@@ -69,7 +69,6 @@ import {getAnchorElement, isOKToLink} from '../../contentInsertionUtils'
 import LinkOptionsTrayController from './components/LinkOptionsTray/LinkOptionsTrayController'
 import {CREATE_LINK, EDIT_LINK} from './components/LinkOptionsDialog/LinkOptionsDialogController'
 import tinymce, {Editor} from 'tinymce'
-import {TsMigrationAny} from '../../../types/ts-migration'
 
 const trayController = new LinkOptionsTrayController()
 
@@ -233,7 +232,7 @@ tinymce.PluginManager.add('instructure_links', function (ed) {
         } else {
           // Type checking is disabled here because the code below isn't type safe. The code below
           // should be updated, specifically rng.endContainer.nextSibling?.tagName
-          const rng = ed.selection.getRng() as TsMigrationAny
+          const rng = ed.selection.getRng() as any
 
           if (
             rng.commonAncestorContainer === rng.endContainer &&

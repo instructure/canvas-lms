@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'underscore'
+import {last, without} from 'lodash'
 import $ from 'jquery'
 
 // To use this, your view must implement a `selectables` method that
@@ -67,7 +67,7 @@ export default {
   selectRange(item) {
     const selectables = this.selectables()
     const newPos = selectables.indexOf(item)
-    const lastPos = selectables.indexOf(_.last(this.state.selectedItems))
+    const lastPos = selectables.indexOf(last(this.state.selectedItems))
     const range = selectables.slice(Math.min(newPos, lastPos), Math.max(newPos, lastPos) + 1)
     // the anchor needs to stay at the end
     if (newPos > lastPos) {
@@ -93,7 +93,7 @@ export default {
       (event && event.target.type) === 'checkbox'
 
     if (leaveOthersAlone && itemIsSelected) {
-      selectedItems = _.without(this.state.selectedItems, item)
+      selectedItems = without(this.state.selectedItems, item)
     } else if (leaveOthersAlone) {
       selectedItems = this.state.selectedItems.slice() // .slice() is to not mutate state directly
       selectedItems.push(item)

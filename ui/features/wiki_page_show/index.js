@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import '@canvas/jquery/jquery.ajaxJSON'
 import ready from '@instructure/ready'
 import '@canvas/context-modules'
 import WikiPage from '@canvas/wiki/backbone/models/WikiPage'

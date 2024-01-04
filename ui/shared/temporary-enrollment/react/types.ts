@@ -43,7 +43,7 @@ export interface Section {
 
 export interface Role {
   id: string
-  role?: string
+  name: string
   label: string
   base_role_name: string
 }

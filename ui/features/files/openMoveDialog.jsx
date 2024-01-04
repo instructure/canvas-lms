@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'underscore'
+import {find} from 'lodash'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import MoveDialog from './react/components/MoveDialog'
@@ -27,7 +27,7 @@ function openMoveDialog(
   thingsToMove,
   {contextType, contextId, returnFocusTo, clearSelectedItems, onMove}
 ) {
-  const rootFolderToShow = _.find(filesEnv.rootFolders, folder => {
+  const rootFolderToShow = find(filesEnv.rootFolders, folder => {
     return (
       `${folder.get('context_type').toLowerCase()}s` === contextType &&
       String(folder.get('context_id')) === String(contextId)

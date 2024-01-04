@@ -29,7 +29,7 @@ module AdheresToPolicy
         @defaults[attr_name] = default_value
 
         define_method attr_name do
-          value = instance_variable_get("@#{attr_name}")
+          value = instance_variable_get(:"@#{attr_name}")
           value.respond_to?(:call) ? value.call : value
         end
       end
@@ -52,7 +52,7 @@ module AdheresToPolicy
 
     def init_defaults
       self.class.defaults.each do |attr_name, default_value|
-        instance_variable_set("@#{attr_name}", default_value)
+        instance_variable_set(:"@#{attr_name}", default_value)
       end
     end
   end

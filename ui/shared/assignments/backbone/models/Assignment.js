@@ -21,6 +21,7 @@
 import {extend} from '@canvas/backbone/utils'
 import $ from 'jquery'
 import _ from 'underscore'
+import {map} from 'lodash'
 import {Model} from '@canvas/backbone'
 import DefaultUrlMixin from '@canvas/backbone/DefaultUrlMixin'
 import TurnitinSettings from '../../TurnitinSettings'
@@ -30,7 +31,7 @@ import AssignmentOverrideCollection from '../collections/AssignmentOverrideColle
 import DateGroupCollection from '@canvas/date-group/backbone/collections/DateGroupCollection'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import GradingPeriodsHelper from '@canvas/grading/GradingPeriodsHelper'
-import tz from '@canvas/timezone'
+import * as tz from '@canvas/datetime'
 import numberHelper from '@canvas/i18n/numberHelper'
 import PandaPubPoller from '@canvas/panda-pub-poller'
 import {matchingToolUrls} from './LtiAssignmentHelpers'
@@ -1076,7 +1077,7 @@ Assignment.prototype.nonBaseDates = function () {
 Assignment.prototype.allDates = function () {
   const groups = this.get('all_dates')
   const models = (groups && groups.models) || []
-  return _.map(models, function (group) {
+  return map(models, function (group) {
     return group.toJSON()
   })
 }

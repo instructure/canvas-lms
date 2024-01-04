@@ -30,6 +30,7 @@ const defaultProps = {
   queryData: {gradingStandard: null},
   setShowTray: () => {},
   handleReadStateChange: () => {},
+  handleRubricReadStateChange: () => {},
   setOpenAssignmentDetailIds: () => {},
   openAssignmentDetailIds: [],
   setSubmissionAssignmentId: () => {},
@@ -49,6 +50,7 @@ const setup = (props = defaultProps) => {
           props.queryData,
           props.setShowTray,
           props.handleReadStateChange,
+          props.handleRubricReadStateChange,
           props.setOpenAssignmentDetailIds,
           props.openAssignmentDetailIds,
           props.setSubmissionAssignmentId,
@@ -121,6 +123,28 @@ describe('AssignmentRow', () => {
 
       const {queryByTestId} = setup({...defaultProps, assignment})
       expect(queryByTestId('rubric_detail_button')).not.toBeInTheDocument()
+    })
+
+    it('shows a badge on the rubric button if there is a new rubric assessment', () => {
+      const assignment = Assignment.mock({
+        submissionsConnection: {
+          nodes: [
+            Submission.mock({
+              hasUnreadRubricAssessment: true,
+              rubricAssessmentsConnection: {
+                nodes: [
+                  {
+                    id: '1',
+                  },
+                ],
+              },
+            })
+          ]
+        }
+      })
+
+      const {queryByTestId} = setup({...defaultProps, assignment})
+      expect(queryByTestId('rubric_detail_button_with_badge')).toBeInTheDocument()
     })
   })
 })

@@ -58,24 +58,6 @@ describe DiscussionEntry do
     expect(topic.discussion_entries.active.length).to eq 1
   end
 
-  it "checks both feature flags for the legacy boolean" do
-    @course = course_model
-    Account.site_admin.enable_feature!(:react_discussions_post)
-    expect(topic.discussion_entries.create(user: user_model).legacy?).to be true
-    Account.site_admin.enable_feature!(:isolated_view)
-    expect(topic.discussion_entries.create(user: user_model).legacy?).to be false
-    @course.disable_feature!(:react_discussions_post)
-    expect(topic.discussion_entries.create(user: user_model).legacy?).to be true
-
-    # Verify that course overrules split_screen_view as well
-    Account.site_admin.disable_feature!(:isolated_view)
-    Account.site_admin.enable_feature!(:split_screen_view)
-    expect(topic.discussion_entries.create(user: user_model).legacy?).to be true
-    # Verify that split_screen_view also returns discussion_entries.legacy as true
-    @course.enable_feature!(:react_discussions_post)
-    expect(topic.discussion_entries.create(user: user_model).legacy?).to be true
-  end
-
   it "preserves parent_id if valid" do
     course_factory
     entry = topic.discussion_entries.create!
@@ -757,7 +739,7 @@ describe DiscussionEntry do
 
     it "does not allow replies from students to topics locked based on date" do
       @entry = @topic.reply_from(user: @teacher, text: "topic")
-      @topic.unlock_at = 1.day.from_now
+      @topic.delayed_post_at = 1.day.from_now
       @topic.save!
       @entry.reply_from(user: @teacher, text: "reply") # should not raise error
       student_in_course(course: @course)

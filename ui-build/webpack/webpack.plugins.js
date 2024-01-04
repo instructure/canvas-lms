@@ -79,7 +79,8 @@ exports.webpackHooks = new WebpackHooks()
 exports.controlAccessBetweenModules = new EsmacPlugin({
   test: /\.[tj]sx?$/,
   include: [
-    resolve(canvasDir, 'ui'),
+    resolve(canvasDir, 'ui/features'),
+    resolve(canvasDir, 'ui/shared'),
     resolve(canvasDir, 'packages'),
     resolve(canvasDir, 'public/javascripts'),
     resolve(canvasDir, 'gems/plugins'),

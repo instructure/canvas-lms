@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import '@canvas/datetime'
+import '@canvas/datetime/jquery'
 import 'jqueryui/dialog'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'

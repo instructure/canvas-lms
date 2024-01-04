@@ -19,14 +19,14 @@
 import React, {useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Popover} from '@instructure/ui-popover'
-import {IconPeerReviewLine, IconCheckLine} from '@instructure/ui-icons'
+import {IconArrowOpenDownLine, IconArrowOpenUpLine, IconCheckLine} from '@instructure/ui-icons'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {Menu} from '@instructure/ui-menu'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
-import {Link} from '@instructure/ui-link'
+import {Button} from '@instructure/ui-buttons'
 import {getPeerReviewUrl} from '../helpers/PeerReviewHelpers'
 import type {AssignedAssessments} from 'api'
 import {AccessibleContent} from '@instructure/ui-a11y-content'
@@ -75,6 +75,8 @@ const NavigationMenuItemLabel = ({
 }
 
 export default ({assignedAssessments, currentAssessmentIndex}: PeerReviewNavigationLinkProps) => {
+  const [togglePeerReviewNavigationMenu, setTogglePeerReviewNavigationMenu] = useState(false)
+
   const renderNavigationMenuItem = (
     assessment: AssignedAssessments,
     index: number,
@@ -115,18 +117,16 @@ export default ({assignedAssessments, currentAssessmentIndex}: PeerReviewNavigat
   return (
     <Popover
       renderTrigger={
-        <View as="div" margin="xx-small 0 xx-small xx-small" data-testid="header-peer-review-link">
-          <View margin="0 xx-small 0 0">
-            <IconPeerReviewLine />
+        <Button data-testid="header-peer-review-link">
+          <View margin="0 x-small 0 0">
+            <Text size="small">{I18n.t('Required Peer Reviews')}</Text>
           </View>
-          <Link as="button" isWithinText={false}>
-            <Text weight="bold" size="small" color="brand">
-              {I18n.t('Required Peer Reviews')}
-            </Text>
-          </Link>
-        </View>
+          {togglePeerReviewNavigationMenu ? <IconArrowOpenUpLine /> : <IconArrowOpenDownLine />}
+        </Button>
       }
       on="click"
+      onShowContent={() => setTogglePeerReviewNavigationMenu(true)}
+      onHideContent={() => setTogglePeerReviewNavigationMenu(false)}
       placement="bottom end"
     >
       <Menu>

@@ -37,7 +37,7 @@ module Factories
           "answers" => [{ "id" => 1 }, { "id" => 2 }]
         }
       )
-      instance_variable_set("@q#{i}", q)
+      instance_variable_set(:"@q#{i}", q)
     end
 
     @bank

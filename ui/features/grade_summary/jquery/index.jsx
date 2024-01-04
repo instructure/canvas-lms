@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'underscore'
+import {forEach, find, extend as lodashExtend} from 'lodash'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.instructure_misc_helpers' /* replaceTags */
@@ -522,7 +522,9 @@ function calculateTotals(calculatedGrades, currentOrFinal, groupWeightingScheme)
         `<span class='submission-custom-grade-status-pill-${ENV.final_override_custom_grade_status_id}'></span>`
       )
 
-    const matchingCustomStatus = ENV?.custom_grade_statuses?.find(status => status.id === ENV.final_override_custom_grade_status_id)
+    const matchingCustomStatus = ENV?.custom_grade_statuses?.find(
+      status => status.id === ENV.final_override_custom_grade_status_id
+    )
     if (matchingCustomStatus?.allow_final_grade_value === false) {
       $finalGradeRow.find('.grade').text('-')
     }
@@ -573,8 +575,8 @@ function updateStudentGrades() {
   // mark dropped assignments
   $('.student_assignment').find('.points_possible').attr('aria-label', '')
 
-  _.forEach(calculatedGrades.assignmentGroups, grades => {
-    _.forEach(grades[currentOrFinal].submissions, submission => {
+  forEach(calculatedGrades.assignmentGroups, grades => {
+    forEach(grades[currentOrFinal].submissions, submission => {
       $(`#submission_${submission.submission.assignment_id}`).toggleClass(
         'dropped',
         !!submission.drop
@@ -591,7 +593,7 @@ function updateStudentGrades() {
 }
 
 function updateScoreForAssignment(assignmentId, score, workflowStateOverride) {
-  const submission = _.find(ENV.submissions, s => `${s.assignment_id}` === `${assignmentId}`)
+  const submission = find(ENV.submissions, s => `${s.assignment_id}` === `${assignmentId}`)
 
   if (submission) {
     submission.score = score
@@ -942,7 +944,7 @@ function setup() {
   })
 }
 
-export default _.extend(GradeSummary, {
+export default lodashExtend(GradeSummary, {
   setup,
   getGradingPeriodSet,
   canBeConvertedToGrade,

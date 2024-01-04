@@ -19,8 +19,8 @@
 /* eslint-disable no-void */
 
 import {extend} from '@canvas/backbone/utils'
+import _, {clone, keys} from 'lodash'
 import $ from 'jquery'
-import _ from 'underscore'
 import FilesystemObject from './FilesystemObject'
 import {uploadFile} from '@canvas/upload-file'
 import '@canvas/jquery/jquery.ajaxJSON'
@@ -110,14 +110,12 @@ File.prototype.toJSON = function () {
   // eslint-disable-next-line prefer-spread
   return _.pick.apply(
     _,
-    [this.attributes, 'file'].concat(
-      slice.call(_.keys((ref = this.uploadParams) != null ? ref : {}))
-    )
+    [this.attributes, 'file'].concat(slice.call(keys((ref = this.uploadParams) != null ? ref : {})))
   )
 }
 
 File.prototype.present = function () {
-  return _.clone(this.attributes)
+  return clone(this.attributes)
 }
 
 File.prototype.externalToolEnabled = function (tool) {

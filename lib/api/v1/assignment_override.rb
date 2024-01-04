@@ -171,7 +171,7 @@ module Api::V1::AssignmentOverride
     end
 
     if !set_type && data.key?(:group_id) && data[:group_id].present?
-      group_category_id = assignment.group_category_id || assignment.discussion_topic.try(:group_category_id)
+      group_category_id = assignment.effective_group_category_id
       if group_category_id
         set_type = "Group"
         # look up the group
@@ -352,9 +352,9 @@ module Api::V1::AssignmentOverride
 
     %i[due_at unlock_at lock_at].each do |field|
       if override_data.key?(field)
-        override.send("override_#{field}", override_data[field])
+        override.send(:"override_#{field}", override_data[field])
       else
-        override.send("clear_#{field}_override")
+        override.send(:"clear_#{field}_override")
       end
     end
   end

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import PropTypes, {InferType} from 'prop-types'
+import PropTypes from 'prop-types'
 import {trayPropTypes} from './plugins/shared/CanvasContentTray'
 import {PRETTY_HTML_EDITOR_VIEW, RAW_HTML_EDITOR_VIEW, WYSIWYG_VIEW} from './StatusBar'
 
@@ -39,7 +39,10 @@ export const toolbarPropType = PropTypes.arrayOf(
   })
 )
 
-export type ToolbarPropType = InferType<typeof toolbarPropType>
+export type ToolbarPropType = {
+  name: string
+  items: string[]
+}
 
 export const menuPropType = PropTypes.objectOf(
   // the key is the name of the menu item a plugin has
@@ -55,7 +58,14 @@ export const menuPropType = PropTypes.objectOf(
   })
 )
 
-export type MenuPropType = InferType<typeof menuPropType>
+export interface MenuItem {
+  title?: string
+  items: string
+}
+
+export type MenuPropType = {
+  [key: string]: MenuItem
+}
 
 export const ltiToolsPropType = PropTypes.arrayOf(
   PropTypes.shape({
@@ -83,7 +93,25 @@ export const ltiToolsPropType = PropTypes.arrayOf(
   })
 )
 
-export type LtiToolsPropType = InferType<typeof ltiToolsPropType>
+export interface CanvasIconClass {
+  icon_url: string
+}
+
+export type IconClassType = string | CanvasIconClass | any
+
+export interface LtiTool {
+  id: string | number
+  favorite: boolean
+  name: string
+  description: string
+  icon_url: string
+  height: number
+  width: number
+  use_tray: boolean
+  canvas_icon_class: IconClassType
+}
+
+export type LtiToolsPropType = LtiTool[]
 
 export const editorOptionsPropType = PropTypes.shape({
   // height of the RCE.
@@ -108,7 +136,16 @@ export const editorOptionsPropType = PropTypes.shape({
   init_instance_callback: PropTypes.func,
 })
 
-export type EditorOptionsPropType = InferType<typeof editorOptionsPropType>
+export type HeightType = number | string
+export interface EditorOptionsPropType {
+  height: HeightType
+  toolbar: ToolbarPropType
+  menu: MenuPropType
+  plugins: string[]
+  readonly: boolean
+  selector: string
+  init_instance_callback: () => void
+}
 
 export const externalToolsConfigPropType = PropTypes.shape({
   // List of iframe allow statements to used with LTI iframes.
@@ -124,7 +161,13 @@ export const externalToolsConfigPropType = PropTypes.shape({
   maxMruTools: PropTypes.number,
 })
 
-export type ExternalToolsConfigPropType = InferType<typeof externalToolsConfigPropType>
+export type ExternalToolsConfig = {
+  ltiIframeAllowances: string[]
+  containingCanvasLtiToolId: string
+  resourceSelectionUrlOverride: string
+  isA2StudentView: boolean
+  maxMruTools: number
+}
 
 export const rceWrapperPropTypes = {
   autosave: PropTypes.shape({

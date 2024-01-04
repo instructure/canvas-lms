@@ -62,7 +62,7 @@ describe "scheduler" do
 
       calendar_create_event_button.click
       wait_for_ajax_requests
-      f(".edit_appointment_group_option").click
+      appointment_group_tab_button.click
 
       set_value(f('input[name="title"]'), title)
       set_value(f('input[name="location"]'), location)
@@ -120,6 +120,29 @@ describe "scheduler" do
       expect(f(".event-detail-overflow a")).to have_attribute("href", "http://google.com/submit")
       calendar_edit_event_link.click
       expect(f("#edit_appt_calendar_event_form textarea")).to include_text(description)
+    end
+
+    it "lets teachers allow observers to sign up only when selected contexts allow it" do
+      course1 = @course
+      course1.account.settings[:allow_observers_in_appointment_groups] = { value: true }
+      course1.account.save!
+      account2 = Account.default.sub_accounts.create!
+      account2.settings[:allow_observers_in_appointment_groups] = { value: false }
+      account2.settings[:show_scheduler] = true
+      account2.save!
+      course2 = course_factory(account: account2, active_all: true, name: "Course 2")
+      course2.enroll_teacher(@user, enrollment_state: "active")
+      get "/calendar"
+
+      calendar_create_event_button.click
+      wait_for_ajax_requests
+      appointment_group_tab_button.click
+
+      expect(allow_observer_signup_checkbox).not_to be_displayed
+      select_context_in_context_selector(course1.id)
+      expect(allow_observer_signup_checkbox).to be_displayed
+      select_context_in_context_selector(course2.id)
+      expect(allow_observer_signup_checkbox).not_to be_displayed
     end
   end
 end

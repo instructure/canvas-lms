@@ -260,6 +260,7 @@ module Lti::IMS
                                     "tool_id" => "Example Tool"
                                   }],
                                   "oidc_initiation_url" => "http://example.com/login",
+                                  "privacy_level" => "anonymous",
                                   "public_jwk_url" => "http://example.com/jwks",
                                   "scopes" => [],
                                   "target_link_uri" => nil,

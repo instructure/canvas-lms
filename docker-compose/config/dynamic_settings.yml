@@ -11,8 +11,8 @@ development:
     canvas:
       # prefix
       address-book:
-        app-host: "http://address-book.docker"
-        secret: "opensesame"
+        app-host: 'http://address-book.docker'
+        secret: 'opensesame'
       live_events.yml: |-
         aws_endpoint: http://kinesis.canvaslms.docker
         kinesis_stream_name: live-events
@@ -20,17 +20,14 @@ development:
         aws_secret_access_key_dec: secret
         # stub_credentials: true # can be used in dev to print creds to stdout
       live-events-subscription-service:
-        app-host: "http://les.docker"
+        app-host: 'http://les.docker'
         sad-panda: null
       math-man:
-        base_url: "http://mathman.docker"
-        use_for_svg: "false"
-        use_for_mml: "false"
-      microsoft-sync:
-        client-id: some_client_id
-        client-secret: some_client_secret
+        base_url: 'http://mathman.docker'
+        use_for_svg: 'false'
+        use_for_mml: 'false'
       rich-content-service:
-        app-host: "http://rce.canvas.docker:3000"
+        app-host: 'http://rce.canvas.docker:3000'
     # another service
     pandata:
       ios-pandata-key: IOS_pandata_key

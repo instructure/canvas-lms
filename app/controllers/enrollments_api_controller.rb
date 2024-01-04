@@ -519,7 +519,7 @@ class EnrollmentsApiController < ApplicationController
       enrollments = Api.paginate(
         collection,
         self,
-        send("api_v1_#{endpoint_scope}_enrollments_url")
+        send(:"api_v1_#{endpoint_scope}_enrollments_url")
       )
 
       ActiveRecord::Associations.preload(enrollments, %i[user course course_section root_account sis_pseudonym])

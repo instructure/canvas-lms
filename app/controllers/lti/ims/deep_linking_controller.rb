@@ -60,7 +60,7 @@ module Lti
         # * not reload the page
         unless create_resources_from_content_items?
           lti_resource_links.each do |content_item|
-            resource_link = Lti::ResourceLink.create_with(context, tool, content_item[:custom], content_item[:url])
+            resource_link = Lti::ResourceLink.create_with(context, tool, content_item[:custom], content_item[:url], content_item[:title])
             content_item[:lookup_uuid] = resource_link&.lookup_uuid
           end
 

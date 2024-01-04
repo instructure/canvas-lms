@@ -106,6 +106,7 @@ require "sharding_spec_helper"
 # let/before/example
 TestDatabaseUtils.reset_database! unless ENV["DB_VALIDITY_ENSURED"] == "1"
 TestDatabaseUtils.check_migrations! unless ENV["DB_VALIDITY_ENSURED"] == "1"
+Setting.reset_cache!
 BlankSlateProtection.install!
 GreatExpectations.install!
 

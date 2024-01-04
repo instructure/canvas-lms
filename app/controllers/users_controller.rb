@@ -1462,7 +1462,8 @@ class UsersController < ApplicationController
 
   def external_tool
     timing_start = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-    @tool = ContextExternalTool.find_for(params[:id], @domain_root_account, :user_navigation)
+    placement = :user_navigation
+    @tool = ContextExternalTool.find_for(params[:id], @domain_root_account, placement)
     @opaque_id = @tool.opaque_identifier_for(@current_user, context: @domain_root_account)
     @resource_type = "user_navigation"
 
@@ -1489,7 +1490,7 @@ class UsersController < ApplicationController
                                                     current_user: @current_user,
                                                     current_pseudonym: @current_pseudonym,
                                                     tool: @tool,
-                                                    placement: :user_navigation
+                                                    placement:
                                                   })
     Canvas::LiveEvents.asset_access(@tool, "external_tools", @current_user.class.name, nil)
     adapter = if @tool.use_1_3?
@@ -1509,10 +1510,10 @@ class UsersController < ApplicationController
               end
 
     @lti_launch.params = adapter.generate_post_payload
-    @lti_launch.resource_url = @tool.login_or_launch_url(extension_type: :user_navigation)
-    @lti_launch.link_text = @tool.label_for(:user_navigation, I18n.locale)
+    @lti_launch.resource_url = @tool.login_or_launch_url(extension_type: placement)
+    @lti_launch.link_text = @tool.label_for(placement, I18n.locale)
     @lti_launch.analytics_id = @tool.tool_id
-    InstStatsd::Statsd.increment("lti.launch", tags: { lti_version: @tool.lti_version, type: :user_navigation })
+    Lti::LogService.new(tool: @tool, context: @domain_root_account, user: @current_user, placement:, launch_type: :direct_link).call
 
     set_active_tab @tool.asset_string
     add_crumb(@current_user.short_name, user_profile_path(@current_user))

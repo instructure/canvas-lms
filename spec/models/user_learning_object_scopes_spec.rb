@@ -995,10 +995,10 @@ describe UserLearningObjectScopes do
 
       context "locked discussion topics" do
         it "shows for ungraded discussion topics with unlock dates and todo dates within the opts date range" do
-          @topic.unlock_at = 1.day.from_now
+          @topic.delayed_post_at = 1.day.from_now
           @topic.todo_date = 1.day.from_now
           @topic.save!
-          @group_topic.unlock_at = 1.day.from_now
+          @group_topic.delayed_post_at = 1.day.from_now
           @group_topic.todo_date = 1.day.from_now
           @group_topic.save!
           expect(@student.discussion_topics_needing_viewing(**opts).sort_by(&:id)).to eq [@topic, @group_topic, @a]

@@ -17,7 +17,7 @@
  */
 
 import axios from '@canvas/axios'
-import timezone from '@canvas/timezone'
+import * as timezone from '@canvas/datetime'
 import type {SubmissionComment, SubmissionCommentData} from '../../../../../api.d'
 import type {SerializedComment} from '../gradebook.d'
 
@@ -30,9 +30,11 @@ function deserializeComment(comment: SubmissionComment): SerializedComment {
   }
 
   if (!comment.author) {
+    // @ts-expect-error
     return baseComment
   }
 
+  // @ts-expect-error
   return {
     ...baseComment,
     authorId: comment.author.id,

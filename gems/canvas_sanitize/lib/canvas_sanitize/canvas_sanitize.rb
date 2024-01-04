@@ -262,7 +262,7 @@ module CanvasSanitize # :nodoc:
       "ul" => ["type"].freeze,
       "param" => ["name", "value"].freeze,
       "object" => %w[width height style data type classid codebase].freeze,
-      "source" => %w[media sizes src srcset type].freeze,
+      "source" => %w[media width height sizes src srcset type].freeze,
       "embed" => %w[name
                     src
                     type

@@ -47,7 +47,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   has_many :quiz_regrades, class_name: "Quizzes::QuizRegrade"
   has_many :quiz_student_visibilities
   belongs_to :context, polymorphic: [:course]
-  belongs_to :assignment, inverse_of: :quiz
+  belongs_to :assignment, inverse_of: :quiz, class_name: "AbstractAssignment"
   belongs_to :assignment_group
   belongs_to :root_account, class_name: "Account"
   has_many :ignores, as: :asset

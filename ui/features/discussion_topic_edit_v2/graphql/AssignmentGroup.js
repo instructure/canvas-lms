@@ -23,15 +23,18 @@ export const AssignmentGroup = {
   fragment: gql`
     fragment AssignmentGroup on AssignmentGroup {
       _id
+      id
       name
     }
   `,
   shape: {
     _id: string,
+    id: string,
     name: string,
   },
-  mock: () => ({
-    _id: '1',
-    name: 'Homework',
+  mock: ({_id = '1', id = '1', name = 'Homework'} = {}) => ({
+    _id,
+    id,
+    name,
   }),
 }

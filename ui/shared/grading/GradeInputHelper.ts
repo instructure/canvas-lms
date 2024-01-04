@@ -23,7 +23,7 @@ import {scoreToGrade} from '@instructure/grading-utils'
 import numberHelper from '@canvas/i18n/numberHelper'
 import type {GradeInput, GradeResult} from './grading.d'
 import {EnvGradebookCommon} from '@canvas/global/env/EnvGradebook'
-import {GlobalEnv} from '@canvas/global/env/GlobalEnv'
+import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 
 // Allow unchecked access to ENV variables that should exist in this context
 declare const ENV: GlobalEnv & EnvGradebookCommon

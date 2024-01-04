@@ -18,7 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import _ from 'underscore'
+import {debounce} from 'lodash'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('SearchGradingPeriodsField')
@@ -33,7 +33,7 @@ export default class SearchGradingPeriodsField extends React.Component {
     this.search(trimmedText)
   }
 
-  search = _.debounce(function (trimmedText) {
+  search = debounce(function (trimmedText) {
     this.props.changeSearchText(trimmedText)
   }, 200)
 

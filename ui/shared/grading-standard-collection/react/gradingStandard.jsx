@@ -24,6 +24,7 @@ import DataRow from './dataRow'
 import $ from 'jquery'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import _ from 'underscore'
+import {map} from 'lodash'
 import splitAssetString from '@canvas/util/splitAssetString'
 
 const I18n = useI18nScope('gradinggradingStandard')
@@ -130,7 +131,7 @@ class GradingStandard extends React.Component {
 
   rowDataIsValid = () => {
     if (this.state.editingStandard.data.length <= 1) return true
-    const rowValues = _.map(this.state.editingStandard.data, dataRow => String(dataRow[1]).trim())
+    const rowValues = map(this.state.editingStandard.data, dataRow => String(dataRow[1]).trim())
     const sanitizedRowValues = _.chain(rowValues).compact().uniq().value()
     const inputsAreUniqueAndNonEmpty = sanitizedRowValues.length === rowValues.length
     const valuesDoNotOverlap = !_.some(this.state.editingStandard.data, (element, index, list) => {
@@ -144,7 +145,7 @@ class GradingStandard extends React.Component {
   }
 
   rowNamesAreValid = () => {
-    const rowNames = _.map(this.state.editingStandard.data, dataRow => dataRow[0].trim())
+    const rowNames = map(this.state.editingStandard.data, dataRow => dataRow[0].trim())
     const sanitizedRowNames = _.chain(rowNames).compact().uniq().value()
     return sanitizedRowNames.length === rowNames.length
   }

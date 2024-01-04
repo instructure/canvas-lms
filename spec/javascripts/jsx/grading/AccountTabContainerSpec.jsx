@@ -21,13 +21,13 @@ import React from 'react'
 import {mount} from 'enzyme'
 import $ from 'jquery'
 import axios from '@canvas/axios'
-import _ from 'lodash'
+import {defaults} from 'lodash'
 import AccountTabContainer from 'ui/features/account_grading_standards/react/AccountTabContainer'
 import 'jqueryui/tabs'
 
 QUnit.module('AccountTabContainer', {
   renderComponent(props = {}) {
-    const defaults = {
+    const defaults_ = {
       readOnly: false,
       urls: {
         gradingPeriodSetsURL: 'api/v1/accounts/1/grading_period_sets',
@@ -37,7 +37,7 @@ QUnit.module('AccountTabContainer', {
         deleteGradingPeriodURL: 'api/v1/accounts/1/grading_periods/%7B%7B%20id%20%7D%7D',
       },
     }
-    const mergedProps = _.defaults(props, defaults)
+    const mergedProps = defaults(props, defaults_)
 
     this.wrapper = mount(<AccountTabContainer {...mergedProps} />)
   },

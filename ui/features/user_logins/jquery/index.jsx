@@ -22,7 +22,7 @@ import ReactDOM from 'react-dom'
 import SuspendedIcon from '../react/SuspendedIcon'
 import $ from 'jquery'
 import Pseudonym from '@canvas/pseudonyms/backbone/models/Pseudonym'
-import '@canvas/forms/jquery/jquery.instructure_forms' /* formSubmit, fillFormData, formErrors */
+import '@canvas/jquery/jquery.instructure_forms' /* formSubmit, fillFormData, formErrors */
 import 'jqueryui/dialog'
 import '@canvas/util/jquery/fixDialogButtons'
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* confirmDelete, showIf */

@@ -29,8 +29,7 @@ describe MicrosoftSync::LoginService do
 
     context "when not configured" do
       before do
-        allow(DynamicSettings).to receive(:find).with(any_args).and_call_original
-        allow(DynamicSettings).to receive(:find).with("microsoft-sync").and_return(nil)
+        allow(Rails.application.credentials).to receive(:microsoft_sync).and_return(nil)
       end
 
       it 'returns an error "MicrosoftSync not configured"' do
@@ -45,16 +44,14 @@ describe MicrosoftSync::LoginService do
 
       before do
         allow(InstStatsd::Statsd).to receive(:increment)
+        allow(Rails.application.credentials).to receive(:microsoft_sync).and_return({
+                                                                                      client_id: "theclientid",
+                                                                                      client_secret: "thesecret"
+                                                                                    })
       end
 
       context "when Microsoft returns a response" do
         before do
-          allow(DynamicSettings).to receive(:find).with(any_args).and_call_original
-          allow(DynamicSettings).to receive(:find).with("microsoft-sync").and_return({
-                                                                                       "client-id" => "theclientid",
-                                                                                       "client-secret" => "thesecret"
-                                                                                     })
-
           WebMock.stub_request(
             :post, "https://login.microsoftonline.com/mytenant/oauth2/v2.0/token"
           ).with(

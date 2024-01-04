@@ -51,6 +51,10 @@ describe('ContentMigrationTable', () => {
   // This is used to mock the result INST-UI Responsive component for rendering
   const originalMediaResult = window.matchMedia('(min-width: 768px)')
 
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
+
   beforeAll(() => {
     setMigrationsMock = jest.fn(() => {})
     window.ENV.COURSE_ID = '0'
@@ -97,7 +101,7 @@ describe('ContentMigrationTable', () => {
 
       expect(fetchMock.called('/api/v1/courses/0/content_migrations?per_page=25', 'GET')).toBe(true)
       await waitFor(() => {
-        expect(setMigrationsMock).toHaveBeenCalledWith(['api_return'])
+        expect(setMigrationsMock).toHaveBeenCalledWith(expect.any(Function))
       })
     })
   })
@@ -130,7 +134,7 @@ describe('ContentMigrationTable', () => {
 
       expect(fetchMock.called('/api/v1/courses/0/content_migrations?per_page=25', 'GET')).toBe(true)
       await waitFor(() => {
-        expect(setMigrationsMock).toHaveBeenCalledWith(['api_return'])
+        expect(setMigrationsMock).toHaveBeenCalledWith(expect.any(Function))
       })
     })
   })

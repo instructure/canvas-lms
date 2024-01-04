@@ -35,7 +35,7 @@ import {Text} from '@instructure/ui-text'
 import {ThreadActions} from '../../components/ThreadActions/ThreadActions'
 import {ThreadingToolbar} from '../../components/ThreadingToolbar/ThreadingToolbar'
 import {
-  UPDATE_ISOLATED_VIEW_DEEPLY_NESTED_ALERT,
+  UPDATE_SPLIT_SCREEN_VIEW_DEEPLY_NESTED_ALERT,
   UPDATE_DISCUSSION_THREAD_READ_STATE,
   UPDATE_DISCUSSION_ENTRY_PARTICIPANT,
 } from '../../../graphql/Mutations'
@@ -48,7 +48,7 @@ const I18n = useI18nScope('discussion_posts')
 
 export const SplitScreenParent = props => {
   const [updateSplitScreenViewDeeplyNestedAlert] = useMutation(
-    UPDATE_ISOLATED_VIEW_DEEPLY_NESTED_ALERT
+    UPDATE_SPLIT_SCREEN_VIEW_DEEPLY_NESTED_ALERT
   )
 
   const client = useApolloClient()
@@ -172,7 +172,7 @@ export const SplitScreenParent = props => {
                 onDismiss={() => {
                   updateSplitScreenViewDeeplyNestedAlert({
                     variables: {
-                      isolatedViewDeeplyNestedAlert: false,
+                      splitScreenViewDeeplyNestedAlert: false,
                     },
                   })
 
@@ -260,7 +260,7 @@ export const SplitScreenParent = props => {
                         props.moreOptionsButtonRef?.current?.focus()
                       }, 0)
                     }}
-                    isIsolatedView={true}
+                    isSplitView={true}
                     editor={props.discussionEntry.editor}
                     isUnread={!props.discussionEntry.entryParticipant?.read}
                     isForcedRead={props.discussionEntry.entryParticipant?.forcedReadState}
@@ -278,7 +278,6 @@ export const SplitScreenParent = props => {
                       props.discussionTopic.author,
                       props.discussionEntry.author
                     )}
-                    updateDraftCache={props.updateDraftCache}
                     quotedEntry={props.discussionEntry.quotedEntry}
                     attachment={props.discussionEntry.attachment}
                   >
@@ -286,7 +285,7 @@ export const SplitScreenParent = props => {
                       <View as="div" padding="0">
                         <ThreadingToolbar
                           discussionEntry={props.discussionEntry}
-                          isIsolatedView={true}
+                          isSplitView={true}
                         >
                           {threadActions}
                         </ThreadingToolbar>
@@ -335,7 +334,6 @@ SplitScreenParent.propTypes = {
   setRCEOpen: PropTypes.func,
   isHighlighted: PropTypes.bool,
   goToTopic: PropTypes.func,
-  updateDraftCache: PropTypes.func,
   replyButtonRef: PropTypes.any,
   moreOptionsButtonRef: PropTypes.any,
 }

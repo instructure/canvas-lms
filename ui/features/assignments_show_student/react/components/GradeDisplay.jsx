@@ -40,7 +40,7 @@ export default function PointsDisplay(props) {
         strip_insignificant_zeros: true,
       })
       return I18n.t(
-        {one: '*1* Possible Point', other: '*%{formattedPoints}* Possible Points'},
+        {one: '*1* Point Possible', other: '*%{formattedPoints}* Points Possible'},
         {
           count: props.pointsPossible,
           formattedPoints,
@@ -103,9 +103,11 @@ export default function PointsDisplay(props) {
       props.gradingType === 'points' &&
       props.receivedGrade != null
     ) {
-      return I18n.t('%{formattedGrade} *Points*', {
+      return I18n.t('*%{formattedGrade}*', {
         formattedGrade,
-        wrappers: [forScreenReader ? '$1' : '<span class="points-text">$1</span>'],
+        wrappers: [
+          forScreenReader ? '$1' : '<span class="points-value"><strong>$1</strong> Points</span>',
+        ],
       }).string
     } else {
       return formattedGrade
@@ -121,7 +123,7 @@ export default function PointsDisplay(props) {
             dangerouslySetInnerHTML={{__html: formatGrade()}}
             data-testid="grade-display"
             lineHeight="fit"
-            size="x-large"
+            size={window.ENV.FEATURES.instui_nav ? 'medium' : 'x-large'}
             transform="capitalize"
           />
         </Flex.Item>

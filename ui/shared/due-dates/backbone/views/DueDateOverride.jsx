@@ -22,15 +22,15 @@ import Backbone from '@canvas/backbone'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import DueDateOverride from '@canvas/assignments/jst/DueDateOverride.handlebars'
-import DateValidator from '@canvas/datetime/DateValidator'
+import DateValidator from '@canvas/grading/DateValidator'
 import ValidatedMixin from '@canvas/forms/backbone/views/ValidatedMixin'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import DueDates from '../../react/DueDates'
 import CoursePacingNotice from '../../react/CoursePacingNotice'
 import StudentGroupStore from '../../react/StudentGroupStore'
 import GradingPeriodsAPI from '@canvas/grading/jquery/gradingPeriodsApi'
-import tz from '@canvas/timezone'
-import '@canvas/forms/jquery/jquery.instructure_forms'
+import * as tz from '@canvas/datetime'
+import '@canvas/jquery/jquery.instructure_forms'
 
 const I18n = useI18nScope('DueDateOverrideView')
 

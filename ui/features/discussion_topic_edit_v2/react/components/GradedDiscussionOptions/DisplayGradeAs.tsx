@@ -54,6 +54,7 @@ type Props = {
 export const DisplayGradeAs = ({displayGradeAs, setDisplayGradeAs}: Props) => {
   return (
     <SimpleSelect
+      data-testid="display-grade-input"
       renderLabel={I18n.t('Display Grade As')}
       value={displayGradeAs}
       onChange={(_event, {id}) => setDisplayGradeAs(id)}

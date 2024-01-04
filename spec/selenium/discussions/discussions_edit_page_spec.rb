@@ -401,7 +401,218 @@ describe "discussions" do
         user_session(teacher)
       end
 
+      context "ungraded" do
+        before do
+          attachment_model
+          # TODO: Update to cover: graded, group discussions, file attachment, any other options later implemented
+          all_discussion_options_enabled = {
+            title: "value for title",
+            message: "value for message",
+            is_anonymous_author: false,
+            anonymous_state: "full_anonymity",
+            todo_date: "Thu, 12 Oct 2023 15:59:59.000000000 UTC +00:00",
+            allow_rating: true,
+            only_graders_can_rate: true,
+            podcast_enabled: true,
+            podcast_has_student_posts: true,
+            require_initial_post: true,
+            discussion_type: "side_comment",
+            delayed_post_at: "Tue, 10 Oct 2023 16:00:00.000000000 UTC +00:00",
+            lock_at: "Wed, 11 Nov 2023 15:59:59.999999000 UTC +00:00",
+            is_section_specific: false,
+            attachment: @attachment
+          }
+
+          @topic_all_options = course.discussion_topics.create!(all_discussion_options_enabled)
+          @topic_no_options = course.discussion_topics.create!(title: "no options enabled - topic", message: "test")
+        end
+
+        it "displays all selected options correctly" do
+          get "/courses/#{course.id}/discussion_topics/#{@topic_all_options.id}/edit"
+
+          expect(f("input[value='full_anonymity']").selected?).to be_truthy
+          expect(f("input[value='full_anonymity']").attribute("disabled")).to eq "true"
+
+          expect(f("input[value='must-respond-before-viewing-replies']").selected?).to be_truthy
+          expect(f("input[value='enable-podcast-feed']").selected?).to be_truthy
+          expect(f("input[value='include-student-replies-in-podcast-feed']").selected?).to be_truthy
+          expect(f("input[value='allow-liking']").selected?).to be_truthy
+          expect(f("input[value='only-graders-can-like']").selected?).to be_truthy
+          expect(f("input[value='add-to-student-to-do']").selected?).to be_truthy
+
+          # Just checking for a value. Formatting and TZ differences between front-end and back-end
+          # makes an exact comparison too fragile.
+          expect(ff("input[placeholder='Select Date']")[0].attribute("value")).to be_truthy
+          expect(ff("input[placeholder='Select Date']")[1].attribute("value")).to be_truthy
+        end
+
+        it "displays all unselected options correctly" do
+          get "/courses/#{course.id}/discussion_topics/#{@topic_no_options.id}/edit"
+
+          expect(f("input[value='full_anonymity']").selected?).to be_falsey
+          expect(f("input[value='full_anonymity']").attribute("disabled")).to eq "true"
+
+          # There are less checks here because certain options are only visible if their parent input is selected
+          expect(f("input[value='must-respond-before-viewing-replies']").selected?).to be_falsey
+          expect(f("input[value='enable-podcast-feed']").selected?).to be_falsey
+          expect(f("input[value='allow-liking']").selected?).to be_falsey
+          expect(f("input[value='add-to-student-to-do']").selected?).to be_falsey
+
+          # Just checking for a value. Formatting and TZ differences between front-end and back-end
+          # makes an exact comparison too fragile.
+          expect(ff("input[placeholder='Select Date']")[0].attribute("value")).to eq("")
+          expect(ff("input[placeholder='Select Date']")[1].attribute("value")).to eq("")
+        end
+
+        context "usage rights" do
+          before do
+            course.root_account.enable_feature!(:usage_rights_discussion_topics)
+            course.update!(usage_rights_required: true)
+
+            usage_rights = @course.usage_rights.create! use_justification: "creative_commons", legal_copyright: "(C) 2014 XYZ Corp", license: "cc_by_nd"
+            @attachment.usage_rights = usage_rights
+            @attachment.save!
+          end
+
+          it "displays correct usage rights" do
+            get "/courses/#{course.id}/discussion_topics/#{@topic_all_options.id}/edit"
+
+            expect(f("button[data-testid='usage-rights-icon']")).to be_truthy
+            f("button[data-testid='usage-rights-icon']").find_element(css: "svg")
+            # Verify that the correct icon appears
+            expect(f("button[data-testid='usage-rights-icon']").find_element(css: "svg").attribute("name")).to eq "IconFilesCreativeCommons"
+
+            f("button[data-testid='usage-rights-icon']").click
+
+            expect(f("input[data-testid='usage-select']").attribute("value")).to eq "The material is licensed under Creative Commons"
+            expect(f("input[data-testid='cc-license-select']").attribute("value")).to eq "CC Attribution No Derivatives"
+            expect(f("input[data-testid='legal-copyright']").attribute("value")).to eq "(C) 2014 XYZ Corp"
+          end
+        end
+      end
+
+      context "ungraded group" do
+        it "displays the selected group category correctly" do
+          group_category = course.group_categories.create!(name: "group category 1")
+
+          discussion_with_group_category = {
+            title: "value for title",
+            message: "value for message",
+            group_category_id: group_category.id,
+          }
+
+          group_topic = course.discussion_topics.create!(discussion_with_group_category)
+          group_topic.update!(group_category_id: group_category.id)
+
+          get "/courses/#{course.id}/discussion_topics/#{group_topic.id}/edit"
+
+          expect(f("input[value='group-discussion']").selected?).to be_truthy
+          expect(f("input[placeholder='Select a group category']").attribute("title")).to eq group_category.name
+        end
+      end
+
+      context "announcememnt" do
+        before do
+          # TODO: Update to cover: file attachments and any other options later implemented
+          all_announcement_options = {
+            title: "value for title",
+            message: "value for message",
+            delayed_post_at: "Thu, 16 Nov 2023 17:00:00.000000000 UTC +00:00",
+            podcast_enabled: true,
+            podcast_has_student_posts: true,
+            require_initial_post: true,
+            discussion_type: "side_comment",
+            allow_rating: true,
+            only_graders_can_rate: true,
+            locked: false,
+          }
+
+          @announcement_all_options = course.announcements.create!(all_announcement_options)
+          # In this case, locked: true displays itself as an unchecked "allow participants to comment" option
+          @announcement_no_options = course.announcements.create!({ title: "no options", message: "nothing else", locked: true })
+        end
+
+        it "displays all selected options correctly" do
+          get "/courses/#{course.id}/discussion_topics/#{@announcement_all_options.id}/edit"
+
+          expect(f("input[value='enable-delay-posting']").selected?).to be_truthy
+          expect(f("input[value='enable-participants-commenting']").selected?).to be_truthy
+          expect(f("input[value='must-respond-before-viewing-replies']").selected?).to be_truthy
+          expect(f("input[value='allow-liking']").selected?).to be_truthy
+          expect(f("input[value='only-graders-can-like']").selected?).to be_truthy
+          expect(f("input[value='enable-podcast-feed']").selected?).to be_truthy
+          expect(f("input[value='include-student-replies-in-podcast-feed']").selected?).to be_truthy
+
+          # Just checking for a value. Formatting and TZ differences between front-end and back-end
+          # makes an exact comparison too fragile.
+          expect(ff("input[placeholder='Select Date']")[0].attribute("value")).to be_truthy
+        end
+
+        it "displays all unselected options correctly" do
+          get "/courses/#{course.id}/discussion_topics/#{@announcement_no_options.id}/edit"
+
+          expect(f("input[value='enable-delay-posting']").selected?).to be_falsey
+          expect(f("input[value='enable-participants-commenting']").selected?).to be_falsey
+          expect(f("input[value='must-respond-before-viewing-replies']").selected?).to be_falsey
+          expect(f("input[value='allow-liking']").selected?).to be_falsey
+          expect(f("input[value='enable-podcast-feed']").selected?).to be_falsey
+        end
+      end
+
       context "graded" do
+        it "displays graded assignment options correctly when initially opening edit page" do
+          discussion_assignment_options = {
+            name: "assignment",
+            points_possible: 10,
+            grading_type: "percent",
+            assignment_group: course.assignment_groups.create!(name: "assignment group"),
+          }
+
+          discussion_assignment_peer_review_options = {
+            peer_reviews: true,
+            automatic_peer_reviews: true,
+            peer_reviews_due_at: 1.day.ago,
+            peer_review_count: 2,
+          }
+
+          discussion_assignment_options = discussion_assignment_options.merge(discussion_assignment_peer_review_options)
+          discussion_assignment = course.assignments.create!(discussion_assignment_options)
+
+          all_graded_discussion_options = {
+            user: teacher,
+            title: "assignment topic title",
+            message: "assignment topic message",
+            discussion_type: "threaded",
+            assignment: discussion_assignment,
+          }
+
+          graded_discussion = course.discussion_topics.create!(all_graded_discussion_options)
+
+          get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/edit"
+
+          # Graded checkbox
+          expect(is_checked(f("input[data-testid='graded-checkbox']"))).to be_truthy
+          # Points possible
+          expect(f("input[data-testid='points-possible-input']").attribute("value")).to eq "10"
+          # Grading type
+          expect(f("input[data-testid='display-grade-input']").attribute("value")).to eq "Percentage"
+          # Assignment Group
+          expect(f("input[data-testid='assignment-group-input']").attribute("value")).to eq "assignment group"
+          # Peer review checkboxes
+          expect(is_checked(f("input[data-testid='peer_review_manual']"))).to be_falsey
+          expect(is_checked(f("input[data-testid='peer_review_off']"))).to be_falsey
+          expect(is_checked(f("input[data-testid='peer_review_auto']"))).to be_truthy
+          # peer review count
+          expect(f("input[data-testid='peer-review-count-input']").attribute("value")).to eq "2"
+
+          # Peer review date
+          # Just checking for a value. Formatting and TZ differences between front-end and back-end
+          # makes an exact comparison too fragile.
+          expect(ff("input[placeholder='Select Date']")[0].attribute("value")).not_to be_empty
+
+          # Add additional tests for overrides and due dates when completed
+        end
+
         it "allows editing the assignment group for the graded discussion" do
           assign_group_2 = course.assignment_groups.create!(name: "Group 2")
           get "/courses/#{course.id}/discussion_topics/#{assignment_topic.id}/edit"
@@ -414,7 +625,7 @@ describe "discussions" do
 
         it "allows editing the points possible, grading type, group category, and peer review for the graded discussion" do
           pp_string = "80"
-          course.group_categories.create!(name: "another group set")
+          group_cat = course.group_categories.create!(name: "another group set")
           get "/courses/#{course.id}/discussion_topics/#{assignment_topic.id}/edit"
 
           # change points possible from 10 to 80. selenium's clear method does not completely remove the previous value
@@ -427,10 +638,9 @@ describe "discussions" do
 
           force_click("input[data-testid='peer_review_manual']")
 
-          # TODO: fix in VICE-4001
-          # force_click("input[data-testid='group-discussion-checkbox']")
-          # force_click("input[placeholder='Select a group category']")
-          # fj("li:contains('#{group_cat.name}')").click
+          force_click("input[data-testid='group-discussion-checkbox']")
+          force_click("input[placeholder='Select a group category']")
+          fj("li:contains('#{group_cat.name}')").click
 
           fj("button:contains('Save')").click
           updated_assignment = assignment.reload
@@ -439,6 +649,15 @@ describe "discussions" do
           expect(updated_assignment.peer_reviews).to be true
           expect(updated_assignment.automatic_peer_reviews).to be false
           expect(updated_assignment.peer_reviews_assign_at).to be_nil
+          expect(assignment.effective_group_category_id).to eq group_cat.id
+        end
+
+        it "adds an attachment to a graded discussion" do
+          get "/courses/#{course.id}/discussion_topics/#{assignment_topic.id}/edit"
+          _filename, fullpath, _data = get_file("testfile5.zip")
+          f("input[data-testid='attachment-input']").send_keys(fullpath)
+          fj("button:contains('Save')").click
+          expect(assignment_topic.reload.attachment_id).to eq Attachment.last.id
         end
       end
     end

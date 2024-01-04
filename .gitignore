@@ -36,7 +36,7 @@ docker-compose.override.yml
 !/log/.keep
 !/log/parallel-runtime-rspec.log
 mkmf.log
-/node_modules
+node_modules
 npm-debug.log
 /public/dist/
 /public/doc/api/
@@ -76,7 +76,6 @@ docker-compose/api-gateway.override.yml
 !/packages/babel-plugin-themeable-styles/lib
 /packages/*/coverage/
 /packages/*/coverage-js/
-/packages/canvas-planner/.babel-cache
 
 # pact artifacts
 /reports/

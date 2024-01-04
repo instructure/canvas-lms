@@ -19,8 +19,11 @@
 
 require_relative "../common"
 require_relative "../helpers/basic/settings_specs"
+require_relative "pages/admin_account_page"
 
 describe "root account basic settings" do
+  include AdminSettingsPage
+
   let(:account) { Account.default }
   let(:account_settings_url) { "/accounts/#{account.id}/settings" }
   let(:reports_url) { "/accounts/#{account.id}/reports_tab" }
@@ -119,6 +122,18 @@ describe "root account basic settings" do
     driver.switch_to.alert.accept
     submit_form("#account_settings")
     expect(Account.default.reload.settings[:suppress_notifications]).to be true
+  end
+
+  it "updates the account's allow_observers_in_appointment_groups setting" do
+    expect(account.allow_observers_in_appointment_groups?).to be false
+
+    user_session(@admin)
+    get account_settings_url
+    expect(is_checked(allow_observers_in_appointments_checkbox)).to be false
+    allow_observers_in_appointments_checkbox.click
+    expect_new_page_load { submit_form("#account_settings") }
+    expect(is_checked(allow_observers_in_appointments_checkbox)).to be true
+    expect(account.reload.allow_observers_in_appointment_groups?).to be true
   end
 
   context "editing slack API key" do

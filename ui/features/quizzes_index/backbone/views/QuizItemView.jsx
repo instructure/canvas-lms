@@ -18,7 +18,7 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 import $ from 'jquery'
-import _ from 'underscore'
+import {each, extend} from 'lodash'
 import Backbone from '@canvas/backbone'
 import CyoeHelper from '@canvas/conditional-release-cyoe-helper'
 import PublishIconView from '@canvas/publish-icon-view'
@@ -329,9 +329,9 @@ export default class ItemView extends Backbone.View {
   }
 
   toJSON() {
-    const base = _.extend(this.model.toJSON(), this.options)
+    const base = extend(this.model.toJSON(), this.options)
     base.quiz_menu_tools = ENV.quiz_menu_tools
-    _.each(base.quiz_menu_tools, tool => {
+    each(base.quiz_menu_tools, tool => {
       tool.url = tool.base_url + `&quizzes[]=${this.model.get('id')}`
     })
 

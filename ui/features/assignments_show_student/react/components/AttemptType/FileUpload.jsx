@@ -315,7 +315,7 @@ class FileUpload extends Component {
                       allowWebcamUploads ? this.handleWebcamPhotoUpload : null
                     }
                     renderCanvasFiles={true}
-                    userID={this.props.assignment.env.currentUser.id}
+                    userID={this.props.assignment.env.currentUser?.id}
                   />
                 </Flex.Item>
               )}

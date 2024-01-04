@@ -220,6 +220,25 @@
                   >{{#t}}Duplicate{{/t}}</a>
                 </li>
                 {{/if}}
+                {{#if canEdit}}
+                {{#if differentiatedModulesFlag}}
+                  <li>
+                    <a
+                      class="assign-to-link icon-permissions"
+                      id="assign_to_{{id}}_link"
+                      href="{{id}}%>"
+                      data-assignment-name="{{name}}"
+                      data-assignment-context-id="{{courseId}}"
+                      data-assignment-id="{{id}}"
+                      data-assignment-points-possible="{{pointsPossible}}"
+                      data-assignment-type="{{is_quiz_assignment}}"
+                      title="<%= {{#t}}Assign this Assignment{{/t}} %>"
+                      aria-label="{{#t}}Assign To...{{/t}}"
+                      data-focus-returns-to="assign_{{id}}_manage_link"
+                    >{{#t}}Assign To...{{/t}}</a>
+                  </li>
+                {{/if}}
+                {{/if}}
             {{/if}}
             {{#unless is_locked}}
               <li>
@@ -376,6 +395,25 @@
                   >{{#t}}Duplicate{{/t}}</a>
                 </li>
                 {{/if}}
+                {{#if canEdit}}
+                {{#if differentiatedModulesFlag}}
+                  <li>
+                    <a
+                      class="assign-to-link icon-permissions"
+                      id="assign_to_{{id}}_link"
+                      href="{{id}}%>"
+                      data-assignment-name="{{name}}"
+                      data-assignment-context-id="{{courseId}}"
+                      data-assignment-id="{{id}}"
+                      data-assignment-points-possible="{{pointsPossible}}"
+                      data-assignment-type="{{is_quiz_assignment}}"
+                      title="<%= {{#t}}Assign this Assignment{{/t}} %>"
+                      aria-label="{{#t}}Assign To...{{/t}}"
+                      data-focus-returns-to="assign_{{id}}_manage_link"
+                    >{{#t}}Assign To...{{/t}}</a>
+                  </li>
+                {{/if}}
+                {{/if}}
                 {{#if canMove}}
                 <li>
                   <a
@@ -455,4 +493,5 @@
   {{/if}}{{/if}}{{/if}}{{/if}}{{/if}}{{/if}}
 </div>
 <div id="assignment_student_peer_review_{{id}}">
+<div id="assign-to-mount-point"></div>
 </div>

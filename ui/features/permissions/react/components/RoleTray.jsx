@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import {useScope as useI18nScope} from '@canvas/i18n'
-import $ from 'jquery'
 
 import {connect} from 'react-redux'
 import PropTypes from 'prop-types'
@@ -34,6 +33,7 @@ import {IconArrowStartSolid, IconEditLine, IconTrashLine, IconXSolid} from '@ins
 import {TextInput} from '@instructure/ui-text-input'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Tray} from '@instructure/ui-tray'
+import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
 
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 import actions from '../actions'
@@ -81,15 +81,18 @@ export default class RoleTray extends Component {
     editTrayVisible: false,
     newTargetBaseRole: null,
     editRoleLabelErrorMessages: [],
-    roleDeleted: false,
+    lastTouchedRoleId: undefined,
   }
 
   // We need this so that if there is an alert displayed inside this tray
   // (such as the delete confirmation alert) it will disapear if we click
-  // on a different role then we are currently operating on.
+  // on a different role then we are currently operating on. We also need
+  // to keep track of the most recent role we touched so that we can return
+  // focus to it when the tray is closed.
   UNSAFE_componentWillReceiveProps(nextProps) {
     if (this.props.id !== nextProps.id) {
       this.clearState()
+      if (typeof nextProps.id === 'string') this.setState({lastTouchedRoleId: nextProps.id})
     }
   }
 
@@ -109,23 +112,23 @@ export default class RoleTray extends Component {
     })
   }
 
-  finishDeleteRole = () => {
-    this.setState({roleDeleted: true}, this.hideTray)
-  }
-
+  // After the tray closes, we want to return focus back to the column header
+  // for the role we just were looking at. Note that if we've deleted the role,
+  // there will no longer be a column header for it, so we'll just return focus
+  // to the role filter input in that case.
   returnFocus = () => {
-    if (this.state.roleDeleted) {
-      $('#permissions-role-filter').focus()
-    } else {
-      const query = `#ic-permissions__role-header-for-role-${this.props.role.id}`
-      const button = $(query).find('button')
+    const id = this.state.lastTouchedRoleId
+    const button = document.querySelector(`#ic-permissions__role-header-for-role-${id} button`)
+    if (button) {
       button.focus()
+    } else {
+      const roleFilter = document.getElementById('permissions-role-filter')
+      roleFilter?.focus()
     }
   }
 
   hideTray = () => {
     this.props.hideTray()
-    this.returnFocus()
     this.clearState()
   }
 
@@ -152,26 +155,8 @@ export default class RoleTray extends Component {
         newTargetBaseRole: null,
         editRoleLabelInput: '',
         editRoleLabelErrorMessages: [],
-        roleDeleted: false,
       },
-      /*
-      The setTimeout here is to ensure that the callback gets called AFTER react
-      is done rendering everything in response to the setState. that is what it
-      did even without the setTimout in react <=15.
-
-      In react 16+ setState callbacks (second argument) now fire immediately
-      after componentDidMount / componentDidUpdate instead of after all components
-      have rendered.
-      (see: https://reactjs.org/blog/2017/09/26/react-v16.0.html#breaking-changes)
-      so unless we put this in a setTimeout the refs that we try to focus in this
-      file may not be set up yet. By putting it in a setTimeout it works the same
-      pre and post react 16 and calls the callback AFTER everything has rerendered
-      */
-      () => {
-        if (typeof callback === 'function') {
-          setTimeout(callback)
-        }
-      }
+      callback
     )
   }
 
@@ -189,7 +174,7 @@ export default class RoleTray extends Component {
   }
 
   hideEditTray = () => {
-    this.clearState(() => this.editButton.focus())
+    this.clearState(() => setTimeout(() => this.editButton.focus()))
   }
 
   showDeleteAlert = () => {
@@ -202,7 +187,7 @@ export default class RoleTray extends Component {
   }
 
   hideDeleteAlert = () => {
-    this.clearState(() => this.deleteButton.focus())
+    this.clearState(() => setTimeout(() => this.deleteButton.focus()))
   }
 
   showEditBaseRoleAlert = baseRoleLabel => {
@@ -215,19 +200,16 @@ export default class RoleTray extends Component {
   }
 
   hideEditBaseRoleAlert = () => {
-    this.setState(
-      {
-        deleteAlertVisible: false,
-        editTrayVisible: true,
-        editBaseRoleAlertVisible: false,
-        newTargetBaseRole: null,
-      },
-      () => this.editRoleInput.focus()
-    )
+    this.setState({
+      deleteAlertVisible: false,
+      editTrayVisible: true,
+      editBaseRoleAlertVisible: false,
+      newTargetBaseRole: null,
+    })
   }
 
   deleteRole = () => {
-    this.props.deleteRole(this.props.role, this.finishDeleteRole, this.hideDeleteAlert)
+    this.props.deleteRole(this.props.role, this.hideTray, this.hideDeleteAlert)
   }
 
   handleBaseRoleChange = () => {
@@ -243,13 +225,13 @@ export default class RoleTray extends Component {
   }
 
   // TODO maybe make this a whole other component we can use/reuse?
-  renderConfirmationAlert = (children, onOk, onCancel) => (
+  renderConfirmationAlert = (children, isOpen, onOk, onCancel) => (
     <div style={{zIndex: 10, position: 'absolute'}}>
-      <Dialog open={true} shouldContainFocus={true}>
+      <Dialog open={isOpen} shouldContainFocus={true} shouldReturnFocus={true}>
         <Alert variant="warning" margin="small">
-          <View as="block">
+          <View display="block">
             {children}
-            <View as="block" margin="small 0 0 0">
+            <View display="block" margin="small 0 0 0">
               <Button onClick={onCancel} margin="none xx-small none none">
                 <ScreenReaderContent>{children}</ScreenReaderContent>
                 {I18n.t('Cancel')}
@@ -277,7 +259,12 @@ export default class RoleTray extends Component {
         <Text as="p">{I18n.t('Click "ok" to continue deleting this role.')}</Text>
       </div>
     )
-    return this.renderConfirmationAlert(text, this.deleteRole, this.hideDeleteAlert)
+    return this.renderConfirmationAlert(
+      text,
+      this.state.deleteAlertVisible,
+      this.deleteRole,
+      this.hideDeleteAlert
+    )
   }
 
   renderEditBaseRoleAlert = () => {
@@ -288,7 +275,12 @@ export default class RoleTray extends Component {
         </Text>
       </div>
     )
-    return this.renderConfirmationAlert(text, this.handleBaseRoleChange, this.hideEditBaseRoleAlert)
+    return this.renderConfirmationAlert(
+      text,
+      this.state.editBaseRoleAlertVisible,
+      this.handleBaseRoleChange,
+      this.hideEditBaseRoleAlert
+    )
   }
 
   renderCloseButton = () => (
@@ -351,7 +343,9 @@ export default class RoleTray extends Component {
       withBackground={false}
       size="medium"
       color="primary"
-      elementRef={c => (this.editButton = c)}
+      elementRef={c => {
+        this.editButton = c
+      }}
       onClick={this.showEditTray}
       screenReaderLabel={I18n.t('Edit')}
     >
@@ -463,20 +457,20 @@ export default class RoleTray extends Component {
         label={this.props.label}
         open={this.props.open}
         onDismiss={this.hideTray}
+        onClose={this.returnFocus.bind(this)}
         size="small"
         placement="end"
-        liveRegion={() => document.getElementById('flash_screenreader_holder')}
+        liveRegion={getLiveRegion}
       >
-        {/* TODO Once INSTUI-1269 is fixed and in canvas, use shouldReturnFocus
-                 open, and defaultFocusElement dialog props instead of the &&
-                 we are currently using to complete destroy this component */}
-        {this.state.deleteAlertVisible && this.renderDeleteAlert()}
-        {this.state.editBaseRoleAlertVisible && this.renderEditBaseRoleAlert()}
+        {this.renderDeleteAlert()}
+        {this.renderEditBaseRoleAlert()}
         {this.renderCloseButton()}
-        <View as="div" padding="small small x-large small">
-          {this.state.editTrayVisible ? this.renderEditHeader() : this.renderTrayHeader()}
-          {this.renderPermissions()}
-        </View>
+        {this.props.label.length > 0 && (
+          <View as="div" padding="small small x-large small">
+            {this.state.editTrayVisible ? this.renderEditHeader() : this.renderTrayHeader()}
+            {this.renderPermissions()}
+          </View>
+        )}
       </Tray>
     )
   }

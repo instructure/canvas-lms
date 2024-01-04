@@ -16,10 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from '@instructure/lodash-underscore'
+import {find} from 'lodash'
 import K from '../../constants'
 
-const findWhere = _.findWhere
 const keys = Object.keys
 const QuestionAnsweredEventDecorator = {}
 
@@ -124,7 +123,7 @@ QuestionAnsweredEventDecorator.run = function (events, questions) {
   keys(finalAnswerEvents).forEach(function (quizQuestionId) {
     const event = finalAnswerEvents[quizQuestionId]
 
-    findWhere(event.attributes.data, {
+    find(event.attributes.data, {
       quizQuestionId,
     }).last = true
   })

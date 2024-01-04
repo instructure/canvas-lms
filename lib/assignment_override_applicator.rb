@@ -210,9 +210,9 @@ module AssignmentOverrideApplicator
   end
 
   def self.group_overrides(assignment_or_quiz, user)
-    return nil unless assignment_or_quiz.is_a?(Assignment)
+    return nil unless assignment_or_quiz.is_a?(AbstractAssignment)
 
-    group_category_id = assignment_or_quiz.group_category_id || assignment_or_quiz.discussion_topic.try(:group_category_id)
+    group_category_id = assignment_or_quiz.effective_group_category_id
     return nil unless group_category_id
 
     group = if assignment_or_quiz.context.user_has_been_student?(user)
@@ -379,7 +379,7 @@ module AssignmentOverrideApplicator
         %i[due_at all_day all_day_date unlock_at lock_at].each do |field|
           next unless assignment_or_quiz.respond_to?(field)
 
-          value = send("overridden_#{field}", assignment_or_quiz, overrides)
+          value = send(:"overridden_#{field}", assignment_or_quiz, overrides)
           # force times to un-zoned UTC -- this will be a cached value and should
           # not care about the TZ of the user that cached it. the user's TZ will
           # be applied before it's returned.

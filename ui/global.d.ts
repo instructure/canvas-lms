@@ -17,7 +17,7 @@
  */
 
 import {sendMessageStudentsWho} from './shared/grading/messageStudentsWhoHelper'
-import {GlobalEnv} from '@canvas/global/env/GlobalEnv'
+import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 import {GlobalInst} from '@canvas/global/inst/GlobalInst'
 
 declare global {
@@ -55,8 +55,8 @@ declare global {
     messageStudents: (options: ReturnType<typeof sendMessageStudentsWho>) => void
     updateGrades: () => void
 
-    bundles: Array<() => void>
-    deferredBundles: Array<() => void>
+    bundles: string[]
+    deferredBundles: string[]
     canvasReadyState?: 'loading' | 'complete'
   }
 

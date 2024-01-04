@@ -198,13 +198,11 @@ class ContextModulesController < ApplicationController
 
       set_tutorial_js_env
 
-      if Account.site_admin.feature_enabled?(:module_publish_menu)
-        @progress = Progress.find_by(
-          context: @context,
-          tag: "context_module_batch_update",
-          workflow_state: ["queued", "running"]
-        )
-      end
+      @progress = Progress.find_by(
+        context: @context,
+        tag: "context_module_batch_update",
+        workflow_state: ["queued", "running"]
+      )
 
       if @is_student
         return unless tab_enabled?(@context.class::TAB_MODULES)

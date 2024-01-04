@@ -19,7 +19,7 @@
 import React from 'react'
 import * as enzyme from 'enzyme'
 import MoveSelect from '@canvas/move-item-tray/react/MoveSelect'
-import {positions} from '@canvas/move-item-tray/positions'
+import {positions} from '@canvas/positions'
 
 QUnit.module('MoveSelect component')
 

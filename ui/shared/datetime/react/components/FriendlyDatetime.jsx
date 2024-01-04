@@ -18,7 +18,7 @@
 
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
-import tz from '@canvas/timezone'
+import * as tz from '../../index'
 import _ from 'underscore'
 import $ from 'jquery'
 import '../../jquery/index'

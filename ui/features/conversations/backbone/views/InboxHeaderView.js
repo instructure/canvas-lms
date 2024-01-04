@@ -17,8 +17,8 @@
 
 import $ from 'jquery'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import _ from 'underscore'
 import {View} from '@canvas/backbone'
+import {fromPairs, filter, toPairs} from 'lodash'
 import Spinner from 'spin.js'
 import CourseSelectionView from './CourseSelectionView'
 import SearchView from './SearchView'
@@ -209,7 +209,7 @@ export default class InboxHeaderView extends View {
   }
 
   filterObj(obj) {
-    return _.object(_.filter(_.pairs(obj), x => !!x[1]))
+    return fromPairs(filter(toPairs(obj), x => !!x[1]))
   }
 
   changeTypeFilter(type) {

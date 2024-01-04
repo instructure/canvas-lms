@@ -2518,6 +2518,23 @@ describe Account do
     end
   end
 
+  describe "allow_observers_in_appointment_groups?" do
+    before :once do
+      @account = Account.default
+      @account.settings[:allow_observers_in_appointment_groups] = { value: true }
+      @account.save!
+    end
+
+    it "returns true if the setting is enabled and the observer_appointment_groups flag is enabled" do
+      expect(@account.allow_observers_in_appointment_groups?).to be true
+    end
+
+    it "returns false if the observer_appointment_groups flag is disabled" do
+      Account.site_admin.disable_feature!(:observer_appointment_groups)
+      expect(@account.allow_observers_in_appointment_groups?).to be false
+    end
+  end
+
   describe "enable_as_k5_account setting" do
     it "enable_as_k5_account? helper returns false by default" do
       account = Account.create!

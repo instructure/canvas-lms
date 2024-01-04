@@ -9188,9 +9188,9 @@ describe Submission do
   describe "checkpoint submissions" do
     before(:once) do
       course = course_model
+      student = student_in_course(course:, active_all: true).user
       course.root_account.enable_feature!(:discussion_checkpoints)
-      student = student_in_course(course: @course, active_all: true).user
-      topic = @course.discussion_topics.create!(title: "graded topic")
+      topic = DiscussionTopic.create_graded_topic!(course:, title: "graded topic")
       topic.create_checkpoints(reply_to_topic_points: 3, reply_to_entry_points: 7)
       @checkpoint_submission = topic.reply_to_topic_checkpoint.submissions.find_by(user: student)
       @parent_submission = topic.assignment.submissions.find_by(user: student)

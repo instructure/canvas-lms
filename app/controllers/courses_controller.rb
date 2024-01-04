@@ -1778,6 +1778,7 @@ class CoursesController < ApplicationController
       csv << [
         I18n.t("Last Name"),
         I18n.t("First Name"),
+        I18n.t("SIS ID"),
         I18n.t("Pairing Code"),
         I18n.t("Expires At"),
       ]
@@ -1786,6 +1787,7 @@ class CoursesController < ApplicationController
         row = []
         row << opc.user.last_name
         row << opc.user.first_name
+        row << opc.user.pseudonym&.sis_user_id
         row << ('="' + opc.code + '"')
         row << opc.expires_at
         csv << row
@@ -2342,13 +2344,11 @@ class CoursesController < ApplicationController
           js_bundle :wiki_page_show
           css_bundle :wiki_page, :tinymce
         when "modules"
-          if Account.site_admin.feature_enabled?(:module_publish_menu)
-            @progress = Progress.find_by(
-              context: @context,
-              tag: "context_module_batch_update",
-              workflow_state: ["queued", "running"]
-            )
-          end
+          @progress = Progress.find_by(
+            context: @context,
+            tag: "context_module_batch_update",
+            workflow_state: ["queued", "running"]
+          )
 
           js_env(CONTEXT_MODULE_ASSIGNMENT_INFO_URL: context_url(@context, :context_context_modules_assignment_info_url))
 
@@ -3196,7 +3196,7 @@ class CoursesController < ApplicationController
             @course.errors.add(:master_course, message)
           else
             action = master_course ? "set" : "remove"
-            MasterCourses::MasterTemplate.send("#{action}_as_master_course", @course)
+            MasterCourses::MasterTemplate.send(:"#{action}_as_master_course", @course)
             @new_save_master_course = master_course
           end
         end
@@ -3316,14 +3316,14 @@ class CoursesController < ApplicationController
     end
 
     if params[:course][:"#{setting_name}_url"]
-      @course.send("#{setting_name}_url=", params[:course][:"#{setting_name}_url"])
-      @course.send("#{setting_name}_id=", nil)
+      @course.send(:"#{setting_name}_url=", params[:course][:"#{setting_name}_url"])
+      @course.send(:"#{setting_name}_id=", nil)
     end
 
     if params[:course][:"#{setting_name}_id"]
       if @course.attachments.active.where(id: params[:course][:"#{setting_name}_id"]).exists?
-        @course.send("#{setting_name}_id=", params[:course][:"#{setting_name}_id"])
-        @course.send("#{setting_name}_url=", nil)
+        @course.send(:"#{setting_name}_id=", params[:course][:"#{setting_name}_id"])
+        @course.send(:"#{setting_name}_url=", nil)
       else
         respond_to do |format|
           format.json { render json: { message: "The image_id is not a valid course file id." }, status: :bad_request }
@@ -3333,8 +3333,8 @@ class CoursesController < ApplicationController
     end
 
     if params[:course][:"remove_#{setting_name}"]
-      @course.send("#{setting_name}_url=", nil)
-      @course.send("#{setting_name}_id=", nil)
+      @course.send(:"#{setting_name}_url=", nil)
+      @course.send(:"#{setting_name}_id=", nil)
     end
   end
 

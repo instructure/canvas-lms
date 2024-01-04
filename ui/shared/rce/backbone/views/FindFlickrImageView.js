@@ -19,7 +19,7 @@
 import {extend} from '@canvas/backbone/utils'
 import Backbone from '@canvas/backbone'
 import $ from 'jquery'
-import _ from 'underscore'
+import {reject} from 'lodash'
 import template from '../../jst/FindFlickrImageView.handlebars'
 import resultTemplate from '../../jst/FindFlickrImageResult.handlebars'
 
@@ -84,7 +84,7 @@ FindFlickrImageView.prototype.searchFlickr = function (event) {
 }
 
 FindFlickrImageView.prototype.renderResults = function (photos) {
-  let html = _.reject(
+  let html = reject(
     photos,
     (function (_this) {
       return function (photo) {

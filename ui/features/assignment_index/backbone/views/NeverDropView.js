@@ -17,8 +17,8 @@
  */
 
 import {extend} from '@canvas/backbone/utils'
+import {defer} from 'lodash'
 import Backbone from '@canvas/backbone'
-import _ from 'underscore'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import neverDropTemplate from '../../jst/NeverDrop.handlebars'
 
@@ -61,7 +61,7 @@ NeverDrop.prototype.removeNeverDrop = function (e) {
 
 NeverDrop.prototype.afterRender = function () {
   if (this.model.has('focus')) {
-    return _.defer(
+    return defer(
       (function (_this) {
         return function () {
           _this.$('select').focus()

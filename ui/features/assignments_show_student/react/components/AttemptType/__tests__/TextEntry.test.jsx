@@ -23,11 +23,16 @@ import React from 'react'
 import TextEntry from '../TextEntry'
 import StudentViewContext from '../../Context'
 
-jest.mock('@canvas/tinymce-external-tools/TinyMCEContentItem', () => ({
-  fromJSON: contentItem => ({
-    codePayload: `<a href="${contentItem.url}" title="${contentItem.title}" target="${contentItem.linkTarget}">${contentItem.title}</a>`,
-  }),
-}))
+jest.mock(
+  '@instructure/canvas-rce/es/rce/plugins/instructure_rce_external_tools/lti11-content-items/RceLti11ContentItem',
+  () => ({
+    RceLti11ContentItem: {
+      fromJSON: contentItem => ({
+        codePayload: `<a href="${contentItem.url}" title="${contentItem.title}" target="${contentItem.linkTarget}">${contentItem.title}</a>`,
+      }),
+    },
+  })
+)
 
 async function makeProps(opts = {}) {
   const mockedSubmission =

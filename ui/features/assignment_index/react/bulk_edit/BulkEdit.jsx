@@ -31,7 +31,7 @@ import BulkEditTable from './BulkEditTable'
 import MoveDatesModal from './MoveDatesModal'
 import useSaveAssignments from './hooks/useSaveAssignments'
 import useMonitorJobCompletion from './hooks/useMonitorJobCompletion'
-import DateValidator from '@canvas/datetime/DateValidator'
+import DateValidator from '@canvas/grading/DateValidator'
 import GradingPeriodsAPI from '@canvas/grading/jquery/gradingPeriodsApi'
 import {originalDateField, canEditAll} from './utils'
 

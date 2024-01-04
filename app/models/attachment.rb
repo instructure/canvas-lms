@@ -138,6 +138,8 @@ class Attachment < ActiveRecord::Base
   has_many :canvadocs_annotation_contexts, inverse_of: :attachment
   has_many :discussion_entry_drafts, inverse_of: :attachment
   has_one :master_content_tag, class_name: "MasterCourses::MasterContentTag", inverse_of: :attachment
+  has_many :assignment_overrides, dependent: :destroy, inverse_of: :attachment
+  has_many :assignment_override_students, dependent: :destroy
 
   before_save :set_root_account_id
   before_save :infer_display_name
@@ -586,7 +588,7 @@ class Attachment < ActiveRecord::Base
     self.folder_id ||= Folder.root_folders(context).first.id rescue nil
     if root_attachment && new_record?
       %i[md5 size content_type].each do |key|
-        send("#{key}=", root_attachment.send(key))
+        send(:"#{key}=", root_attachment.send(key))
       end
       self.workflow_state = "processed"
       write_attribute(:filename, root_attachment.filename)
@@ -2227,7 +2229,7 @@ class Attachment < ActiveRecord::Base
     random_backup_name = "#{dir}#{basename}-#{SecureRandom.uuid}#{extname}"
     return random_backup_name if attempts >= 8
 
-    until block.call(new_name = "#{dir}#{basename}-#{addition}#{extname}") # rubocop:disable Lint/LiteralAssignmentInCondition
+    until block.call(new_name = "#{dir}#{basename}-#{addition}#{extname}")
       addition += 1
       return random_backup_name if addition >= 8
     end

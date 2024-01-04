@@ -343,6 +343,7 @@ describe Rubric do
   end
 
   it "changes workflow state properly when archiving when enhanced_rubrics FF enabled" do
+    Account.site_admin.enable_feature!(:enhanced_rubrics)
     course_with_teacher
     rubric = rubric_model({ context: @course })
     rubric.archive
@@ -350,6 +351,7 @@ describe Rubric do
   end
 
   it "changes workflow state propertly when unarchiving when enhanced_rubrics FF enabled" do
+    Account.site_admin.enable_feature!(:enhanced_rubrics)
     course_with_teacher
     rubric = rubric_model({ context: @course })
     rubric.archive

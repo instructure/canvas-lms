@@ -224,4 +224,18 @@ describe Types::LearningOutcomeType do
       expect(outcome_type.resolve("alignments(contextType: \"Course\", contextId: 999999) { _id }")).to be_nil
     end
   end
+
+  context "canArchive" do
+    let(:course) { Course.create! }
+
+    it "returns true if outcome was created in the same context" do
+      expect(outcome_type.resolve("canArchive(contextType: \"Account\", contextId: #{Account.default.id})"))
+        .to be true
+    end
+
+    it "return false if outcome was created in a different context" do
+      expect(outcome_type.resolve("canArchive(contextType: \"Course\", contextId: #{course.id})"))
+        .to be false
+    end
+  end
 end

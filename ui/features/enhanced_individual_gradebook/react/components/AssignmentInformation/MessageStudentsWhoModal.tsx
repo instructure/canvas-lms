@@ -23,7 +23,7 @@ import MessageStudentsWhoDialog, {
   type SendMessageArgs,
   type Student,
 } from '@canvas/message-students-dialog/react/MessageStudentsWhoDialog'
-import type {CamelizedAssignment} from '@canvas/grading/grading'
+import type {CamelizedAssignment} from '@canvas/grading/grading.d'
 import type {
   AssignmentConnection,
   GradebookOptions,

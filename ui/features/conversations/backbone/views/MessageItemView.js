@@ -1,3 +1,5 @@
+/* eslint-disable no-alert */
+
 //
 // Copyright (C) 2013 - present Instructure, Inc.
 //
@@ -17,8 +19,8 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import _ from 'underscore'
-import tz from '@canvas/timezone'
+import {extend} from 'lodash'
+import * as tz from '@canvas/datetime'
 import {View} from '@canvas/backbone'
 import template from '../../jst/messageItem.handlebars'
 import '@canvas/avatar/jst/_avatar.handlebars'
@@ -76,7 +78,7 @@ export default class MessageItemView extends View {
   toJSON() {
     const json = this.model.toJSON()
     const fudged = $.fudgeDateForProfileTimezone(tz.parse(json.created_at))
-    return _.extend(json, {created_at: fudged})
+    return extend(json, {created_at: fudged})
   }
 
   // Internal: Update participant lists after render.
@@ -155,6 +157,7 @@ export default class MessageItemView extends View {
     }
     let $toFocus
     e.preventDefault()
+    //
     if (!window.confirm(this.messages.confirmDelete)) {
       $(`.message-item-view[data-id=${this.model.id}] .al-trigger`).focus()
       return

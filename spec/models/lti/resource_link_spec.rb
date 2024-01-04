@@ -25,7 +25,8 @@ RSpec.describe Lti::ResourceLink do
   let(:resource_link) do
     Lti::ResourceLink.create!(context_external_tool: tool,
                               context: assignment,
-                              url: "http://www.example.com/launch")
+                              url: "http://www.example.com/launch",
+                              title: "Resource Title")
   end
 
   context "relationships" do
@@ -155,6 +156,24 @@ RSpec.describe Lti::ResourceLink do
         expect(course.lti_resource_links.count).to eq 2
         expect(course.lti_resource_links.first).to eq resource_link_1
         expect(course.lti_resource_links.last).to eq resource_link_2
+      end
+    end
+
+    context "with `title`" do
+      let(:title) { "Resource Title" }
+
+      it "create resource link" do
+        resource_link = described_class.create_with(course, tool, nil, nil, title)
+        expect(course.lti_resource_links.first).to eq resource_link
+        expect(course.lti_resource_links.first.title).to eq title
+      end
+    end
+
+    context "without `title`" do
+      it "create resource link with nil title" do
+        resource_link = described_class.create_with(course, tool)
+        expect(course.lti_resource_links.first).to eq resource_link
+        expect(course.lti_resource_links.first.title).to be_nil
       end
     end
   end

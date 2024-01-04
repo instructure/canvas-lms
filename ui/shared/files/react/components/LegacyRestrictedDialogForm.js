@@ -23,8 +23,8 @@ import Folder from '../../backbone/models/Folder'
 import customPropTypes from '../modules/customPropTypes'
 import setUsageRights from '../../util/setUsageRights'
 import updateModelsUsageRights from '../../util/updateModelsUsageRights'
-import '@canvas/datetime'
-import '@canvas/forms/jquery/jquery.instructure_forms'
+import '@canvas/datetime/jquery'
+import '@canvas/jquery/jquery.instructure_forms'
 
 const I18n = useI18nScope('restrict_student_access')
 

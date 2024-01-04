@@ -220,7 +220,7 @@ module BrandableCSS
 
     def default(type, high_contrast = false)
       bc = high_contrast ? high_contrast_overrides : nil
-      send("all_brand_variable_values_as_#{type}", bc)
+      send(:"all_brand_variable_values_as_#{type}", bc)
     end
 
     def save_default!(type, high_contrast = false)

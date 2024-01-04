@@ -20,7 +20,7 @@
 
 class ModerationGrader < ActiveRecord::Base
   belongs_to :user
-  belongs_to :assignment, inverse_of: :moderation_graders
+  belongs_to :assignment, inverse_of: :moderation_graders, class_name: "AbstractAssignment"
 
   validates :anonymous_id,
             presence: true,

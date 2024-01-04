@@ -92,20 +92,7 @@ describe('DiscussionPostToolbar', () => {
   })
 
   describe('Splitscreen Button', () => {
-    it('should not render if split_screen_view ff is off', async () => {
-      window.ENV.split_screen_view = false
-      const {queryByTestId} = setup(
-        {
-          setUserSplitScreenPreference: jest.fn(),
-          userSplitScreenPreference: false,
-        },
-        updateUserDiscussionsSplitscreenViewMock({discussionsSplitscreenView: true})
-      )
-
-      expect(queryByTestId('splitscreenButton')).toBeNull()
-    })
     it('should call updateUserDiscussionsSplitscreenView mutation when clicked', async () => {
-      window.ENV.split_screen_view = true
       const {getByTestId} = setup(
         {
           setUserSplitScreenPreference: jest.fn(),
@@ -146,16 +133,6 @@ describe('DiscussionPostToolbar', () => {
       fireEvent.click(unread)
       expect(onViewFilterMock.mock.calls.length).toBe(1)
       expect(onViewFilterMock.mock.calls[0][1].id).toBe('unread')
-    })
-
-    it('"My Drafts" filter should be visible', () => {
-      window.ENV.draft_discussions = true
-
-      const onViewFilterMock = jest.fn()
-      const {getByText, getByLabelText} = setup({onViewFilter: onViewFilterMock})
-      const simpleSelect = getByLabelText('Filter by')
-      fireEvent.click(simpleSelect)
-      expect(getByText('My Drafts')).toBeTruthy()
     })
   })
 

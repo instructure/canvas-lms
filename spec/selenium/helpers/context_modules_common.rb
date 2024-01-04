@@ -34,16 +34,6 @@ module ContextModulesCommon
     modules
   end
 
-  def publish_module
-    fj("#context_modules .publish-icon-publish").click
-    wait_for_ajaximations
-  end
-
-  def unpublish_module
-    fj("#context_modules .publish-icon-published").click
-    wait_for_ajaximations
-  end
-
   def module_setup(course = @course)
     @module = course.context_modules.create!(name: "Module 1", workflow_state: "unpublished")
 

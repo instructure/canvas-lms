@@ -323,7 +323,7 @@ export type FormatGradeOptions = {
   delocalize?: boolean
   precision?: number
   pointsPossible?: number
-  score?: number
+  score?: number | null
   restrict_quantitative_data?: boolean
   grading_scheme?: DeprecatedGradingScheme[]
 }

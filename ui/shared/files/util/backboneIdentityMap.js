@@ -46,7 +46,7 @@
  * has already been assigned to the cache with the same ID, then
  * that object will be overridden.
  */
-import _ from 'underscore'
+import {uniqueId, extend as lodashExtend} from 'lodash'
 
 // Stores cached models:
 // key: (unique identifier per class) + ':' + (model id)
@@ -59,8 +59,8 @@ var cache = {}
  * but returns cached objects if possible.
  */
 var IdentityMap = function (realConstructor) {
-  var classCacheKey = _.uniqueId()
-  var modelConstructor = _.extend(function (attributes, options) {
+  var classCacheKey = uniqueId()
+  var modelConstructor = lodashExtend(function (attributes, options) {
     // creates a new object (used if the object isn't found in
     // the cache)
     var create = function () {

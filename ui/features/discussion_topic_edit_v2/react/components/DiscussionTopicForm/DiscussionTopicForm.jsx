@@ -102,46 +102,87 @@ export default function DiscussionTopicForm({
 
   const inputWidth = '100%'
 
-  const [title, setTitle] = useState('')
+  const [title, setTitle] = useState(currentDiscussionTopic?.title || '')
   const [titleValidationMessages, setTitleValidationMessages] = useState([
     {text: '', type: 'success'},
   ])
+  const [postToValidationMessages, setPostToValidationMessages] = useState([])
 
-  const [rceContent, setRceContent] = useState('')
+  const [rceContent, setRceContent] = useState(currentDiscussionTopic?.message || '')
 
-  const [sectionIdsToPostTo, setSectionIdsToPostTo] = useState(['all'])
+  const [sectionIdsToPostTo, setSectionIdsToPostTo] = useState(
+    currentDiscussionTopic?.courseSections && currentDiscussionTopic?.courseSections.length > 0
+      ? currentDiscussionTopic?.courseSections.map(section => section._id)
+      : ['all']
+  )
 
-  const [discussionAnonymousState, setDiscussionAnonymousState] = useState('off')
+  const [discussionAnonymousState, setDiscussionAnonymousState] = useState(
+    currentDiscussionTopic?.anonymousState || 'off'
+  )
   // default anonymousAuthorState to true, since it is the default selection for partial anonymity
   // otherwise, it is just ignored anyway
-  const [anonymousAuthorState, setAnonymousAuthorState] = useState(true)
-  const [requireInitialPost, setRequireInitialPost] = useState(false)
-  const [enablePodcastFeed, setEnablePodcastFeed] = useState(false)
-  const [includeRepliesInFeed, setIncludeRepliesInFeed] = useState(false)
-  const [isGraded, setIsGraded] = useState(false)
-  const [allowLiking, setAllowLiking] = useState(false)
-  const [onlyGradersCanLike, setOnlyGradersCanLike] = useState(false)
-  const [addToTodo, setAddToTodo] = useState(false)
-  const [todoDate, setTodoDate] = useState(null)
-  const [isGroupDiscussion, setIsGroupDiscussion] = useState(false)
-  const [groupCategoryId, setGroupCategoryId] = useState(null)
+  const [anonymousAuthorState, setAnonymousAuthorState] = useState(
+    currentDiscussionTopic?.isAnonymousAuthor || true
+  )
+  const [requireInitialPost, setRequireInitialPost] = useState(
+    currentDiscussionTopic?.requireInitialPost || false
+  )
+  const [enablePodcastFeed, setEnablePodcastFeed] = useState(
+    currentDiscussionTopic?.podcastEnabled || false
+  )
+  const [includeRepliesInFeed, setIncludeRepliesInFeed] = useState(
+    currentDiscussionTopic?.podcastHasStudentPosts || false
+  )
+  const [isGraded, setIsGraded] = useState(!!currentDiscussionTopic?.assignment || false)
+  const [allowLiking, setAllowLiking] = useState(currentDiscussionTopic?.allowRating || false)
+  const [onlyGradersCanLike, setOnlyGradersCanLike] = useState(
+    currentDiscussionTopic?.onlyGradersCanRate || false
+  )
+  const [addToTodo, setAddToTodo] = useState(!!currentDiscussionTopic?.todoDate || false)
+  const [todoDate, setTodoDate] = useState(currentDiscussionTopic?.todoDate || null)
+  const [isGroupDiscussion, setIsGroupDiscussion] = useState(
+    !!currentDiscussionTopic?.groupSet || false
+  )
+  const [groupCategoryId, setGroupCategoryId] = useState(
+    currentDiscussionTopic?.groupSet?._id || null
+  )
   const [groupCategorySelectError, setGroupCategorySelectError] = useState([])
-  const [delayPosting, setDelayPosting] = useState(false)
-  const [locked, setLocked] = useState(false)
+  const [delayPosting, setDelayPosting] = useState(
+    (!!currentDiscussionTopic?.delayedPostAt && isAnnouncement) || false
+  )
+  const [locked, setLocked] = useState((currentDiscussionTopic.locked && isAnnouncement) || false)
 
-  const [availableFrom, setAvailableFrom] = useState(null)
-  const [availableUntil, setAvailableUntil] = useState(null)
+  const [availableFrom, setAvailableFrom] = useState(currentDiscussionTopic?.delayedPostAt || null)
+  const [availableUntil, setAvailableUntil] = useState(currentDiscussionTopic?.lockAt || null)
   const [willAnnouncementPostRightAway, setWillAnnouncementPostRightAway] = useState(true)
-  const [availabiltyValidationMessages, setAvailabilityValidationMessages] = useState([
+  const [availabilityValidationMessages, setAvailabilityValidationMessages] = useState([
     {text: '', type: 'success'},
   ])
 
-  const [pointsPossible, setPointsPossible] = useState(0)
-  const [displayGradeAs, setDisplayGradeAs] = useState('points')
-  const [assignmentGroup, setAssignmentGroup] = useState('')
-  const [peerReviewAssignment, setPeerReviewAssignment] = useState('off')
-  const [peerReviewsPerStudent, setPeerReviewsPerStudent] = useState(1)
-  const [peerReviewDueDate, setPeerReviewDueDate] = useState('')
+  const [pointsPossible, setPointsPossible] = useState(
+    currentDiscussionTopic?.assignment?.pointsPossible || 0
+  )
+  const [displayGradeAs, setDisplayGradeAs] = useState(
+    currentDiscussionTopic?.assignment?.gradingType || 'points'
+  )
+  const [assignmentGroup, setAssignmentGroup] = useState(
+    currentDiscussionTopic?.assignment?.assignmentGroup?._id || ''
+  )
+  const [peerReviewAssignment, setPeerReviewAssignment] = useState(() => {
+    if (currentDiscussionTopic?.assignment?.peerReviews?.enabled) {
+      return currentDiscussionTopic?.assignment?.peerReviews?.automaticReviews
+        ? 'automatically'
+        : 'manually'
+    }
+    return 'off'
+  })
+
+  const [peerReviewsPerStudent, setPeerReviewsPerStudent] = useState(
+    currentDiscussionTopic?.assignment?.peerReviews?.count || 1
+  )
+  const [peerReviewDueDate, setPeerReviewDueDate] = useState(
+    currentDiscussionTopic?.assignment?.peerReviews?.dueAt || ''
+  )
   const [dueDateErrorMessages, setDueDateErrorMessages] = useState([])
   const [assignedInfoList, setAssignedInfoList] = useState([
     {
@@ -167,54 +208,23 @@ export default function DiscussionTopicForm({
   }
   const [showGroupCategoryModal, setShowGroupCategoryModal] = useState(false)
 
-  const [attachment, setAttachment] = useState(null)
+  const [attachment, setAttachment] = useState(currentDiscussionTopic?.attachment || null)
   const [attachmentToUpload, setAttachmentToUpload] = useState(false)
   const affectUserFileQuota = false
 
-  const [usageRightsData, setUsageRightsData] = useState({})
+  const [usageRightsData, setUsageRightsData] = useState(
+    currentDiscussionTopic?.attachment?.usageRights || {}
+  )
   const [usageRightsErrorState, setUsageRightsErrorState] = useState(false)
 
-  const [postToSis, setPostToSis] = useState(false)
+  const [postToSis, setPostToSis] = useState(
+    !!currentDiscussionTopic?.assignment?.postToSis || false
+  )
 
   const handleSettingUsageRightsData = data => {
     setUsageRightsErrorState(false)
     setUsageRightsData(data)
   }
-
-  useEffect(() => {
-    if (!isEditing || !currentDiscussionTopic) return
-
-    setTitle(currentDiscussionTopic.title)
-    setRceContent(currentDiscussionTopic.message)
-    const sectionIds =
-      currentDiscussionTopic.courseSections && currentDiscussionTopic.courseSections.length > 0
-        ? currentDiscussionTopic.courseSections.map(section => section._id)
-        : ['all']
-    setSectionIdsToPostTo(sectionIds)
-    setDiscussionAnonymousState(currentDiscussionTopic.anonymousState || 'off')
-    setAnonymousAuthorState(currentDiscussionTopic.isAnonymousAuthor)
-    setRequireInitialPost(currentDiscussionTopic.requireInitialPost)
-    setEnablePodcastFeed(currentDiscussionTopic.podcastEnabled)
-    setIncludeRepliesInFeed(currentDiscussionTopic.podcastHasStudentPosts)
-
-    setAllowLiking(currentDiscussionTopic.allowRating)
-    setOnlyGradersCanLike(currentDiscussionTopic.onlyGradersCanRate)
-    setAddToTodo(!!currentDiscussionTopic.todoDate)
-    setTodoDate(currentDiscussionTopic.todoDate)
-    setIsGroupDiscussion(!!currentDiscussionTopic.groupSet)
-    setGroupCategoryId(currentDiscussionTopic.groupSet?._id)
-
-    setAvailableFrom(currentDiscussionTopic.delayedPostAt)
-    setAvailableUntil(currentDiscussionTopic.lockAt)
-    setDelayPosting(!!currentDiscussionTopic.delayedPostAt && isAnnouncement)
-    setLocked(currentDiscussionTopic.locked && isAnnouncement)
-    setAttachment(currentDiscussionTopic.attachment)
-    setUsageRightsData(currentDiscussionTopic?.attachment?.usageRights)
-    setIsGraded(!!currentDiscussionTopic?.assignment)
-    setPostToSis(!!currentDiscussionTopic?.assignment?.postToSis)
-    setPointsPossible(currentDiscussionTopic?.assignment?.pointsPossible)
-    setAssignmentGroup(currentDiscussionTopic?.assignment?.assignmentGroup?._id)
-  }, [isEditing, currentDiscussionTopic, discussionAnonymousState, isAnnouncement])
 
   useEffect(() => {
     if (delayPosting) {
@@ -285,6 +295,19 @@ export default function DiscussionTopicForm({
     return false
   }
 
+  const validatePostToSections = () => {
+    // If the PostTo section is not available, no need to validate
+    if (!(!isGraded && !isGroupDiscussion && !isGroupContext)) {
+      return true
+    }
+
+    if (sectionIdsToPostTo.length === 0) {
+      return false
+    } else {
+      return true
+    }
+  }
+
   const validateFormFields = () => {
     let isValid = true
 
@@ -293,6 +316,7 @@ export default function DiscussionTopicForm({
     if (!validateSelectGroup()) isValid = false
     if (!validateAssignToFields()) isValid = false
     if (!validateUsageRights()) isValid = false
+    if (!validatePostToSections()) isValid = false
 
     return isValid
   }
@@ -496,7 +520,6 @@ export default function DiscussionTopicForm({
       assignmentGroupId: assignmentGroup || null,
       peerReviews: preparePeerReviewPayload(),
       assignmentOverrides: prepareAssignmentOverridesPayload(),
-      groupCategoryId: isGroupDiscussion ? groupCategoryId : null,
       dueAt: everyoneOverride.dueDate || null,
       lockAt: everyoneOverride.availableUntil || null,
       unlockAt: everyoneOverride.availableFrom || null,
@@ -511,6 +534,7 @@ export default function DiscussionTopicForm({
         ...payload,
         courseId: ENV.context_id,
         name: title,
+        groupCategoryId: isGroupDiscussion ? groupCategoryId : null,
       }
     }
     return payload
@@ -567,6 +591,30 @@ export default function DiscussionTopicForm({
     )
   }
 
+  const handlePostToSelect = value => {
+    if (
+      !sectionIdsToPostTo.includes(allSectionsOption._id) &&
+      value.includes(allSectionsOption._id)
+    ) {
+      setSectionIdsToPostTo([allSectionsOption._id])
+    } else if (
+      sectionIdsToPostTo.includes(allSectionsOption._id) &&
+      value.includes(allSectionsOption._id) &&
+      value.length > 1
+    ) {
+      setSectionIdsToPostTo(value.filter(section_id => section_id !== allSectionsOption._id))
+    } else {
+      setSectionIdsToPostTo(value)
+    }
+
+    // Update Error message if no section is selected
+    if (value.length === 0) {
+      setPostToValidationMessages([{text: 'A section is required', type: 'error'}])
+    } else {
+      setPostToValidationMessages([])
+    }
+  }
+
   return (
     <>
       <FormFieldGroup description="" rowSpacing="small">
@@ -616,28 +664,12 @@ export default function DiscussionTopicForm({
             <CanvasMultiSelect
               data-testid="section-select"
               label={I18n.t('Post to')}
+              messages={postToValidationMessages}
               assistiveText={I18n.t(
                 'Select sections to post to. Type or use arrow keys to navigate. Multiple selections are allowed.'
               )}
               selectedOptionIds={sectionIdsToPostTo}
-              onChange={value => {
-                if (
-                  !sectionIdsToPostTo.includes(allSectionsOption._id) &&
-                  value.includes(allSectionsOption._id)
-                ) {
-                  setSectionIdsToPostTo([allSectionsOption._id])
-                } else if (
-                  sectionIdsToPostTo.includes(allSectionsOption._id) &&
-                  value.includes(allSectionsOption._id) &&
-                  value.length > 1
-                ) {
-                  setSectionIdsToPostTo(
-                    value.filter(section_id => section_id !== allSectionsOption._id)
-                  )
-                } else {
-                  setSectionIdsToPostTo(value)
-                }
-              }}
+              onChange={handlePostToSelect}
               width={inputWidth}
             >
               {[allSectionsOption, ...sections].map(({_id: id, name: label}) => (
@@ -790,6 +822,7 @@ export default function DiscussionTopicForm({
           )}
           {discussionAnonymousState === 'off' && !isAnnouncement && !isGroupContext && (
             <Checkbox
+              data-testid="graded-checkbox"
               label={I18n.t('Graded')}
               value="graded"
               checked={isGraded}
@@ -976,7 +1009,7 @@ export default function DiscussionTopicForm({
                 }}
                 datePlaceholder={I18n.t('Select Date')}
                 invalidDateTimeMessage={I18n.t('Invalid date and time')}
-                messages={availabiltyValidationMessages}
+                messages={availabilityValidationMessages}
                 layout="columns"
               />
             </FormFieldGroup>

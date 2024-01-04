@@ -59,7 +59,7 @@
           </button>
         <% end %>
       <% end %>
-      <% if Account.site_admin.feature_enabled?(:module_publish_menu) && @context.grants_any_right?(@current_user, session, :manage_content, :manage_course_content_edit) %>
+      <% if @context.grants_any_right?(@current_user, session, :manage_content, :manage_course_content_edit) %>
         <div id="context-modules-publish-menu" data-course-id="<%= @context.id %>" data-progress-id="<%= @progress&.id %>" style="display: inline-block;" data-disabled="<%= @modules.empty? %>"></div>
       <% end %>
       <% if @can_add %>

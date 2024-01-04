@@ -122,6 +122,7 @@ export default function DiscussionTopicFormContainer({apolloClient}) {
           todoDate: addToTodo ? todoDate : null,
           podcastEnabled: enablePodcastFeed,
           podcastHasStudentPosts: includeRepliesInFeed,
+          groupCategoryId: groupCategoryId || null,
           locked,
           fileId: attachment?._id,
           removeAttachment: !attachment?._id,

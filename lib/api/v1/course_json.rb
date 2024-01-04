@@ -271,7 +271,7 @@ module Api::V1
                end
 
       enrollment.send(
-        "#{prefix}_#{current_or_final}_#{score_or_grade}",
+        :"#{prefix}_#{current_or_final}_#{score_or_grade}",
         grading_period_id: current_grading_period.id
       )
     end

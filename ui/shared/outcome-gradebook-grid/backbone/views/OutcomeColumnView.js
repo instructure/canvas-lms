@@ -17,11 +17,11 @@
  */
 
 import {extend} from '@canvas/backbone/utils'
-import _ from 'underscore'
 import {View} from '@canvas/backbone'
+import {extend as lodashExtend, each, map, filter, find} from 'lodash'
 import Popover from 'jquery-popover'
 import Outcome from '@canvas/grade-summary/backbone/models/Outcome'
-import d3 from 'd3/d3'
+import d3 from 'd3'
 import I18n from '@canvas/i18n'
 import popover_template from '@canvas/outcomes/jst/outcomePopover.handlebars'
 
@@ -55,7 +55,7 @@ OutcomeColumnView.prototype.createPopover = function (e) {
   if (!this.account_level_scales()) {
     this.pickColors()
   }
-  const attributes = _.extend(new Outcome(this.attributes).present(), {
+  const attributes = lodashExtend(new Outcome(this.attributes).present(), {
     account_level_scales: this.account_level_scales(),
   })
   const popover = new Popover(e, this.popover_template(attributes), {
@@ -100,7 +100,7 @@ OutcomeColumnView.prototype.pickColors = function () {
   const last = data.length - 1
   const mastery = this.attributes.mastery_points
   const mastery_pos = data.indexOf(
-    _.find(data, function (x) {
+    find(data, function (x) {
       return x.points === mastery
     })
   )
@@ -108,13 +108,13 @@ OutcomeColumnView.prototype.pickColors = function () {
     .linear()
     .domain([0, mastery_pos, (mastery_pos + last) / 2, last])
     .range(['#416929', '#8bab58', '#e0d670', '#dd5c5c'])
-  return _.each(data, function (rating, i) {
-    return (rating.color = color(i))
+  each(data, function (rating, i) {
+    rating.color = color(i)
   })
 }
 
 OutcomeColumnView.prototype.renderChart = function () {
-  this.data = _.filter(this.attributes.ratings, function (rating) {
+  this.data = filter(this.attributes.ratings, function (rating) {
     return rating.percent
   })
   this.r = 50
@@ -183,7 +183,7 @@ OutcomeColumnView.prototype.renderLabels = function () {
       (function (_this) {
         return function (d) {
           let c = _this.getCentroid(d)
-          c = _.map(c, function (x) {
+          c = map(c, function (x) {
             return x * 2.3
           })
           return 'translate(' + c + ')'
@@ -258,10 +258,10 @@ OutcomeColumnView.prototype.renderLabelLines = function () {
       (function (_this) {
         return function (d) {
           const c = _this.getCentroid(d)
-          const c1 = _.map(c, function (x) {
+          const c1 = map(c, function (x) {
             return x * 1.4
           })
-          const c2 = _.map(c, function (x) {
+          const c2 = map(c, function (x) {
             return x * 2.2
           })
           return 'M' + c1[0] + ' ' + c1[1] + ' L' + c2[0] + ' ' + c2[1]

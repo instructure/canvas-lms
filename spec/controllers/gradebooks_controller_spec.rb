@@ -3057,9 +3057,9 @@ describe GradebooksController do
     describe "checkpointed discussions" do
       before do
         @course.root_account.enable_feature!(:discussion_checkpoints)
-        assignment = @course.assignments.create!(checkpointed: true, checkpoint_label: CheckpointLabels::PARENT)
-        assignment.checkpoint_assignments.create!(context: @course, checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC, due_at: 2.days.from_now)
-        assignment.checkpoint_assignments.create!(context: @course, checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY, due_at: 3.days.from_now)
+        assignment = @course.assignments.create!(has_sub_assignments: true)
+        assignment.sub_assignments.create!(context: @course, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC, due_at: 2.days.from_now)
+        assignment.sub_assignments.create!(context: @course, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY, due_at: 3.days.from_now)
         @topic = @course.discussion_topics.create!(assignment:, reply_to_entry_required_count: 1)
       end
 
@@ -3082,14 +3082,14 @@ describe GradebooksController do
         user_session(@teacher)
         post(
           "update_submission",
-          params: post_params.merge(checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC),
+          params: post_params.merge(sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC),
           format: :json
         )
         expect(response).to be_successful
         expect(reply_to_topic_submission.score).to eq 10
       end
 
-      it "raises an error if no checkpoint label is provided" do
+      it "raises an error if no sub assignment tag is provided" do
         user_session(@teacher)
         post(
           "update_submission",
@@ -3097,7 +3097,7 @@ describe GradebooksController do
           format: :json
         )
         expect(response).to have_http_status :bad_request
-        expect(json_parse.dig("errors", "base")).to eq "Must provide a valid checkpoint label when grading checkpointed discussions"
+        expect(json_parse.dig("errors", "base")).to eq "Must provide a valid sub assignment tag when grading checkpointed discussions"
       end
 
       it "ignores checkpoints when the feature flag is disabled" do
@@ -3105,7 +3105,7 @@ describe GradebooksController do
         user_session(@teacher)
         post(
           "update_submission",
-          params: post_params.merge(checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC),
+          params: post_params.merge(sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC),
           format: :json
         )
         expect(response).to be_successful

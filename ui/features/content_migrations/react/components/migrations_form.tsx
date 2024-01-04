@@ -17,6 +17,7 @@
  */
 
 import React, {useEffect, useState, useCallback} from 'react'
+import type {SetStateAction, Dispatch} from 'react'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
@@ -34,7 +35,9 @@ import type {
   ContentMigrationItem,
   ContentMigrationResponse,
   Migrator,
+  DateShifts,
   onSubmitMigrationFormCallback,
+  AdjustDates,
 } from './types'
 import CommonCartridgeImporter from './migrator_forms/common_cartridge'
 import MoodleZipImporter from './migrator_forms/moodle_zip'
@@ -46,9 +49,12 @@ const I18n = useI18nScope('content_migrations_redesign')
 type RequestBody = {
   course_id: string
   migration_type: string
-  date_shift_options: boolean
+  date_shift_options: DateShifts
+  adjust_dates: AdjustDates
   selective_import: boolean
   settings: {[key: string]: any}
+  daySubCollection?: object
+  errored?: boolean
   pre_attachment?: {
     name: string
     no_redirect: boolean
@@ -87,15 +93,12 @@ const renderMigrator = (props: MigratorProps) => {
 }
 
 export const ContentMigrationsForm = ({
-  migrations,
   setMigrations,
 }: {
-  migrations: ContentMigrationItem[]
-  setMigrations: (migrations: ContentMigrationItem[]) => void
+  setMigrations: Dispatch<SetStateAction<ContentMigrationItem[]>>
 }) => {
   const [migrators, setMigrators] = useState<any>([])
   const [chosenMigrator, setChosenMigrator] = useState<string | null>(null)
-
   const handleFileProgress = (_: AttachmentProgressResponse) => {}
   // console.log(`${(response.loaded / response.total) * 100}%`)
 
@@ -104,9 +107,10 @@ export const ContentMigrationsForm = ({
   const onSubmitForm: onSubmitMigrationFormCallback = useCallback(
     async (formData, preAttachmentFile) => {
       const courseId = window.ENV.COURSE_ID
-      if (!chosenMigrator || !courseId) {
+      if (!chosenMigrator || !courseId || formData.errored) {
         return
       }
+      delete formData.errored
       const requestBody: RequestBody = {
         course_id: courseId,
         migration_type: chosenMigrator,
@@ -124,10 +128,10 @@ export const ContentMigrationsForm = ({
           onProgress: handleFileProgress,
         })
       }
-      setMigrations([json as ContentMigrationItem].concat(migrations))
+      setMigrations(prevMigrations => [json as ContentMigrationItem].concat(prevMigrations))
       onResetForm()
     },
-    [chosenMigrator, migrations, setMigrations, onResetForm]
+    [chosenMigrator, setMigrations, onResetForm]
   )
 
   useEffect(() => {

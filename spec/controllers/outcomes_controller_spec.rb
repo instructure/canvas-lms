@@ -161,6 +161,22 @@ describe OutcomesController do
         expect(assigns[:js_env][:OUTCOMES_FRIENDLY_DESCRIPTION]).to be false
       end
     end
+
+    context "archive_outcomes" do
+      it "returns true if archive_outcomes feature flag is enabled" do
+        Account.site_admin.enable_feature!(:archive_outcomes)
+        user_session(@admin)
+        get "index", params: { account_id: @account.id }
+        expect(assigns[:js_env][:ARCHIVE_OUTCOMES]).to be true
+      end
+
+      it "returns false if archive_outcomes feature flag is disabled" do
+        Account.site_admin.disable_feature!(:archive_outcomes)
+        user_session(@admin)
+        get "index", params: { account_id: @account.id }
+        expect(assigns[:js_env][:ARCHIVE_OUTCOMES]).to be false
+      end
+    end
   end
 
   context "outcome_average_calculation" do

@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import tz from '@canvas/timezone'
+import * as tz from '../../index'
 import _ from 'lodash'
 import $ from 'jquery'
 import '../../jquery/index'
@@ -36,6 +36,7 @@ type Props = {
 
 function timeFormatting(dateTime: string | Date, format: string | undefined, showTime: boolean) {
   if (!_.isDate(dateTime)) {
+    // @ts-expect-error
     dateTime = tz.parse(dateTime)
   }
 

@@ -22,16 +22,16 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import numberHelper from '@canvas/i18n/numberHelper'
 import $ from 'jquery'
 import autoBlurActiveInput from './behaviors/autoBlurActiveInput'
-import _ from 'underscore'
+import {isEqual, clone} from 'lodash'
 import LDBLoginPopup from '../backbone/views/LDBLoginPopup'
 import quizTakingPolice from './quiz_taking_police'
 import QuizLogAuditing from '@canvas/quiz-log-auditing'
 import QuizLogAuditingEventDumper from '@canvas/quiz-log-auditing/jquery/dump_events'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/util/toJSON'
-import '@canvas/datetime' /* friendlyDatetime, friendlyDate */
-import '@canvas/forms/jquery/jquery.instructure_forms' /* getFormData, errorBox */
+import '@canvas/jquery/jquery.toJSON'
+import '@canvas/datetime/jquery' /* friendlyDatetime, friendlyDate */
+import '@canvas/jquery/jquery.instructure_forms' /* getFormData, errorBox */
 import 'jqueryui/dialog'
 import '@canvas/rails-flash-notifications'
 import 'jquery-scroll-to-visible/jquery.scrollTo'
@@ -132,13 +132,13 @@ const quizSubmission = (function () {
       const url = $('.backup_quiz_submission_url').attr('href')
       ;(function (submissionData) {
         // Need a shallow clone of the data here because $.ajaxJSON modifies in place
-        const thisSubmissionData = _.clone(submissionData)
+        const thisSubmissionData = clone(submissionData)
         // If this is a timeout-based submission and the data is the same as last time,
         // palliate the server by skipping the data submission
         if (
           !quizSubmission.inBackground &&
           repeat &&
-          _.isEqual(submissionData, lastSuccessfulSubmissionData)
+          isEqual(submissionData, lastSuccessfulSubmissionData)
         ) {
           $lastSaved.text(
             I18n.t('saving_not_needed', 'No new data to save. Last checked at %{t}', {

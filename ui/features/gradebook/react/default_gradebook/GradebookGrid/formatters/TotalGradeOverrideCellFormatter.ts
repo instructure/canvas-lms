@@ -17,7 +17,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'underscore'
+import {escape as lodashEscape} from 'lodash'
 import GradeOverrideEntry from '@canvas/grading/GradeEntry/GradeOverrideEntry'
 import type Gradebook from '../../Gradebook'
 import useStore from '../../stores'
@@ -33,7 +33,7 @@ function renderStartContainer(gradeInfo) {
 }
 
 function render(formattedGrade, gradeInfo, studentId, selectedGradingPeriodId) {
-  const escapedGrade = _.escape(formattedGrade)
+  const escapedGrade = lodashEscape(formattedGrade)
 
   const {finalGradeOverrides} = useStore.getState()
   const customGradeStatusId = gradeOverrideCustomStatus(

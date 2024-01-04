@@ -56,7 +56,7 @@ export const DiscussionTopicRepliesContainer = props => {
   })
 
   useEffect(() => {
-    if (discussionEntriesToUpdate.size > 0 && filter !== 'drafts' && !searchTerm) {
+    if (discussionEntriesToUpdate.size > 0 && !searchTerm) {
       const interval = setInterval(() => {
         let entryIds = Array.from(discussionEntriesToUpdate)
         const entries = props.discussionTopic.discussionEntriesConnection.nodes.filter(
@@ -111,11 +111,9 @@ export const DiscussionTopicRepliesContainer = props => {
             discussionEntry={thread}
             discussionTopic={props.discussionTopic}
             markAsRead={markAsRead}
-            onOpenIsolatedView={props.onOpenIsolatedView}
+            onOpenSplitView={props.onOpenSplitView}
             goToTopic={props.goToTopic}
             highlightEntryId={props.highlightEntryId}
-            removeDraftFromDiscussionCache={props.removeDraftFromDiscussionCache}
-            updateDraftCache={props.updateDraftCache}
             setHighlightEntryId={props.setHighlightEntryId}
             userSplitScreenPreference={props.userSplitScreenPreference}
           />
@@ -137,11 +135,9 @@ export const DiscussionTopicRepliesContainer = props => {
 
 DiscussionTopicRepliesContainer.propTypes = {
   discussionTopic: Discussion.shape,
-  onOpenIsolatedView: PropTypes.func,
+  onOpenSplitView: PropTypes.func,
   goToTopic: PropTypes.func,
   highlightEntryId: PropTypes.string,
-  removeDraftFromDiscussionCache: PropTypes.func,
-  updateDraftCache: PropTypes.func,
   isSearchResults: PropTypes.bool,
   setHighlightEntryId: PropTypes.func,
   userSplitScreenPreference: PropTypes.bool,

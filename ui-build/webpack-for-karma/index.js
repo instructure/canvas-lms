@@ -43,11 +43,7 @@ module.exports = {
       {
         test: /\.(mjs|js|jsx|ts|tsx)$/,
         type: 'javascript/auto',
-        include: [
-          path.resolve(canvasDir, 'node_modules/graphql'),
-          path.resolve(canvasDir, 'packages/datetime-moment-parser/index.js'),
-          path.resolve(canvasDir, 'packages/datetime/index.js'),
-        ],
+        include: [path.resolve(canvasDir, 'node_modules/graphql')],
         resolve: {
           fullySpecified: false,
         },
@@ -61,12 +57,6 @@ module.exports = {
         test: /\.(js|jsx|ts|tsx)$/,
         include: [
           path.join(canvasDir, 'ui'),
-          path.join(canvasDir, 'packages/jquery-kyle-menu'),
-          path.join(canvasDir, 'packages/jquery-popover'),
-          path.resolve(canvasDir, 'packages/canvas-planner'),
-          path.join(canvasDir, 'packages/jquery-selectmenu'),
-          path.resolve(canvasDir, 'packages/convert-case'),
-          path.join(canvasDir, 'packages/slickgrid'),
           path.join(canvasDir, 'spec/javascripts/jsx'),
           path.join(canvasDir, 'spec/coffeescripts'),
           /gems\/plugins\/.*\/app\/(jsx|coffeescripts)\//,
@@ -151,7 +141,6 @@ module.exports = {
   },
   resolve: {
     alias: {
-      d3: 'd3/d3',
       'node_modules-version-of-backbone$': require.resolve('backbone'),
       'node_modules-version-of-react-modal$': require.resolve('react-modal'),
       'spec/jsx': path.join(canvasDir, 'spec/javascripts/jsx'),

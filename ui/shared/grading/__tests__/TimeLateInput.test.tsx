@@ -19,7 +19,7 @@
 
 import React from 'react'
 import {fireEvent, render} from '@testing-library/react'
-import TimeLateInput from '@canvas/grading/TimeLateInput'
+import TimeLateInput from '../TimeLateInput'
 
 describe('TimeLateInput', () => {
   let props

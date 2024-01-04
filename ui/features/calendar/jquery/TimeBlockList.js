@@ -20,8 +20,8 @@ import $ from 'jquery'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import TimeBlockListManager from '@canvas/calendar/TimeBlockListManager'
 import TimeBlockRow from './TimeBlockRow'
-import '@canvas/datetime'
-import '@canvas/forms/jquery/jquery.instructure_forms'
+import '@canvas/datetime/jquery'
+import '@canvas/jquery/jquery.instructure_forms'
 import 'date-js'
 
 const I18n = useI18nScope('calendar')

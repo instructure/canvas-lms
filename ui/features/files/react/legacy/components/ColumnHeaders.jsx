@@ -17,9 +17,9 @@
  */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import _ from 'underscore'
 import React from 'react'
 import PropTypes from 'prop-types'
+import {defaults} from 'lodash'
 
 const I18n = useI18nScope('react_files')
 
@@ -80,6 +80,6 @@ export default {
 
   queryParamsFor(query, property) {
     const order = (query.sort || 'name') === property && query.order === 'desc' ? 'asc' : 'desc'
-    return _.defaults({sort: property, order}, query)
+    return defaults({sort: property, order}, query)
   },
 }

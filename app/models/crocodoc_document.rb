@@ -101,7 +101,7 @@ class CrocodocDocument < ActiveRecord::Base
       opts[:user] = user.crocodoc_user
     end
 
-    crocodoc_ids = opts[:moderated_grading_allow_list]&.map { |h| h["crocodoc_id"] }
+    crocodoc_ids = opts[:moderated_grading_allow_list]&.pluck("crocodoc_id")
     opts.merge! permissions_for_user(user, crocodoc_ids)
 
     unless annotations_on

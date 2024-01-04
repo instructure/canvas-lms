@@ -20,7 +20,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import natcompare from '@canvas/util/natcompare'
 import numberHelper from '@canvas/i18n/numberHelper'
-import '@canvas/forms/jquery/jquery.instructure_forms' /* formSubmit */
+import '@canvas/jquery/jquery.instructure_forms' /* formSubmit */
 import 'jqueryui/dialog'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 

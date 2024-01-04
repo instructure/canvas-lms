@@ -16,4 +16,41 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import '@canvas/util/jquery/confirmEmail'
+import $ from 'jquery'
+import '@canvas/jquery/jquery.ajaxJSON'
+import {useScope as useI18nScope} from '@canvas/i18n'
+import preventDefault from '@canvas/util/preventDefault'
+import '@canvas/rails-flash-notifications'
+
+const I18n = useI18nScope('profile')
+
+$(() => {
+  let resending = false
+
+  $('.re_send_confirmation_link').click(
+    preventDefault(function () {
+      const $this = $(this)
+      const text = $this.text()
+
+      if (resending) return
+      resending = true
+      $this.text(I18n.t('resending', 'resending...'))
+
+      $.ajaxJSON(
+        $this.attr('href'),
+        'POST',
+        {},
+        _data => {
+          resending = false
+          $this.text(text)
+          $.flashMessage(I18n.t('done_resending', 'Done! Message delivery may take a few minutes.'))
+        },
+        _data => {
+          resending = false
+          $this.text(text)
+          $.flashError(I18n.t('failed_resending', 'Request failed. Try again.'))
+        }
+      )
+    })
+  )
+})

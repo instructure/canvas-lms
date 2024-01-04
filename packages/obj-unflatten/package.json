@@ -3,5 +3,9 @@
   "private": true,
   "version": "1.0.0",
   "author": "neme",
-  "main": "./index.js"
+  "main": "./index.js",
+  "owner": "EVAL",
+  "dependencies": {
+    "lodash": "^4.17.21"
+  }
 }

@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import './index'
 import DatetimeField from './DatetimeField'
 import {log} from '@canvas/datetime-natural-parsing-instrument'
 

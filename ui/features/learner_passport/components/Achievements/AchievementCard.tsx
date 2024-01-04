@@ -16,10 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useCallback, useState} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {Pill} from '@instructure/ui-pill'
 import {Text} from '@instructure/ui-text'
+import {Tooltip} from '@instructure/ui-tooltip'
+import {TruncateText} from '@instructure/ui-truncate-text'
 import {View} from '@instructure/ui-view'
 
 export type AchievementCardProps = {
@@ -30,6 +32,12 @@ export type AchievementCardProps = {
 }
 
 const AchievementCard = ({isNew, title, issuer, imageUrl}: AchievementCardProps) => {
+  const [titleIsTruncated, setTitleIsTruncated] = useState(false)
+
+  const handleTruncatedTitle = useCallback((isTruncated: boolean) => {
+    setTitleIsTruncated(isTruncated)
+  }, [])
+
   return (
     <View
       data-testid="achievement-card"
@@ -59,8 +67,12 @@ const AchievementCard = ({isNew, title, issuer, imageUrl}: AchievementCardProps)
             }}
           />
         </Flex.Item>
-        <Flex.Item>
-          <Text weight="bold">{title}</Text>
+        <Flex.Item shouldGrow={false}>
+          <Tooltip renderTip={title} on={titleIsTruncated ? ['focus', 'hover'] : []}>
+            <Text weight="bold">
+              <TruncateText onUpdate={handleTruncatedTitle}>{title}</TruncateText>
+            </Text>
+          </Tooltip>
         </Flex.Item>
         <Flex.Item>
           <Text>{issuer}</Text>

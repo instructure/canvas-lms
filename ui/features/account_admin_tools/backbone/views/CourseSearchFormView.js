@@ -20,7 +20,7 @@ import Backbone from '@canvas/backbone'
 import $ from 'jquery'
 import template from '../../jst/CourseSearchForm.handlebars'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import '@canvas/forms/jquery/jquery.instructure_forms'
+import '@canvas/jquery/jquery.instructure_forms'
 
 const I18n = useI18nScope('course_search')
 

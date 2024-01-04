@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import DateHelper from '../../../../../shared/datetime/dateHelper'
+import DateHelper from '@canvas/datetime/dateHelper'
 import {Discussion} from '../../../graphql/Discussion'
 import {responsiveQuerySizes} from '../../utils'
 import {useScope as useI18nScope} from '@canvas/i18n'

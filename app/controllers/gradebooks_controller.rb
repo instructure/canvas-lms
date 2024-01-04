@@ -890,8 +890,8 @@ class GradebooksController < ApplicationController
 
             submission[:dont_overwrite_grade] = dont_overwrite_grade
             submission.delete(:final) if submission[:final] && !@assignment.permits_moderation?(@current_user)
-            if params.key?(:checkpoint_label) && @domain_root_account&.feature_enabled?(:discussion_checkpoints)
-              submission[:checkpoint_label] = params.delete(:checkpoint_label)
+            if params.key?(:sub_assignment_tag) && @domain_root_account&.feature_enabled?(:discussion_checkpoints)
+              submission[:sub_assignment_tag] = params.delete(:sub_assignment_tag)
             end
             subs = @assignment.grade_student(@user, submission.merge(skip_grader_check: is_default_grade_for_missing))
             apply_provisional_grade_filters!(submissions: subs, final: submission[:final]) if submission[:provisional]

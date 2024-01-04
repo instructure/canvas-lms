@@ -23,7 +23,7 @@ import $ from 'jquery'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Button} from '@instructure/ui-buttons'
 import HomePagePromptContainer from '@canvas/course-homepage/react/Prompt'
-import createStore from '@canvas/util/createStore'
+import createStore from '@canvas/backbone/createStore'
 import * as apiClient from '@canvas/courses/courseAPIClient'
 
 const I18n = useI18nScope('dashcards')

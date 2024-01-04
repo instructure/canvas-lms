@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/module-sequence-footer'
 import MarkAsDone from '@canvas/util/jquery/markAsDone'
 import ToolLaunchResizer from '@canvas/lti/jquery/tool_launch_resizer'

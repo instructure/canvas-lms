@@ -376,6 +376,25 @@ describe Lti::LtiOutboundAdapter do
     end
   end
 
+  describe "#generate_post_payload_for_student_context_card" do
+    let(:student_id) { user_model.global_id }
+
+    it "raises a not prepared error if the tool launch has not been prepared" do
+      expect do
+        adapter.generate_post_payload_for_student_context_card(student_id:)
+      end.to raise_error(RuntimeError, "Called generate_post_payload_for_student_context_card before calling prepare_tool_launch")
+    end
+
+    it "add student id to the overrides" do
+      tool_launch = double("tool launch", generate: {}, url: "http://example.com/launch")
+      allow(LtiOutbound::ToolLaunch).to receive(:new).and_return(tool_launch)
+
+      adapter.prepare_tool_launch(return_url, variable_expander)
+      adapter.generate_post_payload_for_student_context_card(student_id:)
+      expect(tool_launch).to have_received(:generate).with(hash_including(lti_student_id: student_id))
+    end
+  end
+
   describe ".consumer_instance_class" do
     around do |example|
       orig_class = Lti::LtiOutboundAdapter.consumer_instance_class

@@ -25,3 +25,7 @@ export const humanReadableSize = (size: number): string => {
   }
   return size.toFixed(1) + ' ' + units[i]
 }
+
+export const timeout = (delay: number) => {
+  return new Promise(resolve => setTimeout(resolve, delay))
+}

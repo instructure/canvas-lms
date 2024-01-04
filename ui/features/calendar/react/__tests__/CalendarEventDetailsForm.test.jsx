@@ -154,8 +154,6 @@ describe('CalendarEventDetailsForm', () => {
   })
 
   it('shows UpdateCalendarEventsDialog when saving a recurring event', async () => {
-    ENV.FEATURES.calendar_series = true
-
     const props = eventFormProps()
     props.event.calendarEvent = {
       ...props.event.calendarEvent,
@@ -310,6 +308,18 @@ describe('CalendarEventDetailsForm', () => {
 
     act(() => end.click())
     expect(errMessage).not.toBeInTheDocument()
+  })
+
+  it('allows setting arbitrary start/ end times', () => {
+    const {getByTestId} = render(<CalendarEventDetailsForm {...defaultProps} />)
+    const startInput = getByTestId('event-form-start-time')
+    const endInput = getByTestId('event-form-end-time')
+    userEvent.clear(startInput)
+    userEvent.type(startInput, '8:14 AM')
+    userEvent.clear(endInput)
+    userEvent.type(endInput, '9:38 AM')
+    expect(startInput.value).toBe('8:14 AM')
+    expect(endInput.value).toBe('9:38 AM')
   })
 
   it('cannot submit with an empty title', () => {
@@ -496,13 +506,11 @@ describe('CalendarEventDetailsForm', () => {
 
   describe('frequency picker', () => {
     beforeEach(() => {
-      ENV.FEATURES.calendar_series = true
       defaultProps.event.isNewEvent = () => true
       commonEventFactory.mockImplementation(() => defaultProps.event)
     })
 
     afterEach(() => {
-      ENV.FEATURES.calendar_series = false
       defaultProps.event.isNewEvent = () => false
       jest.resetModules()
     })
@@ -516,12 +524,6 @@ describe('CalendarEventDetailsForm', () => {
       defaultProps.event.isNewEvent = () => false
       const component = render(<CalendarEventDetailsForm {...defaultProps} />)
       expect(component.queryByRole('combobox', {name: 'Frequency'})).toBeInTheDocument()
-    })
-
-    it('does not render when calendar_series is disabled', async () => {
-      ENV.FEATURES.calendar_series = false
-      const component = render(<CalendarEventDetailsForm {...defaultProps} />)
-      expect(component.queryByRole('combobox', {name: 'Frequency'})).not.toBeInTheDocument()
     })
 
     it('with option selected contains RRULE on submit', async () => {

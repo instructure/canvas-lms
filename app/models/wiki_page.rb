@@ -57,7 +57,8 @@ class WikiPage < ActiveRecord::Base
   has_many :wiki_page_lookups, inverse_of: :wiki_page
   has_many :wiki_page_embeddings, inverse_of: :wiki_page
   has_one :master_content_tag, class_name: "MasterCourses::MasterContentTag", inverse_of: :wiki_page
-
+  has_many :assignment_overrides, dependent: :destroy, inverse_of: :wiki_page
+  has_many :assignment_override_students, dependent: :destroy
   acts_as_url :title, sync_url: true
 
   validate :validate_front_page_visibility

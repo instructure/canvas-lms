@@ -48,12 +48,12 @@ const icon_verified = `<svg width="12" height="16" viewBox="0 0 12 16" fill="non
 </svg>`
 
 interface AchievementTrayProps {
-  activeCard: AchievementData
+  activeCard?: AchievementData
   open: boolean
-  onDismiss: () => void
+  onClose: () => void
 }
 
-const AchievementTray = ({activeCard, open, onDismiss}: AchievementTrayProps) => {
+const AchievementTray = ({activeCard, open, onClose}: AchievementTrayProps) => {
   const [trayHeadingIsTruncated, setTrayHeadingIsTruncated] = useState(false)
 
   const formatDate = useCallback((date: string) => {
@@ -73,29 +73,30 @@ const AchievementTray = ({activeCard, open, onDismiss}: AchievementTrayProps) =>
     )
   }, [activeCard, handleTruncatedHeading])
 
+  const renderTrayHeader = useCallback(() => {
+    if (!activeCard) return null
+
+    return trayHeadingIsTruncated ? (
+      <Tooltip renderTip={activeCard.title}>{renderTrayHeading()}</Tooltip>
+    ) : (
+      renderTrayHeading()
+    )
+  }, [activeCard, renderTrayHeading, trayHeadingIsTruncated])
+
   return (
     <Tray
       label="Achievement Details"
       open={open}
-      onDismiss={onDismiss}
+      onDismiss={onClose}
       size="regular"
       placement="end"
     >
       <Flex as="div" padding="small small small medium">
         <Flex.Item shouldGrow={true} shouldShrink={true}>
-          {trayHeadingIsTruncated ? (
-            <Tooltip renderTip={activeCard.title}>{renderTrayHeading()}</Tooltip>
-          ) : (
-            renderTrayHeading()
-          )}
+          {renderTrayHeader()}
         </Flex.Item>
         <Flex.Item>
-          <CloseButton
-            placement="end"
-            offset="small"
-            screenReaderLabel="Close"
-            onClick={onDismiss}
-          />
+          <CloseButton placement="end" offset="small" screenReaderLabel="Close" onClick={onClose} />
         </Flex.Item>
       </Flex>
       <Flex
@@ -105,99 +106,108 @@ const AchievementTray = ({activeCard, open, onDismiss}: AchievementTrayProps) =>
         justifyItems="start"
         alignItems="stretch"
       >
-        <Flex.Item as="div" margin="0 0 small 0" align="center">
-          <img
-            src={activeCard.imageUrl || undefined}
-            alt=""
-            style={{
-              minHeight: '128px',
-              minWidth: '128px',
-              background: activeCard.imageUrl
-                ? 'none'
-                : 'repeating-linear-gradient(45deg, #cecece, #cecece 10px, #aeaeae 10px, #aeaeae 20px)',
-            }}
-          />
-        </Flex.Item>
-        {activeCard.verifiedBy && (
-          <Flex.Item align="center">
-            <SVGIcon src={icon_verified} size="x-small" color="success" />{' '}
-            <Text size="small">
-              Verified by{' '}
-              <Link href=" https://openbadges.org/" target="_blank">
-                {activeCard.verifiedBy}
-              </Link>
-            </Text>
-          </Flex.Item>
-        )}
-        <Flex.Item align="end" margin="medium 0">
-          <Button color="secondary" margin="xx-small" onClick={showUnimplemented}>
-            View badge
-          </Button>
-          <Button color="secondary" margin="xx-small" onClick={showUnimplemented}>
-            Print
-          </Button>
-          <Button color="secondary" margin="xx-small" onClick={showUnimplemented}>
-            Download
-          </Button>
-          <Button color="primary" margin="xx-small" onClick={showUnimplemented}>
-            Share
-          </Button>
-        </Flex.Item>
-        <View borderWidth="small 0 0 0" borderColor="secondary" padding="medium 0">
-          <List isUnstyled={true} margin="0">
-            {activeCard.type && (
-              <List.Item margin="0 0 small 0">
-                <IconStarLightLine /> <Text>Award type:</Text>{' '}
-                <Text weight="bold">{activeCard.type}</Text>
-              </List.Item>
+        {activeCard ? (
+          <>
+            <Flex.Item as="div" margin="0 0 small 0" align="center">
+              <img
+                src={activeCard.imageUrl || undefined}
+                alt=""
+                style={{
+                  minHeight: '128px',
+                  minWidth: '128px',
+                  background: activeCard.imageUrl
+                    ? 'none'
+                    : 'repeating-linear-gradient(45deg, #cecece, #cecece 10px, #aeaeae 10px, #aeaeae 20px)',
+                }}
+              />
+            </Flex.Item>
+            {activeCard.verifiedBy && (
+              <Flex.Item align="center">
+                <SVGIcon src={icon_verified} size="x-small" color="success" />{' '}
+                <Text size="small">
+                  Verified by{' '}
+                  <Link href=" https://openbadges.org/" target="_blank">
+                    {activeCard.verifiedBy}
+                  </Link>
+                </Text>
+              </Flex.Item>
             )}
-            <List.Item margin="0 0 small 0">
-              <IconCalendarMonthLine /> <Text>Issued on:</Text>{' '}
-              <Text weight="bold">{formatDate(activeCard.issuedOn)}</Text>
-            </List.Item>
-            {activeCard.expiresOn && (
-              <List.Item margin="0 0 small 0">
-                <IconCalendarMonthLine /> <Text>Expires on:</Text>{' '}
-                <Text weight="bold">{formatDate(activeCard.expiresOn)}</Text>
-              </List.Item>
-            )}
-            <List.Item margin="0 0 small 0">
-              <IconEducatorsLine /> <Text>Issued by:</Text>{' '}
-              {activeCard.issuer.iconUrl && (
-                <Img src={activeCard.issuer.iconUrl} alt="" height="1rem" margin="0 xx-small 0 0" />
-              )}
-              {activeCard.issuer.url ? (
-                <Link href={activeCard.issuer.url} target="_blank">
-                  <Text weight="bold">{activeCard.issuer.name}</Text>
-                </Link>
-              ) : (
-                <Text weight="bold">{activeCard.issuer.name}</Text>
-              )}
-            </List.Item>
-          </List>
-        </View>
-        {activeCard.criteria && (
-          <View borderWidth="small 0 0 0" borderColor="secondary" padding="medium 0">
-            <Text as="div" weight="bold">
-              Earning criteria
-            </Text>
-            <Text as="div">{activeCard.criteria}</Text>
-          </View>
-        )}
-        {activeCard.skills?.length > 0 && (
-          <View borderWidth="small 0 0 0" borderColor="secondary" padding="medium 0">
-            <Text as="div" weight="bold">
-              Skills
-            </Text>
-            <SVGIcon src={icon_verified} size="x-small" color="success" />{' '}
-            <Text as="span" size="x-small">
-              Verified by Lightcast
-            </Text>
-            <View as="div" margin="x-small 0 0 0">
-              {activeCard.skills.map((skill: SkillData) => renderSkillTag(skill))}
+            <Flex.Item align="end" margin="medium 0">
+              <Button color="secondary" margin="xx-small" onClick={showUnimplemented}>
+                View badge
+              </Button>
+              <Button color="secondary" margin="xx-small" onClick={showUnimplemented}>
+                Print
+              </Button>
+              <Button color="secondary" margin="xx-small" onClick={showUnimplemented}>
+                Download
+              </Button>
+              <Button color="primary" margin="xx-small" onClick={showUnimplemented}>
+                Share
+              </Button>
+            </Flex.Item>
+            <View borderWidth="small 0 0 0" borderColor="secondary" padding="medium 0">
+              <List isUnstyled={true} margin="0">
+                {activeCard.type && (
+                  <List.Item margin="0 0 small 0">
+                    <IconStarLightLine /> <Text>Award type:</Text>{' '}
+                    <Text weight="bold">{activeCard.type}</Text>
+                  </List.Item>
+                )}
+                <List.Item margin="0 0 small 0">
+                  <IconCalendarMonthLine /> <Text>Issued on:</Text>{' '}
+                  <Text weight="bold">{formatDate(activeCard.issuedOn)}</Text>
+                </List.Item>
+                {activeCard.expiresOn && (
+                  <List.Item margin="0 0 small 0">
+                    <IconCalendarMonthLine /> <Text>Expires on:</Text>{' '}
+                    <Text weight="bold">{formatDate(activeCard.expiresOn)}</Text>
+                  </List.Item>
+                )}
+                <List.Item margin="0 0 small 0">
+                  <IconEducatorsLine /> <Text>Issued by:</Text>{' '}
+                  {activeCard.issuer.iconUrl && (
+                    <Img
+                      src={activeCard.issuer.iconUrl}
+                      alt=""
+                      height="1rem"
+                      margin="0 xx-small 0 0"
+                    />
+                  )}
+                  {activeCard.issuer.url ? (
+                    <Link href={activeCard.issuer.url} target="_blank">
+                      <Text weight="bold">{activeCard.issuer.name}</Text>
+                    </Link>
+                  ) : (
+                    <Text weight="bold">{activeCard.issuer.name}</Text>
+                  )}
+                </List.Item>
+              </List>
             </View>
-          </View>
-        )}
+            {activeCard.criteria && (
+              <View borderWidth="small 0 0 0" borderColor="secondary" padding="medium 0">
+                <Text as="div" weight="bold">
+                  Earning criteria
+                </Text>
+                <Text as="div">{activeCard.criteria}</Text>
+              </View>
+            )}
+            {activeCard.skills?.length > 0 && (
+              <View borderWidth="small 0 0 0" borderColor="secondary" padding="medium 0">
+                <Text as="div" weight="bold">
+                  Skills
+                </Text>
+                <SVGIcon src={icon_verified} size="x-small" color="success" />{' '}
+                <Text as="span" size="x-small">
+                  Verified by Lightcast
+                </Text>
+                <View as="div" margin="x-small 0 0 0">
+                  {activeCard.skills.map((skill: SkillData) => renderSkillTag(skill))}
+                </View>
+              </View>
+            )}
+          </>
+        ) : null}
       </Flex>
     </Tray>
   )

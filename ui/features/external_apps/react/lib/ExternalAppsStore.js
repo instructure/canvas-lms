@@ -18,7 +18,7 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import _ from 'underscore'
+import {map, sortBy, filter, forEach, find} from 'lodash'
 import createStore from './createStoreJestCompatible'
 import parseLinkHeader from 'link-header-parsing/parseLinkHeaderFromXHR'
 import '@canvas/rails-flash-notifications'
@@ -29,7 +29,7 @@ const PER_PAGE = 50
 
 const sort = function (tools) {
   if (tools) {
-    return _.sortBy(tools, tool => {
+    return sortBy(tools, tool => {
       if (tool.name) {
         return tool.name.toUpperCase()
       } else {
@@ -171,7 +171,7 @@ store.delete = function (tool) {
     url = '/api/v1' + ENV.CONTEXT_BASE_URL + '/tool_proxies/' + tool.app_id
   }
 
-  const tools = _.filter(this.getState().externalTools, t => t.app_id !== tool.app_id)
+  const tools = filter(this.getState().externalTools, t => t.app_id !== tool.app_id)
   this.setState({externalTools: sort(tools)})
 
   $.ajax({
@@ -215,7 +215,7 @@ store.triggerUpdate = function () {
 
 store.activate = function (tool, success, error) {
   const url = '/api/v1' + ENV.CONTEXT_BASE_URL + '/tool_proxies/' + tool.app_id
-  const tools = _.map(this.getState().externalTools, t => {
+  const tools = map(this.getState().externalTools, t => {
     if (t.app_id === tool.app_id) {
       t.enabled = true
     }
@@ -233,7 +233,7 @@ store.activate = function (tool, success, error) {
 }
 
 store.deactivate = function (tool, success, error) {
-  const tools = _.map(this.getState().externalTools, t => {
+  const tools = map(this.getState().externalTools, t => {
     if (t.app_id === tool.app_id) {
       t.enabled = false
     }
@@ -251,7 +251,7 @@ store.deactivate = function (tool, success, error) {
 }
 
 store.findById = function (toolId) {
-  return _.find(this.getState().externalTools, tool => tool.app_id === toolId)
+  return find(this.getState().externalTools, tool => tool.app_id === toolId)
 }
 
 store._generateParams = function (configurationType, data) {
@@ -275,7 +275,7 @@ store._generateParams = function (configurationType, data) {
       } else {
         const pairs = (data.customFields || '').split('\n')
         params.custom_fields = {}
-        _.forEach(pairs, pair => {
+        forEach(pairs, pair => {
           const vals = pair.trim().split(/=(.+)?/)
           params.custom_fields[vals[0]] = vals[1]
         })

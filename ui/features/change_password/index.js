@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import registrationErrors from '@canvas/normalize-registration-errors'
-import '@canvas/forms/jquery/jquery.instructure_forms'
+import '@canvas/jquery/jquery.instructure_forms'
 
 const $form = $('#change_password_form')
 $form.formSubmit({

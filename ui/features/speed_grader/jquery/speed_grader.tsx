@@ -29,7 +29,6 @@ import type {
 import type {
   Attachment,
   AttachmentData,
-  Enrollment,
   GradingPeriod,
   Submission,
   SubmissionComment,
@@ -75,18 +74,16 @@ import {
 } from '@instructure/ui-icons'
 import {Pill} from '@instructure/ui-pill'
 import {
-  styleSubmissionStatusPills,
   determineSubmissionSelection,
   makeSubmissionUpdateRequest,
 } from '../SpeedGraderStatusMenuHelpers'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import round from '@canvas/round'
-// @ts-expect-error
-import _ from 'underscore'
+import {map, keyBy, values, find, includes, reject, some, isEqual, filter} from 'lodash'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import natcompare from '@canvas/util/natcompare'
 import qs from 'qs'
-import tz from '@canvas/timezone'
+import * as tz from '@canvas/datetime'
 import userSettings from '@canvas/user-settings'
 import htmlEscape from 'html-escape'
 import rubricAssessment from '@canvas/rubrics/jquery/rubric_assessment'
@@ -99,8 +96,8 @@ import {
   getSelectedAssessment,
   renderSettingsMenu,
   configureRecognition,
-  getStatusPills,
   hideMediaRecorderContainer,
+  isStudentConcluded,
   renderDeleteAttachmentLink,
   renderPostGradesMenu,
   renderStatusMenu,
@@ -129,14 +126,14 @@ import vericiteInfoTemplate from '../jst/_vericiteInfo.handlebars'
 import vericiteScoreTemplate from '@canvas/grading/jst/_vericiteScore.handlebars'
 import 'jqueryui/draggable'
 import '@canvas/jquery/jquery.ajaxJSON' /* getJSON, ajaxJSON */
-import '@canvas/forms/jquery/jquery.instructure_forms' /* ajaxJSONFiles */
+import '@canvas/jquery/jquery.instructure_forms' /* ajaxJSONFiles */
 import '@canvas/doc-previews' /* loadDocPreview */
-import '@canvas/datetime' /* datetimeString */
+import '@canvas/datetime/jquery' /* datetimeString */
 import 'jqueryui/dialog'
 import 'jqueryui/menu'
 import '@canvas/jquery/jquery.instructure_misc_helpers' /* replaceTags */
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* confirmDelete, showIf, hasScrollbar */
-import '@canvas/keycodes'
+import '@canvas/jquery-keycodes'
 import '@canvas/loading-image'
 import '@canvas/util/templateData'
 import '@canvas/media-comments'
@@ -147,7 +144,7 @@ import 'jquery-scroll-to-visible/jquery.scrollTo'
 import 'jquery-selectmenu'
 import '@canvas/jquery/jquery.disableWhileLoading'
 import '@canvas/util/jquery/fixDialogButtons'
-import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
+import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 import type {EnvGradebookSpeedGrader} from '@canvas/global/env/EnvGradebook'
 import replaceTags from '@canvas/util/replaceTags'
 import type {GradeStatusUnderscore} from '@canvas/grading/accountGradingStatus'
@@ -466,7 +463,7 @@ function mergeStudentsAndSubmission() {
     }
   }
 
-  jsonData.studentMap = _.keyBy(jsonData.studentsWithSubmissions, anonymizableId)
+  jsonData.studentMap = keyBy(jsonData.studentsWithSubmissions, anonymizableId)
 
   switch (userSettings.get('eg_sort_by')) {
     case 'submitted_at': {
@@ -474,6 +471,7 @@ function mergeStudentsAndSubmission() {
         EG.compareStudentsBy(student => {
           const submittedAt = student && student.submission && student.submission.submitted_at
           if (submittedAt) {
+            // @ts-expect-error
             return +tz.parse(submittedAt)
           } else {
             // puts the unsubmitted assignments at the bottom
@@ -1233,7 +1231,6 @@ function updateSubmissionAndPageEffects(data?: {
       refreshGrades(() => {
         EG.showSubmissionDetails()
         if (availableMountPointForStatusMenu()) {
-          styleSubmissionStatusPills(getStatusPills())
           const mountPoint = availableMountPointForStatusMenu()
           if (!mountPoint) throw new Error('SpeedGrader: mount point for status menu not found')
           renderStatusMenu(statusMenuComponent(submission), mountPoint)
@@ -1613,7 +1610,7 @@ EG = {
     if ($rubricFull.filter(':visible').length) {
       const $unSavedRubric = $('.save_rubric_button').parents('#rubric_holder').find('.rubric')
       const unSavedData = rubricAssessment.assessmentData($unSavedRubric)
-      return !_.isEqual(unSavedData, originalRubric_)
+      return !isEqual(unSavedData, originalRubric_)
     }
     return false
   },
@@ -1659,7 +1656,8 @@ EG = {
 
     // choose the first ungraded student if the requested one doesn't exist
     if (!window.jsonData.studentMap[String(representativeOrStudentId)]) {
-      const ungradedStudent = _(window.jsonData.studentsWithSubmissions).find(
+      const ungradedStudent = find(
+        window.jsonData.studentsWithSubmissions,
         (s: StudentWithSubmission) =>
           s.submission &&
           s.submission.workflow_state !== 'graded' &&
@@ -1701,7 +1699,7 @@ EG = {
     // calling _.values on a large collection could be slow, that's why we're fetching from studentMap first
     this.currentStudent =
       window.jsonData.studentMap[selectMenuValue] ||
-      _.values(window.jsonData.studentsWithSubmissions)[0]
+      values(window.jsonData.studentsWithSubmissions)[0]
 
     useStore.setState({currentStudentId: this.currentStudent[anonymizableId]})
     EG.resetReassignButton()
@@ -2323,11 +2321,13 @@ EG = {
         (attachment.crocodoc_url || attachment.canvadoc_url) &&
         EG.currentStudent.provisional_crocodoc_urls
       ) {
-        const urlInfo = _.find(
+        const urlInfo = find(
           EG.currentStudent.provisional_crocodoc_urls,
           (url: ProvisionalCrocodocUrl) => url.attachment_id === attachment.id
         )
+        // @ts-expect-error
         attachment.provisional_crocodoc_url = urlInfo.crocodoc_url
+        // @ts-expect-error
         attachment.provisional_canvadoc_url = urlInfo.canvadoc_url
       } else {
         attachment.provisional_crocodoc_url = null
@@ -2440,7 +2440,7 @@ EG = {
     $submission_late_notice.showIf(submission.late)
     $full_width_container.removeClass('with_enrollment_notice')
     $enrollment_inactive_notice.showIf(
-      _.some(
+      some(
         window.jsonData.studentMap[this.currentStudent[anonymizableId]].enrollments,
         (enrollment: {workflow_state: string}) => {
           if (enrollment.workflow_state === 'inactive') {
@@ -2452,7 +2452,11 @@ EG = {
       )
     )
 
-    const isConcluded = EG.isStudentConcluded(this.currentStudent[anonymizableId])
+    const isConcluded = isStudentConcluded(
+      window.jsonData.studentMap,
+      this.currentStudent[anonymizableId],
+      ENV.selected_section_id
+    )
     $enrollment_concluded_notice.showIf(isConcluded)
 
     const gradingPeriod = window.jsonData.gradingPeriods[(submissionHolder || {}).grading_period_id]
@@ -2474,23 +2478,11 @@ EG = {
     if (mountPoint) {
       const isInModeration = isModerated && !window.jsonData.grades_published_at
       const shouldRender = isMostRecent && !isClosedForSubmission && !isConcluded && !isInModeration
-      styleSubmissionStatusPills(getStatusPills())
       const component = shouldRender ? statusMenuComponent(this.currentStudent.submission) : null
       renderStatusMenu(component, mountPoint)
     }
 
     EG.showDiscussion()
-  },
-
-  isStudentConcluded(student: string) {
-    if (!window.jsonData.studentMap) {
-      return false
-    }
-
-    return _.some(
-      window.jsonData.studentMap[student].enrollments,
-      (enrollment: Enrollment) => enrollment.workflow_state === 'completed'
-    )
   },
 
   refreshSubmissionsToView() {
@@ -2507,7 +2499,7 @@ EG = {
         String($('#submission_to_view').val() || submissionHistory.length - 1),
         10
       )
-      const templateSubmissions = _(submissionHistory).map((o: unknown, i: number) => {
+      const templateSubmissions = map(submissionHistory, (o: unknown, i: number) => {
         // The submission objects nested in the submission_history array
         // can have two different shapes, because the `this.currentStudent.submission`
         // can come from two different API endpoints.
@@ -2689,8 +2681,8 @@ EG = {
 
   totalStudentCount() {
     if (sectionToShow) {
-      return _.filter(window.jsonData.studentsWithSubmissions, (student: StudentWithSubmission) =>
-        _.includes(student.section_ids, sectionToShow)
+      return filter(window.jsonData.studentsWithSubmissions, (student: StudentWithSubmission) =>
+        includes(student.section_ids, sectionToShow)
       ).length
     } else {
       return window.jsonData.studentsWithSubmissions.length
@@ -3012,7 +3004,11 @@ EG = {
     // set.  what this is saying is: if I am able to grade this
     // assignment (I am administrator in the course) or if I wrote
     // this comment... and if the student isn't concluded
-    const isConcluded = EG.isStudentConcluded(EG.currentStudent[anonymizableId])
+    const isConcluded = isStudentConcluded(
+      window.jsonData.studentMap,
+      EG.currentStudent[anonymizableId],
+      ENV.selected_section_id
+    )
     const commentIsDeleteableByMe =
       (ENV.RUBRIC_ASSESSMENT.assessment_type === 'grading' ||
         ENV.RUBRIC_ASSESSMENT.assessor_id === comment[anonymizableAuthorId]) &&
@@ -3034,7 +3030,7 @@ EG = {
                 that.currentStudent.submission &&
                 that.currentStudent.submission.submission_comments
               ) {
-                updatedComments = _.reject(
+                updatedComments = reject(
                   that.currentStudent.submission.submission_comments,
                   (item: SubmissionComment) => {
                     const submissionComment = item.submission_comment || item
@@ -3058,7 +3054,11 @@ EG = {
   addCommentSubmissionHandler(commentElement, comment) {
     const that = this
 
-    const isConcluded = EG.isStudentConcluded(EG.currentStudent[anonymizableId])
+    const isConcluded = isStudentConcluded(
+      window.jsonData.studentMap,
+      EG.currentStudent[anonymizableId],
+      ENV.selected_section_id
+    )
     commentElement
       .find('.submit_comment_button')
       .click(_event => {
@@ -3071,7 +3071,7 @@ EG = {
           $replacementComment.show()
           commentElement.replaceWith($replacementComment)
 
-          updatedComments = _.map(
+          updatedComments = map(
             that.currentStudent.submission.submission_comments,
             (item: SubmissionComment) => {
               const submissionComment = item.submission_comment || item
@@ -3486,7 +3486,13 @@ EG = {
   // should only be called from the anonymous function attached so
   // #submit_same_score.
   handleGradeSubmit(e, use_existing_score: boolean) {
-    if (EG.isStudentConcluded(EG.currentStudent[anonymizableId])) {
+    if (
+      isStudentConcluded(
+        window.jsonData.studentMap,
+        EG.currentStudent[anonymizableId],
+        ENV.selected_section_id
+      )
+    ) {
       EG.showGrade()
       return
     }
@@ -4100,7 +4106,8 @@ function setupSpeedGrader(
   }[]
 ) {
   const speedGraderJSON = speedGraderJsonResponse[0]
-  speedGraderJSON.gradingPeriods = _.keyBy(gradingPeriods, 'id')
+  // @ts-expect-error
+  speedGraderJSON.gradingPeriods = keyBy(gradingPeriods, 'id')
   window.jsonData = speedGraderJSON
   EG.jsonReady()
   EG.setInitiallyLoadedStudent()

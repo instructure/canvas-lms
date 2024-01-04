@@ -411,16 +411,13 @@ $icon-size: 1.4rem;
     display: none;
   }
 
-  .submission-status-pill {
-    display: none;
-  }
-
-  .submission-late-pill,
-  .submission-missing-pill,
+  .submission-status-pill,
   .submission-excused-pill,
-  .submission-extended-pill {
-    display: inline;
+  [class*='submission-custom-grade-status-pill-'] {
     font-size: 1rem;
+    display: flex;
+    justify-content: flex-end;
+    flex: 1;
     padding-left: 10px;
     padding-right: 10px;
   }

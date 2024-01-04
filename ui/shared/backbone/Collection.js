@@ -19,9 +19,23 @@
 /* eslint-disable no-void */
 
 import {extend} from './utils'
-import _ from 'underscore'
 import mixin from './mixin'
 import DefaultUrlMixin from './DefaultUrlMixin'
+import {
+  each,
+  extend as lodashExtend,
+  first,
+  keyBy,
+  isArray,
+  isBoolean,
+  isEmpty,
+  isObject,
+  isString,
+  keys,
+  map,
+  omit,
+  pick,
+} from 'lodash'
 
 const slice = [].slice
 
@@ -106,7 +120,7 @@ export function patch(Backbone) {
     // # `options` will be merged into @defaults. Some options will become direct
     // # properties of your instance, see `_directPropertyOptions`
     Collection.prototype.initialize = function (models, options) {
-      this.options = _.extend({}, this.defaults, options)
+      this.options = lodashExtend({}, this.defaults, options)
       this.setOptionProperties()
       return Collection.__super__.initialize.apply(this, arguments)
     }
@@ -236,16 +250,16 @@ export function patch(Backbone) {
       if (response == null) {
         return Collection.__super__.parse.apply(this, arguments)
       }
-      const rootMeta = _.pick(response, 'meta', 'links', 'linked')
-      if (_.isEmpty(rootMeta)) {
+      const rootMeta = pick(response, 'meta', 'links', 'linked')
+      if (isEmpty(rootMeta)) {
         return Collection.__super__.parse.apply(this, arguments)
       }
-      const collections = _.omit(response, 'meta', 'links', 'linked')
-      if (_.isEmpty(collections)) {
+      const collections = omit(response, 'meta', 'links', 'linked')
+      if (isEmpty(collections)) {
         return Collection.__super__.parse.apply(this, arguments)
       }
-      const collectionKeys = _.keys(collections)
-      const primaryCollectionKey = _.first(collectionKeys)
+      const collectionKeys = keys(collections)
+      const primaryCollectionKey = first(collectionKeys)
       const primaryCollection = collections[primaryCollectionKey]
       if (primaryCollection == null) {
         return Collection.__super__.parse.apply(this, arguments)
@@ -262,23 +276,23 @@ export function patch(Backbone) {
         }
       }
       const index = {}
-      _.each(rootMeta.linked || {}, function (link, key) {
-        return (index[key] = _.indexBy(link, 'id'))
+      each(rootMeta.linked || {}, function (link, key) {
+        return (index[key] = keyBy(link, 'id'))
       })
-      if (_.isEmpty(index)) {
+      if (isEmpty(index)) {
         return Collection.__super__.parse.call(this, primaryCollection, options)
       }
-      _.each(this.sideLoad || {}, function (meta, relation) {
+      each(this.sideLoad || {}, function (meta, relation) {
         let collection, foreignKey
-        if (_.isBoolean(meta) && meta) {
+        if (isBoolean(meta) && meta) {
           meta = {}
         }
-        if (_.isString(meta)) {
+        if (isString(meta)) {
           meta = {
             collection: meta,
           }
         }
-        if (!_.isObject(meta)) {
+        if (!isObject(meta)) {
           return
         }
         foreignKey = meta.foreignKey
@@ -290,15 +304,15 @@ export function patch(Backbone) {
           collection = relation + 's'
         }
         collection = index[collection] || {}
-        return _.each(primaryCollection, function (item) {
+        each(primaryCollection, function (item) {
           let related
           if (!item.links) {
             return
           }
           related = null
           const id = item.links[foreignKey]
-          if (_.isArray(id)) {
-            if (_.isEmpty(collection)) {
+          if (isArray(id)) {
+            if (isEmpty(collection)) {
               collection = index[relation] || index[foreignKey]
               if (collection == null) {
                 // eslint-disable-next-line no-throw-literal
@@ -311,7 +325,7 @@ export function patch(Backbone) {
                 )
               }
             }
-            related = _.map(id, function (pk) {
+            related = map(id, function (pk) {
               return collection[pk]
             })
           } else {
@@ -320,7 +334,7 @@ export function patch(Backbone) {
           if (id != null && related != null) {
             item[relation] = related
             delete item.links[foreignKey]
-            if (_.isEmpty(item.links)) {
+            if (isEmpty(item.links)) {
               return delete item.links
             }
           }

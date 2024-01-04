@@ -17,11 +17,12 @@
  */
 import React from 'react'
 import {DiscussionEdit} from '../DiscussionEdit'
-import {render, fireEvent, waitFor} from '@testing-library/react'
+import {render, fireEvent} from '@testing-library/react'
 import $ from '@canvas/rails-flash-notifications'
 import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
 
 injectGlobalAlertContainers()
+jest.mock('@canvas/rce/react/CanvasRce')
 
 const setup = props => {
   return render(<DiscussionEdit {...props} />)
@@ -33,16 +34,12 @@ const defaultProps = ({
   onCancel = jest.fn(),
   onSubmit = jest.fn(),
   isEdit = false,
-  updateDraft = jest.fn(),
-  draftSaved = false,
   canReplyAnonymously = false,
   discussionAnonymousState = null,
 } = {}) => ({
   show,
   value,
-  draftSaved,
   isEdit,
-  updateDraft,
   onCancel,
   onSubmit,
   canReplyAnonymously,
@@ -104,26 +101,6 @@ describe('DiscussionEdit', () => {
         2000
       )
       expect(onSubmitMock.mock.calls.length).toBe(0)
-    })
-  })
-
-  describe('Draft messages', () => {
-    beforeEach(() => {
-      window.ENV = {
-        draft_discussions: true,
-      }
-    })
-
-    it('should find draft saving text', () => {
-      const container = setup(defaultProps({draftSaved: false}))
-      expect(container.queryByText('Saving')).toBeTruthy()
-      expect(container.queryByText('Saved')).toBeNull()
-    })
-
-    it('should find draft saved text', async () => {
-      const container = setup(defaultProps({draftSaved: true}))
-      await waitFor(() => expect(container.queryByText('Saving')).toBeNull())
-      expect(container.queryByText('Saved')).toBeTruthy()
     })
   })
 

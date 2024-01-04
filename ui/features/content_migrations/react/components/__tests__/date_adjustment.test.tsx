@@ -18,11 +18,108 @@
 
 import React from 'react'
 import {render, screen} from '@testing-library/react'
-import DateAdjustment from '../date_adjustment'
+import DateAdjustments from '../date_adjustments'
+import type {DateAdjustmentConfig} from '../types'
+import userEvent from '@testing-library/user-event'
+
+const dateAdjustments: DateAdjustmentConfig = {
+  adjust_dates: {
+    enabled: false,
+    operation: 'shift_dates',
+  },
+  date_shift_options: {
+    substitutions: {},
+    old_start_date: false,
+    new_start_date: false,
+    old_end_date: false,
+    new_end_date: false,
+    day_substitutions: [],
+  },
+}
+
+const dateAdjustmentsWithSub: DateAdjustmentConfig = {
+  adjust_dates: {
+    enabled: false,
+    operation: 'shift_dates',
+  },
+  date_shift_options: {
+    substitutions: {},
+    old_start_date: false,
+    new_start_date: false,
+    old_end_date: false,
+    new_end_date: false,
+    day_substitutions: [{from: 0, id: 1, to: 0}],
+  },
+}
+
+const setDateAdjustments: (cfg: DateAdjustmentConfig) => void = jest.fn()
 
 describe('DateAdjustment', () => {
-  it('Calls the API and renders the InstUI table', () => {
-    render(<DateAdjustment />)
-    expect(screen.getByText('[Date Adjustment UI TBD]')).toBeInTheDocument()
+  afterEach(() => jest.clearAllMocks())
+
+  it('Renders proper date operation radio buttons', () => {
+    render(
+      <DateAdjustments dateAdjustments={dateAdjustments} setDateAdjustments={setDateAdjustments} />
+    )
+    expect(screen.getByRole('radio', {name: 'Shift dates', hidden: false})).toBeInTheDocument()
+    expect(screen.getByRole('radio', {name: 'Remove dates', hidden: false})).toBeInTheDocument()
+  })
+
+  it('Renders/hides date shifting UI when appropriate', () => {
+    render(
+      <DateAdjustments dateAdjustments={dateAdjustments} setDateAdjustments={setDateAdjustments} />
+    )
+    userEvent.click(screen.getByRole('radio', {name: 'Shift dates', hidden: false}))
+    expect(
+      screen.getByRole('combobox', {name: 'Select original beginning date', hidden: false})
+    ).toBeInTheDocument()
+    expect(
+      screen.getByRole('combobox', {name: 'Select new beginning date', hidden: false})
+    ).toBeInTheDocument()
+    expect(
+      screen.getByRole('combobox', {name: 'Select original end date', hidden: false})
+    ).toBeInTheDocument()
+    expect(
+      screen.getByRole('combobox', {name: 'Select new end date', hidden: false})
+    ).toBeInTheDocument()
+    userEvent.click(screen.getByRole('radio', {name: 'Remove dates', hidden: false}))
+    expect(
+      screen.queryByRole('combobox', {name: 'Select original beginning date', hidden: false})
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('combobox', {name: 'Select new beginning date', hidden: false})
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('combobox', {name: 'Select original end date', hidden: false})
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('combobox', {name: 'Select new end date', hidden: false})
+    ).not.toBeInTheDocument()
+  })
+
+  it('Allows adding multiple weekday substitutions', () => {
+    render(
+      <DateAdjustments dateAdjustments={dateAdjustments} setDateAdjustments={setDateAdjustments} />
+    )
+    userEvent.click(screen.getByRole('radio', {name: 'Shift dates', hidden: false}))
+    userEvent.click(screen.getByRole('button', {name: 'Add substitution', hidden: false}))
+    expect(setDateAdjustments).toHaveBeenCalledWith(dateAdjustmentsWithSub)
+  })
+
+  it('Allows removing multiple weekday substitutions', () => {
+    render(
+      <DateAdjustments
+        dateAdjustments={dateAdjustmentsWithSub}
+        setDateAdjustments={setDateAdjustments}
+      />
+    )
+    userEvent.click(screen.getByRole('radio', {name: 'Shift dates', hidden: false}))
+    const remove_sub_button = screen.getByRole('button', {
+      name: "Remove 'Sunday' to 'Sunday' from substitutes",
+      hidden: false,
+    })
+    expect(remove_sub_button).toBeInTheDocument()
+    userEvent.click(remove_sub_button)
+    expect(setDateAdjustments).toHaveBeenCalledWith(dateAdjustments)
   })
 })

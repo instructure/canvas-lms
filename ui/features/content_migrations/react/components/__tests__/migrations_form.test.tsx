@@ -30,9 +30,7 @@ jest.mock('@canvas/upload-file', () => ({
 const setMigrationsMock = jest.fn()
 
 const renderComponent = (overrideProps?: any) =>
-  render(
-    <ContentMigrationsForm migrations={[]} setMigrations={setMigrationsMock} {...overrideProps} />
-  )
+  render(<ContentMigrationsForm setMigrations={setMigrationsMock} {...overrideProps} />)
 
 describe('ContentMigrationForm', () => {
   beforeEach(() => {
@@ -82,7 +80,7 @@ describe('ContentMigrationForm', () => {
   })
 
   it('Populates select with migrator options', async () => {
-    render(<ContentMigrationsForm migrations={[]} setMigrations={jest.fn()} />)
+    render(<ContentMigrationsForm setMigrations={jest.fn()} />)
     const selectOne = await screen.findByTitle('Select one')
     userEvent.click(selectOne)
     expect(screen.getByText('Copy a Canvas Course')).toBeInTheDocument()
@@ -106,11 +104,22 @@ describe('ContentMigrationForm', () => {
     const [url, response] = fetchMock.lastCall()
     expect(url).toBe('/api/v1/courses/0/content_migrations')
     expect(JSON.parse(response.body)).toStrictEqual({
+      adjust_dates: {
+        enabled: false,
+        operation: 'shift_dates',
+      },
       course_id: '0',
       migration_type: 'course_copy_importer',
       settings: {import_quizzes_next: false, source_course_id: '3'},
       selective_import: false,
-      date_shift_options: false,
+      date_shift_options: {
+        day_substitutions: [],
+        new_end_date: false,
+        new_start_date: false,
+        old_end_date: false,
+        old_start_date: false,
+        substitutions: {},
+      },
     })
   })
 

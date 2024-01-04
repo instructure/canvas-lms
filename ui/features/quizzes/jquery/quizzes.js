@@ -27,7 +27,7 @@
 // xsslint safeString.property question_text
 import regradeTemplate from '../jst/regrade.handlebars'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import _ from 'underscore'
+import {find, forEach, keys, difference} from 'lodash'
 import $ from 'jquery'
 import calcCmd from './calcCmd'
 import htmlEscape from 'html-escape'
@@ -52,12 +52,12 @@ import deparam from 'deparam'
 import SisValidationHelper from '@canvas/sis/SisValidationHelper'
 import LockManager from '@canvas/blueprint-courses/react/components/LockManager/index'
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/datetime' /* time_field, datetime_field */
-import '@canvas/forms/jquery/jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formErrors, errorBox */
+import '@canvas/datetime/jquery' /* time_field, datetime_field */
+import '@canvas/jquery/jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formErrors, errorBox */
 import 'jqueryui/dialog'
 import '@canvas/jquery/jquery.instructure_misc_helpers' /* replaceTags, /\$\.underscore/ */
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* .dim, confirmDelete, showIf */
-import '@canvas/keycodes'
+import '@canvas/jquery-keycodes'
 import '@canvas/loading-image'
 import '@canvas/rails-flash-notifications'
 import '@canvas/util/templateData'
@@ -2203,9 +2203,9 @@ ready(function () {
         name: quiz_title,
       })
 
-      if (_.keys(overrideErrs).length > 0) {
+      if (keys(overrideErrs).length > 0) {
         valid = false
-        _.each(overrideErrs, err => {
+        forEach(overrideErrs, err => {
           err.showError(err.element, err.message)
         })
       }
@@ -2924,7 +2924,7 @@ ready(function () {
       'true_false_question',
       'multiple_answers_question',
     ]
-    return _.find(regradeTypes, className => $el.hasClass(className))
+    return find(regradeTypes, className => $el.hasClass(className))
   }
 
   function disableRegrade(holder) {
@@ -2970,7 +2970,7 @@ ready(function () {
       const oldAnswers = REGRADE_DATA[questionID]
       const newAnswers = correctAnswerIDs($el)
 
-      return oldAnswers.length == newAnswers.length && !_.difference(oldAnswers, newAnswers).length
+      return oldAnswers.length == newAnswers.length && !difference(oldAnswers, newAnswers).length
     }
   }
 
@@ -3280,7 +3280,7 @@ ready(function () {
     }
 
     const newParams = {}
-    _.each(params, (val, key) => {
+    forEach(params, (val, key) => {
       newParams[key.replace('quiz_group[', 'quiz_groups[][')] = val
     })
 
@@ -4088,7 +4088,7 @@ ready(function () {
         data['quiz_group[question_points]'] = quizGroupQuestionPoints
       }
       const newData = {}
-      _.each(data, (val, key) => {
+      forEach(data, (val, key) => {
         newData[key.replace('quiz_group[', 'quiz_groups[][')] = val
       })
       return newData

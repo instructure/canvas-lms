@@ -33,7 +33,7 @@ describe TemporaryEnrollmentPairing do
   end
 
   before do
-    @pairing = TemporaryEnrollmentPairing.create!(root_account: @course.root_account)
+    @pairing = TemporaryEnrollmentPairing.create!(root_account: @course.root_account, created_by: account_admin_user)
     @recipient_temp_enrollment.update!(temporary_enrollment_pairing_id: @pairing.id)
   end
 
@@ -44,9 +44,10 @@ describe TemporaryEnrollmentPairing do
   end
 
   context "validations" do
-    it "requires root_account_id to be present" do
+    it "requires root_account_id, created_by_id to be present" do
       expect(TemporaryEnrollmentPairing.create.valid?).to be_falsey
       expect(TemporaryEnrollmentPairing.create.errors.full_messages).to include("Root account can't be blank")
+      expect(TemporaryEnrollmentPairing.create.errors.full_messages).to include("Created by can't be blank")
     end
 
     it "sets the workflow_state to active by default" do

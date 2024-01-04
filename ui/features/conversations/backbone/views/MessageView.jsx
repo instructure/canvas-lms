@@ -17,7 +17,7 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {View} from '@canvas/backbone'
-import _ from 'underscore'
+import {forEach} from 'lodash'
 import template from '../../jst/message.handlebars'
 import React from 'react'
 import ReactDOM from 'react-dom'
@@ -86,7 +86,7 @@ export default class MessageView extends View {
 
   select(modifier) {
     if (!modifier) {
-      _.each(this.model.collection.without(this.model), m => m.set('selected', false))
+      forEach(this.model.collection.without(this.model), m => m.set('selected', false))
     }
     this.model.set('selected', true)
     if (this.model.unread()) {

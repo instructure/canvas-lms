@@ -22,13 +22,13 @@ import type {
   DeprecatedGradingScheme,
   FinalGradeOverride,
   GradeEntryOptions,
-} from '@canvas/grading/grading'
+} from '@canvas/grading/grading.d'
 import {TextInput} from '@instructure/ui-text-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import GradeOverrideEntry from '@canvas/grading/GradeEntry/GradeOverrideEntry'
 import GradeOverrideInfo from '@canvas/grading/GradeEntry/GradeOverrideInfo'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
-import {scoreToGrade} from '@instructure/grading-utils/lib'
+import {scoreToGrade} from '@instructure/grading-utils'
 import {View} from '@instructure/ui-view'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')

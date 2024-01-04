@@ -21,7 +21,7 @@
 import $ from 'jquery'
 import _ from 'underscore'
 import htmlEscape from 'html-escape'
-import '@canvas/util/toJSON'
+import '@canvas/jquery/jquery.toJSON'
 import '@canvas/jquery/jquery.disableWhileLoading'
 import '../../jquery/jquery.instructure_forms'
 import '@canvas/jquery/jquery.instructure_misc_helpers'

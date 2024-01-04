@@ -17,7 +17,7 @@
  */
 
 import React, {useCallback, useMemo, useState} from 'react'
-import _ from 'lodash'
+import {intersection, some} from 'lodash'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {IconWarningLine} from '@instructure/ui-icons'
@@ -94,8 +94,8 @@ export default function AssignmentInformation({
   const {hasSubmittedSubmissions, submissionTypes, htmlUrl} = assignment
   const showSubmissionDownloadButton = () => {
     const allowList = ['online_upload', 'online_text_entry', 'online_url']
-    const submissionTypesOnAllowlist = _.intersection(submissionTypes, allowList)
-    return hasSubmittedSubmissions && _.some(submissionTypesOnAllowlist)
+    const submissionTypesOnAllowlist = intersection(submissionTypes, allowList)
+    return hasSubmittedSubmissions && some(submissionTypesOnAllowlist)
   }
 
   const translatedSubmissionTypes: {[key: string]: any} = {

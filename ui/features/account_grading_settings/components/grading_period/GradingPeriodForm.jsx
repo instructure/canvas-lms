@@ -20,12 +20,12 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 import update from 'immutability-helper'
-import _ from 'underscore'
 import {Button} from '@instructure/ui-buttons'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import DueDateCalendarPicker from '@canvas/due-dates/react/DueDateCalendarPicker'
 import numberHelper from '@canvas/i18n/numberHelper'
 import round from '@canvas/round'
+import {isEqual} from 'lodash'
 
 const I18n = useI18nScope('gradingPeriodForm')
 
@@ -89,7 +89,7 @@ class GradingPeriodForm extends React.Component {
     }
   }
 
-  hasDistinctCloseDate = ({endDate, closeDate}) => closeDate && !_.isEqual(endDate, closeDate)
+  hasDistinctCloseDate = ({endDate, closeDate}) => closeDate && !isEqual(endDate, closeDate)
 
   mergePeriod = attr => update(this.state.period, {$merge: attr})
 

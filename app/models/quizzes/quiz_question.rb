@@ -193,7 +193,7 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
   def clone_for(quiz, dup = nil, **)
     dup ||= Quizzes::QuizQuestion.new
     attributes.except("id", "quiz_id", "quiz_group_id", "question_data").each do |key, val|
-      dup.send("#{key}=", val)
+      dup.send(:"#{key}=", val)
     end
     data = question_data || ActiveSupport::HashWithIndifferentAccess.new
     data.delete(:id)

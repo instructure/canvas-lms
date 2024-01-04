@@ -1937,7 +1937,8 @@ class AccountsController < ApplicationController
                                    :teachers_can_create_courses_anywhere,
                                    :students_can_create_courses_anywhere,
                                    { default_due_time: [:value] }.freeze,
-                                   { conditional_release: [:value, :locked] }.freeze,].freeze
+                                   { conditional_release: [:value, :locked] }.freeze,
+                                   { allow_observers_in_appointment_groups: [:value] }.freeze,].freeze
 
   def permitted_account_attributes
     [:name,

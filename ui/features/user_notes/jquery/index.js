@@ -19,9 +19,9 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import ready from '@instructure/ready'
-import '@canvas/forms/jquery/jquery.instructure_forms'
+import '@canvas/jquery/jquery.instructure_forms'
 import '@canvas/loading-image'
-import '@canvas/datetime'
+import '@canvas/datetime/jquery'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 import 'jquery-pageless'
 

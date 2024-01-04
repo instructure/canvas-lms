@@ -522,14 +522,14 @@ module Types
       end
     end
 
-    field :checkpointed, Boolean, null: false
+    field :has_sub_assignments, Boolean, null: false
 
     field :checkpoints, [CheckpointType], null: true
     def checkpoints
       load_association(:context).then do |course|
         return nil unless course.root_account&.feature_enabled?(:discussion_checkpoints)
 
-        load_association(:checkpoint_assignments)
+        load_association(:sub_assignments)
       end
     end
   end

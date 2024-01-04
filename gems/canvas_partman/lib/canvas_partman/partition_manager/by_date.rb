@@ -68,7 +68,7 @@ module CanvasPartman
       end
 
       def ensure_or_check_partitions(advance, create_partitions)
-        current = Time.now.utc.send("beginning_of_#{base_class.partitioning_interval.to_s.singularize}")
+        current = Time.now.utc.send(:"beginning_of_#{base_class.partitioning_interval.to_s.singularize}")
         (advance + 1).times do
           unless partition_exists?(current)
             if create_partitions
@@ -83,7 +83,7 @@ module CanvasPartman
       end
 
       def prune_partitions(number_to_keep = 6)
-        min_to_keep = Time.now.utc.send("beginning_of_#{base_class.partitioning_interval.to_s.singularize}")
+        min_to_keep = Time.now.utc.send(:"beginning_of_#{base_class.partitioning_interval.to_s.singularize}")
         # on 5/1, we want to drop 10/1
         # (keeping 11, 12, 1, 2, 3, and 4 - 6 months of data)
         min_to_keep -= number_to_keep.send(base_class.partitioning_interval)

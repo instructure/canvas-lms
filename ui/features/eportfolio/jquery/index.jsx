@@ -36,7 +36,7 @@ import {fetchContent} from './eportfolio_section'
 import sanitizeHtml from 'sanitize-html-with-tinymce'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.tree' /* instTree */
-import '@canvas/forms/jquery/jquery.instructure_forms' /* formSubmit, getFormData, formErrors, errorBox */
+import '@canvas/jquery/jquery.instructure_forms' /* formSubmit, getFormData, formErrors, errorBox */
 import 'jqueryui/dialog'
 import '@canvas/util/jquery/fixDialogButtons'
 import '@canvas/rails-flash-notifications' /* $.screenReaderFlashMessageExclusive */

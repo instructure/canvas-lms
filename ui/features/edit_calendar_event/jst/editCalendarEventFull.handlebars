@@ -139,11 +139,9 @@
     </div>
   </div>
 
-  {{#if ENV.FEATURES.calendar_series}}
-    <fieldset>
-      <div id="recurring_event_frequency_picker"></div>
-    </fieldset>
-  {{/if}}
+  <fieldset>
+    <div id="recurring_event_frequency_picker"></div>
+  </fieldset>
 
   <fieldset>
     <label class="location_label" for="calendar_event_location_name">{{#t "location_name"}}Location{{/t}}</label>
@@ -180,7 +178,7 @@
     </fieldset>
   {{/if}}
 
-  {{!-- Only show duplicate form if is new record. If calendar_series flag is on, this is only enabled for section dates. --}}
+  {{!-- Only show duplicate form if is new record; this is only enabled for section dates. --}}
   {{#if newRecord}}
     <label class="label_with_checkbox" for="duplicate_event">
       <input type="checkbox" id="duplicate_event" name="duplicate" value="true"/>

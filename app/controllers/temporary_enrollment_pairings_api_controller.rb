@@ -85,6 +85,7 @@ class TemporaryEnrollmentPairingsApiController < ApplicationController
   def create
     @temporary_enrollment_pairing = @domain_root_account.temporary_enrollment_pairings
                                                         .build(temporary_enrollment_pairing_params)
+    @temporary_enrollment_pairing.created_by = @current_user
     if @temporary_enrollment_pairing.save
       render json: @temporary_enrollment_pairing.as_json, status: :created
     else
@@ -99,8 +100,11 @@ class TemporaryEnrollmentPairingsApiController < ApplicationController
   # @returns TemporaryEnrollmentPairing
   #
   def destroy
-    @temporary_enrollment_pairing.destroy
-    head :no_content
+    @temporary_enrollment_pairing.workflow_state = "deleted"
+    @temporary_enrollment_pairing.deleted_by = @current_user
+    if @temporary_enrollment_pairing.save
+      head :no_content
+    end
   end
 
   private

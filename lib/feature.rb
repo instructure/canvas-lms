@@ -42,7 +42,7 @@ class Feature
       next unless ATTRS.include?(key)
       next if key == :state && !%w[hidden off allowed on allowed_on].include?(val)
 
-      instance_variable_set "@#{key}", val
+      instance_variable_set :"@#{key}", val
     end
     # for RootAccount features, "allowed" state is redundant; show "off" instead
     @root_opt_in = true if @applies_to == "RootAccount"

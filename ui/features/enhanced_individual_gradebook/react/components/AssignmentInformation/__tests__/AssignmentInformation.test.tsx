@@ -18,7 +18,8 @@
 import $ from 'jquery'
 import React from 'react'
 import {render} from '@testing-library/react'
-import AssignmentInformation, {type AssignmentInformationComponentProps} from '..'
+import AssignmentInformation from '../index'
+import type {AssignmentInformationComponentProps} from '../index'
 import {assignmentInfoDefaultProps, defaultAssignment} from './fixtures'
 
 describe('Assignment Information Tests', () => {

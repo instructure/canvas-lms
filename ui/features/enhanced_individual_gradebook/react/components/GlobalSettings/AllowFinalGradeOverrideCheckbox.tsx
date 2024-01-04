@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {executeApiRequest} from '@canvas/util/apiRequest'
+import {executeApiRequest} from '@canvas/do-fetch-api-effect/apiRequest'
 import type {HandleCheckboxChange} from '../../../types'
 import CheckboxTemplate from './CheckboxTemplate'
 

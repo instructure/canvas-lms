@@ -28,10 +28,13 @@ const renderComponent = (overrideProps?: any) =>
   render(<CommonMigratorControls onSubmit={onSubmit} onCancel={onCancel} {...overrideProps} />)
 
 describe('CommonMigratorControls', () => {
+  afterEach(() => jest.clearAllMocks())
   beforeAll(() => {
     window.ENV.QUIZZES_NEXT_ENABLED = true
     window.ENV.NEW_QUIZZES_MIGRATION_DEFAULT = false
   })
+
+  afterEach(() => jest.clearAllMocks())
 
   it('calls onSubmit with import_quizzes_next', () => {
     renderComponent({canImportAsNewQuizzes: true})
@@ -67,7 +70,18 @@ describe('CommonMigratorControls', () => {
     userEvent.click(screen.getByRole('checkbox', {name: 'Adjust events and due dates'}))
     userEvent.click(screen.getByRole('button', {name: 'Add to Import Queue'}))
 
-    expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({date_shift_options: true}))
+    expect(onSubmit).toHaveBeenCalledWith(
+      expect.objectContaining({
+        date_shift_options: {
+          day_substitutions: [],
+          new_end_date: false,
+          new_start_date: false,
+          old_end_date: false,
+          old_start_date: false,
+          substitutions: {},
+        },
+      })
+    )
   })
 
   it('calls onSubmit with selective_import', () => {
@@ -87,11 +101,24 @@ describe('CommonMigratorControls', () => {
       canAdjustDates: true,
     })
 
+    userEvent.click(screen.getByRole('radio', {name: 'Select specific content'}))
     userEvent.click(screen.getByRole('button', {name: 'Add to Import Queue'}))
 
     expect(onSubmit).toHaveBeenCalledWith({
-      date_shift_options: false,
-      selective_import: false,
+      adjust_dates: {
+        enabled: false,
+        operation: 'shift_dates',
+      },
+      selective_import: true,
+      date_shift_options: {
+        day_substitutions: [],
+        new_end_date: false,
+        new_start_date: false,
+        old_end_date: false,
+        old_start_date: false,
+        substitutions: {},
+      },
+      errored: false,
       settings: {import_quizzes_next: false, overwrite_quizzes: false},
     })
   })

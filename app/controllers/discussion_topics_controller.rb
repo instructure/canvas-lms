@@ -402,7 +402,7 @@ class DiscussionTopicsController < ApplicationController
         }
         fetch_params[:include] = ["sections_user_count", "sections"] if @context.is_a?(Course)
 
-        discussion_topics_fetch_url = send("api_v1_#{@context.class.to_s.downcase}_discussion_topics_path", fetch_params)
+        discussion_topics_fetch_url = send(:"api_v1_#{@context.class.to_s.downcase}_discussion_topics_path", fetch_params)
         (scope.count / fetch_params[:per_page].to_f).ceil.times do |i|
           url = discussion_topics_fetch_url.gsub(fetch_params[:page], (i + 1).to_s)
           prefetch_xhr(url, id: "prefetched_discussion_topic_page_#{i}")
@@ -459,9 +459,9 @@ class DiscussionTopicsController < ApplicationController
       end
 
       InstStatsd::Statsd.increment("discussion_topic.index.visit")
-      InstStatsd::Statsd.count("discussion_topic.index.visit.pinned", @topics&.select(&:pinned)&.count)
+      InstStatsd::Statsd.count("discussion_topic.index.visit.pinned", @topics&.count(&:pinned))
       InstStatsd::Statsd.count("discussion_topic.index.visit.discussions", @topics&.length)
-      InstStatsd::Statsd.count("discussion_topic.index.visit.closed_for_comments", @topics&.select(&:locked)&.count)
+      InstStatsd::Statsd.count("discussion_topic.index.visit.closed_for_comments", @topics&.count(&:locked))
 
       format.json do
         log_api_asset_access(["topics", @context], "topics", "other")
@@ -755,7 +755,7 @@ class DiscussionTopicsController < ApplicationController
     if @context.feature_enabled?(:react_discussions_post)
       env_hash = {
         per_page: 20,
-        isolated_view_initial_page_size: 5,
+        split_screen_view_initial_page_size: 5,
         current_page: 0
       }
       if params[:entry_id]
@@ -832,8 +832,6 @@ class DiscussionTopicsController < ApplicationController
                manual_mark_as_read: @current_user&.manual_mark_as_read?,
                discussion_topic_menu_tools: external_tools_display_hashes(:discussion_topic_menu),
                rce_mentions_in_discussions: @context.feature_enabled?(:react_discussions_post) && !@topic.anonymous?,
-               isolated_view: Account.site_admin.feature_enabled?(:isolated_view),
-               split_screen_view: Account.site_admin.feature_enabled?(:split_screen_view),
                discussion_grading_view: Account.site_admin.feature_enabled?(:discussion_grading_view),
                draft_discussions: Account.site_admin.feature_enabled?(:draft_discussions),
                discussion_entry_version_history: Account.site_admin.feature_enabled?(:discussion_entry_version_history),

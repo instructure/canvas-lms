@@ -24,4 +24,11 @@ class RubricCriterion < ApplicationRecord
   belongs_to :learning_outcome, optional: true
   belongs_to :created_by, class_name: "User"
   belongs_to :deleted_by, class_name: "User"
+
+  def will_change_with_update(new_params)
+    new_params.each do |key, value|
+      return true if self[key] != value
+    end
+    false
+  end
 end

@@ -105,7 +105,7 @@ class Loaders::DiscussionEntryLoader < GraphQL::Batch::Loader
       object.discussion_entries
     elsif object.is_a?(DiscussionEntry)
       if object.root_entry_id.nil?
-        if Account.site_admin.feature_enabled?(:isolated_view) || @user_search_id
+        if @user_search_id
           object.flattened_discussion_subentries
         else
           object.root_discussion_replies
