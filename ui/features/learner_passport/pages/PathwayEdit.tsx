@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect} from 'react'
+import React from 'react'
 import {useMatch} from 'react-router-dom'
-import {PathwayLayout} from '../components/Pathways'
+import {PathwayEdit} from '../components/Pathways'
 
 export function Component() {
   const pathMatch = useMatch('/users/:userId/*')
@@ -26,9 +26,5 @@ export function Component() {
     throw new Error('user id is not present on path')
   }
 
-  useEffect(() => {
-    document.title = 'Learner Passport: Pathways'
-  }, [])
-
-  return <PathwayLayout />
+  return <PathwayEdit />
 }
