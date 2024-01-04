@@ -38,6 +38,8 @@ import type {
   RubricAssessment,
   SubmissionOriginalityData,
 } from '@canvas/grading/grading.d'
+import {SpeedGraderResponse} from '../types'
+import type {SpeedGraderResponseType, SpeedGraderStore} from '../types'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {IconButton} from '@instructure/ui-buttons'
@@ -149,6 +151,12 @@ import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 import type {EnvGradebookSpeedGrader} from '@canvas/global/env/EnvGradebook'
 import replaceTags from '@canvas/util/replaceTags'
 import type {GradeStatusUnderscore} from '@canvas/grading/accountGradingStatus'
+
+declare global {
+  interface Window {
+    jsonData: SpeedGraderStore
+  }
+}
 
 // @ts-expect-error
 if (!('INST' in window)) window.INST = {}
@@ -530,8 +538,7 @@ function handleStudentOrSectionSelected(
 
 function initDropdown() {
   const hideStudentNames = utils.shouldHideStudentNames()
-  // @ts-expect-error
-  $('#hide_student_names').attr('checked', hideStudentNames)
+  $('#hide_student_names').attr('checked', hideStudentNames ? 'checked' : null)
 
   const optionsArray = window.jsonData.studentsWithSubmissions.map(
     (student: StudentWithSubmission) => {
@@ -1760,7 +1767,8 @@ EG = {
         const {allowed_attempts} = window.jsonData
         maxAttempts =
           allowed_attempts != null && allowed_attempts > 0
-            ? (this.currentStudent.submission.attempt || 1) >= window.jsonData.allowed_attempts
+            ? (this.currentStudent.submission.attempt || 1) >=
+              (window.jsonData.allowed_attempts || 0)
             : false
         submittedAt = new Date(submittedAt)
         let submissionComments = this.currentStudent.submission.submission_comments
@@ -4110,12 +4118,14 @@ function getGradingPeriods() {
 
 function setupSpeedGrader(
   gradingPeriods: GradingPeriod[],
-  speedGraderJsonResponse: {
-    gradingPeriods: GradingPeriod[]
-  }[]
+  speedGraderJsonResponse: SpeedGraderResponseType[]
 ) {
-  const speedGraderJSON = speedGraderJsonResponse[0]
-  // @ts-expect-error
+  if (process.env.NODE_ENV !== 'production') {
+    SpeedGraderResponse.parse(speedGraderJsonResponse[0])
+  }
+
+  const speedGraderJSON = speedGraderJsonResponse[0] as SpeedGraderStore
+
   speedGraderJSON.gradingPeriods = keyBy(gradingPeriods, 'id')
   window.jsonData = speedGraderJSON
   EG.jsonReady()
@@ -4227,6 +4237,7 @@ export default {
     QuizzesNextSpeedGrading.setup(EG, $iframe_holder, registerQuizzesNext, refreshGrades, window)
 
     // fire off the request to get the jsonData
+    // @ts-expect-error
     window.jsonData = {}
     const speedGraderJSONUrl = `${window.location.pathname}.json${window.location.search}`
     const speedGraderJsonDfd = $.ajaxJSON(

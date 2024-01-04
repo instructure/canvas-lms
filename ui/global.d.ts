@@ -51,7 +51,6 @@ declare global {
     INST: GlobalInst
 
     webkitSpeechRecognition: any
-    jsonData: any
     messageStudents: (options: ReturnType<typeof sendMessageStudentsWho>) => void
     updateGrades: () => void
 
