@@ -17,7 +17,6 @@
  */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import _ from 'underscore'
 import pubsub from 'jquery-tinypubsub'
 import $ from 'jquery'
 import fileSize from '@canvas/util/fileSize'
@@ -28,6 +27,7 @@ import 'jqueryui/dialog'
 import '@canvas/jquery/jquery.instructure_misc_helpers' /* /\$\.h/ */
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* .dim, /\.log\(/ */
 import 'jqueryui/progressbar'
+import {each} from 'lodash'
 
 const I18n = useI18nScope('media_comments_publicjs')
 
@@ -766,7 +766,7 @@ $(document).bind('media_recording_error', () => {
 })
 
 window.mediaCommentCallback = function (results) {
-  _.each(results, addEntry)
+  each(results, addEntry)
   $('#media_comment_create_dialog').empty().dialog('close')
 }
 
