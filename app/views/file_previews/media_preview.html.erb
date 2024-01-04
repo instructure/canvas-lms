@@ -20,7 +20,7 @@
 <%= render :partial => "layouts/head" %>
 <body style="margin:0; padding: 0; background: transparent;">
   <div id="content" class="file_preview_container">
-    <div id="media_preview" oncontextmenu="return false;" <%= media_preview_attributes(@file) %>></div>
+    <div id="media_preview" <%= media_preview_attributes(@file) %>></div>
   </div>
   <%= render :partial => 'layouts/foot', :locals => { :include_common_bundle => true } %>
 </body>
