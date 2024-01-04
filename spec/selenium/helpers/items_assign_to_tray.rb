@@ -41,6 +41,10 @@ module ItemsAssignToTray
     "//*[@data-testid = 'clearable-date-time-input']//*[contains(@class,'-dateInput')]//input"
   end
 
+  def assign_to_in_tray_selector(button_title)
+    "#{module_item_assign_to_card_selector} #{assign_to_button_selector(button_title)}"
+  end
+
   def assign_to_option_selector(assignee)
     "//li[.//*[contains(text(), '#{assignee}')]]"
   end
@@ -49,8 +53,8 @@ module ItemsAssignToTray
     "//*[@data-testid = 'clearable-date-time-input']//*[contains(@class, '-select')]//input"
   end
 
-  def module_item_assignee_selector
-    "#{module_item_assign_to_card_selector} [data-testid='assignee_selector']"
+  def cancel_button_selector
+    "//*[@data-testid = 'module-item-edit-tray']//button[.//*[contains(text(), 'Cancel')]]"
   end
 
   def icon_type_selector(icon_type)
@@ -61,6 +65,10 @@ module ItemsAssignToTray
     "[data-testid='item-type-text']"
   end
 
+  def module_item_assignee_selector
+    "#{module_item_assign_to_card_selector} [data-testid='assignee_selector']"
+  end
+
   def module_item_assign_to_card_selector
     "[data-testid='item-assign-to-card']"
   end
@@ -69,8 +77,8 @@ module ItemsAssignToTray
     "[data-testid='module-item-edit-tray']"
   end
 
-  def assign_to_in_tray_selector(button_title)
-    "#{module_item_assign_to_card_selector} #{assign_to_button_selector(button_title)}"
+  def save_button_selector
+    "//*[@data-testid = 'module-item-edit-tray']//button[.//*[contains(text(), 'Save')]]"
   end
 
   #------------------------------ Elements ------------------------------
@@ -91,19 +99,19 @@ module ItemsAssignToTray
   end
 
   def assign_to_available_from_date(card_number = 0)
-    assign_to_date[1 + card_number]
+    assign_to_date[1 + (card_number * 3)]
   end
 
   def assign_to_available_from_time(card_number = 0)
-    assign_to_time[1 + card_number]
+    assign_to_time[1 + (card_number * 3)]
   end
 
   def assign_to_due_date(card_number = 0)
-    assign_to_date[0 + card_number]
+    assign_to_date[0 + (card_number * 3)]
   end
 
   def assign_to_due_time(card_number = 0)
-    assign_to_time[0 + card_number]
+    assign_to_time[0 + (card_number * 3)]
   end
 
   def assign_to_in_tray(button_title)
@@ -115,11 +123,15 @@ module ItemsAssignToTray
   end
 
   def assign_to_until_date(card_number = 0)
-    assign_to_date[2 + card_number]
+    assign_to_date[2 + (card_number * 3)]
   end
 
   def assign_to_until_time(card_number = 0)
-    assign_to_time[2 + card_number]
+    assign_to_time[2 + (card_number * 3)]
+  end
+
+  def cancel_button
+    fxpath(cancel_button_selector)
   end
 
   def icon_type(icon_type)
@@ -142,6 +154,10 @@ module ItemsAssignToTray
     f(module_item_edit_tray_selector)
   end
 
+  def save_button
+    fxpath(save_button_selector)
+  end
+
   #------------------------------ Actions ------------------------------
 
   def click_add_assign_to_card
@@ -150,6 +166,14 @@ module ItemsAssignToTray
 
   def click_delete_assign_to_card(card_number)
     assign_to_card_delete_button[card_number].click
+  end
+
+  def click_cancel_button
+    cancel_button.click
+  end
+
+  def click_save_button
+    save_button.click
   end
 
   def icon_type_exists?(icon_type)
