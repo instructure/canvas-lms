@@ -52,7 +52,7 @@ export default class IndexView extends Backbone.View {
       'click .reset-quiz-engine': 'resetQuizEngine',
     }
 
-    this.prototype.keyUpSearch = debounce(() => {
+    this.prototype.keyUpSearch = debounce(function () {
       this.filterResults()
       return this.announceCount()
     }, 200)
