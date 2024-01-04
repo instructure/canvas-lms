@@ -18,8 +18,6 @@
 
 import {extend} from '@canvas/backbone/utils'
 import $ from 'jquery'
-import _ from 'underscore'
-import {map} from 'lodash'
 import {View} from '@canvas/backbone'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import template from '../../jst/missingDueDateDialog.handlebars'
@@ -58,17 +56,15 @@ MissingDateDialogView.prototype.render = function () {
   if (this.invalidFields === true) {
     return false
   } else {
-    this.invalidSectionNames = map(this.invalidFields, this.labelFn)
+    this.invalidSectionNames = this.invalidFields.map(this.labelFn)
     this.showDialog()
     return this
   }
 }
 
 MissingDateDialogView.prototype.getInvalidFields = function () {
-  const invalidDates = _.select(this.$dateFields, function (date) {
-    return $(date).val() === ''
-  })
-  const sectionNames = map(invalidDates, this.labelFn)
+  const invalidDates = this.$dateFields.filter(date => $(date).val() === '')
+  const sectionNames = invalidDates.map(this.labelFn)
   if (sectionNames.length > 0) {
     return [invalidDates, sectionNames]
   } else {
