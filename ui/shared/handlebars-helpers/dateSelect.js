@@ -17,8 +17,8 @@
 
 import I18n from '@canvas/i18n'
 import $ from 'jquery'
-import _ from 'underscore'
 import h from 'html-escape'
+import {clone, defaults} from 'lodash'
 
 /*
 xsslint safeString.identifier i
@@ -57,7 +57,7 @@ const builders = {
 
 // generates something like rails' date_select/select_date
 // TODO: feature parity
-export default function dateSelect(name, options, htmlOptions = _.clone(options)) {
+export default function dateSelect(name, options, htmlOptions = clone(options)) {
   const validOptions = ['type', 'startYear', 'endYear', 'includeBlank', 'order']
   validOptions.forEach(opt => delete htmlOptions[opt])
 
@@ -76,14 +76,14 @@ export default function dateSelect(name, options, htmlOptions = _.clone(options)
   })
 
   if (options.type === 'birthdate') {
-    _.defaults(options, {
+    defaults(options, {
       startYear: year - 1,
       endYear: year - 125,
       includeBlank: true,
     })
   }
 
-  _.defaults(options, {
+  defaults(options, {
     startYear: year - 5,
     endYear: year + 5,
     order,

@@ -18,7 +18,7 @@
 
 import K from './constants'
 import $ from 'jquery'
-import {throttle, extend, uniqueId} from 'underscore'
+import {throttle, uniqueId} from 'lodash'
 
 // # An event tracker installs code to capture quiz events and submits them for
 // # delivery.
@@ -47,7 +47,10 @@ export default class EventTracker {
     // Possible values: see ./constants.js
     if (!this.priority) this.priority = K.EVT_PRIORITY_LOW
 
-    this._options = extend({}, this.options, options)
+    this._options = {
+      ...this.options,
+      ...options,
+    }
     this.uid = `${this.eventType}_${uniqueId()}`
   }
 

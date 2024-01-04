@@ -18,7 +18,7 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import _ from 'underscore'
+import {each, isString, defer, find, partial, isArray} from 'lodash'
 import DialogBaseView from '@canvas/dialog-base-view'
 import UploadFileView from './UploadFileView'
 import TakePictureView from './TakePictureView'
@@ -83,7 +83,7 @@ export default class AvatarDialogView extends DialogBaseView {
 
   show() {
     this.render()
-    _.each(this.children, child => this.listenTo(child, 'ready', this.onReady))
+    each(this.children, child => this.listenTo(child, 'ready', this.onReady))
     this.togglePane(this.$('.nav-pills a')[0])
     return super.show(...arguments)
   }
@@ -147,9 +147,9 @@ export default class AvatarDialogView extends DialogBaseView {
       if (errors) {
         const errorReducer = (errorString, currentError) => (errorString += currentError.message)
 
-        const message = _.isString(errors.base)
+        const message = isString(errors.base)
           ? errors.base
-          : _.isArray(errors.base)
+          : isArray(errors.base)
           ? errors.base.reduce(errorReducer, '')
           : I18n.t(
               'Your profile photo could not be uploaded. You may have exceeded your upload limit.'
@@ -191,7 +191,7 @@ export default class AvatarDialogView extends DialogBaseView {
   // wait 5 seconds and then error out
   waitAndSaveUserAvatar(token, url, count) {
     return $.getJSON('/api/v1/users/self/avatars').then(avatarList => {
-      const processedAvatar = _.find(avatarList, avatar => avatar.token === token)
+      const processedAvatar = find(avatarList, avatar => avatar.token === token)
       if (processedAvatar) {
         return this.saveUserAvatar(token, url)
       } else if (count < 50) {
@@ -213,7 +213,7 @@ export default class AvatarDialogView extends DialogBaseView {
       data: {'user[avatar][token]': token},
       dataType: 'json',
       type: 'PUT',
-    }).then(_.partial(this.updateDomAvatar, url))
+    }).then(partial(this.updateDomAvatar, url))
   }
 
   updateDomAvatar = url => {
@@ -246,7 +246,7 @@ export default class AvatarDialogView extends DialogBaseView {
   checkFocus() {
     // deferring this makes it work more reliably because in some cases (like
     // visibility updates) the focus isn't lost immediately.
-    return _.defer(this.checkFocusDeferred)
+    return defer(this.checkFocusDeferred)
   }
 
   checkFocusDeferred = () => {
@@ -259,7 +259,7 @@ export default class AvatarDialogView extends DialogBaseView {
   }
 
   teardown() {
-    return _.each(this.children, child => child.teardown())
+    each(this.children, child => child.teardown())
   }
 
   toJSON() {

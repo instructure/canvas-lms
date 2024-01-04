@@ -23,7 +23,7 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
  */
 import $ from 'jquery'
-import _ from 'underscore'
+import {pick, omit} from 'lodash'
 import Backbone from '@canvas/backbone'
 import WikiPageRevision from './WikiPageRevision'
 import Assignment from '@canvas/assignments/backbone/models/Assignment'
@@ -47,7 +47,7 @@ export default WikiPage = (function () {
 
     initialize(attributes, options) {
       super.initialize(...arguments)
-      Object.assign(this, _.pick(options || {}, pageOptions))
+      Object.assign(this, pick(options || {}, pageOptions))
       if (this.contextAssetString) {
         ;[this.contextName, this.contextId] = Array.from(splitAssetString(this.contextAssetString))
       }
@@ -110,7 +110,10 @@ export default WikiPage = (function () {
     // Flatten the nested data structure required by the api (see @publish and @unpublish)
     parse(response, _options) {
       if (response.wiki_page) {
-        response = _.extend(_.omit(response, 'wiki_page'), response.wiki_page)
+        response = {
+          ...omit(response, 'wiki_page'),
+          ...response.wiki_page,
+        }
       }
       response.set_assignment =
         response.assignment != null && response.assignment.only_visible_to_overrides
