@@ -1,5 +1,5 @@
 <nav>
-  
+
   <div class="expand-all-toggle">
     <input id="toggle-input" type="checkbox" onClick="toggle(this)">
     <label for="toggle-input" class="toggle-label">Expand all</label>
@@ -34,7 +34,7 @@
       "file.oauth_endpoints.html" => "OAuth2 Endpoints",
       "file.developer_keys.html" => "Developer Keys",
     } %>
-    <input name="header" class="ac-input" id="sidebar-oauth2" type="checkbox" 
+    <input name="header" class="ac-input" id="sidebar-oauth2" type="checkbox"
       <%= if @oauth2_file_list.key?(options[:object]) then 'checked' end %>
     >
     <label class="ac-label" for="sidebar-oauth2">OAuth2</label>
@@ -56,13 +56,13 @@
     <% end %>
 
     <input name="header" class="ac-input" id="sidebar-resources" type="checkbox"
-      <%= 
-        if 
+      <%=
+        if
           options[:object] == 'all_resources.html' ||
-          @resources_file_list.include?(options[:object]) 
-        then 
-          'checked' 
-        end 
+          @resources_file_list.include?(options[:object])
+        then
+          'checked'
+        end
       %>
     >
     <label class="ac-label" for="sidebar-resources">Resources</label>
@@ -70,11 +70,11 @@
       <div class="ac-sub">
         <a href="all_resources.html" class="<%= 'current' if options[:all_resources] %>">All Resources Reference</a>
         <% options[:resources].each do |(resource, controllers)| %>
-          <% 
+          <%
             next if resource.include?('Plagiarism')
             link = url_for("#{topicize resource}.html")
             klass = []
-            klass << "current" if resource == options[:object] 
+            klass << "current" if resource == options[:object]
           %>
           <a class="<%= klass.join(' ') %>" href="<%= link %>"><%= resource %></a>
         <% end %>
@@ -95,7 +95,7 @@
   </div>
 
   <div class="ac-container">
-    <input name="header" class="ac-input" id="sidebar-groupCategories" type="checkbox" 
+    <input name="header" class="ac-input" id="sidebar-groupCategories" type="checkbox"
       <%= if options[:object] == 'file.group_category_csv.html' then 'checked' end %>
     >
     <label class="ac-label" for="sidebar-groupCategories">Group Categories</label>
@@ -131,6 +131,7 @@
     } %>
 
     <% @placements_file_list = {
+      "file.placements_overview.html" => "Placements Overview",
       "file.navigation_tools.html" => "Navigation",
       "file.homework_submission_placement.html" => "Homework Submission",
       "file.editor_button_placement.html" => "Editor Button",
@@ -149,8 +150,8 @@
     <% end %>
 
     <input name="header" class="ac-input" id="sidebar-externalTools" type="checkbox"
-      <%= 
-        if 
+      <%=
+        if
           @lti_file_list.key?(options[:object]) ||
           @placements_file_list.key?(options[:object]) ||
           options[:object] == 'file.plagiarism_platform.html' ||
@@ -158,9 +159,9 @@
           options[:object] == 'file.jwt_access_tokens.html' ||
           options[:object] == 'file.xapi.html' ||
           options[:object] == 'file.canvas_roles.html'
-        then 
-          'checked' 
-        end 
+        then
+          'checked'
+        end
       %>
     >
     <label class="ac-label" for="sidebar-externalTools">External Tools</label>
@@ -168,19 +169,19 @@
     <div class="ac-text">
       <div class="ac-sub">
         <input name="header" class="ac-input" id="sidebar-externalTools-lti" type="checkbox"
-          <%= 
-            if 
+          <%=
+            if
               @lti_file_list.key?(options[:object]) ||
               @placements_file_list.key?(options[:object])
-            then 
-              'checked' 
-            end 
+            then
+              'checked'
+            end
           %>
         >
         <label class="ac-label level1-label" for="sidebar-externalTools-lti">LTI</label>
         <div class="ac-sub-text">
           <%= make_api_doc_anchors(@lti_file_list, options).join.html_safe %>
-          
+
           <div class="ac-sub">
             <input name="header" class="ac-input" id="sidebar-externalTools-lti-placements" type="checkbox"
               <%= if @placements_file_list.key?(options[:object]) then 'checked' end %>
@@ -196,20 +197,20 @@
 
       <a href="<%= url_for("file.xapi.html") %>" class="<%= 'current' if options[:object] == 'file.xapi.html' %>">xAPI</a>
       <a href="<%= url_for("file.canvas_roles.html") %>" class="<%= 'current' if options[:object] == 'file.canvas_roles.html' %>">Canvas Roles</a>
-    
+
     </div>
 
     <div class="ac-text">
       <div class="ac-sub">
         <input name="header" class="ac-input" id="sidebar-externalTools-plagiarism" type="checkbox"
-          <%= 
-            if 
+          <%=
+            if
               options[:object] == 'file.plagiarism_platform.html' ||
               @plagiarism_file_list.include?(options[:object]) ||
               options[:object] == 'file.jwt_access_tokens.html'
-            then 
-              'checked' 
-            end 
+            then
+              'checked'
+            end
           %>
         >
         <label class="ac-label level1-label" for="sidebar-externalTools-plagiarism">Plagiarism Detection Platform</label>
@@ -235,7 +236,7 @@
       "file.data_service_introduction.html" => "Introduction",
       "file.data_service_setup.html" => "Setup",
       "file.data_service_caliper_structure.html" => "Caliper",
-      "file.data_service_canvas_event_metadata.html" => "Metadata",      
+      "file.data_service_canvas_event_metadata.html" => "Metadata",
     } %>
 
     <% @canvas_file_list = {} %>
@@ -247,16 +248,16 @@
     <% DataServicesCaliperLoader.data.each do |content| %>
       <% @caliper_file_list["file.data_service_caliper_#{content[:event_category]}.html"] = content[:page_title] %>
     <% end %>
-    
+
     <input name="header" class="ac-input" id="sidebar-dataServices" type="checkbox"
-      <%= 
-        if 
+      <%=
+        if
           @overview_file_list.key?(options[:object]) ||
           @canvas_file_list.key?(options[:object]) ||
           @caliper_file_list.key?(options[:object])
-        then 
-          'checked' 
-        end 
+        then
+          'checked'
+        end
       %>
     >
     <label class="ac-label" for="sidebar-dataServices">Data Services</label>
@@ -264,14 +265,14 @@
     <div class="ac-text">
       <div class="ac-sub">
         <input name="header" class="ac-input" id="sidebar-dataServices-liveEvents" type="checkbox"
-          <%= 
-            if 
+          <%=
+            if
               @overview_file_list.key?(options[:object]) ||
               @canvas_file_list.key?(options[:object]) ||
               @caliper_file_list.key?(options[:object])
-            then 
-              'checked' 
-            end 
+            then
+              'checked'
+            end
           %>
         >
         <label class="ac-label level1-label" for="sidebar-dataServices-liveEvents">Live Events</label>
