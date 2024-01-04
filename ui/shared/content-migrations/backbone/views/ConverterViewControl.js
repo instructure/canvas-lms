@@ -17,8 +17,8 @@
  */
 
 import $ from 'jquery'
-import _ from 'underscore'
 import 'jquery-tinypubsub'
+import {find} from 'lodash'
 
 // Handles rendering the correct view depending on the
 // value selected.
@@ -79,11 +79,8 @@ ConverterViewControl.resetControl = function () {
   return (this.registeredViews.length = 0)
 }
 
-ConverterViewControl.getView = function (key) {
-  return _.find(ConverterViewControl.registeredViews, function (regView) {
-    return regView.key === key
-  })
-}
+ConverterViewControl.getView = key =>
+  find(ConverterViewControl.registeredViews, rv => rv.key === key)
 
 // Find the view for which the value we are looking for
 // exists and render it in the parent view. This is tightly
