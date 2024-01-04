@@ -16,9 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// @ts-expect-error
-import _ from 'underscore'
 import round from '@canvas/round'
+import {reduce, filter, values, map, groupBy, keyBy} from 'lodash'
 import AssignmentGroupGradeCalculator from './AssignmentGroupGradeCalculator'
 import {bigSum, sum, sumBy, toNumber, weightedPercent} from './GradeCalculationHelper'
 import type {Assignment, AssignmentGroup, UserDueDateMap} from '../../api.d'
@@ -53,7 +52,7 @@ function combineAssignmentGroupGrades(
     const relevantGroupGrades = scopedAssignmentGroupGrades.filter(grade => grade.possible)
     const fullWeight = sumBy(relevantGroupGrades, 'weight')
 
-    let finalGrade = bigSum(_.map(relevantGroupGrades, weightedPercent))
+    let finalGrade = bigSum(relevantGroupGrades.map(weightedPercent))
     if (fullWeight === 0) {
       finalGrade = null
     } else if (fullWeight < 100) {
@@ -80,7 +79,7 @@ function combineGradingPeriodGrades(
   },
   includeUngraded: boolean
 ) {
-  let scopedGradingPeriodGrades = _.map(
+  let scopedGradingPeriodGrades = map(
     gradingPeriodGradesByPeriodId,
     (gradingPeriodGrade: GradingPeriodGrade) => {
       const gradeVersion = includeUngraded ? gradingPeriodGrade.final : gradingPeriodGrade.current
@@ -89,10 +88,10 @@ function combineGradingPeriodGrades(
   )
 
   if (!includeUngraded) {
-    scopedGradingPeriodGrades = _.filter(scopedGradingPeriodGrades, 'possible')
+    scopedGradingPeriodGrades = filter(scopedGradingPeriodGrades, 'possible')
   }
 
-  const scoreSum = bigSum(_.map(scopedGradingPeriodGrades, weightedPercent))
+  const scoreSum = bigSum(scopedGradingPeriodGrades.map(weightedPercent))
   const totalWeight = sumBy(scopedGradingPeriodGrades, 'weight')
   const totalScore =
     totalWeight === 0 ? 0 : toNumber(scoreSum.times(100).div(Math.min(totalWeight, 100)))
@@ -115,11 +114,11 @@ function divideGroupByGradingPeriods(
   // instance of the assignment group includes assignments only from one grading period.
   const assignmentsByGradingPeriodId: {
     [periodId: string]: Assignment[]
-  } = _.groupBy(
+  } = groupBy(
     assignmentGroup.assignments,
     (assignment: Assignment) => effectiveDueDates[assignment.id].grading_period_id
   )
-  return _.map(assignmentsByGradingPeriodId, (assignments: Assignment[]) => ({
+  return map(assignmentsByGradingPeriodId, (assignments: Assignment[]) => ({
     ...assignmentGroup,
     assignments,
   }))
@@ -129,10 +128,11 @@ function extractPeriodBasedAssignmentGroups(
   assignmentGroups: AssignmentGroupCriteriaMap,
   effectiveDueDates: UserDueDateMap
 ): AssignmentGroup[] {
-  return _.reduce(
+  // @ts-expect-error
+  return reduce(
     assignmentGroups,
     (periodBasedGroups: AssignmentGroup[], assignmentGroup: AssignmentGroup) => {
-      const assignedAssignments = _.filter(
+      const assignedAssignments = filter(
         assignmentGroup.assignments,
         (assignment: Assignment) => effectiveDueDates[assignment.id]
       )
@@ -140,6 +140,7 @@ function extractPeriodBasedAssignmentGroups(
         const groupWithAssignedAssignments = {...assignmentGroup, assignments: assignedAssignments}
         return [
           ...periodBasedGroups,
+          // @ts-expect-error
           ...divideGroupByGradingPeriods(groupWithAssignedAssignments, effectiveDueDates),
         ]
       }
@@ -150,14 +151,14 @@ function extractPeriodBasedAssignmentGroups(
 }
 
 function recombinePeriodBasedAssignmentGroupGrades(grades: AssignmentGroupGrade[]) {
-  const map: AssignmentGroupGradeMap = {}
+  const map_: AssignmentGroupGradeMap = {}
 
   for (let g = 0; g < grades.length; g++) {
     const grade = grades[g]
-    const previousGrade = map[grade.assignmentGroupId]
+    const previousGrade = map_[grade.assignmentGroupId]
 
     if (previousGrade) {
-      map[grade.assignmentGroupId] = {
+      map_[grade.assignmentGroupId] = {
         ...previousGrade,
         current: {
           submission_count: previousGrade.current.submission_count + grade.current.submission_count,
@@ -173,11 +174,11 @@ function recombinePeriodBasedAssignmentGroupGrades(grades: AssignmentGroupGrade[
         },
       }
     } else {
-      map[grade.assignmentGroupId] = grade
+      map_[grade.assignmentGroupId] = grade
     }
   }
 
-  return map
+  return map_
 }
 
 function calculateWithGradingPeriods(
@@ -209,14 +210,14 @@ function calculateWithGradingPeriods(
 
   const assignmentGroupsByGradingPeriodId: {
     [periodId: string]: AssignmentGroup[]
-  } = _.groupBy(periodBasedGroups, (assignmentGroup: AssignmentGroup) => {
+  } = groupBy(periodBasedGroups, (assignmentGroup: AssignmentGroup) => {
     const assignmentId = assignmentGroup.assignments[0].id
     return effectiveDueDates[assignmentId].grading_period_id
   })
 
   const gradingPeriodsById: {
     [periodId: string]: CamelizedGradingPeriod
-  } = _.keyBy(gradingPeriods, 'id')
+  } = keyBy(gradingPeriods, 'id')
 
   const gradingPeriodGradesByPeriodId: {
     [periodId: string]: GradingPeriodGrade
@@ -236,7 +237,7 @@ function calculateWithGradingPeriods(
       periodBasedAssignmentGroupGrades.push(groupGrades[assignmentGroup.id])
     }
 
-    const groupGradesList = _.values(groupGrades)
+    const groupGradesList = values(groupGrades)
 
     gradingPeriodGradesByPeriodId[gradingPeriod.id] = {
       gradingPeriodId: gradingPeriod.id,
@@ -258,7 +259,8 @@ function calculateWithGradingPeriods(
     }
   }
 
-  const allAssignmentGroupGrades: AssignmentGroupGrade[] = _.map(
+  // @ts-expect-error
+  const allAssignmentGroupGrades: AssignmentGroupGrade[] = map(
     assignmentGroups,
     (assignmentGroup: AssignmentGroup) =>
       AssignmentGroupGradeCalculator.calculate(
@@ -269,7 +271,7 @@ function calculateWithGradingPeriods(
   )
 
   return {
-    assignmentGroups: _.keyBy(
+    assignmentGroups: keyBy(
       allAssignmentGroupGrades,
       (grade: AssignmentGroupGrade) => grade.assignmentGroupId
     ),
@@ -299,7 +301,8 @@ function calculateWithoutGradingPeriods(
   }
   scoreUnit: 'points' | 'percentage'
 } {
-  const assignmentGroupGrades: AssignmentGroupGrade[] = _.map(
+  // @ts-expect-error
+  const assignmentGroupGrades: AssignmentGroupGrade[] = map(
     assignmentGroups,
     (assignmentGroup: AssignmentGroup) =>
       AssignmentGroupGradeCalculator.calculate(
@@ -310,7 +313,7 @@ function calculateWithoutGradingPeriods(
   )
 
   return {
-    assignmentGroups: _.keyBy(
+    assignmentGroups: keyBy(
       assignmentGroupGrades,
       (grade: AssignmentGroupGrade) => grade.assignmentGroupId
     ),
