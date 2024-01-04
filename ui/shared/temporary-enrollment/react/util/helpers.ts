@@ -55,7 +55,7 @@ export function getDayBoundaries(date: Date = new Date()): [Date, Date] {
   const end = new Date(date)
 
   // set start date time to beginning of day
-  start.setHours(0, 0, 0, 0)
+  start.setHours(0, 1, 0, 0)
   // set end date time to end of day
   end.setHours(23, 59, 59, 999)
 

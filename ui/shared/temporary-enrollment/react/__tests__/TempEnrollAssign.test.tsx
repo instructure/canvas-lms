@@ -219,7 +219,7 @@ describe('TempEnrollAssign', () => {
       fireEvent.blur(endDate)
 
       expect((await findByTestId('temp-enroll-summary')).textContent).toBe(
-        'Canvas will enroll Melvin as a Teacher in the selected courses of John Smith from Sun, Apr 10, 2022, 12:00 AM - Tue, Apr 12, 2022, 11:59 PM'
+        'Canvas will enroll Melvin as a Teacher in the selected courses of John Smith from Sun, Apr 10, 2022, 12:01 AM - Tue, Apr 12, 2022, 11:59 PM'
       )
     })
 

@@ -122,7 +122,7 @@ describe('helpers.ts', () => {
         const date = new Date(2023, 8, 13, 15, 30) // Sep 13, 2023, 15:30
         const [start, end] = getDayBoundaries(date)
 
-        expect(start).toEqual(new Date(2023, 8, 13, 0, 0, 0, 0))
+        expect(start).toEqual(new Date(2023, 8, 13, 0, 1, 0, 0))
         expect(end).toEqual(new Date(2023, 8, 13, 23, 59, 59, 999))
       })
     })
