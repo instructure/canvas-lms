@@ -17,46 +17,7 @@
  */
 
 import $ from 'jquery'
-import _ from 'underscore'
-
-const debounce = _.debounce
 
 export function closeDialog() {
   return $('.ui-dialog-content').dialog('close')
-}
-
-export function useOldDebounce() {
-  // this version of debounce works with sinon's useFakeTimers
-  return (_.debounce = (func, wait, immediate) =>
-    function () {
-      let result
-      const context = this
-      const args = arguments
-      const timestamp = new Date()
-      const later = function () {
-        let timeout
-        const last = new Date() - timestamp
-        if (last < wait) {
-          return (timeout = setTimeout(later, wait - last))
-        } else {
-          timeout = null
-          if (!immediate) {
-            let result
-            return (result = func.apply(context, args))
-          }
-        }
-      }
-      const callNow = immediate && !timeout
-      if (!timeout) {
-        var timeout = setTimeout(later, wait)
-      }
-      if (callNow) {
-        result = func.apply(context, args)
-      }
-      return result
-    })
-}
-
-export function useNormalDebounce() {
-  return (_.debounce = debounce)
 }
