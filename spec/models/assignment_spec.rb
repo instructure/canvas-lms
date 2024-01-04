@@ -1870,6 +1870,79 @@ describe Assignment do
     end
   end
 
+  describe "event: failed_to_clone_outcome_alignment" do
+    subject { described_class }
+
+    let(:target_assignment) do
+      @course.assignments.create!(workflow_state: "outcome_alignment_cloning", **assignment_valid_attributes)
+    end
+
+    describe ".finish_alignment_cloning" do
+      it "updates to unpublished" do
+        expect(target_assignment.workflow_state).to eq "outcome_alignment_cloning"
+        target_assignment.finish_alignment_cloning
+        expect(target_assignment.workflow_state).to eq "unpublished"
+      end
+    end
+
+    describe ".fail_to_clone_alignment" do
+      it "updates to failed_to_clone_outcome_alignment" do
+        expect(target_assignment.workflow_state).to eq "outcome_alignment_cloning"
+        target_assignment.fail_to_clone_alignment
+        expect(target_assignment.workflow_state).to eq "failed_to_clone_outcome_alignment"
+      end
+    end
+
+    describe ".fail_to_clone_alignment and .finish_alignment_cloning" do
+      it "updates to failed_to_clone_outcome_alignment and then to unpublished" do
+        expect(target_assignment.workflow_state).to eq "outcome_alignment_cloning"
+        target_assignment.fail_to_clone_alignment
+        expect(target_assignment.workflow_state).to eq "failed_to_clone_outcome_alignment"
+        target_assignment.finish_alignment_cloning
+        expect(target_assignment.workflow_state).to eq "unpublished"
+      end
+    end
+  end
+
+  describe "scope: cloning_alignments_for_too_long" do
+    subject { described_class.cloning_alignments_for_too_long }
+
+    let_once(:unpublished_assignment) do
+      @course.assignments.create!(workflow_state: "unpublished", **assignment_valid_attributes)
+    end
+    let_once(:new_target_assignment) do
+      @course.assignments.create!(
+        workflow_state: "outcome_alignment_cloning",
+        duplication_started_at: 5.seconds.ago,
+        **assignment_valid_attributes
+      )
+    end
+    let_once(:old_assignment) do
+      @course.assignments.create!(
+        workflow_state: "outcome_alignment_cloning",
+        duplication_started_at: 40.minutes.ago,
+        **assignment_valid_attributes
+      )
+    end
+
+    it { is_expected.to eq([old_assignment]) }
+  end
+
+  describe ".clean_up_cloning_alignments" do
+    before { allow(described_class).to receive(:cloning_alignments_for_too_long).and_return(double) }
+
+    it "marks all assignments that have been in the status cloning assignment for too long as failed_to_clone_outcome_alignment" do
+      now = double("now")
+      expect(Time.zone).to receive(:now).and_return(now)
+      expect(described_class.cloning_alignments_for_too_long).to receive(:update_all).with(
+        duplication_started_at: nil,
+        workflow_state: "failed_to_clone_outcome_alignment",
+        updated_at: now
+      )
+      described_class.clean_up_cloning_alignments
+    end
+  end
+
   describe "scope: migrating_for_too_long" do
     subject { described_class.migrating_for_too_long }
 

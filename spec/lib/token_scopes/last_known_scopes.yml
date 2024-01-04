@@ -2160,4 +2160,6 @@
 - verb: GET
   path: "/api/v1/courses/:course_id/smartsearch"
 - verb: POST
+  path: "/api/v1/courses/:course_id/assignments/:assignment_id/retry_alignment_clone"
+- verb: POST
   path: "/api/v1/courses/:course_id/assign_outcome_order"

@@ -1318,6 +1318,7 @@ CanvasRails::Application.routes.draw do
       post "courses/:course_id/assignments", action: :create
       put "courses/:course_id/assignments/:id", action: :update
       post "courses/:course_id/assignments/:assignment_id/duplicate", action: :duplicate
+      post "courses/:course_id/assignments/:assignment_id/retry_alignment_clone", action: :retry_alignment_clone
       delete "courses/:course_id/assignments/:id", action: :destroy, controller: :assignments
     end
 

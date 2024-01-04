@@ -85,6 +85,8 @@ export default AssignmentListItemView = (function () {
       this.focusOnGroup = this.focusOnGroup.bind(this)
       this.focusOnGroupByID = this.focusOnGroupByID.bind(this)
       this.focusOnFirstGroup = this.focusOnFirstGroup.bind(this)
+      this.onAlignmentCloneFailedRetry = this.onAlignmentCloneFailedRetry.bind(this)
+      this.updateAssignmentCollectionItem = this.updateAssignmentCollectionItem.bind(this)
     }
 
     static initClass() {
@@ -123,6 +125,8 @@ export default AssignmentListItemView = (function () {
         'click .migrate-failed-retry': 'onMigrateFailedRetry',
         'click .duplicate-failed-cancel': 'onDuplicateOrImportFailedCancel',
         'click .import-failed-cancel': 'onDuplicateOrImportFailedCancel',
+        'click .alignment-clone-failed-retry': 'onAlignmentCloneFailedRetry',
+        'click .alignment-clone-failed-cancel': 'onDuplicateOrImportFailedCancel',
       }
 
       this.prototype.messages = shimGetterShorthand(
@@ -498,6 +502,30 @@ export default AssignmentListItemView = (function () {
           return this.delete({silent: true})
         })
         .always(() => $button.prop('disabled', false))
+    }
+
+    onAlignmentCloneFailedRetry(e) {
+      e.preventDefault()
+      const $button = $(e.target)
+      $button.prop('disabled', true)
+      return this.model
+        .alignment_clone_failed(response => {
+          return this.updateAssignmentCollectionItem(response)
+        })
+        .always(() => $button.prop('disabled', false))
+    }
+
+    updateAssignmentCollectionItem(response) {
+      if (!response) {
+        return
+      }
+      this.model.collection.forEach(a => {
+        if (a.get('id') === response.id) {
+          a.set('workflow_state', response.workflow_state)
+          a.set('duplication_started_at', response.duplication_started_at)
+          a.set('updated_at', response.updated_at)
+        }
+      })
     }
 
     onMigrateFailedRetry(e) {

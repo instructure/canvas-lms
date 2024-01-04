@@ -7,6 +7,10 @@
     <div class="ig-row__layout">
       {{>ui/shared/spinner/jst/_spinner.handlebars}} {{#t}}Making a copy of "{{originalAssignmentName}}"{{/t}}
     </div>
+  {{else}} {{#if isCloningAlignment}}
+    <div class="ig-row__layout">
+      {{>ui/shared/spinner/jst/_spinner.handlebars}} {{#t}}Cloning Alignments of "{{originalAssignmentName}}"{{/t}}
+    </div>
   {{else}} {{#if failedToDuplicate}}
     <span aria-live="polite" role="alert" aria-atomic="true">{{#t}}Oops! Something went wrong with making a copy of "{{originalAssignmentName}}"{{/t}}</span>
     <div class="duplicate-failed-actions">
@@ -17,6 +21,20 @@
       {{#unless is_master_course_child_content}}
       <button class="duplicate-failed-cancel btn">
         <span class="screenreader-only">{{#t}}Cancel duplicating "{{originalAssignmentName}}"{{/t}}</span>
+        <span aria-hidden="true">{{#t}}Cancel{{/t}}</span>
+      </button>
+      {{/unless}}
+    </div>
+  {{else}} {{#if failedToCloneAlignment}}
+    <span aria-live="polite" role="alert" aria-atomic="true">{{#t}}Oops! Something went wrong with cloning alignments of "{{originalAssignmentName}}"{{/t}}</span>
+    <div class="alignment-clone-failed-actions">
+      <button class="alignment-clone-failed-retry btn btn-primary">
+        <span class="screenreader-only">{{#t}}Retry cloning "{{originalAssignmentName}}"{{/t}}</span>
+        <span aria-hidden="true">{{#t}}Retry{{/t}}</span>
+      </button>
+      {{#unless is_master_course_child_content}}
+      <button class="alignment-clone-failed-cancel btn">
+        <span class="screenreader-only">{{#t}}Cancel cloning "{{originalAssignmentName}}"{{/t}}</span>
         <span aria-hidden="true">{{#t}}Cancel{{/t}}</span>
       </button>
       {{/unless}}
@@ -490,7 +508,7 @@
     </div>
 
     {{#if canManage}}<form data-view="edit-assignment" class="form-dialog"></form>{{/if}}
-  {{/if}}{{/if}}{{/if}}{{/if}}{{/if}}{{/if}}
+  {{/if}}{{/if}}{{/if}}{{/if}}{{/if}}{{/if}}{{/if}}{{/if}}
 </div>
 <div id="assignment_student_peer_review_{{id}}">
 <div id="assign-to-mount-point"></div>

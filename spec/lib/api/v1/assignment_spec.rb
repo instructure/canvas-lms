@@ -870,11 +870,23 @@ describe "Api::V1::Assignment" do
       end
     end
 
+    shared_examples "sets workflow_state to outcome_alignment_cloning" do
+      let(:original_assignment) { assignment_model }
+      it "goes from duplicating to outcome_alignment_cloning when flag is active" do
+        assignment.update!(workflow_state: "duplicating")
+        assignment.root_account.enable_feature!(:course_copy_alignments)
+        expect do
+          api.update_api_assignment(assignment, assignment_update_params, user)
+        end.to change { assignment.workflow_state }.to("outcome_alignment_cloning")
+      end
+    end
+
     context "when workflow_state is 'duplicating'" do
       let(:workflow_state) { "duplicating" }
 
       include_examples "retains the original publication state"
       include_examples "falls back to 'unpublished' state"
+      include_examples "sets workflow_state to outcome_alignment_cloning"
     end
 
     context "when workflow_state is 'failed_to_duplicate'" do
@@ -909,6 +921,27 @@ describe "Api::V1::Assignment" do
         expect(assignment.duplicate_of.workflow_state).to eq "unpublished"
         expect(assignment.workflow_state).to eq "published"
       end
+    end
+  end
+
+  describe "when updating with 'alignment_cloned_successfully'" do
+    let(:original_assignment) { assignment_model(workflow_state: "published") }
+    let(:assignment) { assignment_model(workflow_state: "outcome_alignment_cloning", duplicate_of: original_assignment) }
+
+    it "updates the state to the original state" do
+      params =  ActionController::Parameters.new(alignment_cloned_successfully: true)
+      assignment.root_account.enable_feature!(:course_copy_alignments)
+      api.update_api_assignment(assignment, params, user_model)
+
+      expect(assignment.workflow_state).to eq original_assignment.workflow_state
+    end
+
+    it "updates the state to 'failed_to_clone_outcome_alignment'" do
+      params =  ActionController::Parameters.new(alignment_cloned_successfully: false)
+      assignment.root_account.enable_feature!(:course_copy_alignments)
+      api.update_api_assignment(assignment, params, user_model)
+
+      expect(assignment.workflow_state).to eq "failed_to_clone_outcome_alignment"
     end
   end
 
