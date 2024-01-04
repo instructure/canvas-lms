@@ -24,7 +24,9 @@ module FilesHelper
       return render_unauthorized_action if @attachment&.deleted?
       return render_unauthorized_action unless @attachment&.media_entry_id
 
-      @media_object = @attachment.media_object_by_media_id
+      # Couldn't use Attachment#media_object_by_media_id since it automatically uses attachment's shard.
+      # Sometimes Attachment and MediaObject can be created in different shards, like cross-shard users media.
+      @media_object = MediaObject.by_media_id(@attachment&.media_entry_id).take
       @media_object.current_attachment = @attachment unless @media_object.nil?
       @media_id = @media_object&.id
     elsif params[:media_object_id].present?
