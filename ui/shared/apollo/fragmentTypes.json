@@ -336,6 +336,9 @@
             "name": "GradingPeriodGroup"
           },
           {
+            "name": "GradingStandard"
+          },
+          {
             "name": "Group"
           },
           {

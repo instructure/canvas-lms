@@ -26,6 +26,7 @@ import {PointsPossible} from './PointsPossible'
 import {PeerReviewOptions} from './PeerReviewOptions'
 import {AssignmentDueDatesManager} from './AssignmentDueDatesManager'
 import {SyncToSisCheckbox} from './SyncToSisCheckbox'
+import {GradingSchemesSelector} from '@canvas/grading-scheme'
 
 type Props = {
   assignmentGroups: [{_id: string; name: string}]
@@ -43,6 +44,8 @@ type Props = {
   setPeerReviewDueDate: (peerReviewDueDate: string) => void
   postToSis: boolean
   setPostToSis: (postToSis: boolean) => void
+  gradingSchemeId?: string
+  setGradingSchemeId: (gradingSchemeId: string) => void
 }
 
 export const GradedDiscussionOptions = ({
@@ -61,6 +64,8 @@ export const GradedDiscussionOptions = ({
   setPeerReviewDueDate,
   postToSis,
   setPostToSis,
+  gradingSchemeId,
+  setGradingSchemeId,
 }: Props) => {
   return (
     <View as="div">
@@ -73,6 +78,16 @@ export const GradedDiscussionOptions = ({
       <View as="div" margin="medium 0">
         <DisplayGradeAs displayGradeAs={displayGradeAs} setDisplayGradeAs={setDisplayGradeAs} />
       </View>
+      {(displayGradeAs === 'gpa_scale' || displayGradeAs === 'letter_grade') && (
+        <GradingSchemesSelector
+          canManage={ENV?.PERMISSIONS?.manage_grading_schemes || false}
+          contextId={ENV.COURSE_ID || ''}
+          contextType="Course"
+          initiallySelectedGradingSchemeId={gradingSchemeId}
+          onChange={newSchemeId => setGradingSchemeId(newSchemeId || '')}
+          archivedGradingSchemesEnabled={false}
+        />
+      )}
       {ENV.POST_TO_SIS && (
         <View as="div" margin="medium 0">
           <SyncToSisCheckbox postToSis={postToSis} setPostToSis={setPostToSis} />

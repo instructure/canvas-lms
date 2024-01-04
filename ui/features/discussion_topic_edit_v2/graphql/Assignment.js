@@ -31,6 +31,10 @@ export const Assignment = {
       unlockAt
       dueAt
       lockAt
+      gradingStandard {
+        id
+        _id
+      }
       peerReviews {
         anonymousReviews
         automaticReviews

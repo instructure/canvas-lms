@@ -221,6 +221,10 @@ export default function DiscussionTopicForm({
     !!currentDiscussionTopic?.assignment?.postToSis || false
   )
 
+  const [gradingSchemeId, setGradingSchemeId] = useState(
+    currentDiscussionTopic?.assignment?.gradingStandard?._id || undefined
+  )
+
   const handleSettingUsageRightsData = data => {
     setUsageRightsErrorState(false)
     setUsageRightsData(data)
@@ -527,6 +531,7 @@ export default function DiscussionTopicForm({
         info =>
           info.assignedList.length === 1 && info.assignedList[0] === defaultEveryoneOption.assetCode
       ),
+      gradingStandardId: gradingSchemeId || null,
     }
     // Additional properties for creation of a graded assignment
     if (!isEditing) {
@@ -976,6 +981,8 @@ export default function DiscussionTopicForm({
                   setPeerReviewDueDate={setPeerReviewDueDate}
                   postToSis={postToSis}
                   setPostToSis={setPostToSis}
+                  gradingSchemeId={gradingSchemeId}
+                  setGradingSchemeId={setGradingSchemeId}
                 />
               </GradedDiscussionDueDatesContext.Provider>
             </View>

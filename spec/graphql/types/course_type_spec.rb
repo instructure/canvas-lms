@@ -264,6 +264,12 @@ describe Types::CourseType do
         ).to eq "Default Grading Scheme"
       end
 
+      it "returns grading standard id" do
+        expect(
+          course_type.resolve("gradingStandard { _id }", current_user: @student)
+        ).to eq course.grading_standard_or_default.id
+      end
+
       it "returns grading standard data" do
         expect(
           course_type.resolve("gradingStandard { data { letterGrade } }", current_user: @student)
