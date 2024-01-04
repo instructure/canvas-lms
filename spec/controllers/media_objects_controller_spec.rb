@@ -137,6 +137,33 @@ describe MediaObjectsController do
         assert_status(401)
       end
     end
+
+    context "cross-shard" do
+      specs_require_sharding
+
+      it "finds an media object from another shard" do
+        user_model
+        user_session(@user)
+        @shard2.activate do
+          @mo = MediaObject.create! media_id: "_media_id"
+        end
+
+        @mo.attachment = Folder.media_folder(@user).attachments.create!(
+          context: @user,
+          display_name: "file.mp4",
+          filename: "file.mp4",
+          content_type: "video/mp4",
+          media_entry_id: @mo.media_id,
+          file_state: "hidden",
+          workflow_state: "pending_upload"
+        )
+
+        @shard2.activate do
+          get "show", params: { attachment_id: @mo.attachment.id }
+          assert_status(200)
+        end
+      end
+    end
   end
 
   describe "GET 'index'" do
