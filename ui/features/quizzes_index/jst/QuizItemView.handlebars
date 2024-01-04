@@ -29,6 +29,10 @@
   <div class="ig-row__layout">
     {{>ui/shared/spinner/jst/_spinner.handlebars}} {{#t}}Making a copy of "{{original_assignment_name}}"{{/t}}
   </div>
+{{else}} {{#if isCloningAlignment}}
+  <div class="ig-row__layout">
+    {{>ui/shared/spinner/jst/_spinner.handlebars}} {{#t}}Cloning Alignments of "{{original_assignment_name}}"{{/t}}
+  </div
 {{else}} {{#if failedToDuplicate}}
   <span aria-live="polite" role="alert" aria-atomic="true">{{#t}}Oops! Something went wrong with making a copy of "{{original_assignment_name}}"{{/t}}</span>
   <div class="duplicate-failed-actions">
@@ -39,6 +43,20 @@
     {{#unless isMasterCourseChildContent}}
     <button class="duplicate-failed-cancel btn">
       <span class="screenreader-only">{{#t}}Cancel duplicating "{{original_assignment_name}}"{{/t}}</span>
+      <span aria-hidden="true">{{#t}}Cancel{{/t}}</span>
+    </button>
+    {{/unless}}
+  </div>
+{{else}} {{#if failedToCloneAlignment}}
+  <span aria-live="polite" role="alert" aria-atomic="true">{{#t}}Oops! Something went wrong with cloning alignments of "{{original_assignment_name}}"{{/t}}</span>
+  <div class="alignment-clone-failed-actions">
+    <button class="alignment-clone-failed-retry btn btn-primary">
+      <span class="screenreader-only">{{#t}}Retry cloning "{{original_assignment_name}}"{{/t}}</span>
+      <span aria-hidden="true">{{#t}}Retry{{/t}}</span>
+    </button>
+    {{#unless isMasterCourseChildContent}}
+    <button class="alignment-clone-failed-cancel btn">
+      <span class="screenreader-only">{{#t}}Cancel cloning "{{original_assignment_name}}"{{/t}}</span>
       <span aria-hidden="true">{{#t}}Cancel{{/t}}</span>
     </button>
     {{/unless}}
@@ -282,6 +300,6 @@
       {{/if}}
     {{/if}}
   </div>
-{{/if}}{{/if}}{{/if}}{{/if}}{{/if}}{{/if}}
+{{/if}}{{/if}}{{/if}}{{/if}}{{/if}}{{/if}}{{/if}}{{/if}}
 <div id="assign-to-mount-point"></div>
 </div>

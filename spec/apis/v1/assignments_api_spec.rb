@@ -2136,6 +2136,56 @@ describe AssignmentsApiController, type: :request do
     end
   end
 
+  describe "POST retry_alignment_clone" do
+    before :once do
+      course_with_teacher(active_all: true)
+      student_in_course(active_all: true)
+    end
+
+    it "retries the alignment cloning process successfully" do
+      assignment = @course.assignments.create(
+        title: "some assignment",
+        assignment_group: @group,
+        due_at: 1.week.from_now
+      )
+      assignment.update_attribute(:workflow_state, "failed_to_clone_outcome_alignment")
+      api_call_as_user(@user,
+                       :post,
+                       "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/retry_alignment_clone",
+                       { controller: "assignments_api",
+                         action: "retry_alignment_clone",
+                         format: "json",
+                         course_id: @course.id.to_s,
+                         assignment_id: assignment.id.to_s,
+                         target_course_id: @course.id.to_s,
+                         target_assignment_id: assignment.id.to_s },
+                       {},
+                       {},
+                       { expected_status: 200 })
+    end
+
+    it "returns 400 when the state is incorrect" do
+      assignment = @course.assignments.create(
+        title: "some assignment",
+        assignment_group: @group,
+        due_at: 1.week.from_now
+      )
+      api_call_as_user(@user,
+                       :post,
+                       "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/retry_alignment_clone",
+                       { controller: "assignments_api",
+                         action: "retry_alignment_clone",
+                         format: "json",
+                         course_id: @course.id.to_s,
+                         assignment_id: assignment.id.to_s,
+                         target_course_id: @course.id.to_s,
+                         target_assignment_id: assignment.id.to_s },
+                       {},
+                       {},
+                       { expected_status: 400 })
+    end
+  end
+
   describe "POST /courses/:course_id/assignments (#create)" do
     def create_assignment_json(group, group_category)
       { "name" => "some assignment",

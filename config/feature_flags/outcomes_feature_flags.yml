@@ -100,3 +100,8 @@ archive_outcomes:
   display_name: Archive Outcomes
   description: Allows users to archive outcomes and outcome groups no longer in use.
   after_state_change_proc: archive_outcomes_after_change_hook
+course_copy_alignments:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Course Copy Alignments Clone
+  description: Allow to clone alignments after the course copy process

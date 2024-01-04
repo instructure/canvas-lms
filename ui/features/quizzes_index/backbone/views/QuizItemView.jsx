@@ -62,6 +62,8 @@ export default class ItemView extends Backbone.View {
       'click .duplicate-failed-cancel': 'onDuplicateOrImportFailedCancel',
       'click .import-failed-cancel': 'onDuplicateOrImportFailedCancel',
       'click .migrate-failed-cancel': 'onDuplicateOrImportFailedCancel',
+      'click .alignment-clone-failed-retry': 'onAlignmentCloneFailedRetry',
+      'click .alignment-clone-failed-cancel': 'onDuplicateOrImportFailedCancel',
       'click .assign-to-link': 'onAssign',
     }
 
@@ -346,6 +348,20 @@ export default class ItemView extends Backbone.View {
     button.prop('disabled', true)
     this.model
       .duplicate_failed(response => {
+        this.addQuizToList(response)
+        this.delete({silent: true})
+      })
+      .always(() => {
+        button.prop('disabled', false)
+      })
+  }
+
+  onAlignmentCloneFailedRetry(e) {
+    e.preventDefault()
+    const button = $(e.target)
+    button.prop('disabled', true)
+    this.model
+      .alignment_clone_failed(response => {
         this.addQuizToList(response)
         this.delete({silent: true})
       })

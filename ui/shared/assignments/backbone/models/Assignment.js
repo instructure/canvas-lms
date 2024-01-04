@@ -35,6 +35,7 @@ import numberHelper from '@canvas/i18n/numberHelper'
 import PandaPubPoller from '@canvas/panda-pub-poller'
 import {matchingToolUrls} from './LtiAssignmentHelpers'
 
+const default_interval = 3000
 const I18n = useI18nScope('models_Assignment')
 
 const hasProp = {}.hasOwnProperty
@@ -206,6 +207,10 @@ function Assignment() {
   this.isPage = this.isPage.bind(this)
   this.isDiscussionTopic = this.isDiscussionTopic.bind(this)
   this.isQuiz = this.isQuiz.bind(this)
+  this.isCloningAlignment = this.isCloningAlignment.bind(this)
+  this.pollUntilFinishedCloningAlignment = this.pollUntilFinishedCloningAlignment.bind(this)
+  this.failedToCloneAlignment = this.failedToCloneAlignment.bind(this)
+  this.alignment_clone_failed = this.alignment_clone_failed.bind(this)
   return Assignment.__super__.constructor.apply(this, arguments)
 }
 
@@ -1112,6 +1117,10 @@ Assignment.prototype.isDuplicating = function () {
   return this.get('workflow_state') === 'duplicating'
 }
 
+Assignment.prototype.isCloningAlignment = function () {
+  return this.get('workflow_state') === 'outcome_alignment_cloning'
+}
+
 Assignment.prototype.isMigrating = function () {
   return this.get('workflow_state') === 'migrating'
 }
@@ -1122,6 +1131,10 @@ Assignment.prototype.isMasterCourseChildContent = function () {
 
 Assignment.prototype.failedToDuplicate = function () {
   return this.get('workflow_state') === 'failed_to_duplicate'
+}
+
+Assignment.prototype.failedToCloneAlignment = function () {
+  return this.get('workflow_state') === 'failed_to_clone_outcome_alignment'
 }
 
 Assignment.prototype.failedToMigrate = function () {
@@ -1270,6 +1283,8 @@ Assignment.prototype.toView = function () {
     'importantDates',
     'externalToolIframeWidth',
     'externalToolIframeHeight',
+    'isCloningAlignment',
+    'failedToCloneAlignment',
   ]
   const hash = {
     id: this.get('id'),
@@ -1474,6 +1489,29 @@ Assignment.prototype.duplicate_failed = function (callback) {
   )
 }
 
+Assignment.prototype.alignment_clone_failed = function (callback) {
+  let query_string
+  const target_course_id = this.courseID()
+  const target_assignment_id = this.id
+  const original_course_id = this.originalCourseID()
+  const original_assignment_id = this.originalAssignmentID()
+  query_string = '?target_assignment_id=' + target_assignment_id
+  if (original_course_id !== target_course_id) {
+    query_string += '&target_course_id=' + target_course_id
+  }
+  return $.ajaxJSON(
+    '/api/v1/courses/' +
+      original_course_id +
+      '/assignments/' +
+      original_assignment_id +
+      '/retry_alignment_clone' +
+      query_string,
+    'POST',
+    {},
+    callback
+  )
+}
+
 // caller is failed migrated assignment
 Assignment.prototype.retry_migration = function (callback) {
   const course_id = this.courseID()
@@ -1500,6 +1538,13 @@ Assignment.prototype.pollUntilFinishedDuplicating = function (interval) {
   return this.pollUntilFinished(interval, this.isDuplicating)
 }
 
+Assignment.prototype.pollUntilFinishedCloningAlignment = function (interval) {
+  if (interval == null) {
+    interval = default_interval
+  }
+  return this.pollUntilFinished(interval, this.isCloningAlignment)
+}
+
 Assignment.prototype.pollUntilFinishedImporting = function (interval) {
   if (interval == null) {
     interval = 3000
@@ -1524,6 +1569,8 @@ Assignment.prototype.pollUntilFinishedLoading = function (interval) {
     return this.pollUntilFinishedImporting(interval)
   } else if (this.isMigrating()) {
     return this.pollUntilFinishedMigrating(interval)
+  } else if (this.isCloningAlignment()) {
+    return this.pollUntilFinishedCloningAlignment(interval)
   }
 }
 

@@ -413,6 +413,16 @@ class AbstractAssignment < ActiveRecord::Base
   def finish_duplicating
     return unless ["duplicating", "failed_to_duplicate"].include?(workflow_state)
 
+    self.workflow_state = if root_account.feature_enabled?(:course_copy_alignments)
+                            "outcome_alignment_cloning"
+                          else
+                            (duplicate_of&.workflow_state == "published" || !can_unpublish?) ? "published" : "unpublished"
+                          end
+  end
+
+  def finish_alignment_cloning
+    return unless ["outcome_alignment_cloning", "failed_to_clone_outcome_alignment"].include?(workflow_state)
+
     self.workflow_state =
       (duplicate_of&.workflow_state == "published" || !can_unpublish?) ? "published" : "unpublished"
   end
@@ -453,6 +463,14 @@ class AbstractAssignment < ActiveRecord::Base
     duplicating_for_too_long.update_all(
       duplication_started_at: nil,
       workflow_state: "failed_to_duplicate",
+      updated_at: Time.zone.now
+    )
+  end
+
+  def self.clean_up_cloning_alignments
+    cloning_alignments_for_too_long.update_all(
+      duplication_started_at: nil,
+      workflow_state: "failed_to_clone_outcome_alignment",
       updated_at: Time.zone.now
     )
   end
@@ -1447,6 +1465,10 @@ class AbstractAssignment < ActiveRecord::Base
     end
     state :failed_to_migrate
     state :deleted
+    state :outcome_alignment_cloning do
+      event :fail_to_clone_alignment, transitions_to: :failed_to_clone_outcome_alignment
+    end
+    state :failed_to_clone_outcome_alignment
   end
 
   alias_method :destroy_permanently!, :destroy
@@ -3198,6 +3220,15 @@ class AbstractAssignment < ActiveRecord::Base
     )
   }
 
+  # Since we are sharing the duplication_started_at date field with the 'duplicating' workflow_state
+  # we are adding twice the timeout to give it enough time to complete.
+  scope :cloning_alignments_for_too_long, lambda {
+    where(
+      "workflow_state = 'outcome_alignment_cloning' AND duplication_started_at < ?",
+      (Setting.get("quizzes_next_timeout_minutes", "15").to_i * 2).minutes.ago
+    )
+  }
+
   scope :importing_for_too_long, lambda {
     where(
       "workflow_state = 'importing' AND importing_started_at < ?",
@@ -4060,7 +4091,7 @@ class AbstractAssignment < ActiveRecord::Base
   end
 
   def hide_on_modules_view?
-    ["duplicating", "failed_to_duplicate"].include?(workflow_state)
+    %w[duplicating failed_to_duplicate outcome_alignment_cloning failed_to_clone_outcome_alignment].include?(workflow_state)
   end
 
   private

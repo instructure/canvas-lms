@@ -41,6 +41,8 @@ module Types
       value "fail_to_import"
       value "migrating"
       value "failed_to_migrate"
+      value "outcome_alignment_cloning"
+      value "failed_to_clone_outcome_alignment"
     end
 
     GRADING_TYPES = Assignment::ALLOWED_GRADING_TYPES.zip(Assignment::ALLOWED_GRADING_TYPES).to_h
