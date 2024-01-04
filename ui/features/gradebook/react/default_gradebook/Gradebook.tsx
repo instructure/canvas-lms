@@ -1109,6 +1109,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       filterAssignmentsBySubmissionsFn(
         this.props.appliedFilters,
         this.submissionStateMap,
+        this.searchFilteredStudentIds,
         this.options.custom_grade_statuses_enabled ? this.options.custom_grade_statuses : []
       ),
     ]
@@ -2425,6 +2426,11 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
   onFilterToStudents = (studentIds: string[]) => {
     this.searchFilteredStudentIds = studentIds
+    this.updateFilterAssignmentIds()
+    const hasChanged = this.setVisibleGridColumns()
+    if (hasChanged) {
+      this.updateGrid()
+    }
     this.updateRows()
   }
 
@@ -2433,6 +2439,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     const hasChanged = this.setVisibleGridColumns()
     if (hasChanged) {
       this.updateGrid()
+      this.updateRows()
     }
   }
 
