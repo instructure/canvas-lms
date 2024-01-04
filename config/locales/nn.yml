@@ -260,6 +260,14 @@ nn:
   a_sticker_with_a_picture_of_a_triangular_lab_beake_bd4c2189: "Eit klistremerke med eit bilete av ein trekanta laboratorieflaske med ein smal hals."
   a_sticker_with_a_picture_of_a_wall_clock_236f2fdd: "Eit klistremerke med eit bilete av et veggur."
   a_sticker_with_a_picture_of_an_apple_488db91: "Eit klistremerke med eit bilete av eit eple."
+  a_sticker_with_a_picture_of_an_archery_target_with_d0348cc: "Eit klistremerke med eit bilete av ei skyteskive med ein pil i midten."
+  a_sticker_with_a_picture_of_an_atom_b112d32f: "Eit klistremerke med eit bilete av eit atom."
+  a_sticker_with_a_picture_of_an_envelope_936cf90c: "Eit klistremerke med eit bilete av ein konvolutt."
+  a_sticker_with_a_picture_of_an_open_mouth_panda_ma_726778e7: "Eit klistremerke med eit bilete av ein panda med open munn som gjer eit overraska ansikt."
+  a_sticker_with_a_picture_of_an_open_mouth_panda_sm_a89776d2: "Eit klistremerke med eit bilete av ein panda med open munn som smiler."
+  a_sticker_with_a_picture_of_an_open_mouth_smiling__777edfce: "Ein klistremerke med eit bilete av ein smilande panda med open munn og som gret gledestårar."
+  a_sticker_with_a_picture_of_an_open_mouth_smiling__ef6bff29: "Eit klistremerke med eit bilete av ein smilande panda med open munn og hjarte i auga."
+  a_sticker_with_a_picture_of_scissors_c7cc3139: "Eit klistremerke med eit bilete av saksar."
   a_student_has_just_turned_in_a_late_submission_for_23f0ba9e: "Ein student har akkurat levert inn ein oppgåve for seint til %{assignment_name} i emnet %{course_name}"
   a_student_has_just_turned_in_a_re_submission_for_a_9e9a17: "Ein student har akkurat levert inn ei oppgåve på nytt for %{assignment_title}i emnet %{course_name}"
   a_student_has_just_turned_in_a_submission_for_assi_d5ba674d: "Ein student har akkurat levert inn ei oppgåve for %{assignment_title}i emnet %{course_name}"
@@ -267,6 +275,7 @@ nn:
   a_student_just_turned_in_their_anonymous_assignmen_1a0e1c47: "Ein student har akkurat levert inn ei anonym oppgåve (på nytt), %{assignment_title}"
   a_student_just_turned_in_their_anonymous_assignmen_75cc5465: "Ein student har akkurat levert inn ei oppgåve (for seint) til %{assignment_name}"
   a_student_just_turned_in_their_assignment_late_ass_e991e212: "Ein student har akkurat levert inn ei oppgåve (for seint) til %{assignment_name}"
+  a_student_or_section_must_be_selected_79ff673d: "Ein student eller ein seksjon må veljast"
   a_studious_panda_658eba28: "Ein lærd panda"
   a_suffix_cannot_be_longer_than_255_characters_plea_2f2fefd5: "Eit suffiks kan ikkje være lengre enn 255 tegn. Bruk eit kortare suffiks og prøv igjen."
   a_suffix_cannot_have_any_tabs_or_spaces_please_rem_47db763e: "Eit suffiks kan ikkje innehalde faner eller mellomrom. Fjern dei og prøv igjen."
@@ -277,7 +286,9 @@ nn:
   a_table_that_contains_the_grading_scheme_data_each_e9031ad3: "Ein tabell som inneheld data frå vurderingsskjemaet. Kvar rad inneheld eit namn, ein maksimal prosentdel og ein minimal prosentdel."
   a_table_that_contains_the_grading_scheme_data_each_fe739bf6: "Ein tabell som inneheld data frå graderingsskjemaet. Kvar rad inneheld eit namn, ein maksimum prosentverdi og ein minimum prosentverdi. Kvar rad inneheld også ein knapp for å legge til ei ny rad nedanfor, og ein knapp for å slette gjeldande rad."
   a_table_that_contains_the_grading_scheme_data_firs_90d2e30d: "Ein tabell som inneheld data for vurderingsskala. Først er eit namn på vurderingsskalaen og knappar for redigering og sletting av skalaen. Kvar rad inneheld eit namn, ein maksimal prosentandel og ein minste prosentandel. I tillegg inneheld kvar rad ein knapp for å leggje til ein ny rad nedanfor, og ein knapp for å slette gjeldande rad."
+  a_timeout_occurred_contacting_external_authenticat_c064ea48: "Ei tidsavbrot oppstod ved kontakt med ekstern autentiseringsteneste"
   a_wonderful_assignment_d3139d9b: "Ei fin oppgåve"
+  a_yearly_rrule_must_include_byday_or_bymonthday_b56649f4: "Ein årleg RRULE må inkludere BYDAY eller BYMONTHDAY"
   a_z_243c3301: A–Å
   a_z_29d8e67c: "A - Å"
   about_this_service_b10bc808: "Om denne tenesta"
@@ -297,6 +308,7 @@ nn:
         common_core_guid: "Vanleg kjerne-GUID (valfri)"
         partner_id: Partnar-ID
         partner_key: Partnarnøkkel
+  academic_engagement_capella_74946a80: "Akademisk engasjement (Capella)"
   acalanes_union_high_grade_report_ae9bce11: "Acalanes Union High vurderingsrapport"
   accept_2fdd362e: Godta
   accept_course_invitation_b4c04fbb: "Godta invitasjon til emne"
@@ -363,6 +375,7 @@ nn:
   account_97b34646: Konto
   account_account_b6b3746b: "Konto: %{account}"
   account_administrators_can_always_create_courses_926dc0cb: "Kontoadministratorar kan alltid lage emner"
+  account_administrators_can_create_custom_status_la_e2a601bf: "Kontoadministratorar kan opprette eigne statusmerkelappar som instruktørar kan bruke i karakterbøkene sine. Desse eigne statusmerkelappane vil ikkje ha nokon funksjonalitet knytt til seg, som til dømes manglande eller forseinka. Administratorar vil også kunne deaktivere standard statusmerkelappar og hindre at dei blir brukt i heile instansen."
   account_and_course_level_outcome_mastery_scales_5bfe7a3b: "Ekspertiseskalaer for læringsmål på konto- og emnenivå"
   account_and_subaccount_40c6430: "Konto og underkonto"
   account_authorization_config: 
@@ -473,11 +486,17 @@ nn:
       discovery_url_description: "Dersom ein oppdagings-URL blir oppgitt, kjem Canvas til å sende vidare alle brukarar til URL-adressa når dei skal godkjennast. Sida hjelper brukaren med å finne ut kvar han skal gå for å logge på. Dersom URL-adressa ikkje er konfigurert, blir den første konfigurasjonen brukt for brukaren si godkjenning."
       login_handle_name_description: "Etiketten som blir brukt for unike påloggings-ID-ar. Eksempel: Pålogging, brukarnamn, student-ID osv."
       unknown_user_url_description: "URL-en for omdirigering av godkjend brukar finst ikkje i Canvas."
+  account_calendar_visibility_350b0475: "Kontokalender Synlighet"
+  account_calendars_4a4a79b2: Kontokalendrar
+  account_calendars_add_edit_delete_events_1ef2b8bd: "Kontokalendrar - legg til / endre / slett hendingar"
+  account_calendars_change_visibility_c795702a: "Kontokalendrar - endre synlegheit"
   account_course_and_user_search_22bf297a: "Konto, emne- og brukarsøk"
   account_creation_still_in_progress_ac0e0a18: "Kontooppretting held fram"
+  account_custom_statuses_f9bbfb1f: "Tilpassa statusar for konto"
   account_default_time_8c7ab62d: "Kontostandard (%{time})"
   account_domain_78f43049: Kontoområde
   account_domain_lookups_f9d1147e: Kontoområdeoppslag
+  account_grading_settings_d683d62e: "Vurderingsinnstillingar for konto"
   account_groups_2f301732: Kontogrupper
   account_id_2c3b4f15: konto-ID
   account_id_73966078: konto_id
