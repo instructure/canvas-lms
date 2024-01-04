@@ -92,15 +92,16 @@ import SpeedgraderHelpers from './speed_grader_helpers'
 import {
   allowsReassignment,
   anonymousName,
-  teardownHandleStatePopped,
-  getSelectedAssessment,
-  renderSettingsMenu,
   configureRecognition,
+  extractStudentIdFromHash,
+  getSelectedAssessment,
   hideMediaRecorderContainer,
   isStudentConcluded,
   renderDeleteAttachmentLink,
   renderPostGradesMenu,
+  renderSettingsMenu,
   renderStatusMenu,
+  rubricAssessmentToPopulate,
   setupAnonymizableAuthorId,
   setupAnonymizableId,
   setupAnonymizableStudentId,
@@ -108,12 +109,12 @@ import {
   setupAnonymousGraders,
   setupIsAnonymous,
   setupIsModerated,
+  speedGraderJSONErrorFn,
   tearDownAssessmentAuditTray,
+  teardownHandleStatePopped,
   teardownSettingsMenu,
   unexcuseSubmission,
   unmountCommentTextArea,
-  rubricAssessmentToPopulate,
-  speedGraderJSONErrorFn,
 } from './speed_grader.utils'
 import SpeedGraderAlerts from '../react/SpeedGraderAlerts'
 // @ts-expect-error
@@ -1425,7 +1426,10 @@ EG = {
     if (queryParams && queryParams[anonymizableStudentId]) {
       initialStudentId = queryParams[anonymizableStudentId]
     } else if (SpeedgraderHelpers.getLocationHash() !== '') {
-      initialStudentId = extractStudentIdFromHash(SpeedgraderHelpers.getLocationHash())
+      initialStudentId = extractStudentIdFromHash(
+        SpeedgraderHelpers.getLocationHash(),
+        anonymizableStudentId
+      )
     }
     SpeedgraderHelpers.setLocationHash('')
 
@@ -4193,21 +4197,6 @@ function setupSelectors() {
 // when considering provisional grades.
 function currentStudentProvisionalGrades() {
   return EG.currentStudent.submission.provisional_grades || []
-}
-
-function extractStudentIdFromHash(hashString: string) {
-  let studentId
-
-  try {
-    // The hash, if present, will be of the form '#{"student_id": "12"}';
-    // remove the first character and parse the rest
-    const hash = JSON.parse(decodeURIComponent(hashString.substr(1)))
-    studentId = hash[anonymizableStudentId].toString()
-  } catch (_error) {
-    studentId = null
-  }
-
-  return studentId
 }
 
 export default {
