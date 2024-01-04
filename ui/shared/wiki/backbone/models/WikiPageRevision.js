@@ -23,7 +23,7 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/main/docs/suggestions.md
  */
 import $ from 'jquery'
-import _ from 'underscore'
+import {pick, has, omit, throttle} from 'lodash'
 import Backbone from '@canvas/backbone'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import DefaultUrlMixin from '@canvas/backbone/DefaultUrlMixin'
@@ -50,10 +50,10 @@ export default WikiPageRevision = (function () {
 
     initialize(attributes, options) {
       super.initialize(...arguments)
-      _.extend(this, _.pick(options || {}, pageRevisionOptions))
+      Object.assign(this, pick(options || {}, pageRevisionOptions))
 
       // the CollectionView managing the revisions "accidentally" passes in a url, so we have to nuke it here...
-      if (_.has(this, 'url')) {
+      if (has(this, 'url')) {
         return delete this.url
       }
     }
@@ -98,7 +98,7 @@ export default WikiPageRevision = (function () {
         // to poll any more than the normal interval, so we created a throttled
         // version of our poll method.
         let pp
-        const throttledPoll = _.throttle(this.doPoll, interval)
+        const throttledPoll = throttle(this.doPoll, interval)
 
         this._poller = new PandaPubPoller(interval, interval * 10, throttledPoll)
         if ((pp = window.ENV.WIKI_PAGE_PANDAPUB)) {
@@ -146,7 +146,7 @@ export default WikiPageRevision = (function () {
     }
 
     toJSON() {
-      return _.omit(super.toJSON(...arguments), 'id')
+      return omit(super.toJSON(...arguments), 'id')
     }
 
     restore() {

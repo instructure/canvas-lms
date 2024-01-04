@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import $ from 'jquery'
-import _ from 'underscore'
+import {uniqueId} from 'lodash'
 import htmlEscape from 'html-escape'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
@@ -85,7 +85,7 @@ const apiUserContent = {
             return this
           }
 
-          const uuid = _.uniqueId('uc_')
+          const uuid = uniqueId('uc_')
           let action = '/object_snippet'
           if (ENV.files_domain) {
             action = `//${ENV.files_domain}${action}`
