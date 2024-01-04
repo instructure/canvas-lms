@@ -21,7 +21,7 @@
 import {extend} from '@canvas/backbone/utils'
 import Backbone from '@canvas/backbone'
 import $ from 'jquery'
-import _ from 'underscore'
+import {debounce, uniqueId} from 'lodash'
 import PaginatedCollectionView from '@canvas/pagination/backbone/views/PaginatedCollectionView'
 import TreeItemView from './TreeItemView'
 import collectionTemplate from '../../jst/TreeCollection.handlebars'
@@ -75,8 +75,8 @@ TreeView.prototype.events = {
 }
 
 TreeView.prototype.initialize = function () {
-  this.tagId = _.uniqueId('treenode-')
-  this.render = _.debounce(this.render)
+  this.tagId = uniqueId('treenode-')
+  this.render = debounce(this.render)
   this.model.on('all', this.render, this)
   this.model.getItems().on('all', this.render, this)
   this.model.getSubtrees().on('all', this.render, this)

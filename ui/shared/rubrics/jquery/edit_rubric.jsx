@@ -23,7 +23,7 @@ import RubricManagement from '../react/components/RubricManagement'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import changePointsPossibleToMatchRubricDialog from '../jst/changePointsPossibleToMatchRubricDialog.handlebars'
 import $ from 'jquery'
-import _ from 'underscore'
+import {debounce} from 'lodash'
 import htmlEscape from 'html-escape'
 import numberHelper from '@canvas/i18n/numberHelper'
 import '@canvas/outcomes/find_outcome'
@@ -702,7 +702,7 @@ const rubricEditing = {
     $rubric.find('.rubric_title .title').focus()
   },
 }
-rubricEditing.sizeRatings = _.debounce(rubricEditing.originalSizeRatings, 10)
+rubricEditing.sizeRatings = debounce(rubricEditing.originalSizeRatings, 10)
 
 const round = function (number, precision) {
   precision = Math.pow(10, precision || 0).toFixed(precision < 0 ? -precision : 0)
@@ -1291,8 +1291,12 @@ rubricEditing.init = function () {
       ) {
         skipPointsUpdate = true
       } else if (data['rubric_association[use_for_grading]'] === '1') {
-        const toolFormId = ENV['LTI_TOOL_FORM_ID'] ? `#tool_form_${ENV['LTI_TOOL_FORM_ID']}` : '#tool_form'
-        const externalToolPoints = $(`${toolFormId} #custom_canvas_assignment_points_possible`).val()
+        const toolFormId = ENV.LTI_TOOL_FORM_ID
+          ? `#tool_form_${ENV.LTI_TOOL_FORM_ID}`
+          : '#tool_form'
+        const externalToolPoints = $(
+          `${toolFormId} #custom_canvas_assignment_points_possible`
+        ).val()
         let assignmentPoints
         if (externalToolPoints) {
           assignmentPoints = numberHelper.parse(externalToolPoints)

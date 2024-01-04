@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {clone} from 'underscore'
+import {clone} from 'lodash'
 import K from './constants'
 import generateUUID from './util/generateUUID'
 
