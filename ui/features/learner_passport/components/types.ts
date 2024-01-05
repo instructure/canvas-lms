@@ -121,17 +121,45 @@ export interface ProjectEditData {
 
 export type MilestoneId = string
 
-// this is a node in the pathway tree
+export type RequirementType =
+  | 'assessment'
+  | 'assignment'
+  | 'course'
+  | 'module'
+  | 'earned_achievement'
+  | 'experience'
+  | 'project'
+
+export type RequirementTypesType = {
+  [Key in RequirementType]: string
+}
+
+export const RequirementTypes: RequirementTypesType = {
+  assessment: 'Assessment',
+  assignment: 'Assignment',
+  course: 'Course',
+  module: 'Module',
+  earned_achievement: 'Achievement',
+  experience: 'Experience',
+  project: 'Project',
+}
 
 export interface RequirementData {
   id: string
+  name: string
+  description: string
+  required?: boolean
+  type: RequirementType
 }
+
+// this is a node in the pathway tree
 export interface MilestoneData {
   id: MilestoneId
   title: string
   description: string
   required?: boolean
   requirements: RequirementData[]
+  achievements: AchievementData[]
   next_milestones: MilestoneId[] // ids of this milestone's children
 }
 

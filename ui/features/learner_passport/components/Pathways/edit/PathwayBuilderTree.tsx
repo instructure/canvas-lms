@@ -17,17 +17,20 @@
  */
 
 import React, {useCallback, useState} from 'react'
-import {IconZoomInLine, IconZoomOutLine} from '@instructure/ui-icons'
 import {Button} from '@instructure/ui-buttons'
-import type {PathwayDetailData} from '../types'
-import PathwayTreeView from './PathwayTreeView'
-import {showUnimplemented} from '../shared/utils'
+import {IconZoomOutLine, IconZoomInLine} from '@instructure/ui-icons'
+import {View} from '@instructure/ui-view'
+import type {PathwayDetailData} from '../../types'
+import PathwayTreeView from '../PathwayTreeView'
+import {showUnimplemented} from '../../shared/utils'
 
-type PathwayViewProps = {
+type PathwayBuilderTreeProps = {
   pathway: PathwayDetailData
+  treeVersion: number
+  onShowSidebar?: () => void
 }
 
-const PathwayView = ({pathway}: PathwayViewProps) => {
+const PathwayBuilderTree = ({pathway, treeVersion, onShowSidebar}: PathwayBuilderTreeProps) => {
   const [zoomLevel, setZoomLevel] = useState(1)
 
   const handleZoomIn = useCallback(() => {
@@ -39,27 +42,38 @@ const PathwayView = ({pathway}: PathwayViewProps) => {
   }, [zoomLevel])
 
   return (
-    <div style={{position: 'relative'}}>
+    <View as="div" minHeight="100%" margin="small" position="relative">
       <div style={{position: 'absolute', top: '.5rem', left: '.5rem', zIndex: 1}}>
-        <Button renderIcon={IconZoomOutLine} onClick={handleZoomOut} />
-        <Button renderIcon={IconZoomInLine} onClick={handleZoomIn} margin="0 0 0 x-small" />
+        {onShowSidebar ? (
+          <Button onClick={onShowSidebar} margin="0 x-small 0 0">
+            Pathway builder
+          </Button>
+        ) : null}
+        <Button renderIcon={IconZoomOutLine} onClick={handleZoomOut} margin="0 x-small 0 0" />
+        <Button renderIcon={IconZoomInLine} onClick={handleZoomIn} />
       </div>
       <div style={{position: 'absolute', top: '.5rem', right: '.5rem', zIndex: 1}}>
         <Button onClick={showUnimplemented}>View as learner</Button>
       </div>
       <div
         style={{
-          position: 'relative',
+          position: 'absolute',
+          left: 0,
+          top: 0,
+          bottom: 0,
+          right: 0,
           overflow: 'auto',
           backgroundSize: '40px 40px',
           backgroundImage: `linear-gradient(to right, rgba(150, 173, 233, .3) 1px, transparent 1px),
                   linear-gradient(to bottom, rgba(150, 173, 233, .3) 1px, transparent 1px)`,
         }}
       >
-        <PathwayTreeView pathway={pathway} zoomLevel={zoomLevel} />
+        <View as="div" margin="0 auto" width="fit-content">
+          <PathwayTreeView key={treeVersion} pathway={pathway} zoomLevel={zoomLevel} />
+        </View>
       </div>
-    </div>
+    </View>
   )
 }
 
-export default PathwayView
+export default PathwayBuilderTree

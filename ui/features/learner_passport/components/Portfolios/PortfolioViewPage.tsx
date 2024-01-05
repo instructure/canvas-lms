@@ -55,7 +55,7 @@ const PortfolioViewPage = () => {
   }, [])
 
   return (
-    <View as="div" id="foo" maxWidth="986px" margin="0 auto">
+    <View as="div" id="portfolio_view_page" maxWidth="986px" margin="0 auto">
       <Breadcrumb label="You are here:" size="small">
         <Breadcrumb.Link href={`/users/${ENV.current_user.id}/passport/portfolios/dashboard`}>
           Portfolios
