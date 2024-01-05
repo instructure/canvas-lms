@@ -38,7 +38,7 @@ If the return url has an id appended to it, Canvas interprets this as an "edit" 
 
 3. If needed, add any backend work to parse the content items returned. This work is done in the `ExternalContentController#success` controller action, and may not need anything added, depending on the placement.
 
-4. In the UI for this placement, listen for the `externalContentReady` postMessage, and update the UI based on the content items returned.
+4. In the UI for this placement, listen for the `EXTERNAL_CONTENT_READY` (defined in `ui/shared/external-tools/messages.ts`) postMessage (using `handleExternalContentMessages` if it is convenient) and update the UI based on the content items returned.
 
 ### Relevant Code
 

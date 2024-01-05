@@ -20,6 +20,10 @@ import $ from 'jquery'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import processSingleContentItem from '@canvas/deep-linking/processors/processSingleContentItem'
 import '@canvas/rails-flash-notifications'
+import {
+  postMessageExternalContentReady,
+  postMessageExternalContentCancel,
+} from '@canvas/external-tools/messages'
 
 const I18n = useI18nScope('content_migrations')
 
@@ -37,17 +41,11 @@ export default function processMigrationContentItem(event) {
       throw new Error(`Expected type "file" but received "${result.type}"`)
     }
 
-    $(window).trigger('externalContentReady', {
-      contentItems: [
-        {
-          text: result.text,
-          url: result.url,
-        },
-      ],
-    })
+    const contentItems = [{text: result.text, url: result.url}]
+    postMessageExternalContentReady(window, {contentItems})
   } catch (error) {
     $.flashError(I18n.t('Error retrieving content'))
-    $(window).trigger('externalContentCancel')
+    postMessageExternalContentCancel(window)
     // eslint-disable-next-line no-console
     console.error(error)
   }

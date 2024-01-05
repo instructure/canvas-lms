@@ -28,7 +28,7 @@ const deepLinkingResponseMessageType = 'LtiDeepLinkingResponse'
  *Checks to see if a postMessage event is valid for
  * deep linking content item processing
  * the RCE handles deep linking separately in
- * ui/shared/tinymce-external-tools/react/components/ExternalToolDialog.js#handleDeepLinking
+ * packages/canvas-rce/src/rce/plugins/instructure_rce_external_tools/components/ExternalToolDialog/ExternalToolDialog.tsx
  * @param event
  * @param env
  * @returns

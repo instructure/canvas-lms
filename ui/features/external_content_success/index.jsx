@@ -25,6 +25,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {Alert} from '@instructure/ui-alerts'
 import replaceTags from '@canvas/util/replaceTags'
+import {postMessageExternalContentReady} from '@canvas/external-tools/messages'
 
 const I18n = useI18nScope('external_content.success')
 
@@ -33,16 +34,8 @@ const ExternalContentSuccess = {}
 const {lti_response_messages, service_id, retrieved_data: data, service} = ENV
 const parentWindow = window.parent || window.opener
 
-ExternalContentSuccess.dataReady = function (data, service_id) {
-  parentWindow.postMessage(
-    {
-      subject: 'externalContentReady',
-      contentItems: data,
-      service_id,
-      service,
-    },
-    ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN
-  )
+ExternalContentSuccess.dataReady = function (contentItems, service_id) {
+  postMessageExternalContentReady(parentWindow, {contentItems, service_id, service})
 
   setTimeout(() => {
     $('#dialog_message').text(
