@@ -26,7 +26,7 @@ import {View} from '@instructure/ui-view'
 
 import {string, bool} from 'prop-types'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import Day from '../Day'
+import AnimatableDay from '../Day'
 import KinderPanda from './KinderPanda'
 import {MULTI_COURSE_ITEMS, SINGLE_COURSE_ITEMS} from './mock-items'
 
@@ -59,7 +59,7 @@ export default function PlannerPreview({timeZone, singleCourse}) {
           <Text>{I18n.t('Below is an example of how students will see their schedule')}</Text>
         </Flex>
       </View>
-      <Day
+      <AnimatableDay
         timeZone={timeZone}
         day={moment().format('YYYY-MM-DD')}
         itemsForDay={singleCourse ? SINGLE_COURSE_ITEMS : MULTI_COURSE_ITEMS}

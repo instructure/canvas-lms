@@ -115,6 +115,7 @@ window.modules = (function () {
         }
         const $module = $('#context_module_blank').clone(true).attr('id', 'context_module_new')
         $('#context_modules').append($module)
+        // eslint-disable-next-line no-restricted-globals
         renderDifferentiatedModulesTray(event.target, $module, settings, options)
       } else {
         const $module = $('#context_module_blank').clone(true).attr('id', 'context_module_new')
