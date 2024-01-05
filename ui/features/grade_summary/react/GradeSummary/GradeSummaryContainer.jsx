@@ -31,8 +31,10 @@ import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
 
 import {ASSIGNMENTS} from '../../graphql/queries'
-import {UPDATE_SUBMISSIONS_READ_STATE} from '../../graphql/Mutations'
-import {UPDATE_RUBRIC_ASSESSMENT_READ_STATE} from '../../graphql/Mutations'
+import {
+  UPDATE_SUBMISSIONS_READ_STATE,
+  UPDATE_RUBRIC_ASSESSMENT_READ_STATE,
+} from '../../graphql/Mutations'
 
 import AssignmentTable from './AssignmentTable'
 import {getGradingPeriodID} from './utils'
@@ -106,7 +108,7 @@ const GradeSummaryContainer = () => {
     },
     onError() {
       setOnFailure(I18n.t('Rubric read state change failed'))
-    }
+    },
   })
 
   useEffect(() => {
@@ -172,7 +174,7 @@ const GradeSummaryContainer = () => {
     )
   }
 
-  const handleRubricReadStateChange = (submissionID) => {
+  const handleRubricReadStateChange = submissionID => {
     if (!submissionID) return
     const arr = [...submissionIdsForRubricUpdate, submissionID]
     setSubmissionIdsForRubricUpdate(

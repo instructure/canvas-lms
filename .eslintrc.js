@@ -91,6 +91,7 @@ module.exports = {
     'no-return-assign': 'off',
     'no-underscore-dangle': 'off',
     'no-use-before-define': 'off',
+    'object-shorthand': 'warn',
     '@typescript-eslint/no-use-before-define': [
       'error',
       {
@@ -112,6 +113,8 @@ module.exports = {
     'promise/catch-or-return': ['warn', {allowFinally: true}], // The recommendation is to error on this, but we downgrade it to a warning
     'promise/avoid-new': 'off',
     'promise/no-nesting': 'off',
+    'react/jsx-no-target-blank': 'warn',
+    'react/jsx-curly-brace-presence': 'warn',
     'react/destructuring-assignment': 'off',
     'react/forbid-prop-types': 'off', // AirBnB doesn't want you to use PropTypes.object, and we agree normally. But there are times where you just want to pass on an opaque object to something else and forcing people to make a PropTypes.shape for it doesn't add any value. People should still encourage each other to use PropTypes.shape normally, when it makes sense, in code-review but we're not going to -2 because of it.
     'react/no-typos': 'off',
@@ -233,7 +236,7 @@ module.exports = {
     '@typescript-eslint/no-shadow': 'warn', // AirBnB says 'error', we downgrade to just 'warn'
     'no-unused-vars': 'off',
     '@typescript-eslint/no-unused-vars': [
-      'error',
+      'warn',
       {
         argsIgnorePattern: '^_',
 
@@ -242,7 +245,7 @@ module.exports = {
       },
     ],
     semi: 'off',
-    '@typescript-eslint/semi': ['error', 'never'],
+    '@typescript-eslint/semi': ['warn', 'never'],
   },
   settings: {
     'import/resolver': {
@@ -283,12 +286,13 @@ module.exports = {
         'import/order': 'off', // because it thinks 'jsx/whatever' and 'compiled/baz' should go in their groups. we don't want to encourage people to do that just so they move them back together once  those everything is in same dir
         'import/no-unresolved': 'off',
         'import/no-webpack-loader-syntax': 'off',
+        'import/newline-after-import': 'warn',
 
         'jest/no-jasmine-globals': 'error',
         'no-constant-condition': 'error',
         'react-hooks/exhaustive-deps': 'error',
         'react/prefer-stateless-function': 'error',
-        'prefer-const': 'error',
+        'prefer-const': 'warn',
 
         // TODO: resolve and remove these overrides
         'react/no-string-refs': 'warn',
