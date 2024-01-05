@@ -620,9 +620,11 @@ nn:
     report_header_start_date: startdato
     report_header_status: status
     report_header_student_id: student-ID
+    report_header_student_login_sis: "student påloggings-id"
     report_header_student_name: studentnamn
     report_header_student_sis: student-SIS
     report_header_student_sis_id: student-SIS-ID
+    report_header_student_sortable_name: "student sorterbart namn"
     report_header_submission_date: innleveringsdato
     report_header_submission_score: "resultat innlevering"
     report_header_term: semester
@@ -1267,6 +1269,13 @@ nn:
             check_box: "CSV-fil over seksjonar"
           users: 
             check_box: "CSV-fil over brukarar"
+    mit: 
+      student_module_completion: 
+        parameters: 
+          account_reports: 
+            mit: 
+              student_module_completion: 
+                check_box: "Enkel rapport"
     new_excelsior_activity_report_csv_parameters: 
       account_reports: 
         excelsior: 
@@ -1566,6 +1575,7 @@ nn:
         turnitin_pledge: Likskapsløfte
         turnitin_shared_secret: "Turnitin delt hemmelegheit"
         users_can_edit_name: "Brukarar kan redigere namnet sitt"
+        users_can_edit_profile: "Brukarar kan redigera profilen sin."
         value: "Slå av kommentering av kunngjeringar"
       links: 
         add_admins: Kontoadministratorar
@@ -2124,6 +2134,7 @@ nn:
   add_attribute_6d6d4a65: "Legg til attributt"
   add_bank: 
     default_name: "Utan namn"
+  add_calendar_36da563b: "Legg til kalender"
   add_cc_subtitle_a9ef4a66: "Legg til undertekst"
   add_collaboration_da9665ac: "Legg til samarbeid"
   add_comment_3205529f: "Legg til kommentar"
@@ -2170,6 +2181,7 @@ nn:
   add_items_44913315: "Legg til element"
   add_items_into_scoring_range_title_be08104e: "Legg element i %{scoring_range_title}"
   add_items_to_score_range_297d413b: "Legg element til i vurderingsintervall"
+  add_label_ab288ab0: "Legg til etikett"
   add_link_5c01c1e8: "Legg til ei lenke"
   add_link_fc336ed6: "Legg til ei lenke"
   add_lti_ad9aaef2: "Legg til LTI"
@@ -2190,6 +2202,7 @@ nn:
   add_new_term_d2217c0d: "Legg til nytt semester"
   add_observers_to_courses_6f494a29: "Legg observatørar til emner"
   add_old_quiz_f4c546a: "Legg til gammal quiz"
+  add_other_calendar_c958e761: "Legg til annan kalender"
   add_outcome_title_ce9dff87: "Legg til læringsmål %{title}"
   add_outcomes_36272787: "Legg til læringsmål"
   add_outcomes_to_account_4647776f: "Legg til Læringsmål til Konto"
