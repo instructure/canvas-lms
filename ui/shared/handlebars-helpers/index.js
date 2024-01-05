@@ -21,7 +21,7 @@ import enrollmentName from './enrollmentName'
 import _Handlebars from 'handlebars/runtime'
 import I18nObj, {useScope as useI18nScope} from '@canvas/i18n' //  'i18nObj' gets the extended I18n object with all the extra functions (interpolate, strftime, ...)
 import $ from 'jquery'
-import _ from 'underscore'
+import {chain, defaults, isDate, map, reduce} from 'lodash'
 import htmlEscape from 'html-escape'
 import semanticDateRange from '@canvas/datetime/semanticDateRange'
 import dateSelect from './dateSelect'
@@ -156,7 +156,7 @@ const object = {
     if (datetime == null) {
       return
     }
-    if (!_.isDate(datetime)) {
+    if (!isDate(datetime)) {
       datetime = tz.parse(datetime)
     }
     const fudged = $.fudgeDateForProfileTimezone(tz.parse(datetime))
@@ -192,7 +192,7 @@ const object = {
     if (datetime == null) {
       return
     }
-    if (!_.isDate(datetime)) {
+    if (!isDate(datetime)) {
       datetime = tz.parse(datetime)
     }
     return new Handlebars.SafeString(
@@ -286,7 +286,7 @@ const object = {
     if (!date) {
       return ''
     }
-    if (!_.isDate(date)) {
+    if (!isDate(date)) {
       date = tz.parse(date)
     }
     const fudged = $.fudgeDateForProfileTimezone(tz.parse(date))
@@ -301,7 +301,7 @@ const object = {
     if (!date) {
       return ''
     }
-    if (!_.isDate(date)) {
+    if (!isDate(date)) {
       date = tz.parse(date)
     }
     const fudged = $.fudgeDateForProfileTimezone(tz.parse(date))
@@ -584,7 +584,7 @@ const object = {
 
   // evaluates the block for each item in context and passes the result to list formatter
   toSentence(context, options) {
-    const results = _.map(context, c => options.fn(c))
+    const results = map(context, c => options.fn(c))
     return listFormatter.format(results)
   },
 
@@ -627,23 +627,21 @@ const object = {
 
     const bracketNotation =
       splitPropertyName[0] +
-      _.chain(splitPropertyName)
-        .rest()
+      chain(splitPropertyName)
+        .drop()
         .map(prop => `[${prop}]`)
         .value()
         .join('')
-    const inputProps = _.extend(
-      {
-        type: 'checkbox',
-        value: 1,
-        id: snakeCase,
-        name: bracketNotation,
-      },
-      hash
-    )
+    const inputProps = {
+      type: 'checkbox',
+      value: 1,
+      id: snakeCase,
+      name: bracketNotation,
+      ...hash,
+    }
 
     if (inputProps.checked == null) {
-      const value = _.reduce(
+      const value = reduce(
         splitPropertyName,
         function (memo, key_) {
           if (memo != null) {
@@ -827,9 +825,9 @@ const object = {
   //
   // Returns a string.
   list(value, options) {
-    _.defaults(options.hash, {separator: ', ', propName: null, limit: null, end: '...'})
+    defaults(options.hash, {separator: ', ', propName: null, limit: null, end: '...'})
     const {propName, limit, end, separator} = options.hash
-    let result = _.map(value, function (item) {
+    let result = map(value, function (item) {
       if (propName) {
         return item[propName]
       } else {
@@ -848,11 +846,9 @@ const object = {
   },
 
   titleize(str) {
-    if (!str) {
-      return ''
-    }
+    if (typeof str !== 'string') return ''
     const words = str.split(/[ _]+/)
-    const titleizedWords = _(words).map(w => w[0].toUpperCase() + w.slice(1))
+    const titleizedWords = words.map(w => w[0].toUpperCase() + w.slice(1))
     return titleizedWords.join(' ')
   },
 
