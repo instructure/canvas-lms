@@ -361,6 +361,69 @@ test("renders 'points' as readonly when user has grade-edit permissions", functi
   ok(view.$el.find('#discussion_topic_assignment_points_possible').attr('readonly'))
 })
 
+test('handleMessageEvent sets ab_guid when subject is assignment.set_ab_guid and the ab_guid is formatted correctly', function () {
+  const view = this.editView({
+    withAssignment: true,
+  })
+
+  const mockEvent = {
+    data: {
+      subject: 'assignment.set_ab_guid',
+      data: ['1E20776E-7053-11DF-8EBF-BE719DFF4B22', '1e20776e-7053-11df-8eBf-Be719dff4b22'],
+    },
+  }
+
+  view.handleMessageEvent(mockEvent)
+
+  deepEqual(
+    view.assignment.get('ab_guid'),
+    ['1E20776E-7053-11DF-8EBF-BE719DFF4B22', '1e20776e-7053-11df-8eBf-Be719dff4b22'],
+    'ab_guid should be set correctly'
+  )
+})
+
+test('handleMessageEvent does not set ab_guid when subject is not assignment.set_ab_guid', function () {
+  const view = this.editView({
+    withAssignment: true,
+  })
+
+  const mockEvent = {
+    data: {
+      subject: 'some.other.subject',
+      data: ['1E20776E-7053-11DF-8EBF-BE719DFF4B22', '1e20776e-7053-11df-8eBf-Be719dff4b22'],
+    },
+  }
+
+  view.handleMessageEvent(mockEvent)
+
+  notDeepEqual(
+    view.assignment.has('ab_guid'),
+    ['not_an_ab_guid', '1e20776e-7053-11df-8eBf-Be719dff4b22'],
+    'ab_guid should not be set'
+  )
+})
+
+test('handleMessageEvent does not set ab_guid when the ab_guid is not formatted correctly', function () {
+  const view = this.editView({
+    withAssignment: true,
+  })
+
+  const mockEvent = {
+    data: {
+      subject: 'assignment.set_ab_guid',
+      data: ['not_an_ab_guid', '1e20776e-7053-11df-8eBf-Be719dff4b22'],
+    },
+  }
+
+  view.handleMessageEvent(mockEvent)
+
+  notDeepEqual(
+    view.assignment.has('ab_guid'),
+    ['not_an_ab_guid', '1e20776e-7053-11df-8eBf-Be719dff4b22'],
+    'ab_guid should not be set'
+  )
+})
+
 QUnit.module(
   'EditView - Sections Specific',
   test('allows discussion to save when section specific has errors has no section', function () {

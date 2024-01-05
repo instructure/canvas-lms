@@ -85,6 +85,8 @@ function EditView() {
   this.locationAfterCancel = this.locationAfterCancel.bind(this)
   this.locationAfterSave = this.locationAfterSave.bind(this)
   this.setRenderSectionsAutocomplete = this.setRenderSectionsAutocomplete.bind(this)
+  this.handleMessageEvent = this.handleMessageEvent.bind(this)
+  window.addEventListener('message', this.handleMessageEvent.bind(this))
   return EditView.__super__.constructor.apply(this, arguments)
 }
 
@@ -294,6 +296,32 @@ EditView.prototype.handlePointsChange = function (ev) {
     return this.$discussionPointPossibleWarning.toggleAccessibly(
       this.assignment.pointsPossible() !== this.initialPointsPossible
     )
+  }
+}
+
+EditView.prototype.validateGuidData = function (event) {
+  const data = event.data.data
+
+  // If data is a string, convert it to an array for consistent processing
+  const dataArray = Array.isArray(data) ? data : [data]
+  const regexPattern =
+    /^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$/
+
+  for (const str of dataArray) {
+    if (!regexPattern.test(str)) {
+      return false
+    }
+  }
+  return dataArray
+}
+
+EditView.prototype.handleMessageEvent = function (event) {
+  if (event?.data?.subject !== 'assignment.set_ab_guid') {
+    return
+  }
+  const abGuid = this.validateGuidData(event)
+  if (abGuid) {
+    this.assignment.set('ab_guid', abGuid)
   }
 }
 
@@ -556,6 +584,9 @@ EditView.prototype.getFormData = function () {
   }
   const assign_data = data.assignment
   delete data.assignment
+  if (assign_data != null ? assign_data.points_possible : void 0) {
+    assign_data.ab_guid = this.assignment.get('ab_guid')
+  }
   if (assign_data != null ? assign_data.points_possible : void 0) {
     if (numberHelper.validate(assign_data.points_possible)) {
       assign_data.points_possible = numberHelper.parse(assign_data.points_possible)

@@ -58,6 +58,7 @@ const isStudent = function () {
 extend(Assignment, Model)
 
 function Assignment() {
+  this.abGuid = this.abGuid.bind(this)
   this.quizzesRespondusEnabled = this.quizzesRespondusEnabled.bind(this)
   this.showGradersAnonymousToGradersCheckbox = this.showGradersAnonymousToGradersCheckbox.bind(this)
   this.pollUntilFinished = this.pollUntilFinished.bind(this)
@@ -314,6 +315,13 @@ Assignment.prototype.assignmentType = function (type) {
   } else {
     return this.set('submission_types', [type])
   }
+}
+
+Assignment.prototype.abGuid = function (ab_guid) {
+  if (!(arguments.length > 0)) {
+    return this.get('ab_guid')
+  }
+  return this.set('ab_guid', ab_guid)
 }
 
 Assignment.prototype.dueAt = function (date) {
@@ -1178,6 +1186,7 @@ Assignment.prototype.submissionTypesFrozen = function () {
 
 Assignment.prototype.toView = function () {
   const fields = [
+    'abGuid',
     'acceptsAnnotatedDocument',
     'acceptsMediaRecording',
     'acceptsOnlineTextEntries',
