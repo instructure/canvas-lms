@@ -21,6 +21,8 @@ import {
   EXTERNAL_CONTENT_CANCEL,
   EXTERNAL_CONTENT_READY,
   handleExternalContentMessages,
+  postMessageExternalContentReady,
+  postMessageExternalContentCancel,
   Service,
 } from '../messages'
 
@@ -133,6 +135,42 @@ describe('1.1 content item messages', () => {
 
         sendPostMessage(externalContentReady())
         expect(ready).not.toHaveBeenCalled()
+      })
+    })
+  })
+
+  describe('sending messages', () => {
+    let originalEnv
+
+    beforeEach(() => {
+      originalEnv = window.ENV
+      window.ENV = {...ENV, DEEP_LINKING_POST_MESSAGE_ORIGIN: 'http://canvas.test'}
+    })
+    afterEach(() => (window.ENV = originalEnv))
+
+    describe('postMessageExternalContentReady', () => {
+      it('posts message to window', () => {
+        const window = {postMessage: jest.fn()}
+        const eventData = {
+          contentItems: [{url: 'test'}],
+          service: 'equella',
+        }
+        postMessageExternalContentReady(window, eventData)
+        expect(window.postMessage).toHaveBeenCalledWith(
+          {subject: 'externalContentReady', ...eventData},
+          'http://canvas.test'
+        )
+      })
+    })
+
+    describe('postMessageExternalContentCancel', () => {
+      it('posts message to window', () => {
+        const window = {postMessage: jest.fn()}
+        postMessageExternalContentCancel(window)
+        expect(window.postMessage).toHaveBeenCalledWith(
+          {subject: 'externalContentCancel'},
+          'http://canvas.test'
+        )
       })
     })
   })

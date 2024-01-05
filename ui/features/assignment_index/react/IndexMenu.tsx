@@ -39,7 +39,6 @@ type Props = {
   sisName: string
   postToSisDefault: boolean
   hasAssignments: boolean
-  currentWindow: Window
 }
 
 type State = {
@@ -88,6 +87,7 @@ export default class IndexMenu extends React.Component<Props, State> {
   }
 
   componentWillUnmount() {
+    this.clearExternalToolTray()
     this.unsubscribe()
   }
 
@@ -204,11 +204,19 @@ export default class IndexMenu extends React.Component<Props, State> {
         allowItemSelection={true}
         selectableItems={groupData}
         onDismiss={handleDismiss}
-        onExternalContentReady={() => (this.props.currentWindow || window).location.reload()}
+        onExternalContentReady={() => window.location.reload()}
         open={tool !== null}
       />,
       document.getElementById('external-tool-mount-point')
     )
+  }
+
+  clearExternalToolTray = () => {
+    // unmount tray component and clear its postMessage handler
+    const mountPointDomElement = document.getElementById('external-tool-mount-point')
+    if (mountPointDomElement) {
+      ReactDOM.unmountComponentAtNode(mountPointDomElement)
+    }
   }
 
   render() {

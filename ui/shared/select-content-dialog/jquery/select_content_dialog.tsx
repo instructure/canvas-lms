@@ -48,6 +48,7 @@ import type {ResourceLinkContentItem} from '@canvas/deep-linking/models/Resource
 import type {EnvContextModules} from '@canvas/global/env/EnvContextModules'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 import replaceTags from '@canvas/util/replaceTags'
+import {EXTERNAL_CONTENT_READY, EXTERNAL_CONTENT_CANCEL} from '@canvas/external-tools/messages'
 
 // @ts-expect-error
 if (!('INST' in window)) window.INST = {}
@@ -193,9 +194,9 @@ export const ltiPostMessageHandler = (tool: LtiLaunchDefinition) => (event: Mess
   if (event.origin === ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN && event.data) {
     if (event.data.subject === 'LtiDeepLinkingResponse') {
       deepLinkingResponseHandler(event)
-    } else if (event.data.subject === 'externalContentReady') {
+    } else if (event.data.subject === EXTERNAL_CONTENT_READY) {
       externalContentReadyHandler(event, tool)
-    } else if (event.data.subject === 'externalContentCancel') {
+    } else if (event.data.subject === EXTERNAL_CONTENT_CANCEL) {
       $('#resource_selection_dialog').dialog('close')
     }
   }

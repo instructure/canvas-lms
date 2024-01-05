@@ -19,6 +19,7 @@ import React, {useEffect} from 'react'
 import CanvasTray from './Tray'
 import $ from 'jquery'
 import ToolLaunchIframe from '@canvas/external-tools/react/components/ToolLaunchIframe'
+import {handleExternalContentMessages} from '@canvas/external-tools/messages'
 
 type Tool = {
   id: string
@@ -79,18 +80,11 @@ export default function ContentTypeExternalToolTray({
   const iframeUrl = `${tool?.base_url}${prefix}${$.param(queryParams)}`
   const title = tool ? tool.title : ''
 
-  useEffect(() => {
-    function handleLtiPostMessage(e: any): void {
-      if (onExternalContentReady) {
-        onExternalContentReady(e)
-      }
-    }
-    $(window).on('externalContentReady', handleLtiPostMessage)
-
-    return () => {
-      $(window).off('externalContentReady', handleLtiPostMessage)
-    }
-  }, [onExternalContentReady])
+  useEffect(
+    // returns cleanup function:
+    () => handleExternalContentMessages({ready: onExternalContentReady}),
+    [onExternalContentReady]
+  )
 
   return (
     <CanvasTray
