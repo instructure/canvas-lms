@@ -118,12 +118,13 @@ describe('publishOneModuleHelper', () => {
     it('calls batchUpdateOneModuleApiCall with the correct argumets', () => {
       const courseId = 1
       const moduleId = 1
-      unpublishModule(courseId, moduleId)
+      const skipItems = false
+      unpublishModule(courseId, moduleId, skipItems)
       expect(spy).toHaveBeenCalledWith(
         courseId,
         moduleId,
         false,
-        false,
+        skipItems,
         'Unpublishing module and items',
         'Module and items unpublished'
       )
@@ -451,7 +452,9 @@ describe('publishOneModuleHelper', () => {
     })
     it('renders the ContextModulesPublishIcon', () => {
       renderContextModulesPublishIcon(1, 2, true, false, 'loading message')
-      expect(getByText(document.body, 'Lesson 2 module publish options, published')).toBeInTheDocument()
+      expect(
+        getByText(document.body, 'Lesson 2 module publish options, published')
+      ).toBeInTheDocument()
     })
   })
 
