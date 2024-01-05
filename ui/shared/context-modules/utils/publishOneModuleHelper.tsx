@@ -54,14 +54,18 @@ export function publishModule(courseId: CanvasId, moduleId: CanvasId, skipItems:
   )
 }
 
-export function unpublishModule(courseId: CanvasId, moduleId: CanvasId) {
-  const loadingMessage = I18n.t('Unpublishing module and items')
-  const successMessage = I18n.t('Module and items unpublished')
+export function unpublishModule(courseId: CanvasId, moduleId: CanvasId, skipItems: boolean) {
+  const loadingMessage = skipItems
+    ? I18n.t('Unpublishing module')
+    : I18n.t('Unpublishing module and items')
+  const successMessage = skipItems
+    ? I18n.t('Module unpublished')
+    : I18n.t('Module and items unpublished')
   exportFuncs.batchUpdateOneModuleApiCall(
     courseId,
     moduleId,
     false,
-    false,
+    skipItems,
     loadingMessage,
     successMessage
   )
