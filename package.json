@@ -23,7 +23,7 @@
     "@instructure/debounce": "^8",
     "@instructure/emotion": "^8",
     "@instructure/media-capture": "^9.0.0",
-    "@instructure/outcomes-ui": "2.0.0",
+    "@instructure/outcomes-ui": "^3",
     "@instructure/react-crop": "^5.0.1",
     "@instructure/reactour": "https://github.com/instructure/reactour#b908434fe544703e26bc67c67c4111252c401f92",
     "@instructure/ready": "*",
