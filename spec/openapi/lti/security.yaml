@@ -1,0 +1,440 @@
+---
+openapi: 3.0.3
+info:
+  title: app
+  version: 1.0.0
+servers: []
+paths:
+  "/api/lti/security/jwks":
+    get:
+      summary: jwks
+      tags:
+      - Security
+      responses:
+        '200':
+          description: returns whether each key is from the current month
+          content:
+            application/json:
+              schema:
+                type: array
+                properties:
+                  keys:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        kty:
+                          type: string
+                        e:
+                          type: string
+                        "n":
+                          type: string
+                        kid:
+                          type: string
+                        alg:
+                          type: string
+                        use:
+                          type: string
+                      required:
+                      - kty
+                      - e
+                      - "n"
+                      - kid
+                      - alg
+                      - use
+                required:
+                - keys
+                items:
+                  type: string
+              example:
+              - today is day 15 and key 0 is not from this month
+              - today is day 15 and key 1 is from this month
+              - today is day 15 and key 2 is not from this month
+      parameters:
+      - name: rotation_check
+        in: query
+        required: false
+        schema:
+          type: integer
+        example: 1
+  "/api/lti/security/openid-configuration":
+    get:
+      summary: openid_configuration
+      tags:
+      - Security
+      parameters:
+      - name: registration_token
+        in: query
+        required: false
+        schema:
+          type: string
+        example: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJyb290X2FjY291bnRfZ2xvYmFsX2lkIjo4MTI0LCJleHAiOjE3MDI2MTkwMTd9.r67qwILzqa5w14gpAbwZOopmt7ZZuPoJrcVE1vgphp8
+      responses:
+        '200':
+          description: contains the correct information
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  issuer:
+                    type: string
+                  authorization_endpoint:
+                    type: string
+                  registration_endpoint:
+                    type: string
+                  jwks_uri:
+                    type: string
+                  token_endpoint:
+                    type: string
+                  token_endpoint_auth_methods_supported:
+                    type: array
+                    items:
+                      type: string
+                  token_endpoint_auth_signing_alg_values_supported:
+                    type: array
+                    items:
+                      type: string
+                  scopes_supported:
+                    type: array
+                    items:
+                      type: string
+                  response_types_supported:
+                    type: array
+                    items:
+                      type: string
+                  id_token_signing_alg_values_supported:
+                    type: array
+                    items:
+                      type: string
+                  claims_supported:
+                    type: array
+                    items:
+                      type: string
+                  subject_types_supported:
+                    type: array
+                    items:
+                      type: string
+                  authorization_server:
+                    type: string
+                  https://purl.imsglobal.org/spec/lti-platform-configuration:
+                    type: object
+                    properties:
+                      product_family_code:
+                        type: string
+                      version:
+                        type: string
+                      messages_supported:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              type: string
+                            placements:
+                              type: array
+                              items:
+                                type: string
+                          required:
+                          - type
+                          - placements
+                      variables:
+                        type: array
+                        items:
+                          type: string
+                      https://canvas.instructure.com/lti/account_name:
+                        type: string
+                      https://canvas.instructure.com/lti/account_lti_guid:
+                        type: string
+                    required:
+                    - product_family_code
+                    - version
+                    - messages_supported
+                    - variables
+                    - https://canvas.instructure.com/lti/account_name
+                    - https://canvas.instructure.com/lti/account_lti_guid
+                required:
+                - issuer
+                - authorization_endpoint
+                - registration_endpoint
+                - jwks_uri
+                - token_endpoint
+                - token_endpoint_auth_methods_supported
+                - token_endpoint_auth_signing_alg_values_supported
+                - scopes_supported
+                - response_types_supported
+                - id_token_signing_alg_values_supported
+                - claims_supported
+                - subject_types_supported
+                - authorization_server
+                - https://purl.imsglobal.org/spec/lti-platform-configuration
+              example:
+                issuer: https://canvas.instructure.com
+                authorization_endpoint: http://canvas.instructure.com/api/lti/authorize_redirect
+                registration_endpoint: http://localhost/api/lti/registrations
+                jwks_uri: http://canvas.instructure.com/login/oauth2/jwks
+                token_endpoint: http://canvas.instructure.com/login/oauth2/token
+                token_endpoint_auth_methods_supported:
+                - private_key_jwt
+                token_endpoint_auth_signing_alg_values_supported:
+                - RS256
+                scopes_supported:
+                - https://purl.imsglobal.org/spec/lti-ags/scope/lineitem
+                - https://purl.imsglobal.org/spec/lti-ags/scope/lineitem.readonly
+                - https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly
+                - https://purl.imsglobal.org/spec/lti-ags/scope/score
+                - https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly
+                - https://canvas.instructure.com/lti/public_jwk/scope/update
+                - https://canvas.instructure.com/lti/account_lookup/scope/show
+                - https://canvas.instructure.com/lti-ags/progress/scope/show
+                response_types_supported:
+                - id_token
+                id_token_signing_alg_values_supported:
+                - RS256
+                claims_supported:
+                - sub
+                - picture
+                - email
+                - name
+                - given_name
+                - family_name
+                - locale
+                subject_types_supported:
+                - public
+                authorization_server: canvas.instructure.com
+                https://purl.imsglobal.org/spec/lti-platform-configuration:
+                  product_family_code: canvas
+                  version: vCloud
+                  messages_supported:
+                  - type: LtiResourceLinkRequest
+                    placements:
+                    - account_navigation
+                    - assignment_edit
+                    - assignment_group_menu
+                    - assignment_index_menu
+                    - assignment_menu
+                    - assignment_selection
+                    - assignment_view
+                    - collaboration
+                    - conference_selection
+                    - course_assignments_menu
+                    - course_home_sub_navigation
+                    - course_navigation
+                    - course_settings_sub_navigation
+                    - discussion_topic_index_menu
+                    - discussion_topic_menu
+                    - file_index_menu
+                    - file_menu
+                    - global_navigation
+                    - homework_submission
+                    - link_selection
+                    - migration_selection
+                    - module_group_menu
+                    - module_index_menu
+                    - module_index_menu_modal
+                    - module_menu_modal
+                    - module_menu
+                    - post_grades
+                    - quiz_index_menu
+                    - quiz_menu
+                    - similarity_detection
+                    - student_context_card
+                    - submission_type_selection
+                    - tool_configuration
+                    - user_navigation
+                    - wiki_index_menu
+                    - wiki_page_menu
+                  - type: LtiDeepLinkingRequest
+                    placements:
+                    - assignment_selection
+                    - collaboration
+                    - conference_selection
+                    - course_assignments_menu
+                    - editor_button
+                    - homework_submission
+                    - link_selection
+                    - migration_selection
+                    - module_index_menu_modal
+                    - module_menu_modal
+                    - submission_type_selection
+                  variables:
+                  - ResourceLink.id
+                  - ResourceLink.description
+                  - ResourceLink.title
+                  - ResourceLink.available.startDateTime
+                  - ResourceLink.available.endDateTime
+                  - ResourceLink.submission.endDateTime
+                  - com.instructure.User.observees
+                  - com.instructure.User.sectionNames
+                  - com.instructure.RCS.app_host
+                  - com.instructure.RCS.service_jwt
+                  - com.instructure.instui_nav
+                  - com.instructure.Observee.sisIds
+                  - Context.title
+                  - com.instructure.Editor.contents
+                  - com.instructure.Editor.selection
+                  - com.instructure.PostMessageToken
+                  - com.instructure.Assignment.lti.id
+                  - com.instructure.Assignment.description
+                  - com.instructure.Assignment.allowedFileExtensions
+                  - com.instructure.OriginalityReport.id
+                  - com.instructure.Submission.id
+                  - com.instructure.File.id
+                  - CourseOffering.sourcedId
+                  - Context.id
+                  - com.instructure.Context.globalId
+                  - Context.sourcedId
+                  - Context.id.history
+                  - Message.documentTarget
+                  - Message.locale
+                  - ToolConsumerInstance.guid
+                  - Canvas.api.domain
+                  - Canvas.api.collaborationMembers.url
+                  - Canvas.api.baseUrl
+                  - ToolProxyBinding.memberships.url
+                  - Canvas.account.id
+                  - Canvas.account.name
+                  - Canvas.account.sisSourceId
+                  - Canvas.rootAccount.id
+                  - Canvas.rootAccount.sisSourceId
+                  - Canvas.externalTool.global_id
+                  - Canvas.externalTool.url
+                  - com.instructure.brandConfigJSON.url
+                  - com.instructure.brandConfigJSON
+                  - com.instructure.brandConfigJS.url
+                  - Canvas.css.common
+                  - Canvas.shard.id
+                  - Canvas.root_account.global_id
+                  - Canvas.root_account.id
+                  - vnd.Canvas.root_account.uuid
+                  - Canvas.root_account.sisSourceId
+                  - Canvas.course.id
+                  - vnd.instructure.Course.uuid
+                  - Canvas.course.name
+                  - Canvas.course.sisSourceId
+                  - com.instructure.Course.integrationId
+                  - Canvas.course.startAt
+                  - Canvas.course.endAt
+                  - Canvas.course.workflowState
+                  - Canvas.course.hideDistributionGraphs
+                  - Canvas.course.gradePassbackSetting
+                  - Canvas.term.startAt
+                  - Canvas.term.endAt
+                  - Canvas.term.name
+                  - CourseSection.sourcedId
+                  - Canvas.enrollment.enrollmentState
+                  - com.instructure.Assignment.anonymous_grading
+                  - com.instructure.Assignment.restrict_quantitative_data
+                  - com.instructure.Course.gradingScheme
+                  - com.Instructure.membership.roles
+                  - Canvas.membership.roles
+                  - Canvas.membership.concludedRoles
+                  - Canvas.membership.permissions<>
+                  - Canvas.course.previousContextIds
+                  - Canvas.course.previousContextIds.recursive
+                  - Canvas.course.previousCourseIds
+                  - Person.name.full
+                  - Person.name.display
+                  - Person.name.family
+                  - Person.name.given
+                  - com.instructure.Person.name_sortable
+                  - Person.email.primary
+                  - com.instructure.Person.pronouns
+                  - vnd.Canvas.Person.email.sis
+                  - Person.address.timezone
+                  - User.image
+                  - User.id
+                  - Canvas.user.id
+                  - vnd.instructure.User.uuid
+                  - vnd.instructure.User.current_uuid
+                  - Canvas.user.prefersHighContrast
+                  - com.instructure.Course.groupIds
+                  - Canvas.group.contextIds
+                  - Membership.role
+                  - Canvas.xuser.allRoles
+                  - com.instructure.User.allRoles
+                  - Canvas.user.globalId
+                  - Canvas.user.isRootAccountAdmin
+                  - Canvas.user.adminableAccounts
+                  - User.username
+                  - Canvas.user.loginId
+                  - Canvas.user.sisSourceId
+                  - Canvas.user.sisIntegrationId
+                  - Person.sourcedId
+                  - Canvas.logoutService.url
+                  - Canvas.masqueradingUser.id
+                  - Canvas.masqueradingUser.userId
+                  - Canvas.xapi.url
+                  - Caliper.url
+                  - Canvas.course.sectionIds
+                  - Canvas.course.sectionRestricted
+                  - Canvas.course.sectionSisSourceIds
+                  - com.instructure.contextLabel
+                  - Canvas.module.id
+                  - Canvas.moduleItem.id
+                  - Canvas.assignment.id
+                  - Canvas.assignment.description
+                  - com.instructure.Group.id
+                  - com.instructure.Group.name
+                  - Canvas.assignment.title
+                  - Canvas.assignment.pointsPossible
+                  - Canvas.assignment.unlockAt
+                  - Canvas.assignment.lockAt
+                  - Canvas.assignment.dueAt
+                  - Canvas.assignment.unlockAt.iso8601
+                  - Canvas.assignment.lockAt.iso8601
+                  - Canvas.assignment.dueAt.iso8601
+                  - Canvas.assignment.earliestEnrollmentDueAt.iso8601
+                  - Canvas.assignment.allDueAts.iso8601
+                  - Canvas.assignment.published
+                  - Canvas.assignment.lockdownEnabled
+                  - Canvas.assignment.allowedAttempts
+                  - Canvas.assignment.submission.studentAttempts
+                  - LtiLink.custom.url
+                  - ToolProxyBinding.custom.url
+                  - ToolProxy.custom.url
+                  - ToolConsumerProfile.url
+                  - vnd.Canvas.OriginalityReport.url
+                  - vnd.Canvas.submission.url
+                  - vnd.Canvas.submission.history.url
+                  - Canvas.file.media.id
+                  - Canvas.file.media.type
+                  - Canvas.file.media.duration
+                  - Canvas.file.media.size
+                  - Canvas.file.media.title
+                  - Canvas.file.usageRights.name
+                  - Canvas.file.usageRights.url
+                  - Canvas.file.usageRights.copyrightText
+                  - com.instructure.Course.accept_canvas_resource_types
+                  - com.instructure.Course.canvas_resource_type
+                  - com.instructure.Course.allow_canvas_resource_selection
+                  - com.instructure.Course.available_canvas_resources
+                  - com.instructure.Account.usage_metrics_enabled
+                  - Canvas.environment.test
+                  https://canvas.instructure.com/lti/account_name: Default Account
+                  https://canvas.instructure.com/lti/account_lti_guid: JXBxpVe9M3CG080A1FZNYCpsejKZaZjCS1nMKNx4:canvas-lms
+        '401':
+          description: rejects timed-out tokens
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        message:
+                          type: string
+                        error_code:
+                          type: string
+                      required:
+                      - message
+                      - error_code
+                required:
+                - errors
+              example:
+                errors:
+                - message: An error occurred.
+                  error_code: unauthorized
