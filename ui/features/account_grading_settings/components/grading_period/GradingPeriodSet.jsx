@@ -19,7 +19,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import $ from 'jquery'
-import _, {map} from 'lodash'
+import {map, some, every, head, tail, sortBy, reject, isNaN, filter, isEmpty, each} from 'lodash'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconEditLine, IconTrashLine, IconPlusLine} from '@instructure/ui-icons'
 import {Link} from '@instructure/ui-link'
@@ -40,8 +40,8 @@ const anyPeriodsOverlap = function (periods) {
   if (isEmpty(periods)) {
     return false
   }
-  const firstPeriod = _.head(periods)
-  const otherPeriods = _.tail(periods)
+  const firstPeriod = head(periods)
+  const otherPeriods = tail(periods)
   const overlapping = some(
     otherPeriods,
     otherPeriod =>
@@ -51,15 +51,15 @@ const anyPeriodsOverlap = function (periods) {
 }
 
 const isValidDate = function (date) {
-  return Object.prototype.toString.call(date) === '[object Date]' && !_.isNaN(date.getTime())
+  return Object.prototype.toString.call(date) === '[object Date]' && !isNaN(date.getTime())
 }
 
 const validatePeriods = function (periods, weighted) {
-  if (_.some(periods, period => !(period.title || '').trim())) {
+  if (some(periods, period => !(period.title || '').trim())) {
     return [I18n.t('All grading periods must have a title')]
   }
 
-  if (weighted && some(periods, period => _.isNaN(period.weight) || period.weight < 0)) {
+  if (weighted && some(periods, period => isNaN(period.weight) || period.weight < 0)) {
     return [I18n.t('All weights must be greater than or equal to 0')]
   }
 
