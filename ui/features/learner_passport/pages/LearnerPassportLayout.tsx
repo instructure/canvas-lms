@@ -148,7 +148,7 @@ export const Component = () => {
             <Flex.Item>{window.ENV.current_user.display_name}</Flex.Item>
           </Flex>
         </View>
-        <View id="foo" as="div" margin="large x-large 0">
+        <View id="learner_passport_container" as="div" margin="large x-large 0">
           <Outlet />
         </View>
       </div>

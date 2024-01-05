@@ -643,7 +643,8 @@ class LearnerPassportController < ApplicationController
           pathway[:learning_outcomes] << JSON.parse(skill)
         end
       when :achievements_earned
-        pathway[:achievements_earned] = Rails.cache.fetch(current_achievements_key) { learner_passport_current_achievements }.select { |a| params[key].include?(a[:id]) }
+        achievement_ids = JSON.parse(params[key])
+        pathway[:achievements_earned] = Rails.cache.fetch(current_achievements_key) { learner_passport_current_achievements }.select { |a| achievement_ids.include?(a[:id]) }
       else
         pathway[key] = params[key]
       end

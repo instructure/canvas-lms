@@ -20,18 +20,15 @@ import React, {useCallback, useState} from 'react'
 import {useActionData, useLoaderData, useSubmit} from 'react-router-dom'
 import {Breadcrumb} from '@instructure/ui-breadcrumb'
 import {Button} from '@instructure/ui-buttons'
-import {Checkbox} from '@instructure/ui-checkbox'
 import {Flex} from '@instructure/ui-flex'
-import {FormField} from '@instructure/ui-form-field'
 import {Heading} from '@instructure/ui-heading'
-import {Text} from '@instructure/ui-text'
-import {TextArea} from '@instructure/ui-text-area'
-import {TextInput} from '@instructure/ui-text-input'
 import {View} from '@instructure/ui-view'
-import type {PathwayEditData, SkillData} from '../../types'
-import SkillSelect from '../../shared/SkillSelect'
-import {AchievementsEdit} from '../../Portfolios/edit/achievements/AchievementsEdit'
-import {showUnimplemented, stringToId} from '../../shared/utils'
+import type {PathwayDetailData, PathwayEditData, SkillData} from '../../types'
+import PathwayCreate from './PathwayCreate'
+import PathwayBuilder from './PathwayBuilder'
+import Path from '@canvas/conditional-release-editor/react/assignment-path'
+
+type PathwayEditSteps = 'create' | 'add_milestones'
 
 const PathwayEdit = () => {
   const submit = useSubmit()
@@ -40,162 +37,144 @@ const PathwayEdit = () => {
   const pathway_data = create_pathway || edit_pathway
   const pathway = pathway_data.pathway
   const allAchievements = pathway_data.achievements
-  const [achievementIds, setAchievementIds] = useState<string[]>(() => {
-    return pathway.achievements_earned.map(achievement => achievement.id)
-  })
-  const [title, setTitle] = useState(pathway.title)
-  const [description, setDescription] = useState(pathway.description)
-  const [isPrivate, setIsPrivate] = useState(!!pathway.is_private)
-  const [skills, setSkills] = useState(pathway.learning_outcomes)
+  const [draftPathway, setDraftPathway] = useState(pathway)
+  const [currStep, setCurrStep] = useState<PathwayEditSteps>('create')
 
-  const handleSubmit = useCallback(
-    (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault()
-      const form = document.getElementById('edit_pathway_form') as HTMLFormElement
-      const formData = new FormData(form)
-
-      formData.delete('learning_outcomes')
-      skills.forEach((skill: SkillData) => {
-        formData.append('learning_outcomes[]', JSON.stringify(skill))
-      })
-      formData.append('draft', 'true')
-
-      submit(formData, {method: 'POST'})
+  const handleChange = useCallback(
+    (newValues: Partial<PathwayDetailData>) => {
+      const newPathway = {...draftPathway, ...newValues}
+      setDraftPathway(newPathway)
     },
-    [skills, submit]
+    [draftPathway]
   )
 
-  const handleTitleChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>, newTitle: string) => {
-      setTitle(newTitle)
-    },
-    []
-  )
+  const handleSubmit = useCallback(() => {
+    const formData = new FormData()
 
-  const handleDescriptionChange = useCallback((event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const newDescription = event.target.value
-    setDescription(newDescription)
-  }, [])
+    formData.append('title', draftPathway.title)
+    formData.append('description', draftPathway.description)
+    formData.append('is_private', draftPathway.is_private ? 'true' : 'false')
+    draftPathway.learning_outcomes.forEach((skill: SkillData) => {
+      formData.append('learning_outcomes[]', JSON.stringify(skill))
+    })
+    formData.append(
+      'achievements_earned',
+      JSON.stringify(draftPathway.achievements_earned.map(a => a.id))
+    )
+    formData.append('draft', 'true')
 
-  const handlePrivateChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    const newPrivate = event.target.checked
-    setIsPrivate(newPrivate)
-  }, [])
-
-  const handleSelectSkills = useCallback((newSkills: SkillData[]) => {
-    setSkills(newSkills)
-  }, [])
-
-  const handleNewAchievements = useCallback((newAchievementIds: string[]) => {
-    setAchievementIds(newAchievementIds)
-  }, [])
+    submit(formData, {method: 'POST'})
+  }, [
+    draftPathway.achievements_earned,
+    draftPathway.description,
+    draftPathway.is_private,
+    draftPathway.learning_outcomes,
+    draftPathway.title,
+    submit,
+  ])
 
   const handleCancelClick = useCallback(() => {
     window.history.back()
   }, [])
 
-  const handleSaveAsDraftClick = useCallback(_e => {
-    ;(document.getElementById('edit_pathway_form') as HTMLFormElement)?.requestSubmit()
+  const handleSaveAsDraftClick = useCallback(
+    _e => {
+      handleSubmit()
+    },
+    [handleSubmit]
+  )
+
+  const handleNextClick = useCallback(_e => {
+    setCurrStep('add_milestones')
   }, [])
 
-  const handleNextClick = useCallback(e => {
-    showUnimplemented(e)
-  }, [])
+  const handlePathwayChange = useCallback(
+    (newPathway: Partial<PathwayDetailData>) => {
+      const newDraftPathway = {...draftPathway, ...newPathway}
+      setDraftPathway(newDraftPathway)
+    },
+    [draftPathway]
+  )
+
+  const renderStep = useCallback(() => {
+    switch (currStep) {
+      case 'create':
+        return (
+          <PathwayCreate
+            pathway={draftPathway}
+            allAchievements={allAchievements}
+            onChange={handleChange}
+          />
+        )
+      case 'add_milestones':
+        return <PathwayBuilder pathway={draftPathway} onChange={handlePathwayChange} />
+      default:
+        return null
+    }
+  }, [currStep, draftPathway, allAchievements, handleChange, handlePathwayChange])
+
+  const renderBreadcrumbsForStep = useCallback(() => {
+    switch (currStep) {
+      case 'create':
+        return (
+          <Breadcrumb label="You are here:" size="small">
+            <Breadcrumb.Link href={`/users/${ENV.current_user.id}/passport/pathways/dashboard`}>
+              Pathways
+            </Breadcrumb.Link>
+            <Breadcrumb.Link>Create Pathway</Breadcrumb.Link>
+          </Breadcrumb>
+        )
+      case 'add_milestones':
+        return (
+          <Breadcrumb label="You are here:" size="small">
+            <Breadcrumb.Link href={`/users/${ENV.current_user.id}/passport/pathways/dashboard`}>
+              Pathways
+            </Breadcrumb.Link>
+            <Breadcrumb.Link href={window.location.href}>Create Pathway</Breadcrumb.Link>
+            <Breadcrumb.Link>Add Milestones</Breadcrumb.Link>
+          </Breadcrumb>
+        )
+      default:
+        return null
+    }
+  }, [currStep])
+
+  const renderHeadingForStep = useCallback(() => {
+    switch (currStep) {
+      case 'create':
+        return 'Create Pathway'
+      case 'add_milestones':
+        return draftPathway.title
+      default:
+        return null
+    }
+  }, [currStep, draftPathway.title])
 
   return (
-    <View as="div">
-      <Breadcrumb label="You are here:" size="small">
-        <Breadcrumb.Link href={`/users/${ENV.current_user.id}/passport/pathways/dashboard`}>
-          Pathways
-        </Breadcrumb.Link>
-        <Breadcrumb.Link
-          href={`/users/${ENV.current_user.id}/passport/pathways/view/${pathway.id}`}
-        >
-          {pathway.title}
-        </Breadcrumb.Link>
-        <Breadcrumb.Link>Edit</Breadcrumb.Link>
-      </Breadcrumb>
+    <div style={{margin: '0 -3rem'}}>
       <View as="div" borderWidth="0 0 small 0" borderColor="primary">
-        <Flex as="div" margin="medium 0 x-large 0" justifyItems="space-between" gap="small">
-          <Flex.Item shouldGrow={true}>
-            <Heading level="h1">Create Pathway</Heading>
-          </Flex.Item>
-          <Flex.Item>
-            <Button margin="0 x-small 0 0" onClick={handleCancelClick}>
-              Cancel
-            </Button>
-            <Button margin="0 x-small 0 0" onClick={handleSaveAsDraftClick}>
-              Save as Draft
-            </Button>
-            <Button color="primary" margin="0" onClick={handleNextClick}>
-              Next
-            </Button>
-          </Flex.Item>
-        </Flex>
+        <div style={{padding: '0 3rem'}}>
+          {renderBreadcrumbsForStep()}
+          <Flex as="div" margin="medium 0 x-large 0" justifyItems="space-between" gap="small">
+            <Flex.Item shouldGrow={true}>
+              <Heading level="h1">{renderHeadingForStep()}</Heading>
+            </Flex.Item>
+            <Flex.Item>
+              <Button margin="0 x-small 0 0" onClick={handleCancelClick}>
+                Cancel
+              </Button>
+              <Button margin="0 x-small 0 0" onClick={handleSaveAsDraftClick}>
+                Save as Draft
+              </Button>
+              <Button color="primary" margin="0" onClick={handleNextClick}>
+                Next
+              </Button>
+            </Flex.Item>
+          </Flex>
+        </div>
       </View>
-      <View as="div" maxWidth="1100px" margin="large auto 0">
-        <form id="edit_pathway_form" method="POST" onSubmit={handleSubmit}>
-          <View as="div">
-            <TextInput
-              renderLabel="Name"
-              name="title"
-              value={title}
-              onChange={handleTitleChange}
-              placeholder="Pathway Name"
-              isRequired={true}
-            />
-          </View>
-          <View as="div" margin="medium 0 0 0">
-            <TextArea
-              label="Description"
-              name="description"
-              value={description}
-              onChange={handleDescriptionChange}
-              height="8rem"
-              placeholder="Pathway Description"
-            />
-          </View>
-          <View as="div" margin="medium 0 0 0">
-            <Checkbox
-              label="Set pathway to private"
-              name="is_private"
-              checked={isPrivate}
-              value={isPrivate.toString()}
-              onChange={handlePrivateChange}
-              variant="toggle"
-            />
-          </View>
-          <View as="div" margin="medium 0 0 0">
-            <input type="hidden" name="learning_outcomes" value={JSON.stringify(skills)} />
-            <SkillSelect
-              label="Learning Outcomes"
-              objectSkills={skills}
-              selectedSkillIds={skills.map((s: SkillData) => stringToId(s.name))}
-              onSelect={handleSelectSkills}
-            />
-          </View>
-          <View as="div" margin="medium 0 0 0">
-            <FormField id="achievements" label="Achievements">
-              <input
-                type="hidden"
-                name="achievements_earned"
-                value={JSON.stringify(achievementIds)}
-              />
-
-              <Text>
-                The learner will be awarded the following achievements when the requirements for
-                this pathway are met.
-              </Text>
-              <AchievementsEdit
-                allAchievements={allAchievements}
-                selectedAchievementIds={achievementIds}
-                onChange={handleNewAchievements}
-              />
-            </FormField>
-          </View>
-        </form>
-      </View>
-    </View>
+      {renderStep()}
+    </div>
   )
 }
 
