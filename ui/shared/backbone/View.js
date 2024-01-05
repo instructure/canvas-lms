@@ -19,8 +19,8 @@
 /* eslint-disable no-void */
 
 import {extend} from './utils'
+import {forEach, map} from 'lodash'
 import $ from 'jquery'
-import _ from 'underscore'
 import htmlEscape from 'html-escape'
 import mixin from './mixin'
 
@@ -114,7 +114,7 @@ export function patch(Backbone) {
     // @param {Object} options
     // @api public
     View.prototype.initialize = function (options) {
-      this.options = _.extend({}, this.defaults, options)
+      this.options = {...this.defaults, ...options}
       this.setOptionProperties()
       this.storeChildrenViews()
       this.$el.data('view', this)
@@ -139,7 +139,7 @@ export function patch(Backbone) {
       if (!this.constructor.__childViews__) {
         return
       }
-      return (this.children = _.map(
+      return (this.children = map(
         this.constructor.__childViews__,
         (function (_this) {
           return function (viewObj) {
@@ -382,7 +382,8 @@ export function patch(Backbone) {
 
     // DEPRECATED - don't use views option, use `child` constructor method
     View.prototype.renderViews = function () {
-      return _.each(this.options.views, this.renderView)
+      forEach(this.options.views, this.renderView)
+      return this.options.views
     }
 
     // DEPRECATED

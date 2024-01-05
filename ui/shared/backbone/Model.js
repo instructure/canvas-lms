@@ -18,7 +18,6 @@
 
 import {extend} from './utils'
 import mixin from './mixin'
-import _ from 'underscore'
 import './Model/computedAttributes'
 import './Model/dateAttributes'
 import './Model/errors'
@@ -47,7 +46,7 @@ export function patch(Backbone) {
     Model.prototype.initialize = function (attributes, options) {
       let fn, i, len, ref
       Model.__super__.initialize.apply(this, arguments)
-      this.options = _.extend({}, this.defaults, options)
+      this.options = {...this.defaults, ...options}
       if (this.__initialize__) {
         ref = this.__initialize__
         for (i = 0, len = ref.length; i < len; i++) {
