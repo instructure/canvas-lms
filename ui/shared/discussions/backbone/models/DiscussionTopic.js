@@ -22,7 +22,7 @@ import {extend} from '@canvas/backbone/utils'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import Backbone from '@canvas/backbone'
 import $ from 'jquery'
-import _ from 'underscore'
+import {defaults, result} from 'lodash'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import ParticipantCollection from '../collections/ParticipantCollection'
 import DiscussionEntriesCollection from '../collections/DiscussionEntriesCollection'
@@ -87,7 +87,7 @@ DiscussionTopic.prototype.parse = function (json) {
 }
 
 DiscussionTopic.prototype.baseUrlWithoutQuerystring = function () {
-  const baseUrl = _.result(this, 'url')
+  const baseUrl = result(this, 'url')
   return baseUrl.split('?')[0]
 }
 
@@ -140,7 +140,7 @@ DiscussionTopic.prototype.toJSON = function () {
   if (!json.set_assignment) {
     delete json.assignment
   }
-  _.extend(json, {
+  Object.assign(json, {
     summary: this.summary(),
     unread_count_tooltip: this.unreadTooltip(),
     reply_count_tooltip: this.replyTooltip(),
@@ -174,9 +174,10 @@ DiscussionTopic.prototype.duplicate = function (context_type, context_id, callba
 }
 
 DiscussionTopic.prototype.toView = function () {
-  return _.extend(this.toJSON(), {
+  return {
+    ...this.toJSON(),
     name: this.get('title'),
-  })
+  }
 }
 
 DiscussionTopic.prototype.unreadTooltip = function () {
@@ -250,7 +251,7 @@ DiscussionTopic.prototype.updatePartial = function (data, options) {
   if (!options.wait) {
     this.set(data)
   }
-  options = _.defaults(options, {
+  options = defaults(options, {
     data: JSON.stringify(data),
     contentType: 'application/json',
   })
@@ -313,7 +314,7 @@ DiscussionTopic.prototype.focusAfterMoving = function () {
 DiscussionTopic.prototype.updateBucket = function (data) {
   let $toFocus
   $toFocus = this.focusAfterMoving()
-  _.defaults(data, {
+  defaults(data, {
     pinned: this.get('pinned'),
     locked: this.get('locked'),
   })
