@@ -149,6 +149,7 @@ disable_oembed_retrieve:
     If enabled, the deprecated oembed_retrieve endpoint will be unavailable.
     This is to ease transitioning any potential users off this endpoint before
     removing it altogether.
+  shadow: true
 include_oauth_consumer_key_in_lti_launch:
   state: hidden
   applies_to: SiteAdmin
