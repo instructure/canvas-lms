@@ -206,6 +206,8 @@ export default function ItemAssignToTray({
               selectedAssigneeIds: defaultOptions,
               defaultOptions,
               overrideId: override.id,
+              contextModuleId: override.context_module_id,
+              contextModuleName: override.context_module_name,
             })
             selectedOptionIds.push(...defaultOptions)
           })
@@ -234,6 +236,8 @@ export default function ItemAssignToTray({
         due_at: null,
         unlock_at: null,
         lock_at: null,
+        contextModuleId: null,
+        contextModuleName: null,
         selectedAssigneeIds: [] as string[],
       } as ItemAssignToCardSpec,
     ]
@@ -357,6 +361,8 @@ export default function ItemAssignToTray({
         <View key={card.key} as="div" margin="small 0 0 0">
           <ItemAssignToCard
             courseId={courseId}
+            contextModuleId={card.contextModuleId}
+            contextModuleName={card.contextModuleName}
             cardId={card.key}
             due_at={card.due_at}
             unlock_at={card.unlock_at}
