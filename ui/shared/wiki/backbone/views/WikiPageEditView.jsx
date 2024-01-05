@@ -228,8 +228,14 @@ export default class WikiPageEditView extends ValidatedFormView {
   }
 
   destroyEditor() {
-    RichContentEditor.destroyRCE(this.$wikiPageBody)
-    return this.$el.remove()
+    //hack fix for LF-1134
+    try {
+      RichContentEditor.destroyRCE(this.$wikiPageBody)
+      this.$el.remove()
+    }
+    catch (e) {
+      console.warn(e)
+    }
   }
 
   switchViews(event) {
