@@ -1406,4 +1406,17 @@ describe "Outcome Reports" do
       end
     end
   end
+
+  describe "common functionality" do
+    let_once(:account_report) { AccountReport.new(report_type: "outcome_export_csv", account: @root_account, user: @user1) }
+    let_once(:outcome_reports) { AccountReports::OutcomeReports.new(account_report) }
+
+    it "caches courses" do
+      row = { "course id" => @course1.id }
+      expect(Course).to receive(:find).with(@course1.id).and_call_original
+      outcome_reports.send :add_outcomes_data, row
+      expect(Course).not_to receive(:find)
+      outcome_reports.send :add_outcomes_data, row
+    end
+  end
 end

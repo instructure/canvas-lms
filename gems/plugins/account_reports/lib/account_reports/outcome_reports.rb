@@ -665,12 +665,21 @@ module AccountReports
       row["learning outcome mastery score"] = nil
     end
 
+    COURSE_CACHE_SIZE = 32
+    def find_cached_course(id)
+      @course_cache ||= {}
+      @course_cache[id] ||= begin
+        @course_cache.delete(@course_cache.keys.first) if @course_cache.size >= COURSE_CACHE_SIZE
+        Course.find(id)
+      end
+    end
+
     def add_outcomes_data(row)
       row["learning outcome mastered"] = unless row["learning outcome mastered"].nil?
                                            row["learning outcome mastered"] ? 1 : 0
                                          end
 
-      course = Course.find(row["course id"])
+      course = find_cached_course(row["course id"])
       outcome_data = if @account_report.account.root_account.feature_enabled?(:account_level_mastery_scales) && course.resolved_outcome_proficiency.present?
                        proficiency(course)
                      elsif row["learning outcome data"].present?
