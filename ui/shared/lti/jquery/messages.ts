@@ -75,6 +75,7 @@ const SUBJECT_IGNORE_LIST = [
   MENTIONS_SELECTION_MESSAGE,
   'betterchat.is_mini_chat',
   'defaultToolContentReady',
+  'assignment.set_ab_guid',
 ] as const
 
 const UNSUPPORTED_IN_RCE = ['lti.enableScrollEvents', 'lti.scrollToTop'] as const
