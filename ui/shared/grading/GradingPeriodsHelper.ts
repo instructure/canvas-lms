@@ -17,11 +17,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'underscore'
+import {find, forEach, isArray, isDate, isString, sortBy} from 'lodash'
 import type {CamelizedGradingPeriod} from './grading.d'
 
 function validateDate(date, nullAllowed = false) {
-  let valid = _.isDate(date)
+  let valid = isDate(date)
   if (nullAllowed && !valid) {
     valid = date === null
   }
@@ -33,16 +33,16 @@ function validateGradingPeriodDates(gradingPeriods) {
   if (gradingPeriods == null) throw new Error(`\'${gradingPeriods}\' must be an array or object`)
 
   const dates = ['startDate', 'endDate', 'closeDate']
-  const periods = _.isArray(gradingPeriods) ? gradingPeriods : [gradingPeriods]
-  _.each(periods, period => {
-    _.each(dates, date => validateDate(period[date]))
+  const periods = isArray(gradingPeriods) ? gradingPeriods : [gradingPeriods]
+  forEach(periods, period => {
+    forEach(dates, date => validateDate(period[date]))
   })
 
   return periods
 }
 
 function validatePeriodID(id: string) {
-  const valid = _.isString(id)
+  const valid = isString(id)
   if (!valid) throw new Error(`Grading period id \`${id}\` must be a String`)
 }
 
@@ -60,8 +60,8 @@ class GradingPeriodsHelper {
   }
 
   get earliestValidDueDate() {
-    const orderedPeriods = _.sortBy(this.gradingPeriods, 'startDate')
-    const earliestOpenPeriod = _.find(orderedPeriods, {isClosed: false})
+    const orderedPeriods = sortBy(this.gradingPeriods, 'startDate')
+    const earliestOpenPeriod = find(orderedPeriods, {isClosed: false})
     if (earliestOpenPeriod) {
       return earliestOpenPeriod.startDate
     } else {
@@ -73,7 +73,7 @@ class GradingPeriodsHelper {
     validateDate(dueAt, true)
 
     return (
-      _.find(this.gradingPeriods, period => this.isDateInGradingPeriod(dueAt, period.id, false)) ||
+      find(this.gradingPeriods, period => this.isDateInGradingPeriod(dueAt, period.id, false)) ||
       null
     )
   }
@@ -84,7 +84,7 @@ class GradingPeriodsHelper {
       validatePeriodID(gradingPeriodID)
     }
 
-    const gradingPeriod = _.find(this.gradingPeriods, {id: gradingPeriodID})
+    const gradingPeriod = find(this.gradingPeriods, {id: gradingPeriodID})
     if (!gradingPeriod) throw new Error(`No grading period has id \`${gradingPeriodID}\``)
 
     if (date === null) {
