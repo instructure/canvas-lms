@@ -18,7 +18,7 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {each, find, every} from 'lodash'
-import htmlEscape from 'html-escape'
+import htmlEscape from '@instructure/html-escape'
 import numberHelper from '@canvas/i18n/numberHelper'
 import {waitForProcessing} from './wait_for_processing'
 import ProcessGradebookUpload from './process_gradebook_upload'

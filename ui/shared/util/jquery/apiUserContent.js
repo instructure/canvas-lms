@@ -17,7 +17,7 @@
 
 import $ from 'jquery'
 import {uniqueId} from 'lodash'
-import htmlEscape from 'html-escape'
+import htmlEscape from '@instructure/html-escape'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('user_content')

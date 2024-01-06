@@ -25,7 +25,7 @@ import {debounce, uniqueId} from 'lodash'
 import PaginatedCollectionView from '@canvas/pagination/backbone/views/PaginatedCollectionView'
 import TreeItemView from './TreeItemView'
 import collectionTemplate from '../../jst/TreeCollection.handlebars'
-import htmlEscape from 'html-escape'
+import htmlEscape from '@instructure/html-escape'
 
 extend(TreeView, Backbone.View)
 

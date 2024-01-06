@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 - present Instructure, Inc.
+ * Copyright (C) 2023 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,16 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-declare class SafeString {
-  'string': string
+// eslint-disable-next-line import/no-unresolved
+export {default} from '@instructure/html-escape'
 
-  constructor(string: any)
-
-  toString(): string
-}
-
-export function htmlEscape(str: string): string
-
-export function unescape(str: string): string
-
-export default function escape<T>(strOrObject: string | SafeString | Object): T
+// eslint-disable-next-line import/no-unresolved
+export * from '@instructure/html-escape'

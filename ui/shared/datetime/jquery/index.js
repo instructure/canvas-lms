@@ -19,7 +19,7 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import * as tz from '../index'
-import htmlEscape from 'html-escape'
+import htmlEscape from '@instructure/html-escape'
 import * as dateFunctions from '../date-functions'
 import {changeTimezone} from '../changeTimezone'
 import DatetimeField from './DatetimeField'

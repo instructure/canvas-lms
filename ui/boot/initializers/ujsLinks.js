@@ -19,7 +19,7 @@
 // https://github.com/rails/jquery-ujs
 
 import $ from 'jquery'
-import htmlEscape from 'html-escape'
+import htmlEscape from '@instructure/html-escape'
 import authenticityToken from '@canvas/authenticity-token'
 
 // #

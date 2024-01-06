@@ -26,7 +26,7 @@ import '@canvas/loading-image'
 import 'jquery-scroll-to-visible/jquery.scrollTo'
 import 'jqueryui/datepicker'
 import easy_student_view from '@canvas/easy-student-view'
-import htmlEscape from 'html-escape'
+import htmlEscape from '@instructure/html-escape'
 
 RichContentEditor.preloadRemoteModule()
 

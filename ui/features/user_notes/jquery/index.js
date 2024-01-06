@@ -24,6 +24,7 @@ import '@canvas/loading-image'
 import '@canvas/datetime/jquery'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 import 'jquery-pageless'
+import {raw} from '@instructure/html-escape'
 
 const I18n = useI18nScope('user_notes')
 
@@ -76,7 +77,7 @@ ready(function () {
         .end()
         .end()
         .find('.formatted_note')
-        .html($.raw(user_note.formatted_note))
+        .html(raw(user_note.formatted_note))
         .end()
         .slideDown()
     },

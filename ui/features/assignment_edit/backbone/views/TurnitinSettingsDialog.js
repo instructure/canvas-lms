@@ -21,7 +21,7 @@ import turnitinSettingsDialog from '../../jst/TurnitinSettingsDialog.handlebars'
 import {extend as lodashExtend} from 'lodash'
 import vericiteSettingsDialog from '../../jst/VeriCiteSettingsDialog.handlebars'
 import {View} from '@canvas/backbone'
-import htmlEscape from 'html-escape'
+import htmlEscape from '@instructure/html-escape'
 import '@canvas/util/jquery/fixDialogButtons'
 
 const EXCLUDE_SMALL_MATCHES_OPTIONS = '.js-exclude-small-matches-options'

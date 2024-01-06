@@ -29,6 +29,7 @@ import dialogTemplate from '../../jst/MoveOutcomeDialog.handlebars'
 import noOutcomesWarning from '../../jst/noOutcomesWarning.handlebars'
 import DefaultUrlMixin from '@canvas/backbone/DefaultUrlMixin'
 import {subscribe} from 'jquery-tinypubsub'
+import {raw} from '@instructure/html-escape'
 
 const I18n = useI18nScope('contentview')
 
@@ -192,7 +193,7 @@ export default class ContentView extends Backbone.View {
     )
     return this.$el != null
       ? this.$el.append(
-          $.raw(
+          raw(
             noOutcomesWarning({
               addOutcomesUrl: `/${this._contextPath()}/outcomes`,
               noOutcomesLinkLabel,

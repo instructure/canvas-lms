@@ -19,7 +19,7 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
-import htmlEscape from 'html-escape'
+import htmlEscape, {raw} from '@instructure/html-escape'
 import 'jqueryui/dialog'
 import 'jqueryui/progressbar'
 
@@ -65,9 +65,7 @@ export default function (url, onClose) {
             })
             const link = `<a href="${htmlEscape(url)}"><b>${htmlEscape(linkText)}</b></a>`
 
-            $('#download_submissions_dialog .status').html(
-              `${htmlEscape(message)}<br>${$.raw(link)}`
-            )
+            $('#download_submissions_dialog .status').html(`${htmlEscape(message)}<br>${raw(link)}`)
             $('#download_submissions_dialog .status_loader').css('visibility', 'hidden')
 
             window.location.href = url

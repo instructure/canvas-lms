@@ -22,7 +22,7 @@ import mejs from '@canvas/mediaelement'
 import MediaElementKeyActionHandler from './MediaElementKeyActionHandler'
 import $ from 'jquery'
 import {map, values} from 'lodash'
-import htmlEscape from 'html-escape'
+import htmlEscape from '@instructure/html-escape'
 import sanitizeUrl from '@canvas/util/sanitizeUrl'
 import {contentMapping} from '@instructure/canvas-rce/src/common/mimeClass'
 

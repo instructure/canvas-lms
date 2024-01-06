@@ -18,7 +18,7 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import htmlEscape from 'html-escape'
+import htmlEscape, {raw} from '@instructure/html-escape'
 import authenticity_token from '@canvas/authenticity-token'
 import './jquery.ajaxJSON'
 import 'jqueryui/dialog'
@@ -39,7 +39,7 @@ $.fn.setOptions = function (prompt, options) {
     result += '<option value="' + optHtml + '">' + optHtml + '</option>'
   })
 
-  return this.html($.raw(result))
+  return this.html(raw(result))
 }
 
 // this function is to prevent you from doing all kinds of expesive operations on a

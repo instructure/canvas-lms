@@ -21,7 +21,7 @@ import $ from 'jquery'
 import {View} from '@canvas/backbone'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import template from '../../jst/missingDueDateDialog.handlebars'
-import htmlEscape from 'html-escape'
+import htmlEscape from '@instructure/html-escape'
 import 'jqueryui/dialog'
 import '@canvas/util/jquery/fixDialogButtons'
 

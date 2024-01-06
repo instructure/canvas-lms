@@ -19,7 +19,7 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 import PropTypes from 'prop-types'
-import htmlEscape from 'html-escape'
+import htmlEscape from '@instructure/html-escape'
 
 const I18n = useI18nScope('external_tools')
 

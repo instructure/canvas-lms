@@ -85,7 +85,7 @@ import natcompare from '@canvas/util/natcompare'
 import qs from 'qs'
 import * as tz from '@canvas/datetime'
 import userSettings from '@canvas/user-settings'
-import htmlEscape from 'html-escape'
+import htmlEscape, {raw} from '@instructure/html-escape'
 import rubricAssessment from '@canvas/rubrics/jquery/rubric_assessment'
 import SpeedgraderSelectMenu from './speed_grader_select_menu'
 import SpeedgraderHelpers from './speed_grader_helpers'
@@ -565,19 +565,18 @@ function initDropdown() {
     const $selectmenu_list = $selectmenu?.data('selectmenu').list
     const $menu = $('#section-menu')
 
-    $menu
-      .find('ul')
-      .append(
-        $.raw(
-          $.map(
-            window.jsonData.context.active_course_sections,
-            section =>
-              `<li><a class="section_${section.id}" data-section-id="${
-                section.id
-              }" href="#">${htmlEscape<string>(section.name)}</a></li>`
-          ).join('')
-        )
+    $menu.find('ul').append(
+      // @ts-expect-error
+      raw(
+        $.map(
+          window.jsonData.context.active_course_sections,
+          section =>
+            `<li><a class="section_${section.id}" data-section-id="${
+              section.id
+            }" href="#">${htmlEscape<string>(section.name)}</a></li>`
+        ).join('')
       )
+    )
 
     $menu
       .insertBefore($selectmenu_list)
@@ -2206,7 +2205,8 @@ EG = {
         count: wordCount,
       })}`
     }
-    $word_count.html($.raw(wordCountHTML))
+    // @ts-expect-error
+    $word_count.html(raw(wordCountHTML))
   },
 
   handleSubmissionSelectionChange() {
@@ -2419,7 +2419,8 @@ EG = {
 
       renderProgressIcon(attachment)
     })
-    $submission_attachment_viewed_at.html($.raw(studentViewedAtHTML))
+    // @ts-expect-error
+    $submission_attachment_viewed_at.html(raw(studentViewedAtHTML))
 
     $submission_files_container.showIf(
       submission.submission_type === 'online_text_entry' ||
@@ -2567,7 +2568,8 @@ EG = {
         }),
       })
     }
-    $multiple_submissions.html($.raw(innerHTML || ''))
+    // @ts-expect-error
+    $multiple_submissions.html(raw(innerHTML || ''))
     StatusPill.renderPills(ENV.custom_grade_statuses)
   },
 
@@ -2760,7 +2762,8 @@ EG = {
       {frameborder: 0, allowfullscreen: true},
       domElement
     )
-    $iframe_holder.html($.raw(iframe)).show()
+    // @ts-expect-error
+    $iframe_holder.html(raw(iframe)).show()
   },
 
   renderLtiLaunch($div, urlBase, submission) {
@@ -2781,7 +2784,8 @@ EG = {
       allow: iframeAllowances(),
       allowfullscreen: true,
     })
-    $div.html($.raw(iframe)).show()
+    // @ts-expect-error
+    $div.html(raw(iframe)).show()
   },
 
   generateWarningTimings(numHours: number): number[] {
@@ -2909,7 +2913,8 @@ EG = {
       contents = SpeedgraderHelpers.buildIframe(htmlEscape(src), options, domElement)
     }
 
-    return $.raw(contents)
+    // @ts-expect-error
+    return raw(contents)
   },
 
   showRubric({validateEnteredData = true} = {}) {
@@ -3167,7 +3172,7 @@ EG = {
 
     commentElement
       .find('span.comment')
-      .html($.raw(htmlEscape<string>(comment.comment).replace(/\n/g, '<br />')))
+      .html(raw(htmlEscape<string>(comment.comment).replace(/\n/g, '<br />')))
 
     deleteCommentLinkText = I18n.t('Delete comment: %{commentText}', {commentText: spokenComment})
     commentElement.find('.delete_comment_link .screenreader-only').text(deleteCommentLinkText)

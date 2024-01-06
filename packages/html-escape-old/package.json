@@ -1,5 +1,5 @@
 {
-  "name": "@instructure/html-escape",
+  "name": "html-escape",
   "private": true,
   "version": "1.0.0",
   "author": "neme",

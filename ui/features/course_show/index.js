@@ -18,7 +18,7 @@
 import $ from 'jquery'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import htmlEscape from 'html-escape'
+import htmlEscape from '@instructure/html-escape'
 import './react/show'
 import '@canvas/jquery/jquery.ajaxJSON'
 import 'jqueryui/dialog'

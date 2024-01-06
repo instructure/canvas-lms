@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import htmlEscape from 'html-escape'
+import htmlEscape, {raw} from '@instructure/html-escape'
 import replaceTags from './replaceTags'
 
 // Fills the selected object(s) with data values as specified.  Plaintext values should be specified in the
@@ -70,7 +70,7 @@ $.fn.fillTemplateData = function (options) {
               options.data[item] = ''
             }
             if (options.htmlValues && $.inArray(item, options.htmlValues) !== -1) {
-              $found.html($.raw(options.data[item].toString()))
+              $found.html(raw(options.data[item].toString()))
               if ($found.hasClass('user_content')) {
                 contentChange = true
                 $found.removeClass('enhanced')

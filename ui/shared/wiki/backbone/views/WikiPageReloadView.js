@@ -18,6 +18,7 @@
 import $ from 'jquery'
 import {extend, pick} from 'lodash'
 import Backbone from '@canvas/backbone'
+import {raw} from '@instructure/html-escape'
 
 const pageReloadOptions = ['reloadMessage', 'warning', 'interval']
 
@@ -34,9 +35,9 @@ export default class WikiPageReloadView extends Backbone.View {
   }
 
   template() {
-    return `<div class='alert alert-${$.raw(
+    return `<div class='alert alert-${raw(
       this.options.warning ? 'warning' : 'info'
-    )} reload-changed-page'>${$.raw(this.reloadMessage)}</div>`
+    )} reload-changed-page'>${raw(this.reloadMessage)}</div>`
   }
 
   initialize(options) {

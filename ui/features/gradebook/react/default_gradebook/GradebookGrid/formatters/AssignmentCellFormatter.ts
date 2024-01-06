@@ -19,7 +19,7 @@
 // xsslint safeString.method I18n.t
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import htmlEscape from 'html-escape'
+import htmlEscape from '@instructure/html-escape'
 import {extractDataTurnitin} from '@canvas/grading/Turnitin'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import {extractSimilarityInfo, isPostable, similarityIcon} from '@canvas/grading/SubmissionHelper'

@@ -19,7 +19,7 @@ import $ from 'jquery'
 import {find} from 'lodash'
 import template from '../jst/ModuleSequenceFooter.handlebars'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import htmlEscape from 'html-escape'
+import htmlEscape from '@instructure/html-escape'
 import '@canvas/jquery/jquery.ajaxJSON'
 
 const I18n = useI18nScope('sequence_footer')
