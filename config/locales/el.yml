@@ -3527,6 +3527,7 @@ el:
   compose_a_new_message_db3a68ed: "Δημιουργία νέου μηνύματος"
   concluded_conferences_cdbe53f9: "Ολοκληρωμένες Συνδιασκέψεις"
   concluded_courses_94782e21: "Ολοκληρωμένα Μαθήματα"
+  concluded_e1e482a0: Ολοκληρώθηκε
   conference_36b50fda: Συνεδρία
   conference_was_deleted_30869390: "Η συνεδρία διαγράφηκε"
   conferences: 
@@ -12761,6 +12762,7 @@ el:
   remove_empty_attachment_b2aea632: "αφαίρεση κενής επισύναψης"
   remove_f47dc62a: Αφαίρεση
   remove_filename_87f3781e: "αφαίρεση %{filename}"
+  remove_filter_68de01d4: "Αφαίρεση Φίλτου"
   remove_icon_a4646413: "αφαίρεση εικονιδίου"
   remove_image_341340b3: "Αφαίρεση Εικόνας"
   remove_media_comment_f4afdb4b: "Αφαίρεση πολυμεσιτικού σχόλιου"
