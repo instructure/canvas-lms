@@ -18,7 +18,7 @@
 import React, {useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Modal} from '@instructure/ui-modal'
-import {UsedLocation} from '@canvas/grading_scheme/gradingSchemeApiModel'
+import type {UsedLocation} from '@canvas/grading_scheme/gradingSchemeApiModel'
 import {Heading} from '@instructure/ui-heading'
 import {CloseButton, Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
