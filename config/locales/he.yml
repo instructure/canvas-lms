@@ -4506,6 +4506,7 @@ he:
   concluded_63150003: "נסתיים וסוכם"
   concluded_conferences_cdbe53f9: "שיחות ועידה שהסתיימו וסוכמו"
   concluded_courses_94782e21: "קורסים שהסתיימו וסוכמו"
+  concluded_e1e482a0: "נסתיים וסוכם"
   concluded_enrollments_9da8da6: "סיום הרשמות"
   conditional_content_7d39e313: "תוכן מותנה"
   conditional_content_b284da8f: "תוכן מותנה"
@@ -16626,6 +16627,7 @@ he:
   remove_empty_attachment_b2aea632: "הסרת תצריף ריק"
   remove_f47dc62a: הסרה
   remove_filename_87f3781e: "הסרת %{filename}"
+  remove_filter_68de01d4: "ביטול מסנן"
   remove_icon_a4646413: "הסרת צלמית"
   remove_image_341340b3: "הסרת תמונה"
   remove_media_comment_f4afdb4b: "הסרת תגובת מדיה"

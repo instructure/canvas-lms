@@ -4136,6 +4136,7 @@ uk:
   concluded_63150003: завершено
   concluded_conferences_cdbe53f9: "Завершені конференції"
   concluded_courses_94782e21: "Завершені курси"
+  concluded_e1e482a0: Завершено
   concluded_enrollments_9da8da6: "Завершені зарахування"
   conduct_virtual_lectures_virtual_office_hours_and__cc05907b: |-
       Проводьте віртуальні лекції, віртуальні офісні години та зібрання студентів
@@ -14937,6 +14938,7 @@ uk:
   remove_empty_attachment_b2aea632: "видалити порожнє вкладення"
   remove_f47dc62a: Видалити
   remove_filename_87f3781e: "видалити %{filename}"
+  remove_filter_68de01d4: "Видалити фільтр"
   remove_icon_a4646413: "видалити значок"
   remove_image_341340b3: "Видалити зображення"
   remove_label_11d96b8f: "Видалити %{label}"

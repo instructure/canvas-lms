@@ -5398,6 +5398,7 @@ hu:
   concluded_63150003: befejeződött
   concluded_conferences_cdbe53f9: "Befejeződött konferenciák"
   concluded_courses_94782e21: "Befejeződött kurzusok"
+  concluded_e1e482a0: Befejeződött
   concluded_enrollments_8f460271: "Lezárult jelentkezések"
   concluded_enrollments_9da8da6: "Lezárt beiratkozások"
   condition_9e5fc8ca: Feltétel
@@ -17607,6 +17608,7 @@ hu:
   remove_file_cbf3f40f: "fájl  eltávolítása"
   remove_filename_87f3781e: "%{filename} eltávolítása"
   remove_filename_dab5c02e: "%{filename}eltávolítása"
+  remove_filter_68de01d4: "Szűrő eltávolítása"
   remove_filter_6f7204e2: "szűrő eltávolítása"
   remove_grading_scheme_title_d3942a08: "Osztályzási rendszer eltávolítása: %{title}"
   remove_group_5d2f2f2d: "csoport eltávolítása"

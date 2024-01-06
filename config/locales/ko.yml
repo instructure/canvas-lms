@@ -3120,6 +3120,7 @@ ko:
         contact_registered: "연락 방법 등록함"
   complete_incomplete_15b3a89c: 완료/미완료
   compose_a_new_message_db3a68ed: "새 메시지 작성"
+  concluded_e1e482a0: 종결됨
   conferences: 
     concluded_conference: 
       ? " delete"

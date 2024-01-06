@@ -5829,6 +5829,7 @@ fa:
   concluded_63150003: "خاتمه یافته"
   concluded_conferences_cdbe53f9: "کنفرانس های خاتمه یافته"
   concluded_courses_94782e21: "درس های خاتمه یافته"
+  concluded_e1e482a0: "خاتمه یافته"
   concluded_enrollments_8f460271: "ثبت نام های پایان یافته"
   concluded_enrollments_9da8da6: "ثبت نام‌های پایان یافته"
   condition_9e5fc8ca: وضعیت
@@ -20192,6 +20193,7 @@ fa:
   remove_file_cbf3f40f: "حذف فایل"
   remove_filename_87f3781e: "حذف %{filename}"
   remove_filename_dab5c02e: "حذف %{filename}"
+  remove_filter_68de01d4: "حذف فیلتر"
   remove_filter_6f7204e2: "حذف فیلتر"
   remove_grading_scheme_title_d3942a08: "حذف طرح نمره گذاری %{title}"
   remove_group_5d2f2f2d: "حذف گروه"
