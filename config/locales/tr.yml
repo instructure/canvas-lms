@@ -4734,6 +4734,7 @@ tr:
   concluded_63150003: sonlandırıldı
   concluded_conferences_cdbe53f9: "Tamamlanmış Canlı Dersler"
   concluded_courses_94782e21: "Tamamlanmış Dersler"
+  concluded_e1e482a0: Sonlandırıldı
   concluded_enrollments_9da8da6: "Sonlandırılmış kayıtlar"
   conditional_content_b284da8f: "Şartı İçerik"
   conditional_release_d206e93b: "Şartlı Yayın"
@@ -16679,6 +16680,7 @@ tr:
   remove_dates_5a5a8df2: "Tarihleri sil"
   remove_edf2b8a7: (Kaldır)
   remove_f47dc62a: Kaldır
+  remove_filter_68de01d4: "Filtreyi Kaldır"
   remove_image_341340b3: "Görseli sil"
   remove_media_comment_f4afdb4b: "Medya yorumunu sil"
   remove_null_values_from_live_event_payloads_3c826f: "Etkinlik verilerinden boş değerleri kaldır"
