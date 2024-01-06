@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import ready from '@instructure/ready'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import htmlEscape from 'html-escape'
+import htmlEscape from '@instructure/html-escape'
 // @ts-expect-error
 import signupDialog from '@canvas/signup-dialog'
 import 'jquery-fancy-placeholder' /* fancyPlaceholder */

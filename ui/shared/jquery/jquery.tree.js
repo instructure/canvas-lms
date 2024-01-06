@@ -26,7 +26,7 @@
 
 // xsslint jqueryObject.identifier tree
 import $ from 'jquery'
-import htmlEscape from 'html-escape'
+import htmlEscape from '@instructure/html-escape'
 import 'jqueryui/draggable'
 import 'jqueryui/droppable'
 

@@ -22,7 +22,7 @@ import _Handlebars from 'handlebars/runtime'
 import I18nObj, {useScope as useI18nScope} from '@canvas/i18n' //  'i18nObj' gets the extended I18n object with all the extra functions (interpolate, strftime, ...)
 import $ from 'jquery'
 import {chain, defaults, isDate, map, reduce} from 'lodash'
-import htmlEscape from 'html-escape'
+import htmlEscape, {raw} from '@instructure/html-escape'
 import semanticDateRange from '@canvas/datetime/semanticDateRange'
 import dateSelect from './dateSelect'
 import mimeClass from '@canvas/mime/mimeClass'
@@ -172,7 +172,7 @@ const object = {
     return new Handlebars.SafeString(`\
 <time data-tooltip data-html-tooltip-title='${htmlEscape(
       timeTitleHtml
-    )}' datetime='${datetime.toISOString()}' ${$.raw(pubdate ? 'pubdate' : undefined)}>
+    )}' datetime='${datetime.toISOString()}' ${raw(pubdate ? 'pubdate' : undefined)}>
   <span aria-hidden='true'>${$.friendlyDatetime(fudged)}</span>
   <span class='screenreader-only'>${timeTitleHtml}</span>
 </time>\
@@ -198,9 +198,9 @@ const object = {
     return new Handlebars.SafeString(
       `<time data-tooltip title='${$.datetimeString(
         datetime
-      )}' datetime='${datetime.toISOString()}' ${$.raw(
-        pubdate ? 'pubdate' : undefined
-      )}>${htmlEscape(datetime.toString(format))}</time>`
+      )}' datetime='${datetime.toISOString()}' ${raw(pubdate ? 'pubdate' : undefined)}>${htmlEscape(
+        datetime.toString(format)
+      )}</time>`
     )
   },
 
@@ -683,7 +683,7 @@ const object = {
 
     return new Handlebars.SafeString(`\
 <input name="${htmlEscape(inputProps.name)}" type="hidden" value="0" ${hiddenDisabledHtml}>
-<input ${$.raw(attributes.join(' '))} />\
+<input ${raw(attributes.join(' '))} />\
 `)
   },
 

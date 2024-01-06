@@ -28,7 +28,7 @@ import WikiPageDeleteDialog from '@canvas/wiki/backbone/views/WikiPageDeleteDial
 import WikiPageReloadView from '@canvas/wiki/backbone/views/WikiPageReloadView'
 import PublishButtonView from '@canvas/publish-button-view'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import htmlEscape from 'html-escape'
+import htmlEscape from '@instructure/html-escape'
 import {publish} from 'jquery-tinypubsub'
 import '@canvas/modules/jquery/prerequisites_lookup'
 import '../../jquery/content_locks'

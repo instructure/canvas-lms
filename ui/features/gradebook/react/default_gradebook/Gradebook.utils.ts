@@ -24,7 +24,7 @@ import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDi
 import getTextWidth from '../shared/helpers/TextMeasure'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import _ from 'lodash'
-import htmlEscape, {unescape} from 'html-escape'
+import htmlEscape, {unescape} from '@instructure/html-escape'
 import filterTypes from './constants/filterTypes'
 import type {
   ColumnSizeSettings,

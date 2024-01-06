@@ -17,7 +17,7 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import htmlEscape from 'html-escape'
+import htmlEscape from '@instructure/html-escape'
 import '@canvas/media-comments/jquery/mediaComment'
 
 const I18n = useI18nScope('instructure_inline_media_comment')

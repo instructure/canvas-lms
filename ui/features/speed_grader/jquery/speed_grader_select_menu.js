@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import 'jquery-selectmenu'
 import SpeedgraderHelpers from './speed_grader_helpers'
-import htmlEscape from 'html-escape'
+import htmlEscape from '@instructure/html-escape'
 
 function optionsToHtml(optionDefinitions) {
   return optionDefinitions

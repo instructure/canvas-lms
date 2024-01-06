@@ -20,7 +20,7 @@
 import {isElement, isEmpty, uniqueId, isArray, each, map, flatten} from 'lodash'
 import $ from 'jquery'
 import authenticity_token from '@canvas/authenticity-token'
-import htmlEscape from 'html-escape'
+import htmlEscape from '@instructure/html-escape'
 /*
 xsslint safeString.identifier iframeId httpMethod
 xsslint jqueryObject.identifier el

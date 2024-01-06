@@ -27,7 +27,7 @@ import Folder from '../../backbone/models/Folder'
 import {Modal} from '@instructure/ui-modal'
 import {CloseButton, Button} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
-import htmlEscape from 'html-escape'
+import htmlEscape from '@instructure/html-escape'
 
 const I18n = useI18nScope('usage_rights_modal')
 

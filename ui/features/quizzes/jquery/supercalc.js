@@ -19,7 +19,7 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import calcCmd from './calcCmd'
-import htmlEscape from 'html-escape'
+import htmlEscape from '@instructure/html-escape'
 import '@canvas/jquery/jquery.instructure_misc_helpers' /* /\$\.raw/ */
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* showIf */
 import 'jqueryui/sortable'

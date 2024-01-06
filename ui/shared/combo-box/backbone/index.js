@@ -19,7 +19,7 @@ import $ from 'jquery'
 import {assignIn, map} from 'lodash'
 import Backbone from '@canvas/backbone'
 import template from '../jst/index.handlebars'
-import htmlEscape from 'html-escape'
+import htmlEscape from '@instructure/html-escape'
 
 // #
 // Build a combo box to represent a list of items.

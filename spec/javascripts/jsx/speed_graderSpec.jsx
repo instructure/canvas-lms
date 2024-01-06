@@ -30,7 +30,7 @@ import moxios from 'moxios'
 import fakeENV from 'helpers/fakeENV'
 import numberHelper from '@canvas/i18n/numberHelper'
 import userSettings from '@canvas/user-settings'
-import {unescape} from 'html-escape'
+import {unescape} from '@instructure/html-escape'
 
 import '@canvas/jquery/jquery.ajaxJSON'
 

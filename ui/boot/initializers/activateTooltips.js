@@ -32,7 +32,7 @@
 //   </button>
 
 import $ from 'jquery'
-import htmlEscape from 'html-escape'
+import htmlEscape, {raw} from '@instructure/html-escape'
 import 'jqueryui/tooltip'
 
 const tooltipsToShortCirtuit = {}
@@ -167,7 +167,7 @@ $('body').on('mouseenter focusin', '[data-tooltip]', function (_event) {
 
   if ($this.data('html-tooltip-title')) {
     opts.content = function () {
-      return $.raw($(this).data('html-tooltip-title'))
+      return raw($(this).data('html-tooltip-title'))
     }
     opts.items = '[data-html-tooltip-title]'
   }

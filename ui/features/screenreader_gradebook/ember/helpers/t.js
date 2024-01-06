@@ -17,7 +17,7 @@
 
 import Ember from 'ember'
 import I18n from '@canvas/i18n'
-import htmlEscape from 'html-escape'
+import htmlEscape from '@instructure/html-escape'
 
 Ember.Handlebars.registerHelper('t', (...args1) => {
   const adjustedLength = Math.max(args1.length, 1),

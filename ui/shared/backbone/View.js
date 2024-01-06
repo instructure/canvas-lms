@@ -21,7 +21,7 @@
 import {extend} from './utils'
 import {forEach, map} from 'lodash'
 import $ from 'jquery'
-import htmlEscape from 'html-escape'
+import htmlEscape from '@instructure/html-escape'
 import mixin from './mixin'
 
 const slice = [].slice

@@ -17,16 +17,15 @@
  */
 
 import $ from 'jquery'
-import htmlEscape from 'html-escape'
+import htmlEscape from '@instructure/html-escape'
 
 if (!('INST' in window)) window.INST = {}
 
-// useful for i18n, e.g. t('key', 'pick one: %{select}', {select: $.raw('<select><option>...')})
-// note that raw returns a SafeString object, so you may want to call toString
-// if you're using it elsewhere
+// remove when gems/plugins no longer reference it
 $.raw = function (str) {
   return new htmlEscape.SafeString(str)
 }
+
 // ensure the jquery html setters don't puke if given a SafeString
 $.each(['html', 'append', 'prepend'], function (idx, method) {
   const orig = $.fn[method]

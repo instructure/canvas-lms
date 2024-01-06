@@ -17,7 +17,7 @@
 
 import I18n from '@canvas/i18n'
 import $ from 'jquery'
-import h from 'html-escape'
+import h from '@instructure/html-escape'
 import {clone, defaults} from 'lodash'
 
 /*
