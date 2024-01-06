@@ -3654,6 +3654,7 @@ hy:
   compose_a_new_message_db3a68ed: "Կազմել նոր հաղորդագրություն"
   concluded_conferences_cdbe53f9: "Ավարտված կոնֆերանսներ"
   concluded_courses_94782e21: "Ավարտված դասընթացներ"
+  concluded_e1e482a0: "Ավարտվել է"
   conference_36b50fda: Կոնֆերանս
   conference_was_deleted_30869390: "Կոնֆերանսը ջնջվել է"
   conferences: 
@@ -14249,6 +14250,7 @@ hy:
   remove_contact_method_ca890ba3: "Ջնջել կապ հաստատելու միջոցը"
   remove_dates_5a5a8df2: "Հանել ամսաթվերը"
   remove_f47dc62a: Հանել
+  remove_filter_68de01d4: "Հեռացնել ֆիլտրները"
   remove_icon_a4646413: "հանել պատկերը"
   remove_media_comment_f4afdb4b: "Հանել մուլտիմեդիա մեկնաբանությունը"
   remove_recipient_name_a6b83cef: "Հեռացնել  %{name} ստացողին "
