@@ -173,7 +173,9 @@ describe('enhanced_user_content/instructure_helpers', () => {
   })
 
   describe('showFilePreviewInline', () => {
-    afterEach(fetchMock.restore)
+    afterEach(() => {
+      fetchMock.restore()
+    })
 
     it('fetches the file', () => {
       const link = document.createElement('a')

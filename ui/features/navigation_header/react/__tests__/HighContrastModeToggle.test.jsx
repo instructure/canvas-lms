@@ -39,7 +39,9 @@ describe('HighContrastModeToggle', () => {
       fetchMock.put(route, goodResponseOn, {overwriteRoutes: true})
     })
 
-    afterEach(fetchMock.restore)
+    afterEach(() => {
+      fetchMock.restore()
+    })
 
     it('shows a toggle in the "off" position', () => {
       const {container} = render(<Subject />)
@@ -81,7 +83,9 @@ describe('HighContrastModeToggle', () => {
       fetchMock.put(route, goodResponseOff, {overwriteRoutes: true})
     })
 
-    afterEach(fetchMock.restore)
+    afterEach(() => {
+      fetchMock.restore()
+    })
 
     it('shows a toggle in the "on" position', () => {
       const {container} = render(<Subject />)
