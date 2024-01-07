@@ -18,9 +18,6 @@
 
 import {createClient} from '..'
 import {gql} from '@apollo/client'
-import {enableFetchMocks} from 'jest-fetch-mock'
-
-enableFetchMocks()
 
 describe('host configuration', () => {
   const someQuery = gql`

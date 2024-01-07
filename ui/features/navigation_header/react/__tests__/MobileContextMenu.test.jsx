@@ -17,9 +17,7 @@
 import React from 'react'
 import {render, waitFor} from '@testing-library/react'
 import MobileContextMenu from '../MobileContextMenu'
-import {enableFetchMocks} from 'jest-fetch-mock'
-
-enableFetchMocks()
+import fetchMock from 'fetch-mock'
 
 const tabsFromApi = [
   {
@@ -70,8 +68,11 @@ const props = {
 describe('MobileContextMenu', () => {
   beforeEach(() => {
     window.ENV = {context_asset_string: 'courses_1'}
-    fetch.resetMocks()
-    fetch.mockResponseOnce(JSON.stringify(tabsFromApi))
+    fetchMock.mock('*', JSON.stringify(tabsFromApi))
+  })
+
+  afterEach(() => {
+    fetchMock.restore()
   })
 
   it('renders spinner while loading', () => {
