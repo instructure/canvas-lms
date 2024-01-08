@@ -27,7 +27,9 @@ describe('AdminTable', () => {
   beforeEach(() => {
     originalENV = global.ENV
     global.ENV = {
-      FEATURES: {},
+      FEATURES: {
+        enhanced_developer_keys_tables: true,
+      },
     }
   })
 
@@ -38,19 +40,21 @@ describe('AdminTable', () => {
   const idFor = n => `1000000000000${n}`
 
   const devKeyList = (numKeys = 10) => {
-    return [...Array(numKeys).keys()].map(n => ({
-      id: idFor(n),
-      name: `key-${n}`,
-      email: `email-${n}`,
-      access_token_count: n * 2,
-      is_lti_key: n == 3,
-      api_key: 'abc12345678',
-      created_at: '2023-12-12T20:36:50Z',
-      visible: true,
-      developer_key_account_binding: {
-        workflow_state: n == 5 ? 'off' : 'on',
-      },
-    }))
+    return [...Array(numKeys).keys()]
+      .map(n => ({
+        id: idFor(n),
+        name: `key-${n}`,
+        email: `email-${n}`,
+        access_token_count: n * 2,
+        is_lti_key: n == 3,
+        api_key: 'abc12345678',
+        created_at: '2023-12-12T20:36:50Z',
+        visible: true,
+        developer_key_account_binding: {
+          workflow_state: n == 5 ? 'off' : 'on',
+        },
+      }))
+      .reverse()
   }
 
   const component = (keys, props = {}) => {
@@ -96,7 +100,7 @@ describe('AdminTable', () => {
     it('defaults to descending id', () => {
       const wrapper = component()
 
-      expect(firstRow(wrapper)).toHaveTextContent('9')
+      expect(firstRow(wrapper)).toHaveTextContent(idFor(9))
     })
 
     it('allows sorting by name', () => {
@@ -143,7 +147,7 @@ describe('AdminTable', () => {
       const wrapper = component()
 
       userEvent.click(wrapper.getByText('Type')) // ascending (API type)
-      expect(firstRow(wrapper)).toHaveTextContent('key-0')
+      expect(firstRow(wrapper)).toHaveTextContent('key-9')
 
       userEvent.click(wrapper.getByText('Type')) // descending (LTI type)
       expect(firstRow(wrapper)).toHaveTextContent('key-3')
@@ -167,6 +171,22 @@ describe('AdminTable', () => {
 
       userEvent.click(wrapper.getByText('Actions')) // descending
       expect(firstRow(wrapper)).toHaveTextContent('key-9')
+    })
+
+    describe('when flag is off', () => {
+      beforeEach(() => {
+        global.ENV.FEATURES.enhanced_developer_keys_tables = false
+      })
+
+      it('does not allow sorting', () => {
+        const wrapper = component()
+
+        userEvent.click(wrapper.getByText('Name')) // "ascending"
+        expect(firstRow(wrapper)).toHaveTextContent('9')
+
+        userEvent.click(wrapper.getByText('Name')) // descending
+        expect(firstRow(wrapper)).toHaveTextContent('9')
+      })
     })
   })
 
@@ -203,6 +223,18 @@ describe('AdminTable', () => {
       userEvent.type(wrapper.getByRole('searchbox'), idFor(1))
       await waitForDebounce()
       expect(wrapper.getAllByRole('row')).toHaveLength(2)
+    })
+
+    describe('when flag is off', () => {
+      beforeEach(() => {
+        global.ENV.FEATURES.enhanced_developer_keys_tables = false
+      })
+
+      it('does not allow filtering', () => {
+        const wrapper = component()
+
+        expect(wrapper.queryByRole('searchbox')).not.toBeInTheDocument()
+      })
     })
   })
 

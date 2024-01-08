@@ -41,6 +41,7 @@ class InheritedTable extends React.Component {
       sortAscending: false,
       typeFilter: 'all',
       searchQuery: '',
+      sortFlagEnabled: window.ENV?.FEATURES?.enhanced_developer_keys_tables,
     }
   }
 
@@ -97,7 +98,7 @@ class InheritedTable extends React.Component {
 
   renderHeader = () => {
     const {prefix} = this.props
-    const {sortBy, sortAscending} = this.state
+    const {sortBy, sortAscending, sortFlagEnabled} = this.state
     const direction = sortAscending ? 'ascending' : 'descending'
 
     return (
@@ -107,12 +108,13 @@ class InheritedTable extends React.Component {
             key={header.id}
             id={header.id}
             width={header.width}
-            {...(header.sortable && {
-              sortDirection: sortBy === header.id ? direction : 'none',
-              onRequestSort: this.onRequestSort,
-            })}
+            {...(header.sortable &&
+              sortFlagEnabled && {
+                sortDirection: sortBy === header.id ? direction : 'none',
+                onRequestSort: this.onRequestSort,
+              })}
           >
-            {header.sortText ? (
+            {header.sortText && sortFlagEnabled ? (
               <Tooltip renderTip={header.sortText} placement="top">
                 {header.text}
               </Tooltip>
@@ -128,7 +130,12 @@ class InheritedTable extends React.Component {
   sortedDeveloperKeys = () => {
     const {prefix} = this.props
     const headers = this.headers(prefix)
-    const {sortBy, sortAscending} = this.state
+    const {sortBy, sortAscending, sortFlagEnabled} = this.state
+
+    if (!sortFlagEnabled) {
+      return this.props.developerKeysList
+    }
+
     const developerKeys = this.filteredDeveloperKeys()
     const sortedKeys = developerKeys.sort((a, b) => {
       const aVal = headers[sortBy].sortValue(a)
@@ -145,7 +152,11 @@ class InheritedTable extends React.Component {
   }
 
   filteredDeveloperKeys = () => {
-    const {typeFilter, searchQuery} = this.state
+    const {typeFilter, searchQuery, sortFlagEnabled} = this.state
+
+    if (!sortFlagEnabled) {
+      return this.props.developerKeysList
+    }
 
     return this.props.developerKeysList.filter(key => {
       const keyType = key.is_lti_key ? 'lti' : 'api'
@@ -180,25 +191,34 @@ class InheritedTable extends React.Component {
 
   render() {
     const {label} = this.props
+    const {sortFlagEnabled} = this.state
     const developerKeys = this.sortedDeveloperKeys()
     return (
       <div>
-        <FilterBar
-          filterOptions={[
-            {value: 'lti', text: I18n.t('LTI Keys')},
-            {value: 'api', text: I18n.t('API Keys')},
-          ]}
-          onFilter={typeFilter => this.setState({typeFilter})}
-          onSearch={searchQuery => this.setState({searchQuery})}
-          searchPlaceholder={I18n.t('Search by name or ID')}
-          searchScreenReaderLabel={I18n.t('Search Developer Keys')}
-        />
+        {sortFlagEnabled && (
+          <FilterBar
+            filterOptions={[
+              {value: 'lti', text: I18n.t('LTI Keys')},
+              {value: 'api', text: I18n.t('API Keys')},
+            ]}
+            onFilter={typeFilter => this.setState({typeFilter})}
+            onSearch={searchQuery => this.setState({searchQuery})}
+            searchPlaceholder={I18n.t('Search by name or ID')}
+            searchScreenReaderLabel={I18n.t('Search Developer Keys')}
+          />
+        )}
         <Table
           data-automation="devKeyInheritedTable"
           caption={<ScreenReaderContent>{label}</ScreenReaderContent>}
           size="medium"
         >
-          <Table.Head renderSortLabel={I18n.t('Sort by')}>{this.renderHeader()}</Table.Head>
+          <Table.Head
+            {...(sortFlagEnabled && {
+              renderSortLabel: I18n.t('Sort by'),
+            })}
+          >
+            {this.renderHeader()}
+          </Table.Head>
           <Table.Body>
             {developerKeys.map(developerKey => (
               <DeveloperKey

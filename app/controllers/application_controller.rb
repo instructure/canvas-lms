@@ -380,6 +380,7 @@ class ApplicationController < ActionController::Base
     mobile_offline_mode
     react_discussions_post
     instui_nav
+    enhanced_developer_keys_tables
   ].freeze
   JS_ENV_BRAND_ACCOUNT_FEATURES = [
     :embedded_release_notes
