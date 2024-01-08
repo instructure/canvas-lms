@@ -23,6 +23,20 @@ import userEvent from '@testing-library/user-event'
 import InheritedTable from '../InheritedTable'
 
 describe('InheritedTable', () => {
+  let originalENV
+  beforeEach(() => {
+    originalENV = global.ENV
+    global.ENV = {
+      FEATURES: {
+        enhanced_developer_keys_tables: true,
+      },
+    }
+  })
+
+  afterEach(() => {
+    global.ENV = originalENV
+  })
+
   const idFor = n => `1000000000000${n}`
 
   const devKeyList = (numKeys = 10) => {
@@ -156,6 +170,18 @@ describe('InheritedTable', () => {
       await waitForDebounce()
       console.log(wrapper.getAllByRole('row').map(r => r.textContent))
       expect(wrapper.getAllByRole('row')).toHaveLength(2)
+    })
+
+    describe('when flag is off', () => {
+      beforeEach(() => {
+        global.ENV.FEATURES.enhanced_developer_keys_tables = false
+      })
+
+      it('does not allow filtering', () => {
+        const wrapper = component()
+
+        expect(wrapper.queryByRole('searchbox')).not.toBeInTheDocument()
+      })
     })
   })
 })

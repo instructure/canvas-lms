@@ -226,3 +226,15 @@ lti_log_launches:
       state: allowed_on
     ci:
       state: allowed_on
+enhanced_developer_keys_tables:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Sort and Filter Developer Keys Tables
+  description: |-
+    When enabled, allows the tables on the Developer Keys page to be
+    sorted and filtered.
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: on
