@@ -252,9 +252,9 @@ Returns the host of the rich content service for the current region.
 "rich-content-iad.inscloudgate.net"
 ```
 ## com.instructure.User.student_view
-Returns true if the user is launching from student view.
+Returns true if the User is from student view process.
 
-**Availability**: *always*  
+**Availability**: *when launched by a logged in user*  
 **Launch Parameter**: *com_instructure_user_student_view*  
 
 ```
