@@ -1039,9 +1039,9 @@ describe "discussions" do
 
           force_click('input[type=checkbox][value="graded"]')
 
-          due_at_input = ff("input[placeholder='Select Date']")[0]
-          available_from_input = ff("input[placeholder='Select Date']")[1]
-          available_until_input = ff("input[placeholder='Select Date']")[2]
+          due_at_input = f("input[placeholder='Select Assignment Due Date']")
+          available_from_input = f("input[placeholder='Select Assignment Available From Date']")
+          available_until_input = f("input[placeholder='Select Assignment Available Until Date']")
 
           set_datetime_input(due_at_input, format_date_for_view(10.days.from_now))
           set_datetime_input(available_from_input, format_date_for_view(5.days.from_now))
