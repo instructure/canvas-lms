@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import fetchMock from 'fetch-mock'
 import {createClient} from '..'
 import {gql} from '@apollo/client'
 
@@ -66,37 +67,8 @@ describe('host configuration', () => {
   })
 
   describe('API gateway override', () => {
-    async function fakeGatewayFetch(url, config) {
-      switch (url) {
-        case '/api/v1/inst_access_tokens': {
-          return {
-            ok: true,
-            status: 200,
-            json: async () => ({token: 'my-fake-token'}),
-          }
-        }
-        case 'http://my-gateway/graphql': {
-          // make sure token is being sent to api gateway
-          expect(config.headers.authorization).toEqual('Bearer my-fake-token')
-          return {
-            ok: true,
-            status: 200,
-            text: async () => {
-              return '{"data": { "aField": "aValue" }, "errors": []}'
-            },
-          }
-        }
-        default: {
-          throw new Error(`Unhandled request: ${url}`)
-        }
-      }
-    }
-
-    beforeAll(() => jest.spyOn(global, 'fetch'))
-
     beforeEach(() => {
-      global.fetch.mockImplementation(fakeGatewayFetch)
-      global.fetch.mockClear()
+      fetchMock.reset()
     })
 
     it('talks to gateway URI with InstAccess token', async () => {
@@ -104,9 +76,22 @@ describe('host configuration', () => {
       // reconfigures itself to talk there over HTTP and to fetch
       // InstAccess tokens to do so (see expectation in mock'd
       // fetch implementation above)
+      fetchMock.mock('/api/v1/inst_access_tokens', {
+        status: 200,
+        body: {token: 'my-fake-token'},
+      })
+
+      // make sure token is being sent to api gateway
+      fetchMock.mock('http://my-gateway/graphql', (url, options) => {
+        expect(options.headers.authorization).toEqual('Bearer my-fake-token')
+        return {status: 200, body: '{"data": { "aField": "aValue" }, "errors": []}'}
+      })
+
       const gatewayApolloClient = createClient({apiGatewayUri: 'http://my-gateway/graphql'})
       const gatewayResponse = await gatewayApolloClient.query({query: someQuery})
       expect(gatewayResponse.data.aField).toEqual('aValue')
+
+      fetchMock.restore()
     })
   })
 })
