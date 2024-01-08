@@ -20,8 +20,7 @@
 
 import {extend} from '@canvas/backbone/utils'
 import $ from 'jquery'
-import _ from 'underscore'
-import {map, find, filter, some} from 'lodash'
+import {map, find, filter, includes, some} from 'lodash'
 import {Model} from '@canvas/backbone'
 import DefaultUrlMixin from '@canvas/backbone/DefaultUrlMixin'
 import TurnitinSettings from '../../TurnitinSettings'
@@ -53,7 +52,7 @@ const isAdmin = function () {
 
 // must check canManage because current_user_roles will include roles from other enrolled courses
 const isStudent = function () {
-  return _.includes(ENV.current_user_roles, 'student') && !canManage()
+  return (ENV.current_user_roles || []).includes('student') && !canManage()
 }
 
 extend(Assignment, Model)
@@ -288,13 +287,22 @@ Assignment.prototype.isNotGraded = function () {
 }
 
 Assignment.prototype.isAssignment = function () {
-  return !_.includes(
-    this._submissionTypes(),
-    'online_quiz',
-    'discussion_topic',
-    'not_graded',
-    'external_tool'
-  )
+  return !(this._submissionTypes() || []).includes('online_quiz')
+
+  // EVAL-3817
+  // The original code cannot possibly have worked as underscore `_.includes` takes only
+  // two argumentswith an optional third fromIndex. Nowhere does it seem to work to pass
+  // a list of arguments to check for inclusion in the first argument. Needs investigation,
+  // see the EVAL-3817 ticket for more details.
+  //
+  // Original code:
+  // return !_.includes(
+  //   this._submissionTypes(),
+  //   'online_quiz',
+  //   'discussion_topic',
+  //   'not_graded',
+  //   'external_tool'
+  // )
 }
 
 Assignment.prototype.assignmentType = function (type) {
@@ -390,9 +398,7 @@ Assignment.prototype.canDelete = function () {
 }
 
 Assignment.prototype.canMove = function () {
-  return (
-    !this.inClosedGradingPeriod() && !_.includes(this.frozenAttributes(), 'assignment_group_id')
-  )
+  return !this.inClosedGradingPeriod() && !includes(this.frozenAttributes(), 'assignment_group_id')
 }
 
 Assignment.prototype.freezeOnCopy = function () {
@@ -523,14 +529,14 @@ Assignment.prototype.selectedSubmissionTypeToolId = function () {
 }
 
 Assignment.prototype.submissionType = function () {
-  const submissionTypes = this._submissionTypes()
-  if (_.includes(submissionTypes, 'none') || submissionTypes.length === 0) {
+  const submissionTypes = this._submissionTypes() || []
+  if (submissionTypes.length === 0 || submissionTypes.includes('none')) {
     return 'none'
-  } else if (_.includes(submissionTypes, 'on_paper')) {
+  } else if (submissionTypes.includes('on_paper')) {
     return 'on_paper'
-  } else if (_.includes(submissionTypes, 'external_tool')) {
+  } else if (submissionTypes.includes('external_tool')) {
     return 'external_tool'
-  } else if (_.includes(submissionTypes, 'default_external_tool')) {
+  } else if (submissionTypes.includes('default_external_tool')) {
     return 'external_tool'
   } else {
     return 'online'
@@ -538,24 +544,24 @@ Assignment.prototype.submissionType = function () {
 }
 
 Assignment.prototype.expectsSubmission = function () {
-  const submissionTypes = this._submissionTypes()
+  const submissionTypes = this._submissionTypes() || []
   return (
     submissionTypes.length > 0 &&
-    !_.includes(submissionTypes, '') &&
-    !_.includes(submissionTypes, 'none') &&
-    !_.includes(submissionTypes, 'not_graded') &&
-    !_.includes(submissionTypes, 'on_paper') &&
-    !_.includes(submissionTypes, 'external_tool')
+    !submissionTypes.includes('') &&
+    !submissionTypes.includes('none') &&
+    !submissionTypes.includes('not_graded') &&
+    !submissionTypes.includes('on_paper') &&
+    !submissionTypes.includes('external_tool')
   )
 }
 
 Assignment.prototype.allowedToSubmit = function () {
-  const submissionTypes = this._submissionTypes()
+  const submissionTypes = this._submissionTypes() || []
   return (
     this.expectsSubmission() &&
     !this.get('locked_for_user') &&
-    !_.includes(submissionTypes, 'online_quiz') &&
-    !_.includes(submissionTypes, 'attendance')
+    !submissionTypes.includes('online_quiz') &&
+    !submissionTypes.includes('attendance')
   )
 }
 
@@ -569,23 +575,28 @@ Assignment.prototype.withoutGradedSubmission = function () {
 }
 
 Assignment.prototype.acceptsOnlineUpload = function () {
-  return !!_.includes(this._submissionTypes(), 'online_upload')
+  const submissionTypes = this._submissionTypes() || []
+  return submissionTypes.includes('online_upload')
 }
 
 Assignment.prototype.acceptsAnnotatedDocument = function () {
-  return !!_.includes(this._submissionTypes(), 'student_annotation')
+  const submissionTypes = this._submissionTypes() || []
+  return submissionTypes.includes('student_annotation')
 }
 
 Assignment.prototype.acceptsOnlineURL = function () {
-  return !!_.includes(this._submissionTypes(), 'online_url')
+  const submissionTypes = this._submissionTypes() || []
+  return submissionTypes.includes('online_url')
 }
 
 Assignment.prototype.acceptsMediaRecording = function () {
-  return !!_.includes(this._submissionTypes(), 'media_recording')
+  const submissionTypes = this._submissionTypes() || []
+  return submissionTypes.includes('media_recording')
 }
 
 Assignment.prototype.acceptsOnlineTextEntries = function () {
-  return !!_.includes(this._submissionTypes(), 'online_text_entry')
+  const submissionTypes = this._submissionTypes() || []
+  return submissionTypes.includes('online_text_entry')
 }
 
 Assignment.prototype.isOnlineSubmission = function () {
@@ -754,7 +765,7 @@ Assignment.prototype.canGroup = function () {
 
 Assignment.prototype.isPlagiarismPlatformLocked = function () {
   return (
-    this.get('has_submitted_submissions') || _.includes(this.frozenAttributes(), 'submission_types')
+    this.get('has_submitted_submissions') || includes(this.frozenAttributes(), 'submission_types')
   )
 }
 
@@ -1162,7 +1173,7 @@ Assignment.prototype.failedToImport = function () {
 }
 
 Assignment.prototype.submissionTypesFrozen = function () {
-  return _.includes(this.frozenAttributes(), 'submission_types')
+  return includes(this.frozenAttributes(), 'submission_types')
 }
 
 Assignment.prototype.toView = function () {
@@ -1397,17 +1408,17 @@ Assignment.prototype._filterFrozenAttributes = function (data) {
   const ref = this.attributes
   for (key in ref) {
     if (!hasProp.call(ref, key)) continue
-    if (_.includes(this.frozenAttributes(), key)) {
+    if (includes(this.frozenAttributes(), key)) {
       delete data[key]
     }
   }
-  if (_.includes(this.frozenAttributes(), 'title')) {
+  if (includes(this.frozenAttributes(), 'title')) {
     delete data.name
   }
-  if (_.includes(this.frozenAttributes(), 'group_category_id')) {
+  if (includes(this.frozenAttributes(), 'group_category_id')) {
     delete data.grade_group_students_individually
   }
-  if (_.includes(this.frozenAttributes(), 'peer_reviews')) {
+  if (includes(this.frozenAttributes(), 'peer_reviews')) {
     delete data.automatic_peer_reviews
     delete data.peer_review_count
     delete data.peer_reviews_assign_at
