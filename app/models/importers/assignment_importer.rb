@@ -103,20 +103,12 @@ module Importers
       )
     end
 
-    def self.reset_new_quiz_workflow_state(item)
-      if item&.quiz_lti? && item.external_tool_tag.workflow_state == "deleted"
-        item.external_tool_tag.workflow_state = "active"
-      end
-    end
-
     def self.import_from_migration(hash, context, migration, item = nil, quiz = nil)
       hash = hash.with_indifferent_access
       return nil if hash[:migration_id] && hash[:assignments_to_import] && !hash[:assignments_to_import][hash[:migration_id]]
 
       item ||= Assignment.where(context_type: context.class.to_s, context_id: context, id: hash[:id]).first
       item ||= Assignment.where(context_type: context.class.to_s, context_id: context, migration_id: hash[:migration_id]).first if hash[:migration_id]
-
-      reset_new_quiz_workflow_state(item)
 
       item ||= context.assignments.temp_record # new(:context => context)
 
@@ -130,6 +122,7 @@ module Importers
       item.title = I18n.t("untitled assignment") if item.title.blank?
       item.migration_id = hash[:migration_id]
       if new_record || item.deleted? || master_migration
+        restore_lti_models(item) if item.deleted?
         item.workflow_state = if item.can_unpublish?
                                 hash[:workflow_state] || "published"
                               else
@@ -545,6 +538,13 @@ module Importers
           end
         end
       end
+    end
+
+    # Restore any deleted LTI models (Lti::ResourceLink, Lti::LineItem, ContentTag)
+    # for an existing assignment, if necessary.
+    def self.restore_lti_models(item)
+      item.lti_resource_links.find_each(&:undestroy)
+      item.external_tool_tag&.workflow_state = "active"
     end
 
     def self.set_annotatable_attachment(assignment, hash, context)

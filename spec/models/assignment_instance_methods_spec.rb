@@ -254,6 +254,12 @@ describe Assignment do
         subject
         expect(assignment.lti_resource_links.first).to be_active
       end
+
+      it "restores external tool tag" do
+        expect(assignment.external_tool_tag.reload).to be_deleted
+        subject
+        expect(assignment.external_tool_tag.reload).to be_active
+      end
     end
   end
 end
