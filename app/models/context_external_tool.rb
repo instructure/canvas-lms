@@ -1399,10 +1399,6 @@ class ContextExternalTool < ActiveRecord::Base
     hash
   end
 
-  def resource_selection_settings
-    settings[:resource_selection]
-  end
-
   def opaque_identifier_for(asset, context: nil)
     ContextExternalTool.opaque_identifier_for(asset, shard, context:)
   end
