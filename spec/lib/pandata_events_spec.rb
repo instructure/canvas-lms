@@ -188,10 +188,11 @@ describe PandataEvents do
       }.with_indifferent_access
     end
     let(:endpoint) { "https://example.com" }
+    let(:response) { Net::HTTPSuccess.new(Net::HTTPOK, "200", "OK") }
 
     before do
       allow(PandataEvents).to receive_messages(credentials:, endpoint:)
-      allow(CanvasHttp).to receive(:post)
+      allow(CanvasHttp).to receive(:post).and_return(response)
     end
 
     it "posts to the endpoint" do
@@ -214,6 +215,48 @@ describe PandataEvents do
       subject
       expect(CanvasHttp).to have_received(:post) do |_, headers, _|
         expect { CanvasSecurity.decode_jwt(headers[:Authorization].split.last, [credentials[:canvas_secret]]) }.not_to raise_error
+      end
+    end
+
+    context "with successful response" do
+      it "returns true" do
+        expect(subject).to be_truthy
+      end
+    end
+
+    context "with unsuccessful response" do
+      let(:response) { double("response", code: 500, body: "uh oh!") }
+
+      before do
+        allow(CanvasHttp).to receive(:post).and_return(response)
+        allow(InstStatsd::Statsd).to receive(:increment).and_return(nil)
+      end
+
+      it "returns false" do
+        expect(subject).to be_falsy
+      end
+
+      it "logs to statsd" do
+        subject
+        expect(InstStatsd::Statsd).to have_received(:increment).with("pandata_events.error.http_failure", tags: { event_type:, status_code: response.code })
+      end
+    end
+
+    context "with CanvasHttp error" do
+      let(:exception) { CanvasHttp::Error.new("uh oh!") }
+
+      before do
+        allow(CanvasHttp).to receive(:post).and_raise(exception)
+        allow(InstStatsd::Statsd).to receive(:increment).and_return(nil)
+      end
+
+      it "returns false" do
+        expect(subject).to be_falsy
+      end
+
+      it "logs to statsd" do
+        subject
+        expect(InstStatsd::Statsd).to have_received(:increment).with("pandata_events.error", tags: { event_type: })
       end
     end
   end
