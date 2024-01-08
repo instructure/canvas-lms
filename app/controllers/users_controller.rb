@@ -2782,7 +2782,7 @@ class UsersController < ApplicationController
     expires_at = 1.day.from_now
     render json: {
       url: PandataEvents.endpoint,
-      auth_token: service.auth_token(@current_user.global_id, expires_at:),
+      auth_token: service.auth_token(@current_user.global_id, expires_at:, cache: false),
       props_token: service.token(props_body),
       expires_at: expires_at.to_f * 1000
     }

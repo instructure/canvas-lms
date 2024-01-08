@@ -218,6 +218,20 @@ describe PandataEvents::CredentialService do
         allow(Canvas.redis).to receive(:setex).and_call_original
       end
 
+      context "when cache is false" do
+        subject { service.auth_token(sub, expires_at:, cache: false) }
+
+        before do
+          allow(Canvas.redis).to receive(:get).and_call_original
+        end
+
+        it "does not cache the token" do
+          subject
+          expect(Canvas.redis).not_to have_received(:setex)
+          expect(Canvas.redis).not_to have_received(:get)
+        end
+      end
+
       it "returns cached token if present" do
         service.auth_token(sub, expires_at:)
         service.auth_token(sub, expires_at:)
