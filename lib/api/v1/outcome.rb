@@ -20,7 +20,6 @@
 
 module Api::V1::Outcome
   include Api::V1::Json
-  include OutcomesServiceAlignmentsHelper
 
   # style can be :full or :abbrev; anything unrecognized defaults to :full.
   # abbreviated includes only id, title, url, subgroups_url, outcomes_url, and can_edit. full expands on
@@ -178,7 +177,7 @@ module Api::V1::Outcome
                      else
                        Account.site_admin.grants_right?(user, session, :manage_global_outcomes)
                      end
-        hash["can_unlink"] = can_unlink?(outcome_link, can_manage:)
+        hash["can_unlink"] = can_manage && outcome_link.can_destroy?
       end
 
       hash["assessed"] = if opts[:assessed_outcomes]
