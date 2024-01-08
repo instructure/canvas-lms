@@ -18,6 +18,7 @@
 import gql from 'graphql-tag'
 import {bool, number, shape, string} from 'prop-types'
 import {AssignmentGroup} from './AssignmentGroup'
+import {AssignmentOverride} from './AssignmentOverride'
 
 export const Assignment = {
   fragment: gql`
@@ -28,9 +29,9 @@ export const Assignment = {
       postToSis
       pointsPossible
       gradingType
-      unlockAt
-      dueAt
-      lockAt
+      dueAt(applyOverrides: false)
+      unlockAt(applyOverrides: false)
+      lockAt(applyOverrides: false)
       gradingStandard {
         id
         _id
@@ -46,8 +47,14 @@ export const Assignment = {
       assignmentGroup {
         ...AssignmentGroup
       }
+      assignmentOverrides {
+        nodes {
+          ...AssignmentOverride
+        }
+      }
     }
     ${AssignmentGroup.fragment}
+    ${AssignmentOverride.fragment}
   `,
 
   shape: shape({
@@ -61,6 +68,15 @@ export const Assignment = {
     unlockAt: string,
     dueAt: string,
     lockAt: string,
+    peerReviews: shape({
+      anonymousReviews: bool,
+      automaticReviews: bool,
+      count: number,
+      dueAt: string,
+      enabled: bool,
+      intraReviews: bool,
+    }),
+    assignmentOverrides: AssignmentOverride.shape(),
   }),
 
   mock: ({
@@ -74,6 +90,8 @@ export const Assignment = {
     unlockAt = null,
     dueAt = null,
     lockAt = null,
+    peerReviews = null,
+    assignmentOverrides = null,
   } = {}) => ({
     id,
     _id,
@@ -85,6 +103,8 @@ export const Assignment = {
     unlockAt,
     dueAt,
     lockAt,
+    peerReviews,
+    assignmentOverrides,
     __typename: 'Assignment',
   }),
 }

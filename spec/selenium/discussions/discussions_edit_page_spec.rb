@@ -590,7 +590,11 @@ describe "discussions" do
             assignment: discussion_assignment,
           }
 
+          discussion_due_date = 5.days.from_now
+
+          course_section = course.course_sections.create!(name: "section alpha")
           graded_discussion = course.discussion_topics.create!(all_graded_discussion_options)
+          graded_discussion.assignment.assignment_overrides.create!(set_type: "CourseSection", set_id: course_section.id, due_at: discussion_due_date)
 
           get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/edit"
           # Grading scheme sub menu is selected
@@ -616,7 +620,9 @@ describe "discussions" do
           # makes an exact comparison too fragile.
           expect(ff("input[placeholder='Select Date']")[0].attribute("value")).not_to be_empty
 
-          # Add additional tests for overrides and due dates when completed
+          expect(f("span[data-testid='assign-to-select-span']").present?).to be_truthy
+          expect(fj("span:contains('#{course_section.name}')").present?).to be_truthy
+          expect(f("input[placeholder='Select Assignment Due Date']").attribute("value")).to eq format_date_for_view(discussion_due_date, :long)
         end
 
         it "allows editing the assignment group for the graded discussion" do

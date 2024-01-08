@@ -44,13 +44,16 @@ import {
   defaultEveryoneElseOption,
   masteryPathsOption,
 } from '../../util/constants'
-import {nanoid} from 'nanoid'
 import {AttachmentDisplay} from '@canvas/discussions/react/components/AttachmentDisplay/AttachmentDisplay'
 import {responsiveQuerySizes} from '@canvas/discussions/react/utils'
 import {UsageRightsContainer} from '../../containers/usageRights/UsageRightsContainer'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 
-import {addNewGroupCategoryToCache} from '../../util/utils'
+import {
+  addNewGroupCategoryToCache,
+  buildAssignmentOverrides,
+  buildDefaultAssignmentOverride,
+} from '../../util/utils'
 
 const I18n = useI18nScope('discussion_create')
 
@@ -184,15 +187,11 @@ export default function DiscussionTopicForm({
     currentDiscussionTopic?.assignment?.peerReviews?.dueAt || ''
   )
   const [dueDateErrorMessages, setDueDateErrorMessages] = useState([])
-  const [assignedInfoList, setAssignedInfoList] = useState([
-    {
-      dueDateId: nanoid(),
-      assignedList: [defaultEveryoneOption.assetCode],
-      dueDate: '',
-      availableFrom: '',
-      availableUntil: '',
-    },
-  ]) // Initialize with one object with a unique id
+  const [assignedInfoList, setAssignedInfoList] = useState(
+    isEditing
+      ? buildAssignmentOverrides(currentDiscussionTopic?.assignment)
+      : buildDefaultAssignmentOverride()
+  )
 
   const assignmentDueDateContext = {
     assignedInfoList,
