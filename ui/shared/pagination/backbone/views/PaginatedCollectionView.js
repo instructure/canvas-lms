@@ -55,9 +55,10 @@ PaginatedCollectionView.prototype.defaults = {
 }
 
 // Adds a loading indicator element
-PaginatedCollectionView.prototype.els = _.extend({}, CollectionView.prototype.els, {
+PaginatedCollectionView.prototype.els = {
+  ...CollectionView.prototype.els,
   '.paginatedLoadingIndicator': '$loadingIndicator',
-})
+}
 
 PaginatedCollectionView.optionProperty('scrollableElement')
 
