@@ -131,6 +131,15 @@ test('onFocus calls options.onFocus if exists', function () {
   ok(options.onFocus.calledWith(editor))
 })
 
+test('establishParentNode escapes targetId to prevent xss', () => {
+  const $target = fixtures.create(
+    '<div class="reply-textarea" id="x\'><img src=x onerror=\'alert(`${document.domain}:${document.cookie}`)\' />">XSS</div>' // eslint-disable-line no-template-curly-in-string
+  )
+  RichContentEditor.loadNewEditor($target, {manageParent: true})
+  const successfulXSSImg = $('img')
+  equal(successfulXSSImg.length, 0)
+})
+
 QUnit.module('RichContentEditor - callOnRCE', {
   setup() {
     fakeENV.setup()
