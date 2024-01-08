@@ -544,7 +544,7 @@ module Lti
                        -> { Lti::Asset.opaque_identifier_for(@context) },
                        default_name: "context_id"
 
-    # The Canvas global identifer for the launch context
+    # The Canvas global identifier for the launch context
     # @example
     #   ```
     #   10000000000070
@@ -552,6 +552,16 @@ module Lti
     register_expansion "com.instructure.Context.globalId",
                        [],
                        -> { @context&.global_id }
+
+    # The Canvas UUID for the launch context
+    # @example
+    #   ```
+    #   4TVeERS266frWLG5RVK0L8BbSC831mUZHaYpK4KP
+    #   ```
+    register_expansion "com.instructure.Context.uuid",
+                       [],
+                       -> { @context.uuid },
+                       -> { @context&.respond_to?(:uuid) }
 
     # If the context is a Course, returns sourced Id of the context
     # @example

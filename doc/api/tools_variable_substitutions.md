@@ -385,13 +385,22 @@ an opaque identifier that uniquely identifies the context of the tool launch.
 "cdca1fe2c392a208bd8a657f8865ddb9ca359534"
 ```
 ## com.instructure.Context.globalId
-The Canvas global identifer for the launch context.
+The Canvas global identifier for the launch context.
 
 **Availability**: *always*  
 
 
 ```
 10000000000070
+```
+## com.instructure.Context.uuid
+The Canvas UUID for the launch context.
+
+**Availability**: *always*  
+
+
+```
+4TVeERS266frWLG5RVK0L8BbSC831mUZHaYpK4KP
 ```
 ## Context.sourcedId [duplicates Person.sourcedId]
 If the context is a Course, returns sourced Id of the context.
