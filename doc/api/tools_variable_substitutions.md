@@ -257,6 +257,10 @@ Returns true if the user is launching from student view.
 **Availability**: *always*  
 **Launch Parameter**: *com_instructure_user_student_view*  
 
+```
+"true"
+"false"
+```
 ## com.instructure.Observee.sisIds
 returns all observee ids linked to this observer as an String separated by `,`.
 
