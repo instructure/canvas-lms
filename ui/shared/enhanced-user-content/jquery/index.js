@@ -19,7 +19,7 @@ import {isolate} from '@canvas/sentry'
 import KeyboardNavDialog from '@canvas/keyboard-nav-dialog'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import _ from 'underscore'
+import {uniqueId} from 'lodash'
 import htmlEscape from '@instructure/html-escape'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
@@ -371,7 +371,7 @@ function addDiscussionTopicEntryWhenClicked() {
       .clone(true)
       .removeClass('blank')
     $reply.before($response.show())
-    const id = _.uniqueId('textarea_')
+    const id = uniqueId('textarea_')
     $response.find('textarea.rich_text').attr('id', id)
     $(document).triggerHandler('richTextStart', $('#' + id))
     $response.find('textarea:first').focus().select()
