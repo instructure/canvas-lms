@@ -31,9 +31,6 @@ import {
   ConversationContext,
   CONVERSATION_ID_WHERE_CAN_REPLY_IS_FALSE,
 } from '../../../../util/constants'
-import {enableFetchMocks} from 'jest-fetch-mock'
-
-enableFetchMocks()
 
 jest.mock('../../../../util/utils', () => ({
   ...jest.requireActual('../../../../util/utils'),
@@ -42,8 +39,6 @@ jest.mock('../../../../util/utils', () => ({
 describe('MessageDetailContainer', () => {
   const server = mswServer(handlers)
   beforeAll(() => {
-    // eslint-disable-next-line no-undef
-    fetchMock.dontMock()
     server.listen()
 
     window.matchMedia = jest.fn().mockImplementation(() => {
@@ -67,8 +62,6 @@ describe('MessageDetailContainer', () => {
 
   afterAll(() => {
     server.close()
-    // eslint-disable-next-line no-undef
-    fetchMock.enableMocks()
   })
 
   const setup = ({
