@@ -156,11 +156,6 @@ module.exports = {
   parallelism: 5,
 
   resolve: {
-    alias: {
-      // TODO: replace our underscore usage with lodash
-      underscore$: resolve(canvasDir, 'ui/shims/underscore.js'),
-    },
-
     fallback: {
       // Called for by minimatch but as we use it, minimatch  can work without it
       path: false,
