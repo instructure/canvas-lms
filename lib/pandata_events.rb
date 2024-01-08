@@ -71,12 +71,23 @@ module PandataEvents
       properties: data
     }
 
-    CanvasHttp.post(
+    res = CanvasHttp.post(
       endpoint,
       { Authorization: "Bearer #{auth_token}" },
       content_type: "application/json",
       body: event_data.to_json
     )
+
+    case res
+    when Net::HTTPSuccess
+      true
+    else
+      InstStatsd::Statsd.increment("pandata_events.error.http_failure", tags: { event_type:, status_code: res.code })
+      false
+    end
+  rescue CanvasHttp::Error
+    InstStatsd::Statsd.increment("pandata_events.error", tags: { event_type: })
+    false
   end
   private_class_method :post_event
 end
