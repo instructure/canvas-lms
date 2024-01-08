@@ -204,10 +204,11 @@ describe PandataEvents do
       subject
       expect(CanvasHttp).to have_received(:post) do |_, _, options|
         body = JSON.parse(options[:body]).with_indifferent_access
-        expect(body[:timestamp]).to be_present
-        expect(body[:eventType]).to eq(event_type)
-        expect(body[:appTag]).to eq(credentials[:canvas_key])
-        expect(body[:properties].with_indifferent_access).to eq(data)
+        event = body[:events].first
+        expect(event[:timestamp]).to be_present
+        expect(event[:eventType]).to eq(event_type)
+        expect(event[:appTag]).to eq(credentials[:canvas_key])
+        expect(event[:properties].with_indifferent_access).to eq(data)
       end
     end
 
