@@ -1011,22 +1011,51 @@ describe "discussions" do
         expect(fj("body:contains('Groups can only be part of the actively selected group set.')")).to be_present
       end
 
-      it "Post to section validation works correctly" do
-        get "/courses/#{course.id}/discussion_topics/new"
+      context "discussion form validations" do
+        it "Post to section validation works correctly" do
+          get "/courses/#{course.id}/discussion_topics/new"
 
-        # Add a title, so that we know that the empty post to field is causing it to not submit
-        title = "Graded Discussion Topic with Peer Reviews"
-        f("input[placeholder='Topic Title']").send_keys title
+          # Add a title, so that we know that the empty post to field is causing it to not submit
+          title = "Graded Discussion Topic with Peer Reviews"
+          f("input[placeholder='Topic Title']").send_keys title
 
-        fj("button:contains('All Sections')").click
-        # Verify that the error message "A section is required" appears
-        expect(fj("body:contains('A section is required')")).to be_present
+          fj("button:contains('All Sections')").click
+          # Verify that the error message "A section is required" appears
+          expect(fj("body:contains('A section is required')")).to be_present
 
-        # Verify that you can not submit the form
-        f("button[data-testid='save-and-publish-button']").click
-        wait_for_ajaximations
-        # Verify that no redirect happened
-        expect(driver.current_url).to end_with("/courses/#{course.id}/discussion_topics/new")
+          # Verify that you can not submit the form
+          f("button[data-testid='save-and-publish-button']").click
+          wait_for_ajaximations
+          # Verify that no redirect happened
+          expect(driver.current_url).to end_with("/courses/#{course.id}/discussion_topics/new")
+        end
+
+        it "Due Date validations work" do
+          get "/courses/#{course.id}/discussion_topics/new"
+
+          # Add a title, so that we know that the empty post to field is causing it to not submit
+          title = "Graded Discussion Topic with due date"
+          f("input[placeholder='Topic Title']").send_keys title
+
+          force_click('input[type=checkbox][value="graded"]')
+
+          due_at_input = ff("input[placeholder='Select Date']")[0]
+          available_from_input = ff("input[placeholder='Select Date']")[1]
+          available_until_input = ff("input[placeholder='Select Date']")[2]
+
+          set_datetime_input(due_at_input, format_date_for_view(10.days.from_now))
+          set_datetime_input(available_from_input, format_date_for_view(5.days.from_now))
+          set_datetime_input(available_until_input, format_date_for_view(5.days.ago))
+
+          expect(fj("span:contains('Due date must not be after the Available Until date.')")).to be_present
+          expect(ffj("span:contains('Unlock date cannot be after lock date')").count).not_to be 0
+
+          # Verify that you can not submit the form
+          f("button[data-testid='save-and-publish-button']").click
+          wait_for_ajaximations
+          # Verify that no redirect happened
+          expect(driver.current_url).to end_with("/courses/#{course.id}/discussion_topics/new")
+        end
       end
 
       context "assignment overrides" do
