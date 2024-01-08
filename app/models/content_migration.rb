@@ -22,7 +22,7 @@ class ContentMigration < ActiveRecord::Base
   include Workflow
   include HtmlTextHelper
   include Rails.application.routes.url_helpers
-  include OutcomesServiceAlignmentsHelper
+  include CanvasOutcomesHelper
 
   belongs_to :context, polymorphic: [:course, :account, :group, { context_user: "User" }]
   validate :valid_date_shift_options
@@ -773,7 +773,7 @@ class ContentMigration < ActiveRecord::Base
         elsif content_is_outcome && outcome_has_results?(outcome, context)
           Rails.logger.debug { "skipping deletion sync for #{content.asset_string} due to there are Learning Outcomes Results" }
           add_skipped_item(child_tag)
-        elsif content_is_outcome && !can_unlink?(link)
+        elsif content_is_outcome && outcome_has_active_alignments?(link, outcome, context)
           Rails.logger.debug { "skipping deletion sync for #{content.asset_string} due to there are active Alignments to Content" }
           add_skipped_item(child_tag)
         else
@@ -797,6 +797,10 @@ class ContentMigration < ActiveRecord::Base
       outcome = LearningOutcome.find_by(id: content.content_id, context_type: "Account")
     end
     [outcome, link]
+  end
+
+  def outcome_has_active_alignments?(link, outcome, context)
+    !link.can_destroy? || outcome_has_alignments?(outcome, context)
   end
 
   def outcome_has_results?(outcome, context)
