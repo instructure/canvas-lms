@@ -28,9 +28,6 @@ import {mswServer} from '../../../../../shared/msw/mswServer'
 import React from 'react'
 import {responsiveQuerySizes} from '../../../util/utils'
 import {ConversationContext} from '../../../util/constants'
-import {enableFetchMocks} from 'jest-fetch-mock'
-
-enableFetchMocks()
 
 jest.mock('../../../util/utils', () => ({
   ...jest.requireActual('../../../util/utils'),
@@ -40,8 +37,6 @@ jest.mock('../../../util/utils', () => ({
 describe('ComposeModalContainer', () => {
   const server = mswServer(handlers)
   beforeAll(() => {
-    // eslint-disable-next-line no-undef
-    fetchMock.dontMock()
     server.listen()
 
     // Add appropriate mocks for responsive
@@ -67,8 +62,6 @@ describe('ComposeModalContainer', () => {
 
   afterAll(() => {
     server.close()
-    // eslint-disable-next-line no-undef
-    fetchMock.enableMocks()
   })
 
   beforeEach(() => {

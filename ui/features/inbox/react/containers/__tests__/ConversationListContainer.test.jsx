@@ -25,9 +25,6 @@ import React from 'react'
 import {render, fireEvent, waitFor, screen} from '@testing-library/react'
 import waitForApolloLoading from '../../../util/waitForApolloLoading'
 import {responsiveQuerySizes} from '../../../util/utils'
-import {enableFetchMocks} from 'jest-fetch-mock'
-
-enableFetchMocks()
 
 jest.mock('../../../util/utils', () => ({
   ...jest.requireActual('../../../util/utils'),
@@ -57,8 +54,6 @@ describe('ConversationListContainer', () => {
   }
 
   beforeAll(() => {
-    // eslint-disable-next-line no-undef
-    fetchMock.dontMock()
     server.listen()
 
     // Add appropriate mocks for responsive
@@ -84,8 +79,6 @@ describe('ConversationListContainer', () => {
 
   afterAll(() => {
     server.close()
-    // eslint-disable-next-line no-undef
-    fetchMock.enableMocks()
   })
 
   beforeEach(() => {
