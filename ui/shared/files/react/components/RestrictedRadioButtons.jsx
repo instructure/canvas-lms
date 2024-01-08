@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'underscore'
 import React from 'react'
 import PropTypes from 'prop-types'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -145,9 +144,7 @@ class RestrictedRadioButtons extends React.Component {
     }
   }
 
-  isPermissionChecked = option =>
-    this.state.selectedOption === option.selectedOptionKey ||
-    _.includes(option.selectedOptionKey, this.state.selectedOption)
+  isPermissionChecked = option => this.state.selectedOption === option.selectedOptionKey
 
   renderPermissionOptions = () => (
     <div>
