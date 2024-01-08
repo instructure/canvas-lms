@@ -470,6 +470,38 @@ module Lti
         end
       end
 
+      describe "with 'com.instructure.Context.uuid'" do
+        let(:exp_hash) { { test: "$com.instructure.Context.uuid" } }
+
+        context "when the launch context is present" do
+          let(:course) { course_model }
+          let(:variable_expander_opts) { super().merge(context: course) }
+
+          it "yields the UUID of the context" do
+            variable_expander.expand_variables!(exp_hash)
+            expect(exp_hash[:test]).to eq course.uuid
+          end
+        end
+
+        context "when the launch context does not respond to 'uuid'" do
+          let(:variable_expander_opts) { super().merge(context: assignment_model) }
+
+          it "does not do the expansion" do
+            variable_expander.expand_variables!(exp_hash)
+            expect(exp_hash[:test]).to eq "$com.instructure.Context.uuid"
+          end
+        end
+
+        context "when the launch context is nil" do
+          let(:variable_expander_opts) { super().merge(context: nil) }
+
+          it "does not do the expansion" do
+            variable_expander.expand_variables!(exp_hash)
+            expect(exp_hash[:test]).to eq "$com.instructure.Context.uuid"
+          end
+        end
+      end
+
       context "$com.instructure.Assignment.restrict_quantitative_data" do
         let(:exp_hash) { { test: "$com.instructure.Assignment.restrict_quantitative_data" } }
 
