@@ -26,7 +26,7 @@ export default {
 
       // I don't know why, but when the hexcode was in the body, it failed to
       // work from selenium
-      const url = `/api/v1/users/${userId}/colors/${contextCode}?hexcode=${hexcode}`
+      const url = `${window.location.origin}/api/v1/users/${userId}/colors/${contextCode}?hexcode=${hexcode}`
       fetch(url, {
         method: 'PUT',
         ...defaultFetchOptions,

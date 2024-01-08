@@ -102,4 +102,9 @@ module.exports = {
       },
     ],
   },
+
+  testEnvironmentOptions: {
+    // https://github.com/mswjs/examples/blob/main/examples/with-jest/jest.config.ts#L20
+    customExportConditions: [''],
+  },
 }

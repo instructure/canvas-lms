@@ -37,7 +37,7 @@ jest.mock('../../../util/utils', () => ({
 describe('ConversationListContainer', () => {
   const server = mswServer(handlers)
   const getConversationsQuery = (scope, course) => {
-    return handlers[0].resolver(
+    const response = handlers[0].resolver(
       {
         variables: {
           scope,
@@ -53,6 +53,7 @@ describe('ConversationListContainer', () => {
         },
       }
     )
+    return JSON.parse(response.body.toString())
   }
 
   beforeAll(() => {
@@ -115,11 +116,13 @@ describe('ConversationListContainer', () => {
 
     it('should change list of conversations when scope changes', async () => {
       const component = setup()
+
       expect(await component.findByText('This is an inbox conversation')).toBeInTheDocument()
 
       // Change scope
       const scope = 'sent'
-      const conversationsQuery = {data: getConversationsQuery(scope).data, loading: false}
+      const data = getConversationsQuery(scope).data
+      const conversationsQuery = {data, loading: false}
       const submissionCommentsQuery = {data: null, loading: false}
 
       component.rerender(

@@ -105,12 +105,6 @@ describe('MessageDetailContainer', () => {
   describe('conversation messages', () => {
     const mockConversation = Conversation.mock()
     describe('rendering', () => {
-      it('should render', () => {
-        const container = setup()
-        expect(container).toBeTruthy()
-        expect(container.queryByTestId('submission-comment-header-line')).toBeNull()
-      })
-
       it('should not render the reply or reply_all option in header if student lacks permission', async () => {
         const container = setup({
           conversation: {...Conversation.mock({_id: CONVERSATION_ID_WHERE_CAN_REPLY_IS_FALSE})},
@@ -209,14 +203,6 @@ describe('MessageDetailContainer', () => {
   describe('submission comments', () => {
     const mockSubmissionComment = {subject: 'mySubject', _id: '1', workflowState: 'unread'}
     describe('rendering', () => {
-      it('should render', () => {
-        const container = setup({
-          isSubmissionCommentsType: true,
-          conversation: mockSubmissionComment,
-        })
-        expect(container).toBeTruthy()
-      })
-
       it('should render conversation information correctly', async () => {
         const container = setup({
           isSubmissionCommentsType: true,
