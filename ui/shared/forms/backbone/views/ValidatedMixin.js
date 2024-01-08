@@ -19,7 +19,7 @@
 /* eslint-disable no-void */
 
 import $ from 'jquery'
-import _ from 'underscore'
+import {without} from 'lodash'
 import htmlEscape, {raw} from '@instructure/html-escape'
 import '@canvas/jquery/jquery.toJSON'
 import '@canvas/jquery/jquery.disableWhileLoading'
@@ -161,6 +161,6 @@ export default {
   getExistingDescriptionIds($input, id) {
     const descriptionIds = $input.attr('aria-describedby')
     const idArray = descriptionIds ? descriptionIds.split(' ') : []
-    return _.without(idArray, id + '_sr_description')
+    return without(idArray, id + '_sr_description')
   },
 }
