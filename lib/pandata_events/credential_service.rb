@@ -59,10 +59,12 @@ module PandataEvents
       Canvas::Security.create_jwt(body, expires_at, private_key, alg)
     end
 
-    def auth_token(sub, expires_at: nil)
-      cache_key = "pandata_events:auth_token:#{app_key}:#{sub}"
-      cached_token = Canvas.redis.get(cache_key)
-      return cached_token if cached_token
+    def auth_token(sub, expires_at: nil, cache: true)
+      if cache
+        cache_key = "pandata_events:auth_token:#{app_key}:#{sub}"
+        cached_token = Canvas.redis.get(cache_key)
+        return cached_token if cached_token
+      end
 
       auth_body = {
         iss: app_key,
@@ -73,7 +75,10 @@ module PandataEvents
       # these tokens should always expire, so don't allow nil here
       expires_at ||= 1.day.from_now
       auth_token = token(auth_body, expires_at:)
-      Canvas.redis.setex(cache_key, expires_at - 1.minute, auth_token)
+
+      if cache
+        Canvas.redis.setex(cache_key, expires_at - 1.minute, auth_token)
+      end
 
       auth_token
     end
