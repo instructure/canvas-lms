@@ -17,7 +17,7 @@
  */
 
 import {extend} from '@canvas/backbone/utils'
-import _ from 'underscore'
+import {has} from 'lodash'
 import {Model} from '@canvas/backbone'
 import DefaultUrlMixin from '@canvas/backbone/DefaultUrlMixin'
 
@@ -31,7 +31,7 @@ ExternalTool.mixin(DefaultUrlMixin)
 
 ExternalTool.prototype.initialize = function () {
   ExternalTool.__super__.initialize.apply(this, arguments)
-  if (_.has(this, 'url')) {
+  if (has(this, 'url')) {
     return delete this.url
   }
 }
