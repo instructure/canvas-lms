@@ -20,7 +20,6 @@
 
 import {extend} from '@canvas/backbone/utils'
 import $ from 'jquery'
-import _ from 'underscore'
 import CollectionView from '@canvas/backbone-collection-view'
 import template from '../../jst/paginatedCollection.handlebars'
 
