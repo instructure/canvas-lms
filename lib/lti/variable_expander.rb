@@ -319,8 +319,8 @@ module Lti
     #
     # @example
     #   ```
-    #  "true"
-    #  "false"
+    #   "true"
+    #   "false"
     #   ```
     register_expansion "com.instructure.User.student_view",
                        [],
