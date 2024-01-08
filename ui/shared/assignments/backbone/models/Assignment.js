@@ -21,7 +21,7 @@
 import {extend} from '@canvas/backbone/utils'
 import $ from 'jquery'
 import _ from 'underscore'
-import {map} from 'lodash'
+import {map, find, filter, some} from 'lodash'
 import {Model} from '@canvas/backbone'
 import DefaultUrlMixin from '@canvas/backbone/DefaultUrlMixin'
 import TurnitinSettings from '../../TurnitinSettings'
@@ -514,7 +514,7 @@ Assignment.prototype.selectedSubmissionTypeToolId = function () {
   const tool_id = (ref = this.get('external_tool_tag_attributes')) != null ? ref.content_id : void 0
   if (
     tool_id &&
-    _.find(this.submissionTypeSelectionTools(), function (tool) {
+    find(this.submissionTypeSelectionTools(), function (tool) {
       return tool_id === tool.id
     })
   ) {
@@ -589,7 +589,7 @@ Assignment.prototype.acceptsOnlineTextEntries = function () {
 }
 
 Assignment.prototype.isOnlineSubmission = function () {
-  return _.some(this._submissionTypes(), function (thing) {
+  return (this._submissionTypes() || []).some(function (thing) {
     return (
       thing === 'online' ||
       thing === 'online_text_entry' ||
@@ -1063,14 +1063,9 @@ Assignment.prototype.nonBaseDates = function () {
   if (!dateGroups) {
     return false
   }
-  const withouBase = _.filter(
-    dateGroups.models,
-    (function (_this) {
-      return function (dateGroup) {
-        return dateGroup && !dateGroup.get('base')
-      }
-    })(this)
-  )
+  const withouBase = filter(dateGroups.models, function (dateGroup) {
+    return dateGroup && !dateGroup.get('base')
+  })
   return withouBase.length > 0
 }
 
@@ -1317,13 +1312,8 @@ Assignment.prototype.inGradingPeriod = function (gradingPeriod) {
   const dateGroups = this.get('all_dates')
   const gradingPeriodsHelper = new GradingPeriodsHelper(gradingPeriod)
   if (dateGroups) {
-    return _.some(
-      dateGroups.models,
-      (function (_this) {
-        return function (dateGroup) {
-          return gradingPeriodsHelper.isDateInGradingPeriod(dateGroup.dueAt(), gradingPeriod.id)
-        }
-      })(this)
+    return some(dateGroups.models, dateGroup =>
+      gradingPeriodsHelper.isDateInGradingPeriod(dateGroup.dueAt(), gradingPeriod.id)
     )
   } else {
     return gradingPeriodsHelper.isDateInGradingPeriod(tz.parse(this.dueAt()), gradingPeriod.id)
