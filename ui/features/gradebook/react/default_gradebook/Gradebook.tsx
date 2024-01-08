@@ -19,19 +19,19 @@
 import $ from 'jquery'
 import type JQuery from 'jquery'
 import deferPromise from '@instructure/defer-promise'
-import _ from '@instructure/lodash-underscore'
 import {
-  intersection,
-  isEqual,
-  some,
-  reject,
-  keyBy,
-  flatten,
   each,
   every,
   filter,
+  flatten,
+  intersection,
+  isEqual,
+  keyBy,
   map,
   pick,
+  reduce,
+  reject,
+  some,
 } from 'lodash'
 import * as tz from '@canvas/datetime'
 import React, {Suspense} from 'react'
@@ -3103,7 +3103,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   // Filtered Content Information Methods
   updateFilteredContentInfo = () => {
     let invalidAssignmentGroups: AssignmentGroup[]
-    this.filteredContentInfo.totalPointsPossible = _.reduce(
+    this.filteredContentInfo.totalPointsPossible = reduce(
       this.assignmentGroups,
       (sum: number, assignmentGroup: AssignmentGroup) =>
         sum + getAssignmentGroupPointsPossible(assignmentGroup),
