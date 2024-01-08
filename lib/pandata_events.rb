@@ -75,7 +75,7 @@ module PandataEvents
       endpoint,
       { Authorization: "Bearer #{auth_token}" },
       content_type: "application/json",
-      body: event_data.to_json
+      body: { events: [event_data] }.to_json
     )
 
     case res
