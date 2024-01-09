@@ -673,9 +673,11 @@ nn:
         invalid_settings: "ugyldige Turnitin-innstillingar, kontroller konto-ID-en og delt hemmelegheit frå Turnitin"
         setings_confirmed: "Turnitin-innstillingar er stadfesta."
     siteadmin: Områdeadministrator
+    suppress_notifications_warning: "Du har 'Ikkje opprett eller send varslar' avkryssa, er du sikker på at du vil fortsette?"
     titles: 
       configure_report: "Konfigurer rapport"
       open_registration_delegated_warning_dialog: "Ein ekstern  identitetsleverandør er aktivert"
+      rqd_help: "Begrens kvantitativ data"
       what_are_quiz_ip_filters: "Kva er IP-filter for quizar?"
     user: Brukar
   account_settings_fe083453: Kontoinnstillingar
@@ -3452,9 +3454,12 @@ nn:
   arabic_c5c87acd: Arabisk
   arc_a935e585: ARC
   archive_3f794d7e: Arkiv
+  archive_grading_scheme_cbbf4264: "Arkiv Vurderingsskjema"
   archive_operation_failed_5504706: "Arkivoperasjon mislukkast"
+  archive_outcomes_20b869b6: "Arkiv Læringsmål"
   archive_selected_d64506ca: "Arkiv er valt"
   archived_de543437: Arkivert
+  archived_grading_schemes_6d698d0: "Arkiverte vurderingsskjemaer"
   are_you_sure_26795d3c: "Er du sikker?"
   are_you_sure_that_you_want_to_remove_these_count_o_67ef2d6c: 
     one: "Er du sikker på at du vil fjerne dette læringsmålet frå denne kontoen?"
@@ -3482,6 +3487,7 @@ nn:
   are_you_sure_you_want_to_delete_this_announcement_293d51a8: "Er du sikker på at du vil slette kunngjeringa?"
   are_you_sure_you_want_to_delete_this_assignment_88be6f5e: "Er du sikker på at du vil slette denne oppgåva?"
   are_you_sure_you_want_to_delete_this_comment_4ee386d: "Er du sikker på at du vil slette denne kommentaren?"
+  are_you_sure_you_want_to_delete_this_custom_status_487882ee: "Er du sikker på at du vil slette denne tilpassa statusen? Denne handlinga kan ikkje angrast. Alle innsendingar og poeng som for øyeblikket er merket med denne tilpassa statusen, vil få statusen fjerna."
   are_you_sure_you_want_to_delete_this_developer_key_9937481a: "Er du sikker på at du vil slette denne utviklarnøkkelen?"
   are_you_sure_you_want_to_delete_this_developer_key_ce246033: "Er du sikker på at du vil slette utviklarnøkkelen? Handlinga vil også slette andre verktøy som er forbundet med utviklarnøkkelen i denne konteksten."
   are_you_sure_you_want_to_delete_this_discussion_334554e0: "Er du sikker på at du vil slette denne diskusjonen?"
@@ -3497,7 +3503,9 @@ nn:
   are_you_sure_you_want_to_delete_this_recording_a4aab14b: "Er du sikker på at du vil slette innspelinga?"
   are_you_sure_you_want_to_delete_this_rubric_any_co_29d7ac76: "Er du sikker på at du vil slette vurderingsskjemaet? Alle emne som er tilknytte vurderingsskjemaet har framleis tilgang, men ingen nye emne kan bruke det."
   are_you_sure_you_want_to_delete_this_rubric_this_a_d4ff43c7: "Er du sikker på at du vil slette dette vurderingsskjemaet? Handlinga vil fjerne koblinga vurderingsskjemaet har til alle oppgåver i emnet og slette eksisteranda innleveringar som er knytte til skjemaet. "
+  are_you_sure_you_want_to_delete_this_setting_be350e82: "Er du sikker på at du vil slette denne innstillinga?"
   are_you_sure_you_want_to_delete_this_to_do_item_497016ea: "Er du sikker på at du vil slette dette gjeremålet?"
+  are_you_sure_you_want_to_delete_this_topic_403a0f40: "Er du sikker på at du vil slette dette temaet?"
   are_you_sure_you_want_to_delete_this_topic_c0466e91: "Er du sikker på at du vil slette dette emnet"
   are_you_sure_you_want_to_delete_this_track_f5a16357: "Er du sikker på at vil slette dette sporet?"
   are_you_sure_you_want_to_delete_your_copy_of_these_f04442ed: 
@@ -3516,8 +3524,10 @@ nn:
   are_you_sure_you_want_to_remove_this_item_7887ce31: "Er du sikker på at du vil fjerne dette elementet? "
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "Er du sikker på at du vil fjerne verktøyet?"
   are_you_sure_you_want_to_remove_this_user_8d1a8295: "Er du sikker på at du vil fjerne denne brukaren?"
+  are_you_sure_you_want_to_remove_this_user_from_all_85fb8eb4: "Er du sikker på at du vil fjerne denne brukeren fra ALLE kontoar? Brukeren vil ikkje berre bli sletta, men vil også bli merka for PERMANENT sletting."
   are_you_sure_you_want_to_remove_this_user_s_profil_6d703c4: "Er du sikker på at du vil fjerne brukaren sitt profilbilde?"
   are_you_sure_you_want_to_report_this_profile_pictu_e22c2210: "Er du sikker på at du vil rapportere profilbilde?"
+  are_you_sure_you_want_to_restore_this_revision_2f3aaabe: "Er du sikker på at du vil gjenopprette denne revisjonen?"
   are_you_sure_you_want_to_resync_these_grades_to_th_e509cb9e: "Er du sikker på at du vil synkronisere vurderingane til studentinformasjonssystemet på nytt?"
   are_you_sure_you_want_to_stop_observing_name_b040e7ab: "Er du sikker på at du vil slutte å observera %{name}?"
   are_you_sure_you_want_to_submit_this_comment_fbe76ba6: "Er du sikker på at du vil sende denne kommentaren?"
@@ -3528,6 +3538,7 @@ nn:
   are_you_sure_you_want_to_unarchive_your_copy_of_th_c961b520: 
     one: "Er du sikker på at du vil fjerne arkivering av denne meldinga?"
     other: "Er du sikker på at du vil fjerne arkivering av desse meldingane?"
+  are_you_sure_you_want_to_unblock_all_stuck_jobs_in_14cb7185: "Er du sikker på at du vil fjerne blokkeringa for alle fastlåste jobbar i denne jobbsamlinga?"
   are_you_sure_you_want_to_unenroll_in_this_subject__30f60c48: "Er du sikker på at du vil melde deg av dette emnet? Du vil ikkje lenger kunne sjå emnelista eller kommunisere direkte med faglærarane, og heller ikkje sjå emnehendingar i straumen eller som meldingar."
   argentina_3257a200: Argentina
   argentina_54_375d6af4: "Argentina (+54)"
@@ -3548,9 +3559,11 @@ nn:
   ask_your_instructor_a_question_a61ca5e9: "Spør faglærar eit spørsmål"
   assess_and_survey_your_students_ce8172a9: "Vurder og kartlegg studentane dine"
   assess_student_understanding_1e0b8d7f: "Vurder studentane si forståing"
+  assessable_artifacts_include_assignments_quizzes_a_62b9698b: "Vurderbare element inkluderar oppgåver, quiz og vurderte diskusjonar."
   assessment_audit_d4a76709: Vurderingslogg
   assessment_audit_events_for_creatorname_56e84e8: "Vurderingslogghendingar for %{creatorName}"
   assessment_audit_tray_5dd11721: "Meny for vurderingslogg"
+  assessment_by_assessor_893a0a2e: "Vurdering av %{assessor}"
   assessment_by_name_7b879a2c: "Vurdert av %{name}"
   assessment_data_887d0e76: Vurderingsdata
   assessment_failed_to_load_ad238b36: "Oppgåve lastar ikkje"
@@ -3565,12 +3578,19 @@ nn:
     default_imported_title: "Importerte spørsmål"
     default_title: "Utan namn – %{course}"
     default_unfiled_title: "Ikkje arkiverte"
+  assessment_question_bank_4c6026e: Vurderingsspørsmålsbank
   assessment_question_id_4eacadb3: "ID for vurderingsspørsmål"
   assessment_title_7ab69b66: vurderingstittel
   assessment_type_81a73b9c: vurderingstype
   asset_string_ddeaf719: Streng
   assign_eedf72bb: Tilordne
+  assign_manually_1785dcfc: "Tildel manuelt"
   assign_reviews_on_date_7e48ec50: "Tilordne gjennomgangar etter dato"
+  assign_temporary_enrollments_bdaaa58a: "Tildel midlertidige påmeldingar"
+  assign_temporary_enrollments_to_recipient_b25cb6be: "Tildel midlertidige påmeldingar til %{recipient}"
+  assign_this_assignment_ac3ca379: "Tildel denne oppgåva"
+  assign_this_module_a4685e57: "Tildel denne modulen"
+  assign_this_quiz_e7d789f: "Tildel denne quizen"
   assign_to_6b806cd9: "Tilordne til: "
   assign_to_95404a83: "Tilordne til"
   assign_to_c46e21: "Tilordne til"
@@ -6517,6 +6537,8 @@ nn:
       folder_picker: 
         default_select_folder: "Vel mappe"
         upload_to: "Last opp til"
+      import_blueprint_settings: 
+        checkbox_label: "Importér innstillingar for blåkopiemne"
       import_quizzes_next_view: 
         import_new_quizzes: "Importer eksisterande quizar som *New Quizzes*"
         import_new_quizzes_help_text: "\"Ny Quizzes\" er det nye testverktøyet i Canvas. %{p_p} For å lære meir kan du kontakte system-administrator eller besøke "
@@ -6726,6 +6748,7 @@ nn:
         restore_items: "Hugs at nokre av elementa kan ha mista dei tilknytte dataa då dei blei sletta. Pass på å stadfeste resultata av gjenopprettingane dine."
       restore_failed: "gjenoppretting muslukkast"
       restoring: gjenopprettar...
+  context_cannot_be_blank_e0124d79: "Konteksten kan ikkje vere tom"
   context_contextname_24d82846: "(%{context}: %{contextName})"
   context_external_tool: 
     url_or_domain_no_valid: "Ukorrekt url for %{url}"
@@ -6955,6 +6978,7 @@ nn:
   continue_draft_6166ea79: "Fortset med utkast"
   continue_typing_to_find_additional_sections_or_stu_49786085: "Hald fram med å skrive for å finne fleire seksjonar eller studentar."
   contribute_4730e633: Bidra
+  contribute_to_the_page_2116bf3b: "Bidra til sida"
   contributed_to_this_module_item_and_is_complete_2799d5c: "Bidratt til denne delen av modulen og har fullført"
   conversation_dialog: 
     message_sent: "Meldinga er send"
@@ -7488,6 +7512,7 @@ nn:
   course_end_date_4c797823: "Sluttdatoen til emnet"
   course_end_date_on_after_a6bbb0b7: "Emne sluttdato den/etter"
   course_ends_at_e8b166df: "Emnet sluttar"
+  course_ends_endat_d1b11465: "Emne sluttar %{endat}"
   course_enrollments_are_in_85eb1e6b: "Emnepåmeldingar er klare"
   course_export_from_date_f4e2a3e4: "*Emneeksport sidan %{date}*"
   course_export_from_date_file_not_available_8a775e53: "Emneeksport frå %{date} (fil er ikke tilgjengeleg)"
@@ -7512,6 +7537,7 @@ nn:
       media_file: "Eksport av ei mediefil mislukkast"
       media_files: "Kan ikkje eksportere nokre av mediefilene"
       media_files_too_large: "Kan ikkje eksportere mediefiler fordi den totale filstorleiken er for stor."
+      media_tracks: "Mislyktes med å eksportere nokre undertekstar"
       module_meta: "Kan ikkje eksportere modulen sine metadata"
       organization: "Kan ikkje generere organisasjonsstrukturen."
       question_bank: "Kan ikkje eksportere \"%{title}\" spørsmålsbanken"
@@ -7558,7 +7584,9 @@ nn:
   course_image_for_course_cfbb08df: "Emnebilde for %{course}"
   course_image_settings_eba3ec55: "Innstillingar for emnebilde"
   course_implemented_apps_fa658f5a: "Emneimplementerte applikasjonar"
+  course_import_html_using_gem_812d0af5: "Emne Import HTML ved hjelp av Gem"
   course_is_already_associated_with_a_blueprint_4d9407cb: "Emnet har allereie kopling til eit Blueprint-emne"
+  course_is_ineligible_to_be_set_as_a_blueprint_8e25ebcc: "Emnet egnar seg ikkje til å bli satt som blåkopi."
   course_level_notification_preferences_require_a_co_2f0a618: "Innstillingar for emnevarsel krev ein emne_id for å oppdatere"
   course_level_notifications_are_inherited_from_your_7ae3c0c2: "Innstillingar for varsel er arva frå innstillingane i kontoen din. Endringar du gjer her vil berre gjelde for dette emnet."
   course_list: 
@@ -9016,6 +9044,9 @@ nn:
   designers_remove_3e590bff: "Designarar - Fjern"
   details_98a31b68: Detaljar
   details_a6f427c3: "Detaljar:"
+  determined_by_course_end_date_5e3ffb4f: "Fastsatt av emnets sluttdato"
+  determined_by_course_pace_45063fa8: "Fastsatt av emnegjennomføring"
+  determined_by_course_start_date_fc1a8ecf: "Fastsatt av emnet sin startdato"
   determines_visibility_and_management_of_outcomes_t_79ca45b: |-
       Avgjer synlegheit og bruk av menyvalet for læringsmål i kontonavigasjon.
       Gir ein brukar løyve til å opprette, importere, endre og slette læringsmål og læringsmålgrupper på konto- og emnenivå.
