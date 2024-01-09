@@ -600,6 +600,8 @@ class LearnerPassportController < ApplicationController
   ###### Pathways ######
 
   def pathways_index
+    # return render json: { message: "Permission denied" }, status: :unauthorized unless @current_user.roles.include?("admin")
+
     pathways = Rails.cache.fetch(current_pathways_key) { learner_passport_current_pathways }.map do |p|
       pw = {
         id: p[:id],

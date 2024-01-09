@@ -36,8 +36,8 @@ import type {ViewProps} from '@instructure/ui-view'
 import {uid} from '@instructure/uid'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import type {AchievementData, ProjectDetailData} from '../types'
-import AchievementCard from '../Achievements/AchievementCard'
-import ProjectCard from '../Projects/ProjectCard'
+import AchievementCard from '../learner/Achievements/AchievementCard'
+import ProjectCard from '../learner/Projects/ProjectCard'
 import ClickableCard from './ClickableCard'
 
 export function stringToId(s: string): string {
