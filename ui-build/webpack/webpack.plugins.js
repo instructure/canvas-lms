@@ -167,6 +167,7 @@ exports.webpackManifest = new WebpackManifestPlugin({
 })
 
 exports.minimizeCode = new TerserPlugin({
+  minify: TerserPlugin.swcMinify,
   parallel: true,
   terserOptions: {
     compress: {

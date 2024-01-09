@@ -26,7 +26,7 @@ const webpackPublicPath = require('./webpackPublicPath')
 const {canvasDir} = require('../params')
 
 const {
-  babel,
+  swc,
   css,
   emberHandlebars,
   fonts,
@@ -190,7 +190,7 @@ module.exports = {
       css,
       images,
       fonts,
-      babel,
+      swc,
       handlebars,
       emberHandlebars,
     ].filter(Boolean),
