@@ -27,6 +27,7 @@ import 'jquery-scroll-to-visible/jquery.scrollTo'
 import 'jqueryui/datepicker'
 import easy_student_view from '@canvas/easy-student-view'
 import htmlEscape from '@instructure/html-escape'
+import {escape} from 'lodash'
 
 RichContentEditor.preloadRemoteModule()
 
@@ -140,7 +141,8 @@ function bindToMiniCalendar() {
     changeMonth($mini_month, `${month}/${day}/${year}`)
     highlightDaysWithEvents()
     selectDate(date)
-    $(`.events_${date}`).ifExists($events => setTimeout(() => selectRow($events), 0)) // focus race condition hack. why do you do this to me, IE?
+    const eventSelector = escape(`.events_${date}`)
+    $(eventSelector).ifExists($events => setTimeout(() => selectRow($events), 0)) // focus race condition hack. why do you do this to me, IE?
   }
 
   $mini_month.on('keypress', '.day_wrapper', ev => {
