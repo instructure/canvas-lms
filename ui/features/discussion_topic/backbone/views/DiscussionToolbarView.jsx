@@ -66,7 +66,6 @@ export default class DiscussionToolbarView extends View {
   afterRender() {
     if (this.$el.find('#search_entries_container')[0]) {
       ReactDOM.render(
-        // eslint-disable-next-line react/jsx-filename-extension
         <TextInput
           onChange={e => {
             // Sends events to hidden input to utilize backbone
