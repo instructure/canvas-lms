@@ -190,7 +190,7 @@ module.exports = {
       css,
       images,
       fonts,
-      swc,
+      ...swc,
       handlebars,
       emberHandlebars,
     ].filter(Boolean),

@@ -76,28 +76,53 @@ exports.fonts = {
   use: 'file-loader',
 }
 
-exports.swc = {
-  test: /\.(js|jsx|ts|tsx)$/,
-  include: [resolve(canvasDir, 'ui'), ...globPlugins('app/{jsx,coffeescripts}/')],
-  exclude: /(node_modules)/,
-  use: {
-    loader: 'swc-loader',
-    options: {
-      sourceMaps: true,
-      jsc: {
-        parser: {
-          syntax: 'typescript',
-          tsx: true,
+const browserTargets = {
+  browsers: 'last 2 versions',
+}
+
+exports.swc = [
+  {
+    test: /\.(j|t)s$/,
+    include: [resolve(canvasDir, 'ui'), ...globPlugins('app/{jsx,coffeescripts}/')],
+    exclude: /(node_modules)/,
+    use: {
+      loader: 'swc-loader',
+      options: {
+        sourceMaps: true,
+        jsc: {
+          externalHelpers: true,
+          parser: {
+            syntax: 'typescript',
+          },
         },
-      },
-      env: {
-        targets: {
-          browsers: 'last 2 versions',
+        env: {
+          targets: browserTargets,
         },
       },
     },
   },
-}
+  {
+    test: /\.(j|t)sx$/,
+    include: [resolve(canvasDir, 'ui'), ...globPlugins('app/{jsx,coffeescripts}/')],
+    exclude: /(node_modules)/,
+    use: {
+      loader: 'swc-loader',
+      options: {
+        sourceMaps: true,
+        jsc: {
+          externalHelpers: true,
+          parser: {
+            syntax: 'typescript',
+            tsx: true,
+          },
+        },
+        env: {
+          targets: browserTargets,
+        },
+      },
+    },
+  },
+]
 
 exports.handlebars = {
   test: /\.handlebars$/,
