@@ -23,6 +23,10 @@ module AssignmentsIndexPage
 
   #------------------------------ Elements ------------------------------
 
+  def assignment_index_menu_tool_link(tool_text)
+    fj("[role=menuitem]:contains('#{tool_text}')")
+  end
+
   def assignments_rows
     f("#ag-list")
   end
@@ -33,6 +37,10 @@ module AssignmentsIndexPage
 
   def manage_assignment_menu(assignment_id)
     f("#assign_#{assignment_id}_manage_link")
+  end
+
+  def assign_to_menu_link(assignment_id)
+    f("#assign_to_#{assignment_id}_link")
   end
 
   def assignment_settings_menu(assignment_id)
@@ -164,6 +172,18 @@ module AssignmentsIndexPage
   end
 
   #------------------------------ Actions --------------------------------
+
+  def click_assign_to_menu_link(assignment_id)
+    assign_to_menu_link(assignment_id).click
+  end
+
+  def click_assignment_settings_menu(assignment_id)
+    assignment_settings_menu(assignment_id).click
+  end
+
+  def click_manage_assignment_button(assignment_id)
+    manage_assignment_menu(assignment_id).click
+  end
 
   def visit_assignments_index_page(course_id)
     get "/courses/#{course_id}/assignments"

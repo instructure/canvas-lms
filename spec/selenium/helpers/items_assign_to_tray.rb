@@ -81,6 +81,10 @@ module ItemsAssignToTray
     "//*[@data-testid = 'module-item-edit-tray']//button[.//*[contains(text(), 'Save')]]"
   end
 
+  def tray_header_selector
+    "[data-testid='module-item-edit-tray'] h3"
+  end
+
   #------------------------------ Elements ------------------------------
   def add_assign_to_card
     f(add_assign_to_card_selector)
@@ -156,6 +160,10 @@ module ItemsAssignToTray
 
   def save_button
     fxpath(save_button_selector)
+  end
+
+  def tray_header
+    f(tray_header_selector)
   end
 
   #------------------------------ Actions ------------------------------
