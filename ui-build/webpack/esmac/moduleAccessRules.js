@@ -52,20 +52,6 @@ module.exports = [
   },
 
   {
-    rule: 'Let shims do whatever they need to',
-    source: 'ui/shims/*',
-    target: '**',
-    specifier: 'any',
-  },
-
-  {
-    rule: 'Let everyone consume shims',
-    source: '**',
-    target: 'ui/shims/*',
-    specifier: 'bare',
-  },
-
-  {
     rule: 'Let everyone consume legacy public/javascripts/',
     source: '**',
     target: 'public/javascripts/**',

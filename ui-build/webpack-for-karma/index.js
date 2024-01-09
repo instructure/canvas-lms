@@ -166,7 +166,6 @@ module.exports = {
     },
     extensions: ['.mjs', '.js', '.jsx', '.ts', '.tsx'],
     modules: [
-      path.join(canvasDir, 'ui/shims'),
       path.join(canvasDir, 'public/javascripts'),
       path.join(canvasDir, 'gems/plugins'),
       path.join(canvasDir, 'spec/coffeescripts'),
