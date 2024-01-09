@@ -1315,6 +1315,13 @@ rubricEditing.init = function () {
             $('#edit_assignment_header input[id="assignment_points_possible"]').val()
           )
         }
+
+        if (Number.isNaN(assignmentPoints) && ENV['ASSIGNMENT_POINTS_POSSIBLE']) {
+          // For 1.3 external tool assignments, we grab the points from an env variable
+          assignmentPoints = numberHelper.parse(
+            ENV['ASSIGNMENT_POINTS_POSSIBLE']
+          )
+        }
         const rubricPoints = parseFloat(data.points_possible)
         if (
           assignmentPoints !== null &&

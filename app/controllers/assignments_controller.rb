@@ -251,6 +251,8 @@ class AssignmentsController < ApplicationController
     GuardRail.activate(:secondary) do
       @assignment ||= @context.assignments.find(params[:id])
 
+      js_env({ ASSIGNMENT_POINTS_POSSIBLE: nil })
+
       if @assignment.deleted?
         flash[:notice] = t "notices.assignment_delete", "This assignment has been deleted"
         redirect_to named_context_url(@context, :context_assignments_url)
@@ -276,7 +278,7 @@ class AssignmentsController < ApplicationController
         if @assignment.submission_types == "external_tool" && Account.site_admin.feature_enabled?(:external_tools_for_a2) && @unlocked
           @tool = ContextExternalTool.from_assignment(@assignment)
 
-          js_env({ LTI_TOOL: "true" })
+          js_env({ LTI_TOOL: "true", ASSIGNMENT_POINTS_POSSIBLE: @assignment.points_possible })
         end
 
         unless @assignment.new_record? || (@locked && !@locked[:can_view])
