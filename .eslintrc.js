@@ -201,7 +201,7 @@ module.exports = {
     'jest/no-large-snapshots': 'warn',
 
     // These are things we care about
-    'react/jsx-filename-extension': ['error', {extensions: ['jsx', 'ts', 'tsx']}],
+    'react/jsx-filename-extension': ['error', {extensions: ['jsx', 'tsx']}],
     'eslint-comments/no-unused-disable': 'error',
     'jest/no-disabled-tests': 'off',
     'import/extensions': [
