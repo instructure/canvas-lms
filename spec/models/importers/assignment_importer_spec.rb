@@ -259,6 +259,37 @@ describe "Importing assignments" do
     expect(AnonymousOrModerationEvent.last.user).to eq migration.user
   end
 
+  context "when assignments are new quizzes/quiz lti" do
+    subject do
+      new_quiz
+      Importers::AssignmentImporter.import_from_migration(assignment_hash, course, migration)
+      new_quiz.reload
+    end
+
+    let(:course) { course_model }
+    let(:migration) { course.content_migrations.create! }
+    let(:new_quiz) do
+      new_quizzes_assignment(course:, title: "Some New Quiz", migration_id: "ib4834d160d180e2e91572e8b9e3b1bc6")
+    end
+    let(:assignment_hash) do
+      {
+        migration_id: "ib4834d160d180e2e91572e8b9e3b1bc6",
+        workflow_state: "published",
+        title: "Tool Assignment",
+        submission_types: "external_tool",
+      }
+    end
+
+    it "sets the content tag workflow state back to active when a previously deleted quiz lti assignment is re-imported back into the course" do
+      subject
+      new_quiz.external_tool_tag.workflow_state = "deleted"
+      new_quiz.save!
+      Importers::AssignmentImporter.import_from_migration(assignment_hash, course, migration)
+      new_quiz.reload
+      expect(new_quiz.external_tool_tag.workflow_state).to eq("active")
+    end
+  end
+
   context "when assignments use an LTI tool" do
     subject do
       assignment # trigger create

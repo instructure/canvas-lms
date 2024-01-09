@@ -103,12 +103,21 @@ module Importers
       )
     end
 
+    def self.reset_new_quiz_workflow_state(item)
+      if item&.quiz_lti? && item.external_tool_tag.workflow_state == "deleted"
+        item.external_tool_tag.workflow_state = "active"
+      end
+    end
+
     def self.import_from_migration(hash, context, migration, item = nil, quiz = nil)
       hash = hash.with_indifferent_access
       return nil if hash[:migration_id] && hash[:assignments_to_import] && !hash[:assignments_to_import][hash[:migration_id]]
 
       item ||= Assignment.where(context_type: context.class.to_s, context_id: context, id: hash[:id]).first
       item ||= Assignment.where(context_type: context.class.to_s, context_id: context, migration_id: hash[:migration_id]).first if hash[:migration_id]
+
+      reset_new_quiz_workflow_state(item)
+
       item ||= context.assignments.temp_record # new(:context => context)
 
       item.updating_user = migration.user
