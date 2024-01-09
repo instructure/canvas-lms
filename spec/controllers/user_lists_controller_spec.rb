@@ -49,4 +49,49 @@ describe UserListsController do
     post "create", params: { course_id: @course.id, user_list: "list", v2: true, search_type: "unique_id" }, format: "json"
     expect(response).to be_successful
   end
+
+  context "temporary enrollments" do
+    before_once do
+      @account = Account.default
+      @account.root_account.enable_feature!(:temporary_enrollments)
+    end
+
+    it "succeeds for AccountAdmin role" do
+      role = admin_role
+      account_admin_user_with_role_changes(role:)
+      user_session(@user)
+
+      post "create", params: { account_id: @account.id, user_list: "list", v2: true, search_type: "unique_id" }, format: "json"
+      expect(response).to be_successful
+    end
+
+    it "succeeds for AccountMembership role" do
+      role = custom_account_role("CustomAccountMembership", account: @account)
+      account_admin_user_with_role_changes(role:, role_changes: { temporary_enrollments_add: true })
+      user_session(@user)
+
+      post "create", params: { account_id: @account.id, user_list: "list", v2: true, search_type: "unique_id" }, format: "json"
+      expect(response).to be_successful
+    end
+
+    it "succeeds for AccountAdmin role with feature flag disabled" do
+      @account.root_account.disable_feature!(:temporary_enrollments)
+      role = admin_role
+      account_admin_user_with_role_changes(role:)
+      user_session(@user)
+
+      post "create", params: { account_id: @account.id, user_list: "list", v2: true, search_type: "unique_id" }, format: "json"
+      expect(response).to be_successful
+    end
+
+    it "unauthorized for custom account role with feature flag disabled" do
+      @account.root_account.disable_feature!(:temporary_enrollments)
+      role = custom_account_role("CustomAccountMembership", account: @account)
+      account_admin_user_with_role_changes(role:, role_changes: { temporary_enrollments_add: true })
+      user_session(@user)
+
+      post "create", params: { account_id: @account.id, user_list: "list", v2: true, search_type: "unique_id" }, format: "json"
+      expect(response).to be_unauthorized
+    end
+  end
 end
