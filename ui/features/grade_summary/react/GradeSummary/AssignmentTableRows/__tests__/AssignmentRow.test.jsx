@@ -138,9 +138,9 @@ describe('AssignmentRow', () => {
                   },
                 ],
               },
-            })
-          ]
-        }
+            }),
+          ],
+        },
       })
 
       const {queryByTestId} = setup({...defaultProps, assignment})

@@ -176,15 +176,13 @@ export default class ItemView extends Backbone.View {
       <ItemAssignToTray
         open={open}
         onClose={() => {
-          ReactDOM.unmountComponentAtNode(
-            document.getElementById('assign-to-mount-point')
-          )
+          ReactDOM.unmountComponentAtNode(document.getElementById('assign-to-mount-point'))
         }}
         onDismiss={() => {
           this.renderItemAssignToTray(false, returnFocusTo, itemProps)
           returnFocusTo.focus()
         }}
-        itemType='assignment'
+        itemType="assignment"
         locale={ENV.LOCALE || 'en'}
         timezone={ENV.TIMEZONE || 'UTC'}
         {...itemProps}

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, { useState } from 'react'
+import React, {useState} from 'react'
 import {Text} from '@instructure/ui-text'
 import {TextArea} from '@instructure/ui-text-area'
 import {View} from '@instructure/ui-view'
@@ -27,7 +27,6 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 const I18n = useI18nScope('SmartSearch')
 
 export default function SearchResult(props) {
-
   function ellipsize(str, max) {
     if (str.length > max) {
       return str.substring(0, max - 3) + '...'
@@ -49,15 +48,15 @@ export default function SearchResult(props) {
       ${I18n.t('Distance')}: ${record.distance.toFixed(3)}
     `
     return (
-        <Tooltip renderTip={tooltipText} as="span">
-          <Rating label={I18n.t('Relevance')} valueNow={relevance} iconCount={5} valueMax={100} />
-        </Tooltip>
+      <Tooltip renderTip={tooltipText} as="span">
+        <Rating label={I18n.t('Relevance')} valueNow={relevance} iconCount={5} valueMax={100} />
+      </Tooltip>
     )
   }
 
   if (props.searchResult.content_type === 'WikiPage') {
     // id, wiki_id, title, body, etc.
-    const wiki_page = props.searchResult;
+    const wiki_page = props.searchResult
     return (
       <View
         as="div"
@@ -69,18 +68,14 @@ export default function SearchResult(props) {
       >
         <h3>{wiki_page.title}</h3>
         <h4>{I18n.t('Course Page')}</h4>
-        <Text
-          as="div"
-          size="medium"
-          color="secondary"
-        >
+        <Text as="div" size="medium" color="secondary">
           {ellipsize(wiki_page.body, 1000)}
         </Text>
+        <View as="div">{getRelevance(wiki_page)}</View>
         <View as="div">
-          {getRelevance(wiki_page)}
-        </View>
-        <View as="div">
-          <a href={wiki_page.html_url} target="_blank">{I18n.t('View Full Page')}</a>
+          <a href={wiki_page.html_url} target="_blank">
+            {I18n.t('View Full Page')}
+          </a>
         </View>
       </View>
     )

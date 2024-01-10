@@ -54,7 +54,7 @@ const ManageOutcomeItem = ({
   onCheckboxHandler,
   canUnlink,
   isEnhanced,
-  canArchive
+  canArchive,
 }) => {
   const {
     contextType,
@@ -123,9 +123,11 @@ const ManageOutcomeItem = ({
                   screenReaderLabel=""
                   withBackground={false}
                   withBorder={false}
-                  interaction={shouldShowDescription && (!accountLevelMasteryScalesFF || shouldExpand)
-                  ? 'enabled'
-                  : 'disabled'}
+                  interaction={
+                    shouldShowDescription && (!accountLevelMasteryScalesFF || shouldExpand)
+                      ? 'enabled'
+                      : 'disabled'
+                  }
                   onClick={onClickHandler}
                   data-testid="manage-outcome-item-expand-toggle"
                 >
@@ -208,7 +210,7 @@ ManageOutcomeItem.propTypes = {
   onCheckboxHandler: PropTypes.func.isRequired,
   canUnlink: PropTypes.bool.isRequired,
   isEnhanced: PropTypes.bool,
-  canArchive: PropTypes.bool
+  canArchive: PropTypes.bool,
 }
 
 export default memo(ManageOutcomeItem)

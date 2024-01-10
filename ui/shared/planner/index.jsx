@@ -33,7 +33,7 @@ import {
   startLoadingAllOpportunities,
   toggleMissingItems,
   reloadWithObservee,
-  getInitialOpportunities
+  getInitialOpportunities,
 } from './actions'
 import {registerScrollEvents} from './utilities/scrollUtils'
 import {initialize as initializeAlerts} from './utilities/alertUtils'
@@ -97,13 +97,13 @@ function externalFocusableWrapper(externalFallbackFocusable) {
     },
     getScrollable() {
       return externalFallbackFocusable
-    }
+    },
   }
 }
 
 const defaultOptions = {
   getActiveApp: () => '',
-  stickyZIndex: 3
+  stickyZIndex: 3,
 }
 
 const defaultEnv = {}
@@ -138,11 +138,11 @@ function initializeCourseAndGroupColors(options) {
   if (!options.env.PREFERENCES) return
   options.env.STUDENT_PLANNER_COURSES = options.env.STUDENT_PLANNER_COURSES.map(dc => ({
     ...dc,
-    color: getCourseColor(dc, options.env)
+    color: getCourseColor(dc, options.env),
   }))
   options.env.STUDENT_PLANNER_GROUPS = options.env.STUDENT_PLANNER_GROUPS.map(dg => ({
     ...dg,
-    color: options.env.PREFERENCES.custom_colors[dg.assetString] || '#666666'
+    color: options.env.PREFERENCES.custom_colors[dg.assetString] || '#666666',
   }))
 }
 
@@ -205,7 +205,7 @@ export async function initializePlanner(options) {
       initializeAlerts({
         visualSuccessCallback: flashMessage,
         visualErrorCallback: flashError,
-        srAlertCallback: srFlashMessage
+        srAlertCallback: srFlashMessage,
       })
       initializeContent(options)
       initializeDateTimeFormatters(options.dateTimeFormatters)
@@ -253,7 +253,7 @@ export function createPlannerApp() {
       registerScrollEvents({
         scrollIntoPast: handleScrollIntoPastAttempt,
         scrollIntoFuture: handleScrollIntoFutureAttempt,
-        scrollPositionChange: pos => dynamicUiManager.handleScrollPositionChange(pos)
+        scrollPositionChange: pos => dynamicUiManager.handleScrollPositionChange(pos),
       })
       createPlannerApp.scrollEventsRegistered = true
     }

@@ -33,7 +33,7 @@ import '@canvas/jquery/jquery.instructure_misc_helpers'
 const I18n = useI18nScope('GradingPeriodSet')
 
 const sortPeriods = function (periods) {
-  return  sortBy(periods, 'startDate')
+  return sortBy(periods, 'startDate')
 }
 
 const anyPeriodsOverlap = function (periods) {
@@ -259,9 +259,9 @@ export default class GradingPeriodSet extends React.Component {
   }
 
   updatePeriod = period => {
-    const periods = reject(this.state.gradingPeriods, _period => period.id === _period.id).concat(
-      [period]
-    )
+    const periods = reject(this.state.gradingPeriods, _period => period.id === _period.id).concat([
+      period,
+    ])
     const validations = validatePeriods(periods, this.state.weighted)
     if (isEmpty(validations)) {
       this.setEditPeriod({saving: true})

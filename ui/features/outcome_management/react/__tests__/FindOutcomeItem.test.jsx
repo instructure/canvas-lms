@@ -150,20 +150,24 @@ describe('FindOutcomeItem', () => {
   describe('Assuming the description is over a line', () => {
     it('displays down pointing caret when description is expanded', () => {
       const {queryByTestId, getByText} = render(
-      <FindOutcomeItem {...defaultProps({description: "<p>Aa</p><p>Bb</p>"})} />)
+        <FindOutcomeItem {...defaultProps({description: '<p>Aa</p><p>Bb</p>'})} />
+      )
       fireEvent.click(getByText('Expand description for outcome Outcome Title'))
       expect(queryByTestId('icon-arrow-down')).toBeInTheDocument()
     })
 
     it('expands description when user clicks on right pointing caret', () => {
       const {queryByTestId, getByText} = render(
-      <FindOutcomeItem {...defaultProps({description: "<p>Aa</p><p>Bb</p>"})} />)
+        <FindOutcomeItem {...defaultProps({description: '<p>Aa</p><p>Bb</p>'})} />
+      )
       fireEvent.click(getByText('Expand description for outcome Outcome Title'))
       expect(queryByTestId('description-expanded')).toBeInTheDocument()
     })
 
     it('collapses description when user clicks on downward pointing caret', () => {
-      const {queryByTestId, getByText} = render(<FindOutcomeItem {...defaultProps({description: "<p>Aa</p><p>Bb</p>"})} />)
+      const {queryByTestId, getByText} = render(
+        <FindOutcomeItem {...defaultProps({description: '<p>Aa</p><p>Bb</p>'})} />
+      )
       fireEvent.click(getByText('Expand description for outcome Outcome Title'))
       fireEvent.click(getByText('Collapse description for outcome Outcome Title'))
       expect(queryByTestId('description-truncated')).toBeInTheDocument()
@@ -180,7 +184,12 @@ describe('FindOutcomeItem', () => {
 
   it('renders a friendly description when the caret is clicked and friendlyDescriptionFF is true, assuming description is over a line', () => {
     const {getByText} = render(
-      <FindOutcomeItem {...defaultProps({description: "<p>Aa</p><p>Bb</p>", friendlyDescription: 'test friendly description'})} />,
+      <FindOutcomeItem
+        {...defaultProps({
+          description: '<p>Aa</p><p>Bb</p>',
+          friendlyDescription: 'test friendly description',
+        })}
+      />,
       {
         friendlyDescriptionFF: true,
       }

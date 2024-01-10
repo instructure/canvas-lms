@@ -61,7 +61,11 @@ class SubmissionHistoriesQuery extends React.Component {
     if (shouldDisplayNeedsSubmissionPeerReview(this.props.initialQueryData)) {
       return (
         <>
-          <Header scrollThreshold={150} assignment={this.props.initialQueryData.assignment} peerReviewLinkData={this.props.initialQueryData.reviewerSubmission} />
+          <Header
+            scrollThreshold={150}
+            assignment={this.props.initialQueryData.assignment}
+            peerReviewLinkData={this.props.initialQueryData.reviewerSubmission}
+          />
           <AssignmentToggleDetails
             description={this.props.initialQueryData.assignment.description}
           />
@@ -73,7 +77,11 @@ class SubmissionHistoriesQuery extends React.Component {
     if (shouldDisplayUnavailablePeerReview(this.props.initialQueryData)) {
       return (
         <>
-          <Header scrollThreshold={150} assignment={this.props.initialQueryData.assignment} peerReviewLinkData={this.props.initialQueryData.reviewerSubmission}/>
+          <Header
+            scrollThreshold={150}
+            assignment={this.props.initialQueryData.assignment}
+            peerReviewLinkData={this.props.initialQueryData.reviewerSubmission}
+          />
           <AssignmentToggleDetails
             description={this.props.initialQueryData.assignment.description}
           />

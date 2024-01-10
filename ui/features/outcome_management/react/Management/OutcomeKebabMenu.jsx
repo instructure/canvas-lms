@@ -30,7 +30,7 @@ import {
   IconSearchLine,
   IconImportLine,
   IconOutcomesLine,
-  IconArchiveLine
+  IconArchiveLine,
 } from '@instructure/ui-icons'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {stripHtmlTags} from '@canvas/outcomes/stripHtmlTags'
@@ -45,7 +45,7 @@ const OutcomeKebabMenu = ({
   canDestroy,
   isGroup,
   groupDescription,
-  canArchive
+  canArchive,
 }) => {
   const {menuOptionForOutcomeDetailsPageFF, archiveOutcomesFF} = useCanvasContext()
   const hasDescription =
@@ -104,7 +104,14 @@ const OutcomeKebabMenu = ({
       {archiveOutcomesFF && (
         <Menu.Item disabled={isGroup ? false : !canArchive} value="archive">
           <IconArchiveLine size="x-small" />
-          <View padding="0 small" data-testid={isGroup || canArchive ? "outcome-kebab-menu-archive" : "outcome-kebab-menu-archive-disabled"}>
+          <View
+            padding="0 small"
+            data-testid={
+              isGroup || canArchive
+                ? 'outcome-kebab-menu-archive'
+                : 'outcome-kebab-menu-archive-disabled'
+            }
+          >
             {I18n.t('Archive')}
           </View>
         </Menu.Item>
@@ -134,7 +141,7 @@ OutcomeKebabMenu.defaultProps = {
   menuTitle: '',
   canEdit: true,
   isGroup: false,
-  canArchive: false
+  canArchive: false,
 }
 
 export default OutcomeKebabMenu

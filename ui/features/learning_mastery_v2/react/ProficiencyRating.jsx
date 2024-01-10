@@ -80,7 +80,9 @@ const ProficiencyRating = ({points, masteryAt, color, description, onClick}) => 
                 />
               </div>
               <View padding="xxx-small xx-small xxx-small xx-small">
-                <Text size="small" weight="bold">{description}</Text>
+                <Text size="small" weight="bold">
+                  {description}
+                </Text>
               </View>
               {!disabled && (
                 <div style={iconStyle} data-testid="enabled-filter">

@@ -95,9 +95,7 @@ const Integrations = () => {
             onSuccess={setMSGroup}
           />
         </MicrosoftSync>
-        {msGroup.debug_info && (
-          <MicrosoftSyncDebugInfo debugInfo={msGroup.debug_info} />
-        )}
+        {msGroup.debug_info && <MicrosoftSyncDebugInfo debugInfo={msGroup.debug_info} />}
       </IntegrationRow>
     </>
   )

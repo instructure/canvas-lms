@@ -164,7 +164,7 @@ export default function DiscussionTopicFormContainer({apolloClient}) {
     if (discussionTopicId && discussionContextType) {
       try {
         if (ENV?.USAGE_RIGHTS_REQUIRED) {
-          await saveUsageRights(usageRightData, attachment);
+          await saveUsageRights(usageRightData, attachment)
         }
       } catch (error) {
         // Handle error on saving usage rights

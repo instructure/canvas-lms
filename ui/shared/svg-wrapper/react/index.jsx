@@ -27,7 +27,7 @@ class SVGWrapper extends React.Component {
   static propTypes = {
     url: PropTypes.string.isRequired,
     fillColor: PropTypes.string,
-    style: PropTypes.any
+    style: PropTypes.any,
   }
 
   componentDidMount() {
@@ -68,7 +68,8 @@ class SVGWrapper extends React.Component {
 
   render() {
     return (
-      <span style={this.props.style}
+      <span
+        style={this.props.style}
         ref={c => {
           this.rootSpan = c
         }}

@@ -27,8 +27,8 @@ import {studentShape} from './shapes'
 const StudentCell = ({courseId, student}) => {
   const student_grades_url = `/courses/${courseId}/grades/${student.id}#tab-outcomes`
 
-  const shouldShowStudentStatus = (student.status === 'inactive' || student.status === 'concluded')
-  const displayNameWidth = shouldShowStudentStatus ? "50%" : "75%"
+  const shouldShowStudentStatus = student.status === 'inactive' || student.status === 'concluded'
+  const displayNameWidth = shouldShowStudentStatus ? '50%' : '75%'
 
   return (
     <>

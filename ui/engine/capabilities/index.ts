@@ -16,5 +16,5 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export {I18n, Translations} from './I18n';
-export {default as IntlPolyfills} from './IntlPolyfills';
+export {I18n, Translations} from './I18n'
+export {default as IntlPolyfills} from './IntlPolyfills'

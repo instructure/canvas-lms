@@ -90,5 +90,4 @@ AttachmentButton.propTypes = {
    * Used to set the responsive state
    */
   responsiveQuerySizes: PropTypes.func.isRequired,
-
 }

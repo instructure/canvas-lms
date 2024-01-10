@@ -63,10 +63,11 @@ const LearningMastery = ({courseId}) => {
   const contextValues = getLMGBContext()
   const {contextURL, outcomeProficiency, accountLevelMasteryScalesFF} = contextValues.env
 
-  const {isLoading, students, outcomes, rollups, gradebookFilters, setGradebookFilters} = useRollups({
-    courseId,
-    accountLevelMasteryScalesFF,
-  })
+  const {isLoading, students, outcomes, rollups, gradebookFilters, setGradebookFilters} =
+    useRollups({
+      courseId,
+      accountLevelMasteryScalesFF,
+    })
   const [visibleRatings, setVisibleRatings] = useState([])
 
   const onGradebookFilterChange = filterItem => {

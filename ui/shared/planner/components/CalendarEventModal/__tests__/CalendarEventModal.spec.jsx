@@ -39,7 +39,7 @@ function defaultProps(options = {}) {
       displayName: 'me',
       avatarUrl: 'http://example.com',
       color: '#777777',
-      ...currentUser
+      ...currentUser,
     },
     location: 'somewhere',
     address: 'here, specifically',
@@ -48,7 +48,7 @@ function defaultProps(options = {}) {
     endTime: moment.tz('2018-09-27T14:00:00', 'Asia/Tokyo'),
     allDay: false,
     timeZone: 'Asia/Tokyo',
-    ...options
+    ...options,
   }
 }
 

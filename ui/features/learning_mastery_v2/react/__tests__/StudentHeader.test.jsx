@@ -51,7 +51,7 @@ describe('StudentHeader', () => {
   })
 
   describe('gradebook filter handler', () => {
-    it('calls gradebook handler function with correct parameter when selecting \'Students without assessments\'', () => {
+    it("calls gradebook handler function with correct parameter when selecting 'Students without assessments'", () => {
       const {getByText} = render(<StudentHeader {...defaultProps()} />)
       fireEvent.click(getByText('Sort Students'))
       fireEvent.click(getByText('Students without assessments'))
@@ -59,7 +59,7 @@ describe('StudentHeader', () => {
       expect(gradebookFilterHandlerMock).toHaveBeenCalledWith('missing_user_rollups')
     })
 
-    it('calls gradebook handler function with correct parameter when selecting \'Inactive Enrollments\'', () => {
+    it("calls gradebook handler function with correct parameter when selecting 'Inactive Enrollments'", () => {
       const {getByText} = render(<StudentHeader {...defaultProps()} />)
       fireEvent.click(getByText('Sort Students'))
       fireEvent.click(getByText('Inactive Enrollments'))
@@ -67,7 +67,7 @@ describe('StudentHeader', () => {
       expect(gradebookFilterHandlerMock).toHaveBeenCalledWith('inactive_enrollments')
     })
 
-    it('calls gradebook handler function with correct parameter when selecting \'Concluded Enrollments\'', () => {
+    it("calls gradebook handler function with correct parameter when selecting 'Concluded Enrollments'", () => {
       const {getByText} = render(<StudentHeader {...defaultProps()} />)
       fireEvent.click(getByText('Sort Students'))
       fireEvent.click(getByText('Concluded Enrollments'))

@@ -21,7 +21,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {Pill} from '@instructure/ui-pill'
-import { IconPublishSolid, IconUnpublishedLine } from '@instructure/ui-icons'
+import {IconPublishSolid, IconUnpublishedLine} from '@instructure/ui-icons'
 import {extend} from '@canvas/backbone/utils'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import Backbone from '@canvas/backbone'

@@ -271,7 +271,8 @@ describe('useCourseAlignments', () => {
 
   it('should wait to load outcomes when arg is true', async () => {
     const {result, rerender} = renderHook(({shouldWait}) => useCourseAlignments(shouldWait), {
-      wrapper, initialProps: { shouldWait: true }
+      wrapper,
+      initialProps: {shouldWait: true},
     })
 
     expect(result.current.loading).toBe(false)

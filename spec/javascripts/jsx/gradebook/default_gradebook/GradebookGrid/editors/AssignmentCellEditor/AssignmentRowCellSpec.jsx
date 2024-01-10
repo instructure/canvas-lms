@@ -39,7 +39,7 @@ QUnit.module('GradebookGrid AssignmentRowCell', suiteHooks => {
 
   suiteHooks.beforeEach(() => {
     fakeENV.setup({
-      GRADEBOOK_OPTIONS: {assignment_missing_shortcut: true}
+      GRADEBOOK_OPTIONS: {assignment_missing_shortcut: true},
     })
     $container = document.createElement('div')
     document.body.appendChild($container)

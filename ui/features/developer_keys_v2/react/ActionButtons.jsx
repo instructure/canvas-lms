@@ -126,37 +126,35 @@ class DeveloperKeyActionButtons extends React.Component {
   renderEditButton() {
     const {developerName, developerKey} = this.props
 
-    return (
-      developerKey.is_lti_registration ? (
-        <Tooltip renderTip={I18n.t('Edit this key')}>
-          <IconButton
-            id="edit-developer-key-button"
-            as={"a"}
-            href={`/accounts/${this.props.contextId}/developer_keys/${developerKey.id}`}
-            withBackground={false}
-            withBorder={false}
-            screenReaderLabel={I18n.t('Edit key %{developerName}', {developerName})}
-            margin="0"
-            size="small"
-          >
-            <IconEditLine />
-          </IconButton>
-        </Tooltip>
-      ) : (
-        <Tooltip renderTip={I18n.t('Edit this key')}>
-          <IconButton
-            id="edit-developer-key-button"
-            withBackground={false}
-            withBorder={false}
-            screenReaderLabel={I18n.t('Edit key %{developerName}', {developerName})}
-            margin="0"
-            size="small"
-            onClick={this.editLinkHandler}
-          >
-            <IconEditLine />
-          </IconButton>
-        </Tooltip>
-      )
+    return developerKey.is_lti_registration ? (
+      <Tooltip renderTip={I18n.t('Edit this key')}>
+        <IconButton
+          id="edit-developer-key-button"
+          as={'a'}
+          href={`/accounts/${this.props.contextId}/developer_keys/${developerKey.id}`}
+          withBackground={false}
+          withBorder={false}
+          screenReaderLabel={I18n.t('Edit key %{developerName}', {developerName})}
+          margin="0"
+          size="small"
+        >
+          <IconEditLine />
+        </IconButton>
+      </Tooltip>
+    ) : (
+      <Tooltip renderTip={I18n.t('Edit this key')}>
+        <IconButton
+          id="edit-developer-key-button"
+          withBackground={false}
+          withBorder={false}
+          screenReaderLabel={I18n.t('Edit key %{developerName}', {developerName})}
+          margin="0"
+          size="small"
+          onClick={this.editLinkHandler}
+        >
+          <IconEditLine />
+        </IconButton>
+      </Tooltip>
     )
   }
 

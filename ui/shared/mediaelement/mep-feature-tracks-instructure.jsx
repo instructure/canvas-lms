@@ -550,7 +550,7 @@ const I18n = useI18nScope('mepfeaturetracksinstructure')
             .attr('aria-label', label)
             .val(lang)
         )
-        .append($('<span aria-hidden="true">').attr('for', id).text("✓"))
+        .append($('<span aria-hidden="true">').attr('for', id).text('✓'))
         .append($('<label aria-hidden="true">').attr('for', id).text(label))
 
       if (
