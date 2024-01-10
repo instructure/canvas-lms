@@ -166,8 +166,14 @@ class EnrollmentState < ActiveRecord::Base
         self.state = wf_state
       elsif global_start_at < now
         if enrollment.temporary_enrollment?
-          # special case for temporary enrollments, mark them deleted once we're past the end date
-          enrollment.destroy
+          ending_enrollment_state = enrollment.temporary_enrollment_pairing&.ending_enrollment_state
+
+          case ending_enrollment_state
+          when "completed", "inactive"
+            self.state = ending_enrollment_state
+          when "deleted", nil
+            enrollment.destroy
+          end
         else
           # we've past the end date so no matter what the state was, we're "completed" now
           self.state = "completed"

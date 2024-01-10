@@ -1222,7 +1222,7 @@ describe EnrollmentsApiController, type: :request do
         end
 
         it "respects enrollment state when a state arg is provided" do
-          start_at, end_at = "2023-10-01T18:53:53Z", "2023-10-31T18:53:53Z"
+          start_at, end_at = "2023-10-01T18:53:53Z", "2023-10-21T18:53:53Z"
           @recipient.enrollments.last.update!(start_at:, end_at:)
           user_path = "/api/v1/users/#{@recipient.id}/enrollments"
           json = api_call_as_user(account_admin_user,
