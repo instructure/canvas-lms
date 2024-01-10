@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import type JQuery from 'jquery'
 import $ from 'jquery'
 import {each} from 'lodash'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -38,27 +39,34 @@ const speedGraderHelpers = {
     return document.location.hash
   },
 
-  setLocation(url) {
+  setLocation(url: string) {
     document.location = url
   },
 
-  setLocationHash(hash) {
+  setLocationHash(hash: string) {
     document.location.hash = hash
   },
 
-  urlContainer(submission, defaultEl, originalityReportEl) {
+  urlContainer(
+    submission: {
+      has_originality_report?: boolean
+    },
+    defaultEl: JQuery,
+    originalityReportEl: JQuery
+  ) {
     if (submission.has_originality_report) {
       return originalityReportEl
     }
     return defaultEl
   },
 
-  buildIframe(src, options = {}, domElement = 'iframe') {
+  buildIframe(src: string, options = {}, domElement = 'iframe') {
     const parts = [`<${domElement}`]
     parts.push(' id="speedgrader_iframe"')
     parts.push(` src="${src}"`)
     Object.keys(options).forEach(option => {
       let key = option
+      // @ts-expect-error
       const value = options[key]
       if (key === 'className') {
         key = 'class'
@@ -69,14 +77,22 @@ const speedGraderHelpers = {
     return parts.join('')
   },
 
-  determineGradeToSubmit(use_existing_score, student, grade) {
+  determineGradeToSubmit(
+    use_existing_score: boolean,
+    student: {
+      submission: {
+        score: number | null
+      }
+    },
+    grade: JQuery
+  ) {
     if (use_existing_score) {
-      return student.submission.score.toString()
+      return (student.submission.score || 0).toString()
     }
-    return grade.val()
+    return String(grade.val())
   },
 
-  iframePreviewVersion(submission) {
+  iframePreviewVersion(submission: any) {
     // check if the submission object is valid
     if (submission == null) {
       return ''
@@ -95,7 +111,7 @@ const speedGraderHelpers = {
     return select + version
   },
 
-  resourceLinkLookupUuidParam(submission) {
+  resourceLinkLookupUuidParam(submission: any) {
     const resourceLinkLookupUuid = submission.resource_link_lookup_uuid
 
     if (resourceLinkLookupUuid) {
@@ -105,7 +121,7 @@ const speedGraderHelpers = {
     return ''
   },
 
-  setRightBarDisabled(isDisabled) {
+  setRightBarDisabled(isDisabled: boolean) {
     const elements = [
       '#grading-box-extended',
       '#speed_grader_comment_textarea',
@@ -118,8 +134,8 @@ const speedGraderHelpers = {
     each(elements, element => {
       if (isDisabled) {
         $(element).addClass('ui-state-disabled')
-        $(element).attr('aria-disabled', true)
-        $(element).attr('readonly', true)
+        $(element).attr('aria-disabled', 'true')
+        $(element).attr('readonly', 'readonly')
         $(element).prop('disabled', true)
       } else {
         $(element).removeClass('ui-state-disabled')
@@ -130,7 +146,12 @@ const speedGraderHelpers = {
     })
   },
 
-  classNameBasedOnStudent(student) {
+  classNameBasedOnStudent(student: {
+    submission_state: string
+    submission: {
+      submitted_at: string
+    }
+  }) {
     const raw = student.submission_state
     let formatted
     switch (raw) {
@@ -153,7 +174,23 @@ const speedGraderHelpers = {
     return {raw, formatted}
   },
 
-  submissionState(student, grading_role) {
+  submissionState(
+    student: {
+      needs_provisional_grade: boolean
+      submission: {
+        workflow_state: string
+        grade: string
+        provisional_grade_id: null | string
+        excused: boolean
+        grade_matches_current_submission: string
+        final_provisional_grade: {
+          grade: string
+        }
+        submitted_at: string
+      }
+    },
+    grading_role: string
+  ) {
     const submission = student.submission
     if (
       submission &&
@@ -184,22 +221,24 @@ const speedGraderHelpers = {
       return 'not_submitted'
     }
   },
-  plagiarismResubmitHandler: (event, resubmitUrl) => {
+  plagiarismResubmitHandler: (event: any, resubmitUrl: string) => {
     event.preventDefault()
 
-    $(event.target).attr('disabled', true).text(I18n.t('turnitin.resubmitting', 'Resubmitting...'))
+    $(event.target)
+      .attr('disabled', 'disabled')
+      .text(I18n.t('turnitin.resubmitting', 'Resubmitting...'))
     $.ajaxJSON(resubmitUrl, 'POST', {}, () => {
       speedGraderHelpers.reloadPage()
     })
   },
 
-  plagiarismResubmitUrl(submission, anonymizableUserId) {
-    return replaceTags($('#assignment_submission_resubmit_to_turnitin_url').attr('href'), {
+  plagiarismResubmitUrl(submission: any, anonymizableUserId: string) {
+    return replaceTags($('#assignment_submission_resubmit_to_turnitin_url').attr('href') || '', {
       [anonymizableUserId]: submission[anonymizableUserId],
     })
   },
 
-  plagiarismResubmitButton(hasOriginalityScore, buttonContainer) {
+  plagiarismResubmitButton(hasOriginalityScore: boolean, buttonContainer: JQuery) {
     if (hasOriginalityScore) {
       buttonContainer.hide()
     } else {
@@ -207,7 +246,7 @@ const speedGraderHelpers = {
     }
   },
 
-  plagiarismErrorMessage(turnitinAsset) {
+  plagiarismErrorMessage(turnitinAsset: {error_message?: string}) {
     return (
       turnitinAsset.error_message ||
       I18n.t(

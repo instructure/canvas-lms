@@ -155,27 +155,27 @@ export type GradebookStudentDetails = {
 }
 
 export type GradebookUserSubmissionDetails = {
-  grade: string | null
-  id: string
-  score: number | null
-  enteredScore?: number | null
   assignmentId: string
-  submissionType?: string | null
-  proxySubmitter?: string | null
-  submittedAt: Date | null
-  state: string
+  cachedDueDate: string | null
+  customGradeStatus?: string | null
+  deductedPoints: null | string | number
+  enteredGrade: string | null
+  enteredScore?: number | null
   excused: boolean
+  grade: string | null
+  gradeMatchesCurrentSubmission: boolean | null
+  gradingPeriodId?: string
+  id: string
   late: boolean
   latePolicyStatus?: string
   missing: boolean
-  userId: string
+  proxySubmitter?: string | null
   redoRequest: boolean
-  cachedDueDate: string | null
-  gradingPeriodId?: string
-  deductedPoints: null | string | number
-  enteredGrade: string | null
-  gradeMatchesCurrentSubmission: boolean | null
-  customGradeStatus?: string | null
+  score: null | number
+  state: string
+  submissionType?: string | null
+  submittedAt: Date | null
+  userId: string
 }
 
 export type GradebookStudentQueryResponse = {

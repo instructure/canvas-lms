@@ -186,6 +186,7 @@ export type CamelizedAssignment = {
 }
 
 export type SubmissionOriginalityData = {
+  error_message?: string
   status: string
   provider: string
   similarity_score: number

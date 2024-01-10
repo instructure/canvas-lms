@@ -415,7 +415,7 @@ describe('Grading Results Tests', () => {
         ...defaultStudentSubmissions,
         enteredGrade: null,
         enteredScore: null,
-        score: null,
+        score: 0,
         grade: null,
       }
       modifiedDefaultAssignments = {
@@ -470,7 +470,7 @@ describe('Grading Results Tests', () => {
             ...modifiedDefaultStudentSubmissions,
             enteredGrade: 'incomplete',
             enteredScore: 0,
-            score: 0,
+            score: null,
             grade: 'incomplete',
           },
         ],
