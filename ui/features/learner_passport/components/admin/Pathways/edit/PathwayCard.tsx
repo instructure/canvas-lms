@@ -17,38 +17,49 @@
  */
 
 import React from 'react'
+import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {View} from '@instructure/ui-view'
-import type {PathwayDetailData} from '../../../types'
+import type {PathwayDetailData, MilestoneData} from '../../../types'
 
 export type MilestoneCardVariant = 'sidebar' | 'tree'
 
 type PathwayMilestoneCardProps = {
-  pathway: PathwayDetailData
+  step: PathwayDetailData | MilestoneData
   variant: MilestoneCardVariant
 }
 
-const PathwayMilestoneCard = ({pathway, variant}: PathwayMilestoneCardProps) => {
+const PathwayMilestoneCard = ({step, variant}: PathwayMilestoneCardProps) => {
+  const isPathway = 'first_milestones' in step
   return (
     <View
       as="div"
-      background="primary-inverse"
+      background={isPathway ? 'primary-inverse' : 'primary'}
+      borderWidth={isPathway ? 'none' : 'small'}
       borderRadius="medium"
       padding="small"
+      textAlign="start"
       width={variant === 'sidebar' ? 'auto' : '350px'}
     >
-      <View as="div">
-        <Text as="div" weight="bold">
-          {pathway.title}
-        </Text>
-        <Text as="div">End of pathway</Text>
-      </View>
+      <Flex as="div" gap="small">
+        <div style={{width: '30px', height: '30px', background: 'grey'}} />
+        <View as="div">
+          {isPathway && (
+            <Text as="div" fontStyle="italic">
+              End of pathway
+            </Text>
+          )}
+          <Text as="div" weight="bold">
+            {step.title}
+          </Text>
+        </View>
+      </Flex>
       {variant === 'tree' ? (
         <View as="div" margin="small 0 0 0">
           <Text as="div">
             <TruncateText maxLines={2} truncate="character">
-              {pathway.description}
+              {step.description}
             </TruncateText>
           </Text>
         </View>

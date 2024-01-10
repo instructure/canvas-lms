@@ -633,24 +633,7 @@ class LearnerPassportController < ApplicationController
     pathway = current_pathways.find { |p| p[:id] == params[:pathway_id] }
     return render json: { message: "Pathway not found" }, status: :not_found if pathway.nil?
 
-    pathway[:learning_outcomes] = []
-    pathway.each_key do |key|
-      next if params[key].nil?
-
-      case key
-      when :is_private
-        pathway[:is_private] = params[key] == "true"
-      when :learning_outcomes
-        params[key].each do |skill|
-          pathway[:learning_outcomes] << JSON.parse(skill)
-        end
-      when :achievements_earned
-        achievement_ids = JSON.parse(params[key])
-        pathway[:achievements_earned] = Rails.cache.fetch(current_achievements_key) { learner_passport_current_achievements }.select { |a| achievement_ids.include?(a[:id]) }
-      else
-        pathway[key] = params[key]
-      end
-    end
+    pathway.replace(JSON.parse(params[:pathway]).transform_keys(&:to_sym))
     pathway[:published] = (params[:draft] == "true") ? nil : Date.today.to_s
     Rails.cache.write(current_pathways_key, current_pathways, expires_in: CACHE_EXPIRATION)
 

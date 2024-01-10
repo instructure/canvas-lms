@@ -34,7 +34,7 @@ const PathwayViewPage = () => {
   return (
     <View as="div" maxWidth="986px" margin="0 auto">
       <Breadcrumb label="You are here:" size="small">
-        <Breadcrumb.Link href={`/users/${ENV.current_user.id}/passport/pathways/dashboard`}>
+        <Breadcrumb.Link href={`/users/${ENV.current_user.id}/passport/admin/pathways/dashboard`}>
           Pathways
         </Breadcrumb.Link>
         <Breadcrumb.Link>{pathway.title}</Breadcrumb.Link>

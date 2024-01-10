@@ -23,10 +23,9 @@ import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {View} from '@instructure/ui-view'
-import type {PathwayDetailData, PathwayEditData, SkillData} from '../../../types'
+import type {PathwayDetailData, PathwayEditData} from '../../../types'
 import PathwayCreate from './PathwayCreate'
 import PathwayBuilder from './PathwayBuilder'
-import Path from '@canvas/conditional-release-editor/react/assignment-path'
 
 type PathwayEditSteps = 'create' | 'add_milestones'
 
@@ -80,28 +79,10 @@ const PathwayEdit = () => {
 
   const handleSubmit = useCallback(() => {
     const formData = new FormData()
-
-    formData.append('title', draftPathway.title)
-    formData.append('description', draftPathway.description)
-    formData.append('is_private', draftPathway.is_private ? 'true' : 'false')
-    draftPathway.learning_outcomes.forEach((skill: SkillData) => {
-      formData.append('learning_outcomes[]', JSON.stringify(skill))
-    })
-    formData.append(
-      'achievements_earned',
-      JSON.stringify(draftPathway.achievements_earned.map(a => a.id))
-    )
-    formData.append('draft', 'true')
-
+    formData.set('pathway', JSON.stringify(draftPathway))
+    formData.set('draft', 'true')
     submit(formData, {method: 'POST'})
-  }, [
-    draftPathway.achievements_earned,
-    draftPathway.description,
-    draftPathway.is_private,
-    draftPathway.learning_outcomes,
-    draftPathway.title,
-    submit,
-  ])
+  }, [draftPathway, submit])
 
   const handleCancelClick = useCallback(() => {
     navigate('../dashboard')
