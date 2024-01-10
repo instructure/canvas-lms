@@ -20,7 +20,7 @@ require_relative "../../spec_helper"
 require_relative "page_objects/assignments_index_page"
 require_relative "../helpers/items_assign_to_tray"
 
-shared_examples_for "selective_release module tray" do |context|
+shared_examples_for "selective_release assign to tray" do |context|
   include AssignmentsIndexPage
   include ItemsAssignToTray
 
@@ -190,7 +190,7 @@ describe "assignments index menu tool placement" do
       user_session(@teacher)
     end
 
-    it_behaves_like "selective_release module tray", :assignment_index
+    include_examples "selective_release assign to tray", :assignment_index
   end
 
   context "assign to tray on course homepage with default assignments index" do
@@ -199,6 +199,6 @@ describe "assignments index menu tool placement" do
       @course.update!(default_view: "assignments")
     end
 
-    it_behaves_like "selective_release module tray", :course_homepage
+    include_examples "selective_release assign to tray", :course_homepage
   end
 end
