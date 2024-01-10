@@ -94,7 +94,7 @@ export const fetchGradesForGradingPeriod = (gradingPeriodId, userId = 'self') =>
   asJson(
     window.fetch(
       `/api/v1/users/${userId}/enrollments?state[]=active&&type[]=StudentEnrollment&grading_period_id=${gradingPeriodId}`,
-      defaultFetchOptions
+      defaultFetchOptions()
     )
   ).then(enrollments =>
     enrollments.map(({course_id, grades}) => ({
@@ -108,7 +108,7 @@ export const fetchLatestAnnouncement = courseId =>
   asJson(
     window.fetch(
       `/api/v1/announcements?context_codes=course_${courseId}&active_only=true&per_page=1`,
-      defaultFetchOptions
+      defaultFetchOptions()
     )
   ).then(data => {
     if (data?.length > 0) {
@@ -123,7 +123,7 @@ export const fetchCourseInstructors = courseId =>
   asJson(
     window.fetch(
       `/api/v1/courses/${courseId}/users?enrollment_type[]=teacher&enrollment_type[]=ta&include[]=avatar_url&include[]=bio&include[]=enrollments`,
-      defaultFetchOptions
+      defaultFetchOptions()
     )
   )
 
@@ -133,12 +133,12 @@ export const fetchCourseApps = courseIds =>
       `/api/v1/external_tools/visible_course_nav_tools?${courseIds
         .map(id => `context_codes[]=course_${id}`)
         .join('&')}`,
-      defaultFetchOptions
+      defaultFetchOptions()
     )
   )
 
 export const fetchCourseTabs = courseId =>
-  asJson(window.fetch(`/api/v1/courses/${courseId}/tabs`, defaultFetchOptions))
+  asJson(window.fetch(`/api/v1/courses/${courseId}/tabs`, defaultFetchOptions()))
 
 export const readableRoleName = role => {
   const ROLES = {

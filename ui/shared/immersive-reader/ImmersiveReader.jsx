@@ -52,7 +52,7 @@ const LOGO = `
 function handleClick({title, content}, readerSDK) {
   ;(readerSDK || import('@microsoft/immersive-reader-sdk'))
     .then(({launchAsync}) => {
-      fetch('/api/v1/immersive_reader/authenticate', defaultFetchOptions)
+      fetch('/api/v1/immersive_reader/authenticate', defaultFetchOptions())
         .then(response => response.json())
         .then(({token, subdomain}) => {
           let htmlPayload = content()

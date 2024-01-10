@@ -138,18 +138,20 @@ export function checkStatus(response: Response) {
   }
 }
 
+const csrfToken = getCookie('_csrf_token')
+
 // these are duplicated in application_helper.rb#prefetch_xhr
 // because we don't have a good pattern for sharing them yet.
 // If you change these defaults, you should probably cascade that change
 // to that ruby location
-export const defaultFetchOptions: {
+export const defaultFetchOptions = (): {
   credentials: 'include' | 'omit' | 'same-origin'
   headers: Record<string, string>
-} = {
+} => ({
   credentials: 'same-origin',
   headers: {
     Accept: 'application/json+canvas-string-ids, application/json',
     'X-Requested-With': 'XMLHttpRequest',
-    'X-CSRF-Token': getCookie('_csrf_token'),
+    'X-CSRF-Token': csrfToken,
   },
-}
+})
