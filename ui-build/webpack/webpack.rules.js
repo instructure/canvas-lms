@@ -94,6 +94,9 @@ exports.swc = [
           parser: {
             syntax: 'typescript',
           },
+          experimental: {
+            plugins: [['swc-plugin-coverage-instrument', {}]],
+          },
         },
         env: {
           targets: browserTargets,
@@ -114,6 +117,9 @@ exports.swc = [
           parser: {
             syntax: 'typescript',
             tsx: true,
+          },
+          experimental: {
+            plugins: [['swc-plugin-coverage-instrument', {}]],
           },
         },
         env: {

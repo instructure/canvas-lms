@@ -25602,6 +25602,11 @@ swc-loader@^0.2.3:
   resolved "https://registry.yarnpkg.com/swc-loader/-/swc-loader-0.2.3.tgz#6792f1c2e4c9ae9bf9b933b3e010210e270c186d"
   integrity sha512-D1p6XXURfSPleZZA/Lipb3A8pZ17fP4NObZvFCDjK/OKljroqDpPmsBdTraWhVBqUNpcWBQY1imWdoPScRlQ7A==
 
+swc-plugin-coverage-instrument@^0.0.20:
+  version "0.0.20"
+  resolved "https://registry.yarnpkg.com/swc-plugin-coverage-instrument/-/swc-plugin-coverage-instrument-0.0.20.tgz#fdbd4b176e405c826c0e5146453ac7a6f1ba1cfa"
+  integrity sha512-WXTGILCZE2hW61yrmxi6doN/UB4RT2K1JJSQVPn9JMJ6X4WJpZsesHi4lHy6qRKVsNIlHZvTWofkpuRi/WQUig==
+
 swfobject@^2.2.1:
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/swfobject/-/swfobject-2.2.1.tgz#e55451d5dde59657335c86b01732c61a923293e2"

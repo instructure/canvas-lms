@@ -201,6 +201,7 @@
     "shallow-equal": "^1.2.0",
     "spin.js": "2.3.2",
     "swc-loader": "^0.2.3",
+    "swc-plugin-coverage-instrument": "^0.0.20",
     "swfobject": "^2.2.1",
     "tablesorter": "^2.28.5",
     "timezone": "npm:@instructure/timezone@1.0.28",
