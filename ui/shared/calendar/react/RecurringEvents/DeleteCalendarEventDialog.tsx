@@ -72,7 +72,7 @@ const DeleteCalendarEventDialog = ({
   const handleDelete = useCallback(() => {
     setIsDeleting(true)
     onDeleting(which)
-    const defaultOptions = {...defaultFetchOptions}
+    const defaultOptions = {...defaultFetchOptions()}
     defaultOptions.headers['Content-Type'] = 'application/json'
     fetch(delUrl, {
       method: 'DELETE',
