@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import $ from 'jquery'
 import '@canvas/datetime/jquery' // $.datetimeString
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {useState} from 'react'
@@ -32,8 +33,8 @@ const usersList = userIds => {
   if (userIds && userIds.length > 0) {
     return (
       <List size="small">
-        {userIds.map((listItem, index) => (
-          <List.Item key={index}>
+        {userIds.map(listItem => (
+          <List.Item key={listItem}>
             <Link href={`/users/${listItem}`}>{listItem}</Link>
           </List.Item>
         ))}
