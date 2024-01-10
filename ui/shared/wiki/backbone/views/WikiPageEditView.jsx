@@ -228,7 +228,7 @@ export default class WikiPageEditView extends ValidatedFormView {
   }
 
   destroyEditor() {
-    //hack fix for LF-1134
+    // hack fix for LF-1134
     try {
       RichContentEditor.destroyRCE(this.$wikiPageBody)
     } catch (e) {

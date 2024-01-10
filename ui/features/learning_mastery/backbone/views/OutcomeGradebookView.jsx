@@ -498,7 +498,7 @@ OutcomeGradebookView.prototype.setOutcomeOrder = function () {
 
   const outcomes = columns.map((c, index) => {
     return {
-      outcome_id: parseInt(c.outcome.id),
+      outcome_id: parseInt(c.outcome.id, 10),
       position: index + 1,
     }
   })
