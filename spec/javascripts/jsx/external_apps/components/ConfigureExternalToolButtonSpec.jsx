@@ -67,6 +67,17 @@ test('uses the tool configuration "target_link_uri" when "url" is not present', 
   wrapper.unmount()
 })
 
+test('includes the tool_configuration placement', () => {
+  const wrapper = mount(<ConfigureExternalToolButton tool={tool} modalIsOpen />)
+  ok(
+    wrapper
+      .instance()
+      .getLaunchUrl({target_link_uri: 'https://advantage.tool.com'})
+      .includes('placement=tool_configuration')
+  )
+  wrapper.unmount()
+})
+
 test('shows beginning info alert and adds styles to iframe', () => {
   const wrapper = mount(<ConfigureExternalToolButton tool={tool} modalIsOpen />)
   wrapper.instance().handleAlertFocus({target: {className: 'before'}})
