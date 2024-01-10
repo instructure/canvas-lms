@@ -557,7 +557,7 @@ export default function DiscussionTopicForm({
         message: rceContent,
         sectionIdsToPostTo,
         discussionAnonymousState,
-        anonymousAuthorState,
+        anonymousAuthorState: discussionAnonymousState === 'off' ? false : anonymousAuthorState,
         requireInitialPost,
         enablePodcastFeed,
         includeRepliesInFeed,

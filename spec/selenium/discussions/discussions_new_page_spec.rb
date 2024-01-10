@@ -527,12 +527,14 @@ describe "discussions" do
         wait_for_ajaximations
 
         dt = DiscussionTopic.last
+
         expect(dt.title).to eq title
         expect(dt.message).to include message
         expect(dt.require_initial_post).to be false
         expect(dt.delayed_post_at).to be_nil
         expect(dt.lock_at).to be_nil
         expect(dt.anonymous_state).to be_nil
+        expect(dt.is_anonymous_author).to be false
         expect(dt).to be_published
 
         # Verify that the discussion topic redirected the page to the new discussion topic
