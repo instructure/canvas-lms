@@ -321,6 +321,28 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
       expect(new_assignment.intra_group_peer_reviews).to eq(new_peer_reviews[:intraReviews])
     end
 
+    it "can update intraReviews" do
+      @discussion_assignment.peer_reviews = true
+      @discussion_assignment.save!
+      @topic.reload
+
+      new_peer_reviews = {
+        intraReviews: false,
+      }
+
+      result = run_mutation(id: @topic.id, assignment: { peerReviews: new_peer_reviews })
+
+      expect(result["errors"]).to be_nil
+
+      # Check response from graphql
+      new_assignment = result["data"]["updateDiscussionTopic"]["discussionTopic"]["assignment"]
+      expect(new_assignment["peerReviews"]["intraReviews"]).to be false
+
+      # Check updated object
+      new_assignment = Assignment.find(@discussion_assignment.id)
+      expect(new_assignment.intra_group_peer_reviews).to be false
+    end
+
     it "sets just the due date" do
       new_due_date = Time.now.utc.iso8601
       result = run_mutation(id: @topic.id, assignment: { dueAt: new_due_date })

@@ -46,6 +46,8 @@ type Props = {
   setPostToSis: (postToSis: boolean) => void
   gradingSchemeId?: string
   setGradingSchemeId: (gradingSchemeId: string) => void
+  intraGroupPeerReviews: boolean
+  setIntraGroupPeerReviews: (intraGroupPeerReviews: boolean) => void
 }
 
 export const GradedDiscussionOptions = ({
@@ -66,6 +68,8 @@ export const GradedDiscussionOptions = ({
   setPostToSis,
   gradingSchemeId,
   setGradingSchemeId,
+  intraGroupPeerReviews,
+  setIntraGroupPeerReviews,
 }: Props) => {
   return (
     <View as="div">
@@ -108,6 +112,8 @@ export const GradedDiscussionOptions = ({
           setPeerReviewsPerStudent={setPeerReviewsPerStudent}
           peerReviewDueDate={peerReviewDueDate}
           setPeerReviewDueDate={setPeerReviewDueDate}
+          intraGroupPeerReviews={intraGroupPeerReviews}
+          setIntraGroupPeerReviews={setIntraGroupPeerReviews}
         />
       </View>
       <View as="div" margin="medium 0">
