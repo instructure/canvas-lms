@@ -35,7 +35,7 @@ class TermsOfServiceCustomContents extends React.Component {
 
   async componentDidMount() {
     const url = '/api/v1/terms_of_service_custom_content'
-    const TERMS_OF_SERVICE_CUSTOM_CONTENT = await (await fetch(url, defaultFetchOptions)).text()
+    const TERMS_OF_SERVICE_CUSTOM_CONTENT = await (await fetch(url, defaultFetchOptions())).text()
 
     this.setState({TERMS_OF_SERVICE_CUSTOM_CONTENT})
   }

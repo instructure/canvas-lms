@@ -29,7 +29,7 @@ export default {
       const url = `/api/v1/users/${userId}/colors/${contextCode}?hexcode=${hexcode}`
       fetch(url, {
         method: 'PUT',
-        ...defaultFetchOptions,
+        ...defaultFetchOptions(),
       })
     })
   },
