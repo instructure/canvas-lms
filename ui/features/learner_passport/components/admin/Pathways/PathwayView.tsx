@@ -56,7 +56,7 @@ const PathwayView = ({pathway}: PathwayViewProps) => {
                   linear-gradient(to bottom, rgba(150, 173, 233, .3) 1px, transparent 1px)`,
         }}
       >
-        <PathwayTreeView pathway={pathway} zoomLevel={zoomLevel} />
+        <PathwayTreeView pathway={pathway} zoomLevel={zoomLevel} selectedStep={null} />
       </div>
     </div>
   )

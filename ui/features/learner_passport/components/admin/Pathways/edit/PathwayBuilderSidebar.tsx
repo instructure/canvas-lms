@@ -16,14 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import {CondensedButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {IconPlusLine} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import type {PathwayDetailData} from '../../../types'
+import type {PathwayDetailData, MilestoneData} from '../../../types'
 import PathwayCard from './PathwayCard'
+import BlankPathwayBox from './BlankPathwayBox'
 
 const Connector = () => {
   return (
@@ -63,13 +64,26 @@ const AddMilestoneButton = ({onClick}: AddMilestoneButtonProps) => {
   )
 }
 
+const findChildMilestones = (milestones: MilestoneData[], ids: string[]) => {
+  return milestones.filter(m => ids.includes(m.id))
+}
+
 type PathwayBuilderSidebarProps = {
   pathway: PathwayDetailData
+  currentStep: MilestoneData | null // null => the pathway is the current step
   onAddStep: () => void
   onHideSidebar: () => void
 }
 
-const PathwayBuilderSidebar = ({pathway, onAddStep, onHideSidebar}: PathwayBuilderSidebarProps) => {
+const PathwayBuilderSidebar = ({
+  currentStep,
+  pathway,
+  onAddStep,
+  onHideSidebar,
+}: PathwayBuilderSidebarProps) => {
+  const childSteps = currentStep ? currentStep.next_milestones : pathway.first_milestones
+  const childMilestones = findChildMilestones(pathway.milestones, childSteps)
+
   return (
     <View
       as="div"
@@ -84,8 +98,15 @@ const PathwayBuilderSidebar = ({pathway, onAddStep, onHideSidebar}: PathwayBuild
         <CondensedButton onClick={onHideSidebar}>Hide</CondensedButton>
       </Flex>
       <View as="div" textAlign="center">
-        <PathwayCard pathway={pathway} variant="sidebar" />
+        <PathwayCard step={currentStep || pathway} variant="sidebar" />
         <Connector />
+        {childMilestones.map((step: MilestoneData) => (
+          <div style={{marginBottom: '30px'}}>
+            <PathwayCard step={step} variant="sidebar" />
+          </div>
+        ))}
+        {childMilestones.length === 0 && <BlankPathwayBox />}
+        <div style={{marginTop: '36px'}} />
         <AddMilestoneButton onClick={onAddStep} />
       </View>
     </View>

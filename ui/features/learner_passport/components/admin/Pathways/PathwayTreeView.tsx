@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useEffect, useLayoutEffect, useRef, useState} from 'react'
+import React, {useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react'
 import dagre from 'dagre'
 import type {Node} from 'dagre'
 import bspline from 'b-spline'
@@ -29,6 +29,7 @@ import {TruncateText} from '@instructure/ui-truncate-text'
 import {View} from '@instructure/ui-view'
 import type {MilestoneId, MilestoneData, PathwayDetailData} from '../../types'
 import {showUnimplemented} from '../../shared/utils'
+import {has} from 'lodash'
 
 const BOX_WIDTH = 322
 
@@ -38,6 +39,9 @@ type NodeType = 'pathway' | 'milestone'
 
 type PathwayTreeViewProps = {
   pathway: PathwayDetailData
+  selectedStep: MilestoneId | null
+  onSelected?: (selectedStep: MilestoneData | null) => void
+  layout?: 'TB' | 'BT' | 'LR' | 'RL'
   zoomLevel?: number
 }
 
@@ -62,7 +66,13 @@ const DivInSVG: React.FC<NamespacedDiv> = props => {
   )
 }
 
-const PathwayTreeView = ({pathway, zoomLevel = 1}: PathwayTreeViewProps) => {
+const PathwayTreeView = ({
+  pathway,
+  selectedStep,
+  onSelected,
+  layout = 'TB',
+  zoomLevel = 1,
+}: PathwayTreeViewProps) => {
   const [g] = useState(new dagre.graphlib.Graph())
   const [dagNodes, setDagNodes] = useState<JSX.Element[]>([])
   const [dagEdges, setDagEdges] = useState<JSX.Element[]>([])
@@ -77,6 +87,53 @@ const PathwayTreeView = ({pathway, zoomLevel = 1}: PathwayTreeViewProps) => {
   const preRenderNodeRef = useRef<HTMLDivElement>(null)
   const svgRef = useRef<SVGSVGElement>(null)
 
+  const handleSelectBox = useCallback(
+    (id: string) => {
+      if (!onSelected) return
+      if (id === '0') {
+        onSelected(null)
+      } else {
+        const milestone = pathway.milestones.find(m => m.id === id)
+        if (!milestone) return
+        onSelected(milestone)
+      }
+    },
+    [onSelected, pathway.milestones]
+  )
+
+  const handleBoxClick = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      handleSelectBox(e.currentTarget.id)
+    },
+    [handleSelectBox]
+  )
+
+  const handleBoxKey = useCallback(
+    (e: React.KeyboardEvent<HTMLDivElement>) => {
+      if (e.key === 'Enter') {
+        handleSelectBox(e.currentTarget.id)
+      }
+    },
+    [handleSelectBox]
+  )
+  const boxStyle = useMemo(() => {
+    return onSelected
+      ? {
+          cursor: 'pointer',
+        }
+      : {}
+  }, [onSelected])
+  const boxProps = useMemo(() => {
+    return onSelected
+      ? {
+          role: 'button',
+          tabIndex: 0,
+          onClick: handleBoxClick,
+          onKeyDown: handleBoxKey,
+        }
+      : {}
+  }, [handleBoxClick, handleBoxKey, onSelected])
+
   const handleFirstNodeRef = useCallback(
     node => {
       setFirstNodeRef(node)
@@ -85,27 +142,33 @@ const PathwayTreeView = ({pathway, zoomLevel = 1}: PathwayTreeViewProps) => {
   )
 
   const renderPathwayBoxContent = useCallback(
-    (node: GraphNode, type: NodeType, width: number, height?: number) => {
+    (node: GraphNode, type: NodeType, selected: boolean, width: number, height?: number) => {
       return (
         <View
           as="div"
           padding="small"
           background={type === 'pathway' ? 'primary-inverse' : 'primary'}
           borderRadius="medium"
-          borderWidth="small"
+          borderWidth="medium"
           width={`${width}px`}
           height={height ? `${height}px` : 'auto'}
+          borderColor={selected ? 'brand' : undefined}
         >
           <Flex as="div" direction="column" justifyItems="start" height="100%">
             <Flex.Item shouldGrow={true} overflowY="visible">
-              <Text weight="bold">{node.title}</Text>
-              <div style={{marginTop: '.5rem'}}>
-                <Text size="small">
-                  <TruncateText maxLines={2} truncate="character">
-                    {node.description}
-                  </TruncateText>
-                </Text>
-              </div>
+              <Flex as="div" gap="small">
+                <div style={{width: '30px', height: '30px', background: 'grey'}} />
+                <Flex.Item>
+                  <Text weight="bold">{node.title}</Text>
+                  <div style={{marginTop: '.5rem'}}>
+                    <Text size="small">
+                      <TruncateText maxLines={2} truncate="character">
+                        {node.description}
+                      </TruncateText>
+                    </Text>
+                  </div>
+                </Flex.Item>
+              </Flex>
               {!('required' in node) || node.required ? null : (
                 <div style={{marginTop: '.5rem'}}>
                   <Pill>Optional</Pill>
@@ -135,8 +198,8 @@ const PathwayTreeView = ({pathway, zoomLevel = 1}: PathwayTreeViewProps) => {
   const renderPathwayBox = useCallback(
     (data: PathwayDetailData | MilestoneData, type: NodeType, key: string) => {
       return (
-        <div id={data.id} key={key}>
-          {renderPathwayBoxContent(data, type, BOX_WIDTH, undefined)}
+        <div id={data.id} key={key} role="button">
+          {renderPathwayBoxContent(data, type, false, BOX_WIDTH, undefined)}
         </div>
       )
     },
@@ -154,7 +217,7 @@ const PathwayTreeView = ({pathway, zoomLevel = 1}: PathwayTreeViewProps) => {
 
   const renderDAG = useCallback(() => {
     // Set an object for the graph label
-    g.setGraph({})
+    g.setGraph({rankdir: layout})
 
     // Default to assigning a new object as a label for each new edge.
     g.setDefaultEdgeLabel(function () {
@@ -173,6 +236,7 @@ const PathwayTreeView = ({pathway, zoomLevel = 1}: PathwayTreeViewProps) => {
     pathway.milestones.forEach((m: MilestoneData) => {
       const ht = graphBoxHeights.milestones.find(n => n.id === m.id)?.height
       g.setNode(m.id, {
+        id: m.id,
         title: m.title,
         description: m.description,
         required: m.required,
@@ -198,6 +262,7 @@ const PathwayTreeView = ({pathway, zoomLevel = 1}: PathwayTreeViewProps) => {
     const nodes = g.nodes().map((n, i) => {
       const node = g.node(n)
       const type = i === 0 ? 'pathway' : 'milestone'
+      const opacity = i === 0 && selectedStep !== null ? 0.7 : 1
       return (
         <foreignObject
           key={n}
@@ -214,9 +279,18 @@ const PathwayTreeView = ({pathway, zoomLevel = 1}: PathwayTreeViewProps) => {
             style={{
               left: 0,
               top: 0,
+              ...boxStyle,
+              opacity,
             }}
+            {...boxProps}
           >
-            {renderPathwayBoxContent(node as PathwayNode, type, node.width, node.height)}
+            {renderPathwayBoxContent(
+              node as PathwayNode,
+              type,
+              selectedStep === n,
+              node.width,
+              node.height
+            )}
           </DivInSVG>
         </foreignObject>
       )
@@ -224,15 +298,19 @@ const PathwayTreeView = ({pathway, zoomLevel = 1}: PathwayTreeViewProps) => {
 
     setDagNodes(nodes)
   }, [
+    boxProps,
+    boxStyle,
     g,
     graphBoxHeights.height,
     graphBoxHeights.milestones,
     handleFirstNodeRef,
+    layout,
     pathway.description,
     pathway.first_milestones,
     pathway.milestones,
     pathway.title,
     renderPathwayBoxContent,
+    selectedStep,
   ])
 
   const renderDAGEdges = useCallback(() => {

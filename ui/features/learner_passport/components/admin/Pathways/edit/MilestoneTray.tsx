@@ -51,7 +51,7 @@ const MilestoneTray = ({milestone, open, variant, onClose, onSave}: MilestoneTra
   const [reqTrayOpenCount, setReqTrayOpenCount] = useState(0)
 
   const handleSave = useCallback(() => {
-    const newMilestone = {
+    const newMilestone: MilestoneData = {
       id: milestoneId,
       title,
       description,

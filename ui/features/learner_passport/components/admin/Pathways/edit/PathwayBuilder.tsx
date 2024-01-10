@@ -17,11 +17,9 @@
  */
 
 import React, {useCallback, useState} from 'react'
-import {CondensedButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
-import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import type {PathwayDetailData, MilestoneData, MilestoneId} from '../../../types'
+import type {PathwayDetailData, MilestoneData} from '../../../types'
 import PathwayBuilderSidebar from './PathwayBuilderSidebar'
 import PathwayBuilderTree from './PathwayBuilderTree'
 import MilestoneTray from './MilestoneTray'
@@ -32,7 +30,7 @@ type PathwayBuilderProps = {
 }
 
 const PathwayBuilder = ({pathway, onChange}: PathwayBuilderProps) => {
-  const [currentRoot, setCurrentRoot] = useState<MilestoneId | null>(null)
+  const [currentRoot, setCurrentRoot] = useState<MilestoneData | null>(null)
   const [milestoneTrayOpen, setMilestoneTrayOpen] = useState(false)
   const [milestoneTrayOpenCount, setMilestoneTrayOpenCount] = useState(0)
   const [treeVersion, setTreeVersion] = useState(0)
@@ -55,17 +53,30 @@ const PathwayBuilder = ({pathway, onChange}: PathwayBuilderProps) => {
     (newMilestone: MilestoneData) => {
       setTreeVersion(treeVersion + 1)
       setMilestoneTrayOpen(false)
+      const first_milestones = [...pathway.first_milestones]
+      const milestones = [...pathway.milestones]
       if (currentRoot === null) {
-        pathway.first_milestones.push(newMilestone.id)
+        first_milestones.push(newMilestone.id)
       } else {
-        const rootMilestone = pathway.milestones.find(ms => ms.id === currentRoot)
+        const rootMilestone = {...currentRoot}
         if (rootMilestone) {
           rootMilestone.next_milestones.push(newMilestone.id)
         }
       }
-      onChange({milestones: [...pathway.milestones, newMilestone]})
+      onChange({first_milestones, milestones: [...milestones, newMilestone]})
     },
     [currentRoot, onChange, pathway.first_milestones, pathway.milestones, treeVersion]
+  )
+
+  const handleSelectStepFromTree = useCallback(
+    (step: MilestoneData | null) => {
+      if (step) {
+        setCurrentRoot(step)
+      } else {
+        setCurrentRoot(null)
+      }
+    },
+    [setCurrentRoot]
   )
 
   return (
@@ -75,6 +86,7 @@ const PathwayBuilder = ({pathway, onChange}: PathwayBuilderProps) => {
           {sidebarIsVisible ? (
             <PathwayBuilderSidebar
               pathway={pathway}
+              currentStep={currentRoot}
               onAddStep={handleAddMilestone}
               onHideSidebar={handleHideSidebar}
             />
@@ -83,7 +95,9 @@ const PathwayBuilder = ({pathway, onChange}: PathwayBuilderProps) => {
         <Flex.Item shouldGrow={true}>
           <PathwayBuilderTree
             pathway={pathway}
+            selectedStep={currentRoot ? currentRoot.id : null}
             onShowSidebar={sidebarIsVisible ? undefined : handleShowSidebar}
+            onSelectStep={handleSelectStepFromTree}
             treeVersion={treeVersion}
           />
         </Flex.Item>
