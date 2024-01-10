@@ -18,11 +18,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative "../spec_helper"
+require_relative "student_visibility/student_visibility_common"
 
 # need tests for:
 # overrides that arent date related
 
 describe "differentiated_assignments" do
+  include StudentVisibilityCommon
+
   specs_require_sharding
 
   def course_with_differentiated_assignments_enabled
@@ -162,30 +165,11 @@ describe "differentiated_assignments" do
       assignment_with_true_only_visible_to_overrides
       give_section_due_date(@assignment, @section_foo)
       enroller_user_in_section(@section_foo)
-      # at this point there should be an entry in the table
-      @visibility_object = AssignmentStudentVisibility.first
     end
 
-    it "returns objects" do
-      expect(@visibility_object).not_to be_nil
-    end
+    let(:visibility_object) { AssignmentStudentVisibility.first }
 
-    it "doesnt allow updates" do
-      @visibility_object.user_id = @visibility_object.user_id + 1
-      expect { @visibility_object.save! }.to raise_error(ActiveRecord::ReadOnlyRecord)
-    end
-
-    it "doesnt allow new records" do
-      expect do
-        AssignmentStudentVisibility.create!(user_id: @user.id,
-                                            assignment_id: @assignment_id,
-                                            course_id: @course.id)
-      end.to raise_error(ActiveRecord::ReadOnlyRecord)
-    end
-
-    it "doesnt allow deletion" do
-      expect { @visibility_object.destroy }.to raise_error(ActiveRecord::ReadOnlyRecord)
-    end
+    it_behaves_like "student visibility models"
   end
 
   context "course_with_differentiated_assignments_enabled" do
