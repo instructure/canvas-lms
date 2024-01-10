@@ -41,11 +41,7 @@ class ErrorReport < ActiveRecord::Base
   end
 
   class Reporter
-    IGNORED_CATEGORIES = "404,ActionDispatch::RemoteIp::IpSpoofAttackError,Turnitin::Errors::SubmissionNotScoredError"
-
-    def ignored_categories
-      Setting.get("ignored_error_report_categories", IGNORED_CATEGORIES).split(",")
-    end
+    IGNORED_CATEGORIES = %w[404 ActionDispatch::RemoteIp::IpSpoofAttackError Turnitin::Errors::SubmissionNotScoredError PG::ConnectionBad].freeze
 
     include ActiveSupport::Callbacks
     define_callbacks :on_log_error
@@ -58,7 +54,7 @@ class ErrorReport < ActiveRecord::Base
 
     def log_error(category, opts)
       opts[:category] = category.to_s.presence || "default"
-      return if ignored_categories.include? category
+      return if IGNORED_CATEGORIES.include? category
 
       @opts = opts
       # sanitize invalid encodings

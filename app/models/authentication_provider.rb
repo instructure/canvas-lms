@@ -26,6 +26,8 @@ class AuthenticationProvider < ActiveRecord::Base
   include Workflow
   validates :auth_filter, length: { maximum: maximum_text_length, allow_blank: true }
 
+  DEBUG_EXPIRE = 30.minutes
+
   workflow do
     state :active
     state :deleted
@@ -355,7 +357,7 @@ class AuthenticationProvider < ActiveRecord::Base
   end
 
   def debug_set(key, value, overwrite: true)
-    ::Canvas.redis.set(debug_key(key), value, ex: debug_expire.to_i, nx: overwrite ? nil : true)
+    ::Canvas.redis.set(debug_key(key), value, ex: DEBUG_EXPIRE.to_i, nx: overwrite ? nil : true)
   end
 
   protected
@@ -426,9 +428,5 @@ class AuthenticationProvider < ActiveRecord::Base
 
   def debug_key(key)
     ["auth_provider_debugging", global_id, key.to_s].cache_key
-  end
-
-  def debug_expire
-    Setting.get("auth_provider_debug_expire_minutes", 30).to_i.minutes
   end
 end

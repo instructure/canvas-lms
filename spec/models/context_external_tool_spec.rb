@@ -736,7 +736,6 @@ describe ContextExternalTool do
     before do
       tool.settings[:environments] = { domain: "beta.example.com" }
       allow(ApplicationController).to receive_messages(test_cluster?: true, test_cluster_name: "beta")
-      Account.site_admin.enable_feature! :dynamic_lti_environment_overrides
     end
 
     context "in standard Canvas" do
@@ -750,14 +749,6 @@ describe ContextExternalTool do
     context "with a lti_1_3 tool" do
       before do
         tool.lti_version = "1.3"
-      end
-
-      it { is_expected.to be false }
-    end
-
-    context "when feature flag is disabled" do
-      before do
-        Account.site_admin.disable_feature! :dynamic_lti_environment_overrides
       end
 
       it { is_expected.to be false }
@@ -1903,7 +1894,6 @@ describe ContextExternalTool do
         context "in nonprod environment" do
           before do
             allow(ApplicationController).to receive_messages(test_cluster?: true, test_cluster_name: "beta")
-            Account.site_admin.enable_feature! :dynamic_lti_environment_overrides
           end
 
           it "matches on override" do

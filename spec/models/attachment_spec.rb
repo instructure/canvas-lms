@@ -243,7 +243,7 @@ describe Attachment do
       crocodocable_attachment_model
 
       attempts = 3
-      Setting.set("max_crocodoc_attempts", attempts)
+      stub_const("Attachment::MAX_CROCODOC_ATTEMPTS", attempts)
 
       track_jobs do
         # first attempt
@@ -345,8 +345,7 @@ describe Attachment do
       it "prefers crocodoc when annotation is requested and canvadocs can't annotate" do
         configure_crocodoc
         configure_canvadocs "annotations_supported" => false
-        Setting.set("canvadoc_mime_types",
-                    (Canvadoc.mime_types << "application/blah").to_json)
+        stub_const("Canvadoc::DEFAULT_MIME_TYPES", (Canvadoc::DEFAULT_MIME_TYPES + ["application/blah"]))
 
         crocodocable = crocodocable_attachment_model
         canvadocable = canvadocable_attachment_model content_type: "application/blah"
@@ -546,11 +545,9 @@ describe Attachment do
       @attachment.save!
     end
 
-    it "delays the creation of the media object by attachment_build_media_object_delay_seconds" do
+    it "delays the creation of the media object" do
       now = Time.now
       allow(Time).to receive(:now).and_return(now)
-      allow(Setting).to receive(:get).and_return(nil)
-      expect(Setting).to receive(:get).with("attachment_build_media_object_delay_seconds", "10").once.and_return("25")
       track_jobs do
         @attachment.save!
       end
@@ -558,7 +555,7 @@ describe Attachment do
       expect(MediaObject.count).to eq 0
       job = created_jobs.find { |j| j.tag == "MediaObject.add_media_files" }
       expect(job.tag).to eq "MediaObject.add_media_files"
-      expect(job.run_at.to_i).to eq (now + 25.seconds).to_i
+      expect(job.run_at.to_i).to eq (now + 1.minute).to_i
     end
 
     it "does not create a media object in a skip_media_object_creation block" do
@@ -1782,7 +1779,7 @@ describe Attachment do
     it "allows custom ttl for download_url" do
       attachment = attachment_with_context(@course, display_name: "foo")
       allow(attachment).to receive(:public_url) # allow other calls due to, e.g., save
-      expect(attachment).to receive(:public_url).with(include(expires_in: 3600.seconds))
+      expect(attachment).to receive(:public_url).with(include(expires_in: 1.day))
       attachment.public_download_url
       expect(attachment).to receive(:public_url).with(include(expires_in: 2.days))
       attachment.public_download_url(2.days)
@@ -2451,7 +2448,7 @@ describe Attachment do
       course_model
       attachment_model(context: @course, uploaded_data: stub_png_data, size: 25)
       quota = Attachment.get_quota(@course)
-      expect(quota[:quota_used]).to eq Attachment.minimum_size_for_quota
+      expect(quota[:quota_used]).to eq Attachment::MINIMUM_SIZE_FOR_QUOTA
     end
 
     it "does not count attachments a student has used for submissions towards the quota" do

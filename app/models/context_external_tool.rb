@@ -773,7 +773,6 @@ class ContextExternalTool < ActiveRecord::Base
   def use_environment_overrides?
     return false if use_1_3?
     return false unless ApplicationController.test_cluster?
-    return false unless Account.site_admin.feature_enabled?(:dynamic_lti_environment_overrides)
     return false if settings[:environments].blank?
 
     true
@@ -1254,7 +1253,6 @@ class ContextExternalTool < ActiveRecord::Base
     # repeat matches with environment-specific url and domain overrides
     # and we haven't been able to find anything yet
     if ApplicationController.test_cluster? &&
-       Account.site_admin.feature_enabled?(:dynamic_lti_environment_overrides) &&
        match.blank?
       match ||= find_tool_match(
         sorted_external_tools,

@@ -341,90 +341,79 @@ describe ExternalToolsController, type: :request do
         allow(Setting).to receive(:set).with("allow_tc_access_").and_return("true")
       end
 
-      context "with feature flag enabled" do
-        before do
-          Account.site_admin.enable_feature! :dynamic_lti_environment_overrides
+      let(:domain) { "www.example-beta.com" }
+
+      def expect_domain_override(url)
+        expect(url).to include(domain)
+      end
+
+      def expect_no_override(url)
+        expect(url).not_to include(domain)
+      end
+
+      context "with domain override" do
+        let(:override_icon_url) { "https://www.example-beta.com/lti/icon" }
+        let(:tool) do
+          t = super()
+          t.settings[:environments] = {
+            domain:
+          }
+          t.save!
+          t
         end
 
-        let(:domain) { "www.example-beta.com" }
-
-        def expect_domain_override(url)
-          expect(url).to include(domain)
+        it "overrides base icon_url" do
+          expect_domain_override(subject["icon_url"])
         end
 
-        def expect_no_override(url)
-          expect(url).not_to include(domain)
+        it "overrides placement icon_url" do
+          expect_domain_override(subject.dig("editor_button", "icon_url"))
         end
 
-        context "with domain override" do
-          let(:override_icon_url) { "https://www.example-beta.com/lti/icon" }
-          let(:tool) do
-            t = super()
-            t.settings[:environments] = {
-              domain:
-            }
-            t.save!
-            t
-          end
-
-          it "overrides base icon_url" do
-            expect_domain_override(subject["icon_url"])
-          end
-
-          it "overrides placement icon_url" do
-            expect_domain_override(subject.dig("editor_button", "icon_url"))
-          end
-
-          it "overrides placement url" do
-            expect_domain_override(subject.dig("editor_button", "url"))
-          end
-
-          it "overrides url" do
-            expect_domain_override(subject["url"])
-          end
-
-          it "overrides domain" do
-            expect_domain_override(subject["domain"])
-          end
+        it "overrides placement url" do
+          expect_domain_override(subject.dig("editor_button", "url"))
         end
 
-        context "with launch_url override" do
-          let(:override_url) { "https://www.example-beta.com/lti/launch" }
-          let(:tool) do
-            t = super()
-            t.settings[:environments] = {
-              launch_url: override_url
-            }
-            t.save!
-            t
-          end
+        it "overrides url" do
+          expect_domain_override(subject["url"])
+        end
 
-          it "overrides url" do
-            expect(subject["url"]).to eq override_url
-          end
-
-          it "does not override placement url" do
-            expect_no_override(subject.dig("editor_button", "url"))
-          end
-
-          it "does not override placement icon_url" do
-            expect_no_override(subject.dig("editor_button", "icon_url"))
-          end
-
-          it "does not override icon url" do
-            expect_no_override(subject["icon_url"])
-          end
-
-          it "does not override domain" do
-            expect_no_override(subject["domain"])
-          end
+        it "overrides domain" do
+          expect_domain_override(subject["domain"])
         end
       end
 
-      # context "with feature flag disabled" do
-      #   see instructure_misc_plugin/spec_canvas/lib/api/v1/external_tools_api_spec.rb
-      #   (since existing environment overrides are defined there as part of beta refresh)
-      # end
+      context "with launch_url override" do
+        let(:override_url) { "https://www.example-beta.com/lti/launch" }
+        let(:tool) do
+          t = super()
+          t.settings[:environments] = {
+            launch_url: override_url
+          }
+          t.save!
+          t
+        end
+
+        it "overrides url" do
+          expect(subject["url"]).to eq override_url
+        end
+
+        it "does not override placement url" do
+          expect_no_override(subject.dig("editor_button", "url"))
+        end
+
+        it "does not override placement icon_url" do
+          expect_no_override(subject.dig("editor_button", "icon_url"))
+        end
+
+        it "does not override icon url" do
+          expect_no_override(subject["icon_url"])
+        end
+
+        it "does not override domain" do
+          expect_no_override(subject["domain"])
+        end
+      end
     end
 
     if Canvas.redis_enabled?

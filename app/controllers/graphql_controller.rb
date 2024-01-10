@@ -72,8 +72,7 @@ class GraphQLController < ApplicationController
       ]
     }
 
-    overall_timeout = Setting.get("graphql_overall_timeout", "60").to_i.seconds
-    Timeout.timeout(overall_timeout) do
+    Timeout.timeout(1.minute) do
       schema.execute(query, variables:, context:)
     end
   end

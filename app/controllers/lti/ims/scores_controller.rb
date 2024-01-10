@@ -336,11 +336,10 @@ module Lti::IMS
     def verify_valid_submitted_at
       submitted_at = params.dig(Lti::Result::AGS_EXT_SUBMISSION, :submitted_at)
       submitted_at_date = parse_timestamp(submitted_at)
-      future_buffer = Setting.get("ags_submitted_at_future_buffer", 1.minute.to_s).to_i.seconds
 
       if submitted_at.present? && submitted_at_date.nil?
         render_error "Provided submitted_at timestamp of #{submitted_at} not a valid timestamp", :bad_request
-      elsif submitted_at_date.present? && submitted_at_date > Time.zone.now + future_buffer
+      elsif submitted_at_date.present? && submitted_at_date > 1.minute.from_now
         render_error "Provided submitted_at timestamp of #{submitted_at} in the future", :bad_request
       end
     end

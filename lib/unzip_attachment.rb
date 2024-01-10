@@ -317,7 +317,7 @@ class ZipFileStats
   def process!
     CanvasUnzip.extract_archive(filename) do |entry|
       @file_count += 1
-      @total_size += [entry.size, Attachment.minimum_size_for_quota].max
+      @total_size += [entry.size, Attachment::MINIMUM_SIZE_FOR_QUOTA].max
       @paths << entry.name
     end
     @file_count = 1 if @file_count == 0

@@ -518,7 +518,7 @@ module Api
   end
 
   def self.pagination_params(base_url)
-    if base_url.length > Setting.get("pagination_max_base_url_for_links", "1000").to_i
+    if base_url.length > 65_536
       # to prevent Link headers from consuming too much of the 8KB Apache allows in response headers
       ESSENTIAL_PAGINATION_PARAMS
     else

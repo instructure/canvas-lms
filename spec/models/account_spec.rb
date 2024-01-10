@@ -1752,7 +1752,7 @@ describe Account do
         sub2.update(default_storage_quota: 10.megabytes)
 
         to_be_subaccount = sub1.sub_accounts.create!
-        expect(to_be_subaccount.default_storage_quota).to eq Account.default_storage_quota
+        expect(to_be_subaccount.default_storage_quota).to eq Account::DEFAULT_STORAGE_QUOTA
 
         # should clear caches
         Timecop.travel(1.second.from_now) do

@@ -34,17 +34,6 @@ describe "authentication_providers/index" do
     @presenter = assign(:presenter, AuthenticationProvidersPresenter.new(account))
   end
 
-  it "lists the auth ips" do
-    Setting.set("account_authorization_config_ip_addresses", "192.168.0.1,192.168.0.2")
-    account.authentication_providers.scope.delete_all
-    account.authentication_providers = [
-      @presenter.new_config("saml"),
-      @presenter.new_config("saml")
-    ]
-    render "authentication_providers/index"
-    expect(response.body).to match("192.168.0.1\n192.168.0.2")
-  end
-
   it "displays the last_timeout_failure" do
     account.authentication_providers.scope.delete_all
     timed_out_aac = account.authentication_providers.create!(auth_type: "ldap")

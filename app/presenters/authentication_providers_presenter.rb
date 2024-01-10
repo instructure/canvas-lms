@@ -92,16 +92,6 @@ class AuthenticationProvidersPresenter
     config.new_record? ? [["Last", nil]] + position_options : position_options
   end
 
-  def ips_configured?
-    !!ip_addresses_setting.presence
-  end
-
-  def ip_list
-    return "" unless ips_configured?
-
-    ip_addresses_setting.split(",").map(&:strip).join("\n")
-  end
-
   def saml_identifiers
     return [] unless saml_enabled?
 
@@ -160,11 +150,5 @@ class AuthenticationProvidersPresenter
     suf = aac.class.sti_name
     suf += "_#{aac.id}" unless aac.new_record?
     suf
-  end
-
-  private
-
-  def ip_addresses_setting
-    Setting.get("account_authorization_config_ip_addresses", nil)
   end
 end
