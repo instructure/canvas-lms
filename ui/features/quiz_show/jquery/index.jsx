@@ -267,16 +267,14 @@ $(document).ready(function () {
       <ItemAssignToTray
         open={open}
         onClose={() => {
-          ReactDOM.unmountComponentAtNode(
-            document.getElementById('assign-to-mount-point')
-          )
+          ReactDOM.unmountComponentAtNode(document.getElementById('assign-to-mount-point'))
         }}
         onDismiss={() => {
           renderItemAssignToTray(false, returnFocusTo, itemProps)
           returnFocusTo.focus()
         }}
-        itemType='quiz'
-        iconType='quiz'
+        itemType="quiz"
+        iconType="quiz"
         locale={ENV.LOCALE || 'en'}
         timezone={ENV.TIMEZONE || 'UTC'}
         {...itemProps}
@@ -292,12 +290,13 @@ $(document).ready(function () {
     const courseId = event.target.getAttribute('data-quiz-context-id')
     const itemName = event.target.getAttribute('data-quiz-name')
     const itemContentId = event.target.getAttribute('data-quiz-id')
-    const pointsPossible = parseFloat(event.target.getAttribute('data-quiz-points-possible')) + ' pts'
+    const pointsPossible =
+      parseFloat(event.target.getAttribute('data-quiz-points-possible')) + ' pts'
     renderItemAssignToTray(true, returnFocusTo, {
       courseId,
       itemName,
       itemContentId,
-      pointsPossible
+      pointsPossible,
     })
   })
 

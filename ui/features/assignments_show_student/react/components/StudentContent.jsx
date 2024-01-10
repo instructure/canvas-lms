@@ -127,7 +127,6 @@ function renderAttemptsAndAvailability(assignment) {
   )
 }
 
-
 function renderContentBaseOnAvailability(
   {assignment, submission, reviewerSubmission},
   alertContext,
@@ -304,7 +303,7 @@ StudentContent.propTypes = {
   submission: Submission.shape,
   reviewerSubmission: Submission.shape,
   onChangeSubmission: func,
-  allSubmissions: arrayOf(Submission.shape)
+  allSubmissions: arrayOf(Submission.shape),
 }
 
 StudentContent.defaultProps = {

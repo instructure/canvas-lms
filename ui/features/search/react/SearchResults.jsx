@@ -21,11 +21,11 @@ import {Flex} from '@instructure/ui-flex'
 import SearchResult from './SearchResult'
 
 export default function SearchResults(props) {
-  function searchItemKey(searchItem){
-    if(searchItem.wiki_page){
-      return "wiki_page-" + searchItem.wiki_page.id
+  function searchItemKey(searchItem) {
+    if (searchItem.wiki_page) {
+      return 'wiki_page-' + searchItem.wiki_page.id
     } // TODO: add other search item types
-    return "unknown";
+    return 'unknown'
   }
 
   return (

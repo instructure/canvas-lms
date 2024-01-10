@@ -487,7 +487,6 @@ OutcomeGradebookView.prototype._rollupsUrl = function (course, exclude, page) {
 //
 // Returns nothing.
 OutcomeGradebookView.prototype.setOutcomeOrder = function () {
-
   const course_id = ENV.context_asset_string.split('_')[1]
   const columns = this.grid.getColumns().slice()
 
@@ -510,9 +509,7 @@ OutcomeGradebookView.prototype.setOutcomeOrder = function () {
 }
 
 OutcomeGradebookView.prototype._assignOrderUrl = function (course) {
-  return (
-    `/api/v1/courses/${course}/assign_outcome_order`
-  )
+  return `/api/v1/courses/${course}/assign_outcome_order`
 }
 
 OutcomeGradebookView.prototype._loadOutcomes = function (page) {

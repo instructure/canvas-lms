@@ -76,10 +76,10 @@ function renderShowDeveloperKeys(ctx) {
   }
 }
 
-const renderDeveloperKeySettings = (ctx) => {
+const renderDeveloperKeySettings = ctx => {
   ReactDOM.render(
     <QueryProvider>
-      <RegistrationSettings ctx={ctx}/>
+      <RegistrationSettings ctx={ctx} />
     </QueryProvider>,
     reactRoot()
   )

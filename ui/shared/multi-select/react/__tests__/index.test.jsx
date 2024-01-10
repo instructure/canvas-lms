@@ -95,7 +95,6 @@ describe('CanvasMultiSelect', () => {
     expect(queryByRole('group', {name: 'Fruit'})).not.toBeInTheDocument()
   })
 
-
   it('filters available options when text is input', () => {
     const {getByRole, queryByRole} = renderComponent()
     const combobox = getByRole('combobox', {name: 'Vegetables'})

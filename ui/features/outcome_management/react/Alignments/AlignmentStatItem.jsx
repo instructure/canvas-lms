@@ -61,7 +61,9 @@ const AlignmentStatItem = ({type, count, percent, average}) => {
   }
 
   const renderTooltip = () => {
-    const tooltipText = I18n.t('Assessable artifacts include assignments, quizzes, and graded discussions')
+    const tooltipText = I18n.t(
+      'Assessable artifacts include assignments, quizzes, and graded discussions'
+    )
     return (
       <Tooltip
         on={['click', 'hover', 'focus']}

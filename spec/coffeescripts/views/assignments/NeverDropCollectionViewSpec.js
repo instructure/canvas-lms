@@ -238,4 +238,3 @@ QUnit.skip('needs rewrite due to debounce hack', () => {
     equal($.trim(text), 'Add an assignment')
   })
 })
-

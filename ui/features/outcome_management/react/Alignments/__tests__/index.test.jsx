@@ -58,15 +58,16 @@ describe('AlignmentSummary', () => {
     )
   }
 
-  const mockUseCourseAlignments = (loading = false) => useCourseAlignments.mockImplementation(() => ({
-    rootGroup: {_id: "1", outcomesCount: 10},
-    loading,
-    loadMore: jest.fn(),
-    searchString: "",
-    onSearchChangeHandler: jest.fn(),
-    onSearchClearHandler: jest.fn(),
-    onFilterChangeHandler: jest.fn(),
-  }))
+  const mockUseCourseAlignments = (loading = false) =>
+    useCourseAlignments.mockImplementation(() => ({
+      rootGroup: {_id: '1', outcomesCount: 10},
+      loading,
+      loadMore: jest.fn(),
+      searchString: '',
+      onSearchChangeHandler: jest.fn(),
+      onSearchClearHandler: jest.fn(),
+      onFilterChangeHandler: jest.fn(),
+    }))
 
   it('renders single loader while loading data', () => {
     mockUseCourseAlignments(true)

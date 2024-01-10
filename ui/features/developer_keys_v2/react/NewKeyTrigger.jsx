@@ -21,7 +21,7 @@ import {View} from '@instructure/ui-view'
 import {Button} from '@instructure/ui-buttons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {IconPlusLine} from '@instructure/ui-icons'
-import { NewKeyButtons } from './NewKeyButtons'
+import {NewKeyButtons} from './NewKeyButtons'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'

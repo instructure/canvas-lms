@@ -641,7 +641,7 @@ test('does not display cancel button when quiz failed to duplicate is blueprint'
     title: 'Foo Copy',
     original_assignment_name: 'Foo',
     workflow_state: 'failed_to_duplicate',
-    migration_id: 'mastercourse_xxxxxxx'
+    migration_id: 'mastercourse_xxxxxxx',
   })
   const view = createView(quiz)
   strictEqual(view.$('button.duplicate-failed-cancel.btn').length, 0)
@@ -652,7 +652,7 @@ test('displays cancel button when quiz failed to duplicate is not blueprint', ()
     id: 2,
     title: 'Foo Copy',
     original_assignment_name: 'Foo',
-    workflow_state: 'failed_to_duplicate'
+    workflow_state: 'failed_to_duplicate',
   })
   const view = createView(quiz)
   ok(view.$('button.duplicate-failed-cancel.btn').text().includes('Cancel'))

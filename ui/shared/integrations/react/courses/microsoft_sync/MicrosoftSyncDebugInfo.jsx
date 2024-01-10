@@ -28,17 +28,15 @@ import {ToggleGroup} from '@instructure/ui-toggle-details'
 
 const I18n = useI18nScope('course_settings')
 
-const usersList = (userIds) => {
+const usersList = userIds => {
   if (userIds && userIds.length > 0) {
     return (
       <List size="small">
-        {
-          userIds.map((listItem, index) => (
-            <List.Item key={index}>
-              <Link href={`/users/${listItem}`}>{listItem}</Link>
-            </List.Item>
-          ))
-        }
+        {userIds.map((listItem, index) => (
+          <List.Item key={index}>
+            <Link href={`/users/${listItem}`}>{listItem}</Link>
+          </List.Item>
+        ))}
       </List>
     )
   }
@@ -61,18 +59,15 @@ const MicrosoftSyncDebugInfo = ({debugInfo}) => {
   return (
     <View as="div" borderWidth="none none small none" borderColor="primary" padding="small small">
       <ToggleGroup
-        summary={I18n.t("Debugging Info (Advanced)...")}
+        summary={I18n.t('Debugging Info (Advanced)...')}
         expanded={expanded}
         onToggle={() => setExpanded(!expanded)}
         toggleLabel={I18n.t('Toggle Debugging Info')}
       >
-        <List size="small">
-          {debugInfo.map(debugInfoItem)}
-        </List>
+        <List size="small">{debugInfo.map(debugInfoItem)}</List>
       </ToggleGroup>
     </View>
   )
 }
 
 export default MicrosoftSyncDebugInfo
-

@@ -206,16 +206,14 @@ function renderItemAssignToTray(open, returnFocusTo, itemProps) {
     <ItemAssignToTray
       open={open}
       onClose={() => {
-        ReactDOM.unmountComponentAtNode(
-          document.getElementById('assign-to-mount-point')
-        )
+        ReactDOM.unmountComponentAtNode(document.getElementById('assign-to-mount-point'))
       }}
       onDismiss={() => {
         renderItemAssignToTray(false, returnFocusTo, itemProps)
         returnFocusTo.focus()
       }}
-      itemType='assignment'
-      iconType='assignment'
+      itemType="assignment"
+      iconType="assignment"
       locale={ENV.LOCALE || 'en'}
       timezone={ENV.TIMEZONE || 'UTC'}
       {...itemProps}
@@ -231,12 +229,13 @@ $('.assign-to-link').on('click keyclick', function (event) {
   const courseId = event.target.getAttribute('data-assignment-context-id')
   const itemName = event.target.getAttribute('data-assignment-name')
   const itemContentId = event.target.getAttribute('data-assignment-id')
-  const pointsPossible = parseFloat(event.target.getAttribute('data-assignment-points-possible')) + ' pts'
+  const pointsPossible =
+    parseFloat(event.target.getAttribute('data-assignment-points-possible')) + ' pts'
   renderItemAssignToTray(true, returnFocusTo, {
     courseId,
     itemName,
     itemContentId,
-    pointsPossible
+    pointsPossible,
   })
 })
 

@@ -165,7 +165,8 @@ class EditPage extends React.Component {
     messageStudentsDialog.show()
   }
 
-  groupSubContextsSelected = () => [...this.state.selectedSubContexts].some(code => code.startsWith('group_'))
+  groupSubContextsSelected = () =>
+    [...this.state.selectedSubContexts].some(code => code.startsWith('group_'))
 
   observerSignupAllowed = () =>
     this.state.contexts?.length > 0 &&

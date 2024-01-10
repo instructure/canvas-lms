@@ -27,7 +27,7 @@ const getDefaultValues = overrides => {
   const days = [
     moment.tz(TZ).add(0, 'day'),
     moment.tz(TZ).add(1, 'day'),
-    moment.tz(TZ).add(2, 'day')
+    moment.tz(TZ).add(2, 'day'),
   ]
   return {
     days: days.map(d => [d.format('YYYY-MM-DD'), [{dateBucketMoment: d}]]),
@@ -35,7 +35,7 @@ const getDefaultValues = overrides => {
     changeDashboardView() {},
     scrollToToday() {},
     isCompletelyEmpty: false,
-    ...overrides
+    ...overrides,
   }
 }
 
@@ -143,7 +143,8 @@ describe('PlannerApp', () => {
           days={[]}
           allPastItemsLoaded={false}
           focusFallback={focusFallback}
-        />, { attachTo: containerElement }
+        />,
+        {attachTo: containerElement}
       )
       const button = wrapper.find('ShowOnFocusButton button')
       button.getDOMNode().focus()
@@ -157,7 +158,7 @@ describe('PlannerApp', () => {
       let days = [
         moment.tz(TZ).add(-6, 'day'),
         moment.tz(TZ).add(-5, 'day'),
-        moment.tz(TZ).add(-4, 'day')
+        moment.tz(TZ).add(-4, 'day'),
       ]
       days = days.map(d => [d.format('YYYY-MM-DD'), [{dateBucketMoment: d}]])
       days[1][1] = [] // no items 4 days ago
@@ -176,7 +177,7 @@ describe('PlannerApp', () => {
       let days = [
         moment.tz(TZ).add(0, 'day'),
         moment.tz(TZ).add(1, 'day'),
-        moment.tz(TZ).add(4, 'day')
+        moment.tz(TZ).add(4, 'day'),
       ]
       days = days.map(d => [d.format('YYYY-MM-DD'), [{dateBucketMoment: d}]])
       const wrapper = shallow(<PlannerApp {...getDefaultValues({days})} />)
@@ -187,7 +188,7 @@ describe('PlannerApp', () => {
       let days = [
         moment.tz(TZ).add(0, 'day'),
         moment.tz(TZ).add(1, 'day'),
-        moment.tz(TZ).add(5, 'day')
+        moment.tz(TZ).add(5, 'day'),
       ]
       days = days.map(d => [d.format('YYYY-MM-DD'), [{dateBucketMoment: d}]])
       const wrapper = shallow(<PlannerApp {...getDefaultValues({days})} />)
@@ -212,7 +213,7 @@ describe('PlannerApp', () => {
         moment.tz(TZ).add(3, 'day'),
         moment.tz(TZ).add(6, 'day'),
         moment.tz(TZ).add(10, 'day'),
-        moment.tz(TZ).add(14, 'day')
+        moment.tz(TZ).add(14, 'day'),
       ]
       days = days.map(d => [d.format('YYYY-MM-DD'), [{dateBucketMoment: d}]])
       shallow(<PlannerApp {...getDefaultValues({days})} />)
@@ -232,9 +233,9 @@ describe('mapStateToProps', () => {
         hasSomeItems: false,
         partialPastDays: [],
         partialFutureDays: [],
-        partialWeekDays: []
+        partialWeekDays: [],
       },
-      days: []
+      days: [],
     }
     const props = mapStateToProps(state)
     expect(props).toMatchObject({isLoading: true})
@@ -247,9 +248,9 @@ describe('mapStateToProps', () => {
         hasSomeItems: null,
         partialPastDays: [],
         partialFutureDays: [],
-        partialWeekDays: []
+        partialWeekDays: [],
       },
-      days: []
+      days: [],
     }
     const props = mapStateToProps(state)
     expect(props).toMatchObject({isLoading: true})
@@ -262,9 +263,9 @@ describe('mapStateToProps', () => {
         hasSomeItems: false,
         partialPastDays: [],
         partialFutureDays: [],
-        partialWeekDays: []
+        partialWeekDays: [],
       },
-      days: []
+      days: [],
     }
     const props = mapStateToProps(state)
     expect(props).toMatchObject({isLoading: false})

@@ -82,17 +82,17 @@ test('renderPills mounts a <Pill /> with correct text to each .submission-excuse
 
 test('renderPills mounts a <Pill /> with correct text to each .submission-custom-grade-status-pill-id', () => {
   const stubbedRender = sandbox.stub(ReactDOM, 'render')
-  const spans = [1, 2, 3].map((elem) => addSpan(`submission-custom-grade-status-pill-${elem}`))
+  const spans = [1, 2, 3].map(elem => addSpan(`submission-custom-grade-status-pill-${elem}`))
   const statuses = {
     1: {
-      name: "status one",
+      name: 'status one',
     },
     2: {
-      name: "status two",
+      name: 'status two',
     },
     3: {
-      name: "status three",
-    }
+      name: 'status three',
+    },
   }
   StatusPill.renderPills(statuses)
 

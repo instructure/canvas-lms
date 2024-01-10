@@ -33,7 +33,6 @@ import OutcomeDescriptionModal from './OutcomeDescriptionModal'
 const I18n = useI18nScope('learning_mastery_gradebook')
 
 const OutcomeHeader = ({outcome}) => {
-
   // OD => OutcomeDescription
   const [isODModalOpen, openODModal, closeODModal] = useModal()
 

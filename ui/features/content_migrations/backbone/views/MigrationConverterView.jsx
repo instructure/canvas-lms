@@ -58,10 +58,14 @@ MigrationConverterView.prototype.els = {
   '#overwrite-warning': '$overwriteWarning',
 }
 
-MigrationConverterView.prototype.events = lodashExtend({}, MigrationConverterView.prototype.events, {
-  'change #chooseMigrationConverter': 'selectConverter',
-  'click .cancelBtn': 'resetForm',
-})
+MigrationConverterView.prototype.events = lodashExtend(
+  {},
+  MigrationConverterView.prototype.events,
+  {
+    'change #chooseMigrationConverter': 'selectConverter',
+    'click .cancelBtn': 'resetForm',
+  }
+)
 
 MigrationConverterView.prototype.toJSON = function (json) {
   json = MigrationConverterView.__super__.toJSON.apply(this, arguments)
@@ -194,7 +198,7 @@ MigrationConverterView.prototype.afterRender = function () {
     hasShadow: false,
     margin: '0 0 medium 0',
   })
-  if(this.$overwriteWarning[0]){
+  if (this.$overwriteWarning[0]) {
     return ReactDOM.render(alert, this.$overwriteWarning[0])
   }
 }

@@ -124,7 +124,10 @@ export default class CoursesListRow extends React.Component {
 
     let roles = (this.props.roles || []).filter(filterFunc)
     if (this.props.blueprint) {
-      roles = roles.filter(role => role.base_role_name != 'StudentEnrollment' && role.base_role_name != 'ObserverEnrollment')
+      roles = roles.filter(
+        role =>
+          role.base_role_name != 'StudentEnrollment' && role.base_role_name != 'ObserverEnrollment'
+      )
     }
     return roles
   }
@@ -258,9 +261,7 @@ export default class CoursesListRow extends React.Component {
           {!teachers && teacher_count && I18n.t('%{teacher_count} teachers', {teacher_count})}
         </Table.Cell>
         <Table.Cell>
-          <a href={sub_url}>
-            {subaccount_name}
-          </a>
+          <a href={sub_url}>{subaccount_name}</a>
         </Table.Cell>
         <Table.Cell>
           {template ? '\u2014' : I18n.n(total_students + newlyEnrolledStudents)}

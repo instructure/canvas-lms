@@ -81,13 +81,17 @@ describe('AlignmentStatItem', () => {
       <AlignmentStatItem {...defaultProps({type: 'artifact'})} />
     )
     fireEvent.click(getByTestId('outcome-alignment-stat-info-icon'))
-    getAllByText(/Assessable artifacts include assignments, quizzes, and graded discussions/).forEach(text => expect(text).toBeInTheDocument())
+    getAllByText(
+      /Assessable artifacts include assignments, quizzes, and graded discussions/
+    ).forEach(text => expect(text).toBeInTheDocument())
   })
 
   it('ScreenReaderContent is available when tooltip is displayed', () => {
     const tree = mount(<AlignmentStatItem {...defaultProps({type: 'artifact'})} />)
     const screenReaderNode = tree.find('ScreenReaderContent').first()
-    expect(screenReaderNode.text()).toBe('Assessable artifacts include assignments, quizzes, and graded discussions')
+    expect(screenReaderNode.text()).toBe(
+      'Assessable artifacts include assignments, quizzes, and graded discussions'
+    )
   })
 
   it('does not display info tooltip if type is outcome', () => {

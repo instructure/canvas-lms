@@ -44,7 +44,7 @@ export default class JumpToHeaderButton extends PureComponent {
         display: 'flex',
         justifyContent: 'flex-end',
         opacity: this.state.focused ? '1' : '0',
-        position: this.state.focused ? 'static' : 'absolute'
+        position: this.state.focused ? 'static' : 'absolute',
       }}
     >
       <Button

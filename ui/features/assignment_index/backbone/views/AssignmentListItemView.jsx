@@ -404,7 +404,11 @@ export default AssignmentListItemView = (function () {
       data.DIRECT_SHARE_ENABLED = !!ENV.DIRECT_SHARE_ENABLED
       data.canOpenManageOptions = this.canOpenManageOptions()
 
-      data.item_assignment_type = data.is_quiz_assignment ? 'quiz' : data.isQuizLTIAssignment ? 'lti-quiz' : 'assignment'
+      data.item_assignment_type = data.is_quiz_assignment
+        ? 'quiz'
+        : data.isQuizLTIAssignment
+        ? 'lti-quiz'
+        : 'assignment'
 
       if (data.canManage) {
         data.spanWidth = 'span3'
@@ -513,21 +517,18 @@ export default AssignmentListItemView = (function () {
       return this.delete({silent: true})
     }
 
-
     renderItemAssignToTray(open, returnFocusTo, itemProps) {
       ReactDOM.render(
         <ItemAssignToTray
           open={open}
           onClose={() => {
-            ReactDOM.unmountComponentAtNode(
-              document.getElementById('assign-to-mount-point')
-            )
+            ReactDOM.unmountComponentAtNode(document.getElementById('assign-to-mount-point'))
           }}
           onDismiss={() => {
             this.renderItemAssignToTray(false, returnFocusTo, itemProps)
             returnFocusTo.focus()
           }}
-          itemType='assignment'
+          itemType="assignment"
           locale={ENV.LOCALE || 'en'}
           timezone={ENV.TIMEZONE || 'UTC'}
           {...itemProps}
@@ -543,14 +544,15 @@ export default AssignmentListItemView = (function () {
       const courseId = e.target.getAttribute('data-assignment-context-id')
       const itemName = e.target.getAttribute('data-assignment-name')
       const itemContentId = e.target.getAttribute('data-assignment-id')
-      const pointsPossible = parseFloat(e.target.getAttribute('data-assignment-points-possible')) + ' pts'
+      const pointsPossible =
+        parseFloat(e.target.getAttribute('data-assignment-points-possible')) + ' pts'
       const iconType = e.target.getAttribute('data-assignment-type')
       this.renderItemAssignToTray(true, returnFocusTo, {
         courseId,
         itemName,
         itemContentId,
         pointsPossible,
-        iconType
+        iconType,
       })
     }
 

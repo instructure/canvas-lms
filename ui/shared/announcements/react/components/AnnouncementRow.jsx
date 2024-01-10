@@ -128,7 +128,11 @@ export default function AnnouncementRow({
   return (
     <CourseItemRow
       title={announcement.title}
-      body={textContent ? <div className="ic-announcement-row__content user_content">{textContent}</div> : null}
+      body={
+        textContent ? (
+          <div className="ic-announcement-row__content user_content">{textContent}</div>
+        ) : null
+      }
       sectionToolTip={sectionsToolTip}
       replyButton={replyButton}
       ref={rowRef}
