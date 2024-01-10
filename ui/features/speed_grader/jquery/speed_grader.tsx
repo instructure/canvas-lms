@@ -424,6 +424,7 @@ function mergeStudentsAndSubmission() {
           window.jsonData.studentSectionIdsMap[student[anonymizableId]]
         )
         student.submission = submission
+        // @ts-expect-error
         student.submission_state = SpeedgraderHelpers.submissionState(student, ENV.grading_role)
         student.index = index
         students.push(student)
@@ -502,6 +503,7 @@ function mergeStudentsAndSubmission() {
       jsonData.studentsWithSubmissions.sort(
         EG.compareStudentsBy(
           student =>
+            // @ts-expect-error
             student && states[SpeedgraderHelpers.submissionState(student, ENV.grading_role)]
         )
       )
@@ -544,6 +546,7 @@ function initDropdown() {
     (student: StudentWithSubmission) => {
       const {submission_state, submission} = student
       let {name} = student
+      // @ts-expect-error
       const className = SpeedgraderHelpers.classNameBasedOnStudent({submission_state, submission})
       if (hideStudentNames || isAnonymous) {
         name = anonymousName(student)
@@ -1562,6 +1565,7 @@ EG = {
       studentName = student.name
     }
 
+    // @ts-expect-error
     const submissionStatus = SpeedgraderHelpers.classNameBasedOnStudent(student)
     return `${studentName} - ${submissionStatus.formatted}`
   },
@@ -2009,7 +2013,7 @@ EG = {
         $assignment_submission_originality_report_url
       )
       const tooltip = I18n.t('Similarity Score - See detailed report')
-      let reportUrl = replaceTags(urlContainer.attr('href'), {
+      let reportUrl = replaceTags(urlContainer.attr('href') || '', {
         [anonymizableUserId]: submission[anonymizableUserId],
         asset_string: assetString,
       })
@@ -3534,12 +3538,12 @@ EG = {
       updateSubmissionAndPageEffects()
     }
 
-    if (ENV.assignment_missing_shortcut && grade.toUpperCase() === 'MI') {
+    if (ENV.assignment_missing_shortcut && String(grade).toUpperCase() === 'MI') {
       if (EG.currentStudent.submission.late_policy_status !== 'missing') {
         updateSubmissionAndPageEffects({latePolicyStatus: 'missing'})
       }
       return
-    } else if (grade.toUpperCase() === 'EX') {
+    } else if (String(grade).toUpperCase() === 'EX') {
       formData['submission[excuse]'] = true
     } else if (unexcuseSubmission(grade, EG.currentStudent.submission, window.jsonData)) {
       formData['submission[excuse]'] = false
@@ -3989,6 +3993,7 @@ EG = {
     }
 
     EG.currentStudent.submission_state = SpeedgraderHelpers.submissionState(
+      // @ts-expect-error
       EG.currentStudent,
       ENV.grading_role
     )
