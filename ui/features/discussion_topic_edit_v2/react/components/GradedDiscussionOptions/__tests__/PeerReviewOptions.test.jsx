@@ -43,6 +43,7 @@ describe('PeerReviewOptions', () => {
     expect(queryByText('Reviews Per Student')).not.toBeInTheDocument()
     expect(queryByText('Reviews Due')).not.toBeInTheDocument()
     expect(queryByText('If left blank, uses due date')).not.toBeInTheDocument()
+    expect(queryByText('Allow intra-group peer reviews')).not.toBeInTheDocument()
   })
 
   it('shows more options when peer review is set to automatically', () => {
@@ -55,6 +56,7 @@ describe('PeerReviewOptions', () => {
     expect(getByText('Reviews Per Student')).toBeInTheDocument()
     expect(getByTestId('peer-review-due-date-container')).toBeInTheDocument()
     expect(getByText('If left blank, uses due date')).toBeInTheDocument()
+    expect(getByText('Allow intra-group peer reviews')).toBeInTheDocument()
   })
 
   it('does not show extra options when peer review is set to manually', () => {
@@ -68,5 +70,6 @@ describe('PeerReviewOptions', () => {
     expect(queryByText('Reviews Per Student')).not.toBeInTheDocument()
     expect(queryByTestId('peer-review-due-date-container')).not.toBeInTheDocument()
     expect(queryByText('If left blank, uses due date')).not.toBeInTheDocument()
+    expect(queryByText('Allow intra-group peer reviews')).not.toBeInTheDocument()
   })
 })

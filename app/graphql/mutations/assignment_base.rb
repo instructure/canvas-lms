@@ -53,15 +53,16 @@ class Mutations::AssignmentInputBase < GraphQL::Schema::InputObject
   argument :assignment_group_id, ID, required: false
   argument :assignment_overrides, [Mutations::AssignmentOverrideCreateOrUpdate], required: false
   argument :due_at, Types::DateTimeType, required: false
-  argument :grading_type, Types::AssignmentType::AssignmentGradingType, required: false
   argument :grading_standard_id, ID, required: false
+  argument :grading_type, Types::AssignmentType::AssignmentGradingType, required: false
   argument :group_category_id, ID, required: false
+  argument :intra_reviews, Boolean, required: false
   argument :lock_at, Types::DateTimeType, required: false
+  argument :only_visible_to_overrides, Boolean, required: false
   argument :peer_reviews, Mutations::AssignmentPeerReviewsUpdate, required: false
   argument :points_possible, Float, required: false
-  argument :unlock_at, Types::DateTimeType, required: false
   argument :post_to_sis, Boolean, required: false
-  argument :only_visible_to_overrides, Boolean, required: false
+  argument :unlock_at, Types::DateTimeType, required: false
 end
 
 class Mutations::AssignmentCreate < Mutations::AssignmentInputBase
@@ -216,9 +217,12 @@ class Mutations::AssignmentBase < Mutations::BaseMutation
       peer_reviews = input_hash.delete(:peer_reviews)
       input_hash[:peer_reviews] = peer_reviews[:enabled] if peer_reviews.key?(:enabled) && peer_reviews[:enabled].present?
       input_hash[:peer_review_count] = peer_reviews[:count] if peer_reviews.key?(:count) && peer_reviews[:count].present?
-      input_hash[:intra_group_peer_reviews] = peer_reviews[:intra_reviews] if peer_reviews.key?(:intra_reviews) && peer_reviews[:intra_reviews].present?
       input_hash[:anonymous_peer_reviews] = peer_reviews[:anonymous_reviews] if peer_reviews.key?(:anonymous_reviews) && peer_reviews[:anonymous_reviews].present?
       input_hash[:automatic_peer_reviews] = peer_reviews[:automatic_reviews] if peer_reviews.key?(:automatic_reviews) && peer_reviews[:automatic_reviews].present?
+
+      # checking peer_reviews[:intra_reviews].present? does not apply since it's a bool, fails in the false case.
+      # peer_reviews.key?(:intra_reviews) should be sufficient.
+      input_hash[:intra_group_peer_reviews] = peer_reviews[:intra_reviews] if peer_reviews.key?(:intra_reviews)
 
       # this should be peer_reviews_due_at, but its not permitted in the backend and peer_reviews_assign_at
       # is transformed into peer_reviews_due_at. that's probably a bug, but just to keep this update resilient
