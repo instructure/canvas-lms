@@ -134,31 +134,20 @@ class Canvadoc < ActiveRecord::Base
     image/tiff
   ].freeze
 
-  # NOTE: the Setting.get('canvadoc_mime_types', ...) and the
-  # Setting.get('canvadoc_submission_mime_types', ...) will
-  # pull from the database first. the second parameter is there
-  # as a default in case the settings are not located in the
-  # db. this means that for instructure production canvas,
-  # we need to update the beta and prod databases with any
-  # mime_types we want to add/remove.
-  # TODO: find out if opensource users need the second param
-  # to the Setting.get(...,...) calls and if not, then remove
-  # them entirely from the codebase (since intructure prod
-  # does not need them)
   def self.mime_types
-    types = JSON.parse Setting.get("canvadoc_mime_types", DEFAULT_MIME_TYPES.to_json)
-
-    types.concat(IWORK_MIME_TYPES) if Account.current_domain_root_account&.feature_enabled?(:docviewer_enable_iwork_files)
-
-    types
+    if Account.current_domain_root_account&.feature_enabled?(:docviewer_enable_iwork_files)
+      DEFAULT_MIME_TYPES + IWORK_MIME_TYPES
+    else
+      DEFAULT_MIME_TYPES
+    end
   end
 
   def self.submission_mime_types
-    types = JSON.parse Setting.get("canvadoc_submission_mime_types", DEFAULT_SUBMISSION_MIME_TYPES.to_json)
-
-    types.concat(IWORK_MIME_TYPES) if Account.current_domain_root_account&.feature_enabled?(:docviewer_enable_iwork_files)
-
-    types
+    if Account.current_domain_root_account&.feature_enabled?(:docviewer_enable_iwork_files)
+      DEFAULT_SUBMISSION_MIME_TYPES + IWORK_MIME_TYPES
+    else
+      DEFAULT_SUBMISSION_MIME_TYPES
+    end
   end
 
   def self.canvadocs_api

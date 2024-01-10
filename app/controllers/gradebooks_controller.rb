@@ -1095,7 +1095,6 @@ class GradebooksController < ApplicationController
           can_delete_attachments: @domain_root_account.grants_right?(@current_user, session, :become_user),
           media_comment_asset_string: @current_user.asset_string,
           late_policy: @context.late_policy&.as_json(include_root: false),
-          speedgrader_grade_sync_max_attempts: Setting.get("speedgrader.grade_sync_max_attempts", "20").to_i,
           assignment_missing_shortcut: Account.site_admin.feature_enabled?(:assignment_missing_shortcut),
         }
         if grading_role_for_user == :moderator
@@ -1465,18 +1464,17 @@ class GradebooksController < ApplicationController
   end
 
   def gradebook_performance_controls
-    per_page = Api::MAX_PER_PAGE
-
+    # Given that these are all consts, this should be removed in a separate refactoring
     {
-      active_request_limit: Setting.get("gradebook.active_request_limit", "12").to_i,
-      api_max_per_page: per_page,
-      assignment_groups_per_page: Setting.get("gradebook.assignment_groups_per_page", per_page).to_i,
-      context_modules_per_page: Setting.get("gradebook.context_modules_per_page", per_page).to_i,
-      custom_column_data_per_page: Setting.get("gradebook.custom_column_data_per_page", per_page).to_i,
-      custom_columns_per_page: Setting.get("gradebook.custom_columns_per_page", per_page).to_i,
-      students_chunk_size: Setting.get("gradebook.students_chunk_size", per_page).to_i,
-      submissions_chunk_size: Setting.get("gradebook.submissions_chunk_size", "10").to_i,
-      submissions_per_page: Setting.get("gradebook.submissions_per_page", per_page).to_i
+      active_request_limit: 12,
+      api_max_per_page: Api::MAX_PER_PAGE,
+      assignment_groups_per_page: Api::MAX_PER_PAGE,
+      context_modules_per_page: Api::MAX_PER_PAGE,
+      custom_column_data_per_page: Api::MAX_PER_PAGE,
+      custom_columns_per_page: Api::MAX_PER_PAGE,
+      students_chunk_size: Api::MAX_PER_PAGE,
+      submissions_chunk_size: 10,
+      submissions_per_page: Api::MAX_PER_PAGE
     }
   end
   private :gradebook_performance_controls

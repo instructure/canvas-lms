@@ -114,7 +114,6 @@ export interface EnvGradebookSpeedGrader {
   late_policy?: {
     late_submission_interval?: 'hour' | 'day' | string
   }
-  speedgrader_grade_sync_max_attempts: number
   assignment_missing_shortcut: boolean
 
   provisional_select_url?: string

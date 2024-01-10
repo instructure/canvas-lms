@@ -159,14 +159,14 @@ Rails.configuration.after_initialize do
   end
 
   Delayed::Periodic.cron "ErrorReport.destroy_error_reports", "2-59/5 * * * *" do
-    cutoff = Setting.get("error_reports_retain_for", 3.months.to_s).to_i
+    cutoff = 3.months
     if cutoff > 0
       with_each_shard_by_database(ErrorReport, :destroy_error_reports, cutoff.seconds.ago)
     end
   end
 
   Delayed::Periodic.cron "Delayed::Job::Failed.cleanup_old_jobs", "0 * * * *" do
-    cutoff = Setting.get("failed_jobs_retain_for", 3.months.to_s).to_i
+    cutoff = 3.months
     if cutoff > 0
       with_each_job_cluster(Delayed::Job::Failed, :cleanup_old_jobs, cutoff.seconds.ago)
     end

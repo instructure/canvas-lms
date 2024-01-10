@@ -218,13 +218,11 @@ class AssetUserAccessLog
         #  Tracking iterator state indefinitely could result in missing writes if a truncated
         # table gets it's iterator reset).
         yesterday_model.transaction do
-          if truncation_enabled?
-            GuardRail.activate(:deploy) do
-              yesterday_model.connection.truncate(yesterday_model.table_name)
-            end
-            compaction_state[:max_log_ids][yesterday_ts.wday] = 0
-            update_metadatum(compaction_state)
+          GuardRail.activate(:deploy) do
+            yesterday_model.connection.truncate(yesterday_model.table_name)
           end
+          compaction_state[:max_log_ids][yesterday_ts.wday] = 0
+          update_metadatum(compaction_state)
         end
       end
       return false unless yesterday_completed
@@ -235,15 +233,6 @@ class AssetUserAccessLog
     # wait forever.  If we completed compaction, though, just finish.
   end
 
-  # TODO: We only care about truncation
-  # while we're using postgres for the log layer.
-  # After the pulsar transition this method should get removed.
-  def self.truncation_enabled?
-    # we can flip this setting when we're pretty sure it's safe to start dropping
-    # data, the iterator state will keep it healthy^
-    Setting.get("aua_log_truncation_enabled", "false") == "true"
-  end
-
   def self.reschedule!
     AssetUserAccessLog.delay(strand: strand_name).compact
   end
@@ -252,13 +241,18 @@ class AssetUserAccessLog
     "AssetUserAccessLog.compact:#{Shard.current.database_server.id}"
   end
 
+  LOG_BATCH_SIZE = 10_000
+  MAX_COMPACTION_TIME = 5.minutes
+
+  # slow down throughput and without holding the jobs, by trading off throughput
+  # for latency
+  INTRA_BATCH_PAUSE = 2.seconds
+
   # TODO: These are postgres partitions, not pulsar topic partitions.
   # Once we are doing this log-compaction operation completely via pulsar, we no longer
   # need this implmentation and can remove it.
   def self.compact_partition(ts)
     partition_model = log_model(ts)
-    log_batch_size = Setting.get("aua_log_batch_size", "10000").to_i
-    max_compaction_time = Setting.get("aua_compaction_time_limit_in_minutes", "5").to_i
     compaction_start = Time.now.utc
 
     # fetch from the canvas metadatum compaction state the last compacted log id.  This lets us
@@ -292,13 +286,7 @@ class AssetUserAccessLog
       log_id_bookmark = [(partition_lower_bound - 1), state_max_log_ids[ts.wday]].max
       while log_id_bookmark < partition_upper_bound
         log_message("processing #{log_id_bookmark} from #{partition_upper_bound}")
-        # maybe we won't need this, but if we need to slow down throughput and don't want to hold
-        # the jobs, increasing this setting value could tradeoff throughput for latency
-        # slowly.  We load in INSIDE the loop so that SIGHUPS can get recognized
-        # more quickly (otherwise we'd have to wait for a job to die or be killed
-        # to respond to updated settings)
-        intra_batch_pause = Setting.get("aua_log_compaction_batch_pause", "0.0").to_f
-        batch_upper_boundary = log_id_bookmark + log_batch_size
+        batch_upper_boundary = log_id_bookmark + LOG_BATCH_SIZE
         agg_sql = aggregation_query(partition_model, log_id_bookmark, batch_upper_boundary)
         # if there ARE no root accounts that are active, aggregating according to
         # them is pointless.  This can happen in scenarios where a system is being decomissioned.
@@ -347,7 +335,7 @@ class AssetUserAccessLog
           GuardRail.activate(:primary) do
             partition_model.transaction do
               log_message("batch updating (sometimes these queries don't get logged)...")
-              partition_model.connection.with_max_update_limit(log_batch_size) do
+              partition_model.connection.with_max_update_limit(LOG_BATCH_SIZE) do
                 partition_model.connection.execute(update_query)
               end
               log_message("...batch update complete")
@@ -359,10 +347,10 @@ class AssetUserAccessLog
             end
           end
           log_id_bookmark = new_iterator_pos
-          sleep(intra_batch_pause) if intra_batch_pause > 0.0
+          sleep(INTRA_BATCH_PAUSE)
         end
         batch_timestamp = Time.now.utc
-        if (batch_timestamp - compaction_start) > (max_compaction_time * 60)
+        if (batch_timestamp - compaction_start) > MAX_COMPACTION_TIME
           # we ran out of time, let the job get re-scheduled
           return false
         end

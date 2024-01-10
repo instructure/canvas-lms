@@ -20,10 +20,6 @@ import $ from 'jquery'
 import {ltiState} from '@canvas/lti/jquery/messages'
 import type {DeepLinkResponse} from './DeepLinkResponse'
 
-const loggingEnabled = () => {
-  return ENV && ENV.DEEP_LINKING_LOGGING
-}
-
 export const contentItemProcessorPrechecks = (response: DeepLinkResponse) => {
   if (response.errormsg) {
     $.flashError(response.errormsg)
@@ -31,17 +27,6 @@ export const contentItemProcessorPrechecks = (response: DeepLinkResponse) => {
 
   if (response.msg) {
     $.flashMessage(response.msg)
-  }
-  if (loggingEnabled()) {
-    if (response.errorlog) {
-      // eslint-disable-next-line no-console
-      console.error(response.errorlog)
-    }
-
-    if (response.log) {
-      // eslint-disable-next-line no-console
-      console.log(response.log)
-    }
   }
 
   if (ltiState?.fullWindowProxy) {

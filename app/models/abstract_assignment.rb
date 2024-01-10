@@ -82,6 +82,8 @@ class AbstractAssignment < ActiveRecord::Base
   DEFAULT_POINTS_POSSIBLE = 0
 
   DUPLICATED_IN_CONTEXT = "duplicated_in_context"
+  QUIZ_SUBMISSION_VERSIONS_LIMIT = 65
+  QUIZZES_NEXT_TIMEOUT = 15.minutes
 
   attr_accessor(
     :resource_map,
@@ -2605,13 +2607,12 @@ class AbstractAssignment < ActiveRecord::Base
   # quiz submission versions are too expensive to de-serialize so we have to
   # cap the number we will do
   def too_many_qs_versions?(student_submissions)
-    qs_threshold = Setting.get("too_many_quiz_submission_versions", "150").to_i
     qs_ids = student_submissions.filter_map(&:quiz_submission_id)
     return false if qs_ids.empty?
 
     Version.shard(shard).from(Version
         .where(versionable_type: "Quizzes::QuizSubmission", versionable_id: qs_ids)
-        .limit(qs_threshold)).count >= qs_threshold
+        .limit(QUIZ_SUBMISSION_VERSIONS_LIMIT)).count >= QUIZ_SUBMISSION_VERSIONS_LIMIT
   end
 
   # :including quiz submission versions won't work for records in the
@@ -3216,7 +3217,7 @@ class AbstractAssignment < ActiveRecord::Base
   scope :duplicating_for_too_long, lambda {
     where(
       "workflow_state = 'duplicating' AND duplication_started_at < ?",
-      Setting.get("quizzes_next_timeout_minutes", "15").to_i.minutes.ago
+      QUIZZES_NEXT_TIMEOUT.ago
     )
   }
 
@@ -3232,14 +3233,14 @@ class AbstractAssignment < ActiveRecord::Base
   scope :importing_for_too_long, lambda {
     where(
       "workflow_state = 'importing' AND importing_started_at < ?",
-      Setting.get("quizzes_next_timeout_minutes", "15").to_i.minutes.ago
+      QUIZZES_NEXT_TIMEOUT.ago
     )
   }
 
   scope :migrating_for_too_long, lambda {
     where(
       "workflow_state = 'migrating' AND duplication_started_at < ?",
-      Setting.get("quizzes_next_timeout_minutes", "15").to_i.minutes.ago
+      QUIZZES_NEXT_TIMEOUT.ago
     )
   }
 

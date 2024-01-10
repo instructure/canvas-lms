@@ -659,14 +659,11 @@ class Account < ActiveRecord::Base
 
   def clear_downstream_caches(*keys_to_clear, xlog_location: nil, is_retry: false)
     shard.activate do
-      if xlog_location
-        timeout = Setting.get("account_cache_clear_replication_timeout", "60").to_i.seconds
-        unless self.class.wait_for_replication(start: xlog_location, timeout:)
-          delay(run_at: Time.now + timeout, singleton: "Account#clear_downstream_caches/#{global_id}:#{keys_to_clear.join("/")}")
-            .clear_downstream_caches(*keys_to_clear, xlog_location:, is_retry: true)
-          # we still clear, but only the first time; after that we just keep waiting
-          return if is_retry
-        end
+      if xlog_location && !self.class.wait_for_replication(start: xlog_location, timeout: 1.minute)
+        delay(run_at: Time.now + timeout, singleton: "Account#clear_downstream_caches/#{global_id}:#{keys_to_clear.join("/")}")
+          .clear_downstream_caches(*keys_to_clear, xlog_location:, is_retry: true)
+        # we still clear, but only the first time; after that we just keep waiting
+        return if is_retry
       end
 
       Account.clear_cache_keys([id] + Account.sub_account_ids_recursive(id), *keys_to_clear)
@@ -892,13 +889,11 @@ class Account < ActiveRecord::Base
     end
   end
 
-  def self.default_storage_quota
-    Setting.get("account_default_quota", 500.megabytes.to_s).to_i
-  end
+  DEFAULT_STORAGE_QUOTA = 500.megabytes
 
   def quota
     return storage_quota if read_attribute(:storage_quote)
-    return self.class.default_storage_quota if root_account?
+    return DEFAULT_STORAGE_QUOTA if root_account?
 
     shard.activate do
       Rails.cache.fetch(["current_quota", global_id].cache_key) do
@@ -909,7 +904,7 @@ class Account < ActiveRecord::Base
 
   def default_storage_quota
     return super if read_attribute(:default_storage_quota)
-    return self.class.default_storage_quota if root_account?
+    return DEFAULT_STORAGE_QUOTA if root_account?
 
     shard.activate do
       @default_storage_quota ||= Rails.cache.fetch(["default_storage_quota", global_id].cache_key) do

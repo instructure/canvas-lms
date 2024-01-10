@@ -7198,7 +7198,7 @@ describe Assignment do
       quiz_with_graded_submission [], course: @course, user: @student
       submissions = @quiz.assignment.submissions
 
-      Setting.set("too_many_quiz_submission_versions", 3)
+      stub_const("AbstractAssignment::QUIZ_SUBMISSION_VERSIONS_LIMIT", 3)
       @quiz_submission.versions.create!
       expect(@quiz.assignment.too_many_qs_versions?(submissions)).to be_falsey
 

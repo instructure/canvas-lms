@@ -74,6 +74,8 @@ class MediaObjectsController < ApplicationController
   include Api::V1::MediaObject
   include FilesHelper
 
+  MISSED_MEDIA_ADDITIONAL_COST = 200
+
   before_action :load_media_object, except: %i[create_media_object index]
   before_action :load_media_object_from_service, only: %i[show iframe_media_player]
   before_action :check_media_permissions, except: %i[create_media_object index media_object_thumbnail update_media_object]
@@ -332,7 +334,7 @@ class MediaObjectsController < ApplicationController
       raise ActiveRecord::RecordNotFound, "invalid media_object_id" unless @media_object
 
       @media_object.delay(singleton: "retrieve_media_details:#{@media_object.media_id}").retrieve_details
-      increment_request_cost(Setting.get("missed_media_additional_request_cost", "200").to_i)
+      increment_request_cost(MISSED_MEDIA_ADDITIONAL_COST)
     end
 
     @media_object.viewed!

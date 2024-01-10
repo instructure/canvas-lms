@@ -185,8 +185,8 @@ jobs_opts = {
   :on_hold_attempt_count => Delayed::Job::ON_HOLD_COUNT,
   :limit => JobsController::LIMIT,
   :starting_query => params[:q],
-  :slow_threshold => Setting.get('jobs.slow_threshold', 600).to_f,
-  :super_slow_threshold => Setting.get('jobs.super_slow_threshold', 3600).to_f
+  :slow_threshold => 10.minutes,
+  :super_slow_threshold => 1.hour
 }
 running_opts = jobs_opts.merge({
   :url => jobs_v1_index_url(:only => :running),

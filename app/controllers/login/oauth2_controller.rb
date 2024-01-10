@@ -27,8 +27,7 @@ class Login::OAuth2Controller < Login::OAuthBaseController
   def new
     super
     nonce = session[:oauth2_nonce] = SecureRandom.hex(24)
-    expiry = Time.zone.now + Setting.get("oauth2_client_timeout", 10.minutes.to_i).to_i
-    jwt = Canvas::Security.create_jwt({ aac_id: @aac.global_id, nonce:, host: request.host_with_port }, expiry)
+    jwt = Canvas::Security.create_jwt({ aac_id: @aac.global_id, nonce:, host: request.host_with_port }, 10.minutes.from_now)
     authorize_url = @aac.generate_authorize_url(oauth2_login_callback_url, jwt)
 
     if @aac.debugging? && @aac.debug_set(:nonce, nonce, overwrite: false)

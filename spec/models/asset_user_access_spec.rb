@@ -445,7 +445,7 @@ describe AssetUserAccess do
 
   describe "delete_old_records" do
     before :once do
-      @old_aua = AssetUserAccess.create! last_access: 13.months.ago
+      @old_aua = AssetUserAccess.create! last_access: 25.months.ago
       @new_aua = AssetUserAccess.create! last_access: 13.seconds.ago
     end
 
@@ -456,9 +456,9 @@ describe AssetUserAccess do
     end
 
     it "sleeps between batches if set" do
-      Setting.set("asset_user_accesses_delete_batch_size", "1")
-      Setting.set("asset_user_accesses_delete_batch_sleep", "0.5")
-      AssetUserAccess.create! last_access: 13.months.ago
+      stub_const("AssetUserAccess::DELETE_BATCH_SIZE", 1)
+      stub_const("AssetUserAccess::DELETE_BATCH_SLEEP", 0.5)
+      AssetUserAccess.create! last_access: 25.months.ago
       expect(AssetUserAccess).to receive(:sleep).with(0.5).at_least(:twice)
       AssetUserAccess.delete_old_records
     end
