@@ -1012,6 +1012,28 @@ describe DiscussionTopicsController do
         expect(response).to redirect_to redirect_path
       end
 
+      it "redirects to groups with module_item_id, embed, display, session_timezome, and session_locale query params when :react_discussions_post is ON" do
+        Account.default.enable_feature! :react_discussions_post
+        user_session(@student)
+        get "show", params: {
+          course_id: @course.id,
+          id: @topic.id,
+          embed: true,
+          display: "borderless",
+          session_timezone: "America/Los_Angeles",
+          session_locale: "en",
+          module_item_id: 789
+        }
+
+        expect(response).to be_redirect
+        expect(response.location).to include "/groups/#{@group1.id}/discussion_topics?"
+        expect(response.location).to include "module_item_id=789"
+        expect(response.location).to include "embed=true"
+        expect(response.location).to include "display=borderless"
+        expect(response.location).to include "session_timezone=America%2FLos_Angeles"
+        expect(response.location).to include "session_locale=en"
+      end
+
       it "does not change the name of the child topic when navigating to it" do
         user_session(@student)
 

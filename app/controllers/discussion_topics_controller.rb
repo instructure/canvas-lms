@@ -777,6 +777,8 @@ class DiscussionTopicsController < ApplicationController
       if topics && topics.length == 1 && !@topic.grants_right?(@current_user, session, :update)
         redirect_params = { root_discussion_topic_id: @topic.id }
         redirect_params[:module_item_id] = params[:module_item_id] if params[:module_item_id].present?
+        # add in query parameters from the url, we want them preserved
+        redirect_params.merge!(request.query_parameters) unless request.query_parameters.empty?
         redirect_to named_context_url(topics[0].context, :context_discussion_topics_url, redirect_params)
         return
       end
@@ -1795,6 +1797,10 @@ class DiscussionTopicsController < ApplicationController
       )
     end
     extra_params[:module_item_id] = params[:module_item_id] if params[:module_item_id].present?
+    extra_params[:embed] = params[:embed] if params[:embed].present?
+    extra_params[:display] = params[:display] if params[:display].present?
+    extra_params[:session_timezone] = params[:session_timezone] if params[:session_timezone].present?
+    extra_params[:session_locale] = params[:session_locale] if params[:session_locale].present?
 
     @root_topic = @context.context.discussion_topics.find(params[:root_discussion_topic_id])
     @topic = @root_topic.ensure_child_topic_for(@context)
