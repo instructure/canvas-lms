@@ -45,7 +45,7 @@ export function showFilePreview(file_id, verifier = '') {
   asJson(
     fetch(
       url,
-      defaultFetchOptions
+      defaultFetchOptions()
     )
   )
     .then(file => {

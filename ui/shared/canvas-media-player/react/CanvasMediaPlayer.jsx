@@ -141,7 +141,7 @@ export default function CanvasMediaPlayer(props) {
       let resp
       try {
         setMediaObjNetworkErr(null)
-        resp = await asJson(fetch(url, defaultFetchOptions))
+        resp = await asJson(fetch(url, defaultFetchOptions()))
       } catch (e) {
         // eslint-disable-next-line no-console
         console.warn(`Error getting ${url}`, e.message)
