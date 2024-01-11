@@ -99,6 +99,7 @@ export default function FilterNav({
     studentGroupCategories,
     onToggleFilterPreset,
     customStatuses,
+    multiselectGradebookFiltersEnabled,
     onToggleDateModal: () => setIsDateModalOpen(true),
   })
 
@@ -255,6 +256,7 @@ export default function FilterNav({
               filterItems={filterItems}
               changeAnnouncement={changeAnnouncement}
               applyFiltersButtonRef={applyFiltersButtonRef}
+              multiselectGradebookFiltersEnabled={multiselectGradebookFiltersEnabled}
             />
           </Flex.Item>
           <Flex.Item data-testid="filter-tags">

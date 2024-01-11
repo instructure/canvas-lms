@@ -89,6 +89,36 @@ export const student: Student = {
   total_grade: 100,
 }
 
+export const student2: Student = {
+  created_at: '',
+  email: '',
+  group_ids: [],
+  id: '2',
+  integration_id: '',
+  login_id: '',
+  short_name: 'John',
+  sis_import_id: '',
+  sis_user_id: null,
+  enrollments: [],
+  first_name: 'Bob',
+  last_name: 'Smith',
+  name: 'Bob Smith',
+  index: 1,
+  section_ids: [],
+  anonymous_name: '',
+  computed_current_score: 100,
+  computed_final_score: 100,
+  cssClass: '',
+  displayName: 'Jim Doe',
+  initialized: false,
+  isConcluded: false,
+  isInactive: false,
+  loaded: false,
+  sections: [],
+  sortable_name: 'Smith, Bob',
+  total_grade: 100,
+}
+
 export const appliedFilters: Filter[] = [
   {
     id: '1',

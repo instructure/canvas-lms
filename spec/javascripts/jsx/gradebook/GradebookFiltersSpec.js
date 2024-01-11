@@ -581,6 +581,7 @@ QUnit.module('Gradebook#filterAssignments', {
             posted_at: null,
             score: 10,
             user_id: '1101',
+            late: true,
             workflow_state: 'graded',
           },
           {
@@ -821,6 +822,50 @@ test('includes no assignments when filtered by existing status but searchFiltere
   ]
   this.gradebook.searchFilteredStudentIds = ['1102']
   this.gradebook.setFilterColumnsBySetting('submissions', 'missing')
+  const filteredAssignments = this.gradebook.filterAssignments(this.assignments)
+  deepEqual(map(filteredAssignments, 'id'), [])
+})
+
+test('allows for multiselect when filtering by status and multiselect_gradebook_filters_enabled', function () {
+  window.ENV.GRADEBOOK_OPTIONS = {
+    multiselect_gradebook_filters_enabled: true,
+  }
+  this.gradebook.props.appliedFilters = [
+    {
+      id: '1',
+      type: 'submissions',
+      value: 'late',
+      created_at: new Date().toISOString(),
+    },
+    {
+      id: '2',
+      type: 'submissions',
+      value: 'missing',
+      created_at: new Date().toISOString(),
+    },
+  ]
+  const filteredAssignments = this.gradebook.filterAssignments(this.assignments)
+  deepEqual(map(filteredAssignments, 'id'), ['2301', '2302'])
+})
+
+test('does not allows for multiselect when filtering by status and multiselect_gradebook_filters_enabled is false', function () {
+  window.ENV.GRADEBOOK_OPTIONS = {
+    multiselect_gradebook_filters_enabled: false,
+  }
+  this.gradebook.props.appliedFilters = [
+    {
+      id: '1',
+      type: 'submissions',
+      value: 'late',
+      created_at: new Date().toISOString(),
+    },
+    {
+      id: '2',
+      type: 'submissions',
+      value: 'missing',
+      created_at: new Date().toISOString(),
+    },
+  ]
   const filteredAssignments = this.gradebook.filterAssignments(this.assignments)
   deepEqual(map(filteredAssignments, 'id'), [])
 })
