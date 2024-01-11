@@ -104,9 +104,9 @@ export default function UsersToolbar(props) {
                     onBlur={() => props.toggleSRMessage(true)}
                     onFocus={() => props.toggleSRMessage(false)}
                     messages={
-                      props.errors.search_term ? [
-                        {type: 'error', text: props.errors.search_term},
-                      ] : []
+                      props.errors.search_term
+                        ? [{type: 'error', text: props.errors.search_term}]
+                        : []
                     }
                   />
                 </Grid.Col>
@@ -152,7 +152,10 @@ export default function UsersToolbar(props) {
                     <Checkbox
                       size="small"
                       checked={props.include_deleted_users}
-                      onChange={e => props.onUpdateFilters({include_deleted_users: event.target.checked})}
+                      onChange={e =>
+                        // eslint-disable-next-line no-restricted-globals
+                        props.onUpdateFilters({include_deleted_users: event.target.checked})
+                      }
                       label={I18n.t('Include deleted users in search results')}
                     />
                   </Grid.Col>
