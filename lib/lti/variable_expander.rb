@@ -315,7 +315,7 @@ module Lti
                        },
                        default_name: "com_instructure_rcs_app_host"
 
-    # Returns true if the User is from student view process
+    # Returns true if the user is launching from student view.
     #
     # @example
     #   ```
