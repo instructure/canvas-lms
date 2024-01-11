@@ -42,7 +42,7 @@ import {fireEvent, screen, waitFor} from '@testing-library/dom'
 import type {FilterPreset, Filter} from '../gradebook.d'
 import type {SlickGridKeyboardEvent} from '../grid.d'
 import type {Submission, Student, Enrollment} from '../../../../../api.d'
-import {enrollment, student, enrollmentFilter, appliedFilters} from './fixtures'
+import {enrollment, student, enrollmentFilter, appliedFilters, student2} from './fixtures'
 
 const unsubmittedSubmission: Submission = {
   anonymous_id: 'dNq5T',
@@ -629,6 +629,12 @@ describe('filterStudentBySectionFn', () => {
     const enrollmentFilterTest = {...enrollmentFilter}
     const appliedFilterTest = [...appliedFilters]
     let modifiedStudents: Student[]
+    const enrollment3: Enrollment = {
+      ...enrollment,
+      course_section_id: 'section2',
+      enrollment_state: 'active',
+    }
+    const modifiedStudent2: Student = {...student2, enrollments: [enrollment3]}
     beforeEach(() => {
       const enrollment1: Enrollment = {
         ...enrollment,
@@ -666,6 +672,52 @@ describe('filterStudentBySectionFn', () => {
         filterStudentBySectionFn(appliedFilterTest, enrollmentFilterTest)
       )
       expect(filteredStudentsSection2[0].name).toBe('Jim Doe')
+    })
+
+    it('filteredStudents include all students when appliedFilters includes multiple sections when multiselect_gradebook_filters_enabled is true', () => {
+      modifiedStudents.push(modifiedStudent2)
+      ENV.GRADEBOOK_OPTIONS = {multiselect_gradebook_filters_enabled: true}
+      const appliedFilters: Filter[] = [
+        {
+          id: '1',
+          type: 'section',
+          created_at: '',
+          value: 'section1',
+        },
+        {
+          id: '1',
+          type: 'section',
+          created_at: '',
+          value: 'section2',
+        },
+      ]
+      const filteredStudents = modifiedStudents.filter(
+        filterStudentBySectionFn(appliedFilters, enrollmentFilterTest)
+      )
+      expect(filteredStudents.length).toBe(2)
+    })
+
+    it('filteredStudents does not include all students when appliedFilters includes multiple sections when multiselect_gradebook_filters_enabled is false', () => {
+      modifiedStudents.push(modifiedStudent2)
+      ENV.GRADEBOOK_OPTIONS = {multiselect_gradebook_filters_enabled: false}
+      const appliedFilters: Filter[] = [
+        {
+          id: '1',
+          type: 'section',
+          created_at: '',
+          value: 'section1',
+        },
+        {
+          id: '1',
+          type: 'section',
+          created_at: '',
+          value: 'section2',
+        },
+      ]
+      const filteredStudents = modifiedStudents.filter(
+        filterStudentBySectionFn(appliedFilters, enrollmentFilterTest)
+      )
+      expect(filteredStudents.length).toBe(1)
     })
   })
 
