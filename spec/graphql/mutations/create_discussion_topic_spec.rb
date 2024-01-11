@@ -146,7 +146,7 @@ describe Mutations::CreateDiscussionTopic do
       message: "#{message}"
       published: #{published}
       requireInitialPost: #{require_initial_post}
-      anonymousState: "off"
+      anonymousState: off
     GQL
 
     result = execute_with_input(query)
@@ -186,7 +186,7 @@ describe Mutations::CreateDiscussionTopic do
       message: "#{message}"
       published: #{published}
       requireInitialPost: #{require_initial_post}
-      anonymousState: "off"
+      anonymousState: off
     GQL
 
     result = execute_with_input(query)
@@ -226,7 +226,7 @@ describe Mutations::CreateDiscussionTopic do
       message: "#{message}"
       published: #{published}
       requireInitialPost: #{require_initial_post}
-      anonymousState: "off"
+      anonymousState: off
       locked: #{locked}
     GQL
 
@@ -292,7 +292,7 @@ describe Mutations::CreateDiscussionTopic do
       title: "#{title}"
       message: "#{message}"
       published: #{published}
-      anonymousState: "off"
+      anonymousState: off
     GQL
 
     result = execute_with_input(query)
@@ -318,7 +318,7 @@ describe Mutations::CreateDiscussionTopic do
       title: "#{title}"
       message: "#{message}"
       published: #{published}
-      anonymousState: "off"
+      anonymousState: off
       fileId: "#{file_id}"
     GQL
 
@@ -341,7 +341,7 @@ describe Mutations::CreateDiscussionTopic do
       title: "#{title}"
       message: "#{message}"
       published: #{published}
-      anonymousState: "#{anonymous_state}"
+      anonymousState: #{anonymous_state}
     GQL
 
     result = execute_with_input(query)
@@ -362,7 +362,7 @@ describe Mutations::CreateDiscussionTopic do
       title: "Student Anonymous Create"
       message: "this should not return an error"
       published: true
-      anonymousState: "full_anonymity"
+      anonymousState: full_anonymity
     GQL
 
     result = execute_with_input(query, @teacher)
@@ -385,7 +385,7 @@ describe Mutations::CreateDiscussionTopic do
       title: "#{title}"
       message: "#{message}"
       published: #{published}
-      anonymousState: "#{anonymous_state}"
+      anonymousState: #{anonymous_state}
     GQL
 
     result = execute_with_input(query)
@@ -409,7 +409,7 @@ describe Mutations::CreateDiscussionTopic do
       title: "#{title}"
       message: "#{message}"
       published: #{published}
-      anonymousState: "#{anonymous_state}"
+      anonymousState: #{anonymous_state}
       isAnonymousAuthor: true
     GQL
 
@@ -434,7 +434,7 @@ describe Mutations::CreateDiscussionTopic do
       title: "#{title}"
       message: "#{message}"
       published: #{published}
-      anonymousState: "#{anonymous_state}"
+      anonymousState: #{anonymous_state}
       isAnonymousAuthor: false
     GQL
 
@@ -458,7 +458,7 @@ describe Mutations::CreateDiscussionTopic do
       contextType: Course
       title: "TODO Discussion"
       published: true
-      anonymousState: "full_anonymity"
+      anonymousState: full_anonymity
       todoDate: "#{todo_date}"
     GQL
 
@@ -486,7 +486,7 @@ describe Mutations::CreateDiscussionTopic do
       message: "#{message}"
       published: #{published}
       requireInitialPost: #{require_initial_post}
-      anonymousState: "off"
+      anonymousState: off
       podcastEnabled: #{podcast_enabled}
       podcastHasStudentPosts: #{podcast_has_student_posts}
     GQL
@@ -596,7 +596,7 @@ describe Mutations::CreateDiscussionTopic do
           title: "#{title}"
           message: "#{message}"
           published: #{published}
-          anonymousState: "#{anonymous_state}"
+          anonymousState: #{anonymous_state}
         GQL
 
         result = execute_with_input(query)
@@ -614,7 +614,7 @@ describe Mutations::CreateDiscussionTopic do
           title: "Student Anonymous Create"
           message: "this should return an error"
           published: true
-          anonymousState: "full_anonymity"
+          anonymousState: full_anonymity
         GQL
 
         result = execute_with_input(query, @student)
@@ -651,7 +651,7 @@ describe Mutations::CreateDiscussionTopic do
         message: "#{message}"
         published: #{published}
         requireInitialPost: #{require_initial_post}
-        anonymousState: "off"
+        anonymousState: off
         specificSections: "all"
       GQL
 
@@ -683,7 +683,7 @@ describe Mutations::CreateDiscussionTopic do
         message: "#{message}"
         published: #{published}
         requireInitialPost: #{require_initial_post}
-        anonymousState: "off"
+        anonymousState: off
         specificSections: "#{section.id},#{section2.id}"
       GQL
 
@@ -723,7 +723,7 @@ describe Mutations::CreateDiscussionTopic do
         message: "#{message}"
         published: #{published}
         requireInitialPost: #{require_initial_post}
-        anonymousState: "off"
+        anonymousState: off
         specificSections: "#{sections}"
       GQL
 
@@ -751,7 +751,7 @@ describe Mutations::CreateDiscussionTopic do
         message: "#{message}"
         published: #{published}
         requireInitialPost: #{require_initial_post}
-        anonymousState: "off"
+        anonymousState: off
         delayedPostAt: "#{delayed_post_at}"
         lockAt: "#{lock_at}"
       GQL
@@ -782,7 +782,7 @@ describe Mutations::CreateDiscussionTopic do
         message: "#{message}"
         published: #{published}
         requireInitialPost: #{require_initial_post}
-        anonymousState: "off"
+        anonymousState: off
         delayedPostAt: "#{delayed_post_at}"
         lockAt: "#{lock_at}"
       GQL
@@ -812,7 +812,7 @@ describe Mutations::CreateDiscussionTopic do
         message: "#{message}"
         published: #{published}
         requireInitialPost: #{require_initial_post}
-        anonymousState: "off"
+        anonymousState: off
         lockAt: "#{lock_at}"
       GQL
 
@@ -842,7 +842,7 @@ describe Mutations::CreateDiscussionTopic do
         message: "#{message}"
         published: #{published}
         requireInitialPost: #{require_initial_post}
-        anonymousState: "off"
+        anonymousState: off
         delayedPostAt: #{delayed_post_at}
         lockAt: #{lock_at}
       GQL
