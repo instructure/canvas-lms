@@ -291,6 +291,64 @@ class LearnerPassportController < ApplicationController
     }
   end
 
+  # ------------- pathways -------------
+
+  def learner_passport_pathway_achievements
+    [
+      {
+        id: "1",
+        title: "Business Foundations Specialization Badge",
+        issuer: {
+          name: "Wharton University of Pennsylvania",
+          url: "https://www.wharton.upenn.edu/"
+        },
+        type: "Canvas Course Assessment Completion",
+        criteria:
+          "To earn this certificate, participants must complete 5 milestones and 10 requirements outlined in the Business Foundations Specialization pathway.",
+        skills: [
+          "Financial Accountint",
+          "Marketing Strategy",
+          "Operations Management",
+          "Change Management",
+          "Decision Making"
+        ]
+      },
+      {
+        id: "2",
+        title: "Product Management Certification",
+        issuer: {
+          name: "Wharton University of Pennsylvania",
+          url: "https://www.wharton.upenn.edu/"
+        },
+        type: "Canvas Course Assessment Completion",
+        criteria: "To earn this certificate, parcipants must pass the course",
+        skills: []
+      },
+      {
+        id: "3",
+        title: "English 101",
+        issuer: {
+          name: "Wharton University of Pennsylvania",
+          url: "https://www.wharton.upenn.edu/"
+        },
+        type: "Canvas Course Assessment Completion",
+        criteria: "To earn this certificate, parcipants must pass the course",
+        skills: []
+      },
+      {
+        id: "4",
+        title: "Pre-Med",
+        issuer: {
+          name: "Wharton University of Pennsylvania",
+          url: "https://www.wharton.upenn.edu/"
+        },
+        type: "Canvas Course Assessment Completion",
+        criteria: "To earn this certificate, parcipants must pass the course",
+        skills: []
+      }
+    ]
+  end
+
   # A pathway is a tree of milestones
   # The pathway is at the root, with first_milestones containing the id's of its children
   # Then each milestone has its data plus next_milestones containing the id's of its children
@@ -306,8 +364,7 @@ class LearnerPassportController < ApplicationController
       completed_count: 0,
       first_milestones: [],
       milestones: [],
-      learning_outcomes: [],
-      achievements_earned: [],
+      completion_award: nil,
     }
   end
 
@@ -598,6 +655,10 @@ class LearnerPassportController < ApplicationController
   end
 
   ###### Pathways ######
+
+  def pathway_badges_index
+    render json: learner_passport_pathway_achievements
+  end
 
   def pathways_index
     # return render json: { message: "Permission denied" }, status: :unauthorized unless @current_user.roles.include?("admin")

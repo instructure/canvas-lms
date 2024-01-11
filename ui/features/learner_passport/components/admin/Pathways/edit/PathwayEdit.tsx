@@ -24,7 +24,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {View} from '@instructure/ui-view'
 import type {PathwayDetailData, PathwayEditData} from '../../../types'
-import PathwayCreate from './PathwayCreate'
+import PathwayInfo from './PathwayInfo'
 import PathwayBuilder from './PathwayBuilder'
 
 type PathwayEditSteps = 'create' | 'add_milestones'
@@ -36,7 +36,7 @@ const PathwayEdit = () => {
   const edit_pathway = useLoaderData() as PathwayEditData
   const pathway_data = create_pathway || edit_pathway
   const pathway = pathway_data.pathway
-  const allAchievements = pathway_data.achievements
+  const allBadges = pathway_data.badges
   const [draftPathway, setDraftPathway] = useState(pathway)
   const [currStep, setCurrStep] = useState<PathwayEditSteps>(() => {
     switch (window.location.hash) {
@@ -95,9 +95,13 @@ const PathwayEdit = () => {
     [handleSubmit]
   )
 
-  const handleNextClick = useCallback(_e => {
-    setCurrStep('add_milestones')
-  }, [])
+  const handleNextClick = useCallback(
+    _e => {
+      if (draftPathway.title === '') return
+      setCurrStep('add_milestones')
+    },
+    [draftPathway.title]
+  )
 
   const handlePathwayChange = useCallback(
     (newPathway: Partial<PathwayDetailData>) => {
@@ -110,19 +114,13 @@ const PathwayEdit = () => {
   const renderStep = useCallback(() => {
     switch (currStep) {
       case 'create':
-        return (
-          <PathwayCreate
-            pathway={draftPathway}
-            allAchievements={allAchievements}
-            onChange={handleChange}
-          />
-        )
+        return <PathwayInfo pathway={draftPathway} allBadges={allBadges} onChange={handleChange} />
       case 'add_milestones':
         return <PathwayBuilder pathway={draftPathway} onChange={handlePathwayChange} />
       default:
         return null
     }
-  }, [currStep, draftPathway, allAchievements, handleChange, handlePathwayChange])
+  }, [currStep, draftPathway, allBadges, handleChange, handlePathwayChange])
 
   const renderBreadcrumbsForStep = useCallback(() => {
     switch (currStep) {
