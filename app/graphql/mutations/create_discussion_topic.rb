@@ -17,6 +17,14 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
+
+class Types::DiscussionTopicContextType < Types::BaseEnum
+  graphql_name "DiscussionTopicContextType"
+  description "Context types that can be associated with discussionTopics"
+  value "Course"
+  value "Group"
+end
+
 class Mutations::CreateDiscussionTopic < Mutations::DiscussionBase
   graphql_name "CreateDiscussionTopic"
 
@@ -24,7 +32,7 @@ class Mutations::CreateDiscussionTopic < Mutations::DiscussionBase
   argument :is_anonymous_author, Boolean, required: false
   argument :anonymous_state, String, required: false
   argument :context_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Context")
-  argument :context_type, String, required: true
+  argument :context_type, Types::DiscussionTopicContextType, required: true
   argument :assignment, Mutations::AssignmentCreate, required: false
 
   # most arguments inherited from DiscussionBase

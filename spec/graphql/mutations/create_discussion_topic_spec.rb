@@ -141,7 +141,7 @@ describe Mutations::CreateDiscussionTopic do
 
     query = <<~GQL
       contextId: "#{@course.id}"
-      contextType: "#{context_type}"
+      contextType: #{context_type}
       title: "#{title}"
       message: "#{message}"
       published: #{published}
@@ -181,7 +181,7 @@ describe Mutations::CreateDiscussionTopic do
     query = <<~GQL
       isAnnouncement: #{is_announcement}
       contextId: "#{@course.id}"
-      contextType: "#{context_type}"
+      contextType: #{context_type}
       title: "#{title}"
       message: "#{message}"
       published: #{published}
@@ -221,7 +221,7 @@ describe Mutations::CreateDiscussionTopic do
     query = <<~GQL
       isAnnouncement: #{is_announcement}
       contextId: "#{@course.id}"
-      contextType: "#{context_type}"
+      contextType: #{context_type}
       title: "#{title}"
       message: "#{message}"
       published: #{published}
@@ -245,7 +245,7 @@ describe Mutations::CreateDiscussionTopic do
   it "creates an allow_rating discussion topic" do
     query = <<~GQL
       contextId: "#{@course.id}"
-      contextType: "Course"
+      contextType: Course
       title: "Allows Ratings"
       message: "You can like this"
       allowRating: true
@@ -264,7 +264,7 @@ describe Mutations::CreateDiscussionTopic do
   it "creates an only_graders_can_rate discussion topic" do
     query = <<~GQL
       contextId: "#{@course.id}"
-      contextType: "Course"
+      contextType: Course
       title: "Allows Ratings"
       message: "You can like this"
       allowRating: true
@@ -288,7 +288,7 @@ describe Mutations::CreateDiscussionTopic do
     published = true
     query = <<~GQL
       contextId: "#{@course.id}"
-      contextType: "#{context_type}"
+      contextType: #{context_type}
       title: "#{title}"
       message: "#{message}"
       published: #{published}
@@ -314,7 +314,7 @@ describe Mutations::CreateDiscussionTopic do
     file_id = attachment.id
     query = <<~GQL
       contextId: "#{@course.id}"
-      contextType: "#{context_type}"
+      contextType: #{context_type}
       title: "#{title}"
       message: "#{message}"
       published: #{published}
@@ -337,7 +337,7 @@ describe Mutations::CreateDiscussionTopic do
     anonymous_state = "full_anonymity"
     query = <<~GQL
       contextId: "#{@course.id}"
-      contextType: "#{context_type}"
+      contextType: #{context_type}
       title: "#{title}"
       message: "#{message}"
       published: #{published}
@@ -358,7 +358,7 @@ describe Mutations::CreateDiscussionTopic do
 
     query = <<~GQL
       contextId: "#{@course.id}"
-      contextType: "Course"
+      contextType: Course
       title: "Student Anonymous Create"
       message: "this should not return an error"
       published: true
@@ -381,7 +381,7 @@ describe Mutations::CreateDiscussionTopic do
     anonymous_state = "partial_anonymity"
     query = <<~GQL
       contextId: "#{@course.id}"
-      contextType: "#{context_type}"
+      contextType: #{context_type}
       title: "#{title}"
       message: "#{message}"
       published: #{published}
@@ -405,7 +405,7 @@ describe Mutations::CreateDiscussionTopic do
     anonymous_state = "partial_anonymity"
     query = <<~GQL
       contextId: "#{@course.id}"
-      contextType: "#{context_type}"
+      contextType: #{context_type}
       title: "#{title}"
       message: "#{message}"
       published: #{published}
@@ -430,7 +430,7 @@ describe Mutations::CreateDiscussionTopic do
     anonymous_state = "partial_anonymity"
     query = <<~GQL
       contextId: "#{@course.id}"
-      contextType: "#{context_type}"
+      contextType: #{context_type}
       title: "#{title}"
       message: "#{message}"
       published: #{published}
@@ -455,7 +455,7 @@ describe Mutations::CreateDiscussionTopic do
 
     query = <<~GQL
       contextId: "#{@course.id}"
-      contextType: "Course"
+      contextType: Course
       title: "TODO Discussion"
       published: true
       anonymousState: "full_anonymity"
@@ -481,7 +481,7 @@ describe Mutations::CreateDiscussionTopic do
 
     query = <<~GQL
       contextId: "#{@course.id}"
-      contextType: "#{context_type}"
+      contextType: #{context_type}
       title: "#{title}"
       message: "#{message}"
       published: #{published}
@@ -512,7 +512,7 @@ describe Mutations::CreateDiscussionTopic do
       it "returns 'not found' with an incorrect ID" do
         query = <<~GQL
           contextId: "1"
-          contextType: "Course"
+          contextType: Course
         GQL
         result = execute_with_input(query)
         expect_error(result, "Not found")
@@ -521,10 +521,11 @@ describe Mutations::CreateDiscussionTopic do
       it "returns 'invalid context' with an incorrect context type" do
         query = <<~GQL
           contextId: "1"
-          contextType: "NotAContextType"
+          contextType: NotAContextType
         GQL
         result = execute_with_input(query)
-        expect_error(result, "Invalid context")
+        expected_error_message = "Argument 'contextType' on InputObject 'CreateDiscussionTopicInput' has an invalid value \\(NotAContextType\\)\\. Expected type 'DiscussionTopicContextType!'\\."
+        expect_error(result, expected_error_message)
       end
     end
 
@@ -539,7 +540,7 @@ describe Mutations::CreateDiscussionTopic do
 
         query = <<~GQL
           contextId: "#{@course.id}"
-          contextType: "#{context_type}"
+          contextType: #{context_type}
           title: "#{title}"
           message: "#{message}"
           published: #{published}
@@ -563,7 +564,7 @@ describe Mutations::CreateDiscussionTopic do
 
         query = <<~GQL
           contextId: "#{@course.id}"
-          contextType: "#{context_type}"
+          contextType: #{context_type}
           title: "#{title}"
           message: "#{message}"
           published: #{published}
@@ -591,7 +592,7 @@ describe Mutations::CreateDiscussionTopic do
 
         query = <<~GQL
           contextId: "#{group.id}"
-          contextType: "#{context_type}"
+          contextType: #{context_type}
           title: "#{title}"
           message: "#{message}"
           published: #{published}
@@ -609,7 +610,7 @@ describe Mutations::CreateDiscussionTopic do
 
         query = <<~GQL
           contextId: "#{@course.id}"
-          contextType: "Course"
+          contextType: Course
           title: "Student Anonymous Create"
           message: "this should return an error"
           published: true
@@ -626,7 +627,7 @@ describe Mutations::CreateDiscussionTopic do
         todo_date = 5.days.from_now.iso8601
         query = <<~GQL
           contextId: "#{@course.id}"
-          contextType: "Course",
+          contextType: Course,
           todoDate: "#{todo_date}"
         GQL
 
@@ -645,7 +646,7 @@ describe Mutations::CreateDiscussionTopic do
       require_initial_post = true
       query = <<~GQL
         contextId: "#{@course.id}"
-        contextType: "#{context_type}"
+        contextType: #{context_type}
         title: "#{title}"
         message: "#{message}"
         published: #{published}
@@ -677,7 +678,7 @@ describe Mutations::CreateDiscussionTopic do
 
       query = <<~GQL
         contextId: "#{@course.id}"
-        contextType: "#{context_type}"
+        contextType: #{context_type}
         title: "#{title}"
         message: "#{message}"
         published: #{published}
@@ -717,7 +718,7 @@ describe Mutations::CreateDiscussionTopic do
 
       query = <<~GQL
         contextId: "#{@course.id}"
-        contextType: "#{context_type}"
+        contextType: #{context_type}
         title: "#{title}"
         message: "#{message}"
         published: #{published}
@@ -745,7 +746,7 @@ describe Mutations::CreateDiscussionTopic do
 
       query = <<~GQL
         contextId: "#{@course.id}"
-        contextType: "#{context_type}"
+        contextType: #{context_type}
         title: "#{title}"
         message: "#{message}"
         published: #{published}
@@ -776,7 +777,7 @@ describe Mutations::CreateDiscussionTopic do
 
       query = <<~GQL
         contextId: "#{@course.id}"
-        contextType: "#{context_type}"
+        contextType: #{context_type}
         title: "#{title}"
         message: "#{message}"
         published: #{published}
@@ -806,7 +807,7 @@ describe Mutations::CreateDiscussionTopic do
 
       query = <<~GQL
         contextId: "#{@course.id}"
-        contextType: "#{context_type}"
+        contextType: #{context_type}
         title: "#{title}"
         message: "#{message}"
         published: #{published}
@@ -836,7 +837,7 @@ describe Mutations::CreateDiscussionTopic do
 
       query = <<~GQL
         contextId: "#{@course.id}"
-        contextType: "#{context_type}"
+        contextType: #{context_type}
         title: "#{title}"
         message: "#{message}"
         published: #{published}
@@ -867,7 +868,7 @@ describe Mutations::CreateDiscussionTopic do
 
       query = <<~GQL
         contextId: "#{@course.id}"
-        contextType: "#{context_type}"
+        contextType: #{context_type}
         title: "#{title}"
         message: "#{message}"
         published: #{published}
@@ -924,7 +925,7 @@ describe Mutations::CreateDiscussionTopic do
 
       query = <<~GQL
         contextId: "#{@course.id}"
-        contextType: "#{context_type}"
+        contextType: #{context_type}
         title: "#{title}"
         message: "#{message}"
         published: #{published}
@@ -968,7 +969,7 @@ describe Mutations::CreateDiscussionTopic do
 
       query = <<~GQL
         contextId: "#{@course.id}"
-        contextType: "#{context_type}"
+        contextType: #{context_type}
         title: "#{title}"
         message: "#{message}"
         published: #{published}
@@ -1005,7 +1006,7 @@ describe Mutations::CreateDiscussionTopic do
 
       query = <<~GQL
         contextId: "#{@course.id}"
-        contextType: "#{context_type}"
+        contextType: #{context_type}
         title: "#{title}"
         message: "#{message}"
         published: #{published}
@@ -1039,7 +1040,7 @@ describe Mutations::CreateDiscussionTopic do
 
       query = <<~GQL
         contextId: "#{@course.id}"
-        contextType: "#{context_type}"
+        contextType: #{context_type}
         title: "#{title}"
         message: "#{message}"
         published: #{published}
