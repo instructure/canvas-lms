@@ -489,6 +489,50 @@ describe "discussions" do
             expect(f("input[data-testid='legal-copyright']").attribute("value")).to eq "(C) 2014 XYZ Corp"
           end
         end
+
+        it "saves all changes correctly" do
+          get "/courses/#{course.id}/discussion_topics/#{@topic_all_options.id}/edit"
+
+          replace_content(f("input[placeholder='Topic Title']"), "new title", { tab_out: true })
+
+          clear_tiny(f("#discussion-topic-message-body"), "discussion-topic-message-body_ifr")
+          type_in_tiny("#discussion-topic-message-body", "new message")
+
+          driver.action.move_to(f("span[data-testid='removable-item']")).perform
+          f("[data-testid='remove-button']").click
+          _, fullpath, _data = get_file("testfile5.zip")
+          f("[data-testid='attachment-input']").send_keys(fullpath)
+
+          f("button[title='Remove All Sections']").click
+          f("input[data-testid='section-select']").click
+          fj("li:contains('value for name')").click
+
+          # we cannot change anonymity on edit, so we just verify its disabled
+          expect(ffj("fieldset:contains('Anonymous Discussion') input[disabled]").count).to eq 3
+
+          force_click("input[value='must-respond-before-viewing-replies']")
+
+          force_click("input[value='enable-podcast-feed']")
+          expect(f("body")).not_to contain_jqcss("input[value='include-student-replies-in-podcast-feed']")
+
+          force_click("input[value='allow-liking']")
+          expect(f("body")).not_to contain_jqcss("input[value='only-graders-can-like']")
+
+          force_click("input[value='add-to-student-to-do']")
+
+          fj("button:contains('Save')").click
+
+          @topic_all_options.reload
+          expect(@topic_all_options.title).to eq "new title"
+          expect(@topic_all_options.message).to include "new message"
+          expect(@topic_all_options.attachment_id).to eq Attachment.last.id
+          expect(@topic_all_options.is_section_specific).to be_truthy
+          expect(@topic_all_options.require_initial_post).to be_falsey
+          expect(@topic_all_options.podcast_enabled).to be_falsey
+          expect(@topic_all_options.allow_rating).to be_falsey
+          expect(@topic_all_options.only_graders_can_rate).to be_falsey
+          expect(@topic_all_options.todo_date).to be_nil
+        end
       end
 
       context "ungraded group" do
