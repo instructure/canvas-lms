@@ -25,48 +25,49 @@ import {DiscussionTopic} from '../../../../graphql/DiscussionTopic'
 
 jest.mock('@canvas/rce/react/CanvasRce')
 
-const setup = ({
-  isEditing = false,
-  currentDiscussionTopic = {},
-  assignmentGroups = [],
-  isStudent = false,
-  sections = [],
-  groupCategories = [],
-  onSubmit = () => {},
-} = {}) => {
-  return render(
-    <DiscussionTopicForm
-      assignmentGroups={assignmentGroups}
-      isEditing={isEditing}
-      currentDiscussionTopic={currentDiscussionTopic}
-      isStudent={isStudent}
-      sections={sections}
-      groupCategories={groupCategories}
-      onSubmit={onSubmit}
-      apolloClient={null}
-      studentEnrollments={[]}
-      isGroupContext={false}
-    />
-  )
-}
-
 describe('DiscussionTopicForm', () => {
+  const setup = ({
+    isEditing = false,
+    currentDiscussionTopic = {},
+    assignmentGroups = [],
+    isStudent = false,
+    sections = [],
+    groupCategories = [],
+    onSubmit = () => {},
+    isGroupContext = false,
+  } = {}) => {
+    return render(
+      <DiscussionTopicForm
+        assignmentGroups={assignmentGroups}
+        isEditing={isEditing}
+        currentDiscussionTopic={currentDiscussionTopic}
+        isStudent={isStudent}
+        sections={sections}
+        groupCategories={groupCategories}
+        onSubmit={onSubmit}
+        apolloClient={null}
+        studentEnrollments={[]}
+        isGroupContext={isGroupContext}
+      />
+    )
+  }
+
   beforeEach(() => {
     window.ENV = {
       DISCUSSION_TOPIC: {
         PERMISSIONS: {
           CAN_ATTACH: true,
+          CAN_MODERATE: true,
         },
+        ATTRIBUTES: {},
       },
-    }
-  })
-  afterEach(() => {
-    window.ENV = {
-      DISCUSSION_TOPIC: {
-        PERMISSIONS: {
-          CAN_ATTACH: true,
-        },
-      },
+      FEATURES: {},
+      PERMISSIONS: {},
+      allow_student_anonymous_discussion_topics: false,
+      USAGE_RIGHTS_REQUIRED: false,
+      K5_HOMEROOM_COURSE: false,
+      current_user: {},
+      STUDENT_PLANNER_ENABLED: true,
     }
   })
 
@@ -74,13 +75,58 @@ describe('DiscussionTopicForm', () => {
     const document = setup()
     expect(document.getByText('Topic Title')).toBeInTheDocument()
     expect(document.queryByText('Attach')).toBeTruthy()
+
+    expect(document.queryByTestId('graded-checkbox')).toBeTruthy()
+    expect(document.queryByTestId('group-discussion-checkbox')).toBeTruthy()
   })
 
-  it('does not display AttachButton when CAN_ATTACH is false', () => {
-    window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_ATTACH = false
-    const document = setup()
+  it('renders expected default teacher discussion options', () => {
+    window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_MODERATE = true
+    window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_MANAGE_CONTENT = true
 
-    expect(document.queryByText('Attach')).toBeFalsy()
+    const document = setup()
+    // Default teacher options in order top to bottom
+    expect(document.getByText('Topic Title')).toBeInTheDocument()
+    expect(document.queryByText('Attach')).toBeTruthy()
+    expect(document.queryByTestId('section-select')).toBeTruthy()
+    expect(document.queryAllByText('Anonymous Discussion')).toBeTruthy()
+    expect(document.queryByTestId('require-initial-post-checkbox')).toBeTruthy()
+    expect(document.queryByLabelText('Enable podcast feed')).toBeInTheDocument()
+    expect(document.queryByTestId('graded-checkbox')).toBeTruthy()
+    expect(document.queryByLabelText('Allow liking')).toBeInTheDocument()
+    expect(document.queryByLabelText('Add to student to-do')).toBeInTheDocument()
+    expect(document.queryByTestId('group-discussion-checkbox')).toBeTruthy()
+    expect(document.queryAllByText('Available from')).toBeTruthy()
+    expect(document.queryAllByText('Until')).toBeTruthy()
+
+    // Hides announcement options
+    expect(document.queryByLabelText('Delay Posting')).not.toBeInTheDocument()
+    expect(document.queryByLabelText('Allow Participants to Comment')).not.toBeInTheDocument()
+  })
+
+  it('renders expected default teacher announcement options', () => {
+    window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_MODERATE = true
+    window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_MANAGE_CONTENT = true
+    window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement = true
+
+    const document = setup()
+    // Default teacher options in order top to bottom
+    expect(document.getByText('Topic Title')).toBeInTheDocument()
+    expect(document.queryByText('Attach')).toBeTruthy()
+    expect(document.queryByTestId('section-select')).toBeTruthy()
+    expect(document.queryByLabelText('Delay Posting')).toBeInTheDocument()
+    expect(document.queryByLabelText('Allow Participants to Comment')).toBeInTheDocument()
+    expect(document.queryByTestId('require-initial-post-checkbox')).toBeTruthy()
+    expect(document.queryByLabelText('Enable podcast feed')).toBeInTheDocument()
+    expect(document.queryByLabelText('Allow liking')).toBeInTheDocument()
+
+    // Hides discussion only options
+    expect(document.queryByLabelText('Add to student to-do')).not.toBeInTheDocument()
+    expect(document.queryByText('Anonymous Discussion')).not.toBeTruthy()
+    expect(document.queryByTestId('graded-checkbox')).not.toBeTruthy()
+    expect(document.queryByTestId('group-discussion-checkbox')).not.toBeTruthy()
+    expect(document.queryByText('Available from')).not.toBeTruthy()
+    expect(document.queryByText('Until')).not.toBeTruthy()
   })
 
   describe('publish indicator', () => {
@@ -207,24 +253,34 @@ describe('DiscussionTopicForm', () => {
   })
 
   describe('Revealing/hiding options', () => {
-    // it('shows AnonymousResponseSelector when Anonymity selector is partial', async () => {
-    //   const {getByRole, getByLabelText} = setup()
-    //   const radioInputPartial = getByRole('radio', {
-    //     name: 'Partial: students can choose to reveal their name and profile picture',
-    //   })
-    //   .click(radioInputPartial)
-    //   expect(radioInputPartial).toBeChecked() // this will fail! TODO: investigate how to check InstUI RadioInput
-    //   await waitFor(() => expect(getByLabelText('This is a Group Discussion')).not.toBeVisible())
-    // })
+    it('shows AnonymousResponseSelector when Anonymity selector is partial', async () => {
+      window.ENV.current_user.display_name = 'Student Name'
+      const document = setup({
+        currentDiscussionTopic: DiscussionTopic.mock({anonymousState: 'partial_anonymity'}),
+        isStudent: true,
+      })
 
-    // it('hides group discussion when Fully/Partially Anonymous', () => {
-    //   const {getByLabelText, queryByLabelText} = setup()
-    //   expect(queryByLabelText('This is a Group Discussion')).toBeInTheDocument()
-    //   getByLabelText(
-    //     'Partial: students can choose to reveal their name and profile picture'
-    //   ).click()
-    //   expect(queryByLabelText('This is a Group Discussion')).not.toBeInTheDocument() // this will fail!
-    // })
+      expect(document.queryByText('Replying as')).toBeTruthy()
+    })
+
+    it('does not show AnonymousResponseSelector when Anonymity selector is full', async () => {
+      window.ENV.current_user.display_name = 'Student Name'
+      const document = setup({
+        currentDiscussionTopic: DiscussionTopic.mock({anonymousState: 'full_anonymity'}),
+        isStudent: true,
+      })
+
+      expect(document.queryByText('Replying as')).toBeFalsy()
+    })
+
+    it('hides group and graded discussion options when Fully/Partially Anonymous', () => {
+      const document = setup({
+        currentDiscussionTopic: DiscussionTopic.mock({anonymousState: 'full_anonymity'}),
+      })
+
+      expect(document.queryByTestId('graded-checkbox')).toBeFalsy()
+      expect(document.queryByTestId('group-discussion-checkbox')).toBeFalsy()
+    })
 
     it('hides post to section, student ToDo, and ungraded options when Graded', () => {
       ENV = {
@@ -248,6 +304,88 @@ describe('DiscussionTopicForm', () => {
       expect(queryByTestId('todo-date-section')).not.toBeInTheDocument()
       expect(queryByLabelText('Post to')).not.toBeInTheDocument()
       expect(queryByTestId('assignment-settings-section')).toBeInTheDocument()
+    })
+
+    it('does not display AttachButton when CAN_ATTACH is false', () => {
+      window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_ATTACH = false
+      const document = setup()
+
+      expect(document.queryByText('Attach')).toBeFalsy()
+    })
+
+    it('shows AnonymousOptions when conditions are met', () => {
+      window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement = false
+      window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_MODERATE = true
+
+      const document = setup({isGroupContext: false})
+      expect(document.queryAllByText('Anonymous Discussion')).toBeTruthy()
+    })
+
+    it('shows AnonymousOptions when students are explicitly allowed are met', () => {
+      window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement = false
+      window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_MODERATE = false
+      window.ENV.allow_student_anonymous_discussion_topics = true
+
+      const document = setup({isGroupContext: false})
+      expect(document.queryAllByText('Anonymous Discussion')).toBeTruthy()
+    })
+
+    it('does not Show AnonymousOptions when in group context', () => {
+      window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement = false
+      window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_MODERATE = false
+
+      const document = setup({isGroupContext: false})
+      expect(document.queryByText('Anonymous Discussion')).toBeFalsy()
+    })
+
+    it('does not show usageRights when not enabled', () => {
+      window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_ATTACH = true
+      window.ENV.FEATURES.usage_rights_discussion_topics = true
+      window.ENV.USAGE_RIGHTS_REQUIRED = false
+      window.ENV.PERMISSIONS.manage_files = true
+
+      const document = setup()
+      expect(document.queryByText('Set usage rights')).toBeFalsy()
+    })
+
+    it('shows usageRights when enabled', () => {
+      window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_ATTACH = true
+      window.ENV.FEATURES.usage_rights_discussion_topics = true
+      window.ENV.USAGE_RIGHTS_REQUIRED = true
+      window.ENV.PERMISSIONS.manage_files = true
+
+      const document = setup()
+      expect(document.queryByText('Set usage rights')).toBeTruthy()
+    })
+
+    it('does not show liking options when in K5_homeRoom', () => {
+      window.ENV.K5_HOMEROOM_COURSE = true
+
+      const document = setup()
+      expect(document.queryByText('Allow liking')).toBeFalsy()
+    })
+
+    it('shows liking options when not in K5_homeRoom', () => {
+      window.ENV.K5_HOMEROOM_COURSE = false
+
+      const document = setup()
+      expect(document.queryByText('Allow liking')).toBeTruthy()
+    })
+
+    it('shows save and publish when not published', () => {
+      const document = setup({
+        currentDiscussionTopic: DiscussionTopic.mock({published: false}),
+      })
+
+      expect(document.queryByTestId('save-and-publish-button')).toBeTruthy()
+    })
+
+    it('does not show save and publish when published', () => {
+      const document = setup({
+        currentDiscussionTopic: DiscussionTopic.mock({published: true}),
+      })
+
+      expect(document.queryByTestId('save-and-publish-button')).toBeFalsy()
     })
   })
 })
