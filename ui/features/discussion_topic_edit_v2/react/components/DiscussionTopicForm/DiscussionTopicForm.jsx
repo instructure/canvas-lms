@@ -77,6 +77,7 @@ export default function DiscussionTopicForm({
     isAnnouncement && !ENV.DISCUSSION_TOPIC?.ATTRIBUTES.course_published
   const isEditingAnnouncement = isAnnouncement && ENV.DISCUSSION_TOPIC?.ATTRIBUTES.id
   const published = currentDiscussionTopic?.published ?? false
+
   const announcementAlertProps = () => {
     if (isUnpublishedAnnouncement) {
       return {
@@ -234,12 +235,6 @@ export default function DiscussionTopicForm({
     setUsageRightsData(data)
   }
 
-  const shouldShowTodoSettings =
-    !isGraded &&
-    !isAnnouncement &&
-    ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MANAGE_CONTENT &&
-    ENV.STUDENT_PLANNER_ENABLED
-
   useEffect(() => {
     if (delayPosting) {
       const rightNow = new Date()
@@ -253,6 +248,42 @@ export default function DiscussionTopicForm({
   useEffect(() => {
     if (!isGroupDiscussion) setGroupCategoryId(null)
   }, [isGroupDiscussion])
+
+  const shouldShowTodoSettings =
+    !isGraded &&
+    !isAnnouncement &&
+    ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MANAGE_CONTENT &&
+    ENV.STUDENT_PLANNER_ENABLED
+
+  const shouldShowPostToSectionOption = !isGraded && !isGroupDiscussion && !isGroupContext
+
+  const shouldShowAnonymousOptions =
+    !isGroupContext &&
+    !isAnnouncement &&
+    (ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MODERATE ||
+      ENV.allow_student_anonymous_discussion_topics)
+
+  const shouldShowAnnouncementOnlyOptions = isAnnouncement && !isGroupContext
+
+  const shouldShowGroupAndGradedDiscussionOptions =
+    discussionAnonymousState === 'off' && !isAnnouncement && !isGroupContext
+
+  const shouldShowUsageRightsOption =
+    ENV?.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_ATTACH &&
+    ENV?.FEATURES?.usage_rights_discussion_topics &&
+    ENV?.USAGE_RIGHTS_REQUIRED &&
+    ENV?.PERMISSIONS?.manage_files
+
+  const shouldShowLikingOption = !ENV.K5_HOMEROOM_COURSE
+
+  const shouldShowPartialAnonymousSelector =
+    !isEditing && discussionAnonymousState === 'partial_anonymity' && isStudent
+
+  const shouldShowAvailabilityOptions = !isAnnouncement && !isGroupContext
+
+  /* discussion moderators viewing a new or still unpublished discussion */
+  const shouldShowSaveAndPublishButton =
+    !isAnnouncement && ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MODERATE && !published
 
   const validateTitle = newTitle => {
     if (newTitle.length > 255) {
@@ -675,7 +706,7 @@ export default function DiscussionTopicForm({
           isGradedDiscussion={!affectUserFileQuota}
           canAttach={ENV.DISCUSSION_TOPIC?.PERMISSIONS.CAN_ATTACH}
         />
-        {!isGraded && !isGroupDiscussion && !isGroupContext && (
+        {shouldShowPostToSectionOption && (
           <View display="block" padding="medium none">
             <CanvasMultiSelect
               data-testid="section-select"
@@ -701,76 +732,70 @@ export default function DiscussionTopicForm({
             </CanvasMultiSelect>
           </View>
         )}
-        {ENV?.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_ATTACH &&
-          ENV?.FEATURES?.usage_rights_discussion_topics &&
-          ENV?.USAGE_RIGHTS_REQUIRED &&
-          ENV?.PERMISSIONS?.manage_files && (
-            <Flex justifyItems="start" gap="small">
-              <Flex.Item>{I18n.t('Set usage rights')}</Flex.Item>
-              <Flex.Item>
-                <UsageRightsContainer
-                  contextType={(ENV?.context_type ?? '').toLocaleLowerCase()}
-                  contextId={ENV?.context_id}
-                  onSaveUsageRights={handleSettingUsageRightsData}
-                  initialUsageRights={usageRightsData}
-                  errorState={usageRightsErrorState}
-                />
-              </Flex.Item>
-            </Flex>
-          )}
+        {shouldShowUsageRightsOption && (
+          <Flex justifyItems="start" gap="small">
+            <Flex.Item>{I18n.t('Set usage rights')}</Flex.Item>
+            <Flex.Item>
+              <UsageRightsContainer
+                contextType={(ENV?.context_type ?? '').toLocaleLowerCase()}
+                contextId={ENV?.context_id}
+                onSaveUsageRights={handleSettingUsageRightsData}
+                initialUsageRights={usageRightsData}
+                errorState={usageRightsErrorState}
+              />
+            </Flex.Item>
+          </Flex>
+        )}
         <Text size="large">{I18n.t('Options')}</Text>
-        {!isGroupContext &&
-          !isAnnouncement &&
-          (ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MODERATE ||
-            ENV.allow_student_anonymous_discussion_topics) && (
-            <View display="block" margin="medium 0">
-              <RadioInputGroup
-                name="anonymous"
-                description={I18n.t('Anonymous Discussion')}
-                value={discussionAnonymousState}
-                onChange={(_event, value) => {
-                  if (value !== 'off') {
-                    setIsGraded(false)
-                    setIsGroupDiscussion(false)
-                    setGroupCategoryId(null)
-                  }
-                  setDiscussionAnonymousState(value)
-                }}
-                disabled={isEditing || isGraded}
-              >
-                <RadioInput
-                  key="off"
-                  value="off"
-                  label={I18n.t(
-                    'Off: student names and profile pictures will be visible to other members of this course'
-                  )}
+        {shouldShowAnonymousOptions && (
+          <View display="block" margin="medium 0">
+            <RadioInputGroup
+              name="anonymous"
+              description={I18n.t('Anonymous Discussion')}
+              value={discussionAnonymousState}
+              onChange={(_event, value) => {
+                if (value !== 'off') {
+                  setIsGraded(false)
+                  setIsGroupDiscussion(false)
+                  setGroupCategoryId(null)
+                }
+                setDiscussionAnonymousState(value)
+              }}
+              disabled={isEditing || isGraded}
+            >
+              <RadioInput
+                key="off"
+                value="off"
+                label={I18n.t(
+                  'Off: student names and profile pictures will be visible to other members of this course'
+                )}
+              />
+              <RadioInput
+                key="partial_anonymity"
+                value="partial_anonymity"
+                label={I18n.t(
+                  'Partial: students can choose to reveal their name and profile picture'
+                )}
+              />
+              <RadioInput
+                key="full_anonymity"
+                value="full_anonymity"
+                label={I18n.t('Full: student names and profile pictures will be hidden')}
+              />
+            </RadioInputGroup>
+            {shouldShowPartialAnonymousSelector && (
+              <View display="block" margin="medium 0">
+                <AnonymousResponseSelector
+                  username={ENV.current_user.display_name}
+                  setAnonymousAuthorState={setAnonymousAuthorState}
+                  discussionAnonymousState={discussionAnonymousState}
                 />
-                <RadioInput
-                  key="partial_anonymity"
-                  value="partial_anonymity"
-                  label={I18n.t(
-                    'Partial: students can choose to reveal their name and profile picture'
-                  )}
-                />
-                <RadioInput
-                  key="full_anonymity"
-                  value="full_anonymity"
-                  label={I18n.t('Full: student names and profile pictures will be hidden')}
-                />
-              </RadioInputGroup>
-              {!isEditing && discussionAnonymousState === 'partial_anonymity' && isStudent && (
-                <View display="block" margin="medium 0">
-                  <AnonymousResponseSelector
-                    username={ENV.current_user.display_name}
-                    setAnonymousAuthorState={setAnonymousAuthorState}
-                    discussionAnonymousState={discussionAnonymousState}
-                  />
-                </View>
-              )}
-            </View>
-          )}
+              </View>
+            )}
+          </View>
+        )}
         <FormFieldGroup description="" rowSpacing="small">
-          {isAnnouncement && !isGroupContext && (
+          {shouldShowAnnouncementOnlyOptions && (
             <Checkbox
               label={I18n.t('Delay Posting')}
               value="enable-delay-posting"
@@ -781,7 +806,7 @@ export default function DiscussionTopicForm({
               }}
             />
           )}
-          {delayPosting && !isGroupContext && (
+          {delayPosting && shouldShowAnnouncementOnlyOptions && (
             <DateTimeInput
               description={I18n.t('Post At')}
               prevMonthLabel={I18n.t('previous')}
@@ -795,7 +820,7 @@ export default function DiscussionTopicForm({
               timeRenderLabel=""
             />
           )}
-          {isAnnouncement && !isGroupContext && (
+          {shouldShowAnnouncementOnlyOptions && (
             <Checkbox
               label={I18n.t('Allow Participants to Comment')}
               value="enable-participants-commenting"
@@ -836,7 +861,7 @@ export default function DiscussionTopicForm({
               />
             </View>
           )}
-          {discussionAnonymousState === 'off' && !isAnnouncement && !isGroupContext && (
+          {shouldShowGroupAndGradedDiscussionOptions && (
             <Checkbox
               data-testid="graded-checkbox"
               label={I18n.t('Graded')}
@@ -846,7 +871,7 @@ export default function DiscussionTopicForm({
               // disabled={sectionIdsToPostTo === [allSectionsOption._id]}
             />
           )}
-          {!ENV.K5_HOMEROOM_COURSE && (
+          {shouldShowLikingOption && (
             <>
               <Checkbox
                 label={I18n.t('Allow liking')}
@@ -903,7 +928,7 @@ export default function DiscussionTopicForm({
               )}
             </>
           )}
-          {discussionAnonymousState === 'off' && !isAnnouncement && !isGroupContext && (
+          {shouldShowGroupAndGradedDiscussionOptions && (
             <Checkbox
               data-testid="group-discussion-checkbox"
               label={I18n.t('This is a Group Discussion')}
@@ -915,7 +940,7 @@ export default function DiscussionTopicForm({
               }}
             />
           )}
-          {discussionAnonymousState === 'off' && isGroupDiscussion && !isGroupContext && (
+          {shouldShowGroupAndGradedDiscussionOptions && isGroupDiscussion && (
             <View display="block" padding="none none none large">
               <SimpleSelect
                 renderLabel={I18n.t('Group Set')}
@@ -974,8 +999,7 @@ export default function DiscussionTopicForm({
             </View>
           )}
         </FormFieldGroup>
-        {!isAnnouncement &&
-          !isGroupContext &&
+        {shouldShowAvailabilityOptions &&
           (isGraded ? (
             <View as="div" data-testid="assignment-settings-section">
               <GradedDiscussionDueDatesContext.Provider value={assignmentDueDateContext}>
@@ -1053,8 +1077,7 @@ export default function DiscussionTopicForm({
           >
             {I18n.t('Cancel')}
           </Button>
-          {/* discussion moderators viewing a new or still unpublished discussion */}
-          {!isAnnouncement && ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MODERATE && !published && (
+          {shouldShowSaveAndPublishButton && (
             <Button
               type="submit"
               onClick={() => submitForm(true)}
