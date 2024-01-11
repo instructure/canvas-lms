@@ -229,6 +229,7 @@ export default class CreateOrUpdateUserModal extends React.Component {
       )
       .filter(Boolean)
   }
+
   render = () => (
     <span>
       <Modal
