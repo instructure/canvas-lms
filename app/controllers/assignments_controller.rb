@@ -576,6 +576,11 @@ class AssignmentsController < ApplicationController
         return
       end
 
+      if @context.root_account.feature_enabled?(:instui_nav)
+        add_crumb(@assignment.title, polymorphic_url([@context, @assignment]))
+        add_crumb(t("Peer Reviews"))
+      end
+
       visible_students = @context.students_visible_to(@current_user).not_fake_student
       visible_students_assigned_to_assignment = visible_students.joins(:submissions).where(submissions: { assignment: @assignment }).merge(Submission.active)
 
@@ -779,9 +784,9 @@ class AssignmentsController < ApplicationController
 
       if @context.root_account.feature_enabled?(:instui_nav)
         if on_quizzes_page? && params.key?(:quiz_lti)
-          add_crumb("Edit Quiz") unless @assignment.new_record?
+          add_crumb(t("Edit Quiz")) unless @assignment.new_record?
         else
-          add_crumb("Edit Assignment") unless @assignment.new_record?
+          add_crumb(t("Edit Assignment")) unless @assignment.new_record?
         end
       else
         add_crumb(@assignment.title, polymorphic_url([@context, @assignment])) unless @assignment.new_record?
