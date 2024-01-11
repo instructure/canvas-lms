@@ -276,7 +276,7 @@ export default function EnhancedIndividualGradebook() {
           <View as="h1">{I18n.t('Gradebook: Individual View')}</View>
         )}
         {/* Was not able to manually change lineHeight in View so used div to modify lineHeight */}
-        <div style={{lineHeight: 1}}>
+        <div style={{lineHeight: 1.25}}>
           <Text size={window.ENV.FEATURES.instui_nav ? 'large' : 'medium'}>
             {I18n.t(
               'Note: Grades and notes will be saved automatically after moving out of the field.'

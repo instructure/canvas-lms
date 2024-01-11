@@ -46,14 +46,18 @@
 <% end %>
 <% js_bundle 'assignments_peer_reviews' %>
 
-<h1><%= t :title, "%{assignment} Peer Reviews", :assignment => @assignment.title %></h1>
-<div style="margin-bottom: 10px">
+<h1 class="ic-Action-header-title" style="margin-bottom: 0.75rem"><%= t :title, "%{assignment} Peer Reviews", :assignment => @assignment.title %></h1>
+<div style="margin-bottom: 2.25rem">
   <% if @assignment.active_rubric_association? %>
-    <%= t :overview_with_rubric, "Student peer reviews will be considered complete when students have commented
-      at least once on the page and filled out the rubric form for the assignment." %>
+    <div class="ic-Action-header-secondary-title">
+      <%= t :overview_with_rubric, "Student peer reviews will be considered complete when students have commented
+        at least once on the page and filled out the rubric form for the assignment." %>
+    </div>
   <% else %>
-    <%= t :overview, "Student peer reviews will be considered complete when students have commented
-      at least once on the page." %>
+    <div class="ic-Action-header-secondary-title">
+      <%= t :overview, "Student peer reviews will be considered complete when students have commented
+        at least once on the page." %>
+    </div>
   <% end %>
 </div>
 <%= form_tag(context_url(@context, :context_assignment_peer_reviews_url), method: :get) do %>
