@@ -239,10 +239,13 @@ describe('DiscussionTopicForm', () => {
 
       const {queryByText, queryByTestId, getByLabelText, queryByLabelText} = setup()
       expect(queryByLabelText('Add to student to-do')).toBeInTheDocument()
+      queryByLabelText('Add to student to-do').click()
+      expect(queryByTestId('todo-date-section')).toBeInTheDocument()
       expect(queryByText('All Sections')).toBeInTheDocument()
       expect(queryByTestId('assignment-settings-section')).not.toBeInTheDocument()
       getByLabelText('Graded').click()
       expect(queryByLabelText('Add to student to-do')).not.toBeInTheDocument()
+      expect(queryByTestId('todo-date-section')).not.toBeInTheDocument()
       expect(queryByLabelText('Post to')).not.toBeInTheDocument()
       expect(queryByTestId('assignment-settings-section')).toBeInTheDocument()
     })
