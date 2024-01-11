@@ -28,7 +28,7 @@ export const CREATE_DISCUSSION_TOPIC = gql`
     $message: String
     $published: Boolean
     $requireInitialPost: Boolean
-    $anonymousState: String
+    $anonymousState: DiscussionTopicAnonymousStateType
     $delayedPostAt: DateTime
     $lockAt: DateTime
     $isAnonymousAuthor: Boolean

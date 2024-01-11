@@ -25,12 +25,20 @@ class Types::DiscussionTopicContextType < Types::BaseEnum
   value "Group"
 end
 
+class Types::DiscussionTopicAnonymousStateType < Types::BaseEnum
+  graphql_name "DiscussionTopicAnonymousStateType"
+  description "Anonymous states for discussionTopics"
+  value "partial_anonymity"
+  value "full_anonymity"
+  value "off"
+end
+
 class Mutations::CreateDiscussionTopic < Mutations::DiscussionBase
   graphql_name "CreateDiscussionTopic"
 
   argument :is_announcement, Boolean, required: false
   argument :is_anonymous_author, Boolean, required: false
-  argument :anonymous_state, String, required: false
+  argument :anonymous_state, Types::DiscussionTopicAnonymousStateType, required: false
   argument :context_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Context")
   argument :context_type, Types::DiscussionTopicContextType, required: true
   argument :assignment, Mutations::AssignmentCreate, required: false
