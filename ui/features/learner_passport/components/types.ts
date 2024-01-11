@@ -121,6 +121,18 @@ export interface ProjectEditData {
 
 export type MilestoneId = string
 
+export type PathwayBadgeType = {
+  id: string
+  title: string
+  issuer: {
+    name: string
+    url: string
+  }
+  type: string
+  criteria: string
+  skills: string[]
+}
+
 export type RequirementType =
   | 'assessment'
   | 'assignment'
@@ -179,12 +191,12 @@ export interface PathwayDetailData extends PathwayData {
   description: string
   is_private?: boolean
   learning_outcomes: SkillData[]
-  achievements_earned: AchievementData[]
+  completion_award: PathwayBadgeType | null
   first_milestones: MilestoneId[] // ids of the milestone children of the root pathway
   milestones: MilestoneData[] // all the milestones in the pathway
 }
 
 export interface PathwayEditData {
   pathway: PathwayDetailData
-  achievements: AchievementData[]
+  badges: PathwayBadgeType[]
 }
