@@ -234,6 +234,12 @@ export default function DiscussionTopicForm({
     setUsageRightsData(data)
   }
 
+  const shouldShowTodoSettings =
+    !isGraded &&
+    !isAnnouncement &&
+    ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MANAGE_CONTENT &&
+    ENV.STUDENT_PLANNER_ENABLED
+
   useEffect(() => {
     if (delayPosting) {
       const rightNow = new Date()
@@ -865,10 +871,8 @@ export default function DiscussionTopicForm({
               )}
             </>
           )}
-          {!isGraded &&
-            !isAnnouncement &&
-            ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MANAGE_CONTENT &&
-            ENV.STUDENT_PLANNER_ENABLED && (
+          {shouldShowTodoSettings && (
+            <>
               <Checkbox
                 label={I18n.t('Add to student to-do')}
                 value="add-to-student-to-do"
@@ -878,21 +882,26 @@ export default function DiscussionTopicForm({
                   setAddToTodo(!addToTodo)
                 }}
               />
-            )}
-          {addToTodo && (
-            <View display="block" padding="none none none large" data-testid="todo-date-section">
-              <DateTimeInput
-                description=""
-                dateRenderLabel=""
-                timeRenderLabel=""
-                prevMonthLabel={I18n.t('previous')}
-                nextMonthLabel={I18n.t('next')}
-                onChange={(_event, newDate) => setTodoDate(newDate)}
-                value={todoDate}
-                invalidDateTimeMessage={I18n.t('Invalid date and time')}
-                layout="columns"
-              />
-            </View>
+              {addToTodo && (
+                <View
+                  display="block"
+                  padding="none none none large"
+                  data-testid="todo-date-section"
+                >
+                  <DateTimeInput
+                    description=""
+                    dateRenderLabel=""
+                    timeRenderLabel=""
+                    prevMonthLabel={I18n.t('previous')}
+                    nextMonthLabel={I18n.t('next')}
+                    onChange={(_event, newDate) => setTodoDate(newDate)}
+                    value={todoDate}
+                    invalidDateTimeMessage={I18n.t('Invalid date and time')}
+                    layout="columns"
+                  />
+                </View>
+              )}
+            </>
           )}
           {discussionAnonymousState === 'off' && !isAnnouncement && !isGroupContext && (
             <Checkbox
