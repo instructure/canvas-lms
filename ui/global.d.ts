@@ -98,13 +98,14 @@ declare global {
     getFormData: <T>(obj?: Record<string, unknown>) => T
     live: any
     loadDocPreview: (options: {
+      attachment_id: string
+      attachment_preview_processing: boolean
+      attachment_view_inline_ping_url: string | null
       height: string
       id: string
       mimeType: string
-      attachment_id: string
-      submission_id: any
-      attachment_view_inline_ping_url: string | undefined
-      attachment_preview_processing: boolean
+      submission_id: string
+      crocodoc_session_url?: string
     }) => void
     mediaComment: any
     mediaCommentThumbnail: (size?: 'normal' | 'small') => void
