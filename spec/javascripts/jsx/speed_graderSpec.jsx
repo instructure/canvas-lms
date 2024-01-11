@@ -1404,13 +1404,13 @@ QUnit.module('SpeedGrader', rootHooks => {
   test('returns an image tag if the attachment is of type "image"', () => {
     const attachment = {id: 1, mime_class: 'image'}
     const contents = SpeedGrader.EG.attachmentIframeContents(attachment)
-    strictEqual(/^<img/.test(contents.string), true)
+    strictEqual(/^<img/.test(contents), true)
   })
 
   test('returns an iframe tag if the attachment is not of type "image"', () => {
     const attachment = {id: 1, mime_class: 'text/plain'}
     const contents = SpeedGrader.EG.attachmentIframeContents(attachment)
-    strictEqual(/^<iframe/.test(contents.string), true)
+    strictEqual(/^<iframe/.test(contents), true)
   })
 
   QUnit.module('emptyIframeHolder', {

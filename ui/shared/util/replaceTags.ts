@@ -30,7 +30,7 @@ export default function replaceTags(
   text: string,
   mapping_or_name: Record<string, string | undefined> | string,
   maybe_value?: string
-) {
+): string {
   if (typeof mapping_or_name === 'object') {
     for (const name in mapping_or_name) {
       text = replaceOneTag(text, name, mapping_or_name[name])

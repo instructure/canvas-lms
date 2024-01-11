@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {z} from 'zod'
 import type {
   Assignment,
   AssignmentGroup,
@@ -185,15 +186,27 @@ export type CamelizedAssignment = {
   submissionTypes: string[]
 }
 
-export type SubmissionOriginalityData = {
-  error_message?: string
-  status: string
-  provider: string
-  similarity_score: number
-  state?: string
-  public_error_message?: string
-  report_url?: string
-}
+export const ZSubmissionOriginalityData = z
+  .object({
+    error_message: z.string().optional(),
+    status: z.string().optional(),
+    provider: z.string().optional(),
+    similarity_score: z.number().optional(),
+    state: z.string().optional(),
+    public_error_message: z.string().optional(),
+    report_url: z.string().optional(),
+  })
+  .extend(z.record(z.unknown()).shape) // TODO: expand
+
+export type SubmissionOriginalityData = z.infer<typeof ZSubmissionOriginalityData>
+
+export const ZVericiteOriginalityData = ZSubmissionOriginalityData.extend(
+  z.object({
+    provider: z.literal('vericite'),
+  }).shape
+)
+
+export type VericiteOriginalityData = z.infer<typeof ZVericiteOriginalityData>
 
 export type SimilarityEntry = {
   id: string
