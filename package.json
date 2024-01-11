@@ -153,7 +153,6 @@
     "immutable": "^3.8.2",
     "invariant": "^2.2.2",
     "is-valid-domain": "^0.0.11",
-    "jquery": "https://github.com/instructure/jquery.git#1.7.2-with-AMD-and-CommonJS",
     "jquery3": "npm:jquery@^3.7.1",
     "jquery-getscrollbarwidth": "^1.0.0",
     "jquery-ui-touch-punch": "^0.2.3",
@@ -441,7 +440,6 @@
     "test-storybook": "yarn jest --roots .storybook --testMatch **/storybook.test.js"
   },
   "resolutions": {
-    "jquery": "https://github.com/instructure/jquery.git#1.7.2-with-AMD-and-CommonJS",
     "graphael": "https://github.com/instructure/graphael.git",
     "@apollo/react-testing": "3.0.1",
     "@apollo/react-common": "3.0.1",
