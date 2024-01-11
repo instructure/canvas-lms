@@ -91,6 +91,18 @@ export const DiscussionThreadContainer = props => {
   const [showReportModal, setShowReportModal] = useState(false)
   const [reportModalIsLoading, setReportModalIsLoading] = useState(false)
   const [reportingError, setReportingError] = useState(false)
+  const [firstSubReply, setFirstSubReply] = useState(false)
+
+  const updateLoadedSubentry = updatedEntry => {
+    // if it's a subentry then we need to update the loadedSubentry.
+    if (props.setLoadedSubentries) {
+      props.setLoadedSubentries(loadedSubentries => {
+        return loadedSubentries.map(entry =>
+          !!updatedEntry.rootEntryId && entry.id === updatedEntry.id ? updatedEntry : entry
+        )
+      })
+    }
+  }
 
   const updateCache = (cache, result) => {
     const newDiscussionEntry = result.data.createDiscussionEntry.discussionEntry
@@ -107,6 +119,17 @@ export const DiscussionThreadContainer = props => {
     addReplyToAllRootEntries(cache, newDiscussionEntry)
     addSubentriesCountToParentEntry(cache, newDiscussionEntry)
     props.setHighlightEntryId(newDiscussionEntry._id)
+
+    // It is a known issue that the first reply of a sub reply has not initiated the sub query call,
+    // as a result we cannot add an entry to it. Before we had expand buttons for each sub-entry,
+    // now we must manually trigger the first one.
+    // See addReplyToDiscussionEntry definition for more details.
+    if (
+      result.data.createDiscussionEntry.discussionEntry.parentId === props.discussionEntry._id &&
+      !props.discussionEntry.subentriesCount
+    ) {
+      setFirstSubReply(true)
+    }
   }
 
   const onEntryCreationCompletion = data => {
@@ -119,6 +142,7 @@ export const DiscussionThreadContainer = props => {
   const [deleteDiscussionEntry] = useMutation(DELETE_DISCUSSION_ENTRY, {
     onCompleted: data => {
       if (!data.deleteDiscussionEntry.errors) {
+        updateLoadedSubentry(data.deleteDiscussionEntry.discussionEntry)
         setOnSuccess(I18n.t('The reply was successfully deleted.'))
       } else {
         setOnFailure(I18n.t('There was an unexpected error while deleting the reply.'))
@@ -132,6 +156,7 @@ export const DiscussionThreadContainer = props => {
   const [updateDiscussionEntry] = useMutation(UPDATE_DISCUSSION_ENTRY, {
     onCompleted: data => {
       if (!data.updateDiscussionEntry.errors) {
+        updateLoadedSubentry(data.updateDiscussionEntry.discussionEntry)
         setOnSuccess(I18n.t('The reply was successfully updated.'))
         setIsEditing(false)
       } else {
@@ -164,6 +189,7 @@ export const DiscussionThreadContainer = props => {
       if (!data || !data.updateDiscussionEntryParticipant) {
         return null
       }
+      updateLoadedSubentry(data.updateDiscussionEntryParticipant.discussionEntry)
       setOnSuccess(I18n.t('The reply was successfully updated.'))
     },
     onError: () => {
@@ -176,6 +202,7 @@ export const DiscussionThreadContainer = props => {
       if (!data || !data.updateDiscussionEntryParticipant) {
         return null
       }
+      updateLoadedSubentry(data.updateDiscussionEntryParticipant.discussionEntry)
       setReportModalIsLoading(false)
       setShowReportModal(false)
       setOnSuccess(I18n.t('You have reported this reply.'), false)
@@ -604,9 +631,9 @@ export const DiscussionThreadContainer = props => {
               </View>
             )}
           </div>
-          {((expandReplies && !searchTerm) || props.depth > 0) &&
+          {((expandReplies && !searchTerm) || props.depth > 0 || firstSubReply) &&
             !splitScreenOn &&
-            props.discussionEntry.subentriesCount > 0 && (
+            (props.discussionEntry.subentriesCount > 0 || firstSubReply) && (
               <DiscussionSubentries
                 discussionTopic={props.discussionTopic}
                 discussionEntryId={props.discussionEntry._id}
@@ -636,6 +663,7 @@ DiscussionThreadContainer.propTypes = {
   setHighlightEntryId: PropTypes.func,
   userSplitScreenPreference: PropTypes.bool,
   allRootEntries: PropTypes.array,
+  setLoadedSubentries: PropTypes.func,
 }
 
 DiscussionThreadContainer.defaultProps = {
@@ -665,13 +693,15 @@ const DiscussionSubentries = props => {
   useEffect(() => {
     const loadedSubentriesIds = loadedSubentries.map(entry => entry._id).join('')
 
+    // this means on all update mutations (including delete) we need to manually update loadedSubentries
     if (subentries.length > 0 && subentriesIds !== loadedSubentriesIds) {
       if (loadedSubentries.length < subentries.length) {
         setTimeout(() => {
-          const newLoadedSubentries = loadedSubentries.concat(
-            subentries.slice(loadedSubentries.length, loadedSubentries.length + 10)
+          setLoadedSubentries(previousloadedSubentries =>
+            previousloadedSubentries.concat(
+              subentries.slice(loadedSubentries.length, loadedSubentries.length + 10)
+            )
           )
-          setLoadedSubentries(newLoadedSubentries)
         }, 500)
       } else {
         // There is a mismatch of IDs, so we need to reset the loadedSubentries
@@ -700,6 +730,7 @@ const DiscussionSubentries = props => {
           highlightEntryId={props.highlightEntryId}
           setHighlightEntryId={props.setHighlightEntryId}
           allRootEntries={allRootEntries}
+          setLoadedSubentries={setLoadedSubentries}
         />
       ))}
       <LoadingReplies isLoading={isLoading} />
@@ -730,6 +761,7 @@ const DiscussionSubentriesMemo = props => {
         highlightEntryId={props.highlightEntryId}
         setHighlightEntryId={props.setHighlightEntryId}
         allRootEntries={props.allRootEntries}
+        setLoadedSubentries={props.setLoadedSubentries}
       />
     )
   }, [
@@ -741,6 +773,7 @@ const DiscussionSubentriesMemo = props => {
     props.highlightEntryId,
     props.setHighlightEntryId,
     props.allRootEntries,
+    props.setLoadedSubentries,
   ])
 }
 
