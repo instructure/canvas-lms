@@ -207,6 +207,9 @@ module.exports = {
     // whatwg-url, its dependency)
     new ProvidePlugin({
       Buffer: ['buffer', 'Buffer'],
+      $: 'jquery',
+      jQuery: 'jquery',
+      'window.jQuery': 'jquery',
     }),
   ].concat(
     process.env.JSPEC_GROUP

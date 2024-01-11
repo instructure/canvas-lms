@@ -49,6 +49,7 @@ const {
   failOnWebpackWarnings,
   getDevtool,
   minimizeCode,
+  provideJQuery,
   readOnlyCache,
   retryChunkLoading,
   setMoreEnvVars,
@@ -203,6 +204,7 @@ module.exports = {
     webpackHooks,
     controlAccessBetweenModules,
     setMoreEnvVars,
+    provideJQuery,
     process.env.NODE_ENV !== 'development' && retryChunkLoading,
 
     !shouldWriteCache && readOnlyCache,

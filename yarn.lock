@@ -17261,10 +17261,6 @@ jquery.elastic@1.0.0:
   resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.7.1.tgz#083ef98927c9a6a74d05a6af02806566d16274de"
   integrity sha512-m4avr8yL8kmFN8psrbFFFmB/If14iN5o9nw/NgnnM+kybDJpRsAynV2BsfpTYrTRysYUdADVD7CkUUizgkpLfg==
 
-jquery@>=1.2.6, jquery@>=1.5, jquery@>=1.7.1, "jquery@https://github.com/instructure/jquery.git#1.7.2-with-AMD-and-CommonJS":
-  version "1.7.2"
-  resolved "https://github.com/instructure/jquery.git#3a48a84c713291b790a2556d9ba036ec4d53c52f"
-
 js-beautify@1:
   version "1.14.0"
   resolved "https://registry.yarnpkg.com/js-beautify/-/js-beautify-1.14.0.tgz#2ce790c555d53ce1e3d7363227acf5dc69024c2d"

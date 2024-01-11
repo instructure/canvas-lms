@@ -18,7 +18,7 @@
 
 /* eslint-disable import/no-extraneous-dependencies */
 
-const {EnvironmentPlugin, DefinePlugin, IgnorePlugin} = require('webpack')
+const {EnvironmentPlugin, DefinePlugin, IgnorePlugin, ProvidePlugin} = require('webpack')
 const {sync} = require('glob')
 const {join, resolve} = require('path')
 const MomentTimezoneDataPlugin = require('moment-timezone-data-webpack-plugin')
@@ -37,6 +37,12 @@ const WebpackHooks = require('./webpackHooks')
 const webpackPublicPath = require('./webpackPublicPath')
 
 const {canvasDir} = require('../params')
+
+exports.provideJQuery = new ProvidePlugin({
+  $: 'jquery',
+  jQuery: 'jquery',
+  'window.jQuery': 'jquery',
+})
 
 // sets these environment variables in compiled code.
 // process.env.NODE_ENV will make it so react and others are much smaller and don't run their
