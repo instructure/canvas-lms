@@ -27,9 +27,8 @@ import {Pill} from '@instructure/ui-pill'
 import {Text} from '@instructure/ui-text'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {View} from '@instructure/ui-view'
-import type {MilestoneId, MilestoneData, PathwayDetailData} from '../../types'
+import type {MilestoneData, PathwayDetailData} from '../../types'
 import {showUnimplemented} from '../../shared/utils'
-import {has} from 'lodash'
 
 const BOX_WIDTH = 322
 
@@ -39,7 +38,7 @@ type NodeType = 'pathway' | 'milestone'
 
 type PathwayTreeViewProps = {
   pathway: PathwayDetailData
-  selectedStep: MilestoneId | null
+  selectedStep: string | null
   onSelected?: (selectedStep: MilestoneData | null) => void
   layout?: 'TB' | 'BT' | 'LR' | 'RL'
   zoomLevel?: number
@@ -230,7 +229,7 @@ const PathwayTreeView = ({
       width: 320,
       height: graphBoxHeights.height,
     })
-    pathway.first_milestones.forEach((m: MilestoneId) => {
+    pathway.first_milestones.forEach((m: string) => {
       g.setEdge('0', m)
     })
     pathway.milestones.forEach((m: MilestoneData) => {
@@ -243,7 +242,7 @@ const PathwayTreeView = ({
         width: 320,
         height: ht || 132,
       })
-      m.next_milestones.forEach((n: MilestoneId) => {
+      m.next_milestones.forEach((n: string) => {
         g.setEdge(m.id, n)
       })
     })

@@ -939,6 +939,7 @@ CanvasRails::Application.routes.draw do
 
     get "passport/data/pathways" => "learner_passport#pathways_index"
     get "passport/data/pathways/badges" => "learner_passport#pathway_badges_index"
+    get "passport/data/pathways/learner_groups" => "learner_passport#pathway_learner_groups_index"
     put "passport/data/pathways/create" => "learner_passport#pathway_create"
     post "passport/data/pathways/:pathway_id" => "learner_passport#pathway_update"
     get "passport/data/pathways/show/:pathway_id" => "learner_passport#pathway_show"

@@ -119,8 +119,6 @@ export interface ProjectEditData {
 
 // ---------- pathways ----------
 
-export type MilestoneId = string
-
 export type PathwayBadgeType = {
   id: string
   title: string
@@ -131,6 +129,12 @@ export type PathwayBadgeType = {
   type: string
   criteria: string
   skills: string[]
+}
+
+export type LearnerGroupType = {
+  id: string
+  name: string
+  memberCount: number
 }
 
 export type RequirementType =
@@ -166,13 +170,13 @@ export interface RequirementData {
 
 // this is a node in the pathway tree
 export interface MilestoneData {
-  id: MilestoneId
+  id: string
   title: string
   description: string
   required?: boolean
   requirements: RequirementData[]
   achievements: AchievementData[]
-  next_milestones: MilestoneId[] // ids of this milestone's children
+  next_milestones: string[] // ids of this milestone's children
 }
 
 // this is the root of the pathway tree
@@ -192,11 +196,13 @@ export interface PathwayDetailData extends PathwayData {
   is_private?: boolean
   learning_outcomes: SkillData[]
   completion_award: PathwayBadgeType | null
-  first_milestones: MilestoneId[] // ids of the milestone children of the root pathway
+  learner_groups: string[] // learner group ids
+  first_milestones: string[] // ids of the milestone children of the root pathway
   milestones: MilestoneData[] // all the milestones in the pathway
 }
 
 export interface PathwayEditData {
   pathway: PathwayDetailData
   badges: PathwayBadgeType[]
+  learner_groups: LearnerGroupType[]
 }
