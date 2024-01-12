@@ -16,23 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import RoleMismatchToolTip from './RoleMismatchToolTip'
+import React, {type ReactNode} from 'react'
 import {View} from '@instructure/ui-view'
-import {ENROLLMENT_TREE_ICON_OFFSET} from './types'
 
 interface Props {
   width?: string
   positionTop?: string
   positionLeft?: string
+  children: ReactNode
 }
 
 const ICON_BUTTON_WIDTH_SMALL: string = '1.75rem'
 
-const RoleMismatchToolTipWrapper = ({
+const ToolTipWrapper = ({
   width = ICON_BUTTON_WIDTH_SMALL,
-  positionTop = ENROLLMENT_TREE_ICON_OFFSET,
+  positionTop = '0',
   positionLeft = '0',
+  children,
 }: Props): JSX.Element => {
   return (
     <View as="div" position="relative" width={width}>
@@ -42,10 +42,10 @@ const RoleMismatchToolTipWrapper = ({
         insetInlineStart={positionLeft}
         width={width}
       >
-        <RoleMismatchToolTip />
+        {children}
       </View>
     </View>
   )
 }
 
-export default RoleMismatchToolTipWrapper
+export default ToolTipWrapper

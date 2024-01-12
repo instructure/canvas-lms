@@ -38,7 +38,7 @@ import {
   type Role,
   type User,
 } from '../types'
-import {deleteEnrollment} from '../api/enrollment'
+import {deleteEnrollment, getTemporaryEnrollmentPairing} from '../api/enrollment'
 import * as localStorageUtils from '../util/helpers'
 import {getDayBoundaries} from '../util/helpers'
 import MockDate from 'mockdate'
@@ -47,6 +47,7 @@ const backCall = jest.fn()
 
 jest.mock('../api/enrollment', () => ({
   deleteEnrollment: jest.fn(),
+  getTemporaryEnrollmentPairing: jest.fn(),
 }))
 
 const falsePermissions = {
@@ -219,7 +220,7 @@ describe('TempEnrollAssign', () => {
       fireEvent.blur(endDate)
 
       expect((await findByTestId('temp-enroll-summary')).textContent).toBe(
-        'Canvas will enroll Melvin as a Teacher in the selected courses of John Smith from Sun, Apr 10, 2022, 12:01 AM - Tue, Apr 12, 2022, 11:59 PM'
+        'Canvas will enroll Melvin as a Teacher in the selected courses of John Smith from Sun, Apr 10, 2022, 12:01 AM - Tue, Apr 12, 2022, 11:59 PM with an ending enrollment state of Deleted'
       )
     })
 
@@ -270,6 +271,17 @@ describe('TempEnrollAssign', () => {
         const storedData = localStorage.getItem(tempEnrollAssignData) as string
         const parsedData = JSON.parse(storedData)
         expect(parsedData).toEqual({roleChoice: {id: '92', name: 'Teacher'}})
+      })
+
+      it('saves to localStorage on state select', async () => {
+        const screen = render(<TempEnrollAssign {...props} />)
+        const stateSelect = await screen.findByPlaceholderText('Begin typing to search')
+        fireEvent.click(stateSelect)
+        const options = await screen.findAllByRole('option')
+        fireEvent.click(options[0]) // select the “Deleted” option
+        const storedData = localStorage.getItem(tempEnrollAssignData) as string
+        const parsedData = JSON.parse(storedData)
+        expect(parsedData).toEqual({stateChoice: 'deleted'})
       })
 
       it('saves to localStorage on START date change', async () => {
@@ -407,6 +419,7 @@ describe('TempEnrollAssign', () => {
         role_id: '92',
         start_at: startAt,
         end_at: endAt,
+        temporary_enrollment_pairing_id: 143,
       },
     ] as Enrollment[]
 
@@ -416,12 +429,35 @@ describe('TempEnrollAssign', () => {
         ...props,
         tempEnrollmentsPairing: tempEnrollmentsPairingMock,
       }
+      ;(getTemporaryEnrollmentPairing as jest.Mock).mockResolvedValue({
+        response: {status: 204, ok: true},
+        json: {
+          temporary_enrollment_pairing: {
+            id: '143',
+            root_account_id: '2',
+            workflow_state: 'active',
+            created_at: '2024-01-12T20:02:47Z',
+            updated_at: '2024-01-12T20:02:47Z',
+            created_by_id: '1',
+            deleted_by_id: null,
+            ending_enrollment_state: null,
+          },
+        },
+      })
     })
 
     it('should set the role correctly when a matching role is found', async () => {
       const {findByPlaceholderText} = render(<TempEnrollAssign {...tempProps} />)
       const roleSelect = (await findByPlaceholderText('Select a Role')) as HTMLInputElement
       expect(roleSelect.value).toBe('Teacher')
+    })
+
+    it('should set the state correctly when a matching state is found', async () => {
+      const {findByPlaceholderText} = render(<TempEnrollAssign {...tempProps} />)
+      const stateSelect = (await findByPlaceholderText(
+        'Begin typing to search'
+      )) as HTMLInputElement
+      expect(stateSelect.value).toBe('Deleted')
     })
 
     it('should choose the default if no role is found', async () => {

@@ -72,16 +72,21 @@ export async function fetchTemporaryEnrollments(
 /**
  * Creates a temporary enrollment pairing object
  *
- * @param {string} accountId Account ID
+ * @param {string} accountId ID of the account
+ * @param {string} endingEnrollmentState Ending enrollment state (e.g., “deleted”, “completed”, “inactive”)
  * @returns {Promise<TemporaryEnrollmentPairing>} Resolves to a temporary enrollment pairing object
  */
 export async function createTemporaryEnrollmentPairing(
-  accountId: string
+  accountId: string,
+  endingEnrollmentState: string
 ): Promise<TemporaryEnrollmentPairing> {
   try {
     const response = await doFetchApi({
       path: `/api/v1/accounts/${accountId}/temporary_enrollment_pairings`,
       method: 'POST',
+      params: {
+        ending_enrollment_state: endingEnrollmentState,
+      },
     })
     return response.json.temporary_enrollment_pairing
   } catch (error) {
@@ -90,6 +95,35 @@ export async function createTemporaryEnrollmentPairing(
     } else {
       throw new Error(
         I18n.t('Failed to create temporary enrollment pairing due to an unknown error')
+      )
+    }
+  }
+}
+
+/**
+ * Retrieves a single temporary enrollment pairing object, by its ID
+ *
+ * @param {string} accountId ID of the account
+ * @param {number} pairingId ID of the temporary enrollment pairing to retrieve
+ * @returns {Promise<TemporaryEnrollmentPairing>} Resolves to the temporary enrollment pairing object
+ */
+export async function getTemporaryEnrollmentPairing(
+  accountId: string,
+  pairingId: number
+): Promise<TemporaryEnrollmentPairing> {
+  try {
+    const response = await doFetchApi({
+      path: `/api/v1/accounts/${accountId}/temporary_enrollment_pairings/${pairingId}`,
+      method: 'GET',
+    })
+
+    return response.json.temporary_enrollment_pairing
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(I18n.t('Failed to retrieve temporary enrollment pairing'))
+    } else {
+      throw new Error(
+        I18n.t('Failed to retrieve temporary enrollment pairing due to an unknown error')
       )
     }
   }

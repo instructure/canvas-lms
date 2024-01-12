@@ -18,9 +18,10 @@
 
 import {
   createEnrollment,
-  deleteEnrollment,
   createTemporaryEnrollmentPairing,
+  deleteEnrollment,
   fetchTemporaryEnrollments,
+  getTemporaryEnrollmentPairing,
 } from '../../api/enrollment'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {type Enrollment, ITEMS_PER_PAGE, type User} from '../../types'
@@ -238,17 +239,20 @@ describe('enrollment api', () => {
         const mockResponse = {
           json: {
             temporary_enrollment_pairing: {
-              id: 10,
-              root_account_id: 2,
+              id: '143',
+              root_account_id: '2',
               workflow_state: 'active',
-              created_at: '2023-11-14T03:56:42Z',
-              updated_at: '2023-11-14T03:56:42Z',
+              created_at: '2024-01-12T20:02:47Z',
+              updated_at: '2024-01-12T20:02:47Z',
+              created_by_id: '1',
+              deleted_by_id: null,
+              ending_enrollment_state: 'completed',
             },
           },
         }
         ;(doFetchApi as jest.Mock).mockResolvedValue(mockResponse)
         const rootAccountId = '2'
-        const result = await createTemporaryEnrollmentPairing(rootAccountId)
+        const result = await createTemporaryEnrollmentPairing(rootAccountId, 'completed')
         expect(result).toEqual(mockResponse.json.temporary_enrollment_pairing)
       })
 
@@ -257,13 +261,67 @@ describe('enrollment api', () => {
         ;(doFetchApi as jest.Mock).mockRejectedValue(mockError)
         const rootAccountId = '2'
         try {
-          await createTemporaryEnrollmentPairing(rootAccountId)
+          await createTemporaryEnrollmentPairing(rootAccountId, 'completed')
         } catch (error) {
           if (error instanceof Error) {
             expect(error.message).toBe(`Failed to create temporary enrollment pairing`)
           } else {
             expect(error).toBeInstanceOf(Error)
           }
+        }
+      })
+    })
+
+    describe('getTemporaryEnrollmentPairing', () => {
+      it('retrieves temporary enrollment pairing successfully', async () => {
+        const accountId = '2'
+        const pairingId = 143
+        const mockResponse = {
+          json: {
+            temporary_enrollment_pairing: {
+              id: '143',
+              root_account_id: '2',
+              workflow_state: 'active',
+              created_at: '2024-01-12T20:02:47Z',
+              updated_at: '2024-01-12T20:02:47Z',
+              created_by_id: '1',
+              deleted_by_id: null,
+              ending_enrollment_state: 'completed',
+            },
+          },
+        }
+        ;(doFetchApi as jest.Mock).mockResolvedValue(mockResponse)
+        const result = await getTemporaryEnrollmentPairing(accountId, pairingId)
+        expect(result).toEqual(mockResponse.json.temporary_enrollment_pairing)
+      })
+
+      it('throws a specific error message on failure', async () => {
+        const accountId = '2'
+        const pairingId = 143
+        const mockError: Error = new Error('Network error occurred')
+        ;(doFetchApi as jest.Mock).mockRejectedValue(mockError)
+        try {
+          await getTemporaryEnrollmentPairing(accountId, pairingId)
+        } catch (error) {
+          if (error instanceof Error) {
+            expect(error.message).toBe('Failed to retrieve temporary enrollment pairing')
+          } else {
+            expect(error).toBeInstanceOf(Error)
+          }
+        }
+      })
+
+      it('throws an unknown error message when the error is not an instance of Error', async () => {
+        const accountId = '2'
+        const pairingId = 143
+        const mockError = 'Some non-Error value'
+        ;(doFetchApi as jest.Mock).mockRejectedValue(mockError)
+        try {
+          await getTemporaryEnrollmentPairing(accountId, pairingId)
+        } catch (error: any) {
+          expect(error.message).toBe(
+            'Failed to retrieve temporary enrollment pairing due to an unknown error'
+          )
         }
       })
     })
