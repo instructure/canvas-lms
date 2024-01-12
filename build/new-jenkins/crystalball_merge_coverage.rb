@@ -43,7 +43,7 @@ Dir.glob("#{path}/**/*_map.yml") do |filename|
     # JS files will be added to the map based on the parent directory of the file only
     # TODO: we should have a flag to filter JS at this level
     changed_files.map! do |file|
-      if /(\.js|\.ts|\.tsx)/.match?(file)
+      if /(\.js|\.jsx|\.ts|\.tsx)/.match?(file)
         # Wrap in File.dirname if we want to filter by directories
         file.gsub(%r{("|/usr/src/app/)}, "")
       else

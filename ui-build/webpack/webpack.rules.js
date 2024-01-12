@@ -158,7 +158,7 @@ exports.emberHandlebars = {
 // only use it when generating crystalball map
 // i.e. process.env.CRYSTALBALL_MAP === '1'
 exports.istanbul = {
-  test: /\.(js|ts|tsx)$/,
+  test: /\.(js|jsx|ts|tsx)$/,
   include: [
     resolve(canvasDir, 'ui'),
     resolve(canvasDir, 'spec/javascripts/jsx'),
