@@ -20,15 +20,14 @@ import React, {useCallback, useEffect, useLayoutEffect, useMemo, useRef, useStat
 import dagre from 'dagre'
 import type {Node} from 'dagre'
 import bspline from 'b-spline'
-import {CondensedButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
-import {IconBulletListLine} from '@instructure/ui-icons'
+import {IconBulletListLine, IconGroupLine} from '@instructure/ui-icons'
 import {Pill} from '@instructure/ui-pill'
 import {Text} from '@instructure/ui-text'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {View} from '@instructure/ui-view'
 import type {MilestoneData, PathwayDetailData} from '../../types'
-import {showUnimplemented} from '../../shared/utils'
+import {pluralize, showUnimplemented} from '../../shared/utils'
 
 const BOX_WIDTH = 322
 
@@ -142,6 +141,7 @@ const PathwayTreeView = ({
 
   const renderPathwayBoxContent = useCallback(
     (node: GraphNode, type: NodeType, selected: boolean, width: number, height?: number) => {
+      const req_count: number = 'requirement_count' in node ? (node.requirement_count as number) : 0
       return (
         <View
           as="div"
@@ -174,19 +174,28 @@ const PathwayTreeView = ({
                 </div>
               )}
             </Flex.Item>
-            <Flex margin="medium 0 0 0" alignItems="center" justifyItems="space-between">
+
+            {type === 'pathway' ? (
               <Flex.Item>
-                <IconBulletListLine size="small" />
-                <View margin="0 0 0 x-small">
-                  <Text>2 requirements</Text>
+                <IconGroupLine size="x-small" />
+                <View display="inline-block" margin="0 0 0 x-small">
+                  <Text>
+                    {pluralize(
+                      (node as PathwayDetailData).learner_groups.length,
+                      '1 learner group',
+                      `${(node as PathwayDetailData).learner_groups.length} learner groups`
+                    )}
+                  </Text>
                 </View>
               </Flex.Item>
+            ) : (
               <Flex.Item>
-                <CondensedButton onClick={showUnimplemented}>
-                  <Text color={type === 'pathway' ? 'primary-inverse' : 'brand'}>Show</Text>
-                </CondensedButton>
+                <IconBulletListLine size="x-small" />
+                <View display="inline-block" margin="0 0 0 x-small">
+                  <Text>{pluralize(req_count, '1 requirement', `${req_count} requirements`)}</Text>
+                </View>
               </Flex.Item>
-            </Flex>
+            )}
           </Flex>
         </View>
       )
@@ -228,6 +237,7 @@ const PathwayTreeView = ({
       description: pathway.description,
       width: 320,
       height: graphBoxHeights.height,
+      learner_groups: pathway.learner_groups,
     })
     pathway.first_milestones.forEach((m: string) => {
       g.setEdge('0', m)
@@ -239,6 +249,7 @@ const PathwayTreeView = ({
         title: m.title,
         description: m.description,
         required: m.required,
+        requirement_count: m.requirements.length,
         width: 320,
         height: ht || 132,
       })
@@ -306,6 +317,7 @@ const PathwayTreeView = ({
     layout,
     pathway.description,
     pathway.first_milestones,
+    pathway.learner_groups,
     pathway.milestones,
     pathway.title,
     renderPathwayBoxContent,

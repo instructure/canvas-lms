@@ -146,7 +146,7 @@ export type RequirementType =
   | 'experience'
   | 'project'
 
-export type RequirementTypesType = {
+type RequirementTypesType = {
   [Key in RequirementType]: string
 }
 
@@ -160,12 +160,32 @@ export const RequirementTypes: RequirementTypesType = {
   project: 'Project',
 }
 
+export type CanvasRequirementType = 'assignment' | 'course' | 'module'
+type CanvasRequirementTypesType = {
+  [Key in CanvasRequirementType]: string
+}
+
+export const CanvasRequirementTypes: CanvasRequirementTypesType = {
+  assignment: 'assignments',
+  course: 'courses',
+  module: 'modules',
+}
+
+export type CanvasRequirementSearchResultType = {
+  id: string
+  name: string
+  url: string
+  learning_outcome_count: number
+}
+
 export interface RequirementData {
   id: string
   name: string
   description: string
+  learning_outcome_count?: number
   required?: boolean
   type: RequirementType
+  canvas_content?: CanvasRequirementSearchResultType
 }
 
 // this is a node in the pathway tree

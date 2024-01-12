@@ -27,8 +27,15 @@ import {TextInput} from '@instructure/ui-text-input'
 import {Tray} from '@instructure/ui-tray'
 import {View} from '@instructure/ui-view'
 import {uid} from '@instructure/uid'
-import type {RequirementData, RequirementType} from '../../../types'
-import {RequirementTypes} from '../../../types'
+import type {
+  CanvasRequirementSearchResultType,
+  CanvasRequirementType,
+  RequirementData,
+  RequirementType,
+} from '../../../types'
+import {RequirementTypes, CanvasRequirementTypes} from '../../../types'
+import CanvasRequirement from './requirements/CanvasRequirement'
+import NotImplementedRequirements from './requirements/NotImplementedRequirements'
 
 type RequirementTrayProps = {
   requirement?: RequirementData
@@ -44,6 +51,9 @@ const RequirementTray = ({requirement, open, variant, onClose, onSave}: Requirem
   const [description, setDescription] = useState(requirement?.description || '')
   const [required, setRequired] = useState<boolean>(requirement?.required || true)
   const [type, setType] = useState<RequirementType | null>(requirement?.type || null)
+  const [canvasContent, setCanvasContent] = useState<CanvasRequirementSearchResultType | undefined>(
+    requirement?.canvas_content
+  )
 
   const handleSave = useCallback(() => {
     if (!(name && type)) return
@@ -54,9 +64,10 @@ const RequirementTray = ({requirement, open, variant, onClose, onSave}: Requirem
       description,
       required,
       type,
+      canvas_content: canvasContent,
     }
     onSave(newRequirement)
-  }, [description, name, onSave, required, requirementId, type])
+  }, [canvasContent, description, name, onSave, required, requirementId, type])
 
   const handleNameChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>, newName: string) => {
@@ -77,6 +88,26 @@ const RequirementTray = ({requirement, open, variant, onClose, onSave}: Requirem
   const handleTypeChange = useCallback((event: React.SyntheticEvent<Element, Event>, {value}) => {
     setType(value as RequirementType)
   }, [])
+
+  const handleCanvasRequirementChange = useCallback(
+    (canvasRequirement: CanvasRequirementSearchResultType | undefined) => {
+      setCanvasContent(canvasRequirement)
+    },
+    []
+  )
+
+  const renderRequirementPicker = useCallback(() => {
+    if (!type) return
+    if (Object.keys(CanvasRequirementTypes).includes(type)) {
+      return (
+        <CanvasRequirement
+          type={type as CanvasRequirementType}
+          onChange={handleCanvasRequirementChange}
+        />
+      )
+    }
+    return <NotImplementedRequirements />
+  }, [handleCanvasRequirementChange, type])
 
   return (
     <View as="div">
@@ -131,26 +162,28 @@ const RequirementTray = ({requirement, open, variant, onClose, onSave}: Requirem
                     onChange={handleOptionalCheck}
                   />
                 </View>
+
+                <View as="div" padding="large 0 small 0">
+                  <SimpleSelect
+                    isRequired={true}
+                    placeholder="Select a type"
+                    renderLabel="Requirement type"
+                    defaultValue=""
+                    value={type || undefined}
+                    onChange={handleTypeChange}
+                  >
+                    {Object.keys(RequirementTypes).map(key => {
+                      const reqtype = key as RequirementType
+                      return (
+                        <SimpleSelect.Option key={reqtype} id={reqtype} value={reqtype}>
+                          {RequirementTypes[reqtype]}
+                        </SimpleSelect.Option>
+                      )
+                    })}
+                  </SimpleSelect>
+                </View>
               </View>
-              <View as="div" padding="large 0 small 0">
-                <SimpleSelect
-                  isRequired={true}
-                  placeholder="Select a type"
-                  renderLabel="Requirement type"
-                  defaultValue=""
-                  value={type || undefined}
-                  onChange={handleTypeChange}
-                >
-                  {Object.keys(RequirementTypes).map(key => {
-                    const reqtype = key as RequirementType
-                    return (
-                      <SimpleSelect.Option key={reqtype} id={reqtype} value={reqtype}>
-                        {RequirementTypes[reqtype]}
-                      </SimpleSelect.Option>
-                    )
-                  })}
-                </SimpleSelect>
-              </View>
+              {renderRequirementPicker()}
             </View>
           </Flex.Item>
           <Flex.Item align="end" width="100%">

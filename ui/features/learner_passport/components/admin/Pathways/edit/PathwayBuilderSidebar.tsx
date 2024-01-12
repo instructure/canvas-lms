@@ -101,7 +101,7 @@ const PathwayBuilderSidebar = ({
         <PathwayCard step={currentStep || pathway} variant="sidebar" />
         <Connector />
         {childMilestones.map((step: MilestoneData) => (
-          <div style={{marginBottom: '30px'}}>
+          <div key={step.id} style={{marginBottom: '30px'}}>
             <PathwayCard step={step} variant="sidebar" />
           </div>
         ))}

@@ -32,6 +32,7 @@ import {View} from '@instructure/ui-view'
 import {uid} from '@instructure/uid'
 import type {MilestoneData} from '../../../types'
 import AddRequirementTray from './AddRequirementTray'
+import MilestoneRequirementCard from './requirements/MilestoneRequirementCard'
 
 type MilestoneTrayProps = {
   milestone?: MilestoneData
@@ -166,8 +167,12 @@ const MilestoneTray = ({milestone, open, variant, onClose, onSave}: MilestoneTra
                           background="secondary"
                           borderWidth="small"
                           borderRadius="medium"
+                          margin="0 0 small 0"
                         >
-                          <pre key={requirement.id}>{JSON.stringify(requirement, null, 2)}</pre>
+                          <MilestoneRequirementCard
+                            key={requirement.id}
+                            requirement={requirement}
+                          />
                         </View>
                       ))}
                     </View>
