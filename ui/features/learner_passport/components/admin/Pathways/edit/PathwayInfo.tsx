@@ -24,19 +24,23 @@ import {Text} from '@instructure/ui-text'
 import {TextArea} from '@instructure/ui-text-area'
 import {TextInput} from '@instructure/ui-text-input'
 import {View} from '@instructure/ui-view'
-import type {PathwayDetailData, PathwayBadgeType} from '../../../types'
+import type {PathwayDetailData, PathwayBadgeType, LearnerGroupType} from '../../../types'
 import AddBadgeModal from './AddBadgeModal'
 import PathwayBadgeCard from './PathwayBadgeCard'
+import LearnerGroupCard from './LearnerGroupCard'
+import AddLearnerGroupModal from './AddLearnerGroupModal'
 import {showUnimplemented} from '../../../shared/utils'
 
 type PathwayInfoProps = {
   pathway: PathwayDetailData
   allBadges: PathwayBadgeType[]
+  allLearnerGroups: LearnerGroupType[]
   onChange: (newValues: Partial<PathwayDetailData>) => void
 }
 
-const PathwayInfo = ({pathway, allBadges, onChange}: PathwayInfoProps) => {
+const PathwayInfo = ({pathway, allBadges, allLearnerGroups, onChange}: PathwayInfoProps) => {
   const [achievementModalIsOpen, setAchievementModalIsOpen] = useState(false)
+  const [learnerGroupModalIsOpen, setLearnerGroupModalIsOpen] = useState(false)
 
   const handleTitleChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>, newTitle: string) => {
@@ -76,6 +80,30 @@ const PathwayInfo = ({pathway, allBadges, onChange}: PathwayInfoProps) => {
   const handleRemoveAchievement = useCallback(() => {
     onChange({completion_award: null})
   }, [onChange])
+
+  const handleOpenLearnerGroupModal = useCallback(() => {
+    setLearnerGroupModalIsOpen(true)
+  }, [])
+
+  const handleCloseLearnerGroupModal = useCallback(() => {
+    setLearnerGroupModalIsOpen(false)
+  }, [])
+
+  const handleSaveLearnerGroups = useCallback(
+    (newLearnerGroupIds: string[]) => {
+      setLearnerGroupModalIsOpen(false)
+      onChange({learner_groups: newLearnerGroupIds})
+    },
+    [onChange]
+  )
+
+  const handleRemoveLearnerGroup = useCallback(
+    (groupId: string) => {
+      const newLearnerGroups = pathway.learner_groups.filter(id => id !== groupId)
+      onChange({learner_groups: newLearnerGroups})
+    },
+    [onChange, pathway.learner_groups]
+  )
 
   return (
     <View as="div" maxWidth="1100px" margin="large auto large auto">
@@ -130,13 +158,33 @@ const PathwayInfo = ({pathway, allBadges, onChange}: PathwayInfoProps) => {
               Add learners who will be participating in the pathway. You can also add groups later.
             </Text>
             <View as="div" margin="small 0 0 0">
-              <Button renderIcon={IconAddLine} onClick={showUnimplemented}>
+              {pathway.learner_groups.map(groupId => {
+                const group = allLearnerGroups.find(g => g.id === groupId)
+                if (!group) {
+                  return null
+                }
+                return (
+                  <LearnerGroupCard
+                    key={groupId}
+                    group={group}
+                    onRemove={handleRemoveLearnerGroup}
+                  />
+                )
+              })}
+              <Button renderIcon={IconAddLine} onClick={handleOpenLearnerGroupModal}>
                 Add Learner Group
               </Button>
               <Button renderIcon={IconAddLine} margin="0 0 0 small" onClick={showUnimplemented}>
                 Create Learner Group
               </Button>
             </View>
+            <AddLearnerGroupModal
+              open={learnerGroupModalIsOpen}
+              allLearnerGroups={allLearnerGroups}
+              selectedGroupIds={pathway.learner_groups}
+              onClose={handleCloseLearnerGroupModal}
+              onSave={handleSaveLearnerGroups}
+            />
           </FormField>
         </View>
       </View>

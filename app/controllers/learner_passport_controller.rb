@@ -293,6 +293,31 @@ class LearnerPassportController < ApplicationController
 
   # ------------- pathways -------------
 
+  def learner_passport_learner_groups
+    [
+      {
+        id: "1",
+        name: "2022-23 Business Foundations",
+        memberCount: 63,
+      },
+      {
+        id: "2",
+        name: "2022-23 Business Foundations Cohort 1",
+        memberCount: 27,
+      },
+      {
+        id: "3",
+        name: "2022-23 Business Foundations Cohort 2",
+        memberCount: 36,
+      },
+      {
+        id: "4",
+        name: "Marketing Test Group",
+        memberCount: 12,
+      }
+    ]
+  end
+
   def learner_passport_pathway_achievements
     [
       {
@@ -365,6 +390,7 @@ class LearnerPassportController < ApplicationController
       first_milestones: [],
       milestones: [],
       completion_award: nil,
+      learner_groups: [],
     }
   end
 
@@ -423,6 +449,7 @@ class LearnerPassportController < ApplicationController
       ],
       learning_outcomes: [],
       achievements_earned: [],
+      learner_groups: ["2", "3"],
     }
   end
 
@@ -655,6 +682,10 @@ class LearnerPassportController < ApplicationController
   end
 
   ###### Pathways ######
+
+  def pathway_learner_groups_index
+    render json: learner_passport_learner_groups
+  end
 
   def pathway_badges_index
     render json: learner_passport_pathway_achievements

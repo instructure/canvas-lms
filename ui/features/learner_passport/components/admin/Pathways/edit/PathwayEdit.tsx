@@ -37,6 +37,7 @@ const PathwayEdit = () => {
   const pathway_data = create_pathway || edit_pathway
   const pathway = pathway_data.pathway
   const allBadges = pathway_data.badges
+  const allLearnerGroups = pathway_data.learner_groups
   const [draftPathway, setDraftPathway] = useState(pathway)
   const [currStep, setCurrStep] = useState<PathwayEditSteps>(() => {
     switch (window.location.hash) {
@@ -114,13 +115,20 @@ const PathwayEdit = () => {
   const renderStep = useCallback(() => {
     switch (currStep) {
       case 'create':
-        return <PathwayInfo pathway={draftPathway} allBadges={allBadges} onChange={handleChange} />
+        return (
+          <PathwayInfo
+            pathway={draftPathway}
+            allBadges={allBadges}
+            allLearnerGroups={allLearnerGroups}
+            onChange={handleChange}
+          />
+        )
       case 'add_milestones':
         return <PathwayBuilder pathway={draftPathway} onChange={handlePathwayChange} />
       default:
         return null
     }
-  }, [currStep, draftPathway, allBadges, handleChange, handlePathwayChange])
+  }, [currStep, draftPathway, allBadges, allLearnerGroups, handleChange, handlePathwayChange])
 
   const renderBreadcrumbsForStep = useCallback(() => {
     switch (currStep) {

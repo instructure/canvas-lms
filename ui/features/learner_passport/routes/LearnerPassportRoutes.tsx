@@ -329,10 +329,13 @@ export const LearnerPassportRoutes = (
                 res.json()
               )
               const p2 = fetch(
+                `/users/${params.userId}/passport/data/pathways/learner_groups`
+              ).then(res => res.json())
+              const p3 = fetch(
                 `/users/${params.userId}/passport/data/pathways/show/${params.pathwayId}`
               ).then(res => res.json())
-              const [badges, pathway] = await Promise.all([p1, p2])
-              return {badges, pathway}
+              const [badges, learner_groups, pathway] = await Promise.all([p1, p2, p3])
+              return {badges, learner_groups, pathway}
             }}
             action={async ({request, params}) => {
               const formData = await request.formData()

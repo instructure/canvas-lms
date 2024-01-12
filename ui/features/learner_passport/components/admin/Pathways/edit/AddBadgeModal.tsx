@@ -99,7 +99,7 @@ const AddBadgeModal = ({allBadges, open, selectedBadgeId, onClose, onSave}: AddB
         onClick={handleBadgeClick}
         onKeyDown={handleBadgeKey}
       >
-        <div style={{background: 'grey', width: '62px', height: '62px'}} />
+        <div style={{background: 'grey', width: '62px', height: '62px', margin: '0 auto'}} />
         <View as="div" margin="medium 0 0 0">
           <Text as="div" size="medium" weight="bold">
             {badge.title}
@@ -132,12 +132,10 @@ const AddBadgeModal = ({allBadges, open, selectedBadgeId, onClose, onSave}: AddB
         </Flex>
       </Modal.Body>
       <Modal.Footer>
-        <Modal.Footer>
-          <Button onClick={onClose}>Cancel</Button>
-          <Button onClick={handleSave} color="primary">
-            Save
-          </Button>
-        </Modal.Footer>
+        <Button onClick={onClose}>Cancel</Button>
+        <Button onClick={handleSave} color="primary" margin="0 0 0 x-small">
+          Save
+        </Button>
       </Modal.Footer>
     </Modal>
   )
