@@ -88,6 +88,7 @@ exports.swc = [
     use: {
       loader: 'swc-loader',
       options: {
+        parseMap: true,
         sourceMaps: true,
         jsc: {
           externalHelpers: true,
@@ -113,6 +114,7 @@ exports.swc = [
     use: {
       loader: 'swc-loader',
       options: {
+        parseMap: true,
         sourceMaps: true,
         jsc: {
           externalHelpers: true,
