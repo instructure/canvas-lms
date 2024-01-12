@@ -480,7 +480,7 @@ export default class TokenSelector {
     clearTimeout(this.timeout)
     this.select(null)
     return (this.timeout = setTimeout(() => {
-      if (this.lastFetch && !this.lastFetch.isResolved()) {
+      if (this.lastFetch && !this.lastFetch.state() === 'resolved') {
         this.nextRequest = true
         return
       }
