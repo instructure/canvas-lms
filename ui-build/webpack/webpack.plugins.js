@@ -219,20 +219,3 @@ exports.buildCacheOptions = {
     resolveBuildDependencies: {hash: true, timestamp: false},
   },
 }
-
-// style of source mapping to enhance the debugging process
-// https://webpack.js.org/configuration/devtool/
-exports.getDevtool = function (skipSourcemaps) {
-  let devtool
-  if (skipSourcemaps) {
-    // Fast
-    devtool = false
-  } else if (process.env.NODE_ENV === 'production' || process.env.COVERAGE === '1') {
-    // Slow. "Recommended choice for production builds with high quality SourceMaps.""
-    devtool = 'source-map'
-  } else {
-    // "Recommended choice for development builds with maximum performance"
-    devtool = 'eval'
-  }
-  return devtool
-}

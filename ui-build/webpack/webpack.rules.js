@@ -95,7 +95,9 @@ exports.swc = [
             syntax: 'typescript',
           },
           experimental: {
-            plugins: [['swc-plugin-coverage-instrument', {}]],
+            plugins: [
+              process.env.CRYSTALBALL_MAP === '1' && ['swc-plugin-coverage-instrument', {}],
+            ].filter(Boolean),
           },
         },
         env: {
@@ -119,7 +121,9 @@ exports.swc = [
             tsx: true,
           },
           experimental: {
-            plugins: [['swc-plugin-coverage-instrument', {}]],
+            plugins: [
+              process.env.CRYSTALBALL_MAP === '1' && ['swc-plugin-coverage-instrument', {}],
+            ].filter(Boolean),
           },
         },
         env: {
