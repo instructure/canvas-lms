@@ -68,8 +68,7 @@ class SubmissionSearch
     search_scope = if @course.grants_any_right?(@searcher, @session, :manage_grades, :view_all_grades) || @course.participating_observers.map(&:id).include?(@searcher.id)
                      # a user with manage_grades, view_all_grades, or an observer can see other users' submissions
                      # TODO: may want to add a preloader for this
-                     allowed_user_ids = @course.users_visible_to(@searcher)
-                     search_scope.where(user_id: allowed_user_ids)
+                     search_scope.where(user_id: allowed_users)
                    elsif @course.grants_right?(@searcher, @session, :read_grades)
                      # a user can see their own submission
                      search_scope.where(user_id: @searcher.id)
@@ -124,5 +123,37 @@ class SubmissionSearch
         end
     end
     search_scope.order(:user_id)
+  end
+
+  private
+
+  def allowed_users
+    if @options[:apply_gradebook_enrollment_filters]
+      @course.users_visible_to(@searcher, true, exclude_enrollment_state: excluded_enrollment_states_from_gradebook_settings)
+    elsif @options[:include_concluded] || @options[:include_deactivated]
+      @course.users_visible_to(@searcher, true, exclude_enrollment_state: excluded_enrollment_states_from_filters)
+    else
+      @course.users_visible_to(@searcher)
+    end
+  end
+
+  def excluded_enrollment_states_from_gradebook_settings
+    settings = @searcher.get_preference(:gradebook_settings, @course.global_id) || {}
+    excluded_enrollment_states(
+      completed: settings["show_concluded_enrollments"] != "true",
+      inactive: settings["show_inactive_enrollments"] != "true"
+    )
+  end
+
+  def excluded_enrollment_states_from_filters
+    excluded_enrollment_states(
+      completed: !@options[:include_concluded],
+      inactive: !@options[:include_deactivated]
+    )
+  end
+
+  def excluded_enrollment_states(states)
+    excluded_states = states.filter_map { |state, excluded| state if excluded }
+    excluded_states << :rejected
   end
 end

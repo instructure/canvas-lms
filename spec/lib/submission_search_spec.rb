@@ -57,6 +57,110 @@ describe SubmissionSearch do
     expect(results.preload(:user).map(&:user)).to eq students
   end
 
+  it "excludes rejected students by default" do
+    course.enrollments.find_by(user: jonah).reject
+    results = SubmissionSearch.new(assignment, teacher, nil, order_by: [{ field: "username" }]).search
+    expect(results.where(user: jonah).exists?).to be false
+  end
+
+  it "excludes deactivated students by default" do
+    course.enrollments.find_by(user: jonah).deactivate
+    results = SubmissionSearch.new(assignment, teacher, nil, order_by: [{ field: "username" }]).search
+    expect(results.where(user: jonah).exists?).to be false
+  end
+
+  it "optionally includes deactivated students" do
+    course.enrollments.find_by(user: jonah).deactivate
+    results = SubmissionSearch.new(assignment, teacher, nil, order_by: [{ field: "username" }], include_deactivated: true).search
+    expect(results.where(user: jonah).exists?).to be true
+  end
+
+  it "excludes rejected students when including deactivated students" do
+    course.enrollments.find_by(user: jonah).reject
+    results = SubmissionSearch.new(assignment, teacher, nil, order_by: [{ field: "username" }], include_deactivated: true).search
+    expect(results.where(user: jonah).exists?).to be false
+  end
+
+  it "excludes concluded students by default" do
+    course.enrollments.find_by(user: jonah).conclude
+    results = SubmissionSearch.new(assignment, teacher, nil, order_by: [{ field: "username" }]).search
+    expect(results.where(user: jonah).exists?).to be false
+  end
+
+  it "optionally includes concluded students" do
+    course.enrollments.find_by(user: jonah).conclude
+    results = SubmissionSearch.new(assignment, teacher, nil, order_by: [{ field: "username" }], include_concluded: true).search
+    expect(results.where(user: jonah).exists?).to be true
+  end
+
+  it "excludes rejected students when including concluded students" do
+    course.enrollments.find_by(user: jonah).reject
+    results = SubmissionSearch.new(assignment, teacher, nil, order_by: [{ field: "username" }], include_concluded: true).search
+    expect(results.where(user: jonah).exists?).to be false
+  end
+
+  it "optionally includes deactivated students via gradebook settings" do
+    course.enrollments.find_by(user: jonah).deactivate
+    teacher.preferences[:gradebook_settings] = {
+      course.global_id => {
+        "show_inactive_enrollments" => "true"
+      }
+    }
+    teacher.save!
+    results = SubmissionSearch.new(
+      assignment,
+      teacher,
+      nil,
+      order_by: [{ field: "username" }],
+      apply_gradebook_enrollment_filters: true
+    ).search
+    expect(results.where(user: jonah).exists?).to be true
+  end
+
+  it "optionally includes concluded students via gradebook settings" do
+    course.enrollments.find_by(user: jonah).conclude
+    teacher.preferences[:gradebook_settings] = {
+      course.global_id => {
+        "show_concluded_enrollments" => "true"
+      }
+    }
+    teacher.save!
+    results = SubmissionSearch.new(
+      assignment,
+      teacher,
+      nil,
+      order_by: [{ field: "username" }],
+      apply_gradebook_enrollment_filters: true
+    ).search
+    expect(results.where(user: jonah).exists?).to be true
+  end
+
+  it "ignores include_concluded and include_deactivated when apply_gradebook_enrollment_filters is true" do
+    course.enrollments.find_by(user: amanda).deactivate
+    course.enrollments.find_by(user: jonah).conclude
+    teacher.preferences[:gradebook_settings] = {
+      course.global_id => {
+        "show_concluded_enrollments" => "false",
+        "show_inactive_enrollments" => "false"
+      }
+    }
+    teacher.save!
+    results = SubmissionSearch.new(
+      assignment,
+      teacher,
+      nil,
+      order_by: [{ field: "username" }],
+      apply_gradebook_enrollment_filters: true,
+      include_concluded: true,
+      include_deactivated: true
+    ).search
+
+    aggregate_failures do
+      expect(results.where(user: amanda).exists?).to be false
+      expect(results.where(user: jonah).exists?).to be false
+    end
+  end
+
   it "finds submissions with user name search" do
     results = SubmissionSearch.new(assignment,
                                    teacher,
