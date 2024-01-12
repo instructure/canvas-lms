@@ -28,7 +28,7 @@ describe Checkpoints::DiscussionCheckpointCreatorService do
     let(:service) { Checkpoints::DiscussionCheckpointCreatorService }
 
     it "raises a FlagDisabledError when the checkpoints feature flag is disabled" do
-      @topic.root_account.disable_feature!(:discussion_checkpoints)
+      @topic.context.root_account.disable_feature!(:discussion_checkpoints)
 
       expect do
         service.call(
@@ -37,7 +37,7 @@ describe Checkpoints::DiscussionCheckpointCreatorService do
           dates: [{ type: "everyone", due_at: 2.days.from_now }],
           points_possible: 6
         )
-      end.to raise_error(Checkpoints::DiscussionCheckpointCreatorService::FlagDisabledError)
+      end.to raise_error(Checkpoints::FlagDisabledError)
     end
 
     it "raises a DateTypeRequiredError when a type is not specified on a date" do
@@ -48,7 +48,7 @@ describe Checkpoints::DiscussionCheckpointCreatorService do
           dates: [{ due_at: 2.days.from_now }],
           points_possible: 6
         )
-      end.to raise_error(Checkpoints::DiscussionCheckpointCreatorService::DateTypeRequiredError)
+      end.to raise_error(Checkpoints::DateTypeRequiredError)
     end
 
     it "updates the reply_to_entry_required_count on the topic when creating a reply to entry checkpoint" do

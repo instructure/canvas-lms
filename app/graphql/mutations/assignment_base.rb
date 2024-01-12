@@ -63,6 +63,7 @@ class Mutations::AssignmentInputBase < GraphQL::Schema::InputObject
   argument :points_possible, Float, required: false
   argument :post_to_sis, Boolean, required: false
   argument :unlock_at, Types::DateTimeType, required: false
+  argument :for_checkpoints, Boolean, required: false
 end
 
 class Mutations::AssignmentCreate < Mutations::AssignmentInputBase

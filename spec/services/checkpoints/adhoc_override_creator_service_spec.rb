@@ -35,7 +35,7 @@ describe Checkpoints::AdhocOverrideCreatorService do
       override = { due_at: 2.days.from_now }
       expect do
         service.call(checkpoint: @checkpoint, override:)
-      end.to raise_error(Checkpoints::AdhocOverrideCreatorService::StudentIdsRequiredError)
+      end.to raise_error(Checkpoints::StudentIdsRequiredError)
     end
 
     it "creates a parent adhoc override without dates set (but still overridden), if one doesn't already exist" do

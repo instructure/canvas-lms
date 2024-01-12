@@ -18,9 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class Checkpoints::DateOverrideCreatorService < ApplicationService
-  class SetTypeRequiredError < StandardError; end
-  class SetTypeNotSupportedError < StandardError; end
-
   def initialize(checkpoint:, overrides:)
     super()
     @checkpoint = checkpoint
@@ -29,8 +26,8 @@ class Checkpoints::DateOverrideCreatorService < ApplicationService
 
   def call
     @overrides.each do |override|
-      set_type = override.fetch(:set_type) { raise SetTypeRequiredError, "set_type is required, but was not provided" }
-      service = services.fetch(set_type) { |key| raise SetTypeNotSupportedError, "set_type of '#{key}' not supported. Supported types: #{services.keys}" }
+      set_type = override.fetch(:set_type) { raise Checkpoints::SetTypeRequiredError, "set_type is required, but was not provided" }
+      service = services.fetch(set_type) { |key| raise Checkpoints::SetTypeNotSupportedError, "set_type of '#{key}' not supported. Supported types: #{services.keys}" }
       service.call(checkpoint: @checkpoint, override:)
     end
   end

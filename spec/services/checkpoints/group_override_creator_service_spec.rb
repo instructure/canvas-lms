@@ -36,14 +36,14 @@ describe Checkpoints::GroupOverrideCreatorService do
       override = { set_id: @group.id, due_at: 2.days.from_now }
       expect do
         service.call(checkpoint: @checkpoint, override:)
-      end.to raise_error(Checkpoints::GroupOverrideCreatorService::GroupAssignmentRequiredError)
+      end.to raise_error(Checkpoints::GroupAssignmentRequiredError)
     end
 
     it "raises an error if set_id is not provided" do
       override = { due_at: 2.days.from_now }
       expect do
         service.call(checkpoint: @checkpoint, override:)
-      end.to raise_error(Checkpoints::GroupOverrideCreatorService::SetIdRequiredError)
+      end.to raise_error(Checkpoints::SetIdRequiredError)
     end
 
     it "raises an error if provided a set_id for a soft-deleted group" do

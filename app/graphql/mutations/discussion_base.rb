@@ -18,6 +18,46 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+class Types::DiscussionCheckpointDateType < Types::BaseEnum
+  graphql_name "DiscussionCheckpointDateType"
+  description "Types of dates that can be set for discussion checkpoints"
+  value "everyone"
+  value "override"
+end
+
+class Types::DiscussionCheckpointDateSetType < Types::BaseEnum
+  graphql_name "DiscussionCheckpointDateSetType"
+  description "Types of date set that can be set for discussion checkpoints"
+  value "CourseSection"
+  value "Group"
+  value "ADHOC"
+end
+
+class Mutations::DiscussionCheckpointDate < GraphQL::Schema::InputObject
+  argument :type, Types::DiscussionCheckpointDateType, required: true
+  argument :due_at, Types::DateTimeType, required: true
+  argument :student_ids, [Integer], required: false
+  argument :set_type, Types::DiscussionCheckpointDateSetType, required: false
+  argument :set_id, Integer, required: false
+
+  def to_object
+    {
+      type: self[:type],
+      due_at: self[:due_at],
+      student_ids: self[:student_ids],
+      set_type: self[:set_type],
+      set_id: self[:set_id]
+    }
+  end
+end
+
+class Mutations::DiscussionCheckpoints < GraphQL::Schema::InputObject
+  argument :checkpoint_label, String, required: true
+  argument :dates, [Mutations::DiscussionCheckpointDate], required: true
+  argument :points_possible, Integer, required: true
+  argument :replies_required, Integer, required: false
+end
+
 class Mutations::DiscussionBase < Mutations::BaseMutation
   argument :allow_rating, Boolean, required: false
   argument :delayed_post_at, Types::DateTimeType, required: false
