@@ -89,6 +89,7 @@ test('restores a user after search finds a deleted user', function () {
     {'Content-Type': 'application/json'},
     JSON.stringify({...userJSON, login_id: 'du'}),
   ])
-  ok(dfd.isResolved(), 'All ajax request in this deferred object should be resolved')
+  // eslint-disable-next-line qunit/no-ok-equality
+  ok(dfd.state() === 'resolved', 'All ajax request in this deferred object should be resolved')
   equal(this.userRestore.get('login_id'), 'du')
 })
