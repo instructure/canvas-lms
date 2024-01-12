@@ -128,4 +128,5 @@ export interface SelectedEnrollment {
 
 export interface TemporaryEnrollmentPairing {
   id: string
+  ending_enrollment_state: string
 }

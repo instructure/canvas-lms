@@ -60,8 +60,14 @@ import {
   createEnrollment,
   createTemporaryEnrollmentPairing,
   deleteEnrollment,
+  getTemporaryEnrollmentPairing,
 } from './api/enrollment'
 import './TempEnrollCustom.css'
+import EnrollmentStateSelect, {
+  type EnrollmentStateOption,
+  enrollmentStates,
+  getLabelForState,
+} from './EnrollmentStateSelect'
 
 declare const ENV: GlobalEnv & EnvCommon
 
@@ -97,6 +103,7 @@ interface StoredData {
   roleChoice: RoleChoice
   startDate: Date
   endDate: Date
+  stateChoice: EnrollmentStateOption
 }
 
 type RoleName =
@@ -123,7 +130,9 @@ export const defaultRoleChoice: RoleChoice = {
 
 // get data from local storage or set defaults
 export function getStoredData(roles: Role[]): StoredData {
-  const [defaultStartDate, defaultEndDate] = getDayBoundaries()
+  const rawStoredData: Partial<StoredData> =
+    getFromLocalStorage<StoredData>(tempEnrollAssignData) || {}
+
   const teacherRole = roles.find(
     role => role.base_role_name === 'TeacherEnrollment' && role.name === 'TeacherEnrollment'
   )
@@ -133,20 +142,16 @@ export function getStoredData(roles: Role[]): StoredData {
         name: removeStringAffix(teacherRole.base_role_name, 'Enrollment'),
       }
     : defaultRoleChoice
-  const defaultStoredData: StoredData = {
-    roleChoice,
-    startDate: defaultStartDate,
-    endDate: defaultEndDate,
-  }
-  const rawStoredData: Partial<StoredData> =
-    getFromLocalStorage<StoredData>(tempEnrollAssignData) || {}
+
+  const [defaultStartDate, defaultEndDate] = getDayBoundaries()
   const parsedStartDate = safeDateConversion(rawStoredData.startDate)
   const parsedEndDate = safeDateConversion(rawStoredData.endDate)
-  // return local data or defaults
+
   return {
-    roleChoice: rawStoredData.roleChoice || defaultStoredData.roleChoice,
-    startDate: parsedStartDate || defaultStoredData.startDate,
-    endDate: parsedEndDate || defaultStoredData.endDate,
+    roleChoice: rawStoredData.roleChoice || roleChoice,
+    startDate: parsedStartDate || defaultStartDate,
+    endDate: parsedEndDate || defaultEndDate,
+    stateChoice: rawStoredData.stateChoice || 'deleted',
   }
 }
 
@@ -232,6 +237,7 @@ export function TempEnrollAssign(props: Props) {
   const [startDate, setStartDate] = useState<Date>(storedData.startDate)
   const [endDate, setEndDate] = useState<Date>(storedData.endDate)
   const [roleChoice, setRoleChoice] = useState<RoleChoice>(storedData.roleChoice)
+  const [stateChoice, setStateChoice] = useState<EnrollmentStateOption>(storedData.stateChoice)
 
   // reminders …
   // enrollmentProps = recipient user object
@@ -268,6 +274,18 @@ export function TempEnrollAssign(props: Props) {
       if (firstEnrollment.end_at) {
         setEndDate(new Date(firstEnrollment.end_at))
       }
+      getTemporaryEnrollmentPairing(ENV.ACCOUNT_ID, firstEnrollment.temporary_enrollment_pairing_id)
+        .then(tempEnrollmentPairing => {
+          const enrollmentState = tempEnrollmentPairing?.ending_enrollment_state
+          const matchedState = enrollmentStates.find(state => state.value === enrollmentState)
+          if (matchedState) {
+            setStateChoice(matchedState.value)
+          }
+        })
+        .catch(error => {
+          // eslint-disable-next-line no-console
+          console.error('Error fetching temporary enrollment pairing:', error)
+        })
     }
   }, [props.tempEnrollmentsPairing, props.roles])
 
@@ -361,6 +379,13 @@ export function TempEnrollAssign(props: Props) {
     })
   }
 
+  const handleEnrollmentStateChange = (selectedOption: EnrollmentStateOption) => {
+    setStateChoice(selectedOption)
+    updateLocalStorageObject(tempEnrollAssignData, {
+      stateChoice: selectedOption,
+    })
+  }
+
   const handleValidationError = (message: string) => {
     setErrorMsg(message)
     props.setEnrollmentStatus(false)
@@ -408,7 +433,7 @@ export function TempEnrollAssign(props: Props) {
     try {
       setErrorMsg('')
       const temporaryEnrollmentPairing: TemporaryEnrollmentPairing =
-        await createTemporaryEnrollmentPairing(ENV.ACCOUNT_ID)
+        await createTemporaryEnrollmentPairing(ENV.ACCOUNT_ID, stateChoice)
 
       if (props.tempEnrollmentsPairing && props.tempEnrollmentsPairing.length >= 1) {
         // delete any enrollments that were not selected
@@ -556,7 +581,7 @@ export function TempEnrollAssign(props: Props) {
                 />
               </Grid.Col>
             </Grid.Row>
-            <Grid.Row>
+            <Grid.Row vAlign="top">
               <Grid.Col width={8}>
                 <DateTimeInput
                   timezone={ENV.TIMEZONE}
@@ -579,6 +604,13 @@ export function TempEnrollAssign(props: Props) {
                   timeInputRef={ref => setAnalyticPropsOnRef(ref, analyticProps('EndTime'))}
                 />
               </Grid.Col>
+              <Grid.Col>
+                <EnrollmentStateSelect
+                  label="Ending enrollment state"
+                  onChange={handleEnrollmentStateChange}
+                  value={stateChoice}
+                />
+              </Grid.Col>
             </Grid.Row>
           </Grid>
         </Flex.Item>
@@ -587,13 +619,14 @@ export function TempEnrollAssign(props: Props) {
             <Flex.Item shouldGrow={true}>
               <Text as="p" data-testid="temp-enroll-summary">
                 {I18n.t(
-                  'Canvas will enroll %{recipient} as a %{role} in the selected courses of %{source} from %{start} - %{end}',
+                  'Canvas will enroll %{recipient} as a %{role} in the selected courses of %{source} from %{start} - %{end} with an ending enrollment state of %{state}',
                   {
                     recipient: enrollmentProps.name,
                     role: roleLabel,
                     source: userProps.name,
                     start: formatDateTime(startDate),
                     end: formatDateTime(endDate),
+                    state: getLabelForState(stateChoice),
                   }
                 )}
               </Text>
