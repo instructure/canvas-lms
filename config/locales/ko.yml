@@ -9417,6 +9417,7 @@ ko:
   no_students_have_taken_the_survey_yet_d378cd35: "어떤 학생도 이 설문을 치르지 않음"
   no_submission_fb131a40: "제출물 없음"
   no_time_limit_for_long_running_conferences_d49fdfad: "시간 제한 없음(장기 회의)"
+  not_deleted_2a7f63ef: "(삭제 안 됨)"
   not_installed_37a21a76: "설치 안 됨"
   nothing_for_now_e3e3ce2a: "현재 없음"
   notice_some_notifications_may_contain_confidential_5985f52a: "주의: 일부 알림은 기밀 정보를 포함할 수도 있습니다. 여러분의 기관에서 제공하는 것이 아닌 이메일로 알림을 받게 되면 민감한 Canvas 과목 및 그룹 정보를 기관 시스템 밖으로 보내는 결과를 낳을 수도 있습니다."
@@ -14159,6 +14160,7 @@ ko:
   website_url_177fc1dc: "웹 사이트 URL"
   welcome_to_your_courses_to_customize_the_list_of_c_f95e4b2: "나의 과목에 오신 것을 환영합니다! 과목들의 목록을 편집하려면 \"모든 과목\"을 클릭하고 표시할 과목들에 별표 표시를 하십시오."
   what_should_the_csv_file_look_like_985a59ac: "CSV 파일은 어떻게 보입니까?"
+  what_would_you_like_to_do_next_2835397e: "다음에 어떤 작업을 하시겠습니까?"
   widget: 
     upload_media_track_form: 
       choose_a_language: "--언어 선택--"

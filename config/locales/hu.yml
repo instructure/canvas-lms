@@ -14488,6 +14488,7 @@ hu:
   not_available_until_next_submission_2175158: "A következő beadásig nem érhető el"
   not_completed_55fb4c00: Befejezetlen
   not_completed_d70acea3: Befejezetlen
+  not_deleted_2a7f63ef: "(Nem törölt)"
   not_factored_into_grading_455dcf6a: "Nincs beleszámítva az osztályzásba"
   not_graded_e027c866: "Nem értékelt"
   not_graded_e78bcd50: "Nem értékelt"
@@ -21164,6 +21165,7 @@ hu:
   what_does_provisioning_only_mean_eac9a4a1: "Mit jelent a 'csak létesítés'?"
   what_happened_322d8259: "Mi történt?"
   what_should_the_csv_file_look_like_985a59ac: "Hogyan nézzen ki a CSV fájl?"
+  what_would_you_like_to_do_next_2835397e: "Mit szeretne csinálni a következő lépésben?"
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "Amikor a felhasználók belépnek a kurzusba, ezt az oldalt fogják látni. Beállíthatja, hogy a hírfolyamot, a kurzusmoduljait, a tematikát vagy egy testreszabott oldalt mutasson. A hírfolyam az alapértelmezett beállítás."
   when_selected_the_course_is_in_a_read_only_state_o_5aaeb0d: "Ha ki van választva, akkor a kurzus csak olvasható állapotban lesz ezen dátumokon kívül."
   when_selected_the_course_section_is_in_a_read_only_a7571eb2: "Ha ki van választva, akkor a kurzus szakasz csak olvasható állapotban van ezen dátumokon kívül."
