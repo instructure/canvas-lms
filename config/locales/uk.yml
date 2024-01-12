@@ -11844,6 +11844,7 @@ uk:
   not_available_until_next_submission_2175158: "Не доступно до наступного відправлення"
   not_completed_55fb4c00: "Не Завершено"
   not_completed_d70acea3: "Не завершено "
+  not_deleted_2a7f63ef: "(Не видалено)"
   not_factored_into_grading_455dcf6a: "Не враховані за порядкуванням "
   not_graded_e027c866: "Оцінка відсутня"
   not_graded_e78bcd50: "Не оцінено "
@@ -18398,6 +18399,7 @@ uk:
   well_below_mastery_37664bdc: "Суттєво нижча майстерність"
   what_does_provisioning_only_mean_eac9a4a1: "Що означає Provisioning Only?"
   what_should_the_csv_file_look_like_985a59ac: "Як має виглядати файл CSV?"
+  what_would_you_like_to_do_next_2835397e: "Що б ви хотіли робити далі?"
   when_adding_multiple_users_use_a_comma_or_line_bre_67f9c87d: "Під час додавання декількох користувачів використовуйте коми або перехід на наступний рядок для відділення користувачів."
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "Це сторінка, яку побачать люди, коли відвідуватимуть цей курс. Ви можете налаштувати її для показу потоку активності, списку модулів курсу, навчального плану або власної сторінки, яку ви самі створюєте. За замовчуванням - це потік активності курсу."
   when_people_visit_your_course_this_is_the_first_pa_5093ec45: |-
