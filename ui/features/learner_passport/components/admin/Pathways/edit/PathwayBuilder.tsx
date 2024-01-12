@@ -38,6 +38,7 @@ const PathwayBuilder = ({pathway, onChange}: PathwayBuilderProps) => {
 
   const handleShowSidebar = useCallback(() => {
     setSidebarIsVisible(true)
+    setTreeVersion(Date.now())
   }, [])
 
   const handleHideSidebar = useCallback(() => {
@@ -51,7 +52,7 @@ const PathwayBuilder = ({pathway, onChange}: PathwayBuilderProps) => {
 
   const handleSaveMilestone = useCallback(
     (newMilestone: MilestoneData) => {
-      setTreeVersion(treeVersion + 1)
+      setTreeVersion(Date.now())
       setMilestoneTrayOpen(false)
       const first_milestones = [...pathway.first_milestones]
       const milestones = [...pathway.milestones]
@@ -65,7 +66,7 @@ const PathwayBuilder = ({pathway, onChange}: PathwayBuilderProps) => {
       }
       onChange({first_milestones, milestones: [...milestones, newMilestone]})
     },
-    [currentRoot, onChange, pathway.first_milestones, pathway.milestones, treeVersion]
+    [currentRoot, onChange, pathway.first_milestones, pathway.milestones]
   )
 
   const handleSelectStepFromTree = useCallback(

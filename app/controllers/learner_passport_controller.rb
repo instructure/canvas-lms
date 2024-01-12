@@ -691,6 +691,26 @@ class LearnerPassportController < ApplicationController
     render json: learner_passport_pathway_achievements
   end
 
+  def pathway_canvas_requirements_index
+    search_string = params[:search_string] || ""
+    return render json: [], status: :no_content if search_string.blank?
+
+    type = params[:type] || "course"
+
+    results = case type
+              when "assignment"
+                Assignment.where("title LIKE ?", "%#{search_string}%").limit(10).map { |a| { id: a.id, name: a.title, url: "/#{a.context_type}s/#{a.context_id}/assignments/#{a.id}", lo_count: 0 } }
+              when "course"
+                Course.where("name LIKE ?", "%#{search_string}%").select("id, name, (select count(1) from #{LearningOutcome.quoted_table_name} where learning_outcomes.context_id = courses.id AND learning_outcomes.context_type = 'Course') AS lo_count").limit(10).map { |c| { id: c.id, name: c.name, url: "/courses/#{c.id}", learning_outcome_count: c.lo_count } }
+              when "module"
+                ContextModule.where("name LIKE ?", "%#{search_string}%").limit(10).map { |m| { id: m.id, name: m.name, url: "/courses/#{m.context_id}/modules/#{m.id}", lo_count: 0 } }
+              else
+                return render json: { message: "Invalid type" }, status: :bad_request
+              end
+
+    render json: results
+  end
+
   def pathways_index
     # return render json: { message: "Permission denied" }, status: :unauthorized unless @current_user.roles.include?("admin")
 

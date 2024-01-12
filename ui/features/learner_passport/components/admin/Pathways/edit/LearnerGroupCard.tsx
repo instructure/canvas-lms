@@ -80,8 +80,8 @@ const LearnerGroupCard = ({group, onRemove}: LearnerGroupCardProps) => {
         {group.name}
       </Text>
       <View as="div" margin="small 0 0 0">
-        <Tag text="Not Started" margin="0 medium 0 0" />
-        <Text>{group.memberCount} Members</Text>
+        <Tag text="Not Started" margin="0 small 0 0" />
+        <Text size="small">{group.memberCount} Members</Text>
       </View>
     </View>
   )
