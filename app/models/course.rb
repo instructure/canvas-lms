@@ -3033,7 +3033,8 @@ class Course < ActiveRecord::Base
                                            user,
                                            visibilities,
                                            visibility,
-                                           enrollment_state: opts[:enrollment_state])
+                                           enrollment_state: opts[:enrollment_state],
+                                           exclude_enrollment_state: opts[:exclude_enrollment_state])
   end
 
   def enrollments_visible_to(user, opts = {})
@@ -3044,8 +3045,12 @@ class Course < ActiveRecord::Base
     apply_enrollment_visibilities_internal(enrollment_scope.except(:preload), user, visibilities, visibility)
   end
 
-  def apply_enrollment_visibilities_internal(scope, user, visibilities, visibility, enrollment_state: nil)
-    scope = scope.where(enrollments: { workflow_state: enrollment_state }) if enrollment_state
+  def apply_enrollment_visibilities_internal(scope, user, visibilities, visibility, enrollment_state: nil, exclude_enrollment_state: nil)
+    if enrollment_state
+      scope = scope.where(enrollments: { workflow_state: enrollment_state })
+    elsif exclude_enrollment_state
+      scope = scope.where.not(enrollments: { workflow_state: exclude_enrollment_state })
+    end
     # See also MessageableUsers (same logic used to get users across multiple courses) (should refactor)
     case visibility
     when :full then scope
