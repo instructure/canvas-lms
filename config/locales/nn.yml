@@ -17113,6 +17113,7 @@ nn:
   not_calculated_in_final_grade_2b7d5bd1: "Ikkje rekna med i sluttvurdering"
   not_completed_55fb4c00: "Ikkje fullført"
   not_completed_d70acea3: "Ikkje fullført"
+  not_deleted_2a7f63ef: "(Ikkje sletta)"
   not_factored_into_grading_455dcf6a: "Ikkje faktorisert til karaktersetjing"
   not_for_this_conversation_f5271cf5: "ikkje for denne samtalen"
   not_graded_e027c866: "Ikkje vurdert"
@@ -26698,6 +26699,7 @@ nn:
       diskusjonar og lagre filer.
   what_should_the_csv_file_look_like_985a59ac: "Korleis vil du at CSV-fila skal sjå ut?"
   what_storage_options_do_i_have_in_zoom_b79c738e: "Kva lagringsalternativ har eg i Zoom?"
+  what_would_you_like_to_do_next_2835397e: "Kva vil du gjere vidare?"
   when_adding_external_links_to_a_module_users_can_s_1f893718: |-
       Når ein legg til eksterne lenker til ein modul, kan ein velje om desse skal
       laste i ei ny fane. Når dette flagget er skrudd på, vil den haka være vald som standard
