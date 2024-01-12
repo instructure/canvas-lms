@@ -47,7 +47,6 @@ const {
   environmentVars,
   excludeMomentLocales,
   failOnWebpackWarnings,
-  getDevtool,
   minimizeCode,
   provideJQuery,
   readOnlyCache,
@@ -134,9 +133,15 @@ module.exports = {
   bail: isProduction,
 
   // style of source mapping to enhance the debugging process
-  devtool: getDevtool(skipSourcemaps),
+  // https://webpack.js.org/configuration/devtool/
+  devtool: skipSourcemaps
+    ? false
+    : process.env.NODE_ENV === 'production' || process.env.COVERAGE === '1'
+    ? // "Recommended choice for production builds"
+      'source-map'
+    : // "Recommended choice for development builds"
+      'eval-source-map',
 
-  // we don't yet use multiple entry points
   entry: {main: resolve(canvasDir, 'ui/index.ts')},
 
   watchOptions: {ignored: ['**/node_modules/']},
