@@ -3004,8 +3004,8 @@ describe DiscussionTopic do
 
   describe "checkpoints" do
     before do
+      @course.root_account.enable_feature!(:discussion_checkpoints)
       @topic = DiscussionTopic.create_graded_topic!(course: @course, title: "Discussion Topic Title", user: @teacher)
-      @topic.root_account.enable_feature!(:discussion_checkpoints)
     end
 
     it "not in place in the topic" do

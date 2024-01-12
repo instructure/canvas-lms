@@ -34,6 +34,8 @@ class DiscussionTopic < ActiveRecord::Base
   include DuplicatingObjects
   include LockedFor
 
+  REQUIRED_CHECKPOINT_COUNT = 2
+
   restrict_columns :content, [:title, :message]
   restrict_columns :settings, %i[require_initial_post
                                  discussion_type

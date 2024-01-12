@@ -42,6 +42,7 @@ class Mutations::CreateDiscussionTopic < Mutations::DiscussionBase
   argument :context_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Context")
   argument :context_type, Types::DiscussionTopicContextType, required: true
   argument :assignment, Mutations::AssignmentCreate, required: false
+  argument :checkpoints, [Mutations::DiscussionCheckpoints], required: false
 
   # most arguments inherited from DiscussionBase
 
@@ -122,12 +123,32 @@ class Mutations::CreateDiscussionTopic < Mutations::DiscussionBase
       elsif working_assignment.present?
         discussion_topic.assignment = working_assignment&.[](:assignment)
       end
+
+      # Assignment must be present to set checkpoints
+      if input[:checkpoints]&.count == DiscussionTopic::REQUIRED_CHECKPOINT_COUNT
+        return validation_error(I18n.t("If checkpoints are defined, forCheckpoints: true must be provided to the discussion topic assignment.")) unless input.dig(:assignment, :for_checkpoints)
+
+        input[:checkpoints].each do |checkpoint|
+          dates = checkpoint[:dates]&.map(&:to_object)
+
+          Checkpoints::DiscussionCheckpointCreatorService.call(
+            discussion_topic:,
+            checkpoint_label: checkpoint[:checkpoint_label],
+            points_possible: checkpoint[:points_possible],
+            dates:
+          )
+        end
+      end
     end
 
     discussion_topic.saved_by = :assignment if discussion_topic.assignment.present?
     return errors_for(discussion_topic) unless discussion_topic.save!
 
     { discussion_topic: }
+  rescue Checkpoints::DiscussionCheckpointError => e
+    raise GraphQL::ExecutionError, e.message
+  rescue ActiveRecord::RecordInvalid
+    errors_for(discussion_topic)
   rescue ActiveRecord::RecordNotFound
     raise GraphQL::ExecutionError, "Not found"
   end
