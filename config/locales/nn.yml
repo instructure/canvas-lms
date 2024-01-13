@@ -309,6 +309,7 @@ nn:
         partner_id: Partnar-ID
         partner_key: Partnarnøkkel
   academic_engagement_capella_74946a80: "Akademisk engasjement (Capella)"
+  academic_success_reporting_2585c499: "Akademisk suksessrapportering"
   acalanes_union_high_grade_report_ae9bce11: "Acalanes Union High vurderingsrapport"
   accept_2fdd362e: Godta
   accept_course_invitation_b4c04fbb: "Godta invitasjon til emne"
@@ -862,6 +863,8 @@ nn:
         select_default: "Vel ein loggtype"
         select_label: "Vel ei loggtype å søke etter."
       page_title: "Administratorverktøy for %{account}"
+      restore_content_pane: 
+        select_default: "Velg ein gjenopprettingstype"
       user_date_range_search_form: 
         find: Finn
         generate_activity_userid: "Brukar-ID: *%{user_id}*"
@@ -2454,6 +2457,7 @@ nn:
   all_dates_fields_must_be_present_and_formatted_cor_3a0fe925: "Alle datofelt må finnast og vere korrekt formaterte"
   all_day_fb42c4fc: "Heile dagen"
   all_discussion_entries_report_c1e02906: "Rapport over alle diskusjonsoppføringar"
+  all_events_6ae4331b: "Alle arrangement"
   all_finished_time_to_publish_your_course_click_the_b6f07217: "Er du ferdig?  Du kan publisere emnet ditt. Klikk på knappen nedanfor. Publisering inneber at brukarane kan ta del på emnet."
   all_gradeable_student_submissions_report_d11ee705: "Rapport over alle studentinnleveringar som kan vurderast"
   all_grades_hidden_3092d5b5: "Alle vurderingar er skjulte"
@@ -2468,6 +2472,7 @@ nn:
   all_image_types_allowed_9c65004d: "Alle bildetyper tillatne"
   all_items_a49b66c7: "Alle element"
   all_items_marked_processed_have_been_saved_by_canv_7045295a: "Alle element merka med \"behandla\" er lagra av Canvas."
+  all_jobs_1d82f9d6: "Alle jobbar"
   all_media_types_allowed_3c0cdce7: "Alle mediatyper tillatne"
   all_modules_20c9a1c8: "Alle modular"
   all_my_files_a0213441: "Alle filene mine"
@@ -2493,8 +2498,10 @@ nn:
   all_timezones_5e8afa7b: "Alle tidssoner"
   all_types_allowed_287eb6b0: "Alle typer tillatne"
   all_ungraded_artifacts_ec3ba09: "Alle ugraderte gjenstandar"
+  all_user_data_5d97832: "All brukardata"
   all_users_associated_with_this_course_6be8d492: "Alle brukarar som er tilknytta emnet"
   all_users_associated_with_this_institution_d29850be: "Alle brukarar som er tilknytta institusjonen"
+  all_version_history_fbf060a0: "All Versjonshistorikk"
   all_versions_student_submission_report_e4def68d: "Rapport for alle versjonar av studentinnlevering"
   all_weights_must_be_greater_than_or_equal_to_0_cc2dcdf1: "All vekting må vere større eller lik 0"
   allow_a_moderator_to_review_multiple_independent_g_752c4b90: "La ein sensuransvarleg gå gjennom fleire uavhengige karaktersetjingar for utvalde innleveringar"
