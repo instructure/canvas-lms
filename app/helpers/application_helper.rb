@@ -661,7 +661,7 @@ module ApplicationHelper
 
   def support_url
     (@domain_root_account && @domain_root_account.settings[:support_url]) ||
-      (Account.default && Account.default.settings[:support_url])
+      Setting.get("default_support_url", nil)
   end
 
   def help_link_url
