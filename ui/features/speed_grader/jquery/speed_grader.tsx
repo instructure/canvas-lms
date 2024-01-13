@@ -90,6 +90,7 @@ import userSettings from '@canvas/user-settings'
 import htmlEscape, {raw} from '@instructure/html-escape'
 import rubricAssessment from '@canvas/rubrics/jquery/rubric_assessment'
 import SpeedgraderSelectMenu from './speed_grader_select_menu'
+import type {SelectOptionDefinition} from './speed_grader_select_menu'
 import SpeedgraderHelpers from './speed_grader_helpers'
 import {
   allowsReassignment,
@@ -341,13 +342,13 @@ function sectionSelectionOptions(
   courseSections: CourseSection[],
   groupGradingModeEnabled = false,
   selectedSectionId: null | string = null
-) {
+): SelectOptionDefinition[] {
   if (courseSections.length <= 1 || groupGradingModeEnabled) {
     return []
   }
 
   let selectedSectionName = I18n.t('All Sections')
-  const sectionOptions = [
+  const sectionOptions: SelectOptionDefinition[] = [
     {
       [anonymizableId]: 'section_all',
       data: {
@@ -1709,7 +1710,11 @@ EG = {
       EG.addSubmissionComment(true)
     }
 
-    const selectMenuValue = $selectmenu?.val()
+    if (!$selectmenu) {
+      throw new Error('SpeedGrader: selectmenu not found')
+    }
+
+    const selectMenuValue = $selectmenu.val()
     // calling _.values on a large collection could be slow, that's why we're fetching from studentMap first
     this.currentStudent =
       window.jsonData.studentMap[selectMenuValue] ||

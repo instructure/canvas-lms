@@ -16,12 +16,28 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import type JQuery from 'jquery'
 import $ from 'jquery'
 import 'jquery-selectmenu'
 import SpeedgraderHelpers from './speed_grader_helpers'
 import htmlEscape from '@instructure/html-escape'
 
-function optionsToHtml(optionDefinitions) {
+export type SelectOptionDefinition = {
+  anonymizableId?: 'anonymous_id' | 'id'
+  anonymous_id?: string
+  className?: {
+    formatted?: string
+    raw: string
+  }
+  data?: {
+    'section-id': string
+  }
+  id?: string
+  name: string
+  options?: SelectOptionDefinition[]
+}
+
+function optionsToHtml(optionDefinitions: SelectOptionDefinition[]) {
   return optionDefinitions
     .map(definition => {
       let html = ''
@@ -46,7 +62,7 @@ function optionsToHtml(optionDefinitions) {
         html = `
         <option
           value="${htmlEscape(definition[definition.anonymizableId])}"
-          class="${htmlEscape(definition.className.raw)} ui-selectmenu-hasIcon"
+          class="${htmlEscape(definition.className?.raw)} ui-selectmenu-hasIcon"
         >
           ${htmlEscape(labels.join(' – '))}
         </option>
@@ -58,86 +74,110 @@ function optionsToHtml(optionDefinitions) {
     .join('')
 }
 
-function buildStudentIdMap(optionDefinitions) {
-  const studentMap = {}
+export function buildStudentIdMap(optionDefinitions: SelectOptionDefinition[]) {
+  const studentMap: Record<string, number> = {}
   let adjust = 0
   optionDefinitions.forEach((optionDefinition, index) => {
     if (optionDefinition.options) {
       // There should only ever be one, but just in case
       adjust += 1
-    } else {
-      studentMap[optionDefinition[optionDefinition.anonymizableId]] = index - adjust
+    } else if (optionDefinition.anonymizableId) {
+      const id = optionDefinition[optionDefinition.anonymizableId]
+      if (id) {
+        studentMap[id] = index - adjust
+      }
     }
   })
   return studentMap
 }
 
-export default function speedgraderSelectMenu(optionsArray) {
-  // Array of the initial data needed to build the select menu
-  this.options_array = optionsArray
-
-  // Index used by text formatting function
-  this.option_index = 0
-  this.opt_group_found = false
-  this.option_sub_index = 0
-
-  // Array for the generated option tags
-  this.option_tag_array = null
-
-  // Map of student id to index position
-  this.student_id_map = null
-
-  this.buildHtml = function (options) {
-    const optionHtml = optionsToHtml(options)
-
-    return `<select id='students_selectmenu'>${optionHtml}</select>`
+export function focusHandlerAccessibilityFixes(container: JQuery) {
+  const focus = function () {
+    $(container).find('span.ui-selectmenu-icon').css('background-position', '-17px 0')
+  }
+  const focusOut = function () {
+    $(container).find('span.ui-selectmenu-icon').css('background-position', '0 0')
   }
 
-  this.selectMenuAccessibilityFixes = function (container) {
-    const $select_menu = $(container).find('select#students_selectmenu')
+  // In case someone mouseovers, let's visual color to match a
+  // keyboard focus
+  $(container).on('focus', 'a.ui-selectmenu', focus)
+  $(container).on('focusout', 'a.ui-selectmenu', focusOut)
 
-    $(container)
-      .find('a.ui-selectmenu')
-      .removeAttr('role')
-      .removeAttr('aria-haspopup')
-      .removeAttr('aria-owns')
-      .removeAttr('aria-disabled')
-      .attr('aria-hidden', true)
-      .attr('tabindex', -1)
-      .css('margin', 0)
+  // Remove the focus binding from jquery that steals away from
+  // the select and add our own that doesn't, but still does some
+  // visual decoration.
+  const $select_menu = $(container).find('select#students_selectmenu')
+  $select_menu.unbind('focus')
+  $select_menu.bind('focus', focus)
+  $select_menu.bind('focusout', focusOut)
+}
 
-    $select_menu
-      .addClass('screenreader-only')
-      .removeAttr('style')
-      .removeAttr('aria-disabled')
-      .attr('tabindex', 0)
-      .show()
+// xsslint safeString.function getIcon
+function getIconHtml(helper_text: string) {
+  let icon = "<span class='ui-selectmenu-item-icon speedgrader-selectmenu-icon'>"
+  if (helper_text === 'graded') {
+    icon += "<i class='icon-check'></i>"
+  } else if (['not_graded', 'resubmitted'].indexOf(helper_text) !== -1) {
+    // This is the UTF-8 code for "Black Circle"
+    icon += '&#9679;'
+  }
+  return icon.concat('</span>')
+}
+
+function buildHtml(options: SelectOptionDefinition[]) {
+  const optionHtml = optionsToHtml(options)
+
+  return `<select id='students_selectmenu'>${optionHtml}</select>`
+}
+
+export function selectMenuAccessibilityFixes(container: JQuery) {
+  const $select_menu = $(container).find('select#students_selectmenu')
+
+  $(container)
+    .find('a.ui-selectmenu')
+    .removeAttr('role')
+    .removeAttr('aria-haspopup')
+    .removeAttr('aria-owns')
+    .removeAttr('aria-disabled')
+    .attr('aria-hidden', 'true')
+    .attr('tabindex', -1)
+    .css('margin', 0)
+
+  $select_menu
+    .addClass('screenreader-only')
+    .removeAttr('style')
+    .removeAttr('aria-disabled')
+    .attr('tabindex', 0)
+    .show()
+}
+
+export function replaceDropdownIcon(container: JQuery) {
+  const $span = $(container).find('span.ui-selectmenu-icon')
+  $span.removeClass('ui-icon')
+  $("<i class='icon-mini-arrow-down'></i>").appendTo($span)
+}
+
+export default class SpeedgraderSelectMenu {
+  options_array: SelectOptionDefinition[]
+
+  option_index: number = 0
+
+  opt_group_found: boolean = false
+
+  option_sub_index: number = 0
+
+  option_tag_array: JQuery = $()
+
+  student_id_map: Record<string, number> = {}
+
+  $el: JQuery = $()
+
+  constructor(optionsArray: SelectOptionDefinition[]) {
+    this.options_array = optionsArray
   }
 
-  this.focusHandlerAccessibilityFixes = function (container) {
-    const focus = function (_e) {
-      $(container).find('span.ui-selectmenu-icon').css('background-position', '-17px 0')
-    }
-    const focusOut = function (_e) {
-      $(container).find('span.ui-selectmenu-icon').css('background-position', '0 0')
-    }
-
-    // In case someone mouseovers, let's visual color to match a
-    // keyboard focus
-    $(container).on('focus', 'a.ui-selectmenu', focus)
-    $(container).on('focusout', 'a.ui-selectmenu', focusOut)
-
-    // Remove the focus binding from jquery that steals away from
-    // the select and add our own that doesn't, but still does some
-    // visual decoration.
-    const $select_menu = $(container).find('select#students_selectmenu')
-    $select_menu.unbind('focus')
-    $select_menu.bind('focus', focus)
-    $select_menu.bind('focusout', focusOut)
-  }
-
-  this.keyEventAccessibilityFixes = function (container) {
-    const self = this
+  keyEventAccessibilityFixes(container: JQuery) {
     const $select_menu = $(container).find('select#students_selectmenu')
     // The fake gui menu won't update in firefox until the select is
     // chosen, to work around this, we force an update on any key
@@ -146,74 +186,68 @@ export default function speedgraderSelectMenu(optionsArray) {
       const code = e.keyCode || e.which
       if (code === 37 || code === 38 || code === 39 || code === 40) {
         // left, up, right, down arrow
-        self.$el.change()
+        this.$el.change()
       }
     })
   }
 
-  this.accessibilityFixes = function (container) {
-    this.focusHandlerAccessibilityFixes(container)
-    this.selectMenuAccessibilityFixes(container)
+  accessibilityFixes(container: JQuery) {
+    focusHandlerAccessibilityFixes(container)
+    selectMenuAccessibilityFixes(container)
     this.keyEventAccessibilityFixes(container)
   }
 
-  this.appendTo = function (selector, onChange) {
-    const self = this
+  appendTo(selector: string, onChange: (event: any) => void) {
     this.student_id_map = buildStudentIdMap(this.options_array)
 
     $(
       '<label class="screenreader-only" for="students_selectmenu">Select a student</label>'
     ).appendTo(selector)
 
-    this.$el = $(this.buildHtml(this.options_array))
+    this.$el = $(buildHtml(this.options_array))
       .appendTo(selector)
       .selectmenu({
+        // @ts-expect-error
         style: 'dropdown',
-        format: text => self.formatSelectText(text),
-        open: event => {
-          self.our_open(event)
-        },
+        format: () => this.formatSelectText(),
+        open: () => this.our_open(),
       })
-    // Remove the section change optgroup since it'll be replaced by a popout menu
+
     $('ul#students_selectmenu-menu li.ui-selectmenu-group').remove()
-
-    // Create indexes into what we've created because we'll want them later
     this.option_tag_array = $('#students_selectmenu > option')
-
     this.$el.change(onChange)
     this.accessibilityFixes(this.$el.parent())
-    this.replaceDropdownIcon(this.$el.parent())
-  }
-
-  this.replaceDropdownIcon = function (container) {
-    const $span = $(container).find('span.ui-selectmenu-icon')
-    $span.removeClass('ui-icon')
-    $("<i class='icon-mini-arrow-down'></i>").appendTo($span)
+    replaceDropdownIcon(this.$el.parent())
   }
 
   // The following 4 functions just delegate to the contained component.
-  this.val = (...args) => this.$el.val(...args)
-  this.data = (...args) => this.$el.data(...args)
-  this.selectmenu = (...args) => this.$el.selectmenu(...args)
-  this.change = (...args) => this.$el.change(...args)
 
-  this.our_open = _event => {
+  // @ts-expect-error
+  val(...args) {
+    // @ts-expect-error
+    return String(this.$el.val(...args))
+  }
+
+  data(str: string) {
+    return this.$el.data(str)
+  }
+
+  // @ts-expect-error
+  selectmenu(...args) {
+    // @ts-expect-error
+    return this.$el.selectmenu(...args)
+  }
+
+  // @ts-expect-error
+  change(...args) {
+    return this.$el.change(...args)
+  }
+
+  our_open() {
     this.accessibilityFixes(this.$el.parent())
   }
 
-  // xsslint safeString.function getIcon
-  this.getIconHtml = function (helper_text) {
-    let icon = "<span class='ui-selectmenu-item-icon speedgrader-selectmenu-icon'>"
-    if (helper_text === 'graded') {
-      icon += "<i class='icon-check'></i>"
-    } else if (['not_graded', 'resubmitted'].indexOf(helper_text) !== -1) {
-      // This is the UTF-8 code for "Black Circle"
-      icon += '&#9679;'
-    }
-    return icon.concat('</span>')
-  }
-
-  this.formatSelectText = function (_text) {
+  formatSelectText() {
     let option = this.options_array[this.option_index]
     let optgroup
     let html = ''
@@ -221,14 +255,18 @@ export default function speedgraderSelectMenu(optionsArray) {
     if (option.options) {
       optgroup = option
 
-      if (!this.opt_group_found) {
+      if (!this.opt_group_found && optgroup.options) {
         // We encountered this optgroup but haven't start traversing it yet
         this.opt_group_found = true
         this.option_sub_index = 0
-        option = optgroup.options[this.option_sub_index]
+        option = optgroup.options?.[this.option_sub_index]
       }
 
-      if (this.opt_group_found && this.option_sub_index < optgroup.options.length) {
+      if (
+        this.opt_group_found &&
+        optgroup.options &&
+        this.option_sub_index < optgroup.options.length
+      ) {
         // We're still traversing this optgroup, carry on
         option = optgroup.options[this.option_sub_index]
 
@@ -253,18 +291,23 @@ export default function speedgraderSelectMenu(optionsArray) {
 
     return `
         ${html}
-        ${this.getIconHtml(htmlEscape(option.className.raw))}
+        ${getIconHtml(htmlEscape(option.className?.raw || ''))}
         <span class="ui-selectmenu-item-header">
           ${htmlEscape(option.name)}
         </span>
     `
   }
 
-  this.updateSelectMenuStatus = function ({
+  updateSelectMenuStatus({
     student,
     isCurrentStudent,
     newStudentInfo,
     anonymizableId,
+  }: {
+    student: any
+    isCurrentStudent: boolean
+    newStudentInfo: string
+    anonymizableId: 'anonymous_id' | 'id'
   }) {
     if (!student) return
     const optionIndex = this.student_id_map[student[anonymizableId]]
