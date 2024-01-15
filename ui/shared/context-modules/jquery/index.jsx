@@ -2354,7 +2354,7 @@ $(document).ready(function () {
     $.ajaxJSON(url, 'POST', {collapse})
   })
 
-  function setExternalToolTray(tool, moduleData, selectable, returnFocusTo) {
+  function setExternalToolTray(tool, moduleData, placement = 'module_index_menu', returnFocusTo) {
     const handleDismiss = () => {
       setExternalToolTray(null)
       returnFocusTo.focus()
@@ -2366,7 +2366,7 @@ $(document).ready(function () {
     ReactDOM.render(
       <ContentTypeExternalToolTray
         tool={tool}
-        placement="module_index_menu"
+        placement={placement}
         acceptedResourceTypes={[
           'assignment',
           'audio',
@@ -2379,7 +2379,7 @@ $(document).ready(function () {
           'video',
         ]}
         targetResourceType="module"
-        allowItemSelection={selectable}
+        allowItemSelection={placement === 'module_index_menu'}
         selectableItems={moduleData}
         onDismiss={handleDismiss}
         open={tool !== null}
@@ -2467,7 +2467,7 @@ $(document).ready(function () {
         name: currentModule.find('.name').attr('title'),
       })
     }
-    setExternalToolTray(tool, moduleData, launchType === 'module_index_menu', $('.al-trigger')[0])
+    setExternalToolTray(tool, moduleData, launchType, $('.al-trigger')[0])
   }
 
   $('.menu_tray_tool_link').click(openExternalTool)
