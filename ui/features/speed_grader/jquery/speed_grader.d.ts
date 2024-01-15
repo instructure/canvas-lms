@@ -26,11 +26,14 @@ import AssessmentAuditTray from '../react/AssessmentAuditTray'
 // fields marked as z.null() can be improved in subsequent commits
 
 export const ZSubmissionType = z.union([
-  z.literal('online'),
-  z.literal('online_text_entry'),
+  z.literal('basic_lti_launch'),
+  z.literal('discussion_topic'),
   z.literal('media_recording'),
-  z.literal('online_url'),
+  z.literal('online_quiz'),
+  z.literal('online_text_entry'),
   z.literal('online_upload'),
+  z.literal('online_url'),
+  z.literal('online'),
   z.literal('student_annotation'),
 ])
 
@@ -73,7 +76,7 @@ export const ZRubricAssessment = z.object({
   assessor_id: z.string(),
   anonymous_assessor_id: z.string(),
   assessment_type: z.string(),
-  assessor_name: z.string(),
+  assessor_name: z.string().nullable(),
 })
 
 export type RubricAssessment = z.infer<typeof ZRubricAssessment>
@@ -147,13 +150,14 @@ const ZBaseSubmission = z.object({
   seconds_late: z.number().optional(),
   show_grade_in_dropdown: z.boolean().optional(),
   submission_comments: z.lazy(() => z.array(ZSubmissionComment).optional()),
-  submission_type: z.string().nullable(),
+  submission_type: ZSubmissionType.nullable(),
   submitted_at: z.date().nullable(),
   turnitin_data: ZSubmissionOriginalityData.optional(),
   updated_at: z.string(),
   url: z.string().optional(),
   user_id: z.string(),
-  vericite_data: ZVericiteOriginalityData.optional(),
+  vericite_data: ZVericiteOriginalityData.optional(), // not used in SpeedGrader
+  version: z.number().optional(),
   word_count: z.null(),
   workflow_state: z.string(),
   versioned_attachments: z.array(ZVersionedAttachment).optional(),
@@ -208,14 +212,14 @@ export const ZStudent = z.object({
   email: z.string().nullable(),
   group_ids: z.array(z.string()),
   id: z.string(),
-  integration_id: z.string().nullable(),
-  login_id: z.string(),
+  integration_id: z.string().nullish(), // not used in SpeedGrader
+  login_id: z.string().optional(), // not used in SpeedGrader
   name: z.string(),
   section_ids: z.array(z.string()),
   short_name: z.string(),
   sortable_name: z.string(),
-  sis_import_id: z.string().nullable(),
-  sis_user_id: z.string().nullable(),
+  sis_import_id: z.string().nullish(), // not used in SpeedGrader
+  sis_user_id: z.string().nullish(), // not used in SpeedGrader
 })
 
 export type Student = z.infer<typeof ZStudent>
@@ -241,20 +245,20 @@ export const ZAssignment = z.object({
   allowed_attempts: z.number(),
   created_at: z.string(),
   id: z.string(),
-  html_url: z.string(),
-  allowed_extensions: z.array(z.string()),
+  html_url: z.string(), // not used in SpeedGrader
+  allowed_extensions: z.array(z.string()), // not used in SpeedGrader
   annotatable_attachment_id: z.string().nullable(),
   anonymous_grading: z.boolean(),
   anonymous_instructor_annotations: z.boolean(),
   anonymous_peer_reviews: z.boolean(),
   assessment_requests: z.array(z.unknown()),
   assignment_group_id: z.string(),
-  automatic_peer_reviews: z.boolean(),
+  automatic_peer_reviews: z.boolean(), // not used in SpeedGrader
   can_duplicate: z.boolean(),
   course_id: z.string(),
   due_date_required: z.boolean(),
   final_grader_id: z.string().nullable(),
-  grade_group_students_individually: z.boolean(),
+  grade_group_students_individually: z.boolean(), // not used in SpeedGrader
   graded_submissions_exist: z.boolean(),
   grader_comments_visible_to_graders: z.boolean(),
   grader_count: z.number(),
@@ -266,7 +270,7 @@ export const ZAssignment = z.object({
   group_category_id: z.string().nullable(),
   has_overrides: z.boolean(),
   has_submitted_submissions: z.boolean(),
-  hide_in_gradebook: z.boolean(),
+  hide_in_gradebook: z.boolean(), // not used in SpeedGrader
   important_dates: z.boolean(),
   integration_data: z.object({}),
   integration_id: z.string().nullable(),
@@ -298,7 +302,7 @@ export const ZAssignment = z.object({
   sis_assignment_id: z.string().nullable(),
   submission_types: z.array(z.string()),
   submissions_download_url: z.string(),
-  unlock_at: z.string().nullable(),
+  unlock_at: z.string().nullable(), // not used in SpeedGrader
   unpublishable: z.boolean(),
   updated_at: z.string(),
   workflow_state: ZWorkflowState,
@@ -307,41 +311,41 @@ export const ZAssignment = z.object({
 export type Assignment = z.infer<typeof ZAssignment>
 
 export const ZEnrollment = z.object({
-  associated_user_id: z.string().nullable(),
+  associated_user_id: z.string().nullable(), // not used in SpeedGrader
   course_id: z.string(),
-  course_integration_id: z.string().nullable(),
+  course_integration_id: z.string().nullable(), // not used in SpeedGrader
   course_section_id: z.string(),
   created_at: z.string(),
-  end_at: z.string().nullable(),
+  end_at: z.string().nullable(), // not used in SpeedGrader
   enrollment_state: z.union([z.literal('active')]),
-  html_url: z.string(),
+  html_url: z.string(), // not used in SpeedGrader
   id: z.string(),
-  last_activity_at: z.string().nullable(),
-  last_attended_at: z.string().nullable(),
-  limit_privileges_to_course_section: z.boolean(),
+  last_activity_at: z.string().nullable(), // not used in SpeedGrader
+  last_attended_at: z.string().nullable(), // not used in SpeedGrader
+  limit_privileges_to_course_section: z.boolean(), // not used in SpeedGrader
   role_id: z.string(),
   root_account_id: z.string(),
-  section_integration_id: z.string().nullable(),
+  section_integration_id: z.string().nullable(), // not used in SpeedGrader
   sis_account_id: z.string().nullable(),
   sis_course_id: z.string().nullable(),
-  sis_import_id: z.string().nullable(),
+  sis_import_id: z.string().nullish(), // not used in SpeedGrader
   sis_section_id: z.string().nullable(),
-  sis_user_id: z.string().nullable(),
+  sis_user_id: z.string().nullish(), // not used in SpeedGrader
   start_at: z.string().nullable(),
-  total_activity_time: z.number(),
+  total_activity_time: z.number(), // not used in SpeedGrader
   type: z.union([z.literal('StudentEnrollment'), z.literal('StudentViewEnrollment')]),
   updated_at: z.string(),
   user_id: z.string(),
   grades: z.object({
-    html_url: z.string(),
-    current_grade: z.number().nullable(),
-    current_score: z.number().nullable(),
-    final_grade: z.number().nullable(),
-    final_score: z.number().nullable(),
-    unposted_current_score: z.number().nullable(),
-    unposted_current_grade: z.number().nullable(),
-    unposted_final_score: z.number().nullable(),
-    unposted_final_grade: z.number().nullable(),
+    html_url: z.string(), // not used in SpeedGrader
+    current_grade: z.number().nullable(), // not used in SpeedGrader
+    current_score: z.number().nullable(), // not used in SpeedGrader
+    final_grade: z.number().nullable(), // not used in SpeedGrader
+    final_score: z.number().nullable(), // not used in SpeedGrader
+    unposted_current_score: z.number().nullable(), // not used in SpeedGrader
+    unposted_current_grade: z.number().nullable(), // not used in SpeedGrader
+    unposted_final_score: z.number().nullable(), // not used in SpeedGrader
+    unposted_final_grade: z.number().nullable(), // not used in SpeedGrader
   }),
   workflow_state: ZWorkflowState,
 })
@@ -359,12 +363,12 @@ export const ZSubmissionComment = z.object({
     html_url: z.string(),
   }),
   author_id: z.string(),
-  author_name: z.string(),
+  author_name: z.string().nullable(),
   avatar_path: z.string(),
   cached_attachments: z.array(ZAttachment),
   comment: z.string(),
   created_at: z.string(),
-  display_updated_at: z.string().nullable(),
+  display_updated_at: z.string().nullable(), // not used in SpeedGrader
   draft: z.boolean(),
   edited_at: z.string().nullable(),
   group_comment_id: z.string(),
@@ -527,7 +531,7 @@ export type SpeedGrader = {
   setCurrentStudentAvatar: () => void
   setActiveProvisionalGradeFields: (options?: {
     grade?: null | Partial<ProvisionalGrade>
-    label?: string
+    label?: string | null
   }) => void
   handleSubmissionSelectionChange: () => void
   isGradingTypePercent: () => boolean
@@ -641,32 +645,32 @@ export type CourseSection = {
 }
 
 export const ZSpeedGraderEnrollment = z.object({
+  course_section_id: z.string(),
   user_id: z.string(),
   workflow_state: z.string(),
-  course_section_id: z.string(),
 })
 
 export type SpeedGraderEnrollmentType = z.infer<typeof ZSpeedGraderEnrollment>
 
 export const ZSpeedGraderStudent = z.object({
+  fake_student: z.boolean(),
   id: z.string(),
   name: z.string(),
-  sortable_name: z.string(),
   rubric_assessments: z.array(ZRubricAssessment),
-  fake_student: z.boolean(),
+  sortable_name: z.string(),
 })
 
 export type SpeedGraderStudentType = z.infer<typeof ZSpeedGraderStudent>
 
 export const ZTurnItInSettings = z.object({
-  originality_report_visibility: z.string(),
-  s_paper_check: z.string(),
-  internet_check: z.string(),
-  journal_check: z.string(),
   exclude_biblio: z.string(),
   exclude_quoted: z.string(),
   exclude_type: z.string(),
   exclude_value: z.string(),
+  internet_check: z.string(),
+  journal_check: z.string(),
+  originality_report_visibility: z.string(),
+  s_paper_check: z.string(),
   submit_papers_to: z.string(),
 })
 
@@ -687,24 +691,24 @@ export const ZAssignedAssessments = z.object({
 export type AssignedAssessments = z.infer<typeof ZAssignedAssessments>
 
 export const ZSpeedGraderContext = z.object({
-  id: z.string(),
+  active_course_sections: z.array(z.object({id: z.string(), name: z.string()})),
   concluded: z.boolean(),
+  enrollments: z.array(ZSpeedGraderEnrollment),
+  id: z.string(),
+  quiz: ZQuiz.nullable(),
   rep_for_student: z.record(z.string(), z.string()),
   students: z.array(ZSpeedGraderStudent),
-  active_course_sections: z.array(z.object({id: z.string(), name: z.string()})),
-  enrollments: z.array(ZSpeedGraderEnrollment),
-  quiz: ZQuiz.nullable(),
 })
 
 export type SpeedGraderContextType = z.infer<typeof ZSpeedGraderContext>
 
 export const ZSpeedGraderResponse = z
   .object({
-    ab_guid: z.array(z.string()),
-    all_day_date: z.null(),
-    all_day: z.boolean(),
+    ab_guid: z.array(z.string()), // not used in SpeedGrader
+    all_day_date: z.string().nullable(), // not used in SpeedGrader
+    all_day: z.boolean(), // not used in SpeedGrader
     allowed_attempts: z.number().nullable(),
-    allowed_extensions: z.array(z.unknown()),
+    allowed_extensions: z.array(z.unknown()), // not used in SpeedGrader
     annotatable_attachment_id: z.string().nullable(),
     anonymize_graders: z.boolean(),
     anonymize_students: z.boolean(),
@@ -712,80 +716,80 @@ export const ZSpeedGraderResponse = z
     anonymous_instructor_annotations: z.boolean(),
     anonymous_peer_reviews: z.boolean(),
     assignment_group_id: z.string(),
-    automatic_peer_reviews: z.boolean(),
-    cloned_item_id: z.string().nullable(),
+    automatic_peer_reviews: z.boolean(), // not used in SpeedGrader
+    cloned_item_id: z.string().nullable(), // not used in SpeedGrader
     context_id: z.string(),
     context_type: z.string(),
     context: ZSpeedGraderContext,
-    copied: z.boolean(),
-    could_be_locked: z.boolean(),
+    copied: z.boolean(), // not used in SpeedGrader
+    could_be_locked: z.boolean(), // not used in SpeedGrader
     created_at: z.string(),
-    description: z.string(),
+    description: z.string(), // not used in SpeedGrader
     due_at: z.string().nullable(),
-    duplicate_of_id: z.string().nullable(),
-    duplication_started_at: z.string().nullable(),
+    duplicate_of_id: z.string().nullable(), // not used in SpeedGrader
+    duplication_started_at: z.string().nullable(), // not used in SpeedGrader
     final_grader_id: z.string().nullable(),
-    freeze_on_copy: z.boolean(),
-    grade_group_students_individually: z.boolean(),
+    freeze_on_copy: z.boolean(), // not used in SpeedGrader
+    grade_group_students_individually: z.boolean(), // not used in SpeedGrader
     grader_comments_visible_to_graders: z.boolean(),
     grader_count: z.number(),
     grader_names_visible_to_final_grader: z.boolean(),
-    grader_section_id: z.string().nullable(),
+    grader_section_id: z.string().nullable(), // not used in SpeedGrader
     graders_anonymous_to_graders: z.boolean(),
     grades_published_at: z.null(),
-    grading_standard_id: z.string().nullable(),
+    grading_standard_id: z.string().nullable(), // not used in SpeedGrader
     grading_type: z.string(),
-    group_category_id: z.string().nullable(),
-    group_category: z.null(),
+    group_category_id: z.string().nullable(), // not used in SpeedGrader
+    group_category: z.null(), // not used in SpeedGrader
     GROUP_GRADING_MODE: z.boolean(),
-    has_sub_assignments: z.boolean(),
-    hide_in_gradebook: z.boolean(),
+    has_sub_assignments: z.boolean(), // not used in SpeedGrader
+    hide_in_gradebook: z.boolean(), // not used in SpeedGrader
     id: z.string(),
-    important_dates: z.boolean(),
-    importing_started_at: z.null(),
-    integration_data: z.object({}),
+    important_dates: z.boolean(), // not used in SpeedGrader
+    importing_started_at: z.null(), // not used in SpeedGrader
+    integration_data: z.object({}), // not used in SpeedGrader
     integration_id: z.string().nullable(),
-    intra_group_peer_reviews: z.boolean(),
-    line_item_resource_id: z.string().nullable(),
-    line_item_tag: z.null(),
-    lock_at: z.null(),
-    lti_context_id: z.string(),
-    lti_resource_link_custom_params: z.null(),
-    lti_resource_link_lookup_uuid: z.string().nullish(),
-    lti_resource_link_url: z.null(),
-    mastery_score: z.null(),
-    max_score: z.null(),
-    migrate_from_id: z.string().nullable(),
-    migration_id: z.string().nullable(),
+    intra_group_peer_reviews: z.boolean(), // not used in SpeedGrader
+    line_item_resource_id: z.string().nullable(), // not used in SpeedGrader
+    line_item_tag: z.null(), // not used in SpeedGrader
+    lock_at: z.null(), // not used in SpeedGrader
+    lti_context_id: z.string(), // not used in SpeedGrader
+    lti_resource_link_custom_params: z.null(), // not used in SpeedGrader
+    lti_resource_link_lookup_uuid: z.string().nullish(), // not used in SpeedGrader
+    lti_resource_link_url: z.null(), // not used in SpeedGrader
+    mastery_score: z.null(), // not used in SpeedGrader
+    max_score: z.null(), // not used in SpeedGrader
+    migrate_from_id: z.string().nullable(), // not used in SpeedGrader
+    migration_id: z.string().nullable(), // not used in SpeedGrader
     min_score: z.null(),
     moderated_grading: z.boolean(),
     muted: z.boolean(),
     omit_from_final_grade: z.boolean(),
-    only_visible_to_overrides: z.boolean(),
-    parent_assignment_id: z.string().nullable(),
-    peer_review_count: z.number(),
-    peer_reviews_assigned: z.boolean(),
-    peer_reviews_due_at: z.null(),
-    peer_reviews: z.boolean(),
+    only_visible_to_overrides: z.boolean(), // not used in SpeedGrader
+    parent_assignment_id: z.string().nullable(), // not used in SpeedGrader
+    peer_review_count: z.number(), // not used in SpeedGrader
+    peer_reviews_assigned: z.boolean(), // not used in SpeedGrader
+    peer_reviews_due_at: z.null(), // not used in SpeedGrader
+    peer_reviews: z.boolean(), // not used in SpeedGrader
     points_possible: z.number(),
     position: z.number(),
-    post_manually: z.boolean(),
-    post_to_sis: z.boolean(),
+    post_manually: z.boolean(), // not used in SpeedGrader
+    post_to_sis: z.boolean(), // not used in SpeedGrader
     quiz_lti: z.boolean(),
     root_account_id: z.string(),
     settings: z.null(),
-    sis_source_id: z.string().nullable(),
-    sub_assignment_tag: z.null(),
+    sis_source_id: z.string().nullable(), // not used in SpeedGrader
+    sub_assignment_tag: z.null(), // not used in SpeedGrader
     submission_types: z.string(),
-    submissions_downloads: z.number(),
+    submissions_downloads: z.number(), // not used in SpeedGrader
     submissions: z.array(ZSubmission),
-    time_zone_edited: z.string(),
+    time_zone_edited: z.string(), // not used in SpeedGrader
     title: z.string(),
     too_many_quiz_submissions: z.boolean(),
     turnitin_enabled: z.boolean(),
     turnitin_id: z.string().nullable(),
     turnitin_settings: ZTurnItInSettings,
-    unlock_at: z.null(),
+    unlock_at: z.null(), // not used in SpeedGrader
     updated_at: z.string(),
     vericite_enabled: z.boolean(),
     workflow_state: z.string(),
@@ -814,25 +818,25 @@ export type DocumentPreviewOptions = {
   attachment_id: string
   attachment_preview_processing: boolean
   attachment_view_inline_ping_url: string | null
+  crocodoc_session_url?: string
   height: string
   id: string
   mimeType: string
   submission_id: string
-  crocodoc_session_url?: string
 }
 
 export const ZScoringSnapshot = z.object({
-  user_id: z.string().nullable(),
-  version_number: z.number(),
+  fudge_points: z.number(),
   last_question_touched: z.string().nullable(),
   question_updates: z.record(z.string(), z.unknown()),
-  fudge_points: z.number(),
+  user_id: z.string().nullable(),
+  version_number: z.number(),
 })
 
 export type ScoringSnapshot = z.infer<typeof ZScoringSnapshot>
 
 export type CommentRenderingOptions = {
-  hideStudentNames?: boolean
-  commentBlank: JQuery<HTMLElement>
   commentAttachmentBlank: JQuery<HTMLElement>
+  commentBlank: JQuery<HTMLElement>
+  hideStudentNames?: boolean
 }
