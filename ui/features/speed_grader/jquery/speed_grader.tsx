@@ -269,7 +269,7 @@ let isAdmin: boolean
 let showSubmissionOverride: (submission: Submission) => void
 let externalToolLaunchOptions = {singleLtiLaunch: false}
 let externalToolLoaded = false
-let provisionalGraderDisplayNames: Record<string, string>
+let provisionalGraderDisplayNames: Record<string, string | null>
 let EG: SpeedGrader
 
 const customProvisionalGraderLabel = I18n.t('Custom')
@@ -1399,9 +1399,7 @@ EG = {
 
       if (ENV.student_group_reason_for_change != null) {
         SpeedGraderAlerts.showStudentGroupChangeAlert({
-          // @ts-expect-error
           selectedStudentGroup: ENV.selected_student_group,
-          // @ts-expect-error
           reasonForChange: ENV.student_group_reason_for_change,
         })
       }
@@ -1654,18 +1652,15 @@ EG = {
 
     // choose the first ungraded student if the requested one doesn't exist
     if (!window.jsonData.studentMap[String(representativeOrStudentId)]) {
-      const ungradedStudent = find(
-        window.jsonData.studentsWithSubmissions,
+      const ungradedStudent = window.jsonData.studentsWithSubmissions.find(
         (s: StudentWithSubmission) =>
           s.submission &&
           s.submission.workflow_state !== 'graded' &&
           s.submission.submission_type &&
           (!isModerated || s.submission.grade == null)
       )
-      // @ts-expect-error
-      representativeOrStudentId = (ungradedStudent || window.jsonData.studentsWithSubmissions[0])[
-        anonymizableId
-      ]
+      const student = ungradedStudent || window.jsonData.studentsWithSubmissions[0]
+      representativeOrStudentId = student[anonymizableId]
     }
 
     return representativeOrStudentId?.toString()
@@ -2075,7 +2070,10 @@ EG = {
       $turnitinInfoContainer_.append($turnitinInfo)
 
       if (showLegacyResubmit) {
-        const resubmitUrl = SpeedgraderHelpers.plagiarismResubmitUrl(submission, anonymizableUserId)
+        const resubmitUrl = SpeedgraderHelpers.plagiarismResubmitUrl(
+          submission as HistoricalSubmission,
+          anonymizableUserId
+        )
         $('.turnitin_resubmit_button').on('click', e => {
           SpeedgraderHelpers.plagiarismResubmitHandler(e, resubmitUrl)
         })
@@ -2231,8 +2229,8 @@ EG = {
     const $submission_to_view = $('#submission_to_view')
     const submissionToViewVal = $submission_to_view.val()
     const currentSelectedIndex = currentIndex(this, submissionToViewVal)
-    const submissionHolder = this.currentStudent && this.currentStudent.submission
-    const submissionHistory = submissionHolder && submissionHolder.submission_history
+    const submissionHolder = this.currentStudent?.submission
+    const submissionHistory = submissionHolder?.submission_history
     const isMostRecent = submissionHistory && submissionHistory.length - 1 === currentSelectedIndex
     const inlineableAttachments: Attachment[] = []
     const browserableAttachments: Attachment[] = []
@@ -2424,9 +2422,8 @@ EG = {
     $submission_attachment_viewed_at.html(studentViewedAtHTML)
 
     $submission_files_container.showIf(
-      // @ts-expect-error
       submission.submission_type === 'online_text_entry' ||
-        (submission.versioned_attachments && submission.versioned_attachments.length)
+        Boolean(submission.versioned_attachments && submission.versioned_attachments.length > 0)
     )
 
     let preview_attachment: null | Attachment = null
@@ -2466,8 +2463,13 @@ EG = {
     )
     $enrollment_concluded_notice.showIf(isConcluded)
 
-    // @ts-expect-error
-    const gradingPeriod = window.jsonData.gradingPeriods[(submissionHolder || {}).grading_period_id]
+    // because we make .submission absent in some tests
+    const gradingPeriodId = (submissionHolder || {}).grading_period_id
+    const gradingPeriod =
+      // needs confirmation, but the API may only return a string type now
+      typeof gradingPeriodId === 'string' || typeof gradingPeriodId === 'number'
+        ? window.jsonData.gradingPeriods[gradingPeriodId]
+        : undefined
     const isClosedForSubmission = !!gradingPeriod && gradingPeriod.is_closed
     selectors.get('#closed_gp_notice').showIf(isClosedForSubmission)
     SpeedgraderHelpers.setRightBarDisabled(isConcluded)
@@ -2923,7 +2925,7 @@ EG = {
       ENV.RUBRIC_ASSESSMENT.assessment_user_id = this.currentStudent[anonymizableId]
 
       const isModerator = ENV.grading_role === 'moderator'
-      const selectMenuOptions: {id: string; name: string}[] = []
+      const selectMenuOptions: {id: string; name: string | null}[] = []
 
       const assessmentsByMe = EG.currentStudent.rubric_assessments.filter(assessment =>
         assessmentBelongsToCurrentUser(assessment)
@@ -3149,8 +3151,7 @@ EG = {
     }
     // anonymous commentors
     if (comment.author_name == null) {
-      // @ts-expect-error
-      const {provisional_grade_id} = EG.currentStudent.submission.provisional_grades.find(
+      const {provisional_grade_id} = (EG.currentStudent.submission.provisional_grades || []).find(
         (pg: ProvisionalGrade) => pg.anonymous_grader_id === comment.anonymous_id
       ) as ProvisionalGrade
       if (
@@ -3207,10 +3208,11 @@ EG = {
 
   currentDisplayedSubmission(): HistoricalSubmission {
     const displayedHistory =
-      this.currentStudent.submission?.submission_history?.[
-        // @ts-expect-error
-        this.currentStudent.submission.currentSelectedIndex
-      ]
+      typeof this.currentStudent.submission?.currentSelectedIndex === 'number'
+        ? this.currentStudent.submission?.submission_history?.[
+            this.currentStudent.submission.currentSelectedIndex
+          ]
+        : undefined
     return displayedHistory?.submission || this.currentStudent.submission
   },
 
@@ -3952,7 +3954,6 @@ EG = {
         const displayName = grade.anonymous_grader_id
           ? ENV.anonymous_identities[grade.anonymous_grader_id].name
           : grade.scorer_name
-        // @ts-expect-error
         provisionalGraderDisplayNames[grade.provisional_grade_id] = displayName
       }
     })
@@ -3996,7 +3997,7 @@ EG = {
   },
 
   setActiveProvisionalGradeFields({label = '', grade = null} = {}) {
-    $grading_box_selected_grader.text(label)
+    $grading_box_selected_grader.text(label || '')
 
     const submission: Submission = EG.currentStudent.submission || {}
     if (grade !== null) {

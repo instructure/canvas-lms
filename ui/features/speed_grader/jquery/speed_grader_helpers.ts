@@ -24,7 +24,7 @@ import '@canvas/datetime/jquery'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 import replaceTags from '@canvas/util/replaceTags'
 import type {
-  // HistoricalSubmission,
+  HistoricalSubmission,
   StudentWithSubmission,
   Submission,
   SubmissionState,
@@ -94,7 +94,7 @@ const speedGraderHelpers = {
     return String(grade.val())
   },
 
-  iframePreviewVersion(submission: any) {
+  iframePreviewVersion(submission: Submission) {
     // check if the submission object is valid
     if (submission == null) {
       return ''
@@ -113,7 +113,7 @@ const speedGraderHelpers = {
     return select + version
   },
 
-  resourceLinkLookupUuidParam(submission: any) {
+  resourceLinkLookupUuidParam(submission: HistoricalSubmission) {
     const resourceLinkLookupUuid = submission.resource_link_lookup_uuid
 
     if (resourceLinkLookupUuid) {
@@ -219,7 +219,10 @@ const speedGraderHelpers = {
     })
   },
 
-  plagiarismResubmitUrl(submission: any, anonymizableUserId: string) {
+  plagiarismResubmitUrl(
+    submission: HistoricalSubmission,
+    anonymizableUserId: 'anonymous_id' | 'user_id'
+  ) {
     return replaceTags($('#assignment_submission_resubmit_to_turnitin_url').attr('href') || '', {
       [anonymizableUserId]: submission[anonymizableUserId],
     })

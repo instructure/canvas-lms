@@ -30,7 +30,6 @@ import type {RubricAssessment} from '@canvas/grading/grading.d'
 import type {
   Enrollment,
   GradingError,
-  HistoricalSubmission,
   SpeedGrader,
   Submission,
   StudentWithSubmission,

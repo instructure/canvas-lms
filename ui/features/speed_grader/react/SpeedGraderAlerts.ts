@@ -22,9 +22,17 @@ import '@canvas/rails-flash-notifications'
 
 const I18n = useI18nScope('speed_grader')
 
-function showStudentGroupChangeAlert({selectedStudentGroup = null, reasonForChange = null} = {}) {
+function showStudentGroupChangeAlert({
+  selectedStudentGroup = null,
+  reasonForChange = null,
+}: {
+  selectedStudentGroup?: null | {
+    name: string
+  }
+  reasonForChange?: null | string
+} = {}) {
   const groupName = selectedStudentGroup?.name
-  let groupText
+  let groupText: string | null = null
   if (reasonForChange === 'student_not_in_selected_group') {
     groupText = I18n.t(
       `The group "%{groupName}" was selected because the student you requested is not in the previously-selected group. You can change the selected group in the Gradebook.`,
@@ -46,7 +54,7 @@ function showStudentGroupChangeAlert({selectedStudentGroup = null, reasonForChan
     )
   }
 
-  if (groupText != null) {
+  if (groupText) {
     $.flashMessage(groupText, 10000)
   }
 }
