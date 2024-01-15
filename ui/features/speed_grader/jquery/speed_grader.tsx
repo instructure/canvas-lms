@@ -38,7 +38,6 @@ import type {
   RubricAssessment,
   SubmissionOriginalityData,
 } from '@canvas/grading/grading.d'
-import {SpeedGraderResponse} from '../types'
 import type {SpeedGraderResponseType, SpeedGraderStore} from '../types'
 import React from 'react'
 import ReactDOM from 'react-dom'
@@ -4130,10 +4129,6 @@ function setupSpeedGrader(
   gradingPeriods: GradingPeriod[],
   speedGraderJsonResponse: SpeedGraderResponseType[]
 ) {
-  if (process.env.NODE_ENV !== 'production') {
-    SpeedGraderResponse.parse(speedGraderJsonResponse[0])
-  }
-
   const speedGraderJSON = speedGraderJsonResponse[0] as SpeedGraderStore
 
   speedGraderJSON.gradingPeriods = keyBy(gradingPeriods, 'id')
