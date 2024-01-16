@@ -1330,6 +1330,36 @@ describe "Modules API", type: :request do
                {},
                { expected_status: 401 })
     end
+
+    context "with the differentiated_modules flag enabled" do
+      before :once do
+        Account.site_admin.enable_feature!(:differentiated_modules)
+        @module2.assignment_overrides.create!
+      end
+
+      it "does not include unassigned modules in the index" do
+        json = api_call(:get,
+                        "/api/v1/courses/#{@course.id}/modules",
+                        controller: "context_modules_api",
+                        action: "index",
+                        format: "json",
+                        course_id: @course.id.to_s)
+        expect(json.pluck("id")).to contain_exactly(@module1.id)
+      end
+
+      it "returns 404 for unassigned modules in show" do
+        api_call(:get,
+                 "/api/v1/courses/#{@course.id}/modules/#{@module2.id}",
+                 { controller: "context_modules_api",
+                   action: "show",
+                   format: "json",
+                   course_id: @course.id.to_s,
+                   id: @module2.id.to_s },
+                 {},
+                 {},
+                 { expected_status: 404 })
+      end
+    end
   end
 
   context "differentiated assignments" do
