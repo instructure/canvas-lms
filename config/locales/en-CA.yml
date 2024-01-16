@@ -2,6 +2,31 @@
 # Do not edit it by hand, your changes will be overwritten.
 --- 
 en-CA: 
+  ? ""
+  : 
+    atom_no_author: "No Author"
+    comment_from_files: 
+      one: "See attached file"
+      other: "See attached files"
+    errors: 
+      cannot_save_att: "You don't have permission to edit the locked attribute %{att_name}"
+    feed_entry_title: "Assignment: %{assignment}"
+    feed_entry_title_with_course: "Assignment, %{course}: %{assignment}"
+    labels: 
+      due: Due
+    student_annotation: "a student annotation"
+    submission_action_take_quiz: "Take %{title}"
+    submission_action_turn_in_assignment: "Turn in %{title}"
+    submission_types: 
+      a_content_page: "a content page"
+      a_discussion_post: "a discussion post"
+      a_file_upload: "a file upload"
+      a_media_recording: "a media recording"
+      a_quiz: "a quiz"
+      a_text_entry_box: "a text entry box"
+      a_website_url: "a website url"
+      external_tool: "an external tool"
+      on_paper: "on paper"
   1_hour_and_count_minutes_27533c1b: 
     one: "1 hour and 1 minute"
     other: "1 hour and %{count} minutes"
@@ -1586,17 +1611,7 @@ en-CA:
           Specify a set of IP address filters that teachers can use to protect access to quizzes.  Filters can be a comma-separated list of addresses, or an address followed by a mask ("192.168.217.1/24" or "192.168.217.1/255.255.255.0")."
       quiz_ip_filters_help_title: "What are Quiz IP Filters?"
       quiz_ip_filters_help_tooltip: "What are Quiz IP Filters?"
-      quotas: 
-        ? "          \n\
-            \x20         megabytes_tooltip"
-        : megabytes
-        default_account_quota_title: "Default Account Quotas"
-        default_course_storage_quota: "Course Quota"
-        default_group_storage_quota: "Group Quota"
-        default_user_storage_quota: "User Quota"
-        megabytes: megabytes
-        megabytes_tooltip: megabytes
-        update_button: Update
+      quotas: megabytes
       report_last_run_never: Never
       report_running: "The report is running.*You'll receive an email when it is done.*"
       rqd_help_message: "When selected, this setting will limit the view of new courses' quantitative (numeric) grading data. Students and observers will only see qualitative data, which includes letter grades and comments."
@@ -2225,6 +2240,7 @@ en-CA:
   add_students_to_the_course_874be8fb: "Add Students to the Course"
   add_sub_account_to_account_name_b104db90: "Add Sub-Account to %{account_name}"
   add_submission_type_8690db4b: "Add submission type"
+  add_substitution_9c2ce8f9: "Add substitution"
   add_subtitle_9f660cc: "Add Subtitle"
   add_tas_to_courses_27741f81: "Add TAs to courses"
   add_tas_to_the_course_2aac6e02: "Add TAs to the Course"
@@ -2482,6 +2498,7 @@ en-CA:
   all_timezones_5e8afa7b: "All Timezones"
   all_types_allowed_287eb6b0: "All Types Allowed"
   all_ungraded_artifacts_ec3ba09: "All ungraded artifacts"
+  all_user_data_5d97832: "All user data"
   all_users_associated_with_this_course_6be8d492: "All users associated with this course"
   all_users_associated_with_this_institution_d29850be: "All users associated with this institution"
   all_version_history_fbf060a0: "All Version History"
@@ -2530,6 +2547,9 @@ en-CA:
   allow_moderator_to_review_multiple_independent_gra_c59d64f6: "Allow moderator to review multiple independent grades for selected submissions"
   allow_multiple_attempts_e67a0a37: "Allow Multiple Attempts"
   allow_multiple_file_ags_submissions_to_count_as_on_6e24aa34: "Allow multiple file AGS submissions to count as only one submission"
+  allow_observers_to_schedule_appointments_in_the_ca_7f4d0052: "Allow observers to schedule appointments in the calendar"
+  allow_observers_to_sign_up_9afddf76: "Allow observers to sign-up"
+  allow_observers_to_sign_up_for_appointments_when_e_54f1d9d6: "Allow observers to sign-up for appointments when enabled by the teacher"
   allow_opt_out_of_inbox: "Allow users to opt out of the Conversation's Inbox. This will cause all conversation messages and notifications to be sent as ASAP notifications to the user's primary email, hide the Conversation's Inbox unread messages badge on the Inbox, and hide the Conversation's notification preferences."
   allow_outcome_extra_credit_57c1e84e: "Allow Outcome Extra Credit"
   allow_pages_to_be_deleted_in_bulk_199d3d3b: "Allow pages to be deleted in bulk"
@@ -3456,6 +3476,7 @@ en-CA:
   an_sftp_user_can_only_be_managed_from_a_root_accou_57d9d8e6: "An SFTP User can only be managed from a root account."
   an_unexpected_error_has_occurred_bc608420: "An unexpected error has occurred"
   an_unexpected_error_has_occurred_see_error_report__f20b878d: "An unexpected error has occurred: see error report %{id}"
+  an_unexpected_error_occurred_please_try_again_late_c58da3e4: "An unexpected error occurred, please try again later"
   an_unknown_error_has_occurred_verify_the_csv_file__96087ece: "An unknown error has occurred. Verify the CSV file or try again later."
   an_unknown_error_occurred_d77b1cdb: "An unknown error occurred"
   an_unknown_error_occurred_please_reach_out_in_canv_43a4da74: |-
@@ -3820,6 +3841,7 @@ en-CA:
   are_you_sure_you_want_to_remove_this_item_7887ce31: "Are you sure you want to remove this item?"
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "Are you sure you want to remove this tool?"
   are_you_sure_you_want_to_remove_this_user_8d1a8295: "Are you sure you want to remove this user?"
+  are_you_sure_you_want_to_remove_this_user_from_all_85fb8eb4: "Are you sure you want to remove this user from ALL accounts? The user will not only be deleted, but will be marked for PERMANENT deletion."
   are_you_sure_you_want_to_remove_this_user_s_profil_6d703c4: "Are you sure you want to remove this user's profile picture?"
   are_you_sure_you_want_to_report_this_profile_pictu_e22c2210: "Are you sure you want to report this profile picture?"
   are_you_sure_you_want_to_restore_this_revision_2f3aaabe: "Are you sure you want to restore this revision?"
@@ -3886,6 +3908,7 @@ en-CA:
   assign_temporary_enrollments_bdaaa58a: "Assign temporary enrollments"
   assign_temporary_enrollments_to_name_e8b43c5c: "Assign temporary enrollments to %{name}"
   assign_temporary_enrollments_to_recipient_b25cb6be: "Assign temporary enrollments to %{recipient}"
+  assign_this_assignment_ac3ca379: "Assign this Assignment"
   assign_this_module_a4685e57: "Assign this module"
   assign_to_6b806cd9: "Assign to:"
   assign_to_95404a83: "Assign To"
@@ -5033,6 +5056,7 @@ en-CA:
   before_you_can_edit_your_profile_you_need_to_verif_4fd9143e: "Before you can edit your profile, you need to verify your email address (%{email}) by clicking the link in the email we sent you. If you don't see it, *click to re-send the email*, and make sure to check your spam box."
   begin_typing_to_search_7daa7b1: "Begin typing to search"
   beginning_date_2d2a29ac: "Beginning date"
+  beginning_date_4ce53896: "Beginning date:"
   beginning_of_your_to_do_history_61ef2dce: "Beginning of Your To-Do History"
   begins_on_f4dae008: "Begins On"
   behaviour_change_related_to_the_bugfix_in_apg_122__63cfa767: "Behaviour change related to the bugfix in APG-122. Do not allow custom columns to be created that are titled the same as gradebook importer reserved names, also ignore non-active custom columns on gradebook import as well as those that use reserved names."
@@ -5832,6 +5856,7 @@ en-CA:
   cancel_updating_comment_6816d855: "Cancel Updating Comment"
   canceling_this_attempt_will_permanently_delete_any_21ce850c: "Canceling this attempt will permanently delete any work performed in this attempt. Do you wish to proceed and delete your work?"
   cannot_access_group_in_concluded_course_90a8db52: "Cannot access group in concluded course"
+  cannot_add_a_temporary_enrollment_to_a_concluded_c_459a44fa: "Cannot add a temporary enrollment to a concluded course"
   cannot_add_role_name_name_already_in_use_a523639c: "Cannot add role name %{name}: already in use"
   cannot_add_section_to_a_non_section_specific_discu_d2a7f263: "Cannot add section to a non-section-specific discussion"
   cannot_autograde_at_this_time_a146ad9d: "Cannot autograde at this time"
@@ -5845,6 +5870,7 @@ en-CA:
   cannot_be_nil_when_course_id_is_nil_f539388: "cannot be nil when course_id is nil"
   cannot_be_present_when_account_id_is_present_f7d9b51f: "cannot be present when account_id is present"
   cannot_be_present_when_course_id_is_present_785e6a59: "cannot be present when course_id is present"
+  cannot_be_true_for_sub_assignments_66a9ba5f: "cannot be true for sub assignments"
   cannot_change_an_override_due_date_to_a_date_withi_8b1be496: "Cannot change an override due date to a date within a closed grading period"
   cannot_change_locked_status_on_granular_permission_6f13bf4f: "Cannot change locked status on granular permission"
   cannot_change_role_name_to_label_already_in_use_c8126e4e: "Cannot change role name to %{label}: already in use"
@@ -5852,6 +5878,7 @@ en-CA:
   cannot_change_the_due_date_of_an_override_in_a_clo_4b3a4dcd: "Cannot change the due date of an override in a closed grading period"
   cannot_change_the_due_date_to_a_date_within_a_clos_61eb0951: "Cannot change the due date to a date within a closed grading period"
   cannot_change_the_due_date_when_due_in_a_closed_gr_965b99cb: "Cannot change the due date when due in a closed grading period"
+  cannot_create_a_temporary_enrollment_with_an_inact_c471bfbe: "Cannot create a temporary enrollment with an inactive role"
   cannot_create_an_appointment_group_for_a_concluded_f4da02e3: "cannot create an appointment group for a concluded course"
   cannot_create_event_for_deleted_course_c800f310: "cannot create event for deleted course"
   cannot_create_or_change_reservation_for_past_appoi_45870c16: "Cannot create or change reservation for past appointment"
@@ -5993,6 +6020,7 @@ en-CA:
   canvas_user_id_4c18b78a: canvas_user_id
   canvas_will_enroll_recipient_as_a_role_in_source_s_33514fc6: "Canvas will enroll %{recipient} as a %{role} in %{source}'s selected courses from %{start} - %{end}"
   canvas_will_enroll_recipient_as_a_role_in_source_s_7fe7d625: "Canvas will enroll %{recipient} as a %{role} in %{source}’s selected courses from %{start} - %{end}"
+  canvas_will_enroll_recipient_as_a_role_in_the_sele_5ef30bec: "Canvas will enroll %{recipient} as a %{role} in the selected courses of %{source} from %{start} - %{end}"
   canvas_will_remove_keys_with_null_values_from_live_6d7e3091: "Canvas will remove keys with null values from live event payloads if this feature is enabled."
   cap_the_number_of_rces_rendered_on_initial_page_lo_c3890aec: |-
       Cap the number of RCEs rendered on initial page load. After that
@@ -6071,6 +6099,7 @@ en-CA:
   change_rubrics_visibility_on_accounts_to_depend_on_967b4caa: "Change Rubrics visibility on Accounts to depend on the Rubrics permission instead of the Learning Outcomes permission"
   change_section_to_sectionname_6e947e90: "Change section to %{sectionName}"
   change_sis_ids_3a47154d: "Change SIS IDs"
+  change_to_b757d327: "change to"
   change_visibility_of_account_calendars_fd03fbb8: "Change visibility of account calendars"
   changed_by_person_c39615e: "Changed by: %{person}"
   changed_item_1d16a85f: "Changed Item"
@@ -9300,6 +9329,7 @@ en-CA:
       - December
   date_4e62ac59: date
   date_61419973: "Date:"
+  date_adjustments_331bb009: "Date adjustments"
   date_at_time_25a04cd2: "%{date} at %{time}"
   date_created_87e265bc: "Date Created"
   date_created_b93b76fb: ", date created: "
@@ -10763,6 +10793,7 @@ en-CA:
   end_time_must_be_after_start_time_84398c82: "end_time must be after start_time"
   end_tutorial_7fb16b6f: "End Tutorial"
   end_user_license_agreement_6d2c666b: "End-User License Agreement."
+  ending_date_b9359e06: "Ending date:"
   ending_date_e1ea13a4: "Ending date"
   ends_4fcb632: "Ends:"
   ends_at_9a62b528: "Ends at"
@@ -11293,6 +11324,7 @@ en-CA:
   error_updating_discussion_topic_d47c64ff: "Error updating discussion topic"
   error_updating_file_usage_rights_f9216019: "Error updating file usage rights"
   error_updating_module_access_f0970f4c: "Error updating module access."
+  error_updating_moduleitemname_96819b43: "Error updating \"%{moduleItemName}\""
   error_updating_modulename_settings_da982acf: "Error updating %{moduleName} settings."
   error_updating_notes_31b24785: "Error updating notes"
   error_updating_pacename_ad07f9df: "Error updating %{paceName}"
@@ -11656,6 +11688,9 @@ en-CA:
   failed_to_create_domain_lookup_4d40fa17: "Failed to create domain lookup"
   failed_to_create_internal_setting_f60fb462: "Failed to create internal setting"
   failed_to_create_new_role_e336e461: "Failed to create new role"
+  failed_to_create_temporary_enrollment_pairing_617dd0c3: "Failed to create temporary enrollment pairing"
+  failed_to_create_temporary_enrollment_pairing_due__a2bf61a: "Failed to create temporary enrollment pairing due to an unknown error"
+  failed_to_create_temporary_enrollment_please_try_a_4d765613: "Failed to create temporary enrollment, please try again later"
   failed_to_create_temporary_enrollment_please_try_a_ad6fefb0: "Failed to create temporary enrollment, please try again"
   failed_to_create_webhook_b766cf5c: "Failed to create webhook."
   failed_to_delete_auth_tokens_on_canvas_side_1d871f46: "Failed to delete auth tokens on Canvas side"
@@ -11667,6 +11702,8 @@ en-CA:
   failed_to_delete_name_4abd2ed5: "Failed to delete %{name}."
   failed_to_delete_role_label_27959de3: "Failed to delete role %{label}"
   failed_to_delete_selected_pages_26fa87db: "Failed to delete selected pages"
+  failed_to_delete_temporary_enrollment_a448a32a: "Failed to delete temporary enrollment"
+  failed_to_delete_temporary_enrollment_due_to_an_un_45295b0f: "Failed to delete temporary enrollment due to an unknown error"
   failed_to_delete_to_do_64edff49: "Failed to delete to do"
   failed_to_export_blueprint_course_settings_1ced8c6: "Failed to export blueprint course settings"
   failed_to_export_context_info_acb07497: "Failed to export context info"
@@ -11677,6 +11714,8 @@ en-CA:
   failed_to_fetch_migration_issues_data_a896da98: "Failed to fetch migration issues data."
   failed_to_fetch_temporary_enrollment_data_9422003: "Failed to fetch temporary enrollment data"
   failed_to_get_new_activity_17e7ec7c: "Failed to get new activity"
+  failed_to_get_temporary_enrollments_for_provider_617a73ea: "Failed to get temporary enrollments for provider"
+  failed_to_get_temporary_enrollments_for_recipient_1baf62d3: "Failed to get temporary enrollments for recipient"
   failed_to_ignore_assignment_46565fa3: "Failed to ignore assignment"
   failed_to_import_media_objects_4c1fcb4f: "Failed to import media objects"
   failed_to_import_some_lti_resource_links_ab124c3f: "Failed to import some LTI resource links"
@@ -12083,11 +12122,15 @@ en-CA:
   forgot_password_url_3f9c04b: "Forgot Password URL"
   form_background_fb654518: "Form Background"
   form_border_f61f12dc: "Form Border"
+  formattedgrade_c0747a09: "*%{formattedGrade}*"
   formattedgrade_points_576abfea: "%{formattedGrade} *Points*"
   formattedgrade_points_90505a61: "%{formattedGrade} Points"
   formattedpoints_points_c75261e2: 
     one: "1 point"
     other: "%{formattedPoints} points"
+  formattedpoints_points_possible_1d93043f: 
+    one: "*1* Point Possible"
+    other: "*%{formattedPoints}* Points Possible"
   formattedpoints_points_possible_dad9d40a: 
     one: "1 point possible"
     other: "%{formattedPoints} points possible"
@@ -12557,6 +12600,7 @@ en-CA:
         out_of: "Out of"
         score: Score
         submission_progress_status: "Submission Progress Status"
+        submitted: Submitted
       labels: 
         final_grade_hidden: "Calculation of totals has been disabled"
         high: High
@@ -13265,6 +13309,7 @@ en-CA:
   have_a_question_about_canvas_ask_it_here_5781cce: "Have a question about Canvas? Ask it here."
   have_not_been_graded_df2a5fd2: "Have not been graded"
   have_not_yet_submitted_57e6a58b: "Have not yet submitted"
+  have_students_sign_up_in_groups_d6cfd4d2: "Have students sign up in groups"
   haven_t_been_graded_d7dee5bb: "Haven't been graded"
   haven_t_submitted_yet_e63834db: "Haven't submitted yet"
   he_him_99aea1a8: He/Him
@@ -15253,6 +15298,7 @@ en-CA:
   log_in_c9e240ef: "Log in"
   log_in_to_submit_962106cf: "Log in to submit"
   log_in_url_is_not_a_valid_uri_7b8c57ee: "Log in URL is not a valid URI"
+  log_lti_launches_ff06c5fe: "Log LTI launches"
   log_on_url_fc166e4c: "Log On URL"
   log_out_379ba28a: "Log Out"
   log_out_url_2605c2c1: "Log Out URL"
@@ -15524,6 +15570,8 @@ en-CA:
   manage_students_for_the_course_3b1bc4f0: "Manage students for the course"
   manage_subject_coursecontext_2328e1ff: "Manage Subject: %{courseContext}"
   manage_subject_f9835769: "Manage Subject"
+  manage_temporary_enrollment_providers_for_name_eb2a6f43: "Manage Temporary Enrollment Providers for %{name}"
+  manage_temporary_enrollment_recipients_for_name_61dd34d4: "Manage Temporary Enrollment Recipients for %{name}"
   manage_temporary_enrollments_4c4f21ef: "Manage Temporary Enrollments"
   manage_update_23de23a1: "Manage Update"
   manage_update_for_toolname_f8e3b2fb: "Manage update for %{toolName}"
@@ -17678,6 +17726,7 @@ en-CA:
   module_publish_menu_30b638dd: "Module Publish Menu"
   module_publish_menu_88b54c1b: "Module publish menu"
   module_published_80f0b9b8: "Module published"
+  moduleitemname_updated_7c7d495c: "%{moduleItemName} updated"
   modulename_created_successfully_6c273e09: "%{moduleName} created successfully."
   modulename_module_publish_options_69ef1ece: "%{moduleName} Module publish options"
   modulename_module_publish_options_publishedstatus_94ea7f49: "%{moduleName} module publish options, %{publishedStatus}"
@@ -17803,6 +17852,7 @@ en-CA:
   move_to_1c208ae5: "Move To..."
   move_to_25d7ef11: "Move To"
   move_to_9b91c6e0: "Move To…"
+  move_to_b7dddc4f: "Move to:"
   move_to_bottom_d0f71bf0: "Move to bottom"
   move_to_dde1a5e1: "Move to..."
   move_to_end_c6bfbcf5: "Move to End"
@@ -18308,6 +18358,7 @@ en-CA:
   nonce_77113ba4: Nonce
   none_3b5e34d2: None
   none_9b6c9bec: none
+  none_anonymized_e1ff7c45: "None (Anonymized)"
   northeast_community_college_course_syllabus_report_8124f969: "Northeast Community College Course Syllabus Report"
   norway_47_bc598662: "Norway (+47)"
   norwegian_53f391ec: Norwegian
@@ -22309,6 +22360,7 @@ en-CA:
   remove_contact_method_ca890ba3: "Remove contact method"
   remove_course_association_name_b760c502: "Remove course association %{name}"
   remove_d83a966c: "Remove:"
+  remove_dates_5a5a8df2: "Remove dates"
   remove_dates_9b9ba2f6: "Remove Dates"
   remove_delay_for_gradebook_student_search_307b4ecf: "Remove Delay for Gradebook Student Search"
   remove_designers_from_courses_42332a57: "Remove Designers from courses"
@@ -22326,6 +22378,7 @@ en-CA:
   remove_filename_dab5c02e: "Remove %{filename}"
   remove_filter_6f7204e2: "Remove filter"
   remove_filtername_filter_6b6d7063: "Remove %{filterName} Filter"
+  remove_from_to_to_from_substitutes_4a6dc71d: "Remove '%{from}' to '%{to}' from substitutes"
   remove_grading_scheme_title_d3942a08: "Remove Grading Scheme %{title}"
   remove_group_5d2f2f2d: "Remove Group"
   remove_group_981d6a02: "Remove Group?"
@@ -22614,6 +22667,7 @@ en-CA:
   revert_to_actual_score_f665eea9: "Revert to Actual Score"
   revert_to_old_ui_3211da41: "Revert to old UI"
   reverts_the_visible_assignments_scope_to_its_origi_87eb35d: "Reverts the visible assignments scope to its original form"
+  review_7197fba3: "Review "
   review_feedback_4b4abb38: "Review Feedback"
   review_now_318a6a3e: "Review Now"
   reviewer_b993ce28: " Reviewer"
@@ -23324,6 +23378,7 @@ en-CA:
   see_vericite_results_b44dd8c8: "See VeriCite results"
   select_1e849959: "[ Select ]"
   select_a_course_4710371f: "Select a Course"
+  select_a_date_optional_d60168d0: "Select a date (optional)"
   select_a_grading_period_5ea50f1: "Select a Grading Period..."
   select_a_grading_period_aab25483: "Select a Grading Period"
   select_a_group_category_295f7a34: "Select a group category"
@@ -23414,9 +23469,13 @@ en-CA:
   select_module_to_move_item_into_89fb2ac7: "Select module to move item into"
   select_name_to_mention_15d9674e: "Select %{name} to mention"
   select_navigation_links_68e1e924: "Select Navigation Links"
+  select_new_beginning_date_bb3c9650: "Select new beginning date"
+  select_new_end_date_f10caeca: "Select new end date"
   select_one_8e0af564: "Select One"
   select_one_b647b384: "Select one"
   select_one_of_the_options_c8b0c6e4: "Select one of the options:"
+  select_original_beginning_date_31a23f92: "Select original beginning date"
+  select_original_end_date_dc11de7d: "Select original end date"
   select_outcome_7e6e2562: "Select outcome"
   select_outcome_title_b99b3ca0: "Select outcome %{title}"
   select_page_e93fc123: "Select page"
@@ -24313,6 +24372,7 @@ en-CA:
   sharing_a_qr_code_can_give_others_immediate_access_79575158: "Sharing a QR code can give others immediate access to your account through the %{canvas} mobile applications."
   she_her_3f459cc2: She/Her
   she_her_c8b5e3be: she/her
+  shift_dates_746698a5: "Shift dates"
   shift_dates_b5a7b7a1: "Shift Dates"
   shift_due_dates_and_assignment_availability_dates__c5ad272: "Shift due dates and assignment availability dates forward by a number of days."
   shipping_country_code_as_reported_by_salesforce_631961fe: "Shipping Country Code as Reported by Salesforce"
@@ -25354,6 +25414,7 @@ en-CA:
   subscribe_failed_2eb62de0: "Subscribe failed"
   subscribe_to_title_c7d6bbd2: "Subscribe to %{title}"
   subscribed_fe74d22a: Subscribed
+  substitution_713c65b9: Substitution
   subtitle_ee60ca78: Subtitle
   subtitles_could_not_be_imported_from_file_5de6da0b: "Subtitles could not be imported from %{file}"
   subtitles_lang_could_not_be_imported_for_file_4d1be2e3: "Subtitles (%{lang}) could not be imported for %{file}"
@@ -25582,6 +25643,7 @@ en-CA:
   temporarily_enroll_a_user_into_a_course_this_tempo_990488f8: "Temporarily enroll a user into a course. This temporary enrollment is paired up with another enrollment within the course."
   temporarily_enroll_name_8acb66ce: "Temporarily enroll %{name}"
   temporary_9c54e959: "Temporary:"
+  temporary_enrollment_enrollmenttype_for_username_a5410ed7: "Temporary Enrollment %{enrollmentType} for %{userName}"
   temporary_enrollment_option_links_eb9b8b2e: "Temporary enrollment option links"
   temporary_enrollment_pairings_56f35f5c: "Temporary Enrollment Pairings"
   temporary_enrollment_was_successfully_created_78b48a7a: "Temporary enrollment was successfully created."
@@ -26025,6 +26087,7 @@ en-CA:
   the_specified_assignment_id_could_not_be_found_e4e64f5f: "The specified assignment (%{id}) could not be found"
   the_specified_label_already_exists_please_enter_a__7f2b7598: "The specified label already exists. Please enter a different label name."
   the_specified_resource_does_not_exist_71d8b751: "The specified resource does not exist."
+  the_specified_type_must_match_the_base_type_for_th_eea5ab7d: "The specified type must match the base type for the role"
   the_specified_user_id_is_not_a_student_in_this_cou_372573ca: "The specified user (%{id}) is not a student in this course"
   the_specified_user_is_not_a_student_in_this_course_5a81d8a5: "The specified user is not a student in this course"
   the_start_date_for_the_pace_plan_must_be_after_the_44e8ed5b: "The start date for the pace plan must be after the end date."
@@ -27544,6 +27607,7 @@ en-CA:
   tool_content_2924d18f: "Tool content"
   tool_content_e699e813: "Tool Content"
   tool_created_at_82c0daba: "Tool Created At"
+  tool_id_94b91929: "Tool ID"
   tool_id_afd739e1: "Tool Id"
   tool_name_7d58a6e4: "Tool Name"
   tool_not_found_f6366382: "Tool Not Found"
@@ -27552,6 +27616,7 @@ en-CA:
   tool_supports_deep_linking_at_this_placement_561e1874: "Tool supports Deep Linking at this placement"
   tool_toolname_found_for_client_id_clientid_would_y_13f35b91: "Tool \"%{toolName}\" found for client ID %{clientId}. Would you like to install it?"
   tool_type_afa58fcb: "Tool Type"
+  tool_type_tool_configured_tool_id_251c2959: "Tool Type (tool-configured \"tool_id\")"
   toolname_logo_6b639926: "%{toolName} Logo"
   tooltip_info_for_tenant_input_81a0eca8: "Tooltip info for tenant input"
   tooltip_that_contains_info_about_the_microsoft_tea_24d892cf: "Tooltip that contains info about the Microsoft Teams Sync Login Attribute."
@@ -28193,11 +28258,13 @@ en-CA:
   user_count_respondents_e30a8593: "%{user_count} respondents"
   user_course_access_log_f7b8a4bd: "User Course Access Log"
   user_data_export_from_date_6ba21b89: "*User Data Export from %{date}*"
+  user_data_shared_with_this_tool_545ca14f: "User data shared with this tool"
   user_date_range_search: 
     cant_come_before_from: "'To Date' can't come before 'From Date'"
   user_details_2613c079: "User Details"
   user_details_e9aef9e5: "User details"
   user_does_not_have_permission_to_select_final_grad_47560e75: "user does not have permission to select final grade"
+  user_fields_included_dd0fd52: "User fields included:"
   user_files_78e21703: "User Files"
   user_groups_query_error_bba6a6b7: "User groups query error"
   user_id_8256faeb: user_id
@@ -28354,6 +28421,8 @@ en-CA:
   user_profile_picture_46bffbc7: "User profile picture"
   user_removed_successfully_20a3889d: "User removed successfully"
   user_results_updated_9ce38dce: "User results updated."
+  user_s_email_only_401dbaba: "User's email only"
+  user_s_name_only_474c2ab4: "User's name only"
   user_s_settings_d65644b4: "%{user}'s Settings"
   user_search_panel_18f80511: "User search panel"
   user_search_results_3af96217: "User Search results"
@@ -28968,7 +29037,13 @@ en-CA:
       When enabled, Root accounts with a `:ready_for_new_quizzes_provision` key
       in their settings that have not been provisioned will be provisioned. This
       check and provision occurs on every shard around that shard region's midnight.
+  when_enabled_sends_data_for_all_lti_launches_to_th_2c76d174: |-
+      When enabled, sends data for all LTI launches to the PandataEvents system
+      for querying and visualization.
   when_enabled_site_admin_account_ui_will_allow_asso_9d04a1d8: "When enabled, site admin account UI will allow associating a service User with a DeveloperKey and using that key/user with the client_credentials grant type"
+  when_enabled_teachers_can_choose_to_allow_observer_320b555e: |-
+      When enabled, teachers can choose to allow observers to schedule appointments
+      when creating appointment groups in the calendar.
   when_enabled_the_hidden_html_forms_that_are_used_t_c5edd929: |-
       When enabled, the hidden HTML forms that are used to trigger an LTI launch
       will each have a random number appended to their id. When disabled, each
@@ -29496,8 +29571,10 @@ en-CA:
   you_must_attach_at_least_one_file_to_this_assignme_9f39ce12: "You must attach at least one file to this assignment"
   you_must_be_authorized_to_manage_sis_in_order_to_r_a218ceb7: "You must be authorized to manage SIS in order to reactivate logins with an associated SIS ID."
   you_must_be_authorized_to_manage_sis_in_order_to_s_bb867901: "You must be authorized to manage SIS in order to suspend logins with an associated SIS ID."
+  you_must_choose_a_content_option_c776bdef: "You must choose a content option"
   you_must_choose_a_recipient_3171112f: "You must choose a recipient"
   you_must_enter_a_date_f8eabfb1: "You must enter a date"
+  you_must_enter_a_name_for_the_new_question_bank_83ff5748: "You must enter a name for the new question bank"
   you_must_have_a_student_or_section_selected_a99e45df: "You must have a student or section selected"
   you_must_input_a_section_b8d370fe: "You must input a section"
   you_must_log_in_to_view_replies_9ccd4da0: "You must log in to view replies"
@@ -29512,6 +29589,7 @@ en-CA:
   you_must_provide_targetgroupid_or_targetcontextid__dd2bf92: "You must provide targetGroupId or targetContextId and targetContextType"
   you_must_publish_your_course_for_students_to_recei_1995ee46: "You must publish your course for students to receive announcement notifications. Notifications will not be sent retroactively from announcements created before publishing the course."
   you_must_select_a_course_to_copy_content_from_e7bd9e09: "You must select a course to copy content from"
+  you_must_select_a_file_to_import_content_from_28a242ff: "You must select a file to import content from"
   you_must_select_a_folder_to_upload_your_migration__ac7bc7c0: "You must select a folder to upload your migration to"
   you_must_select_an_assignment_group_c16a2168: "You must select an assignment group."
   you_must_select_at_least_one_calendar_to_create_an_29e6769c: "You must select at least one calendar to create an event."
