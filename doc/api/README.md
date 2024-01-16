@@ -13,10 +13,10 @@ API Changes
 
 For API resources, such as the API Change Log for additions, changes, deprecations, and removals, view the <a href="https://community.canvaslms.com/t5/Change-Log/tkb-p/changelog">Canvas API page</a> in the Canvas Community.
 
-API Terms of Service
+API Policy
 ------
 
-Please carefully review <a href="https://www.instructure.com/policies/api-policy">The Canvas Cloud API Terms of Service</a> before using the API.
+Please carefully review <a href="https://www.instructure.com/policies/api-policy">the Canvas API Policy</a> before using the API.
 
 Schema
 ------
