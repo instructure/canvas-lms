@@ -173,6 +173,7 @@ export async function createEnrollment(
   enrollmentUserId: string,
   userId: string,
   pairingId: string,
+  enrollmentLimitPrivilegesToSection: boolean,
   startDate: Date,
   endDate: Date,
   roleId: string
@@ -185,6 +186,7 @@ export async function createEnrollment(
           user_id: enrollmentUserId,
           temporary_enrollment_source_user_id: userId,
           temporary_enrollment_pairing_id: pairingId,
+          limit_privileges_to_course_section: enrollmentLimitPrivilegesToSection,
           start_at: startDate.toISOString(),
           end_at: endDate.toISOString(),
           role_id: roleId,

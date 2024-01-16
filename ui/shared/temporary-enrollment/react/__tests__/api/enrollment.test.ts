@@ -53,6 +53,7 @@ const mockEnrollment: Enrollment = {
   role_id: '5',
   user: mockSomeUser,
   enrollment_state: 'active',
+  limit_privileges_to_course_section: false,
   temporary_enrollment_pairing_id: 2,
   temporary_enrollment_source_user_id: 3,
   type: 'TeacherEnrollment',
@@ -327,11 +328,12 @@ describe('enrollment api', () => {
     })
 
     describe('createEnrollment', () => {
-      const mockParams: [string, string, string, string, Date, Date, string] = [
+      const mockParams: [string, string, string, string, boolean, Date, Date, string] = [
         '1',
         '1',
         '2',
         '1',
+        false,
         new Date('2022-01-01'),
         new Date('2022-06-01'),
         '1',
@@ -347,6 +349,7 @@ describe('enrollment api', () => {
               user_id: '1',
               temporary_enrollment_source_user_id: '2',
               temporary_enrollment_pairing_id: '1',
+              limit_privileges_to_course_section: false,
               start_at: '2022-01-01T00:00:00.000Z',
               end_at: '2022-06-01T00:00:00.000Z',
               role_id: '1',

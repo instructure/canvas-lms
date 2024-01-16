@@ -397,13 +397,34 @@ export function TempEnrollAssign(props: Props) {
     for (const role in tree) {
       for (const course of tree[role].children) {
         for (const section of course.children) {
-          // check if the section is selected, or if the course is selected and has only one section
           if (section.isCheck || (course.children.length === 1 && course.isCheck)) {
-            // omitting the first character of the ID (assumed prefix)
-            selectedEnrolls.push({
-              course: course.id.slice(1),
-              section: section.id.slice(1),
-            })
+            if (enrollmentsByCourse) {
+              enrollmentsByCourse.forEach((c: Course) => {
+                const courseId = course.id.slice(1) // remove leading 'c' prefix from course.id
+                const sectionId = section.id.slice(1) // remove leading 's' prefix from section.id
+                let enrollment
+                if (c.id === courseId) {
+                  enrollment = c.enrollments.find(
+                    matchedEnrollment =>
+                      // covers base role types
+                      matchedEnrollment.role_id === roleChoice.id ||
+                      // covers custom role types if existing enrollment with same role type is present
+                      matchedEnrollment.type === roleChoice.name.toLowerCase()
+                  )
+                  if (enrollment === undefined) {
+                    // covers custom role types if no matching enrollment role type is present
+                    enrollment = c.enrollments[c.enrollments.length - 1]
+                  }
+                  if (enrollment) {
+                    selectedEnrolls.push({
+                      section: sectionId,
+                      limit_privileges_to_course_section:
+                        enrollment.limit_privileges_to_course_section,
+                    })
+                  }
+                }
+              })
+            }
           }
         }
       }
@@ -459,6 +480,7 @@ export function TempEnrollAssign(props: Props) {
             enrollmentProps.id,
             userProps.id,
             temporaryEnrollmentPairing.id,
+            enroll.limit_privileges_to_course_section,
             startDate,
             endDate,
             roleChoice.id

@@ -253,6 +253,7 @@ describe('TempEnrollEdit component', () => {
       enrollment_state: '',
       temporary_enrollment_source_user_id: 0,
       type: '',
+      limit_privileges_to_course_section: false,
       user: mockRecipientUser,
       temporary_enrollment_provider: mockProviderUser,
       temporary_enrollment_pairing_id: 1,
