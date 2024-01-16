@@ -1,7 +1,8 @@
 ---
 smart_search:
   state: hidden
-  applies_to: RootAccount
+  applies_to: Course
   display_name: Smart Search
   description: AI driven smart search feature.
   after_state_change_proc: smart_search_after_state_change_hook
+  beta: true
