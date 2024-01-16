@@ -587,33 +587,58 @@ export default function DiscussionTopicForm({
     return payload
   }
 
+  const createSubmitPayload = shouldPublish => {
+    const payload = {
+      // Static payload properties
+      title,
+      message: rceContent,
+      podcastEnabled: enablePodcastFeed,
+      podcastHasStudentPosts: includeRepliesInFeed,
+      published: shouldPublish,
+      isAnnouncement,
+      fileId: attachment?._id,
+      delayedPostAt: availableFrom,
+      lockAt: availableUntil,
+      // Conditional payload properties
+      assignment: prepareAssignmentPayload(),
+      groupCategoryId: isGroupDiscussion ? groupCategoryId : null,
+      specificSections: shouldShowPostToSectionOption ? sectionIdsToPostTo.join() : 'all',
+      locked: shouldShowAnnouncementOnlyOptions ? locked : false,
+      requireInitialPost: !isGroupDiscussion ? requireInitialPost : false,
+      todoDate: addToTodo ? todoDate : null,
+      allowRating: shouldShowLikingOption ? allowLiking : false,
+      onlyGradersCanRate: shouldShowLikingOption ? onlyGradersCanLike : false,
+      ...(shouldShowUsageRightsOption && {usageRightsData}),
+    }
+
+    // Additional properties for editing mode
+    if (isEditing) {
+      return {
+        ...payload,
+        discussionTopicId: currentDiscussionTopic._id,
+        published: shouldPublish,
+        removeAttachment: !attachment?._id,
+      }
+    }
+
+    // Properties for creation mode
+    return {
+      ...payload,
+      contextId: ENV.context_id,
+      contextType: ENV.context_is_not_group ? 'Course' : 'Group',
+      published: shouldPublish,
+      isAnonymousAuthor:
+        shouldShowAnonymousOptions && discussionAnonymousState !== 'off'
+          ? anonymousAuthorState
+          : false,
+      anonymousState: shouldShowAnonymousOptions ? discussionAnonymousState : 'off',
+    }
+  }
+
   const submitForm = shouldPublish => {
     if (validateFormFields()) {
-      onSubmit({
-        title,
-        message: rceContent,
-        sectionIdsToPostTo,
-        discussionAnonymousState,
-        anonymousAuthorState: discussionAnonymousState === 'off' ? false : anonymousAuthorState,
-        requireInitialPost,
-        enablePodcastFeed,
-        includeRepliesInFeed,
-        isGraded,
-        allowLiking,
-        onlyGradersCanLike,
-        addToTodo,
-        todoDate,
-        isGroupDiscussion,
-        groupCategoryId: isGroupDiscussion ? groupCategoryId : null,
-        availableFrom,
-        availableUntil,
-        shouldPublish,
-        locked,
-        isAnnouncement,
-        assignment: prepareAssignmentPayload(),
-        attachment,
-        usageRightsData,
-      })
+      const payload = createSubmitPayload(shouldPublish)
+      onSubmit(payload)
       return true
     }
     return false
