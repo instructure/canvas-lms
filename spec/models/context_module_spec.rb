@@ -1852,4 +1852,25 @@ describe ContextModule do
 
     m2.evaluate_for(@student)
   end
+
+  describe "only_visible_to_overrides" do
+    before :once do
+      course_factory
+      @module = @course.context_modules.create!
+    end
+
+    it "returns true if the module has active overrides" do
+      @module.assignment_overrides.create!
+      expect(@module.only_visible_to_overrides).to be true
+    end
+
+    it "returns false if the module has no overrides" do
+      expect(@module.only_visible_to_overrides).to be false
+    end
+
+    it "returns false if the module has only deleted overrides" do
+      @module.assignment_overrides.create!(workflow_state: "deleted")
+      expect(@module.only_visible_to_overrides).to be false
+    end
+  end
 end
