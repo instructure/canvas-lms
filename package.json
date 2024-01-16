@@ -123,7 +123,7 @@
     "b-spline": "^2.0.2",
     "backbone": "1.1.1",
     "big.js": "^5.0.3",
-    "browserslist": "^4.19.1",
+    "browserslist": "^4.22.2",
     "canvas_offline_course_viewer": "https://github.com/instructure/canvas_offline_course_viewer.git#1.2.0",
     "chart.js": "^3.9.1",
     "chartjs-adapter-moment": "^1.0.0",
