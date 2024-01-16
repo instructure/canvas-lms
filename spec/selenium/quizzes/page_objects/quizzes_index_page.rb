@@ -23,8 +23,18 @@ require_relative "../../common"
 
 module QuizzesIndexPage
   #------------------------------ Selectors -----------------------------
+  def assign_to_link_selector(quiz_id)
+    "#{quiz_settings_menu_selector(quiz_id)} .assign-to-link"
+  end
 
+  def quiz_settings_menu_selector(quiz_id)
+    "ul[role='menu']#ui-id-#{quiz_id}-1"
+  end
   #------------------------------ Elements ------------------------------
+
+  def assign_to_link(quiz_id)
+    f(assign_to_link_selector(quiz_id))
+  end
 
   def quiz_index_settings_button
     fj("[role=button]:contains('Quiz Settings')")
@@ -63,6 +73,14 @@ module QuizzesIndexPage
   end
 
   #------------------------------ Actions ------------------------------
+  def click_assign_to_link(quiz_id)
+    assign_to_link(quiz_id).click
+  end
+
+  def click_manage_quiz_button(quiz_id)
+    manage_quiz_menu(quiz_id).click
+  end
+
   def visit_quizzes_index_page(course_id)
     get "/courses/#{course_id}/quizzes"
   end
