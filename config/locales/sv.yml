@@ -2,6 +2,31 @@
 # Do not edit it by hand, your changes will be overwritten.
 --- 
 sv: 
+  ? ""
+  : 
+    atom_no_author: "Ingen författare"
+    comment_from_files: 
+      one: "Se bifogad fil"
+      other: "Se bifogade filer"
+    errors: 
+      cannot_save_att: "Du har inte tillåtelse att redigera det låsta attributet %{att_name}"
+    feed_entry_title: "Uppgift: %{assignment}"
+    feed_entry_title_with_course: "Uppgift, %{course}: %{assignment}"
+    labels: 
+      due: Inlämningsdatum
+    student_annotation: "en studentnotering"
+    submission_action_take_quiz: "Ta %{title}"
+    submission_action_turn_in_assignment: "Lämna in %{title}"
+    submission_types: 
+      a_content_page: "en innehållssida"
+      a_discussion_post: "ett diskussionsinlägg"
+      a_file_upload: "en filuppladdning"
+      a_media_recording: "en medieinspelning"
+      a_quiz: "ett quiz"
+      a_text_entry_box: "en textinmatningsruta"
+      a_website_url: "en länk till webbplats"
+      external_tool: "ett externt verktyg"
+      on_paper: "på papper"
   1_hour_and_count_minutes_27533c1b: 
     one: "1 timme och 1 minut"
     other: "1 timme och %{count} minuter"
@@ -2360,6 +2385,7 @@ sv:
   add_students_to_the_course_874be8fb: "Lägg till studenter till kursen"
   add_sub_account_to_account_name_b104db90: "Lägg till underkonto till %{account_name}"
   add_submission_type_8690db4b: "Lägg till inlämningstyp"
+  add_substitution_9c2ce8f9: "Lägg till ersättning"
   add_subtitle_9f660cc: "Lägg till undertext"
   add_tas_to_courses_27741f81: "Lägg till TA:er i kurser"
   add_tas_to_the_course_2aac6e02: "Lägg till lärarassistenter till kursen"
@@ -2620,6 +2646,7 @@ sv:
   all_timezones_5e8afa7b: "Alla tidszoner"
   all_types_allowed_287eb6b0: "Alla typer tillåtna"
   all_ungraded_artifacts_ec3ba09: "Alla ej bedömda artefakter"
+  all_user_data_5d97832: "Alla användardata"
   all_users_associated_with_this_course_6be8d492: "Alla användare som associeras till den här kursen"
   all_users_associated_with_this_institution_d29850be: "Alla användare som associeras till den här lärosätet"
   all_version_history_fbf060a0: "Historik för alla versioner"
@@ -2669,6 +2696,9 @@ sv:
   allow_moderator_to_review_multiple_independent_gra_c59d64f6: "Tillåt att en ansvarig bedömare granskar de givna omdömena för samtliga eller vissa utvalda inlämningar"
   allow_multiple_attempts_e67a0a37: "Tillåt flera försök"
   allow_multiple_file_ags_submissions_to_count_as_on_6e24aa34: "Tillåt att flera AGS-inlämningar av filer räknas som en inlämning"
+  allow_observers_to_schedule_appointments_in_the_ca_7f4d0052: "Tillåt att observatörer schemalägger möten i kalendern"
+  allow_observers_to_sign_up_9afddf76: "Tillåt att observatörer registrerar sig"
+  allow_observers_to_sign_up_for_appointments_when_e_54f1d9d6: "Tillåt att observatörer registrerar sig för möten som aktiverats av läraren."
   allow_opt_out_of_inbox: "Tillåt att användare avregistrerar sig från inkorgen för Konversationer. Detta gör att alla konversationsmeddelanden och aviseringar skickas som aviseringar så fort som möjligt till användarens privata e-post, döljer ikonen för olästa meddelanden i inkorgen för Konversationer och döljer inställningar för Konversationer-aviseringar."
   allow_outcome_extra_credit_57c1e84e: "Tillåt extra poäng för lärandemål"
   allow_pages_to_be_deleted_in_bulk_199d3d3b: "Tillåt sidor att raderas i bulk"
@@ -3597,6 +3627,7 @@ sv:
   an_sftp_user_can_only_be_managed_from_a_root_accou_57d9d8e6: "En SFTP-användare kan bara hanteras från ett root-konto."
   an_unexpected_error_has_occurred_bc608420: "Ett oväntat fel uppstod"
   an_unexpected_error_has_occurred_see_error_report__f20b878d: "Ett oväntat fel har uppstått: se felrapporten %{id}"
+  an_unexpected_error_occurred_please_try_again_late_c58da3e4: "Ett oväntat fel inträffade. Försök igen senare."
   an_unknown_error_has_occurred_verify_the_csv_file__96087ece: "Ett okänt fel har uppstått. Verifiera CSV-filen eller försök igen senare."
   an_unknown_error_occurred_d77b1cdb: "Ett okänt fel uppstod."
   an_unknown_error_occurred_please_reach_out_in_canv_43a4da74: |-
@@ -3973,6 +4004,7 @@ sv:
   are_you_sure_you_want_to_remove_this_item_7887ce31: "Vill du ta bort detta objekt?"
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "Vill du ta bort det här verktyget?"
   are_you_sure_you_want_to_remove_this_user_8d1a8295: "Vill du ta bort den här användaren?"
+  are_you_sure_you_want_to_remove_this_user_from_all_85fb8eb4: "Är du säker på att du vill ta bort den här användaren från ALLA konton? Användaren kommer inte endast att raderas, utan även markeras för PERMANANT borttagning."
   are_you_sure_you_want_to_remove_this_user_s_profil_6d703c4: "Vill du ta bort den här användarens profilbild?"
   are_you_sure_you_want_to_report_this_profile_pictu_e22c2210: "Vill du rapportera den här profilbilden?"
   are_you_sure_you_want_to_restore_this_revision_2f3aaabe: "Är du säker på att du vill återställa den här revisionen?"
@@ -4042,6 +4074,7 @@ sv:
   assign_temporary_enrollments_bdaaa58a: "Tilldela temporära registreringar"
   assign_temporary_enrollments_to_name_e8b43c5c: "Tilldela temporära registreringar till %{name}"
   assign_temporary_enrollments_to_recipient_b25cb6be: "Tilldela temporära registreringar till %{recipient}"
+  assign_this_assignment_ac3ca379: "Tilldela denna uppgift"
   assign_this_module_a4685e57: "Tilldela den här modulen"
   assign_to_6b806cd9: "Tilldela till:"
   assign_to_95404a83: "Tilldela till"
@@ -5339,6 +5372,7 @@ sv:
   before_you_can_edit_your_profile_you_need_to_verif_4fd9143e: "Innan du kan redigera din profil måste du bekräfta din e-postadress (%{email}) genom att klicka på länken i e-postmeddelandet vi skickade dig. Om du inte ser det, *klicka på skicka igen i e-postmeddelande*, och se till att kolla din skräppost."
   begin_typing_to_search_7daa7b1: "Börja skriva för att söka"
   beginning_date_2d2a29ac: Startdatum
+  beginning_date_4ce53896: "Startdatum:"
   beginning_of_your_to_do_history_61ef2dce: "Början av din att göra-historik"
   begins_on_f4dae008: Börjar
   behaviour_change_related_to_the_bugfix_in_apg_122__63cfa767: "Beteendeändringen är relaterad till korrigeringen i APG-122. Tillåt inte att anpassade kolumner skapas med samma titlar som i reserverade namn i bedömningsöversiktens importerare. Ignorera även ej aktiva anpassade kolumner i bedömningsöversiktsimporten, såväl som de som använder reserverade namn"
@@ -6196,6 +6230,7 @@ sv:
   cancel_updating_comment_6816d855: "Avbryt uppdatering av kommentar"
   canceling_this_attempt_will_permanently_delete_any_21ce850c: "Om du avbryter det här försöket kommer allt arbete som utförts under det här försöket att tas bort permanent. Vill du fortsätta och ta bort arbetet?"
   cannot_access_group_in_concluded_course_90a8db52: "Det går inte att nå en grupp i en avslutad kurs"
+  cannot_add_a_temporary_enrollment_to_a_concluded_c_459a44fa: "Det går inte att lägga till en tillfällig registrering i en slutförd kurs"
   cannot_add_role_name_name_already_in_use_a523639c: "Det går inte att lägga till rollnamnet %{name}: används redan"
   cannot_add_section_to_a_non_section_specific_discu_d2a7f263: "Det går inte att lägga till avsnitt till en diskussion utan sektioner"
   cannot_autograde_at_this_time_a146ad9d: "Det går inte att bedöma automatiskt just nu"
@@ -6211,6 +6246,7 @@ sv:
   cannot_be_nil_when_course_id_is_nil_f539388: "Det går inte att vara tomt om course_id är tomt"
   cannot_be_present_when_account_id_is_present_f7d9b51f: "kan inte finnas om account_id finns"
   cannot_be_present_when_course_id_is_present_785e6a59: "kan inte finnas om course_id finns"
+  cannot_be_true_for_sub_assignments_66a9ba5f: "kan inte vara sant för deluppgifter"
   cannot_change_an_override_due_date_to_a_date_withi_8b1be496: "Kan inte åsidosätta inlämningsdatum till ett datum i en stängd betygsperiod"
   cannot_change_locked_status_on_granular_permission_6f13bf4f: "Det går inte att ändra låsstatus på en detaljerad behörighet."
   cannot_change_role_name_to_label_already_in_use_c8126e4e: "Det går inte att ändra rollnamnet till %{label}: används redan"
@@ -6218,6 +6254,7 @@ sv:
   cannot_change_the_due_date_of_an_override_in_a_clo_4b3a4dcd: "Det går inte att ändra ett åsidosatt  inlämningsdatum i en stängd bedömningsperiod"
   cannot_change_the_due_date_to_a_date_within_a_clos_61eb0951: "Det går inte att ändra inlämningsdatum till ett datum i en stängd bedömningsperiod"
   cannot_change_the_due_date_when_due_in_a_closed_gr_965b99cb: "Det går inte att ändra inlämningsdatum om det är i en stängd bedömningsperiod"
+  cannot_create_a_temporary_enrollment_with_an_inact_c471bfbe: "Det går inte att skapa en tillfällig registrering med en inaktiv roll"
   cannot_create_an_appointment_group_for_a_concluded_f4da02e3: "det går inte att skapa en mötesgrupp för en avslutad kurs"
   cannot_create_event_for_deleted_course_c800f310: "det går inte att skapa en händelse för en borttagen kurs"
   cannot_create_or_change_reservation_for_past_appoi_45870c16: "Det går inte att skapa eller ändra reservationer för möten som varit"
@@ -6360,6 +6397,7 @@ sv:
   canvas_user_id_4c18b78a: canvas_user_id
   canvas_will_enroll_recipient_as_a_role_in_source_s_33514fc6: "Canvas registrerar %{recipient} som en %{role} i kurser som %{source} valt mellan %{start}–%{end}"
   canvas_will_enroll_recipient_as_a_role_in_source_s_7fe7d625: "Canvas kommer att registrera %{recipient} som %{role} i kurser som valts av %{source} från %{start}–%{end}"
+  canvas_will_enroll_recipient_as_a_role_in_the_sele_5ef30bec: "Canvas registrerar %{recipient} som %{role} i de valda kurserna av %{source} från %{start} till %{end}"
   canvas_will_regrade_all_your_submissions_after_you_2d68694a: "Canvas omklassa alla svar efter att du har detta Quiz, det kan ta ett par minuter."
   canvas_will_remove_keys_with_null_values_from_live_6d7e3091: "Canvas tar bort nycklar med null-värden från livehändelsers nyttolaster om den här funktionen är aktiverad."
   cap_the_number_of_rces_rendered_on_initial_page_lo_c3890aec: |-
@@ -6440,6 +6478,7 @@ sv:
   change_rubrics_visibility_on_accounts_to_depend_on_967b4caa: "Ändra synlighet för matriser i konton för att använda behörigheter för matriser istället för lärandemål."
   change_section_to_sectionname_6e947e90: "Ändra sektionen till %{sectionName}"
   change_sis_ids_3a47154d: "Ändra SIS ID:n"
+  change_to_b757d327: "ändra till"
   change_visibility_of_account_calendars_fd03fbb8: "Ändra synligheten för kontokalendrar"
   changed_by_person_c39615e: "Ändrad av: %{person}"
   changed_item_1d16a85f: "Ändrat objekt"
@@ -10018,6 +10057,7 @@ sv:
       - December
   date_4e62ac59: datum
   date_61419973: "Datum:"
+  date_adjustments_331bb009: "Justeringar av datum"
   date_at_time_25a04cd2: "%{date} kl. %{time}"
   date_created_87e265bc: "Skapad den"
   date_created_b93b76fb: ", skapad den: "
@@ -11585,6 +11625,7 @@ sv:
   end_time_must_be_after_start_time_84398c82: "end_time måste infalla efter start_time"
   end_tutorial_7fb16b6f: "Avsluta självstudie"
   end_user_license_agreement_6d2c666b: "Slutanvändarens licensavtal."
+  ending_date_b9359e06: "Slutdatum:"
   ending_date_e1ea13a4: Slutdatum
   ends_4fcb632: "Slutar:"
   ends_at_9a62b528: "Slutar vid"
@@ -12138,6 +12179,7 @@ sv:
   error_updating_discussion_topic_d47c64ff: "Ett fel inträffade när diskussionsämnet skulle uppdateras"
   error_updating_file_usage_rights_f9216019: "Ett fel inträffade när användarrättigheterna till filen skulle uppdateras"
   error_updating_module_access_f0970f4c: "Ett fel inträffade när åtkomsten till modulen uppdaterades."
+  error_updating_moduleitemname_96819b43: "Fel vid uppdatering av \"%{moduleItemName}\""
   error_updating_modulename_settings_da982acf: "Ett fel uppstod när inställningarna för %{moduleName} uppdaterades."
   error_updating_notes_31b24785: "Fel vid uppdatering av anteckningar"
   error_updating_pacename_ad07f9df: "Fel vid uppdatering av %{paceName}"
@@ -12589,6 +12631,9 @@ sv:
   failed_to_create_domain_lookup_4d40fa17: "Det gick inte att skapa domänuppslaget"
   failed_to_create_internal_setting_f60fb462: "Det gick inte att skapa intern inställning"
   failed_to_create_new_role_e336e461: "Det gick inte att skapa ny roll"
+  failed_to_create_temporary_enrollment_pairing_617dd0c3: "Det gick inte att skapa parkoppling för tillfällig registrering"
+  failed_to_create_temporary_enrollment_pairing_due__a2bf61a: "Det gick inte att skapa parkoppling för tillfällig registrering på grund av ett okänt fel"
+  failed_to_create_temporary_enrollment_please_try_a_4d765613: "Det gick inte att skapa tillfällig registrering, försök igen senare"
   failed_to_create_temporary_enrollment_please_try_a_ad6fefb0: "Det gick inte att skapa tillfällig registrering, försök igen."
   failed_to_create_webhook_b766cf5c: "Misslyckades att skapa beteendemönster för webbsida."
   failed_to_create_zip_file_1a943d06: "Misslyckades att skapa zipfil"
@@ -12601,6 +12646,8 @@ sv:
   failed_to_delete_name_4abd2ed5: "Det gick inte att ta bort %{name}."
   failed_to_delete_role_label_27959de3: "Det gick inte att ta bort rollen %{label}"
   failed_to_delete_selected_pages_26fa87db: "Det gick inte att radera valda sidor"
+  failed_to_delete_temporary_enrollment_a448a32a: "Det gick inte att radera tillfällig registrering"
+  failed_to_delete_temporary_enrollment_due_to_an_un_45295b0f: "Det gick inte att radera tillfällig registrering på grund av ett okänt fel"
   failed_to_delete_to_do_64edff49: "Det gick inte att ta bort att göra"
   failed_to_export_blueprint_course_settings_1ced8c6: "Det gick inte att exportera inställningar för Blueprint-kurs"
   failed_to_export_context_info_acb07497: "Det gick inte att exportera kontextinformation"
@@ -12611,6 +12658,8 @@ sv:
   failed_to_fetch_migration_issues_data_a896da98: "Det gick inte att hämta data om migreringsproblem."
   failed_to_fetch_temporary_enrollment_data_9422003: "Det gick inte att hämta data om tillfällig registrering"
   failed_to_get_new_activity_17e7ec7c: "Det gick inte att hämta ny aktivitet"
+  failed_to_get_temporary_enrollments_for_provider_617a73ea: "Det gick inte att hämta tillfällig registrering för leverantören"
+  failed_to_get_temporary_enrollments_for_recipient_1baf62d3: "Det gick inte att hämta tillfällig registrering för mottagaren"
   failed_to_ignore_assignment_46565fa3: "Det gick inte att ignorera uppgiften"
   failed_to_import_media_objects_4c1fcb4f: "Det gick inte att importera mediaobjekt"
   failed_to_import_some_lti_resource_links_ab124c3f: "Det gick inte att importera några LTI-resurslänkar"
@@ -13088,11 +13137,15 @@ sv:
   forgot_password_url_3f9c04b: "URL för glömt lösenord"
   form_background_fb654518: "Formens bakgrund"
   form_border_f61f12dc: "Formens kantlinje"
+  formattedgrade_c0747a09: "*%{formattedGrade}*"
   formattedgrade_points_576abfea: "%{formattedGrade} *poäng*"
   formattedgrade_points_90505a61: "%{formattedGrade} poäng"
   formattedpoints_points_c75261e2: 
     one: "1 poäng"
     other: "%{formattedPoints} poäng"
+  formattedpoints_points_possible_1d93043f: 
+    one: "*1* möjliga poäng"
+    other: "*%{formattedPoints}* möjliga poäng"
   formattedpoints_points_possible_dad9d40a: 
     one: "1 poäng möjlig"
     other: "%{formattedPoints} möjliga poäng"
@@ -13732,6 +13785,7 @@ sv:
         out_of: Av
         score: Poäng
         submission_progress_status: "Inlämningens förloppsstatus"
+        submitted: Skickad
       icons: 
         turnitin_results: "Se Turnitinresultat"
       labels: 
@@ -14752,6 +14806,7 @@ sv:
   have_a_question_about_canvas_ask_it_here_5781cce: "Har du någon fråga om Canvas? Ställ den här."
   have_not_been_graded_df2a5fd2: "Har inte bedömts"
   have_not_yet_submitted_57e6a58b: "Har ännu inte lämnat in"
+  have_students_sign_up_in_groups_d6cfd4d2: "Registrera studenter i grupper"
   haven_t_been_graded_d7dee5bb: "Inte har bedömts ännu"
   haven_t_submitted_yet_e63834db: "Inte har skickat in ännu"
   he_him_99aea1a8: Han/honom
@@ -16808,6 +16863,7 @@ sv:
   log_in_c9e240ef: "Logga in"
   log_in_to_submit_962106cf: "Logga in för att skicka"
   log_in_url_is_not_a_valid_uri_7b8c57ee: "Inloggnings-URL:n är inte en giltig URI"
+  log_lti_launches_ff06c5fe: "Logga LTI-lanseringar"
   log_on_url_fc166e4c: "Logga in URL"
   log_out_379ba28a: "Logga ut"
   log_out_url_2605c2c1: "Logga ut URL"
@@ -17110,6 +17166,8 @@ sv:
   manage_students_for_the_course_3b1bc4f0: "Hantera studenter för kursen"
   manage_subject_coursecontext_2328e1ff: "Hantera ämnen: %{courseContext}"
   manage_subject_f9835769: "Hantera ämnen"
+  manage_temporary_enrollment_providers_for_name_eb2a6f43: "Hantera tillfälliga registreringsleverantörer för %{name}"
+  manage_temporary_enrollment_recipients_for_name_61dd34d4: "Hantera tillfälliga registreringsmottagare för %{name}"
   manage_temporary_enrollments_4c4f21ef: "Hantera tillfälliga registreringar"
   manage_update_23de23a1: "Hantera uppdatering"
   manage_update_for_toolname_f8e3b2fb: "Hantera uppdatering för %{toolName}"
@@ -19452,6 +19510,7 @@ sv:
   module_publish_menu_30b638dd: Modulpubliceringsmeny
   module_publish_menu_88b54c1b: Modulpubliceringsmeny
   module_published_80f0b9b8: "Modulen publicerades"
+  moduleitemname_updated_7c7d495c: "%{moduleItemName} har uppdaterats"
   modulename_created_successfully_6c273e09: "%{moduleName} skapades."
   modulename_module_publish_options_69ef1ece: "%{moduleName} Modulpubliceringsalternativ"
   modulename_module_publish_options_publishedstatus_94ea7f49: "%{moduleName} modulpubliceringsalternativ, %{publishedStatus}"
@@ -19697,6 +19756,7 @@ sv:
   move_to_1c208ae5: "Flytta till ..."
   move_to_25d7ef11: "Flytta till"
   move_to_9b91c6e0: "Flytta till ..."
+  move_to_b7dddc4f: "Flytta till:"
   move_to_bottom_d0f71bf0: "Flytta längst ned"
   move_to_dde1a5e1: "Flytta till ..."
   move_to_end_c6bfbcf5: "Flytta till slutet"
@@ -20225,6 +20285,7 @@ sv:
   nonce_77113ba4: Nonce
   none_3b5e34d2: Inga
   none_9b6c9bec: inga
+  none_anonymized_e1ff7c45: "Inga (anonymiserade)"
   northeast_community_college_course_syllabus_report_8124f969: "Kursöversiktsrapport för Northeast Community College"
   norway_47_bc598662: "Norge (+47)"
   norway_c11471b3: Norge
@@ -24624,6 +24685,7 @@ sv:
   remove_contact_method_ca890ba3: "Ta bort kontaktmetod"
   remove_course_association_name_b760c502: "Ta bort kursassociation %{name}"
   remove_d83a966c: "Ta bort:"
+  remove_dates_5a5a8df2: "Ta bort datum"
   remove_dates_9b9ba2f6: "Ta bort datum"
   remove_delay_for_gradebook_student_search_307b4ecf: "Ta bort försening för studentsökning i omdömesboken"
   remove_designers_from_courses_42332a57: "Ta bort designers från kurser"
@@ -24641,6 +24703,7 @@ sv:
   remove_filename_dab5c02e: "Ta bort %{filename}"
   remove_filter_6f7204e2: "Ta bort filter"
   remove_filtername_filter_6b6d7063: "Ta bort filtret %{filterName}"
+  remove_from_to_to_from_substitutes_4a6dc71d: "Ta bort %{from} till %{to} från ersättningar"
   remove_grading_scheme_title_d3942a08: "Ta bort bedömningsschema %{title}"
   remove_group_5d2f2f2d: "Ta bort grupp"
   remove_group_981d6a02: "Ta bort grupp?"
@@ -24948,6 +25011,7 @@ sv:
   revert_to_actual_score_f665eea9: "Återgå till det verkliga resultatet"
   revert_to_old_ui_3211da41: "Återgå till det gamla användargränssnittet"
   reverts_the_visible_assignments_scope_to_its_origi_87eb35d: "Återställer det synliga uppgiftsomfånget till dess ursprungliga form."
+  review_7197fba3: "Granska "
   review_feedback_4b4abb38: "Feedback från granskning"
   review_now_318a6a3e: "Granska nu"
   reviewer_b993ce28: Bedömare
@@ -25689,6 +25753,7 @@ sv:
   see_vericite_results_b44dd8c8: "Se VeriCite resultat"
   select_1e849959: "[ Välj ]"
   select_a_course_4710371f: "Välj en kurs"
+  select_a_date_optional_d60168d0: "Välj ett datum (valfritt)"
   select_a_grading_period_5ea50f1: "Välj en bedömningsperiod ..."
   select_a_grading_period_aab25483: "Välj en bedömningsperiod"
   select_a_group_category_295f7a34: "Välj en gruppkategori"
@@ -25781,9 +25846,13 @@ sv:
   select_module_to_move_item_into_89fb2ac7: "Välj modul för att flytta post in i"
   select_name_to_mention_15d9674e: "Välj %{name} för att göra ett omnämnande"
   select_navigation_links_68e1e924: "Välj navigeringslänkar"
+  select_new_beginning_date_bb3c9650: "Välj ett nytt startdatum"
+  select_new_end_date_f10caeca: "Välj ett nytt slutdatum"
   select_one_8e0af564: "Välj en"
   select_one_b647b384: "Välj ett alternativ"
   select_one_of_the_options_c8b0c6e4: "Välj ett av alternativen:"
+  select_original_beginning_date_31a23f92: "Välj ursprungligt startdatum"
+  select_original_end_date_dc11de7d: "Välj ursprungligt slutdatum"
   select_outcome_7e6e2562: "Välj lärandemål"
   select_outcome_title_b99b3ca0: "Välj lärandemålet %{title}"
   select_page_e93fc123: "Välj sida"
@@ -26813,6 +26882,7 @@ sv:
   sharing_a_qr_code_can_give_others_immediate_access_79575158: "Delning av en QR-kod kan ge andra omedelbar åtkomst till ditt konto via %{canvas}-mobilapparna."
   she_her_3f459cc2: Hon/henne
   she_her_c8b5e3be: hon/henne
+  shift_dates_746698a5: "Växla datum"
   shift_dates_b5a7b7a1: "Ändra datum"
   shift_due_dates_and_assignment_availability_dates__c5ad272: "Flytta fram inlämningsdatum och uppgiftens tillgänglighetsdatum ett antal dagar."
   shipping_country_code_as_reported_by_salesforce_631961fe: "Landskod för frakt enligt Salesforce-rapport"
@@ -27935,6 +28005,7 @@ sv:
   subscribe_failed_2eb62de0: "Prenumerationen misslyckades"
   subscribe_to_title_c7d6bbd2: "Prenumerera på %{title}"
   subscribed_fe74d22a: Prenumererar
+  substitution_713c65b9: Substitut
   subtitle_ee60ca78: Undertext
   subtitles_could_not_be_imported_from_file_5de6da0b: "Det gick inte att importera undertexter från %{file}"
   subtitles_lang_could_not_be_imported_for_file_4d1be2e3: "Det gick inte att importera undertexter (%{lang}) för %{file}"
@@ -28175,6 +28246,7 @@ sv:
   temporarily_enroll_a_user_into_a_course_this_tempo_990488f8: "Registrera en användare tillfälligt för en kurs. Den här tillfälliga registreringen paras samman med en annan registrering i kursen."
   temporarily_enroll_name_8acb66ce: "Registrera %{name} tillfälligt"
   temporary_9c54e959: "Temporär:"
+  temporary_enrollment_enrollmenttype_for_username_a5410ed7: "Tillfällig registrering %{enrollmentType} för %{userName}"
   temporary_enrollment_option_links_eb9b8b2e: "Länkar till alternativ till temporära registrering"
   temporary_enrollment_pairings_56f35f5c: "Tillfälliga registreringar – parkopplingar"
   temporary_enrollment_was_successfully_created_78b48a7a: "Den tillfälliga registreringen skapades."
@@ -28634,6 +28706,7 @@ sv:
   the_specified_file_with_file_id_already_has_an_ori_bd30758c: "Den specifika filen med file_id har redan en originell rapport"
   the_specified_label_already_exists_please_enter_a__7f2b7598: "Den angivna etiketten finns redan. Ange ett annat etikettnamn."
   the_specified_resource_does_not_exist_71d8b751: "Den angivna resursen finns inte."
+  the_specified_type_must_match_the_base_type_for_th_eea5ab7d: "Den angivna typen måste matcha rollens bastyp"
   the_specified_user_id_is_not_a_student_in_this_cou_372573ca: "Den angivna användaren (%{id}) är inte en student i den här kursen"
   the_specified_user_is_not_a_student_in_this_course_5a81d8a5: "Den angivna användaren är inte en student i den här kursen"
   the_start_date_for_the_pace_plan_must_be_after_the_44e8ed5b: "Taktplanens startdatum måste infalla efter slutdatumet."
@@ -30170,6 +30243,7 @@ sv:
   tool_content_2924d18f: Verktygsinnehåll
   tool_content_e699e813: Verktygsinnehåll
   tool_created_at_82c0daba: "Verktyget skapades"
+  tool_id_94b91929: Verktygs-ID
   tool_id_afd739e1: Verktygs-ID
   tool_name_7d58a6e4: Verktygsnamn
   tool_not_found_f6366382: "Verktyget hittades inte"
@@ -30178,6 +30252,7 @@ sv:
   tool_supports_deep_linking_at_this_placement_561e1874: "Verktyget stöder djuplänkning vid den här placeringen"
   tool_toolname_found_for_client_id_clientid_would_y_13f35b91: "Verktyget \"%{toolName}\" hittades för klient-ID %{clientId}. Vill du installera det?"
   tool_type_afa58fcb: Verktygstyp
+  tool_type_tool_configured_tool_id_251c2959: "Verktygstyp (verktyskonfigurerad \"tool_id\")"
   toolname_logo_6b639926: "%{toolName} Logo"
   tooltip_info_for_tenant_input_81a0eca8: "Knappbeskrivning för klientorganisationsinmatning"
   tooltip_that_contains_info_about_the_microsoft_tea_24d892cf: "Knappbeskrivning som innehåller information om Microsoft Teams Sync-inloggningsattribut."
@@ -30862,6 +30937,7 @@ sv:
   user_count_respondents_e30a8593: "%{user_count} respondenter"
   user_course_access_log_f7b8a4bd: "Kursåtkomstlogg för användare"
   user_data_export_from_date_6ba21b89: "*Export av användardata från %{date}*"
+  user_data_shared_with_this_tool_545ca14f: "Användardata delade med det här verktyget"
   user_date_range_search: 
     cant_be_blank: "Canvas användar-ID kan inte vara tom"
     cant_come_before_from: "\"Till datum\" kan inte komma före \"Från datum\""
@@ -30869,6 +30945,7 @@ sv:
   user_details_2613c079: Användarinformation
   user_details_e9aef9e5: Användardetaljer
   user_does_not_have_permission_to_select_final_grad_47560e75: "användare har inte behörighet att välja slutbedömning"
+  user_fields_included_dd0fd52: "Användarfält inkluderade:"
   user_files_78e21703: Användarfiler
   user_groups_query_error_bba6a6b7: "Frågefel för användargrupper"
   user_id_8256faeb: user_id
@@ -31029,6 +31106,8 @@ sv:
   user_profile_picture_46bffbc7: "Användarens profilbild"
   user_removed_successfully_20a3889d: "Användaren togs bort"
   user_results_updated_9ce38dce: "Användarresultaten har uppdaterats."
+  user_s_email_only_401dbaba: "Endast användarens e-postadress"
+  user_s_name_only_474c2ab4: "Endast användarens e-postadress"
   user_s_settings_d65644b4: "%{user}s inställningar"
   user_search_panel_18f80511: "Sökpanel för användare"
   user_search_results_3af96217: "Sökresultat för användare"
@@ -31697,7 +31776,13 @@ sv:
       Om aktiverad, etableras rotkonton med en `:ready_for_new_quizzes_provision`-nyckel
       i inställningarna som inte har etablerats. Denna
       kontroll och etablering inträffar i alla skärvor runt midnatt i skärvans region.
+  when_enabled_sends_data_for_all_lti_launches_to_th_2c76d174: |-
+      Om aktiverad skickas data för alla LTI-lanseringar till PandataEvents-systemet
+      för frågor och visualisering.
   when_enabled_site_admin_account_ui_will_allow_asso_9d04a1d8: "Om aktiverad kommer webbplatsadministratörer att tillåta koppling mellan tjänstens användare till en DeveloperKey och sedan använda den nyckeln/användaren med tillåtelsetypen client_credentials"
+  when_enabled_teachers_can_choose_to_allow_observer_320b555e: |-
+      Om aktiverad kan lärare välja att låta observatörer schemalägga möten
+      när de skapar mötesgrupper i kalendern.
   when_enabled_the_hidden_html_forms_that_are_used_t_c5edd929: |-
       Om funktionen är aktiverad har de dolda HTML-formulären som används för att utlösa en LTI-lansering
       ett slumpmässigt nummer tillagt i sitt ID. Om funktionen är inaktiverad har vart
@@ -32234,8 +32319,10 @@ sv:
   you_must_attach_at_least_one_file_to_this_assignme_9f39ce12: "Du måste bifoga åtminstone en fil till den här uppgiften"
   you_must_be_authorized_to_manage_sis_in_order_to_r_a218ceb7: "Du måste ha behörighet att hantera SIS för att kunna återaktivera inloggningar med ett associerat SIS-ID."
   you_must_be_authorized_to_manage_sis_in_order_to_s_bb867901: "Du måste ha behörighet att hantera SIS för att kunna suspendera inloggningar med ett associerat SIS-ID."
+  you_must_choose_a_content_option_c776bdef: "Du måste välja ett innehållsalternativ"
   you_must_choose_a_recipient_3171112f: "Du måste välja en mottagare"
   you_must_enter_a_date_f8eabfb1: "Du måste ange ett datum"
+  you_must_enter_a_name_for_the_new_question_bank_83ff5748: "Du måste ange ett namn för den nya frågebanken"
   you_must_have_a_student_or_section_selected_a99e45df: "Du måste ha en student eller en sektion vald"
   you_must_input_a_section_b8d370fe: "Du måste ange en sektion"
   you_must_log_in_to_view_replies_9ccd4da0: "Du måste logga in för att visa svar"
@@ -32250,6 +32337,7 @@ sv:
   you_must_provide_targetgroupid_or_targetcontextid__dd2bf92: "Du måste tillhandahålla targetGroupId eller targetContextId och targetContextType"
   you_must_publish_your_course_for_students_to_recei_1995ee46: "Du måste publicera din kurs för studenter för att ta emot meddelandeaviseringar. Aviseringar skickas inte retroaktivt från meddelanden som skapats före publiceringen av kursen.."
   you_must_select_a_course_to_copy_content_from_e7bd9e09: "Du måste välja en kurs att kopiera innehåll från"
+  you_must_select_a_file_to_import_content_from_28a242ff: "Du måste välja en fil att importera innehåll från"
   you_must_select_a_folder_to_upload_your_migration__ac7bc7c0: "Du måste välja en mapp att ladda upp din migrering till"
   you_must_select_an_assignment_group_c16a2168: "Du måste välja en uppgiftsgrupp."
   you_must_select_at_least_one_calendar_to_create_an_29e6769c: "Du måste välja minst en kalender för att skapa en händelse."
