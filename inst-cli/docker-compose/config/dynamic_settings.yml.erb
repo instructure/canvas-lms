@@ -41,6 +41,10 @@ development:
       ios-pandata-secret: teamrocketblastoffatthespeedoflight
       android-pandata-key: ANDROID_pandata_key
       android-pandata-secret: surrendernoworpreparetofight
+  # Key/value pairs in the store tree can have overrides
+  # persisted in Settings. They are included by default but
+  # can be ignored by passing 'ignore_fallback_overrides: true'
+  # to your DynamicSettings.find call.
   store:
     canvas:
       lti-keys:

@@ -27,11 +27,11 @@ RSpec.describe SecurityController, type: :request do
   let(:future_key) { CanvasSecurity::KeyStorage.new_key }
 
   let(:fallback_proxy) do
-    DynamicSettings::FallbackProxy.new(
-      CanvasSecurity::KeyStorage::PAST => past_key,
-      CanvasSecurity::KeyStorage::PRESENT => present_key,
-      CanvasSecurity::KeyStorage::FUTURE => future_key
-    )
+    DynamicSettings::FallbackProxy.new({
+                                         CanvasSecurity::KeyStorage::PAST => past_key,
+                                         CanvasSecurity::KeyStorage::PRESENT => present_key,
+                                         CanvasSecurity::KeyStorage::FUTURE => future_key
+                                       })
   end
 
   around do |example|

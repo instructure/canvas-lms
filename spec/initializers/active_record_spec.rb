@@ -365,8 +365,8 @@ module ActiveRecord
       end
 
       after do
-        allow(DynamicSettings).to receive(:find).with("activerecord/ignored_columns", tree: :store).and_call_original
-        allow(DynamicSettings).to receive(:find).with("activerecord/ignored_columns_disabled", tree: :store).and_call_original
+        allow(DynamicSettings).to receive(:find).with("activerecord/ignored_columns", tree: :store, ignore_fallback_overrides: true).and_call_original
+        allow(DynamicSettings).to receive(:find).with("activerecord/ignored_columns_disabled", tree: :store, ignore_fallback_overrides: true).and_call_original
 
         reset_cache!
         User.create!(name: "user u2")
@@ -378,12 +378,12 @@ module ActiveRecord
       end
 
       def set_ignored_columns_state!(columns, enabled)
-        allow(DynamicSettings).to receive(:find).with("activerecord", tree: :store).and_return(
-          DynamicSettings::FallbackProxy.new({ "ignored_columns_disabled" => !enabled })
+        allow(DynamicSettings).to receive(:find).with("activerecord", tree: :store, ignore_fallback_overrides: true).and_return(
+          DynamicSettings::FallbackProxy.new({ "ignored_columns_disabled" => !enabled }, ignore_fallback_overrides: true)
         )
 
-        allow(DynamicSettings).to receive(:find).with("activerecord/ignored_columns", tree: :store).and_return(
-          DynamicSettings::FallbackProxy.new({ "users" => columns })
+        allow(DynamicSettings).to receive(:find).with("activerecord/ignored_columns", tree: :store, ignore_fallback_overrides: true).and_return(
+          DynamicSettings::FallbackProxy.new({ "users" => columns }, ignore_fallback_overrides: true)
         )
 
         reset_cache!
