@@ -81,80 +81,13 @@ export default function DiscussionTopicFormContainer({apolloClient}) {
   }
 
   const handleFormSubmit = formData => {
-    const {
-      title,
-      message,
-      sectionIdsToPostTo,
-      shouldPublish,
-      requireInitialPost,
-      discussionAnonymousState,
-      availableFrom,
-      availableUntil,
-      anonymousAuthorState,
-      allowLiking,
-      onlyGradersCanLike,
-      addToTodo,
-      todoDate,
-      enablePodcastFeed,
-      includeRepliesInFeed,
-      locked,
-      isAnnouncement,
-      groupCategoryId,
-      assignment,
-      attachment,
-      usageRightsData,
-    } = formData
-
+    const {usageRightsData, ...formDataWithoutUsageRights} = formData
     setUsageRightData(usageRightsData)
+
     if (isEditing) {
-      updateDiscussionTopic({
-        variables: {
-          discussionTopicId: currentDiscussionTopicId,
-          title,
-          message,
-          specificSections: sectionIdsToPostTo.join(),
-          published: shouldPublish,
-          requireInitialPost,
-          delayedPostAt: availableFrom,
-          lockAt: availableUntil,
-          allowRating: allowLiking,
-          onlyGradersCanRate: onlyGradersCanLike,
-          todoDate: addToTodo ? todoDate : null,
-          podcastEnabled: enablePodcastFeed,
-          podcastHasStudentPosts: includeRepliesInFeed,
-          groupCategoryId: groupCategoryId || null,
-          locked,
-          fileId: attachment?._id,
-          removeAttachment: !attachment?._id,
-          assignment,
-        },
-      })
+      updateDiscussionTopic({variables: formDataWithoutUsageRights})
     } else {
-      createDiscussionTopic({
-        variables: {
-          contextId: ENV.context_id,
-          contextType: ENV.context_is_not_group ? 'Course' : 'Group',
-          title,
-          message,
-          specificSections: sectionIdsToPostTo.join(),
-          published: shouldPublish,
-          requireInitialPost,
-          anonymousState: discussionAnonymousState,
-          delayedPostAt: availableFrom,
-          lockAt: availableUntil,
-          isAnonymousAuthor: anonymousAuthorState,
-          allowRating: allowLiking,
-          onlyGradersCanRate: onlyGradersCanLike,
-          todoDate: addToTodo ? todoDate : null,
-          podcastEnabled: enablePodcastFeed,
-          podcastHasStudentPosts: includeRepliesInFeed,
-          locked,
-          isAnnouncement,
-          groupCategoryId: groupCategoryId || null,
-          assignment,
-          fileId: attachment?._id,
-        },
-      })
+      createDiscussionTopic({variables: formDataWithoutUsageRights})
     }
   }
 
