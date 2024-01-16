@@ -217,7 +217,8 @@ shared_context "in-process server selenium tests" do
         # Is fixed in Chrome 109, remove this once upgraded to or above Chrome 109 https://bugs.chromium.org/p/chromium/issues/detail?id=1307772
         "Found a 'popup' attribute. If you are testing the popup API, you must enable Experimental Web Platform Features.",
         "Uncaught DOMException: play() failed because the user didn't interact with the document first.",
-        "security - Refused to frame 'https://drive.google.com/' because an ancestor violates the following Content Security Policy directive: \"frame-ancestors https://docs.google.com\"."
+        "security - Refused to frame 'https://drive.google.com/' because an ancestor violates the following Content Security Policy directive: \"frame-ancestors https://docs.google.com\".",
+        "This file should be served over HTTPS." # tests are not run over https, this error is expected
       ].freeze
 
       javascript_errors = browser_logs.select do |e|
