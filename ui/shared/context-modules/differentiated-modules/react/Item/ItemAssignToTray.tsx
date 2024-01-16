@@ -39,6 +39,7 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 import type {
   BaseDateDetails,
   DateDetails,
+  exportedOverride,
   FetchDueDatesResponse,
   ItemAssignToCardSpec,
 } from './types'
@@ -79,6 +80,13 @@ function makeCardId(): string {
   return uid('assign-to-card', 3)
 }
 
+export function getEveryoneOption(hasOverrides: boolean) {
+  return {
+    id: 'everyone',
+    value: hasOverrides ? I18n.t('Everyone else') : I18n.t('Everyone'),
+  }
+}
+
 export const updateModuleItem = ({
   courseId,
   moduleItemType,
@@ -117,6 +125,7 @@ export const updateModuleItem = ({
 // TODO: need props to initialize with cards corresponding to current assignments
 export interface ItemAssignToTrayProps {
   open: boolean
+  onSave?: (overrides: ItemAssignToCardSpec[]) => void
   onClose: () => void
   onDismiss: () => void
   courseId: string
@@ -124,13 +133,25 @@ export interface ItemAssignToTrayProps {
   itemType: string
   iconType: string
   itemContentId: string
-  pointsPossible: string
+  pointsPossible: string | number
   locale: string
   timezone: string
+  defaultCards?: ItemAssignToCardSpec[]
+  defaultDisabledOptionIds?: string[]
+  defaultSectionId?: string
+  onAddCard?: () => void
+  onAssigneesChange?: (
+    cardId: string,
+    newAssignee: Record<string, any>,
+    deletedAssignee: Record<string, any>[]
+  ) => void
+  onDatesChange?: (cardId: string, dateType: string, newDate: string) => void
+  onCardRemove?: (cardId: string) => void
 }
 
 export default function ItemAssignToTray({
   open,
+  onSave,
   onClose,
   onDismiss,
   courseId,
@@ -141,23 +162,55 @@ export default function ItemAssignToTray({
   pointsPossible,
   locale,
   timezone,
+  defaultCards,
+  defaultDisabledOptionIds = [],
+  onAddCard,
+  onAssigneesChange,
+  onDatesChange,
+  onCardRemove,
+  defaultSectionId,
 }: ItemAssignToTrayProps) {
-  const [assignToCards, setAssignToCards] = useState<ItemAssignToCardSpec[]>([])
+  const [assignToCards, setAssignToCards] = useState<ItemAssignToCardSpec[]>(defaultCards ?? [])
   const [fetchInFlight, setFetchInFlight] = useState(false)
-  const [disabledOptionIds, setDisabledOptionIds] = useState<string[]>([])
-  const everyoneOption = useMemo(
-    () => getEveryoneOption(assignToCards.length > 1),
-    [assignToCards.length]
-  )
+  const [disabledOptionIds, setDisabledOptionIds] = useState<string[]>(defaultDisabledOptionIds)
+  const everyoneOption = useMemo(() => {
+    const hasOverrides =
+      (disabledOptionIds.length === 1 && !disabledOptionIds.includes('everyone')) ||
+      disabledOptionIds.length > 1 ||
+      assignToCards.length > 1
+    return getEveryoneOption(hasOverrides)
+  }, [disabledOptionIds, assignToCards])
+
+  const handleDismiss = useCallback(() => {
+    if (defaultCards) {
+      setAssignToCards(defaultCards)
+    }
+    onDismiss()
+  }, [defaultCards, onDismiss])
 
   const {allOptions, isLoading, setSearchTerm} = useFetchAssignees({
     courseId,
     everyoneOption,
     defaultValues: [],
-    onError: onDismiss,
+    onError: handleDismiss,
   })
 
   useEffect(() => {
+    if (defaultCards !== undefined) {
+      setAssignToCards(defaultCards)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(defaultCards)])
+
+  useEffect(() => {
+    setDisabledOptionIds(defaultDisabledOptionIds)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(defaultDisabledOptionIds)])
+
+  useEffect(() => {
+    if (defaultCards !== undefined) {
+      return
+    }
     setFetchInFlight(true)
     doFetchApi({
       path: itemTypeToApiURL(courseId, itemType, itemContentId),
@@ -217,15 +270,19 @@ export default function ItemAssignToTray({
       })
       .catch(() => {
         showFlashError()()
-        onDismiss()
+        handleDismiss()
       })
       .finally(() => {
         setFetchInFlight(false)
       })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [courseId, itemContentId, itemType])
+  }, [courseId, itemContentId, itemType, JSON.stringify(defaultCards)])
 
-  const handleAddCard = useCallback(() => {
+  const handleAddCard = () => {
+    if (onAddCard) {
+      onAddCard()
+      return
+    }
     const cardId = makeCardId()
     const cards: ItemAssignToCardSpec[] = [
       ...assignToCards,
@@ -242,9 +299,14 @@ export default function ItemAssignToTray({
       } as ItemAssignToCardSpec,
     ]
     setAssignToCards(cards)
-  }, [assignToCards])
+  }
 
   const handleUpdate = useCallback(() => {
+    if (onSave !== undefined) {
+      onSave(assignToCards)
+      return
+    }
+
     const payload = generateDateDetailsPayload(assignToCards)
     updateModuleItem({
       courseId,
@@ -252,9 +314,9 @@ export default function ItemAssignToTray({
       moduleItemType: itemType,
       moduleItemName: itemName,
       payload,
-      onSuccess: onDismiss,
+      onSuccess: handleDismiss,
     })
-  }, [assignToCards, courseId, itemContentId, itemName, itemType, onDismiss])
+  }, [onSave, assignToCards, courseId, itemContentId, itemType, itemName, handleDismiss])
 
   const handleDeleteCard = useCallback(
     (cardId: string) => {
@@ -264,8 +326,9 @@ export default function ItemAssignToTray({
       const cards = assignToCards.filter(({key}) => key !== cardId)
       setAssignToCards(cards)
       setDisabledOptionIds(newDisabled)
+      onCardRemove?.(cardId)
     },
-    [assignToCards, disabledOptionIds]
+    [assignToCards, disabledOptionIds, onCardRemove]
   )
 
   const handleCardValidityChange = useCallback(
@@ -287,13 +350,60 @@ export default function ItemAssignToTray({
         ? {...card, selectedAssigneeIds, hasAssignees: assignees.length > 0}
         : card
     )
+    if (onAssigneesChange) {
+      handleCustomAssigneesChange(cardId, assignees, deletedAssignees)
+    }
+
     const allSelectedOptions = [...disabledOptionIds, ...assignees.map(({id}) => id)]
     const uniqueOptions = [...new Set(allSelectedOptions)]
     const newDisabled = uniqueOptions.filter(id =>
       deletedAssignees.length > 0 ? !deletedAssignees.includes(id) : true
     )
+
     setAssignToCards(cards)
     setDisabledOptionIds(newDisabled)
+  }
+
+  const handleCustomAssigneesChange = (
+    cardId: string,
+    assignees: AssigneeOption[],
+    deletedAssignees: string[]
+  ) => {
+    const newSelectedOption = assignees.filter(
+      assignee => !disabledOptionIds.includes(assignee.id)
+    )[0]
+    const idData = newSelectedOption?.id?.split('-')
+    const isEveryoneOption = newSelectedOption?.id === everyoneOption.id
+    const parsedCard =
+      newSelectedOption === undefined
+        ? ({} as exportedOverride)
+        : ({
+            id: isEveryoneOption ? defaultSectionId : idData[1],
+            name: newSelectedOption.value,
+          } as exportedOverride)
+    if (newSelectedOption?.id === everyoneOption.id) {
+      parsedCard.course_section_id = defaultSectionId
+    } else if (parsedCard.id && idData[0] === 'section') {
+      parsedCard.course_section_id = idData[1]
+    } else if (parsedCard.id && idData[0] === 'student') {
+      parsedCard.short_name = newSelectedOption.value
+    }
+
+    const parsedDeletedCard = deletedAssignees.map(id => {
+      const card = allOptions.find(a => a.id === id)
+      const data = card?.id?.split('-')
+      const deleted = {name: card?.value, type: data?.[0]} as exportedOverride
+      if (id === everyoneOption.id) {
+        deleted.course_section_id = defaultSectionId
+      } else if (data?.[0] === 'section') {
+        deleted.course_section_id = data[1]
+      } else if (data?.[0] === 'student') {
+        deleted.short_name = card?.value
+        deleted.student_id = data[1]
+      }
+      return deleted
+    })
+    onAssigneesChange?.(cardId, parsedCard, parsedDeletedCard)
   }
 
   const handleDatesChange = useCallback(
@@ -302,8 +412,9 @@ export default function ItemAssignToTray({
         card.key === cardId ? {...card, [dateAttribute]: dateValue} : card
       )
       setAssignToCards(cards)
+      onDatesChange?.(cardId, dateAttribute, dateValue ?? '')
     },
-    [assignToCards]
+    [assignToCards, onDatesChange]
   )
 
   const allCardsValid = useCallback(() => {
@@ -319,7 +430,7 @@ export default function ItemAssignToTray({
     return (
       <Flex.Item margin="medium 0" padding="0 medium" width="100%">
         <CloseButton
-          onClick={onDismiss}
+          onClick={handleDismiss}
           screenReaderLabel={I18n.t('Close')}
           placement="end"
           offset="small"
@@ -344,13 +455,6 @@ export default function ItemAssignToTray({
         return I18n.t('Quiz')
       default:
         return ''
-    }
-  }
-
-  function getEveryoneOption(hasOverrides: boolean) {
-    return {
-      id: 'everyone',
-      value: hasOverrides ? I18n.t('Everyone else') : I18n.t('Everyone'),
     }
   }
 
@@ -415,7 +519,7 @@ export default function ItemAssignToTray({
         <TrayFooter
           updateInteraction={allCardsValid() ? 'enabled' : 'inerror'}
           saveButtonLabel={I18n.t('Save')}
-          onDismiss={onDismiss}
+          onDismiss={handleDismiss}
           onUpdate={handleUpdate}
         />
       </Flex.Item>

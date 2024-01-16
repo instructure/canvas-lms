@@ -1193,6 +1193,8 @@ EditView.prototype.toJSON = function () {
       (typeof ENV !== 'undefined' && ENV !== null
         ? ENV.ANONYMOUS_INSTRUCTOR_ANNOTATIONS_ENABLED
         : void 0) || false,
+        differentiatedModulesEnabled: ENV.FEATURES.differentiated_modules
+    
   })
 }
 

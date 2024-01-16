@@ -186,7 +186,7 @@ describe "selective_release module item assign to tray" do
       expect(assign_to_in_tray("Remove Everyone")[0]).to be_displayed
     end
 
-    it "first card pill stays Everyone when student added to first card" do
+    it "first card pill changes to Everyone else when student added to first card" do
       go_to_modules
 
       manage_module_item_button(@module_item1).click
@@ -194,7 +194,7 @@ describe "selective_release module item assign to tray" do
 
       select_module_item_assignee(0, @student1.name)
 
-      expect(assign_to_in_tray("Remove Everyone")[0]).to be_displayed
+      expect(assign_to_in_tray("Remove Everyone else")[0]).to be_displayed
       expect(assign_to_in_tray("Remove #{@student1.name}")[0]).to be_displayed
     end
 
