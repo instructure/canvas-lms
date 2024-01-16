@@ -22,8 +22,8 @@ module OpenAi
       Rails.application.credentials.dig(:smart_search, :openai_api_token)
     end
 
-    def smart_search_available?(root_account)
-      api_key.present? && root_account&.feature_enabled?(:smart_search)
+    def smart_search_available?(context)
+      api_key.present? && context&.feature_enabled?(:smart_search)
     end
 
     def generate_embedding(input)
@@ -68,8 +68,6 @@ module OpenAi
     end
 
     def index_account(root_account)
-      return unless smart_search_available?(root_account)
-
       # by default, index all courses updated in the last year
       date_cutoff = Setting.get("smart_search_index_days_ago", "365").to_i.days.ago
       root_account.all_courses.active.where(updated_at: date_cutoff..).find_each do |course|
@@ -78,11 +76,8 @@ module OpenAi
               n_strand: "smart_search_index_course").index_course(course)
       end
     end
-    handle_asynchronously :index_account, priority: Delayed::LOW_PRIORITY
 
     def index_course(course)
-      return unless smart_search_available?(course.root_account)
-
       # index non-deleted pages (that have not already been indexed)
       course.wiki_pages.not_deleted
             .where.missing(:wiki_page_embeddings)
