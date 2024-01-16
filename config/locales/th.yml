@@ -2,6 +2,31 @@
 # Do not edit it by hand, your changes will be overwritten.
 --- 
 th: 
+  ? ""
+  : 
+    atom_no_author: ไม่มีผู้จัดทำ
+    comment_from_files: 
+      one: ดูไฟล์ที่แนบ
+      other: ดูไฟล์ที่แนบ
+    errors: 
+      cannot_save_att: "คุณไม่มีสิทธิ์อนุญาตสำหรับแก้ไขคุณลักษณ์ %{att_name} ที่ล็อคไว้"
+    feed_entry_title: "ภารกิจ: %{assignment}"
+    feed_entry_title_with_course: "ภารกิจ, %{course}: %{assignment}"
+    labels: 
+      due: ครบกำหนด
+    student_annotation: หมายเหตุกำกับสำหรับผู้เรียน
+    submission_action_take_quiz: "ทำ %{title}"
+    submission_action_turn_in_assignment: "ส่งมอบ %{title}"
+    submission_types: 
+      a_content_page: หน้าเนื้อหา
+      a_discussion_post: โพสต์การพูดคุย
+      a_file_upload: การอัพโหลดไฟล์
+      a_media_recording: การบันทึกสื่อมีเดีย
+      a_quiz: แบบทดสอบ
+      a_text_entry_box: ช่องกรอกข้อความ
+      a_website_url: "URL เว็บไซต์"
+      external_tool: เครื่องมือจากภายนอก
+      on_paper: เอกสาร
   1_hour_and_count_minutes_27533c1b: 
     one: "1 ชั่วโมง 1 นาที"
     other: "1 ชั่วโมง %{count} นาที"
@@ -1915,6 +1940,7 @@ th:
   add_students_to_the_course_874be8fb: เพิ่มผู้เรียนไปยังบทเรียนดังกล่าว
   add_sub_account_to_account_name_b104db90: "เพิ่มบัญชีย่อยไปยัง %{account_name}"
   add_submission_type_8690db4b: เพิ่มประเภทผลงานจัดส่ง
+  add_substitution_9c2ce8f9: เพิ่มการแทนที่
   add_subtitle_9f660cc: เพิ่มคำบรรยาย
   add_tas_to_courses_27741f81: "เพิ่ม TA ไปยังบทเรียน"
   add_tas_to_the_course_2aac6e02: "เพิ่ม TA ไปยังบทเรียน"
@@ -2139,6 +2165,7 @@ th:
   all_timezones_5e8afa7b: ทุกเขตเวลา
   all_types_allowed_287eb6b0: ทุกประเภทที่อนุญาต
   all_ungraded_artifacts_ec3ba09: ผลงานที่ไม่ได้ให้เกรดทั้งหมด
+  all_user_data_5d97832: ข้อมูลผู้ใช้ทั้งหมด
   all_users_associated_with_this_course_6be8d492: ผู้ใช้ทั้งหมดที่เชื่อมโยงกับบทเรียนนี้
   all_users_associated_with_this_institution_d29850be: ผู้ใช้ทั้งหมดที่เชื่อมโยงกับสถาบันนี้
   all_version_history_fbf060a0: ประวัติทุกเวอร์ชั่น
@@ -2177,6 +2204,9 @@ th:
   allow_moderator_to_review_multiple_independent_gra_c59d64f6: "อนุญาตให้ผู้ควบคุมพิจารณาเกรดหลาย ๆ รายการสำหรับผลงานจัดส่งที่เลือกแบบเป็นอิสระ"
   allow_multiple_attempts_e67a0a37: อนุญาตให้ดำเนินการได้หลายครั้ง
   allow_multiple_file_ags_submissions_to_count_as_on_6e24aa34: "อนุญาตให้มีผลงานจัดส่ง AGS เป็นไฟล์ข้อมูลหลายชุดเป็นผลงานจัดเสียงเดียว"
+  allow_observers_to_schedule_appointments_in_the_ca_7f4d0052: ผู้สังเกตการณ์สามารถกำหนดนัดหมายในปฏิทิน
+  allow_observers_to_sign_up_9afddf76: ผู้สังเกตการณ์สามารถเลือกเข้าร่วม
+  allow_observers_to_sign_up_for_appointments_when_e_54f1d9d6: ผู้สังเกตการณ์สามารถเลือกเข้าร่วมนัดหมายหากผู้สอนเปิดใช้งานไว้
   allow_opt_out_of_inbox: "อนุญาตให้ผู้ใช้สามารถถอนตัวจากการรับเมลการพูดคุย รายการนี้จะทำให้ข้อความการพูดคุยและการแจ้งข้อมูลทั้งหมดถูกจัดส่งเป็นการแจ้งข้อมูลแบบเร่งด่วนไปยังอีเมลหลักของผู้ใช้ ปิดซ่อนตราสัญลักษณ์ข้อความที่ไม่ได้อ่านในกล่องจดหมายสำหรับการพูดคุยในกล่องจดหมายและซ่อนค่าปรับแต่งการแจ้งข้อมูลการพูดคุย"
   allow_outcome_extra_credit_57c1e84e: อนุญาตเครดิตพิเศษสำหรับผลลัพธ์
   allow_participants_to_comment_2380a686: อนุญาตให้ผู้เข้าร่วมแสดงความเห็น
@@ -2699,6 +2729,7 @@ th:
   an_outcome_import_is_currently_in_progress_11e6cb38: การนำเข้าผลลัพธ์กำลังดำเนินการในปัจจุบัน
   an_sftp_user_can_only_be_managed_from_a_root_accou_57d9d8e6: "ผู้ใช้ SFTP สามารถจัดการได้จากบัญชีรากเท่านั้น"
   an_unexpected_error_has_occurred_see_error_report__f20b878d: "เกิดข้อผิดพลาดที่ไม่คาดคิด: ดูรายงานข้อผิดพลาด %{id}"
+  an_unexpected_error_occurred_please_try_again_late_c58da3e4: "เกิดข้อผิดพลาดที่ไม่คาดคิด กรุณาลองใหม่อีกครั้งในภายหลัง"
   an_unknown_error_has_occurred_verify_the_csv_file__96087ece: "เกิดข้อผิดพลาดที่ไม่รู้จัก ยืนยันไฟล์ CSV หรือลองใหม่อีกครั้งในภายหลัง"
   an_unknown_error_occurred_please_reach_out_in_canv_43a4da74: |-
       เกิดข้อผิดพลาดที่ไม่รู้จัก
@@ -3011,6 +3042,7 @@ th:
   are_you_sure_you_want_to_remove_this_item_7887ce31: แน่ใจว่าต้องการลบรายการนี้หรือไม่
   are_you_sure_you_want_to_remove_this_tool_7363f90b: แน่ใจว่าต้องการลบเครื่องมือนี้หรือไม่
   are_you_sure_you_want_to_remove_this_user_8d1a8295: แน่ใจว่าต้องการลบผู้ใช้นี้หรือไม่
+  are_you_sure_you_want_to_remove_this_user_from_all_85fb8eb4: "แน่ใจว่าต้องการลบผู้ใช้นี้ออกจากบัญชีผู้ใช้ทั้งหมดหรือไม่ ไม่เพียงแต่มีการลบผู้ใช้เท่านั้น แต่จะกำกับว่าลบอย่างถาวรด้วย"
   are_you_sure_you_want_to_remove_this_user_s_profil_6d703c4: แน่ใจว่าต้องการลบภาพโพรไฟล์ผู้ใช้นี้หรือไม่
   are_you_sure_you_want_to_report_this_profile_pictu_e22c2210: แน่ใจว่าต้องการแจ้งภาพโพรไฟล์นี้หรือไม่
   are_you_sure_you_want_to_restore_this_revision_2f3aaabe: แน่ใจว่าต้องการกู้คืนการแก้ไขนี้หรือไม่
@@ -3070,6 +3102,7 @@ th:
   assign_temporary_enrollments_bdaaa58a: จัดสรรการลงทะเบียนชั่วคราว
   assign_temporary_enrollments_to_name_e8b43c5c: "จัดสรรการลงทะเบียนชั่วคราวให้แก่ %{name}"
   assign_temporary_enrollments_to_recipient_b25cb6be: "จัดสรรการลงทะเบียนชั่วคราวให้แก่ %{recipient}"
+  assign_this_assignment_ac3ca379: มอบหมายภารกิจนี้
   assign_this_module_a4685e57: จัดสรรหน่วยการเรียนนี้
   assign_to_6b806cd9: "กำหนดให้กับ:"
   assign_to_95404a83: กำหนดให้กับ
@@ -4006,6 +4039,7 @@ th:
   before_you_can_edit_your_profile_you_need_to_verif_4fd9143e: "ก่อนสามารถแก้ไขโพรไฟล์ของคุณ คุณจะต้องยืนยันอีเมลแอดเดรสของคุณ (%{email}) โดยคลิกที่ลิงค์ในอีเมลที่เราจัดส่งถึงคุณ หากไม่พบ *ให้คลิกเพื่อส่งอีเมล*ใหม่ และตรวจสอบกล่องอีเมลขยะของคุณ"
   begin_typing_to_search_7daa7b1: เริ่มพิมพ์เพื่อค้นหา
   beginning_date_2d2a29ac: วันที่เริ่มต้น
+  beginning_date_4ce53896: "วันที่เริ่มต้น:"
   beginning_of_your_to_do_history_61ef2dce: จุดเริ่มต้นประวัติสิ่งที่ต้องทำของคุณ
   begins_on_f4dae008: เริ่มเมื่อ
   being_processed_by_plagiarism_service_2269be71: กำลังประมวลผลจากบริการตรวจสอบการขโมยผลงาน
@@ -4634,6 +4668,7 @@ th:
   cancel_updating_comment_6816d855: ยกเลิกการอัพเดตความคิดเห็น
   canceling_this_attempt_will_permanently_delete_any_21ce850c: "การยกเลิกการดำเนินการนี้เป็นการลบงานที่ดำเนินการที่เกี่ยวข้องกันนี้ไปอย่างถาวร ต้องการดำเนินการต่อและลบงานของคุณหรือไม่"
   cannot_access_group_in_concluded_course_90a8db52: ไม่สามารถสืบค้นกลุ่มในบทเรียนที่สรุป
+  cannot_add_a_temporary_enrollment_to_a_concluded_c_459a44fa: ไม่สามารถเพิ่มการลงทะเบียนชั่วคราวไปยังบทเรียนที่สรุปแล้ว
   cannot_add_role_name_name_already_in_use_a523639c: "ไม่สามารถเพิ่มชื่อบทบาท %{name}: ถูกใช้อยู่แล้ว"
   cannot_add_section_to_a_non_section_specific_discu_d2a7f263: ไม่สามารถเพิ่มกลุ่มย่อยไปยังการพูดคุยที่ไม่เฉพาะสำหรับกลุ่มย่อยใดโดยเฉพาะ
   cannot_autograde_at_this_time_a146ad9d: ไม่สามารถให้เกรดอัตโนมัติในเวลานี้
@@ -4647,6 +4682,7 @@ th:
   cannot_be_nil_when_course_id_is_nil_f539388: "จะเป็นศูนย์ไม่ได้หาก course_id เป็นศูนย์"
   cannot_be_present_when_account_id_is_present_f7d9b51f: "จะมีอยู่ไม่ได้หาก account_id มีอยู่"
   cannot_be_present_when_course_id_is_present_785e6a59: "จะมีอยู่ไม่ได้หาก course_id มีอยู่"
+  cannot_be_true_for_sub_assignments_66a9ba5f: ไม่มีผลสำหรับภารกิจย่อย
   cannot_change_an_override_due_date_to_a_date_withi_8b1be496: ไม่สามารถแก้ไขวันครบกำหนดการบอกล้างไปยังวันที่ภายในระยะเวลาการให้เกรดที่สรุปแล้ว
   cannot_change_locked_status_on_granular_permission_6f13bf4f: ไม่สามารถแก้ไขสถานะล็อคในสิทธิ์อนุญาตแบบแยกย่อยได้
   cannot_change_role_name_to_label_already_in_use_c8126e4e: "ไม่สามารถเปลี่ยนชื่อบทบาทเป็น %{label}: ถูกใช้งานอยู่แล้ว"
@@ -4654,6 +4690,7 @@ th:
   cannot_change_the_due_date_of_an_override_in_a_clo_4b3a4dcd: ไม่สามารถแก้ไขวันครบกำหนดของส่วนการบอกล้างในระยะเวลาการให้เกรดที่สรุปไปแล้ว
   cannot_change_the_due_date_to_a_date_within_a_clos_61eb0951: ไม่สามารถแก้ไขวันครบกำหนดไปยังวันที่ภายในระยะเวลาการให้เกรดที่สรุปแล้ว
   cannot_change_the_due_date_when_due_in_a_closed_gr_965b99cb: ไม่สามารถแก้ไขวันครบกำหนดหากวันครบกำหนดอยู่ในระยะเวลาการให้เกรดที่สรุปไปแล้ว
+  cannot_create_a_temporary_enrollment_with_an_inact_c471bfbe: ไม่สามารถจัดทำส่วนการลงทะเบียนชั่วคราวที่มีบทบาทที่ไม่ใช้งาน
   cannot_create_an_appointment_group_for_a_concluded_f4da02e3: ไม่สามารถจัดทำกลุ่มนัดหมายสำหรับบทเรียนที่สรุปไปแล้ว
   cannot_create_event_for_deleted_course_c800f310: ไม่สามารถจัดทำกิจกรรมสำหรับบทเรียนที่ลบไปแล้ว
   cannot_create_or_change_reservation_for_past_appoi_45870c16: ไม่สามารถจัดทำหรือแก้ไขการจองสำหรับนัดหมายที่ผ่านมาแล้ว
@@ -4775,6 +4812,7 @@ th:
   canvas_user_id_4c18b78a: canvas_user_id
   canvas_will_enroll_recipient_as_a_role_in_source_s_33514fc6: "Canvas จะลงทะเบียน %{recipient} เป็น %{role} ในบทเรียนที่เลือกของ %{source} จาก %{start} - %{end}"
   canvas_will_enroll_recipient_as_a_role_in_source_s_7fe7d625: "Canvas จะลงทะเบียน %{recipient} เป็น %{role} ในบทเรียนที่เลือกไว้ของ %{source} จาก %{start} - %{end}"
+  canvas_will_enroll_recipient_as_a_role_in_the_sele_5ef30bec: "Canvas จะลงทะเบียน %{recipient} เป็น %{role} ในบทเรียนที่เลือกเมื่อ %{source} จาก %{start} - %{end}"
   canvas_will_remove_keys_with_null_values_from_live_6d7e3091: "Canvas จะลบคีย์ที่มีค่าเปล่าจากเพย์โหลดกิจกรรมไฟล์หากเปิดใช้งานคุณสมบัตินี้ไว้"
   cap_the_number_of_rces_rendered_on_initial_page_lo_c3890aec: |-
       บันทึกจำนวน REC ที่มีการเรนเดอร์ระหว่างโหลดเพจครั้งแรกไว้ หลังจากนั้น
@@ -4844,6 +4882,7 @@ th:
       update_assignment_points: เปลี่ยนคะแนนภารกิจให้ตรงกับเกณฑ์การให้คะแนนหรือไม่
   change_section_to_sectionname_6e947e90: "เปลี่ยนกลุ่มย่อยเป็น %{sectionName}"
   change_sis_ids_3a47154d: "เปลี่ยน SIS ID"
+  change_to_b757d327: เปลี่ยนเป็น
   change_visibility_of_account_calendars_fd03fbb8: แก้ไขการแสดงผลปฏิทินบัญชีผู้ใช้
   changed_item_1d16a85f: รายการที่แก้ไข
   changes_the_resourcelink_id_substitution_parameter_15c7faaf: |-
@@ -6323,6 +6362,7 @@ th:
   count_attempts_d23c69a0: 
     one: "1 การดำเนินการ"
     other: "%{count} การดำเนินการ"
+    zero: การดำเนินการที่ไม่จำกัด
   count_changes_pushed_by_user_654aade2: "%{count} การเปลี่ยนแปลงที่แจ้งโดย %{user}"
   count_comments_cb137ab8: 
     one: "1 ความเห็น"
@@ -7684,6 +7724,7 @@ th:
       - ธันวาคม
   date_4e62ac59: วันที่
   date_61419973: "วันที่:"
+  date_adjustments_331bb009: การปรับวันที่
   date_at_time_25a04cd2: "%{date} ที่ %{time}"
   date_created_87e265bc: วันที่จัดทำ
   date_created_createdat_265a0dfa: "วันที่จัดทำ: %{createdAt}"
@@ -8815,6 +8856,7 @@ th:
   end_time_cannot_be_before_start_time_7fa9a8e8: เวลาสิ้นสุดจะอยู่ก่อนเวลาเริ่มต้นไม่ได้
   end_time_must_be_after_start_time_84398c82: "end_time จะต้องอยู่หลังจาก start_time"
   end_user_license_agreement_6d2c666b: ข้อตกลงสิทธิ์ใช้งานผู้ใช้ปลายทาง
+  ending_date_b9359e06: "วันที่สิ้นสุด:"
   ending_date_e1ea13a4: วันที่สิ้นสุด
   ends_4fcb632: "สิ้นสุด:"
   ends_at_9a62b528: สิ้นสุดเมื่อ
@@ -9266,6 +9308,7 @@ th:
   error_updating_discussion_topic_d47c64ff: มีข้อผิดพลาดในการอัพเดตหัวข้อการพูดคุย
   error_updating_file_usage_rights_f9216019: มีข้อผิดพลาดในการอัพเดตสิทธิ์การใช้งาน
   error_updating_module_access_f0970f4c: เกิดข้อผิดพลาดในการอัพเดตสิทธิ์ใช้งานโมดูล
+  error_updating_moduleitemname_96819b43: "มีข้อผิดพลาดในการอัพเดต \"%{moduleItemName}\""
   error_updating_modulename_settings_da982acf: "มีข้อผิดพลาดในการอัพเดตค่า %{moduleName}"
   error_updating_notes_31b24785: มีปัญหาในการอัพเดตหมายเหตุหรือบันทึกย่อ
   error_updating_pacename_ad07f9df: "มีข้อผิดพลาดในการอัพเดต %{paceName}"
@@ -9586,6 +9629,9 @@ th:
   failed_to_create_domain_lookup_4d40fa17: ไม่สามารถจัดทำส่วนการค้นหาโดเมน
   failed_to_create_internal_setting_f60fb462: ไม่สามารถจัดทำค่าปรับตั้งภายในได้
   failed_to_create_new_role_e336e461: ไม่สามารถจัดทำบทบาทใหม่
+  failed_to_create_temporary_enrollment_pairing_617dd0c3: ไม่สามารถจัดทำคู่การลงทะเบียนชั่วคราว
+  failed_to_create_temporary_enrollment_pairing_due__a2bf61a: ไม่สามารถจัดทำคู่การลงทะเบียนชั่วคราวเนื่องจากข้อผิดพลาดที่ไม่ทราบ
+  failed_to_create_temporary_enrollment_please_try_a_4d765613: "ไม่สามารถจัดทำส่วนการลงทะเบียนชั่วคราว กรุณาลองใหม่อีกครั้งในภายหลัง"
   failed_to_create_temporary_enrollment_please_try_a_ad6fefb0: "ไม่สามารถจัดทำรายการลงทะเบียนชั่วคราวได้ กรุณาลองใหม่อีกครั้ง"
   failed_to_delete_auth_tokens_on_canvas_side_1d871f46: "ไม่สามารถลบชุดข้อมูลตรวจรับรองจากฝั่ง Canvas"
   failed_to_delete_auth_tokens_on_catalog_side_54aa9a8c: ไม่สามารถลบชุดข้อมูลตรวจรับรองจากฝั่งแคตาล็อก
@@ -9596,6 +9642,8 @@ th:
   failed_to_delete_name_4abd2ed5: "ไม่สามารถลบ %{name}"
   failed_to_delete_role_label_27959de3: "ไม่สามารถลบบทบาท %{label}"
   failed_to_delete_selected_pages_26fa87db: ไม่สามารถลบเพจที่เลือก
+  failed_to_delete_temporary_enrollment_a448a32a: ไม่สามารถลบส่วนการลงทะเบียนชั่วคราว
+  failed_to_delete_temporary_enrollment_due_to_an_un_45295b0f: ไม่สามารถลบส่วนการลงทะเบียนชั่วคราวเนื่องจากข้อผิดพลาดที่ไม่ทราบ
   failed_to_delete_to_do_64edff49: ไม่สามารถลบรายการสิ่งที่ต้องทำ
   failed_to_export_blueprint_course_settings_1ced8c6: ไม่สามารถส่งออกค่าปรับตั้งบทเรียนพิมพ์เขียว
   failed_to_export_context_info_acb07497: ไม่สามารถส่งออกข้อมูลแวดล้อม
@@ -9605,6 +9653,8 @@ th:
   failed_to_fetch_migration_issues_data_a896da98: ไม่สามารถสืบค้นข้อมูลปัญหาการโอนย้าย
   failed_to_fetch_temporary_enrollment_data_9422003: ไม่สามารถสืบค้นข้อมูลการลงทะเบียนชั่วคราว
   failed_to_get_new_activity_17e7ec7c: ไม่สามารถสืบค้นกิจกรรมใหม่
+  failed_to_get_temporary_enrollments_for_provider_617a73ea: ไม่สามารถสืบค้นส่วนการลงทะเบียนชั่วคราวสำหรับผู้จัดหา
+  failed_to_get_temporary_enrollments_for_recipient_1baf62d3: ไม่สามารถสืบค้นส่วนการลงทะเบียนชั่วคราวสำหรับผู้รับ
   failed_to_ignore_assignment_46565fa3: ไม่สามารถละเว้นภารกิจได้
   failed_to_import_media_objects_4c1fcb4f: ไม่สามารถนำเข้าออบเจคต์สื่อ
   failed_to_import_some_lti_resource_links_ab124c3f: "ไม่สามารถนำเข้าลิงค์ทรัพยากร LTI บางส่วน"
@@ -9956,10 +10006,14 @@ th:
   forgot_password_url_3f9c04b: "ลืม URL รหัสผ่าน"
   form_background_fb654518: พื้นหลังแบบฟอร์ม
   form_border_f61f12dc: กรอบแบบฟอร์ม
+  formattedgrade_c0747a09: "*%{formattedGrade}*"
   formattedgrade_points_576abfea: "%{formattedGrade} *คะแนน*"
   formattedpoints_points_c75261e2: 
     one: "1 คะแนน"
     other: "%{formattedPoints} คะแนน"
+  formattedpoints_points_possible_1d93043f: 
+    one: "*1* คะแนนนที่เป็นไปได้"
+    other: "*%{formattedPoints}* คะแนนที่เป็นไปได้"
   formattedpoints_points_possible_dad9d40a: 
     one: "1 คะแนนที่เป็นไปได้"
     other: "%{formattedPoints} คะแนนที่เป็นไปได้"
@@ -10267,6 +10321,7 @@ th:
         out_of: จาก
         score: คะแนน
         submission_progress_status: สถานะความคืบหน้าในการจัดส่ง
+        submitted: จัดส่งแล้ว
       labels: 
         final_grade_hidden: การคำนวณผลรวมถูกปิดใช้งาน
         high: สูง
@@ -10847,6 +10902,7 @@ th:
   have_a_question_about_canvas_ask_it_here_5781cce: "มีคำถามเกี่ยวกับ Canvas หรือไม่ สอบถามได้ที่นี่"
   have_not_been_graded_df2a5fd2: ยังไม่ได้ให้เกรด
   have_not_yet_submitted_57e6a58b: ยังไม่ได้จัดส่ง
+  have_students_sign_up_in_groups_d6cfd4d2: ให้ผู้สมัครเรียนเข้ารวมกลุ่ม
   haven_t_been_graded_d7dee5bb: ยังไม่ได้ให้เกรด
   haven_t_submitted_yet_e63834db: ยังไม่ได้จัดส่ง
   he_him_99aea1a8: เขา
@@ -12513,6 +12569,7 @@ th:
   log_in_c9e240ef: ล็อกอิน
   log_in_to_submit_962106cf: ล็อกอินเพื่อส่ง
   log_in_url_is_not_a_valid_uri_7b8c57ee: "URL ล็อกอินไม่ใช่ URI ที่ถูกต้อง"
+  log_lti_launches_ff06c5fe: "เรียกใช้ LTI บันทึกประวัติ"
   log_on_url_fc166e4c: "URL ล็อกออน"
   log_out_379ba28a: ล็อกเอาท์
   log_out_url_2605c2c1: "URL ล็อกเอาท์"
@@ -12767,6 +12824,8 @@ th:
   manage_students_for_the_course_3b1bc4f0: จัดการผู้เรียนสำหรับบทเรียน
   manage_subject_coursecontext_2328e1ff: "จัดการวิชา: %{courseContext}"
   manage_subject_f9835769: จัดการวิชา
+  manage_temporary_enrollment_providers_for_name_eb2a6f43: "จัดการผู้จัดการลงทะเบียนชั่วคราวสำหรับ %{name}"
+  manage_temporary_enrollment_recipients_for_name_61dd34d4: "จัดการผู้รับการลงทะเบียนชั่วคราวสำหรับ %{name}"
   manage_temporary_enrollments_4c4f21ef: จัดการการลงทะเบียนชั่วคราว
   manage_update_23de23a1: จัดการการอัพเดต
   manage_update_for_toolname_f8e3b2fb: "จัดการการอัพเดตสำหรับ %{toolName}"
@@ -14742,6 +14801,7 @@ th:
   module_publish_menu_30b638dd: เมนูเผยแพร่หน่วยการเรียน
   module_publish_menu_88b54c1b: เมนูเผยแพร่หน่วยการเรียน
   module_published_80f0b9b8: เผยแพร่หน่วยการเรียนแล้ว
+  moduleitemname_updated_7c7d495c: "อัพเดต %{moduleItemName} แล้ว"
   modulename_created_successfully_6c273e09: "จัดทำ %{moduleName} เสร็จสิ้น"
   modulename_module_publish_options_69ef1ece: "%{moduleName} ตัวเลือกในการเผยแพร่หน่วยการเรียน"
   modulename_module_publish_options_publishedstatus_94ea7f49: "ตัวเลือกในการเผยแพร่หน่วยการเรียน %{moduleName}, %{publishedStatus}"
@@ -14851,6 +14911,7 @@ th:
   move_to_1c208ae5: ย้ายไป...
   move_to_25d7ef11: ย้ายไป
   move_to_9b91c6e0: ย้ายไป...
+  move_to_b7dddc4f: "ย้ายไป:"
   move_to_bottom_d0f71bf0: ย้ายไปล่างสุด
   move_to_dde1a5e1: ย้ายไป...
   move_to_end_c6bfbcf5: ย้ายไปท้ายสุด
@@ -15318,6 +15379,7 @@ th:
   nonce_77113ba4: Nonce
   none_3b5e34d2: ไม่มี
   none_9b6c9bec: ไม่มี
+  none_anonymized_e1ff7c45: "ไม่มี (ไม่ระบุตัวตน)"
   northeast_community_college_course_syllabus_report_8124f969: "รายงานหลักสูตรสำหรับบทเรียนของ Northeast Community College"
   norway_47_bc598662: "นอร์เวย์ (+47)"
   norwegian_53f391ec: นอร์เวย์
@@ -18836,6 +18898,7 @@ th:
   remove_contact_method_ca890ba3: ลบวิธีการติดต่อ
   remove_course_association_name_b760c502: "ลบการเชื่อมโยงบทเรียน %{name}"
   remove_d83a966c: "ลบ:"
+  remove_dates_5a5a8df2: ลบวันที่
   remove_dates_9b9ba2f6: ลบวันที่
   remove_delay_for_gradebook_student_search_307b4ecf: ลบระยะหน่วงสำหรับค้นหาผู้เรียนในสมุดบันทึกเกรด
   remove_designers_from_courses_42332a57: ลบผู้ออกแบบจากบทเรียน
@@ -18852,6 +18915,7 @@ th:
   remove_filename_dab5c02e: "ลบ %{filename}"
   remove_filter_6f7204e2: ลบตัวกรอง
   remove_filtername_filter_6b6d7063: "ลบตัวกรอง %{filterName}"
+  remove_from_to_to_from_substitutes_4a6dc71d: "ลบ '%{from}' ถึง '%{to}' จากข้อมูลแทนที่"
   remove_grading_scheme_title_d3942a08: "ลบรูปแบบการให้เกรด %{title}"
   remove_group_5d2f2f2d: ลบกลุ่ม
   remove_group_981d6a02: ลบกลุ่มหรือไม่
@@ -19112,6 +19176,7 @@ th:
   revert_date_changes_5105ce5: คืนค่าการเปลี่ยนวันที่
   revert_to_actual_score_f665eea9: กลับคืนเป็นคะแนนจริง
   reverts_the_visible_assignments_scope_to_its_origi_87eb35d: ปรับขอบเขตภารกิจที่จัดแสดงเป็นรูปแบบเริ่มต้น
+  review_7197fba3: "พิจารณา "
   review_feedback_4b4abb38: พิจารณาผลตอบรับ
   review_now_318a6a3e: พิจารณาตอนนี้
   reviews_due_5178cab6: กำหนดเวลาแสดงความคิดเห็น
@@ -19725,6 +19790,7 @@ th:
   see_vericite_results_b44dd8c8: "ดูผลลัพธ์ VeriCite"
   select_1e849959: "[ เลือก ]"
   select_a_course_4710371f: เลือกบทเรียน
+  select_a_date_optional_d60168d0: "เลือกวันที่ (เผื่อเลือก)"
   select_a_grading_period_5ea50f1: เลือกระยะเวลาการให้เกรด...
   select_a_grading_period_aab25483: เลือกระยะเวลาการให้เกรด
   select_a_group_category_295f7a34: เลือกหมวดหมู่กลุ่ม
@@ -19806,9 +19872,13 @@ th:
   select_module_item_3ab50479: เลือกรายการหน่วยการเรียน
   select_name_to_mention_15d9674e: "เลือก %{name} ที่จะอ้างถึง"
   select_navigation_links_68e1e924: เลือกลิงค์สืบค้นเนื้อหา
+  select_new_beginning_date_bb3c9650: เลือกวันที่เริ่มต้นใหม่
+  select_new_end_date_f10caeca: เลือกวันที่สิ้นสุดใหม่
   select_one_8e0af564: เลือกหนึ่งรายการ
   select_one_b647b384: เลือกหนึ่งรายการ
   select_one_of_the_options_c8b0c6e4: "เลือกหนึ่งตัวเลือก:"
+  select_original_beginning_date_31a23f92: เลือกวันที่เริ่มต้นเดิม
+  select_original_end_date_dc11de7d: เลือกวันที่สิ้นสุดเดิม
   select_outcome_7e6e2562: เลือกผลลัพธ์
   select_outcome_title_b99b3ca0: "เลือกผลลัพธ์ %{title}"
   select_page_e93fc123: เลือกเพจ
@@ -20485,6 +20555,7 @@ th:
   shared_secret_892c88f2: ข้อมูลลับที่แชร์
   sharing_a_qr_code_can_give_others_immediate_access_79575158: "การแชร์รหัส QR จะช่วยให้บุคคลอื่นสามารถเข้าไปยังบัญชีของคุณได้ในทันทีผ่านแอพพลิเคชั่นสำหรับอุปกรณ์พกพา %{canvas}"
   she_her_3f459cc2: เธอ
+  shift_dates_746698a5: ปรับวันที่
   shift_dates_b5a7b7a1: ปรับวันที่
   shift_due_dates_and_assignment_availability_dates__c5ad272: ปรับวันครบกำหนดและวันที่จัดสรรภารกิจไปในอนาคตเป็นจำนวนวัน
   shipping_country_code_as_reported_by_salesforce_631961fe: รหัสประเทศสำหรับจัดส่งตามที่พนักงานขายแจ้ง
@@ -21433,6 +21504,7 @@ th:
   subscribe_failed_2eb62de0: สมัครบริการล้มเหลว
   subscribe_to_title_c7d6bbd2: "สมัครไปยัง %{title}"
   subscribed_fe74d22a: สมัครบริการแล้ว
+  substitution_713c65b9: การแทนที่
   subtitle_ee60ca78: คำบรรยาย
   subtitles_could_not_be_imported_from_file_5de6da0b: "ไม่สามารถนำเข้าคำบรรยายจาก %{file}"
   subtitles_lang_could_not_be_imported_for_file_4d1be2e3: "ไม่สามารถนำเข้าคำบรรยาย (%{lang}) สำหรับ %{file}"
@@ -21632,6 +21704,7 @@ th:
   temporarily_enroll_a_user_into_a_course_this_tempo_990488f8: "ลงทะเบียนผู้ใช้ชั่วคราวไปยังบทเรียน การลงทะเบียนชั่วคราวนี้จะถูกเข้าคู่กับการลงทะเบียนอื่นภายในบทเรียนดังกล่าว"
   temporarily_enroll_name_8acb66ce: "การลงทะเบียนชั่วคราว %{name}"
   temporary_9c54e959: "ชั่วคราว:"
+  temporary_enrollment_enrollmenttype_for_username_a5410ed7: "การลงทะเบียนชั่วคราว %{enrollmentType} สำหรับ %{userName}"
   temporary_enrollment_option_links_eb9b8b2e: ลิงค์ตัวเลือกการลงทะเบียนชั่วคราว
   temporary_enrollment_pairings_56f35f5c: การจับคู่การลงทะเบียนชั่วคราว
   temporary_enrollment_was_successfully_created_78b48a7a: จัดทำการลงทะเบียนชั่วคราวเสร็จสิ้น
@@ -22013,6 +22086,7 @@ th:
   the_specified_assignment_id_could_not_be_found_e4e64f5f: "ไม่พบภารกิจที่ระบุ (%{id})"
   the_specified_label_already_exists_please_enter_a__7f2b7598: "มีฉลากกำกับที่ระบุอยู่แล้ว กรุณากรอกชื่อฉลากกำกับอื่น"
   the_specified_resource_does_not_exist_71d8b751: ทรัพยากรที่ระบุไม่มีอยู่
+  the_specified_type_must_match_the_base_type_for_th_eea5ab7d: ประเภทที่ระบุจะต้องตรงกับประเภทเกณฑ์พื้นฐานของบทบาท
   the_specified_user_id_is_not_a_student_in_this_cou_372573ca: "ผู้ใช้ที่ระบุ (%{id}) ไม่ใช่ผู้เรียนในบทเรียนนี้"
   the_specified_user_is_not_a_student_in_this_course_5a81d8a5: ผู้ใช้ที่ระบุไม่ใช่ผู้เรียนในบทเรียนนี้
   the_start_date_for_the_pace_plan_must_be_after_the_44e8ed5b: วันที่เริ่มต้นสำหรับแผนเนื้อหาจะต้องอยู่หลังจากวันที่สิ้นสุด
@@ -23074,6 +23148,7 @@ th:
   tool_content_2924d18f: เนื้อหาของเครื่องมือ
   tool_content_e699e813: เนื้อหาของเครื่องมือ
   tool_created_at_82c0daba: จัดทำเครื่องมือเมื่อ
+  tool_id_94b91929: "ID เครื่องมือ"
   tool_id_afd739e1: "Id เครื่องมือ"
   tool_name_7d58a6e4: ชื่อเครื่องมือ
   tool_not_found_f6366382: ไม่พบเครื่องมือ
@@ -23081,6 +23156,7 @@ th:
   tool_privacy_level_9d392813: ระดับความเป็นส่วนตัวของเครื่องมือ
   tool_toolname_found_for_client_id_clientid_would_y_13f35b91: "พบเครื่องมือ \"%{toolName}\" สำหรับ ID ไคลเอนท์ %{clientId} ต้องการติดตั้งหรือไม่"
   tool_type_afa58fcb: ประเภทเครื่องมือ
+  tool_type_tool_configured_tool_id_251c2959: "ประเภทเครื่องมือ (\"tool_id\" ที่กำหนดค่าจากเครื่องมือ)"
   toolname_logo_6b639926: "%{toolName} โลโก้"
   tooltips: 
     finished: เสร็จสิ้นแล้ว
@@ -23595,11 +23671,13 @@ th:
   user_could_not_be_found_3e7ef5fe: ไม่พบผู้ใช้
   user_course_access_log_f7b8a4bd: บันทึกประวัติการสืบค้นบทเรียนของผู้ใช้
   user_data_export_from_date_6ba21b89: "*การส่งออกข้อมูลผู้ใช้จาก %{date}*"
+  user_data_shared_with_this_tool_545ca14f: ข้อมูลผู้ใช้ที่แชร์จากเครื่องมือนี้
   user_date_range_search: 
     cant_come_before_from: "'ถึงวันที่’ จะอยู่ก่อน ‘จากวันที่ ไม่ได้'"
   user_details_2613c079: รายละเอียดผู้ใช้
   user_details_e9aef9e5: รายละเอียดผู้ใช้
   user_does_not_have_permission_to_select_final_grad_47560e75: ผู้ใช้ไม่ได้รับอนุญาตให้เลือกเกรดสรุป
+  user_fields_included_dd0fd52: "ฟิลด์ผู้ใช้ที่รวมอยู่ด้วย:"
   user_files_78e21703: ไฟล์ของผู้ใช้
   user_groups_query_error_bba6a6b7: ข้อผิดพลาดการสืบค้นกลุ่มผู้ใช้
   user_id_8256faeb: user_id
@@ -23753,6 +23831,8 @@ th:
   user_profile_picture_46bffbc7: ภาพโพรไฟล์ผู้ใช้
   user_removed_successfully_20a3889d: ลบผู้ใช้เสร็จสิ้น
   user_results_updated_9ce38dce: อัพเดตผลลัพธ์ของผู้ใช้แล้ว
+  user_s_email_only_401dbaba: เฉพาะอีเมลผู้ใช้
+  user_s_name_only_474c2ab4: เฉพาะชื่อผู้ใช้
   user_search_panel_18f80511: แผงข้อมูลการค้นหาผู้ใช้
   user_search_results_f5445b8b: ผลการค้นหาของผู้ใช้
   user_selected_answer: คุณเลือก
@@ -24297,7 +24377,13 @@ th:
       หากเปิดใช้งานไว้ บัญชีรากที่มีคีย์ `:ready_for_new_quizzes_provision`
       ในค่าปรับตั้งที่ไม่ได้จัดสรรไว้จะไม่ถูกจัดสรร การ
       ตรวจสอบและจัดสรรนี้จะเกิดขึ้นในทุก ๆ shard ประมาณเวลาเที่ยงคืนของพื้นที่ของ shard ดังกล่าว
+  when_enabled_sends_data_for_all_lti_launches_to_th_2c76d174: |-
+      หากเปิดใช้งานไว้ จะมีการส่งข้อมูลสำหรับการเรียกใช้ LTI ทั้งหมดไปยังระบบ PandataEvents
+      เพื่อสืบค้นและแสดงผล
   when_enabled_site_admin_account_ui_will_allow_asso_9d04a1d8: "หากเปิดใช้งาน UI บัญชีผู้ดูแลไซต์จะอนุญาตให้เชื่อมโยงผู้ใใช้บริการกับ DeveloperKey และใช้คีย์/ผู้ใช้ดังกล่าวกับประเภทการจัดสรร client_credentials"
+  when_enabled_teachers_can_choose_to_allow_observer_320b555e: |-
+      หากเปิดใช้งาน ผู้สอนสามารถเลือกอนุญาตผู้สังเการณ์ในการทำนัดหมาย
+      ขณะจัดทำกลุ่มนัดหมายในปฏิทิน
   when_enabled_the_hidden_html_forms_that_are_used_t_c5edd929: |-
       ขณะเปิดใช้งาน แบบฟอร์ม HTML ที่ซ่อนไว้ที่ใช้เพื่อสั่งการเรียกใช้ LTI
       จะมีหมายเลขสุ่มผนวกไว้กับ ID ของตน หากปิดใช้งาน
@@ -24740,8 +24826,10 @@ th:
   you_must_attach_at_least_one_file_to_this_assignme_9f39ce12: คุณจะต้องแนบอย่างน้อยหนึ่งไฟล์ไปยังภารกิจนี้
   you_must_be_authorized_to_manage_sis_in_order_to_r_a218ceb7: "คุณจะต้องได้รับอนุญาตให้จัดการ SIS เพื่อเปิดใช้งานการล็อกอินใหม่ผ่าน SIS ID ที่เชื่อมโยงไว้"
   you_must_be_authorized_to_manage_sis_in_order_to_s_bb867901: "คุณจะต้องได้รับอนุญาตให้จัดการ SIS เพื่อระงับการล็อกอินผ่าน SIS ID ที่เชื่อมโยงไว้"
+  you_must_choose_a_content_option_c776bdef: คุณจะต้องเลือกตัวเลือกเนื้อหา
   you_must_choose_a_recipient_3171112f: คุณจะต้องเลือกผู้รับ
   you_must_enter_a_date_f8eabfb1: คุณจะต้องกรอกวันที่
+  you_must_enter_a_name_for_the_new_question_bank_83ff5748: คุณจะต้องกรอกชื่อสำหรับแถวคำถามใหม่
   you_must_have_a_student_or_section_selected_a99e45df: คุณจะต้องเลือกผู้เรียนหรือกลุ่มย่อยไว้
   you_must_input_a_section_b8d370fe: คุณจะต้องกรอกกลุ่มย่อย
   you_must_log_in_to_view_replies_9ccd4da0: คุณจะต้องล็อกอินเพื่อดูการตอบกลับ
@@ -24755,6 +24843,7 @@ th:
   you_must_provide_targetgroupid_or_targetcontextid__dd2bf92: "คุณจะต้องแจ้ง targetGroupId หรือ targetContextId และ targetContextType"
   you_must_publish_your_course_for_students_to_recei_1995ee46: "คุณจะต้องเผยแพร่บทเรียนสำหรับผู้เรียนของคุณเพื่อรับประกาศแจ้ง การแจ้งข้อมูลจะไม่มีการส่งย้อนหลังสำหรับประกาศที่จัดทำก่อนการเผยแพร่บทเรียน"
   you_must_select_a_course_to_copy_content_from_e7bd9e09: คุณจะต้องเลือกบทเรียนที่จะคัดลอกเนื้อหา
+  you_must_select_a_file_to_import_content_from_28a242ff: คุณจะต้องเลือกไฟล์ที่จะนำเข้าเนื้อหา
   you_must_select_a_folder_to_upload_your_migration__ac7bc7c0: คุณจะต้องเลือกโฟลเดอร์ที่จะอัพโหลดการโอนย้ายของคุณ
   you_must_select_an_assignment_group_c16a2168: คุณจะต้องเลือกกลุ่มภารกิจ
   you_must_select_at_least_one_calendar_to_create_an_29e6769c: คุณจะต้องเลือกอย่างน้อยหนึ่งรายการปฏิทินเพื่อจัดทำกิจกรรม
