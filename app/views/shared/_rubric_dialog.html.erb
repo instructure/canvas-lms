@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
+<% js_env :context_rubric_associations_url => context_url(@context, :context_rubric_associations_url) %>
+
 <div class="rubric_dialog mathjax_ignore" id="rubric_dialog" style="display: none;">
   <h2 class="pull-left"><%= t 'titles.find_a_rubric', "Find a Rubric" %></h2>
   <a style="float: <%= direction('right') %>;" href="<%= context_url(@context, :context_rubrics_url) %>"><%= t 'links.manage_rubrics', "Manage Rubrics" %></a>
