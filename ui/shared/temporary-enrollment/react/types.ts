@@ -54,6 +54,7 @@ export interface RoleChoice {
 }
 
 export interface Enrollment {
+  limit_privileges_to_course_section: boolean
   id: string
   user_id?: string
   course_id: string
@@ -122,8 +123,8 @@ export interface Permissions {
 }
 
 export interface SelectedEnrollment {
-  course: string
   section: string
+  limit_privileges_to_course_section: boolean
 }
 
 export interface TemporaryEnrollmentPairing {

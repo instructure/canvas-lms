@@ -518,6 +518,7 @@ describe('TempEnrollAssign', () => {
         temporary_enrollment_source_user_id: 0,
         type: '',
         course_section_id: '7',
+        limit_privileges_to_course_section: false,
         user: {
           id: '1',
         } as User,
@@ -561,6 +562,7 @@ describe('TempEnrollAssign', () => {
         temporary_enrollment_source_user_id: 0,
         type: '',
         course_section_id: '7',
+        limit_privileges_to_course_section: false,
         user: {
           id: '1',
         } as User,
@@ -620,6 +622,7 @@ describe('TempEnrollAssign', () => {
           temporary_enrollment_source_user_id: 0,
           type: '',
           course_section_id: '7',
+          limit_privileges_to_course_section: false,
           user: {
             id: '1',
           } as User,
