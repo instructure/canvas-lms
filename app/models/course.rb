@@ -3357,7 +3357,7 @@ class Course < ActiveRecord::Base
                      Course.default_tabs
                    end
 
-    if OpenAi.smart_search_available?(root_account)
+    if OpenAi.smart_search_available?(self)
       default_tabs.insert(1,
                           {
                             id: TAB_SEARCH,

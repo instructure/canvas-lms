@@ -142,8 +142,6 @@ class WikiPage < ActiveRecord::Base
   end
 
   def generate_embeddings
-    return unless OpenAi.smart_search_available?(root_account)
-
     delete_embeddings
     chunk_content do |chunk|
       embedding = OpenAi.generate_embedding(chunk)
