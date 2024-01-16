@@ -204,6 +204,19 @@ describe('ItemAssignToTray', () => {
     expect(onDismiss).toHaveBeenCalled()
   })
 
+  it('does not fetch assignee options when defaultCards are passed', () => {
+    renderComponent({defaultCards: []})
+    expect(fetchMock.calls('/api/v1/courses/1/assignments/23/date_details').length).toBe(0)
+  })
+
+  it('calls customAddCard if passed when a card is added', () => {
+    const customAddCard = jest.fn()
+    const {getByRole} = renderComponent({onAddCard: customAddCard})
+
+    act(() => getByRole('button', {name: 'Add'}).click())
+    expect(customAddCard).toHaveBeenCalled()
+  })
+
   describe('AssigneeSelector', () => {
     it.skip('shows existing overrides as selected options', async () => {
       const {findAllByTestId} = renderComponent()

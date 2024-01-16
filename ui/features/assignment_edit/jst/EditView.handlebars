@@ -254,7 +254,11 @@
     <div class="form-column-left">
       <legend id="assignment_overrides">
         <label for="assignment_overrides">
-          {{#t}}Assign{{/t}}
+          {{#if differentiatedModulesEnabled}}
+            {{#t}}Assign Access{{/t}}
+          {{else}}
+            {{#t}}Assign{{/t}}
+          {{/if}}
         </label>
       </legend>
     </div>
