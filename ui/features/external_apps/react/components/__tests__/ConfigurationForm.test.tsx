@@ -52,7 +52,8 @@ afterEach(() => {
   jest.resetAllMocks()
 })
 
-describe('when configuration type is manual', () => {
+// INTEROP-8410 - remove or rewrite to remove spies on imports
+describe.skip('when configuration type is manual', () => {
   const getNameInput = () => {
     return screen.getByRole('textbox', {name: /name/i})
   }
@@ -204,7 +205,8 @@ describe('when configuration type is manual', () => {
   })
 })
 
-describe('when configuration type is url', () => {
+// INTEROP-8410 - remove or rewrite to remove spies on imports
+describe.skip('when configuration type is url', () => {
   const baseProps = {
     configurationType: 'url',
     tool: {},
@@ -309,7 +311,8 @@ describe('when configuration type is url', () => {
   })
 })
 
-describe('when configuration type is xml', () => {
+// INTEROP-8410 - remove or rewrite to remove spies on imports
+describe.skip('when configuration type is xml', () => {
   const baseProps = {
     configurationType: 'xml',
     tool: {},

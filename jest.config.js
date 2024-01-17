@@ -17,6 +17,7 @@
  */
 
 const {defaults} = require('jest-config')
+const {swc} = require('./ui-build/webpack/webpack.rules')
 
 const esModules = ['mime'].join('|')
 
@@ -79,25 +80,16 @@ module.exports = {
   transform: {
     '\\.handlebars$': '<rootDir>/jest/handlebarsTransformer.js',
     '\\.graphql$': '<rootDir>/jest/rawLoader.js',
-    '\\.[jt]sx?$': [
-      'babel-jest',
+    '^.+\\.(j|t)s?$': [
+      '@swc/jest',
       {
-        configFile: false,
-        presets: [
-          [
-            '@babel/preset-env',
-            {
-              // until we're on Jest 27 and can look into loading ESMs natively;
-              // https://jestjs.io/docs/ecmascript-modules
-              modules: 'auto',
-            },
-          ],
-          ['@babel/preset-react', {useBuiltIns: true}],
-          ['@babel/preset-typescript', {}],
-        ],
-        targets: {
-          node: 'current',
-        },
+        jsc: swc[0].use.options.jsc,
+      },
+    ],
+    '^.+\\.(j|t)sx?$': [
+      '@swc/jest',
+      {
+        jsc: swc[1].use.options.jsc,
       },
     ],
   },
