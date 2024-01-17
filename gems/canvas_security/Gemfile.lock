@@ -115,9 +115,10 @@ GEM
     irb (1.11.1)
       rdoc
       reline (>= 0.4.2)
-    json-jwt (1.16.3)
+    json-jwt (1.16.5)
       activesupport (>= 4.2)
       aes_key_wrap
+      base64
       bindata
       faraday (~> 2.0)
       faraday-follow_redirects
