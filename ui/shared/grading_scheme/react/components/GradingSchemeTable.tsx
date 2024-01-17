@@ -26,11 +26,13 @@ import {
   IconEditLine,
   IconTrashLine,
   IconArchiveLine,
+  IconUnarchiveLine,
 } from '@instructure/ui-icons'
 import {IconButton} from '@instructure/ui-buttons'
 import type {GradingScheme, GradingSchemeCardData} from '../../gradingSchemeApiModel'
 import {Link} from '@instructure/ui-link'
 import {TruncateText} from '@instructure/ui-truncate-text'
+import {Tooltip} from '@instructure/ui-tooltip'
 
 const I18n = useI18nScope('GradingSchemeManagement')
 
@@ -42,7 +44,9 @@ type Props = {
   viewUsedLocations: (gradingScheme: GradingScheme) => void
   openDuplicateModal: (gradingScheme: GradingScheme) => void
   openDeleteModal: (gradingScheme: GradingScheme) => void
+  archiveOrUnarchiveScheme: (gradingScheme: GradingScheme) => void
   defaultScheme?: boolean
+  archivedSchemes?: boolean
 }
 export const GradingSchemeTable = ({
   caption,
@@ -52,7 +56,9 @@ export const GradingSchemeTable = ({
   viewUsedLocations,
   openDuplicateModal,
   openDeleteModal,
+  archiveOrUnarchiveScheme,
   defaultScheme = false,
+  archivedSchemes = false,
 }: Props) => {
   const [ascending, setAscending] = useState(true)
   const direction = ascending ? 'ascending' : 'descending'
@@ -89,7 +95,15 @@ export const GradingSchemeTable = ({
       <Table.ColHeader id="actions" key="actions" width="20%" />
     </Table.Row>
   )
-
+  if (gradingSchemeCards.length === 0) {
+    return (
+      <>
+        {archivedSchemes
+          ? I18n.t('You have no archived grading schemes.')
+          : I18n.t('You have no active grading schemes.')}
+      </>
+    )
+  }
   return (
     <Responsive
       query={{
@@ -120,7 +134,7 @@ export const GradingSchemeTable = ({
                     </Link>
                   </Table.Cell>
                   <Table.Cell key="locationsUsed">
-                    {gradingSchemeCard.gradingScheme.used_locations ? (
+                    {gradingSchemeCard.gradingScheme.used_locations.length > 0 ? (
                       <Link
                         isWithinText={false}
                         onClick={() => viewUsedLocations(gradingSchemeCard.gradingScheme)}
@@ -148,23 +162,51 @@ export const GradingSchemeTable = ({
                           withBackground={false}
                           onClick={() => editGradingScheme(gradingSchemeCard.gradingScheme.id)}
                           screenReaderLabel={I18n.t('Edit Grading Scheme')}
+                          disabled={gradingSchemeCard.gradingScheme.used_locations.length > 0}
                         >
-                          <IconEditLine />
+                          {gradingSchemeCard.gradingScheme.used_locations.length > 0 ? (
+                            <Tooltip
+                              renderTip={I18n.t(
+                                "You can't edit this grading scheme because it has been used for grading."
+                              )}
+                            >
+                              <IconEditLine />
+                            </Tooltip>
+                          ) : (
+                            <IconEditLine />
+                          )}
                         </IconButton>
                         <IconButton
                           withBorder={false}
                           withBackground={false}
-                          screenReaderLabel={I18n.t('Archive Grading Scheme')}
+                          screenReaderLabel={
+                            archivedSchemes
+                              ? I18n.t('Unarchive Grading Scheme')
+                              : I18n.t('Archive Grading Scheme')
+                          }
+                          onClick={() => archiveOrUnarchiveScheme(gradingSchemeCard.gradingScheme)}
                         >
-                          <IconArchiveLine />
+                          {archivedSchemes ? <IconUnarchiveLine /> : <IconArchiveLine />}
                         </IconButton>
+
                         <IconButton
                           withBorder={false}
                           withBackground={false}
                           screenReaderLabel={I18n.t('Delete Grading Scheme')}
                           onClick={() => openDeleteModal(gradingSchemeCard.gradingScheme)}
+                          disabled={gradingSchemeCard.gradingScheme.used_locations.length > 0}
                         >
-                          <IconTrashLine />
+                          {gradingSchemeCard.gradingScheme.used_locations.length > 0 ? (
+                            <Tooltip
+                              renderTip={I18n.t(
+                                "You can't delete this grading scheme because it is in use."
+                              )}
+                            >
+                              <IconTrashLine />
+                            </Tooltip>
+                          ) : (
+                            <IconTrashLine />
+                          )}
                         </IconButton>
                       </>
                     ) : (
