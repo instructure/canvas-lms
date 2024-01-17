@@ -521,7 +521,7 @@ GEM
       tzinfo
     expgen (0.1.1)
       parslet
-    factory_bot (6.4.2)
+    factory_bot (6.4.5)
       activesupport (>= 5.0.0)
     faraday (2.7.12)
       base64
@@ -708,7 +708,7 @@ GEM
     mini_magick (4.12.0)
     mini_mime (1.1.5)
     mini_portile2 (2.8.5)
-    minitest (5.20.0)
+    minitest (5.21.1)
     moodle2cc (0.2.42)
       builder
       instructure-happymapper (~> 0.5.10)

@@ -149,7 +149,7 @@ GEM
     method_source (1.0.0)
     mini_mime (1.1.5)
     mini_portile2 (2.8.5)
-    minitest (5.20.0)
+    minitest (5.21.1)
     net-imap (0.4.8)
       date
       net-protocol
