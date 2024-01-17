@@ -132,7 +132,8 @@ describe('useResize', () => {
       expect(rightColumn).toHaveStyle('width: 74%')
     })
 
-    it('resizes the panes properly when RTL', () => {
+    // OUT-6141 - remove or rewrite to remove spies on imports
+    it.skip('resizes the panes properly when RTL', () => {
       jest.spyOn(rtlHelper, 'isRTL').mockImplementation(() => true)
       const {getByTestId} = render(<TestComponent />)
       const leftColumn = getByTestId('leftColumn')
@@ -198,7 +199,8 @@ describe('useResize', () => {
       expect(getByTestId('rightColumn')).toHaveStyle('width: 713px')
     })
 
-    it('resizes the panes properly when RTL', () => {
+    // OUT-6141 - remove or rewrite to remove spies on imports
+    it.skip('resizes the panes properly when RTL', () => {
       jest.spyOn(rtlHelper, 'isRTL').mockImplementation(() => true)
       const {getByTestId} = render(<TestComponent />)
       expect(getByTestId('leftColumn')).toHaveStyle('width: 25%')

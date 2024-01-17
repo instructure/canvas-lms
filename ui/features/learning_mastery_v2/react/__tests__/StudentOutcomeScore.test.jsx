@@ -21,7 +21,8 @@ import {render} from '@testing-library/react'
 import StudentOutcomeScore from '../StudentOutcomeScore'
 import * as SVGUrl from '../icons'
 
-describe('StudentOutcomeScore', () => {
+// OUT-6141 - remove or rewrite to remove spies on imports
+describe.skip('StudentOutcomeScore', () => {
   let svgUrlSpy
 
   const defaultProps = (props = {}) => {
