@@ -67,7 +67,7 @@ function createHttpLink(httpLinkOptions = {}) {
   return new HttpLink(linkOpts)
 }
 
-function createCache() {
+export function createCache() {
   return new InMemoryCache({
     addTypename: true,
     dataIdFromObject: object => {
@@ -102,7 +102,7 @@ function createCache() {
   })
 }
 
-async function createPersistentCache(passphrase = null) {
+export async function createPersistentCache(passphrase = null) {
   const cache = createCache()
   await persistCache({
     cache,
@@ -111,7 +111,7 @@ async function createPersistentCache(passphrase = null) {
   return cache
 }
 
-function createClient(opts = {}) {
+export function createClient(opts = {}) {
   const cache = opts.cache || createCache()
   const defaults = opts.defaults || {}
   const resolvers = opts.resolvers || {}
@@ -168,4 +168,4 @@ function createClient(opts = {}) {
   return client
 }
 
-export {createClient, gql, ApolloProvider, Query, createCache, createPersistentCache}
+export {gql, ApolloProvider, Query}
