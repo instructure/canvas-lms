@@ -260,13 +260,15 @@ const PathwayTreeView = ({
 
     dagre.layout(g)
 
-    let maxX = 0
-    let maxY = 0
-    g.nodes().forEach(n => {
-      const node = g.node(n)
-      maxX = Math.max(maxX, node.x + node.width / 2)
-      maxY = Math.max(maxY, node.y + node.height / 2)
-    })
+    // let maxX = 0
+    // let maxY = 0
+    // g.nodes().forEach(n => {
+    //   const node = g.node(n)
+    //   maxX = Math.max(maxX, node.x + node.width / 2)
+    //   maxY = Math.max(maxY, node.y + node.height / 2)
+    // })
+    const maxX = g.graph().width as number
+    const maxY = g.graph().height as number
     setViewBox([0, 0, maxX, maxY])
 
     const nodes = g.nodes().map((n, i) => {
@@ -336,7 +338,18 @@ const PathwayTreeView = ({
         commands.push(`L${p[0]} ${p[1]}`)
       }
       commands.push(`L${points[points.length - 1].x} ${points[points.length - 1].y}`)
-      return <path d={commands.join(' ')} fill="none" stroke="#C7CDD1" strokeWidth={2} />
+      return (
+        <g fill="none" stroke="#C7CDD1">
+          <circle cx={points[0].x} cy={points[0].y} r="2" strokeWidth="2" />
+          <path d={commands.join(' ')} fill="none" strokeWidth={2} />
+          <circle
+            cx={points[points.length - 1].x}
+            cy={points[points.length - 1].y}
+            r="2"
+            strokeWidth="2"
+          />
+        </g>
+      )
     })
     setDagEdges(edges)
   }, [g, firstNodeRef])
@@ -388,28 +401,45 @@ const PathwayTreeView = ({
     renderDAGEdges()
   }, [dagNodes, renderDAGEdges])
 
+  const graphWidth = g.graph()?.width ? `${g.graph().width * zoomLevel}px` : 'auto'
+  const graphHeight = g.graph()?.height ? `${g.graph().height * zoomLevel}px` : 'auto'
+
   return preRendered ? (
     <div
-      ref={viewRef}
       style={{
-        position: 'relative',
-        padding: '.5rem',
-        transform: `scale(${zoomLevel})`,
-        transformOrigin: '0 0',
+        minWidth: graphWidth,
+        minHeight: graphHeight,
+        backgroundSize: '40px 40px',
+        backgroundImage: `linear-gradient(to right, rgba(150, 173, 233, .3) 1px, transparent 1px),
+                  linear-gradient(to bottom, rgba(150, 173, 233, .3) 1px, transparent 1px)`,
       }}
     >
-      <svg
-        ref={svgRef}
-        className="dag"
-        viewBox={`${viewBox[0]} ${viewBox[1]} ${viewBox[2]} ${viewBox[3]}`}
-        x={viewBox[0]}
-        y={viewBox[1]}
-        width={viewBox[2]}
-        height={viewBox[3]}
-      >
-        {dagNodes}
-        {dagEdges}
-      </svg>
+      <View as="div" width="fit-content">
+        <div
+          ref={viewRef}
+          style={{
+            position: 'relative',
+            padding: '.5rem',
+            transform: `scale(${zoomLevel})`,
+            transformOrigin: '0 0',
+          }}
+        >
+          <svg
+            ref={svgRef}
+            className="dag"
+            viewBox={`${viewBox[0]} ${viewBox[1]} ${viewBox[2]} ${viewBox[3]}`}
+            x={viewBox[0]}
+            y={viewBox[1]}
+            width={viewBox[2]}
+            height={viewBox[3]}
+          >
+            {dagNodes}
+            <g fill="none" stroke="#C7CDD1">
+              {dagEdges}
+            </g>
+          </svg>
+        </div>
+      </View>
     </div>
   ) : (
     renderPathwayBoxes()

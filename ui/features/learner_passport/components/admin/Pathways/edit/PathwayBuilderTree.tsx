@@ -88,30 +88,16 @@ const PathwayBuilderTree = ({
         </Button>
         <Button onClick={handleFlipClick}>Flip pathway</Button>
       </div>
-      <div
-        style={{
-          position: 'absolute',
-          left: 0,
-          top: 0,
-          bottom: 0,
-          right: 0,
-          overflow: 'visible',
-          backgroundSize: '40px 40px',
-          backgroundImage: `linear-gradient(to right, rgba(150, 173, 233, .3) 1px, transparent 1px),
-                  linear-gradient(to bottom, rgba(150, 173, 233, .3) 1px, transparent 1px)`,
-        }}
-      >
-        <View as="div" margin="0 auto" width="fit-content">
-          <PathwayTreeView
-            key={`${treeVersion}-${layout}`}
-            pathway={pathway}
-            selectedStep={selectedStep}
-            zoomLevel={zoomLevel}
-            layout={layout}
-            onSelected={onSelectStep}
-          />
-        </View>
-      </div>
+      <View as="div" overflowX="auto" overflowY="visible">
+        <PathwayTreeView
+          key={`${treeVersion}-${layout}`}
+          pathway={pathway}
+          selectedStep={selectedStep}
+          zoomLevel={zoomLevel}
+          layout={layout}
+          onSelected={onSelectStep}
+        />
+      </View>
     </View>
   )
 }

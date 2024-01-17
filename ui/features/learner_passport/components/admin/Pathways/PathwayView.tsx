@@ -47,17 +47,8 @@ const PathwayView = ({pathway}: PathwayViewProps) => {
       <div style={{position: 'absolute', top: '.5rem', right: '.5rem', zIndex: 1}}>
         <Button onClick={showUnimplemented}>View as learner</Button>
       </div>
-      <div
-        style={{
-          position: 'relative',
-          overflow: 'auto',
-          backgroundSize: '40px 40px',
-          backgroundImage: `linear-gradient(to right, rgba(150, 173, 233, .3) 1px, transparent 1px),
-                  linear-gradient(to bottom, rgba(150, 173, 233, .3) 1px, transparent 1px)`,
-        }}
-      >
-        <PathwayTreeView pathway={pathway} zoomLevel={zoomLevel} selectedStep={null} />
-      </div>
+
+      <PathwayTreeView pathway={pathway} zoomLevel={zoomLevel} selectedStep={null} />
     </div>
   )
 }

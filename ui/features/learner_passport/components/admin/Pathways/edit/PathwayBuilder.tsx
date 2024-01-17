@@ -81,19 +81,20 @@ const PathwayBuilder = ({pathway, onChange}: PathwayBuilderProps) => {
   )
 
   return (
-    <View as="div" height="100vh">
+    <View as="div">
       <Flex as="div" alignItems="stretch" height="100%">
-        <Flex.Item shouldShrink={true}>
-          {sidebarIsVisible ? (
+        {sidebarIsVisible ? (
+          <Flex.Item shouldShrink={false} shouldGrow={false}>
             <PathwayBuilderSidebar
               pathway={pathway}
               currentStep={currentRoot}
               onAddStep={handleAddMilestone}
               onHideSidebar={handleHideSidebar}
             />
-          ) : null}
-        </Flex.Item>
-        <Flex.Item shouldGrow={true}>
+          </Flex.Item>
+        ) : null}
+
+        <Flex.Item shouldGrow={true} shouldShrink={true}>
           <PathwayBuilderTree
             pathway={pathway}
             selectedStep={currentRoot ? currentRoot.id : null}

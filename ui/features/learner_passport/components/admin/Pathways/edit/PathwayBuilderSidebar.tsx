@@ -30,8 +30,8 @@ const Connector = () => {
   return (
     <div style={{margin: '4px 0 -1px 0'}}>
       <svg xmlns="http://www.w3.org/2000/svg" width="6" height="36" viewBox="0 0 6 36" fill="none">
-        <circle cx="3" cy="3" r="2" transform="rotate(90 3 3)" stroke="#6B7780" strokeWidth="2" />
-        <circle cx="3" cy="33" r="2" transform="rotate(90 3 33)" stroke="#6B7780" strokeWidth="2" />
+        <circle cx="3" cy="3" r="2" stroke="#6B7780" strokeWidth="2" />
+        <circle cx="3" cy="33" r="2" stroke="#6B7780" strokeWidth="2" />
         <path d="M3 6L3 30" stroke="#6B7780" strokeWidth="2" strokeLinecap="square" />
       </svg>
     </div>
