@@ -53,7 +53,7 @@ gem "gepub", "1.0.15"
 gem "apollo-federation", "~> 3.8"
 gem "graphql", "~> 1.12.7"
 gem "graphql-batch", "~> 0.5"
-gem "highline", "~> 2.0", require: false
+gem "highline", "~> 3.0", require: false
 gem "httparty", "~> 0.21"
 gem "i18nliner", "~> 0.2.4"
 gem "icalendar", "~> 2.9", require: false
