@@ -30,7 +30,7 @@ group :test do
   gem "rspec_around_all", "0.2.0"
   gem "rspec-rails", "~> 6.0"
   gem "rspec-collection_matchers", "~> 1.2"
-  gem "shoulda-matchers", "~> 5.3"
+  gem "shoulda-matchers", "~> 6.0"
 
   gem "once-ler", "~> 2.0"
 

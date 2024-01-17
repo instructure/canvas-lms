@@ -1028,7 +1028,7 @@ GEM
     sentry-ruby (5.15.2)
       concurrent-ruby (~> 1.0, >= 1.0.2)
     sexp_processor (4.17.1)
-    shoulda-matchers (5.3.0)
+    shoulda-matchers (6.0.0)
       activesupport (>= 5.2.0)
     signet (0.18.0)
       addressable (~> 2.8)
@@ -1330,7 +1330,7 @@ DEPENDENCIES
   selenium-webdriver (~> 4.12)
   sentry-inst_jobs (~> 5.10)
   sentry-rails (~> 5.10)
-  shoulda-matchers (~> 5.3)
+  shoulda-matchers (~> 6.0)
   simplecov-rcov (~> 0.3)
   simply_versioned!
   spring-commands-parallel-rspec (= 1.1.0)
