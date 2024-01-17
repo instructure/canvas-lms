@@ -95,7 +95,7 @@ describe ContentExportsApiController, type: :request do
       expect(json[0]["export_type"]).to eql "qti"
       expect(json[0]["course_id"]).to eql t_course.id
       expect(json[0]["created_at"]).to eql @pending.created_at.as_json
-      expect(json[0]["progress_url"]).to be_include "/progress/#{@pending.job_progress.id}"
+      expect(json[0]["progress_url"]).to include "/progress/#{@pending.job_progress.id}"
 
       expect(json[1]["id"]).to eql @past.id
       expect(json[1]["workflow_state"]).to eql "exported"
@@ -103,8 +103,8 @@ describe ContentExportsApiController, type: :request do
       expect(json[1]["course_id"]).to eql t_course.id
       expect(json[1]["created_at"]).to eql @past.created_at.as_json
       expect(json[1]["user_id"]).to eql t_teacher.id
-      expect(json[1]["progress_url"]).to be_include "/progress/#{@past.job_progress.id}"
-      expect(json[1]["attachment"]["url"]).to be_include "/files/#{@past.attachment.id}/download?download_frd=1&verifier=#{@past.attachment.uuid}"
+      expect(json[1]["progress_url"]).to include "/progress/#{@past.job_progress.id}"
+      expect(json[1]["attachment"]["url"]).to include "/files/#{@past.attachment.id}/download?download_frd=1&verifier=#{@past.attachment.uuid}"
 
       expect(json[2]["id"]).to eql @my_zip_export.id
       expect(json[2]["workflow_state"]).to eql "exported"
@@ -112,8 +112,8 @@ describe ContentExportsApiController, type: :request do
       expect(json[2]["course_id"]).to eql t_course.id
       expect(json[2]["created_at"]).to eql @my_zip_export.created_at.as_json
       expect(json[2]["user_id"]).to eql t_teacher.id
-      expect(json[2]["progress_url"]).to be_include "/progress/#{@my_zip_export.job_progress.id}"
-      expect(json[2]["attachment"]["url"]).to be_include "/files/#{@my_zip_export.attachment.id}/download?download_frd=1&verifier=#{@my_zip_export.attachment.uuid}"
+      expect(json[2]["progress_url"]).to include "/progress/#{@my_zip_export.job_progress.id}"
+      expect(json[2]["attachment"]["url"]).to include "/files/#{@my_zip_export.attachment.id}/download?download_frd=1&verifier=#{@my_zip_export.attachment.uuid}"
     end
 
     it "paginates" do
@@ -175,7 +175,7 @@ describe ContentExportsApiController, type: :request do
       expect(json["course_id"]).to eql t_course.id
       expect(json["created_at"]).to eql @past.created_at.as_json
       expect(json["user_id"]).to eql t_teacher.id
-      expect(json["attachment"]["url"]).to be_include "/files/#{@past.attachment.id}/download?download_frd=1&verifier=#{@past.attachment.uuid}"
+      expect(json["attachment"]["url"]).to include "/files/#{@past.attachment.id}/download?download_frd=1&verifier=#{@past.attachment.uuid}"
     end
 
     it "does not find course copy exports" do

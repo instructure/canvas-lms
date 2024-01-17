@@ -626,20 +626,20 @@ describe UserLearningObjectScopes do
 
     it "counts assignments with ungraded submissions across multiple courses" do
       expect(@teacher.assignments_needing_grading.size).to be(2)
-      expect(@teacher.assignments_needing_grading).to be_include(@course1.assignments.first)
-      expect(@teacher.assignments_needing_grading).to be_include(@course2.assignments.first)
+      expect(@teacher.assignments_needing_grading).to include(@course1.assignments.first)
+      expect(@teacher.assignments_needing_grading).to include(@course2.assignments.first)
 
       # grade one submission for one assignment; these numbers don't change
       @course1.assignments.first.grade_student(@student_a, grade: "1", grader: @teacher)
       expect(@teacher.assignments_needing_grading.size).to be 2
-      expect(@teacher.assignments_needing_grading).to be_include(@course1.assignments.first)
-      expect(@teacher.assignments_needing_grading).to be_include(@course2.assignments.first)
+      expect(@teacher.assignments_needing_grading).to include(@course1.assignments.first)
+      expect(@teacher.assignments_needing_grading).to include(@course2.assignments.first)
 
       # grade the other submission; now course1's assignment no longer needs grading
       @course1.assignments.first.grade_student(@student_b, grade: "1", grader: @teacher)
       @teacher = User.find(@teacher.id)
       expect(@teacher.assignments_needing_grading.size).to be 1
-      expect(@teacher.assignments_needing_grading).to be_include(@course2.assignments.first)
+      expect(@teacher.assignments_needing_grading).to include(@course2.assignments.first)
     end
 
     it "includes re-submitted submissions in the list of submissions needing grading" do
@@ -653,8 +653,8 @@ describe UserLearningObjectScopes do
 
     it "only counts submissions in accessible course sections" do
       expect(@ta.assignments_needing_grading.size).to be 2
-      expect(@ta.assignments_needing_grading).to be_include(@course1.assignments.first)
-      expect(@ta.assignments_needing_grading).to be_include(@course2.assignments.first)
+      expect(@ta.assignments_needing_grading).to include(@course1.assignments.first)
+      expect(@ta.assignments_needing_grading).to include(@course2.assignments.first)
 
       # grade student A's submissions in both courses; now course1's assignment
       # should not show up because the TA doesn't have access to studentB's submission
@@ -663,7 +663,7 @@ describe UserLearningObjectScopes do
       @ta = User.find(@ta.id)
       expect(@ta.assignments_needing_grading.size).to be 1
       expect(@ta.assignments_needing_grading(scope_only: true).to_a.size).to be 1
-      expect(@ta.assignments_needing_grading).to be_include(@course2.assignments.first)
+      expect(@ta.assignments_needing_grading).to include(@course2.assignments.first)
 
       # but if we enroll the TA in both sections of course1, it should be accessible
       @course1.enroll_user(@ta,
@@ -675,8 +675,8 @@ describe UserLearningObjectScopes do
       @ta = User.find(@ta.id)
       expect(@ta.assignments_needing_grading.size).to be 2
       expect(@ta.assignments_needing_grading(scope_only: true).to_a.size).to be 2
-      expect(@ta.assignments_needing_grading).to be_include(@course1.assignments.first)
-      expect(@ta.assignments_needing_grading).to be_include(@course2.assignments.first)
+      expect(@ta.assignments_needing_grading).to include(@course1.assignments.first)
+      expect(@ta.assignments_needing_grading).to include(@course2.assignments.first)
     end
 
     it "does not count submissions for users with a deleted enrollment in the graders's section" do

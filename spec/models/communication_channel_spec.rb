@@ -251,7 +251,7 @@ describe CommunicationChannel do
   end
 
   it "acts as list" do
-    expect(CommunicationChannel).to be_respond_to(:acts_as_list)
+    expect(CommunicationChannel).to respond_to(:acts_as_list)
   end
 
   it "scopes the list to the user" do

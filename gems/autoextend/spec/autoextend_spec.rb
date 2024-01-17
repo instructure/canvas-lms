@@ -82,7 +82,7 @@ describe Autoextend do
   end
 
   after do
-    Object.send(:remove_const, :AutoextendSpec)
+    Object.send(:remove_const, :AutoextendSpec) # rubocop:disable RSpec/RemoveConst
     Autoextend.send(:extensions_hash).reject! { |k, _| k =~ /^AutoextendSpec::/ }
     ActiveSupport::Dependencies.clear
   end

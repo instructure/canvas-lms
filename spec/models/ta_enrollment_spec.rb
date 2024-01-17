@@ -32,6 +32,6 @@
 
 describe TaEnrollment do
   it "subclasses Enrollment" do
-    expect(TaEnrollment.ancestors).to be_include(Enrollment)
+    expect(TaEnrollment.ancestors).to include(Enrollment)
   end
 end

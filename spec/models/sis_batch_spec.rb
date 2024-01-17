@@ -312,7 +312,7 @@ describe SisBatch do
       expect_any_instantiation_of(b5).not_to receive(:process_without_send_later)
       SisBatch.process_all_for_account(@a1)
       run_jobs
-      [b1, b2, b4].each { |batch| expect([:imported, :imported_with_messages]).to be_include(batch.reload.state) }
+      [b1, b2, b4].each { |batch| expect([:imported, :imported_with_messages]).to include(batch.reload.state) }
     end
 
     it "aborts non processed sis_batches when aborted" do
@@ -607,7 +607,7 @@ s2,test_1,section2,active),
       expect(@batch.data[:stack_trace]).to be_nil
 
       expect(@c1.reload).to be_deleted
-      expect(@c1.stuck_sis_fields).not_to be_include(:workflow_state)
+      expect(@c1.stuck_sis_fields).not_to include(:workflow_state)
       expect(@c2.reload).to be_available
       expect(@c3.reload).to be_available
       expect(@c4.reload).to be_claimed

@@ -787,7 +787,7 @@ describe UsersController do
         expect(p.user.communication_channels.length).to eq 1
         expect(p.user.communication_channels.first).to be_unconfirmed
         expect(p.user.communication_channels.first.path).to eq "jacob@instructure.com"
-        expect([cc1, cc2, cc3]).not_to be_include(p.user.communication_channels.first)
+        expect([cc1, cc2, cc3]).not_to include(p.user.communication_channels.first)
       end
 
       it "re-uses 'conflicting' unique_ids if it hasn't been fully registered yet" do
@@ -2001,8 +2001,8 @@ describe UsersController do
       teacher_enrollments = assigns[:presenter].teacher_enrollments
       expect(teacher_enrollments).not_to be_nil
       teachers = teacher_enrollments.map(&:user)
-      expect(teachers).to be_include(@teacher)
-      expect(teachers).not_to be_include(@designer)
+      expect(teachers).to include(@teacher)
+      expect(teachers).not_to include(@designer)
     end
 
     it "does not redirect to an observer enrollment with no observee" do
@@ -2413,7 +2413,7 @@ describe UsersController do
         post "masquerade", params: { user_id: user2.id }
         expect(response).to be_redirect
 
-        expect(admin.associated_shards(:shadow)).to be_include(@shard1)
+        expect(admin.associated_shards(:shadow)).to include(@shard1)
       end
     end
 
@@ -2429,7 +2429,7 @@ describe UsersController do
         post "masquerade", params: { user_id: user2.id }
         expect(response).not_to be_redirect
 
-        expect(admin.associated_shards(:shadow)).not_to be_include(@shard1)
+        expect(admin.associated_shards(:shadow)).not_to include(@shard1)
       end
     end
 
@@ -2445,7 +2445,7 @@ describe UsersController do
         post "masquerade", params: { user_id: user2.id }
         expect(response).to be_redirect
 
-        expect(admin.associated_shards(:shadow)).not_to be_include(@shard1)
+        expect(admin.associated_shards(:shadow)).not_to include(@shard1)
       end
     end
   end

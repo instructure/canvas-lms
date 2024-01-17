@@ -598,12 +598,12 @@ describe "Outcome Results API", type: :request do
             expect(rollup["links"].keys.sort).to eq %w[section status user]
             expect(rollup["links"]["section"]).to eq @course.course_sections.first.id.to_s
             expect(rollup["links"]["status"]).to eq student_enrollment_status(@course, outcome_student, @course.course_sections.first)
-            expect(student_ids).to be_include(rollup["links"]["user"])
+            expect(student_ids).to include(rollup["links"]["user"])
             expect(rollup["scores"].size).to eq 1
             rollup["scores"].each do |score|
               expect(score.keys.sort).to eq %w[count hide_points links score submitted_at title]
               expect(score["count"]).to eq 1
-              expect([0, 1]).to be_include(score["score"])
+              expect([0, 1]).to include(score["score"])
               expect(score["links"].keys.sort).to eq %w[outcome]
               expect(score["links"]["outcome"]).to eq outcome_object.id.to_s
             end
@@ -675,12 +675,12 @@ describe "Outcome Results API", type: :request do
             expect(rollup["links"].keys.sort).to eq %w[section status user]
             expect(rollup["links"]["section"]).to eq outcome_course_sections[0].id.to_s
             expect(rollup["links"]["status"]).to eq student_enrollment_status(outcome_course, outcome_course_sections.first.students.first, outcome_course_sections.first)
-            expect(outcome_course_sections[0].student_ids.map(&:to_s)).to be_include(rollup["links"]["user"])
+            expect(outcome_course_sections[0].student_ids.map(&:to_s)).to include(rollup["links"]["user"])
             expect(rollup["scores"].size).to eq 1
             rollup["scores"].each do |score|
               expect(score.keys.sort).to eq %w[count hide_points links score submitted_at title]
               expect(score["count"]).to eq 1
-              expect([0, 2]).to be_include(score["score"])
+              expect([0, 2]).to include(score["score"])
               expect(score["links"].keys.sort).to eq %w[outcome]
               expect(score["links"]["outcome"]).to eq outcome_object.id.to_s
             end

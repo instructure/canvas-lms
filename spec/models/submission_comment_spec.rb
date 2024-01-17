@@ -239,21 +239,21 @@ RSpec.describe SubmissionComment do
     it "does not send notifications to users in concluded sections" do
       @submission_ended = @assignment.submit_homework(@student_ended)
       @comment = @submission_ended.add_comment(author: @teacher, comment: "some comment")
-      expect(@comment.messages_sent.keys).not_to be_include("Submission Comment")
+      expect(@comment.messages_sent.keys).not_to include("Submission Comment")
     end
 
     it "does not dispatch notification on create if course is unpublished" do
       @course.complete
       @comment = @submission.add_comment(author: @teacher, comment: "some comment")
       expect(@course).to_not be_available
-      expect(@comment.messages_sent.keys).to_not be_include("Submission Comment")
+      expect(@comment.messages_sent.keys).to_not include("Submission Comment")
     end
 
     it "does not dispatch notification on create if student is inactive" do
       @student.enrollments.first.deactivate
 
       @comment = @submission.add_comment(author: @teacher, comment: "some comment")
-      expect(@comment.messages_sent.keys).to_not be_include("Submission Comment")
+      expect(@comment.messages_sent.keys).to_not include("Submission Comment")
     end
 
     it "does not dispatch notification on create for provisional comments" do
@@ -266,7 +266,7 @@ RSpec.describe SubmissionComment do
       @submission = @assignment.find_or_create_submission(@student)
       @comment = @submission.add_comment(author: @student, comment: "some comment")
       expect(@submission).to be_unsubmitted
-      expect(@comment.messages_sent).to be_include("Submission Comment For Teacher")
+      expect(@comment.messages_sent).to include("Submission Comment For Teacher")
     end
 
     it "doesn't dispatch notifications on create for manually posted assignments" do

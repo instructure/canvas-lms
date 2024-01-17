@@ -133,7 +133,7 @@ describe SIS::CSV::EnrollmentImporter do
       "test_1,user_7,teacher,S001,active,,1985-08-24,2011-08-29"
     )
     course = @account.courses.where(sis_source_id: "test_1").first
-    expect(course.teachers.map(&:name)).to be_include("User Uno")
+    expect(course.teachers.map(&:name)).to include("User Uno")
     expect(course.students.first.name).to eq "User Dos"
     expect(course.tas.first.name).to eq "User Tres"
     expect(course.observers.first.name).to eq "User Quatro"
@@ -1229,8 +1229,8 @@ describe SIS::CSV::EnrollmentImporter do
     a2 = @account.sub_accounts.find_by(sis_source_id: "a2")
     u1 = @account.pseudonyms.active.find_by(sis_user_id: "u1").user
     v1 = @account.pseudonyms.active.find_by(sis_user_id: "v1").user
-    expect(u1.associated_accounts).not_to be_include(a2)
-    expect(v1.associated_accounts).not_to be_include(a1)
+    expect(u1.associated_accounts).not_to include(a2)
+    expect(v1.associated_accounts).not_to include(a1)
   end
 
   it "does not enroll students in blueprint courses" do

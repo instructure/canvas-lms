@@ -67,7 +67,7 @@ describe "speed grader" do
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
       expect(f("#grading-box-extended")).to have_attribute("value", "7")
-      expect(f("#discussion span.comment").text).to be_include "wat"
+      expect(f("#discussion span.comment").text).to include "wat"
 
       time = 5.minutes.from_now
       Timecop.freeze(time) do
@@ -90,7 +90,7 @@ describe "speed grader" do
 
       pg = @submission.provisional_grade(@user)
       expect(pg.score.to_i).to be 8
-      expect(pg.submission_comments.map(&:comment)).to be_include "srsly"
+      expect(pg.submission_comments.map(&:comment)).to include "srsly"
     end
 
     it "creates rubric assessments for the provisional grade" do

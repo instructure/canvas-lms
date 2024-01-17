@@ -1142,7 +1142,7 @@ describe "Module Items API", type: :request do
                      id: @wiki_page_tag.id.to_s },
                    { module_item: { module_id: @module3.id } })
 
-          expect(@module2.reload.content_tags.map(&:id)).not_to be_include @wiki_page_tag.id
+          expect(@module2.reload.content_tags.map(&:id)).not_to include @wiki_page_tag.id
           expect(@module2.updated_at).to be > old_updated_ats[0]
           expect(@module3.reload.content_tags.map(&:id)).to eq [@wiki_page_tag.id]
           expect(@module3.updated_at).to be > old_updated_ats[1]
@@ -1166,7 +1166,7 @@ describe "Module Items API", type: :request do
                      id: @assignment_tag.id.to_s },
                    { module_item: { module_id: @module2.id } })
 
-          expect(@module1.reload.content_tags.map(&:id)).not_to be_include @assignment_tag.id
+          expect(@module1.reload.content_tags.map(&:id)).not_to include @assignment_tag.id
           expect(@module1.updated_at).to be > old_updated_ats[0]
           expect(@module1.completion_requirements.size).to eq 3
           expect(@module1.completion_requirements.detect { |req| req[:id] == @assignment_tag.id }).to be_nil
@@ -1193,7 +1193,7 @@ describe "Module Items API", type: :request do
                      id: @assignment_tag.id.to_s },
                    { module_item: { module_id: @module2.id, position: 2 } })
 
-          expect(@module1.reload.content_tags.map(&:id)).not_to be_include @assignment_tag.id
+          expect(@module1.reload.content_tags.map(&:id)).not_to include @assignment_tag.id
           expect(@module1.updated_at).to be > old_updated_ats[0]
           expect(@module1.completion_requirements.size).to eq 3
           expect(@module1.completion_requirements.detect { |req| req[:id] == @assignment_tag.id }).to be_nil

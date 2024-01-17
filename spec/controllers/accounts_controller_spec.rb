@@ -197,7 +197,7 @@ describe AccountsController do
       new_admin = CommunicationChannel.where(path: "testadmin@example.com").first.user
       expect(new_admin).not_to be_nil
       @account.reload
-      expect(@account.account_users.map(&:user)).to be_include(new_admin)
+      expect(@account.account_users.map(&:user)).to include(new_admin)
     end
 
     it "allows adding a new custom account admin" do
@@ -208,7 +208,7 @@ describe AccountsController do
       new_admin = CommunicationChannel.find_by(path: "testadmin@example.com").user
       expect(new_admin).to_not be_nil
       @account.reload
-      expect(@account.account_users.map(&:user)).to be_include(new_admin)
+      expect(@account.account_users.map(&:user)).to include(new_admin)
       expect(@account.account_users.find_by(role_id: role.id).user).to eq new_admin
     end
 
@@ -226,8 +226,8 @@ describe AccountsController do
       @subaccount.account_users.create!(user_id: @usr.id, role_id: admin_role.id).destroy
       post "add_account_user", params: { account_id: @subaccount.id, role_id: admin_role.id, user_list: "usr@instructure.com" }
       expect(response).to be_successful
-      expect(@subaccount.account_users.map(&:user)).to be_include(@usr)
-      expect(@usr.user_account_associations.map(&:account)).to be_include(@subaccount)
+      expect(@subaccount.account_users.map(&:user)).to include(@usr)
+      expect(@usr.user_account_associations.map(&:account)).to include(@subaccount)
     end
   end
 

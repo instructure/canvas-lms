@@ -234,7 +234,7 @@ describe AuthenticationProvider do
                                      purpose: :provisioning)
       @user.reload
       expect(@user.short_name).to eq "Mr. Cutler"
-      expect(@user.communication_channels.email.active.pluck(:path)).to be_include("cody@school.edu")
+      expect(@user.communication_channels.email.active.pluck(:path)).to include("cody@school.edu")
       expect(@pseudonym.integration_id).to eq "abc123"
       expect(@user.locale).to eq "es"
       expect(@user.name).to eq "Cody Cutrer"
@@ -265,7 +265,7 @@ describe AuthenticationProvider do
                                        "timezone" => "America/New_York"
                                      })
       @user.reload
-      expect(@user.communication_channels.email.active.pluck(:path)).to be_include("cody@school.edu")
+      expect(@user.communication_channels.email.active.pluck(:path)).to include("cody@school.edu")
       expect(@pseudonym.integration_id).not_to eq "abc123"
       expect(@user.locale).to eq "es"
       expect(@user.name).to eq "Cody Cutrer"

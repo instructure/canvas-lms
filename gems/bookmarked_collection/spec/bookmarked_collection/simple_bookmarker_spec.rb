@@ -45,7 +45,7 @@ describe BookmarkedCollection::SimpleBookmarker do
 
   context "#bookmark_for" do
     it "is comparable" do
-      expect(@bookmarker.bookmark_for(@bob)).to be_respond_to(:<=>)
+      expect(@bookmarker.bookmark_for(@bob)).to respond_to(:<=>)
     end
 
     it "matches the columns, in order" do

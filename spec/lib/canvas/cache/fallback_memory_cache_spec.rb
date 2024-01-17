@@ -21,7 +21,7 @@ describe Canvas::Cache::FallbackMemoryCache do
     allow(Rails.env).to receive(:development?).and_return true
     cache = Canvas::Cache::FallbackMemoryCache.new
     cache.write("role_override_key", teacher_role)
-    Object.send(:remove_const, "Role")
+    Object.send(:remove_const, "Role") # rubocop:disable RSpec/RemoveConst
     load(Rails.root.join("app/models/role.rb"))
     expect { cache.fetch("role_override_key") }.not_to raise_error
   end

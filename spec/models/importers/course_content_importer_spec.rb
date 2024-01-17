@@ -196,7 +196,7 @@ describe Course do
       # files
       expect(@course.attachments.length).to eq(4)
       @course.attachments.each do |f|
-        expect(File).to be_exist(f.full_filename)
+        expect(File).to exist(f.full_filename)
       end
       file = @course.attachments.where(migration_id: "1865116044002").first
       expect(file).not_to be_nil

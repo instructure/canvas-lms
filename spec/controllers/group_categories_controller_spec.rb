@@ -318,8 +318,8 @@ describe GroupCategoriesController do
       json = response.parsed_body
 
       expect(response).to be_successful
-      expect(json.count).to be_equal 1
-      expect(json[0]["group_submissions"][0]).to be_equal @sub.id
+      expect(json.count).to equal 1
+      expect(json[0]["group_submissions"][0]).to equal @sub.id
     end
 
     it "does not include group submissions if param is absent" do
@@ -328,8 +328,8 @@ describe GroupCategoriesController do
       json = response.parsed_body
 
       expect(response).to be_successful
-      expect(json.count).to be_equal 1
-      expect(json[0]["group_submissions"]).to be_equal nil
+      expect(json.count).to equal 1
+      expect(json[0]["group_submissions"]).to equal nil
     end
   end
 

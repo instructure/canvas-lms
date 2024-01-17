@@ -28,7 +28,7 @@ end
 describe Marshal do
   it "retries .load() when an 'undefined class/module ...' error is raised" do
     str = Marshal.dump(MarshalTesting::BlankClass.new)
-    MarshalTesting.send :remove_const, "BlankClass"
+    MarshalTesting.send :remove_const, "BlankClass" # rubocop:disable RSpec/RemoveConst
     expect(Marshal.load(str)).to be_instance_of(MarshalTesting::BlankClass) # rubocop:disable Security/MarshalLoad
   end
 end

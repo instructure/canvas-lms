@@ -3125,9 +3125,9 @@ describe AssignmentsApiController, type: :request do
         assignment.publish if assignment.unpublished?
 
         expect(@student.messages.detect { |m| m.notification_id == @notification.id }.body)
-          .to be_include "Jun 22"
+          .to include "Jun 22"
         expect(@ta.messages.detect { |m| m.notification_id == @notification.id }.body)
-          .to be_include "Multiple Dates"
+          .to include "Multiple Dates"
       end
 
       it "only notifies students with visibility on creation" do
