@@ -26,8 +26,7 @@ import '@testing-library/jest-dom'
 import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import ConfigurationForm from '../configuration_forms/ConfigurationForm'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import $ from 'jquery'
+import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 
 const renderForm = (props: Object) => {
   return render(<ConfigurationForm {...props} />)
@@ -47,11 +46,7 @@ jest.mock('@canvas/alerts/react/FlashAlert')
 
 const handleSubmitMock = jest.fn()
 
-let mockedFlash: jest.Mocked<typeof showFlashAlert | typeof $.screenReaderFlashError>
-
-beforeAll(() => {
-  mockedFlash = jest.mocked(showFlashAlert)
-})
+const mockedFlash = FlashAlert.showFlashAlert as jest.Mock<typeof FlashAlert.showFlashAlert>
 
 afterEach(() => {
   jest.resetAllMocks()
@@ -152,7 +147,10 @@ describe('when configuration type is manual', () => {
       renderForm(baseProps)
       userEvent.click(getSubmitButton())
 
-      expect(handleSubmitMock).not.toHaveBeenCalled()
+      // This can't use .not.toHaveBeenCalled because the submit function receives a React synthetic event,
+      // and if it has been called, jest will try to print out the result of that event, which results in
+      // a misleading error message about what actually happened, so toHaveBeenCalledTimes it is.
+      expect(handleSubmitMock).toHaveBeenCalledTimes(0)
       expect(mockedFlash).toHaveBeenCalled()
     })
 
@@ -160,7 +158,7 @@ describe('when configuration type is manual', () => {
       renderForm(baseProps)
       userEvent.click(getSubmitButton())
 
-      expect(handleSubmitMock).not.toHaveBeenCalled()
+      expect(handleSubmitMock).toHaveBeenCalledTimes(0)
       expect(screen.getByText('This field is required')).toBeInTheDocument()
     })
 
@@ -170,7 +168,7 @@ describe('when configuration type is manual', () => {
         userEvent.paste(getNameInput(), 'a really cool name')
         userEvent.click(getSubmitButton())
 
-        expect(handleSubmitMock).not.toHaveBeenCalled()
+        expect(handleSubmitMock).toHaveBeenCalledTimes(0)
         expect(mockedFlash).toHaveBeenCalled()
       })
 
@@ -179,7 +177,7 @@ describe('when configuration type is manual', () => {
         userEvent.paste(getNameInput(), 'a really cool name')
         userEvent.click(getSubmitButton())
 
-        expect(handleSubmitMock).not.toHaveBeenCalled()
+        expect(handleSubmitMock).toHaveBeenCalledTimes(0)
         expect(screen.getAllByText(/Either the url or domain should be set./i)).not.toHaveLength(0)
       })
 
