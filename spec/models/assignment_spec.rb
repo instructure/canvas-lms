@@ -4545,8 +4545,8 @@ describe Assignment do
         res = @a.assign_peer_reviews
         expect(res.length).to eql(@submissions.length)
         @submissions.each do |s|
-          expect(res.map(&:asset)).to be_include(s)
-          expect(res.map(&:assessor_asset)).to be_include(s)
+          expect(res.map(&:asset)).to include(s)
+          expect(res.map(&:assessor_asset)).to include(s)
         end
       end
 
@@ -4557,8 +4557,8 @@ describe Assignment do
         @a.peer_review_count = 1
         res = @a.assign_peer_reviews
         expect(res.length).to eql(@submissions.length)
-        expect(res.map(&:asset)).not_to be_include(fake_sub)
-        expect(res.map(&:assessor_asset)).not_to be_include(fake_sub)
+        expect(res.map(&:asset)).not_to include(fake_sub)
+        expect(res.map(&:assessor_asset)).not_to include(fake_sub)
       end
 
       it "assigns when already graded" do
@@ -4569,8 +4569,8 @@ describe Assignment do
         res = @a.assign_peer_reviews
         expect(res.length).to eql(@submissions.length)
         @submissions.each do |s|
-          expect(res.map(&:asset)).to be_include(s)
-          expect(res.map(&:assessor_asset)).to be_include(s)
+          expect(res.map(&:asset)).to include(s)
+          expect(res.map(&:assessor_asset)).to include(s)
         end
       end
     end
@@ -6117,7 +6117,7 @@ describe Assignment do
         @a.created_at = 1.month.ago
         @a.due_at = Time.now + 60
         @a.save!
-        expect(@a.messages_sent).to be_include("Assignment Due Date Changed")
+        expect(@a.messages_sent).to include("Assignment Due Date Changed")
         expect(@a.messages_sent["Assignment Due Date Changed"].first.from_name).to eq @course.name
       end
 
@@ -6131,7 +6131,7 @@ describe Assignment do
         @a.description = "New description"
         @a.points_possible = 50
         @a.save!
-        expect(@a.messages_sent).not_to be_include("Assignment Due Date Changed")
+        expect(@a.messages_sent).not_to include("Assignment Due Date Changed")
       end
     end
 
@@ -6175,14 +6175,14 @@ describe Assignment do
         @a.description = "something different"
         @a.notify_of_update = true
         @a.save
-        expect(@a.messages_sent).to be_include("Assignment Changed")
+        expect(@a.messages_sent).to include("Assignment Changed")
         expect(@a.messages_sent["Assignment Changed"].first.from_name).to eq @course.name
       end
 
       it "does not create a message when an assignment changes SHORTLY AFTER it's been created" do
         @a.description = "something different"
         @a.save
-        expect(@a.messages_sent).not_to be_include("Assignment Changed")
+        expect(@a.messages_sent).not_to include("Assignment Changed")
       end
 
       it "does not create a message when a muted assignment changes" do
@@ -6201,7 +6201,7 @@ describe Assignment do
 
       it "creates a message when an assignment is added to a course in process" do
         assignment_model(course: @course)
-        expect(@a.messages_sent).to be_include("Assignment Created")
+        expect(@a.messages_sent).to include("Assignment Created")
         expect(@a.messages_sent["Assignment Created"].first.from_name).to eq @course.name
       end
 
@@ -6209,7 +6209,7 @@ describe Assignment do
         Notification.create(name: "Assignment Created")
         course_with_teacher(active_user: true)
         assignment_model(course: @course)
-        expect(@a.messages_sent).not_to be_include("Assignment Created")
+        expect(@a.messages_sent).not_to include("Assignment Created")
       end
     end
 
@@ -6254,11 +6254,11 @@ describe Assignment do
           @assignment.do_notifications!
 
           messages_sent = @assignment.messages_sent["Assignment Created"]
-          expect(messages_sent.detect { |m| m.user_id == @teacher.id }.body).to be_include "Multiple Dates"
-          expect(messages_sent.detect { |m| m.user_id == @studentA.id }.body).to be_include "Jan 1, 2011"
-          expect(messages_sent.detect { |m| m.user_id == @ta.id }.body).to be_include "Multiple Dates"
-          expect(messages_sent.detect { |m| m.user_id == @studentB.id }.body).to be_include "Jan 2, 2011"
-          expect(messages_sent.detect { |m| m.user_id == @ta2.id }.body).to be_include "Multiple Dates"
+          expect(messages_sent.detect { |m| m.user_id == @teacher.id }.body).to include "Multiple Dates"
+          expect(messages_sent.detect { |m| m.user_id == @studentA.id }.body).to include "Jan 1, 2011"
+          expect(messages_sent.detect { |m| m.user_id == @ta.id }.body).to include "Multiple Dates"
+          expect(messages_sent.detect { |m| m.user_id == @studentB.id }.body).to include "Jan 2, 2011"
+          expect(messages_sent.detect { |m| m.user_id == @ta2.id }.body).to include "Multiple Dates"
         end
 
         it "notifies the correct people with differentiated_assignments enabled" do
@@ -6267,11 +6267,11 @@ describe Assignment do
           @assignment.do_notifications!
 
           messages_sent = @assignment.messages_sent["Assignment Created"]
-          expect(messages_sent.detect { |m| m.user_id == @teacher.id }.body).to be_include "Multiple Dates"
-          expect(messages_sent.detect { |m| m.user_id == @studentA.id }.body).to be_include "Jan 1, 2011"
-          expect(messages_sent.detect { |m| m.user_id == @ta.id }.body).to be_include "Multiple Dates"
-          expect(messages_sent.detect { |m| m.user_id == @studentB.id }.body).to be_include "Jan 2, 2011"
-          expect(messages_sent.detect { |m| m.user_id == @ta2.id }.body).to be_include "Multiple Dates"
+          expect(messages_sent.detect { |m| m.user_id == @teacher.id }.body).to include "Multiple Dates"
+          expect(messages_sent.detect { |m| m.user_id == @studentA.id }.body).to include "Jan 1, 2011"
+          expect(messages_sent.detect { |m| m.user_id == @ta.id }.body).to include "Multiple Dates"
+          expect(messages_sent.detect { |m| m.user_id == @studentB.id }.body).to include "Jan 2, 2011"
+          expect(messages_sent.detect { |m| m.user_id == @ta2.id }.body).to include "Multiple Dates"
           expect(messages_sent.detect { |m| m.user_id == student.id }).to be_nil
         end
 
@@ -6286,7 +6286,7 @@ describe Assignment do
 
           # when the override matches the default, show the default and not "Multiple"
           messages_sent = @assignment.messages_sent["Assignment Created"]
-          messages_sent.each { |m| expect(m.body).to be_include "Jan 1, 2011" }
+          messages_sent.each { |m| expect(m.body).to include "Jan 1, 2011" }
         end
       end
 
@@ -6303,11 +6303,11 @@ describe Assignment do
           @assignment.save!
 
           messages_sent = @assignment.messages_sent["Assignment Due Date Changed"]
-          expect(messages_sent.detect { |m| m.user_id == @teacher.id }.body).to be_include "Jan 9, 2011"
-          expect(messages_sent.detect { |m| m.user_id == @studentA.id }.body).to be_include "Jan 9, 2011"
-          expect(messages_sent.detect { |m| m.user_id == @ta.id }.body).to be_include "Jan 9, 2011"
+          expect(messages_sent.detect { |m| m.user_id == @teacher.id }.body).to include "Jan 9, 2011"
+          expect(messages_sent.detect { |m| m.user_id == @studentA.id }.body).to include "Jan 9, 2011"
+          expect(messages_sent.detect { |m| m.user_id == @ta.id }.body).to include "Jan 9, 2011"
           expect(messages_sent.detect { |m| m.user_id == @studentB.id }).to be_nil
-          expect(messages_sent.detect { |m| m.user_id == @ta2.id }.body).to be_include "Jan 9, 2011"
+          expect(messages_sent.detect { |m| m.user_id == @ta2.id }.body).to include "Jan 9, 2011"
         end
 
         it "notifies appropriate parties when an override due date changes" do
@@ -6319,12 +6319,12 @@ describe Assignment do
 
           messages_sent = override.messages_sent["Assignment Due Date Changed"]
           expect(messages_sent.detect { |m| m.user_id == @studentA.id }).to be_nil
-          expect(messages_sent.detect { |m| m.user_id == @studentB.id }.body).to be_include "Jan 11, 2011"
+          expect(messages_sent.detect { |m| m.user_id == @studentB.id }.body).to include "Jan 11, 2011"
 
           messages_sent = override.messages_sent["Assignment Due Date Override Changed"]
           expect(messages_sent.detect { |m| m.user_id == @ta.id }).to be_nil
-          expect(messages_sent.detect { |m| m.user_id == @teacher.id }.body).to be_include "Jan 11, 2011"
-          expect(messages_sent.detect { |m| m.user_id == @ta2.id }.body).to be_include "Jan 11, 2011"
+          expect(messages_sent.detect { |m| m.user_id == @teacher.id }.body).to include "Jan 11, 2011"
+          expect(messages_sent.detect { |m| m.user_id == @ta2.id }.body).to include "Jan 11, 2011"
         end
       end
 
@@ -6405,8 +6405,8 @@ describe Assignment do
       expect(res).not_to be_nil
       expect(res).not_to be_empty
       expect(res.length).to be(2)
-      expect(res.map(&:user)).to be_include(@u1)
-      expect(res.map(&:user)).to be_include(@u2)
+      expect(res.map(&:user)).to include(@u1)
+      expect(res.map(&:user)).to include(@u2)
     end
 
     it "creates an initial submission comment for only the submitter by default" do
@@ -8874,8 +8874,8 @@ describe Assignment do
       @assignment = @course.assignments.create! points_possible: 10
       @shard1.activate do
         sql = @course.assignments.with_student_submission_count.to_sql
-        expect(sql).to be_include(Shard.default.name)
-        expect(sql).not_to be_include(@shard1.name)
+        expect(sql).to include(Shard.default.name)
+        expect(sql).not_to include(@shard1.name)
       end
     end
   end

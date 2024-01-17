@@ -140,10 +140,10 @@ describe Group do
       group3 = Group.create!(name: "group3", group_category:, context:)
       group4 = Group.create!(name: "group4", group_category: other_category, context:)
       expect(group1.peer_groups.length).to eq 2
-      expect(group1.peer_groups).to be_include(group2)
-      expect(group1.peer_groups).to be_include(group3)
-      expect(group1.peer_groups).not_to be_include(group1)
-      expect(group1.peer_groups).not_to be_include(group4)
+      expect(group1.peer_groups).to include(group2)
+      expect(group1.peer_groups).to include(group3)
+      expect(group1.peer_groups).not_to include(group1)
+      expect(group1.peer_groups).not_to include(group4)
     end
 
     it "does not find peer groups for student organized groups" do
@@ -172,18 +172,18 @@ describe Group do
       user_model
       pseudonym_model(user_id: @user.id)
       @group.add_user(@user)
-      expect(@group.users).to be_include(@user)
+      expect(@group.users).to include(@user)
     end
 
     it "is not able to add a person to the group twice" do
       user_model
       pseudonym_model(user_id: @user.id)
       @group.add_user(@user)
-      expect(@group.users).to be_include(@user)
+      expect(@group.users).to include(@user)
       expect(@group.users.count).to eq 1
       @group.add_user(@user)
       @group.reload
-      expect(@group.users).to be_include(@user)
+      expect(@group.users).to include(@user)
       expect(@group.users.count).to eq 1
     end
 
@@ -195,12 +195,12 @@ describe Group do
       user_model
       pseudonym_model(user_id: @user.id)
       group1.add_user(@user)
-      expect(group1.users).to be_include(@user)
+      expect(group1.users).to include(@user)
 
       group2.add_user(@user)
-      expect(group2.users).to be_include(@user)
+      expect(group2.users).to include(@user)
       group1.reload
-      expect(group1.users).not_to be_include(@user)
+      expect(group1.users).not_to include(@user)
     end
 
     it "adds a user at the right workflow_state by default" do

@@ -337,7 +337,7 @@ describe ContentMigration do
       topic2 = @copy_to.discussion_topics.where(migration_id: mig_id(topic)).first
 
       @copy_to.reload
-      expect(@copy_to.syllabus_body).to be_include("/courses/#{@copy_to.id}/discussion_topics/#{topic2.id}")
+      expect(@copy_to.syllabus_body).to include("/courses/#{@copy_to.id}/discussion_topics/#{topic2.id}")
     end
 
     it "does not copy lock_at directly when on assignment" do

@@ -181,7 +181,7 @@ describe "calendar2" do
         f("#use_section_dates").click
 
         num_rows = ff(".show_if_using_sections .row_header").length
-        expect(num_rows).to be_equal(num_sections)
+        expect(num_rows).to equal(num_sections)
       end
 
       it "keeps the modal's context changes in the more options screen when editing" do

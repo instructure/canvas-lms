@@ -388,8 +388,8 @@ describe EportfoliosController do
       expect(assigns[:portfolio]).not_to be_frozen
       expect(assigns[:portfolio]).to be_deleted
       @user.reload
-      expect(@user.eportfolios).to be_include(@portfolio)
-      expect(@user.eportfolios.active).not_to be_include(@portfolio)
+      expect(@user.eportfolios).to include(@portfolio)
+      expect(@user.eportfolios.active).not_to include(@portfolio)
     end
   end
 

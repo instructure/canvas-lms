@@ -337,7 +337,7 @@ describe ContextModule do
       @tag = @module.add_item({ id: @assignment.id, type: "assignment" }) # @assignment)
 
       expect(@tag.content).to eql(@assignment)
-      expect(@module.content_tags).to be_include(@tag)
+      expect(@module.content_tags).to include(@tag)
     end
 
     it "does not add an invalid assignment" do
@@ -362,7 +362,7 @@ describe ContextModule do
       @tag = @module.add_item({ id: @page.id, type: "wiki_page" }) # @page)
 
       expect(@tag.content).to eql(@page)
-      expect(@module.content_tags).to be_include(@tag)
+      expect(@module.content_tags).to include(@tag)
     end
 
     it "does not add invalid wiki pages" do
@@ -378,7 +378,7 @@ describe ContextModule do
       @tag = @module.add_item({ id: @file.id, type: "attachment" }) # @file)
 
       expect(@tag.content).to eql(@file)
-      expect(@module.content_tags).to be_include(@tag)
+      expect(@module.content_tags).to include(@tag)
     end
 
     it "allows adding items more than once" do
@@ -386,8 +386,8 @@ describe ContextModule do
       @tag1 = @module.add_item(id: @assignment.id, type: "assignment")
       @tag2 = @module.add_item(id: @assignment.id, type: "assignment")
       expect(@tag1).not_to eq @tag2
-      expect(@module.content_tags).to be_include(@tag1)
-      expect(@module.content_tags).to be_include(@tag2)
+      expect(@module.content_tags).to include(@tag1)
+      expect(@module.content_tags).to include(@tag2)
 
       @mod2 = @course.context_modules.create!(name: "mod2")
       @tag3 = @mod2.add_item(id: @assignment.id, type: "assignment")
@@ -412,7 +412,7 @@ describe ContextModule do
       @module.workflow_state = "published"
       @module.save!
 
-      expect(@module.content_tags).to be_include(@tag)
+      expect(@module.content_tags).to include(@tag)
     end
 
     describe "when adding an LTI 1.3 external tool" do
@@ -444,7 +444,7 @@ describe ContextModule do
         @module.workflow_state = "published"
         @module.save!
 
-        expect(@module.content_tags).to be_include(@tag)
+        expect(@module.content_tags).to include(@tag)
         expect(@tag.associated_asset).to be_a(Lti::ResourceLink)
         expect(@tag.associated_asset.custom).to eq("foo" => "bar")
       end
@@ -693,8 +693,8 @@ describe ContextModule do
 
       tehmod.update_for(@student, :read, tag)
       mods_with_progressions = @student.context_module_progressions.collect(&:context_module_id)
-      expect(mods_with_progressions).not_to be_include othermods[1].id
-      expect(mods_with_progressions).not_to be_include othermods[2].id
+      expect(mods_with_progressions).not_to include othermods[1].id
+      expect(mods_with_progressions).not_to include othermods[2].id
     end
 
     it "does not remove completed contribution requirements when viewed" do
@@ -1419,7 +1419,7 @@ describe ContextModule do
       @submission = @quiz.generate_submission(@student)
       @submission.workflow_state = "complete"
       @submission.save!
-      expect(@module.evaluate_for(@student).requirements_met).to be_include({ id: @tag.id, type: "must_submit" })
+      expect(@module.evaluate_for(@student).requirements_met).to include({ id: @tag.id, type: "must_submit" })
     end
 
     context "with conditional release" do

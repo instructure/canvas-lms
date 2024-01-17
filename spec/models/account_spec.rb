@@ -403,9 +403,9 @@ describe Account do
                                            default: false,
                                            expose_to_ui_proc: proc { |user, account| user == user2 && account == Account.default },
                                          })
-        expect(Account.services_exposed_to_ui_hash(:setting).keys).not_to be_include(:myservice)
-        expect(Account.services_exposed_to_ui_hash(:setting, user1, Account.default).keys).not_to be_include(:myservice)
-        expect(Account.services_exposed_to_ui_hash(:setting, user2, Account.default).keys).to be_include(:myservice)
+        expect(Account.services_exposed_to_ui_hash(:setting).keys).not_to include(:myservice)
+        expect(Account.services_exposed_to_ui_hash(:setting, user1, Account.default).keys).not_to include(:myservice)
+        expect(Account.services_exposed_to_ui_hash(:setting, user2, Account.default).keys).to include(:myservice)
       end
     end
 
@@ -415,7 +415,7 @@ describe Account do
       end
 
       it "returns the service" do
-        expect(AccountServices.allowable_services.keys).to be_include(:myplugin)
+        expect(AccountServices.allowable_services.keys).to include(:myplugin)
       end
 
       it "allows setting the service" do
@@ -432,8 +432,8 @@ describe Account do
 
       describe "services_exposed_to_ui_hash" do
         it "returns services defined in a plugin" do
-          expect(Account.services_exposed_to_ui_hash.keys).to be_include(:myplugin)
-          expect(Account.services_exposed_to_ui_hash(:setting).keys).to be_include(:myplugin)
+          expect(Account.services_exposed_to_ui_hash.keys).to include(:myplugin)
+          expect(Account.services_exposed_to_ui_hash(:setting).keys).to include(:myplugin)
         end
       end
     end
@@ -926,15 +926,15 @@ describe Account do
       group.add_user(@user1)
       users = @account.users_not_in_groups([group])
       expect(users.size).to eq 2
-      expect(users).not_to be_include(@user1)
+      expect(users).not_to include(@user1)
     end
 
     it "includes users otherwise" do
       group = @account.groups.create
       group.add_user(@user1)
       users = @account.users_not_in_groups([group])
-      expect(users).to be_include(@user2)
-      expect(users).to be_include(@user3)
+      expect(users).to include(@user2)
+      expect(users).to include(@user3)
     end
 
     it "allows ordering by user's sortable name" do
@@ -957,28 +957,28 @@ describe Account do
     it "includes 'Developer Keys' for the authorized users of the site_admin account" do
       account_admin_user(account: Account.site_admin)
       tabs = Account.site_admin.tabs_available(@admin)
-      expect(tabs.pluck(:id)).to be_include(Account::TAB_DEVELOPER_KEYS)
+      expect(tabs.pluck(:id)).to include(Account::TAB_DEVELOPER_KEYS)
 
       tabs = Account.site_admin.tabs_available(nil)
-      expect(tabs.pluck(:id)).not_to be_include(Account::TAB_DEVELOPER_KEYS)
+      expect(tabs.pluck(:id)).not_to include(Account::TAB_DEVELOPER_KEYS)
     end
 
     it "includes 'Developer Keys' for the admin users of an account" do
       account = Account.create!
       account_admin_user(account:)
       tabs = account.tabs_available(@admin)
-      expect(tabs.pluck(:id)).to be_include(Account::TAB_DEVELOPER_KEYS)
+      expect(tabs.pluck(:id)).to include(Account::TAB_DEVELOPER_KEYS)
 
       tabs = account.tabs_available(nil)
-      expect(tabs.pluck(:id)).not_to be_include(Account::TAB_DEVELOPER_KEYS)
+      expect(tabs.pluck(:id)).not_to include(Account::TAB_DEVELOPER_KEYS)
     end
 
     it "does not include 'Developer Keys' for non-site_admin accounts" do
       tabs = @account.tabs_available(nil)
-      expect(tabs.pluck(:id)).not_to be_include(Account::TAB_DEVELOPER_KEYS)
+      expect(tabs.pluck(:id)).not_to include(Account::TAB_DEVELOPER_KEYS)
 
       tabs = @account.root_account.tabs_available(nil)
-      expect(tabs.pluck(:id)).not_to be_include(Account::TAB_DEVELOPER_KEYS)
+      expect(tabs.pluck(:id)).not_to include(Account::TAB_DEVELOPER_KEYS)
     end
 
     it "does not include external tools if not configured for account navigation" do
@@ -987,7 +987,7 @@ describe Account do
       tool.save!
       expect(tool.has_placement?(:account_navigation)).to be false
       tabs = @account.tabs_available(nil)
-      expect(tabs.pluck(:id)).not_to be_include(tool.asset_string)
+      expect(tabs.pluck(:id)).not_to include(tool.asset_string)
     end
 
     it "includes active external tools if configured on the account" do
@@ -1011,8 +1011,8 @@ describe Account do
 
       tabs = @account.tabs_available
       tab_ids = tabs.pluck(:id)
-      expect(tab_ids).to be_include(tool1.asset_string)
-      expect(tab_ids).not_to be_include(tool2.asset_string)
+      expect(tab_ids).to include(tool1.asset_string)
+      expect(tab_ids).not_to include(tool2.asset_string)
       tab = tabs.detect { |t| t[:id] == tool1.asset_string }
       expect(tab[:label]).to eq tool1.settings[:account_navigation][:text]
       expect(tab[:href]).to eq :account_external_tool_path
@@ -1025,7 +1025,7 @@ describe Account do
       tool.save!
       expect(tool.has_placement?(:account_navigation)).to be true
       tabs = @account.tabs_available(nil)
-      expect(tabs.pluck(:id)).to be_include(tool.asset_string)
+      expect(tabs.pluck(:id)).to include(tool.asset_string)
       tab = tabs.detect { |t| t[:id] == tool.asset_string }
       expect(tab[:label]).to eq tool.settings[:account_navigation][:text]
       expect(tab[:href]).to eq :account_external_tool_path
@@ -1049,11 +1049,11 @@ describe Account do
       tool.save!
       expect(tool.has_placement?(:account_navigation)).to be true
       tabs = @account.tabs_available(@teacher)
-      expect(tabs.pluck(:id)).to_not be_include(tool.asset_string)
+      expect(tabs.pluck(:id)).to_not include(tool.asset_string)
 
       admin = account_admin_user(account: @account)
       tabs = @account.tabs_available(admin)
-      expect(tabs.pluck(:id)).to be_include(tool.asset_string)
+      expect(tabs.pluck(:id)).to include(tool.asset_string)
     end
 
     it "uses localized labels" do
@@ -1097,7 +1097,7 @@ describe Account do
     it "uses :manage_assignments to determine question bank tab visibility" do
       account_admin_user_with_role_changes(account: @account, role_changes: { manage_assignments: true, manage_grades: false })
       tabs = @account.tabs_available(@admin)
-      expect(tabs.pluck(:id)).to be_include(Account::TAB_QUESTION_BANKS)
+      expect(tabs.pluck(:id)).to include(Account::TAB_QUESTION_BANKS)
     end
 
     describe "account calendars tab" do

@@ -1722,7 +1722,7 @@ describe Submission do
 
   it "is versioned" do
     submission_spec_model
-    expect(@submission).to be_respond_to(:versions)
+    expect(@submission).to respond_to(:versions)
   end
 
   it "does not save new versions by default" do

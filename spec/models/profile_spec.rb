@@ -36,8 +36,10 @@ describe Profile do
     # rubocop:enable Lint/ConstantDefinitionInBlock, RSpec/LeakyConstantDeclaration
 
     after do
+      # rubocop:disable RSpec/RemoveConst
       Object.send(:remove_const, :FooProfile)
       Object.send(:remove_const, :Foo)
+      # rubocop:enable RSpec/RemoveConst
     end
 
     describe "initialization" do

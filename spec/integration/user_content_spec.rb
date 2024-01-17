@@ -30,7 +30,7 @@ describe "User Content" do
       sig = Canvas::Security.hmac_sha1(snippet)
       post "http://files.example.com/object_snippet", params: { object_data: snippet, s: sig }
       expect(response).to be_successful
-      expect(response.body).to be_include(obj_data)
+      expect(response.body).to include(obj_data)
 
       post "http://canvas.example.com/object_snippet", params: { object_data: snippet, s: sig }
       assert_status(400)
@@ -45,7 +45,7 @@ describe "User Content" do
       sig = Canvas::Security.hmac_sha1(snippet)
       post "http://files.example.com/object_snippet", params: { object_data: snippet, s: sig }
       expect(response).to be_successful
-      expect(response.body).to be_include(obj_data)
+      expect(response.body).to include(obj_data)
     end
   end
 end

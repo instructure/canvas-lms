@@ -305,7 +305,7 @@ describe AuthenticationProvidersPresenter do
       allow(AuthenticationProvider::Facebook).to receive(:enabled?).and_return(true)
       Account.default.authentication_providers.create!(auth_type: "facebook")
       presenter = described_class.new(Account.default)
-      expect(presenter.new_auth_types).not_to be_include(AuthenticationProvider::Facebook)
+      expect(presenter.new_auth_types).not_to include(AuthenticationProvider::Facebook)
     end
   end
 end

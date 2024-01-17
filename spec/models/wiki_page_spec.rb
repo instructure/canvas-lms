@@ -33,7 +33,7 @@ describe WikiPage do
     expect(p.messages_sent).not_to be_empty
     expect(p.messages_sent["Updated Wiki Page"]).not_to be_nil
     expect(p.messages_sent["Updated Wiki Page"]).not_to be_empty
-    expect(p.messages_sent["Updated Wiki Page"].map(&:user)).to be_include(@user)
+    expect(p.messages_sent["Updated Wiki Page"].map(&:user)).to include(@user)
   end
 
   it "sends page updated notifications to students if active" do
@@ -45,7 +45,7 @@ describe WikiPage do
     p.notify_of_update = true
     p.save!
     p.update(body: "Awgawg")
-    expect(p.messages_sent["Updated Wiki Page"].map(&:user)).to be_include(@student)
+    expect(p.messages_sent["Updated Wiki Page"].map(&:user)).to include(@student)
   end
 
   it "does not send page updated notifications to students if not active" do
@@ -58,7 +58,7 @@ describe WikiPage do
     p.notify_of_update = true
     p.save!
     p.update(body: "Awgawg")
-    expect(p.messages_sent["Updated Wiki Page"].map(&:user)).to_not be_include(@student)
+    expect(p.messages_sent["Updated Wiki Page"].map(&:user)).to_not include(@student)
   end
 
   describe "duplicate manages titles properly" do

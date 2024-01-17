@@ -1579,13 +1579,7 @@ describe "Files API", type: :request do
             end
           end
 
-          @original_net_http = Net.send(:remove_const, :HTTP)
-          Net.send(:const_set, :HTTP, mocked_http)
-        end
-
-        after do
-          Net.send(:remove_const, :HTTP)
-          Net.send(:const_set, :HTTP, @original_net_http)
+          stub_const("Net::HTTP", mocked_http)
         end
 
         it "only downloads data until the end of the metadata tag" do

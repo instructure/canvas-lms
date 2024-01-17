@@ -2508,7 +2508,7 @@ describe DiscussionTopicsController, type: :request do
       new_file = Attachment.find(json["attachment"]["id"])
       expect(new_file.display_name).to match(/txt-[0-9]+\.txt/)
       expect(json["attachment"]["display_name"]).to eq new_file.display_name
-      expect(json["attachment"]["url"]).to be_include "verifier="
+      expect(json["attachment"]["url"]).to include "verifier="
     end
 
     it "creates a submission from an entry on a graded topic" do

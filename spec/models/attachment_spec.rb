@@ -662,8 +662,8 @@ describe Attachment do
       a.destroy
       expect(a).not_to be_frozen
       expect(a).to be_deleted
-      expect(@course.attachments).to be_include(a)
-      expect(@course.attachments.active).not_to be_include(a)
+      expect(@course.attachments).to include(a)
+      expect(@course.attachments.active).not_to include(a)
     end
 
     it "still destroys without error if file data is lost" do
@@ -1711,12 +1711,12 @@ describe Attachment do
     it "finds a unique name for files" do
       existing_files = %w[a.txt b.txt c.txt]
       expect(Attachment.make_unique_filename("d.txt", existing_files)).to eq "d.txt"
-      expect(existing_files).not_to be_include(Attachment.make_unique_filename("b.txt", existing_files))
+      expect(existing_files).not_to include(Attachment.make_unique_filename("b.txt", existing_files))
 
       existing_files = %w[/a/b/a.txt /a/b/b.txt /a/b/c.txt]
       expect(Attachment.make_unique_filename("/a/b/d.txt", existing_files)).to eq "/a/b/d.txt"
       new_name = Attachment.make_unique_filename("/a/b/b.txt", existing_files)
-      expect(existing_files).not_to be_include(new_name)
+      expect(existing_files).not_to include(new_name)
       expect(new_name).to match(%r{^/a/b/b[^.]+\.txt})
     end
 
@@ -2091,7 +2091,7 @@ describe Attachment do
 
         # i can't seem to get a s3 url so I am just going to make sure the thumbnail namespace was inherited from the attachment
         expect(thumb.namespace).to eq @attachment.namespace
-        expect(thumb.authenticated_s3_url).to be_include @attachment.namespace
+        expect(thumb.authenticated_s3_url).to include @attachment.namespace
       end
     end
 
@@ -2102,7 +2102,7 @@ describe Attachment do
 
         # nil out namespace so we can make sure the url generating is working properly
         thumb.namespace = nil
-        expect(thumb.authenticated_s3_url).not_to be_include @attachment.namespace
+        expect(thumb.authenticated_s3_url).not_to include @attachment.namespace
       end
     end
   end

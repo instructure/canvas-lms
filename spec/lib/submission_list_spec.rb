@@ -96,7 +96,7 @@ describe SubmissionList do
       SubmissionList.days(@course).each do |day|
         expect(day).to be_is_a(OpenStruct)
         expect(day.send(:table).keys.size).to eql(available_keys.size)
-        available_keys.each { |k| expect(day.send(:table)).to be_include(k) }
+        available_keys.each { |k| expect(day.send(:table)).to include(k) }
         expect(day.graders).to be_is_a(Array)
         expect(day.date).to be_is_a(Date)
       end
@@ -108,7 +108,7 @@ describe SubmissionList do
         day.graders.each do |grader|
           expect(grader).to be_is_a(OpenStruct)
           expect(grader.send(:table).keys.size).to eql(available_keys.size)
-          available_keys.each { |k| expect(grader.send(:table).keys).to be_include(k) }
+          available_keys.each { |k| expect(grader.send(:table).keys).to include(k) }
           expect(grader.grader_id).to be_is_a(Numeric)
           expect(grader.assignments).to be_is_a(Array)
           expect(grader.name).to be_is_a(String)
@@ -135,7 +135,7 @@ describe SubmissionList do
           grader.assignments.each do |assignment|
             expect(assignment).to be_is_a(OpenStruct)
             expect(assignment.send(:table).keys.size).to eql(available_keys.size)
-            available_keys.each { |k| expect(assignment.send(:table).keys).to be_include(k) }
+            available_keys.each { |k| expect(assignment.send(:table).keys).to include(k) }
             expect(assignment.submission_count).to eql(assignment.submissions.size)
             expect(assignment.name).to be_is_a(String)
             expect(assignment.name).to eql(assignment.submissions[0].assignment_name)
@@ -194,7 +194,7 @@ describe SubmissionList do
               assignment.submissions.each do |submission|
                 expect(submission).to be_is_a(OpenStruct)
                 expect(submission.send(:table).keys.size).to eql(available_keys.size)
-                available_keys.each { |k| expect(submission.send(:table).keys).to be_include(k) }
+                available_keys.each { |k| expect(submission.send(:table).keys).to include(k) }
               end
             end
           end

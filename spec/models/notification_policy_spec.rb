@@ -39,7 +39,7 @@ describe NotificationPolicy do
       communication_channel(@student, { username: "secondary@example.com", active_cc: true })
       @policy = NotificationPolicy.create(notification: @notif, communication_channel: @cc, frequency: "immediately")
       @assignment = @course.assignments.create!(title: "test assignment")
-      expect(@assignment.messages_sent).to be_include("Assignment Created")
+      expect(@assignment.messages_sent).to include("Assignment Created")
       m = @assignment.messages_sent["Assignment Created"].find { |message| message.to == "default@example.com" }
       expect(m).to be_nil
       m = @assignment.messages_sent["Assignment Created"].find { |message| message.to == "secondary@example.com" }
@@ -140,14 +140,14 @@ describe NotificationPolicy do
       end
 
       it "is able to differentiate by several frequencies at once" do
-        expect(NotificationPolicy.by_frequency([:immediately, :daily])).to be_include(@n1)
-        expect(NotificationPolicy.by_frequency([:immediately, :daily])).to be_include(@n2)
+        expect(NotificationPolicy.by_frequency([:immediately, :daily])).to include(@n1)
+        expect(NotificationPolicy.by_frequency([:immediately, :daily])).to include(@n2)
       end
 
       it "is able to combine an array of frequencies with a for scope" do
-        expect(NotificationPolicy.for(@user).by_frequency([:daily, :weekly])).to be_include(@n2)
-        expect(NotificationPolicy.for(@user).by_frequency([:daily, :weekly])).to be_include(@n3)
-        expect(NotificationPolicy.for(@user).by_frequency([:daily, :weekly])).not_to be_include(@n1)
+        expect(NotificationPolicy.for(@user).by_frequency([:daily, :weekly])).to include(@n2)
+        expect(NotificationPolicy.for(@user).by_frequency([:daily, :weekly])).to include(@n3)
+        expect(NotificationPolicy.for(@user).by_frequency([:daily, :weekly])).not_to include(@n1)
       end
     end
 

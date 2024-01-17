@@ -111,7 +111,7 @@ RSpec.describe Mutations::UpdateDiscussionEntryParticipant do
         "ratingSum"
       )
     ).to eq 1
-    expect(@discussion_entry.rating(@discussion_entry.user)).to be_equal 1
+    expect(@discussion_entry.rating(@discussion_entry.user)).to equal 1
   end
 
   it "updates the report type" do

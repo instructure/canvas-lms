@@ -936,8 +936,8 @@ describe EnrollmentsApiController, type: :request do
                      }
         expect(response).to have_http_status :bad_request
         json = JSON.parse(response.body)
-        expect(json["message"]).to be_include "enrollment[self_enrollment_code] is invalid"
-        expect(json["message"]).to be_include "enrollment[user_id] must be 'self' when self-enrolling"
+        expect(json["message"]).to include "enrollment[self_enrollment_code] is invalid"
+        expect(json["message"]).to include "enrollment[user_id] must be 'self' when self-enrolling"
       end
 
       it "requires the course to be in a valid state" do
@@ -948,7 +948,7 @@ describe EnrollmentsApiController, type: :request do
                      { enrollment: { user_id: "self", self_enrollment_code: @course.self_enrollment_code } }
         expect(response).to have_http_status :bad_request
         json = JSON.parse(response.body)
-        expect(json["message"]).to be_include "course is not open for self-enrollment"
+        expect(json["message"]).to include "course is not open for self-enrollment"
       end
 
       it "lets anyone self-enroll" do
