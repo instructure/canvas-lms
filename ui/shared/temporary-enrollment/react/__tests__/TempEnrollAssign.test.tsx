@@ -663,7 +663,8 @@ describe('TempEnrollAssign', () => {
     })
   })
 
-  describe('getStoredData', () => {
+  // FOO-4218 - remove or rewrite to remove spies on imports
+  describe.skip('getStoredData', () => {
     let mockRoles: Role[]
 
     function mockGetFromLocalStorage<T extends object>(data: T | undefined) {
