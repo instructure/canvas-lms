@@ -26,7 +26,7 @@ class Checkpoint
   def as_json
     {
       name:,
-      label:,
+      tag:,
       points_possible:,
       due_at:,
       only_visible_to_overrides:
@@ -39,8 +39,8 @@ class Checkpoint
     @assignment.name
   end
 
-  def label
-    @assignment.checkpoint_label
+  def tag
+    @assignment.sub_assignment_tag
   end
 
   def points_possible

@@ -15,10 +15,10 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-import type {RegistrationOverlay} from '../react/RegistrationSettings/RegistrationOverlayState'
-import type {LtiPlacement} from './LtiPlacements'
-import type {LtiScope} from './LtiScopes'
+import {type RegistrationOverlay} from '../react/RegistrationSettings/RegistrationOverlayState'
+import {type LtiPlacement} from './LtiPlacements'
+import {type LtiPrivacyLevel} from './LtiPrivacyLevel'
+import {type LtiScope} from './LtiScopes'
 
 export type SubClaims = Array<string>
 export type MessageType = 'LtiResourceLinkRequest' | 'LtiDeepLinkingRequest'
@@ -40,6 +40,7 @@ export type LtiRegistration = {
     domain: string
     messages: Array<LtiMessage>
     target_link_uri: string
+    'https://canvas.instructure.com/lti/privacy_level'?: LtiPrivacyLevel
   }
   developer_key_id: string
   overlay: null | RegistrationOverlay

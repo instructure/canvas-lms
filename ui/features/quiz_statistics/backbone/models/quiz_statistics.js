@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from '@instructure/lodash-underscore'
+import {find} from 'lodash'
 import Backbone from '@canvas/backbone'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import K from '../../constants'
@@ -26,7 +26,6 @@ import wrap from '@canvas/quiz-legacy-client-apps/util/array_wrap'
 
 const I18n = useI18nScope('quiz_statistics')
 
-const findWhere = _.findWhere
 let parseQuestion
 
 const QuizStatistics = Backbone.Model.extend({
@@ -108,7 +107,7 @@ parseQuestion = function (question) {
     })
 
     correctAnswerPointBiserials =
-      findWhere(attrs.pointBiserials, {
+      find(attrs.pointBiserials, {
         correct: true,
       }) || {}
 

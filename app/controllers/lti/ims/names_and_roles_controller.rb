@@ -339,7 +339,7 @@ module Lti::IMS
     end
 
     def new_provider
-      Providers.const_get("#{context.class}MembershipsProvider").new(context, self, tool)
+      Providers.const_get(:"#{context.class}MembershipsProvider").new(context, self, tool)
     end
   end
 end

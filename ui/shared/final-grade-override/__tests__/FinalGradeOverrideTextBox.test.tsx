@@ -19,7 +19,7 @@
 import React from 'react'
 import {FinalGradeOverrideTextBox, type FinalGradeOverrideTextBoxProps} from '../react'
 import {fireEvent, render} from '@testing-library/react'
-import type {DeprecatedGradingScheme} from '@canvas/grading/grading'
+import type {DeprecatedGradingScheme} from '@canvas/grading/grading.d'
 
 const gradingScheme: DeprecatedGradingScheme = {
   data: [

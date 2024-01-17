@@ -19,10 +19,10 @@
 /* eslint-disable no-void */
 
 import $ from 'jquery'
+import {uniqueId} from 'lodash'
 import {extend} from '@canvas/backbone/utils'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import Backbone from '@canvas/backbone'
-import _ from 'underscore'
 import template from '../../jst/TreeBrowser.handlebars'
 import TreeView from './TreeView'
 
@@ -168,7 +168,7 @@ TreeBrowserView.prototype.setFocus = function ($to, $from) {
   }
   toId = $to.attr('id')
   if (!toId) {
-    toId = _.uniqueId('treenode-')
+    toId = uniqueId('treenode-')
     $to.attr('id', toId)
   }
   this.$tree.attr('aria-activedescendant', toId)

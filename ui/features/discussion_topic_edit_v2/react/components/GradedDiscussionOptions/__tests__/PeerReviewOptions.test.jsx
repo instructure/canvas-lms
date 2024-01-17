@@ -45,17 +45,28 @@ describe('PeerReviewOptions', () => {
     expect(queryByText('If left blank, uses due date')).not.toBeInTheDocument()
   })
 
-  it('shows more options when peer review is active', () => {
+  it('shows more options when peer review is set to automatically', () => {
     const {getByText, getByTestId} = renderPeerReviewOptions({
+      ...defaultProps,
+      peerReviewAssignment: 'automatically',
+    })
+    expect(getByText('Peer Reviews')).toBeInTheDocument()
+    expect(getByText('Off')).toBeInTheDocument()
+    expect(getByText('Reviews Per Student')).toBeInTheDocument()
+    expect(getByTestId('peer-review-due-date-container')).toBeInTheDocument()
+    expect(getByText('If left blank, uses due date')).toBeInTheDocument()
+  })
+
+  it('does not show extra options when peer review is set to manually', () => {
+    const {getByText, queryByText, queryByTestId} = renderPeerReviewOptions({
       ...defaultProps,
       peerReviewAssignment: 'manually',
     })
     expect(getByText('Peer Reviews')).toBeInTheDocument()
     expect(getByText('Off')).toBeInTheDocument()
-    expect(getByText('Assign manually')).toBeInTheDocument()
-    expect(getByText('Automatically assign')).toBeInTheDocument()
-    expect(getByText('Reviews Per Student')).toBeInTheDocument()
-    expect(getByTestId('peer-review-due-date-container')).toBeInTheDocument()
-    expect(getByText('If left blank, uses due date')).toBeInTheDocument()
+    // Expect these options to not exist for manually set peer reviews
+    expect(queryByText('Reviews Per Student')).not.toBeInTheDocument()
+    expect(queryByTestId('peer-review-due-date-container')).not.toBeInTheDocument()
+    expect(queryByText('If left blank, uses due date')).not.toBeInTheDocument()
   })
 })

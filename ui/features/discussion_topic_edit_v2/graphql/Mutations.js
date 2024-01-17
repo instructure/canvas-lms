@@ -140,6 +140,7 @@ export const UPDATE_DISCUSSION_TOPIC = gql`
     $locked: Boolean
     $specificSections: String
     $fileId: ID
+    $groupCategoryId: ID
     $removeAttachment: Boolean
     $assignment: AssignmentUpdate
   ) {
@@ -159,6 +160,7 @@ export const UPDATE_DISCUSSION_TOPIC = gql`
         podcastHasStudentPosts: $podcastHasStudentPosts
         locked: $locked
         specificSections: $specificSections
+        groupCategoryId: $groupCategoryId
         fileId: $fileId
         removeAttachment: $removeAttachment
         assignment: $assignment

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {parse, format} from 'datetime'
+import {parse, format} from '@canvas/datetime'
 import fr_FR from 'timezone/fr_FR'
 import zh_CN from 'timezone/zh_CN'
 import en_US from 'timezone/en_US'

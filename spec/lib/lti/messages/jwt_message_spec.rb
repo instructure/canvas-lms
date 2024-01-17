@@ -1071,4 +1071,26 @@ describe Lti::Messages::JwtMessage do
       end
     end
   end
+
+  describe "inst-specific extension claims" do
+    subject { decoded_jwt["https://www.instructure.com/#{claim}"] }
+
+    context "placement claim" do
+      let(:claim) { "placement" }
+
+      it "matches the resource_type" do
+        expect(subject).to eq opts[:resource_type]
+      end
+    end
+
+    context "lti_student_id claim" do
+      let(:claim) { "lti_student_id" }
+      let(:student_id) { "123" }
+      let(:opts) { { student_id: } }
+
+      it "uses student_id from opts" do
+        expect(subject).to eq student_id
+      end
+    end
+  end
 end

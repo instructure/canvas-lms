@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {renderHook} from '@testing-library/react-hooks/dom'
-import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
+import OutcomesContext from '../../contexts/OutcomesContext'
 import useOutcomeFormValidate from '../useOutcomeFormValidate'
 
 describe('useOutcomeFormValidate', () => {

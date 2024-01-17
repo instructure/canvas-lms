@@ -1,5 +1,6 @@
 {
   "name": "@canvas-features/context_module_progressions",
   "private": true,
-  "version": "1.0.0"
+  "version": "1.0.0",
+  "owner": "LF"
 }

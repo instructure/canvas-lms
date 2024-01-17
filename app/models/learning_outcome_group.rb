@@ -50,6 +50,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
 
   workflow do
     state :active
+    state :archived
     state :deleted
   end
 
@@ -256,8 +257,31 @@ class LearningOutcomeGroup < ActiveRecord::Base
     end
   end
 
-  scope :active, -> { where("learning_outcome_groups.workflow_state<>'deleted'") }
+  def archive!
+    # Only active groups can be archived
+    if workflow_state == "active"
+      self.workflow_state = "archived"
+      self.archived_at = Time.now.utc
+      save!
+    elsif workflow_state == "deleted"
+      raise ActiveRecord::RecordNotSaved, "Cannot archive a deleted LearningOutcomeGroup"
+    end
+  end
+
+  def unarchive!
+    # Only archived groups can be unarchived
+    if workflow_state == "archived"
+      self.workflow_state = "active"
+      self.archived_at = nil
+      save!
+    elsif workflow_state == "deleted"
+      raise ActiveRecord::RecordNotSaved, "Cannot unarchive a deleted LearningOutcomeGroup"
+    end
+  end
+
+  scope :active, -> { where("learning_outcome_groups.workflow_state NOT IN ('deleted', 'archived')") }
   scope :active_first, -> { order(Arel.sql("CASE WHEN workflow_state = 'active' THEN 0 ELSE 1 END")) }
+  scope :archived, -> { where("learning_outcome_groups.workflow_state = 'archived' AND learning_outcome_groups.archived_at IS NOT NULL") }
 
   scope :global, -> { where(context_id: nil) }
 

@@ -34,7 +34,8 @@ class Lti::LineItem < ApplicationRecord
              foreign_key: :lti_resource_link_id,
              class_name: "Lti::ResourceLink"
   belongs_to :assignment,
-             inverse_of: :line_items
+             inverse_of: :line_items,
+             class_name: "AbstractAssignment"
   belongs_to :root_account,
              class_name: "Account"
   has_many :results,

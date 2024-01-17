@@ -17,8 +17,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'underscore'
 import round from '@canvas/round'
+import {escape as lodashEscape} from 'lodash'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {scoreToGrade} from '@instructure/grading-utils'
 import {scoreToPercentage, scoreToScaledPoints} from '@canvas/grading/GradeCalculationHelper'
@@ -26,7 +26,7 @@ import htmlEscape from 'html-escape'
 import listFormatterPolyfill from '@canvas/util/listFormatter'
 import type Gradebook from '../../Gradebook'
 import type {Assignment} from '../../../../../../api.d'
-import type {DeprecatedGradingScheme} from '@canvas/grading/grading'
+import type {DeprecatedGradingScheme} from '@canvas/grading/grading.d'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 
 const I18n = useI18nScope('gradebook')
@@ -110,7 +110,7 @@ function render(options) {
   }
 
   if (options.letterGrade) {
-    const escapedGrade = _.escape(options.letterGrade)
+    const escapedGrade = lodashEscape(options.letterGrade)
 
     // xsslint safeString.identifier escapedGrade
     letterGrade = `<span class="letter-grade-points">${escapedGrade}</span>`

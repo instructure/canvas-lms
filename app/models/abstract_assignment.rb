@@ -37,9 +37,8 @@ class AbstractAssignment < ActiveRecord::Base
   include Plannable
   include DuplicatingObjects
   include LockedFor
-  include Checkpointable
 
-  self.ignored_columns += %i[context_code]
+  self.ignored_columns += %i[context_code checkpointed checkpoint_label]
 
   GRADING_TYPES = OpenStruct.new(
     {
@@ -168,6 +167,10 @@ class AbstractAssignment < ActiveRecord::Base
   has_many :conditional_release_associations, class_name: "ConditionalRelease::AssignmentSetAssociation", dependent: :destroy, inverse_of: :assignment, foreign_key: :assignment_id
   has_one :master_content_tag, class_name: "MasterCourses::MasterContentTag", inverse_of: :assignment, foreign_key: :content_id
 
+  belongs_to :parent_assignment, class_name: "Assignment", inverse_of: :sub_assignments
+  has_many :sub_assignments, -> { active }, foreign_key: :parent_assignment_id, inverse_of: :parent_assignment
+  has_many :sub_assignment_submissions, through: :sub_assignments, source: :submissions
+
   scope :assigned_to_student, ->(student_id) { joins(:submissions).where(submissions: { user_id: student_id }) }
   scope :anonymous, -> { where(anonymous_grading: true) }
   scope :moderated, -> { where(moderated_grading: true) }
@@ -258,6 +261,10 @@ class AbstractAssignment < ActiveRecord::Base
   # included to make it easier to work with api, which returns
   # sis_source_id as sis_assignment_id.
   alias_attribute :sis_assignment_id, :sis_source_id
+
+  def checkpoint?
+    false
+  end
 
   def context_code
     "#{context_type.downcase}_#{context_id}"
@@ -420,6 +427,24 @@ class AbstractAssignment < ActiveRecord::Base
     return unless grading_type_requires_points?
 
     update!(points_possible: DEFAULT_POINTS_POSSIBLE)
+  end
+
+  # Returns the value to be stored in the polymorphic type column for Polymorphic Associations.
+  def self.polymorphic_name
+    "Assignment"
+  end
+
+  # Returns the value to be used for asset string prefixes.
+  def self.reflection_type_name
+    name.underscore
+  end
+
+  def self.serialization_root_key
+    name.underscore
+  end
+
+  def self.url_context_class
+    self
   end
 
   def self.clean_up_duplicating_assignments
@@ -785,7 +810,7 @@ class AbstractAssignment < ActiveRecord::Base
 
   def ab_guid_through_rubric
     # ab_guid is an academic benchmark guid - it can be saved on the assignmenmt itself, or accessed through this association
-    rubric&.learning_outcome_alignments&.map { |loa| loa.learning_outcome.vendor_guid }&.compact || []
+    rubric&.learning_outcome_alignments&.filter_map { |loa| loa.learning_outcome.vendor_guid } || []
   end
 
   def update_student_submissions(updating_user)
@@ -1068,7 +1093,7 @@ class AbstractAssignment < ActiveRecord::Base
   end
 
   def delete_empty_abandoned_children
-    if saved_change_to_submission_types?
+    if governs_submittable? && saved_change_to_submission_types?
       each_submission_type do |submittable, type|
         unless self.submission_types == type.to_s
           submittable&.unlink!(:assignment)
@@ -1095,7 +1120,7 @@ class AbstractAssignment < ActiveRecord::Base
   def update_submittable
     # If we're updating the assignment's muted status as part of posting
     # grades, don't bother doing this
-    return true if deleted? || grade_posting_in_progress
+    return true if !governs_submittable? || deleted? || grade_posting_in_progress
 
     if self.submission_types == "online_quiz" && @saved_by != :quiz
       quiz = Quizzes::Quiz.where(assignment_id: self).first || context.quizzes.build
@@ -1142,7 +1167,7 @@ class AbstractAssignment < ActiveRecord::Base
   def all_context_module_tags
     all_tags = context_module_tags.to_a
     each_submission_type do |submission, _, short_type|
-      all_tags.concat(submission.context_module_tags) if send("#{short_type}?")
+      all_tags.concat(submission.context_module_tags) if send(:"#{short_type}?")
     end
     all_tags
   end
@@ -1334,60 +1359,6 @@ class AbstractAssignment < ActiveRecord::Base
     context&.broadcast_data
   end
 
-  set_broadcast_policy do |p|
-    p.dispatch :assignment_due_date_changed
-    p.to do |assignment|
-      # everyone who is _not_ covered by an assignment override affecting due_at
-      # (the AssignmentOverride records will take care of notifying those users)
-      excluded_ids = participants_with_overridden_due_at.to_set(&:id)
-      BroadcastPolicies::AssignmentParticipants.new(assignment, excluded_ids).to
-    end
-    p.whenever do |assignment|
-      BroadcastPolicies::AssignmentPolicy.new(assignment)
-                                         .should_dispatch_assignment_due_date_changed?
-    end
-    p.data { course_broadcast_data }
-
-    p.dispatch :assignment_changed
-    p.to do |assignment|
-      BroadcastPolicies::AssignmentParticipants.new(assignment).to
-    end
-    p.whenever do |assignment|
-      BroadcastPolicies::AssignmentPolicy.new(assignment)
-                                         .should_dispatch_assignment_changed?
-    end
-    p.data { course_broadcast_data }
-
-    p.dispatch :assignment_created
-    p.to do |assignment|
-      BroadcastPolicies::AssignmentParticipants.new(assignment).to
-    end
-    p.whenever do |assignment|
-      BroadcastPolicies::AssignmentPolicy.new(assignment)
-                                         .should_dispatch_assignment_created?
-    end
-    p.data { course_broadcast_data }
-    p.filter_asset_by_recipient do |assignment, user|
-      assignment.overridden_for(user, skip_clone: true)
-    end
-
-    p.dispatch :submissions_posted
-    p.to do |assignment|
-      assignment.course.participating_instructors
-    end
-    p.whenever do |assignment|
-      BroadcastPolicies::AssignmentPolicy.new(assignment)
-                                         .should_dispatch_submissions_posted?
-    end
-    p.data do |record|
-      if record.posting_params_for_notifications.present?
-        record.posting_params_for_notifications.merge(course_broadcast_data)
-      else
-        course_broadcast_data
-      end
-    end
-  end
-
   def notify_of_update=(val)
     @assignment_changed = Canvas::Plugin.value_to_boolean(val)
   end
@@ -1439,7 +1410,6 @@ class AbstractAssignment < ActiveRecord::Base
     each_submission_type { |submission| submission.destroy if submission && !submission.deleted? }
     conditional_release_rules.destroy_all
     conditional_release_associations.destroy_all
-    checkpoint_assignments.destroy_all
     refresh_course_content_participation_counts
 
     # Assignment owns deletion of Lti::LineItem, Lti::ResourceLink
@@ -1512,7 +1482,7 @@ class AbstractAssignment < ActiveRecord::Base
       copy_attrs = %w[due_at lock_at unlock_at]
       if quiz && @saved_by != :quiz &&
          copy_attrs.any? { |attr| changes[attr] }
-        copy_attrs.each { |attr| quiz.send "#{attr}=", send(attr) }
+        copy_attrs.each { |attr| quiz.send :"#{attr}=", send(attr) }
         quiz.saved_by = :assignment
         quiz.save
       end
@@ -1798,7 +1768,7 @@ class AbstractAssignment < ActiveRecord::Base
         locked = { object: assignment_for_user, lock_at: assignment_for_user.lock_at, can_view: true }
       else
         each_submission_type do |submission, _, short_type|
-          next unless send("#{short_type}?")
+          next unless send(:"#{short_type}?")
 
           if (submission_locked = submission.low_level_locked_for?(user, opts.merge(skip_assignment: true)))
             locked = submission_locked
@@ -2081,11 +2051,11 @@ class AbstractAssignment < ActiveRecord::Base
     submissions = []
     grade_group_students = !(grade_group_students_individually || opts[:excused])
 
-    if checkpointed? && root_account&.feature_enabled?(:discussion_checkpoints)
-      checkpoint_label = opts.delete(:checkpoint_label)
-      checkpoint_assignment = find_checkpoint(checkpoint_label)
-      if checkpoint_label.blank? || checkpoint_assignment.nil?
-        raise ::Assignment::GradeError, "Must provide a valid checkpoint label when grading checkpointed discussions"
+    if has_sub_assignments? && root_account&.feature_enabled?(:discussion_checkpoints)
+      sub_assignment_tag = opts.delete(:sub_assignment_tag)
+      checkpoint_assignment = find_checkpoint(sub_assignment_tag)
+      if sub_assignment_tag.blank? || checkpoint_assignment.nil?
+        raise ::Assignment::GradeError, "Must provide a valid sub assignment tag when grading checkpointed discussions"
       end
 
       checkpoint_submissions = checkpoint_assignment.grade_student(original_student, opts)
@@ -3408,7 +3378,7 @@ class AbstractAssignment < ActiveRecord::Base
   # * AssignmentOverride and
   # * AssignmentOverrideStudent
   def self.suspend_due_date_caching(&)
-    Assignment.suspend_callbacks(:update_cached_due_dates) do
+    AbstractAssignment.suspend_callbacks(:update_cached_due_dates) do
       AssignmentOverride.suspend_callbacks(:update_cached_due_dates) do
         AssignmentOverrideStudent.suspend_callbacks(:update_cached_due_dates, &)
       end
@@ -3417,8 +3387,14 @@ class AbstractAssignment < ActiveRecord::Base
 
   # Suspend callbacks that recalculate grading period grades
   def self.suspend_grading_period_grade_recalculation(&)
-    Assignment.suspend_callbacks(:update_grading_period_grades) do
+    AbstractAssignment.suspend_callbacks(:update_grading_period_grades) do
       AssignmentOverride.suspend_callbacks(:update_grading_period_grades, &)
+    end
+  end
+
+  def self.suspend_due_date_caching_and_score_recalculation(&)
+    suspend_due_date_caching do
+      suspend_grading_period_grade_recalculation(&)
     end
   end
 

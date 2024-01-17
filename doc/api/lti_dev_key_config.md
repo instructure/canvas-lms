@@ -1,4 +1,4 @@
-# Configuring LTI Advantage Tools
+# Manually Configuring LTI Advantage Tools
 
 <a name="top"></a>
 
@@ -8,7 +8,7 @@
 For a successful launch to occur, LTI Advantage Tools require configuration
 on both Canvas and inside the tool:
 
-- [Configuring LTI Advantage Tools](#configuring-lti-advantage-tools)
+- [Manually Configuring LTI Advantage Tools](#configuring-lti-advantage-tools)
 - [Overview of an LTI Launch](#overview-of-an-lti-launch)
 - [Configuring Canvas in the Tool](#configuring-canvas-in-the-tool)
 - [Configuring the Tool in Canvas](#configuring-the-tool-in-canvas)

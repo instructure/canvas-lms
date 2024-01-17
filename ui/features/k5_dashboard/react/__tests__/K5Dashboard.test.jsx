@@ -417,7 +417,7 @@ describe('K-5 Dashboard', () => {
     it('filters important dates to those selected', async () => {
       moxios.stubs.reset()
       // Overriding mocked cards to make all cards active so we have 2 subjects to choose from
-      moxios.stubRequest('/api/v1/dashboard/dashboard_cards', {
+      moxios.stubRequest(window.location.origin + '/api/v1/dashboard/dashboard_cards', {
         status: 200,
         response: MOCK_CARDS.map(c => ({...c, enrollmentState: 'active'})),
       })

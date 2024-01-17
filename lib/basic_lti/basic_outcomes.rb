@@ -230,7 +230,7 @@ module BasicLTI
         end
 
         op = operation_ref_identifier.underscore
-        return false unless respond_to?("handle_#{op}", true)
+        return false unless respond_to?(:"handle_#{op}", true)
 
         InstStatsd::Statsd.increment("lti.1_1.basic_outcomes.requests", tags: { op:, type: request_type })
 
@@ -240,7 +240,7 @@ module BasicLTI
           self.body = "<#{operation_ref_identifier}Response />"
           true
         else
-          send("handle_#{op}", tool, assignment, user)
+          send(:"handle_#{op}", tool, assignment, user)
         end
       end
 

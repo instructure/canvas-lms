@@ -29,7 +29,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
 import ReactDOM from 'react-dom'
 import React from 'react'
-import '@canvas/forms/jquery/jquery.instructure_forms' // formSubmit
+import '@canvas/jquery/jquery.instructure_forms' // formSubmit
 
 const I18n = useI18nScope('conferences')
 

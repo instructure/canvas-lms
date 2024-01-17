@@ -26,8 +26,8 @@ import {TempEnrollSearch} from './TempEnrollSearch'
 import {TempEnrollEdit} from './TempEnrollEdit'
 import {TempEnrollAssign} from './TempEnrollAssign'
 import {Flex} from '@instructure/ui-flex'
-import {MODULE_NAME, RECIPIENT} from './types'
 import type {Enrollment, EnrollmentType, Role, TempEnrollPermissions, User} from './types'
+import {MODULE_NAME, RECIPIENT} from './types'
 import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import {createAnalyticPropsGenerator, setAnalyticPropsOnRef} from './util/analytics'
 import {Spinner} from '@instructure/ui-spinner'
@@ -77,9 +77,9 @@ export const generateModalTitle = (
     }
   }
   if (isEditMode && userName) {
-    return I18n.t(`%{userName}’s Temporary Enrollment %{enrollmentType}`, {
-      userName,
+    return I18n.t(`Temporary Enrollment %{enrollmentType} for %{userName}`, {
       enrollmentType: enrollmentType === RECIPIENT ? 'Providers' : 'Recipients',
+      userName,
     })
   }
   return I18n.t('Find a recipient of Temporary Enrollments')

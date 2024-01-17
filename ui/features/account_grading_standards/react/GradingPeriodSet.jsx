@@ -19,7 +19,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import $ from 'jquery'
-import _ from 'lodash'
+import {map, some, every, head, tail, sortBy, reject, isNaN, filter, isEmpty, each} from 'lodash'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconEditLine, IconTrashLine, IconPlusLine} from '@instructure/ui-icons'
 import {Link} from '@instructure/ui-link'
@@ -33,16 +33,16 @@ import '@canvas/jquery/jquery.instructure_misc_helpers'
 const I18n = useI18nScope('GradingPeriodSet')
 
 const sortPeriods = function (periods) {
-  return _.sortBy(periods, 'startDate')
+  return sortBy(periods, 'startDate')
 }
 
 const anyPeriodsOverlap = function (periods) {
-  if (_.isEmpty(periods)) {
+  if (isEmpty(periods)) {
     return false
   }
-  const firstPeriod = _.head(periods)
-  const otherPeriods = _.tail(periods)
-  const overlapping = _.some(
+  const firstPeriod = head(periods)
+  const otherPeriods = tail(periods)
+  const overlapping = some(
     otherPeriods,
     otherPeriod =>
       otherPeriod.startDate < firstPeriod.endDate && firstPeriod.startDate < otherPeriod.endDate
@@ -51,19 +51,19 @@ const anyPeriodsOverlap = function (periods) {
 }
 
 const isValidDate = function (date) {
-  return Object.prototype.toString.call(date) === '[object Date]' && !_.isNaN(date.getTime())
+  return Object.prototype.toString.call(date) === '[object Date]' && !isNaN(date.getTime())
 }
 
 const validatePeriods = function (periods, weighted) {
-  if (_.some(periods, period => !(period.title || '').trim())) {
+  if (some(periods, period => !(period.title || '').trim())) {
     return [I18n.t('All grading periods must have a title')]
   }
 
-  if (weighted && _.some(periods, period => _.isNaN(period.weight) || period.weight < 0)) {
+  if (weighted && some(periods, period => isNaN(period.weight) || period.weight < 0)) {
     return [I18n.t('All weights must be greater than or equal to 0')]
   }
 
-  const validDates = _.every(
+  const validDates = every(
     periods,
     period =>
       isValidDate(period.startDate) && isValidDate(period.endDate) && isValidDate(period.closeDate)
@@ -73,13 +73,13 @@ const validatePeriods = function (periods, weighted) {
     return [I18n.t('All dates fields must be present and formatted correctly')]
   }
 
-  const orderedStartAndEndDates = _.every(periods, period => period.startDate < period.endDate)
+  const orderedStartAndEndDates = every(periods, period => period.startDate < period.endDate)
 
   if (!orderedStartAndEndDates) {
     return [I18n.t('All start dates must be before the end date')]
   }
 
-  const orderedEndAndCloseDates = _.every(periods, period => period.endDate <= period.closeDate)
+  const orderedEndAndCloseDates = every(periods, period => period.endDate <= period.closeDate)
 
   if (!orderedEndAndCloseDates) {
     return [I18n.t('All close dates must be on or after the end date')]
@@ -187,10 +187,10 @@ export default class GradingPeriodSet extends React.Component {
       })
   }
 
-  setTerms = () => _.filter(this.props.terms, {gradingPeriodGroupId: this.props.set.id})
+  setTerms = () => filter(this.props.terms, {gradingPeriodGroupId: this.props.set.id})
 
   termNames = () => {
-    const names = _.map(this.setTerms(), 'displayName')
+    const names = map(this.setTerms(), 'displayName')
     if (names.length > 0) {
       return I18n.t('Terms: ') + names.join(', ')
     } else {
@@ -211,7 +211,7 @@ export default class GradingPeriodSet extends React.Component {
 
   removeGradingPeriod = idToRemove => {
     this.setState(oldState => {
-      const gradingPeriods = _.reject(oldState.gradingPeriods, period => period.id === idToRemove)
+      const gradingPeriods = reject(oldState.gradingPeriods, period => period.id === idToRemove)
       return {gradingPeriods}
     })
   }
@@ -223,7 +223,7 @@ export default class GradingPeriodSet extends React.Component {
   saveNewPeriod = period => {
     const periods = this.state.gradingPeriods.concat([period])
     const validations = validatePeriods(periods, this.state.weighted)
-    if (_.isEmpty(validations)) {
+    if (isEmpty(validations)) {
       this.setNewPeriod({saving: true})
       gradingPeriodsApi
         .batchUpdate(this.props.set.id, periods)
@@ -237,7 +237,7 @@ export default class GradingPeriodSet extends React.Component {
           this.setNewPeriod({saving: false})
         })
     } else {
-      _.each(validations, message => {
+      each(validations, message => {
         $.flashError(message)
       })
     }
@@ -259,11 +259,11 @@ export default class GradingPeriodSet extends React.Component {
   }
 
   updatePeriod = period => {
-    const periods = _.reject(this.state.gradingPeriods, _period => period.id === _period.id).concat(
-      [period]
-    )
+    const periods = reject(this.state.gradingPeriods, _period => period.id === _period.id).concat([
+      period,
+    ])
     const validations = validatePeriods(periods, this.state.weighted)
-    if (_.isEmpty(validations)) {
+    if (isEmpty(validations)) {
       this.setEditPeriod({saving: true})
       gradingPeriodsApi
         .batchUpdate(this.props.set.id, periods)
@@ -277,7 +277,7 @@ export default class GradingPeriodSet extends React.Component {
           this.setNewPeriod({saving: false})
         })
     } else {
-      _.each(validations, message => {
+      each(validations, message => {
         $.flashError(message)
       })
     }
@@ -368,7 +368,7 @@ export default class GradingPeriodSet extends React.Component {
 
   renderGradingPeriods = () => {
     const actionsDisabled = isActionsDisabled(this.state, this.props)
-    return _.map(this.state.gradingPeriods, period => {
+    return map(this.state.gradingPeriods, period => {
       if (period.id === this.state.editPeriod.id) {
         return (
           <div

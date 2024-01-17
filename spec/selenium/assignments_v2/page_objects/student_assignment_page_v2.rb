@@ -64,7 +64,7 @@ class StudentAssignmentPageV2
     end
 
     def assignment_title(title)
-      fj("h2 span:contains(#{title})")
+      fj("h1 span:contains(#{title})")
     end
 
     def details_toggle

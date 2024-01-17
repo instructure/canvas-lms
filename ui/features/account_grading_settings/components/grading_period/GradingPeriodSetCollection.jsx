@@ -18,7 +18,20 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import _ from 'underscore'
+import {
+  compact,
+  difference,
+  filter,
+  find,
+  includes,
+  isDate,
+  map,
+  reject,
+  some,
+  sortBy,
+  union,
+  without,
+} from 'lodash'
 import $ from 'jquery'
 import {Button} from '@instructure/ui-buttons'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -36,12 +49,12 @@ import '@canvas/jquery/jquery.instructure_misc_plugins'
 const I18n = useI18nScope('GradingPeriodSetCollection')
 
 const presentEnrollmentTerms = function (enrollmentTerms) {
-  return _.map(enrollmentTerms, term => {
+  return map(enrollmentTerms, term => {
     const newTerm = {...term}
 
     if (newTerm.name) {
       newTerm.displayName = newTerm.name
-    } else if (_.isDate(newTerm.startAt)) {
+    } else if (isDate(newTerm.startAt)) {
       const started = DateHelper.formatDateForDisplay(newTerm.startAt)
       newTerm.displayName = I18n.t('Term starting ') + started
     } else {
@@ -106,8 +119,8 @@ export default class GradingPeriodSetCollection extends React.Component {
   }
 
   associateTermsWithSet = (setID, termIDs) =>
-    _.map(this.state.enrollmentTerms, term => {
-      if (_.includes(termIDs, term.id)) {
+    map(this.state.enrollmentTerms, term => {
+      if (includes(termIDs, term.id)) {
         const newTerm = {...term}
         newTerm.gradingPeriodGroupId = setID
         return newTerm
@@ -146,17 +159,17 @@ export default class GradingPeriodSetCollection extends React.Component {
   }
 
   onSetsLoaded = sets => {
-    const sortedSets = _.sortBy(sets, 'createdAt').reverse()
+    const sortedSets = sortBy(sets, 'createdAt').reverse()
     this.setState({sets: sortedSets})
   }
 
   onSetUpdated = updatedSet => {
-    const sets = _.map(this.state.sets, set =>
+    const sets = map(this.state.sets, set =>
       set.id === updatedSet.id ? {...set, ...updatedSet} : set
     )
 
-    const terms = _.map(this.state.enrollmentTerms, term => {
-      if (_.includes(updatedSet.enrollmentTermIDs, term.id)) {
+    const terms = map(this.state.enrollmentTerms, term => {
+      if (includes(updatedSet.enrollmentTermIDs, term.id)) {
         return {...term, gradingPeriodGroupId: updatedSet.id}
       } else if (term.gradingPeriodGroupId === updatedSet.id) {
         return {...term, gradingPeriodGroupId: null}
@@ -170,18 +183,18 @@ export default class GradingPeriodSetCollection extends React.Component {
   }
 
   setAndGradingPeriodTitles = set => {
-    const titles = _.pluck(set.gradingPeriods, 'title')
+    const titles = map(set.gradingPeriods, 'title')
     titles.unshift(set.title)
-    return _.compact(titles)
+    return compact(titles)
   }
 
   searchTextMatchesTitles = titles =>
-    _.some(titles, title => SearchHelpers.substringMatchRegex(this.state.searchText).test(title))
+    some(titles, title => SearchHelpers.substringMatchRegex(this.state.searchText).test(title))
 
   filterSetsBySearchText = (sets, searchText) => {
     if (searchText === '') return sets
 
-    return _.filter(sets, set => {
+    return filter(sets, set => {
       const titles = this.setAndGradingPeriodTitles(set)
       return this.searchTextMatchesTitles(titles)
     })
@@ -196,9 +209,9 @@ export default class GradingPeriodSetCollection extends React.Component {
   filterSetsBySelectedTerm = (sets, terms, selectedTermID) => {
     if (selectedTermID === '0') return sets
 
-    const activeTerm = _.findWhere(terms, {id: selectedTermID})
+    const activeTerm = find(terms, {id: selectedTermID})
     const setID = activeTerm.gradingPeriodGroupId
-    return _.where(sets, {id: setID})
+    return filter(sets, {id: setID})
   }
 
   changeSelectedEnrollmentTerm = event => {
@@ -239,8 +252,8 @@ export default class GradingPeriodSetCollection extends React.Component {
   }
 
   toggleSetBody = setId => {
-    if (_.includes(this.state.expandedSetIDs, setId)) {
-      this.setState({expandedSetIDs: _.without(this.state.expandedSetIDs, setId)})
+    if (includes(this.state.expandedSetIDs, setId)) {
+      this.setState({expandedSetIDs: without(this.state.expandedSetIDs, setId)})
     } else {
       this.setState({expandedSetIDs: this.state.expandedSetIDs.concat([setId])})
     }
@@ -262,13 +275,13 @@ export default class GradingPeriodSetCollection extends React.Component {
   }
 
   removeGradingPeriodSet = setID => {
-    const newSets = _.reject(this.state.sets, set => set.id === setID)
+    const newSets = reject(this.state.sets, set => set.id === setID)
     const nodeToFocus = this.nodeToFocusOnAfterSetDeletion(setID)
     this.setState({sets: newSets}, () => nodeToFocus.focus())
   }
 
   updateSetPeriods = (setID, gradingPeriods) => {
-    const newSets = _.map(this.state.sets, set => {
+    const newSets = map(this.state.sets, set => {
       if (set.id === setID) {
         return {...set, gradingPeriods}
       }
@@ -290,21 +303,21 @@ export default class GradingPeriodSetCollection extends React.Component {
   }
 
   termsBelongingToActiveSets = () => {
-    const setIDs = _.pluck(this.state.sets, 'id')
-    return _.filter(this.state.enrollmentTerms, term => {
+    const setIDs = map(this.state.sets, 'id')
+    return filter(this.state.enrollmentTerms, term => {
       const setID = term.gradingPeriodGroupId
-      return setID && _.includes(setIDs, setID)
+      return setID && includes(setIDs, setID)
     })
   }
 
   termsNotBelongingToActiveSets = () =>
-    _.difference(this.state.enrollmentTerms, this.termsBelongingToActiveSets())
+    difference(this.state.enrollmentTerms, this.termsBelongingToActiveSets())
 
   selectableTermsForEditSetForm = setID => {
-    const termsBelongingToThisSet = _.where(this.termsBelongingToActiveSets(), {
+    const termsBelongingToThisSet = filter(this.termsBelongingToActiveSets(), {
       gradingPeriodGroupId: setID,
     })
-    return _.union(this.termsNotBelongingToActiveSets(), termsBelongingToThisSet)
+    return union(this.termsNotBelongingToActiveSets(), termsBelongingToThisSet)
   }
 
   closeEditSetForm = _id => {
@@ -351,7 +364,7 @@ export default class GradingPeriodSetCollection extends React.Component {
       deleteGradingPeriodURL: this.props.urls.deleteGradingPeriodURL,
     }
 
-    return _.map(this.getVisibleSets(), set => {
+    return map(this.getVisibleSets(), set => {
       if (this.state.editSet.id === set.id) {
         return this.renderEditGradingPeriodSetForm(set)
       } else {
@@ -366,7 +379,7 @@ export default class GradingPeriodSetCollection extends React.Component {
             readOnly={this.props.readOnly}
             permissions={set.permissions}
             terms={this.state.enrollmentTerms}
-            expanded={_.includes(this.state.expandedSetIDs, set.id)}
+            expanded={includes(this.state.expandedSetIDs, set.id)}
             onEdit={this.editGradingPeriodSet}
             onDelete={this.removeGradingPeriodSet}
             onPeriodsChange={this.updateSetPeriods}

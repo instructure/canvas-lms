@@ -54,13 +54,14 @@ class Lti::ResourceLink < ApplicationRecord
     original_undestroy
   end
 
-  def self.create_with(context, tool, custom_params = nil, url = nil)
+  def self.create_with(context, tool, custom_params = nil, url = nil, title = nil)
     return if context.nil? || tool.nil?
 
     context.lti_resource_links.create!(
       custom: Lti::DeepLinkingUtil.validate_custom_params(custom_params),
       context_external_tool: tool,
-      url:
+      url:,
+      title:
     )
   end
 

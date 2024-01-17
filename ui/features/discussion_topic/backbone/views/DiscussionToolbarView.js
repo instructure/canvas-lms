@@ -16,9 +16,9 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import {View} from '@canvas/backbone'
-import _ from 'underscore'
 import 'jqueryui/button'
 import $ from 'jquery'
+import {debounce} from 'lodash'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {TextInput} from '@instructure/ui-text-input'
@@ -48,7 +48,7 @@ export default class DiscussionToolbarView extends View {
 
     this.prototype.filter = this.prototype.afterRender
 
-    this.prototype.filterBySearch = _.debounce(function () {
+    this.prototype.filterBySearch = debounce(function () {
       let value = this.$searchInput.val()
       if (value === '') {
         value = null

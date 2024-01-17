@@ -123,6 +123,9 @@ class AssignmentsController < ApplicationController
   end
 
   def render_a2_student_view(student:)
+    if @context.root_account.feature_enabled?(:instui_nav)
+      add_crumb(@assignment.title, polymorphic_url([@context, @assignment]))
+    end
     current_user_submission = @assignment.submissions.find_by(user: student)
     submission = if @context.feature_enabled?(:peer_reviews_for_a2)
                    if params[:reviewee_id].present? && !@assignment.anonymous_peer_reviews?

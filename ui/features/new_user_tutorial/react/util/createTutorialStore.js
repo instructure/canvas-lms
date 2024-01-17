@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import createStore from '@canvas/util/createStore'
+import createStore from '@canvas/backbone/createStore'
 
 const defaultState = Object.freeze({
   isCollapsed: false,

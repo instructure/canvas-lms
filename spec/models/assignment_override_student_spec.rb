@@ -216,6 +216,9 @@ describe AssignmentOverrideStudent do
     let(:quiz_id) { 1 }
     let(:assignment_id) { 2 }
     let(:context_module_id) { 3 }
+    let(:wiki_page_id) { 4 }
+    let(:discussion_topic_id) { 5 }
+    let(:attachment_id) { 6 }
 
     before do
       override_student.assignment_override = override
@@ -269,6 +272,24 @@ describe AssignmentOverrideStudent do
       it "has a nil quiz ID" do
         expect(override_student.quiz_id).to be_nil
       end
+    end
+
+    it "sets default values when the override has a wiki_page" do
+      override.wiki_page_id = wiki_page_id
+      override_student.send(:default_values)
+      expect(override_student.wiki_page_id).to eq wiki_page_id
+    end
+
+    it "sets default values when the override has a discussion_topic" do
+      override.discussion_topic_id = discussion_topic_id
+      override_student.send(:default_values)
+      expect(override_student.discussion_topic_id).to eq discussion_topic_id
+    end
+
+    it "sets default values when the override has an attachment" do
+      override.attachment_id = attachment_id
+      override_student.send(:default_values)
+      expect(override_student.attachment_id).to eq attachment_id
     end
   end
 

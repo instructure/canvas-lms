@@ -16,6 +16,7 @@
 #   SKIP_NPM_LOGIN=1
 #   SKIP_NPM_PUBLISH=1
 #   SKIP_ALERT=1
+#   SKIP_NPM_INSTALL=1
 
 function prompt {
     read -p "$1 (Y/N): " confirm &&
@@ -47,6 +48,31 @@ if [ -z "$SKIP_NPM_LOGIN" ]; then
     npm login
 else
     echo "Would have logged into NPM"
+fi
+
+if [ -z "$SKIP_NPM_INSTALL" ]; then
+    # checks that the package is able to be installed outside
+    # of the canvas-lms directory
+    echo -e "\nVerifying NPM install...\n"
+
+    script_dir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+    current_dir=$(pwd)
+    temp=$(mktemp -d)
+    cd "$temp"
+    yarn add file:$script_dir/..
+
+    if [[ ! $? -eq 0 ]]; then
+        echo "npm install failed"
+        cd "$current_dir"
+        rm -rf "$temp"
+        exit 1
+    fi
+
+    echo "npm install successful"
+    cd "$current_dir"
+    rm -rf "$temp"
+else
+    echo "Would have verified NPM install"
 fi
 
 if [ -z "$SKIP_NPM_PUBLISH" ]; then

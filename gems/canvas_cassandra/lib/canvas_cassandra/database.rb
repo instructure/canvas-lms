@@ -74,8 +74,8 @@ module CanvasCassandra
 
       def to_cql_ary(field = nil)
         field = "#{field}_" if field
-        statements = send("#{field}statements")
-        args = send("#{field}args")
+        statements = send(:"#{field}statements")
+        args = send(:"#{field}args")
         case statements.size
         when 0
           raise "Cannot execute an empty batch"

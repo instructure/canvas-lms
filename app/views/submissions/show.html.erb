@@ -344,7 +344,7 @@
                     <div class="comment_media">
                       <%= t(
                         "This is a media comment, *click here to view*.",
-                        wrapper: "<br/><a data-author='#{author_name}' data-created_at='#{created_at}' href='#' class='play_comment_link media-comment'>\1</a>.")
+                        wrapper: "<br/><a data-author='#{::HtmlTextHelper.strip_tags(author_name)}' data-created_at='#{created_at}' href='#' class='play_comment_link media-comment'>\1</a>.")
                       %>
                       <span class="media_comment_id" style="display: none;"><%= comment.media_comment_id %></span>
                       <div class="media_comment_content">

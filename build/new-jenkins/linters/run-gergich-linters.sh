@@ -47,6 +47,7 @@ if ! git diff HEAD~1 --exit-code -GENV -- 'packages/canvas-rce/**/*.js' 'package
   gergich comment "{\"path\":\"/COMMIT_MSG\",\"position\":1,\"severity\":\"error\",\"message\":\"$message\"}"
 fi
 
+node ui-build/webpack/generatePluginBundles.js
 ruby script/tsc & TSC_PID=$!
 ruby script/stylelint
 ruby script/rlint --no-fail-on-offense

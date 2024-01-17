@@ -17,9 +17,6 @@
  */
 
 import $ from 'jquery'
-import _ from '@instructure/lodash-underscore'
-
-const extend = _.extend
 
 /**
  * @class Common.Core.Environment
@@ -79,7 +76,7 @@ const Environment = {
    *
    */
   updateQueryString(params) {
-    this.query = extend({}, this.query, params)
+    this.query = {...this.query, ...params}
 
     window.history.pushState(
       '',

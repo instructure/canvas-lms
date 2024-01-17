@@ -600,7 +600,7 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def uses_preferred_lti_version?
-    !!send("use_#{PREFERRED_LTI_VERSION}?")
+    !!send(:"use_#{PREFERRED_LTI_VERSION}?")
   end
 
   def active?
@@ -991,7 +991,7 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def identity_fields_changed?
-    IDENTITY_FIELDS.excluding(:settings).any? { |field| send("#{field}_changed?") } ||
+    IDENTITY_FIELDS.excluding(:settings).any? { |field| send(:"#{field}_changed?") } ||
       (Utils::HashUtils.sort_nested_data(settings_was) != Utils::HashUtils.sort_nested_data(settings))
   end
 

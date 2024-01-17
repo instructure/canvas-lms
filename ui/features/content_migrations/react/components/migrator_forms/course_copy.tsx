@@ -27,6 +27,7 @@ import {Select} from '@instructure/ui-select'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import CommonMigratorControls from './common_migrator_controls'
 import type {onSubmitMigrationFormCallback} from '../types'
+import {Text} from '@instructure/ui-text'
 
 const I18n = useI18nScope('content_migrations_redesign')
 
@@ -44,6 +45,7 @@ export const CourseCopyImporter = ({onSubmit, onCancel}: CourseCopyImporterProps
   const [searchParam, setSearchParam] = useState<string>('')
   const [courseOptions, setCourseOptions] = useState<any>([])
   const [selectedCourse, setSelectedCourse] = useState<any>(false)
+  const [selectedCourseError, setSelectedCourseError] = useState<boolean>(false)
   const [includeCompletedCourses, setIncludeCompletedCourses] = useState<boolean>(false)
 
   const throttledCourseFetch = useRef(
@@ -99,6 +101,10 @@ export const CourseCopyImporter = ({onSubmit, onCancel}: CourseCopyImporterProps
   const handleSubmit: onSubmitMigrationFormCallback = useCallback(
     formData => {
       formData.settings.source_course_id = selectedCourse.id
+      setSelectedCourseError(!selectedCourse)
+      if (!selectedCourse) {
+        return
+      }
       onSubmit(formData)
     },
     [selectedCourse, onSubmit]
@@ -121,6 +127,20 @@ export const CourseCopyImporter = ({onSubmit, onCancel}: CourseCopyImporterProps
           onBlur={() => {
             setCourseOptions([])
           }}
+          messages={
+            selectedCourseError
+              ? [
+                  {
+                    text: (
+                      <Text color="danger">
+                        {I18n.t('You must select a course to copy content from')}
+                      </Text>
+                    ),
+                    type: 'error',
+                  },
+                ]
+              : []
+          }
         >
           {courseOptions.length > 0 ? (
             courseOptions.map((option: CourseOption) => {

@@ -142,7 +142,6 @@ export const SplitScreenThreadsContainer = props => {
           setToBeMarkedAsRead={setToBeMarkedAsRead}
           goToTopic={props.goToTopic}
           isHighlighted={entry._id === props.highlightEntryId}
-          updateDraftCache={props.updateDraftCache}
           moreOptionsButtonRef={props.moreOptionsButtonRef}
         />
       ))}
@@ -183,7 +182,6 @@ SplitScreenThreadsContainer.propTypes = {
   hasMoreNewerReplies: PropTypes.bool,
   fetchingMoreOlderReplies: PropTypes.bool,
   fetchingMoreNewerReplies: PropTypes.bool,
-  updateDraftCache: PropTypes.func,
   moreOptionsButtonRef: PropTypes.any,
 }
 
@@ -210,8 +208,7 @@ const SplitScreenThreadContainer = props => {
     if (
       !ENV.manual_mark_as_read &&
       !props.discussionEntry.entryParticipant?.read &&
-      !props.discussionEntry?.entryParticipant?.forcedReadState &&
-      filter !== 'drafts'
+      !props.discussionEntry?.entryParticipant?.forcedReadState
     ) {
       const observer = new IntersectionObserver(
         ([entry]) => entry.isIntersecting && props.setToBeMarkedAsRead(props.discussionEntry._id),
@@ -403,7 +400,7 @@ const SplitScreenThreadContainer = props => {
                         props.moreOptionsButtonRef?.current?.focus()
                       }, 0)
                     }}
-                    isIsolatedView={true}
+                    isSplitView={true}
                     editor={props.discussionEntry.editor}
                     isUnread={!props.discussionEntry.entryParticipant?.read}
                     isForcedRead={props.discussionEntry.entryParticipant?.forcedReadState}
@@ -421,15 +418,11 @@ const SplitScreenThreadContainer = props => {
                       props.discussionTopic.author,
                       props.discussionEntry.author
                     )}
-                    updateDraftCache={props.updateDraftCache}
                     quotedEntry={props.discussionEntry.quotedEntry}
                     attachment={props.discussionEntry.attachment}
                   >
                     <View as="div">
-                      <ThreadingToolbar
-                        discussionEntry={props.discussionEntry}
-                        isIsolatedView={true}
-                      >
+                      <ThreadingToolbar discussionEntry={props.discussionEntry} isSplitView={true}>
                         {threadActions}
                       </ThreadingToolbar>
                     </View>
@@ -472,6 +465,5 @@ SplitScreenThreadContainer.propTypes = {
   onOpenSplitScreenView: PropTypes.func,
   goToTopic: PropTypes.func,
   isHighlighted: PropTypes.bool,
-  updateDraftCache: PropTypes.func,
   moreOptionsButtonRef: PropTypes.any,
 }

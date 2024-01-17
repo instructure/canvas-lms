@@ -352,6 +352,6 @@ class AssetUserAccess < ActiveRecord::Base
 
   def increment(attribute)
     incremented_value = (send(attribute) || 0) + 1
-    send("#{attribute}=", incremented_value)
+    send(:"#{attribute}=", incremented_value)
   end
 end

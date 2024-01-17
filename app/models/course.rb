@@ -3635,11 +3635,11 @@ class Course < ActiveRecord::Base
         end
       end
     RUBY
-    alias_method "#{setting}?", setting if opts[:boolean]
+    alias_method :"#{setting}?", setting if opts[:boolean]
     if opts[:alias]
       alias_method opts[:alias], setting
-      alias_method "#{opts[:alias]}=", "#{setting}="
-      alias_method "#{opts[:alias]}?", "#{setting}?"
+      alias_method :"#{opts[:alias]}=", "#{setting}="
+      alias_method :"#{opts[:alias]}?", "#{setting}?"
     end
   end
 
@@ -4410,12 +4410,12 @@ class Course < ActiveRecord::Base
       case event.to_s
       when "publish"
         context_module.publish unless context_module.active?
-        unless Account.site_admin.feature_enabled?(:module_publish_menu) && skip_content_tags
+        unless skip_content_tags
           context_module.publish_items!(progress:)
         end
       when "unpublish"
         context_module.unpublish unless context_module.unpublished?
-        if Account.site_admin.feature_enabled?(:module_publish_menu) && !skip_content_tags
+        unless skip_content_tags
           context_module.unpublish_items!(progress:)
         end
       when "delete"

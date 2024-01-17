@@ -17,9 +17,9 @@
  */
 
 import React from 'react'
-import GradebookMenu from '@canvas/gradebook-menu'
+import GradebookMenu from '../GradebookMenu'
 import {Link} from '@instructure/ui-link'
-import type {GradiantVariantName} from '@canvas/gradebook-menu'
+import type {GradiantVariantName} from '../GradebookMenu'
 import {fireEvent, render} from '@testing-library/react'
 
 describe('GradebookMenu', () => {

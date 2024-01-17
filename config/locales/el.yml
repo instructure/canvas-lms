@@ -3527,6 +3527,7 @@ el:
   compose_a_new_message_db3a68ed: "Δημιουργία νέου μηνύματος"
   concluded_conferences_cdbe53f9: "Ολοκληρωμένες Συνδιασκέψεις"
   concluded_courses_94782e21: "Ολοκληρωμένα Μαθήματα"
+  concluded_e1e482a0: Ολοκληρώθηκε
   conference_36b50fda: Συνεδρία
   conference_was_deleted_30869390: "Η συνεδρία διαγράφηκε"
   conferences: 
@@ -9979,6 +9980,7 @@ el:
   not_available_487d3648: "Δεν διατίθεται"
   not_available_until_next_submission_2175158: "Μη διαθέσιμο έως την επόμενη υποβολή"
   not_completed_d70acea3: "Δεν έχει ολοκληρωθεί"
+  not_deleted_2a7f63ef: "(χωρίς διαγραφή)"
   not_graded_e027c866: "Δεν έχει βαθμολογηθεί"
   not_graded_e78bcd50: "Δεν έχει βαθμολογηθεί"
   not_installed_37a21a76: "Δεν εγκαταστάθηκε"
@@ -12761,6 +12763,7 @@ el:
   remove_empty_attachment_b2aea632: "αφαίρεση κενής επισύναψης"
   remove_f47dc62a: Αφαίρεση
   remove_filename_87f3781e: "αφαίρεση %{filename}"
+  remove_filter_68de01d4: "Αφαίρεση Φίλτου"
   remove_icon_a4646413: "αφαίρεση εικονιδίου"
   remove_image_341340b3: "Αφαίρεση Εικόνας"
   remove_media_comment_f4afdb4b: "Αφαίρεση πολυμεσιτικού σχόλιου"
@@ -15454,6 +15457,7 @@ el:
   welcome_to_your_courses_to_customize_the_list_of_c_22de652e: "<mrk mid=\"6789\" mtype=\"seg\">Καλώς ορίσατε στα μαθήματά σας!</mrk> <mrk mid=\"6790\" mtype=\"seg\">Για παραμετροποίηση της λίστας των μαθημάτων σας, κάντε κλικ στον σύνδεσμο «Όλα τα Μαθήματα» και βάλτε αστερίσκο στα μαθήματα που θέλετε να προβάλετε.</mrk>"
   well_below_mastery_37664bdc: "Αρκετά Κάτω από το Επίπεδο Επιδεξιότητας"
   what_should_the_csv_file_look_like_985a59ac: "Πως πρέπει να είναι το CSV αρχείο;"
+  what_would_you_like_to_do_next_2835397e: "Τι θα θέλατε να κάνετε έπειτα;"
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "<mrk mid=\"4369\" mtype=\"seg\">Όταν επισκέπτεται κάποιος το μάθημα, αυτή είναι η σελίδα που θα βλέπει.</mrk>  <mrk mid=\"4370\" mtype=\"seg\">Μπορείτε να ρυθμίσετε να εμφανίζεται η ροή δραστηριοτήτων, η λίστα των ενοτήτων του μαθήματος, το αναλυτικό πρόγραμμα ή κάποια προσαρμοσμένη σελίδα που θα δημιουργήσετε εσείς.</mrk>  <mrk mid=\"4371\" mtype=\"seg\">Η προεπιλεγμένη ρύθμιση είναι η ροή δραστηριοτήτων.</mrk>"
   where_would_you_like_to_move_title_fabd6e8f: "Πού θα θέλατε να μετακινήσετε το %{title};"
   white_87fa64fd: Λευκό

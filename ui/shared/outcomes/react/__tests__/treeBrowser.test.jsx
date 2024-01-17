@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {createCache} from '@canvas/apollo'
-import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
+import OutcomesContext from '../contexts/OutcomesContext'
 import {useManageOutcomes} from '../treeBrowser'
 import {smallOutcomeTree} from '../../mocks/Management'
 import {renderHook, act} from '@testing-library/react-hooks'

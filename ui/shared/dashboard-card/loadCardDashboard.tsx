@@ -23,8 +23,6 @@ import DashboardCard from './react/DashboardCard'
 import axios from '@canvas/axios'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {asJson, checkStatus, getPrefetchedXHR} from '@canvas/util/xhr'
-// @ts-expect-error
-import buildURL from 'axios/lib/helpers/buildURL'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import type {Card} from './types'
 
@@ -89,11 +87,15 @@ export class CardDashboardLoader {
       let sessionStorageTimeout: number
       const sessionStorageKey = `dashcards_for_user_${ENV && ENV.current_user_id}`
       const urlPrefix = '/api/v1/dashboard/dashboard_cards'
-      const url = buildURL(urlPrefix, {observed_user_id: observedUserId})
+      const url = new URL(urlPrefix, window.location.origin)
+      if (observedUserId) {
+        url.searchParams.append('observed_user_id', observedUserId)
+      }
+      const urlString = url.toString()
       this.promiseToGetDashboardCards =
-        asJson(getPrefetchedXHR(url)) ||
+        asJson(getPrefetchedXHR(urlString)) ||
         axios
-          .get(url)
+          .get(urlString)
           // @ts-expect-error
           .then(checkStatus)
           // @ts-expect-error

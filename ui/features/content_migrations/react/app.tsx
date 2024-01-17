@@ -26,7 +26,7 @@ export const App = () => {
 
   return (
     <>
-      <ContentMigrationsForm migrations={migrations} setMigrations={setMigrations} />
+      <ContentMigrationsForm setMigrations={setMigrations} />
       <ContentMigrationsTable migrations={migrations} setMigrations={setMigrations} />
     </>
   )

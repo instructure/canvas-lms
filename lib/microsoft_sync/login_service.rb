@@ -50,6 +50,8 @@ module MicrosoftSync
 
       # Returns JSON returned from endpoint, including 'access_token' and 'expires_in'
       def new_token(tenant)
+        raise ArgumentError, "MicrosoftSync not configured" unless client_id && client_secret
+
         headers = { "Content-Type" => "application/x-www-form-urlencoded" }
         body = {
           scope: "https://graph.microsoft.com/.default",
@@ -113,18 +115,17 @@ module MicrosoftSync
       end
 
       def client_id
-        settings["client-id"]
+        settings[:client_id]
       end
 
       private
 
       def settings
-        DynamicSettings.find("microsoft-sync") or
-          raise ArgumentError, "MicrosoftSync not configured"
+        Rails.application.credentials&.microsoft_sync&.with_indifferent_access || {}
       end
 
       def client_secret
-        settings["client-secret"]
+        settings[:client_secret]
       end
     end
   end

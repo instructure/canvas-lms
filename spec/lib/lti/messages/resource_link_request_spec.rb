@@ -89,6 +89,26 @@ describe Lti::Messages::ResourceLinkRequest do
           )
         end
       end
+
+      context "when resource_link has a title" do
+        let(:title) { "ResourceLink Title" }
+        let(:resource_link) do
+          Lti::ResourceLink.create!(
+            context_external_tool: tool_override || tool,
+            context: course,
+            custom: {
+              link_has_expansion2: "$Canvas.assignment.id",
+              no_expansion: "overrides tool param!"
+            },
+            url: "http://www.example.com/launch",
+            title:
+          )
+        end
+
+        it "uses title for rlid title" do
+          expect(jws.dig("https://purl.imsglobal.org/spec/lti/claim/resource_link", "title")).to eq title
+        end
+      end
     end
 
     it_behaves_like "disabled rlid claim group check"

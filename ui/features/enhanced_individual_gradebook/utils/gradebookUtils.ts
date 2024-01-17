@@ -16,16 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash'
-import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
+import {uniq, sortBy} from 'lodash'
+import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 import type {
   AssignmentGroupCriteriaMap,
   CamelizedGradingPeriodSet,
   SubmissionGradeCriteria,
-} from '@canvas/grading/grading'
+} from '@canvas/grading/grading.d'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import round from '@canvas/round'
-import tz from '@canvas/timezone'
+import * as tz from '@canvas/datetime'
 import userSettings from '@canvas/user-settings'
 
 import {ApiCallStatus, GradebookSortOrder} from '../types'
@@ -124,7 +124,7 @@ export function mapAssignmentGroupQueryResults(
         integration_data: {},
         sis_source_id: curr.sisId,
         invalid: totalGroupPoints === 0,
-        gradingPeriodsIds: _.uniq(assignmentGroupGradingPeriods),
+        gradingPeriodsIds: uniq(assignmentGroupGradingPeriods),
       }
 
       return prev
@@ -188,11 +188,11 @@ export function sortAssignments(
 ): SortableAssignment[] {
   switch (sortOrder) {
     case GradebookSortOrder.Alphabetical:
-      return _.sortBy(assignments, 'sortableName')
+      return sortBy(assignments, 'sortableName')
     case GradebookSortOrder.DueDate:
-      return _.sortBy(assignments, ['sortableDueDate', 'sortableName'])
+      return sortBy(assignments, ['sortableDueDate', 'sortableName'])
     case GradebookSortOrder.AssignmentGroup:
-      return _.sortBy(assignments, ['assignmentGroupPosition', 'sortableName'])
+      return sortBy(assignments, ['assignmentGroupPosition', 'sortableName'])
     default:
       return assignments
   }
@@ -495,6 +495,7 @@ function mapToSortableAssignment(
   gradingPeriodId?: string | null
 ): SortableAssignment {
   // Used sort date logic from screenreader_gradebook_controller.js
+  // @ts-expect-error
   const sortableDueDate = assignment.dueAt ? +tz.parse(assignment.dueAt) / 1000 : Number.MAX_VALUE
   return {
     ...assignment,

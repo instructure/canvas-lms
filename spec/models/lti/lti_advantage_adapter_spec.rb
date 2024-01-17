@@ -82,6 +82,15 @@ describe Lti::LtiAdvantageAdapter do
     @course
   end
 
+  describe "#generate_post_payload_for_student_context_card" do
+    let(:login_message) { adapter.generate_post_payload_for_student_context_card(student_id:) }
+    let(:student_id) { "123" }
+
+    it "includes extension lti_student_id claim in the id_token" do
+      expect(params["https://www.instructure.com/lti_student_id"]).to eq(student_id)
+    end
+  end
+
   describe "#generate_post_payload" do
     context 'when the message type is "LtiDeepLinkingRequest"' do
       let(:opts) { { resource_type: "editor_button", domain: "test.com" } }
@@ -210,10 +219,6 @@ describe Lti::LtiAdvantageAdapter do
       it 'sets "canvas_enviroment" to "test"' do
         expect(login_message["canvas_environment"]).to eq "test"
       end
-    end
-
-    it "accepts a student_id parameter" do
-      expect(adapter.generate_post_payload(student_id: 123).keys).to include("iss")
     end
 
     context "when no i18n locale is set in the request" do

@@ -32,6 +32,7 @@ import {View} from '@instructure/ui-view'
 
 import {ASSIGNMENTS} from '../../graphql/queries'
 import {UPDATE_SUBMISSIONS_READ_STATE} from '../../graphql/Mutations'
+import {UPDATE_RUBRIC_ASSESSMENT_READ_STATE} from '../../graphql/Mutations'
 
 import AssignmentTable from './AssignmentTable'
 import {getGradingPeriodID} from './utils'
@@ -42,6 +43,7 @@ const I18n = useI18nScope('grade_summary')
 const GradeSummaryContainer = () => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const [submissionIdsForUpdate, setSubmissionIdsForUpdate] = useState([])
+  const [submissionIdsForRubricUpdate, setSubmissionIdsForRubricUpdate] = useState([])
   const [submissionAssignmentId, setSubmissionAssignmentId] = useState('')
 
   const gradingPeriod = ENV?.grading_period?.id || getGradingPeriodID()
@@ -85,6 +87,28 @@ const GradeSummaryContainer = () => {
     },
   })
 
+  const [readStateChangeRubric] = useMutation(UPDATE_RUBRIC_ASSESSMENT_READ_STATE, {
+    onCompleted(data) {
+      if (data.updateRubricAssessmentReadState.errors) {
+        setOnFailure(I18n.t('Rubric read state change operation failed'))
+      } else {
+        setOnSuccess(
+          I18n.t(
+            {
+              one: 'Rubric read state Changed!',
+              other: 'Rubric read states Changed!',
+            },
+            {count: '1000'}
+          )
+        )
+        setSubmissionIdsForRubricUpdate([])
+      }
+    },
+    onError() {
+      setOnFailure(I18n.t('Rubric read state change failed'))
+    }
+  })
+
   useEffect(() => {
     const interval = setInterval(() => {
       if (submissionIdsForUpdate.length > 0) {
@@ -99,6 +123,20 @@ const GradeSummaryContainer = () => {
 
     return () => clearInterval(interval)
   }, [submissionIdsForUpdate, readStateChangeSubmission])
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (submissionIdsForRubricUpdate.length > 0) {
+        readStateChangeRubric({
+          variables: {
+            submissionIds: submissionIdsForRubricUpdate,
+          },
+        })
+      }
+    }, 3000)
+
+    return () => clearInterval(interval)
+  }, [submissionIdsForRubricUpdate, readStateChangeRubric])
 
   if (assignmentQuery.loading) {
     return (
@@ -134,6 +172,16 @@ const GradeSummaryContainer = () => {
     )
   }
 
+  const handleRubricReadStateChange = (submissionID) => {
+    if (!submissionID) return
+    const arr = [...submissionIdsForRubricUpdate, submissionID]
+    setSubmissionIdsForRubricUpdate(
+      arr.filter(
+        (item, index) => item !== null && item !== undefined && arr.indexOf(item) === index
+      )
+    )
+  }
+
   return (
     <Responsive
       query={{
@@ -152,6 +200,7 @@ const GradeSummaryContainer = () => {
               queryData={assignmentQuery?.data?.legacyNode}
               layout={layout}
               handleReadStateChange={handleReadStateChange}
+              handleRubricReadStateChange={handleRubricReadStateChange}
               setSubmissionAssignmentId={setSubmissionAssignmentId}
               submissionAssignmentId={submissionAssignmentId}
             />

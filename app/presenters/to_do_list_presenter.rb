@@ -63,7 +63,7 @@ class ToDoListPresenter
 
   def assignments_needing(type, opts = {})
     if @user
-      @user.send("assignments_needing_#{type}", contexts: @contexts, limit: ASSIGNMENT_LIMIT, **opts).map do |assignment|
+      @user.send(:"assignments_needing_#{type}", contexts: @contexts, limit: ASSIGNMENT_LIMIT, **opts).map do |assignment|
         AssignmentPresenter.new(@view, assignment, @user, type)
       end
     else

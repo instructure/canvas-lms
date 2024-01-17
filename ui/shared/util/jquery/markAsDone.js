@@ -16,7 +16,6 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import $ from 'jquery'
-import '@canvas/jquery/jquery.ajaxJSON'
 
 export default {
   toggle(button) {

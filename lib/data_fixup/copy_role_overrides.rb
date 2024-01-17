@@ -31,7 +31,7 @@ module DataFixup::CopyRoleOverrides
 
         dup = RoleOverride.new
         old_role_override.attributes.except("id", "permission", "created_at", "updated_at").each do |key, val|
-          dup.send("#{key}=", val)
+          dup.send(:"#{key}=", val)
         end
         dup.permission = new_permission.to_s
         dup.save!

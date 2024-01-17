@@ -17,7 +17,7 @@
  */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import tz from '@canvas/timezone'
+import * as tz from '@canvas/datetime'
 import moment from 'moment'
 import React, {useState} from 'react'
 import {bool} from 'prop-types'

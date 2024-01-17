@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import '@canvas/datetime'
+import '@canvas/datetime/jquery'
 import moment from 'moment'
 import PageViewCollection from './backbone/collections/PageViewCollection'
 import PageViewView from './backbone/views/PageViewView'

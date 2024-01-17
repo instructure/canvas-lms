@@ -18,7 +18,7 @@
 import $ from 'jquery'
 import htmlEscape from 'html-escape'
 import EditorToggle from '@canvas/editor-toggle'
-import {send} from '@canvas/rce/RceCommandShim'
+import {send} from '@canvas/rce-command-shim'
 import _inherits from '@babel/runtime/helpers/esm/inheritsLoose'
 
 _inherits(MultipleChoiceToggle, EditorToggle)

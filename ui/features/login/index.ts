@@ -23,7 +23,7 @@ import htmlEscape from 'html-escape'
 // @ts-expect-error
 import signupDialog from '@canvas/signup-dialog'
 import 'jquery-fancy-placeholder' /* fancyPlaceholder */
-import '@canvas/forms/jquery/jquery.instructure_forms' /* formSubmit, getFormData, formErrors, errorBox */
+import '@canvas/jquery/jquery.instructure_forms' /* formSubmit, getFormData, formErrors, errorBox */
 import '@canvas/loading-image'
 import '@canvas/rails-flash-notifications'
 

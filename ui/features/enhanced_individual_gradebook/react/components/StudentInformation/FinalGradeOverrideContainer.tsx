@@ -19,7 +19,7 @@
 import {View} from '@instructure/ui-view'
 import React, {useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import type {DeprecatedGradingScheme, FinalGradeOverride} from '@canvas/grading/grading'
+import type {DeprecatedGradingScheme, FinalGradeOverride} from '@canvas/grading/grading.d'
 import {updateFinalGradeOverride} from '@canvas/grading/FinalGradeOverrideApi'
 import {ApiCallStatus} from '../../../types'
 import {FinalGradeOverrideTextBox} from '@canvas/final-grade-override'

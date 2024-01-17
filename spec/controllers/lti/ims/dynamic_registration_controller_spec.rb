@@ -144,6 +144,7 @@ describe Lti::IMS::DynamicRegistrationController do
           }],
           "claims" => ["iss", "sub"],
           "target_link_uri" => "https://example.com/launch",
+          "https://canvas.instructure.com/lti/privacy_level" => "email_only",
         },
       }
     end
@@ -162,7 +163,10 @@ describe Lti::IMS::DynamicRegistrationController do
       end
 
       context "and with valid registration params" do
-        subject { post :create, params: { registration_token: valid_token, **registration_params } }
+        subject do
+          request.headers["Authorization"] = "Bearer #{valid_token}"
+          post :create, params: { **registration_params }
+        end
 
         it "accepts valid params and creates a registration model" do
           subject
@@ -182,6 +186,7 @@ describe Lti::IMS::DynamicRegistrationController do
           expect(parsed_body).to include(expected_response_keys)
           expect(parsed_body["client_id"]).to eq DeveloperKey.last.global_id.to_s
           created_registration = Lti::IMS::Registration.last
+          expect(created_registration.privacy_level).to eq("email_only")
           expect(created_registration).not_to be_nil
         end
 
@@ -199,7 +204,10 @@ describe Lti::IMS::DynamicRegistrationController do
       end
 
       context "and with invalid registration params" do
-        subject { post :create, params: { registration_token: valid_token, **invalid_registration_params } }
+        subject do
+          request.headers["Authorization"] = "Bearer #{valid_token}"
+          post :create, params: invalid_registration_params
+        end
 
         let(:invalid_registration_params) do
           wrong_grant_types = registration_params
@@ -222,7 +230,10 @@ describe Lti::IMS::DynamicRegistrationController do
     end
 
     context "with an invalid token" do
-      subject { post :create, params: { registration_token: invalid_token, **registration_params } }
+      subject do
+        request.headers["Authorization"] = "Bearer #{invalid_token}"
+        post :create, params: registration_params
+      end
 
       context "that has no uuid" do
         let(:invalid_token) do
@@ -258,6 +269,20 @@ describe Lti::IMS::DynamicRegistrationController do
           expect(response).to have_http_status(:unauthorized)
         end
       end
+    end
+  end
+
+  describe "#registration_token" do
+    subject { get :registration_token }
+
+    before do
+      account_admin_user
+      user_session(@admin)
+    end
+
+    it "returns a 200" do
+      subject
+      expect(response).to have_http_status(:ok)
     end
   end
 end

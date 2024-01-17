@@ -90,7 +90,7 @@ module CanvasRails
       log_config["daemon_ident"] ||= "canvas-lms-daemon"
       facilities = 0
       (log_config["facilities"] || []).each do |facility|
-        facilities |= Syslog.const_get "LOG_#{facility.to_s.upcase}"
+        facilities |= Syslog.const_get :"LOG_#{facility.to_s.upcase}"
       end
       ident = (ENV["RUNNING_AS_DAEMON"] == "true") ? log_config["daemon_ident"] : log_config["app_ident"]
       opts[:include_pid] = true if log_config["include_pid"] == true

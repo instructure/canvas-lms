@@ -19,7 +19,7 @@
 
 import {getByText, getAllByText, waitFor} from '@testing-library/dom'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {updateModuleItem} from '@canvas/context-modules/jquery/utils'
+import {updateModuleItem} from '../jquery/utils'
 import publishOneModuleHelperModule from '../utils/publishOneModuleHelper'
 import {initBody, makeModuleWithItems} from './testHelpers'
 
@@ -39,8 +39,8 @@ const {
 
 jest.mock('@canvas/do-fetch-api-effect')
 
-jest.mock('@canvas/context-modules/jquery/utils', () => {
-  const originalModule = jest.requireActual('@canvas/context-modules/jquery/utils')
+jest.mock('../jquery/utils', () => {
+  const originalModule = jest.requireActual('../jquery/utils')
   return {
     __esmodule: true,
     ...originalModule,

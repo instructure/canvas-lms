@@ -28,7 +28,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import Helper from './context_modules_helper'
 import CyoeHelper from '@canvas/conditional-release-cyoe-helper'
 import ContextModulesView from '../backbone/views/context_modules' /* handles the publish/unpublish state */
-import RelockModulesDialog from '../backbone/views/RelockModulesDialog'
+import RelockModulesDialog from '@canvas/relock-modules-dialog'
 import vddTooltip from '@canvas/due-dates/jquery/vddTooltip'
 import vddTooltipView from '../jst/_vddTooltip.handlebars'
 import Publishable from '../backbone/models/Publishable'
@@ -40,13 +40,13 @@ import get from 'lodash/get'
 import axios from '@canvas/axios'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/datetime' /* dateString, datetimeString, time_field, datetime_field */
-import '@canvas/forms/jquery/jquery.instructure_forms' /* formSubmit, fillFormData, formErrors, errorBox */
+import '@canvas/datetime/jquery' /* dateString, datetimeString, time_field, datetime_field */
+import '@canvas/jquery/jquery.instructure_forms' /* formSubmit, fillFormData, formErrors, errorBox */
 import 'jqueryui/dialog'
 import '@canvas/util/jquery/fixDialogButtons'
 import '@canvas/jquery/jquery.instructure_misc_helpers' /* /\$\.underscore/ */
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* .dim, confirmDelete, fragmentChange, showIf */
-import '@canvas/keycodes'
+import '@canvas/jquery-keycodes'
 import '@canvas/loading-image'
 import '@canvas/util/templateData' /* fillTemplateData, getTemplateData */
 import 'date-js' /* Date.parse */
@@ -70,9 +70,9 @@ import ContextModulesPublishMenu from '../react/ContextModulesPublishMenu'
 import {renderContextModulesPublishIcon} from '../utils/publishOneModuleHelper'
 import {underscoreString} from '@canvas/convert-case'
 import {selectContentDialog} from '@canvas/select-content-dialog'
-import DifferentiatedModulesTray from '@canvas/differentiated-modules'
-import ItemAssignToTray from '@canvas/differentiated-modules/react/Item/ItemAssignToTray'
-import {parseModule, parseModuleList} from '@canvas/differentiated-modules/utils/moduleHelpers'
+import DifferentiatedModulesTray from '../differentiated-modules'
+import ItemAssignToTray from '../differentiated-modules/react/Item/ItemAssignToTray'
+import {parseModule, parseModuleList} from '../differentiated-modules/utils/moduleHelpers'
 import {addModuleElement} from '../utils/moduleHelpers'
 
 if (!('INST' in window)) window.INST = {}
@@ -606,7 +606,6 @@ window.modules = (function () {
           $a.attr('data-item-context-id', data.context_id)
           $a.attr('data-item-context-type', data.context_type)
           $a.attr('data-item-content-id', data.content_id)
-          $a.attr('data-item-content-type', data.content_type)
         }
       }
 
@@ -1344,9 +1343,7 @@ modules.initModuleManagement = function (duplicate) {
             const $contextModules = $('#context_modules .context_module')
             if (!$contextModules.length) {
               $('#expand_collapse_all').hide()
-              if (window.ENV?.FEATURES?.module_publish_menu) {
-                updatePublishMenuDisabledState(true)
-              }
+              updatePublishMenuDisabledState(true)
             }
           })
           $.flashMessage(
@@ -2557,13 +2554,11 @@ $(document).ready(function () {
           renderItemAssignToTray(false, returnFocusTo, itemProps)
           returnFocusTo.focus()
         }}
-        onSave={() => {}}
         courseId={itemProps.courseId}
-        moduleItemId={itemProps.moduleItemId}
-        moduleItemName={itemProps.moduleItemName}
-        moduleItemType={itemProps.moduleItemType}
-        moduleItemContentType={itemProps.moduleItemContentType}
-        moduleItemContentId={itemProps.moduleItemContentId}
+        itemName={itemProps.moduleItemName}
+        itemType={itemProps.moduleItemType}
+        iconType={itemProps.moduleItemType}
+        itemContentId={itemProps.moduleItemContentId}
         pointsPossible={itemProps.pointsPossible}
         locale={ENV.LOCALE || 'en'}
         timezone={ENV.TIMEZONE || 'UTC'}
@@ -2587,17 +2582,14 @@ $(document).ready(function () {
     const moduleItemName = event.target.getAttribute('data-item-name')
     const moduleItemType = event.target.getAttribute('data-item-type')
     const courseId = event.target.getAttribute('data-item-context-id')
-    const moduleItemContentType = event.target.getAttribute('data-item-content-type')
     const moduleItemContentId = event.target.getAttribute('data-item-content-id')
     const itemProps = parseModuleItemElement(
       document.getElementById(`context_module_item_${moduleItemId}`)
     )
     renderItemAssignToTray(true, returnFocusTo, {
       courseId,
-      moduleItemId,
       moduleItemName,
       moduleItemType,
-      moduleItemContentType,
       moduleItemContentId,
       ...itemProps,
     })

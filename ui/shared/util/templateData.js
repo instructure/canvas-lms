@@ -18,7 +18,6 @@
 
 import $ from 'jquery'
 import htmlEscape from 'html-escape'
-import '@canvas/jquery/jquery.instructure_misc_helpers' /* replaceTags */
 import replaceTags from './replaceTags'
 
 // Fills the selected object(s) with data values as specified.  Plaintext values should be specified in the

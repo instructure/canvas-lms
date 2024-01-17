@@ -214,7 +214,7 @@ describe EnrollmentState do
         @recipient = user_factory(active_all: true)
         course1 = course_with_teacher(active_all: true, user: @provider).course
         course2 = course_with_teacher(active_all: true, user: @provider).course
-        temporary_enrollment_pairing = TemporaryEnrollmentPairing.create!(root_account: Account.default)
+        temporary_enrollment_pairing = TemporaryEnrollmentPairing.create!(root_account: Account.default, created_by: account_admin_user)
         @enrollment1 = course1.enroll_user(
           @recipient,
           "TeacherEnrollment",

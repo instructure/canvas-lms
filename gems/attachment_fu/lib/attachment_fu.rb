@@ -129,7 +129,7 @@ module AttachmentFu # :nodoc:
         m.belongs_to :parent, class_name: "::#{base_class}" unless options[:thumbnails].empty?
       end
 
-      storage_mod = AttachmentFu::Backends.const_get("#{options[:storage].to_s.classify}Backend")
+      storage_mod = AttachmentFu::Backends.const_get(:"#{options[:storage].to_s.classify}Backend")
       include storage_mod unless included_modules.include?(storage_mod)
 
       unless parent_options[:processor]
@@ -150,7 +150,7 @@ module AttachmentFu # :nodoc:
           end
         else
           begin
-            processor_mod = AttachmentFu::Processors.const_get("#{attachment_options[:processor].to_s.classify}Processor")
+            processor_mod = AttachmentFu::Processors.const_get(:"#{attachment_options[:processor].to_s.classify}Processor")
             include processor_mod unless included_modules.include?(processor_mod)
           rescue Object
             raise unless load_related_exception?($!)

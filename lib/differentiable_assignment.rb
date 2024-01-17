@@ -19,7 +19,7 @@
 
 module DifferentiableAssignment
   def differentiated_assignments_applies?
-    if is_a?(Assignment) || Quizzes::Quiz.class_names.include?(class_name)
+    if is_a?(AbstractAssignment) || Quizzes::Quiz.class_names.include?(class_name)
       only_visible_to_overrides
     elsif assignment
       assignment.only_visible_to_overrides
@@ -47,11 +47,11 @@ module DifferentiableAssignment
   end
 
   def visibility_view
-    is_a?(Assignment) ? AssignmentStudentVisibility : Quizzes::QuizStudentVisibility
+    is_a?(AbstractAssignment) ? AssignmentStudentVisibility : Quizzes::QuizStudentVisibility
   end
 
   def column_name
-    is_a?(Assignment) ? :assignment_id : :quiz_id
+    is_a?(AbstractAssignment) ? :assignment_id : :quiz_id
   end
 
   # will not filter the collection for teachers, will for non-observer students

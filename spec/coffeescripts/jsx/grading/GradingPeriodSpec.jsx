@@ -19,7 +19,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
-import _ from 'lodash'
+import {defaults} from 'lodash'
 import GradingPeriod from 'ui/features/course_grading_standards/react/gradingPeriod'
 import fakeENV from 'helpers/fakeENV'
 import DateHelper from '@canvas/datetime/dateHelper'
@@ -78,7 +78,7 @@ QUnit.module('GradingPeriod', {
       onDeleteGradingPeriod() {},
       updateGradingPeriodCollection: sinon.spy(),
     }
-    const props = _.defaults(opts, exampleProps)
+    const props = defaults(opts, exampleProps)
     const GradingPeriodElement = <GradingPeriod {...props} />
     return ReactDOM.render(GradingPeriodElement, wrapper)
   },

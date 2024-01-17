@@ -32,8 +32,24 @@ const selectiveData: any[] = [
   },
 ]
 
+const migration = {
+  id: '2',
+  migration_type: 'course_copy_importer',
+  migration_type_title: 'Copy a Canvas Course',
+  progress_url: 'http://mock.progress.url',
+  settings: {
+    source_course_id: '456',
+    source_course_name: 'Other course',
+    source_course_html_url: 'http://mock.other-course.url',
+  },
+  workflow_state: 'waiting_for_select',
+  migration_issues_count: 0,
+  migration_issues_url: 'http://mock.issues.url',
+  created_at: 'Apr 15 at 9:11pm',
+}
+
 const renderComponent = (overrideProps?: any) =>
-  render(<ContentSelectionModal courseId="1" migrationId="2" {...overrideProps} />)
+  render(<ContentSelectionModal courseId="1" migration={migration} {...overrideProps} />)
 
 describe('ContentSelectionModal', () => {
   afterEach(() => jest.clearAllMocks())
@@ -95,11 +111,11 @@ describe('ContentSelectionModal', () => {
       })
     })
 
-    it('calls onSubmit', async () => {
+    it('calls updateMigrationItem', async () => {
       window.ENV.current_user_id = '3'
-      const onSubmit = jest.fn()
-      renderComponent({onSubmit})
-      expect(onSubmit).not.toHaveBeenCalled()
+      const updateMigrationItem = jest.fn()
+      renderComponent({updateMigrationItem})
+      expect(updateMigrationItem).not.toHaveBeenCalled()
 
       const button = screen.getByRole('button', {name: 'Select content'})
       userEvent.click(button)
@@ -110,7 +126,7 @@ describe('ContentSelectionModal', () => {
       userEvent.click(submitButton)
 
       await waitFor(() => {
-        expect(onSubmit).toHaveBeenCalled()
+        expect(updateMigrationItem).toHaveBeenCalled()
       })
     })
 

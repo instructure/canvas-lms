@@ -106,9 +106,7 @@ describe "context modules" do
     end
 
     it "adds a published quiz to a module", priority: "1" do
-      @pub_quiz = Quizzes::Quiz.create!(context: @course, title: "Published Quiz")
-      @pub_quiz.workflow_state = "published"
-      @pub_quiz.save!
+      @pub_quiz = Quizzes::Quiz.create!(context: @course, title: "Published Quiz", workflow_state: "available")
       @mod.add_item(type: "quiz", id: @pub_quiz.id)
       go_to_modules
       verify_module_title("Published Quiz")
@@ -240,10 +238,11 @@ describe "context modules" do
       @mod.save!
       go_to_modules
       verify_module_title("some assignment in a module")
-      expect(ff("span.publish-icon.unpublished.publish-icon-publish > i.icon-unpublish").length).to eq(2)
-      ff(".icon-unpublish")[0].click
-      wait_for_ajax_requests
-      expect(ff("span.publish-icon.unpublished.publish-icon-published > i.icon-publish").length).to eq(2)
+      expect(unpublished_module_icon(@mod.id)).to be_present
+      expect(f("span.publish-icon.unpublished.publish-icon-publish > i.icon-unpublish")).to be_present
+      publish_module_and_items(@mod.id)
+      expect(published_module_icon(@mod.id)).to be_present
+      expect(f("span.publish-icon.unpublished.publish-icon-published > i.icon-publish")).to be_present
     end
   end
 
@@ -631,7 +630,7 @@ describe "context modules" do
       @module.add_item({ id: @file.id, type: "attachment" })
       get "/courses/#{@course.id}/modules"
 
-      ff(".icon-publish")[1].click
+      f(".icon-publish").click
       wait_for_ajaximations
       set_value f(".UsageRightsSelectBox__select"), "own_copyright"
       set_value f("#copyrightHolder"), "Test User"

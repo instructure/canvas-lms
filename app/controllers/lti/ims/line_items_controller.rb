@@ -299,7 +299,7 @@ module Lti
 
         a = line_item.assignment
         attr_mapping.each do |param_name, assignment_attr_name|
-          a.send("#{assignment_attr_name}=", line_item_params[param_name]) if line_item_params.key?(param_name)
+          a.send(:"#{assignment_attr_name}=", line_item_params[param_name]) if line_item_params.key?(param_name)
         end
         a.save!
       end

@@ -24,7 +24,7 @@ import type {
   AssignmentGroupCriteriaMap,
   FinalGradeOverrideMap,
   FinalGradeOverride,
-} from '@canvas/grading/grading'
+} from '@canvas/grading/grading.d'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {Text} from '@instructure/ui-text'

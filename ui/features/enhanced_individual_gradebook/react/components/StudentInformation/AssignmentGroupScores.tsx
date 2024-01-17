@@ -21,7 +21,7 @@ import type {
   AssignmentGroupCriteriaMap,
   AssignmentGroupGradeMap,
   DeprecatedGradingScheme,
-} from '@canvas/grading/grading'
+} from '@canvas/grading/grading.d'
 import RowScore from './RowScore'
 
 type Props = {

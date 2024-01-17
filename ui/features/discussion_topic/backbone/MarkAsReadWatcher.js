@@ -16,8 +16,8 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import Backbone from '@canvas/backbone'
-import _ from 'underscore'
 import $ from 'jquery'
+import _, {extend, throttle} from 'lodash'
 
 // An entry needs to be in the viewport for 2 consecutive secods for it to be marked as read
 // if you are scrolling quickly down the page and it comes in and out of the viewport in less
@@ -65,7 +65,7 @@ class MarkAsReadWatcher {
     return this.checkForVisibleEntries()
   }
 
-  static checkForVisibleEntries = _.throttle(() => {
+  static checkForVisibleEntries = throttle(() => {
     const topOfViewport = $window.scrollTop()
     const bottomOfViewport = topOfViewport + $window.height()
     MarkAsReadWatcher.unread.forEach(entry => {
@@ -78,4 +78,4 @@ class MarkAsReadWatcher {
   }, CHECK_THROTTLE)
 }
 
-export default _.extend(MarkAsReadWatcher, Backbone.Events)
+export default extend(MarkAsReadWatcher, Backbone.Events)

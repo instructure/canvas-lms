@@ -21,7 +21,7 @@ shared_examples_for "it has a proc attribute setter and getter for" do |attribut
   it "the attribute '#{attribute}'" do
     obj = described_class.new
     expect(obj.send(attribute)).to be_nil
-    obj.send("#{attribute}=", -> { 10 })
+    obj.send(:"#{attribute}=", -> { 10 })
     expect(obj.send(attribute)).to eq 10
   end
 end

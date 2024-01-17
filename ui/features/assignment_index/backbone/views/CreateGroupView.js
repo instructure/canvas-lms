@@ -18,7 +18,7 @@
 import round from '@canvas/round'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import _ from 'underscore'
+import {each, extend as lodashExtend} from 'lodash'
 import numberHelper from '@canvas/i18n/numberHelper'
 import AssignmentGroup from '@canvas/assignments/backbone/models/AssignmentGroup'
 import NeverDropCollection from '../collections/NeverDropCollection'
@@ -98,7 +98,7 @@ class CreateGroupView extends DialogFormView {
     if (data.group_weight && Number.isNaN(Number(numberHelper.parse(data.group_weight)))) {
       errors.group_weight = [{type: 'number', message: this.messages.non_number}]
     }
-    _.each(data.rules, (value, name) => {
+    each(data.rules, (value, name) => {
       // don't want to validate the never_drop field
       if (name === 'never_drop') {
         return
@@ -169,7 +169,7 @@ class CreateGroupView extends DialogFormView {
 
   toJSON() {
     const data = this.model.toJSON()
-    return _.extend(data, {
+    return lodashExtend(data, {
       show_weight: this.showWeight(),
       can_change_weighting: this.canChangeWeighting(),
       group_weight: this.showWeight() ? data.group_weight : null,
@@ -199,7 +199,7 @@ CreateGroupView.prototype.defaults = {
   height: 500,
 }
 
-CreateGroupView.prototype.events = _.extend({}, CreateGroupView.prototype.events, {
+CreateGroupView.prototype.events = lodashExtend({}, CreateGroupView.prototype.events, {
   'click .dialog_closer': 'close',
   'blur .group_weight': 'roundWeight',
 })

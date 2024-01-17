@@ -23,7 +23,7 @@ import htmlEscape from 'html-escape'
 import {truncateText} from '@canvas/util/TextHelper'
 import round from '@canvas/round'
 import numberHelper from '@canvas/i18n/numberHelper'
-import '@canvas/forms/jquery/jquery.instructure_forms' /* fillFormData */
+import '@canvas/jquery/jquery.instructure_forms' /* fillFormData */
 import 'jqueryui/dialog'
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* showIf */
 import '@canvas/util/templateData'

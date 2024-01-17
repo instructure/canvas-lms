@@ -120,7 +120,7 @@ module Lti
       @context = context
       @controller = controller
       @request = controller.request if controller
-      opts.each { |opt, val| instance_variable_set("@#{opt}", val) }
+      opts.each { |opt, val| instance_variable_set(:"@#{opt}", val) }
 
       # This will provide the most accurate version of the actual launch
       # url used, whether directly provided from a resource link or
@@ -230,8 +230,8 @@ module Lti
     # Returns "$ResourceLink.title" otherwise
     register_expansion "ResourceLink.title",
                        [],
-                       -> { @assignment.title },
-                       -> { @assignment && @assignment.title.present? },
+                       -> { @resource_link&.title || @assignment&.title || lti_helper.tag_from_resource_link(@resource_link)&.title || @context.name },
+                       -> { @resource_link || (@assignment && @assignment.title.present?) },
                        default_name: "resourcelink_title"
 
     # LTI - Custom parameter substitution: ResourceLink.available.startDateTime
@@ -317,6 +317,19 @@ module Lti
                        },
                        default_name: "com_instructure_rcs_app_host"
 
+    # Returns true if the User is from student view process
+    #
+    # @example
+    #   ```
+    #  "true"
+    #  "false"
+    #   ```
+    register_expansion "com.instructure.User.student_view",
+                       [],
+                       -> { @current_user.fake_student? || false },
+                       USER_GUARD,
+                       default_name: "com_instructure_user_student_view"
+
     # Returns the RCS Service JWT for the current user
     #
     # @internal
@@ -358,7 +371,7 @@ module Lti
                        [],
                        lambda {
                          observed_users = ObserverEnrollment.observed_students(@context, @current_user).keys
-                         observed_users&.collect { |user| find_sis_user_id_for(user) }&.compact&.join(",")
+                         observed_users&.filter_map { |user| find_sis_user_id_for(user) }&.join(",")
                        },
                        COURSE_GUARD,
                        default_name: "com_instructure_observee_sis_ids"

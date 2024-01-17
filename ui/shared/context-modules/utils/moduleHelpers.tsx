@@ -25,7 +25,7 @@ import $, * as JQuery from 'jquery'
 import {renderContextModulesPublishIcon} from './publishOneModuleHelper'
 import setupContentIds from '../jquery/setupContentIds'
 import {initPublishButton, overrideModel, setExpandAllButton} from '../jquery/utils'
-import RelockModulesDialog from '../backbone/views/RelockModulesDialog'
+import RelockModulesDialog from '@canvas/relock-modules-dialog'
 
 export function addModuleElement(
   data: Record<string, any>,
@@ -86,19 +86,17 @@ export function addModuleElement(
     }
     overrideModel(moduleItems, relockModulesDialog, view.model, view)
   }
-  if (window.ENV?.FEATURES?.module_publish_menu) {
-    const isPublishing =
-      document.querySelector<Element & {dataset: Record<string, string>}>(
-        '#context-modules-publish-menu'
-      )?.dataset['data-progress-id'] !== undefined
-    updatePublishMenuDisabledState(isPublishing)
-    renderContextModulesPublishIcon(
-      data.context_module.context_id,
-      data.context_module.id,
-      published,
-      isPublishing
-    )
-  }
+  const isPublishing =
+    document.querySelector<Element & {dataset: Record<string, string>}>(
+      '#context-modules-publish-menu'
+    )?.dataset['data-progress-id'] !== undefined
+  updatePublishMenuDisabledState(isPublishing)
+  renderContextModulesPublishIcon(
+    data.context_module.context_id,
+    data.context_module.id,
+    published,
+    isPublishing
+  )
   relockModulesDialog.renderIfNeeded(data.context_module)
   $module.triggerHandler('update', data)
   const module_dnd = $module.find('.module_dnd')[0]

@@ -146,7 +146,7 @@ module RespondusSoapEndpoint
       Rails.logger.debug "Parameters: #{([userName, "[FILTERED]", context] + log_args).inspect}"
       load_user(method, userName, password)
       load_session(context)
-      return_args = send("_#{method}", userName, password, context, *args) || []
+      return_args = send(:"_#{method}", userName, password, context, *args) || []
       ["Success", "", dump_session] + return_args
     rescue => e
       case e
@@ -173,7 +173,7 @@ module RespondusSoapEndpoint
 
       def wrap_api_call(*methods)
         methods.each do |method|
-          alias_method "_#{method}", method
+          alias_method :"_#{method}", method
           class_eval(<<~RUBY, __FILE__, __LINE__ + 1)
             def #{method}(userName, password, context, *args)
               ret = nil

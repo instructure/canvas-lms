@@ -27,13 +27,13 @@ import {
 } from '@instructure/ui-icons'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {MODULE_NAME, PROVIDER, RECIPIENT, TOOLTIP_MAX_WIDTH} from './types'
 import type {EnrollmentType, Role} from './types'
+import {MODULE_NAME, PROVIDER, RECIPIENT, TOOLTIP_MAX_WIDTH} from './types'
 import {TempEnrollModal} from './TempEnrollModal'
 import {createAnalyticPropsGenerator} from './util/analytics'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
-import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
+import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 import type {EnvCommon} from '@canvas/global/env/EnvCommon'
 
 declare const ENV: GlobalEnv & EnvCommon
@@ -57,10 +57,10 @@ export function generateTooltip(enrollmentType: EnrollmentType, name: string): J
   let message
   switch (enrollmentType) {
     case PROVIDER:
-      message = I18n.t('Manage %{name}’s Temporary Enrollment Recipients', {name})
+      message = I18n.t('Manage Temporary Enrollment Recipients for %{name}', {name})
       break
     case RECIPIENT:
-      message = I18n.t('Manage %{name}’s Temporary Enrollment Providers', {name})
+      message = I18n.t('Manage Temporary Enrollment Providers for %{name}', {name})
       break
     default:
       message = I18n.t('Create Temporary Enrollment Pairing for %{name}', {name})
@@ -118,16 +118,11 @@ export default function TempEnrollUsersListRow(props: Props) {
     designer: props.permissions.can_add_observer,
   }
 
-  let enrollmentStatusParams = {}
-  if (ENV.ACCOUNT_ID !== ENV.ROOT_ACCOUNT_ID) {
-    enrollmentStatusParams = {account_id: ENV.ACCOUNT_ID}
-  }
-
   useFetchApi(
     // @ts-ignore - this hook isn't ts-ified
     {
       path: `/api/v1/users/${props.user.id}/temporary_enrollment_status`,
-      params: enrollmentStatusParams,
+      ...(ENV.ACCOUNT_ID !== ENV.ROOT_ACCOUNT_ID && {params: {account_id: ENV.ACCOUNT_ID}}),
       success: (json: TemporaryEnrollmentData) => setTemporaryEnrollmentState(json),
       error: showFlashError(I18n.t('Failed to fetch temporary enrollment data')),
     },

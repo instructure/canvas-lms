@@ -1,5 +1,6 @@
 {
   "name": "@canvas-features/discussion_topics_post",
   "private": true,
-  "version": "1.0.0"
+  "version": "1.0.0",
+  "owner": "VICE"
 }

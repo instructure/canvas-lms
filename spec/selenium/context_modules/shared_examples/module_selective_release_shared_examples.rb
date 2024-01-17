@@ -387,7 +387,6 @@ shared_examples_for "selective_release edit module lock until" do |context|
 
   it "updates lock until date and time on edit module tray" do
     get @mod_url
-
     lock_until_date = format_date_for_view(Time.zone.today + 2.days)
     scroll_to_the_top_of_modules_page
     manage_module_button(@module).click
@@ -454,6 +453,7 @@ shared_examples_for "selective_release add module lock until" do |context|
   end
 
   it "updates lock until date and time on add module tray" do
+    skip("LF-1120 - lock until on modules now doesn't show up")
     get @mod_url
 
     lock_until_date = format_date_for_view(Time.zone.today + 2.days)

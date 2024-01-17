@@ -19,7 +19,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
-import _ from 'underscore'
+import {each, map, filter, isEmpty} from 'lodash'
 import $ from 'jquery'
 import {Button} from '@instructure/ui-buttons'
 import {Checkbox} from '@instructure/ui-checkbox'
@@ -69,12 +69,12 @@ class GradingPeriodSetForm extends React.Component {
 
   constructor(props) {
     super(props)
-    const associatedEnrollmentTerms = _.where(props.enrollmentTerms, {
+    const associatedEnrollmentTerms = filter(props.enrollmentTerms, {
       gradingPeriodGroupId: props.set.id,
     })
     const set = {
       ...props.set,
-      enrollmentTermIDs: _.pluck(associatedEnrollmentTerms, 'id'),
+      enrollmentTermIDs: map(associatedEnrollmentTerms, 'id'),
     }
 
     this.state = {set: buildSet(set)}
@@ -107,10 +107,10 @@ class GradingPeriodSetForm extends React.Component {
     e.preventDefault()
     if (this.props.onSave) {
       const validations = validateSet(this.state.set)
-      if (_.isEmpty(validations)) {
+      if (isEmpty(validations)) {
         this.props.onSave(this.state.set)
       } else {
-        _.each(validations, message => {
+        each(validations, message => {
           $.flashError(message)
         })
       }

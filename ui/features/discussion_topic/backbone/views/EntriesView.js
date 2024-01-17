@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import _ from 'underscore'
+import {without, sortedIndexOf, find} from 'lodash'
 import flattenObjects from '@canvas/util/flattenObjects'
 import $ from 'jquery'
 import pageNavTemplate from '../../jst/pageNav.handlebars'
@@ -115,7 +115,7 @@ export default class EntriesView extends Backbone.View {
       ;({parent} = child)
       descendants++
       // put the child on top so we can easily render it
-      const replies = _.without(parent.replies, child)
+      const replies = without(parent.replies, child)
       replies.unshift(child)
       parent.replies = replies
       // see if its rendered
@@ -219,8 +219,8 @@ export default class EntriesView extends Backbone.View {
     const json = this.collection.toJSON()
     // sub-collections are displayed in reverse when flat, in imitation of Facebook
     const list = flattenObjects(json, 'replies', !this.options.threaded)
-    const entry = _.find(list, x => `${x.id}` === id)
-    let pos = _.indexOf(list, entry)
+    const entry = find(list, x => `${x.id}` === id)
+    let pos = sortedIndexOf(list, entry)
     pos += reverse ? -1 : 1
     pos = Math.min(Math.max(0, pos), list.length - 1)
     const next = list[pos]

@@ -24,7 +24,7 @@ import filesEnv from '../modules/filesEnv'
 import setUsageRights from '../../util/setUsageRights'
 import updateModelsUsageRights from '../../util/updateModelsUsageRights'
 import '@canvas/rails-flash-notifications'
-import '@canvas/forms/jquery/jquery.instructure_forms'
+import '@canvas/jquery/jquery.instructure_forms'
 
 const I18n = useI18nScope('usage_rights_modal')
 

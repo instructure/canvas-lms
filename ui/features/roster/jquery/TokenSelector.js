@@ -17,7 +17,7 @@
 //
 
 import $ from 'jquery'
-import _ from 'underscore'
+import {once} from 'lodash'
 import TokenSelectorList from './TokenSelectorList'
 import RecipientCollection from '../backbone/collections/RecipientCollection'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
@@ -554,7 +554,7 @@ export default class TokenSelector {
     if (!collection.atLeastOnePageFetched) {
       collection.on(
         'fetch',
-        _.once(() => {
+        once(() => {
           this.autoSelectFirst(list)
           if (this.nextRequest) {
             this.updateSearch()

@@ -46,6 +46,34 @@ describe DiscussionTopic do
       )
   end
 
+  describe ".create_graded_topic!" do
+    it "returns a discussion topic with an attached assignment" do
+      topic = DiscussionTopic.create_graded_topic!(course: @course, title: "My Graded Topic")
+      aggregate_failures do
+        expect(topic).to be_a DiscussionTopic
+        expect(topic.assignment.submission_types).to eq "discussion_topic"
+      end
+    end
+
+    it "sets the title on both the assignment and discussion topic" do
+      title = "My Graded Topic"
+      topic = DiscussionTopic.create_graded_topic!(course: @course, title:)
+      aggregate_failures do
+        expect(topic.title).to eq title
+        expect(topic.assignment.title).to eq title
+      end
+    end
+
+    it "optionally accepts a user to be assigned to the discussion topic" do
+      topic = DiscussionTopic.create_graded_topic!(course: @course, title: "My Graded Topic", user: @teacher)
+      expect(topic.user).to eq @teacher
+    end
+
+    it "raises an error when the assignment is invalid" do
+      expect { DiscussionTopic.create_graded_topic!(course: nil, title: "My Graded Topic") }.to raise_error(ActiveRecord::RecordInvalid)
+    end
+  end
+
   describe ".preload_subentry_counts" do
     it "preloads the discussion subentry count" do
       topic1 = @course.discussion_topics.create!
@@ -2337,7 +2365,7 @@ describe DiscussionTopic do
     it "does not allow replies from students to topics locked based on date" do
       course_with_teacher(active_all: true)
       discussion_topic_model(context: @course)
-      @topic.unlock_at = 1.day.from_now
+      @topic.delayed_post_at = 1.day.from_now
       @topic.save!
       @topic.reply_from(user: @teacher, text: "reply") # should not raise error
       student_in_course(course: @course).accept!
@@ -2976,27 +3004,28 @@ describe DiscussionTopic do
 
   describe "checkpoints" do
     before do
-      @topic = @course.discussion_topics.create!(title: "Discussion Topic Title", user: @teacher)
+      @topic = DiscussionTopic.create_graded_topic!(course: @course, title: "Discussion Topic Title", user: @teacher)
+      @topic.root_account.enable_feature!(:discussion_checkpoints)
     end
 
     it "not in place in the topic" do
       expect(@topic.checkpoints?).to be false
-      expect(@topic.checkpoint_assignments.length).to eq 0
+      expect(@topic.sub_assignments.length).to eq 0
       expect(@topic.reply_to_topic_checkpoint).to be_nil
       expect(@topic.reply_to_entry_checkpoint).to be_nil
       expect(@topic.reply_to_entry_required_count).to eq 0
     end
 
     it "does not allow setting the reply_to_entry_required_count to more than 10" do
-      @topic.create_checkpoints(reply_to_topic_points: 10, reply_to_entry_points: 15, reply_to_entry_required_count: 11)
-
-      expect(@topic).to_not be_valid
+      expect do
+        @topic.create_checkpoints(reply_to_topic_points: 10, reply_to_entry_points: 15, reply_to_entry_required_count: 11)
+      end.to raise_error(ActiveRecord::RecordInvalid)
     end
 
-    it "does not allow setting the reply_to_entry_required_count to 0 when checkpoints are there" do
-      @topic.create_checkpoints(reply_to_topic_points: 10, reply_to_entry_points: 15, reply_to_entry_required_count: 0)
-
-      expect(@topic).to_not be_valid
+    it "does not create a discussion topic per-checkpoint (instead, checkpoints belong to the topic through the parent)" do
+      expect do
+        @topic.create_checkpoints(reply_to_topic_points: 10, reply_to_entry_points: 15, reply_to_entry_required_count: 0)
+      end.not_to change { DiscussionTopic.count }.from(1)
     end
 
     describe "in place" do
@@ -3008,10 +3037,9 @@ describe DiscussionTopic do
 
       it "in the topic" do
         expect(@topic.checkpoints?).to be true
-        expect(@topic.checkpoint_assignments.length).to eq 2
-        expect(@topic.assignment.checkpoint_label).to eq CheckpointLabels::PARENT
-        expect(@topic.reply_to_topic_checkpoint.checkpoint_label).to eq CheckpointLabels::REPLY_TO_TOPIC
-        expect(@topic.reply_to_entry_checkpoint.checkpoint_label).to eq CheckpointLabels::REPLY_TO_ENTRY
+        expect(@topic.sub_assignments.length).to eq 2
+        expect(@topic.reply_to_topic_checkpoint.sub_assignment_tag).to eq CheckpointLabels::REPLY_TO_TOPIC
+        expect(@topic.reply_to_entry_checkpoint.sub_assignment_tag).to eq CheckpointLabels::REPLY_TO_ENTRY
       end
 
       it "correctly marks the reply to topic checkpoint submission as submitted when the student replies to topic" do
@@ -3035,10 +3063,11 @@ describe DiscussionTopic do
 
       it "correctly leaves the reply to entry checkpoint submission as unsubmitted when the student has not replied to an entry 5 times" do
         entry = @topic.discussion_entries.create!(user: @teacher, message: "reply to topic")
+        @topic.discussion_entries.create!(user: @student, message: "reply to topic by student")
         @topic.discussion_entries.create!(user: @student, message: "reply to entry", root_entry_id: entry.id, parent_id: entry.id)
 
         expect(@topic.assignment.submissions.find_by(user: @student).workflow_state).to eq "unsubmitted"
-        expect(@topic.reply_to_topic_checkpoint.submissions.find_by(user: @student).workflow_state).to eq "unsubmitted"
+        expect(@topic.reply_to_topic_checkpoint.submissions.find_by(user: @student).workflow_state).to eq "submitted"
         expect(@topic.reply_to_entry_checkpoint.submissions.find_by(user: @student).workflow_state).to eq "unsubmitted"
       end
 
@@ -3049,9 +3078,7 @@ describe DiscussionTopic do
           @topic.discussion_entries.create!(user: @student, message: "reply to entry by student", root_entry_id: entry_by_teacher.id, parent_id: entry_by_teacher.id)
         end
 
-        # TODO: When all the children submissions are marked as submitted, the parent submission should be marked as submitted too.
-        # This will be done in a subsequent ticket.
-        expect(@topic.assignment.submissions.find_by(user: @student).workflow_state).to eq "unsubmitted"
+        expect(@topic.assignment.submissions.find_by(user: @student).workflow_state).to eq "submitted"
         expect(@topic.reply_to_topic_checkpoint.submissions.find_by(user: @student).workflow_state).to eq "submitted"
         expect(@topic.reply_to_entry_checkpoint.submissions.find_by(user: @student).workflow_state).to eq "submitted"
       end

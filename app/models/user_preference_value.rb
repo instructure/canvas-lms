@@ -49,7 +49,7 @@ class UserPreferenceValue < ActiveRecord::Base
   add_user_preference :gradebook_column_order, use_sub_keys: true
   add_user_preference :gradebook_column_size, use_sub_keys: true
   add_user_preference :gradebook_settings, use_sub_keys: true
-  add_user_preference :isolated_view_deeply_nested_alert
+  add_user_preference :split_screen_view_deeply_nested_alert
   add_user_preference :new_user_tutorial_statuses
   add_user_preference :selected_calendar_contexts
   add_user_preference :enabled_account_calendars

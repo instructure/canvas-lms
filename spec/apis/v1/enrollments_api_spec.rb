@@ -229,7 +229,7 @@ describe EnrollmentsApiController, type: :request do
           teacher_in_course(active_all: true)
           @account = Account.default
           @account.enable_feature!(:temporary_enrollments)
-          @temporary_enrollment_pairing = TemporaryEnrollmentPairing.create!(root_account: @account)
+          @temporary_enrollment_pairing = TemporaryEnrollmentPairing.create!(root_account: @account, created_by: account_admin_user)
         end
 
         context "when feature flag is enabled" do
@@ -1150,7 +1150,7 @@ describe EnrollmentsApiController, type: :request do
         @recipient = user_factory(active_all: true)
         course1 = course_with_teacher(active_all: true, user: @provider).course
         course2 = course_with_teacher(active_all: true, user: @provider).course
-        temporary_enrollment_pairing = TemporaryEnrollmentPairing.create!(root_account: Account.default)
+        temporary_enrollment_pairing = TemporaryEnrollmentPairing.create!(root_account: Account.default, created_by: account_admin_user)
         course1.enroll_user(
           @recipient,
           "TeacherEnrollment",
@@ -2019,7 +2019,7 @@ describe EnrollmentsApiController, type: :request do
         @user = current_user
         json = api_call(:get, @path, @params)
         enrollments = %w[observer student ta teacher].inject([]) do |res, type|
-          res + @course.send("#{type}_enrollments").eager_load(:user).order(User.sortable_name_order_by_clause("users"))
+          res + @course.send(:"#{type}_enrollments").eager_load(:user).order(User.sortable_name_order_by_clause("users"))
         end
         expect(json).to match_array(enrollments.map do |e|
           h = {
@@ -2389,7 +2389,7 @@ describe EnrollmentsApiController, type: :request do
       it "includes users' sis and login ids" do
         json = api_call(:get, @path, @params)
         enrollments = %w[observer student ta teacher].inject([]) do |res, type|
-          res + @course.send("#{type}_enrollments").preload(:user)
+          res + @course.send(:"#{type}_enrollments").preload(:user)
         end
         enrollments = enrollments.sort_by { |e| [e.type, e.user.sortable_name] }
         expect(json).to eq(enrollments.map do |e|
@@ -2765,7 +2765,7 @@ describe EnrollmentsApiController, type: :request do
         it "properly paginates" do
           json = api_call(:get, "#{@path}?page=1&per_page=1", @params.merge(page: 1.to_param, per_page: 1.to_param))
           enrollments = %w[observer student ta teacher].inject([]) do |res, type|
-            res + @course.send("#{type}_enrollments").preload(:user)
+            res + @course.send(:"#{type}_enrollments").preload(:user)
           end.map do |e|
             h = {
               "root_account_id" => e.root_account_id,
@@ -2832,7 +2832,7 @@ describe EnrollmentsApiController, type: :request do
         it "properly paginates" do
           json = api_call(:get, "#{@path}?page=1&per_page=1", @params.merge(page: 1.to_param, per_page: 1.to_param))
           enrollments = %w[observer student ta teacher].inject([]) do |res, type|
-            res + @course.send("#{type}_enrollments").preload(:user)
+            res + @course.send(:"#{type}_enrollments").preload(:user)
           end.map do |e|
             h = {
               "root_account_id" => e.root_account_id,
@@ -3510,7 +3510,7 @@ describe EnrollmentsApiController, type: :request do
       @recipient = user_factory(active_all: true)
       course1 = course_with_teacher(active_all: true, user: @provider).course
       course2 = course_with_teacher(active_all: true, user: @provider).course
-      temporary_enrollment_pairing = TemporaryEnrollmentPairing.create!(root_account: Account.default)
+      temporary_enrollment_pairing = TemporaryEnrollmentPairing.create!(root_account: Account.default, created_by: account_admin_user)
       course1.enroll_user(
         @recipient,
         "TeacherEnrollment",

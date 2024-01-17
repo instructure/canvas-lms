@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'underscore'
+import {find, groupBy} from 'lodash'
 import React from 'react'
 import {string} from 'prop-types'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -87,9 +87,10 @@ export default class FileSelectBox extends React.Component {
     let {folders} = this.state
 
     // Put files into the right folders.
-    const groupedFiles = _.groupBy(files, 'folder_id')
+    const groupedFiles = groupBy(files, 'folder_id')
     for (const key in groupedFiles) {
-      const folder = _.findWhere(folders, {id: parseInt(key, 10)})
+      const numericKey = parseInt(key, 10)
+      const folder = find(folders, e => e.id === numericKey)
       if (folder) {
         folder.files = groupedFiles[key]
       }

@@ -1,5 +1,6 @@
 {
   "name": "@canvas-features/ldap_settings_test",
   "private": true,
-  "version": "1.0.0"
+  "version": "1.0.0",
+  "owner": "FOO"
 }

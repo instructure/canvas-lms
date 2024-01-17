@@ -63,6 +63,18 @@ module Lti
       Rails.logger.error "Unable to generate lti_launch_debug_trace: #{e.message}"
     end
 
+    # Information about the request to generate_sessionless_launch
+    def generate_sessionless_launch_debug_trace
+      return nil unless domain_root_account && self.class.log_level(domain_root_account) > 0
+
+      encode_str({
+        request_id: RequestContext::Generator.request_id,
+        user_agent: request.user_agent
+      }.to_json)
+    rescue => e
+      Rails.logger.error "Unable to generate sessionless lti_launch_debug_trace: #{e.message}"
+    end
+
     # Returns hash of the debugging fields (i.e., what #debug_info_fields returns)
     def self.decode_debug_trace(debug_trace)
       debug_trace && JSON.parse(decode_str(debug_trace))

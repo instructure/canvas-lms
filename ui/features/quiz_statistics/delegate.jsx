@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from '@instructure/lodash-underscore'
+import {extend} from 'lodash'
 import config from './config'
 import controller from './controller'
 import initialize from './config/initializer'
@@ -24,7 +24,6 @@ import Layout from './react/components/app'
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-const extend = _.extend
 let container
 
 /**

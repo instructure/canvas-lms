@@ -18,6 +18,8 @@
 
 const {defaults} = require('jest-config')
 
+const esModules = ['mime'].join('|')
+
 module.exports = {
   moduleNameMapper: {
     '\\.svg$': '<rootDir>/jest/imageMock.js',
@@ -73,6 +75,8 @@ module.exports = {
 
   testEnvironment: '<rootDir>/jest/strictTimeLimitEnvironment.js',
 
+  transformIgnorePatterns: [`/node_modules/(?!${esModules})`],
+
   transform: {
     '\\.handlebars$': '<rootDir>/jest/handlebarsTransformer.js',
     '\\.graphql$': '<rootDir>/jest/rawLoader.js',
@@ -86,7 +90,7 @@ module.exports = {
             {
               // until we're on Jest 27 and can look into loading ESMs natively;
               // https://jestjs.io/docs/ecmascript-modules
-              modules: 'commonjs',
+              modules: 'auto',
             },
           ],
           ['@babel/preset-react', {useBuiltIns: true}],

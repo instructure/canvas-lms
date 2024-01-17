@@ -19,9 +19,9 @@
 /* eslint-disable object-shorthand */
 
 import {extend} from '@canvas/backbone/utils'
+import {extend as lodashExtend} from 'lodash'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import _ from 'underscore'
 import DialogFormView from '@canvas/forms/backbone/views/DialogFormView'
 import template from '../../jst/DeleteGroup.handlebars'
 import wrapper from '@canvas/forms/jst/EmptyDialogFormWrapper.handlebars'
@@ -56,7 +56,7 @@ DeleteGroupView.prototype.els = {
   '.group_select': '$groupSelect',
 }
 
-DeleteGroupView.prototype.events = _.extend({}, DeleteGroupView.prototype.events, {
+DeleteGroupView.prototype.events = lodashExtend({}, DeleteGroupView.prototype.events, {
   'click .dialog_closer': 'close',
   'change .group_select': 'selectMove',
 })
@@ -84,7 +84,7 @@ DeleteGroupView.prototype.toJSON = function () {
   const groups_json = groups.map(function (model) {
     return model.toJSON()
   })
-  return _.extend(data, {
+  return lodashExtend(data, {
     assignment_count: this.model.get('assignments').length,
     groups: groups_json,
     label_id: data.id,

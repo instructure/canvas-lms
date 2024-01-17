@@ -18,7 +18,7 @@
 
 import {extend} from '@canvas/backbone/utils'
 import $ from 'jquery'
-import _ from 'underscore'
+import {extend as lodashExtend} from 'lodash'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import pairingCodeTemplate from '../../jst/PairingCodeUserObservees.handlebars'
 import itemView from './UserObserveeView'
@@ -48,7 +48,7 @@ UserObserveesView.prototype.events = {
   'click .remove-observee': 'removeObservee',
 }
 
-UserObserveesView.prototype.els = _.extend({}, PaginatedCollectionView.prototype.els, {
+UserObserveesView.prototype.els = lodashExtend({}, PaginatedCollectionView.prototype.els, {
   '.add-observee-form': '$form',
 })
 

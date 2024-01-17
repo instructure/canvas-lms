@@ -17,7 +17,7 @@
  */
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import _ from 'underscore'
+import {debounce} from 'lodash'
 
 const I18n = useI18nScope('common_bundle')
 
@@ -36,7 +36,7 @@ export default function setupCSP(rootElement) {
       })
     }
 
-    const setupCSPForIframes = _.debounce(
+    const setupCSPForIframes = debounce(
       () =>
         Array.from(rootElement.querySelectorAll('iframe.attachment-html-iframe')).forEach(frame => {
           if (!frame.getAttribute('csp')) {

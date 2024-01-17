@@ -4734,6 +4734,7 @@ tr:
   concluded_63150003: sonlandırıldı
   concluded_conferences_cdbe53f9: "Tamamlanmış Canlı Dersler"
   concluded_courses_94782e21: "Tamamlanmış Dersler"
+  concluded_e1e482a0: Sonlandırıldı
   concluded_enrollments_9da8da6: "Sonlandırılmış kayıtlar"
   conditional_content_b284da8f: "Şartı İçerik"
   conditional_release_d206e93b: "Şartlı Yayın"
@@ -13344,6 +13345,7 @@ tr:
   not_available_487d3648: "Mevcut değil"
   not_available_until_next_submission_2175158: "Bir sonraki gönderime kadar kullanılamaz"
   not_completed_d70acea3: Tamamlanmadı
+  not_deleted_2a7f63ef: (Silinmedi)
   not_graded_e027c866: Notlandırılmamış
   not_graded_e78bcd50: Notlandırılmamış
   not_installed_37a21a76: "Yüklü Değil"
@@ -16679,6 +16681,7 @@ tr:
   remove_dates_5a5a8df2: "Tarihleri sil"
   remove_edf2b8a7: (Kaldır)
   remove_f47dc62a: Kaldır
+  remove_filter_68de01d4: "Filtreyi Kaldır"
   remove_image_341340b3: "Görseli sil"
   remove_media_comment_f4afdb4b: "Medya yorumunu sil"
   remove_null_values_from_live_event_payloads_3c826f: "Etkinlik verilerinden boş değerleri kaldır"
@@ -19913,6 +19916,7 @@ tr:
   well_below_mastery_37664bdc: "Yeterliğin Epey Altında"
   what_are_self_sign_up_groups_af1f002a: "Kendi Kendine Üye Ol Grupları Nedir?"
   what_should_the_csv_file_look_like_985a59ac: "CSV dosyası nasıl olmalı?"
+  what_would_you_like_to_do_next_2835397e: "Bir sonraki adımda ne yapmak istersiniz?"
   when_adding_multiple_users_use_a_comma_or_line_bre_67f9c87d: "Çoklu kullanıcı eklerken kullanıcıları ayırmak için aralarına virgül koyun ya da her birini yeni satıra ekleyin"
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "İnsnalar dersi ziyaret ettiğinde bu sayfayı görecekler. Bu sayfayı etkinlik akışını, ders modüllerinin bir listesini, ders izlencesini veya sizin oluşturduğunuz bir sayfayı gösterecek şekilde ayarlayabilirsiniz. Varsayılan olarak ders etkinlik akışı ayarlıdır."
   when_posting_grades_for_anonymous_assignments_grad_b13f3ae6: "İsimsiz ödevler için notlar yayınlandığında notlar dersteki herkes için yayınlanır. Anonimlik kaldırılacak."

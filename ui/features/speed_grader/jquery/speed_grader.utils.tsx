@@ -26,7 +26,7 @@ import SpeedGraderSettingsMenu from '../react/SpeedGraderSettingsMenu'
 import htmlEscape from 'html-escape'
 import {Pill} from '@instructure/ui-pill'
 import * as Alerts from '@instructure/ui-alerts'
-import type {Assignment, Submission} from '../../../api.d'
+import type {Assignment, Enrollment, Submission} from '../../../api.d'
 import type {RubricAssessment} from '@canvas/grading/grading.d'
 import type {GradingError, SpeedGrader, StudentWithSubmission} from './speed_grader.d'
 import SpeedGraderPostGradesMenu from '../react/SpeedGraderPostGradesMenu'
@@ -309,12 +309,6 @@ export function renderPostGradesMenu(EG: SpeedGrader) {
   )
 }
 
-export function getStatusPills() {
-  return document.querySelectorAll(
-    '.submission-missing-pill, .submission-late-pill, .submission-excused-pill, .submission-extended-pill, [class^="submission-custom-grade-status-pill-"]'
-  )
-}
-
 export function hideMediaRecorderContainer() {
   $('#media_media_recording').hide().removeData('comment_id').removeData('comment_type')
 }
@@ -497,4 +491,23 @@ export function rubricAssessmentToPopulate(EG) {
   }
 
   return assessment
+}
+
+export function isStudentConcluded(studentMap: any, student: string, sectionId: string | null) {
+  if (!studentMap) {
+    return false
+  }
+
+  // If we're in a section specific mode, we'll look to see if there are any concluded enrollments in this section. If
+  // we're in the all sections mode, we only look concluded when ALL enrollments are concluded.
+  if (sectionId) {
+    return studentMap[student].enrollments.some(
+      (enrollment: Enrollment) =>
+        enrollment.workflow_state === 'completed' && enrollment.course_section_id === sectionId
+    )
+  } else {
+    return studentMap[student].enrollments.every(
+      (enrollment: Enrollment) => enrollment.workflow_state === 'completed'
+    )
+  }
 }

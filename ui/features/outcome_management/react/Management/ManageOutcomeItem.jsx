@@ -54,6 +54,7 @@ const ManageOutcomeItem = ({
   onCheckboxHandler,
   canUnlink,
   isEnhanced,
+  canArchive
 }) => {
   const {
     contextType,
@@ -159,6 +160,7 @@ const ManageOutcomeItem = ({
             <OutcomeKebabMenu
               canDestroy={canUnlink}
               canEdit={canEdit}
+              canArchive={canArchive}
               menuTitle={I18n.t('Menu for outcome %{title}', {title})}
               onMenuHandler={onMenuHandlerWrapper}
             />
@@ -205,7 +207,8 @@ ManageOutcomeItem.propTypes = {
   onMenuHandler: PropTypes.func.isRequired,
   onCheckboxHandler: PropTypes.func.isRequired,
   canUnlink: PropTypes.bool.isRequired,
-  isEnhanced: PropTypes.bool
+  isEnhanced: PropTypes.bool,
+  canArchive: PropTypes.bool
 }
 
 export default memo(ManageOutcomeItem)

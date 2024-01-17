@@ -30,6 +30,10 @@ class ContextSelector extends React.Component {
     appointmentGroup: PropTypes.object,
     contexts: PropTypes.array,
     className: PropTypes.string,
+    selectedContexts: PropTypes.instanceOf(Set).isRequired,
+    selectedSubContexts: PropTypes.instanceOf(Set).isRequired,
+    setSelectedContexts: PropTypes.func.isRequired,
+    setSelectedSubContexts: PropTypes.func.isRequired,
   }
 
   constructor() {
@@ -38,22 +42,12 @@ class ContextSelector extends React.Component {
     this.sectionsCheckboxes = {}
     this.state = {
       showDropdown: false,
-      selectedContexts: new Set(),
-      selectedSubContexts: new Set(),
       expandedContexts: new Set(),
     }
   }
 
   componentDidMount() {
     this.setIndeterminates()
-  }
-
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    this.setState({
-      selectedContexts: new Set(nextProps.appointmentGroup.context_codes),
-      selectedSubContexts: new Set(nextProps.appointmentGroup.sub_context_codes),
-      expandedContexts: new Set(),
-    })
   }
 
   componentDidUpdate(_previousProps) {
@@ -85,7 +79,7 @@ class ContextSelector extends React.Component {
 
   isSubContextChecked = (context, subContext) => {
     return (
-      this.state.selectedSubContexts.has(subContext) ||
+      this.props.selectedSubContexts.has(subContext) ||
       (this.isContextChecked(context) && !this.isContextIndeterminate(context))
     )
   }
@@ -98,15 +92,15 @@ class ContextSelector extends React.Component {
   }
 
   isContextChecked = context => {
-    return this.state.selectedContexts.has(context)
+    return this.props.selectedContexts.has(context)
   }
 
   isContextIndeterminate = context => {
-    if (!this.state.selectedContexts.has(context)) {
+    if (!this.props.selectedContexts.has(context)) {
       return false
     }
     const subContexts = this.subContextsForContext(context)
-    return subContexts.some(subContext => this.state.selectedSubContexts.has(subContext))
+    return subContexts.some(subContext => this.props.selectedSubContexts.has(subContext))
   }
 
   isContextDisabled = context => {
@@ -121,8 +115,8 @@ class ContextSelector extends React.Component {
 
   toggleCourse = (course, select) => {
     // set course, unset sections
-    const contexts = new Set(this.state.selectedContexts)
-    const subContexts = new Set(this.state.selectedSubContexts)
+    const contexts = new Set(this.props.selectedContexts)
+    const subContexts = new Set(this.props.selectedSubContexts)
     const subContextsToRemove = this.subContextsForContext(course)
     if (select) {
       contexts.add(course)
@@ -132,18 +126,16 @@ class ContextSelector extends React.Component {
     for (const subContext of subContextsToRemove) {
       subContexts.delete(subContext)
     }
-    this.setState({
-      selectedContexts: contexts,
-      selectedSubContexts: subContexts,
-    })
+    this.props.setSelectedContexts(contexts)
+    this.props.setSelectedSubContexts(subContexts)
   }
 
   toggleSection = (context, section, select) => {
     // appointment groups do this thing where if all of the sub contexts in a contexts are
     // included, we don't store them in sub_context_codes. we make an intermediate subContexts
     // set that reflects which subcontexts are checked.
-    const contexts = new Set(this.state.selectedContexts)
-    const subContexts = new Set(this.state.selectedSubContexts)
+    const contexts = new Set(this.props.selectedContexts)
+    const subContexts = new Set(this.props.selectedSubContexts)
     const siblingSubContexts = new Set(this.subContextsForContext(context))
     let checkedSubContexts = new Set()
     for (const subContext of subContexts) {
@@ -179,10 +171,8 @@ class ContextSelector extends React.Component {
       // no sub contexts were checked
       contexts.delete(context)
     }
-    this.setState({
-      selectedContexts: contexts,
-      selectedSubContexts: subContexts,
-    })
+    this.props.setSelectedContexts(contexts)
+    this.props.setSelectedSubContexts(subContexts)
   }
 
   toggleCourseExpanded = course => {
@@ -221,10 +211,10 @@ class ContextSelector extends React.Component {
 
   buttonText = () => {
     let text = ''
-    if (this.state.selectedSubContexts.size > 0) {
-      text = this.contextAndCountText(this.state.selectedSubContexts)
-    } else if (this.state.selectedContexts.size > 0) {
-      text = this.contextAndCountText(this.state.selectedContexts)
+    if (this.props.selectedSubContexts.size > 0) {
+      text = this.contextAndCountText(this.props.selectedSubContexts)
+    } else if (this.props.selectedContexts.size > 0) {
+      text = this.contextAndCountText(this.props.selectedContexts)
     }
     return text || I18n.t('Select Calendars')
   }
@@ -256,10 +246,6 @@ class ContextSelector extends React.Component {
                   this.sectionsCheckboxes[section.asset_string] = checkbox
                 }}
                 value={section.asset_string}
-                defaultChecked={this.isSubContextChecked(
-                  context.asset_string,
-                  section.asset_string
-                )}
                 checked={this.isSubContextChecked(context.asset_string, section.asset_string)}
                 disabled={this.isSubContextDisabled(context.asset_string, section.asset_string)}
               />
@@ -312,7 +298,6 @@ class ContextSelector extends React.Component {
                     )
                   }
                   value={context.asset_string}
-                  defaultChecked={this.isContextChecked(context.asset_string)}
                   checked={this.isContextChecked(context.asset_string)}
                   disabled={this.isContextDisabled(context.asset_string)}
                 />
@@ -335,7 +320,7 @@ class ContextSelector extends React.Component {
       : 'ContextSelector'
 
     return (
-      <div className={classes} {...this.props}>
+      <div className={classes}>
         <Button
           ref={c => {
             this.dropdownButton = c
@@ -348,6 +333,7 @@ class ContextSelector extends React.Component {
         </Button>
         <div
           id="context-selector-dropdown"
+          data-testid="context-selector-dropdown"
           className={`ContextSelector__Dropdown ${this.state.showDropdown ? 'show' : 'hidden'}`}
         >
           <Grid>

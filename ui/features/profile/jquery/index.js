@@ -21,8 +21,8 @@ import $ from 'jquery'
 import Pseudonym from '@canvas/pseudonyms/backbone/models/Pseudonym'
 import AvatarWidget from '@canvas/avatar-dialog-view'
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/datetime' /* datetimeString, time_field, datetime_field */
-import '@canvas/forms/jquery/jquery.instructure_forms' /* formSubmit, formErrors, errorBox */
+import '@canvas/datetime/jquery' /* datetimeString, time_field, datetime_field */
+import '@canvas/jquery/jquery.instructure_forms' /* formSubmit, formErrors, errorBox */
 import 'jqueryui/dialog'
 import '@canvas/util/jquery/fixDialogButtons'
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* confirmDelete, fragmentChange, showIf */

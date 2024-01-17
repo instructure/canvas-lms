@@ -17,6 +17,7 @@
  */
 
 import _ from 'underscore'
+import {map} from 'lodash'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
@@ -144,14 +145,14 @@ export default class DueDates extends React.Component {
   // -------------------
 
   formattedSectionHash = unformattedSections => {
-    const formattedSections = _.map(unformattedSections, this.formatSection)
+    const formattedSections = map(unformattedSections, this.formatSection)
     return _.keyBy(formattedSections, 'id')
   }
 
   formatSection = section => _.extend(section.attributes, {course_section_id: section.id})
 
   formattedGroupHash = unformattedGroups => {
-    const formattedGroups = _.map(unformattedGroups, this.formatGroup)
+    const formattedGroups = map(unformattedGroups, this.formatGroup)
     return _.keyBy(formattedGroups, 'id')
   }
 
@@ -162,7 +163,7 @@ export default class DueDates extends React.Component {
     return _.chain(rows)
       .values()
       .map(row =>
-        _.map(row.overrides, override => {
+        map(row.overrides, override => {
           override.attributes.persisted = row.persisted
           return override
         })
@@ -291,7 +292,7 @@ export default class DueDates extends React.Component {
     const oldOverrides = this.state.rows[rowKey].overrides
     const oldDates = this.state.rows[rowKey].dates
 
-    const newOverrides = _.map(oldOverrides, override => {
+    const newOverrides = map(oldOverrides, override => {
       override.set(dateType, newDate)
       return override
     })
@@ -338,7 +339,7 @@ export default class DueDates extends React.Component {
     const allStudents = _.values(this.state.students)
     if (_.isEmpty(allStudents)) return allStudents
 
-    const overrides = _.map(this.props.overrides, override => override.attributes)
+    const overrides = map(this.props.overrides, override => override.attributes)
     const assignment = {
       due_at: this.props.dueAt,
       only_visible_to_overrides: this.props.isOnlyVisibleToOverrides,
@@ -471,7 +472,7 @@ export default class DueDates extends React.Component {
   // -------------------
 
   rowsToRender = () =>
-    _.map(this.sortedRowKeys(), rowKey => {
+    map(this.sortedRowKeys(), rowKey => {
       const row = this.state.rows[rowKey]
       const overrides = row.overrides || []
       const dates = row.dates || {}

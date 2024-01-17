@@ -3269,7 +3269,7 @@ class User < ActiveRecord::Base
   end
 
   def should_show_deeply_nested_alert?
-    ActiveModel::Type::Boolean.new.cast(get_preference(:isolated_view_deeply_nested_alert) || true)
+    ActiveModel::Type::Boolean.new.cast(get_preference(:split_screen_view_deeply_nested_alert) || true)
   end
 
   def stamp_logout_time!

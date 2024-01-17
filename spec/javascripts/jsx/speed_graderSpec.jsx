@@ -25,6 +25,7 @@ import SpeedGraderAlerts from 'ui/features/speed_grader/react/SpeedGraderAlerts'
 import SpeedGraderHelpers from 'ui/features/speed_grader/jquery/speed_grader_helpers'
 import JQuerySelectorCache from 'ui/features/speed_grader/JQuerySelectorCache'
 import QuizzesNextSpeedGrading from 'ui/features/speed_grader/QuizzesNextSpeedGrading'
+import * as SGUtils from 'ui/features/speed_grader/jquery/speed_grader.utils'
 import moxios from 'moxios'
 import fakeENV from 'helpers/fakeENV'
 import numberHelper from '@canvas/i18n/numberHelper'
@@ -5332,9 +5333,9 @@ QUnit.module('SpeedGrader', rootHooks => {
 
         test('isStudentConcluded is called with anonymous id', () => {
           SpeedGrader.EG.currentStudent = alphaStudent
-          const isStudentConcluded = sinon.stub(SpeedGrader.EG, 'isStudentConcluded')
+          const isStudentConcluded = sinon.stub(SGUtils, 'isStudentConcluded')
           SpeedGrader.EG.handleSubmissionSelectionChange()
-          deepEqual(isStudentConcluded.firstCall.args, [alpha.anonymous_id])
+          deepEqual(isStudentConcluded.firstCall.args[1], alpha.anonymous_id)
           isStudentConcluded.restore()
         })
 
@@ -5632,9 +5633,9 @@ QUnit.module('SpeedGrader', rootHooks => {
         })
 
         test('calls isStudentConcluded with student looked up by anonymous id', () => {
-          const isStudentConcluded = sinon.stub(SpeedGrader.EG, 'isStudentConcluded')
+          const isStudentConcluded = sinon.stub(SGUtils, 'isStudentConcluded')
           SpeedGrader.EG.addCommentDeletionHandler($(), {})
-          deepEqual(isStudentConcluded.firstCall.args, [alphaStudent.anonymous_id])
+          deepEqual(isStudentConcluded.firstCall.args[1], alphaStudent.anonymous_id)
           isStudentConcluded.restore()
         })
       })
@@ -5801,9 +5802,9 @@ QUnit.module('SpeedGrader', rootHooks => {
         })
 
         test('calls isStudentConcluded with student looked up by anonymous id', () => {
-          const isStudentConcluded = sinon.spy(SpeedGrader.EG, 'isStudentConcluded')
+          const isStudentConcluded = sinon.spy(SGUtils, 'isStudentConcluded')
           SpeedGrader.EG.handleGradeSubmit({}, false)
-          deepEqual(isStudentConcluded.firstCall.args, [alphaStudent.anonymous_id])
+          deepEqual(isStudentConcluded.firstCall.args[1], alphaStudent.anonymous_id)
           isStudentConcluded.restore()
         })
 

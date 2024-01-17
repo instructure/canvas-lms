@@ -18,7 +18,7 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 import $ from 'jquery'
-import _ from 'underscore'
+import {last} from 'lodash'
 import DialogBaseView from '@canvas/dialog-base-view'
 import invitationsViewTemplate from '../../jst/InvitationsView.handlebars'
 import '@canvas/rails-flash-notifications'
@@ -48,7 +48,7 @@ export default class InvitationsView extends DialogBaseView {
     this.showDialogButtons()
 
     const data = this.model.toJSON()
-    data.time = $.datetimeString(_.last(this.model.get('enrollments')).updated_at)
+    data.time = $.datetimeString(last(this.model.get('enrollments')).updated_at)
     this.$el.html(invitationsViewTemplate(data))
 
     const pending = this.invitationIsPending()

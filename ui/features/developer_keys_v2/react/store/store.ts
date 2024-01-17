@@ -17,7 +17,7 @@
  */
 
 import {createStore, applyMiddleware, combineReducers} from 'redux'
-import ReduxThunk from 'redux-thunk'
+import {thunk} from 'redux-thunk'
 import _ from 'lodash'
 import listDeveloperKeysReducer from '../reducers/listDeveloperKeysReducer'
 import deactivateDeveloperKeyReducer from '../reducers/deactivateReducer'
@@ -29,7 +29,7 @@ import makeInvisibleDeveloperKeyReducer from '../reducers/makeInvisibleReducer'
 import listDeveloperKeyScopesReducer from '../reducers/listScopesReducer'
 
 const middleware = [
-  ReduxThunk,
+  thunk,
 
   // this is so redux-logger is not included in the production webpack bundle
   process.env.NODE_ENV !== 'production' &&

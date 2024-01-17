@@ -34,6 +34,7 @@ describe AppointmentGroupsController, type: :request do
   end
 
   expected_fields = %w[
+    allow_observer_signup
     appointments_count
     context_codes
     created_at
@@ -271,6 +272,38 @@ describe AppointmentGroupsController, type: :request do
     expect(cjson.first["user"]["id"]).to eql @student1.id
   end
 
+  context "allow_observer_signup attribute" do
+    before :once do
+      @ag = AppointmentGroup.create!(title: "something", new_appointments: [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]], contexts: [@course])
+    end
+
+    it "is not included if the observer_appointment_groups flag is disabled" do
+      Account.site_admin.disable_feature! :observer_appointment_groups
+
+      json = api_call(:get, "/api/v1/appointment_groups/#{@ag.id}", {
+                        controller: "appointment_groups", action: "show", format: "json", id: @ag.id.to_s
+                      })
+      expect(json.keys).not_to include("allow_observer_signup")
+    end
+
+    it "is false by default" do
+      json = api_call(:get, "/api/v1/appointment_groups/#{@ag.id}", {
+                        controller: "appointment_groups", action: "show", format: "json", id: @ag.id.to_s
+                      })
+      expect(json["allow_observer_signup"]).to be false
+    end
+
+    it "is true if allow_observer_signup is enabled" do
+      @course.account.settings[:allow_observers_in_appointment_groups] = { value: true }
+      @course.account.save!
+      @ag.update!(allow_observer_signup: true)
+      json = api_call(:get, "/api/v1/appointment_groups/#{@ag.id}", {
+                        controller: "appointment_groups", action: "show", format: "json", id: @ag.id.to_s
+                      })
+      expect(json["allow_observer_signup"]).to be true
+    end
+  end
+
   it "gets a reservable appointment group" do
     student_in_course course: course_factory(active_all: true), user: @me, active_all: true
     ag = AppointmentGroup.create!(title: "yay", new_appointments: [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"]], contexts: [@course])
@@ -410,6 +443,40 @@ describe AppointmentGroupsController, type: :request do
                     {},
                     expected_status: 400)
     expect(json["error"]).to eql "cannot create an appointment group for a concluded course"
+  end
+
+  context "setting allow_observer_signup" do
+    let(:appointment_group_params) do
+      {
+        appointment_group: {
+          context_codes: [@course.asset_string],
+          title: "bad appointment group",
+          new_appointments: { "0" => ["2012-01-01 12:00:00", "2012-01-01 13:00:00"] },
+          allow_observer_signup: true
+        }
+      }
+    end
+
+    it "forbids creating an appointment group with allow_observer_signup if the context does not allow it" do
+      json = api_call(:post,
+                      "/api/v1/appointment_groups",
+                      { controller: "appointment_groups", action: "create", format: "json" },
+                      appointment_group_params,
+                      {},
+                      expected_status: 403)
+      expect(json["error"]).to eql "cannot allow observers to sign up for appointment groups in this course"
+    end
+
+    it "allows creating an appointment group with allow_observer_signup if the context allows it" do
+      @course.account.settings[:allow_observers_in_appointment_groups] = { value: true }
+      @course.account.save!
+      api_call(:post,
+               "/api/v1/appointment_groups",
+               { controller: "appointment_groups", action: "create", format: "json" },
+               appointment_group_params,
+               {},
+               expected_status: 201)
+    end
   end
 
   it "creates a new appointment group with a sub_context" do

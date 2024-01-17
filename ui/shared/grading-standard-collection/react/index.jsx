@@ -22,6 +22,7 @@ import GradingStandard from './gradingStandard'
 import $ from 'jquery'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import _ from 'underscore'
+import {map} from 'lodash'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 
 const I18n = useI18nScope('external_toolsgradingStandardCollection')
@@ -35,7 +36,7 @@ class GradingStandardCollection extends React.Component {
 
   gotStandards = standards => {
     let formattedStandards = $.extend(true, [], standards)
-    formattedStandards = _.map(formattedStandards, standard => {
+    formattedStandards = map(formattedStandards, standard => {
       standard.grading_standard.data = this.formatStandardData(standard.grading_standard.data)
       return standard
     })
@@ -43,7 +44,7 @@ class GradingStandardCollection extends React.Component {
   }
 
   formatStandardData = standardData =>
-    _.map(standardData, dataRow => [dataRow[0], this.roundToTwoDecimalPlaces(dataRow[1] * 100)])
+    map(standardData, dataRow => [dataRow[0], this.roundToTwoDecimalPlaces(dataRow[1] * 100)])
 
   addGradingStandard = () => {
     const newStandard = {

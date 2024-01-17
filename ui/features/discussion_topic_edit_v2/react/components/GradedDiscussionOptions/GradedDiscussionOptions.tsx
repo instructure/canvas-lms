@@ -89,7 +89,7 @@ export const GradedDiscussionOptions = ({
         <PeerReviewOptions
           peerReviewAssignment={peerReviewAssignment}
           setPeerReviewAssignment={setPeerReviewAssignment}
-          peerReviewsPerStudent={peerReviewsPerStudent}
+          peerReviewsPerStudent={peerReviewsPerStudent || 0}
           setPeerReviewsPerStudent={setPeerReviewsPerStudent}
           peerReviewDueDate={peerReviewDueDate}
           setPeerReviewDueDate={setPeerReviewDueDate}

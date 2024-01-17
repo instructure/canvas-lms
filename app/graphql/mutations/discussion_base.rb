@@ -35,33 +35,16 @@ class Mutations::DiscussionBase < Mutations::BaseMutation
   argument :specific_sections, String, required: false
   argument :file_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Attachment")
 
-  field :discussion_topic, Types::DiscussionType, null: true
+  field :discussion_topic, Types::DiscussionType, null:
 
-  def process_common_inputs(input, is_announcement, discussion_topic, is_create = false)
-    # is_create default values are set here
-    if is_create
-      discussion_topic.user = current_user
-      discussion_topic.workflow_state = (input[:published] || is_announcement) ? "active" : "unpublished"
-      discussion_topic.require_initial_post = input[:require_initial_post] || false
-      discussion_topic.allow_rating = input[:allow_rating] || false
-      discussion_topic.only_graders_can_rate = input[:only_graders_can_rate] || false
-      discussion_topic.podcast_enabled = input[:podcast_enabled] || false
-      discussion_topic.podcast_has_student_posts = input[:podcast_has_student_posts] || false
-    end
+  # These are inputs that are allowed to be directly assigned from graphql to the model without additional processing or logic involved
+  ALLOWED_INPUTS = %i[title message require_initial_post allow_rating only_graders_can_rate podcast_enabled podcast_has_student_posts].freeze
 
-    # These 2 fields that can be null when being created, no defaults
-    discussion_topic.title = input[:title] if input.key?(:title)
-    discussion_topic.message = input[:message] if input.key?(:message)
+  def process_common_inputs(input, is_announcement, discussion_topic)
+    model_attrs = input.to_h.slice(*ALLOWED_INPUTS)
+    discussion_topic.assign_attributes(model_attrs)
 
-    # These fields are updated regardless of is_create, but only if they are present in the input
-    # Yes some of these are redundant with the is_create logic, but its getting set to the input[] value either way.
-    # This allows us to have the is_create logic grouped for readability.
     discussion_topic.workflow_state = "active" if input.key?(:published) && (input[:published] || is_announcement)
-    discussion_topic.require_initial_post = input[:require_initial_post] if input.key?(:require_initial_post)
-    discussion_topic.allow_rating = input[:allow_rating] if input.key?(:allow_rating)
-    discussion_topic.only_graders_can_rate = input[:only_graders_can_rate] if input.key?(:only_graders_can_rate)
-    discussion_topic.podcast_enabled = input[:podcast_enabled] if input.key?(:podcast_enabled)
-    discussion_topic.podcast_has_student_posts = input[:podcast_has_student_posts] if input.key?(:podcast_has_student_posts)
 
     unless is_announcement
       discussion_topic.todo_date = input[:todo_date] if input.key?(:todo_date)

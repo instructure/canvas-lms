@@ -72,9 +72,7 @@ describe "permissions index" do
       expect(PermissionsIndex.role_header).to include_text("Student\nbest role name ever\n")
     end
 
-    # Skipped by FOO-4110 - unclear if this test is still valid, broken, or still correct
-    # but the underlying behavior of the component is no longer correct.
-    skip "FOO-4110 (28-Nov-2023) focuses on newly created role when you close out all the thing" do
+    it "focuses on newly created role when you close out all the thing" do
       role_name = "no this is the best role name ever"
       PermissionsIndex.add_role(role_name)
       PermissionsIndex.close_role_tray

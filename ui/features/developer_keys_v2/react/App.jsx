@@ -139,67 +139,6 @@ class DeveloperKeysApp extends React.Component {
     this.setState({selectedTab: id})
   }
 
-  buildDevKeyOIDCText(_features) {
-    const today = new Date()
-    const changeDate = new Date(1692460800000) // August 19, 2023 at 16:00:00 UTC
-    const formattedDate = DateHelper.formatDateForDisplay(changeDate)
-    const footer = I18n.t(
-      '*This Canvas Community article* details the reasoning behind this change, its scope, exact directions for what to change, and further clarification for both Canvas admins and LTI 1.3 tool developers.',
-      {
-        wrappers: [
-          `<a href="https://community.canvaslms.com/t5/The-Product-Blog/Minor-LTI-1-3-Changes-New-OIDC-Auth-Endpoint-Support-for/ba-p/551677">$1</a>`,
-        ],
-      }
-    )
-    const makeAlertMsg = (testid, paragraphs) => {
-      return (
-        <div data-testid={testid}>
-          {paragraphs.map(paragraph => (
-            <View as="div" margin="small" key={paragraph.toString().slice(0, 10)}>
-              <Text dangerouslySetInnerHTML={{__html: paragraph}} />
-            </View>
-          ))}
-        </div>
-      )
-    }
-
-    const boldMarkup = '<strong>$1</strong>'
-    if (changeDate > today) {
-      const firstParagraph = I18n.t(
-        'On %{date}, the LTI 1.3 Platform Storage specification will be fully supported by Canvas. Tools wishing to implement this must change the OIDC Auth endpoint they store for Canvas from *https://canvas.instructure.com/api/lti/authorize_redirect* to *https://sso.canvaslms.com/api/lti/authorize_redirect*. The OIDC Auth endpoint recommended for new 1.3 tool installations will also change on that day, and we recommend that all 1.3 tools switch their configuration to use this new endpoint as soon as they can.',
-        {
-          date: formattedDate,
-          wrappers: [boldMarkup, boldMarkup],
-        }
-      )
-
-      const secondParagraph = I18n.t(
-        'This is *not* a breaking change. All LTI 1.3 tool behavior will remain the same regardless of the endpoint used, with the exception of the newly-supported Platform Storage spec. This also does **not** need to be completed before %{date}. Enforcement of this change will happen on a later, unspecified date.',
-        {
-          date: formattedDate,
-          wrappers: [boldMarkup, boldMarkup],
-        }
-      )
-
-      return makeAlertMsg('preFlipText', [firstParagraph, secondParagraph, footer])
-    } else {
-      const firstParagraph = I18n.t(
-        'As of %{date}, the LTI 1.3 Platform Storage specification is fully supported by Canvas. Tools wishing to implement this must change the OIDC Auth endpoint they store for Canvas from *https://canvas.instructure.com/api/lti/authorize_redirect* to *https://sso.canvaslms.com/api/lti/authorize_redirect*. The OIDC Auth endpoint recommended for new 1.3 tool installations has also changed, and we recommend that all 1.3 tools switch their configuration to use this new endpoint as soon as they can.',
-        {
-          date: formattedDate,
-          wrappers: [boldMarkup, boldMarkup],
-        }
-      )
-
-      const secondParagraph = I18n.t(
-        'This is *not* a breaking change. All LTI 1.3 tool behavior will remain the same regardless of the endpoint used, with the exception of the newly-supported Platform Storage spec. Enforcement of this change will happen on a later, unspecified date.',
-        {wrappers: [boldMarkup, boldMarkup]}
-      )
-
-      return makeAlertMsg('postFlipText', [firstParagraph, secondParagraph, footer])
-    }
-  }
-
   /**
    * Due to some annoying accessibility issues related to modal focus
    * returning and screenreader issues, we have to use a setTimeout here
@@ -243,13 +182,6 @@ class DeveloperKeysApp extends React.Component {
         <View as="div" margin="0 0 small 0" padding="none">
           <Heading level="h1">{I18n.t('Developer Keys')}</Heading>
         </View>
-        {ENV?.FEATURES?.dev_key_oidc_alert && (
-          <div data-testid="OIDC_alert">
-            <Alert variant="info" margin="small">
-              {this.buildDevKeyOIDCText(ENV.FEATURES)}
-            </Alert>
-          </div>
-        )}
         <Tabs
           onRequestTabChange={this.changeTab.bind(this)}
           shouldFocusOnRender={this.state.focusTab}

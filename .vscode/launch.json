@@ -20,6 +20,14 @@
       "rdbgPath": "bin/rdbg-spring",
       "command": "rspec",
       "script": "${file}"
+    },
+    {
+      "type": "rdbg",
+      "request": "launch",
+      "name": "Run Current Spec File and Line",
+      "rdbgPath": "bin/rdbg-spring",
+      "command": "rspec",
+      "script": "${file}:${lineNumber}"
     }
   ]
 }

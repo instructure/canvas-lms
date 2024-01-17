@@ -342,10 +342,10 @@ class OutcomesApiController < ApplicationController
 
       # capturing question alignment(s)
       question_metadata = attempt[:metadata][:question_metadata]
-      unless question_metadata.blank?
-        question_metadata&.each do |question|
-          os_alignments_from_results["#{r[:external_outcome_id]}_#{question[:quiz_item_id]}_quizzes.item"] = r
-        end
+      next if question_metadata.blank?
+
+      question_metadata&.each do |question|
+        os_alignments_from_results["#{r[:external_outcome_id]}_#{question[:quiz_item_id]}_quizzes.item"] = r
       end
     end
 

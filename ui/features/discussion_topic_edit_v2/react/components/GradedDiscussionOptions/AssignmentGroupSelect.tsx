@@ -36,6 +36,7 @@ export const AssignmentGroupSelect = ({
 }: Props) => {
   return (
     <SimpleSelect
+      data-testid="assignment-group-input"
       renderLabel={I18n.t('Assignment Group')}
       value={assignmentGroup}
       onChange={(_event, {id}) => {

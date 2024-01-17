@@ -19,7 +19,7 @@
 import {bool, func} from 'prop-types'
 import React, {createRef} from 'react'
 import CanvasRce from '@canvas/rce/react/CanvasRce'
-import TinyMCEContentItem from '@canvas/tinymce-external-tools/TinyMCEContentItem'
+import {RceLti11ContentItem} from '@instructure/canvas-rce/es/rce/plugins/instructure_rce_external_tools/lti11-content-items/RceLti11ContentItem'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import apiUserContent from '@canvas/util/jquery/apiUserContent'
 import theme from '@instructure/canvas-theme'
@@ -55,7 +55,7 @@ export default class TextEntry extends React.Component {
     }
 
     e.data.content_items
-      .map(contentItem => TinyMCEContentItem.fromJSON(contentItem).codePayload)
+      .map(contentItem => RceLti11ContentItem.fromJSON(contentItem).codePayload)
       .forEach(code => {
         editor.insertCode(code)
       })

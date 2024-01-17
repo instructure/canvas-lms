@@ -18,7 +18,7 @@
 
 import parseLinkHeader from 'parse-link-header'
 import ajaxJSON from '@canvas/jquery/jquery.ajaxJSON'
-import createStore from '@canvas/util/createStore'
+import createStore from '@canvas/backbone/createStore'
 
 const getNextUrl = obj => obj && obj.links && obj.links.next && obj.links.next.url
 

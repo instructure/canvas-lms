@@ -17,18 +17,17 @@
  */
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
-import {ThemeablePropTypes} from '@instructure/ui-themeable'
 import {Alert} from '@instructure/ui-alerts'
 
 export default class ErrorAlert extends Component {
   static propTypes = {
     error: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Error)]),
     children: PropTypes.node.isRequired,
-    margin: ThemeablePropTypes.spacing
+    margin: PropTypes.any,
   }
 
   static defaultProps = {
-    error: null
+    error: null,
   }
 
   renderDetail() {

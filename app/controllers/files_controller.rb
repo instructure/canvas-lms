@@ -1046,6 +1046,7 @@ class FilesController < ApplicationController
     model = Object.const_get(params[:context_type])
     @context = model.where(id: params[:context_id]).first
 
+    overwritten_instfs_uuid = nil
     @attachment = if params.key?(:precreated_attachment_id)
                     att = Attachment.where(id: params[:precreated_attachment_id]).take
                     if att.nil?
@@ -1055,7 +1056,18 @@ class FilesController < ApplicationController
                       att
                     end
                   else
-                    @context.shard.activate { Attachment.where(context: @context).build }
+                    @context.shard.activate do
+                      # avoid creating an identical Attachment
+                      unless params[:on_duplicate] == "rename"
+                        att = Attachment.find_by(context: @context,
+                                                 folder_id: params[:folder_id],
+                                                 display_name: params[:display_name] || params[:name],
+                                                 size: params[:size],
+                                                 md5: params[:sha512])
+                        overwritten_instfs_uuid = att.instfs_uuid if att
+                      end
+                      att || Attachment.where(context: @context).build
+                    end
                   end
 
     # service metadata
@@ -1090,7 +1102,11 @@ class FilesController < ApplicationController
     @attachment.save!
 
     # apply duplicate handling
-    @attachment.handle_duplicates(params[:on_duplicate])
+    if overwritten_instfs_uuid
+      InstFS.delay_if_production.delete_file(overwritten_instfs_uuid)
+    else
+      @attachment.handle_duplicates(params[:on_duplicate])
+    end
 
     # trigger upload success callbacks
     if @context.respond_to?(:file_upload_success_callback)

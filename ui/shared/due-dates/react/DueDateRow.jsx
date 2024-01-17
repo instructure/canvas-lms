@@ -17,6 +17,7 @@
  */
 
 import _ from 'underscore'
+import {map} from 'lodash'
 import React from 'react'
 import PropTypes from 'prop-types'
 import DueDateTokenWrapper from './DueDateTokenWrapper'
@@ -84,7 +85,7 @@ class DueDateRow extends React.Component {
 
   tokenizedSections = sectionOverrides => {
     sectionOverrides = sectionOverrides || []
-    return _.map(sectionOverrides, (override, index) => ({
+    return map(sectionOverrides, (override, index) => ({
       id: `section-key-${index}`,
       type: 'section',
       course_section_id: override.get('course_section_id'),
@@ -94,7 +95,7 @@ class DueDateRow extends React.Component {
 
   tokenizedGroups = groupOverrides => {
     groupOverrides = groupOverrides || []
-    return _.map(groupOverrides, (override, index) => ({
+    return map(groupOverrides, (override, index) => ({
       id: `group-key-${index}`,
       type: 'group',
       group_id: override.get('group_id'),
@@ -107,7 +108,7 @@ class DueDateRow extends React.Component {
     return _.reduce(
       adhocOverrides,
       (overrideTokens, ov) => {
-        const tokensForStudents = _.map(ov.get('student_ids'), this.tokenFromStudentId.bind(this))
+        const tokensForStudents = map(ov.get('student_ids'), this.tokenFromStudentId.bind(this))
         return overrideTokens.concat(tokensForStudents)
       },
       []
@@ -116,7 +117,7 @@ class DueDateRow extends React.Component {
 
   tokenizedNoop = noopOverrides => {
     noopOverrides = noopOverrides || []
-    return _.map(noopOverrides, (override, index) => ({
+    return map(noopOverrides, (override, index) => ({
       id: `noop-key-${index}`,
       noop_id: override.get('noop_id'),
       name: override.get('title'),

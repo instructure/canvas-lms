@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import type {GradingPeriodGrade, DeprecatedGradingScheme} from '@canvas/grading/grading'
+import type {GradingPeriodGrade, DeprecatedGradingScheme} from '@canvas/grading/grading.d'
 import type {GradingPeriodSet} from '../../../../../api.d'
 import RowScore from './RowScore'
 

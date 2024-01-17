@@ -22,10 +22,10 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import DateHelper from '@canvas/datetime/dateHelper'
 import NaiveRequestDispatch from '@canvas/network/NaiveRequestDispatch/index'
 import gradingPeriodsApi from './gradingPeriodsApi'
-import type {CamelizedGradingPeriodSet} from '@canvas/grading/grading.d'
+import type {CamelizedGradingPeriodSet} from '../grading.d'
 import type {GradingPeriodSet, GradingPeriodSetGroup} from 'api.d'
 import {EnvGradingStandardsCommon} from '@canvas/global/env/EnvGradingStandards'
-import {GlobalEnv} from '@canvas/global/env/GlobalEnv'
+import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 import replaceTags from '@canvas/util/replaceTags'
 
 // Allow unchecked access to ENV variables that should exist in this context

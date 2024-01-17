@@ -152,6 +152,7 @@ module LtiOutbound
       hash["oauth_callback"] = "about:blank"
 
       hash["ext_platform"] = overrides[:platform] if overrides.key?(:platform)
+      hash["ext_lti_student_id"] = overrides[:lti_student_id] if overrides.key?(:lti_student_id)
 
       @variable_expander.expand_variables!(hash)
       hash

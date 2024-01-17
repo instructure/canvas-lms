@@ -87,7 +87,7 @@ class CalendarsController < ApplicationController
         can_create_assignments: context.respond_to?(:assignments) && Assignment.new.tap { |a| a.context = context }.grants_right?(@current_user, session, :create),
         assignment_groups: context.respond_to?(:assignments) ? context.assignment_groups.active.pluck(:id, :name).map { |id, name| { id:, name: } } : [],
         can_create_appointment_groups: ag_permission,
-        can_make_reservation: context.grants_right?(@current_user, :participate_as_student),
+        user_is_student: context.grants_right?(@current_user, :participate_as_student),
         can_update_todo_date: context.grants_any_right?(@current_user, session, :manage_content, :manage_course_content_edit),
         can_update_discussion_topic: context.grants_right?(@current_user, session, :moderate_forum),
         can_update_wiki_page: context.grants_right?(@current_user, session, :update),
@@ -97,7 +97,8 @@ class CalendarsController < ApplicationController
         course_pacing_enabled: context.is_a?(Course) && @domain_root_account.feature_enabled?(:course_paces) && context.enable_course_paces,
         user_is_observer: context.is_a?(Course) && context.enrollments.where(user_id: @current_user).first&.observer?,
         default_due_time: context.is_a?(Course) && context.default_due_time,
-        can_view_context: context.grants_right?(@current_user, session, :read)
+        can_view_context: context.grants_right?(@current_user, session, :read),
+        allow_observers_in_appointment_groups: context.is_a?(Course) && context.account.allow_observers_in_appointment_groups?,
       }
       if context.is_a?(Course)
         info[:course_conclude_at] = context.restrict_enrollments_to_course_dates ? context.conclude_at : context.enrollment_term.end_at

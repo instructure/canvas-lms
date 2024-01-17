@@ -31,6 +31,7 @@ export const Submission = {
       grade
       score
       gradingPeriodId
+      hasUnreadRubricAssessment
       hideGradeFromStudent
       readState
       late
@@ -59,6 +60,7 @@ export const Submission = {
     grade: string,
     score: float,
     gradingPeriodId: string,
+    hasUnreadRubricAssessment: bool,
     hideGradeFromStudent: bool,
     readState: string,
     late: bool,
@@ -85,6 +87,7 @@ export const Submission = {
     grade = 'A-',
     score = 90,
     gradingPeriodId = '1',
+    hasUnreadRubricAssessment = false,
     hideGradeFromStudent = false,
     readState = 'read',
     late = false,
@@ -114,6 +117,7 @@ export const Submission = {
     grade,
     score,
     gradingPeriodId,
+    hasUnreadRubricAssessment,
     hideGradeFromStudent,
     readState,
     late,

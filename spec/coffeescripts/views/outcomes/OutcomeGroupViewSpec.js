@@ -18,9 +18,9 @@
 
 import $ from 'jquery'
 import fakeENV from 'helpers/fakeENV'
-import OutcomeContentBase from '@canvas/outcome-content-view/backbone/views/OutcomeContentBase'
+import OutcomeContentBase from '@canvas/outcomes/content-view/backbone/views/OutcomeContentBase'
 import OutcomeGroup from '@canvas/outcomes/backbone/models/OutcomeGroup'
-import OutcomeGroupView from '@canvas/outcome-content-view/backbone/views/OutcomeGroupView'
+import OutcomeGroupView from '@canvas/outcomes/content-view/backbone/views/OutcomeGroupView'
 import fixtures from 'helpers/fixtures'
 
 // stub function that creates the RCE to avoid

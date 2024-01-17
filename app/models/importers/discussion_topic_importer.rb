@@ -110,7 +110,7 @@ module Importers
          is_anonymous_author].each do |attr|
         next if options[attr].nil? && item.class.columns_hash[attr.to_s].type == :boolean
 
-        item.send("#{attr}=", options[attr])
+        item.send(:"#{attr}=", options[attr])
       end
 
       type = item.is_a?(Announcement) ? :announcement : :discussion_topic

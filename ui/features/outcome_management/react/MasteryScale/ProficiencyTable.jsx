@@ -24,8 +24,8 @@ import {IconPlusLine} from '@instructure/ui-icons'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import ProficiencyRating from './ProficiencyRating'
-import uuid from 'uuid/v1'
-import _ from 'lodash'
+import {v1 as uuid} from 'uuid'
+import {memoize, isEqual} from 'lodash'
 import {fromJS, List} from 'immutable'
 import NumberHelper from '@canvas/i18n/numberHelper'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
@@ -114,7 +114,7 @@ class ProficiencyTable extends React.Component {
   hasPendingChanges = () => {
     const {rows, savedRows} = this.state
 
-    return !_.isEqual(rows, savedRows)
+    return !isEqual(rows, savedRows)
   }
 
   hideConfirmationModal = () => this.setState({showConfirmation: false})
@@ -187,7 +187,7 @@ class ProficiencyTable extends React.Component {
     )
   }
 
-  handleMasteryChange = _.memoize(index => () => {
+  handleMasteryChange = memoize(index => () => {
     this.setState(({rows}) => {
       const masteryIndex = rows.findIndex(row => row.get('mastery'))
       const adjustedRows = rows
@@ -197,7 +197,7 @@ class ProficiencyTable extends React.Component {
     }, this.notifyPendingChanges)
   })
 
-  handleDescriptionChange = _.memoize(index => value => {
+  handleDescriptionChange = memoize(index => value => {
     this.setState(({rows}) => {
       if (!this.invalidDescription(value)) {
         rows = rows.removeIn([index, 'descriptionError'])
@@ -207,7 +207,7 @@ class ProficiencyTable extends React.Component {
     }, this.notifyPendingChanges)
   })
 
-  handlePointsChange = _.memoize(index => value => {
+  handlePointsChange = memoize(index => value => {
     this.setState(({rows}) => {
       const parsed = NumberHelper.parse(value)
       if (!this.invalidPoints(parsed) && parsed >= 0) {
@@ -218,7 +218,7 @@ class ProficiencyTable extends React.Component {
     }, this.notifyPendingChanges)
   })
 
-  handleColorChange = _.memoize(index => value => {
+  handleColorChange = memoize(index => value => {
     this.setState(
       ({rows}) => ({
         rows: rows.update(index, row => row.set('color', unformatColor(value))),
@@ -227,7 +227,7 @@ class ProficiencyTable extends React.Component {
     )
   })
 
-  handleDelete = _.memoize(index => () => {
+  handleDelete = memoize(index => () => {
     const masteryIndex = this.state.rows.findIndex(row => row.get('mastery'))
     let rows = this.state.rows.delete(index)
 

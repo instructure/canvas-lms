@@ -18,7 +18,7 @@
  */
 
 import React from 'react'
-import _ from 'underscore'
+import {isEqual, isEmpty, cloneDeep} from 'lodash'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
@@ -47,7 +47,7 @@ import type {
 const I18n = useI18nScope('gradebook')
 
 function isLatePolicySaveable({latePolicy: {changes, validationErrors}}): boolean {
-  return !_.isEmpty(changes) && _.isEmpty(validationErrors)
+  return !isEmpty(changes) && isEmpty(validationErrors)
 }
 
 function haveCourseSettingsChanged({props, state}): boolean {
@@ -68,7 +68,7 @@ function isPostPolicyChanged({props, state}) {
 }
 
 function haveViewOptionsChanged({state: {viewOptions, viewOptionsLastSaved}}): boolean {
-  return viewOptions != null && !_.isEqual(viewOptions, viewOptionsLastSaved)
+  return viewOptions != null && !isEqual(viewOptions, viewOptionsLastSaved)
 }
 
 function onSaveSettingsFailure() {
@@ -244,7 +244,7 @@ export default class GradebookSettingsModal extends React.Component<
       .catch(onSavePostPolicyFailure)
 
   saveViewOptions = () => {
-    const savedOptions: GradebookViewOptions = _.cloneDeep(this.state.viewOptions)
+    const savedOptions: GradebookViewOptions = cloneDeep(this.state.viewOptions)
     if (!this.props.onViewOptionsUpdated) {
       throw new Error('onViewOptionsUpdated is required to save view options')
     }

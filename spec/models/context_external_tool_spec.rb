@@ -1154,7 +1154,7 @@ describe ContextExternalTool do
       course_with_teacher(active_all: true)
       @tool = @course.context_external_tools.new(name: "a", consumer_key: "12345", shared_secret: "secret", url: "http://www.example.com")
       Lti::ResourcePlacement::PLACEMENTS.each do |type|
-        @tool.send "#{type}=", {
+        @tool.send :"#{type}=", {
           url: nav_url,
           text: "Example",
           icon_url: "http://www.example.com/image.ico",
@@ -2311,7 +2311,7 @@ describe ContextExternalTool do
       course_with_teacher(active_all: true)
       @tool = @course.context_external_tools.new(name: "a", consumer_key: "12345", shared_secret: "secret", custom_fields: { "a" => "1", "b" => "2" }, url: "http://www.example.com")
       Lti::ResourcePlacement::PLACEMENTS.each do |type|
-        @tool.send "#{type}=", {
+        @tool.send :"#{type}=", {
           text: "Example",
           url: "http://www.example.com",
           icon_url: "http://www.example.com/image.ico",

@@ -16,10 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from '@instructure/lodash-underscore'
+import {pick} from 'lodash'
 import {camelize} from './convert_case'
-
-const pick = _.pick
 
 export default function pickAndNormalize(set, keys) {
   return camelize(pick(set || {}, keys))

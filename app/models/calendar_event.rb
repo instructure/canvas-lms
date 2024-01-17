@@ -298,14 +298,14 @@ class CalendarEvent < ActiveRecord::Base
   def populate_appointment_group_defaults
     self.effective_context_code = context.appointment_group_contexts.map(&:context_code).join(",")
     if new_record?
-      AppointmentGroup::EVENT_ATTRIBUTES.each { |attr| send("#{attr}=", context.send(attr)) }
+      AppointmentGroup::EVENT_ATTRIBUTES.each { |attr| send(:"#{attr}=", context.send(attr)) }
       if locked?
         self.start_at = start_at_was if !new_record? && start_at_changed?
         self.end_at   = end_at_was   if !new_record? && end_at_changed?
       end
     else
       # we only allow changing the description
-      (AppointmentGroup::EVENT_ATTRIBUTES - [:description]).each { |attr| send("#{attr}=", send("#{attr}_was")) if send("#{attr}_changed?") }
+      (AppointmentGroup::EVENT_ATTRIBUTES - [:description]).each { |attr| send(:"#{attr}=", send(:"#{attr}_was")) if send(:"#{attr}_changed?") }
     end
   end
   protected :populate_appointment_group_defaults
@@ -316,7 +316,7 @@ class CalendarEvent < ActiveRecord::Base
                                   else # e.g. section-level event
                                     parent_event.context_code
                                   end
-    (locked? ? LOCKED_ATTRIBUTES : CASCADED_ATTRIBUTES).each { |attr| send("#{attr}=", parent_event.send(attr)) }
+    (locked? ? LOCKED_ATTRIBUTES : CASCADED_ATTRIBUTES).each { |attr| send(:"#{attr}=", parent_event.send(attr)) }
   end
   protected :populate_with_parent_event
 

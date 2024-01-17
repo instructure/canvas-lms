@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import '@canvas/datetime'
+import '@canvas/datetime/jquery'
 
 const exports = {}
 

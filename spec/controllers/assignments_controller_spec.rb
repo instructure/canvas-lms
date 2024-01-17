@@ -876,6 +876,7 @@ describe AssignmentsController do
     describe "assignments_2_student" do
       before do
         @course.enable_feature!(:assignments_2_student)
+        @course.root_account.enable_feature!(:instui_nav)
         @course.save!
       end
 
@@ -895,6 +896,12 @@ describe AssignmentsController do
       context "when logged in as a student" do
         before do
           user_session(@student)
+        end
+
+        it "sets crumb to the assignment title" do
+          get "show", params: { course_id: @course.id, id: @assignment.id }
+          expect(assigns[:_crumbs][3][1]).to include("/courses/#{@course.id}/assignments/#{@assignment.id}")
+          expect(assigns[:_crumbs][3][0]).to include(@assignment.title)
         end
 
         it "does not render the 'old' assignment page layout" do

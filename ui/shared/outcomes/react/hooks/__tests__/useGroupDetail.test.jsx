@@ -24,7 +24,7 @@ import {groupDetailMocks, groupDetailMocksFetchMore} from '../../../mocks/Manage
 import {MockedProvider} from '@apollo/react-testing'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 import OutcomesContext, {ACCOUNT_GROUP_ID} from '../../contexts/OutcomesContext'
-import {FIND_GROUP_OUTCOMES} from '@canvas/outcomes/graphql/Management'
+import {FIND_GROUP_OUTCOMES} from '../../../graphql/Management'
 
 jest.mock('@canvas/alerts/react/FlashAlert')
 

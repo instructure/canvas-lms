@@ -24,12 +24,12 @@ module Types
 
     field :name, String, null: true
 
-    field :label,
+    field :tag,
           String,
-          "the label of the checkpoint",
+          "the tag of the checkpoint",
           null: false
-    def label
-      checkpoint.checkpoint_label
+    def tag
+      checkpoint.sub_assignment_tag
     end
 
     field :points_possible,

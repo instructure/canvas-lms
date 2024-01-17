@@ -21,9 +21,9 @@ import PropTypes from 'prop-types'
 
 // add highlighting and remove HTML from all incoming text
 // with the exception of anything within the <iframe></iframe> HTML tag
-const addSearchHighlighting = (searchTerm, searchArea, isIsolatedView) => {
+const addSearchHighlighting = (searchTerm, searchArea, isSplitView) => {
   // Check for conditions where highlighting should not be applied
-  if (!searchArea || !searchTerm || isIsolatedView) {
+  if (!searchArea || !searchTerm || isSplitView) {
     return searchArea
   }
 
@@ -66,7 +66,7 @@ export function SearchSpan({...props}) {
     <span
       className="user_content"
       dangerouslySetInnerHTML={{
-        __html: addSearchHighlighting(props.searchTerm, props.text, props.isIsolatedView),
+        __html: addSearchHighlighting(props.searchTerm, props.text, props.isSplitView),
       }}
     />
   )
@@ -81,5 +81,5 @@ SearchSpan.propTypes = {
    * String containing displayable message
    */
   text: PropTypes.string.isRequired,
-  isIsolatedView: PropTypes.bool,
+  isSplitView: PropTypes.bool,
 }

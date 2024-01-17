@@ -348,14 +348,11 @@ class ApplicationController < ActionController::Base
   JS_ENV_SITE_ADMIN_FEATURES = %i[
     featured_help_links
     lti_platform_storage
-    calendar_series
     account_level_blackout_dates
     render_both_to_do_lists
     course_paces_redesign
     course_paces_for_students
-    module_publish_menu
     explicit_latex_typesetting
-    dev_key_oidc_alert
     media_links_use_attachment_id
     permanent_page_links
     differentiated_modules
@@ -2187,7 +2184,8 @@ class ApplicationController < ActionController::Base
         @lti_launch.resource_url = @tool.login_or_launch_url(preferred_launch_url: @resource_url)
         @lti_launch.link_text = @resource_title
         @lti_launch.analytics_id = @tool.tool_id
-        InstStatsd::Statsd.increment("lti.launch", tags: { lti_version: @tool.lti_version, type: :content_tag_redirect })
+
+        Lti::LogService.new(tool: @tool, context:, user: @current_user, placement: nil, launch_type: :content_item).call
 
         @append_template = "context_modules/tool_sequence_footer" if render_external_tool_append_template?
         render Lti::AppUtil.display_template(external_tool_redirect_display_type)
@@ -2791,11 +2789,6 @@ class ApplicationController < ActionController::Base
     !!(mobile_device? && (in_android_app || in_ios_app))
   end
 
-  # temp: will remove in INTEROP-8277
-  include Lti::Oidc
-  helper_method :oidc_authorization_domain
-  # end temp
-
   def ms_office?
     request.user_agent.to_s.include?("ms-office") ||
       request.user_agent.to_s.match?(%r{Word/\d+\.\d+})
@@ -2857,7 +2850,7 @@ class ApplicationController < ActionController::Base
       hash = {}
       objtypes.each do |instance_symbol|
         instance_name = instance_symbol.to_s
-        obj = instance_variable_get("@#{instance_name}")
+        obj = instance_variable_get(:"@#{instance_name}")
         policy = obj.check_policy(@current_user, session) unless obj.nil? || !obj.respond_to?(:check_policy)
         hash[:"#{instance_name.upcase}_RIGHTS"] = ActiveSupport::HashWithIndifferentAccess[policy.map { |right| [right, true] }] unless policy.nil?
       end

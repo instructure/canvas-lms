@@ -19,8 +19,8 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
 import 'jquery-scroll-to-visible'
-import tz from '@canvas/timezone'
-import _ from 'underscore'
+import * as tz from '@canvas/datetime'
+import {clone, each} from 'lodash'
 import Backbone from '@canvas/backbone'
 import template from '../../jst/WikiPage.handlebars'
 import StickyHeaderMixin from '@canvas/wiki/backbone/views/StickyHeaderMixin'
@@ -307,7 +307,7 @@ export default class WikiPageView extends Backbone.View {
     json.explicit_latex_typesetting = !!ENV.FEATURES?.explicit_latex_typesetting
 
     if (json.lock_info) {
-      json.lock_info = _.clone(json.lock_info)
+      json.lock_info = clone(json.lock_info)
     }
     if (json.lock_info != null ? json.lock_info.unlock_at : undefined) {
       json.lock_info.unlock_at =
@@ -322,7 +322,7 @@ export default class WikiPageView extends Backbone.View {
     }
 
     json.wiki_page_menu_tools = ENV.wiki_page_menu_tools
-    _.each(json.wiki_page_menu_tools, tool => {
+    each(json.wiki_page_menu_tools, tool => {
       tool.url = `${tool.base_url}&pages[]=${this.model.get('page_id')}`
     })
     json.frontPageText = ENV.K5_SUBJECT_COURSE ? I18n.t('Subject Home') : I18n.t('Front Page')

@@ -25,7 +25,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {ProgressBar} from '@instructure/ui-progress'
-import '@canvas/forms/jquery/jquery.instructure_forms'
+import '@canvas/jquery/jquery.instructure_forms'
 
 const I18n = useI18nScope('content_migrations')
 

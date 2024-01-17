@@ -18,7 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import _ from 'underscore'
+import {map, filter, sortBy} from 'lodash'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('EnrollmentTermsDropdown')
@@ -30,11 +30,11 @@ class EnrollmentTermsDropdown extends React.Component {
   }
 
   sortedTerms = terms => {
-    const dated = _.filter(terms, term => term.startAt)
-    const datedTermsSortedByStart = _.sortBy(dated, term => term.startAt).reverse()
+    const dated = filter(terms, term => term.startAt)
+    const datedTermsSortedByStart = sortBy(dated, term => term.startAt).reverse()
 
-    const undated = _.filter(terms, term => !term.startAt)
-    const undatedTermsSortedByCreate = _.sortBy(undated, term => term.createdAt).reverse()
+    const undated = filter(terms, term => !term.startAt)
+    const undatedTermsSortedByCreate = sortBy(undated, term => term.createdAt).reverse()
     return datedTermsSortedByStart.concat(undatedTermsSortedByCreate)
   }
 
@@ -44,7 +44,7 @@ class EnrollmentTermsDropdown extends React.Component {
         {I18n.t('All Terms')}
       </option>
     )
-    const options = _.map(this.sortedTerms(terms), term => (
+    const options = map(this.sortedTerms(terms), term => (
       <option key={term.id} value={term.id}>
         {term.displayName}
       </option>
