@@ -198,7 +198,6 @@ function Assignment() {
   this.unlockAt = this.unlockAt.bind(this)
   this.dueAt = this.dueAt.bind(this)
   this.assignmentType = this.assignmentType.bind(this)
-  this.isAssignment = this.isAssignment.bind(this)
   this.isNotGraded = this.isNotGraded.bind(this)
   this.defaultToolUrl = this.defaultToolUrl.bind(this)
   this.defaultToolName = this.defaultToolName.bind(this)
@@ -285,25 +284,6 @@ Assignment.prototype.defaultToolUrl = function () {
 
 Assignment.prototype.isNotGraded = function () {
   return this._hasOnlyType('not_graded')
-}
-
-Assignment.prototype.isAssignment = function () {
-  return !(this._submissionTypes() || []).includes('online_quiz')
-
-  // EVAL-3817
-  // The original code cannot possibly have worked as underscore `_.includes` takes only
-  // two argumentswith an optional third fromIndex. Nowhere does it seem to work to pass
-  // a list of arguments to check for inclusion in the first argument. Needs investigation,
-  // see the EVAL-3817 ticket for more details.
-  //
-  // Original code:
-  // return !_.includes(
-  //   this._submissionTypes(),
-  //   'online_quiz',
-  //   'discussion_topic',
-  //   'not_graded',
-  //   'external_tool'
-  // )
 }
 
 Assignment.prototype.assignmentType = function (type) {

@@ -262,25 +262,6 @@ test('returns false if record is graded', () => {
   equal(assignment.isNotGraded(), false)
 })
 
-QUnit.module('Assignment#isAssignment')
-
-test('returns true if record is not quiz,ungraded,external tool, or discussion', () => {
-  const assignment = new Assignment({name: 'foo'})
-  assignment.set('submission_types', ['online_url'])
-  equal(assignment.isAssignment(), true)
-})
-
-test('returns true if record has no submission types', () => {
-  const assignment = new Assignment({name: 'foo'})
-  equal(assignment.isAssignment(), true)
-})
-
-test('returns false if record is quiz,ungraded, external tool, or discussion', () => {
-  const assignment = new Assignment({name: 'foo'})
-  assignment.set('submission_types', ['online_quiz'])
-  equal(assignment.isAssignment(), false)
-})
-
 QUnit.module('Assignment#asignmentType as a setter')
 
 test("sets the record's submission_types to the value", () => {
