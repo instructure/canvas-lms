@@ -885,7 +885,7 @@ GEM
     ratom-nokogiri (0.10.11)
       nokogiri (>= 1.5.6, < 2.0)
     rchardet (1.8.0)
-    rdiscount (2.2.7.2)
+    rdiscount (2.2.7.3)
     rdoc (6.6.2)
       psych (>= 4.0.0)
     redcarpet (3.6.0)
