@@ -19,6 +19,8 @@
 import handler from '../lti.get_data'
 import * as platformStorage from '../../platform_storage'
 
+jest.mock('../../platform_storage')
+
 describe('lti.get_data handler', () => {
   let message
   let responseMessages
@@ -33,7 +35,7 @@ describe('lti.get_data handler', () => {
     event = {
       origin: 'http://example.com',
     }
-    jest.spyOn(platformStorage, 'getData').mockImplementation(() => value)
+    platformStorage.getData.mockImplementation(() => value)
   })
 
   afterEach(() => {

@@ -19,6 +19,8 @@
 import handler from '../lti.put_data'
 import * as platformStorage from '../../platform_storage'
 
+jest.mock('../../platform_storage')
+
 describe('lti.put_data handler', () => {
   let message
   let responseMessages
@@ -33,8 +35,8 @@ describe('lti.put_data handler', () => {
     event = {
       origin: 'http://example.com',
     }
-    jest.spyOn(platformStorage, 'clearData').mockImplementation(() => {})
-    jest.spyOn(platformStorage, 'putData').mockImplementation(() => {})
+    platformStorage.clearData.mockImplementation(() => {})
+    platformStorage.putData.mockImplementation(() => {})
   })
 
   afterEach(() => {
@@ -106,7 +108,7 @@ describe('lti.put_data handler', () => {
 
     beforeEach(() => {
       platformStorage.putData.mockRestore()
-      jest.spyOn(platformStorage, 'putData').mockImplementation(() => {
+      platformStorage.putData.mockImplementation(() => {
         const e = new Error(errorMessage)
         e.code = code
         throw e
