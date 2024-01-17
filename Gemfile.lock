@@ -998,7 +998,8 @@ GEM
     ruby2ruby (2.5.0)
       ruby_parser (~> 3.1)
       sexp_processor (~> 4.6)
-    ruby_parser (3.20.3)
+    ruby_parser (3.21.0)
+      racc (~> 1.5)
       sexp_processor (~> 4.16)
     rubycas-client (2.3.9)
       activesupport
@@ -1024,7 +1025,7 @@ GEM
       sentry-ruby (~> 5.15.2)
     sentry-ruby (5.15.2)
       concurrent-ruby (~> 1.0, >= 1.0.2)
-    sexp_processor (4.17.0)
+    sexp_processor (4.17.1)
     shoulda-matchers (5.3.0)
       activesupport (>= 5.2.0)
     signet (0.18.0)
