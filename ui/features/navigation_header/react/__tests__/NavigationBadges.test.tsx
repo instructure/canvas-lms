@@ -83,7 +83,8 @@ describe('GlobalNavigation', () => {
         fetchMock.calls().every(([url]) => url !== '/api/v1/users/self/content_shares/unread_count')
       ).toBe(true)
     })
-    it('fetches inbox count when user has not opted out of notifications', async () => {
+    // FOO-4218 - remove or rewrite to remove spies on imports
+    it.skip('fetches inbox count when user has not opted out of notifications', async () => {
       ENV.current_user_disabled_inbox = false
       await act(async () => {
         render(<NavigationBadges />)
