@@ -700,8 +700,6 @@ class ActiveRecord::Base
     end
   end
 
-  scope :non_shadow, ->(key = primary_key) { where("#{key}<=? AND #{key}>?", Shard::IDS_PER_SHARD, 0) }
-
   def self.create_and_ignore_on_duplicate(*args)
     # FIXME: handle array fields and setting of nulls where those are not the default
     model = new(*args)
