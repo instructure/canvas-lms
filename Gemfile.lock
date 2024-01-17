@@ -722,7 +722,7 @@ GEM
     mustache (1.1.1)
     neighbor (0.3.2)
       activerecord (>= 6.1)
-    net-http (0.4.0)
+    net-http (0.4.1)
       uri
     net-imap (0.4.8)
       date
