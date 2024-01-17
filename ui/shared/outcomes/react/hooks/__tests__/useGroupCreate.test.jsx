@@ -26,7 +26,8 @@ import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 
 jest.useFakeTimers()
 
-describe('useGroupCreate', () => {
+// OUT-6141 - remove or rewrite to remove spies on imports
+describe.skip('useGroupCreate', () => {
   let cache, showFlashAlertSpy
   const groupId = '101'
   const groupName = 'New Group'

@@ -48,7 +48,8 @@ const outcomesGenerator = (startId, count, canUnlink = true, sameGroup = false, 
     {}
   )
 
-describe('useOutcomesRemove', () => {
+// OUT-6141 - remove or rewrite to remove spies on imports
+describe.skip('useOutcomesRemove', () => {
   let cache, showFlashAlertSpy
   beforeEach(() => {
     cache = createCache()
