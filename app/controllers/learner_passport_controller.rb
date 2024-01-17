@@ -719,7 +719,7 @@ class LearnerPassportController < ApplicationController
         id: p[:id],
         title: p[:title],
         milestoneCount: p[:milestones].length,
-        requirementCount: p[:milestones].reduce(0) { |sum, m| sum + m[:requirements].length },
+        requirementCount: p[:milestones].reduce(0) { |sum, m| sum + m.with_indifferent_access[:requirements].length },
         enrolled_student_count: p[:enrolled_student_count],
         started_count: p[:started_count],
         completed_count: p[:completed_count],

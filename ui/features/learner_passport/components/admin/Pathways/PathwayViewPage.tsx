@@ -21,6 +21,7 @@ import {useActionData, useLoaderData} from 'react-router-dom'
 import {Breadcrumb} from '@instructure/ui-breadcrumb'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
+import {Heading} from '@instructure/ui-heading'
 import {View} from '@instructure/ui-view'
 import type {PathwayDetailData} from '../../types'
 import PathwayView from './PathwayView'
@@ -32,27 +33,24 @@ const PathwayViewPage = () => {
   const pathway = create_pathway || edit_pathway
 
   return (
-    <View as="div" maxWidth="986px" margin="0 auto">
-      <Breadcrumb label="You are here:" size="small">
-        <Breadcrumb.Link href={`/users/${ENV.current_user.id}/passport/admin/pathways/dashboard`}>
-          Pathways
-        </Breadcrumb.Link>
-        <Breadcrumb.Link>{pathway.title}</Breadcrumb.Link>
-      </Breadcrumb>
-      <Flex as="div" margin="0 0 medium 0" justifyItems="end">
-        <Flex.Item>
-          <Button margin="0 x-small 0 0" onClick={showUnimplemented}>
-            Save as Draft
-          </Button>
-          <Button margin="0 x-small 0 0" color="primary" onClick={showUnimplemented}>
-            Next
-          </Button>
-        </Flex.Item>
-      </Flex>
-      <View as="div" borderWidth="small" borderColor="secondary" margin="0 0 x-large 0">
-        <PathwayView pathway={pathway} />
+    <Flex as="div" direction="column" gap="small" alignItems="stretch">
+      <View as="div" margin="0 x-large">
+        <Breadcrumb label="You are here:" size="small">
+          <Breadcrumb.Link href={`/users/${ENV.current_user.id}/passport/admin/pathways/dashboard`}>
+            Pathways
+          </Breadcrumb.Link>
+          <Breadcrumb.Link>{pathway.title}</Breadcrumb.Link>
+        </Breadcrumb>
+        <View as="div" margin="0 0 medium 0">
+          <Heading level="h1">{pathway.title}</Heading>
+        </View>
       </View>
-    </View>
+      <Flex.Item shouldGrow={true}>
+        <View as="div" overflowX="auto" overflowY="visible">
+          <PathwayView pathway={pathway} />
+        </View>
+      </Flex.Item>
+    </Flex>
   )
 }
 
