@@ -2047,6 +2047,14 @@ class Attachment < ActiveRecord::Base
     return unless child
     raise "must be a child" unless child.root_attachment_id == id
 
+    if !instfs_hosted? && %w[ContentMigration ContentExport].include?(context_type) && Attachment.s3_storage? && !s3object.exists?
+      child.workflow_state = child.file_state = "deleted"
+      child.root_attachment_id = nil
+      child.deleted_at ||= Time.now.utc
+      child.save!
+      return make_childless
+    end
+
     child.root_attachment_id = nil
     copy_attachment_content(child, split_root_attachment: true)
     child.save!
