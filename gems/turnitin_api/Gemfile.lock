@@ -28,7 +28,7 @@ GEM
       activerecord (>= 5.2)
       activesupport (>= 5.2)
     base64 (0.2.0)
-    concurrent-ruby (1.2.2)
+    concurrent-ruby (1.2.3)
     crack (0.4.5)
       rexml
     diff-lcs (1.5.0)

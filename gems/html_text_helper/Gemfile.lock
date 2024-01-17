@@ -22,7 +22,7 @@ GEM
       i18n (>= 1.6, < 2)
       minitest (>= 5.1)
       tzinfo (~> 2.0)
-    concurrent-ruby (1.2.2)
+    concurrent-ruby (1.2.3)
     crass (1.0.6)
     diff-lcs (1.5.0)
     docile (1.4.0)

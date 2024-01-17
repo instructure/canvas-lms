@@ -459,7 +459,7 @@ GEM
       descendants_tracker (~> 0.0.1)
     colored (1.2)
     colorize (1.1.0)
-    concurrent-ruby (1.2.2)
+    concurrent-ruby (1.2.3)
     connection_pool (2.4.1)
     crack (0.4.5)
       rexml

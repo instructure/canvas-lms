@@ -34,7 +34,7 @@ GEM
       aws-sigv4 (~> 1.1)
     aws-sigv4 (1.8.0)
       aws-eventstream (~> 1, >= 1.0.2)
-    concurrent-ruby (1.2.2)
+    concurrent-ruby (1.2.3)
     debug (1.9.0)
       irb (~> 1.10)
       reline (>= 0.3.8)
