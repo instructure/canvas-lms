@@ -37,7 +37,8 @@ describe('UploadProgress', () => {
     expect(getByText('foo.txt')).toBeInTheDocument()
   })
 
-  it('announces upload progress to screen reader when queue changes', function () {
+  // LF-1169 - remove or rewrite to remove spies on imports
+  it.skip('announces upload progress to screen reader when queue changes', function () {
     const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
     const uploader = makeUploader('foo.txt')
     const {container, rerender} = render(<UploadProgress uploader={uploader} />)
@@ -67,7 +68,8 @@ describe('UploadProgress', () => {
     )
   })
 
-  it('does not announce upload progress to screen reader if progress has not changed', function () {
+  // LF-1169 - remove or rewrite to remove spies on imports
+  it.skip('does not announce upload progress to screen reader if progress has not changed', function () {
     const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
     const uploader = makeUploader('foo.txt')
 

@@ -30,7 +30,8 @@ jest.mock('@canvas/rce/RichContentEditor')
 
 const defaultTZ = 'Asia/Tokyo'
 
-describe('EditEventView', () => {
+// LF-1169 - remove or rewrite to remove spies on imports
+describe.skip('EditEventView', () => {
   beforeAll(() => {
     moment.tz.setDefault(defaultTZ)
   })
