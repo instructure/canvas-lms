@@ -7,7 +7,7 @@ if [ -z "$SKIP_YARN" ]; then
   rm -rf $(printf 'gems/plugins/%s ' "${PLUGINS_LIST_ARR[@]}")
 
   export DISABLE_POSTINSTALL=1
-  yarn install --ignore-optional || yarn install --ignore-optional --network-concurrency 1
+  yarn install || yarn install --network-concurrency 1
 fi
 
 if ! git diff --exit-code yarn.lock; then
