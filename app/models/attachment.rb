@@ -1918,6 +1918,11 @@ class Attachment < ActiveRecord::Base
   def make_childless(preferred_child = nil)
     return if root_attachment_id
 
+    # everything is deleted? just unlink
+    if workflow_state == "deleted" && file_state == "deleted" && !instfs_hosted? && !s3object.exists?
+      children.where(workflow_state: "deleted", file_state: "deleted", instfs_uuid: nil).update_all(root_attachment_id: nil)
+    end
+
     child = preferred_child || children.take
     return unless child
     raise "must be a child" unless child.root_attachment_id == id
