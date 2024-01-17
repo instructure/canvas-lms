@@ -54,7 +54,8 @@ const getAddAttachments = ({
   )
 }
 
-describe('addAttachmentsFn', () => {
+// VICE-4065 - remove or rewrite to remove spies on uploadFileModule import
+describe.skip('addAttachmentsFn', () => {
   beforeEach(() => {
     uploadFileModule.uploadFiles = jest.fn().mockResolvedValue([])
   })
