@@ -20,24 +20,24 @@
 const STORAGE_CHAR_LIMIT = 4096 // IMS minimum storage limit is 4096 bytes so 4096 chars is more than enough
 const STORAGE_KEY_LIMIT = 500
 
-const limits = {}
+export const limits = {}
 
-const createLimit = tool_id => {
+export const createLimit = tool_id => {
   if (!limits[tool_id]) {
     limits[tool_id] = {keyCount: 0, charCount: 0}
   }
 }
 
-const getLimit = tool_id => {
+export const getLimit = tool_id => {
   createLimit(tool_id)
   return limits[tool_id]
 }
 
-const clearLimit = (tool_id: string) => {
+export const clearLimit = (tool_id: string) => {
   delete limits[tool_id]
 }
 
-const addToLimit = (tool_id: string, key: string, value: string) => {
+export const addToLimit = (tool_id: string, key: string, value: string) => {
   createLimit(tool_id)
   const length = key.length + value.length
 
@@ -57,7 +57,7 @@ const addToLimit = (tool_id: string, key: string, value: string) => {
   limits[tool_id].charCount += length
 }
 
-const removeFromLimit = (tool_id: string, key: string, value: string) => {
+export const removeFromLimit = (tool_id: string, key: string, value: string) => {
   limits[tool_id].keyCount--
   limits[tool_id].charCount -= key.length + value.length
 
@@ -69,21 +69,20 @@ const removeFromLimit = (tool_id: string, key: string, value: string) => {
   }
 }
 
-const getKey = (tool_id: string, key: string) => `lti|platform_storage|${tool_id}|${key}`
+export const getKey = (tool_id: string, key: string) => `lti|platform_storage|${tool_id}|${key}`
 
-const putData = (tool_id: string, key: string, value: string) => {
+export const putData = (tool_id: string, key: string, value: string) => {
   addToLimit(tool_id, key, value)
   window.localStorage.setItem(getKey(tool_id, key), value)
 }
 
-const getData = (tool_id: string, key: string) => window.localStorage.getItem(getKey(tool_id, key))
+export const getData = (tool_id: string, key: string) =>
+  window.localStorage.getItem(getKey(tool_id, key))
 
-const clearData = (tool_id: string, key: string) => {
+export const clearData = (tool_id: string, key: string) => {
   const value = getData(tool_id, key)
   if (value) {
     removeFromLimit(tool_id, key, value)
     window.localStorage.removeItem(getKey(tool_id, key))
   }
 }
-
-export {getLimit, clearLimit, addToLimit, removeFromLimit, clearData, getData, putData}
