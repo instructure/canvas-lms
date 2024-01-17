@@ -103,7 +103,7 @@ GEM
       sorbet-runtime (>= 0.5.10821)
     code_teams (1.0.2)
       sorbet-runtime
-    concurrent-ruby (1.2.2)
+    concurrent-ruby (1.2.3)
     crass (1.0.6)
     date (3.3.4)
     debug (1.9.0)
