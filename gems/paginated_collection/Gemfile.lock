@@ -25,12 +25,12 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.12.0)
     rspec-support (3.12.1)
-    sqlite3 (1.6.9)
+    sqlite3 (1.7.0)
       mini_portile2 (~> 2.8.0)
-    sqlite3 (1.6.9-aarch64-linux)
-    sqlite3 (1.6.9-arm64-darwin)
-    sqlite3 (1.6.9-x86_64-darwin)
-    sqlite3 (1.6.9-x86_64-linux)
+    sqlite3 (1.7.0-aarch64-linux)
+    sqlite3 (1.7.0-arm64-darwin)
+    sqlite3 (1.7.0-x86_64-darwin)
+    sqlite3 (1.7.0-x86_64-linux)
     will_paginate (4.0.0)
 
 PLATFORMS
