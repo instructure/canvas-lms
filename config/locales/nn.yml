@@ -204,6 +204,7 @@ nn:
   a_microsoft_365_group_must_have_owners_and_no_user_96f91864: "Ei Microsoft 365-gruppe må ha eigarar, og ingen brukarar som tilsvarer faglærarane i Canvas-emnet, kan bli funnen på Microsoft-sida. Dersom du nyleg la til eller fjerna emneeigarar, kan ei ny synkronisering løyse dette problemet."
   a_name_for_this_set_is_required_222bad23: "Eit namn er obligatorisk. "
   a_name_is_required_b5df38a9: "Eit namn er obligatorisk"
+  a_new_annotation_has_been_made_by_author_on_the_as_63ad4351: " %{author} har lagt til ein ny merknad på oppgåva %{assignment_name}."
   a_new_assignment_has_been_created_for_your_course__12b72639: "Ei ny oppgåve er oppretta for emnet ditt, %{course_name}"
   a_new_module_has_been_created_with_the_content_ret_b01468b2: "Ein ny modul er blitt oppretta med innhaldet som vart returnert frå verktøyet. Om du vil sjå det, kan du gå til Modular."
   a_page_with_this_title_already_exists_please_choos_19c53cc4: "Ei side med denne tittelen finst allereie. Vennligst vel ein annan tittel."
