@@ -31,8 +31,8 @@ QUnit.module('DevelopersKeyApp', {
   beforeEach: () => {
     window.ENV = {
       FEATURES: {
-        lti_dynamic_registration: true
-      }
+        lti_dynamic_registration: true,
+      },
     }
   },
   afterEach: () => {

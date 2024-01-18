@@ -2004,9 +2004,9 @@ describe('SubmissionManager', () => {
         }
 
         const {getByText, findByText} = render(
-            <MockedProvider mocks={mocks}>
-              <SubmissionManager {...prop} />
-            </MockedProvider>
+          <MockedProvider mocks={mocks}>
+            <SubmissionManager {...prop} />
+          </MockedProvider>
         )
         await new Promise(resolve => setTimeout(resolve, 1))
         const submitButton = getByText('Submit')

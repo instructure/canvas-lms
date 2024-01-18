@@ -20,24 +20,9 @@
 
 module Lti
   class PlatformStorage
-    DEFAULT_TARGET = "_parent"
     # This represents the name for the target browser frame for
     # Platform Storage messages and should be used when constructing the iframe.
     FORWARDING_TARGET = "post_message_forwarding"
-
-    # the name of the target browser frame to which tools should send
-    # Platform Storage events.
-    # if tools should use the parent frame (ie Canvas itself), this
-    # should be `_parent`.
-    def self.lti_storage_target
-      return FORWARDING_TARGET if flag_enabled?
-
-      DEFAULT_TARGET
-    end
-
-    def self.flag_enabled?
-      Account.site_admin.feature_enabled?(:lti_platform_storage)
-    end
 
     def self.signing_secret
       Rails.application&.credentials&.dig(:lti_platform_storage, :signing_secret)

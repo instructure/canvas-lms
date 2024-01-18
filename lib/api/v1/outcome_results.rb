@@ -96,6 +96,7 @@ module Api::V1::OutcomeResults
         context:,
         friendly_descriptions:
       )
+
       hash[:alignments] = alignment_asset_string_map[o.id]
       hash
     end

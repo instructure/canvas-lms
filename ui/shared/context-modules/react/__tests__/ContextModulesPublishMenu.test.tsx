@@ -176,6 +176,7 @@ describe('ContextModulesPublishMenu', () => {
       expect(getByText('Publish all modules and items')).toBeInTheDocument()
       expect(getByText('Publish modules only')).toBeInTheDocument()
       expect(getByText('Unpublish all modules and items')).toBeInTheDocument()
+      expect(getByText('Unpublish modules only')).toBeInTheDocument()
     })
 
     it('calls publishAll when clicked publish all menu item is clicked', () => {
@@ -205,6 +206,16 @@ describe('ContextModulesPublishMenu', () => {
       const publishButton = getByText('Unpublish all modules and items')
       act(() => publishButton.click())
       const modalTitle = getByRole('heading', {name: 'Unpublish all modules and items'})
+      expect(modalTitle).toBeInTheDocument()
+    })
+
+    it('calls unpublishModuleOnly when unpublish modules only is clicked', () => {
+      const {getByRole, getByText} = render(<ContextModulesPublishMenu {...defaultProps} />)
+      const menuButton = getByRole('button')
+      act(() => menuButton.click())
+      const publishButton = getByText('Unpublish modules only')
+      act(() => publishButton.click())
+      const modalTitle = getByRole('heading', {name: 'Unpublish modules only'})
       expect(modalTitle).toBeInTheDocument()
     })
   })

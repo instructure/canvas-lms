@@ -49,7 +49,7 @@ export default class CalendarEventModal extends React.Component {
     startTime: momentObj.isRequired,
     endTime: momentObj,
     allDay: bool.isRequired,
-    timeZone: string.isRequired
+    timeZone: string.isRequired,
   }
 
   renderRow(firstColumnContent, secondColumnContent) {

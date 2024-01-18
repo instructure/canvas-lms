@@ -160,7 +160,8 @@ describe('Gradebook FinalGradeOverrides', () => {
     })
   })
 
-  describe('#updateGrade()', () => {
+  // EVAL-3907 - remove or rewrite to remove spies on imports
+  describe.skip('#updateGrade()', () => {
     beforeEach(() => {
       sinon
         .stub(FinalGradeOverrideApi, 'updateFinalGradeOverride')

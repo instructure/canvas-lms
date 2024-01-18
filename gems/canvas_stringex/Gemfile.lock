@@ -16,7 +16,7 @@ GEM
       i18n (>= 1.6, < 2)
       minitest (>= 5.1)
       tzinfo (~> 2.0)
-    concurrent-ruby (1.2.2)
+    concurrent-ruby (1.2.3)
     diff-lcs (1.5.0)
     docile (1.4.0)
     i18n (1.14.1)
@@ -43,12 +43,12 @@ GEM
       simplecov_json_formatter (~> 0.1)
     simplecov-html (0.12.3)
     simplecov_json_formatter (0.1.4)
-    sqlite3 (1.6.9)
+    sqlite3 (1.7.0)
       mini_portile2 (~> 2.8.0)
-    sqlite3 (1.6.9-aarch64-linux)
-    sqlite3 (1.6.9-arm64-darwin)
-    sqlite3 (1.6.9-x86_64-darwin)
-    sqlite3 (1.6.9-x86_64-linux)
+    sqlite3 (1.7.0-aarch64-linux)
+    sqlite3 (1.7.0-arm64-darwin)
+    sqlite3 (1.7.0-x86_64-darwin)
+    sqlite3 (1.7.0-x86_64-linux)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
 
@@ -69,4 +69,4 @@ DEPENDENCIES
   sqlite3
 
 BUNDLED WITH
-   2.4.20
+   2.5.3

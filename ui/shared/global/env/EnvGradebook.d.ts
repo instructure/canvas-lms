@@ -90,7 +90,7 @@ export interface EnvGradebookSpeedGrader {
   anonymous_identities: Record<string, {name: string}>
   instructor_selectable_states: unknown
   final_grader_id: unknown
-  grading_role: unknown
+  grading_role: string
   grading_type: string
   lti_retrieve_url: string
   course_id: string
@@ -130,8 +130,10 @@ export interface EnvGradebookSpeedGrader {
 
   filter_speed_grader_by_student_group_feature_enabled: boolean
   filter_speed_grader_by_student_group?: boolean
-  selected_student_group?: unknown
-  student_group_reason_for_change?: unknown
+  selected_student_group?: {
+    name: string
+  }
+  student_group_reason_for_change?: string
 
   update_rubric_assessment_url?: string
   RUBRIC_ASSESSMENT: {

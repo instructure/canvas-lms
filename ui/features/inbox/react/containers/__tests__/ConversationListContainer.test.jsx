@@ -25,9 +25,6 @@ import React from 'react'
 import {render, fireEvent, waitFor, screen} from '@testing-library/react'
 import waitForApolloLoading from '../../../util/waitForApolloLoading'
 import {responsiveQuerySizes} from '../../../util/utils'
-import {enableFetchMocks} from 'jest-fetch-mock'
-
-enableFetchMocks()
 
 jest.mock('../../../util/utils', () => ({
   ...jest.requireActual('../../../util/utils'),
@@ -37,7 +34,7 @@ jest.mock('../../../util/utils', () => ({
 describe('ConversationListContainer', () => {
   const server = mswServer(handlers)
   const getConversationsQuery = (scope, course) => {
-    return handlers[0].resolver(
+    const response = handlers[0].resolver(
       {
         variables: {
           scope,
@@ -53,11 +50,10 @@ describe('ConversationListContainer', () => {
         },
       }
     )
+    return JSON.parse(response.body.toString())
   }
 
   beforeAll(() => {
-    // eslint-disable-next-line no-undef
-    fetchMock.dontMock()
     server.listen()
 
     // Add appropriate mocks for responsive
@@ -83,8 +79,6 @@ describe('ConversationListContainer', () => {
 
   afterAll(() => {
     server.close()
-    // eslint-disable-next-line no-undef
-    fetchMock.enableMocks()
   })
 
   beforeEach(() => {
@@ -115,11 +109,13 @@ describe('ConversationListContainer', () => {
 
     it('should change list of conversations when scope changes', async () => {
       const component = setup()
+
       expect(await component.findByText('This is an inbox conversation')).toBeInTheDocument()
 
       // Change scope
       const scope = 'sent'
-      const conversationsQuery = {data: getConversationsQuery(scope).data, loading: false}
+      const data = getConversationsQuery(scope).data
+      const conversationsQuery = {data, loading: false}
       const submissionCommentsQuery = {data: null, loading: false}
 
       component.rerender(

@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-const _ = require('underscore')
-const axe = require('axe-core')
+import {reject} from 'lodash'
+import axe from 'axe-core'
 
-module.exports = {
+export default {
   isVisible($el, message = '') {
     ok($el.length, 'elements found')
     ok($el.is(':visible'), `${$el} is visible ${message}`)
@@ -56,10 +56,7 @@ module.exports = {
 
     return axe.a11yCheck(el, axeConfig, result => {
       const ignores = options.ignores || []
-      const violations = _.reject(
-        result.violations,
-        violation => ignores.indexOf(violation.id) >= 0
-      )
+      const violations = reject(result.violations, violation => ignores.indexOf(violation.id) >= 0)
 
       const err = violations.map(violation =>
         [`[${violation.id}] ${violation.help}`, `${violation.helpUrl}\n`].join('\n')

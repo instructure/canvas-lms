@@ -321,3 +321,13 @@ enhanced_rubrics:
       state: allowed
     development:
       state: allowed
+multiselect_gradebook_filters:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Multi-select Gradebook Filters
+  description: This feature enables multi-select filters in the Gradebook.
+  environments:
+    ci:
+      state: allowed
+    development:
+      state: allowed

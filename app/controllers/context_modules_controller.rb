@@ -67,7 +67,7 @@ class ContextModulesController < ApplicationController
     end
 
     def load_modules
-      @modules = @context.modules_visible_to(@current_user).limit(Setting.get("course_module_limit", "1000").to_i)
+      @modules = @context.modules_visible_to(@current_user).limit(1000)
       @modules.each(&:check_for_stale_cache_after_unlocking!)
       @collapsed_modules = ContextModuleProgression.for_user(@current_user)
                                                    .for_modules(@modules)
@@ -840,7 +840,7 @@ class ContextModulesController < ApplicationController
     # find the assignments/quizzes with too many active overrides and mark them as such
     if assignments_or_quizzes.any?
       ids = AssignmentOverride.active.where(override_column => assignments_or_quizzes)
-                              .group(override_column).having("COUNT(*) > ?", Setting.get("assignment_all_dates_too_many_threshold", "25").to_i)
+                              .group(override_column).having("COUNT(*) > ?", Api::V1::Assignment::ALL_DATES_LIMIT)
                               .active.pluck(override_column)
 
       if ids.any?

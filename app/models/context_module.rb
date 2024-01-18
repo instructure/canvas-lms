@@ -23,6 +23,7 @@ class ContextModule < ActiveRecord::Base
   include SearchTermHelper
   include DuplicatingObjects
   include LockedFor
+  include DifferentiableAssignment
 
   include MasterCourses::Restrictor
   restrict_columns :state, [:workflow_state]
@@ -34,6 +35,7 @@ class ContextModule < ActiveRecord::Base
   has_many :content_tags, -> { order("content_tags.position, content_tags.title") }, dependent: :destroy
   has_many :assignment_overrides, dependent: :destroy, inverse_of: :context_module
   has_many :assignment_override_students, dependent: :destroy
+  has_many :module_student_visibilities
   has_one :master_content_tag, class_name: "MasterCourses::MasterContentTag", inverse_of: :context_module
   acts_as_list scope: { context: self, workflow_state: ["active", "unpublished"] }
 
@@ -264,6 +266,10 @@ class ContextModule < ActiveRecord::Base
     self.root_account_id ||= context&.root_account_id
   end
 
+  def only_visible_to_overrides
+    assignment_overrides.active.exists?
+  end
+
   def duplicate
     copy_title = get_copy_title(self, t("Copy"), name)
     new_module = duplicate_base_model(copy_title)
@@ -351,6 +357,11 @@ class ContextModule < ActiveRecord::Base
   scope :starting_with_name, lambda { |name|
     where("name ILIKE ?", "#{name}%")
   }
+  scope :visible_to_students_in_course_with_da, lambda { |user_id, course_id|
+    joins(:module_student_visibilities)
+      .where(module_student_visibilities: { user_id:, course_id: })
+  }
+
   alias_method :published?, :active?
 
   def publish_items!(progress: nil)

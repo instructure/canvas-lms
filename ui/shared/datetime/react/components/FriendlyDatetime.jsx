@@ -19,7 +19,7 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import * as tz from '../../index'
-import _ from 'underscore'
+import {isDate, memoize} from 'lodash'
 import $ from 'jquery'
 import '../../jquery/index'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -44,7 +44,7 @@ class FriendlyDatetime extends Component {
   // tz.parse, $.fudge, $.datetimeString, etc.
   // As long as @props.datetime stays same, we don't have to recompute our output.
   // memoizing like this beat React.addons.PureRenderMixin 3x
-  render = _.memoize(
+  render = memoize(
     () => {
       // Separate props not used by the `time` element
       const {prefixMobile, showTime, ...timeElementProps} = this.props
@@ -53,7 +53,7 @@ class FriendlyDatetime extends Component {
       if (!datetime) {
         return <time />
       }
-      if (!_.isDate(datetime)) {
+      if (!isDate(datetime)) {
         datetime = tz.parse(datetime)
       }
       const fudged = $.fudgeDateForProfileTimezone(datetime)

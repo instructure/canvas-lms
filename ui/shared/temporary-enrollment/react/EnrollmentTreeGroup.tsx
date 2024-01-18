@@ -28,7 +28,8 @@ import {createAnalyticPropsGenerator} from './util/analytics'
 import type {NodeStructure} from './types'
 import {ENROLLMENT_TREE_ICON_OFFSET, ENROLLMENT_TREE_SPACING, MODULE_NAME} from './types'
 import type {Spacing} from '@instructure/emotion'
-import RoleMismatchToolTipWrapper from './RoleMismatchToolTipWrapper'
+import ToolTipWrapper from './ToolTipWrapper'
+import RoleMismatchToolTip from './RoleMismatchToolTip'
 
 const I18n = useI18nScope('temporary_enrollment')
 
@@ -183,7 +184,9 @@ export function EnrollmentTreeGroup(props: Props) {
                 </Flex.Item>
                 {props.isMismatch ? (
                   <Flex.Item>
-                    <RoleMismatchToolTipWrapper />
+                    <ToolTipWrapper positionTop={ENROLLMENT_TREE_ICON_OFFSET}>
+                      <RoleMismatchToolTip />
+                    </ToolTipWrapper>
                   </Flex.Item>
                 ) : null}
               </Flex>

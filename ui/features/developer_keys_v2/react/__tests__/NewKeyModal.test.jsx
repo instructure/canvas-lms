@@ -621,7 +621,9 @@ describe('receiving an HTTP response', () => {
           ],
         },
       })
-      expect(flashStub).toHaveBeenCalledWith('Tool configuration must have public jwk or public jwk url')
+      expect(flashStub).toHaveBeenCalledWith(
+        'Tool configuration must have public jwk or public jwk url'
+      )
       expect(closeModal).not.toHaveBeenCalled()
       done()
     })

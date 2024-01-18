@@ -20,12 +20,10 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 import $ from 'jquery'
-import _ from '@instructure/lodash-underscore'
-import {extend} from 'lodash'
+import {extend, omit} from 'lodash'
 import 'jquery-qtip'
 import ScreenReaderContent from '@canvas/quiz-legacy-client-apps/react/components/screen_reader_content'
 
-const omit = _.omit
 const POPUP_PROPS = [
   'content',
   'popupOptions',

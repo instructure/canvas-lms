@@ -42,6 +42,8 @@ export interface DateDetailsOverride {
   lock_at: string | null
   all_day?: boolean
   all_day_date?: string | null
+  context_module_id?: string | null
+  context_module_name?: string | null
 }
 
 export interface ItemAssignToCardSpec {
@@ -54,6 +56,8 @@ export interface ItemAssignToCardSpec {
   lock_at: string | null
   selectedAssigneeIds: string[]
   defaultOptions?: string[]
+  contextModuleId?: string | null
+  contextModuleName?: string | null
 }
 
 export interface DateDetails extends BaseDateDetails {

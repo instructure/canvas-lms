@@ -18,7 +18,7 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import htmlEscape from 'html-escape'
+import htmlEscape from '@instructure/html-escape'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.instructure_forms' /* formSubmit */
 import 'jqueryui/dialog'
@@ -139,7 +139,9 @@ $(document).ready(function () {
     event.preventDefault()
     const result = await showConfirmationDialog({
       label: I18n.t('Confirm Deletion'),
-      body: I18n.t('Are you sure you want to permanently remove the user from ALL accounts'),
+      body: I18n.t(
+        'Are you sure you want to remove this user from ALL accounts? The user will not only be deleted, but will be marked for PERMANENT deletion.'
+      ),
     })
     if (!result) {
       return
@@ -148,7 +150,7 @@ $(document).ready(function () {
     $.ajaxJSON(
       $link.attr('href'),
       'DELETE',
-      {},
+      {delete_me_frd: true},
       _data => {
         $.flashMessage(I18n.t('User removed successfully'))
       },

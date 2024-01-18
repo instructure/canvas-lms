@@ -55,7 +55,7 @@ module Api::V1::ContextModule
     count = tags.count
     hash["items_count"] = count
     hash["items_url"] = polymorphic_url([:api_v1, context_module.context, context_module, :items])
-    if includes.include?("items") && count <= Setting.get("api_max_per_page", "50").to_i
+    if includes.include?("items") && count <= Api::MAX_PER_PAGE
       if opts[:search_term].present? && !context_module.matches_attribute?(:name, opts[:search_term])
         tags = ContentTag.search_by_attribute(tags, :title, opts[:search_term])
         return nil if tags.count == 0

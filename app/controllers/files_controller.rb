@@ -831,7 +831,7 @@ class FilesController < ApplicationController
       # request to get the data.
       # Protect ourselves against reading huge files into memory -- if the
       # attachment is too big, don't return it.
-      if @attachment.size > Setting.get("attachment_json_response_max_size", 1.megabyte.to_s).to_i
+      if @attachment.size > 1.megabyte
         render json: { error: t("errors.too_large", "The file is too large to edit") }
         return
       end

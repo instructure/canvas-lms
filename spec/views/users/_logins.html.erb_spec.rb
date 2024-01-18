@@ -83,7 +83,7 @@ describe "users/_logins" do
       assign(:current_user, sally)
       assign(:user, bob)
       render
-      expect(response).to have_tag("a.add_pseudonym_link")
+      expect(response).to have_tag("a.add_pseudonym_link", with: { "data-can-manage-sis" => "true" })
     end
 
     it "does not display when user lacks permission to create pseudonym" do

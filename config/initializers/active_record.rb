@@ -1284,14 +1284,7 @@ ActiveRecord::Relation.class_eval do
 
   def update_all_locked_in_order(lock_type: :no_key_update, **updates)
     locked_scope = lock(lock_type).order(primary_key.to_sym)
-    if Setting.get("update_all_locked_in_order_subquery", "true") == "true"
-      unscoped.where(primary_key => locked_scope).update_all(updates)
-    else
-      transaction do
-        ids = locked_scope.pluck(primary_key)
-        unscoped.where(primary_key => ids).update_all(updates) unless ids.empty?
-      end
-    end
+    unscoped.where(primary_key => locked_scope).update_all(updates)
   end
 
   def touch_all(*names, time: nil)
@@ -1301,12 +1294,8 @@ ActiveRecord::Relation.class_eval do
   end
 
   def touch_all_skip_locked(*names, time: nil)
-    if Setting.get("touch_all_skip_locked_enabled", "true") == "true"
-      activate do |relation|
-        relation.update_all_locked_in_order(**relation.klass.touch_attributes_with_time(*names, time:), lock_type: :no_key_update_skip_locked)
-      end
-    else
-      touch_all(*names, time:)
+    activate do |relation|
+      relation.update_all_locked_in_order(**relation.klass.touch_attributes_with_time(*names, time:), lock_type: :no_key_update_skip_locked)
     end
   end
 

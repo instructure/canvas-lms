@@ -527,12 +527,14 @@ describe "discussions" do
         wait_for_ajaximations
 
         dt = DiscussionTopic.last
+
         expect(dt.title).to eq title
         expect(dt.message).to include message
         expect(dt.require_initial_post).to be false
         expect(dt.delayed_post_at).to be_nil
         expect(dt.lock_at).to be_nil
         expect(dt.anonymous_state).to be_nil
+        expect(dt.is_anonymous_author).to be false
         expect(dt).to be_published
 
         # Verify that the discussion topic redirected the page to the new discussion topic
@@ -926,6 +928,37 @@ describe "discussions" do
         expect(dt.assignment.name).to eq title
       end
 
+      it "creates a discussion topic with selected grading scheme/standard" do
+        grading_standard = course.grading_standards.create!(title: "Win/Lose", data: [["Winner", 0.94], ["Loser", 0]])
+
+        get "/courses/#{course.id}/discussion_topics/new"
+
+        title = "Graded Discussion Topic with letter grade type"
+        message = "replying to topic"
+
+        f("input[placeholder='Topic Title']").send_keys title
+        type_in_tiny("textarea", message)
+
+        force_click('input[type=checkbox][value="graded"]')
+        wait_for_ajaximations
+
+        f("input[data-testid='display-grade-input']").click
+        ffj("span:contains('Letter Grade')").last.click
+        expect(fj("span:contains('Manage All Grading Schemes')").present?).to be_truthy
+
+        ffj("span:contains('Default Canvas Grading Scheme')").last.click
+        fj("option:contains('#{grading_standard.title}')").click
+
+        f("button[data-testid='save-and-publish-button']").click
+        wait_for_ajaximations
+
+        dt = DiscussionTopic.last
+
+        expect(dt.title).to eq title
+        expect(dt.assignment.name).to eq title
+        expect(dt.assignment.grading_standard_id).to eq grading_standard.id
+      end
+
       it "edits a topic with an assignment with sync to sis" do
         @account = @course.root_account
         @account.set_feature_flag! "post_grades", "on"
@@ -980,22 +1013,51 @@ describe "discussions" do
         expect(fj("body:contains('Groups can only be part of the actively selected group set.')")).to be_present
       end
 
-      it "Post to section validation works correctly" do
-        get "/courses/#{course.id}/discussion_topics/new"
+      context "discussion form validations" do
+        it "Post to section validation works correctly" do
+          get "/courses/#{course.id}/discussion_topics/new"
 
-        # Add a title, so that we know that the empty post to field is causing it to not submit
-        title = "Graded Discussion Topic with Peer Reviews"
-        f("input[placeholder='Topic Title']").send_keys title
+          # Add a title, so that we know that the empty post to field is causing it to not submit
+          title = "Graded Discussion Topic with Peer Reviews"
+          f("input[placeholder='Topic Title']").send_keys title
 
-        fj("button:contains('All Sections')").click
-        # Verify that the error message "A section is required" appears
-        expect(fj("body:contains('A section is required')")).to be_present
+          fj("button:contains('All Sections')").click
+          # Verify that the error message "A section is required" appears
+          expect(fj("body:contains('A section is required')")).to be_present
 
-        # Verify that you can not submit the form
-        f("button[data-testid='save-and-publish-button']").click
-        wait_for_ajaximations
-        # Verify that no redirect happened
-        expect(driver.current_url).to end_with("/courses/#{course.id}/discussion_topics/new")
+          # Verify that you can not submit the form
+          f("button[data-testid='save-and-publish-button']").click
+          wait_for_ajaximations
+          # Verify that no redirect happened
+          expect(driver.current_url).to end_with("/courses/#{course.id}/discussion_topics/new")
+        end
+
+        it "Due Date validations work" do
+          get "/courses/#{course.id}/discussion_topics/new"
+
+          # Add a title, so that we know that the empty post to field is causing it to not submit
+          title = "Graded Discussion Topic with due date"
+          f("input[placeholder='Topic Title']").send_keys title
+
+          force_click('input[type=checkbox][value="graded"]')
+
+          due_at_input = f("input[placeholder='Select Assignment Due Date']")
+          available_from_input = f("input[placeholder='Select Assignment Available From Date']")
+          available_until_input = f("input[placeholder='Select Assignment Available Until Date']")
+
+          set_datetime_input(due_at_input, format_date_for_view(10.days.from_now))
+          set_datetime_input(available_from_input, format_date_for_view(5.days.from_now))
+          set_datetime_input(available_until_input, format_date_for_view(5.days.ago))
+
+          expect(fj("span:contains('Due date must not be after the Available Until date.')")).to be_present
+          expect(ffj("span:contains('Unlock date cannot be after lock date')").count).not_to be 0
+
+          # Verify that you can not submit the form
+          f("button[data-testid='save-and-publish-button']").click
+          wait_for_ajaximations
+          # Verify that no redirect happened
+          expect(driver.current_url).to end_with("/courses/#{course.id}/discussion_topics/new")
+        end
       end
 
       context "assignment overrides" do

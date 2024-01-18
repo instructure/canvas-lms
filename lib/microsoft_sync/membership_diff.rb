@@ -46,10 +46,14 @@ module MicrosoftSync
       end
     end
 
+    def local_owners_or_members
+      @local_owners | @local_members
+    end
+
     def additions
       # Admins/teachers need to be both owners and members in the remote group
       {
-        members: ((@local_members | @local_owners) - @remote_members).to_a,
+        members: (local_owners_or_members - @remote_members).to_a,
         owners: (@local_owners - @remote_owners).to_a
       }
     end

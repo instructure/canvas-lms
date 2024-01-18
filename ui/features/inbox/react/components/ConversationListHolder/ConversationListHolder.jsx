@@ -208,6 +208,7 @@ export const ConversationListHolder = ({
 
   // Render individual menu items
   const renderMenuItem = (conversation, isLast) => {
+    if (!conversation?.messages?.length) return null
     return (
       <ConversationListItem
         id={conversation._id}
@@ -256,9 +257,13 @@ export const ConversationListHolder = ({
       return renderLoading()
     }
 
-    return menuData.map(conversation => {
-      return renderMenuItem(conversation, conversation?.isLast)
-    })
+    const conversationListItems = menuData
+      .map(conversation => {
+        return renderMenuItem(conversation, conversation?.isLast)
+      })
+      .filter(item => item !== null)
+
+    return conversationListItems.length ? conversationListItems : renderNoResultsFound()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [menuData])
 

@@ -126,9 +126,13 @@ describe('UserSuspendLink::', () => {
       fetchMock.put(route, 200)
     })
 
-    afterAll(fetchMock.restore)
+    afterAll(() => {
+      fetchMock.restore()
+    })
 
-    afterEach(fetchMock.resetHistory)
+    afterEach(() => {
+      fetchMock.resetHistory()
+    })
 
     it('makes no API call if the modal is canceled', async () => {
       const {getByText, findByTestId} = render(<UserSuspendLink />)

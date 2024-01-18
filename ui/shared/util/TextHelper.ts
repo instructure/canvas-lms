@@ -16,9 +16,8 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-import $ from 'jquery'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import htmlEscape from 'html-escape'
+import htmlEscape, {raw} from '@instructure/html-escape'
 import TwitterText from 'twitter-text'
 
 const I18n = useI18nScope('lib.text_helper')
@@ -31,7 +30,7 @@ export function quoteClump(lines: string[]) {
     I18n.t('quoted_text_toggle', 'show quoted text')
   )}</a> \
 <div class='quoted_text' style='display: none;'> \
-${$.raw(lines.join('\n'))} \
+${raw(lines.join('\n'))} \
 </div> \
 </div>`
 }

@@ -78,10 +78,10 @@ module Lti
           body = {
             iss: ISS,
             sub:,
-            exp: Setting.get("lti.oauth2.access_token.exp", 1.hour).to_i.seconds.from_now,
+            exp: 1.hour.from_now,
             aud:,
             iat: Time.zone.now.to_i,
-            nbf: Setting.get("lti.oauth2.access_token.nbf", 30.seconds).to_i.seconds.ago,
+            nbf: 30.seconds.ago,
             jti: SecureRandom.uuid,
             shard_id:
           }

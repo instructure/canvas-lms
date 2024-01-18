@@ -83,8 +83,8 @@ describe Lti::Messages::ResourceLinkRequest do
       context "when link-level custom params are given in resource_link" do
         it "merges them in with tool/placement parameters" do
           expect(jws["https://purl.imsglobal.org/spec/lti/claim/custom"]).to eq(
-            "link_has_expansion2" => assignment.id,
-            "has_expansion" => user.id,
+            "link_has_expansion2" => assignment.id.to_s,
+            "has_expansion" => user.id.to_s,
             "no_expansion" => "overrides tool param!"
           )
         end
@@ -151,8 +151,8 @@ describe Lti::Messages::ResourceLinkRequest do
             }
           )
           expect(jws["https://purl.imsglobal.org/spec/lti/claim/custom"]).to eq(
-            "link_has_expansion" => assignment.id,
-            "has_expansion" => user.id,
+            "link_has_expansion" => assignment.id.to_s,
+            "has_expansion" => user.id.to_s,
             "no_expansion" => "overrides tool param"
           )
         end
@@ -165,7 +165,7 @@ describe Lti::Messages::ResourceLinkRequest do
           )
 
           expect(jws["https://purl.imsglobal.org/spec/lti/claim/custom"]).to eq(
-            "has_expansion" => user.id,
+            "has_expansion" => user.id.to_s,
             "no_expansion" => "foo"
           )
         end

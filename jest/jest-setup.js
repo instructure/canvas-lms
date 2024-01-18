@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import 'cross-fetch/polyfill'
+import {TextDecoder, TextEncoder} from 'util'
 import CoreTranslations from '../public/javascripts/translations/en.json'
 import Enzyme from 'enzyme'
 import Adapter from 'enzyme-adapter-react-16'
@@ -84,7 +86,7 @@ window.ENV = {
   use_rce_enhancements: true,
   FEATURES: {
     extended_submission_state: true,
-  }
+  },
 }
 
 Enzyme.configure({adapter: new Adapter()})
@@ -264,3 +266,6 @@ Document.prototype.createRange =
       },
     }
   }
+
+global.TextEncoder = TextEncoder
+global.TextDecoder = TextDecoder

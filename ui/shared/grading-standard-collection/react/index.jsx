@@ -21,8 +21,7 @@ import update from 'immutability-helper'
 import GradingStandard from './gradingStandard'
 import $ from 'jquery'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import _ from 'underscore'
-import {map} from 'lodash'
+import {map, each, intersection, find} from 'lodash'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 
 const I18n = useI18nScope('external_toolsgradingStandardCollection')
@@ -62,7 +61,7 @@ class GradingStandardCollection extends React.Component {
   }
 
   getStandardById = id =>
-    _.find(this.state.standards, standard => standard.grading_standard.id === id)
+    find(this.state.standards, standard => standard.grading_standard.id === id)
 
   standardNotCreated = gradingStandard => gradingStandard.id === -1
 
@@ -82,7 +81,7 @@ class GradingStandardCollection extends React.Component {
     }
   }
 
-  anyStandardBeingEdited = () => !!_.find(this.state.standards, standard => standard.editing)
+  anyStandardBeingEdited = () => !!find(this.state.standards, standard => standard.editing)
 
   saveGradingStandard = standard => {
     const newStandards = $.extend(true, [], this.state.standards)
@@ -126,7 +125,7 @@ class GradingStandardCollection extends React.Component {
 
   dataFormattedForCreate = standard => {
     const formattedData = {grading_standard: standard}
-    _.each(standard.data, (dataRow, i) => {
+    each(standard.data, (dataRow, i) => {
       const name = dataRow[0]
       const value = dataRow[1]
       formattedData.grading_standard.data[i] = [
@@ -139,7 +138,7 @@ class GradingStandardCollection extends React.Component {
 
   dataFormattedForUpdate = standard => {
     const formattedData = {grading_standard: {title: standard.title, standard_data: {}}}
-    _.each(standard.data, (dataRow, i) => {
+    each(standard.data, (dataRow, i) => {
       const name = dataRow[0]
       const value = dataRow[1]
       formattedData.grading_standard.standard_data[`scheme_${i}`] = {
@@ -172,7 +171,7 @@ class GradingStandardCollection extends React.Component {
   }
 
   hasAdminOrTeacherRole = () =>
-    _.intersection(ENV.current_user_roles, ['teacher', 'admin']).length > 0
+    intersection(ENV.current_user_roles, ['teacher', 'admin']).length > 0
 
   getAddButtonCssClasses = () => {
     let classes = 'Button pull-right add_standard_button'

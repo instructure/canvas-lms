@@ -22,6 +22,7 @@ describe GradebooksController do
   include TextHelper
 
   before :once do
+    Account.site_admin.disable_feature!(:archived_grading_schemes)
     course_with_teacher active_all: true
     @teacher_enrollment = @enrollment
     student_in_course active_all: true
@@ -1379,10 +1380,6 @@ describe GradebooksController do
 
       describe "performance_controls" do
         let(:performance_controls) { assigns[:js_env][:GRADEBOOK_OPTIONS][:performance_controls] }
-
-        before(:once) do
-          Setting.set("api_max_per_page", 100)
-        end
 
         it "includes active_request_limit" do
           Setting.set("gradebook.active_request_limit", 20)

@@ -20,8 +20,7 @@
 
 import {extend} from '@canvas/backbone/utils'
 import $ from 'jquery'
-import _ from 'underscore'
-import {map} from 'lodash'
+import {map, find, filter, includes, some} from 'lodash'
 import {Model} from '@canvas/backbone'
 import DefaultUrlMixin from '@canvas/backbone/DefaultUrlMixin'
 import TurnitinSettings from '../../TurnitinSettings'
@@ -53,12 +52,13 @@ const isAdmin = function () {
 
 // must check canManage because current_user_roles will include roles from other enrolled courses
 const isStudent = function () {
-  return _.includes(ENV.current_user_roles, 'student') && !canManage()
+  return (ENV.current_user_roles || []).includes('student') && !canManage()
 }
 
 extend(Assignment, Model)
 
 function Assignment() {
+  this.abGuid = this.abGuid.bind(this)
   this.quizzesRespondusEnabled = this.quizzesRespondusEnabled.bind(this)
   this.showGradersAnonymousToGradersCheckbox = this.showGradersAnonymousToGradersCheckbox.bind(this)
   this.pollUntilFinished = this.pollUntilFinished.bind(this)
@@ -198,7 +198,6 @@ function Assignment() {
   this.unlockAt = this.unlockAt.bind(this)
   this.dueAt = this.dueAt.bind(this)
   this.assignmentType = this.assignmentType.bind(this)
-  this.isAssignment = this.isAssignment.bind(this)
   this.isNotGraded = this.isNotGraded.bind(this)
   this.defaultToolUrl = this.defaultToolUrl.bind(this)
   this.defaultToolName = this.defaultToolName.bind(this)
@@ -287,16 +286,6 @@ Assignment.prototype.isNotGraded = function () {
   return this._hasOnlyType('not_graded')
 }
 
-Assignment.prototype.isAssignment = function () {
-  return !_.includes(
-    this._submissionTypes(),
-    'online_quiz',
-    'discussion_topic',
-    'not_graded',
-    'external_tool'
-  )
-}
-
 Assignment.prototype.assignmentType = function (type) {
   if (!(arguments.length > 0)) {
     return this._getAssignmentType()
@@ -306,6 +295,13 @@ Assignment.prototype.assignmentType = function (type) {
   } else {
     return this.set('submission_types', [type])
   }
+}
+
+Assignment.prototype.abGuid = function (ab_guid) {
+  if (!(arguments.length > 0)) {
+    return this.get('ab_guid')
+  }
+  return this.set('ab_guid', ab_guid)
 }
 
 Assignment.prototype.dueAt = function (date) {
@@ -390,9 +386,7 @@ Assignment.prototype.canDelete = function () {
 }
 
 Assignment.prototype.canMove = function () {
-  return (
-    !this.inClosedGradingPeriod() && !_.includes(this.frozenAttributes(), 'assignment_group_id')
-  )
+  return !this.inClosedGradingPeriod() && !includes(this.frozenAttributes(), 'assignment_group_id')
 }
 
 Assignment.prototype.freezeOnCopy = function () {
@@ -514,7 +508,7 @@ Assignment.prototype.selectedSubmissionTypeToolId = function () {
   const tool_id = (ref = this.get('external_tool_tag_attributes')) != null ? ref.content_id : void 0
   if (
     tool_id &&
-    _.find(this.submissionTypeSelectionTools(), function (tool) {
+    find(this.submissionTypeSelectionTools(), function (tool) {
       return tool_id === tool.id
     })
   ) {
@@ -523,14 +517,14 @@ Assignment.prototype.selectedSubmissionTypeToolId = function () {
 }
 
 Assignment.prototype.submissionType = function () {
-  const submissionTypes = this._submissionTypes()
-  if (_.includes(submissionTypes, 'none') || submissionTypes.length === 0) {
+  const submissionTypes = this._submissionTypes() || []
+  if (submissionTypes.length === 0 || submissionTypes.includes('none')) {
     return 'none'
-  } else if (_.includes(submissionTypes, 'on_paper')) {
+  } else if (submissionTypes.includes('on_paper')) {
     return 'on_paper'
-  } else if (_.includes(submissionTypes, 'external_tool')) {
+  } else if (submissionTypes.includes('external_tool')) {
     return 'external_tool'
-  } else if (_.includes(submissionTypes, 'default_external_tool')) {
+  } else if (submissionTypes.includes('default_external_tool')) {
     return 'external_tool'
   } else {
     return 'online'
@@ -538,24 +532,24 @@ Assignment.prototype.submissionType = function () {
 }
 
 Assignment.prototype.expectsSubmission = function () {
-  const submissionTypes = this._submissionTypes()
+  const submissionTypes = this._submissionTypes() || []
   return (
     submissionTypes.length > 0 &&
-    !_.includes(submissionTypes, '') &&
-    !_.includes(submissionTypes, 'none') &&
-    !_.includes(submissionTypes, 'not_graded') &&
-    !_.includes(submissionTypes, 'on_paper') &&
-    !_.includes(submissionTypes, 'external_tool')
+    !submissionTypes.includes('') &&
+    !submissionTypes.includes('none') &&
+    !submissionTypes.includes('not_graded') &&
+    !submissionTypes.includes('on_paper') &&
+    !submissionTypes.includes('external_tool')
   )
 }
 
 Assignment.prototype.allowedToSubmit = function () {
-  const submissionTypes = this._submissionTypes()
+  const submissionTypes = this._submissionTypes() || []
   return (
     this.expectsSubmission() &&
     !this.get('locked_for_user') &&
-    !_.includes(submissionTypes, 'online_quiz') &&
-    !_.includes(submissionTypes, 'attendance')
+    !submissionTypes.includes('online_quiz') &&
+    !submissionTypes.includes('attendance')
   )
 }
 
@@ -569,27 +563,32 @@ Assignment.prototype.withoutGradedSubmission = function () {
 }
 
 Assignment.prototype.acceptsOnlineUpload = function () {
-  return !!_.includes(this._submissionTypes(), 'online_upload')
+  const submissionTypes = this._submissionTypes() || []
+  return submissionTypes.includes('online_upload')
 }
 
 Assignment.prototype.acceptsAnnotatedDocument = function () {
-  return !!_.includes(this._submissionTypes(), 'student_annotation')
+  const submissionTypes = this._submissionTypes() || []
+  return submissionTypes.includes('student_annotation')
 }
 
 Assignment.prototype.acceptsOnlineURL = function () {
-  return !!_.includes(this._submissionTypes(), 'online_url')
+  const submissionTypes = this._submissionTypes() || []
+  return submissionTypes.includes('online_url')
 }
 
 Assignment.prototype.acceptsMediaRecording = function () {
-  return !!_.includes(this._submissionTypes(), 'media_recording')
+  const submissionTypes = this._submissionTypes() || []
+  return submissionTypes.includes('media_recording')
 }
 
 Assignment.prototype.acceptsOnlineTextEntries = function () {
-  return !!_.includes(this._submissionTypes(), 'online_text_entry')
+  const submissionTypes = this._submissionTypes() || []
+  return submissionTypes.includes('online_text_entry')
 }
 
 Assignment.prototype.isOnlineSubmission = function () {
-  return _.some(this._submissionTypes(), function (thing) {
+  return (this._submissionTypes() || []).some(function (thing) {
     return (
       thing === 'online' ||
       thing === 'online_text_entry' ||
@@ -754,7 +753,7 @@ Assignment.prototype.canGroup = function () {
 
 Assignment.prototype.isPlagiarismPlatformLocked = function () {
   return (
-    this.get('has_submitted_submissions') || _.includes(this.frozenAttributes(), 'submission_types')
+    this.get('has_submitted_submissions') || includes(this.frozenAttributes(), 'submission_types')
   )
 }
 
@@ -1063,14 +1062,9 @@ Assignment.prototype.nonBaseDates = function () {
   if (!dateGroups) {
     return false
   }
-  const withouBase = _.filter(
-    dateGroups.models,
-    (function (_this) {
-      return function (dateGroup) {
-        return dateGroup && !dateGroup.get('base')
-      }
-    })(this)
-  )
+  const withouBase = filter(dateGroups.models, function (dateGroup) {
+    return dateGroup && !dateGroup.get('base')
+  })
   return withouBase.length > 0
 }
 
@@ -1167,11 +1161,12 @@ Assignment.prototype.failedToImport = function () {
 }
 
 Assignment.prototype.submissionTypesFrozen = function () {
-  return _.includes(this.frozenAttributes(), 'submission_types')
+  return includes(this.frozenAttributes(), 'submission_types')
 }
 
 Assignment.prototype.toView = function () {
   const fields = [
+    'abGuid',
     'acceptsAnnotatedDocument',
     'acceptsMediaRecording',
     'acceptsOnlineTextEntries',
@@ -1317,13 +1312,8 @@ Assignment.prototype.inGradingPeriod = function (gradingPeriod) {
   const dateGroups = this.get('all_dates')
   const gradingPeriodsHelper = new GradingPeriodsHelper(gradingPeriod)
   if (dateGroups) {
-    return _.some(
-      dateGroups.models,
-      (function (_this) {
-        return function (dateGroup) {
-          return gradingPeriodsHelper.isDateInGradingPeriod(dateGroup.dueAt(), gradingPeriod.id)
-        }
-      })(this)
+    return some(dateGroups.models, dateGroup =>
+      gradingPeriodsHelper.isDateInGradingPeriod(dateGroup.dueAt(), gradingPeriod.id)
     )
   } else {
     return gradingPeriodsHelper.isDateInGradingPeriod(tz.parse(this.dueAt()), gradingPeriod.id)
@@ -1407,17 +1397,17 @@ Assignment.prototype._filterFrozenAttributes = function (data) {
   const ref = this.attributes
   for (key in ref) {
     if (!hasProp.call(ref, key)) continue
-    if (_.includes(this.frozenAttributes(), key)) {
+    if (includes(this.frozenAttributes(), key)) {
       delete data[key]
     }
   }
-  if (_.includes(this.frozenAttributes(), 'title')) {
+  if (includes(this.frozenAttributes(), 'title')) {
     delete data.name
   }
-  if (_.includes(this.frozenAttributes(), 'group_category_id')) {
+  if (includes(this.frozenAttributes(), 'group_category_id')) {
     delete data.grade_group_students_individually
   }
-  if (_.includes(this.frozenAttributes(), 'peer_reviews')) {
+  if (includes(this.frozenAttributes(), 'peer_reviews')) {
     delete data.automatic_peer_reviews
     delete data.peer_review_count
     delete data.peer_reviews_assign_at

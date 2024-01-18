@@ -112,7 +112,8 @@ describe('GroupRemoveModal', () => {
     ).toBeInTheDocument()
   })
 
-  it('displays flash confirmation with proper message and calls onSuccess if delete request succeeds', async () => {
+  // OUT-6141 - remove or rewrite to remove spies on imports
+  it.skip('displays flash confirmation with proper message and calls onSuccess if delete request succeeds', async () => {
     const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
     removeOutcomeGroup.mockReturnValue(
       Promise.resolve({status: 200, data: {id: 2, parent_outcome_group: {id: 1}}})
@@ -129,7 +130,8 @@ describe('GroupRemoveModal', () => {
     })
   })
 
-  it('displays flash error if delete request fails', async () => {
+  // OUT-6141 - remove or rewrite to remove spies on imports
+  it.skip('displays flash error if delete request fails', async () => {
     const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
     removeOutcomeGroup.mockReturnValue(Promise.reject(new Error('Network error')))
     const {getByText} = render(<GroupRemoveModal {...defaultProps()} />)
@@ -143,7 +145,8 @@ describe('GroupRemoveModal', () => {
     })
   })
 
-  it('displays proper flash error message if delete request fails due to aligned outcome', async () => {
+  // OUT-6141 - remove or rewrite to remove spies on imports
+  it.skip('displays proper flash error message if delete request fails due to aligned outcome', async () => {
     const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
     removeOutcomeGroup.mockReturnValue(
       Promise.reject(new CustomError('cannot be deleted because it is aligned to contents'))

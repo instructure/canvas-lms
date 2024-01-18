@@ -126,12 +126,12 @@ describe('ItemAssignToTray', () => {
   })
 
   it('renders a quiz', () => {
-    const {getByText} = renderComponent({itemType: 'quiz'})
+    const {getByText} = renderComponent({itemType: 'quiz', iconType: 'quiz'})
     expect(getByText('Quiz | 10 pts')).toBeInTheDocument()
   })
 
   it('renders a new quiz', () => {
-    const {getByText} = renderComponent({itemType: 'lti-quiz'})
+    const {getByText} = renderComponent({itemType: 'lti-quiz', iconType: 'lti-quiz'})
     expect(getByText('Quiz | 10 pts')).toBeInTheDocument()
   })
 

@@ -20,15 +20,16 @@
 import React, {useEffect, useState} from 'react'
 import ReactDOM, {createPortal} from 'react-dom'
 
-interface PseudonymEditArgs {
+interface PseudonymArgs {
   canEditSisUserId: boolean
-  integrationId: number
-  sisUserId: number
+  integrationId?: string
+  sisUserId?: string
 }
 
 interface JQInterface {
   onCancel: () => void
-  onEdit: (args?: PseudonymEditArgs) => void
+  onEdit: (args?: PseudonymArgs) => void
+  onAdd: (args?: PseudonymArgs) => void
 }
 
 declare global {
@@ -42,7 +43,8 @@ declare global {
 window.canvas_pseudonyms = {
   jqInterface: {
     onCancel() {},
-    onEdit(_args?: PseudonymEditArgs) {},
+    onEdit(_args?: PseudonymArgs) {},
+    onAdd(_args?: PseudonymArgs) {},
   },
 }
 
@@ -84,10 +86,13 @@ interface ExternalIdsProps {
 }
 const ExternalIds = ({integrationIdLabel, jqInterface, sisUserIdLabel}: ExternalIdsProps) => {
   const [canEditSisUserId, setCanEditSisUserId] = useState<boolean | undefined>(false)
-  const [integrationId, setIntegrationId] = useState<number | undefined>()
-  const [sisUserId, setSisUserId] = useState<number | undefined>()
+  const [integrationId, setIntegrationId] = useState<string | undefined>()
+  const [sisUserId, setSisUserId] = useState<string | undefined>()
 
   useEffect(() => {
+    jqInterface.onAdd = args => {
+      setCanEditSisUserId(args?.canEditSisUserId)
+    }
     jqInterface.onEdit = args => {
       setCanEditSisUserId(args?.canEditSisUserId)
       setIntegrationId(args?.integrationId)
@@ -99,10 +104,11 @@ const ExternalIds = ({integrationIdLabel, jqInterface, sisUserIdLabel}: External
     }
 
     return () => {
+      jqInterface.onAdd = () => {}
       jqInterface.onEdit = () => {}
       jqInterface.onCancel = () => {}
     }
-  }, [jqInterface.onCancel, jqInterface.onEdit])
+  }, [jqInterface.onAdd, jqInterface.onCancel, jqInterface.onEdit])
 
   if (!canEditSisUserId) return <></>
 

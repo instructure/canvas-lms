@@ -103,8 +103,7 @@ class AssignmentsController < ApplicationController
 
   def render_a2_student_view?
     @current_user.present? && @assignment.a2_enabled? && !can_do(@context, @current_user, :read_as_admin) &&
-      (!params.key?(:assignments_2) || value_to_boolean(params[:assignments_2])) &&
-      (!@context_enrollment&.observer? || Setting.get("assignments_2_observer_view", "false") == "true")
+      (!params.key?(:assignments_2) || value_to_boolean(params[:assignments_2]))
   end
 
   def a2_active_student_and_enrollment
@@ -252,6 +251,8 @@ class AssignmentsController < ApplicationController
     GuardRail.activate(:secondary) do
       @assignment ||= @context.assignments.find(params[:id])
 
+      js_env({ ASSIGNMENT_POINTS_POSSIBLE: nil })
+
       if @assignment.deleted?
         flash[:notice] = t "notices.assignment_delete", "This assignment has been deleted"
         redirect_to named_context_url(@context, :context_assignments_url)
@@ -277,7 +278,7 @@ class AssignmentsController < ApplicationController
         if @assignment.submission_types == "external_tool" && Account.site_admin.feature_enabled?(:external_tools_for_a2) && @unlocked
           @tool = ContextExternalTool.from_assignment(@assignment)
 
-          js_env({ LTI_TOOL: "true" })
+          js_env({ LTI_TOOL: "true", ASSIGNMENT_POINTS_POSSIBLE: @assignment.points_possible })
         end
 
         unless @assignment.new_record? || (@locked && !@locked[:can_view])
@@ -302,15 +303,13 @@ class AssignmentsController < ApplicationController
         log_asset_access(@assignment, "assignments", @assignment.assignment_group)
 
         if render_a2_student_view?
-          if Setting.get("assignments_2_observer_view", "false") == "true"
-            js_env({ OBSERVER_OPTIONS: {
-                     OBSERVED_USERS_LIST: observed_users(@current_user, session, @context.id),
-                     CAN_ADD_OBSERVEE: @current_user
-                                       .profile
-                                       .tabs_available(@current_user, root_account: @domain_root_account)
-                                       .any? { |t| t[:id] == UserProfile::TAB_OBSERVEES }
-                   } })
-          end
+          js_env({ OBSERVER_OPTIONS: {
+                   OBSERVED_USERS_LIST: observed_users(@current_user, session, @context.id),
+                   CAN_ADD_OBSERVEE: @current_user
+                                      .profile
+                                      .tabs_available(@current_user, root_account: @domain_root_account)
+                                      .any? { |t| t[:id] == UserProfile::TAB_OBSERVEES }
+                 } })
 
           student_to_view, active_enrollment = a2_active_student_and_enrollment
           if student_to_view.present?
@@ -579,6 +578,11 @@ class AssignmentsController < ApplicationController
         return
       end
 
+      if @context.root_account.feature_enabled?(:instui_nav)
+        add_crumb(@assignment.title, polymorphic_url([@context, @assignment]))
+        add_crumb(t("Peer Reviews"))
+      end
+
       visible_students = @context.students_visible_to(@current_user).not_fake_student
       visible_students_assigned_to_assignment = visible_students.joins(:submissions).where(submissions: { assignment: @assignment }).merge(Submission.active)
 
@@ -782,9 +786,9 @@ class AssignmentsController < ApplicationController
 
       if @context.root_account.feature_enabled?(:instui_nav)
         if on_quizzes_page? && params.key?(:quiz_lti)
-          add_crumb("Edit Quiz") unless @assignment.new_record?
+          add_crumb(t("Edit Quiz")) unless @assignment.new_record?
         else
-          add_crumb("Edit Assignment") unless @assignment.new_record?
+          add_crumb(t("Edit Assignment")) unless @assignment.new_record?
         end
       else
         add_crumb(@assignment.title, polymorphic_url([@context, @assignment])) unless @assignment.new_record?

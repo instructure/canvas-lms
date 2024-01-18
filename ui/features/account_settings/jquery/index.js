@@ -19,7 +19,7 @@
 import 'jqueryui/dialog'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import htmlEscape from 'html-escape'
+import htmlEscape from '@instructure/html-escape'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
 import axios from '@canvas/axios'
 import {setupCache} from 'axios-cache-adapter/src/index'

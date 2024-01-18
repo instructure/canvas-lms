@@ -18,10 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class Checkpoints::GroupOverrideCreatorService < ApplicationService
+  require_relative "discussion_checkpoint_error"
   include Checkpoints::DateOverrider
-
-  class GroupAssignmentRequiredError < StandardError; end
-  class SetIdRequiredError < StandardError; end
 
   def initialize(checkpoint:, override:)
     super()
@@ -31,10 +29,10 @@ class Checkpoints::GroupOverrideCreatorService < ApplicationService
 
   def call
     if @checkpoint.effective_group_category_id.nil?
-      raise GroupAssignmentRequiredError, "must be a group assignment in order to create group overrides"
+      raise Checkpoints::GroupAssignmentRequiredError, "must be a group assignment in order to create group overrides"
     end
 
-    group_id = @override.fetch(:set_id) { raise SetIdRequiredError, "set_id is required, but was not provided" }
+    group_id = @override.fetch(:set_id) { raise Checkpoints::SetIdRequiredError, "set_id is required, but was not provided" }
     group = @checkpoint.course.active_groups.where(group_category_id: @checkpoint.effective_group_category_id).find(group_id)
     override = create_override(assignment: @checkpoint, group:)
 

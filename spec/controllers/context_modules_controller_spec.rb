@@ -979,7 +979,7 @@ describe ContextModulesController do
       @assign = @course.assignments.create! title: "WHAT", points_possible: 123
       @tag = @mod.add_item(type: "assignment", id: @assign.id)
 
-      Setting.set("assignment_all_dates_too_many_threshold", "1")
+      stub_const("Api::V1::Assignment::ALL_DATES_LIMIT", 1)
 
       2.times do
         student = student_in_course(course: @course, active_all: true).user
@@ -1003,7 +1003,7 @@ describe ContextModulesController do
 
       @tag = @mod.add_item(type: "discussion_topic", id: @topic.id)
 
-      Setting.set("assignment_all_dates_too_many_threshold", "1")
+      stub_const("Api::V1::Assignment::ALL_DATES_LIMIT", 1)
 
       2.times do
         student = student_in_course(course: @course, active_all: true).user
@@ -1060,7 +1060,7 @@ describe ContextModulesController do
       @quiz = @course.quizzes.create!(title: "sad", due_at: 1.week.from_now, quiz_type: "survey")
       @tag = @mod.add_item(type: "quiz", id: @quiz.id)
 
-      Setting.set("assignment_all_dates_too_many_threshold", "1")
+      stub_const("Api::V1::Assignment::ALL_DATES_LIMIT", 1)
 
       2.times do
         student = student_in_course(course: @course, active_all: true).user

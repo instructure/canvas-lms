@@ -53,6 +53,7 @@ import GradingSchemeEditModal from './GradingSchemeEditModal'
 import {TextInput} from '@instructure/ui-text-input'
 import GradingSchemeCreateModal from './GradingSchemeCreateModal'
 import {Heading} from '@instructure/ui-heading'
+import GradingSchemeUsedLocationsModal from './GradingSchemeUsedLocationsModal'
 
 const I18n = useI18nScope('GradingSchemeManagement')
 
@@ -86,6 +87,7 @@ export const GradingSchemesManagement = ({
     GradingSchemeTemplateCardData | undefined
   >(undefined)
 
+  const [viewingUsedLocations, setViewingUsedLocations] = useState<boolean>(false)
   const [editing, setEditing] = useState<boolean>(false)
   const [selectedGradingScheme, setSelectedGradingScheme] = useState<GradingScheme | undefined>(
     undefined
@@ -101,6 +103,35 @@ export const GradingSchemesManagement = ({
   useEffect(() => {
     loadGradingSchemes(contextType, contextId)
       .then(gradingSchemes => {
+        if (archivedGradingSchemesEnabled) {
+          // TODO: remove this once used locations are available via API
+          gradingSchemes.forEach(gradingScheme => {
+            if (gradingScheme.used_locations === undefined) {
+              gradingScheme.used_locations = []
+            }
+            for (let i = 0; i < 6; i++) {
+              gradingScheme.used_locations.push({
+                id: Math.floor(Math.random() * 3) + 1,
+                name: `Course ${Math.floor(Math.random() * 100) + 1}`,
+                concluded: Math.random() > 0.5,
+                assignments: [
+                  {
+                    id: Math.floor(Math.random() * 10) + 1,
+                    title: `Assignment ${Math.floor(Math.random() * 100) + 1}`,
+                  },
+                  {
+                    id: Math.floor(Math.random() * 10) + 1,
+                    title: `Assignment ${Math.floor(Math.random() * 100) + 1}`,
+                  },
+                  {
+                    id: Math.floor(Math.random() * 10) + 1,
+                    title: `Assignment ${Math.floor(Math.random() * 100) + 1}`,
+                  },
+                ],
+              })
+            }
+          })
+        }
         setGradingSchemeCards(
           gradingSchemes.map(scheme => {
             return {
@@ -121,7 +152,13 @@ export const GradingSchemesManagement = ({
       .catch(error => {
         showFlashError(I18n.t('There was an error while loading the default grading scheme'))(error)
       })
-  }, [loadGradingSchemes, loadDefaultGradingScheme, contextType, contextId])
+  }, [
+    loadGradingSchemes,
+    loadDefaultGradingScheme,
+    contextType,
+    contextId,
+    archivedGradingSchemesEnabled,
+  ])
 
   const handleGradingSchemeDelete = async (gradingSchemeId: string) => {
     if (!gradingSchemeCards) return
@@ -251,6 +288,17 @@ export const GradingSchemesManagement = ({
         return gradingSchemeCard
       })
     )
+  }
+
+  function viewUsedLocations(gradingScheme: GradingScheme) {
+    setSelectedGradingScheme(gradingScheme)
+    setEditing(false)
+    setViewingUsedLocations(true)
+  }
+
+  function handleCancelViewUsedLocations() {
+    setViewingUsedLocations(false)
+    setSelectedGradingScheme(undefined)
   }
 
   function openGradingScheme(gradingScheme: GradingScheme) {
@@ -390,6 +438,7 @@ export const GradingSchemesManagement = ({
                 caption="Canvas Default Grading Schemes"
                 editGradingScheme={editGradingScheme}
                 openGradingScheme={openGradingScheme}
+                viewUsedLocations={viewUsedLocations}
                 handleGradingSchemeDelete={handleGradingSchemeDelete}
                 defaultScheme={true}
               />
@@ -404,11 +453,12 @@ export const GradingSchemesManagement = ({
                 gradingSchemeCards={gradingSchemeCards}
                 caption="Grading Schemes"
                 editGradingScheme={editGradingScheme}
+                viewUsedLocations={viewUsedLocations}
                 openGradingScheme={openGradingScheme}
                 handleGradingSchemeDelete={handleGradingSchemeDelete}
               />
               <GradingSchemeViewModal
-                open={selectedGradingScheme !== undefined && !editing}
+                open={selectedGradingScheme !== undefined && !editing && !viewingUsedLocations}
                 gradingScheme={selectedGradingScheme}
                 handleClose={() => setSelectedGradingScheme(undefined)}
                 handleGradingSchemeDelete={handleGradingSchemeDelete}
@@ -416,7 +466,7 @@ export const GradingSchemesManagement = ({
                 canManageScheme={canManageScheme}
               />
               <GradingSchemeEditModal
-                open={selectedGradingScheme !== undefined && editing}
+                open={selectedGradingScheme !== undefined && editing && !viewingUsedLocations}
                 gradingScheme={selectedGradingScheme}
                 handleCancelEdit={handleCancelEdit}
                 handleUpdateScheme={handleUpdateScheme}
@@ -432,6 +482,11 @@ export const GradingSchemesManagement = ({
                 defaultGradingSchemeTemplate={defaultGradingScheme}
                 defaultPointsGradingScheme={defaultPointsGradingScheme}
                 handleCancelCreate={handleCancelCreate}
+              />
+              <GradingSchemeUsedLocationsModal
+                open={selectedGradingScheme !== undefined && !editing && viewingUsedLocations}
+                handleClose={handleCancelViewUsedLocations}
+                usedLocations={selectedGradingScheme?.used_locations}
               />
             </>
           ) : (

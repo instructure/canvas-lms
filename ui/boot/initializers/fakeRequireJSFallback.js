@@ -69,6 +69,9 @@ if (!('require' in window)) {
         'things can change in any release and you are responsible for making sure your custom ' +
         'JavaScript that uses it continues to work.'
     )
+    if (deps.includes('underscore')) {
+      console.error("Support for require('underscore') is deprecated and will be removed.")
+    }
     if (deps.includes('jquery')) {
       console.error(
         "You don't need to `require(['jquery...`, just use the global `$` variable directly."

@@ -30,7 +30,7 @@ import moxios from 'moxios'
 import fakeENV from 'helpers/fakeENV'
 import numberHelper from '@canvas/i18n/numberHelper'
 import userSettings from '@canvas/user-settings'
-import {unescape} from 'html-escape'
+import {unescape} from '@instructure/html-escape'
 
 import '@canvas/jquery/jquery.ajaxJSON'
 
@@ -1223,7 +1223,7 @@ QUnit.module('SpeedGrader', rootHooks => {
         name: 'Guy B. Studying',
         submission_state: 'not_graded',
         submission: {
-          grading_period_id: 8,
+          grading_period_id: '8',
           score: 7,
           grade: 70,
           submission_comments: [
@@ -1404,13 +1404,13 @@ QUnit.module('SpeedGrader', rootHooks => {
   test('returns an image tag if the attachment is of type "image"', () => {
     const attachment = {id: 1, mime_class: 'image'}
     const contents = SpeedGrader.EG.attachmentIframeContents(attachment)
-    strictEqual(/^<img/.test(contents.string), true)
+    strictEqual(/^<img/.test(contents), true)
   })
 
   test('returns an iframe tag if the attachment is not of type "image"', () => {
     const attachment = {id: 1, mime_class: 'text/plain'}
     const contents = SpeedGrader.EG.attachmentIframeContents(attachment)
-    strictEqual(/^<iframe/.test(contents.string), true)
+    strictEqual(/^<iframe/.test(contents), true)
   })
 
   QUnit.module('emptyIframeHolder', {
@@ -1865,7 +1865,7 @@ QUnit.module('SpeedGrader', rootHooks => {
             currentSelectedIndex: 1,
             score: 7,
             grade: 70,
-            grading_period_id: 8,
+            grading_period_id: '8',
             submission_type: 'basic_lti_launch',
             workflow_state: 'submitted',
             submission_history: [
@@ -2037,7 +2037,7 @@ QUnit.module('SpeedGrader', rootHooks => {
             currentSelectedIndex: 1,
             score: 7,
             grade: 70,
-            grading_period_id: 8,
+            grading_period_id: '8',
             submission_type: 'online_text_entry',
             workflow_state: 'submitted',
             submission_history: [
@@ -2563,7 +2563,7 @@ QUnit.module('SpeedGrader', rootHooks => {
     QUnit.skip('disables the complete/incomplete select when grading period is closed', () => {
       finishSetup()
       // the select box is not powered by isClosedForSubmission, it's powered by isConcluded
-      SpeedGrader.EG.currentStudent.submission.grading_period_id = 8
+      SpeedGrader.EG.currentStudent.submission.grading_period_id = '8'
       SpeedGrader.EG.handleSubmissionSelectionChange()
       const select = document.getElementById('grading-box-extended')
       ok(select.hasAttribute('disabled'))
@@ -2574,7 +2574,7 @@ QUnit.module('SpeedGrader', rootHooks => {
       () => {
         finishSetup()
         // the select box is not powered by isClosedForSubmission, it's powered by isConcluded
-        SpeedGrader.EG.currentStudent.submission.grading_period_id = 7
+        SpeedGrader.EG.currentStudent.submission.grading_period_id = '7'
         SpeedGrader.EG.handleSubmissionSelectionChange()
         const select = document.getElementById('grading-box-extended')
         notOk(select.hasAttribute('disabled'))
@@ -3396,7 +3396,7 @@ QUnit.module('SpeedGrader', rootHooks => {
         rubric_assessments: [],
         submission_state: 'not_graded',
         submission: {
-          grading_period_id: 8,
+          grading_period_id: '8',
           score: 7,
           grade: 70,
           submission_comments: [],
@@ -7556,14 +7556,14 @@ QUnit.module('SpeedGrader', rootHooks => {
 
         submission = {
           anonymous_id: 'abcde',
-          grading_period_id: 8,
+          grading_period_id: '8',
           id: '1',
           user_id: '1',
           submission_type: 'online_text_entry',
           submission_history: [
             {
               anonymous_id: 'abcde',
-              grading_period_id: 8,
+              grading_period_id: '8',
               id: '1',
               user_id: '1',
               submission_type: 'online_text_entry',

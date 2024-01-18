@@ -604,4 +604,50 @@ describe GradingStandard do
       end
     end
   end
+
+  describe "#unarchive!" do
+    let_once(:data) { [["A", 94], ["F", 0]] }
+    let(:grading_standard) { GradingStandard.create(context: Account.default, workflow_state: "archived", data:) }
+
+    it "let to unarchive" do
+      expect { grading_standard.unarchive! }.to change { grading_standard.workflow_state }.from("archived").to("active")
+      expect(grading_standard.halted?)
+        .to be(false)
+      expect(grading_standard.halted_because)
+        .to be_nil
+    end
+
+    it "does not change workflow_state to active if the current workflow_state is deleted" do
+      grading_standard.update(workflow_state: "deleted")
+      grading_standard.unarchive!
+      expect(grading_standard.workflow_state).to eq("deleted")
+      expect(grading_standard.halted?)
+        .to be(true)
+      expect(grading_standard.halted_because)
+        .to_not be_nil
+    end
+  end
+
+  describe "#archive!" do
+    let_once(:data) { [["A", 94], ["F", 0]] }
+    let(:grading_standard) { GradingStandard.create(context: Account.default, workflow_state: "active", data:) }
+
+    it "let to archive" do
+      expect { grading_standard.archive! }.to change { grading_standard.workflow_state }.from("active").to("archived")
+      expect(grading_standard.halted?)
+        .to be(false)
+      expect(grading_standard.halted_because)
+        .to be_nil
+    end
+
+    it "does not change workflow_state to archive if the current workflow_state is deleted" do
+      grading_standard.update(workflow_state: "deleted")
+      grading_standard.archive!
+      expect(grading_standard.workflow_state).to eq("deleted")
+      expect(grading_standard.halted?)
+        .to be(true)
+      expect(grading_standard.halted_because)
+        .to_not be_nil
+    end
+  end
 end

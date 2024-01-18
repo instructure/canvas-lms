@@ -70,6 +70,33 @@ describe TemporaryEnrollmentPairingsApiController do
       expect(temporary_enrollment_pairing["id"]).not_to be_nil
       expect(temporary_enrollment_pairing["created_by_id"]).to eq(@admin.id)
     end
+
+    it "creates a new temporary enrollment pairing with an ending enrollment state" do
+      post :create, params: { account_id: @account.id, ending_enrollment_state: "completed" }
+
+      expect(response).to be_successful
+      json_response = response.parsed_body
+      temporary_enrollment_pairing = json_response["temporary_enrollment_pairing"]
+      expect(temporary_enrollment_pairing["ending_enrollment_state"]).to eq("completed")
+    end
+
+    it "does not set ending enrollment state with an invalid ending enrollment state" do
+      post :create, params: { account_id: @account.id, ending_enrollment_state: "invalid" }
+
+      expect(response).to be_successful
+      json_response = response.parsed_body
+      temporary_enrollment_pairing = json_response["temporary_enrollment_pairing"]
+      expect(temporary_enrollment_pairing["ending_enrollment_state"]).to eq("deleted")
+    end
+
+    it "defaults to deleted ending enrollment state if no ending enrollment state is given" do
+      post :create, params: { account_id: @account.id }
+
+      expect(response).to be_successful
+      json_response = response.parsed_body
+      temporary_enrollment_pairing = json_response["temporary_enrollment_pairing"]
+      expect(temporary_enrollment_pairing["ending_enrollment_state"]).to eq("deleted")
+    end
   end
 
   describe "DELETE #destroy" do

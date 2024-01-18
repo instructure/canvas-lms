@@ -70,7 +70,7 @@ describe "Global Navigation" do
 
     describe "Groups Link" do
       it "filters concluded groups and loads additional pages if necessary" do
-        Setting.set("api_per_page", 2)
+        stub_const("Api::PER_PAGE", 2)
 
         student = user_factory
         2.times do |x|

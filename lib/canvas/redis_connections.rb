@@ -59,8 +59,8 @@ module Canvas
     # to make sure we aren't holding open connections we aren't
     # using.
     def self.clear_idle!
-      clear_frequency = Setting.get("clear_idle_connections_frequency", 60).to_i
-      clear_timeout = Setting.get("clear_idle_connections_timeout", 60).to_i
+      clear_frequency = 1.minute.to_i
+      clear_timeout =  1.minute.to_i
       @last_clear_time ||= Time.now.utc
       if (Time.now.utc - @last_clear_time) > clear_frequency
         @last_clear_time = Time.now.utc

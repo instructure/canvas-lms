@@ -876,7 +876,6 @@ class AbstractAssignment < ActiveRecord::Base
 
   def update_grades_if_details_changed
     if needs_to_recompute_grade? && saved_by != :migration
-      Rails.logger.debug "GRADES: recalculating because assignment #{global_id} changed. (#{saved_changes.inspect})"
       self.class.connection.after_transaction_commit { context.recompute_student_scores }
     end
     true
@@ -3405,8 +3404,7 @@ class AbstractAssignment < ActiveRecord::Base
     quiz.clear_cache_key(:availability) if quiz?
 
     unless saved_by == :migration
-      relevant_changes = saved_changes.slice(:due_at, :workflow_state, :only_visible_to_overrides, :anonymous_grading).inspect
-      Rails.logger.debug "GRADES: recalculating because scope changed for Assignment #{global_id}: #{relevant_changes}"
+      saved_changes.slice(:due_at, :workflow_state, :only_visible_to_overrides, :anonymous_grading).inspect
       SubmissionLifecycleManager.recompute(self, update_grades: true)
     end
   end
@@ -3634,12 +3632,7 @@ class AbstractAssignment < ActiveRecord::Base
     relock_modules!(relocked_modules, student_ids)
     each_submission_type { |submission| submission&.relock_modules!(relocked_modules, student_ids) }
 
-    update_grades = if only_visible_to_overrides?
-                      Rails.logger.debug "GRADES: recalculating because assignment overrides on #{global_id} changed."
-                      true
-                    else
-                      false
-                    end
+    update_grades = only_visible_to_overrides?
 
     SubmissionLifecycleManager.recompute(self, update_grades:, executing_user: updating_user)
   end
@@ -3974,9 +3967,8 @@ class AbstractAssignment < ActiveRecord::Base
     # grading periods that have closed within a somewhat larger interval to
     # avoid "missing" a given period if the periodic job doesn't run for a while.
     now = Time.zone.now
-    look_back = Setting.get("disable_post_to_sis_on_grading_period", "60").to_i
     GradingPeriod.active.joins(:grading_period_group)
-                 .where(close_date: look_back.minutes.ago(now)..now)
+                 .where(close_date: 1.hour.ago(now)..now)
                  .where(grading_period_groups: { root_account: eligible_root_accounts }).find_each do |gp|
       gp.delay(
         singleton: "disable_post_to_sis_on_grading_period_#{gp.global_id}",

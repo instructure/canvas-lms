@@ -29,13 +29,13 @@ import SearchResults from './SearchResults'
 const I18n = useI18nScope('SmartSearch')
 
 export default function SearchApp() {
-  const [searchResults, setSearchResults] = useState([]);
-  const [searchString, setSearchString] = useState('');
-  const [searching, setSearching] = useState(false);
-  const [textInput, setTextInput] = useState(null);
-  const [textInputValue, setTextInputValue] = useState('');
-  const [page, setPage] = useState(1);
-  const [pageCount, setPageCount] = useState(1);
+  const [searchResults, setSearchResults] = useState([])
+  const [searchString, setSearchString] = useState('')
+  const [searching, setSearching] = useState(false)
+  const [textInput, setTextInput] = useState(null)
+  const [textInputValue, setTextInputValue] = useState('')
+  const [page, setPage] = useState(1)
+  const [pageCount, setPageCount] = useState(1)
 
   function handleChange(e, value) {
     setTextInputValue(value)
@@ -54,9 +54,9 @@ export default function SearchApp() {
       path: `/api/v1/courses/${ENV.COURSE_ID}/smartsearch`,
       params: {
         q: searchString,
-        page: page
+        page: page,
       },
-      forceResult: searchString ? undefined : { results: [] },
+      forceResult: searchString ? undefined : {results: []},
       loading: useCallback(isLoading => {
         setSearching(isLoading)
         if (isLoading) {
@@ -66,39 +66,39 @@ export default function SearchApp() {
       meta: useCallback(({link}) => {
         setPageCount(parseInt(link.last?.page, 10) || 1)
       }, []),
-      success: useCallback(json => {
-        setSearchResults(json.results)
-        textInput?.focus()
-      }, [textInput]),
+      success: useCallback(
+        json => {
+          setSearchResults(json.results)
+          textInput?.focus()
+        },
+        [textInput]
+      ),
     },
     [searchString, page]
   )
 
   return (
     <View>
+      {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
       <div onKeyDown={handleKey}>
         <TextInput
           renderLabel={<h1>{I18n.t('Search')}</h1>}
           interaction={searching ? 'disabled' : 'enabled'}
-          ref={e => (setTextInput(e))}
+          ref={e => setTextInput(e)}
           onChange={handleChange}
           value={textInputValue}
           renderAfterInput={() => <IconSearchLine />}
         />
       </div>
 
-      {searching ?
-        <Spinner renderTitle={I18n.t('Searching')} /> :
+      {searching ? (
+        <Spinner renderTitle={I18n.t('Searching')} />
+      ) : (
         <SearchResults searchResults={searchResults} />
-      }
+      )}
 
       {pageCount > 1 ? (
-        <Paginator
-          pageCount={pageCount}
-          page={page}
-          loadPage={p => setPage(p)}
-          margin="small"
-        />
+        <Paginator pageCount={pageCount} page={page} loadPage={p => setPage(p)} margin="small" />
       ) : null}
     </View>
   )

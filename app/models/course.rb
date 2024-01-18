@@ -490,17 +490,12 @@ class Course < ActiveRecord::Base
     end
   end
 
-  def modules_visible_to(user, array_is_okay: false)
-    if grants_right?(user, :view_unpublished_items)
-      if array_is_okay && association(:context_modules).loaded?
-        context_modules.reject(&:deleted?)
-      else
-        context_modules.not_deleted
-      end
-    elsif array_is_okay && association(:context_modules).loaded?
-      context_modules.select(&:active?)
+  def modules_visible_to(user)
+    scope = grants_right?(user, :view_unpublished_items) ? context_modules.not_deleted : context_modules.active
+    if Account.site_admin.feature_enabled?(:differentiated_modules)
+      DifferentiableAssignment.scope_filter(scope, user, self)
     else
-      context_modules.active
+      scope
     end
   end
 
@@ -1463,7 +1458,6 @@ class Course < ActiveRecord::Base
                             admin_visible_student_enrollments.pluck(:user_id)
                           end
 
-    Rails.logger.debug "GRADES: recomputing scores in course=#{global_id} students=#{visible_student_ids.inspect}"
     Enrollment.recompute_final_score(
       visible_student_ids,
       id,

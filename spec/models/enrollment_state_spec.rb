@@ -243,13 +243,36 @@ describe EnrollmentState do
 
       it "invalidates temporary enrollments after end_date has been reached" do
         @enrollment1.update!(end_at: 1.day.ago)
-        @enrollment_state1.recalculate_state
 
         expect(@enrollment1.reload).to be_deleted
         expect(@enrollment2.reload).to be_active
         expect(@enrollment_state1.reload.state).to eq "deleted"
         expect(@enrollment_state1.reload.state_started_at).to be_truthy
         expect(@enrollment_state2.reload.state).to eq "active"
+      end
+
+      it "respects accepted pairing ending enrollment states after end_date has been reached" do
+        @enrollment1.temporary_enrollment_pairing.update!(ending_enrollment_state: "completed")
+        @enrollment1.update!(end_at: 1.day.ago)
+
+        expect(@enrollment1.reload.workflow_state).to eq "active"
+        expect(@enrollment2.reload).to be_active
+        expect(@enrollment_state1.reload.state).to eq "completed"
+        expect(@enrollment_state2.reload.state).to eq "active"
+
+        @enrollment1.temporary_enrollment_pairing.update!(ending_enrollment_state: "inactive")
+        @enrollment1.update!(end_at: 1.day.ago)
+        expect(@enrollment_state1.reload.state).to eq "inactive"
+
+        @enrollment1.temporary_enrollment_pairing.update!(ending_enrollment_state: "deleted")
+        @enrollment1.update!(end_at: 1.day.ago)
+        expect(@enrollment_state1.reload.state).to eq "deleted"
+      end
+
+      it "defaults to deleted for null pairing ending enrollment state" do
+        @enrollment1.temporary_enrollment_pairing.update!(ending_enrollment_state: nil)
+        @enrollment1.update!(end_at: 1.day.ago)
+        expect(@enrollment_state1.reload.state).to eq "deleted"
       end
     end
 

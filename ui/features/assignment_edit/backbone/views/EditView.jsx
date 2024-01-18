@@ -197,6 +197,8 @@ function EditView() {
   this.handlePointsChange = this.handlePointsChange.bind(this)
   this.settingsToCache = this.settingsToCache.bind(this)
   this.handleCancel = this.handleCancel.bind(this)
+  this.handleMessageEvent = this.handleMessageEvent.bind(this)
+  window.addEventListener('message', this.handleMessageEvent.bind(this))
 
   return EditView.__super__.constructor.apply(this, arguments)
 }
@@ -944,6 +946,32 @@ EditView.prototype.handleSubmissionTypeChange = function (_ev) {
   return this.$externalToolNewTabContainer.toggleAccessibly(subVal.includes('external_tool'))
 }
 
+EditView.prototype.validateGuidData = function (event) {
+  const data = event.data.data
+
+  // If data is a string, convert it to an array for consistent processing
+  const dataArray = Array.isArray(data) ? data : [data]
+  const regexPattern =
+    /^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$/
+
+  for (const str of dataArray) {
+    if (!regexPattern.test(str)) {
+      return false
+    }
+  }
+  return dataArray
+}
+
+EditView.prototype.handleMessageEvent = function (event) {
+  if (event?.data?.subject !== 'assignment.set_ab_guid') {
+    return
+  }
+  const abGuid = this.validateGuidData(event)
+  if (abGuid) {
+    this.assignment.set('ab_guid', abGuid)
+  }
+}
+
 EditView.prototype.handlePlacementExternalToolSelect = function (selection) {
   const toolId = selection.replace('external_tool_placement_', '')
   this.$externalToolsContentId.val(toolId)
@@ -1216,6 +1244,7 @@ EditView.prototype.getFormData = function () {
   data = this._inferSubmissionTypes(data)
   data = this._filterAllowedExtensions(data)
   data = this._unsetGroupsIfExternalTool(data)
+  data.ab_guid = this.assignment.get('ab_guid')
   if (!(typeof ENV !== 'undefined' && ENV !== null ? ENV.IS_LARGE_ROSTER : void 0)) {
     data = this.groupCategorySelector.filterFormData(data)
   }

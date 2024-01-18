@@ -169,9 +169,9 @@ function DateTimeInput(props) {
 
   return (
     <FormFieldGroup
-      colSpacing={props.colSpacing || "medium"}
+      colSpacing={props.colSpacing || 'medium'}
       vAlign="top"
-      layout={props.layout || "stacked"}
+      layout={props.layout || 'stacked'}
       rowSpacing="small"
       messages={goodMessage(formatDateTime(inputValue))}
       description={props.description}

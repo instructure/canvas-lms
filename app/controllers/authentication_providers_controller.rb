@@ -947,6 +947,43 @@ class AuthenticationProvidersController < ApplicationController
     redirect_to :account_authentication_providers
   end
 
+  def refresh_saml_metadata
+    ap = @account.authentication_providers.active.find(params[:authentication_provider_id])
+
+    if ap&.auth_type != "saml"
+      respond_to do |format|
+        format.html do
+          flash[:error] = t("Unsupported authentication type")
+          redirect_to(account_authentication_providers_path(@account))
+        end
+        format.json do
+          return render(status: :bad_request, json: { errors: ["Unsupported authentication type"] })
+        end
+      end
+    elsif ap&.metadata_uri.blank?
+      respond_to do |format|
+        format.html do
+          flash[:error] = t("IdP metadata URI cannot be blank")
+          redirect_to(account_authentication_providers_path(@account))
+        end
+        format.json do
+          return render(status: :bad_request, json: { errors: ["A valid metadata URI is required"] })
+        end
+      end
+    else
+      AuthenticationProvider::SAML::MetadataRefresher.refresh_providers(providers: [ap])
+      respond_to do |format|
+        format.html do
+          flash[:notice] = t("Metadata refresh has been initiated. Please check back")
+          redirect_to(account_authentication_providers_path(@account))
+        end
+        format.json { render json: { status: "ok" } }
+      end
+    end
+  rescue ActiveRecord::RecordNotFound => e
+    render json: { message: e.message }, status: :not_found
+  end
+
   def start_debugging
     ap = @account.authentication_providers.active.find(params[:authentication_provider_id])
 

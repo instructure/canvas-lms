@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Backbone from '@canvas/backbone'
 import CourseRestoreModel from 'ui/features/account_admin_tools/backbone/models/CourseRestore'
 import $ from 'jquery'
 
@@ -112,6 +111,7 @@ test('responds with a deferred object', function () {
 })
 
 // a restored course should be populated with a deleted course with an after a search was made.
+// eslint-disable-next-line qunit/no-test-expect-argument
 test('restores a course after search finds a deleted course', 2, function () {
   this.courseRestore.search(this.course_id)
   this.server.respond('GET', this.courseRestore.searchUrl(), [
@@ -131,6 +131,7 @@ test('restores a course after search finds a deleted course', 2, function () {
     {'Content-Type': 'application/json'},
     JSON.stringify(progressCompletedJSON),
   ])
-  ok(dfd.isResolved(), 'All ajax request in this deferred object should be resolved')
+  // eslint-disable-next-line qunit/no-ok-equality
+  ok(dfd.state() === 'resolved', 'All ajax request in this deferred object should be resolved')
   equal(this.courseRestore.get('workflow_state'), 'unpublished')
 })

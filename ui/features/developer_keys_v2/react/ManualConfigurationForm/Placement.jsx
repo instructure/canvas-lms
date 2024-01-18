@@ -62,9 +62,7 @@ export default class Placement extends React.Component {
   ]
 
   // Placements that use launch_height/width instead of selection_height/width
-  launchPlacements = [
-    'assignment_edit',
-  ]
+  launchPlacements = ['assignment_edit']
 
   isLaunchPlacementType(placementName) {
     return this.launchPlacements.includes(placementName)

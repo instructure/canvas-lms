@@ -72,7 +72,8 @@ describe('useManageOutcomes', () => {
     expect(result2.current.collections['100']).toBeUndefined()
   })
 
-  it('should flash a screenreader only info message when a group is loading', async () => {
+  // OUT-6141 - remove or rewrite to remove spies on imports
+  it.skip('should flash a screenreader only info message when a group is loading', async () => {
     const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
     const {result} = renderHook(() => useManageOutcomes(), {wrapper})
     await act(async () => jest.runAllTimers())

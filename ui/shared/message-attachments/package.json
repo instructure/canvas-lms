@@ -2,6 +2,7 @@
   "name": "@canvas/message-attachments",
   "private": true,
   "version": "1.0.0",
-  "author": "Instructure, Inc."
+  "author": "neme",
+  "owner": "VICE"
 }
 

@@ -14,15 +14,15 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import _ from 'underscore'
+import {mixin, reduce, each, max, last, filter, sum} from 'lodash'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import numberFormat from '@canvas/i18n/numberFormat'
 
 const I18n = useI18nScope('CalculationMethodContent')
 
-_.mixin({
+mixin({
   sum(array, accessor = null, start = 0) {
-    return _.reduce(array, (memo, el) => (accessor != null ? accessor(el) : el) + memo, start)
+    return reduce(array, (memo, el) => (accessor != null ? accessor(el) : el) + memo, start)
   },
 })
 
@@ -35,12 +35,12 @@ class WeightedAverage {
     this.weight = weight
     this.range = range
     this.rest = this.range.slice(0, +-2 + 1 || undefined)
-    this.last = _.last(this.range)
+    this.last = last(this.range)
   }
 
   value() {
     const n =
-      (_.sum(this.rest) / this.rest.length) * this.toPercentage(this.remainder()) +
+      (sum(this.rest) / this.rest.length) * this.toPercentage(this.remainder()) +
       this.last * this.toPercentage(this.weight)
     return Math.round(n * 100) / 100
   }
@@ -94,12 +94,12 @@ class NMastery {
   }
 
   aboveMastery() {
-    return _.filter(this.range, n => n >= this.mastery_points)
+    return filter(this.range, n => n >= this.mastery_points)
   }
 
   value() {
     if (this.mastery_points != null && this.aboveMastery().length >= this.n) {
-      return Math.round((_.sum(this.aboveMastery()) / this.aboveMastery().length) * 100) / 100
+      return Math.round((sum(this.aboveMastery()) / this.aboveMastery().length) * 100) / 100
     } else {
       return I18n.t('N/A')
     }
@@ -113,7 +113,7 @@ class Average {
 
   value() {
     if (this.range.length > 0) {
-      return Math.round((_.sum(this.range) / this.range.length) * 100) / 100
+      return Math.round((sum(this.range) / this.range.length) * 100) / 100
     } else {
       return I18n.t('N/A')
     }
@@ -123,7 +123,7 @@ class Average {
 export default class CalculationMethodContent {
   constructor(model) {
     // We can pass in a straight object or a backbone model
-    _.each(
+    each(
       ['calculation_method', 'calculation_int', 'mastery_points', 'is_individual_outcome'],
       attr => (this[attr] = model.get != null ? model.get(attr) : model[attr])
     )
@@ -185,7 +185,7 @@ export default class CalculationMethodContent {
       },
       highest: {
         exampleScores: this.exampleScoreIntegers().join(', '),
-        exampleResult: numberFormat.outcomeScore(_.max(this.exampleScoreIntegers())),
+        exampleResult: numberFormat.outcomeScore(max(this.exampleScoreIntegers())),
       },
       average: {
         method: I18n.t('Average'),
@@ -238,7 +238,7 @@ export default class CalculationMethodContent {
       },
       highest: {
         exampleScores: this.exampleScoreIntegers().slice(0, 4).join(', '),
-        exampleResult: numberFormat.outcomeScore(_.max(this.exampleScoreIntegers().slice(0, 4))),
+        exampleResult: numberFormat.outcomeScore(max(this.exampleScoreIntegers().slice(0, 4))),
       },
       average: {
         method: I18n.t('Average'),
@@ -384,7 +384,7 @@ export default class CalculationMethodContent {
         friendlyCalculationMethod: I18n.t('Most Recent Score'),
         exampleText: I18n.t('Mastery score reflects the most recent graded assignment or quiz.'),
         exampleScores: this.exampleScoreIntegers().slice(0, 4).join(', '),
-        exampleResult: numberFormat.outcomeScore(_.last(this.exampleScoreIntegers().slice(0, 4))),
+        exampleResult: numberFormat.outcomeScore(last(this.exampleScoreIntegers().slice(0, 4))),
       },
       highest: {
         method: I18n.t('Highest Score'),

@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import _ from 'underscore'
+import {some} from 'lodash'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -249,7 +249,7 @@ export function updateProgressionState($module) {
     const $icon_container = $mod_item.find('.module-item-status-icon')
     const mod_id = $mod_item.getTemplateData({textValues: ['id']}).id
 
-    const completed = _.some(
+    const completed = some(
       reqs_met,
       // eslint-disable-next-line eqeqeq
       req => req.id == mod_id && $mod_item.hasClass(req.type + '_requirement')

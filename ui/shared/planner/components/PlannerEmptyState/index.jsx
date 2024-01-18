@@ -110,9 +110,7 @@ export default class PlannerEmptyState extends Component {
   }
 
   renderNothingLeft = () => {
-    const msg = this.props.isWeekly
-      ? I18n.t('Nothing Due This Week')
-      : I18n.t('Nothing More To Do')
+    const msg = this.props.isWeekly ? I18n.t('Nothing Due This Week') : I18n.t('Nothing More To Do')
     return (
       <div
         className={classnames(

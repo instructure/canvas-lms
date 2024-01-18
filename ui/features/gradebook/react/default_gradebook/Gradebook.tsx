@@ -19,19 +19,19 @@
 import $ from 'jquery'
 import type JQuery from 'jquery'
 import deferPromise from '@instructure/defer-promise'
-import _ from '@instructure/lodash-underscore'
 import {
-  intersection,
-  isEqual,
-  some,
-  reject,
-  keyBy,
-  flatten,
   each,
   every,
   filter,
+  flatten,
+  intersection,
+  isEqual,
+  keyBy,
   map,
   pick,
+  reduce,
+  reject,
+  some,
 } from 'lodash'
 import * as tz from '@canvas/datetime'
 import React, {Suspense} from 'react'
@@ -136,7 +136,7 @@ import GradeDisplayWarningDialog from '../../jquery/GradeDisplayWarningDialog'
 import PostGradesFrameDialog from '../../jquery/PostGradesFrameDialog'
 import NumberCompare from '../../util/NumberCompare'
 import {camelizeProperties} from '@canvas/convert-case'
-import htmlEscape from 'html-escape'
+import htmlEscape from '@instructure/html-escape'
 import * as EnterGradesAsSetting from '../shared/EnterGradesAsSetting'
 import SetDefaultGradeDialogManager from '../shared/SetDefaultGradeDialogManager'
 import AsyncComponents from './AsyncComponents'
@@ -3103,7 +3103,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   // Filtered Content Information Methods
   updateFilteredContentInfo = () => {
     let invalidAssignmentGroups: AssignmentGroup[]
-    this.filteredContentInfo.totalPointsPossible = _.reduce(
+    this.filteredContentInfo.totalPointsPossible = reduce(
       this.assignmentGroups,
       (sum: number, assignmentGroup: AssignmentGroup) =>
         sum + getAssignmentGroupPointsPossible(assignmentGroup),
@@ -5143,6 +5143,9 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
                   this.options.custom_grade_statuses_enabled
                     ? this.options.custom_grade_statuses
                     : []
+                }
+                multiselectGradebookFiltersEnabled={
+                  this.options.multiselect_gradebook_filters_enabled
                 }
               />
             )}

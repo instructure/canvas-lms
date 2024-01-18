@@ -39,7 +39,7 @@ class ExternalFeedAggregator
         feeds.each do |feed|
           GuardRail.activate(:primary) do
             if feed.inactive?
-              feed.update_attribute(:refresh_at, inactive_wait_seconds.seconds.from_now)
+              feed.update_attribute(:refresh_at, 48.hours.from_now)
               next
             end
             process_feed(feed)
@@ -91,7 +91,7 @@ class ExternalFeedAggregator
       success = parse_entries(feed, response.body)
       @logger.info(success ? "successful response" : "200 with no data returned")
       feed.consecutive_failures = 0 if success
-      feed.update_attribute(:refresh_at, success_wait_seconds.seconds.from_now)
+      feed.update_attribute(:refresh_at, 2.hours.from_now)
     else
       @logger.info("request failed #{response.class}")
       handle_failure(feed)
@@ -110,18 +110,6 @@ class ExternalFeedAggregator
   def handle_failure(feed)
     feed.increment(:failures)
     feed.increment(:consecutive_failures)
-    feed.update_attribute(:refresh_at, failure_wait_seconds.seconds.from_now)
-  end
-
-  def inactive_wait_seconds
-    Setting.get("external_feed_success_wait_seconds", 48.hours.to_s).to_f
-  end
-
-  def success_wait_seconds
-    Setting.get("external_feed_success_wait_seconds", 2.hours.to_s).to_f
-  end
-
-  def failure_wait_seconds
-    Setting.get("external_feed_failure_wait_seconds", 30.minutes.to_s).to_f
+    feed.update_attribute(:refresh_at, 30.minutes.from_now)
   end
 end

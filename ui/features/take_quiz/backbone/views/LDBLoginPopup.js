@@ -19,7 +19,7 @@ import _, {map, isBoolean, extend} from 'lodash'
 import Backbone from '@canvas/backbone'
 import $ from 'jquery'
 import Markup from '../../jst/LDBLoginPopup.handlebars'
-import htmlEscape from 'html-escape'
+import htmlEscape from '@instructure/html-escape'
 import '@canvas/jquery/jquery.toJSON'
 
 // Consumes an event and stops it from propagating.

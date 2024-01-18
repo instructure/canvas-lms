@@ -53,7 +53,7 @@ gem "gepub", "1.0.15"
 gem "apollo-federation", "~> 3.8"
 gem "graphql", "~> 1.12.7"
 gem "graphql-batch", "~> 0.5"
-gem "highline", "~> 2.0", require: false
+gem "highline", "~> 3.0", require: false
 gem "httparty", "~> 0.21"
 gem "i18nliner", "~> 0.2.4"
 gem "icalendar", "~> 2.9", require: false
@@ -61,7 +61,7 @@ gem "diplomat", "~> 2.6", require: false
 gem "ims-lti", "~> 2.3", require: "ims"
 gem "rrule", "~> 0.5", require: false
 
-gem "inst_access", "~> 0.4"
+gem "inst_access", "0.4.2"
 gem "inst_statsd", "~> 3.0"
 gem "inst-jobs", "~> 3.1"
 gem "inst-jobs-autoscaling", "2.1.1"
@@ -82,7 +82,7 @@ gem "oj", "~> 3.16"
 gem "outrigger", "~> 3.0"
 gem "parallel", "~> 1.23", require: false
 gem "pdf-reader", "~> 2.11"
-gem "pg_query", "~> 4.2", require: false
+gem "pg_query", "~> 5.1", require: false
 gem "prawn-emoji", "~> 5.3", require: false
 gem "prawn-rails", "~> 1.4"
   gem "matrix", "0.4.2" # Used to be a default gem but is no more, but prawn depends on it implicitly

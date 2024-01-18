@@ -132,9 +132,11 @@ const FindOutcomeItem = ({
                   }
                   withBackground={false}
                   withBorder={false}
-                  interaction={shouldShowDescription && (!accountLevelMasteryScalesFF || shouldExpand)
-                  ? 'enabled'
-                  : 'disabled'}
+                  interaction={
+                    shouldShowDescription && (!accountLevelMasteryScalesFF || shouldExpand)
+                      ? 'enabled'
+                      : 'disabled'
+                  }
                   onClick={onClickHandler}
                 >
                   <div style={{display: 'flex', alignSelf: 'center', fontSize: '0.875rem'}}>

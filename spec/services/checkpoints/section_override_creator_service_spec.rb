@@ -34,7 +34,7 @@ describe Checkpoints::SectionOverrideCreatorService do
       override = { due_at: 2.days.from_now }
       expect do
         service.call(checkpoint: @checkpoint, override:)
-      end.to raise_error(Checkpoints::SectionOverrideCreatorService::SetIdRequiredError)
+      end.to raise_error(Checkpoints::SetIdRequiredError)
     end
 
     it "raises an error if provided a set_id for a soft-deleted section" do

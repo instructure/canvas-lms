@@ -108,6 +108,8 @@ class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
     }
   rescue ActiveRecord::RecordNotFound
     raise GraphQL::ExecutionError, "not found"
+  rescue ArgumentError
+    raise GraphQL::ExecutionError, "Assignment group category id and discussion topic group category id do not match"
   end
 end
 
@@ -125,14 +127,27 @@ def set_discussion_assignment_association(assignment_params, discussion_topic)
     assignment_params[:state] = discussion_topic.published? ? "published" : "unpublished"
     assignment_params[:name] = discussion_topic.title
 
+    validate_and_remove_group_category_id(assignment_params, discussion_topic) if assignment_params.key?(:group_category_id)
+
     # If a topic doesn't have a group_category_id or has submissions, then the assignment group_category_id should be nil
     unless discussion_topic.try(:group_category_id) || assignment.has_submitted_submissions?
       assignment_params[:group_category_id] = nil
     end
+
     # Finalize assignment restoration
     discussion_topic.assignment = assignment
     discussion_topic.sync_assignment
     # This save is required to prevent an extra discussion_topic from being created in the updateAssignment
     assignment.save!
+  end
+end
+
+def validate_and_remove_group_category_id(assignment_params, discussion_topic)
+  if assignment_params[:group_category_id].present? && discussion_topic.group_category_id.present? && assignment_params[:group_category_id] != discussion_topic.group_category_id.to_s
+    raise ArgumentError, "Group category IDs do not match"
+  end
+
+  if assignment_params[:group_category_id].present?
+    assignment_params.delete(:group_category_id)
   end
 end

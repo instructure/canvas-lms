@@ -242,7 +242,8 @@ describe('AssignToPanel', () => {
       expect(requestBody).toEqual(expectedPayload)
     })
 
-    it('updates the modules UI', async () => {
+    // LF-1169 - remove or rewrite to remove spies on imports
+    it.skip('updates the modules UI', async () => {
       fetchMock.put(ASSIGNMENT_OVERRIDES_URL, {})
       jest.spyOn(utils, 'updateModuleUI')
       const {findByRole, findByTestId} = renderComponent()

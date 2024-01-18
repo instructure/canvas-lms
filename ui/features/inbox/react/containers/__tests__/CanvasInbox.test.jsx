@@ -26,9 +26,6 @@ import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
 import {responsiveQuerySizes} from '../../../util/utils'
 import waitForApolloLoading from '../../../util/waitForApolloLoading'
-import {enableFetchMocks} from 'jest-fetch-mock'
-
-enableFetchMocks()
 
 jest.mock('../../../util/utils', () => ({
   ...jest.requireActual('../../../util/utils'),
@@ -39,8 +36,6 @@ describe('CanvasInbox App Container', () => {
   const server = mswServer(handlers)
 
   beforeAll(() => {
-    // eslint-disable-next-line no-undef
-    fetchMock.dontMock()
     server.listen()
     window.matchMedia = jest.fn().mockImplementation(() => {
       return {
@@ -64,8 +59,6 @@ describe('CanvasInbox App Container', () => {
 
   afterAll(() => {
     server.close()
-    // eslint-disable-next-line no-undef
-    fetchMock.enableMocks()
     window.ENV = {}
   })
 

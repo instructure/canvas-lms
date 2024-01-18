@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 
-import h from 'html-escape'
+import h from '@instructure/html-escape'
 import Outcome from '../../../backbone/models/Outcome'
 import OutcomeIconBase from './OutcomeIconBase'
 import '@canvas/jquery/jquery.disableWhileLoading'

@@ -17,7 +17,7 @@
 //
 
 import $ from 'jquery'
-import _ from 'underscore'
+import {once, min} from 'lodash'
 import BaseView from './AvatarUploadBaseView'
 import template from '../../jst/takePictureView.handlebars'
 import BlobFactory from '../../BlobFactory'
@@ -80,10 +80,7 @@ export default class TakePictureView extends BaseView {
     } catch (err) {
       this.$video.attr('src', window.URL.createObjectURL(this.stream))
     }
-    return this.$video.on(
-      'onloadedmetadata loadedmetadata',
-      _.once(this.onMediaMetadata).bind(this)
-    )
+    return this.$video.on('onloadedmetadata loadedmetadata', once(this.onMediaMetadata).bind(this))
   }
 
   onMediaMetadata(_e) {
@@ -92,7 +89,7 @@ export default class TakePictureView extends BaseView {
       if (this.$video[0].videoHeight === 0) return
       window.clearInterval(wait)
 
-      const clipSize = _.min([this.$video.height(), this.$video.width()])
+      const clipSize = min([this.$video.height(), this.$video.width()])
       this.$clip.height(clipSize).width(clipSize)
 
       if (this.$video.width() > clipSize) {

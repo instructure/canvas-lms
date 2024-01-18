@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'underscore'
+import {groupBy} from 'lodash'
 import Folder from '../backbone/models/Folder'
 import File from '../backbone/models/File'
 import ModuleFile from '../backbone/models/ModuleFile'
@@ -31,7 +31,7 @@ import ModuleFile from '../backbone/models/ModuleFile'
 export default function updateModelsUsageRights(apiData, models) {
   const affectedIds = apiData && apiData.file_ids
   // Seperate the models array into a file group and a folder group.
-  const {files, folders} = _.groupBy(models, item => {
+  const {files, folders} = groupBy(models, item => {
     if (item instanceof File) return 'files'
     if (item instanceof ModuleFile) return 'files'
     if (item instanceof Folder) return 'folders'

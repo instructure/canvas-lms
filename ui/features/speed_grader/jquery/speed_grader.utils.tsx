@@ -23,12 +23,17 @@ import ReactDOM from 'react-dom'
 import $ from 'jquery'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import SpeedGraderSettingsMenu from '../react/SpeedGraderSettingsMenu'
-import htmlEscape from 'html-escape'
+import htmlEscape from '@instructure/html-escape'
 import {Pill} from '@instructure/ui-pill'
 import * as Alerts from '@instructure/ui-alerts'
-import type {Assignment, Enrollment, Submission} from '../../../api.d'
 import type {RubricAssessment} from '@canvas/grading/grading.d'
-import type {GradingError, SpeedGrader, StudentWithSubmission} from './speed_grader.d'
+import type {
+  Enrollment,
+  GradingError,
+  SpeedGrader,
+  Submission,
+  StudentWithSubmission,
+} from './speed_grader.d'
 import SpeedGraderPostGradesMenu from '../react/SpeedGraderPostGradesMenu'
 import {isGraded, isPostable} from '@canvas/grading/SubmissionHelper'
 import JQuerySelectorCache from '../JQuerySelectorCache'
@@ -266,7 +271,7 @@ export function tearDownAssessmentAuditTray(EG: SpeedGrader) {
   EG.assessmentAuditTray = null
 }
 
-export function unexcuseSubmission(grade: string, submission: Submission, assignment: Assignment) {
+export function unexcuseSubmission(grade: string, submission: Submission, assignment: unknown) {
   return grade === '' && submission.excused && assignment.grading_type === 'pass_fail'
 }
 

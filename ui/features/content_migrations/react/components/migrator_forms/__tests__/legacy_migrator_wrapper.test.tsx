@@ -22,7 +22,7 @@ import userEvent from '@testing-library/user-event'
 import LegacyMigratorWrapper from '../legacy_migrator_wrapper'
 import ConverterViewControl from '@canvas/content-migrations/backbone/views/ConverterViewControl'
 
-const converterViewControlMock = () => {
+jest.mock('@canvas/content-migrations/backbone/views/ConverterViewControl', () => {
   const el = window.document.createElement('div')
   el.innerHTML = '<input name="file" type="file" />'
   const view = {
@@ -40,11 +40,7 @@ const converterViewControlMock = () => {
       .fn()
       .mockImplementation(({_, migrationConverter}) => migrationConverter.renderConverter(view)),
   }
-}
-
-jest.mock('@canvas/content-migrations/backbone/views/ConverterViewControl', () =>
-  converterViewControlMock()
-)
+})
 
 const onSubmit = jest.fn()
 const onCancel = jest.fn()

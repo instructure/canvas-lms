@@ -16,8 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'underscore'
-import {map} from 'lodash'
+import {groupBy, map, reduce, union} from 'lodash'
 import React from 'react'
 import PropTypes from 'prop-types'
 import DueDateTokenWrapper from './DueDateTokenWrapper'
@@ -60,7 +59,7 @@ class DueDateRow extends React.Component {
   // 1 group override => 1 token for the group
 
   tokenizedOverrides = () => {
-    const {sectionOverrides, groupOverrides, adhocOverrides, noopOverrides} = _.groupBy(
+    const {sectionOverrides, groupOverrides, adhocOverrides, noopOverrides} = groupBy(
       this.props.overrides,
       ov => {
         if (ov.get('course_section_id')) {
@@ -75,7 +74,7 @@ class DueDateRow extends React.Component {
       }
     )
 
-    return _.union(
+    return union(
       this.tokenizedSections(sectionOverrides),
       this.tokenizedGroups(groupOverrides),
       this.tokenizedAdhoc(adhocOverrides),
@@ -105,7 +104,7 @@ class DueDateRow extends React.Component {
 
   tokenizedAdhoc = adhocOverrides => {
     adhocOverrides = adhocOverrides || []
-    return _.reduce(
+    return reduce(
       adhocOverrides,
       (overrideTokens, ov) => {
         const tokensForStudents = map(ov.get('student_ids'), this.tokenFromStudentId.bind(this))

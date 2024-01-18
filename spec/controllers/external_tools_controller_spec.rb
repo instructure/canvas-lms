@@ -1057,7 +1057,7 @@ describe ExternalToolsController do
           get_page
           expect(launch_hash["https://purl.imsglobal.org/spec/lti/claim/custom"]).to include(
             "abc" => "def",
-            "expans" => @teacher.id
+            "expans" => @teacher.id.to_s
           )
         end
 
@@ -1070,7 +1070,7 @@ describe ExternalToolsController do
 
           expect(launch_hash["https://purl.imsglobal.org/spec/lti/claim/custom"]).to include(
             "abc" => "def",
-            "expans" => @teacher.id
+            "expans" => @teacher.id.to_s
           )
         end
 
@@ -1146,7 +1146,7 @@ describe ExternalToolsController do
           get_page
           expect(
             launch_params["https://purl.imsglobal.org/spec/lti/claim/custom"]
-          ).to eq({ "abc" => "def", "expans" => @teacher.id })
+          ).to eq({ "abc" => "def", "expans" => @teacher.id.to_s })
         end
 
         it "if parent_frame_context is not given it does not include it in lti_message_hint" do
@@ -1470,22 +1470,9 @@ describe ExternalToolsController do
         Account.site_admin.enable_feature!(:lti_rce_postmessage_support)
       end
 
-      context "with platform storage flag enabled" do
-        before { Account.site_admin.enable_feature!(:lti_platform_storage) }
-
-        it "renders the sibling forwarder frame once" do
-          subject
-          expect(response.body.scan('id="post_message_forwarding').count).to eq 1
-        end
-      end
-
-      context "with platform storage flag disabled" do
-        before { Account.site_admin.disable_feature!(:lti_platform_storage) }
-
-        it "does not render the sibling forwarder frame" do
-          subject
-          expect(response.body.scan('id="post_message_forwarding').count).to eq 0
-        end
+      it "renders the sibling forwarder frame once" do
+        subject
+        expect(response.body.scan('id="post_message_forwarding').count).to eq 1
       end
 
       it "renders the tool launch iframe" do

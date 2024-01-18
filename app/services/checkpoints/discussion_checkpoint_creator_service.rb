@@ -18,8 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class Checkpoints::DiscussionCheckpointCreatorService < ApplicationService
-  class FlagDisabledError < StandardError; end
-  class DateTypeRequiredError < StandardError; end
+  require_relative "discussion_checkpoint_error"
 
   def initialize(discussion_topic:, checkpoint_label:, dates:, points_possible:, replies_required: 1)
     super()
@@ -32,8 +31,19 @@ class Checkpoints::DiscussionCheckpointCreatorService < ApplicationService
   end
 
   def call
-    unless @discussion_topic.root_account.feature_enabled?(:discussion_checkpoints)
-      raise FlagDisabledError, "discussion_checkpoints feature flag must be enabled"
+    unless @discussion_topic.context.root_account.feature_enabled?(:discussion_checkpoints)
+      raise Checkpoints::FlagDisabledError, "discussion_checkpoints feature flag must be enabled"
+    end
+
+    valid_date_types = %w[everyone override].freeze
+
+    @dates.each do |date|
+      if date[:type].blank?
+        raise Checkpoints::DateTypeRequiredError, "each date must have a type specified ('everyone' or 'override')"
+      end
+      unless valid_date_types.include?(date[:type])
+        raise Checkpoints::InvalidDateTypeError, "invalid date type: #{date[:type]}"
+      end
     end
 
     checkpoint = create_checkpoint
@@ -127,7 +137,7 @@ class Checkpoints::DiscussionCheckpointCreatorService < ApplicationService
 
   def dates_by_type(type)
     @dates.select do |date|
-      date_type = date.fetch(:type) { raise DateTypeRequiredError, "each date must have a type specified ('everyone' or 'override')" }
+      date_type = date.fetch(:type) { raise Checkpoints::DateTypeRequiredError, "each date must have a type specified ('everyone' or 'override')" }
       date_type == type
     end
   end

@@ -24,7 +24,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import helpDialogTemplate from './jst/helpDialog.handlebars'
 import $ from 'jquery'
 import {find} from 'lodash'
-import htmlEscape from 'html-escape'
+import htmlEscape, {raw} from '@instructure/html-escape'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 import 'jqueryui/dialog'
 import '@canvas/jquery/jquery.disableWhileLoading'
@@ -188,7 +188,7 @@ const helpDialog = {
           c =>
             `<option
             value='course_${c.id}_admins'
-            ${$.raw(ENV.context_id === c.id ? 'selected' : '')}
+            ${raw(ENV.context_id === c.id ? 'selected' : '')}
           >
             ${htmlEscape(c.name)}
           </option>`

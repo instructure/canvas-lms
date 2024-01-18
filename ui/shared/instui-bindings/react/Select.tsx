@@ -219,7 +219,12 @@ class CanvasSelect extends React.Component<CanvasSelectProps, State> {
 
   renderNoOptionsOption(): ReactElement {
     return (
-      <SelectOption id={noOptionsOptionId} isHighlighted={false} isSelected={false}>
+      <SelectOption
+        id={noOptionsOptionId}
+        key={noOptionsOptionId}
+        isHighlighted={false}
+        isSelected={false}
+      >
         {this.props.noOptionsLabel}
       </SelectOption>
     )

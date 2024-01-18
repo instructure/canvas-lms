@@ -262,6 +262,7 @@ end
 # since it's such an integral part of the unzipping
 # process
 class ZipFileStats
+  MAX_FILE_COUNT = 250_000
   attr_reader :file_count, :total_size, :paths, :filename, :quota_remaining
 
   def initialize(filename)
@@ -274,9 +275,8 @@ class ZipFileStats
   end
 
   def validate_against(context)
-    max = Setting.get("max_zip_file_count", "100000").to_i
-    if file_count > max
-      raise ArgumentError, "Zip File cannot have more than #{max} entries"
+    if file_count > MAX_FILE_COUNT
+      raise ArgumentError, "Zip File cannot have more than #{MAX_FILE_COUNT} entries"
     end
 
     # check whether the nominal size of the zip's contents would exceed

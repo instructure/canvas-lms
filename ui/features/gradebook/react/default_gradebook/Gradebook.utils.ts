@@ -24,7 +24,7 @@ import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDi
 import getTextWidth from '../shared/helpers/TextMeasure'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import _ from 'lodash'
-import htmlEscape, {unescape} from 'html-escape'
+import htmlEscape, {unescape} from '@instructure/html-escape'
 import filterTypes from './constants/filterTypes'
 import type {
   ColumnSizeSettings,
@@ -63,11 +63,14 @@ import type {GradeStatus} from '@canvas/grading/accountGradingStatus'
 
 const I18n = useI18nScope('gradebook')
 
-const dateTimeFormatter = Intl.DateTimeFormat(I18n.currentLocale(), {
-  year: 'numeric',
-  month: 'numeric',
-  day: 'numeric',
-})
+const createDateTimeFormatter = (timeZone: string) => {
+  return Intl.DateTimeFormat(I18n.currentLocale(), {
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric',
+    timeZone,
+  })
+}
 
 const ASSIGNMENT_KEY_REGEX = /^assignment_(?!group)/
 
@@ -387,11 +390,11 @@ export const getLabelForFilter = (
     }
   } else if (filter.type === 'start-date') {
     if (typeof filter.value !== 'string') throw new Error('invalid start-date value')
-    const value = dateTimeFormatter.format(new Date(filter.value))
+    const value = createDateTimeFormatter(ENV.TIMEZONE).format(new Date(filter.value))
     return I18n.t('Start Date %{value}', {value})
   } else if (filter.type === 'end-date') {
     if (typeof filter.value !== 'string') throw new Error('invalid end-date value')
-    const value = dateTimeFormatter.format(new Date(filter.value))
+    const value = createDateTimeFormatter(ENV.TIMEZONE).format(new Date(filter.value))
     return I18n.t('End Date %{value}', {value})
   }
 

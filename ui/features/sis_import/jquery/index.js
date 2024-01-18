@@ -18,7 +18,7 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import htmlEscape from 'html-escape'
+import htmlEscape, {raw} from '@instructure/html-escape'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.instructure_forms' /* formSubmit, formErrors */
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* showIf, disableIf */
@@ -248,7 +248,7 @@ $(document).ready(function (_event) {
             $('#sis_importer').hide()
             $('.copy_progress').progressbar('option', 'value', 100)
             $('.progress_message').html(
-              $.raw(
+              raw(
                 htmlEscape(
                   I18n.t(
                     'messages.import_complete_success',
@@ -278,7 +278,7 @@ $(document).ready(function (_event) {
                 I18n.t('errors.import_failed_messages', 'The import failed with these messages:')
               )
               message += createMessageHtml(sis_batch)
-              $('.sis_messages .sis_error_message').html($.raw(message))
+              $('.sis_messages .sis_error_message').html(raw(message))
             }
             $('.sis_messages').show()
           } else if (sis_batch.workflow_state === 'imported_with_messages') {
@@ -293,7 +293,7 @@ $(document).ready(function (_event) {
               )
               message += createMessageHtml(sis_batch)
               message += createCountsHtml(sis_batch)
-              $('.sis_messages').show().html($.raw(message))
+              $('.sis_messages').show().html(raw(message))
             }
           } else {
             if (progress == lastProgress) {

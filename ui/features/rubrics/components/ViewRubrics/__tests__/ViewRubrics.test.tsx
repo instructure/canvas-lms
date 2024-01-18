@@ -47,26 +47,30 @@ describe('ViewRubrics Tests', () => {
 
     it('renders the ViewRubrics component with all rubric data split rubrics by workflow state', () => {
       queryClient.setQueryData(['accountRubrics-1'], RUBRICS_QUERY_RESPONSE)
-      const {getByTestId} = renderComponent()
+      const {getByTestId, getByText} = renderComponent()
 
       // total rubrics length per workflow state + header row
-      expect(getByTestId('saved-rubrics-table').querySelectorAll('tr').length).toEqual(3)
-      expect(getByTestId('archived-rubrics-table').querySelectorAll('tr').length).toEqual(2)
+      expect(getByTestId('saved-rubrics-panel').querySelectorAll('tr').length).toEqual(3)
 
       expect(getByTestId('rubric-title-1')).toHaveTextContent('Rubric 1')
       expect(getByTestId('rubric-points-1')).toHaveTextContent('10')
       expect(getByTestId('rubric-criterion-count-1')).toHaveTextContent('5')
       expect(getByTestId('rubric-locations-1')).toHaveTextContent('-')
 
-      expect(getByTestId('rubric-title-2')).toHaveTextContent('Rubric 2')
-      expect(getByTestId('rubric-points-2')).toHaveTextContent('30')
-      expect(getByTestId('rubric-criterion-count-2')).toHaveTextContent('3')
-      expect(getByTestId('rubric-locations-2')).toHaveTextContent('-')
-
       expect(getByTestId('rubric-title-3')).toHaveTextContent('Rubric 3')
       expect(getByTestId('rubric-points-3')).toHaveTextContent('20')
       expect(getByTestId('rubric-criterion-count-3')).toHaveTextContent('5')
       expect(getByTestId('rubric-locations-3')).toHaveTextContent('-')
+
+      const archivedRubricsTab = getByText('Archived')
+      archivedRubricsTab.click()
+
+      expect(getByTestId('archived-rubrics-table').querySelectorAll('tr').length).toEqual(2)
+
+      expect(getByTestId('rubric-title-2')).toHaveTextContent('Rubric 2')
+      expect(getByTestId('rubric-points-2')).toHaveTextContent('30')
+      expect(getByTestId('rubric-criterion-count-2')).toHaveTextContent('3')
+      expect(getByTestId('rubric-locations-2')).toHaveTextContent('-')
     })
   })
 
@@ -74,29 +78,32 @@ describe('ViewRubrics Tests', () => {
     beforeAll(() => {
       jest.spyOn(Router, 'useParams').mockReturnValue({courseId: '1'})
     })
-
     it('renders the ViewRubrics component with split rubrics by workflow state', () => {
       queryClient.setQueryData(['courseRubrics-1'], RUBRICS_QUERY_RESPONSE)
-      const {getByTestId} = renderComponent()
+      const {getByTestId, getByText} = renderComponent()
 
       // total rubrics length per workflow state + header row
       expect(getByTestId('saved-rubrics-table').querySelectorAll('tr').length).toEqual(3)
-      expect(getByTestId('archived-rubrics-table').querySelectorAll('tr').length).toEqual(2)
 
       expect(getByTestId('rubric-title-1')).toHaveTextContent('Rubric 1')
       expect(getByTestId('rubric-points-1')).toHaveTextContent('10')
       expect(getByTestId('rubric-criterion-count-1')).toHaveTextContent('5')
       expect(getByTestId('rubric-locations-1')).toHaveTextContent('-')
 
-      expect(getByTestId('rubric-title-2')).toHaveTextContent('Rubric 2')
-      expect(getByTestId('rubric-points-2')).toHaveTextContent('30')
-      expect(getByTestId('rubric-criterion-count-2')).toHaveTextContent('3')
-      expect(getByTestId('rubric-locations-2')).toHaveTextContent('-')
-
       expect(getByTestId('rubric-title-3')).toHaveTextContent('Rubric 3')
       expect(getByTestId('rubric-points-3')).toHaveTextContent('20')
       expect(getByTestId('rubric-criterion-count-3')).toHaveTextContent('5')
       expect(getByTestId('rubric-locations-3')).toHaveTextContent('-')
+
+      const archivedRubricsTab = getByText('Archived')
+      archivedRubricsTab.click()
+
+      expect(getByTestId('archived-rubrics-table').querySelectorAll('tr').length).toEqual(2)
+
+      expect(getByTestId('rubric-title-2')).toHaveTextContent('Rubric 2')
+      expect(getByTestId('rubric-points-2')).toHaveTextContent('30')
+      expect(getByTestId('rubric-criterion-count-2')).toHaveTextContent('3')
+      expect(getByTestId('rubric-locations-2')).toHaveTextContent('-')
     })
   })
 })

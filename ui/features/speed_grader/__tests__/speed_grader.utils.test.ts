@@ -27,11 +27,7 @@ const students: Student[] = [
     email: '',
     group_ids: [],
     id: '0',
-    integration_id: '',
-    login_id: '',
     short_name: 'John',
-    sis_import_id: '',
-    sis_user_id: null,
     enrollments: [
       {
         user_id: '0',
@@ -69,11 +65,7 @@ const students: Student[] = [
     email: '',
     group_ids: [],
     id: '1',
-    integration_id: '',
-    login_id: '',
     short_name: 'John',
-    sis_import_id: '',
-    sis_user_id: null,
     enrollments: [
       // @ts-expect-error
       {
@@ -111,11 +103,7 @@ const students: Student[] = [
     email: '',
     group_ids: [],
     id: '2',
-    integration_id: '',
-    login_id: '',
     short_name: 'John',
-    sis_import_id: '',
-    sis_user_id: null,
     enrollments: [
       {
         user_id: '2',

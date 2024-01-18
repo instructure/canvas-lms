@@ -23,9 +23,6 @@ import {RequestDispatch} from '@canvas/network'
 import PerformanceControls from '../../PerformanceControls'
 import FakeServer from '@canvas/network/NaiveRequestDispatch/__tests__/FakeServer'
 import {NetworkFake} from '@canvas/network/NetworkFake/index'
-import {enableFetchMocks} from 'jest-fetch-mock'
-
-enableFetchMocks()
 
 const initialState = store.getState()
 

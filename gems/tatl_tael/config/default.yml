@@ -18,6 +18,7 @@ CopyrightLinter:
       - "**/bower/**"
       - "**/mediaelement/**"
       - "**/shims/**"
+      - "**/jquery/**"
       - "**/vendor/**"
       - "gems/tatl_tael/spec/lib/tatl_tael/linters/fixtures/**"
       - "gems/plugins/**"

@@ -398,7 +398,7 @@ describe SIS::CSV::ImportRefactored do
     end
 
     it "alsoes retry in a new job" do
-      Setting.set("number_of_tries_before_failing", 2)
+      stub_const("SIS::CSV::ImportRefactored::MAX_TRIES", 2)
       allow(InstStatsd::Statsd).to receive(:increment)
       expect_any_instance_of(SIS::CSV::ImportRefactored).to receive(:run_parallel_importer).exactly(6).and_call_original
       expect_any_instance_of(SIS::CSV::ImportRefactored).to receive(:try_importing_segment).exactly(6).and_call_original

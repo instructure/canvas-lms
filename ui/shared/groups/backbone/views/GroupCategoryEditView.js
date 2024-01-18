@@ -22,7 +22,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import DialogFormView from '@canvas/forms/backbone/views/DialogFormView'
 import wrapperTemplate from '@canvas/forms/jst/EmptyDialogFormWrapper.handlebars'
 import template from '../../jst/groupCategoryEdit.handlebars'
-import h from 'html-escape'
+import h from '@instructure/html-escape'
 
 const I18n = useI18nScope('groups')
 

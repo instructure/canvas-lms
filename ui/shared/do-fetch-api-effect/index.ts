@@ -18,7 +18,7 @@
  */
 
 import getCookie from '@instructure/get-cookie'
-import parseLinkHeader from 'parse-link-header'
+import parseLinkHeader from '@canvas/parse-link-header'
 import {defaultFetchOptions} from '@canvas/util/xhr'
 import {toQueryString} from '@canvas/query-string-encoding'
 import type {QueryParameterRecord} from '@canvas/query-string-encoding'

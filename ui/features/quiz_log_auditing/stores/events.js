@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from '@instructure/lodash-underscore'
+import {range} from 'lodash'
 import Config from '../config'
 import Dispatcher from '../dispatcher'
 import Environment from '@canvas/quiz-legacy-client-apps/environment'
@@ -26,8 +26,6 @@ import QuestionAnsweredEventDecorator from '../backbone/models/question_answered
 import QuestionCollection from '../backbone/collections/questions'
 import Store from '@canvas/quiz-legacy-client-apps/store'
 import Submission from '../backbone/models/submission'
-
-const range = _.range
 
 export default new Store(
   'events',

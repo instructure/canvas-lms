@@ -161,8 +161,8 @@ describe Lti::IMS::NamesAndRolesSerializer do
     let(:message_matcher) do
       {
         "https://purl.imsglobal.org/spec/lti/claim/custom" => {
-          "user_id" => user.id,
-          "canvas_user_id" => user.id,
+          "user_id" => user.id.to_s,
+          "canvas_user_id" => user.id.to_s,
           "unsupported_param_1" => "$unsupported.param.1",
           "unsupported_param_2" => "$unsupported.param.2"
         }.merge(custom_params)
@@ -282,7 +282,7 @@ describe Lti::IMS::NamesAndRolesSerializer do
           expect(received_custom_claim["canvas_course_endat"]).to eq course.end_at.utc.iso8601
           expect(received_custom_claim["canvas_course_gradepassbacksetting"]).to eq course.grade_passback_setting
           expect(received_custom_claim["canvas_course_hidedistributiongraphs"]).to eq course.hide_distribution_graphs?
-          expect(received_custom_claim["canvas_course_id"]).to eq course.id
+          expect(received_custom_claim["canvas_course_id"]).to eq course.id.to_s
           expect(received_custom_claim["canvas_course_name"]).to eq course.name
 
           lti_helper = Lti::SubstitutionsHelper.new(course, course.root_account, user, tool)

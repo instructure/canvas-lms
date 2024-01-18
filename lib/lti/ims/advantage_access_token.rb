@@ -57,7 +57,7 @@ module Lti
           expected_aud: expected_audience,
           require_iss: true,
           skip_jti_check: true,
-          max_iat_age: Setting.get("oauth2_jwt_iat_ago_in_seconds", 60.minutes.to_s).to_i.seconds
+          max_iat_age: 60.minutes
         )
 
         # In this case we know the error message can just be safely shunted into the API response (in other cases

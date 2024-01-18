@@ -3517,7 +3517,7 @@ describe DiscussionTopicsController, type: :request do
 
       it "fails if the max entry depth is reached" do
         entry = @entry
-        (DiscussionEntry.max_depth - 1).times do
+        (DiscussionEntry::MAX_DEPTH - 1).times do
           entry = create_reply(entry)
         end
         api_call(:post,

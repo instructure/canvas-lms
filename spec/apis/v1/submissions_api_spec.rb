@@ -3126,7 +3126,7 @@ describe "Submissions API", type: :request do
       end
 
       it "errors if too many students requested" do
-        allow(Api).to receive(:max_per_page).and_return(0)
+        stub_const("Api::MAX_PER_PAGE", 0)
         @user = @student1
         api_call(:get,
                  "/api/v1/courses/#{@course.id}/students/submissions.json",

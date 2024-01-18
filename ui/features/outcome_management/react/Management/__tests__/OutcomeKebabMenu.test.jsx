@@ -39,7 +39,12 @@ describe('OutcomeKebabMenu', () => {
 
   const renderWithProvider = (
     children,
-    {contextType = 'Account', contextId = '1', menuOptionForOutcomeDetailsPageFF = true, archiveOutcomesFF = false} = {}
+    {
+      contextType = 'Account',
+      contextId = '1',
+      menuOptionForOutcomeDetailsPageFF = true,
+      archiveOutcomesFF = false,
+    } = {}
   ) => {
     return render(
       <OutcomesContext.Provider
@@ -122,12 +127,9 @@ describe('OutcomeKebabMenu', () => {
   describe('Archive Outcome FF', () => {
     describe('when FF is disabled', () => {
       it('does not render Archive menu option for an outcome', () => {
-        const {queryByText} = renderWithProvider(
-          <OutcomeKebabMenu {...defaultProps()} />,
-          {
-            archiveOutcomesFF: false,
-          }
-        )
+        const {queryByText} = renderWithProvider(<OutcomeKebabMenu {...defaultProps()} />, {
+          archiveOutcomesFF: false,
+        })
         const menuButton = queryByText(groupMenuTitle)
         fireEvent.click(menuButton)
         expect(queryByText('Archive')).not.toBeInTheDocument()
@@ -157,7 +159,7 @@ describe('OutcomeKebabMenu', () => {
         const menuButton = getByText(groupMenuTitle)
         fireEvent.click(menuButton)
         expect(getByText('Archive')).toBeInTheDocument()
-        expect(getByTestId("outcome-kebab-menu-archive")).toBeInTheDocument()
+        expect(getByTestId('outcome-kebab-menu-archive')).toBeInTheDocument()
       })
 
       it('renders disabled Archive menu option for an outcome when canArchive is false', () => {
@@ -170,7 +172,7 @@ describe('OutcomeKebabMenu', () => {
         const menuButton = getByText(groupMenuTitle)
         fireEvent.click(menuButton)
         expect(getByText('Archive')).toBeInTheDocument()
-        expect(getByTestId("outcome-kebab-menu-archive-disabled")).toBeInTheDocument()
+        expect(getByTestId('outcome-kebab-menu-archive-disabled')).toBeInTheDocument()
       })
 
       it('renders enabled Archive menu option for an outcome group', () => {

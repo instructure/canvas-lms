@@ -1,0 +1,551 @@
+---
+openapi: 3.0.3
+info:
+  title: app
+  version: 1.0.0
+servers: []
+paths:
+  "/api/lti/groups/{group_id}/names_and_roles":
+    get:
+      summary: group_index
+      tags:
+      - Lti::IMS::NamesAndRole
+      parameters:
+      - name: group_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 716163
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+        example: 2
+      - name: pass
+        in: query
+        required: false
+        schema:
+          type: string
+        example: thru
+      - name: per_page
+        in: query
+        required: false
+        schema:
+          type: integer
+        example: 2
+      - name: rlid
+        in: query
+        required: false
+        schema:
+          type: string
+        example: 194bad1fb03db0e9e2e556629a4ca4f7
+      - name: role
+        in: query
+        required: false
+        schema:
+          type: string
+        example: http://purl.imsglobal.org/vocab/lis/v2/membership#Manager
+      responses:
+        '200':
+          description: returns all group members
+          content:
+            application/vnd.ims.lti-nrps.v2.membershipcontainer+json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  context:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      title:
+                        type: string
+                    required:
+                    - id
+                    - title
+                  members:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                        name:
+                          type: string
+                        picture:
+                          type: string
+                        given_name:
+                          type: string
+                        family_name:
+                          type: string
+                        user_id:
+                          type: string
+                        lti11_legacy_user_id:
+                          type: string
+                        roles:
+                          type: array
+                          items:
+                            type: string
+                        message:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              https://purl.imsglobal.org/spec/lti/claim/message_type:
+                                type: string
+                              locale:
+                                type: string
+                              https://purl.imsglobal.org/spec/lti/claim/custom:
+                                type: object
+                                properties:
+                                  baz:
+                                    type: string
+                                  foo:
+                                    type: string
+                                  person_name_full:
+                                    type: string
+                                  person_name_display:
+                                    type: string
+                                  person_name_family:
+                                    type: string
+                                  person_name_given:
+                                    type: string
+                                  user_image:
+                                    type: string
+                                  user_id:
+                                    type: integer
+                                  canvas_user_id:
+                                    type: integer
+                                  vnd_instructure_user_uuid:
+                                    type: string
+                                  canvas_user_globalid:
+                                    type: integer
+                                  canvas_user_sissourceid:
+                                    type: string
+                                  person_sourced_id:
+                                    type: string
+                                  message_locale:
+                                    type: string
+                                  vnd_canvas_person_email_sis:
+                                    type: string
+                                  person_email_primary:
+                                    type: string
+                                  person_address_timezone:
+                                    type: string
+                                  user_username:
+                                    type: string
+                                  canvas_user_sisintegrationid:
+                                    type: string
+                                  canvas_user_loginid:
+                                    type: string
+                                  canvas_xapi_url:
+                                    type: string
+                                  caliper_url:
+                                    type: string
+                                  unsupported_param_1:
+                                    type: string
+                                  unsupported_param_2:
+                                    type: string
+                                required:
+                                - person_name_full
+                                - person_name_display
+                                - person_name_family
+                                - person_name_given
+                                - user_image
+                                - user_id
+                                - canvas_user_id
+                                - vnd_instructure_user_uuid
+                                - canvas_user_globalid
+                                - canvas_user_sissourceid
+                                - person_sourced_id
+                                - message_locale
+                                - vnd_canvas_person_email_sis
+                                - person_email_primary
+                                - person_address_timezone
+                                - user_username
+                                - canvas_user_sisintegrationid
+                                - canvas_user_loginid
+                                - canvas_xapi_url
+                                - caliper_url
+                                - unsupported_param_1
+                                - unsupported_param_2
+                              https://purl.imsglobal.org/spec/lti/claim/lti11_legacy_user_id:
+                                type: string
+                              https://purl.imsglobal.org/spec/lti/claim/lti1p1:
+                                type: object
+                                properties:
+                                  user_id:
+                                    type: string
+                                required:
+                                - user_id
+                            required:
+                            - https://purl.imsglobal.org/spec/lti/claim/message_type
+                            - locale
+                            - https://purl.imsglobal.org/spec/lti/claim/custom
+                            - https://purl.imsglobal.org/spec/lti/claim/lti11_legacy_user_id
+                            - https://purl.imsglobal.org/spec/lti/claim/lti1p1
+                        email:
+                          type: string
+                        lis_person_sourcedid:
+                          type: string
+                      required:
+                      - status
+                      - name
+                      - picture
+                      - given_name
+                      - family_name
+                      - user_id
+                      - lti11_legacy_user_id
+                      - roles
+                      - message
+                      - email
+                      - lis_person_sourcedid
+                required:
+                - id
+                - context
+                - members
+              example:
+                id: http://test.host/api/lti/groups/716159/names_and_roles?pass=thru&role=http%3A%2F%2Fpurl.imsglobal.org%2Fvocab%2Flis%2Fv2%2Fmembership%23Member
+                context:
+                  id: 43849229e5c886f6aafc5bb36fe4c3b33cb3df17
+                  title: 2xUeyCRQz6yjVTWiI2SyNtbOikAZGRX9SzfIvgrR
+                members:
+                - status: Active
+                  name: value for name
+                  picture: http://localhost/images/messages/avatar-50.png
+                  given_name: value for
+                  family_name: name
+                  user_id: dfd1f6b6-887d-421a-85bb-f553a6922dbc
+                  lti11_legacy_user_id: 245a4bb33da4baab24fa34772e633c9bd4b7177f
+                  roles:
+                  - http://purl.imsglobal.org/vocab/lis/v2/membership#Member
+                  - http://purl.imsglobal.org/vocab/lis/v2/membership#Manager
+                - status: Active
+                  name: Marta Perkins
+                  picture: http://localhost/images/messages/avatar-50.png
+                  given_name: Marta
+                  family_name: Perkins
+                  user_id: 48f6ef9f-8dfb-42ca-9fd4-6bd23b6c0a07
+                  lti11_legacy_user_id: 6d12dd551c852cb1b5039130b4faa255c8cce75d
+                  roles:
+                  - http://purl.imsglobal.org/vocab/lis/v2/membership#Member
+                  message:
+                  - https://purl.imsglobal.org/spec/lti/claim/message_type: LtiResourceLinkRequest
+                    locale: en
+                    https://purl.imsglobal.org/spec/lti/claim/custom: {}
+                    https://purl.imsglobal.org/spec/lti/claim/lti11_legacy_user_id: 6d12dd551c852cb1b5039130b4faa255c8cce75d
+                    https://purl.imsglobal.org/spec/lti/claim/lti1p1:
+                      user_id: 6d12dd551c852cb1b5039130b4faa255c8cce75d
+                - status: Active
+                  name: User
+                  picture: http://localhost/images/messages/avatar-50.png
+                  given_name: User
+                  family_name: ''
+                  user_id: 46402316-6175-41d3-9022-d2dffd5f9042
+                  lti11_legacy_user_id: d5bca1b80d33ba6599feb3138ec119454f9dd597
+                  roles:
+                  - http://purl.imsglobal.org/vocab/lis/v2/membership#Member
+                  - http://purl.imsglobal.org/vocab/lis/v2/membership#Manager
+                  message:
+                  - https://purl.imsglobal.org/spec/lti/claim/message_type: LtiResourceLinkRequest
+                    locale: en
+                    https://purl.imsglobal.org/spec/lti/claim/custom: {}
+                    https://purl.imsglobal.org/spec/lti/claim/lti11_legacy_user_id: d5bca1b80d33ba6599feb3138ec119454f9dd597
+                    https://purl.imsglobal.org/spec/lti/claim/lti1p1:
+                      user_id: d5bca1b80d33ba6599feb3138ec119454f9dd597
+        '401':
+          description: returns 401 unauthorized and complains about missing assertions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                      message:
+                        type: string
+                    required:
+                    - type
+                    - message
+                required:
+                - errors
+              example:
+                errors:
+                  type: unauthorized
+                  message: 'Invalid access token field/s: the following assertions
+                    are missing: sub,aud,exp,iat,jti,iss'
+        '400':
+          description: returns a 400 bad_request and descriptive error message
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                      message:
+                        type: string
+                    required:
+                    - type
+                    - message
+                required:
+                - errors
+              example:
+                errors:
+                  type: bad_request
+                  message: Invalid 'rlid' parameter
+        '500':
+          description: returns 500 not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        message:
+                          type: string
+                        error_code:
+                          type: string
+                      required:
+                      - message
+                      - error_code
+                  error_report_id:
+                    type: integer
+                required:
+                - errors
+                - error_report_id
+              example:
+                errors:
+                - message: An error occurred.
+                  error_code: internal_server_error
+                error_report_id: 127858
+        '404':
+          description: returns 404 not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        message:
+                          type: string
+                      required:
+                      - message
+                required:
+                - errors
+              example: {}
+  "/api/lti/groups/{group_id}/membership_service":
+    get:
+      summary: group_index
+      tags:
+      - Lti::MembershipService
+      parameters:
+      - name: group_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 716160
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+        example: 2
+      - name: per_page
+        in: query
+        required: false
+        schema:
+          type: integer
+        example: 1
+      - name: role
+        in: query
+        required: false
+        schema:
+          type: string
+        example: Instructor
+      responses:
+        '200':
+          description: outputs the expected data in the expected format at the top
+            level
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  "@id":
+                    nullable: true
+                  "@type":
+                    type: string
+                  "@context":
+                    type: string
+                  differences:
+                    nullable: true
+                  nextPage:
+                    type: string
+                    nullable: true
+                  pageOf:
+                    type: object
+                    properties:
+                      membershipPredicate:
+                        type: string
+                      membershipSubject:
+                        type: object
+                        properties:
+                          "@id":
+                            nullable: true
+                          name:
+                            type: string
+                          "@type":
+                            type: string
+                          contextId:
+                            type: string
+                          membership:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                "@id":
+                                  nullable: true
+                                status:
+                                  type: string
+                                role:
+                                  type: array
+                                  items:
+                                    type: string
+                                member:
+                                  type: object
+                                  properties:
+                                    "@id":
+                                      nullable: true
+                                    name:
+                                      type: string
+                                    img:
+                                      nullable: true
+                                    email:
+                                      type: string
+                                      nullable: true
+                                    familyName:
+                                      type: string
+                                    givenName:
+                                      type: string
+                                    resultSourcedId:
+                                      nullable: true
+                                    sourcedId:
+                                      nullable: true
+                                    userId:
+                                      type: string
+                                  required:
+                                  - "@id"
+                                  - name
+                                  - img
+                                  - email
+                                  - familyName
+                                  - givenName
+                                  - resultSourcedId
+                                  - sourcedId
+                                  - userId
+                              required:
+                              - "@id"
+                              - status
+                              - role
+                              - member
+                        required:
+                        - "@id"
+                        - name
+                        - "@type"
+                        - contextId
+                        - membership
+                      "@id":
+                        nullable: true
+                      "@context":
+                        type: string
+                      "@type":
+                        type: string
+                    required:
+                    - membershipPredicate
+                    - membershipSubject
+                    - "@id"
+                    - "@context"
+                    - "@type"
+                required:
+                - "@id"
+                - "@type"
+                - "@context"
+                - differences
+                - nextPage
+                - pageOf
+              example:
+                "@id":
+                "@type": Page
+                "@context": http://purl.imsglobal.org/ctx/lis/v2/MembershipContainer
+                differences:
+                nextPage:
+                pageOf:
+                  membershipPredicate: http://www.w3.org/ns/org#membership
+                  membershipSubject:
+                    "@id":
+                    name: Group 1
+                    "@type": Context
+                    contextId: 43849229e5c886f6aafc5bb36fe4c3b33cb3df17
+                    membership:
+                    - "@id":
+                      status: Active
+                      role:
+                      - urn:lti:role:ims/lis/Member
+                      member:
+                        "@id":
+                        name: value for name
+                        img:
+                        email: nobody@example.com
+                        familyName: name
+                        givenName: value for
+                        resultSourcedId:
+                        sourcedId:
+                        userId: f911f4d388aeff99d2c123bc20a157eff4ef0430
+                  "@id":
+                  "@context": http://purl.imsglobal.org/ctx/lis/v2/MembershipContainer
+                  "@type": LISMembershipContainer
+        '401':
+          description: requires a user
+          content:
+            text/html:
+              schema:
+                type: string
+              example: ''
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        message:
+                          type: string
+                      required:
+                      - message
+                required:
+                - errors
+              example:
+                errors:
+                - message: Invalid access token.

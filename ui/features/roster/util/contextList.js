@@ -15,9 +15,8 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import $ from 'jquery'
 import {chain, values, pick, includes, clone} from 'lodash'
-import h from 'html-escape'
+import h, {raw} from '@instructure/html-escape'
 import listWithOthers from './listWithOthers'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 
@@ -36,7 +35,7 @@ function format(context, linkToContexts) {
   if (linkToContexts && context.type === 'course') {
     html = `<a href='${h(context.url)}'>${html}</a>`
   }
-  return $.raw(html)
+  return raw(html)
 }
 
 // given a map of ids by type (e.g. {courses: [1, 2], groups: ...})

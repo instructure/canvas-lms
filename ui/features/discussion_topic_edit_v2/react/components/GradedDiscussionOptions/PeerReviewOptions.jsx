@@ -25,6 +25,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {RadioInputGroup, RadioInput} from '@instructure/ui-radio-input'
+import {Checkbox} from '@instructure/ui-checkbox'
 
 const I18n = useI18nScope('discussion_create')
 
@@ -41,6 +42,8 @@ export const PeerReviewOptions = ({
   setPeerReviewsPerStudent,
   peerReviewDueDate,
   setPeerReviewDueDate,
+  intraGroupPeerReviews,
+  setIntraGroupPeerReviews,
 }) => {
   return (
     <View as="div">
@@ -96,6 +99,14 @@ export const PeerReviewOptions = ({
             <Text as="p" size="small">
               {I18n.t('If left blank, uses due date')}
             </Text>
+          </View>
+          <View as="div" margin="small 0">
+            <Checkbox
+              label={I18n.t('Allow intra-group peer reviews')}
+              value="intra_group_peer_reviews"
+              checked={intraGroupPeerReviews}
+              onChange={() => setIntraGroupPeerReviews(!intraGroupPeerReviews)}
+            />
           </View>
         </>
       )}

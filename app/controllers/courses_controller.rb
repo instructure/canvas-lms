@@ -2168,23 +2168,19 @@ class CoursesController < ApplicationController
       end
 
       if @context && @current_user
-        if Setting.get("assignments_2_observer_view", "false") == "true"
-          observed_users(@current_user, session, @context.id) # sets @selected_observed_user
-          context_enrollment_scope = @context.enrollments.where(user_id: @current_user)
-          if observee_selected?
-            context_enrollment_scope = context_enrollment_scope.where(associated_user_id: @selected_observed_user)
-          end
-          @context_enrollment = context_enrollment_scope.first
-          js_env({ OBSERVER_OPTIONS: {
-                   OBSERVED_USERS_LIST: observed_users(@current_user, session, @context.id),
-                   CAN_ADD_OBSERVEE: @current_user
-                                     .profile
-                                     .tabs_available(@current_user, root_account: @domain_root_account)
-                                     .any? { |t| t[:id] == UserProfile::TAB_OBSERVEES }
-                 } })
-        else
-          @context_enrollment = @context.enrollments.where(user_id: @current_user).first
+        observed_users(@current_user, session, @context.id) # sets @selected_observed_user
+        context_enrollment_scope = @context.enrollments.where(user_id: @current_user)
+        if observee_selected?
+          context_enrollment_scope = context_enrollment_scope.where(associated_user_id: @selected_observed_user)
         end
+        @context_enrollment = context_enrollment_scope.first
+        js_env({ OBSERVER_OPTIONS: {
+                 OBSERVED_USERS_LIST: observed_users(@current_user, session, @context.id),
+                 CAN_ADD_OBSERVEE: @current_user
+                                    .profile
+                                    .tabs_available(@current_user, root_account: @domain_root_account)
+                                    .any? { |t| t[:id] == UserProfile::TAB_OBSERVEES }
+               } })
 
         if @context_enrollment
           @context_membership = @context_enrollment # for AUA
@@ -4091,7 +4087,7 @@ class CoursesController < ApplicationController
   end
 
   def update_grade_passback_setting(grade_passback_setting)
-    valid_states = Setting.get("valid_grade_passback_settings", "nightly_sync,disabled").split(",")
+    valid_states = ["nightly_sync", "disabled"]
     unless grade_passback_setting.blank? || valid_states.include?(grade_passback_setting)
       @course.errors.add(:grade_passback_setting, t("Invalid grade_passback_setting"))
     end

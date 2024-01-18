@@ -288,7 +288,6 @@ describe Lti::LtiOutboundAdapter do
 
     it "does not copy query params to the post body if :disable_post_only is set on root_Account" do
       allow(account).to receive(:all_account_users_for).with(user).and_return([])
-      allow(account).to receive(:feature_enabled?).with(:variable_substitution_numeric_to_string).and_return(false)
       allow(account).to receive(:feature_enabled?).with(:disable_lti_post_only).and_return(true)
       adapter.prepare_tool_launch(return_url, variable_expander)
       payload = adapter.generate_post_payload
