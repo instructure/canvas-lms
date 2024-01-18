@@ -16,9 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useEffect, useState} from 'react'
 import {useParams} from 'react-router-dom'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import {useQuery} from '@canvas/query'
 import {View} from '@instructure/ui-view'
 import {TextInput} from '@instructure/ui-text-input'
 import {Heading} from '@instructure/ui-heading'
@@ -35,6 +36,8 @@ import {Link} from '@instructure/ui-link'
 import {RubricCriteriaRow} from './RubricCriteriaRow'
 import {NewCriteriaRow} from './NewCriteriaRow'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {fetchRubric} from '../../queries/RubricFormQueries'
+import LoadingIndicator from '@canvas/loading-indicator/react'
 
 const I18n = useI18nScope('rubrics-form')
 
@@ -42,8 +45,25 @@ const {Option: SimpleSelectOption} = SimpleSelect
 
 export const RubricForm = () => {
   const {rubricId} = useParams()
+  const [rubricFormTitle, setRubricFormTitle] = useState<string>('')
 
   const header = rubricId ? I18n.t('Edit Rubric') : I18n.t('Create New Rubric')
+
+  const {data, isLoading} = useQuery({
+    queryKey: [`fetch-rubric-${rubricId}`],
+    queryFn: async () => fetchRubric(rubricId),
+    enabled: !!rubricId,
+  })
+
+  useEffect(() => {
+    if (data && data.title) {
+      setRubricFormTitle(data.title)
+    }
+  }, [data])
+
+  if (isLoading && !!rubricId) {
+    return <LoadingIndicator />
+  }
 
   return (
     <View as="div">
@@ -52,7 +72,12 @@ export const RubricForm = () => {
       </Heading>
 
       <View as="div" display="block" margin="large 0 small 0" maxWidth="45rem">
-        <TextInput renderLabel={I18n.t('Rubric Name')} />
+        <TextInput
+          data-testid="rubric-form-title"
+          renderLabel={I18n.t('Rubric Name')}
+          onChange={e => setRubricFormTitle(e.target.value)}
+          value={rubricFormTitle}
+        />
       </View>
       <View as="div" margin="medium 0" maxWidth="45rem">
         <Flex wrap="wrap" justifyItems="space-between">

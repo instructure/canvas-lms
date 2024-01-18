@@ -17,12 +17,23 @@
  */
 
 import React from 'react'
+import Router from 'react-router'
 import {BrowserRouter} from 'react-router-dom'
 import {render} from '@testing-library/react'
-import {QueryProvider} from '@canvas/query'
+import {QueryProvider, queryClient} from '@canvas/query'
 import {RubricForm} from '../index'
+import {RUBRICS_QUERY_RESPONSE} from './fixtures'
+
+jest.mock('react-router', () => ({
+  ...jest.requireActual('react-router'),
+  useParams: jest.fn(),
+}))
 
 describe('RubricForm Tests', () => {
+  beforeAll(() => {
+    jest.spyOn(Router, 'useParams').mockReturnValue({accountId: '1'})
+  })
+
   const renderComponent = () => {
     return render(
       <QueryProvider>
@@ -33,9 +44,26 @@ describe('RubricForm Tests', () => {
     )
   }
 
-  it('renders component', () => {
-    const {getByText} = renderComponent()
+  describe('without rubricId', () => {
+    it('loads rubric data and populates appropriate fields', () => {
+      queryClient.setQueryData(['fetch-rubric-1'], RUBRICS_QUERY_RESPONSE)
 
-    expect(getByText('Create New Rubric')).toBeInTheDocument()
+      const {getByTestId, getByText} = renderComponent()
+      expect(getByText('Create New Rubric')).toBeInTheDocument()
+      expect(getByTestId('rubric-form-title')).toHaveValue('')
+    })
+  })
+
+  describe('with rubricId', () => {
+    beforeAll(() => {
+      jest.spyOn(Router, 'useParams').mockReturnValue({rubricId: '1'})
+    })
+
+    it('loads rubric data and populates appropriate fields', () => {
+      queryClient.setQueryData(['fetch-rubric-1'], RUBRICS_QUERY_RESPONSE)
+
+      const {getByTestId} = renderComponent()
+      expect(getByTestId('rubric-form-title')).toHaveValue('Rubric 1')
+    })
   })
 })
