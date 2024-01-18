@@ -309,6 +309,14 @@ describe('updateRRuleForNewDate', () => {
     expect(updateRRuleForNewDate(moment.tz('2023-07-17T00:00:00', defaultTZ), null)).toBeNull()
   })
 
+  it('updates a weekly rrule to match the all days of the week', () => {
+    const rrule = 'FREQ=WEEKLY;INTERVAL=1;BYDAY=MO,TU,WE,TH,FR;COUNT=260'
+    const newDate = moment.tz('2023-07-18T00:00:00', defaultTZ)
+    expect(updateRRuleForNewDate(newDate, rrule)).toEqual(
+      'FREQ=WEEKLY;INTERVAL=1;BYDAY=MO,TU,WE,TH,FR;COUNT=260'
+    )
+  })
+
   it('updates a weekly rrule to match the new day of the week', () => {
     const rrule = 'FREQ=WEEKLY;INTERVAL=1;BYDAY=MO;COUNT=52'
     const newDate = moment.tz('2023-07-18T00:00:00', defaultTZ)
