@@ -23,7 +23,7 @@ export type Enrollment = Readonly<{
   course_section_id: string
   created_at: string
   end_at: null | string
-  enrollment_state: 'active'
+  enrollment_state: 'active' | 'inactive' | 'completed' | 'invited'
   html_url: string
   id: string
   last_activity_at: null | string
