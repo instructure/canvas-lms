@@ -30,6 +30,7 @@ import type {
   ColumnSizeSettings,
   CustomColumn,
   CustomStatusIdString,
+  EnrollmentFilter,
   Filter,
   FilterPreset,
   FilterType,
@@ -710,7 +711,21 @@ export const filterStudentBySubmissionFn = (
   }
 }
 
-export const filterStudentBySectionFn = (appliedFilters: Filter[]) => {
+const getIncludedEnrollmentStates = (enrollmentFilter: EnrollmentFilter) => {
+  const enrollmentStates = ['active', 'invited']
+  if (enrollmentFilter.inactive) {
+    enrollmentStates.push('inactive')
+  }
+  if (enrollmentFilter.concluded) {
+    enrollmentStates.push('completed')
+  }
+  return enrollmentStates
+}
+
+export const filterStudentBySectionFn = (
+  appliedFilters: Filter[],
+  enrollmentFilter: EnrollmentFilter
+) => {
   const sectionFilters = findFilterValuesOfType(
     'section',
     appliedFilters
@@ -720,8 +735,14 @@ export const filterStudentBySectionFn = (appliedFilters: Filter[]) => {
     if (sectionFilters.length === 0) {
       return true
     }
-
-    return student.sections ? student.sections.includes(sectionFilters[0]) : false
+    const includedEnrollmentStates = getIncludedEnrollmentStates(enrollmentFilter)
+    const enrollmentStates = student.enrollments
+      .filter(e => e.course_section_id === sectionFilters[0])
+      .map(enrollment => enrollment.enrollment_state)
+    return student.sections
+      ? enrollmentStates.length > 0 &&
+          _.intersection(enrollmentStates, includedEnrollmentStates).length > 0
+      : false
   }
 }
 

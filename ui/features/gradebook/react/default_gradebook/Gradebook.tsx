@@ -1245,7 +1245,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
           this.options.custom_grade_statuses_enabled ? this.options.custom_grade_statuses : []
         )
       )
-      .filter(filterStudentBySectionFn(this.props.appliedFilters))
+      .filter(filterStudentBySectionFn(this.props.appliedFilters, this.getEnrollmentFilters()))
   }
 
   updateFilteredStudentIds = () => {
