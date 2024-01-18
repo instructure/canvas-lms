@@ -29,6 +29,17 @@ class Rubric < ActiveRecord::Base
     end
   end
 
+  class RubricAssessedAlignments < ActiveModel::Validator
+    def validate(record)
+      return if record.criteria.nil?
+
+      ids = record.criteria.pluck(:learning_outcome_id).compact
+      ids_from_results = record.learning_outcome_ids_from_results
+
+      record.errors.add :base, I18n.t("This rubric removes criterions that have learning outcome results") unless (ids_from_results - ids).empty?
+    end
+  end
+
   include Workflow
   include HtmlTextHelper
 
@@ -51,6 +62,7 @@ class Rubric < ActiveRecord::Base
   validates :title, length: { maximum: maximum_string_length, allow_blank: false }
 
   validates_with RubricUniqueAlignments
+  validates_with RubricAssessedAlignments
 
   before_validation :default_values
   before_create :set_root_account_id
