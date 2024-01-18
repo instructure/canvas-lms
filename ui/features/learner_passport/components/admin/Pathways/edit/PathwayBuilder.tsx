@@ -16,29 +16,29 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useState} from 'react'
+import React, {useCallback, useEffect, useState} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
-import type {PathwayDetailData, MilestoneData} from '../../../types'
+import type {PathwayDetailData, DraftPathway, MilestoneData} from '../../../types'
 import PathwayBuilderSidebar from './PathwayBuilderSidebar'
 import PathwayBuilderTree from './PathwayBuilderTree'
 import MilestoneTray from './MilestoneTray'
+import {showUnimplemented} from '../../../shared/utils'
 
 type PathwayBuilderProps = {
-  pathway: PathwayDetailData
+  pathway: DraftPathway
   onChange: (newValues: Partial<PathwayDetailData>) => void
 }
 
 const PathwayBuilder = ({pathway, onChange}: PathwayBuilderProps) => {
   const [currentRoot, setCurrentRoot] = useState<MilestoneData | null>(null)
   const [milestoneTrayOpen, setMilestoneTrayOpen] = useState(false)
-  const [milestoneTrayOpenCount, setMilestoneTrayOpenCount] = useState(0)
-  const [treeVersion, setTreeVersion] = useState(0)
+  const [milestoneTrayOpenKey, setMilestoneTrayOpenKey] = useState(0)
+  const [activeMilestone, setActiveMilestone] = useState<MilestoneData | undefined>(undefined)
   const [sidebarIsVisible, setSidebarIsVisible] = useState(true)
 
   const handleShowSidebar = useCallback(() => {
     setSidebarIsVisible(true)
-    setTreeVersion(Date.now())
   }, [])
 
   const handleHideSidebar = useCallback(() => {
@@ -46,25 +46,64 @@ const PathwayBuilder = ({pathway, onChange}: PathwayBuilderProps) => {
   }, [])
 
   const handleAddMilestone = useCallback(() => {
-    setMilestoneTrayOpenCount(milestoneTrayOpenCount + 1)
+    setMilestoneTrayOpenKey(Date.now())
     setMilestoneTrayOpen(true)
-  }, [milestoneTrayOpenCount])
+  }, [])
+
+  const handleEditPathway = useCallback(() => {
+    showUnimplemented({currentTarget: {textContent: 'edit pathway'}})
+  }, [])
+
+  const handleEditMilestone = useCallback(
+    (milestoneId: string) => {
+      setMilestoneTrayOpenKey(Date.now())
+      const milestone = pathway.milestones.find(m => m.id === milestoneId)
+      setActiveMilestone(milestone)
+      setMilestoneTrayOpen(true)
+    },
+    [pathway.milestones]
+  )
+
+  const handleDeleteMilestone = useCallback(
+    (milestoneID: string) => {
+      const newMilestones = [...pathway.milestones]
+      const mIndex = pathway.milestones.findIndex(m => m.id === milestoneID)
+      if (mIndex >= 0) {
+        newMilestones.splice(mIndex, 1)
+      }
+
+      const newFirstMilestones = [...pathway.first_milestones]
+      const fIndex = pathway.first_milestones.findIndex(m => m === milestoneID)
+      if (fIndex >= 0) {
+        newFirstMilestones.splice(fIndex, 1)
+      }
+      onChange({milestones: newMilestones, first_milestones: newFirstMilestones})
+    },
+    [onChange, pathway.first_milestones, pathway.milestones]
+  )
 
   const handleSaveMilestone = useCallback(
     (newMilestone: MilestoneData) => {
-      setTreeVersion(Date.now())
       setMilestoneTrayOpen(false)
-      const first_milestones = [...pathway.first_milestones]
-      const milestones = [...pathway.milestones]
-      if (currentRoot === null) {
-        first_milestones.push(newMilestone.id)
+
+      const mIndex = pathway.milestones.findIndex(m => m.id === newMilestone.id)
+      if (mIndex >= 0) {
+        const newMilestones = [...pathway.milestones]
+        newMilestones[mIndex] = newMilestone
+        onChange({milestones: newMilestones})
       } else {
-        const rootMilestone = {...currentRoot}
-        if (rootMilestone) {
-          rootMilestone.next_milestones.push(newMilestone.id)
+        const first_milestones = [...pathway.first_milestones]
+        const milestones = [...pathway.milestones]
+        if (currentRoot === null) {
+          first_milestones.push(newMilestone.id)
+        } else {
+          const rootMilestone = {...currentRoot}
+          if (rootMilestone) {
+            rootMilestone.next_milestones.push(newMilestone.id)
+          }
         }
+        onChange({first_milestones, milestones: [...milestones, newMilestone]})
       }
-      onChange({first_milestones, milestones: [...milestones, newMilestone]})
     },
     [currentRoot, onChange, pathway.first_milestones, pathway.milestones]
   )
@@ -89,6 +128,9 @@ const PathwayBuilder = ({pathway, onChange}: PathwayBuilderProps) => {
               pathway={pathway}
               currentStep={currentRoot}
               onAddStep={handleAddMilestone}
+              onEditPathway={handleEditPathway}
+              onEditStep={handleEditMilestone}
+              onDeleteStep={handleDeleteMilestone}
               onHideSidebar={handleHideSidebar}
             />
           </Flex.Item>
@@ -100,12 +142,13 @@ const PathwayBuilder = ({pathway, onChange}: PathwayBuilderProps) => {
             selectedStep={currentRoot ? currentRoot.id : null}
             onShowSidebar={sidebarIsVisible ? undefined : handleShowSidebar}
             onSelectStep={handleSelectStepFromTree}
-            treeVersion={treeVersion}
+            treeVersion={pathway.timestamp}
           />
         </Flex.Item>
       </Flex>
       <MilestoneTray
-        key={milestoneTrayOpenCount}
+        key={milestoneTrayOpenKey}
+        milestone={activeMilestone}
         open={milestoneTrayOpen}
         variant="add"
         onClose={() => setMilestoneTrayOpen(false)}

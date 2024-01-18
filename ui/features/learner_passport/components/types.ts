@@ -221,6 +221,10 @@ export interface PathwayDetailData extends PathwayData {
   milestones: MilestoneData[] // all the milestones in the pathway
 }
 
+export interface DraftPathway extends PathwayDetailData {
+  timestamp: number
+}
+
 export interface PathwayEditData {
   pathway: PathwayDetailData
   badges: PathwayBadgeType[]
