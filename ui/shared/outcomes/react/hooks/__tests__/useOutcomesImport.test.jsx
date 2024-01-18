@@ -27,21 +27,24 @@ import {createCache} from '@canvas/apollo'
 import {MockedProvider} from '@apollo/react-testing'
 import OutcomesContext from '../../contexts/OutcomesContext'
 import {importGroupMocks, importOutcomeMocks} from '../../../mocks/Management'
-import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import resolveProgress from '@canvas/progress/resolve_progress'
 import {waitFor} from '@testing-library/react'
 
 jest.mock('@canvas/progress/resolve_progress')
+
 jest.useFakeTimers()
 
-// OUT-6141 - remove or rewrite to remove spies on imports
-describe.skip('useOutcomesImport', () => {
-  let cache, showFlashAlertSpy
+jest.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashAlert: jest.fn(() => jest.fn(() => {})),
+}))
+
+describe('useOutcomesImport', () => {
+  let cache
   const groupId = '100'
   const outcomeId = '200'
   beforeEach(() => {
     cache = createCache()
-    showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
     resolveProgress.mockImplementation(() => Promise.resolve())
   })
 
@@ -164,7 +167,7 @@ describe.skip('useOutcomesImport', () => {
       })
       expect(result.current.importGroupsStatus).toEqual({[groupId]: IMPORT_PENDING})
       await act(async () => jest.runAllTimers())
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      expect(showFlashAlert).toHaveBeenCalledWith({
         message: 'An error occurred while importing these outcomes.',
         type: 'error',
       })
@@ -182,7 +185,7 @@ describe.skip('useOutcomesImport', () => {
         })
       })
       await act(async () => jest.runAllTimers())
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      expect(showFlashAlert).toHaveBeenCalledWith({
         message: 'All outcomes from New Group have been successfully added to this account.',
         type: 'success',
       })
@@ -206,7 +209,7 @@ describe.skip('useOutcomesImport', () => {
         })
       })
       await act(async () => jest.runAllTimers())
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      expect(showFlashAlert).toHaveBeenCalledWith({
         message: 'All outcomes from New Group have been successfully added to 123 Group.',
         type: 'success',
       })
@@ -227,7 +230,7 @@ describe.skip('useOutcomesImport', () => {
         })
       })
       await act(async () => jest.runAllTimers())
-      expect(showFlashAlertSpy).toHaveBeenCalledTimes(0)
+      expect(showFlashAlert).not.toHaveBeenCalled()
     })
 
     it('imports group in Course context and displays flash confirmation', async () => {
@@ -249,7 +252,7 @@ describe.skip('useOutcomesImport', () => {
         })
       })
       await act(async () => jest.runAllTimers())
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      expect(showFlashAlert).toHaveBeenCalledWith({
         message: 'All outcomes from New Group have been successfully added to this course.',
         type: 'success',
       })
@@ -279,7 +282,7 @@ describe.skip('useOutcomesImport', () => {
         result.current.importOutcomes({outcomeOrGroupId: '100'})
       })
       await act(async () => jest.runAllTimers())
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      expect(showFlashAlert).toHaveBeenCalledWith({
         message: 'An error occurred while importing these outcomes: GraphQL error: Network error.',
         type: 'error',
       })
@@ -296,7 +299,7 @@ describe.skip('useOutcomesImport', () => {
         result.current.importOutcomes({outcomeOrGroupId: '100'})
       })
       await act(async () => jest.runAllTimers())
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      expect(showFlashAlert).toHaveBeenCalledWith({
         message: 'An error occurred while importing these outcomes.',
         type: 'error',
       })
@@ -426,7 +429,7 @@ describe.skip('useOutcomesImport', () => {
       })
       expect(result.current.importOutcomesStatus).toEqual({[outcomeId]: IMPORT_PENDING})
       await act(async () => jest.runAllTimers())
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      expect(showFlashAlert).toHaveBeenCalledWith({
         message: 'An error occurred while importing this outcome.',
         type: 'error',
       })
@@ -444,7 +447,7 @@ describe.skip('useOutcomesImport', () => {
         result.current.importOutcomes({outcomeOrGroupId: outcomeId, isGroup: false})
       })
       await act(async () => jest.runAllTimers())
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      expect(showFlashAlert).toHaveBeenCalledWith({
         message: 'An error occurred while importing this outcome: GraphQL error: Network error.',
         type: 'error',
       })
@@ -461,7 +464,7 @@ describe.skip('useOutcomesImport', () => {
         result.current.importOutcomes({outcomeOrGroupId: outcomeId, isGroup: false})
       })
       await act(async () => jest.runAllTimers())
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      expect(showFlashAlert).toHaveBeenCalledWith({
         message: 'An error occurred while importing this outcome.',
         type: 'error',
       })
