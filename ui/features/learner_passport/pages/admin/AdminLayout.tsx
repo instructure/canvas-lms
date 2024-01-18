@@ -61,6 +61,10 @@ export const Component = () => {
         body:not(.full-width):not(.outcomes):not(.body--login-confirmation).learner-passport .ic-Layout-wrapper {
           max-width: 100%;
         }
+        #main #content.ic-Layout-contentMain {
+          padding: 0;
+          position:relative;
+        }
       `
       document.head.appendChild(s)
     }
@@ -99,63 +103,77 @@ export const Component = () => {
 
   return (
     <Portal open={true} mountNode={mountPoint}>
-      <div style={{margin: '-36px -48px -48px -48px'}}>
-        <View as="div" background="secondary" padding="small medium" borderWidth="0 0 small 0">
-          <Flex>
-            <div style={{color: 'var(--ic-brand-primary)'}}>
-              <SVGIcon src={passportSvg} inline={true} size="small" title="Learner Passport" />
-            </div>
-            <Flex.Item shouldGrow={true} margin="0 medium 0 0">
-              <div style={{display: 'inline-block', marginInlineStart: '1.5rem'}} role="tablist">
-                <div
-                  role="tab"
-                  data-tabid="pathways"
-                  style={selectedTab === 'pathways' ? activeStyle : inactiveStyle}
-                  tabIndex={0}
-                  onClick={handleTabClick}
-                  onKeyDown={handleTabKey}
-                >
-                  Pathways
-                </div>
-                <div
-                  role="tab"
-                  data-tabid="achievements"
-                  style={selectedTab === 'achievements' ? activeStyle : inactiveStyle}
-                  tabIndex={0}
-                  onClick={handleTabClick}
-                  onKeyDown={handleTabKey}
-                >
-                  Achievements
-                </div>
-                <div
-                  role="tab"
-                  data-tabid="learner_records"
-                  style={selectedTab === 'learner_records' ? activeStyle : inactiveStyle}
-                  tabIndex={0}
-                  onClick={handleTabClick}
-                  onKeyDown={handleTabKey}
-                >
-                  Learner Records
-                </div>
-                <div
-                  role="tab"
-                  data-tabid="institution_settings"
-                  style={selectedTab === 'institution_settings' ? activeStyle : inactiveStyle}
-                  tabIndex={0}
-                  onClick={handleTabClick}
-                  onKeyDown={handleTabKey}
-                >
-                  Institution Settings
-                </div>
+      <Flex direction="column" alignItems="stretch" height="100dvh">
+        <Flex.Item as="div" shouldGrow={false} shouldShrink={false}>
+          <View
+            as="div"
+            background="secondary"
+            padding="small medium"
+            borderWidth="0 0 small 0"
+            height="100%"
+          >
+            <Flex height="100%">
+              <div style={{color: 'var(--ic-brand-primary)'}}>
+                <SVGIcon src={passportSvg} inline={true} size="small" title="Learner Passport" />
               </div>
-            </Flex.Item>
-            <Flex.Item>{window.ENV.current_user.display_name}</Flex.Item>
-          </Flex>
-        </View>
-        <View id="learner_passport_container" as="div" margin="large x-large 0">
+              <Flex.Item shouldGrow={true} margin="0 medium 0 0">
+                <div style={{display: 'inline-block', marginInlineStart: '1.5rem'}} role="tablist">
+                  <div
+                    role="tab"
+                    data-tabid="pathways"
+                    style={selectedTab === 'pathways' ? activeStyle : inactiveStyle}
+                    tabIndex={0}
+                    onClick={handleTabClick}
+                    onKeyDown={handleTabKey}
+                  >
+                    Pathways
+                  </div>
+                  <div
+                    role="tab"
+                    data-tabid="achievements"
+                    style={selectedTab === 'achievements' ? activeStyle : inactiveStyle}
+                    tabIndex={0}
+                    onClick={handleTabClick}
+                    onKeyDown={handleTabKey}
+                  >
+                    Achievements
+                  </div>
+                  <div
+                    role="tab"
+                    data-tabid="learner_records"
+                    style={selectedTab === 'learner_records' ? activeStyle : inactiveStyle}
+                    tabIndex={0}
+                    onClick={handleTabClick}
+                    onKeyDown={handleTabKey}
+                  >
+                    Learner Records
+                  </div>
+                  <div
+                    role="tab"
+                    data-tabid="institution_settings"
+                    style={selectedTab === 'institution_settings' ? activeStyle : inactiveStyle}
+                    tabIndex={0}
+                    onClick={handleTabClick}
+                    onKeyDown={handleTabKey}
+                  >
+                    Institution Settings
+                  </div>
+                </div>
+              </Flex.Item>
+              <Flex.Item>{window.ENV.current_user.display_name}</Flex.Item>
+            </Flex>
+          </View>
+        </Flex.Item>
+        <Flex.Item
+          id="learner_passport_container"
+          as="div"
+          shouldGrow={true}
+          shouldShrink={false}
+          overflowY="hidden"
+        >
           <Outlet />
-        </View>
-      </div>
+        </Flex.Item>
+      </Flex>
     </Portal>
   )
 }

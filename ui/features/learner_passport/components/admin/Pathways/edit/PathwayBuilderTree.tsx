@@ -72,7 +72,14 @@ const PathwayBuilderTree = ({
 
   const layout = getLayout(viewDirection, flipped)
   return (
-    <View as="div" minHeight="100%" margin="small" position="relative">
+    <View
+      data-compid="pathway-builder-tree"
+      as="div"
+      height="100%"
+      margin="small"
+      position="relative"
+      overflowY="auto"
+    >
       <div style={{position: 'absolute', top: '.5rem', left: '.5rem', zIndex: 1}}>
         {onShowSidebar ? (
           <Button onClick={onShowSidebar} margin="0 x-small 0 0">
@@ -88,16 +95,14 @@ const PathwayBuilderTree = ({
         </Button>
         <Button onClick={handleFlipClick}>Flip pathway</Button>
       </div>
-      <View as="div" overflowX="auto" overflowY="visible">
-        <PathwayTreeView
-          key={`${treeVersion}-${layout}`}
-          pathway={pathway}
-          selectedStep={selectedStep}
-          zoomLevel={zoomLevel}
-          layout={layout}
-          onSelected={onSelectStep}
-        />
-      </View>
+      <PathwayTreeView
+        key={`${treeVersion}-${layout}`}
+        pathway={pathway}
+        selectedStep={selectedStep}
+        zoomLevel={zoomLevel}
+        layout={layout}
+        onSelected={onSelectStep}
+      />
     </View>
   )
 }

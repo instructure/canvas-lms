@@ -380,7 +380,7 @@ class LearnerPassportController < ApplicationController
   def learner_passport_pathway_template
     {
       id: "",
-      title: "",
+      title: "New Pathway",
       description: "",
       published: nil,
       is_private: false,
@@ -753,7 +753,11 @@ class LearnerPassportController < ApplicationController
   end
 
   def pathway_show
-    pathway = Rails.cache.fetch(current_pathways_key) { learner_passport_current_pathways }.find { |p| p[:id] == params[:pathway_id] }
+    pathway = if params[:pathway_id] == "new"
+                Rails.cache.fetch(pathway_template_key) { learner_passport_pathway_template }.clone
+              else
+                Rails.cache.fetch(current_pathways_key) { learner_passport_current_pathways }.find { |p| p[:id] == params[:pathway_id] }
+              end
     return render json: { message: "Pathway not found" }, status: :not_found if pathway.nil?
 
     render json: pathway
