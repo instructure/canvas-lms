@@ -19,23 +19,38 @@
 import React, {useCallback, useEffect, useState} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
-import type {PathwayDetailData, DraftPathway, MilestoneData} from '../../../types'
+import type {
+  LearnerGroupType,
+  PathwayBadgeType,
+  PathwayDetailData,
+  DraftPathway,
+  MilestoneData,
+} from '../../../types'
 import PathwayBuilderSidebar from './PathwayBuilderSidebar'
 import PathwayBuilderTree from './PathwayBuilderTree'
 import MilestoneTray from './MilestoneTray'
-import {showUnimplemented} from '../../../shared/utils'
+import PathwayDetailsTray from './PathwayDetailsTray'
 
 type PathwayBuilderProps = {
   pathway: DraftPathway
+  mode: 'create' | 'edit'
+  allBadges: PathwayBadgeType[]
+  allLearnerGroups: LearnerGroupType[]
   onChange: (newValues: Partial<PathwayDetailData>) => void
 }
 
-const PathwayBuilder = ({pathway, onChange}: PathwayBuilderProps) => {
+const PathwayBuilder = ({
+  pathway,
+  mode,
+  allBadges,
+  allLearningGroups,
+  onChange,
+}: PathwayBuilderProps) => {
   const [currentRoot, setCurrentRoot] = useState<MilestoneData | null>(null)
-  const [milestoneTrayOpen, setMilestoneTrayOpen] = useState(false)
+  const [sidebarIsVisible, setSidebarIsVisible] = useState(true)
   const [milestoneTrayOpenKey, setMilestoneTrayOpenKey] = useState(0)
   const [activeMilestone, setActiveMilestone] = useState<MilestoneData | undefined>(undefined)
-  const [sidebarIsVisible, setSidebarIsVisible] = useState(true)
+  const [pathwayTrayOpenKey, setPathwayTrayOpenKey] = useState(mode === 'create' ? Date.now() : 0)
 
   const handleShowSidebar = useCallback(() => {
     setSidebarIsVisible(true)
@@ -47,19 +62,17 @@ const PathwayBuilder = ({pathway, onChange}: PathwayBuilderProps) => {
 
   const handleAddMilestone = useCallback(() => {
     setMilestoneTrayOpenKey(Date.now())
-    setMilestoneTrayOpen(true)
   }, [])
 
   const handleEditPathway = useCallback(() => {
-    showUnimplemented({currentTarget: {textContent: 'edit pathway'}})
+    setPathwayTrayOpenKey(Date.now())
   }, [])
 
   const handleEditMilestone = useCallback(
     (milestoneId: string) => {
-      setMilestoneTrayOpenKey(Date.now())
       const milestone = pathway.milestones.find(m => m.id === milestoneId)
       setActiveMilestone(milestone)
-      setMilestoneTrayOpen(true)
+      setMilestoneTrayOpenKey(Date.now())
     },
     [pathway.milestones]
   )
@@ -84,7 +97,7 @@ const PathwayBuilder = ({pathway, onChange}: PathwayBuilderProps) => {
 
   const handleSaveMilestone = useCallback(
     (newMilestone: MilestoneData) => {
-      setMilestoneTrayOpen(false)
+      setMilestoneTrayOpenKey(0)
 
       const mIndex = pathway.milestones.findIndex(m => m.id === newMilestone.id)
       if (mIndex >= 0) {
@@ -119,39 +132,73 @@ const PathwayBuilder = ({pathway, onChange}: PathwayBuilderProps) => {
     [setCurrentRoot]
   )
 
+  const handleSavePathwayDetails = useCallback(
+    (newValues: Partial<PathwayDetailData>) => {
+      setPathwayTrayOpenKey(0)
+      onChange(newValues)
+    },
+    [onChange]
+  )
+
   return (
-    <View as="div">
-      <Flex as="div" alignItems="stretch" height="100%">
-        {sidebarIsVisible ? (
-          <Flex.Item shouldShrink={false} shouldGrow={false}>
-            <PathwayBuilderSidebar
+    <View
+      as="div"
+      data-compid="pathway-builder"
+      borderWidth="small 0 0 0"
+      height="100%"
+      position="relative"
+    >
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          right: 0,
+          bottom: 0,
+          left: 0,
+          boxSizing: 'border-box',
+        }}
+      >
+        <Flex as="div" alignItems="stretch" height="100%">
+          {sidebarIsVisible ? (
+            <Flex.Item shouldShrink={false} shouldGrow={false}>
+              <PathwayBuilderSidebar
+                pathway={pathway}
+                currentStep={currentRoot}
+                onAddStep={handleAddMilestone}
+                onEditPathway={handleEditPathway}
+                onEditStep={handleEditMilestone}
+                onDeleteStep={handleDeleteMilestone}
+                onHideSidebar={handleHideSidebar}
+              />
+            </Flex.Item>
+          ) : null}
+
+          <Flex.Item shouldGrow={true} shouldShrink={true}>
+            <PathwayBuilderTree
               pathway={pathway}
-              currentStep={currentRoot}
-              onAddStep={handleAddMilestone}
-              onEditPathway={handleEditPathway}
-              onEditStep={handleEditMilestone}
-              onDeleteStep={handleDeleteMilestone}
-              onHideSidebar={handleHideSidebar}
+              selectedStep={currentRoot ? currentRoot.id : null}
+              onShowSidebar={sidebarIsVisible ? undefined : handleShowSidebar}
+              onSelectStep={handleSelectStepFromTree}
+              treeVersion={pathway.timestamp}
             />
           </Flex.Item>
-        ) : null}
-
-        <Flex.Item shouldGrow={true} shouldShrink={true}>
-          <PathwayBuilderTree
-            pathway={pathway}
-            selectedStep={currentRoot ? currentRoot.id : null}
-            onShowSidebar={sidebarIsVisible ? undefined : handleShowSidebar}
-            onSelectStep={handleSelectStepFromTree}
-            treeVersion={pathway.timestamp}
-          />
-        </Flex.Item>
-      </Flex>
+        </Flex>
+      </div>
+      <PathwayDetailsTray
+        key={pathwayTrayOpenKey}
+        pathway={pathway}
+        allBadges={allBadges}
+        selectedBadgeId={pathway.completion_award?.id || null}
+        open={pathwayTrayOpenKey > 0}
+        onClose={() => setPathwayTrayOpenKey(0)}
+        onSave={handleSavePathwayDetails}
+      />
       <MilestoneTray
         key={milestoneTrayOpenKey}
         milestone={activeMilestone}
-        open={milestoneTrayOpen}
+        open={milestoneTrayOpenKey > 0}
         variant="add"
-        onClose={() => setMilestoneTrayOpen(false)}
+        onClose={() => setMilestoneTrayOpenKey(0)}
         onSave={handleSaveMilestone}
       />
     </View>

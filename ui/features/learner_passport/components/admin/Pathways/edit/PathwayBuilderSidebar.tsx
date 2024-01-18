@@ -110,11 +110,12 @@ const PathwayBuilderSidebar = ({
 
   return (
     <View
+      data-compid="pathway-builder-sidebar"
       as="div"
       padding="large medium large x-large"
       background="secondary"
       shadow="topmost"
-      minHeight="100%"
+      height="100%"
       width="480px"
     >
       <Flex as="div" margin="0 0 medium 0" justifyItems="space-between">

@@ -16,6 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+export type PageBreadcrumb = {
+  text: string
+  url?: string
+}
+
 export interface AchievementData {
   id: string
   isNew: boolean

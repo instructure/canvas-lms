@@ -292,27 +292,7 @@ export const LearnerPassportRoutes = (
             loader={async ({params}) => {
               return fetch(`/users/${params.userId}/passport/data/pathways`)
             }}
-          >
-            <Route
-              path="create"
-              action={async ({request}) => {
-                const formData = await request.formData()
-                const response = await fetch(
-                  `/users/${formData.get('userId')}/passport/data/pathways/create`,
-                  {
-                    method: 'PUT',
-                    cache: 'no-cache',
-                    headers: {
-                      'X-CSRF-Token': getCookie('_csrf_token'),
-                      'Content-type': 'application/json',
-                    },
-                  }
-                )
-                const json = await response.json()
-                return redirect(`../../edit/${json.id}`)
-              }}
-            />
-          </Route>
+          />
           <Route
             path="view/:pathwayId"
             loader={async ({params}) => {

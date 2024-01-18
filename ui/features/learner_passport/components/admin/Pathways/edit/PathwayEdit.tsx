@@ -16,61 +16,34 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useEffect, useState} from 'react'
-import {useActionData, useLoaderData, useNavigate, useSubmit} from 'react-router-dom'
-import {Breadcrumb} from '@instructure/ui-breadcrumb'
+import React, {useCallback, useState} from 'react'
+import {useLoaderData, useSubmit} from 'react-router-dom'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
+import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
+import {uid} from '@instructure/uid'
 import type {PathwayDetailData, PathwayEditData, DraftPathway} from '../../../types'
-import PathwayInfo from './PathwayInfo'
+import AdminHeader from '../../AdminHeader'
 import PathwayBuilder from './PathwayBuilder'
 
-type PathwayEditSteps = 'create' | 'add_milestones'
+type PathwayEditMode = 'create' | 'edit'
 
 const PathwayEdit = () => {
   const submit = useSubmit()
-  const navigate = useNavigate()
-  const create_pathway = useActionData() as PathwayEditData
-  const edit_pathway = useLoaderData() as PathwayEditData
-  const pathway_data = create_pathway || edit_pathway
-  const pathway = pathway_data.pathway
-  const allBadges = pathway_data.badges
-  const allLearnerGroups = pathway_data.learner_groups
+  const pathway_edit_data = useLoaderData() as PathwayEditData
+  const pathway = pathway_edit_data.pathway
+  const allBadges = pathway_edit_data.badges
+  const allLearnerGroups = pathway_edit_data.learner_groups
+  const [mode] = useState<PathwayEditMode>(() => {
+    return pathway.id ? 'edit' : 'create'
+  })
   const [draftPathway, setDraftPathway] = useState<DraftPathway>(() => {
-    return {...pathway, timestamp: Date.now()}
+    const pw = {...pathway, timestamp: Date.now()}
+    if (!pw.id) pw.id = uid('pathway', 3)
+    return pw
   })
-  const [currStep, setCurrStep] = useState<PathwayEditSteps>(() => {
-    switch (window.location.hash) {
-      case '#add_milestones':
-        return 'add_milestones'
-      case '#create':
-      default:
-        return 'create'
-    }
-  })
-
-  const handleHashChange = useCallback(() => {
-    switch (window.location.hash) {
-      case '#add_milestones':
-        setCurrStep('add_milestones')
-        break
-      case '#create':
-      default:
-        setCurrStep('create')
-        break
-    }
-  }, [])
-
-  useEffect(() => {
-    window.addEventListener('hashchange', handleHashChange)
-    return () => window.removeEventListener('hashchange', handleHashChange)
-  }, [handleHashChange])
-
-  useEffect(() => {
-    window.location.hash = currStep
-  }, [currStep])
 
   const handleChange = useCallback(
     (newValues: Partial<PathwayDetailData>) => {
@@ -80,30 +53,28 @@ const PathwayEdit = () => {
     [draftPathway]
   )
 
-  const handleSubmit = useCallback(() => {
-    const formData = new FormData()
-    formData.set('pathway', JSON.stringify(draftPathway))
-    formData.set('draft', 'true')
-    submit(formData, {method: 'POST'})
-  }, [draftPathway, submit])
-
-  const handleCancelClick = useCallback(() => {
-    navigate('../dashboard')
-  }, [navigate])
+  const handleSubmit = useCallback(
+    (asDraft: boolean) => {
+      const formData = new FormData()
+      formData.set('pathway', JSON.stringify(draftPathway))
+      formData.set('draft', asDraft.toString())
+      submit(formData, {method: 'POST'})
+    },
+    [draftPathway, submit]
+  )
 
   const handleSaveAsDraftClick = useCallback(
     _e => {
-      handleSubmit()
+      handleSubmit(true)
     },
     [handleSubmit]
   )
 
-  const handleNextClick = useCallback(
+  const handlePublishClick = useCallback(
     _e => {
-      if (draftPathway.title === '') return
-      setCurrStep('add_milestones')
+      handleSubmit(false)
     },
-    [draftPathway.title]
+    [handleSubmit]
   )
 
   const handlePathwayChange = useCallback(
@@ -114,94 +85,42 @@ const PathwayEdit = () => {
     [draftPathway]
   )
 
-  const renderStep = useCallback(() => {
-    switch (currStep) {
-      case 'create':
-        return (
-          <PathwayInfo
-            pathway={draftPathway}
-            allBadges={allBadges}
-            allLearnerGroups={allLearnerGroups}
-            onChange={handleChange}
-          />
-        )
-      case 'add_milestones':
-        return <PathwayBuilder pathway={draftPathway} onChange={handlePathwayChange} />
-      default:
-        return null
-    }
-  }, [currStep, draftPathway, allBadges, allLearnerGroups, handleChange, handlePathwayChange])
-
-  const renderBreadcrumbsForStep = useCallback(() => {
-    switch (currStep) {
-      case 'create':
-        return (
-          <Breadcrumb label="You are here:" size="small">
-            <Breadcrumb.Link
-              href={`/users/${ENV.current_user.id}/passport/admin/pathways/dashboard`}
-            >
-              Pathways
-            </Breadcrumb.Link>
-            <Breadcrumb.Link>Create Pathway</Breadcrumb.Link>
-          </Breadcrumb>
-        )
-      case 'add_milestones': {
-        const loc = new URL(window.location.href)
-        loc.hash = 'create'
-        const href = loc.href
-        return (
-          <Breadcrumb label="You are here:" size="small">
-            <Breadcrumb.Link
-              href={`/users/${ENV.current_user.id}/passport/admin/pathways/dashboard`}
-            >
-              Pathways
-            </Breadcrumb.Link>
-            <Breadcrumb.Link href={href}>Create Pathway</Breadcrumb.Link>
-            <Breadcrumb.Link>Add Milestones</Breadcrumb.Link>
-          </Breadcrumb>
-        )
-      }
-      default:
-        return null
-    }
-  }, [currStep])
-
-  const renderHeadingForStep = useCallback(() => {
-    switch (currStep) {
-      case 'create':
-        return 'Create Pathway'
-      case 'add_milestones':
-        return draftPathway.title
-      default:
-        return null
-    }
-  }, [currStep, draftPathway.title])
-
   return (
-    <div style={{margin: '0 -3rem'}}>
-      <View as="div" borderWidth="0 0 small 0" borderColor="primary">
-        <div style={{padding: '0 3rem'}}>
-          {renderBreadcrumbsForStep()}
-          <Flex as="div" margin="medium 0 x-large 0" justifyItems="space-between" gap="small">
-            <Flex.Item shouldGrow={true}>
-              <Heading level="h1">{renderHeadingForStep()}</Heading>
-            </Flex.Item>
-            <Flex.Item>
-              <Button margin="0 x-small 0 0" onClick={handleCancelClick}>
-                Cancel
-              </Button>
-              <Button margin="0 x-small 0 0" onClick={handleSaveAsDraftClick}>
-                Save as Draft
-              </Button>
-              <Button color="primary" margin="0" onClick={handleNextClick}>
-                Next
-              </Button>
-            </Flex.Item>
-          </Flex>
-        </div>
-      </View>
-      {renderStep()}
-    </div>
+    <Flex as="div" direction="column" alignItems="stretch" height="100%">
+      <AdminHeader
+        title={
+          <>
+            <Heading level="h1">{draftPathway.title}</Heading>
+            <Text size="small">{draftPathway.milestones.length} Milestones | y Requirements</Text>
+          </>
+        }
+        breadcrumbs={[
+          {
+            text: 'Pathways',
+            url: `/users/${ENV.current_user.id}/passport/admin/pathways/dashboard`,
+          },
+          {text: 'Pathway Builder'},
+        ]}
+      >
+        <>
+          <Button margin="0 x-small 0 0" onClick={handleSaveAsDraftClick}>
+            Save as Draft
+          </Button>
+          <Button color="primary" margin="0" onClick={handlePublishClick}>
+            Publish Pathway
+          </Button>
+        </>
+      </AdminHeader>
+      <Flex.Item shouldGrow={true} shouldShrink={false} overflowY="visible">
+        <PathwayBuilder
+          pathway={draftPathway}
+          mode={mode}
+          allBadges={allBadges}
+          allLearnerGroups={allLearnerGroups}
+          onChange={handlePathwayChange}
+        />
+      </Flex.Item>
+    </Flex>
   )
 }
 

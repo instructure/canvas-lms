@@ -151,6 +151,7 @@ const PathwayTreeView = ({
           borderWidth="medium"
           width={`${width}px`}
           height={height ? `${height}px` : 'auto'}
+          minHeight="100%"
           borderColor={selected ? 'brand' : undefined}
         >
           <Flex as="div" direction="column" justifyItems="start" height="100%">
@@ -225,7 +226,7 @@ const PathwayTreeView = ({
 
   const renderDAG = useCallback(() => {
     // Set an object for the graph label
-    g.setGraph({rankdir: layout})
+    g.setGraph({rankdir: layout, marginx: pathway.first_milestones.length < 2 ? 100 : 0})
 
     // Default to assigning a new object as a label for each new edge.
     g.setDefaultEdgeLabel(function () {
@@ -399,9 +400,11 @@ const PathwayTreeView = ({
 
   return preRendered ? (
     <div
+      data-compid="pathway-tree-view"
       style={{
         minWidth: graphWidth,
         minHeight: graphHeight,
+        height: '100%',
         backgroundSize: '40px 40px',
         backgroundImage: `linear-gradient(to right, rgba(150, 173, 233, .3) 1px, transparent 1px),
                   linear-gradient(to bottom, rgba(150, 173, 233, .3) 1px, transparent 1px)`,

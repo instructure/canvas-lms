@@ -17,16 +17,19 @@
  */
 
 import React from 'react'
-import {Heading} from '@instructure/ui-heading'
-import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
+import AdminHeader from '../AdminHeader'
 
 const LearnerRecordsDashboard = () => {
   return (
     <View as="div">
-      <Heading level="h1">Learner Records</Heading>
-      <Text>Access and view learner records for people at your institution</Text>
-      <View as="div" margin="large 0 0" background="secondary" height="700px" />
+      <AdminHeader
+        title="Learner Records"
+        description="Access and view learner records for people at your institution"
+      />
+      <View as="div" margin="large">
+        <View as="div" margin="large 0 0" background="secondary" height="700px" />
+      </View>
     </View>
   )
 }

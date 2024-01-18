@@ -20,13 +20,13 @@ import React, {useCallback, useEffect, useState} from 'react'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
-import {Modal} from '@instructure/ui-modal'
 import {Text} from '@instructure/ui-text'
+import {Tray} from '@instructure/ui-tray'
 import {View} from '@instructure/ui-view'
 
 import type {PathwayBadgeType} from '../../../types'
 
-type AddBadgeModalProps = {
+type AddBadgeTrayProps = {
   allBadges: PathwayBadgeType[]
   open: boolean
   selectedBadgeId: string | null
@@ -34,7 +34,7 @@ type AddBadgeModalProps = {
   onSave: (badgeId: string | null) => void
 }
 
-const AddBadgeModal = ({allBadges, open, selectedBadgeId, onClose, onSave}: AddBadgeModalProps) => {
+const AddBadgeTray = ({allBadges, open, selectedBadgeId, onClose, onSave}: AddBadgeTrayProps) => {
   const [currSelectedId, setCurrSelectedId] = useState<string | null>(null)
 
   useEffect(() => {
@@ -88,7 +88,7 @@ const AddBadgeModal = ({allBadges, open, selectedBadgeId, onClose, onSave}: AddB
         display="inline-block"
         shadow="resting"
         padding="medium"
-        width="227px"
+        width="210px"
         height="214px"
         textAlign="center"
         role="button"
@@ -113,32 +113,49 @@ const AddBadgeModal = ({allBadges, open, selectedBadgeId, onClose, onSave}: AddB
   }
 
   return (
-    <Modal
+    <Tray
+      label="Achievements"
       open={open}
       onDismiss={onClose}
-      label="Add Award"
-      size="large"
-      shouldCloseOnDocumentClick={false}
+      size="regular"
+      placement="end"
+      themeOverride={{regularWidth: '480px'}}
     >
-      <Modal.Header>
-        <CloseButton placement="end" offset="medium" onClick={onClose} screenReaderLabel="Close" />
-        <Heading>Add Award</Heading>
-      </Modal.Header>
-      <Modal.Body padding="medium">
-        <Flex as="div" gap="small">
-          {allBadges.map((badge: PathwayBadgeType) => {
-            return renderBadge(badge)
-          })}
+      <Flex as="div" direction="column" height="100vh">
+        <Flex as="div" padding="small small 0 medium">
+          <Flex.Item shouldGrow={true} shouldShrink={true}>
+            <Heading level="h2" margin="0 0 small 0">
+              Achievements
+            </Heading>
+          </Flex.Item>
+          <Flex.Item>
+            <CloseButton
+              placement="end"
+              offset="small"
+              screenReaderLabel="Close"
+              onClick={onClose}
+            />
+          </Flex.Item>
         </Flex>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button onClick={onClose}>Cancel</Button>
-        <Button onClick={handleSave} color="primary" margin="0 0 0 x-small">
-          Save
-        </Button>
-      </Modal.Footer>
-    </Modal>
+        <Flex.Item shouldGrow={true} padding="medium">
+          <Text>Select a badge or certificate</Text>
+          <Flex as="div" wrap="wrap" gap="small" margin="xx-small 0 0 0">
+            {allBadges.map((badge: PathwayBadgeType) => {
+              return renderBadge(badge)
+            })}
+          </Flex>
+        </Flex.Item>
+        <Flex.Item align="end" width="100%">
+          <View as="div" padding="small medium" borderWidth="small 0 0 0" textAlign="end">
+            <Button onClick={onClose}>Cancel</Button>
+            <Button margin="0 0 0 small" onClick={handleSave}>
+              Save Achievement
+            </Button>
+          </View>
+        </Flex.Item>
+      </Flex>
+    </Tray>
   )
 }
 
-export default AddBadgeModal
+export default AddBadgeTray
