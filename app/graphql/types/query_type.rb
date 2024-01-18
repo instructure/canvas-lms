@@ -224,5 +224,17 @@ module Types
 
       Setting.all
     end
+
+    field :rubric, Types::RubricType, null: true do
+      description "Rubric"
+      argument :id,
+               ID,
+               "a graphql or legacy id",
+               required: true,
+               prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Rubric")
+    end
+    def rubric(id:)
+      GraphQLNodeLoader.load("Rubric", id, context)
+    end
   end
 end
