@@ -27,7 +27,7 @@ import {Text} from '@instructure/ui-text'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {View} from '@instructure/ui-view'
 import type {MilestoneData, PathwayDetailData} from '../../types'
-import {pluralize, showUnimplemented} from '../../shared/utils'
+import {pluralize} from '../../shared/utils'
 
 const BOX_WIDTH = 322
 
@@ -260,13 +260,6 @@ const PathwayTreeView = ({
 
     dagre.layout(g)
 
-    // let maxX = 0
-    // let maxY = 0
-    // g.nodes().forEach(n => {
-    //   const node = g.node(n)
-    //   maxX = Math.max(maxX, node.x + node.width / 2)
-    //   maxY = Math.max(maxY, node.y + node.height / 2)
-    // })
     const maxX = g.graph().width as number
     const maxY = g.graph().height as number
     setViewBox([0, 0, maxX, maxY])

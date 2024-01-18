@@ -23,7 +23,7 @@ import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {View} from '@instructure/ui-view'
-import type {PathwayDetailData, PathwayEditData} from '../../../types'
+import type {PathwayDetailData, PathwayEditData, DraftPathway} from '../../../types'
 import PathwayInfo from './PathwayInfo'
 import PathwayBuilder from './PathwayBuilder'
 
@@ -38,7 +38,9 @@ const PathwayEdit = () => {
   const pathway = pathway_data.pathway
   const allBadges = pathway_data.badges
   const allLearnerGroups = pathway_data.learner_groups
-  const [draftPathway, setDraftPathway] = useState(pathway)
+  const [draftPathway, setDraftPathway] = useState<DraftPathway>(() => {
+    return {...pathway, timestamp: Date.now()}
+  })
   const [currStep, setCurrStep] = useState<PathwayEditSteps>(() => {
     switch (window.location.hash) {
       case '#add_milestones':
@@ -106,7 +108,7 @@ const PathwayEdit = () => {
 
   const handlePathwayChange = useCallback(
     (newPathway: Partial<PathwayDetailData>) => {
-      const newDraftPathway = {...draftPathway, ...newPathway}
+      const newDraftPathway = {...draftPathway, ...newPathway, timestamp: Date.now()}
       setDraftPathway(newDraftPathway)
     },
     [draftPathway]
