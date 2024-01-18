@@ -1646,6 +1646,7 @@ export const updateLearningOutcomeMocks = ({
     pointsPossible,
     ratings: outputRatings,
   }
+  if (description === null) delete input.description
 
   return [
     {
