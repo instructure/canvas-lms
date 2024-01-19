@@ -19,7 +19,9 @@
 import React from 'react'
 
 const NotImplementedRequirements = () => {
-  return <div>Sorry, this feature is not implemented yet.</div>
+  return (
+    <div style={{marginTop: '0.5rem'}}>Sorry, this requirement type is not implemented yet.</div>
+  )
 }
 
 export default NotImplementedRequirements

@@ -70,15 +70,16 @@ const PathwayCard = ({step, onEdit}: PathwayCardProps) => {
 
 type MilestoneCardProps = {
   step: MilestoneData
+  variant: 'root' | 'child'
   onEdit: (id: string) => void
-  onDelete: (id: string) => void
+  onDelete?: (id: string) => void
 }
 
-const MilestoneCard = ({step, onEdit, onDelete}: MilestoneCardProps) => {
+const MilestoneCard = ({step, variant, onEdit, onDelete}: MilestoneCardProps) => {
   return (
     <View
       as="div"
-      background="primary"
+      background={variant === 'root' ? 'primary-inverse' : 'primary'}
       borderWidth="small"
       borderRadius="medium"
       padding="small"
@@ -97,6 +98,7 @@ const MilestoneCard = ({step, onEdit, onDelete}: MilestoneCardProps) => {
         </Flex.Item>
         <Flex.Item>
           <IconButton
+            color={variant === 'root' ? 'primary-inverse' : 'primary'}
             screenReaderLabel="edit step"
             size="small"
             withBackground={false}
@@ -105,16 +107,18 @@ const MilestoneCard = ({step, onEdit, onDelete}: MilestoneCardProps) => {
           >
             <IconEditLine />
           </IconButton>
-          <IconButton
-            margin="0 0 0 x-small"
-            screenReaderLabel="delete step"
-            size="small"
-            withBackground={false}
-            withBorder={false}
-            onClick={() => onDelete(step.id)}
-          >
-            <IconTrashLine />
-          </IconButton>
+          {onDelete && (
+            <IconButton
+              margin="0 0 0 x-small"
+              screenReaderLabel="delete step"
+              size="small"
+              withBackground={false}
+              withBorder={false}
+              onClick={() => onDelete(step.id)}
+            >
+              <IconTrashLine />
+            </IconButton>
+          )}
         </Flex.Item>
       </Flex>
     </View>

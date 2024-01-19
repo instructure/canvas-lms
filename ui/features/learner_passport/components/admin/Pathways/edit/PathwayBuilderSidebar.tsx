@@ -139,12 +139,17 @@ const PathwayBuilderSidebar = ({
         <CondensedButton onClick={onHideSidebar}>Hide</CondensedButton>
       </Flex>
       <View as="div" textAlign="center">
-        <PathwayCard step={pathway} onEdit={handleEditPathway} />
+        {currentStep === null ? (
+          <PathwayCard step={pathway} onEdit={handleEditPathway} />
+        ) : (
+          <MilestoneCard step={currentStep} variant="root" onEdit={handleEditMilestone} />
+        )}
         <Connector />
         {childMilestones.map((step: MilestoneData) => (
           <div key={step.id} style={{marginBottom: '30px'}}>
             <MilestoneCard
               step={step}
+              variant="child"
               onEdit={handleEditMilestone}
               onDelete={handleDeleteMilestone}
             />

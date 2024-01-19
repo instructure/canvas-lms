@@ -340,7 +340,7 @@ const PathwayTreeView = ({
       }
       commands.push(`L${points[points.length - 1].x} ${points[points.length - 1].y}`)
       return (
-        <g fill="none" stroke="#C7CDD1">
+        <g fill="none" stroke="#C7CDD1" key={`edge-${edg.v}-${edg.w}`}>
           <circle cx={points[0].x} cy={points[0].y} r="2" strokeWidth="2" />
           <path d={commands.join(' ')} fill="none" strokeWidth={2} />
           <circle
