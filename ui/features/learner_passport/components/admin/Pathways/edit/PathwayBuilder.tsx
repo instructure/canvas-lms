@@ -30,6 +30,7 @@ import PathwayBuilderSidebar from './PathwayBuilderSidebar'
 import PathwayBuilderTree from './PathwayBuilderTree'
 import MilestoneTray from './MilestoneTray'
 import PathwayDetailsTray from './PathwayDetailsTray'
+import confirm from '../../../shared/Confirmation'
 
 type PathwayBuilderProps = {
   pathway: DraftPathway
@@ -78,19 +79,25 @@ const PathwayBuilder = ({
   )
 
   const handleDeleteMilestone = useCallback(
-    (milestoneID: string) => {
-      const newMilestones = [...pathway.milestones]
-      const mIndex = pathway.milestones.findIndex(m => m.id === milestoneID)
-      if (mIndex >= 0) {
-        newMilestones.splice(mIndex, 1)
+    async (milestoneIDs: string[]) => {
+      const rootMilestone = pathway.milestones.find(m => m.id === milestoneIDs[0])
+      if (!rootMilestone) return
+      let answer: boolean = false
+      if (milestoneIDs.length === 1) {
+        answer = await confirm(`Confirm deletion of ${rootMilestone.title}.`, 'Delete step')
+      } else {
+        answer = await confirm(
+          `Confirm deletion of ${rootMilestone.title} and all of the steps beneath it.`,
+          'Delete step and prerequisites'
+        )
       }
-
-      const newFirstMilestones = [...pathway.first_milestones]
-      const fIndex = pathway.first_milestones.findIndex(m => m === milestoneID)
-      if (fIndex >= 0) {
-        newFirstMilestones.splice(fIndex, 1)
+      if (answer) {
+        const newMilestones = [...pathway.milestones].filter(m => !milestoneIDs.includes(m.id))
+        const newFirstMilestones = [...pathway.first_milestones].filter(
+          mid => !milestoneIDs.includes(mid)
+        )
+        onChange({milestones: newMilestones, first_milestones: newFirstMilestones})
       }
-      onChange({milestones: newMilestones, first_milestones: newFirstMilestones})
     },
     [onChange, pathway.first_milestones, pathway.milestones]
   )

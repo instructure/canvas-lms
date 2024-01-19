@@ -64,6 +64,8 @@ const DivInSVG: React.FC<NamespacedDiv> = props => {
   )
 }
 
+const MILESTONES_HAVE_IMAGES = false
+
 const PathwayTreeView = ({
   pathway,
   selectedStep,
@@ -154,28 +156,33 @@ const PathwayTreeView = ({
           minHeight="100%"
           borderColor={selected ? 'brand' : undefined}
         >
-          <Flex as="div" direction="column" justifyItems="start" height="100%">
-            <Flex.Item shouldGrow={true} overflowY="visible">
+          <Flex as="div" direction="column" justifyItems="start" height="100%" gap="small">
+            {MILESTONES_HAVE_IMAGES ? (
               <Flex as="div" gap="small">
-                <div style={{width: '30px', height: '30px', background: 'grey'}} />
-                <Flex.Item>
+                <Flex.Item shouldShrink={false} shouldGrow={false}>
+                  <div style={{width: '30px', height: '30px', background: 'grey'}} />
+                </Flex.Item>
+                <Flex.Item shouldShrink={true}>
                   <Text weight="bold">{node.title}</Text>
-                  <div style={{marginTop: '.5rem'}}>
-                    <Text size="small">
-                      <TruncateText maxLines={2} truncate="character">
-                        {node.description}
-                      </TruncateText>
-                    </Text>
-                  </div>
                 </Flex.Item>
               </Flex>
+            ) : (
+              <Flex.Item shouldShrink={true}>
+                <Text weight="bold">{node.title}</Text>
+              </Flex.Item>
+            )}
+            <Flex.Item shouldGrow={true}>
+              <Text as="div" size="small">
+                <TruncateText maxLines={2} truncate="character">
+                  {node.description}
+                </TruncateText>
+              </Text>
               {!('required' in node) || node.required ? null : (
                 <div style={{marginTop: '.5rem'}}>
                   <Pill>Optional</Pill>
                 </div>
               )}
             </Flex.Item>
-
             {type === 'pathway' ? (
               <Flex.Item>
                 <IconGroupLine size="x-small" />
