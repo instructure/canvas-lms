@@ -235,6 +235,27 @@ describe "selective_release module item assign to tray" do
       expect(assign_to_date_and_time[2].text).to include("Saturday, January 7, 2023 9:00 PM")
     end
 
+    it "displays an error when due date is invalid" do
+      go_to_modules
+
+      manage_module_item_button(@module_item1).click
+      click_manage_module_item_assign_to(@module_item1)
+      update_due_date(0, "wrongdate")
+
+      expect(assign_to_date_and_time[0].text).to include("Invalid date")
+    end
+
+    it "displays an error when the availability date is after the due date" do
+      go_to_modules
+
+      manage_module_item_button(@module_item1).click
+      click_manage_module_item_assign_to(@module_item1)
+      update_due_date(0, "12/31/2022")
+      update_available_date(0, "1/1/2023")
+
+      expect(assign_to_date_and_time[1].text).to include("Unlock date cannot be after due date")
+    end
+
     it "can remove a student from a card with two students" do
       @module_item1.assignment.assignment_overrides.create!(set_type: "ADHOC")
       @module_item1.assignment.assignment_overrides.first.assignment_override_students.create!(user: @student1)
