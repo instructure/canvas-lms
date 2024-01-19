@@ -172,7 +172,7 @@ export default function DiscussionTopicFormContainer({apolloClient}) {
       currentDiscussionTopic={currentDiscussionTopic}
       isStudent={ENV.current_user_is_student}
       assignmentGroups={currentContext?.assignmentGroupsConnection?.nodes}
-      sections={currentContext?.sectionsConnection?.nodes}
+      sections={ENV.SECTION_LIST}
       groupCategories={currentContext?.groupSetsConnection?.nodes}
       studentEnrollments={filterUniqueUsers(currentContext?.enrollmentsConnection?.nodes)}
       apolloClient={apolloClient}

@@ -102,7 +102,7 @@ export default function DiscussionTopicForm({
     }
   }
 
-  const allSectionsOption = {_id: 'all', name: 'All Sections'}
+  const allSectionsOption = {id: 'all', name: 'All Sections'}
 
   const inputWidth = '100%'
 
@@ -677,16 +677,16 @@ export default function DiscussionTopicForm({
 
   const handlePostToSelect = value => {
     if (
-      !sectionIdsToPostTo.includes(allSectionsOption._id) &&
-      value.includes(allSectionsOption._id)
+      !sectionIdsToPostTo.includes(allSectionsOption.id) &&
+      value.includes(allSectionsOption.id)
     ) {
-      setSectionIdsToPostTo([allSectionsOption._id])
+      setSectionIdsToPostTo([allSectionsOption.id])
     } else if (
-      sectionIdsToPostTo.includes(allSectionsOption._id) &&
-      value.includes(allSectionsOption._id) &&
+      sectionIdsToPostTo.includes(allSectionsOption.id) &&
+      value.includes(allSectionsOption.id) &&
       value.length > 1
     ) {
-      setSectionIdsToPostTo(value.filter(section_id => section_id !== allSectionsOption._id))
+      setSectionIdsToPostTo(value.filter(section_id => section_id !== allSectionsOption.id))
     } else {
       setSectionIdsToPostTo(value)
     }
@@ -758,7 +758,7 @@ export default function DiscussionTopicForm({
               onChange={handlePostToSelect}
               width={inputWidth}
             >
-              {[allSectionsOption, ...sections].map(({_id: id, name: label}) => (
+              {[allSectionsOption, ...sections].map(({id, name: label}) => (
                 <CanvasMultiSelect.Option
                   id={id}
                   value={`opt-${id}`}
