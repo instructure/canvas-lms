@@ -43,7 +43,7 @@ const PathwayBuilder = ({
   pathway,
   mode,
   allBadges,
-  allLearningGroups,
+  allLearnerGroups,
   onChange,
 }: PathwayBuilderProps) => {
   const [currentRoot, setCurrentRoot] = useState<MilestoneData | null>(null)
@@ -188,6 +188,7 @@ const PathwayBuilder = ({
         key={pathwayTrayOpenKey}
         pathway={pathway}
         allBadges={allBadges}
+        allLearnerGroups={allLearnerGroups}
         selectedBadgeId={pathway.completion_award?.id || null}
         open={pathwayTrayOpenKey > 0}
         onClose={() => setPathwayTrayOpenKey(0)}

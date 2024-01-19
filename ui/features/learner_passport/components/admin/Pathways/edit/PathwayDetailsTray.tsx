@@ -31,13 +31,15 @@ import {TextInput} from '@instructure/ui-text-input'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
 import {Tray} from '@instructure/ui-tray'
 import {View} from '@instructure/ui-view'
-import type {PathwayDetailData, PathwayBadgeType} from '../../../types'
-import {showUnimplemented} from '../../../shared/utils'
+import type {LearnerGroupType, PathwayDetailData, PathwayBadgeType} from '../../../types'
 import AddBadgeTray from './AddBadgeTray'
+import AddLearnerGroupsTray, {LearnerGroupCard} from './AddLearnerGroupsTray'
+import {showUnimplemented} from '../../../shared/utils'
 
 type PathwayDetailsTrayProps = {
   pathway: PathwayDetailData
   allBadges: PathwayBadgeType[]
+  allLearnerGroups: LearnerGroupType[]
   selectedBadgeId: string | null
   open: boolean
   onClose: () => void
@@ -47,6 +49,7 @@ type PathwayDetailsTrayProps = {
 const PathwayDetailsTray = ({
   pathway,
   allBadges,
+  allLearnerGroups,
   selectedBadgeId,
   open,
   onClose,
@@ -55,14 +58,17 @@ const PathwayDetailsTray = ({
   const [title, setTitle] = useState(pathway.title)
   const [description, setDescription] = useState(pathway.description)
   const [currSelectedBadgeId, setCurrSelectedBadgeId] = useState<string | null>(selectedBadgeId)
-  const [selectedLearnerGroupIds, setSelectedLearnerGroupIds] = useState<string[]>([])
+  const [selectedLearnerGroupIds, setSelectedLearnerGroupIds] = useState<string[]>(
+    pathway.learner_groups
+  )
   const [selectedShareIds, setSelectedShareIds] = useState<string[]>([])
   const [addBadgeTrayOpenKey, setAddBadgeTrayOpenKey] = useState(0)
+  const [addLearnerGroupsTrayOpenKey, setAddLearnerGroupsTrayOpenKey] = useState(0)
 
   const handleSave = useCallback(() => {
     const badge = allBadges.find(b => b.id === currSelectedBadgeId)
-    onSave({title, description, completion_award: badge})
-  }, [allBadges, currSelectedBadgeId, description, onSave, title])
+    onSave({title, description, completion_award: badge, learner_groups: selectedLearnerGroupIds})
+  }, [allBadges, currSelectedBadgeId, description, onSave, selectedLearnerGroupIds, title])
 
   const handleTitleChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>, newTitle: string) => {
@@ -83,6 +89,15 @@ const PathwayDetailsTray = ({
   const handleSaveBadge = useCallback((badgeId: string | null) => {
     setCurrSelectedBadgeId(badgeId)
     setAddBadgeTrayOpenKey(0)
+  }, [])
+
+  const handleAddLearnerGroupClick = useCallback(() => {
+    setAddLearnerGroupsTrayOpenKey(Date.now())
+  }, [])
+
+  const handleSaveLearnerGroups = useCallback((learnerGroupIds: string[]) => {
+    setSelectedLearnerGroupIds(learnerGroupIds)
+    setAddLearnerGroupsTrayOpenKey(0)
   }, [])
 
   const handleShareSearchChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
@@ -182,10 +197,29 @@ const PathwayDetailsTray = ({
                   <Text as="div" size="small">
                     Add learner groups to this pathway. You can also add groups later.
                   </Text>
-                  <Button margin="small 0 0 0" renderIcon={IconAddLine}>
+                  {selectedLearnerGroupIds.length > 0 && (
+                    <Flex as="div" margin="small 0 0 0" direction="column" gap="small">
+                      {selectedLearnerGroupIds.map(id => {
+                        const group = allLearnerGroups.find(g => g.id === id)
+                        if (group) {
+                          return <LearnerGroupCard key={id} group={group} />
+                        }
+                        return null
+                      })}
+                    </Flex>
+                  )}
+                  <Button
+                    margin="small 0 0 0"
+                    renderIcon={IconAddLine}
+                    onClick={handleAddLearnerGroupClick}
+                  >
                     Add Learner Groups
                   </Button>
-                  <Button margin="small 0 0 x-small" renderIcon={IconAddLine}>
+                  <Button
+                    margin="small 0 0 x-small"
+                    renderIcon={IconAddLine}
+                    onClick={showUnimplemented}
+                  >
                     Create Learner Group
                   </Button>
                 </FormField>
@@ -227,6 +261,14 @@ const PathwayDetailsTray = ({
         allBadges={allBadges}
         onClose={() => setAddBadgeTrayOpenKey(0)}
         onSave={handleSaveBadge}
+      />
+      <AddLearnerGroupsTray
+        key={addLearnerGroupsTrayOpenKey}
+        open={addLearnerGroupsTrayOpenKey > 0}
+        allLearnerGroups={allLearnerGroups}
+        selectedLearnerGroupIds={selectedLearnerGroupIds}
+        onClose={() => setAddLearnerGroupsTrayOpenKey(0)}
+        onSave={handleSaveLearnerGroups}
       />
     </View>
   )
