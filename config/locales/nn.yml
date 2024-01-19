@@ -8846,12 +8846,15 @@ nn:
   define_general_settings_for_locked_objects_in_this_20da2981: "Definer generelle innstillingar for låste element i dette emnet. "
   define_settings_by_type_for_locked_objects_in_this_676197bf: "Definer innstillingar etter type for låste element i dette emnet."
   define_text_to_go_before_and_after_the_dropdown_an_be8d16e2: "Skriv inn teksta som skal stå før og etter rullegardinmenyen og set saman ei samling moglege svar."
+  delay_posting_f45eed7d: "Publiser seinare"
   delay_posting_this_topic_until_aa483eec: "Utsett å poste dette emnet til"
   delayed_until_58b7af4b: "Utsett til:"
+  delete_8d6d2222: "Slett:"
   delete_a143a2ab: slett
   delete_a6efa79d: Slett
   delete_account_name_96aee330: "Slett %{account_name}"
   delete_alignment_f33c97d5: "Slett justering"
+  delete_all_other_course_content_721e0ae3: "Slett alt anna emneinnhald"
   delete_announcement_title_756a9d1f: "Slett kunngjering %{title}"
   delete_assignment_5d3f3f15: "slett oppgåve"
   delete_assignment_group_7c3b01c4: "Slett oppgåvegruppe"
@@ -8870,11 +8873,13 @@ nn:
   delete_current_message_5da0221a: "Slett denne meldinga"
   delete_current_module_item_21fefc54: "Slett gjeldande modul/element"
   delete_custom_help_link_814f0509: "Slett eigendefinert Hjelp-kopling"
+  delete_custom_status_b20e5195: "Slett tilpassa status?"
   delete_disabled_3196ce47: "Slett (slått av)"
   delete_discussion_title_a28df8b6: "Slett diskusjon %{title}"
   delete_domain_5ba75b7c: "Slett domene"
   delete_domain_domain_c5b68f5: "Slett domene %{domain}"
   delete_entry_title_5e59727b: "Slett oppføring %{title}"
+  delete_external_tools_9c862186: "Slett eksterne verktøy"
   delete_failed_6285e600: "Sletting mislukkast"
   delete_feedname_1ac9a4a4: "Slett %{feedName}"
   delete_filter_83ca1a6a: "Slett filter"
@@ -8882,22 +8887,26 @@ nn:
   delete_grading_period_dba36e59: "Slett karaktersetjingsperiode"
   delete_grading_period_set_b35358dd: "Slett sett med karaktersetjingsperiodar"
   delete_grading_scheme_6b308832: "Slett oppsett for karaktersetjing"
+  delete_grading_scheme_a1f8f5dc: "Slett vurderingsskjema"
   delete_grading_scheme_title_215f0a40: "Slett vurderingsskjema %{title}"
   delete_group_86c381ec: "Slett gruppe"
   delete_groups_c637c07: "Slett grupper"
   delete_in_progress_2d3f0e0d: "Sletting i gang"
   delete_key_developername_be80e695: "Slett nøkkel %{developerName}"
   delete_key_name_c2de8c0c: "Slett nøkkel %{name}"
+  delete_live_events_subscriptions_b15bc9a6: "Slett abonnement på direktesendinger"
   delete_lti_1d1cef27: "Slett LTI"
   delete_mastery_level_position_5cf0f8f7: "Slett meistringsnivå %{position}"
   delete_my_account_41060aad: "Slett Min konto"
   delete_name_81c1b5b2: "Slett %{name}"
+  delete_name_94088f7c: "Slett \"%{name}\""
   delete_operation_failed_3db8cd19: "Sletteoperasjon mislykka"
   delete_outcome_cc6546f1: "Slett læringsmål"
   delete_outcome_group_6b399d34: "Slett læringsmålgruppe"
   delete_pages_ab60f58: "Slett sider"
   delete_prerequisite_5e97bdf4: "Slett føresetnader"
   delete_prerequisite_title_19741947: "Slett føresetnader %{title}"
+  delete_preset_d7fda473: "Slett forhandsinnstilling"
   delete_proficiency_rating_5436ee08: "Slett ferdigheitsnivå"
   delete_quiz_142b8099: "Slett Quiz"
   delete_rating_24876355: "Slett vurdering"
@@ -8910,6 +8919,7 @@ nn:
   delete_selected_a023ccf8: "Slett Valt"
   delete_selected_announcements_69e23710: "Slett valde kunngjeringar"
   delete_selected_pages_7bc50580: "Slett valde sider"
+  delete_status_name_b0814fc6: "Slett status %{name}"
   delete_survey_56fddbbd: "Slett Undersøking"
   delete_term_name_f707abc9: "Slett semester %{name}"
   delete_theme_918a7f24: "Slett tema?"
@@ -8944,6 +8954,8 @@ nn:
   deleted_content_referenced_in_this_resource_e42d1998: "Sletta innhald referert til i denne ressursen: "
   deleted_deletedtimingdisplay_f4c73003: "Sletta %{deletedTimingDisplay}"
   deleted_topic_notice: "Emnet er sletta"
+  deleted_user_59fdcef7: "SLETTA BRUKAR"
+  deleted_user_tools_26f9e03e: "Sletta brukarverktøy"
   deleting_6421031e: slettar...
   deleting_a_submission_file_is_typically_done_only__fb8b07e6: |-
       Fjerning av ei innleveringsfil er kun typisk dersom ein student har lasta opp upassande eller privat innhald.
@@ -8951,6 +8963,8 @@ nn:
       Denne handlinga er irreversibel. Er du sikker på at du ynskjer å slette %{file}?
   deleting_a_user_will_destroy_all_of_their_eportfol_7f9ff34a: "Sletting av ein brukar vil øydelegge alle deira ePortfolioar. Alternativt kan ePortfolioar bli individuelt merka som 'spam' eller 'trygt' for å ende synlegheiten deira."
   deleting_assignment_22d5851d: "slettar oppgåve"
+  deleting_custom_status_statusname_5bd7dfa9: "Slettar tilpassa status %{statusName}"
+  deleting_f2ff0d09: Slettar
   delicious_7f9ac66f: Delicious
   demo_sites_require_recaptcha_settings_to_be_config_8bf9c7e3: "Demonstrasjonsområde må ha reCAPTCHA-innstillingar for å konfigurerast. Ta kontakt med områdeadministrator for denne førekomsten i Canvas."
   demos: 
@@ -9036,11 +9050,13 @@ nn:
   deployment_id_fc270280: Utrullings-ID
   deployment_id_for_tool_app_cb59335: "Utrullings-ID for %{tool}-appen"
   deployment_id_for_toolname_app_e54a7364: "Utrullings-ID for %{toolName}-appen"
+  deprioritize_section_overrides_for_nonactive_enrol_9aa72d60: "Nedprioriter seksjonsoverstyringar for ikkje-aktive påmeldingar"
   desc_12ad2869: "%{desc}"
   descending_b7828162: Synkande
   description_436c48d7: Skildring
   description_61f4296: "* Skildring"
   description_for_mastery_level_position_description_cc17114b: "Skildring av ekspertisenivå %{position}: %{description}"
+  description_must_be_less_than_2500_characters_1ee7c522: "Beskrivelsa må vere mindre enn 2500 teikn."
   descriptivename_was_changed_from_formattedoldvalue_47623537: "%{descriptiveName} vart endra frå %{formattedOldValue} til %{formattedNewValue}."
   descriptivename_was_set_to_formattednewvalue_cd78b357: "%{descriptiveName} vart satt til %{formattedNewValue}."
   descriptivename_was_turned_off_38771a19: "%{descriptiveName} vart skrudd av."
@@ -9055,6 +9071,9 @@ nn:
   determined_by_course_end_date_5e3ffb4f: "Fastsatt av emnets sluttdato"
   determined_by_course_pace_45063fa8: "Fastsatt av emnegjennomføring"
   determined_by_course_start_date_fc1a8ecf: "Fastsatt av emnet sin startdato"
+  determined_by_section_end_date_3cda3832: "Fastsatt av seksjonen sin sluttdato"
+  determined_by_section_start_date_65850a18: "Fastsatt av startdato for seksjonen"
+  determined_by_today_s_date_87330acf: "Fastsatt av dagens dato"
   determines_visibility_and_management_of_outcomes_t_79ca45b: |-
       Avgjer synlegheit og bruk av menyvalet for læringsmål i kontonavigasjon.
       Gir ein brukar løyve til å opprette, importere, endre og slette læringsmål og læringsmålgrupper på konto- og emnenivå.
@@ -9129,18 +9148,21 @@ nn:
     unnamed_tool: "Verktøy utan namn"
   developer_keys_d70ba44a: Utviklarnøklar
   developer_keys_manage_806da2d: "Utviklarnøklar - administrer"
+  developer_keys_report_4d041e62: "Rapport Utviklarnøklar "
   developers_keys_table_69ae6b7e: "Tabell for utviklarnøklar"
   dialog_form_wrapper: 
     cancel: Avbryt
     save_settings: "Lagre innstillingar"
     saving: Lagrar...
   did_you_know_you_can_now_create_detailed_filters_a_c6b8756c: "Visste du at du no kan lage detaljerte filter og lagre dei til framtidig bruk?"
+  did_you_know_you_can_now_create_filter_presets_and_f0bc546e: "Visste du at du nå kan opprette filterinnstillingar og lagre dei for framtidig bruk?"
   did_you_mean_id_241c900c: "Meinte du *%{id}*?"
   didn_t_find_what_you_are_looking_for_keep_trying_ee5b508c: "Fann du ikkje det du leita etter? Forsøk vidare!"
   different_course_b875770e: "anna emne"
   differentiate_between_system_and_user_generated_li_b5a1c49f: |-
       Differensier mellom system- og brukargenererte direktehendingar
       i Canvas Data tenesteverktøyet
+  differentiated_modules_5e2377d7: "Differensierte modular"
   diigo_993c4646: Diigo
   direct_share_80afd4a7: "Direct Share"
   disableWhileLoading: 
@@ -9159,6 +9181,7 @@ nn:
   disable_extra_filter_options_1d1cdc02: "deaktiver ekstra filterval"
   disable_keyboard_shortcuts_9db78832: "Deaktiver hurtigtastar"
   disable_new_quiz_importing_and_migration_checkboxe_3f738b75: "Skru av avkrysningsbokser for import og migrasjon av nye quizar, og set \"skrudd på\" som standard"
+  disable_oembed_retrieve_endpoint_56c050c8: "Deaktiver oembed_retrieve-endepunktet"
   disable_post_to_sis_for_assignment_in_closed_gradi_921b0271: "Deaktiver Post-til-SIS for oppgåver i lukka karaktersetjingsperiodar"
   disable_scope_6ba4e4d4: "Deaktiver omfang"
   disable_smart_app_banner_on_mobile_devices_bed9bf3b: "Deaktiver 'Smart App Banner' på mobile einingar"
@@ -9205,7 +9228,9 @@ nn:
   discovery_url_3dce06d9: "URL-adresse for søk"
   discussion_6719c51d: Diskusjon
   discussion_assignments_cannot_be_section_specific_93d63843: "Diskusjonar merka som oppgåve kan ikkje vere seksjonsspesifikk"
+  discussion_checkpoints_f40122e8: "Diskusjon sjekkpunkter"
   discussion_content_is_locked_or_not_yet_available_ab6d5314: "Diskusjonsinnhald er låst eller ikkje gjort tilgjengeleg enno"
+  discussion_create_edit_page_react_update_66fffbd6: "Diskusjonar Opprett/Rediger Side Reager Oppdater"
   discussion_entries: 
     created_entry_notice: "Registreringa er oppretta."
     deleted_entry_notice: "Registreringa er sletta"
@@ -9221,11 +9246,14 @@ nn:
   discussion_filter_5d68de61: Diskusjonsfilter
   discussion_group_category_locked: "Gruppekategoriar kan ikkje førast direkte inn i ei diskusjonsoppgåve, men bør i staden skrivast inn i diskusjonen"
   discussion_inline_grading_4631a62e: "Inline vurdering for diskusjonar"
+  discussion_itemtitle_1a5ff063: "Diskusjon, %{itemTitle}"
   discussion_mention_c70cb87a: "Tagging i diskusjon"
   discussion_podcast_feed_d62cc56f: "Diskusjon, podkaststraum"
   discussion_post_count_report_2da4c6c: "Rapport av antall diskusjonsinnlegg"
   discussion_posts_c998c9ad: Diskusjonsinnlegg
   discussion_redesign_description: "Denne funksjonaliteten bedrer opplevelsen for diskusjonar og kunngjeringar. Når funksjonsflagget er skrudd på vil tidleg tilgang til pågåande forbetringar verte vist automatisk ved kvar release. Sjå *Discussions/Announcements Redesign user group* i Canvas Community for fleire detaljar."
+  discussion_redesign_discussion_entry_version_histo_f1878f4f: "Diskusjonar Redesign - Diskusjonsinnlegg Versjonshistorikk"
+  discussion_redesign_grading_view_467bf307: "Diskusjonar Redesign Vurderingsvisning"
   discussion_settings_2fbf0b95: Diskusjonsinnstillingar
   discussion_submission_781d5d33: "Innsending av diskusjon"
   discussion_topic: 
@@ -9568,6 +9596,8 @@ nn:
   discussions_view_c6818792: "Diskusjonar - vis"
   discussions_with_groups_cannot_be_section_specific_1146d29: "Gruppediskusjonar kan ikkje vere seksjonsspesifikke"
   dismiss_dacdb625: Forkast
+  dismiss_itemtitle_c5020a4c: "Avvis %{itemTitle}"
+  dismiss_opportunityname_4fb10e11: "Avvis %{opportunityName}"
   dismiss_this_5c74dddc: "Forkast dette"
   dismissed_8b0b1fc9: Forkasta
   dismissed_opportunities_f0826640: "Forkasta val"
@@ -9576,6 +9606,7 @@ nn:
   display_as_percentage_3e755dc: "Vis som prosent"
   display_as_points_63084235: "Vis som poeng"
   display_course_catalog: "Vis ei søkeliste med emne for denne rotkontoen med \"Inkluder dette emnet i offentleg emneliste\" aktivert."
+  display_grade_as_7b5376a6: "Vis vurderingsresultat som"
   display_grades_as_points_percentages_complete_inco_fa848380: |-
       Vis vurderingsresultat som
       poeng, prosent, godkjend/ikkje godkjend, vel ei anna tilnærming som passer
@@ -9583,6 +9614,7 @@ nn:
       for seint leverte oppgåver eller skjule resultat til du er klar til å synleggjere
       dei for studentane. Ynskjer du å sjå og vurdere innleveringar på vanleg måte, bruk SpeedGrader.
   display_historical_view_of_achievements_of_users_53db5938: "Vis historisk oversikt over brukarar sine prestasjonar"
+  display_name_36e114d3: "%{display_name}"
   display_name_6c2cfc58: "Namn som skal visast:"
   display_name_b80c243e: "Namn som skal visast"
   display_student_filter_options_ab034cfa: "Vis val for studentfilter"
@@ -9591,14 +9623,20 @@ nn:
   display_total_grades_when_the_all_grading_periods__4e6add83: "Vis alle karakterane når rullegardinmenyen \"Alle karakterperiodane\" er vald (karakterperiode må vera definert)"
   display_totals_for_all_grading_periods_ad1ea050: "Vis totalsummane i \"Alle karakterperiodar\""
   display_totals_for_all_grading_periods_option_4a72586: "Vis totalsummane i Alle karakterperiodar-valet"
+  display_updated_at_d5b25d7b: "%{display_updated_at}"
   display_values_f517c73c: "Vis verdiar"
   displaying_to_students_b1e92058: "Vis for studentar"
+  displayname_loaded_14d71a0a: "%{displayName} lasta"
+  displayname_loading_in_progress_2be325fd: "%{displayName} lasting pågår"
+  displayname_loading_pending_3aa2723e: "%{displayName} lasting ventar"
+  displayname_loading_success_8177d735: "%{displayName} lastinga vellykka"
   displays_confetti_for_teachers_that_run_the_link_v_2d55dfc0: |-
       Viser konfetti til lærarar som køyrer lenkevalidering på
       emne kor ingen feil blir funne.
   displays_confetti_for_users_that_turn_in_an_assign_3e67e13c: |-
       Viser konfetti til dei som leverer ei oppgåve før
       forfallsdatoen.
+  distance_a377c748: Avstand
   district_id_6f408184: Område-ID
   divide_into_equal_slots_of_input_value_minutes_fca83452: "Del inn i like tidsluker på %{input_value} minutt."
   divide_into_equal_slots_of_num_minutes_minutes_go_52caee81: "Del inn i like tidsluker på %{num_minutes} minutt. *Gå*"
@@ -9606,10 +9644,12 @@ nn:
   divide_into_equal_time_slots_in_minutes_234312fa: "Del inn i like tidsluker (i minutt"
   division_cutoff_cutoff_value_e938bc9d: "Divisjonsavskjering %{cutoff_value}"
   do_not_count_this_assignment_towards_the_final_gra_4dd92e00: "Ikkje tel med denne oppgåva i sluttresultatet"
+  do_not_display_in_gradebook_or_the_student_s_grade_3de05e1c: "Vis ikkje i vurderingsoversikta eller på eleven si vurderingsside"
   do_not_show_again_for_this_assignment_d0abd4ae: "Ikkje vis igjen for denne oppgåva"
   do_nothing_9672b478: "Gjer ingenting"
   doc_50924b72: DOC
   doc_c63509f8: doc
+  doc_file_b1d0042f: Doc-fil
   document_to_annotate_d37b93bc: "Dokument til annotering"
   docviewer_area_created_37502a31: "Docviewer-område er oppretta"
   docviewer_area_deleted_6e56d3ba: "Docviewer-område er sletta"
@@ -9654,6 +9694,7 @@ nn:
   dorsey_business_schools_student_activity_and_perfo_160cf319: "Dorsey Business Schools - aktivitet og prestasjon til student"
   down_5831a426: Ned
   download_all_submissions_304d6797: "Last ned alle innleveringar"
+  download_as_ce13bff6: "Last ned som..."
   download_as_zip_5dae7f19: "Last ned som ZIP"
   download_assignment_submissions_41e50ee7: "Last ned oppgåveinnleveringar"
   download_associated_files_f35dcb5e: "Last ned tilknytte filer"
