@@ -1546,7 +1546,7 @@ class AccountsController < ApplicationController
                     end
 
     if is_authorized
-      @users = @account.all_users(nil)
+      @users = @account.all_users
       @avatar_counts = {
         all: format_avatar_count(@users.with_avatar_state("any").count),
         reported: format_avatar_count(@users.with_avatar_state("reported").count),

@@ -787,14 +787,9 @@ class Account < ActiveRecord::Base
     user_account_associations.where(user_id: user).exists?
   end
 
-  def all_users(limit = 250)
-    @cached_all_users ||= {}
-    @cached_all_users[limit] ||= User.of_account(self).limit(limit)
-  end
-
   def fast_all_users(limit = nil)
     @cached_fast_all_users ||= {}
-    @cached_fast_all_users[limit] ||= all_users(limit).active.select("users.id, users.updated_at, users.name, users.sortable_name").order_by_sortable_name
+    @cached_fast_all_users[limit] ||= all_users.limit(limit).active.select("users.id, users.updated_at, users.name, users.sortable_name").order_by_sortable_name
   end
 
   def users_not_in_groups(groups, opts = {})
