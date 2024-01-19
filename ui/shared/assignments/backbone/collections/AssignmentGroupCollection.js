@@ -18,7 +18,6 @@
 import ModuleCollection from '@canvas/modules/backbone/collections/ModuleCollection'
 import {savedObservedId} from '@canvas/observer-picker/ObserverGetObservee'
 import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection'
-import _ from 'lodash'
 import AssignmentGroup from '../models/AssignmentGroup'
 import SubmissionCollection from './SubmissionCollection'
 
@@ -37,7 +36,8 @@ export default class AssignmentGroupCollection extends PaginatedCollection {
       }
 
       for (const assignment of this.assignments()) {
-        const assignmentModuleNames = _(assignment.get('module_ids')).map(id => moduleNames[id])
+        const moduleIds = assignment.get('module_ids') || []
+        const assignmentModuleNames = moduleIds.map(id => moduleNames[id])
         assignment.set('modules', assignmentModuleNames)
       }
     })
