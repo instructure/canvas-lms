@@ -58,6 +58,8 @@ describe('DiscussionTopicForm', () => {
         PERMISSIONS: {
           CAN_ATTACH: true,
           CAN_MODERATE: true,
+          CAN_CREATE_ASSIGNMENT: true,
+          CAN_SET_GROUP: true,
         },
         ATTRIBUTES: {},
       },
@@ -288,6 +290,7 @@ describe('DiscussionTopicForm', () => {
         DISCUSSION_TOPIC: {
           PERMISSIONS: {
             CAN_MANAGE_CONTENT: true,
+            CAN_CREATE_ASSIGNMENT: true,
           },
         },
       }
