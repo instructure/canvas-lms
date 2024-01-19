@@ -66,13 +66,14 @@ const PathwayDetailsTray = ({
   const [addLearnerGroupsTrayOpenKey, setAddLearnerGroupsTrayOpenKey] = useState(0)
 
   const handleSave = useCallback(() => {
+    if (!title) return
     const badge = allBadges.find(b => b.id === currSelectedBadgeId)
     onSave({title, description, completion_award: badge, learner_groups: selectedLearnerGroupIds})
   }, [allBadges, currSelectedBadgeId, description, onSave, selectedLearnerGroupIds, title])
 
   const handleTitleChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>, newTitle: string) => {
-      setTitle(newTitle)
+      setTitle(newTitle.trim())
     },
     []
   )

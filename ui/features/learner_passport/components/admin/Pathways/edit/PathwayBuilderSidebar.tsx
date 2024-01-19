@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useState} from 'react'
+import React, {useCallback} from 'react'
 import {CondensedButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {IconPlusLine} from '@instructure/ui-icons'
@@ -68,13 +68,28 @@ const findChildMilestones = (milestones: MilestoneData[], ids: string[]) => {
   return milestones.filter(m => ids.includes(m.id))
 }
 
+const findSubtreeMilestones = (
+  milestones: MilestoneData[],
+  rootId: string,
+  subtree: string[]
+): string[] => {
+  const root = milestones.find(m => m.id === rootId)
+  if (!root) return subtree
+  subtree.push(rootId)
+  if (root.next_milestones.length === 0) return subtree
+  root?.next_milestones.forEach(nextid => {
+    subtree.concat(findSubtreeMilestones(milestones, nextid, subtree))
+  })
+  return subtree
+}
+
 type PathwayBuilderSidebarProps = {
   pathway: PathwayDetailData
   currentStep: MilestoneData | null // null => the pathway is the current step
   onAddStep: () => void
   onEditPathway: () => void
   onEditStep: (id: string) => void
-  onDeleteStep: (id: string) => void
+  onDeleteStep: (subtree: string[]) => void
   onHideSidebar: () => void
 }
 
@@ -103,9 +118,10 @@ const PathwayBuilderSidebar = ({
 
   const handleDeleteMilestone = useCallback(
     (milestoneId: string) => {
-      onDeleteStep(milestoneId)
+      const subtree = findSubtreeMilestones(pathway.milestones, milestoneId, [])
+      onDeleteStep(subtree)
     },
-    [onDeleteStep]
+    [onDeleteStep, pathway.milestones]
   )
 
   return (

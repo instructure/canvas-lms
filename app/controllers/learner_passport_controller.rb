@@ -380,7 +380,7 @@ class LearnerPassportController < ApplicationController
   def learner_passport_pathway_template
     {
       id: "",
-      title: "New Pathway",
+      title: "",
       description: "",
       published: nil,
       is_private: false,
