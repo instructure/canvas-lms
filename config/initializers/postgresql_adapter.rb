@@ -23,6 +23,14 @@ class QuotedValue < String
 end
 
 module PostgreSQLAdapterExtensions
+  # when changing this, you need to re-apply the latest migration creating the guard_excessive_updates function
+  DEFAULT_MAX_UPDATE_LIMIT = 1000
+
+  def initialize(*)
+    super
+    @max_update_limit = DEFAULT_MAX_UPDATE_LIMIT
+  end
+
   def configure_connection
     super
 
@@ -258,6 +266,11 @@ module PostgreSQLAdapterExtensions
   end
 
   def with_max_update_limit(limit)
+    return yield if limit == @max_update_limit
+
+    old_limit = @max_update_limit
+    @max_update_limit = limit
+
     if transaction_open?
       execute("SET LOCAL inst.max_update_limit = #{limit}")
       ret = yield
@@ -269,6 +282,8 @@ module PostgreSQLAdapterExtensions
       end
     end
     ret
+  ensure
+    @max_update_limit = old_limit if old_limit
   end
 
   def quote(*args)
