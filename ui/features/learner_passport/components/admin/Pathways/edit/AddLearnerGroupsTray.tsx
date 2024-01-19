@@ -118,7 +118,7 @@ const AddLearnerGroupsTray = ({
   }, [currSelectedIds, onSave])
 
   const renderGroupCard = (group: LearnerGroupType) => {
-    return <LearnerGroupCard group={group} onRemove={handleRemoveGroup} />
+    return <LearnerGroupCard key={group.id} group={group} onRemove={handleRemoveGroup} />
   }
 
   const renderGroupOptions = () => {

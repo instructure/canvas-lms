@@ -30,7 +30,7 @@ import {TextInput} from '@instructure/ui-text-input'
 import {Tray} from '@instructure/ui-tray'
 import {View} from '@instructure/ui-view'
 import {uid} from '@instructure/uid'
-import type {MilestoneData} from '../../../types'
+import type {MilestoneData, RequirementData} from '../../../types'
 import AddRequirementTray from './AddRequirementTray'
 import MilestoneRequirementCard from './requirements/MilestoneRequirementCard'
 
@@ -48,8 +48,8 @@ const MilestoneTray = ({milestone, open, variant, onClose, onSave}: MilestoneTra
   const [description, setDescription] = useState(milestone?.description || '')
   const [required, setRequired] = useState(milestone?.required || false)
   const [requirements, setRequirements] = useState(milestone?.requirements || [])
-  const [reqTrayIsOpen, setReqTrayIsOpen] = useState(false)
-  const [reqTrayOpenCount, setReqTrayOpenCount] = useState(0)
+  const [activeRequirement, setActiveRequirement] = useState<RequirementData | undefined>(undefined)
+  const [reqTrayKey, setReqTrayKey] = useState(0)
 
   const handleSave = useCallback(() => {
     const newMilestone: MilestoneData = {
@@ -82,20 +82,40 @@ const MilestoneTray = ({milestone, open, variant, onClose, onSave}: MilestoneTra
   }, [])
 
   const handleAddRequirementClick = useCallback(() => {
-    setReqTrayOpenCount(reqTrayOpenCount + 1)
-    setReqTrayIsOpen(true)
-  }, [reqTrayOpenCount])
+    setActiveRequirement(undefined)
+    setReqTrayKey(Date.now())
+  }, [])
 
   const handleRequirementTrayClose = useCallback(() => {
-    setReqTrayIsOpen(false)
+    setReqTrayKey(0)
   }, [])
 
   const handleSaveRequirement = useCallback(
-    requirement => {
-      setRequirements([...requirements, requirement])
+    newRequirement => {
+      if (activeRequirement) {
+        const prevVersion = requirements.findIndex(r => r.id === activeRequirement.id)
+        const newRequirements = [...requirements]
+        newRequirements.splice(prevVersion, 1, newRequirement)
+        setRequirements(newRequirements)
+      } else {
+        setRequirements([...requirements, newRequirement])
+      }
       handleRequirementTrayClose()
     },
-    [handleRequirementTrayClose, requirements]
+    [activeRequirement, handleRequirementTrayClose, requirements]
+  )
+
+  const handleEditRequirement = useCallback((requirement: RequirementData) => {
+    setActiveRequirement(requirement)
+    setReqTrayKey(Date.now())
+  }, [])
+
+  const handleDeleteRequirement = useCallback(
+    (requirement: RequirementData) => {
+      const newRequirements = [...requirements].filter(r => r.id !== requirement.id)
+      setRequirements(newRequirements)
+    },
+    [requirements]
   )
 
   return (
@@ -123,7 +143,7 @@ const MilestoneTray = ({milestone, open, variant, onClose, onSave}: MilestoneTra
               />
             </Flex.Item>
           </Flex>
-          <Flex.Item shouldGrow={true}>
+          <Flex.Item shouldGrow={true} shouldShrink={true} overflowY="auto">
             <View as="div" padding="0 medium medium medium">
               <Alert variant="info" renderCloseButtonLabel="Close" margin="0 0 small 0">
                 Steps are building blocks for your pathway. They can represent something as large as
@@ -162,6 +182,7 @@ const MilestoneTray = ({milestone, open, variant, onClose, onSave}: MilestoneTra
                     <View as="div" margin="small 0">
                       {requirements.map(requirement => (
                         <View
+                          key={requirement.id}
                           as="div"
                           padding="small"
                           background="secondary"
@@ -172,6 +193,8 @@ const MilestoneTray = ({milestone, open, variant, onClose, onSave}: MilestoneTra
                           <MilestoneRequirementCard
                             key={requirement.id}
                             requirement={requirement}
+                            onEdit={() => handleEditRequirement(requirement)}
+                            onDelete={() => handleDeleteRequirement(requirement)}
                           />
                         </View>
                       ))}
@@ -209,8 +232,9 @@ const MilestoneTray = ({milestone, open, variant, onClose, onSave}: MilestoneTra
       </Tray>
 
       <AddRequirementTray
-        key={reqTrayOpenCount}
-        open={reqTrayIsOpen}
+        key={reqTrayKey}
+        requirement={activeRequirement}
+        open={reqTrayKey > 0}
         variant="add"
         onClose={handleRequirementTrayClose}
         onSave={handleSaveRequirement}

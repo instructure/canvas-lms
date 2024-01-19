@@ -18,6 +18,7 @@
 
 import React from 'react'
 import {IconDragHandleLine, IconEditLine, IconTrashLine} from '@instructure/ui-icons'
+import {IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Link} from '@instructure/ui-link'
 import {Tag} from '@instructure/ui-tag'
@@ -27,7 +28,17 @@ import type {RequirementData} from '../../../../types'
 import {RequirementTypes} from '../../../../types'
 import {pluralize} from '../../../../shared/utils'
 
-const MilestoneRequirementCard = ({requirement}: {requirement: RequirementData}) => {
+type MilestoneRequirementCardProps = {
+  requirement: RequirementData
+  onEdit: (requirement: RequirementData) => void
+  onDelete: (requirement: RequirementData) => void
+}
+
+const MilestoneRequirementCard = ({
+  requirement,
+  onEdit,
+  onDelete,
+}: MilestoneRequirementCardProps) => {
   return (
     <Flex gap="small">
       <Flex.Item align="center">
@@ -80,10 +91,24 @@ const MilestoneRequirementCard = ({requirement}: {requirement: RequirementData})
       </Flex.Item>
       <Flex.Item align="center">
         <View display="inline-block" margin="0 small 0 0">
-          <IconEditLine />
-        </View>
-        <View display="inline-block">
-          <IconTrashLine />
+          <IconButton
+            screenReaderLabel="edit"
+            size="small"
+            withBackground={false}
+            withBorder={false}
+            onClick={() => onEdit(requirement)}
+          >
+            <IconEditLine />
+          </IconButton>
+          <IconButton
+            screenReaderLabel="delete"
+            size="small"
+            withBackground={false}
+            withBorder={false}
+            onClick={() => onDelete(requirement)}
+          >
+            <IconTrashLine />
+          </IconButton>
         </View>
       </Flex.Item>
     </Flex>

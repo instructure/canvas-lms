@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useEffect, useState} from 'react'
+import React, {useCallback, useState} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import type {
@@ -50,6 +50,7 @@ const PathwayBuilder = ({
   const [currentRoot, setCurrentRoot] = useState<MilestoneData | null>(null)
   const [sidebarIsVisible, setSidebarIsVisible] = useState(true)
   const [milestoneTrayOpenKey, setMilestoneTrayOpenKey] = useState(0)
+  const [milestoneTrayVariant, setMilestoneTrayVariant] = useState<'add' | 'edit'>('add')
   const [activeMilestone, setActiveMilestone] = useState<MilestoneData | undefined>(undefined)
   const [pathwayTrayOpenKey, setPathwayTrayOpenKey] = useState(mode === 'create' ? Date.now() : 0)
 
@@ -62,6 +63,8 @@ const PathwayBuilder = ({
   }, [])
 
   const handleAddMilestone = useCallback(() => {
+    setActiveMilestone(undefined)
+    setMilestoneTrayVariant('add')
     setMilestoneTrayOpenKey(Date.now())
   }, [])
 
@@ -73,6 +76,7 @@ const PathwayBuilder = ({
     (milestoneId: string) => {
       const milestone = pathway.milestones.find(m => m.id === milestoneId)
       setActiveMilestone(milestone)
+      setMilestoneTrayVariant('edit')
       setMilestoneTrayOpenKey(Date.now())
     },
     [pathway.milestones]
@@ -205,7 +209,7 @@ const PathwayBuilder = ({
         key={milestoneTrayOpenKey}
         milestone={activeMilestone}
         open={milestoneTrayOpenKey > 0}
-        variant="add"
+        variant={milestoneTrayVariant}
         onClose={() => setMilestoneTrayOpenKey(0)}
         onSave={handleSaveMilestone}
       />
