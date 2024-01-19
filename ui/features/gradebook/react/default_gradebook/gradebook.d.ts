@@ -294,6 +294,11 @@ export type Filter = {
   created_at: string
 }
 
+export type EnrollmentFilter = {
+  concluded: boolean
+  inactive: boolean
+}
+
 export type CustomStatusIdString = `custom-status-${string}`
 
 export type SubmissionFilterValue =
