@@ -1918,9 +1918,16 @@ class Attachment < ActiveRecord::Base
   def make_childless(preferred_child = nil)
     return if root_attachment_id
 
+    # if parent is broken, all children are broken
+    if file_state == "broken"
+      children.where.not(file_state: "broken").in_batches.update_all(file_state: "broken")
+      children.in_batches.update_all(root_attachment_id: nil)
+      return
+    end
+
     # everything is deleted? just unlink
     if workflow_state == "deleted" && file_state == "deleted" && !instfs_hosted? && !s3object.exists?
-      children.where(workflow_state: "deleted", file_state: "deleted", instfs_uuid: nil).update_all(root_attachment_id: nil)
+      children.where(workflow_state: "deleted", file_state: "deleted", instfs_uuid: nil).in_batches.update_all(root_attachment_id: nil)
     end
 
     child = preferred_child || children.take
@@ -1930,7 +1937,7 @@ class Attachment < ActiveRecord::Base
     child.root_attachment_id = nil
     copy_attachment_content(child, split_root_attachment: true)
     child.save!
-    Attachment.where(root_attachment_id: self).where.not(id: child).update_all(root_attachment_id: child.id)
+    Attachment.where(root_attachment_id: self).where.not(id: child).in_batches.update_all(root_attachment_id: child.id)
   end
 
   private def service_side_clone(destination)
@@ -1969,11 +1976,19 @@ class Attachment < ActiveRecord::Base
         if split_root_attachment
           old_content_type = self.content_type
           scope = Attachment.where(md5:, namespace:, root_attachment_id: nil)
-          scope.update_all(content_type: "invalid/invalid") # prevents find_existing_attachment_for_md5 from reattaching the child to the old root
+          # prevents find_existing_attachment_for_md5 from reattaching the child to the old root
+          scope.where.not(content_type: "invalid/invalid")
+               .in_batches
+               .update_all(content_type: "invalid/invalid")
         end
         Attachments::Storage.store_for_attachment(destination, open)
       ensure
-        scope.where.not(id: destination).update_all(content_type: old_content_type) if split_root_attachment
+        if split_root_attachment
+          scope.where.not(id: destination)
+               .where.not(content_type: old_content_type)
+               .in_batches
+               .update_all(content_type: old_content_type)
+        end
       end
     end
   end
