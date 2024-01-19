@@ -265,8 +265,17 @@ export default function DiscussionTopicForm({
 
   const shouldShowAnnouncementOnlyOptions = isAnnouncement && !isGroupContext
 
-  const shouldShowGroupAndGradedDiscussionOptions =
-    discussionAnonymousState === 'off' && !isAnnouncement && !isGroupContext
+  const shouldShowGroupOptions =
+    discussionAnonymousState === 'off' &&
+    !isAnnouncement &&
+    !isGroupContext &&
+    ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_SET_GROUP
+
+  const shouldShowGradedDiscussionOptions =
+    discussionAnonymousState === 'off' &&
+    !isAnnouncement &&
+    !isGroupContext &&
+    ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_CREATE_ASSIGNMENT
 
   const shouldShowUsageRightsOption =
     ENV?.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_ATTACH &&
@@ -284,6 +293,9 @@ export default function DiscussionTopicForm({
   /* discussion moderators viewing a new or still unpublished discussion */
   const shouldShowSaveAndPublishButton =
     !isAnnouncement && ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MODERATE && !published
+
+  const shouldShowPodcastFeedOption =
+    ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MODERATE && !ENV.K5_HOMEROOM_COURSE
 
   const validateTitle = newTitle => {
     if (newTitle.length > 255) {
@@ -722,15 +734,17 @@ export default function DiscussionTopicForm({
           defaultContent={isEditing ? currentDiscussionTopic?.message : ''}
           autosave={false}
         />
-        <AttachmentDisplay
-          attachment={attachment}
-          setAttachment={setAttachment}
-          setAttachmentToUpload={setAttachmentToUpload}
-          attachmentToUpload={attachmentToUpload}
-          responsiveQuerySizes={responsiveQuerySizes}
-          isGradedDiscussion={!affectUserFileQuota}
-          canAttach={ENV.DISCUSSION_TOPIC?.PERMISSIONS.CAN_ATTACH}
-        />
+        {ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_ATTACH && (
+          <AttachmentDisplay
+            attachment={attachment}
+            setAttachment={setAttachment}
+            setAttachmentToUpload={setAttachmentToUpload}
+            attachmentToUpload={attachmentToUpload}
+            responsiveQuerySizes={responsiveQuerySizes}
+            isGradedDiscussion={!affectUserFileQuota}
+            canAttach={ENV.DISCUSSION_TOPIC?.PERMISSIONS.CAN_ATTACH}
+          />
+        )}
         {shouldShowPostToSectionOption && (
           <View display="block" padding="medium none">
             <CanvasMultiSelect
@@ -867,15 +881,17 @@ export default function DiscussionTopicForm({
             />
           )}
 
-          <Checkbox
-            label={I18n.t('Enable podcast feed')}
-            value="enable-podcast-feed"
-            checked={enablePodcastFeed}
-            onChange={() => {
-              setIncludeRepliesInFeed(!enablePodcastFeed && includeRepliesInFeed)
-              setEnablePodcastFeed(!enablePodcastFeed)
-            }}
-          />
+          {shouldShowPodcastFeedOption && (
+            <Checkbox
+              label={I18n.t('Enable podcast feed')}
+              value="enable-podcast-feed"
+              checked={enablePodcastFeed}
+              onChange={() => {
+                setIncludeRepliesInFeed(!enablePodcastFeed && includeRepliesInFeed)
+                setEnablePodcastFeed(!enablePodcastFeed)
+              }}
+            />
+          )}
           {enablePodcastFeed && !isGroupContext && (
             <View display="block" padding="none none none large">
               <Checkbox
@@ -886,7 +902,7 @@ export default function DiscussionTopicForm({
               />
             </View>
           )}
-          {shouldShowGroupAndGradedDiscussionOptions && (
+          {shouldShowGradedDiscussionOptions && (
             <Checkbox
               data-testid="graded-checkbox"
               label={I18n.t('Graded')}
@@ -953,7 +969,7 @@ export default function DiscussionTopicForm({
               )}
             </>
           )}
-          {shouldShowGroupAndGradedDiscussionOptions && (
+          {shouldShowGroupOptions && (
             <Checkbox
               data-testid="group-discussion-checkbox"
               label={I18n.t('This is a Group Discussion')}
@@ -965,7 +981,7 @@ export default function DiscussionTopicForm({
               }}
             />
           )}
-          {shouldShowGroupAndGradedDiscussionOptions && isGroupDiscussion && (
+          {shouldShowGroupOptions && isGroupDiscussion && (
             <View display="block" padding="none none none large">
               <SimpleSelect
                 renderLabel={I18n.t('Group Set')}

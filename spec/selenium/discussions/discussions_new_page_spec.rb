@@ -504,6 +504,14 @@ describe "discussions" do
         expect(f("span[data-testid='anon-conversation']").text).to eq "When creating a reply, you will have the option to show your name and profile picture to other course members or remain anonymous."
         expect(f("span[data-testid='author_name']").text).to include "Anonymous"
       end
+
+      it "hides the correct options" do
+        get "/courses/#{course.id}/discussion_topics/new"
+        expect(f("body")).not_to contain_jqcss "input[value='full_anonymity']"
+        expect(f("body")).not_to contain_jqcss "input[value='enable-podcast-feed']"
+        expect(f("body")).not_to contain_jqcss "input[value='graded']"
+        expect(f("body")).not_to contain_jqcss "input[data-testid='group-discussion-checkbox']"
+      end
     end
 
     context "as a teacher" do
