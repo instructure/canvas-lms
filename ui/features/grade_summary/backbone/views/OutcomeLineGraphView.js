@@ -123,7 +123,7 @@ class OutcomeLineGraphView extends Backbone.View {
   }
 
   render() {
-    if (this.deferred.isResolved()) {
+    if (this.deferred.state() === 'resolved') {
       if (this.collection.isEmpty()) {
         return this
       }
