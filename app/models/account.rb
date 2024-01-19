@@ -66,6 +66,7 @@ class Account < ActiveRecord::Base
   has_many :sis_batches
   has_many :abstract_courses, class_name: "AbstractCourse"
   has_many :root_abstract_courses, class_name: "AbstractCourse", foreign_key: "root_account_id"
+  has_many :user_account_associations
   has_many :all_users, -> { distinct }, through: :user_account_associations, source: :user
   has_many :users, through: :active_account_users
   has_many :user_past_lti_ids, as: :context, inverse_of: :context
@@ -152,7 +153,6 @@ class Account < ActiveRecord::Base
   has_many :error_reports
   has_many :announcements, class_name: "AccountNotification"
   has_many :alerts, -> { preload(:criteria) }, as: :context, inverse_of: :context
-  has_many :user_account_associations
   has_many :report_snapshots
   has_many :external_integration_keys, as: :context, inverse_of: :context, dependent: :destroy
   has_many :shared_brand_configs
@@ -787,25 +787,6 @@ class Account < ActiveRecord::Base
     user_account_associations.where(user_id: user).exists?
   end
 
-  def fast_course_base(opts = {})
-    opts[:order] ||= Course.best_unicode_collation_key("courses.name").asc
-    columns = "courses.id, courses.name, courses.workflow_state, courses.course_code, courses.sis_source_id, courses.enrollment_term_id"
-    associated_courses = self.associated_courses(
-      include_crosslisted_courses: opts[:include_crosslisted_courses]
-    )
-    associated_courses = associated_courses.active.order(opts[:order])
-    associated_courses = associated_courses.with_enrollments if opts[:hide_enrollmentless_courses]
-    associated_courses = associated_courses.master_courses if opts[:only_master_courses]
-    associated_courses = associated_courses.for_term(opts[:term]) if opts[:term].present?
-    associated_courses = yield associated_courses if block_given?
-    associated_courses.limit(opts[:limit]).active_first.select(columns).to_a
-  end
-
-  def fast_all_courses(opts = {})
-    @cached_fast_all_courses ||= {}
-    @cached_fast_all_courses[opts] ||= fast_course_base(opts)
-  end
-
   def all_users(limit = 250)
     @cached_all_users ||= {}
     @cached_all_users[limit] ||= User.of_account(self).limit(limit)
@@ -823,12 +804,6 @@ class Account < ActiveRecord::Base
                 .select("users.id, users.name")
     scope = scope.select(opts[:order]).order(opts[:order]) if opts[:order]
     scope
-  end
-
-  def courses_name_like(query = "", opts = {})
-    opts[:limit] ||= 200
-    @cached_courses_name_like ||= {}
-    @cached_courses_name_like[[query, opts]] ||= fast_course_base(opts) { |q| q.name_like(query) }
   end
 
   def self_enrollment_course_for(code)
