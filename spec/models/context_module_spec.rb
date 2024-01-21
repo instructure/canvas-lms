@@ -234,6 +234,29 @@ describe ContextModule do
     end
   end
 
+  describe "update_assignment_submissions" do
+    before :once do
+      Account.site_admin.enable_feature!(:differentiated_modules)
+      course_module
+      @student1 = student_in_course(active_all: true, name: "Student 1").user
+      @assignment = @course.assignments.create!(title: "some assignment")
+      @module.add_item({ id: @assignment.id, type: "assignment" })
+    end
+
+    it "correctly updates submissions after delete" do
+      adhoc_override = @module.assignment_overrides.create!(set_type: "ADHOC")
+      adhoc_override.assignment_override_students.create!(user: @student1)
+
+      @module.update_assignment_submissions(@module.current_assignments_and_quizzes)
+      @assignment.submissions.reload
+      expect(@assignment.submissions.length).to eq 1
+
+      @module.destroy!
+      @assignment.submissions.reload
+      expect(@assignment.submissions.length).to eq 2
+    end
+  end
+
   describe "prerequisites=" do
     it "assigns prerequisites" do
       course_module
