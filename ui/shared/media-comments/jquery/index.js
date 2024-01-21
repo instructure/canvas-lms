@@ -17,7 +17,7 @@
  */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import pubsub from 'jquery-tinypubsub'
+import * as pubsub from 'jquery-tinypubsub'
 import $ from 'jquery'
 import fileSize from '@canvas/util/fileSize'
 import htmlEscape from '@instructure/html-escape'

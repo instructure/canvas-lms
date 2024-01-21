@@ -209,7 +209,7 @@ module.exports = {
       'ignorePackages',
       {js: 'never', ts: 'never', jsx: 'never', tsx: 'never', coffee: 'never'},
     ],
-    'import/no-commonjs': 'off', // This is overridden where it counts
+    'import/no-commonjs': 'error', // This is overridden where it counts
     'import/no-extraneous-dependencies': ['error', {devDependencies: true}],
     'lodash/callback-binding': 'error',
     'lodash/collection-method-value': 'error',
