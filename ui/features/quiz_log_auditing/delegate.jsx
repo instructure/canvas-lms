@@ -27,20 +27,12 @@ import controller from './controller'
 let container
 
 /**
- * @class Events.Core.Delegate
- *
- * The client app delegate. This is the main interface that embedding
- * applications use to interact with the client app.
- */
-const exports = {}
-
-/**
  * Configure the application. See Config for the supported options.
  *
  * @param  {Object} options
  *         A set of options to override.
  */
-const configure = function (options) {
+export const configure = function (options) {
   extend(config, options)
 }
 
@@ -56,7 +48,7 @@ const configure = function (options) {
  * @return {Promise}
  *         Fulfilled when the app has been started and rendered.
  */
-const mount = function (node, options) {
+export const mount = function (node, options) {
   configure(options)
   container = node
 
@@ -66,31 +58,22 @@ const mount = function (node, options) {
   })
 }
 
-const isMounted = function () {
+export const isMounted = function () {
   return !!container
 }
 
-const update = function (props) {
+export const update = function (props) {
   ReactDOM.render(<Layout {...props} />, container)
 }
 
-const reload = function () {
+export const reload = function () {
   controller.load()
 }
 
-const unmount = function () {
+export const unmount = function () {
   if (isMounted()) {
     controller.stop()
     ReactDOM.unmountComponentAtNode(container)
     container = undefined
   }
 }
-
-exports.configure = configure
-exports.mount = mount
-exports.isMounted = isMounted
-exports.update = update
-exports.reload = reload
-exports.unmount = unmount
-
-export default exports
