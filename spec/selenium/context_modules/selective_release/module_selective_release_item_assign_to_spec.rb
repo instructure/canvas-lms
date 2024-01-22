@@ -103,6 +103,38 @@ describe "selective_release module item assign to tray" do
       expect(icon_type_exists?("Quiz")).to be true
       expect(item_type_text.text).to eq("Quiz")
     end
+
+    it "shows the correct icon type and title for a classic quiz after indent" do
+      go_to_modules
+      add_new_module_item_and_yield("#quizs_select", "Quiz", "[ Create Quiz ]", "A Classic Quiz") do
+        f("label[for=classic_quizzes_radio]").click
+      end
+      module_item = ContentTag.last
+
+      manage_module_item_button(module_item).click
+      click_manage_module_item_indent(module_item)
+      manage_module_item_button(module_item).click
+      click_manage_module_item_assign_to(module_item)
+
+      expect(item_tray_exists?).to be true
+      expect(icon_type_exists?("Quiz")).to be true
+      expect(item_type_text.text).to eq("Quiz")
+    end
+
+    it "does not show tray when flag if off after item indent" do
+      Account.site_admin.disable_feature! :differentiated_modules
+      go_to_modules
+      add_new_module_item_and_yield("#quizs_select", "Quiz", "[ Create Quiz ]", "A Classic Quiz") do
+        f("label[for=classic_quizzes_radio]").click
+      end
+      module_item = ContentTag.last
+
+      manage_module_item_button(module_item).click
+      click_manage_module_item_indent(module_item)
+      manage_module_item_button(module_item).click
+
+      expect(element_exists?(manage_module_item_assign_to_selector(module_item.id))).to be_falsey
+    end
   end
 
   context "assign to tray values" do
