@@ -1411,7 +1411,15 @@ describe "Outcome Reports" do
     let_once(:account_report) { AccountReport.new(report_type: "outcome_export_csv", account: @root_account, user: @user1) }
     let_once(:outcome_reports) { AccountReports::OutcomeReports.new(account_report) }
 
+    it "doesn't load courses if account_level_mastery_scales feature is off" do
+      @root_account.disable_feature!(:account_level_mastery_scales)
+      row = { "course id" => @course1.id }
+      expect(Course).not_to receive(:find)
+      outcome_reports.send :add_outcomes_data, row
+    end
+
     it "caches courses" do
+      @root_account.enable_feature!(:account_level_mastery_scales)
       row = { "course id" => @course1.id }
       expect(Course).to receive(:find).with(@course1.id).and_call_original
       outcome_reports.send :add_outcomes_data, row
