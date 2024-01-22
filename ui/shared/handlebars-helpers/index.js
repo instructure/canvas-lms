@@ -655,6 +655,10 @@ const object = {
       }
     }
 
+    if ('aria-expanded' in inputProps) {
+      inputProps['aria-expanded'] = inputProps['aria-expanded'] ? 'true' : 'false'
+    }
+
     for (const prop of ['checked', 'disabled']) {
       if (inputProps[prop]) {
         inputProps[prop] = prop
