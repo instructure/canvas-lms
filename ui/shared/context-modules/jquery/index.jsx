@@ -609,7 +609,7 @@ window.modules = (function () {
           const $a = $assignToMenuItem.find('a')
           $a.attr('data-item-id', data.id)
           $a.attr('data-item-name', data.title)
-          $a.attr('data-item-type', data.quiz_lti ? 'lti-quiz' : data.type)
+          $a.attr('data-item-type', data.quiz_lti ? 'lti-quiz' : data.content_type == 'Quizzes::Quiz' ? 'quiz' : data.type)
           $a.attr('data-item-context-id', data.context_id)
           $a.attr('data-item-context-type', data.context_type)
           $a.attr('data-item-content-id', data.content_id)

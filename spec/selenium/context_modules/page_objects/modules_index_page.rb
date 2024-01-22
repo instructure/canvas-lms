@@ -29,6 +29,10 @@ module ModulesIndexPage
     "#context_module_item_#{module_item_id} .module-item-assign-to-link"
   end
 
+  def manage_module_item_indent_selector(module_item_id)
+    "#context_module_item_#{module_item_id} .indent_item_link"
+  end
+
   def module_create_button_selector
     "//button[.//*[contains(text(), 'Create a new Module')]]"
   end
@@ -80,6 +84,10 @@ module ModulesIndexPage
 
   def manage_module_item_assign_to(module_item_id)
     f(manage_module_item_assign_to_selector(module_item_id))
+  end
+
+  def manage_module_item_indent(module_item_id)
+    f(manage_module_item_indent_selector(module_item_id))
   end
 
   def modules_index_settings_button
@@ -191,6 +199,10 @@ module ModulesIndexPage
 
   def click_manage_module_item_assign_to(module_item)
     manage_module_item_assign_to(module_item.id).click
+  end
+
+  def click_manage_module_item_indent(module_item)
+    manage_module_item_indent(module_item.id).click
   end
 
   def click_module_create_button
