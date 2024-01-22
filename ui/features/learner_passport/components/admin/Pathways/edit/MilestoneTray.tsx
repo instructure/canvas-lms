@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useState} from 'react'
+import React, {useCallback, useEffect, useState} from 'react'
 import {Alert} from '@instructure/ui-alerts'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Checkbox} from '@instructure/ui-checkbox'
@@ -29,13 +29,12 @@ import {TextArea} from '@instructure/ui-text-area'
 import {TextInput} from '@instructure/ui-text-input'
 import {Tray} from '@instructure/ui-tray'
 import {View} from '@instructure/ui-view'
-import {uid} from '@instructure/uid'
 import type {MilestoneData, RequirementData} from '../../../types'
 import AddRequirementTray from './AddRequirementTray'
 import MilestoneRequirementCard from './requirements/MilestoneRequirementCard'
 
 type MilestoneTrayProps = {
-  milestone?: MilestoneData
+  milestone: MilestoneData
   open: boolean
   variant: 'add' | 'edit'
   onClose: () => void
@@ -43,15 +42,39 @@ type MilestoneTrayProps = {
 }
 
 const MilestoneTray = ({milestone, open, variant, onClose, onSave}: MilestoneTrayProps) => {
-  const [milestoneId] = useState(milestone?.id || uid('ms', 3))
-  const [title, setTitle] = useState(milestone?.title || '')
-  const [description, setDescription] = useState(milestone?.description || '')
-  const [required, setRequired] = useState(milestone?.required || false)
-  const [requirements, setRequirements] = useState(milestone?.requirements || [])
+  const [milestoneId, setMilestoneId] = useState(milestone.id)
+  const [title, setTitle] = useState(milestone.title)
+  const [description, setDescription] = useState(milestone.description)
+  const [required, setRequired] = useState(milestone.required)
+  const [requirements, setRequirements] = useState(milestone.requirements)
   const [activeRequirement, setActiveRequirement] = useState<RequirementData | undefined>(undefined)
+  const [reqTrayOpen, setReqTrayOpen] = useState(false)
   const [reqTrayKey, setReqTrayKey] = useState(0)
 
+  useEffect(() => {
+    if (milestoneId !== milestone.id) {
+      setMilestoneId(milestone.id)
+      setTitle(milestone.title)
+      setDescription(milestone.description)
+      setRequired(milestone.required)
+      setRequirements(milestone.requirements)
+    }
+  }, [
+    milestone.description,
+    milestone.id,
+    milestone.required,
+    milestone.requirements,
+    milestone.title,
+    milestoneId,
+  ])
+
+  const handleCancel = useCallback(() => {
+    setReqTrayOpen(false)
+    onClose()
+  }, [onClose])
+
   const handleSave = useCallback(() => {
+    setReqTrayOpen(false)
     const newMilestone: MilestoneData = {
       id: milestoneId,
       title,
@@ -84,10 +107,11 @@ const MilestoneTray = ({milestone, open, variant, onClose, onSave}: MilestoneTra
   const handleAddRequirementClick = useCallback(() => {
     setActiveRequirement(undefined)
     setReqTrayKey(Date.now())
+    setReqTrayOpen(true)
   }, [])
 
   const handleRequirementTrayClose = useCallback(() => {
-    setReqTrayKey(0)
+    setReqTrayOpen(false)
   }, [])
 
   const handleSaveRequirement = useCallback(
@@ -108,6 +132,7 @@ const MilestoneTray = ({milestone, open, variant, onClose, onSave}: MilestoneTra
   const handleEditRequirement = useCallback((requirement: RequirementData) => {
     setActiveRequirement(requirement)
     setReqTrayKey(Date.now())
+    setReqTrayOpen(true)
   }, [])
 
   const handleDeleteRequirement = useCallback(
@@ -139,7 +164,7 @@ const MilestoneTray = ({milestone, open, variant, onClose, onSave}: MilestoneTra
                 placement="end"
                 offset="small"
                 screenReaderLabel="Close"
-                onClick={onClose}
+                onClick={handleCancel}
               />
             </Flex.Item>
           </Flex>
@@ -222,7 +247,7 @@ const MilestoneTray = ({milestone, open, variant, onClose, onSave}: MilestoneTra
           </Flex.Item>
           <Flex.Item align="end" width="100%">
             <View as="div" padding="small medium" borderWidth="small 0 0 0" textAlign="end">
-              <Button onClick={onClose}>Cancel</Button>
+              <Button onClick={handleCancel}>Cancel</Button>
               <Button margin="0 0 0 small" onClick={handleSave}>
                 Save Step
               </Button>
@@ -234,7 +259,7 @@ const MilestoneTray = ({milestone, open, variant, onClose, onSave}: MilestoneTra
       <AddRequirementTray
         key={reqTrayKey}
         requirement={activeRequirement}
-        open={reqTrayKey > 0}
+        open={reqTrayOpen}
         variant="add"
         onClose={handleRequirementTrayClose}
         onSave={handleSaveRequirement}

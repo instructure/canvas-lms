@@ -24,6 +24,7 @@ import {Heading} from '@instructure/ui-heading'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {TextArea} from '@instructure/ui-text-area'
 import {TextInput} from '@instructure/ui-text-input'
+import {Tooltip} from '@instructure/ui-tooltip'
 import {Tray} from '@instructure/ui-tray'
 import {View} from '@instructure/ui-view'
 import {uid} from '@instructure/uid'
@@ -55,19 +56,23 @@ const RequirementTray = ({requirement, open, variant, onClose, onSave}: Requirem
     requirement?.canvas_content
   )
 
+  const isValid = useCallback(() => {
+    return name && type
+  }, [name, type])
+
   const handleSave = useCallback(() => {
-    if (!(name && type)) return
+    if (!isValid()) return
 
     const newRequirement = {
       id: requirementId,
       name,
       description,
       required,
-      type,
+      type: type as RequirementType,
       canvas_content: canvasContent,
     }
     onSave(newRequirement)
-  }, [canvasContent, description, name, onSave, required, requirementId, type])
+  }, [canvasContent, description, isValid, name, onSave, required, requirementId, type])
 
   const handleNameChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>, newName: string) => {
@@ -189,9 +194,14 @@ const RequirementTray = ({requirement, open, variant, onClose, onSave}: Requirem
           <Flex.Item align="end" width="100%">
             <View as="div" padding="small medium" borderWidth="small 0 0 0" textAlign="end">
               <Button onClick={onClose}>Cancel</Button>
-              <Button margin="0 0 0 small" onClick={handleSave}>
-                Save Requirement
-              </Button>
+              <Tooltip
+                renderTip="You must provide a name and type before saving."
+                on={isValid() ? [] : ['click', 'hover', 'focus']}
+              >
+                <Button margin="0 0 0 small" onClick={handleSave}>
+                  Save Requirement
+                </Button>
+              </Tooltip>
             </View>
           </Flex.Item>
         </Flex>

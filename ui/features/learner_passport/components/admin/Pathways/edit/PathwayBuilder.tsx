@@ -19,6 +19,7 @@
 import React, {useCallback, useState} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
+import {uid} from '@instructure/uid'
 import type {
   LearnerGroupType,
   PathwayBadgeType,
@@ -31,6 +32,18 @@ import PathwayBuilderTree from './PathwayBuilderTree'
 import MilestoneTray from './MilestoneTray'
 import PathwayDetailsTray from './PathwayDetailsTray'
 import confirm from '../../../shared/Confirmation'
+
+function makeDefaultMilestone(): MilestoneData {
+  return {
+    id: uid('ms', 3),
+    title: '',
+    description: '',
+    required: false,
+    requirements: [],
+    achievements: [],
+    next_milestones: [],
+  }
+}
 
 type PathwayBuilderProps = {
   pathway: DraftPathway
@@ -49,10 +62,10 @@ const PathwayBuilder = ({
 }: PathwayBuilderProps) => {
   const [currentRoot, setCurrentRoot] = useState<MilestoneData | null>(null)
   const [sidebarIsVisible, setSidebarIsVisible] = useState(true)
-  const [milestoneTrayOpenKey, setMilestoneTrayOpenKey] = useState(0)
+  const [milestoneTrayOpen, setMilestoneTrayOpen] = useState(false)
   const [milestoneTrayVariant, setMilestoneTrayVariant] = useState<'add' | 'edit'>('add')
-  const [activeMilestone, setActiveMilestone] = useState<MilestoneData | undefined>(undefined)
-  const [pathwayTrayOpenKey, setPathwayTrayOpenKey] = useState(mode === 'create' ? Date.now() : 0)
+  const [activeMilestone, setActiveMilestone] = useState<MilestoneData>(makeDefaultMilestone())
+  const [pathwayTrayOpen, setPathwayTrayOpen] = useState(mode === 'create')
 
   const handleShowSidebar = useCallback(() => {
     setSidebarIsVisible(true)
@@ -63,21 +76,24 @@ const PathwayBuilder = ({
   }, [])
 
   const handleAddMilestone = useCallback(() => {
-    setActiveMilestone(undefined)
+    setActiveMilestone(makeDefaultMilestone())
     setMilestoneTrayVariant('add')
-    setMilestoneTrayOpenKey(Date.now())
+    setMilestoneTrayOpen(true)
+    setPathwayTrayOpen(false)
   }, [])
 
   const handleEditPathway = useCallback(() => {
-    setPathwayTrayOpenKey(Date.now())
+    setPathwayTrayOpen(true)
+    setMilestoneTrayOpen(false)
   }, [])
 
   const handleEditMilestone = useCallback(
     (milestoneId: string) => {
       const milestone = pathway.milestones.find(m => m.id === milestoneId)
-      setActiveMilestone(milestone)
+      setActiveMilestone(milestone || makeDefaultMilestone())
       setMilestoneTrayVariant('edit')
-      setMilestoneTrayOpenKey(Date.now())
+      setMilestoneTrayOpen(true)
+      setPathwayTrayOpen(false)
     },
     [pathway.milestones]
   )
@@ -108,7 +124,7 @@ const PathwayBuilder = ({
 
   const handleSaveMilestone = useCallback(
     (newMilestone: MilestoneData) => {
-      setMilestoneTrayOpenKey(0)
+      setMilestoneTrayOpen(false)
 
       const mIndex = pathway.milestones.findIndex(m => m.id === newMilestone.id)
       if (mIndex >= 0) {
@@ -145,7 +161,7 @@ const PathwayBuilder = ({
 
   const handleSavePathwayDetails = useCallback(
     (newValues: Partial<PathwayDetailData>) => {
-      setPathwayTrayOpenKey(0)
+      setPathwayTrayOpen(false)
       onChange(newValues)
     },
     [onChange]
@@ -196,21 +212,19 @@ const PathwayBuilder = ({
         </Flex>
       </div>
       <PathwayDetailsTray
-        key={pathwayTrayOpenKey}
         pathway={pathway}
         allBadges={allBadges}
         allLearnerGroups={allLearnerGroups}
         selectedBadgeId={pathway.completion_award?.id || null}
-        open={pathwayTrayOpenKey > 0}
-        onClose={() => setPathwayTrayOpenKey(0)}
+        open={pathwayTrayOpen}
+        onClose={() => setPathwayTrayOpen(false)}
         onSave={handleSavePathwayDetails}
       />
       <MilestoneTray
-        key={milestoneTrayOpenKey}
         milestone={activeMilestone}
-        open={milestoneTrayOpenKey > 0}
+        open={milestoneTrayOpen}
         variant={milestoneTrayVariant}
-        onClose={() => setMilestoneTrayOpenKey(0)}
+        onClose={() => setMilestoneTrayOpen(false)}
         onSave={handleSaveMilestone}
       />
     </View>
