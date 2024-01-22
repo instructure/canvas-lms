@@ -104,45 +104,52 @@
 
   <div id="wrapper" class="ic-Layout-wrapper">
     <% if crumbs.length > 1 %>
-      <div class="ic-app-nav-toggle-and-crumbs no-print">
-        <% if @show_left_side %>
-          <button type="button" id="courseMenuToggle" class="Button Button--link ic-app-course-nav-toggle" aria-live="polite" aria-label="<%= subnav_menu_text %>">
-            <i class="icon-hamburger" aria-hidden="true"></i>
-          </button>
-        <% end %>
+      <% if @instui_topnav && @domain_root_account.try(:feature_enabled?, :instui_nav) %>
+        <% js_env breadcrumbs: crumbs[1..]&.map { |crumb| { name: crumb[0], url: crumb[1] } } %>
+        <div class="instui-topnav-container">
+          <div id="react-instui-topnav"></div>
+        </div>
+      <% else %>
+        <div class="ic-app-nav-toggle-and-crumbs no-print">
+          <% if @show_left_side %>
+            <button type="button" id="courseMenuToggle" class="Button Button--link ic-app-course-nav-toggle" aria-live="polite" aria-label="<%= subnav_menu_text %>">
+              <i class="icon-hamburger" aria-hidden="true"></i>
+            </button>
+          <% end %>
 
-        <div class="ic-app-crumbs">
+          <div class="ic-app-crumbs">
+            <% if @context&.is_a?(Course) && @context.elementary_subject_course? %>
+              <%= link_to course_path(id: @context.id), :class => "btn k5-back-to-subject", :id => "back_to_subject" do %>
+                <i class="icon-arrow-open-left"></i> <%= t('Back to Subject') %>
+              <% end %>
+            <% else %>
+              <%= render_crumbs %>
+            <% end %>
+          </div>
+
           <% if @context&.is_a?(Course) && @context.elementary_subject_course? %>
-            <%= link_to course_path(id: @context.id), :class => "btn k5-back-to-subject", :id => "back_to_subject" do %>
-              <i class="icon-arrow-open-left"></i> <%= t('Back to Subject') %>
+            <span class="k5-heading-course-name"><%= @context.nickname_for(@current_user) %></span>
+          <% end %>
+
+          <div class="right-of-crumbs">
+            <% if tutorials_enabled? %>
+              <div class="TutorialToggleHolder"></div>
             <% end %>
-          <% else %>
-            <%= render_crumbs %>
-          <% end %>
-        </div>
-
-        <% if @context&.is_a?(Course) && @context.elementary_subject_course? %>
-          <span class="k5-heading-course-name"><%= @context.nickname_for(@current_user) %></span>
-        <% end %>
-
-        <div class="right-of-crumbs">
-          <% if tutorials_enabled? %>
-            <div class="TutorialToggleHolder"></div>
-          <% end %>
-          <% if show_immersive_reader? %>
-            <div id="immersive_reader_mount_point"></div>
-          <% end %>
-          <% if show_student_view_button? %>
-            <%= link_to course_student_view_path(course_id: @context, redirect_to_referer: 1), :class => "btn", :id => "easy_student_view", :method => :post do %>
-              <i class="icon-student-view"></i> <%= t('Student View') %>
+            <% if show_immersive_reader? %>
+              <div id="immersive_reader_mount_point"></div>
             <% end %>
-          <% end %>
-          <% if (@context&.is_a?(Course) || @context&.is_a?(Assignment)) && @context_enrollment&.observer? %>
-            <div id='observer-picker-mountpoint' style="margin: 3px;"></div>
-          <% end %>
-        </div>
+            <% if show_student_view_button? %>
+              <%= link_to course_student_view_path(course_id: @context, redirect_to_referer: 1), :class => "btn", :id => "easy_student_view", :method => :post do %>
+                <i class="icon-student-view"></i> <%= t('Student View') %>
+              <% end %>
+            <% end %>
+            <% if (@context&.is_a?(Course) || @context&.is_a?(Assignment)) && @context_enrollment&.observer? %>
+              <div id='observer-picker-mountpoint' style="margin: 3px;"></div>
+            <% end %>
+          </div>
 
-      </div>
+        </div>
+      <% end %>
     <% end %>
     <div id="main" class="ic-Layout-columns">
       <% if !@body_class_no_headers %>

@@ -324,6 +324,11 @@ body:not(.course-menu-expanded) {
   }
 }
 
+.instui-topnav-container {
+  margin: 0 $ic-sp * 2;
+  min-height: $ic-breadcrumbs-height;
+}
+
 .ic-app-nav-toggle-and-crumbs {
   display: flex;
   align-items: center;

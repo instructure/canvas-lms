@@ -25,8 +25,8 @@ jest.mock('../hooks/useToggleCourseNav', () => ({
     toggle: jest.fn(),
   }),
 }))
-describe('SideNav', () => {
-  // test that SideNav renders without errors
+describe('TopNav', () => {
+  // test that TopNav renders without errors
   beforeEach(() => {
     window.ENV.breadcrumbs = [
       {name: 'crumb', url: 'crumb'},
@@ -40,6 +40,7 @@ describe('SideNav', () => {
 
   it('renders with breadcrumbs', () => {
     const {getByText} = render(<TopNav />)
+
     expect(getByText('crumb')).toBeInTheDocument()
   })
 })
