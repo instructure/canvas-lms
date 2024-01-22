@@ -147,8 +147,6 @@ describe GradingSchemesJsonController, type: :request do
 
         response_json = response.parsed_body
         expect(response_json.first["title"]).to eq("My Grading Scheme")
-        expect(response_json.first["workflow_state"]).to eq("archived")
-        expect(response_json.first["used_locations"]).to eq([])
       end
     end
 
@@ -436,6 +434,65 @@ describe GradingSchemesJsonController, type: :request do
                                       "scaling_factor" => 5.0 })
       end
     end
+
+    describe "#used_locations" do
+      let_once(:data) { [["A", 94], ["F", 0]] }
+
+      before(:once) do
+        @root_account = Account.default
+        course_with_teacher(active_all: true, account: @root_account)
+        @admin = account_admin_user(account: @root_account)
+        @student = user_factory(active_user: true)
+        @sub_account = @root_account.sub_accounts.create!
+        course_with_teacher(account: @root_account)
+        @enrollment.update(workflow_state: "active")
+        @grading_standard = GradingStandard.create(context: @root_account, workflow_state: "active", data:)
+        @root_account.update(grading_standard_id: @grading_standard.id)
+        @sub_account.update(grading_standard_id: @grading_standard.id)
+        @course.update(grading_standard_id: @grading_standard.id)
+        3.times do
+          assignment = @course.assignments.create!(title: "hi", grading_standard_id: @grading_standard.id)
+          assignment.submissions.create!(user: @student, workflow_state: "graded")
+        end
+      end
+
+      it "returns courses and assignments where the grading standard is used" do
+        user_session(@admin)
+        get "/accounts/#{@account.id}/grading_schemes/#{@grading_standard.id}/used_locations", as: :json
+        locations = response.parsed_body
+
+        expect(locations.size).to eq(1)
+        expect(locations.first["id"]).to eq(@course.id)
+        expect(locations.first["assignments"].size).to eq(3)
+      end
+
+      it "does not return courses without graded assignments" do
+        another_course = course_factory
+        another_course.assignments.create!(title: "hi")
+        @course.assignments.create!(title: "hi")
+
+        user_session(@admin)
+        get "/accounts/#{@account.id}/grading_schemes/#{@grading_standard.id}/used_locations", as: :json
+        locations = response.parsed_body
+
+        course_ids = locations.pluck("id")
+        expect(course_ids).not_to include(another_course.id)
+      end
+
+      it "returns courses without grading standard but with assignment related" do
+        another_course = course_factory
+        another_course.assignments.create!(title: "hi")
+        assignment = @course.assignments.create!(title: "hi", grading_standard_id: @grading_standard.id)
+        assignment.submissions.create!(user: @student, workflow_state: "graded")
+
+        user_session(@admin)
+        get "/accounts/#{@account.id}/grading_schemes/#{@grading_standard.id}/used_locations", as: :json
+        locations = response.parsed_body
+
+        course_ids = locations.pluck("id")
+        expect(course_ids).to include(another_course.id)
+      end
+    end
   end
 
   context "course teacher" do
@@ -479,8 +536,6 @@ describe GradingSchemesJsonController, type: :request do
         response_json = response.parsed_body
 
         expect(response_json.first["title"]).to eq("My Course Level Grading Standard")
-        expect(response_json.first["workflow_state"]).to eq("archived")
-        expect(response_json.first["used_locations"][0]["name"]).to eq(@course.name)
       end
 
       it "returns the appropriate permissions for a teacher without 'Grades — Edit' access" do
@@ -707,57 +762,6 @@ describe GradingSchemesJsonController, type: :request do
                                       "assessed_assignment" => false,
                                       "points_based" => false,
                                       "scaling_factor" => 1.0 })
-      end
-    end
-
-    describe "#used_locations_for" do
-      let_once(:data) { [["A", 94], ["F", 0]] }
-
-      before(:once) do
-        @root_account = Account.default
-        @student = user_factory(active_user: true)
-        @sub_account = @root_account.sub_accounts.create!
-        course_with_teacher(account: @root_account)
-        @enrollment.update(workflow_state: "active")
-        @grading_standard = GradingStandard.create(context: @sub_account, workflow_state: "active", data:)
-        @root_account.update(grading_standard_id: @grading_standard.id)
-        @sub_account.update(grading_standard_id: @grading_standard.id)
-        @course.update(grading_standard_id: @grading_standard.id)
-        3.times do
-          assignment = @course.assignments.create!(title: "hi", grading_standard_id: @grading_standard.id)
-          assignment.submissions.create!(user: @student, workflow_state: "graded")
-        end
-      end
-
-      it "returns courses and assignments where the grading standard is used" do
-        locations = GradingSchemesJsonController.used_locations_for(@grading_standard)
-
-        expect(locations.size).to eq(1)
-        expect(locations.first[:id]).to eq(@course.id)
-        expect(locations.first[:assignments].size).to eq(3)
-      end
-
-      it "does not return courses without graded assignments" do
-        another_course = course_factory
-        another_course.assignments.create!(title: "hi")
-        @course.assignments.create!(title: "hi")
-
-        locations = GradingSchemesJsonController.used_locations_for(@grading_standard)
-
-        course_ids = locations.pluck(:id)
-        expect(course_ids).not_to include(another_course.id)
-      end
-
-      it "returns courses without grading standard but with assignment related" do
-        another_course = course_factory
-        another_course.assignments.create!(title: "hi")
-        assignment = @course.assignments.create!(title: "hi", grading_standard_id: @grading_standard.id)
-        assignment.submissions.create!(user: @student, workflow_state: "graded")
-
-        locations = GradingSchemesJsonController.used_locations_for(@grading_standard)
-
-        course_ids = locations.pluck(:id)
-        expect(course_ids).to include(another_course.id)
       end
     end
   end

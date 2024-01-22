@@ -255,7 +255,7 @@ class GradingStandard < ActiveRecord::Base
   private :prevent_deletion_of_used_schemes
 
   def assessed_assignment?
-    assessed_assignments.distinct(:id).count > 0
+    assessed_assignments.exists?
   end
 
   def assessed_assignments
