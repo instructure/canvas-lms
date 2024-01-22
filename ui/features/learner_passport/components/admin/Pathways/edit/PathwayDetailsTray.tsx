@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useState} from 'react'
+import React, {useCallback, useEffect, useState} from 'react'
 
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
@@ -64,6 +64,15 @@ const PathwayDetailsTray = ({
   const [selectedShareIds, setSelectedShareIds] = useState<string[]>([])
   const [addBadgeTrayOpenKey, setAddBadgeTrayOpenKey] = useState(0)
   const [addLearnerGroupsTrayOpenKey, setAddLearnerGroupsTrayOpenKey] = useState(0)
+
+  const handleCancel = useCallback(() => {
+    setTitle(pathway.title)
+    setDescription(pathway.description)
+    setCurrSelectedBadgeId(selectedBadgeId)
+    setSelectedLearnerGroupIds(pathway.learner_groups)
+    setSelectedShareIds([])
+    onClose()
+  }, [onClose, pathway.description, pathway.learner_groups, pathway.title, selectedBadgeId])
 
   const handleSave = useCallback(() => {
     if (!title) return
@@ -247,7 +256,7 @@ const PathwayDetailsTray = ({
           </Flex.Item>
           <Flex.Item align="end" width="100%">
             <View as="div" padding="small medium" borderWidth="small 0 0 0" textAlign="end">
-              <Button onClick={onClose}>Cancel</Button>
+              <Button onClick={handleCancel}>Cancel</Button>
               <Button margin="0 0 0 small" onClick={handleSave}>
                 Save Pathway Details
               </Button>
