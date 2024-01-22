@@ -24,26 +24,31 @@ require_relative "../../dashboard/pages/k5_dashboard_page"
 require_relative "../../dashboard/pages/k5_dashboard_common_page"
 require_relative "../../../helpers/k5_common"
 require_relative "../shared_examples/module_selective_release_shared_examples"
+require_relative "../../assignments/page_objects/assignments_index_page"
 
 describe "selective_release modules for students" do
   include_context "in-process server selenium tests"
   include ContextModulesCommon
   include ModulesIndexPage
-  include ModulesSettingsTray
+  include AssignmentsIndexPage
   include K5DashboardPageObject
   include K5DashboardCommonPageObject
   include K5Common
 
   context "provides modules for correct students" do
     before(:once) do
-      Account.site_admin.enable_feature! :differentiated_modules
+      differentiated_modules_on
       course_with_teacher(active_all: true)
-      module_setup
-      @module.update!(workflow_state: "active")
+      @module = @course.context_modules.create!(name: "Module 1", workflow_state: "active")
+      @assignment1 = @course.assignments.create!(title: "first item in module", workflow_state: "active")
+      @module.add_item type: "assignment", id: @assignment1.id
       @student1 = student_in_course(active_all: true, name: "Student 1").user
       @student2 = student_in_course(active_all: true, name: "Student 2").user
       @student3 = student_in_course(active_all: true, name: "Student 3").user
-      @section_override1 = @module.assignment_overrides.create!(set_type: "CourseSection", set_id: @course.course_sections.first)
+      @observer1 = observer_in_course(active_all: true, name: "Observer").user
+      @observer1_enrollment = @course.enroll_user(@observer1, "ObserverEnrollment", enrollment_state: "active", associated_user_id: @student1.id)
+      @observer2 = observer_in_course(active_all: true, name: "Observer").user
+      @observer2_enrollment = @course.enroll_user(@observer2, "ObserverEnrollment", enrollment_state: "active", associated_user_id: @student2.id)
       @adhoc_override1 = @module.assignment_overrides.create!(set_type: "ADHOC")
       @adhoc_override1.assignment_override_students.create!(user: @student1)
     end
@@ -55,10 +60,32 @@ describe "selective_release modules for students" do
     end
 
     it "does not show module for un-assigned student" do
-      skip("LF-689: waiting for this one to be true")
       user_session(@student2)
       go_to_modules
+
       expect(element_exists?(context_module_selector(@module.id))).to be_falsey
+      expect(element_exists?(no_context_modules_message_selector)).to be_truthy
+    end
+
+    it "does not show assignment for unassigned module" do
+      user_session(@student2)
+      get "/courses/#{@course.id}/assignments"
+
+      expect(element_exists?(assignment_row_selector(@assignment1.id))).to be_falsey
+    end
+
+    it "shows module to observer of an assigned student" do
+      user_session(@observer1)
+      go_to_modules
+      expect(element_exists?(context_module_selector(@module.id))).to be_truthy
+    end
+
+    it "does not show module to observer of an unassigned student" do
+      user_session(@observer2)
+      go_to_modules
+
+      expect(element_exists?(context_module_selector(@module.id))).to be_falsey
+      expect(element_exists?(no_context_modules_message_selector)).to be_truthy
     end
   end
 end

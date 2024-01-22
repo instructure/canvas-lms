@@ -45,6 +45,10 @@ module ModulesIndexPage
     ".add_module_link"
   end
 
+  def no_context_modules_message_selector
+    "#no_context_modules_message"
+  end
+
   def pill_message_selector(module_id)
     "#context_module_#{module_id} .requirements_message li"
   end
@@ -120,6 +124,10 @@ module ModulesIndexPage
 
   def new_module_link
     f(new_module_link_selector)
+  end
+
+  def no_context_modules_message
+    f(no_context_modules_message_selector)
   end
 
   def pill_message(module_id)
