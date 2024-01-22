@@ -78,7 +78,7 @@ class SmartSearchController < ApplicationController
   # @returns [SearchResult]
   def search
     return render_unauthorized_action unless @context.grants_right?(@current_user, session, :read)
-    return render_unauthorized_action unless OpenAi.smart_search_available?(@domain_root_account)
+    return render_unauthorized_action unless OpenAi.smart_search_available?(@context)
     return render json: { error: "missing 'q' param" }, status: :bad_request unless params.key?(:q)
 
     OpenAi.with_pgvector do
@@ -108,11 +108,11 @@ class SmartSearchController < ApplicationController
   end
 
   def show
-    # TODO: remove course specific stuff once we have account level search
-    render_unauthorized_action unless OpenAi.smart_search_available?(@domain_root_account)
+    @context = Course.find(params[:course_id])
+
+    render_unauthorized_action unless OpenAi.smart_search_available?(@context)
     set_active_tab("search")
     @show_left_side = true
-    @context = Course.find(params[:course_id])
     add_crumb(t("#crumbs.search", "Search"), named_context_url(@context, :course_search_url)) unless @skip_crumb
     js_env({
              COURSE_ID: @context.id.to_s
