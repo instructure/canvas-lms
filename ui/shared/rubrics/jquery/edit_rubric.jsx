@@ -1224,7 +1224,8 @@ rubricEditing.init = function () {
         .getTemplateData({textValues: ['id']}).id
       data['rubric_association[purpose]'] = params.rubric_association_purpose
       $rubric_dialog.loadingImage()
-      const url = $rubric_dialog.find('.select_rubric_url').attr('href')
+      const url = window.ENV.context_rubric_associations_url
+      if (!url) throw new Error('Rubric Associations URL is undefined')
       $.ajaxJSON(
         url,
         'POST',

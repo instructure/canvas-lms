@@ -41,6 +41,58 @@ describe "reply attachment" do
       Account.site_admin.disable_feature! :react_discussions_post
     end
 
+    it "prevents XSS by not loading rubric urls in user content" do
+      assignment = @course.assignments.create!(
+        name: "Assignment",
+        submission_types: ["online_text_entry"],
+        points_possible: 20
+      )
+      dt = @course.discussion_topics.create!(
+        title: "Graded Discussion",
+        discussion_type: "threaded",
+        posted_at: "2017-07-09 16:32:34",
+        user: @teacher,
+        message: '{{<div id="rubric_dialog"><div class="select_rubric_link">Click me!</div><a class="select_rubric_url" href="https://google.com"></a></div>}}',
+        assignment:
+      )
+      get "/courses/#{@course.id}/discussion_topics/#{dt.id}"
+
+      f(".admin-links").click
+      f(".rubric_dialog_trigger").click
+      f(".ui-dialog-titlebar-close").click
+      f(".select_rubric_link").click
+      browser_logs = driver.logs.get(:browser)
+      xss_requests = browser_logs.select { |e| e&.message&.include?("Failed to load resource: net::ERR_NAME_NOT_RESOLVED") }
+
+      expect(xss_requests.length).to eq 0
+    end
+
+    it "searches for and adds a rubric" do
+      assignment = @course.assignments.create!(
+        name: "Assignment",
+        submission_types: ["online_text_entry"],
+        points_possible: 20
+      )
+      dt = @course.discussion_topics.create!(
+        title: "Graded Discussion",
+        discussion_type: "threaded",
+        posted_at: "2017-07-09 16:32:34",
+        user: @teacher,
+        assignment:
+      )
+      rubric = rubric_model({ context: @course })
+      rubric.associate_with(assignment, @course, purpose: "grading")
+
+      get "/courses/#{@course.id}/discussion_topics/#{dt.id}"
+
+      f(".admin-links").click
+      f(".rubric_dialog_trigger").click
+      fj(".find_rubric_link:visible").click
+      fj(".select_rubric_link:visible").click
+
+      expect(f(".rubric_title").text).to eq rubric.title
+    end
+
     it "allows reply after cancel" do
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
       f(".discussion-reply-box").click
@@ -108,6 +160,58 @@ describe "reply attachment" do
 
       f("button[data-testid='DiscussionEdit-submit'").click
       wait_for_ajaximations
+    end
+
+    it "prevents XSS by not loading rubric urls in user content" do
+      assignment = @course.assignments.create!(
+        name: "Assignment",
+        submission_types: ["online_text_entry"],
+        points_possible: 20
+      )
+      dt = @course.discussion_topics.create!(
+        title: "Graded Discussion",
+        discussion_type: "threaded",
+        posted_at: "2017-07-09 16:32:34",
+        user: @teacher,
+        message: '{{<div id="rubric_dialog"><div class="select_rubric_link">Click me!</div><a class="select_rubric_url" href="https://google.com"></a></div>}}',
+        assignment:
+      )
+      get "/courses/#{@course.id}/discussion_topics/#{dt.id}"
+
+      f("button[data-testid='discussion-post-menu-trigger']").click
+      fj("span[role='menuitem']:contains('Add Rubric')").click
+      f(".ui-dialog-titlebar-close").click
+      f(".select_rubric_link").click
+      browser_logs = driver.logs.get(:browser)
+      xss_requests = browser_logs.select { |e| e&.message&.include?("Failed to load resource: net::ERR_NAME_NOT_RESOLVED") }
+
+      expect(xss_requests.length).to eq 0
+    end
+
+    it "searches for and adds a rubric" do
+      assignment = @course.assignments.create!(
+        name: "Assignment",
+        submission_types: ["online_text_entry"],
+        points_possible: 20
+      )
+      dt = @course.discussion_topics.create!(
+        title: "Graded Discussion",
+        discussion_type: "threaded",
+        posted_at: "2017-07-09 16:32:34",
+        user: @teacher,
+        assignment:
+      )
+      rubric = rubric_model({ context: @course })
+      rubric.associate_with(assignment, @course, purpose: "grading")
+
+      get "/courses/#{@course.id}/discussion_topics/#{dt.id}"
+
+      f("button[data-testid='discussion-post-menu-trigger']").click
+      fj("span[role='menuitem']:contains('Show Rubric')").click
+      fj(".find_rubric_link:visible").click
+      fj(".select_rubric_link:visible").click
+
+      expect(f(".rubric_title").text).to eq rubric.title
     end
 
     it "can add a mention from the mentions menu" do

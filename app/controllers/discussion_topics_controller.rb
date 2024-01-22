@@ -758,6 +758,7 @@ class DiscussionTopicsController < ApplicationController
         split_screen_view_initial_page_size: 5,
         current_page: 0
       }
+      env_hash[:context_rubric_associations_url] = context_url(@context, :context_rubric_associations_url) rescue nil
       if params[:entry_id]
         entry = @topic.discussion_entries.find(params[:entry_id])
         env_hash[:discussions_deep_link] = {
