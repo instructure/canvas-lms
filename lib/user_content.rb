@@ -215,14 +215,14 @@ module UserContent
     end
 
     def precise_translate_content(html)
-      doc = Nokogiri::HTML5::DocumentFragment.parse(html)
+      doc = Nokogiri::HTML5::DocumentFragment.parse(html, nil, { max_tree_depth: 10_000 })
       attributes = %w[value href longdesc src srcset title]
 
       doc.css("img, iframe, video, source, param, a").each do |e|
         attributes.each do |attr|
           attribute_value = e.attributes[attr]&.value
           if attribute_value&.match?(@toplevel_regex)
-            e.inner_html = e.inner_html.gsub(@toplevel_regex) { |url| replacement(url) } if e.name == "a" && e.inner_html.delete("\n").strip.include?(e["href"].strip)
+            e.inner_html = e.inner_html.gsub(@toplevel_regex) { |url| replacement(url) } if e.name == "a" && e["href"] && e.inner_html.delete("\n").strip.include?(e["href"].strip)
             e.set_attribute(attr, attribute_value.gsub(@toplevel_regex) { |url| replacement(url) })
           end
         end
