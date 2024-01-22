@@ -119,6 +119,13 @@ describe UserContent do
       expect(rewriter.user_can_view_content?(att2)).to be_falsey
     end
 
+    describe "precise_translate_content" do
+      it "deals properly with non-href anchors and nodes too deep" do
+        expect { rewriter.precise_translate_content("<a title='/courses/#{rewriter.context.id}/assignments/5'>non-href link</a>") }.not_to raise_error
+        expect { rewriter.precise_translate_content("<!DOCTYPE html>" + ("<div>" * 1000)) }.not_to raise_error
+      end
+    end
+
     describe "@toplevel_regex" do
       let(:regex) do
         rewriter.instance_variable_get(:@toplevel_regex)
