@@ -679,8 +679,8 @@ module AccountReports
                                            row["learning outcome mastered"] ? 1 : 0
                                          end
 
-      course = find_cached_course(row["course id"])
-      outcome_data = if @account_report.account.root_account.feature_enabled?(:account_level_mastery_scales) && course.resolved_outcome_proficiency.present?
+      outcome_data = if @account_report.account.root_account.feature_enabled?(:account_level_mastery_scales) &&
+                        (course = find_cached_course(row["course id"])).resolved_outcome_proficiency.present?
                        proficiency(course)
                      elsif row["learning outcome data"].present?
                        YAML.safe_load(row["learning outcome data"])[:rubric_criterion]
