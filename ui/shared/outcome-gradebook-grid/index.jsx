@@ -441,7 +441,7 @@ const Grid = {
       return ['rating_3', '#E0061F', I18n.t('Well Below Mastery')]
     },
     getColumnResults(data, column) {
-      return chain(data).pluck(column.field).filter(isObject).value()
+      return chain(data).map(column.field).filter(isObject).value()
     },
     headerRowCell({node, column, grid}, score) {
       if (column.field === 'student') {
