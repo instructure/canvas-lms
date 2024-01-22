@@ -288,11 +288,8 @@ $.mediaComment.upload_delegate = {
 let reset_selectors = false
 let lastInit = null
 $.mediaComment.init = function (mediaType, opts) {
-  require.ensure(
-    [],
-    () => {
-      const swfobject = require('swfobject')
-
+  import('swfobject')
+    .then(swfobject => {
       lastInit = lastInit || new Date()
       mediaType = mediaType || 'any'
       opts = opts || {}
@@ -677,9 +674,10 @@ $.mediaComment.init = function (mediaType, opts) {
         // only call mediaCommentReady if we are not doing js uploader
         mediaCommentReady()
       }
-    },
-    'mediaCommentRecordAsyncChunk'
-  )
+    })
+    .catch(() => {
+      throw new Error('Failed to load swfobject')
+    })
 } // End of init function
 
 $(document).ready(function () {
