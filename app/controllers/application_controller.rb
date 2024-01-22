@@ -251,7 +251,7 @@ class ApplicationController < ActionController::Base
             release_notes_badge_disabled: @current_user&.release_notes_badge_disabled?,
           },
           FULL_STORY_ENABLED: fullstory_enabled_for_session?(session),
-          RAILS_ENVIRONMENT: Canvas.environment
+          RAILS_ENVIRONMENT: Canvas.environment,
         }
         @js_env[:IN_PACED_COURSE] = @context.account.feature_enabled?(:course_paces) && @context.enable_course_paces? if @context.is_a?(Course)
         unless SentryExtensions::Settings.settings.blank?

@@ -193,6 +193,7 @@ export interface EnvCommon {
     type?: string
     classes?: string
   }>
+  breadcrumbs: {name: string; url: string}[]
 }
 
 /**
