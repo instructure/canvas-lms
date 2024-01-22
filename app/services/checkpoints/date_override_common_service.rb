@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2023 - present Instructure, Inc.
+# Copyright (C) 2024 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -17,14 +17,24 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class Checkpoints::DateOverrideCreatorService < Checkpoints::DateOverrideCommonService
+class Checkpoints::DateOverrideCommonService < ApplicationService
+  def initialize(checkpoint:, overrides:)
+    super()
+    @checkpoint = checkpoint
+    @overrides = overrides
+  end
+
+  def call
+    @overrides.each do |override|
+      set_type = override.fetch(:set_type) { raise Checkpoints::SetTypeRequiredError, "set_type is required, but was not provided" }
+      service = services.fetch(set_type) { |key| raise Checkpoints::SetTypeNotSupportedError, "set_type of '#{key}' not supported. Supported types: #{services.keys}" }
+      service.call(checkpoint: @checkpoint, override:)
+    end
+  end
+
   private
 
   def services
-    {
-      "CourseSection" => Checkpoints::SectionOverrideCreatorService,
-      "Group" => Checkpoints::GroupOverrideCreatorService,
-      "ADHOC" => Checkpoints::AdhocOverrideCreatorService,
-    }
+    {}
   end
 end
