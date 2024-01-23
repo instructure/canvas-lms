@@ -29,23 +29,21 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Table} from '@instructure/ui-table'
 import {View} from '@instructure/ui-view'
 import useFetchApi from '@canvas/use-fetch-api-hook'
-// import useDebouncedSearchTerm from '@canvas/search-item-selector/react/hooks/useDebouncedSearchTerm'
-import type {CanvasUserSearchResultType} from '../../../../types'
+import type {CanvasUserSearchResultType, PathwayUserShareType} from '../../../../types'
 
 const MIN_SEARCH_TERM_LENGTH = 2
 const SEARCH_DEBOUNCE_MS = 750
 
 type CanvasUserFinderProps = {
-  selectedUsers: CanvasUserSearchResultType[]
-  onChange: (newSelectedUsers: CanvasUserSearchResultType[]) => void
+  selectedUsers: PathwayUserShareType[]
+  onChange: (newSelectedUsers: PathwayUserShareType[]) => void
 }
 
 const CanvasUserFinder = ({selectedUsers, onChange}: CanvasUserFinderProps) => {
   const [searchTerm, setSearchTerm] = useState<string>('')
   const [debouncedSearchterm, setDebouncedSearchTerm] = useState<string>('_') // will cause a 400 on the first fetch
-  const [searchResults, setSearchResults] = useState<CanvasUserSearchResultType[] | null>(null)
-  const [currSelectedUsers, setCurrSelectedUsers] =
-    useState<CanvasUserSearchResultType[]>(selectedUsers)
+  const [searchResults, setSearchResults] = useState<PathwayUserShareType[] | null>(null)
+  const [currSelectedUsers, setCurrSelectedUsers] = useState<PathwayUserShareType[]>(selectedUsers)
 
   const [inFlight, setInFlight] = useState<boolean>(false)
   const [showSearchResults, setShowSearchResults] = useState<boolean>(false)
@@ -59,26 +57,30 @@ const CanvasUserFinder = ({selectedUsers, onChange}: CanvasUserFinderProps) => {
   // the controller will return immediately a 400 since debouncedSearchterm is empty
   useFetchApi(
     {
-      path: `/api/v1/accounts/${ENV.ACCOUNT_ID}/users`,
+      path: `/users/${ENV.current_user.id}/passport/data/pathways/share_users`, // `/api/v1/accounts/${ENV.ACCOUNT_ID}/users`,
+      params: {
+        search_term: debouncedSearchterm,
+      },
       success: useCallback((results: CanvasUserSearchResultType[]) => {
         if (results === undefined) {
-          // there is no way to keep useFetchApi from firing when dependencies
-          // aren't adequate for the search. This is probably the 400 response
-          // because the search_term is too short
           setSearchResults(null)
         } else {
-          setSearchResults(results || [])
-          if (results.length > 0) setShowSearchResults(true)
+          const shares: PathwayUserShareType[] = results.map(r => {
+            return {
+              id: r.id,
+              name: r.name,
+              role: 'viewer',
+              sortable_name: r.sortable_name,
+              avatar_url: r.avatar_url,
+            }
+          })
+          // strip unwanted fields
+          setSearchResults(shares || [])
+          setShowSearchResults(true)
         }
       }, []),
-      params: {
-        sort: 'sortable_name',
-        order: 'asc',
-        'include[]': 'avatar_url',
-        search_term: debouncedSearchterm,
-        per_page: 20,
-      },
       error: useCallback(() => {
+        // this will happen on the first fetch, since debouncedSearchterm < 2 chars long
         setSearchResults(null)
       }, []),
       loading: isLoading,
