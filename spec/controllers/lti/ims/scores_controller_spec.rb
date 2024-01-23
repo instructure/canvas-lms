@@ -438,11 +438,7 @@ module Lti::IMS
             end
           end
 
-          context "with submitted_at extension" do
-            let(:params_overrides) do
-              super().merge(Lti::Result::AGS_EXT_SUBMISSION => { submitted_at: })
-            end
-
+          shared_examples_for "a request specifying when the submission occurred" do
             shared_examples_for "updates submission time" do
               it do
                 send_request
@@ -451,8 +447,6 @@ module Lti::IMS
             end
 
             context "when submitted_at is prior to submission due date" do
-              let(:submitted_at) { 5.minutes.ago.iso8601(3) }
-
               before { result.submission.update!(cached_due_date: 2.minutes.ago.iso8601(3)) }
 
               it_behaves_like "updates submission time"
@@ -460,6 +454,7 @@ module Lti::IMS
 
               it "does not mark submission late" do
                 send_request
+                expect(response).to be_ok
                 expect(Submission.late.count).to eq 0
               end
             end
@@ -490,6 +485,22 @@ module Lti::IMS
 
               it_behaves_like "updates existing submission"
             end
+          end
+
+          context "with submitted_at extension" do
+            let(:submitted_at) { 5.minutes.ago.iso8601(3) }
+            let(:params_overrides) do
+              super().merge(Lti::Result::AGS_EXT_SUBMISSION => { submitted_at: })
+            end
+
+            it_behaves_like "a request specifying when the submission occurred"
+          end
+
+          context "with submittedAt param present" do
+            let(:submitted_at) { 5.minutes.ago.iso8601(3) }
+            let(:params_overrides) { super().merge(submittedAt: submitted_at) }
+
+            it_behaves_like "a request specifying when the submission occurred"
           end
 
           context "with content items in extension" do
