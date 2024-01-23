@@ -30,7 +30,7 @@ class AccessToken < ActiveRecord::Base
   attr_reader :full_token
   attr_reader :plaintext_refresh_token
 
-  belongs_to :developer_key, counter_cache: :access_token_count
+  belongs_to :developer_key
   belongs_to :user, inverse_of: :access_tokens
   belongs_to :real_user, inverse_of: :masquerade_tokens, class_name: "User"
   has_one :account, through: :developer_key
@@ -74,6 +74,7 @@ class AccessToken < ActiveRecord::Base
 
   before_create :generate_token
   before_create :generate_refresh_token
+  after_create :queue_developer_key_token_count_increment
 
   alias_method :destroy_permanently!, :destroy
   def destroy
@@ -311,5 +312,12 @@ class AccessToken < ActiveRecord::Base
 
     now = Time.zone.now
     tokens.in_batches(of: 10_000).update_all(updated_at: now, permanent_expires_at: now)
+  end
+
+  def queue_developer_key_token_count_increment
+    developer_key&.shard&.activate do
+      strand = "developer_key_token_count_increment_#{developer_key.global_id}"
+      DeveloperKey.delay_if_production(strand:).increment_counter(:access_token_count, developer_key.id)
+    end
   end
 end
