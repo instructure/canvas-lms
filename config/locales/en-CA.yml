@@ -1611,7 +1611,13 @@ en-CA:
           Specify a set of IP address filters that teachers can use to protect access to quizzes.  Filters can be a comma-separated list of addresses, or an address followed by a mask ("192.168.217.1/24" or "192.168.217.1/255.255.255.0")."
       quiz_ip_filters_help_title: "What are Quiz IP Filters?"
       quiz_ip_filters_help_tooltip: "What are Quiz IP Filters?"
-      quotas: megabytes
+      quotas: 
+        default_account_quota_title: "Default Account Quotas"
+        default_course_storage_quota: "Course Quota"
+        default_group_storage_quota: "Group Quota"
+        default_user_storage_quota: "User Quota"
+        megabytes: megabytes
+        update_button: Update
       report_last_run_never: Never
       report_running: "The report is running.*You'll receive an email when it is done.*"
       rqd_help_message: "When selected, this setting will limit the view of new courses' quantitative (numeric) grading data. Students and observers will only see qualitative data, which includes letter grades and comments."
