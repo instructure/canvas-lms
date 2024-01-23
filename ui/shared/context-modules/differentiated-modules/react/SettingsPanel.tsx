@@ -182,9 +182,10 @@ export default function SettingsPanel({
     const handleRequest = moduleId ? updateModule : createModule
 
     setLoading(true)
+    // eslint-disable-next-line promise/catch-or-return
     handleRequest({moduleId, moduleElement, addModuleUI, data: state})
+      .finally(() => setLoading(false))
       .then(() => (onDidSubmit ? onDidSubmit() : onDismiss()))
-      .catch(() => setLoading(false))
   }, [onDidSubmit, onDismiss, addModuleUI, moduleId, moduleElement, state])
 
   function customOnDismiss() {

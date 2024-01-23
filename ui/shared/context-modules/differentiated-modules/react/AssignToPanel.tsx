@@ -174,9 +174,10 @@ export default function AssignToPanel({
 
   const handleSave = useCallback(() => {
     setIsLoading(true)
+    // eslint-disable-next-line promise/catch-or-return
     updateModuleAssignees({courseId, moduleId, moduleElement, selectedAssignees})
+      .finally(() => setIsLoading(false))
       .then(() => (onDidSubmit ? onDidSubmit() : onDismiss()))
-      .catch(() => setIsLoading(false))
   }, [courseId, moduleElement, moduleId, onDidSubmit, onDismiss, selectedAssignees])
 
   const handleChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {

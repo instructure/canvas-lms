@@ -194,7 +194,7 @@ describe('AssignToPanel', () => {
 
   describe('on update', () => {
     it('creates new assignment overrides', async () => {
-      fetchMock.put(ASSIGNMENT_OVERRIDES_URL, {})
+      fetchMock.put(ASSIGNMENT_OVERRIDES_URL, {}, {delay: 200})
       const {findByTestId, findByText, getByRole, findAllByText} = renderComponent()
       const customOption = await findByTestId('custom-option')
       act(() => customOption.click())
@@ -214,10 +214,8 @@ describe('AssignToPanel', () => {
     })
 
     it('updates existing assignment overrides', async () => {
-      fetchMock.getOnce(ASSIGNMENT_OVERRIDES_URL, ASSIGNMENT_OVERRIDES_DATA, {
-        overwriteRoutes: true,
-      })
-      fetchMock.put(ASSIGNMENT_OVERRIDES_URL, {})
+      fetchMock.get(ASSIGNMENT_OVERRIDES_URL, ASSIGNMENT_OVERRIDES_DATA, {overwriteRoutes: true})
+      fetchMock.put(ASSIGNMENT_OVERRIDES_URL, {}, {delay: 200})
       const studentsOverride = ASSIGNMENT_OVERRIDES_DATA[0]
       const existingOverride = ASSIGNMENT_OVERRIDES_DATA[1]
       const {findByTestId, findByText, getByRole, findAllByText} = renderComponent()
@@ -254,7 +252,7 @@ describe('AssignToPanel', () => {
     })
 
     it('calls onDidSubmit instead of onDismiss if passed', async () => {
-      fetchMock.put(ASSIGNMENT_OVERRIDES_URL, {})
+      fetchMock.put(ASSIGNMENT_OVERRIDES_URL, {}, {delay: 200})
       const onDidSubmitMock = jest.fn()
       const onDismissMock = jest.fn()
       const {findByTestId, findByText, getByRole} = renderComponent({
@@ -267,8 +265,11 @@ describe('AssignToPanel', () => {
       userEvent.click(getByRole('button', {name: 'Update Module'}))
 
       expect(await findByTestId('loading-overlay')).toBeInTheDocument()
-      expect(onDidSubmitMock).toHaveBeenCalled()
-      expect(onDismissMock).not.toHaveBeenCalled()
+
+      await waitFor(() => {
+        expect(onDidSubmitMock).toHaveBeenCalled()
+        expect(onDismissMock).not.toHaveBeenCalled()
+      })
     })
   })
 })
