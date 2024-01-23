@@ -775,6 +775,8 @@
   path: "/api/v1/show_k5_dashboard"
 - verb: POST
   path: "/api/v1/users/:id/clear_cache"
+- verb: DELETE
+  path: "/api/v1/users/mobile_sessions"
 - verb: GET
   path: "/api/v1/users/:user_id/observers"
 - verb: GET
