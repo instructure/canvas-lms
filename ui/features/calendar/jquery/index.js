@@ -24,6 +24,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {map, defaults, filter, omit, each, has, last, includes} from 'lodash'
 import * as tz from '@canvas/datetime'
+import {encodeQueryString} from '@canvas/query-string-encoding'
 import moment from 'moment'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import decodeFromHex from '@canvas/util/decodeFromHex'
@@ -649,7 +650,7 @@ export default class Calendar {
       }
     }
     if (changed) {
-      const fragment = '#' + $.param(data, this)
+      const fragment = '#' + encodeQueryString(data, this)
       if (replaceState || window.location.hash === '') {
         return window.history.replaceState(null, '', fragment)
       } else {
@@ -1346,7 +1347,9 @@ export default class Calendar {
     if (!(group_ids.length > 0)) return
 
     return $.getJSON(
-      `/api/v1/appointment_groups/next_appointment?${$.param({appointment_group_ids: group_ids})}`,
+      `/api/v1/appointment_groups/next_appointment?${encodeQueryString({
+        appointment_group_ids: group_ids,
+      })}`,
       data => {
         if (data.length > 0) {
           const nextDate = Date.parse(data[0].start_at)

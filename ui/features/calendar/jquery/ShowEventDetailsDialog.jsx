@@ -33,6 +33,7 @@ import reservationOverLimitDialog from '../jst/reservationOverLimitDialog.handle
 import MessageParticipantsDialog from '@canvas/calendar/jquery/MessageParticipantsDialog'
 import preventDefault from '@canvas/util/preventDefault'
 import axios from '@canvas/axios'
+import {encodeQueryString} from '@canvas/query-string-encoding'
 import {publish} from 'jquery-tinypubsub'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
@@ -451,7 +452,7 @@ export default class ShowEventDetailsDialog {
 
   openShowPage = jsEvent => {
     const pieces = $(jsEvent.target).attr('href').split('#')
-    pieces[0] += `?${$.param({return_to: window.location.href})}`
+    pieces[0] += `?${encodeQueryString({return_to: window.location.href})}`
     window.location.href = pieces.join('#')
   }
 }

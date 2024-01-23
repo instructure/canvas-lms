@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
+import {encodeQueryString} from '@canvas/query-string-encoding'
 
 /**
  * @class Common.Core.Environment
@@ -81,7 +81,7 @@ const Environment = {
     window.history.pushState(
       '',
       '',
-      [window.location.pathname, decodeURIComponent($.param(this.query))].join('?')
+      [window.location.pathname, decodeURIComponent(encodeQueryString(this.query))].join('?')
     )
   },
 

@@ -33,7 +33,7 @@ import GroupCollection from '@canvas/groups/backbone/collections/GroupCollection
 import '@canvas/jquery/jquery.disableWhileLoading'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {decodeQueryString} from '@canvas/query-string-encoding'
+import {decodeQueryString, encodeQueryString} from '@canvas/query-string-encoding'
 import ConversationStatusFilter from './react/ConversationStatusFilter'
 import ready from '@instructure/ready'
 
@@ -335,7 +335,10 @@ const ConversationsRouter = Backbone.Router.extend({
     // process of loading the page if so, and we wouldn't want to create a
     // spurious history entry by not doing so.
     const existingHash = window.location.hash && window.location.hash.substring(1)
-    return this.navigate(`filter=${$.param(filters)}`, {trigger: true, replace: !existingHash})
+    return this.navigate(`filter=${encodeQueryString(filters)}`, {
+      trigger: true,
+      replace: !existingHash,
+    })
   },
 
   onCourse(course) {

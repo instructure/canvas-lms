@@ -30,6 +30,7 @@ import userSettingOptionsTemplate from '../../jst/userSettingOptions.handlebars'
 import authenticity_token from '@canvas/authenticity-token'
 import numberHelper from '@canvas/i18n/numberHelper'
 import '@canvas/jquery/jquery.instructure_forms'
+import {encodeQueryString} from '@canvas/query-string-encoding'
 
 const I18n = useI18nScope('conferences')
 
@@ -68,7 +69,7 @@ EditConferenceView.prototype.render = function () {
     object_name: 'web_conference',
     beforeSubmit: (function (_this) {
       return function (data) {
-        data = deparam($.param(data)).web_conference
+        data = deparam(encodeQueryString(data)).web_conference
         _this.model.set(data)
         return _this.model.trigger('startSync')
       }

@@ -24,6 +24,7 @@ import $ from 'jquery'
 import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection'
 import GroupUser from '../models/GroupUser'
 import h from '@instructure/html-escape'
+import {encodeQueryString} from '@canvas/query-string-encoding'
 
 const I18n = useI18nScope('GroupUserCollection')
 
@@ -54,7 +55,7 @@ GroupUserCollection.prototype.url = function () {
   if (this.markInactiveStudents) {
     params.include.push('active_status')
   }
-  return url_base + $.param(params)
+  return url_base + encodeQueryString(params)
 }
 
 GroupUserCollection.prototype.initialize = function (models) {
