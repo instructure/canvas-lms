@@ -38,9 +38,6 @@ module GoogleDrive
       return if drive.authorization.expires_at && !drive.authorization.expired?
 
       drive.authorization.refresh!
-    rescue Signet::AuthorizationError
-      InstStatsd::Statsd.increment("google_drive.refresh_token_error")
-      raise Google::Apis::Error
     end
 
     def create_doc(name)
@@ -100,7 +97,6 @@ module GoogleDrive
     end
 
     def authorized?
-      force_token_update
       drive.get_about(fields: "user")
       true
     rescue ConnectionException, NoTokenError, Google::Apis::Error
