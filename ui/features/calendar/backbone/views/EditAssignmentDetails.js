@@ -37,6 +37,7 @@ import '@canvas/datetime/jquery'
 import '@canvas/jquery/jquery.instructure_forms'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 import '../../fcMomentHandlebarsHelpers'
+import {encodeQueryString} from '@canvas/query-string-encoding'
 
 const I18n = useI18nScope('calendar')
 
@@ -138,7 +139,7 @@ export default class EditAssignmentDetailsRewrite extends ValidatedFormView {
       params.assignment_group_id = data.assignment_group_id
     }
     params.return_to = window.location.href
-    pieces[0] += `?${$.param(params)}`
+    pieces[0] += `?${encodeQueryString(params)}`
     return (window.location.href = pieces.join('#'))
   }
 
