@@ -52,6 +52,7 @@ export const LearnerPassportAdminRoutes = (
             const p3 = fetch(
               `/users/${params.userId}/passport/data/pathways/show/${params.pathwayId}`
             ).then(res => res.json())
+
             const [badges, learner_groups, pathway] = await Promise.all([p1, p2, p3])
             return {badges, learner_groups, pathway}
           }}
@@ -69,7 +70,7 @@ export const LearnerPassportAdminRoutes = (
               }
             )
             const json = await response.json()
-            if (formData.get('draft')) {
+            if (formData.get('draft') === 'true') {
               return redirect('.')
             } else {
               return redirect(`../view/${json.id}`)

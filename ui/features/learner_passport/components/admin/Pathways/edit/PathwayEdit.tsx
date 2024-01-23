@@ -44,14 +44,6 @@ const PathwayEdit = () => {
     return pw
   })
 
-  const handleChange = useCallback(
-    (newValues: Partial<PathwayDetailData>) => {
-      const newPathway = {...draftPathway, ...newValues}
-      setDraftPathway(newPathway)
-    },
-    [draftPathway]
-  )
-
   const handleSubmit = useCallback(
     (asDraft: boolean) => {
       const formData = new FormData()
