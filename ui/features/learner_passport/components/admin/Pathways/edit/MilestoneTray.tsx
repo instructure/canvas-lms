@@ -32,6 +32,7 @@ import {View} from '@instructure/ui-view'
 import type {MilestoneData, RequirementData} from '../../../types'
 import AddRequirementTray from './AddRequirementTray'
 import MilestoneRequirementCard from './requirements/MilestoneRequirementCard'
+import {showUnimplemented} from '../../../shared/utils'
 
 type MilestoneTrayProps = {
   milestone: MilestoneData
@@ -143,6 +144,10 @@ const MilestoneTray = ({milestone, open, variant, onClose, onSave}: MilestoneTra
     [requirements]
   )
 
+  const handleAddAchievementClick = useCallback(() => {
+    showUnimplemented({currentTarget: {textContent: 'Add Achievement'}})
+  }, [])
+
   return (
     <View as="div">
       <Tray
@@ -241,7 +246,18 @@ const MilestoneTray = ({milestone, open, variant, onClose, onSave}: MilestoneTra
                 </View>
               </View>
               <View as="div" padding="large 0 0 0">
-                add achievements
+                <FormField id="milestone_achievements" label="Achievements">
+                  <Text as="div">
+                    Add a badge or certificate to this milestone to recognize a key accomplishment.
+                  </Text>
+                  <Button
+                    renderIcon={IconAddLine}
+                    margin="medium 0 0 0"
+                    onClick={handleAddAchievementClick}
+                  >
+                    Add Achievement
+                  </Button>
+                </FormField>
               </View>
             </View>
           </Flex.Item>

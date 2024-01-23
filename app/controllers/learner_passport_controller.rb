@@ -450,6 +450,7 @@ class LearnerPassportController < ApplicationController
       learning_outcomes: [],
       achievements_earned: [],
       learner_groups: ["2", "3"],
+      shares: [],
     }
   end
 
