@@ -155,17 +155,8 @@ class ExternalToolsController < ApplicationController
 
   TimingMeta = Struct.new(:tags)
 
-  def track_time_with_lti_version(name)
-    timing_start = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-    timing_meta = TimingMeta.new({})
-    yield(timing_meta)
-  ensure
-    timing_end = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-    InstStatsd::Statsd.timing(name, timing_end - timing_start, tags: timing_meta.tags || {})
-  end
-
   def retrieve
-    track_time_with_lti_version "lti.retrieve.request_time" do |timing_meta|
+    Utils::InstStatsdUtils::Timing.track "lti.retrieve.request_time" do |timing_meta|
       tool, url = find_tool_and_url(
         resource_link_lookup_uuid,
         params[:url],
@@ -330,7 +321,7 @@ class ExternalToolsController < ApplicationController
   end
 
   def sessionless_launch
-    track_time_with_lti_version "lti.sessionless_launch.request_time" do |timing_meta|
+    Utils::InstStatsdUtils::Timing.track "lti.sessionless_launch.request_time" do |timing_meta|
       if Canvas.redis_enabled?
         launch_settings = fetch_and_delete_launch(
           @context,
@@ -460,7 +451,7 @@ class ExternalToolsController < ApplicationController
   #        "not_selectable": false
   #      }
   def show
-    track_time_with_lti_version "lti.show.request_time" do |timing_meta|
+    Utils::InstStatsdUtils::Timing.track "lti.show.request_time" do |timing_meta|
       if api_request?
         tool = @context.context_external_tools.active.find(params[:external_tool_id])
         render json: external_tool_json(tool, @context, @current_user, session)
@@ -538,7 +529,7 @@ class ExternalToolsController < ApplicationController
   end
 
   def resource_selection
-    track_time_with_lti_version "lti.resource_selection.request_time" do |timing_meta|
+    Utils::InstStatsdUtils::Timing.track "lti.resource_selection.request_time" do |timing_meta|
       placement = params[:placement] || params[:launch_type]
       selection_type = placement || "resource_selection"
       selection_type = "editor_button" if params[:editor]
