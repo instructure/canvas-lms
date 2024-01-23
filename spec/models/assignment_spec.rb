@@ -11556,8 +11556,6 @@ describe Assignment do
           lti_context_id: SecureRandom.uuid
         )
 
-        p old_tool.id
-        p new_tool.id
         expect(Assignment.fetch_indirect_batch(old_tool.id, new_tool.id, [indirect_assignment.id, invalid_assign.id]).to_a)
           .to contain_exactly(indirect_assignment)
       end
