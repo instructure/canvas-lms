@@ -299,4 +299,17 @@ class AccessToken < ActiveRecord::Base
   def manually_created?
     developer_key_id == DeveloperKey.default.id
   end
+
+  def self.invalidate_mobile_tokens!(account)
+    return unless account.root_account?
+
+    developer_key_ids = DeveloperKey.mobile_app_keys.map do |app_key|
+      app_key.respond_to?(:global_id) ? app_key.global_id : app_key.id
+    end
+    user_ids = User.active.joins(:pseudonyms).where(pseudonyms: { account_id: account }).ids
+    tokens = active.where(developer_key_id: developer_key_ids, user_id: user_ids)
+
+    now = Time.zone.now
+    tokens.update_all(updated_at: now, permanent_expires_at: now)
+  end
 end

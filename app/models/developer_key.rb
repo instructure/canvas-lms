@@ -226,6 +226,13 @@ class DeveloperKey < ActiveRecord::Base
         DeveloperKey.shard([Shard.current, Account.site_admin.shard].uniq).where(vendor_code:).to_a
       end
     end
+
+    def mobile_app_keys(active: true)
+      GuardRail.activate(:secondary) do
+        keys = shard(Shard.default).where.not(sns_arn: nil)
+        active ? keys.nondeleted : keys
+      end
+    end
   end
 
   def clear_cache

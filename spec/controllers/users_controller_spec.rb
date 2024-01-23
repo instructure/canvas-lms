@@ -3175,6 +3175,26 @@ describe UsersController do
       expect(user.reload.last_logged_out).not_to be_nil
       expect(user.access_tokens.take.permanent_expires_at).to be <= Time.zone.now
     end
+
+    it "allows admin to expire mobile sessions" do
+      user_session(admin)
+      delete "expire_mobile_sessions", format: :json
+
+      expect(response).to have_http_status :ok
+      expect(user.reload.access_tokens.take.permanent_expires_at).to be <= Time.zone.now
+    end
+
+    it "only expires access tokens associated to mobile app developer keys" do
+      dev_key = DeveloperKey.create!
+      user2.access_tokens.create!(developer_key: dev_key)
+
+      user_session(admin)
+      delete "expire_mobile_sessions", format: :json
+
+      expect(response).to have_http_status :ok
+      expect(user.reload.access_tokens.take.permanent_expires_at).to be <= Time.zone.now
+      expect(user2.reload.access_tokens.take.permanent_expires_at).to be_nil
+    end
   end
 
   describe "PUT 'settings'" do
