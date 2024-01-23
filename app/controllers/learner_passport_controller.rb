@@ -391,6 +391,7 @@ class LearnerPassportController < ApplicationController
       milestones: [],
       completion_award: nil,
       learner_groups: [],
+      shares: [],
     }
   end
 
@@ -450,7 +451,36 @@ class LearnerPassportController < ApplicationController
       learning_outcomes: [],
       achievements_earned: [],
       learner_groups: ["2", "3"],
-      shares: [],
+      shares: [
+        {
+          id: "rs1",
+          name: "Mick Jagger",
+          sortable_name: "Jagger, Mick",
+          avatar_url: "/images/messages/avatar-50.png",
+          role: "collaborator",
+        },
+        {
+          id: "rs2",
+          name: "Keith Richards",
+          sortable_name: "Richards, Keith",
+          avatar_url: "/images/messages/avatar-50.png",
+          role: "collaborator",
+        },
+        {
+          id: "rs3",
+          name: "Charlie Watts",
+          sortable_name: "Watts, Charlie",
+          avatar_url: "/images/messages/avatar-50.png",
+          role: "viewer",
+        },
+        {
+          id: "rs4",
+          name: "Ronnie Wood",
+          sortable_name: "Wood, Ronnie",
+          avatar_url: "/images/messages/avatar-50.png",
+          role: "reviewer",
+        },
+      ],
     }
   end
 
@@ -500,6 +530,10 @@ class LearnerPassportController < ApplicationController
 
   def pathway_template_key
     "learner_passport_pathway_template #{@current_user.global_id}"
+  end
+
+  def pathway_sample_key
+    "learner_passport_pathway_sample #{@current_user.global_id}"
   end
 
   def index
@@ -764,6 +798,29 @@ class LearnerPassportController < ApplicationController
     render json: pathway
   end
 
+  def pathway_share_users
+    search_term = params[:search_term] || ""
+    return render json: [{ message: "search term must be at least 2 characters long" }], status: :bad_request if search_term.blank? || search_term.length < 2
+
+    results = User.where("LOWER(name) LIKE ?", "%#{search_term.downcase}%")
+                  .and(User.where(TeacherEnrollment.where("user_id=users.id").arel.exists).or(User.where(AccountUser.where("user_id=users.id").arel.exists)))
+                  .order("sortable_name")
+                  .limit(10)
+                  .map { |u| { id: u.id, name: u.name, sortable_name: u.sortable_name, avatar_url: u.avatar_url, role: "viewer" } }
+
+    # results = UserSearch.for_user_in_context(search_term,
+    #                                          Account.default,
+    #                                          @current_user,
+    #                                          session,
+    #                                          {
+    #                                            order: "asc",
+    #                                            sort: "sortable_name",
+    #                                            enrollment_type: "teacher_enrollment",
+    #                                            include_deleted_users: false
+    #                                          })
+    render json: results
+  end
+
   def reset
     if params.key? :empty
       Rails.cache.write(current_portfolios_key, [], expires_in: CACHE_EXPIRATION)
@@ -774,7 +831,7 @@ class LearnerPassportController < ApplicationController
       Rails.cache.write(current_portfolios_key, [sample_portfolio.clone], expires_in: CACHE_EXPIRATION)
       sample_project = Rails.cache.fetch(project_sample_key) { learner_passport_project_sample }
       Rails.cache.write(current_projects_key, [sample_project.clone], expires_in: CACHE_EXPIRATION)
-      sample_pathway = Rails.cache.fetch(current_pathways_key) { learner_passport_pathway_sample }
+      sample_pathway = Rails.cache.fetch(pathway_sample_key) { learner_passport_pathway_sample }
       Rails.cache.write(current_pathways_key, [sample_pathway.clone], expires_in: CACHE_EXPIRATION)
     end
     render json: { message: "Portfolios reset" }, status: :accepted

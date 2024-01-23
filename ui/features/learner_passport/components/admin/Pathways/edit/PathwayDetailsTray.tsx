@@ -34,7 +34,7 @@ import type {
   LearnerGroupType,
   PathwayDetailData,
   PathwayBadgeType,
-  CanvasUserSearchResultType,
+  PathwayUserShareType,
 } from '../../../types'
 import AddBadgeTray from './AddBadgeTray'
 import AddLearnerGroupsTray, {LearnerGroupCard} from './AddLearnerGroupsTray'
@@ -66,7 +66,7 @@ const PathwayDetailsTray = ({
   const [selectedLearnerGroupIds, setSelectedLearnerGroupIds] = useState<string[]>(
     pathway.learner_groups
   )
-  const [selectedShares, setSelectedShares] = useState<CanvasUserSearchResultType[]>([])
+  const [selectedShares, setSelectedShares] = useState<PathwayUserShareType[]>(pathway.shares)
   const [addBadgeTrayOpenKey, setAddBadgeTrayOpenKey] = useState(0)
   const [addLearnerGroupsTrayOpenKey, setAddLearnerGroupsTrayOpenKey] = useState(0)
 
@@ -82,8 +82,22 @@ const PathwayDetailsTray = ({
   const handleSave = useCallback(() => {
     if (!title) return
     const badge = allBadges.find(b => b.id === currSelectedBadgeId)
-    onSave({title, description, completion_award: badge, learner_groups: selectedLearnerGroupIds})
-  }, [allBadges, currSelectedBadgeId, description, onSave, selectedLearnerGroupIds, title])
+    onSave({
+      title,
+      description,
+      completion_award: badge,
+      learner_groups: selectedLearnerGroupIds,
+      shares: selectedShares,
+    })
+  }, [
+    allBadges,
+    currSelectedBadgeId,
+    description,
+    onSave,
+    selectedLearnerGroupIds,
+    selectedShares,
+    title,
+  ])
 
   const handleTitleChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>, newTitle: string) => {
@@ -115,7 +129,7 @@ const PathwayDetailsTray = ({
     setAddLearnerGroupsTrayOpenKey(0)
   }, [])
 
-  const handleChangeSharedUser = useCallback((users: CanvasUserSearchResultType[]) => {
+  const handleChangeSharedUser = useCallback((users: PathwayUserShareType[]) => {
     setSelectedShares(users)
   }, [])
 

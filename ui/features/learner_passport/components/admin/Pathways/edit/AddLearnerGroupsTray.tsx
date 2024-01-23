@@ -178,7 +178,7 @@ const AddLearnerGroupsTray = ({
           <View as="div" padding="small medium" borderWidth="small 0 0 0" textAlign="end">
             <Button onClick={onClose}>Cancel</Button>
             <Button margin="0 0 0 small" onClick={handleSave}>
-              Save Achievement
+              Save Groups
             </Button>
           </View>
         </Flex.Item>

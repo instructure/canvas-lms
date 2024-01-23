@@ -193,12 +193,17 @@ export interface RequirementData {
   canvas_content?: CanvasRequirementSearchResultType
 }
 
-export type CanvasUserSearchResultType = {
+export interface CanvasUserSearchResultType {
   id: string
   name: string
-  role?: string
   sortable_name: string
   avatar_url: string
+}
+
+export type PathwayUserShareRoleType = 'collaborator' | 'reviewer' | 'viewer'
+
+export interface PathwayUserShareType extends CanvasUserSearchResultType {
+  role: PathwayUserShareRoleType
 }
 
 // this is a node in the pathway tree
@@ -230,7 +235,7 @@ export interface PathwayDetailData extends PathwayData {
   learning_outcomes: SkillData[]
   completion_award: PathwayBadgeType | null
   learner_groups: string[] // learner group ids
-  shares: CanvasUserSearchResultType[]
+  shares: PathwayUserShareType[]
   first_milestones: string[] // ids of the milestone children of the root pathway
   milestones: MilestoneData[] // all the milestones in the pathway
 }
