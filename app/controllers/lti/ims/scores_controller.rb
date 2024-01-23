@@ -151,6 +151,9 @@ module Lti::IMS
     # @argument comment [String]
     #   Comment visible to the student about this score.
     #
+    # @argument submittedAt [String]
+    #  Date and time that the submission was originally created. Should use ISO8601-formatted date with subsecond precision.
+    #
     # @argument https://canvas.instructure.com/lti/submission [Optional, Object]
     #   (EXTENSION) Optional submission type and data. Fields listed below.
     #
@@ -170,7 +173,7 @@ module Lti::IMS
     #   (EXTENSION field) submission data (URL or body text). Only used for submission_types basic_lti_launch, online_text_entry, online_url. Ignored if content_items are provided.
     #
     # @argument https://canvas.instructure.com/lti/submission[submitted_at] [Optional, String]
-    #   (EXTENSION field) Date and time that the submission was originally created. Should use ISO8601-formatted date with subsecond precision. This should match the data and time that the original submission happened in Canvas.
+    #   (EXTENSION field) Date and time that the submission was originally created. Should use ISO8601-formatted date with subsecond precision. This should match the date and time that the original submission happened in Canvas.
     #
     # @argument https://canvas.instructure.com/lti/submission[content_items] [Optional, Array]
     #   (EXTENSION field) Files that should be included with the submission. Each item should contain `type: file`, and a url pointing to the file. It can also contain a title, and an explicit MIME type if needed (otherwise, MIME type will be inferred from the title or url). If any items are present, submission_type will be online_upload.
@@ -188,6 +191,7 @@ module Lti::IMS
     #     "scoreGiven": 83,
     #     "scoreMaximum": 100,
     #     "comment": "This is exceptional work.",
+    #     "submittedAt": "2017-04-14T18:54:36.736+00:00"
     #     "activityProgress": "Completed",
     #     "gradingProgress": "FullyGraded",
     #     "userId": "5323497",
@@ -283,7 +287,7 @@ module Lti::IMS
     end
 
     REQUIRED_PARAMS = %i[userId activityProgress gradingProgress timestamp].freeze
-    OPTIONAL_PARAMS = %i[scoreGiven scoreMaximum comment].freeze
+    OPTIONAL_PARAMS = %i[scoreGiven scoreMaximum comment submittedAt].freeze
     EXTENSION_PARAMS = [
       :new_submission,
       :preserve_score,
@@ -305,7 +309,7 @@ module Lti::IMS
         update_params = params.permit(REQUIRED_PARAMS + OPTIONAL_PARAMS,
                                       Lti::Result::AGS_EXT_SUBMISSION => EXTENSION_PARAMS).transform_keys do |k|
           k.to_s.underscore
-        end.except(:timestamp, :user_id, :score_given, :score_maximum).to_unsafe_h
+        end.except(:timestamp, :user_id, :score_given, :score_maximum, :submitted_at).to_unsafe_h
         update_params[:extensions] = extract_extensions(update_params)
         update_params.merge(result_score: params[:scoreGiven], result_maximum: params[:scoreMaximum])
       end
@@ -334,7 +338,7 @@ module Lti::IMS
     end
 
     def verify_valid_submitted_at
-      submitted_at = params.dig(Lti::Result::AGS_EXT_SUBMISSION, :submitted_at)
+      submitted_at = params[:submittedAt] || params.dig(Lti::Result::AGS_EXT_SUBMISSION, :submitted_at)
       submitted_at_date = parse_timestamp(submitted_at)
 
       if submitted_at.present? && submitted_at_date.nil?
@@ -593,7 +597,7 @@ module Lti::IMS
     end
 
     def submitted_at
-      submitted_at = scores_params.dig(:extensions, Lti::Result::AGS_EXT_SUBMISSION, :submitted_at)
+      submitted_at = params[:submittedAt] || scores_params.dig(:extensions, Lti::Result::AGS_EXT_SUBMISSION, :submitted_at)
       parse_timestamp(submitted_at)
     end
 
