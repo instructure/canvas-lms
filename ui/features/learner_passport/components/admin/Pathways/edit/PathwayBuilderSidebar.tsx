@@ -23,8 +23,7 @@ import {IconPlusLine} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import type {PathwayDetailData, MilestoneData} from '../../../types'
-import {PathwayCard, MilestoneCard} from './PathwayBuilderSidebarCards'
-import BlankPathwayBox from './BlankPathwayBox'
+import {PathwayCard, MilestoneCard, BlankPathwayCard} from './PathwayBuilderSidebarCards'
 
 const Connector = () => {
   return (
@@ -68,28 +67,13 @@ const findChildMilestones = (milestones: MilestoneData[], ids: string[]) => {
   return milestones.filter(m => ids.includes(m.id))
 }
 
-const findSubtreeMilestones = (
-  milestones: MilestoneData[],
-  rootId: string,
-  subtree: string[]
-): string[] => {
-  const root = milestones.find(m => m.id === rootId)
-  if (!root) return subtree
-  subtree.push(rootId)
-  if (root.next_milestones.length === 0) return subtree
-  root?.next_milestones.forEach(nextid => {
-    subtree.concat(findSubtreeMilestones(milestones, nextid, subtree))
-  })
-  return subtree
-}
-
 type PathwayBuilderSidebarProps = {
   pathway: PathwayDetailData
   currentStep: MilestoneData | null // null => the pathway is the current step
   onAddStep: () => void
   onEditPathway: () => void
   onEditStep: (id: string) => void
-  onDeleteStep: (subtree: string[]) => void
+  onDeleteStep: (milestoneId: string) => void
   onHideSidebar: () => void
 }
 
@@ -118,10 +102,9 @@ const PathwayBuilderSidebar = ({
 
   const handleDeleteMilestone = useCallback(
     (milestoneId: string) => {
-      const subtree = findSubtreeMilestones(pathway.milestones, milestoneId, [])
-      onDeleteStep(subtree)
+      onDeleteStep(milestoneId)
     },
-    [onDeleteStep, pathway.milestones]
+    [onDeleteStep]
   )
 
   return (
@@ -142,20 +125,19 @@ const PathwayBuilderSidebar = ({
         {currentStep === null ? (
           <PathwayCard step={pathway} onEdit={handleEditPathway} />
         ) : (
-          <MilestoneCard step={currentStep} variant="root" onEdit={handleEditMilestone} />
+          <MilestoneCard step={currentStep} onEdit={handleEditMilestone} />
         )}
         <Connector />
         {childMilestones.map((step: MilestoneData) => (
           <div key={step.id} style={{marginBottom: '30px'}}>
             <MilestoneCard
               step={step}
-              variant="child"
               onEdit={handleEditMilestone}
               onDelete={handleDeleteMilestone}
             />
           </div>
         ))}
-        {childMilestones.length === 0 && <BlankPathwayBox />}
+        {childMilestones.length === 0 && <BlankPathwayCard />}
         <div style={{marginTop: '36px'}} />
         <AddMilestoneButton onClick={onAddStep} />
       </View>

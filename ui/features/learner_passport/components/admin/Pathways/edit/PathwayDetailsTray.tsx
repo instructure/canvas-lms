@@ -36,7 +36,7 @@ import type {
   PathwayBadgeType,
   PathwayUserShareType,
 } from '../../../types'
-import AddBadgeTray from './AddBadgeTray'
+import AddBadgeTray, {renderBadge} from './AddBadgeTray'
 import AddLearnerGroupsTray, {LearnerGroupCard} from './AddLearnerGroupsTray'
 import CanvasUserFinder from './shares/CanvasUserFinder'
 import {showUnimplemented} from '../../../shared/utils'
@@ -85,7 +85,7 @@ const PathwayDetailsTray = ({
     onSave({
       title,
       description,
-      completion_award: badge,
+      completion_award: badge?.id || null,
       learner_groups: selectedLearnerGroupIds,
       shares: selectedShares,
     })
@@ -133,42 +133,6 @@ const PathwayDetailsTray = ({
     setSelectedShares(users)
   }, [])
 
-  const renderBadge = (badgeId: string | null) => {
-    if (badgeId === null) return null
-
-    const badge = allBadges.find(b => b.id === badgeId)
-    return badge ? (
-      <View as="div" background="secondary" margin="small 0">
-        <Flex as="div">
-          <Flex.Item padding="small" shouldShrink={false} shouldGrow={false}>
-            {badge.image ? (
-              <img src={badge.image} alt="" style={{width: '100px'}} />
-            ) : (
-              <div style={{width: '100px', height: '100px', backgroundColor: 'grey'}} />
-            )}
-          </Flex.Item>
-          <Flex.Item padding="medium medium medium 0" shouldShrink={true}>
-            <Text as="div" weight="bold">
-              {badge.title}
-            </Text>
-            <Text as="div">{badge.issuer.name}</Text>
-          </Flex.Item>
-        </Flex>
-        {badge.skills.length > 0 ? (
-          <View as="div" padding="small" borderWidth="small 0 0 0">
-            <ToggleDetails summary="Skills received">
-              <Flex as="div" gap="xx-small" wrap="wrap" margin="small 0 0 0">
-                {badge.skills.map(skill => {
-                  return <Tag key={skill} text={skill} />
-                })}
-              </Flex>
-            </ToggleDetails>
-          </View>
-        ) : null}
-      </View>
-    ) : null
-  }
-
   return (
     <View as="div">
       <Tray label="Pathway Details" open={open} onDismiss={onClose} size="regular" placement="end">
@@ -198,6 +162,9 @@ const PathwayDetailsTray = ({
                     renderLabel="Pathway Name"
                     value={title}
                     onChange={handleTitleChange}
+                    messages={
+                      title ? undefined : [{text: 'Pathway name is Required', type: 'error'}]
+                    }
                   />
                 </View>
                 <View as="div" margin="0 0 small 0">
@@ -215,7 +182,7 @@ const PathwayDetailsTray = ({
                     Add a badge or certificate that the learner will receive when the pathway is
                     completed. The skills associated with that achievement will be linked as well.
                   </Text>
-                  {renderBadge(currSelectedBadgeId)}
+                  {renderBadge(allBadges, currSelectedBadgeId)}
                   <Button
                     margin="small 0 0 0"
                     onClick={handleAddAchievementClick}

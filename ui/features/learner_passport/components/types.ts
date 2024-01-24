@@ -214,7 +214,7 @@ export interface MilestoneData {
   description: string
   required?: boolean
   requirements: RequirementData[]
-  achievements: AchievementData[]
+  completion_award: string | null
   next_milestones: string[] // ids of this milestone's children
 }
 
@@ -234,7 +234,7 @@ export interface PathwayDetailData extends PathwayData {
   description: string
   is_private?: boolean
   learning_outcomes: SkillData[]
-  completion_award: PathwayBadgeType | null
+  completion_award: string | null
   learner_groups: string[] // learner group ids
   shares: PathwayUserShareType[]
   first_milestones: string[] // ids of the milestone children of the root pathway

@@ -20,7 +20,7 @@ import React, {useCallback, useState} from 'react'
 import {Button} from '@instructure/ui-buttons'
 import {IconZoomOutLine, IconZoomInLine} from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
-import type {PathwayDetailData, MilestoneData} from '../../../types'
+import type {DraftPathway, MilestoneData} from '../../../types'
 import PathwayTreeView from '../PathwayTreeView'
 
 const getLayout = (viewDirection: 'horizontal' | 'vertical', flipped: boolean) => {
@@ -32,7 +32,7 @@ const getLayout = (viewDirection: 'horizontal' | 'vertical', flipped: boolean) =
 }
 
 type PathwayBuilderTreeProps = {
-  pathway: PathwayDetailData
+  pathway: DraftPathway
   selectedStep: string | null
   treeVersion: number
   onShowSidebar?: () => void
@@ -96,7 +96,7 @@ const PathwayBuilderTree = ({
         <Button onClick={handleFlipClick}>Flip pathway</Button>
       </div>
       <PathwayTreeView
-        key={`${treeVersion}-${layout}`}
+        version={`${treeVersion}-${layout}`}
         pathway={pathway}
         selectedStep={selectedStep}
         zoomLevel={zoomLevel}

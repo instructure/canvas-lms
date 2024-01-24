@@ -24,7 +24,6 @@ import {Heading} from '@instructure/ui-heading'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {TextArea} from '@instructure/ui-text-area'
 import {TextInput} from '@instructure/ui-text-input'
-import {Tooltip} from '@instructure/ui-tooltip'
 import {Tray} from '@instructure/ui-tray'
 import {View} from '@instructure/ui-view'
 import {uid} from '@instructure/uid'
@@ -55,8 +54,12 @@ const RequirementTray = ({requirement, open, variant, onClose, onSave}: Requirem
   const [canvasContent, setCanvasContent] = useState<CanvasRequirementSearchResultType | undefined>(
     requirement?.canvas_content
   )
+  const [validName, setValidName] = useState<boolean>(true)
+  const [validType, setValidType] = useState<boolean>(true)
 
   const isValid = useCallback(() => {
+    setValidName(!!name)
+    setValidType(!!type)
     return name && type
   }, [name, type])
 
@@ -92,6 +95,7 @@ const RequirementTray = ({requirement, open, variant, onClose, onSave}: Requirem
 
   const handleTypeChange = useCallback((event: React.SyntheticEvent<Element, Event>, {value}) => {
     setType(value as RequirementType)
+    setValidType(!!value)
   }, [])
 
   const handleCanvasRequirementChange = useCallback(
@@ -147,7 +151,9 @@ const RequirementTray = ({requirement, open, variant, onClose, onSave}: Requirem
                     renderLabel="Name"
                     isRequired={true}
                     value={name}
+                    onBlur={() => setValidName(!!name)}
                     onChange={handleNameChange}
+                    messages={validName ? undefined : [{text: 'Name is Required', type: 'error'}]}
                   />
                 </View>
                 <View as="div" margin="0 0 small 0">
@@ -175,7 +181,13 @@ const RequirementTray = ({requirement, open, variant, onClose, onSave}: Requirem
                     renderLabel="Requirement type"
                     defaultValue=""
                     value={type || undefined}
+                    onBlur={() => setValidType(!!type)}
                     onChange={handleTypeChange}
+                    messages={
+                      validType
+                        ? undefined
+                        : [{text: 'Requirement type is Required', type: 'error'}]
+                    }
                   >
                     {Object.keys(RequirementTypes).map(key => {
                       const reqtype = key as RequirementType
@@ -194,14 +206,9 @@ const RequirementTray = ({requirement, open, variant, onClose, onSave}: Requirem
           <Flex.Item align="end" width="100%">
             <View as="div" padding="small medium" borderWidth="small 0 0 0" textAlign="end">
               <Button onClick={onClose}>Cancel</Button>
-              <Tooltip
-                renderTip="You must provide a name and type before saving."
-                on={isValid() ? [] : ['click', 'hover', 'focus']}
-              >
-                <Button margin="0 0 0 small" onClick={handleSave}>
-                  Save Requirement
-                </Button>
-              </Tooltip>
+              <Button margin="0 0 0 small" onClick={handleSave}>
+                Save Requirement
+              </Button>
             </View>
           </Flex.Item>
         </Flex>
