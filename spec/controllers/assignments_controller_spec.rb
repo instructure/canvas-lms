@@ -2255,40 +2255,70 @@ describe AssignmentsController do
     end
 
     context "when the root account does not have a default tool url set" do
+      subject { get :edit, params: { course_id: course.id, id: @assignment.id } }
+
       let(:course) { @course }
       let(:root_account) { course.root_account }
 
       before do
         user_session(@teacher)
-        get :edit, params: { course_id: course.id, id: @assignment.id }
       end
 
-      it "js_env SUBMISSION_TYPE_SELECTION_TOOLS is correctly set for submission type tools" do
-        tool_settings = {
-          base_title: "my title",
-          external_url: "https://tool.launch.url",
-          selection_width: 750,
-          selection_height: 480,
-          icon_url: nil,
-        }
+      context "js_env SUBMISSION_TYPE_SELECTION_TOOLS" do
+        let(:tool_settings) do
+          {
+            base_title: "my title",
+            external_url: "https://tool.launch.url",
+            selection_width: 750,
+            selection_height: 480,
+            icon_url: nil,
+          }
+        end
 
-        @tool = factory_with_protected_attributes(@course.context_external_tools,
-                                                  url: "http://www.justanexamplenotarealwebsite.com/tool1",
-                                                  shared_secret: "test123",
-                                                  consumer_key: "test123",
-                                                  name: tool_settings[:base_title],
-                                                  settings: {
-                                                    submission_type_selection: tool_settings
-                                                  })
-        user_session(@teacher)
+        let(:tool) do
+          factory_with_protected_attributes(@course.context_external_tools,
+                                            url: "http://www.justanexamplenotarealwebsite.com/tool1",
+                                            shared_secret: "test123",
+                                            consumer_key: "test123",
+                                            name: tool_settings[:base_title],
+                                            settings: {
+                                              submission_type_selection: tool_settings
+                                            })
+        end
 
-        get :edit, params: { course_id: @course.id, id: @assignment.id }
-        expect(assigns[:js_env][:SUBMISSION_TYPE_SELECTION_TOOLS][0]).to include(
-          base_title: tool_settings[:base_title],
-          title: tool_settings[:base_title],
-          selection_width: tool_settings[:selection_width],
-          selection_height: tool_settings[:selection_height]
-        )
+        it "is correctly set" do
+          tool
+          subject
+          expect(assigns[:js_env][:SUBMISSION_TYPE_SELECTION_TOOLS][0]).to include(
+            base_title: tool_settings[:base_title],
+            title: tool_settings[:base_title],
+            selection_width: tool_settings[:selection_width],
+            selection_height: tool_settings[:selection_height]
+          )
+        end
+
+        context "the tool includes a submission_type_selection_launch_points" do
+          let(:launch_point) do
+            {
+              "target_link_uri" => "https://example.com/launch?placement=submission_type_selection",
+              "title" => "Launch",
+              "description" => "Launch the tool",
+              "icon_url" => "https://example.com/icon.png",
+            }
+          end
+          let(:tool_settings) do
+            super().tap do |options|
+              options[:submission_type_selection_launch_points] = [launch_point]
+            end
+          end
+
+          it "includes the launch points" do
+            tool
+            subject
+            expect(assigns[:js_env][:SUBMISSION_TYPE_SELECTION_TOOLS][0])
+              .to include(submission_type_selection_launch_points: [launch_point])
+          end
+        end
       end
 
       it 'does not set "DEFAULT_ASSIGNMENT_TOOL_URL"' do

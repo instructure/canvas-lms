@@ -20,6 +20,58 @@
 
 module Schemas::Lti
   class ToolConfiguration < Schemas::Base
+    LAUNCH_INFO_SCHEMA =
+      {
+        "target_link_uri" => {
+          "type" => "string"
+        }.freeze,
+        "text" => {
+          "type" => "string"
+        }.freeze,
+        "icon_url" => {
+          "type" => "string"
+        }.freeze,
+        "message_type" => {
+          "type" => "string",
+          "enum" => %w[LtiDeepLinkingRequest LtiResourceLinkRequest].freeze
+        }.freeze,
+        "canvas_icon_class" => {
+          "type" => "string"
+        }.freeze,
+        "selection_width" => {
+          "type" => "number"
+        }.freeze,
+        "selection_height" => {
+          "type" => "number"
+        }.freeze,
+      }.freeze
+
+    SUBMISSION_LAUNCH_POINTS_SCHEMA =
+      {
+        "type" => "array",
+        "items" => {
+          "type" => "object",
+          "required" => %w[target_link_uri].freeze,
+          "additionalProperties" => false,
+          "properties" => {
+            "target_link_uri" => {
+              "type" => "string",
+              "format" => "uri"
+            }.freeze,
+            "title" => {
+              "type" => "string"
+            }.freeze,
+            "icon_url" => {
+              "type" => "string",
+              "format" => "uri"
+            }.freeze,
+            "description" => {
+              "type" => "string"
+            }.freeze
+          }
+        }
+      }.freeze
+
     SCHEMA = {
       "type" => "object",
       "required" => [
@@ -58,10 +110,7 @@ module Schemas::Lti
           "type" => "array",
           "items" => {
             "type" => "object",
-            "required" => [
-              "platform",
-              "settings"
-            ].freeze,
+            "required" => %w[platform settings].freeze,
             "properties" => {
               "domain" => {
                 "type" => "string"
@@ -86,82 +135,36 @@ module Schemas::Lti
                   }.freeze,
                   "placements" => {
                     "type" => "array",
-                    "items" => {
-                      "type" => "object",
-                      "required" => [
-                        "placement"
-                      ].freeze,
-                      "properties" => {
-                        "placement" => {
-                          "type" => "string",
-                          "enum" => %w[
-                            account_navigation
-                            similarity_detection
-                            assignment_edit
-                            assignment_group_menu
-                            assignment_index_menu
-                            assignment_menu
-                            assignment_selection
-                            assignment_view
-                            collaboration
-                            conference_selection
-                            course_assignments_menu
-                            course_home_sub_navigation
-                            course_navigation
-                            course_settings_sub_navigation
-                            discussion_topic_menu
-                            discussion_topic_index_menu
-                            editor_button
-                            file_menu
-                            file_index_menu
-                            global_navigation
-                            homework_submission
-                            link_selection
-                            migration_selection
-                            module_group_menu
-                            module_index_menu
-                            module_index_menu_modal
-                            module_menu
-                            module_menu_modal
-                            post_grades
-                            quiz_index_menu
-                            quiz_menu
-                            resource_selection
-                            submission_type_selection
-                            student_context_card
-                            tool_configuration
-                            user_navigation
-                            wiki_index_menu
-                            wiki_page_menu
-                          ].freeze
+                    "items" =>
+                      { "oneOf" => [
+                        {
+                          "type" => "object",
+                          "required" => [
+                            "placement"
+                          ].freeze,
+                          "properties" => {
+                            "placement" => {
+                              "type" => "string",
+                              "enum" => (Lti::ResourcePlacement::PLACEMENTS - [:submission_type_selection]).map(&:to_s).freeze
+                            }.freeze,
+                            **LAUNCH_INFO_SCHEMA,
+                          }.freeze
                         }.freeze,
-                        "target_link_uri" => {
-                          "type" => "string"
-                        }.freeze,
-                        "text" => {
-                          "type" => "string"
-                        }.freeze,
-                        "icon_url" => {
-                          "type" => "string"
-                        }.freeze,
-                        "message_type" => {
-                          "type" => "string",
-                          "enum" => [
-                            "LtiDeepLinkingRequest",
-                            "LtiResourceLinkRequest"
-                          ].freeze
-                        }.freeze,
-                        "canvas_icon_class" => {
-                          "type" => "string"
-                        }.freeze,
-                        "selection_width" => {
-                          "type" => "number"
-                        }.freeze,
-                        "selection_height" => {
-                          "type" => "number"
-                        }.freeze,
-                      }.freeze
-                    }.freeze
+                        {
+                          "type" => "object",
+                          "required" => [
+                            "placement"
+                          ].freeze,
+                          "properties" => {
+                            "placement" => {
+                              "type" => "string",
+                              "pattern" => "^submission_type_selection$"
+                            },
+                            **LAUNCH_INFO_SCHEMA,
+                            "submission_type_selection_launch_points" => SUBMISSION_LAUNCH_POINTS_SCHEMA
+                          }.freeze
+                        }.freeze
+                      ].freeze }.freeze
                   }.freeze
                 }.freeze
               }.freeze,
