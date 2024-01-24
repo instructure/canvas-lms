@@ -28,7 +28,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import DueDates from '../../react/DueDates'
 import CoursePacingNotice from '../../react/CoursePacingNotice'
 import StudentGroupStore from '../../react/StudentGroupStore'
-import DifferentiatedModulesLink from '../../react/DifferentiatedModulesLink'
+import DifferentiatedModulesSection from '../../react/DifferentiatedModulesSection'
 import GradingPeriodsAPI from '@canvas/grading/jquery/gradingPeriodsApi'
 import * as tz from '@canvas/datetime'
 import '@canvas/jquery/jquery.instructure_forms'
@@ -76,14 +76,15 @@ DueDateOverrideView.prototype.render = function () {
     }), div)
   }
 
-  const assignToSection = ENV.FEATURES?.differentiated_modules ? React.createElement(DifferentiatedModulesLink, {
-    onSave: this.setNewOverridesCollection,
+  const assignToSection = ENV.FEATURES?.differentiated_modules ? React.createElement(DifferentiatedModulesSection, {
+    onSync: this.setNewOverridesCollection,
     defaultSectionId: this.model.defaultDueDateSectionId,
     overrides: this.model.overrides.models,
     assignmentId: this.model.assignment.get('id'),
     assignmentName: this.model.assignment.get('name') || this.model.assignment.get('title'),
     pointsPossible: this.model.assignment.get('points_possible'),
     type: this.model.assignment.objectType().toLowerCase(),
+    importantDates: this.model.assignment.get('important_dates'),
     }
     ) : React.createElement(DueDates, {
     overrides: this.model.overrides.models,
@@ -280,9 +281,11 @@ DueDateOverrideView.prototype.showError = function (element, message) {
 // ==============================
 
 DueDateOverrideView.prototype.setNewOverridesCollection = function (newOverrides, importantDates) {
-  this.model.overrides.reset(newOverrides)
-  const onlyVisibleToOverrides = !this.model.overrides.containsDefaultDueDate()
-  this.model.assignment.isOnlyVisibleToOverrides(onlyVisibleToOverrides)
+  if(newOverrides !== undefined){
+    this.model.overrides.reset(newOverrides)
+    const onlyVisibleToOverrides = !this.model.overrides.containsDefaultDueDate()
+    this.model.assignment.isOnlyVisibleToOverrides(onlyVisibleToOverrides)
+  }
   return this.model.assignment.importantDates(importantDates)
 }
 

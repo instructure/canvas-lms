@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useMemo } from 'react'
 import { Link } from '@instructure/ui-link'
 import { Text } from '@instructure/ui-text'
 import { View } from '@instructure/ui-view'
+import {Checkbox} from '@instructure/ui-checkbox'
 import { useScope as useI18nScope } from '@canvas/i18n'
 import ItemAssignToTray, { getEveryoneOption } from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToTray'
 import { IconEditLine } from '@instructure/ui-icons'
@@ -9,15 +10,19 @@ import _ from 'underscore'
 import { forEach, map } from 'lodash'
 import TokenActions from './TokenActions'
 import { sortedRowKeys, getAllOverrides, datesFromOverride } from '../util/overridesUtils'
-import { string, func, array, number, oneOfType } from 'prop-types'
+import { string, func, array, number, oneOfType, bool } from 'prop-types'
 
 const I18n = useI18nScope('DueDateOverrideView')
 
-const DifferentiatedModulesLink = ({ onSave, assignmentName, assignmentId, type, pointsPossible, overrides, defaultSectionId }) => {
+const cloneObject = (object) => JSON.parse(JSON.stringify(object))
+
+const DifferentiatedModulesSection = ({ onSync, assignmentName, assignmentId, type, pointsPossible, overrides, defaultSectionId, importantDates }) => {
     const [open, setOpen] = useState(false)
-    const [stagedCards, setStagedCards] = useState();
+    const [stagedCards, setStagedCards] = useState([]);
     const [stagedOverrides, setStagedOverrides] = useState(overrides);
+    const [preSavedOverrides, setPreSavedOverrides] = useState(cloneObject(overrides));
     const [disabledOptionIds, setDisabledOptionIds] = useState([])
+    const [stagedImportantDates, setStagedImportantDates] = useState(importantDates)
     const linkRef = useRef();
 
     useEffect(() => {
@@ -62,16 +67,16 @@ const DifferentiatedModulesLink = ({ onSave, assignmentName, assignmentId, type,
                     selectedOptionIds.push(...defaultOptions)
                 }
             })
-
+            const uniqueIds = [...new Set(defaultOptions)]
             return {
                 key: cardId,
-                isValid: defaultOptions.length > 0,
-                hasAssignees: defaultOptions.length > 0,
+                isValid: uniqueIds.length > 0,
+                hasAssignees: uniqueIds.length > 0,
                 due_at: dates.due_at,
                 unlock_at: dates.unlock_at,
                 lock_at: dates.lock_at,
-                selectedAssigneeIds: defaultOptions,
-                defaultOptions,
+                selectedAssigneeIds: uniqueIds,
+                defaultOptions: uniqueIds,
                 overrideId: row.id,
                 index: row.index
             }
@@ -82,7 +87,16 @@ const DifferentiatedModulesLink = ({ onSave, assignmentName, assignmentId, type,
         return sortedCards
     }, [stagedCards])
 
-    const handleClose = () => setOpen(false)
+    const handleClose = () => {
+        setOpen(false)
+    }
+
+    const handleDismiss =()=>{
+        handleClose();
+        setStagedOverrides(overrides)
+        setPreSavedOverrides(cloneObject(overrides))
+        linkRef.current.focus()
+    }
 
     const generateCard = (cardId, newOverrides, rowDates) => {
         const newRow = TokenActions.handleTokenAdd({}, newOverrides, cardId, rowDates)[0]
@@ -125,7 +139,7 @@ const DifferentiatedModulesLink = ({ onSave, assignmentName, assignmentId, type,
     }
 
     const handleDatesUpdate = (cardId, dateType, newDate) => {
-        const row = stagedCards[cardId]
+        const row = {...stagedCards[cardId]}
         const oldOverrides = row.overrides
         const oldDates = row.dates
 
@@ -165,9 +179,38 @@ const DifferentiatedModulesLink = ({ onSave, assignmentName, assignmentId, type,
     const handleSave = () => {
         const newOverrides = getAllOverrides(stagedCards).filter(row => row.attributes.course_section_id || row.attributes.student_ids);
         setStagedOverrides(newOverrides);
-        onSave(newOverrides);
+        setPreSavedOverrides(cloneObject(newOverrides))
+        onSync(newOverrides, stagedImportantDates);
         setOpen(false);
     }
+
+    const handleImportantDatesChange = (event) => {
+        const newImportantDatesValue = event.target.checked
+        onSync(undefined, newImportantDatesValue)
+        setStagedImportantDates(newImportantDatesValue)
+    }
+
+    const imporantDatesCheckbox = () => {
+        if (ENV.K5_SUBJECT_COURSE || ENV.K5_HOMEROOM_COURSE) {
+          const disabled = !preSavedOverrides?.some(({assignment_override}) => assignment_override.due_at)
+          const checked = !disabled && stagedImportantDates
+          return (
+            <div id="important-dates">
+              <Checkbox
+                label={I18n.t('Mark as important date and show on homeroom sidebar')}
+                name="important_dates"
+                data-testid="important_dates"
+                size="small"
+                value={checked ? 1 : 0}
+                checked={checked}
+                onChange={handleImportantDatesChange}
+                disabled={disabled}
+                inline={true}
+              />
+            </div>
+          )
+        }
+      }
 
     return (
         <>
@@ -185,18 +228,16 @@ const DifferentiatedModulesLink = ({ onSave, assignmentName, assignmentId, type,
                     <View as="div">
                         {I18n.t('Manage Assign To')}
                         <Text as="div" color="secondary" size="small">
-                            {I18n.t('%{overridesCount} Assigned', { overridesCount: stagedOverrides.filter(override => !override.draft).length })}
+                            {I18n.t('%{overridesCount} Assigned', { overridesCount: preSavedOverrides?.filter(override => !override.draft).length })}
                         </Text>
                     </View>
                 </Link>
             </View>
+            {type === 'assignment' && imporantDatesCheckbox()}
             <ItemAssignToTray
                 open={open}
                 onClose={handleClose}
-                onDismiss={() => {
-                    handleClose()
-                    linkRef.current.focus()
-                }}
+                onDismiss={handleDismiss}
                 courseId={ENV.COURSE_ID}
                 itemName={assignmentName}
                 itemType={type}
@@ -218,14 +259,15 @@ const DifferentiatedModulesLink = ({ onSave, assignmentName, assignmentId, type,
     )
 }
 
-DifferentiatedModulesLink.propTypes = {
-    onSave: func.isRequired,
+DifferentiatedModulesSection.propTypes = {
+    onSync: func.isRequired,
     assignmentName: string.isRequired,
     assignmentId: string.isRequired,
     type: string.isRequired,
     pointsPossible: oneOfType([number, string]),
     overrides: array.isRequired,
-    defaultSectionId: oneOfType([number, string])
+    defaultSectionId: oneOfType([number, string]),
+    importantDates: bool,
 }
 
-export default DifferentiatedModulesLink;
+export default DifferentiatedModulesSection;
