@@ -292,7 +292,8 @@ module Lti
                        default_name: "com_instructure_user_observees"
 
     # Returns an array of the section names in a JSON-escaped format that the user is enrolled in, if the
-    # context of the tool launch is within a course.
+    # context of the tool launch is within a course. The names are sorted by the course_section_id, so that
+    # they are useful in conjunction with the Canvas.course.sectionIds substitution.
     #
     # @example
     #   ```
@@ -300,7 +301,7 @@ module Lti
     #   ```
     register_expansion "com.instructure.User.sectionNames",
                        [],
-                       -> { @context.enrollments.active.joins(:course_section).where(user_id: @current_user.id).pluck(:name)&.to_json },
+                       -> { @context.enrollments.active.joins(:course_section).where(user_id: @current_user.id).order(:course_section_id).pluck(:name)&.to_json },
                        ENROLLMENT_GUARD,
                        default_name: "com_instructure_user_section_names"
 
