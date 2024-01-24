@@ -1036,6 +1036,74 @@ describe ContentTag do
     end
   end
 
+  describe "#update_module_item_submissions" do
+    before do
+      Account.site_admin.enable_feature!(:differentiated_modules)
+      course_factory
+      @student1 = student_in_course(active_all: true, name: "Student 1").user
+      @student2 = student_in_course(active_all: true, name: "Student 2").user
+      @context_module = @course.context_modules.create!
+
+      @assignment = @course.assignments.create!
+      @context_module.add_item(id: @assignment.id, type: "assignment")
+      @tag = @context_module.content_tags.first
+    end
+
+    it "assignment is added to a module" do
+      adhoc_override = @context_module.assignment_overrides.create!(set_type: "ADHOC")
+      adhoc_override.assignment_override_students.create!(user: @student1)
+
+      @assignment2 = @course.assignments.create!
+      expect(@assignment2.submissions.length).to eq 2
+
+      @context_module.add_item(id: @assignment2.id, type: "assignment")
+      @assignment2.submissions.reload
+      expect(@assignment2.submissions.length).to eq 1
+    end
+
+    it "assignment is removed from a module" do
+      adhoc_override = @context_module.assignment_overrides.create!(set_type: "ADHOC")
+      adhoc_override.assignment_override_students.create!(user: @student1)
+
+      @context_module.update_assignment_submissions(@context_module.current_assignments_and_quizzes)
+      @assignment.submissions.reload
+      expect(@assignment.submissions.length).to eq 1
+
+      @tag.destroy
+      @assignment.submissions.reload
+      expect(@assignment.submissions.length).to eq 2
+    end
+
+    it "assignment is moved from one module to another" do
+      adhoc_override = @context_module.assignment_overrides.create!(set_type: "ADHOC")
+      adhoc_override.assignment_override_students.create!(user: @student1)
+      @context_module2 = @course.context_modules.create!
+
+      @context_module.update_assignment_submissions(@context_module.current_assignments_and_quizzes)
+      @assignment.submissions.reload
+      expect(@assignment.submissions.length).to eq 1
+
+      @tag.context_module_id = @context_module2.id
+      @tag.save!
+      @assignment.submissions.reload
+      expect(@assignment.submissions.length).to eq 2
+    end
+
+    it "assignment is moved from module with no overrides to module with overrides" do
+      @context_module2 = @course.context_modules.create!
+      adhoc_override2 = @context_module2.assignment_overrides.create!(set_type: "ADHOC")
+      adhoc_override2.assignment_override_students.create!(user: @student1)
+
+      @assignment.submissions.reload
+      expect(@assignment.submissions.length).to eq 2
+
+      @tag.context_module_id = @context_module2.id
+      @tag.save!
+      @assignment.submissions.reload
+      expect(@assignment.submissions.length).to eq 1
+    end
+  end
+
   describe "#trigger_publish!" do
     it "publishes the tag if it is unpublished" do
       course_factory

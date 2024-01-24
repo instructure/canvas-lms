@@ -82,6 +82,7 @@ class ContentTag < ActiveRecord::Base
   after_save :send_items_to_stream
   after_save :clear_total_outcomes_cache
   after_save :update_course_pace_module_items
+  after_save :update_module_item_submissions
   after_create :update_outcome_contexts
 
   include CustomValidations
@@ -448,6 +449,7 @@ class ContentTag < ActiveRecord::Base
     delete_outcome_friendly_description if content_type == "LearningOutcome"
 
     run_submission_lifecycle_manager_for_quizzes_next(force: true)
+    update_module_item_submissions(change_of_module: false)
 
     # after deleting the last native link to an unaligned outcome, delete the
     # outcome. we do this here instead of in LearningOutcome#destroy because
@@ -865,6 +867,24 @@ class ContentTag < ActiveRecord::Base
 
       # Republish the course pace if changes were made
       course_pace.create_publish_progress if deleted? || cpmi.destroyed? || cpmi.saved_change_to_id? || saved_change_to_position?
+    end
+  end
+
+  def update_module_item_submissions(change_of_module: true)
+    return unless Account.site_admin.feature_enabled?(:differentiated_modules)
+
+    return unless tag_type == "context_module" && (content_type == "Assignment" || content_type == "Quizzes::Quiz")
+
+    if change_of_module
+      return unless saved_change_to_context_module_id? && AssignmentOverride.active.where(context_module_id: saved_change_to_context_module_id).exists?
+    else
+      return unless context_module.assignment_overrides.active.exists?
+    end
+    if content_type == "Assignment"
+      SubmissionLifecycleManager.recompute(content, update_grades: true)
+      # TODO: recompute quiz submissions
+      # else
+      # SubmissionLifecycleManager.recompute(content.assignment, update_grades: true)
     end
   end
 
