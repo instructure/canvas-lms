@@ -99,7 +99,15 @@ const AddBadgeTray = ({allBadges, open, selectedBadgeId, onClose, onSave}: AddBa
         onClick={handleBadgeClick}
         onKeyDown={handleBadgeKey}
       >
-        <div style={{background: 'grey', width: '62px', height: '62px', margin: '0 auto'}} />
+        {badge.image ? (
+          <img
+            src={badge.image}
+            alt=""
+            style={{height: '62px', margin: '0 auto', display: 'block'}}
+          />
+        ) : (
+          <div style={{background: 'grey', width: '62px', height: '62px', margin: '0 auto'}} />
+        )}
         <View as="div" margin="medium 0 0 0">
           <Text as="div" size="medium" weight="bold">
             {badge.title}

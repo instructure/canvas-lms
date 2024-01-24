@@ -207,43 +207,44 @@ const MilestoneTray = ({milestone, open, variant, onClose, onSave}: MilestoneTra
                 </View>
               </View>
               <View as="div" padding="large 0" borderWidth="0 0 small 0">
-                <View as="div" margin="0 0 small 0">
-                  {requirements.length > 0 ? (
-                    <View as="div" margin="small 0">
-                      {requirements.map(requirement => (
-                        <View
-                          key={requirement.id}
-                          as="div"
-                          padding="small"
-                          background="secondary"
-                          borderWidth="small"
-                          borderRadius="medium"
-                          margin="0 0 small 0"
-                        >
-                          <MilestoneRequirementCard
+                <FormField id="milestone_requiremens" label="Requirements">
+                  <Text as="div">
+                    Select a criteria learners must complete before continuing progress along the
+                    pathway.
+                  </Text>
+                  <View as="div" margin="0 0 small 0">
+                    {requirements.length > 0 ? (
+                      <View as="div" margin="small 0">
+                        {requirements.map(requirement => (
+                          <View
                             key={requirement.id}
-                            requirement={requirement}
-                            onEdit={() => handleEditRequirement(requirement)}
-                            onDelete={() => handleDeleteRequirement(requirement)}
-                          />
-                        </View>
-                      ))}
-                    </View>
-                  ) : null}
-                  <FormField id="milestone_requiremens" label="Requirements">
-                    <Text as="div">
-                      Select a criteria learners must complete before continuing progress along the
-                      pathway.
-                    </Text>
+                            as="div"
+                            padding="small"
+                            background="secondary"
+                            borderWidth="small"
+                            borderRadius="medium"
+                            margin="0 0 small 0"
+                          >
+                            <MilestoneRequirementCard
+                              key={requirement.id}
+                              requirement={requirement}
+                              onEdit={() => handleEditRequirement(requirement)}
+                              onDelete={() => handleDeleteRequirement(requirement)}
+                            />
+                          </View>
+                        ))}
+                      </View>
+                    ) : null}
+
                     <Button
                       renderIcon={IconAddLine}
-                      margin="medium 0 0 0"
+                      margin="small 0 0 0"
                       onClick={handleAddRequirementClick}
                     >
                       Add Requirement
                     </Button>
-                  </FormField>
-                </View>
+                  </View>
+                </FormField>
               </View>
               <View as="div" padding="large 0 0 0">
                 <FormField id="milestone_achievements" label="Achievements">
