@@ -2591,8 +2591,8 @@ $(document).ready(function () {
   // to all the assignment's data (due due dates, availability, etc)
   function parseModuleItemElement(element) {
     const pointsPossibleElem = element?.querySelector('.points_possible_display')
-    const points = pointsPossibleElem?.textContent
-    return {pointsPossible: points}
+    const points = parseFloat(pointsPossibleElem?.textContent)
+    return {pointsPossible: isNaN(points) ? undefined : points}
   }
 
   $('.module-item-assign-to-link').on('click keyclick', function (event) {

@@ -30,7 +30,7 @@ describe "assignments show page assign to" do
     Account.site_admin.enable_feature! :differentiated_modules
 
     course_with_teacher(active_all: true)
-    @assignment1 = @course.assignments.create(name: "test assignment")
+    @assignment1 = @course.assignments.create(name: "test assignment", points_possible: 25)
 
     @student1 = student_in_course(course: @course, active_all: true, name: "Student 1").user
     @student2 = student_in_course(course: @course, active_all: true, name: "Student 2").user
@@ -50,6 +50,7 @@ describe "assignments show page assign to" do
 
     expect(tray_header.text).to eq("test assignment")
     expect(icon_type_exists?("Assignment")).to be true
+    expect(item_type_text.text).to include("25 pts")
   end
 
   it "assigns student and saves assignment" do

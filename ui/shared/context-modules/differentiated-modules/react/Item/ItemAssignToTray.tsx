@@ -133,7 +133,7 @@ export interface ItemAssignToTrayProps {
   itemType: string
   iconType: string
   itemContentId: string
-  pointsPossible: string | number
+  pointsPossible?: number | null
   locale: string
   timezone: string
   defaultCards?: ItemAssignToCardSpec[]
@@ -425,6 +425,9 @@ export default function ItemAssignToTray({
     return assignToCards.every(card => card.hasAssignees)
   }, [assignToCards])
 
+  const renderPointsPossible = () =>
+    pointsPossible === 1 ? I18n.t('1 pt') : I18n.t('%{pointsPossible} pts', {pointsPossible})
+
   function Header() {
     const icon = itemTypeToIcon(iconType)
     return (
@@ -439,7 +442,7 @@ export default function ItemAssignToTray({
           {icon} {itemName}
         </Heading>
         <View data-testid="item-type-text" as="div" margin="medium 0 0 0">
-          {renderItemType()} {pointsPossible ? `| ${pointsPossible}` : ''}
+          {renderItemType()} {pointsPossible != null && `| ${renderPointsPossible()}`}
         </View>
       </Flex.Item>
     )

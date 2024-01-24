@@ -141,6 +141,7 @@ describe "selective_release module item assign to tray" do
     before(:once) do
       module_setup
       @module_item1 = ContentTag.find_by(context_id: @course.id, context_module_id: @module.id, content_type: "Assignment", content_id: @assignment1.id)
+      @module_item2 = ContentTag.find_by(context_id: @course.id, context_module_id: @module.id, content_type: "Assignment", content_id: @assignment2.id)
       @module.update!(workflow_state: "active")
       @student1 = student_in_course(course: @course, active_all: true, name: "Student 1").user
       @student2 = student_in_course(course: @course, active_all: true, name: "Student 2").user
@@ -159,6 +160,21 @@ describe "selective_release module item assign to tray" do
       expect(item_tray_exists?).to be true
       expect(module_item_assign_to_card[0]).to be_displayed
       expect(assign_to_in_tray("Remove Everyone")[0]).to be_displayed
+    end
+
+    it "shows points possible only when present" do
+      @assignment1.update!(points_possible: 10)
+      @assignment2.update!(points_possible: nil)
+      go_to_modules
+
+      manage_module_item_button(@module_item1).click
+      click_manage_module_item_assign_to(@module_item1)
+      expect(item_type_text.text).to include("10 pts")
+
+      click_cancel_button
+      manage_module_item_button(@module_item2).click
+      click_manage_module_item_assign_to(@module_item2)
+      expect(item_type_text.text).not_to include("pts")
     end
 
     it "changes pills when new card is added" do

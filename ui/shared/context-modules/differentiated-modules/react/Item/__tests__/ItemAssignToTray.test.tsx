@@ -32,7 +32,7 @@ describe('ItemAssignToTray', () => {
     itemType: 'assignment',
     iconType: 'assignment',
     itemContentId: '23',
-    pointsPossible: '10 pts',
+    pointsPossible: 10,
     locale: 'en',
     timezone: 'UTC',
   }
@@ -135,12 +135,35 @@ describe('ItemAssignToTray', () => {
     expect(getByText('Quiz | 10 pts')).toBeInTheDocument()
   })
 
-  it('renders with no points', () => {
-    const {getByText, queryByText, getByLabelText} = renderComponent({pointsPossible: undefined})
-    expect(getByText('Item Name')).toBeInTheDocument()
-    expect(getByText('Assignment')).toBeInTheDocument()
-    expect(queryByText('pts')).not.toBeInTheDocument()
-    expect(getByLabelText('Edit assignment Item Name')).toBeInTheDocument()
+  describe('pointsPossible display', () => {
+    it('does not render points display if undefined', () => {
+      const {getByText, queryByText, getByLabelText} = renderComponent({pointsPossible: undefined})
+      expect(getByText('Item Name')).toBeInTheDocument()
+      expect(getByText('Assignment')).toBeInTheDocument()
+      expect(getByLabelText('Edit assignment Item Name')).toBeInTheDocument()
+      expect(queryByText('pts')).not.toBeInTheDocument()
+      expect(queryByText('pt')).not.toBeInTheDocument()
+    })
+
+    it('renders with 0 points', () => {
+      const {getByText} = renderComponent({pointsPossible: 0})
+      expect(getByText('Assignment | 0 pts')).toBeInTheDocument()
+    })
+
+    it('renders singular with 1 point', () => {
+      const {getByText} = renderComponent({pointsPossible: 1})
+      expect(getByText('Assignment | 1 pt')).toBeInTheDocument()
+    })
+
+    it('renders fractional points', () => {
+      const {getByText} = renderComponent({pointsPossible: 100.5})
+      expect(getByText('Assignment | 100.5 pts')).toBeInTheDocument()
+    })
+
+    it('renders a normal amount of points', () => {
+      const {getByText} = renderComponent({pointsPossible: 25})
+      expect(getByText('Assignment | 25 pts')).toBeInTheDocument()
+    })
   })
 
   it('renders times in the given timezone', async () => {

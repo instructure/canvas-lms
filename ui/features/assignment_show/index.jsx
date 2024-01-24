@@ -229,8 +229,8 @@ $('.assign-to-link').on('click keyclick', function (event) {
   const courseId = event.target.getAttribute('data-assignment-context-id')
   const itemName = event.target.getAttribute('data-assignment-name')
   const itemContentId = event.target.getAttribute('data-assignment-id')
-  const pointsPossible =
-    parseFloat(event.target.getAttribute('data-assignment-points-possible')) + ' pts'
+  const pointsString = event.target.getAttribute('data-assignment-points-possible')
+  const pointsPossible = pointsString ? parseFloat(pointsString) : undefined
   renderItemAssignToTray(true, returnFocusTo, {
     courseId,
     itemName,
