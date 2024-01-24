@@ -71,9 +71,10 @@ class GradingSchemesJsonController < ApplicationController
   def show_default_grading_scheme
     respond_to do |format|
       format.json do
-        render json: GradingSchemesJsonController.to_grading_scheme_json(
+        render json: GradingSchemesJsonController.default_to_json(
           GradingSchemesJsonController.default_canvas_grading_standard(@context),
-          @current_user
+          @current_user,
+          @context
         )
       end
     end
@@ -115,6 +116,10 @@ class GradingSchemesJsonController < ApplicationController
     return unless authorized_action(grading_standard, @current_user, :manage)
 
     render json: used_locations_for(grading_standard)
+  end
+
+  def default_used_locations
+    render json: default_scheme_used_locations
   end
 
   def archive
@@ -173,6 +178,14 @@ class GradingSchemesJsonController < ApplicationController
     }.as_json
   end
 
+  def self.default_to_json(grading_standard, user, context)
+    to_grading_scheme_json(grading_standard, user).tap do |json|
+      # because GradingStandard generates the JSON property with a '?' on the end of it,
+      # instead of using the JSON convention for boolean properties
+      json["assessed_assignment"] = GradingStandard.default_scheme_assessed_assignments(context).exists?
+    end
+  end
+
   def self.to_grading_scheme_json(grading_standard, user)
     grading_standard.as_json(methods: JSON_METHODS,
                              include_root: false,
@@ -192,6 +205,21 @@ class GradingSchemesJsonController < ApplicationController
     end
   end
 
+  def default_scheme_used_locations
+    scope = GradingStandard.default_scheme_assessed_assignments(@context)
+                           .joins("INNER JOIN #{Course.quoted_table_name} ON assignments.context_type = 'Course' AND assignments.context_id = courses.id")
+                           .order("courses.name ASC, title ASC")
+
+    used_locations = Api.paginate(
+      scope,
+      self,
+      account_grading_schemes_default_used_locations_path(account_id: context.id),
+      per_page: USED_LOCATIONS_PER_PAGE
+    )
+
+    used_locations_to_json(used_locations)
+  end
+
   def used_locations_for(grading_standard)
     scope = grading_standard.assessed_assignments
                             .joins("INNER JOIN #{Course.quoted_table_name} ON assignments.context_type = 'Course' AND assignments.context_id = courses.id")
@@ -206,6 +234,10 @@ class GradingSchemesJsonController < ApplicationController
       per_page: USED_LOCATIONS_PER_PAGE
     )
 
+    used_locations_to_json(used_locations)
+  end
+
+  def used_locations_to_json(used_locations)
     used_locations.group_by(&:context).map do |course, assignments|
       course_json = course.as_json(only: [:id, :name], methods: [:concluded?], include_root: false)
       course_json[:assignments] = assignments.as_json(only: [:id, :title], include_root: false)
