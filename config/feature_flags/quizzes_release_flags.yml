@@ -65,3 +65,8 @@ new_quizzes_migrate_without_content_rewrite:
   environments:
     development:
       state: allowed_on
+new_quizzes_common_cartridge:
+  state: hidden
+  display_name: New Quizzes Common Cartridge Support
+  description: If enabled, Canvas will be able to export New Quizzes as a part of Common Cartridge Export Packages.
+  applies_to: SiteAdmin
