@@ -1426,5 +1426,13 @@ describe "Outcome Reports" do
       expect(Course).not_to receive(:find)
       outcome_reports.send :add_outcomes_data, row
     end
+
+    it "doesn't instantiate the entire scope" do
+      scope = outcome_reports.send(:student_assignment_outcome_map_scope)
+      expect(scope).not_to receive(:[])
+      outcome_reports.send(:write_outcomes_report,
+                           AccountReports::OutcomeReports.student_assignment_outcome_headers,
+                           scope)
+    end
   end
 end

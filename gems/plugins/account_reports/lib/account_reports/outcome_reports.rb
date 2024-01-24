@@ -559,13 +559,11 @@ module AccountReports
       end
     end
 
-    def canvas_next?(canvas_scope, canvas_index, os_scope, os_index)
-      return false if canvas_index >= canvas_scope.length
+    def canvas_next?(canvas, os_scope, os_index)
       return true if os_index >= os_scope.length
 
       order = map_order_to_columns(outcome_order)
 
-      canvas = canvas_scope[canvas_index]
       os = os_scope[os_index]
       order.each do |column|
         if canvas[column] != os[column]
@@ -587,20 +585,7 @@ module AccountReports
       os_scope = config_options[:new_quizzes_scope]
 
       write_report headers, enable_i18n_features do |csv|
-        total = canvas_scope.length + os_scope.length
-        GuardRail.activate(:primary) { AccountReport.where(id: @account_report.id).update_all(total_lines: total) }
-
-        canvas_index = 0
-        os_index = 0
-        while canvas_index < canvas_scope.length || os_index < os_scope.length
-          if canvas_next?(canvas_scope, canvas_index, os_scope, os_index)
-            row = canvas_scope[canvas_index].attributes.dup
-            canvas_index += 1
-          else
-            row = os_scope[os_index]
-            os_index += 1
-          end
-
+        write_row = lambda do |row|
           row["assignment url"] = "https://#{host}" \
                                   "/courses/#{row["course id"]}" \
                                   "/assignments/#{row["assignment id"]}"
@@ -608,6 +593,24 @@ module AccountReports
           add_outcomes_data(row)
           csv << headers.map { |h| row[h] }
         end
+
+        total = os_scope.length + canvas_scope.except(:select).count
+        GuardRail.activate(:primary) { AccountReport.where(id: @account_report.id).update_all(total_lines: total) }
+
+        os_index = 0
+        canvas_scope.find_each do |canvas_row|
+          until canvas_next?(canvas_row, os_scope, os_index)
+            write_row.call(os_scope[os_index])
+            os_index += 1
+          end
+          write_row.call(canvas_row.attributes)
+        end
+
+        while os_index < os_scope.length
+          write_row.call(os_scope[os_index])
+          os_index += 1
+        end
+
         csv << [config_options[:empty_scope_message]] if total == 0
       end
     end
