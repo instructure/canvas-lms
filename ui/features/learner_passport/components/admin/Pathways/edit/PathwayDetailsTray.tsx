@@ -141,7 +141,11 @@ const PathwayDetailsTray = ({
       <View as="div" background="secondary" margin="small 0">
         <Flex as="div">
           <Flex.Item padding="small" shouldShrink={false} shouldGrow={false}>
-            <div style={{width: '100px', height: '100px', backgroundColor: 'grey'}} />
+            {badge.image ? (
+              <img src={badge.image} alt="" style={{width: '100px'}} />
+            ) : (
+              <div style={{width: '100px', height: '100px', backgroundColor: 'grey'}} />
+            )}
           </Flex.Item>
           <Flex.Item padding="medium medium medium 0" shouldShrink={true}>
             <Text as="div" weight="bold">

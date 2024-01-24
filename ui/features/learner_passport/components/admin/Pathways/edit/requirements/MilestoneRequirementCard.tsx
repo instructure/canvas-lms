@@ -44,7 +44,7 @@ const MilestoneRequirementCard = ({
       <Flex.Item align="center">
         <IconDragHandleLine />
       </Flex.Item>
-      <Flex.Item shouldGrow={true}>
+      <Flex.Item shouldGrow={true} shouldShrink={true}>
         <View as="div" background="secondary">
           <View as="div">
             <Text weight="bold">{requirement.name}</Text>

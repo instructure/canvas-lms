@@ -127,6 +127,7 @@ export interface ProjectEditData {
 export type PathwayBadgeType = {
   id: string
   title: string
+  image: string | null
   issuer: {
     name: string
     url: string
