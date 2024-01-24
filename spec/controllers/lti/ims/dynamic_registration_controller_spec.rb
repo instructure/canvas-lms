@@ -48,59 +48,6 @@ describe Lti::IMS::DynamicRegistrationController do
     end
   end
 
-  describe "#redirect_to_tool_registration" do
-    subject { get :redirect_to_tool_registration, params: { registration_url: "https://example.com" } }
-
-    before do
-      account_admin_user
-      user_session(@admin)
-    end
-
-    context "with the lti_dynamic_registration flag disabled" do
-      it "returns a 404" do
-        @admin.account.disable_feature! :lti_dynamic_registration
-        subject
-        expect(response).to have_http_status(:not_found)
-      end
-    end
-
-    context "with a valid registration url" do
-      it "redirects to the registration_url" do
-        subject
-        parsed_redirect_uri = Addressable::URI.parse(response.headers["Location"])
-        expect(parsed_redirect_uri.omit(:query).to_s).to eq("https://example.com")
-        expect(response).to have_http_status(:found)
-      end
-
-      it "gives the oidc url in the response" do
-        subject
-        parsed_redirect_uri = Addressable::URI.parse(response.headers["Location"])
-        oidc_url = parsed_redirect_uri.query_values["openid_configuration"]
-        expect(oidc_url).to eq("https://canvas.instructure.com/api/lti/security/openid-configuration")
-      end
-
-      it "supports multiple subdomains in the oidc url" do
-        @request.host = "sub.test.host"
-        allow(Canvas::Security).to receive(:config).and_return({ "lti_iss" => "https://sub.test.host" })
-        subject
-        parsed_redirect_uri = Addressable::URI.parse(response.headers["Location"])
-        oidc_url = parsed_redirect_uri.query_values["openid_configuration"]
-        expect(oidc_url).to eq("https://sub.test.host/api/lti/security/openid-configuration")
-      end
-
-      it "sets user id, root account id, and date in the JWT" do
-        subject
-        parsed_redirect_uri = Addressable::URI.parse(response.headers["Location"])
-        jwt = parsed_redirect_uri.query_values["registration_token"]
-        jwt_hash = Canvas::Security.decode_jwt(jwt)
-
-        expect(Time.parse(jwt_hash["initiated_at"])).to be_within(1.minute).of(Time.now)
-        expect(jwt_hash["user_id"]).to eq(@admin.id)
-        expect(jwt_hash["root_account_global_id"]).to eq(@admin.account.root_account.global_id)
-      end
-    end
-  end
-
   describe "#create" do
     let(:scopes) do
       [
