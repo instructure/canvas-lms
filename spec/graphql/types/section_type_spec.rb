@@ -78,4 +78,28 @@ describe Types::SectionType do
       expect(tester.resolve("sisId")).to be_nil
     end
   end
+
+  context "students connection" do
+    let(:course) do
+      course_with_student(active_all: true)
+      @course
+    end
+    let(:section) { course.course_sections.create! name: "Whatever" }
+    let(:section_type) { GraphQLTypeTester.new(section, current_user: @teacher) }
+    let(:student) { User.create! }
+    let(:student2) { User.create! }
+
+    before do
+      course.enroll_student(student, enrollment_state: "active", section:)
+      course.enroll_student(student2, enrollment_state: "active", section:)
+    end
+
+    it "returns students in the section" do
+      expect(section_type.resolve("students { nodes { _id }}")).to contain_exactly(student.id.to_s, student2.id.to_s)
+    end
+
+    it "requires read permission" do
+      expect(section_type.resolve("students { nodes { _id }}", current_user: @student)).to be_nil
+    end
+  end
 end
