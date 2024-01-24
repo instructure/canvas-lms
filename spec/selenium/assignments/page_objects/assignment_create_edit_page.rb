@@ -22,8 +22,17 @@ class AssignmentCreateEditPage
     include SeleniumDependencies
 
     # CSS Selectors
+
+    def manage_assign_to_button_selector
+      "[data-testid='manage-assign-to']"
+    end
+
     def submission_type_selector
       "#assignment_submission_type"
+    end
+
+    def text_entry_submission_type_toggle_selector
+      "#assignment_text_entry"
     end
 
     # Selectors
@@ -37,6 +46,10 @@ class AssignmentCreateEditPage
 
     def assignment_save_button
       find_button("Save")
+    end
+
+    def assignment_cancel_button
+      find_button("Cancel")
     end
 
     def save_publish_button
@@ -116,8 +129,16 @@ class AssignmentCreateEditPage
       f("#assignment_hide_in_gradebook")
     end
 
+    def manage_assign_to_button
+      f(manage_assign_to_button_selector)
+    end
+
     def omit_from_final_grade_checkbox
       f("#assignment_omit_from_final_grade")
+    end
+
+    def text_entry_submission_type_toggle
+      f(text_entry_submission_type_toggle_selector)
     end
 
     # Methods & Actions
@@ -133,8 +154,16 @@ class AssignmentCreateEditPage
       assignment_name_textfield.send_keys(text)
     end
 
+    def replace_assignment_name(text)
+      assignment_name_textfield.send_keys([:control, "a"], :backspace, text)
+    end
+
     def add_number_of_graders(number)
       replace_content(grader_count_input, number, tab_out: true)
+    end
+
+    def click_manage_assign_to_button
+      manage_assign_to_button.click
     end
 
     def select_moderate_checkbox
@@ -153,8 +182,16 @@ class AssignmentCreateEditPage
       wait_for_new_page_load { save_publish_button.click }
     end
 
+    def cancel_assignment
+      wait_for_new_page_load { assignment_cancel_button.click }
+    end
+
     def select_grading_type(type, select_by = :text)
       click_option(display_grade_as, type, select_by)
+    end
+
+    def select_text_entry_submission_type
+      text_entry_submission_type_toggle.click
     end
 
     def enter_points_possible(points)
