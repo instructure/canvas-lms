@@ -20,7 +20,9 @@ import React, {useCallback, useEffect, useState} from 'react'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
+import {Tag} from '@instructure/ui-tag'
 import {Text} from '@instructure/ui-text'
+import {ToggleDetails} from '@instructure/ui-toggle-details'
 import {Tray} from '@instructure/ui-tray'
 import {View} from '@instructure/ui-view'
 
@@ -166,4 +168,41 @@ const AddBadgeTray = ({allBadges, open, selectedBadgeId, onClose, onSave}: AddBa
   )
 }
 
+const renderBadge = (allBadges: PathwayBadgeType[], badgeId: string | null) => {
+  if (badgeId === null) return null
+
+  const badge = allBadges.find(b => b.id === badgeId)
+  return badge ? (
+    <View as="div" background="secondary" margin="small 0">
+      <Flex as="div">
+        <Flex.Item padding="small" shouldShrink={false} shouldGrow={false}>
+          {badge.image ? (
+            <img src={badge.image} alt="" style={{width: '100px'}} />
+          ) : (
+            <div style={{width: '100px', height: '100px', backgroundColor: 'grey'}} />
+          )}
+        </Flex.Item>
+        <Flex.Item padding="medium medium medium 0" shouldShrink={true}>
+          <Text as="div" weight="bold">
+            {badge.title}
+          </Text>
+          <Text as="div">{badge.issuer.name}</Text>
+        </Flex.Item>
+      </Flex>
+      {badge.skills.length > 0 ? (
+        <View as="div" padding="small" borderWidth="small 0 0 0">
+          <ToggleDetails summary="Skills received">
+            <Flex as="div" gap="xx-small" wrap="wrap" margin="small 0 0 0">
+              {badge.skills.map(skill => {
+                return <Tag key={skill} text={skill} />
+              })}
+            </Flex>
+          </ToggleDetails>
+        </View>
+      ) : null}
+    </View>
+  ) : null
+}
+
 export default AddBadgeTray
+export {renderBadge}

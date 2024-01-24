@@ -40,9 +40,24 @@ function makeDefaultMilestone(): MilestoneData {
     description: '',
     required: false,
     requirements: [],
-    achievements: [],
+    completion_award: null,
     next_milestones: [],
   }
+}
+
+const findSubtreeMilestones = (
+  milestones: MilestoneData[],
+  rootId: string,
+  subtree: string[]
+): string[] => {
+  const root = milestones.find(m => m.id === rootId)
+  if (!root) return subtree
+  subtree.push(rootId)
+  if (root.next_milestones.length === 0) return subtree
+  root?.next_milestones.forEach(nextid => {
+    subtree.concat(findSubtreeMilestones(milestones, nextid, subtree))
+  })
+  return subtree
 }
 
 type PathwayBuilderProps = {
@@ -99,11 +114,15 @@ const PathwayBuilder = ({
   )
 
   const handleDeleteMilestone = useCallback(
-    async (milestoneIDs: string[]) => {
-      const rootMilestone = pathway.milestones.find(m => m.id === milestoneIDs[0])
+    async (milestoneId: string) => {
+      const rootMilestone = pathway.milestones.find(m => m.id === milestoneId)
       if (!rootMilestone) return
+
+      // find the subtree of milestones to delete
       let answer: boolean = false
-      if (milestoneIDs.length === 1) {
+      const subtree = findSubtreeMilestones(pathway.milestones, milestoneId, [])
+
+      if (subtree.length === 1) {
         answer = await confirm(`Confirm deletion of ${rootMilestone.title}.`, 'Delete step')
       } else {
         answer = await confirm(
@@ -112,10 +131,15 @@ const PathwayBuilder = ({
         )
       }
       if (answer) {
-        const newMilestones = [...pathway.milestones].filter(m => !milestoneIDs.includes(m.id))
+        const newMilestones = [...pathway.milestones].filter(m => !subtree.includes(m.id))
         const newFirstMilestones = [...pathway.first_milestones].filter(
-          mid => !milestoneIDs.includes(mid)
+          mid => !subtree.includes(mid)
         )
+        // remove the deleted milestone from its parents' next_milestones
+        newMilestones.forEach(m => {
+          m.next_milestones = m.next_milestones.filter(mid => mid !== milestoneId)
+        })
+
         onChange({milestones: newMilestones, first_milestones: newFirstMilestones})
       }
     },
@@ -137,6 +161,11 @@ const PathwayBuilder = ({
         if (currentRoot === null) {
           first_milestones.push(newMilestone.id)
         } else {
+          if (currentRoot.next_milestones[0] === 'blank') {
+            currentRoot.next_milestones = []
+            pathway.timestamp = Date.now()
+          }
+
           const rootMilestone = {...currentRoot}
           if (rootMilestone) {
             rootMilestone.next_milestones.push(newMilestone.id)
@@ -145,18 +174,26 @@ const PathwayBuilder = ({
         onChange({first_milestones, milestones: [...milestones, newMilestone]})
       }
     },
-    [currentRoot, onChange, pathway.first_milestones, pathway.milestones]
+    [currentRoot, onChange, pathway.first_milestones, pathway.milestones, pathway.timestamp]
   )
 
   const handleSelectStepFromTree = useCallback(
     (step: MilestoneData | null) => {
+      if (currentRoot && currentRoot.next_milestones[0] === 'blank') {
+        currentRoot.next_milestones = []
+        pathway.timestamp = Date.now()
+      }
       if (step) {
         setCurrentRoot(step)
+        if (step.next_milestones.length === 0) {
+          step.next_milestones.push('blank')
+          pathway.timestamp = Date.now()
+        }
       } else {
         setCurrentRoot(null)
       }
     },
-    [setCurrentRoot]
+    [currentRoot, pathway.timestamp]
   )
 
   const handleSavePathwayDetails = useCallback(
@@ -215,12 +252,13 @@ const PathwayBuilder = ({
         pathway={pathway}
         allBadges={allBadges}
         allLearnerGroups={allLearnerGroups}
-        selectedBadgeId={pathway.completion_award?.id || null}
+        selectedBadgeId={pathway.completion_award || null}
         open={pathwayTrayOpen}
         onClose={() => setPathwayTrayOpen(false)}
         onSave={handleSavePathwayDetails}
       />
       <MilestoneTray
+        allBadges={allBadges}
         milestone={activeMilestone}
         open={milestoneTrayOpen}
         variant={milestoneTrayVariant}

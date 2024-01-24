@@ -393,7 +393,7 @@ class LearnerPassportController < ApplicationController
       completed_count: 0,
       first_milestones: [],
       milestones: [],
-      completion_award: nil,
+      completion_award: nil, # id of entry in learner_passport_pathway_achievements
       learner_groups: [],
       shares: [],
     }
@@ -409,6 +409,7 @@ class LearnerPassportController < ApplicationController
       enrolled_student_count: 63,
       started_count: 42,
       completed_count: 15,
+      completion_award: "1",
       first_milestones: ["1", "2"],
       milestones: [
         {
@@ -416,6 +417,7 @@ class LearnerPassportController < ApplicationController
           title: "Introduction to Marketing",
           description: "Taught by three of Warton's top faculty in the marketing department, consistently raked as the #1 business school in the world, this course covers three core topics in customer loyalty: branding, customer centricity, and practical, go-to-market strategies.",
           required: true,
+          completion_award: nil,
           requirements: [
             {
               id: "1",
@@ -439,6 +441,7 @@ class LearnerPassportController < ApplicationController
           title: "Introduction to Financial Accounting",
           description: "Master the technical skills needed to analyze financial statements and disclosures for use in financial analysis.",
           required: false,
+          completion_award: nil,
           requirements: [{ id: "3" }],
           next_milestones: []
         },
@@ -447,6 +450,7 @@ class LearnerPassportController < ApplicationController
           title: "Marketing Strategy and Brand Positioning",
           description: "Professor Kahn starts us off with the first of two Branding modules: Marketing Strategy and Brand Positioning. Then, you'll move on to the second Branding module where we'll teach you to analyze end line data and develop insights to guide your brand strategy.",
           required: true,
+          completion_award: nil,
           requirements: [{ id: "4" }, { id: "5" }],
           next_milestones: []
         },
@@ -455,6 +459,7 @@ class LearnerPassportController < ApplicationController
           title: "The Limits of Product-Centric Thinking & The Opportunities and Challenges of Customer Centricity",
           description: "Module 2 of our class features Professor Peter Fader, who will focus on concepts related to Customer Centric Marketing. In an economy that is increasingly responsive to customer behaviors, it is imperative to focus on the right customers for strategic advantages. You will learn how to acquire and retain the right customers, generate more profits from them and evaluate the effectiveness of your marketing activities.",
           required: true,
+          completion_award: nil,
           requirements: [{ id: "6" }, { id: "7" }],
           next_milestones: ["5"]
         },
@@ -463,6 +468,7 @@ class LearnerPassportController < ApplicationController
           title: "Communications Strategy & Fundamentals of Pricing",
           description: "Complte this course as part of the Wharton's Business Foundations Specialization, and you'll have the opportunity to learn the essentials of marketing management while earning an online certificate from The Wharton School!",
           required: true,
+          completion_award: nil,
           requirements: [],
           next_milestones: []
         }

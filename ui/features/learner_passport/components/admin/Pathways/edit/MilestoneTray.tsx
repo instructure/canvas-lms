@@ -29,20 +29,28 @@ import {TextArea} from '@instructure/ui-text-area'
 import {TextInput} from '@instructure/ui-text-input'
 import {Tray} from '@instructure/ui-tray'
 import {View} from '@instructure/ui-view'
-import type {MilestoneData, RequirementData} from '../../../types'
+import type {MilestoneData, RequirementData, PathwayBadgeType} from '../../../types'
 import AddRequirementTray from './AddRequirementTray'
+import AddBadgeTray, {renderBadge} from './AddBadgeTray'
 import MilestoneRequirementCard from './requirements/MilestoneRequirementCard'
-import {showUnimplemented} from '../../../shared/utils'
 
 type MilestoneTrayProps = {
   milestone: MilestoneData
   open: boolean
   variant: 'add' | 'edit'
+  allBadges: PathwayBadgeType[]
   onClose: () => void
   onSave: (milestone: MilestoneData) => void
 }
 
-const MilestoneTray = ({milestone, open, variant, onClose, onSave}: MilestoneTrayProps) => {
+const MilestoneTray = ({
+  milestone,
+  open,
+  variant,
+  allBadges,
+  onClose,
+  onSave,
+}: MilestoneTrayProps) => {
   const [milestoneId, setMilestoneId] = useState(milestone.id)
   const [title, setTitle] = useState(milestone.title)
   const [description, setDescription] = useState(milestone.description)
@@ -51,6 +59,9 @@ const MilestoneTray = ({milestone, open, variant, onClose, onSave}: MilestoneTra
   const [activeRequirement, setActiveRequirement] = useState<RequirementData | undefined>(undefined)
   const [reqTrayOpen, setReqTrayOpen] = useState(false)
   const [reqTrayKey, setReqTrayKey] = useState(0)
+  const [addBadgeTrayOpen, setAddBadgeTrayOpen] = useState(false)
+  const [selectedBadgeId, setSelectedBadgeId] = useState<string | null>(milestone.completion_award)
+  const [validName, setValidName] = useState(true)
 
   useEffect(() => {
     if (milestoneId !== milestone.id) {
@@ -69,12 +80,18 @@ const MilestoneTray = ({milestone, open, variant, onClose, onSave}: MilestoneTra
     milestoneId,
   ])
 
+  const isValid = useCallback(() => {
+    setValidName(!!title)
+    return !!title
+  }, [title])
+
   const handleCancel = useCallback(() => {
     setReqTrayOpen(false)
     onClose()
   }, [onClose])
 
   const handleSave = useCallback(() => {
+    if (!title) return
     setReqTrayOpen(false)
     const newMilestone: MilestoneData = {
       id: milestoneId,
@@ -82,11 +99,20 @@ const MilestoneTray = ({milestone, open, variant, onClose, onSave}: MilestoneTra
       description,
       required,
       requirements,
-      achievements: [],
-      next_milestones: [],
+      completion_award: selectedBadgeId,
+      next_milestones: milestone.next_milestones,
     }
     onSave(newMilestone)
-  }, [description, milestoneId, onSave, required, requirements, title])
+  }, [
+    description,
+    milestone.next_milestones,
+    milestoneId,
+    onSave,
+    required,
+    requirements,
+    selectedBadgeId,
+    title,
+  ])
 
   const handleNameChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>, newName: string) => {
@@ -145,7 +171,12 @@ const MilestoneTray = ({milestone, open, variant, onClose, onSave}: MilestoneTra
   )
 
   const handleAddAchievementClick = useCallback(() => {
-    showUnimplemented({currentTarget: {textContent: 'Add Achievement'}})
+    setAddBadgeTrayOpen(true)
+  }, [])
+
+  const handleSaveBadge = useCallback((badgeId: string | null) => {
+    setSelectedBadgeId(badgeId)
+    setAddBadgeTrayOpen(false)
   }, [])
 
   return (
@@ -185,7 +216,11 @@ const MilestoneTray = ({milestone, open, variant, onClose, onSave}: MilestoneTra
                     isRequired={true}
                     renderLabel="Step Name"
                     value={title}
+                    onBlur={() => setValidName(!!title)}
                     onChange={handleNameChange}
+                    messages={
+                      validName ? undefined : [{text: 'Step name is Required', type: 'error'}]
+                    }
                   />
                 </View>
                 <View as="div" margin="0 0 small 0">
@@ -251,9 +286,10 @@ const MilestoneTray = ({milestone, open, variant, onClose, onSave}: MilestoneTra
                   <Text as="div">
                     Add a badge or certificate to this milestone to recognize a key accomplishment.
                   </Text>
+                  {selectedBadgeId && renderBadge(allBadges, selectedBadgeId)}
                   <Button
                     renderIcon={IconAddLine}
-                    margin="medium 0 0 0"
+                    margin="small 0 0 0"
                     onClick={handleAddAchievementClick}
                   >
                     Add Achievement
@@ -280,6 +316,13 @@ const MilestoneTray = ({milestone, open, variant, onClose, onSave}: MilestoneTra
         variant="add"
         onClose={handleRequirementTrayClose}
         onSave={handleSaveRequirement}
+      />
+      <AddBadgeTray
+        selectedBadgeId={selectedBadgeId}
+        open={addBadgeTrayOpen}
+        onClose={() => setAddBadgeTrayOpen(false)}
+        onSave={handleSaveBadge}
+        allBadges={allBadges}
       />
     </View>
   )

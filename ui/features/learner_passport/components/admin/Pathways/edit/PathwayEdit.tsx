@@ -40,7 +40,10 @@ const PathwayEdit = () => {
   })
   const [draftPathway, setDraftPathway] = useState<DraftPathway>(() => {
     const pw = {...pathway, timestamp: Date.now()}
-    if (!pw.id) pw.id = uid('pathway', 3)
+    if (!pw.id) {
+      pw.id = uid('pathway', 3)
+      pw.title = 'New Pathway'
+    }
     return pw
   })
 
@@ -76,13 +79,21 @@ const PathwayEdit = () => {
     [draftPathway]
   )
 
+  const reqCount = useCallback(() => {
+    return draftPathway.milestones.reduce((acc, m) => {
+      return acc + m.requirements.length
+    }, 0)
+  }, [draftPathway.milestones])
+
   return (
     <Flex as="div" direction="column" alignItems="stretch" height="100%">
       <AdminHeader
         title={
           <>
             <Heading level="h1">{draftPathway.title}</Heading>
-            <Text size="small">{draftPathway.milestones.length} Milestones | y Requirements</Text>
+            <Text size="small">
+              {draftPathway.milestones.length} Milestones | {reqCount()} Requirements
+            </Text>
           </>
         }
         breadcrumbs={[
