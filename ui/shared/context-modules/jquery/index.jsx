@@ -845,6 +845,28 @@ const renderDifferentiatedModulesTray = (
   )
 }
 
+// Based on the logic from ui/shared/context-modules/differentiated-modules/utils/moduleHelpers.ts
+const updateUnlockTime = function ($module, unlock_at) {
+  const friendlyDatetime = unlock_at ? $.datetimeString(unlock_at) : ''
+
+  const unlockAtElement = $module.find('.unlock_at')
+  if (unlockAtElement.length) {
+    unlockAtElement.text(friendlyDatetime)
+  }
+
+  const displayedUnlockAtElement = $module.find('.displayed_unlock_at')
+  if (displayedUnlockAtElement.length) {
+    displayedUnlockAtElement.text(friendlyDatetime)
+    displayedUnlockAtElement.attr('data-html-tooltip-title', friendlyDatetime)
+  }
+
+  const unlockDetailsElement = $module.find('.unlock_details')
+  if (unlockDetailsElement.length) {
+    // User has selected a lock date and that date is in the future
+    $module.find('.unlock_details').showIf(unlock_at && Date.parse(unlock_at) > new Date())
+  }
+}
+
 const updatePrerequisites = function ($module, prereqs) {
   const $prerequisitesDiv = $module.find('.prerequisites')
   let prereqsList = ''
@@ -969,8 +991,6 @@ modules.initModuleManagement = function (duplicate) {
 
   // -------- BINDING THE UPDATE EVENT -----------------
   $('.context_module').bind('update', (event, data) => {
-    data.context_module.displayed_unlock_at = $.datetimeString(data.context_module.unlock_at)
-    data.context_module.unlock_at = $.datetimeString(data.context_module.unlock_at)
     const $module = $('#context_module_' + data.context_module.id)
     $module.attr('data-module-id', data.context_module.id)
     $module.attr('aria-label', data.context_module.name)
@@ -985,11 +1005,7 @@ modules.initModuleManagement = function (duplicate) {
       hrefValues: ['id'],
     })
 
-    $module
-      .find('.unlock_details')
-      .showIf(
-        data.context_module.unlock_at && Date.parse(data.context_module.unlock_at) > new Date()
-      )
+    updateUnlockTime($module, data.context_module.unlock_at)
     updatePrerequisites($module, data.context_module.prerequisites)
     updateOtherPrerequisites(data.context_module.id, data.context_module.name)
 
