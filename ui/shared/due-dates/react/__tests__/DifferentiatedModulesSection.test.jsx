@@ -18,10 +18,10 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
-import DifferentiatedModulesLink from '../DifferentiatedModulesLink'
+import DifferentiatedModulesSection from '../DifferentiatedModulesSection'
 import AssignmentOverrideCollection from '@canvas/assignments/backbone/collections/AssignmentOverrideCollection'
 
-describe('DifferentiatedModulesLink', () => {
+describe('DifferentiatedModulesSection', () => {
     const assignmentcollection = new AssignmentOverrideCollection([{
         id: "100",
         assignment_id: "5",
@@ -38,7 +38,8 @@ describe('DifferentiatedModulesLink', () => {
       }])
 
     const props = {
-        onSave: () => { },
+        onSync: () => { },
+        importantDates: false,
         assignmentName: 'First Assignment',
         assignmentId: '1',
         type: 'assignment',
@@ -48,7 +49,7 @@ describe('DifferentiatedModulesLink', () => {
     }
 
     it('renders', () => {
-        const {getByText} = render(<DifferentiatedModulesLink {...props} />)
+        const {getByText} = render(<DifferentiatedModulesSection {...props} />)
         expect(
             getByText('Manage Assign To')
           ).toBeInTheDocument()
@@ -58,17 +59,50 @@ describe('DifferentiatedModulesLink', () => {
     })
 
     it('opens ItemAssignToTray', () => {
-        const {getByText, getByTestId} = render(<DifferentiatedModulesLink {...props} />)
+        const {getByText, getByTestId} = render(<DifferentiatedModulesSection {...props} />)
         getByTestId('manage-assign-to').click()
         expect(getByText('First Assignment')).toBeInTheDocument()
     })
 
-    it('calls onSave when saving changes made in ItemAssignToTray', () => {
-        const onSaveMock = jest.fn()
-        const {getByRole, getByTestId} = render(<DifferentiatedModulesLink {...props} onSave={onSaveMock} />)
+    it('calls onSync when saving changes made in ItemAssignToTray', () => {
+        const onSyncMock = jest.fn()
+        const {getByRole, getByTestId} = render(<DifferentiatedModulesSection {...props} onSync={onSyncMock} />)
 
         getByTestId('manage-assign-to').click()
         getByRole('button', {name: 'Save'}).click()
-        expect(onSaveMock).toHaveBeenCalled()
+        expect(onSyncMock).toHaveBeenCalledWith(assignmentcollection.models, props.importantDates)
+    })
+
+    describe('important dates', ()=>{
+        beforeAll(()=>{
+            global.ENV = {
+                K5_SUBJECT_COURSE: true
+            }
+        })
+
+        it('does not render the option for non-assignment items', ()=>{
+            const {queryByTestId} = render(<DifferentiatedModulesSection {...props} type="quiz" />)
+
+            expect(queryByTestId('important_dates')).not.toBeInTheDocument()
+        })
+
+        it('calls onSync with the importantDates flag when checking/unchecking the option', () => {
+            const onSyncMock = jest.fn()
+            const {getByTestId} = render(<DifferentiatedModulesSection {...props} onSync={onSyncMock} />)
+
+            getByTestId('important_dates').click()
+            expect(onSyncMock).toHaveBeenCalledWith(undefined, true)
+
+            getByTestId('important_dates').click()
+            expect(onSyncMock).toHaveBeenCalledWith(undefined, false)
+        })
+
+        it('disables the importantDates check when no due dates are set', () => {
+            const override = assignmentcollection.models[0]
+            override.set('due_at', '')
+            const {getByTestId} = render(<DifferentiatedModulesSection {...props} overrides={[override]} />)
+
+            expect(getByTestId('important_dates')).toBeDisabled()
+        })
     })
 })
