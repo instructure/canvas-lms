@@ -14,6 +14,6 @@ Gem::Specification.new do |s|
 
   s.files = Dir["{lib}/**/*"]
 
-  s.add_dependency "moodle2cc", "0.2.42"
+  s.add_dependency "moodle2cc", "0.2.43"
   s.add_dependency "rails", ">= 3.2"
 end
