@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as uploadFileModule from '@canvas/upload-file'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {ApolloProvider} from 'react-apollo'
 import ComposeModalManager from '../ComposeModalContainer/ComposeModalManager'
@@ -26,16 +25,21 @@ import {handlers} from '../../../graphql/mswHandlers'
 import {mswClient} from '../../../../../shared/msw/mswClient'
 import {mswServer} from '../../../../../shared/msw/mswServer'
 import React from 'react'
-import {responsiveQuerySizes} from '../../../util/utils'
 import {ConversationContext} from '../../../util/constants'
+import * as utils from '../../../util/utils'
+import * as uploadFileModule from '@canvas/upload-file'
 
-jest.mock('../../../util/utils', () => ({
-  ...jest.requireActual('../../../util/utils'),
-  responsiveQuerySizes: jest.fn(),
+jest.mock('@canvas/upload-file', () => ({
+  uploadFiles: jest.fn().mockResolvedValue([]), // Or any initial mock setup
 }))
 
-// VICE-4065 - remove or rewrite to remove spies on responsiveQuerySizes import
-describe.skip('ComposeModalContainer', () => {
+jest.mock('../../../util/utils', () => ({
+  responsiveQuerySizes: jest.fn().mockReturnValue({
+    desktop: {minWidth: '768px'},
+  }),
+}))
+
+describe('ComposeModalContainer', () => {
   const server = mswServer(handlers)
   beforeAll(() => {
     server.listen()
@@ -50,11 +54,6 @@ describe.skip('ComposeModalContainer', () => {
         removeListener: jest.fn(),
       }
     })
-
-    // Repsonsive Query Mock Default
-    responsiveQuerySizes.mockImplementation(() => ({
-      desktop: {minWidth: '768px'},
-    }))
   })
 
   afterEach(() => {
@@ -143,7 +142,8 @@ describe.skip('ComposeModalContainer', () => {
     })
   })
 
-  describe('Attachments', () => {
+  // VICE-4065 - remove or rewrite to remove spies on responsiveQuerySizes import
+  describe.skip('Attachments', () => {
     it('attempts to upload a file', async () => {
       uploadFileModule.uploadFiles.mockResolvedValue([{id: '1', name: 'file1.jpg'}])
       const {findByTestId} = setup()
@@ -538,9 +538,9 @@ describe.skip('ComposeModalContainer', () => {
   describe('Responsive', () => {
     describe('Mobile', () => {
       beforeEach(() => {
-        responsiveQuerySizes.mockImplementation(() => ({
+        utils.responsiveQuerySizes.mockReturnValue({
           mobile: {maxWidth: '67'},
-        }))
+        })
       })
 
       it('Should emit correct testId for mobile compose window', async () => {
@@ -552,9 +552,9 @@ describe.skip('ComposeModalContainer', () => {
 
     describe('Desktop', () => {
       beforeEach(() => {
-        responsiveQuerySizes.mockImplementation(() => ({
+        utils.responsiveQuerySizes.mockReturnValue({
           desktop: {minWidth: '768'},
-        }))
+        })
       })
 
       it('Should emit correct testId for destop compose window', async () => {
@@ -566,6 +566,7 @@ describe.skip('ComposeModalContainer', () => {
   })
 
   it('validates recipients', async () => {
+    const mockedSetOnFailure = jest.fn().mockResolvedValue({})
     const mockConversation = {
       _id: '1',
       messages: [
@@ -584,7 +585,12 @@ describe.skip('ComposeModalContainer', () => {
         },
       ],
     }
-    const component = setup({conversation: mockConversation, isForward: true})
+    const component = setup({
+      conversation: mockConversation,
+      isForward: true,
+      setOnFailure: mockedSetOnFailure,
+      selectedIds: [],
+    })
 
     // Wait for modal to load
     await component.findByTestId('message-body')
@@ -592,6 +598,10 @@ describe.skip('ComposeModalContainer', () => {
     // Hit send
     const button = component.getByTestId('send-button')
     fireEvent.click(button)
+    expect(mockedSetOnFailure).toHaveBeenCalledWith(
+      'Please insert a message body., Please select a recipient.',
+      true
+    )
 
     expect(component.findByText('Please select a recipient.')).toBeTruthy()
 

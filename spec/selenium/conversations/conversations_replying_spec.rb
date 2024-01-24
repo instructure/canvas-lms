@@ -57,7 +57,8 @@ describe "conversations new" do
         f("textarea[data-testid='message-body']").send_keys("no recipient")
         f("button[data-testid='send-button']").click
         wait_for_ajaximations
-        expect(fj("span:contains('Please select a recipient.')")).to be_displayed
+        # There is a hidden screen reader message that is not displayed and a visible error message
+        expect(ffj("span:contains('Please select a recipient.')")[1]).to be_displayed
       end
 
       it "allows adding a new recipient", :ignore_js_errors do
