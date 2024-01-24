@@ -572,8 +572,7 @@ export default AssignmentListItemView = (function () {
       const courseId = e.target.getAttribute('data-assignment-context-id')
       const itemName = e.target.getAttribute('data-assignment-name')
       const itemContentId = e.target.getAttribute('data-assignment-id')
-      const pointsPossible =
-        parseFloat(e.target.getAttribute('data-assignment-points-possible')) + ' pts'
+      const pointsPossible = this.model.get('points_possible')
       const iconType = e.target.getAttribute('data-assignment-type')
       this.renderItemAssignToTray(true, returnFocusTo, {
         courseId,

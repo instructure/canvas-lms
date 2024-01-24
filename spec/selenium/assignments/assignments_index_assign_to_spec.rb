@@ -43,6 +43,7 @@ shared_examples_for "selective_release assign to tray" do |context|
     expect(item_tray_exists?).to be_truthy
     expect(tray_header.text).to eq("test assignment")
     expect(icon_type_exists?("Assignment")).to be true
+    expect(item_type_text.text).to include("25 pts")
   end
 
   it "assigns student and saves assignment" do
@@ -168,7 +169,7 @@ describe "assignments index menu tool placement" do
   before :once do
     Account.site_admin.enable_feature! :differentiated_modules
     course_with_teacher(active_all: true)
-    @assignment1 = @course.assignments.create(name: "test assignment")
+    @assignment1 = @course.assignments.create(name: "test assignment", points_possible: 25)
 
     @course.enable_feature! :quizzes_next
     @course.context_external_tools.create!(
