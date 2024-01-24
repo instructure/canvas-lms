@@ -39,7 +39,7 @@ GEM
     i18n (1.14.1)
       concurrent-ruby (~> 1.0)
     idn-ruby (0.1.5)
-    io-console (0.7.1)
+    io-console (0.7.2)
     irb (1.11.1)
       rdoc
       reline (>= 0.4.2)

@@ -111,7 +111,7 @@ GEM
       debug_inspector (~> 1.0)
       fugit (~> 1.3)
       railties (>= 6.0)
-    io-console (0.7.1)
+    io-console (0.7.2)
     irb (1.11.1)
       rdoc
       reline (>= 0.4.2)
