@@ -35,4 +35,8 @@ module Checkpoints
   class SetIdRequiredError < DiscussionCheckpointError; end
 
   class StudentIdsRequiredError < DiscussionCheckpointError; end
+
+  class CheckpointNotFoundError < DiscussionCheckpointError; end
+
+  class OverrideNotFoundError < DiscussionCheckpointError; end
 end

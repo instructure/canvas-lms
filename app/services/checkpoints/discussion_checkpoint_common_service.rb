@@ -123,4 +123,10 @@ class Checkpoints::DiscussionCheckpointCommonService < ApplicationService
       date_type == type
     end
   end
+
+  def compute_due_dates_and_create_submissions(checkpoint)
+    assignments = [checkpoint, checkpoint.parent_assignment]
+    AbstractAssignment.clear_cache_keys(assignments, :availability)
+    SubmissionLifecycleManager.recompute_course(checkpoint.course, assignments:, update_grades: true)
+  end
 end
