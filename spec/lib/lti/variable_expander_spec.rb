@@ -1177,6 +1177,20 @@ module Lti
             expect(JSON.parse(expand!("$com.instructure.User.sectionNames"))).to \
               match_array ["section one", "section two"]
           end
+
+          it "orders the names by section id" do
+            add_section("section three", { course: })
+            s1 = course.course_sections.find_by(name: "section one")
+            s2 = course.course_sections.find_by(name: "section two")
+            s3 = course.course_sections.find_by(name: "section three")
+            create_enrollment(course, user, { section: s3 }) # Create the enrollment "out of order" based on section id
+            create_enrollment(course, user, { section: s2 })
+            exp_hash = { test: "$com.instructure.User.sectionNames" }
+            variable_expander.expand_variables!(exp_hash)
+            expect(s1.id).to be < s2.id
+            expect(s2.id).to be < s3.id
+            expect(JSON.parse(exp_hash[:test])).to eq ["section one", "section two", "section three"]
+          end
         end
 
         context "when the course has groups" do
