@@ -1303,15 +1303,16 @@ QUnit.module('SpeedGrader', rootHooks => {
         strictEqual(provisionalGrade.selected, true)
       })
 
-      test('does not select the provisional grade if the user is not the final grader', () => {
+      test('does not select the provisional grade if the user is not the final grader', async() => {
         env.current_user_id = '1102'
         fakeENV.setup(env)
         SpeedGrader.EG.handleGradeSubmit(null, true)
+        await awhile()
         strictEqual(provisionalGrade.selected, false)
       })
     })
 
-    test('hasWarning and flashWarning are called', function () {
+    test('hasWarning and flashWarning are called', async() => {
       SpeedGrader.EG.jsonReady()
       const flashWarningStub = sandbox.stub($, 'flashWarning')
       sandbox.stub(SpeedGraderHelpers, 'determineGradeToSubmit').returns('15')
@@ -1319,6 +1320,7 @@ QUnit.module('SpeedGrader', rootHooks => {
       sandbox.stub(SpeedGrader.EG, 'refreshSubmissionsToView')
       sandbox.stub(SpeedGrader.EG, 'updateSelectMenuStatus')
       sandbox.stub(SpeedGrader.EG, 'showGrade')
+      await awhile()
       SpeedGrader.EG.handleGradeSubmit(10, false)
       const [, , , callback] = $.ajaxJSON.getCall(2).args
       const submissions = [
@@ -1327,11 +1329,13 @@ QUnit.module('SpeedGrader', rootHooks => {
         },
       ]
       callback(submissions)
+      await awhile()
       ok(flashWarningStub.calledOnce)
     })
 
-    test('handleGradeSubmit should submit score if using existing score', () => {
+    test('handleGradeSubmit should submit score if using existing score', async () => {
       SpeedGrader.EG.jsonReady()
+      await awhile()
       SpeedGrader.EG.handleGradeSubmit(null, true)
       equal($.ajaxJSON.getCall(2).args[0], 'my_url.com')
       equal($.ajaxJSON.getCall(2).args[1], 'POST')
@@ -1341,9 +1345,10 @@ QUnit.module('SpeedGrader', rootHooks => {
       equal(formData['submission[user_id]'], 4)
     })
 
-    test('handleGradeSubmit should submit grade if not using existing score', function () {
+    test('handleGradeSubmit should submit grade if not using existing score', async () => {
       SpeedGrader.EG.jsonReady()
       sandbox.stub(SpeedGraderHelpers, 'determineGradeToSubmit').returns('56')
+      await awhile()
       SpeedGrader.EG.handleGradeSubmit(null, false)
       equal($.ajaxJSON.getCall(2).args[0], 'my_url.com')
       equal($.ajaxJSON.getCall(2).args[1], 'POST')
@@ -1364,11 +1369,12 @@ QUnit.module('SpeedGrader', rootHooks => {
       SpeedGraderHelpers.determineGradeToSubmit.restore()
     })
 
-    test('unexcuses the submission if the grade is blank and the assignment is complete/incomplete', function () {
+    test('unexcuses the submission if the grade is blank and the assignment is complete/incomplete', async ()=>  {
       SpeedGrader.EG.jsonReady()
       sandbox.stub(SpeedGraderHelpers, 'determineGradeToSubmit').returns('')
       window.jsonData.grading_type = 'pass_fail'
       SpeedGrader.EG.currentStudent.submission.excused = true
+      await awhile()
       SpeedGrader.EG.handleGradeSubmit(null, false)
       const [, , formData] = $.ajaxJSON.getCall(2).args
       strictEqual(formData['submission[excuse]'], false)
@@ -3191,32 +3197,36 @@ QUnit.module('SpeedGrader', rootHooks => {
       fakeENV.teardown()
     })
 
-    test('shows an error', () => {
+    test('shows an error', async () => {
       SpeedGrader.setup()
+      await awhile()
       notEqual($('#speed_grader_timeout_alert').text(), '')
     })
 
     QUnit.module('when the filter_speed_grader_by_student_group feature is enabled', () => {
-      test('includes a link to the "large course" setting when the setting is not enabled', () => {
+      test('includes a link to the "large course" setting when the setting is not enabled', async () => {
         ENV.filter_speed_grader_by_student_group_feature_enabled = true
         ENV.filter_speed_grader_by_student_group = false
         SpeedGrader.setup()
+        await awhile()
         const $link = $('#speed_grader_timeout_alert a')
         const url = new URL($link[0].href)
         strictEqual(url.pathname, '/courses/29/settings')
       })
 
-      test('excludes a link to the "large course" setting when the setting is already enabled', () => {
+      test('excludes a link to the "large course" setting when the setting is already enabled', async () => {
         ENV.filter_speed_grader_by_student_group_feature_enabled = true
         ENV.filter_speed_grader_by_student_group = true
         SpeedGrader.setup()
+        await awhile()
         strictEqual($('#speed_grader_timeout_alert a').length, 0)
       })
     })
 
-    test('excludes a link to the "large course" setting when the filter_speed_grader_by_student_group feature is disabled', () => {
+    test('excludes a link to the "large course" setting when the filter_speed_grader_by_student_group feature is disabled', async () => {
       ENV.filter_speed_grader_by_student_group_feature_enabled = false
       SpeedGrader.setup()
+      await awhile()
       strictEqual($('#speed_grader_timeout_alert a').length, 0)
     })
   })
