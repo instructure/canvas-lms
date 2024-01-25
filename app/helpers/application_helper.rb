@@ -186,7 +186,7 @@ module ApplicationHelper
       });"
   end
 
-  # puts the "main" webpack entry and the moment & timezone files in the <head> of the document
+  # puts webpack entries and the moment & timezone files in the <head> of the document
   def include_head_js
     paths = []
     paths << active_brand_config_url("js")
@@ -205,7 +205,7 @@ module ApplicationHelper
       )
     end
 
-    @script_chunks = ::Canvas::Cdn.registry.scripts_for("main")
+    @script_chunks = ::Canvas::Cdn.registry.entries
     @script_chunks.uniq!
 
     chunk_urls = @script_chunks

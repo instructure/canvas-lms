@@ -47,6 +47,10 @@ module Canvas
           end
         end
 
+        def entries
+          @manifest.values.grep(/-entry-\w+\.js/).map { |file_path| realpath(file_path) }
+        end
+
         private
 
         def load_manifest_from_disk

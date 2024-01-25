@@ -125,7 +125,14 @@ module.exports = {
 
       // which chunks will be selected for optimization
       chunks: 'all',
-      cacheGroups: {defaultVendors: false}, // don't split out node_modules and app code in different chunks
+      cacheGroups: {
+        react: {
+          test: /[\\/]node_modules[\\/](react|react-dom)[\\/]/,
+          name: 'react',
+          chunks: 'all',
+        },
+        defaultVendors: false,
+      },
     },
   },
 
