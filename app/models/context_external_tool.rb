@@ -1456,7 +1456,7 @@ class ContextExternalTool < ActiveRecord::Base
 
   # Add new types to this as we finish their migration methods
   # and they'll be automagically migrated.
-  VALID_MIGRATION_TYPES = [Assignment, ContentTag].freeze
+  VALID_MIGRATION_TYPES = [Assignment, ContentTag, ExternalToolCollaboration].freeze
 
   # for helping tool providers upgrade from 1.1 to 1.3.
   # this method will upgrade all related content to 1.3,
@@ -1487,13 +1487,13 @@ class ContextExternalTool < ActiveRecord::Base
       VALID_MIGRATION_TYPES.each do |type|
         next unless type.include?(Lti::Migratable)
 
-        type.directly_associated_items(tool_id, context).find_ids_in_batches do |ids|
+        type.directly_associated_items(tool_id, context)&.find_ids_in_batches do |ids|
           delay_if_production(
             priority: Delayed::LOW_PRIORITY,
             n_strand: ["ContextExternalTool#migrate_content_to_1_3", tool_id]
           ).prepare_direct_batch_for_migration(ids, type)
         end
-        type.indirectly_associated_items(tool_id, context).find_ids_in_batches do |ids|
+        type.indirectly_associated_items(tool_id, context)&.find_ids_in_batches do |ids|
           delay_if_production(
             priority: Delayed::LOW_PRIORITY,
             n_strand: ["ContextExternalTool#migrate_content_to_1_3", tool_id]
@@ -1522,7 +1522,9 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def prepare_content_for_migration(content)
-    content.migrate_to_1_3_if_needed!(self)
+    GuardRail.activate(:primary) do
+      content.migrate_to_1_3_if_needed!(self)
+    end
   rescue ActiveRecord::RecordInvalid, PG::UniqueViolation => e
     Sentry.with_scope do |scope|
       scope.set_tags(content_id: content.global_id)

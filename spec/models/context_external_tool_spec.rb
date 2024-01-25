@@ -3655,6 +3655,7 @@ describe ContextExternalTool do
 
       let(:course) { course_model(account:) }
       let(:account) { account_model }
+      let(:url) { "https://special.url" }
       let(:direct_assignment) do
         a = assignment_model(context: course, title: "direct", submission_types: "external_tool")
         a.external_tool_tag = ContentTag.create!(context: a, content: old_tool)
@@ -3667,7 +3668,14 @@ describe ContextExternalTool do
         a.save!
         a
       end
-      let(:old_tool) { external_tool_model(context: course, opts: { url: "https://special.url" }) }
+      let(:indirect_collaboration) do
+        external_tool_collaboration_model(
+          context: course,
+          title: "Indirect Collaboration",
+          url:
+        )
+      end
+      let(:old_tool) { external_tool_model(context: course, opts: { url: }) }
       let(:tool) do
         t = old_tool.dup
         t.lti_version = "1.3"
@@ -3682,6 +3690,13 @@ describe ContextExternalTool do
         subject
         expect(direct_assignment.line_items.count).to eq 1
         expect(indirect_assignment.line_items.count).to eq 1
+      end
+
+      it "calls external_tool_collaboration#migrate_to_1_3_if_needed!" do
+        indirect_collaboration
+        expect(course.lti_resource_links.count).to eq 0
+        subject
+        expect(course.lti_resource_links.count).to eq 1
       end
 
       shared_examples_for "finds related content" do
@@ -3744,6 +3759,12 @@ describe ContextExternalTool do
           subject
           expect(tool).to have_received(:prepare_content_for_migration).with(direct)
           expect(tool).to have_received(:prepare_content_for_migration).with(indirect)
+        end
+
+        it "finds indirect collaboration" do
+          indirect_collaboration
+          subject
+          expect(tool).to have_received(:prepare_content_for_migration).with(indirect_collaboration)
         end
       end
 
