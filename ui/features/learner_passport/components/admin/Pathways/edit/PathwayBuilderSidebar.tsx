@@ -125,13 +125,14 @@ const PathwayBuilderSidebar = ({
         {currentStep === null ? (
           <PathwayCard step={pathway} onEdit={handleEditPathway} />
         ) : (
-          <MilestoneCard step={currentStep} onEdit={handleEditMilestone} />
+          <MilestoneCard step={currentStep} variant="root" onEdit={handleEditMilestone} />
         )}
         <Connector />
         {childMilestones.map((step: MilestoneData) => (
           <div key={step.id} style={{marginBottom: '30px'}}>
             <MilestoneCard
               step={step}
+              variant="child"
               onEdit={handleEditMilestone}
               onDelete={handleDeleteMilestone}
             />
