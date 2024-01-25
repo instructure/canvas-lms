@@ -69,6 +69,7 @@ module Canvas
       # @return [Array.<String>]
       #  Real paths to the JS files that make up the specified bundle
       delegate :scripts_for, to: :bundler
+      delegate :entries, to: :bundler
 
       # @return [String]
       #  Real path to the asset.

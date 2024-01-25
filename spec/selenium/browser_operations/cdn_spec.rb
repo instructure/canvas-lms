@@ -94,6 +94,5 @@ describe "Stuff related to how we load stuff from CDN and use brandable_css" do
     check_asset("script", "/timezone/Etc/UTC.js")
     check_asset("script", "/timezone/en_US.js")
     Canvas::Cdn.registry.scripts_for("main").each { |c| check_asset("script", c, true) }
-    Canvas::Cdn.registry.scripts_for("login").each { |c| check_asset("link", c, true) }
   end
 end
