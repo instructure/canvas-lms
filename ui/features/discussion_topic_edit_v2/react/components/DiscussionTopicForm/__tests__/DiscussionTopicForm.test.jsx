@@ -149,12 +149,11 @@ describe('DiscussionTopicForm', () => {
       expect(queryByText('Not Published')).not.toBeInTheDocument()
     })
 
-    it('does not show the publish indicator when not editing', () => {
+    it('displays the publish indicator with the text `Not Published` when not editing', () => {
       const {queryByText} = setup({isEditing: false})
 
-      // Verifies that the publish indicator is not in the document
-      expect(queryByText('Published')).not.toBeInTheDocument()
-      expect(queryByText('Not Published')).not.toBeInTheDocument()
+      // Verifies that the publish indicator with the text Not Published is in the document
+      expect(queryByText('Not Published')).toBeInTheDocument()
     })
 
     it('displays publish indicator correctly', () => {
@@ -245,7 +244,7 @@ describe('DiscussionTopicForm', () => {
 
     it('shows too-long title reminder', async () => {
       const {getByText, getByLabelText} = setup()
-      const titleInput = getByLabelText('Topic Title')
+      const titleInput = getByLabelText(/Topic Title/)
       fireEvent.input(titleInput, {target: {value: 'A'.repeat(260)}})
       userEvent.type(titleInput, 'A')
       await waitFor(() =>

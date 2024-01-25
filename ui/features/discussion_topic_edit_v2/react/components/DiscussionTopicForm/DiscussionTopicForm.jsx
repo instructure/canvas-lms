@@ -670,7 +670,7 @@ export default function DiscussionTopicForm({
     return (
       <Flex justifyItems="space-between">
         <Flex.Item>{I18n.t('Topic Title')}</Flex.Item>
-        {!isAnnouncement && isEditing && <Flex.Item>{publishStatus}</Flex.Item>}
+        {!isAnnouncement && <Flex.Item>{publishStatus}</Flex.Item>}
       </Flex>
     )
   }
