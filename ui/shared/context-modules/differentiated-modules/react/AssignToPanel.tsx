@@ -61,14 +61,13 @@ type Option = {
 const EVERYONE_OPTION: Option = {
   value: 'everyone',
   getLabel: () => I18n.t('Everyone'),
-  getDescription: () => I18n.t('This module will be visible to everyone.'),
+  getDescription: () => I18n.t('This module is visible to everyone.'),
 }
 
 const CUSTOM_OPTION: Option = {
   value: 'custom',
-  getLabel: () => I18n.t('Custom Access'),
-  getDescription: () =>
-    I18n.t('Create custom access and optionally set Lock Until date for each group.'),
+  getLabel: () => I18n.t('Assign To'),
+  getDescription: () => I18n.t('Assign module to individuals or sections.'),
 }
 
 export const updateModuleAssignees = ({
@@ -201,12 +200,10 @@ export default function AssignToPanel({
       <Flex.Item padding="medium medium small" size={bodyHeight}>
         <Flex direction="column" justifyItems="start">
           <Flex.Item>
-            <Text>
-              {I18n.t('By default everyone in this course has assigned access to this module.')}
-            </Text>
+            <Text>{I18n.t('By default, this module is visible to everyone.')}</Text>
           </Flex.Item>
-          <Flex.Item overflowX="hidden">
-            <RadioInputGroup description={I18n.t('Select Access Type')} name="access_type">
+          <Flex.Item overflowX="hidden" margin="small 0 0 0">
+            <RadioInputGroup description={I18n.t('Set Visibility')} name="access_type">
               {[EVERYONE_OPTION, CUSTOM_OPTION].map(option => (
                 <Flex key={option.value} justifyItems="start">
                   <Flex.Item align="start">
@@ -252,7 +249,7 @@ export default function AssignToPanel({
       </Flex.Item>
       <Flex.Item margin="auto none none none" size={footerHeight}>
         <Footer
-          saveButtonLabel={moduleId ? I18n.t('Update Module') : I18n.t('Add Module')}
+          saveButtonLabel={moduleId ? I18n.t('Save') : I18n.t('Add Module')}
           onDismiss={onDismiss}
           onUpdate={handleSave}
         />

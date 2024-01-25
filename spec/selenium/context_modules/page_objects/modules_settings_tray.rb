@@ -319,7 +319,7 @@ module ModulesSettingsTray
   end
 
   def settings_tray_update_module_button
-    fxpath(settings_tray_button_selector("Edit Module Settings", "Update Module"))
+    fxpath(settings_tray_button_selector("Edit Module Settings", "Save"))
   end
 
   def settings_tray_close_button

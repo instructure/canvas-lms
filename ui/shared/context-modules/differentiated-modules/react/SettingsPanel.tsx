@@ -349,7 +349,7 @@ export default function SettingsPanel({
       </Flex.Item>
       <Flex.Item size={footerHeight}>
         <Footer
-          saveButtonLabel={moduleId ? I18n.t('Update Module') : I18n.t('Add Module')}
+          saveButtonLabel={moduleId ? I18n.t('Save') : I18n.t('Add Module')}
           onDismiss={customOnDismiss}
           onUpdate={handleSave}
           updateInteraction={state.nameInputMessages.length > 0 ? 'inerror' : 'enabled'}

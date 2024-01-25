@@ -62,9 +62,7 @@ describe('AssignToPanel', () => {
 
   it('renders', async () => {
     const {findByText} = renderComponent()
-    expect(
-      await findByText('By default everyone in this course has assigned access to this module.')
-    ).toBeInTheDocument()
+    expect(await findByText('By default, this module is visible to everyone.')).toBeInTheDocument()
   })
 
   it('renders options', async () => {
@@ -203,7 +201,7 @@ describe('AssignToPanel', () => {
       const option1 = await findByText(SECTIONS_DATA[0].name)
       act(() => option1.click())
 
-      getByRole('button', {name: 'Update Module'}).click()
+      getByRole('button', {name: 'Save'}).click()
       expect((await findAllByText('Module access updated successfully.'))[0]).toBeInTheDocument()
       const requestBody = fetchMock.lastOptions(ASSIGNMENT_OVERRIDES_URL)?.body
       const expectedPayload = JSON.stringify({
@@ -226,7 +224,7 @@ describe('AssignToPanel', () => {
       // removing the existing section override
       act(() => option1.click())
 
-      getByRole('button', {name: 'Update Module'}).click()
+      getByRole('button', {name: 'Save'}).click()
       expect((await findAllByText('Module access updated successfully.'))[0]).toBeInTheDocument()
       const requestBody = fetchMock.lastOptions(ASSIGNMENT_OVERRIDES_URL)?.body
       // it sends back the student list override, including the assignment override id
@@ -243,7 +241,7 @@ describe('AssignToPanel', () => {
       fetchMock.put(ASSIGNMENT_OVERRIDES_URL, {})
       jest.spyOn(utils, 'updateModuleUI')
       const {findByRole} = renderComponent()
-      const updateButton = await findByRole('button', {name: 'Update Module'})
+      const updateButton = await findByRole('button', {name: 'Save'})
       updateButton.click()
       await waitFor(() => expect(utils.updateModuleUI).toHaveBeenCalled())
     })
@@ -259,7 +257,7 @@ describe('AssignToPanel', () => {
       userEvent.click(await findByTestId('custom-option'))
       userEvent.click(await findByTestId('assignee_selector'))
       userEvent.click(await findByText(SECTIONS_DATA[0].name))
-      userEvent.click(getByRole('button', {name: 'Update Module'}))
+      userEvent.click(getByRole('button', {name: 'Save'}))
 
       await waitFor(() => {
         expect(onDidSubmitMock).toHaveBeenCalled()

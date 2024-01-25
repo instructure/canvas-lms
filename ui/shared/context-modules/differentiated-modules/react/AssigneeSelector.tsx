@@ -46,6 +46,7 @@ interface Props {
   customIsLoading?: boolean
   customSetSearchTerm?: (term: string) => void
   onError?: () => void
+  showVisualLabel?: boolean
 }
 
 export interface AssigneeOption {
@@ -70,6 +71,7 @@ const AssigneeSelector = ({
   customIsLoading,
   customSetSearchTerm,
   onError,
+  showVisualLabel = true,
 }: Props) => {
   const listElementRef = useRef<HTMLElement | null>(null)
   const [options, setOptions] = useState<AssigneeOption[]>(defaultValues)
@@ -118,12 +120,14 @@ const AssigneeSelector = ({
     }, 500)
   }
 
+  const label = I18n.t('Assign To')
+
   return (
     <>
       <CanvasMultiSelect
         data-testid="assignee_selector"
         messages={messages}
-        label={I18n.t('Assign To')}
+        label={showVisualLabel ? label : <ScreenReaderContent>{label}</ScreenReaderContent>}
         size={size}
         selectedOptionIds={selectedOptionIds}
         onChange={handleChange}

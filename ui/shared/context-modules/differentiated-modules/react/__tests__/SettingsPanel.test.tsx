@@ -168,7 +168,7 @@ describe('SettingsPanel', () => {
 
     it('validates the module name', () => {
       const {getByRole, getByText} = renderComponent({moduleName: ''})
-      const updateButton = getByRole('button', {name: 'Update Module'})
+      const updateButton = getByRole('button', {name: 'Save'})
 
       updateButton.click()
       updateButton.focus()
@@ -179,7 +179,7 @@ describe('SettingsPanel', () => {
     it('makes a request to the modules update endpoint', async () => {
       doFetchApi.mockResolvedValue({response: {ok: true}, json: {}})
       const {getByRole, findByTestId} = renderComponent()
-      getByRole('button', {name: 'Update Module'}).click()
+      getByRole('button', {name: 'Save'}).click()
       expect(await findByTestId('loading-overlay')).toBeInTheDocument()
       expect(doFetchApi).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -195,7 +195,7 @@ describe('SettingsPanel', () => {
       jest.spyOn(miscUtils, 'convertModuleSettingsForApi')
       doFetchApi.mockResolvedValue({response: {ok: true}, json: {}})
       const {getByRole} = renderComponent()
-      getByRole('button', {name: 'Update Module'}).click()
+      getByRole('button', {name: 'Save'}).click()
       expect(miscUtils.convertModuleSettingsForApi).toHaveBeenCalled()
     })
 
@@ -204,7 +204,7 @@ describe('SettingsPanel', () => {
       jest.spyOn(moduleUtils, 'updateModuleUI')
       doFetchApi.mockResolvedValue({response: {ok: true}, json: {}})
       const {getByRole} = renderComponent()
-      getByRole('button', {name: 'Update Module'}).click()
+      getByRole('button', {name: 'Save'}).click()
       await waitFor(() => {
         expect(moduleUtils.updateModuleUI).toHaveBeenCalled()
       })
@@ -215,7 +215,7 @@ describe('SettingsPanel', () => {
       jest.spyOn(alerts, 'showFlashAlert')
       doFetchApi.mockResolvedValue({response: {ok: true}, json: {}})
       const {getByRole} = renderComponent()
-      getByRole('button', {name: 'Update Module'}).click()
+      getByRole('button', {name: 'Save'}).click()
       await waitFor(() => {
         expect(alerts.showFlashAlert).toHaveBeenCalledWith({
           type: 'success',
@@ -230,7 +230,7 @@ describe('SettingsPanel', () => {
       const e = new Error('error')
       doFetchApi.mockRejectedValue(e)
       const {getByRole} = renderComponent()
-      getByRole('button', {name: 'Update Module'}).click()
+      getByRole('button', {name: 'Save'}).click()
       await waitFor(() => {
         expect(alerts.showFlashAlert).toHaveBeenCalledWith({
           err: e,
@@ -242,7 +242,7 @@ describe('SettingsPanel', () => {
     it('calls the render function on the re-lock dialog', async () => {
       doFetchApi.mockResolvedValue({response: {ok: true}, json: {}})
       const {getByRole} = renderComponent()
-      getByRole('button', {name: 'Update Module'}).click()
+      getByRole('button', {name: 'Save'}).click()
       await waitFor(() => expect(RelockModulesDialog.prototype.renderIfNeeded).toHaveBeenCalled())
     })
 
@@ -254,7 +254,7 @@ describe('SettingsPanel', () => {
         onDidSubmit: onDidSubmitMock,
         onDismiss: onDismissMock,
       })
-      userEvent.click(getByRole('button', {name: 'Update Module'}))
+      userEvent.click(getByRole('button', {name: 'Save'}))
 
       expect(await findByTestId('loading-overlay')).toBeInTheDocument()
       expect(onDidSubmitMock).toHaveBeenCalled()
