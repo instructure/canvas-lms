@@ -65,8 +65,6 @@ const DivInSVG: React.FC<NamespacedDiv> = props => {
   )
 }
 
-const MILESTONES_HAVE_IMAGES = false
-
 const PathwayTreeView = ({
   pathway,
   selectedStep,
@@ -193,18 +191,36 @@ const PathwayTreeView = ({
           borderColor={selected ? 'brand' : undefined}
         >
           <Flex as="div" direction="column" justifyItems="start" height="100%" gap="small">
-            {MILESTONES_HAVE_IMAGES ? (
+            {type === 'pathway' && (node as PathwayDetailData).image_url ? (
               <Flex as="div" gap="small">
                 <Flex.Item shouldShrink={false} shouldGrow={false}>
-                  <div style={{width: '30px', height: '30px', background: 'grey'}} />
+                  <img
+                    src={(node as PathwayDetailData).image_url}
+                    alt=""
+                    style={{height: '42px'}}
+                  />
                 </Flex.Item>
                 <Flex.Item shouldShrink={true}>
-                  <Text weight="bold">{node.title}</Text>
+                  {type === 'pathway' && (
+                    <Text as="div" fontStyle="italic">
+                      End of pathway
+                    </Text>
+                  )}
+                  <Text as="div" weight="bold">
+                    {node.title}
+                  </Text>
                 </Flex.Item>
               </Flex>
             ) : (
               <Flex.Item shouldShrink={false} shouldGrow={false}>
-                <Text weight="bold">{node.title}</Text>
+                {type === 'pathway' && (
+                  <Text as="div" fontStyle="italic">
+                    End of pathway
+                  </Text>
+                )}
+                <Text as="div" weight="bold">
+                  {node.title}
+                </Text>
               </Flex.Item>
             )}
             <Flex.Item shouldGrow={true}>
@@ -272,7 +288,7 @@ const PathwayTreeView = ({
   const renderDAG = useCallback(() => {
     if (!preRendered) return
     // Set an object for the graph label
-    g.setGraph({rankdir: layout, marginx: pathway.first_milestones.length < 2 ? 100 : 0})
+    g.setGraph({rankdir: layout, marginy: 50})
 
     // Default to assigning a new object as a label for each new edge.
     g.setDefaultEdgeLabel(function () {
@@ -282,6 +298,7 @@ const PathwayTreeView = ({
     g.setNode('0', {
       title: pathway.title,
       description: pathway.description,
+      image_url: pathway.image_url,
       width: 320,
       height: graphBoxHeights.height,
       learner_groups: pathway.learner_groups,
@@ -366,6 +383,7 @@ const PathwayTreeView = ({
     layout,
     pathway.description,
     pathway.first_milestones,
+    pathway.image_url,
     pathway.learner_groups,
     pathway.milestones,
     pathway.title,
