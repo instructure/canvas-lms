@@ -34,6 +34,7 @@ type OptionProps = {
   id: string
   value: string
   label: React.ReactNode
+  tagText?: string
 }
 
 export type Size = 'small' | 'medium' | 'large'
@@ -106,6 +107,7 @@ function CanvasMultiSelect(props: Props) {
       id: string
       value: string
       label: React.ReactNode
+      tagText?: string
     }[]
   >(
     () =>
@@ -115,6 +117,7 @@ function CanvasMultiSelect(props: Props) {
           id: n.props.id,
           value: n.props.value,
           label: n.props.children,
+          tagText: n.props.tagText,
         }
       }) || [],
     [children]
@@ -138,10 +141,11 @@ function CanvasMultiSelect(props: Props) {
 
     function renderOption(child: {
       key: React.Key
-      props: {id: string; children: React.ReactNode; key?: string; group: string}
+      props: {id: string; children: React.ReactNode; key?: string; group: string; tagText?: string}
     }) {
       // eslint-disable-next-line @typescript-eslint/no-shadow
       const {id, children, ...optionProps} = child.props
+      delete optionProps.tagText
       return (
         <Select.Option
           id={id}
@@ -226,7 +230,7 @@ function CanvasMultiSelect(props: Props) {
       selectedOptionIds.map(id => {
         const opt = options.find(c => c.props.id === id)
         if (!opt) return null
-        const tagText = opt.props.children || opt.props.label
+        const tagText = opt.props.tagText || opt.props.children || opt.props.label
         return (
           <Tag
             dismissible={true}
@@ -289,6 +293,8 @@ function CanvasMultiSelect(props: Props) {
     setAnnouncement(message)
   }
 
+  const primaryLabel = (option: OptionProps) => option.tagText || (option.label as string)
+
   function onRequestShowOptions() {
     setIsShowingOptions(true)
     customOnRequestShowOptions()
@@ -300,7 +306,9 @@ function CanvasMultiSelect(props: Props) {
     setInputValue('')
     if (filteredOptionIds?.length === 1) {
       const option = getChildById(filteredOptionIds[0])
-      setAnnouncement(I18n.t('%{label} selected. List collapsed.', {label: option?.label}))
+      setAnnouncement(
+        I18n.t('%{label} selected. List collapsed.', {label: option ? primaryLabel(option) : ''})
+      )
       onChange([...selectedOptionIds, filteredOptionIds[0]])
     }
     setFilteredOptionIds(null)
@@ -311,9 +319,9 @@ function CanvasMultiSelect(props: Props) {
     e.persist()
     const option = getChildById(id)
     if (typeof option === 'undefined') return
-    if (e.type === 'keydown') setInputValue(option.label as string)
+    if (e.type === 'keydown') setInputValue(primaryLabel(option))
     setHighlightedOptionId(id)
-    setAnnouncement(option.label as string)
+    setAnnouncement(primaryLabel(option))
   }
 
   function onRequestSelectOption(e: React.SyntheticEvent, {id}: {id?: string}): void {
@@ -322,7 +330,7 @@ function CanvasMultiSelect(props: Props) {
     setFilteredOptionIds(null)
     setIsShowingOptions(false)
     if (!id || typeof option === 'undefined') return
-    setAnnouncement(I18n.t('%{label} selected. List collapsed.', {label: option.label}))
+    setAnnouncement(I18n.t('%{label} selected. List collapsed.', {label: primaryLabel(option)}))
     onChange([...selectedOptionIds, id])
     customOnRequestSelectOption([...selectedOptionIds, id])
   }
@@ -336,7 +344,7 @@ function CanvasMultiSelect(props: Props) {
       selectedOptionIds.length > 0
     ) {
       const option = getChildById(selectedOptionIds.slice(-1)[0])
-      setAnnouncement(I18n.t('%{label} removed.', {label: option?.label || ''}))
+      setAnnouncement(I18n.t('%{label} removed.', {label: option ? primaryLabel(option) : ''}))
       onChange(selectedOptionIds.slice(0, -1))
     }
   }

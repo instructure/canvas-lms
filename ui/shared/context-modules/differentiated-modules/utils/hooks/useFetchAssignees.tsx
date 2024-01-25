@@ -104,16 +104,20 @@ const useFetchAssignees = ({
           if (studentsResult.status === 'fulfilled') {
             const studentsJSON = studentsResult.value.json as Record<string, string>[]
             studentsParsedResult =
-              studentsJSON?.map(({id, name}: any) => {
+              studentsJSON?.map(({id, name, sis_user_id}: any) => {
                 const parsedId = `student-${id}`
                 // if an existing override exists for this student, use it so we have its overrideId
                 const existing = allOptions.find(option => option.id === parsedId)
                 if (existing !== undefined) {
-                  return existing
+                  return {
+                    ...existing,
+                    sisID: sis_user_id,
+                  }
                 }
                 return {
                   id: parsedId,
                   value: name,
+                  sisID: sis_user_id,
                   group: I18n.t('Students'),
                 }
               }) ?? []
@@ -125,7 +129,17 @@ const useFetchAssignees = ({
           const defaultOptions =
             everyoneOption !== undefined ? [everyoneOption, ...allOptions] : allOptions
           const newOptions = uniqBy(
-            [...defaultOptions, ...sectionsParsedResult, ...studentsParsedResult],
+            [
+              ...defaultOptions.map(option => {
+                const sisID = studentsParsedResult.find(student => student.id === option.id)?.sisID
+                if (sisID !== undefined) {
+                  return {...option, sisID}
+                }
+                return option
+              }),
+              ...sectionsParsedResult,
+              ...studentsParsedResult,
+            ],
             'id'
           )
           setAllOptions(newOptions)
