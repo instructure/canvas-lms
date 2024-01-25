@@ -81,7 +81,7 @@ DueDateOverrideView.prototype.render = function () {
     defaultSectionId: this.model.defaultDueDateSectionId,
     overrides: this.model.overrides.models,
     assignmentId: this.model.assignment.get('id'),
-    assignmentName: this.model.assignment.get('name'),
+    assignmentName: this.model.assignment.get('name') || this.model.assignment.get('title'),
     pointsPossible: this.model.assignment.get('points_possible'),
     type: this.model.assignment.objectType().toLowerCase(),
     }
