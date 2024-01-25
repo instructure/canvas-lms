@@ -217,6 +217,9 @@ class ExternalToolsController < ApplicationController
       [tool, provided_url]
     elsif resource_link.url
       tool = resource_link.current_external_tool context
+      unless tool
+        invalid_settings_error
+      end
       [tool, resource_link.url]
     else
       invalid_settings_error
