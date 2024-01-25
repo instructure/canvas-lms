@@ -518,6 +518,33 @@ describe AccountNotification do
         expected_users = @users[:sub1] + @users[:sub1sub] - [@students[:sub1sub], @teachers[:sub1sub]]
         expect(an.applicable_user_ids).to match_array(expected_users.map(&:id))
       end
+
+      it "excludes suspended users" do
+        an = account_notification(account: @accounts[:sub1sub])
+        suspended_student = @students[:sub1sub]
+        p1 = suspended_student.pseudonyms.new unique_id: "uniqueid1", account: suspended_student.account
+        p1.workflow_state = "suspended"
+        p1.save!
+        expected_users = @users[:sub1sub] - [suspended_student]
+        expect(suspended_student.suspended?).to be true
+        expect(an.applicable_user_ids).to match_array(expected_users.map(&:id))
+      end
+
+      it "does not exclude users with an active and suspended pseudonym" do
+        an = account_notification(account: @accounts[:sub1sub])
+        student_with_one_suspended_one_active_pseudonym = @students[:sub1sub]
+
+        p1 = student_with_one_suspended_one_active_pseudonym.pseudonyms.new unique_id: "uniqueid1", account: student_with_one_suspended_one_active_pseudonym.account
+        p1.workflow_state = "suspended"
+        p1.save!
+
+        p2 = student_with_one_suspended_one_active_pseudonym.pseudonyms.new unique_id: "uniqueid2", account: student_with_one_suspended_one_active_pseudonym.account
+        p2.save!
+
+        expected_users = @users[:sub1sub]
+        expect(student_with_one_suspended_one_active_pseudonym.suspended?).to be false
+        expect(an.applicable_user_ids).to match_array(expected_users.map(&:id))
+      end
     end
 
     context "queue_message_broadcast" do
