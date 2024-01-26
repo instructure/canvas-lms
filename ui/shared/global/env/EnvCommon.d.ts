@@ -200,41 +200,42 @@ export interface EnvCommon {
  * From ApplicationController#JS_ENV_SITE_ADMIN_FEATURES
  */
 export type SiteAdminFeatureId =
-  | 'featured_help_links'
-  | 'account_level_blackout_dates'
   | 'account_calendar_events'
-  | 'instui_nav'
-  | 'render_both_to_do_lists'
-  | 'course_paces_redesign'
+  | 'account_level_blackout_dates'
   | 'course_paces_for_students'
-  | 'explicit_latex_typesetting'
-  | 'media_links_use_attachment_id'
-  | 'permanent_page_links'
+  | 'course_paces_redesign'
   | 'differentiated_modules'
   | 'enhanced_course_creation_account_fetching'
-  | 'instui_for_import_page'
   | 'enhanced_rubrics'
+  | 'explicit_latex_typesetting'
+  | 'featured_help_links'
+  | 'instui_for_import_page'
+  | 'instui_nav'
+  | 'media_links_use_attachment_id'
   | 'multiselect_gradebook_filters'
+  | 'permanent_page_links'
+  | 'platform_service_speedgrader'
+  | 'render_both_to_do_lists'
 
 /**
  * From ApplicationController#JS_ENV_ROOT_ACCOUNT_FEATURES
  */
 export type RootAccountFeatureId =
-  | 'product_tours'
-  | 'usage_rights_discussion_topics'
-  | 'granular_permissions_manage_users'
+  | 'buttons_and_icons_root_account'
   | 'create_course_subaccount_picker'
+  | 'extended_submission_state'
+  | 'granular_permissions_manage_users'
+  | 'instui_nav'
   | 'lti_deep_linking_module_index_menu_modal'
   | 'lti_dynamic_registration'
   | 'lti_multiple_assignment_deep_linking'
   | 'lti_overwrite_user_url_input_select_content_dialog'
-  | 'buttons_and_icons_root_account'
-  | 'extended_submission_state'
+  | 'mobile_offline_mode'
+  | 'product_tours'
+  | 'rce_transform_loaded_content'
   | 'scheduled_page_publication'
   | 'send_usage_metrics'
-  | 'rce_transform_loaded_content'
-  | 'mobile_offline_mode'
-  | 'instui_nav'
+  | 'usage_rights_discussion_topics'
 
 /**
  * From ApplicationController#JS_ENV_BRAND_ACCOUNT_FEATURES
