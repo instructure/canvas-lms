@@ -1477,7 +1477,7 @@ ActiveRecord::Relation.prepend(UpdateAndDeleteWithJoins)
 module UpdateAndDeleteAllWithLimit
   def delete_all(*args)
     if limit_value || offset_value
-      scope = except(:select).select(primary_key)
+      scope = except(:select).select(primary_key).lock
       return unscoped.where(primary_key => scope).delete_all
     end
     super
@@ -1485,7 +1485,7 @@ module UpdateAndDeleteAllWithLimit
 
   def update_all(updates, *args)
     if limit_value || offset_value
-      scope = except(:select).select(primary_key)
+      scope = except(:select).select(primary_key).lock
       return unscoped.where(primary_key => scope).update_all(updates)
     end
     super
