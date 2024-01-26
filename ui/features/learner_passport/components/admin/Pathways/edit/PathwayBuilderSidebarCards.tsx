@@ -98,7 +98,7 @@ const MilestoneCard = ({step, variant, onEdit, onDelete}: MilestoneCardProps) =>
             <TruncateText>{step.title}</TruncateText>
           </Text>
           <Text as="div" size="small">
-            {step.next_milestones.length} prerequisites
+            {step.next_milestones.filter(m => m !== 'blank').length} prerequisites
           </Text>
         </Flex.Item>
         <Flex.Item>

@@ -31,8 +31,11 @@ import {Tray} from '@instructure/ui-tray'
 import {View} from '@instructure/ui-view'
 import type {MilestoneData, RequirementData, PathwayBadgeType} from '../../../types'
 import AddRequirementTray from './AddRequirementTray'
-import AddBadgeTray, {renderBadge} from './AddBadgeTray'
+import AddBadgeTray, {renderBadges} from './AddBadgeTray'
 import MilestoneRequirementCard from './requirements/MilestoneRequirementCard'
+import {readFromLocalStorage, writeToLocalStorage} from '../../../shared/LocalStorage'
+
+const SHOW_ALERT_KEY = 'passport_showMilestoneTrayAlert'
 
 type MilestoneTrayProps = {
   milestone: MilestoneData
@@ -62,6 +65,7 @@ const MilestoneTray = ({
   const [addBadgeTrayOpen, setAddBadgeTrayOpen] = useState(false)
   const [selectedBadgeId, setSelectedBadgeId] = useState<string | null>(milestone.completion_award)
   const [validName, setValidName] = useState(true)
+  const [showAlert, setShowAlert] = useState(() => readFromLocalStorage(SHOW_ALERT_KEY) !== 'false')
 
   useEffect(() => {
     if (milestoneId !== milestone.id) {
@@ -80,10 +84,15 @@ const MilestoneTray = ({
     milestoneId,
   ])
 
-  const isValid = useCallback(() => {
-    setValidName(!!title)
-    return !!title
-  }, [title])
+  const handleCloseAlert = useCallback(() => {
+    setShowAlert(false)
+    writeToLocalStorage(SHOW_ALERT_KEY, 'false')
+  }, [])
+
+  const handleTrayClosed = useCallback(() => {
+    setReqTrayOpen(false)
+    setAddBadgeTrayOpen(false)
+  }, [])
 
   const handleCancel = useCallback(() => {
     setReqTrayOpen(false)
@@ -184,7 +193,7 @@ const MilestoneTray = ({
       <Tray
         label={variant === 'add' ? 'Add Step' : 'Edit Step'}
         open={open}
-        onDismiss={onClose}
+        onClose={handleTrayClosed}
         size="regular"
         placement="end"
       >
@@ -206,10 +215,17 @@ const MilestoneTray = ({
           </Flex>
           <Flex.Item shouldGrow={true} shouldShrink={true} overflowY="auto">
             <View as="div" padding="0 medium medium medium">
-              <Alert variant="info" renderCloseButtonLabel="Close" margin="0 0 small 0">
-                Steps are building blocks for your pathway. They can represent something as large as
-                a course or module, or as small as a assignment.
-              </Alert>
+              {showAlert && (
+                <Alert
+                  variant="info"
+                  renderCloseButtonLabel="Close"
+                  margin="0 0 small 0"
+                  onDismiss={handleCloseAlert}
+                >
+                  Steps are building blocks for your pathway. They can represent something as large
+                  as a course or module, or as small as a assignment.
+                </Alert>
+              )}
               <View as="div" padding="0 0 medium 0" borderWidth="0 0 small 0">
                 <View as="div" margin="0 0 small 0">
                   <TextInput
@@ -262,6 +278,7 @@ const MilestoneTray = ({
                           >
                             <MilestoneRequirementCard
                               key={requirement.id}
+                              variant="edit"
                               requirement={requirement}
                               onEdit={() => handleEditRequirement(requirement)}
                               onDelete={() => handleDeleteRequirement(requirement)}
@@ -286,7 +303,7 @@ const MilestoneTray = ({
                   <Text as="div">
                     Add a badge or certificate to this milestone to recognize a key accomplishment.
                   </Text>
-                  {selectedBadgeId && renderBadge(allBadges, selectedBadgeId)}
+                  {selectedBadgeId && renderBadges(allBadges, selectedBadgeId)}
                   <Button
                     renderIcon={IconAddLine}
                     margin="small 0 0 0"

@@ -168,11 +168,8 @@ const AddBadgeTray = ({allBadges, open, selectedBadgeId, onClose, onSave}: AddBa
   )
 }
 
-const renderBadge = (allBadges: PathwayBadgeType[], badgeId: string | null) => {
-  if (badgeId === null) return null
-
-  const badge = allBadges.find(b => b.id === badgeId)
-  return badge ? (
+const renderBadge = (badge: PathwayBadgeType) => {
+  return (
     <View as="div" background="secondary" margin="small 0">
       <Flex as="div">
         <Flex.Item padding="small" shouldShrink={false} shouldGrow={false}>
@@ -201,8 +198,15 @@ const renderBadge = (allBadges: PathwayBadgeType[], badgeId: string | null) => {
         </View>
       ) : null}
     </View>
-  ) : null
+  )
+}
+
+const renderBadges = (allBadges: PathwayBadgeType[], badgeId: string | null) => {
+  if (badgeId === null) return null
+
+  const badge = allBadges.find(b => b.id === badgeId)
+  return badge ? renderBadge(badge) : null
 }
 
 export default AddBadgeTray
-export {renderBadge}
+export {renderBadges, renderBadge}

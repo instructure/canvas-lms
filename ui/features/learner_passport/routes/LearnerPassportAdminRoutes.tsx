@@ -36,7 +36,9 @@ export const LearnerPassportAdminRoutes = (
         <Route
           path="view/:pathwayId"
           loader={async ({params}) => {
-            return fetch(`/users/${params.userId}/passport/data/pathways/show/${params.pathwayId}`)
+            return fetch(
+              `/users/${params.userId}/passport/data/pathways/show/${params.pathwayId}?include=all`
+            )
           }}
           lazy={() => import('../pages/admin/PathwayView')}
         />
