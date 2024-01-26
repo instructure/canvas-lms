@@ -184,7 +184,7 @@ module SIS
       def create_batch_attachment(path)
         return if File.stat(path).size == 0
 
-        data = Rack::Test::UploadedFile.new(path, Attachment.mimetype(path))
+        data = Canvas::UploadedFile.new(path, Attachment.mimetype(path))
         Attachment.create_data_attachment(@batch, data, File.basename(path))
       end
 

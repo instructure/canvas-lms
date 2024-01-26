@@ -33,17 +33,12 @@ module Canvas::Migration::Worker
   end
 
   def self.upload_overview_file(file, content_migration)
-    uploaded_data = Rack::Test::UploadedFile.new(file.path, Attachment.mimetype(file.path))
+    uploaded_data = Canvas::UploadedFile.new(file.path, Attachment.mimetype(file.path))
 
     att = Attachment.new
     att.context = content_migration
     att.uploaded_data = uploaded_data
     att.save
-    begin
-      uploaded_data.unlink
-    rescue
-      Rails.logger.warn "Couldn't unlink overview for content_migration #{content_migration.id}"
-    end
     content_migration.overview_attachment = att
     content_migration.save
     att
@@ -64,12 +59,12 @@ module Canvas::Migration::Worker
         end
       end
 
-      upload_file = Rack::Test::UploadedFile.new(zip_file, "application/zip")
+      upload_file = Canvas::UploadedFile.new(zip_file, "application/zip")
       att = Attachment.new
       att.context = content_migration
       att.uploaded_data = upload_file
       att.save
-      upload_file.unlink
+      File.unlink(zip_file)
       content_migration.exported_attachment = att
       content_migration.save
     rescue => e

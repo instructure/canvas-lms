@@ -616,7 +616,7 @@ describe ContentZipper do
         zip_name = "submissions.zip"
         zip_path = File.join(RSpec.configuration.fixture_path, zip_name)
         data = "just some stub data"
-        expect(Rack::Test::UploadedFile).to receive(:new).with(zip_path, "application/zip").and_return data
+        expect(Canvas::UploadedFile).to receive(:new).with(zip_path, "application/zip").and_return data
         expect(@attachment).to receive(:uploaded_data=).with data
         zipper = ContentZipper.new
         zipper.mark_successful!
