@@ -61,6 +61,7 @@ const I18n = useI18nScope('instructure')
 //    processData: formSubmit by default just calls $.fn.getFormData.
 //      if you need additional data in the form submission, add
 //      it here and return the new object.
+//    formatApiData: formats the form data to fit the jsonapi format
 //    beforeSubmit: called right before the request is sent.  Useful
 //      for hiding forms, adding ajax loader icons, etc.
 //    success: called on success
@@ -119,6 +120,9 @@ $.fn.formSubmit = function (options) {
       } catch (e) {
         error = e
         if (INST && INST.environment !== 'production') throw error
+      }
+      if (options.formatApiData && $.isFunction(options.formatApiData)) {
+        submitParam = options.formatApiData(formData)
       }
       if (submitParam === false) {
         return false
@@ -303,7 +307,11 @@ $.fn.formSubmit = function (options) {
       })
       $form.data('submitting', true).submit().data('submitting', false)
     } else {
-      $.ajaxJSON(action, method, formData, xhrSuccess, xhrError)
+      const apiData =
+        options.formatApiData && $.isFunction(options.formatApiData)
+          ? options.formatApiData(formData)
+          : formData
+      $.ajaxJSON(action, method, apiData, xhrSuccess, xhrError)
     }
   })
   return this
