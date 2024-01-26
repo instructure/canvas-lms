@@ -969,85 +969,58 @@ module Lti
           c.save!
           c
         end
-        let(:variable_expander) do
-          VariableExpander.new(
-            root_account,
-            account,
-            controller,
-            current_user: user,
-            tool:,
-            assignment: new_assignment
-          )
-        end
+        let(:variable_expander_opts) { { current_user: user, tool:, assignment: new_assignment } }
 
         before do
           group.update!(users: [user])
           new_assignment.update!(group_category:)
         end
 
-        shared_examples "a safe expansion when assignment is blank" do
-          let(:expansion) { raise "override in spec" }
-          let(:variable_expander) do
-            VariableExpander.new(
-              root_account,
-              account,
-              controller,
-              current_user: user,
-              tool:
-            )
-          end
-
-          it "returns the variable if no Assignment is present" do
-            expect_unexpanded! expansion
-          end
-        end
-
-        shared_examples "a safe expansion when user is blank" do
-          let(:expansion) { raise "override in spec" }
-          let(:variable_expander) do
-            VariableExpander.new(
-              root_account,
-              account,
-              controller,
-              current_user: user,
-              tool:
-            )
-          end
-
-          it "returns the variable if no User is present" do
-            expect_unexpanded! expansion
-          end
-        end
-
         describe "com.instructure.Group.id" do
-          let(:expansion_string) { "$com.instructure.Group.id" }
+          let(:expansion) { "$com.instructure.Group.id" }
 
-          it_behaves_like "a safe expansion when assignment is blank" do
-            let(:expansion) { expansion_string }
+          context "when assignment is blank" do
+            let(:variable_expander_opts) { { current_user: user, tool: } }
+
+            it "safely remains unexpanded" do
+              expect_unexpanded! expansion
+            end
           end
 
-          it_behaves_like "a safe expansion when user is blank" do
-            let(:expansion) { expansion_string }
+          context "when user is blank" do
+            let(:variable_expander_opts) { { tool:, assignment: new_assignment } }
+
+            it "safely remains unexpanded" do
+              expect_unexpanded! expansion
+            end
           end
 
           it "has a substitution for com.instructure.Group.id" do
-            expect(expand!(expansion_string)).to eq group.id
+            expect(expand!(expansion)).to eq group.id
           end
         end
 
         describe "com.instructure.Group.name" do
-          let(:expansion_string) { "$com.instructure.Group.name" }
+          let(:expansion) { "$com.instructure.Group.name" }
 
-          it_behaves_like "a safe expansion when assignment is blank" do
-            let(:expansion) { expansion_string }
+          context "when assignment is blank" do
+            let(:variable_expander_opts) { { current_user: user, tool: } }
+
+            it "it safely remains unexpanded" do
+              expect_unexpanded! expansion
+            end
           end
 
-          it_behaves_like "a safe expansion when user is blank" do
-            let(:expansion) { expansion_string }
+          context "when user is blank" do
+            let(:variable_expander_opts) { { tool:, assignment: new_assignment } }
+
+            it "it safely remains unexpanded" do
+              expect_unexpanded! expansion
+            end
           end
 
           it "has a substitution for com.instructure.Group.name" do
-            expect(expand!(expansion_string)).to eq group.name
+            expect(expand!(expansion)).to eq group.name
           end
         end
       end
@@ -2269,25 +2242,35 @@ module Lti
           end
         end
 
-        it "has substitution for $Canvas.masqueradingUser.id" do
-          masquerading_user = User.new
-          allow(masquerading_user).to receive(:id).and_return(7878)
-          allow(user).to receive(:id).and_return(42)
-          variable_expander.instance_variable_set(:@current_user, masquerading_user)
-          expect(expand!("$Canvas.masqueradingUser.id")).to eq 42
-        end
+        describe "masquerading user substititions" do
+          before do
+            masqueradee = User.new
+            allow(masqueradee).to receive(:id).and_return(7878)
+            allow(user).to receive(:id).and_return(42)
+            variable_expander.instance_variable_set(:@current_user, masqueradee)
+          end
 
-        it "does not expand $Canvas.masqueradingUser.id when the controller is unset" do
-          variable_expander.instance_variable_set(:@controller, nil)
-          variable_expander.instance_variable_set(:@request, nil)
-          expect_unexpanded! "$Canvas.masqueradingUser.id"
-        end
+          it "has substitution for $Canvas.masqueradingUser.id" do
+            expect(expand!("$Canvas.masqueradingUser.id")).to eq 42
+          end
 
-        it "has substitution for $Canvas.masqueradingUser.userId" do
-          masquerading_user = User.new
-          allow(masquerading_user).to receive(:id).and_return(7878)
-          variable_expander.instance_variable_set(:@current_user, masquerading_user)
-          expect(expand!("$Canvas.masqueradingUser.userId")).to eq "6cd2e0d65bd5aef3b5ee56a64bdcd595e447bc8f"
+          it "does not expand $Canvas.masqueradingUser.id when the controller is unset" do
+            variable_expander.instance_variable_set(:@controller, nil)
+            variable_expander.instance_variable_set(:@request, nil)
+            expect_unexpanded! "$Canvas.masqueradingUser.id"
+          end
+
+          it "has substitution for $Canvas.masqueradingUser.userId" do
+            expect(expand!("$Canvas.masqueradingUser.userId")).to eq "6cd2e0d65bd5aef3b5ee56a64bdcd595e447bc8f"
+          end
+
+          context "when the tool is LTI 1.3" do
+            before { allow(tool).to receive(:use_1_3?).and_return(true) }
+
+            it "returns the user's lti id instead of lti 1.1 user_id" do
+              expect(expand!("$Canvas.masqueradingUser.userId")).to eq user.lti_id
+            end
+          end
         end
 
         it "has substitution for Canvas.module.id" do
