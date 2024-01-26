@@ -372,6 +372,18 @@ class LearnerPassportController < ApplicationController
         type: "Canvas Course Assessment Completion",
         criteria: "To earn this certificate, parcipants must pass the course",
         skills: []
+      },
+      {
+        id: "5",
+        title: "Marketer",
+        image: "/images/learner_passport/university_badge.png",
+        issuer: {
+          name: "Wharton University of Pennsylvania",
+          url: "https://www.wharton.upenn.edu/"
+        },
+        type: "Canvas Course Assessment Completion",
+        criteria: "To earn this certificate, parcipants must pass the course",
+        skills: []
       }
     ]
   end
@@ -417,7 +429,7 @@ class LearnerPassportController < ApplicationController
           title: "Introduction to Marketing",
           description: "Taught by three of Warton's top faculty in the marketing department, consistently raked as the #1 business school in the world, this course covers three core topics in customer loyalty: branding, customer centricity, and practical, go-to-market strategies.",
           required: true,
-          completion_award: nil,
+          completion_award: "5",
           requirements: [
             {
               id: "1",
@@ -442,7 +454,22 @@ class LearnerPassportController < ApplicationController
           description: "Master the technical skills needed to analyze financial statements and disclosures for use in financial analysis.",
           required: false,
           completion_award: nil,
-          requirements: [{ id: "3" }],
+          requirements: [
+            {
+              id: "3",
+              name: "Complete a financial analysis",
+              description: "Complete a financial analysis of a company, compile the analysis into a professional format, and present the analysis with recommendations for future action.",
+              required: true,
+              type: "project",
+            },
+            {
+              id: "4",
+              name: "Final exam",
+              description: "Complete a final exam with a score of 80% or higher.",
+              required: true,
+              type: "assessment"
+            },
+          ],
           next_milestones: []
         },
         {
@@ -451,7 +478,7 @@ class LearnerPassportController < ApplicationController
           description: "Professor Kahn starts us off with the first of two Branding modules: Marketing Strategy and Brand Positioning. Then, you'll move on to the second Branding module where we'll teach you to analyze end line data and develop insights to guide your brand strategy.",
           required: true,
           completion_award: nil,
-          requirements: [{ id: "4" }, { id: "5" }],
+          requirements: [],
           next_milestones: []
         },
         {
@@ -460,7 +487,7 @@ class LearnerPassportController < ApplicationController
           description: "Module 2 of our class features Professor Peter Fader, who will focus on concepts related to Customer Centric Marketing. In an economy that is increasingly responsive to customer behaviors, it is imperative to focus on the right customers for strategic advantages. You will learn how to acquire and retain the right customers, generate more profits from them and evaluate the effectiveness of your marketing activities.",
           required: true,
           completion_award: nil,
-          requirements: [{ id: "6" }, { id: "7" }],
+          requirements: [],
           next_milestones: ["5"]
         },
         {
@@ -479,32 +506,32 @@ class LearnerPassportController < ApplicationController
       shares: [
         {
           id: "rs1",
-          name: "Mick Jagger",
-          sortable_name: "Jagger, Mick",
+          name: "Robert Reich",
+          sortable_name: "Reich, Robert",
           avatar_url: "/images/messages/avatar-50.png",
           role: "collaborator",
         },
         {
           id: "rs2",
-          name: "Keith Richards",
-          sortable_name: "Richards, Keith",
+          name: "Janet Yellen",
+          sortable_name: "Yellen, Janet",
           avatar_url: "/images/messages/avatar-50.png",
           role: "collaborator",
         },
         {
           id: "rs3",
-          name: "Charlie Watts",
-          sortable_name: "Watts, Charlie",
-          avatar_url: "/images/messages/avatar-50.png",
-          role: "viewer",
-        },
-        {
-          id: "rs4",
-          name: "Ronnie Wood",
-          sortable_name: "Wood, Ronnie",
+          name: "Timothy Geithner",
+          sortable_name: "Geithner, Timothy",
           avatar_url: "/images/messages/avatar-50.png",
           role: "reviewer",
         },
+        {
+          id: "rs4",
+          name: "Ben Bernanke",
+          sortable_name: "Bernanke, Ben",
+          avatar_url: "/images/messages/avatar-50.png",
+          role: "viewer",
+        }
       ],
     }
   end
@@ -820,6 +847,14 @@ class LearnerPassportController < ApplicationController
               end
     return render json: { message: "Pathway not found" }, status: :not_found if pathway.nil?
 
+    return render json: pathway if params[:include] != "all"
+
+    # if we get here, expand id fields with their respective data
+    pathway[:completion_award] = learner_passport_pathway_achievements.find { |a| a[:id] == pathway[:completion_award] } if pathway[:completion_award].present?
+    pathway[:learner_groups] = learner_passport_learner_groups.select { |lg| pathway[:learner_groups].include?(lg[:id]) } if pathway[:learner_groups].count > 0
+    pathway[:milestones] = pathway[:milestones].each do |milestone|
+      milestone[:completion_award] = learner_passport_pathway_achievements.find { |a| a[:id] == milestone[:completion_award] } if milestone[:completion_award].present?
+    end
     render json: pathway
   end
 

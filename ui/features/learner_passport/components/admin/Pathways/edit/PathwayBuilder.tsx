@@ -179,6 +179,8 @@ const PathwayBuilder = ({
 
   const handleSelectStepFromTree = useCallback(
     (step: MilestoneData | null) => {
+      setMilestoneTrayOpen(false)
+      setPathwayTrayOpen(false)
       if (currentRoot && currentRoot.next_milestones[0] === 'blank') {
         currentRoot.next_milestones = []
         pathway.timestamp = Date.now()

@@ -17,20 +17,16 @@
  */
 
 import React from 'react'
-import {useActionData, useLoaderData} from 'react-router-dom'
+import {useLoaderData} from 'react-router-dom'
 import {Breadcrumb} from '@instructure/ui-breadcrumb'
-import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {View} from '@instructure/ui-view'
-import type {PathwayDetailData} from '../../types'
+import type {PathwayViewDetailData} from '../../types'
 import PathwayView from './PathwayView'
-import {showUnimplemented} from '../../shared/utils'
 
 const PathwayViewPage = () => {
-  const create_pathway = useActionData() as PathwayDetailData
-  const edit_pathway = useLoaderData() as PathwayDetailData
-  const pathway = create_pathway || edit_pathway
+  const pathway = useLoaderData() as PathwayViewDetailData
 
   return (
     <Flex as="div" direction="column" gap="small" alignItems="stretch">

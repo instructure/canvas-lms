@@ -23,11 +23,9 @@ import {Flex} from '@instructure/ui-flex'
 import {FormField} from '@instructure/ui-form-field'
 import {Heading} from '@instructure/ui-heading'
 import {IconAddLine} from '@instructure/ui-icons'
-import {Tag} from '@instructure/ui-tag'
 import {Text} from '@instructure/ui-text'
 import {TextArea} from '@instructure/ui-text-area'
 import {TextInput} from '@instructure/ui-text-input'
-import {ToggleDetails} from '@instructure/ui-toggle-details'
 import {Tray} from '@instructure/ui-tray'
 import {View} from '@instructure/ui-view'
 import type {
@@ -36,7 +34,7 @@ import type {
   PathwayBadgeType,
   PathwayUserShareType,
 } from '../../../types'
-import AddBadgeTray, {renderBadge} from './AddBadgeTray'
+import AddBadgeTray, {renderBadges} from './AddBadgeTray'
 import AddLearnerGroupsTray, {LearnerGroupCard} from './AddLearnerGroupsTray'
 import CanvasUserFinder from './shares/CanvasUserFinder'
 import {showUnimplemented} from '../../../shared/utils'
@@ -182,7 +180,7 @@ const PathwayDetailsTray = ({
                     Add a badge or certificate that the learner will receive when the pathway is
                     completed. The skills associated with that achievement will be linked as well.
                   </Text>
-                  {renderBadge(allBadges, currSelectedBadgeId)}
+                  {renderBadges(allBadges, currSelectedBadgeId)}
                   <Button
                     margin="small 0 0 0"
                     onClick={handleAddAchievementClick}
