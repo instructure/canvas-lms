@@ -122,7 +122,7 @@ describe "context modules" do
 
     it "retains focus when deleting prerequisites with different modules" do
       skip("LF-960 Waiting for updates to a11y issues found for new tray")
-      Account.site_admin.enable_feature! :differentiated_modules
+      differentiated_modules_on
       modules = create_modules(3)
       go_to_modules
       manage_module_button(modules[2]).click
@@ -315,7 +315,7 @@ describe "context modules" do
 
     context "Specific Keyboard Accessibility with differentiated modules", priority: "1" do
       before :once do
-        Account.site_admin.enable_feature! :differentiated_modules
+        differentiated_modules_on
         modules = create_modules(2, true)
         modules[0].add_item({ id: @assignment.id, type: "assignment" })
         modules[0].add_item({ id: @assignment2.id, type: "assignment" })

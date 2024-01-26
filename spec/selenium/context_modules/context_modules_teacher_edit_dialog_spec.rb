@@ -369,7 +369,7 @@ describe "context modules" do
 
     context "specific tests with differentiated modules" do
       before :once do
-        Account.site_admin.enable_feature! :differentiated_modules
+        differentiated_modules_on
       end
 
       it "shows the added prerequisites when editing a module with enabled differentiated modules" do

@@ -20,15 +20,17 @@ require_relative "../helpers/quizzes_common"
 require_relative "../../spec_helper"
 require_relative "page_objects/quizzes_index_page"
 require_relative "../helpers/items_assign_to_tray"
+require_relative "../helpers/context_modules_common"
 
 describe "quizzes selective_release assign to tray" do
   include_context "in-process server selenium tests"
   include QuizzesIndexPage
   include ItemsAssignToTray
   include QuizzesCommon
+  include ContextModulesCommon
 
   before :once do
-    Account.site_admin.enable_feature! :differentiated_modules
+    differentiated_modules_on
     Account.site_admin.enable_feature! :newquizzes_on_quiz_page
 
     course_with_teacher(active_all: true)

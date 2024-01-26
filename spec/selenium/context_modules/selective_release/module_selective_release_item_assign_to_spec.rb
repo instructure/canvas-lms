@@ -37,7 +37,7 @@ describe "selective_release module item assign to tray" do
   include K5Common
 
   before(:once) do
-    Account.site_admin.enable_feature! :differentiated_modules
+    differentiated_modules_on
     course_with_teacher(active_all: true)
 
     @course.enable_feature! :quizzes_next

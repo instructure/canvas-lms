@@ -176,7 +176,7 @@ describe "context modules" do
 
     context "when adding new module with differentiated modules" do
       before :once do
-        Account.site_admin.enable_feature! :differentiated_modules
+        differentiated_modules_on
         @new_module = @course.context_modules.create! name: "New Module"
       end
 
@@ -186,14 +186,14 @@ describe "context modules" do
       end
 
       it "adds a new module with differentiated modules", priority: "1" do
-        Account.site_admin.enable_feature! :differentiated_modules
+        differentiated_modules_on
         add_module_with_tray("New Module2")
         mod = @course.context_modules.last
         expect(mod.name).to eq "New Module2"
       end
 
       it "publishes an unpublished module with differentiated modules", priority: "1" do
-        Account.site_admin.enable_feature! :differentiated_modules
+        differentiated_modules_on
         add_module_with_tray("New Module2")
         expect(ff(".context_module")[1]).to have_class("unpublished_module")
         expect(@course.context_modules.count).to eq 2
