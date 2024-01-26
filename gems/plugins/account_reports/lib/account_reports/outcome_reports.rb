@@ -582,6 +582,7 @@ module AccountReports
       config_options[:new_quizzes_scope] ||= []
       host = root_account.domain
       enable_i18n_features = true
+      @account_level_mastery_scales_enabled = @account_report.account.root_account.feature_enabled?(:account_level_mastery_scales)
 
       os_scope = config_options[:new_quizzes_scope]
 
@@ -679,7 +680,7 @@ module AccountReports
                                            row["learning outcome mastered"] ? 1 : 0
                                          end
 
-      outcome_data = if @account_report.account.root_account.feature_enabled?(:account_level_mastery_scales) &&
+      outcome_data = if @account_level_mastery_scales_enabled &&
                         (course = find_cached_course(row["course id"])).resolved_outcome_proficiency.present?
                        proficiency(course)
                      elsif row["learning outcome data"].present?
@@ -690,7 +691,7 @@ module AccountReports
       row["learning outcome mastery score"] = outcome_data[:mastery_points]
       score = set_score(row, outcome_data)
       rating = set_rating(row, score, outcome_data) if score.present?
-      if row["assessment type"] != "quiz" && @account_report.account.root_account.feature_enabled?(:account_level_mastery_scales)
+      if row["assessment type"] != "quiz" && @account_level_mastery_scales_enabled
         row["learning outcome points possible"] = outcome_data[:points_possible]
       end
       if row["learning outcome points hidden"]
