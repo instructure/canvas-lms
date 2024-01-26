@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 - present Instructure, Inc.
+ * Copyright (C) 2024 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,20 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export type Rubric = {
-  id: string
-  criteria?: {
-    points: number
-    description: string
-    longDescription: string
-    ignoreForScoring: boolean
-    masteryPoints: number
-    criterionUseRange: boolean
-  }[]
-  criteriaCount: number
-  hidePoints?: boolean
-  locations: string[]
-  pointsPossible: number
+export type RubricFormProps = {
+  id?: string
   title: string
-  workflowState?: string
+  hidePoints: boolean
+  accountId?: string
+  courseId?: string
 }
+
+export type RubricFormValueTypes = string | boolean
