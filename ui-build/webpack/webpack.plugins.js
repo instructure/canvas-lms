@@ -28,10 +28,11 @@ const MomentTimezoneDataPlugin = require('moment-timezone-data-webpack-plugin')
 const EsmacPlugin = require('webpack-esmac-plugin')
 const {WebpackManifestPlugin} = require('rspack-manifest-plugin')
 const {RetryChunkLoadPlugin} = require('webpack-retry-chunk-load-plugin')
-// keep this in sync with webpack's dep version
-// uses terser to minify JavaScript
-
+const {
+  container: {ModuleFederationPlugin},
+} = require('@rspack/core')
 const WebpackHooks = require('./webpackHooks')
+const {fetchSpeedGraderLibrary} = require('./remotes')
 
 // determines which folder public assets are compiled to
 const webpackPublicPath = require('./webpackPublicPath')
@@ -183,3 +184,12 @@ exports.buildCacheOptions = {
     resolve: {hash: true, timestamp: false},
   },
 }
+
+exports.moduleFederation = new ModuleFederationPlugin({
+  name: 'canvas',
+  remotes: {
+    speedgrader: `promise new Promise(${fetchSpeedGraderLibrary.toString()})`,
+  },
+  exposes: {},
+  shared: {},
+})
