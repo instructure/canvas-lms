@@ -2815,9 +2815,10 @@ class User < ActiveRecord::Base
     end
   end
 
-  def root_admin_for?(root_account)
+  def root_admin_for?(root_account, cached_account_users: nil)
     root_ids = [root_account.id, Account.site_admin.id]
-    account_users.any? { |au| root_ids.include?(au.account_id) }
+    aus = cached_account_users || account_users.active
+    aus.any? { |au| root_ids.include?(au.account_id) }
   end
 
   def eportfolios_enabled?
@@ -3389,7 +3390,7 @@ class User < ActiveRecord::Base
 
     if account_users.any?
       roles << "admin"
-      roles << "root_admin" if root_admin_for?(root_account)
+      roles << "root_admin" if root_admin_for?(root_account, cached_account_users: account_users)
       roles << "consortium_admin" if account_users.any? { |au| au.shard != root_account.shard }
     end
     roles
