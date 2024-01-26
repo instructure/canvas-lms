@@ -721,7 +721,7 @@ describe "context modules" do
 
     context "with the differentiated_modules flag enabled" do
       before :once do
-        Account.site_admin.enable_feature! :differentiated_modules
+        differentiated_modules_on
         @module1 = @course.context_modules.create!(name: "module 1")
         @module2 = @course.context_modules.create!(name: "module 2")
         @module3 = @course.context_modules.create!(name: "module 3")
