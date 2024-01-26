@@ -3631,6 +3631,12 @@ describe User do
       expect(@user.roles(@account)).to eq %w[user admin root_admin]
     end
 
+    it "does not include 'root_admin' if the user's root account admin user record is deleted" do
+      au = @account.account_users.create!(user: @user, role: admin_role)
+      au.destroy
+      expect(@user.roles(@account)).to eq %w[user]
+    end
+
     it "caches results" do
       enable_cache do
         sub_account = @account.sub_accounts.create!
@@ -3672,6 +3678,12 @@ describe User do
     it "returns true if the user an admin in a root account" do
       @account.account_users.create!(user: @user, role: admin_role)
       expect(@user.root_admin_for?(@account)).to be true
+    end
+
+    it "returns false if the user *was* an admin in a root account" do
+      au = @account.account_users.create!(user: @user, role: admin_role)
+      au.destroy
+      expect(@user.root_admin_for?(@account)).to be false
     end
   end
 
