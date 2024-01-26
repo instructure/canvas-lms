@@ -354,7 +354,7 @@ class SisBatch < ActiveRecord::Base
 
     self.generated_diff = Attachment.create_data_attachment(
       self,
-      Rack::Test::UploadedFile.new(diffed_data_file.path, "application/zip"),
+      Canvas::UploadedFile.new(diffed_data_file.path, "application/zip"),
       t(:diff_filename, "sis_upload_diffed_%{id}.zip", id:)
     )
     save!
@@ -782,7 +782,7 @@ class SisBatch < ActiveRecord::Base
     end
     self.errors_attachment = Attachment.create_data_attachment(
       self,
-      Rack::Test::UploadedFile.new(file, "csv", true),
+      Canvas::UploadedFile.new(file, "csv"),
       "sis_errors_attachment_#{id}.csv"
     )
     save! if Rails.env.production?
