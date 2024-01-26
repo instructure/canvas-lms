@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback} from 'react'
+import React, {useCallback, useState} from 'react'
+import {Alert} from '@instructure/ui-alerts'
 import {CondensedButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {IconPlusLine} from '@instructure/ui-icons'
@@ -24,6 +25,9 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import type {PathwayDetailData, MilestoneData} from '../../../types'
 import {PathwayCard, MilestoneCard, BlankPathwayCard} from './PathwayBuilderSidebarCards'
+import {readFromLocalStorage, writeToLocalStorage} from '../../../shared/LocalStorage'
+
+const SHOW_ALERT_KEY = 'pathway-add-step-alert'
 
 const Connector = () => {
   return (
@@ -45,6 +49,7 @@ const AddMilestoneButton = ({onClick}: AddMilestoneButtonProps) => {
   return (
     <View
       as="div"
+      margin="medium 0 0 0"
       padding="small"
       role="button"
       cursor="pointer"
@@ -86,8 +91,16 @@ const PathwayBuilderSidebar = ({
   onDeleteStep,
   onHideSidebar,
 }: PathwayBuilderSidebarProps) => {
+  const [showAlert, setShowAlert] = useState(() => readFromLocalStorage(SHOW_ALERT_KEY) !== 'false')
+  const [firstSteps] = useState(pathway.milestones.length)
+
   const childSteps = currentStep ? currentStep.next_milestones : pathway.first_milestones
   const childMilestones = findChildMilestones(pathway.milestones, childSteps)
+
+  const handleCloseAlert = useCallback(() => {
+    setShowAlert(false)
+    writeToLocalStorage(SHOW_ALERT_KEY, 'false')
+  }, [])
 
   const handleEditPathway = useCallback(() => {
     onEditPathway()
@@ -139,7 +152,16 @@ const PathwayBuilderSidebar = ({
           </div>
         ))}
         {childMilestones.length === 0 && <BlankPathwayCard />}
-        <div style={{marginTop: '36px'}} />
+        {showAlert && firstSteps === 0 && pathway.milestones.length === 1 && (
+          <Alert
+            variant="info"
+            renderCloseButtonLabel="Close"
+            margin="medium 0 0 0"
+            onDismiss={handleCloseAlert}
+          >
+            Select a step to add a prerequisite
+          </Alert>
+        )}
         <AddMilestoneButton onClick={onAddStep} />
       </View>
     </View>
