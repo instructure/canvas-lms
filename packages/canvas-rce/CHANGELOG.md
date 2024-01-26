@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 5.12.1 - 2024-01-26
+
+### Fixed
+
+- An issue where we were adding file verifiers unnecessarily to non-user files
+  which were allowing students access to course files they should not have
+  access to
+- An issue where type query parameter was duplicated.
+- Fix focus ring in RCE content
+- Stop adding wrap params to course links
+
+### Changed
+
+- Bump redux-thunk to 3.1.0
+- Show full name in hover in All Files tray
+- Remove "scroll-into-view"
+- jQuery changes
+- Upgrade moment to 0.5.43
+- Upgrade babel-loader to 9.1.3
+- Remove use of InferType
+- Show media captions in New Quizzes
+- Bump Instui to 8.49
+
+
 ## 5.11.1 - 2023-10-12
 
 ### Fixed
