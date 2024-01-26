@@ -1109,25 +1109,29 @@ export default function DiscussionTopicForm({
           margin="xx-large none"
           padding="large none"
         >
-          <Button
-            type="button"
-            color="secondary"
-            onClick={() => {
-              window.location.assign(ENV.CANCEL_TO)
-            }}
-          >
-            {I18n.t('Cancel')}
-          </Button>
-          {shouldShowSaveAndPublishButton && (
+          <View margin="0 x-small 0 0">
             <Button
-              type="submit"
-              onClick={() => submitForm(true)}
+              type="button"
               color="secondary"
-              margin="xxx-small"
-              data-testid="save-and-publish-button"
+              onClick={() => {
+                window.location.assign(ENV.CANCEL_TO)
+              }}
             >
-              {I18n.t('Save and Publish')}
+              {I18n.t('Cancel')}
             </Button>
+          </View>
+          {shouldShowSaveAndPublishButton && (
+            <View margin="0 x-small 0 0">
+              <Button
+                type="submit"
+                onClick={() => submitForm(true)}
+                color="secondary"
+                margin="xxx-small"
+                data-testid="save-and-publish-button"
+              >
+                {I18n.t('Save and Publish')}
+              </Button>
+            </View>
           )}
           {/* for announcements, show publish when the available until da */}
           {isAnnouncement ? (
