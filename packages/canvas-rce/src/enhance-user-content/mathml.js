@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+// eslint-disable-next-line import/no-extraneous-dependencies
 import $ from 'jquery'
 
 const MathJaxDirective = Object.freeze({
@@ -179,11 +180,11 @@ class Mathml {
 
     const mathElements = elem.getElementsByTagName('math')
     for (let i = 0; i < mathElements.length; i++) {
-      const $el = $(mathElements[i])
+      const el = mathElements[i]
       if (
-        $el.is(':visible') &&
-        $el.parent('.hidden-readable').length <= 0 &&
-        $el.parent('.MJX_Assistive_MathML').length <= 0 // already mathjax'd
+        el.offsetParent !== null &&
+        !el.closest('.hidden-readable') &&
+        !el.closest('.MJX_Assistive_MathML') // already mathjax'd
       ) {
         return true
       }
