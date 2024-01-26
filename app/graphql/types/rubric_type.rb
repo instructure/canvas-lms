@@ -48,6 +48,7 @@ module Types
       !!object.hide_score_total
     end
 
+    field :hide_points, Boolean, null: true
     field :points_possible, Float, null: true
     field :title, String, null: true
     field :workflow_state, String, null: false

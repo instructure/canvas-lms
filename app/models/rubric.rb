@@ -65,6 +65,7 @@ class Rubric < ActiveRecord::Base
   validates_with RubricAssessedAlignments
 
   before_validation :default_values
+  before_save :set_default_hide_points
   before_create :set_root_account_id
   after_save :update_alignments
   after_save :touch_associations
@@ -330,6 +331,7 @@ class Rubric < ActiveRecord::Base
     self.data = data.criteria
     self.title = data.title
     self.points_possible = data.points_possible
+    self.hide_points = params[:hide_points]
     save
     self
   end
@@ -529,6 +531,10 @@ class Rubric < ActiveRecord::Base
       else
         context&.root_account_id
       end
+  end
+
+  def set_default_hide_points
+    self.hide_points = false if hide_points.nil?
   end
 
   def enhanced_rubrics_enabled?

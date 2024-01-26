@@ -17,9 +17,14 @@
  */
 
 import React, {useEffect, useState} from 'react'
-import {useParams} from 'react-router-dom'
+import {useNavigate, useParams} from 'react-router-dom'
+import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {useQuery} from '@canvas/query'
+import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
+import LoadingIndicator from '@canvas/loading-indicator/react'
+import {useQuery, useMutation, queryClient} from '@canvas/query'
+import {Alert} from '@instructure/ui-alerts'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {View} from '@instructure/ui-view'
 import {TextInput} from '@instructure/ui-text-input'
 import {Heading} from '@instructure/ui-heading'
@@ -35,17 +40,35 @@ import {Button} from '@instructure/ui-buttons'
 import {Link} from '@instructure/ui-link'
 import {RubricCriteriaRow} from './RubricCriteriaRow'
 import {NewCriteriaRow} from './NewCriteriaRow'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {fetchRubric} from '../../queries/RubricFormQueries'
-import LoadingIndicator from '@canvas/loading-indicator/react'
+import {fetchRubric, saveRubric, type RubricQueryResponse} from '../../queries/RubricFormQueries'
+import {type RubricFormProps, type RubricFormValueTypes} from '../../types/RubricForm'
 
 const I18n = useI18nScope('rubrics-form')
 
 const {Option: SimpleSelectOption} = SimpleSelect
 
+const defaultRubricForm: RubricFormProps = {
+  title: '',
+  hidePoints: false,
+}
+
+const translateRubricData = (fields: RubricQueryResponse): RubricFormProps => {
+  return {
+    id: fields.id,
+    title: fields.title ?? '',
+    hidePoints: fields.hidePoints ?? false,
+  }
+}
+
 export const RubricForm = () => {
-  const {rubricId} = useParams()
-  const [rubricFormTitle, setRubricFormTitle] = useState<string>('')
+  const {rubricId, accountId, courseId} = useParams()
+  const navigate = useNavigate()
+  const navigateUrl = accountId ? `/accounts/${accountId}/rubrics` : `/courses/${courseId}/rubrics`
+  const [rubricForm, setRubricForm] = useState<RubricFormProps>({
+    ...defaultRubricForm,
+    accountId,
+    courseId,
+  })
 
   const header = rubricId ? I18n.t('Edit Rubric') : I18n.t('Create New Rubric')
 
@@ -55,11 +78,43 @@ export const RubricForm = () => {
     enabled: !!rubricId,
   })
 
+  const {
+    isLoading: saveLoading,
+    isSuccess: saveSuccess,
+    isError: saveError,
+    mutate,
+  } = useMutation({
+    mutationFn: async () => saveRubric(rubricForm),
+    mutationKey: ['save-rubric'],
+    onSuccess: async () => {
+      showFlashSuccess(I18n.t('Rubric saved successfully'))()
+      const queryKey = accountId ? `accountRubrics-${accountId}` : `courseRubrics-${courseId}`
+      await queryClient.invalidateQueries([`fetch-rubric-${rubricId}`], {}, {cancelRefetch: true})
+      await queryClient.invalidateQueries([queryKey], undefined, {cancelRefetch: true})
+    },
+  })
+
+  const setRubricFormField = (field: keyof RubricFormProps, value: RubricFormValueTypes) => {
+    setRubricForm(prevState => ({...prevState, [field]: value}))
+  }
+
+  const formValid = () => {
+    // Add more form validation here
+    return rubricForm.title.trim().length > 0
+  }
+
   useEffect(() => {
-    if (data && data.title) {
-      setRubricFormTitle(data.title)
+    if (data) {
+      const rubricFormData = translateRubricData(data)
+      setRubricForm({...rubricFormData, accountId, courseId})
     }
-  }, [data])
+  }, [accountId, courseId, data])
+
+  useEffect(() => {
+    if (saveSuccess) {
+      navigate(navigateUrl)
+    }
+  }, [navigate, navigateUrl, saveSuccess])
 
   if (isLoading && !!rubricId) {
     return <LoadingIndicator />
@@ -67,6 +122,17 @@ export const RubricForm = () => {
 
   return (
     <View as="div">
+      {saveError && (
+        <Alert
+          variant="error"
+          liveRegionPoliteness="polite"
+          isLiveRegionAtomic={true}
+          liveRegion={getLiveRegion}
+          timeout={3000}
+        >
+          <Text weight="bold">{I18n.t('There was an error saving the rubric.')}</Text>
+        </Alert>
+      )}
       <Heading level="h1" as="h1" margin="small 0" themeOverride={{h1FontWeight: 700}}>
         {header}
       </Heading>
@@ -75,8 +141,8 @@ export const RubricForm = () => {
         <TextInput
           data-testid="rubric-form-title"
           renderLabel={I18n.t('Rubric Name')}
-          onChange={e => setRubricFormTitle(e.target.value)}
-          value={rubricFormTitle}
+          onChange={e => setRubricFormField('title', e.target.value)}
+          value={rubricForm.title}
         />
       </View>
       <View as="div" margin="medium 0" maxWidth="45rem">
@@ -87,7 +153,10 @@ export const RubricForm = () => {
                 <Text weight="bold">{I18n.t('Type')}:</Text>
               </Flex.Item>
               <Flex.Item margin="0 0 0 small">
-                <RubricTypeSelect />
+                <RubricHidePointsSelect
+                  hidePoints={rubricForm.hidePoints}
+                  onChangeHidePoints={hidePoints => setRubricFormField('hidePoints', hidePoints)}
+                />
               </Flex.Item>
             </Flex>
           </Flex.Item>
@@ -189,9 +258,15 @@ export const RubricForm = () => {
             </Link>
           </Flex.Item>
           <Flex.Item>
-            <Button>{I18n.t('Cancel')}</Button>
+            <Button onClick={() => navigate(navigateUrl)}>{I18n.t('Cancel')}</Button>
 
-            <Button margin="0 0 0 small" color="primary">
+            <Button
+              margin="0 0 0 small"
+              color="primary"
+              onClick={() => mutate()}
+              disabled={saveLoading || !formValid()}
+              data-testid="save-rubric-button"
+            >
               {I18n.t('Save Rubric')}
             </Button>
           </Flex.Item>
@@ -201,12 +276,22 @@ export const RubricForm = () => {
   )
 }
 
-const RubricTypeSelect = () => {
+type RubricHidePointsSelectProps = {
+  hidePoints: boolean
+  onChangeHidePoints: (hidePoints: boolean) => void
+}
+const RubricHidePointsSelect = ({hidePoints, onChangeHidePoints}: RubricHidePointsSelectProps) => {
+  const onChange = (value?: string | number) => {
+    onChangeHidePoints(value === 'unscored')
+  }
+
   return (
     <SimpleSelect
       renderLabel={<ScreenReaderContent>{I18n.t('Rubric Type')}</ScreenReaderContent>}
       size="small"
       width="8.125rem"
+      value={hidePoints ? 'unscored' : 'scored'}
+      onChange={(e, {value}) => onChange(value)}
     >
       <SimpleSelectOption id="scoredOption" value="scored">
         {I18n.t('Scored')}
