@@ -80,8 +80,9 @@ test('should add rows correctly', function () {
   const rowsBefore = this.me.rows.length
   const data = [Date.parse('next tuesday at 7pm'), Date.parse('next tuesday at 8pm')]
   const row = this.me.addRow(data)
-  equal(this.me.rows.length, rowsBefore + 1)
-  ok($.contains(this.me.element, row.$row), 'make sure the element got appended to my <tbody>')
+  strictEqual(this.me.rows.length, rowsBefore + 1, 'row count should increase by 1')
+  // element and $row are jQuery objects, so we need to compare the DOM elements
+  ok(this.me.element[0].contains(row.$row[0]), 'make sure the element got appended')
 })
 
 test('should validate if all rows are valid and complete or blank', function () {
