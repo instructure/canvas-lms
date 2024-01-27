@@ -10195,6 +10195,7 @@ ko:
   points_bb475533: 배점
   points_out_of_total_24f61148: "**%{total}** 점 중 *%{points}점*"
   points_possible_e57d5613: "가능한 점수"
+  pointspossible_pts_624a6733: "%{pointsPossible}점"
   post_at_be4b826d: "게시 시각"
   post_comment_a5a430a6: "의견 게시"
   posted_on_e1010e1e: "발행일:"
