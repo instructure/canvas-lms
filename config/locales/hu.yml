@@ -4,6 +4,7 @@
 hu: 
   1_item_scores_5512cd03: "1- Elem pontszámok"
   1_item_scores_examplescores_9736236: "1- Elem pontszámok: %{exampleScores}"
+  1_pt_cd3551c8: "1 pont"
   1st_reviewer_3c1d0119: "1. értékelő"
   25th_75th_ile_406a67bf: "25-75 percentilis között"
   25th_75th_percentile_aa4c11f2: "25-75 percentilis között"
@@ -15736,6 +15737,7 @@ hu:
   points_pts_e5596bf7: "%{points} pont"
   points_should_be_strictly_decreasing_l_r_18f26f87: "A pontoknak szigorúan csökkenőnek kell lenni: %{l} <= %{r}"
   points_total_pts_5b4cbd77: "%{points} / %{total} pont"
+  pointspossible_pts_624a6733: "%{pointsPossible} pont"
   poland_48_e77cc14d: "Lengyelország (+48)"
   polish_4cf2ecaf: Lengyel
   polling: 
