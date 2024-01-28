@@ -10991,6 +10991,7 @@ el:
   points_possible_e57d5613: "Πιθανά μόρια"
   points_possible_must_be_0_or_more_for_selected_gra_f96a04e3: "Τα πιθανά μόρια πρέπει να είναι 0 ή μεγαλύτερα από το 0 για τον επιλεγμένο τύπο βαθμολόγησης"
   points_pts_e5596bf7: "%{points} μόρια"
+  pointspossible_pts_624a6733: "%{pointsPossible} μόρια"
   polling: 
     poll_sessions: 
       errors: 
