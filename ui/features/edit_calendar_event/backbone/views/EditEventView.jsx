@@ -677,7 +677,7 @@ EditCalendarEventView.prototype.events = {
   'change #use_section_dates': 'toggleUseSectionDates',
   'click .delete_link': 'destroyModel',
   'click .switch_event_description_view': 'toggleHtmlView',
-  'change "#duplicate_event': 'duplicateCheckboxChanged',
+  'change #duplicate_event': 'duplicateCheckboxChanged',
   'click .btn[role="button"]': 'cancel',
 }
 EditCalendarEventView.type = 'event'
