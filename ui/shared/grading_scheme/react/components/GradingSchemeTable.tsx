@@ -134,7 +134,7 @@ export const GradingSchemeTable = ({
                     </Link>
                   </Table.Cell>
                   <Table.Cell key="locationsUsed">
-                    {gradingSchemeCard.gradingScheme.used_locations.length > 0 ? (
+                    {(gradingSchemeCard.gradingScheme.used_locations || []).length > 0 ? (
                       <Link
                         isWithinText={false}
                         onClick={() => viewUsedLocations(gradingSchemeCard.gradingScheme)}
@@ -162,9 +162,11 @@ export const GradingSchemeTable = ({
                           withBackground={false}
                           onClick={() => editGradingScheme(gradingSchemeCard.gradingScheme.id)}
                           screenReaderLabel={I18n.t('Edit Grading Scheme')}
-                          disabled={gradingSchemeCard.gradingScheme.used_locations.length > 0}
+                          disabled={
+                            (gradingSchemeCard.gradingScheme.used_locations || []).length > 0
+                          }
                         >
-                          {gradingSchemeCard.gradingScheme.used_locations.length > 0 ? (
+                          {(gradingSchemeCard.gradingScheme.used_locations || []).length > 0 ? (
                             <Tooltip
                               renderTip={I18n.t(
                                 "You can't edit this grading scheme because it has been used for grading."
@@ -194,9 +196,11 @@ export const GradingSchemeTable = ({
                           withBackground={false}
                           screenReaderLabel={I18n.t('Delete Grading Scheme')}
                           onClick={() => openDeleteModal(gradingSchemeCard.gradingScheme)}
-                          disabled={gradingSchemeCard.gradingScheme.used_locations.length > 0}
+                          disabled={
+                            (gradingSchemeCard.gradingScheme.used_locations || []).length > 0
+                          }
                         >
-                          {gradingSchemeCard.gradingScheme.used_locations.length > 0 ? (
+                          {(gradingSchemeCard.gradingScheme.used_locations || []).length > 0 ? (
                             <Tooltip
                               renderTip={I18n.t(
                                 "You can't delete this grading scheme because it is in use."
