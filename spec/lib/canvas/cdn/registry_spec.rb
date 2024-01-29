@@ -106,7 +106,11 @@ describe Canvas::Cdn::Registry do
     end
 
     it "does not include .map.js files" do
-      @webpack_manifest = { "main" => "a-entry-1234.js", "foo" => "a-entry-1234.map.js" }
+      @webpack_manifest = {
+        "main" => "a-entry-1234.js",
+        "foo" => "a-entry-1234.map.js",
+        "bar" => "a-entry-1234.js.map.js"
+      }
 
       expect(subject.entries).to eq(
         [

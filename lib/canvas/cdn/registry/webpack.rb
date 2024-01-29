@@ -49,7 +49,7 @@ module Canvas
 
         def entries
           # contains -entry- in filename, ends in .js, but doesn't end in .map.js
-          @manifest.values.grep(/-entry-\w+(?<!\.map)\.js/).map { |file_path| realpath(file_path) }
+          @manifest.values.grep(/-entry-.*\.js$/).grep_v(/\.map\.js$/).map { |x| realpath(x) }
         end
 
         private
