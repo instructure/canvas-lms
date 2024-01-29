@@ -30,7 +30,6 @@ import {initSentry} from './initializers/initSentry'
 import {up as renderRailsFlashNotifications} from './initializers/renderRailsFlashNotifications'
 import {up as activateCourseMenuToggler} from './initializers/activateCourseMenuToggler'
 import {up as enhanceUserContent} from './initializers/enhanceUserContent'
-import {isolate} from '@canvas/sentry'
 
 // Import is required, workaround for ARC-8398
 // eslint-disable-next-line import/no-nodejs-modules
@@ -52,9 +51,9 @@ moment().locale(ENV.MOMENT_LOCALE)
 let runOnceAfterLocaleFiles = () => {
   configureDateTimeMomentParser()
   configureDateTime()
-  isolate(renderRailsFlashNotifications)()
-  isolate(activateCourseMenuToggler)()
-  isolate(enhanceUserContent)()
+  renderRailsFlashNotifications()
+  activateCourseMenuToggler()
+  enhanceUserContent()
 }
 
 window.addEventListener('canvasReadyStateChange', function ({detail}) {

@@ -23,7 +23,6 @@
 // the critical code to display a page will be executed sooner
 
 import $ from 'jquery'
-import {isolate} from '@canvas/sentry'
 
 // modules that do their own thing on every page that simply need to be required
 import './addBrowserClasses'
@@ -39,7 +38,7 @@ import './activateLtiThumbnailLauncher'
 import './sanitizeCSSOverflow'
 
 if (ENV.page_view_update_url) {
-  isolate(() => import(/* webpackChunkName: "[request]" */ './trackPageViews'))()
+  import(/* webpackChunkName: "[request]" */ './trackPageViews')
 }
 
 // preventDefault so we dont change the hash
