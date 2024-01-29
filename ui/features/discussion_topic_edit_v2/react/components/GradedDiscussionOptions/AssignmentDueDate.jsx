@@ -134,8 +134,8 @@ export const AssignmentDueDate = ({
           invalidDateTimeMessage={I18n.t('Invalid date and time')}
           layout="columns"
           datePlaceholder={I18n.t('Select Assignment Due Date')}
-          dateRenderLabel=""
-          timeRenderLabel=""
+          dateRenderLabel={I18n.t('Date')}
+          timeRenderLabel={I18n.t('Time')}
           messages={dueDateErrorMessage}
         />
         <DateTimeInput
@@ -151,8 +151,8 @@ export const AssignmentDueDate = ({
           invalidDateTimeMessage={I18n.t('Invalid date and time')}
           layout="columns"
           datePlaceholder={I18n.t('Select Assignment Available From Date')}
-          dateRenderLabel=""
-          timeRenderLabel=""
+          dateRenderLabel={I18n.t('Date')}
+          timeRenderLabel={I18n.t('Time')}
           messages={availableFromAndUntilErrorMessage}
         />
         <DateTimeInput
@@ -168,8 +168,8 @@ export const AssignmentDueDate = ({
           invalidDateTimeMessage={I18n.t('Invalid date and time')}
           layout="columns"
           datePlaceholder={I18n.t('Select Assignment Available Until Date')}
-          dateRenderLabel=""
-          timeRenderLabel=""
+          dateRenderLabel={I18n.t('Date')}
+          timeRenderLabel={I18n.t('Time')}
           messages={availableFromAndUntilErrorMessage}
         />
       </FormFieldGroup>

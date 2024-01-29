@@ -857,8 +857,8 @@ export default function DiscussionTopicForm({
               invalidDateTimeMessage={I18n.t('Invalid date and time')}
               layout="columns"
               datePlaceholder={I18n.t('Select Date')}
-              dateRenderLabel=""
-              timeRenderLabel=""
+              dateRenderLabel={I18n.t('Date')}
+              timeRenderLabel={I18n.t('Time')}
             />
           )}
           {shouldShowAnnouncementOnlyOptions && (
@@ -955,11 +955,12 @@ export default function DiscussionTopicForm({
                   display="block"
                   padding="none none none large"
                   data-testid="todo-date-section"
+                  margin="small 0 0 0"
                 >
                   <DateTimeInput
                     description=""
-                    dateRenderLabel=""
-                    timeRenderLabel=""
+                    dateRenderLabel={I18n.t('Date')}
+                    timeRenderLabel={I18n.t('Time')}
                     prevMonthLabel={I18n.t('previous')}
                     nextMonthLabel={I18n.t('next')}
                     onChange={(_event, newDate) => setTodoDate(newDate)}
@@ -1091,8 +1092,8 @@ export default function DiscussionTopicForm({
             <FormFieldGroup description="" width={inputWidth}>
               <DateTimeInput
                 description={I18n.t('Available from')}
-                dateRenderLabel=""
-                timeRenderLabel=""
+                dateRenderLabel={I18n.t('Date')}
+                timeRenderLabel={I18n.t('Time')}
                 prevMonthLabel={I18n.t('previous')}
                 nextMonthLabel={I18n.t('next')}
                 value={availableFrom}
@@ -1106,9 +1107,9 @@ export default function DiscussionTopicForm({
               />
               <DateTimeInput
                 description={I18n.t('Until')}
-                dateRenderLabel=""
-                timeRenderLabel=""
-                prevMonthLabel={I18n.t('previous')}
+                dateRenderLabel={I18n.t('Date')}
+                timeRenderLabel={I18n.t('Time')}
+                prevMonthLabel={I18n.t('Time')}
                 nextMonthLabel={I18n.t('next')}
                 value={availableUntil}
                 onChange={(_event, newAvailableUntil) => {
