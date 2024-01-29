@@ -310,6 +310,6 @@ class AccessToken < ActiveRecord::Base
     tokens = active.where(developer_key_id: developer_key_ids, user_id: user_ids)
 
     now = Time.zone.now
-    tokens.update_all(updated_at: now, permanent_expires_at: now)
+    tokens.in_batches(of: 10_000).update_all(updated_at: now, permanent_expires_at: now)
   end
 end
