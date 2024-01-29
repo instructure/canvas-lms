@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 - present Instructure, Inc.
+ * Copyright (C) 2024 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,21 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * From content_migrations_controller.rb
- */
-export interface EnvContentMigrations {
-  SHOW_SELECTABLE_OUTCOMES_IN_IMPORT?: boolean
-  UPLOAD_LIMIT?: number
-  QUESTION_BANKS?: {
-    assessment_question_bank: {
-      id: number
-      title: string
-    }
-  }[]
-  NEW_QUIZZES_IMPORT?: boolean
-  NEW_QUIZZES_MIGRATION?: boolean
-  QUIZZES_NEXT_ENABLED?: boolean
-  NEW_QUIZZES_MIGRATION_DEFAULT?: boolean
-  EXPORT_WARNINGS?: string[]
+import React from 'react'
+import {render} from '@testing-library/react'
+import CopyWarningsModal from '../CopyWarningsModal'
+
+function renderComponent(errorMessages: string[]) {
+  return render(<CopyWarningsModal errorMessages={errorMessages} />)
 }
+
+describe('CourseDefaultDueTime', () => {
+  describe('can render with the warning message', () => {
+    it('renders course default due time', () => {
+      const {getByLabelText} = renderComponent(['This is a test warning message'])
+      expect(getByLabelText('This is a test warning message')).toBeInTheDocument()
+    })
+  })
+})

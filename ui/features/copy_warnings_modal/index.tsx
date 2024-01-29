@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 - present Instructure, Inc.
+ * Copyright (C) 2017 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,21 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * From content_migrations_controller.rb
- */
-export interface EnvContentMigrations {
-  SHOW_SELECTABLE_OUTCOMES_IN_IMPORT?: boolean
-  UPLOAD_LIMIT?: number
-  QUESTION_BANKS?: {
-    assessment_question_bank: {
-      id: number
-      title: string
-    }
-  }[]
-  NEW_QUIZZES_IMPORT?: boolean
-  NEW_QUIZZES_MIGRATION?: boolean
-  QUIZZES_NEXT_ENABLED?: boolean
-  NEW_QUIZZES_MIGRATION_DEFAULT?: boolean
-  EXPORT_WARNINGS?: string[]
-}
+import ready from '@instructure/ready'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import CopyWarningsModal from './react/CopyWarningsModal'
+
+ready(() => {
+  const container = document.querySelector('#warning_messages_modal_container')
+  if (container && ENV.EXPORT_WARNINGS && ENV.EXPORT_WARNINGS.length > 0) {
+    ReactDOM.render(<CopyWarningsModal errorMessages={ENV.EXPORT_WARNINGS} />, container)
+  }
+})
