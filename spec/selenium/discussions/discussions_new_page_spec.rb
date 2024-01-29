@@ -628,6 +628,14 @@ describe "discussions" do
         expect(f("span[data-testid='author_name']").text).to eq "teacher"
       end
 
+      it "displays the grading and groups not supported in anonymous discussions message when either of the anonymous options are selected" do
+        get "/courses/#{course.id}/discussion_topics/new"
+        force_click("input[value='full_anonymity']")
+        expect(f("[data-testid=groups_grading_not_allowed]")).to be_displayed
+        force_click("input[value='partial_anonymity']")
+        expect(f("[data-testid=groups_grading_not_allowed]")).to be_displayed
+      end
+
       it "creates an allow_rating discussion topic successfully" do
         get "/courses/#{course.id}/discussion_topics/new"
         f("input[placeholder='Topic Title']").send_keys "This is allow_rating"
