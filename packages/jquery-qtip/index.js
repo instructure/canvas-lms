@@ -1,3 +1,20 @@
+/* eslint-disable dot-notation */
+/* eslint-disable object-shorthand */
+/* eslint-disable no-extra-boolean-cast */
+/* eslint-disable lines-around-directive */
+/* eslint-disable strict */
+/* eslint-disable yoda */
+/* eslint-disable operator-assignment */
+/* eslint-disable no-sequences */
+/* eslint-disable block-scoped-var */
+/* eslint-disable no-var */
+/* eslint-disable no-empty */
+/* eslint-disable prefer-spread */
+/* eslint-disable vars-on-top */
+/* eslint-disable no-restricted-globals */
+/* eslint-disable no-lonely-if */
+/* eslint-disable no-shadow-restricted-names */
+
 /*
  * qTip2 - Pretty powerful tooltips - v2.2.0
  * http://qtip2.com
@@ -10,7 +27,8 @@
  * Plugins: tips viewport svg
  * Styles: None
  */
-/*global window: false, jQuery: false, console: false, define: false */
+
+/* global jQuery: false */
 
 /* Cache window, document, undefined */
 (function( window, document, undefined ) {
@@ -1676,7 +1694,7 @@ function init(elem, id, opts) {
 	html5 = elem.data(opts.metadata.name || 'qtipopts');
 
 	// If we don't get an object returned attempt to parse it manualyl without parseJSON
-	try { html5 = typeof html5 === 'string' ? $.parseJSON(html5) : html5; } catch(e) {}
+	try { html5 = typeof html5 === 'string' ? JSON.parse(html5) : html5; } catch(e) {}
 
 	// Merge in and sanitize metadata
 	config = $.extend(TRUE, {}, QTIP.defaults, opts,

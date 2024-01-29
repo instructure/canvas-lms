@@ -522,7 +522,7 @@ $.sendFormAsBinary = function (options, not_binary) {
     if (xhr.readyState === 4) {
       let json = null
       try {
-        json = $.parseJSON(xhr.responseText)
+        json = JSON.parse(xhr.responseText)
       } catch (e) {
         // no-op
       }

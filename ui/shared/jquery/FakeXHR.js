@@ -37,7 +37,7 @@ export default class FakeXHR {
     this.responseText = body
 
     try {
-      this.response = $.parseJSON(body)
+      this.response = JSON.parse(body)
     } catch (e) {
       this.status = 500
       this.statusText = '500 Internal Server Error'
