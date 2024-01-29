@@ -23,7 +23,6 @@ import '@canvas/jquery/jquery.instructure_jquery_patches' // this needs to be be
 import './boot'
 
 // true modules that we use in this file
-import $ from 'jquery'
 import ready from '@instructure/ready'
 import splitAssetString from '@canvas/util/splitAssetString'
 import {Mathml} from '@instructure/canvas-rce'
@@ -119,6 +118,9 @@ function afterDocumentReady() {
     advanceReadiness('deferredBundles')
   })
 
+  const helpButton = document.querySelector('.help_dialog_trigger')
+  if (helpButton !== null) helpButton.addEventListener('click', openHelpDialog)
+
   loadReactRouter()
   loadNewUserTutorials()
 
@@ -208,16 +210,18 @@ if (ENV.badge_counts) {
   import('./boot/initializers/showBadgeCounts')
 }
 
-doRandomThingsToDOM()
-
-function doRandomThingsToDOM() {
-  $('.help_dialog_trigger').click(event => {
-    event.preventDefault()
-    // eslint-disable-next-line promise/catch-or-return
-    import('./boot/initializers/enableHelpDialog').then(({default: helpDialog}) =>
-      helpDialog.open()
-    )
-  })
+// Load and then display the Canvas help dialog if the user has requested it
+async function openHelpDialog(event: Event): Promise<void> {
+  event.preventDefault()
+  try {
+    const {default: helpDialog} = await import('./boot/initializers/enableHelpDialog')
+    helpDialog.open()
+  } catch (e) {
+    /* eslint-disable no-console */
+    console.error('Help dialog could not be displayed')
+    console.error(e)
+    /* eslint-enable no-console */
+  }
 }
 
 async function loadNewUserTutorials() {
