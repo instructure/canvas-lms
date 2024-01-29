@@ -1040,6 +1040,13 @@ export default function DiscussionTopicForm({
             </View>
           )}
         </FormFieldGroup>
+        {discussionAnonymousState.includes('anonymity') && !isEditing && (
+          <View width="580px" display="block" data-testid="groups_grading_not_allowed">
+            <Alert variant="info" margin="small">
+              {I18n.t('Grading and Groups are not supported in Anonymous Discussions.')}
+            </Alert>
+          </View>
+        )}
         {shouldShowAvailabilityOptions &&
           (isGraded ? (
             <View as="div" data-testid="assignment-settings-section">
