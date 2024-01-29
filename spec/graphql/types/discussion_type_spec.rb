@@ -756,6 +756,14 @@ describe Types::DiscussionType do
         expect(discussion_type.resolve("mentionableUsersConnection { nodes { _id } }")).to eq(discussion.context.participating_users_in_context.map { |u| u.id.to_s })
       end
     end
+
+    it "returns can_group correctly" do
+      student_in_course(active_all: true)
+      expect(discussion_type.resolve("canGroup")).to be true
+
+      discussion.discussion_entries.create!(message: "other student entry", user: @student)
+      expect(discussion_type.resolve("canGroup")).to be false
+    end
   end
 
   context "group discussion with deleted group" do
