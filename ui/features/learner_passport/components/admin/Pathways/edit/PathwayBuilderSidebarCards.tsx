@@ -39,7 +39,7 @@ const PathwayCard = ({step, onEdit}: PathwayCardProps) => {
     <View
       as="div"
       background="primary-inverse"
-      borderRadius="medium"
+      borderRadius="large"
       padding="small"
       textAlign="start"
     >
@@ -47,12 +47,12 @@ const PathwayCard = ({step, onEdit}: PathwayCardProps) => {
         {step.image_url && (
           <img src={step.image_url} alt="" style={{height: '42px', display: 'inline-block'}} />
         )}
-        <Flex.Item shouldGrow={true}>
-          <Text as="div" fontStyle="italic">
+        <Flex.Item shouldGrow={true} shouldShrink={true}>
+          <Text as="div" fontStyle="italic" size="x-small">
             End of pathway
           </Text>
-          <Text as="div" weight="bold">
-            {step.title}
+          <Text as="div" weight="bold" size="x-small">
+            <TruncateText>{step.title}</TruncateText>
           </Text>
         </Flex.Item>
         <IconButton
@@ -81,23 +81,20 @@ const MilestoneCard = ({step, variant, onEdit, onDelete}: MilestoneCardProps) =>
   return (
     <View
       as="div"
+      background="primary"
       borderWidth="small"
-      borderRadius="medium"
+      borderRadius="large"
       padding="small"
       textAlign="start"
       width="auto"
     >
       <Flex as="div" gap="small">
-        {variant === 'child' ? (
-          <IconDragHandleLine />
-        ) : (
-          <div style={{width: '1rem', height: '1rem'}} />
-        )}
+        {variant === 'child' && <IconDragHandleLine />}
         <Flex.Item shouldGrow={true} shouldShrink={true}>
-          <Text as="div" weight="bold">
+          <Text as="div" weight="bold" size="x-small">
             <TruncateText>{step.title}</TruncateText>
           </Text>
-          <Text as="div" size="small">
+          <Text as="div" size="x-small">
             {step.next_milestones.filter(m => m !== 'blank').length} prerequisites
           </Text>
         </Flex.Item>

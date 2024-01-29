@@ -20,18 +20,13 @@ import React, {useCallback, useState} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {uid} from '@instructure/uid'
-import type {
-  LearnerGroupType,
-  PathwayBadgeType,
-  PathwayDetailData,
-  DraftPathway,
-  MilestoneData,
-} from '../../../types'
+import type {PathwayDetailData, DraftPathway, MilestoneData} from '../../../types'
 import PathwayBuilderSidebar from './PathwayBuilderSidebar'
 import PathwayBuilderTree from './PathwayBuilderTree'
 import MilestoneTray from './MilestoneTray'
 import PathwayDetailsTray from './PathwayDetailsTray'
 import confirm from '../../../shared/Confirmation'
+import {findSubtreeMilestones} from '../../../shared/utils'
 
 function makeDefaultMilestone(): MilestoneData {
   return {
@@ -45,36 +40,13 @@ function makeDefaultMilestone(): MilestoneData {
   }
 }
 
-const findSubtreeMilestones = (
-  milestones: MilestoneData[],
-  rootId: string,
-  subtree: string[]
-): string[] => {
-  const root = milestones.find(m => m.id === rootId)
-  if (!root) return subtree
-  subtree.push(rootId)
-  if (root.next_milestones.length === 0) return subtree
-  root?.next_milestones.forEach(nextid => {
-    subtree.concat(findSubtreeMilestones(milestones, nextid, subtree))
-  })
-  return subtree
-}
-
 type PathwayBuilderProps = {
   pathway: DraftPathway
   mode: 'create' | 'edit'
-  allBadges: PathwayBadgeType[]
-  allLearnerGroups: LearnerGroupType[]
   onChange: (newValues: Partial<PathwayDetailData>) => void
 }
 
-const PathwayBuilder = ({
-  pathway,
-  mode,
-  allBadges,
-  allLearnerGroups,
-  onChange,
-}: PathwayBuilderProps) => {
+const PathwayBuilder = ({pathway, mode, onChange}: PathwayBuilderProps) => {
   const [currentRoot, setCurrentRoot] = useState<MilestoneData | null>(null)
   const [sidebarIsVisible, setSidebarIsVisible] = useState(true)
   const [milestoneTrayOpen, setMilestoneTrayOpen] = useState(false)
@@ -252,15 +224,12 @@ const PathwayBuilder = ({
       </div>
       <PathwayDetailsTray
         pathway={pathway}
-        allBadges={allBadges}
-        allLearnerGroups={allLearnerGroups}
         selectedBadgeId={pathway.completion_award || null}
         open={pathwayTrayOpen}
         onClose={() => setPathwayTrayOpen(false)}
         onSave={handleSavePathwayDetails}
       />
       <MilestoneTray
-        allBadges={allBadges}
         milestone={activeMilestone}
         open={milestoneTrayOpen}
         variant={milestoneTrayVariant}

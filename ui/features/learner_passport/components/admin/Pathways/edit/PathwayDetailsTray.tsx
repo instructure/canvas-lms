@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useState} from 'react'
+import React, {useCallback, useContext, useState} from 'react'
 
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
@@ -28,21 +28,14 @@ import {TextArea} from '@instructure/ui-text-area'
 import {TextInput} from '@instructure/ui-text-input'
 import {Tray} from '@instructure/ui-tray'
 import {View} from '@instructure/ui-view'
-import type {
-  LearnerGroupType,
-  PathwayDetailData,
-  PathwayBadgeType,
-  PathwayUserShareType,
-} from '../../../types'
+import type {PathwayDetailData, PathwayUserShareType} from '../../../types'
 import AddBadgeTray, {renderBadges} from './AddBadgeTray'
-import AddLearnerGroupsTray, {LearnerGroupCard} from './AddLearnerGroupsTray'
+import AddLearnerGroupsPicker from './AddLearnerGroupsPicker'
 import CanvasUserFinder from './shares/CanvasUserFinder'
-import {showUnimplemented} from '../../../shared/utils'
+import {DataContext} from '../PathwayEditDataContext'
 
 type PathwayDetailsTrayProps = {
   pathway: PathwayDetailData
-  allBadges: PathwayBadgeType[]
-  allLearnerGroups: LearnerGroupType[]
   selectedBadgeId: string | null
   open: boolean
   onClose: () => void
@@ -51,13 +44,12 @@ type PathwayDetailsTrayProps = {
 
 const PathwayDetailsTray = ({
   pathway,
-  allBadges,
-  allLearnerGroups,
   selectedBadgeId,
   open,
   onClose,
   onSave,
 }: PathwayDetailsTrayProps) => {
+  const {allBadges, allLearnerGroups} = useContext(DataContext)
   const [title, setTitle] = useState(pathway.title)
   const [description, setDescription] = useState(pathway.description)
   const [currSelectedBadgeId, setCurrSelectedBadgeId] = useState<string | null>(selectedBadgeId)
@@ -65,8 +57,7 @@ const PathwayDetailsTray = ({
     pathway.learner_groups
   )
   const [selectedShares, setSelectedShares] = useState<PathwayUserShareType[]>(pathway.shares)
-  const [addBadgeTrayOpenKey, setAddBadgeTrayOpenKey] = useState(0)
-  const [addLearnerGroupsTrayOpenKey, setAddLearnerGroupsTrayOpenKey] = useState(0)
+  const [addBadgeTrayOpen, setAddBadgeTrayOpen] = useState(false)
 
   const handleCancel = useCallback(() => {
     setTitle(pathway.title)
@@ -81,8 +72,8 @@ const PathwayDetailsTray = ({
     if (!title) return
     const badge = allBadges.find(b => b.id === currSelectedBadgeId)
     onSave({
-      title,
-      description,
+      title: title.trim(),
+      description: description.trim(),
       completion_award: badge?.id || null,
       learner_groups: selectedLearnerGroupIds,
       shares: selectedShares,
@@ -99,7 +90,7 @@ const PathwayDetailsTray = ({
 
   const handleTitleChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>, newTitle: string) => {
-      setTitle(newTitle.trim())
+      setTitle(newTitle)
     },
     []
   )
@@ -110,21 +101,20 @@ const PathwayDetailsTray = ({
   }, [])
 
   const handleAddAchievementClick = useCallback(() => {
-    setAddBadgeTrayOpenKey(Date.now())
+    setAddBadgeTrayOpen(true)
   }, [])
 
   const handleSaveBadge = useCallback((badgeId: string | null) => {
     setCurrSelectedBadgeId(badgeId)
-    setAddBadgeTrayOpenKey(0)
+    setAddBadgeTrayOpen(false)
   }, [])
 
-  const handleAddLearnerGroupClick = useCallback(() => {
-    setAddLearnerGroupsTrayOpenKey(Date.now())
+  const handleRemoveBadge = useCallback(() => {
+    setCurrSelectedBadgeId(null)
   }, [])
 
   const handleSaveLearnerGroups = useCallback((learnerGroupIds: string[]) => {
     setSelectedLearnerGroupIds(learnerGroupIds)
-    setAddLearnerGroupsTrayOpenKey(0)
   }, [])
 
   const handleChangeSharedUser = useCallback((users: PathwayUserShareType[]) => {
@@ -180,11 +170,12 @@ const PathwayDetailsTray = ({
                     Add a badge or certificate that the learner will receive when the pathway is
                     completed. The skills associated with that achievement will be linked as well.
                   </Text>
-                  {renderBadges(allBadges, currSelectedBadgeId)}
+                  {renderBadges(allBadges, currSelectedBadgeId, handleRemoveBadge)}
                   <Button
                     margin="small 0 0 0"
                     onClick={handleAddAchievementClick}
                     renderIcon={IconAddLine}
+                    interaction={currSelectedBadgeId ? 'disabled' : 'enabled'}
                   >
                     Add Achievement
                   </Button>
@@ -192,34 +183,14 @@ const PathwayDetailsTray = ({
               </View>
               <View as="div" padding="medium 0" borderWidth="0 0 small 0">
                 <FormField id="pathway-learner-groups" label="Learner Groups">
-                  <Text as="div" size="small">
+                  <Text as="div" size="small" weight="normal">
                     Add learner groups to this pathway. You can also add groups later.
                   </Text>
-                  {selectedLearnerGroupIds.length > 0 && (
-                    <Flex as="div" margin="small 0 0 0" direction="column" gap="small">
-                      {selectedLearnerGroupIds.map(id => {
-                        const group = allLearnerGroups.find(g => g.id === id)
-                        if (group) {
-                          return <LearnerGroupCard key={id} group={group} />
-                        }
-                        return null
-                      })}
-                    </Flex>
-                  )}
-                  <Button
-                    margin="small 0 0 0"
-                    renderIcon={IconAddLine}
-                    onClick={handleAddLearnerGroupClick}
-                  >
-                    Add Learner Groups
-                  </Button>
-                  <Button
-                    margin="small 0 0 x-small"
-                    renderIcon={IconAddLine}
-                    onClick={showUnimplemented}
-                  >
-                    Create Learner Group
-                  </Button>
+
+                  <AddLearnerGroupsPicker
+                    selectedLearnerGroupIds={selectedLearnerGroupIds}
+                    onChange={handleSaveLearnerGroups}
+                  />
                 </FormField>
               </View>
               <View as="div" padding="medium 0">
@@ -241,20 +212,10 @@ const PathwayDetailsTray = ({
         </Flex>
       </Tray>
       <AddBadgeTray
-        key={addBadgeTrayOpenKey}
-        open={addBadgeTrayOpenKey > 0}
+        open={addBadgeTrayOpen}
         selectedBadgeId={currSelectedBadgeId}
-        allBadges={allBadges}
-        onClose={() => setAddBadgeTrayOpenKey(0)}
+        onClose={() => setAddBadgeTrayOpen(false)}
         onSave={handleSaveBadge}
-      />
-      <AddLearnerGroupsTray
-        key={addLearnerGroupsTrayOpenKey}
-        open={addLearnerGroupsTrayOpenKey > 0}
-        allLearnerGroups={allLearnerGroups}
-        selectedLearnerGroupIds={selectedLearnerGroupIds}
-        onClose={() => setAddLearnerGroupsTrayOpenKey(0)}
-        onSave={handleSaveLearnerGroups}
       />
     </View>
   )

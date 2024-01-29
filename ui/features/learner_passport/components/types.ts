@@ -214,17 +214,7 @@ export interface MilestoneData {
   description: string
   required?: boolean
   requirements: RequirementData[]
-  completion_award: string | null
-  next_milestones: string[] // ids of this milestone's children
-}
-
-export interface MilestoneViewData {
-  id: string
-  title: string
-  description: string
-  required?: boolean
-  requirements: RequirementData[]
-  completion_award: PathwayBadgeType | null
+  completion_award: string | PathwayBadgeType | null
   next_milestones: string[] // ids of this milestone's children
 }
 
@@ -245,23 +235,19 @@ export interface PathwayDetailData extends PathwayData {
   image_url: string | null
   is_private?: boolean
   learning_outcomes: SkillData[]
-  completion_award: string | null
-  learner_groups: string[] // learner group ids
+  completion_award: string | PathwayBadgeType | null
+  learner_groups: string[] | LearnerGroupType[]
   shares: PathwayUserShareType[]
   first_milestones: string[] // ids of the milestone children of the root pathway
   milestones: MilestoneData[] // all the milestones in the pathway
 }
 
-export interface PathwayViewDetailData extends PathwayData {
-  description: string
-  image_url: string | null
-  is_private?: boolean
-  learning_outcomes: SkillData[]
-  completion_award: PathwayBadgeType | null
-  learner_groups: LearnerGroupType[]
-  shares: PathwayUserShareType[]
-  first_milestones: string[] // ids of the milestone children of the root pathway
-  milestones: MilestoneViewData[] // all the milestones in the pathway
+export function isPathwayBadgeType(badge: string | PathwayBadgeType): badge is PathwayBadgeType {
+  return (badge as PathwayBadgeType).id !== undefined
+}
+
+export function isLearnerGroupType(group: string | LearnerGroupType): group is LearnerGroupType {
+  return (group as LearnerGroupType).id !== undefined
 }
 
 export interface DraftPathway extends PathwayDetailData {

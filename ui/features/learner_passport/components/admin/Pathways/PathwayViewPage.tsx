@@ -22,11 +22,11 @@ import {Breadcrumb} from '@instructure/ui-breadcrumb'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {View} from '@instructure/ui-view'
-import type {PathwayViewDetailData} from '../../types'
+import type {PathwayDetailData} from '../../types'
 import PathwayView from './PathwayView'
 
 const PathwayViewPage = () => {
-  const pathway = useLoaderData() as PathwayViewDetailData
+  const pathway = useLoaderData() as PathwayDetailData
 
   return (
     <Flex as="div" direction="column" gap="small" alignItems="stretch">

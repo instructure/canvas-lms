@@ -26,6 +26,7 @@ import {uid} from '@instructure/uid'
 import type {PathwayDetailData, PathwayEditData, DraftPathway} from '../../../types'
 import AdminHeader from '../../AdminHeader'
 import PathwayBuilder from './PathwayBuilder'
+import {DataContext} from '../PathwayEditDataContext'
 
 type PathwayEditMode = 'create' | 'edit'
 
@@ -86,43 +87,39 @@ const PathwayEdit = () => {
   }, [draftPathway.milestones])
 
   return (
-    <Flex as="div" direction="column" alignItems="stretch" height="100%">
-      <AdminHeader
-        title={
+    <DataContext.Provider value={{allBadges, allLearnerGroups}}>
+      <Flex as="div" direction="column" alignItems="stretch" height="100%">
+        <AdminHeader
+          title={
+            <>
+              <Heading level="h1">{draftPathway.title}</Heading>
+              <Text size="small">
+                {draftPathway.milestones.length} Milestones | {reqCount()} Requirements
+              </Text>
+            </>
+          }
+          breadcrumbs={[
+            {
+              text: 'Pathways',
+              url: `/users/${ENV.current_user.id}/passport/admin/pathways/dashboard`,
+            },
+            {text: 'Pathway Builder'},
+          ]}
+        >
           <>
-            <Heading level="h1">{draftPathway.title}</Heading>
-            <Text size="small">
-              {draftPathway.milestones.length} Milestones | {reqCount()} Requirements
-            </Text>
+            <Button margin="0 x-small 0 0" onClick={handleSaveAsDraftClick}>
+              Save as Draft
+            </Button>
+            <Button color="primary" margin="0" onClick={handlePublishClick}>
+              Publish Pathway
+            </Button>
           </>
-        }
-        breadcrumbs={[
-          {
-            text: 'Pathways',
-            url: `/users/${ENV.current_user.id}/passport/admin/pathways/dashboard`,
-          },
-          {text: 'Pathway Builder'},
-        ]}
-      >
-        <>
-          <Button margin="0 x-small 0 0" onClick={handleSaveAsDraftClick}>
-            Save as Draft
-          </Button>
-          <Button color="primary" margin="0" onClick={handlePublishClick}>
-            Publish Pathway
-          </Button>
-        </>
-      </AdminHeader>
-      <Flex.Item shouldGrow={true} shouldShrink={false} overflowY="visible">
-        <PathwayBuilder
-          pathway={draftPathway}
-          mode={mode}
-          allBadges={allBadges}
-          allLearnerGroups={allLearnerGroups}
-          onChange={handlePathwayChange}
-        />
-      </Flex.Item>
-    </Flex>
+        </AdminHeader>
+        <Flex.Item shouldGrow={true} shouldShrink={false} overflowY="visible">
+          <PathwayBuilder pathway={draftPathway} mode={mode} onChange={handlePathwayChange} />
+        </Flex.Item>
+      </Flex>
+    </DataContext.Provider>
   )
 }
 

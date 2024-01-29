@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback} from 'react'
+import React, {useCallback, useContext} from 'react'
 import {Avatar} from '@instructure/ui-avatar'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
@@ -25,17 +25,20 @@ import {Table} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
 import {Tray} from '@instructure/ui-tray'
 import {View} from '@instructure/ui-view'
-import type {PathwayViewDetailData} from '../../types'
-import {renderBadge} from './edit/AddBadgeTray'
-import {LearnerGroupCard} from './edit/AddLearnerGroupsTray'
+import type {PathwayDetailData} from '../../types'
+import {renderCompletionAward} from './edit/AddBadgeTray'
+import {LearnerGroupCard} from './edit/AddLearnerGroupsPicker'
+import {DataContext} from './PathwayEditDataContext'
 
 type PathwayViewDetailsTrayProps = {
-  pathway: PathwayViewDetailData
+  pathway: PathwayDetailData
   open: boolean
   onClose: () => void
 }
 
 const PathwayViewDetailsTray = ({pathway, open, onClose}: PathwayViewDetailsTrayProps) => {
+  const {allBadges} = useContext(DataContext)
+
   const renderCanvasUserTable = useCallback(() => {
     return (
       <Table caption="Selected Users">
@@ -114,7 +117,7 @@ const PathwayViewDetailsTray = ({pathway, open, onClose}: PathwayViewDetailsTray
                   Pathway Completion Achievement
                 </Text>
                 {pathway.completion_award ? (
-                  renderBadge(pathway.completion_award)
+                  renderCompletionAward(allBadges, pathway.completion_award)
                 ) : (
                   <Text>none</Text>
                 )}
