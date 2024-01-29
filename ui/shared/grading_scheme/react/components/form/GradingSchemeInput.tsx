@@ -43,6 +43,7 @@ export interface ComponentProps {
   onSave: (updatedGradingSchemeData: GradingSchemeEditableData) => any
   schemeInputType: 'percentage' | 'points'
   archivedGradingSchemesEnabled?: boolean
+  editSchemeDataDisabled?: boolean
 }
 export interface GradingSchemeEditableData {
   title: string
@@ -69,7 +70,13 @@ export type GradingSchemeInputHandle = {
 
 export const GradingSchemeInput = React.forwardRef<GradingSchemeInputHandle, ComponentProps>(
   (
-    {initialFormDataByInputType, schemeInputType, onSave, archivedGradingSchemesEnabled = false},
+    {
+      initialFormDataByInputType,
+      schemeInputType,
+      onSave,
+      archivedGradingSchemesEnabled = false,
+      editSchemeDataDisabled = false,
+    },
     ref
   ) => {
     interface GradingSchemeInputState {
@@ -86,7 +93,8 @@ export const GradingSchemeInput = React.forwardRef<GradingSchemeInputHandle, Com
       maxRangeDisplay: string
     }
 
-    const [showAlert, setShowAlert] = useState<boolean>(false)
+    const [showAlert, setShowAlert] = useState(false)
+    const [valid, setValid] = useState(true)
 
     const formStateByType = {
       percentage: initializeFormState(initialFormDataByInputType.percentage),
@@ -133,7 +141,7 @@ export const GradingSchemeInput = React.forwardRef<GradingSchemeInputHandle, Com
       savePressed: () => {
         const dataToSave = formStateToSaveData(formState)
         const isValid = gradingSchemeIsValid(dataToSave)
-
+        setValid(isValid)
         setShowAlert(!isValid)
         if (isValid) {
           onSave(dataToSave)
@@ -337,7 +345,7 @@ export const GradingSchemeInput = React.forwardRef<GradingSchemeInputHandle, Com
         <View as="div" withVisualDebug={false}>
           <View as="div" padding="none small medium none" withVisualDebug={false}>
             <Flex justifyItems="space-between" wrap="wrap">
-              <Flex.Item padding="small none small none">
+              <Flex.Item>
                 <TextInput
                   isRequired={true}
                   width="23rem"
@@ -345,15 +353,21 @@ export const GradingSchemeInput = React.forwardRef<GradingSchemeInputHandle, Com
                   onChange={changeTitle}
                   defaultValue={formState.title}
                   placeholder={I18n.t('New Grading Scheme')}
+                  messages={
+                    !valid && formState.title === ''
+                      ? [{text: I18n.t('Enter a grading scheme name'), type: 'error'}]
+                      : []
+                  }
                 />
               </Flex.Item>
-              <Flex.Item padding="none none small x-small" margin="small none none none">
+              <Flex.Item margin="medium none none none">
                 <RadioInputGroup
                   layout="columns"
                   name={`pointsBased_${shortid()}`}
                   defaultValue={formState.pointsBased ? 'points' : 'percentage'}
                   description={I18n.t('Grade by')}
                   onChange={(event: any, newValue: string) => handlePointsBasedChanged(newValue)}
+                  disabled={editSchemeDataDisabled}
                 >
                   <RadioInput value="percentage" label={I18n.t('Percentage')} />
                   <RadioInput value="points" label={I18n.t('Points')} />
@@ -371,10 +385,10 @@ export const GradingSchemeInput = React.forwardRef<GradingSchemeInputHandle, Com
             </caption>
             <thead>
               <tr>
-                <th style={{width: '30%', textAlign: 'start', padding: '0.5rem'}}>
+                <th style={{width: '30%', textAlign: 'start', padding: '0 0 16px'}}>
                   {I18n.t('Letter Grade')}
                 </th>
-                <th colSpan={2} style={{width: '40%', textAlign: 'start', padding: '0.5rem'}}>
+                <th colSpan={2} style={{width: '40%', textAlign: 'start', padding: '0 0 16px'}}>
                   {I18n.t('Range')}
                 </th>
                 <th style={{width: '30%'}}>
@@ -400,7 +414,7 @@ export const GradingSchemeInput = React.forwardRef<GradingSchemeInputHandle, Com
                     displayScalingFactor={formState.scalingFactor}
                     onHighRangeChange={it => handleRowHighRangeChanged(idx, it)}
                     onHighRangeBlur={highRangeValue => handleBlurRowHighRange(idx, highRangeValue)}
-                    archivedGradingSchemesEnabled={archivedGradingSchemesEnabled}
+                    editSchemeDataDisabled={editSchemeDataDisabled}
                   />
                 </Fragment>
               ))}

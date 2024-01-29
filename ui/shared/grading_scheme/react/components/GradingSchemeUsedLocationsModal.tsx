@@ -15,10 +15,10 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React, {useState} from 'react'
+import React, {useCallback, useEffect, useRef, useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Modal} from '@instructure/ui-modal'
-import type {UsedLocation} from '@canvas/grading_scheme/gradingSchemeApiModel'
+import type {GradingScheme, UsedLocation} from '@canvas/grading_scheme/gradingSchemeApiModel'
 import {Heading} from '@instructure/ui-heading'
 import {CloseButton, Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
@@ -28,23 +28,102 @@ import {Link} from '@instructure/ui-link'
 import {List} from '@instructure/ui-list'
 import {View} from '@instructure/ui-view'
 import {Pill} from '@instructure/ui-pill'
+import {useGradingSchemeUsedLocations} from '../hooks/useGradingSchemeUsedLocations'
+import {ApiCallStatus} from '../hooks/ApiCallStatus'
+import {Spinner} from '@instructure/ui-spinner'
+import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = useI18nScope('GradingSchemeViewModal')
 
 type Props = {
   open: boolean
-  usedLocations?: UsedLocation[]
+  gradingScheme?: GradingScheme
   handleClose: () => void
 }
-const GradingSchemeUsedLocationsModal = ({open, usedLocations, handleClose}: Props) => {
+const GradingSchemeUsedLocationsModal = ({open, gradingScheme, handleClose}: Props) => {
   const [filter, setFilter] = useState<string>('')
-  if (!usedLocations) {
-    return <></>
+  const [usedLocations, setUsedLocations] = useState<UsedLocation[]>([])
+  const path = useRef<string | undefined>(undefined)
+  const moreLocationsLeft = useRef(true)
+  const sentinelRef = useRef(null)
+  const fetchingLocations = useRef(false)
+
+  const {getGradingSchemeUsedLocations, gradingSchemeUsedLocationsStatus} =
+    useGradingSchemeUsedLocations()
+  const loadMoreItems = useCallback(async () => {
+    if (!gradingScheme || fetchingLocations.current) {
+      return
+    }
+    fetchingLocations.current = true
+    try {
+      const newLocations = await getGradingSchemeUsedLocations(
+        gradingScheme.context_type,
+        gradingScheme.context_id,
+        gradingScheme.id,
+        path.current
+      )
+
+      setUsedLocations(prevLocations => {
+        if (newLocations.usedLocations[0]?.id === prevLocations[prevLocations.length - 1]?.id) {
+          prevLocations[prevLocations.length - 1].assignments.push(
+            ...newLocations.usedLocations[0].assignments
+          )
+          newLocations.usedLocations.shift()
+        }
+        return [...prevLocations, ...newLocations.usedLocations]
+      })
+      path.current = newLocations.nextPage
+      moreLocationsLeft.current = !newLocations.isLastPage
+      fetchingLocations.current = false
+    } catch (error: any) {
+      showFlashError(I18n.t('Failed to load used locations'))(error)
+    }
+  }, [getGradingSchemeUsedLocations, gradingScheme])
+
+  const reset = () => {
+    setUsedLocations([])
+    path.current = undefined
+    moreLocationsLeft.current = true
   }
+
+  useEffect(() => {
+    if (!open) {
+      return
+    }
+    const timer = setTimeout(() => {
+      if (!sentinelRef?.current) {
+        return
+      }
+      const observer = new IntersectionObserver(
+        entries => {
+          if (
+            entries[0].isIntersecting &&
+            moreLocationsLeft.current &&
+            !fetchingLocations.current
+          ) {
+            loadMoreItems()
+          }
+        },
+        {
+          root: null,
+          rootMargin: '0px',
+          threshold: 0.4,
+        }
+      )
+
+      observer.observe(sentinelRef.current)
+      return () => {
+        observer.disconnect()
+      }
+    }, 0)
+    return () => clearTimeout(timer)
+  }, [gradingSchemeUsedLocationsStatus, loadMoreItems, moreLocationsLeft, open])
+
   return (
     <Modal
       as="form"
       open={open}
+      onClose={reset}
       onDismiss={handleClose}
       label={I18n.t('Locations Used')}
       size="small"
@@ -59,7 +138,7 @@ const GradingSchemeUsedLocationsModal = ({open, usedLocations, handleClose}: Pro
         <Heading>{I18n.t('Locations Used')}</Heading>
       </Modal.Header>
       <Modal.Body>
-        <View as="div" margin="0 0 x-small 0">
+        <View as="div" margin="0 0 medium">
           <TextInput
             type="search"
             placeholder={I18n.t('Search...')}
@@ -71,29 +150,32 @@ const GradingSchemeUsedLocationsModal = ({open, usedLocations, handleClose}: Pro
         </View>
         <List isUnstyled={true} margin="0 0 0 0">
           {usedLocations.map(course => {
-            let filteredAssignments = course.assignments
-            if (filter !== '') {
+            let filteredAssignments = []
+            const courseNameMatches = course.name.toLowerCase().includes(filter.toLowerCase())
+            // if there's no filter or the course name matches the filter, return all assignments
+            if (filter === '' || courseNameMatches) {
+              filteredAssignments = course.assignments
+            } else {
               filteredAssignments = course.assignments.filter(assignment =>
                 assignment.title.toLowerCase().includes(filter.toLowerCase())
               )
-            }
-            if (
-              filteredAssignments.length === 0 &&
-              !course.name.toLowerCase().includes(filter.toLowerCase())
-            ) {
-              return <></>
+              // if no assignments match the filter nor the course name,
+              // don't render the course in the list
+              if (filteredAssignments.length === 0) {
+                return <></>
+              }
             }
             return (
               <>
-                <List.Item margin="0 0 x-small 0">
+                <List.Item margin="x-small 0 0" key={course.id}>
                   <Flex alignItems="center">
-                    <Flex.Item margin="0 xx-small 0 0">
+                    <Flex.Item margin="0 x-small 0 0">
                       <Link isWithinText={false} href={`/courses/${course.id}`}>
                         {course.name}
                       </Link>
                     </Flex.Item>
                     <Flex.Item>
-                      {course.concluded ? <Pill>{I18n.t('Concluded')}</Pill> : <></>}
+                      {course['concluded?'] ? <Pill>{I18n.t('Concluded')}</Pill> : <></>}
                     </Flex.Item>
                   </Flex>
                 </List.Item>
@@ -101,7 +183,7 @@ const GradingSchemeUsedLocationsModal = ({open, usedLocations, handleClose}: Pro
                 {filteredAssignments.length > 0 ? (
                   <List isUnstyled={true}>
                     {filteredAssignments.map(assignment => (
-                      <List.Item margin="0 0 x-small 0">
+                      <List.Item margin="x-small 0 0" key={assignment.id}>
                         <Link
                           isWithinText={false}
                           href={`/courses/${course.id}/assignments/${assignment.id}`}
@@ -118,6 +200,12 @@ const GradingSchemeUsedLocationsModal = ({open, usedLocations, handleClose}: Pro
             )
           })}
         </List>
+        {gradingSchemeUsedLocationsStatus === ApiCallStatus.PENDING ? (
+          <Spinner renderTitle={I18n.t('Loading')} size="small" />
+        ) : (
+          <></>
+        )}
+        <div ref={sentinelRef} style={{height: '1px'}} />
       </Modal.Body>
       <Modal.Footer>
         <Flex justifyItems="end">

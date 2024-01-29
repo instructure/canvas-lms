@@ -29,6 +29,8 @@ const I18n = useI18nScope('GradingSchemeViewModal')
 type Props = {
   open: boolean
   gradingScheme?: GradingScheme
+  isCourseDefault?: boolean
+  viewingFromAccountManagementPage?: boolean
   handleClose: () => void
   openDeleteModal: (gradingScheme: GradingScheme) => void
   editGradingScheme: (gradingSchemeId: string) => void
@@ -37,6 +39,8 @@ type Props = {
 const GradingSchemeViewModal = ({
   open,
   gradingScheme,
+  isCourseDefault = false,
+  viewingFromAccountManagementPage = false,
   handleClose,
   openDeleteModal,
   editGradingScheme,
@@ -45,6 +49,10 @@ const GradingSchemeViewModal = ({
   if (!gradingScheme) {
     return <></>
   }
+  const disableEditScheme =
+    (!viewingFromAccountManagementPage && gradingScheme.context_type === 'Account') ||
+    gradingScheme.assessed_assignment ||
+    isCourseDefault
   return (
     <Modal as="form" open={open} onDismiss={handleClose} label={gradingScheme.title} size="small">
       <Modal.Header>
@@ -60,8 +68,8 @@ const GradingSchemeViewModal = ({
         <GradingSchemeView
           gradingScheme={gradingScheme}
           archivedGradingSchemesEnabled={true}
-          disableDelete={!canManageScheme(gradingScheme)}
-          disableEdit={!canManageScheme(gradingScheme)}
+          disableDelete={!canManageScheme(gradingScheme) || (disableEditScheme ?? false)}
+          disableEdit={!canManageScheme(gradingScheme) || (disableEditScheme ?? false)}
           onDeleteRequested={() => openDeleteModal(gradingScheme)}
           onEditRequested={() => editGradingScheme(gradingScheme.id)}
         />
@@ -69,9 +77,7 @@ const GradingSchemeViewModal = ({
       <Modal.Footer>
         <Flex justifyItems="end">
           <Flex.Item>
-            <Button onClick={handleClose} margin="0 x-small 0 x-small">
-              {I18n.t('Cancel')}
-            </Button>
+            <Button onClick={handleClose}>{I18n.t('Cancel')}</Button>
           </Flex.Item>
         </Flex>
       </Modal.Footer>
