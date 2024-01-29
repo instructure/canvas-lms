@@ -317,7 +317,7 @@ describe "assignments" do
           expect_new_page_load { f(".more_options").click }
           expect(f("#assignment_name").attribute(:value)).to include(expected_text)
           expect(f("#assignment_points_possible").attribute(:value)).to include(points)
-          due_at_field = fj(".date_field:first[data-date-type='due_at']")
+          due_at_field = fj(".date_field[data-date-type='due_at']:first")
           expect(due_at_field).to have_value due_at
           click_option("#assignment_submission_type", "No Submission")
           submit_assignment_form

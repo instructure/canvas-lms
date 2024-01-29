@@ -78,7 +78,7 @@ const rubricEditing = {
         document.getElementById('add_criterion_container')
       )
       if (focusTarget) {
-        $rubric.find(`"#add_criterion_container ${focusTarget}:visible`).focus()
+        $rubric.find(`#add_criterion_container ${focusTarget}:visible`).focus()
       }
     }, 0)
   },
