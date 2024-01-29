@@ -297,6 +297,8 @@ export default function DiscussionTopicForm({
   const shouldShowPodcastFeedOption =
     ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MODERATE && !ENV.K5_HOMEROOM_COURSE
 
+  const canGroupDiscussion = !isEditing || currentDiscussionTopic?.canGroup || false
+
   const validateTitle = newTitle => {
     if (newTitle.length > 255) {
       setTitleValidationMessages([
@@ -979,6 +981,7 @@ export default function DiscussionTopicForm({
                 setGroupCategoryId(!isGroupDiscussion ? '' : groupCategoryId)
                 setIsGroupDiscussion(!isGroupDiscussion)
               }}
+              disabled={!canGroupDiscussion}
             />
           )}
           {shouldShowGroupOptions && isGroupDiscussion && (
@@ -1000,6 +1003,7 @@ export default function DiscussionTopicForm({
                 messages={groupCategorySelectError}
                 placeholder={I18n.t('Select a group category')}
                 width={inputWidth}
+                disabled={!canGroupDiscussion}
               >
                 {groupCategories.map(({_id: id, name: label}) => (
                   <SimpleSelect.Option
@@ -1037,6 +1041,15 @@ export default function DiscussionTopicForm({
                   allowSelfSignup={ENV.allow_self_signup}
                 />
               )}
+            </View>
+          )}
+          {!canGroupDiscussion && isEditing && (
+            <View display="block" data-testid="group-category-not-editable">
+              <Alert variant="warning" margin="small none small none">
+                {I18n.t(
+                  'Students have already submitted to this discussion, so group settings cannot be changed.'
+                )}
+              </Alert>
             </View>
           )}
         </FormFieldGroup>

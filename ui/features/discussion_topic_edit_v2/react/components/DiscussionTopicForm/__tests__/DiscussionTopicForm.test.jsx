@@ -22,6 +22,7 @@ import userEvent from '@testing-library/user-event'
 import React from 'react'
 import DiscussionTopicForm from '../DiscussionTopicForm'
 import {DiscussionTopic} from '../../../../graphql/DiscussionTopic'
+import {GroupSet} from '../../../../graphql/GroupSet'
 
 jest.mock('@canvas/rce/react/CanvasRce')
 
@@ -388,6 +389,26 @@ describe('DiscussionTopicForm', () => {
       })
 
       expect(document.queryByTestId('save-and-publish-button')).toBeFalsy()
+    })
+
+    it('displays a warning when a user can not edit group category', () => {
+      const document = setup({
+        groupCategories: [{_id: '1', name: 'Mutant Power Training Group 1'}],
+        isEditing: true,
+        currentDiscussionTopic: DiscussionTopic.mock({groupSet: GroupSet.mock(), canGroup: false}),
+      })
+
+      expect(document.queryByTestId('group-category-not-editable')).toBeTruthy()
+    })
+
+    it('does not display a warning when a user can edit group category', () => {
+      const document = setup({
+        groupCategories: [{_id: '1', name: 'Mutant Power Training Group 1'}],
+        isEditing: true,
+        currentDiscussionTopic: DiscussionTopic.mock({groupSet: GroupSet.mock(), canGroup: true}),
+      })
+
+      expect(document.queryByTestId('group-category-not-editable')).toBeFalsy()
     })
   })
 })
