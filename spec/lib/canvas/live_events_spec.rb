@@ -1337,13 +1337,29 @@ describe Canvas::LiveEvents do
     end
   end
 
-  describe ".quiz_export_complete" do
+  describe "ContentExport" do
     let(:export_class) do
       Class.new do
         attr_accessor :context
 
         def initialize(context)
           @context = context
+        end
+
+        def export_type
+          :new_quizzes
+        end
+
+        def created_at
+          003_003_2033
+        end
+
+        def context_id
+          @context.global_id
+        end
+
+        def context_type
+          "Course"
         end
 
         def global_id
@@ -1360,24 +1376,53 @@ describe Canvas::LiveEvents do
         end
       end
     end
-    let(:content_export) { export_class.new(course_model) }
 
-    it "triggers a live event with content export settings and amended context details" do
-      fake_export_context = { key1: "val1", key2: "val2", content_export_id: "content-export-123456789" }
+    describe ".quiz_export_complete" do
+      let(:content_export) { export_class.new(course_model) }
 
-      expect_event(
-        "quiz_export_complete",
-        fake_export_context,
-        hash_including({
-                         context_type: "Course",
-                         context_id: content_export.context.global_id.to_s,
-                         root_account_id: content_export.context.root_account.global_id.to_s,
-                         root_account_uuid: content_export.context.root_account.uuid,
-                         root_account_lti_guid: content_export.context.root_account.lti_guid.to_s,
-                       })
-      ).once
+      it "triggers a live event with content export settings and amended context details" do
+        fake_export_context = { key1: "val1", key2: "val2", content_export_id: "content-export-123456789" }
 
-      Canvas::LiveEvents.quiz_export_complete(content_export)
+        expect_event(
+          "quiz_export_complete",
+          fake_export_context,
+          hash_including({
+                           context_type: "Course",
+                           context_id: content_export.context.global_id.to_s,
+                           root_account_id: content_export.context.root_account.global_id.to_s,
+                           root_account_uuid: content_export.context.root_account.uuid,
+                           root_account_lti_guid: content_export.context.root_account.lti_guid.to_s
+                         })
+        ).once
+
+        Canvas::LiveEvents.quiz_export_complete(content_export)
+      end
+    end
+
+    describe ".content_export_created" do
+      before do
+        @context = course_model
+      end
+
+      let(:content_export) { export_class.new(@context) }
+
+      let(:event_data) do
+        {
+          content_export_id: 123_456_789.to_s,
+          export_type: content_export.export_type,
+          created_at: content_export.created_at,
+          context_id: content_export.context_id.to_s,
+          context_uuid: content_export.context.uuid,
+          context_type: content_export.context_type,
+          settings: content_export.settings
+        }
+      end
+
+      it "triggers a live event with content export settings and context details" do
+        expect_event("content_export_created", event_data).once
+
+        Canvas::LiveEvents.content_export_created(content_export)
+      end
     end
   end
 

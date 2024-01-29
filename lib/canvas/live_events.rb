@@ -1161,4 +1161,23 @@ module Canvas::LiveEvents
     }
     post_event_stringified("heartbeat", data)
   end
+
+  def self.content_export_created(content_export)
+    post_event_stringified(
+      "content_export_created",
+      content_export_data(content_export)
+    )
+  end
+
+  def self.content_export_data(content_export)
+    {
+      content_export_id: content_export.global_id,
+      export_type: content_export.export_type,
+      created_at: content_export.created_at,
+      context_id: content_export.context_id,
+      context_uuid: content_export.context.uuid,
+      context_type: content_export.context_type,
+      settings: content_export.settings
+    }
+  end
 end
