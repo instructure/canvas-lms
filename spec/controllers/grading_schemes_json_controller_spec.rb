@@ -201,7 +201,8 @@ describe GradingSchemesJsonController, type: :request do
                                             "permissions" => { "manage" => true },
                                             "assessed_assignment" => false,
                                             "points_based" => false,
-                                            "scaling_factor" => 1.0 })
+                                            "scaling_factor" => 1.0,
+                                            "workflow_state" => "active" })
       end
     end
 
@@ -228,7 +229,8 @@ describe GradingSchemesJsonController, type: :request do
                                       "permissions" => { "manage" => true },
                                       "assessed_assignment" => false,
                                       "points_based" => false,
-                                      "scaling_factor" => 1.0 })
+                                      "scaling_factor" => 1.0,
+                                      "workflow_state" => "active" })
       end
     end
 
@@ -393,7 +395,8 @@ describe GradingSchemesJsonController, type: :request do
                                       "permissions" => { "manage" => true },
                                       "assessed_assignment" => false,
                                       "points_based" => false,
-                                      "scaling_factor" => 1.0 })
+                                      "scaling_factor" => 1.0,
+                                      "workflow_state" => "active" })
       end
 
       it "returns success when putting account level grading scheme that is points based" do
@@ -431,7 +434,8 @@ describe GradingSchemesJsonController, type: :request do
                                       "permissions" => { "manage" => true },
                                       "assessed_assignment" => false,
                                       "points_based" => true,
-                                      "scaling_factor" => 5.0 })
+                                      "scaling_factor" => 5.0,
+                                      "workflow_state" => "active" })
       end
     end
 
@@ -536,6 +540,7 @@ describe GradingSchemesJsonController, type: :request do
         response_json = response.parsed_body
 
         expect(response_json.first["title"]).to eq("My Course Level Grading Standard")
+        expect(response_json.first["workflow_state"]).to eq("archived")
       end
 
       it "returns the appropriate permissions for a teacher without 'Grades — Edit' access" do
@@ -571,7 +576,8 @@ describe GradingSchemesJsonController, type: :request do
                                             "permissions" => { "manage" => false },
                                             "assessed_assignment" => false,
                                             "points_based" => false,
-                                            "scaling_factor" => 1.0 })
+                                            "scaling_factor" => 1.0,
+                                            "workflow_state" => "active" })
 
         expect(response_json[1]).to eq({ "id" => @course_level_grading_standard.id.to_s,
                                          "title" => "My Course Level Grading Standard",
@@ -582,7 +588,8 @@ describe GradingSchemesJsonController, type: :request do
                                          "permissions" => { "manage" => true },
                                          "assessed_assignment" => false,
                                          "points_based" => false,
-                                         "scaling_factor" => 1.0 })
+                                         "scaling_factor" => 1.0,
+                                         "workflow_state" => "active" })
       end
     end
 
@@ -733,7 +740,8 @@ describe GradingSchemesJsonController, type: :request do
                                       "permissions" => { "manage" => true },
                                       "assessed_assignment" => false,
                                       "points_based" => false,
-                                      "scaling_factor" => 1.0 })
+                                      "scaling_factor" => 1.0,
+                                      "workflow_state" => "active" })
       end
     end
 
@@ -761,7 +769,8 @@ describe GradingSchemesJsonController, type: :request do
                                       "permissions" => { "manage" => true },
                                       "assessed_assignment" => false,
                                       "points_based" => false,
-                                      "scaling_factor" => 1.0 })
+                                      "scaling_factor" => 1.0,
+                                      "workflow_state" => "active" })
       end
     end
   end

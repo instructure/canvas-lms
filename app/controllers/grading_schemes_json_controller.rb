@@ -226,7 +226,7 @@ class GradingSchemesJsonController < ApplicationController
   end
 
   def self.json_serialized_fields
-    %w[id title scaling_factor points_based context_type context_id]
+    %w[id title scaling_factor points_based context_type context_id workflow_state]
   end
 
   def grading_standards_for_context

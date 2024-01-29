@@ -626,7 +626,8 @@ describe GradebooksController do
         grading_standard = @course.grading_standards.build({ title: "My Grading Scheme",
                                                              data: GradingSchemesJsonController.to_grading_standard_data(data),
                                                              points_based: true,
-                                                             scaling_factor: 4.0 })
+                                                             scaling_factor: 4.0,
+                                                             workflow_state: "active" })
         @course.update!(grading_standard:)
         all_grading_periods_id = 0
         get "grade_summary", params: { course_id: @course.id, id: @student.id, grading_period_id: all_grading_periods_id }
@@ -639,7 +640,8 @@ describe GradebooksController do
                                                                          "permissions" => { "manage" => false },
                                                                          "assessed_assignment" => false,
                                                                          "points_based" => grading_standard.points_based,
-                                                                         "scaling_factor" => grading_standard.scaling_factor })
+                                                                         "scaling_factor" => grading_standard.scaling_factor,
+                                                                         "workflow_state" => "active" })
         expect(controller.js_env[:grading_scheme]).to be_nil
       end
 
@@ -657,7 +659,8 @@ describe GradebooksController do
                                                                          "permissions" => { "manage" => false },
                                                                          "assessed_assignment" => false,
                                                                          "points_based" => false,
-                                                                         "scaling_factor" => 1.0 })
+                                                                         "scaling_factor" => 1.0,
+                                                                         "workflow_state" => nil })
 
         expect(controller.js_env[:grading_scheme]).to be_nil
       end
@@ -690,7 +693,8 @@ describe GradebooksController do
                                                                          "permissions" => { "manage" => false },
                                                                          "assessed_assignment" => false,
                                                                          "points_based" => false,
-                                                                         "scaling_factor" => 1.0 })
+                                                                         "scaling_factor" => 1.0,
+                                                                         "workflow_state" => nil })
         expect(controller.js_env[:grading_scheme]).to be_nil
       end
 
