@@ -81,7 +81,7 @@ export default {
       jqXHR => {
         let parsedResponse
         try {
-          parsedResponse = $.parseJSON(jqXHR.responseText)
+          parsedResponse = JSON.parse(jqXHR.responseText)
         } catch (error) {
           // no-op
         }

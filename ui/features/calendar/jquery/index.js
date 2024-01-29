@@ -1278,7 +1278,7 @@ export default class Calendar {
         data = deparam(window.location.hash.substring(1)) || {}
       } else {
         // legacy
-        data = $.parseJSON(decodeFromHex(window.location.hash.substring(1))) || {}
+        data = JSON.parse(decodeFromHex(window.location.hash.substring(1))) || {}
       }
     } catch (e) {
       data = {}
