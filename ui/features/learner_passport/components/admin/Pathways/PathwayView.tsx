@@ -19,20 +19,20 @@
 import React, {useCallback, useState} from 'react'
 import {IconZoomInLine, IconZoomOutLine} from '@instructure/ui-icons'
 import {Button} from '@instructure/ui-buttons'
-import type {PathwayViewDetailData, MilestoneData, MilestoneViewData} from '../../types'
+import type {PathwayDetailData, MilestoneData} from '../../types'
 import PathwayTreeView from './PathwayTreeView'
 import PathwayViewDetailsTray from './PathwayViewDetailsTray'
 import MilestoneViewDetaislTray from './MilestoneViewDetailsTray'
 import {showUnimplemented} from '../../shared/utils'
 
 type PathwayViewProps = {
-  pathway: PathwayViewDetailData
+  pathway: PathwayDetailData
 }
 
 const PathwayView = ({pathway}: PathwayViewProps) => {
   const [zoomLevel, setZoomLevel] = useState(1)
   const [pathwayDetailsOpen, setPathwayDetailsOpen] = useState(false)
-  const [activeMilestone, setActiveMilestone] = useState<MilestoneViewData>(pathway.milestones[0])
+  const [activeMilestone, setActiveMilestone] = useState<MilestoneData>(pathway.milestones[0])
   const [milestoneDetailsOpen, setMilestoneDetailsOpen] = useState(false)
 
   const handleZoomIn = useCallback(() => {
@@ -43,20 +43,17 @@ const PathwayView = ({pathway}: PathwayViewProps) => {
     setZoomLevel(zoomLevel - 0.1)
   }, [zoomLevel])
 
-  const handleSelectFromTree = useCallback(
-    (milestone: MilestoneViewData | MilestoneData | null) => {
-      if (milestone === null) {
-        setMilestoneDetailsOpen(false)
-        setPathwayDetailsOpen(true)
-      } else {
-        // in this context we know it's a MilestoneViewData
-        setActiveMilestone(milestone as MilestoneViewData)
-        setMilestoneDetailsOpen(true)
-        setPathwayDetailsOpen(false)
-      }
-    },
-    []
-  )
+  const handleSelectFromTree = useCallback((milestone: MilestoneData | null) => {
+    if (milestone === null) {
+      setMilestoneDetailsOpen(false)
+      setPathwayDetailsOpen(true)
+    } else {
+      // in this context we know it's a MilestoneViewData
+      setActiveMilestone(milestone as MilestoneData)
+      setMilestoneDetailsOpen(true)
+      setPathwayDetailsOpen(false)
+    }
+  }, [])
 
   const handleCloseMilestoneDetails = useCallback(() => {
     setMilestoneDetailsOpen(false)

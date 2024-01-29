@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useEffect, useState} from 'react'
+import React, {useCallback, useContext, useEffect, useState} from 'react'
 import {Alert} from '@instructure/ui-alerts'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Checkbox} from '@instructure/ui-checkbox'
@@ -29,11 +29,12 @@ import {TextArea} from '@instructure/ui-text-area'
 import {TextInput} from '@instructure/ui-text-input'
 import {Tray} from '@instructure/ui-tray'
 import {View} from '@instructure/ui-view'
-import type {MilestoneData, RequirementData, PathwayBadgeType} from '../../../types'
+import type {MilestoneData, RequirementData} from '../../../types'
 import AddRequirementTray from './AddRequirementTray'
 import AddBadgeTray, {renderBadges} from './AddBadgeTray'
 import MilestoneRequirementCard from './requirements/MilestoneRequirementCard'
 import {readFromLocalStorage, writeToLocalStorage} from '../../../shared/LocalStorage'
+import {DataContext} from '../PathwayEditDataContext'
 
 const SHOW_ALERT_KEY = 'passport_showMilestoneTrayAlert'
 
@@ -41,19 +42,12 @@ type MilestoneTrayProps = {
   milestone: MilestoneData
   open: boolean
   variant: 'add' | 'edit'
-  allBadges: PathwayBadgeType[]
   onClose: () => void
   onSave: (milestone: MilestoneData) => void
 }
 
-const MilestoneTray = ({
-  milestone,
-  open,
-  variant,
-  allBadges,
-  onClose,
-  onSave,
-}: MilestoneTrayProps) => {
+const MilestoneTray = ({milestone, open, variant, onClose, onSave}: MilestoneTrayProps) => {
+  const {allBadges} = useContext(DataContext)
   const [milestoneId, setMilestoneId] = useState(milestone.id)
   const [title, setTitle] = useState(milestone.title)
   const [description, setDescription] = useState(milestone.description)
@@ -188,6 +182,10 @@ const MilestoneTray = ({
     setAddBadgeTrayOpen(false)
   }, [])
 
+  const handleRemoveBadge = useCallback(() => {
+    setSelectedBadgeId(null)
+  }, [])
+
   return (
     <View as="div">
       <Tray
@@ -303,8 +301,9 @@ const MilestoneTray = ({
                   <Text as="div">
                     Add a badge or certificate to this milestone to recognize a key accomplishment.
                   </Text>
-                  {selectedBadgeId && renderBadges(allBadges, selectedBadgeId)}
+                  {selectedBadgeId && renderBadges(allBadges, selectedBadgeId, handleRemoveBadge)}
                   <Button
+                    interaction={selectedBadgeId ? 'disabled' : 'enabled'}
                     renderIcon={IconAddLine}
                     margin="small 0 0 0"
                     onClick={handleAddAchievementClick}
@@ -339,7 +338,6 @@ const MilestoneTray = ({
         open={addBadgeTrayOpen}
         onClose={() => setAddBadgeTrayOpen(false)}
         onSave={handleSaveBadge}
-        allBadges={allBadges}
       />
     </View>
   )

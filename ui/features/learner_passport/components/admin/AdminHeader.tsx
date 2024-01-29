@@ -50,7 +50,7 @@ const AdminHeader = ({title, description, breadcrumbs, children}: AdminHeaderPro
   }
 
   return (
-    <View as="div" margin="x-small large large large">
+    <View as="div" margin="medium large large large">
       {renderBreadcrumbs()}
       <Flex as="div" alignItems="start" margin="large 0 0 0">
         <Flex.Item shouldGrow={true}>

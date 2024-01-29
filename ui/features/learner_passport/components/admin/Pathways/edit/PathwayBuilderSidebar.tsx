@@ -31,7 +31,7 @@ const SHOW_ALERT_KEY = 'pathway-add-step-alert'
 
 const Connector = () => {
   return (
-    <div style={{margin: '4px 0 -1px 0'}}>
+    <div style={{margin: '4px 0 -1px 0', textAlign: 'center'}}>
       <svg xmlns="http://www.w3.org/2000/svg" width="6" height="36" viewBox="0 0 6 36" fill="none">
         <circle cx="3" cy="3" r="2" stroke="#6B7780" strokeWidth="2" />
         <circle cx="3" cy="33" r="2" stroke="#6B7780" strokeWidth="2" />
@@ -50,19 +50,21 @@ const AddMilestoneButton = ({onClick}: AddMilestoneButtonProps) => {
     <View
       as="div"
       margin="medium 0 0 0"
-      padding="small"
+      padding="x-small"
       role="button"
       cursor="pointer"
       onClick={onClick}
       background="primary"
+      borderColor="brand"
       borderRadius="medium"
       borderWidth="small"
       textAlign="center"
     >
       <View as="div" margin="0 auto">
-        <IconPlusLine size="x-small" />
-        <View as="div" display="inline-block" margin="0 0 0 small" />
-        <Text color="brand">Add Step</Text>
+        <IconPlusLine size="x-small" color="brand" />
+        <View as="div" display="inline-block" margin="0 0 0 x-small">
+          <Text color="brand">Add Step</Text>
+        </View>
       </View>
     </View>
   )
@@ -124,46 +126,50 @@ const PathwayBuilderSidebar = ({
     <View
       data-compid="pathway-builder-sidebar"
       as="div"
-      padding="large medium large x-large"
+      padding="medium"
       background="secondary"
       shadow="topmost"
       height="100%"
-      width="480px"
+      width="350px"
     >
-      <Flex as="div" margin="0 0 medium 0" justifyItems="space-between">
-        <Text weight="bold">Pathway Builder</Text>
-        <CondensedButton onClick={onHideSidebar}>Hide</CondensedButton>
+      <Flex as="div" direction="column" alignItems="stretch" height="100%">
+        <Flex.Item overflowX="hidden">
+          <Flex as="div" margin="0 0 medium 0" justifyItems="space-between">
+            <Text weight="bold">Pathway Builder</Text>
+            <CondensedButton onClick={onHideSidebar}>Hide</CondensedButton>
+          </Flex>
+        </Flex.Item>
+        <Flex.Item shouldShrink={true} align="center" overflowY="auto">
+          {currentStep === null ? (
+            <PathwayCard step={pathway} onEdit={handleEditPathway} />
+          ) : (
+            <MilestoneCard step={currentStep} variant="root" onEdit={handleEditMilestone} />
+          )}
+          <Connector />
+          {childMilestones.map((step: MilestoneData) => (
+            <div key={step.id} style={{marginBottom: '4px'}}>
+              <MilestoneCard
+                step={step}
+                variant="child"
+                onEdit={handleEditMilestone}
+                onDelete={handleDeleteMilestone}
+              />
+            </div>
+          ))}
+          {childMilestones.length === 0 && <BlankPathwayCard />}
+          {showAlert && firstSteps === 0 && pathway.milestones.length === 1 && (
+            <Alert
+              variant="info"
+              renderCloseButtonLabel="Close"
+              margin="medium 0 0 0"
+              onDismiss={handleCloseAlert}
+            >
+              Select a step to add a prerequisite
+            </Alert>
+          )}
+          <AddMilestoneButton onClick={onAddStep} />
+        </Flex.Item>
       </Flex>
-      <View as="div" textAlign="center">
-        {currentStep === null ? (
-          <PathwayCard step={pathway} onEdit={handleEditPathway} />
-        ) : (
-          <MilestoneCard step={currentStep} variant="root" onEdit={handleEditMilestone} />
-        )}
-        <Connector />
-        {childMilestones.map((step: MilestoneData) => (
-          <div key={step.id} style={{marginBottom: '30px'}}>
-            <MilestoneCard
-              step={step}
-              variant="child"
-              onEdit={handleEditMilestone}
-              onDelete={handleDeleteMilestone}
-            />
-          </div>
-        ))}
-        {childMilestones.length === 0 && <BlankPathwayCard />}
-        {showAlert && firstSteps === 0 && pathway.milestones.length === 1 && (
-          <Alert
-            variant="info"
-            renderCloseButtonLabel="Close"
-            margin="medium 0 0 0"
-            onDismiss={handleCloseAlert}
-          >
-            Select a step to add a prerequisite
-          </Alert>
-        )}
-        <AddMilestoneButton onClick={onAddStep} />
-      </View>
     </View>
   )
 }

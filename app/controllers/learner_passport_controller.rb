@@ -853,7 +853,11 @@ class LearnerPassportController < ApplicationController
     pathway[:completion_award] = learner_passport_pathway_achievements.find { |a| a[:id] == pathway[:completion_award] } if pathway[:completion_award].present?
     pathway[:learner_groups] = learner_passport_learner_groups.select { |lg| pathway[:learner_groups].include?(lg[:id]) } if pathway[:learner_groups].count > 0
     pathway[:milestones] = pathway[:milestones].each do |milestone|
-      milestone[:completion_award] = learner_passport_pathway_achievements.find { |a| a[:id] == milestone[:completion_award] } if milestone[:completion_award].present?
+      next unless milestone.with_indifferent_access[:completion_award].present?
+
+      milestone[:completion_award] = learner_passport_pathway_achievements.find do |a|
+        a[:id] == milestone.with_indifferent_access[:completion_award]
+      end
     end
     render json: pathway
   end

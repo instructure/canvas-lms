@@ -16,24 +16,27 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useContext} from 'react'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import {Tray} from '@instructure/ui-tray'
 import {View} from '@instructure/ui-view'
-import type {MilestoneViewData} from '../../types'
-import {renderBadge} from './edit/AddBadgeTray'
+import type {MilestoneData, PathwayBadgeType} from '../../types'
+import {renderCompletionAward} from './edit/AddBadgeTray'
 import MilestoneRequirementCard from './edit/requirements/MilestoneRequirementCard'
+import {DataContext} from './PathwayEditDataContext'
 
 type MilestoneViewTrayProps = {
-  milestone: MilestoneViewData
+  milestone: MilestoneData
   open: boolean
   onClose: () => void
 }
 
 const MilestoneViewTray = ({milestone, open, onClose}: MilestoneViewTrayProps) => {
+  const {allBadges} = useContext(DataContext)
+
   return (
     <Tray label="Step Details" open={open} size="regular" placement="end" onDismiss={onClose}>
       <Flex as="div" direction="column" height="100vh">
@@ -106,7 +109,8 @@ const MilestoneViewTray = ({milestone, open, onClose}: MilestoneViewTrayProps) =
                 <Text as="div" weight="bold">
                   Completion Award
                 </Text>
-                {milestone.completion_award && renderBadge(milestone.completion_award)}
+                {milestone.completion_award &&
+                  renderCompletionAward(allBadges, milestone.completion_award)}
               </View>
             )}
           </View>

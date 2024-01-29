@@ -27,6 +27,7 @@ import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Select} from '@instructure/ui-select'
 import {Spinner} from '@instructure/ui-spinner'
 import {Table} from '@instructure/ui-table'
+import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import useFetchApi from '@canvas/use-fetch-api-hook'
 import type {CanvasUserSearchResultType, PathwayUserShareType} from '../../../../types'
@@ -165,71 +166,70 @@ const CanvasUserFinder = ({selectedUsers, onChange}: CanvasUserFinderProps) => {
 
   const renderSelection = () => {
     return (
-      <View as="div" margin="small 0">
-        <Table caption="Selected Users">
-          <Table.Head>
-            <Table.Row>
-              <Table.ColHeader id="name">User</Table.ColHeader>
-              <Table.ColHeader id="role">Role</Table.ColHeader>
-              <Table.ColHeader id="action" width="40px">
-                <ScreenReaderContent>Action</ScreenReaderContent>
-              </Table.ColHeader>
-            </Table.Row>
-          </Table.Head>
-          <Table.Body>
-            {currSelectedUsers
-              .sort((a, b) => a.sortable_name.localeCompare(b.sortable_name))
-              .map(user => {
-                return (
-                  <Table.Row key={user.id}>
-                    <Table.Cell>
-                      <Flex gap="x-small">
-                        <Flex.Item shouldGrow={false} shouldShrink={false}>
-                          <Avatar name={user.name} src={user.avatar_url} size="xx-small" />
-                        </Flex.Item>
-                        <Flex.Item shouldGrow={true} shouldShrink={true} wrap="wrap">
-                          {user.name}
-                        </Flex.Item>
-                      </Flex>
-                    </Table.Cell>
-                    <Table.Cell>
-                      <SimpleSelect
-                        renderLabel={<ScreenReaderContent>select a role</ScreenReaderContent>}
-                        value={user.role}
-                        width="9rem"
-                        onChange={(_event, {value}) => handleChangeUserRole(user.id, value)}
-                      >
-                        <SimpleSelect.Option id="role-collaborator" value="collaborator">
-                          Collaborator
-                        </SimpleSelect.Option>
-                        <SimpleSelect.Option id="role-reviewer" value="reviewer">
-                          Reviewer
-                        </SimpleSelect.Option>
-                        <SimpleSelect.Option id="role-viewer" value="viewer">
-                          Viewer
-                        </SimpleSelect.Option>
-                      </SimpleSelect>
-                    </Table.Cell>
-                    <Table.Cell>
-                      <IconButton
-                        screenReaderLabel={`Remove ${user.name}`}
-                        withBackground={false}
-                        withBorder={false}
-                        onClick={() => {
-                          const newSelectedUsers = currSelectedUsers.filter(u => u.id !== user.id)
-                          setCurrSelectedUsers(newSelectedUsers)
-                          onChange(newSelectedUsers)
-                        }}
-                      >
-                        <IconTrashLine size="x-small" />
-                      </IconButton>
-                    </Table.Cell>
-                  </Table.Row>
-                )
-              })}
-          </Table.Body>
-        </Table>
-      </View>
+      <Table caption="Selected Users">
+        <Table.Head>
+          <Table.Row>
+            <Table.ColHeader id="name">User</Table.ColHeader>
+            <Table.ColHeader id="role">Role</Table.ColHeader>
+            <Table.ColHeader id="action" width="40px">
+              <ScreenReaderContent>Action</ScreenReaderContent>
+            </Table.ColHeader>
+          </Table.Row>
+        </Table.Head>
+        <Table.Body>
+          {currSelectedUsers
+            .sort((a, b) => a.sortable_name.localeCompare(b.sortable_name))
+            .map(user => {
+              return (
+                <Table.Row key={user.id}>
+                  <Table.Cell>
+                    <Flex gap="x-small">
+                      <Flex.Item shouldGrow={false} shouldShrink={false}>
+                        <Avatar name={user.name} src={user.avatar_url} size="xx-small" />
+                      </Flex.Item>
+                      <Flex.Item shouldGrow={true} shouldShrink={true} wrap="wrap">
+                        {user.name}
+                      </Flex.Item>
+                    </Flex>
+                  </Table.Cell>
+                  <Table.Cell>
+                    <SimpleSelect
+                      renderLabel={<ScreenReaderContent>select a role</ScreenReaderContent>}
+                      value={user.role}
+                      width="9rem"
+                      onChange={(_event, {value}) => handleChangeUserRole(user.id, value)}
+                    >
+                      <SimpleSelect.Option id="role-collaborator" value="collaborator">
+                        Collaborator
+                      </SimpleSelect.Option>
+                      <SimpleSelect.Option id="role-reviewer" value="reviewer">
+                        Reviewer
+                      </SimpleSelect.Option>
+                      <SimpleSelect.Option id="role-viewer" value="viewer">
+                        Viewer
+                      </SimpleSelect.Option>
+                    </SimpleSelect>
+                  </Table.Cell>
+                  <Table.Cell>
+                    <IconButton
+                      screenReaderLabel={`Remove ${user.name}`}
+                      withBackground={false}
+                      withBorder={false}
+                      onClick={() => {
+                        const newSelectedUsers = currSelectedUsers.filter(u => u.id !== user.id)
+                        setCurrSelectedUsers(newSelectedUsers)
+                        onChange(newSelectedUsers)
+                      }}
+                      size="small"
+                    >
+                      <IconTrashLine size="x-small" />
+                    </IconButton>
+                  </Table.Cell>
+                </Table.Row>
+              )
+            })}
+        </Table.Body>
+      </Table>
     )
   }
 
@@ -272,9 +272,18 @@ const CanvasUserFinder = ({selectedUsers, onChange}: CanvasUserFinderProps) => {
   }
 
   return (
-    <View as="div" margin="medium 0 0 0">
+    <View as="div">
       <Select
-        renderLabel={<ScreenReaderContent>type to search for users</ScreenReaderContent>}
+        renderLabel={
+          <>
+            <Text as="div" weight="bold">
+              Share
+            </Text>
+            <Text as="div" weight="normal" lineHeight="double" size="small">
+              Add users to collaborate on, review, or view the pathway.
+            </Text>
+          </>
+        }
         placeholder="Search for users"
         renderBeforeInput={inFlight ? <IconProgressLine /> : <IconSearchLine />}
         isShowingOptions={showSearchResults}

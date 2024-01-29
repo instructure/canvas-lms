@@ -76,7 +76,7 @@ const PathwayBuilderTree = ({
       data-compid="pathway-builder-tree"
       as="div"
       height="100%"
-      margin="small"
+      margin="0"
       position="relative"
       overflowY="auto"
     >

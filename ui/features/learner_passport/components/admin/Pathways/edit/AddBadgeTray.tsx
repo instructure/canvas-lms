@@ -16,8 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useEffect, useState} from 'react'
-import {Button, CloseButton} from '@instructure/ui-buttons'
+import React, {useCallback, useContext, useEffect, useState} from 'react'
+import {IconArrowOpenStartLine, IconTrashLine} from '@instructure/ui-icons'
+import {Button, CloseButton, IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {Tag} from '@instructure/ui-tag'
@@ -25,23 +26,28 @@ import {Text} from '@instructure/ui-text'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
 import {Tray} from '@instructure/ui-tray'
 import {View} from '@instructure/ui-view'
-
-import type {PathwayBadgeType} from '../../../types'
+import {DataContext} from '../PathwayEditDataContext'
+import {isPathwayBadgeType, type PathwayBadgeType} from '../../../types'
 
 type AddBadgeTrayProps = {
-  allBadges: PathwayBadgeType[]
   open: boolean
   selectedBadgeId: string | null
   onClose: () => void
   onSave: (badgeId: string | null) => void
 }
 
-const AddBadgeTray = ({allBadges, open, selectedBadgeId, onClose, onSave}: AddBadgeTrayProps) => {
+const AddBadgeTray = ({open, selectedBadgeId, onClose, onSave}: AddBadgeTrayProps) => {
+  const {allBadges} = useContext(DataContext)
   const [currSelectedId, setCurrSelectedId] = useState<string | null>(null)
 
   useEffect(() => {
     setCurrSelectedId(selectedBadgeId)
   }, [selectedBadgeId])
+
+  const handleClose = useCallback(() => {
+    setCurrSelectedId(selectedBadgeId)
+    onClose()
+  }, [onClose, selectedBadgeId])
 
   const handleSelectBadge = useCallback(
     (badgeId: string | null) => {
@@ -81,7 +87,7 @@ const AddBadgeTray = ({allBadges, open, selectedBadgeId, onClose, onSave}: AddBa
     onSave(currSelectedId)
   }, [currSelectedId, onSave])
 
-  const renderBadge = (badge: PathwayBadgeType) => {
+  const renderBadgeForTray = (badge: PathwayBadgeType) => {
     return (
       <View
         as="div"
@@ -126,38 +132,48 @@ const AddBadgeTray = ({allBadges, open, selectedBadgeId, onClose, onSave}: AddBa
     <Tray
       label="Achievements"
       open={open}
-      onDismiss={onClose}
+      onDismiss={handleClose}
       size="regular"
       placement="end"
       themeOverride={{regularWidth: '480px'}}
     >
       <Flex as="div" direction="column" height="100vh">
-        <Flex as="div" padding="small small 0 medium">
-          <Flex.Item shouldGrow={true} shouldShrink={true}>
-            <Heading level="h2" margin="0 0 small 0">
-              Achievements
-            </Heading>
-          </Flex.Item>
+        <Flex as="div" padding="small small 0 medium" direction="row-reverse">
           <Flex.Item>
             <CloseButton
               placement="end"
               offset="small"
               screenReaderLabel="Close"
-              onClick={onClose}
+              onClick={handleClose}
             />
           </Flex.Item>
+
+          <Flex.Item shouldGrow={true} shouldShrink={true}>
+            <Heading level="h2">Achievements</Heading>
+          </Flex.Item>
+
+          <IconButton
+            margin="0 small 0 0"
+            screenReaderLabel="back"
+            size="small"
+            withBackground={false}
+            withBorder={false}
+            onClick={handleClose}
+          >
+            <IconArrowOpenStartLine />
+          </IconButton>
         </Flex>
         <Flex.Item shouldGrow={true} padding="medium">
           <Text>Select a badge or certificate</Text>
           <Flex as="div" wrap="wrap" gap="small" margin="xx-small 0 0 0">
             {allBadges.map((badge: PathwayBadgeType) => {
-              return renderBadge(badge)
+              return renderBadgeForTray(badge)
             })}
           </Flex>
         </Flex.Item>
         <Flex.Item align="end" width="100%">
           <View as="div" padding="small medium" borderWidth="small 0 0 0" textAlign="end">
-            <Button onClick={onClose}>Cancel</Button>
+            <Button onClick={handleClose}>Back</Button>
             <Button margin="0 0 0 small" onClick={handleSave}>
               Save Achievement
             </Button>
@@ -168,23 +184,39 @@ const AddBadgeTray = ({allBadges, open, selectedBadgeId, onClose, onSave}: AddBa
   )
 }
 
-const renderBadge = (badge: PathwayBadgeType) => {
+const renderBadge = (badge: PathwayBadgeType, onRemove?: () => void) => {
   return (
-    <View as="div" background="secondary" margin="small 0">
-      <Flex as="div">
-        <Flex.Item padding="small" shouldShrink={false} shouldGrow={false}>
-          {badge.image ? (
-            <img src={badge.image} alt="" style={{width: '100px'}} />
-          ) : (
-            <div style={{width: '100px', height: '100px', backgroundColor: 'grey'}} />
-          )}
-        </Flex.Item>
-        <Flex.Item padding="medium medium medium 0" shouldShrink={true}>
+    <View
+      as="div"
+      background="secondary"
+      borderWidth="small"
+      borderRadius="medium"
+      margin="small 0"
+    >
+      <Flex as="div" gap="small" padding="small">
+        {badge.image && (
+          <Flex.Item shouldShrink={false} shouldGrow={false} width="40px">
+            <img src={badge.image} alt="" style={{width: '430px'}} />
+          </Flex.Item>
+        )}
+        <Flex.Item shouldGrow={true}>
           <Text as="div" weight="bold">
             {badge.title}
           </Text>
           <Text as="div">{badge.issuer.name}</Text>
         </Flex.Item>
+        {onRemove && (
+          <Flex.Item>
+            <IconButton
+              screenReaderLabel="remove"
+              size="small"
+              withBackground={false}
+              onClick={onRemove}
+            >
+              <IconTrashLine />
+            </IconButton>
+          </Flex.Item>
+        )}
       </Flex>
       {badge.skills.length > 0 ? (
         <View as="div" padding="small" borderWidth="small 0 0 0">
@@ -201,12 +233,31 @@ const renderBadge = (badge: PathwayBadgeType) => {
   )
 }
 
-const renderBadges = (allBadges: PathwayBadgeType[], badgeId: string | null) => {
+const renderBadges = (
+  allBadges: PathwayBadgeType[],
+  badgeId: string | null,
+  onRemove?: () => void
+) => {
   if (badgeId === null) return null
 
   const badge = allBadges.find(b => b.id === badgeId)
-  return badge ? renderBadge(badge) : null
+  return badge ? renderBadge(badge, onRemove) : null
+}
+
+const renderCompletionAward = (
+  allBadges: PathwayBadgeType[],
+  badgeOrId: string | PathwayBadgeType | null
+): JSX.Element | undefined => {
+  if (!badgeOrId) return undefined
+  let badge
+  if (typeof badgeOrId === 'string') {
+    badge = allBadges.find(b => b.id === badgeOrId)
+  }
+  if (isPathwayBadgeType(badgeOrId)) {
+    badge = badgeOrId
+  }
+  return badge && renderBadge(badge)
 }
 
 export default AddBadgeTray
-export {renderBadges, renderBadge}
+export {renderBadges, renderBadge, renderCompletionAward}

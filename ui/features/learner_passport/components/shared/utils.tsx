@@ -35,7 +35,7 @@ import {View} from '@instructure/ui-view'
 import type {ViewProps} from '@instructure/ui-view'
 import {uid} from '@instructure/uid'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import type {AchievementData, ProjectDetailData} from '../types'
+import type {AchievementData, MilestoneData, ProjectDetailData} from '../types'
 import AchievementCard from '../learner/Achievements/AchievementCard'
 import ProjectCard from '../learner/Projects/ProjectCard'
 import ClickableCard from './ClickableCard'
@@ -224,4 +224,19 @@ export function pluralize(count: number, singular: string, plural: string) {
     default:
       throw new Error('Unknown: ' + grammaticalNumber)
   }
+}
+
+export const findSubtreeMilestones = (
+  milestones: MilestoneData[],
+  rootId: string,
+  subtree: string[]
+): string[] => {
+  const root = milestones.find(m => m.id === rootId)
+  if (!root) return subtree
+  subtree.push(rootId)
+  if (root.next_milestones.length === 0) return subtree
+  root?.next_milestones.forEach(nextid => {
+    subtree.concat(findSubtreeMilestones(milestones, nextid, subtree))
+  })
+  return subtree
 }
