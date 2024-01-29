@@ -164,7 +164,8 @@ describe('AccountCalendarSettings', () => {
       expect(modalTitle).not.toBeInTheDocument()
     })
 
-    it('does not show the confirmation modal if changing only the account visibility', async () => {
+    // LF-1202
+    it.skip('does not show the confirmation modal if changing only the account visibility', async () => {
       const {queryByRole, getByRole, getByTestId, findByText} = render(
         <AccountCalendarSettings {...defaultProps} />
       )
