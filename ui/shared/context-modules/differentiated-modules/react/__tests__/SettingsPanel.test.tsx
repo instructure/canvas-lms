@@ -30,6 +30,11 @@ jest.mock('@canvas/do-fetch-api-effect')
 jest.mock('@canvas/relock-modules-dialog')
 
 describe('SettingsPanel', () => {
+  beforeAll(() => {
+    // GMT-7
+    window.ENV.TIMEZONE = 'America/Denver'
+  })
+
   const props: SettingsPanelProps = {
     moduleElement: document.createElement('div'),
     moduleId: '1',
@@ -61,13 +66,26 @@ describe('SettingsPanel', () => {
   })
 
   it('renders the date time input when unlockAt is set', () => {
-    const {getByText} = renderComponent({unlockAt: '2020-01-01T00:00:00Z'})
+    const {getByText, getAllByText, getByDisplayValue} = renderComponent({
+      unlockAt: '2020-01-01T00:00:00Z',
+    })
     expect(getByText('Date')).toBeInTheDocument()
+    expect(getByText('Time')).toBeInTheDocument()
+    expect(getByDisplayValue('December 31, 2019')).toBeInTheDocument()
+    expect(getByDisplayValue('5:00 PM')).toBeInTheDocument()
+    expect(getAllByText('Tuesday, December 31, 2019 5:00 PM')[0]).toBeInTheDocument()
   })
 
   it('renders the date time input when unlockAt is set and lockUntilChecked is true', () => {
-    const {getByText} = renderComponent({lockUntilChecked: true, unlockAt: '2020-01-01T00:00:00Z'})
+    const {getByText, getAllByText, getByDisplayValue} = renderComponent({
+      lockUntilChecked: true,
+      unlockAt: '2020-01-01T00:00:00Z',
+    })
     expect(getByText('Date')).toBeInTheDocument()
+    expect(getByText('Time')).toBeInTheDocument()
+    expect(getByDisplayValue('December 31, 2019')).toBeInTheDocument()
+    expect(getByDisplayValue('5:00 PM')).toBeInTheDocument()
+    expect(getAllByText('Tuesday, December 31, 2019 5:00 PM')[0]).toBeInTheDocument()
   })
 
   it('does not render the date time input when unlockAt is set and lockUntilChecked is false', () => {

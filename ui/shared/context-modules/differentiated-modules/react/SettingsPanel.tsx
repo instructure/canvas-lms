@@ -235,6 +235,8 @@ export default function SettingsPanel({
           <View data-testid="lock-until-input" as="div" padding="small">
             <DateTimeInput
               value={state.unlockAt}
+              locale={ENV.LOCALE || 'en'}
+              timezone={ENV.TIMEZONE || 'UTC'}
               dateRenderLabel={I18n.t('Date')}
               timeRenderLabel={I18n.t('Time')}
               invalidDateTimeMessage={I18n.t('Invalid date!')}
