@@ -63,20 +63,7 @@ require('./generatePluginBundles')
 
 if (!process.env.NODE_ENV) process.env.NODE_ENV = 'development'
 
-// We have a bunch of things (like our selenium jenkins builds) that have
-// historically used the environment variable JS_BUILD_NO_UGLIFY to make their
-// prod webpack builds go faster. But the slowest thing was not actually uglify
-// (aka terser), it is generating the sourcemaps. Now that we added the
-// performance hints and want to fail the build if you accidentally make our
-// bundles larger than a certain size, we need to always uglify to check the
-// after-uglify size of things, but can skip making sourcemaps if you want it to
-// go faster. So this is to allow people to use either environment variable:
-// the technically more correct SKIP_SOURCEMAPS one or the historically used JS_BUILD_NO_UGLIFY one.
-// TODO: only use SKIP_SOURCEMAPS
-//   JS_BUILD_NO_UGLIFY only used in gulp
-const skipSourcemaps = Boolean(
-  process.env.SKIP_SOURCEMAPS || process.env.JS_BUILD_NO_UGLIFY === '1'
-)
+const skipSourcemaps = process.env.SKIP_SOURCEMAPS === '1'
 
 const shouldWriteCache =
   process.env.WRITE_BUILD_CACHE === '1' || process.env.NODE_ENV === 'development'
