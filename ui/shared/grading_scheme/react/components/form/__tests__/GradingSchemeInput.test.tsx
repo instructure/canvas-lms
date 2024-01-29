@@ -70,9 +70,7 @@ describe('GradingSchemeInput', () => {
     expect((minRangeCells[2] as HTMLInputElement).value).toBe('70')
     expect((minRangeCells[3] as HTMLInputElement).value).toBe('60')
 
-    // the last min range is a hard coded 0.0
-    // note that query results 4-7 are the wrapping spans with the 'to ' in them
-    expect(minRangeCells[8].textContent).toBe('0%')
+    expect(minRangeCells[4].textContent).toBe('0%')
 
     const maxRangeCells = screen.getAllByLabelText('Upper limit of range')
 
@@ -108,21 +106,18 @@ describe('GradingSchemeInput', () => {
     expect(letterGradeInputs[3].value).toBe('D')
 
     const maxRangeCells = screen.getAllByLabelText('Upper limit of range')
-    expect(maxRangeCells.length).toBe(5)
-    // note: the first result is also inside of the first row
-    expect(maxRangeCells[1].querySelector('input')?.value).toBe('4')
-    expect(maxRangeCells[2].textContent).toBe('< 3')
-    expect(maxRangeCells[3].textContent).toBe('< 2')
-    expect(maxRangeCells[4].textContent).toBe('< 1')
+    expect(maxRangeCells.length).toBe(4)
+    expect((maxRangeCells[0] as HTMLInputElement).value).toBe('4')
+    expect(maxRangeCells[1].textContent).toBe('< 3')
+    expect(maxRangeCells[2].textContent).toBe('< 2')
+    expect(maxRangeCells[3].textContent).toBe('< 1')
 
     const minRangeCells = screen.getAllByLabelText('Lower limit of range')
 
     expect((minRangeCells[0] as HTMLInputElement).value).toBe('3')
     expect((minRangeCells[1] as HTMLInputElement).value).toBe('2')
     expect((minRangeCells[2] as HTMLInputElement).value).toBe('1')
-    // the last min range is a hard coded 0.0
-    // note that query results 3-5 are the wrapping spans with the 'to ' in them
-    expect(minRangeCells[6].textContent).toBe('0')
+    expect(minRangeCells[3].textContent).toBe('0')
   })
 
   it('save callback is invoked on parent imperative save button press when form data is valid', () => {

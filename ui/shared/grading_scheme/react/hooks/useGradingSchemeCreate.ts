@@ -29,9 +29,9 @@ export const useGradingSchemeCreate = (): {
     contextId: string,
     gradingSchemeTemplate: GradingSchemeTemplate
   ) => Promise<GradingScheme>
-  createGradingSchemeStatus: string
+  createGradingSchemeStatus: ApiCallStatus
 } => {
-  const [createGradingSchemeStatus, setCreateGradingSchemeStatus] = useState(
+  const [createGradingSchemeStatus, setCreateGradingSchemeStatus] = useState<ApiCallStatus>(
     ApiCallStatus.NOT_STARTED
   )
 

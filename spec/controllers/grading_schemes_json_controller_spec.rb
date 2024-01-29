@@ -251,7 +251,8 @@ describe GradingSchemesJsonController, type: :request do
         expect(response_json.length).to eq 1
 
         expect(response_json.first).to eq({ "id" => account_level_grading_standard.id.to_s,
-                                            "title" => "My Account Level Grading Standard" })
+                                            "title" => "My Account Level Grading Standard",
+                                            "context_type" => account_level_grading_standard.context_type.to_s })
       end
     end
 
@@ -663,10 +664,12 @@ describe GradingSchemesJsonController, type: :request do
         expect(response_json.length).to eq 2
 
         expect(response_json.first).to eq({ "id" => account_level_grading_standard.id.to_s,
-                                            "title" => "My Account Level Grading Standard" })
+                                            "title" => "My Account Level Grading Standard",
+                                            "context_type" => "Account" })
 
         expect(response_json[1]).to eq({ "id" => course_level_grading_standard.id.to_s,
-                                         "title" => "My Course Level Grading Standard" })
+                                         "title" => "My Course Level Grading Standard",
+                                         "context_type" => "Course" })
       end
     end
 

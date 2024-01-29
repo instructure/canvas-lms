@@ -119,7 +119,11 @@ export const GradingSchemeViewEditModal: React.FC<GradingSchemeViewEditModalProp
       setGradingScheme(updatedGradingScheme)
       if (onUpdate) {
         // if parent supplied a callback method, inform parent that grading standard was updated
-        onUpdate({title: updatedGradingScheme.title, id: updatedGradingScheme.id})
+        onUpdate({
+          title: updatedGradingScheme.title,
+          id: updatedGradingScheme.id,
+          context_type: updatedGradingScheme.context_type,
+        })
       }
     } catch (error) {
       showFlashError(I18n.t('There was an error while updating the grading scheme'))(error as Error)

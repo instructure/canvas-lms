@@ -191,6 +191,7 @@ GradingTypeSelector.prototype.renderGradingSchemeSelector = function () {
     onChange: this.handleGradingStandardIdChanged,
     contextId: ENV.COURSE_ID,
     contextType: 'Course',
+    archivedGradingSchemesEnabled: ENV.ARCHIVED_GRADING_SCHEMES_ENABLED,
   }
   const mountPoint = document.querySelector('#grading_scheme_selector-target')
   // eslint-disable-next-line react/no-render-return-value
