@@ -341,3 +341,13 @@ customizable_default_due_time:
       state: allowed_on
     development:
       state: allowed_on
+platform_service_speedgrader:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: "SpeedGrader 2: Steel Thread"
+  description: This feature provides a new SpeedGrader platform experience.
+  environments:
+    ci:
+      state: allowed
+    development:
+      state: allowed
