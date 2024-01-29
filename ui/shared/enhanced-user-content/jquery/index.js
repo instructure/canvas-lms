@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {isolate} from '@canvas/sentry'
 import KeyboardNavDialog from '@canvas/keyboard-nav-dialog'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
@@ -645,7 +644,5 @@ export default function enhanceTheEntireUniverse() {
     makeAllExternalLinksExternalLinks,
     wireUpFilePreview,
     setDialogCloseText,
-  ]
-    .map(isolate)
-    .map(x => x())
+  ].map(x => x())
 }
