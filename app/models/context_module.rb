@@ -304,7 +304,7 @@ class ContextModule < ActiveRecord::Base
     ContentTag.where(context_module_id: self).where.not(workflow_state: "deleted").update(workflow_state: "deleted", updated_at: deleted_at)
     delay_if_production(n_strand: "context_module_update_downstreams", priority: Delayed::LOW_PRIORITY).update_downstreams
     save!
-    update_assignment_submissions(module_assignments_quizzes)
+    update_assignment_submissions(module_assignments_quizzes) if assignment_overrides.active.exists?
     true
   end
 
@@ -987,8 +987,8 @@ class ContextModule < ActiveRecord::Base
     assignment_overrides
   end
 
-  def update_assignment_submissions(module_assignments_quizzes)
-    if Account.site_admin.feature_enabled?(:differentiated_modules) && assignment_overrides.active.exists?
+  def update_assignment_submissions(module_assignments_quizzes = current_assignments_and_quizzes)
+    if Account.site_admin.feature_enabled?(:differentiated_modules)
       SubmissionLifecycleManager.recompute_course(context, assignments: module_assignments_quizzes, update_grades: true)
     end
   end
