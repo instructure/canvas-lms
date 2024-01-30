@@ -149,6 +149,7 @@ import 'jquery-scroll-to-visible/jquery.scrollTo'
 import 'jquery-selectmenu'
 import '@canvas/jquery/jquery.disableWhileLoading'
 import '@canvas/util/jquery/fixDialogButtons'
+import {isPreviewable} from '@instructure/canvas-rce/es/rce/plugins/shared/Previewable'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 import type {EnvGradebookSpeedGrader} from '@canvas/global/env/EnvGradebook'
 import replaceTags from '@canvas/util/replaceTags'
@@ -2340,7 +2341,7 @@ EG = {
       if (
         attachment.crocodoc_url ||
         attachment.canvadoc_url ||
-        $.isPreviewable(attachment.content_type)
+        isPreviewable(attachment.content_type)
       ) {
         inlineableAttachments.push(attachment)
       }
@@ -2873,7 +2874,7 @@ EG = {
           iframe_min_height: 0,
         })
       )
-    } else if ($.isPreviewable(attachment.content_type, 'google')) {
+    } else if (!INST?.disableGooglePreviews && isPreviewable(attachment.content_type)) {
       $no_annotation_warning.show()
 
       const currentStudentIDAsOfAjaxCall = this.currentStudent[anonymizableId]

@@ -19,7 +19,7 @@
 import React from 'react'
 import {act, fireEvent, render, screen, waitFor} from '@testing-library/react'
 import EquationEditorModal from '../index'
-import Mathml, {MathJaxDirective} from '../../../../../enhance-user-content/mathml'
+import {MathJaxDirective, Mathml} from '../../../../../enhance-user-content/mathml'
 import advancedPreference from '../advancedPreference'
 import {MathfieldElement} from 'mathlive'
 import RCEGlobals from '../../../../RCEGlobals'

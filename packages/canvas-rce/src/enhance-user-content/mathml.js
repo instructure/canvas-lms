@@ -360,4 +360,4 @@ function handleNewMath(event) {
 
 window.addEventListener(Mathml.processNewMathEventName, handleNewMath)
 
-export {Mathml as default, mathImageHelper, MathJaxDirective}
+export {Mathml, mathImageHelper, MathJaxDirective}
