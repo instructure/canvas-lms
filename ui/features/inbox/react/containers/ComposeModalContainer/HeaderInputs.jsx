@@ -220,6 +220,7 @@ const HeaderInputs = props => {
                   renderTitle={I18n.t('Getting recipients observers')}
                   size="x-small"
                   margin="none none none x-small"
+                  delay={300}
                 />
               </div>
             )}
