@@ -32,12 +32,12 @@ const DEFAULT_LIST_OPTIONS = {
     {id: '2', name: 'Section 2'},
   ],
   Students: [
-    {user: {_id: 'u_1', name: 'Jason'}},
-    {user: {_id: 'u_2', name: 'Drake'}},
-    {user: {_id: 'u_3', name: 'Caleb'}},
-    {user: {_id: 'u_4', name: 'Aaron'}},
-    {user: {_id: 'u_5', name: 'Chawn'}},
-    {user: {_id: 'u_6', name: 'Omar'}},
+    {_id: 'u_1', name: 'Jason'},
+    {_id: 'u_2', name: 'Drake'},
+    {_id: 'u_3', name: 'Caleb'},
+    {_id: 'u_4', name: 'Aaron'},
+    {_id: 'u_5', name: 'Chawn'},
+    {_id: 'u_6', name: 'Omar'},
   ],
   Groups: [
     {_id: '1', name: 'Group 1'},

@@ -55,8 +55,8 @@ export const AssignmentDueDatesManager = () => {
     'Course Sections': sections.map(section => {
       return {assetCode: `course_section_${section?.id}`, label: section?.name}
     }),
-    Students: studentEnrollments.map(enrollment => {
-      return {assetCode: `user_${enrollment?.user?._id}`, label: enrollment?.user?.name}
+    Students: studentEnrollments.map(user => {
+      return {assetCode: `user_${user?._id}`, label: user?.name}
     }),
     Groups: groups?.map(group => {
       return {assetCode: `group_${group?._id}`, label: group?.name}
@@ -126,8 +126,8 @@ export const AssignmentDueDatesManager = () => {
       'Course Sections': sections.map(section => {
         return {assetCode: `course_section_${section?.id}`, label: section?.name}
       }),
-      Students: studentEnrollments.map(enrollment => {
-        return {assetCode: `user_${enrollment?.user?._id}`, label: enrollment?.user?.name}
+      Students: studentEnrollments.map(user => {
+        return {assetCode: `user_${user?._id}`, label: user?.name}
       }),
       Groups: groups?.map(group => {
         return {assetCode: `group_${group?._id}`, label: group?.name}
