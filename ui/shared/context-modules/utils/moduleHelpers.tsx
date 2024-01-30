@@ -18,7 +18,7 @@
 
 import ReactDOM from 'react-dom'
 import React from 'react'
-import {Mathml} from '@canvas/rce/canvas-rce'
+import {Mathml} from '@instructure/canvas-rce/es/enhance-user-content/mathml'
 import ModuleFileDrop from '@canvas/context-module-file-drop/react'
 import ModuleFile from '@canvas/files/backbone/models/ModuleFile'
 import $, * as JQuery from 'jquery'

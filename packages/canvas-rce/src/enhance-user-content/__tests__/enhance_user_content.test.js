@@ -17,7 +17,7 @@
  */
 
 import {enhanceUserContent} from '../enhance_user_content'
-import Mathml from '../mathml'
+import {Mathml} from '../mathml'
 
 jest.useFakeTimers()
 

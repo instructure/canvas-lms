@@ -22,7 +22,7 @@ import {closest, getData, hide, insertAfter, setData, show} from './jqueryish_fu
 import {getTld, isExternalLink, showFilePreview, youTubeID} from './instructure_helper'
 import mediaCommentThumbnail from './media_comment_thumbnail'
 import {addParentFrameContextToUrl} from '../rce/plugins/instructure_rce_external_tools/util/addParentFrameContextToUrl'
-import Mathml, {MathJaxDirective} from './mathml'
+import {MathJaxDirective, Mathml} from './mathml'
 
 // in jest the es directory doesn't exist so stub the undefined svg
 const IconDownloadSVG = IconDownloadLine?.src || '<svg></svg>'
