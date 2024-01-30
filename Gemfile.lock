@@ -521,7 +521,7 @@ GEM
       tzinfo
     expgen (0.1.1)
       parslet
-    factory_bot (6.4.5)
+    factory_bot (6.4.6)
       activesupport (>= 5.0.0)
     faraday (2.7.12)
       base64
