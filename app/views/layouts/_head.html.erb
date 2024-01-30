@@ -14,100 +14,47 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-
 -%><!DOCTYPE html>
-<html dir="<%= I18n.rtl? ? 'rtl' : 'ltr' %>"   lang=<%= raw I18n.locale.to_json %>>
+<html dir="<%= I18n.rtl? ? 'rtl' : 'ltr' %>" lang=<%= raw I18n.locale.to_json %>>
 <head>
   <meta charset="utf-8">
-  <% if @sentry_trace.present? %>
-  <meta name="sentry-trace" content="<%= @sentry_trace %>"/>
-  <% end %>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="<%= brand_variable('ic-brand-global-nav-bgd') %>">
+  <% unless @allow_robot_indexing %><meta name="robots" content="noindex,nofollow" /><% end %>
+  <%= include_custom_meta_tags %>
+  <% if @sentry_trace.present? %><meta name="sentry-trace" content="<%= @sentry_trace %>"/><% end %>
+  <title><%= @page_title || (yield :page_title).presence || t('default_page_title', "Canvas LMS") %></title>
+
   <%= preload_link_tag(font_path("/fonts/lato/extended/Lato-Regular.woff2"), { as: "font", type: "font/woff2", crossorigin: 'anonymous' }) %>
   <%= preload_link_tag(font_path("/fonts/lato/extended/Lato-Bold.woff2"), { as: "font", type: "font/woff2", crossorigin: 'anonymous' }) %>
   <%= preload_link_tag(font_path("/fonts/lato/extended/Lato-Italic.woff2"), { as: "font", type: "font/woff2", crossorigin: 'anonymous' }) %>
   <%= stylesheet_link_tag(css_url_for('fonts')) %>
-  <% unless params && (params[:controller]&.starts_with?('login/') || params[:controller]&.starts_with?('oauth'))  # some windows apps need to do the oauth login dance from an ie11 webview %>
-    <script>if (navigator.userAgent.match(/(MSIE|Trident\/)/)) location.replace('/ie-is-not-supported.html')</script>
-  <% end %>
-  <%= render_datadog_rum_js %>
-  <%= favicon_link_tag(favicon) %>
-  <%= favicon_link_tag(brand_variable('ic-brand-apple-touch-icon'), rel: 'apple-touch-icon', type: nil) %>
   <%= stylesheet_link_tag(active_brand_config_url('css'), media: "all") %>
-  <%= yield :head %>
-  <%= include_custom_meta_tags %>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="<%= brand_variable('ic-brand-global-nav-bgd') %>">
-  <% unless @allow_robot_indexing %>
-  <meta name="robots" content="noindex,nofollow" />
+  <% unless params && (params[:controller]&.starts_with?('login/') || params[:controller]&.starts_with?('oauth'))  # some windows apps need to do the oauth login dance from an ie11 webview %>
   <% end %>
+  <%= yield :head %>
   <%= benchmark("include_css_bundles") { include_css_bundles } %>
+  <%= favicon_link_tag(brand_variable('ic-brand-apple-touch-icon'), rel: 'apple-touch-icon', type: nil) %>
+  <%= favicon_link_tag(favicon) %>
+  <% @content_for_head&.each do |string| %>
+  <%= string %><% end %>
   <%= include_account_css %>
-
+  <%= render_datadog_rum_js %>
+  <script>if (navigator.userAgent.match(/(MSIE|Trident\/)/)) location.replace('/ie-is-not-supported.html')</script>
   <% js_bundle :navigation_header unless @headers == false %>
-
   <% js_env(active_context_tab: get_active_tab) %>
   <script>
     INST = <%= benchmark("rendering INST") { raw(inst_env.to_json) } %>;
     ENV = <%= benchmark("rendering ENV") { raw(render_js_env) } %>;
-    BRANDABLE_CSS_HANDLEBARS_INDEX = <%= benchmark("rendering BRANDABLE_CSS_HANDLEBARS_INDEX") { raw BrandableCSS.handlebars_index_json } %>;
+    BRANDABLE_CSS_HANDLEBARS_INDEX = <%= benchmark("rendering BRANDABLE_CSS_HANDLEBARS_INDEX") { raw(BrandableCSS.handlebars_index_json) } %>
   </script>
-
   <%= benchmark("include_head_js") { include_head_js } %>
-  <% @xhrs_to_prefetch_from_controller&.each do |(args, kwargs)| %>
+  <% @xhrs_to_prefetch_from_controller&.each do |(args, kwargs)| -%>
     <%= prefetch_xhr(*args, **kwargs) %>
-  <% end %>
-  <% @content_for_head&.each do |string| %>
-    <%= string %>
-  <% end %>
-  <title><%= @page_title || (yield :page_title).presence || t('default_page_title', "Canvas LMS") %></title>
-
-  <% if fullstory_enabled_for_session?(session) %>
-    <%= render :partial => "shared/fullstory_snippet" %>
-  <% end %>
-
-  <% if @include_recaptcha %>
-  <script src="https://www.google.com/recaptcha/api.js?render=explicit&hl=<%= I18n.locale %>" async defer></script>
-  <% end %>
-
-  <% if load_heap? %>
-    <script type="text/javascript">
-      window.heap=window.heap||[],heap.load=function(e,t){window.heap.appid=e,window.heap.config=t=t||{};var r=document.createElement("script");r.type="text/javascript",r.async=!0,r.src="https://cdn.heapanalytics.com/js/heap-"+e+".js";var a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(r,a);for(var n=function(e){return function(){heap.push([e].concat(Array.prototype.slice.call(arguments,0)))}},p=["addEventProperties","addUserProperties","clearEventProperties","identify","resetIdentity","removeEventProperty","setEventProperties","track","unsetEventProperty"],o=0;o<p.length;o++)heap[p[o]]=n(p[o])};
-      heap.load("<%= find_heap_application_id%>");
-      heap.clearEventProperties();
-      heap.addEventProperties({'Base.appName': 'Canvas'});
-      setTimeout(() => {
-        if (ENV.current_user_heap_id && ENV.current_user_heap_id !== heap.identity) {
-          heap.identify(ENV.current_user_heap_id);
-        }
-        props = {}
-        if (ENV.current_user_roles) {
-          props['role'] = ENV.current_user_roles[ENV.current_user_roles.length - 1]
-        }
-        if (ENV.DOMAIN_ROOT_ACCOUNT_UUID) {
-          props['Canvas.accountId'] = ENV.DOMAIN_ROOT_ACCOUNT_UUID
-        }
-        if (ENV.DOMAIN_ROOT_ACCOUNT_SFID) {
-          props['Canvas.salesforceAccountId'] = ENV.DOMAIN_ROOT_ACCOUNT_SFID
-        }
-        if (Object.keys(props).length > 0) {
-          heap.addUserProperties(props);
-        }
-      }, 1000);
-    </script>
-  <% end %>
-
-  <% if load_hotjar? %>
-  <!-- Hotjar Tracking Code for my site -->
-<script>
-    (function(h,o,t,j,a,r){
-        h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
-        h._hjSettings={hjid:3758065,hjsv:6};
-        a=o.getElementsByTagName('head')[0];
-        r=o.createElement('script');r.async=1;
-        r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
-        a.appendChild(r);
-    })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
-</script>
-
-  <% end %>
+  <% end -%>
+  <% if @include_recaptcha %><script src="https://www.google.com/recaptcha/api.js?render=explicit&hl=<%= I18n.locale %>" async></script><% end %>
+  <% if fullstory_enabled_for_session?(session) %><% end %>
+  <%= render :partial => "shared/fullstory_snippet" %>
+  <% if load_heap? %><%= render :partial => "shared/heap_js" %><% end %>
+  <% if load_hotjar? %><%= render :partial => "shared/hotjar_js" %><% end %>
 </head>
