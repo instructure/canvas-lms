@@ -331,6 +331,8 @@ window.modules = (function () {
               } else {
                 $context_module_item.find('.mc_objectives').remove()
               }
+
+              $context_module_item.addClass('rendered')
             })
 
             vddTooltip()
@@ -2608,6 +2610,7 @@ $(document).ready(function () {
   function parseModuleItemElement(element) {
     const pointsPossibleElem = element?.querySelector('.points_possible_display')
     const points = parseFloat(pointsPossibleElem?.textContent)
+    // eslint-disable-next-line no-restricted-globals
     return {pointsPossible: isNaN(points) ? undefined : points}
   }
 

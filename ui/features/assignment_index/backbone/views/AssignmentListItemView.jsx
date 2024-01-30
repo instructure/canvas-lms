@@ -305,6 +305,7 @@ export default AssignmentListItemView = (function () {
 
       super.render(...arguments)
       this.initializeSisButton()
+      $('.ig-details').addClass('rendered')
       // reset the model's view property; it got overwritten by child views
       if (this.model) {
         return (this.model.view = this)
