@@ -284,6 +284,15 @@ describe AuthenticationProvider do
       expect(@user.name).not_to be_blank
     end
 
+    it "ignores empty sis_user_id or integration_id values" do
+      @pseudonym.update sis_user_id: "test", integration_id: "testfrd"
+      aac.apply_federated_attributes(@pseudonym,
+                                     { "sis_id" => "", "internal_id" => "" },
+                                     purpose: :provisioning)
+      expect(@pseudonym.sis_user_id).to eq "test"
+      expect(@pseudonym.integration_id).to eq "testfrd"
+    end
+
     context "admin_roles" do
       it "ignores non-existent roles" do
         aac.apply_federated_attributes(@pseudonym, { "admin_roles" => "garbage" })
