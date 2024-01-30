@@ -62,13 +62,13 @@ export default function factory(spec) {
       /**
        * Load the first page of data for the given params
        */
-      load(params) {
+      load(params, successHandler = () => {}) {
         const key = this.getKey(params)
         this.lastParams = params
         const normalizedParams = this.normalizeParams(params)
         const url = this.getUrl()
 
-        return this._load(key, url, normalizedParams)
+        return this._load(key, url, normalizedParams, {successHandler})
       },
 
       /**
@@ -144,6 +144,7 @@ export default function factory(spec) {
             if (this.jsonKey) data = data[this.jsonKey]
             if (options.wrap) data = [data]
             if (options.append) data = (this.getStateFor(key).data || []).concat(data)
+            if (options.successHandler) options.successHandler(data, xhr)
 
             const links = parseLinkHeader(xhr.getResponseHeader('Link'))
             this.mergeState(key, {data, links, loading: false})

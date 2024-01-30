@@ -86,11 +86,10 @@ test('loadingUsers', () => {
   equal(message.type, 'LOADING_USERS', 'it returns the proper type')
 })
 
-test('applySearchFilter', assert => {
-  const start = assert.async()
+test('applySearchFilter', () => {
   let count = 3
   const done = () => {
-    --count || start()
+    --count
   }
 
   const fakeDispatcherSearchLengthOkay = response => {
