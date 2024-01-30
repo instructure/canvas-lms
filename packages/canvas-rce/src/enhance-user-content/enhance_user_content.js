@@ -16,17 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {IconDownloadLine, IconExternalLinkLine} from '@instructure/ui-icons/es/svg'
+import {IconDownloadLine} from '@instructure/ui-icons/es/svg'
 import formatMessage from '../format-message'
 import {closest, getData, hide, insertAfter, setData, show} from './jqueryish_funcs'
-import {getTld, isExternalLink, showFilePreview, youTubeID} from './instructure_helper'
+import {isExternalLink, showFilePreview, youTubeID} from './instructure_helper'
 import mediaCommentThumbnail from './media_comment_thumbnail'
 import {addParentFrameContextToUrl} from '../rce/plugins/instructure_rce_external_tools/util/addParentFrameContextToUrl'
 import {MathJaxDirective, Mathml} from './mathml'
+import {makeExternalLinkIcon} from './external_links'
 
 // in jest the es directory doesn't exist so stub the undefined svg
 const IconDownloadSVG = IconDownloadLine?.src || '<svg></svg>'
-const IconExternalLinkSVG = IconExternalLinkLine?.src || '<svg></svg>'
 
 function makeDownloadButton(download_url, filename) {
   const a = document.createElement('a')
@@ -51,28 +51,6 @@ function makeDownloadButton(download_url, filename) {
   a.appendChild(srspan)
 
   return a
-}
-
-function makeExternalLinkIcon(forLink) {
-  const dir = (forLink && window.getComputedStyle(forLink).direction) || 'ltr'
-  const $icon = document.createElement('span')
-  $icon.setAttribute('class', 'external_link_icon')
-  const style = `margin-inline-start: 5px; display: inline-block; text-indent: initial; ${
-    dir === 'rtl' ? 'transform:scale(-1, 1)' : ''
-  }`
-  $icon.setAttribute('style', style)
-  $icon.setAttribute('role', 'presentation')
-  $icon.innerHTML = IconExternalLinkSVG
-  $icon.firstChild.setAttribute(
-    'style',
-    'width:1em; height:1em; vertical-align:middle; fill:currentColor'
-  )
-
-  const srspan = document.createElement('span')
-  srspan.setAttribute('class', 'screenreader-only')
-  srspan.textContent = formatMessage('Links to an external site.')
-  $icon.appendChild(srspan)
-  return $icon
 }
 
 function handleYoutubeLink($link) {
@@ -399,40 +377,4 @@ export function enhanceUserContent(container = document, opts = {}) {
       const src = frame.src
       frame.src = src
     })
-}
-
-export function makeAllExternalLinksExternalLinks() {
-  // in 100ms (to give time for everything else to load), find all the external links and add give them
-  // the external link look and behavior (force them to open in a new tab)
-  setTimeout(function () {
-    const content = document.getElementById('content')
-    if (!content) return
-    const tld = getTld(window.location.hostname)
-    const links = content.querySelectorAll(`a[href*="//"]:not([href*="${tld}"])`) // technique for finding "external" links copied from https://davidwalsh.name/external-links-css
-    for (let i = 0; i < links.length; i++) {
-      const $link = links[i]
-      // don't mess with the ones that were already processed in enhanceUserContent
-      if ($link.classList.contains('external')) continue
-      if ($link.matches('.open_in_a_new_tab')) continue
-      if ($link.querySelectorAll('img').length > 0) continue
-      if ($link.matches('.not_external')) continue
-      if ($link.matches('.exclude_external_icon')) continue
-      // we have some pre-instui buttons that are styled links
-      if ($link.classList.contains('btn')) continue
-      const $linkToReplace = $link
-      if ($linkToReplace) {
-        const $linkIndicator = makeExternalLinkIcon()
-        $linkToReplace.classList.add('external')
-        $linkToReplace.querySelectorAll('span.ui-icon-extlink').forEach(c => c.remove)
-        $linkToReplace.setAttribute('target', '_blank')
-        $linkToReplace.setAttribute('rel', 'noreferrer noopener')
-        const $linkSpan = document.createElement('span')
-        const $linkText = $linkToReplace.innerHTML
-        $linkSpan.innerHTML = $linkText
-        while ($linkToReplace.firstChild) $linkToReplace.removeChild($linkToReplace.firstChild)
-        $linkToReplace.appendChild($linkSpan)
-        $linkToReplace.appendChild($linkIndicator)
-      }
-    }
-  }, 100)
 }
