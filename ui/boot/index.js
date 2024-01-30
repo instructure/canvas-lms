@@ -29,7 +29,6 @@ import {up as configureDateTime} from './initializers/configureDateTime'
 import {initSentry} from './initializers/initSentry'
 import {up as renderRailsFlashNotifications} from './initializers/renderRailsFlashNotifications'
 import {up as activateCourseMenuToggler} from './initializers/activateCourseMenuToggler'
-import {up as enhanceUserContent} from './initializers/enhanceUserContent'
 
 // Import is required, workaround for ARC-8398
 // eslint-disable-next-line import/no-nodejs-modules
@@ -53,7 +52,14 @@ let runOnceAfterLocaleFiles = () => {
   configureDateTime()
   renderRailsFlashNotifications()
   activateCourseMenuToggler()
-  enhanceUserContent()
+  import('@canvas/enhanced-user-content')
+    .then(({enhanceTheEntireUniverse}) => {
+      return enhanceTheEntireUniverse()
+    })
+    .catch(e => {
+      // eslint-disable-next-line no-console
+      console.error('Failed to init @canvas/enhanced-user-content', e)
+    })
 }
 
 window.addEventListener('canvasReadyStateChange', function ({detail}) {
