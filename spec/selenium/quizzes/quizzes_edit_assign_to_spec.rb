@@ -120,9 +120,10 @@ describe "quiz edit page assign to" do
 
     expect(assign_to_due_date(0).attribute("value")).to eq("Dec 31, 2022")
     expect(assign_to_due_time(0).attribute("value")).to eq("5:00 PM")
-    expect(assign_to_date_and_time[0].text).to include("Saturday, December 31, 2022 5:00 PM")
-    expect(assign_to_date_and_time[1].text).to include("Tuesday, December 27, 2022 8:00 AM")
-    expect(assign_to_date_and_time[2].text).to include("Saturday, January 7, 2023 9:00 PM")
+    expect(assign_to_available_from_date(0).attribute("value")).to eq("Dec 27, 2022")
+    expect(assign_to_available_from_time(0).attribute("value")).to eq("8:00 AM")
+    expect(assign_to_until_date(0).attribute("value")).to eq("Jan 7, 2023")
+    expect(assign_to_until_time(0).attribute("value")).to eq("9:00 PM")
   end
 
   it "does not update overrides after tray save on edit page" do

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useEffect, useState} from 'react'
+import React, {useCallback, useEffect, useRef, useState, type SyntheticEvent} from 'react'
 import {View} from '@instructure/ui-view'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconTrashLine} from '@instructure/ui-icons'
@@ -75,6 +75,37 @@ function setTimeToStringDate(time: string, date: string | undefined): string | u
   return chosenDate.isValid() ? chosenDate.utc().toISOString() : date
 }
 
+function generateMessages(
+  value: string | null,
+  error: string | null,
+  unparsed: boolean
+): FormMessage[] {
+  if (unparsed) return [{type: 'error', text: I18n.t('Invalid date')}]
+  if (error) return [{type: 'error', text: error}]
+  if (
+    ENV.CONTEXT_TIMEZONE &&
+    ENV.TIMEZONE !== ENV.CONTEXT_TIMEZONE &&
+    ENV.context_asset_string.startsWith('course') &&
+    moment(value).isValid()
+  ) {
+    return [
+      {
+        type: 'hint',
+        text: I18n.t('Local: %{datetime}', {
+          datetime: moment.tz(value, ENV.TIMEZONE).format('ddd, MMM D, YYYY, h:mm A'),
+        }),
+      },
+      {
+        type: 'hint',
+        text: I18n.t('Course: %{datetime}', {
+          datetime: moment.tz(value, ENV.CONTEXT_TIMEZONE).format('ddd, MMM D, YYYY, h:mm A'),
+        }),
+      },
+    ]
+  }
+  return []
+}
+
 export default function ItemAssignToCard({
   courseId,
   contextModuleId,
@@ -108,7 +139,9 @@ export default function ItemAssignToCard({
   const [availableFromDate, setAvailableFromDate] = useState<string | null>(unlock_at)
   const [availableToDate, setAvailableToDate] = useState<string | null>(lock_at)
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({})
+  const [unparsedFieldKeys, setUnparsedFieldKeys] = useState<Set<string>>(new Set())
   const [error, setError] = useState<FormMessage[]>([])
+  const dateInputRefs = useRef<Record<string, HTMLInputElement | null>>({})
 
   const handleSelect = (newSelectedAssignees: AssigneeOption[]) => {
     const errorMessage: FormMessage = {
@@ -121,6 +154,23 @@ export default function ItemAssignToCard({
     setError(newSelectedAssignees.length > 0 ? [] : [errorMessage])
     onCardAssignmentChange?.(cardId, newSelectedAssignees, deletedAssigneeIds)
   }
+
+  const handleBlur = useCallback(
+    (unparsedFieldKey: string) => (e: SyntheticEvent) => {
+      const target = e.target as HTMLInputElement
+      if (!target || target !== dateInputRefs.current[unparsedFieldKey]) return
+      const unparsedFieldExists = unparsedFieldKeys.has(unparsedFieldKey)
+      const isEmpty = target.value.trim() === ''
+      const isValid = moment(target.value).isValid()
+      if ((isEmpty || isValid) && unparsedFieldExists) {
+        unparsedFieldKeys.delete(unparsedFieldKey)
+        setUnparsedFieldKeys(new Set([...unparsedFieldKeys]))
+      } else if (!isEmpty && !isValid && !unparsedFieldExists) {
+        setUnparsedFieldKeys(new Set([unparsedFieldKey, ...unparsedFieldKeys]))
+      }
+    },
+    [unparsedFieldKeys]
+  )
 
   const handleDelete = useCallback(() => {
     onDelete?.(cardId)
@@ -209,6 +259,7 @@ export default function ItemAssignToCard({
     value: string | null
     onChange: (event: React.SyntheticEvent, value: string | undefined) => void
     onClear: () => void
+    messages: FormMessage[]
   }
 
   const dateTimeInputs: DateTimeInput[] = [
@@ -219,6 +270,11 @@ export default function ItemAssignToCard({
       value: dueDate,
       onChange: handleDueDateChange,
       onClear: () => handleDueAtChange(null),
+      messages: generateMessages(
+        dueDate,
+        validationErrors.due_at ?? null,
+        unparsedFieldKeys.has('due_at')
+      ),
     },
     {
       key: 'unlock_at',
@@ -227,6 +283,11 @@ export default function ItemAssignToCard({
       value: availableFromDate,
       onChange: handleAvailableFromDateChange,
       onClear: () => handleUnlockAtChange(null),
+      messages: generateMessages(
+        availableFromDate,
+        validationErrors.unlock_at ?? null,
+        unparsedFieldKeys.has('unlock_at')
+      ),
     },
     {
       key: 'lock_at',
@@ -235,6 +296,11 @@ export default function ItemAssignToCard({
       value: availableToDate,
       onChange: handleAvailableToDateChange,
       onClear: () => handleLockAtChange(null),
+      messages: generateMessages(
+        availableToDate,
+        validationErrors.lock_at ?? null,
+        unparsedFieldKeys.has('lock_at')
+      ),
     },
   ]
 
@@ -284,14 +350,15 @@ export default function ItemAssignToCard({
         customIsLoading={customIsLoading}
         customSetSearchTerm={customSetSearchTerm}
       />
-      {dateTimeInputs.map(props => (
+      {dateTimeInputs.map((props: DateTimeInput) => (
         <ClearableDateTimeInput
           breakpoints={{}}
           {...props}
-          messages={
-            // eslint-disable-next-line react/prop-types
-            validationErrors[props.key] ? [{type: 'error', text: validationErrors[props.key]}] : []
-          }
+          showMessages={false}
+          locale={ENV.LOCALE || 'en'}
+          timezone={ENV.TIMEZONE || 'UTC'}
+          onBlur={handleBlur(props.key)}
+          dateInputRef={el => (dateInputRefs.current[props.key] = el)}
         />
       ))}
       <ContextModuleLink

@@ -166,23 +166,6 @@ describe('ItemAssignToTray', () => {
     })
   })
 
-  it('renders times in the given timezone', async () => {
-    const {findAllByText} = renderComponent({itemContentId: '25', timezone: 'America/Denver'})
-
-    const times = await findAllByText('Thursday, October 5, 2023 6:01 AM')
-    expect(times).toHaveLength(2) // screenreader + visible message
-  })
-
-  it('renders times in the given locale', async () => {
-    const {findAllByText} = renderComponent({
-      itemContentId: '25',
-      locale: 'en-GB',
-      timezone: 'America/Denver',
-    })
-    const times = await findAllByText('Thursday, 5 October 2023 06:01')
-    expect(times).toHaveLength(2) // screenreader + visible message
-  })
-
   it('calls onDismiss when close button is clicked', () => {
     const onDismiss = jest.fn()
     const {getByRole} = renderComponent({onDismiss})
