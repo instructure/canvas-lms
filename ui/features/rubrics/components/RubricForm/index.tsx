@@ -55,6 +55,7 @@ const defaultRubricForm: RubricFormProps = {
   criteria: [],
   pointsPossible: 0,
   buttonDisplay: 'numeric',
+  ratingOrder: 'descending',
 }
 
 const translateRubricData = (fields: RubricQueryResponse): RubricFormProps => {
@@ -65,6 +66,7 @@ const translateRubricData = (fields: RubricQueryResponse): RubricFormProps => {
     criteria: fields.criteria ?? [],
     pointsPossible: fields.pointsPossible ?? 0,
     buttonDisplay: fields.buttonDisplay ?? 'numeric',
+    ratingOrder: fields.ratingOrder ?? 'descending',
   }
 }
 
@@ -215,7 +217,10 @@ export const RubricForm = () => {
                 <Text weight="bold">{I18n.t('Rating Order')}:</Text>
               </Flex.Item>
               <Flex.Item margin="0 0 0 small">
-                <RubricRatingOrderSelect />
+                <RubricRatingOrderSelect
+                  ratingOrder={rubricForm.ratingOrder}
+                  onChangeOrder={ratingOrder => setRubricFormField('ratingOrder', ratingOrder)}
+                />
               </Flex.Item>
             </Flex>
           </Flex.Item>
@@ -376,17 +381,28 @@ const RubricHidePointsSelect = ({hidePoints, onChangeHidePoints}: RubricHidePoin
   )
 }
 
-const RubricRatingOrderSelect = () => {
+type RubricRatingOrderSelectProps = {
+  ratingOrder: string
+  onChangeOrder: (ratingOrder: string) => void
+}
+
+const RubricRatingOrderSelect = ({ratingOrder, onChangeOrder}: RubricRatingOrderSelectProps) => {
+  const onChange = (value: string) => {
+    onChangeOrder(value)
+  }
+
   return (
     <SimpleSelect
       renderLabel={<ScreenReaderContent>{I18n.t('Rubric Rating Order')}</ScreenReaderContent>}
       size="small"
       width="8.125rem"
+      value={ratingOrder}
+      onChange={(e, {value}) => onChange(value !== undefined ? value.toString() : '')}
     >
-      <SimpleSelectOption id="highToLowOption" value="highToLow">
+      <SimpleSelectOption id="highToLowOption" value="descending">
         {I18n.t('High < Low')}
       </SimpleSelectOption>
-      <SimpleSelectOption id="lowToHighOption" value="lowToHigh">
+      <SimpleSelectOption id="lowToHighOption" value="ascending">
         {I18n.t('Low < High')}
       </SimpleSelectOption>
     </SimpleSelect>

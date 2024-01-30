@@ -50,6 +50,7 @@ module Types
 
     field :button_display, String, null: false
     field :hide_points, Boolean, null: true
+    field :rating_order, String, null: false
     field :points_possible, Float, null: true
     field :title, String, null: true
     field :workflow_state, String, null: false
