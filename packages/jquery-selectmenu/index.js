@@ -392,7 +392,7 @@ $.widget('ui.selectmenu', {
             }
           })
           .bind('mouseout.selectmenu blur.selectmenu', function () {
-            if ($(this).is(self._selectedOptionLi().selector)) {
+            if ($(this).is(self._selectedOptionLi())) {
               $(this).addClass(activeClass)
             }
             $(this).removeClass(self.widgetBaseClass + '-item-focus ui-state-hover')
