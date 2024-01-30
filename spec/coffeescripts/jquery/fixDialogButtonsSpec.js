@@ -58,9 +58,8 @@ test('handles buttons', function () {
   })
   msg =
     'make sure clicking on converted ui-dialog-button causes submit handler to be called on form'
-  const $submitButton = $dialog
-    .dialog('widget')
-    .find('.ui-dialog-buttonpane .ui-button:contains("This will Submit the form")')
+  const $submitButton = $dialog.find('.btn[type="submit"]')
+
   const originalButtonText = $submitButton.text()
   const deferred = new $.Deferred()
   let submitWasCalled = false
