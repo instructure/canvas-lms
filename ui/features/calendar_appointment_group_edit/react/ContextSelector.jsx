@@ -220,6 +220,7 @@ class ContextSelector extends React.Component {
   }
 
   renderSections(context) {
+    const filteredSections = context.sections?.filter(section => section.can_create_appointment_groups) ?? []
     return (
       <div
         id={`${context.asset_string}_sections`}
@@ -227,7 +228,7 @@ class ContextSelector extends React.Component {
           this.state.expandedContexts.has(context) ? 'CourseListItem-sections' : 'hiddenSection'
         }
       >
-        {(context.sections || []).map(section => {
+        {filteredSections.map(section => {
           return (
             <div className="sectionItem" key={section.asset_string}>
               <input
@@ -264,9 +265,13 @@ class ContextSelector extends React.Component {
   }
 
   renderListItems() {
+    const filteredContexts = this.props.contexts.filter(context => context
+      .can_create_appointment_groups ||
+      context.sections?.some(section => section
+          .can_create_appointment_groups))
     return (
       <div>
-        {this.props.contexts.map(context => {
+        {filteredContexts.map(context => {
           const expanded = this.state.expandedContexts.has(context)
           const inputId = `${context.asset_string}_checkbox`
           return (
