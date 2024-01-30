@@ -75,9 +75,17 @@ export default function factory(spec) {
        * Create a record; since we're lazy, just blow away all the store
        * data, but reload the last thing we fetched
        */
-      create(params) {
+      create(params, successHandler = () => {}, errorHandler = () => {}) {
         const url = this.getUrl()
-        return ajaxJSON(url, 'POST', this.normalizeParams(params)).then(() => {
+        return ajaxJSON(
+          url,
+          'POST',
+          this.normalizeParams(params),
+          data => {
+            successHandler(data)
+          },
+          errorHandler
+        ).then(() => {
           this.clearState()
           if (this.lastParams) this.load(this.lastParams)
         })
