@@ -113,9 +113,14 @@ describe('RubricForm Tests', () => {
     })
 
     it('will navigate back to /rubrics after successfully saving', async () => {
-      jest
-        .spyOn(RubricFormQueries, 'saveRubric')
-        .mockImplementation(() => Promise.resolve({id: '1', title: 'Rubric 1', pointsPossible: 10}))
+      jest.spyOn(RubricFormQueries, 'saveRubric').mockImplementation(() =>
+        Promise.resolve({
+          id: '1',
+          title: 'Rubric 1',
+          pointsPossible: 10,
+          buttonDisplay: 'numeric',
+        })
+      )
       const {getByTestId} = renderComponent()
       const titleInput = getByTestId('rubric-form-title')
       fireEvent.change(titleInput, {target: {value: 'Rubric 1'}})
