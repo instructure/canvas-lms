@@ -39,7 +39,7 @@ const ModalSpinner = (props: Props) => (
     <Modal.Body>
       <Flex direction="column" textAlign="center">
         <Flex.Item>
-          <Spinner renderTitle={props.label} size="large" />
+          <Spinner renderTitle={props.label} size="large" delay={300} />
         </Flex.Item>
         <Flex.Item>
           <Text>{props.message}</Text>
