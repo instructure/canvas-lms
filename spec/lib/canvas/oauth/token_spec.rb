@@ -154,6 +154,34 @@ module Canvas::OAuth
       end
     end
 
+    describe ".find_access_token" do
+      specs_require_sharding
+      let_once(:scopes) { ["url:POST|/api/v1/inst_access_tokens"] }
+      let_once(:purpose) { "inst_access_tokens" }
+
+      before do
+        Shard.default.activate do
+          @dev_key = DeveloperKey.create!(scopes:)
+        end
+        @shard1.activate do
+          @user = User.create!
+          Shard.default.activate { user.save_shadow_record }
+          @user.access_tokens.create!(developer_key_id: @dev_key.global_id, scopes:, purpose:)
+        end
+      end
+
+      it "finds the user's access token" do
+        access_token = token.class.find_access_token(@user, @dev_key, scopes, purpose)
+        expect(access_token).to be_a AccessToken
+      end
+
+      it "returns nil if token isn't found" do
+        @user.access_tokens.destroy_all
+        access_token = token.class.find_access_token(@user, @dev_key.reload, scopes, purpose)
+        expect(access_token).to be_nil
+      end
+    end
+
     describe "#as_json" do
       let(:json) { token.as_json }
 
