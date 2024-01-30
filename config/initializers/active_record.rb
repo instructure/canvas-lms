@@ -1472,7 +1472,7 @@ module UpdateAndDeleteWithJoins
     connection.delete(sql, "SQL", [])
   end
 end
-ActiveRecord::Relation.prepend(UpdateAndDeleteWithJoins)
+Switchman::ActiveRecord::Relation.include(UpdateAndDeleteWithJoins)
 
 module UpdateAndDeleteAllWithLimit
   def delete_all(*args)
@@ -1491,7 +1491,7 @@ module UpdateAndDeleteAllWithLimit
     super
   end
 end
-ActiveRecord::Relation.prepend(UpdateAndDeleteAllWithLimit)
+Switchman::ActiveRecord::Relation.include(UpdateAndDeleteAllWithLimit)
 
 ActiveRecord::Associations::CollectionProxy.class_eval do
   def respond_to?(name, include_private = false)
