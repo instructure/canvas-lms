@@ -61,6 +61,7 @@ class Rubric < ActiveRecord::Base
   validates :description, length: { maximum: maximum_text_length, allow_blank: true }
   validates :title, length: { maximum: maximum_string_length, allow_blank: false }
   validates :button_display, inclusion: { in: %w[numeric emoji letter] }
+  validates :rating_order, inclusion: { in: %w[ascending descending] }
 
   validates_with RubricUniqueAlignments
   validates_with RubricAssessedAlignments
@@ -334,6 +335,7 @@ class Rubric < ActiveRecord::Base
     self.title = data.title
     self.points_possible = data.points_possible
     self.hide_points = params[:hide_points]
+    self.rating_order = params[:rating_order] if params.key?(:rating_order)
     save
     self
   end

@@ -74,5 +74,10 @@ describe Types::RubricType do
       rubric.update!(button_display: "letter")
       expect(rubric_type.resolve("buttonDisplay")).to eq rubric.button_display
     end
+
+    it "rating_order" do
+      rubric.update!(rating_order: "descending")
+      expect(rubric_type.resolve("ratingOrder")).to eq rubric.rating_order
+    end
   end
 end

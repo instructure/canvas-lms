@@ -119,6 +119,7 @@ describe('RubricForm Tests', () => {
           title: 'Rubric 1',
           pointsPossible: 10,
           buttonDisplay: 'numeric',
+          ratingOrder: 'descending',
         })
       )
       const {getByTestId} = renderComponent()

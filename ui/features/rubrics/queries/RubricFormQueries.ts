@@ -30,6 +30,7 @@ const RUBRIC_QUERY = gql`
       title
       hidePoints
       buttonDisplay
+      ratingOrder
       workflowState
       pointsPossible
       criteria {
@@ -49,7 +50,7 @@ const RUBRIC_QUERY = gql`
 
 export type RubricQueryResponse = Pick<
   Rubric,
-  'id' | 'title' | 'criteria' | 'hidePoints' | 'pointsPossible' | 'buttonDisplay'
+  'id' | 'title' | 'criteria' | 'hidePoints' | 'pointsPossible' | 'buttonDisplay' | 'ratingOrder'
 >
 
 type FetchRubricResponse = {
@@ -66,7 +67,7 @@ export const fetchRubric = async (id?: string): Promise<RubricQueryResponse | nu
 }
 
 export const saveRubric = async (rubric: RubricFormProps): Promise<RubricQueryResponse> => {
-  const {id, title, hidePoints, accountId, courseId, buttonDisplay} = rubric
+  const {id, title, hidePoints, accountId, courseId, ratingOrder, buttonDisplay} = rubric
   const urlPrefix = accountId ? `/accounts/${accountId}` : `/courses/${courseId}`
   const url = `${urlPrefix}/rubrics/${id ?? ''}`
   const method = id ? 'PATCH' : 'POST'
@@ -100,6 +101,7 @@ export const saveRubric = async (rubric: RubricFormProps): Promise<RubricQueryRe
         hide_points: hidePoints,
         criteria,
         button_display: buttonDisplay,
+        rating_order: ratingOrder,
       },
       rubric_association: {
         association_id: accountId ?? courseId,
@@ -125,5 +127,6 @@ export const saveRubric = async (rubric: RubricFormProps): Promise<RubricQueryRe
     criteria: savedRubric.criteria,
     pointsPossible: savedRubric.points_possible,
     buttonDisplay: savedRubric.button_display,
+    ratingOrder: savedRubric.rating_order,
   }
 }

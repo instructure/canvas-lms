@@ -27,4 +27,5 @@ export type RubricFormProps = {
   criteria: RubricCriterion[]
   pointsPossible: number
   buttonDisplay: string
+  ratingOrder: string
 }

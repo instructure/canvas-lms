@@ -89,6 +89,7 @@ export const ViewRubrics = () => {
         pointsPossible: curr.pointsPossible,
         criteriaCount: curr.criteriaCount,
         locations: [], // TODO: add locations once we have them
+        ratingOrder: curr.ratingOrder,
       }
 
       curr.workflowState === 'active'
