@@ -26,11 +26,20 @@ module TestDatabaseUtils
 
         # total migration - all run migrations - all skipped migrations
         needs_migration =
-          ActiveRecord::Base.connection.migration_context.migrations.collect(&:version).size -
-          ActiveRecord::Base.connection.migration_context.get_all_versions.size -
-          skipped_migrations.size
+          ActiveRecord::Base.connection.migration_context.migrations.map(&:version) -
+          ActiveRecord::Base.connection.migration_context.get_all_versions -
+          skipped_migrations.map(&:version)
 
-        raise ActiveRecord::PendingMigrationError if needs_migration > 0
+        unless needs_migration.empty?
+          if ENV["NO_AUTO_MIGRATE"] == "1"
+            raise ActiveRecord::PendingMigrationError
+          else
+            Switchman::TestHelper.recreate_persistent_test_shards(dont_create: true)
+            Shard.with_each_shard do
+              ActiveRecord::Tasks::DatabaseTasks.migrate
+            end
+          end
+        end
       end
     end
 
