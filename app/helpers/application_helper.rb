@@ -176,14 +176,9 @@ module ApplicationHelper
   end
 
   def load_scripts_async_in_order(script_urls, cors_anonymous: false)
-    # this is how you execute scripts in order, in a way that doesn’t block rendering,
-    # and without having to use 'defer' to wait until the whole DOM is loaded.
-    # see: https://www.html5rocks.com/en/tutorials/speed/script-loading/
-    javascript_tag "
-      ;#{script_urls.map { |url| javascript_path(url) }}.forEach(function(src) {
-        var s = document.createElement('script'); s.src = src; s.async = false;#{" s.crossOrigin = 'anonymous';" if cors_anonymous}
-        document.head.appendChild(s)
-      });"
+    script_urls.map { |url| javascript_path(url) }.map do |url|
+      javascript_include_tag(url, defer: true, crossorigin: cors_anonymous ? "anonymous" : nil)
+    end.join("\n  ").rstrip.html_safe
   end
 
   # puts webpack entries and the moment & timezone files in the <head> of the document
@@ -200,7 +195,7 @@ module ApplicationHelper
     # if there is a moment locale besides english set, put a script tag for it
     # so it is loaded and ready before we run any of our app code
     if js_env[:MOMENT_LOCALE] && js_env[:MOMENT_LOCALE] != "en"
-      paths += ::Canvas::Cdn.registry.scripts_for(
+      paths << ::Canvas::Cdn.registry.scripts_for(
         "moment/locale/#{js_env[:MOMENT_LOCALE]}"
       )
     end
@@ -211,13 +206,10 @@ module ApplicationHelper
     chunk_urls = @script_chunks
 
     capture do
-      # if we don't also put preload tags for these, the browser will prioritize and
-      # download the bundle chunks we preload below before these scripts
-      paths.each { |url| concat preload_link_tag(javascript_path(url)) }
-      chunk_urls.each { |url| concat preload_link_tag(url, crossorigin: "anonymous") }
-
       concat load_scripts_async_in_order(paths)
+      concat "\n  "
       concat load_scripts_async_in_order(chunk_urls, cors_anonymous: true)
+      concat "\n"
       concat include_js_bundles
     end
   end
@@ -232,6 +224,7 @@ module ApplicationHelper
     @rendered_js_bundles += new_js_bundles
 
     @rendered_preload_chunks ||= []
+    @script_chunks ||= []
     preload_chunks =
       new_js_bundles.map do |(bundle, plugin, *)|
         ::Canvas::Cdn.registry.scripts_for("#{plugin ? "#{plugin}-" : ""}#{bundle}")
@@ -274,7 +267,8 @@ module ApplicationHelper
       bundles = new_css_bundles.map { |(bundle, plugin)| css_url_for(bundle, plugin) }
       bundles << css_url_for("disable_transitions") if disable_css_transitions?
       bundles << { media: "all" }
-      stylesheet_link_tag(*bundles)
+      tags = bundles.map { |bundle| stylesheet_link_tag(bundle) }
+      tags.reject(&:empty?).join("\n  ").html_safe
     end
   end
 
