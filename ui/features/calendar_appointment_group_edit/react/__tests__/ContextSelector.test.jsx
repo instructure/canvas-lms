@@ -25,16 +25,19 @@ const COURSE_1 = {
   id: '1',
   name: 'testcourse',
   asset_string: 'course_1',
+  can_create_appointment_groups: true,
   sections: [
     {
       id: '1',
       asset_string: 'course_section_1',
       name: 'testsection',
+      can_create_appointment_groups: true
     },
     {
       id: '3',
       asset_string: 'course_section_3',
       name: 'testsection3',
+      can_create_appointment_groups: true
     },
   ],
 }
@@ -43,11 +46,13 @@ const COURSE_2 = {
   id: '2',
   name: 'testcourse2',
   asset_string: 'course_2',
+  can_create_appointment_groups: true,
   sections: [
     {
       id: '2',
       asset_string: 'course_section_2',
       name: 'testsection2',
+      can_create_appointment_groups: true
     },
   ],
 }
