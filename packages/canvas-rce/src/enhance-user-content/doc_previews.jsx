@@ -127,6 +127,10 @@ export function loadDocPreview($container, options) {
 
   if (!$container) return // an issue in specs
 
+  if (!($container instanceof HTMLElement)) {
+    throw new Error('loadDocPreview requires a DOM element as first argument')
+  }
+
   function tellAppIViewedThisInline() {
     // if I have a url to ping back to the app that I viewed this file inline, ping it.
     if (opts.attachment_view_inline_ping_url) {

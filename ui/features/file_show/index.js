@@ -31,5 +31,5 @@ const previewDefaults = {
 ready(() => {
   const previewDiv = $('#doc_preview')
   previewDiv.fillWindowWithMe()
-  loadDocPreview($.merge(previewDefaults, previewDiv.data()))
+  loadDocPreview(previewDiv[0], $.merge(previewDefaults, previewDiv.data()))
 })

@@ -48,7 +48,7 @@ $(document).ready(() => {
       width: $(document).width() * 0.95,
       height: $(document).height() * 0.75,
     })
-    loadDocPreview(dialog, $.extend({height: '100%'}, $(this).data()))
+    loadDocPreview(dialog[0], $.extend({height: '100%'}, $(this).data()))
     $('.submission_annotation.unread_indicator').hide()
     $('.file-upload-submission-attachment .modal_preview_link').attr(
       'title',

@@ -26,7 +26,6 @@ import {enhanceUserContent, makeAllExternalLinksExternalLinks} from '@instructur
 import './instructure_helper'
 import 'jqueryui/draggable'
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/doc-previews' /* loadDocPreview */
 import '@canvas/datetime/jquery' /* datetimeString, dateString, fudgeDateForProfileTimezone */
 import '@canvas/jquery/jquery.instructure_forms' /* formSubmit, fillFormData, formErrors */
 import 'jqueryui/dialog'

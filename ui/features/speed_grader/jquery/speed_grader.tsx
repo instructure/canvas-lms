@@ -132,7 +132,7 @@ import vericiteScoreTemplate from '@canvas/grading/jst/_vericiteScore.handlebars
 import 'jqueryui/draggable'
 import '@canvas/jquery/jquery.ajaxJSON' /* getJSON, ajaxJSON */
 import '@canvas/jquery/jquery.instructure_forms' /* ajaxJSONFiles */
-import '@canvas/doc-previews' /* loadDocPreview */
+import {loadDocPreview} from '@instructure/canvas-rce/es/enhance-user-content/doc_previews'
 import '@canvas/datetime/jquery' /* datetimeString */
 import 'jqueryui/dialog'
 import 'jqueryui/menu'
@@ -2859,7 +2859,9 @@ EG = {
         this.displayExpirationWarnings(aggressiveWarnings, 10, canvadocMessage)
       }
 
-      $iframe_holder.show().loadDocPreview(
+      $iframe_holder.show()
+      loadDocPreview(
+        $iframe_holder[0],
         $.extend(previewOptions, {
           crocodoc_session_url: attachment.provisional_crocodoc_url || attachment.crocodoc_url,
         })
@@ -2868,7 +2870,9 @@ EG = {
       const aggressiveWarnings = this.generateWarningTimings(10)
       this.displayExpirationWarnings(aggressiveWarnings, 10, canvadocMessage)
 
-      $iframe_holder.show().loadDocPreview(
+      $iframe_holder.show()
+      loadDocPreview(
+        $iframe_holder[0],
         $.extend(previewOptions, {
           canvadoc_session_url: attachment.provisional_canvadoc_url || attachment.canvadoc_url,
           iframe_min_height: 0,
@@ -2881,7 +2885,8 @@ EG = {
       previewOptions = $.extend(previewOptions, {
         ajax_valid: () => currentStudentIDAsOfAjaxCall === this.currentStudent[anonymizableId],
       })
-      $iframe_holder.show().loadDocPreview(previewOptions)
+      $iframe_holder.show()
+      loadDocPreview($iframe_holder[0], previewOptions)
     } else if (browserableCssClasses.test(attachment.mime_class)) {
       // xsslint safeString.identifier iframeHolderContents
       const iframeHolderContents = this.attachmentIframeContents(attachment)
