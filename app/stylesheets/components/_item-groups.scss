@@ -45,7 +45,7 @@
 }
 
 .ig-header {
-  min-height: 30px;
+  min-height: 38px;
   padding-top: $ic-sp*0.5;
   padding-bottom: $ic-sp*0.5;
 
@@ -211,6 +211,16 @@
     white-space: normal;
   }
 
+  &:after {
+    content: "\00a0\00a0 \00a0\00a0";
+  }
+  &:last-of-type {
+    &:after { display: none; }
+  }
+}
+
+.assignment_group .ig-details__item,
+.ui-sortable .rendered .ig-details__item {
   &:after {
     content: "\00a0\00a0|\00a0\00a0";
   }
