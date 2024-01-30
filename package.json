@@ -176,7 +176,6 @@
     "parse-link-header": "^1",
     "prop-types": "^15",
     "qs": "^6.6.0",
-    "querystring": "0.2.1",
     "react": "^16.13.1",
     "react-apollo": "~3.0.1",
     "react-dnd": "6.0",
