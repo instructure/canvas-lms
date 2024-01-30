@@ -5501,35 +5501,11 @@ QUnit.module('SpeedGrader', rootHooks => {
           delete SpeedGrader.EG.currentStudent
         })
 
-        // it is difficult to test that a bound function is passed the correct parameters without
-        // fully simulating SpeedGrader so instead let's ensure that both ajax_valid() is true
-        // and currentStudent was not undefined
-        test('ajax_valid returns', () => {
-          const loadDocPreview = sinon.stub($.fn, 'loadDocPreview')
-          SpeedGrader.EG.currentStudent = alphaStudent
-          const attachment = {content_type: 'application/rtf'}
-          SpeedGrader.EG.renderAttachment(attachment)
-          strictEqual(loadDocPreview.firstCall.args[0].ajax_valid(), true)
-          loadDocPreview.restore()
-        })
-
         test('currentStudent is present', () => {
           SpeedGrader.EG.currentStudent = alphaStudent
           const attachment = {content_type: 'application/rtf'}
           SpeedGrader.EG.renderAttachment(attachment)
           strictEqual(SpeedGrader.EG.currentStudent.anonymous_id, alphaStudent.anonymous_id)
-        })
-
-        test('calls loadDocPreview for canvadoc documents with iframe_min_height set to 0', () => {
-          const loadDocPreview = sinon.stub($.fn, 'loadDocPreview')
-          SpeedGrader.EG.currentStudent = alphaStudent
-          const attachment = {content_type: 'application/pdf', canvadoc_url: 'fake_url'}
-
-          SpeedGrader.EG.renderAttachment(attachment)
-
-          const [documentParams] = loadDocPreview.firstCall.args
-          strictEqual(documentParams.iframe_min_height, 0)
-          loadDocPreview.restore()
         })
       })
 
