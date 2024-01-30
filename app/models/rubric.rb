@@ -60,6 +60,7 @@ class Rubric < ActiveRecord::Base
   validates :context_id, :context_type, :workflow_state, presence: true
   validates :description, length: { maximum: maximum_text_length, allow_blank: true }
   validates :title, length: { maximum: maximum_string_length, allow_blank: false }
+  validates :button_display, inclusion: { in: %w[numeric emoji letter] }
 
   validates_with RubricUniqueAlignments
   validates_with RubricAssessedAlignments
@@ -329,6 +330,7 @@ class Rubric < ActiveRecord::Base
     data = generate_criteria(params)
     self.hide_score_total = params[:hide_score_total] if hide_score_total.nil? || (association_count || 0) < 2
     self.data = data.criteria
+    self.button_display = params[:button_display] if params.key?(:button_display)
     self.title = data.title
     self.points_possible = data.points_possible
     self.hide_points = params[:hide_points]

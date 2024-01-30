@@ -48,6 +48,7 @@ module Types
       !!object.hide_score_total
     end
 
+    field :button_display, String, null: false
     field :hide_points, Boolean, null: true
     field :points_possible, Float, null: true
     field :title, String, null: true

@@ -69,5 +69,10 @@ describe Types::RubricType do
       rubric.update!(hide_points: true)
       expect(rubric_type.resolve("hidePoints")).to eq rubric.hide_points
     end
+
+    it "button_display" do
+      rubric.update!(button_display: "letter")
+      expect(rubric_type.resolve("buttonDisplay")).to eq rubric.button_display
+    end
   end
 end
