@@ -201,9 +201,9 @@ const DynamicRegistrationModalFooter = (props: DynamicRegistrationModalFooterPro
             }
             onClick={() => {
               loadingRegistrationToken()
-              getRegistrationToken()
+              getRegistrationToken(props.contextId)
                 .then(token => {
-                  register(token)
+                  register(props.contextId, token)
                 })
                 .catch(err => {
                   error(err instanceof Error ? err : undefined)
@@ -267,6 +267,7 @@ const DynamicRegistrationModalFooter = (props: DynamicRegistrationModalFooterPro
             onClick={() => {
               // eslint-disable-next-line promise/catch-or-return
               closeAndSaveOverlay(
+                props.contextId,
                 state.registration,
                 state.overlayStore.getState().state.registration
               ).then(onFinish)

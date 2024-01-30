@@ -42,7 +42,7 @@ describe Lti::IMS::DynamicRegistrationController do
     controller_routes.each do |route|
       route_path = route.path.spec.to_s.gsub("(.:format)", "")
       if openapi_spec.dig("paths", route_path, route.verb.downcase).nil?
-        throw "No openapi documentation for #{route_path} #{route.verb.downcase}"
+        throw "No openapi documentation for #{route_path} #{route.verb.downcase}, please add it to #{openapi_location}"
       end
       expect(openapi_spec["paths"][route_path][route.verb.downcase]).not_to be_nil
     end
@@ -95,7 +95,7 @@ describe Lti::IMS::DynamicRegistrationController do
         {
           user_id: User.create!.id,
           initiated_at: 1.minute.ago,
-          root_account_global_id: Account.first.root_account_id,
+          root_account_global_id: Account.default.global_id,
           uuid: SecureRandom.uuid,
         }
       end
@@ -137,7 +137,7 @@ describe Lti::IMS::DynamicRegistrationController do
           dk = DeveloperKey.last
           expect(dk.name).to eq(registration_params["client_name"])
           expect(dk.scopes).to eq(scopes)
-          expect(dk.account.id).to eq(token_hash[:root_account_global_id])
+          expect(dk.account.global_id).to eq(token_hash[:root_account_global_id])
           expect(dk.redirect_uris).to eq(registration_params["redirect_uris"])
           expect(dk.public_jwk_url).to eq(registration_params["jwks_uri"])
           expect(dk.is_lti_key).to be(true)
@@ -215,10 +215,12 @@ describe Lti::IMS::DynamicRegistrationController do
   end
 
   describe "#registration_token" do
-    subject { get :registration_token }
+    subject do
+      get :registration_token, params: { account_id: Account.default.id }
+    end
 
     before do
-      account_admin_user
+      account_admin_user(account: Account.default)
       user_session(@admin)
     end
 

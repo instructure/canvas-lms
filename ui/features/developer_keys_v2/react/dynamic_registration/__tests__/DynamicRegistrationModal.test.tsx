@@ -63,7 +63,7 @@ describe('DynamicRegistrationModal', () => {
     it('forwards users to the tool', async () => {
       useDynamicRegistrationState.getState().open('http://localhost?foo=bar')
       useDynamicRegistrationState.getState().loadingRegistrationToken()
-      useDynamicRegistrationState.getState().register({
+      useDynamicRegistrationState.getState().register('1', {
         oidc_configuration_url: 'http://canvas.instructure.com',
         token: 'abc',
         uuid: '123',

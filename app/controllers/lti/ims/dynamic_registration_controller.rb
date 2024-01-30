@@ -22,19 +22,36 @@ module Lti
     class DynamicRegistrationController < ApplicationController
       REGISTRATION_TOKEN_EXPIRATION = 1.hour
 
-      before_action :require_dynamic_registration_flag
+      before_action :require_dynamic_registration_flag, except: [:create]
       before_action :require_user, except: [:create]
+      before_action :require_account, except: [:create]
 
       # This skip_before_action is required because :load_user will
       # attempt to find the bearer token, which is not stored with
       # the other Canvas tokens.
       skip_before_action :load_user, only: [:create]
 
+      def require_account
+        require_context_with_permission(account_context, :manage_developer_keys)
+      end
+
+      def account_context
+        require_account_context
+        return @context if context_is_domain_root_account?
+
+        # failover to what require_site_admin_with_permission uses
+        Account.site_admin
+      end
+
+      def context_is_domain_root_account?
+        @context == @domain_root_account
+      end
+
       def registration_token
         uuid = SecureRandom.uuid
         current_time = DateTime.now.iso8601
         user_id = @current_user.id
-        root_account_global_id = @domain_root_account.global_id
+        root_account_global_id = account_context.global_id
         token = Canvas::Security.create_jwt(
           {
             uuid:,
@@ -67,7 +84,6 @@ module Lti
         issuer_protocol = parsed_issuer.scheme
         issuer_port = parsed_issuer.port
 
-        @domain_root_account.global_id
         openid_configuration_url(protocol: issuer_protocol, port: issuer_port, host: issuer_domain, registration_token:)
       end
 
@@ -98,6 +114,11 @@ module Lti
           return
         end
 
+        unless root_account.feature_enabled? :lti_dynamic_registration
+          render status: :not_found, template: "shared/errors/404_message"
+          return
+        end
+
         root_account.shard.activate do
           registration_params = params.permit(*expected_registration_params)
           registration_params["lti_tool_configuration"] = registration_params["https://purl.imsglobal.org/spec/lti-tool-configuration"]
@@ -107,7 +128,7 @@ module Lti
 
           developer_key = DeveloperKey.new(
             name: registration_params["client_name"],
-            account: root_account,
+            account: root_account.site_admin? ? nil : root_account,
             redirect_uris: registration_params["redirect_uris"],
             public_jwk_url: registration_params["jwks_uri"],
             oidc_initiation_url: registration_params["initiate_login_uri"],
@@ -166,7 +187,7 @@ module Lti
       end
 
       def require_dynamic_registration_flag
-        unless @domain_root_account.feature_enabled? :lti_dynamic_registration
+        unless account_context.feature_enabled? :lti_dynamic_registration
           render status: :not_found, template: "shared/errors/404_message"
         end
       end

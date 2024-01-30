@@ -2787,9 +2787,9 @@ CanvasRails::Application.routes.draw do
 
     # Dynamic Registration Service
     scope(controller: "lti/ims/dynamic_registration") do
-      get "registration_token", action: :registration_token
-      get "registrations/uuid/:registration_uuid", action: :registration_by_uuid
-      put "registrations/:registration_id/overlay", action: :update_registration_overlay
+      get "accounts/:account_id/registration_token", action: :registration_token
+      get "accounts/:account_id/registrations/uuid/:registration_uuid", action: :registration_by_uuid
+      put "accounts/:account_id/registrations/:registration_id/overlay", action: :update_registration_overlay
       get "registrations/:registration_id/view", action: :registration_view, as: :lti_registration_config
       post "registrations", action: :create
     end
