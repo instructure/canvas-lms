@@ -285,6 +285,27 @@ module ActiveRecord
           end.to_not raise_error
         end
       end
+
+      describe "update_all" do
+        context "with shard_value" do
+          specs_require_sharding
+
+          it "iterates all shards" do
+            u1 = u2 = nil
+            @shard1.activate do
+              u1 = User.create!(name: "u1")
+              u1.communication_channels.create!(path: "email@domain.com")
+            end
+            @shard2.activate do
+              u2 = User.create!(name: "u2")
+              u2.communication_channels.create!(path: "email@domain.com")
+            end
+            User.joins(:communication_channel).shard([@shard1, @shard2]).update_all(name: "changed")
+            expect(u1.reload.name).to eql "changed"
+            expect(u2.reload.name).to eql "changed"
+          end
+        end
+      end
     end
 
     describe "update_all with limit" do
@@ -296,6 +317,18 @@ module ActiveRecord
         Eportfolio.joins(:user).order(:id).limit(1).update_all(name: "changed")
         expect(e1.reload.name).to eq "changed"
         expect(e2.reload.name).not_to eq "changed"
+      end
+
+      context "with shard_value" do
+        specs_require_sharding
+
+        it "iterates all shards" do
+          u1 = @shard1.activate { User.create!(name: "u1") }
+          u2 = @shard2.activate { User.create!(name: "u2") }
+          User.shard([@shard1, @shard2]).limit(10).update_all(name: "changed")
+          expect(u1.reload.name).to eql "changed"
+          expect(u2.reload.name).to eql "changed"
+        end
       end
     end
 
