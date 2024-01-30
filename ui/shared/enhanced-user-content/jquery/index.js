@@ -621,7 +621,7 @@ const setDialogCloseText = () => {
   $.ui.dialog.prototype.options.closeText = I18n.t('Close')
 }
 
-export default function enhanceTheEntireUniverse() {
+export function enhanceTheEntireUniverse() {
   ;[
     ellipsifyBreadcrumbs,
     bindKeyboardShortcutsHelpPanel,
