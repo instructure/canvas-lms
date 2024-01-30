@@ -25,6 +25,7 @@ import {
 } from './HtmlFragmentContentItem'
 import {type ImageContentItem, imageContentItemToHtmlString} from './ImageContentItem'
 import {type LinkContentItem, linkContentItemToHtmlString} from './LinkContentItem'
+import {captureException} from '@sentry/react'
 
 export type ContentItem =
   | ResourceLinkContentItem
@@ -33,8 +34,10 @@ export type ContentItem =
   | ImageContentItem
 
 const assertNever = (item: never): void => {
+  const errorMessage = 'Could not process content item'
   // eslint-disable-next-line no-console
-  console.error(`Could not process content item`, item)
+  console.error(errorMessage, item)
+  captureException(new Error(errorMessage))
 }
 
 export const contentItemToHtmlString =

@@ -40,6 +40,7 @@ import {setupSubmitHandler} from '@canvas/assignments/jquery/reuploadSubmissions
 import ready from '@instructure/ready'
 import {monitorLtiMessages} from '@canvas/lti/jquery/messages'
 import ItemAssignToTray from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToTray'
+import {captureException} from '@sentry/browser'
 
 if (!('INST' in window)) window.INST = {}
 
@@ -129,6 +130,7 @@ function renderCoursePacingNotice() {
       .catch(ex => {
         // eslint-disable-next-line no-console
         console.error('Falied loading CoursePacingNotice', ex)
+        captureException(ex)
       })
   }
 }

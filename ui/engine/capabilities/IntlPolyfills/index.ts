@@ -25,6 +25,7 @@ import {shouldPolyfill as spfNF} from '@formatjs/intl-numberformat/should-polyfi
 import {shouldPolyfill as spfDTF} from '@formatjs/intl-datetimeformat/should-polyfill'
 import {shouldPolyfill as spfRTF} from '@formatjs/intl-relativetimeformat/should-polyfill'
 import {oncePerPage} from '@instructure/updown'
+import {captureException} from '@sentry/browser'
 
 declare const ENV: {
   readonly LOCALES: string[]
@@ -176,9 +177,14 @@ function polyfillUp(...polyfills: unknown[]) {
   polyfills.forEach(polyfillResult => {
     if (typeof polyfillResult === 'undefined') return
     const r = polyfillResult as PolyfillerUpValue
-    if (r.error)
+    if (r.error) {
+      const errorMessage = `${r.subsys} polyfill for locale "${r.locale}" failed: ${r.error}`
       // eslint-disable-next-line no-console
-      console.error(`${r.subsys} polyfill for locale "${r.locale}" failed: ${r.error}`)
+      console.error(errorMessage)
+      captureException(
+        new Error(`${r.subsys} polyfill for locale "${r.locale}" failed: ${r.error}`)
+      )
+    }
     if (r.source === 'polyfill')
       // eslint-disable-next-line no-console
       console.info(`${r.subsys} polyfilled "${r.loaded}" for locale "${r.locale}"`)

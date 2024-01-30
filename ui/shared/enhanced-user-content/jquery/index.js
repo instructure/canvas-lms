@@ -43,6 +43,7 @@ import 'jquery-tinypubsub' /* /\.publish\(/ */
 import 'jqueryui/resizable'
 import 'jqueryui/sortable'
 import 'jqueryui/tabs'
+import {captureException} from '@sentry/browser'
 
 const I18n = useI18nScope('instructure_js')
 
@@ -100,6 +101,7 @@ function enhanceUserJQueryWidgetContent() {
         "will go away. Rather than relying on the internals of Canvas's JavaScript, " +
         'you should use your own custom JS file to do any such customizations.'
       console.error(msg, $elements) // eslint-disable-line no-console
+      captureException(new Error(msg))
     })
     .end()
     .filter('.dialog')
@@ -531,6 +533,7 @@ function doThingsToModuleSequenceFooter() {
       .catch(ex => {
         // eslint-disable-next-line no-console
         console.error(ex)
+        captureException(ex)
       })
   }
 }

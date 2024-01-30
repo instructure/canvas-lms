@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {captureException} from '@sentry/browser'
+
 /**
  * Remove prefix or suffix (default) from input string
  *
@@ -89,6 +91,7 @@ export function getFromLocalStorage<T extends object>(storageKey: string): T | u
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(`Error fetching/parsing ${storageKey} from localStorage:`, error)
+    captureException(error)
   }
 }
 
@@ -108,6 +111,7 @@ export function setToLocalStorage<T>(storageKey: string, value: T): void {
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(`Error serializing/saving ${storageKey} to localStorage:`, error)
+    captureException(error)
   }
 }
 
