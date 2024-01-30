@@ -26,18 +26,21 @@ export type RegistrationToken = {
   uuid: string
 }
 
-export const getRegistrationToken = () =>
-  axios.get(`/api/lti/registration_token`).then(resp => resp.data as unknown as RegistrationToken)
-
-export const getRegistrationByUUID = (registrationUuid: string) =>
+export const getRegistrationToken = (accountId: string) =>
   axios
-    .get(`/api/lti/registrations/uuid/${registrationUuid}`)
+    .get(`/api/lti/accounts/${accountId}/registration_token`)
+    .then(resp => resp.data as unknown as RegistrationToken)
+
+export const getRegistrationByUUID = (accountId: string, registrationUuid: string) =>
+  axios
+    .get(`/api/lti/accounts/${accountId}/registrations/uuid/${registrationUuid}`)
     .then(resp => resp.data as unknown as LtiRegistration)
 
 export const updateRegistrationOverlay = (
+  accountId: string,
   registrationId: number | string,
   overlay: RegistrationOverlay
 ) =>
   axios
-    .put(`/api/lti/registrations/${registrationId}/overlay`, overlay)
+    .put(`/api/lti/accounts/${accountId}/registrations/${registrationId}/overlay`, overlay)
     .then(resp => resp.data as unknown as LtiRegistration)

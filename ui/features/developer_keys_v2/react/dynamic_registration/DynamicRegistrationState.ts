@@ -63,7 +63,7 @@ interface DynamicRegistrationActions {
    * @param registrationToken The registration token from canvas
    * @returns
    */
-  register: (registrationToken: RegistrationToken) => void
+  register: (accountId: string, registrationToken: RegistrationToken) => void
   loadingRegistrationToken: () => void
   loadingRegistration: (
     registrationToken: RegistrationToken,
@@ -76,6 +76,7 @@ interface DynamicRegistrationActions {
     overlay: RegistrationOverlay
   ) => Promise<unknown>
   closeAndSaveOverlay: (
+    accountId: string,
     registration: LtiRegistration,
     overlay: RegistrationOverlay
   ) => Promise<unknown>
@@ -260,7 +261,7 @@ export const useDynamicRegistrationState = create<
   loadingRegistrationToken: () =>
     set(stateFrom('opened')(state => loadingRegistrationToken(state.dynamicRegistrationUrl))),
   setUrl: url => set(stateFor(opened(url))),
-  register: (registrationToken: RegistrationToken) =>
+  register: (accountId: string, registrationToken: RegistrationToken) =>
     set(
       stateFrom('loading_registration_token')((state, {loadingRegistration, confirm, error}) => {
         const onMessage = (message: MessageEvent) => {
@@ -270,7 +271,7 @@ export const useDynamicRegistrationState = create<
           ) {
             window.removeEventListener('message', onMessage)
             loadingRegistration(registrationToken, state.dynamicRegistrationUrl)
-            getRegistrationByUUID(registrationToken.uuid)
+            getRegistrationByUUID(accountId, registrationToken.uuid)
               .then(reg => {
                 const store = createRegistrationOverlayStore(reg.client_name, reg)
                 confirm(reg, store)
@@ -289,7 +290,7 @@ export const useDynamicRegistrationState = create<
   confirm: (registration: LtiRegistration, overlayStore: StoreApi<RegistrationOverlayStore>) =>
     set(stateFor(confirming(registration, overlayStore))),
   enableAndClose: (
-    contextId: string,
+    accountId: string,
     registration: LtiRegistration,
     overlay: RegistrationOverlay
   ) => {
@@ -297,13 +298,17 @@ export const useDynamicRegistrationState = create<
       stateFrom('confirming')(state => enablingAndClosing(state.registration, state.overlayStore))
     )
     return Promise.all([
-      updateRegistrationOverlay(registration.id, overlay),
-      updateDeveloperKeyWorkflowState(contextId, registration.developer_key_id, 'on'),
+      updateRegistrationOverlay(accountId, registration.id, overlay),
+      updateDeveloperKeyWorkflowState(accountId, registration.developer_key_id, 'on'),
     ]).catch(err => set(stateFor(errorState(err))))
   },
-  closeAndSaveOverlay: (registration: LtiRegistration, overlay: RegistrationOverlay) => {
+  closeAndSaveOverlay: (
+    accountId: string,
+    registration: LtiRegistration,
+    overlay: RegistrationOverlay
+  ) => {
     set(stateFrom('confirming')(state => closingAndSaving(state.registration, state.overlayStore)))
-    return updateRegistrationOverlay(registration.id, overlay).catch(err =>
+    return updateRegistrationOverlay(accountId, registration.id, overlay).catch(err =>
       set(stateFor(errorState(err)))
     )
   },
