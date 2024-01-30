@@ -21,6 +21,7 @@
 import './boot/initializers/setWebpackCdnHost'
 import '@canvas/jquery/jquery.instructure_jquery_patches' // this needs to be before anything else that requires jQuery
 import './boot'
+import {captureException} from '@sentry/browser'
 
 // true modules that we use in this file
 import ready from '@instructure/ready'
@@ -87,6 +88,7 @@ up({
 }).catch((e: Error) => {
   // eslint-disable-next-line no-console
   console.error(`Canvas front-end did not successfully start! (${e.message})`)
+  captureException(e)
 })
 
 const readinessTargets = [
@@ -220,6 +222,7 @@ async function openHelpDialog(event: Event): Promise<void> {
     /* eslint-disable no-console */
     console.error('Help dialog could not be displayed')
     console.error(e)
+    captureException(e)
     /* eslint-enable no-console */
   }
 }

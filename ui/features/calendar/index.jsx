@@ -31,6 +31,7 @@ import UndatedEventsList from './jquery/UndatedEventsList'
 import configureSchedulerStore from './react/scheduler/store/configureStore'
 import loadFullCalendarLocaleData from './ext/loadFullCalendarLocaleData'
 import 'jquery-kyle-menu'
+import {captureException} from '@sentry/react'
 
 const eventDataSource = new EventDataSource(ENV.CALENDAR.CONTEXTS)
 const schedulerStore = ENV.CALENDAR.SHOW_SCHEDULER ? configureSchedulerStore() : null
@@ -83,11 +84,12 @@ const start = () => {
 }
 
 const startAnyway = error => {
+  // eslint-disable-next-line no-console
   console.error('Unable to load FullCalendar locale data for "%s" -- %s', ENV.MOMENT_LOCALE, error)
   start()
 }
 
-loadFullCalendarLocaleData(ENV.MOMENT_LOCALE).then(start, startAnyway)
+loadFullCalendarLocaleData(ENV.MOMENT_LOCALE).then(start, startAnyway).catch(captureException)
 
 let keyboardUser = true
 

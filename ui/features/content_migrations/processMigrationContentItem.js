@@ -24,6 +24,7 @@ import {
   postMessageExternalContentReady,
   postMessageExternalContentCancel,
 } from '@canvas/external-tools/messages'
+import { captureException } from '@sentry/react'
 
 const I18n = useI18nScope('content_migrations')
 
@@ -48,5 +49,6 @@ export default function processMigrationContentItem(event) {
     postMessageExternalContentCancel(window)
     // eslint-disable-next-line no-console
     console.error(error)
+    captureException(error)
   }
 }
