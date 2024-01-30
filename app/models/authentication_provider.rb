@@ -313,6 +313,8 @@ class AuthenticationProvider < ActiveRecord::Base
         account_users_to_delete.each(&:destroy)
         account_users_to_activate.each(&:reactivate)
       when "sis_user_id", "integration_id"
+        next if value.empty?
+
         pseudonym[attribute] = value
       when "display_name"
         user.short_name = value
