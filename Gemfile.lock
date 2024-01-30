@@ -937,7 +937,7 @@ GEM
     rspec-openapi (0.11.0)
       actionpack (>= 5.2.0)
       rspec-core
-    rspec-rails (6.1.0)
+    rspec-rails (6.1.1)
       actionpack (>= 6.1)
       activesupport (>= 6.1)
       railties (>= 6.1)
