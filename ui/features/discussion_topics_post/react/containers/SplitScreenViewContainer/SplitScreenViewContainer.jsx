@@ -133,7 +133,11 @@ export const SplitScreenViewContainer = props => {
       updateDiscussionTopicEntryCounts(cache, props.discussionTopic.id, {
         unreadCountChange: discussionUnreadCountChange,
       })
-      updateDiscussionEntryRootEntryCounts(cache, result, discussionUnreadCountChange)
+      updateDiscussionEntryRootEntryCounts(
+        cache,
+        result.data.updateDiscussionEntryParticipant.discussionEntry,
+        discussionUnreadCountChange
+      )
     }
   }
 
