@@ -19,6 +19,8 @@
 import React, {useCallback, useState} from 'react'
 import {IconZoomInLine, IconZoomOutLine} from '@instructure/ui-icons'
 import {Button} from '@instructure/ui-buttons'
+import {Flex} from '@instructure/ui-flex'
+import {View} from '@instructure/ui-view'
 import type {PathwayDetailData, MilestoneData} from '../../types'
 import PathwayTreeView from './PathwayTreeView'
 import PathwayViewDetailsTray from './PathwayViewDetailsTray'
@@ -59,25 +61,30 @@ const PathwayView = ({pathway}: PathwayViewProps) => {
     setMilestoneDetailsOpen(false)
   }, [])
 
-  return (
-    <>
-      <div style={{position: 'relative'}}>
-        <div style={{position: 'absolute', top: '.5rem', left: '.5rem', zIndex: 1}}>
+  const renderBuilderControls = useCallback(() => {
+    return (
+      <Flex as="div" justifyItems="space-between" margin="x-small">
+        <Flex.Item>
           <Button renderIcon={IconZoomOutLine} onClick={handleZoomOut} />
           <Button renderIcon={IconZoomInLine} onClick={handleZoomIn} margin="0 0 0 x-small" />
-        </div>
-        <div style={{position: 'absolute', top: '.5rem', right: '.5rem', zIndex: 1}}>
+        </Flex.Item>
+        <Flex.Item>
           <Button onClick={showUnimplemented}>View as learner</Button>
-        </div>
+        </Flex.Item>
+      </Flex>
+    )
+  }, [handleZoomIn, handleZoomOut])
 
-        <PathwayTreeView
-          pathway={pathway}
-          version="1"
-          zoomLevel={zoomLevel}
-          selectedStep={null}
-          onSelected={handleSelectFromTree}
-        />
-      </div>
+  return (
+    <>
+      <PathwayTreeView
+        pathway={pathway}
+        version="1"
+        zoomLevel={zoomLevel}
+        selectedStep={null}
+        onSelected={handleSelectFromTree}
+        renderTreeControls={renderBuilderControls}
+      />
       <PathwayViewDetailsTray
         pathway={pathway}
         open={pathwayDetailsOpen}
