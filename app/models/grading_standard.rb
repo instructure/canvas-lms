@@ -247,7 +247,7 @@ class GradingStandard < ActiveRecord::Base
   end
 
   def prevent_deletion_of_used_schemes
-    return unless assessed_assignment? && Account.site_admin.feature_enabled?(:archived_grading_schemes)
+    return unless Account.site_admin.feature_enabled?(:archived_grading_schemes) && assessed_assignment?
 
     errors.add(:workflow_state, "You cannot delete a used scheme")
     throw :error
@@ -255,7 +255,11 @@ class GradingStandard < ActiveRecord::Base
   private :prevent_deletion_of_used_schemes
 
   def assessed_assignment?
-    assessed_assignments.exists?
+    if Account.site_admin.feature_enabled?(:archived_grading_schemes)
+      assessed_assignments.exists?
+    else
+      assignments.active.joins(:submissions).where("submissions.workflow_state='graded'").exists?
+    end
   end
 
   def assessed_assignments
