@@ -47,7 +47,7 @@ class Course < ActiveRecord::Base
   end
 
   serialize :tab_configuration
-  serialize :settings, Hash
+  serialize :settings, type: Hash
   belongs_to :root_account, class_name: "Account"
   belongs_to :abstract_course
   belongs_to :enrollment_term

@@ -30,8 +30,8 @@ class ContextModuleProgression < ActiveRecord::Base
 
   after_save :touch_user
 
-  serialize :requirements_met, Array
-  serialize :incomplete_requirements, Array
+  serialize :requirements_met, type: Array
+  serialize :incomplete_requirements, type: Array
 
   validates :user_id, :context_module_id, presence: true
 

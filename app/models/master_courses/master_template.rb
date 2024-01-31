@@ -38,8 +38,8 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
 
   belongs_to :active_migration, class_name: "MasterCourses::MasterMigration"
 
-  serialize :default_restrictions, Hash
-  serialize :default_restrictions_by_type, Hash
+  serialize :default_restrictions, type: Hash
+  serialize :default_restrictions_by_type, type: Hash
   validate :require_valid_restrictions
 
   attr_accessor :child_course_count

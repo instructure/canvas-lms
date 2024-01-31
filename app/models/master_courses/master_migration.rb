@@ -43,8 +43,8 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
 
   before_create :set_root_account_id
 
-  serialize :export_results, Hash
-  serialize :migration_settings, Hash
+  serialize :export_results, type: Hash
+  serialize :migration_settings, type: Hash
 
   has_a_broadcast_policy
 

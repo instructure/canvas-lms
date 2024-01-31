@@ -37,7 +37,7 @@ class AssignmentGroup < ActiveRecord::Base
   belongs_to :context, polymorphic: [:course]
   acts_as_list scope: { context: self, workflow_state: "available" }
   has_a_broadcast_policy
-  serialize :integration_data, Hash
+  serialize :integration_data, type: Hash
 
   has_many :scores, -> { active }
   has_many :assignments, -> { order("position, due_at, title") }
