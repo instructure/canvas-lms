@@ -2933,7 +2933,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       }
     }
     this.gridData.rows.sort(respectorOfPersonsSort())
-    this.courseContent.students.setStudentIds(map(this.gridData.rows, 'id'))
     this.gradebookGrid?.invalidate()
   }
 

@@ -25,6 +25,21 @@ QUnit.module('sortByStudentColumn', {
   },
 })
 
+test('does not cause gradebook to forget about students that are loaded but not currently in view', function () {
+  this.gradebook.courseContent.students.setStudentIds(['1', '3', '4'])
+
+  this.gradebook.gridData.rows = [
+    {id: '3', sortable_name: 'Z'},
+    {id: '4', sortable_name: 'A'},
+  ]
+
+  this.gradebook.sortByStudentColumn('sortable_name', 'ascending')
+  const loadedStudentIds = this.gradebook.courseContent.students
+    .listStudents()
+    .map(student => student.id)
+  deepEqual(loadedStudentIds, ['1', '3', '4'])
+})
+
 test('sorts the gradebook rows', function () {
   this.gradebook.gridData.rows = [
     {id: '3', sortable_name: 'Z'},
