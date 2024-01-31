@@ -21,8 +21,8 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-content'
 import {Portal} from '@instructure/ui-portal'
 import {useQuery} from '@canvas/query'
-import {getSetting} from './queries/settingsQuery'
 import {getUnreadCount} from './queries/unreadCountQuery'
+import {getSetting} from '@canvas/settings-query/react/settingsQuery'
 
 const I18n = useI18nScope('Navigation')
 
