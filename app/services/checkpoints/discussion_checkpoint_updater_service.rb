@@ -52,7 +52,6 @@ class Checkpoints::DiscussionCheckpointUpdaterService < Checkpoints::DiscussionC
         Checkpoints::DateOverrideCreatorService.call(checkpoint:, overrides: new_overrides) if new_overrides.any?
 
         # 3. Remove overrides that are no longer present
-        # TODO: Maybe call the DeleterService in the future?
         checkpoint.assignment_overrides.where(id: override_ids_to_delete).destroy_all if override_ids_to_delete.any?
       end
 
