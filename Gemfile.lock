@@ -1281,6 +1281,7 @@ DEPENDENCIES
   outrigger (~> 3.0)
   pact (~> 1.57)
   pact-messages (= 0.2.0)
+  pact-mock_service (= 3.11.2)
   pact_broker-client (= 1.72)
   paginated_collection!
   parallel (~> 1.23)

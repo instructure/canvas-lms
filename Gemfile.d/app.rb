@@ -21,6 +21,7 @@
 
 gem "bootsnap", "~> 1.16", require: false
 gem "rails", ($canvas_rails == "7.1") ? "~> 7.1.3" : "~> 7.0.4"
+  gem "rack", "~> 3.0" if $canvas_rails == "7.1" # needed to force Rack 3 due to a confluence of dependencies involving pact
 gem "switchman", "~> 3.5"
 gem "guardrail", "~> 3.0"
 gem "switchman-inst-jobs", "~> 4.0"
