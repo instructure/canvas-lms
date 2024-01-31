@@ -19,9 +19,13 @@
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {AUTO_MARK_AS_READ_DELAY, SearchContext} from '../../utils/constants'
 import {Discussion} from '../../../graphql/Discussion'
+import {DiscussionEntry} from '../../../graphql/DiscussionEntry'
 import {DiscussionThreadContainer} from '../DiscussionThreadContainer/DiscussionThreadContainer'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {updateDiscussionTopicEntryCounts} from '../../utils/index'
+import {
+  updateDiscussionTopicEntryCounts,
+  updateDiscussionEntryRootEntryCounts,
+} from '../../utils/index'
 import PropTypes from 'prop-types'
 import React, {useContext, useEffect, useState} from 'react'
 import {SearchResultsCount} from '../../components/SearchResultsCount/SearchResultsCount'
@@ -41,7 +45,30 @@ export const DiscussionTopicRepliesContainer = props => {
 
   const updateCache = (cache, result) => {
     updateDiscussionTopicEntryCounts(cache, props.discussionTopic.id, {
-      unreadCountChange: -result.data.updateDiscussionEntriesReadState.discussionEntries.length,
+      unreadCountChange: -result?.data?.updateDiscussionEntriesReadState?.discussionEntries?.length,
+    })
+
+    // update each root discussionEntry in cache
+    result?.data?.updateDiscussionEntriesReadState?.discussionEntries?.forEach(discussionEntry => {
+      const discussionEntryOptions = {
+        id: btoa('DiscussionEntry-' + discussionEntry._id),
+        fragment: DiscussionEntry.fragment,
+        fragmentName: 'DiscussionEntry',
+      }
+
+      const data = JSON.parse(JSON.stringify(cache.readFragment(discussionEntryOptions)))
+
+      data.entryParticipant.read = discussionEntry.entryParticipant.read
+
+      cache.writeFragment({
+        ...discussionEntryOptions,
+        data,
+      })
+
+      if (discussionEntry.rootEntryId) {
+        const discussionUnreadCountchange = discussionEntry.entryParticipant.read ? -1 : 1
+        updateDiscussionEntryRootEntryCounts(cache, discussionEntry, discussionUnreadCountchange)
+      }
     })
   }
 
@@ -58,11 +85,10 @@ export const DiscussionTopicRepliesContainer = props => {
   useEffect(() => {
     if (discussionEntriesToUpdate.size > 0 && !searchTerm) {
       const interval = setInterval(() => {
-        let entryIds = Array.from(discussionEntriesToUpdate)
+        const entryIds = Array.from(discussionEntriesToUpdate)
         const entries = props.discussionTopic.discussionEntriesConnection.nodes.filter(
           entry => entryIds.includes(entry._id) && entry.entryParticipant?.read === false
         )
-        entryIds = entries.map(entry => entry._id)
         entries.forEach(entry => (entry.entryParticipant.read = true))
         setDiscussionEntriesToUpdate(new Set())
         updateDiscussionEntriesReadState({

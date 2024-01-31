@@ -19,6 +19,7 @@
 import {
   addReplyToDiscussionEntry,
   getSpeedGraderUrl,
+  updateDiscussionEntryRootEntryCounts,
   updateDiscussionTopicEntryCounts,
   responsiveQuerySizes,
   isTopicAuthor,
@@ -105,6 +106,29 @@ export const DiscussionThreadContainer = props => {
     }
   }
 
+  const updateDiscussionEntryParticipantCache = (cache, result) => {
+    if (
+      props.discussionEntry.entryParticipant?.read !==
+      result.data.updateDiscussionEntryParticipant.discussionEntry.entryParticipant?.read
+    ) {
+      const discussionUnreadCountchange = result.data.updateDiscussionEntryParticipant
+        .discussionEntry.entryParticipant?.read
+        ? -1
+        : 1
+      updateDiscussionTopicEntryCounts(cache, props.discussionTopic.id, {
+        unreadCountChange: discussionUnreadCountchange,
+      })
+
+      if (result.data.updateDiscussionEntryParticipant.discussionEntry.rootEntryId) {
+        updateDiscussionEntryRootEntryCounts(
+          cache,
+          result.data.updateDiscussionEntryParticipant.discussionEntry,
+          discussionUnreadCountchange
+        )
+      }
+    }
+  }
+
   const updateCache = (cache, result) => {
     const newDiscussionEntry = result.data.createDiscussionEntry.discussionEntry
     const variables = {
@@ -168,21 +192,6 @@ export const DiscussionThreadContainer = props => {
       setOnFailure(I18n.t('There was an unexpected error while updating the reply.'))
     },
   })
-
-  const updateDiscussionEntryParticipantCache = (cache, result) => {
-    if (
-      props.discussionEntry.entryParticipant?.read !==
-      result.data.updateDiscussionEntryParticipant.discussionEntry.entryParticipant?.read
-    ) {
-      const discussionUnreadCountchange = result.data.updateDiscussionEntryParticipant
-        .discussionEntry.entryParticipant?.read
-        ? -1
-        : 1
-      updateDiscussionTopicEntryCounts(cache, props.discussionTopic.id, {
-        unreadCountChange: discussionUnreadCountchange,
-      })
-    }
-  }
 
   const [updateDiscussionEntryParticipant] = useMutation(UPDATE_DISCUSSION_ENTRY_PARTICIPANT, {
     update: updateDiscussionEntryParticipantCache,
@@ -363,6 +372,13 @@ export const DiscussionThreadContainer = props => {
     setThreadRefCurrent(refCurrent)
   }, [])
 
+  const updateReadState = discussionEntry => {
+    props.markAsRead(discussionEntry._id)
+    // manually update this entry's read state, then updateLoadedSubentry
+    discussionEntry.entryParticipant.read = !discussionEntry.entryParticipant?.read
+    updateLoadedSubentry(discussionEntry)
+  }
+
   useEffect(() => {
     if (
       !ENV.manual_mark_as_read &&
@@ -370,7 +386,7 @@ export const DiscussionThreadContainer = props => {
       !props.discussionEntry?.entryParticipant?.forcedReadState
     ) {
       const observer = new IntersectionObserver(
-        ([entry]) => entry.isIntersecting && props.markAsRead(props.discussionEntry._id),
+        ([entry]) => entry.isIntersecting && updateReadState(props.discussionEntry),
         {
           root: null,
           rootMargin: '0px',
