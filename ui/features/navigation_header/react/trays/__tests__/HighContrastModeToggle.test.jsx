@@ -18,7 +18,7 @@ import React from 'react'
 import {getByText} from '@testing-library/dom'
 import {render, fireEvent} from '@testing-library/react'
 import fetchMock from 'fetch-mock'
-import Subject from '../trays/HighContrastModeToggle'
+import Subject from '../HighContrastModeToggle'
 
 const USER_ID = 100
 const route = `api/v1/users/${USER_ID}/features/flags/high_contrast`

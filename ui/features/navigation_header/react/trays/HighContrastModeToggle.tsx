@@ -64,6 +64,11 @@ const HighContrastLabel = ({loading, isMobile}: HighContrastLabelProps) => {
   const tipText = isMobile ? mobileTipText : dekstopTipText
   const tipTriggers: TipTrigger[] = ['click']
 
+  // Show a spinner after a delay in case API calls take an excessive amount of time,
+  // but only do this in development or production environments, not in tests
+  const spinnerDelay =
+    process.env.NODE_ENV === 'test' || typeof process.env.NODE_ENV === 'undefined' ? undefined : 300
+
   if (!isMobile) {
     tipTriggers.push('hover')
     tipTriggers.push('focus')
@@ -104,6 +109,7 @@ const HighContrastLabel = ({loading, isMobile}: HighContrastLabelProps) => {
       </Tooltip>
       {loading && (
         <Spinner
+          delay={spinnerDelay}
           data-testid="hcm-change-spinner"
           size="x-small"
           renderTitle={I18n.t('Waiting for change to complete')}
