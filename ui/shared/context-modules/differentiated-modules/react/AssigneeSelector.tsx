@@ -88,6 +88,7 @@ const AssigneeSelector = ({
     customSetSearchTerm,
     onError,
   })
+  const [highlightedOptionId, setHighlightedOptionId] = useState<string | null>(null)
 
   const shouldUpdateOptions = [
     JSON.stringify(allOptions),
@@ -170,6 +171,7 @@ const AssigneeSelector = ({
           ))
         }
         customMatcher={optionMatcher}
+        onUpdateHighlightedOption={setHighlightedOptionId}
       >
         {options.map(option => {
           return (
@@ -182,7 +184,11 @@ const AssigneeSelector = ({
             >
               <Text as="div">{option.value}</Text>
               {option.sisID && (
-                <Text as="div" size="small" color="secondary">
+                <Text
+                  as="div"
+                  size="small"
+                  color={highlightedOptionId === option.id ? 'secondary-inverse' : 'secondary'}
+                >
                   {option.sisID}
                 </Text>
               )}

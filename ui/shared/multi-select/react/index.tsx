@@ -74,6 +74,7 @@ type Props = {
   size?: Size
   visibleOptionsCount?: number
   messages?: FormMessage[]
+  onUpdateHighlightedOption?: (id: string) => void
 }
 
 function CanvasMultiSelect(props: Props) {
@@ -92,6 +93,7 @@ function CanvasMultiSelect(props: Props) {
     customOnRequestHideOptions,
     customOnRequestSelectOption,
     isLoading,
+    onUpdateHighlightedOption,
     ...otherProps
   } = props
 
@@ -322,6 +324,7 @@ function CanvasMultiSelect(props: Props) {
     if (e.type === 'keydown') setInputValue(primaryLabel(option))
     setHighlightedOptionId(id)
     setAnnouncement(primaryLabel(option))
+    onUpdateHighlightedOption?.(id)
   }
 
   function onRequestSelectOption(e: React.SyntheticEvent, {id}: {id?: string}): void {
