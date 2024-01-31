@@ -1461,17 +1461,12 @@ module Lti
         end
 
         it "has a functioning guard for $Canvas.term.startAt when term.start_at is not set" do
-          term = course.enrollment_term
-          expect(term&.start_at).to be_falsey
+          expect(course.enrollment_term&.start_at).to be_falsey
           expect_unexpanded!("$Canvas.term.startAt")
         end
 
         it "has substitution for $Canvas.term.startAt when term.start_at is set" do
-          course.enrollment_term ||= EnrollmentTerm.new
-          term = course.enrollment_term
-
-          term.start_at = "2015-05-21 17:01:36"
-          term.save
+          course.enrollment_term = EnrollmentTerm.new(start_at: "2015-05-21 17:01:36")
           expect(expand!("$Canvas.term.startAt")).to eq "2015-05-21 17:01:36"
         end
 
@@ -1482,33 +1477,37 @@ module Lti
         end
 
         it "has a functioning guard for $Canvas.term.endAt when term.start_at is not set" do
-          term = course.enrollment_term
-          expect(term&.end_at).to be_falsey
+          expect(course.enrollment_term&.end_at).to be_falsey
           expect_unexpanded!("$Canvas.term.endAt")
         end
 
         it "has substitution for $Canvas.term.endAt when term.start_at is set" do
-          course.enrollment_term ||= EnrollmentTerm.new
-          term = course.enrollment_term
-
-          term.end_at = "2015-05-21 17:01:36"
-          term.save
+          course.enrollment_term = EnrollmentTerm.new(end_at: "2015-05-21 17:01:36")
           expect(expand!("$Canvas.term.endAt")).to eq "2015-05-21 17:01:36"
         end
 
         it "has a functioning guard for $Canvas.term.name when term.name is not set" do
-          term = course.enrollment_term
-          expect(term&.name).to be_falsey
+          expect(course.enrollment_term&.name).to be_falsey
           expect_unexpanded!("$Canvas.term.name")
         end
 
         it "has substitution for $Canvas.term.name when term.name is set" do
-          course.enrollment_term ||= EnrollmentTerm.new
-          term = course.enrollment_term
-
-          term.name = "W1 2017"
-          term.save
+          course.enrollment_term = EnrollmentTerm.new(name: "W1 2017")
           expect(expand!("$Canvas.term.name")).to eq "W1 2017"
+        end
+
+        it "has a functioning guard for $Canvas.term.id when there is no term or term ID" do
+          # This may not be possible, but regardless it's good not to crash
+          expect(course.enrollment_term).to be_nil
+          expect_unexpanded!("$Canvas.term.id")
+          course.enrollment_term = EnrollmentTerm.new
+          expect_unexpanded!("$Canvas.term.id")
+        end
+
+        it "has substitution for $Canvas.term.id when there is a term" do
+          term = EnrollmentTerm.create!(root_account:)
+          course.enrollment_term = term
+          expect(expand!("$Canvas.term.id")).to eq term.id
         end
 
         it "has substitution for $Canvas.externalTool.global_id" do
