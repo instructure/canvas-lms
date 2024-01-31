@@ -130,7 +130,7 @@ export default class TokenSelector {
     if (this.uiLocked) {
       return true
     }
-    if (this.$menu.find('.no-results').length > 0 && [13, 'Enter'].includes(keyCode)) {
+    if (this.isShowingNoResults() && [13, 'Enter'].includes(keyCode)) {
       return e.preventDefault()
     }
 
@@ -273,10 +273,17 @@ export default class TokenSelector {
   blur() {
     // It seems we can't check focus while it is being changed, so check it later.
     return setTimeout(() => {
-      if (!this.input.hasFocus() && !(this.$container.find(':focus').length > 0)) {
+      if (
+        !this.input.hasFocus() &&
+        (!(this.$container.find('.active').length > 0) || this.isShowingNoResults())
+      ) {
         return this.close()
       }
     }, 0)
+  }
+
+  isShowingNoResults() {
+    return this.$menu.find('.no-results').length > 0
   }
 
   listExpanded() {
