@@ -890,7 +890,7 @@ describe "discussions" do
         expect(ff("span[data-testid='assign-to-select-option']").count).to eq assign_to_option_count
       end
 
-      it "creates a discussion topic with an assignment with peer reviews" do
+      it "creates a discussion topic with an assignment with automatic peer reviews" do
         get "/courses/#{course.id}/discussion_topics/new"
 
         title = "Graded Discussion Topic with Peer Reviews"
@@ -917,6 +917,33 @@ describe "discussions" do
         expect(dt.assignment.peer_review_count).to be 1
         expect(dt.assignment.peer_reviews).to be true
         expect(dt.assignment.automatic_peer_reviews).to be true
+      end
+
+      it "creates a discussion topic with an assignment with manual peer reviews" do
+        get "/courses/#{course.id}/discussion_topics/new"
+
+        title = "Graded Discussion Topic with Peer Reviews"
+        message = "replying to topic"
+
+        f("input[placeholder='Topic Title']").send_keys title
+        type_in_tiny("textarea", message)
+
+        force_click('input[type=checkbox][value="graded"]')
+        wait_for_ajaximations
+
+        f("input[data-testid='points-possible-input']").send_keys "12"
+        force_click("input[data-testid='peer_review_manual']")
+
+        f("input[data-testid='assign-to-select']").click
+        ff("span[data-testid='assign-to-select-option']")[0].click
+
+        f("button[data-testid='save-and-publish-button']").click
+        wait_for_ajaximations
+
+        dt = DiscussionTopic.last
+        expect(dt.assignment.peer_review_count).to be 0
+        expect(dt.assignment.peer_reviews).to be true
+        expect(dt.assignment.automatic_peer_reviews).to be false
       end
 
       it "creates a discussion topic with an assignment with Sync to SIS" do
@@ -1382,6 +1409,80 @@ describe "discussions" do
           expect(override_titles).to include @group_1.name
           expect(override_titles).to include @group_2.name
           expect(override_titles).to include @group_3.name
+        end
+
+        it "creates a published graded group discussion with group overrides with the expected assignment properties" do
+          get "/courses/#{course.id}/discussion_topics/new"
+
+          title = "Graded Discussion Topic with section, group, and student overries separately"
+          message = "replying to topic"
+
+          f("input[placeholder='Topic Title']").send_keys title
+          type_in_tiny("textarea", message)
+
+          force_click('input[type=checkbox][value="graded"]')
+          wait_for_ajaximations
+
+          force_click("input[data-testid='group-discussion-checkbox']")
+          group_category_input = f("input[placeholder='Select a group category']")
+          group_category_input.click
+          group_category_input.send_keys :arrow_down
+          group_category_input.send_keys :enter
+
+          f("input[data-testid='points-possible-input']").send_keys "12"
+
+          assign_to_element = f("input[data-testid='assign-to-select']")
+          assign_to_element.click
+          assign_to_element.send_keys :backspace
+          assign_to_element.send_keys "group 1"
+          assign_to_element.send_keys :enter
+          assign_to_element.send_keys "group 2"
+          assign_to_element.send_keys :enter
+          assign_to_element.send_keys "group 3"
+          assign_to_element.send_keys :enter
+
+          f("button[data-testid='save-and-publish-button']").click
+          wait_for_ajaximations
+
+          dt = Assignment.last.discussion_topic
+          expect(dt.assignment.workflow_state).to eq "published"
+          expect(dt.assignment.group_category_id).to be_nil
+          expect(dt.assignment.submission_types).to eq "discussion_topic"
+          expect(dt.assignment.only_visible_to_overrides).to be true
+          expect(dt.assignment.group_category).to be_nil
+          expect(dt.assignment.description).to eq "<p>replying to topic</p>"
+        end
+
+        it "creates an unpublished graded group discussion with no overrides with the expected assignment properties" do
+          get "/courses/#{course.id}/discussion_topics/new"
+
+          title = "Graded Discussion Topic with section, group, and student overries separately"
+          message = "replying to topic"
+
+          f("input[placeholder='Topic Title']").send_keys title
+          type_in_tiny("textarea", message)
+
+          force_click('input[type=checkbox][value="graded"]')
+          wait_for_ajaximations
+
+          force_click("input[data-testid='group-discussion-checkbox']")
+          group_category_input = f("input[placeholder='Select a group category']")
+          group_category_input.click
+          group_category_input.send_keys :arrow_down
+          group_category_input.send_keys :enter
+
+          f("input[data-testid='points-possible-input']").send_keys "12"
+
+          f("button[data-testid='save-button']").click
+          wait_for_ajaximations
+
+          dt = Assignment.last.discussion_topic
+          expect(dt.assignment.workflow_state).to eq "unpublished"
+          expect(dt.assignment.group_category_id).to be_nil
+          expect(dt.assignment.submission_types).to eq "discussion_topic"
+          expect(dt.assignment.only_visible_to_overrides).to be false
+          expect(dt.assignment.group_category).to be_nil
+          expect(dt.assignment.description).to eq "<p>replying to topic</p>"
         end
       end
     end

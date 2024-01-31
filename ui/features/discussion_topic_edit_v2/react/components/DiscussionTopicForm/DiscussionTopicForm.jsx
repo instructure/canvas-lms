@@ -555,7 +555,7 @@ export default function DiscussionTopicForm({
       ? null
       : {
           automaticReviews: peerReviewAssignment === 'automatically',
-          count: peerReviewsPerStudent,
+          count: !isEditing && peerReviewAssignment === 'manually' ? 0 : peerReviewsPerStudent,
           enabled: true,
           dueAt: peerReviewDueDate || null,
           intraReviews: intraGroupPeerReviews,
@@ -584,10 +584,7 @@ export default function DiscussionTopicForm({
       dueAt: everyoneOverride.dueDate || null,
       lockAt: everyoneOverride.availableUntil || null,
       unlockAt: everyoneOverride.availableFrom || null,
-      onlyVisibleToOverrides: assignedInfoList.every(
-        info =>
-          info.assignedList.length === 1 && info.assignedList[0] === defaultEveryoneOption.assetCode
-      ),
+      onlyVisibleToOverrides: !Object.keys(everyoneOverride).length,
       gradingStandardId: gradingSchemeId || null,
     }
     // Additional properties for creation of a graded assignment
@@ -596,7 +593,6 @@ export default function DiscussionTopicForm({
         ...payload,
         courseId: ENV.context_id,
         name: title,
-        groupCategoryId: isGroupDiscussion ? groupCategoryId : null,
       }
     }
     return payload

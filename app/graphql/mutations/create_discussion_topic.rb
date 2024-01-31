@@ -115,7 +115,7 @@ class Mutations::CreateDiscussionTopic < Mutations::DiscussionBase
 
     if input.key?(:assignment) && input[:assignment].present?
       working_assignment = Mutations::CreateAssignment.new(object:, context:, field: nil)
-                                                      &.resolve(input: input[:assignment])
+                                                      &.resolve(input: input[:assignment], submittable: discussion_topic)
 
       if working_assignment[:errors].present?
         return validation_error(working_assignment[:errors])
