@@ -388,23 +388,42 @@ shared_examples_for "an object whose dates are overridable" do
 
   describe "all_assignment_overrides" do
     before do
+      Account.site_admin.enable_feature!(:differentiated_modules)
       student_in_course(course:)
       override.override_due_at(7.days.from_now)
       override.set_type = "ADHOC"
       override.save!
 
-      module1 = @course.context_modules.create!(name: "Module 1")
-      overridable.context_module_tags.create! context_module: module1, context: @course, tag_type: "context_module"
+      @module1 = @course.context_modules.create!(name: "Module 1")
+      @tag1 = overridable.context_module_tags.create! context_module: @module1, context: @course, tag_type: "context_module"
 
-      @module_override = module1.assignment_overrides.create!
+      @module_override = @module1.assignment_overrides.create!
       override_student = @module_override.assignment_override_students.build
       override_student.user = @student
       override_student.save!
     end
 
     it "includes context module overrides" do
-      Account.site_admin.enable_feature!(:differentiated_modules)
       expect(overridable.all_assignment_overrides).to include(@module_override)
+    end
+
+    it "includes unpublished context module overrides" do
+      @module1.workflow_state = "unpublished"
+      @module1.save!
+      expect(overridable.all_assignment_overrides).to include(@module_override)
+    end
+
+    it "includes an assignment's quiz's context module overrides" do
+      if overridable_type == :quiz
+        overridable.assignment = Assignment.new
+        expect(overridable.assignment.all_assignment_overrides).to include(@module_override)
+      end
+      expect(overridable.all_assignment_overrides).to include(@module_override)
+    end
+
+    it "does not include deleted content tags" do
+      @tag1.destroy
+      expect(overridable.all_assignment_overrides).not_to include(@module_override)
     end
 
     it "does not include context module overrides without the flag" do
