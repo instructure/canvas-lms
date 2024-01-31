@@ -37,7 +37,7 @@ it('passes trigger property functions and forwards the calls to the dynamic ui m
     registerAnimatable: jest.fn(),
     deregisterAnimatable: jest.fn(),
     preTriggerUpdates: jest.fn(),
-    triggerUpdates: jest.fn()
+    triggerUpdates: jest.fn(),
   }
 
   const wrapper = mount(

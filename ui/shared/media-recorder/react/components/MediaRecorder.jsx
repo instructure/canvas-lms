@@ -20,7 +20,7 @@ import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {MediaCapture, canUseMediaCapture} from '@instructure/media-capture'
 import {func} from 'prop-types'
-import { mediaExtension } from '../../mimetypes'
+import {mediaExtension} from '../../mimetypes'
 const I18n = useI18nScope('media_recorder')
 const DEFAULT_EXTENSION = 'webm'
 const fileExtensionRegex = /\.\S/
@@ -54,7 +54,7 @@ export function fileWithExtension(file) {
   const name = file.name?.endsWith('.') ? `${file.name}${extension}` : `${file.name}.${extension}`
   return new File([file], name, {
     type: file.type,
-    lastModified: file.lastModified
+    lastModified: file.lastModified,
   })
 }
 

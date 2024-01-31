@@ -26,6 +26,7 @@ import ClearableDateTimeInput from './ClearableDateTimeInput'
 import moment from 'moment'
 import AssigneeSelector, {type AssigneeOption} from '../AssigneeSelector'
 import type {FormMessage} from '@instructure/ui-form-field'
+import ContextModuleLink from './ContextModuleLink'
 
 const I18n = useI18nScope('differentiated_modules')
 
@@ -38,13 +39,15 @@ export interface DateValidatorInputArgs {
   unlock_at: string | null
   due_at: string | null
   set_type?: string
-  course_section_id?: string
+  course_section_id?: string | null
   student_ids?: string[]
 }
 
 export type ItemAssignToCardProps = {
   courseId: string
   cardId: string
+  contextModuleId?: string | null
+  contextModuleName?: string | null
   due_at: string | null
   unlock_at: string | null
   lock_at: string | null
@@ -74,6 +77,8 @@ function setTimeToStringDate(time: string, date: string | undefined): string | u
 
 export default function ItemAssignToCard({
   courseId,
+  contextModuleId,
+  contextModuleName,
   cardId,
   due_at = null,
   unlock_at = null,
@@ -289,6 +294,11 @@ export default function ItemAssignToCard({
           }
         />
       ))}
+      <ContextModuleLink
+        courseId={courseId}
+        contextModuleId={contextModuleId}
+        contextModuleName={contextModuleName}
+      />
     </View>
   )
 }

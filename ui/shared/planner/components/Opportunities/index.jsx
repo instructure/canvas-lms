@@ -175,9 +175,7 @@ export class Opportunities_ extends Component {
 
   renderTitle(which) {
     const srtitle =
-      which === 'new'
-        ? I18n.t('New Opportunities')
-        : I18n.t('Dismissed Opportunities')
+      which === 'new' ? I18n.t('New Opportunities') : I18n.t('Dismissed Opportunities')
     const title = which === 'new' ? I18n.t('New') : I18n.t('Dismissed')
     return <AccessibleContent alt={srtitle}>{title}</AccessibleContent>
   }

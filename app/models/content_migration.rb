@@ -118,7 +118,7 @@ class ContentMigration < ActiveRecord::Base
       if pre_processing? || exporting? || importing?
         self.started_at ||= Time.now.utc
       end
-      if failed? || imported? || exported?
+      if failed? || imported?
         self.finished_at ||= Time.now.utc
       end
     end

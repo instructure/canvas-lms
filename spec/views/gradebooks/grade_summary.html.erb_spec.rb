@@ -122,7 +122,6 @@ describe "gradebooks/grade_summary" do
     context "when the assignment enhancements flag is enabled" do
       before do
         @course.enable_feature!(:assignments_2_student)
-        Setting.set("assignments_2_observer_view", "true")
       end
 
       it "takes the submitting student to A2 flow" do

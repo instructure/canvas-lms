@@ -166,7 +166,6 @@ module.exports = {
     },
     extensions: ['.mjs', '.js', '.jsx', '.ts', '.tsx'],
     modules: [
-      path.join(canvasDir, 'ui/shims'),
       path.join(canvasDir, 'public/javascripts'),
       path.join(canvasDir, 'gems/plugins'),
       path.join(canvasDir, 'spec/coffeescripts'),
@@ -208,6 +207,9 @@ module.exports = {
     // whatwg-url, its dependency)
     new ProvidePlugin({
       Buffer: ['buffer', 'Buffer'],
+      $: 'jquery',
+      jQuery: 'jquery',
+      'window.jQuery': 'jquery',
     }),
   ].concat(
     process.env.JSPEC_GROUP

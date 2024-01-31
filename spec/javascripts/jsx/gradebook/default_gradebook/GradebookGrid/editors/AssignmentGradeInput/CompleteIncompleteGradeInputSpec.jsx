@@ -30,7 +30,7 @@ QUnit.module('GradebookGrid CompleteIncompleteGradeInput', suiteHooks => {
 
   suiteHooks.beforeEach(() => {
     fakeENV.setup({
-      GRADEBOOK_OPTIONS: {assignment_missing_shortcut: true}
+      GRADEBOOK_OPTIONS: {assignment_missing_shortcut: true},
     })
     const assignment = {
       pointsPossible: 10,

@@ -26,6 +26,7 @@ const mockEnrollment = {
   enrollment_state: 'active',
   course_id: '',
   course_section_id: '',
+  limit_privileges_to_course_section: false,
   end_at: '',
   id: '',
   start_at: '',

@@ -3,7 +3,7 @@
     "allowJs": true, // allows importing of .js files from .ts files
     "esModuleInterop": true, // more accurately transpiles to the ES6 module spec (maybe not needed w/ babel transpilation)
     "isolatedModules": true, // required to adhere to babel's single-file transpilation process
-    "jsx": "react", // transpiles jsx to React.createElement calls (maybe not needed w/ babel transpilation)
+    "jsx": "react-jsx", // transpiles jsx to React.createElement calls (maybe not needed w/ babel transpilation)
     "lib": ["DOM", "ES2020", "ESNext"], // include types for DOM APIs and standard JS up to ES2020
     "incremental": true, // enables incremental compilation for faster builds
     "module": "es2020", // support the most modern ES6-style module syntax

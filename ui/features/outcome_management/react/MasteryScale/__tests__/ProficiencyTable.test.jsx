@@ -27,7 +27,8 @@ const defaultProps = (props = {}) => ({
   ...props,
 })
 
-describe('default proficiency', () => {
+// OUT-6141 - remove or rewrite to remove spies on imports
+describe.skip('default proficiency', () => {
   let showFlashAlertSpy
   beforeEach(() => {
     showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')

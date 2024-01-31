@@ -3245,7 +3245,7 @@ describe User do
       specs_require_sharding
 
       it "checks for associated accounts on shards the user shares with the seeker" do
-        # create target user on defualt shard
+        # create target user on default shard
         target = user_factory
         # create account on another shard
         account = @shard1.activate { Account.create! }

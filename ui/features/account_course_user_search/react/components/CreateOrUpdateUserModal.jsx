@@ -253,7 +253,7 @@ export default class CreateOrUpdateUserModal extends React.Component {
                   renderLabel={renderLabel}
                   label={label}
                   data-testid={label ?? renderLabel}
-                  value={get(this.state.data, name) ?? ''}
+                  value={get(this.state.data, name)?.toString() ?? ''}
                   checked={get(this.state.data, name) ?? false}
                   onChange={e =>
                     this.onChange(

@@ -23,12 +23,12 @@ import {Attachment} from './Attachment'
 export const CREATE_DISCUSSION_TOPIC = gql`
   mutation CreateDiscussionTopic(
     $contextId: ID!
-    $contextType: String!
+    $contextType: DiscussionTopicContextType!
     $title: String
     $message: String
     $published: Boolean
     $requireInitialPost: Boolean
-    $anonymousState: String
+    $anonymousState: DiscussionTopicAnonymousStateType
     $delayedPostAt: DateTime
     $lockAt: DateTime
     $isAnonymousAuthor: Boolean

@@ -18,7 +18,6 @@
 
 import {extend} from '@canvas/backbone/utils'
 import Backbone from '@canvas/backbone'
-import _ from 'underscore'
 
 extend(MigrationView, Backbone.View)
 
@@ -35,19 +34,12 @@ function MigrationView() {
 // @api private override ValidateFormView
 
 MigrationView.prototype.validateBeforeSave = function () {
-  // There might be a better way to do this with reduce
-  const validations = {}
-  _.each(
-    this.children,
-    (function (_this) {
-      return function (child) {
-        if (child.validations) {
-          return _.extend(validations, child.validations())
-        }
-      }
-    })(this)
-  )
-  return validations
+  const keys = Object.keys(this.children)
+  return keys.reduce((acc, k) => {
+    const child = this.children[k]
+    if (child.validations) Object.assign(acc, child.validations())
+    return acc
+  }, {})
 }
 
 export default MigrationView

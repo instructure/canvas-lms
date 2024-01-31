@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-import h from 'html-escape'
+import h from '@instructure/html-escape'
 import OutcomeIconBase from './OutcomeIconBase'
 
 export default class OutcomeIconView extends OutcomeIconBase {

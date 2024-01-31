@@ -21,7 +21,7 @@ import preventDefault from '@canvas/util/preventDefault'
 import signupDialog from '@canvas/signup-dialog'
 import loginForm from '../jst/login.handlebars'
 import authenticity_token from '@canvas/authenticity-token'
-import htmlEscape from 'html-escape'
+import htmlEscape from '@instructure/html-escape'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('registration')

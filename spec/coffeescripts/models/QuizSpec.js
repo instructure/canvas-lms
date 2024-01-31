@@ -491,3 +491,31 @@ test('stops polling when the quiz has finished migrating', function () {
   this.clock.tick(3000)
   ok(this.quiz.fetch.calledOnce)
 })
+
+QUnit.module('Assignment#pollUntilFinishedLoading (importing)', {
+  setup() {
+    this.clock = sinon.useFakeTimers()
+    this.quiz = new Quiz({workflow_state: 'importing'})
+    sandbox.stub(this.quiz, 'fetch').returns($.Deferred().resolve())
+  },
+  teardown() {
+    this.clock.restore()
+  },
+})
+
+test('polls for updates (importing)', function () {
+  this.quiz.pollUntilFinishedLoading(4000)
+  this.clock.tick(2000)
+  notOk(this.quiz.fetch.called)
+  this.clock.tick(3000)
+  ok(this.quiz.fetch.called)
+})
+
+test('stops polling when the quiz has finished importing', function () {
+  this.quiz.pollUntilFinishedLoading(3000)
+  this.quiz.set({workflow_state: 'unpublished'})
+  this.clock.tick(3000)
+  ok(this.quiz.fetch.calledOnce)
+  this.clock.tick(3000)
+  ok(this.quiz.fetch.calledOnce)
+})

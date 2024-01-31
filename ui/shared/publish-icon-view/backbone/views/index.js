@@ -18,7 +18,6 @@
 
 import {extend} from '@canvas/backbone/utils'
 import PublishButtonView from '@canvas/publish-button-view'
-import _ from 'underscore'
 
 extend(PublishIconView, PublishButtonView)
 
@@ -46,7 +45,10 @@ PublishIconView.optionProperty('unpublishText')
 
 PublishIconView.prototype.initialize = function () {
   PublishIconView.__super__.initialize.apply(this, arguments)
-  return (this.events = _.extend({}, PublishButtonView.prototype.events, this.events))
+  return (this.events = {
+    ...PublishButtonView.prototype.events,
+    ...this.events,
+  })
 }
 
 PublishIconView.prototype.setElement = function () {

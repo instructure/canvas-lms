@@ -18,7 +18,7 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import h from 'html-escape'
+import h from '@instructure/html-escape'
 import authenticity_token from '@canvas/authenticity-token'
 import '@canvas/jquery/jquery.ajaxJSON'
 import 'jqueryui/dialog'

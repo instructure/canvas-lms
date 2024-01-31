@@ -44,13 +44,16 @@ import {
   defaultEveryoneElseOption,
   masteryPathsOption,
 } from '../../util/constants'
-import {nanoid} from 'nanoid'
 import {AttachmentDisplay} from '@canvas/discussions/react/components/AttachmentDisplay/AttachmentDisplay'
 import {responsiveQuerySizes} from '@canvas/discussions/react/utils'
 import {UsageRightsContainer} from '../../containers/usageRights/UsageRightsContainer'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 
-import {addNewGroupCategoryToCache} from '../../util/utils'
+import {
+  addNewGroupCategoryToCache,
+  buildAssignmentOverrides,
+  buildDefaultAssignmentOverride,
+} from '../../util/utils'
 
 const I18n = useI18nScope('discussion_create')
 
@@ -74,6 +77,7 @@ export default function DiscussionTopicForm({
     isAnnouncement && !ENV.DISCUSSION_TOPIC?.ATTRIBUTES.course_published
   const isEditingAnnouncement = isAnnouncement && ENV.DISCUSSION_TOPIC?.ATTRIBUTES.id
   const published = currentDiscussionTopic?.published ?? false
+
   const announcementAlertProps = () => {
     if (isUnpublishedAnnouncement) {
       return {
@@ -184,15 +188,11 @@ export default function DiscussionTopicForm({
     currentDiscussionTopic?.assignment?.peerReviews?.dueAt || ''
   )
   const [dueDateErrorMessages, setDueDateErrorMessages] = useState([])
-  const [assignedInfoList, setAssignedInfoList] = useState([
-    {
-      dueDateId: nanoid(),
-      assignedList: [defaultEveryoneOption.assetCode],
-      dueDate: '',
-      availableFrom: '',
-      availableUntil: '',
-    },
-  ]) // Initialize with one object with a unique id
+  const [assignedInfoList, setAssignedInfoList] = useState(
+    isEditing
+      ? buildAssignmentOverrides(currentDiscussionTopic?.assignment)
+      : buildDefaultAssignmentOverride()
+  )
 
   const assignmentDueDateContext = {
     assignedInfoList,
@@ -221,6 +221,15 @@ export default function DiscussionTopicForm({
     !!currentDiscussionTopic?.assignment?.postToSis || false
   )
 
+  const [gradingSchemeId, setGradingSchemeId] = useState(
+    currentDiscussionTopic?.assignment?.gradingStandard?._id || undefined
+  )
+
+  const [intraGroupPeerReviews, setIntraGroupPeerReviews] = useState(
+    // intra_group_peer_reviews
+    !!currentDiscussionTopic?.assignment?.peerReviews?.intraReviews || false
+  )
+
   const handleSettingUsageRightsData = data => {
     setUsageRightsErrorState(false)
     setUsageRightsData(data)
@@ -239,6 +248,42 @@ export default function DiscussionTopicForm({
   useEffect(() => {
     if (!isGroupDiscussion) setGroupCategoryId(null)
   }, [isGroupDiscussion])
+
+  const shouldShowTodoSettings =
+    !isGraded &&
+    !isAnnouncement &&
+    ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MANAGE_CONTENT &&
+    ENV.STUDENT_PLANNER_ENABLED
+
+  const shouldShowPostToSectionOption = !isGraded && !isGroupDiscussion && !isGroupContext
+
+  const shouldShowAnonymousOptions =
+    !isGroupContext &&
+    !isAnnouncement &&
+    (ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MODERATE ||
+      ENV.allow_student_anonymous_discussion_topics)
+
+  const shouldShowAnnouncementOnlyOptions = isAnnouncement && !isGroupContext
+
+  const shouldShowGroupAndGradedDiscussionOptions =
+    discussionAnonymousState === 'off' && !isAnnouncement && !isGroupContext
+
+  const shouldShowUsageRightsOption =
+    ENV?.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_ATTACH &&
+    ENV?.FEATURES?.usage_rights_discussion_topics &&
+    ENV?.USAGE_RIGHTS_REQUIRED &&
+    ENV?.PERMISSIONS?.manage_files
+
+  const shouldShowLikingOption = !ENV.K5_HOMEROOM_COURSE
+
+  const shouldShowPartialAnonymousSelector =
+    !isEditing && discussionAnonymousState === 'partial_anonymity' && isStudent
+
+  const shouldShowAvailabilityOptions = !isAnnouncement && !isGroupContext
+
+  /* discussion moderators viewing a new or still unpublished discussion */
+  const shouldShowSaveAndPublishButton =
+    !isAnnouncement && ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MODERATE && !published
 
   const validateTitle = newTitle => {
     if (newTitle.length > 255) {
@@ -498,6 +543,7 @@ export default function DiscussionTopicForm({
           count: peerReviewsPerStudent,
           enabled: true,
           dueAt: peerReviewDueDate || null,
+          intraReviews: intraGroupPeerReviews,
         }
   }
 
@@ -527,6 +573,7 @@ export default function DiscussionTopicForm({
         info =>
           info.assignedList.length === 1 && info.assignedList[0] === defaultEveryoneOption.assetCode
       ),
+      gradingStandardId: gradingSchemeId || null,
     }
     // Additional properties for creation of a graded assignment
     if (!isEditing) {
@@ -547,7 +594,7 @@ export default function DiscussionTopicForm({
         message: rceContent,
         sectionIdsToPostTo,
         discussionAnonymousState,
-        anonymousAuthorState,
+        anonymousAuthorState: discussionAnonymousState === 'off' ? false : anonymousAuthorState,
         requireInitialPost,
         enablePodcastFeed,
         includeRepliesInFeed,
@@ -659,7 +706,7 @@ export default function DiscussionTopicForm({
           isGradedDiscussion={!affectUserFileQuota}
           canAttach={ENV.DISCUSSION_TOPIC?.PERMISSIONS.CAN_ATTACH}
         />
-        {!isGraded && !isGroupDiscussion && !isGroupContext && (
+        {shouldShowPostToSectionOption && (
           <View display="block" padding="medium none">
             <CanvasMultiSelect
               data-testid="section-select"
@@ -685,76 +732,70 @@ export default function DiscussionTopicForm({
             </CanvasMultiSelect>
           </View>
         )}
-        {ENV?.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_ATTACH &&
-          ENV?.FEATURES?.usage_rights_discussion_topics &&
-          ENV?.USAGE_RIGHTS_REQUIRED &&
-          ENV?.PERMISSIONS?.manage_files && (
-            <Flex justifyItems="start" gap="small">
-              <Flex.Item>{I18n.t('Set usage rights')}</Flex.Item>
-              <Flex.Item>
-                <UsageRightsContainer
-                  contextType={(ENV?.context_type ?? '').toLocaleLowerCase()}
-                  contextId={ENV?.context_id}
-                  onSaveUsageRights={handleSettingUsageRightsData}
-                  initialUsageRights={usageRightsData}
-                  errorState={usageRightsErrorState}
-                />
-              </Flex.Item>
-            </Flex>
-          )}
+        {shouldShowUsageRightsOption && (
+          <Flex justifyItems="start" gap="small">
+            <Flex.Item>{I18n.t('Set usage rights')}</Flex.Item>
+            <Flex.Item>
+              <UsageRightsContainer
+                contextType={(ENV?.context_type ?? '').toLocaleLowerCase()}
+                contextId={ENV?.context_id}
+                onSaveUsageRights={handleSettingUsageRightsData}
+                initialUsageRights={usageRightsData}
+                errorState={usageRightsErrorState}
+              />
+            </Flex.Item>
+          </Flex>
+        )}
         <Text size="large">{I18n.t('Options')}</Text>
-        {!isGroupContext &&
-          !isAnnouncement &&
-          (ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MODERATE ||
-            ENV.allow_student_anonymous_discussion_topics) && (
-            <View display="block" margin="medium 0">
-              <RadioInputGroup
-                name="anonymous"
-                description={I18n.t('Anonymous Discussion')}
-                value={discussionAnonymousState}
-                onChange={(_event, value) => {
-                  if (value !== 'off') {
-                    setIsGraded(false)
-                    setIsGroupDiscussion(false)
-                    setGroupCategoryId(null)
-                  }
-                  setDiscussionAnonymousState(value)
-                }}
-                disabled={isEditing || isGraded}
-              >
-                <RadioInput
-                  key="off"
-                  value="off"
-                  label={I18n.t(
-                    'Off: student names and profile pictures will be visible to other members of this course'
-                  )}
+        {shouldShowAnonymousOptions && (
+          <View display="block" margin="medium 0">
+            <RadioInputGroup
+              name="anonymous"
+              description={I18n.t('Anonymous Discussion')}
+              value={discussionAnonymousState}
+              onChange={(_event, value) => {
+                if (value !== 'off') {
+                  setIsGraded(false)
+                  setIsGroupDiscussion(false)
+                  setGroupCategoryId(null)
+                }
+                setDiscussionAnonymousState(value)
+              }}
+              disabled={isEditing || isGraded}
+            >
+              <RadioInput
+                key="off"
+                value="off"
+                label={I18n.t(
+                  'Off: student names and profile pictures will be visible to other members of this course'
+                )}
+              />
+              <RadioInput
+                key="partial_anonymity"
+                value="partial_anonymity"
+                label={I18n.t(
+                  'Partial: students can choose to reveal their name and profile picture'
+                )}
+              />
+              <RadioInput
+                key="full_anonymity"
+                value="full_anonymity"
+                label={I18n.t('Full: student names and profile pictures will be hidden')}
+              />
+            </RadioInputGroup>
+            {shouldShowPartialAnonymousSelector && (
+              <View display="block" margin="medium 0">
+                <AnonymousResponseSelector
+                  username={ENV.current_user.display_name}
+                  setAnonymousAuthorState={setAnonymousAuthorState}
+                  discussionAnonymousState={discussionAnonymousState}
                 />
-                <RadioInput
-                  key="partial_anonymity"
-                  value="partial_anonymity"
-                  label={I18n.t(
-                    'Partial: students can choose to reveal their name and profile picture'
-                  )}
-                />
-                <RadioInput
-                  key="full_anonymity"
-                  value="full_anonymity"
-                  label={I18n.t('Full: student names and profile pictures will be hidden')}
-                />
-              </RadioInputGroup>
-              {!isEditing && discussionAnonymousState === 'partial_anonymity' && isStudent && (
-                <View display="block" margin="medium 0">
-                  <AnonymousResponseSelector
-                    username={ENV.current_user.display_name}
-                    setAnonymousAuthorState={setAnonymousAuthorState}
-                    discussionAnonymousState={discussionAnonymousState}
-                  />
-                </View>
-              )}
-            </View>
-          )}
+              </View>
+            )}
+          </View>
+        )}
         <FormFieldGroup description="" rowSpacing="small">
-          {isAnnouncement && !isGroupContext && (
+          {shouldShowAnnouncementOnlyOptions && (
             <Checkbox
               label={I18n.t('Delay Posting')}
               value="enable-delay-posting"
@@ -765,7 +806,7 @@ export default function DiscussionTopicForm({
               }}
             />
           )}
-          {delayPosting && !isGroupContext && (
+          {delayPosting && shouldShowAnnouncementOnlyOptions && (
             <DateTimeInput
               description={I18n.t('Post At')}
               prevMonthLabel={I18n.t('previous')}
@@ -779,7 +820,7 @@ export default function DiscussionTopicForm({
               timeRenderLabel=""
             />
           )}
-          {isAnnouncement && !isGroupContext && (
+          {shouldShowAnnouncementOnlyOptions && (
             <Checkbox
               label={I18n.t('Allow Participants to Comment')}
               value="enable-participants-commenting"
@@ -820,7 +861,7 @@ export default function DiscussionTopicForm({
               />
             </View>
           )}
-          {discussionAnonymousState === 'off' && !isAnnouncement && !isGroupContext && (
+          {shouldShowGroupAndGradedDiscussionOptions && (
             <Checkbox
               data-testid="graded-checkbox"
               label={I18n.t('Graded')}
@@ -830,7 +871,7 @@ export default function DiscussionTopicForm({
               // disabled={sectionIdsToPostTo === [allSectionsOption._id]}
             />
           )}
-          {!ENV.K5_HOMEROOM_COURSE && (
+          {shouldShowLikingOption && (
             <>
               <Checkbox
                 label={I18n.t('Allow liking')}
@@ -855,10 +896,8 @@ export default function DiscussionTopicForm({
               )}
             </>
           )}
-          {!isGraded &&
-            !isAnnouncement &&
-            ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MANAGE_CONTENT &&
-            ENV.STUDENT_PLANNER_ENABLED && (
+          {shouldShowTodoSettings && (
+            <>
               <Checkbox
                 label={I18n.t('Add to student to-do')}
                 value="add-to-student-to-do"
@@ -868,23 +907,28 @@ export default function DiscussionTopicForm({
                   setAddToTodo(!addToTodo)
                 }}
               />
-            )}
-          {addToTodo && (
-            <View display="block" padding="none none none large" data-testid="todo-date-section">
-              <DateTimeInput
-                description=""
-                dateRenderLabel=""
-                timeRenderLabel=""
-                prevMonthLabel={I18n.t('previous')}
-                nextMonthLabel={I18n.t('next')}
-                onChange={(_event, newDate) => setTodoDate(newDate)}
-                value={todoDate}
-                invalidDateTimeMessage={I18n.t('Invalid date and time')}
-                layout="columns"
-              />
-            </View>
+              {addToTodo && (
+                <View
+                  display="block"
+                  padding="none none none large"
+                  data-testid="todo-date-section"
+                >
+                  <DateTimeInput
+                    description=""
+                    dateRenderLabel=""
+                    timeRenderLabel=""
+                    prevMonthLabel={I18n.t('previous')}
+                    nextMonthLabel={I18n.t('next')}
+                    onChange={(_event, newDate) => setTodoDate(newDate)}
+                    value={todoDate}
+                    invalidDateTimeMessage={I18n.t('Invalid date and time')}
+                    layout="columns"
+                  />
+                </View>
+              )}
+            </>
           )}
-          {discussionAnonymousState === 'off' && !isAnnouncement && !isGroupContext && (
+          {shouldShowGroupAndGradedDiscussionOptions && (
             <Checkbox
               data-testid="group-discussion-checkbox"
               label={I18n.t('This is a Group Discussion')}
@@ -896,7 +940,7 @@ export default function DiscussionTopicForm({
               }}
             />
           )}
-          {discussionAnonymousState === 'off' && isGroupDiscussion && !isGroupContext && (
+          {shouldShowGroupAndGradedDiscussionOptions && isGroupDiscussion && (
             <View display="block" padding="none none none large">
               <SimpleSelect
                 renderLabel={I18n.t('Group Set')}
@@ -955,8 +999,7 @@ export default function DiscussionTopicForm({
             </View>
           )}
         </FormFieldGroup>
-        {!isAnnouncement &&
-          !isGroupContext &&
+        {shouldShowAvailabilityOptions &&
           (isGraded ? (
             <View as="div" data-testid="assignment-settings-section">
               <GradedDiscussionDueDatesContext.Provider value={assignmentDueDateContext}>
@@ -976,6 +1019,10 @@ export default function DiscussionTopicForm({
                   setPeerReviewDueDate={setPeerReviewDueDate}
                   postToSis={postToSis}
                   setPostToSis={setPostToSis}
+                  gradingSchemeId={gradingSchemeId}
+                  setGradingSchemeId={setGradingSchemeId}
+                  intraGroupPeerReviews={intraGroupPeerReviews}
+                  setIntraGroupPeerReviews={setIntraGroupPeerReviews}
                 />
               </GradedDiscussionDueDatesContext.Provider>
             </View>
@@ -1030,8 +1077,7 @@ export default function DiscussionTopicForm({
           >
             {I18n.t('Cancel')}
           </Button>
-          {/* discussion moderators viewing a new or still unpublished discussion */}
-          {!isAnnouncement && ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MODERATE && !published && (
+          {shouldShowSaveAndPublishButton && (
             <Button
               type="submit"
               onClick={() => submitForm(true)}

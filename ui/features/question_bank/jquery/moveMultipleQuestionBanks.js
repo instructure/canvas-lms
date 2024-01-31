@@ -19,7 +19,7 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import moveQuestionTemplate from '../jst/move_question.handlebars'
-import htmlEscape from 'html-escape'
+import htmlEscape from '@instructure/html-escape'
 import loadBanks from './loadBanks'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.instructure_forms' /* formSubmit, getFormData, formErrors */

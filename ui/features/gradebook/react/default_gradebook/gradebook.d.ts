@@ -143,6 +143,7 @@ export type GradebookOptions = {
   late_policy: LatePolicy | null
   login_handle_name: null | string
   message_attachment_upload_folder_id: string
+  multiselect_gradebook_filters_enabled: boolean
   outcome_gradebook_enabled: boolean
   performance_controls: PerformanceControlValues
   post_grades_feature: boolean

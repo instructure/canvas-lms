@@ -18,7 +18,7 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import _ from 'underscore'
+import {each, clone, indexOf, find, last} from 'lodash'
 import Backbone from '@canvas/backbone'
 import Outcome from '../../../backbone/models/Outcome'
 import OutcomeGroup from '../../../backbone/models/OutcomeGroup'
@@ -63,7 +63,7 @@ export default class SidebarView extends Backbone.View {
   }
 
   resetSidebar() {
-    _.each(this.directories, d => d.remove())
+    each(this.directories, d => d.remove())
     this.directories = []
     this.cachedDirectories = {}
     return this.addDirFor(this.rootOutcomeGroup, true)
@@ -76,9 +76,9 @@ export default class SidebarView extends Backbone.View {
     if (this.cachedDirectories[outcomeGroup.id]) {
       dir = this.cachedDirectories[outcomeGroup.id]
     } else {
-      const parent = _.last(this.directories)
+      const parent = last(this.directories)
       const DirectoryClass = outcomeGroup.get('directoryClass') || OutcomesDirectoryView
-      const i = _.indexOf(this.directories, this.selectedDir())
+      const i = indexOf(this.directories, this.selectedDir())
       dir = new DirectoryClass({
         outcomeGroup,
         parent,
@@ -122,7 +122,7 @@ export default class SidebarView extends Backbone.View {
     } else {
       dir.groups.add(model)
     }
-    this._scrollToDir(_.indexOf(this.directories, dir), model)
+    this._scrollToDir(indexOf(this.directories, dir), model)
 
     // select the view
     return model.trigger('select')
@@ -135,9 +135,9 @@ export default class SidebarView extends Backbone.View {
     if (useDir && !selectedModel) useDir.clearSelection()
 
     // remove all directories after the selected dir from @directories and the view
-    const i = _.indexOf(this.directories, useDir)
+    const i = indexOf(this.directories, useDir)
     const dirsToRemove = this.directories.splice(i + 1, this.directories.length - (i + 1))
-    _.each(dirsToRemove, d => d.remove())
+    each(dirsToRemove, d => d.remove())
     const isAddingDir = selectedModel instanceof OutcomeGroup && !selectedModel.isNew()
     if (isAddingDir) this.addDirFor(selectedModel)
     this.updateSidebarWidth()
@@ -182,7 +182,7 @@ export default class SidebarView extends Backbone.View {
   }
 
   clearOutcomeSelection() {
-    return _.last(this.directories).clearOutcomeSelection()
+    return last(this.directories).clearOutcomeSelection()
   }
 
   // Go up a directory.
@@ -191,7 +191,7 @@ export default class SidebarView extends Backbone.View {
     if (this.selectedModel() instanceof OutcomeGroup) {
       this.selectDir(this.selectedDir())
     } else {
-      const i = _.indexOf(this.directories, this.selectedDir())
+      const i = indexOf(this.directories, this.selectedDir())
       this.selectDir(this.directories[i - 1])
     }
 
@@ -220,7 +220,7 @@ export default class SidebarView extends Backbone.View {
 
   render() {
     this.$el.empty()
-    _.each(this.directories, dir => this.renderDir(dir))
+    each(this.directories, dir => this.renderDir(dir))
     return this
   }
 
@@ -244,7 +244,7 @@ export default class SidebarView extends Backbone.View {
   // Find a directory for a given outcome group or add a new directory view.
   dirForGroup(outcomeGroup) {
     return (
-      _.find(this.directories, d => d.outcomeGroup === outcomeGroup) || this.addDirFor(outcomeGroup)
+      find(this.directories, d => d.outcomeGroup === outcomeGroup) || this.addDirFor(outcomeGroup)
     )
   }
 
@@ -301,15 +301,15 @@ export default class SidebarView extends Backbone.View {
     this.$sidebar.animate({scrollLeft}, {duration: 200})
     const scrollTop =
       (this.entryHeight + 1) *
-      _.indexOf(
+      indexOf(
         this.directories[dirIndex].views(),
-        _.find(this.directories[dirIndex].views(), v => v.model === model)
+        find(this.directories[dirIndex].views(), v => v.model === model)
       )
     return this.directories[dirIndex].$el.animate({scrollTop}, {duration: 200})
   }
 
   _findLastDir(f) {
-    return _.find(_.clone(this.directories).reverse(), f) || _.last(this.directories)
+    return find(clone(this.directories).reverse(), f) || last(this.directories)
   }
 }
 SidebarView.initClass()

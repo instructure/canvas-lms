@@ -58,7 +58,9 @@ class TeacherFeedbackForm extends React.Component {
       disableWhileLoading: true,
       required: ['recipients[]', 'body'],
       processData: data => {
-        const selectedCourseId = document.querySelector('select[name="recipients[]"] option:checked').dataset.courseId
+        const selectedCourseId = document.querySelector(
+          'select[name="recipients[]"] option:checked'
+        ).dataset.courseId
         const subject = this.state.courses.find(c => c.id === selectedCourseId).name
         const extraData = {
           subject,

@@ -16,19 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
+import {useScope as useI18nScope} from '@canvas/i18n'
+
+const I18n = useI18nScope('discussion_create')
 
 export const defaultEveryoneOption = {
   assetCode: 'everyone',
-  label: 'Everyone',
+  label: I18n.t('Everyone'),
 }
 export const defaultEveryoneElseOption = {
   assetCode: 'everyone',
-  label: 'Everyone else',
+  label: I18n.t('Everyone else'),
 }
 
 export const masteryPathsOption = {
   assetCode: 'mastery_paths',
-  label: 'Mastery Paths',
+  label: I18n.t('Mastery Paths'),
 }
 
 const GradedDiscussionDueDateDefaultValues = {
@@ -44,3 +47,9 @@ const GradedDiscussionDueDateDefaultValues = {
 export const GradedDiscussionDueDatesContext = React.createContext(
   GradedDiscussionDueDateDefaultValues
 )
+
+export const ASSIGNMENT_OVERRIDE_GRAPHQL_TYPENAMES = {
+  ADHOC: 'AdhocStudents',
+  SECTION: 'Section',
+  GROUP: 'Group',
+}

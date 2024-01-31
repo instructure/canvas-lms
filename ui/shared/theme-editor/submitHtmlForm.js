@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import htmlEscape from 'html-escape'
+import htmlEscape from '@instructure/html-escape'
 import 'jquery.cookie'
 
 export function submitHtmlForm(action, method, md5) {

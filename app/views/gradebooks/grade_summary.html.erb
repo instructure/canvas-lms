@@ -83,11 +83,17 @@
     </div>
   <% end %>
 
-  <div id="print-grades-container" class="ic-Action-header">
+  <div id="print-grades-container" class="ic-Action-header" style="margin-bottom: 2.25rem">
     <div class="ic-Action-header__Primary">
-      <h1 class="ic-Action-header__Heading">
-        <%= t("Grades for %{student}", student: @presenter.student_name) %>
-      </h1>
+      <% if @domain_root_account.feature_enabled?(:instui_nav) %>
+        <h1 class="ic-Action-header__Heading ic-Action-header-title">
+          <%= t("Grades") %>
+        </h1>
+      <% else %>
+        <h1 class="ic-Action-header__Heading">
+          <%= t("Grades for %{student}", student: @presenter.student_name) %>
+        </h1>
+      <% end %>
       <% if !@use_responsive_design %>
         <div class="col-xs-6" ></div>
       <% end %>

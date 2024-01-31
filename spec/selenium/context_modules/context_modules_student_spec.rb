@@ -718,5 +718,24 @@ describe "context modules" do
 
       expect(f(".user_content")).to include_text(page.body)
     end
+
+    context "with the differentiated_modules flag enabled" do
+      before :once do
+        Account.site_admin.enable_feature! :differentiated_modules
+        @module1 = @course.context_modules.create!(name: "module 1")
+        @module2 = @course.context_modules.create!(name: "module 2")
+        @module3 = @course.context_modules.create!(name: "module 3")
+      end
+
+      it "shows only modules that a student is assigned" do
+        @module2.assignment_overrides.create!
+        @module3.assignment_overrides.create!(set: @course.default_section)
+
+        go_to_modules
+        expect(f("#context_modules")).to include_text "module 1"
+        expect(f("#context_modules")).not_to include_text "module 2"
+        expect(f("#context_modules")).to include_text "module 3"
+      end
+    end
   end
 end

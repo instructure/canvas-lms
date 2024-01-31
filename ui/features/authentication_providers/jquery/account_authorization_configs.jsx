@@ -17,7 +17,7 @@
  */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import htmlEscape from 'html-escape'
+import htmlEscape from '@instructure/html-escape'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import AuthTypePicker from '../react/AuthTypePicker'

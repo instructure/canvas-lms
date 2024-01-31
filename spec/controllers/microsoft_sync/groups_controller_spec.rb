@@ -342,5 +342,31 @@ describe MicrosoftSync::GroupsController do
         JSON.parse(group.to_json(include_root: false, except: %i[job_state last_error_report_id]))
       )
     end
+
+    describe "when there is debug info present on the entry" do
+      let(:debug_info) { [{ "msg" => "Some fake debug info", "timestamp" => "2020-01-01T00:00:00Z" }] }
+
+      before { group.update debug_info:, last_error_report: ErrorReport.create! }
+
+      context "when the user is SiteAdmin" do
+        before { user_session(site_admin) }
+
+        let(:site_admin) { site_admin_user(user: user_with_pseudonym(account: Account.site_admin)) }
+
+        it "includes the debugging info and error report id" do
+          expect(subject).to be_successful
+          expect(json_parse["debug_info"]).to eq(debug_info)
+          expect(json_parse["last_error_report_id"]).to eq(group.last_error_report.id)
+        end
+      end
+
+      context "when the user is not SiteAdmin" do
+        it "does not include the debugging info or last error report id" do
+          expect(subject).to be_successful
+          expect(json_parse["debug_info"]).to be_nil
+          expect(json_parse["last_error_report_id"]).to be_nil
+        end
+      end
+    end
   end
 end

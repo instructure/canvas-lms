@@ -367,7 +367,9 @@ class FileUpload extends Component {
             </>
           )}
         </Table.Cell>
-        <Table.Cell themeOverride={cellTheme}>{file.isLoading && this.renderFileProgress(file)}</Table.Cell>
+        <Table.Cell themeOverride={cellTheme}>
+          {file.isLoading && this.renderFileProgress(file)}
+        </Table.Cell>
         <Table.Cell themeOverride={cellTheme}>
           {!file.isLoading && <IconCompleteSolid color="success" />}
         </Table.Cell>

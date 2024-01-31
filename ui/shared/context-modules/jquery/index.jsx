@@ -33,7 +33,7 @@ import vddTooltip from '@canvas/due-dates/jquery/vddTooltip'
 import vddTooltipView from '../jst/_vddTooltip.handlebars'
 import Publishable from '../backbone/models/Publishable'
 import PublishButtonView from '@canvas/publish-button-view'
-import htmlEscape from 'html-escape'
+import htmlEscape from '@instructure/html-escape'
 import ContentTypeExternalToolTray from '@canvas/trays/react/ContentTypeExternalToolTray'
 import {monitorLtiMessages, ltiState} from '@canvas/lti/jquery/messages'
 import get from 'lodash/get'
@@ -99,22 +99,29 @@ window.modules = (function () {
       return indent
     },
 
-    addModule(callback = () => { }) {
+    addModule(callback = () => {}) {
       if (ENV.FEATURES.differentiated_modules) {
-        const options = { initialTab: 'settings' };
+        const options = {initialTab: 'settings'}
         const settings = {
           moduleList: parseModuleList(),
           addModuleUI: (data, $moduleElement) => {
             if (typeof callback === 'function') {
               callback(data, $moduleElement)
             } else {
-              addModuleElement(data, $moduleElement, updatePublishMenuDisabledState, new RelockModulesDialog(), {})
+              addModuleElement(
+                data,
+                $moduleElement,
+                updatePublishMenuDisabledState,
+                new RelockModulesDialog(),
+                {}
+              )
             }
-            $moduleElement.css('display', 'block');
-          }
+            $moduleElement.css('display', 'block')
+          },
         }
         const $module = $('#context_module_blank').clone(true).attr('id', 'context_module_new')
         $('#context_modules').append($module)
+        // eslint-disable-next-line no-restricted-globals
         renderDifferentiatedModulesTray(event.target, $module, settings, options)
       } else {
         const $module = $('#context_module_blank').clone(true).attr('id', 'context_module_new')
@@ -602,7 +609,7 @@ window.modules = (function () {
           const $a = $assignToMenuItem.find('a')
           $a.attr('data-item-id', data.id)
           $a.attr('data-item-name', data.title)
-          $a.attr('data-item-type', data.quiz_lti ? 'lti-quiz' : data.type)
+          $a.attr('data-item-type', data.quiz_lti ? 'lti-quiz' : data.content_type == 'Quizzes::Quiz' ? 'quiz' : data.type)
           $a.attr('data-item-context-id', data.context_id)
           $a.attr('data-item-context-type', data.context_type)
           $a.attr('data-item-content-id', data.content_id)
@@ -820,7 +827,7 @@ const renderDifferentiatedModulesTray = (
   returnFocusTo,
   moduleElement,
   settingsProps,
-  options = {initialTab: 'settings'},
+  options = {initialTab: 'settings'}
 ) => {
   const container = document.getElementById('differentiated-modules-mount-point')
   ReactDOM.render(
@@ -837,7 +844,6 @@ const renderDifferentiatedModulesTray = (
     container
   )
 }
-
 
 const updatePrerequisites = function ($module, prereqs) {
   const $prerequisitesDiv = $module.find('.prerequisites')
@@ -1067,7 +1073,14 @@ modules.initModuleManagement = function (duplicate) {
       $module.removeClass('dont_remove')
       return $module
     },
-    success: (data, $module) => addModuleElement(data, $module, updatePublishMenuDisabledState, relock_modules_dialog, moduleItems),
+    success: (data, $module) =>
+      addModuleElement(
+        data,
+        $module,
+        updatePublishMenuDisabledState,
+        relock_modules_dialog,
+        moduleItems
+      ),
     error(data, $module) {
       $module.loadingImage('remove')
     },
@@ -1653,7 +1666,14 @@ modules.initModuleManagement = function (duplicate) {
 
   $(document).on('click', '.add_module_link', event => {
     event.preventDefault()
-    const addModuleCallback =  (data, $moduleElement) => addModuleElement(data, $moduleElement, updatePublishMenuDisabledState, relock_modules_dialog, moduleItems);
+    const addModuleCallback = (data, $moduleElement) =>
+      addModuleElement(
+        data,
+        $moduleElement,
+        updatePublishMenuDisabledState,
+        relock_modules_dialog,
+        moduleItems
+      )
     modules.addModule(addModuleCallback)
   })
 

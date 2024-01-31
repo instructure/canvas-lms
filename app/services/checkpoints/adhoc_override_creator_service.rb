@@ -18,9 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class Checkpoints::AdhocOverrideCreatorService < ApplicationService
+  require_relative "discussion_checkpoint_error"
   include Checkpoints::DateOverrider
-
-  class StudentIdsRequiredError < StandardError; end
 
   def initialize(checkpoint:, override:)
     super()
@@ -29,7 +28,9 @@ class Checkpoints::AdhocOverrideCreatorService < ApplicationService
   end
 
   def call
-    desired_student_ids = @override.fetch(:student_ids) { raise StudentIdsRequiredError, "student_ids is required, but was not provided" }
+    desired_student_ids = @override.fetch(:student_ids) { raise Checkpoints::StudentIdsRequiredError, "student_ids is required, but was not provided" }
+    raise Checkpoints::StudentIdsRequiredError, "student_ids is required, but was not provided" if desired_student_ids.blank?
+
     student_ids = @checkpoint.course.all_students.where(id: desired_student_ids).pluck(:id)
     override = build_override(assignment: @checkpoint, student_ids:)
     build_override_students(override:, student_ids:)

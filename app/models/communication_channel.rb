@@ -69,6 +69,8 @@ class CommunicationChannel < ActiveRecord::Base
 
   RETIRE_THRESHOLD = 1
 
+  MAX_CCS_PER_USER = 100
+
   # Generally, "TYPE_PERSONAL_EMAIL" should be treated exactly the same
   # as TYPE_EMAIL.  It is just kept distinct for the purposes of customers
   # querying records in Canvas Data.
@@ -80,8 +82,7 @@ class CommunicationChannel < ActiveRecord::Base
   end
 
   def under_user_cc_limit
-    max_ccs = Setting.get("max_ccs_per_user", "100").to_i
-    if user.communication_channels.limit(max_ccs + 1).count > max_ccs
+    if user.communication_channels.limit(MAX_CCS_PER_USER + 1).count > MAX_CCS_PER_USER
       errors.add(:user_id, "user communication_channels limit exceeded")
     end
   end
@@ -318,7 +319,7 @@ class CommunicationChannel < ActiveRecord::Base
 
     @request_password = true
     Rails.cache.write(["recent_password_reset", global_id].cache_key, true, expires_in: Setting.get("resend_password_reset_time", 5).to_f.minutes)
-    set_confirmation_code(true, Setting.get("password_reset_token_expiration_minutes", "120").to_i.minutes.from_now)
+    set_confirmation_code(true, 2.hours.from_now)
     save!
     @request_password = false
   end

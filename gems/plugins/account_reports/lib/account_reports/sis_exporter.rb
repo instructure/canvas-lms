@@ -137,15 +137,17 @@ module AccountReports
     end
 
     def user_query
-      root_account.pseudonyms.except(:preload).joins(:user).select(
-        "pseudonyms.id, pseudonyms.sis_user_id, pseudonyms.user_id, pseudonyms.sis_batch_id,
-         pseudonyms.integration_id,pseudonyms.authentication_provider_id,pseudonyms.unique_id,
-         pseudonyms.workflow_state, users.sortable_name,users.updated_at AS user_updated_at,
-         users.name, users.short_name, users.pronouns AS db_pronouns"
-      ).where("NOT EXISTS (SELECT user_id
-                           FROM #{Enrollment.quoted_table_name} e
-                           WHERE e.type = 'StudentViewEnrollment'
-                           AND e.user_id = pseudonyms.user_id)")
+      root_account.shard.activate do
+        root_account.pseudonyms.except(:preload).joins(:user).select(
+          "pseudonyms.id, pseudonyms.sis_user_id, pseudonyms.user_id, pseudonyms.sis_batch_id,
+           pseudonyms.integration_id,pseudonyms.authentication_provider_id,pseudonyms.unique_id,
+           pseudonyms.workflow_state, users.sortable_name,users.updated_at AS user_updated_at,
+           users.name, users.short_name, users.pronouns AS db_pronouns"
+        ).where("NOT EXISTS (SELECT user_id
+                             FROM #{Enrollment.quoted_table_name} e
+                             WHERE e.type = 'StudentViewEnrollment'
+                             AND e.user_id = pseudonyms.user_id)")
+      end
     end
 
     def user_query_options(users)

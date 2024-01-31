@@ -245,7 +245,7 @@ describe CommunicationChannel do
   end
 
   it "limits quantity of channels a user can have" do
-    Setting.set("max_ccs_per_user", "3")
+    stub_const("CommunicationChannel::MAX_CCS_PER_USER", 3)
     user = User.create!(name: "jim halpert")
     expect { 5.times { |i| communication_channel(user, username: "user_#{user.id}_#{i}@example.com") } }.to raise_error(ActiveRecord::RecordInvalid)
   end

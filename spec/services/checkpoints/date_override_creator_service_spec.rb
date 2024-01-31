@@ -33,14 +33,14 @@ describe Checkpoints::DateOverrideCreatorService do
       overrides = [{ type: "override", due_at: 2.days.from_now }]
       expect do
         service.call(checkpoint: @checkpoint, overrides:)
-      end.to raise_error(Checkpoints::DateOverrideCreatorService::SetTypeRequiredError)
+      end.to raise_error(Checkpoints::SetTypeRequiredError)
     end
 
     it "raises a SetTypeNotSupportedError when a provided date has an unsupported set_type" do
       overrides = [{ type: "override", set_type: "Potato", due_at: 2.days.from_now }]
       expect do
         service.call(checkpoint: @checkpoint, overrides:)
-      end.to raise_error(Checkpoints::DateOverrideCreatorService::SetTypeNotSupportedError)
+      end.to raise_error(Checkpoints::SetTypeNotSupportedError)
     end
 
     it "calls the SectionOverrideCreatorService to create a section override" do

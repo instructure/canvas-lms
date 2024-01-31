@@ -17,7 +17,6 @@
  */
 
 import numberHelper from '@canvas/i18n/numberHelper'
-import I18n from '@canvas/i18n'
 import I18nStubber from 'helpers/I18nStubber'
 
 let input, output, delimiter, separator
@@ -53,7 +52,7 @@ test('uses default parse function', () => {
 
 test('returns NaN for invalid numbers', () => {
   numberHelper._parseNumber.restore()
-  ok(isNaN(numberHelper.parse('foo')))
+  ok(Number.isNaN(numberHelper.parse('foo')))
 })
 
 test('returns value of parse function', () => {
@@ -78,18 +77,33 @@ test('uses default delimiter and separator if not a valid number', () => {
 })
 
 test('returns NaN for null and undefined values', () => {
-  ok(isNaN(numberHelper.parse(null)))
-  ok(isNaN(numberHelper.parse(undefined)))
+  ok(Number.isNaN(numberHelper.parse(null)))
+  ok(Number.isNaN(numberHelper.parse(undefined)))
 })
 
 test('returns input if already a number', () => {
-  const input = 4.7
+  input = 4.7
   equal(numberHelper.parse(input), input)
 })
 
 test('supports e notation', () => {
   numberHelper._parseNumber.restore()
   equal(numberHelper.parse('3e2'), 300)
+})
+
+test('supports a negative exponent', () => {
+  numberHelper._parseNumber.restore()
+  equal(numberHelper.parse('3e-1'), 0.3)
+})
+
+test('supports a negative scientific notation value', () => {
+  numberHelper._parseNumber.restore()
+  equal(numberHelper.parse('-3e1'), -30)
+})
+
+test('does not support an invalid scientific notation format', () => {
+  numberHelper._parseNumber.restore()
+  ok(Number.isNaN(numberHelper.parse('19 will e')))
 })
 
 test('parses toString value of objects', () => {

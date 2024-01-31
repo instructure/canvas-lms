@@ -50,6 +50,8 @@ class Mutations::CreateAssignment < Mutations::AssignmentBase
 
     api_proxy = ApiProxy.new(context[:request], @working_assignment, context[:session], current_user)
 
+    validate_for_checkpoints(input_hash)
+
     # modifies input_hash
     prepare_input_params!(input_hash, api_proxy)
 

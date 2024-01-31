@@ -260,8 +260,8 @@
                   <a href="<%= context_url(@context, :context_url) %>/gradebook/speed_grader?assignment_id=<%= module_item&.assignment&.present? ? module_item.assignment.id : "{{ assignment_id }}" %>" title="<%= t('SpeedGrader')%>"><%= @module_item_image_tags['speed_grader'] %> <%= t('SpeedGrader') %></a>
                 </li>
               <% end %>
-              <% if  @context.grants_right?(@current_user, :manage_assignments_edit) %>
-                <li class="assign-to-option <%= (Account.site_admin.feature_enabled?(:differentiated_modules) && module_item.present? && ["Assignment", "Quizzes::Quiz"].include?(module_item[:content_type])) ? "" : "hidden" %>" role="presentation">
+              <% if  @context.grants_right?(@current_user, :manage_assignments_edit) &&  Account.site_admin.feature_enabled?(:differentiated_modules) %>
+                <li class="assign-to-option <%= (module_item.present? && ["Assignment", "Quizzes::Quiz"].include?(module_item[:content_type])) ? "" : "hidden" %>" role="presentation">
                   <a
                     class="module-item-assign-to-link"
                     href="#<%= module_item ? module_item.id : "{{ id }}" %>"

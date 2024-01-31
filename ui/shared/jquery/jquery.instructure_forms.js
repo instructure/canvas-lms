@@ -22,7 +22,7 @@ import $ from 'jquery'
 import {uniqueId, find, result} from 'lodash'
 import FakeXHR from './FakeXHR'
 import authenticity_token from '@canvas/authenticity-token'
-import htmlEscape from 'html-escape'
+import htmlEscape, {raw} from '@instructure/html-escape'
 import './jquery.ajaxJSON' /* ajaxJSON, defaultAjaxError */
 import './jquery.disableWhileLoading'
 import '@canvas/datetime/jquery' /* date_field, time_field, datetime_field */
@@ -1118,7 +1118,7 @@ $.fn.formErrors = function (data_errors, options) {
     }
     errorDetails[name] = {object: $obj, message: msg}
     hasErrors = true
-    const offset = $obj.errorBox($.raw(msg)).offset()
+    const offset = $obj.errorBox(raw(msg)).offset()
     if (offset.top > highestTop) {
       highestTop = offset.top
     }

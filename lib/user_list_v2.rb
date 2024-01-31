@@ -97,7 +97,7 @@ class UserListV2
 
     all_shards = Set.new(all_account_ids.map { |id| Shard.shard_for(id) }.uniq)
     # however it doesn't seem like it makes much sense to all hit the global_lookups if we're looking on at most 2-3 shards
-    return if all_shards.count <= Setting.get("global_lookups_shard_threshold", "3").to_i
+    return if all_shards.count <= 3
 
     restricted_shards = Set.new
     restricted_shards << @root_account.shard

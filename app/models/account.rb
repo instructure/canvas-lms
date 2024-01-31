@@ -70,6 +70,7 @@ class Account < ActiveRecord::Base
   has_many :users, through: :active_account_users
   has_many :user_past_lti_ids, as: :context, inverse_of: :context
   has_many :pseudonyms, -> { preload(:user) }, inverse_of: :account
+  has_many :deleted_users, -> { where(pseudonyms: { workflow_state: "deleted" }) }, through: :pseudonyms, source: :user
   has_many :role_overrides, as: :context, inverse_of: :context
   has_many :course_account_associations
   has_many :child_courses, -> { where(course_account_associations: { depth: 0 }) }, through: :course_account_associations, source: :course

@@ -221,7 +221,7 @@ module Lti::IMS::Providers
 
     def pagination_args
       # Set a default page size to use if no page size is given in the request
-      pagination_args = { default_per_page: MAX_PAGE_SIZE }
+      pagination_args = { default_per_page: MAX_PAGE_SIZE, max_per_page: MAX_PAGE_SIZE }
 
       # Treat LTI's `limit` param as override of std `per_page` API pagination param. Is no LTI override for `page`.
       if limit > 0

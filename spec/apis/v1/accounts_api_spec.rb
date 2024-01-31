@@ -1801,7 +1801,7 @@ describe "Accounts API", type: :request do
     end
 
     it "limits the maximum per-page returned" do
-      create_courses(15, account: @a1, account_associations: true)
+      create_courses(110, account: @a1, account_associations: true)
       expect(api_call(:get,
                       "/api/v1/accounts/#{@a1.id}/courses?per_page=12",
                       controller: "accounts",
@@ -1809,14 +1809,13 @@ describe "Accounts API", type: :request do
                       account_id: @a1.to_param,
                       format: "json",
                       per_page: "12").size).to eq 12
-      Setting.set("api_max_per_page", "5")
       expect(api_call(:get,
-                      "/api/v1/accounts/#{@a1.id}/courses?per_page=12",
+                      "/api/v1/accounts/#{@a1.id}/courses?per_page=105",
                       controller: "accounts",
                       action: "courses_api",
                       account_id: @a1.to_param,
                       format: "json",
-                      per_page: "12").size).to eq 5
+                      per_page: "105").size).to eq 100
     end
 
     it "returns courses filtered search term" do

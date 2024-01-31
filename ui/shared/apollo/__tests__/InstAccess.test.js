@@ -15,24 +15,28 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import getCookie from '@instructure/get-cookie'
+
+import fetchMock from 'fetch-mock'
 import InstAccess from '../InstAccess'
-import {enableFetchMocks} from 'jest-fetch-mock'
 
-enableFetchMocks()
-
-jest.mock('@instructure/get-cookie', () => {
-  return jest.fn().mockImplementation(cookieName => {
-    if (cookieName === '_csrf_token') {
-      return 'myVerySafeCsrfToken'
-    }
-    return null
-  })
-})
+const mockGetCookie = cookieName => {
+  if (cookieName === '_csrf_token') {
+    return 'myVerySafeCsrfToken'
+  }
+  return null
+}
 
 describe('InstAccess', () => {
   beforeEach(() => {
-    getCookie.mockClear()
+    jest.mock('@instructure/get-cookie', () => ({
+      __esModule: true,
+      default: jest.fn().mockImplementation(mockGetCookie),
+    }))
+    fetchMock.reset()
+  })
+
+  afterEach(() => {
+    jest.restoreAllMocks()
   })
 
   describe('initialization', () => {
@@ -49,55 +53,46 @@ describe('InstAccess', () => {
 
   describe('token fetching', () => {
     it('will use a provided token if available', async () => {
-      const fakeFetch = jest.fn(async (uri, options) => {
-        expect(uri).toEqual('http://fake-gateway/graphql')
-        expect(options.headers.authorization).toEqual('Bearer veryFakeToken')
-        return {
-          status: 200,
-        }
+      fetchMock.mock('http://fake-gateway/graphql', {
+        status: 200,
+        headers: {Authorization: 'Bearer veryFakeToken'},
       })
+
       const ia = new InstAccess({
         token: 'veryFakeToken',
-        preferredFetch: fakeFetch,
+        preferredFetch: fetchMock.fetchHandler,
       })
+
       await ia.gatewayAuthenticatedFetch('http://fake-gateway/graphql', {})
-      expect(fakeFetch.mock.calls.length).toEqual(1)
+      expect(fetchMock.calls('http://fake-gateway/graphql').length).toEqual(1)
     })
 
     it('fetches a token (with CSRF protection) when it needs one', async () => {
-      const fakeFetch = jest.fn(async (uri, options) => {
-        if (uri === '/api/v1/inst_access_tokens') {
-          expect(options.headers['X-CSRF-Token']).toEqual('myVerySafeCsrfToken')
-          return {
-            status: 200,
-            json: () => {
-              return {token: 'canvasProvidedToken'}
-            },
-          }
-        }
-        expect(uri).toEqual('http://fake-gateway/graphql')
-        expect(options.headers.authorization).toEqual('Bearer canvasProvidedToken')
-        return {
-          status: 200,
-        }
+      fetchMock.mock('/api/v1/inst_access_tokens', {
+        status: 200,
+        body: {token: 'canvasProvidedToken'},
+        headers: {'X-CSRF-Token': 'myVerySafeCsrfToken'},
       })
-      const ia = new InstAccess({preferredFetch: fakeFetch})
+
+      fetchMock.mock('http://fake-gateway/graphql', {
+        status: 200,
+        headers: {Authorization: 'Bearer canvasProvidedToken'},
+      })
+
+      const ia = new InstAccess({preferredFetch: fetchMock.fetchHandler})
       await ia.gatewayAuthenticatedFetch('http://fake-gateway/graphql', {})
-      expect(fakeFetch.mock.calls.length).toEqual(2)
+      expect(fetchMock.calls('/api/v1/inst_access_tokens').length).toEqual(1)
+      expect(fetchMock.calls('http://fake-gateway/graphql').length).toEqual(1)
     })
 
     it('refreshes token when expired', async () => {
-      const fakeFetch = jest.fn(async (uri, options) => {
-        if (uri === '/api/v1/inst_access_tokens') {
-          expect(options.headers['X-CSRF-Token']).toEqual('myVerySafeCsrfToken')
-          return {
-            status: 200,
-            json: () => {
-              return {token: 'freshCanvasProvidedToken'}
-            },
-          }
-        }
-        expect(uri).toEqual('http://fake-gateway/graphql')
+      fetchMock.mock('/api/v1/inst_access_tokens', {
+        status: 200,
+        body: {token: 'freshCanvasProvidedToken'},
+        headers: {'X-CSRF-Token': 'myVerySafeCsrfToken'},
+      })
+
+      fetchMock.mock('http://fake-gateway/graphql', (url, options) => {
         let statusCode = 401
         if (options.headers.authorization === 'Bearer freshCanvasProvidedToken') {
           // if it uses the provided expired token, it should fail here, and won't get a 200
@@ -106,34 +101,34 @@ describe('InstAccess', () => {
         }
         return {status: statusCode}
       })
+
       const ia = new InstAccess({
         token: 'ExistingToken',
-        preferredFetch: fakeFetch,
+        preferredFetch: fetchMock.fetchHandler,
       })
+
       const finalResponse = await ia.gatewayAuthenticatedFetch('http://fake-gateway/graphql', {})
       expect(finalResponse.status).toEqual(200)
-      expect(fakeFetch.mock.calls.length).toEqual(3)
+      expect(fetchMock.calls('/api/v1/inst_access_tokens').length).toEqual(1)
+      expect(fetchMock.calls('http://fake-gateway/graphql').length).toEqual(2)
     })
 
     it('uses global fetch if no implementation provided', async () => {
-      async function fakeGatewayFetch() {
-        return {
-          ok: true,
-          status: 200,
-          json: async () => ({token: 'my-fake-token'}),
-          text: async () => {
-            return '{"data": { "aField": "aValue" }, "errors": []}'
-          },
-        }
-      }
-      jest.spyOn(global, 'fetch')
-      global.fetch.mockImplementation(fakeGatewayFetch)
+      fetchMock.mock('/api/v1/inst_access_tokens', {
+        status: 200,
+        body: {token: 'my-fake-token'},
+      })
+
+      fetchMock.mock('http://fake-gateway/graphql', {
+        status: 200,
+        body: '{"data": { "aField": "aValue" }, "errors": []}',
+      })
+
       const ia = new InstAccess({})
       const finalResponse = await ia.gatewayAuthenticatedFetch('http://fake-gateway/graphql', {})
       expect(finalResponse.status).toEqual(200)
-      expect(global.fetch.mock.calls.length).toEqual(2)
-      expect(global.fetch.mock.calls[0][0]).toEqual('/api/v1/inst_access_tokens')
-      expect(global.fetch.mock.calls[1][0]).toEqual('http://fake-gateway/graphql')
+      expect(fetchMock.calls('/api/v1/inst_access_tokens').length).toEqual(1)
+      expect(fetchMock.calls('http://fake-gateway/graphql').length).toEqual(1)
     })
   })
 })

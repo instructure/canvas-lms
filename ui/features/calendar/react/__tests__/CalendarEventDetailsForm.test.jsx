@@ -124,7 +124,7 @@ describe('CalendarEventDetailsForm', () => {
     defaultProps.event.isNewEvent = () => false
   })
 
-  it.skip('renders main elements and updates an event with valid parameters (flaky)', async () => {
+  it('renders main elements and updates an event with valid parameters (flaky)', async () => {
     const component = render(<CalendarEventDetailsForm {...defaultProps} />)
 
     changeValue(component, 'edit-calendar-event-form-title', 'Class Party')

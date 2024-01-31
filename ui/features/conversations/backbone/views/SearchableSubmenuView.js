@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import htmlEscape from 'html-escape'
+import htmlEscape from '@instructure/html-escape'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {debounce} from 'lodash'

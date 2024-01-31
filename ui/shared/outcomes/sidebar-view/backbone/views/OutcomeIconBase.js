@@ -19,7 +19,7 @@
 import $ from 'jquery'
 
 import Backbone from '@canvas/backbone'
-import h from 'html-escape'
+import h from '@instructure/html-escape'
 import 'jqueryui/draggable'
 
 // This is the parent view for <li /> tags inside of an

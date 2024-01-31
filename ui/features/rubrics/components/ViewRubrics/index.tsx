@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useState} from 'react'
 import {useNavigate, useParams} from 'react-router-dom'
 import {useQuery} from '@canvas/query'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -28,6 +28,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {IconAddLine, IconSearchLine} from '@instructure/ui-icons'
 import {TextInput} from '@instructure/ui-text-input'
+import {Tabs} from '@instructure/ui-tabs'
 import {View} from '@instructure/ui-view'
 import {RubricTable} from './RubricTable'
 import type {RubricQueryResponse} from '../../types/Rubric'
@@ -41,11 +42,17 @@ const {Item: FlexItem} = Flex
 
 const I18n = useI18nScope('rubrics-list-view')
 
+export const TABS = {
+  saved: 'Saved',
+  archived: 'Archived',
+}
+
 export const ViewRubrics = () => {
   const navigate = useNavigate()
   const {accountId, courseId} = useParams()
   const isAccount = !!accountId
   const isCourse = !!courseId
+  const [selectedTab, setSelectedTab] = useState<string | undefined>(TABS.saved)
 
   let queryVariables: FetchRubricVariables
   let fetchQuery: (queryVariables: FetchRubricVariables) => Promise<RubricQueryResponse>
@@ -121,23 +128,34 @@ export const ViewRubrics = () => {
         </FlexItem>
       </Flex>
 
-      <View as="div" margin="large 0 0 0">
-        <Heading level="h2" themeOverride={{h1FontWeight: 700}}>
-          {I18n.t('Saved')}
-        </Heading>
-      </View>
-      <View as="div" margin="medium 0" data-testid="saved-rubrics-table">
-        <RubricTable rubrics={activeRubrics} />
-      </View>
-
-      <View as="div" margin="large 0 0 0">
-        <Heading level="h2" themeOverride={{h1FontWeight: 700}}>
-          {I18n.t('Archived')}
-        </Heading>
-      </View>
-      <View as="div" margin="medium 0" data-testid="archived-rubrics-table">
-        <RubricTable rubrics={archivedRubrics} />
-      </View>
+      <Tabs
+        margin="large auto"
+        padding="medium"
+        onRequestTabChange={(_e: any, {id}: {id?: string}) => setSelectedTab(id)}
+      >
+        <Tabs.Panel
+          id={TABS.saved}
+          data-testid="saved-rubrics-panel"
+          renderTitle={I18n.t('Saved')}
+          isSelected={selectedTab === TABS.saved}
+          padding="none"
+        >
+          <View as="div" margin="medium 0" data-testid="saved-rubrics-table">
+            <RubricTable rubrics={activeRubrics} />
+          </View>
+        </Tabs.Panel>
+        <Tabs.Panel
+          id={TABS.archived}
+          data-testid="archived-rubrics-panel"
+          renderTitle={I18n.t('Archived')}
+          isSelected={selectedTab === TABS.archived}
+          padding="none"
+        >
+          <View as="div" margin="medium 0" data-testid="archived-rubrics-table">
+            <RubricTable rubrics={archivedRubrics} />
+          </View>
+        </Tabs.Panel>
+      </Tabs>
     </View>
   )
 }

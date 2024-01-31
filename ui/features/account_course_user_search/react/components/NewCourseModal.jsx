@@ -119,7 +119,7 @@ export default function NewCourseModal({terms, children}) {
             <TextInput
               renderLabel={
                 <>
-                  {I18n.t('Course Name')} 
+                  {I18n.t('Course Name')}
                   <Text color="danger"> *</Text>
                 </>
               }

@@ -32,7 +32,15 @@ import {
   CELL_HEIGHT,
 } from './constants'
 
-const Gradebook = ({courseId, students, outcomes, rollups, visibleRatings, gradebookFilters, gradebookFilterHandler}) => {
+const Gradebook = ({
+  courseId,
+  students,
+  outcomes,
+  rollups,
+  visibleRatings,
+  gradebookFilters,
+  gradebookFilterHandler,
+}) => {
   const headerRow = useRef(null)
   const gridRef = useRef(null)
 
@@ -48,7 +56,10 @@ const Gradebook = ({courseId, students, outcomes, rollups, visibleRatings, grade
     <>
       <Flex padding="medium 0 0 0">
         <Flex.Item borderWidth="large 0 medium 0">
-          <StudentHeader gradebookFilters={gradebookFilters} gradebookFilterHandler={gradebookFilterHandler} />
+          <StudentHeader
+            gradebookFilters={gradebookFilters}
+            gradebookFilterHandler={gradebookFilterHandler}
+          />
         </Flex.Item>
         <Flex.Item size={`${STUDENT_COLUMN_RIGHT_PADDING}px`} />
         <View

@@ -956,8 +956,8 @@ class AssignmentsApiController < ApplicationController
       scope = scope.where(post_to_sis: value_to_boolean(params[:post_to_sis])) if params[:post_to_sis]
 
       if params[:assignment_ids]
-        if params[:assignment_ids].length > Api.max_per_page
-          return render json: { message: "Request contains too many assignment_ids.  Limit #{Api.max_per_page}" }, status: :bad_request
+        if params[:assignment_ids].length > Api::MAX_PER_PAGE
+          return render json: { message: "Request contains too many assignment_ids.  Limit #{Api::MAX_PER_PAGE}" }, status: :bad_request
         end
 
         scope = scope.where(id: params[:assignment_ids])

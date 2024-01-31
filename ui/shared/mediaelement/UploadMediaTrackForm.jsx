@@ -16,11 +16,11 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import _ from 'underscore'
 import template from './jst/UploadMediaTrackForm.handlebars'
 // eslint-disable-next-line import/no-cycle
 import mejs from './index'
 import $ from 'jquery'
+import {map} from 'lodash'
 
 import CopyToClipboard from '@canvas/copy-to-clipboard'
 import React from 'react'
@@ -36,7 +36,7 @@ export default class UploadMediaTrackForm {
     this.attachmentId = attachmentId
     this.lockedMediaAttachment = lockedMediaAttachment
     const templateVars = {
-      languages: _.map(mejs.language.codes, (name, code) => ({name, code})),
+      languages: map(mejs.language.codes, (name, code) => ({name, code})),
       video_url: this.video_url,
       is_amazon_url: this.video_url.search(/.mp4/) !== -1,
     }

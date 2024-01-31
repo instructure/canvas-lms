@@ -20,7 +20,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import Course from '@canvas/courses/backbone/models/Course'
 import Group from '@canvas/groups/backbone/models/Group'
 import ValidatedFormView from '@canvas/forms/backbone/views/ValidatedFormView'
-import htmlEscape from 'html-escape'
+import htmlEscape from '@instructure/html-escape'
 import template from '../../jst/ManualQuotas.handlebars'
 import '@canvas/rails-flash-notifications'
 

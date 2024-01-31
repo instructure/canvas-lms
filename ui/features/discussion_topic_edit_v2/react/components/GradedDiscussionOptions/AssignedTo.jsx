@@ -23,6 +23,7 @@ import {Tag} from '@instructure/ui-tag'
 import {Alert} from '@instructure/ui-alerts'
 import {Select} from '@instructure/ui-select'
 import {IconCheckSolid} from '@instructure/ui-icons'
+import {View} from '@instructure/ui-view'
 
 const I18n = useI18nScope('discussion_create')
 const liveRegion = () => document.getElementById('flash_screenreader_holder')
@@ -244,7 +245,7 @@ export const AssignedTo = ({
   }
 
   return (
-    <>
+    <View as="span" data-testid="assign-to-select-span">
       <Select
         renderLabel={I18n.t('Assign To')}
         assistiveText={I18n.t(
@@ -274,7 +275,7 @@ export const AssignedTo = ({
           {announcement}
         </Alert>
       )}
-    </>
+    </View>
   )
 }
 

@@ -29,20 +29,20 @@ import {Pill} from '@instructure/ui-pill'
 
 const I18n = useI18nScope('OutcomeDescriptionModal')
 
-const getCalculationMethod = (outcome) => {
+const getCalculationMethod = outcome => {
   const calc_int = outcome.calculation_int
-  const other_int = (100 - calc_int)
+  const other_int = 100 - calc_int
 
   switch (outcome.calculation_method) {
-    case ('decaying_average'):
+    case 'decaying_average':
       return I18n.t('%{calc_int}/%{other_int} Weighted Average', {calc_int, other_int})
-    case ('standard_decaying_average'):
+    case 'standard_decaying_average':
       return I18n.t('%{calc_int}/%{other_int} Decaying Average', {calc_int, other_int})
-    case ('n_mastery'):
+    case 'n_mastery':
       return I18n.t('Number of Times (%{calc_int})', {calc_int})
-    case ('highest'):
+    case 'highest':
       return I18n.t('Highest')
-    case ('latest'):
+    case 'latest':
       return I18n.t('Most Recent Score')
     default:
       return I18n.t('Average')
@@ -52,56 +52,60 @@ const getCalculationMethod = (outcome) => {
 const OutcomeDescriptionModal = ({outcome, isOpen, onCloseHandler}) => {
   const {outcomesFriendlyDescriptionFF, contextURL} = useLMGBContext()
 
-  const missingDisplayName = outcome.display_name === ""
-  const missingDescription = outcome.description === ""
-  const missingFriendlyDescription = outcome.friendly_description === null || outcome.friendly_description === ""
+  const missingDisplayName = outcome.display_name === ''
+  const missingDescription = outcome.description === ''
+  const missingFriendlyDescription =
+    outcome.friendly_description === null || outcome.friendly_description === ''
   const calculationMethod = getCalculationMethod(outcome)
-  const shouldDisplayEmptyModal = missingDisplayName && missingDescription && missingFriendlyDescription
+  const shouldDisplayEmptyModal =
+    missingDisplayName && missingDescription && missingFriendlyDescription
 
   return (
     <Modal
-      size='small'
+      size="small"
       open={isOpen}
       onDismiss={onCloseHandler}
       shouldReturnFocus={true}
       shouldCloseOnDocumentClick={false}
-      overflow='scroll'
+      overflow="scroll"
       label={I18n.t('%{outcomeTitle}', {outcomeTitle: outcome.title})}
-      data-testid='outcome-description-modal'
+      data-testid="outcome-description-modal"
     >
       <Modal.Body>
         {!shouldDisplayEmptyModal && (
           <>
             <View
-              display='block'
-              width='100%'
-              padding='0 0 medium 0'
-              data-testid='outcome-display-name'
+              display="block"
+              width="100%"
+              padding="0 0 medium 0"
+              data-testid="outcome-display-name"
             >
-              <Text wrap='break-word' size='x-large' weight='bold'>{outcome.display_name}</Text>
+              <Text wrap="break-word" size="x-large" weight="bold">
+                {outcome.display_name}
+              </Text>
             </View>
             <Pill data-testid="calculation-method">{calculationMethod}</Pill>
-            {outcomesFriendlyDescriptionFF && !missingFriendlyDescription &&  (
+            {outcomesFriendlyDescriptionFF && !missingFriendlyDescription && (
               <View
-                display='block'
-                width='100%'
-                padding='x-small'
-                background='secondary'
-                data-testid='outcome-friendly-description'
+                display="block"
+                width="100%"
+                padding="x-small"
+                background="secondary"
+                data-testid="outcome-friendly-description"
               >
-                <View display='block' width='100%' padding='xx-small x-small x-small x-small'>
-                  <Text weight='bold'>{I18n.t("Friendly Description")}</Text>
+                <View display="block" width="100%" padding="xx-small x-small x-small x-small">
+                  <Text weight="bold">{I18n.t('Friendly Description')}</Text>
                 </View>
-                <View display='block' width='100%' padding='0 x-small xx-small x-small'>
+                <View display="block" width="100%" padding="0 x-small xx-small x-small">
                   <Text>{outcome.friendly_description}</Text>
                 </View>
               </View>
             )}
             <View
-              display='block'
-              width='100%'
-              padding='small 0 small 0'
-              data-testid='outcome-description'
+              display="block"
+              width="100%"
+              padding="small 0 small 0"
+              data-testid="outcome-description"
               dangerouslySetInnerHTML={{__html: outcome.description}}
             />
           </>
@@ -109,21 +113,24 @@ const OutcomeDescriptionModal = ({outcome, isOpen, onCloseHandler}) => {
         {shouldDisplayEmptyModal && (
           <>
             <View
-              display='block'
-              width='100%'
-              padding='0 0 x-small 0'
-              data-testid='outcome-empty-title'
+              display="block"
+              width="100%"
+              padding="0 0 x-small 0"
+              data-testid="outcome-empty-title"
             >
-              <Text weight='bold'>{I18n.t('There is no description for this outcome.')}</Text>
+              <Text weight="bold">{I18n.t('There is no description for this outcome.')}</Text>
             </View>
             <View
-              display='block'
-              width='100%'
-              height='300px'
-              data-testid='outcome-empty-description'
+              display="block"
+              width="100%"
+              height="300px"
+              data-testid="outcome-empty-description"
             >
               <Text>
-                {I18n.t('To edit the name, description, or friendly description of an outcome, open the')}&nbsp;
+                {I18n.t(
+                  'To edit the name, description, or friendly description of an outcome, open the'
+                )}
+                &nbsp;
                 <Link href={contextURL + '/outcomes'}>{I18n.t('Outcomes')}</Link>
                 &nbsp;{I18n.t('view, locate the outcome, and click the')}&nbsp;
                 <b>{I18n.t('Edit')}</b>
@@ -140,7 +147,7 @@ const OutcomeDescriptionModal = ({outcome, isOpen, onCloseHandler}) => {
 OutcomeDescriptionModal.propTypes = {
   outcome: PropTypes.shape(outcomeShape).isRequired,
   isOpen: PropTypes.bool.isRequired,
-  onCloseHandler: PropTypes.func.isRequired
+  onCloseHandler: PropTypes.func.isRequired,
 }
 
 export default OutcomeDescriptionModal

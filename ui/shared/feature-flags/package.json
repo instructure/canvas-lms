@@ -3,5 +3,6 @@
   "private": true,
   "version": "1.0.0",
   "author": "neme",
-  "main": "./react/FeatureFlags.jsx"
+  "main": "./react/FeatureFlags.jsx",
+  "owner": "FOO"
 }

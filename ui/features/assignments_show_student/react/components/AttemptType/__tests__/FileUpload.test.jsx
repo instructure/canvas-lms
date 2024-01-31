@@ -74,15 +74,16 @@ async function makeProps(overrides) {
   return props
 }
 
-beforeAll(() => {
-  $('body').append('<div role="alert" id="flash_screenreader_holder" />')
-})
+// EVAL-3907 - remove or rewrite to remove spies on imports
+describe.skip('FileUpload', () => {
+  beforeAll(() => {
+    $('body').append('<div role="alert" id="flash_screenreader_holder" />')
+  })
 
-beforeEach(() => {
-  uploadFileModule.uploadFile = jest.fn().mockResolvedValue(null)
-})
+  beforeEach(() => {
+    uploadFileModule.uploadFile = jest.fn().mockResolvedValue(null)
+  })
 
-describe('FileUpload', () => {
   const uploadFiles = (element, files) => {
     fireEvent.change(element, {
       target: {

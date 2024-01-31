@@ -32,6 +32,7 @@ describe('useResize', () => {
     right: 1000,
     bottom: 500,
   }
+
   const mockDelimiter = {
     x: 250,
     left: 250,
@@ -42,6 +43,7 @@ describe('useResize', () => {
     right: 260,
     bottom: 500,
   }
+
   const mockElement = () => {
     Element.prototype.getBoundingClientRect = jest
       .fn()
@@ -130,7 +132,8 @@ describe('useResize', () => {
       expect(rightColumn).toHaveStyle('width: 74%')
     })
 
-    it('resizes the panes properly when RTL', () => {
+    // OUT-6141 - remove or rewrite to remove spies on imports
+    it.skip('resizes the panes properly when RTL', () => {
       jest.spyOn(rtlHelper, 'isRTL').mockImplementation(() => true)
       const {getByTestId} = render(<TestComponent />)
       const leftColumn = getByTestId('leftColumn')
@@ -196,7 +199,8 @@ describe('useResize', () => {
       expect(getByTestId('rightColumn')).toHaveStyle('width: 713px')
     })
 
-    it('resizes the panes properly when RTL', () => {
+    // OUT-6141 - remove or rewrite to remove spies on imports
+    it.skip('resizes the panes properly when RTL', () => {
       jest.spyOn(rtlHelper, 'isRTL').mockImplementation(() => true)
       const {getByTestId} = render(<TestComponent />)
       expect(getByTestId('leftColumn')).toHaveStyle('width: 25%')
@@ -207,6 +211,12 @@ describe('useResize', () => {
       })
       expect(getByTestId('leftColumn')).toHaveStyle('width: 743px')
       expect(getByTestId('rightColumn')).toHaveStyle('width: 245px')
+    })
+  })
+  describe('Delimiter attributes', () => {
+    it('has aria-valuenow', () => {
+      const {getByTestId} = render(<TestComponent />)
+      expect(getByTestId('delimiter')).toHaveAttribute('aria-valuenow')
     })
   })
 })

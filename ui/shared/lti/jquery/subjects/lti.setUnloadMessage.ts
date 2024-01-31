@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import htmlEscape from 'html-escape'
+import htmlEscape from '@instructure/html-escape'
 import {setUnloadMessage} from '../util'
 import type {LtiMessageHandler} from '../lti_message_handler'
 

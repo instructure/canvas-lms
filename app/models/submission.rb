@@ -680,10 +680,7 @@ class Submission < ActiveRecord::Base
   def update_final_score
     if saved_change_to_score? || saved_change_to_excused? ||
        (workflow_state_before_last_save == "pending_review" && workflow_state == "graded")
-      if skip_grade_calc
-        Rails.logger.debug "GRADES: NOT recomputing scores for submission #{global_id} because skip_grade_calc was set"
-      else
-        Rails.logger.debug "GRADES: submission #{global_id} score changed. recomputing grade for course #{context.global_id} user #{user_id}."
+      unless skip_grade_calc
         self.class.connection.after_transaction_commit do
           Enrollment.recompute_final_score_in_singleton(
             user_id,
@@ -3015,7 +3012,6 @@ class Submission < ActiveRecord::Base
     context.clear_todo_list_cache_later(:admins)
     user_ids = graded_user_ids.to_a
     if user_ids.any?
-      Rails.logger.debug "GRADES: recomputing scores in course #{context.id} for users #{user_ids} because of bulk submission update"
       context.recompute_student_scores(user_ids)
     end
   end

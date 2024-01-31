@@ -19,7 +19,6 @@
 /* eslint-disable no-void */
 
 import {extend} from '@canvas/backbone/utils'
-import _ from 'underscore'
 import $ from 'jquery'
 import Backbone from '@canvas/backbone'
 import template from '../../jst/PaginatedView.handlebars'
@@ -111,14 +110,10 @@ PaginatedView.prototype.fetchNextPageIfNeeded = function () {
         const shouldFetchNextPage =
           _this.distanceToBottom() < _this.distanceTillFetchNextPage || !_this.collection.length
         if ($(_this.paginationScrollContainer).is(':visible') && shouldFetchNextPage) {
-          return _this.collection.fetch(
-            _.extend(
-              {
-                page: 'next',
-              },
-              _this.fetchOptions
-            )
-          )
+          return _this.collection.fetch({
+            page: 'next',
+            ..._this.fetchOptions,
+          })
         }
       }
     })(this),

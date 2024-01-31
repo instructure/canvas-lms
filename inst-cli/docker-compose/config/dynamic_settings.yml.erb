@@ -13,12 +13,6 @@ development:
       address-book:
         app-host: "http://address-book.docker"
         secret: "opensesame"
-      live_events.yml: |-
-        aws_endpoint: http://quiz-api-kinesis.<%= Inst::Config.domain %>:4567
-        kinesis_stream_name: canvas-live-events
-        aws_access_key_id: fake-key-id
-        aws_secret_access_key_dec: toomanysecrets
-        aws_region: us-east-1
       live-events-subscription-service:
         app-host: "http://les.docker"
         sad-panda: null
@@ -70,6 +64,12 @@ development:
         nonprod_oauth_client_id: <%= ENV['CANVAS_CLIENT_ID'] %>
       # api_gateway_enabled: 'true'
       # api_gateway_uri: 'http://inst-gateway.docker/graphql'
+      live_events.yml: |-
+        aws_endpoint: http://quiz-api-kinesis.<%= Inst::Config.domain %>:4567
+        kinesis_stream_name: canvas-live-events
+        aws_access_key_id: fake-key-id
+        aws_secret_access_key_dec: toomanysecrets
+        aws_region: us-east-1
       auditors.yml: |
         write_paths:
           - active_record

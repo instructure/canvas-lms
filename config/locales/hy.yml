@@ -12217,6 +12217,7 @@ hy:
   points_points_b6b422e2: "Միավոր.  %{points}"
   points_possible_e57d5613: "Հնարավոր միավորներ"
   points_possible_must_be_0_or_more_for_selected_gra_f96a04e3: "Գնահատման այս ընտրված տեսակի համար հնարավոր միավորները պետք է լինեն 0-ից ոչ պակաս"
+  pointspossible_pts_624a6733: "%{pointsPossible} հնարավոր միավորներ"
   polling: 
     poll_sessions: 
       errors: 

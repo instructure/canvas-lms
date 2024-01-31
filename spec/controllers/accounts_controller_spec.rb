@@ -136,24 +136,22 @@ describe AccountsController do
 
   context "restore_user" do
     before(:once) do
-      @site_admin = site_admin_user
       account_with_admin
       @deleted_user = user_with_pseudonym(account: @account)
       @deleted_user.destroy
     end
 
-    before { user_session(@site_admin) }
+    before { user_session(@admin) }
 
-    it "allows site-admins to restore deleted users" do
+    it "allows admins to restore deleted users" do
       put "restore_user", params: { account_id: @account.id, user_id: @deleted_user.id }
       expect(@deleted_user.reload.workflow_state).to eq "registered"
       expect(@deleted_user.pseudonyms.take.workflow_state).to eq "active"
       expect(@deleted_user.user_account_associations.find_by(account: @account)).not_to be_nil
     end
 
-    it "does not allow standard admins to restore deleted users" do
-      # probably fine if someone wants to allow regular admins to do this at some point
-      user_session(@admin)
+    it "does not allow users without login permissions to restore deleted users" do
+      account_admin_user_with_role_changes(user: @admin, role_changes: { manage_user_logins: false })
       put "restore_user", params: { account_id: @account.id, user_id: @deleted_user.id }, format: "json"
       expect(response).to be_unauthorized
     end
@@ -1910,8 +1908,8 @@ describe AccountsController do
     end
 
     context "pagination" do
-      before(:once) do
-        Setting.set("eportfolio_moderation_results_per_page", 2)
+      before do
+        stub_const("AccountsController::EPORTFOLIO_MODERATION_PER_PAGE", 2)
       end
 
       it "does not return more than the specified results per page" do

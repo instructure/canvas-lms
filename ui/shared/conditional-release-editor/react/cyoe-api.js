@@ -17,7 +17,7 @@
  */
 
 import axios from '@canvas/axios'
-import parseLinkHeader from 'parse-link-header'
+import parseLinkHeader from '@canvas/parse-link-header'
 import numberHelper from '@canvas/i18n/numberHelper'
 
 import categories, {OTHER_ID} from './categories'

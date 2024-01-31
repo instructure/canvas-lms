@@ -110,6 +110,20 @@ create_course_subaccount_picker:
     people who can manually create courses to put those courses into any sub-account
     where they have enrollments.
 
+deleted_user_tools:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: 'Deleted User Tools'
+  description: |-
+    Adds a new page to the admin tools that allows admins to view and manage
+    deleted users. Also allows admins to search for deleted users with a checkbox
+    on the account user page.
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
+
 enhanced_course_creation_account_fetching:
   applies_to: SiteAdmin
   state: hidden
@@ -211,6 +225,13 @@ learner_passport:
   root_opt_in: true
   display_name: Learner Passport Prototype
   description: An in-progress working prototype of the Learner Passport feature.
+
+learner_passport_r2:
+  state: hidden
+  applies_to: RootAccount
+  root_opt_in: true
+  display_name: Learner Passport Prototype R2
+  description: An in-progress working prototype of the Learner Passport feature, Release 2.
 
 precise_link_replacements:
   state: hidden

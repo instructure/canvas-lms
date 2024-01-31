@@ -340,6 +340,7 @@ CanvasRails::Application.routes.draw do
     end
 
     resources :grading_standards, only: %i[index create update destroy]
+
     resources :assignment_groups do
       post "reorder" => "assignment_groups#reorder_assignments", :as => :reorder_assignments
       collection do
@@ -503,6 +504,8 @@ CanvasRails::Application.routes.draw do
     get "grading_schemes" => "grading_schemes_json#detail_list"
     get "grading_scheme_summaries" => "grading_schemes_json#summary_list"
     post "grading_schemes" => "grading_schemes_json#create"
+    post "grading_schemes/:id/archive" => "grading_schemes_json#archive"
+    post "grading_schemes/:id/unarchive" => "grading_schemes_json#unarchive"
     delete "grading_schemes/:id" => "grading_schemes_json#destroy"
     put "grading_schemes/:id" => "grading_schemes_json#update"
     get "grading_schemes/default" => "grading_schemes_json#show_default_grading_scheme"
@@ -692,10 +695,13 @@ CanvasRails::Application.routes.draw do
     resources :account_notifications, only: %i[create update destroy]
     concerns :announcements
     resources :submissions
-    delete "authentication_providers" => "authentication_providers#destroy_all", :as => :remove_all_authentication_providers
+
     put "sso_settings" => "authentication_providers#update_sso_settings",
         :as => :update_sso_settings
-
+    delete "authentication_providers" => "authentication_providers#destroy_all", :as => :remove_all_authentication_providers
+    resources :authentication_providers, only: %i[show] do
+      get :refresh_metadata, action: :refresh_saml_metadata
+    end
     resources :authentication_providers, only: %i[index create update destroy] do
       get :debugging, action: :debug_data
       put :debugging, action: :start_debugging
@@ -785,6 +791,9 @@ CanvasRails::Application.routes.draw do
 
     get "grading_schemes" => "grading_schemes_json#detail_list"
     get "grading_scheme_summaries" => "grading_schemes_json#summary_list"
+    get "grading_scheme_grouped" => "grading_schemes_json#grouped_list"
+    post "grading_schemes/:id/archive" => "grading_schemes_json#archive"
+    post "grading_schemes/:id/unarchive" => "grading_schemes_json#unarchive"
     post "grading_schemes" => "grading_schemes_json#create"
     delete "grading_schemes/:id" => "grading_schemes_json#destroy"
     put "grading_schemes/:id" => "grading_schemes_json#update"
@@ -930,6 +939,14 @@ CanvasRails::Application.routes.draw do
     get "passport/data/projects/show/:project_id" => "learner_passport#project_show"
     put "passport/data/projects/duplicate" => "learner_passport#project_duplicate"
     put "passport/data/projects/delete" => "learner_passport#project_delete"
+
+    get "passport/data/pathways" => "learner_passport#pathways_index"
+    get "passport/data/pathways/badges" => "learner_passport#pathway_badges_index"
+    get "passport/data/pathways/learner_groups" => "learner_passport#pathway_learner_groups_index"
+    get "passport/data/pathways/canvas_requirements" => "learner_passport#pathway_canvas_requirements_index"
+    put "passport/data/pathways/create" => "learner_passport#pathway_create"
+    post "passport/data/pathways/:pathway_id" => "learner_passport#pathway_update"
+    get "passport/data/pathways/show/:pathway_id" => "learner_passport#pathway_show"
 
     get "passport/data/skills" => "learner_passport#skills_index"
     get "passport/data/reset" => "learner_passport#reset"
@@ -2197,6 +2214,7 @@ CanvasRails::Application.routes.draw do
     scope(controller: :outcome_results) do
       get "courses/:course_id/outcome_rollups", action: :rollups, as: "course_outcome_rollups"
       get "courses/:course_id/outcome_results", action: :index, as: "course_outcome_results"
+      post "courses/:course_id/assign_outcome_order", action: :outcome_order, as: "course_outcomes_order"
     end
 
     scope(controller: :outcomes_academic_benchmark_import_api) do
@@ -2768,6 +2786,7 @@ CanvasRails::Application.routes.draw do
       get "register", action: :redirect_to_tool_registration
       get "registrations/uuid/:registration_uuid", action: :registration_by_uuid
       put "registrations/:registration_id/overlay", action: :update_registration_overlay
+      get "registrations/:registration_id/view", action: :registration_view, as: :lti_registration_config
       post "registrations", action: :create
     end
 

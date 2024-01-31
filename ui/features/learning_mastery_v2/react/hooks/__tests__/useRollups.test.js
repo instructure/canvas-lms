@@ -205,7 +205,8 @@ describe('useRollups', () => {
       expect(fetchMock).toHaveBeenCalledWith('/api/v1/courses/1/outcome_rollups', params)
     })
 
-    it('renders a flashAlert if the request fails', async () => {
+    // OUT-6141 - remove or rewrite to remove spies on imports
+    it.skip('renders a flashAlert if the request fails', async () => {
       fetchMock = jest.spyOn(axios, 'get').mockRejectedValue({})
       const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
       renderHook(() => useRollups({courseId: '1'}))

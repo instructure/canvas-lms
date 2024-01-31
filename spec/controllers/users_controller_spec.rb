@@ -2348,6 +2348,26 @@ describe UsersController do
       get "show", params: { id: @user.id }
       expect(response).to have_http_status :ok
     end
+
+    it "shows a deleted user from the account context if they have a deleted pseudonym for that account" do
+      course_with_teacher(active_all: 1, user: user_with_pseudonym)
+      account_admin_user(active_all: true)
+      user_session(@admin)
+      @teacher.remove_from_root_account(Account.default)
+
+      get "show", params: { account_id: Account.default.id, id: @teacher.id }
+      expect(response).to have_http_status :ok
+    end
+
+    it "does not show a deleted user from an account the user doesn't have access to" do
+      course_with_teacher(active_all: 1, user: user_with_pseudonym)
+      account_admin_user(active_all: true, account: account_model)
+      user_session(@admin)
+      @teacher.remove_from_root_account(@course.root_account)
+
+      get "show", params: { account_id: @course.root_account.id, id: @teacher.id }
+      expect(response).to have_http_status :unauthorized
+    end
   end
 
   describe "PUT 'update'" do

@@ -22,6 +22,10 @@ class AssignmentPage
     include SeleniumDependencies
 
     # Selectors
+    def assign_to_button
+      f(".assign-to-link")
+    end
+
     def course_pacing_notice_selector
       "[data-testid='CoursePacingNotice']"
     end
@@ -85,6 +89,11 @@ class AssignmentPage
 
     def course_pacing_notice
       f(course_pacing_notice_selector)
+    end
+
+    # Methods
+    def click_assign_to_button
+      assign_to_button.click
     end
   end
 end

@@ -74,7 +74,7 @@ const ContextModulesPublishIcon = ({
 
   const unpublishAll = () => {
     if (isPublishing) return
-    unpublishModule(courseId, moduleId)
+    unpublishModule(courseId, moduleId, false)
   }
 
   const publishAll = () => {
@@ -85,6 +85,11 @@ const ContextModulesPublishIcon = ({
   const publishModuleOnly = () => {
     if (isPublishing) return
     publishModule(courseId, moduleId, true)
+  }
+
+  const unpublishModuleOnly = () => {
+    if (isPublishing) return
+    unpublishModule(courseId, moduleId, true)
   }
 
   const publishedStatus = published ? I18n.t('published') : I18n.t('unpublished')
@@ -114,6 +119,9 @@ const ContextModulesPublishIcon = ({
         </MenuItem>
         <MenuItem onClick={unpublishAll}>
           <IconUnpublishedLine /> {I18n.t('Unpublish module and all items')}
+        </MenuItem>
+        <MenuItem onClick={unpublishModuleOnly}>
+          <IconUnpublishedLine /> {I18n.t('Unpublish module only')}
         </MenuItem>
       </Menu>
     </View>

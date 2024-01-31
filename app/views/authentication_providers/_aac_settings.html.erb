@@ -93,6 +93,15 @@
         <% end %>
 
         <div class="ic-Form-actions">
+          <% if !aac.new_record? && aac.auth_type == "saml" && @current_pseudonym.authentication_provider != aac %>
+              <%= link_to(account_authentication_provider_refresh_metadata_url(account, aac),
+                method: "get",
+                id: "refresh-metadata-#{aac.id}",
+                data: { disable_with: t('refreshing...')},
+                class: 'Button') do %>
+                <%= t("Refresh Metadata") %>
+              <% end %>
+          <% end %>
           <% if !aac.new_record? && @current_pseudonym.authentication_provider != aac %>
               <%= link_to(account_authentication_provider_url(account, aac),
                 method: "delete",

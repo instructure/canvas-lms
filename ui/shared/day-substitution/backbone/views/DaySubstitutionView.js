@@ -17,7 +17,6 @@
  */
 
 import {extend} from '@canvas/backbone/utils'
-import _ from 'underscore'
 import {map} from 'lodash'
 import Backbone from '@canvas/backbone'
 import I18n from '@canvas/i18n'
@@ -104,7 +103,7 @@ DaySubstitutionView.prototype.weekdays = function () {
     (function (_this) {
       return function (day) {
         return {
-          index: _.indexOf(dayArray, day),
+          index: (dayArray || []).indexOf(day),
           name: day,
         }
       }

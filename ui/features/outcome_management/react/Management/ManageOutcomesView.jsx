@@ -59,10 +59,11 @@ const ManageOutcomesView = ({
 
   const [isEnhanced, setIsEnhanced] = useState(false)
 
-  useEffect(()=>{
+  useEffect(() => {
     // for rendering math equations in outcome descriptions
     setIsEnhanced(!isEnhanced)
-  }, [outcomes, selectedOutcomes]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [outcomes, selectedOutcomes])
 
   if (loading && !outcomeGroup) {
     return (
@@ -166,7 +167,7 @@ const ManageOutcomesView = ({
                 friendlyDescription,
                 contextType,
                 contextId,
-                canArchive
+                canArchive,
               },
             }) => (
               <ManageOutcomeItem
@@ -224,7 +225,7 @@ ManageOutcomesView.propTypes = {
             canEdit: PropTypes.bool.isRequired,
             contextType: PropTypes.string,
             contextId: PropTypes.string,
-            canArchive: PropTypes.bool
+            canArchive: PropTypes.bool,
           }),
         })
       ),

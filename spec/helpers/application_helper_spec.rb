@@ -478,6 +478,11 @@ describe ApplicationHelper do
       expect(helper.help_link_classes).to eq "help_dialog_trigger"
     end
 
+    it "returns the default_support_url setting if set" do
+      Setting.set("default_support_url", "http://help.example.com")
+      expect(helper.help_link_url).to eq "http://help.example.com"
+    end
+
     it "overrides default help link with the configured support url" do
       support_url = "http://instructure.com"
       Account.default.update_attribute(:settings, { support_url: })

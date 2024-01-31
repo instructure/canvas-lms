@@ -2157,3 +2157,5 @@
   path: "/api/v1/accounts/:account_id/admins/self"
 - verb: GET
   path: "/api/v1/courses/:course_id/smartsearch"
+- verb: POST
+  path: "/api/v1/courses/:course_id/assign_outcome_order"

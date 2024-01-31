@@ -60,3 +60,11 @@ describe "utc_datetime" do
     expect(utc_datetime.iso8601).to eq "2000-01-03T20:15:00+00:00"
   end
 end
+
+describe "fancy_midnight" do
+  it "doesn't stomp on your Jenkins specs at midnight UTC" do
+    time = Time.now.beginning_of_day + 4.seconds
+    expect(CanvasTime.fancy_midnight(time)).to eq(time)
+    expect(CanvasTime.fancy_midnight(time.beginning_of_day)).to eq time.end_of_day
+  end
+end

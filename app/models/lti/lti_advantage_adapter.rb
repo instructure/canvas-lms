@@ -200,7 +200,7 @@ module Lti
         canvas_environment: ApplicationController.test_cluster_name || "prod",
         canvas_region: @context.shard.database_server.config[:region] || "not_configured"
       )
-      req.lti_storage_target = Lti::PlatformStorage.lti_storage_target if @include_storage_target
+      req.lti_storage_target = Lti::PlatformStorage::FORWARDING_TARGET if @include_storage_target
       req.as_json
     end
 

@@ -25,7 +25,7 @@ import {Text} from '@instructure/ui-text'
 import useFetchApi from '@canvas/use-fetch-api-hook'
 import type {SkillData} from '../types'
 import {stringToId} from './utils'
-import AddSkillModal from '../Portfolios/edit/personal_info/AddSkillModal'
+import AddSkillModal from './AddSkillModal'
 import SkillTag from './SkillTag'
 
 interface SkillSelectProps {

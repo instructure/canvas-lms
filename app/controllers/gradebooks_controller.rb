@@ -73,9 +73,11 @@ class GradebooksController < ApplicationController
            })
     return render :grade_summary_list unless @presenter.student
 
-    add_crumb(@presenter.student_name, named_context_url(@context,
-                                                         :context_student_grades_url,
-                                                         @presenter.student_id))
+    unless @context.root_account.feature_enabled?(:instui_nav)
+      add_crumb(@presenter.student_name, named_context_url(@context,
+                                                           :context_student_grades_url,
+                                                           @presenter.student_id))
+    end
 
     js_bundle :grade_summary, :rubric_assessment
     css_bundle :grade_summary
@@ -465,7 +467,7 @@ class GradebooksController < ApplicationController
     set_student_context_cards_js_env
 
     gradebook_is_editable = @context.grants_right?(@current_user, session, :manage_grades)
-    per_page = Setting.get("api_max_per_page", "50").to_i
+    per_page = Api::MAX_PER_PAGE
     teacher_notes = @context.custom_gradebook_columns.not_deleted.where(teacher_notes: true).first
 
     last_exported_gradebook_csv = GradebookCSV.last_successful_export(course: @context, user: @current_user)
@@ -544,6 +546,7 @@ class GradebooksController < ApplicationController
       late_policy: @context.late_policy.as_json(include_root: false),
       login_handle_name: root_account.settings[:login_handle_name],
       message_attachment_upload_folder_id: @current_user.conversation_attachments_folder.id.to_s,
+      multiselect_gradebook_filters_enabled: Account.site_admin.feature_enabled?(:multiselect_gradebook_filters),
       outcome_gradebook_enabled: outcome_gradebook_enabled?,
       performance_controls: gradebook_performance_controls,
       post_grades_feature: post_grades_feature?,
@@ -588,7 +591,7 @@ class GradebooksController < ApplicationController
     last_exported_gradebook_csv = GradebookCSV.last_successful_export(course: @context, user: @current_user)
     last_exported_attachment = last_exported_gradebook_csv.try(:attachment)
     teacher_notes = @context.custom_gradebook_columns.not_deleted.where(teacher_notes: true).first
-    per_page = Setting.get("api_max_per_page", "50").to_i
+    per_page = Api::MAX_PER_PAGE
     gradebook_options = {
       active_grading_periods: active_grading_periods_json,
       attachment_url: authenticated_download_url(last_exported_attachment),
@@ -640,7 +643,7 @@ class GradebooksController < ApplicationController
     set_student_context_cards_js_env
 
     gradebook_is_editable = @context.grants_right?(@current_user, session, :manage_grades)
-    per_page = Setting.get("api_max_per_page", "50").to_i
+    per_page = Api::MAX_PER_PAGE
     teacher_notes = @context.custom_gradebook_columns.not_deleted.where(teacher_notes: true).first
     ag_includes = %i[assignments assignment_visibility grades_published]
 
@@ -1462,7 +1465,7 @@ class GradebooksController < ApplicationController
   end
 
   def gradebook_performance_controls
-    per_page = Api.max_per_page
+    per_page = Api::MAX_PER_PAGE
 
     {
       active_request_limit: Setting.get("gradebook.active_request_limit", "12").to_i,

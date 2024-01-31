@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {DateTimeInput} from '@instructure/ui-date-time-input'
@@ -32,6 +32,67 @@ export const AssignmentDueDate = ({
   assignToErrorMessages,
 }) => {
   const [assignedInformation, setAssignedInformation] = useState(initialAssignedInformation)
+  const [dueDateErrorMessage, setDueDateErrorMessage] = useState([])
+  const [availableFromAndUntilErrorMessage, setAvailableFromAndUntilErrorMessage] = useState([])
+
+  const validateDueDate = (dueDate, availableFrom, availableUntil) => {
+    const due = new Date(dueDate)
+    const from = availableFrom ? new Date(availableFrom) : null
+    const until = availableUntil ? new Date(availableUntil) : null
+
+    if (from && due < from) {
+      return I18n.t('Due date must not be before the Available From date.')
+    }
+    if (until && due > until) {
+      return I18n.t('Due date must not be after the Available Until date.')
+    }
+    return null
+  }
+
+  const validateAvailableFromAndUntil = (availableFrom, availableUntil) => {
+    const from = availableFrom ? new Date(availableFrom) : null
+    const until = availableUntil ? new Date(availableUntil) : null
+
+    if (from && until && from > until) {
+      return I18n.t('Unlock date cannot be after lock date')
+    }
+    return null
+  }
+
+  useEffect(() => {
+    const {dueDate, availableFrom, availableUntil} = assignedInformation
+
+    const dueDateError = validateDueDate(dueDate, availableFrom, availableUntil)
+    const availableFromAndUntilError = validateAvailableFromAndUntil(availableFrom, availableUntil)
+
+    if (dueDateError) {
+      setDueDateErrorMessage([
+        {
+          text: dueDateError,
+          type: 'error',
+        },
+      ])
+    } else {
+      setDueDateErrorMessage([])
+    }
+
+    if (availableFromAndUntilError) {
+      setAvailableFromAndUntilErrorMessage([
+        {
+          text: availableFromAndUntilError,
+          type: 'error',
+        },
+      ])
+    } else {
+      setAvailableFromAndUntilErrorMessage([])
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    assignedInformation.dueDate,
+    assignedInformation.availableFrom,
+    assignedInformation.availableUntil,
+  ])
 
   // Form properties
   return (
@@ -72,9 +133,10 @@ export const AssignmentDueDate = ({
           value={assignedInformation.dueDate}
           invalidDateTimeMessage={I18n.t('Invalid date and time')}
           layout="columns"
-          datePlaceholder={I18n.t('Select Date')}
+          datePlaceholder={I18n.t('Select Assignment Due Date')}
           dateRenderLabel=""
           timeRenderLabel=""
+          messages={dueDateErrorMessage}
         />
         <DateTimeInput
           description={I18n.t('Available from')}
@@ -88,9 +150,10 @@ export const AssignmentDueDate = ({
           value={assignedInformation.availableFrom}
           invalidDateTimeMessage={I18n.t('Invalid date and time')}
           layout="columns"
-          datePlaceholder={I18n.t('Select Date')}
+          datePlaceholder={I18n.t('Select Assignment Available From Date')}
           dateRenderLabel=""
           timeRenderLabel=""
+          messages={availableFromAndUntilErrorMessage}
         />
         <DateTimeInput
           description={I18n.t('Until')}
@@ -104,9 +167,10 @@ export const AssignmentDueDate = ({
           value={assignedInformation.availableUntil}
           invalidDateTimeMessage={I18n.t('Invalid date and time')}
           layout="columns"
-          datePlaceholder={I18n.t('Select Date')}
+          datePlaceholder={I18n.t('Select Assignment Available Until Date')}
           dateRenderLabel=""
           timeRenderLabel=""
+          messages={availableFromAndUntilErrorMessage}
         />
       </FormFieldGroup>
     </>

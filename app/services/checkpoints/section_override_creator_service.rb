@@ -20,8 +20,6 @@
 class Checkpoints::SectionOverrideCreatorService < ApplicationService
   include Checkpoints::DateOverrider
 
-  class SetIdRequiredError < StandardError; end
-
   def initialize(checkpoint:, override:)
     super()
     @checkpoint = checkpoint
@@ -29,7 +27,9 @@ class Checkpoints::SectionOverrideCreatorService < ApplicationService
   end
 
   def call
-    section_id = @override.fetch(:set_id) { raise SetIdRequiredError, "set_id is required, but was not provided" }
+    section_id = @override.fetch(:set_id) { raise Checkpoints::SetIdRequiredError, "set_id is required, but was not provided" }
+    raise Checkpoints::SetIdRequiredError, "set_id is required, but was not provided" if section_id.blank?
+
     section = @checkpoint.course.active_course_sections.find(section_id)
     override = create_override(assignment: @checkpoint, section:)
 

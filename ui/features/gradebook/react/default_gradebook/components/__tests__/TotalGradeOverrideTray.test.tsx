@@ -144,7 +144,8 @@ describe('TotalGradeOverrideTray Tests', () => {
     })
   })
 
-  describe('radio input tests', () => {
+  // EVAL-3907 - remove or rewrite to remove spies on imports
+  describe.skip('radio input tests', () => {
     it('renders each radio input', () => {
       const {getByLabelText} = getComponent()
       const noneRadio = getByLabelText('None')

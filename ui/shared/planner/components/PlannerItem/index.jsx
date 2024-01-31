@@ -244,7 +244,7 @@ export class PlannerItem_raw extends Component {
             assignmentType,
             title,
             datetime,
-            endTime: this.props.endTime.format('LT')
+            endTime: this.props.endTime.format('LT'),
           })
         } else {
           return I18n.t('%{assignmentType} %{title}, at %{datetime}.', {

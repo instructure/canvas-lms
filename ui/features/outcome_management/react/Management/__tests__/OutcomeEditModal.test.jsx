@@ -35,7 +35,8 @@ injectGlobalAlertContainers()
 
 jest.useFakeTimers()
 
-describe('OutcomeEditModal', () => {
+// OUT-6141 - remove or rewrite to remove spies on imports
+describe.skip('OutcomeEditModal', () => {
   let onCloseHandlerMock
   let showFlashAlertSpy
   let onEditLearningOutcomeHandlerMock

@@ -6821,22 +6821,44 @@ describe Course do
     before :once do
       course_with_teacher active_all: true
       student_in_course active_enrollment: true
-      @course.context_modules.create!(name: "published")
-      @course.context_modules.create!(name: "unpublished").unpublish!
+      @m1 = @course.context_modules.create!(name: "published 1")
+      @m2 = @course.context_modules.create!(name: "published 2")
+      @m3 = @course.context_modules.create!(name: "unpublished", workflow_state: "unpublished")
     end
 
     it "shows published modules to students" do
-      expect(@course.modules_visible_to(@student).map(&:name)).to match_array %w[published]
+      expect(@course.modules_visible_to(@student).pluck(:name)).to contain_exactly("published 1", "published 2")
     end
 
     it "shows all modules to teachers" do
-      expect(@course.modules_visible_to(@teacher).map(&:name)).to match_array %w[published unpublished]
+      expect(@course.modules_visible_to(@teacher).pluck(:name)).to contain_exactly("published 1", "published 2", "unpublished")
     end
 
     it "shows all modules to teachers even when course is concluded" do
       @course.complete!
       expect(@course.grants_right?(@teacher, :manage_content)).to be(false)
-      expect(@course.modules_visible_to(@teacher).map(&:name)).to match_array %w[published unpublished]
+      expect(@course.modules_visible_to(@teacher).pluck(:name)).to contain_exactly("published 1", "published 2", "unpublished")
+    end
+
+    context "when the differentiated_modules flag is enabled" do
+      before :once do
+        Account.site_admin.enable_feature! :differentiated_modules
+        @m2.assignment_overrides.create!
+      end
+
+      it "shows only modules that don't have overrides to student" do
+        expect(@course.modules_visible_to(@student).pluck(:name)).to contain_exactly("published 1")
+      end
+
+      it "shows published modules with overrides as long as student has an override" do
+        @m2.assignment_overrides.create!(set: @course.default_section)
+        @m3.assignment_overrides.create!(set: @course.default_section)
+        expect(@course.modules_visible_to(@student).pluck(:name)).to contain_exactly("published 1", "published 2")
+      end
+
+      it "shows all modules to teachers regardless of visibility status" do
+        expect(@course.modules_visible_to(@teacher).pluck(:name)).to contain_exactly("published 1", "published 2", "unpublished")
+      end
     end
   end
 

@@ -142,10 +142,10 @@ describe ConversationsController, type: :request do
       end
     end
 
-    it "ignores include[]=participant_avatars if you're going to break everything" do
+    it "ignores include[]=participant_avatars if there are too many participants" do
       conversation(@bob, workflow_state: "read")
 
-      Setting.set("max_conversation_participant_count_for_avatars", "1")
+      stub_const("Api::V1::Conversation::AVATAR_INCLUDE_LIMIT", 1)
 
       json = api_call(:get,
                       "/api/v1/conversations.json",

@@ -35,6 +35,9 @@ import FilterNavDateModal from './FilterDateModal'
 import FilterTray from './FilterTray'
 import {useFilterDropdownData} from './FilterNav.utils'
 import type {GradeStatus} from '@canvas/grading/accountGradingStatus'
+import {IconArrowOpenDownLine} from '@instructure/ui-icons'
+import {View} from '@instructure/ui-view'
+import {FilterNavPopover} from './FilterNavPopover'
 
 const I18n = useI18nScope('gradebook')
 
@@ -45,6 +48,7 @@ export type FilterNavProps = {
   gradingPeriods: CamelizedGradingPeriod[]
   studentGroupCategories: StudentGroupCategoryMap
   customStatuses: GradeStatus[]
+  multiselectGradebookFiltersEnabled: boolean
 }
 
 export default function FilterNav({
@@ -54,6 +58,7 @@ export default function FilterNav({
   sections,
   studentGroupCategories,
   customStatuses,
+  multiselectGradebookFiltersEnabled,
 }: FilterNavProps) {
   const [isTrayOpen, setIsTrayOpen] = useState(false)
   const [isDateModalOpen, setIsDateModalOpen] = useState(false)
@@ -64,51 +69,14 @@ export default function FilterNav({
   const appliedFilters = useStore(state => state.appliedFilters)
   const applyFiltersButtonRef = useRef<HTMLButtonElement>(null)
   const filterTagRef = useRef<(HTMLElement | null)[]>([])
+  const [isFilterNavPopoverOpen, setIsFilterNavPopoverOpen] = useState<boolean>(false)
+  const [openFilterKey, setOpenFilterKey] = useState<string | null>(null)
 
   const handleClearFilters = () => {
     setAnnouncement(I18n.t('All Filters Have Been Cleared'))
     applyFilters([])
     applyFiltersButtonRef.current?.focus()
   }
-
-  const activeFilterComponents = appliedFilters.filter(isFilterNotEmpty).map((filter, i) => {
-    const label = getLabelForFilter(
-      filter,
-      assignmentGroups,
-      gradingPeriods,
-      modules,
-      sections,
-      studentGroupCategories,
-      customStatuses
-    )
-
-    const handleDeleteFilterClick = () => {
-      setAnnouncement(I18n.t('Removed %{filterName} Filter', {filterName: label}))
-      useStore.setState({
-        appliedFilters: appliedFilters.filter(c => c.id !== filter.id),
-      })
-    }
-
-    return (
-      <Tag
-        data-testid={`applied-filter-${label}`}
-        key={`staged-filter-${filter.id}`}
-        elementRef={(e: Element | null) => {
-          filterTagRef.current[i] = e as HTMLElement
-        }}
-        text={
-          <AccessibleContent alt={I18n.t('Remove %{filterName} Filter', {filterName: label})}>
-            <Tooltip renderTip={label} positionTarget={filterTagRef.current[i]}>
-              {label}
-            </Tooltip>
-          </AccessibleContent>
-        }
-        dismissible={true}
-        onClick={handleDeleteFilterClick}
-        margin="0 xx-small 0 0"
-      />
-    )
-  })
 
   const onToggleFilterPreset = useCallback(
     (filterPreset: FilterPreset) => {
@@ -132,6 +100,133 @@ export default function FilterNav({
     onToggleFilterPreset,
     customStatuses,
     onToggleDateModal: () => setIsDateModalOpen(true),
+  })
+
+  const activeFilterComponents = appliedFilters.filter(isFilterNotEmpty).map((filter, i) => {
+    const label = getLabelForFilter(
+      filter,
+      assignmentGroups,
+      gradingPeriods,
+      modules,
+      sections,
+      studentGroupCategories,
+      customStatuses
+    )
+
+    const handleDeleteFilterClick = () => {
+      setAnnouncement(I18n.t('Removed %{filterName} Filter', {filterName: label}))
+      useStore.setState({
+        appliedFilters: appliedFilters.filter(c => c.id !== filter.id),
+      })
+      setIsFilterNavPopoverOpen(false)
+      setOpenFilterKey('')
+    }
+
+    const handleSelectFilterClick = () => {
+      setAnnouncement(I18n.t('Added %{filterName} Filter', {filterName: label}))
+
+      if (filter.type === 'start-date' || filter.type === 'end-date') {
+        setIsDateModalOpen(true)
+      }
+    }
+
+    const handlePopoverClick = () => {
+      if (openFilterKey !== filterKey) {
+        setIsFilterNavPopoverOpen(true)
+        setOpenFilterKey(filterKey)
+        return
+      }
+      setIsFilterNavPopoverOpen(false)
+      setOpenFilterKey('')
+    }
+
+    const getFilterKey = () => {
+      const submissionStateFilterValues = [
+        'has-ungraded-submissions',
+        'has-submissions',
+        'has-no-submissions',
+        'has-unposted-grades',
+      ]
+
+      switch (filter.type) {
+        case 'section':
+          return 'sections'
+        case 'assignment-group':
+          return 'assignment-groups'
+        case 'module':
+          return 'modules'
+        case 'grading-period':
+          return 'grading-periods'
+        case 'student-group':
+          return 'student-groups'
+        case 'start-date':
+          return 'start-date'
+        case 'end-date':
+          return 'end-date'
+        case 'submissions':
+          return submissionStateFilterValues.includes(filter.value ?? '') ? 'submissions' : 'status'
+        default:
+          return ''
+      }
+    }
+
+    const filterKey = getFilterKey()
+    const selectedFilterItem = filterItems[filterKey]
+    const menuItems = selectedFilterItem?.items ?? []
+    const menuGroups = selectedFilterItem?.itemGroups ?? []
+
+    return multiselectGradebookFiltersEnabled ? (
+      <FilterNavPopover
+        key={`staged-filter-popover-${filter.id}`}
+        data-testid={`applied-filter-popover-${label}`}
+        renderTrigger={
+          <Tag
+            data-testid={`applied-filter-${label}`}
+            key={`staged-filter-${filter.id}`}
+            elementRef={(e: Element | null) => {
+              filterTagRef.current[i] = e as HTMLElement
+            }}
+            text={
+              <AccessibleContent alt={I18n.t('%{filterName} Filter Options', {filterName: label})}>
+                <Tooltip renderTip={label} positionTarget={filterTagRef.current[i]}>
+                  {label}
+                </Tooltip>
+                <View as="span" margin="0 0 0 small">
+                  <IconArrowOpenDownLine />
+                </View>
+              </AccessibleContent>
+            }
+            onClick={handlePopoverClick}
+            margin="0 xx-small 0 0"
+          />
+        }
+        isOpen={isFilterNavPopoverOpen && openFilterKey === filterKey}
+        filterType={filter.type}
+        menuGroups={menuGroups}
+        menuItems={menuItems}
+        handleHideFilter={handlePopoverClick}
+        handleRemoveFilter={handleDeleteFilterClick}
+        handleSelectFilter={handleSelectFilterClick}
+      />
+    ) : (
+      <Tag
+        data-testid={`applied-filter-${label}`}
+        key={`staged-filter-${filter.id}`}
+        elementRef={(e: Element | null) => {
+          filterTagRef.current[i] = e as HTMLElement
+        }}
+        text={
+          <AccessibleContent alt={I18n.t('Remove %{filterName} Filter', {filterName: label})}>
+            <Tooltip renderTip={label} positionTarget={filterTagRef.current[i]}>
+              {label}
+            </Tooltip>
+          </AccessibleContent>
+        }
+        dismissible={true}
+        onClick={handleDeleteFilterClick}
+        margin="0 xx-small 0 0"
+      />
+    )
   })
 
   const startDate = appliedFilters.find((c: Filter) => c.type === 'start-date')?.value || null

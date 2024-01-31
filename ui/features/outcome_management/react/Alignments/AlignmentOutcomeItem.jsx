@@ -84,7 +84,9 @@ const AlignmentOutcomeItem = ({title, description, alignments}) => {
         <Flex.Item size="50%" shouldGrow={true}>
           <div style={{padding: '0.625rem 0'}}>
             <Heading level="h4" as="h3">
-              <div style={{overflowWrap: 'break-word'}} data-testid="alignment-outcome-item-title">{addZeroWidthSpace(title)}</div>
+              <div style={{overflowWrap: 'break-word'}} data-testid="alignment-outcome-item-title">
+                {addZeroWidthSpace(title)}
+              </div>
             </Heading>
           </div>
         </Flex.Item>

@@ -1773,12 +1773,6 @@ describe CoursesController, type: :request do
           expect(@course.reload.grade_passback_setting).to eq "disabled"
         end
 
-        it "updates the grade_passback_setting to custom setting" do
-          Setting.set("valid_grade_passback_settings", "one,two,three")
-          api_call(:put, @path, @params, course: { grade_passback_setting: "one" })
-          expect(@course.reload.grade_passback_setting).to eq "one"
-        end
-
         it "removes the grade_passback_setting" do
           @course.update_attribute(:grade_passback_setting, "nightly_sync")
           api_call(:put, @path, @params, course: { grade_passback_setting: "" })
@@ -2528,6 +2522,11 @@ describe CoursesController, type: :request do
     it "includes account if requested" do
       json = api_call(:get, "/api/v1/courses.json", { controller: "courses", action: "index", format: "json" }, { include: ["account"] })
       expect(json.first.dig("account", "name")).to eq "Default Account"
+    end
+
+    it "includes subaccount_id if requested for backwards compatibility" do
+      json = api_call(:get, "/api/v1/courses.json", { controller: "courses", action: "index", format: "json" }, { include: ["subaccount"] })
+      expect(json.first["subaccount_id"]).to eq @course1.account.id
     end
 
     it "includes subaccount_name if requested for backwards compatibility" do

@@ -489,6 +489,50 @@ describe "discussions" do
             expect(f("input[data-testid='legal-copyright']").attribute("value")).to eq "(C) 2014 XYZ Corp"
           end
         end
+
+        it "saves all changes correctly" do
+          get "/courses/#{course.id}/discussion_topics/#{@topic_all_options.id}/edit"
+
+          replace_content(f("input[placeholder='Topic Title']"), "new title", { tab_out: true })
+
+          clear_tiny(f("#discussion-topic-message-body"), "discussion-topic-message-body_ifr")
+          type_in_tiny("#discussion-topic-message-body", "new message")
+
+          driver.action.move_to(f("span[data-testid='removable-item']")).perform
+          f("[data-testid='remove-button']").click
+          _, fullpath, _data = get_file("testfile5.zip")
+          f("[data-testid='attachment-input']").send_keys(fullpath)
+
+          f("button[title='Remove All Sections']").click
+          f("input[data-testid='section-select']").click
+          fj("li:contains('value for name')").click
+
+          # we cannot change anonymity on edit, so we just verify its disabled
+          expect(ffj("fieldset:contains('Anonymous Discussion') input[disabled]").count).to eq 3
+
+          force_click("input[value='must-respond-before-viewing-replies']")
+
+          force_click("input[value='enable-podcast-feed']")
+          expect(f("body")).not_to contain_jqcss("input[value='include-student-replies-in-podcast-feed']")
+
+          force_click("input[value='allow-liking']")
+          expect(f("body")).not_to contain_jqcss("input[value='only-graders-can-like']")
+
+          force_click("input[value='add-to-student-to-do']")
+
+          fj("button:contains('Save')").click
+
+          @topic_all_options.reload
+          expect(@topic_all_options.title).to eq "new title"
+          expect(@topic_all_options.message).to include "new message"
+          expect(@topic_all_options.attachment_id).to eq Attachment.last.id
+          expect(@topic_all_options.is_section_specific).to be_truthy
+          expect(@topic_all_options.require_initial_post).to be_falsey
+          expect(@topic_all_options.podcast_enabled).to be_falsey
+          expect(@topic_all_options.allow_rating).to be_falsey
+          expect(@topic_all_options.only_graders_can_rate).to be_falsey
+          expect(@topic_all_options.todo_date).to be_nil
+        end
       end
 
       context "ungraded group" do
@@ -561,11 +605,15 @@ describe "discussions" do
 
       context "graded" do
         it "displays graded assignment options correctly when initially opening edit page" do
+          grading_standard = course.grading_standards.create!(title: "Win/Lose", data: [["Winner", 0.94], ["Loser", 0]])
+
+          # Create a grading standard and make sure it is selected
           discussion_assignment_options = {
             name: "assignment",
             points_possible: 10,
-            grading_type: "percent",
+            grading_type: "letter_grade",
             assignment_group: course.assignment_groups.create!(name: "assignment group"),
+            grading_standard_id: grading_standard.id,
           }
 
           discussion_assignment_peer_review_options = {
@@ -586,16 +634,22 @@ describe "discussions" do
             assignment: discussion_assignment,
           }
 
+          discussion_due_date = 5.days.from_now
+
+          course_section = course.course_sections.create!(name: "section alpha")
           graded_discussion = course.discussion_topics.create!(all_graded_discussion_options)
+          graded_discussion.assignment.assignment_overrides.create!(set_type: "CourseSection", set_id: course_section.id, due_at: discussion_due_date)
 
           get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/edit"
-
+          # Grading scheme sub menu is selected
+          expect(fj("span:contains('#{grading_standard.title}')").present?).to be_truthy
+          expect(fj("span:contains('Manage All Grading Schemes')").present?).to be_truthy
           # Graded checkbox
           expect(is_checked(f("input[data-testid='graded-checkbox']"))).to be_truthy
           # Points possible
           expect(f("input[data-testid='points-possible-input']").attribute("value")).to eq "10"
           # Grading type
-          expect(f("input[data-testid='display-grade-input']").attribute("value")).to eq "Percentage"
+          expect(f("input[data-testid='display-grade-input']").attribute("value")).to eq "Letter Grade"
           # Assignment Group
           expect(f("input[data-testid='assignment-group-input']").attribute("value")).to eq "assignment group"
           # Peer review checkboxes
@@ -610,7 +664,9 @@ describe "discussions" do
           # makes an exact comparison too fragile.
           expect(ff("input[placeholder='Select Date']")[0].attribute("value")).not_to be_empty
 
-          # Add additional tests for overrides and due dates when completed
+          expect(f("span[data-testid='assign-to-select-span']").present?).to be_truthy
+          expect(fj("span:contains('#{course_section.name}')").present?).to be_truthy
+          expect(f("input[placeholder='Select Assignment Due Date']").attribute("value")).to eq format_date_for_view(discussion_due_date, :long)
         end
 
         it "allows editing the assignment group for the graded discussion" do

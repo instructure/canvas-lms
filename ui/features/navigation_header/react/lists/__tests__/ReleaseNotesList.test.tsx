@@ -21,9 +21,6 @@ import {render as testingLibraryRender, act, waitFor} from '@testing-library/rea
 import ReleaseNotesList from '../ReleaseNotesList'
 import userEvent from '@testing-library/user-event'
 import {QueryProvider, queryClient} from '@canvas/query'
-import {enableFetchMocks} from 'jest-fetch-mock'
-
-enableFetchMocks()
 
 const render = (children: unknown) =>
   testingLibraryRender(<QueryProvider>{children}</QueryProvider>)

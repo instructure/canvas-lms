@@ -25,7 +25,8 @@ import OutcomesContext, {
   ROOT_GROUP_ID,
 } from '@canvas/outcomes/react/contexts/OutcomesContext'
 
-describe('GroupActionDrillDown', () => {
+// OUT-6141 - remove or rewrite to remove spies on imports
+describe.skip('GroupActionDrillDown', () => {
   let onCollectionClick, showFlashAlertSpy, setShowOutcomesView
 
   const collections = {

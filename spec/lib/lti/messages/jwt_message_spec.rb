@@ -721,7 +721,7 @@ describe Lti::Messages::JwtMessage do
 
     it "expands variable expansions" do
       Lti::Messages::JwtMessage.generate_id_token(jwt_message.generate_post_payload)
-      expect(message_custom["has_expansion"]).to eq user.id
+      expect(message_custom["has_expansion"]).to eq user.id.to_s
     end
 
     context "when custom parameters claim group disabled" do

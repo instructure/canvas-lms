@@ -17,6 +17,7 @@
  */
 
 const {defaults} = require('jest-config')
+const {swc} = require('./ui-build/webpack/webpack.rules')
 
 const esModules = ['mime'].join('|')
 
@@ -25,7 +26,6 @@ module.exports = {
     '\\.svg$': '<rootDir>/jest/imageMock.js',
     'node_modules-version-of-backbone': require.resolve('backbone'),
     'node_modules-version-of-react-modal': require.resolve('react-modal'),
-    underscore$: '<rootDir>/packages/lodash-underscore/index.js',
     '^Backbone$': '<rootDir>/public/javascripts/Backbone.js',
     // jest can't import the icons
     '@instructure/ui-icons/es/svg': '<rootDir>/packages/canvas-rce/src/rce/__tests__/_mockIcons.js',
@@ -38,7 +38,7 @@ module.exports = {
     'crypto-es': '<rootDir>/packages/canvas-rce/src/rce/__mocks__/_mockCryptoEs.ts',
   },
   roots: ['<rootDir>/ui', 'gems/plugins', 'public/javascripts'],
-  moduleDirectories: ['ui/shims', 'public/javascripts', 'node_modules'],
+  moduleDirectories: ['public/javascripts', 'node_modules'],
   reporters: [
     'default',
     [
@@ -80,26 +80,22 @@ module.exports = {
   transform: {
     '\\.handlebars$': '<rootDir>/jest/handlebarsTransformer.js',
     '\\.graphql$': '<rootDir>/jest/rawLoader.js',
-    '\\.[jt]sx?$': [
-      'babel-jest',
+    '^.+\\.(j|t)s?$': [
+      '@swc/jest',
       {
-        configFile: false,
-        presets: [
-          [
-            '@babel/preset-env',
-            {
-              // until we're on Jest 27 and can look into loading ESMs natively;
-              // https://jestjs.io/docs/ecmascript-modules
-              modules: 'auto',
-            },
-          ],
-          ['@babel/preset-react', {useBuiltIns: true}],
-          ['@babel/preset-typescript', {}],
-        ],
-        targets: {
-          node: 'current',
-        },
+        jsc: swc[0].use.options.jsc,
       },
     ],
+    '^.+\\.(j|t)sx?$': [
+      '@swc/jest',
+      {
+        jsc: swc[1].use.options.jsc,
+      },
+    ],
+  },
+
+  testEnvironmentOptions: {
+    // https://github.com/mswjs/examples/blob/main/examples/with-jest/jest.config.ts#L20
+    customExportConditions: [''],
   },
 }

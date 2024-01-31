@@ -55,6 +55,7 @@ export default class Quiz extends Backbone.Model {
     this.objectType = this.objectType.bind(this)
     this.isDuplicating = this.isDuplicating.bind(this)
     this.isMigrating = this.isMigrating.bind(this)
+    this.isImporting = this.isImporting.bind(this)
     this.importantDates = this.importantDates.bind(this)
 
     super.initialize(...arguments)
@@ -234,6 +235,10 @@ export default class Quiz extends Backbone.Model {
     return this.get('workflow_state') === 'migrating'
   }
 
+  isImporting() {
+    return this.get('workflow_state') === 'importing'
+  }
+
   name(newName) {
     if (!(arguments.length > 0)) return this.get('title')
     return this.set('title', newName)
@@ -312,6 +317,9 @@ export default class Quiz extends Backbone.Model {
     }
     if (this.isMigrating()) {
       this.pollUntilFinished(interval, this.isMigrating)
+    }
+    if (this.isImporting()) {
+      this.pollUntilFinished(interval, this.isImporting)
     }
   }
 

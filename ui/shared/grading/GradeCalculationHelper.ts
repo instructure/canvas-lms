@@ -17,7 +17,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'underscore'
+import {map, reduce} from 'lodash'
 import Big from 'big.js'
 
 export function add(a: number, b: number): Big {
@@ -41,12 +41,12 @@ export function bigSum(values: Big[]) {
 }
 
 export function sum(collection) {
-  const bigValue = _.reduce(collection, add, 0)
+  const bigValue = reduce(collection, add, 0)
   return toNumber(bigValue)
 }
 
 export function sumBy(collection, attr) {
-  const values = _.map(collection, attr)
+  const values = map(collection, attr)
   return sum(values)
 }
 

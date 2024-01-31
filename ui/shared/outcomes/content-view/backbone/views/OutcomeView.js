@@ -30,6 +30,7 @@ import {showConfirmOutcomeEdit} from '../../react/ConfirmOutcomeEditModal'
 import {addCriterionInfoButton} from '../../react/CriterionInfo'
 import 'jqueryui/dialog'
 import CalculationMethodContent from '@canvas/grading/CalculationMethodContent'
+import {raw} from '@instructure/html-escape'
 
 const I18n = useI18nScope('OutcomeView')
 
@@ -247,7 +248,7 @@ export default class OutcomeView extends OutcomeContentBase {
     }
     const points = this.$('.points_possible')
     points.html(
-      $.raw(
+      raw(
         I18n.t('%{points_possible} Points', {
           points_possible: I18n.n(total, {precision: 2, strip_insignificant_zeros: true}),
         })

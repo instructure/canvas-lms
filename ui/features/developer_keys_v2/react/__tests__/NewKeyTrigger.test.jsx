@@ -33,9 +33,9 @@ let wrapper = 'empty wrapper'
 
 beforeEach(() => {
   window.ENV = {
-    FEATURES:{
-      lti_dynamic_registration: true
-    }
+    FEATURES: {
+      lti_dynamic_registration: true,
+    },
   }
   wrapper = mount(
     <DeveloperKeyModalTrigger store={store} actions={actions} setAddKeyButtonRef={() => {}} />

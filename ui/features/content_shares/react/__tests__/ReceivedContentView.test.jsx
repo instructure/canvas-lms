@@ -39,7 +39,9 @@ describe('view of received content', () => {
     if (liveRegion) liveRegion.remove()
   })
 
-  afterEach(fetchMock.restore)
+  afterEach(() => {
+    fetchMock.restore()
+  })
 
   it('renders spinner while loading', () => {
     useFetchApi.mockImplementationOnce(({loading}) => loading(true))

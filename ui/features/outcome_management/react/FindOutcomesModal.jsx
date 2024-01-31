@@ -343,7 +343,6 @@ const FindOutcomesModal = ({
               tabIndex="0"
               role="separator"
               aria-orientation="vertical"
-              aria-hidden="true"
               onKeyDown={onKeyDownHandler}
               elementRef={setDelimiterRef}
             >

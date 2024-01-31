@@ -1,6 +1,3 @@
-p {
-  line-height: 1.5;
-}
 
 .label {
   display: inline-block;
@@ -78,7 +75,8 @@ a:active {
 body {
   margin:0; padding:0;
   font-family: "Helvetica Neue", Arial, sans-serif;
-  font-size: 13px;
+  line-height: 21px;
+  font-size: 16px;
 }
 
 #content {
@@ -401,6 +399,7 @@ pre.code {
 
 pre.code code {
   overflow: auto;
+  background-color: white;
 }
 
 table#quicklinks {
@@ -453,6 +452,12 @@ div.warning-message {
   border-radius: 3px;
 }
 
+code {
+  background: #efefef;
+  border-radius: 4px;
+  padding: 2px 4px;
+}
+
 code.enum {
   color: white;
   font-weight: bold;
@@ -472,7 +477,6 @@ code.enum {
   background: #efefef;
   border-radius: 3px;
   padding: 12px;
-  font-size: 1.1em;
 }
 
 table.request-params,
@@ -497,7 +501,7 @@ table.response-fields td {
   border-bottom: 1px solid #ccc;
   vertical-align: text-top;
   font-family: Monaco, Lucida Console, monospace;
-  font-size: 12px;
+  font-size: 16px;
   word-wrap: break-word;
 }
 

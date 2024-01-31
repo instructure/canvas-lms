@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-import _ from 'underscore'
+import {find, forEach} from 'lodash'
 import * as tz from '@canvas/datetime'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import GradingPeriodsHelper from './GradingPeriodsHelper'
@@ -104,7 +104,7 @@ export default class DateValidator {
     const unlockAt = data.unlock_at
     const dueAt = data.due_at
     const section_id = data.set_type === 'CourseSection' ? data.set_id : data.course_section_id
-    const section = _.find(ENV.SECTION_LIST, {id: section_id})
+    const section = find(ENV.SECTION_LIST, {id: section_id})
     const currentDateRange = section ? this.getSectionRange(section) : this.dateRange
     const datetimesToValidate = []
     const forIndividualStudents = data.student_ids?.length || data.set_type === 'ADHOC'
@@ -223,7 +223,7 @@ export default class DateValidator {
       } else if (datetimeSet.date) {
         switch (datetimeSet.range) {
           case 'start_range':
-            _.each(datetimeSet.validationDates, (validationDate, dateType) => {
+            forEach(datetimeSet.validationDates, (validationDate, dateType) => {
               if (
                 validationDate &&
                 this._formatDatetime(datetimeSet.date) > this._formatDatetime(validationDate)
@@ -233,7 +233,7 @@ export default class DateValidator {
             })
             break
           case 'end_range':
-            _.each(datetimeSet.validationDates, (validationDate, dateType) => {
+            forEach(datetimeSet.validationDates, (validationDate, dateType) => {
               if (
                 validationDate &&
                 this._formatDatetime(datetimeSet.date) < this._formatDatetime(validationDate)

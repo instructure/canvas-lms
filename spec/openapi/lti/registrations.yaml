@@ -1,0 +1,328 @@
+---
+openapi: 3.0.3
+info:
+  title: app
+  version: 1.0.0
+servers: []
+paths:
+  "/api/lti/registrations":
+    post:
+      summary: create
+      tags:
+      - Lti::IMS::DynamicRegistration
+      responses:
+        '401':
+          description: returns a 401
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        message:
+                          type: string
+                        error_code:
+                          type: string
+                      required:
+                      - message
+                      - error_code
+                required:
+                - errors
+              example:
+                errors:
+                - message: An error occurred.
+                  error_code: unauthorized
+        '200':
+          description: fills in values on the developer key
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  client_id:
+                    type: string
+                  application_type:
+                    type: string
+                  grant_types:
+                    type: array
+                    items:
+                      type: string
+                  initiate_login_uri:
+                    type: string
+                  redirect_uris:
+                    type: array
+                    items:
+                      type: string
+                  response_types:
+                    type: array
+                    items:
+                      type: string
+                  client_name:
+                    type: string
+                  jwks_uri:
+                    type: string
+                  token_endpoint_auth_method:
+                    type: string
+                  scope:
+                    type: string
+                  https://purl.imsglobal.org/spec/lti-tool-configuration:
+                    type: object
+                    properties:
+                      domain:
+                        type: string
+                      messages:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              type: string
+                            target_link_uri:
+                              type: string
+                            label:
+                              type: string
+                            icon_uri:
+                              type: string
+                            custom_parameters:
+                              type: object
+                              properties:
+                                foo:
+                                  type: string
+                              required:
+                              - foo
+                            roles:
+                              type: array
+                              items:
+                                type: string
+                            placements:
+                              type: array
+                              items:
+                                type: string
+                          required:
+                          - type
+                          - target_link_uri
+                          - label
+                          - icon_uri
+                          - custom_parameters
+                          - roles
+                          - placements
+                      claims:
+                        type: array
+                        items:
+                          type: string
+                      target_link_uri:
+                        type: string
+                    required:
+                    - domain
+                    - messages
+                    - claims
+                    - target_link_uri
+                required:
+                - client_id
+                - application_type
+                - grant_types
+                - initiate_login_uri
+                - redirect_uris
+                - response_types
+                - client_name
+                - jwks_uri
+                - token_endpoint_auth_method
+                - scope
+                - https://purl.imsglobal.org/spec/lti-tool-configuration
+              example:
+                client_id: '941'
+                application_type: web
+                grant_types:
+                - client_credentials
+                - implicit
+                initiate_login_uri: https://example.com/login
+                redirect_uris:
+                - https://example.com/launch
+                response_types:
+                - id_token
+                client_name: the client name
+                jwks_uri: https://example.com/api/jwks
+                token_endpoint_auth_method: private_key_jwt
+                scope: https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly
+                  https://purl.imsglobal.org/spec/lti-ags/scope/score
+                https://purl.imsglobal.org/spec/lti-tool-configuration:
+                  domain: example.com
+                  messages:
+                  - type: LtiResourceLinkRequest
+                    target_link_uri: https://example.com/launch
+                    label: deep link label
+                    icon_uri: https://example.com/icon.jpg
+                    custom_parameters:
+                      foo: bar
+                    roles:
+                    - http://purl.imsglobal.org/vocab/lis/v2/membership#ContentDeveloper
+                    - http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor
+                    placements:
+                    - course_navigation
+                  claims:
+                  - iss
+                  - sub
+                  target_link_uri: https://example.com/launch
+        '422':
+          description: returns a 422 with validation errors
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        field:
+                          type: string
+                        message:
+                          type: string
+                        error_code:
+                          nullable: true
+                      required:
+                      - field
+                      - message
+                      - error_code
+                required:
+                - errors
+              example:
+                errors:
+                - field: grant_types
+                  message: Must include client_credentials, implicit
+                  error_code: 
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                application_type:
+                  type: string
+                client_name:
+                  type: string
+                grant_types:
+                  type: array
+                  items:
+                    type: string
+                https://purl.imsglobal.org/spec/lti-tool-configuration:
+                  type: object
+                  properties:
+                    claims:
+                      type: array
+                      items:
+                        type: string
+                    domain:
+                      type: string
+                    messages:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          type:
+                            type: string
+                          label:
+                            type: string
+                          placements:
+                            type: array
+                            items:
+                              type: string
+                          target_link_uri:
+                            type: string
+                          custom_parameters:
+                            type: object
+                            properties:
+                              foo:
+                                type: string
+                            required:
+                            - foo
+                          roles:
+                            type: array
+                            items:
+                              type: string
+                          icon_uri:
+                            type: string
+                        required:
+                        - type
+                        - label
+                        - placements
+                        - target_link_uri
+                        - custom_parameters
+                        - roles
+                        - icon_uri
+                    target_link_uri:
+                      type: string
+                  required:
+                  - claims
+                  - domain
+                  - messages
+                  - target_link_uri
+                initiate_login_uri:
+                  type: string
+                jwks_uri:
+                  type: string
+                redirect_uris:
+                  type: array
+                  items:
+                    type: string
+                registration_token:
+                  type: string
+                response_types:
+                  type: array
+                  items:
+                    type: string
+                scope:
+                  type: string
+                token_endpoint_auth_method:
+                  type: string
+              required:
+              - application_type
+              - client_name
+              - grant_types
+              - https://purl.imsglobal.org/spec/lti-tool-configuration
+              - initiate_login_uri
+              - jwks_uri
+              - redirect_uris
+              - registration_token
+              - response_types
+              - scope
+              - token_endpoint_auth_method
+            example:
+              application_type: web
+              client_name: the client name
+              grant_types:
+              - client_credentials
+              - implicit
+              https://purl.imsglobal.org/spec/lti-tool-configuration:
+                claims:
+                - iss
+                - sub
+                domain: example.com
+                messages:
+                - type: LtiResourceLinkRequest
+                  label: deep link label
+                  placements:
+                  - course_navigation
+                  target_link_uri: https://example.com/launch
+                  custom_parameters:
+                    foo: bar
+                  roles:
+                  - http://purl.imsglobal.org/vocab/lis/v2/membership#ContentDeveloper
+                  - http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor
+                  icon_uri: https://example.com/icon.jpg
+                target_link_uri: https://example.com/launch
+              initiate_login_uri: https://example.com/login
+              jwks_uri: https://example.com/api/jwks
+              redirect_uris:
+              - https://example.com/launch
+              registration_token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxNzY4LCJpbml0aWF0ZWRfYXQiOiIyMDIzLTEyLTE1VDAyOjM5OjM3WiIsInJvb3RfYWNjb3VudF9nbG9iYWxfaWQiOjAsInV1aWQiOiIzN2ExN2E2NC03ODlhLTQ5NGYtYjFjNy1lNjllN2I3ZjRlNzIiLCJleHAiOjE3MDI2MTE2Mzd9.Q9mhBLdBY8gXf_cQxB2RYOoPk6_a47gqNLpUXjVnFcc
+              response_types:
+              - id_token
+              scope: https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly
+                https://purl.imsglobal.org/spec/lti-ags/scope/score
+              token_endpoint_auth_method: private_key_jwt
