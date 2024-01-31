@@ -16928,6 +16928,7 @@ nn:
   new_gradebook_297f7e2d: "Ny vurderingsoversikt"
   new_gradebook_enables_an_early_release_of_new_grad_76b8bf45: "Ny vurderingsoversikt tillet tidlege releaser av Ny vurderingsoversikt-forbetringar."
   new_gradebook_plagiarism_indicator_8dd22971: "Plagiatkontrollindikator for ny vurderingsoversikt"
+  new_group_8d6ad781: "Ny gruppe"
   new_group_category_66be9cbd: "Ny gruppekategori"
   new_group_set_7241a581: "Nytt gruppesett"
   new_mention_ad04b872: "Ny tagging"
@@ -23462,6 +23463,7 @@ nn:
   students_can_only_participate_in_the_course_betwee_6f8595aa: "Studentar kan berre delta på emnet mellom desse datoane"
   students_can_see_originality_score_797fe634: "Studentar kan sjå det opphavlege resultatet"
   students_cannot_view_quiz_responses_after_course_c_88e929ed: "Studentane kan ikkje sjå quizrespons etter at emnet er fullført"
+  students_have_already_submitted_to_this_discussion_f55db744: "Studentar har allereie sendt innlegg til diskusjonen og gruppeinnstillingar kan difor ikkje endrast."
   students_have_either_already_taken_or_started_taki_a076336: "Studentar har enten gjennomført eller er i gang med å ta denne quizen. Ver forsiktig med å redigere han. Dersom du gjer store endringar i quiz-spørsmåla, bør du tenkje på å vurdere dei studentane som svarte på den tidlegare versjonen av quizen på nytt."
   students_have_the_option_to_reply_anonymously_some_503cdf6c: "Studentar har mogleheit til å svara anonymt. Nokre namn og profilbilde kan vere skjulte."
   students_must_complete_all_of_these_requirements_15fa97f7: "Studentane må fullføre alle desse krava"
@@ -25921,6 +25923,7 @@ nn:
   upload_progress_for_name_39f03acf: "Opplastingsframdrift for %{name}"
   upload_scores_csv_a8416cf: "Last opp resultat (.csv)"
   upload_successful_ca47465f: Opplasta
+  upload_to_d8556041: "Last opp til"
   upload_your_outcomes_bceeadbe: "Last opp læringsmåla! "
   uploaded_285a2bfb: "Lasta opp"
   uploaded_files_11f11564: "Opplasta filer"
