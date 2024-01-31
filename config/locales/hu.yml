@@ -14361,6 +14361,7 @@ hu:
   new_gradebook_297f7e2d: "Új osztálynapló"
   new_gradebook_enables_an_early_release_of_new_grad_76b8bf45: "Az Új osztálynapló lehetővé teszi az új osztálynapló fejlesztéseinek korai kiadását."
   new_gradebook_plagiarism_indicator_8dd22971: "Új osztálynapló plágiumjelző"
+  new_group_8d6ad781: "Új csoport"
   new_group_category_66be9cbd: "Új csoporthalmaz"
   new_group_set_7241a581: "Új csoporthalmaz "
   new_module_4e9287e4: "Új modul"
@@ -19384,6 +19385,7 @@ hu:
   students_can_only_participate_in_the_course_betwee_6f8595aa: "A hallgatók csak ezen dátumok között vehetnek részt a kurzusban"
   students_can_see_originality_score_797fe634: "A hallgatók láthatják az eredetiség eredményt"
   students_cannot_view_quiz_responses_after_course_c_88e929ed: "A hallgatók nem tekinthetik meg a kvízválaszokat, miután a kurzus befejeződött/lezárult"
+  students_have_already_submitted_to_this_discussion_f55db744: "A hallgatók már hozzászóltak ehhez a megbeszéléshez, úgyhogy a csoportbeállítások nem módosíthatóak."
   students_have_either_already_taken_or_started_taki_a076336: "Néhány hallgató már kitöltötte, vagy elkezdte kitölteni ezt a kvízt, így vigyázzon a szerkesztésével. Ha jelentősen megváltoztatja valamelyik kvízkérdést, vegye figyelembe azon hallgatók eredményeit, akik a kvíz régi verzióját oldották meg."
   students_must_complete_all_of_these_requirements_15fa97f7: "A hallgatóknak az összes követelményt teljesíteniük kell"
   students_must_move_through_requirements_in_sequent_2c750874: "A hallgatóknak a követelményeket adott sorrendben kell teljesíteniük"
@@ -20579,6 +20581,7 @@ hu:
   upload_not_available_for_this_folder_8f8623c6: "A feltöltés nem érhető el erre a mappára"
   upload_scores_csv_a8416cf: "Pontszámok feltöltése (.csv)"
   upload_successful_ca47465f: "A feltöltés sikeres"
+  upload_to_d8556041: "Feltöltés ide"
   upload_your_outcomes_bceeadbe: "Töltse fel a tanulási eredményeit!"
   uploaded_285a2bfb: Feltöltve
   uploaded_media_bc29db35: "Feltöltött médiafájl"
