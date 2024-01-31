@@ -2260,3 +2260,13 @@ module AdditionalIgnoredColumns
   end
 end
 ActiveRecord::Base.singleton_class.include(AdditionalIgnoredColumns)
+
+if $canvas_rails == "7.0"
+  module SerializeCompat
+    def serialize(attr_name, *args, coder: nil, type: Object, **kwargs)
+      args = [coder || type] if args.empty?
+      super(attr_name, *args, **kwargs)
+    end
+  end
+  ActiveRecord::Base.singleton_class.prepend(SerializeCompat)
+end

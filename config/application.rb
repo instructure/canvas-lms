@@ -375,7 +375,7 @@ module CanvasRails
 
     initializer "canvas.extend_shard", before: "active_record.initialize_database" do
       # have to do this before the default shard loads
-      Switchman::Shard.serialize :settings, Hash
+      Switchman::Shard.serialize :settings, type: Hash
       Switchman.cache = -> { MultiCache.cache }
     end
 

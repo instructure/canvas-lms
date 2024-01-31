@@ -23,7 +23,7 @@ class ErrorReport < ActiveRecord::Base
   belongs_to :account
   serialize :http_env
   # misc key/value pairs with more details on the error
-  serialize :data, Hash
+  serialize :data, type: Hash
 
   before_save :guess_email
   before_save :truncate_enormous_fields

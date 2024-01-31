@@ -67,7 +67,7 @@ class ContextExternalTool < ActiveRecord::Base
       YAML.dump(value)
     end
   end
-  serialize :settings, SettingsSerializer
+  serialize :settings, coder: SettingsSerializer
 
   # add_identity_hash needs to calculate off of other data in the object, so it
   # should always be the last field change callback to run

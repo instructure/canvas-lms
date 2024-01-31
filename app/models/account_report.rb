@@ -31,7 +31,7 @@ class AccountReport < ActiveRecord::Base
 
   validates :account_id, :user_id, :workflow_state, presence: true
 
-  serialize :parameters, Hash
+  serialize :parameters, type: Hash
 
   attr_accessor :runners
 
