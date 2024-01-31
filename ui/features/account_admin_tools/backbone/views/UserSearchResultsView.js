@@ -35,7 +35,7 @@ export default class UserSearchResultsView extends CourseSearchResultsView {
   resultsFound() {
     if (!this.model.get('id') && this.model.get('status')) {
       return $.screenReaderFlashMessage(I18n.t('User not found'))
-    } else if (this.model.get('workflow_state') === 'deleted') {
+    } else if (this.userDeleted()) {
       return $.screenReaderFlashMessage(I18n.t('User found'))
     } else {
       return $.screenReaderFlashMessage(I18n.t('User found (not deleted)'))
@@ -49,16 +49,22 @@ export default class UserSearchResultsView extends CourseSearchResultsView {
     return this.model.on('doneRestoring', () => $('#viewUser').focus())
   }
 
+  userDeleted() {
+    return this.model.get('id') && this.model.get('login_id') == null
+  }
+
+  userActive() {
+    return this.model.get('id') && this.model.get('login_id') != null
+  }
+
   // Depending on what we get back when restoring the model
   // we want to display the course or error message correctly.
   toJSON(json) {
     json = super.toJSON(...arguments)
-    json.showRestore = this.model.get('id') && this.model.get('login_id') == null
+    json.showRestore = this.userDeleted()
     json.showNotFound = !this.model.get('id') && this.model.get('status')
-    json.showSuccessfullRestore =
-      this.model.get('id') && this.model.get('login_id') != null && this.model.get('restored')
-    json.showNonDeletedUser =
-      this.model.get('id') && this.model.get('login_id') != null && !this.model.get('restored')
+    json.showSuccessfullRestore = this.userActive() && this.model.get('restored')
+    json.showNonDeletedUser = this.userActive() && !this.model.get('restored')
     if (this.model.get('enrollments')) json.enrollmentCount = this.model.get('enrollments').length
     return json
   }
