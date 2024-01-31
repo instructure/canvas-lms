@@ -89,7 +89,12 @@ module DatesOverridable
   end
 
   def assignment_context_modules
-    ContextModule.active.where(id: context_module_tags.select(:context_module_id))
+    if is_a?(Assignment) && quiz.present?
+      # if it's a quiz's assignment, the context module content tags are attached to the quiz
+      ContextModule.not_deleted.where(id: quiz.context_module_tags.select(:context_module_id))
+    else
+      ContextModule.not_deleted.where(id: context_module_tags.select(:context_module_id))
+    end
   end
 
   def multiple_due_dates?
