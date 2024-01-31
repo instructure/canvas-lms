@@ -959,7 +959,7 @@ describe SIS::CSV::CourseImporter do
       template = @account.courses.create!(name: "Template Course", template: true)
       template.assignments.create!(title: "my assignment")
       @account.update!(course_template: template)
-
+      expect_any_instance_of(ContentMigration).to receive(:queue_migration).with(priority: 25).and_call_original
       process_csv_data_cleanly(
         "course_id,short_name,long_name,account_id,term_id,status",
         "test_1,TC 101,Test Course 101,,,active"
@@ -970,6 +970,7 @@ describe SIS::CSV::CourseImporter do
       expect(course.name).to eq "Test Course 101"
       expect(course.assignments.length).to eq 1
       expect(course.assignments.first.title).to eq "my assignment"
+      expect(course.content_migrations.first.strand).to eq "sis_import_course_templates"
     end
   end
 
