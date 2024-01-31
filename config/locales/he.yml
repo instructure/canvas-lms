@@ -13173,6 +13173,7 @@ he:
   new_export_3ab758: "ייצוא נתונים חדש"
   new_file_135ae520: "[ קובץ חדש ]"
   new_file_added_for_name_a5ec3156: "התווסף קובץ חדש ל %{name}"
+  new_group_8d6ad781: "קבוצה חדשה"
   new_group_category_66be9cbd: "קטגורית קבוצה חדשה"
   new_group_set_7241a581: "אוסף קבוצות חדש"
   new_module_4e9287e4: "מודול חדש"
@@ -18488,6 +18489,7 @@ he:
   students_are_not_allowed_to_access_test_installati_11b9078: "תלמידים אינם מורשים לגשת להתקנות ניסיוניות"
   students_being_observed_4de3e520: "תלמידים בהשגחה"
   students_cannot_view_quiz_responses_after_course_c_88e929ed: "תלמידים אינם יכולים לעיין בתגובות הבוחן לאחר שקורס מסתיים ונחתם."
+  students_have_already_submitted_to_this_discussion_f55db744: "תלמידים כבר תרמו לדיון זה, כך שהגדרות קבוצתיות אינן ניתנות לשינוי"
   students_have_either_already_taken_or_started_taki_a076336: "תלמידים לקחו כבר או לוקחים כעת את הבוחן, כך שיש להיות זהיר לגבי עריכתו. אם משנים שאלת בוחן כלשהי בצורה משמעותית, יש לשקול הערכה מחדש של התלמידים אשר כבר ענו על הגירסה הישנה של הבוחן."
   students_must_complete_all_of_these_requirements_15fa97f7: "התלמידים חייבים להשלים את כל החובות האלה."
   students_must_move_through_requirements_in_sequent_2c750874: "תלמידים חייבים לבצע את המחויבויות לפי הסדר"
@@ -19636,6 +19638,7 @@ he:
   upload_media_ce31135a: "העלאת מדיה"
   upload_scores_csv_a8416cf: "העלאת ציונים (CSV.)"
   upload_successful_ca47465f: "העלאה הצליחה"
+  upload_to_d8556041: "העלאה אל"
   uploaded_285a2bfb: הועלה
   uploading_19e8a4e7: מעלה
   uploading_ee585874: מעלה...
