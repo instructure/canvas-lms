@@ -45,9 +45,9 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {useQuery} from '@canvas/query'
 import {useMutation, useQueryClient} from '@tanstack/react-query'
 import {getUnreadCount} from './queries/unreadCountQuery'
-import {getSetting, setSetting} from './queries/settingsQuery'
 import {getActiveItem, getTrayLabel, getTrayPortal} from './utils'
 import type {ActiveTray, ExternalTool} from './utils'
+import {getSetting, setSetting} from '@canvas/settings-query/react/settingsQuery'
 
 const I18n = useI18nScope('sidenav')
 

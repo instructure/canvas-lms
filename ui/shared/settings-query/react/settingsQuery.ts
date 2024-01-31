@@ -18,6 +18,8 @@
 
 import type {QueryKey} from '@tanstack/react-query'
 import type {Setting} from '@canvas/global/env/EnvCommon'
+import {defaultFetchOptions} from '@canvas/util/xhr'
+import doFetchApi from '@canvas/do-fetch-api-effect'
 
 const settings = [
   'manual_mark_as_read',
@@ -44,12 +46,9 @@ export function setSetting({setting, newState}: {setting: Setting; newState: boo
   ENV.SETTINGS[setting] = newState
 
   // use fetch
-  return fetch('/api/v1/users/self/settings', {
-    method: 'PUT',
-    body: JSON.stringify({[setting]: newState}),
-    headers: {
-      'Content-Type': 'application/json',
-    },
+  return doFetchApi({
+    path: '/api/v1/users/self/settings',
+    params: {[setting]: newState},
   })
     .then(() => {
       // ensure change
