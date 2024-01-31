@@ -40,7 +40,6 @@ const {
 } = require('./webpack.rules')
 
 const {
-  analyzeBundles,
   buildCacheOptions,
   controlAccessBetweenModules,
   customSourceFileExtensions,
@@ -50,7 +49,6 @@ const {
   minimizeCode,
   provideJQuery,
   readOnlyCache,
-  retryChunkLoading,
   setMoreEnvVars,
   timezoneData,
   webpackHooks,
@@ -65,15 +63,13 @@ require('./generatePluginBundles')
 // dynamically import each plugin extension
 require('./generatePluginExtensions')
 
-if (!process.env.NODE_ENV) process.env.NODE_ENV = 'development'
-
 const skipSourcemaps = process.env.SKIP_SOURCEMAPS === '1'
 
 const shouldWriteCache =
-  process.env.WRITE_BUILD_CACHE === '1' || process.env.NODE_ENV === 'development'
+  process.env.WRITE_BUILD_CACHE === '1' || process.env.NODE_ENV !== 'production'
 
 module.exports = {
-  mode: process.env.NODE_ENV,
+  mode: isProduction ? 'production' : 'development',
 
   // infer platform and ES-features from @instructure/browserslist-config-canvas-lms
   target: ['browserslist'],
@@ -81,23 +77,6 @@ module.exports = {
   // use file cache (instead of memory cache)
   // assumes that the cache is only reused when no build dependencies are changing.
   ...(process.env.USE_BUILD_CACHE === '1' ? buildCacheOptions : null),
-
-  performance: skipSourcemaps
-    ? false
-    : {
-        // This just reflects how big the 'main' entry is at the time of writing. Every
-        // time we get it smaller we should change this to the new smaller number so it
-        // only goes down over time instead of growing bigger over time
-        maxEntrypointSize: 1270000,
-        // This is how big our biggest js bundles are at the time of writing. We should
-        // first work to attack the things in `thingsWeKnowAreWayTooBig` so we can start
-        // tracking them too. Then, as we work to get all chunks smaller, we should change
-        // this number to the size of our biggest known asset and hopefully someday get
-        // to where they are all under the default value of 250000 and then remove this
-        // TODO: decrease back to 1200000 LS-1222
-        // NOTE: if maxAssetSize changes, update: ~build/new-jenkins/library/vars/webpackStage.groovy
-        maxAssetSize: 1400000,
-      },
 
   optimization: {
     // named: readable ids for better debugging
@@ -134,7 +113,7 @@ module.exports = {
   // https://webpack.js.org/configuration/devtool/
   devtool: skipSourcemaps
     ? false
-    : process.env.NODE_ENV === 'production' || process.env.COVERAGE === '1'
+    : isProduction || process.env.COVERAGE === '1'
     ? // "Recommended choice for production builds"
       'source-map'
     : // "Recommended choice for development builds"
@@ -144,25 +123,21 @@ module.exports = {
 
   watchOptions: {ignored: ['**/node_modules/']},
 
+  externalsType: 'global',
   output: {
-    publicPath: !isProduction ? '/dist/webpack-dev/' : '/dist/webpack-production/',
+    publicPath: isProduction ? '/dist/webpack-production/' : '/dist/webpack-dev/',
     clean: true, // clean /dist folder before each build
     path: join(canvasDir, 'public', webpackPublicPath),
     hashFunction: 'xxhash64',
-
-    // Add /* filename */ comments to generated require()s in the output.
-    pathinfo: !isProduction,
-
     filename: '[name]-entry-[contenthash].js',
     chunkFilename: '[name]-chunk-[contenthash].js',
   },
-
-  parallelism: 5,
 
   resolve: {
     fallback: {
       // Called for by minimatch but as we use it, minimatch  can work without it
       path: false,
+      timers: false,
       // several things need stream
       stream: require.resolve('stream-browserify'),
     },
@@ -171,7 +146,6 @@ module.exports = {
 
     extensions: ['.js', '.jsx', '.ts', '.tsx'],
   },
-
   module: {
     parser: {
       javascript: {
@@ -181,11 +155,6 @@ module.exports = {
         reexportExportsPresence: 'error',
       },
     },
-
-    // This can boost the performance when ignoring big libraries.
-    // The files are expected to have no call to require, define or similar.
-    // They are allowed to use exports and module.exports.
-    noParse: [require.resolve('jquery'), require.resolve('tinymce')],
 
     rules: [
       process.env.CRYSTALBALL_MAP === '1' && istanbul, // adds ~20 seconds to build time
@@ -208,16 +177,11 @@ module.exports = {
     controlAccessBetweenModules,
     setMoreEnvVars,
     provideJQuery,
-    process.env.NODE_ENV !== 'development' && retryChunkLoading,
-
     !shouldWriteCache && readOnlyCache,
-
     process.env.WEBPACK_PEDANTIC !== '0' && failOnWebpackWarnings,
-
-    process.env.WEBPACK_ANALYSIS === '1' && analyzeBundles,
-
     process.env.NODE_ENV !== 'test' && excludeMomentLocales,
-
-    process.env.NODE_ENV !== 'test' && webpackManifest,
+    // including the following prints this warning
+    // "custom stage for process_assets is not supported yet, so Infinity is fallback to Compilation.PROCESS_ASSETS_STAGE_REPORT(5000)""
+    webpackManifest,
   ].filter(Boolean),
 }
