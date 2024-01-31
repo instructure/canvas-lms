@@ -172,7 +172,7 @@ module Lti
         debug_trace_metrics = (@decoded_jwt && Lti::LaunchDebugLogger.decode_debug_trace(@decoded_jwt["debug_trace"])) || {}
         orig_timestamp = debug_trace_metrics&.dig("time")&.then { Time.parse _1 }
 
-        metrics = {
+        metrics = [{
           id: SecureRandom.uuid,
           type: "lti_launch_debug_logger",
 
@@ -192,7 +192,7 @@ module Lti
 
           **debug_trace_metrics.transform_keys { |orig_key| "init_#{orig_key}" } || {},
           **lti_launch_debug_logger_sessionless_source_metrics(debug_trace_metrics["path"]) || {}
-        }.compact
+        }.compact]
 
         CanvasHttp.put(metrics_endpoint, {}, body: metrics.to_json, content_type: "application/json")
       rescue => e
