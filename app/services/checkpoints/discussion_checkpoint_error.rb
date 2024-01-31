@@ -39,4 +39,6 @@ module Checkpoints
   class CheckpointNotFoundError < DiscussionCheckpointError; end
 
   class OverrideNotFoundError < DiscussionCheckpointError; end
+
+  class NoCheckpointsFoundError < DiscussionCheckpointError; end
 end
