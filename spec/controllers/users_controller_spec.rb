@@ -2308,6 +2308,20 @@ describe UsersController do
       expect(response).to render_template("users/show")
     end
 
+    it "404s, but still shows, on a deleted user for admins" do
+      Account.site_admin.enable_feature!(:deleted_user_tools)
+
+      course_with_teacher(active_all: 1, user: user_with_pseudonym)
+
+      account_admin_user
+      user_session(@admin)
+      @teacher.destroy
+
+      get "show", params: { id: @teacher.id }
+      expect(response).to have_http_status :not_found
+      expect(response).to render_template("users/show")
+    end
+
     it "responds to JSON request" do
       account = Account.create!
       course_with_student(active_all: true, account:)
@@ -2349,6 +2363,8 @@ describe UsersController do
     end
 
     it "shows a deleted user from the account context if they have a deleted pseudonym for that account" do
+      Account.site_admin.enable_feature!(:deleted_user_tools)
+
       course_with_teacher(active_all: 1, user: user_with_pseudonym)
       account_admin_user(active_all: true)
       user_session(@admin)
@@ -2356,6 +2372,35 @@ describe UsersController do
 
       get "show", params: { account_id: Account.default.id, id: @teacher.id }
       expect(response).to have_http_status :ok
+    end
+
+    context "cross-shard deleted users" do
+      specs_require_sharding
+
+      before do
+        Account.site_admin.enable_feature!(:deleted_user_tools)
+        @shard1.activate do
+          course_with_teacher(active_all: 1, user: user_with_pseudonym)
+        end
+        Account.default.pseudonyms.create!(user: @teacher, unique_id: "teacher-shard1")
+        user_with_pseudonym
+        account_admin_user(user: @user, active_all: true)
+        user_session(@admin)
+        @teacher.remove_from_root_account(Account.default)
+      end
+
+      it "shows a deleted user from the account context if they have a deleted pseudonym for that account" do
+        get "show", params: { account_id: Account.default.id, id: @teacher.id }
+
+        expect(response).to have_http_status :ok
+      end
+
+      it "does not give login ID for another account in json format" do
+        get "show", params: { account_id: Account.default.id, id: @teacher.id, format: :json }
+
+        expect(response).to have_http_status :ok
+        expect(response.parsed_body["login_id"]).to be_nil
+      end
     end
 
     it "does not show a deleted user from an account the user doesn't have access to" do

@@ -1296,9 +1296,21 @@ class User < ActiveRecord::Base
     return false unless user && sought_right
     return account.grants_right?(user, sought_right) if fake_student? # doesn't have account association
 
-    # Intentionally include deleted pseudoymns when checking deleted users if the user has
-    # site-admin access (important for diagnosing deleted users)
-    accounts_to_search = if associated_accounts.empty? && Account.site_admin.grants_right?(user, :read)
+    # Intentionally include deleted pseudonyms when checking deleted users (important for diagnosing deleted users)
+    accounts_to_search = if Account.site_admin.feature_enabled?(:deleted_user_tools)
+                           if associated_accounts.empty?
+                             if merged_into_user
+                               # Early return from inside if to ensure we handle chains of merges correctly
+                               return merged_into_user.check_accounts_right?(user, sought_right)
+                             elsif Account.where(id: pseudonyms.pluck(:account_id)).any?
+                               Account.where(id: pseudonyms.pluck(:account_id))
+                             else
+                               associated_accounts
+                             end
+                           else
+                             associated_accounts
+                           end
+                         elsif associated_accounts.empty? && Account.site_admin.grants_right?(user, :read)
                            if merged_into_user
                              # Early return from inside if to ensure we handle chains of merges correctly
                              return merged_into_user.check_accounts_right?(user, sought_right)
