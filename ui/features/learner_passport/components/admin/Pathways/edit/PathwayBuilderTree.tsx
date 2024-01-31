@@ -19,6 +19,7 @@
 import React, {useCallback, useState} from 'react'
 import {Button} from '@instructure/ui-buttons'
 import {IconZoomOutLine, IconZoomInLine} from '@instructure/ui-icons'
+import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import type {DraftPathway, MilestoneData} from '../../../types'
 import PathwayTreeView from '../PathwayTreeView'
@@ -70,40 +71,46 @@ const PathwayBuilderTree = ({
     setFlipped(!flipped)
   }, [flipped])
 
+  const renderBuilderControls = useCallback(() => {
+    return (
+      <Flex as="div" justifyItems="space-between" margin="x-small">
+        <Flex.Item>
+          {onShowSidebar ? (
+            <Button onClick={onShowSidebar} margin="0 x-small 0 0">
+              Pathway builder
+            </Button>
+          ) : null}
+          <Button renderIcon={IconZoomOutLine} onClick={handleZoomOut} margin="0 x-small 0 0" />
+          <Button renderIcon={IconZoomInLine} onClick={handleZoomIn} />
+        </Flex.Item>
+        <Flex.Item>
+          <Button onClick={handleViewDirectionClick} margin="0 x-small 0 0">
+            {viewDirection === 'vertical' ? 'View horizontally' : 'View vertically'}
+          </Button>
+          <Button onClick={handleFlipClick}>Flip pathway</Button>
+        </Flex.Item>
+      </Flex>
+    )
+  }, [
+    handleFlipClick,
+    handleViewDirectionClick,
+    handleZoomIn,
+    handleZoomOut,
+    onShowSidebar,
+    viewDirection,
+  ])
+
   const layout = getLayout(viewDirection, flipped)
   return (
-    <View
-      data-compid="pathway-builder-tree"
-      as="div"
-      height="100%"
-      margin="0"
-      position="relative"
-      overflowY="auto"
-    >
-      <div style={{position: 'absolute', top: '.5rem', left: '.5rem', zIndex: 1}}>
-        {onShowSidebar ? (
-          <Button onClick={onShowSidebar} margin="0 x-small 0 0">
-            Pathway builder
-          </Button>
-        ) : null}
-        <Button renderIcon={IconZoomOutLine} onClick={handleZoomOut} margin="0 x-small 0 0" />
-        <Button renderIcon={IconZoomInLine} onClick={handleZoomIn} />
-      </div>
-      <div style={{position: 'absolute', top: '.5rem', right: '.5rem', zIndex: 1}}>
-        <Button onClick={handleViewDirectionClick} margin="0 x-small 0 0">
-          {viewDirection === 'vertical' ? 'View horizontally' : 'View vertically'}
-        </Button>
-        <Button onClick={handleFlipClick}>Flip pathway</Button>
-      </div>
-      <PathwayTreeView
-        version={`${treeVersion}-${layout}`}
-        pathway={pathway}
-        selectedStep={selectedStep}
-        zoomLevel={zoomLevel}
-        layout={layout}
-        onSelected={onSelectStep}
-      />
-    </View>
+    <PathwayTreeView
+      version={`${treeVersion}-${layout}`}
+      pathway={pathway}
+      selectedStep={selectedStep}
+      zoomLevel={zoomLevel}
+      layout={layout}
+      onSelected={onSelectStep}
+      renderTreeControls={renderBuilderControls}
+    />
   )
 }
 

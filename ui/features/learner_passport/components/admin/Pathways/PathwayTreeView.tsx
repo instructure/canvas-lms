@@ -51,6 +51,7 @@ type PathwayTreeViewProps = {
   layout?: 'TB' | 'BT' | 'LR' | 'RL'
   version: string
   zoomLevel?: number
+  renderTreeControls?: () => JSX.Element | null
 }
 
 type BoxHeights = {
@@ -81,6 +82,7 @@ const PathwayTreeView = ({
   layout = 'TB',
   version,
   zoomLevel = 1,
+  renderTreeControls,
 }: PathwayTreeViewProps) => {
   const {allBadges} = useContext(DataContext)
   const [g] = useState(new dagre.graphlib.Graph())
@@ -88,6 +90,7 @@ const PathwayTreeView = ({
   const [dagEdges, setDagEdges] = useState<JSX.Element[]>([])
   const [rootNodeRef, setRootNodeRef] = useState(null)
   const [viewBox, setViewBox] = useState([0, 0, 0, 0])
+  const [treeRef, setTreeRef] = useState<Element | null>(null)
 
   const [preRendered, setPreRendered] = useState(false)
   const [graphBoxHeights, setGraphBoxHeights] = useState<BoxHeights>({
@@ -541,49 +544,83 @@ const PathwayTreeView = ({
     renderDAGEdges()
   }, [dagNodes, renderDAGEdges])
 
+  const probablyRenderTreeControls = useCallback(() => {
+    if (treeRef === null) return null
+    if (!renderTreeControls) return null
+
+    const box = treeRef.getBoundingClientRect()
+
+    return (
+      <div
+        style={{
+          position: 'fixed',
+          top: `${box.top + window.scrollY + 8}px`,
+          left: `${box.left + window.scrollX + 8}px`,
+          right: '8px',
+          height: 'auto',
+          zIndex: 1,
+        }}
+      >
+        {renderTreeControls()}
+      </div>
+    )
+  }, [renderTreeControls, treeRef])
+
   const graphWidth = g.graph()?.width ? `${g.graph().width * zoomLevel}px` : 'auto'
   const graphHeight = g.graph()?.height ? `${g.graph().height * zoomLevel}px` : 'auto'
 
   return preRendered ? (
-    <div
-      data-compid="pathway-tree-view"
-      style={{
-        minWidth: graphWidth,
-        minHeight: graphHeight,
-        height: '100%',
-        backgroundSize: '24px 24px',
-        backgroundImage: `linear-gradient(to right, rgba(245, 245, 245, 1.0) 1px, transparent 1px),
-                  linear-gradient(to bottom, rgba(245, 245, 245, 1.0) 1px, transparent 1px)`,
-      }}
-    >
-      <View as="div" width="fit-content">
+    <>
+      {probablyRenderTreeControls()}
+      <View
+        data-compid="pathway-tree-view"
+        as="div"
+        elementRef={el => setTreeRef(el)}
+        height="100%"
+        margin="0"
+        position="relative"
+        overflowY="auto"
+      >
         <div
-          ref={viewRef}
           style={{
-            position: 'relative',
-            padding: '.5rem',
-            transform: `scale(${zoomLevel})`,
-            transformOrigin: '0 0',
+            minWidth: graphWidth,
             minHeight: graphHeight,
+            height: '100%',
+            backgroundSize: '24px 24px',
+            backgroundImage: `linear-gradient(to right, rgba(245, 245, 245, 1.0) 1px, transparent 1px),
+                  linear-gradient(to bottom, rgba(245, 245, 245, 1.0) 1px, transparent 1px)`,
           }}
         >
-          <svg
-            ref={svgRef}
-            className="dag"
-            viewBox={`${viewBox[0]} ${viewBox[1]} ${viewBox[2]} ${viewBox[3]}`}
-            x={viewBox[0]}
-            y={viewBox[1]}
-            width={viewBox[2]}
-            height={viewBox[3]}
-          >
-            {dagNodes}
-            <g fill="none" stroke="#C7CDD1">
-              {dagEdges}
-            </g>
-          </svg>
+          <View as="div" width="fit-content">
+            <div
+              ref={viewRef}
+              style={{
+                position: 'relative',
+                padding: '.5rem',
+                transform: `scale(${zoomLevel})`,
+                transformOrigin: '0 0',
+                minHeight: graphHeight,
+              }}
+            >
+              <svg
+                ref={svgRef}
+                className="dag"
+                viewBox={`${viewBox[0]} ${viewBox[1]} ${viewBox[2]} ${viewBox[3]}`}
+                x={viewBox[0]}
+                y={viewBox[1]}
+                width={viewBox[2]}
+                height={viewBox[3]}
+              >
+                {dagNodes}
+                <g fill="none" stroke="#C7CDD1">
+                  {dagEdges}
+                </g>
+              </svg>
+            </div>
+          </View>
         </div>
       </View>
-    </div>
+    </>
   ) : (
     preRenderPathwayBoxes()
   )
