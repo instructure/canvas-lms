@@ -77,7 +77,7 @@ function teardownFixtures() {
   while (fixtures.firstChild) fixtures.removeChild(fixtures.firstChild)
 }
 
-const awhile = () => new Promise(resolve => setTimeout(resolve, 2))
+const awhile = (milliseconds = 2) => new Promise(resolve => setTimeout(resolve, milliseconds))
 
 QUnit.module('SpeedGrader', rootHooks => {
   let history
@@ -1298,12 +1298,14 @@ QUnit.module('SpeedGrader', rootHooks => {
         SpeedGrader.EG.jsonReady()
       })
 
-      test('selects the provisional grade if the user is the final grader', () => {
+      test('selects the provisional grade if the user is the final grader', async () => {
         SpeedGrader.EG.handleGradeSubmit(null, true)
+        // more time is needed between jsonReady() and submissionSuccess()
+        await awhile(75)
         strictEqual(provisionalGrade.selected, true)
       })
 
-      test('does not select the provisional grade if the user is not the final grader', async() => {
+      test('does not select the provisional grade if the user is not the final grader', async () => {
         env.current_user_id = '1102'
         fakeENV.setup(env)
         SpeedGrader.EG.handleGradeSubmit(null, true)
@@ -1312,7 +1314,7 @@ QUnit.module('SpeedGrader', rootHooks => {
       })
     })
 
-    test('hasWarning and flashWarning are called', async() => {
+    test('hasWarning and flashWarning are called', async () => {
       SpeedGrader.EG.jsonReady()
       const flashWarningStub = sandbox.stub($, 'flashWarning')
       sandbox.stub(SpeedGraderHelpers, 'determineGradeToSubmit').returns('15')
@@ -1369,7 +1371,7 @@ QUnit.module('SpeedGrader', rootHooks => {
       SpeedGraderHelpers.determineGradeToSubmit.restore()
     })
 
-    test('unexcuses the submission if the grade is blank and the assignment is complete/incomplete', async ()=>  {
+    test('unexcuses the submission if the grade is blank and the assignment is complete/incomplete', async () => {
       SpeedGrader.EG.jsonReady()
       sandbox.stub(SpeedGraderHelpers, 'determineGradeToSubmit').returns('')
       window.jsonData.grading_type = 'pass_fail'
