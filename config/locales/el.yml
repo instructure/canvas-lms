@@ -9923,6 +9923,7 @@ el:
   new_discussion_dae4fae3: "Νέο Θέμα Συζήτησης"
   new_export_3ab758: "Νέα Εξαγωγή"
   new_file_135ae520: "[ Νέο Αρχείο ]"
+  new_group_8d6ad781: "Νέα Ομάδα"
   new_group_set_7241a581: "Νέο Σετ Ομάδων"
   new_module_4e9287e4: "Νέα Ενότητα"
   new_outcome_7fba8c7d: "Νέο Αποτέλεσμα"
@@ -14990,6 +14991,7 @@ el:
   upload_media_ce31135a: "Μεταφόρτωση Αρχείου Πολυμέσων"
   upload_scores_csv_a8416cf: "Μεταφόρτωση Βαθμολογιών (.csv)"
   upload_successful_ca47465f: "Η μεταφόρτωση ήταν επιτυχής"
+  upload_to_d8556041: "Μεταφόρτωση σε"
   uploaded_285a2bfb: Μεταφορτώθηκε
   uploading_19e8a4e7: "Γίνεται φόρτωση..."
   uploading_ee585874: "Γίνεται μεταφόρτωση..."
