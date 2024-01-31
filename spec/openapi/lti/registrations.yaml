@@ -11,33 +11,8 @@ paths:
       tags:
       - Lti::IMS::DynamicRegistration
       responses:
-        '401':
-          description: returns a 401
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  errors:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        message:
-                          type: string
-                        error_code:
-                          type: string
-                      required:
-                      - message
-                      - error_code
-                required:
-                - errors
-              example:
-                errors:
-                - message: An error occurred.
-                  error_code: unauthorized
         '200':
-          description: fills in values on the developer key
+          description: accepts valid params and creates a registration model
           content:
             application/json:
               schema:
@@ -116,6 +91,10 @@ paths:
                           type: string
                       target_link_uri:
                         type: string
+                      https://canvas.instructure.com/lti/privacy_level:
+                        type: string
+                      https://canvas.instructure.com/lti/registration_config_url:
+                        type: string
                     required:
                     - domain
                     - messages
@@ -134,7 +113,7 @@ paths:
                 - scope
                 - https://purl.imsglobal.org/spec/lti-tool-configuration
               example:
-                client_id: '941'
+                client_id: '200000000000981'
                 application_type: web
                 grant_types:
                 - client_credentials
@@ -167,6 +146,33 @@ paths:
                   - iss
                   - sub
                   target_link_uri: https://example.com/launch
+                  https://canvas.instructure.com/lti/privacy_level: email_only
+                  https://canvas.instructure.com/lti/registration_config_url: http://test.host/api/lti/registrations/200000000000168/view
+        '401':
+          description: returns a 401
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        message:
+                          type: string
+                        error_code:
+                          type: string
+                      required:
+                      - message
+                      - error_code
+                required:
+                - errors
+              example:
+                errors:
+                - message: An error occurred.
+                  error_code: unauthorized
         '422':
           description: returns a 422 with validation errors
           content:
@@ -257,6 +263,8 @@ paths:
                         - icon_uri
                     target_link_uri:
                       type: string
+                    https://canvas.instructure.com/lti/privacy_level:
+                      type: string
                   required:
                   - claims
                   - domain
@@ -288,7 +296,6 @@ paths:
               - initiate_login_uri
               - jwks_uri
               - redirect_uris
-              - registration_token
               - response_types
               - scope
               - token_endpoint_auth_method
@@ -316,6 +323,7 @@ paths:
                   - http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor
                   icon_uri: https://example.com/icon.jpg
                 target_link_uri: https://example.com/launch
+                https://canvas.instructure.com/lti/privacy_level: email_only
               initiate_login_uri: https://example.com/login
               jwks_uri: https://example.com/api/jwks
               redirect_uris:
