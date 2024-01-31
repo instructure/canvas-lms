@@ -151,7 +151,9 @@ class GradebooksController < ApplicationController
           display_updated_at: datetime_string(comment.updated_at),
           is_read: comment.read?(@current_user) || (!@presenter.student_is_user? && !@presenter.user_an_observer_of_student?),
         }
-        comment_map[:media_object] = SubmissionComment.serialize_media_comment(comment.media_comment_id) if comment.media_comment?
+        if comment.media_comment? && (media_object = SubmissionComment.serialize_media_comment(comment.media_comment_id))
+          comment_map[:media_object] = media_object
+        end
         comment_map
       end.as_json
       json[:assignment_url] = context_url(@context, :context_assignment_url, submission.assignment_id)

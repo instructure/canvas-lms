@@ -93,18 +93,21 @@ describe GradebooksController do
         attachment = attachment_model(context: @assignment)
         attachment2 = attachment_model(context: @assignment)
         other_student = @course.enroll_user(User.create!(name: "some other user")).user
+        deleted_media_object = factory_with_protected_attributes(MediaObject, media_id: "m-someid2", media_type: "video", title: "Example Media Object 2", context: @course)
         submission_to_comment = @assignment.grade_student(@student, grade: 10, grader: @teacher).first
         comment_1 = submission_to_comment.add_comment(comment: "a student comment", author: @teacher, attachments: [attachment])
         comment_2 = submission_to_comment.add_comment(comment: "another student comment", author: @teacher, attachments: [attachment, attachment2])
         comment_3 = submission_to_comment.add_comment(comment: "an anonymous comment", author: other_student)
         comment_4 = submission_to_comment.add_comment(media_comment_id: "m-someid", media_comment_type: "video", author: @student)
+        submission_to_comment.add_comment(media_comment_id: "m-someid2", media_comment_type: "video", author: @student)
+        deleted_media_object.destroy_permanently!
         comment_1.mark_read!(@student)
 
         get "grade_summary", params: { course_id: @course.id, id: @student.id }
         submission = assigns[:js_env][:submissions].find { |s| s[:assignment_id] == @assignment.id }
         aggregate_failures do
           expect(submission[:score]).to be 10.0
-          expect(submission[:submission_comments].length).to be 4
+          expect(submission[:submission_comments].length).to be 5
 
           submission_comment_1 = submission[:submission_comments].first
           expect(submission_comment_1).to include({
