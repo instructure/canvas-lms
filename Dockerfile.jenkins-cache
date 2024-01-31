@@ -69,7 +69,7 @@ RUN --mount=target=/tmp/src \
     .i18nrc \
     Rakefile \
     gulpfile.js \
-    webpack.config.js \
+    rspack.config.js \
     \
     | tee /tmp/dst/webpack-runner-dependencies.tar | md5sum > /tmp/dst/webpack-runner-dependencies.tar.md5 && \
   \

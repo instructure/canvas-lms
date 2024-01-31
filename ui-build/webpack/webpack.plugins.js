@@ -16,17 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-const {EnvironmentPlugin, DefinePlugin, IgnorePlugin, ProvidePlugin} = require('webpack')
-const {sync} = require('glob')
-const {join, resolve} = require('path')
+const {IgnorePlugin} = require('webpack')
+const {
+  DefinePlugin,
+  ProvidePlugin,
+  EnvironmentPlugin,
+  SwcJsMinimizerRspackPlugin,
+} = require('@rspack/core')
+const {resolve} = require('path')
 const MomentTimezoneDataPlugin = require('moment-timezone-data-webpack-plugin')
-const {BundleAnalyzerPlugin} = require('webpack-bundle-analyzer')
 const EsmacPlugin = require('webpack-esmac-plugin')
-const {WebpackManifestPlugin} = require('webpack-manifest-plugin')
+const {WebpackManifestPlugin} = require('rspack-manifest-plugin')
 const {RetryChunkLoadPlugin} = require('webpack-retry-chunk-load-plugin')
 // keep this in sync with webpack's dep version
 // uses terser to minify JavaScript
-const TerserPlugin = require('terser-webpack-plugin')
 
 const WebpackHooks = require('./webpackHooks')
 
@@ -128,18 +131,6 @@ exports.failOnWebpackWarnings = function (compiler) {
   })
 }
 
-exports.analyzeBundles = new BundleAnalyzerPlugin({
-  analyzerMode: 'static',
-  reportFilename: process.env.WEBPACK_ANALYSIS_FILE
-    ? resolve(process.env.WEBPACK_ANALYSIS_FILE)
-    : resolve(canvasDir, 'tmp/webpack-bundle-analysis.html'),
-  openAnalyzer: false,
-  generateStatsFile: false,
-  statsOptions: {
-    source: false,
-  },
-})
-
 // don't include any of the moment locales in the common bundle
 // (otherwise it is huge!) we load them explicitly onto the page in
 // include_js_bundles from rails.
@@ -158,50 +149,37 @@ exports.webpackManifest = new WebpackManifestPlugin({
   useEntryKeys: true,
 })
 
-exports.minimizeCode = new TerserPlugin({
-  minify: TerserPlugin.swcMinify,
-  parallel: true,
-  terserOptions: {
-    compress: {
-      sequences: false, // prevents it from combining a bunch of statements with ","s so it is easier to set breakpoints
-
-      // these are all things that terser does by default but we turn
-      // them off because they don't reduce file size enough to justify the
-      // time they take, especially after gzip:
-      // see: https://slack.engineering/keep-webpack-fast-a-field-guide-for-better-build-performance-f56a5995e8f1
-      booleans: false,
-      collapse_vars: false,
-      comparisons: false,
-      computed_props: false,
-      hoist_props: false,
-      if_return: false,
-      join_vars: false,
-      keep_infinity: true,
-      loops: false,
-      negate_iife: false,
-      properties: false,
-      reduce_funcs: false,
-      reduce_vars: false,
-      typeofs: false,
-    },
-    output: {
-      comments: false,
-      semicolons: false, // prevents everything being on one line so it's easier to view in devtools
-    },
+exports.minimizeCode = new SwcJsMinimizerRspackPlugin({
+  compress: {
+    sequences: false, // prevents it from combining a bunch of statements with ","s so it is easier to set breakpoints
+    // these are all things that terser does by default but we turn
+    // them off because they don't reduce file size enough to justify the
+    // time they take, especially after gzip:
+    // see: https://slack.engineering/keep-webpack-fast-a-field-guide-for-better-build-performance-f56a5995e8f1
+    booleans: false,
+    collapse_vars: false,
+    comparisons: false,
+    computed_props: false,
+    hoist_props: false,
+    if_return: false,
+    join_vars: false,
+    keep_infinity: true,
+    loops: false,
+    negate_iife: false,
+    properties: false,
+    reduce_funcs: false,
+    reduce_vars: false,
+    typeofs: false,
+  },
+  output: {
+    comments: false,
+    semicolons: false, // prevents everything being on one line so it's easier to view in devtools
   },
 })
 
 exports.buildCacheOptions = {
-  cache: {
-    type: 'filesystem',
-    allowCollectingMemory: false,
-    buildDependencies: {config: []},
-    compression: 'gzip',
-  },
   snapshot: {
-    buildDependencies: {hash: true, timestamp: false},
     module: {hash: true, timestamp: false},
     resolve: {hash: true, timestamp: false},
-    resolveBuildDependencies: {hash: true, timestamp: false},
   },
 }
