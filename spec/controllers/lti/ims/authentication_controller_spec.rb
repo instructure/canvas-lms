@@ -254,7 +254,10 @@ describe Lti::IMS::AuthenticationController do
             content_type: "application/json",
             body: a_string_including("lti_launch_debug_logger")
           ) do |*_args, body:, **_kwargs|
-            log = JSON.parse(body)
+            logs = JSON.parse(body)
+            expect(logs).to be_a(Array)
+            expect(logs.length).to eq(1)
+            log = logs.first
             expect(log["type"]).to eq("lti_launch_debug_logger")
 
             expect(log["id"]).to match(/\A[0-9a-f-]{16,}\z/)
