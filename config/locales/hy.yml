@@ -11131,6 +11131,7 @@ hy:
   new_course_role_6a7bb75f: "Դասընթացի նոր դերը"
   new_discussion_dae4fae3: "Նոր քննարկում"
   new_file_135ae520: "[ նոր ֆայլ ]"
+  new_group_8d6ad781: "Նոր խումբ"
   new_group_set_7241a581: "Նոր խմբերի շարք"
   new_module_4e9287e4: "Նոր Մոդուլ"
   new_outcome_7fba8c7d: "Նոր արդյունք"
@@ -15861,6 +15862,7 @@ hy:
   student_view_ac9b672f: "Դիտում ունկնդրի կողմից"
   students_1b8cd07b: Ունկնդիրներ
   students_being_observed_4de3e520: "Դիտարկվող ունկնդիրներ"
+  students_have_already_submitted_to_this_discussion_f55db744: "Ունկնդիրներն արդեն այս քննարկման առթիվ ուղարկել են իրենց պատասխանները, ուստի խմբի կարգաբերումները հնարավոր չէ փոխել: "
   students_must_complete_all_of_these_requirements_15fa97f7: "Ունկնդիրը պետք է կատարի բոլոր այս պահանջները"
   students_who_have_taken_the_quiz_count_69dbbda0: 
     one: "Այն ունկնդիրները, ովքեր վերցրել են թեստը՝  (%{count})"
@@ -16739,6 +16741,7 @@ hy:
   upload_files_a228f20f: "Ներբեռնել ֆայլերը"
   upload_scores_csv_a8416cf: "Բեռնել գնահատականները (.csv)"
   upload_successful_ca47465f: "Բեռնվեց հաջողությամբ"
+  upload_to_d8556041: "Ներբեռնել դեպի"
   uploaded_285a2bfb: "Ներբեռնված է"
   uploading_19e8a4e7: Բեռնում
   uploading_ee585874: "Բեռնում է..."
