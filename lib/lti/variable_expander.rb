@@ -92,6 +92,7 @@ module Lti
         @context.enrollment_term.end_at
     end
     TERM_NAME_GUARD = -> { @context.is_a?(Course) && @context.enrollment_term&.name }
+    TERM_ID_GUARD = -> { @context.is_a?(Course) && @context.enrollment_term_id }
     USER_GUARD = -> { @current_user }
     SIS_USER_GUARD = -> { sis_pseudonym&.sis_user_id }
     PSEUDONYM_GUARD = -> { sis_pseudonym }
@@ -970,6 +971,17 @@ module Lti
                        -> { @context.enrollment_term.name },
                        TERM_NAME_GUARD,
                        default_name: "canvas_term_name"
+
+    # returns the current course's term numerical id.
+    # @example
+    #   ```
+    #   123
+    #   ```
+    register_expansion "Canvas.term.id",
+                       [],
+                       -> { @context.enrollment_term_id },
+                       TERM_ID_GUARD,
+                       default_name: "canvas_term_id"
 
     # returns the current course sis source id
     # to return the section source id use Canvas.course.sectionIds
