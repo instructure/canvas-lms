@@ -4317,7 +4317,7 @@ is:
         save_and_publish: "Vista og birta"
       description: Lýsing
       freeze_properties: "Læsa eiginleikum verkefnis við afritun"
-      notify_content_change: "Tilkynna notendum að þetta efni hefur breyst"
+      notify_content_change: "Tilkynna notendum að þetta efni hafi breyst"
       points_possible: Punktar
       submission_attempts: Skilatilraunir
     errors: 
@@ -14683,8 +14683,8 @@ is:
   italian_bd3c792d: Ítalska
   italy_39_cfad867a: "Ítalía (+39)"
   item_5bd51103: Atriði
-  item_banks_1db48044: Atriðabankar
-  item_banks_manage_account_e8040580: "Atriðabankar - stjórna reikningi"
+  item_banks_1db48044: Spurningabankar
+  item_banks_manage_account_e8040580: "Spurningabankar - stjórna reikningi"
   item_cannot_be_duplicated_cebf3109: "Ekki er hægt af afrita atriði"
   item_category_category_icon_for_item_name_item_nam_ff2b97f0: "%{item_category} flokkatákn fyrir heiti atriðis %{item_name}"
   item_complete_d334fd43: "(Atriði lokið)"
@@ -19766,7 +19766,7 @@ is:
   playback: 
     notes: Athugasemdir
     podcast: Hlaðvarp
-    presentation: Kynning
+    presentation: Staðsetning
     statistics: Tölfræði
     video: Myndband
   please_add_a_due_date_1d433d2: "Bættu við skiladegi"
@@ -20408,7 +20408,7 @@ is:
     labels: 
       requirements_must_be_completed: "Eftirfarandi kröfur þarf að uppfylla áður en síðan verður opnuð"
   prerequisites_names_e4fffb88: "Forkröfur: %{names}"
-  presentation_2d9387ca: Kynning
+  presentation_2d9387ca: Staðsetning
   presents_the_quiz_setting_to_avoid_automatic_submi_363b91ff: "Sýnir prófstillingar til að forðast sjálfvirk skil tímamældra prófa þegar tiltækum tíma er lokið."
   press_alt_f8_to_see_a_list_of_keyboard_shortcuts_2a8c7bc0: "Ýttu á ALT + F8 til að sjá lista yfir flýtileiðir á lyklaborði"
   press_space_to_start_over_d4b8a2da: "Ýttu á „bil“ til að byrja aftur"
@@ -21464,7 +21464,7 @@ is:
           answer_with_margin: "með bili"
           answer_with_precision: "með nákvæmni"
           your_answer: "Þitt svar"
-        margin_of_error: Villumörk
+        margin_of_error: Skekkjumörk
         plus_or_minus: +/-
         range_answer: "Milli %{lower_bound} og %{upper_bound}"
         you_left_this_blank: "(Þú hafðir þetta autt)"
@@ -25776,7 +25776,7 @@ is:
     grades: Einkunnir
     groups: Hópar
     home: Heim
-    item_banks: Atriðabankar
+    item_banks: Spurningabankar
     modules: Námsefni
     observees: "Fylgist með"
     outcomes: Niðurstöður
@@ -29429,7 +29429,7 @@ is:
       editing_roles: 
         anyone: "Hver sem er"
         only_members: "Aðeins meðlimir"
-      notify_users_text: "Tilkynna notendum að þetta efni hefur breyst"
+      notify_users_text: "Tilkynna notendum að þetta efni hafi breyst"
       options_label: Valkostir
       title_label: "Titill síðu"
     wiki_page_index: 
