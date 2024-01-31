@@ -81,6 +81,7 @@ module SIS
           else
             state_changes << :updated
           end
+          course.saved_by = :sis_import
           course_enrollment_term_id_stuck = course.stuck_sis_fields.include?(:enrollment_term_id)
           if !course_enrollment_term_id_stuck && term_id
             term = @root_account.enrollment_terms.active.where(sis_source_id: term_id).take

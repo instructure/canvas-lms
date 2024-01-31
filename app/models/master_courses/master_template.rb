@@ -367,7 +367,7 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
         MasterCourses::MasterMigration.start_new_migration!(template,
                                                             migrating_user,
                                                             retry_later: true,
-                                                            priority: Setting.get("sis_blueprint_sync_priority", "25").to_i)
+                                                            priority: Delayed::LOW_PRIORITY + 5)
       end
     end
   end

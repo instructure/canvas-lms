@@ -32,7 +32,7 @@ class Course < ActiveRecord::Base
   include OutcomeImportContext
   include MaterialChanges
 
-  attr_accessor :teacher_names, :master_course, :primary_enrollment_role
+  attr_accessor :teacher_names, :master_course, :primary_enrollment_role, :saved_by
   attr_writer :student_count, :teacher_count, :primary_enrollment_type, :primary_enrollment_role_id, :primary_enrollment_rank, :primary_enrollment_state, :primary_enrollment_date, :invitation, :master_migration
 
   time_zone_attribute :time_zone
@@ -4456,8 +4456,13 @@ class Course < ActiveRecord::Base
       content_migration.copy_options = { everything: true }
       content_migration.migration_settings[:migration_ids_to_import] = { copy: { everything: true } }
       content_migration.workflow_state = "importing"
+      priority = Delayed::LOW_PRIORITY
+      if saved_by == :sis_import
+        priority += 5
+        content_migration.strand = "sis_import_course_templates"
+      end
       content_migration.save!
-      content_migration.queue_migration
+      content_migration.queue_migration(priority:)
     end
   end
 
