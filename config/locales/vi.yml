@@ -12613,8 +12613,7 @@ vi:
         details: 
           mfa_enrollment: |-
               Xác thực đa yếu tố tăng cường bảo mật bằng cách yêu cầu bạn phải có thứ gì đó thuộc quyền sở hữu thực của mình,
-              ngoài việc biết mật khẩu của bạn, để đăng nhập vào Canvas. Đây có thể là thiết bị có thể tạo các mã xác minh
-              hoặc điện thoại có thể nhận tin nhắn văn bản. Có thể cấu hình MFA bằng cách quét mã QR dưới đây bằng ứng dụng xác thực
+              ngoài việc biết mật khẩu của bạn, để đăng nhập vào Canvas. %{otp_via_sms_message} Có thể cấu hình MFA bằng cách quét mã QR dưới đây bằng ứng dụng xác thực
               Mật khẩu sử dụng một lần dựa trên thời gian (Time-based one-time password, TOTP) trên iPhone hoặc Android (ví dụ: Google Authenticator,
               Microsoft Authenticator, Authy). Bạn có thể cấu hình các thẻ bảo mật khác bằng cách nhập mã khóa bí mật **%{secret_key}**.
               Sau khi bạn đã cấu hình xác thực đa yếu tố, bạn nên truy cập trang hồ sơ của mình và in
