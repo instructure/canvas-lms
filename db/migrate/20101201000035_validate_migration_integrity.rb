@@ -32,8 +32,13 @@ class ValidateMigrationIntegrity < ActiveRecord::Migration[4.2]
     initial_migration_version = "20101210192618"
     last_squashed_migration_version = "20180425185812"
 
-    initial_migration_has_run = ActiveRecord::SchemaMigration.where(version: initial_migration_version).exists?
-    last_squashed_migration_has_run = ActiveRecord::SchemaMigration.where(version: last_squashed_migration_version).exists?
+    versions = if $canvas_rails == "7.1"
+                 ActiveRecord::SchemaMigration.new(ActiveRecord::Base.connection).versions
+               else
+                 ActiveRecord::SchemaMigration.all_versions
+               end
+    initial_migration_has_run = versions.include?(initial_migration_version)
+    last_squashed_migration_has_run = versions.include?(last_squashed_migration_version)
 
     if initial_migration_has_run && !last_squashed_migration_has_run
       raise <<~TEXT

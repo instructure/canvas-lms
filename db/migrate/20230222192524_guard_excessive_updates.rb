@@ -69,7 +69,9 @@ class GuardExcessiveUpdates < ActiveRecord::Migration[7.0]
     SQL
     set_search_path("guard_excessive_updates")
 
-    ::ActiveRecord::InternalMetadata[:guard_dangerous_changes_installed] = "true"
+    metadata = ActiveRecord::InternalMetadata
+    metadata = metadata.new(connection) if $canvas_rails == "7.1"
+    metadata[:guard_dangerous_changes_installed] = "true"
 
     ActiveRecord::Base.connection.tables.grep_v(/^_/).each do |table|
       add_guard_excessive_updates(table)
