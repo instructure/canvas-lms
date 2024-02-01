@@ -16958,8 +16958,7 @@ nl:
         details: 
           mfa_enrollment: |-
               Multi-Factor-verificatie (MFA) verbetert de beveiliging omdat je niet alleen je wachtwoord moet kennen, maar ook iets fysieks
-              in je bezit moet hebben om je te kunnen aanmelden bij Canvas. Dat kan een apparaat zijn dat verificatiecodes genereert
-              of een telefoon die SMS-berichten kan ontvangen. MFA kan worden geconfigureerd door de QR-code hieronder te scannen met
+              in je bezit moet hebben om je te kunnen aanmelden bij Canvas. %{otp_via_sms_message} MFA kan worden geconfigureerd door de QR-code hieronder te scannen met
               behulp van een authenticator-app voor een op tijd gebaseerd eenmalig wachtwoord op iPhone of Android (bijv.: Google Authenticator,
               Microsoft Authenticator, Authy). Andere tokens kunnen worden geconfigureerd door de geheime sleutel **%{secret_key}**in te voeren.
               Nadat je Multi-Factor-verificatie hebt geconfigureerd, is het raadzaam naar je profielpagina te gaan en daar een reeks back-upcodes
