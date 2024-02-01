@@ -30,8 +30,8 @@ exports.globPlugins = function (pattern) {
 // e.g. ['foo-bar': 'gems/plugins/foo/app/coffeescripts/bundles/bar.js']
 exports.getPluginBundles = function () {
   // TODO: move plugin frontend code in app/{jsx,coffeescripts}/bundles to ui/features
-  const pluginBundlesPattern = `${canvasDir}/gems/plugins/*/app/{jsx,coffeescripts}/bundles/**/*.js`
-  const fileNameRegexp = /\/([^/]+)\.js/
+  const pluginBundlesPattern = `${canvasDir}/gems/plugins/*/app/{jsx,coffeescripts}/bundles/**/*.{js,jsx}`
+  const fileNameRegexp = /\/([^/]+)\.jsx?/
   const pluginNameRegexp = /plugins\/([^/]+)\/app/
   const pluginBundles = sync(pluginBundlesPattern, []).map(entryFilepath => {
     const pluginName = pluginNameRegexp.exec(entryFilepath)[1]
