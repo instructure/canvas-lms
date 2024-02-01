@@ -15339,8 +15339,7 @@ it:
         details: 
           mfa_enrollment: |-
               L'autenticazione a più fattori aumenta la sicurezza in quanto chiede agli utenti di provare il possesso di un oggetto fisico,
-              oltre a richiedere la conoscenza della password, prima di eseguire l'accesso a Canvas. Questo può essere un dispositivo in grado di generare
-              codici di verifica o un telefono che può ricevere messaggi di testo. MFA può essere configurato eseguendo la scansione del QR code
+              oltre a richiedere la conoscenza della password, prima di eseguire l'accesso a Canvas. %{otp_via_sms_message} MFA può essere configurato eseguendo la scansione del QR code
               sotto utilizzando un’app di autenticazione Time-based one-time password (TOTP) per iPhone o Android (ad es. Google Authenticator,
               Microsoft Authenticator, Authy). Puoi configurare altri token inserendo la chiave segreta **%{secret_key}**.
               Una volta configurata l'autenticazione a più fattori, ti consigliamo di accedere alla tua pagina del profilo e stampare

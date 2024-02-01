@@ -13753,8 +13753,7 @@ sl:
         details: 
           mfa_enrollment: |-
               Z večfaktorsko overitvijo pristnosti je varnost povečana, saj od vas poleg poznavanja gesla za prijavo v
-              sistem Canvas zahteva fizično posedovanje nečesa. To je lahko naprava, ki generira kode preverjanja, ali telefon,
-              ki lahko sprejema besedilna sporočila. MFA je mogoče konfigurirati z branjem kode QR spodaj z uporabo aplikacije
+              sistem Canvas zahteva fizično posedovanje nečesa. %{otp_via_sms_message} MFA je mogoče konfigurirati z branjem kode QR spodaj z uporabo aplikacije
               za preverjanje pristnosti enkratnega gesla na podlagi časa (TOTP) na napravi iPhone ali Android (npr. Google Authenticator,
               Microsoft Authenticator, Authy). Druge žetone je mogoče konfigurirati z vnosom skrivnega ključa **%{secret_key}**.
               Ko konfigurirate večfaktorsko overitev pristnosti, je priporočljivo, da se premaknete na stran svojega profila in natisnete

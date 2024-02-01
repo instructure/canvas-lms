@@ -9923,6 +9923,7 @@ el:
   new_discussion_dae4fae3: "Νέο Θέμα Συζήτησης"
   new_export_3ab758: "Νέα Εξαγωγή"
   new_file_135ae520: "[ Νέο Αρχείο ]"
+  new_group_8d6ad781: "Νέα Ομάδα"
   new_group_set_7241a581: "Νέο Σετ Ομάδων"
   new_module_4e9287e4: "Νέα Ενότητα"
   new_outcome_7fba8c7d: "Νέο Αποτέλεσμα"
@@ -14134,6 +14135,7 @@ el:
   student_viewed_document_9065adb8: "Σπουδαστής που πρόβαλε το Έγγραφο"
   students_1b8cd07b: Μαθητές
   students_being_observed_4de3e520: "Σπουδαστές υπό Παρατήρηση"
+  students_have_already_submitted_to_this_discussion_f55db744: "Οι σπουδαστές έχουν ήδη πραγματοποιήσει υποβολές σε αυτή τη συζήτηση, επομένως οι ρυθμίσεις της ομάδας δεν μπορούν να αλλάξουν."
   students_must_complete_all_of_these_requirements_15fa97f7: "Οι σπουδαστές θα πρέπει να ολοκληρώσουν όλες αυτές τις απαιτήσεις"
   students_must_move_through_requirements_in_sequent_2c750874: "Οι σπουδαστές θα πρέπει να μετακινηθούν στις απαιτήσεις διαδοχικά από τη μια στην επόμενη"
   students_who_have_taken_the_quiz_count_69dbbda0: 
@@ -14990,6 +14992,7 @@ el:
   upload_media_ce31135a: "Μεταφόρτωση Αρχείου Πολυμέσων"
   upload_scores_csv_a8416cf: "Μεταφόρτωση Βαθμολογιών (.csv)"
   upload_successful_ca47465f: "Η μεταφόρτωση ήταν επιτυχής"
+  upload_to_d8556041: "Μεταφόρτωση σε"
   uploaded_285a2bfb: Μεταφορτώθηκε
   uploading_19e8a4e7: "Γίνεται φόρτωση..."
   uploading_ee585874: "Γίνεται μεταφόρτωση..."

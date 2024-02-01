@@ -16046,8 +16046,7 @@ fr-CA:
         details: 
           mfa_enrollment: |-
               L’authentification multifacteur augmente la sécurité en exigeant que vous ayez quelque chose en votre possession physique,
-              en plus de connaître votre mot de passe, afin de vous connecter à Canvas. Il peut s’agir d’un appareil capable de générer des
-              codes de vérification ou d’un téléphone pouvant recevoir des messages texte. MFA peut être configuré en scannant le code QR ci-dessous à l’aide 
+              en plus de connaître votre mot de passe, afin de vous connecter à Canvas. %{otp_via_sms_message} MFA peut être configuré en scannant le code QR ci-dessous à l’aide 
               d’une application d’authentification de mot de passe à usage unique basé sur le temps (TOTP) sur iPhone ou Android (ex : Google Authenticator,
               Microsoft Authenticator, Authy). D’autres jetons peuvent être configurés en entrant la clé secrète **%{secret_key}**.
               Une fois que vous avez configuré l’authentification multifacteur, il est recommandé d’accéder à votre page de profil et d’imprimer

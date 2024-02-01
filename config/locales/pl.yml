@@ -17399,8 +17399,7 @@ pl:
         details: 
           mfa_enrollment: |-
               Uwierzytelnienie wieloskładnikowe zwiększa bezpieczeństwo, ponieważ oprócz znajomości hasła, do zalogowania się w Canvas
-              wymagany jest fizyczny przedmiot. Może to być urządzenie, które generuje kody weryfikacyjne, lub telefon, który odbiera
-              wiadomości tekstowe. Ochronę MFA można skonfigurować, skanując kod QR poniżej za pomocą aplikacji uwierzytelniającej
+              wymagany jest fizyczny przedmiot. %{otp_via_sms_message} Ochronę MFA można skonfigurować, skanując kod QR poniżej za pomocą aplikacji uwierzytelniającej
               TOTP (tj. jednorazowe, czasowe uwierzytelnianie) na urządzeniu iPhone lub w systemie Android (np.: Google Authenticator,
               Microsoft Authenticator, Authy). Inne tokeny można skonfigurować, wprowadzając tajny klucz **%{secret_key}**.
               Po skonfigurowaniu uwierzytelnienia wieloskładnikowego zaleca się przejście do strony profilu i wydrukowanie
