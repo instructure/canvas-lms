@@ -16,20 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {
-  chain,
-  difference,
-  filter,
-  forEach,
-  groupBy,
-  indexOf,
-  isEmpty,
-  isEqual,
-  keyBy,
-  map,
-  reduce,
-  union,
-} from 'lodash'
+import {chain, difference, forEach, isEmpty, isEqual, keyBy, map, reduce, union} from 'lodash'
+import _ from 'underscore'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
@@ -44,7 +32,12 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import GradingPeriodsHelper from '@canvas/grading/GradingPeriodsHelper'
 import {Checkbox} from '@instructure/ui-checkbox'
 import '@canvas/rails-flash-notifications'
-import {sortedRowKeys, rowsFromOverrides, getAllOverrides, datesFromOverride} from '../util/overridesUtils'
+import {
+  sortedRowKeys,
+  rowsFromOverrides,
+  getAllOverrides,
+  datesFromOverride,
+} from '../util/overridesUtils'
 
 const I18n = useI18nScope('due_datesDueDates')
 
