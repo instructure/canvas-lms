@@ -15822,8 +15822,7 @@ ht:
         details: 
           mfa_enrollment: |-
               Otantifikasyon milti faktoryèl la ranfòse sekirite a, li egzije pou w gen yon bagay nan men w, anplis de modpas
-              ou pou w ka konekte sou Canvas. Li kapab se yon aparèy ki kapab jenere kòd verifikasyon oswa yon telefòn
-              ki ka resevwa mesaj tèks. Ou ka eskane kòd QR anba a avèk yon aplikasyon otantifikasyon pa modpas
+              ou pou w ka konekte sou Canvas. %{otp_via_sms_message} Ou ka eskane kòd QR anba a avèk yon aplikasyon otantifikasyon pa modpas
               inik ki base sou tan (TOTP) sou iPhone oswa Android pou konfigire MFA a (ex: Google Authenticator,
               Microsoft Authenticator, Authy). Lòt token ka konfigire si w antre kle sekrè a **%{secret_key}**.
               Lè w fin konfigire otantifikasyon milti faktoryèl la, li rekòmande pou w ale sou profil ou epi enprime
