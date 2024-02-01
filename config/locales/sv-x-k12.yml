@@ -15078,8 +15078,7 @@ sv-x-k12:
         details: 
           mfa_enrollment: |-
               Multifaktorautentisering ökar säkerheten genom att kräva att du har något i din fysiska besittning,
-              utöver att ditt lösenord, för att logga in på Canvas. Detta kan vara en enhet som kan generera
-              verifieringskoder, eller en telefon som kan ta emot textmeddelanden. MFA kan konfigureras genom att skanna QR-koden
+              utöver att ditt lösenord, för att logga in på Canvas. %{otp_via_sms_message} MFA kan konfigureras genom att skanna QR-koden
               nedan med en autentiseringsapp med ett tidsbaserat engångslösenord (TOTP) i iPhone eller Android (t.ex: Google Authenticator,
               Microsoft Authenticator, Authy). Andra tokens kan konfigureras genom att ange den hemliga nyckeln **%{secret_key}**.
               När du har konfigurerat flerfaktorsautentisering rekommenderas du att gå till din profilsida och skriva ut
