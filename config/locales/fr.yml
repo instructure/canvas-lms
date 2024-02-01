@@ -16967,8 +16967,7 @@ fr:
         details: 
           mfa_enrollment: |-
               L’identification à plusieurs facteurs augmente la sécurité en imposant d’avoir sur soi un objet physique, en plus de connaître son mot de passe,
-              afin de pouvoir s’identifier dans Canvas. Il peut s’agir d’un appareil capable de générer un code de vérification, ou d’un téléphone pouvant recevoir
-              un message écrit. L'authentification multi-facteurs peut être configurée en scannant le code QR ci-dessous ci-dessous à l’aide d’une application d'authentification
+              afin de pouvoir s’identifier dans Canvas. %{otp_via_sms_message} L'authentification multi-facteurs peut être configurée en scannant le code QR ci-dessous ci-dessous à l’aide d’une application d'authentification
               à mot de passe unique à durée limitée (Time-based one-time password, ou TOTP) sur iPhone ou Android (par ex. : Google Authenticator,
               Microsoft Authenticator, Authy). D'autres jetons peuvent être configurés en saisissant la clé secrète **%{secret_key}**.
               Une fois l’authentification à plusieurs facteurs configurée, il est recommandé de vous rendre sur votre page profil et d’imprimer
