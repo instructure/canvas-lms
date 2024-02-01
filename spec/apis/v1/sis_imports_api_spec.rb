@@ -1122,7 +1122,7 @@ describe SisImportsApiController, type: :request do
   end
 
   it "works with import permissions" do
-    account_admin_user_with_role_changes(user: @user, role_changes: { manage_sis: false, import_sis: true })
+    account_with_role_changes(user: @user, role_changes: { manage_sis: false, import_sis: true })
     api_call(:post,
              "/api/v1/accounts/#{@account.id}/sis_imports.json",
              { controller: "sis_imports_api",

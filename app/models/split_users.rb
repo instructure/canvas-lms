@@ -208,7 +208,7 @@ class SplitUsers
     account_users_ids = records.where(context_type: "AccountUser").pluck(:context_id)
 
     Shard.partition_by_shard(account_users_ids) do |shard_account_user_ids|
-      AccountUser.where(id: shard_account_user_ids).update_all(user_id: restored_user.id)
+      AccountUser.where(id: shard_account_user_ids).where.not(user_id: restored_user).update_all(user_id: restored_user.id)
     end
     restore_workflow_states_from_records(records)
   end
