@@ -14461,8 +14461,7 @@ fi:
         details: 
           mfa_enrollment: |-
               Monimenetelmäinen todentaminen lisää tietoturvaa vaatimalla, että kirjautuaksesi Canvasiin sinulla on jotakin fyysisessä
-              omistuksessasi sen lisäksi, että tiedät salasanan. Tämä voi olla laite, joka voi luoda vahvistuskoodeja tai puhelin,
-              joka vastaanottaa tekstiviestejä. MFA voidaan konfiguroida skanaamalla alla oleva viivakoodi aikaan perustuvan
+              omistuksessasi sen lisäksi, että tiedät salasanan. %{otp_via_sms_message} MFA voidaan konfiguroida skanaamalla alla oleva viivakoodi aikaan perustuvan
               kertaluontoisen salasanan (TOTP) todennussovelluksen avulla iPhonessa tai Androidissa (esim.: Google Authenticator,
               Microsoft Authenticator, Authy). Muut tunnukset voidaan todentaa syöttämällä salainen avain **%{secret_key}**.
               Kun olet konfiguroinut monimenetelmäisen todentamisen, suositellaan, että siirryt profiilisivulle ja tulostat joukon
