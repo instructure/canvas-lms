@@ -1902,7 +1902,7 @@ module IgnoreOutOfSequenceMigrationDates
   def current_migration_number(dirname)
     migration_lookup_at(dirname).filter_map do |file|
       digits = File.basename(file).split("_").first
-      next if ActiveRecord::Base.timestamped_migrations && digits.length != 14
+      next if ActiveRecord.timestamped_migrations && digits.length != 14
 
       digits.to_i
     end.max.to_i
@@ -1916,7 +1916,7 @@ Autoextend.hook(:"ActiveRecord::Generators::MigrationGenerator",
 
 module AlwaysUseMigrationDates
   def next_migration_number(number)
-    if ActiveRecord::Base.timestamped_migrations
+    if ActiveRecord.timestamped_migrations
       Time.now.utc.strftime("%Y%m%d%H%M%S")
     else
       SchemaMigration.normalize_migration_number(number)
