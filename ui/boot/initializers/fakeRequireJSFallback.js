@@ -34,14 +34,14 @@
   })
   should log: underscore, jquery and the colors
 */
-import jQuery from 'jquery'
+import $ from 'jquery'
 import {captureException} from '@sentry/browser'
 
 if (!('require' in window)) {
   const getDefaultExport = m => m.default
 
   const thingsWeStillAllowThemToRequire = {
-    jquery: () => jQuery,
+    jquery: () => $,
     // load these asynchronously so they are not downloaded unless asked for
     i18nObj: () =>
       import(/* webpackChunkName: "[request]" */ '@canvas/i18n').then(getDefaultExport),
@@ -56,7 +56,7 @@ if (!('require' in window)) {
       return thingsWeStillAllowThemToRequire[module]()
     } else if (/^(https?:)?\/\//.test(module)) {
       // starts with 'http://', 'https://' or '//'
-      return jQuery.getScript(module)
+      return $.getScript(module)
     } else {
       throw new Error(
         `Cannot load ${module}, use your own RequireJS or something else to load this script`
