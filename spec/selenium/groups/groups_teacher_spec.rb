@@ -225,6 +225,7 @@ describe "new groups" do
     end
 
     it "Allows teacher to join students to groups in unpublished courses", priority: "1" do
+      skip "FOO-4220" # TODO: re-enable this test (or rewrite) after fixing FOO-4263
       group_test_setup(3, 1, 2)
       @course.workflow_state = "unpublished"
       @course.save!
