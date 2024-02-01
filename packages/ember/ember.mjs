@@ -11,6 +11,33 @@
 import HandlebarsExports from 'handlebars/runtime.js'
 import jQuery from 'jquery'
 
+/* begin define / AMD polyfill */
+var registry = {};
+
+const define = function(name, deps, callback) {
+    if (typeof name !== 'string') {
+        throw new Error('Module name must be a string');
+    }
+    if (!Array.isArray(deps)) {
+        throw new Error('Dependencies must be an array');
+    }
+    if (typeof callback !== 'function') {
+        throw new Error('Module factory must be a function');
+    }
+
+    registry[name] = callback.apply(null, deps.map(function(dep) {
+        if (registry[dep]) {
+            return registry[dep];
+        } else {
+            throw new Error('Module ' + dep + ' not found');
+        }
+    }));
+};
+
+// Mark this 'define' function as AMD compliant
+define.amd = {};
+/* end define / AMD polyfill */
+
 const Handlebars = HandlebarsExports.default;
 const Ember = window.Ember = {};
 const MetamorphENV = Ember.MetamorphENV = {};
