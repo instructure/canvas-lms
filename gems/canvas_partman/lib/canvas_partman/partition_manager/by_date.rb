@@ -103,6 +103,10 @@ module CanvasPartman
         super(table_name)
       end
 
+      def partition_tables
+        super.sort_by { |t| date_from_partition_name(t) }
+      end
+
       protected
 
       def table_regex
