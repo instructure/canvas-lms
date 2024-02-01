@@ -16891,8 +16891,7 @@ de:
         details: 
           mfa_enrollment: |-
               Die Multi-Faktor-Authentifizierung erhöht die Sicherheit, indem sie verlangt, dass Sie zusätzlich zu Ihrem Kennwort etwas in Ihrem Besitz haben,
-              um sich bei Canvas anzumelden. Dies kann ein Gerät sein, das Bestätigungscodes generieren kann, oder ein Telefon,
-              das Textnachrichten empfangen kann. MFA kann durch Scannen des unten stehenden QR-Codes mit einer Authentifizierungs-App für
+              um sich bei Canvas anzumelden. %{otp_via_sms_message} MFA kann durch Scannen des unten stehenden QR-Codes mit einer Authentifizierungs-App für
               zeitbasierte Kennwörter (Time-based One-Time Password, TOTP) auf dem iPhone oder Android konfiguriert werden (z. B: Google Authenticator,
               Microsoft Authenticator, Authy). Andere Token können durch Eingabe des Geheimschlüssels konfiguriert werden **%{secret_key}**.
               Sobald Sie die Multi-Faktor-Authentifizierung konfiguriert haben, empfehlen wir Ihnen, auf Ihrer Profilseite einen
