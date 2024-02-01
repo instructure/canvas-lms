@@ -2136,7 +2136,11 @@ Rails.application.config.after_initialize do
     cache = MultiCache.fetch("schema_cache")
     next if cache.nil?
 
-    connection_pool.set_schema_cache(cache)
+    if $canvas_rails == "7.1"
+      connection_pool.schema_reflection.set_schema_cache(cache)
+    else
+      connection_pool.set_schema_cache(cache)
+    end
     LoadAccount.schema_cache_loaded!
   end
 end
