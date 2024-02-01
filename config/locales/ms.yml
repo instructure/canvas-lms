@@ -12204,8 +12204,7 @@ ms:
         details: 
           mfa_enrollment: |-
               Pengesahan berbilang faktor meningkatkan keselamatan dengan mensyaratkan anda memiliki sesuatu bersama anda dalam bentuk fizikal,
-              selain mengetahui kata laluan anda supaya anda boleh log masuk ke Canvas. Sesuatu yang berbentuk fizikal ini boleh jadi peranti
-              yang dapat menjana kod pengesahan atau telefon yang boleh menerima mesej teks. MFA boleh dikonfigurasikan dengan mengimbas kod QR
+              selain mengetahui kata laluan anda supaya anda boleh log masuk ke Canvas. %{otp_via_sms_message} MFA boleh dikonfigurasikan dengan mengimbas kod QR
               di bawah menggunakan aplikasi pengesah kata laluan sekali guna berasaskan Masa (TOTP) pada iPhone atau Android (cth: Google Authenticator,
               Microsoft Authenticator, Authy). Token lain boleh dikonfigurasikan dengan memasukkan kod kunci rahsia **%{secret_key}**.
               Sebaik sahaja anda telah mengkonfigurasikan pengesahan berbilang faktor, anda disarankan untuk pergi ke halaman profil
