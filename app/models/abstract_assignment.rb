@@ -1525,6 +1525,7 @@ class AbstractAssignment < ActiveRecord::Base
       submission.restore(:assignment) if from != short_type && submission
     end
     lti_resource_links.find_each(&:undestroy)
+    external_tool_tag&.update!(workflow_state: "active")
   end
 
   def participants_with_overridden_due_at

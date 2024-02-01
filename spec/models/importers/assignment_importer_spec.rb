@@ -282,11 +282,11 @@ describe "Importing assignments" do
 
     it "sets the content tag workflow state back to active when a previously deleted quiz lti assignment is re-imported back into the course" do
       subject
-      new_quiz.external_tool_tag.workflow_state = "deleted"
+      new_quiz.destroy
       new_quiz.save!
       Importers::AssignmentImporter.import_from_migration(assignment_hash, course, migration)
       new_quiz.reload
-      expect(new_quiz.external_tool_tag.workflow_state).to eq("active")
+      expect(new_quiz.external_tool_tag).to be_active
     end
   end
 
@@ -351,6 +351,26 @@ describe "Importing assignments" do
         it "updates the URL" do
           expect { subject }.to change { assignment.external_tool_tag.url }.from(tool.url).to tool_url
         end
+      end
+    end
+
+    context "when previously deleted LTI assignment is re-imported" do
+      let(:tool) { external_tool_model(context: course.root_account) }
+      let(:tool_id) { tool.id }
+      let(:tool_url) { tool.url }
+
+      before do
+        assignment
+        Importers::AssignmentImporter.import_from_migration(assignment_hash, course, migration)
+        assignment.reload
+        assignment.destroy
+        assignment.save!
+      end
+
+      it "un-deletes content tag" do
+        expect(assignment.external_tool_tag).to be_deleted
+        subject
+        expect(assignment.external_tool_tag).to be_active
       end
     end
 
@@ -610,6 +630,31 @@ describe "Importing assignments" do
                 .to eq(expected_created_line_items_fields)
             end
           end
+        end
+      end
+
+      context "when previously deleted LTI assignment is re-imported" do
+        let(:line_item) { assignment.line_items.first }
+        let(:resource_link) { assignment.lti_resource_links.first }
+
+        before do
+          assignment
+          Importers::AssignmentImporter.import_from_migration(assignment_hash, course, migration)
+          assignment.reload
+          assignment.destroy
+          assignment.save!
+        end
+
+        it "un-deletes resource links" do
+          expect(line_item).to be_deleted
+          subject
+          expect(line_item.reload).to be_active
+        end
+
+        it "un-deletes line items" do
+          expect(resource_link).to be_deleted
+          subject
+          expect(resource_link.reload).to be_active
         end
       end
     end
