@@ -13568,8 +13568,7 @@ ca:
         details: 
           mfa_enrollment: |-
               L'autenticació multifactorial augmenta la seguretat en requerir-vos la possessió física d'alguna cosa, a més de saber
-              la contrasenya, per iniciar la sessió al Canvas. Pot ser un dispositiu que pugui generar codis de verificació,
-              o bé un telèfon que pugui rebre missatges de text. Per configurar l’MFA es pot escanejar el codi QR de sota mitjançant
+              la contrasenya, per iniciar la sessió al Canvas. %{otp_via_sms_message} Per configurar l’MFA es pot escanejar el codi QR de sota mitjançant
               una aplicació d'autenticació de contrasenya única basada en el temps (TOTP) a iPhone o Android (per exemple: Google Authenticator,
               Microsoft Authenticator o Authy). Per configurar altres testimonis, introduïu la clau secreta **%{secret_key}**.
               Quan hàgiu configurat l'autenticació multifactorial, és recomanable que aneu a la vostra pàgina de perfil i imprimiu
