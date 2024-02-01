@@ -32,7 +32,7 @@ describe "Account Calendar Settings" do
     @sub2_account = Account.create!(name: "sub2", parent_account: account)
     @sub_sub_account = Account.create!(name: "sub sub", parent_account: @sub1_account)
     @admin_user = account_admin_user(account:, active_all: true)
-    account_admin_user(account: @sub_account, user: @admin_user)
+    account_admin_user(account: @sub1_account, user: @admin_user)
     account_admin_user(account: @sub_sub_account, user: @admin_user)
   end
 

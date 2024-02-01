@@ -615,8 +615,10 @@ describe SplitUsers do
       SplitUsers.split_db_users(source_user)
 
       expect(admin.reload.workflow_state).to eq "active"
-      expect(admin.reload.user).to eq restored_user
-      expect(admin2.reload.user).to eq restored_user
+      expect(admin.user).to eq restored_user
+      expect(admin2.reload.workflow_state).to eq "active"
+      expect(admin2.user).to eq restored_user
+      expect(admin3.reload.workflow_state).to eq "active"
       expect(admin3.reload.user).to eq source_user
     end
 

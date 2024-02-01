@@ -802,7 +802,7 @@ describe User do
           expect(@user.user_account_associations.shard(@user).map(&:account)).to eq [Account.site_admin]
           expect(@account.reload.user_account_associations.map(&:user)).to eq []
 
-          @account.account_users.create!(user: @user)
+          au.reactivate!
 
           expect(@user.user_account_associations.shard(@user).map(&:account).sort_by(&:id)).to eq(
             [Account.site_admin, @account].sort_by(&:id)

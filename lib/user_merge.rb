@@ -135,7 +135,13 @@ class UserMerge
 
       account_users = AccountUser.where(user_id: from_user)
       merge_data.add_more_data(account_users)
-      account_users.update_all(user_id: target_user.id, updated_at: Time.now.utc)
+      # soft-delete account_users that would violate the unique index, then move the rest
+      target_combos = AccountUser.where(user_id: target_user).pluck(:role_id, :account_id).to_set
+      conflicting_ids = account_users.filter_map { |au| au.id if target_combos.include?([au.role_id, au.account_id]) }
+      if conflicting_ids.any?
+        AccountUser.where(id: conflicting_ids).update_all(workflow_state: "deleted", updated_at: Time.now.utc)
+      end
+      AccountUser.where(user_id: from_user).where.not(id: conflicting_ids).update_all(user_id: target_user.id, updated_at: Time.now.utc)
 
       attachments = Attachment.where(user_id: from_user)
       merge_data.add_more_data(attachments)
