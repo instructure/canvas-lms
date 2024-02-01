@@ -15389,8 +15389,7 @@ cy:
         details: 
           mfa_enrollment: |-
               Mae proses ddilysu sawl cam yn cynnig mwy o ddiogelwch drwy fynnu bod gennych chi rywbeth yn eich eiddo,
-              yn ogystal â gwybod eich cyfrinair, er mwyn mewngofnodi i Canvas. Gall hwn fod yn ddyfais sy’n gallu creu
-              codau dilysu neu ffôn sy’n gallu derbyn negeseuon testun. Mae modd ffurfweddu MFA drwy sganio’r cod QR
+              yn ogystal â gwybod eich cyfrinair, er mwyn mewngofnodi i Canvas. %{otp_via_sms_message} Mae modd ffurfweddu MFA drwy sganio’r cod QR
               isod gan ddefnyddio ap awdurdodi cyfrinair un-tro yn seiliedig ar amser ar iPhone neu Android (ex: Google Authenticator,
               Microsoft Authenticator, Authy). Modd ffurfweddu tocynnau eraill drwy roi’r allwedd gyfrinachol **%{secret_key}**.
               Ar ôl i chi ffurfweddu’r broses ddilysu sawl cam, rydym yn awgrymu eich bod yn mynd i dudalen eich proffil ac yn
