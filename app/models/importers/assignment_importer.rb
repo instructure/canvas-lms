@@ -109,6 +109,7 @@ module Importers
 
       item ||= Assignment.where(context_type: context.class.to_s, context_id: context, id: hash[:id]).first
       item ||= Assignment.where(context_type: context.class.to_s, context_id: context, migration_id: hash[:migration_id]).first if hash[:migration_id]
+
       item ||= context.assignments.temp_record # new(:context => context)
 
       item.updating_user = migration.user
@@ -121,6 +122,7 @@ module Importers
       item.title = I18n.t("untitled assignment") if item.title.blank?
       item.migration_id = hash[:migration_id]
       if new_record || item.deleted? || master_migration
+        restore_lti_models(item) if item.deleted?
         item.workflow_state = if item.can_unpublish?
                                 hash[:workflow_state] || "published"
                               else
@@ -536,6 +538,13 @@ module Importers
           end
         end
       end
+    end
+
+    # Restore any deleted LTI models (Lti::ResourceLink, Lti::LineItem, ContentTag)
+    # for an existing assignment, if necessary.
+    def self.restore_lti_models(item)
+      item.lti_resource_links.find_each(&:undestroy)
+      item.external_tool_tag&.workflow_state = "active"
     end
 
     def self.set_annotatable_attachment(assignment, hash, context)
