@@ -17,16 +17,19 @@
  */
 
 import React from 'react'
-import {Heading} from '@instructure/ui-heading'
-import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
+import AdminHeader from '../AdminHeader'
 
 const InstitutionSettingsDashboard = () => {
   return (
     <View as="div">
-      <Heading level="h1">Institution Settings</Heading>
-      <Text>Manage all institution settings related to issuers and permissions</Text>
-      <View as="div" margin="large 0 0" background="secondary" height="700px" />
+      <AdminHeader
+        title="Institution Setting"
+        description="Manage all institution settings related to issuers and permissions"
+      />
+      <View as="div" margin="large">
+        <View as="div" margin="large 0 0" background="secondary" height="700px" />
+      </View>
     </View>
   )
 }

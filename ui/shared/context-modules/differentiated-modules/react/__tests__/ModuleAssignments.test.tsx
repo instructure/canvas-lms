@@ -30,8 +30,9 @@ const props: ModuleAssignmentsProps = {
 
 const SECTIONS_URL = `/api/v1/courses/${props.courseId}/sections`
 const STUDENTS_URL = `api/v1/courses/${props.courseId}/users?enrollment_type=student`
-const FILTERED_SECTIONS_URL = `/api/v1/courses/${props.courseId}/sections?search_term=sec`
-const FILTERED_STUDENTS_URL = `api/v1/courses/${props.courseId}/users?search_term=sec&enrollment_type=student`
+const FILTERED_SECTIONS_URL = /\/api\/v1\/courses\/.+\/sections\?search_term=.+/
+const FILTERED_STUDENTS_URL =
+  /\/api\/v1\/courses\/.+\/users\?search_term=.+&enrollment_type=student/
 
 describe('ModuleAssignments', () => {
   beforeAll(() => {
@@ -70,6 +71,16 @@ describe('ModuleAssignments', () => {
     })
   })
 
+  it('shows sis id in list', async () => {
+    const {findByTestId, findByText, getByText} = renderComponent()
+    const moduleAssignments = await findByTestId('assignee_selector')
+    act(() => moduleAssignments.click())
+    await findByText(STUDENTS_DATA[0].name)
+    STUDENTS_DATA.forEach(student => {
+      expect(getByText(student.sis_user_id)).toBeInTheDocument()
+    })
+  })
+
   it('fetches filtered results from both APIs', async () => {
     const {findByTestId, findByText, getByText} = renderComponent()
     const moduleAssignments = await findByTestId('assignee_selector')
@@ -82,6 +93,24 @@ describe('ModuleAssignments', () => {
     FILTERED_STUDENTS_DATA.forEach(student => {
       expect(getByText(student.name)).toBeInTheDocument()
     })
+  })
+
+  it('allows filtering by SIS ID', async () => {
+    const {findByTestId, findByText} = renderComponent()
+    const moduleAssignments = await findByTestId('assignee_selector')
+    act(() => moduleAssignments.click())
+    fireEvent.change(moduleAssignments, {target: {value: 'raNDoM_iD_8'}})
+    expect(await findByText('Secilia')).toBeInTheDocument()
+  })
+
+  it('shows SIS ID on existing options', async () => {
+    const {findByTestId, findByText, getByTitle} = renderComponent({
+      defaultValues: [{id: 'student-2', group: 'Students', overrideId: '1234', value: 'Peter'}],
+    })
+    const moduleAssignments = await findByTestId('assignee_selector')
+    act(() => moduleAssignments.click())
+    act(() => getByTitle('Remove Peter').click())
+    expect(await findByText('peter002')).toBeInTheDocument()
   })
 
   it('calls onSelect with parsed options', async () => {

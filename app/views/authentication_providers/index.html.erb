@@ -66,17 +66,6 @@
          url: context_url(@account, :context_user_url, @current_user)) %>
 </p>
 
-<% if @presenter.ips_configured? %>
-  <p>
-    <%= t(:ip_address_list_description,
-        "If you are using an authentication service that requires the Canvas "\
-        "servers to contact your servers directly, such as LDAP, you'll need "\
-        "to make sure that your servers can accept connections from these "\
-        "IP addresses:") %>
-    <pre> <%= @presenter.ip_list %> </pre>
-  </p>
-<% end %>
-
 <%= render partial: 'sso_settings_form',
            locals: { presenter: @presenter, account: @account }%>
 

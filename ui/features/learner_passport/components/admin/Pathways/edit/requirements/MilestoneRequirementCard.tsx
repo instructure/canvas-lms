@@ -16,8 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useCallback} from 'react'
 import {IconDragHandleLine, IconEditLine, IconTrashLine} from '@instructure/ui-icons'
+import {IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Link} from '@instructure/ui-link'
 import {Tag} from '@instructure/ui-tag'
@@ -27,13 +28,33 @@ import type {RequirementData} from '../../../../types'
 import {RequirementTypes} from '../../../../types'
 import {pluralize} from '../../../../shared/utils'
 
-const MilestoneRequirementCard = ({requirement}: {requirement: RequirementData}) => {
+type MilestoneRequirementCardProps = {
+  requirement: RequirementData
+  variant: 'view' | 'edit'
+  onEdit?: (requirement: RequirementData) => void
+  onDelete?: (requirement: RequirementData) => void
+}
+
+const MilestoneRequirementCard = ({
+  requirement,
+  variant,
+  onEdit,
+  onDelete,
+}: MilestoneRequirementCardProps) => {
+  const handleEditRequirement = useCallback(() => onEdit?.(requirement), [onEdit, requirement])
+
+  const handleDeleteRequirement = useCallback(
+    () => onDelete?.(requirement),
+    [onDelete, requirement]
+  )
   return (
     <Flex gap="small">
-      <Flex.Item align="center">
-        <IconDragHandleLine />
-      </Flex.Item>
-      <Flex.Item shouldGrow={true}>
+      {variant === 'edit' && (
+        <Flex.Item align="center">
+          <IconDragHandleLine />
+        </Flex.Item>
+      )}
+      <Flex.Item shouldGrow={true} shouldShrink={true}>
         <View as="div" background="secondary">
           <View as="div">
             <Text weight="bold">{requirement.name}</Text>
@@ -78,14 +99,30 @@ const MilestoneRequirementCard = ({requirement}: {requirement: RequirementData})
           )}
         </View>
       </Flex.Item>
-      <Flex.Item align="center">
-        <View display="inline-block" margin="0 small 0 0">
-          <IconEditLine />
-        </View>
-        <View display="inline-block">
-          <IconTrashLine />
-        </View>
-      </Flex.Item>
+      {variant === 'edit' && (
+        <Flex.Item align="center">
+          <View display="inline-block" margin="0 small 0 0">
+            <IconButton
+              screenReaderLabel="edit"
+              size="small"
+              withBackground={false}
+              withBorder={false}
+              onClick={handleEditRequirement}
+            >
+              <IconEditLine />
+            </IconButton>
+            <IconButton
+              screenReaderLabel="delete"
+              size="small"
+              withBackground={false}
+              withBorder={false}
+              onClick={handleDeleteRequirement}
+            >
+              <IconTrashLine />
+            </IconButton>
+          </View>
+        </Flex.Item>
+      )}
     </Flex>
   )
 }

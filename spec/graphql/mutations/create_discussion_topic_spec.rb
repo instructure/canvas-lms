@@ -1103,6 +1103,50 @@ describe Mutations::CreateDiscussionTopic do
       expect(result["errors"]).to be_nil
     end
 
+    it "successfully creates a discussion topic with checkpoints using dueAt, lockAt, unlockAt" do
+      context_type = "Course"
+      title = "Graded Discussion w/Checkpoints"
+      message = "Lorem ipsum..."
+      published = true
+      due_at = 5.days.from_now
+      lock_at = 5.days.from_now
+      unlock_at = 2.days.from_now
+
+      query = <<~GQL
+        contextId: "#{@course.id}"
+        contextType: #{context_type}
+        title: "#{title}"
+        message: "#{message}"
+        published: #{published}
+        assignment: {
+          courseId: "#{@course.id}",
+          name: "#{title}",
+          forCheckpoints: true
+        }
+        checkpoints: [
+          {
+            checkpointLabel: "reply_to_topic",
+            pointsPossible: 10,
+            dates: [{ type: everyone, dueAt: "#{due_at.iso8601}", lockAt: "#{lock_at.iso8601}", unlockAt: "#{unlock_at.iso8601}" }]
+          },
+          {
+            checkpointLabel: "reply_to_entry",
+            pointsPossible: 15,
+            dates: [{ type: everyone, dueAt: "#{10.days.from_now.iso8601}" }],
+            repliesRequired: 3
+          }
+        ]
+      GQL
+
+      result = execute_with_input_with_assignment(query)
+      expect(result["errors"]).to be_nil
+
+      checkpoint = SubAssignment.find_by(sub_assignment_tag: "reply_to_topic")
+      expect(checkpoint.due_at).to be_within(1.second).of due_at
+      expect(checkpoint.lock_at).to be_within(1.second).of lock_at
+      expect(checkpoint.unlock_at).to be_within(1.second).of unlock_at
+    end
+
     it "successfully creates a discussion topic with checkpoints and CourseSection overrides" do
       section1 = add_section("M03")
       section2 = add_section("M06")

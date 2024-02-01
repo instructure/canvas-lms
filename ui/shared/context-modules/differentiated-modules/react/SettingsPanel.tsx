@@ -182,9 +182,10 @@ export default function SettingsPanel({
     const handleRequest = moduleId ? updateModule : createModule
 
     setLoading(true)
+    // eslint-disable-next-line promise/catch-or-return
     handleRequest({moduleId, moduleElement, addModuleUI, data: state})
+      .finally(() => setLoading(false))
       .then(() => (onDidSubmit ? onDidSubmit() : onDismiss()))
-      .catch(() => setLoading(false))
   }, [onDidSubmit, onDismiss, addModuleUI, moduleId, moduleElement, state])
 
   function customOnDismiss() {
@@ -234,6 +235,8 @@ export default function SettingsPanel({
           <View data-testid="lock-until-input" as="div" padding="small">
             <DateTimeInput
               value={state.unlockAt}
+              locale={ENV.LOCALE || 'en'}
+              timezone={ENV.TIMEZONE || 'UTC'}
               dateRenderLabel={I18n.t('Date')}
               timeRenderLabel={I18n.t('Time')}
               invalidDateTimeMessage={I18n.t('Invalid date!')}
@@ -348,7 +351,7 @@ export default function SettingsPanel({
       </Flex.Item>
       <Flex.Item size={footerHeight}>
         <Footer
-          saveButtonLabel={moduleId ? I18n.t('Update Module') : I18n.t('Add Module')}
+          saveButtonLabel={moduleId ? I18n.t('Save') : I18n.t('Add Module')}
           onDismiss={customOnDismiss}
           onUpdate={handleSave}
           updateInteraction={state.nameInputMessages.length > 0 ? 'inerror' : 'enabled'}

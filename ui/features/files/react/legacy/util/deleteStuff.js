@@ -60,7 +60,7 @@ export default function deleteStuff(filesAndFolders, args) {
       error(model, response, _options) {
         const reason = (() => {
           try {
-            const json = $.parseJSON(response.responseText)
+            const json = JSON.parse(response.responseText)
             return json && json.message
           } catch (error) {
             // no-op

@@ -57,5 +57,5 @@ services:
 
   dynamodb:
     image: $DYNAMODB_IMAGE_TAG
-    command: -jar DynamoDBLocal.jar
+    command: -jar DynamoDBLocal.jar -sharedDb
     init: true

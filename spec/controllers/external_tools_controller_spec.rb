@@ -364,7 +364,6 @@ describe ExternalToolsController do
 
         before do
           allow(ApplicationController).to receive_messages(test_cluster?: true, test_cluster_name: "beta")
-          Account.site_admin.enable_feature! :dynamic_lti_environment_overrides
 
           tool.course_navigation = { enabled: true }
           tool.settings[:environments] = {
@@ -630,7 +629,6 @@ describe ExternalToolsController do
 
         before do
           allow(ApplicationController).to receive_messages(test_cluster?: true, test_cluster_name: "beta")
-          Account.site_admin.enable_feature! :dynamic_lti_environment_overrides
 
           @tool.settings[:environments] = {
             domain:
@@ -891,7 +889,6 @@ describe ExternalToolsController do
 
         before do
           allow(ApplicationController).to receive_messages(test_cluster?: true, test_cluster_name: "beta")
-          Account.site_admin.enable_feature! :dynamic_lti_environment_overrides
 
           @tool.settings[:environments] = {
             domain:
@@ -2830,7 +2827,6 @@ describe ExternalToolsController do
 
       before do
         allow(ApplicationController).to receive_messages(test_cluster?: true, test_cluster_name: "beta")
-        Account.site_admin.enable_feature! :dynamic_lti_environment_overrides
         user_session(account_admin_user)
 
         tool.settings[:environments] = {

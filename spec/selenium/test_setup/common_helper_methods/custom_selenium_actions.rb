@@ -244,7 +244,8 @@ module CustomSeleniumActions
   end
 
   def get_value(selector)
-    driver.execute_script("return $(#{selector.inspect}).val()")
+    script = "return document.querySelector(arguments[0]).value;"
+    driver.execute_script(script, selector)
   end
 
   def get_options(selector, scope = nil)

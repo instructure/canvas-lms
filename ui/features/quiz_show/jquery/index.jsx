@@ -290,8 +290,8 @@ $(document).ready(function () {
     const courseId = event.target.getAttribute('data-quiz-context-id')
     const itemName = event.target.getAttribute('data-quiz-name')
     const itemContentId = event.target.getAttribute('data-quiz-id')
-    const pointsPossible =
-      parseFloat(event.target.getAttribute('data-quiz-points-possible')) + ' pts'
+    const pointsString = event.target.getAttribute('data-quiz-points-possible')
+    const pointsPossible = pointsString ? parseFloat(pointsString) : undefined
     renderItemAssignToTray(true, returnFocusTo, {
       courseId,
       itemName,

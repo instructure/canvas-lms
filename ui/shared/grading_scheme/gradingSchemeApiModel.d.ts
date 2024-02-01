@@ -47,6 +47,7 @@ export interface GradingScheme {
   scaling_factor: number
   points_based: boolean
   used_locations?: UsedLocation[]
+  workflow_state: 'active' | 'archived' | 'deleted'
 }
 
 export interface GradingSchemeUpdateRequest {

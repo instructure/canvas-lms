@@ -22,20 +22,22 @@ import useGroupCreate from '../useGroupCreate'
 import {createCache} from '@canvas/apollo'
 import {MockedProvider} from '@apollo/react-testing'
 import {createOutcomeGroupMocks} from '../../../mocks/Management'
-import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
 jest.useFakeTimers()
 
-// OUT-6141 - remove or rewrite to remove spies on imports
-describe.skip('useGroupCreate', () => {
-  let cache, showFlashAlertSpy
+jest.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashAlert: jest.fn(() => jest.fn(() => {})),
+}))
+
+describe('useGroupCreate', () => {
+  let cache
   const groupId = '101'
   const groupName = 'New Group'
   const parentGroupId = '100'
 
   beforeEach(() => {
     cache = createCache()
-    showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
   })
 
   afterEach(() => {
@@ -77,7 +79,7 @@ describe.skip('useGroupCreate', () => {
       result.current.createGroup(groupName, parentGroupId)
     })
     await act(async () => jest.runAllTimers())
-    expect(showFlashAlertSpy).toHaveBeenCalledWith({
+    expect(showFlashAlert).toHaveBeenCalledWith({
       message: '"New Group" was successfully created.',
       type: 'success',
     })
@@ -94,7 +96,7 @@ describe.skip('useGroupCreate', () => {
       result.current.createGroup(groupName, parentGroupId)
     })
     await act(async () => jest.runAllTimers())
-    expect(showFlashAlertSpy).toHaveBeenCalledWith({
+    expect(showFlashAlert).toHaveBeenCalledWith({
       message: 'An error occurred while creating this group. Please try again.',
       type: 'error',
     })
@@ -111,7 +113,7 @@ describe.skip('useGroupCreate', () => {
       result.current.createGroup(groupName, parentGroupId)
     })
     await act(async () => jest.runAllTimers())
-    expect(showFlashAlertSpy).toHaveBeenCalledWith({
+    expect(showFlashAlert).toHaveBeenCalledWith({
       message: 'An error occurred while creating this group. Please try again.',
       type: 'error',
     })

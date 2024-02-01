@@ -164,14 +164,7 @@ export function patch(Backbone) {
       if (options.data == null && this.options.params != null) {
         options.data = this.options.params
       }
-      return Collection.__super__.fetch.call(this, options).then(
-        null,
-        (function (_this) {
-          return function (xhr) {
-            return _this.trigger('fetch:fail', xhr)
-          }
-        })(this)
-      )
+      return Collection.__super__.fetch.call(this, options)
     }
 
     Collection.prototype.url = function () {

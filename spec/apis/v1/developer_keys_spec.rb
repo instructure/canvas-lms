@@ -144,7 +144,7 @@ describe DeveloperKeysController, type: :request do
                         format: "json",
                         account_id: sa_id.to_s
                       })
-      expect(json.first.keys).not_to be_include("test_cluster_only")
+      expect(json.first.keys).not_to include("test_cluster_only")
     end
 
     it "does include `test_cluster_only` when enabled" do
@@ -157,7 +157,7 @@ describe DeveloperKeysController, type: :request do
                         format: "json",
                         account_id: sa_id.to_s
                       })
-      expect(json.first.keys).to be_include("test_cluster_only")
+      expect(json.first.keys).to include("test_cluster_only")
     end
 
     describe "developer key account bindings" do

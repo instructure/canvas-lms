@@ -356,8 +356,8 @@ describe ActiveRecord::Base do
         { name: "bulk_insert_2", workflow_state: "registered", created_at: now, updated_at: now }
       ]
       names = User.order(:name).pluck(:name)
-      expect(names).to be_include("bulk_insert_1")
-      expect(names).to be_include("bulk_insert_2")
+      expect(names).to include("bulk_insert_1")
+      expect(names).to include("bulk_insert_2")
     end
 
     it "handles arrays" do
@@ -369,8 +369,8 @@ describe ActiveRecord::Base do
         { name: "bulk_insert_2", workflow_state: "registered", redirect_uris: arr2, root_account_id: Account.default.id, created_at: now, updated_at: now }
       ]
       names = DeveloperKey.order(:name).pluck(:redirect_uris)
-      expect(names).to be_include(arr1.map(&:to_s))
-      expect(names).to be_include(arr2)
+      expect(names).to include(arr1.map(&:to_s))
+      expect(names).to include(arr2)
     end
 
     it "does not raise an error if there are no records" do
@@ -842,11 +842,11 @@ describe ActiveRecord::Base do
     end
 
     it "prefixes specific associations" do
-      expect(AssessmentRequest.reflections.keys).to be_include("assessor_asset_submission")
+      expect(AssessmentRequest.reflections.keys).to include("assessor_asset_submission")
     end
 
     it "prefixes specific associations with an explicit name" do
-      expect(LearningOutcomeResult.reflections.keys).to be_include("association_assignment")
+      expect(LearningOutcomeResult.reflections.keys).to include("association_assignment")
     end
 
     it "passes the correct foreign key down to specific associations" do

@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {isolate} from '@canvas/sentry'
 import KeyboardNavDialog from '@canvas/keyboard-nav-dialog'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
@@ -23,11 +22,11 @@ import {uniqueId} from 'lodash'
 import htmlEscape from '@instructure/html-escape'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
-import {enhanceUserContent, makeAllExternalLinksExternalLinks} from '@instructure/canvas-rce'
+import {enhanceUserContent} from '@instructure/canvas-rce'
+import {makeAllExternalLinksExternalLinks} from '@instructure/canvas-rce/es/enhance-user-content/external_links'
 import './instructure_helper'
 import 'jqueryui/draggable'
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/doc-previews' /* loadDocPreview */
 import '@canvas/datetime/jquery' /* datetimeString, dateString, fudgeDateForProfileTimezone */
 import '@canvas/jquery/jquery.instructure_forms' /* formSubmit, fillFormData, formErrors */
 import 'jqueryui/dialog'
@@ -44,6 +43,7 @@ import 'jquery-tinypubsub' /* /\.publish\(/ */
 import 'jqueryui/resizable'
 import 'jqueryui/sortable'
 import 'jqueryui/tabs'
+import {captureException} from '@sentry/browser'
 
 const I18n = useI18nScope('instructure_js')
 
@@ -101,6 +101,7 @@ function enhanceUserJQueryWidgetContent() {
         "will go away. Rather than relying on the internals of Canvas's JavaScript, " +
         'you should use your own custom JS file to do any such customizations.'
       console.error(msg, $elements) // eslint-disable-line no-console
+      captureException(new Error(msg))
     })
     .end()
     .filter('.dialog')
@@ -532,6 +533,7 @@ function doThingsToModuleSequenceFooter() {
       .catch(ex => {
         // eslint-disable-next-line no-console
         console.error(ex)
+        captureException(ex)
       })
   }
 }
@@ -622,7 +624,7 @@ const setDialogCloseText = () => {
   $.ui.dialog.prototype.options.closeText = I18n.t('Close')
 }
 
-export default function enhanceTheEntireUniverse() {
+export function enhanceTheEntireUniverse() {
   ;[
     ellipsifyBreadcrumbs,
     bindKeyboardShortcutsHelpPanel,
@@ -645,7 +647,5 @@ export default function enhanceTheEntireUniverse() {
     makeAllExternalLinksExternalLinks,
     wireUpFilePreview,
     setDialogCloseText,
-  ]
-    .map(isolate)
-    .map(x => x())
+  ].map(x => x())
 }

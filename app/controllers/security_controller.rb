@@ -63,10 +63,10 @@ class SecurityController < ApplicationController
 
   # Schema is specified here: https://www.imsglobal.org/spec/lti-dr/v1p0#openid-configuration
   def openid_configuration
-    access_token = AuthenticationMethods.access_token(request)
+    access_token = params[:registration_token] # AuthenticationMethods.access_token(request)
 
     unless access_token
-      render json: { error: "Access token missing." }, status: :unauthorized
+      render json: { error: "Access token missing (You must include the registration_token parameter)." }, status: :unauthorized
       return
     end
 

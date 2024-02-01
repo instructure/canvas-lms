@@ -68,6 +68,7 @@ import EnrollmentStateSelect, {
   enrollmentStates,
   getLabelForState,
 } from './EnrollmentStateSelect'
+import {captureException} from '@sentry/browser'
 
 declare const ENV: GlobalEnv & EnvCommon
 
@@ -285,6 +286,7 @@ export function TempEnrollAssign(props: Props) {
         .catch(error => {
           // eslint-disable-next-line no-console
           console.error('Error fetching temporary enrollment pairing:', error)
+          captureException(error)
         })
     }
   }, [props.tempEnrollmentsPairing, props.roles])
@@ -349,6 +351,9 @@ export function TempEnrollAssign(props: Props) {
     } else {
       // eslint-disable-next-line no-console
       console.error('Invalid date in handleDateChange:', dateValue)
+      captureException(
+        new Error(`Invalid date in handleDateChange: ${dateValue} for ${localStorageKey}`)
+      )
     }
   }
 

@@ -1763,15 +1763,15 @@ describe Course do
       group.add_user(@user1)
       users = @course.users_not_in_groups([group])
       expect(users.size).to eq 2
-      expect(users).not_to be_include(@user1)
+      expect(users).not_to include(@user1)
     end
 
     it "includes users otherwise" do
       group = @course.groups.create
       group.add_user(@user1)
       users = @course.users_not_in_groups([group])
-      expect(users).to be_include(@user2)
-      expect(users).to be_include(@user3)
+      expect(users).to include(@user2)
+      expect(users).to include(@user3)
     end
 
     it "allows ordering by user's sortable name" do
@@ -1987,7 +1987,7 @@ describe Course do
 
     context "vanilla usage" do
       it "returns participating_admins and participating_students" do
-        [@student, @ta, @teach].each { |usr| expect(@course.participants).to be_include(usr) }
+        [@student, @ta, @teach].each { |usr| expect(@course.participants).to include(usr) }
       end
 
       it "uses date-based logic if requested" do
@@ -2031,27 +2031,27 @@ describe Course do
       it "returns participating_admins, participating_students, and observers" do
         participants = @course.participants(include_observers: true)
         [@student, @ta, @teach, @course_level_observer, @student_following_observer].each do |usr|
-          expect(participants).to be_include(usr)
+          expect(participants).to include(usr)
         end
       end
 
       context "excluding specific students" do
         it "rejects observers only following one of the excluded students" do
           partic = @course.participants(include_observers: true, excluded_user_ids: [@student.id, @student_following_observer.id])
-          [@student, @student_following_observer].each { |usr| expect(partic).to_not be_include(usr) }
+          [@student, @student_following_observer].each { |usr| expect(partic).to_not include(usr) }
         end
 
         it "includes admins and course level observers" do
           partic = @course.participants(include_observers: true, excluded_user_ids: [@student.id, @student_following_observer.id])
-          [@ta, @teach, @course_level_observer].each { |usr| expect(partic).to be_include(usr) }
+          [@ta, @teach, @course_level_observer].each { |usr| expect(partic).to include(usr) }
         end
       end
     end
 
     it "excludes some student when passed their id" do
       partic = @course.participants(include_observers: false, excluded_user_ids: [@student.id])
-      [@ta, @teach].each { |usr| expect(partic).to be_include(usr) }
-      expect(partic).to_not be_include(@student)
+      [@ta, @teach].each { |usr| expect(partic).to include(usr) }
+      expect(partic).to_not include(@student)
     end
   end
 
@@ -2089,7 +2089,7 @@ describe Course do
 
       it "enrolls a ta as invited if the course isn't published" do
         expect(@tae).to be_invited
-        expect(@tae.messages_sent).to be_include("Enrollment Registration")
+        expect(@tae.messages_sent).to include("Enrollment Registration")
       end
     end
 
@@ -2106,7 +2106,7 @@ describe Course do
 
       it "enrolls a teacher as invited if the course isn't published" do
         expect(@te).to be_invited
-        expect(@te.messages_sent).to be_include("Enrollment Registration")
+        expect(@te.messages_sent).to include("Enrollment Registration")
       end
     end
 
@@ -2893,7 +2893,7 @@ describe Course do
 
       it "removes ids for tabs not in the default list" do
         @course.tab_configuration = [{ "id" => 912 }]
-        expect(@course.tabs_available(@user).pluck(:id)).not_to be_include(912)
+        expect(@course.tabs_available(@user).pluck(:id)).not_to include(912)
         tab_ids = @course.tabs_available(@user).pluck(:id)
         expect(tab_ids).to eql(default_tab_ids)
         expect(tab_ids.length).to be > 0
@@ -2939,7 +2939,7 @@ describe Course do
           hidden: true
         }]
         tab_ids = @course.tabs_available(@user).pluck(:id)
-        expect(tab_ids).to be_include(Course::TAB_PEOPLE)
+        expect(tab_ids).to include(Course::TAB_PEOPLE)
       end
 
       it "enables the home tab and puts it first if it was hidden" do
@@ -2968,7 +2968,7 @@ describe Course do
 
         tabs = @course.tabs_available(@user, include_external: true).pluck(:label)
 
-        expect(tabs).to be_include("Item Banks")
+        expect(tabs).to include("Item Banks")
       end
 
       describe "with canvas_for_elementary account setting on" do
@@ -3053,8 +3053,8 @@ describe Course do
             @course.save!
 
             tabs = @course.tabs_available(@user, include_external: true).pluck(:label)
-            expect(tabs).to be_include("visible tool")
-            expect(tabs).not_to be_include("hidden tool")
+            expect(tabs).to include("visible tool")
+            expect(tabs).not_to include("hidden tool")
           end
 
           context "with course_subject_tabs option" do
@@ -3211,7 +3211,7 @@ describe Course do
 
       it "hides unused tabs if not an admin" do
         tab_ids = @course.tabs_available(@user).pluck(:id)
-        expect(tab_ids).not_to be_include(Course::TAB_SETTINGS)
+        expect(tab_ids).not_to include(Course::TAB_SETTINGS)
         expect(tab_ids.length).to be > 0
       end
 
@@ -3225,12 +3225,12 @@ describe Course do
           hidden: true
         }]
         tab_ids = @course.tabs_available(@user).pluck(:id)
-        expect(tab_ids).not_to be_include(Course::TAB_PEOPLE)
+        expect(tab_ids).not_to include(Course::TAB_PEOPLE)
       end
 
       it "shows grades tab for students" do
         tab_ids = @course.tabs_available(@user).pluck(:id)
-        expect(tab_ids).to be_include(Course::TAB_GRADES)
+        expect(tab_ids).to include(Course::TAB_GRADES)
       end
 
       it "includes tabs for active external tools" do
@@ -3255,8 +3255,8 @@ describe Course do
 
         tabs = @course.tabs_available.pluck(:id)
 
-        expect(tabs).to be_include(t1.asset_string)
-        expect(tabs).not_to be_include(t2.asset_string)
+        expect(tabs).to include(t1.asset_string)
+        expect(tabs).not_to include(t2.asset_string)
       end
 
       it "does not include item banks tab for active external tools" do
@@ -3274,7 +3274,7 @@ describe Course do
 
         tabs = @course.tabs_available(@user, include_external: true).pluck(:label)
 
-        expect(tabs).not_to be_include("Item Banks")
+        expect(tabs).not_to include("Item Banks")
       end
 
       context "when 'Item Banks' has been added to the course navigation links" do
@@ -3377,7 +3377,7 @@ describe Course do
 
         tabs = @course.tabs_available(nil, include_external: false).pluck(:id)
 
-        expect(tabs).not_to be_include(t1.asset_string)
+        expect(tabs).not_to include(t1.asset_string)
       end
 
       it "includes message handlers if opt[:include_external] is true" do
@@ -3415,17 +3415,17 @@ describe Course do
         @oe.save!
         @user.reload
         tab_ids = @course.tabs_available(@user).pluck(:id)
-        expect(tab_ids).not_to be_include(Course::TAB_GRADES)
+        expect(tab_ids).not_to include(Course::TAB_GRADES)
       end
 
       it "shows grades tab for observers if they are linked to a student" do
         tab_ids = @course.tabs_available(@user).pluck(:id)
-        expect(tab_ids).to be_include(Course::TAB_GRADES)
+        expect(tab_ids).to include(Course::TAB_GRADES)
       end
 
       it "shows discussion tab for observers by default" do
         tab_ids = @course.tabs_available(@user).pluck(:id)
-        expect(tab_ids).to be_include(Course::TAB_DISCUSSIONS)
+        expect(tab_ids).to include(Course::TAB_DISCUSSIONS)
       end
 
       it "does not show discussion tab for observers without read_forum" do
@@ -3434,7 +3434,7 @@ describe Course do
                              role: observer_role,
                              enabled: false)
         tab_ids = @course.tabs_available(@user).pluck(:id)
-        expect(tab_ids).not_to be_include(Course::TAB_DISCUSSIONS)
+        expect(tab_ids).not_to include(Course::TAB_DISCUSSIONS)
       end
 
       it "recognizes active_course_level_observers" do
@@ -3443,8 +3443,8 @@ describe Course do
         @course_level_observer = observer_enrollment.user
 
         course_observers = @course.active_course_level_observers
-        expect(course_observers).to be_include(@course_level_observer)
-        expect(course_observers).to_not be_include(@oe.user)
+        expect(course_observers).to include(@course_level_observer)
+        expect(course_observers).to_not include(@oe.user)
       end
     end
 
@@ -4800,7 +4800,7 @@ describe Course do
       @teacher = user_model
       @course.enroll_teacher(@teacher).accept
       tabs = @course.tabs_available(@teacher)
-      expect(tabs.pluck(:id)).not_to be_include(tool.asset_string)
+      expect(tabs.pluck(:id)).not_to include(tool.asset_string)
     end
 
     it "includes external tools if configured on the course" do
@@ -4811,7 +4811,7 @@ describe Course do
       @teacher = user_model
       @course.enroll_teacher(@teacher).accept
       tabs = @course.tabs_available(@teacher)
-      expect(tabs.pluck(:id)).to be_include(tool.asset_string)
+      expect(tabs.pluck(:id)).to include(tool.asset_string)
       tab = tabs.detect { |t| t[:id] == tool.asset_string }
       expect(tab[:label]).to eq tool.settings[:course_navigation][:text]
       expect(tab[:href]).to eq :course_external_tool_path
@@ -4829,7 +4829,7 @@ describe Course do
       @teacher = user_model
       @course.enroll_teacher(@teacher).accept
       tabs = @course.tabs_available(@teacher)
-      expect(tabs.pluck(:id)).to be_include(tool.asset_string)
+      expect(tabs.pluck(:id)).to include(tool.asset_string)
       tab = tabs.detect { |t| t[:id] == tool.asset_string }
       expect(tab[:label]).to eq tool.settings[:course_navigation][:text]
       expect(tab[:href]).to eq :course_external_tool_path
@@ -4847,7 +4847,7 @@ describe Course do
       @teacher = user_model
       @course.enroll_teacher(@teacher).accept
       tabs = @course.tabs_available(@teacher)
-      expect(tabs.pluck(:id)).to be_include(tool.asset_string)
+      expect(tabs.pluck(:id)).to include(tool.asset_string)
       tab = tabs.detect { |t| t[:id] == tool.asset_string }
       expect(tab[:label]).to eq tool.settings[:course_navigation][:text]
       expect(tab[:href]).to eq :course_external_tool_path
@@ -4868,11 +4868,11 @@ describe Course do
       @student.register!
       @course.enroll_student(@student).accept
       tabs = @course.tabs_available(nil)
-      expect(tabs.pluck(:id)).not_to be_include(tool.asset_string)
+      expect(tabs.pluck(:id)).not_to include(tool.asset_string)
       tabs = @course.tabs_available(@student)
-      expect(tabs.pluck(:id)).not_to be_include(tool.asset_string)
+      expect(tabs.pluck(:id)).not_to include(tool.asset_string)
       tabs = @course.tabs_available(@teacher)
-      expect(tabs.pluck(:id)).to be_include(tool.asset_string)
+      expect(tabs.pluck(:id)).to include(tool.asset_string)
       tab = tabs.detect { |t| t[:id] == tool.asset_string }
       expect(tab[:label]).to eq tool.settings[:course_navigation][:text]
       expect(tab[:href]).to eq :course_external_tool_path
@@ -4893,11 +4893,11 @@ describe Course do
       @student.register!
       @course.enroll_student(@student).accept
       tabs = @course.tabs_available(nil)
-      expect(tabs.pluck(:id)).not_to be_include(tool.asset_string)
+      expect(tabs.pluck(:id)).not_to include(tool.asset_string)
       tabs = @course.tabs_available(@student)
-      expect(tabs.pluck(:id)).to be_include(tool.asset_string)
+      expect(tabs.pluck(:id)).to include(tool.asset_string)
       tabs = @course.tabs_available(@teacher)
-      expect(tabs.pluck(:id)).to be_include(tool.asset_string)
+      expect(tabs.pluck(:id)).to include(tool.asset_string)
       tab = tabs.detect { |t| t[:id] == tool.asset_string }
       expect(tab[:label]).to eq tool.settings[:course_navigation][:text]
       expect(tab[:href]).to eq :course_external_tool_path
@@ -4925,16 +4925,16 @@ describe Course do
       @teacher = user_model
       @course.enroll_teacher(@teacher).accept
       tabs = @course.tabs_available(@teacher)
-      expect(tabs.pluck(:id)).to be_include(tool.asset_string)
+      expect(tabs.pluck(:id)).to include(tool.asset_string)
 
       @course.tab_configuration = Course.default_tabs.map { |t| { id: t[:id] } }.insert(1, { id: tool.asset_string, hidden: true })
       @course.save!
       @course = Course.find(@course.id)
       tabs = @course.tabs_available(@teacher)
-      expect(tabs.pluck(:id)).not_to be_include(tool.asset_string)
+      expect(tabs.pluck(:id)).not_to include(tool.asset_string)
 
       tabs = @course.tabs_available(@teacher, for_reordering: true)
-      expect(tabs.pluck(:id)).to be_include(tool.asset_string)
+      expect(tabs.pluck(:id)).to include(tool.asset_string)
     end
 
     it "uses extension default values" do
@@ -5092,7 +5092,7 @@ describe Course do
       user = account_admin_user(account: sub_account)
       course = Course.create!(account: sub_sub_account)
 
-      expect(Course.manageable_by_user(user.id).map(&:id)).to be_include(course.id)
+      expect(Course.manageable_by_user(user.id).map(&:id)).to include(course.id)
 
       user.account_users.first.destroy!
       expect(Course.manageable_by_user(user.id)).to_not be_exists
@@ -5105,7 +5105,7 @@ describe Course do
       e = course.teacher_enrollments.first
       e.accept
 
-      expect(Course.manageable_by_user(user.id).map(&:id)).to be_include(course.id)
+      expect(Course.manageable_by_user(user.id).map(&:id)).to include(course.id)
     end
 
     it "includes courses the user is actively enrolled in as a ta" do
@@ -5115,7 +5115,7 @@ describe Course do
       e = course.ta_enrollments.first
       e.accept
 
-      expect(Course.manageable_by_user(user.id).map(&:id)).to be_include(course.id)
+      expect(Course.manageable_by_user(user.id).map(&:id)).to include(course.id)
     end
 
     it "includes courses the user is actively enrolled in as a designer" do
@@ -5123,7 +5123,7 @@ describe Course do
       user = user_with_pseudonym
       course.enroll_designer(user).accept
 
-      expect(Course.manageable_by_user(user.id).map(&:id)).to be_include(course.id)
+      expect(Course.manageable_by_user(user.id).map(&:id)).to include(course.id)
     end
 
     it "does not include courses the user is enrolled in when the enrollment is non-active" do
@@ -5402,7 +5402,7 @@ describe Course do
         @course.student_view_student
         @admin = account_admin_user
         visible_enrollments = @course.apply_enrollment_visibility(@course.student_enrollments, @admin)
-        expect(visible_enrollments.map(&:user)).to be_include(@course.student_view_student)
+        expect(visible_enrollments.map(&:user)).to include(@course.student_view_student)
       end
 
       it "is safely empty for a nil user" do
@@ -5417,12 +5417,12 @@ describe Course do
         @course.enroll_user(@admin, "ObserverEnrollment")
 
         visible_enrollments = @course.apply_enrollment_visibility(@course.student_enrollments, @admin)
-        expect(visible_enrollments.map(&:user)).to be_include(@course.student_view_student)
+        expect(visible_enrollments.map(&:user)).to include(@course.student_view_student)
       end
 
       it "returns student view students to student view students" do
         visible_enrollments = @course.apply_enrollment_visibility(@course.student_enrollments, @course.student_view_student)
-        expect(visible_enrollments.map(&:user)).to be_include(@course.student_view_student)
+        expect(visible_enrollments.map(&:user)).to include(@course.student_view_student)
       end
     end
 
@@ -5807,7 +5807,7 @@ describe Course do
 
       student_view_student = student_view_course.student_view_student
 
-      expect(student_view_course.enrollments.map(&:user_id)).to be_include(student_view_student.id)
+      expect(student_view_course.enrollments.map(&:user_id)).to include(student_view_student.id)
     end
 
     it "does not create a section if a section already exists" do
@@ -5816,7 +5816,7 @@ describe Course do
       expect(not_default_section).not_to be_default_section
       student_view_student = student_view_course.student_view_student
       expect(student_view_course.reload.course_sections.active.count).to be 1
-      expect(not_default_section.enrollments.map(&:user_id)).to be_include(student_view_student.id)
+      expect(not_default_section.enrollments.map(&:user_id)).to include(student_view_student.id)
     end
 
     it "creates and return the student view student for a course" do

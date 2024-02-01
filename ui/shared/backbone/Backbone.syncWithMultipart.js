@@ -104,7 +104,7 @@ export function patch(Backbone) {
     function callback() {
       const iframeBody = $iframe[0].contentDocument && $iframe[0].contentDocument.body
 
-      let response = $.parseJSON($(iframeBody).text())
+      let response = JSON.parse($(iframeBody).text())
       // in case the form redirects after receiving the upload (API uploads),
       // prevent trying to work with an empty response
       if (!response) return

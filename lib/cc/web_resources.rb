@@ -33,12 +33,22 @@ module CC
     def add_course_files
       return if for_course_copy
 
-      @html_exporter.referenced_files.each_key do |att_id|
+      (@html_exporter.referenced_files.keys + @html_exporter.referenced_assessment_question_files.keys).each do |att_id|
         add_item_to_export("attachment_#{att_id}", "attachments")
+      end
+
+      @html_exporter.referenced_assessment_question_files.each_value do |att|
+        path = "#{CCHelper::WEB_RESOURCES_FOLDER}/assessment_questions#{att.full_display_path}"
+        add_file_to_manifest(att, path, create_key(att))
+        content_zipper.add_attachment_to_zip(att, @zip_file, path)
       end
 
       course_folder = Folder.root_folders(@course).first
       files_with_metadata = { folders: [], files: [] }
+      if @html_exporter.referenced_assessment_question_files.present?
+        aq_folder = Folder.new(name: "assessment_questions", full_name: "assessment_questions", hidden: true)
+        files_with_metadata[:folders] << [aq_folder, "assessment_questions"]
+      end
       @added_attachments = {}
 
       content_zipper.process_folder(
@@ -62,46 +72,50 @@ module CC
         if file_or_folder_restricted?(file) || file.usage_rights || file.display_name != file.unencoded_filename || file.category == Attachment::ICON_MAKER_ICONS
           files_with_metadata[:files] << [file, migration_id]
         end
-        @resources.resource(
-          "type" => CCHelper::WEBCONTENT,
-          :identifier => migration_id,
-          :href => path
-        ) do |res|
-          if file.locked || file.usage_rights
-            res.metadata do |meta_node|
-              meta_node.lom :lom do |lom_node|
-                if file.locked
-                  lom_node.lom :educational do |edu_node|
-                    edu_node.lom :intendedEndUserRole do |role_node|
-                      role_node.lom :source, "IMSGLC_CC_Rolesv1p1"
-                      role_node.lom :value, "Instructor"
-                    end
-                  end
-                end
-                if file.usage_rights
-                  lom_node.lom :rights do |rights_node|
-                    rights_node.lom :copyrightAndOtherRestrictions do |node|
-                      node.lom :value, (file.usage_rights.license == "public_domain") ? "no" : "yes"
-                    end
-                    description = []
-                    description << file.usage_rights.legal_copyright if file.usage_rights.legal_copyright.present?
-                    description << file.usage_rights.license_name unless file.usage_rights.license == "private"
-                    rights_node.lom :description do |desc|
-                      desc.lom :string, description.join('\n')
-                    end
-                  end
-                end
-              end
-            end
-          end
-          res.file(href: path)
-        end
+        add_file_to_manifest(file, path, migration_id)
       rescue
         title = file.unencoded_filename rescue I18n.t("course_exports.unknown_titles.file", "Unknown file")
         add_error(I18n.t("course_exports.errors.file", "The file \"%{file_name}\" failed to export", file_name: title), $!)
       end
 
       add_meta_info_for_files(files_with_metadata)
+    end
+
+    def add_file_to_manifest(file, path, migration_id)
+      @resources.resource(
+        "type" => CCHelper::WEBCONTENT,
+        :identifier => migration_id,
+        :href => path
+      ) do |res|
+        if file.locked || file.usage_rights
+          res.metadata do |meta_node|
+            meta_node.lom :lom do |lom_node|
+              if file.locked
+                lom_node.lom :educational do |edu_node|
+                  edu_node.lom :intendedEndUserRole do |role_node|
+                    role_node.lom :source, "IMSGLC_CC_Rolesv1p1"
+                    role_node.lom :value, "Instructor"
+                  end
+                end
+              end
+              if file.usage_rights
+                lom_node.lom :rights do |rights_node|
+                  rights_node.lom :copyrightAndOtherRestrictions do |node|
+                    node.lom :value, (file.usage_rights.license == "public_domain") ? "no" : "yes"
+                  end
+                  description = []
+                  description << file.usage_rights.legal_copyright if file.usage_rights.legal_copyright.present?
+                  description << file.usage_rights.license_name unless file.usage_rights.license == "private"
+                  rights_node.lom :description do |desc|
+                    desc.lom :string, description.join('\n')
+                  end
+                end
+              end
+            end
+          end
+        end
+        res.file(href: path)
+      end
     end
 
     def files_meta_path

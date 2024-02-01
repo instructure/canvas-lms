@@ -21,7 +21,6 @@
 // Generates all the pre-translated code in lib/translated/{locale}.
 
 const shell = require('shelljs')
-const promisify = require('util').promisify
 
 shell.set('-e')
 
@@ -37,10 +36,5 @@ shell.exec('rm -rf lib/*')
 shell.exec('rm -rf es/*')
 shell.exec('scripts/installTranslations.js')
 
-shell.echo('Building CommonJS version')
-shell.exec(
-  "JEST_WORKER_ID=1 npx babel --out-dir lib src --ignore '**/__tests__' --extensions '.ts,.tsx,.js,.jsx'"
-)
-
-shell.echo('Building ES Modules version')
+shell.echo('Building')
 shell.exec("npx babel --out-dir es src --ignore '**/__tests__' --extensions '.ts,.tsx,.js,.jsx'")

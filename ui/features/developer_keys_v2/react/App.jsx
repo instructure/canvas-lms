@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Button, CloseButton} from '@instructure/ui-buttons'
+import {Button} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {Spinner} from '@instructure/ui-spinner'
 import {Tabs} from '@instructure/ui-tabs'
@@ -31,11 +31,8 @@ import AdminTable from './AdminTable'
 import InheritedTable from './InheritedTable'
 import DeveloperKey from './DeveloperKey'
 import NewKeyModal from './NewKeyModal'
-import DeveloperKeyModalTrigger from './NewKeyTrigger'
 import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import DateHelper from '@canvas/datetime/dateHelper'
-import {DeveloperKeysAppState} from './store/store'
-import actions from './actions/developerKeysActions'
 import {DynamicRegistrationModal} from './dynamic_registration/DynamicRegistrationModal'
 
 const I18n = useI18nScope('react_developer_keys')
@@ -66,16 +63,8 @@ class DeveloperKeysApp extends React.Component {
     this.inheritedTableRef = node
   }
 
-  setAddKeyButtonRef = node => {
-    this.addDevKeyButton = node
-  }
-
   setInheritedTabRef = node => {
     this.inheritedTab = node
-  }
-
-  focusDevKeyButton = () => {
-    this.addDevKeyButton.focus()
   }
 
   focusInheritedTab = () => {
@@ -191,11 +180,6 @@ class DeveloperKeysApp extends React.Component {
             id="tab-panel-account"
             isSelected={tab === 'tab-panel-account'}
           >
-            <DeveloperKeyModalTrigger
-              store={store}
-              actions={actions}
-              setAddKeyButtonRef={this.setAddKeyButtonRef}
-            />
             <NewKeyModal
               store={store}
               actions={actions}

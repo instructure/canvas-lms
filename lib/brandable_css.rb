@@ -297,7 +297,7 @@ module BrandableCSS
         raise "#{file.expand_path} does not exist. You need to run `yarn run build:css` before you can serve css."
       end
 
-      @handlebars_index_json = file.read
+      @handlebars_index_json = file.read.rstrip
     end
 
     # bundle path should be something like "bundles/speedgrader" or "plugins/analytics/something"

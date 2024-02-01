@@ -176,6 +176,24 @@ RSpec.describe Lti::ResourceLink do
         expect(course.lti_resource_links.first.title).to be_nil
       end
     end
+
+    context "with `lti_1_1_id`" do
+      let(:lti_1_1_id) { "1234" }
+
+      it "creates a resource link with the lti_1_1_id" do
+        resource_link = described_class.create_with(course, tool, lti_1_1_id:)
+        expect(course.lti_resource_links.first).to eq resource_link
+        expect(course.lti_resource_links.first.lti_1_1_id).to eq lti_1_1_id
+      end
+    end
+
+    context "without `lti_1_1_id`" do
+      it "creates a resource link with a nil lti_1_1_id" do
+        resource_link = described_class.create_with(course, tool)
+        expect(course.lti_resource_links.first).to eq resource_link
+        expect(course.lti_resource_links.first.lti_1_1_id).to be_nil
+      end
+    end
   end
 
   describe ".find_or_initialize_for_context_and_lookup_uuid" do

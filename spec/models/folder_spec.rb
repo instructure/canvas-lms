@@ -161,7 +161,7 @@ describe Folder do
     nil_a = @course.attachments.new
     nil_a.update(uploaded_data: default_uploaded_data)
     expect(nil_a.folder_id).not_to be_nil
-    expect(f.active_file_attachments).to be_include(a)
+    expect(f.active_file_attachments).to include(a)
     # f.active_file_attachments.should be_include(nil_a)
   end
 
@@ -173,8 +173,8 @@ describe Folder do
     a.save!
     nil_a = @course.attachments.new
     nil_a.update(uploaded_data: default_uploaded_data)
-    expect(f.active_file_attachments).to be_include(a)
-    expect(f.active_file_attachments).to be_include(nil_a)
+    expect(f.active_file_attachments).to include(a)
+    expect(f.active_file_attachments).to include(nil_a)
   end
 
   it "does not return files without a folder_id if it's not the 'unfiled' folder" do
@@ -184,8 +184,8 @@ describe Folder do
     a.uploaded_data = default_uploaded_data
     a.save!
     nil_a = @course.attachments.create!(uploaded_data: default_uploaded_data)
-    expect(f.active_file_attachments).to be_include(a)
-    expect(f.active_file_attachments).not_to be_include(nil_a)
+    expect(f.active_file_attachments).to include(a)
+    expect(f.active_file_attachments).not_to include(nil_a)
   end
 
   it "implements the not_locked scope correctly" do

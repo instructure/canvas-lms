@@ -278,8 +278,9 @@ module Lti
     register_expansion "com.instructure.User.observees",
                        [],
                        lambda {
-                         observed_users = ObserverEnrollment.observed_students(@context, @current_user)
-                                                            .keys
+                         observed_users =
+                           ObserverEnrollment.observed_students(@context, @current_user)
+                                             .keys
                          if @tool.use_1_3?
                            observed_users.map { |u| u.lookup_lti_id(@context) }.join(",")
                          else
@@ -1477,17 +1478,29 @@ module Lti
                        -> { @controller.logged_in_user.id },
                        MASQUERADING_GUARD
 
-    # Returns the 40 character opaque user_id for masquerading user.
-    # This is the pseudonym the user is actually logged in as.
-    # It may not hold all the sis info needed in other launch substitutions.
+    # Returns the opaque user_id for the masquerading user. This is the
+    # pseudonym the user is actually logged in as. It may not hold all the sis
+    # info needed in other launch substitutions.
+    #
+    # For LTI 1.3 tools, the opaque user IDs are UUIDv4 values (also used in
+    # the "sub" claim in LTI 1.3 launches), while for other LTI versions, the
+    # user ID will be the user's 40 character opaque LTI id.
     #
     # @example
     #   ```
-    #   "da12345678cb37ba1e522fc7c5ef086b7704eff9"
+    #    LTI 1.3: "8b9f8327-aa32-fa90-9ea2-2fa8ef79e0f9",
+    #    All Others: "da12345678cb37ba1e522fc7c5ef086b7704eff9"
     #   ```
     register_expansion "Canvas.masqueradingUser.userId",
                        [],
-                       -> { @tool.opaque_identifier_for(@controller.logged_in_user, context: @context) },
+                       lambda {
+                         u = @controller.logged_in_user
+                         if lti_1_3?
+                           u.lookup_lti_id(@context)
+                         else
+                           @tool.opaque_identifier_for(u, context: @context)
+                         end
+                       },
                        MASQUERADING_GUARD
 
     # Returns the xapi url for the user.

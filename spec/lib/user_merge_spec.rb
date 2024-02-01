@@ -73,7 +73,7 @@ describe UserMerge do
       user2.reload
       expect(user2.pseudonyms).to be_empty
       user1.reload
-      expect(user1.pseudonyms.map(&:unique_id)).to be_include("sam@yahoo.com")
+      expect(user1.pseudonyms.map(&:unique_id)).to include("sam@yahoo.com")
     end
 
     it "moves lti_id to the new users" do
@@ -262,7 +262,7 @@ describe UserMerge do
         UserMerge.from(user2).into(user1)
         expect(user2.reload.submissions.length).to be(0)
         expect(user1.reload.submissions.length).to be(1)
-        expect(user1.submissions.map(&:id)).to be_include(submission.id)
+        expect(user1.submissions.map(&:id)).to include(submission.id)
       end
 
       it "ignores scored unsubmitted submission belonging to from user" do
@@ -291,8 +291,8 @@ describe UserMerge do
         UserMerge.from(user2).into(user1)
         expect(user2.reload.submissions.length).to be(0)
         expect(user1.reload.submissions.length).to be(2)
-        expect(user1.submissions.map(&:id)).to be_include(submission.id)
-        expect(user1.submissions.map(&:id)).not_to be_include(submission2.id)
+        expect(user1.submissions.map(&:id)).to include(submission.id)
+        expect(user1.submissions.map(&:id)).not_to include(submission2.id)
       end
     end
 
@@ -316,8 +316,8 @@ describe UserMerge do
       expect(user2.submissions.length).to be(1)
       expect(user2.submissions.first.id).to eql(s2.id)
       expect(user1.submissions.length).to be(2)
-      expect(user1.submissions.map(&:id)).to be_include(s1.id)
-      expect(user1.submissions.map(&:id)).to be_include(s3.id)
+      expect(user1.submissions.map(&:id)).to include(s1.id)
+      expect(user1.submissions.map(&:id)).to include(s3.id)
     end
 
     it "does not move or delete submission when both users have submissions" do
@@ -388,8 +388,8 @@ describe UserMerge do
       expect(qs2.reload.submission_id).to eq sub.id
 
       expect(user1.quiz_submissions.length).to be(2)
-      expect(user1.quiz_submissions.map(&:id)).to be_include(qs2.id)
-      expect(user1.quiz_submissions.map(&:id)).to be_include(qs3.id)
+      expect(user1.quiz_submissions.map(&:id)).to include(qs2.id)
+      expect(user1.quiz_submissions.map(&:id)).to include(qs3.id)
     end
 
     it "moves ccs to the new user (but only if they don't already exist)" do

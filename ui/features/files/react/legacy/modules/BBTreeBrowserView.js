@@ -18,6 +18,7 @@
 
 import $ from 'jquery'
 import TreeBrowserView from '@canvas/tree-browser-view'
+import {captureException} from '@sentry/react'
 
 export default class BBTreeBrowserView {
   static create(bbOptions, options = {}) {
@@ -32,9 +33,11 @@ export default class BBTreeBrowserView {
 
     if (options.render) {
       if (options.element == null) {
-        console.error(
+        const errorMessage =
           "`element` option missing error: An element to attach the TreeBrowserView to must be specified when setting the render option to 'true' for BBTreeBrowserView"
-        )
+        // eslint-disable-next-line no-console
+        console.error(errorMessage)
+        captureException(errorMessage)
       }
       if (options.element) {
         this.render(index, options.element, options.callback)

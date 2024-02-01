@@ -55,6 +55,7 @@ export default function ModuleAssignments({
       defaultValues={defaultValues}
       selectedOptionIds={selectedOptions.map(({id}) => id)}
       onError={onDismiss}
+      showVisualLabel={false}
     />
   )
 }

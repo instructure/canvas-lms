@@ -24,11 +24,11 @@ describe DatadogRumHelper do
   include ApplicationHelper
 
   let(:datadog_rum_config) do
-    DynamicSettings::FallbackProxy.new(
-      application_id: "27627d1e-8a4f-4645-b390-bb396fc83c81",
-      client_token: "a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r",
-      sample_rate_percentage: 100.0
-    )
+    DynamicSettings::FallbackProxy.new({
+                                         application_id: "27627d1e-8a4f-4645-b390-bb396fc83c81",
+                                         client_token: "a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r",
+                                         sample_rate_percentage: 100.0
+                                       })
   end
 
   describe "#include_datadog_rum_js?" do

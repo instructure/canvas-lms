@@ -65,7 +65,7 @@ module Lti::Messages
     end
 
     def add_lti1p1_claims!
-      @message.lti1p1.resource_link_id = @assignment.lti_resource_link_id if include_lti1p1_resource_link_id_migration?
+      @message.lti1p1.resource_link_id = resource_link&.lti_1_1_id if include_lti1p1_resource_link_id_migration?
       super
     end
 
@@ -76,7 +76,7 @@ module Lti::Messages
     # @see https://www.imsglobal.org/spec/lti/v1p3/migr#remapping-parameters for more info on LTI 1.1 -> 1.3 migration
     # parameters
     def include_lti1p1_resource_link_id_migration?
-      @assignment && launch_resource_link_id != @assignment.lti_resource_link_id
+      launch_resource_link_id != resource_link&.lti_1_1_id && resource_link&.lti_1_1_id.present?
     end
 
     # whenever possible, use the correct resource link id whether that comes from

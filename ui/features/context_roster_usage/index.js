@@ -33,7 +33,7 @@ $(() => {
     scrape(data) {
       if (typeof data === 'string') {
         try {
-          data = $.parseJSON(data)
+          data = JSON.parse(data)
         } catch (e) {
           data = []
         }

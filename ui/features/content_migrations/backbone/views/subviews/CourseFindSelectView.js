@@ -27,6 +27,7 @@ import autocompleteItemTemplate from '../../../jst/autocomplete_item.handlebars'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.disableWhileLoading'
 import 'jqueryui/autocomplete'
+import {encodeQueryString} from '@canvas/query-string-encoding'
 
 const I18n = useI18nScope('content_migrations')
 
@@ -151,7 +152,7 @@ CourseFindSelectView.prototype.toggleConcludedCourses = function () {
 CourseFindSelectView.prototype.manageableCourseUrl = function () {
   let params
   if (this.includeConcludedCourses) {
-    params = $.param({
+    params = encodeQueryString({
       'include[]': 'concluded',
     })
   }

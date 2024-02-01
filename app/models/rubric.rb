@@ -29,6 +29,17 @@ class Rubric < ActiveRecord::Base
     end
   end
 
+  class RubricAssessedAlignments < ActiveModel::Validator
+    def validate(record)
+      return if record.criteria.nil?
+
+      ids = record.criteria.pluck(:learning_outcome_id).compact
+      ids_from_results = record.learning_outcome_ids_from_results
+
+      record.errors.add :base, I18n.t("This rubric removes criterions that have learning outcome results") unless (ids_from_results - ids).empty?
+    end
+  end
+
   include Workflow
   include HtmlTextHelper
 
@@ -43,6 +54,7 @@ class Rubric < ActiveRecord::Base
   has_many :rubric_associations_with_deleted, class_name: "RubricAssociation", inverse_of: :rubric
   has_many :rubric_assessments, through: :rubric_associations, dependent: :destroy
   has_many :learning_outcome_alignments, -> { where("content_tags.tag_type='learning_outcome' AND content_tags.workflow_state<>'deleted'").preload(:learning_outcome) }, as: :content, inverse_of: :content, class_name: "ContentTag"
+  has_many :learning_outcome_results, -> { active }, through: :rubric_assessments
   has_many :rubric_criteria, class_name: "RubricCriterion", inverse_of: :rubric, dependent: :destroy
 
   validates :context_id, :context_type, :workflow_state, presence: true
@@ -50,8 +62,10 @@ class Rubric < ActiveRecord::Base
   validates :title, length: { maximum: maximum_string_length, allow_blank: false }
 
   validates_with RubricUniqueAlignments
+  validates_with RubricAssessedAlignments
 
   before_validation :default_values
+  before_save :set_default_hide_points
   before_create :set_root_account_id
   after_save :update_alignments
   after_save :touch_associations
@@ -317,6 +331,7 @@ class Rubric < ActiveRecord::Base
     self.data = data.criteria
     self.title = data.title
     self.points_possible = data.points_possible
+    self.hide_points = params[:hide_points]
     save
     self
   end
@@ -518,7 +533,15 @@ class Rubric < ActiveRecord::Base
       end
   end
 
+  def set_default_hide_points
+    self.hide_points = false if hide_points.nil?
+  end
+
   def enhanced_rubrics_enabled?
     Account.site_admin.feature_enabled?(:enhanced_rubrics)
+  end
+
+  def learning_outcome_ids_from_results
+    learning_outcome_results.select(:learning_outcome_id).distinct.pluck(:learning_outcome_id)
   end
 end

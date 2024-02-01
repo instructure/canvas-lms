@@ -1,0 +1,7 @@
+{
+  "name": "@canvas/filter-bar",
+  "private": true,
+  "version": "1.0.0",
+  "author": "xmoffatt",
+  "main": "index.ts"
+}

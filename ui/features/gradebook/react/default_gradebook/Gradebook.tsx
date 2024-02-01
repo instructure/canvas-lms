@@ -1109,6 +1109,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       filterAssignmentsBySubmissionsFn(
         this.props.appliedFilters,
         this.submissionStateMap,
+        this.searchFilteredStudentIds,
         this.options.custom_grade_statuses_enabled ? this.options.custom_grade_statuses : []
       ),
     ]
@@ -2425,6 +2426,11 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
   onFilterToStudents = (studentIds: string[]) => {
     this.searchFilteredStudentIds = studentIds
+    this.updateFilterAssignmentIds()
+    const hasChanged = this.setVisibleGridColumns()
+    if (hasChanged) {
+      this.updateGrid()
+    }
     this.updateRows()
   }
 
@@ -2433,6 +2439,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     const hasChanged = this.setVisibleGridColumns()
     if (hasChanged) {
       this.updateGrid()
+      this.updateRows()
     }
   }
 
@@ -4676,9 +4683,13 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   }
 
   refreshScoreToUngradedColumnHeaders() {
-    const columnIds = this.gridDisplaySettings.hideAssignmentGroupTotals
-      ? ['total_grade']
-      : [...this.assignmentGroupColumnIds(), 'total_grade']
+    let columnIds: string[] = []
+    if (!this.gridDisplaySettings.hideAssignmentGroupTotals) {
+      columnIds = [...this.assignmentGroupColumnIds()]
+    }
+    if (!this.gridDisplaySettings.hideTotal) {
+      columnIds.push('total_grade')
+    }
     this.gradebookGrid?.gridSupport?.columns.updateColumnHeaders(columnIds)
   }
 

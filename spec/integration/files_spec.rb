@@ -51,7 +51,7 @@ describe FilesController do
 
       get location
       # could be success or redirect, depending on S3 config
-      expect([200, 302]).to be_include(response.status)
+      expect([200, 302]).to include(response.status)
       # ensure that the user wasn't logged in by the normal means
       expect(controller.instance_variable_get(:@current_user)).to be_nil
     end
@@ -60,7 +60,7 @@ describe FilesController do
       allow(HostUrl).to receive(:file_host_with_shard).and_return(["test.host", Shard.default])
       get "http://test.host/files/#{@submission.attachment.id}/download", params: { inline: "1", verifier: @submission.attachment.uuid }
       # could be success or redirect, depending on S3 config
-      expect([200, 302]).to be_include(response.status)
+      expect([200, 302]).to include(response.status)
       expect(response["Pragma"]).to be_nil
       expect(response["Cache-Control"]).not_to match(/no-cache/)
     end
@@ -185,7 +185,7 @@ describe FilesController do
 
     get location
     # could be success or redirect, depending on S3 config
-    expect([200, 302]).to be_include(response.status)
+    expect([200, 302]).to include(response.status)
     # ensure that the user wasn't logged in by the normal means
     expect(controller.instance_variable_get(:@current_user)).to be_nil
   end
@@ -307,7 +307,7 @@ describe FilesController do
     expect(response).to be_redirect
     follow_redirect!
     # could be success or redirect, depending on S3 config
-    expect([200, 302]).to be_include(response.status)
+    expect([200, 302]).to include(response.status)
     expect(@module.evaluate_for(@user).state).to be(:completed)
   end
 

@@ -64,5 +64,10 @@ describe Types::RubricType do
     it "title" do
       expect(rubric_type.resolve("title")).to eq rubric.title
     end
+
+    it "hide_points" do
+      rubric.update!(hide_points: true)
+      expect(rubric_type.resolve("hidePoints")).to eq rubric.hide_points
+    end
   end
 end

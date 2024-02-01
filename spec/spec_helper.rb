@@ -31,6 +31,7 @@ rescue LoadError
 end
 
 require "crystalball"
+require "rspec/openapi"
 
 ENV["RAILS_ENV"] = "test"
 
@@ -449,6 +450,26 @@ RSpec.configure do |config|
   if ENV["RAILS_LOAD_ALL_LOCALES"] && RSpec.configuration.filter.rules[:i18n]
     config.around do |example|
       SpecMultipleLocales.run(example)
+    end
+  end
+
+  if ENV["OPENAPI"]
+    config.define_derived_metadata(file_path: %r{spec/controllers}) do |metadata|
+      metadata[:attempt_openapi_generation] = true
+    end
+
+    config.after(:example, :attempt_openapi_generation) do |example|
+      OpenApiGenerator.generate(self, example)
+    end
+
+    config.after(:suite) do
+      result_recorder = RSpec::OpenAPI::ResultRecorder.new(RSpec::OpenAPI.path_records)
+      result_recorder.record_results!
+      if result_recorder.errors?
+        error_message = result_recorder.error_message
+        colorizer = RSpec::Core::Formatters::ConsoleCodes
+        RSpec.configuration.reporter.message colorizer.wrap(error_message, :failure)
+      end
     end
   end
 

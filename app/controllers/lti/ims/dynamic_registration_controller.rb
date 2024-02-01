@@ -47,7 +47,7 @@ module Lti
 
         render json: {
           uuid:,
-          oidc_configuration_url:,
+          oidc_configuration_url: oidc_configuration_url(token),
           token:
         }
       end
@@ -56,7 +56,7 @@ module Lti
         render json: Lti::IMS::Registration.find_by(guid: params[:registration_uuid])
       end
 
-      def oidc_configuration_url
+      def oidc_configuration_url(registration_token)
         issuer_url = Canvas::Security.config["lti_iss"]
         parsed_issuer = Addressable::URI.parse(issuer_url)
         issuer_domain = if Rails.env.development?
@@ -68,7 +68,7 @@ module Lti
         issuer_port = parsed_issuer.port
 
         @domain_root_account.global_id
-        openid_configuration_url(protocol: issuer_protocol, port: issuer_port, host: issuer_domain)
+        openid_configuration_url(protocol: issuer_protocol, port: issuer_port, host: issuer_domain, registration_token:)
       end
 
       def update_registration_overlay
@@ -78,33 +78,6 @@ module Lti
         registration.save!
         registration.update_external_tools!
         render json: registration
-      end
-
-      def redirect_to_tool_registration
-        tool_registration_url = params.require(:registration_url) # redirect to this
-        uuid = SecureRandom.uuid
-
-        current_time = DateTime.now.iso8601
-        user_id = @current_user.id
-        root_account_global_id = @domain_root_account.global_id
-        jwt = Canvas::Security.create_jwt(
-          {
-            uuid:,
-            initiated_at: current_time,
-            user_id:,
-            root_account_global_id:
-          },
-          REGISTRATION_TOKEN_EXPIRATION.from_now
-        )
-
-        redirection_url = Addressable::URI.parse(tool_registration_url)
-        redirection_url_params = redirection_url.query_values || {}
-        redirection_url_params[:registration_token] = jwt
-        redirection_url_params[:openid_configuration] = oidc_configuration_url
-
-        redirection_url.query_values = redirection_url_params
-
-        redirect_to redirection_url.to_s
       end
 
       def create

@@ -84,15 +84,6 @@ module.exports = {
     ],
 
     ['@babel/plugin-proposal-decorators', {legacy: true}],
-
-    [
-      '@instructure/babel-plugin-themeable-styles',
-      {
-        ignore: () => false,
-        postcssrc: require('@instructure/ui-postcss-config')()(),
-        themeablerc: {},
-      },
-    ],
   ],
 
   targets: {

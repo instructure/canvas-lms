@@ -85,6 +85,8 @@ export default AssignmentListItemView = (function () {
       this.focusOnGroup = this.focusOnGroup.bind(this)
       this.focusOnGroupByID = this.focusOnGroupByID.bind(this)
       this.focusOnFirstGroup = this.focusOnFirstGroup.bind(this)
+      this.onAlignmentCloneFailedRetry = this.onAlignmentCloneFailedRetry.bind(this)
+      this.updateAssignmentCollectionItem = this.updateAssignmentCollectionItem.bind(this)
     }
 
     static initClass() {
@@ -123,6 +125,8 @@ export default AssignmentListItemView = (function () {
         'click .migrate-failed-retry': 'onMigrateFailedRetry',
         'click .duplicate-failed-cancel': 'onDuplicateOrImportFailedCancel',
         'click .import-failed-cancel': 'onDuplicateOrImportFailedCancel',
+        'click .alignment-clone-failed-retry': 'onAlignmentCloneFailedRetry',
+        'click .alignment-clone-failed-cancel': 'onDuplicateOrImportFailedCancel',
       }
 
       this.prototype.messages = shimGetterShorthand(
@@ -301,6 +305,7 @@ export default AssignmentListItemView = (function () {
 
       super.render(...arguments)
       this.initializeSisButton()
+      $('.ig-details').addClass('rendered')
       // reset the model's view property; it got overwritten by child views
       if (this.model) {
         return (this.model.view = this)
@@ -500,6 +505,30 @@ export default AssignmentListItemView = (function () {
         .always(() => $button.prop('disabled', false))
     }
 
+    onAlignmentCloneFailedRetry(e) {
+      e.preventDefault()
+      const $button = $(e.target)
+      $button.prop('disabled', true)
+      return this.model
+        .alignment_clone_failed(response => {
+          return this.updateAssignmentCollectionItem(response)
+        })
+        .always(() => $button.prop('disabled', false))
+    }
+
+    updateAssignmentCollectionItem(response) {
+      if (!response) {
+        return
+      }
+      this.model.collection.forEach(a => {
+        if (a.get('id') === response.id) {
+          a.set('workflow_state', response.workflow_state)
+          a.set('duplication_started_at', response.duplication_started_at)
+          a.set('updated_at', response.updated_at)
+        }
+      })
+    }
+
     onMigrateFailedRetry(e) {
       e.preventDefault()
       const $button = $(e.target)
@@ -544,8 +573,7 @@ export default AssignmentListItemView = (function () {
       const courseId = e.target.getAttribute('data-assignment-context-id')
       const itemName = e.target.getAttribute('data-assignment-name')
       const itemContentId = e.target.getAttribute('data-assignment-id')
-      const pointsPossible =
-        parseFloat(e.target.getAttribute('data-assignment-points-possible')) + ' pts'
+      const pointsPossible = this.model.get('points_possible')
       const iconType = e.target.getAttribute('data-assignment-type')
       this.renderItemAssignToTray(true, returnFocusTo, {
         courseId,

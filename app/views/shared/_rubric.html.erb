@@ -151,10 +151,11 @@
 </thead>
 <tbody>
   <% if rubric && rubric.criteria %>
+    <% learning_outcome_ids = rubric.learning_outcome_ids_from_results %>
     <% rubric.criteria_object.each do |criterion| %>
       <% rating = assessment.ratings.find{|r| r[:criterion_id] == criterion.id} rescue nil %>
       <% friendly_description = outcome_friendly_descriptions.detect {|x| x["learning_outcome_id"] == criterion[:learning_outcome_id]}.description rescue '' %>
-      <%= render :partial => "shared/rubric_criterion", :object => criterion, :locals => {:assessing => assessing, :assessment_rating => rating, :rubric => rubric, :rubric_association => rubric_association, :edit_view => edit_view, :friendly_description => friendly_description} %>
+      <%= render :partial => "shared/rubric_criterion", :object => criterion, :locals => {:assessing => assessing, :assessment_rating => rating, :rubric => rubric, :rubric_association => rubric_association, :edit_view => edit_view, :friendly_description => friendly_description, :learning_outcome_ids => learning_outcome_ids} %>
     <% end %>
   <% end %>
   <%= render :partial => "shared/rubric_criterion", :object => nil %>

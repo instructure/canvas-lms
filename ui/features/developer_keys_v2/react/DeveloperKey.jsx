@@ -168,7 +168,7 @@ class DeveloperKey extends React.Component {
                   onHideContent={this.handleShowKey}
                   screenReaderLabel={I18n.t('Key')}
                   renderTrigger={
-                    <Button onClick={this.handleShowKey} size="small">
+                    <Button data-testid="show-key" onClick={this.handleShowKey} size="small">
                       {this.state.showKey ? I18n.t('Hide Key') : I18n.t('Show Key')}
                       <ScreenReaderContent>{this.getToolName()}</ScreenReaderContent>
                     </Button>

@@ -303,7 +303,7 @@ ValidatedFormView.prototype.parseErrorResponse = function (response) {
     }
   } else {
     try {
-      return $.parseJSON(response.responseText).errors
+      return JSON.parse(response.responseText).errors
     } catch (error1) {
       return {}
     }

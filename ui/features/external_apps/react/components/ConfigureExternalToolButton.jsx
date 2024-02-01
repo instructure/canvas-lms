@@ -46,7 +46,7 @@ export default class ConfigureExternalToolButton extends React.Component {
     const toolConfigUrl = toolConfiguration.url || toolConfiguration.target_link_uri
     return `${ENV.CONTEXT_BASE_URL}/external_tools/retrieve?url=${encodeURIComponent(
       toolConfigUrl
-    )}&display=borderless`
+    )}&display=borderless&placement=tool_configuration`
   }
 
   openModal = e => {

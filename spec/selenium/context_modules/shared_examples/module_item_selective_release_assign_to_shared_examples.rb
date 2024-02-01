@@ -214,4 +214,16 @@ shared_examples_for "module item assign to tray" do |context|
     expect(wait_for_no_such_element { module_item_edit_tray }).to be_truthy
     expect(latest_module_item.assignment.assignment_overrides.first.assignment_override_students.count).to eq(1)
   end
+
+  it "shows the inherited module info on a card" do
+    @adhoc_override1 = @module.assignment_overrides.create!(set_type: "ADHOC")
+    @adhoc_override1.assignment_override_students.create!(user: @student1)
+
+    get @mod_url
+
+    manage_module_item_button(@module_item1).click
+    click_manage_module_item_assign_to(@module_item1)
+
+    expect(inherited_from.last.text).to eq("Inherited from #{@module.name}")
+  end
 end

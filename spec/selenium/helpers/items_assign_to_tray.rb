@@ -61,6 +61,10 @@ module ItemsAssignToTray
     "[name='Icon#{icon_type}']"
   end
 
+  def inherited_from_selector
+    "#{module_item_edit_tray_selector} [data-testid='context-module-text']"
+  end
+
   def item_type_text_selector
     "[data-testid='item-type-text']"
   end
@@ -144,6 +148,10 @@ module ItemsAssignToTray
 
   def icon_type(icon_type)
     f(icon_type_selector(icon_type))
+  end
+
+  def inherited_from
+    ff(inherited_from_selector)
   end
 
   def item_type_text

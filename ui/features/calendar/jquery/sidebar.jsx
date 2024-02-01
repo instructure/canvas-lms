@@ -39,7 +39,7 @@ class VisibleContextManager {
     this.$holder = $holder
     const fragmentData = (() => {
       try {
-        return $.parseJSON(decodeFromHex(window.location.hash.substring(1))) || {}
+        return JSON.parse(decodeFromHex(window.location.hash.substring(1))) || {}
       } catch (e) {
         return {}
       }

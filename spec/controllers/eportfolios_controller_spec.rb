@@ -75,8 +75,8 @@ describe EportfoliosController do
 
       it "exposes the feature state for rich content service to js_env" do
         allow(DynamicSettings).to receive(:find).with("rich-content-service", default_ttl: 5.minutes).and_return(
-          DynamicSettings::FallbackProxy.new("app-host" => "rce.docker",
-                                             "cdn-host" => "rce.docker")
+          DynamicSettings::FallbackProxy.new({ "app-host" => "rce.docker",
+                                               "cdn-host" => "rce.docker" })
         )
         get "user_index"
         expect(response).to be_successful
@@ -388,8 +388,8 @@ describe EportfoliosController do
       expect(assigns[:portfolio]).not_to be_frozen
       expect(assigns[:portfolio]).to be_deleted
       @user.reload
-      expect(@user.eportfolios).to be_include(@portfolio)
-      expect(@user.eportfolios.active).not_to be_include(@portfolio)
+      expect(@user.eportfolios).to include(@portfolio)
+      expect(@user.eportfolios.active).not_to include(@portfolio)
     end
   end
 

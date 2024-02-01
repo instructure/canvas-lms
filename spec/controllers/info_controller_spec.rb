@@ -173,7 +173,7 @@ describe InfoController do
       allow(DynamicSettings).to receive(:find).with(any_args).and_call_original
       allow(DynamicSettings).to receive(:find)
         .with("rich-content-service")
-        .and_return(DynamicSettings::FallbackProxy.new("app-host" => "rce.instructure.com"))
+        .and_return(DynamicSettings::FallbackProxy.new({ "app-host" => "rce.instructure.com" }))
       allow(CanvasHttp).to receive(:get).with(any_args).and_return(success_response)
       allow(IncomingMailProcessor::IncomingMessageProcessor).to receive_messages(run_periodically: true, healthy?: true)
     end

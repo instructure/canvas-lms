@@ -22,7 +22,7 @@ import {headerFor, originFromHost} from './rcs/api'
 import getTranslations from './getTranslations'
 import defaultTinymceConfig from './defaultTinymceConfig'
 import {setLocale} from './common/natcompare'
-import Mathml from './enhance-user-content/mathml'
+import {Mathml} from './enhance-user-content/mathml'
 
 export * from './enhance-user-content/index'
 

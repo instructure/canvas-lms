@@ -34,6 +34,7 @@ import GradingPeriodsAPI from '@canvas/grading/jquery/gradingPeriodsApi'
 import SisValidationHelper from '@canvas/sis/SisValidationHelper'
 import '@canvas/datetime/jquery'
 import * as tz from '@canvas/datetime'
+import {encodeQueryString} from '@canvas/query-string-encoding'
 
 const I18n = useI18nScope('CreateAssignmentView')
 
@@ -149,7 +150,7 @@ CreateAssignmentView.prototype.moreOptions = function () {
       })
   } else {
     const url = this.assignmentGroup ? this.newAssignmentUrl() : this.model.htmlEditUrl()
-    return this.redirectTo(url + '?' + $.param(dataParams))
+    return this.redirectTo(url + '?' + encodeQueryString(dataParams))
   }
 }
 

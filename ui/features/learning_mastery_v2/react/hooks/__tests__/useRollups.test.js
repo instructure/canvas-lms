@@ -18,13 +18,20 @@
 
 import {renderHook, act} from '@testing-library/react-hooks/dom'
 import axios from '@canvas/axios'
-import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import useRollups from '../useRollups'
 
 jest.useFakeTimers()
 
+jest.mock('@canvas/axios', () => ({
+  get: jest.fn(),
+}))
+
+jest.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashAlert: jest.fn(() => jest.fn(() => {})),
+}))
+
 describe('useRollups', () => {
-  let fetchMock
   const mockedUsers = [
     {
       id: '1',
@@ -128,7 +135,7 @@ describe('useRollups', () => {
         rollups: mockedRollups,
       },
     })
-    fetchMock = jest.spyOn(axios, 'get').mockResolvedValue(promise)
+    axios.get.mockResolvedValue(promise)
   })
 
   describe('useRollups hook', () => {
@@ -148,7 +155,7 @@ describe('useRollups', () => {
       const {result} = renderHook(() => useRollups({courseId: '1'}))
       await act(async () => jest.runAllTimers())
       const {students, outcomes, rollups, gradebookFilters} = result.current
-      expect(fetchMock).toHaveBeenCalled()
+      expect(axios.get).toHaveBeenCalled()
       expect(students).toEqual(mockedUsers)
       expect(outcomes).toEqual(mockedOutcomes)
       expect(gradebookFilters).toEqual([])
@@ -178,7 +185,7 @@ describe('useRollups', () => {
       const {result} = renderHook(() => useRollups({courseId: '1'}))
       await act(async () => jest.runAllTimers())
       const {students} = result.current
-      expect(fetchMock).toHaveBeenCalled()
+      expect(axios.get).toHaveBeenCalled()
       expect(students[2]).toStrictEqual({
         id: '3',
         name: 'Student 3',
@@ -202,17 +209,15 @@ describe('useRollups', () => {
           page: 1,
         },
       }
-      expect(fetchMock).toHaveBeenCalledWith('/api/v1/courses/1/outcome_rollups', params)
+      expect(axios.get).toHaveBeenCalledWith('/api/v1/courses/1/outcome_rollups', params)
     })
 
-    // OUT-6141 - remove or rewrite to remove spies on imports
-    it.skip('renders a flashAlert if the request fails', async () => {
-      fetchMock = jest.spyOn(axios, 'get').mockRejectedValue({})
-      const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
+    it('renders a flashAlert if the request fails', async () => {
+      axios.get.mockRejectedValue({})
       renderHook(() => useRollups({courseId: '1'}))
       await act(async () => jest.runAllTimers())
-      expect(fetchMock).toHaveBeenCalled()
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      expect(axios.get).toHaveBeenCalled()
+      expect(showFlashAlert).toHaveBeenCalledWith({
         message: 'Error loading rollups',
         type: 'error',
       })

@@ -2147,7 +2147,7 @@ describe CoursesController do
       post "unenroll_user", params: { course_id: @course.id, id: @enrollment.id }
       @course.reload
       expect(response).to be_successful
-      expect(@course.enrollments.map(&:user)).not_to be_include(@student)
+      expect(@course.enrollments.map(&:user)).not_to include(@student)
     end
 
     it "does not allow teachers to unenroll themselves" do
@@ -2162,7 +2162,7 @@ describe CoursesController do
       post "unenroll_user", params: { course_id: @course.id, id: @teacher_enrollment.id }
       @course.reload
       expect(response).to be_successful
-      expect(@course.enrollments.map(&:user)).not_to be_include(@teacher)
+      expect(@course.enrollments.map(&:user)).not_to include(@teacher)
     end
   end
 
@@ -2191,8 +2191,8 @@ describe CoursesController do
       post "enroll_users", params: { course_id: @course.id, user_list: "\"Sam\" <sam@yahoo.com>, \"Fred\" <fred@yahoo.com>" }
       expect(response).to be_successful
       @course.reload
-      expect(@course.students.map(&:name)).to be_include("Sam")
-      expect(@course.students.map(&:name)).to be_include("Fred")
+      expect(@course.students.map(&:name)).to include("Sam")
+      expect(@course.students.map(&:name)).to include("Fred")
     end
 
     it "does not enroll people in hard-concluded courses" do
@@ -2201,8 +2201,8 @@ describe CoursesController do
       post "enroll_users", params: { course_id: @course.id, user_list: "\"Sam\" <sam@yahoo.com>, \"Fred\" <fred@yahoo.com>" }
       expect(response).not_to be_successful
       @course.reload
-      expect(@course.students.map(&:name)).not_to be_include("Sam")
-      expect(@course.students.map(&:name)).not_to be_include("Fred")
+      expect(@course.students.map(&:name)).not_to include("Sam")
+      expect(@course.students.map(&:name)).not_to include("Fred")
     end
 
     it "does not enroll people in soft-concluded courses" do
@@ -2214,8 +2214,8 @@ describe CoursesController do
       post "enroll_users", params: { course_id: @course.id, user_list: "\"Sam\" <sam@yahoo.com>, \"Fred\" <fred@yahoo.com>" }
       expect(response).not_to be_successful
       @course.reload
-      expect(@course.students.map(&:name)).not_to be_include("Sam")
-      expect(@course.students.map(&:name)).not_to be_include("Fred")
+      expect(@course.students.map(&:name)).not_to include("Sam")
+      expect(@course.students.map(&:name)).not_to include("Fred")
     end
 
     it "records initial_enrollment_type on new users" do
@@ -2246,8 +2246,8 @@ describe CoursesController do
       expect(response).to be_successful
       @course.reload
       expect(@course.students).to be_empty
-      expect(@course.observers.map(&:name)).to be_include("Sam")
-      expect(@course.observers.map(&:name)).to be_include("Fred")
+      expect(@course.observers.map(&:name)).to include("Sam")
+      expect(@course.observers.map(&:name)).to include("Fred")
       expect(@course.observer_enrollments.map(&:workflow_state)).to eql(["invited", "invited"])
     end
 

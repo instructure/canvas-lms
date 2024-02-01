@@ -39,6 +39,8 @@
 class InstAccessTokensController < ApplicationController
   before_action :require_user, :require_non_jwt_auth
 
+  ADDITIONAL_CREATE_REQUEST_COST = 200
+
   # @API Create InstAccess token
   #
   # Create a unique, encrypted InstAccess token.
@@ -55,7 +57,7 @@ class InstAccessTokensController < ApplicationController
   # @returns InstAccessToken
   def create
     # tokens are good for an hour, so nobody should have a legit need to spam this endpoint
-    increment_request_cost(Setting.get("inst_access_token_additional_request_cost", "200").to_i)
+    increment_request_cost(ADDITIONAL_CREATE_REQUEST_COST)
 
     token = InstAccess::Token.for_user(
       user_uuid: @current_user.uuid,

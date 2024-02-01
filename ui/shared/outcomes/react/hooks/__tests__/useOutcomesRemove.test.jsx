@@ -27,10 +27,14 @@ import useOutcomesRemove, {
 import {createCache} from '@canvas/apollo'
 import OutcomesContext from '../../contexts/OutcomesContext'
 import {deleteOutcomeMocks} from '../../../mocks/Management'
-import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {MockedProvider} from '@apollo/react-testing'
 
 jest.useFakeTimers()
+
+jest.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashAlert: jest.fn(() => jest.fn(() => {})),
+}))
 
 const outcomesGenerator = (startId, count, canUnlink = true, sameGroup = false, title = '') =>
   new Array(count).fill(0).reduce(
@@ -48,12 +52,10 @@ const outcomesGenerator = (startId, count, canUnlink = true, sameGroup = false, 
     {}
   )
 
-// OUT-6141 - remove or rewrite to remove spies on imports
-describe.skip('useOutcomesRemove', () => {
-  let cache, showFlashAlertSpy
+describe('useOutcomesRemove', () => {
+  let cache
   beforeEach(() => {
     cache = createCache()
-    showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
   })
 
   afterEach(() => {
@@ -95,7 +97,7 @@ describe.skip('useOutcomesRemove', () => {
         result.current.removeOutcomes(outcomes)
       })
       await act(async () => jest.runAllTimers())
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      expect(showFlashAlert).toHaveBeenCalledWith({
         message: 'This outcome was successfully removed.',
         type: 'success',
       })
@@ -113,7 +115,7 @@ describe.skip('useOutcomesRemove', () => {
         result.current.removeOutcomes(outcomes)
       })
       await act(async () => jest.runAllTimers())
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      expect(showFlashAlert).toHaveBeenCalledWith({
         message: 'An error occurred while removing this outcome. Please try again.',
         type: 'error',
       })
@@ -131,7 +133,7 @@ describe.skip('useOutcomesRemove', () => {
         result.current.removeOutcomes(outcomes)
       })
       await act(async () => jest.runAllTimers())
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      expect(showFlashAlert).toHaveBeenCalledWith({
         message: 'An error occurred while removing this outcome. Please try again.',
         type: 'error',
       })
@@ -149,7 +151,7 @@ describe.skip('useOutcomesRemove', () => {
         result.current.removeOutcomes(outcomes)
       })
       await act(async () => jest.runAllTimers())
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      expect(showFlashAlert).toHaveBeenCalledWith({
         message: 'An error occurred while removing this outcome. Please try again.',
         type: 'error',
       })
@@ -167,7 +169,7 @@ describe.skip('useOutcomesRemove', () => {
         result.current.removeOutcomes(outcomes)
       })
       await act(async () => jest.runAllTimers())
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      expect(showFlashAlert).toHaveBeenCalledWith({
         message: 'An error occurred while removing this outcome. Please try again.',
         type: 'error',
       })
@@ -218,7 +220,7 @@ describe.skip('useOutcomesRemove', () => {
           result.current.removeOutcomes(outcomes)
         })
         await act(async () => jest.runAllTimers())
-        expect(showFlashAlertSpy).toHaveBeenCalledWith({
+        expect(showFlashAlert).toHaveBeenCalledWith({
           message: '4 outcomes were successfully removed.',
           type: 'success',
         })
@@ -236,7 +238,7 @@ describe.skip('useOutcomesRemove', () => {
           result.current.removeOutcomes(outcomes)
         })
         await act(async () => jest.runAllTimers())
-        expect(showFlashAlertSpy).toHaveBeenCalledWith({
+        expect(showFlashAlert).toHaveBeenCalledWith({
           message: 'An error occurred while removing these outcomes. Please try again.',
           type: 'error',
         })
@@ -254,7 +256,7 @@ describe.skip('useOutcomesRemove', () => {
           result.current.removeOutcomes(outcomes)
         })
         await act(async () => jest.runAllTimers())
-        expect(showFlashAlertSpy).toHaveBeenCalledWith({
+        expect(showFlashAlert).toHaveBeenCalledWith({
           message: 'An error occurred while removing these outcomes. Please try again.',
           type: 'error',
         })
@@ -272,7 +274,7 @@ describe.skip('useOutcomesRemove', () => {
           result.current.removeOutcomes(outcomes)
         })
         await act(async () => jest.runAllTimers())
-        expect(showFlashAlertSpy).toHaveBeenCalledWith({
+        expect(showFlashAlert).toHaveBeenCalledWith({
           message: 'An error occurred while removing these outcomes. Please try again.',
           type: 'error',
         })
@@ -290,7 +292,7 @@ describe.skip('useOutcomesRemove', () => {
           result.current.removeOutcomes(outcomes)
         })
         await act(async () => jest.runAllTimers())
-        expect(showFlashAlertSpy).toHaveBeenCalledWith({
+        expect(showFlashAlert).toHaveBeenCalledWith({
           message: 'An error occurred while removing these outcomes. Please try again.',
           type: 'error',
         })

@@ -124,7 +124,7 @@ module Lti
         render json: {
           access_token: Lti::OAuth2::AccessToken.create_jwt(aud:, sub: jwt_validator.sub, reg_key:).to_s,
           token_type: "bearer",
-          expires_in: Setting.get("lti.oauth2.access_token.expiration", 1.hour.to_s)
+          expires_in: 1.hour.to_s
         }
       end
 

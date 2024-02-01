@@ -37,7 +37,7 @@ describe "selective_release module item assign to tray" do
   include K5Common
 
   before(:once) do
-    Account.site_admin.enable_feature! :differentiated_modules
+    differentiated_modules_on
     course_with_teacher(active_all: true)
 
     @course.enable_feature! :quizzes_next
@@ -141,6 +141,7 @@ describe "selective_release module item assign to tray" do
     before(:once) do
       module_setup
       @module_item1 = ContentTag.find_by(context_id: @course.id, context_module_id: @module.id, content_type: "Assignment", content_id: @assignment1.id)
+      @module_item2 = ContentTag.find_by(context_id: @course.id, context_module_id: @module.id, content_type: "Assignment", content_id: @assignment2.id)
       @module.update!(workflow_state: "active")
       @student1 = student_in_course(course: @course, active_all: true, name: "Student 1").user
       @student2 = student_in_course(course: @course, active_all: true, name: "Student 2").user
@@ -159,6 +160,21 @@ describe "selective_release module item assign to tray" do
       expect(item_tray_exists?).to be true
       expect(module_item_assign_to_card[0]).to be_displayed
       expect(assign_to_in_tray("Remove Everyone")[0]).to be_displayed
+    end
+
+    it "shows points possible only when present" do
+      @assignment1.update!(points_possible: 10)
+      @assignment2.update!(points_possible: nil)
+      go_to_modules
+
+      manage_module_item_button(@module_item1).click
+      click_manage_module_item_assign_to(@module_item1)
+      expect(item_type_text.text).to include("10 pts")
+
+      click_cancel_button
+      manage_module_item_button(@module_item2).click
+      click_manage_module_item_assign_to(@module_item2)
+      expect(item_type_text.text).not_to include("pts")
     end
 
     it "changes pills when new card is added" do
@@ -186,7 +202,7 @@ describe "selective_release module item assign to tray" do
       expect(assign_to_in_tray("Remove Everyone")[0]).to be_displayed
     end
 
-    it "first card pill stays Everyone when student added to first card" do
+    it "first card pill changes to Everyone else when student added to first card" do
       go_to_modules
 
       manage_module_item_button(@module_item1).click
@@ -194,7 +210,7 @@ describe "selective_release module item assign to tray" do
 
       select_module_item_assignee(0, @student1.name)
 
-      expect(assign_to_in_tray("Remove Everyone")[0]).to be_displayed
+      expect(assign_to_in_tray("Remove Everyone else")[0]).to be_displayed
       expect(assign_to_in_tray("Remove #{@student1.name}")[0]).to be_displayed
     end
 
@@ -265,6 +281,27 @@ describe "selective_release module item assign to tray" do
       expect(assign_to_date_and_time[0].text).to include("Saturday, December 31, 2022 5:00 PM")
       expect(assign_to_date_and_time[1].text).to include("Tuesday, December 27, 2022 8:00 AM")
       expect(assign_to_date_and_time[2].text).to include("Saturday, January 7, 2023 9:00 PM")
+    end
+
+    it "displays an error when due date is invalid" do
+      go_to_modules
+
+      manage_module_item_button(@module_item1).click
+      click_manage_module_item_assign_to(@module_item1)
+      update_due_date(0, "wrongdate")
+
+      expect(assign_to_date_and_time[0].text).to include("Invalid date")
+    end
+
+    it "displays an error when the availability date is after the due date" do
+      go_to_modules
+
+      manage_module_item_button(@module_item1).click
+      click_manage_module_item_assign_to(@module_item1)
+      update_due_date(0, "12/31/2022")
+      update_available_date(0, "1/1/2023")
+
+      expect(assign_to_date_and_time[1].text).to include("Unlock date cannot be after due date")
     end
 
     it "can remove a student from a card with two students" do

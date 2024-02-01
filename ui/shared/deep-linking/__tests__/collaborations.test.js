@@ -118,13 +118,6 @@ describe('collaborationUrl', () => {
 })
 
 describe('onExternalContentReady', () => {
-  const params = overrides => [
-    {},
-    {
-      contentItems: {},
-      ...overrides,
-    },
-  ]
   let querySelector, ajaxJSON
 
   beforeAll(() => {
@@ -149,7 +142,7 @@ describe('onExternalContentReady', () => {
   })
 
   it('creates a new collaboration', () => {
-    onExternalContentReady(...params())
+    onExternalContentReady({contentItems: {}})
     expect($.ajaxJSON).toHaveBeenCalledWith(
       'http://www.test.com/create?tool_id=',
       'POST',
@@ -161,7 +154,7 @@ describe('onExternalContentReady', () => {
 
   describe('with a service id', () => {
     it('updates the existing collaboration', () => {
-      onExternalContentReady(...params({service_id: 1}))
+      onExternalContentReady({contentItems: {}, service_id: 1})
       expect($.ajaxJSON).toHaveBeenCalledWith(
         'http://www.test.com/update?tool_id=',
         'PUT',

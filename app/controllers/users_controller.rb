@@ -2264,6 +2264,17 @@ class UsersController < ApplicationController
     render json: "ok"
   end
 
+  # @API Log users out of all mobile apps
+  #
+  # Permanently expires any active mobile sessions for _all_ users, forcing them to re-authorize.
+  def expire_mobile_sessions
+    return unless authorized_action(@domain_root_account, @current_user, :manage_user_logins)
+
+    AccessToken.delay_if_production.invalidate_mobile_tokens!(@domain_root_account)
+
+    render json: "ok"
+  end
+
   def media_download
     fetcher = MediaSourceFetcher.new(CanvasKaltura::ClientV3.new)
     extension = params[:type]

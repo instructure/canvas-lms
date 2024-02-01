@@ -125,7 +125,7 @@ export const CommonMigratorControls = ({
   const handleSubmit = useCallback(() => {
     const data: any = {settings: {}}
     setContentError(selectiveImport === null)
-    data.errored = selectiveImport === null // So the parent form can guard submit and show it's own errors
+    data.errored = canSelectContent && selectiveImport === null // So the parent form can guard submit and show it's own errors
     canSelectContent && (data.selective_import = selectiveImport)
     if (canAdjustDates && dateAdjustments) {
       dateAdjustments.adjust_dates && (data.adjust_dates = dateAdjustments.adjust_dates)

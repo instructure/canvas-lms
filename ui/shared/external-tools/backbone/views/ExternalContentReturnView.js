@@ -23,6 +23,7 @@ import $ from 'jquery'
 import Backbone from '@canvas/backbone'
 import template from '../../jst/ExternalContentReturnView.handlebars'
 import iframeAllowances from '@canvas/external-apps/iframeAllowances'
+import {handleExternalContentMessages} from '../../messages'
 
 extend(ExternalContentReturnView, Backbone.View)
 
@@ -103,13 +104,10 @@ ExternalContentReturnView.prototype.afterRender = function () {
 }
 
 ExternalContentReturnView.prototype.attachLtiEvents = function () {
-  $(window).on('externalContentReady', this._contentReady)
-  return $(window).on('externalContentCancel', this._contentCancel)
-}
-
-ExternalContentReturnView.prototype.detachLtiEvents = function () {
-  $(window).off('externalContentReady', this._contentReady)
-  return $(window).off('externalContentCancel', this._contentCancel)
+  this.detachLtiEvents = handleExternalContentMessages({
+    ready: this._contentReady,
+    cancel: this._contentCancel,
+  })
 }
 
 ExternalContentReturnView.prototype.removeDialog = function () {
@@ -117,13 +115,13 @@ ExternalContentReturnView.prototype.removeDialog = function () {
   return this.remove()
 }
 
-ExternalContentReturnView.prototype._contentReady = function (event, data) {
+ExternalContentReturnView.prototype._contentReady = function (data) {
   this.trigger('ready', data)
   return this.removeDialog()
 }
 
-ExternalContentReturnView.prototype._contentCancel = function (event, data) {
-  this.trigger('cancel', data)
+ExternalContentReturnView.prototype._contentCancel = function () {
+  this.trigger('cancel', {})
   return this.removeDialog()
 }
 

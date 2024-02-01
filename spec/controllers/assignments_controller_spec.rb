@@ -2255,40 +2255,70 @@ describe AssignmentsController do
     end
 
     context "when the root account does not have a default tool url set" do
+      subject { get :edit, params: { course_id: course.id, id: @assignment.id } }
+
       let(:course) { @course }
       let(:root_account) { course.root_account }
 
       before do
         user_session(@teacher)
-        get :edit, params: { course_id: course.id, id: @assignment.id }
       end
 
-      it "js_env SUBMISSION_TYPE_SELECTION_TOOLS is correctly set for submission type tools" do
-        tool_settings = {
-          base_title: "my title",
-          external_url: "https://tool.launch.url",
-          selection_width: 750,
-          selection_height: 480,
-          icon_url: nil,
-        }
+      context "js_env SUBMISSION_TYPE_SELECTION_TOOLS" do
+        let(:tool_settings) do
+          {
+            base_title: "my title",
+            external_url: "https://tool.launch.url",
+            selection_width: 750,
+            selection_height: 480,
+            icon_url: nil,
+          }
+        end
 
-        @tool = factory_with_protected_attributes(@course.context_external_tools,
-                                                  url: "http://www.justanexamplenotarealwebsite.com/tool1",
-                                                  shared_secret: "test123",
-                                                  consumer_key: "test123",
-                                                  name: tool_settings[:base_title],
-                                                  settings: {
-                                                    submission_type_selection: tool_settings
-                                                  })
-        user_session(@teacher)
+        let(:tool) do
+          factory_with_protected_attributes(@course.context_external_tools,
+                                            url: "http://www.justanexamplenotarealwebsite.com/tool1",
+                                            shared_secret: "test123",
+                                            consumer_key: "test123",
+                                            name: tool_settings[:base_title],
+                                            settings: {
+                                              submission_type_selection: tool_settings
+                                            })
+        end
 
-        get :edit, params: { course_id: @course.id, id: @assignment.id }
-        expect(assigns[:js_env][:SUBMISSION_TYPE_SELECTION_TOOLS][0]).to include(
-          base_title: tool_settings[:base_title],
-          title: tool_settings[:base_title],
-          selection_width: tool_settings[:selection_width],
-          selection_height: tool_settings[:selection_height]
-        )
+        it "is correctly set" do
+          tool
+          subject
+          expect(assigns[:js_env][:SUBMISSION_TYPE_SELECTION_TOOLS][0]).to include(
+            base_title: tool_settings[:base_title],
+            title: tool_settings[:base_title],
+            selection_width: tool_settings[:selection_width],
+            selection_height: tool_settings[:selection_height]
+          )
+        end
+
+        context "the tool includes a submission_type_selection_launch_points" do
+          let(:launch_point) do
+            {
+              "target_link_uri" => "https://example.com/launch?placement=submission_type_selection",
+              "title" => "Launch",
+              "description" => "Launch the tool",
+              "icon_url" => "https://example.com/icon.png",
+            }
+          end
+          let(:tool_settings) do
+            super().tap do |options|
+              options[:submission_type_selection_launch_points] = [launch_point]
+            end
+          end
+
+          it "includes the launch points" do
+            tool
+            subject
+            expect(assigns[:js_env][:SUBMISSION_TYPE_SELECTION_TOOLS][0])
+              .to include(submission_type_selection_launch_points: [launch_point])
+          end
+        end
       end
 
       it 'does not set "DEFAULT_ASSIGNMENT_TOOL_URL"' do
@@ -2648,27 +2678,70 @@ describe AssignmentsController do
       user_session(@teacher)
       @assignment = @course.assignments.create(title: "Peer Review Assignment", workflow_state: "published")
       @assignment.update!(peer_reviews: true, submission_types: "text_entry")
-      @student2 = User.create!(name: "Sam")
-      @student3 = User.create!(name: "Samantha")
-      @student4 = User.create!(name: "Jim")
+      @student2 = User.create!(name: "Bob Travis")
+      @student3 = User.create!(name: "Samantha Lee")
+      @student4 = User.create!(name: "Jim Carey")
       @course.enroll_user(@student2, "StudentEnrollment", enrollment_state: "active")
       @course.enroll_user(@student3, "StudentEnrollment", enrollment_state: "active")
       @course.enroll_user(@student4, "StudentEnrollment", enrollment_state: "active")
-    end
-
-    it "students instance variable contains students who match the search term parameter" do
-      get "peer_reviews", params: { course_id: @course.id, assignment_id: @assignment.id, search_term: "Sa" }
-      expect(assigns[:students]).to include(have_attributes(name: "Sam"), have_attributes(name: "Samantha"))
-    end
-
-    it "students intance variable has no students when search term parameter does not match any student names" do
-      get "peer_reviews", params: { course_id: @course.id, assignment_id: @assignment.id, search_term: "Hello World" }
-      expect(assigns[:students].length).to eq(0)
+      @assignment.assign_peer_review(@student2, @student3)
+      @assignment.assign_peer_review(@student3, @student4)
     end
 
     it "all visible students are listed in the assign peer review dropdown" do
       get "peer_reviews", params: { course_id: @course.id, assignment_id: @assignment.id, search_term: "Sa" }
       expect(assigns[:students_dropdown_list].length).to eq(4)
+    end
+
+    context "when Search By Reviewer option is selected" do
+      it "students instance variable contains the assessors who match the search term" do
+        get "peer_reviews", params: { course_id: @course.id, assignment_id: @assignment.id, search_term: "Sa", selected_option: "reviewer" }
+        expect(assigns[:students]).to include(have_attributes(name: "Samantha Lee"))
+      end
+
+      it "students instance variable contains the assessors who match the search term parameter when search term has extraneous spaces" do
+        get "peer_reviews", params: { course_id: @course.id, assignment_id: @assignment.id, search_term: " Samantha   Lee ", selected_option: "reviewer" }
+        expect(assigns[:students]).to include(have_attributes(name: "Samantha Lee"))
+      end
+
+      it "students instance variable contains the assessors who match the search term parameter when search term has the users last name first" do
+        get "peer_reviews", params: { course_id: @course.id, assignment_id: @assignment.id, search_term: "Lee, Samantha", selected_option: "reviewer" }
+        expect(assigns[:students]).to include(have_attributes(name: "Samantha Lee"))
+      end
+
+      it "students instance variable has no assessors when search term does not match any assessor names" do
+        get "peer_reviews", params: { course_id: @course.id, assignment_id: @assignment.id, search_term: "Hello World", selected_option: "reviewer" }
+        expect(assigns[:students].length).to eq(0)
+      end
+    end
+
+    context "when Search By Peer Review option is selected" do
+      it "students instance variable contains assessor whose assigned assessments contains the student matching the search term" do
+        get "peer_reviews", params: { course_id: @course.id, assignment_id: @assignment.id, search_term: "Jim Carey", selected_option: "student" }
+        expect(assigns[:students]).to include(have_attributes(name: "Samantha Lee"))
+      end
+
+      it "students instance variable contains assessor whose assigned assessments contains the student matching the search term when search term has extraneous spaces" do
+        get "peer_reviews", params: { course_id: @course.id, assignment_id: @assignment.id, search_term: " Jim  Carey  ", selected_option: "student" }
+        expect(assigns[:students]).to include(have_attributes(name: "Samantha Lee"))
+      end
+
+      it "students instance variable contains assessor whose assigned assessments contains the student matching the search term when search term is last name first" do
+        get "peer_reviews", params: { course_id: @course.id, assignment_id: @assignment.id, search_term: "Carey, Jim", selected_option: "student" }
+        expect(assigns[:students]).to include(have_attributes(name: "Samantha Lee"))
+      end
+    end
+
+    context "when All option is selected" do
+      it "students instance variable contains both the assessor and asset that contain the search term" do
+        get "peer_reviews", params: { course_id: @course.id, assignment_id: @assignment.id, search_term: "sa", selected_option: "all" }
+        expect(assigns[:students]).to include(have_attributes(name: "Samantha Lee"), have_attributes(name: "Bob Travis"))
+      end
+
+      it "students instance variable contains the assessor when there are no peer reviews assigned to the assessor" do
+        get "peer_reviews", params: { course_id: @course.id, assignment_id: @assignment.id, search_term: "ji", selected_option: "all" }
+        expect(assigns[:students]).to include(have_attributes(name: "Jim Carey"))
+      end
     end
   end
 end

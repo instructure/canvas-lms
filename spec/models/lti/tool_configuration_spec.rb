@@ -47,6 +47,23 @@ module Lti
         end
 
         it { is_expected.to be true }
+
+        context "with a valid submission_type_selection_launch_points" do
+          let(:settings) do
+            super().tap do |c|
+              c["extensions"].first["settings"]["submission_type_selection_launch_points"] = [
+                {
+                  "target_link_uri" => "http://example.com/launch?placement=submission_type_selection",
+                  "title" => "Test Title",
+                  "icon_url" => "https://static.thenounproject.com/png/131630-211.png",
+                  "description" => "Test Description"
+                }
+              ]
+            end
+          end
+
+          it { is_expected.to be true }
+        end
       end
 
       context "with non-matching schema" do
@@ -65,6 +82,35 @@ module Lti
         it "is contains a message about missing target_link_uri" do
           tool_configuration.valid?
           expect(tool_configuration.errors[:configuration].first.message).to include("target_link_uri,")
+        end
+      end
+
+      context "with an invalid submission_type_selection_launch_points" do
+        let(:settings) do
+          s = super()
+          s["extensions"].first["settings"]["placements"] << {
+            "placement" => "submission_type_selection",
+            "message_type" => "LtiResourceLinkRequest",
+            "submission_type_selection_launch_points" => [{
+              # Invalid target_link_uri
+              "target_link_uri" => "",
+              "title" => 4,
+              "icon_url" => "https://static.thenounproject.com/png/131630-211.png",
+              "description" => "Test Description"
+            }]
+          }
+          s
+        end
+
+        before do
+          tool_configuration.developer_key = developer_key
+        end
+
+        it { is_expected.to be false }
+
+        it "contains a message about invalid submission_type_selection placement" do
+          tool_configuration.valid?
+          expect(tool_configuration.errors[:configuration].first.message).to include("submission_type_selection")
         end
       end
 

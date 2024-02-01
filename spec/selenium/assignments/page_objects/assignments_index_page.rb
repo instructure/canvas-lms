@@ -21,6 +21,9 @@ require_relative "../../common"
 module AssignmentsIndexPage
   #------------------------------ Selectors -----------------------------
 
+  def assignment_row_selector(assignment_id)
+    "#assignment_#{assignment_id}"
+  end
   #------------------------------ Elements ------------------------------
 
   def assignment_index_menu_tool_link(tool_text)
@@ -32,7 +35,7 @@ module AssignmentsIndexPage
   end
 
   def assignment_row(assignment_id)
-    f("#assignment_#{assignment_id}")
+    f(assignment_row_selector(assignment_id))
   end
 
   def manage_assignment_menu(assignment_id)

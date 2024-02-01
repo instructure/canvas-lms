@@ -25,20 +25,28 @@ import {View} from '@instructure/ui-view'
 
 type ConfirmationModalProps = {
   message: string | React.ReactNode
+  confirmText?: string
+  cancelText?: string
   onConfirm: () => void
   onCancel: () => void
 }
 
-const ConfirmationModal = ({message, onConfirm, onCancel}: ConfirmationModalProps) => {
+const ConfirmationModal = ({
+  message,
+  confirmText,
+  cancelText,
+  onConfirm,
+  onCancel,
+}: ConfirmationModalProps) => {
   return (
     <Alert variant="warning">
       <Text>{message}</Text>
       <View as="div" margin="small 0 0 0">
         <Button margin="x-small" onClick={onCancel}>
-          Cancel
+          {cancelText || 'Cancel'}
         </Button>
         <Button margin="x-small" color="danger" onClick={onConfirm}>
-          Confirm
+          {confirmText || 'Confirm'}
         </Button>
       </View>
     </Alert>
@@ -62,7 +70,11 @@ function getAlertContainer() {
   return alertContainer
 }
 
-function confirm(message: string | React.ReactNode) {
+function confirm(
+  message: string | React.ReactNode,
+  confirmText: string = 'Confirm',
+  cancelText: string = 'Cancel'
+): Promise<boolean> {
   return new Promise(resolve => {
     const alertContainer = getAlertContainer()
     const container = document.createElement('div')
@@ -80,7 +92,13 @@ function confirm(message: string | React.ReactNode) {
       resolve(false)
     }
     ReactDOM.render(
-      <ConfirmationModal message={message} onConfirm={handleConfirm} onCancel={handleCancel} />,
+      <ConfirmationModal
+        message={message}
+        confirmText={confirmText}
+        cancelText={cancelText}
+        onConfirm={handleConfirm}
+        onCancel={handleCancel}
+      />,
       container
     )
   })

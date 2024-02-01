@@ -932,6 +932,39 @@ class AssignmentsApiController < ApplicationController
     end
   end
 
+  def retry_alignment_clone
+    old_assignment = old_assignment_for_duplicate
+    target_assignment = target_assignment_for_duplicate
+    target_course = target_course_for_duplicate
+    unless target_assignment.workflow_state == "failed_to_clone_outcome_alignment"
+      render json: { error: t("invalid status") }, status: :bad_request
+      return
+    end
+    target_assignment.workflow_state = "outcome_alignment_cloning"
+    target_assignment.duplication_started_at = Time.zone.now
+    target_assignment.save!
+    result_json = if use_quiz_json?
+                    quiz_json(target_assignment, @context, @current_user, session, {}, QuizzesNext::QuizSerializer)
+                  else
+                    assignment_json(target_assignment, @current_user, session)
+                  end
+    result_json["new_positions"] = { target_assignment.id => target_assignment.position }
+    Canvas::LiveEvents.quizzes_next_quiz_duplicated(
+      {
+        original_course_uuid: old_assignment.context.uuid,
+        new_course_uuid: target_course.uuid,
+        new_course_resource_link_id: target_course.lti_context_id,
+        domain: target_course.root_account&.domain(ApplicationController.test_cluster_name),
+        new_course_name: target_course.name,
+        created_on_blueprint_sync: false,
+        resource_map_url: "",
+        remove_alignments: false,
+        status: "outcome_alignment_cloning"
+      }
+    )
+    render json: result_json
+  end
+
   def get_assignments(user)
     if authorized_action(@context, user, :read)
       log_api_asset_access(["assignments", @context], "assignments", "other")

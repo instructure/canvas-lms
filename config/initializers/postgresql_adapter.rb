@@ -23,10 +23,19 @@ class QuotedValue < String
 end
 
 module PostgreSQLAdapterExtensions
+  # when changing this, you need to re-apply the latest migration creating the guard_excessive_updates function
+  DEFAULT_MAX_UPDATE_LIMIT = 1000
+
+  def initialize(*)
+    super
+    @max_update_limit = DEFAULT_MAX_UPDATE_LIMIT
+  end
+
   def configure_connection
     super
 
-    @connection.set_notice_receiver do |result|
+    conn = (Rails.version < "7.1") ? @connection : @raw_connection
+    conn.set_notice_receiver do |result|
       severity = result.result_error_field(PG::PG_DIAG_SEVERITY_NONLOCALIZED)
       rails_severity = case severity
                        when "WARNING", "NOTICE"
@@ -235,7 +244,7 @@ module PostgreSQLAdapterExtensions
     # internal_metadata to exist and this guard isn't really useful there either
     return if ["schema_migrations", "internal_metadata"].include?(table_name)
     # If the function doesn't exist yet it will be backfilled
-    return unless ::ActiveRecord::InternalMetadata[:guard_dangerous_changes_installed]
+    return unless ((Rails.version < "7.1") ? ::ActiveRecord::InternalMetadata : ::ActiveRecord::InternalMetadata.new(self))[:guard_dangerous_changes_installed]
 
     ["UPDATE", "DELETE"].each do |operation|
       trigger_name = "guard_excessive_#{operation.downcase}s"
@@ -258,6 +267,11 @@ module PostgreSQLAdapterExtensions
   end
 
   def with_max_update_limit(limit)
+    return yield if limit == @max_update_limit
+
+    old_limit = @max_update_limit
+    @max_update_limit = limit
+
     if transaction_open?
       execute("SET LOCAL inst.max_update_limit = #{limit}")
       ret = yield
@@ -269,6 +283,8 @@ module PostgreSQLAdapterExtensions
       end
     end
     ret
+  ensure
+    @max_update_limit = old_limit if old_limit
   end
 
   def quote(*args)
@@ -437,6 +453,11 @@ module ReferenceDefinitionExtensions
 end
 
 module SchemaStatementsExtensions
+  # TODO: move this to activerecord-pg-extensions
+  def valid_column_definition_options
+    super + [:delay_validation]
+  end
+
   def add_column_for_alter(table_name, column_name, type, **options)
     td = create_table_definition(table_name)
     cd = td.new_column_definition(column_name, type, **options)

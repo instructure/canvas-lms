@@ -43,6 +43,11 @@ class Lti::ResourceLink < ApplicationRecord
            dependent: :destroy,
            foreign_key: :lti_resource_link_id
 
+  has_one :content_tag,
+          as: :associated_asset,
+          required: false,
+          inverse_of: :associated_asset
+
   before_validation :generate_resource_link_uuid, on: :create
   before_validation :generate_lookup_uuid, on: :create
   before_save :set_root_account
@@ -54,14 +59,15 @@ class Lti::ResourceLink < ApplicationRecord
     original_undestroy
   end
 
-  def self.create_with(context, tool, custom_params = nil, url = nil, title = nil)
+  def self.create_with(context, tool, custom_params = nil, url = nil, title = nil, lti_1_1_id: nil)
     return if context.nil? || tool.nil?
 
     context.lti_resource_links.create!(
       custom: Lti::DeepLinkingUtil.validate_custom_params(custom_params),
       context_external_tool: tool,
       url:,
-      title:
+      title:,
+      lti_1_1_id:
     )
   end
 

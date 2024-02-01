@@ -17,10 +17,11 @@
  */
 
 import DatetimeField, {
-  TIME_FORMAT_OPTIONS,
   DATE_FORMAT_OPTIONS,
   DATETIME_FORMAT_OPTIONS,
+  TIME_FORMAT_OPTIONS,
 } from '@canvas/datetime/jquery/DatetimeField'
+import '@canvas/datetime/jquery'
 import $ from 'jquery'
 import * as tz from '@canvas/datetime'
 import tzInTest from '@canvas/datetime/specHelpers'
@@ -186,13 +187,19 @@ test('should not add datepicker when timeOnly', function () {
 })
 
 test('should place suggest outside wrapper when adding datepicker', function () {
+  const $wrapper = $('<div></div>').appendTo('body')
+  this.$field.appendTo($wrapper)
   const field = new DatetimeField(this.$field, {})
   equal(this.$field.parent().next()[0], field.$suggest[0], 'wrapper and suggest are siblings')
+  $wrapper.remove()
 })
 
 test('should place suggest next to field when not adding datepicker', function () {
+  const $wrapper = $('<div></div>').appendTo('body')
+  this.$field.appendTo($wrapper)
   const field = new DatetimeField(this.$field, {timeOnly: true})
   equal(this.$field.next()[0], field.$suggest[0], 'field and suggest are siblings')
+  $wrapper.remove()
 })
 
 test('should set the button to disabled when given the option to do so', function () {

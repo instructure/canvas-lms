@@ -574,6 +574,17 @@ QUnit.module('Gradebook#executeApplyScoreToUngraded', hooks => {
     ok(gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.calledWith(['total_grade']))
   })
 
+  test('only updates assignment group columns when the total column is hidden', async () => {
+    gradebook.gridDisplaySettings.hideTotal = true
+    gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders = sinon.stub()
+    await gradebook.executeApplyScoreToUngraded({value: 50.0})
+    ok(
+      gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.calledWith([
+        'assignment_group_10',
+      ])
+    )
+  })
+
   test('calls the startProcess method with the course ID as the first argument', async () => {
     await gradebook.executeApplyScoreToUngraded({value: 50.0})
 

@@ -242,7 +242,7 @@ module Lti
           let(:valid_params) { { course_id: context.id, userId: user.id, line_item_id: line_item.id } }
 
           it "is ignored" do
-            expect_any_instance_of(Assignment).not_to receive(:prepare_for_ags_if_needed!)
+            expect_any_instance_of(Assignment).not_to receive(:migrate_to_1_3_if_needed!)
             get :index, params: valid_params
           end
         end
@@ -266,7 +266,7 @@ module Lti
           let(:valid_params) { { course_id: context.id, userId: user.id, resourceLinkId: assignment.lti_context_id } }
 
           it "fixes up line items on assignment" do
-            expect_any_instance_of(Assignment).to receive(:prepare_for_ags_if_needed!)
+            expect_any_instance_of(Assignment).to receive(:migrate_to_1_3_if_needed!)
             get :index, params: valid_params
           end
         end

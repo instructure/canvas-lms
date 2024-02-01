@@ -1287,7 +1287,8 @@ class CalendarEventsApiController < ApplicationController
         asset_string: context.asset_string,
         color: @current_user.custom_colors[context.asset_string],
         selected: selected_contexts.include?(context.asset_string),
-        allow_observers_in_appointment_groups: context.is_a?(Course) && context.account.allow_observers_in_appointment_groups?
+        allow_observers_in_appointment_groups: context.is_a?(Course) && context.account.allow_observers_in_appointment_groups?,
+        can_create_appointment_groups: context.is_a?(Course) && context.grants_right?(@current_user, session, :manage_calendar)
       }
 
       if context.is_a?(Course)
@@ -1297,6 +1298,7 @@ class CalendarEventsApiController < ApplicationController
             name: section.name,
             asset_string: section.asset_string,
             selected: selected_contexts.include?(section.asset_string),
+            can_create_appointment_groups: section.grants_right?(@current_user, session, :manage_calendar)
           }
         end
       end

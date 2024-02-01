@@ -22,12 +22,25 @@ module Types
   class SubmissionSearchFilterInputType < Types::BaseInputObject
     graphql_name "SubmissionSearchFilterInput"
 
+    argument :apply_gradebook_enrollment_filters, Boolean, <<~MD, required: false
+      Filters submissions for deactivated and concluded users based on the calling user's
+      'Show -> Inactive Enrollments' and 'Show -> Concluded Enrollments' settings in the Gradebook.
+      When true, this filter takes precedence over the include_concluded and include_deactivated filters.
+    MD
+
     argument :include_unsubmitted, Boolean, required: false
 
     argument :states, [SubmissionStateType], required: false, default_value: DEFAULT_SUBMISSION_STATES
     argument :section_ids, [ID], required: false, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("Section")
 
     argument :enrollment_types, [EnrollmentTypeType], required: false
+    argument :include_concluded, Boolean, <<~MD, required: false
+      Include submissions for concluded students.
+    MD
+
+    argument :include_deactivated, Boolean, <<~MD, required: false
+      Include submissions for deactivated students.
+    MD
 
     argument :user_search, String, <<~MD, required: false
       The partial name or full ID of the users to match and return in the

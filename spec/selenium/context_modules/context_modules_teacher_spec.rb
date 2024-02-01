@@ -327,7 +327,7 @@ describe "context modules" do
     end
 
     it "validates locking a module item display functionality with differentiated modules" do
-      Account.site_admin.enable_feature! :differentiated_modules
+      differentiated_modules_on
       m1 = @course.context_modules.create!(name: "module 1")
 
       go_to_modules

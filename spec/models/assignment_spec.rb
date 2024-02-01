@@ -1870,6 +1870,79 @@ describe Assignment do
     end
   end
 
+  describe "event: failed_to_clone_outcome_alignment" do
+    subject { described_class }
+
+    let(:target_assignment) do
+      @course.assignments.create!(workflow_state: "outcome_alignment_cloning", **assignment_valid_attributes)
+    end
+
+    describe ".finish_alignment_cloning" do
+      it "updates to unpublished" do
+        expect(target_assignment.workflow_state).to eq "outcome_alignment_cloning"
+        target_assignment.finish_alignment_cloning
+        expect(target_assignment.workflow_state).to eq "unpublished"
+      end
+    end
+
+    describe ".fail_to_clone_alignment" do
+      it "updates to failed_to_clone_outcome_alignment" do
+        expect(target_assignment.workflow_state).to eq "outcome_alignment_cloning"
+        target_assignment.fail_to_clone_alignment
+        expect(target_assignment.workflow_state).to eq "failed_to_clone_outcome_alignment"
+      end
+    end
+
+    describe ".fail_to_clone_alignment and .finish_alignment_cloning" do
+      it "updates to failed_to_clone_outcome_alignment and then to unpublished" do
+        expect(target_assignment.workflow_state).to eq "outcome_alignment_cloning"
+        target_assignment.fail_to_clone_alignment
+        expect(target_assignment.workflow_state).to eq "failed_to_clone_outcome_alignment"
+        target_assignment.finish_alignment_cloning
+        expect(target_assignment.workflow_state).to eq "unpublished"
+      end
+    end
+  end
+
+  describe "scope: cloning_alignments_for_too_long" do
+    subject { described_class.cloning_alignments_for_too_long }
+
+    let_once(:unpublished_assignment) do
+      @course.assignments.create!(workflow_state: "unpublished", **assignment_valid_attributes)
+    end
+    let_once(:new_target_assignment) do
+      @course.assignments.create!(
+        workflow_state: "outcome_alignment_cloning",
+        duplication_started_at: 5.seconds.ago,
+        **assignment_valid_attributes
+      )
+    end
+    let_once(:old_assignment) do
+      @course.assignments.create!(
+        workflow_state: "outcome_alignment_cloning",
+        duplication_started_at: 40.minutes.ago,
+        **assignment_valid_attributes
+      )
+    end
+
+    it { is_expected.to eq([old_assignment]) }
+  end
+
+  describe ".clean_up_cloning_alignments" do
+    before { allow(described_class).to receive(:cloning_alignments_for_too_long).and_return(double) }
+
+    it "marks all assignments that have been in the status cloning assignment for too long as failed_to_clone_outcome_alignment" do
+      now = double("now")
+      expect(Time.zone).to receive(:now).and_return(now)
+      expect(described_class.cloning_alignments_for_too_long).to receive(:update_all).with(
+        duplication_started_at: nil,
+        workflow_state: "failed_to_clone_outcome_alignment",
+        updated_at: now
+      )
+      described_class.clean_up_cloning_alignments
+    end
+  end
+
   describe "scope: migrating_for_too_long" do
     subject { described_class.migrating_for_too_long }
 
@@ -4545,8 +4618,8 @@ describe Assignment do
         res = @a.assign_peer_reviews
         expect(res.length).to eql(@submissions.length)
         @submissions.each do |s|
-          expect(res.map(&:asset)).to be_include(s)
-          expect(res.map(&:assessor_asset)).to be_include(s)
+          expect(res.map(&:asset)).to include(s)
+          expect(res.map(&:assessor_asset)).to include(s)
         end
       end
 
@@ -4557,8 +4630,8 @@ describe Assignment do
         @a.peer_review_count = 1
         res = @a.assign_peer_reviews
         expect(res.length).to eql(@submissions.length)
-        expect(res.map(&:asset)).not_to be_include(fake_sub)
-        expect(res.map(&:assessor_asset)).not_to be_include(fake_sub)
+        expect(res.map(&:asset)).not_to include(fake_sub)
+        expect(res.map(&:assessor_asset)).not_to include(fake_sub)
       end
 
       it "assigns when already graded" do
@@ -4569,8 +4642,8 @@ describe Assignment do
         res = @a.assign_peer_reviews
         expect(res.length).to eql(@submissions.length)
         @submissions.each do |s|
-          expect(res.map(&:asset)).to be_include(s)
-          expect(res.map(&:assessor_asset)).to be_include(s)
+          expect(res.map(&:asset)).to include(s)
+          expect(res.map(&:assessor_asset)).to include(s)
         end
       end
     end
@@ -6117,7 +6190,7 @@ describe Assignment do
         @a.created_at = 1.month.ago
         @a.due_at = Time.now + 60
         @a.save!
-        expect(@a.messages_sent).to be_include("Assignment Due Date Changed")
+        expect(@a.messages_sent).to include("Assignment Due Date Changed")
         expect(@a.messages_sent["Assignment Due Date Changed"].first.from_name).to eq @course.name
       end
 
@@ -6131,7 +6204,7 @@ describe Assignment do
         @a.description = "New description"
         @a.points_possible = 50
         @a.save!
-        expect(@a.messages_sent).not_to be_include("Assignment Due Date Changed")
+        expect(@a.messages_sent).not_to include("Assignment Due Date Changed")
       end
     end
 
@@ -6175,14 +6248,14 @@ describe Assignment do
         @a.description = "something different"
         @a.notify_of_update = true
         @a.save
-        expect(@a.messages_sent).to be_include("Assignment Changed")
+        expect(@a.messages_sent).to include("Assignment Changed")
         expect(@a.messages_sent["Assignment Changed"].first.from_name).to eq @course.name
       end
 
       it "does not create a message when an assignment changes SHORTLY AFTER it's been created" do
         @a.description = "something different"
         @a.save
-        expect(@a.messages_sent).not_to be_include("Assignment Changed")
+        expect(@a.messages_sent).not_to include("Assignment Changed")
       end
 
       it "does not create a message when a muted assignment changes" do
@@ -6201,7 +6274,7 @@ describe Assignment do
 
       it "creates a message when an assignment is added to a course in process" do
         assignment_model(course: @course)
-        expect(@a.messages_sent).to be_include("Assignment Created")
+        expect(@a.messages_sent).to include("Assignment Created")
         expect(@a.messages_sent["Assignment Created"].first.from_name).to eq @course.name
       end
 
@@ -6209,7 +6282,7 @@ describe Assignment do
         Notification.create(name: "Assignment Created")
         course_with_teacher(active_user: true)
         assignment_model(course: @course)
-        expect(@a.messages_sent).not_to be_include("Assignment Created")
+        expect(@a.messages_sent).not_to include("Assignment Created")
       end
     end
 
@@ -6254,11 +6327,11 @@ describe Assignment do
           @assignment.do_notifications!
 
           messages_sent = @assignment.messages_sent["Assignment Created"]
-          expect(messages_sent.detect { |m| m.user_id == @teacher.id }.body).to be_include "Multiple Dates"
-          expect(messages_sent.detect { |m| m.user_id == @studentA.id }.body).to be_include "Jan 1, 2011"
-          expect(messages_sent.detect { |m| m.user_id == @ta.id }.body).to be_include "Multiple Dates"
-          expect(messages_sent.detect { |m| m.user_id == @studentB.id }.body).to be_include "Jan 2, 2011"
-          expect(messages_sent.detect { |m| m.user_id == @ta2.id }.body).to be_include "Multiple Dates"
+          expect(messages_sent.detect { |m| m.user_id == @teacher.id }.body).to include "Multiple Dates"
+          expect(messages_sent.detect { |m| m.user_id == @studentA.id }.body).to include "Jan 1, 2011"
+          expect(messages_sent.detect { |m| m.user_id == @ta.id }.body).to include "Multiple Dates"
+          expect(messages_sent.detect { |m| m.user_id == @studentB.id }.body).to include "Jan 2, 2011"
+          expect(messages_sent.detect { |m| m.user_id == @ta2.id }.body).to include "Multiple Dates"
         end
 
         it "notifies the correct people with differentiated_assignments enabled" do
@@ -6267,11 +6340,11 @@ describe Assignment do
           @assignment.do_notifications!
 
           messages_sent = @assignment.messages_sent["Assignment Created"]
-          expect(messages_sent.detect { |m| m.user_id == @teacher.id }.body).to be_include "Multiple Dates"
-          expect(messages_sent.detect { |m| m.user_id == @studentA.id }.body).to be_include "Jan 1, 2011"
-          expect(messages_sent.detect { |m| m.user_id == @ta.id }.body).to be_include "Multiple Dates"
-          expect(messages_sent.detect { |m| m.user_id == @studentB.id }.body).to be_include "Jan 2, 2011"
-          expect(messages_sent.detect { |m| m.user_id == @ta2.id }.body).to be_include "Multiple Dates"
+          expect(messages_sent.detect { |m| m.user_id == @teacher.id }.body).to include "Multiple Dates"
+          expect(messages_sent.detect { |m| m.user_id == @studentA.id }.body).to include "Jan 1, 2011"
+          expect(messages_sent.detect { |m| m.user_id == @ta.id }.body).to include "Multiple Dates"
+          expect(messages_sent.detect { |m| m.user_id == @studentB.id }.body).to include "Jan 2, 2011"
+          expect(messages_sent.detect { |m| m.user_id == @ta2.id }.body).to include "Multiple Dates"
           expect(messages_sent.detect { |m| m.user_id == student.id }).to be_nil
         end
 
@@ -6286,7 +6359,7 @@ describe Assignment do
 
           # when the override matches the default, show the default and not "Multiple"
           messages_sent = @assignment.messages_sent["Assignment Created"]
-          messages_sent.each { |m| expect(m.body).to be_include "Jan 1, 2011" }
+          messages_sent.each { |m| expect(m.body).to include "Jan 1, 2011" }
         end
       end
 
@@ -6303,11 +6376,11 @@ describe Assignment do
           @assignment.save!
 
           messages_sent = @assignment.messages_sent["Assignment Due Date Changed"]
-          expect(messages_sent.detect { |m| m.user_id == @teacher.id }.body).to be_include "Jan 9, 2011"
-          expect(messages_sent.detect { |m| m.user_id == @studentA.id }.body).to be_include "Jan 9, 2011"
-          expect(messages_sent.detect { |m| m.user_id == @ta.id }.body).to be_include "Jan 9, 2011"
+          expect(messages_sent.detect { |m| m.user_id == @teacher.id }.body).to include "Jan 9, 2011"
+          expect(messages_sent.detect { |m| m.user_id == @studentA.id }.body).to include "Jan 9, 2011"
+          expect(messages_sent.detect { |m| m.user_id == @ta.id }.body).to include "Jan 9, 2011"
           expect(messages_sent.detect { |m| m.user_id == @studentB.id }).to be_nil
-          expect(messages_sent.detect { |m| m.user_id == @ta2.id }.body).to be_include "Jan 9, 2011"
+          expect(messages_sent.detect { |m| m.user_id == @ta2.id }.body).to include "Jan 9, 2011"
         end
 
         it "notifies appropriate parties when an override due date changes" do
@@ -6319,12 +6392,12 @@ describe Assignment do
 
           messages_sent = override.messages_sent["Assignment Due Date Changed"]
           expect(messages_sent.detect { |m| m.user_id == @studentA.id }).to be_nil
-          expect(messages_sent.detect { |m| m.user_id == @studentB.id }.body).to be_include "Jan 11, 2011"
+          expect(messages_sent.detect { |m| m.user_id == @studentB.id }.body).to include "Jan 11, 2011"
 
           messages_sent = override.messages_sent["Assignment Due Date Override Changed"]
           expect(messages_sent.detect { |m| m.user_id == @ta.id }).to be_nil
-          expect(messages_sent.detect { |m| m.user_id == @teacher.id }.body).to be_include "Jan 11, 2011"
-          expect(messages_sent.detect { |m| m.user_id == @ta2.id }.body).to be_include "Jan 11, 2011"
+          expect(messages_sent.detect { |m| m.user_id == @teacher.id }.body).to include "Jan 11, 2011"
+          expect(messages_sent.detect { |m| m.user_id == @ta2.id }.body).to include "Jan 11, 2011"
         end
       end
 
@@ -6405,8 +6478,8 @@ describe Assignment do
       expect(res).not_to be_nil
       expect(res).not_to be_empty
       expect(res.length).to be(2)
-      expect(res.map(&:user)).to be_include(@u1)
-      expect(res.map(&:user)).to be_include(@u2)
+      expect(res.map(&:user)).to include(@u1)
+      expect(res.map(&:user)).to include(@u2)
     end
 
     it "creates an initial submission comment for only the submitter by default" do
@@ -7125,7 +7198,7 @@ describe Assignment do
       quiz_with_graded_submission [], course: @course, user: @student
       submissions = @quiz.assignment.submissions
 
-      Setting.set("too_many_quiz_submission_versions", 3)
+      stub_const("AbstractAssignment::QUIZ_SUBMISSION_VERSIONS_LIMIT", 3)
       @quiz_submission.versions.create!
       expect(@quiz.assignment.too_many_qs_versions?(submissions)).to be_falsey
 
@@ -8874,8 +8947,8 @@ describe Assignment do
       @assignment = @course.assignments.create! points_possible: 10
       @shard1.activate do
         sql = @course.assignments.with_student_submission_count.to_sql
-        expect(sql).to be_include(Shard.default.name)
-        expect(sql).not_to be_include(@shard1.name)
+        expect(sql).to include(Shard.default.name)
+        expect(sql).not_to include(@shard1.name)
       end
     end
   end
@@ -10529,94 +10602,6 @@ describe Assignment do
               expect(subject.line_items.first.resource_link).not_to eq resource_link
             end
           end
-
-          describe "#prepare_for_ags_if_needed!" do
-            subject { assignment }
-
-            let(:use_tool) { false }
-
-            context "when the assignment is not AGS ready" do
-              before do
-                assignment.update!(lti_context_id: SecureRandom.uuid)
-
-                # assignments configured with LTI 1.1 will not have
-                # LineItem or ResouceLink records prior to the LTI 1.3
-                # launch.
-                # (note: this needs to happen _after_ any other calls to
-                # assignment.save! since that calls update_line_items)
-                # (note: this setup and test hierarchy is not great)
-                assignment.line_items.destroy_all
-
-                Lti::ResourceLink.where(
-                  resource_link_uuid: assignment.lti_context_id
-                ).destroy_all
-
-                allow(assignment).to receive(:tool_from_external_tool_tag).and_call_original
-                assignment.prepare_for_ags_if_needed!(tool, use_tool:)
-              end
-
-              it "creates the default line item" do
-                expect(subject.line_items).to be_present
-              end
-
-              it "creates the LTI resource link" do
-                expect(
-                  Lti::ResourceLink.where(
-                    resource_link_uuid: subject.lti_context_id
-                  )
-                ).to be_present
-              end
-
-              it "queries to find correct tool" do
-                expect(assignment).to have_received(:tool_from_external_tool_tag).at_least(:once)
-              end
-
-              context "when told to use the given tool" do
-                let(:use_tool) { true }
-
-                it "does not query for the tool again" do
-                  expect(subject).not_to have_received(:tool_from_external_tool_tag)
-                end
-              end
-            end
-
-            shared_examples_for "a method that does not change AGS columns" do
-              it "does not recreate the default line item" do
-                expect do
-                  assignment.prepare_for_ags_if_needed!(tool)
-                end.not_to change { assignment.line_items.first.id }
-              end
-
-              it "does not recreate the LTI resource link" do
-                expect do
-                  assignment.prepare_for_ags_if_needed!(tool)
-                end.not_to change {
-                  Lti::ResourceLink.where(resource_link_uuid: subject.lti_context_id)
-                                   .first
-                                   .id
-                }
-              end
-            end
-
-            context "when the tool does not use 1.3" do
-              before do
-                tool.use_1_3 = false
-                tool.save!
-              end
-
-              it_behaves_like "a method that does not change AGS columns"
-            end
-
-            context "when the tool does not have a developer key" do
-              before { tool.update!(developer_key: nil) }
-
-              it_behaves_like "a method that does not change AGS columns"
-            end
-
-            context "when the assignment already has line items" do
-              it_behaves_like "a method that does not change AGS columns"
-            end
-          end
         end
 
         context "and resource link and line item exist" do
@@ -11410,6 +11395,243 @@ describe Assignment do
 
     it "soft-deletes child assignments when the parent assignment is soft-deleted" do
       expect { @parent.destroy }.to change { @child.reload.deleted? }.from(false).to(true)
+    end
+  end
+
+  describe "Lti::Migratable" do
+    let(:url) { "http://www.example.com" }
+    let(:account) { account_model }
+    let(:course) { course_model(account:) }
+    let(:developer_key) { dev_key_model_1_3(account:) }
+    let(:old_tool) { external_tool_model(context: course, opts: { url: }) }
+    let(:new_tool) { external_tool_1_3_model(context: course, developer_key:, opts: { url:, name: "1.3 tool" }) }
+    let(:direct_assignment) do
+      assignment_model(
+        context: course,
+        name: "Direct Assignment",
+        submission_types: "external_tool",
+        external_tool_tag_attributes: { content: old_tool },
+        lti_context_id: SecureRandom.uuid
+      )
+    end
+    let(:unpublished_direct) do
+      a = direct_assignment.dup
+      a.update!(lti_context_id: SecureRandom.uuid, workflow_state: "unpublished", external_tool_tag_attributes: { content: old_tool })
+      a
+    end
+    let(:indirect_assignment) do
+      assign = assignment_model(
+        context: course,
+        name: "Indirect Assignment",
+        submission_types: "external_tool",
+        external_tool_tag_attributes: { url: },
+        lti_context_id: SecureRandom.uuid
+      )
+      # There's an before_save hook that looks up the appropriate tool
+      # based on the URL. Great for production, bad for testing :(
+      assign.external_tool_tag.update_column(:content_id, nil)
+      assign
+    end
+    let(:unpublished_indirect) do
+      a = indirect_assignment.dup
+      a.update!(lti_context_id: SecureRandom.uuid, workflow_state: "unpublished", external_tool_tag_attributes: { url: })
+      a.external_tool_tag.update_column(:content_id, nil)
+      a
+    end
+
+    describe "#migrate_to_1_3_if_needed!" do
+      subject { direct_assignment.migrate_to_1_3_if_needed!(new_tool) }
+
+      context "when the assignment is not AGS ready" do
+        before do
+          direct_assignment.line_items.destroy_all
+
+          Lti::ResourceLink.where(
+            resource_link_uuid: direct_assignment.lti_context_id
+          ).destroy_all
+        end
+
+        it "creates the default line item" do
+          subject
+          expect(direct_assignment.line_items).to be_present
+        end
+
+        it "creates the LTI resource link" do
+          subject
+          expect(
+            Lti::ResourceLink.where(
+              resource_link_uuid: direct_assignment.lti_context_id
+            )
+          ).to be_present
+        end
+
+        it "does not query for the tool again" do
+          expect(direct_assignment).not_to receive(:tool_from_external_tool_tag)
+          subject
+        end
+      end
+
+      shared_examples_for "an idempotent migration" do
+        it "does not recreate the default line item" do
+          direct_assignment.migrate_to_1_3_if_needed!(new_tool)
+          expect { direct_assignment.migrate_to_1_3_if_needed!(new_tool) }
+            .not_to change { direct_assignment.line_items.first&.id }
+        end
+
+        it "does not recreate the LTI resource link" do
+          direct_assignment.migrate_to_1_3_if_needed!(new_tool)
+          expect { direct_assignment.migrate_to_1_3_if_needed!(new_tool) }
+            .not_to change {
+                      Lti::ResourceLink.where(resource_link_uuid: direct_assignment.lti_context_id)
+                                       .first
+                                       &.id
+                    }
+        end
+      end
+
+      context "when the tool does not use 1.3" do
+        before do
+          new_tool.update!(use_1_3: false)
+        end
+
+        it_behaves_like "an idempotent migration"
+      end
+
+      context "when the tool does not have a developer key" do
+        before { new_tool.update!(developer_key: nil) }
+
+        it_behaves_like "an idempotent migration"
+      end
+
+      context "when the assignment already has line items" do
+        it_behaves_like "an idempotent migration"
+      end
+
+      context "when the assignment has line items but hasn't written the LTI 1.1 id" do
+        let(:assignment) { assignment_model(context: course, submission_types: "external_tool", external_tool_tag_attributes: { content: new_tool }) }
+
+        before do
+          # Avoid any callbacks that might write the LTI 1.1 id
+          assignment.primary_resource_link.update_column(:lti_1_1_id, nil)
+        end
+
+        it "updates the existing resource link with the LTI 1.1 id" do
+          resource_link = assignment.primary_resource_link
+          expect(resource_link.lti_1_1_id).to be_nil
+
+          assignment.migrate_to_1_3_if_needed!(new_tool)
+          expect(resource_link.reload.lti_1_1_id).to eq(assignment.lti_resource_link_id)
+        end
+      end
+    end
+
+    context "finding items" do
+      def create_misc_assignments
+        # Same course, just deleted
+        assign = direct_assignment.dup
+        assign.update!(workflow_state: "deleted", lti_context_id: SecureRandom.uuid, name: "Deleted Same Course")
+
+        # Different account
+        new_course = course_model(account: account_model)
+
+        assignment_model(
+          context: new_course,
+          name: "Different Account Direct Relation",
+          submission_types: "external_tool",
+          external_tool_tag_attributes: { content: old_tool },
+          lti_context_id: SecureRandom.uuid
+        )
+        indirect = assignment_model(
+          context: new_course,
+          name: "Different Account Indirect Relation",
+          submission_types: "external_tool",
+          external_tool_tag_attributes: { url: },
+          lti_context_id: SecureRandom.uuid
+        )
+        indirect.external_tool_tag.update_column(:content_id, nil)
+      end
+
+      describe "#directly_associated_items" do
+        it "finds all active assignments in the same course" do
+          create_misc_assignments
+          direct_assignment
+          indirect_assignment
+
+          expect(Assignment.directly_associated_items(old_tool.id, course))
+            .to contain_exactly(direct_assignment, unpublished_direct)
+        end
+
+        it "finds all active assignments in the same account" do
+          create_misc_assignments
+          direct_assignment
+          indirect_assignment
+
+          new_course = course_model(account:)
+          other_assign = assignment_model(
+            context: new_course,
+            submission_types: "external_tool",
+            external_tool_tag_attributes: { content: old_tool },
+            lti_context_id: SecureRandom.uuid
+          )
+
+          expect(Assignment.directly_associated_items(old_tool.id, account))
+            .to contain_exactly(direct_assignment, other_assign, unpublished_direct)
+        end
+      end
+
+      describe "#indirectly_associated_items" do
+        it "finds all active assignments in the same course" do
+          create_misc_assignments
+          direct_assignment
+          indirect_assignment
+
+          expect(Assignment.indirectly_associated_items(old_tool.id, course))
+            .to contain_exactly(indirect_assignment, unpublished_indirect)
+        end
+
+        it "finds all active assignments in the same account" do
+          create_misc_assignments
+          direct_assignment
+          indirect_assignment
+
+          new_course = course_model(account:)
+          other_assign = assignment_model(
+            context: new_course,
+            title: "Indirect Assignment, Same Account",
+            submission_types: "external_tool",
+            external_tool_tag_attributes: { url: },
+            lti_context_id: SecureRandom.uuid
+          )
+          other_assign.external_tool_tag.update_column(:content_id, nil)
+
+          expect(Assignment.indirectly_associated_items(old_tool.id, account))
+            .to contain_exactly(indirect_assignment, other_assign, unpublished_indirect)
+        end
+      end
+    end
+
+    describe "#fetch_direct_batch" do
+      it "fetches only the ids it's given" do
+        direct_assignment
+        indirect_assignment
+
+        expect(Assignment.fetch_direct_batch([direct_assignment.id]).to_a)
+          .to contain_exactly(direct_assignment)
+      end
+    end
+
+    describe "#fetch_indirect_batch" do
+      it "ignores assignments that can't be associated with the tool being migrated" do
+        invalid_assign = assignment_model(
+          context: course,
+          submission_types: "external_tool",
+          external_tool_tag_attributes: { url: "https://notreallythere.com" },
+          lti_context_id: SecureRandom.uuid
+        )
+
+        expect(Assignment.fetch_indirect_batch(old_tool.id, new_tool.id, [indirect_assignment.id, invalid_assign.id]).to_a)
+          .to contain_exactly(indirect_assignment)
+      end
     end
   end
 end

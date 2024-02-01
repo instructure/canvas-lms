@@ -74,25 +74,23 @@ export default function NewCourseModal({terms, children}) {
       return
     }
 
-    // CoursesStore.create doesn't return a Promise
-    // eslint-disable-next-line promise/catch-or-return
-    CoursesStore.create({course: data})
-      .then(createdCourse => {
-        closeModal()
-        showFlashAlert({
-          type: 'success',
-          message: (
-            <Text>
-              {I18n.t('%{course_name} successfully added!', {course_name: createdCourse.name})}
-              &emsp;
-              <Link href={`/courses/${createdCourse.id}`}>{I18n.t('Go to the new course')}</Link>
-            </Text>
-          ),
-        })
+    const successHandler = (createdCourse) => {
+      closeModal()
+      showFlashAlert({
+        type: 'success',
+        message: (
+          <Text>
+            {I18n.t('%{course_name} successfully added!', {course_name: createdCourse.name})}
+            &emsp;
+            <Link href={`/courses/${createdCourse.id}`}>{I18n.t('Go to the new course')}</Link>
+          </Text>
+        ),
       })
-      .error(() => {
-        showFlashError(I18n.t('Something went wrong creating the course. Please try again.'))
-      })
+    }
+
+    const errorHandler = showFlashError(I18n.t('Something went wrong creating the course. Please try again.'))
+
+    CoursesStore.create({course: data}, successHandler, errorHandler)
   }
 
   function onChange(field) {

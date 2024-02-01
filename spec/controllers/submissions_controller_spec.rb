@@ -288,8 +288,8 @@ describe SubmissionsController do
       expect(assigns[:submission].submission_type).to eql("online_upload")
       expect(assigns[:submission].attachments).not_to be_empty
       expect(assigns[:submission].attachments.length).to be(2)
-      expect(assigns[:submission].attachments.map(&:display_name)).to be_include("doc.doc")
-      expect(assigns[:submission].attachments.map(&:display_name)).to be_include("txt.txt")
+      expect(assigns[:submission].attachments.map(&:display_name)).to include("doc.doc")
+      expect(assigns[:submission].attachments.map(&:display_name)).to include("txt.txt")
     end
 
     it "fails but not raise when the submission is invalid" do

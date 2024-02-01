@@ -22,7 +22,7 @@ import Footer, {type FooterProps} from '../Footer'
 
 describe('Footer', () => {
   const props: FooterProps = {
-    saveButtonLabel: 'Update Module',
+    saveButtonLabel: 'Save',
     updateInteraction: 'enabled',
     onDismiss: jest.fn(),
     onUpdate: jest.fn(),
@@ -37,7 +37,7 @@ describe('Footer', () => {
   it('renders', () => {
     const {getByText} = renderComponent()
     expect(getByText('Cancel')).toBeInTheDocument()
-    expect(getByText('Update Module')).toBeInTheDocument()
+    expect(getByText('Save')).toBeInTheDocument()
   })
 
   it('labels the update button from the prop', () => {
@@ -53,13 +53,13 @@ describe('Footer', () => {
 
   it('calls onUpdate when update button is clicked', () => {
     const {getByRole} = renderComponent()
-    getByRole('button', {name: /update module/i}).click()
+    getByRole('button', {name: 'Save'}).click()
     expect(props.onUpdate).toHaveBeenCalled()
   })
 
   it('does not call onUpdate when in-error', () => {
     const {getByRole, getByText} = renderComponent({updateInteraction: 'inerror'})
-    const savebtn = getByRole('button', {name: /update module/i})
+    const savebtn = getByRole('button', {name: 'Save'})
     savebtn.click()
     expect(props.onUpdate).not.toHaveBeenCalled()
     savebtn.focus()
@@ -68,14 +68,14 @@ describe('Footer', () => {
 
   it('does not display the error tooltip when not in-error', () => {
     const {getByRole, queryByText} = renderComponent()
-    const savebtn = getByRole('button', {name: /update module/i})
+    const savebtn = getByRole('button', {name: 'Save'})
     savebtn.focus()
     expect(queryByText('Please fix errors before continuing')).not.toBeInTheDocument()
   })
 
   it('displays the error tooltip when in-error', () => {
     const {getByRole, queryByText} = renderComponent({updateInteraction: 'inerror'})
-    const savebtn = getByRole('button', {name: /update module/i})
+    const savebtn = getByRole('button', {name: 'Save'})
     savebtn.focus()
     expect(queryByText('Please fix errors before continuing')).toBeInTheDocument()
   })

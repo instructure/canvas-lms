@@ -22,6 +22,7 @@ import {oncePerPage} from '@instructure/updown'
 import {useTranslations} from '@canvas/i18n'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import fallbacks from 'translations/en.json'
+import {captureException} from '@sentry/browser'
 
 declare const ENV: {
   RAILS_ENVIRONMENT: 'development' | 'test' | 'production'
@@ -69,6 +70,7 @@ const Translations: Capability = {
       console.error(
         `CAUTION could not load translations for "${ENV.LOCALE}", falling back to US English`
       )
+      captureException(new Error(`Could not load translations for "${ENV.LOCALE}"`))
     }
   }),
   requires: [LocaleBackfill],

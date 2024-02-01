@@ -53,7 +53,7 @@ export const AssignmentDueDatesManager = () => {
   const [listOptions, setListOptions] = useState({
     '': getDefaultBaseOptions(ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED, defaultEveryoneOption),
     'Course Sections': sections.map(section => {
-      return {assetCode: `course_section_${section?._id}`, label: section?.name}
+      return {assetCode: `course_section_${section?.id}`, label: section?.name}
     }),
     Students: studentEnrollments.map(enrollment => {
       return {assetCode: `user_${enrollment?.user?._id}`, label: enrollment?.user?.name}
@@ -124,7 +124,7 @@ export const AssignmentDueDatesManager = () => {
         showEveryoneElseOption ? defaultEveryoneElseOption : defaultEveryoneOption
       ),
       'Course Sections': sections.map(section => {
-        return {assetCode: `course_section_${section?._id}`, label: section?.name}
+        return {assetCode: `course_section_${section?.id}`, label: section?.name}
       }),
       Students: studentEnrollments.map(enrollment => {
         return {assetCode: `user_${enrollment?.user?._id}`, label: enrollment?.user?.name}

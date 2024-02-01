@@ -46,8 +46,10 @@ describe ModelCache do
   after do
     ModelCache.keys.delete("TestModelCacheUser")
     ModelCache.keys.delete("TestModelCachePseudonym")
+    # rubocop:disable RSpec/RemoveConst
     Object.send(:remove_const, :TestModelCacheUser)
     Object.send(:remove_const, :TestModelCachePseudonym)
+    # rubocop:enable RSpec/RemoveConst
   end
 
   it "does not cache by default" do

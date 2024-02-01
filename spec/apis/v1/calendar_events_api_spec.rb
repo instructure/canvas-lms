@@ -4673,6 +4673,24 @@ describe CalendarEventsApiController, type: :request do
         end
       end
       expect(context).not_to be_nil
+      expect(context["sections"][0]).to include({ "can_create_appointment_groups" => true })
+    end
+
+    it "includes can_create_appointment_groups flag" do
+      student = user_factory(active_all: true)
+      @course.enroll_student(student, enrollment_state: "active")
+
+      json = api_call_as_user(student, :get, "/api/v1/calendar_events/visible_contexts", {
+                                controller: "calendar_events_api",
+                                action: "visible_contexts",
+                                format: "json"
+                              })
+
+      student_enrollment_context = json["contexts"].find do |c|
+        c["id"] == @course.id.to_s
+      end
+
+      expect(student_enrollment_context).to include({ "can_create_appointment_groups" => false })
     end
 
     it "excludes concluded courses" do
