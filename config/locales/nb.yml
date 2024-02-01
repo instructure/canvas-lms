@@ -16974,8 +16974,7 @@ nb:
         details: 
           mfa_enrollment: |-
               Multi-faktor autentisering øker sikkerheten ved å kreve at du har noe i fysisk besittelse, samtidig som du kan
-              passordet ditt, for å logge inn på Canvas. Dette kan være en enhet som kan generere bekreftelsekoder, eller
-              en telefon som kan motta tekstmeldinger. MFA kan konfigureres ved å skanne QR-koden nedenfor ved hjelp
+              passordet ditt, for å logge inn på Canvas. %{otp_via_sms_message} MFA kan konfigureres ved å skanne QR-koden nedenfor ved hjelp
               av en autentiseringsapp med et tidsbegrenset engangspassord (TOTP) på iPhone eller Android (for eksempel). Google Authenticator,
               Microsoft Authenticator, Authy). Andre nøkler kan bli konfigurert ved å skrive inn det hemmelige tegnet **%{secret_key}**.
               Når du har konfigurert multi-faktor autentisering, anbefales det at du går til din profil-side og printer
