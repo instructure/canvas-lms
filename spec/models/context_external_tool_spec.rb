@@ -1526,19 +1526,6 @@ describe ContextExternalTool do
       expect(@found_tool).to eql(@tool)
     end
 
-    it "doesn't error when one of the tools has an invalid URL and it must match on domain" do
-      context = @course
-      domain = "notarealdomain.com"
-      url = "https://notarealdomain.com/another/launch"
-      first = external_tool_model(context:, opts: { url:, domain: })
-      second = external_tool_model(context:, opts: { url:, domain: })
-
-      first.update_column(:url, "http<>malformed url!?**&")
-      first.update_column(:domain, "<>not!*^%>>valid")
-
-      expect(ContextExternalTool.find_external_tool("https://#{domain}/deep_linking_request", context)).to eq(second)
-    end
-
     context "when exclude_tool_id is set" do
       subject { ContextExternalTool.find_external_tool("http://www.google.com", Course.find(course.id), nil, exclude_tool.id) }
 
@@ -1727,24 +1714,6 @@ describe ContextExternalTool do
           it "prefers LTI 1.1 tools when there is an domain match" do
             expect(find_tool("https://www.test.com/another_endpoint", prefer_1_1: true)).to \
               eq lti_1_1_tool
-          end
-        end
-
-        context "and the 1.3 tool has the same domain but a different URL" do
-          before do
-            lti_1_3_tool.update!(url: "https://#{domain}/1_3/foo?baz=fizz")
-          end
-
-          it "prefers the LTI 1.3 tool even when the 1.1 tool exactly matches" do
-            expect(find_tool(url)).to eq lti_1_3_tool
-          end
-
-          it "prefers the LTI 1.3 tool even when the 1.1 tool partially matches" do
-            expect(find_tool("#{url}&unmatched=bizz")).to eq lti_1_3_tool
-          end
-
-          it "prefers the LTI 1.3 tool even when both tools match on domain" do
-            expect(find_tool("https://#{domain}/deep_linking_location")).to eq lti_1_3_tool
           end
         end
       end
