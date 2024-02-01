@@ -746,7 +746,7 @@ describe ActiveRecord::ConnectionAdapters::SchemaStatements do
           @column_definitions[table_name].keys
         end
 
-        def new_column_from_field(table_name, field)
+        def new_column_from_field(table_name, field, *)
           @column_definitions[table_name][field]
         end
 
