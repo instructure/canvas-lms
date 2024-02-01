@@ -1237,23 +1237,15 @@ class ContextExternalTool < ActiveRecord::Base
       ->(t) { t.url.present? }
     )
 
-    # Check for any 1.3 tools that might match on domain
-    domain_match = find_tool_match(
+    # If still no matches, use domain matching to try to find a tool
+    match ||= find_tool_match(
       sorted_external_tools,
       ->(t) { t.matches_tool_domain?(url) },
       ->(t) { t.domain.present? }
     )
 
-    # Prefer 1.3 domain match over 1.1 url match to make
-    # sure 1.3 tool gets launched during upgrade
-    if match.blank? || (!match.use_1_3? && domain_match&.use_1_3?)
-      match = domain_match
-    end
-
     # repeat matches with environment-specific url and domain overrides
-    # and we haven't been able to find anything yet
-    if ApplicationController.test_cluster? &&
-       match.blank?
+    if ApplicationController.test_cluster?
       match ||= find_tool_match(
         sorted_external_tools,
         ->(t) { t.matches_url?(url, use_environment_overrides: true) },
@@ -1266,17 +1258,11 @@ class ContextExternalTool < ActiveRecord::Base
         ->(t) { t.url.present? }
       )
 
-      domain_match = find_tool_match(
+      match ||= find_tool_match(
         sorted_external_tools,
         ->(t) { t.matches_tool_domain?(url, use_environment_overrides: true) },
         ->(t) { t.domain.present? }
       )
-      # Prefer 1.3 domain match over 1.1 url match to make
-      # sure 1.3 tool gets launched during upgrade
-      if match.blank? || (!match.use_1_3? && domain_match&.use_1_3?)
-        match = domain_match
-      end
-
     end
     match
   end
