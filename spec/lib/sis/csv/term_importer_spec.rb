@@ -153,6 +153,35 @@ describe SIS::CSV::TermImporter do
     expect(t1.enrollment_dates_overrides.where(enrollment_type: "StudentEnrollment").first).to be_nil
   end
 
+  it "makes manual enrollment type date change overrides sticky" do
+    process_csv_data(
+      "term_id,name,status,start_date,end_date,date_override_enrollment_type",
+      "T001,Winter24,active,2024-01-01 00:00:00,2024-05-01 00:00:00,",
+      "T001,Winter24,active,2024-01-01 00:00:00,2024-04-25 00:00:00,StudentEnrollment",
+      "T001,Winter24,active,2023-12-31 00:00:00,2024-04-25 00:00:00,TeacherEnrollment"
+    )
+
+    t1 = @account.enrollment_terms.where(sis_source_id: "T001").first
+    override = t1.enrollment_dates_overrides.where(enrollment_type: "StudentEnrollment").first
+    override.end_at = DateTime.parse("2024-04-30 00:00:00")
+    override.save!
+    process_csv_data(
+      "term_id,name,status,start_date,end_date,date_override_enrollment_type",
+      "T001,Winter24,active,2024-1-02 00:00:00,2024-04-26 00:00:00,StudentEnrollment"
+    )
+    override.reload
+    expect(override.end_at).to eq DateTime.parse("2024-04-30 00:00:00")
+    expect(t1.enrollment_dates_overrides.where(enrollment_type: "TeacherEnrollment").first).not_to be_nil
+
+    process_csv_data(
+      "term_id,name,status,start_date,end_date,date_override_enrollment_type",
+      "T001,Winter24,deleted,,,StudentEnrollment",
+      "T001,Winter24,deleted,,,TeacherEnrollment"
+    )
+    expect(t1.enrollment_dates_overrides.where(enrollment_type: "StudentEnrollment").first).not_to be_nil
+    expect(t1.enrollment_dates_overrides.where(enrollment_type: "TeacherEnrollment").first).to be_nil
+  end
+
   it "creates rollback data" do
     process_csv_data_cleanly(
       "term_id,name,status,start_date,end_date",
