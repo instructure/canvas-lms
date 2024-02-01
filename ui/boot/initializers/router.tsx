@@ -60,7 +60,7 @@ const portalRouter = createBrowserRouter(
       {window.ENV.FEATURES.enhanced_rubrics && RubricRoutes}
 
       {window.ENV.FEATURES.learner_passport && LearnerPassportLearnerRoutes}
-      {window.ENV.FEATURES.learner_passport_r2 && LearnerPassportAdminRoutes}
+      {window.ENV.FEATURES.learner_passport && LearnerPassportAdminRoutes}
 
       <Route path="*" element={<></>} />
     </Route>

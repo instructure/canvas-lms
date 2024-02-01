@@ -124,7 +124,7 @@ const PathwayBuilderSidebar = ({
 
   return (
     <View
-      data-compid="pathway-builder-sidebar"
+      id="pathway-builder-sidebar"
       as="div"
       padding="medium"
       background="secondary"

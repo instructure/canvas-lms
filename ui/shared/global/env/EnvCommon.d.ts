@@ -244,11 +244,7 @@ export type BrandAccountFeatureId = 'embedded_release_notes'
  * Feature id exported in ApplicationController that aren't mentioned in
  * JS_ENV_SITE_ADMIN_FEATURES or JS_ENV_ROOT_ACCOUNT_FEATURES or JS_ENV_BRAND_ACCOUNT_FEATURES
  */
-export type OtherFeatureId =
-  | 'canvas_k6_theme'
-  | 'new_math_equation_handling'
-  | 'learner_passport'
-  | 'learner_passport_r2'
+export type OtherFeatureId = 'canvas_k6_theme' | 'new_math_equation_handling' | 'learner_passport'
 
 /**
  * From ApplicationHelper#set_tutorial_js_env

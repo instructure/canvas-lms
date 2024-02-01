@@ -90,7 +90,6 @@ const PathwayTreeView = ({
   const [dagEdges, setDagEdges] = useState<JSX.Element[]>([])
   const [rootNodeRef, setRootNodeRef] = useState(null)
   const [viewBox, setViewBox] = useState([0, 0, 0, 0])
-  const [treeRef, setTreeRef] = useState<Element | null>(null)
 
   const [preRendered, setPreRendered] = useState(false)
   const [graphBoxHeights, setGraphBoxHeights] = useState<BoxHeights>({
@@ -101,8 +100,8 @@ const PathwayTreeView = ({
   const [selectedSubtree, setSelectedSubtree] = useState<string[]>(() => {
     return selectedStep ? findSubtreeMilestones(pathway.milestones, selectedStep, []) : []
   })
+  const [scrollOffset, setScrollOffset] = useState({top: 0, left: 0})
 
-  const viewRef = useRef<HTMLDivElement | null>(null)
   const preRenderNodeRef = useRef<HTMLDivElement | null>(null)
   const svgRef = useRef<SVGSVGElement | null>(null)
 
@@ -128,9 +127,13 @@ const PathwayTreeView = ({
     if (svgRef.current) {
       setPreRendered(false)
     }
-    viewRef.current = null
     preRenderNodeRef.current = null
     svgRef.current = null
+
+    const treeRoot = document.getElementById('pathway-tree-view')
+    if (treeRoot) {
+      setScrollOffset({top: treeRoot.scrollTop, left: treeRoot.scrollLeft})
+    }
   }, [g])
 
   useEffect(() => {
@@ -140,7 +143,7 @@ const PathwayTreeView = ({
   const handleSelectBox = useCallback(
     (id: string) => {
       if (!onSelected) return
-      if (id === '0' || id === selectedStep) {
+      if (id === '0') {
         onSelected(null)
       } else {
         const milestone = pathway.milestones.find(m => m.id === id)
@@ -148,7 +151,7 @@ const PathwayTreeView = ({
         onSelected(milestone)
       }
     },
-    [onSelected, pathway.milestones, selectedStep]
+    [onSelected, pathway.milestones]
   )
 
   const handleBoxClick = useCallback(
@@ -167,13 +170,7 @@ const PathwayTreeView = ({
     },
     [handleSelectBox]
   )
-  const boxStyle = useMemo(() => {
-    return onSelected
-      ? {
-          cursor: 'pointer',
-        }
-      : {}
-  }, [onSelected])
+
   const boxProps = useMemo(() => {
     return onSelected
       ? {
@@ -190,14 +187,6 @@ const PathwayTreeView = ({
       setRootNodeRef(node)
     },
     [setRootNodeRef]
-  )
-
-  const isInSelectedBranch = useCallback(
-    (nodeId: string) => {
-      if (!selectedStep) return false
-      if (nodeId === selectedStep) return true
-    },
-    [selectedStep]
   )
 
   const renderPathwayBoxContent = useCallback(
@@ -417,7 +406,7 @@ const PathwayTreeView = ({
               display: 'relative',
               left: 0,
               top: 0,
-              ...boxStyle,
+              cursor: onSelected && n !== 'blank' ? 'pointer' : 'default',
             }}
             {...boxProps}
           >
@@ -451,12 +440,12 @@ const PathwayTreeView = ({
     setDagNodes(nodes)
   }, [
     boxProps,
-    boxStyle,
     g,
     graphBoxHeights.height,
     graphBoxHeights.milestones,
     handleRootNodeRef,
     layout,
+    onSelected,
     pathway.description,
     pathway.first_milestones,
     pathway.image_url,
@@ -534,6 +523,15 @@ const PathwayTreeView = ({
     }
   }, [pathway.id, version, preRendered])
 
+  useLayoutEffect(() => {
+    if (preRendered) {
+      const treeRoot = document.getElementById('pathway-tree-view')
+      if (treeRoot) {
+        treeRoot.scrollTo(scrollOffset.left, scrollOffset.top)
+      }
+    }
+  }, [preRendered, scrollOffset.left, scrollOffset.top])
+
   useEffect(() => {
     if (preRendered && graphBoxHeights.height > 0) {
       renderDAG()
@@ -545,10 +543,11 @@ const PathwayTreeView = ({
   }, [dagNodes, renderDAGEdges])
 
   const probablyRenderTreeControls = useCallback(() => {
-    if (treeRef === null) return null
+    const treeRoot = document.getElementById('pathway-tree-view')
+    if (treeRoot === null) return null
     if (!renderTreeControls) return null
 
-    const box = treeRef.getBoundingClientRect()
+    const box = treeRoot.getBoundingClientRect()
 
     return (
       <div
@@ -564,7 +563,7 @@ const PathwayTreeView = ({
         {renderTreeControls()}
       </div>
     )
-  }, [renderTreeControls, treeRef])
+  }, [renderTreeControls])
 
   const graphWidth = g.graph()?.width ? `${g.graph().width * zoomLevel}px` : 'auto'
   const graphHeight = g.graph()?.height ? `${g.graph().height * zoomLevel}px` : 'auto'
@@ -573,9 +572,8 @@ const PathwayTreeView = ({
     <>
       {probablyRenderTreeControls()}
       <View
-        data-compid="pathway-tree-view"
+        id="pathway-tree-view"
         as="div"
-        elementRef={el => setTreeRef(el)}
         height="100%"
         margin="0"
         position="relative"
@@ -593,7 +591,6 @@ const PathwayTreeView = ({
         >
           <View as="div" width="fit-content">
             <div
-              ref={viewRef}
               style={{
                 position: 'relative',
                 padding: '.5rem',
