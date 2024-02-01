@@ -15486,8 +15486,8 @@ is:
         details: 
           mfa_enrollment: |-
               Margþætt sannvottun eykur öryggi með því að krefjast þess að þú hafir eitthvað efnislegt í þinni vörslu,
-              auk þess að kunna lykilorðið til þess að skrá þig inn í Canvas. Þetta getur verið tæki sem myndar staðfestingarkóða,
-              eða síma sem getur móttekið SMS. Hægt er að stilla MFA með því að skanna QR kóðann hér að neðan með því að
+              auk þess að kunna lykilorðið til þess að skrá þig inn í Canvas. %{otp_via_sms_message}
+              Hægt er að stilla MFA með því að skanna QR kóðann hér að neðan með því að
               nota tímabundið eins skiptis lykilorða (TOTP) auðkenningarforrit á iPhone eða Android (t.d.: Google Authenticator,
               Microsoft Authenticator, Authy). Hægt er að stilla önnur tákn með því að slá inn leyndarlykilinn **%{secret_key}**.
               Þegar þú hefur fínstillt margþætta sannvottun, er ráðlegt að þú farir á uppsetningarsíðu þína og prentir
