@@ -16,21 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import jQuery from 'jquery'
+import $ from 'jquery'
 
-const $fixtures = jQuery('#fixtures')
+const $fixtures = $('#fixtures')
 const fixtures = {}
 let fixtureId = 1
 export default function (fixture) {
   const id = fixture + fixtureId++
   const path = `fixtures/${fixture}.html`
-  jQuery.ajax({
+  $.ajax({
     async: false,
     cache: false,
     dataType: 'html',
     url: path,
     success(html) {
-      return (fixtures[id] = jQuery('<div/>', {
+      return (fixtures[id] = $('<div/>', {
         html,
         id,
       }).appendTo($fixtures))

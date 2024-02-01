@@ -1,3 +1,23 @@
+/* eslint-disable linebreak-style */
+/* eslint-disable no-loop-func */
+/* eslint-disable eslint-comments/no-duplicate-disable */
+/* eslint-disable no-eval */
+/* eslint-disable linebreak-style */
+/* eslint-disable no-empty */
+/* eslint-disable @typescript-eslint/no-redeclare */
+/* eslint-disable no-useless-concat */
+/* eslint-disable no-bitwise */
+/* eslint-disable radix */
+/* eslint-disable linebreak-style */
+/* eslint-disable no-func-assign */
+/* eslint-disable no-undef */
+/* eslint-disable block-scoped-var */
+/* eslint-disable import/no-extraneous-dependencies */
+/* eslint-disable no-var */
+/* eslint-disable prettier/prettier */
+/* eslint-disable no-throw-literal */
+/* eslint-disable linebreak-style */
+/* eslint-disable vars-on-top */
 /*
  * Copyright (c) 2010 Michael Leibman, http://github.com/mleibman/slickgrid
  *
@@ -21,7 +41,7 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import jQuery from 'jquery'
+import $ from 'jquery'
 import './slick.core'
 import './jquery.event.drag-2.2'
 import {isRTL} from '@canvas/i18n/rtlHelper'
@@ -34,7 +54,6 @@ import 'jqueryui/sortable'
  * source as possible but still want it to tell us about the important stuff.
  */
 
-/* eslint-disable notice/notice, no-var, vars-on-top, prefer-template, object-shorthand, no-use-before-define, max-len, eqeqeq, no-multi-assign, no-cond-assign, one-var */
 /* eslint linebreak-style: ["error", "windows"] */
 
 /**
@@ -56,17 +75,16 @@ import 'jqueryui/sortable'
  */
 
 // make sure required JavaScript modules are loaded
-if (typeof jQuery === 'undefined') {
+if (typeof $ === 'undefined') {
   throw 'SlickGrid requires jquery module to be loaded'
 }
-if (!jQuery.fn.drag) {
+if (!$.fn.drag) {
   throw 'SlickGrid requires jquery.event.drag module to be loaded'
 }
 if (typeof Slick === 'undefined') {
   throw 'slick.core.js not loaded'
 }
 
-;(function ($) {
   // Slick.Grid
   $.extend(true, window, {
     Slick: {
@@ -3036,7 +3054,7 @@ if (typeof Slick === 'undefined') {
     }
 
     function getCanvasFromEvent(e) {
-      return jQuery(e.target).closest('.grid-canvas')
+      return $(e.target).closest('.grid-canvas')
     }
 
     function getCellFromEvent(e) {
@@ -4150,4 +4168,3 @@ if (typeof Slick === 'undefined') {
 
     init()
   }
-})(jQuery)
