@@ -17013,8 +17013,7 @@ en-AU:
         details: 
           mfa_enrollment: |-
               Multi-factor authentication increases security by requiring that you have something in your physical possession,
-              in addition to knowing your password, in order to log in to Canvas. This can be a device that can generate
-              verification codes, or a phone that can receive text messages. MFA can be configured by scanning the QR code
+              in addition to knowing your password, in order to log in to Canvas. %{otp_via_sms_message} MFA can be configured by scanning the QR code
               below using a Time-based one-time password (TOTP) authenticator app on iPhone or Android (ex: Google Authenticator,
               Microsoft Authenticator, Authy). Other tokens can be configured by entering the secret key **%{secret_key}**.
               Once you have configured multi-factor authentication, it is recommended that you go to your profile page and print
