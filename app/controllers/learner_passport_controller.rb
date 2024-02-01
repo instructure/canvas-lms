@@ -590,7 +590,6 @@ class LearnerPassportController < ApplicationController
 
   def index
     js_env[:FEATURES][:learner_passport] = @domain_root_account.feature_enabled?(:learner_passport)
-    js_env[:FEATURES][:learner_passport_r2] = @domain_root_account.feature_enabled?(:learner_passport_r2)
 
     # hide the breadcrumbs application.html.erb renders
     render html: "<style>.ic-app-nav-toggle-and-crumbs.no-print {display: none;}</style>".html_safe,

@@ -18,32 +18,48 @@
 
 import React from 'react'
 import {useLoaderData} from 'react-router-dom'
-import {Breadcrumb} from '@instructure/ui-breadcrumb'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {View} from '@instructure/ui-view'
 import type {PathwayDetailData} from '../../types'
+import AdminHeader from '../AdminHeader'
 import PathwayView from './PathwayView'
 
 const PathwayViewPage = () => {
   const pathway = useLoaderData() as PathwayDetailData
 
   return (
-    <Flex as="div" direction="column" gap="small" alignItems="stretch">
-      <View as="div" margin="0 x-large">
-        <Breadcrumb label="You are here:" size="small">
-          <Breadcrumb.Link href={`/users/${ENV.current_user.id}/passport/admin/pathways/dashboard`}>
-            Pathways
-          </Breadcrumb.Link>
-          <Breadcrumb.Link>{pathway.title}</Breadcrumb.Link>
-        </Breadcrumb>
-        <View as="div" margin="0 0 medium 0">
-          <Heading level="h1">{pathway.title}</Heading>
-        </View>
-      </View>
-      <Flex.Item shouldGrow={true}>
-        <View as="div" overflowX="auto" overflowY="visible">
-          <PathwayView pathway={pathway} />
+    <Flex as="div" direction="column" alignItems="stretch" height="100%">
+      <AdminHeader
+        title={<Heading level="h1">{pathway.title}</Heading>}
+        breadcrumbs={[
+          {
+            text: 'Pathways',
+            url: `/users/${ENV.current_user.id}/passport/admin/pathways/dashboard`,
+          },
+          {text: pathway.title},
+        ]}
+      />
+      <Flex.Item shouldGrow={true} shouldShrink={false} overflowY="visible">
+        <View
+          as="div"
+          id="pathway-view"
+          borderWidth="small 0 0 0"
+          height="100%"
+          position="relative"
+        >
+          <div
+            style={{
+              position: 'absolute',
+              top: 0,
+              right: 0,
+              bottom: 0,
+              left: 0,
+              boxSizing: 'border-box',
+            }}
+          >
+            <PathwayView pathway={pathway} />
+          </div>
         </View>
       </Flex.Item>
     </Flex>
