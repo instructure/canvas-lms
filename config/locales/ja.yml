@@ -16964,7 +16964,7 @@ ja:
         details: 
           mfa_enrollment: |-
               マルチファクター認証は、Canvas にログインするためにパスワードを知ることに加えて、物理的になにかを所有することを要求することにより、
-              セキュリティを強化します。これには、確認コードを生成できるデバイスや、テキストメッセージを受信できる電話機などがあります。
+              セキュリティを強化します。%{otp_via_sms_message}
               MFAは、iPhoneまたはAndroidのタイムベース ワンタイムパスワード（TOTP）認証アプリ（例：Google Authenticator、Microsoft Authenticator）
               を使用して、以下のQRコードをスキャンすることで設定できます：例：Google Authenticator、Microsoft Authenticator、Authy）。
               その他のトークンは、シークレットキーを入力することで設定できます**%{secret_key}**。マルチファクタ認証を設定したらご自分の

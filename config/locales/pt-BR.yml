@@ -16957,8 +16957,7 @@ pt-BR:
         details: 
           mfa_enrollment: |-
               A autenticação multifator aumenta a segurança ao exigir algo em sua posse física, além de saber a sua senha,
-              para fazerlogin no Canvas. Isso pode ser um dispositivo que possa gerar códigos de verificação ou um telefone
-              que possa receber mensagens de texto. O MFA pode ser configurado digitalizando o código QR abaixo usando
+              para fazerlogin no Canvas. %{otp_via_sms_message} O MFA pode ser configurado digitalizando o código QR abaixo usando
               um aplicativo autenticador de senha única baseada em tempo (TOTP) no iPhone ou Android (ex: Google Authenticator,
               Microsoft Authenticator, Authy). Outros tokens podem ser configurados inserindo a chave secreta **%{secret_key}**.
               Depois de configurar a autenticação multifator, é recomendável que você vá para a página do seu perfil e imprima

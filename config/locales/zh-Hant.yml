@@ -16957,8 +16957,8 @@ zh-Hant:
         details: 
           mfa_enrollment: |-
               除了要知道您的密碼之外，多因素驗證還會要求您實際佔有某物，
-              以便登入 Canvas，從而提高安全性。其可能是一個可以産生
-              驗證碼的裝置，或者一支可以接收簡訊的行動電話。您可以透過使用 iPhone 或 Android 上基於時間的一次性密碼 (TOTP)
+              以便登入 Canvas，從而提高安全性。%{otp_via_sms_message}
+              您可以透過使用 iPhone 或 Android 上基於時間的一次性密碼 (TOTP)
               身分驗證器應用程式掃描以下的二維碼來配置 MFA（例如：Google Authenticator、
               Microsoft Authenticator、Authy）。輸入加密資料金鑰可以配置其他權杖**%{secret_key}**。
               您一配置多因素驗證後，建議您前往您的個人檔案頁面並列

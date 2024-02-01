@@ -9386,6 +9386,7 @@ ko:
   new_13daf639: "새 항목"
   new_discussion_dae4fae3: "새 토론"
   new_file_135ae520: "[ 새 파일 ]"
+  new_group_8d6ad781: "새 그룹"
   new_outcome_7fba8c7d: "새 성과"
   new_quizzes_dbda7e0a: "새로운 퀴즈"
   next_40e12421: 다음
@@ -13720,6 +13721,7 @@ ko:
   upload_data_dc4fa4cb: "데이터 업로드"
   upload_file_fd2361b8: "파일 업로드"
   upload_files_a228f20f: "파일 업로드"
+  upload_to_d8556041: "업로드 위치"
   uploaded_285a2bfb: 업로드했음
   uploading_19e8a4e7: "업로드 중"
   uploading_ee585874: "업로드 중..."

@@ -16961,7 +16961,7 @@ es:
         details: 
           mfa_enrollment: |-
               La autenticación de varios factores aumenta la seguridad al solicitarle que tenga algo en su posesión física, además de conocer su contraseña,
-              para iniciar sesión en Canvas. Puede ser un dispositivo que genere códigos de verificación o un teléfono que reciba mensajes de texto.
+              para iniciar sesión en Canvas. %{otp_via_sms_message}
               La autenticación de varios factores (Multi-Factor Authentication, MFA) se puede configurar escaneando el siguiente código QR con
               una aplicación de autenticación de contraseña de un solo uso basada en el tiempo (Time-based One-Time Password, TOTP) para Iphone o Android
               (por ejemplo: Autenticador de Google, autenticador de Microsoft, Authy). Se pueden configurar otros tokens ingresando la clave secreta **%{secret_key}**.

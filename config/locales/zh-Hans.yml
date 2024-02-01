@@ -16943,8 +16943,8 @@ zh-Hans:
         details: 
           mfa_enrollment: |-
               要登录 Canvas，除了要求您输入密码，
-              多重身份验证通过要求您拥有一些实物来提高安全性。这个实物可以是能够生成
-              验证码的设备，或者能够接收短信的手机。您可以通过在 iPhone 或 Android 上使用基于时间的一次性密码 (TOTP)
+              多重身份验证通过要求您拥有一些实物来提高安全性。%{otp_via_sms_message}
+              您可以通过在 iPhone 或 Android 上使用基于时间的一次性密码 (TOTP)
               身份验证器应用程序扫描下方二维码来配置 MFA（例如：Google Authenticator、
               Microsoft Authenticator、Authy）还可以通过输入密钥 **%{secret_key}** 来配置其他令牌。
               配置好多重身份验证后，建议您到个人资料页面打印

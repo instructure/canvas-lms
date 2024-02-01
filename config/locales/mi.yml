@@ -16902,8 +16902,7 @@ mi:
         details: 
           mfa_enrollment: |-
               Ko te motuhēhēnga-maha-maha ka whakanui ake i te haumarutanga ma te tono kia whai taonga koe i roto i to tinana,
-              i tua atu i te mohio ki to kupu huna, kia takiuru ki Canvas. He taputapu tenei ka taea te whakaputa waehere manatoko,
-              he waea ranei ka taea te whiwhi karere kuputuhi. Ka taea te whirihora MFA ma te matawai i te waehere QR i raro iho ma
+              i tua atu i te mohio ki to kupu huna, kia takiuru ki Canvas. %{otp_via_sms_message} Ka taea te whirihora MFA ma te matawai i te waehere QR i raro iho ma
               te whakamahi i te taupānga whakamotuhēhēnga kupuhipa kotahi-wā (TOTP) i runga i te iPhone, i te Android ranei (ex: Google Authenticator,
               Microsoft Authenticator, Authy). Ko etahi atu tohu ka taea te whirihora ma te whakauru i te ki ngaro **%{secret_key}**.
               Kua whirihorahia e koe te motuhēhēnga-maha, e tūtohu ana kia haere koe ki to wharangi whaarangi ka ta

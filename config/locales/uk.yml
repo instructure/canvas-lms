@@ -11725,6 +11725,7 @@ uk:
   new_file_added_for_name_a5ec3156: "Новий файл додано для %{name}"
   new_gradebook_297f7e2d: "Новий Журнал оцінок"
   new_gradebook_enables_an_early_release_of_new_grad_76b8bf45: "Новий Журнал оцінок дозволяє швидко реалізовувати вдосконалення нового журналу."
+  new_group_8d6ad781: "Нова група"
   new_group_category_66be9cbd: "Нова категорія груп"
   new_group_set_7241a581: "Налаштування нової групи"
   new_module_4e9287e4: "Новий модуль"
@@ -16626,6 +16627,7 @@ uk:
   students_being_observed_4de3e520: "Студенти, за якими спостерігають"
   students_can_only_participate_in_the_course_betwee_6f8595aa: "Студенти можуть брати участь  в курсі тільки між цими датами"
   students_cannot_view_quiz_responses_after_course_c_88e929ed: "Студенти не можуть переглядати відповіді на Контрольної роботи після завершення курсу"
+  students_have_already_submitted_to_this_discussion_f55db744: "Студенти вже долучилися до обговорення, тому групові налаштування не можуть бути змінені."
   students_have_either_already_taken_or_started_taki_a076336: "Студенти або вже склали або почали складати цю контрольну роботу, тому будьте обережні щодо її редагування. Якщо вам потрібно змінити будь-які запитання, можливо, вам слід подумати про переоцінку студентів, які склали попередню версію контрольної роботи."
   students_must_complete_all_of_these_requirements_15fa97f7: "Студенти повинні виконати усі зазначені вимоги"
   students_must_move_through_requirements_in_sequent_2c750874: "Студенти повинні переміщатися по вимогах в послідовному порядку"
@@ -17825,6 +17827,7 @@ uk:
   upload_media_ce31135a: "Завантажити медіа контент"
   upload_scores_csv_a8416cf: "Завантажити результати (.csv)"
   upload_successful_ca47465f: "Завантаження виконано успішно"
+  upload_to_d8556041: "Завантажити до"
   uploaded_285a2bfb: Завантажено
   uploading_ee585874: Завантаження...
   uploading_submission_4c8d944b: "Завантаження матеріалу"
