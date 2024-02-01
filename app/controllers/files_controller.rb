@@ -1059,11 +1059,11 @@ class FilesController < ApplicationController
                     @context.shard.activate do
                       # avoid creating an identical Attachment
                       unless params[:on_duplicate] == "rename"
-                        att = Attachment.find_by(context: @context,
-                                                 folder_id: params[:folder_id],
-                                                 display_name: params[:display_name] || params[:name],
-                                                 size: params[:size],
-                                                 md5: params[:sha512])
+                        att = Attachment.active.find_by(context: @context,
+                                                        folder_id: params[:folder_id],
+                                                        display_name: params[:display_name] || params[:name],
+                                                        size: params[:size],
+                                                        md5: params[:sha512])
                         overwritten_instfs_uuid = att.instfs_uuid if att
                       end
                       att || Attachment.where(context: @context).build
