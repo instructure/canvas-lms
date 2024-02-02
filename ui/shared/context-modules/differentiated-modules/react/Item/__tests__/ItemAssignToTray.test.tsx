@@ -212,14 +212,6 @@ describe('ItemAssignToTray', () => {
     expect(getAllByTestId('item-assign-to-card')).toHaveLength(2)
   })
 
-  it.skip('deletes a card when delete button is clicked', async () => {
-    const {getAllByRole, findAllByTestId, getAllByTestId} = renderComponent()
-    const cards = await findAllByTestId('item-assign-to-card')
-    expect(cards).toHaveLength(2)
-    act(() => getAllByRole('button', {name: 'Delete'})[1].click())
-    expect(getAllByTestId('item-assign-to-card')).toHaveLength(1)
-  })
-
   it('calls onDismiss when the cancel button is clicked', () => {
     const onDismiss = jest.fn()
     const {getByRole} = renderComponent({onDismiss})
@@ -241,17 +233,6 @@ describe('ItemAssignToTray', () => {
   })
 
   describe('AssigneeSelector', () => {
-    it.skip('shows existing overrides as selected options', async () => {
-      const {findAllByTestId} = renderComponent()
-      const sectionOverride = SECTIONS_DATA.find(
-        section => section.id === OVERRIDES[0].course_section_id
-      )!
-      const selectedOptions = await findAllByTestId('assignee_selector_selected_option')
-      expect(selectedOptions).toHaveLength(2)
-      expect(selectedOptions[0]).toHaveTextContent('Everyone else')
-      expect(selectedOptions[1]).toHaveTextContent(sectionOverride?.name)
-    })
-
     it('does not render everyone option if the assignment is set to overrides only', async () => {
       fetchMock.get(
         '/api/v1/courses/1/assignments/23/date_details',
@@ -330,28 +311,6 @@ describe('ItemAssignToTray', () => {
       const onDismiss = jest.fn()
       renderComponent({onDismiss})
       await waitFor(() => expect(onDismiss).toHaveBeenCalledTimes(1))
-    })
-
-    it.skip('does not allow to use the same assignee in more than one card', async () => {
-      const sectionOverride = SECTIONS_DATA.find(
-        section => section.id === OVERRIDES[0].course_section_id
-      )!
-      const otherSections = SECTIONS_DATA.filter(
-        section => section.id !== OVERRIDES[0].course_section_id
-      )!
-      const {findAllByTestId, getAllByRole} = renderComponent()
-      const assigneeSelectors = await findAllByTestId('assignee_selector')
-      act(() => assigneeSelectors[0].click())
-      const listOptions = getAllByRole('listitem')
-      let sectionOption = listOptions.find(
-        listitem => listitem.textContent === sectionOverride.name
-      )
-      // the option from the second card should not be available in the first card
-      expect(sectionOption).toBeUndefined()
-      otherSections.forEach(section => {
-        sectionOption = listOptions.find(listitem => listitem.textContent === section.name)
-        expect(sectionOption).not.toBeUndefined()
-      })
     })
   })
   describe('on save', () => {
