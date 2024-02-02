@@ -440,9 +440,9 @@ describe "Common Cartridge exporting" do
     describe "hidden folders" do
       before :once do
         folder = Folder.create!(name: "hidden", context: @course, hidden: true, parent_folder: Folder.root_folders(@course).first)
-        linked_att = Attachment.create!(filename: "linked.png", uploaded_data: StringIO.new("1"), folder:, context: @course)
+        @linked_att = Attachment.create!(filename: "linked.png", uploaded_data: StringIO.new("1"), folder:, context: @course)
         Attachment.create!(filename: "not-linked.jpg", uploaded_data: StringIO.new("2"), folder:, context: @course)
-        @course.wiki_pages.create!(title: "paeg", body: "Image yo: <img src=\"/courses/#{@course.id}/files/#{linked_att.id}/preview\">")
+        @course.wiki_pages.create!(title: "paeg", body: "Image yo: <img src=\"/courses/#{@course.id}/files/#{@linked_att.id}/preview\">")
         @ce.export_type = ContentExport::COMMON_CARTRIDGE
         @ce.save!
       end
@@ -452,6 +452,17 @@ describe "Common Cartridge exporting" do
 
         expect(@zip_file.find_entry("web_resources/hidden/linked.png")).not_to be_nil
         expect(@zip_file.find_entry("web_resources/hidden/not-linked.jpg")).not_to be_nil
+      end
+
+      it "does not export hidden folders on selective exports" do
+        @ce.selected_content = { attachments: { @linked_att.migration_id.to_s => "1" } }
+        run_export
+
+        expect(@zip_file.read("course_settings/files_meta.xml").split("\n")).to eq([
+                                                                                     '<?xml version="1.0" encoding="UTF-8"?>',
+                                                                                     '<fileMeta xmlns="http://canvas.instructure.com/xsd/cccv1p0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://canvas.instructure.com/xsd/cccv1p0 https://canvas.instructure.com/xsd/cccv1p0.xsd">',
+                                                                                     "</fileMeta>"
+                                                                                   ])
       end
 
       it "excludes unlinked files for student export" do
