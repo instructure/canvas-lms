@@ -33,3 +33,10 @@ export type Rubric = {
   title: string
   workflowState?: string
 }
+
+export type RubricRating = {
+  id: string
+  description: string
+  longDescription: string
+  points: number
+}
