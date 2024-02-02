@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {chain, debounce, find, groupBy, isEmpty, pluck, some, union} from 'lodash'
+import {chain, debounce, find, map, groupBy, isEmpty, some, union} from 'lodash'
 import React from 'react'
 import PropTypes from 'prop-types'
 import OverrideStudentStore from './OverrideStudentStore'
@@ -351,7 +351,7 @@ class DueDateTokenWrapper extends React.Component {
     if (this.props.disabled) {
       return (
         // eslint-disable-next-line react/no-string-refs
-        <DisabledTokenInput tokens={pluck(this.props.tokens, 'name')} ref="DisabledTokenInput" />
+        <DisabledTokenInput tokens={map(this.props.tokens, 'name')} ref="DisabledTokenInput" />
       )
     }
     const ariaLabel = I18n.t(
