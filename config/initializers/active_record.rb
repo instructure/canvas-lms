@@ -1335,7 +1335,7 @@ ActiveRecord::Relation.class_eval do
   def union(*scopes, from: false)
     table = connection.quote_local_table_name(table_name)
     scopes.unshift(self)
-    scopes = scopes.reject { |s| (Rails.version < "7.1") ? s.is_a?(ActiveRecord::NullRelation) : s.null_relation? }
+    scopes = scopes.reject(&:null_relation?)
     return scopes.first if scopes.length == 1
     return self if scopes.empty?
 
@@ -2269,4 +2269,6 @@ if $canvas_rails == "7.0"
     end
   end
   ActiveRecord::Base.singleton_class.prepend(SerializeCompat)
+
+  ActiveRecord::Relation.send(:public, :null_relation?)
 end
