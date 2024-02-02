@@ -18,7 +18,7 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import htmlEscape from 'html-escape'
+import sanitizeHtml from 'sanitize-html-with-tinymce'
 import moveMultipleQuestionBanks from './moveMultipleQuestionBanks'
 import loadBanks from './loadBanks'
 import addBank from './addBank'
@@ -169,6 +169,9 @@ export function attachPageEvents(_e) {
         for (const idx in data.questions) {
           const question = data.questions[idx].assessment_question
           question.assessment_question_id = question.id
+          const question_data = question.question_data
+          question_data.question_text = sanitizeHtml(question_data.question_text || '')
+          question.question_data = question_data
           const $question = $('#question_teaser_blank').clone().removeAttr('id')
           $question.fillTemplateData({
             data: question,
@@ -176,7 +179,7 @@ export function attachPageEvents(_e) {
             hrefValues: ['id'],
           })
           $question.fillTemplateData({
-            data: htmlEscape(question.question_data),
+            data: question_data,
             htmlValues: ['question_text'],
           })
           $question.data('question', question)
