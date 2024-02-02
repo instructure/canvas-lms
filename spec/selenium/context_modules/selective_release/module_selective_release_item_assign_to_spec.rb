@@ -318,6 +318,20 @@ describe "selective_release module item assign to tray" do
       expect(element_exists?(assign_to_in_tray_selector("Remove #{@student2.name}"))).to be_falsey
       expect(assign_to_in_tray("Remove #{@student1.name}")[0]).to be_displayed
     end
+
+    it "deletes individual cards" do
+      @module_item1.assignment.assignment_overrides.create!(set_type: "ADHOC")
+      @module_item1.assignment.assignment_overrides.create!(set_type: "ADHOC")
+      @module_item1.assignment.assignment_overrides.first.assignment_override_students.create!(user: @student1)
+      @module_item1.assignment.assignment_overrides.second.assignment_override_students.create!(user: @student2)
+      go_to_modules
+
+      manage_module_item_button(@module_item1).click
+      click_manage_module_item_assign_to(@module_item1)
+      expect(module_item_assign_to_card.count).to be(3)
+      click_delete_assign_to_card(2)
+      expect(module_item_assign_to_card.count).to be(2)
+    end
   end
 
   context "item assign to tray saves" do
