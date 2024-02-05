@@ -579,7 +579,7 @@ GEM
       rexml
     google-apis-drive_v3 (0.48.0)
       google-apis-core (>= 0.12.0, < 2.a)
-    google-cloud-env (2.1.0)
+    google-cloud-env (2.1.1)
       faraday (>= 1.0, < 3.a)
     google-protobuf (3.25.2)
     google-protobuf (3.25.2-aarch64-linux)
