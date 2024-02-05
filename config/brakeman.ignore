@@ -95,25 +95,6 @@
     {
       "warning_type": "SQL Injection",
       "warning_code": 0,
-      "fingerprint": "0fa6de183523f46dcea89ac2032d6c127bfd096819b358a808be5e8572198071",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "config/initializers/active_record.rb",
-      "line": 1058,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "connection.execute(\"CREATE INDEX \\\"temp_primary_key\\\" ON #{connection.quote_local_table_name(\"#{table_name}_in_batches_temp_table_#{apply_limits(self, start, finish, order).to_sql.hash.abs.to_s(36)}\"[(-63..)])}(#{connection.quote_column_name(primary_key)})\")",
-      "render_path": null,
-      "location": null,
-      "user_input": "connection.quote_local_table_name(\"#{table_name}_in_batches_temp_table_#{apply_limits(self, start, finish, order).to_sql.hash.abs.to_s(36)}\"[(-63..)])",
-      "confidence": "Medium",
-      "cwe_id": [
-        89
-      ],
-      "note": ""
-    },
-    {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
       "fingerprint": "113ccdd673061935b7a5ef6c1e6683d843514d6719553a87a515d0fc2dd5c446",
       "check_name": "SQL",
       "message": "Possible SQL injection",
@@ -344,6 +325,25 @@
     {
       "warning_type": "SQL Injection",
       "warning_code": 0,
+      "fingerprint": "35e66d23292d49be0bf88dad293d7f402a8c0b8a3ba01f0de8767897a0989f96",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "config/initializers/active_record.rb",
+      "line": 893,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "connection.execute(\"DECLARE #{\"#{table_name}_in_batches_cursor_#{apply_limits(clone, start, finish, build_batch_orders(order)).except(:select).select(primary_key).to_sql.hash.abs.to_s(36)}\"} CURSOR FOR #{apply_limits(clone, start, finish, build_batch_orders(order)).except(:select).select(primary_key).to_sql}\")",
+      "render_path": null,
+      "location": null,
+      "user_input": "apply_limits(clone, start, finish, build_batch_orders(order)).except(:select).select(primary_key).to_sql.hash.abs",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
       "fingerprint": "364b9e86d24b93b583e663f2f5a9385bfb80852531582ad3398147d31a98d498",
       "check_name": "SQL",
       "message": "Possible SQL injection",
@@ -436,25 +436,6 @@
     {
       "warning_type": "SQL Injection",
       "warning_code": 0,
-      "fingerprint": "4afbde61f179b09eb9c908ae134870827d8f6ea07937947e28249549f35e6be6",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "config/initializers/active_record.rb",
-      "line": 890,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "connection.execute(\"DECLARE #{\"#{table_name}_in_batches_cursor_#{apply_limits(clone, start, finish, order).except(:select).select(primary_key).to_sql.hash.abs.to_s(36)}\"} CURSOR FOR #{apply_limits(clone, start, finish, order).except(:select).select(primary_key).to_sql}\")",
-      "render_path": null,
-      "location": null,
-      "user_input": "apply_limits(clone, start, finish, order).except(:select).select(primary_key).to_sql.hash.abs",
-      "confidence": "Medium",
-      "cwe_id": [
-        89
-      ],
-      "note": ""
-    },
-    {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
       "fingerprint": "57bf50dbd2610462dcf2668cee33bc98fa95715b7017fa3ce22202b03a026ef4",
       "check_name": "SQL",
       "message": "Possible SQL injection",
@@ -469,25 +450,6 @@
         "method": "DiscussionEntryParticipant.upsert_for_entries"
       },
       "user_input": "[entry_or_topic].map do\n row_values(batch_entry, user.id, entry_or_topic.root_account_id, (new_state or \"unread\"), [connection.quote(forced), connection.quote(rating), connection.quote(:BRAKEMAN_SAFE_LITERAL)])\n end.map do\n \"(#{row.join(\",\")})\"\n end.join(\",\")",
-      "confidence": "Medium",
-      "cwe_id": [
-        89
-      ],
-      "note": ""
-    },
-    {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
-      "fingerprint": "607e0b2fd3ad558c69c74279b0a3ac040cc53f92514027776a793e77145d0e37",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "config/initializers/active_record.rb",
-      "line": 1092,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "connection.execute(\"DROP TABLE #{\"#{table_name}_in_batches_temp_table_#{apply_limits(self, start, finish, order).to_sql.hash.abs.to_s(36)}\"[(-63..)]}\")",
-      "render_path": null,
-      "location": null,
-      "user_input": "\"#{table_name}_in_batches_temp_table_#{apply_limits(self, start, finish, order).to_sql.hash.abs.to_s(36)}\"[(-63..)]",
       "confidence": "Medium",
       "cwe_id": [
         89
@@ -656,6 +618,25 @@
       "note": ""
     },
     {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "71cfd336595906692a50a1ce226161486c116baf7be179a8aafe75b0e5bc0cb9",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "config/initializers/active_record.rb",
+      "line": 1098,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "connection.execute(\"DROP TABLE #{\"#{table_name}_in_batches_temp_table_#{apply_limits(self, start, finish, build_batch_orders(order)).to_sql.hash.abs.to_s(36)}\"[(-63..)]}\")",
+      "render_path": null,
+      "location": null,
+      "user_input": "\"#{table_name}_in_batches_temp_table_#{apply_limits(self, start, finish, build_batch_orders(order)).to_sql.hash.abs.to_s(36)}\"[(-63..)]",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
+      ],
+      "note": ""
+    },
+    {
       "warning_type": "File Access",
       "warning_code": 16,
       "fingerprint": "74a55118935cb7380eac981c319e00702be0820eba0d660b45435563caceb4ac",
@@ -765,6 +746,25 @@
       "confidence": "Medium",
       "cwe_id": [
         77
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "8191472e7cb903bb026cb078bec2d0ecc4c91f3cb2199cf99186a1e142c679fa",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "config/initializers/active_record.rb",
+      "line": 1064,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "connection.execute(\"CREATE INDEX \\\"temp_primary_key\\\" ON #{connection.quote_local_table_name(\"#{table_name}_in_batches_temp_table_#{apply_limits(self, start, finish, build_batch_orders(order)).to_sql.hash.abs.to_s(36)}\"[(-63..)])}(#{connection.quote_column_name(primary_key)})\")",
+      "render_path": null,
+      "location": null,
+      "user_input": "connection.quote_local_table_name(\"#{table_name}_in_batches_temp_table_#{apply_limits(self, start, finish, build_batch_orders(order)).to_sql.hash.abs.to_s(36)}\"[(-63..)])",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
       ],
       "note": ""
     },
@@ -900,6 +900,25 @@
         "method": "current_cached_due_dates"
       },
       "user_input": "assignment_and_student_id_values(:entries => entries).join(\",\")",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "9e07215a728d4c6c701fc0f0d9fd2d772ffcfdf092893b67e5d5ef87717d40ac",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "config/initializers/active_record.rb",
+      "line": 903,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "connection.select_values(\"FETCH FORWARD #{of} FROM #{\"#{table_name}_in_batches_cursor_#{apply_limits(clone, start, finish, build_batch_orders(order)).except(:select).select(primary_key).to_sql.hash.abs.to_s(36)}\"}\")",
+      "render_path": null,
+      "location": null,
+      "user_input": "of",
       "confidence": "Medium",
       "cwe_id": [
         89
@@ -1374,7 +1393,7 @@
       "check_name": "SQL",
       "message": "Possible SQL injection",
       "file": "config/initializers/active_record.rb",
-      "line": 913,
+      "line": 916,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
       "code": "connection.execute(\"CLOSE #{cursor}\")",
       "render_path": null,
@@ -1435,49 +1454,11 @@
     {
       "warning_type": "SQL Injection",
       "warning_code": 0,
-      "fingerprint": "ebd1e0364dd1ddaee4778f4a5febc04517ff68e46110191b79ccdad8be96ee69",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "config/initializers/active_record.rb",
-      "line": 1061,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "connection.execute(\"ALTER TABLE #{\"#{table_name}_in_batches_temp_table_#{apply_limits(self, start, finish, order).to_sql.hash.abs.to_s(36)}\"[(-63..)]} ADD temp_primary_key SERIAL PRIMARY KEY\")",
-      "render_path": null,
-      "location": null,
-      "user_input": "\"#{table_name}_in_batches_temp_table_#{apply_limits(self, start, finish, order).to_sql.hash.abs.to_s(36)}\"[(-63..)]",
-      "confidence": "Medium",
-      "cwe_id": [
-        89
-      ],
-      "note": ""
-    },
-    {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
-      "fingerprint": "ec99a7da7f724717d99dc78a5912e54af9681b11832d9e305f3ccf78a9a62299",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "config/initializers/active_record.rb",
-      "line": 900,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "connection.select_values(\"FETCH FORWARD #{of} FROM #{\"#{table_name}_in_batches_cursor_#{apply_limits(clone, start, finish, order).except(:select).select(primary_key).to_sql.hash.abs.to_s(36)}\"}\")",
-      "render_path": null,
-      "location": null,
-      "user_input": "of",
-      "confidence": "Medium",
-      "cwe_id": [
-        89
-      ],
-      "note": ""
-    },
-    {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
       "fingerprint": "ed7c9737aa0322745fdf46f8b995b7cbeb46a1823508dde7374a7a3a290a9ab9",
       "check_name": "SQL",
       "message": "Possible SQL injection",
       "file": "config/initializers/active_record.rb",
-      "line": 1600,
+      "line": 1606,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
       "code": "connection.select_value(\"SELECT COUNT(*) FROM pg_proc WHERE proname='#{procname}'\")",
       "render_path": null,
@@ -1513,6 +1494,25 @@
       "confidence": "Medium",
       "cwe_id": [
         470
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "f3dac3134b91a97f3428a364aa976a9381a5c2b1361867f962ef87f6a6c4f2b2",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "config/initializers/active_record.rb",
+      "line": 1067,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "connection.execute(\"ALTER TABLE #{\"#{table_name}_in_batches_temp_table_#{apply_limits(self, start, finish, build_batch_orders(order)).to_sql.hash.abs.to_s(36)}\"[(-63..)]} ADD temp_primary_key SERIAL PRIMARY KEY\")",
+      "render_path": null,
+      "location": null,
+      "user_input": "\"#{table_name}_in_batches_temp_table_#{apply_limits(self, start, finish, build_batch_orders(order)).to_sql.hash.abs.to_s(36)}\"[(-63..)]",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
       ],
       "note": ""
     },
@@ -1633,6 +1633,6 @@
       "note": ""
     }
   ],
-  "updated": "2024-02-05 09:37:54 -0700",
+  "updated": "2024-02-05 15:44:13 -0700",
   "brakeman_version": "6.1.2"
 }
