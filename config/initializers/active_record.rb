@@ -798,6 +798,7 @@ module UsefulFindInBatches
     else
       enum_for(:find_each, start:, finish:, order:, **kwargs) do
         relation = self
+        order = build_batch_orders(order) if $canvas_rails == "7.1"
         apply_limits(relation, start, finish, order).size
       end
     end
@@ -808,6 +809,7 @@ module UsefulFindInBatches
     relation = self
     unless block_given?
       return to_enum(:find_in_batches, start:, finish:, order:, batch_size:, **kwargs) do
+        order = build_batch_orders(order) if $canvas_rails == "7.1"
         total = apply_limits(relation, start, finish, order).size
         (total - 1).div(batch_size) + 1
       end
@@ -879,6 +881,7 @@ module UsefulFindInBatches
 
   def in_batches_with_cursor(of: 1000, start: nil, finish: nil, order: :asc, load: false)
     klass.transaction do
+      order = build_batch_orders(order) if $canvas_rails == "7.1"
       relation = apply_limits(clone, start, finish, order)
 
       relation.skip_query_cache!
@@ -919,6 +922,7 @@ module UsefulFindInBatches
     limited_query = limit(0).to_sql
 
     relation = self
+    order = build_batch_orders(order) if $canvas_rails == "7.1"
     relation_for_copy = apply_limits(relation, start, finish, order)
     unless load
       relation_for_copy = relation_for_copy.except(:select).select(primary_key)
@@ -1013,6 +1017,7 @@ module UsefulFindInBatches
   # and yields the objects in batches in the same order as the scope specified
   # so the DB connection can be fully recycled during each block.
   def in_batches_with_pluck_ids(of: 1000, start: nil, finish: nil, order: :asc, load: false)
+    order = build_batch_orders(order) if $canvas_rails == "7.1"
     relation = apply_limits(self, start, finish, order)
     all_object_ids = relation.pluck(:id)
     current_order_values = order_values
@@ -1041,6 +1046,7 @@ module UsefulFindInBatches
              group, or order)."
       end
 
+      order = build_batch_orders(order) if $canvas_rails == "7.1"
       relation = apply_limits(self, start, finish, order)
       sql = relation.to_sql
       table = "#{table_name}_in_batches_temp_table_#{sql.hash.abs.to_s(36)}"
