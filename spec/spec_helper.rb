@@ -418,7 +418,11 @@ RSpec.configure do |config|
   config.fail_if_no_examples = true
   config.use_transactional_fixtures = true
   config.use_instantiated_fixtures = false
-  config.fixture_path = Rails.root.join("spec/fixtures")
+  if $canvas_rails == "7.0"
+    config.fixture_path = Rails.root.join("spec/fixtures")
+  else
+    config.fixture_paths = [Rails.root.join("spec/fixtures")]
+  end
   config.infer_spec_type_from_file_location!
   config.raise_errors_for_deprecations!
   config.color = true
