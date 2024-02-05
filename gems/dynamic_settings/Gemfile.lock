@@ -42,7 +42,7 @@ GEM
       irb (~> 1.10)
       reline (>= 0.3.8)
     deep_merge (1.2.2)
-    diff-lcs (1.5.0)
+    diff-lcs (1.5.1)
     diplomat (2.6.4)
       deep_merge (~> 1.2)
       faraday (>= 0.9, < 3.0, != 2.0.0)

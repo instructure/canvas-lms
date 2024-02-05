@@ -19,7 +19,7 @@ GEM
     base64 (0.2.0)
     bindata (2.4.15)
     concurrent-ruby (1.2.3)
-    diff-lcs (1.5.0)
+    diff-lcs (1.5.1)
     faraday (2.7.12)
       base64
       faraday-net_http (>= 2.0, < 3.1)

@@ -34,7 +34,7 @@ GEM
     debug (1.9.1)
       irb (~> 1.10)
       reline (>= 0.3.8)
-    diff-lcs (1.5.0)
+    diff-lcs (1.5.1)
     docile (1.4.0)
     i18n (1.14.1)
       concurrent-ruby (~> 1.0)
