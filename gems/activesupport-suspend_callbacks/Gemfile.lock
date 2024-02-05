@@ -24,7 +24,7 @@ GEM
     irb (1.11.1)
       rdoc
       reline (>= 0.4.2)
-    minitest (5.21.2)
+    minitest (5.22.0)
     psych (5.1.2)
       stringio
     rake (13.1.0)
