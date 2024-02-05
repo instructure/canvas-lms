@@ -40,7 +40,8 @@ module ApplicationHelper
     Rails
       .cache
       .fetch(["context_user_name", context, user_id].cache_key, { expires_in: 15.minutes }) do
-        context_user_name_display(User.find(user_id))
+        user = User.find_by(id: user_id)
+        user && context_user_name_display(user)
       end
   end
 
