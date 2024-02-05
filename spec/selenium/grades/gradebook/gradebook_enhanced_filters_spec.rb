@@ -29,6 +29,11 @@ describe "Enhanced Gradebook Filters" do
   include GradebookSetup
   include_context "late_policy_course_setup"
 
+  def format_grading_period_title_with_date(grp)
+    dates = [grp.start_date, grp.end_date, grp.close_date].map { |d| format_date_for_view(d, "%-m/%-d/%y") }
+    "#{grp.title}: #{dates[0]} - #{dates[1]} | #{dates[2]}"
+  end
+
   before(:once) do
     Account.site_admin.enable_feature!(:enhanced_gradebook_filters)
     Account.site_admin.enable_feature!(:custom_gradebook_statuses)
@@ -173,12 +178,13 @@ describe "Enhanced Gradebook Filters" do
       end
 
       it "can filter and unfilter by grading period" do
+        title = format_grading_period_title_with_date(@gp_closed)
         Gradebook.apply_filters_button.click
         Gradebook.select_filter_type_menu_item("Grading Periods")
-        Gradebook.select_filter_menu_item(@gp_closed.title)
+        Gradebook.select_filter_menu_item(title)
         expect(Gradebook.fetch_assignment_names).to eq [@a1.name]
 
-        Gradebook.select_filter_menu_item(@gp_closed.title)
+        Gradebook.select_filter_menu_item(title)
         expect(Gradebook.fetch_assignment_names).to eq [@a4.name, @a5.name, @a6.name, @a2.name, @a3.name]
       end
 
@@ -387,18 +393,19 @@ describe "Enhanced Gradebook Filters" do
         Gradebook.select_filter_type_menu_item("Modules")
         Gradebook.select_filter_menu_item("module1")
         Gradebook.select_filter_dropdown_back_button
-        Gradebook.select_filter_type_menu_item("Grading Periods")
-        Gradebook.select_filter_menu_item(@gp_closed.title)
-        Gradebook.select_filter_dropdown_back_button
         Gradebook.select_filter_type_menu_item("Submissions")
         Gradebook.select_filter_menu_item("Has Submissions")
         Gradebook.select_filter_dropdown_back_button
         Gradebook.select_filter_type_menu_item("Student Groups")
         Gradebook.select_sorted_filter_menu_item("group1")
+        Gradebook.select_filter_dropdown_back_button
+        Gradebook.select_filter_type_menu_item("Grading Periods")
+        gp_title = format_grading_period_title_with_date(@gp_closed)
+        Gradebook.select_filter_menu_item(gp_title)
         expect(Gradebook.fetch_assignment_names).to eq [@a1.name]
         expect(Gradebook.fetch_student_names).to eq [@student1.name]
 
-        Gradebook.clear_filter("GP Closed")
+        Gradebook.clear_filter(gp_title)
         Gradebook.clear_filter("module1")
         expect(Gradebook.fetch_assignment_names).to eq [@a3.name]
         expect(Gradebook.fetch_student_names).to eq [@student1.name]

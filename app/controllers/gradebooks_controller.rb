@@ -578,6 +578,7 @@ class GradebooksController < ApplicationController
       user_asset_string: @current_user&.asset_string,
       version: params.fetch(:version, nil),
       assignment_missing_shortcut: Account.site_admin.feature_enabled?(:assignment_missing_shortcut),
+      grading_periods_filter_dates_enabled: Account.site_admin.feature_enabled?(:grading_periods_filter_dates),
     }
 
     js_env({

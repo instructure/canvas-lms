@@ -25,6 +25,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import natcompare from '@canvas/util/natcompare'
 import {
   doFiltersMatch,
+  formatGradingPeriodTitleForDisplay,
   getCustomStatusIdStrings,
   isFilterNotEmpty,
   mapCustomStatusToIdString,
@@ -152,7 +153,7 @@ function useFilterDropdownData({
     if (gradingPeriods.length > 0) {
       const gradingPeriodItems: FilterDrilldownMenuItem[] = gradingPeriods.map(a => ({
         id: a.id,
-        name: a.title,
+        name: formatGradingPeriodTitleForDisplay(a),
         isSelected: appliedFilters.some(c => c.type === 'grading-period' && c.value === a.id),
         onToggle: () => {
           const filter: Filter = {
