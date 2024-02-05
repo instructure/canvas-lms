@@ -124,6 +124,39 @@ describe AssignmentsApiController, type: :request do
                { expected_status: 401 })
     end
 
+    context "when the 'new_quizzes' query param is set" do
+      subject do
+        api_get_assignments_index_from_course(course, { new_quizzes: true })
+      end
+
+      let!(:new_quizzes_assignment) do
+        a = assignment_model(submission_types: "external_tool", course:, title: "New Quizzes")
+        a.external_tool_tag_attributes = { content: tool }
+        a.save!
+        a
+      end
+
+      let(:course) { @course }
+      let(:tool) do
+        course.context_external_tools.create!(
+          name: "Quizzes.Next",
+          consumer_key: "test_key",
+          shared_secret: "test_secret",
+          tool_id: "Quizzes 2",
+          url: "http://example.com/launch"
+        )
+      end
+
+      before do
+        course.assignments.create!(title: "Non Quiz Assignment")
+      end
+
+      it "only includes the New Quizzes assignments" do
+        expect(subject.count).to eq 1
+        expect(subject.first["id"]).to eq new_quizzes_assignment.id
+      end
+    end
+
     it "includes in_closed_grading_period in returned json" do
       @course.assignments.create!(title: "Example Assignment")
       json = api_get_assignments_index_from_course(@course)
