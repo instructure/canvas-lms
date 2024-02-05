@@ -1232,9 +1232,11 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   }
 
   filterStudents = (students: Student[]): Student[] => {
-    // If we're filtering by search term, we don't need to apply other frontend filters.
+    // need to apply row specific filters here as well, such as the student groups filter when it becomes a frontend filter
     if (this.isFilteringRowsBySearchTerm()) {
-      return students.filter(student => this.searchFilteredStudentIds.includes(student.id))
+      return students
+        .filter(student => this.searchFilteredStudentIds.includes(student.id))
+        .filter(filterStudentBySectionFn(this.props.appliedFilters, this.getEnrollmentFilters()))
     }
 
     return students
