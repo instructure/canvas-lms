@@ -9,7 +9,6 @@ GEM
   specs:
     addressable (2.8.6)
       public_suffix (>= 2.0.2, < 6.0)
-    base64 (0.2.0)
     bigdecimal (3.1.6)
     crack (0.4.6)
       bigdecimal
@@ -19,11 +18,10 @@ GEM
       reline (>= 0.3.8)
     declarative (0.0.20)
     diff-lcs (1.5.1)
-    faraday (2.7.12)
-      base64
-      faraday-net_http (>= 2.0, < 3.1)
-      ruby2_keywords (>= 0.0.4)
-    faraday-net_http (3.0.2)
+    faraday (2.9.0)
+      faraday-net_http (>= 2.0, < 3.2)
+    faraday-net_http (3.1.0)
+      net-http
     google-apis-core (0.13.0)
       addressable (~> 2.5, >= 2.5.1)
       googleauth (~> 1.9)
@@ -52,6 +50,8 @@ GEM
     jwt (2.7.1)
     mini_mime (1.1.5)
     multi_json (1.15.0)
+    net-http (0.4.1)
+      uri
     os (1.1.4)
     psych (5.1.2)
       stringio
@@ -80,7 +80,6 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.13.0)
     rspec-support (3.13.0)
-    ruby2_keywords (0.0.5)
     signet (0.18.0)
       addressable (~> 2.8)
       faraday (>= 0.17.5, < 3.a)
@@ -90,6 +89,7 @@ GEM
     timecop (0.9.8)
     trailblazer-option (0.1.2)
     uber (0.1.0)
+    uri (0.13.0)
     webmock (3.19.1)
       addressable (>= 2.8.0)
       crack (>= 0.3.2)
