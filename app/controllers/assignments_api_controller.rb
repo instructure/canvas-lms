@@ -787,6 +787,8 @@ class AssignmentsApiController < ApplicationController
   #   Determines the order of the assignments. Defaults to "position".
   # @argument post_to_sis [Boolean]
   #   Return only assignments that have post_to_sis set or not set.
+  # @argument new_quizzes [Boolean]
+  #   Return only New Quizzes assignments
   # @returns [Assignment]
   def index
     error_or_array = get_assignments(@current_user)
@@ -987,6 +989,10 @@ class AssignmentsApiController < ApplicationController
       end
 
       scope = scope.where(post_to_sis: value_to_boolean(params[:post_to_sis])) if params[:post_to_sis]
+
+      if params[:new_quizzes]
+        scope = scope.type_quiz_lti
+      end
 
       if params[:assignment_ids]
         if params[:assignment_ids].length > Api::MAX_PER_PAGE
