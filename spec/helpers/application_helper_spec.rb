@@ -1392,4 +1392,22 @@ describe ApplicationHelper do
       end
     end
   end
+
+  describe "context_user_name" do
+    before :once do
+      user_factory(short_name: "User Name")
+    end
+
+    it "accepts a user" do
+      expect(context_user_name(Account.default, @user)).to eq "User Name"
+    end
+
+    it "accepts a user_id" do
+      expect(context_user_name(Account.default, @user.id)).to eq "User Name"
+    end
+
+    it "returns nil if supplied the id of a nonexistent user" do
+      expect(context_user_name(Account.default, 0)).to be_nil
+    end
+  end
 end
