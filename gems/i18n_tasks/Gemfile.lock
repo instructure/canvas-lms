@@ -31,7 +31,7 @@ GEM
       minitest (>= 5.1)
       tzinfo (~> 2.0)
     concurrent-ruby (1.2.3)
-    diff-lcs (1.5.0)
+    diff-lcs (1.5.1)
     docile (1.4.0)
     erubi (1.12.0)
     globby (0.1.2)

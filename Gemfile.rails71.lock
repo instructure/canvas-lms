@@ -504,7 +504,7 @@ GEM
     deep_merge (1.2.2)
     descendants_tracker (0.0.4)
       thread_safe (~> 0.3, >= 0.3.1)
-    diff-lcs (1.5.0)
+    diff-lcs (1.5.1)
     dig_rb (1.0.1)
     digest-murmurhash (1.1.1)
     diplomat (2.6.4)
