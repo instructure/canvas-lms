@@ -358,7 +358,10 @@ export const getLabelForFilter = (
     return assignmentGroups.find(a => a.id === filter.value)?.name || I18n.t('Assignment Group')
   } else if (filter.type === 'grading-period') {
     if (filter.value === '0') return I18n.t('All Grading Periods')
-    return gradingPeriods.find(g => g.id === filter.value)?.title || I18n.t('Grading Period')
+    return (
+      formatGradingPeriodTitleForDisplay(gradingPeriods.find(g => g.id === filter.value)) ||
+      I18n.t('Grading Period')
+    )
   } else if (filter.type === 'student-group') {
     const studentGroups: StudentGroup[] = Object.values(studentGroupCategories)
       .map((c: StudentGroupCategory) => c.groups)
@@ -797,4 +800,29 @@ export const filterAssignmentsBySubmissionsFn = (
     )
     return result
   }
+}
+export function formatGradingPeriodTitleForDisplay(
+  gradingPeriod: GradingPeriod | undefined | null
+) {
+  if (!gradingPeriod) return null
+
+  let title = gradingPeriod.title
+
+  if (ENV.GRADEBOOK_OPTIONS?.grading_periods_filter_dates_enabled) {
+    const formatter = Intl.DateTimeFormat(I18n.currentLocale(), {
+      year: '2-digit',
+      month: 'numeric',
+      day: 'numeric',
+      timezone: ENV.TIMEZONE,
+    })
+
+    title = I18n.t('%{title}: %{start} - %{end} | %{closed}', {
+      title: gradingPeriod.title,
+      start: formatter.format(gradingPeriod.startDate),
+      end: formatter.format(gradingPeriod.endDate),
+      closed: formatter.format(gradingPeriod.closeDate),
+    })
+  }
+
+  return title
 }
