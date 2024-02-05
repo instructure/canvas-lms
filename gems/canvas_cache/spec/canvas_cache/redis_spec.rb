@@ -306,4 +306,26 @@ describe CanvasCache::Redis do
       end
     end
   end
+
+  describe "#disconnect_if_idle" do
+    let(:redis) { CanvasCache::Redis.redis }
+    let(:client) { redis._client }
+
+    it "closes the connection if no command was ever received" do
+      expect(client).to receive(:close)
+      client.disconnect_if_idle(Process.clock_gettime(Process::CLOCK_MONOTONIC))
+    end
+
+    it "does not close the connection if a commmand was recently received" do
+      redis.get("key")
+      expect(client).not_to receive(:close)
+      client.disconnect_if_idle(Process.clock_gettime(Process::CLOCK_MONOTONIC) - 10)
+    end
+
+    it "closes the connection if a commmand was received, but not recently" do
+      redis.get("key")
+      expect(client).to receive(:close)
+      client.disconnect_if_idle(Process.clock_gettime(Process::CLOCK_MONOTONIC) + 10)
+    end
+  end
 end
