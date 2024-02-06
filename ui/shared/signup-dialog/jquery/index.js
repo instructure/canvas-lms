@@ -16,10 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable prefer-const */
-/* eslint-disable import/no-mutable-exports */
-/* eslint-disable no-void */
-
 import $ from 'jquery'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import preventDefault from '@canvas/util/preventDefault'
@@ -35,14 +31,13 @@ import './validate'
 import '@canvas/jquery/jquery.instructure_forms'
 import '@canvas/datetime/jquery'
 import '@canvas/util/jquery/fixDialogButtons'
+import extensions from '@canvas/bundles/extensions'
 
-let $nodes, I18n, signupDialog, templates, termsHtml
+const I18n = useI18nScope('registration')
 
-I18n = useI18nScope('registration')
+const $nodes = {}
 
-$nodes = {}
-
-templates = {
+const templates = {
   teacherDialog,
   studentDialog,
   parentDialog,
@@ -53,10 +48,9 @@ templates = {
 // # we do this in coffee because of this hbs 1.3 bug:
 // # https://github.com/wycats/handlebars.js/issues/748
 // # https://github.com/fivetanley/i18nliner-handlebars/commit/55be26ff
-termsHtml = function (arg) {
-  let privacy_policy_url, terms_of_use_url
-  terms_of_use_url = arg.terms_of_use_url
-  privacy_policy_url = arg.privacy_policy_url
+const termsHtml = function (arg) {
+  const terms_of_use_url = arg.terms_of_use_url
+  const privacy_policy_url = arg.privacy_policy_url
   return I18n.t(
     'teacher_dialog.agree_to_terms_and_pp',
     'You agree to the *terms of use* and acknowledge the **privacy policy**.',
@@ -69,17 +63,17 @@ termsHtml = function (arg) {
   )
 }
 
-signupDialog = function (id, title, path) {
-  let $form, $node, el, html
+const signupDialog = function (id, title, path) {
+  let el
   if (path == null) {
     path = null
   }
   if (!templates[id]) {
     return
   }
-  $node = $nodes[id] != null ? $nodes[id] : ($nodes[id] = $('<div />'))
+  const $node = $nodes[id] != null ? $nodes[id] : ($nodes[id] = $('<div />'))
   path || (path = '/users')
-  html = templates[id]({
+  const html = templates[id]({
     account: ENV.ACCOUNT.registration_settings,
     terms_required: ENV.ACCOUNT.terms_required,
     recaptcha: ENV.ACCOUNT.recaptcha_key,
@@ -94,12 +88,12 @@ signupDialog = function (id, title, path) {
       return signupDialog($(this).data('template'), $(this).prop('title'))
     })
   )
-  $form = $node.find('form')
+  const $form = $node.find('form')
   $form.formSubmit({
     required: (function () {
-      let i, len, ref, results
-      ref = $form.find(':input[name]').not('[type=hidden]')
-      results = []
+      let i, len
+      const ref = $form.find(':input[name]').not('[type=hidden]')
+      const results = []
       for (i = 0, len = ref.length; i < len; i++) {
         el = ref[i]
         results.push(el.name)
@@ -180,6 +174,7 @@ signupDialog = function (id, title, path) {
         $form.attr('data-captcha-id', $captchaId)
         $node.find('button[type=submit]').prop('disabled', true)
       }
+      // eslint-disable-next-line no-void
       return typeof signupDialog.afterRender === 'function' ? signupDialog.afterRender() : void 0
     },
     close() {
@@ -201,4 +196,10 @@ signupDialog = function (id, title, path) {
 
 signupDialog.templates = templates
 
-export default signupDialog
+const loadExtension = extensions['ui/shared/signup-dialog/jquery/index.js']?.()
+
+const loadSignupDialog = loadExtension
+  ? loadExtension.then(extension => extension.default(signupDialog))
+  : Promise.resolve(signupDialog)
+
+export {loadSignupDialog}

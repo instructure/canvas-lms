@@ -28,7 +28,6 @@ const {RetryChunkLoadPlugin} = require('webpack-retry-chunk-load-plugin')
 // uses terser to minify JavaScript
 const TerserPlugin = require('terser-webpack-plugin')
 
-const SourceFileExtensionsPlugin = require('./SourceFileExtensionsPlugin')
 const WebpackHooks = require('./webpackHooks')
 
 // determines which folder public assets are compiled to
@@ -56,17 +55,6 @@ exports.environmentVars = new EnvironmentPlugin({
 exports.timezoneData = new MomentTimezoneDataPlugin({
   startYear: 2011,
   endYear: new Date().getFullYear() + 15,
-})
-
-// allow plugins to extend source files
-// TODO: remove dependency of Canvas plugins on this extension:
-//   - instructure_misc_plugin
-//   - multiple_root_accounts
-//   - migration_tool
-exports.customSourceFileExtensions = new SourceFileExtensionsPlugin({
-  context: canvasDir,
-  include: sync(join(canvasDir, 'gems/plugins/*/package.json'), {absolute: true}),
-  tmpDir: join(canvasDir, 'tmp/webpack-source-file-extensions'),
 })
 
 // hooks for webpack lifecycle (start, fail, done)

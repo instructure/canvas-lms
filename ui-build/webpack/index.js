@@ -61,6 +61,10 @@ const {
 // dynamically import each plugin bundle
 require('./generatePluginBundles')
 
+// generates ui/shared/bundles/extensions.ts with functions that
+// dynamically import each plugin extension
+require('./generatePluginExtensions')
+
 if (!process.env.NODE_ENV) process.env.NODE_ENV = 'development'
 
 const skipSourcemaps = process.env.SKIP_SOURCEMAPS === '1'
