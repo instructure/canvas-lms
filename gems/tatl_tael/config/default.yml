@@ -19,6 +19,7 @@ CopyrightLinter:
       - "**/mediaelement/**"
       - "**/shims/**"
       - "**/jquery/**"
+      - "**/jqueryui-unpatched/**"
       - "**/vendor/**"
       - "gems/tatl_tael/spec/lib/tatl_tael/linters/fixtures/**"
       - "packages/canvas-rce/src/rce/tinymce**"
