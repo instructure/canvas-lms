@@ -1,4 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies */
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *

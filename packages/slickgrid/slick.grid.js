@@ -12,7 +12,6 @@
 /* eslint-disable no-func-assign */
 /* eslint-disable no-undef */
 /* eslint-disable block-scoped-var */
-/* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable no-var */
 /* eslint-disable prettier/prettier */
 /* eslint-disable no-throw-literal */
@@ -140,7 +139,7 @@ if (typeof Slick === 'undefined') {
       dataItemColumnValueExtractor: null,
       fullWidthRows: false,
       multiColumnSort: false,
-      defaultFormatter: defaultFormatter,
+      defaultFormatter,
       forceSyncScrolling: false,
       numberOfColumnsToFreeze: 0, // Number of left-most columns to freeze from scrolling
     }
@@ -302,8 +301,8 @@ if (typeof Slick === 'undefined') {
       }
 
       editController = {
-        commitCurrentEdit: commitCurrentEdit,
-        cancelCurrentEdit: cancelCurrentEdit,
+        commitCurrentEdit,
+        cancelCurrentEdit,
       }
 
       $outerContainer
@@ -540,7 +539,7 @@ if (typeof Slick === 'undefined') {
             if (newScrollTop < 0) {
               newScrollTop = 0
             }
-            handleScroll({wheelDelta: wheelDelta, scrollTop: newScrollTop})
+            handleScroll({wheelDelta, scrollTop: newScrollTop})
           })
           $headerScroller_0
             .bind('contextmenu', handleHeaderContextMenu)
@@ -1023,14 +1022,14 @@ if (typeof Slick === 'undefined') {
           helper: 'clone',
           placeholder: 'slick-sortable-placeholder ui-state-default slick-header-column',
           forcePlaceholderSize: true,
-          start: function (e, ui) {
+          start (e, ui) {
             ui.placeholder.width(ui.helper.outerWidth() - headerColumnWidthDiff)
             $(ui.helper).addClass('slick-header-column-active')
           },
-          beforeStop: function (e, ui) {
+          beforeStop (e, ui) {
             $(ui.helper).removeClass('slick-header-column-active')
           },
-          stop: function (e) {
+          stop (e) {
             if (!getEditorLock().commitCurrentEdit()) {
               $(this).sortable('cancel')
               return
@@ -1604,7 +1603,7 @@ if (typeof Slick === 'undefined') {
     }
 
     function setSortColumn(columnId, ascending) {
-      setSortColumns([{columnId: columnId, sortAsc: ascending}])
+      setSortColumns([{columnId, sortAsc: ascending}])
     }
 
     function setSortColumns(cols) {
@@ -2677,7 +2676,7 @@ if (typeof Slick === 'undefined') {
         }
       }
 
-      trigger(self.onScroll, {scrollLeft: scrollLeft, scrollTop: scrollTop})
+      trigger(self.onScroll, {scrollLeft, scrollTop})
     }
 
     function asyncPostProcessRows() {
@@ -2753,7 +2752,7 @@ if (typeof Slick === 'undefined') {
       cellCssClasses[key] = hash
       updateCellCssStylesOnRenderedRows(hash, null)
 
-      trigger(self.onCellCssStylesChanged, {key: key, hash: hash})
+      trigger(self.onCellCssStylesChanged, {key, hash})
     }
 
     function removeCellCssStyles(key) {
@@ -2764,7 +2763,7 @@ if (typeof Slick === 'undefined') {
       updateCellCssStylesOnRenderedRows(null, cellCssClasses[key])
       delete cellCssClasses[key]
 
-      trigger(self.onCellCssStylesChanged, {key: key, hash: null})
+      trigger(self.onCellCssStylesChanged, {key, hash: null})
     }
 
     function setCellCssStyles(key, hash) {
@@ -2773,7 +2772,7 @@ if (typeof Slick === 'undefined') {
       cellCssClasses[key] = hash
       updateCellCssStylesOnRenderedRows(hash, prevHash)
 
-      trigger(self.onCellCssStylesChanged, {key: key, hash: hash})
+      trigger(self.onCellCssStylesChanged, {key, hash})
     }
 
     function getCellCssStyles(key) {
@@ -2993,14 +2992,14 @@ if (typeof Slick === 'undefined') {
     function handleHeaderContextMenu(e) {
       var $header = $(e.target).closest('.slick-header-column', '.slick-header-columns')
       var column = $header && $header.data('column')
-      trigger(self.onHeaderContextMenu, {column: column}, e)
+      trigger(self.onHeaderContextMenu, {column}, e)
     }
 
     function handleHeaderClick(e) {
       var $header = $(e.target).closest('.slick-header-column', '.slick-header-columns')
       var column = $header && $header.data('column')
       if (column) {
-        trigger(self.onHeaderClick, {column: column}, e)
+        trigger(self.onHeaderClick, {column}, e)
       }
     }
 
@@ -3030,7 +3029,7 @@ if (typeof Slick === 'undefined') {
         cell = 0
       }
 
-      return {row: row, cell: cell - 1}
+      return {row, cell: cell - 1}
     }
 
     function getCellFromNode(cellNode) {
@@ -3071,8 +3070,8 @@ if (typeof Slick === 'undefined') {
         return null
       } else {
         return {
-          row: row,
-          cell: cell,
+          row,
+          cell,
         }
       }
     }
@@ -3272,7 +3271,7 @@ if (typeof Slick === 'undefined') {
         trigger(self.onBeforeEditCell, {
           row: activeRow,
           cell: activeCell,
-          item: item,
+          item,
           column: columnDef,
         }) === false
       ) {
@@ -3562,8 +3561,8 @@ if (typeof Slick === 'undefined') {
 
       if (cell < columns.length) {
         return {
-          row: row,
-          cell: cell,
+          row,
+          cell,
           posX: cell,
         }
       }
@@ -3581,7 +3580,7 @@ if (typeof Slick === 'undefined') {
       }
 
       var prev = {
-        row: row,
+        row,
         cell: firstFocusableCell,
         posX: firstFocusableCell,
       }
@@ -3616,9 +3615,9 @@ if (typeof Slick === 'undefined') {
 
         if (canCellBeActive(row, prevCell)) {
           return {
-            row: row,
+            row,
             cell: prevCell,
-            posX: posX,
+            posX,
           }
         }
       }
@@ -3639,9 +3638,9 @@ if (typeof Slick === 'undefined') {
 
         if (canCellBeActive(row, prevCell)) {
           return {
-            row: row,
+            row,
             cell: prevCell,
-            posX: posX,
+            posX,
           }
         }
       }
@@ -3652,8 +3651,8 @@ if (typeof Slick === 'undefined') {
         row = cell = posX = 0
         if (canCellBeActive(row, cell)) {
           return {
-            row: row,
-            cell: cell,
+            row,
+            cell,
             posX: cell,
           }
         }
@@ -3669,7 +3668,7 @@ if (typeof Slick === 'undefined') {
         firstFocusableCell = findFirstFocusableCell(row)
         if (firstFocusableCell !== null) {
           return {
-            row: row,
+            row,
             cell: firstFocusableCell,
             posX: firstFocusableCell,
           }
@@ -3684,8 +3683,8 @@ if (typeof Slick === 'undefined') {
         cell = posX = columns.length - 1
         if (canCellBeActive(row, cell)) {
           return {
-            row: row,
-            cell: cell,
+            row,
+            cell,
             posX: cell,
           }
         }
@@ -3706,7 +3705,7 @@ if (typeof Slick === 'undefined') {
         lastSelectableCell = findLastFocusableCell(row)
         if (lastSelectableCell !== null) {
           pos = {
-            row: row,
+            row,
             cell: lastSelectableCell,
             posX: lastSelectableCell,
           }
@@ -3926,11 +3925,11 @@ if (typeof Slick === 'undefined') {
                 editor: currentEditor,
                 serializedValue: currentEditor.serializeValue(),
                 prevSerializedValue: serializedEditorValue,
-                execute: function () {
+                execute () {
                   this.editor.applyValue(item, this.serializedValue)
                   updateRow(this.row)
                 },
-                undo: function () {
+                undo () {
                   this.editor.applyValue(item, this.prevSerializedValue)
                   updateRow(this.row)
                 },
@@ -3947,14 +3946,14 @@ if (typeof Slick === 'undefined') {
               trigger(self.onCellChange, {
                 row: activeRow,
                 cell: activeCell,
-                column: column,
-                item: item,
+                column,
+                item,
               })
             } else {
               var newItem = {}
               currentEditor.applyValue(newItem, currentEditor.serializeValue())
               makeActiveCellNormal()
-              trigger(self.onAddNewRow, {item: newItem, column: column})
+              trigger(self.onAddNewRow, {item: newItem, column})
             }
 
             // check whether the lock has been re-acquired by event handlers
@@ -3968,10 +3967,10 @@ if (typeof Slick === 'undefined') {
             trigger(self.onValidationError, {
               editor: currentEditor,
               cellNode: activeCellNode,
-              validationResults: validationResults,
+              validationResults,
               row: activeRow,
               cell: activeCell,
-              column: column,
+              column,
             })
 
             currentEditor.focus()
@@ -4082,88 +4081,88 @@ if (typeof Slick === 'undefined') {
       onCellCssStylesChanged: new Slick.Event(),
 
       // Methods
-      registerPlugin: registerPlugin,
-      unregisterPlugin: unregisterPlugin,
-      getColumns: getColumns,
-      setColumns: setColumns,
-      getColumnIndex: getColumnIndex,
-      updateColumnHeader: updateColumnHeader,
-      setNumberOfColumnsToFreeze: setNumberOfColumnsToFreeze,
-      setSortColumn: setSortColumn,
-      setSortColumns: setSortColumns,
-      getSortColumns: getSortColumns,
-      autosizeColumns: autosizeColumns,
-      getOptions: getOptions,
-      setOptions: setOptions,
-      getData: getData,
-      getDataLength: getDataLength,
-      getDataItem: getDataItem,
-      setData: setData,
-      getSelectionModel: getSelectionModel,
-      setSelectionModel: setSelectionModel,
-      getSelectedRows: getSelectedRows,
-      setSelectedRows: setSelectedRows,
-      getContainerNode: getContainerNode,
+      registerPlugin,
+      unregisterPlugin,
+      getColumns,
+      setColumns,
+      getColumnIndex,
+      updateColumnHeader,
+      setNumberOfColumnsToFreeze,
+      setSortColumn,
+      setSortColumns,
+      getSortColumns,
+      autosizeColumns,
+      getOptions,
+      setOptions,
+      getData,
+      getDataLength,
+      getDataItem,
+      setData,
+      getSelectionModel,
+      setSelectionModel,
+      getSelectedRows,
+      setSelectedRows,
+      getContainerNode,
 
-      render: render,
-      invalidate: invalidate,
-      invalidateRow: invalidateRow,
-      invalidateRows: invalidateRows,
-      invalidateAllRows: invalidateAllRows,
-      updateCell: updateCell,
-      updateRow: updateRow,
+      render,
+      invalidate,
+      invalidateRow,
+      invalidateRows,
+      invalidateAllRows,
+      updateCell,
+      updateRow,
       getViewport: getVisibleRange,
-      getRenderedRange: getRenderedRange,
-      resizeCanvas: resizeCanvas,
-      updateRowCount: updateRowCount,
-      scrollRowIntoView: scrollRowIntoView,
-      scrollRowToTop: scrollRowToTop,
-      scrollCellIntoView: scrollCellIntoView,
-      getCanvasNode: getCanvasNode,
+      getRenderedRange,
+      resizeCanvas,
+      updateRowCount,
+      scrollRowIntoView,
+      scrollRowToTop,
+      scrollCellIntoView,
+      getCanvasNode,
       focus: setFocus,
 
-      getCellFromPoint: getCellFromPoint,
-      getCellFromEvent: getCellFromEvent,
-      getActiveCell: getActiveCell,
-      setActiveCell: setActiveCell,
-      getActiveCellNode: getActiveCellNode,
-      getActiveCellPosition: getActiveCellPosition,
-      resetActiveCell: resetActiveCell,
+      getCellFromPoint,
+      getCellFromEvent,
+      getActiveCell,
+      setActiveCell,
+      getActiveCellNode,
+      getActiveCellPosition,
+      resetActiveCell,
       editActiveCell: makeActiveCellEditable,
-      getCellEditor: getCellEditor,
-      getCellNode: getCellNode,
-      getCellNodeBox: getCellNodeBox,
-      canCellBeSelected: canCellBeSelected,
-      canCellBeActive: canCellBeActive,
-      navigatePrev: navigatePrev,
-      navigateNext: navigateNext,
-      navigateUp: navigateUp,
-      navigateDown: navigateDown,
-      navigateLeft: navigateLeft,
-      navigateRight: navigateRight,
-      navigatePageUp: navigatePageUp,
-      navigatePageDown: navigatePageDown,
-      gotoCell: gotoCell,
-      getTopPanel: getTopPanel,
-      setTopPanelVisibility: setTopPanelVisibility,
-      setHeaderRowVisibility: setHeaderRowVisibility,
-      getHeaderRow: getHeaderRow,
-      getHeaderRowColumn: getHeaderRowColumn,
-      getColumnHeaderNode: getColumnHeaderNode,
-      getGridPosition: getGridPosition,
-      flashCell: flashCell,
-      addCellCssStyles: addCellCssStyles,
-      setCellCssStyles: setCellCssStyles,
-      removeCellCssStyles: removeCellCssStyles,
-      getCellCssStyles: getCellCssStyles,
-      getUID: getUID,
+      getCellEditor,
+      getCellNode,
+      getCellNodeBox,
+      canCellBeSelected,
+      canCellBeActive,
+      navigatePrev,
+      navigateNext,
+      navigateUp,
+      navigateDown,
+      navigateLeft,
+      navigateRight,
+      navigatePageUp,
+      navigatePageDown,
+      gotoCell,
+      getTopPanel,
+      setTopPanelVisibility,
+      setHeaderRowVisibility,
+      getHeaderRow,
+      getHeaderRowColumn,
+      getColumnHeaderNode,
+      getGridPosition,
+      flashCell,
+      addCellCssStyles,
+      setCellCssStyles,
+      removeCellCssStyles,
+      getCellCssStyles,
+      getUID,
 
       init: finishInitialization,
-      destroy: destroy,
+      destroy,
 
       // IEditor implementation
-      getEditorLock: getEditorLock,
-      getEditController: getEditController,
+      getEditorLock,
+      getEditController,
     })
 
     init()
