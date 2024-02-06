@@ -48,6 +48,7 @@ import {AttachmentDisplay} from '@canvas/discussions/react/components/Attachment
 import {responsiveQuerySizes} from '@canvas/discussions/react/utils'
 import {UsageRightsContainer} from '../../containers/usageRights/UsageRightsContainer'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 import {
   addNewGroupCategoryToCache,
@@ -72,10 +73,10 @@ export default function DiscussionTopicForm({
   const rceRef = useRef()
   const {setOnFailure} = useContext(AlertManagerContext)
 
-  const isAnnouncement = ENV.DISCUSSION_TOPIC?.ATTRIBUTES?.is_announcement ?? false
+  const isAnnouncement = ENV?.DISCUSSION_TOPIC?.ATTRIBUTES?.is_announcement ?? false
   const isUnpublishedAnnouncement =
     isAnnouncement && !ENV.DISCUSSION_TOPIC?.ATTRIBUTES.course_published
-  const isEditingAnnouncement = isAnnouncement && ENV.DISCUSSION_TOPIC?.ATTRIBUTES.id
+  const isEditingAnnouncement = isAnnouncement && ENV?.DISCUSSION_TOPIC?.ATTRIBUTES.id
   const published = currentDiscussionTopic?.published ?? false
 
   const announcementAlertProps = () => {
@@ -703,6 +704,13 @@ export default function DiscussionTopicForm({
 
   return (
     <>
+      <ScreenReaderContent>
+        {title ? (
+          <h1>{title}</h1>
+        ) : (
+          <h1>{isAnnouncement ? I18n.t('New Announcement') : I18n.t('New Discussion')}</h1>
+        )}
+      </ScreenReaderContent>
       <FormFieldGroup description="" rowSpacing="small">
         {(isUnpublishedAnnouncement || isEditingAnnouncement) && (
           <Alert variant={announcementAlertProps().variant}>{announcementAlertProps().text}</Alert>
