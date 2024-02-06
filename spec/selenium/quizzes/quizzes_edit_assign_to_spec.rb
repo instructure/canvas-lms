@@ -149,4 +149,17 @@ describe "quiz edit page assign to" do
 
     expect(@classic_quiz.assignment_overrides.count).to eq(0)
   end
+
+  it "disables submit button when tray is open" do
+    get "/courses/#{@course.id}/quizzes/#{@classic_quiz.id}/edit"
+
+    click_manage_assign_to_button
+
+    wait_for_assign_to_tray_spinner
+    keep_trying_until { expect(item_tray_exists?).to be_truthy }
+    expect(quiz_save_button).to be_disabled
+
+    click_cancel_button
+    expect(quiz_save_button).to be_enabled
+  end
 end

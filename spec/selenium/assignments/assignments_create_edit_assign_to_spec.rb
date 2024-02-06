@@ -122,6 +122,20 @@ shared_examples_for "item assign to tray during assignment creation/update" do
     expect(due_at_row).not_to be_nil
     expect(due_at_row.text.count("-")).to eq(3)
   end
+
+  it "disables submit button when tray is open" do
+    AssignmentCreateEditPage.replace_assignment_name("new test assignment")
+    AssignmentCreateEditPage.enter_points_possible("100")
+    AssignmentCreateEditPage.select_text_entry_submission_type
+    AssignmentCreateEditPage.click_manage_assign_to_button
+
+    wait_for_assign_to_tray_spinner
+    keep_trying_until { expect(item_tray_exists?).to be_truthy }
+    expect(AssignmentCreateEditPage.assignment_save_button).to be_disabled
+
+    click_cancel_button
+    expect(AssignmentCreateEditPage.assignment_save_button).to be_enabled
+  end
 end
 
 describe "assignments show page assign to" do

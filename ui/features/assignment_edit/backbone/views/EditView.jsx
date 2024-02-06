@@ -300,6 +300,22 @@ EditView.prototype.initialize = function (options) {
   this.assignment = this.model
   this.setDefaultsIfNew()
   this.dueDateOverrideView = options.views['js-assignment-overrides']
+  if (ENV.FEATURES?.differentiated_modules) {
+    this.listenTo(this.dueDateOverrideView, 'tray:open', () =>
+      // Disables all Save, Save & Publish and Build buttons
+      this.$el
+        .find('.assignment__action-buttons button:not(".cancel_button")')
+        .prop('disabled', true)
+    )
+
+    this.listenTo(this.dueDateOverrideView, 'tray:close', () =>
+      // Enables all Save, Save & Publish and Build buttons
+      this.$el
+        .find('.assignment__action-buttons button:not(".cancel_button")')
+        .prop('disabled', false)
+    )
+  }
+
   this.on(
     'success',
     (function (_this) {
