@@ -18,7 +18,6 @@
 
 const crypto = require('crypto')
 const fs = require('fs')
-// eslint-disable-next-line import/no-extraneous-dependencies
 const mkdirp = require('mkdirp')
 const path = require('path')
 

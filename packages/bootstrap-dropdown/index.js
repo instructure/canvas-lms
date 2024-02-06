@@ -3,7 +3,6 @@
 /* eslint-disable vars-on-top */
 /* eslint-disable no-bitwise */
 /* eslint-disable object-shorthand */
-/* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable no-var */
 
 /* ============================================================

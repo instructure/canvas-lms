@@ -1,4 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable prettier/prettier */
 /* eslint-disable dot-notation */
 /* eslint-disable object-shorthand */

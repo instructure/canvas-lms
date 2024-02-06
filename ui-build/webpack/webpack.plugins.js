@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable import/no-extraneous-dependencies */
-
 const {EnvironmentPlugin, DefinePlugin, IgnorePlugin, ProvidePlugin} = require('webpack')
 const {sync} = require('glob')
 const {join, resolve} = require('path')
