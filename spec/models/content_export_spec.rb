@@ -24,6 +24,12 @@ describe ContentExport do
     @ce = @course.content_exports.create!
   end
 
+  def create_content_export(opts = {})
+    course = course_model
+    allow(course).to receive(:feature_enabled?).with(:quizzes_next).and_return(true)
+    ContentExport.new({ context: course }.merge(opts))
+  end
+
   it "records the job id" do
     allow(Delayed::Worker).to receive(:current_job).and_return(double("Delayed::Job", id: 123))
     @ce.export(synchronous: true)
@@ -407,12 +413,6 @@ describe ContentExport do
   describe "#disable_content_rewriting?" do
     subject { content_export.disable_content_rewriting? }
 
-    def create_content_export(opts = {})
-      course = course_model
-      allow(course).to receive(:feature_enabled?).with(:quizzes_next).and_return(true)
-      ContentExport.new({ context: course }.merge(opts))
-    end
-
     context "quizzes_next export" do
       let(:content_export) { create_content_export(export_type: ContentExport::QUIZZES2, settings: { quizzes2: {} }) }
 
@@ -451,6 +451,17 @@ describe ContentExport do
 
         it { is_expected.to be false }
       end
+    end
+  end
+
+  describe "#mark_waiting_for_external_tool" do
+    let(:content_export) do
+      create_content_export(export_type: ContentExport::COURSE_COPY, workflow_state: "created")
+    end
+
+    it "transitions to waiting_for_external_tool" do
+      expect { content_export.mark_waiting_for_external_tool }.to change { content_export.workflow_state }
+        .from("created").to("waiting_for_external_tool")
     end
   end
 end
