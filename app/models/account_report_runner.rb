@@ -71,9 +71,9 @@ class AccountReportRunner < ActiveRecord::Base
     update!(workflow_state: "error", ended_at: Time.now.utc)
   end
 
-  scope :in_progress, -> { where(workflow_state: %w[running]) }
   scope :completed, -> { where(workflow_state: %w[completed]) }
   scope :incomplete, -> { where(workflow_state: %w[created running]) }
+  scope :incomplete_or_failed, -> { where.not(workflow_state: "completed") }
 
   def delete_account_report_rows
     account_report_rows.in_batches(of: 10_000).delete_all
