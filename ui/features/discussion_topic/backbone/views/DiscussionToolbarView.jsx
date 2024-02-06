@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import {View} from '@canvas/backbone'
-import 'jqueryui/button'
+import 'jqueryui-unpatched/button'
 import $ from 'jquery'
 import {debounce} from 'lodash'
 import React from 'react'
