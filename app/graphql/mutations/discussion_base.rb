@@ -34,6 +34,7 @@ class Types::DiscussionCheckpointDateSetType < Types::BaseEnum
 end
 
 class Mutations::DiscussionCheckpointDate < GraphQL::Schema::InputObject
+  argument :id, Integer, required: false
   argument :type, Types::DiscussionCheckpointDateType, required: true
   argument :due_at, Types::DateTimeType, required: false
   argument :lock_at, Types::DateTimeType, required: false
@@ -44,6 +45,7 @@ class Mutations::DiscussionCheckpointDate < GraphQL::Schema::InputObject
 
   def to_object
     {
+      id: self[:id],
       type: self[:type],
       due_at: self[:due_at],
       lock_at: self[:lock_at],
@@ -78,6 +80,7 @@ class Mutations::DiscussionBase < Mutations::BaseMutation
   argument :podcast_has_student_posts, Boolean, required: false
   argument :specific_sections, String, required: false
   argument :file_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Attachment")
+  argument :checkpoints, [Mutations::DiscussionCheckpoints], required: false
 
   field :discussion_topic, Types::DiscussionType, null:
 

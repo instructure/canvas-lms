@@ -24,6 +24,7 @@ class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
   argument :discussion_topic_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("DiscussionTopic")
   argument :remove_attachment, Boolean, required: false
   argument :assignment, Mutations::AssignmentUpdate, required: false
+  argument :set_checkpoints, Boolean, required: false
 
   field :discussion_topic, Types::DiscussionType, null: false
   def resolve(input:)
@@ -97,6 +98,32 @@ class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
 
         discussion_topic.assignment = assignment_create_result[:assignment]
       end
+
+      # Assignment must be present to set checkpoints
+      if discussion_topic.assignment && input[:checkpoints]&.count == DiscussionTopic::REQUIRED_CHECKPOINT_COUNT
+        return validation_error(I18n.t("If checkpoints are defined, forCheckpoints: true must be provided to the discussion topic assignment.")) unless input.dig(:assignment, :for_checkpoints)
+
+        input[:checkpoints].each do |checkpoint|
+          dates = checkpoint[:dates]&.map(&:to_object)
+
+          Checkpoints::DiscussionCheckpointUpdaterService.call(
+            discussion_topic:,
+            checkpoint_label: checkpoint[:checkpoint_label],
+            points_possible: checkpoint[:points_possible],
+            dates:,
+            replies_required: checkpoint[:replies_required]
+          )
+        end
+      end
+    end
+
+    # Determine if the checkpoints are being deleted
+    is_deleting_checkpoints = input.key?(:set_checkpoints) && !input[:set_checkpoints]
+
+    if is_deleting_checkpoints
+      Checkpoints::DiscussionCheckpointDeleterService.call(
+        discussion_topic:
+      )
     end
 
     return errors_for(discussion_topic) unless discussion_topic.save!
