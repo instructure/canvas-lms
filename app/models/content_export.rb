@@ -54,6 +54,7 @@ class ContentExport < ActiveRecord::Base
 
   workflow do
     state :created
+    state :waiting_for_external_tool
     state :exporting
     state :exported
     state :exported_for_course_copy
@@ -167,6 +168,10 @@ class ContentExport < ActiveRecord::Base
   def reset_and_start_job_progress
     job_progress.try :reset!
     job_progress.try :start!
+  end
+
+  def mark_waiting_for_external_tool
+    self.workflow_state = "waiting_for_external_tool"
   end
 
   def mark_exporting
