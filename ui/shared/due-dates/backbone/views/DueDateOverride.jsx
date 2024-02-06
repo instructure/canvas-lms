@@ -70,37 +70,43 @@ DueDateOverrideView.prototype.render = function () {
   if (!div) {
     return
   }
-  if(this.options && this.options.inPacedCourse && this.options.isModuleItem){
-    return ReactDOM.render(React.createElement(CoursePacingNotice, {
-      courseId: this.options.courseId,
-    }), div)
+  if (this.options && this.options.inPacedCourse && this.options.isModuleItem) {
+    return ReactDOM.render(
+      React.createElement(CoursePacingNotice, {
+        courseId: this.options.courseId,
+      }),
+      div
+    )
   }
 
-  const assignToSection = ENV.FEATURES?.differentiated_modules ? React.createElement(DifferentiatedModulesSection, {
-    onSync: this.setNewOverridesCollection,
-    defaultSectionId: this.model.defaultDueDateSectionId,
-    overrides: this.model.overrides.models,
-    assignmentId: this.model.assignment.get('id'),
-    assignmentName: this.model.assignment.get('name') || this.model.assignment.get('title'),
-    pointsPossible: this.model.assignment.get('points_possible'),
-    type: this.model.assignment.objectType().toLowerCase(),
-    importantDates: this.model.assignment.get('important_dates'),
-    }
-    ) : React.createElement(DueDates, {
-    overrides: this.model.overrides.models,
-    syncWithBackbone: this.setNewOverridesCollection,
-    sections: this.model.sections.models,
-    defaultSectionId: this.model.defaultDueDateSectionId,
-    selectedGroupSetId: this.model.assignment.get('group_category_id'),
-    gradingPeriods: this.gradingPeriods,
-    hasGradingPeriods: this.hasGradingPeriods,
-    isOnlyVisibleToOverrides: this.model.assignment.isOnlyVisibleToOverrides(),
-    dueAt: tz.parse(this.model.assignment.get('due_at')),
-    dueDatesReadonly: this.options.dueDatesReadonly,
-    availabilityDatesReadonly: this.options.availabilityDatesReadonly,
-    importantDates: this.model.assignment.get('important_dates'),
-    defaultDueTime: ENV.DEFAULT_DUE_TIME,
-  })
+  const assignToSection = ENV.FEATURES?.differentiated_modules
+    ? React.createElement(DifferentiatedModulesSection, {
+        onSync: this.setNewOverridesCollection,
+        defaultSectionId: this.model.defaultDueDateSectionId,
+        overrides: this.model.overrides.models,
+        assignmentId: this.model.assignment.get('id'),
+        assignmentName: this.model.assignment.get('name') || this.model.assignment.get('title'),
+        pointsPossible: this.model.assignment.get('points_possible'),
+        type: this.model.assignment.objectType().toLowerCase(),
+        importantDates: this.model.assignment.get('important_dates'),
+        onTrayOpen: () => this.trigger('tray:open'),
+        onTrayClose: () => this.trigger('tray:close'),
+      })
+    : React.createElement(DueDates, {
+        overrides: this.model.overrides.models,
+        syncWithBackbone: this.setNewOverridesCollection,
+        sections: this.model.sections.models,
+        defaultSectionId: this.model.defaultDueDateSectionId,
+        selectedGroupSetId: this.model.assignment.get('group_category_id'),
+        gradingPeriods: this.gradingPeriods,
+        hasGradingPeriods: this.hasGradingPeriods,
+        isOnlyVisibleToOverrides: this.model.assignment.isOnlyVisibleToOverrides(),
+        dueAt: tz.parse(this.model.assignment.get('due_at')),
+        dueDatesReadonly: this.options.dueDatesReadonly,
+        availabilityDatesReadonly: this.options.availabilityDatesReadonly,
+        importantDates: this.model.assignment.get('important_dates'),
+        defaultDueTime: ENV.DEFAULT_DUE_TIME,
+      })
 
   // eslint-disable-next-line react/no-render-return-value
   return ReactDOM.render(assignToSection, div)
@@ -281,7 +287,7 @@ DueDateOverrideView.prototype.showError = function (element, message) {
 // ==============================
 
 DueDateOverrideView.prototype.setNewOverridesCollection = function (newOverrides, importantDates) {
-  if(newOverrides !== undefined){
+  if (newOverrides !== undefined) {
     this.model.overrides.reset(newOverrides)
     const onlyVisibleToOverrides = !this.model.overrides.containsDefaultDueDate()
     this.model.assignment.isOnlyVisibleToOverrides(onlyVisibleToOverrides)

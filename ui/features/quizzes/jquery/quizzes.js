@@ -133,6 +133,19 @@ const renderDueDates = lockedItems => {
       isModuleItem: ENV.IS_MODULE_ITEM,
       courseId: ENV.COURSE_ID,
     })
+
+    if (ENV.FEATURES?.differentiated_modules) {
+      overrideView.bind('tray:open', () => {
+        $('#quiz_edit_wrapper .btn.save_quiz_button').attr('disabled', true)
+        $('#quiz_edit_wrapper .btn.save_and_publish').attr('disabled', true)
+      })
+
+      overrideView.bind('tray:close', () => {
+        $('#quiz_edit_wrapper .btn.save_quiz_button').attr('disabled', false)
+        $('#quiz_edit_wrapper .btn.save_and_publish').attr('disabled', false)
+      })
+    }
+
     overrideView.render()
   }
 }
