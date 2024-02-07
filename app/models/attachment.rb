@@ -25,21 +25,6 @@ require "crocodoc"
 class Attachment < ActiveRecord::Base
   class UniqueRenameFailure < StandardError; end
 
-  self.ignored_columns += %i[last_lock_at
-                             last_unlock_at
-                             enrollment_id
-                             cached_s3_url
-                             s3_url_cached_at
-                             scribd_account_id
-                             scribd_user
-                             scribd_mime_type_id
-                             submitted_to_scribd_at
-                             scribd_doc
-                             scribd_attempts
-                             cached_scribd_thumbnail
-                             last_inline_view
-                             local_filename]
-
   def self.display_name_order_by_clause(table = nil)
     col = table ? "#{table}.display_name" : "display_name"
     best_unicode_collation_key(col)
@@ -369,7 +354,7 @@ class Attachment < ActiveRecord::Base
           ) AS media_tracks_all
         SQL
       :media_tracks
-    ).where(row: 1)
+    ).select(MediaTrack.all.arel.projections, "for_att_id", "inherited").where(row: 1)
   end
 
   # this is here becase attachment_fu looks to make sure that parent_id is nil before it will create a thumbnail of something.

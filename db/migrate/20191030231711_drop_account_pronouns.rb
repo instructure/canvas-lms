@@ -23,5 +23,6 @@ class DropAccountPronouns < ActiveRecord::Migration[5.2]
   def change
     drop_table :account_pronouns
     remove_column :users, :account_pronoun_id, :int, limit: 8
+    User.reset_column_information
   end
 end

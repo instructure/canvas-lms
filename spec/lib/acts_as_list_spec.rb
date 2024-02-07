@@ -104,7 +104,7 @@ describe "acts_as_list" do
   describe "base scope" do
     it "scopes by the base class rather then the STI class" do
       scope = AuthenticationProvider::CAS.new.list_scope_base
-      expect(scope.to_sql).not_to(match(/auth_type/))
+      expect(scope.where_clause.ast.to_sql).not_to(match(/auth_type/))
     end
   end
 end

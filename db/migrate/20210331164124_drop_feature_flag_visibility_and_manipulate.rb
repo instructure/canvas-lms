@@ -23,5 +23,6 @@ class DropFeatureFlagVisibilityAndManipulate < ActiveRecord::Migration[6.0]
   def change
     remove_column :feature_flags, :visibility, :string, limit: 255
     remove_column :feature_flags, :manipulate, :string, limit: 255
+    FeatureFlag.reset_column_information
   end
 end

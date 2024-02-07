@@ -96,8 +96,6 @@ class DeveloperKey < ActiveRecord::Base
     state :deleted
   end
 
-  self.ignored_columns += %i[oidc_login_uri tool_id]
-
   # https://stackoverflow.com/a/2500819
   alias_method :referenced_tool_configuration, :tool_configuration
 

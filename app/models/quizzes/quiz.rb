@@ -1246,7 +1246,7 @@ class Quizzes::Quiz < ActiveRecord::Base
         SELECT CASE WHEN overrides.due_at_overridden THEN overrides.due_at ELSE q.due_at END as user_due_date, q.*
         FROM #{Quizzes::Quiz.quoted_table_name} q
         INNER JOIN overrides ON overrides.quiz_id = q.id) as quizzes")
-      .not_for_assignment
+      .select(arel.projections, "user_due_date").not_for_assignment
   }
 
   scope :ungraded_due_between_for_user, lambda { |start, ending, user|

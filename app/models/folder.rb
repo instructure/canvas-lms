@@ -19,8 +19,6 @@
 #
 
 class Folder < ActiveRecord::Base
-  self.ignored_columns += %i[last_lock_at last_unlock_at]
-
   def self.name_order_by_clause(table = nil)
     col = table ? "#{table}.name" : "name"
     best_unicode_collation_key(col)
