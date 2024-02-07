@@ -17,13 +17,13 @@
  */
 
 import type {AssigneeOption} from '../react/AssigneeSelector'
-import type {
-  AssignmentOverridePayload,
-  AssignmentOverridesPayload,
-  DateDetailsOverride,
-} from '../react/types'
+import type {AssignmentOverridePayload, AssignmentOverridesPayload} from '../react/types'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {type DateDetailsPayload, type ItemAssignToCardSpec} from '../react/Item/types'
+import {
+  type DateDetailsPayload,
+  type ItemAssignToCardSpec,
+  DateDetailsOverride,
+} from '../react/Item/types'
 
 const I18n = useI18nScope('differentiated_modules')
 
@@ -82,7 +82,8 @@ export const generateDateDetailsPayload = (cards: ItemAssignToCardSpec[]) => {
   payload.assignment_overrides = overrideCards
     .map(card => {
       const isSectionOverride =
-        card.defaultOptions?.[0].includes('section') && card.overrideId !== everyoneCard?.overrideId
+        card.defaultOptions?.[0]?.includes('section') &&
+        card.overrideId !== everyoneCard?.overrideId
       const overrides: DateDetailsOverride[] = card.selectedAssigneeIds
         .filter(assignee => assignee.includes('section'))
         ?.map((section, index) => ({
@@ -132,4 +133,34 @@ export function updateModuleUI(moduleElement: HTMLDivElement, payload: Assignmen
       assignToButtonContainer.innerHTML = ''
     }
   }
+}
+
+export function getOverriddenAssignees(overrides?: DateDetailsOverride[]) {
+  const moduleOverrides = overrides?.filter(override => override.context_module_id !== undefined)
+  const overriddenTargets = moduleOverrides?.reduce(
+    (acc: {sections: string[]; students: string[]}, current) => {
+      const sectionOverride = overrides?.find(
+        tmp =>
+          tmp.course_section_id !== undefined &&
+          tmp.course_section_id === current.course_section_id &&
+          !tmp.context_module_id
+      )
+      if (sectionOverride && current.course_section_id) {
+        acc.sections.push(current.course_section_id)
+        return acc
+      }
+      const students = current.student_ids
+      const studentsOverride =
+        overrides?.reduce((studentIds: string[], current) => {
+          if (current.context_module_id !== undefined) return studentIds
+          const overriddenIds = current.student_ids?.filter(id => students?.includes(id)) ?? []
+          studentIds.push(...overriddenIds)
+          return studentIds
+        }, []) ?? []
+      acc.students.push(...studentsOverride)
+      return acc
+    },
+    {sections: [], students: []}
+  )
+  return overriddenTargets
 }

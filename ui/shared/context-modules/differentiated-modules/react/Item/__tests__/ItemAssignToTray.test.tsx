@@ -371,4 +371,60 @@ describe('ItemAssignToTray', () => {
       expect(onDismissMock).not.toHaveBeenCalled()
     })
   })
+
+  describe('Module Overrides', () => {
+    const DATE_DETAILS_WITHOUT_OVERRIDES = {
+      id: '23',
+      due_at: '2023-10-05T12:00:00Z',
+      unlock_at: '2023-10-01T12:00:00Z',
+      lock_at: '2023-11-01T12:00:00Z',
+      only_visible_to_overrides: false,
+      overrides: [
+        {
+          id: '3',
+          assignment_id: '23',
+          title: 'Sally and Wally',
+          due_at: '2023-10-02T12:00:00Z',
+          all_day: false,
+          all_day_date: '2023-10-02',
+          unlock_at: null,
+          lock_at: null,
+          course_section_id: '4',
+          context_module_id: 1,
+          context_module_name: 'Test Module',
+        },
+      ],
+    }
+
+    const DATE_DETAILS_WITH_OVERRIDES = {
+      ...DATE_DETAILS_WITHOUT_OVERRIDES,
+      overrides: [...OVERRIDES, ...DATE_DETAILS_WITHOUT_OVERRIDES.overrides],
+    }
+
+    it('shows module cards if they are not overridden', async () => {
+      fetchMock.get(
+        '/api/v1/courses/1/assignments/23/date_details',
+        DATE_DETAILS_WITHOUT_OVERRIDES,
+        {
+          overwriteRoutes: true,
+        }
+      )
+      const {getByText, findAllByTestId, getByTestId} = renderComponent()
+      const cards = await findAllByTestId('item-assign-to-card')
+      expect(getByText('Inherited from')).toBeInTheDocument()
+      expect(getByTestId('context-module-text')).toBeInTheDocument()
+      expect(cards).toHaveLength(2)
+    })
+
+    it('does not show overridden module cards', async () => {
+      fetchMock.get('/api/v1/courses/1/assignments/23/date_details', DATE_DETAILS_WITH_OVERRIDES, {
+        overwriteRoutes: true,
+      })
+      const {queryByText, findAllByTestId, queryByTestId} = renderComponent()
+      const cards = await findAllByTestId('item-assign-to-card')
+      expect(queryByText('Inherited from')).not.toBeInTheDocument()
+      expect(queryByTestId('context-module-text')).not.toBeInTheDocument()
+      expect(cards).toHaveLength(2)
+    })
+  })
 })
