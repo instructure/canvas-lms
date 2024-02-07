@@ -50,7 +50,7 @@ GEM
       dogstatsd-ruby (>= 4.2, < 6.0, != 5.0.0)
       statsd-ruby (~> 1.0)
     minitest (5.22.2)
-    multipart-post (2.3.0)
+    multipart-post (2.4.0)
     net-http (0.4.1)
       uri
     public_suffix (5.0.4)
