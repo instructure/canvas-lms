@@ -33,7 +33,7 @@ import french from 'timezone/fr_FR'
 import I18nStubber from 'helpers/I18nStubber'
 import fakeENV from 'helpers/fakeENV'
 import assertions from 'helpers/assertions'
-import 'helpers/jquery.simulate'
+import '@canvas/jquery/jquery.simulate'
 import '../../../../ui/boot/initializers/activateTooltips'
 
 function buildAssignment1() {

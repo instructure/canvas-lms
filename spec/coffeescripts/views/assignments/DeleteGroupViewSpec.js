@@ -16,15 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Backbone from '@canvas/backbone'
 import AssignmentGroupCollection from '@canvas/assignments/backbone/collections/AssignmentGroupCollection'
-import AssignmentCollection from '@canvas/assignments/backbone/collections/AssignmentCollection'
 import AssignmentGroup from '@canvas/assignments/backbone/models/AssignmentGroup'
 import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import DeleteGroupView from 'ui/features/assignment_index/backbone/views/DeleteGroupView'
 import $ from 'jquery'
 import assertions from 'helpers/assertions'
-import 'helpers/jquery.simulate'
+import '@canvas/jquery/jquery.simulate'
 
 const group = (assignments = true, id) =>
   new AssignmentGroup({
@@ -50,6 +48,7 @@ QUnit.module('DeleteGroupView', {
   },
 })
 
+// eslint-disable-next-line qunit/resolve-async
 test('should be accessible', assert => {
   const view = createView(false, true)
   const done = assert.async()

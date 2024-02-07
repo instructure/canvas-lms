@@ -28,7 +28,7 @@ import ToggleShowByView from 'ui/features/assignment_index/backbone/views/Toggle
 import $ from 'jquery'
 import fakeENV from 'helpers/fakeENV'
 import assertions from 'helpers/assertions'
-import 'helpers/jquery.simulate'
+import '@canvas/jquery/jquery.simulate'
 
 const fixtures = $('#fixtures')
 

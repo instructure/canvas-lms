@@ -23,7 +23,7 @@ import $ from 'jquery'
 import fakeENV from 'helpers/fakeENV'
 import CyoeHelper from '@canvas/conditional-release-cyoe-helper'
 import assertions from 'helpers/assertions'
-import 'helpers/jquery.simulate'
+import '@canvas/jquery/jquery.simulate'
 import ReactDOM from 'react-dom'
 
 const createQuiz = function (options = {}) {

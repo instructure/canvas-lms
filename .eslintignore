@@ -1,5 +1,4 @@
 /doc/*
 /packages/*/node_modules/**
-/spec/selenium/helpers/jquery.simulate.js
 node_modules
 **/*/.mocharc.js
