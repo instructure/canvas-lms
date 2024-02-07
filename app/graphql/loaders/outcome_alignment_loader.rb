@@ -37,6 +37,7 @@ class Loaders::OutcomeAlignmentLoader < GraphQL::Batch::Loader
     active_os_alignments = outcome_alignment_summary_with_new_quizzes_enabled?(@context) ? get_active_os_alignments(@context) : {}
 
     outcomes.each do |outcome|
+      all_fields = %w[id alignment_type content_id content_type context_id context_type title learning_outcome_id created_at updated_at assignment_id assignment_submission_types assignment_workflow_state discussion_id quiz_id module_id module_name module_workflow_state]
       # direct outcome alignments to rubric, assignment, quiz, and graded discussions
       # map assignment id to quiz/discussion id
       assignments_sub = Assignment
@@ -137,9 +138,9 @@ class Loaders::OutcomeAlignmentLoader < GraphQL::Batch::Loader
                               ")
                               .distinct
 
-        all_alignments = ContentTag.from("(#{direct_alignments.to_sql} UNION #{indirect_alignments.to_sql} UNION #{external_alignments.to_sql}) AS content_tags")
+        all_alignments = ContentTag.select(all_fields).from("(#{direct_alignments.to_sql} UNION #{indirect_alignments.to_sql} UNION #{external_alignments.to_sql}) AS content_tags")
       else
-        all_alignments = ContentTag.from("(#{direct_alignments.to_sql} UNION #{indirect_alignments.to_sql}) AS content_tags")
+        all_alignments = ContentTag.select(all_fields).from("(#{direct_alignments.to_sql} UNION #{indirect_alignments.to_sql}) AS content_tags")
       end
 
       # deduplicate and sort alignments

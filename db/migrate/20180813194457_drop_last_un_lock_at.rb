@@ -26,5 +26,7 @@ class DropLastUnLockAt < ActiveRecord::Migration[5.1]
     remove_column :folders, :last_unlock_at, :datetime
     remove_column :attachments, :last_lock_at, :datetime
     remove_column :attachments, :last_unlock_at, :datetime
+    Folder.reset_column_information
+    Attachment.reset_column_information
   end
 end

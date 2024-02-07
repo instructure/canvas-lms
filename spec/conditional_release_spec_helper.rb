@@ -23,12 +23,12 @@ RSpec.shared_examples "a soft-deletable model" do
   it { is_expected.to have_db_column(:deleted_at) }
 
   it "adds a deleted_at where clause when requested" do
-    expect(described_class.active.all.to_sql).to include('"deleted_at" IS NULL')
+    expect(described_class.active.all.where_clause.ast.to_sql).to include('"deleted_at" IS NULL')
   end
 
   it "skips adding the deleted_at where clause normally" do
     # sorry - no default scopes
-    expect(described_class.all.to_sql).not_to include("deleted_at")
+    expect(described_class.all.where_clause.ast.to_sql).not_to include("deleted_at")
   end
 
   it "soft deletes" do

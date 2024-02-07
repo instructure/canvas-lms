@@ -23,5 +23,6 @@ class DropUnusedUserColumns < ActiveRecord::Migration[5.2]
   def change
     remove_column :users, :gender, :string, limit: 255
     remove_column :users, :birthdate, :datetime
+    User.reset_column_information
   end
 end

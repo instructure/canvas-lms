@@ -39,8 +39,6 @@ class AbstractAssignment < ActiveRecord::Base
   include LockedFor
   include Lti::Migratable
 
-  self.ignored_columns += %i[context_code checkpointed checkpoint_label]
-
   GRADING_TYPES = OpenStruct.new(
     {
       points: "points",
@@ -3162,7 +3160,7 @@ class AbstractAssignment < ActiveRecord::Base
     from("(SELECT s.cached_due_date AS user_due_date, a.*
           FROM #{Assignment.quoted_table_name} a
           INNER JOIN #{Submission.quoted_table_name} AS s ON s.assignment_id = a.id
-          WHERE s.user_id = #{User.connection.quote(user.id_for_database)} AND s.workflow_state <> 'deleted') AS assignments")
+          WHERE s.user_id = #{User.connection.quote(user.id_for_database)} AND s.workflow_state <> 'deleted') AS assignments").select(arel.projections, "user_due_date")
   }
 
   scope :with_latest_due_date, lambda {
@@ -3171,7 +3169,7 @@ class AbstractAssignment < ActiveRecord::Base
           LEFT JOIN #{AssignmentOverride.quoted_table_name} ao
           ON ao.assignment_id = a.id
           AND ao.due_at_overridden
-          GROUP BY a.id) AS assignments")
+          GROUP BY a.id) AS assignments").select(arel.projections, "latest_due_date")
   }
 
   scope :updated_after, lambda { |*args|

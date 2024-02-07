@@ -23,6 +23,7 @@ class RemoveComputedCurrentScoreAndComputedFinalScoreFromEnrollments < ActiveRec
   def up
     remove_column :enrollments, :computed_current_score
     remove_column :enrollments, :computed_final_score
+    Enrollment.reset_column_information
   end
 
   def down

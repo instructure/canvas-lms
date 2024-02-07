@@ -19,8 +19,6 @@
 #
 
 class ConversationParticipant < ActiveRecord::Base
-  self.ignored_columns += %i[root_account_id]
-
   include Workflow
   include TextHelper
   include SimpleTags
