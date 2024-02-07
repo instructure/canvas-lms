@@ -16,6 +16,8 @@ services:
     image: selenium/standalone-chrome
     # Use the seleniarm (not selenium) image on ARM architectures
     # image: seleniarm/standalone-chromium:latest
+    # or
+    # image: seleniarm/standalone-chromium:4.16
     environment:
       SE_NODE_GRID_URL: selenium-hub:4444/wd/hub
       VIRTUAL_HOST: seleniumch.docker
