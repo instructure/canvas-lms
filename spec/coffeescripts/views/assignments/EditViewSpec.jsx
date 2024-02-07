@@ -32,7 +32,7 @@ import PeerReviewsSelector from '@canvas/assignments/backbone/views/PeerReviewsS
 import fakeENV from 'helpers/fakeENV'
 import userSettings from '@canvas/user-settings'
 import assertions from 'helpers/assertions'
-import 'helpers/jquery.simulate'
+import '@canvas/jquery/jquery.simulate'
 import ExternalToolModalLauncher from '@canvas/external-tools/react/components/ExternalToolModalLauncher'
 
 const s_params = 'some super secure params'

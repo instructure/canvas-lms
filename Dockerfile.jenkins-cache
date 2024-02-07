@@ -111,7 +111,6 @@ RUN --mount=target=/tmp/src \
         public \
         spec/coffeescripts \
         spec/javascripts \
-        spec/selenium/helpers/jquery.simulate.js \
         tmp \
         ui \
         ui-build \

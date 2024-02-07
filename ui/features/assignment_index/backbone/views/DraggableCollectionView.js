@@ -22,6 +22,7 @@ import $ from 'jquery'
 import {each, isEmpty, extend as lodashExtend} from 'lodash'
 import CollectionView from '@canvas/backbone-collection-view'
 import 'jqueryui/sortable'
+import '@canvas/jquery/jquery.simulate'
 
 extend(DraggableCollectionView, CollectionView)
 

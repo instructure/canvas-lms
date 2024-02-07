@@ -21,7 +21,7 @@ import CheckboxView from 'ui/features/content_migrations/backbone/views/ContentC
 import CheckboxModel from 'ui/features/content_migrations/backbone/models/ContentCheckbox'
 import $ from 'jquery'
 import fakeENV from 'helpers/fakeENV'
-import 'helpers/jquery.simulate'
+import '@canvas/jquery/jquery.simulate'
 
 class CheckboxHelper {
   static initClass() {
