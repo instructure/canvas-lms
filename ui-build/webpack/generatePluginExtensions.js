@@ -58,7 +58,9 @@ async function generateImports() {
 
     const eslintDirectives =
       '/* eslint-disable import/extensions */\n/* eslint-disable notice/notice */\n\n'
-    const outputContent = `${eslintDirectives}export default {\n${importStatements},\n}\n`
+    const outputContent = `${eslintDirectives}export default {\n${importStatements}${
+      importStatements.length > 0 ? ',' : ''
+    }\n}\n`
     await fs.writeFile(outputPath, outputContent, 'utf8')
 
     console.log('Generated imports:', outputPath)
