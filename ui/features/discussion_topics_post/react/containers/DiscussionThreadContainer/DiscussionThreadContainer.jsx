@@ -505,14 +505,18 @@ export const DiscussionThreadContainer = props => {
                               : null
                           }
                           isReported={props.discussionEntry?.entryParticipant?.reportType != null}
-                          onQuoteReply={() => {
-                            setReplyFromId(props.discussionEntry._id)
-                            if (splitScreenOn) {
-                              props.onOpenSplitView(props.discussionEntry._id, true)
-                            } else {
-                              setEditorExpanded(true)
-                            }
-                          }}
+                          onQuoteReply={
+                            props.discussionEntry.permissions.reply
+                              ? () => {
+                                  setReplyFromId(props.discussionEntry._id)
+                                  if (splitScreenOn) {
+                                    props.onOpenSplitView(props.discussionEntry._id, true)
+                                  } else {
+                                    setEditorExpanded(true)
+                                  }
+                                }
+                              : null
+                          }
                           onMarkThreadAsRead={readState =>
                             updateDiscussionThreadReadState({
                               variables: {

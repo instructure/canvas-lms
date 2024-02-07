@@ -229,10 +229,14 @@ export const SplitScreenParent = props => {
                             },
                           })
                         }
-                        onQuoteReply={() => {
-                          setReplyFromId(props.discussionEntry._id)
-                          props.setRCEOpen(true)
-                        }}
+                        onQuoteReply={
+                          props.discussionEntry.permissions.reply
+                            ? () => {
+                                setReplyFromId(props.discussionEntry._id)
+                                props.setRCEOpen(true)
+                              }
+                            : null
+                        }
                         onReport={
                           props.discussionTopic.permissions?.studentReporting
                             ? () => {

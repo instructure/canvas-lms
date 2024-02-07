@@ -111,6 +111,23 @@ describe('DiscussionThreadContainer', () => {
     expect(queryByTestId('threading-toolbar-reply')).toBeInTheDocument()
   })
 
+  it('should not render quote button if reply permission is false', () => {
+    const {queryAllByText, getByTestId} = setup(
+      defaultProps({
+        discussionEntryOverrides: {permissions: DiscussionEntryPermissions.mock({reply: false})},
+      })
+    )
+    fireEvent.click(getByTestId('thread-actions-menu'))
+    expect(queryAllByText('Quote Reply').length).toBe(0)
+  })
+
+  it('should render quote button if reply permission is true', () => {
+    const {getByTestId, getByText} = setup(defaultProps())
+    fireEvent.click(getByTestId('thread-actions-menu'))
+
+    expect(getByText('Quote Reply')).toBeInTheDocument()
+  })
+
   describe('delete permission', () => {
     it('removed when false', async () => {
       const props = defaultProps()
