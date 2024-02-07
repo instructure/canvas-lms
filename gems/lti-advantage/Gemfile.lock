@@ -35,7 +35,7 @@ GEM
       bindata
       faraday (~> 2.0)
       faraday-follow_redirects
-    minitest (5.22.0)
+    minitest (5.22.2)
     net-http (0.4.1)
       uri
     rake (13.1.0)

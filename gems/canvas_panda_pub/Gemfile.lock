@@ -112,7 +112,7 @@ GEM
       mime-types-data (~> 3.2015)
     mime-types-data (3.2024.0206)
     mini_portile2 (2.8.5)
-    minitest (5.22.0)
+    minitest (5.22.2)
     net-http (0.4.1)
       uri
     nokogiri (1.15.5)
