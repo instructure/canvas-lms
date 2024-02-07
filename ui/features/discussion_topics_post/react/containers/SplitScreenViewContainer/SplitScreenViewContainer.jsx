@@ -239,10 +239,17 @@ export const SplitScreenViewContainer = props => {
   }
 
   const getRCEStartingValue = () => {
+    // Check if mentions in discussions are enabled
+    if (!ENV.rce_mentions_in_discussions) {
+      return ''
+    }
     const mentionsValue =
       splitScreenEntryOlderDirection.data.legacyNode.depth >= 3
         ? ReactDOMServer.renderToString(
-            <span className="mceNonEditable mention" data-mention="1">
+            <span
+              className="mceNonEditable mention"
+              data-mention={splitScreenEntryOlderDirection?.data?.legacyNode.author?._id}
+            >
               @{getDisplayName(splitScreenEntryOlderDirection.data.legacyNode)}
             </span>
           )

@@ -623,9 +623,12 @@ export const DiscussionThreadContainer = props => {
                   }}
                   quotedEntry={buildQuotedReply([props.discussionEntry], replyFromId)}
                   value={
-                    props.discussionEntry.depth > 2
+                    !!ENV.rce_mentions_in_discussions && props.discussionEntry.depth > 2
                       ? ReactDOMServer.renderToString(
-                          <span className="mceNonEditable mention" data-mention="1">
+                          <span
+                            className="mceNonEditable mention"
+                            data-mention={props.discussionEntry.author?._id}
+                          >
                             @{getDisplayName(props.discussionEntry)}
                           </span>
                         )
