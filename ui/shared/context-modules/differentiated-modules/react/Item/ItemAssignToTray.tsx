@@ -47,7 +47,7 @@ import ItemAssignToCard from './ItemAssignToCard'
 import TrayFooter from '../Footer'
 import type {AssigneeOption} from '../AssigneeSelector'
 import useFetchAssignees from '../../utils/hooks/useFetchAssignees'
-import {generateDateDetailsPayload} from '../../utils/assignToHelper'
+import {generateDateDetailsPayload, getOverriddenAssignees} from '../../utils/assignToHelper'
 
 const I18n = useI18nScope('differentiated_modules')
 
@@ -219,6 +219,7 @@ export default function ItemAssignToTray({
         // TODO: exhaust pagination
         const dateDetailsApiResponse = response.json
         const overrides = dateDetailsApiResponse.overrides
+        const overriddenTargets = getOverriddenAssignees(overrides)
         delete dateDetailsApiResponse.overrides
         const baseDates: BaseDateDetails = dateDetailsApiResponse
         const onlyOverrides = dateDetailsApiResponse.only_visible_to_overrides
@@ -242,11 +243,27 @@ export default function ItemAssignToTray({
         }
         if (overrides?.length) {
           overrides.forEach(override => {
+            let removeCard = false
+            let filteredStudents = override.student_ids
+            if (override.context_module_id && override.student_ids) {
+              filteredStudents = filteredStudents?.filter(
+                id => !overriddenTargets?.students?.includes(id)
+              )
+              removeCard = override.student_ids?.length > 0 && filteredStudents?.length === 0
+            }
             const studentOverrides =
-              override.student_ids?.map(studentId => `student-${studentId}`) ?? []
+              filteredStudents?.map(studentId => `student-${studentId}`) ?? []
             const defaultOptions = studentOverrides
             if (override.course_section_id) {
               defaultOptions.push(`section-${override.course_section_id}`)
+            }
+            if (
+              removeCard ||
+              (override.context_module_id &&
+                override?.course_section_id &&
+                overriddenTargets?.sections?.includes(override?.course_section_id))
+            ) {
+              return
             }
             const cardId = makeCardId()
             cards.push({
@@ -306,8 +323,12 @@ export default function ItemAssignToTray({
       onSave(assignToCards)
       return
     }
-
-    const payload = generateDateDetailsPayload(assignToCards)
+    const filteredCards = assignToCards.filter(
+      card =>
+        [null, undefined, ''].includes(card.contextModuleId) ||
+        (card.contextModuleId !== null && card.isEdited)
+    )
+    const payload = generateDateDetailsPayload(filteredCards)
     updateModuleItem({
       courseId,
       moduleItemContentId: itemContentId,
@@ -409,7 +430,7 @@ export default function ItemAssignToTray({
   const handleDatesChange = useCallback(
     (cardId: string, dateAttribute: string, dateValue: string | null) => {
       const cards = assignToCards.map(card =>
-        card.key === cardId ? {...card, [dateAttribute]: dateValue} : card
+        card.key === cardId ? {...card, [dateAttribute]: dateValue, isEdited: true} : card
       )
       setAssignToCards(cards)
       onDatesChange?.(cardId, dateAttribute, dateValue ?? '')
