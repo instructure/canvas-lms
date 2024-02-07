@@ -718,7 +718,7 @@ GEM
     msgpack (1.7.2)
     multi_json (1.15.0)
     multi_xml (0.6.0)
-    multipart-post (2.3.0)
+    multipart-post (2.4.0)
     mustache (1.1.1)
     neighbor (0.3.2)
       activerecord (>= 6.1)
