@@ -19,8 +19,8 @@
 #
 
 class GradingSchemesJsonController < ApplicationController
-  JSON_METHODS =
-    %i[assessed_assignment? context_name].freeze
+  include GradingSchemeSerializer
+
   GRADING_SCHEMES_LIMIT = 100
   USED_LOCATIONS_PER_PAGE = 100
   before_action :require_context
@@ -72,7 +72,6 @@ class GradingSchemesJsonController < ApplicationController
     respond_to do |format|
       format.json do
         render json: GradingSchemesJsonController.default_to_json(
-          GradingSchemesJsonController.default_canvas_grading_standard(@context),
           @current_user,
           @context
         )
@@ -171,70 +170,40 @@ class GradingSchemesJsonController < ApplicationController
     end
   end
 
-  def self.to_grading_scheme_summary_json(grading_standard)
-    {
-      title: grading_standard.title,
-      id: grading_standard.id.to_s
-    }.as_json
-  end
-
-  def self.default_to_json(grading_standard, user, context)
-    to_grading_scheme_json(grading_standard, user).tap do |json|
-      # because GradingStandard generates the JSON property with a '?' on the end of it,
-      # instead of using the JSON convention for boolean properties
-      json["assessed_assignment"] = GradingStandard.default_scheme_assessed_assignments(context).exists?
-    end
-  end
-
-  def self.to_grading_scheme_json(grading_standard, user)
-    grading_standard.as_json(methods: JSON_METHODS,
-                             include_root: false,
-                             only: json_serialized_fields,
-                             permissions: { user: }).tap do |json|
-      # because GradingStandard generates the JSON property with a '?' on the end of it,
-      # instead of using the JSON convention for boolean properties
-      json["assessed_assignment"] = json["assessed_assignment?"]
-      json.delete "assessed_assignment?"
-
-      # because GradingStandard serializes its id as a number instead of a string
-      json["id"] = json["id"].to_s
-
-      # because GradingStandard serializes its data rows to JSON as an array of arrays: [["A", .90], ["B", .80]]
-      # instead of our desired format of an array of objects with name/value pairs [{name: "A", value: .90], {name: "B", value: .80}]
-      json["data"] = grading_standard["data"].map { |grading_standard_data_row| { name: grading_standard_data_row[0], value: grading_standard_data_row[1] } }
-    end
-  end
-
   def default_scheme_used_locations
-    scope = GradingStandard.default_scheme_assessed_assignments(@context)
-                           .joins("INNER JOIN #{Course.quoted_table_name} ON assignments.context_type = 'Course' AND assignments.context_id = courses.id")
-                           .order("courses.name ASC, title ASC")
+    GuardRail.activate(:secondary) do
+      scope = GradingStandard.default_scheme_used_locations(@context)
+                             .joins("INNER JOIN #{Course.quoted_table_name} ON assignments.context_type = 'Course' AND assignments.context_id = courses.id")
+                             .order("courses.name ASC, title ASC")
 
-    used_locations = Api.paginate(
-      scope,
-      self,
-      account_grading_schemes_default_used_locations_path(account_id: context.id),
-      per_page: USED_LOCATIONS_PER_PAGE
-    )
+      used_locations = Api.paginate(
+        scope,
+        self,
+        account_grading_schemes_default_used_locations_path(account_id: @context.id),
+        per_page: USED_LOCATIONS_PER_PAGE
+      )
 
-    used_locations_to_json(used_locations)
+      used_locations_to_json(used_locations)
+    end
   end
 
   def used_locations_for(grading_standard)
-    scope = grading_standard.assessed_assignments
-                            .joins("INNER JOIN #{Course.quoted_table_name} ON assignments.context_type = 'Course' AND assignments.context_id = courses.id")
-                            .order("courses.name ASC, title ASC")
+    GuardRail.activate(:secondary) do
+      scope = grading_standard.used_locations
+                              .joins("INNER JOIN #{Course.quoted_table_name} ON assignments.context_type = 'Course' AND assignments.context_id = courses.id")
+                              .order("courses.name ASC, title ASC")
 
-    used_locations = Api.paginate(
-      scope,
-      self,
-      account_grading_schemes_used_locations_path(
-        account_id: @context.id, id: grading_standard.id
-      ),
-      per_page: USED_LOCATIONS_PER_PAGE
-    )
+      used_locations = Api.paginate(
+        scope,
+        self,
+        account_grading_schemes_used_locations_path(
+          account_id: @context.id, id: grading_standard.id
+        ),
+        per_page: USED_LOCATIONS_PER_PAGE
+      )
 
-    used_locations_to_json(used_locations)
+      used_locations_to_json(used_locations)
+    end
   end
 
   def used_locations_to_json(used_locations)

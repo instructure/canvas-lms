@@ -255,22 +255,28 @@ class GradingStandard < ActiveRecord::Base
   private :prevent_deletion_of_used_schemes
 
   def assessed_assignment?
-    if Account.site_admin.feature_enabled?(:archived_grading_schemes)
-      assessed_assignments.exists?
-    else
-      assignments.active.joins(:submissions).where("submissions.workflow_state='graded'").exists?
+    GuardRail.activate(:secondary) do
+      unless Account.site_admin.feature_enabled?(:archived_grading_schemes)
+        return assignments.active.joins(:submissions).where("submissions.workflow_state='graded'").exists?
+      end
+
+      return true if assessed_course_assignments.exists? || assessed_assignments.exists?
+
+      false
     end
   end
 
-  def assessed_assignments
-    assignments_with_graded_submissions = assignments
-                                          .except(:order).joins(:submissions)
-                                          .where("submissions.workflow_state='graded'")
-
-    assignments_with_graded_submissions.union(assessed_course_assignments)
+  def used_locations
+    assessed_assignments.union(assessed_course_assignments)
   end
 
-  def self.default_scheme_assessed_assignments(context)
+  def assessed_assignments
+    assignments
+      .except(:order).joins(:submissions)
+      .where("submissions.workflow_state='graded'")
+  end
+
+  def self.default_scheme_used_locations(context)
     if context.is_a?(Course)
       courses = [context]
     else # is an account
