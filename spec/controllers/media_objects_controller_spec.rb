@@ -163,6 +163,111 @@ describe MediaObjectsController do
           assert_status(200)
         end
       end
+
+      it "finds media object when attachment is on its own shard" do
+        @shard1.activate do
+          @mo = MediaObject.create! media_id: "_media_id"
+        end
+
+        @shard2.activate do
+          user_model
+          user_session(@user)
+          @att = Folder.media_folder(@user).attachments.create!(
+            context: @user,
+            display_name: "file.mp4",
+            filename: "file.mp4",
+            content_type: "video/mp4",
+            media_entry_id: @mo.media_id,
+            file_state: "hidden",
+            workflow_state: "pending_upload"
+          )
+        end
+        @mo.attachment = @att
+        @mo.save!
+        @shard1.activate do
+          get "show", params: { attachment_id: @mo.attachment.id }
+          assert_status(200)
+        end
+      end
+
+      it "finds media object when the access shard is different" do
+        @shard2.activate do
+          user_model
+          user_session(@user)
+          @mo = MediaObject.create! media_id: "_media_id"
+          @mo.attachment = Folder.media_folder(@user).attachments.create!(
+            context: @user,
+            display_name: "file.mp4",
+            filename: "file.mp4",
+            content_type: "video/mp4",
+            file_state: "hidden",
+            workflow_state: "pending_upload",
+            media_entry_id: @mo.media_id
+          )
+        end
+
+        @shard1.activate do
+          get "show", params: { attachment_id: @mo.attachment.id }
+          assert_status(200)
+        end
+      end
+
+      it "finds media object when media object is on its own shard" do
+        skip "LF-1251"
+        @shard1.activate do
+          user_model
+          user_session(@user)
+          @att = Folder.media_folder(@user).attachments.create!(
+            context: @user,
+            display_name: "file.mp4",
+            filename: "file.mp4",
+            content_type: "video/mp4",
+            file_state: "hidden",
+            workflow_state: "pending_upload"
+          )
+        end
+
+        @shard2.activate do
+          @mo = MediaObject.create! media_id: "_media_id"
+        end
+
+        @mo.attachment = @att
+        @mo.save!
+        @att.media_entry_id = @mo.media_id
+        @att.save!
+
+        @shard1.activate do
+          get "show", params: { attachment_id: @mo.attachment.id }
+          assert_status(200)
+        end
+      end
+
+      it "finds media object when all shards are different" do
+        skip "LF-1251"
+        @shard1.activate do
+          @mo = MediaObject.create! media_id: "_media_id"
+        end
+
+        @shard2.activate do
+          user_model
+          user_session(@user)
+          @att = Folder.media_folder(@user).attachments.create!(
+            context: @user,
+            display_name: "file.mp4",
+            filename: "file.mp4",
+            content_type: "video/mp4",
+            media_entry_id: @mo.media_id,
+            file_state: "hidden",
+            workflow_state: "pending_upload"
+          )
+        end
+        @mo.attachment = @att
+        @mo.save!
+
+        # Shard.active is different than shard1/2 if this isn't wrapped in a shard.activate
+        get "show", params: { attachment_id: @mo.attachment.id }
+        assert_status(200)
+      end
     end
   end
 
