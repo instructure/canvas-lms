@@ -32,9 +32,13 @@ import {Pill} from '@instructure/ui-pill'
 import {View} from '@instructure/ui-view'
 import {CriterionModal} from './CriterionModal'
 
-const I18n = useI18nScope('rubrics-criteria-row')
+const I18n = useI18nScope('rubrics-criteria-new-row')
 
-export const NewCriteriaRow = () => {
+type NewCriteriaRowProps = {
+  rowIndex: number
+}
+
+export const NewCriteriaRow = ({rowIndex}: NewCriteriaRowProps) => {
   const [isCriterionModalOpen, setIsCriterionModalOpen] = React.useState(false)
 
   return (
@@ -45,7 +49,7 @@ export const NewCriteriaRow = () => {
       />
       <Flex>
         <Flex.Item align="start" margin="small 0 0 0">
-          <Text weight="bold">{I18n.t('2.')}</Text>
+          <Text weight="bold">{rowIndex}.</Text>
         </Flex.Item>
         <Flex.Item margin="0 small" align="start" shouldGrow={true}>
           <Button renderIcon={IconEditLine} onClick={() => setIsCriterionModalOpen(true)}>

@@ -48,6 +48,7 @@ module Types
       Loaders::IDLoader.for(LearningOutcome).load(object[:learning_outcome_id])
     end
 
+    field :learning_outcome_id, ID, null: true
     field :long_description, String, null: true
     field :mastery_points, Float, null: true
     field :points, Float, null: true
