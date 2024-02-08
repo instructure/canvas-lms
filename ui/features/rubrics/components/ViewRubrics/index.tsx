@@ -90,6 +90,10 @@ export const ViewRubrics = () => {
         criteriaCount: curr.criteriaCount,
         locations: [], // TODO: add locations once we have them
         ratingOrder: curr.ratingOrder,
+        hidePoints: curr.hidePoints,
+        workflowState: curr.workflowState,
+        buttonDisplay: curr.buttonDisplay,
+        criteria: curr.criteria,
       }
 
       curr.workflowState === 'active'
