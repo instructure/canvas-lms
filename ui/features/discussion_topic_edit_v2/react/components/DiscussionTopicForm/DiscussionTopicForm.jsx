@@ -71,6 +71,10 @@ export default function DiscussionTopicForm({
   apolloClient,
 }) {
   const rceRef = useRef()
+  const textInputRef = useRef()
+  const sectionInputRef = useRef()
+  const dateInputRef = useRef()
+  const groupOptionsRef = useRef()
   const {setOnFailure} = useContext(AlertManagerContext)
 
   const isAnnouncement = ENV?.DISCUSSION_TOPIC?.ATTRIBUTES?.is_announcement ?? false
@@ -316,6 +320,9 @@ export default function DiscussionTopicForm({
   }
 
   const validateAvailability = (newAvailableFrom, newAvailableUntil) => {
+    if (isGraded) {
+      return true
+    }
     if (newAvailableFrom === null || newAvailableUntil === null) {
       setAvailabilityValidationMessages([{text: '', type: 'success'}])
       return true
@@ -371,12 +378,28 @@ export default function DiscussionTopicForm({
   const validateFormFields = () => {
     let isValid = true
 
-    if (!validateTitle(title)) isValid = false
-    if (!validateAvailability(availableFrom, availableUntil)) isValid = false
-    if (!validateSelectGroup()) isValid = false
-    if (!validateAssignToFields()) isValid = false
-    if (!validateUsageRights()) isValid = false
-    if (!validatePostToSections()) isValid = false
+    const validationRefs = [
+      {validationFunction: validateTitle(title), ref: textInputRef.current},
+      {validationFunction: validatePostToSections(), ref: sectionInputRef.current},
+      {validationFunction: validateSelectGroup(), ref: groupOptionsRef.current},
+      {
+        validationFunction: validateAvailability(availableFrom, availableUntil),
+        ref: dateInputRef.current,
+      },
+      {validationFunction: validateAssignToFields(), ref: null},
+      {validationFunction: validateUsageRights(), ref: null},
+    ]
+
+    const inValidFields = []
+
+    validationRefs.forEach(({validationFunction, ref}) => {
+      if (!validationFunction) {
+        if (ref) inValidFields.push(ref)
+        isValid = false
+      }
+    })
+
+    inValidFields[0]?.focus()
 
     return isValid
   }
@@ -716,6 +739,7 @@ export default function DiscussionTopicForm({
           type={I18n.t('text')}
           placeholder={I18n.t('Topic Title')}
           value={title}
+          ref={textInputRef}
           onChange={(_event, value) => {
             validateTitle(value)
             const newTitle = value.substring(0, 255)
@@ -763,6 +787,9 @@ export default function DiscussionTopicForm({
               selectedOptionIds={sectionIdsToPostTo}
               onChange={handlePostToSelect}
               width={inputWidth}
+              setInputRef={ref => {
+                sectionInputRef.current = ref
+              }}
             >
               {[allSectionsOption, ...sections].map(({id, name: label}) => (
                 <CanvasMultiSelect.Option
@@ -1009,6 +1036,9 @@ export default function DiscussionTopicForm({
                 placeholder={I18n.t('Select a group category')}
                 width={inputWidth}
                 disabled={!canGroupDiscussion}
+                inputRef={ref => {
+                  groupOptionsRef.current = ref
+                }}
               >
                 {groupCategories.map(({_id: id, name: label}) => (
                   <SimpleSelect.Option
@@ -1124,6 +1154,9 @@ export default function DiscussionTopicForm({
                 invalidDateTimeMessage={I18n.t('Invalid date and time')}
                 messages={availabilityValidationMessages}
                 layout="columns"
+                dateInputRef={ref => {
+                  dateInputRef.current = ref
+                }}
               />
             </FormFieldGroup>
           ))}
