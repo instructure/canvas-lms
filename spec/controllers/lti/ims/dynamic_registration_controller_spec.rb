@@ -67,6 +67,7 @@ describe Lti::IMS::DynamicRegistrationController do
         "jwks_uri" => "https://example.com/api/jwks",
         "token_endpoint_auth_method" => "private_key_jwt",
         "scope" => scopes.join(" "),
+        "logo_uri" => "https://example.com/logo.jpg",
         "https://purl.imsglobal.org/spec/lti-tool-configuration" => {
           "domain" => "example.com",
           "messages" => [{
@@ -117,6 +118,7 @@ describe Lti::IMS::DynamicRegistrationController do
             "grant_types" => registration_params["grant_types"],
             "initiate_login_uri" => registration_params["initiate_login_uri"],
             "redirect_uris" => registration_params["redirect_uris"],
+            "logo_uri" => registration_params["logo_uri"],
             "response_types" => registration_params["response_types"],
             "client_name" => registration_params["client_name"],
             "jwks_uri" => registration_params["jwks_uri"],
@@ -141,6 +143,7 @@ describe Lti::IMS::DynamicRegistrationController do
           expect(dk.redirect_uris).to eq(registration_params["redirect_uris"])
           expect(dk.public_jwk_url).to eq(registration_params["jwks_uri"])
           expect(dk.is_lti_key).to be(true)
+          expect(dk.icon_url).to eq("https://example.com/logo.jpg")
           expect(dk.oidc_initiation_url).to eq(registration_params["initiate_login_uri"])
         end
       end

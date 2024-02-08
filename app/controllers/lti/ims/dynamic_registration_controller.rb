@@ -133,7 +133,8 @@ module Lti
             public_jwk_url: registration_params["jwks_uri"],
             oidc_initiation_url: registration_params["initiate_login_uri"],
             is_lti_key: true,
-            scopes:
+            scopes:,
+            icon_url: registration_params["logo_uri"]
           )
           registration = Lti::IMS::Registration.new(
             developer_key:,
@@ -169,6 +170,7 @@ module Lti
           response_types: registration.response_types,
           client_name: registration.client_name,
           jwks_uri: registration.jwks_uri,
+          logo_uri: developer_key.icon_url,
           token_endpoint_auth_method: registration.token_endpoint_auth_method,
           scope: registration.scopes.join(" "),
           "https://purl.imsglobal.org/spec/lti-tool-configuration": registration.lti_tool_configuration.merge(
