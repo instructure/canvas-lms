@@ -76,12 +76,13 @@ const defaultExpandedReplies = id => {
 
 export const DiscussionThreadContainer = props => {
   const replyButtonRef = useRef()
+  const expansionButtonRef = useRef()
   const moreOptionsButtonRef = useRef()
 
   const {searchTerm, filter, allThreadsStatus, expandedThreads, setExpandedThreads} =
     useContext(SearchContext)
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
-  const {replyFromId, setReplyFromId} = useContext(DiscussionManagerUtilityContext)
+  const {replyFromId, setReplyFromId, usedThreadingToolbarChildRef} = useContext(DiscussionManagerUtilityContext)
   const [expandReplies, setExpandReplies] = useState(
     defaultExpandedReplies(props.discussionEntry._id)
   )
@@ -281,6 +282,7 @@ export const DiscussionThreadContainer = props => {
           setEditorExpanded(newEditorExpanded)
 
           if (splitScreenOn) {
+            usedThreadingToolbarChildRef.current = replyButtonRef.current
             props.onOpenSplitView(props.discussionEntry._id, true)
           }
         }}
@@ -307,6 +309,7 @@ export const DiscussionThreadContainer = props => {
   if (props.depth === 0 && props.discussionEntry.lastReply) {
     threadActions.push(
       <ThreadingToolbar.Expansion
+        expansionButtonRef={expansionButtonRef}
         key={`expand-${props.discussionEntry._id}`}
         delimiterKey={`expand-delimiter-${props.discussionEntry._id}`}
         authorName={getDisplayName(props.discussionEntry)}
@@ -318,6 +321,7 @@ export const DiscussionThreadContainer = props => {
         }
         onClick={() => {
           if (splitScreenOn) {
+            usedThreadingToolbarChildRef.current = expansionButtonRef.current
             props.onOpenSplitView(props.discussionEntry._id, false)
           } else {
             setExpandReplies(!expandReplies)
