@@ -600,6 +600,16 @@ class ContentExport < ActiveRecord::Base
     end
   end
 
+  def set_contains_new_quizzes_settings
+    settings[:contains_new_quizzes] = contains_new_quizzes?
+  end
+
+  def contains_new_quizzes?
+    return false unless new_quizzes_common_cartridge_enabled?
+
+    context.assignments.active.type_quiz_lti.count.positive?
+  end
+
   scope :active, -> { where("content_exports.workflow_state<>'deleted'") }
   scope :not_for_copy, -> { where.not(content_exports: { export_type: [COURSE_COPY, MASTER_COURSE_COPY] }) }
   scope :common_cartridge, -> { where(export_type: COMMON_CARTRIDGE) }
@@ -638,5 +648,9 @@ class ContentExport < ActiveRecord::Base
 
   def new_quizzes_bank_migration_enabled?
     context_type == "Course" && NewQuizzesFeaturesHelper.new_quizzes_bank_migrations_enabled?(context)
+  end
+
+  def new_quizzes_common_cartridge_enabled?
+    context_type == "Course" && NewQuizzesFeaturesHelper.new_quizzes_common_cartridge_enabled?(context)
   end
 end

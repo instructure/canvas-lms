@@ -56,4 +56,8 @@ module NewQuizzesFeaturesHelper
   def disable_content_rewriting?(context = @context)
     context.feature_enabled?(:quizzes_next) && Account.site_admin.feature_enabled?(:new_quizzes_migrate_without_content_rewrite)
   end
+
+  def new_quizzes_common_cartridge_enabled?(context = @context)
+    context.feature_enabled?(:quizzes_next) && Account.site_admin.feature_enabled?(:new_quizzes_common_cartridge)
+  end
 end

@@ -454,6 +454,83 @@ describe ContentExport do
     end
   end
 
+  describe "common_cartridge" do
+    before :once do
+      assignment_model(submission_types: "external_tool", course: @course)
+      tool = @c.context_external_tools.create!(
+        name: "Quizzes.Next",
+        consumer_key: "test_key",
+        shared_secret: "test_secret",
+        tool_id: "Quizzes 2",
+        url: "http://example.com/launch"
+      )
+      @a.external_tool_tag_attributes = { content: tool }
+      @a.save!
+
+      @course.root_account.settings[:provision] = { "lti" => "lti url" }
+      @course.root_account.save!
+      @ce = @course.content_exports.create!
+    end
+
+    context "with feature flags enabled" do
+      before do
+        allow(NewQuizzesFeaturesHelper).to receive(:new_quizzes_common_cartridge_enabled?).and_return(true)
+      end
+
+      it "should not have :contains_new_quizzes in the settings" do
+        expect(@ce.settings[:contains_new_quizzes]).to be_nil
+      end
+
+      context "when setting the contains_new_quizzes" do
+        before do
+          @ce.set_contains_new_quizzes_settings
+        end
+
+        context "when the course has New Quizzes assignments" do
+          it "the settings to contains_new_quizzes should be set to true" do
+            expect(@ce.settings[:contains_new_quizzes]).to be true
+          end
+        end
+
+        context "when the course does not have New Quizzes assignments" do
+          before do
+            @another_course = course_model
+            @ce = @another_course.content_exports.create!
+            @ce.set_contains_new_quizzes_settings
+          end
+
+          it "the settings to contains_new_quizzes should be set to false" do
+            expect(@ce.settings[:contains_new_quizzes]).to be false
+          end
+        end
+      end
+    end
+
+    context "with feature flags disabled" do
+      before do
+        @ce.set_contains_new_quizzes_settings
+      end
+
+      context "when the course has New Quizzes assignments" do
+        it "does not contain new quizzes in the export" do
+          expect(@ce.settings[:contains_new_quizzes]).to be false
+        end
+      end
+
+      context "when the course does not have New Quizzes assignments" do
+        before do
+          @another_course = course_model
+          @ce = @another_course.content_exports.create!
+          @ce.set_contains_new_quizzes_settings
+        end
+
+        it "should not contain a New Quiz in the export" do
+          expect(@ce.settings[:contains_new_quizzes]).to be false
+        end
+      end
+    end
+  end
+
   describe "#mark_waiting_for_external_tool" do
     let(:content_export) do
       create_content_export(export_type: ContentExport::COURSE_COPY, workflow_state: "created")
