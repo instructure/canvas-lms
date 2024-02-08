@@ -75,6 +75,7 @@ type Props = {
   visibleOptionsCount?: number
   messages?: FormMessage[]
   onUpdateHighlightedOption?: (id: string) => void
+  setInputRef?: (ref: HTMLInputElement | null) => void
 }
 
 function CanvasMultiSelect(props: Props) {
@@ -94,6 +95,7 @@ function CanvasMultiSelect(props: Props) {
     customOnRequestSelectOption,
     isLoading,
     onUpdateHighlightedOption,
+    setInputRef,
     ...otherProps
   } = props
 
@@ -103,6 +105,10 @@ function CanvasMultiSelect(props: Props) {
   const [announcement, setAnnouncement] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement | null>(null)
   const noOptionId = useRef(uniqueId(NO_OPTIONS_OPTION_ID))
+
+  if (inputRef && setInputRef) {
+    setInputRef(inputRef.current)
+  }
 
   const childProps: OptionProps[] = useMemo<
     {
