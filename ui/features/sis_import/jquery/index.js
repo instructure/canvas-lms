@@ -22,7 +22,7 @@ import htmlEscape, {raw} from '@instructure/html-escape'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.instructure_forms' /* formSubmit, formErrors */
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* showIf, disableIf */
-import 'jqueryui/progressbar'
+import 'jqueryui-unpatched/progressbar'
 
 const I18n = useI18nScope('sis_import')
 
