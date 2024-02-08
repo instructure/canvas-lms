@@ -2831,7 +2831,7 @@ CanvasRails::Application.routes.draw do
 
     # Security
     scope(controller: "security") do
-      get "security/jwks", action: :jwks, as: :jwks_show
+      get "security/jwks", action: :jwks, as: :lti_jwks
       get "security/openid-configuration", action: :openid_configuration, as: :openid_configuration
     end
 
