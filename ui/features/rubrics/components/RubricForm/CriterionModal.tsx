@@ -34,31 +34,31 @@ const I18n = useI18nScope('rubrics-criterion-modal')
 
 export const DEFAULT_RUBRIC_RATINGS: RubricRating[] = [
   {
-    id: '-1',
+    id: '',
     points: 4,
     description: I18n.t('Exceeds'),
     longDescription: '',
   },
   {
-    id: '-1',
+    id: '',
     points: 3,
     description: I18n.t('Mastery'),
     longDescription: '',
   },
   {
-    id: '-1',
+    id: '',
     points: 2,
     description: I18n.t('Near'),
     longDescription: '',
   },
   {
-    id: '-1',
+    id: '',
     points: 1,
     description: I18n.t('Below'),
     longDescription: '',
   },
   {
-    id: '-1',
+    id: '',
     points: 0,
     description: I18n.t('No Evidence'),
     longDescription: '',
@@ -110,8 +110,8 @@ export const CriterionModal = ({isOpen, onDismiss}: CriterionModalProps) => {
         <Heading>{I18n.t('Create New Criterion')}</Heading>
       </Modal.Header>
       <Modal.Body>
-        <View as="div" margin="x-small 0">
-          <View as="span" margin="0 small 0 0">
+        <View as="div" margin="0">
+          <View as="span" margin="0 small 0 0" themeOverride={{marginSmall: '1rem'}}>
             <TextInput
               renderLabel={I18n.t('Criterion Name')}
               placeholder={I18n.t('Enter the name')}
@@ -148,8 +148,10 @@ export const CriterionModal = ({isOpen, onDismiss}: CriterionModalProps) => {
                 {I18n.t('Rating Name')}
               </View>
             </Flex.Item>
-            <Flex.Item margin="0 0 0 small">
-              <View as="div">{I18n.t('Rating Description')}</View>
+            <Flex.Item>
+              <View as="div" margin="0 0 0 small" themeOverride={{marginSmall: '1rem'}}>
+                {I18n.t('Rating Description')}
+              </View>
             </Flex.Item>
           </Flex>
         </View>
@@ -239,7 +241,7 @@ const RatingRow = ({rating, scale, onRemove}: RatingRowProps) => {
         </View>
       </Flex.Item>
       <Flex.Item shouldGrow={true} shouldShrink={true}>
-        <View as="div" margin="0 small">
+        <View as="div" margin="0 small" themeOverride={{marginSmall: '1rem'}}>
           <TextInput
             renderLabel={<ScreenReaderContent>{I18n.t('Rating Description')}</ScreenReaderContent>}
             display="inline-block"

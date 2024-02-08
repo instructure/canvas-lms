@@ -16,12 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import type {RubricCriterion} from '@canvas/rubrics/react/types/rubric'
+
 export type RubricFormProps = {
   id?: string
   title: string
   hidePoints: boolean
   accountId?: string
   courseId?: string
+  criteria: RubricCriterion[]
+  pointsPossible: number
 }
 
 export type RubricFormValueTypes = string | boolean

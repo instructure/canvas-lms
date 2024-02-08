@@ -50,6 +50,8 @@ const {Option: SimpleSelectOption} = SimpleSelect
 const defaultRubricForm: RubricFormProps = {
   title: '',
   hidePoints: false,
+  criteria: [],
+  pointsPossible: 0,
 }
 
 const translateRubricData = (fields: RubricQueryResponse): RubricFormProps => {
@@ -57,6 +59,8 @@ const translateRubricData = (fields: RubricQueryResponse): RubricFormProps => {
     id: fields.id,
     title: fields.title ?? '',
     hidePoints: fields.hidePoints ?? false,
+    criteria: fields.criteria ?? [],
+    pointsPossible: fields.pointsPossible ?? 0,
   }
 }
 
@@ -194,7 +198,7 @@ export const RubricForm = () => {
           </Flex.Item>
           <Flex.Item>
             <Text weight="bold" size="xx-large" themeOverride={{fontWeightBold: 400}}>
-              10
+              {rubricForm.pointsPossible}
             </Text>
             <View as="span" margin="0 0 0 small">
               <Text weight="light" size="x-large">
@@ -213,9 +217,11 @@ export const RubricForm = () => {
           overflowX="hidden"
           as="main"
         >
-          <RubricCriteriaRow />
+          {rubricForm.criteria.map((criterion, index) => (
+            <RubricCriteriaRow key={criterion.id} criterion={criterion} rowIndex={index + 1} />
+          ))}
 
-          <NewCriteriaRow />
+          <NewCriteriaRow rowIndex={rubricForm.criteria.length + 1} />
         </Flex.Item>
       </Flex>
 
