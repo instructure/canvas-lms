@@ -274,6 +274,26 @@ describe "reply attachment" do
       expect(attachment_link.attribute("href")).to include("/courses/#{@course.id}")
     end
 
+    it "replies to a graded discussion with attachment regardless of quota limit while being a teacher" do
+      discussion_assignment = @course.assignments.create!(name: "graded discussion")
+      graded_discussion_topic = @course.discussion_topics.create!(title: "graded discussion", assignment: discussion_assignment)
+
+      Setting.set("user_default_quota", -1)
+      file_attachment = "graded.png"
+      entry_text = "new entry"
+
+      user_session(@teacher)
+      Discussion.visit(@course, graded_discussion_topic)
+
+      add_a_reply_react(entry_text, file_attachment)
+      entry = DiscussionEntry.last
+      expect(entry.attachment.folder.full_name).to include("/Submissions/#{@course.name}")
+
+      attachment_link = fj("a:contains('graded')")
+      expect(attachment_link).to be_truthy
+      expect(attachment_link.attribute("href")).to include("/courses/#{@course.id}")
+    end
+
     it "can view and delete legacy reply attachments" do
       entry = @topic.discussion_entries.create!(
         user: @student,
