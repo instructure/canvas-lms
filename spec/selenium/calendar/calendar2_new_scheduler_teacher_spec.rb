@@ -146,6 +146,24 @@ describe "scheduler" do
       expect(allow_observer_signup_checkbox).not_to be_displayed
     end
 
+    it "lets teachers edit appointment groups even if a context is concluded", :ignore_js_errors do
+      course1 = @course
+      course2 = course_factory(active_all: true, name: "Course 2")
+      teacher_in_course(course: course2, user: @user, active_all: true)
+      create_appointment_group(contexts: [course1, course2])
+      course1.conclude_at = 1.week.ago
+      course1.restrict_enrollments_to_course_dates = true
+      course1.save!
+      ag = AppointmentGroup.last
+
+      get "/appointment_groups/#{ag.id}/edit"
+      wait_for_ajaximations
+      location = "office"
+      location_input.send_keys(location)
+      click_save_button
+      expect(ag.reload.location_name).to eq(location)
+    end
+
     context "Message Students" do
       it "sends individual messages to students who have not signed up", :ignore_js_errors do
         create_appointment_group(contexts: [@course])

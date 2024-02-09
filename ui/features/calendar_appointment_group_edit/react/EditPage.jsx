@@ -174,7 +174,7 @@ class EditPage extends React.Component {
     [...this.state.selectedContexts].every(
       context_code =>
         this.state.contexts.find(c => c.asset_string === context_code)
-          .allow_observers_in_appointment_groups
+          ?.allow_observers_in_appointment_groups
     )
 
   deleteGroup = () => {

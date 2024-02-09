@@ -31,6 +31,14 @@ module SchedulerPage
     'button:contains("Send")'
   end
 
+  def save_button_selector
+    '.EditPage__Header button:contains("Save")'
+  end
+
+  def location_input_selector
+    'input[name="location"]'
+  end
+
   #------------------------- Elements ---------------------------
   def message_students_button
     fj(message_students_button_selector)
@@ -44,6 +52,14 @@ module SchedulerPage
     fj(send_message_button_selector)
   end
 
+  def save_button
+    fj(save_button_selector)
+  end
+
+  def location_input
+    f(location_input_selector)
+  end
+
   #----------------------- Actions/Methods ----------------------
   def click_message_students_button
     message_students_button.click
@@ -51,5 +67,9 @@ module SchedulerPage
 
   def click_send_message_button
     send_message_button.click
+  end
+
+  def click_save_button
+    save_button.click
   end
 end
