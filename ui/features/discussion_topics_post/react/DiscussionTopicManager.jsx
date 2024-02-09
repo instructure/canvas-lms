@@ -122,6 +122,8 @@ const DiscussionTopicManager = props => {
     usedThreadingToolbarChildRef,
   }
 
+  const isModuleItem = ENV.SEQUENCE != null
+
   // Unread filter
   // This introduces a double query for DISCUSSION_QUERY when filter changes
   useEffect(() => {
@@ -317,7 +319,7 @@ const DiscussionTopicManager = props => {
                   <View
                     display="block"
                     padding="medium medium 0 small"
-                    height={isSplitScreenViewOpen ? '100vh' : '100%'}
+                    height={isModuleItem ? '85vh' : '90vh'}
                   >
                     <DiscussionTopicToolbarContainer
                       discussionTopic={discussionTopicQuery.data.legacyNode}
