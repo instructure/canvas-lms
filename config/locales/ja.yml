@@ -660,7 +660,7 @@ ja:
     report_header_id: ID
     report_header_integration_id: integration_id
     report_header_last_access_at: 最終アクセス日時
-    report_header_last_activity_at: 直近活動日
+    report_header_last_activity_at: 最終ログイン日時
     report_header_last_ip: "前回の IP"
     report_header_last_name: last_name
     report_header_learning_outcome_id: "学習アウトカム ID"
@@ -2677,7 +2677,7 @@ ja:
   allow_bb7ce9b1: 許可
   allow_blueprint_publishing_after_association_fae6ba95: 関連付け実行後に青写真の公開を許可する
   allow_bulk_grade_export_to_sis_e11a6e66: "SIS へ一括で成績のエクスポートができます"
-  allow_comments_a1f45d8: コメントを許可
+  allow_comments_a1f45d8: コメントを許可する
   allow_comments_for_title_7ac9e00: "%{title} のコメントを許可する"
   allow_conference_selection_lti_placement_c020ad8d: 会議選択LTI配置を許可する
   allow_course_content_to_be_downloaded_and_viewed_o_48a0d252: コースのコンテンツをオフラインでダウンロードおよび表示できるようにする
@@ -3419,8 +3419,8 @@ ja:
   allows_user_to_view_the_people_link_in_course_navi_58b38f5d: ユーザーがコースナビゲーションにディスカッションリンクを表示できるようにします。
   allows_user_to_view_the_previous_sis_import_dates__1716ddb5: ユーザーが以前のSISのインポートの日付、エラー、およびインポートされた項目を表示できるようにします。
   allows_user_to_view_the_prior_enrollments_button_i_b04b8132: ユーザーがコースの人物のページで以前の登録ボタンを表示できるようにします。
-  allows_user_to_view_the_publish_button_in_a_course_c18d0360: "ユーザーが未公開のコースのコースカードの[公開]ボタンを表示できるようにします（カードビューダッシュボード）。"
-  allows_user_to_view_the_publish_course_and_unpubli_55fcd20: "ユーザーがコースのホームページで[コースの公開]ボタンと[コースの非公開]ボタンを表示できるようにします。ユーザーが未公開のコースのコースカードの[公開]ボタンを表示できるようにします（カードビューダッシュボード）。"
+  allows_user_to_view_the_publish_button_in_a_course_c18d0360: "ユーザーが非公開のコースのコースカードの[公開]ボタンを表示できるようにします（カードビューダッシュボード）。"
+  allows_user_to_view_the_publish_course_and_unpubli_55fcd20: "ユーザーがコースのホームページで[コースの公開]ボタンと[コースの非公開]ボタンを表示できるようにします。ユーザーが非公開のコースのコースカードの[公開]ボタンを表示できるようにします（カードビューダッシュボード）。"
   allows_user_to_view_the_publish_course_and_unpubli_aac98465: "ユーザーがコースのホームページで[コースの公開]ボタンと[コースの非公開]ボタンを表示できるようにします。"
   allows_user_to_view_the_reset_course_content_butto_75c8c410: "ユーザーが[コースコンテンツのリセット]ボタンを表示できるようにします。"
   allows_user_to_view_the_rubrics_link_in_course_nav_41052c80: ユーザーがコースナビゲーションにルーブリックリンクを表示できるようにします。
@@ -3759,9 +3759,9 @@ ja:
   announcements_from_the_past_four_months_cefbc99c: 過去4カ月の通知
   announcements_list_c75fc413: "アナウンスメント リスト"
   announcements_loaded_e9335d5f: アナウンスメントが読み込まれました！
-  announcements_locked_successfully_43d58107: アナウンスメントを正常にロックしました
+  announcements_locked_successfully_43d58107: コメントを正常にロックしました
   announcements_tutorial_tray_994287d6: お知らせチュートリアルトレイ
-  announcements_unlocked_successfully_1432da9d: アナウンスメントを正常にロック解除しました
+  announcements_unlocked_successfully_1432da9d: コメントを正常にロック解除しました
   announcements_view_1019d00d: "アナウンスメント - 表示"
   announcment_itemtitle_c0fe1c06: "発表、%{itemTitle}"
   anonymize_all_annotations_made_by_instructors_on_s_4f2b70a5: この課題のためにインストラクターが提出したすべての注釈を匿名にするSpeedGrader
@@ -3830,7 +3830,7 @@ ja:
   any_sub_account_ec7069f2: いずれかのサブアカウント
   any_term_d49af19f: いずれかの語
   anyone_with_a_direct_link_private_b3bc9661: 直接リンクを持っている人全員（プライベート）
-  anyone_with_the_url_9d7e5e07: URLのある全員
+  anyone_with_the_url_9d7e5e07: URLを知っているすべてのユーザーにする
   api_7bd66e19: API
   api_host_ddaf400e: "API ホスト:"
   api_key_eeeb2167: "API 鍵"
@@ -4420,7 +4420,7 @@ ja:
       buttons: 
         save_and_publish: 保存して公開
       cancel: キャンセル
-      differentiated_due_dates: 分化期日
+      differentiated_due_dates: 一つの期日
       discussion_type: ディスカッション
       external_tool_type: 外部ツール
       more: その他のオプション
@@ -4431,11 +4431,11 @@ ja:
       saving: 保存しています...
     create_group: 
       cancel: キャンセル
-      drop_highest: "最高スコア:"
-      drop_lowest: "最低スコア:"
+      drop_highest: "スコア上位:"
+      drop_lowest: "スコア下位:"
       example_group_name: "例: 小論文グループ 1"
       group_name: "グループ名:"
-      never_drop: "決して下げない:"
+      never_drop: "対象外:"
       percent_of_total: "% (総合評定中)"
       save: 保存
       saving: 保存しています...
@@ -5294,7 +5294,7 @@ ja:
   availability_8942cde6: 利用可能性
   availability_dates_438d71e0: 利用可能な日付
   availability_dates_changed_exceptions_465ba375: 可用性日付が変更された例外：
-  availability_e415e857: 利用可能性：
+  availability_e415e857: 公開設定：
   available_2ed9f226: ご用意している種類：
   available_8606e40c: 使用可能
   available_after_3416802b: （）後に利用可能
@@ -5304,13 +5304,13 @@ ja:
   available_date_must_be_before_the_due_date_cbab390b: 「利用可能日」を「締切日」より前にすることはできません
   available_date_must_be_before_the_until_date_9ccc52b: 「利用可能日」は、「終了日」の日付の前でなければなりません
   available_folders_694d0436: 使用可能なフォルダ
-  available_from_587ce92f: 次から使用可能
+  available_from_587ce92f: 開始日時
   available_from_availabledate_b8cb93ef: "%{availableDate}から利用可能"
   available_from_availabledate_until_untildate_f27b70aa: "%{availableDate}から%{untilDate}まで利用可能"
   available_from_date_43b5e11d: 利用可能期間の開始日付
   available_from_date_afc594fa: "日付から利用可能:"
   available_from_date_must_precede_available_until_c9f9e533: 「この日から利用可能」日は、「この日まで利用可能」日の前でなければなりません
-  available_from_f84e4611: 次から使用可能
+  available_from_f84e4611: 開始日時
   available_from_field_for_styleguide_7ced3861: スタイルガイドの欄から使用できます
   available_from_format_like_yyyy_mm_dd_hh_mm_8b726122: "次の日付けから- このような形式で YYYY-MM-DD hh:mm"
   available_pronouns_b45330b1: 利用できる代名詞
@@ -5320,11 +5320,11 @@ ja:
   available_until_date_2c0ccec3: "日付まで利用可能:"
   available_until_date_cd125c62: 利用可能期間の終了日付
   available_until_date_d2fe6cb1: "次の日付まで利用可能%{date}"
-  available_until_f3b9c4ed: まで利用可能
+  available_until_f3b9c4ed: 終了日時
   available_until_field_for_styleguide_85d5d65a: スタイルガイドの欄の使用期限は
   available_until_format_like_yyyy_mm_dd_hh_mm_622378d6: "次の日付けまで- このような形式で YYYY-MM-DD hh:mm"
-  available_until_lock_at_ab022445: "%{lock_at} まで利用可能"
-  available_until_untildate_b926fe11: "%{untilDate}まで利用可能"
+  available_until_lock_at_ab022445: "%{lock_at} 終了日時"
+  available_until_untildate_b926fe11: "%{untilDate}終了日時"
   availableslots_available_87b8b69d: "%{availableSlots} 使用可能"
   availableslots_more_available_be5193a8: "%{availableSlots} さらに利用可能"
   avatar_8a8aa935: アバター
@@ -5701,8 +5701,8 @@ ja:
     show_all_artifacts: すべての成果物を表示
     submit: 送信
     unmasquerade: マスカレードを停止
-    unpublish: 未公開
-    unpublished: 未公開
+    unpublish: 非公開
+    unpublished: 非公開
     update: 更新
     view_account_roster: アカウント名簿の表示
     view_course_roster: コース名簿の表示
@@ -6222,9 +6222,9 @@ ja:
   can_t_delete_alignments_based_on_rubric_associatio_d9fd10a3: 注釈への関連付けに基づいたアライメントは削除できません。これらの関連付けを削除するには、そのアセットの注釈から当該行を削除する必要があります
   can_t_enable_anonymous_grading_and_group_assignmen_9938416e: 匿名の採点とグループ課題を一緒に使用することはできません
   can_t_perform_diffing_against_more_than_one_file_o_44475c0d: 同じタイプの複数のファイルに対する差分の実行はできません。
-  can_t_unpublish_if_there_are_student_submissions_2d7cd742: 受講者の提出物がある場合は、未公開にできません
-  can_t_unpublish_item_name_if_there_are_student_sub_b83c7a9f: "受講者の提出物がある場合は、%{item_name} を未公開にできません"
-  can_t_unpublish_name_if_there_are_student_submissi_8ab8086c: "受講者の提出物がある場合は、%{name}を未公開にできません"
+  can_t_unpublish_if_there_are_student_submissions_2d7cd742: 受講者の提出物がある場合は、非公開にできません
+  can_t_unpublish_item_name_if_there_are_student_sub_b83c7a9f: "受講者の提出物がある場合は、%{item_name} を非公開にできません"
+  can_t_unpublish_name_if_there_are_student_submissi_8ab8086c: "受講者の提出物がある場合は、%{name}を非公開にできません"
   can_update_external_tools_168c1abe: 外部ツールを更新できます。
   can_update_public_jwk_for_lti_services_26037129: "LTI サービスのパブリック jwk を更新できます。"
   can_update_subscription_to_data_service_data_374a0c89: データサービスデータへのサブスクリプションを更新できます。
@@ -6339,7 +6339,7 @@ ja:
   canvas_alert_late_anonymous_submission_assignment__bf9a6452: "Canvas アラート - 匿名提出の遅れ：%{assignment_name}"
   canvas_alert_late_submission_user_name_assignment__ee1301ac: "Canvas アラート - 提出の遅れ：%{user_name}, %{assignment_name}"
   canvas_alert_resubmission_user_name_assignment_tit_ed70e703: "Canvas アラート - 再提出：%{user_name}, %{assignment_title}"
-  canvas_alert_students_are_attempting_to_access_unp_be207cdc: "Canvas アラート - %{bad_link}内の未公開のコンテンツ%{asset_link}にアクセスしようとしています。"
+  canvas_alert_students_are_attempting_to_access_unp_be207cdc: "Canvas アラート - %{bad_link}内の非公開のコンテンツ%{asset_link}にアクセスしようとしています。"
   canvas_alert_students_are_clicking_on_bad_link_to__d5e1e282: "Canvas アラート - 受講者は、%{bad_link}で%{asset_link}.で削除されたコンテンツをクリックしています。"
   canvas_alert_submission_user_name_assignment_title_4503ccf: "Canvas アラート - 提出：%{user_name}, %{assignment_title}"
   canvas_attribute_eaa7e31a: "Canvas 属性"
@@ -6710,7 +6710,7 @@ ja:
   close_the_window_and_try_again_7353f8e: ウィンドウを閉じてから、再度お試しください。
   close_total_grade_override_tray_d3b1d190: 評定上書きトレイを閉じる
   close_warning_d61daf2c: 警告を閉じる
-  closed_for_comments_e395b42f: コメントを閉じました
+  closed_for_comments_e395b42f: コメントを閉じたディスカッション
   closes_5c6b4367: 閉じる：
   cluster_cluster_b57fe99a: "クラスタ：%{cluster}"
   cluster_f407976: クラスタ
@@ -7347,7 +7347,7 @@ ja:
   content_for_section_1_7ecfb319: セクション1のコンテンツ
   content_for_section_2_e7c6e2a3: セクション2のコンテンツ
   content_for_section_3_90c1d235: セクション3のコンテンツ
-  content_import_files_cannot_be_downloaded_after_en_7e3a2099: "コンテンツのインスポートファイルは %{ENV.CONTENT_MIGRATIONS_EXPIRE_DA}日後にはダウンロードできません。"
+  content_import_files_cannot_be_downloaded_after_en_7e3a2099: "コンテンツのインポートファイルは %{ENV.CONTENT_MIGRATIONS_EXPIRE_DA}日後にはダウンロードできません。"
   content_imports: 
     errors: 
       import_failed: "移行のためのインポート中にエラーが発生しました。システム管理者に連絡の上、次のコードを知らせてください: \"%{code}\""
@@ -8206,7 +8206,7 @@ ja:
   correct_answer_comments_34ca671f: 正解コメント
   correct_answers_are_available_until_date_df01cc5f: "正解は %{date} まで利用可能です。"
   correct_answers_are_hidden_5d0a0009: 正解は非表示になっています。
-  correct_answers_are_no_longer_available_c67dfc28: 正解はもう利用できません。
+  correct_answers_are_no_longer_available_c67dfc28: 正解は表示できません。
   correct_answers_will_be_available_from_to_5762e8c6: "正解は %{from} ～ %{to} に利用可能になります。"
   correct_answers_will_be_available_on_date_48137: "正解は %{date} に利用可能になります。"
   correct_check_icon_617da6c3: チェックアイコンを訂正
@@ -8527,7 +8527,7 @@ ja:
   count_type_would_be_deleted_and_exceeds_the_set_th_19dc538d: "%{count} %{type} 項目は削除され、既定の閾値を超えています%{change_threshold}%"
   count_unpublished_changes_a366ed45: 
     one: "%{count}の未公開の変更"
-    other: "%{count}の未公開の変更"
+    other: "%{count}の非公開の変更"
   count_unread_cff5855: "%{count}の未読"
   count_unread_messages_99d6bf17: 
     one: "%{count}の未読メッセージ"
@@ -8567,10 +8567,10 @@ ja:
       other: "%{count} 個のコースが処理されました"
     course: コース
     course_format: 
-      blended: ブレンドされた
+      blended: ブレンド型授業
       not_set: 設定されていません
-      on_campus: キャンパス内
-      online: オンライン
+      on_campus: 対面授業
+      online: オンライン授業
     course_not_found: コースが見つかりませんでした
     csv: 
       comments: コメント
@@ -9132,7 +9132,7 @@ ja:
       create_failed: コースの作成に失敗しました
       role_not_active: "アクティブではないロールにはユーザを追加できません: '%{role}'"
       role_not_found: ロールが見つかりませんでした
-      unpublish: 受講者の提出物が存在する場合は、コースを未公開にできません。
+      unpublish: 受講者の提出物が存在する場合は、コースを非公開にできません。
     group_list: 
       headings: 
         groups: "コース グループ"
@@ -9225,7 +9225,7 @@ ja:
         validating: 検証中...
         will_not_be_added: これらのユーザにはエラーがあるため、追加できません。正しい形式であることを確認してください。
       edit_sections_view: 
-        edit_sections_desc: "セクションはユーザの編成手段の 1 つです。セクションを利用するとで、1 つのコースで複数のクラスを教えることができ、コースの内容を 1 箇所にまとめることができます。以下では、ユーザを別のセクションに移動したり、セクションの登録を追加/削除できます。ユーザは常に 1 つ以上のセクションに含まれる必要があります。"
+        edit_sections_desc: "セクションはユーザの編成手段の 1 つです。セクションを利用することで、1 つのコースで複数のクラスを教えることができ、コースの内容を 1 箇所にまとめることができます。ここでは、ユーザを別のセクションに移動したり、セクションのを追加/削除できます。ユーザは常に 1 つ以上のセクションに含まれる必要があります。"
       index: 
         cannot_add_users: このコースは完了しているため、新しいユーザを追加できません
         filter_field_description: メンバーの検索。フィールドに入力すると、メンバーのリストが自動的にフィルタリングされて、入力内容に一致する名前のメンバーのみが表示されます。
@@ -9264,14 +9264,14 @@ ja:
         pending_acceptance_of_invitation: 保留
       roster_users: 
         canvas_user_id: "Canvas ユーザ ID"
-        last_activity: 直近活動日
+        last_activity: 最終ログイン日時
         login_name: "ログイン ID"
         login_name_or_sis_id: "ログイン/SIS ID"
         name: 名前
         no_people_found: メンバーが見つかりません
         role: ロール
         section: セクション
-        total_activity: 全活動時間
+        total_activity: ログイン合計時間
         you_can_search_by: "次の条件で検索:"
       section: 
         remove_user_from_course_section: "%{name} からユーザを削除"
@@ -9345,7 +9345,7 @@ ja:
         course_paces: コースペーシング
         course_section_name: 新しいセクションの追加
         course_status_published: コースは公開されています
-        course_status_unpublished: コースは未公開です
+        course_status_unpublished: コースは非公開です
         course_template: コーステンプレート
         course_visibility: 可視性
         custom_course_visibility: カスタマイズ
@@ -9429,7 +9429,7 @@ ja:
       titles: 
         edit_navigation: "コース ナビゲーションの編集"
       tooltips: 
-        cannot_unpublish_course: 採点済みの受講者の提出物がある場合は、このコースを未公開にできません
+        cannot_unpublish_course: 採点済みの受講者の提出物がある場合は、このコースを非公開にできません
       transifex_message: "[Canvas 翻訳コミュニティ](%{transifex_url}) に参加"
       turnitin: "これらのコメントは、Turnitin が使用可能になっている課題を受講者が提出する際に表示されます"
       view_grading_scheme: 採点スキームを表示します
@@ -10202,7 +10202,7 @@ ja:
   define_text_to_go_before_and_after_the_dropdown_an_be8d16e2: ドロップダウンの前後に入るテキストを定義し、考えられる答えのセットを組み立ててください。
   delay_posting_f45eed7d: 転記遅延
   delay_posting_this_topic_until_aa483eec: このトピックの投稿を先送り
-  delayed_until_58b7af4b: まで遅れる：
+  delayed_until_58b7af4b: 投稿予定日時：
   delete_8d6d2222: 削除：
   delete_a143a2ab: 削除
   delete_a6efa79d: 削除
@@ -10610,7 +10610,7 @@ ja:
   disabling_this_permission_will_override_if_enabled_9c4fa650: |-
       この権限を無効にすると、ルーブリック - 追加/編集/削除の権限が無効になり（有効な場合）、個々の課題からのルーブリックの作成や編集を禁止します。
       ただし、学習成果 - 追加/編集/削除が有効になっている場合でも、ユーザーは成果（ルーブリックの管理ボタン）を介してルーブリックを追加できます。
-  disallow_comments_6d04b47a: コメントを却下する
+  disallow_comments_6d04b47a: コメントを許可しない
   disallow_comments_for_title_21f9c653: "%{title} へのコメント許可を取り消す"
   disallow_replies_for_title_ca3806b2: "（）への返信を却下する%{title}"
   discard_changes_e04b15f9: 変更をなしにする
@@ -10682,7 +10682,7 @@ ja:
       until: 利用終了日時
     assignment_todo: 
       todo_date: "タスク日付：%{date}"
-    cannot_unpublish_with_replies: 受講者の返信がある場合は未公開にできません
+    cannot_unpublish_with_replies: 受講者の返信がある場合は非公開にできません
     confirm_delete_announcement: 
       one: "この %{count} 個のアナウンスを削除してもよろしいですか?"
       other: "この %{count} 個のアナウンスを削除してもよろしいですか?"
@@ -10825,7 +10825,7 @@ ja:
     points_possible_number: 配点は数値で入力してください
     published_button: 
       buttons: 
-        not_published: 未公開
+        not_published: 非公開
         published: 公開済み
     reply_count_tooltip: 
       one: "1 件の返信があります。"
@@ -10866,10 +10866,10 @@ ja:
       show_rubric: ルーブリックの表示
       speed_grader: SpeedGrader™
       tooltips: 
-        cannot_unpublish_discussion: 受講者の返信がある場合は未公開にできません
+        cannot_unpublish_discussion: 受講者の返信がある場合は非公開にできません
       topic: トピック
       topic_podcast_feed_link: "トピックのポッドキャスト フィード"
-      topic_subscribe: 定期購読
+      topic_subscribe: 常に通知
       topic_subscribe_tooltip: 購読が中止されました。新しいコメントの通知は行われません
       topic_subscribed_tooltip: 購読されました。新しいコメントが通知されます
       topic_time_locked: "このトピックは %{time} までロックされています"
@@ -11423,7 +11423,7 @@ ja:
   edited_editedtimingdisplay_85d8f1db: "%{editedTimingDisplay}を編集"
   edited_editedtimingdisplay_8788890e: "、%{editedTimingDisplay}を編集した"
   editing_an_announcement_will_create_a_notification_cbb5377a: アナウンスを編集すると、ユーザーダッシュボードとコースアクティビティストリームに通知が作成されます。ユーザーが編集したアナウンスを通知設定で受信したい場合、新しいアナウンスを作成する必要があります。
-  editing_permissions_for_name_3503e235: "編集権限: %{name}"
+  editing_permissions_for_name_3503e235: "%{name}を編集する"
   editor: 
     alt_text: "代替テキスト:"
     button: 
@@ -12904,7 +12904,7 @@ ja:
     hidden_status: 非表示です。リンクで利用できます
     published_status: 公開済み
     restricted_status: "%{from_date} から %{until_date} まで利用できます"
-    unpublished_status: 未公開
+    unpublished_status: 非公開
   file_storage_32477f6: "ファイル ストレージ"
   file_tree_collapsed_d4b0ae96: ファイルツリーが折りたたまれている
   file_tree_expanded_a1d20c4a: ファイルツリーが展開されている
@@ -13923,7 +13923,7 @@ ja:
         save: 保存
         save_settings: 設定の保存
         submit_comment: コメントの提出
-      comment_submitted: コメントが提出されました。
+      comment_submitted: コメントが送信されました。
       crocodoc_pending: "Crocodoc はこの文書を処理中です。"
       gradebook: 
         mute_assignment: 課題をミュートにする
@@ -13933,7 +13933,7 @@ ja:
         assessment: アセスメント
         grading: 採点
         no_group_submission: このグループは、この課題に対する提出物を持っていません
-        no_submission: この受講者は、この課題に対する提出物を持っていません
+        no_submission: この受講者は、まだ提出していません
         submission: この受講者は課題を提出しました
       icons: 
         delete_comment: コメントの削除
@@ -14994,7 +14994,7 @@ ja:
   hide_courses_menu_1b8ca649: コースメニューを非表示にする
   hide_courses_navigation_menu_6f7c4cfd: コースナビゲーションメニューを非表示にする
   hide_courses_without_enrollments_6df4dfad: 登録者のいないコースを非表示にする
-  hide_courses_without_students_fc6fc7a0: 受講者徒のいないコースを非表示にする
+  hide_courses_without_students_fc6fc7a0: 受講者のいないコースを非表示にする
   hide_details_df9ef4a2: 詳細を非表示にする
   hide_e057ff36: 非表示にする
   hide_from_everyone_9fc3e6d0: 全員に非表示にする
@@ -15113,10 +15113,10 @@ ja:
   how_do_i_move_or_reorder_a_module_e64a4baa: モジュールは、どのように移動、または順番変更すればよいですか？
   how_do_i_mute_and_unmute_all_participants_a7a2115b: すべての参加者をミュートおよびミュート解除するにはどうすればよいですか？
   how_do_i_post_grades_for_an_assignment_in_the_grad_bc01018e: 評定表に課題の評定を掲示するにはどうすればよいですか？
-  how_do_i_publish_or_unpublish_a_discussion_as_an_i_4055a43e: 考察を講師として公開、または未公開にするにはどうすればよいですか？
-  how_do_i_publish_or_unpublish_a_module_as_an_instr_6e1758d7: モジュールを講師として公開、または未公開にするにはどうすればよいですか？
-  how_do_i_publish_or_unpublish_a_page_as_an_instruc_5721ea3: ページを講師として公開、または未公開にするにはどうすればよいですか？
-  how_do_i_publish_or_unpublish_an_assignment_as_an__616f465: 課題を講師として公開、または未公開にするにはどうすればよいですか？
+  how_do_i_publish_or_unpublish_a_discussion_as_an_i_4055a43e: 考察を講師として公開、または非公開にするにはどうすればよいですか？
+  how_do_i_publish_or_unpublish_a_module_as_an_instr_6e1758d7: モジュールを講師として公開、または非公開にするにはどうすればよいですか？
+  how_do_i_publish_or_unpublish_a_page_as_an_instruc_5721ea3: ページを講師として公開、または非公開にするにはどうすればよいですか？
+  how_do_i_publish_or_unpublish_an_assignment_as_an__616f465: 課題を講師として公開、または非公開にするにはどうすればよいですか？
   how_do_i_record_a_conference_e4845e7: 会議を録画するにはどうすればよいですか？
   how_do_i_record_a_meeting_ae3a0d4e: 会議を記録するにはどうすればよいですか？
   how_do_i_reply_to_a_discussion_as_an_instructor_399fdaff: 考察に講師として返答するにはどうすればよいですか？
@@ -15524,7 +15524,7 @@ ja:
   if_you_change_an_assignment_s_points_possible_you__25a0edad: 課題の配点を変更する場合は、課題を再評価する必要があります。
   if_you_change_an_assignment_s_points_possible_you__dba531cb: 課題の配点を変更する場合は、すべての提出物を再評価する必要があります。
   if_you_configure_settings_that_cause_you_to_not_be_13d4cbbf: "ログインができない原因となる設定を設定した場合、%{url}で通常のCanvasログインに直接アクセスすることができます。"
-  if_you_do_not_select_usage_rights_now_this_file_wi_40c42125: 今すぐ使用権を選択しない場合、このファイルはアップロード後に未公開になります。
+  if_you_do_not_select_usage_rights_now_this_file_wi_40c42125: 今すぐ使用権を選択しない場合、このファイルはアップロード後に非公開になります。
   if_you_enable_this_feature_be_sure_that_your_sales_566967e6: この機能を有効にした場合、セールスフォースアカウントに、表の左の欄の中の名前と共にこれらのカスタムフィールドがきちんと追加されていることを確認してください。
   if_you_have_a_canvas_account_with_a_specific_insti_daa9696e: "特定の教育機関の%{canvas}アカウントをお持ちの方は、お手伝いできます。"
   if_you_have_a_moment_click_here_to_tell_us_what_ha_d8b578d5: ちょっとお時間があれば、*ここをクリックして何が起こったのか教えてください*。
@@ -15737,9 +15737,9 @@ ja:
   include_the_datadog_rum_js_agent_in_the_document_h_dab3570d: "ドキュメントの HEAD に Datadog RUM JS エージェントを含めます。"
   include_this_assignment_s_grades_when_posting_to_y_6bff3323: 学校の受講生情報システムに投稿する際にこの課題の成績を含める
   include_this_assignment_s_grades_when_syncing_to_y_55bfa487: あなたの学校の受講者情報システムと同期するとき、にこの課題の評定を含める
-  include_unpublished_assignments_83ebbaec: 未公開の課題を含む
-  include_unpublished_courses_2fde6389: 未公開のコースを含む
-  include_unpublished_courses_7a0e7aab: 未公開のコースを含む
+  include_unpublished_assignments_83ebbaec: 非公開の課題を含む
+  include_unpublished_courses_2fde6389: 非公開のコースを含む
+  include_unpublished_courses_7a0e7aab: 非公開のコースを含む
   include_unsubmitted_and_deleted_submissions_101225c7: 未提出および削除済みの提出物を含む
   include_unsubmitted_deleted_submissions_99fc2aad: 未提出&削除済みの提出物を含む
   include_users_with_no_enrollments_2a888dac: 登録されていないユーザーを含める
@@ -16338,7 +16338,7 @@ ja:
   large_balsamiq_font_5fe45fae: "Large Balsamiqフォント"
   large_course_db3d58b: "大コース:"
   last_7_days_bd411f1f: 過去7日
-  last_activity_a983e541: 直近活動日
+  last_activity_a983e541: 最終ログイン日時
   last_ae273283: 最終
   last_assessment_cd5659b6: "最終アセスメント： "
   last_attempt_7258ebd7: 最終試行
@@ -18022,7 +18022,7 @@ ja:
             詳細は %{website} をご覧ください
       summary: 
         subject: "成績とコメントがリリースされました:  %{title}、%{course}"
-    assignment_unpublished_module: この課題は未公開モジュールの一部で、まだ使用できません。
+    assignment_unpublished_module: この課題は非公開モジュールの一部で、まだ使用できません。
     blueprint_content_added: 
       email: 
         body: "青写真コースの変更は、%{name}に同期されています。"
@@ -18156,7 +18156,7 @@ ja:
     content_locked_module: "このコンテンツはモジュール *%{module}* の一部で、まだロックが解除されていません。"
     content_locked_until: "%{date} まで、このコンテンツはロックされています。"
     content_module_time_locked: "このコンテンツはモジュール *%{module}* の一部です。%{time} までロックされています。"
-    content_unpublished_module: このコンテンツは未公開モジュールの一部で、まだ使用できません。
+    content_unpublished_module: このコンテンツは非公開モジュールの一部で、まだ使用できません。
     conversation_created: 
       email: 
         attached_files: "添付ファイル:"
@@ -18510,7 +18510,7 @@ ja:
     file_locked_module: "このファイルはモジュール *%{module}* の一部で、まだロックが解除されていません。"
     file_locked_until: "%{date} まで、このファイルはロックされています。"
     file_module_time_locked: "このファイルはモジュール *%{module}* の一部です。%{time} までロックされています。"
-    file_unpublished_module: このファイルは未公開モジュールの一部で、まだ使用できません。
+    file_unpublished_module: このファイルは非公開モジュールの一部で、まだ使用できません。
     forgot_password: 
       email: 
         associated_login: "このアドレスは、ログイン \"%{login_identifier}\" に関連付けられています。"
@@ -18928,7 +18928,7 @@ ja:
     page_locked_module: "このページはモジュール *%{module}* の一部で、まだロックが解除されていません。"
     page_locked_until: "%{date} まで、このページはロックされています。"
     page_module_time_locked: "このページはモジュール *%{module}* の一部です。%{time} までロックされています。"
-    page_unpublished_module: このページは未公開モジュールの一部で、まだ使用できません。
+    page_unpublished_module: このページは非公開モジュールの一部で、まだ使用できません。
     peer_review_invitation: 
       email: 
         body: "%{reviewee} のピア レビューに招待されました。レビューするには、以下のリンクをクリックしてください。"
@@ -18999,7 +18999,7 @@ ja:
         subject: "再評価済みの小テスト: %{quiz}, %{context}"
       twitter: 
         body: "Canvas アラート - 再評価済みの小テスト: %{quiz}"
-    quiz_unpublished_module: この小テストは未公開モジュールの一部で、まだ使用できません。
+    quiz_unpublished_module: この小テストは非公開モジュールの一部で、まだ使用できません。
     report_generated: 
       email: 
         html: 
@@ -19282,7 +19282,7 @@ ja:
     topic_locked_module: "このトピックはモジュール *%{module}* の一部で、まだロックが解除されていません。"
     topic_locked_until: "%{date} まで、このトピックはロックされています。"
     topic_module_time_locked: "このトピックはモジュール *%{module}* の一部です。%{time} までロックされています。"
-    topic_unpublished_module: このトピックは未公開モジュールの一部で、まだ使用できません。
+    topic_unpublished_module: このトピックは非公開モジュールの一部で、まだ使用できません。
     updated_wiki_page: 
       email: 
         body: "ページ%{title}が更新されました。"
@@ -19463,7 +19463,7 @@ ja:
     assignment_points_possible: 
       one: "%{count} 点"
       other: "%{count} 点"
-    cant_unpublish_when_students_submit: 受講者の提出物がある場合は、未公開にできません
+    cant_unpublish_when_students_submit: 受講者の提出物がある場合は、非公開にできません
     question_count: 
       one: "%{count}の質問"
       other: "%{count}の質問"
@@ -19536,7 +19536,7 @@ ja:
   module_publish_menu_30b638dd: モジュール公開メニュー
   module_publish_menu_88b54c1b: モジュール公開メニュー
   module_published_80f0b9b8: モジュールは公開
-  module_unpublished_6a8166da: モジュール未公開
+  module_unpublished_6a8166da: モジュール非公開
   moduleitemname_updated_7c7d495c: "%{moduleItemName} が更新されました"
   modulename_created_successfully_6c273e09: "%{moduleName}が正常に作成されました。"
   modulename_module_publish_options_69ef1ece: "%{moduleName}モジュール公開オプション"
@@ -19688,7 +19688,7 @@ ja:
   modules_settings_a7066f13: モジュール設定
   modules_tutorial_tray_d58ac3cb: モジュールブック.チュートリアルトレイ
   modules_updated_abeb4ec6: モジュールの更新
-  moduletitle_unpublished_8a70e0cd: "%{moduleTitle}（未公開）"
+  moduletitle_unpublished_8a70e0cd: "%{moduleTitle}（非公開）"
   mon_8f18082a: 月曜
   monday_432ff613: 月曜日
   month_s_5c17590e: 月
@@ -20125,7 +20125,7 @@ ja:
   new_video_conference_17817456: 新規ビデオ会議
   new_zealand_64_f126cf2e: "ニュージーランド (+64)"
   new_zealand_ef5d7b74: ニュージーランド
-  newest_first_87672763: 最新のものを最初に
+  newest_first_87672763: 新しい順
   newest_oldest_d768cf1a: "最新 - 最古"
   next_40e12421: 次
   next_adjust_the_paces_for_individual_sections_and__a9e72b7: "次に、個々のセクションおよび/または受講者のペースを調整し、ニーズに基づいてさらにカスタマイズします (このステップはオプションです)。"
@@ -20166,7 +20166,7 @@ ja:
   no_alignments_are_available_for_this_outcome_7f8346f9: このアウトカムには位置調整はありません。
   no_allowed_domains_b6633d12: 許可されていないドメイン
   no_analytics_data_available_aa32c101: 利用可能な分析データはありません。
-  no_announcements_280df147: アナウンスメントなし
+  no_announcements_280df147: 現在、アナウンスメントはありません
   no_announcements_to_display_fbf9ed1e: 表示する通知なし
   no_artifacts_with_that_name_found_b8679f53: その名前のアーティファクトは見つかりませんでした
   no_assignment_group_assigned_8f1cdb9b: 割り当てられた課題グループなし
@@ -20253,7 +20253,7 @@ ja:
   no_message_present_e3af6358: メッセージはありません
   no_migration_file: コンテンツ移行にはファイルが必要です。
   no_module_assigned_ca183bd7: 割り当てられたモジュールなし
-  no_more_items_to_show_6a1333c6: 表示する項目がなくなりました
+  no_more_items_to_show_6a1333c6: これ以降の予定はありません
   no_more_results_17c4f108: これ以上結果はありません
   no_more_results_to_load_6774fb1c: これ以上読み込む結果はありません。
   no_outcome_file_or_authority_given_c90f9c5f: 成果ファイルまたは権限が指定されていません
@@ -20362,7 +20362,7 @@ ja:
   not_mastered_5c2f9968: 熟達していない
   not_now_97efd947: まだ
   not_now_afa29fa7: 今は実行しない
-  not_published_73f7079: 未公開
+  not_published_73f7079: 非公開
   not_required_if_this_is_populated_the_entered_text_68a9b719: 必須ではありません。これが入力されると、入力されたテキストがログイン属性に追加されます
   not_reviewed_c38d9e97: 未確認
   not_selected_57866888: 選択されていません
@@ -20419,7 +20419,7 @@ ja:
   nothing_new_needs_attention_3ac548d4: 注意を必要する新しいものは何もない。
   nothing_planned_today_selecting_most_recent_item_ffd71bff: 今日は何も計画されていません。最新のアイテムを選択中。
   nothing_planned_today_selecting_next_item_f6718aa: 今日は何も計画されていません。次のアイテムを選択中。
-  nothing_planned_yet_8675ffe9: まだ何も計画されていません。
+  nothing_planned_yet_8675ffe9: 予定はありません。
   nothing_to_split_off_of_this_user_28ba9dd5: このユーザーの分割はありません
   notice_concluded_student_6d416c4: "注意： 完了済みの受講者"
   notice_inactive_student_bcc4248a: "注意: 非アクティブの受講者"
@@ -20690,7 +20690,7 @@ ja:
   notifications_search_results_80a0b06f: 通知検索結果
   notifications_unsupported_65f6bf65: サポートされていない通知
   notifications_view_f9a60770: "通知 - 表示"
-  notifications_will_not_be_sent_retroactively_for_a_e84dc84e: コース公開前、またはコース開始日前に作成された通知に対して、過去にさかのぼって通知を送信することはできません。「投稿遅延」オプションを使用して、将来の日付に公開するように設定することもできます。
+  notifications_will_not_be_sent_retroactively_for_a_e84dc84e: コース公開前、またはコース開始日前に作成された通知に対して、過去にさかのぼって通知を送信することはできません。「後で投稿」オプションを使用して、将来の日付に公開するように設定することもできます。
   notify_immediately_d1749c07: すぐに通知する
   notify_students_in_time_of_assignments_that_requir_332ef10e: 注意が必要な課題に間に合うよう、受講者に通知します。
   notify_users_this_quiz_has_changed_c5b05995: この問題が変更されたことをユーザに通知します
@@ -20870,7 +20870,7 @@ ja:
   okay_got_it_d686d4e8: わかりました
   old_policy_39e4f77: 旧ポリシー
   old_quiz_e8dafede: 古いクイズ
-  oldest_first_ab166f62: 最古のものを最初に
+  oldest_first_ab166f62: 古い順
   oldest_newest_4de86803: "最古 - 最新"
   oldgradebookgradebookKeyboardNav: 
     keyboard_assignment_desc: 現在の課題の詳細ページに移動
@@ -20946,7 +20946,7 @@ ja:
   only_announcements_can_be_section_specific_1ff992a: 広告のみをセクション固有にすることができます
   only_available_to_students_with_link_107e2468: リンク付きの受講者のみ利用可能です
   only_available_to_students_with_link_not_visible_i_b21ec391: 受講生はリンクでのみ利用できます。受講生のファイルには表示されません。
-  only_available_with_link_5ffb9492: リンクでのみ利用可能
+  only_available_with_link_5ffb9492: リンクを知っている受講者のみ利用可能
   only_collect_grades_that_have_been_graded_since_th_96baed94: "start_at の時点以降に採点された評定のみを収集します。"
   only_course_announcements_and_discussions_can_be_s_924d4386: セクション固有なのはコースアナウントとデイスカッションのみです
   only_course_announcements_can_be_section_specific_eabcd6e0: コースアナウントのみがセクション固有です
@@ -21330,7 +21330,7 @@ ja:
   owner_email_236d1b2: 所有者の電子メール
   owner_email_4d02f795: 所有者の電子メール：
   pace_duration_cb8f5de7: ペース期間
-  pace_is_new_and_unpublished_9aa68306: ペースは新規・未公開
+  pace_is_new_and_unpublished_9aa68306: ペースは新規・非公開
   pace_plan_56e8fb1d: ペース計画
   pace_plans_4bb9c5ff: ペース計画
   pace_plans_adds_support_for_rolling_enrollments_to_10a27107: "ペース計画は、Canvas にローリング登録のサポートを追加します。講師が定義するペースに基づいて、異なる開始日の学生に魔法のように期日を分配することができます。ペース計画のユーザーグループに参加して、詳細を知り、フィードバックを行ってください。"
@@ -22834,7 +22834,7 @@ ja:
       published: 公開済み
       published_desc: 公開されています。クリックすると未公開にします。
       publishing: 公開しています...
-      unpublish: 未公開
+      unpublish: 非公開
       unpublishing: 公開を中止しています...
   publish_courses_8c1a0038: コースを公開する
   publish_final_grade_for_the_student_when_this_modu_f3b521ab: このモジュールの完了時に、受講者の最終的な評定を公開します
@@ -22854,7 +22854,7 @@ ja:
   publish_title_102f2d90: "公開%{title}"
   publish_upon_association_53cb0450: 関連付け実行時に公開
   publishable: 
-    cant_unpublish: 未公開にできません
+    cant_unpublish: 非公開にできません
   publishableModuleItem: 
     disabled: このアイテムでは公開は無効になっています
     disabled_assignment: 受講生の提出物がある場合は、未公開にできません
@@ -23264,7 +23264,7 @@ ja:
       saving: 保存しています...
       update_group: グループの更新
       update_question: 問題の更新
-    cant_unpublish_when_students_submit: 受講者の提出物がある場合は、未公開にできません
+    cant_unpublish_when_students_submit: 受講者の提出物がある場合は、非公開にできません
     choose_option: "[ 選択 ]"
     confirms: 
       delete_answer: 提出物のある問題から解答を削除すると、この問題の再評価オプションが無効になります。よろしいですか?
@@ -24777,7 +24777,7 @@ ja:
     other: アウトカムを削除しますか？
   remove_pace_97381e05: ペースを削除
   remove_placement_90862c13: "%{placement}を削除する"
-  remove_points_from_rubric_dcd4b585: ルービックからポイントを削除する
+  remove_points_from_rubric_dcd4b585: ルーブリックからポイントを削除する
   remove_prerequisite_13ab96eb: 前提条件を削除する
   remove_pronouns_5ff760ff: 代名詞を削除する
   remove_pronouns_pronoun_c8b03d78: "代名詞%{pronoun}を削除する"
@@ -24958,7 +24958,7 @@ ja:
   reserved_f247b60b: 予約済み
   reset_95a81614: リセット
   reset_all_6e5e040a: すべてをリセットする
-  reset_all_unpublished_changes_243f179f: 未公開の変更内容をすべてリセットしますか?
+  reset_all_unpublished_changes_243f179f: 非公開の変更内容をすべてリセットしますか?
   reset_courses_fe29ddf9: コースリセット
   reset_lti_provision_6d8e287f: LTI条項をリセット
   reset_multi_factor_authentication_2b63a558: マルチファクタ認証をリセットしてください
@@ -25411,7 +25411,7 @@ ja:
   saving_the_csp_status_failed_please_try_again_8275aaa4: CSPステータスの保存に失敗しました。もう一度やり直してください。
   scale_mathman_equation_images_to_match_the_size_of_2bca4e2e: 周囲のフォントサイズに合わせて、数学式の画像を拡大・縮小することができます。
   scantron_quiz_4a97a17a: "Scantron 小テスト"
-  schedule_availability_ad09a2e5: 利用可能なスケジュール
+  schedule_availability_ad09a2e5: 期間を設定する
   schedule_e5dd4c32: スケジュール
   schedule_preview_3bcda153: スケジュールプレビュー
   schedule_student_availability_332154a: 受講者の利用可能状況をスケジュール
@@ -25476,7 +25476,7 @@ ja:
   screenreader_gradebook: 
     assignment_information: 
       actions: 
-        assignment_is_muted: ミュート?
+        assignment_is_muted: ミュートの設定
         curve_grades: 分布曲線に基づいた評価
         message_students: 次の状態の受講生にメッセージを送る...
         set_default_grade: デフォルトの評定の設定
@@ -26310,7 +26310,7 @@ ja:
       buttons: 
         accept: 受諾
         decline: 拒否
-      invitation_text: "[%{course}](%{link_to_course})に参加するように招待されました（ユーザーのロールは）。%{role_name}"
+      invitation_text: "[%{course}](%{link_to_course}) に %{role_name} として招待されました。"
     enrollment: 
       enrolled_as_designer: 設計者として参加登録済み
       enrolled_as_limited_designer: セクションのみへのアクセス権を持つ設計者として参加登録済み
@@ -26599,7 +26599,7 @@ ja:
       buttons: 
         create: ルーブリックの作成
       defaults: 
-        rubric_title: 多少のルーブリック
+        rubric_title: ルーブリック
       headers: 
         criteria: 基準
         points: 点
@@ -27515,7 +27515,7 @@ ja:
   state_published_e8914697: 、状態：公開中
   state_standards_c9b1affd: 状態の標準
   state_unpublished_83c18d01: 、状態：未公開
-  state_unpublished_e19c06e6: 状態：未公開
+  state_unpublished_e19c06e6: 状態：非公開
   statistics: 
     csv_columns: 
       attempt: 試行
@@ -27699,7 +27699,7 @@ ja:
   students_access_report_5637cbfb: 受講者アクセスレポート
   students_add_4e988446: "学生 - 追加"
   students_add_76d5c2a6: "受講生 - 追加"
-  students_are_attempting_to_access_unpublished_cont_be329862: "%{bad_link}内の未公開のコンテンツ%{asset_link}にアクセスしようとしています。"
+  students_are_attempting_to_access_unpublished_cont_be329862: "%{bad_link}内の非公開のコンテンツ%{asset_link}にアクセスしようとしています。"
   students_are_clicking_on_bad_link_to_content_that__d9c51d0d: "受講者は、%{bad_link}で%{asset_link}.で削除されたコンテンツをクリックしています。"
   students_are_loading_206c5246: 受講者は読み込み中
   students_are_not_allowed_to_access_test_installati_11b9078: 受講者はテストインストールにアクセスを許可されていません。
@@ -28007,7 +28007,7 @@ ja:
   submissions_posted_title_course_43677dba: "投稿された提出物：%{title}さん、%{course}"
   submissions_re_upload_status_page_6cdbc96d: 提出再アップロードステータスページ
   submissions_view_and_make_comments_cafaf361: "提出 - 閲覧してコメントする"
-  submit_a3cc6859: 提出
+  submit_a3cc6859: 送信
   submit_a_comment_7edbf648: コメントを送信
   submit_a_feature_idea_2d4baa3d: 機能的なアイディアを送信する
   submit_assignment: 
@@ -28057,7 +28057,7 @@ ja:
   submitted_on_date_13c89fb: "%{date}に提出"
   submitted_submitdate_bdd3bf09: "提出しました：%{submitDate}"
   submitting_types_7c5a7096: "提出: %{types}"
-  subscribe_4b301fb7: 定期購読
+  subscribe_4b301fb7: 常に通知
   subscribe_failed_2eb62de0: 定期購読に失敗しました
   subscribe_to_title_c7d6bbd2: "%{title} を定期購読する"
   subscribed_fe74d22a: 購読済み
@@ -29031,8 +29031,8 @@ ja:
                      手動でドメインを追加する機能により、ドメインがホワイトリストに追加されます。
                         ホワイトリストにはドメイン100の制限があります。
   this_and_all_following_events_4b4b283: このイベントと次のすべてのイベント
-  this_announcement_will_not_be_visible_until_delaye_88f7f5c: "この発表は、%{delayedPostAt}まで表示されません。"
-  this_area_will_be_used_by_the_assessor_to_leave_co_98a5db8b: このエリアは、この基準に関するコメントを残すために査定人が使用します。
+  this_announcement_will_not_be_visible_until_delaye_88f7f5c: "このアナウンスメントは、%{delayedPostAt}まで表示されません。"
+  this_area_will_be_used_by_the_assessor_to_leave_co_98a5db8b: この基準に関するコメントを残すために使用します。
   this_assignment_does_not_count_toward_the_final_gr_29ede05f: この課題は最終的な成績には影響しません
   this_assignment_does_not_count_toward_the_final_gr_a5c238e2: この課題は最終評定に考慮されません。
   this_assignment_has_been_excused_87f1dc13: この課題は免除されました
@@ -29052,12 +29052,12 @@ ja:
   this_assignment_is_not_applicable_to_this_student_c149a5ad: この課題はこの受講者には該当しません
   this_assignment_is_not_graded_576f1244: 課題は採点されていません。
   this_assignment_is_overdue_a44bea3b: この課題は期日を過ぎています
-  this_assignment_is_part_of_an_unpublished_module_a_4e25b3c5: この課題は未公開モジュールの一部で、まだ使用できません。
+  this_assignment_is_part_of_an_unpublished_module_a_4e25b3c5: この課題は非公開モジュールの一部で、まだ使用できません。
   this_assignment_is_still_unpublished_a9185624: この課題はまだ未発表です
   this_assignment_is_unpublished_64c0f46c: この課題は未発表です
   this_assignment_submission_is_my_own_original_work_e820ce4b: この課題提出物は私自身のものであり、オリジナルの研究結果です
   this_assignment_will_no_longer_count_towards_your__a6eb6778: この課題は評定に考慮されなくなります。
-  this_attachment_has_been_unpublished_by_the_author_37bff9c3: この添付は作者により未公開とされています。
+  this_attachment_has_been_unpublished_by_the_author_37bff9c3: この添付は作者により非公開とされています。
   this_canvas_community_article_details_the_reasonin_37be9375: "*このCanvas Communityの記事*には、この変更の理由、範囲、変更内容の正確な指示、Canvas管理者およびLTI 1.3ツール開発者のための詳細な説明が記載されています。"
   this_canvas_installation_is_only_for_testing_and_w_12e52370: "この Canvas のインストールはテスト用で、*毎月リセットされます。*"
   this_canvas_installation_is_only_for_testing_and_w_17ce8bc2: 
@@ -29206,10 +29206,10 @@ ja:
   this_is_a_message_for_name_7abf1e39: "これは*%{name}* へのするメッセージです"
   this_is_a_message_from_canvas_administration_dbd63778: "これは *Canvas 管理者*からのメッセージです"
   this_is_a_message_from_name_ec0cdfac: "これは *%{name}* からのメッセージです"
-  this_is_a_new_course_pace_and_all_changes_are_unpu_78532778: これは新しいコースペースであり、すべての変更は未公開です。公開すると、変更を保存し、ペースを作成します。
+  this_is_a_new_course_pace_and_all_changes_are_unpu_78532778: これは新しいコースペースであり、すべての変更は非公開です。公開すると、変更を保存し、ペースを作成します。
   this_is_a_new_navbar_being_implemented_with_react__5342e82a: これは、reactルータを念頭に置いて実装されている新しいナビバーです。
-  this_is_a_new_section_pace_and_all_changes_are_unp_df916ec6: これは新しいセクションのペースであり、すべての変更は未公開です。公開すると、変更を保存し、ペースを作成します。
-  this_is_a_new_student_pace_and_all_changes_are_unp_b0e4ee70: これは新しい受講者のペースであり、すべての変更は未公開です。公開すると、変更を保存し、ペースを作成します。
+  this_is_a_new_section_pace_and_all_changes_are_unp_df916ec6: これは新しいセクションのペースであり、すべての変更は非公開です。公開すると、変更を保存し、ペースを作成します。
+  this_is_a_new_student_pace_and_all_changes_are_unp_b0e4ee70: これは新しい受講者のペースであり、すべての変更は非公開です。公開すると、変更を保存し、ペースを作成します。
   this_is_a_preview_of_the_draft_version_of_the_quiz_910a02e0: これは、小テストのドラフト版のプレビューです
   this_is_a_preview_of_the_published_version_of_the__70e0c8: これは、小テストの公開バージョンのプレビューです
   this_is_a_report_of_all_students_enrolled_in_a_cou_d0137d3c: |-
@@ -29314,7 +29314,7 @@ ja:
   this_question_will_show_a_checkbox_next_to_each_an_169cd6d9: この質問は、それぞれの答えの横にチェックボックスを表示します。
   this_quiz_has_been_excused_d89d2b74: この小テストは免除されました
   this_quiz_is_no_longer_available_as_your_enrollmen_a5fab8f7: あなたの登録が終了したため、この小テストは、もう利用できなくなりました。
-  this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*この小テストは未公開です* 公開されるまでは、教員のみがこの小テストを表示できます。"
+  this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*この小テストは非公開です* 公開されるまでは、教員のみがこの小テストを表示できます。"
   this_quiz_needs_review_50e014e: この小テストはレビューが必要です
   this_rating_is_selected_ca68fce6: この評価が選択されています
   this_recorder_uses_flash_as_a_result_you_may_find__427d2ddb: "このレコーダーは、 Flashを使用します。結果、あなたのローカルマシンにレコーディングを行いやすくなり、メディアアップローダータブを使用して、それをアップロードします。"
@@ -29684,7 +29684,7 @@ ja:
   title_required_3ff5969: タイトルが必要です
   title_separator: ": "
   title_tray_ec9f7488: "%{title}トレイ"
-  title_unpublished_51ddbc6a: "%{title}（未公開）"
+  title_unpublished_51ddbc6a: "%{title}（非公開）"
   title_was_successfully_created_f2a07c56: "\"%{title}\" は正常に作成されました。"
   title_was_successfully_updated_14b78676: "\"%{title}\" は正常に更新されました。"
   titles: 
@@ -30337,7 +30337,7 @@ ja:
   topic_podcast_feed_dff98ab0: "トピックのポッドキャスト フィード"
   topic_title_85384ce8: トピックのタイトル
   total_71a4807: 合計
-  total_activity_21022e7c: 全活動時間
+  total_activity_21022e7c: ログイン合計時間
   total_column_options_4e6a6032: 合計列オプション
   total_grade_b0c33841: "合計:%{grade}"
   total_messages_af025be6: 合計メッセージ数
@@ -30693,32 +30693,32 @@ ja:
   unprovision_catalog_6e0d59c: "Catalog をアンプロビジョン"
   unprovisioning_will_terminate_your_catalog_account_eaa723c7: "アンプロビジョニングは、あなたの Catalog アカウントを終了させます。リスト、登録、受講者データを含む、Catalog のすべてのデータは失われ、復元できません。"
   unprovisioning_your_catalog_account_7780ee2b: "Catalog アカウントのプロビジョニング解除"
-  unpublish_9f2d730b: 未公開
-  unpublish_all_modules_and_items_ba0291f4: すべてのモジュールとアイテムをアンパブリッシュする
-  unpublish_module_and_all_items_e6dd35e5: モジュールとすべてのアイテムをアンパブリッシュする
+  unpublish_9f2d730b: 非公開
+  unpublish_all_modules_and_items_ba0291f4: すべてのモジュールとアイテムを非公開する
+  unpublish_module_and_all_items_e6dd35e5: モジュールとすべてのアイテムを非公開する
   unpublish_module_only_1987d840: モジュールのみパブリッシュ解除
   unpublish_modules_only_934a9ab: モジュールのみパブリッシュ解除
   unpublish_progress_503dfcfa: 進行状態を非公開にする
-  unpublish_title_26ae9667: "未公開%{title}"
-  unpublished_8b6107d6: 未公開
+  unpublish_title_26ae9667: "非公開%{title}"
+  unpublished_8b6107d6: 非公開
   unpublished_assignments_9cdbcc87: 課題を非公開にする
-  unpublished_changes_cb1cf6ff: 未公開の変更
-  unpublished_changes_tray_9e9b2ac2: 「未公開の変更」トレイ
+  unpublished_changes_cb1cf6ff: 非公開の変更
+  unpublished_changes_tray_9e9b2ac2: 「非公開の変更」トレイ
   unpublished_click_to_modify_60f9051: "公開しない - クリックして変更する"
   unpublished_click_to_publish_6a6d12e1: 公開取り消し済み。ここをクリックして公開。
-  unpublished_click_to_publish_c073631a: 未公開です。クリックすると公開になります。
+  unpublished_click_to_publish_c073631a: 非公開です。クリックすると公開になります。
   unpublished_click_to_publish_item_name_614c4952: "未公開です。クリックすると%{item_name}を公開にします。"
   unpublished_click_to_publish_module_name_89f8601c: "未公開です。クリックすると%{module_name}を公開にします。"
   unpublished_click_to_publish_name_10104b5c: "未公開です。%{name}を公開するには、クリックしてください"
   unpublished_click_to_publish_title_7c57293f: "公開取り消し済み。クリックして%{title}を公開。"
   unpublished_content_referenced_in_this_resource_865f8ef6: このリソースで参照される非公開のコンテンツ：
-  unpublished_courses_4299148e: 未公開のコース
-  unpublished_courses_count_d35672f0: "未公開のコース (%{count})"
-  unpublished_courses_title: 未公開のコース
-  unpublished_dfd8801: 未公開
+  unpublished_courses_4299148e: 非公開のコース
+  unpublished_courses_count_d35672f0: "非公開のコース (%{count})"
+  unpublished_courses_title: 非公開のコース
+  unpublished_dfd8801: 非公開
   unpublished_drafts_bb352243: 未公開の下書き
   unpublished_drafts_count_86e16f17: "未公開の下書き (%{count})"
-  unpublished_subjects_62a7d38: 未公開の科目
+  unpublished_subjects_62a7d38: 非公開の科目
   unpublishing_1fa99dc6: 公開取り消し中...
   unpublishing_module_67fcb7d3: モジュールのをパブリッシュ解除
   unpublishing_module_and_items_ca2edd97: モジュールとアイテムの公開停止
@@ -30741,7 +30741,7 @@ ja:
   unstar_b84daaef: スター取り消し
   unstar_conversation_45fc43d6: 会話からスターを削除
   unstarted_932f2990: 開始前
-  unsubscribe_8be438ff: 購読中止
+  unsubscribe_8be438ff: 通知オフ
   unsubscribe_from_title_c98461b3: "%{title} の定期購読をキャンセルする"
   unsubscribed_c93564a2: 登録解除済み
   unsubscribed_failed_2a176d2: 定期購読のキャンセルに失敗しました
@@ -31668,13 +31668,13 @@ ja:
   viewing_folders_is_not_available_798a15e1: フォルダーの表示は利用できません
   viewsContextModules: 
     context_module: 
-      unpublish: 未公開
+      unpublish: 非公開
     context_modules: 
       publish: 公開
   violation_log_491edd84: 違反ログ
   violation_log_tray_d4eff9f4: 違反ログトレイ
   virtual_lectures_in_real_time_a1778dea: リアルタイムの仮想講義
-  visibility_3ad7b08d: ビジビリティ：
+  visibility_3ad7b08d: 公開範囲：
   visibility_selector_866f70df: 可視性セレクタ
   visible_assignments_scope_change_dbb84ebb: 表示される課題の範囲変更
   visit_864b4060: アクセス
@@ -31979,7 +31979,7 @@ ja:
       published_indicator: 公開済み
       toolbar_menu: 
         settings: 設定
-      unpublished_indicator: 未公開
+      unpublished_indicator: 非公開
       view_page_history_wiki: ページ履歴の表示
       wiki: 
         todo_date: タスク日付：
@@ -32039,7 +32039,7 @@ ja:
   wiki_page: 
     atom_author: "Wiki ページ"
     atom_entry_title: "Wiki ページ、%{course_or_group_name}: %{page_title}"
-    cannot_set_unpublished_front_page: "は未公開なので、トップ ページとして設定できませんでした"
+    cannot_set_unpublished_front_page: "は非公開なので、トップ ページとして設定できませんでした"
     cannot_unpublish_front_page: "トップ ページは非公開にできません"
     defaults: 
       no_content: コンテンツなし
@@ -32367,10 +32367,10 @@ ja:
   you_have_successfully_updated_the_discussion_topic_b2910500: ディスカッショントピックが正常に更新されました。
   you_have_totalcount_peer_reviews_to_complete_6d01cb11: "%{totalCount}つのピアレビューを完了する必要があります。"
   you_have_unpublished_changes_to_your_course_pace_c_90d5a4b1: あなたのコースペースへの変更を未公開にしました。続行すると、これらの変更は破棄されます。
-  you_have_unpublished_changes_to_your_course_pace_c_fe6db8c0: あなたのコースペースに未公開の変更があります。続行すると、これらの変更は破棄されます。
+  you_have_unpublished_changes_to_your_course_pace_c_fe6db8c0: あなたのコースペースに非公開の変更があります。続行すると、これらの変更は破棄されます。
   you_have_unpublished_changes_to_your_course_pace_p_b94561ba: あなたのコースペースプランへの変更を未公開にしました。続行すると、これらの変更は破棄されます。
-  you_have_unpublished_changes_to_your_section_pace__9cf0aed: あなたのセクションペースへの変更を未公開にしました。続行すると、これらの変更は破棄されます。
-  you_have_unpublished_changes_to_your_student_pace__41f251bd: あなたの受講者ペースへの変更を未公開にしました。続行すると、これらの変更は破棄されます。
+  you_have_unpublished_changes_to_your_section_pace__9cf0aed: あなたのセクションペースへの変更を非公開にしました。続行すると、これらの変更は破棄されます。
+  you_have_unpublished_changes_to_your_student_pace__41f251bd: あなたの受講者ペースへの変更を非公開にしました。続行すると、これらの変更は破棄されます。
   you_have_unsynced_changes_that_will_sync_to_all_as_9028e711: 新しい関連付けが保存されたときに、関連付けられているすべてのコースに同期する変更を同期していません。
   you_just_sent_a_message_in_canvas_86b4945c: "経った今、Canvas 内でメッセージを送信しました。"
   you_left_the_required_name_field_empty_8f9bce5c: 必須の名前フィールドが空欄のままです。
@@ -32457,7 +32457,7 @@ ja:
   you_ve_been_invited_to_the_course_course_course_ro_a74d748b: "コース、%{course}に招待されています。コースのロール: %{role_type}"
   you_ve_been_mentioned_discussion_topic_by_user_nam_60649d56: "あなたが言及されました：%{discussion_topic}（%{user_name}が言及）"
   you_ve_been_reminded_to_assess_rubric_context_70eeb600: "%{rubric}、%{context} のアセスメント実施について念押しの通知が届いています。"
-  you_ve_scrolled_back_to_your_very_first_to_do_873510d1: あなたの最初のToDoにスクロールしました！
+  you_ve_scrolled_back_to_your_very_first_to_do_873510d1: これより前のタスクはありません
   you_ve_updated_the_scoring_criteria_this_will_affe_ec852671: 採点基準を更新しました。これにより、このアウトカムを使用して以前に評価されたすべての受講者に影響があります
   you_will_be_redirected_to_a_login_page_where_you_w_fc8df402: あなたの子供の認証情報でログインする必要があるログインページにリダイレクトされます。
   you_will_be_redirected_to_gradebook_while_your_fil_23fab7de: "ファイルがアップロードされている間、グレードブックにリダイレクトされます。CSV ファイルが大きいと、変更が更新されるまでに数分かかる場合があります。データを上書きを防ぐため、アップロードが完了しており、グレードブックが正しいことを確認してから追加の変更を行ってください。"
@@ -32530,7 +32530,7 @@ ja:
   your_grading_schemes_b785: あなたの成績評定スキーム
   your_group_is_being_created_88c0c024: あなたのグループを作成中です
   your_groups_are_being_created_50156e34: あなたのグループを作成中です。
-  your_homeroom_is_currently_unpublished_93c14f4f: ホームルームは現在未公開です。
+  your_homeroom_is_currently_unpublished_93c14f4f: ホームルームは現在非公開です。
   your_instructor_has_not_posted_the_grade_while_you_c5cd731c: あなたの講師はこの評定を提出していません。講師が評定を提出していない間、評定とコメントの情報は利用できません。
   your_instructor_has_released_grade_changes_and_new_218d61bb: |-
       講師が、%{title}の評定変更と新しいコメントをリリースしました%{course}、
