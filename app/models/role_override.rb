@@ -1105,6 +1105,21 @@ class RoleOverride < ActiveRecord::Base
           AccountAdmin
         ],
       },
+      share_banks_with_subaccounts: {
+        label: -> { t("permissions.share_banks_with_subaccounts", "Share item banks with subaccounts") },
+        label_v2: -> { t("Item Banks - share with subaccounts") },
+        available_to: %w[
+          DesignerEnrollment
+          TaEnrollment
+          TeacherEnrollment
+          AccountAdmin
+          AccountMembership
+        ],
+        true_for: %w[
+          AccountAdmin
+        ],
+        account_allows: ->(_a) { Account.site_admin.feature_enabled?(:new_quizzes_subaccount_sharing_permission) },
+      },
       manage_files_add: {
         label: -> { t("Add course files") },
         label_v2: -> { t("Course Files - add") },
