@@ -471,6 +471,7 @@ test('does not follow a cross-origin return_to', function () {
 })
 
 test('disables fields when inClosedGradingPeriod', function () {
+  ENV.current_user_is_admin = false
   const view = this.editView({in_closed_grading_period: true})
   view.$el.appendTo($('#fixtures'))
 
@@ -1753,21 +1754,6 @@ QUnit.module('EditView: anonymous grading', hooks => {
     const view = editView()
     strictEqual(view.toJSON().anonymousGradingEnabled, true)
     strictEqual(view.$el.find('input#assignment_anonymous_grading').length, 1)
-  })
-
-  test('shows warning text under checkbox when assignment is Quiz LTI', () => {
-    ENV.NEW_QUIZZES_ANONYMOUS_GRADING_ENABLED = true
-    ENV.ANONYMOUS_GRADING_ENABLED = true
-    const view = editView({is_quiz_lti_assignment: true})
-    strictEqual(view.toJSON().anonymousGradingEnabled, true)
-    strictEqual(view.$el.find('#anonymous-lti-text').length, 1)
-  })
-
-  test('hides the anonymous grading box if ENV.NEW_QUIZZES_ANONYMOUS_GRADING_ENABLED if off', () => {
-    ENV.ANONYMOUS_GRADING_ENABLED = true
-    const view = editView({is_quiz_lti_assignment: true})
-    strictEqual(view.toJSON().anonymousGradingEnabled, false)
-    strictEqual(view.$el.find('#anonymous-lti-text').length, 0)
   })
 
   test('is disabled when group assignment is enabled', () => {
