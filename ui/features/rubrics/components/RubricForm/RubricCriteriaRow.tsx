@@ -35,18 +35,21 @@ import {
   IconEditLine,
   IconTrashLine,
 } from '@instructure/ui-icons'
-import {CriterionModal} from './CriterionModal'
 
 const I18n = useI18nScope('rubrics-criteria-row')
 
 type RubricCriteriaRowProps = {
   criterion: RubricCriterion
   rowIndex: number
+  onEditCriterion: () => void
 }
 
-export const RubricCriteriaRow = ({criterion, rowIndex}: RubricCriteriaRowProps) => {
+export const RubricCriteriaRow = ({
+  criterion,
+  rowIndex,
+  onEditCriterion,
+}: RubricCriteriaRowProps) => {
   const {description, longDescription, points} = criterion
-  const [isCriterionModalOpen, setIsCriterionModalOpen] = useState(false)
 
   return (
     <>
@@ -107,8 +110,9 @@ export const RubricCriteriaRow = ({criterion, rowIndex}: RubricCriteriaRowProps)
             withBackground={false}
             withBorder={false}
             screenReaderLabel={I18n.t('Edit Criterion')}
-            onClick={() => setIsCriterionModalOpen(true)}
+            onClick={onEditCriterion}
             size="small"
+            data-testid="rubric-criteria-row-edit-button"
           >
             <IconEditLine />
           </IconButton>
@@ -131,10 +135,7 @@ export const RubricCriteriaRow = ({criterion, rowIndex}: RubricCriteriaRowProps)
         </Flex.Item>
       </Flex>
       <RatingScaleAccordion ratings={criterion.ratings} />
-      <CriterionModal
-        isOpen={isCriterionModalOpen}
-        onDismiss={() => setIsCriterionModalOpen(false)}
-      />
+
       <View as="hr" margin="medium 0 small 0" />
     </>
   )
@@ -179,7 +180,8 @@ const RatingScaleAccordion = ({ratings}: RatingScaleAccordionProps) => {
           return (
             <RatingScaleAccordionItem
               rating={rating}
-              key={`rating-scale-item-${rating.id}`}
+              // eslint-disable-next-line react/no-array-index-key
+              key={`rating-scale-item-${rating.id}-${index}`}
               scale={scale}
               spacing={spacing}
             />

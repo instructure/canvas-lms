@@ -18,7 +18,7 @@
 
 import React, {useEffect, useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import type {RubricRating} from '@canvas/rubrics/react/types/rubric'
+import type {RubricCriterion, RubricRating} from '@canvas/rubrics/react/types/rubric'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Button, CloseButton, IconButton} from '@instructure/ui-buttons'
 import {Checkbox} from '@instructure/ui-checkbox'
@@ -29,6 +29,8 @@ import {Modal} from '@instructure/ui-modal'
 import {NumberInput} from '@instructure/ui-number-input'
 import {TextInput} from '@instructure/ui-text-input'
 import {View} from '@instructure/ui-view'
+import type {FormMessage} from '@instructure/ui-form-field'
+import {TextArea} from '@instructure/ui-text-area'
 
 const I18n = useI18nScope('rubrics-criterion-modal')
 
@@ -65,12 +67,16 @@ export const DEFAULT_RUBRIC_RATINGS: RubricRating[] = [
   },
 ]
 
-type CriterionModalProps = {
+export type CriterionModalProps = {
+  criterion?: RubricCriterion
   isOpen: boolean
+  onSave: (criterion: RubricCriterion) => void
   onDismiss: () => void
 }
-export const CriterionModal = ({isOpen, onDismiss}: CriterionModalProps) => {
-  const [ratings, setRatings] = useState<RubricRating[]>(DEFAULT_RUBRIC_RATINGS)
+export const CriterionModal = ({criterion, isOpen, onDismiss, onSave}: CriterionModalProps) => {
+  const [ratings, setRatings] = useState<RubricRating[]>([])
+  const [criterionDescription, setCriterionDescription] = useState('')
+  const [criterionLongDescription, setCriterionLongDescription] = useState('')
 
   const addRating = (index: number) => {
     const newRating = {
@@ -90,11 +96,51 @@ export const CriterionModal = ({isOpen, onDismiss}: CriterionModalProps) => {
     setRatings(newRatings)
   }
 
+  const {
+    description: existingDescription,
+    longDescription: existingLongDescription,
+    ratings: existingRatings,
+  } = criterion ?? {}
+
   useEffect(() => {
-    if (!isOpen) {
-      setRatings(DEFAULT_RUBRIC_RATINGS)
+    if (isOpen) {
+      setCriterionDescription(existingDescription ?? '')
+      setCriterionLongDescription(existingLongDescription ?? '')
+      setRatings(existingRatings ?? DEFAULT_RUBRIC_RATINGS)
     }
-  }, [isOpen])
+  }, [existingDescription, existingLongDescription, existingRatings, isOpen])
+
+  const updateRating = (index: number, rating: RubricRating) => {
+    const newRatings = [...ratings]
+    newRatings[index] = rating
+    setRatings(newRatings)
+  }
+
+  const saveChanges = () => {
+    const newCriterion: RubricCriterion = {
+      id: criterion?.id ?? '',
+      description: criterionDescription,
+      longDescription: criterionLongDescription,
+      ratings,
+      points: Math.max(...ratings.map(r => r.points), 0),
+      criterionUseRange: criterion?.criterionUseRange ?? false,
+      ignoreForScoring: criterion?.ignoreForScoring ?? false,
+      masteryPoints: criterion?.masteryPoints ?? 0,
+      learningOutcomeId: criterion?.learningOutcomeId ?? undefined,
+    }
+
+    onSave(newCriterion)
+  }
+
+  const isValid = () => {
+    return (
+      criterionDescription.trim().length > 0 && ratings.every(r => r.description.trim().length > 0)
+    )
+  }
+
+  const criterionDescriptionErrorMessage: FormMessage[] = criterionDescription.trim().length
+    ? []
+    : [{text: 'Criteria Name Required', type: 'error'}]
 
   return (
     <Modal
@@ -104,6 +150,7 @@ export const CriterionModal = ({isOpen, onDismiss}: CriterionModalProps) => {
       height="45.125rem"
       label={I18n.t('Rubric Criterion Modal')}
       shouldCloseOnDocumentClick={true}
+      data-testid="rubric-criterion-modal"
     >
       <Modal.Header>
         <CloseButton placement="end" offset="small" onClick={onDismiss} screenReaderLabel="Close" />
@@ -117,7 +164,10 @@ export const CriterionModal = ({isOpen, onDismiss}: CriterionModalProps) => {
               placeholder={I18n.t('Enter the name')}
               display="inline-block"
               width="20.75rem"
-              onChange={() => {}}
+              value={criterionDescription}
+              messages={criterionDescriptionErrorMessage}
+              onChange={(e, value) => setCriterionDescription(value)}
+              data-testid="rubric-criterion-description"
             />
           </View>
           <View as="span">
@@ -126,7 +176,8 @@ export const CriterionModal = ({isOpen, onDismiss}: CriterionModalProps) => {
               placeholder={I18n.t('Enter the description')}
               display="inline-block"
               width="41.75rem"
-              onChange={() => {}}
+              value={criterionLongDescription}
+              onChange={(e, value) => setCriterionLongDescription(value)}
             />
           </View>
         </View>
@@ -164,7 +215,12 @@ export const CriterionModal = ({isOpen, onDismiss}: CriterionModalProps) => {
               // eslint-disable-next-line react/no-array-index-key
               <View as="div" key={`rating-row-${rating.id}-${index}`}>
                 <AddRatingRow onClick={() => addRating(index)} />
-                <RatingRow rating={rating} scale={scale} onRemove={() => removeRating(index)} />
+                <RatingRow
+                  rating={rating}
+                  scale={scale}
+                  onRemove={() => removeRating(index)}
+                  onChange={updatedRating => updateRating(index, updatedRating)}
+                />
               </View>
             )
           })}
@@ -175,15 +231,25 @@ export const CriterionModal = ({isOpen, onDismiss}: CriterionModalProps) => {
       <Modal.Footer>
         <Flex width="100%">
           <Flex.Item shouldShrink={true} shouldGrow={true}>
-            <Checkbox label="Save this rating scale as default" value="medium" />
+            <Checkbox label={I18n.t('Save this rating scale as default')} value="medium" />
           </Flex.Item>
           <Flex.Item>
-            <Button margin="0 x-small 0 0" onClick={onDismiss}>
-              Cancel
+            <Button
+              margin="0 x-small 0 0"
+              onClick={onDismiss}
+              data-testid="rubric-criterion-cancel"
+            >
+              {I18n.t('Cancel')}
             </Button>
           </Flex.Item>
           <Flex.Item>
-            <Button color="primary" type="submit">
+            <Button
+              color="primary"
+              type="submit"
+              disabled={!isValid()}
+              onClick={() => saveChanges()}
+              data-testid="rubric-criterion-save"
+            >
               {I18n.t('Save Criterion')}
             </Button>
           </Flex.Item>
@@ -196,12 +262,27 @@ export const CriterionModal = ({isOpen, onDismiss}: CriterionModalProps) => {
 type RatingRowProps = {
   rating: RubricRating
   scale: number
+  onChange: (rating: RubricRating) => void
   onRemove: () => void
 }
-const RatingRow = ({rating, scale, onRemove}: RatingRowProps) => {
+const RatingRow = ({rating, scale, onChange, onRemove}: RatingRowProps) => {
+  function setRatingForm<K extends keyof RubricRating>(key: K, value: RubricRating[K]) {
+    onChange({...rating, [key]: value})
+  }
+
+  const setNumber = (value: number) => {
+    if (Number.isNaN(value)) return 0
+
+    return value < 0 ? 0 : value > 100 ? 100 : value
+  }
+
+  const errorMessage: FormMessage[] = rating.description.trim().length
+    ? []
+    : [{text: 'Rating Name Required', type: 'error'}]
+
   return (
     <Flex>
-      <Flex.Item>
+      <Flex.Item align="start">
         <View as="div" width="3.938rem">
           <TextInput
             renderLabel={<ScreenReaderContent>{I18n.t('Rating Scale')}</ScreenReaderContent>}
@@ -215,44 +296,49 @@ const RatingRow = ({rating, scale, onRemove}: RatingRowProps) => {
           />
         </View>
       </Flex.Item>
-      <Flex.Item>
+      <Flex.Item align="start">
         <View as="div" width="4.938rem">
           <NumberInput
             renderLabel={<ScreenReaderContent>{I18n.t('Rating Points')}</ScreenReaderContent>}
             value={rating.points}
+            onIncrement={() => setRatingForm('points', setNumber(rating.points + 1))}
+            onDecrement={() => setRatingForm('points', setNumber(rating.points - 1))}
+            onChange={(e, value) => setRatingForm('points', setNumber(Number(value ?? 0)))}
             data-testid="rating-points"
           />
         </View>
       </Flex.Item>
-      <Flex.Item>
-        <View as="div" width="3rem" textAlign="center" cursor="pointer">
+      <Flex.Item align="start">
+        <View as="div" width="3rem" textAlign="center" cursor="pointer" margin="xx-small 0 0 0">
           <IconDragHandleLine />
         </View>
       </Flex.Item>
-      <Flex.Item>
+      <Flex.Item align="start">
         <View as="div" width="8.875rem">
           <TextInput
             renderLabel={<ScreenReaderContent>{I18n.t('Rating Name')}</ScreenReaderContent>}
             display="inline-block"
             value={rating.description}
-            onChange={() => {}}
+            onChange={(e, value) => setRatingForm('description', value)}
             data-testid="rating-name"
+            messages={errorMessage}
           />
         </View>
       </Flex.Item>
-      <Flex.Item shouldGrow={true} shouldShrink={true}>
+      <Flex.Item shouldGrow={true} shouldShrink={true} align="start">
         <View as="div" margin="0 small" themeOverride={{marginSmall: '1rem'}}>
-          <TextInput
-            renderLabel={<ScreenReaderContent>{I18n.t('Rating Description')}</ScreenReaderContent>}
-            display="inline-block"
+          <TextArea
+            label={<ScreenReaderContent>{I18n.t('Rating Description')}</ScreenReaderContent>}
             value={rating.longDescription}
             width="100%"
-            onChange={() => {}}
+            height="2.25rem"
+            maxHeight="6.75rem"
+            onChange={e => setRatingForm('longDescription', e.target.value)}
             data-testid="rating-description"
           />
         </View>
       </Flex.Item>
-      <Flex.Item>
+      <Flex.Item align="start">
         <View as="div">
           <IconButton
             screenReaderLabel={I18n.t('Remove Rating')}

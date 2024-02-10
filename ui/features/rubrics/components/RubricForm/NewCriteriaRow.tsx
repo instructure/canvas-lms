@@ -30,29 +30,27 @@ import {
 import {Text} from '@instructure/ui-text'
 import {Pill} from '@instructure/ui-pill'
 import {View} from '@instructure/ui-view'
-import {CriterionModal} from './CriterionModal'
 
 const I18n = useI18nScope('rubrics-criteria-new-row')
 
 type NewCriteriaRowProps = {
   rowIndex: number
+  onEditCriterion: () => void
 }
 
-export const NewCriteriaRow = ({rowIndex}: NewCriteriaRowProps) => {
-  const [isCriterionModalOpen, setIsCriterionModalOpen] = React.useState(false)
-
+export const NewCriteriaRow = ({rowIndex, onEditCriterion}: NewCriteriaRowProps) => {
   return (
     <View>
-      <CriterionModal
-        isOpen={isCriterionModalOpen}
-        onDismiss={() => setIsCriterionModalOpen(false)}
-      />
       <Flex>
         <Flex.Item align="start" margin="small 0 0 0">
           <Text weight="bold">{rowIndex}.</Text>
         </Flex.Item>
         <Flex.Item margin="0 small" align="start" shouldGrow={true}>
-          <Button renderIcon={IconEditLine} onClick={() => setIsCriterionModalOpen(true)}>
+          <Button
+            renderIcon={IconEditLine}
+            onClick={onEditCriterion}
+            data-testid="add-criterion-button"
+          >
             {I18n.t('Draft New Criterion')}
           </Button>
           <Button renderIcon={IconOutcomesLine} margin="0 0 0 small">

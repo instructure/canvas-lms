@@ -18,11 +18,33 @@
 
 import React from 'react'
 import {fireEvent, render} from '@testing-library/react'
-import {CriterionModal, DEFAULT_RUBRIC_RATINGS} from '../CriterionModal'
+import {CriterionModal, DEFAULT_RUBRIC_RATINGS, type CriterionModalProps} from '../CriterionModal'
+import type {RubricCriterion} from '@canvas/rubrics/react/types/rubric'
 
 describe('CriterionModal tests', () => {
-  const renderComponent = () => {
-    return render(<CriterionModal isOpen={true} onDismiss={() => {}} />)
+  const renderComponent = (props?: Partial<CriterionModalProps>) => {
+    return render(
+      <CriterionModal isOpen={true} onDismiss={() => {}} onSave={() => {}} {...props} />
+    )
+  }
+
+  const DEFAULT_CRITERION: RubricCriterion = {
+    id: '1',
+    description: 'Test Criterion',
+    points: 10,
+    criterionUseRange: false,
+    ignoreForScoring: false,
+    longDescription: '',
+    masteryPoints: 0,
+    learningOutcomeId: '',
+    ratings: [{id: '1', description: 'Test Rating', points: 0, longDescription: ''}],
+  }
+
+  const getCriterion = (props?: Partial<RubricCriterion>) => {
+    return {
+      ...DEFAULT_CRITERION,
+      ...props,
+    }
   }
 
   describe('Ratings Tests', () => {
@@ -91,6 +113,67 @@ describe('CriterionModal tests', () => {
           (ratingName as HTMLInputElement).value === DEFAULT_RUBRIC_RATINGS[2].description
       )
       expect(removedRating).toBeUndefined()
+    })
+  })
+
+  describe('Save and Cancel Tests', () => {
+    it('save button should not be disabled if there is a criterion name and rating name', () => {
+      const criterion = getCriterion()
+      const {getByTestId} = renderComponent({criterion})
+
+      expect(getByTestId('rubric-criterion-save')).not.toBeDisabled()
+    })
+
+    it('save button should be disabled if there is no criterion name', () => {
+      const criterion = getCriterion({description: ''})
+
+      const {getByTestId} = renderComponent({criterion})
+
+      expect(getByTestId('rubric-criterion-save')).toBeDisabled()
+    })
+
+    it('save button should be disabled if there is no rating name', () => {
+      const criterion = getCriterion({
+        ratings: [{id: '1', description: '', points: 0, longDescription: ''}],
+      })
+
+      const {getByTestId} = renderComponent({criterion})
+
+      expect(getByTestId('rubric-criterion-save')).toBeDisabled()
+    })
+
+    it('save button should be disabled if there is only a single rating with no name', () => {
+      const ratings = [
+        {id: '1', description: 'Valid', points: 0, longDescription: ''},
+        {id: '1', description: 'Valid', points: 0, longDescription: ''},
+        {id: '1', description: '', points: 0, longDescription: ''},
+        {id: '1', description: 'Valid', points: 0, longDescription: ''},
+      ]
+      const criterion = getCriterion({ratings})
+
+      const {getByTestId} = renderComponent({criterion})
+
+      expect(getByTestId('rubric-criterion-save')).toBeDisabled()
+    })
+
+    it('should call onSave when save button is clicked', () => {
+      const onSave = jest.fn()
+      const criterion = getCriterion()
+
+      const {getByTestId} = renderComponent({onSave, criterion})
+
+      fireEvent.click(getByTestId('rubric-criterion-save'))
+
+      expect(onSave).toHaveBeenCalled()
+    })
+
+    it('should call onDismiss when cancel button is clicked', () => {
+      const onDismiss = jest.fn()
+      const {getByTestId} = renderComponent({onDismiss})
+
+      fireEvent.click(getByTestId('rubric-criterion-cancel'))
+
+      expect(onDismiss).toHaveBeenCalled()
     })
   })
 })

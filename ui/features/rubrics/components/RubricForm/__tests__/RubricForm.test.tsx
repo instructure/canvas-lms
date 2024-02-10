@@ -19,7 +19,7 @@
 import React from 'react'
 import Router from 'react-router'
 import {BrowserRouter} from 'react-router-dom'
-import {fireEvent, render} from '@testing-library/react'
+import {fireEvent, render, waitFor} from '@testing-library/react'
 import {QueryProvider, queryClient} from '@canvas/query'
 import {RubricForm} from '../index'
 import {RUBRICS_QUERY_RESPONSE} from './fixtures'
@@ -191,6 +191,90 @@ describe('RubricForm Tests', () => {
 
       const ratingScaleAccordionItems = queryAllByTestId('rating-scale-accordion-item')
       expect(ratingScaleAccordionItems.length).toEqual(0)
+    })
+
+    describe('criterion modal', () => {
+      it('opens the criterion modal when the add criterion button is clicked', async () => {
+        queryClient.setQueryData(['fetch-rubric-1'], RUBRICS_QUERY_RESPONSE)
+
+        const {getByTestId, queryByTestId} = renderComponent()
+        expect(queryByTestId('rubric-criterion-modal')).toBeNull()
+        fireEvent.click(getByTestId('add-criterion-button'))
+
+        await new Promise(resolve => setTimeout(resolve, 0))
+        expect(getByTestId('rubric-criterion-modal')).toBeInTheDocument()
+      })
+
+      it('does not save new criterion when the cancel button is clicked', async () => {
+        queryClient.setQueryData(['fetch-rubric-1'], RUBRICS_QUERY_RESPONSE)
+
+        const {getByTestId, queryAllByTestId} = renderComponent()
+        fireEvent.click(getByTestId('add-criterion-button'))
+        await new Promise(resolve => setTimeout(resolve, 0))
+        expect(getByTestId('rubric-criterion-modal')).toBeInTheDocument()
+        fireEvent.change(getByTestId('rubric-criterion-description'), {
+          target: {value: 'New Criterion Test'},
+        })
+        fireEvent.click(getByTestId('rubric-criterion-cancel'))
+        expect(queryAllByTestId('rubric-criteria-row').length).toEqual(2)
+      })
+
+      it('saves new criterion when the save button is clicked', async () => {
+        queryClient.setQueryData(['fetch-rubric-1'], RUBRICS_QUERY_RESPONSE)
+
+        const {getByTestId, queryAllByTestId} = renderComponent()
+        expect(queryAllByTestId('rubric-criteria-row').length).toEqual(2)
+
+        fireEvent.click(getByTestId('add-criterion-button'))
+        await new Promise(resolve => setTimeout(resolve, 0))
+        expect(getByTestId('rubric-criterion-modal')).toBeInTheDocument()
+        fireEvent.change(getByTestId('rubric-criterion-description'), {
+          target: {value: 'New Criterion Test'},
+        })
+        fireEvent.click(getByTestId('rubric-criterion-save'))
+
+        expect(queryAllByTestId('rubric-criteria-row').length).toEqual(3)
+        const criteriaRowDescriptions = queryAllByTestId('rubric-criteria-row-description')
+        expect(criteriaRowDescriptions[2]).toHaveTextContent('New Criterion Test')
+      })
+
+      it('updates existing criterion when the save button is clicked', async () => {
+        queryClient.setQueryData(['fetch-rubric-1'], RUBRICS_QUERY_RESPONSE)
+
+        const {getByTestId, queryAllByTestId} = renderComponent()
+        expect(queryAllByTestId('rubric-criteria-row').length).toEqual(2)
+
+        fireEvent.click(queryAllByTestId('rubric-criteria-row-edit-button')[0])
+        await new Promise(resolve => setTimeout(resolve, 0))
+        expect(getByTestId('rubric-criterion-modal')).toBeInTheDocument()
+        fireEvent.change(getByTestId('rubric-criterion-description'), {
+          target: {value: 'Updated Criterion Test'},
+        })
+        fireEvent.click(getByTestId('rubric-criterion-save'))
+
+        expect(queryAllByTestId('rubric-criteria-row').length).toEqual(2)
+        const criteriaRowDescriptions = queryAllByTestId('rubric-criteria-row-description')
+        expect(criteriaRowDescriptions[0]).toHaveTextContent('Updated Criterion Test')
+      })
+
+      it('does not update existing criterion when the cancel button is clicked', async () => {
+        queryClient.setQueryData(['fetch-rubric-1'], RUBRICS_QUERY_RESPONSE)
+
+        const {getByTestId, queryAllByTestId} = renderComponent()
+        expect(queryAllByTestId('rubric-criteria-row').length).toEqual(2)
+
+        fireEvent.click(queryAllByTestId('rubric-criteria-row-edit-button')[0])
+        await new Promise(resolve => setTimeout(resolve, 0))
+        expect(getByTestId('rubric-criterion-modal')).toBeInTheDocument()
+        fireEvent.change(getByTestId('rubric-criterion-description'), {
+          target: {value: 'Updated Criterion Test'},
+        })
+        fireEvent.click(getByTestId('rubric-criterion-cancel'))
+
+        expect(queryAllByTestId('rubric-criteria-row').length).toEqual(2)
+        const criteriaRowDescriptions = queryAllByTestId('rubric-criteria-row-description')
+        expect(criteriaRowDescriptions[0]).not.toHaveTextContent('Updated Criterion Test')
+      })
     })
   })
 })
