@@ -41,12 +41,16 @@ const I18n = useI18nScope('rubrics-criteria-row')
 type RubricCriteriaRowProps = {
   criterion: RubricCriterion
   rowIndex: number
+  onDeleteCriterion: () => void
+  onDuplicateCriterion: () => void
   onEditCriterion: () => void
 }
 
 export const RubricCriteriaRow = ({
   criterion,
   rowIndex,
+  onDeleteCriterion,
+  onDuplicateCriterion,
   onEditCriterion,
 }: RubricCriteriaRowProps) => {
   const {description, longDescription, points} = criterion
@@ -120,7 +124,9 @@ export const RubricCriteriaRow = ({
             withBackground={false}
             withBorder={false}
             screenReaderLabel={I18n.t('Delete Criterion')}
+            onClick={onDeleteCriterion}
             size="small"
+            data-testid="rubric-criteria-row-delete-button"
           >
             <IconTrashLine />
           </IconButton>
@@ -128,7 +134,9 @@ export const RubricCriteriaRow = ({
             withBackground={false}
             withBorder={false}
             screenReaderLabel={I18n.t('Duplicate Criterion')}
+            onClick={onDuplicateCriterion}
             size="small"
+            data-testid="rubric-criteria-row-duplicate-button"
           >
             <IconDuplicateLine />
           </IconButton>
