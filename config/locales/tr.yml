@@ -14650,6 +14650,7 @@ tr:
   previous_student_899a6732: "Önceki Öğrenci"
   previous_time_cc96b361: "Önceki (%{time})"
   previous_timestamp_19343a58: "Önceki (%{timestamp})"
+  print_d0e3d53f: Yazdır
   priority_dd4381ee: Öncelik
   privacy_290109ea: Gizlilik
   private_3883d133: Özel
