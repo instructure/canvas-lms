@@ -27,5 +27,3 @@ export type RubricFormProps = {
   criteria: RubricCriterion[]
   pointsPossible: number
 }
-
-export type RubricFormValueTypes = string | boolean

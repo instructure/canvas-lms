@@ -23,6 +23,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
 import LoadingIndicator from '@canvas/loading-indicator/react'
 import {useQuery, useMutation, queryClient} from '@canvas/query'
+import type {RubricCriterion} from '@canvas/rubrics/react/types/rubric'
 import {Alert} from '@instructure/ui-alerts'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {View} from '@instructure/ui-view'
@@ -41,7 +42,8 @@ import {Link} from '@instructure/ui-link'
 import {RubricCriteriaRow} from './RubricCriteriaRow'
 import {NewCriteriaRow} from './NewCriteriaRow'
 import {fetchRubric, saveRubric, type RubricQueryResponse} from '../../queries/RubricFormQueries'
-import {type RubricFormProps, type RubricFormValueTypes} from '../../types/RubricForm'
+import type {RubricFormProps} from '../../types/RubricForm'
+import {CriterionModal} from './CriterionModal'
 
 const I18n = useI18nScope('rubrics-form')
 
@@ -74,6 +76,9 @@ export const RubricForm = () => {
     courseId,
   })
 
+  const [selectedCriterion, setSelectedCriterion] = useState<RubricCriterion>()
+  const [isCriterionModalOpen, setIsCriterionModalOpen] = useState(false)
+
   const header = rubricId ? I18n.t('Edit Rubric') : I18n.t('Create New Rubric')
 
   const {data, isLoading} = useQuery({
@@ -98,13 +103,38 @@ export const RubricForm = () => {
     },
   })
 
-  const setRubricFormField = (field: keyof RubricFormProps, value: RubricFormValueTypes) => {
-    setRubricForm(prevState => ({...prevState, [field]: value}))
+  const setRubricFormField = <K extends keyof RubricFormProps>(
+    key: K,
+    value: RubricFormProps[K]
+  ) => {
+    setRubricForm(prevState => ({...prevState, [key]: value}))
   }
 
   const formValid = () => {
     // Add more form validation here
     return rubricForm.title.trim().length > 0
+  }
+
+  const openCriterionModal = (criterion?: RubricCriterion) => {
+    setSelectedCriterion(criterion)
+    setIsCriterionModalOpen(true)
+  }
+
+  const handleSaveCriterion = (updatedCriteria: RubricCriterion) => {
+    const criteria = [...rubricForm.criteria]
+
+    const criterionIndexToUpdate = criteria.findIndex(c => c.id === updatedCriteria.id)
+
+    if (criterionIndexToUpdate < 0) {
+      criteria.push(updatedCriteria)
+    } else {
+      criteria[criterionIndexToUpdate] = updatedCriteria
+    }
+
+    const newPointsPossible = criteria.reduce((acc, c) => acc + c.points, 0)
+    setRubricFormField('pointsPossible', newPointsPossible)
+    setRubricFormField('criteria', criteria)
+    setIsCriterionModalOpen(false)
   }
 
   useEffect(() => {
@@ -218,10 +248,18 @@ export const RubricForm = () => {
           as="main"
         >
           {rubricForm.criteria.map((criterion, index) => (
-            <RubricCriteriaRow key={criterion.id} criterion={criterion} rowIndex={index + 1} />
+            <RubricCriteriaRow
+              key={criterion.id}
+              criterion={criterion}
+              rowIndex={index + 1}
+              onEditCriterion={() => openCriterionModal(criterion)}
+            />
           ))}
 
-          <NewCriteriaRow rowIndex={rubricForm.criteria.length + 1} />
+          <NewCriteriaRow
+            rowIndex={rubricForm.criteria.length + 1}
+            onEditCriterion={() => openCriterionModal()}
+          />
         </Flex.Item>
       </Flex>
 
@@ -278,6 +316,13 @@ export const RubricForm = () => {
           </Flex.Item>
         </Flex>
       </div>
+
+      <CriterionModal
+        criterion={selectedCriterion}
+        isOpen={isCriterionModalOpen}
+        onDismiss={() => setIsCriterionModalOpen(false)}
+        onSave={(updatedCriteria: RubricCriterion) => handleSaveCriterion(updatedCriteria)}
+      />
     </View>
   )
 }
