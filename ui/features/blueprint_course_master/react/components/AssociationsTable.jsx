@@ -74,7 +74,7 @@ export default class AssociationsTable extends React.Component {
     }
 
     if (this.props.isLoadingAssociations && !nextProps.isLoadingAssociations) {
-      $.screenReaderFlashMessageExclusive(I18n.t('Loading associations complete'))
+      $.screenReaderFlashMessage(I18n.t('Loading associations complete'))
     }
   }
 
