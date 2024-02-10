@@ -122,6 +122,19 @@ export const RubricForm = () => {
     setIsCriterionModalOpen(true)
   }
 
+  const duplicateCriterion = (criterion: RubricCriterion) => {
+    const newCriterion = {...criterion, id: ``}
+    setSelectedCriterion(newCriterion)
+    setIsCriterionModalOpen(true)
+  }
+
+  const deleteCriterion = (criterion: RubricCriterion) => {
+    const criteria = rubricForm.criteria.filter(c => c.id !== criterion.id)
+    const newPointsPossible = criteria.reduce((acc, c) => acc + c.points, 0)
+    setRubricFormField('pointsPossible', newPointsPossible)
+    setRubricFormField('criteria', criteria)
+  }
+
   const handleSaveCriterion = (updatedCriteria: RubricCriterion) => {
     const criteria = [...rubricForm.criteria]
 
@@ -259,6 +272,8 @@ export const RubricForm = () => {
               key={criterion.id}
               criterion={criterion}
               rowIndex={index + 1}
+              onDeleteCriterion={() => deleteCriterion(criterion)}
+              onDuplicateCriterion={() => duplicateCriterion(criterion)}
               onEditCriterion={() => openCriterionModal(criterion)}
             />
           ))}
