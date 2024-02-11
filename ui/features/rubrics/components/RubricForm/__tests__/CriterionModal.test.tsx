@@ -114,6 +114,36 @@ describe('CriterionModal tests', () => {
       )
       expect(removedRating).toBeUndefined()
     })
+
+    it('should drag and drop a rating to a new index', () => {
+      const ratings = [
+        {id: '1', description: 'Rating 1', points: 0, longDescription: ''},
+        {id: '2', description: 'Rating 2', points: 0, longDescription: ''},
+        {id: '3', description: 'Rating 3', points: 0, longDescription: ''},
+      ]
+      const {queryAllByTestId} = renderComponent({criterion: getCriterion({ratings})})
+      const dragRating = queryAllByTestId('rating-drag-handle')[0]
+      const dropRating = queryAllByTestId('rating-drag-handle')[2]
+
+      fireEvent.dragStart(dragRating)
+      fireEvent.dragOver(dropRating)
+      fireEvent.drop(dropRating)
+
+      const totalRatingNames = queryAllByTestId('rating-name').map(
+        ratingName => (ratingName as HTMLInputElement).value
+      )
+      expect(totalRatingNames.length).toEqual(ratings.length)
+
+      const newFirstIndex = totalRatingNames.findIndex(
+        ratingName => ratingName === ratings[0].description
+      )
+      const newLastIndex = totalRatingNames.findIndex(
+        ratingName => ratingName === ratings[2].description
+      )
+
+      expect(newFirstIndex).toEqual(2)
+      expect(newLastIndex).toEqual(1)
+    })
   })
 
   describe('Save and Cancel Tests', () => {
