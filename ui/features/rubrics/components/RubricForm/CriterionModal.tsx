@@ -77,6 +77,8 @@ export const CriterionModal = ({criterion, isOpen, onDismiss, onSave}: Criterion
   const [ratings, setRatings] = useState<RubricRating[]>([])
   const [criterionDescription, setCriterionDescription] = useState('')
   const [criterionLongDescription, setCriterionLongDescription] = useState('')
+  const [draggedRatingIndex, setDraggedRatingIndex] = useState<number>()
+  const [draggedOverIndex, setDraggedOverIndex] = useState<number>()
 
   const addRating = (index: number) => {
     const newRating = {
@@ -132,6 +134,54 @@ export const CriterionModal = ({criterion, isOpen, onDismiss, onSave}: Criterion
     onSave(newCriterion)
   }
 
+  const handleDragOver = (event: React.DragEvent, index: number) => {
+    event.preventDefault()
+    setDraggedOverIndex(index)
+  }
+
+  const handleDragLeave = (event: React.DragEvent) => {
+    const target = event.target as Node
+    const relatedTarget = event.relatedTarget as Node | null
+
+    // Check if the drag actually left area and its descendants
+    if (target !== relatedTarget && !target.contains(relatedTarget)) {
+      setDraggedOverIndex(undefined)
+    }
+  }
+
+  const handleDragDrop = (event: React.DragEvent, index: number) => {
+    event.preventDefault()
+    const fromIndex = Number(draggedRatingIndex)
+    const toIndex = index
+
+    if (fromIndex === toIndex) return
+
+    const ratingFieldsToMove = ratings.map(r => {
+      return {
+        description: r.description,
+        longDescription: r.longDescription,
+      }
+    })
+
+    const movedRating = ratingFieldsToMove.splice(fromIndex, 1)[0]
+    ratingFieldsToMove.splice(toIndex, 0, movedRating)
+
+    const newRatings = ratings.map((r, i) => {
+      return {
+        ...r,
+        description: ratingFieldsToMove[i].description,
+        longDescription: ratingFieldsToMove[i].longDescription,
+      }
+    })
+
+    setRatings(newRatings)
+  }
+
+  const handleDragEnd = () => {
+    setDraggedRatingIndex(undefined)
+    setDraggedOverIndex(undefined)
+  }
+
   const isValid = () => {
     return (
       criterionDescription.trim().length > 0 && ratings.every(r => r.description.trim().length > 0)
@@ -149,7 +199,7 @@ export const CriterionModal = ({criterion, isOpen, onDismiss, onSave}: Criterion
       width="66.5rem"
       height="45.125rem"
       label={I18n.t('Rubric Criterion Modal')}
-      shouldCloseOnDocumentClick={true}
+      shouldCloseOnDocumentClick={false}
       data-testid="rubric-criterion-modal"
     >
       <Modal.Header>
@@ -216,10 +266,18 @@ export const CriterionModal = ({criterion, isOpen, onDismiss, onSave}: Criterion
               <View as="div" key={`rating-row-${rating.id}-${index}`}>
                 <AddRatingRow onClick={() => addRating(index)} />
                 <RatingRow
+                  index={index}
+                  isDragging={draggedRatingIndex === index}
+                  isDraggedOver={draggedOverIndex === index && draggedRatingIndex !== index}
                   rating={rating}
                   scale={scale}
                   onRemove={() => removeRating(index)}
                   onChange={updatedRating => updateRating(index, updatedRating)}
+                  onDragDrop={handleDragDrop}
+                  onDragOver={handleDragOver}
+                  onDragStart={() => setDraggedRatingIndex(index)}
+                  onDragEnd={handleDragEnd}
+                  onDragLeave={handleDragLeave}
                 />
               </View>
             )
@@ -260,13 +318,34 @@ export const CriterionModal = ({criterion, isOpen, onDismiss, onSave}: Criterion
 }
 
 type RatingRowProps = {
+  index: number
+  isDragging: boolean
+  isDraggedOver: boolean
   rating: RubricRating
   scale: number
   onChange: (rating: RubricRating) => void
   onRemove: () => void
+  onDragStart: (e: React.DragEvent, index: number) => void
+  onDragOver: (e: React.DragEvent, index: number) => void
+  onDragDrop: (e: React.DragEvent, index: number) => void
+  onDragLeave: (e: React.DragEvent) => void
+  onDragEnd: () => void
 }
-const RatingRow = ({rating, scale, onChange, onRemove}: RatingRowProps) => {
-  function setRatingForm<K extends keyof RubricRating>(key: K, value: RubricRating[K]) {
+const RatingRow = ({
+  index,
+  isDragging,
+  isDraggedOver,
+  rating,
+  scale,
+  onChange,
+  onRemove,
+  onDragOver,
+  onDragStart,
+  onDragDrop,
+  onDragEnd,
+  onDragLeave,
+}: RatingRowProps) => {
+  const setRatingForm = <K extends keyof RubricRating>(key: K, value: RubricRating[K]) => {
     onChange({...rating, [key]: value})
   }
 
@@ -281,7 +360,13 @@ const RatingRow = ({rating, scale, onChange, onRemove}: RatingRowProps) => {
     : [{text: 'Rating Name Required', type: 'error'}]
 
   return (
-    <Flex>
+    <Flex
+      onDragStart={(e: React.DragEvent) => onDragStart(e, index)}
+      onDragOver={(e: React.DragEvent) => onDragOver(e, index)}
+      onDrop={(e: React.DragEvent) => onDragDrop(e, index)}
+      onDragEnd={onDragEnd}
+      onDragLeave={onDragLeave}
+    >
       <Flex.Item align="start">
         <View as="div" width="3.938rem">
           <TextInput
@@ -308,13 +393,18 @@ const RatingRow = ({rating, scale, onChange, onRemove}: RatingRowProps) => {
           />
         </View>
       </Flex.Item>
-      <Flex.Item align="start">
+      <Flex.Item align="start" draggable={true} data-testid="rating-drag-handle">
         <View as="div" width="3rem" textAlign="center" cursor="pointer" margin="xx-small 0 0 0">
           <IconDragHandleLine />
         </View>
       </Flex.Item>
       <Flex.Item align="start">
-        <View as="div" width="8.875rem">
+        <View
+          as="div"
+          width="8.875rem"
+          borderWidth={isDragging || isDraggedOver ? 'medium' : 'none'}
+          borderColor={isDragging ? 'brand' : 'success'}
+        >
           <TextInput
             renderLabel={<ScreenReaderContent>{I18n.t('Rating Name')}</ScreenReaderContent>}
             display="inline-block"
@@ -326,7 +416,13 @@ const RatingRow = ({rating, scale, onChange, onRemove}: RatingRowProps) => {
         </View>
       </Flex.Item>
       <Flex.Item shouldGrow={true} shouldShrink={true} align="start">
-        <View as="div" margin="0 small" themeOverride={{marginSmall: '1rem'}}>
+        <View
+          as="div"
+          margin="0 small"
+          themeOverride={{marginSmall: '1rem'}}
+          borderWidth={isDragging || isDraggedOver ? 'medium' : 'none'}
+          borderColor={isDragging ? 'brand' : 'success'}
+        >
           <TextArea
             label={<ScreenReaderContent>{I18n.t('Rating Description')}</ScreenReaderContent>}
             value={rating.longDescription}
