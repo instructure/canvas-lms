@@ -35,6 +35,13 @@ function ExternalContentReturnView() {
   return ExternalContentReturnView.__super__.constructor.apply(this, arguments)
 }
 
+function focusOnOpen() {
+  const titleClose = $(this).parent().find('.ui-dialog-titlebar-close')
+  if (titleClose.length) {
+    titleClose.trigger('focus')
+  }
+}
+
 ExternalContentReturnView.prototype.template = template
 
 ExternalContentReturnView.optionProperty('launchType')
@@ -99,6 +106,7 @@ ExternalContentReturnView.prototype.afterRender = function () {
       height: settings.selection_height,
       resizable: true,
       close: this.removeDialog,
+      open: focusOnOpen,
     })
   }
 }
