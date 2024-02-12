@@ -92,9 +92,9 @@ describe "new groups" do
       expect(f(".group-user")).to include_text(@students[0].name)
 
       # Moves the student
-      f(".group-user-actions").click
+      f("[data-testid=groupUserMenu").click
       wait_for_ajaximations
-      f(".edit-group-assignment").click
+      f("[data-testid=moveTo").click
       wait_for_ajaximations
       click_option(".move-select .move-select__group select", @testgroup[1].name.to_s)
       button = f('.move-select button[type="submit"]')
@@ -145,9 +145,9 @@ describe "new groups" do
       wait_for_ajaximations
 
       # Sets user as group leader
-      f(".group-user-actions").click
+      f("[data-testid=groupUserMenu]").click
       wait_for_ajaximations
-      f(".set-as-leader").click
+      f("[data-testid=setAsLeader]").click
       wait_for_ajaximations
 
       # Looks for student to have a group leader icon
@@ -156,7 +156,7 @@ describe "new groups" do
       expect(f(".span3.ellipsis.group-leader")).to be_displayed
       expect(f(".span3.ellipsis.group-leader")).to include_text(@students.first.name)
 
-      check_element_has_focus f(".group-user-actions[data-user-id='user_#{@students.first.id}']")
+      check_element_has_focus f("[data-userid='#{@students.first.id}']")
     end
 
     it "allows teachers to message unassigned students" do
@@ -285,10 +285,10 @@ describe "new groups" do
       f(".group[data-id=\"#{@testgroup[0].id}\"] .toggle-group").click
       wait_for_ajaximations
 
-      f(".group-user-actions[data-user-id=\"user_#{@students[0].id}\"]").click
+      fj("[data-testid=groupUserMenu][data-userid=#{@students[0].id}]").click
       wait_for_ajaximations
 
-      f(".ui-menu-item .edit-group-assignment").click
+      f("[data-testid=moveTo]").click
       wait_for_ajaximations
 
       f(".move-select .move-select__group") # fixes flakiness since the ff below doesn't wait for the element to appear
@@ -325,10 +325,10 @@ describe "new groups" do
       f(".group[data-id=\"#{@testgroup[0].id}\"] .toggle-group").click
       wait_for_ajaximations
 
-      f(".group-user-actions[data-user-id=\"user_#{@students[0].id}\"]").click
+      fj("[data-testid=groupUserMenu][data-userid=#{@students[0].id}]").click
       wait_for_ajaximations
 
-      f(".ui-menu-item .remove-from-group").click
+      f("[data-testid=removeFromGroup]").click
       wait_for_ajaximations
 
       expect(f(".ui-cnvs-scrollable")).to include_text(@students[0].name)
@@ -347,9 +347,9 @@ describe "new groups" do
 
       f(".group[data-id=\"#{@testgroup[0].id}\"] .toggle-group").click
       wait_for_ajaximations
-      f(".group-user-actions[data-user-id=\"user_#{@students[0].id}\"]").click
-      wait_for(method: nil, timeout: 1) { f(".ui-menu-item .edit-group-assignment").displayed? }
-      f(".ui-menu-item .edit-group-assignment").click
+      fj("[data-testid=groupUserMenu][data-userid=#{@students[0].id}]").click
+      wait_for_ajaximations
+      f("[data-testid=moveTo]").click
       wait_for(method: nil, timeout: 2) { fxpath("//*[@data-cid='Tray']//*[@role='dialog']").displayed? }
       ff(".move-select .move-select__group option").last.click
       f('.move-select button[type="submit"]').click
@@ -410,8 +410,9 @@ describe "new groups" do
       expect(f(".group[data-id=\"#{@testgroup[0].id}\"] .group-user")).to include_text("Test Student 1")
       expect(f(".group-leader .icon-user")).to be_displayed
 
-      f(".group-user-actions[data-user-id=\"user_#{@students[0].id}\"]").click
-      f(".ui-menu-item .icon-trash").click
+      fj("[data-testid=groupUserMenu][data-userid=#{@students[0].id}]").click
+      wait_for_ajaximations
+      f("[data-testid=removeFromGroup]").click
       wait_for_ajaximations
 
       get "/courses/#{@course.id}/groups"
@@ -974,9 +975,9 @@ describe "new groups" do
           expect(ff(".group-users").last).to include_text @students.last.name
 
           # Moves Test User 2 to Test Group 1
-          ff(".group-user-actions").last.click
-          wait_for(method: nil, timeout: 1) { f(".ui-menu-item .edit-group-assignment").displayed? }
-          ff(".edit-group-assignment").last.click
+          ff("[data-testid=groupUserMenu]").last.click
+          wait_for_ajaximations
+          f("[data-testid=moveTo]").click
           wait_for(method: nil, timeout: 2) { fxpath("//*[@data-cid='Tray']//*[@role='dialog']").displayed? }
           click_option(".move-select .move-select__group select", @testgroup.first.name.to_s)
 
