@@ -16,12 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useRef, useContext} from 'react'
 import PropTypes from 'prop-types'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {DateTimeInput} from '@instructure/ui-date-time-input'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {AssignedTo} from './AssignedTo'
+import {GradedDiscussionDueDatesContext} from '../../util/constants'
 
 const I18n = useI18nScope('discussion_create')
 
@@ -31,9 +32,16 @@ export const AssignmentDueDate = ({
   onAssignedInfoChange,
   assignToErrorMessages,
 }) => {
+  const dueAtRef = useRef()
+  const unlockAtRef = useRef()
+
   const [assignedInformation, setAssignedInformation] = useState(initialAssignedInformation)
   const [dueDateErrorMessage, setDueDateErrorMessage] = useState([])
   const [availableFromAndUntilErrorMessage, setAvailableFromAndUntilErrorMessage] = useState([])
+
+  const {gradedDiscussionRefMap, setGradedDiscussionRefMap} = useContext(
+    GradedDiscussionDueDatesContext
+  )
 
   const validateDueDate = (dueDate, availableFrom, availableUntil) => {
     const due = new Date(dueDate)
@@ -59,6 +67,24 @@ export const AssignmentDueDate = ({
     return null
   }
 
+  const setRefMap = (field, ref) => {
+    const refMap = gradedDiscussionRefMap.get(initialAssignedInformation.dueDateId)
+    refMap[field] = ref
+    setGradedDiscussionRefMap(new Map(gradedDiscussionRefMap))
+  }
+
+  useEffect(() => {
+    const refObject = {
+      assignedToRef: null,
+      dueAtRef: null,
+      unlockAtRef: null,
+    }
+
+    gradedDiscussionRefMap.set(initialAssignedInformation.dueDateId, refObject)
+    setGradedDiscussionRefMap(gradedDiscussionRefMap)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   useEffect(() => {
     const {dueDate, availableFrom, availableUntil} = assignedInformation
 
@@ -72,8 +98,10 @@ export const AssignmentDueDate = ({
           type: 'error',
         },
       ])
+      setRefMap('dueAtRef', dueAtRef)
     } else {
       setDueDateErrorMessage([])
+      setRefMap('dueAtRef', null)
     }
 
     if (availableFromAndUntilError) {
@@ -83,8 +111,10 @@ export const AssignmentDueDate = ({
           type: 'error',
         },
       ])
+      setRefMap('unlockAtRef', unlockAtRef)
     } else {
       setAvailableFromAndUntilErrorMessage([])
+      setRefMap('unlockAtRef', null)
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -137,6 +167,9 @@ export const AssignmentDueDate = ({
           dateRenderLabel={I18n.t('Date')}
           timeRenderLabel={I18n.t('Time')}
           messages={dueDateErrorMessage}
+          dateInputRef={ref => {
+            dueAtRef.current = ref
+          }}
         />
         <DateTimeInput
           description={I18n.t('Available from')}
@@ -154,6 +187,9 @@ export const AssignmentDueDate = ({
           dateRenderLabel={I18n.t('Date')}
           timeRenderLabel={I18n.t('Time')}
           messages={availableFromAndUntilErrorMessage}
+          dateInputRef={ref => {
+            unlockAtRef.current = ref
+          }}
         />
         <DateTimeInput
           description={I18n.t('Until')}
@@ -187,6 +223,7 @@ AssignmentDueDate.propTypes = {
     )
   ).isRequired,
   initialAssignedInformation: PropTypes.shape({
+    dueDateId: PropTypes.string,
     assignedList: PropTypes.arrayOf(PropTypes.string),
     dueDate: PropTypes.string,
     availableFrom: PropTypes.string,
@@ -199,6 +236,7 @@ AssignmentDueDate.propTypes = {
 AssignmentDueDate.defaultProps = {
   availableAssignToOptions: {},
   initialAssignedInformation: {
+    dueDateId: '',
     assignedList: [],
     dueDate: '',
     availableFrom: '',

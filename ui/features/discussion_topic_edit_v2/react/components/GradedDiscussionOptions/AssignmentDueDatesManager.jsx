@@ -49,6 +49,8 @@ export const AssignmentDueDatesManager = () => {
     groups,
     dueDateErrorMessages,
     setDueDateErrorMessages,
+    gradedDiscussionRefMap,
+    setGradedDiscussionRefMap,
   } = useContext(GradedDiscussionDueDatesContext)
   const [listOptions, setListOptions] = useState({
     '': getDefaultBaseOptions(ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED, defaultEveryoneOption),
@@ -89,6 +91,8 @@ export const AssignmentDueDatesManager = () => {
   const handleCloseAssignmentDueDate = dueDateId => () => {
     const updatedInfoList = assignedInfoList.filter(info => info.dueDateId !== dueDateId)
     setAssignedInfoList(updatedInfoList)
+    gradedDiscussionRefMap.delete(dueDateId)
+    setGradedDiscussionRefMap(new Map(gradedDiscussionRefMap))
   }
 
   const getAvailableOptionsFor = dueDateId => {
