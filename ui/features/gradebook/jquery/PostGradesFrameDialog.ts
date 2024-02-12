@@ -68,6 +68,12 @@ export default class PostGradesFrameDialog {
       width: 800,
       height: 600,
       dialogClass: 'post-grades-frame-dialog',
+      open() {
+        const titleClose = $(this).parent().find('.ui-dialog-titlebar-close')
+        if (titleClose.length) {
+          titleClose.trigger('focus')
+        }
+      },
     })
 
     // list for focus/blur events
