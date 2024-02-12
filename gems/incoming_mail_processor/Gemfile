@@ -12,3 +12,5 @@ gem "utf8_cleaner", path: "../utf8_cleaner"
 # here.  I've reached out to the bundler team, but no word yet
 gem "canvas_errors", path: "../canvas_errors"
 gem "canvas_text_helper", path: "../canvas_text_helper"
+
+eval_gemfile(gemfile.dirname.join("../gemfile_prefix.rb"))

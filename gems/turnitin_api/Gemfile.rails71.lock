@@ -1,0 +1,110 @@
+PATH
+  remote: .
+  specs:
+    turnitin_api (0.1.0)
+      activesupport
+      faraday (~> 2.7)
+      faraday-follow_redirects (~> 0.3)
+      faraday-multipart (~> 1.0)
+      inst_statsd
+      simple_oauth (~> 0.3)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    activemodel (7.1.3)
+      activesupport (= 7.1.3)
+    activerecord (7.1.3)
+      activemodel (= 7.1.3)
+      activesupport (= 7.1.3)
+      timeout (>= 0.4.0)
+    activesupport (7.1.3)
+      base64
+      bigdecimal
+      concurrent-ruby (~> 1.0, >= 1.0.2)
+      connection_pool (>= 2.2.5)
+      drb
+      i18n (>= 1.6, < 2)
+      minitest (>= 5.1)
+      mutex_m
+      tzinfo (~> 2.0)
+    addressable (2.8.6)
+      public_suffix (>= 2.0.2, < 6.0)
+    aroi (1.0.0)
+      activerecord (>= 5.2)
+      activesupport (>= 5.2)
+    base64 (0.2.0)
+    bigdecimal (3.1.6)
+    concurrent-ruby (1.2.3)
+    connection_pool (2.4.1)
+    crack (1.0.0)
+      bigdecimal
+      rexml
+    diff-lcs (1.5.1)
+    dogstatsd-ruby (5.6.1)
+    drb (2.2.0)
+      ruby2_keywords
+    faraday (2.9.0)
+      faraday-net_http (>= 2.0, < 3.2)
+    faraday-follow_redirects (0.3.0)
+      faraday (>= 1, < 3)
+    faraday-multipart (1.0.4)
+      multipart-post (~> 2)
+    faraday-net_http (3.1.0)
+      net-http
+    hashdiff (1.1.0)
+    i18n (1.14.1)
+      concurrent-ruby (~> 1.0)
+    inst_statsd (3.0.4)
+      aroi (>= 0.0.7)
+      dogstatsd-ruby (>= 4.2, < 6.0, != 5.0.0)
+      statsd-ruby (~> 1.0)
+    minitest (5.22.2)
+    multipart-post (2.4.0)
+    mutex_m (0.2.0)
+    net-http (0.4.1)
+      uri
+    public_suffix (5.0.4)
+    rake (13.1.0)
+    rexml (3.2.6)
+    rspec (3.13.0)
+      rspec-core (~> 3.13.0)
+      rspec-expectations (~> 3.13.0)
+      rspec-mocks (~> 3.13.0)
+    rspec-core (3.13.0)
+      rspec-support (~> 3.13.0)
+    rspec-expectations (3.13.0)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.13.0)
+    rspec-mocks (3.13.0)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.13.0)
+    rspec-support (3.13.0)
+    ruby2_keywords (0.0.5)
+    simple_oauth (0.3.1)
+    statsd-ruby (1.5.0)
+    timeout (0.4.1)
+    tzinfo (2.0.6)
+      concurrent-ruby (~> 1.0)
+    uri (0.13.0)
+    webmock (3.20.0)
+      addressable (>= 2.8.0)
+      crack (>= 0.3.2)
+      hashdiff (>= 0.4.0, < 2.0.0)
+
+PLATFORMS
+  aarch64-linux
+  arm64-darwin
+  ruby
+  x86_64-darwin
+  x86_64-linux
+
+DEPENDENCIES
+  bundler (~> 2.2)
+  rake
+  rspec (~> 3.12)
+  turnitin_api!
+  webmock (~> 3.0)
+
+BUNDLED WITH
+   2.5.3

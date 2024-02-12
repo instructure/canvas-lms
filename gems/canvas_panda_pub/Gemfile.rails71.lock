@@ -1,0 +1,236 @@
+PATH
+  remote: ../canvas_cache
+  specs:
+    canvas_cache (0.1.0)
+      activesupport
+      config_file
+      digest-murmurhash (>= 1.1.0)
+      guardrail (>= 2.0.0)
+      redis (~> 5.0)
+      redis-clustering (~> 5.0)
+      redis-scripting (>= 1.0.0)
+
+PATH
+  remote: ../canvas_http
+  specs:
+    canvas_http (1.0.0)
+      canvas_cache
+      legacy_multipart
+
+PATH
+  remote: ../canvas_slug
+  specs:
+    canvas_slug (0.0.1)
+      swearjar (~> 1.4)
+
+PATH
+  remote: ../config_file
+  specs:
+    config_file (0.1.0)
+      railties (>= 5.0)
+
+PATH
+  remote: ../legacy_multipart
+  specs:
+    legacy_multipart (0.0.1)
+      canvas_slug
+      mime-types (~> 3.2)
+
+PATH
+  remote: .
+  specs:
+    canvas_panda_pub (1.0.0)
+      canvas_http
+      json-jwt (~> 1.10)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    actionpack (7.1.3)
+      actionview (= 7.1.3)
+      activesupport (= 7.1.3)
+      nokogiri (>= 1.8.5)
+      racc
+      rack (>= 2.2.4)
+      rack-session (>= 1.0.1)
+      rack-test (>= 0.6.3)
+      rails-dom-testing (~> 2.2)
+      rails-html-sanitizer (~> 1.6)
+    actionview (7.1.3)
+      activesupport (= 7.1.3)
+      builder (~> 3.1)
+      erubi (~> 1.11)
+      rails-dom-testing (~> 2.2)
+      rails-html-sanitizer (~> 1.6)
+    activemodel (7.1.3)
+      activesupport (= 7.1.3)
+    activerecord (7.1.3)
+      activemodel (= 7.1.3)
+      activesupport (= 7.1.3)
+      timeout (>= 0.4.0)
+    activesupport (7.1.3)
+      base64
+      bigdecimal
+      concurrent-ruby (~> 1.0, >= 1.0.2)
+      connection_pool (>= 2.2.5)
+      drb
+      i18n (>= 1.6, < 2)
+      minitest (>= 5.1)
+      mutex_m
+      tzinfo (~> 2.0)
+    addressable (2.8.6)
+      public_suffix (>= 2.0.2, < 6.0)
+    aes_key_wrap (1.1.0)
+    base64 (0.2.0)
+    bigdecimal (3.1.6)
+    bindata (2.4.15)
+    builder (3.2.4)
+    concurrent-ruby (1.2.3)
+    connection_pool (2.4.1)
+    crack (1.0.0)
+      bigdecimal
+      rexml
+    crass (1.0.6)
+    diff-lcs (1.5.1)
+    digest-murmurhash (1.1.1)
+    drb (2.2.0)
+      ruby2_keywords
+    erubi (1.12.0)
+    faraday (2.9.0)
+      faraday-net_http (>= 2.0, < 3.2)
+    faraday-follow_redirects (0.3.0)
+      faraday (>= 1, < 3)
+    faraday-net_http (3.1.0)
+      net-http
+    guardrail (3.0.3)
+      activerecord (>= 6.1, < 7.2)
+      railties (>= 6.1, < 7.2)
+    hashdiff (1.1.0)
+    i18n (1.14.1)
+      concurrent-ruby (~> 1.0)
+    io-console (0.7.2)
+    irb (1.11.2)
+      rdoc
+      reline (>= 0.4.2)
+    json-jwt (1.16.5)
+      activesupport (>= 4.2)
+      aes_key_wrap
+      base64
+      bindata
+      faraday (~> 2.0)
+      faraday-follow_redirects
+    loofah (2.22.0)
+      crass (~> 1.0.2)
+      nokogiri (>= 1.12.0)
+    mime-types (3.5.2)
+      mime-types-data (~> 3.2015)
+    mime-types-data (3.2024.0206)
+    mini_portile2 (2.8.5)
+    minitest (5.22.2)
+    mutex_m (0.2.0)
+    net-http (0.4.1)
+      uri
+    nokogiri (1.15.5)
+      mini_portile2 (~> 2.8.2)
+      racc (~> 1.4)
+    nokogiri (1.15.5-aarch64-linux)
+      racc (~> 1.4)
+    nokogiri (1.15.5-arm64-darwin)
+      racc (~> 1.4)
+    nokogiri (1.15.5-x86_64-darwin)
+      racc (~> 1.4)
+    nokogiri (1.15.5-x86_64-linux)
+      racc (~> 1.4)
+    psych (5.1.2)
+      stringio
+    public_suffix (5.0.4)
+    racc (1.7.3)
+    rack (3.0.9)
+    rack-session (2.0.0)
+      rack (>= 3.0.0)
+    rack-test (2.1.0)
+      rack (>= 1.3)
+    rackup (2.1.0)
+      rack (>= 3)
+      webrick (~> 1.8)
+    rails-dom-testing (2.2.0)
+      activesupport (>= 5.0.0)
+      minitest
+      nokogiri (>= 1.6)
+    rails-html-sanitizer (1.6.0)
+      loofah (~> 2.21)
+      nokogiri (~> 1.14)
+    railties (7.1.3)
+      actionpack (= 7.1.3)
+      activesupport (= 7.1.3)
+      irb
+      rackup (>= 1.0.0)
+      rake (>= 12.2)
+      thor (~> 1.0, >= 1.2.2)
+      zeitwerk (~> 2.6)
+    rake (13.1.0)
+    rdoc (6.6.2)
+      psych (>= 4.0.0)
+    redis (5.1.0)
+      redis-client (>= 0.17.0)
+    redis-client (0.19.1)
+      connection_pool
+    redis-cluster-client (0.7.5)
+      redis-client (~> 0.12)
+    redis-clustering (5.1.0)
+      redis (= 5.1.0)
+      redis-cluster-client (>= 0.7.0)
+    redis-scripting (1.0.1)
+      redis (>= 3.0)
+    reline (0.4.2)
+      io-console (~> 0.5)
+    rexml (3.2.6)
+    rspec (3.13.0)
+      rspec-core (~> 3.13.0)
+      rspec-expectations (~> 3.13.0)
+      rspec-mocks (~> 3.13.0)
+    rspec-core (3.13.0)
+      rspec-support (~> 3.13.0)
+    rspec-expectations (3.13.0)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.13.0)
+    rspec-mocks (3.13.0)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.13.0)
+    rspec-support (3.13.0)
+    ruby2_keywords (0.0.5)
+    stringio (3.1.0)
+    swearjar (1.4.0)
+    thor (1.3.0)
+    timeout (0.4.1)
+    tzinfo (2.0.6)
+      concurrent-ruby (~> 1.0)
+    uri (0.13.0)
+    webmock (3.20.0)
+      addressable (>= 2.8.0)
+      crack (>= 0.3.2)
+      hashdiff (>= 0.4.0, < 2.0.0)
+    webrick (1.8.1)
+    zeitwerk (2.6.13)
+
+PLATFORMS
+  aarch64-linux
+  arm64-darwin
+  ruby
+  x86_64-darwin
+  x86_64-linux
+
+DEPENDENCIES
+  bundler (>= 1.5, < 3)
+  canvas_cache!
+  canvas_http!
+  canvas_panda_pub!
+  canvas_slug!
+  config_file!
+  legacy_multipart!
+  rake
+  rspec (~> 3.0)
+  webmock (~> 3.0)
+
+BUNDLED WITH
+   2.5.3

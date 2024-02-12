@@ -1,0 +1,248 @@
+PATH
+  remote: ..
+  specs:
+    canvas_cache (0.1.0)
+      activesupport
+      config_file
+      digest-murmurhash (>= 1.1.0)
+      guardrail (>= 2.0.0)
+      redis (~> 5.0)
+      redis-clustering (~> 5.0)
+      redis-scripting (>= 1.0.0)
+    canvas_errors (0.1.0)
+      activesupport
+      code_ownership
+      inst-jobs
+    canvas_security (0.1.0)
+      activesupport
+      canvas_cache
+      canvas_errors
+      dynamic_settings
+      json-jwt
+    config_file (0.1.0)
+      railties (>= 5.0)
+    dynamic_settings (0.1.0)
+      activesupport (>= 5.0)
+      config_file
+      diplomat (>= 2.5.1)
+      railties
+
+PATH
+  remote: .
+  specs:
+    request_context (0.1.0)
+      actionpack
+      canvas_security
+      railties
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    actionpack (7.1.3)
+      actionview (= 7.1.3)
+      activesupport (= 7.1.3)
+      nokogiri (>= 1.8.5)
+      racc
+      rack (>= 2.2.4)
+      rack-session (>= 1.0.1)
+      rack-test (>= 0.6.3)
+      rails-dom-testing (~> 2.2)
+      rails-html-sanitizer (~> 1.6)
+    actionview (7.1.3)
+      activesupport (= 7.1.3)
+      builder (~> 3.1)
+      erubi (~> 1.11)
+      rails-dom-testing (~> 2.2)
+      rails-html-sanitizer (~> 1.6)
+    activemodel (7.1.3)
+      activesupport (= 7.1.3)
+    activerecord (7.1.3)
+      activemodel (= 7.1.3)
+      activesupport (= 7.1.3)
+      timeout (>= 0.4.0)
+    activerecord-pg-extensions (0.5.4)
+      activerecord (>= 7.0, < 7.2)
+      railties (>= 7.0, < 7.2)
+    activesupport (7.1.3)
+      base64
+      bigdecimal
+      concurrent-ruby (~> 1.0, >= 1.0.2)
+      connection_pool (>= 2.2.5)
+      drb
+      i18n (>= 1.6, < 2)
+      minitest (>= 5.1)
+      mutex_m
+      tzinfo (~> 2.0)
+    aes_key_wrap (1.1.0)
+    after_transaction_commit (2.2.2)
+      activerecord (>= 5.2)
+    base64 (0.2.0)
+    bigdecimal (3.1.6)
+    bindata (2.4.15)
+    builder (3.2.4)
+    code_ownership (1.36.1)
+      code_teams (~> 1.0)
+      packs-specification
+      sorbet-runtime (>= 0.5.10821)
+    code_teams (1.0.2)
+      sorbet-runtime
+    concurrent-ruby (1.2.3)
+    connection_pool (2.4.1)
+    crass (1.0.6)
+    debug (1.9.1)
+      irb (~> 1.10)
+      reline (>= 0.3.8)
+    debug_inspector (1.2.0)
+    deep_merge (1.2.2)
+    diff-lcs (1.5.1)
+    digest-murmurhash (1.1.1)
+    diplomat (2.6.4)
+      deep_merge (~> 1.2)
+      faraday (>= 0.9, < 3.0, != 2.0.0)
+    drb (2.2.0)
+      ruby2_keywords
+    erubi (1.12.0)
+    et-orbi (1.2.7)
+      tzinfo
+    faraday (2.9.0)
+      faraday-net_http (>= 2.0, < 3.2)
+    faraday-follow_redirects (0.3.0)
+      faraday (>= 1, < 3)
+    faraday-net_http (3.1.0)
+      net-http
+    fugit (1.9.0)
+      et-orbi (~> 1, >= 1.2.7)
+      raabro (~> 1.4)
+    guardrail (3.0.3)
+      activerecord (>= 6.1, < 7.2)
+      railties (>= 6.1, < 7.2)
+    i18n (1.14.1)
+      concurrent-ruby (~> 1.0)
+    inst-jobs (3.1.14)
+      activerecord (>= 6.0)
+      activerecord-pg-extensions (~> 0.4)
+      activesupport (>= 6.0)
+      after_transaction_commit (>= 1.0, < 3)
+      debug_inspector (~> 1.0)
+      fugit (~> 1.3)
+      railties (>= 6.0)
+    io-console (0.7.2)
+    irb (1.11.2)
+      rdoc
+      reline (>= 0.4.2)
+    json-jwt (1.16.5)
+      activesupport (>= 4.2)
+      aes_key_wrap
+      base64
+      bindata
+      faraday (~> 2.0)
+      faraday-follow_redirects
+    loofah (2.22.0)
+      crass (~> 1.0.2)
+      nokogiri (>= 1.12.0)
+    mini_portile2 (2.8.5)
+    minitest (5.22.2)
+    mutex_m (0.2.0)
+    net-http (0.4.1)
+      uri
+    nokogiri (1.15.5)
+      mini_portile2 (~> 2.8.2)
+      racc (~> 1.4)
+    nokogiri (1.15.5-aarch64-linux)
+      racc (~> 1.4)
+    nokogiri (1.15.5-arm64-darwin)
+      racc (~> 1.4)
+    nokogiri (1.15.5-x86_64-darwin)
+      racc (~> 1.4)
+    nokogiri (1.15.5-x86_64-linux)
+      racc (~> 1.4)
+    packs-specification (0.0.10)
+      sorbet-runtime
+    psych (5.1.2)
+      stringio
+    raabro (1.4.0)
+    racc (1.7.3)
+    rack (3.0.9)
+    rack-session (2.0.0)
+      rack (>= 3.0.0)
+    rack-test (2.1.0)
+      rack (>= 1.3)
+    rackup (2.1.0)
+      rack (>= 3)
+      webrick (~> 1.8)
+    rails-dom-testing (2.2.0)
+      activesupport (>= 5.0.0)
+      minitest
+      nokogiri (>= 1.6)
+    rails-html-sanitizer (1.6.0)
+      loofah (~> 2.21)
+      nokogiri (~> 1.14)
+    railties (7.1.3)
+      actionpack (= 7.1.3)
+      activesupport (= 7.1.3)
+      irb
+      rackup (>= 1.0.0)
+      rake (>= 12.2)
+      thor (~> 1.0, >= 1.2.2)
+      zeitwerk (~> 2.6)
+    rake (13.1.0)
+    rdoc (6.6.2)
+      psych (>= 4.0.0)
+    redis (5.1.0)
+      redis-client (>= 0.17.0)
+    redis-client (0.19.1)
+      connection_pool
+    redis-cluster-client (0.7.5)
+      redis-client (~> 0.12)
+    redis-clustering (5.1.0)
+      redis (= 5.1.0)
+      redis-cluster-client (>= 0.7.0)
+    redis-scripting (1.0.1)
+      redis (>= 3.0)
+    reline (0.4.2)
+      io-console (~> 0.5)
+    rspec (3.13.0)
+      rspec-core (~> 3.13.0)
+      rspec-expectations (~> 3.13.0)
+      rspec-mocks (~> 3.13.0)
+    rspec-core (3.13.0)
+      rspec-support (~> 3.13.0)
+    rspec-expectations (3.13.0)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.13.0)
+    rspec-mocks (3.13.0)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.13.0)
+    rspec-support (3.13.0)
+    ruby2_keywords (0.0.5)
+    sorbet-runtime (0.5.10965)
+    stringio (3.1.0)
+    thor (1.3.0)
+    timecop (0.9.8)
+    timeout (0.4.1)
+    tzinfo (2.0.6)
+      concurrent-ruby (~> 1.0)
+    uri (0.13.0)
+    webrick (1.8.1)
+    zeitwerk (2.6.13)
+
+PLATFORMS
+  aarch64-linux
+  arm64-darwin
+  ruby
+  x86_64-darwin
+  x86_64-linux
+
+DEPENDENCIES
+  bundler
+  canvas_cache!
+  canvas_security!
+  config_file!
+  debug
+  dynamic_settings!
+  request_context!
+  rspec
+  timecop
+
+BUNDLED WITH
+   2.5.3
