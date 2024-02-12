@@ -17,7 +17,8 @@
 
 import $ from 'jquery'
 import replaceTags from '@canvas/util/replaceTags'
-import 'jqueryui/autocomplete'
+import 'jqueryui-unpatched/menu'
+import 'jqueryui-unpatched/autocomplete'
 
 const $select_name = $('#select_name')
 const $selected_name = $('#selected_name')

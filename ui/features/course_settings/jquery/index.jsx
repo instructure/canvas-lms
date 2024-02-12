@@ -34,7 +34,8 @@ import '@canvas/util/templateData' /* fillTemplateData, getTemplateData */
 import '@canvas/link-enrollment' /* global link_enrollment */
 import 'jquery-tinypubsub' /* /\.publish/ */
 import 'jquery-scroll-to-visible/jquery.scrollTo'
-import 'jqueryui/autocomplete'
+import 'jqueryui-unpatched/menu'
+import 'jqueryui-unpatched/autocomplete'
 import 'jqueryui/sortable'
 import 'jqueryui/tabs'
 
