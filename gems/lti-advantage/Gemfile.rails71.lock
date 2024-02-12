@@ -1,0 +1,86 @@
+PATH
+  remote: .
+  specs:
+    lti-advantage (0.1.0)
+      activemodel (>= 5.1)
+      json-jwt (~> 1.5)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    activemodel (7.1.3)
+      activesupport (= 7.1.3)
+    activesupport (7.1.3)
+      base64
+      bigdecimal
+      concurrent-ruby (~> 1.0, >= 1.0.2)
+      connection_pool (>= 2.2.5)
+      drb
+      i18n (>= 1.6, < 2)
+      minitest (>= 5.1)
+      mutex_m
+      tzinfo (~> 2.0)
+    aes_key_wrap (1.1.0)
+    base64 (0.2.0)
+    bigdecimal (3.1.6)
+    bindata (2.4.15)
+    concurrent-ruby (1.2.3)
+    connection_pool (2.4.1)
+    diff-lcs (1.5.1)
+    drb (2.2.0)
+      ruby2_keywords
+    faraday (2.9.0)
+      faraday-net_http (>= 2.0, < 3.2)
+    faraday-follow_redirects (0.3.0)
+      faraday (>= 1, < 3)
+    faraday-net_http (3.1.0)
+      net-http
+    i18n (1.14.1)
+      concurrent-ruby (~> 1.0)
+    json-jwt (1.16.5)
+      activesupport (>= 4.2)
+      aes_key_wrap
+      base64
+      bindata
+      faraday (~> 2.0)
+      faraday-follow_redirects
+    minitest (5.22.2)
+    mutex_m (0.2.0)
+    net-http (0.4.1)
+      uri
+    rake (13.1.0)
+    redcarpet (3.6.0)
+    rspec (3.13.0)
+      rspec-core (~> 3.13.0)
+      rspec-expectations (~> 3.13.0)
+      rspec-mocks (~> 3.13.0)
+    rspec-core (3.13.0)
+      rspec-support (~> 3.13.0)
+    rspec-expectations (3.13.0)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.13.0)
+    rspec-mocks (3.13.0)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.13.0)
+    rspec-support (3.13.0)
+    ruby2_keywords (0.0.5)
+    tzinfo (2.0.6)
+      concurrent-ruby (~> 1.0)
+    uri (0.13.0)
+
+PLATFORMS
+  aarch64-linux
+  arm64-darwin
+  ruby
+  x86_64-darwin
+  x86_64-linux
+
+DEPENDENCIES
+  bundler (~> 2.2)
+  lti-advantage!
+  rake
+  redcarpet
+  rspec (~> 3.0)
+
+BUNDLED WITH
+   2.5.3

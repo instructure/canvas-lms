@@ -1,0 +1,91 @@
+PATH
+  remote: .
+  specs:
+    broadcast_policy (1.0.0)
+      activesupport
+      after_transaction_commit
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    activemodel (7.1.3)
+      activesupport (= 7.1.3)
+    activerecord (7.1.3)
+      activemodel (= 7.1.3)
+      activesupport (= 7.1.3)
+      timeout (>= 0.4.0)
+    activesupport (7.1.3)
+      base64
+      bigdecimal
+      concurrent-ruby (~> 1.0, >= 1.0.2)
+      connection_pool (>= 2.2.5)
+      drb
+      i18n (>= 1.6, < 2)
+      minitest (>= 5.1)
+      mutex_m
+      tzinfo (~> 2.0)
+    after_transaction_commit (2.2.2)
+      activerecord (>= 5.2)
+    base64 (0.2.0)
+    bigdecimal (3.1.6)
+    coderay (1.1.3)
+    concurrent-ruby (1.2.3)
+    connection_pool (2.4.1)
+    debug (1.9.1)
+      irb (~> 1.10)
+      reline (>= 0.3.8)
+    diff-lcs (1.5.1)
+    drb (2.2.0)
+      ruby2_keywords
+    i18n (1.14.1)
+      concurrent-ruby (~> 1.0)
+    io-console (0.7.2)
+    irb (1.11.2)
+      rdoc
+      reline (>= 0.4.2)
+    method_source (1.0.0)
+    minitest (5.22.2)
+    mutex_m (0.2.0)
+    pry (0.14.2)
+      coderay (~> 1.1)
+      method_source (~> 1.0)
+    psych (5.1.2)
+      stringio
+    rdoc (6.6.2)
+      psych (>= 4.0.0)
+    reline (0.4.2)
+      io-console (~> 0.5)
+    rspec (3.13.0)
+      rspec-core (~> 3.13.0)
+      rspec-expectations (~> 3.13.0)
+      rspec-mocks (~> 3.13.0)
+    rspec-core (3.13.0)
+      rspec-support (~> 3.13.0)
+    rspec-expectations (3.13.0)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.13.0)
+    rspec-mocks (3.13.0)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.13.0)
+    rspec-support (3.13.0)
+    ruby2_keywords (0.0.5)
+    stringio (3.1.0)
+    timeout (0.4.1)
+    tzinfo (2.0.6)
+      concurrent-ruby (~> 1.0)
+
+PLATFORMS
+  aarch64-linux
+  arm64-darwin
+  ruby
+  x86_64-darwin
+  x86_64-linux
+
+DEPENDENCIES
+  broadcast_policy!
+  debug
+  pry
+  rspec (~> 3.12)
+
+BUNDLED WITH
+   2.5.3

@@ -45,9 +45,13 @@ if Bundler.default_gemfile == gemfile
     end
   end
 
-  (gemfile_root.glob("Gemfile.d/*.lock") + gemfile_root.glob("gems/*/Gemfile.lock")).each do |gem_lockfile_name|
+  (gemfile_root.glob("Gemfile.d/*.lock") + gemfile_root.glob("gems/*/*.lock")).each do |gem_lockfile_name|
+    parent = gem_lockfile_name.basename
+    parent = nil unless parent.to_s.match?(/\.rails\d+\.lock$/)
+    gemfile = gem_lockfile_name.to_s.sub(/(?:.rails\d+)?\.lock$/, "")
     return unless lockfile(gem_lockfile_name,
-                           gemfile: gem_lockfile_name.to_s.sub(/\.lock$/, ""))
+                           gemfile:,
+                           parent:)
   end
 end
 

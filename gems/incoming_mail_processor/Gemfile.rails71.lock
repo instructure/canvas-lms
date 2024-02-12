@@ -1,0 +1,275 @@
+PATH
+  remote: ../canvas_errors
+  specs:
+    canvas_errors (0.1.0)
+      activesupport
+      code_ownership
+      inst-jobs
+
+PATH
+  remote: ../canvas_text_helper
+  specs:
+    canvas_text_helper (0.0.1)
+      i18n
+
+PATH
+  remote: ../html_text_helper
+  specs:
+    html_text_helper (0.0.1)
+      activesupport (>= 3.2)
+      canvas_text_helper
+      nokogiri
+      sanitize (~> 6.0)
+      twitter-text (~> 3.1)
+
+PATH
+  remote: ../utf8_cleaner
+  specs:
+    utf8_cleaner (0.0.1)
+
+PATH
+  remote: .
+  specs:
+    incoming_mail_processor (0.0.1)
+      activesupport (>= 3.2)
+      aws-sdk-s3
+      aws-sdk-sqs
+      canvas_errors
+      html_text_helper
+      inst_statsd
+      mail (~> 2.8)
+      net-imap
+      net-pop
+      net-smtp
+      utf8_cleaner
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    actionpack (7.1.3)
+      actionview (= 7.1.3)
+      activesupport (= 7.1.3)
+      nokogiri (>= 1.8.5)
+      racc
+      rack (>= 2.2.4)
+      rack-session (>= 1.0.1)
+      rack-test (>= 0.6.3)
+      rails-dom-testing (~> 2.2)
+      rails-html-sanitizer (~> 1.6)
+    actionview (7.1.3)
+      activesupport (= 7.1.3)
+      builder (~> 3.1)
+      erubi (~> 1.11)
+      rails-dom-testing (~> 2.2)
+      rails-html-sanitizer (~> 1.6)
+    activemodel (7.1.3)
+      activesupport (= 7.1.3)
+    activerecord (7.1.3)
+      activemodel (= 7.1.3)
+      activesupport (= 7.1.3)
+      timeout (>= 0.4.0)
+    activerecord-pg-extensions (0.5.4)
+      activerecord (>= 7.0, < 7.2)
+      railties (>= 7.0, < 7.2)
+    activesupport (7.1.3)
+      base64
+      bigdecimal
+      concurrent-ruby (~> 1.0, >= 1.0.2)
+      connection_pool (>= 2.2.5)
+      drb
+      i18n (>= 1.6, < 2)
+      minitest (>= 5.1)
+      mutex_m
+      tzinfo (~> 2.0)
+    after_transaction_commit (2.2.2)
+      activerecord (>= 5.2)
+    aroi (1.0.0)
+      activerecord (>= 5.2)
+      activesupport (>= 5.2)
+    aws-eventstream (1.3.0)
+    aws-partitions (1.889.0)
+    aws-sdk-core (3.191.1)
+      aws-eventstream (~> 1, >= 1.3.0)
+      aws-partitions (~> 1, >= 1.651.0)
+      aws-sigv4 (~> 1.8)
+      jmespath (~> 1, >= 1.6.1)
+    aws-sdk-kms (1.77.0)
+      aws-sdk-core (~> 3, >= 3.191.0)
+      aws-sigv4 (~> 1.1)
+    aws-sdk-s3 (1.143.0)
+      aws-sdk-core (~> 3, >= 3.191.0)
+      aws-sdk-kms (~> 1)
+      aws-sigv4 (~> 1.8)
+    aws-sdk-sqs (1.70.0)
+      aws-sdk-core (~> 3, >= 3.191.0)
+      aws-sigv4 (~> 1.1)
+    aws-sigv4 (1.8.0)
+      aws-eventstream (~> 1, >= 1.0.2)
+    base64 (0.2.0)
+    bigdecimal (3.1.6)
+    builder (3.2.4)
+    code_ownership (1.36.1)
+      code_teams (~> 1.0)
+      packs-specification
+      sorbet-runtime (>= 0.5.10821)
+    code_teams (1.0.2)
+      sorbet-runtime
+    concurrent-ruby (1.2.3)
+    connection_pool (2.4.1)
+    crass (1.0.6)
+    date (3.3.4)
+    debug (1.9.1)
+      irb (~> 1.10)
+      reline (>= 0.3.8)
+    debug_inspector (1.2.0)
+    diff-lcs (1.5.1)
+    dogstatsd-ruby (5.6.1)
+    drb (2.2.0)
+      ruby2_keywords
+    erubi (1.12.0)
+    et-orbi (1.2.7)
+      tzinfo
+    fugit (1.9.0)
+      et-orbi (~> 1, >= 1.2.7)
+      raabro (~> 1.4)
+    i18n (1.14.1)
+      concurrent-ruby (~> 1.0)
+    idn-ruby (0.1.5)
+    inst-jobs (3.1.14)
+      activerecord (>= 6.0)
+      activerecord-pg-extensions (~> 0.4)
+      activesupport (>= 6.0)
+      after_transaction_commit (>= 1.0, < 3)
+      debug_inspector (~> 1.0)
+      fugit (~> 1.3)
+      railties (>= 6.0)
+    inst_statsd (3.0.4)
+      aroi (>= 0.0.7)
+      dogstatsd-ruby (>= 4.2, < 6.0, != 5.0.0)
+      statsd-ruby (~> 1.0)
+    io-console (0.7.2)
+    irb (1.11.2)
+      rdoc
+      reline (>= 0.4.2)
+    jmespath (1.6.2)
+    loofah (2.22.0)
+      crass (~> 1.0.2)
+      nokogiri (>= 1.12.0)
+    mail (2.8.1)
+      mini_mime (>= 0.1.1)
+      net-imap
+      net-pop
+      net-smtp
+    mini_mime (1.1.5)
+    mini_portile2 (2.8.5)
+    minitest (5.22.2)
+    mutex_m (0.2.0)
+    net-imap (0.4.10)
+      date
+      net-protocol
+    net-pop (0.1.2)
+      net-protocol
+    net-protocol (0.2.2)
+      timeout
+    net-smtp (0.4.0.1)
+      net-protocol
+    nokogiri (1.15.5)
+      mini_portile2 (~> 2.8.2)
+      racc (~> 1.4)
+    nokogiri (1.15.5-aarch64-linux)
+      racc (~> 1.4)
+    nokogiri (1.15.5-arm64-darwin)
+      racc (~> 1.4)
+    nokogiri (1.15.5-x86_64-darwin)
+      racc (~> 1.4)
+    nokogiri (1.15.5-x86_64-linux)
+      racc (~> 1.4)
+    packs-specification (0.0.10)
+      sorbet-runtime
+    psych (5.1.2)
+      stringio
+    raabro (1.4.0)
+    racc (1.7.3)
+    rack (3.0.9)
+    rack-session (2.0.0)
+      rack (>= 3.0.0)
+    rack-test (2.1.0)
+      rack (>= 1.3)
+    rackup (2.1.0)
+      rack (>= 3)
+      webrick (~> 1.8)
+    rails-dom-testing (2.2.0)
+      activesupport (>= 5.0.0)
+      minitest
+      nokogiri (>= 1.6)
+    rails-html-sanitizer (1.6.0)
+      loofah (~> 2.21)
+      nokogiri (~> 1.14)
+    railties (7.1.3)
+      actionpack (= 7.1.3)
+      activesupport (= 7.1.3)
+      irb
+      rackup (>= 1.0.0)
+      rake (>= 12.2)
+      thor (~> 1.0, >= 1.2.2)
+      zeitwerk (~> 2.6)
+    rake (13.1.0)
+    rdoc (6.6.2)
+      psych (>= 4.0.0)
+    reline (0.4.2)
+      io-console (~> 0.5)
+    rspec (3.13.0)
+      rspec-core (~> 3.13.0)
+      rspec-expectations (~> 3.13.0)
+      rspec-mocks (~> 3.13.0)
+    rspec-core (3.13.0)
+      rspec-support (~> 3.13.0)
+    rspec-expectations (3.13.0)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.13.0)
+    rspec-mocks (3.13.0)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.13.0)
+    rspec-support (3.13.0)
+    ruby2_keywords (0.0.5)
+    sanitize (6.1.0)
+      crass (~> 1.0.2)
+      nokogiri (>= 1.12.0)
+    sorbet-runtime (0.5.10965)
+    statsd-ruby (1.5.0)
+    stringio (3.1.0)
+    thor (1.3.0)
+    timecop (0.9.8)
+    timeout (0.4.1)
+    twitter-text (3.1.0)
+      idn-ruby
+      unf (~> 0.1.0)
+    tzinfo (2.0.6)
+      concurrent-ruby (~> 1.0)
+    unf (0.1.4)
+      unf_ext
+    unf_ext (0.0.9.1)
+    webrick (1.8.1)
+    zeitwerk (2.6.13)
+
+PLATFORMS
+  aarch64-linux
+  arm64-darwin
+  ruby
+  x86_64-darwin
+  x86_64-linux
+
+DEPENDENCIES
+  bundler (~> 2.2)
+  canvas_errors!
+  canvas_text_helper!
+  debug
+  html_text_helper!
+  incoming_mail_processor!
+  rspec (~> 3.12)
+  timecop (~> 0.9.5)
+  utf8_cleaner!
+  webrick
+
+BUNDLED WITH
+   2.5.3

@@ -12,6 +12,7 @@ RUN --mount=target=/tmp/src \
     Gemfile \
     Gemfile*.lock \
     Gemfile.d \
+    gems/gemfile_prefix.rb \
     gems/**/Gemfile \
     gems/**/Gemfile.lock \
     gems/**/*.gemspec \
