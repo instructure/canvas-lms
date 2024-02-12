@@ -29,6 +29,7 @@ import {
   getDefaultSettingKeyForColumnType,
   getGradeAsPercent,
   getStudentGradeForColumn,
+  groupIdsMatch,
   isGradedOrExcusedSubmissionUnposted,
   maxAssignmentCount,
   onGridKeyDown,
@@ -156,6 +157,24 @@ describe('getStudentGradeForColumn', () => {
     const grade = getStudentGradeForColumn(student, 'total_grade')
     expect(grade.score).toStrictEqual(null)
     expect(grade.possible).toStrictEqual(0)
+  })
+})
+
+describe('groupIdsMatch', () => {
+  it('returns true when passed two sets of ids with the same contents', () => {
+    expect(groupIdsMatch(['1', '2'], ['1', '2'])).toStrictEqual(true)
+  })
+
+  it('returns true when passed two sets of ids with the same contents in different order', () => {
+    expect(groupIdsMatch(['2', '1'], ['1', '2'])).toStrictEqual(true)
+  })
+
+  it('returns true when passed two empty arrays', () => {
+    expect(groupIdsMatch([], [])).toStrictEqual(true)
+  })
+
+  it('returns false when passed two different sets of ids', () => {
+    expect(groupIdsMatch(['1'], ['1', '2'])).toStrictEqual(false)
   })
 })
 
