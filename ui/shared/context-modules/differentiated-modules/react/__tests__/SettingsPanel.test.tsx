@@ -22,12 +22,38 @@ import SettingsPanel, {type SettingsPanelProps} from '../SettingsPanel'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import * as miscUtils from '../../utils/miscHelpers'
 import * as moduleUtils from '../../utils/moduleHelpers'
-import * as alerts from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import RelockModulesDialog from '@canvas/relock-modules-dialog'
 import userEvent from '@testing-library/user-event'
 
 jest.mock('@canvas/do-fetch-api-effect')
 jest.mock('@canvas/relock-modules-dialog')
+
+jest.mock('../../utils/miscHelpers', () => {
+  const originalModule = jest.requireActual('../../utils/miscHelpers')
+
+  return {
+    __esModule: true,
+    ...originalModule,
+    convertModuleSettingsForApi: jest
+      .fn()
+      .mockImplementation(originalModule.convertModuleSettingsForApi),
+  }
+})
+
+jest.mock('../../utils/moduleHelpers', () => {
+  const originalModule = jest.requireActual('../../utils/moduleHelpers')
+
+  return {
+    __esModule: true,
+    ...originalModule,
+    updateModuleUI: jest.fn(),
+  }
+})
+
+jest.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashAlert: jest.fn(() => jest.fn(() => {})),
+}))
 
 describe('SettingsPanel', () => {
   beforeAll(() => {
@@ -208,18 +234,14 @@ describe('SettingsPanel', () => {
       )
     })
 
-    // LF-1169 - remove or rewrite to remove spies on imports
-    it.skip('formats the form state for the request body', () => {
-      jest.spyOn(miscUtils, 'convertModuleSettingsForApi')
+    it('formats the form state for the request body', () => {
       doFetchApi.mockResolvedValue({response: {ok: true}, json: {}})
       const {getByRole} = renderComponent()
       getByRole('button', {name: 'Save'}).click()
       expect(miscUtils.convertModuleSettingsForApi).toHaveBeenCalled()
     })
 
-    // LF-1169 - remove or rewrite to remove spies on imports
-    it.skip('updates the modules page UI', async () => {
-      jest.spyOn(moduleUtils, 'updateModuleUI')
+    it('updates the modules page UI', async () => {
       doFetchApi.mockResolvedValue({response: {ok: true}, json: {}})
       const {getByRole} = renderComponent()
       getByRole('button', {name: 'Save'}).click()
@@ -228,29 +250,25 @@ describe('SettingsPanel', () => {
       })
     })
 
-    // LF-1169 - remove or rewrite to remove spies on imports
-    it.skip('shows a flash alert on success', async () => {
-      jest.spyOn(alerts, 'showFlashAlert')
+    it('shows a flash alert on success', async () => {
       doFetchApi.mockResolvedValue({response: {ok: true}, json: {}})
       const {getByRole} = renderComponent()
       getByRole('button', {name: 'Save'}).click()
       await waitFor(() => {
-        expect(alerts.showFlashAlert).toHaveBeenCalledWith({
+        expect(showFlashAlert).toHaveBeenCalledWith({
           type: 'success',
           message: 'Week 1 settings updated successfully.',
         })
       })
     })
 
-    // LF-1169 - remove or rewrite to remove spies on imports
-    it.skip('shows a flash alert on failure', async () => {
-      jest.spyOn(alerts, 'showFlashAlert')
+    it('shows a flash alert on failure', async () => {
       const e = new Error('error')
       doFetchApi.mockRejectedValue(e)
       const {getByRole} = renderComponent()
       getByRole('button', {name: 'Save'}).click()
       await waitFor(() => {
-        expect(alerts.showFlashAlert).toHaveBeenCalledWith({
+        expect(showFlashAlert).toHaveBeenCalledWith({
           err: e,
           message: 'Error updating Week 1 settings.',
         })
@@ -281,16 +299,14 @@ describe('SettingsPanel', () => {
   })
 
   describe('on create', () => {
-    // LF-1169 - remove or rewrite to remove spies on imports
-    it.skip('calls addModuleUI when module is created', async () => {
-      jest.spyOn(alerts, 'showFlashAlert')
+    it('calls addModuleUI when module is created', async () => {
       const addModuleUI = jest.fn()
       doFetchApi.mockResolvedValue({response: {ok: true}, json: {}})
       const {getByRole, findByTestId} = renderComponent({moduleId: undefined, addModuleUI})
       getByRole('button', {name: 'Add Module'}).click()
       expect(await findByTestId('loading-overlay')).toBeInTheDocument()
       await waitFor(() => {
-        expect(alerts.showFlashAlert).toHaveBeenCalledWith({
+        expect(showFlashAlert).toHaveBeenCalledWith({
           type: 'success',
           message: 'Week 1 created successfully.',
         })

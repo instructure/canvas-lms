@@ -27,20 +27,19 @@ import EditEventView from '../EditEventView'
 import * as UpdateCalendarEventDialogModule from '@canvas/calendar/react/RecurringEvents/UpdateCalendarEventDialog'
 
 jest.mock('@canvas/rce/RichContentEditor')
+jest.mock('@canvas/calendar/react/RecurringEvents/UpdateCalendarEventDialog', () => ({
+  renderUpdateCalendarEventDialog: jest.fn().mockImplementation(() => Promise.resolve('all')),
+}))
 
 const defaultTZ = 'Asia/Tokyo'
 
-// LF-1169 - remove or rewrite to remove spies on imports
-describe.skip('EditEventView', () => {
+describe('EditEventView', () => {
   beforeAll(() => {
     moment.tz.setDefault(defaultTZ)
   })
   beforeEach(() => {
     window.ENV = {FEATURES: {}, TIMEZONE: 'Asia/Tokyo'}
     document.body.innerHTML = '<div id="application"><form id="content"></form></div>'
-    jest
-      .spyOn(UpdateCalendarEventDialogModule, 'renderUpdateCalendarEventDialog')
-      .mockImplementation(() => Promise.resolve('all'))
   })
 
   afterEach(() => {
