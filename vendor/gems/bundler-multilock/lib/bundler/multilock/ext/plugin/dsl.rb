@@ -7,7 +7,7 @@ module Bundler
         module DSL
           ::Bundler::Plugin::DSL.include(self)
 
-          def lockfile(...)
+          def lockfile(*, **)
             # pass
           end
         end
