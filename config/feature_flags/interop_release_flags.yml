@@ -225,3 +225,14 @@ enhanced_developer_keys_tables:
       state: allowed_on
     ci:
       state: on
+assignment_edit_placement_not_on_announcements:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Allows LTI tools with assignment_edit placement to be launched on Announcements page
+  description: |-
+    When enabled, an LTI tool with the assignment_edit placement will be launched on the Announcement page.
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on

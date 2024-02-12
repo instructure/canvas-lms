@@ -366,6 +366,7 @@ class ApplicationController < ActionController::Base
     instui_for_import_page
     enhanced_rubrics
     multiselect_gradebook_filters
+    assignment_edit_placement_not_on_announcements
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     product_tours

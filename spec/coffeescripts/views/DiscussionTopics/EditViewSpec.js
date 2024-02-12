@@ -747,3 +747,13 @@ test('it does not attach assignment external tools component in group context', 
   const view = this.editView()
   equal(view.$AssignmentExternalTools.children().size(), 0)
 })
+
+test('it renders assignment external tools on announcements page when assignment_edit_placement_not_on_announcements flag is on', function () {
+  const view = this.editView({isAnnouncement: true})
+  equal(view.$AssignmentExternalTools.children().size(), 0)
+})
+
+test('it does not render assignment external tools on announcements page when assignment_edit_placement_not_on_announcements flag is off', function () {
+  const view = this.editView({isAnnouncement: false})
+  equal(view.$AssignmentExternalTools.children().size(), 0)
+})
