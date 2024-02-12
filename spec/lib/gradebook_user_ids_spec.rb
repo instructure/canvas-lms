@@ -24,7 +24,7 @@ describe GradebookUserIds do
     @course = Course.create!
     @teacher = teacher_in_course(course: @course, active_all: true).user
     @teacher.preferences[:gradebook_settings] = {}
-    @teacher.preferences[:gradebook_settings][@course.id] = {
+    @teacher.preferences[:gradebook_settings][@course.global_id] = {
       show_inactive_enrollments: "false",
       show_concluded_enrollments: "false",
       sort_rows_by_column_id: "student",
@@ -168,7 +168,7 @@ describe GradebookUserIds do
       @student2.enrollments.find_by(course_section: viewable_section).conclude
 
       @teacher.preferences[:gradebook_settings] = {
-        @course.id => {
+        @course.global_id => {
           show_inactive_enrollments: "true",
           show_concluded_enrollments: "true"
         }
@@ -180,18 +180,20 @@ describe GradebookUserIds do
   describe "filtering by student group" do
     let_once(:category) do
       category = @course.group_categories.create!(name: "whatever")
-      category.create_groups(2)
+      category.create_groups(3)
 
       category.groups.first.add_user(@student1)
       category.groups.second.add_user(@student2)
+      category.groups.third.add_user(@student3)
       category
     end
     let_once(:group) { category.groups.first }
+    let_once(:group2) { category.groups.second }
 
     context "when a group is specified" do
       before(:once) do
         @teacher.preferences[:gradebook_settings] = {
-          @course.id => {
+          @course.global_id => {
             filter_rows_by: {
               student_group_id: group.id
             }
@@ -200,7 +202,7 @@ describe GradebookUserIds do
       end
 
       it "does not blow up when sorting by first name" do
-        @teacher.preferences[:gradebook_settings][@course.id][:sort_rows_by_column_id] = "student_firstname"
+        @teacher.preferences[:gradebook_settings][@course.global_id][:sort_rows_by_column_id] = "student_firstname"
         expect { gradebook_user_ids.user_ids }.not_to raise_error
       end
 
@@ -209,7 +211,7 @@ describe GradebookUserIds do
       end
 
       it "only returns students in the selected group when sorting by total_grade" do
-        @teacher.preferences[:gradebook_settings][@course.id][:sort_rows_by_column_id] = "total_grade"
+        @teacher.preferences[:gradebook_settings][@course.global_id][:sort_rows_by_column_id] = "total_grade"
         expect(gradebook_user_ids.user_ids).to contain_exactly(@student1.id)
       end
 
@@ -219,13 +221,40 @@ describe GradebookUserIds do
       end
     end
 
+    context "when multiple groups are specified" do
+      before(:once) do
+        @teacher.preferences[:gradebook_settings] = {
+          @course.global_id => {
+            filter_rows_by: {
+              student_group_ids: [group.id, group2.id]
+            }
+          }
+        }
+      end
+
+      it "ignores the student_group_ids setting when multiselect_gradebook_filters is disabled" do
+        expect(gradebook_user_ids.user_ids).to match_array(@course.student_ids)
+      end
+
+      it "only returns students in the selected groups when multiselect_gradebook_filters is enabled" do
+        Account.site_admin.enable_feature!(:multiselect_gradebook_filters)
+        expect(gradebook_user_ids.user_ids).to contain_exactly(@student1.id, @student2.id)
+      end
+
+      it "ignores students in groups that have been deleted" do
+        group.destroy!
+        Account.site_admin.enable_feature!(:multiselect_gradebook_filters)
+        expect(gradebook_user_ids.user_ids).to contain_exactly(@student2.id)
+      end
+    end
+
     context "when no group is specified" do
       it "returns students in all groups" do
         expect(gradebook_user_ids.user_ids).to match_array(@course.students.pluck(:id))
       end
 
       it "returns students in all groups when sorting by total_grade" do
-        @teacher.preferences[:gradebook_settings][@course.id][:sort_rows_by_column_id] = "total_grade"
+        @teacher.preferences[:gradebook_settings][@course.global_id][:sort_rows_by_column_id] = "total_grade"
         expect(gradebook_user_ids.user_ids).to match_array(@course.students.pluck(:id))
       end
     end
@@ -238,7 +267,7 @@ describe GradebookUserIds do
   end
 
   it "sorts by sortable name ascending if the user's sort preferences are not supported" do
-    @teacher.preferences[:gradebook_settings][@course.id][:sort_rows_by_column_id] = "some_new_column"
+    @teacher.preferences[:gradebook_settings][@course.global_id][:sort_rows_by_column_id] = "some_new_column"
     expected_user_ids = [@student1.id, @student4.id, @student3.id, @student2.id, @fake_student.id]
     expect(gradebook_user_ids.user_ids).to eq(expected_user_ids)
   end
@@ -263,12 +292,12 @@ describe GradebookUserIds do
     end
 
     it "includes inactive student ids if the user preferences include show_inactive_enrollments" do
-      @teacher.preferences[:gradebook_settings][@course.id][:show_inactive_enrollments] = "true"
+      @teacher.preferences[:gradebook_settings][@course.global_id][:show_inactive_enrollments] = "true"
       expect(gradebook_user_ids.user_ids).to include @inactive_student.id
     end
 
     it "includes concluded student ids if the user preferences include show_concluded_enrollments" do
-      @teacher.preferences[:gradebook_settings][@course.id][:show_concluded_enrollments] = "true"
+      @teacher.preferences[:gradebook_settings][@course.global_id][:show_concluded_enrollments] = "true"
       expect(gradebook_user_ids.user_ids).to include @concluded_student.id
     end
 
@@ -279,7 +308,7 @@ describe GradebookUserIds do
 
     describe "student sortable name sorting" do
       before(:once) do
-        @teacher.preferences[:gradebook_settings][@course.id][:sort_rows_by_setting_key] = "sortable_name"
+        @teacher.preferences[:gradebook_settings][@course.global_id][:sort_rows_by_setting_key] = "sortable_name"
       end
 
       it "sorts by student sortable name ascending" do
@@ -289,13 +318,13 @@ describe GradebookUserIds do
 
       it "sorts by student sortable name ascending if passed an invalid sort_rows_by_setting_key for the column" do
         # "grade" is invalid here because the "student" column cannot be sorted by grade
-        @teacher.preferences[:gradebook_settings][@course.id][:sort_rows_by_setting_key] = "grade"
+        @teacher.preferences[:gradebook_settings][@course.global_id][:sort_rows_by_setting_key] = "grade"
         expected_user_ids = [@student1.id, @student4.id, @student3.id, @student2.id, @fake_student.id]
         expect(gradebook_user_ids.user_ids).to eq(expected_user_ids)
       end
 
       it "sorts by student sortable name descending" do
-        @teacher.preferences[:gradebook_settings][@course.id][:sort_rows_by_direction] = "descending"
+        @teacher.preferences[:gradebook_settings][@course.global_id][:sort_rows_by_direction] = "descending"
         expected_user_ids = [@student2.id, @student3.id, @student4.id, @student1.id, @fake_student.id]
         expect(gradebook_user_ids.user_ids).to eq(expected_user_ids)
       end
@@ -310,7 +339,7 @@ describe GradebookUserIds do
 
     describe "sorting by student first name" do
       before(:once) do
-        @teacher.preferences[:gradebook_settings][@course.id][:sort_rows_by_column_id] = "student_firstname"
+        @teacher.preferences[:gradebook_settings][@course.global_id][:sort_rows_by_column_id] = "student_firstname"
       end
 
       it "sorts by student first name ascending" do
@@ -319,7 +348,7 @@ describe GradebookUserIds do
       end
 
       it "sorts by student first name descending" do
-        @teacher.preferences[:gradebook_settings][@course.id][:sort_rows_by_direction] = "descending"
+        @teacher.preferences[:gradebook_settings][@course.global_id][:sort_rows_by_direction] = "descending"
         expected_user_ids = [@student2.id, @student3.id, @student4.id, @student1.id, @fake_student.id]
         expect(gradebook_user_ids.user_ids).to eq(expected_user_ids)
       end
@@ -327,7 +356,7 @@ describe GradebookUserIds do
 
     describe "sorting by login ID" do
       before(:once) do
-        @teacher.preferences[:gradebook_settings][@course.id][:sort_rows_by_setting_key] = "login_id"
+        @teacher.preferences[:gradebook_settings][@course.global_id][:sort_rows_by_setting_key] = "login_id"
       end
 
       it "sorts by student login ID ascending" do
@@ -336,7 +365,7 @@ describe GradebookUserIds do
       end
 
       it "sorts by student login ID descending" do
-        @teacher.preferences[:gradebook_settings][@course.id][:sort_rows_by_direction] = "descending"
+        @teacher.preferences[:gradebook_settings][@course.global_id][:sort_rows_by_direction] = "descending"
         expected_user_ids = [@student2.id, @student4.id, @student3.id, @student1.id, @fake_student.id]
         expect(gradebook_user_ids.user_ids).to eq(expected_user_ids)
       end
@@ -351,7 +380,7 @@ describe GradebookUserIds do
 
     describe "sorting by SIS ID" do
       before(:once) do
-        @teacher.preferences[:gradebook_settings][@course.id][:sort_rows_by_setting_key] = "sis_user_id"
+        @teacher.preferences[:gradebook_settings][@course.global_id][:sort_rows_by_setting_key] = "sis_user_id"
       end
 
       it "sorts by SIS ID ascending" do
@@ -360,7 +389,7 @@ describe GradebookUserIds do
       end
 
       it "sorts by SIS ID descending" do
-        @teacher.preferences[:gradebook_settings][@course.id][:sort_rows_by_direction] = "descending"
+        @teacher.preferences[:gradebook_settings][@course.global_id][:sort_rows_by_direction] = "descending"
         expected_user_ids = [@student2.id, @student3.id, @student4.id, @student1.id, @fake_student.id]
         expect(gradebook_user_ids.user_ids).to eq(expected_user_ids)
       end
@@ -375,7 +404,7 @@ describe GradebookUserIds do
 
     describe "sorting by integration ID" do
       before(:once) do
-        @teacher.preferences[:gradebook_settings][@course.id][:sort_rows_by_setting_key] = "integration_id"
+        @teacher.preferences[:gradebook_settings][@course.global_id][:sort_rows_by_setting_key] = "integration_id"
       end
 
       it "sorts by integration ID ascending" do
@@ -384,7 +413,7 @@ describe GradebookUserIds do
       end
 
       it "sorts by integration ID descending" do
-        @teacher.preferences[:gradebook_settings][@course.id][:sort_rows_by_direction] = "descending"
+        @teacher.preferences[:gradebook_settings][@course.global_id][:sort_rows_by_direction] = "descending"
         expected_user_ids = [@student2.id, @student3.id, @student4.id, @student1.id, @fake_student.id]
         expect(gradebook_user_ids.user_ids).to eq(expected_user_ids)
       end
@@ -409,8 +438,8 @@ describe GradebookUserIds do
         @assignment.grade_student(@student2, grade: 1, grader: @teacher)
         @assignment.grade_student(@student3, grade: 9, grader: @teacher)
         @assignment.grade_student(@student4, grade: 9, grader: @teacher)
-        @teacher.preferences[:gradebook_settings][@course.id][:sort_rows_by_column_id] = "assignment_#{@assignment.id}"
-        @teacher.preferences[:gradebook_settings][@course.id][:sort_rows_by_setting_key] = "missing"
+        @teacher.preferences[:gradebook_settings][@course.global_id][:sort_rows_by_column_id] = "assignment_#{@assignment.id}"
+        @teacher.preferences[:gradebook_settings][@course.global_id][:sort_rows_by_setting_key] = "missing"
       end
 
       it "returns user ids for users with missing submissions first" do
@@ -432,12 +461,12 @@ describe GradebookUserIds do
       end
 
       it "includes inactive student ids if the user preferences include show_inactive_enrollments" do
-        @teacher.preferences[:gradebook_settings][@course.id][:show_inactive_enrollments] = "true"
+        @teacher.preferences[:gradebook_settings][@course.global_id][:show_inactive_enrollments] = "true"
         expect(gradebook_user_ids.user_ids).to include @inactive_student.id
       end
 
       it "includes concluded student ids if the user preferences include show_concluded_enrollments" do
-        @teacher.preferences[:gradebook_settings][@course.id][:show_concluded_enrollments] = "true"
+        @teacher.preferences[:gradebook_settings][@course.global_id][:show_concluded_enrollments] = "true"
         expect(gradebook_user_ids.user_ids).to include @concluded_student.id
       end
 
@@ -470,8 +499,8 @@ describe GradebookUserIds do
         @assignment.grade_student(@student2, grade: 1, grader: @teacher)
         @assignment.grade_student(@student3, grade: 9, grader: @teacher)
         @assignment.grade_student(@student4, grade: 9, grader: @teacher)
-        @teacher.preferences[:gradebook_settings][@course.id][:sort_rows_by_column_id] = "assignment_#{@assignment.id}"
-        @teacher.preferences[:gradebook_settings][@course.id][:sort_rows_by_setting_key] = "late"
+        @teacher.preferences[:gradebook_settings][@course.global_id][:sort_rows_by_column_id] = "assignment_#{@assignment.id}"
+        @teacher.preferences[:gradebook_settings][@course.global_id][:sort_rows_by_setting_key] = "late"
       end
 
       it "returns user ids for users with late submissions first" do
@@ -493,12 +522,12 @@ describe GradebookUserIds do
       end
 
       it "includes inactive student ids if the user preferences include show_inactive_enrollments" do
-        @teacher.preferences[:gradebook_settings][@course.id][:show_inactive_enrollments] = "true"
+        @teacher.preferences[:gradebook_settings][@course.global_id][:show_inactive_enrollments] = "true"
         expect(gradebook_user_ids.user_ids).to include @inactive_student.id
       end
 
       it "includes concluded student ids if the user preferences include show_concluded_enrollments" do
-        @teacher.preferences[:gradebook_settings][@course.id][:show_concluded_enrollments] = "true"
+        @teacher.preferences[:gradebook_settings][@course.global_id][:show_concluded_enrollments] = "true"
         expect(gradebook_user_ids.user_ids).to include @concluded_student.id
       end
 
@@ -531,8 +560,8 @@ describe GradebookUserIds do
         @assignment.grade_student(@student2, grade: 1, grader: @teacher)
         @assignment.grade_student(@student3, grade: 9, grader: @teacher)
         @assignment.grade_student(@student4, grade: 9, grader: @teacher)
-        @teacher.preferences[:gradebook_settings][@course.id][:sort_rows_by_column_id] = "assignment_#{@assignment.id}"
-        @teacher.preferences[:gradebook_settings][@course.id][:sort_rows_by_setting_key] = "grade"
+        @teacher.preferences[:gradebook_settings][@course.global_id][:sort_rows_by_column_id] = "assignment_#{@assignment.id}"
+        @teacher.preferences[:gradebook_settings][@course.global_id][:sort_rows_by_setting_key] = "grade"
       end
 
       it "includes concluded students ids if the course is concluded" do
@@ -549,7 +578,7 @@ describe GradebookUserIds do
 
       context "ascending" do
         before(:once) do
-          @teacher.preferences[:gradebook_settings][@course.id][:sort_rows_by_direction] = "ascending"
+          @teacher.preferences[:gradebook_settings][@course.global_id][:sort_rows_by_direction] = "ascending"
         end
 
         it "excludes fake students if they are deactivated" do
@@ -586,7 +615,7 @@ describe GradebookUserIds do
         it "returns all students even if only a subset is assigned" do
           assignment = @course.assignments.create!(points_possible: 10, only_visible_to_overrides: true)
           create_adhoc_override_for_assignment(assignment, [@student1, @student3], due_at: nil)
-          @teacher.preferences[:gradebook_settings][@course.id][:sort_rows_by_column_id] =
+          @teacher.preferences[:gradebook_settings][@course.global_id][:sort_rows_by_column_id] =
             "assignment_#{assignment.id}"
 
           expect(gradebook_user_ids.user_ids).to eq(
@@ -597,7 +626,7 @@ describe GradebookUserIds do
 
       context "descending" do
         before(:once) do
-          @teacher.preferences[:gradebook_settings][@course.id][:sort_rows_by_direction] = "descending"
+          @teacher.preferences[:gradebook_settings][@course.global_id][:sort_rows_by_direction] = "descending"
         end
 
         it "excludes fake students if they are deactivated" do
@@ -635,12 +664,12 @@ describe GradebookUserIds do
       end
 
       it "includes inactive student ids if the user preferences include show_inactive_enrollments" do
-        @teacher.preferences[:gradebook_settings][@course.id][:show_inactive_enrollments] = "true"
+        @teacher.preferences[:gradebook_settings][@course.global_id][:show_inactive_enrollments] = "true"
         expect(gradebook_user_ids.user_ids).to include @inactive_student.id
       end
 
       it "includes concluded student ids if the user preferences include show_concluded_enrollments" do
-        @teacher.preferences[:gradebook_settings][@course.id][:show_concluded_enrollments] = "true"
+        @teacher.preferences[:gradebook_settings][@course.global_id][:show_concluded_enrollments] = "true"
         expect(gradebook_user_ids.user_ids).to include @concluded_student.id
       end
     end
@@ -665,8 +694,8 @@ describe GradebookUserIds do
       @assignment2.grade_student(@student3, grade: 100, grader: @teacher)
       @assignment2.grade_student(@student4, grade: 99, grader: @teacher)
 
-      @teacher.preferences[:gradebook_settings][@course.id][:sort_rows_by_column_id] = "total_grade"
-      @teacher.preferences[:gradebook_settings][@course.id][:sort_rows_by_setting_key] = "grade"
+      @teacher.preferences[:gradebook_settings][@course.global_id][:sort_rows_by_column_id] = "total_grade"
+      @teacher.preferences[:gradebook_settings][@course.global_id][:sort_rows_by_setting_key] = "grade"
     end
 
     context "with total grade" do
@@ -676,7 +705,7 @@ describe GradebookUserIds do
       end
 
       it "sorts by total grade descending" do
-        @teacher.preferences[:gradebook_settings][@course.id][:sort_rows_by_direction] = "descending"
+        @teacher.preferences[:gradebook_settings][@course.global_id][:sort_rows_by_direction] = "descending"
         expected_user_ids = [@student3.id, @student4.id, @student2.id, @student1.id, @fake_student.id]
         expect(gradebook_user_ids.user_ids).to eq(expected_user_ids)
       end
@@ -695,7 +724,7 @@ describe GradebookUserIds do
 
     context "with assignment group" do
       before(:once) do
-        @teacher.preferences[:gradebook_settings][@course.id][:sort_rows_by_column_id] =
+        @teacher.preferences[:gradebook_settings][@course.global_id][:sort_rows_by_column_id] =
           "assignment_group_#{@second_assignment_group.id}"
       end
 
@@ -705,7 +734,7 @@ describe GradebookUserIds do
       end
 
       it "sorts by assignment group grade descending" do
-        @teacher.preferences[:gradebook_settings][@course.id][:sort_rows_by_direction] = "descending"
+        @teacher.preferences[:gradebook_settings][@course.global_id][:sort_rows_by_direction] = "descending"
         expected_user_ids = [@student3.id, @student4.id, @student1.id, @student2.id, @fake_student.id]
         expect(gradebook_user_ids.user_ids).to eq(expected_user_ids)
       end
@@ -728,12 +757,12 @@ describe GradebookUserIds do
     end
 
     it "includes inactive student ids if the user preferences include show_inactive_enrollments" do
-      @teacher.preferences[:gradebook_settings][@course.id][:show_inactive_enrollments] = "true"
+      @teacher.preferences[:gradebook_settings][@course.global_id][:show_inactive_enrollments] = "true"
       expect(gradebook_user_ids.user_ids).to include @inactive_student.id
     end
 
     it "includes concluded student ids if the user preferences include show_concluded_enrollments" do
-      @teacher.preferences[:gradebook_settings][@course.id][:show_concluded_enrollments] = "true"
+      @teacher.preferences[:gradebook_settings][@course.global_id][:show_concluded_enrollments] = "true"
       expect(gradebook_user_ids.user_ids).to include @concluded_student.id
     end
 
@@ -768,14 +797,14 @@ describe GradebookUserIds do
 
         it "sorts by the current grading period totals if a grading period ID of 'null' is in user preferences" do
           allow(@course).to receive(:grading_periods?).and_return(true)
-          @teacher.preferences[:gradebook_settings][@course.id][:filter_columns_by][:grading_period_id] = "null"
+          @teacher.preferences[:gradebook_settings][@course.global_id][:filter_columns_by][:grading_period_id] = "null"
           expected_user_ids = [@student1.id, @student3.id, @student4.id, @student2.id, @fake_student.id]
           expect(gradebook_user_ids.user_ids).to eq(expected_user_ids)
         end
 
         it "sorts by the selected grading period totals if a selected grading period is in user preferences" do
           allow(@course).to receive(:grading_periods?).and_return(true)
-          @teacher.preferences[:gradebook_settings][@course.id][:filter_columns_by][:grading_period_id] =
+          @teacher.preferences[:gradebook_settings][@course.global_id][:filter_columns_by][:grading_period_id] =
             @future_period.id.to_s
           expected_user_ids = [@student2.id, @student1.id, @student4.id, @student3.id, @fake_student.id]
           expect(gradebook_user_ids.user_ids).to eq(expected_user_ids)
@@ -783,7 +812,7 @@ describe GradebookUserIds do
 
         it "sorts by 'All Grading Periods' if a grading period ID of '0' is in user preferences" do
           allow(@course).to receive(:grading_periods?).and_return(true)
-          @teacher.preferences[:gradebook_settings][@course.id][:filter_columns_by][:grading_period_id] = "0"
+          @teacher.preferences[:gradebook_settings][@course.global_id][:filter_columns_by][:grading_period_id] = "0"
           expected_user_ids = [@student1.id, @student2.id, @student4.id, @student3.id, @fake_student.id]
           expect(gradebook_user_ids.user_ids).to eq(expected_user_ids)
         end
@@ -791,7 +820,7 @@ describe GradebookUserIds do
 
       context "descending" do
         before(:once) do
-          @teacher.preferences[:gradebook_settings][@course.id][:sort_rows_by_direction] = "descending"
+          @teacher.preferences[:gradebook_settings][@course.global_id][:sort_rows_by_direction] = "descending"
         end
 
         it "sorts by the current grading period totals if no selected grading period is in user preferences" do
@@ -802,14 +831,14 @@ describe GradebookUserIds do
 
         it "sorts by the current grading period totals if a grading period ID of 'null' is in user preferences" do
           allow(@course).to receive(:grading_periods?).and_return(true)
-          @teacher.preferences[:gradebook_settings][@course.id][:filter_columns_by][:grading_period_id] = "null"
+          @teacher.preferences[:gradebook_settings][@course.global_id][:filter_columns_by][:grading_period_id] = "null"
           expected_user_ids = [@student2.id, @student4.id, @student3.id, @student1.id, @fake_student.id]
           expect(gradebook_user_ids.user_ids).to eq(expected_user_ids)
         end
 
         it "sorts by the selected grading period totals if a selected grading period is in user preferences" do
           allow(@course).to receive(:grading_periods?).and_return(true)
-          @teacher.preferences[:gradebook_settings][@course.id][:filter_columns_by][:grading_period_id] =
+          @teacher.preferences[:gradebook_settings][@course.global_id][:filter_columns_by][:grading_period_id] =
             @future_period.id.to_s
           expected_user_ids = [@student3.id, @student4.id, @student1.id, @student2.id, @fake_student.id]
           expect(gradebook_user_ids.user_ids).to eq(expected_user_ids)
@@ -817,7 +846,7 @@ describe GradebookUserIds do
 
         it "sorts by 'All Grading Periods' if a grading period ID of '0' is in user preferences" do
           allow(@course).to receive(:grading_periods?).and_return(true)
-          @teacher.preferences[:gradebook_settings][@course.id][:filter_columns_by][:grading_period_id] = "0"
+          @teacher.preferences[:gradebook_settings][@course.global_id][:filter_columns_by][:grading_period_id] = "0"
           expected_user_ids = [@student3.id, @student4.id, @student2.id, @student1.id, @fake_student.id]
           expect(gradebook_user_ids.user_ids).to eq(expected_user_ids)
         end

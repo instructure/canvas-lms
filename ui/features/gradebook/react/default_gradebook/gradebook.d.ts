@@ -55,6 +55,7 @@ export type GradebookSettings = {
   filter_rows_by: {
     section_id: string | null
     student_group_id: string | null
+    student_group_ids?: string[] | null
   }
   hide_assignment_group_totals: 'false' | 'true'
   hide_total: 'false' | 'true'

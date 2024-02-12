@@ -48,7 +48,8 @@ class GradebookSettingsController < ApplicationController
         ],
         filter_rows_by: [
           :section_id,
-          :student_group_id
+          :student_group_id,
+          { student_group_ids: [] }
         ],
         selected_view_options_filters: []
       },

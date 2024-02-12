@@ -106,6 +106,7 @@ import type {
 } from '@canvas/grading/grading.d'
 import type {
   ColumnFilterKey,
+  FilterRowsBy,
   GridColumn,
   GridData,
   GridDataColumnsWithObjects,
@@ -214,6 +215,7 @@ import {
   getDefaultSettingKeyForColumnType,
   getGradeAsPercent,
   getStudentGradeForColumn,
+  groupIdsMatch,
   hiddenStudentIdsForAssignment,
   htmlDecode,
   isAdmin,
@@ -1648,6 +1650,19 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
   }
 
+  updateCurrentStudentGroups = (groupIds: string[]) => {
+    const savedSetting = this.getFilterRowsBySetting('studentGroupIds') || []
+    if (!groupIdsMatch(groupIds, savedSetting)) {
+      this.setFilterRowsBySetting('studentGroupIds', groupIds)
+      const groupId = groupIds.length > 0 ? groupIds[groupIds.length - 1] : null
+      this.setFilterRowsBySetting('studentGroupId', groupId)
+      return this.saveSettings({}).then(() => {
+        this.updateStudentGroupFilterVisibility()
+        this.props.reloadStudentData()
+      })
+    }
+  }
+
   assignmentGroupList = () => {
     if (!this.assignmentGroups) {
       return []
@@ -2900,6 +2915,12 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       view_ungraded_as_zero: viewUngradedAsZero ? 'true' : 'false',
       colors,
     }
+
+    if (this.options.multiselect_gradebook_filters_enabled) {
+      gradebook_settings.filter_rows_by.student_group_ids =
+        this.gridDisplaySettings.filterRowsBy.studentGroupIds
+    }
+
     if (this.options.enhanced_gradebook_filters) {
       return GradebookApi.saveUserSettings(this.options.context_id, gradebook_settings)
     } else {
@@ -3990,10 +4011,11 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     this.updateFilterAssignmentIds()
   }
 
-  getFilterRowsBySetting = (filterKey: RowFilterKey): string | null =>
-    this.gridDisplaySettings.filterRowsBy[filterKey]
+  getFilterRowsBySetting = <K extends keyof FilterRowsBy>(filterKey: K): FilterRowsBy[K] => {
+    return this.gridDisplaySettings.filterRowsBy[filterKey]
+  }
 
-  setFilterRowsBySetting = (filterKey: RowFilterKey, value: null | string) => {
+  setFilterRowsBySetting = <K extends keyof FilterRowsBy>(filterKey: K, value: FilterRowsBy[K]) => {
     this.gridDisplaySettings.filterRowsBy[filterKey] = value
   }
 
@@ -4932,7 +4954,11 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       // student groups
       const prevStudentGroupIds = findFilterValuesOfType('student-group', prevProps.appliedFilters)
       const studentGroupIds = findFilterValuesOfType('student-group', this.props.appliedFilters)
-      if (prevStudentGroupIds[0] !== studentGroupIds[0]) {
+      if (this.options.multiselect_gradebook_filters_enabled) {
+        if (!groupIdsMatch(prevStudentGroupIds, studentGroupIds)) {
+          this.updateCurrentStudentGroups(studentGroupIds)
+        }
+      } else if (prevStudentGroupIds[0] !== studentGroupIds[0]) {
         if (studentGroupIds.length === 0 || !studentGroupIds[0]) {
           this.updateCurrentStudentGroup(null)
         } else {

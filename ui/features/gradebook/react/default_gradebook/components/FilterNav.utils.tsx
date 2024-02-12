@@ -242,7 +242,7 @@ function useFilterDropdownData({
                     value: group.id,
                     created_at: new Date().toISOString(),
                   }
-                  toggleFilter(filter)
+                  toggleFilterHelper(filter)
                 },
               })),
           })),

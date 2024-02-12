@@ -260,7 +260,8 @@ describe('filtersState', () => {
       .initializeAppliedFilters(
         initialRowFilterSettings,
         initialColumnFilterSettings,
-        customStatuses
+        customStatuses,
+        false
       )
     store.getState().initializeStagedFilters()
     expect(store.getState().stagedFilters.length).toStrictEqual(0)
@@ -286,7 +287,8 @@ describe('filtersState', () => {
       .initializeAppliedFilters(
         initialRowFilterSettings,
         initialColumnFilterSettings,
-        customStatuses
+        customStatuses,
+        false
       )
     store.getState().initializeStagedFilters()
     expect(store.getState().stagedFilters).not.toBeNull()
@@ -319,7 +321,43 @@ describe('filtersState', () => {
       .initializeAppliedFilters(
         initialRowFilterSettings,
         initialColumnFilterSettings,
-        customStatuses
+        customStatuses,
+        false
+      )
+    store.getState().initializeStagedFilters()
+    expect(store.getState().stagedFilters).not.toBeNull()
+    expect(store.getState().stagedFilters).toMatchObject([
+      {
+        id: expect.any(String),
+        type: 'student-group',
+        value: '1',
+      },
+    ])
+  })
+
+  it('derive staged student group filter from gradebook settings (multiselect)', async () => {
+    const url = `/api/v1/courses/${courseId}/gradebook_filters`
+    fetchMock.post(url, mockResponse[0])
+    const initialRowFilterSettings: InitialRowFilterSettings = {
+      section_id: null,
+      student_group_id: '1',
+      student_group_ids: ['1'],
+    }
+    const initialColumnFilterSettings: InitialColumnFilterSettings = {
+      assignment_group_id: null,
+      context_module_id: null,
+      grading_period_id: null,
+      submissions: null,
+      start_date: null,
+      end_date: null,
+    }
+    store
+      .getState()
+      .initializeAppliedFilters(
+        initialRowFilterSettings,
+        initialColumnFilterSettings,
+        customStatuses,
+        true
       )
     store.getState().initializeStagedFilters()
     expect(store.getState().stagedFilters).not.toBeNull()
@@ -352,7 +390,8 @@ describe('filtersState', () => {
       .initializeAppliedFilters(
         initialRowFilterSettings,
         initialColumnFilterSettings,
-        customStatuses
+        customStatuses,
+        false
       )
     store.getState().initializeStagedFilters()
     expect(store.getState().stagedFilters).not.toBeNull()
@@ -385,7 +424,8 @@ describe('filtersState', () => {
       .initializeAppliedFilters(
         initialRowFilterSettings,
         initialColumnFilterSettings,
-        customStatuses
+        customStatuses,
+        false
       )
     store.getState().initializeStagedFilters()
     expect(store.getState().stagedFilters).not.toBeNull()
@@ -418,7 +458,8 @@ describe('filtersState', () => {
       .initializeAppliedFilters(
         initialRowFilterSettings,
         initialColumnFilterSettings,
-        customStatuses
+        customStatuses,
+        false
       )
     store.getState().initializeStagedFilters()
     expect(store.getState().stagedFilters).not.toBeNull()
@@ -451,7 +492,8 @@ describe('filtersState', () => {
       .initializeAppliedFilters(
         initialRowFilterSettings,
         initialColumnFilterSettings,
-        customStatuses
+        customStatuses,
+        false
       )
     store.getState().initializeStagedFilters()
     expect(store.getState().stagedFilters.length).toStrictEqual(0)
@@ -477,7 +519,8 @@ describe('filtersState', () => {
       .initializeAppliedFilters(
         initialRowFilterSettings,
         initialColumnFilterSettings,
-        customStatuses
+        customStatuses,
+        false
       )
     store.getState().initializeStagedFilters()
     expect(store.getState().stagedFilters).not.toBeNull()
@@ -510,7 +553,8 @@ describe('filtersState', () => {
       .initializeAppliedFilters(
         initialRowFilterSettings,
         initialColumnFilterSettings,
-        customStatuses
+        customStatuses,
+        false
       )
     store.getState().initializeStagedFilters()
     expect(store.getState().stagedFilters).toMatchObject([
@@ -542,7 +586,8 @@ describe('filtersState', () => {
       .initializeAppliedFilters(
         initialRowFilterSettings,
         initialColumnFilterSettings,
-        customStatuses
+        customStatuses,
+        false
       )
     store.getState().initializeStagedFilters()
     expect(store.getState().stagedFilters.length).toStrictEqual(0)
