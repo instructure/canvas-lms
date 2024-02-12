@@ -360,8 +360,10 @@
     <div id="filterResults" class="discussion_subentries hidden"></div>
 
   </div>
-
-  <%= prefetch_assignment_external_tools %>
+  
+  <% unless @topic.is_announcement && Account.site_admin.feature_enabled?(:assignment_edit_placement_not_on_announcements) %>
+    <%= prefetch_assignment_external_tools %>
+  <% end %>
 
   <div id="direct-share-mount-point"></div>
 
