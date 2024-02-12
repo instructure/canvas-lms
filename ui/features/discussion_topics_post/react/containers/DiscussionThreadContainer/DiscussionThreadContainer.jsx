@@ -279,7 +279,7 @@ export const DiscussionThreadContainer = props => {
   const splitScreenOn = props.userSplitScreenPreference
 
   const threadActions = []
-  if (props.discussionEntry.permissions.reply) {
+  if (props?.discussionEntry?.permissions?.reply) {
     threadActions.push(
       <ThreadingToolbar.Reply
         replyButtonRef={replyButtonRef}
@@ -526,7 +526,7 @@ export const DiscussionThreadContainer = props => {
                           }
                           isReported={props.discussionEntry?.entryParticipant?.reportType != null}
                           onQuoteReply={
-                            props.discussionEntry.permissions.reply
+                            props?.discussionEntry?.permissions?.reply
                               ? () => {
                                   setReplyFromId(props.discussionEntry._id)
                                   if (splitScreenOn) {
