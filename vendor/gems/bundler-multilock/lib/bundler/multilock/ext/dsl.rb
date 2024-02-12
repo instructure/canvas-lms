@@ -41,7 +41,7 @@ module Bundler
           if block
             instance_eval(&block)
           else
-            instance_eval(contents.dup.tap { |x| x.untaint if RUBY_VERSION < "2.7" }, gemfile.to_s, 1)
+            instance_eval(contents.dup.tap { |x| x.untaint if RUBY_VERSION < "2.7" }, @gemfile.to_s, 1)
           end
         rescue Exception => e # rubocop:disable Lint/RescueException
           message = "There was an error " \

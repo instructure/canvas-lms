@@ -190,7 +190,8 @@ module Bundler
       private
 
       def cache_reverse_dependencies(lockfile)
-        reverse_dependencies = Hash.new { |h, k| h[k] = Gem::Requirement.default_prerelease }
+        # can use Gem::Requirement.default_prelease when Ruby 2.6 support is dropped
+        reverse_dependencies = Hash.new { |h, k| h[k] = Gem::Requirement.new(">= 0.a") }
 
         lockfile.dependencies.each_value do |spec|
           reverse_dependencies[spec.name].requirements.concat(spec.requirement.requirements)

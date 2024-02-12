@@ -60,16 +60,18 @@ module Bundler
           raise ArgumentError, "Lockfile #{lockfile} is already defined"
         end
 
-        env_lockfile = ENV["BUNDLE_LOCKFILE"]&.then { |l| expand_lockfile(l) }
+        env_lockfile = lockfile if active && ENV["BUNDLE_LOCKFILE"] == "active"
+        env_lockfile ||= ENV["BUNDLE_LOCKFILE"]&.then { |l| expand_lockfile(l) }
         active = env_lockfile == lockfile if env_lockfile
 
         if active && (old_active = lockfile_definitions.find { |definition| definition[:active] })
-          raise ArgumentError, "Only one lockfile (#{old_active[:lockfile]}) can be flagged as the default"
+          raise ArgumentError, "Only one lockfile (#{old_active[:lockfile]}) can be flagged as active"
         end
 
         parent = expand_lockfile(parent)
         if parent != Bundler.default_lockfile(force_original: true) &&
-           !lockfile_definitions.find { |definition| definition[:lockfile] == parent }
+           !lockfile_definitions.find { |definition| definition[:lockfile] == parent } &&
+           !parent.exist?
           raise ArgumentError, "Parent lockfile #{parent} is not defined"
         end
 
@@ -313,7 +315,7 @@ module Bundler
         end
         return unless default_lockfile_definition && default_lockfile_definition[:active] == false
 
-        raise GemfileEvalError, "No lockfiles marked as default"
+        raise GemfileEvalError, "No lockfiles marked as active"
       end
 
       # @!visibility private
@@ -468,7 +470,12 @@ module Bundler
             resolved_remotely = true
           end
           SharedHelpers.capture_filesystem_access do
-            definition.lock(lockfile_definition[:lockfile], true)
+            if Bundler.gem_version >= Gem::Version.new("2.5.6")
+              definition.instance_variable_set(:@lockfile, lockfile_definition[:lockfile])
+              definition.lock(true)
+            else
+              definition.lock(lockfile_definition[:lockfile], true)
+            end
           end
         ensure
           Bundler.ui.level = previous_ui_level
@@ -493,6 +500,8 @@ module Bundler
   end
 end
 
+# see https://github.com/rubygems/rubygems/pull/7368
+Bundler::LazySpecification.include(Bundler::MatchMetadata) if defined?(Bundler::MatchMetadata)
 Bundler::Multilock.inject_preamble unless Bundler::Multilock.loaded?
 
 # this is terrible, but we can't prepend into these modules because we only load
