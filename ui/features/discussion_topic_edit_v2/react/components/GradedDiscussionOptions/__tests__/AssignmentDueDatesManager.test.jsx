@@ -53,6 +53,8 @@ const setup = ({
   students = DEFAULT_LIST_OPTIONS.Students,
   courseSections = DEFAULT_LIST_OPTIONS['Course Sections'],
   courseGroups = DEFAULT_LIST_OPTIONS.Groups,
+  gradedDiscussionRefMap = new Map(),
+  setGradedDiscussionRefMap = () => {},
 } = {}) => {
   return render(
     <GradedDiscussionDueDatesContext.Provider
@@ -63,6 +65,8 @@ const setup = ({
         sections: courseSections,
         dueDateErrorMessages,
         groups: courseGroups,
+        gradedDiscussionRefMap,
+        setGradedDiscussionRefMap,
       }}
     >
       <AssignmentDueDatesManager />

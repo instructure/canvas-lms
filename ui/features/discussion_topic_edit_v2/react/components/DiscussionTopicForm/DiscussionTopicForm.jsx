@@ -55,6 +55,7 @@ import {
   buildAssignmentOverrides,
   buildDefaultAssignmentOverride,
 } from '../../util/utils'
+import { ConversationListHolder } from 'features/inbox/react/components/ConversationListHolder/ConversationListHolder'
 
 const I18n = useI18nScope('discussion_create')
 
@@ -75,6 +76,7 @@ export default function DiscussionTopicForm({
   const sectionInputRef = useRef()
   const dateInputRef = useRef()
   const groupOptionsRef = useRef()
+  const gradedDiscussionRef = useRef()
   const {setOnFailure} = useContext(AlertManagerContext)
 
   const isAnnouncement = ENV?.DISCUSSION_TOPIC?.ATTRIBUTES?.is_announcement ?? false
@@ -199,6 +201,8 @@ export default function DiscussionTopicForm({
       : buildDefaultAssignmentOverride()
   )
 
+  const [gradedDiscussionRefMap, setGradedDiscussionRefMap] = useState(new Map())
+
   const assignmentDueDateContext = {
     assignedInfoList,
     setAssignedInfoList,
@@ -210,6 +214,8 @@ export default function DiscussionTopicForm({
       groupCategories.find(groupCategory => groupCategory._id === groupCategoryId)?.groupsConnection
         ?.nodes || [],
     groupCategoryId,
+    gradedDiscussionRefMap,
+    setGradedDiscussionRefMap,
   }
   const [showGroupCategoryModal, setShowGroupCategoryModal] = useState(false)
 
@@ -323,6 +329,7 @@ export default function DiscussionTopicForm({
     if (isGraded) {
       return true
     }
+
     if (newAvailableFrom === null || newAvailableUntil === null) {
       setAvailabilityValidationMessages([{text: '', type: 'success'}])
       return true
@@ -375,6 +382,23 @@ export default function DiscussionTopicForm({
     }
   }
 
+  const validateGradedDiscussionFields = () => {
+    if (!isGraded) {
+      return true
+    }
+
+    for (const refMap of gradedDiscussionRefMap.values()) {
+      for (const value of Object.values(refMap)) {
+        if (value !== null) {
+          gradedDiscussionRef.current = value.current
+          return false
+        }
+      }
+    }
+    gradedDiscussionRef.current = null
+    return true
+  }
+
   const validateFormFields = () => {
     let isValid = true
 
@@ -386,6 +410,7 @@ export default function DiscussionTopicForm({
         validationFunction: validateAvailability(availableFrom, availableUntil),
         ref: dateInputRef.current,
       },
+      {validationFunction: validateGradedDiscussionFields(), ref: gradedDiscussionRef.current},
       {validationFunction: validateAssignToFields(), ref: null},
       {validationFunction: validateUsageRights(), ref: null},
     ]
