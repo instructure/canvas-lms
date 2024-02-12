@@ -57,13 +57,6 @@ export default class GroupUsersView extends PaginatedCollectionView {
     }
 
     this.prototype.template = template
-
-    this.prototype.events = {
-      'click .remove-from-group': 'removeUserFromGroup',
-      'click .remove-as-leader': 'removeLeader',
-      'click .set-as-leader': 'setLeader',
-      'click .edit-group-assignment': 'editGroupAssignment',
-    }
   }
 
   initialize() {
@@ -85,11 +78,8 @@ export default class GroupUsersView extends PaginatedCollectionView {
     return this.collection.models.map(model => model.itemView.closeMenu())
   }
 
-  removeUserFromGroup(e) {
-    e.preventDefault()
-    e.stopPropagation()
-    const $target = $(e.currentTarget)
-    const user = this.collection.getUser($target.data('user-id'))
+  removeUserFromGroup(userId) {
+    const user = this.collection.getUser(userId)
 
     if (groupHasSubmissions(this.model)) {
       this.cloneCategoryView = new GroupCategoryCloneView({
@@ -101,61 +91,22 @@ export default class GroupUsersView extends PaginatedCollectionView {
         if (this.cloneCategoryView.cloneSuccess) {
           return window.location.reload()
         } else if (this.cloneCategoryView.changeGroups) {
-          return this.removeUser(e, $target)
+          return this.removeUser(userId)
         } else {
           $(`#group-${this.model.id}-user-${user.id}-actions`).focus()
         }
       })
     } else {
-      return this.removeUser(e, $target)
+      return this.removeUser(userId)
     }
   }
 
-  removeUser(e, $target) {
-    return this.collection.getUser($target.data('user-id')).save('group', null)
+  removeUser(userId) {
+    return this.collection.getUser(userId).save('group', null)
   }
 
-  removeLeader(e) {
-    e.preventDefault()
-    e.stopPropagation()
-    const $target = $(e.currentTarget)
-    const user_id = $target.data('user-id').toString().replace('user_', '')
-    const user_name = this.model.get('leader').display_name
-    return this.model.save(
-      {leader: null},
-      {
-        success: () => {
-          $.screenReaderFlashMessage(I18n.t('Removed %{user} as group leader', {user: user_name}))
-          $(`.group-user-actions[data-user-id='user_${user_id}']`, this.el).focus()
-        },
-      }
-    )
-  }
-
-  setLeader(e) {
-    e.preventDefault()
-    e.stopPropagation()
-    const $target = $(e.currentTarget)
-    const user_id = $target.data('user-id').toString().replace('user_', '')
-    return this.model.save(
-      {leader: {id: user_id}},
-      {
-        success: () => {
-          $.screenReaderFlashMessage(
-            I18n.t('%{user} is now group leader', {user: this.model.get('leader').display_name})
-          )
-          $(`.group-user-actions[data-user-id='user_${user_id}']`, this.el).focus()
-        },
-      }
-    )
-  }
-
-  editGroupAssignment(e) {
-    e.preventDefault()
-    e.stopPropagation()
-
-    const $target = $(e.currentTarget)
-    const user = this.collection.getUser($target.data('user-id'))
+  editGroupAssignment(userId) {
+    const user = this.collection.getUser(userId)
 
     this.moveTrayProps = {
       title: I18n.t('Move Student'),
