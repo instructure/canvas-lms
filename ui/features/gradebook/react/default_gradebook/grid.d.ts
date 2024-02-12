@@ -94,7 +94,7 @@ export type GridData = {
   rows: GradebookStudent[]
 }
 
-export type RowFilterKey = 'sectionId' | 'studentGroupId'
+export type RowFilterKey = 'sectionId' | 'studentGroupId' | 'studentGroupIds'
 
 export type ColumnFilterKey =
   | 'assignmentGroupId'
@@ -113,13 +113,19 @@ export type FilterColumnsOptions = {
   endDate: null | string
 }
 
+export type FilterRowsBy = {
+  sectionId: string | null
+  studentGroupId: string | null
+  studentGroupIds: string[] | null
+}
+
 export type GridDisplaySettings = {
   colors: StatusColors
   enterGradesAs: {
     [assignmentId: string]: GradeEntryMode
   }
   filterColumnsBy: FilterColumnsOptions
-  filterRowsBy: {sectionId: string | null; studentGroupId: string | null}
+  filterRowsBy: FilterRowsBy
   hideTotal: boolean
   selectedPrimaryInfo: 'last_first' | 'first_last'
   selectedSecondaryInfo: string

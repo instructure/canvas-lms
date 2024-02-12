@@ -300,6 +300,29 @@
       "note": ""
     },
     {
+      "warning_type": "Mass Assignment",
+      "warning_code": 70,
+      "fingerprint": "32b64d41a0918e3360b4d3396a3031784769aed85f82338ab2c4f409b28cc9f6",
+      "check_name": "MassAssignment",
+      "message": "Specify exact keys allowed for mass assignment instead of using `permit!` which allows any keys",
+      "file": "app/controllers/gradebook_settings_controller.rb",
+      "line": 72,
+      "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
+      "code": "params.require(:gradebook_settings).permit({ :filter_columns_by => ([:context_module_id, :grading_period_id, :assignment_group_id, :submissions, :start_date, :end_date]), :filter_rows_by => ([:section_id, :student_group_id, { :student_group_ids => ([]) }]), :selected_view_options_filters => ([]) }, :enter_grades_as, :hide_assignment_group_totals, :hide_total, :show_concluded_enrollments, :show_inactive_enrollments, :show_unpublished_assignments, :show_separate_first_last_names, :student_column_display_as, :student_column_secondary_info, :sort_rows_by_column_id, :sort_rows_by_setting_key, :sort_rows_by_direction, :view_ungraded_as_zero, :colors => ([:late, :missing, :resubmitted, :dropped, :excused, :extended])).permit!",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "GradebookSettingsController",
+        "method": "gradebook_settings_params"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": [
+        915
+      ],
+      "note": ""
+    },
+    {
       "warning_type": "SQL Injection",
       "warning_code": 0,
       "fingerprint": "34265f36dd8188fc6fb9da9025880ca88fd44f0d60fbb4a421c43e26b209f59f",
@@ -1648,29 +1671,6 @@
       "cwe_id": [
         20,
         185
-      ],
-      "note": ""
-    },
-    {
-      "warning_type": "Mass Assignment",
-      "warning_code": 70,
-      "fingerprint": "fe51dc8ef7eaef41744c62633219ae140f5a2df7c95adc6f7ef126e84860b034",
-      "check_name": "MassAssignment",
-      "message": "Specify exact keys allowed for mass assignment instead of using `permit!` which allows any keys",
-      "file": "app/controllers/gradebook_settings_controller.rb",
-      "line": 71,
-      "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
-      "code": "params.require(:gradebook_settings).permit({ :filter_columns_by => ([:context_module_id, :grading_period_id, :assignment_group_id, :submissions, :start_date, :end_date]), :filter_rows_by => ([:section_id, :student_group_id]), :selected_view_options_filters => ([]) }, :enter_grades_as, :hide_assignment_group_totals, :hide_total, :show_concluded_enrollments, :show_inactive_enrollments, :show_unpublished_assignments, :show_separate_first_last_names, :student_column_display_as, :student_column_secondary_info, :sort_rows_by_column_id, :sort_rows_by_setting_key, :sort_rows_by_direction, :view_ungraded_as_zero, :colors => ([:late, :missing, :resubmitted, :dropped, :excused, :extended])).permit!",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "GradebookSettingsController",
-        "method": "gradebook_settings_params"
-      },
-      "user_input": null,
-      "confidence": "Medium",
-      "cwe_id": [
-        915
       ],
       "note": ""
     }

@@ -138,6 +138,10 @@ export function getStudentGradeForColumn(student: GradebookStudent, field: strin
   return student[field] || {score: null, possible: 0}
 }
 
+export function groupIdsMatch(groupIds1: string[], groupIds2: string[]): boolean {
+  return [...groupIds1].sort().join() === [...groupIds2].sort().join()
+}
+
 export function htmlDecode(input?: string): string | null {
   return input
     ? new DOMParser().parseFromString(input, 'text/html').documentElement.textContent

@@ -28,6 +28,7 @@ class GradebookUserIds
     @sort_by = settings[:sort_rows_by_setting_key] || "name"
     @selected_grading_period_id = settings.dig(:filter_columns_by, :grading_period_id)
     @selected_section_id = settings.dig(:filter_rows_by, :section_id)
+    @selected_student_group_ids = settings.dig(:filter_rows_by, :student_group_ids)
     @selected_student_group_id = settings.dig(:filter_rows_by, :student_group_id)
     @direction = settings[:sort_rows_by_direction] || "ascending"
   end
@@ -210,12 +211,20 @@ class GradebookUserIds
                .joins("LEFT JOIN #{Enrollment.quoted_table_name} ON enrollments.user_id=users.id")
                .merge(student_enrollments_scope)
 
-    if student_group_id.present?
-      students.joins(group_memberships: :group)
-              .where(group_memberships: { group: student_group_id, workflow_state: :accepted })
+    multiselect_filters_enabled = Account.site_admin.feature_enabled?(:multiselect_gradebook_filters)
+    if multiselect_filters_enabled && student_group_ids.present?
+      students_in_groups(students, student_group_ids)
+    elsif !multiselect_filters_enabled && student_group_id.present?
+      students_in_groups(students, student_group_id)
     else
       students
     end
+  end
+
+  def students_in_groups(students, group_id_or_group_ids)
+    students.joins(group_memberships: :group)
+            .where(group_memberships: { group: group_id_or_group_ids, workflow_state: :accepted })
+            .merge(Group.active)
   end
 
   def sort_by_scores(type = :total_grade, id = nil)
@@ -262,6 +271,18 @@ class GradebookUserIds
   def student_group_id
     return nil if @selected_student_group_id.nil? || ["0", "null"].include?(@selected_student_group_id)
 
-    Group.active.where(id: @selected_student_group_id).exists? ? @selected_student_group_id : nil
+    active_groups_exist?(@selected_student_group_id) ? @selected_student_group_id : nil
+  end
+
+  def student_group_ids
+    @student_group_ids ||= if @selected_student_group_ids.blank? || !active_groups_exist?(@selected_student_group_ids)
+                             []
+                           else
+                             @selected_student_group_ids
+                           end
+  end
+
+  def active_groups_exist?(id_or_ids)
+    Group.active.where(id: id_or_ids).exists?
   end
 end
