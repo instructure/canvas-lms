@@ -2751,38 +2751,132 @@ describe Canvas::LiveEvents do
 
   describe "rubric_assessed" do
     before(:once) do
+      assignment_model
       outcome_model
       outcome_with_rubric(outcome: @outcome, context: Account.default)
       course_with_student
+      @association = @rubric.associate_with(@assignment, @course, purpose: "grading", use_for_grading: true)
       @rubric_assessment = rubric_assessment_model(rubric: @rubric, user: @student, assessment_type: "graded")
+    end
+
+    context "rubric_assessment_submitted_at" do
+      it "returns rubric assessment updated_at if the assignment is not submitted" do
+        submitted_at = Canvas::LiveEvents.rubric_assessment_submitted_at(@rubric_assessment)
+        expect(submitted_at).to eq @rubric_assessment.updated_at
+      end
+
+      it "returns submission submitted_at date if the rubric aligned assignment is a submission and is submitted" do
+        submitted_at_date = Time.zone.now
+        # submission type needs to be present for submitted_at date to be returned
+        @rubric_assessment.artifact.update!(submitted_at: submitted_at_date, submission_type: "online_text")
+        @rubric_assessment.artifact.reload
+        submitted_at = Canvas::LiveEvents.rubric_assessment_submitted_at(@rubric_assessment)
+        expect(submitted_at).to eq @rubric_assessment.artifact.submitted_at
+      end
+
+      it "returns rubric assessment updated_at if the rubric aligned assignment is not a Submission object" do
+        @assignment.update!(moderated_grading: true, grader_count: 1)
+        outcome_with_rubric
+        assignment_model
+        @association = @rubric.associate_with(@assignment, @course, purpose: "grading", use_for_grading: true)
+        submission = @assignment.find_or_create_submission(@student)
+        provisional_grade = submission.find_or_create_provisional_grade!(@teacher, grade: 3)
+        criterion_id = :"criterion_#{@rubric.data[0][:id]}"
+        assessment = @association.assess({
+                                           user: @student,
+                                           assessor: @student,
+                                           artifact: provisional_grade,
+                                           assessment: {
+                                             :assessment_type => "grading",
+                                             criterion_id => {
+                                               points: "3"
+                                             }
+                                           }
+                                         })
+        submitted_at = Canvas::LiveEvents.rubric_assessment_submitted_at(assessment)
+        expect(submitted_at).to eq assessment.updated_at
+      end
+    end
+
+    context "rubric_assessment_attempt" do
+      it "return nil if the assignment is not submitted" do
+        attempt = Canvas::LiveEvents.rubric_assessment_attempt(@rubric_assessment)
+        expect(attempt).to be_nil
+      end
+
+      it "returns submission attempt if the rubric aligned assignment is a Submission object and is submitted" do
+        submitted_at_date = Time.zone.now
+        # submission type needs to be present for submitted_at date to be returned
+        @rubric_assessment.artifact.update!(submitted_at: submitted_at_date, submission_type: "online_text")
+        @rubric_assessment.artifact.reload
+        attempt = Canvas::LiveEvents.rubric_assessment_attempt(@rubric_assessment)
+        expect(attempt).to eq @rubric_assessment.artifact.attempt
+      end
+
+      it "returns nil if the rubric aligned artifact is not a Submission" do
+        assignment_model
+        @assignment.update!(moderated_grading: true, grader_count: 1)
+        outcome_with_rubric
+        @association = @rubric.associate_with(@assignment, @course, purpose: "grading", use_for_grading: true)
+        submission = @assignment.find_or_create_submission(@student)
+        provisional_grade = submission.find_or_create_provisional_grade!(@teacher, grade: 3)
+        criterion_id = :"criterion_#{@rubric.data[0][:id]}"
+        assessment = @association.assess({
+                                           user: @student,
+                                           assessor: @student,
+                                           artifact: provisional_grade,
+                                           assessment: {
+                                             :assessment_type => "grading",
+                                             criterion_id => {
+                                               points: "3"
+                                             }
+                                           }
+                                         })
+        attempt = Canvas::LiveEvents.rubric_assessment_attempt(assessment)
+        expect(attempt).to be_nil
+      end
     end
 
     context "triggers a live event" do
       it "successfully with context uuid" do
+        attempt = Canvas::LiveEvents.rubric_assessment_attempt(@rubric_assessment)
+        expect(attempt).to be_nil
+        submitted_at = Canvas::LiveEvents.rubric_assessment_submitted_at(@rubric_assessment)
+
         assessment_data = {
           id: @rubric_assessment.id.to_s,
           aligned_to_outcomes: @rubric_assessment.aligned_outcome_ids.count.positive?,
           artifact_id: @rubric_assessment.artifact_id.to_s,
           artifact_type: @rubric_assessment.artifact_type,
           assessment_type: @rubric_assessment.assessment_type,
-          context_uuid: @rubric_assessment.rubric_association.context.uuid
+          context_uuid: @rubric_assessment.rubric_association.context.uuid,
+          submitted_at:,
+          created_at: @rubric_assessment.created_at,
+          updated_at: @rubric_assessment.updated_at
         }
         expect_event("rubric_assessed", assessment_data)
         Canvas::LiveEvents.rubric_assessed(@rubric_assessment)
       end
 
-      it "context uuid is not present event data when nil" do
+      it "when context uuid is not present event data will be nil" do
         context = @rubric_assessment.rubric_association.context
         allow_any_instance_of(Course).to receive(:assign_uuid).and_return(true)
         context.uuid = nil
         context.save
+
+        attempt = Canvas::LiveEvents.rubric_assessment_attempt(@rubric_assessment)
+        expect(attempt).to be_nil
+        submitted_at = Canvas::LiveEvents.rubric_assessment_submitted_at(@rubric_assessment)
 
         assessment_data = {
           id: @rubric_assessment.id.to_s,
           aligned_to_outcomes: @rubric_assessment.aligned_outcome_ids.count.positive?,
           artifact_id: @rubric_assessment.artifact_id.to_s,
           artifact_type: @rubric_assessment.artifact_type,
-          assessment_type: @rubric_assessment.assessment_type
+          assessment_type: @rubric_assessment.assessment_type,
+          submitted_at:,
+          created_at: @rubric_assessment.created_at,
+          updated_at: @rubric_assessment.updated_at,
         }
         expect_event("rubric_assessed", assessment_data)
         Canvas::LiveEvents.rubric_assessed(@rubric_assessment)

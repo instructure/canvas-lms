@@ -925,6 +925,22 @@ module Canvas::LiveEvents
     post_event_stringified("learning_outcome_link_updated", get_learning_outcome_link_data(link).merge(updated_at: link.updated_at))
   end
 
+  def self.rubric_assessment_submitted_at(rubric_assessment)
+    submitted_at = nil
+    if rubric_assessment.artifact.is_a?(Submission)
+      submitted_at = rubric_assessment.artifact.submitted_at
+    end
+    submitted_at.nil? ? rubric_assessment.updated_at : submitted_at
+  end
+
+  def self.rubric_assessment_attempt(rubric_assessment)
+    attempt = nil
+    if rubric_assessment.artifact.is_a?(Submission)
+      attempt = rubric_assessment.artifact.attempt
+    end
+    attempt
+  end
+
   def self.rubric_assessed(rubric_assessment)
     # context uuid may have the potential to be nil. Instead of throwing an error if
     # context uuid is nil, it will be up to the consumer of the live event to
@@ -938,7 +954,11 @@ module Canvas::LiveEvents
       artifact_id: rubric_assessment.artifact_id,
       artifact_type: rubric_assessment.artifact_type,
       assessment_type: rubric_assessment.assessment_type,
-      context_uuid: uuid
+      context_uuid: uuid,
+      submitted_at: rubric_assessment_submitted_at(rubric_assessment),
+      created_at: rubric_assessment.created_at,
+      updated_at: rubric_assessment.updated_at,
+      attempt: rubric_assessment_attempt(rubric_assessment)
     }
 
     post_event_stringified("rubric_assessed", data)
