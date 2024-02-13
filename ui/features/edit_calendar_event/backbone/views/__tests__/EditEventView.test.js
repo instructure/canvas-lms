@@ -69,8 +69,8 @@ describe('EditEventView', () => {
   }
 
   it('renders', () => {
-    render()
-    expect(within(document.body).getByText('Edit Calendar Event')).not.toBeNull()
+    const e = render()
+    expect(within(document.body).getByText(`Edit [${e.model.get('title')}]`)).not.toBeNull()
   })
 
   it('defaults to today if no start date is given', () => {
