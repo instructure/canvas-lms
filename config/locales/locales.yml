@@ -1068,7 +1068,7 @@ ja:
   locales:
     ja: 日本語
   time:
-    event: "%{date} 日  %{time}"
+    event: "%{date} %{time}"
     formats:
       tiny: "%k.%M"
       tiny_on_the_hour: "%k.%M"
