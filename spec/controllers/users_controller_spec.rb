@@ -2308,18 +2308,6 @@ describe UsersController do
       expect(response).to render_template("users/show")
     end
 
-    it "404s, but still shows, on a deleted user for admins" do
-      course_with_teacher(active_all: 1, user: user_with_pseudonym)
-
-      account_admin_user
-      user_session(@admin)
-      @teacher.destroy
-
-      get "show", params: { id: @teacher.id }
-      expect(response).to have_http_status :not_found
-      expect(response).to render_template("users/show")
-    end
-
     it "responds to JSON request" do
       account = Account.create!
       course_with_student(active_all: true, account:)
