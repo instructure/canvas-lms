@@ -19,7 +19,7 @@
 import {DiscussionEdit} from '../DiscussionEdit/DiscussionEdit'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
-import React, {useContext} from 'react'
+import React, {useContext, useEffect} from 'react'
 import {getDisplayName, responsiveQuerySizes} from '../../utils'
 import {SearchContext} from '../../utils/constants'
 import {SearchSpan} from '../SearchSpan/SearchSpan'
@@ -34,6 +34,15 @@ const I18n = useI18nScope('discussion_posts')
 
 export function PostMessage({...props}) {
   const {searchTerm} = useContext(SearchContext)
+
+  useEffect(() => {
+    if (ENV.SEQUENCE !== undefined && props.isTopic) {
+      // eslint-disable-next-line promise/catch-or-return
+      import('@canvas/modules/jquery/prerequisites_lookup').then(() => {
+        INST.lookupPrerequisites()
+      })
+    }
+  }, [props.isTopic])
 
   let heading = 'h2'
 
