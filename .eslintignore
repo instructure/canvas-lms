@@ -2,3 +2,4 @@
 /packages/*/node_modules/**
 node_modules
 **/*/.mocharc.js
+/packages/jqueryui-unpatched/**
