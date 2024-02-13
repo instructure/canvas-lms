@@ -3434,7 +3434,15 @@ describe ContextExternalTool do
   end
 
   describe "editor_button_json" do
-    let(:tool) { @root_account.context_external_tools.new(name: "editor thing", domain: "www.example.com") }
+    let(:tool) do
+      @root_account.context_external_tools.new({
+                                                 name: "editor thing",
+                                                 domain: "www.example.com",
+                                                 developer_key: DeveloperKey.create,
+                                               })
+    end
+
+    before { tool.editor_button = {} }
 
     it "includes a boolean false for use_tray" do
       tool.editor_button = { use_tray: "false" }
@@ -3448,16 +3456,26 @@ describe ContextExternalTool do
       expect(json[0][:use_tray]).to be true
     end
 
+    it "includes a boolean false for always_on" do
+      Setting.set("rce_always_on_developer_key_ids", "90000000000001,90000000000002")
+      json = ContextExternalTool.editor_button_json([tool], @course, user_with_pseudonym)
+      expect(json[0][:always_on]).to be false
+    end
+
+    it "includes a boolean true for always_on" do
+      Setting.set("rce_always_on_developer_key_ids", "90000000000001,#{tool.developer_key.global_id}")
+      json = ContextExternalTool.editor_button_json([tool], @course, user_with_pseudonym)
+      expect(json[0][:always_on]).to be true
+    end
+
     describe "includes the description" do
       it "parsed into HTML" do
-        tool.editor_button = {}
         tool.description = "the first paragraph.\n\nthe second paragraph."
         json = ContextExternalTool.editor_button_json([tool], @course, user_with_pseudonym)
         expect(json[0][:description]).to eq "<p>the first paragraph.</p>\n\n<p>the second paragraph.</p>\n"
       end
 
       it 'with target="_blank" on links' do
-        tool.editor_button = {}
         tool.description = "[link text](http://the.url)"
         json = ContextExternalTool.editor_button_json([tool], @course, user_with_pseudonym)
         expect(json[0][:description]).to eq "<p><a href=\"http://the.url\" target=\"_blank\">link text</a></p>\n"
