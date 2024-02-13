@@ -224,18 +224,26 @@ class ContextExternalTool < ActiveRecord::Base
       false
     end
 
-    def editor_button_json(tools, context, user, session = nil)
+    def editor_button_json(tools, context, user, session, default_tool_icon_base_url)
       tools.select! { |tool| visible?(tool.editor_button["visibility"], user, context, session) }
       markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML.new({ link_attributes: { target: "_blank" } }))
       always_on_ids = Setting.get("rce_always_on_developer_key_ids", "").split(",").map(&:to_i)
       tools.map do |tool|
+        canvas_icon_class = tool.editor_button(:canvas_icon_class)
+        icon_url = tool.editor_button(:icon_url)
+        if canvas_icon_class.blank? && icon_url.blank?
+          # Default tool icons are served by canvas; some users of this method
+          # may need a full URL rather than path.
+          icon_url = default_tool_icon_base_url + tool.default_icon_path
+        end
+
         {
           name: tool.label_for(:editor_button, I18n.locale),
           id: tool.id,
           favorite: tool.is_rce_favorite_in_context?(context),
           url: tool.editor_button(:url),
-          icon_url: tool.editor_button(:icon_url),
-          canvas_icon_class: tool.editor_button(:canvas_icon_class),
+          icon_url:,
+          canvas_icon_class:,
           width: tool.editor_button(:selection_width),
           height: tool.editor_button(:selection_height),
           use_tray: tool.editor_button(:use_tray) == "true",
@@ -827,7 +835,9 @@ class ContextExternalTool < ActiveRecord::Base
       settings.delete(type) unless extension_setting(type, :url)
     end
 
-    settings.delete(:editor_button) unless editor_button(:icon_url) || editor_button(:canvas_icon_class)
+    unless root_account.feature_enabled?(:allow_lti_tools_editor_button_placement_without_icon)
+      settings.delete(:editor_button) unless editor_button(:icon_url) || editor_button(:canvas_icon_class)
+    end
 
     sync_placements!(Lti::ResourcePlacement::PLACEMENTS.select { |type| settings[type] }.map(&:to_s))
     true
@@ -1585,6 +1595,15 @@ class ContextExternalTool < ActiveRecord::Base
 
   def associated_1_1_tool(context, launch_url = nil)
     ContextExternalTool.associated_1_1_tool(self, context, launch_url || url || domain)
+  end
+
+  # Icon for tools which don't provide one, based on the DeveloperKey or tool
+  # id, and the tool name
+  def default_icon_path
+    Rails.application.routes.url_helpers.lti_tool_default_icon_path(
+      id: global_developer_key_id || global_id,
+      name:
+    )
   end
 
   private
