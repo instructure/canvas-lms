@@ -162,6 +162,10 @@ module Outcomes
       if object[:mastery_points].present?
         object[:mastery_points] = strict_parse_float(object[:mastery_points], I18n.t("mastery points"))
       end
+      if object[:friendly_description].present? && object[:friendly_description].length > 255
+        raise InvalidDataError, I18n.t("Friendly description is too long (maximum is 255 characters)")
+      end
+
       import_object(object)
     end
 
