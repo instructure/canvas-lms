@@ -80,7 +80,7 @@ shared_examples "user settings page change pic window" do
     expect(fj('.nav.nav-pills li :contains("From Gravatar")')).to include_text("From Gravatar")
 
     # There are 'X', Save, and Cancel buttons
-    expect(f("button.ui-dialog-titlebar-close")).to be_truthy
+    expect(f(".ui-dialog-titlebar-close")).to be_truthy
     expect(fj('.ui-button :contains("Cancel")')).to be_truthy
     expect(fj('.ui-button :contains("Save")')).to be_truthy
   end

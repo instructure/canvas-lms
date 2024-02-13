@@ -53,7 +53,7 @@ QUnit.module('SelectContentDialog', {
     $(window).off('beforeunload')
     clickEvent = {}
     fixtures.innerHTML = ''
-    $('#resource_selection_dialog').parent().remove()
+    $('#resource_selection_dialog').remove()
   },
 })
 

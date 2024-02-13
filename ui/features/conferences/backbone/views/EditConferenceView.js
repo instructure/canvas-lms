@@ -107,7 +107,7 @@ EditConferenceView.prototype.show = function (model, opts) {
   this.model = model
   this.render()
   if (opts.isEditing) {
-    newTitle = I18n.t('Edit "%{conference_title}"', {
+    newTitle = I18n.t('Edit %{conference_title}', {
       conference_title: model.get('title'),
     })
     this.$el.dialog('option', 'title', newTitle)

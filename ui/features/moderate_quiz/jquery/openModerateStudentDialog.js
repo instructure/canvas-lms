@@ -29,6 +29,12 @@ const openModerateStudentDialog = ($dialog, dialogWidth) => {
       width: dialogWidth,
       modal: true,
       zIndex: 1000,
+      open() {
+        const titleClose = $dialog.parent().find('.ui-dialog-titlebar-close')
+        if (titleClose.length) {
+          titleClose.trigger('focus')
+        }
+      },
     })
     .fixDialogButtons()
 

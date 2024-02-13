@@ -1,3 +1,8 @@
+/* eslint-disable  no-useless-concat */
+/* eslint-disable  vars-on-top */
+/* eslint-disable  no-var */
+/* eslint-disable  block-scoped-var */
+/* eslint-disable  no-restricted-globals */
 /*
  * jQuery UI selectmenu dev version
  *
@@ -25,7 +30,7 @@ $.widget('ui.selectmenu', {
     positionOptions: {
       my: 'left top',
       at: 'left bottom',
-      offset: null
+      offset: null,
     },
     width: null,
     menuWidth: null,
@@ -34,7 +39,7 @@ $.widget('ui.selectmenu', {
     icons: null,
     format: null,
     escapeHtml: false,
-    bgImage() {}
+    bgImage() {},
   },
 
   _create() {
@@ -61,7 +66,7 @@ $.widget('ui.selectmenu', {
       href: '#nogo',
       tabindex: this.element.attr('disabled') ? 1 : 0,
       'aria-haspopup': true,
-      'aria-owns': this.ids[2]
+      'aria-owns': this.ids[2],
     })
     this.newelementWrap = $('<span />').append(this.newelement).insertAfter(this.element)
 
@@ -87,7 +92,7 @@ $.widget('ui.selectmenu', {
       'click.selectmenu': function (event) {
         self.newelement.focus()
         event.preventDefault()
-      }
+      },
     })
 
     // click toggle for menu visibility
@@ -222,10 +227,10 @@ $.widget('ui.selectmenu', {
       'aria-hidden': true,
       role: 'listbox',
       'aria-labelledby': this.ids[1],
-      id: this.ids[2]
+      id: this.ids[2],
     })
     this.listWrap = $('<div />', {
-      class: self.widgetBaseClass + '-menu'
+      class: self.widgetBaseClass + '-menu',
     })
       .append(this.list)
       .appendTo(o.appendTo)
@@ -316,7 +321,7 @@ $.widget('ui.selectmenu', {
         classes: opt.attr('class'),
         typeahead: opt.attr('typeahead'),
         parentOptGroup: opt.parent('optgroup'),
-        bgImage: o.bgImage.call(opt)
+        bgImage: o.bgImage.call(opt),
       })
     })
 
@@ -338,7 +343,7 @@ $.widget('ui.selectmenu', {
           href: '#nogo',
           tabindex: -1,
           role: 'option',
-          'aria-selected': false
+          'aria-selected': false,
         }
         if (selectOptionData[i].disabled) {
           thisAAttr['aria-disabled'] = selectOptionData[i].disabled
@@ -632,7 +637,7 @@ $.widget('ui.selectmenu', {
     return {
       index,
       option: $('option', this.element).get(index),
-      value: this.element[0].value
+      value: this.element[0].value,
     }
   },
 
@@ -984,7 +989,7 @@ $.widget('ui.selectmenu', {
       my: o.positionOptions.my,
       at: o.positionOptions.at,
       offset: o.positionOptions.offset || _offset,
-      collision: o.positionOptions.collision || o.style == 'popup' ? 'fit' : 'flip'
+      collision: o.positionOptions.collision || o.style == 'popup' ? 'fit' : 'flip',
     })
   },
 
@@ -1019,5 +1024,5 @@ $.widget('ui.selectmenu', {
       }
     }
     return -1
-  }
+  },
 })

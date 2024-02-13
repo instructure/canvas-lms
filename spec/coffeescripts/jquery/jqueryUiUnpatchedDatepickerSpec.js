@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import 'jqueryui-unpatched/datepicker'
+import 'jqueryui/datepicker'
 
 QUnit.module('datepicker Widget', {
   beforeEach(assert) {

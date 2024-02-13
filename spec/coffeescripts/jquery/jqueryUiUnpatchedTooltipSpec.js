@@ -17,10 +17,7 @@
  */
 
 import $ from 'jquery'
-import 'jqueryui-unpatched/core'
-import 'jqueryui-unpatched/widget'
-import 'jqueryui-unpatched/position'
-import 'jqueryui-unpatched/tooltip'
+import 'jqueryui/tooltip'
 
 QUnit.module('tooltip widget', {
   beforeEach() {
@@ -51,9 +48,14 @@ QUnit.test('tooltip hides on mouseleave', function (assert) {
   const done = assert.async()
   const $tooltipTarget = $('#test-tooltip')
   $tooltipTarget.tooltip('open')
+  let tooltipClosed = false
   $tooltipTarget.on('tooltipclose', function () {
     assert.ok(true, 'tooltip is hidden on mouseleave')
-    done()
+    // this flag prevents “Too many calls to the `assert.async` callback” error
+    if (!tooltipClosed) {
+      tooltipClosed = true
+      done()
+    }
   })
   $tooltipTarget.trigger('mouseleave')
 })

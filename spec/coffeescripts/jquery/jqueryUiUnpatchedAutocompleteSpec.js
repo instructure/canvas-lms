@@ -17,11 +17,7 @@
  */
 
 import $ from 'jquery'
-import 'jqueryui-unpatched/core'
-import 'jqueryui-unpatched/widget'
-import 'jqueryui-unpatched/position'
-import 'jqueryui-unpatched/menu'
-import 'jqueryui-unpatched/autocomplete'
+import 'jqueryui/autocomplete'
 import '@canvas/jquery/jquery.simulate'
 
 QUnit.module('Autocomplete Widget', {

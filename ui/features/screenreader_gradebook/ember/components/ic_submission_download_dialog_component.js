@@ -20,7 +20,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import Ember from 'ember'
 import register from '../helpers/register'
 import '../../jst/components/ic-submission-download-dialog.hbs'
-import 'jqueryui-unpatched/progressbar'
+import 'jqueryui/progressbar'
 import 'jqueryui/dialog'
 
 const I18n = useI18nScope('submissions')

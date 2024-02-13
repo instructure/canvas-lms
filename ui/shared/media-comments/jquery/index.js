@@ -26,7 +26,7 @@ import '@canvas/jquery/jquery.ajaxJSON'
 import 'jqueryui/dialog'
 import '@canvas/jquery/jquery.instructure_misc_helpers' /* /\$\.h/ */
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* .dim, /\.log\(/ */
-import 'jqueryui-unpatched/progressbar'
+import 'jqueryui/progressbar'
 import {each} from 'lodash'
 
 const I18n = useI18nScope('media_comments_publicjs')
