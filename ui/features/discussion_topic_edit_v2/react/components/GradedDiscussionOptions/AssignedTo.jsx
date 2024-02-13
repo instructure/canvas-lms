@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useRef, useMemo, useEffect, useCallback} from 'react'
+import React, {useState, useRef, useMemo, useEffect, useCallback, useContext} from 'react'
 import PropTypes from 'prop-types'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Tag} from '@instructure/ui-tag'
@@ -24,15 +24,16 @@ import {Alert} from '@instructure/ui-alerts'
 import {Select} from '@instructure/ui-select'
 import {IconCheckSolid} from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
+import {GradedDiscussionDueDatesContext} from '../../util/constants'
 
 const I18n = useI18nScope('discussion_create')
 const liveRegion = () => document.getElementById('flash_screenreader_holder')
 
 export const AssignedTo = ({
+  dueDateId,
   initialAssignedToInformation,
   availableAssignToOptions,
   onOptionSelect,
-  errorMessage,
   onOptionDismiss,
 }) => {
   const [selectedOptionAssetCode, setSelectedOptionAssetCode] = useState(
@@ -41,6 +42,7 @@ export const AssignedTo = ({
   const [isShowingOptions, setIsShowingOptions] = useState(false)
   const [highlightedOptionAssetCode, setHighlightedOptionAssetCode] = useState(null)
   const [announcement, setAnnouncement] = useState(null)
+  const [errorMessage, setErrorMessage] = useState([])
   const inputRef = useRef(null)
 
   // This is the value that is visible in the search input
@@ -52,6 +54,10 @@ export const AssignedTo = ({
     Object.values(availableAssignToOptions)
       .flat()
       .find(option => initialAssignedToInformation.includes(option.assetCode)) || []
+  )
+
+  const {groupCategoryId, groups, gradedDiscussionRefMap, setGradedDiscussionRefMap} = useContext(
+    GradedDiscussionDueDatesContext
   )
 
   // Add the checkmark icon to the selected options
@@ -114,9 +120,65 @@ export const AssignedTo = ({
   }, [currentFilterInput, filteredOptions])
 
   useEffect(() => {
+    const refObject = {
+      assignedToRef: null,
+      dueAtRef: null,
+      unlockAtRef: null,
+    }
+
+    gradedDiscussionRefMap.set(dueDateId, refObject)
+    setGradedDiscussionRefMap(gradedDiscussionRefMap)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const setRefMap = (field, ref) => {
+    const refMap = gradedDiscussionRefMap.get(dueDateId)
+    refMap[field] = ref
+    setGradedDiscussionRefMap(new Map(gradedDiscussionRefMap))
+  }
+
+  const validateAssignTo = () => {
+    const error = []
+    const missingAssignToOptionError = {
+      text: I18n.t('Please select at least one option.'),
+      type: 'error',
+    }
+    const illegalGroupCategoryError = {
+      text: I18n.t('Groups can only be part of the actively selected group set.'),
+      type: 'error',
+    }
+    if (selectedOptionAssetCode.length === 0) {
+      error.push(missingAssignToOptionError)
+    }
+
+    const availableAssetCodes = groups?.map(group => `group_${group._id}`) || []
+
+    if (
+      selectedOptionAssetCode.filter(assetCode => {
+        if (assetCode.includes('group')) {
+          return !availableAssetCodes.includes(assetCode)
+        } else {
+          return false
+        }
+      }).length > 0
+    ) {
+      error.push(illegalGroupCategoryError)
+    }
+
+    if (error.length > 0) {
+      setRefMap('assignedToRef', inputRef)
+    } else {
+      setRefMap('assignedToRef', null)
+    }
+
+    setErrorMessage(error)
+  }
+
+  useEffect(() => {
+    validateAssignTo()
     setActiveOptions(selectedOptionAssetCode.map(assetCode => getOptionByAssetCode(assetCode)))
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedOptionAssetCode])
+  }, [selectedOptionAssetCode, groupCategoryId])
 
   // Might rely on id
   const handleOptionSelected = assetCode => {
@@ -280,6 +342,7 @@ export const AssignedTo = ({
 }
 
 AssignedTo.propTypes = {
+  dueDateId: PropTypes.string,
   initialAssignedToInformation: PropTypes.arrayOf(PropTypes.string),
   onOptionSelect: PropTypes.func,
   availableAssignToOptions: PropTypes.objectOf(
@@ -290,7 +353,6 @@ AssignedTo.propTypes = {
       })
     )
   ).isRequired,
-  errorMessage: PropTypes.array,
   onOptionDismiss: PropTypes.func,
 }
 
@@ -301,7 +363,6 @@ AssignedTo.defaultProps = {
     'Course Sections': [],
     Students: [],
   },
-  errorMessage: [],
   onOptionSelect: () => {},
   onOptionDismiss: () => {},
 }

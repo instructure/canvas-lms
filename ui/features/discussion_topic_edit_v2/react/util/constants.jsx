@@ -39,8 +39,6 @@ const GradedDiscussionDueDateDefaultValues = {
   setAssignedInfoList: () => {},
   studentEnrollments: [],
   sections: [],
-  dueDateErrorMessages: [],
-  setDueDateErrorMessages: () => {},
   groups: [],
   gradedDiscussionRefMap: new Map(),
   setGradedDiscussionRefMap: () => {},

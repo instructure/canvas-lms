@@ -55,7 +55,6 @@ import {
   buildAssignmentOverrides,
   buildDefaultAssignmentOverride,
 } from '../../util/utils'
-import { ConversationListHolder } from 'features/inbox/react/components/ConversationListHolder/ConversationListHolder'
 
 const I18n = useI18nScope('discussion_create')
 
@@ -194,7 +193,6 @@ export default function DiscussionTopicForm({
   const [peerReviewDueDate, setPeerReviewDueDate] = useState(
     currentDiscussionTopic?.assignment?.peerReviews?.dueAt || ''
   )
-  const [dueDateErrorMessages, setDueDateErrorMessages] = useState([])
   const [assignedInfoList, setAssignedInfoList] = useState(
     isEditing
       ? buildAssignmentOverrides(currentDiscussionTopic?.assignment)
@@ -206,8 +204,6 @@ export default function DiscussionTopicForm({
   const assignmentDueDateContext = {
     assignedInfoList,
     setAssignedInfoList,
-    dueDateErrorMessages,
-    setDueDateErrorMessages,
     studentEnrollments,
     sections,
     groups:
@@ -411,7 +407,6 @@ export default function DiscussionTopicForm({
         ref: dateInputRef.current,
       },
       {validationFunction: validateGradedDiscussionFields(), ref: gradedDiscussionRef.current},
-      {validationFunction: validateAssignToFields(), ref: null},
       {validationFunction: validateUsageRights(), ref: null},
     ]
 
@@ -427,67 +422,6 @@ export default function DiscussionTopicForm({
     inValidFields[0]?.focus()
 
     return isValid
-  }
-
-  const validateAssignToFields = () => {
-    // as validation is not required if not graded.
-    if (!isGraded) return true
-
-    const missingAssignToOptionError = {
-      text: I18n.t('Please select at least one option.'),
-      type: 'error',
-    }
-
-    // Validate each assignedInfo and collect errors.
-    const errors = assignedInfoList.reduce((foundErrors, currentAssignedInfo) => {
-      const isAssignedListInvalid =
-        !currentAssignedInfo.assignedList ||
-        !Array.isArray(currentAssignedInfo.assignedList) ||
-        currentAssignedInfo.assignedList.length === 0
-
-      if (isAssignedListInvalid) {
-        foundErrors.push({
-          dueDateId: currentAssignedInfo.dueDateId,
-          message: missingAssignToOptionError,
-        })
-      }
-
-      const illegalGroupCategoryError = {
-        text: I18n.t('Groups can only be part of the actively selected group set.'),
-        type: 'error',
-      }
-
-      const availableAssetCodes =
-        groupCategories
-          .find(groupCategory => groupCategory._id === groupCategoryId)
-          ?.groupsConnection?.nodes.map(group => `group_${group._id}`) || []
-
-      if (
-        currentAssignedInfo.assignedList.filter(assetCode => {
-          if (assetCode.includes('group')) {
-            return !availableAssetCodes.includes(assetCode)
-          } else {
-            return false
-          }
-        }).length > 0
-      ) {
-        foundErrors.push({
-          dueDateId: currentAssignedInfo.dueDateId,
-          message: illegalGroupCategoryError,
-        })
-      }
-
-      return foundErrors
-    }, [])
-
-    // If there are errors, set the error state and return false.
-    if (errors.length > 0) {
-      setDueDateErrorMessages(errors)
-      return false
-    }
-
-    // All assignedLists are valid if no errors were found.
-    return true
   }
 
   const prepareOverride = (

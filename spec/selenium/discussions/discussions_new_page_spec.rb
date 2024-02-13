@@ -1075,6 +1075,26 @@ describe "discussions" do
           expect(driver.current_url).to end_with("/courses/#{course.id}/discussion_topics/new")
         end
 
+        it "Assign To validation works correctly" do
+          get "/courses/#{course.id}/discussion_topics/new"
+
+          # Add a title, so that we know that the empty post to field is causing it to not submit
+          title = "Graded Discussion Topic with Peer Reviews"
+          f("input[placeholder='Topic Title']").send_keys title
+
+          force_click('input[type=checkbox][value="graded"]')
+
+          fj("button:contains('Everyone')").click
+          # Verify that the error message "Please select at least one option." appears
+          expect(fj("body:contains('Please select at least one option.')")).to be_present
+
+          # Verify that you can not submit the form
+          f("button[data-testid='save-and-publish-button']").click
+          wait_for_ajaximations
+          # Verify that no redirect happened
+          expect(driver.current_url).to end_with("/courses/#{course.id}/discussion_topics/new")
+        end
+
         it "Due Date validations work" do
           get "/courses/#{course.id}/discussion_topics/new"
 
