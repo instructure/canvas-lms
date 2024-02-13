@@ -30,7 +30,6 @@ export const AssignmentDueDate = ({
   initialAssignedInformation,
   availableAssignToOptions,
   onAssignedInfoChange,
-  assignToErrorMessages,
 }) => {
   const dueAtRef = useRef()
   const unlockAtRef = useRef()
@@ -72,18 +71,6 @@ export const AssignmentDueDate = ({
     refMap[field] = ref
     setGradedDiscussionRefMap(new Map(gradedDiscussionRefMap))
   }
-
-  useEffect(() => {
-    const refObject = {
-      assignedToRef: null,
-      dueAtRef: null,
-      unlockAtRef: null,
-    }
-
-    gradedDiscussionRefMap.set(initialAssignedInformation.dueDateId, refObject)
-    setGradedDiscussionRefMap(gradedDiscussionRefMap)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
 
   useEffect(() => {
     const {dueDate, availableFrom, availableUntil} = assignedInformation
@@ -129,6 +116,7 @@ export const AssignmentDueDate = ({
     <>
       <FormFieldGroup description="" width="100%" data-testid="assignment-due-date">
         <AssignedTo
+          dueDateId={initialAssignedInformation.dueDateId}
           availableAssignToOptions={availableAssignToOptions}
           initialAssignedToInformation={initialAssignedInformation.assignedList}
           onOptionSelect={selectedOption => {
@@ -149,7 +137,6 @@ export const AssignmentDueDate = ({
             setAssignedInformation(newInfo)
             onAssignedInfoChange(newInfo)
           }}
-          errorMessage={assignToErrorMessages}
         />
         <DateTimeInput
           description={I18n.t('Due')}
@@ -230,7 +217,6 @@ AssignmentDueDate.propTypes = {
     availableUntil: PropTypes.string,
   }),
   onAssignedInfoChange: PropTypes.func,
-  assignToErrorMessages: PropTypes.arrayOf(PropTypes.object),
 }
 
 AssignmentDueDate.defaultProps = {

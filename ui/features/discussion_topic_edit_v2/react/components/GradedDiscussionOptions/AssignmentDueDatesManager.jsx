@@ -47,8 +47,6 @@ export const AssignmentDueDatesManager = () => {
     studentEnrollments,
     sections,
     groups,
-    dueDateErrorMessages,
-    setDueDateErrorMessages,
     gradedDiscussionRefMap,
     setGradedDiscussionRefMap,
   } = useContext(GradedDiscussionDueDatesContext)
@@ -70,9 +68,6 @@ export const AssignmentDueDatesManager = () => {
       info.dueDateId === dueDateId ? {...info, ...newInfo} : info
     )
     setAssignedInfoList(updatedInfoList)
-    // Remove the error message for the dueDateId if it exists
-    const updatedErrorMessages = dueDateErrorMessages.filter(error => error.dueDateId !== dueDateId)
-    setDueDateErrorMessages(updatedErrorMessages)
   }
 
   const handleAddAssignment = () => {
@@ -185,9 +180,6 @@ export const AssignmentDueDatesManager = () => {
                   onAssignedInfoChange={newInfo =>
                     handleAssignedInfoChange(newInfo, info.dueDateId)
                   }
-                  assignToErrorMessages={dueDateErrorMessages
-                    ?.filter(element => element.dueDateId === info.dueDateId && element.message)
-                    .map(element => element.message)}
                 />
               </div>
             </View>
