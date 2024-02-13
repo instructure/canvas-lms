@@ -990,7 +990,7 @@ describe "Users API", type: :request do
                         { controller: "users", action: "api_show", id: @other_user.id.to_param, format: "json" },
                         {},
                         expected_status: 404)
-        expect(json.keys).to include("id")
+        expect(json.keys).to eq ["errors"]
       end
 
       it "404s but still returns the user on a deleted user for a site admin" do
