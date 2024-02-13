@@ -151,7 +151,7 @@ describe "blueprint courses quizzes" do
       get "/courses/#{@copy_to.id}/quizzes/#{@quiz_copy.id}/edit"
 
       # open the questions tab
-      hover_and_click('#quiz_tabs_tab_list li[aria-controls="questions_tab"]')
+      hover_and_click('#quiz_tabs_tab_list li[aria-controls="questions_tab"] .ui-tabs-anchor')
       expect(f("#quiz_edit_wrapper #questions_tab").displayed?).to be true
 
       # hover the question description and the edit/pencil link should not appear
@@ -175,7 +175,7 @@ describe "blueprint courses quizzes" do
       get "/courses/#{@copy_to.id}/quizzes/#{@quiz_copy.id}/edit"
 
       # open the questions tab
-      hover_and_click('#quiz_tabs_tab_list li[aria-controls="questions_tab"]')
+      hover_and_click('#quiz_tabs_tab_list li[aria-controls="questions_tab"] .ui-tabs-anchor')
       expect(f("#quiz_edit_wrapper #questions_tab").displayed?).to be true
 
       # hover the question description and the edit/pencil link should not appear
@@ -195,7 +195,7 @@ describe "blueprint courses quizzes" do
 
       get "/courses/#{@copy_to.id}/quizzes/#{@quiz_copy.id}/edit"
 
-      hover_and_click('#quiz_tabs_tab_list li[aria-controls="questions_tab"]')
+      hover_and_click('#quiz_tabs_tab_list li[aria-controls="questions_tab"] .ui-tabs-anchor')
       expect(f("#quiz_edit_wrapper #questions_tab").displayed?).to be true
 
       # questions can be edited but not deleted
@@ -235,7 +235,7 @@ describe "blueprint courses quizzes" do
 
     it "allows editing/deleting the quiz group when nothing is locked" do
       get "/courses/#{@copy_to.id}/quizzes/#{@quiz_copy.id}/edit"
-      hover_and_click('#quiz_tabs_tab_list li[aria-controls="questions_tab"]')
+      hover_and_click('#quiz_tabs_tab_list li[aria-controls="questions_tab"] .ui-tabs-anchor')
       expect(f("#quiz_edit_wrapper #questions_tab").displayed?).to be true
 
       expect(f(".group_top")).to contain_css(".delete_group_link")
@@ -248,7 +248,7 @@ describe "blueprint courses quizzes" do
       @tag.update(restrictions: { content: false, points: true, due_dates: true, availability_dates: true })
 
       get "/courses/#{@copy_to.id}/quizzes/#{@quiz_copy.id}/edit"
-      hover_and_click('#quiz_tabs_tab_list li[aria-controls="questions_tab"]')
+      hover_and_click('#quiz_tabs_tab_list li[aria-controls="questions_tab"] .ui-tabs-anchor')
       expect(f("#quiz_edit_wrapper #questions_tab").displayed?).to be true
 
       expect(f(".group_top")).not_to contain_css(".delete_group_link")
@@ -261,7 +261,7 @@ describe "blueprint courses quizzes" do
       @tag.update(restrictions: { content: true, points: true, due_dates: true, availability_dates: true })
 
       get "/courses/#{@copy_to.id}/quizzes/#{@quiz_copy.id}/edit"
-      hover_and_click('#quiz_tabs_tab_list li[aria-controls="questions_tab"]')
+      hover_and_click('#quiz_tabs_tab_list li[aria-controls="questions_tab"] .ui-tabs-anchor')
       expect(f("#quiz_edit_wrapper #questions_tab").displayed?).to be true
 
       expect(f(".group_top")).not_to contain_css(".edit_group_link")
