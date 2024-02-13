@@ -147,7 +147,7 @@ module ModulesIndexPage
   end
 
   def tool_dialog_iframe
-    tool_dialog.find_element(:css, "iframe")
+    f(".tool_launch")
   end
 
   def view_assign
