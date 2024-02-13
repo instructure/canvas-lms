@@ -55,6 +55,13 @@ def nodeRequirementsTemplate() {
           POSTGRES_PASSWORD: env.POSTGRES_PASSWORD,
         ],
         ports: [5432],
+      ],
+      [
+        name: 'dynamodb',
+        image: env.DYNAMODB_IMAGE_TAG,
+        resourceRequestCpu: '1',
+        resourceLimitCpu: '8',
+        ports: [8000],
       ]
     ],
   ]
