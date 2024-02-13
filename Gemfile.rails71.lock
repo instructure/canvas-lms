@@ -451,7 +451,7 @@ GEM
     canvas_connect (0.3.16)
       adobe_connect (~> 1.0.0)
       rake (>= 0.9.6)
-    canvas_link_migrator (1.0.4)
+    canvas_link_migrator (1.0.5)
       activesupport
       addressable
       nokogiri
@@ -1212,7 +1212,7 @@ DEPENDENCIES
   canvas_ext!
   canvas_http!
   canvas_kaltura!
-  canvas_link_migrator (~> 1.0.4)
+  canvas_link_migrator (~> 1.0.5)
   canvas_mimetype_fu!
   canvas_panda_pub!
   canvas_partman!
