@@ -33,7 +33,11 @@ $(document).ready(() => {
   const $selfUnenrollmentDialog = $('#self_unenrollment_dialog')
   $('.self_unenrollment_link').click(_event =>
     $selfUnenrollmentDialog
-      .dialog({title: I18n.t('titles.drop_course', 'Drop this Course')})
+      .dialog({
+        title: I18n.t('titles.drop_course', 'Drop this Course'),
+        modal: true,
+        zIndex: 1000,
+      })
       .fixDialogButtons()
   )
 

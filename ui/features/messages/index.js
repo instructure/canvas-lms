@@ -100,6 +100,7 @@ MessageModal.prototype.dialogOptions = {
   autoOpen: false,
   modal: true,
   title: I18n.t('dialog.title', 'Send a reply message'),
+  zIndex: 1000,
 }
 
 $(() => $('.reply-button').on('click', showDialog))

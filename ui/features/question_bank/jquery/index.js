@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-shadow, no-alert, eqeqeq */
 /*
  * Copyright (C) 2011 - present Instructure, Inc.
  *
@@ -294,6 +295,8 @@ export function attachPageEvents(_e) {
     $dialog.dialog({
       width: 600,
       title: I18n.t('title.move_copy_questions', 'Move/Copy Questions'),
+      modal: true,
+      zIndex: 1000,
     })
     $dialog.parent().find('.ui-dialog-titlebar-close').focus()
   })

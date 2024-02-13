@@ -68,6 +68,8 @@ window.rubricAssessment = {
             .dialog({
               title: I18n.t('Criterion Long Description'),
               width: 400,
+              modal: true,
+              zIndex: 1000,
             })
         }
       })
@@ -101,6 +103,8 @@ window.rubricAssessment = {
           close() {
             $rubric_criterion_comments_link.focus()
           },
+          modal: true,
+          zIndex: 1000,
         })
         $rubric_criterion_comments_dialog.find('textarea.criterion_comments').focus()
       })
@@ -158,6 +162,8 @@ window.rubricAssessment = {
         close() {
           $rubric_rating_comments_link.focus()
         },
+        modal: true,
+        zIndex: 1000,
       })
       $rubric_criterion_comments_dialog.find('.criterion_description').focus()
     })

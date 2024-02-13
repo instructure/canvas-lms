@@ -79,6 +79,8 @@ window.link_enrollment = (function () {
       $dialog.dialog({
         title: I18n.t('titles.link_to_student', 'Link to Student'),
         width: 400,
+        modal: true,
+        zIndex: 1000,
       })
     },
     updateDialog($dialog, enrollment_id, current_user_id) {

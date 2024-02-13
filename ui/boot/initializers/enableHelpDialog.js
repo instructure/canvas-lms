@@ -45,6 +45,8 @@ const helpDialog = {
       width: 400,
       title: helpDialog.defaultTitle,
       close: () => helpDialog.switchTo('#help-dialog-options'),
+      modal: true,
+      zIndex: 1000,
     })
 
     helpDialog.$dialog.dialog('widget').delegate(

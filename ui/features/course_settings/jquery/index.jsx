@@ -332,6 +332,7 @@ $(document).ready(function () {
       modal: true,
       resizable: false,
       width: 400,
+      zIndex: 1000,
     })
   })
 
@@ -369,6 +370,8 @@ $(document).ready(function () {
       .dialog({
         title: I18n.t('titles.move_course', 'Move Course'),
         width: 500,
+        modal: true,
+        zIndex: 1000,
       })
       .fixDialogButtons()
   })
@@ -625,6 +628,8 @@ $(document).ready(function () {
       $('#reset_course_content_dialog').dialog({
         title: I18n.t('titles.reset_course_content_dialog_help', 'Reset Course Content'),
         width: 500,
+        zIndex: 1000,
+        modal: true,
       })
 
       $('.ui-dialog').focus()

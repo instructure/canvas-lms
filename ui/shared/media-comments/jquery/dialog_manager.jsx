@@ -47,6 +47,7 @@ export default class DialogManager {
       width: 470,
       height: 300,
       modal: true,
+      zIndex: 1000,
     })
     return (this.dialog = $('#media_comment_dialog'))
   }
@@ -68,6 +69,7 @@ export default class DialogManager {
       width: 650,
       height: 550,
       modal: true,
+      zIndex: 1000,
     })
   }
 

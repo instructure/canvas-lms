@@ -1,4 +1,3 @@
-//
 // Copyright (C) 2012 - present Instructure, Inc.
 //
 // This file is part of Canvas.
@@ -56,6 +55,7 @@ const assignmentRubricDialog = {
       resizable: true,
       autoOpen: false,
       close: () => this.$focusReturnsTo.focus(),
+      zIndex: 1000,
     })
 
     return $.get(ENV.DISCUSSION.GRADED_RUBRICS_URL, html => {

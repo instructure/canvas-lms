@@ -136,6 +136,8 @@ export default register(
           this.dialogOptions = {
             title: 'Download Assignment Submissions',
             resizable: false,
+            modal: true,
+            zIndex: 1000,
           }
         }
         if (this.$dialog == null) {

@@ -1,3 +1,4 @@
+/* eslint-disable eqeqeq, no-alert */
 /*
  * Copyright (C) 2011 - present Instructure, Inc.
  *
@@ -367,6 +368,8 @@ $('.show_token_link').click(function (event) {
   const url = $(this).attr('rel')
   $dialog.dialog({
     width: 700,
+    modal: true,
+    zIndex: 1000,
   })
   const $token = $(this).parents('.access_token')
   $dialog.data('token', $token)
@@ -430,6 +433,8 @@ $('.add_access_token_link').click(function (event) {
       open() {
         $(this).closest('.ui-dialog').focus()
       },
+      modal: true,
+      zIndex: 1000,
     })
     .fixDialogButtons()
 })
