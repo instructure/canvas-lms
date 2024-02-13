@@ -17,9 +17,7 @@
  */
 
 import $ from 'jquery'
-import 'jqueryui-unpatched/core'
-import 'jqueryui-unpatched/widget'
-import 'jqueryui-unpatched/tabs'
+import 'jqueryui/tabs'
 
 QUnit.module('tabs widget', {
   beforeEach() {

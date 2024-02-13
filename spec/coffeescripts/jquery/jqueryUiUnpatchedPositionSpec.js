@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import 'jqueryui-unpatched/position'
+import 'jqueryui/position'
 
 QUnit.module('jQuery UI Position Tests', {
   beforeEach() {

@@ -47,7 +47,7 @@ import '@canvas/jquery/jquery.instructure_misc_plugins' /* confirmDelete, showIf
 import '@canvas/loading-image'
 import '@canvas/util/templateData' /* fillTemplateData, getTemplateData */
 import 'jquery-scroll-to-visible/jquery.scrollTo'
-import 'jqueryui-unpatched/progressbar'
+import 'jqueryui/progressbar'
 import 'jqueryui/sortable'
 
 const I18n = useI18nScope('eportfolio')

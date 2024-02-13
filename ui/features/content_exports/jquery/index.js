@@ -21,7 +21,7 @@ import $ from 'jquery'
 import htmlEscape from '@instructure/html-escape'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.instructure_forms' /* formSubmit */
-import 'jqueryui-unpatched/progressbar'
+import 'jqueryui/progressbar'
 
 const I18n = useI18nScope('content_exports')
 

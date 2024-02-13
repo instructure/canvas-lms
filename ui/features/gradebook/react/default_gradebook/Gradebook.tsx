@@ -186,7 +186,7 @@ import 'jqueryui/tooltip'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 import 'jquery-tinypubsub'
-import 'jqueryui-unpatched/position'
+import 'jqueryui/position'
 import '@canvas/util/jquery/fixDialogButtons'
 
 import {

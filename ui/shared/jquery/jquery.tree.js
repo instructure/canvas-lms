@@ -27,11 +27,8 @@
 // xsslint jqueryObject.identifier tree
 import $ from 'jquery'
 import htmlEscape from '@instructure/html-escape'
-import 'jqueryui-unpatched/core'
-import 'jqueryui-unpatched/widget'
-import 'jqueryui-unpatched/mouse'
-import 'jqueryui-unpatched/draggable'
-import 'jqueryui-unpatched/droppable'
+import 'jqueryui/draggable'
+import 'jqueryui/droppable'
 
 function isOpera() {
   const ua = window.navigator.userAgent

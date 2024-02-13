@@ -17,10 +17,7 @@
  */
 
 import $ from 'jquery'
-import 'jqueryui-unpatched/core'
-import 'jqueryui-unpatched/widget'
-import 'jqueryui-unpatched/mouse'
-import 'jqueryui-unpatched/sortable'
+import 'jqueryui/sortable'
 import '@canvas/jquery/jquery.simulate'
 
 QUnit.module('Sortable Widget', {

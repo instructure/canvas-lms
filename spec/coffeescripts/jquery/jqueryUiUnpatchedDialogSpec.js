@@ -18,14 +18,7 @@
 
 import $ from 'jquery'
 
-import 'jqueryui-unpatched/core'
-import 'jqueryui-unpatched/widget'
-import 'jqueryui-unpatched/position'
-import 'jqueryui-unpatched/button'
-import 'jqueryui-unpatched/mouse'
-import 'jqueryui-unpatched/resizable'
-import 'jqueryui-unpatched/draggable'
-import 'jqueryui-unpatched/dialog'
+import 'jqueryui/dialog'
 
 QUnit.module('Dialog Widget', {
   beforeEach() {
@@ -39,6 +32,37 @@ QUnit.module('Dialog Widget', {
     $('#test-dialog').remove() // Remove test dialog from DOM
   },
 })
+
+QUnit.test(
+  'Button click function can be passed in without being triggered on init',
+  async function (assert) {
+    const done = assert.async()
+    const $dialog = $('#test-dialog')
+
+    $dialog.dialog({
+      open() {
+        ok(true)
+        done()
+      },
+      buttons: [
+        {
+          text: 'Re-Lock Modules',
+          click: () => {
+            ok(false, 'click should not auto execute!')
+            done()
+          },
+        },
+        {
+          text: 'Continue',
+          class: 'btn-primary',
+        },
+      ],
+      id: 'relock_modules_dialog',
+      title: 'Requirements Changed',
+    })
+    $dialog.dialog('open') // Open the dialog
+  }
+)
 
 QUnit.test('Dialog widget is initialized', function (assert) {
   // Arrange

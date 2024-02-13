@@ -84,24 +84,24 @@ $.extend(proto, {
           current.prepend('<span class="ui-icon ui-icon-check"></span>')
           parent.attr({
             role: 'menuitemcheckbox',
-            'aria-checked': 'true'
+            'aria-checked': 'true',
           })
         } else if (current.children("input[type='radio']").is(':checked')) {
           current.prepend('<span class="ui-icon ui-icon-radio-on"></span>')
           parent.attr({
             role: 'menuitemradio',
-            'aria-checked': 'true'
+            'aria-checked': 'true',
           })
         } else if (current.children("input[type='radio']").length) {
           current.prepend('<span class="ui-icon ui-icon-radio-off"></span>')
           parent.attr({
             role: 'menuitemradio',
-            'aria-checked': 'false'
+            'aria-checked': 'false',
           })
         } else {
           parent.attr({
             role: 'menuitemcheckbox',
-            'aria-checked': 'false'
+            'aria-checked': 'false',
           })
         }
 
@@ -179,7 +179,7 @@ $.extend(proto, {
     // Save active reference before collapseAll triggers blur
     const ui = {
       // Selecting a menu item removes the active item causing multiple clicks to be missing an item
-      item: this.active || $(event.target).closest('.ui-menu-item')
+      item: this.active || $(event.target).closest('.ui-menu-item'),
     }
 
     if (ui.item.children('a').children().is("input[type='checkbox']")) {
@@ -228,5 +228,5 @@ $.extend(proto, {
     if (!ui.item.children('a').children().is("input[type='checkbox'], input[type='radio']"))
       this.collapseAll()
     this._trigger('select', event, ui)
-  }
+  },
 })

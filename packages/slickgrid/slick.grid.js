@@ -17,6 +17,7 @@
 /* eslint-disable no-throw-literal */
 /* eslint-disable linebreak-style */
 /* eslint-disable vars-on-top */
+/* eslint-disable  no-constant-condition */
 /*
  * Copyright (c) 2010 Michael Leibman, http://github.com/mleibman/slickgrid
  *

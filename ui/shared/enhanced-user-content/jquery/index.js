@@ -40,7 +40,7 @@ import '@canvas/util/jquery/fixDialogButtons'
 import '@canvas/media-comments/jquery/mediaCommentThumbnail'
 import 'date-js'
 import 'jquery-tinypubsub' /* /\.publish\(/ */
-import 'jqueryui-unpatched/resizable'
+import 'jqueryui/resizable'
 import 'jqueryui/sortable'
 import 'jqueryui/tabs'
 import {captureException} from '@sentry/browser'

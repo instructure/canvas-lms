@@ -49,7 +49,7 @@ import '../ext/patches-to-fullcalendar'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 import 'jquery-tinypubsub'
-import 'jqueryui-unpatched/button'
+import 'jqueryui/button'
 import 'jqueryui/tooltip'
 
 const I18n = useI18nScope('calendar')

@@ -24,7 +24,7 @@ import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.instructure_forms' // validateForm, formErrors, errorBox
 import replaceTags from '@canvas/util/replaceTags'
 import 'jquery-tinypubsub' // /\.publish/
-import 'jqueryui-unpatched/button'
+import 'jqueryui/button'
 
 const I18n = useI18nScope('alerts')
 

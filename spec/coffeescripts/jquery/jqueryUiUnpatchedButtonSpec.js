@@ -17,8 +17,7 @@
  */
 
 import $ from 'jquery'
-import 'jqueryui-unpatched/widget'
-import 'jqueryui-unpatched/button'
+import 'jqueryui/button'
 
 QUnit.module('Button Widget', {
   beforeEach() {

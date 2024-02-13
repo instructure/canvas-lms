@@ -17,7 +17,7 @@
 
 import $ from 'jquery'
 import './monkey-patches'
-import 'jqueryui-unpatched/button'
+import 'jqueryui/button'
 import './popup'
 
 /*
