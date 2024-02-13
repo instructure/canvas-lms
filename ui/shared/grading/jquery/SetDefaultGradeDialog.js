@@ -73,6 +73,8 @@ SetDefaultGradeDialog.prototype.show = function (onClose) {
     .dialog({
       resizable: false,
       width: 350,
+      modal: true,
+      zIndex: 1000,
     })
     .fixDialogButtons()
   this.$dialog.on(

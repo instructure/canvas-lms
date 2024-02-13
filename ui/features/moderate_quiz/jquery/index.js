@@ -280,6 +280,8 @@ $(document).ready(function (_event) {
       .dialog({
         title: I18n.t('titles.student_extensions', 'Student Extensions'),
         width: DIALOG_WIDTH,
+        modal: true,
+        zIndex: 1000,
       })
       .fixDialogButtons()
   })
@@ -487,6 +489,8 @@ $(document).ready(function (_event) {
       .dialog({
         title: I18n.t('titles.extend_quiz_time', 'Extend Quiz Time'),
         width: DIALOG_WIDTH,
+        modal: true,
+        zIndex: 1000,
       })
       .fixDialogButtons()
   })
@@ -656,6 +660,7 @@ $(document).ready(function (_event) {
           width: DIALOG_WIDTH,
           height: 200,
           close: this.closeDialog.bind(this),
+          zIndex: 1000,
         })
         .dialog('open')
         .fixDialogButtons()

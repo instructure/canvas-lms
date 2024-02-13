@@ -315,6 +315,7 @@ $.mediaComment.init = function (mediaType, opts) {
           width: 560,
           height: 475,
           modal: true,
+          zIndex: 1000,
         })
         $dialog.dialog('option', 'close', () => {
           $('#audio_record').before("<div id='audio_record'/>").remove()

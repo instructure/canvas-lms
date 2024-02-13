@@ -139,6 +139,7 @@ export default (function () {
             return _this.$dialog.remove()
           }
         })(this),
+        zIndex: 1000,
       })
       .fixDialogButtons()
     this.$dialog.on('dialogclose', onClose)

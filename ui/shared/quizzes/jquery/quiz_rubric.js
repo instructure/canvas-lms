@@ -34,6 +34,8 @@ const quizRubric = {
       title: I18n.t('titles.details', 'Assignment Rubric Details'),
       width: 600,
       resizable: true,
+      modal: true,
+      zIndex: 1000,
     })
   },
 
@@ -44,6 +46,8 @@ const quizRubric = {
     $loading.dialog({
       width: 400,
       height: 200,
+      modal: true,
+      zIndex: 1000,
     })
     return $loading
   },

@@ -1,3 +1,4 @@
+/* eslint-disable no-alert */
 /*
  * Copyright (C) 2015 - present Instructure, Inc.
  *
@@ -80,6 +81,8 @@ export default function (ed) {
           $box.find('iframe').attr('src', 'about:blank')
         },
         title: 'Embed content from Equella',
+        modal: true,
+        zIndex: 1000,
       })
       .bind('equella_ready', (event, data) => {
         const selectedContent = ed.selection.getContent()

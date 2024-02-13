@@ -1,3 +1,4 @@
+/* eslint-disable no-console, @typescript-eslint/no-shadow, eqeqeq, no-alert */
 /*
  * Copyright (C) 2011 - present Instructure, Inc.
  *
@@ -421,6 +422,7 @@ const quizSubmission = (function () {
               quizSubmission.submitQuiz()
             }
           },
+          zIndex: 1000,
         })
     },
 
@@ -1000,6 +1002,7 @@ showDeauthorizedDialog = function () {
         },
       },
     ],
+    zIndex: 1000,
   })
 }
 

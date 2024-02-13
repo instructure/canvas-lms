@@ -69,6 +69,8 @@ function handleCourseClick(e) {
     width: 550,
     height: 500,
     resizable: false,
+    modal: true,
+    zIndex: 1000,
   })
   e.preventDefault()
 }

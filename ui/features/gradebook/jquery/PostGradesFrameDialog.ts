@@ -74,6 +74,8 @@ export default class PostGradesFrameDialog {
           titleClose.trigger('focus')
         }
       },
+      modal: true,
+      zIndex: 1000,
     })
 
     // list for focus/blur events

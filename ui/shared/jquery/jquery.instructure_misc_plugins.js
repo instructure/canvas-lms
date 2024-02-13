@@ -183,6 +183,7 @@ $.fn.confirmDelete = function (options) {
                 },
               },
             ],
+            zIndex: 1000,
           },
           dialog_options
         )

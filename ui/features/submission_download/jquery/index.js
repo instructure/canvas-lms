@@ -40,6 +40,8 @@ INST.downloadSubmissions = function (url, onClose) {
       close() {
         cancelled = true
       },
+      modal: true,
+      zIndex: 1000,
     })
     .on('dialogclose', onClose)
   $('#download_submissions_dialog .progress').progressbar({value: 0})

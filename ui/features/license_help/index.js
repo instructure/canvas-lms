@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-shadow */
 /*
  * Copyright (C) 2011 - present Instructure, Inc.
  *
@@ -95,6 +96,8 @@ $(document).on('click', '.license_help_link', function (event) {
       autoOpen: false,
       title: I18n.t('content_license_help', 'Content Licensing Help'),
       width: Math.min(window.innerWidth, 620),
+      modal: true,
+      zIndex: 1000,
     })
     $.get('/partials/_license_help.html', html =>
       $dialog

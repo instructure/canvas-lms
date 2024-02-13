@@ -78,6 +78,8 @@ DialogBaseView.prototype.initDialog = function () {
         })(this),
       },
     ],
+    modal: true,
+    zIndex: 1000,
     ...result(this, 'dialogOptions'),
   }
   this.dialog = $('<div id="' + opts.id + '"></div>')
