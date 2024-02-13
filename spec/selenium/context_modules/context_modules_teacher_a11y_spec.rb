@@ -92,6 +92,7 @@ describe "context modules" do
             close_button = div.find_element(:css, ".ui-dialog-titlebar-close.ui-corner-all")
           end
         end
+
         check_element_has_focus(close_button)
       end
     end

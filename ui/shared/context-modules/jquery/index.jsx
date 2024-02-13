@@ -1456,7 +1456,14 @@ modules.initModuleManagement = function (duplicate) {
           $('#edit_item_form').hideErrors()
           $cogLink.focus()
         },
+        open() {
+          const titleClose = $(this).parent().find('.ui-dialog-titlebar-close')
+          if (titleClose.length) {
+            titleClose.trigger('focus')
+          }
+        },
         minWidth: 320,
+        modal: true,
       })
       .fixDialogButtons()
   })
