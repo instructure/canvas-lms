@@ -109,6 +109,8 @@ export default class MessageFormDialog extends DialogBaseView {
           click: e => this.sendMessage(e),
         },
       ],
+      modal: true,
+      zIndex: 1000,
     }
   }
 

@@ -35,7 +35,10 @@ describe "jquery ui" do
   def create_simple_modal
     driver.execute_script(<<~JS)
       $('<div><select /><input /></div>')
-        .dialog()
+        .dialog({
+          modal: true,
+          zIndex: 1000
+        })
         .find('select')
         .focus()
     JS
@@ -48,14 +51,20 @@ describe "jquery ui" do
 
   it "makes dialogs modal by default" do
     expect(driver.execute_script(<<~JS)).to be true
-      return $('<div />').dialog().dialog('option', 'modal');
+      return $('<div />').dialog({
+        modal: true,
+        zIndex: 1000
+      }).dialog('option', 'modal');
     JS
     expect(f(".ui-widget-overlay")).to be_displayed
 
     # make sure that hiding then showing the same dialog again, it still looks modal
     expect(driver.execute_script(<<~JS)).to be true
       return $('<div />')
-        .dialog()
+        .dialog({
+          modal: true,
+          zIndex: 1000
+        })
         .dialog('close')
         .dialog('open')
         .dialog('option', 'modal');
@@ -122,7 +131,10 @@ describe "jquery ui" do
       title = "<b>this</b> is the title"
       expect(driver.execute_script(<<~JS)).to eq title
         return $('<div id="jqueryui_test" title="#{title}">hello</div>')
-          .dialog()
+          .dialog({
+            modal: true,
+            zIndex: 1000
+          })
           .parent('.ui-dialog')
           .find('.ui-dialog-title')
           .text();
@@ -132,7 +144,10 @@ describe "jquery ui" do
     it "uses a non-breaking space for empty titles" do
       expect(driver.execute_script(<<~JS)).to eq "\302\240"
         return $('<div id="jqueryui_test">hello</div>')
-          .dialog()
+          .dialog({
+            modal: true,
+            zIndex: 1000
+          })
           .parent('.ui-dialog')
           .find('.ui-dialog-title')
           .text();
@@ -140,7 +155,10 @@ describe "jquery ui" do
 
       expect(driver.execute_script(<<~JS)).to eq "\302\240"
         return $('#jqueryui_test')
-          .dialog()
+          .dialog({
+            modal: true,
+            zIndex: 1000
+          })
           .dialog('option', 'title', 'foo')
           .dialog('option', 'title', '')
           .parent('.ui-dialog')
@@ -153,7 +171,11 @@ describe "jquery ui" do
       title = "<b>this</b> is the title"
       expect(driver.execute_script(<<~JS)).to eq title
         return $('<div id="jqueryui_test">hello again</div>')
-          .dialog({title: #{title.inspect}})
+          .dialog({
+            title: #{title.inspect},
+            modal: true,
+            zIndex: 1000
+          })
           .parent('.ui-dialog')
           .find('.ui-dialog-title')
           .text();
@@ -162,7 +184,10 @@ describe "jquery ui" do
       new_title = "and now <i>this</i> is the title"
       expect(driver.execute_script(<<~JS)).to eq new_title
         return $('#jqueryui_test')
-          .dialog()
+          .dialog({
+            modal: true,
+            zIndex: 1000
+          })
           .dialog('option', 'title', #{new_title.inspect})
           .parent('.ui-dialog')
           .find('.ui-dialog-title')
@@ -174,7 +199,11 @@ describe "jquery ui" do
       title = "<i>i want formatting <b>for realz</b></i>"
       expect(driver.execute_script(<<~JS)).to eq title
         return $('<div id="jqueryui_test">here we go</div>')
-          .dialog({title: $(#{title.inspect})})
+          .dialog({
+            title: $(#{title.inspect}),
+            modal: true,
+            zIndex: 1000
+          })
           .parent('.ui-dialog')
           .find('.ui-dialog-title')
           .html();
@@ -183,7 +212,10 @@ describe "jquery ui" do
       new_title = "<i>i <b>still</b> want formatting</i>"
       expect(driver.execute_script(<<~JS)).to eq new_title
         return $('#jqueryui_test')
-          .dialog()
+          .dialog({
+            modal: true,
+            zIndex: 1000
+          })
           .dialog('option', 'title', $(#{new_title.inspect}))
           .parent('.ui-dialog')
           .find('.ui-dialog-title')

@@ -43,7 +43,10 @@ QUnit.module('Dialog Widget', {
 QUnit.test('Dialog widget is initialized', function (assert) {
   // Arrange
   const $dialog = $('#test-dialog')
-  $dialog.dialog()
+  $dialog.dialog({
+    modal: true,
+    zIndex: 1000,
+  })
 
   // Act
   $dialog.dialog('open') // Open the dialog
@@ -67,6 +70,8 @@ QUnit.test('Open and Close events are triggered', async function (assert) {
       ok(openTriggered, 'dialog on open was not called')
       done()
     },
+    modal: true,
+    zIndex: 1000,
   })
 
   $dialog.dialog('open') // Open the dialog

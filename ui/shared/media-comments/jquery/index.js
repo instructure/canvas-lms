@@ -618,6 +618,7 @@ $.mediaComment.init = function (mediaType, opts) {
           width: 470,
           height: 300,
           modal: true,
+          zIndex: 1000,
         })
 
         // **********************************************************************

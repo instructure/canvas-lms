@@ -122,6 +122,8 @@ export default class ShowEventDetailsDialog {
         const $dialog = $(reservationOverLimitDialog(error)).dialog({
           resizable: false,
           width: 450,
+          modal: true,
+          zIndex: 1000,
           buttons: error.reschedulable
             ? [
                 {

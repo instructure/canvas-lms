@@ -316,6 +316,7 @@ const mediaCommentActions = {
             .attr('aria-label', I18n.t('Play Media Comment'))
           $(event.currentTarget).parent().find('.ui-dialog-titlebar-close').focus()
         },
+        zIndex: 1000,
       })
 
       // Populate dialog box with a video

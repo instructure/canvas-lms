@@ -45,6 +45,8 @@ export default class RelockModulesDialog extends DialogBaseView {
           click: e => this.cancel(e),
         },
       ],
+      modal: true,
+      zIndex: 1000,
     }
   }
 

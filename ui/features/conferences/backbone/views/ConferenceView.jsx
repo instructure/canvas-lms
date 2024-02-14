@@ -267,6 +267,8 @@ ConferenceView.prototype.external = function (e) {
         resizable: true,
         height: 'auto',
         title: $self.text(),
+        modal: true,
+        zIndex: 1000,
       })
     } else {
       return window.open(data[0].url)

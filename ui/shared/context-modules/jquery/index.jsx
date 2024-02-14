@@ -1464,6 +1464,7 @@ modules.initModuleManagement = function (duplicate) {
         },
         minWidth: 320,
         modal: true,
+        zIndex: 1000,
       })
       .fixDialogButtons()
   })
@@ -1922,6 +1923,8 @@ modules.initModuleManagement = function (duplicate) {
         module: module.name,
       }),
       width: 400,
+      modal: true,
+      zIndex: 1000,
     })
   })
   $('#add_context_module_form .cancel_button').click(_event => {

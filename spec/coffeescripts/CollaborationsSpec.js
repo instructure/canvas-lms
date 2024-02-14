@@ -33,6 +33,8 @@ QUnit.module('Collaborations', {
       width: 550,
       height: 500,
       resizable: false,
+      modal: true,
+      zIndex: 1000,
     })
     const dom = $('<div></div>')
     dom.append(dialog)

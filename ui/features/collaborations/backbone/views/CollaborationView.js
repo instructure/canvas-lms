@@ -124,8 +124,8 @@ CollaborationView.prototype.confirmGoogleDocsDelete = function () {
   return $dialog.dialog({
     title: I18n.t('titles.delete', 'Delete collaboration?'),
     width: 350,
-    zIndex: 1000,
     modal: true,
+    zIndex: 1000,
   })
 }
 
