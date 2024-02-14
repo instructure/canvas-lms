@@ -539,6 +539,7 @@ class ProfileController < ApplicationController
 
     js_bundle :qr_mobile_login
 
+    page_has_instui_topnav
     render html: "", layout: true
   end
 end
