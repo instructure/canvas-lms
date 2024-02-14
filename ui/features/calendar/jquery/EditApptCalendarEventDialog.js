@@ -50,6 +50,8 @@ export default class EditApptCalendarEventDialog {
           click: this.save,
         },
       ],
+      modal: true,
+      zIndex: 1000,
     })
     this.dialog.submit(event => {
       event.preventDefault()

@@ -257,6 +257,8 @@ export default class EditAppointmentGroupDetails {
     return $('#options_help_dialog').dialog({
       title: I18n.t('affect_reservations', 'How will this affect reservations?'),
       width: 400,
+      modal: true,
+      zIndex: 1000,
     })
   }
 

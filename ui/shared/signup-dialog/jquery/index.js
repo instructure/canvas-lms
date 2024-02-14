@@ -183,6 +183,8 @@ const signupDialog = function (id, title, path) {
       }
       return $('.error_box').filter(':visible').remove()
     },
+    modal: true,
+    zIndex: 1000,
   })
   $node.fixDialogButtons()
   // re-disable after fixing

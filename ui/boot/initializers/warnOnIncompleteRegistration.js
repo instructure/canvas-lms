@@ -37,5 +37,7 @@ if (ENV.INCOMPLETE_REGISTRATION) {
           class: 'btn-primary',
         },
       ],
+      modal: true,
+      zIndex: 1000,
     })
 }

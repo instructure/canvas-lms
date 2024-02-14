@@ -59,6 +59,8 @@ export default class UploadMediaTrackForm {
             click: this.onSubmit,
           },
         ],
+        modal: true,
+        zIndex: 1000,
       })
 
     ReactDOM.render(

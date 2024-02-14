@@ -97,6 +97,8 @@ function toggleRegion($region, showRegion, $trigger) {
           close() {
             toggleRegion($region, false)
           },
+          modal: true,
+          zIndex: 1000,
         },
         dialogOpts
       )

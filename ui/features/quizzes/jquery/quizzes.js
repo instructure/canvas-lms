@@ -4335,6 +4335,7 @@ ready(function () {
           height: displayGroupSelector ? 345 : 265,
           close: this.removeEventListeners.bind(this),
           open: this.focusDialog.bind(this),
+          zIndex: 1000,
         })
         .dialog('open')
 
@@ -5125,6 +5126,8 @@ $.fn.formulaQuestion = function () {
     $('#help_with_equations_dialog').dialog({
       title: I18n.t('titles.help_with_formulas', 'Help with Quiz Question Formulas'),
       width: 500,
+      modal: true,
+      zIndex: 1000,
     })
   })
   $question.find('.combinations_option').attr('disabled', true)

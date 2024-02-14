@@ -48,7 +48,10 @@ test('handles buttons', function () {
 </form>
 `)
     .appendTo('#fixtures')
-    .dialog()
+    .dialog({
+      modal: true,
+      zIndex: 1000,
+    })
     .fixDialogButtons()
   ok($dialog.is(':ui-dialog:visible'), 'pops up dialog')
   equal($dialog.dialog('option', 'buttons').length, 2, 'converts both buttons in .button-pane only')

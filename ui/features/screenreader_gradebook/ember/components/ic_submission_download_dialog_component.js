@@ -143,7 +143,10 @@ export default register(
         if (this.$dialog == null) {
           this.$dialog = $('#submissions_download_dialog form').dialog(this.dialogOptions)
         }
-        this.$dialog.dialog()
+        this.$dialog.dialog({
+          modal: true,
+          zIndex: 1000,
+        })
         return this.checkForChange()
       },
 

@@ -36,6 +36,8 @@ export default class EditRolesView extends DialogBaseView {
       width: '300px',
       id: 'edit_roles',
       title: I18n.t('Edit Course Role'),
+      modal: true,
+      zIndex: 1000,
     }
   }
 
