@@ -27,7 +27,6 @@ x-base-service: &BASE-SERVICE
       - locales:/usr/src/app/config/locales/generated
       - log:/usr/src/app/log
       - node_modules:/usr/src/app/node_modules
-      - old-copy-of-react-14-that-is-just-here-so-if-analytics-is-checked-out-it-doesnt-change-yarn.lock_node_modules:/usr/src/app/packages/old-copy-of-react-14-that-is-just-here-so-if-analytics-is-checked-out-it-doesnt-change-yarn.lock/node_modules
       - pacts:/usr/src/app/pacts
       - public_dist:/usr/src/app/public/dist
       - reports:/usr/src/app/reports
@@ -146,7 +145,6 @@ volumes:
   locales: {}
   log: {}
   node_modules: {}
-  old-copy-of-react-14-that-is-just-here-so-if-analytics-is-checked-out-it-doesnt-change-yarn.lock_node_modules: {}
   pg_data: {}
   pacts: {}
   public_dist: {}
