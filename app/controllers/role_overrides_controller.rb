@@ -192,9 +192,11 @@ class RoleOverridesController < ApplicationController
                ACCOUNT_ENABLE_ALERTS: @context.settings[:enable_alerts]
              })
 
+      add_crumb t "Permissions"
       js_bundle :permissions
       css_bundle :permissions
       set_active_tab "permissions"
+      page_has_instui_topnav
     end
   end
 
