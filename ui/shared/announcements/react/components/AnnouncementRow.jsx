@@ -64,13 +64,13 @@ export default function AnnouncementRow({
     <SectionsTooltip totalUserCount={announcement.user_count} sections={announcement.sections} />
   ) : null
 
-  const replyButton = announcement.locked ? null : (
-    <View display="block" margin="x-small 0 0">
+  const replyButton = announcement?.permissions?.reply ? (
+    <View display="block" margin="x-small 0 0" data-testid="announcement-reply">
       <Text color="brand">
         <IconReplyLine /> {I18n.t('Reply')}
       </Text>
     </View>
-  )
+  ) : null
 
   const renderMenuList = () => {
     const menuList = []
