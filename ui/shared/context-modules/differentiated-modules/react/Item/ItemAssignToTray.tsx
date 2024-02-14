@@ -514,7 +514,7 @@ export default function ItemAssignToTray({
 
   function Body() {
     return (
-      <Flex.Item padding="small medium 0" shouldGrow={true} shouldShrink={true}>
+      <Flex.Item padding="small medium" shouldGrow={true} shouldShrink={true}>
         {fetchInFlight && (
           <Mask>
             <Spinner renderTitle={I18n.t('Loading')} />
@@ -539,7 +539,7 @@ export default function ItemAssignToTray({
 
   function Footer() {
     return (
-      <Flex.Item margin="small 0 0 0" width="100%">
+      <Flex.Item width="100%">
         <TrayFooter
           updateInteraction={allCardsValid() ? 'enabled' : 'inerror'}
           saveButtonLabel={I18n.t('Save')}
