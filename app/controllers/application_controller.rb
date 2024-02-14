@@ -153,6 +153,13 @@ class ApplicationController < ActionController::Base
     @js_env = nil
   end
 
+  def page_has_instui_topnav
+    return unless @domain_root_account.try(:feature_enabled?, :instui_nav)
+
+    @instui_topnav = true
+    js_env breadcrumbs: crumbs[1..]&.map { |crumb| { name: crumb[0], url: crumb[1] } }
+  end
+
   def set_normalized_route
     # Presently used only by Sentry, and not needed for API requests
     return unless request.format.html? && SentryExtensions::Settings.settings[:frontend_dsn]

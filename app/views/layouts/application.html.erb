@@ -104,8 +104,7 @@
 
   <div id="wrapper" class="ic-Layout-wrapper">
     <% if crumbs.length > 1 %>
-      <% if @instui_topnav && @domain_root_account.try(:feature_enabled?, :instui_nav) %>
-        <% js_env breadcrumbs: crumbs[1..]&.map { |crumb| { name: crumb[0], url: crumb[1] } } %>
+      <% if @instui_topnav %>
         <div class="instui-topnav-container">
           <div id="react-instui-topnav"></div>
         </div>
