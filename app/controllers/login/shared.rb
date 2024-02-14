@@ -36,12 +36,9 @@ module Login::Shared
     Auditors::Authentication.record(pseudonym, "login")
 
     # Send metrics for successful login
-    if Setting.get("enable_login_metric", "true") == "true"
-      auth_type = pseudonym&.authentication_provider&.auth_type
-      tags = { auth_type: }
-      tags[:domain] = request.host if Setting.get("enable_login_metric_domain", "true") == "true"
-      InstStatsd::Statsd.increment("login.count", tags:) if auth_type
-    end
+    auth_type = pseudonym&.authentication_provider&.auth_type
+    tags = { auth_type:, domain: request.host }
+    InstStatsd::Statsd.increment("login.count", tags:) if auth_type
 
     # Since the user just logged in, we'll reset the context to include their info.
     setup_live_events_context

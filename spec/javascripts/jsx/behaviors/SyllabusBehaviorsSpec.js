@@ -199,12 +199,31 @@ test('escapes selector when jumping to event', () => {
     '<div class="mini_month"><div class="day_wrapper" id="mini_day_2023_10_31_1"><div class="mini_calendar_day" id="mini_day_2023_10_31_1, id=[<img src=x onerror=\'alert(`${document.domain}:${document.cookie}`)\' />]">Click me to trigger XSS</div></div></div>'
   )
   SyllabusBehaviors.bindToMiniCalendar()
-  $('.mini_calendar_day').trigger('click')
-  const selectorValue = spy.firstCall.thisValue.selector
-  equal(
-    selectorValue,
-    // eslint-disable-next-line no-template-curly-in-string
-    '.events_2023_10_31_1, id=[&lt;img src=x onerror=&#39;alert(`${document.domain}:${document.cookie}`)&#39; &gt;&lt;/div&gt;]'
-  )
+  let errorThrown = false
+  let error = null
+  try {
+    $('.mini_calendar_day').trigger('click')
+  } catch (e) {
+    errorThrown = true
+    error = e
+  }
+  if (errorThrown) {
+    equal(
+      error?.message,
+      // eslint-disable-next-line no-template-curly-in-string
+      "Syntax error, unrecognized expression: #mini_day_2023_10_31_1, id=[<img src=x onerror='alert(`${document.domain}:${document.cookie}`)' ></div>]",
+      'Expected syntax error for malformed selector in jQuery >= 1.8'
+    )
+  } else {
+    const selectorValue = spy.firstCall ? spy.firstCall.thisValue.selector : ''
+    const yourEscapedIdValue =
+      // eslint-disable-next-line no-template-curly-in-string
+      '.events_2023_10_31_1, id=[&lt;img src=x onerror=&#39;alert(`${document.domain}:${document.cookie}`)&#39; &gt;&lt;/div&gt;]'
+    equal(
+      selectorValue,
+      yourEscapedIdValue,
+      'Expected escaped/sanitized selector value in jQuery < 1.8'
+    )
+  }
   $.fn.ifExists = restoreFn
 })

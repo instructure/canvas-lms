@@ -19,11 +19,19 @@
 #
 
 require "active_support/cache"
+require "active_support/version"
 
 module CanvasCache
   module RedisCacheStore
     module ClassMethods
       ActiveSupport::Cache::RedisCacheStore.singleton_class.prepend(self)
+
+      # Rails.version < "7.1"
+      unless ActiveSupport.version < "7.1"
+        def retrieve_pool_options(_options)
+          false
+        end
+      end
 
       def build_redis(**redis_options)
         Redis.patch

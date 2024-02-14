@@ -6,6 +6,8 @@
 # please add the commit hashes here
 
 548a2a17327cd60a09b9b28513e7dbed2c5c56d5 # send_later => delay
+502aa068da4a7dd565cb5a78a5bf4d13d6069acc # Layout/Multiline*LineBreaks
+dbfff50c2d62f84b8ff448de6c7c70c1bff3891a # Layout
 7c1f3bbb0354262145b37acf372547d22d86fc07 # Layout gems/plugins
 dd8fc67c414faf398380463d4a872c8cbd6121c7 # Layout gems
 4896de008ed30710180923831b7db0da6f4fc102 # Layout config

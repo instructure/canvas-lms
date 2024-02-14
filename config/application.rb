@@ -27,18 +27,19 @@ require "rails/test_unit/railtie"
 
 Bundler.require(*Rails.groups)
 
-if defined?(Spring)
-  Spring.after_fork do
-    if ENV["RUBY_DEBUG_OPEN"]
-      require "debug/session"
-      next unless defined?(DEBUGGER__)
+debug_launch = lambda do
+  if ENV["RUBY_DEBUG_OPEN"]
+    require "debug/session"
+    next unless defined?(DEBUGGER__)
 
-      DEBUGGER__.open(nonstop: ENV["RUBY_DEBUG_NONSTOP"])
-    elsif ENV["RUBY_DEBUG_START"]
-      require "debug/start"
-    end
+    DEBUGGER__.open(nonstop: ENV["RUBY_DEBUG_NONSTOP"])
+  elsif ENV["RUBY_DEBUG_START"]
+    require "debug/start"
   end
 end
+
+Spring.after_fork(&debug_launch) if defined?(Spring)
+debug_launch.call if !defined?(Passenger) && Rails.env.development?
 
 module CanvasRails
   class Application < Rails::Application
@@ -57,6 +58,8 @@ module CanvasRails
     config.action_dispatch.default_headers["Referrer-Policy"] = "no-referrer-when-downgrade"
     config.action_controller.forgery_protection_origin_check = true
     ActiveSupport.to_time_preserves_timezone = true
+    # Ensure switchman gets the new version before the main initialize_cache initializer runs
+    config.active_support.cache_format_version = ActiveSupport.cache_format_version = 7.0
 
     config.app_generators do |c|
       c.test_framework :rspec
@@ -166,12 +169,22 @@ module CanvasRails
         end
       end
 
-      def initialize(connection, logger, connection_parameters, config)
-        unless config.key?(:prepared_statements)
-          config = config.dup
-          config[:prepared_statements] = false
+      if Rails.version < "7.1"
+        def initialize(connection, logger, connection_parameters, config)
+          unless config.key?(:prepared_statements)
+            config = config.dup
+            config[:prepared_statements] = false
+          end
+          super(connection, logger, connection_parameters, config)
         end
-        super(connection, logger, connection_parameters, config)
+      else
+        def initialize(config)
+          unless config.key?(:prepared_statements)
+            config = config.dup
+            config[:prepared_statements] = false
+          end
+          super(config)
+        end
       end
 
       def connect
@@ -179,7 +192,11 @@ module CanvasRails
         hosts.each_with_index do |host, index|
           connection_parameters = @connection_parameters.dup
           connection_parameters[:host] = host
-          @connection = PG::Connection.connect(connection_parameters)
+          if Rails.version < "7.1"
+            @connection = PG::Connection.connect(connection_parameters)
+          else
+            @raw_connection = PG::Connection.connect(connection_parameters)
+          end
 
           configure_connection
 
@@ -322,8 +339,19 @@ module CanvasRails
       def self.generate_key(*); end
     end
 
-    def key_generator
+    def key_generator(...)
       DummyKeyGenerator
+    end
+
+    # # This also depends on secret_key_base and is not a feature we use or currently intend to support
+    unless Rails.version < "7.1"
+      initializer "canvas.ignore_generated_token_verifier", before: "active_record.generated_token_verifier" do
+        config.after_initialize do
+          ActiveSupport.on_load(:active_record) do
+            self.generated_token_verifier = "UNUSED"
+          end
+        end
+      end
     end
 
     initializer "canvas.init_dynamic_settings", before: "canvas.extend_shard" do

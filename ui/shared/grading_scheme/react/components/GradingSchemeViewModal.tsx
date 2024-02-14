@@ -30,7 +30,7 @@ type Props = {
   open: boolean
   gradingScheme?: GradingScheme
   handleClose: () => void
-  handleGradingSchemeDelete: (gradingSchemeId: string) => void
+  openDeleteModal: (gradingScheme: GradingScheme) => void
   editGradingScheme: (gradingSchemeId: string) => void
   canManageScheme: (gradingScheme: GradingScheme) => boolean
 }
@@ -38,7 +38,7 @@ const GradingSchemeViewModal = ({
   open,
   gradingScheme,
   handleClose,
-  handleGradingSchemeDelete,
+  openDeleteModal,
   editGradingScheme,
   canManageScheme,
 }: Props) => {
@@ -62,7 +62,7 @@ const GradingSchemeViewModal = ({
           archivedGradingSchemesEnabled={true}
           disableDelete={!canManageScheme(gradingScheme)}
           disableEdit={!canManageScheme(gradingScheme)}
-          onDeleteRequested={() => handleGradingSchemeDelete(gradingScheme.id)}
+          onDeleteRequested={() => openDeleteModal(gradingScheme)}
           onEditRequested={() => editGradingScheme(gradingScheme.id)}
         />
       </Modal.Body>

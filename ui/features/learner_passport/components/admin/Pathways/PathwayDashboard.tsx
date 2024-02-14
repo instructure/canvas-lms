@@ -28,6 +28,7 @@ import {Text} from '@instructure/ui-text'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {View} from '@instructure/ui-view'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import AdminHeader from '../AdminHeader'
 import PathwayCard from './PathwayCard'
 import type {PathwayData} from '../../types'
 import {showUnimplemented} from '../../shared/utils'
@@ -63,10 +64,8 @@ const PathwayDashboard = () => {
   }
 
   const handleCreateClick = useCallback(() => {
-    const formData = new FormData()
-    formData.append('userId', ENV.current_user.id)
-    submit(formData, {method: 'PUT', action: 'create'})
-  }, [submit])
+    navigate('../edit/new')
+  }, [navigate])
 
   const handleAction = useCallback(
     (pathwayId: string, action: string) => {
@@ -86,24 +85,15 @@ const PathwayDashboard = () => {
 
   return (
     <View as="div" maxWidth="1260px">
-      <Flex justifyItems="space-between">
-        <Flex.Item shouldGrow={true}>
-          <Heading level="h1" themeOverride={{h1FontWeight: 700}}>
-            Pathways
-          </Heading>
-        </Flex.Item>
-        <Flex.Item>
-          <Button renderIcon={IconPlusLine} color="primary" onClick={handleCreateClick}>
-            Create Pathway
-          </Button>
-        </Flex.Item>
-      </Flex>
-      <View as="div" margin="small 0 large 0">
-        <Text size="large">
-          Create and manage learning pathways with milestones, requirements, and badges.
-        </Text>
-      </View>
-      <View>
+      <AdminHeader
+        title="Pathways"
+        description="Create and manage learning pathways with milestones, requirements, and badges"
+      >
+        <Button renderIcon={IconPlusLine} color="primary" onClick={handleCreateClick}>
+          New Pathway
+        </Button>
+      </AdminHeader>
+      <View as="div" margin="0 large large large">
         {pathways?.length > 0 ? null : (
           <View as="div" margin="0">
             <Text size="medium">No pathways created</Text>

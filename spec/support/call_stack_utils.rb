@@ -55,6 +55,6 @@ module CallStackUtils
 end
 
 ignore_regex = RSpec::CallerFilter::IGNORE_REGEX
-RSpec::CallerFilter.send :remove_const, :IGNORE_REGEX
+RSpec::CallerFilter.send :remove_const, :IGNORE_REGEX # rubocop:disable RSpec/RemoveConst
 RSpec::CallerFilter::IGNORE_REGEX = Regexp.union(ignore_regex, CallStackUtils::APP_IGNORE_REGEX)
 RSpec::Core::Formatters::ExceptionPresenter.prepend CallStackUtils::ExceptionPresenter

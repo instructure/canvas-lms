@@ -1001,7 +1001,7 @@ describe "Users API", type: :request do
                         { controller: "users", action: "api_show", id: @other_user.id.to_param, format: "json" },
                         {},
                         expected_status: 404)
-        expect(json.keys).not_to be_include("errors")
+        expect(json.keys).not_to include("errors")
       end
 
       it "404s but still returns the user on a deleted user, including merge info, for a site admin" do
@@ -1013,7 +1013,7 @@ describe "Users API", type: :request do
                         { controller: "users", action: "api_show", id: @other_user.id.to_param, format: "json" },
                         {},
                         expected_status: 404)
-        expect(json.keys).not_to be_include("errors")
+        expect(json.keys).not_to include("errors")
         expect(json["merged_into_user_id"]).to eq u3.id
       end
     end
@@ -3322,13 +3322,13 @@ describe "Users API", type: :request do
       a = @course.assignments.create!(due_at: 2.days.ago, workflow_state: "published", submission_types: "online_text_entry")
       a.destroy
       json = api_call(:get, @path, @params)
-      expect(json.pluck("id")).not_to be_include a.id
+      expect(json.pluck("id")).not_to include a.id
     end
 
     it "does not show unpublished assignments" do
       a = @course.assignments.create!(due_at: 2.days.ago, workflow_state: "unpublished", submission_types: "online_text_entry")
       json = api_call(:get, @path, @params)
-      expect(json.pluck("id")).not_to be_include a.id
+      expect(json.pluck("id")).not_to include a.id
     end
 
     context "current_grading_period filter" do

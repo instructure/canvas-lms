@@ -40,6 +40,7 @@ import {setupSubmitHandler} from '@canvas/assignments/jquery/reuploadSubmissions
 import ready from '@instructure/ready'
 import {monitorLtiMessages} from '@canvas/lti/jquery/messages'
 import ItemAssignToTray from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToTray'
+import {captureException} from '@sentry/browser'
 
 if (!('INST' in window)) window.INST = {}
 
@@ -129,6 +130,7 @@ function renderCoursePacingNotice() {
       .catch(ex => {
         // eslint-disable-next-line no-console
         console.error('Falied loading CoursePacingNotice', ex)
+        captureException(ex)
       })
   }
 }
@@ -229,8 +231,8 @@ $('.assign-to-link').on('click keyclick', function (event) {
   const courseId = event.target.getAttribute('data-assignment-context-id')
   const itemName = event.target.getAttribute('data-assignment-name')
   const itemContentId = event.target.getAttribute('data-assignment-id')
-  const pointsPossible =
-    parseFloat(event.target.getAttribute('data-assignment-points-possible')) + ' pts'
+  const pointsString = event.target.getAttribute('data-assignment-points-possible')
+  const pointsPossible = pointsString ? parseFloat(pointsString) : undefined
   renderItemAssignToTray(true, returnFocusTo, {
     courseId,
     itemName,

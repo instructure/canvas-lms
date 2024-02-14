@@ -395,7 +395,7 @@ export const AddressBook = ({
       <View as="div" padding="xx-small" data-testid="menu-loading-spinner">
         <Flex width="100%" margin="xxx-small none xxx-small xxx-small">
           <Flex.Item align="start" margin="0 small 0 0">
-            <Spinner renderTitle={I18n.t('Loading')} size="x-small" />
+            <Spinner renderTitle={I18n.t('Loading')} size="x-small" delay={300} />
           </Flex.Item>
           <Flex.Item align="center" shouldGrow={true} shouldShrink={true}>
             <View>

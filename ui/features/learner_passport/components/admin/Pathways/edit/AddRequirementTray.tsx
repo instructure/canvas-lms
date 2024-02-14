@@ -54,20 +54,28 @@ const RequirementTray = ({requirement, open, variant, onClose, onSave}: Requirem
   const [canvasContent, setCanvasContent] = useState<CanvasRequirementSearchResultType | undefined>(
     requirement?.canvas_content
   )
+  const [validName, setValidName] = useState<boolean>(true)
+  const [validType, setValidType] = useState<boolean>(true)
+
+  const isValid = useCallback(() => {
+    setValidName(!!name)
+    setValidType(!!type)
+    return name && type
+  }, [name, type])
 
   const handleSave = useCallback(() => {
-    if (!(name && type)) return
+    if (!isValid()) return
 
     const newRequirement = {
       id: requirementId,
       name,
       description,
       required,
-      type,
+      type: type as RequirementType,
       canvas_content: canvasContent,
     }
     onSave(newRequirement)
-  }, [canvasContent, description, name, onSave, required, requirementId, type])
+  }, [canvasContent, description, isValid, name, onSave, required, requirementId, type])
 
   const handleNameChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>, newName: string) => {
@@ -87,6 +95,7 @@ const RequirementTray = ({requirement, open, variant, onClose, onSave}: Requirem
 
   const handleTypeChange = useCallback((event: React.SyntheticEvent<Element, Event>, {value}) => {
     setType(value as RequirementType)
+    setValidType(!!value)
   }, [])
 
   const handleCanvasRequirementChange = useCallback(
@@ -142,7 +151,9 @@ const RequirementTray = ({requirement, open, variant, onClose, onSave}: Requirem
                     renderLabel="Name"
                     isRequired={true}
                     value={name}
+                    onBlur={() => setValidName(!!name)}
                     onChange={handleNameChange}
+                    messages={validName ? undefined : [{text: 'Name is Required', type: 'error'}]}
                   />
                 </View>
                 <View as="div" margin="0 0 small 0">
@@ -170,7 +181,13 @@ const RequirementTray = ({requirement, open, variant, onClose, onSave}: Requirem
                     renderLabel="Requirement type"
                     defaultValue=""
                     value={type || undefined}
+                    onBlur={() => setValidType(!!type)}
                     onChange={handleTypeChange}
+                    messages={
+                      validType
+                        ? undefined
+                        : [{text: 'Requirement type is Required', type: 'error'}]
+                    }
                   >
                     {Object.keys(RequirementTypes).map(key => {
                       const reqtype = key as RequirementType

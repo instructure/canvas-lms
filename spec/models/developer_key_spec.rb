@@ -1169,7 +1169,7 @@ describe DeveloperKey do
     AccessToken.create!(user: user_model, developer_key: developer_key_saved)
     AccessToken.create!(user: user_model, developer_key: developer_key_saved)
 
-    expect(developer_key_saved.access_token_count).to eq 3
+    expect(developer_key_saved.reload.access_token_count).to eq 3
   end
 
   it "returns the last_used_at value for a key" do

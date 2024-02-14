@@ -19,12 +19,13 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import StudentOutcomeScore from '../StudentOutcomeScore'
-import * as SVGUrl from '../icons'
+import {svgUrl} from '../icons'
 
-// OUT-6141 - remove or rewrite to remove spies on imports
-describe.skip('StudentOutcomeScore', () => {
-  let svgUrlSpy
+jest.mock('../icons', () => ({
+  svgUrl: jest.fn(() => 'http://test.com'),
+}))
 
+describe('StudentOutcomeScore', () => {
   const defaultProps = (props = {}) => {
     return {
       outcome: {
@@ -52,17 +53,12 @@ describe.skip('StudentOutcomeScore', () => {
   }
 
   beforeEach(() => {
-    svgUrlSpy = jest.spyOn(SVGUrl, 'svgUrl')
     window.ENV = {GRADEBOOK_OPTIONS: {ACCOUNT_LEVEL_MASTERY_SCALES: true}}
-  })
-
-  afterEach(() => {
-    jest.clearAllMocks()
   })
 
   it('calls svgUrl with the right arguments', () => {
     render(<StudentOutcomeScore {...defaultProps()} />)
-    expect(svgUrlSpy).toHaveBeenCalledWith(3, 5)
+    expect(svgUrl).toHaveBeenCalledWith(3, 5)
   })
 
   it('renders ScreenReaderContent with the rating description', () => {

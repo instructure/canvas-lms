@@ -302,6 +302,18 @@ describe Types::UserType do
       ).to eq []
     end
 
+    it "excludes deactivated enrollments when currentOnly is true" do
+      @student.enrollments.each(&:deactivate)
+      results = user_type.resolve("enrollments(currentOnly: true) { _id }")
+      expect(results).to be_empty
+    end
+
+    it "includes deactivated enrollments when currentOnly is false" do
+      @student.enrollments.each(&:deactivate)
+      results = user_type.resolve("enrollments(currentOnly: false) { _id }")
+      expect(results).not_to be_empty
+    end
+
     it "excludes concluded enrollments when excludeConcluded is true" do
       expect(user_type.resolve("enrollments(excludeConcluded: true) { _id }").length).to eq 1
       @student.enrollments.update_all workflow_state: "completed"

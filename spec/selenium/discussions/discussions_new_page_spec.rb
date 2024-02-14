@@ -504,6 +504,14 @@ describe "discussions" do
         expect(f("span[data-testid='anon-conversation']").text).to eq "When creating a reply, you will have the option to show your name and profile picture to other course members or remain anonymous."
         expect(f("span[data-testid='author_name']").text).to include "Anonymous"
       end
+
+      it "hides the correct options" do
+        get "/courses/#{course.id}/discussion_topics/new"
+        expect(f("body")).not_to contain_jqcss "input[value='full_anonymity']"
+        expect(f("body")).not_to contain_jqcss "input[value='enable-podcast-feed']"
+        expect(f("body")).not_to contain_jqcss "input[value='graded']"
+        expect(f("body")).not_to contain_jqcss "input[data-testid='group-discussion-checkbox']"
+      end
     end
 
     context "as a teacher" do
@@ -618,6 +626,14 @@ describe "discussions" do
         wait_for_ajaximations
         expect(f("span[data-testid='anon-conversation']").text).to eq "When creating a reply, students will have the option to show their name and profile picture or remain anonymous. Your name and profile picture will be visible to all course members."
         expect(f("span[data-testid='author_name']").text).to eq "teacher"
+      end
+
+      it "displays the grading and groups not supported in anonymous discussions message when either of the anonymous options are selected" do
+        get "/courses/#{course.id}/discussion_topics/new"
+        force_click("input[value='full_anonymity']")
+        expect(f("[data-testid=groups_grading_not_allowed]")).to be_displayed
+        force_click("input[value='partial_anonymity']")
+        expect(f("[data-testid=groups_grading_not_allowed]")).to be_displayed
       end
 
       it "creates an allow_rating discussion topic successfully" do

@@ -64,6 +64,7 @@ module Types
     field :is_announcement, Boolean, null: false
     field :is_section_specific, Boolean, null: true
     field :require_initial_post, Boolean, null: true
+    field :can_group, Boolean, null: true, method: :can_group?
 
     field :message, String, null: true
     def message

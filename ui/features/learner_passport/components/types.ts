@@ -16,6 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+export type PageBreadcrumb = {
+  text: string
+  url?: string
+}
+
 export interface AchievementData {
   id: string
   isNew: boolean
@@ -122,6 +127,7 @@ export interface ProjectEditData {
 export type PathwayBadgeType = {
   id: string
   title: string
+  image: string | null
   issuer: {
     name: string
     url: string
@@ -188,6 +194,19 @@ export interface RequirementData {
   canvas_content?: CanvasRequirementSearchResultType
 }
 
+export interface CanvasUserSearchResultType {
+  id: string
+  name: string
+  sortable_name: string
+  avatar_url: string
+}
+
+export type PathwayUserShareRoleType = 'collaborator' | 'reviewer' | 'viewer'
+
+export interface PathwayUserShareType extends CanvasUserSearchResultType {
+  role: PathwayUserShareRoleType
+}
+
 // this is a node in the pathway tree
 export interface MilestoneData {
   id: string
@@ -195,7 +214,7 @@ export interface MilestoneData {
   description: string
   required?: boolean
   requirements: RequirementData[]
-  achievements: AchievementData[]
+  completion_award: string | PathwayBadgeType | null
   next_milestones: string[] // ids of this milestone's children
 }
 
@@ -213,12 +232,26 @@ export interface PathwayData {
 
 export interface PathwayDetailData extends PathwayData {
   description: string
+  image_url: string | null
   is_private?: boolean
   learning_outcomes: SkillData[]
-  completion_award: PathwayBadgeType | null
-  learner_groups: string[] // learner group ids
+  completion_award: string | PathwayBadgeType | null
+  learner_groups: string[] | LearnerGroupType[]
+  shares: PathwayUserShareType[]
   first_milestones: string[] // ids of the milestone children of the root pathway
   milestones: MilestoneData[] // all the milestones in the pathway
+}
+
+export function isPathwayBadgeType(badge: string | PathwayBadgeType): badge is PathwayBadgeType {
+  return (badge as PathwayBadgeType).id !== undefined
+}
+
+export function isLearnerGroupType(group: string | LearnerGroupType): group is LearnerGroupType {
+  return (group as LearnerGroupType).id !== undefined
+}
+
+export interface DraftPathway extends PathwayDetailData {
+  timestamp: number
 }
 
 export interface PathwayEditData {

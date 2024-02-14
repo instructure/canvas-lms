@@ -38,8 +38,14 @@ module CanvasCache
     end
 
     module Client
+      def self.prepended(klass)
+        super
+
+        klass.attr_accessor :last_command_at
+      end
+
       def disconnect_if_idle(since_when)
-        close if !@process_start || @process_start < since_when
+        close if last_command_at.nil? || last_command_at < since_when
       end
     end
 
@@ -153,6 +159,7 @@ module CanvasCache
         ::Redis::Scripting::Module.prepend(Scripting::Module) if defined?(::Redis::Scripting::Module)
         ::Redis.prepend(Redis)
         ::Redis.prepend(IgnorePipelinedKey)
+        ::RedisClient::Cluster.prepend(Client)
         ::RedisClient::Cluster.prepend(IgnorePipelinedKey)
         ::Redis::Client.prepend(Client)
         ::Redis::Distributed.prepend(Distributed)

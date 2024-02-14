@@ -3,8 +3,6 @@
 namespace :graphql do
   desc "Dump GraphQL schema and fragment types"
   task schema: :environment do
-    GraphQLPostgresTimeout.do_not_wrap = true
-
     Rails.root.join("schema.graphql").open("w") do |f|
       f.puts CanvasSchema.to_definition
     end

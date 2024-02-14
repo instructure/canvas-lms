@@ -35,7 +35,7 @@ import * as advancedPreference from './advancedPreference'
 import {instuiPopupMountNode} from '../../../../util/fullscreenHelpers'
 
 import {css} from 'aphrodite'
-import Mathml, {MathJaxDirective} from '../../../../enhance-user-content/mathml'
+import {MathJaxDirective, Mathml} from '../../../../enhance-user-content/mathml'
 import styles from './styles'
 
 import RCEGlobals from '../../../RCEGlobals'

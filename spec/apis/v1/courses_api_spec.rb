@@ -2399,8 +2399,8 @@ describe CoursesController, type: :request do
           expect(@course1.reload).to be_available
           progress = Progress.find(json["id"])
           expect(progress).to be_completed
-          expect(progress.message).to be_include "1 course processed"
-          expect(progress.message).to be_include "The course was not found: #{@course2.id}"
+          expect(progress.message).to include "1 course processed"
+          expect(progress.message).to include "The course was not found: #{@course2.id}"
         end
 
         it "does not update courses in another account" do
@@ -2415,8 +2415,8 @@ describe CoursesController, type: :request do
           expect(@course1.reload).to be_available
           progress = Progress.find(json["id"])
           expect(progress).to be_completed
-          expect(progress.message).to be_include "1 course processed"
-          expect(progress.message).to be_include "The course was not found: #{otherCourse.id}"
+          expect(progress.message).to include "1 course processed"
+          expect(progress.message).to include "The course was not found: #{otherCourse.id}"
         end
 
         it "succeeds when publishing already published courses" do
@@ -2425,7 +2425,7 @@ describe CoursesController, type: :request do
           json = api_call(:put, @path, @params, { event: "offer", course_ids: })
           run_jobs
           progress = Progress.find(json["id"])
-          expect(progress.message).to be_include "3 courses processed"
+          expect(progress.message).to include "3 courses processed"
           [@course1, @course2, @course3].each { |c| expect(c.reload).to be_available }
         end
 
@@ -2436,7 +2436,7 @@ describe CoursesController, type: :request do
           json = api_call(:put, @path, @params, { event: "conclude", course_ids: })
           run_jobs
           progress = Progress.find(json["id"])
-          expect(progress.message).to be_include "3 courses processed"
+          expect(progress.message).to include "3 courses processed"
           [@course1, @course2, @course3].each { |c| expect(c.reload).to be_completed }
         end
 
@@ -2447,7 +2447,7 @@ describe CoursesController, type: :request do
           json = api_call(:put, @path, @params, { event: "offer", course_ids: })
           run_jobs
           progress = Progress.find(json["id"])
-          expect(progress.message).to be_include "3 courses processed"
+          expect(progress.message).to include "3 courses processed"
           [@course1, @course2, @course3].each { |c| expect(c.reload).to be_available }
         end
 
@@ -2462,8 +2462,8 @@ describe CoursesController, type: :request do
           run_jobs
           progress = Progress.find(json["id"])
           expect(progress).to be_failed
-          expect(progress.message).to be_include "0 courses processed"
-          expect(progress.message).to be_include "The course was not found: #{@course2.id}"
+          expect(progress.message).to include "0 courses processed"
+          expect(progress.message).to include "The course was not found: #{@course2.id}"
         end
 
         it "reports a failure if an exception is raised outside course update" do
@@ -2474,7 +2474,7 @@ describe CoursesController, type: :request do
           run_jobs
           progress = Progress.find(json["id"])
           expect(progress).to be_failed
-          expect(progress.message).to be_include "crazy exception"
+          expect(progress.message).to include "crazy exception"
         end
       end
 

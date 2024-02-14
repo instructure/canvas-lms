@@ -425,30 +425,14 @@ describe ApplicationHelper do
           it "justs include domain root account's when there is no context or @current_user" do
             output = helper.include_account_js
             expect(output).to have_tag "script"
-            expect(output).to eq("<script>
-//<![CDATA[
-
-      ;[\"https://example.com/root/account.js\"].forEach(function(src) {
-        var s = document.createElement('script'); s.src = src; s.async = false;
-        document.head.appendChild(s)
-      });
-//]]>
-</script>")
+            expect(output).to eq("<script src=\"https://example.com/root/account.js\" defer=\"defer\"></script>")
           end
 
           it "loads custom js even for high contrast users" do
             @current_user = user_factory
             user_factory.enable_feature!(:high_contrast)
             output = helper.include_account_js
-            expect(output).to eq("<script>
-//<![CDATA[
-
-      ;[\"https://example.com/root/account.js\"].forEach(function(src) {
-        var s = document.createElement('script'); s.src = src; s.async = false;
-        document.head.appendChild(s)
-      });
-//]]>
-</script>")
+            expect(output).to eq("<script src=\"https://example.com/root/account.js\" defer=\"defer\"></script>")
           end
 
           it "includes granchild, child, and root when viewing the grandchild or any course or group in it" do
@@ -456,15 +440,7 @@ describe ApplicationHelper do
             group = course.groups.create!
             [@grandchild_account, course, group].each do |context|
               @context = context
-              expect(helper.include_account_js).to eq("<script>
-//<![CDATA[
-
-      ;[\"https://example.com/root/account.js\", \"https://example.com/child/account.js\", \"https://example.com/grandchild/account.js\"].forEach(function(src) {
-        var s = document.createElement('script'); s.src = src; s.async = false;
-        document.head.appendChild(s)
-      });
-//]]>
-</script>")
+              expect(helper.include_account_js).to eq("<script src=\"https://example.com/root/account.js\" defer=\"defer\"></script>\n  <script src=\"https://example.com/child/account.js\" defer=\"defer\"></script>\n  <script src=\"https://example.com/grandchild/account.js\" defer=\"defer\"></script>")
             end
           end
         end

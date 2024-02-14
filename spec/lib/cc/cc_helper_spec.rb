@@ -301,6 +301,43 @@ describe CC::CCHelper do
       expect(urls[1]).to eq "http://www.example.com:8080/courses/#{@othercourse.id}/wiki/front-page"
     end
 
+    context "assessment_question file links" do
+      before do
+        attachment_model(uploaded_data: stub_png_data)
+        assessment_question_bank_model
+        question_data = {
+          "name" => "test question",
+          "points_possible" => 10,
+          "answers" => [{ "id" => 1 }, { "id" => 2 }],
+        }
+        @question = @bank.assessment_questions.create!(question_data:)
+        @question.question_data = question_data.merge("question_text" => %(<p><img src="/courses/#{@course.id}/files/#{@attachment.id}/download"></p>))
+        @question.save!
+        quiz_model(course: @course)
+        @quiz.add_assessment_questions([@question])
+      end
+
+      it "translates assessment_question links during export" do
+        @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, for_course_copy: false)
+        question_text = @quiz.quiz_questions[0].question_data["question_text"]
+        matches = question_text.match %r{/assessment_questions/#{@question.id}/files/(?<file_id>\d+)}
+        expect(matches[:file_id]).not_to be_nil
+
+        translated = @exporter.html_content(question_text)
+        expect(translated).to match %r{\$IMS-CC-FILEBASE\$/assessment_questions/test%20my%20file\?%20hai!&amp;.png}
+      end
+
+      it "removes verifier query parameters on links" do
+        @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, for_course_copy: false)
+        qb_attachment = @question.attachments.take
+        question_text = %(<p><img src="/assessment_questions/#{@question.id}/files/#{qb_attachment.id}/download?verifier=#{qb_attachment.uuid}&amp;verifier=random_other_att_verifier" alt="5e9toe-2.jpeg" /></p>)
+        @question.question_data = @question.question_data = question_data.merge("question_text" => question_text)
+        @question.save!
+        translated = @exporter.html_content(question_text)
+        expect(translated).to match %r{\$IMS-CC-FILEBASE\$/assessment_questions/test%20my%20file\?%20hai!&amp;.png}
+      end
+    end
+
     it "copies the correct page when the url is an old slug" do
       Account.site_admin.enable_feature! :permanent_page_links
       allow(HostUrl).to receive_messages(protocol: "http", context_host: "www.example.com:8080")

@@ -28,8 +28,8 @@ import {
 
 const DEFAULT_LIST_OPTIONS = {
   'Course Sections': [
-    {_id: '1', name: 'Section 1'},
-    {_id: '2', name: 'Section 2'},
+    {id: '1', name: 'Section 1'},
+    {id: '2', name: 'Section 2'},
   ],
   Students: [
     {user: {_id: 'u_1', name: 'Jason'}},

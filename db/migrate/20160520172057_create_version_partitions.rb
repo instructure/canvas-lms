@@ -22,7 +22,7 @@ class CreateVersionPartitions < ActiveRecord::Migration[4.2]
 
   def up
     partman = CanvasPartman::PartitionManager.create(SimplyVersioned::Version)
-    partman.create_initial_partitions(SimplyVersioned::Partitioner.precreate_tables)
+    partman.create_initial_partitions(SimplyVersioned::Partitioner::PRECREATE_TABLES)
   end
 
   def down

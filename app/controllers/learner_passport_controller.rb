@@ -46,8 +46,6 @@ class LearnerPassportController < ApplicationController
         issuer: {
           name: "General Assembly",
           url: "https://generalassemb.ly/education/product-management/new-york-city",
-          iconUrl:
-            "data:image/png;base64,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"
         },
         issuedOn: "2023-10-30",
         expiresOn: "2033-10-30",
@@ -60,7 +58,7 @@ class LearnerPassportController < ApplicationController
           { name: "Market Research", verified: false },
           { name: "User Research", verified: false }
         ],
-        imageUrl: nil,
+        imageUrl: "/images/learner_passport/certificate_of_completion.png",
         verifiedBy: "Open Badges"
       },
       {
@@ -323,6 +321,7 @@ class LearnerPassportController < ApplicationController
       {
         id: "1",
         title: "Business Foundations Specialization Badge",
+        image: "/images/learner_passport/wharton.png",
         issuer: {
           name: "Wharton University of Pennsylvania",
           url: "https://www.wharton.upenn.edu/"
@@ -341,6 +340,7 @@ class LearnerPassportController < ApplicationController
       {
         id: "2",
         title: "Product Management Certification",
+        image: "/images/learner_passport/certificate_of_achievement.png",
         issuer: {
           name: "Wharton University of Pennsylvania",
           url: "https://www.wharton.upenn.edu/"
@@ -352,6 +352,7 @@ class LearnerPassportController < ApplicationController
       {
         id: "3",
         title: "English 101",
+        image: "/images/learner_passport/ribbon.png",
         issuer: {
           name: "Wharton University of Pennsylvania",
           url: "https://www.wharton.upenn.edu/"
@@ -363,6 +364,19 @@ class LearnerPassportController < ApplicationController
       {
         id: "4",
         title: "Pre-Med",
+        image: "/images/learner_passport/university_badge.png",
+        issuer: {
+          name: "Wharton University of Pennsylvania",
+          url: "https://www.wharton.upenn.edu/"
+        },
+        type: "Canvas Course Assessment Completion",
+        criteria: "To earn this certificate, parcipants must pass the course",
+        skills: []
+      },
+      {
+        id: "5",
+        title: "Marketer",
+        image: "/images/learner_passport/university_badge.png",
         issuer: {
           name: "Wharton University of Pennsylvania",
           url: "https://www.wharton.upenn.edu/"
@@ -382,6 +396,7 @@ class LearnerPassportController < ApplicationController
       id: "",
       title: "",
       description: "",
+      image_url: nil,
       published: nil,
       is_private: false,
       enrolled_student_count: 0,
@@ -389,8 +404,9 @@ class LearnerPassportController < ApplicationController
       completed_count: 0,
       first_milestones: [],
       milestones: [],
-      completion_award: nil,
+      completion_award: nil, # id of entry in learner_passport_pathway_achievements
       learner_groups: [],
+      shares: [],
     }
   end
 
@@ -399,11 +415,13 @@ class LearnerPassportController < ApplicationController
       id: "1",
       title: "Business Foundations Specialization",
       description: "Solve Real Business Problems. Build a foundation of core business skills in marketing, finance, accounting and operations.",
+      image_url: "/images/learner_passport/wharton.png",
       published: "2024-01-03",
       is_private: false,
       enrolled_student_count: 63,
       started_count: 42,
       completed_count: 15,
+      completion_award: "1",
       first_milestones: ["1", "2"],
       milestones: [
         {
@@ -411,7 +429,23 @@ class LearnerPassportController < ApplicationController
           title: "Introduction to Marketing",
           description: "Taught by three of Warton's top faculty in the marketing department, consistently raked as the #1 business school in the world, this course covers three core topics in customer loyalty: branding, customer centricity, and practical, go-to-market strategies.",
           required: true,
-          requirements: [{ id: "1" }, { id: "2" }],
+          completion_award: "5",
+          requirements: [
+            {
+              id: "1",
+              name: "Create a marketing plan",
+              description: "Create a marketing plan for a product or service and present it in a professional format, with marketing research, strategy, and budget.",
+              required: true,
+              type: "project",
+            },
+            {
+              id: "2",
+              name: "Complete a marketing analysis",
+              description: "Complete a marketing analysis of a product or service, compile the analysis into a professional format, and present the analysis with recommendations for future action.",
+              required: true,
+              type: "project"
+            },
+          ],
           next_milestones: ["3", "4"]
         },
         {
@@ -419,7 +453,23 @@ class LearnerPassportController < ApplicationController
           title: "Introduction to Financial Accounting",
           description: "Master the technical skills needed to analyze financial statements and disclosures for use in financial analysis.",
           required: false,
-          requirements: [{ id: "3" }],
+          completion_award: nil,
+          requirements: [
+            {
+              id: "3",
+              name: "Complete a financial analysis",
+              description: "Complete a financial analysis of a company, compile the analysis into a professional format, and present the analysis with recommendations for future action.",
+              required: true,
+              type: "project",
+            },
+            {
+              id: "4",
+              name: "Final exam",
+              description: "Complete a final exam with a score of 80% or higher.",
+              required: true,
+              type: "assessment"
+            },
+          ],
           next_milestones: []
         },
         {
@@ -427,7 +477,8 @@ class LearnerPassportController < ApplicationController
           title: "Marketing Strategy and Brand Positioning",
           description: "Professor Kahn starts us off with the first of two Branding modules: Marketing Strategy and Brand Positioning. Then, you'll move on to the second Branding module where we'll teach you to analyze end line data and develop insights to guide your brand strategy.",
           required: true,
-          requirements: [{ id: "4" }, { id: "5" }],
+          completion_award: nil,
+          requirements: [],
           next_milestones: []
         },
         {
@@ -435,7 +486,8 @@ class LearnerPassportController < ApplicationController
           title: "The Limits of Product-Centric Thinking & The Opportunities and Challenges of Customer Centricity",
           description: "Module 2 of our class features Professor Peter Fader, who will focus on concepts related to Customer Centric Marketing. In an economy that is increasingly responsive to customer behaviors, it is imperative to focus on the right customers for strategic advantages. You will learn how to acquire and retain the right customers, generate more profits from them and evaluate the effectiveness of your marketing activities.",
           required: true,
-          requirements: [{ id: "6" }, { id: "7" }],
+          completion_award: nil,
+          requirements: [],
           next_milestones: ["5"]
         },
         {
@@ -443,6 +495,7 @@ class LearnerPassportController < ApplicationController
           title: "Communications Strategy & Fundamentals of Pricing",
           description: "Complte this course as part of the Wharton's Business Foundations Specialization, and you'll have the opportunity to learn the essentials of marketing management while earning an online certificate from The Wharton School!",
           required: true,
+          completion_award: nil,
           requirements: [],
           next_milestones: []
         }
@@ -450,6 +503,36 @@ class LearnerPassportController < ApplicationController
       learning_outcomes: [],
       achievements_earned: [],
       learner_groups: ["2", "3"],
+      shares: [
+        {
+          id: "rs1",
+          name: "Robert Reich",
+          sortable_name: "Reich, Robert",
+          avatar_url: "/images/messages/avatar-50.png",
+          role: "collaborator",
+        },
+        {
+          id: "rs2",
+          name: "Janet Yellen",
+          sortable_name: "Yellen, Janet",
+          avatar_url: "/images/messages/avatar-50.png",
+          role: "collaborator",
+        },
+        {
+          id: "rs3",
+          name: "Timothy Geithner",
+          sortable_name: "Geithner, Timothy",
+          avatar_url: "/images/messages/avatar-50.png",
+          role: "reviewer",
+        },
+        {
+          id: "rs4",
+          name: "Ben Bernanke",
+          sortable_name: "Bernanke, Ben",
+          avatar_url: "/images/messages/avatar-50.png",
+          role: "viewer",
+        }
+      ],
     }
   end
 
@@ -499,6 +582,10 @@ class LearnerPassportController < ApplicationController
 
   def pathway_template_key
     "learner_passport_pathway_template #{@current_user.global_id}"
+  end
+
+  def pathway_sample_key
+    "learner_passport_pathway_sample #{@current_user.global_id}"
   end
 
   def index
@@ -719,7 +806,7 @@ class LearnerPassportController < ApplicationController
         id: p[:id],
         title: p[:title],
         milestoneCount: p[:milestones].length,
-        requirementCount: p[:milestones].reduce(0) { |sum, m| sum + m[:requirements].length },
+        requirementCount: p[:milestones].reduce(0) { |sum, m| sum + m.with_indifferent_access[:requirements].length },
         enrolled_student_count: p[:enrolled_student_count],
         started_count: p[:started_count],
         completed_count: p[:completed_count],
@@ -753,10 +840,49 @@ class LearnerPassportController < ApplicationController
   end
 
   def pathway_show
-    pathway = Rails.cache.fetch(current_pathways_key) { learner_passport_current_pathways }.find { |p| p[:id] == params[:pathway_id] }
+    pathway = if params[:pathway_id] == "new"
+                Rails.cache.fetch(pathway_template_key) { learner_passport_pathway_template }.clone
+              else
+                Rails.cache.fetch(current_pathways_key) { learner_passport_current_pathways }.find { |p| p[:id] == params[:pathway_id] }
+              end
     return render json: { message: "Pathway not found" }, status: :not_found if pathway.nil?
 
+    return render json: pathway if params[:include] != "all"
+
+    # if we get here, expand id fields with their respective data
+    pathway[:completion_award] = learner_passport_pathway_achievements.find { |a| a[:id] == pathway[:completion_award] } if pathway[:completion_award].present?
+    pathway[:learner_groups] = learner_passport_learner_groups.select { |lg| pathway[:learner_groups].include?(lg[:id]) } if pathway[:learner_groups].count > 0
+    pathway[:milestones] = pathway[:milestones].each do |milestone|
+      next unless milestone.with_indifferent_access[:completion_award].present?
+
+      milestone[:completion_award] = learner_passport_pathway_achievements.find do |a|
+        a[:id] == milestone.with_indifferent_access[:completion_award]
+      end
+    end
     render json: pathway
+  end
+
+  def pathway_share_users
+    search_term = params[:search_term] || ""
+    return render json: [{ message: "search term must be at least 2 characters long" }], status: :bad_request if search_term.blank? || search_term.length < 2
+
+    results = User.where("LOWER(name) LIKE ?", "%#{search_term.downcase}%")
+                  .and(User.where(TeacherEnrollment.where("user_id=users.id").arel.exists).or(User.where(AccountUser.where("user_id=users.id").arel.exists)))
+                  .order("sortable_name")
+                  .limit(10)
+                  .map { |u| { id: u.id, name: u.name, sortable_name: u.sortable_name, avatar_url: u.avatar_url, role: "viewer" } }
+
+    # results = UserSearch.for_user_in_context(search_term,
+    #                                          Account.default,
+    #                                          @current_user,
+    #                                          session,
+    #                                          {
+    #                                            order: "asc",
+    #                                            sort: "sortable_name",
+    #                                            enrollment_type: "teacher_enrollment",
+    #                                            include_deleted_users: false
+    #                                          })
+    render json: results
   end
 
   def reset
@@ -769,7 +895,7 @@ class LearnerPassportController < ApplicationController
       Rails.cache.write(current_portfolios_key, [sample_portfolio.clone], expires_in: CACHE_EXPIRATION)
       sample_project = Rails.cache.fetch(project_sample_key) { learner_passport_project_sample }
       Rails.cache.write(current_projects_key, [sample_project.clone], expires_in: CACHE_EXPIRATION)
-      sample_pathway = Rails.cache.fetch(current_pathways_key) { learner_passport_pathway_sample }
+      sample_pathway = Rails.cache.fetch(pathway_sample_key) { learner_passport_pathway_sample }
       Rails.cache.write(current_pathways_key, [sample_pathway.clone], expires_in: CACHE_EXPIRATION)
     end
     render json: { message: "Portfolios reset" }, status: :accepted

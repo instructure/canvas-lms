@@ -21,6 +21,7 @@ import {clone} from 'lodash'
 import createStore, {type CanvasStore} from '@canvas/backbone/createStore'
 import parseLinkHeader from 'link-header-parsing/parseLinkHeaderFromXHR'
 import '@canvas/rails-flash-notifications'
+import {encodeQueryString} from '@canvas/query-string-encoding'
 
 const initialStoreState = {
   links: {},
@@ -59,7 +60,7 @@ class ObjectStore {
     if (options) {
       options.per_page = options.perPage
       delete options.perPage
-      apiEndpoint += '?' + $.param(options)
+      apiEndpoint += '?' + encodeQueryString(options)
     }
     this.apiEndpoint = apiEndpoint
   }

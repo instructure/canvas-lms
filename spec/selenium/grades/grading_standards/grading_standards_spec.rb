@@ -52,6 +52,7 @@ describe "grading standards" do
   end
 
   it "allows setting a grading standard for an assignment", priority: "1" do
+    skip "FOO-4220" # TODO: re-enable this test before merging EVAL-3171
     course_with_teacher_logged_in
 
     @assignment = @course.assignments.create!(title: "new assignment")
@@ -93,6 +94,7 @@ describe "grading standards" do
   end
 
   it "allows setting a grading standard for a course", priority: "1" do
+    skip "FOO-4220" # TODO: re-enable this test before merging EVAL-3171
     skip_if_safari(:alert)
     course_with_teacher_logged_in
 

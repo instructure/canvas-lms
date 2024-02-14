@@ -75,7 +75,21 @@ export function toQueryString(params: QueryParameterRecord): string {
 // This is just to implement backward-compatibility from the old package. Almost
 // nothing uses it anyway and we recommend toQueryString() for new needs.
 // Need to be careful about duplicated keys, which have to be mapped into arrays.
-export function encodeQueryString(params: Array<Record<string, string | null>>): string {
+export function encodeQueryString(
+  unknownParams:
+    | Record<string, string | null | undefined>[]
+    | Record<string, string | null | undefined>
+): string {
+  let params: Record<string, string | null | undefined>[]
+
+  if (Array.isArray(unknownParams)) {
+    params = unknownParams
+  } else if (typeof unknownParams === 'object') {
+    params = [unknownParams as Record<string, string | null | undefined>]
+  } else {
+    throw new TypeError('encodeQueryString() expects an array or object')
+  }
+
   const realParms: QueryParameterRecord = {}
   params.forEach(p => {
     const k = Object.keys(p)[0]

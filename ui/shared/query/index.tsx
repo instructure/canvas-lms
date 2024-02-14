@@ -17,8 +17,18 @@
  */
 
 import React from 'react'
-import {useQuery as baseUseQuery, hashQueryKey, QueryClient} from '@tanstack/react-query'
-import type {UseQueryOptions, QueryKey, QueryFunction} from '@tanstack/react-query'
+import {
+  useMutation as baseUseMutation,
+  useQuery as baseUseQuery,
+  hashQueryKey,
+  QueryClient,
+} from '@tanstack/react-query'
+import type {
+  UseQueryOptions,
+  QueryKey,
+  QueryFunction,
+  UseMutationOptions,
+} from '@tanstack/react-query'
 import {PersistQueryClientProvider} from '@tanstack/react-query-persist-client'
 import {createSyncStoragePersister} from '@tanstack/query-sync-storage-persister'
 import wasPageReloaded from '@canvas/util/wasPageReloaded'
@@ -115,6 +125,10 @@ export function useQuery<
   })
 
   return queryResult
+}
+
+export function useMutation(options: UseMutationOptions) {
+  return baseUseMutation(options)
 }
 
 export function prefetchQuery(queryKey: QueryKey, queryFn: QueryFunction) {

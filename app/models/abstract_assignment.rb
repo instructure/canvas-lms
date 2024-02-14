@@ -37,6 +37,7 @@ class AbstractAssignment < ActiveRecord::Base
   include Plannable
   include DuplicatingObjects
   include LockedFor
+  include Lti::Migratable
 
   self.ignored_columns += %i[context_code checkpointed checkpoint_label]
 
@@ -81,6 +82,8 @@ class AbstractAssignment < ActiveRecord::Base
   DEFAULT_POINTS_POSSIBLE = 0
 
   DUPLICATED_IN_CONTEXT = "duplicated_in_context"
+  QUIZ_SUBMISSION_VERSIONS_LIMIT = 65
+  QUIZZES_NEXT_TIMEOUT = 15.minutes
 
   attr_accessor(
     :resource_map,
@@ -197,6 +200,7 @@ class AbstractAssignment < ActiveRecord::Base
              OR (pc.id IS NOT NULL AND pc.post_manually = False)
       SQL
   }
+  scope :nondeleted, -> { where.not(workflow_state: "deleted") }
 
   validates_associated :external_tool_tag, if: :external_tool?
   validate :group_category_changes_ok?
@@ -411,6 +415,16 @@ class AbstractAssignment < ActiveRecord::Base
   def finish_duplicating
     return unless ["duplicating", "failed_to_duplicate"].include?(workflow_state)
 
+    self.workflow_state = if root_account.feature_enabled?(:course_copy_alignments)
+                            "outcome_alignment_cloning"
+                          else
+                            (duplicate_of&.workflow_state == "published" || !can_unpublish?) ? "published" : "unpublished"
+                          end
+  end
+
+  def finish_alignment_cloning
+    return unless ["outcome_alignment_cloning", "failed_to_clone_outcome_alignment"].include?(workflow_state)
+
     self.workflow_state =
       (duplicate_of&.workflow_state == "published" || !can_unpublish?) ? "published" : "unpublished"
   end
@@ -451,6 +465,14 @@ class AbstractAssignment < ActiveRecord::Base
     duplicating_for_too_long.update_all(
       duplication_started_at: nil,
       workflow_state: "failed_to_duplicate",
+      updated_at: Time.zone.now
+    )
+  end
+
+  def self.clean_up_cloning_alignments
+    cloning_alignments_for_too_long.update_all(
+      duplication_started_at: nil,
+      workflow_state: "failed_to_clone_outcome_alignment",
       updated_at: Time.zone.now
     )
   end
@@ -1197,34 +1219,80 @@ class AbstractAssignment < ActiveRecord::Base
     end
   end
 
-  def prepare_for_ags_if_needed!(tool, use_tool: false)
-    # Don't do anything unless the tool is AGS ready
+  def migrate_to_1_3_if_needed!(tool)
+    # Don't do anything unless the tool is actually a 1.3 tool
     return unless tool&.use_1_3? && tool.developer_key.present?
 
-    # The assignment is already AGS ready
-    return if line_items.active.present?
+    # The assignment has already been migrated.
+    return if line_items.active.present? && primary_resource_link&.lti_1_1_id.present?
 
-    if use_tool
-      # the 1.3 tool has already been loaded by
-      # ContextExternalTool#prepare_for_ags, and this
-      # method is about to get called for a large number
-      # of assignments, so querying for the correct tool
-      # each time is not a good idea.
-      update_line_items(tool)
-    else
-      # the default usage of this method is "just-in-time"
-      # which will be called with the currently-asssociated
-      # tool for the assignment. but it's good to explicitly
-      # find the tool again to confirm they match
-      update_line_items
+    # If the tool is nil, as is the case in just-in-time launches,
+    # update_line_items will re-lookup the appropriate tool for us.
+    # Otherwise, tool will be a 1.3 tool that was already fetched
+    # appropriately, so we can just pass it in and avoid re-querying.
+    update_line_items(tool, lti_1_1_id: lti_resource_link_id)
+  end
+
+  def self.directly_associated_items(tool_id, context)
+    assignment_scope = Assignment.nondeleted.joins(:external_tool_tag)
+    # limit to assignments in the tool's context
+    case context
+    when Course
+      assignment_scope = assignment_scope.where(context_id: context.id)
+    when Account
+      root_account_id = context.root_account? ? context.id : context.root_account_id
+      assignment_scope = assignment_scope.where(root_account_id:, content_tags: { root_account_id: })
     end
+
+    assignment_scope
+      .where(content_tags: { content_id: tool_id })
+  end
+
+  def self.indirectly_associated_items(_tool_id, context)
+    assignment_scope = Assignment.nondeleted.joins(:external_tool_tag)
+    # limit to assignments in the tool's context
+    case context
+    when Course
+      assignment_scope = assignment_scope.where(context_id: context.id)
+    when Account
+      root_account_id = context.root_account? ? context.id : context.root_account_id
+      assignment_scope = assignment_scope.where(root_account_id:, content_tags: { root_account_id: })
+    end
+
+    # TODO: this does not account for assignments that _are_ linked to a
+    # tool and the tag has a content_id, but the content_id doesn't match
+    # the current tool
+    assignment_scope
+      .where(content_tags: { content_id: nil })
+  end
+
+  def self.fetch_direct_batch(ids, &)
+    return to_enum(:fetch_direct_batch, ids) unless block_given?
+
+    Assignment.where(id: ids).find_each(&)
+  end
+
+  def self.fetch_indirect_batch(tool_id, new_tool_id, ids, &)
+    return to_enum(:fetch_indirect_batch, tool_id, new_tool_id, ids) unless block_given?
+
+    Assignment
+      .where(id: ids)
+      .preload(:external_tool_tag)
+      .find_each do |a|
+        # again, look for the 1.1 tool by excluding the new tool from this query.
+        # a (currently) unavoidable N+1, sadly
+        a_tool = ContextExternalTool.find_external_tool(a.external_tool_tag.url, a, nil, new_tool_id)
+        next if a_tool.nil? || a_tool.id != tool_id
+
+        yield a
+      end
   end
 
   def create_assignment_line_item!
     update_line_items
   end
 
-  def update_line_items(lti_1_3_tool = nil)
+  def update_line_items(lti_1_3_tool = nil, lti_1_1_id: nil)
     # TODO: Edits to existing Assignment<->Tool associations are (mostly) ignored
     #
     # A few key points as a result:
@@ -1255,7 +1323,8 @@ class AbstractAssignment < ActiveRecord::Base
           custom: validate_resource_link_custom_params,
           resource_link_uuid: lti_context_id,
           context_external_tool: lti_1_3_tool || tool_from_external_tool_tag,
-          url: lti_resource_link_url
+          url: lti_resource_link_url,
+          lti_1_1_id:
         )
 
         li = line_items.create!(label: title, score_maximum: points_possible, resource_link: rl, coupled: true, resource_id: line_item_resource_id, tag: line_item_tag, end_date_time: due_at)
@@ -1283,6 +1352,7 @@ class AbstractAssignment < ActiveRecord::Base
 
         options[:lookup_uuid] = lti_resource_link_lookup_uuid unless lti_resource_link_lookup_uuid.nil?
         options[:url] = lti_resource_link_url if lti_resource_link_url
+        options[:lti_1_1_id] = lti_1_1_id if lti_1_1_id.present?
 
         return if options.empty?
 
@@ -1397,6 +1467,10 @@ class AbstractAssignment < ActiveRecord::Base
     end
     state :failed_to_migrate
     state :deleted
+    state :outcome_alignment_cloning do
+      event :fail_to_clone_alignment, transitions_to: :failed_to_clone_outcome_alignment
+    end
+    state :failed_to_clone_outcome_alignment
   end
 
   alias_method :destroy_permanently!, :destroy
@@ -2534,13 +2608,12 @@ class AbstractAssignment < ActiveRecord::Base
   # quiz submission versions are too expensive to de-serialize so we have to
   # cap the number we will do
   def too_many_qs_versions?(student_submissions)
-    qs_threshold = Setting.get("too_many_quiz_submission_versions", "150").to_i
     qs_ids = student_submissions.filter_map(&:quiz_submission_id)
     return false if qs_ids.empty?
 
     Version.shard(shard).from(Version
         .where(versionable_type: "Quizzes::QuizSubmission", versionable_id: qs_ids)
-        .limit(qs_threshold)).count >= qs_threshold
+        .limit(QUIZ_SUBMISSION_VERSIONS_LIMIT)).count >= QUIZ_SUBMISSION_VERSIONS_LIMIT
   end
 
   # :including quiz submission versions won't work for records in the
@@ -3145,21 +3218,30 @@ class AbstractAssignment < ActiveRecord::Base
   scope :duplicating_for_too_long, lambda {
     where(
       "workflow_state = 'duplicating' AND duplication_started_at < ?",
-      Setting.get("quizzes_next_timeout_minutes", "15").to_i.minutes.ago
+      QUIZZES_NEXT_TIMEOUT.ago
+    )
+  }
+
+  # Since we are sharing the duplication_started_at date field with the 'duplicating' workflow_state
+  # we are adding twice the timeout to give it enough time to complete.
+  scope :cloning_alignments_for_too_long, lambda {
+    where(
+      "workflow_state = 'outcome_alignment_cloning' AND duplication_started_at < ?",
+      (Setting.get("quizzes_next_timeout_minutes", "15").to_i * 2).minutes.ago
     )
   }
 
   scope :importing_for_too_long, lambda {
     where(
       "workflow_state = 'importing' AND importing_started_at < ?",
-      Setting.get("quizzes_next_timeout_minutes", "15").to_i.minutes.ago
+      QUIZZES_NEXT_TIMEOUT.ago
     )
   }
 
   scope :migrating_for_too_long, lambda {
     where(
       "workflow_state = 'migrating' AND duplication_started_at < ?",
-      Setting.get("quizzes_next_timeout_minutes", "15").to_i.minutes.ago
+      QUIZZES_NEXT_TIMEOUT.ago
     )
   }
 
@@ -4011,7 +4093,7 @@ class AbstractAssignment < ActiveRecord::Base
   end
 
   def hide_on_modules_view?
-    ["duplicating", "failed_to_duplicate"].include?(workflow_state)
+    %w[duplicating failed_to_duplicate outcome_alignment_cloning failed_to_clone_outcome_alignment].include?(workflow_state)
   end
 
   private

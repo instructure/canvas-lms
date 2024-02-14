@@ -244,7 +244,6 @@ class ApplicationController < ActionController::Base
           disable_keyboard_shortcuts: @current_user&.prefers_no_keyboard_shortcuts?,
           LTI_LAUNCH_FRAME_ALLOWANCES: Lti::Launch.iframe_allowances,
           DEEP_LINKING_POST_MESSAGE_ORIGIN: request.base_url,
-          DEEP_LINKING_LOGGING: Setting.get("deep_linking_logging", nil),
           comment_library_suggestions_enabled: @current_user&.comment_library_suggestions_enabled?,
           SETTINGS: {
             open_registration: @domain_root_account&.open_registration?,
@@ -380,6 +379,7 @@ class ApplicationController < ActionController::Base
     mobile_offline_mode
     react_discussions_post
     instui_nav
+    enhanced_developer_keys_tables
   ].freeze
   JS_ENV_BRAND_ACCOUNT_FEATURES = [
     :embedded_release_notes
@@ -523,6 +523,10 @@ class ApplicationController < ActionController::Base
     end
     hash[:base_title] = tool.default_label(I18n.locale) if custom_settings.include?(:base_title)
     hash[:external_url] = tool.url if custom_settings.include?(:external_url)
+    if type == :submission_type_selection && tool.submission_type_selection[:submission_type_selection_launch_points].present?
+      hash[:submission_type_selection_launch_points] = tool.submission_type_selection[:submission_type_selection_launch_points]
+    end
+
     hash
   end
   helper_method :external_tool_display_hash
@@ -1747,8 +1751,7 @@ class ApplicationController < ActionController::Base
   end
 
   def log_gets
-    if @page_view && !request.xhr? && request.get? && ((response.media_type || "").to_s.include?("html") ||
-      ((Setting.get("create_get_api_page_views", "true") == "true") && api_request?))
+    if @page_view && !request.xhr? && request.get? && ((response.media_type || "").to_s.include?("html") || api_request?)
       @page_view.render_time ||= (Time.now.utc - @page_before_render) rescue nil
       @page_view_update = true
     end
@@ -2071,7 +2074,8 @@ class ApplicationController < ActionController::Base
       @resource_url = @tag.url
       @tool = ContextExternalTool.from_content_tag(tag, context)
 
-      @assignment&.prepare_for_ags_if_needed!(@tool)
+      @assignment&.migrate_to_1_3_if_needed!(@tool)
+      tag.migrate_to_1_3_if_needed!(@tool)
 
       tag.context_module_action(@current_user, :read)
       if @tool

@@ -43,6 +43,7 @@ export const DiscussionTopic = {
       lockAt
       locked
       published
+      canGroup
       courseSections {
         ...Section
       }
@@ -83,6 +84,7 @@ export const DiscussionTopic = {
     groupSet: GroupSet.shape,
     attachment: Attachment.shape,
     assignment: Assignment.shape,
+    canGroup: bool,
   }),
 
   mock: ({
@@ -106,6 +108,7 @@ export const DiscussionTopic = {
     groupSet = GroupSet.mock(),
     attachment = Attachment.mock(),
     assignment = null,
+    canGroup = false,
   } = {}) => ({
     _id,
     id,
@@ -127,6 +130,7 @@ export const DiscussionTopic = {
     groupSet,
     attachment,
     assignment,
+    canGroup,
     __typename: 'Discussion',
   }),
 }

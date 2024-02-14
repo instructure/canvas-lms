@@ -93,4 +93,30 @@ describe Canvas::Cdn::Registry do
       )
     end
   end
+
+  describe ".entries" do
+    it "returns realpaths to entries within the bundle" do
+      @webpack_manifest = { "main" => "a-entry-1234.js" }
+
+      expect(subject.entries).to eq(
+        [
+          "/dist/webpack-dev/a-entry-1234.js"
+        ]
+      )
+    end
+
+    it "does not include .map.js files" do
+      @webpack_manifest = {
+        "main" => "a-entry-1234.js",
+        "foo" => "a-entry-1234.map.js",
+        "bar" => "a-entry-1234.js.map.js"
+      }
+
+      expect(subject.entries).to eq(
+        [
+          "/dist/webpack-dev/a-entry-1234.js"
+        ]
+      )
+    end
+  end
 end

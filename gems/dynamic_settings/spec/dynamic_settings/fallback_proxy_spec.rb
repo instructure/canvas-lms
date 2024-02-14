@@ -16,6 +16,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 require "spec_helper"
+require "fixtures/setting"
 
 module DynamicSettings
   RSpec.describe FallbackProxy do
@@ -29,11 +30,37 @@ module DynamicSettings
     end
 
     let(:proxy) { FallbackProxy.new(fallback_data) }
+    let(:foo_key) { FallbackProxy::PERSISTENCE_FLAG + FallbackProxy::PERSISTED_TREE + "/foo" }
+    let(:baz_key) { FallbackProxy::PERSISTENCE_FLAG + "baz/qux" }
+    let(:foo_setting) { Setting.new(foo_key, "override") }
+    let(:baz_setting) { Setting.new(baz_key, "override") }
 
     describe "#initalize" do
+      before { allow(Setting).to receive(:where).and_return([foo_setting]) }
+
       it "must store an empty hash when initialized with nil" do
         proxy = FallbackProxy.new(nil)
         expect(proxy.data).to eq({})
+      end
+
+      describe "with ignore_fallback_overrides: true" do
+        it "does not load overrides from Settings" do
+          proxy = FallbackProxy.new(fallback_data, FallbackProxy::PERSISTED_TREE, ignore_fallback_overrides: true)
+          expect(proxy[:foo]).to eq "bar"
+        end
+      end
+
+      describe "with ignore_fallback_overrides: false" do
+        it "loads overrides from Settings for PERSISTED_TREE" do
+          proxy = FallbackProxy.new(fallback_data, FallbackProxy::PERSISTED_TREE, ignore_fallback_overrides: false)
+          expect(proxy[:foo]).to eq "override"
+        end
+
+        it "does not load overrides from Settings for other trees" do
+          allow(Setting).to receive(:where).and_return([baz_setting])
+          proxy = FallbackProxy.new(fallback_data, ignore_fallback_overrides: false).for_prefix("baz")
+          expect(proxy[:qux]).to eq "42"
+        end
       end
     end
 
@@ -59,6 +86,30 @@ module DynamicSettings
         kvs = { foo1: "bar1", foo2: "bar2" }
         proxy.set_keys(kvs)
         expect(proxy.data).to include kvs
+      end
+
+      describe "with ignore_fallback_overrides: true" do
+        it "does not persist writes to PERSISTED_TREE in Settings" do
+          proxy = FallbackProxy.new(fallback_data, FallbackProxy::PERSISTED_TREE, ignore_fallback_overrides: true)
+          expect(Setting).not_to receive(:set)
+          proxy.set_keys({ foo: "1" })
+        end
+      end
+
+      describe "with ignore_fallback_overrides: false" do
+        before { allow(Setting).to receive(:where).and_return([foo_setting]) }
+
+        it "persists writes to PERSISTED_TREE in Settings" do
+          proxy = FallbackProxy.new(fallback_data, FallbackProxy::PERSISTED_TREE, ignore_fallback_overrides: false)
+          expect(Setting).to receive(:set).with(foo_key, "2")
+          proxy.set_keys({ foo: "2" })
+        end
+
+        it "does not persist writes to other trees in Settings" do
+          proxy = FallbackProxy.new(fallback_data, ignore_fallback_overrides: false)
+          expect(Setting).not_to receive(:set)
+          proxy.set_keys({ bzz: "3" })
+        end
       end
     end
   end

@@ -54,10 +54,19 @@ describe('ContentTypeExternalToolTray', () => {
     expect(onDismiss.mock.calls.length).toBe(1)
   })
 
-  it('calls onExternalContentReady when it receives an externalContentReady event', () => {
-    renderTray()
-    $(window).trigger('externalContentReady')
-    expect(onExternalContentReady).toHaveBeenCalledTimes(1)
+  describe ('external content message handling', () => {
+    const origEnv = {...window.ENV}
+    const origin = 'http://example.com'
+    beforeAll(() => window.ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN = origin)
+    afterAll(() => window.ENV = origEnv)
+    const sendPostMessage = (data) =>
+      fireEvent(window, new MessageEvent('message', {data, origin}))
+
+    it('calls onExternalContentReady when it receives an externalContentReady postMessage', () => {
+      renderTray()
+      sendPostMessage({subject: 'externalContentReady'})
+      expect(onExternalContentReady).toHaveBeenCalledTimes(1)
+    })
   })
 
   describe('constructs iframe src url', () => {

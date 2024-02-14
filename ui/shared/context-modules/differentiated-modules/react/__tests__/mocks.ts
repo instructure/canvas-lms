@@ -30,14 +30,38 @@ export const FILTERED_SECTIONS_DATA = [
 ]
 
 export const STUDENTS_DATA = [
-  {id: '1', name: 'Ben', created_at: '2023-01-01', sortable_name: 'Ben'},
-  {id: '2', name: 'Peter', created_at: '2023-01-01', sortable_name: 'Peter'},
-  {id: '3', name: 'Grace', created_at: '2023-01-01', sortable_name: 'Grace'},
-  {id: '4', name: 'Secilia', created_at: '2023-01-01', sortable_name: 'Secilia'},
+  {id: '1', name: 'Ben', created_at: '2023-01-01', sortable_name: 'Ben', sis_user_id: 'ben001'},
+  {
+    id: '2',
+    name: 'Peter',
+    created_at: '2023-01-01',
+    sortable_name: 'Peter',
+    sis_user_id: 'peter002',
+  },
+  {
+    id: '3',
+    name: 'Grace',
+    created_at: '2023-01-01',
+    sortable_name: 'Grace',
+    sis_user_id: 'grace003',
+  },
+  {
+    id: '4',
+    name: 'Secilia',
+    created_at: '2023-01-01',
+    sortable_name: 'Secilia',
+    sis_user_id: 'random_id_8',
+  },
 ]
 
 export const FILTERED_STUDENTS_DATA = [
-  {id: '4', name: 'Secilia', created_at: '2023-01-01', sortable_name: 'Secilia'},
+  {
+    id: '4',
+    name: 'Secilia',
+    created_at: '2023-01-01',
+    sortable_name: 'Secilia',
+    sis_user_id: 'random_id_8',
+  },
 ]
 
 export const ASSIGNMENT_OVERRIDES_DATA = [

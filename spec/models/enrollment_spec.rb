@@ -1442,7 +1442,7 @@ describe Enrollment do
       course_with_teacher(active_all: true)
       user_with_pseudonym
       e = @course.enroll_student(@user)
-      expect(e.messages_sent).to be_include("Enrollment Registration")
+      expect(e.messages_sent).to include("Enrollment Registration")
     end
 
     it "does not send out invitations immediately if the course restricts future viewing" do
@@ -1503,7 +1503,7 @@ describe Enrollment do
       course_with_teacher
       user_with_pseudonym
       e = @course.enroll_student(@user)
-      expect(e.messages_sent).not_to be_include("Enrollment Registration")
+      expect(e.messages_sent).not_to include("Enrollment Registration")
     end
 
     it "sends out invitations for previously-created enrollments when the course is published" do
@@ -1511,7 +1511,7 @@ describe Enrollment do
       course_with_teacher
       user_with_pseudonym
       e = @course.enroll_student(@user)
-      expect(e.messages_sent).not_to be_include("Enrollment Registration")
+      expect(e.messages_sent).not_to include("Enrollment Registration")
       expect(@user.pseudonym).not_to be_nil
       @course.offer
       e.reload
@@ -2386,7 +2386,7 @@ describe Enrollment do
 
       # he should be removed from the group
       expect(group.users.size).to eq 1
-      expect(group.users).not_to be_include(user2)
+      expect(group.users).not_to include(user2)
       expect(group).to have_common_section
     end
 
@@ -2430,7 +2430,7 @@ describe Enrollment do
       # he should be removed from the group, keeping the group and the category
       # happily satisfying the self sign-up restriction.
       expect(group.users.size).to eq 1
-      expect(group.users).not_to be_include(user2)
+      expect(group.users).not_to include(user2)
       expect(group).to have_common_section
       expect(category).not_to have_heterogenous_group
     end
@@ -2462,7 +2462,7 @@ describe Enrollment do
 
       # he should still be in the group
       expect(group.users.size).to eq 2
-      expect(group.users).to be_include(user2)
+      expect(group.users).to include(user2)
     end
 
     it "ungroups the user from all groups, restricted and unrestricted when completely unenrolling from the course" do
@@ -2500,8 +2500,8 @@ describe Enrollment do
 
       expect(group1.users.size).to eq 1
       expect(group2.users.size).to eq 1
-      expect(group1.users).not_to be_include(user2)
-      expect(group2.users).not_to be_include(user2)
+      expect(group1.users).not_to include(user2)
+      expect(group2.users).not_to include(user2)
       expect(group1).to have_common_section
     end
 
@@ -2535,7 +2535,7 @@ describe Enrollment do
 
       # user2 should be removed from the group
       expect(group.users.size).to eq 1
-      expect(group.users).not_to be_include(user2)
+      expect(group.users).not_to include(user2)
       expect(group).to have_common_section
     end
 
@@ -2568,7 +2568,7 @@ describe Enrollment do
 
       # user2 should not be removed from group 2
       expect(group.users.size).to eq 2
-      expect(group.users).to be_include(user2)
+      expect(group.users).to include(user2)
       expect(group).not_to have_common_section
     end
 
@@ -2597,7 +2597,7 @@ describe Enrollment do
 
       # he should not be removed from the group
       expect(group.users.size).to eq 1
-      expect(group.users).to be_include(user1)
+      expect(group.users).to include(user1)
       expect(group).to have_common_section
     end
 
@@ -2648,7 +2648,7 @@ describe Enrollment do
 
       # he should still be in the group
       expect(group.users.size).to eq 1
-      expect(group.users).to be_include(user1)
+      expect(group.users).to include(user1)
     end
 
     it "ignores previously deleted memberships" do
@@ -2671,7 +2671,7 @@ describe Enrollment do
 
       # she should still be removed from the group
       expect(group.users.size).to eq 0
-      expect(group.users).not_to be_include(user)
+      expect(group.users).not_to include(user)
     end
   end
 

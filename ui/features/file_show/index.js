@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import '@canvas/doc-previews'
+import {loadDocPreview} from '@instructure/canvas-rce/es/enhance-user-content/doc_previews'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 import ready from '@instructure/ready'
 
@@ -31,5 +31,5 @@ const previewDefaults = {
 ready(() => {
   const previewDiv = $('#doc_preview')
   previewDiv.fillWindowWithMe()
-  previewDiv.loadDocPreview($.merge(previewDefaults, previewDiv.data()))
+  loadDocPreview(previewDiv[0], $.merge(previewDefaults, previewDiv.data()))
 })

@@ -71,27 +71,27 @@ module AssignmentOverridesSeleniumHelper
   end
 
   def first_due_at_element
-    fj(".datePickerDateField:first[data-date-type='due_at']")
+    fj(".datePickerDateField[data-date-type='due_at']:first")
   end
 
   def first_unlock_at_element
-    fj(".datePickerDateField:first[data-date-type='unlock_at']")
+    fj(".datePickerDateField[data-date-type='unlock_at']:first")
   end
 
   def first_lock_at_element
-    fj(".datePickerDateField:first[data-date-type='lock_at']")
+    fj(".datePickerDateField[data-date-type='lock_at']:first")
   end
 
   def last_due_at_element
-    fj(".datePickerDateField:last[data-date-type='due_at']")
+    fj(".datePickerDateField[data-date-type='due_at']:last")
   end
 
   def last_unlock_at_element
-    fj(".datePickerDateField:last[data-date-type='unlock_at']")
+    fj(".datePickerDateField[data-date-type='unlock_at']:last")
   end
 
   def last_lock_at_element
-    fj(".datePickerDateField:last[data-date-type='lock_at']")
+    fj(".datePickerDateField[data-date-type='lock_at']:last")
   end
 
   def add_override

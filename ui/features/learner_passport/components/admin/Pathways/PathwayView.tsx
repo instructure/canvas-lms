@@ -19,8 +19,12 @@
 import React, {useCallback, useState} from 'react'
 import {IconZoomInLine, IconZoomOutLine} from '@instructure/ui-icons'
 import {Button} from '@instructure/ui-buttons'
-import type {PathwayDetailData} from '../../types'
+import {Flex} from '@instructure/ui-flex'
+import {View} from '@instructure/ui-view'
+import type {PathwayDetailData, MilestoneData} from '../../types'
 import PathwayTreeView from './PathwayTreeView'
+import PathwayViewDetailsTray from './PathwayViewDetailsTray'
+import MilestoneViewDetaislTray from './MilestoneViewDetailsTray'
 import {showUnimplemented} from '../../shared/utils'
 
 type PathwayViewProps = {
@@ -29,6 +33,9 @@ type PathwayViewProps = {
 
 const PathwayView = ({pathway}: PathwayViewProps) => {
   const [zoomLevel, setZoomLevel] = useState(1)
+  const [pathwayDetailsOpen, setPathwayDetailsOpen] = useState(false)
+  const [activeMilestone, setActiveMilestone] = useState<MilestoneData>(pathway.milestones[0])
+  const [milestoneDetailsOpen, setMilestoneDetailsOpen] = useState(false)
 
   const handleZoomIn = useCallback(() => {
     setZoomLevel(zoomLevel + 0.1)
@@ -38,27 +45,57 @@ const PathwayView = ({pathway}: PathwayViewProps) => {
     setZoomLevel(zoomLevel - 0.1)
   }, [zoomLevel])
 
+  const handleSelectFromTree = useCallback((milestone: MilestoneData | null) => {
+    if (milestone === null) {
+      setMilestoneDetailsOpen(false)
+      setPathwayDetailsOpen(true)
+    } else {
+      // in this context we know it's a MilestoneViewData
+      setActiveMilestone(milestone as MilestoneData)
+      setMilestoneDetailsOpen(true)
+      setPathwayDetailsOpen(false)
+    }
+  }, [])
+
+  const handleCloseMilestoneDetails = useCallback(() => {
+    setMilestoneDetailsOpen(false)
+  }, [])
+
+  const renderBuilderControls = useCallback(() => {
+    return (
+      <Flex as="div" justifyItems="space-between" margin="x-small">
+        <Flex.Item>
+          <Button renderIcon={IconZoomOutLine} onClick={handleZoomOut} />
+          <Button renderIcon={IconZoomInLine} onClick={handleZoomIn} margin="0 0 0 x-small" />
+        </Flex.Item>
+        <Flex.Item>
+          <Button onClick={showUnimplemented}>View as learner</Button>
+        </Flex.Item>
+      </Flex>
+    )
+  }, [handleZoomIn, handleZoomOut])
+
   return (
-    <div style={{position: 'relative'}}>
-      <div style={{position: 'absolute', top: '.5rem', left: '.5rem', zIndex: 1}}>
-        <Button renderIcon={IconZoomOutLine} onClick={handleZoomOut} />
-        <Button renderIcon={IconZoomInLine} onClick={handleZoomIn} margin="0 0 0 x-small" />
-      </div>
-      <div style={{position: 'absolute', top: '.5rem', right: '.5rem', zIndex: 1}}>
-        <Button onClick={showUnimplemented}>View as learner</Button>
-      </div>
-      <div
-        style={{
-          position: 'relative',
-          overflow: 'auto',
-          backgroundSize: '40px 40px',
-          backgroundImage: `linear-gradient(to right, rgba(150, 173, 233, .3) 1px, transparent 1px),
-                  linear-gradient(to bottom, rgba(150, 173, 233, .3) 1px, transparent 1px)`,
-        }}
-      >
-        <PathwayTreeView pathway={pathway} zoomLevel={zoomLevel} selectedStep={null} />
-      </div>
-    </div>
+    <>
+      <PathwayTreeView
+        pathway={pathway}
+        version="1"
+        zoomLevel={zoomLevel}
+        selectedStep={null}
+        onSelected={handleSelectFromTree}
+        renderTreeControls={renderBuilderControls}
+      />
+      <PathwayViewDetailsTray
+        pathway={pathway}
+        open={pathwayDetailsOpen}
+        onClose={() => setPathwayDetailsOpen(false)}
+      />
+      <MilestoneViewDetaislTray
+        milestone={activeMilestone}
+        open={milestoneDetailsOpen}
+        onClose={handleCloseMilestoneDetails}
+      />
+    </>
   )
 }
 

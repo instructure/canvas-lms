@@ -4076,6 +4076,13 @@ ready(function () {
   $('.quiz_group_form').formSubmit({
     object_name: 'quiz_group',
 
+    formatApiData(data) {
+      const newData = {}
+      forEach(data, (val, key) => {
+        newData[key.replace('quiz_group[', 'quiz_groups[][')] = val
+      })
+      return newData
+    },
     // rewrite the data so that it fits the jsonapi format
     processData(data) {
       const quizGroupQuestionPoints = numberHelper.parse(data['quiz_group[question_points]'])
@@ -4087,11 +4094,7 @@ ready(function () {
       } else {
         data['quiz_group[question_points]'] = quizGroupQuestionPoints
       }
-      const newData = {}
-      forEach(data, (val, key) => {
-        newData[key.replace('quiz_group[', 'quiz_groups[][')] = val
-      })
-      return newData
+      return data
     },
     beforeSubmit(formData) {
       const $form = $(this)

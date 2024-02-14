@@ -77,8 +77,8 @@ describe "speed grader - discussion submissions" do
       expect(f("#main")).not_to include_text(@first_message)
       expect(f("#main")).to include_text(@second_message)
       url = f("#main div.attachment_data a")["href"]
-      expect(url).to be_include "/files/#{@attachment_thing.id}/download?verifier=#{@attachment_thing.uuid}"
-      expect(url).not_to be_include "/courses/#{@course}"
+      expect(url).to include "/files/#{@attachment_thing.id}/download?verifier=#{@attachment_thing.uuid}"
+      expect(url).not_to include "/courses/#{@course}"
     end
   end
 

@@ -43,5 +43,8 @@ module Types
         section.sis_source_id if course.grants_any_right?(current_user, :read_sis, :manage_sis)
       end
     end
+
+    field :students, UserType.connection_type, null: true
+    delegate :students, to: :object
   end
 end

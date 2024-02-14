@@ -60,10 +60,11 @@ module Canvas
     # using.
     def self.clear_idle!
       clear_frequency = 1.minute.to_i
-      clear_timeout =  1.minute.to_i
-      @last_clear_time ||= Time.now.utc
-      if (Time.now.utc - @last_clear_time) > clear_frequency
-        @last_clear_time = Time.now.utc
+      clear_timeout = 1.minute.to_i
+      now = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+      @last_clear_time ||= now
+      if (now - @last_clear_time) > clear_frequency
+        @last_clear_time = now
         # gather all the redises we can find
         redises = Switchman.config[:cache_map].values
                            .filter_map { |cache| cache.try(:redis) }.uniq

@@ -197,12 +197,6 @@ content_migration_asset_map_v2:
   description: Adds Additional Fields to the Content Migration Asset Map
   applies_to: SiteAdmin
 
-gem_migration_links:
-  state: hidden
-  display_name: Course Import HTML Using Gem
-  description: Use gem during course import to update Canvas resource links
-  applies_to: SiteAdmin
-
 instui_for_import_page:
   state: hidden
   display_name: Use InstUI for the course import page

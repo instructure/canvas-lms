@@ -24,6 +24,23 @@ require "canvas_http/circuit_breaker"
 require "logger"
 
 module CanvasHttp
+  OPEN_TIMEOUT = 5
+  READ_TIMEOUT = 30
+
+  def self.blocked_ip_ranges
+    @blocked_ip_ranges || [
+      "127.0.0.1/8",
+      "10.0.0.0/8",
+      "172.16.0.0/12",
+      "192.168.0.0/16",
+      "fd00::/8"
+    ]
+  end
+
+  def self.blocked_ip_ranges=(range)
+    @blocked_ip_ranges = range
+  end
+
   class Error < ::StandardError
     attr_reader :body
 
@@ -235,7 +252,7 @@ module CanvasHttp
   end
 
   def self.insecure_host?(host)
-    return false unless (filters = blocked_ip_filters)
+    return false if blocked_ip_ranges.empty?
 
     resolved_addrs = Resolv.getaddresses(host)
     unless resolved_addrs.any?
@@ -256,11 +273,11 @@ module CanvasHttp
       raise UnresolvableUriError, "#{host} resolves to only unparseable IPs..."
     end
 
-    filters.each do |filter|
-      addr_range = ::IPAddr.new(filter)
+    blocked_ip_ranges.each do |range|
+      addr_range = ::IPAddr.new(range)
       ip_addrs.any? do |addr|
         if addr_range.include?(addr)
-          logger.warn("CANVAS_HTTP WARNING insecure address | host: #{host} | insecure_address: #{addr} | filter: #{filter}")
+          logger.warn("CANVAS_HTTP WARNING insecure address | host: #{host} | insecure_address: #{addr} | range: #{range}")
           return true
         end
       end
@@ -272,25 +289,13 @@ module CanvasHttp
   def self.connection_for_uri(uri)
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = (uri.scheme == "https")
-    http.ssl_timeout = http.open_timeout = open_timeout
-    http.read_timeout = read_timeout
+    http.ssl_timeout = http.open_timeout = OPEN_TIMEOUT
+    http.read_timeout = READ_TIMEOUT
     # Don't rely on net/http's internal retries, since they swallow errors in a
     # way that can't be detected when streaming responses, leading to duplicate
     # data
     http.max_retries = 0
     http
-  end
-
-  def self.open_timeout
-    @open_timeout.respond_to?(:call) ? @open_timeout.call : @open_timeout || 5
-  end
-
-  def self.read_timeout
-    @read_timeout.respond_to?(:call) ? @read_timeout.call : @read_timeout || 30
-  end
-
-  def self.blocked_ip_filters
-    @blocked_ip_filters.respond_to?(:call) ? @blocked_ip_filters.call : @blocked_ip_filters
   end
 
   def self.logger
@@ -302,7 +307,7 @@ module CanvasHttp
   end
 
   class << self
-    attr_writer :open_timeout, :read_timeout, :blocked_ip_filters, :logger
+    attr_writer :logger
     attr_accessor :cost
 
     def reset_cost!

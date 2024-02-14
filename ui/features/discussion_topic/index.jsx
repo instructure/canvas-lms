@@ -35,6 +35,7 @@ import EntriesView from './backbone/views/EntriesView'
 import SectionsTooltip from '@canvas/sections-tooltip'
 import DiscussionTopicKeyboardShortcutModal from './react/DiscussionTopicKeyboardShortcutModal'
 import ready from '@instructure/ready'
+import {captureException} from '@sentry/react'
 
 const I18n = useI18nScope('discussions')
 
@@ -85,6 +86,7 @@ function renderCoursePacingNotice() {
       .catch(ex => {
         // eslint-disable-next-line no-console
         console.error('Falied loading CoursePacingNotice', ex)
+        captureException(new Error('Failed loading CoursePacingNotice: ' + ex.message))
       })
   }
 }

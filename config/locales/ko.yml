@@ -9360,6 +9360,7 @@ ko:
     where_to_move: "*%{name}*을(를) 어디로 이동하시겠습니까?"
   move_dialog_select: 
     move_to_end: "-- 아래에 --"
+  move_name_to_a_new_group_acabed4e: "%{name}을(를) 새 그룹으로 이동"
   move_to_1c208ae5: "다음으로 이동..."
   multi_factor_authentication_configured_865b1bde: "다단계 인증 구성"
   must_be_255_characters_or_less_e8e7f25e: "255글자보다 적어야 함"
@@ -11823,6 +11824,7 @@ ko:
   remove_email_address_b1820820: "이메일 주소 제거하기"
   remove_f47dc62a: 제거
   remove_media_comment_f4afdb4b: "미디어 설명 제거"
+  remove_name_from_group_487cce74: "%{name}을(를) 그룹에서 제거"
   remove_row_c198da5a: "행 삭제"
   remove_these_dates_48453a81: "이 날짜 제거"
   remove_user_from_section_5556f465: "섹션에서 사용자 제거"

@@ -347,7 +347,12 @@
       <div class="form-row language-row">
         <div class="form-label"><%= f.blabel :default_due_time, en: "Default due time" %></div>
         <div class="tall-row">
-          <%= f.select :default_due_time, options_for_select(default_due_time_options(@context), default_due_time_key(@context)), {}, {'aria-describedby' => 'due-time-description'} %>
+          <% if Account.site_admin.feature_enabled?(:customizable_default_due_time) %>
+            <div id="default_due_time_container" style="width: 350px"></div>
+            <%= f.hidden_field :default_due_time %>
+          <% else %>
+            <%= f.select :default_due_time, options_for_select(default_due_time_options(@context), default_due_time_key(@context)), {}, {'aria-describedby' => 'due-time-description'} %>
+          <% end %>
           <div class="aside palign" id="due-time-description">
             <%= t("This influences the user interface for setting due dates. It does not change the time due for any existing assignments.") %>
           </div>

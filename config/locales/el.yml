@@ -12757,6 +12757,7 @@ el:
   registration_url_60e0eaaa: "URL Εγγραφής"
   regular_style_checkbox_ee3d71c1: "Κουτάκι επιλογής κανονικής εμφάνισης"
   remove_account_from_this_profile_c3095eb2: "Αφαίρεση λογαριασμού απο αυτό το προφίλ"
+  remove_as_leader_22d1a7d8: "Αφαίρεση από Αρχηγό"
   remove_attachment_ceae0973: "Αφαίρεση Επισύναψης"
   remove_avatar_picture_aba765eb: "Αφαίρεση εικόνας άβαταρ"
   remove_contact_method_ca890ba3: "Αφαίρεση τρόπου επικοινωνίας"
@@ -13361,6 +13362,7 @@ el:
     must_be_logged_in: "Πρέπει να είσαστε συνδεδεμένοι για να χρησιμοποιήσετε το Kaltura"
   services_ccd7bca0: Υπηρεσίες
   set_a_random_student_as_group_leader_663dcfd5: "Ορίστε τυχαίο σπουδαστή ως αρχηγό της ομάδας"
+  set_as_leader_f710dcec: "Ορισμός ως Αρχηγού"
   set_default_email_address_400f70dc: "Ορισμός προεπιλεγμένης ηλεκτρονικής διεύθυνσης"
   set_default_grade_d0bd8f30: "Δηλώστε τον προεπιλεγμένο βαθμό"
   set_default_grade_dialog: 
@@ -13369,6 +13371,7 @@ el:
     set_grades_button: "Δηλώστε τον προεπιλεγμένο βαθμό"
     set_grades_button_loading: "Αποθήκευση/Ρύθμιση Βαθμών"
   set_first_student_to_join_as_group_leader_5cfc206f: "Ορίστε τον πρώτο σπουδαστή που θα συμμετάσχει ως αρχηγός της ομάδας"
+  set_name_as_leader_591c8009: "Ορισμός %{name} ως αρχηγού"
   settings: 
     recaptcha_settings: 
       instructions: |-

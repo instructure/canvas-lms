@@ -302,10 +302,10 @@ describe "Admins API", type: :request do
 
       it "returns the correct format" do
         json = api_call(:get, @path, @path_opts)
-        expect(json).to be_include({ "id" => @admin.account_users.first.id,
-                                     "role" => "AccountAdmin",
-                                     "role_id" => admin_role.id,
-                                     "user" =>
+        expect(json).to include({ "id" => @admin.account_users.first.id,
+                                  "role" => "AccountAdmin",
+                                  "role_id" => admin_role.id,
+                                  "user" =>
                                       { "id" => @admin.id,
                                         "created_at" => @admin.created_at.iso8601,
                                         "name" => @admin.name,
@@ -315,7 +315,7 @@ describe "Admins API", type: :request do
                                         "integration_id" => nil,
                                         "sis_import_id" => nil,
                                         "login_id" => @admin.pseudonym.unique_id },
-                                     "workflow_state" => "active" })
+                                  "workflow_state" => "active" })
       end
 
       it "scopes the results to the user_id if given" do

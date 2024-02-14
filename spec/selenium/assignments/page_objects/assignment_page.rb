@@ -95,5 +95,10 @@ class AssignmentPage
     def click_assign_to_button
       assign_to_button.click
     end
+
+    def retrieve_due_date_table_row(row_item)
+      row_elements = f(".assignment_dates").find_elements(:tag_name, "tr")
+      row_elements.detect { |i| i.text.include?(row_item) }
+    end
   end
 end

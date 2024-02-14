@@ -184,8 +184,9 @@
         </a>
       </li>
       <% if @current_user.present? &&  @domain_root_account && @domain_root_account.feature_enabled?(:learner_passport) %>
-        <li class="menu-item ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if active_path?("/users/#{@current_user.id}/passport") %>">
-           <a id="global_nav_passport_link" role="button" href="<%="/users/#{@current_user.id}/passport/admin"%>" class="ic-app-header__menu-list-link">
+        <% if @domain_root_account.feature_enabled?(:learner_passport_r2) && (["admin", "teacher"] & @current_user.roles(@domain_root_account)).present? %>
+          <li class="menu-item ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if active_path?("/users/#{@current_user.id}/passport") %>">
+            <a id="global_nav_passport_link" role="button" href="<%="/users/#{@current_user.id}/passport/admin"%>" class="ic-app-header__menu-list-link">
               <div class="menu-item-icon-container" aria-hidden="true">
                 <%= render(partial: "shared/svg/svg_icon_passport", formats: [:svg]) %>
               </div>
@@ -194,7 +195,6 @@
               </div>
             </a>
           </li>
-        <% if @current_user.roles(Account.site_admin).include? "admin" %>
         <% else %>
           <li class="menu-item ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if active_path?("/users/#{@current_user.id}/passport") %>">
             <a id="global_nav_passport_link" role="button" href="<%="/users/#{@current_user.id}/passport/learner"%>" class="ic-app-header__menu-list-link">

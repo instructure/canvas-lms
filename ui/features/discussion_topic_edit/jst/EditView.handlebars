@@ -195,12 +195,13 @@
               {{checkbox "podcast_enabled"
               checked=podcast_url
               class="element_toggler"
+              aria-expanded=podcast_url
               aria-controls="podcast_has_student_posts_container"}}
               {{#t "enable_podcast_feed"}}Enable podcast feed{{/t}}
             </label></div>
 
           {{#if contextIsCourse}}
-          <div><label id="podcast_has_student_posts_container" style="{{hiddenUnless podcast_url}}"
+          <div><label id="podcast_has_student_posts_container" style="{{hiddenUnless podcast_url}}; margin-left: 20px;"
               class="checkbox short-label" for="podcast_has_student_posts">
               {{checkbox "podcast_has_student_posts"}}
               {{#t "include_replies_in_podcast_feed"}}Include student replies in podcast feed{{/t}}
@@ -225,6 +226,7 @@
               id="allow_rating"
               class="element_toggler"
               checked=allow_rating
+              aria-expanded=allow_rating
               aria-controls="rating_settings_container"}}
               {{#t "allow_liking"}}Allow liking{{/t}}
             </label></div>

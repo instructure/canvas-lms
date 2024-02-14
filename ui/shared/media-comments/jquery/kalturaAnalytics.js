@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
+import {encodeQueryString} from '@canvas/query-string-encoding'
 import $ from 'jquery'
 import 'jquery.cookie'
 import {clone, throttle} from 'lodash'
@@ -51,7 +52,7 @@ class KalturaAnalytics {
     data['event:currentPoint'] = parseInt(this.mediaElement.currentTime * 1000, 10)
     data['event:eventTimestamp'] = new Date().getTime()
 
-    return this.queueApiCall(this.apiUrl + $.param(data))
+    return this.queueApiCall(this.apiUrl + encodeQueryString(data))
   }
 
   // kaltura expects a persistent analytic session token for the user

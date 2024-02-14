@@ -156,7 +156,7 @@ describe PageView do
 
         other_root = Account.create!
         user.pseudonyms.create!(account: other_root, unique_id: "bob")
-        expect(user.associated_accounts).to be_include(other_root)
+        expect(user.associated_accounts).to include(other_root)
         viewer4 = account_admin_user(account: other_root)
         expect(user.grants_right?(viewer4, :view_statistics)).to be true
 

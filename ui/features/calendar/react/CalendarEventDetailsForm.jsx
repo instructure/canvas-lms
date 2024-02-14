@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
 import React, {useState, useEffect, useLayoutEffect, useCallback, useRef} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {TextInput} from '@instructure/ui-text-input'
@@ -48,6 +47,7 @@ import {
 } from '@canvas/calendar/react/RecurringEvents/FrequencyPicker/utils'
 import {renderUpdateCalendarEventDialog} from '@canvas/calendar/react/RecurringEvents/UpdateCalendarEventDialog'
 import FrequencyPicker from '@canvas/calendar/react/RecurringEvents/FrequencyPicker/FrequencyPicker'
+import {encodeQueryString} from '@canvas/query-string-encoding'
 
 const I18n = useI18nScope('calendar.edit_calendar_event')
 
@@ -246,7 +246,7 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
 
   const buildEditEventUrl = extraParams => {
     const moreOptionsUrl = new URL(getMoreOptionsHref(), window.location.origin)
-    const queryString = $.param({...getEventUrlParams(), ...extraParams})
+    const queryString = encodeQueryString({...getEventUrlParams(), ...extraParams})
     if (moreOptionsUrl.search) {
       moreOptionsUrl.search += `&${queryString}`
     } else {
@@ -327,7 +327,7 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
           },
         }
         const conferenceParams = new URLSearchParams(
-          $.param({
+          encodeQueryString({
             calendar_event: {
               web_conference: webConf,
             },

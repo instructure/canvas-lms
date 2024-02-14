@@ -585,7 +585,7 @@ describe "context modules" do
       end
 
       it "creating a new module should display a drag and drop area with differentiated modules" do
-        Account.site_admin.enable_feature! :differentiated_modules
+        differentiated_modules_on
         get "/courses/#{@course.id}/modules"
 
         click_new_module_link
@@ -604,7 +604,7 @@ describe "context modules" do
     end
 
     it "adds a file item to a module when differentiated modules is enabled", priority: "1" do
-      Account.site_admin.enable_feature! :differentiated_modules
+      differentiated_modules_on
 
       get "/courses/#{@course.id}/modules"
       manually_add_module_item("#attachments_select", "File", file_name)

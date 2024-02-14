@@ -767,8 +767,8 @@ describe GroupsController do
       expect(assigns[:group]).to eql(@group)
       expect(assigns[:group]).not_to be_frozen
       expect(assigns[:group]).to be_deleted
-      expect(@course.groups).to be_include(@group)
-      expect(@course.groups.active).not_to be_include(@group)
+      expect(@course.groups).to include(@group)
+      expect(@course.groups.active).not_to include(@group)
     end
 
     it "deletes group (granular permissions)" do
@@ -779,8 +779,8 @@ describe GroupsController do
       expect(assigns[:group]).to eql(@group)
       expect(assigns[:group]).not_to be_frozen
       expect(assigns[:group]).to be_deleted
-      expect(@course.groups).to be_include(@group)
-      expect(@course.groups.active).not_to be_include(@group)
+      expect(@course.groups).to include(@group)
+      expect(@course.groups.active).not_to include(@group)
     end
 
     it "does not delete group if :manage_groups_delete is not enabled (granular permissions)" do
@@ -993,8 +993,8 @@ describe GroupsController do
       json = json_parse(response.body)
 
       expect(response).to be_successful
-      expect(json.count).to be_equal 1
-      expect(json[0]["group_submissions"][0]).to be_equal @sub.id
+      expect(json.count).to equal 1
+      expect(json[0]["group_submissions"][0]).to equal @sub.id
     end
 
     it "does not include group submissions if param is absent" do
@@ -1003,8 +1003,8 @@ describe GroupsController do
       json = json_parse(response.body)
 
       expect(response).to be_successful
-      expect(json.count).to be_equal 1
-      expect(json[0]["group_submissions"]).to be_equal nil
+      expect(json.count).to equal 1
+      expect(json[0]["group_submissions"]).to equal nil
     end
 
     describe "inactive students" do

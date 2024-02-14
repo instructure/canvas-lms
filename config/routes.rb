@@ -797,6 +797,7 @@ CanvasRails::Application.routes.draw do
     post "grading_schemes" => "grading_schemes_json#create"
     delete "grading_schemes/:id" => "grading_schemes_json#destroy"
     put "grading_schemes/:id" => "grading_schemes_json#update"
+    get "grading_schemes/:id/used_locations" => "grading_schemes_json#used_locations", :as => :grading_schemes_used_locations
     get "grading_schemes/default" => "grading_schemes_json#show_default_grading_scheme"
     get "grading_schemes/:id" => "grading_schemes_json#show"
 
@@ -947,6 +948,7 @@ CanvasRails::Application.routes.draw do
     put "passport/data/pathways/create" => "learner_passport#pathway_create"
     post "passport/data/pathways/:pathway_id" => "learner_passport#pathway_update"
     get "passport/data/pathways/show/:pathway_id" => "learner_passport#pathway_show"
+    get "passport/data/pathways/share_users" => "learner_passport#pathway_share_users"
 
     get "passport/data/skills" => "learner_passport#skills_index"
     get "passport/data/reset" => "learner_passport#reset"
@@ -1317,6 +1319,7 @@ CanvasRails::Application.routes.draw do
       post "courses/:course_id/assignments", action: :create
       put "courses/:course_id/assignments/:id", action: :update
       post "courses/:course_id/assignments/:assignment_id/duplicate", action: :duplicate
+      post "courses/:course_id/assignments/:assignment_id/retry_alignment_clone", action: :retry_alignment_clone
       delete "courses/:course_id/assignments/:id", action: :destroy, controller: :assignments
     end
 
@@ -1627,6 +1630,8 @@ CanvasRails::Application.routes.draw do
       get "show_k5_dashboard", controller: "users", action: "show_k5_dashboard"
 
       post "users/:id/clear_cache", action: :clear_cache, as: "clear_cache"
+
+      delete "users/mobile_sessions", controller: "users", action: :expire_mobile_sessions
 
       scope(controller: :user_observees) do
         get    "users/:user_id/observers", action: :observers, as: "user_observers"
@@ -2783,7 +2788,6 @@ CanvasRails::Application.routes.draw do
     # Dynamic Registration Service
     scope(controller: "lti/ims/dynamic_registration") do
       get "registration_token", action: :registration_token
-      get "register", action: :redirect_to_tool_registration
       get "registrations/uuid/:registration_uuid", action: :registration_by_uuid
       put "registrations/:registration_id/overlay", action: :update_registration_overlay
       get "registrations/:registration_id/view", action: :registration_view, as: :lti_registration_config

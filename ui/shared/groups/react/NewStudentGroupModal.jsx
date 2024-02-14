@@ -34,6 +34,7 @@ import {throttle} from 'lodash'
 import CanvasModal from '@canvas/instui-bindings/react/Modal'
 import CanvasMultiSelect from '@canvas/multi-select'
 import doFetchApi from '@canvas/do-fetch-api-effect'
+import { captureException } from '@sentry/react'
 
 const I18n = useI18nScope('student_groups')
 
@@ -63,6 +64,7 @@ export default function NewStudentGroupModal({userCollection, loadMore, onSave, 
       .then(notifyDidSave)
       .catch(err => {
         console.error(err) // eslint-disable-line no-console
+        captureException(err)
         setStatus('error')
       })
   }

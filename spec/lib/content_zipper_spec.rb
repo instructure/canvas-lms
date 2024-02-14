@@ -135,7 +135,7 @@ describe ContentZipper do
         if f.file?
           expect(f.name).to match(/some9991234guy/)
           expect(f.get_input_stream.read).to match(/This submission was a url/)
-          expect(f.get_input_stream.read).to be_include("http://www.instructure.com/")
+          expect(f.get_input_stream.read).to include("http://www.instructure.com/")
         end
       end
     end

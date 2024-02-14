@@ -189,7 +189,7 @@ describe "context modules" do
     end
 
     it "adds links to newly created modules with differentiated modules tray" do
-      Account.site_admin.enable_feature! :differentiated_modules
+      differentiated_modules_on
 
       go_to_modules
       click_new_module_link

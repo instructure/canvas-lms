@@ -17,16 +17,19 @@
  */
 
 import React from 'react'
-import {Heading} from '@instructure/ui-heading'
-import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
+import AdminHeader from '../AdminHeader'
 
 const AchievementsDashboard = () => {
   return (
     <View as="div">
-      <Heading level="h1">Achievements</Heading>
-      <Text>Manage badges, CredentialsContainer, and certificates for your institution</Text>
-      <View as="div" margin="large 0 0" background="secondary" height="700px" />
+      <AdminHeader
+        title="Achievements"
+        description="Manage badges, CredentialsContainer, and certificates for your institution"
+      />
+      <View as="div" margin="large">
+        <View as="div" margin="large 0 0" background="secondary" height="700px" />
+      </View>
     </View>
   )
 }

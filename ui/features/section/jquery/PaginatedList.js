@@ -166,7 +166,7 @@ export default class PaginatedList {
   animateInResults($results) {
     $results.css('display', 'none')
     this.el.list.append($results)
-    return $results.slideDown()
+    return $results.filter('*').slideDown()
   }
 
   // #

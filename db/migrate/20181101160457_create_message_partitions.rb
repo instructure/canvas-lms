@@ -22,7 +22,7 @@ class CreateMessagePartitions < ActiveRecord::Migration[5.1]
 
   def up
     partman = CanvasPartman::PartitionManager.create(Message)
-    partman.create_initial_partitions(Messages::Partitioner.precreate_tables)
+    partman.create_initial_partitions(Messages::Partitioner::PRECREATE_TABLES)
   end
 
   def down

@@ -334,7 +334,7 @@ describe RubricsController do
     it "assigns variables" do
       course_with_teacher_logged_in(active_all: true)
       rubric_association_model(user: @user, context: @course)
-      expect(@course.rubrics).to be_include(@rubric)
+      expect(@course.rubrics).to include(@rubric)
       put "update", params: { course_id: @course.id, id: @rubric.id, rubric: {} }
       expect(assigns[:rubric]).to eql(@rubric)
       expect(response).to be_successful

@@ -18,7 +18,16 @@
 
 export type Rubric = {
   id: string
+  criteria?: {
+    points: number
+    description: string
+    longDescription: string
+    ignoreForScoring: boolean
+    masteryPoints: number
+    criterionUseRange: boolean
+  }[]
   criteriaCount: number
+  hidePoints?: boolean
   locations: string[]
   pointsPossible: number
   title: string

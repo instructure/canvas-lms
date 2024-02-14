@@ -69,7 +69,7 @@ gulp.task('rev', () => {
   ).pipe(gulpPlugins.rev())
 
   if (
-    process.env.JS_BUILD_NO_UGLIFY !== '1' &&
+    process.env.SKIP_SOURCEMAPS !== '1' &&
     (process.env.NODE_ENV === 'production' || process.env.RAILS_ENV === 'production')
   ) {
     const jsFilter = gulpPlugins.filter('**/*.js', {restore: true})

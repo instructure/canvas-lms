@@ -31,7 +31,7 @@ if Bundler.default_gemfile == gemfile
     if rails_version == SUPPORTED_RAILS_VERSIONS.first
       lockfile = nil unless include_plugins
     elsif include_plugins
-      parent = "rails#{rails_versions.delete(".")}"
+      parent = "rails#{rails_version.delete(".")}"
     end
 
     active = rails_version == $canvas_rails && !!include_plugins

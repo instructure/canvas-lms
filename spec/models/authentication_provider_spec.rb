@@ -234,7 +234,7 @@ describe AuthenticationProvider do
                                      purpose: :provisioning)
       @user.reload
       expect(@user.short_name).to eq "Mr. Cutler"
-      expect(@user.communication_channels.email.active.pluck(:path)).to be_include("cody@school.edu")
+      expect(@user.communication_channels.email.active.pluck(:path)).to include("cody@school.edu")
       expect(@pseudonym.integration_id).to eq "abc123"
       expect(@user.locale).to eq "es"
       expect(@user.name).to eq "Cody Cutrer"
@@ -265,7 +265,7 @@ describe AuthenticationProvider do
                                        "timezone" => "America/New_York"
                                      })
       @user.reload
-      expect(@user.communication_channels.email.active.pluck(:path)).to be_include("cody@school.edu")
+      expect(@user.communication_channels.email.active.pluck(:path)).to include("cody@school.edu")
       expect(@pseudonym.integration_id).not_to eq "abc123"
       expect(@user.locale).to eq "es"
       expect(@user.name).to eq "Cody Cutrer"
@@ -282,6 +282,15 @@ describe AuthenticationProvider do
     it "doesn't asplode with an empty email" do
       aac.apply_federated_attributes(@pseudonym, { "email" => "" })
       expect(@user.name).not_to be_blank
+    end
+
+    it "ignores empty sis_user_id or integration_id values" do
+      @pseudonym.update sis_user_id: "test", integration_id: "testfrd"
+      aac.apply_federated_attributes(@pseudonym,
+                                     { "sis_id" => "", "internal_id" => "" },
+                                     purpose: :provisioning)
+      expect(@pseudonym.sis_user_id).to eq "test"
+      expect(@pseudonym.integration_id).to eq "testfrd"
     end
 
     context "admin_roles" do
@@ -341,6 +350,26 @@ describe AuthenticationProvider do
         @user.reload
         expect(@user.locale).to eq "en-GB"
       end
+    end
+  end
+
+  context "otp_via_sms" do
+    let(:aac) do
+      account.authentication_providers.new(auth_type: "canvas")
+    end
+
+    it "defaults to true" do
+      expect(aac.otp_via_sms?).to be_truthy
+    end
+
+    it "can opt out" do
+      aac.update! settings: { otp_via_sms: false }
+      expect(aac.otp_via_sms?).to be_falsey
+    end
+
+    it "can opt back in" do
+      aac.update! settings: { otp_via_sms: true }
+      expect(aac.otp_via_sms?).to be_truthy
     end
   end
 end

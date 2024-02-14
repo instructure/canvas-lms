@@ -184,19 +184,21 @@ test('should show modules column', () => {
 })
 
 test("should show 'Add Quiz/Test' button if quiz lti is enabled", () => {
+  ENV.FEATURES.instui_nav = true
   ENV.PERMISSIONS.manage_assignments_add = true
   ENV.QUIZ_LTI_ENABLED = true
-  const view = assignmentIndex()
-  const $button = view.$('.new_quiz_lti')
+  const view = assignmentIndex({withAssignmentSettings: true})
+  const $button = view.$('#new_quiz_lti')
   equal($button.length, 1)
   ok(/\?quiz_lti$/.test($button.attr('href')))
 })
 
 test("should not show 'Add Quiz/Test' button if quiz lti is not enabled", () => {
+  ENV.FEATURES.instui_nav = true
   ENV.PERMISSIONS.manage_assignments_add = true
   ENV.QUIZ_LTI_ENABLED = false
-  const view = assignmentIndex()
-  equal(view.$('.new_quiz_lti').length, 0)
+  const view = assignmentIndex({withAssignmentSettings: true})
+  equal(view.$('#new_quiz_lti').length, 0)
 })
 
 test('should contain a drag and drop warning for screen readers', () => {
@@ -240,6 +242,9 @@ QUnit.module('AssignmentIndex - bulk edit', {
   setup() {
     fakeENV.setup({
       PERMISSIONS: {manage_assignments: true},
+      URLS: {
+        new_assignment_url: 'test',
+      },
     })
   },
 

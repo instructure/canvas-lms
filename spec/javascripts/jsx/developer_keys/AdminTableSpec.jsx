@@ -17,7 +17,6 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
 import AdminTable from 'ui/features/developer_keys_v2/react/AdminTable'
 import $ from 'jquery'
@@ -25,6 +24,17 @@ import $ from 'jquery'
 QUnit.module('AdminTable', {
   teardown() {
     document.getElementById('fixtures').innerHTML = ''
+  },
+  beforeEach: () => {
+    window.ENV = {
+      FEATURES: {
+        lti_dynamic_registration: true,
+        enhanced_developer_keys_tables: true,
+      },
+    }
+  },
+  afterEach: () => {
+    window.ENV = {}
   },
 })
 
@@ -37,7 +47,7 @@ function devKeyList(numKeys = 10) {
 }
 
 function component(keyList, props = {}) {
-  return TestUtils.renderIntoDocument(
+  const c = TestUtils.renderIntoDocument(
     <AdminTable
       store={{dispatch: () => {}}}
       actions={{}}
@@ -50,26 +60,14 @@ function component(keyList, props = {}) {
       {...props}
     />
   )
+  c.setState({sortAscending: true})
+  return c
 }
 
-function componentNode(keyList = null) {
-  return ReactDOM.findDOMNode(component(keyList))
-}
-
-test('it renders table with placeholder text if no keys are given', () => {
-  const node = componentNode([])
-  equal(node.querySelectorAll('span')[2].innerText, 'Nothing here yet')
-})
-
-test('does render the "Owner Email" heading', () => {
-  const node = componentNode()
-  equal(node.querySelectorAll('th')[1].innerText, 'Owner Email')
-})
-
-test('does render the "Stats" heading', () => {
-  const node = componentNode()
-  equal(node.querySelectorAll('th')[3].innerText, 'Stats')
-})
+/**
+ * TODO: move to Jest tests found in
+ * ui/features/developer_keys_v2/react/__tests__/AdminTable.test.jsx
+ */
 
 test('focuses delete icon if show more button clicked', () => {
   const list = devKeyList()
@@ -121,10 +119,11 @@ test('makes correct screenReader notification if key deleted', () => {
 
 test('focuses on external button if first item deleted', () => {
   const list = devKeyList()
-  const setFocus = sinon.spy()
-  const table = component(list, {setFocus})
+  const table = component(list)
+  const focusSpy = sinon.spy()
+  table.addDevKeyButton.focus = focusSpy
   table.onDelete('0')
-  ok(setFocus.called)
+  ok(focusSpy.called)
 })
 
 test('makes correct screenReader notification if first item deleted', () => {

@@ -716,7 +716,7 @@ describe "API Authentication", type: :request do
           "access_token" => @token.full_token,
         }
       end
-      expect(Account.default.reload.users).to be_include(u2)
+      expect(Account.default.reload.users).to include(u2)
     end
 
     it "errors if the access token is expired or non-existent" do

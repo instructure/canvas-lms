@@ -22,6 +22,7 @@ class GradingSchemesJsonController < ApplicationController
   JSON_METHODS =
     %i[assessed_assignment? context_name].freeze
   GRADING_SCHEMES_LIMIT = 100
+  USED_LOCATIONS_PER_PAGE = 100
   before_action :require_context
   before_action :require_user
   before_action :validate_read_permission, only: %i[grouped_list detail_list summary_list show]
@@ -109,6 +110,13 @@ class GradingSchemesJsonController < ApplicationController
     end
   end
 
+  def used_locations
+    grading_standard = grading_standards_for_context.find(params[:id])
+    return unless authorized_action(grading_standard, @current_user, :manage)
+
+    render json: used_locations_for(grading_standard)
+  end
+
   def archive
     grading_standard = grading_standards_for_context.find(params[:id])
     if authorized_action(grading_standard, @current_user, :manage)
@@ -166,10 +174,10 @@ class GradingSchemesJsonController < ApplicationController
   end
 
   def self.to_grading_scheme_json(grading_standard, user)
-    only = json_serialized_fields
-    only << "workflow_state" if Account.site_admin.feature_enabled?(:archived_grading_schemes)
-
-    grading_standard.as_json({ methods: JSON_METHODS, include_root: false, only:, permissions: { user: } }).tap do |json|
+    grading_standard.as_json(methods: JSON_METHODS,
+                             include_root: false,
+                             only: json_serialized_fields,
+                             permissions: { user: }).tap do |json|
       # because GradingStandard generates the JSON property with a '?' on the end of it,
       # instead of using the JSON convention for boolean properties
       json["assessed_assignment"] = json["assessed_assignment?"]
@@ -178,27 +186,31 @@ class GradingSchemesJsonController < ApplicationController
       # because GradingStandard serializes its id as a number instead of a string
       json["id"] = json["id"].to_s
 
-      # because used locations is used for the new designs
-      if Account.site_admin.feature_enabled?(:archived_grading_schemes)
-        json["used_locations"] = used_locations_for(grading_standard)
-      end
-
       # because GradingStandard serializes its data rows to JSON as an array of arrays: [["A", .90], ["B", .80]]
       # instead of our desired format of an array of objects with name/value pairs [{name: "A", value: .90], {name: "B", value: .80}]
       json["data"] = grading_standard["data"].map { |grading_standard_data_row| { name: grading_standard_data_row[0], value: grading_standard_data_row[1] } }
     end
   end
 
-  def self.used_locations_for(grading_standard)
-    locations = []
+  def used_locations_for(grading_standard)
+    scope = grading_standard.assessed_assignments
+                            .joins("INNER JOIN #{Course.quoted_table_name} ON assignments.context_type = 'Course' AND assignments.context_id = courses.id")
+                            .order("courses.name ASC, title ASC")
 
-    grading_standard.assessed_assignments.preload(:context).group_by(&:context).each do |course, assignments|
+    used_locations = Api.paginate(
+      scope,
+      self,
+      account_grading_schemes_used_locations_path(
+        account_id: @context.id, id: grading_standard.id
+      ),
+      per_page: USED_LOCATIONS_PER_PAGE
+    )
+
+    used_locations.group_by(&:context).map do |course, assignments|
       course_json = course.as_json(only: [:id, :name], methods: [:concluded?], include_root: false)
       course_json[:assignments] = assignments.as_json(only: [:id, :title], include_root: false)
-      locations << course_json
+      course_json
     end
-
-    locations
   end
 
   def self.to_grading_standard_data(grading_scheme_json_data)

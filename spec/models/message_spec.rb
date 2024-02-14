@@ -280,7 +280,7 @@ describe Message do
       m3 = message_model(workflow_state: "sending", user: user_factory)
       expect(Message.in_state(:bounced)).to eq [m1]
       expect(Message.in_state([:bounced, :sent]).sort_by(&:id)).to eq [m1, m2].sort_by(&:id)
-      expect(Message.in_state([:bounced, :sent])).not_to be_include(m3)
+      expect(Message.in_state([:bounced, :sent])).not_to include(m3)
     end
 
     it "is able to search on its context" do

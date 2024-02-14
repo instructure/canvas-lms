@@ -17,7 +17,7 @@
 
 // mediaComment.js
 import {useScope as useI18nScope} from '@canvas/i18n'
-import pubsub from 'jquery-tinypubsub'
+import * as pubsub from 'jquery-tinypubsub'
 import mejs from '@canvas/mediaelement'
 import MediaElementKeyActionHandler from './MediaElementKeyActionHandler'
 import $ from 'jquery'

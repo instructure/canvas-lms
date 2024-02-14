@@ -243,19 +243,25 @@ const ComposeModalContainer = props => {
 
   const validMessageFields = () => {
     let isValid = true
+    const errors = [] // Initialize an array to collect errors
+
     if (!body) {
-      setBodyMessages([{text: I18n.t('Please insert a message body.'), type: 'error'}])
+      const errorMessage = I18n.t('Please insert a message body.')
+      setBodyMessages([{text: errorMessage, type: 'error'}])
+      errors.push(errorMessage) // Add error message to the array
       isValid = false
     }
 
     if (!isSubmissionCommentsType) {
       if (addressBookInputValue !== '') {
-        setAddressBookMessages([
-          {text: I18n.t('No matches found. Please insert a valid recipient.'), type: 'error'},
-        ])
+        const errorMessage = I18n.t('No matches found. Please insert a valid recipient.')
+        setAddressBookMessages([{text: errorMessage, type: 'error'}])
+        errors.push(errorMessage) // Add error message to the array
         isValid = false
       } else if (props.selectedIds.length === 0) {
-        setAddressBookMessages([{text: I18n.t('Please select a recipient.'), type: 'error'}])
+        const errorMessage = I18n.t('Please select a recipient.')
+        setAddressBookMessages([{text: errorMessage, type: 'error'}])
+        errors.push(errorMessage) // Add error message to the array
         isValid = false
       }
     }
@@ -265,9 +271,16 @@ const ComposeModalContainer = props => {
         !ENV.CONVERSATIONS.CAN_MESSAGE_ACCOUNT_CONTEXT &&
         (!selectedContext || !selectedContext?.contextID)
       ) {
-        setCourseMessages([{text: I18n.t('Please select a course'), type: 'error'}])
+        const errorMessage = I18n.t('Please select a course')
+        setCourseMessages([{text: errorMessage, type: 'error'}])
+        errors.push(errorMessage) // Add error message to the array
         isValid = false
       }
+    }
+
+    // Aggregate errors and output to the screen reader
+    if (errors.length > 0) {
+      setOnFailure(errors.join(', '), true)
     }
 
     return isValid

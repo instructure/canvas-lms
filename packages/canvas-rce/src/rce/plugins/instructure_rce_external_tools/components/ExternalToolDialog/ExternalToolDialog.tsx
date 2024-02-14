@@ -176,6 +176,9 @@ export default class ExternalToolDialog extends React.Component<
       if (data?.subject === 'LtiDeepLinkingResponse') {
         processEditorContentItems(ev, this.props.env, this)
       } else if (data?.subject === 'externalContentReady') {
+        // 'externalContentReady' is EXTERNAL_CONTENT_READY in
+        // ui/shared/external-tools/externalContentEvents.ts
+        // where events are also described/used
         this.handleExternalContentReady(ev.data)
       }
     }

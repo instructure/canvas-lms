@@ -60,13 +60,7 @@
     </div>
   <% end %>
 </div>
-<%= form_tag(context_url(@context, :context_assignment_peer_reviews_url), method: :get) do %>
-    <div class="ic-Input-group">
-      <%= text_field_tag :search_term, params[:search_term], class: "ic-Input", placeholder: t('Search People'),
-      'aria-label' => t('Search people. As you type in this field, the list of people will be automatically filtered to only include those whose names match your input.')%>
-      <%= submit_tag t('Search'), class: "Button" %>
-    </div>
-<% end %>
+<div id="filter_peer_review"></div>
 <ul class="unstyled_list" style="margin-<%= direction('left') %>: 20px;">
   <li style="<%= hidden unless @students.empty? %>" class="no_students_message"><%= t 'messages.no_students_found', "No Students Found" %></li>
   <% @students.each do |student| %>

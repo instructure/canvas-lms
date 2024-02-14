@@ -30,6 +30,7 @@ import {completeUpload} from '@canvas/upload-file'
 import CourseCopyImporter from './migrator_forms/course_copy'
 import CanvasCartridgeImporter from './migrator_forms/canvas_cartridge'
 import LegacyMigratorWrapper from './migrator_forms/legacy_migrator_wrapper'
+import ZipFileImporter from './migrator_forms/zip_file'
 import type {
   AttachmentProgressResponse,
   ContentMigrationItem,
@@ -42,7 +43,6 @@ import type {
 import CommonCartridgeImporter from './migrator_forms/common_cartridge'
 import MoodleZipImporter from './migrator_forms/moodle_zip'
 import QTIZipImporter from './migrator_forms/qti_zip'
-import CommonMigratorControls from './migrator_forms/common_migrator_controls'
 
 const I18n = useI18nScope('content_migrations_redesign')
 
@@ -71,8 +71,7 @@ type MigratorProps = {
 const renderMigrator = (props: MigratorProps) => {
   switch (props.value) {
     case 'zip_file_importer':
-      // TODO: Replace this with the zip importer component
-      return <CommonMigratorControls {...props} />
+      return <ZipFileImporter {...props} />
     case 'course_copy_importer':
       return <CourseCopyImporter {...props} />
     case 'moodle_converter':

@@ -20,9 +20,8 @@
 class Quizzes::QuizSubmissionEventPartitioner
   cattr_accessor :logger
 
-  def self.precreate_tables
-    Setting.get("quiz_events_partitions_precreate_months", 2).to_i
-  end
+  PRECREATE_TABLES = 2
+  KEEP_MONTHS = 6
 
   def self.process(in_migration = false, prune: false)
     Shard.current.database_server.unguard do
@@ -32,11 +31,11 @@ class Quizzes::QuizSubmissionEventPartitioner
 
         partman = CanvasPartman::PartitionManager.create(Quizzes::QuizSubmissionEvent)
 
-        partman.ensure_partitions(precreate_tables)
+        partman.ensure_partitions(PRECREATE_TABLES)
 
         if prune
           Shard.current.database_server.unguard do
-            partman.prune_partitions(Setting.get("quiz_events_partitions_keep_months", 6).to_i)
+            partman.prune_partitions(KEEP_MONTHS)
           end
         end
 
@@ -59,6 +58,6 @@ class Quizzes::QuizSubmissionEventPartitioner
 
   def self.processed?
     partman = CanvasPartman::PartitionManager.create(Quizzes::QuizSubmissionEvent)
-    partman.partitions_created?(precreate_tables - 1)
+    partman.partitions_created?(PRECREATE_TABLES - 1)
   end
 end

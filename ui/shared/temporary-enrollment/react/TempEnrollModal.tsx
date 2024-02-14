@@ -33,6 +33,7 @@ import {createAnalyticPropsGenerator, setAnalyticPropsOnRef} from './util/analyt
 import {Spinner} from '@instructure/ui-spinner'
 import {fetchTemporaryEnrollments} from './api/enrollment'
 import {Alert} from '@instructure/ui-alerts'
+import {captureException} from '@sentry/browser'
 
 const I18n = useI18nScope('temporary_enrollment')
 
@@ -114,6 +115,7 @@ export function TempEnrollModal(props: Props) {
       setErrorMessage('An unexpected error occurred, please try again later.')
       // eslint-disable-next-line no-console
       console.error(`Failed to fetch enrollments for user ${userId}:`, error)
+      captureException(error)
     }
   }
 

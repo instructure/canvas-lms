@@ -123,7 +123,7 @@ $(document).ready(() => {
       $standard
         .find('.update_grading_standard_url')
         .attr('href', $('#update_grading_standard_url').attr('href'))
-      const data = $.parseJSON($('#default_grading_standard_data').val())
+      const data = JSON.parse($('#default_grading_standard_data').val())
       const standard = {title: '', id: null, data}
       $standard
         .fillTemplateData({

@@ -150,7 +150,7 @@ describe "Roles API", type: :request do
                           "/api/v1/accounts/#{@account.id}/roles?state[]=inactive&state[]=active",
                           { controller: "role_overrides", action: "api_index", format: "json", account_id: @account.id.to_param, state: %w[inactive active] })
           expect(json.size).to eq 7
-          expect(json.pluck("role")).to be_include "inactive_role"
+          expect(json.pluck("role")).to include "inactive_role"
         end
       end
     end
@@ -285,7 +285,7 @@ describe "Roles API", type: :request do
 
       it "does not recycle a deleted role" do
         @role.destroy
-        expect(@account.roles.active.map(&:name)).to_not be_include @role_name
+        expect(@account.roles.active.map(&:name)).to_not include @role_name
 
         json = api_call(:post,
                         "/api/v1/accounts/#{@account.id}/roles",

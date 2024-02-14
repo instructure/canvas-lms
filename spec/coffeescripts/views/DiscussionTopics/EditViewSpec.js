@@ -232,7 +232,7 @@ test('shows todo input with date when given date', function () {
   ENV.TIMEZONE = 'America/Chicago'
   const view = this.editView({}, {todo_date: '2017-01-03'})
   equal(view.$el.find('#allow_todo_date').prop('checked'), true)
-  equal(view.$el.find('input[name="todo_date"').val(), 'Jan 2, 2017, 6:00 PM')
+  equal(view.$el.find('input[name="todo_date"]').val(), 'Jan 2, 2017, 6:00 PM')
 })
 
 test('renders announcement page when planner enabled', function () {
@@ -271,8 +271,8 @@ test('does save todo date if allow_todo_date is checked and discussion is not gr
   view.renderGroupCategoryOptions()
   view.$el.find('#allow_todo_date').prop('checked', true)
   view.$el.find('#allow_todo_date').trigger('change')
-  view.$el.find('input[name="todo_date"').val(todo_date.toISOString())
-  view.$el.find('input[name="todo_date"').trigger('change')
+  view.$el.find('input[name="todo_date"]').val(todo_date.toISOString())
+  view.$el.find('input[name="todo_date"]').trigger('change')
   const formData = view.getFormData()
   equal(formData.todo_date.toString(), todo_date.toString())
 })

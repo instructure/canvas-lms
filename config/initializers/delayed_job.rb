@@ -71,16 +71,15 @@ end
 Delayed::Backend::ActiveRecord::Job.include(Delayed::Backend::DefaultJobAccount)
 
 Delayed::Settings.default_job_options        = -> { { current_shard: Shard.current } }
-Delayed::Settings.fetch_batch_size           = -> { Setting.get("jobs_get_next_batch_size", "5").to_i }
+Delayed::Settings.fetch_batch_size           = 20
 Delayed::Settings.job_detailed_log_format    = ->(job) { job.to_detailed_log_format }
 Delayed::Settings.job_short_log_format       = ->(job) { job.to_short_log_format }
 Delayed::Settings.max_attempts               = 1
 Delayed::Settings.num_strands                = ->(strand_name) { Setting.get("#{strand_name}_num_strands", nil) }
 Delayed::Settings.pool_procname_suffix       = " (#{Canvas.revision})" if Canvas.revision
 Delayed::Settings.queue                      = "canvas_queue"
-Delayed::Settings.select_random_from_batch   = -> { Setting.get("jobs_select_random", "false") == "true" }
-Delayed::Settings.sleep_delay                = -> { Setting.get("delayed_jobs_sleep_delay", "2.0").to_f }
-Delayed::Settings.sleep_delay_stagger        = -> { Setting.get("delayed_jobs_sleep_delay_stagger", "2.0").to_f }
+Delayed::Settings.sleep_delay                = 2.0
+Delayed::Settings.sleep_delay_stagger        = 2.0
 Delayed::Settings.worker_procname_prefix     = -> { "#{Shard.current(Delayed::Backend::ActiveRecord::AbstractJob).id}~" }
 Delayed::Settings.worker_health_check_type   = Delayed::CLI.instance&.config&.dig("health_check", "type")&.to_sym || :none
 Delayed::Settings.worker_health_check_config = Delayed::CLI.instance&.config&.[]("health_check")
@@ -88,9 +87,7 @@ Delayed::Settings.worker_health_check_config = Delayed::CLI.instance&.config&.[]
 # ResendPlagiarismEvents
 # MicrosoftSync::StateMachineJob
 # turnitin/veracite/canvadocs/etc.
-Delayed::Settings.stranded_run_at_grace_period = -> { Setting.get("delayed_jobs_stranded_run_at_grace_period", 31_622_400).to_f.seconds }
-# transitional
-Delayed::Settings.infer_strand_from_singleton = -> { Setting.get("infer_strand_from_singleton", false) == "true" }
+Delayed::Settings.stranded_run_at_grace_period = 1.year
 
 # load our periodic_jobs.yml (cron overrides config file)
 Delayed::Periodic.add_overrides(ConfigFile.load("periodic_jobs").dup || {})

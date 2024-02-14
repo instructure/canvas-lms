@@ -20,9 +20,11 @@ import {Table} from '@instructure/ui-table'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
+import {Tooltip} from '@instructure/ui-tooltip'
 import React from 'react'
 import {arrayOf, func, shape, string} from 'prop-types'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import FilterBar from '@canvas/filter-bar'
 
 import DeveloperKey from './DeveloperKey'
 import {createSetFocusCallback} from './AdminTable'
@@ -32,11 +34,150 @@ import '@canvas/rails-flash-notifications'
 const I18n = useI18nScope('react_developer_keys')
 
 class InheritedTable extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      sortBy: `${this.props.prefix}-id`,
+      sortAscending: false,
+      typeFilter: 'all',
+      searchQuery: '',
+      sortFlagEnabled: window.ENV?.FEATURES?.enhanced_developer_keys_tables,
+    }
+  }
+
+  headers = prefix => ({
+    [`${prefix}-name`]: {
+      id: `${prefix}-name`,
+      text: I18n.t('Name'),
+      width: '45%',
+      sortable: true,
+      sortText: I18n.t('Sort by Name'),
+      sortValue: key => key.name,
+    },
+    [`${prefix}-id`]: {
+      id: `${prefix}-id`,
+      text: I18n.t('Id'),
+      width: '25%',
+      sortable: true,
+      sortText: I18n.t('Sort by Client ID'),
+      sortValue: key => key.id,
+    },
+    [`${prefix}-type`]: {
+      id: `${prefix}-type`,
+      text: I18n.t('Type'),
+      width: '15%',
+      sortable: true,
+      sortText: I18n.t('Sort by Type'),
+      sortValue: key => key.is_lti_key,
+    },
+    [`${prefix}-state`]: {
+      id: `${prefix}-state`,
+      text: I18n.t('State'),
+      width: '15%',
+      sortable: true,
+      sortText: I18n.t('Sort by State'),
+      // inherited keys only have a binding when they are turned On
+      sortValue: key => key.developer_key_account_binding?.workflow_state || 'allow',
+    },
+  })
+
+  onRequestSort = (_, {id}) => {
+    const {sortBy, sortAscending} = this.state
+
+    if (id === sortBy) {
+      this.setState({
+        sortAscending: !sortAscending,
+      })
+    } else {
+      this.setState({
+        sortBy: id,
+        sortAscending: true,
+      })
+    }
+  }
+
+  renderHeader = () => {
+    const {prefix} = this.props
+    const {sortBy, sortAscending, sortFlagEnabled} = this.state
+    const direction = sortAscending ? 'ascending' : 'descending'
+
+    return (
+      <Table.Row>
+        {Object.values(this.headers(prefix)).map(header => (
+          <Table.ColHeader
+            key={header.id}
+            id={header.id}
+            width={header.width}
+            {...(header.sortable &&
+              sortFlagEnabled && {
+                sortDirection: sortBy === header.id ? direction : 'none',
+                onRequestSort: this.onRequestSort,
+              })}
+          >
+            {header.sortText && sortFlagEnabled ? (
+              <Tooltip renderTip={header.sortText} placement="top">
+                {header.text}
+              </Tooltip>
+            ) : (
+              header.text
+            )}
+          </Table.ColHeader>
+        ))}
+      </Table.Row>
+    )
+  }
+
+  sortedDeveloperKeys = () => {
+    const {prefix} = this.props
+    const headers = this.headers(prefix)
+    const {sortBy, sortAscending, sortFlagEnabled} = this.state
+
+    if (!sortFlagEnabled) {
+      return this.props.developerKeysList
+    }
+
+    const developerKeys = this.filteredDeveloperKeys()
+    const sortedKeys = developerKeys.sort((a, b) => {
+      const aVal = headers[sortBy].sortValue(a)
+      const bVal = headers[sortBy].sortValue(b)
+      if (aVal < bVal) {
+        return sortAscending ? -1 : 1
+      }
+      if (aVal > bVal) {
+        return sortAscending ? 1 : -1
+      }
+      return 0
+    })
+    return sortedKeys
+  }
+
+  filteredDeveloperKeys = () => {
+    const {typeFilter, searchQuery, sortFlagEnabled} = this.state
+
+    if (!sortFlagEnabled) {
+      return this.props.developerKeysList
+    }
+
+    return this.props.developerKeysList.filter(key => {
+      const keyType = key.is_lti_key ? 'lti' : 'api'
+      const typeMatch = typeFilter === 'all' || typeFilter === keyType
+      const searchMatch =
+        searchQuery === '' ||
+        this.checkForMatch(key.name, searchQuery) ||
+        this.checkForMatch(key.id, searchQuery)
+      return typeMatch && searchMatch
+    })
+  }
+
+  checkForMatch = (attr, searchQuery) => {
+    return attr && attr.toLowerCase().includes(searchQuery.toLowerCase())
+  }
+
   // this should be called when more keys are loaded,
   // and only handles the screenreader callout and focus
   setFocusCallback = () =>
     createSetFocusCallback({
-      developerKeysList: this.props.developerKeysList,
+      developerKeysList: this.sortedDeveloperKeys(),
       developerKeyRef: this.developerKeyRef,
       srMsg: I18n.t(
         'Loaded more developer keys. Focus moved to the last enabled developer key in the list.'
@@ -49,32 +190,37 @@ class InheritedTable extends React.Component {
   }
 
   render() {
-    const {developerKeysList, prefix, label} = this.props
+    const {label} = this.props
+    const {sortFlagEnabled} = this.state
+    const developerKeys = this.sortedDeveloperKeys()
     return (
       <div>
+        {sortFlagEnabled && (
+          <FilterBar
+            filterOptions={[
+              {value: 'lti', text: I18n.t('LTI Keys')},
+              {value: 'api', text: I18n.t('API Keys')},
+            ]}
+            onFilter={typeFilter => this.setState({typeFilter})}
+            onSearch={searchQuery => this.setState({searchQuery})}
+            searchPlaceholder={I18n.t('Search by name or ID')}
+            searchScreenReaderLabel={I18n.t('Search Developer Keys')}
+          />
+        )}
         <Table
           data-automation="devKeyInheritedTable"
           caption={<ScreenReaderContent>{label}</ScreenReaderContent>}
           size="medium"
         >
-          <Table.Head>
-            <Table.Row>
-              <Table.ColHeader id={`${prefix}-name`} width="45%">
-                {I18n.t('Name')}
-              </Table.ColHeader>
-              <Table.ColHeader id={`${prefix}-details`} width="25%">
-                {I18n.t('Details')}
-              </Table.ColHeader>
-              <Table.ColHeader id={`${prefix}-type`} width="15%">
-                {I18n.t('Type')}
-              </Table.ColHeader>
-              <Table.ColHeader id={`${prefix}-state`} width="15%">
-                {I18n.t('State')}
-              </Table.ColHeader>
-            </Table.Row>
+          <Table.Head
+            {...(sortFlagEnabled && {
+              renderSortLabel: I18n.t('Sort by'),
+            })}
+          >
+            {this.renderHeader()}
           </Table.Head>
           <Table.Body>
-            {developerKeysList.map(developerKey => (
+            {developerKeys.map(developerKey => (
               <DeveloperKey
                 ref={key => {
                   this[`developerKey-${developerKey.id}`] = key
@@ -91,7 +237,7 @@ class InheritedTable extends React.Component {
             ))}
           </Table.Body>
         </Table>
-        {developerKeysList.length === 0 && (
+        {developerKeys.length === 0 && (
           <View as="div" margin="medium" textAlign="center">
             <Text size="large">{I18n.t('Nothing here yet')}</Text>
           </View>

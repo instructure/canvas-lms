@@ -22,6 +22,7 @@ import userEvent from '@testing-library/user-event'
 import React from 'react'
 import DiscussionTopicForm from '../DiscussionTopicForm'
 import {DiscussionTopic} from '../../../../graphql/DiscussionTopic'
+import {GroupSet} from '../../../../graphql/GroupSet'
 
 jest.mock('@canvas/rce/react/CanvasRce')
 
@@ -58,6 +59,8 @@ describe('DiscussionTopicForm', () => {
         PERMISSIONS: {
           CAN_ATTACH: true,
           CAN_MODERATE: true,
+          CAN_CREATE_ASSIGNMENT: true,
+          CAN_SET_GROUP: true,
         },
         ATTRIBUTES: {},
       },
@@ -147,12 +150,11 @@ describe('DiscussionTopicForm', () => {
       expect(queryByText('Not Published')).not.toBeInTheDocument()
     })
 
-    it('does not show the publish indicator when not editing', () => {
+    it('displays the publish indicator with the text `Not Published` when not editing', () => {
       const {queryByText} = setup({isEditing: false})
 
-      // Verifies that the publish indicator is not in the document
-      expect(queryByText('Published')).not.toBeInTheDocument()
-      expect(queryByText('Not Published')).not.toBeInTheDocument()
+      // Verifies that the publish indicator with the text Not Published is in the document
+      expect(queryByText('Not Published')).toBeInTheDocument()
     })
 
     it('displays publish indicator correctly', () => {
@@ -243,7 +245,7 @@ describe('DiscussionTopicForm', () => {
 
     it('shows too-long title reminder', async () => {
       const {getByText, getByLabelText} = setup()
-      const titleInput = getByLabelText('Topic Title')
+      const titleInput = getByLabelText(/Topic Title/)
       fireEvent.input(titleInput, {target: {value: 'A'.repeat(260)}})
       userEvent.type(titleInput, 'A')
       await waitFor(() =>
@@ -288,6 +290,7 @@ describe('DiscussionTopicForm', () => {
         DISCUSSION_TOPIC: {
           PERMISSIONS: {
             CAN_MANAGE_CONTENT: true,
+            CAN_CREATE_ASSIGNMENT: true,
           },
         },
       }
@@ -386,6 +389,26 @@ describe('DiscussionTopicForm', () => {
       })
 
       expect(document.queryByTestId('save-and-publish-button')).toBeFalsy()
+    })
+
+    it('displays a warning when a user can not edit group category', () => {
+      const document = setup({
+        groupCategories: [{_id: '1', name: 'Mutant Power Training Group 1'}],
+        isEditing: true,
+        currentDiscussionTopic: DiscussionTopic.mock({groupSet: GroupSet.mock(), canGroup: false}),
+      })
+
+      expect(document.queryByTestId('group-category-not-editable')).toBeTruthy()
+    })
+
+    it('does not display a warning when a user can edit group category', () => {
+      const document = setup({
+        groupCategories: [{_id: '1', name: 'Mutant Power Training Group 1'}],
+        isEditing: true,
+        currentDiscussionTopic: DiscussionTopic.mock({groupSet: GroupSet.mock(), canGroup: true}),
+      })
+
+      expect(document.queryByTestId('group-category-not-editable')).toBeFalsy()
     })
   })
 })

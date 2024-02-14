@@ -57,6 +57,7 @@ export default class Quiz extends Backbone.Model {
     this.isMigrating = this.isMigrating.bind(this)
     this.isImporting = this.isImporting.bind(this)
     this.importantDates = this.importantDates.bind(this)
+    this.isCloningAlignment = this.isCloningAlignment.bind(this)
 
     super.initialize(...arguments)
     this.initId()
@@ -231,6 +232,10 @@ export default class Quiz extends Backbone.Model {
     return this.get('workflow_state') === 'duplicating'
   }
 
+  isCloningAlignment() {
+    return this.get('workflow_state') === 'outcome_alignment_cloning'
+  }
+
   isMigrating() {
     return this.get('workflow_state') === 'migrating'
   }
@@ -299,6 +304,24 @@ export default class Quiz extends Backbone.Model {
     )
   }
 
+  alignment_clone_failed(callback) {
+    const target_course_id = this.get('course_id')
+    const target_assignment_id = this.get('id')
+    const original_course_id = this.get('original_course_id')
+    const original_assignment_id = this.get('original_assignment_id')
+    let query_string = `?target_assignment_id=${target_assignment_id}`
+    if (original_course_id !== target_course_id) {
+      // when it's a course copy failure
+      query_string += `&target_course_id=${target_course_id}`
+    }
+    $.ajaxJSON(
+      `/api/v1/courses/${original_course_id}/assignments/${original_assignment_id}/retry_alignment_clone${query_string}`,
+      'POST',
+      {},
+      callback
+    )
+  }
+
   // caller is failed migrated assignment
   retry_migration(callback) {
     const course_id = this.get('course_id')
@@ -317,6 +340,9 @@ export default class Quiz extends Backbone.Model {
     }
     if (this.isMigrating()) {
       this.pollUntilFinished(interval, this.isMigrating)
+    }
+    if (this.isCloningAlignment()) {
+      this.pollUntilFinished(interval, this.isCloningAlignment)
     }
     if (this.isImporting()) {
       this.pollUntilFinished(interval, this.isImporting)

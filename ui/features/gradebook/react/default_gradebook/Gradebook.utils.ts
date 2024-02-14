@@ -749,6 +749,7 @@ export const filterStudentBySectionFn = (
 export const filterAssignmentsBySubmissionsFn = (
   appliedFilters: Filter[],
   submissionStateMap: SubmissionStateMap,
+  searchFilteredStudentIds: string[],
   customStatuses: GradeStatus[]
 ) => {
   const {filtersNeedingSome, filtersNeedingEvery} = categorizeFilters(
@@ -761,7 +762,13 @@ export const filterAssignmentsBySubmissionsFn = (
       return true
     }
 
-    const submissions = submissionStateMap.getSubmissionsByAssignment(assignment.id)
+    let submissions = submissionStateMap.getSubmissionsByAssignment(assignment.id)
+
+    if (searchFilteredStudentIds.length > 0) {
+      submissions = submissions.filter(submission =>
+        searchFilteredStudentIds.includes(submission.user_id)
+      )
+    }
 
     const result = filterSubmissionsByCategorizedFilters(
       filtersNeedingSome,
