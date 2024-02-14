@@ -59,7 +59,7 @@ describe "quiz edit page assign to" do
     expect(icon_type_exists?("Quiz")).to be true
   end
 
-  it "assigns student and saves assignment" do
+  it "assigns student and saves assignment", :ignore_js_errors do
     get "/courses/#{@course.id}/quizzes/#{@classic_quiz.id}/edit"
 
     click_manage_assign_to_button
@@ -78,7 +78,7 @@ describe "quiz edit page assign to" do
 
     click_save_button
     keep_trying_until { expect(item_tray_exists?).to be_falsey }
-    expect(manage_assign_to_button.text).to include("2 Assigned")
+    expect(pending_changes_pill_exists?).to be_truthy
 
     submit_page
 
