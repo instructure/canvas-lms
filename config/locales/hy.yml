@@ -11073,6 +11073,7 @@ hy:
   move_dialog_select: 
     move_to_end: "-- Ներքևում--"
   move_module_item_77754119: "Տեղափոխել Մոդուլ/Տարր"
+  move_name_to_a_new_group_acabed4e: " %{name} տեղափոխել նոր խումբ"
   move_outcome_ce497e6c: "Տեղափոխել արդյունքը"
   move_outcome_group_cfa1a505: "Տեղափոխել արդյունքների խումբը"
   move_to_1c208ae5: "Անցնել ..."
@@ -14247,6 +14248,7 @@ hy:
   registration_url_60e0eaaa: "Գրանցման URL-հասցե"
   regular_style_checkbox_ee3d71c1: "Սովորական-ոճի կոճակ"
   remind_me_next_time_6402eb7d: "Հիշեցնել ինձ հաջորդ անգամ "
+  remove_as_leader_22d1a7d8: "Հանել առաջնորդությունից"
   remove_attachment_ceae0973: "Հանել հավելվածը"
   remove_avatar_picture_aba765eb: "Հանել ավատարի պատկերը"
   remove_c_name_section_d8eabd3a: "Ջնջել %{c.name} բաժինը"
@@ -14256,6 +14258,8 @@ hy:
   remove_filter_68de01d4: "Հեռացնել ֆիլտրները"
   remove_icon_a4646413: "հանել պատկերը"
   remove_media_comment_f4afdb4b: "Հանել մուլտիմեդիա մեկնաբանությունը"
+  remove_name_as_leader_3e03780a: " %{name} հանել առաջնորդությունից"
+  remove_name_from_group_487cce74: " %{name} հանել խմբից"
   remove_recipient_name_a6b83cef: "Հեռացնել  %{name} ստացողին "
   remove_row_c198da5a: "Հանել տողը"
   remove_row_f9d59cba: "Հանել Տողը"
@@ -14871,6 +14875,7 @@ hy:
   services_api: 
     must_be_logged_in: "Kaltura օգտագործելու համար դուք պետք է մուտք գործեք համակարգ "
   set_a_random_student_as_group_leader_663dcfd5: "Պատահական ունկնդրի նշանակել խմբի ղեկավար"
+  set_as_leader_f710dcec: "Ընտրել որպես առաջնորդ"
   set_default_grade_d0bd8f30: "Սահմանել ըստ լռության ընդունված գնահատականը"
   set_default_grade_dialog: 
     default_grades: "Նշանակել բոլոր ունկնդիրներին միեւնույն գնահատականը *%{assignment.name}* հանձնարարության համար, մուտքագրելով գնահատականի մեծությունը ստորև."
