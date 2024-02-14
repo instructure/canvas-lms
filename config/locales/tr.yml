@@ -13162,6 +13162,7 @@ tr:
   move_module_contents_74fa15d5: "Modül içeriklerini taşı"
   move_module_item_77754119: "Modülü/Öğeyi Taşı"
   move_module_item_f525d6c8: "Modül Öğesini Taşı"
+  move_name_to_a_new_group_acabed4e: "%{name}'i yeni bir gruba taşı"
   move_outcome_ce497e6c: "Öğrenme Çıktısını Taşı"
   move_outcome_group_cfa1a505: "Öğrenme Çıktı Grubunu Taşı"
   move_this_module_4a262aaf: "Bu Modülü taşı"
@@ -16679,6 +16680,7 @@ tr:
   remove_account_from_this_profile_c3095eb2: "Bu hesabı profilimden sil"
   remove_all_course_observer_members_4622c70d: "Tüm Ders Gözlemci Üyelerini Kaldır"
   remove_all_group_observer_members_af5675f3: "Tüm Grup Gözlemci Üyelerini Kaldır"
+  remove_as_leader_22d1a7d8: "Liderlikten Sil"
   remove_attachment_ceae0973: "Ekli Dosyayı Kaldır"
   remove_avatar_picture_aba765eb: "Avatar resmini kaldır"
   remove_dates_5a5a8df2: "Tarihleri sil"
@@ -16687,6 +16689,8 @@ tr:
   remove_filter_68de01d4: "Filtreyi Kaldır"
   remove_image_341340b3: "Görseli sil"
   remove_media_comment_f4afdb4b: "Medya yorumunu sil"
+  remove_name_as_leader_3e03780a: "%{name}'i liderlikten kaldır"
+  remove_name_from_group_487cce74: "Gruptan %{name}'i kaldır"
   remove_null_values_from_live_event_payloads_3c826f: "Etkinlik verilerinden boş değerleri kaldır"
   remove_row_c198da5a: "Satırı sil"
   remove_row_f9d59cba: "Satırı Sil"
@@ -17351,6 +17355,7 @@ tr:
   services_api: 
     must_be_logged_in: "Kaltura kullanarak giriş yapmalısınız"
   set_a_random_student_as_group_leader_663dcfd5: "Grup liderini öğrenciler arasından rastgele seç"
+  set_as_leader_f710dcec: "Lider Olarak Ata"
   set_default_grade_a202ebc1: "Var Sayılan Notu Ayarla"
   set_default_grade_d0bd8f30: "Varsayılan notu belirle"
   set_default_grade_dialog: 
@@ -17361,6 +17366,7 @@ tr:
     set_grades_button_loading: "Notlar Ayarlanıyor..."
   set_first_student_to_join_as_group_leader_5cfc206f: "İlk katılan öğrenciyi grup lideri yap"
   set_group_weights_fd41c1f: "Grup Ağırlıklarını Ayarla"
+  set_name_as_leader_591c8009: "%{name}'u lider olarak ata"
   set_of_grading_periods_545b37e9: "Notlandırma Peryod Seti"
   set_up_how_your_proficiency_ratings_appear_inside__8139bb81: "\n\
       \x20           Yeterlilik Puanlarınızın Öğrenme Yeterliliği Not Defteri içinde nasıl görüneceğini ayarlayın.\n\
