@@ -18,6 +18,7 @@
 
 import CanvasMultiSelect from '../index'
 import {fireEvent, render} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import React from 'react'
 import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
 
@@ -125,5 +126,26 @@ describe('CanvasMultiSelect', () => {
     fireEvent.input(combobox, {target: {value: '?'}})
     expect(getByRole('option', {name: 'Broccoli'})).toBeInTheDocument()
     expect(queryByRole('option', {name: 'Cucumber'})).not.toBeInTheDocument()
+  })
+
+  it('calls customOnRequestShowOptions when clicking the input', () => {
+    const customOnRequestShowOptions = jest.fn()
+    props.customOnRequestShowOptions = customOnRequestShowOptions
+    const {getByRole} = renderComponent()
+    const combobox = getByRole('combobox', {name: 'Vegetables'})
+    userEvent.click(combobox)
+    expect(customOnRequestShowOptions).toHaveBeenCalled()
+  })
+
+  it('calls customOnRequestHideOptions when blurring the input', () => {
+    const customOnRequestHideOptions = jest.fn()
+    props.customOnRequestHideOptions = customOnRequestHideOptions
+    const {getByRole} = renderComponent()
+    const combobox = getByRole('combobox', {name: 'Vegetables'})
+    userEvent.click(combobox)
+    expect(getByRole('option', {name: 'Broccoli'})).toBeInTheDocument()
+    expect(customOnRequestHideOptions).not.toHaveBeenCalled()
+    userEvent.tab()
+    expect(customOnRequestHideOptions).toHaveBeenCalled()
   })
 })

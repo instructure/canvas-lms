@@ -310,6 +310,7 @@ function CanvasMultiSelect(props: Props) {
 
   function onRequestHideOptions() {
     setIsShowingOptions(false)
+    customOnRequestHideOptions()
     if (!highlightedOptionId) return
     setInputValue('')
     if (filteredOptionIds?.length === 1) {
@@ -320,7 +321,6 @@ function CanvasMultiSelect(props: Props) {
       onChange([...selectedOptionIds, filteredOptionIds[0]])
     }
     setFilteredOptionIds(null)
-    customOnRequestHideOptions()
   }
 
   function onRequestHighlightOption(e: any, {id}: any) {
