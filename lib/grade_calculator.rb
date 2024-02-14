@@ -70,7 +70,7 @@ class GradeCalculator
     # publish student enrollment nouns when we're called by zero grader
     # zero grader will call us with a single user_id
     return if user_ids.length > 1
-    enrollment = StudentEnrollment.find_by(user_id: user_ids, course_id: course_id)
+    enrollment = StudentEnrollment.find_by(user_id: user_ids, course_id: course_id, workflow_state: 'active')
     enrollment.publish_as_v2 if enrollment
   end
 
