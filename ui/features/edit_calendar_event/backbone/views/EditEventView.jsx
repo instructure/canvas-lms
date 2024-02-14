@@ -262,7 +262,7 @@ export default class EditCalendarEventView extends Backbone.View {
   renderHeaderComponent() {
     const title = this.model.id == null ? 
       I18n.t('Create New Calendar Event') : 
-      I18n.t('Edit [%{title}]', {title: this.model.get('title')})
+      I18n.t('Edit %{title}', {title: this.model.get('title')})
 
     ReactDOM.render(
       <EditCalendarEventHeader title={title} />,

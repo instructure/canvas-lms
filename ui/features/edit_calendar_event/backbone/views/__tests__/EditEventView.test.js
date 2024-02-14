@@ -70,7 +70,7 @@ describe('EditEventView', () => {
 
   it('renders', () => {
     const e = render()
-    expect(within(document.body).getByText(`Edit [${e.model.get('title')}]`)).not.toBeNull()
+    expect(within(document.body).getByText(`Edit ${e.model.get('title')}`)).not.toBeNull()
   })
 
   it('defaults to today if no start date is given', () => {
