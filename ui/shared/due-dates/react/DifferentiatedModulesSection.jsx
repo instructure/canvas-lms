@@ -18,7 +18,6 @@
 
 import React, {useState, useRef, useEffect, useMemo, useCallback} from 'react'
 import {Link} from '@instructure/ui-link'
-import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -29,8 +28,9 @@ import {IconEditLine} from '@instructure/ui-icons'
 import _ from 'underscore'
 import {forEach, map} from 'lodash'
 import TokenActions from './TokenActions'
-import {sortedRowKeys, getAllOverrides, datesFromOverride} from '../util/overridesUtils'
-import {string, func, array, number, oneOfType, bool} from 'prop-types'
+import { sortedRowKeys, getAllOverrides, datesFromOverride, areCardsEqual } from '../util/overridesUtils'
+import { string, func, array, number, oneOfType, bool } from 'prop-types'
+import {Pill} from '@instructure/ui-pill'
 
 const I18n = useI18nScope('DueDateOverrideView')
 
@@ -52,6 +52,8 @@ const DifferentiatedModulesSection = ({
   const [stagedCards, setStagedCards] = useState([])
   const [stagedOverrides, setStagedOverrides] = useState(overrides)
   const [preSavedOverrides, setPreSavedOverrides] = useState(cloneObject(overrides))
+  const [preSavedCards, setPreSavedCards] = useState(null);
+  const [showPendingChangesPill, setShowPendingChangesPill] = useState(false);
   const [disabledOptionIds, setDisabledOptionIds] = useState([])
   const [stagedImportantDates, setStagedImportantDates] = useState(importantDates)
   const linkRef = useRef()
@@ -59,7 +61,7 @@ const DifferentiatedModulesSection = ({
   useEffect(() => {
     let index = 0
     const overridesByKey = _.groupBy(stagedOverrides, override => {
-      override.set('rowKey', override.attributes.rowKey ?? override.combinedDates())
+      override.set('rowKey', override.attributes?.rowKey ?? override?.combinedDates())
 
       return override.get('rowKey')
     })
@@ -68,11 +70,14 @@ const DifferentiatedModulesSection = ({
         const datesForGroup = datesFromOverride(overrides[0])
         index++
         index = stagedCards?.[key]?.index ?? overrides?.[0]?.index ?? index
-        return [key, {overrides, dates: datesForGroup, persisted: true, index}]
+        return [key, {overrides, dates: datesForGroup, index}]
       })
       .object()
       .value()
     setStagedCards(parsedOverrides)
+    if(preSavedCards === null){
+      setPreSavedCards(cloneObject(parsedOverrides))
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stagedOverrides])
 
@@ -100,9 +105,12 @@ const DifferentiatedModulesSection = ({
         }
       })
       const uniqueIds = [...new Set(defaultOptions)]
+      const preSavedCard = preSavedCards[cardId]
+      const isPersisted = areCardsEqual(preSavedCard, row)
       return {
         key: cardId,
         isValid: uniqueIds.length > 0,
+        highlightCard: !isPersisted,
         hasAssignees: uniqueIds.length > 0,
         due_at: dates.due_at,
         unlock_at: dates.unlock_at,
@@ -125,6 +133,13 @@ const DifferentiatedModulesSection = ({
     onTrayOpen?.()
   }, [onTrayOpen])
 
+  useEffect(()=>{
+    if(!open && ![undefined, null].includes(preSavedCards)){
+      const hasChanges = cards.some(({highlightCard}) => highlightCard) || cards.length < Object.entries(preSavedCards).length
+        setShowPendingChangesPill(hasChanges)
+    }
+}, [cards, open])
+
   const handleClose = useCallback(() => {
     setOpen(false)
     onTrayClose?.()
@@ -133,7 +148,7 @@ const DifferentiatedModulesSection = ({
   const handleDismiss = () => {
     handleClose()
     setStagedOverrides(overrides)
-    setPreSavedOverrides(cloneObject(overrides))
+    setPreSavedOverrides(preSavedOverrides)
     linkRef.current.focus()
   }
 
@@ -157,7 +172,7 @@ const DifferentiatedModulesSection = ({
     const tmp = {}
     const dates = rowDates || datesFromOverride(newOverrides[0])
     const currentIndex = stagedCards[cardId]?.index
-    tmp[cardId] = {overrides: newOverrides, dates, persisted: false, index: currentIndex}
+    tmp[cardId] = {overrides: newOverrides, dates, index: currentIndex}
 
     const newRows = _.extend({...stagedCards}, tmp)
     setStagedCards(newRows)
@@ -183,14 +198,15 @@ const DifferentiatedModulesSection = ({
     const row = {...stagedCards[cardId]}
     const oldOverrides = row.overrides
     const oldDates = row.dates
+    const date = newDate === "" ? null : newDate
 
     const newOverrides = map(oldOverrides, override => {
-      override.set(dateType, newDate)
+      override.set(dateType, date)
       return override
     })
 
     const tmp = {}
-    tmp[dateType] = newDate
+    tmp[dateType] = date
     const newDates = _.extend(oldDates, tmp)
 
     updateRow(cardId, newOverrides, newDates)
@@ -277,11 +293,9 @@ const DifferentiatedModulesSection = ({
         >
           <View as="div">
             {I18n.t('Manage Assign To')}
-            <Text as="div" color="secondary" size="small">
-              {I18n.t('%{overridesCount} Assigned', {
-                overridesCount: preSavedOverrides?.filter(override => !override.draft).length,
-              })}
-            </Text>
+            {showPendingChangesPill && <Pill data-testid="pending_changes_pill" color="info" margin="auto small">
+                    {I18n.t('Pending Changes')}
+                </Pill>}
           </View>
         </Link>
       </View>

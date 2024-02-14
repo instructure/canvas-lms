@@ -166,11 +166,11 @@ describe('ItemAssignToTray', () => {
     })
   })
 
-  it('calls onDismiss when close button is clicked', () => {
-    const onDismiss = jest.fn()
-    const {getByRole} = renderComponent({onDismiss})
+  it('calls onClose when close button is clicked', () => {
+    const onClose = jest.fn()
+    const {getByRole} = renderComponent({onClose})
     getByRole('button', {name: 'Close'}).click()
-    expect(onDismiss).toHaveBeenCalled()
+    expect(onClose).toHaveBeenCalled()
   })
 
   it('adds a card when add button is clicked', async () => {

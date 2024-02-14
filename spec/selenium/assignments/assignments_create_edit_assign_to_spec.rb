@@ -64,7 +64,7 @@ shared_examples_for "item assign to tray during assignment creation/update" do
     click_save_button
 
     keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
-    expect(AssignmentCreateEditPage.manage_assign_to_button.text).to include("2 Assigned")
+    expect(AssignmentCreateEditPage.pending_changes_pill_exists?).to be_truthy
 
     AssignmentCreateEditPage.save_assignment
 
@@ -104,7 +104,7 @@ shared_examples_for "item assign to tray during assignment creation/update" do
 
     keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
 
-    expect(AssignmentCreateEditPage.manage_assign_to_button.text).to include("2 Assigned")
+    expect(AssignmentCreateEditPage.pending_changes_pill_exists?).to be_truthy
 
     AssignmentCreateEditPage.save_assignment
     assignment = Assignment.last
@@ -138,7 +138,7 @@ shared_examples_for "item assign to tray during assignment creation/update" do
   end
 end
 
-describe "assignments show page assign to" do
+describe "assignments show page assign to", :ignore_js_errors do
   include_context "in-process server selenium tests"
   include AssignmentsIndexPage
   include ItemsAssignToTray

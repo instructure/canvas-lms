@@ -66,6 +66,7 @@ export type ItemAssignToCardProps = {
   customAllOptions?: AssigneeOption[]
   customIsLoading?: boolean
   customSetSearchTerm?: (term: string) => void
+  highlightCard?: boolean
 }
 
 function setTimeToStringDate(time: string, date: string | undefined): string | undefined {
@@ -125,6 +126,7 @@ export default function ItemAssignToCard({
   customAllOptions,
   customIsLoading,
   customSetSearchTerm,
+  highlightCard,
 }: ItemAssignToCardProps) {
   const [dateValidator] = useState<DateValidator>(
     new DateValidator({
@@ -304,68 +306,79 @@ export default function ItemAssignToCard({
     },
   ]
 
+  const wrapperProps = highlightCard
+    ? {
+        borderWidth: 'none none none large',
+        'data-testid': 'highlighted_card',
+        borderColor: 'brand',
+        borderRadius: 'medium',
+      }
+    : {borderWidth: 'none', borderColor: 'primary', borderRadius: 'medium'}
   return (
-    <View
-      data-testid="item-assign-to-card"
-      as="div"
-      position="relative"
-      padding="medium small small small"
-      borderWidth="small"
-      borderColor="primary"
-      borderRadius="medium"
-    >
-      {typeof onDelete === 'function' && (
-        <div
-          style={{
-            position: 'absolute',
-            insetInlineEnd: '.75rem',
-            insetBlockStart: '.75rem',
-            zIndex: 2,
-          }}
-        >
-          <IconButton
-            color="danger"
-            screenReaderLabel={I18n.t('Delete')}
-            size="small"
-            withBackground={false}
-            withBorder={false}
-            onClick={handleDelete}
+    <View as="div" {...wrapperProps}>
+      <View
+        data-testid="item-assign-to-card"
+        as="div"
+        position="relative"
+        padding="medium small small small"
+        borderWidth="small"
+        borderColor="primary"
+        borderRadius="none medium medium none"
+      >
+        {highlightCard && <View height="100%" background="brand" width="1rem" />}
+        {typeof onDelete === 'function' && (
+          <div
+            style={{
+              position: 'absolute',
+              insetInlineEnd: '.75rem',
+              insetBlockStart: '.75rem',
+              zIndex: 2,
+            }}
           >
-            <IconTrashLine />
-          </IconButton>
-        </div>
-      )}
-      <AssigneeSelector
-        onSelect={handleSelect}
-        selectedOptionIds={selectedAssigneeIds}
-        everyoneOption={everyoneOption}
-        courseId={courseId}
-        defaultValues={[]}
-        clearAllDisabled={true}
-        size="medium"
-        messages={error}
-        disabledOptionIds={disabledOptionIds}
-        disableFetch={!isOpen}
-        customAllOptions={customAllOptions}
-        customIsLoading={customIsLoading}
-        customSetSearchTerm={customSetSearchTerm}
-      />
-      {dateTimeInputs.map((props: DateTimeInput) => (
-        <ClearableDateTimeInput
-          breakpoints={{}}
-          {...props}
-          showMessages={false}
-          locale={ENV.LOCALE || 'en'}
-          timezone={ENV.TIMEZONE || 'UTC'}
-          onBlur={handleBlur(props.key)}
-          dateInputRef={el => (dateInputRefs.current[props.key] = el)}
+            <IconButton
+              color="danger"
+              screenReaderLabel={I18n.t('Delete')}
+              size="small"
+              withBackground={false}
+              withBorder={false}
+              onClick={handleDelete}
+            >
+              <IconTrashLine />
+            </IconButton>
+          </div>
+        )}
+        <AssigneeSelector
+          onSelect={handleSelect}
+          selectedOptionIds={selectedAssigneeIds}
+          everyoneOption={everyoneOption}
+          courseId={courseId}
+          defaultValues={[]}
+          clearAllDisabled={true}
+          size="medium"
+          messages={error}
+          disabledOptionIds={disabledOptionIds}
+          disableFetch={!isOpen}
+          customAllOptions={customAllOptions}
+          customIsLoading={customIsLoading}
+          customSetSearchTerm={customSetSearchTerm}
         />
-      ))}
-      <ContextModuleLink
-        courseId={courseId}
-        contextModuleId={contextModuleId}
-        contextModuleName={contextModuleName}
-      />
+        {dateTimeInputs.map((props: DateTimeInput) => (
+          <ClearableDateTimeInput
+            breakpoints={{}}
+            {...props}
+            showMessages={false}
+            locale={ENV.LOCALE || 'en'}
+            timezone={ENV.TIMEZONE || 'UTC'}
+            onBlur={handleBlur(props.key)}
+            dateInputRef={el => (dateInputRefs.current[props.key] = el)}
+          />
+        ))}
+        <ContextModuleLink
+          courseId={courseId}
+          contextModuleId={contextModuleId}
+          contextModuleName={contextModuleName}
+        />
+      </View>
     </View>
   )
 }

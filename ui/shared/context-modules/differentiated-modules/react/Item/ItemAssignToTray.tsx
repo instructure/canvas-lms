@@ -171,6 +171,7 @@ export default function ItemAssignToTray({
   defaultSectionId,
 }: ItemAssignToTrayProps) {
   const [assignToCards, setAssignToCards] = useState<ItemAssignToCardSpec[]>(defaultCards ?? [])
+  const [initialCards, setInitialCards] = useState<ItemAssignToCardSpec[]>([])
   const [fetchInFlight, setFetchInFlight] = useState(false)
   const [disabledOptionIds, setDisabledOptionIds] = useState<string[]>(defaultDisabledOptionIds)
   const everyoneOption = useMemo(() => {
@@ -283,6 +284,7 @@ export default function ItemAssignToTray({
           })
         }
         setDisabledOptionIds(selectedOptionIds)
+        setInitialCards(cards)
         setAssignToCards(cards)
       })
       .catch(() => {
@@ -366,9 +368,17 @@ export default function ItemAssignToTray({
     deletedAssignees: string[]
   ) => {
     const selectedAssigneeIds = assignees.map(({id}) => id)
+    const initialCard = initialCards.find(card => card.key === cardId)
+    const areEquals =
+      JSON.stringify(initialCard?.selectedAssigneeIds) === JSON.stringify(selectedAssigneeIds)
     const cards = assignToCards.map(card =>
       card.key === cardId
-        ? {...card, selectedAssigneeIds, hasAssignees: assignees.length > 0}
+        ? {
+            ...card,
+            selectedAssigneeIds,
+            highlightCard: !areEquals,
+            hasAssignees: assignees.length > 0,
+          }
         : card
     )
     if (onAssigneesChange) {
@@ -429,13 +439,20 @@ export default function ItemAssignToTray({
 
   const handleDatesChange = useCallback(
     (cardId: string, dateAttribute: string, dateValue: string | null) => {
-      const cards = assignToCards.map(card =>
-        card.key === cardId ? {...card, [dateAttribute]: dateValue, isEdited: true} : card
-      )
+      const newDate = dateValue === null ? undefined : dateValue
+      const initialCard = initialCards.find(card => card.key === cardId)
+      const {highlightCard, isEdited, ...currentCardProps} = assignToCards.find(
+        card => card.key === cardId
+      ) as ItemAssignToCardSpec
+      const currentCard = {...currentCardProps, [dateAttribute]: newDate}
+      const areEquals = JSON.stringify(initialCard) === JSON.stringify(currentCard)
+
+      const newCard = {...currentCard, highlightCard: !areEquals, isEdited: true}
+      const cards = assignToCards.map(card => (card.key === cardId ? newCard : card))
       setAssignToCards(cards)
-      onDatesChange?.(cardId, dateAttribute, dateValue ?? '')
+      onDatesChange?.(cardId, dateAttribute, newDate ?? '')
     },
-    [assignToCards, onDatesChange]
+    [assignToCards, initialCards, onDatesChange]
   )
 
   const allCardsValid = useCallback(() => {
@@ -454,7 +471,7 @@ export default function ItemAssignToTray({
     return (
       <Flex.Item margin="medium 0" padding="0 medium" width="100%">
         <CloseButton
-          onClick={handleDismiss}
+          onClick={onClose}
           screenReaderLabel={I18n.t('Close')}
           placement="end"
           offset="small"
@@ -506,6 +523,7 @@ export default function ItemAssignToTray({
             customAllOptions={allOptions}
             customIsLoading={isLoading}
             customSetSearchTerm={setSearchTerm}
+            highlightCard={card.highlightCard}
           />
         </View>
       )

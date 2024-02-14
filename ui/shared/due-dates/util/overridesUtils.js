@@ -62,3 +62,36 @@ export const getAllOverrides = givenRows => {
     .compact()
     .value()
 }
+
+export const areCardsEqual = (preSavedCard, currentCard) => {
+  if (preSavedCard === undefined) return false
+
+  const {index, ...preSaved} = preSavedCard
+  const {index: indexb, ...current} = currentCard
+  preSaved.overrides = preSaved.overrides.map(({assignment_override}) => {
+    const {course_section_id, student_ids, due_at, lock_at, unlock_at, rowKey} = assignment_override
+    const params = {due_at, lock_at, unlock_at, rowKey}
+    if (course_section_id) {
+      params.course_section_id = course_section_id
+    }
+    if (student_ids) {
+      return {...params, student_ids: student_ids.filter(s => s).sort()}
+    }
+    return params
+  })
+
+  current.overrides = current.overrides
+    .filter(override => override.attributes.course_section_id || override.attributes.student_ids)
+    .map(({attributes}) => {
+      const {course_section_id, student_ids, due_at, lock_at, unlock_at, rowKey} = attributes
+      const params = {due_at, lock_at, unlock_at, rowKey}
+      if (course_section_id) {
+        params.course_section_id = course_section_id
+      }
+      if (student_ids) {
+        return {...params, student_ids: student_ids.filter(s => s).sort()}
+      }
+      return params
+    })
+  return JSON.stringify(preSaved) === JSON.stringify(current)
+}

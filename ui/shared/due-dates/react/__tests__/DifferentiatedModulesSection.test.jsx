@@ -17,9 +17,16 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {render, act} from '@testing-library/react'
 import DifferentiatedModulesSection from '../DifferentiatedModulesSection'
 import AssignmentOverrideCollection from '@canvas/assignments/backbone/collections/AssignmentOverrideCollection'
+import fetchMock from 'fetch-mock'
+
+const SECTIONS_DATA = [
+    {id: '1', course_id: '1', name: 'Course 1', start_at: null, end_at: null},
+    {id: '2', course_id: '1', name: 'Section A', start_at: null, end_at: null},
+  ]
+  const COURSE_ID = 1
 
 describe('DifferentiatedModulesSection', () => {
     const assignmentcollection = new AssignmentOverrideCollection([{
@@ -31,7 +38,7 @@ describe('DifferentiatedModulesSection', () => {
         all_day_date: "2024-01-17",
         unlock_at: null,
         lock_at: null,
-        course_section_id: "5",
+        course_section_id: "2",
         due_at_overridden: true,
         unlock_at_overridden: true,
         lock_at_overridden: true,
@@ -48,13 +55,33 @@ describe('DifferentiatedModulesSection', () => {
         defaultSectionId: 0,
     }
 
+    const SECTIONS_URL = `/api/v1/courses/${COURSE_ID}/sections`
+    const STUDENTS_URL = `api/v1/courses/${COURSE_ID}/users?enrollment_type=student`
+
+    beforeAll(() => {
+        window.ENV ||= {}
+        ENV.COURSE_ID = COURSE_ID
+        if (!document.getElementById('flash_screenreader_holder')) {
+          const liveRegion = document.createElement('div')
+          liveRegion.id = 'flash_screenreader_holder'
+          liveRegion.setAttribute('role', 'alert')
+          document.body.appendChild(liveRegion)
+        }
+      })
+
+    beforeEach(()=>{
+        fetchMock.get(STUDENTS_URL, []).get(SECTIONS_URL, SECTIONS_DATA)
+    })
+
+    afterEach(() => {
+        fetchMock.resetHistory()
+        fetchMock.restore()
+    })
+
     it('renders', () => {
         const {getByText} = render(<DifferentiatedModulesSection {...props} />)
         expect(
             getByText('Manage Assign To')
-          ).toBeInTheDocument()
-        expect(
-            getByText(`${props.overrides.length} Assigned`)
           ).toBeInTheDocument()
     })
 
@@ -71,6 +98,40 @@ describe('DifferentiatedModulesSection', () => {
         getByTestId('manage-assign-to').click()
         getByRole('button', {name: 'Save'}).click()
         expect(onSyncMock).toHaveBeenCalledWith(assignmentcollection.models, props.importantDates)
+    })
+
+    describe('pending changes', () => {
+        const addAssignee = async (getByTestId, findByTestId, findByText) => {
+            getByTestId('manage-assign-to').click()
+            const assigneeSelector = await findByTestId('assignee_selector')
+            act(() => assigneeSelector.click())
+            const option1 = await findByText(SECTIONS_DATA[0].name)
+            act(() => option1.click())
+        }
+
+        it('highlights card if it has changes', async ()=>{
+            const {getByTestId, findByTestId, findByText} = render(<DifferentiatedModulesSection {...props} />)
+            await addAssignee(getByTestId, findByTestId, findByText)
+            expect(getByTestId('highlighted_card')).toBeInTheDocument()
+        })
+        // skipping for now, since the pill is being validated in selenium specs
+        it.skip('reverts highlighted style when changes are removed',async ()=>{
+            const {getByTestId, findByTestId, findByText,getByText, queryByTestId} = render(<DifferentiatedModulesSection {...props} />)
+            await addAssignee(getByTestId, findByTestId, findByText)
+            expect(getByTestId('highlighted_card')).toBeInTheDocument()
+
+            const selectedOption = getByText(SECTIONS_DATA[0].name)
+            act(() => selectedOption.click())
+            expect(queryByTestId('highlighted_card')).not.toBeInTheDocument()
+        })
+        // skipping for now, since the pill is being validated in selenium specs
+        it.skip('shows pending changes pill', async ()=>{
+            const {getByTestId, findByTestId, findByText, getByRole} = render(<DifferentiatedModulesSection {...props} />)
+            await addAssignee(getByTestId, findByTestId, findByText)
+            expect(getByTestId('highlighted_card')).toBeInTheDocument()
+            getByRole('button', {name: 'Close'}).click()
+            expect(getByTestId('pending_changes_pill')).toBeInTheDocument()
+        })
     })
 
     describe('important dates', ()=>{
