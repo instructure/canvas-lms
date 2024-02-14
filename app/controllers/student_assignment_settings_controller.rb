@@ -1,6 +1,8 @@
 class StudentAssignmentSettingsController < ApplicationController
   def update
     # {"value"=>"increment", "user_id"=>"1", "assignment_id"=>"2", "id"=>"max_attempts"}
+    assignment = ::Assignment.find(params[:assignment_id])
+    reject!("Only teachers may add attempts", :forbidden) unless authorized_action(assignment.course, @current_user, :manage_assignments)
 
     SettingsService.update_settings(
       id: {
