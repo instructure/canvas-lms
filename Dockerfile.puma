@@ -83,7 +83,6 @@ RUN set -eux; \
     packages/k5uploader/es \
     packages/k5uploader/lib \
     packages/k5uploader/node_modules \
-    packages/old-copy-of-react-14-that-is-just-here-so-if-analytics-is-checked-out-it-doesnt-change-yarn.lock/node_modules \
     pacts \
     public/dist \
     public/doc/api \
