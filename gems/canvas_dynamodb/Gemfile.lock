@@ -9,20 +9,24 @@ GEM
   remote: https://rubygems.org/
   specs:
     aws-eventstream (1.3.0)
-    aws-partitions (1.889.0)
+    aws-partitions (1.894.0)
     aws-sdk-applicationautoscaling (1.80.0)
       aws-sdk-core (~> 3, >= 3.191.0)
       aws-sigv4 (~> 1.1)
-    aws-sdk-core (3.191.1)
+    aws-sdk-core (3.191.2)
       aws-eventstream (~> 1, >= 1.3.0)
       aws-partitions (~> 1, >= 1.651.0)
       aws-sigv4 (~> 1.8)
+      base64
       jmespath (~> 1, >= 1.6.1)
-    aws-sdk-dynamodb (1.102.0)
+    aws-sdk-dynamodb (1.103.0)
       aws-sdk-core (~> 3, >= 3.191.0)
       aws-sigv4 (~> 1.1)
+      bigdecimal
     aws-sigv4 (1.8.0)
       aws-eventstream (~> 1, >= 1.0.2)
+    base64 (0.2.0)
+    bigdecimal (3.1.6)
     diff-lcs (1.5.1)
     docile (1.4.0)
     jmespath (1.6.2)
