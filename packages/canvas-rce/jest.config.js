@@ -34,6 +34,7 @@ module.exports = {
     ],
   ],
   setupFilesAfterEnv: [
+    '@testing-library/jest-dom',
     '<rootDir>/jest/jest-setup-framework.js',
     '<rootDir>/../../jest/stubInstUi.js',
   ],
@@ -60,9 +61,7 @@ module.exports = {
           ['@babel/preset-react', {}],
           ['@babel/preset-typescript', {}],
         ],
-        plugins: [
-          ['@babel/plugin-proposal-decorators', {legacy: true}],
-        ],
+        plugins: [['@babel/plugin-proposal-decorators', {legacy: true}]],
       },
     ],
   },

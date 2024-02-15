@@ -21,6 +21,7 @@ import moxios from 'moxios'
 import sinon from 'sinon'
 import {fireEvent, render, waitFor} from '@testing-library/react'
 import {AnnotatedDocumentSelector} from '../EditAssignment'
+import {FileBrowser} from '@canvas/rce/FileBrowser'
 
 describe('AnnotatedDocumentSelector', () => {
   describe('when attachment prop is present', () => {

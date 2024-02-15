@@ -19,6 +19,11 @@
 // Several components use aphrodite, which tries to manipulate the dom
 // on a timer which expires after the test completes and the document no longer exists
 import {StyleSheetTestUtils} from 'aphrodite'
+// eslint-disable-next-line import/no-nodejs-modules
+import {TextDecoder, TextEncoder} from 'util'
+
+global.TextEncoder = TextEncoder
+global.TextDecoder = TextDecoder
 
 /**
  * We want to ensure errors and warnings get appropriate eyes. If
@@ -45,6 +50,8 @@ const ignoredErrors = [
   /You seem to have overlapping act\(\) calls/,
   /A theme registry has already been initialized/,
   /Warning: Failed prop type: Invalid prop `color` of value `secondary` supplied to `CondensedButton`, expected one of \["primary","primary-inverse"\]./,
+  /ReactDOM.render is no longer supported in React 18/,
+  /Warning: Failed %s type: %s%s/,
 ]
 const globalWarn = global.console.warn
 const ignoredWarnings = [

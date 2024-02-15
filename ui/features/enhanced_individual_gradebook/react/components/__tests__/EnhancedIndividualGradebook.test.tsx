@@ -63,6 +63,8 @@ const mockSearchParams = (defaultSearchParams = {}) => {
   return {searchParamsMock, setSearchParamsMock}
 }
 
+const CUSTOM_TIMEOUT_LIMIT = 1000
+
 describe('Enhanced Individual Gradebook', () => {
   beforeEach(() => {
     ;(window.ENV as any) = setGradebookOptions()
@@ -132,7 +134,7 @@ describe('Enhanced Individual Gradebook', () => {
       const gradebookHistoryLink = getByTestId('gradebook-history-link')
       expect(gradebookHistoryLink).toBeInTheDocument()
 
-      await new Promise(resolve => setTimeout(resolve, 0))
+      await new Promise(resolve => setTimeout(resolve, CUSTOM_TIMEOUT_LIMIT))
 
       const contentSelectionStudent = getByTestId('content-selection-student')
       expect(within(contentSelectionStudent).getByText('No Student Selected')).toBeInTheDocument()
@@ -241,7 +243,7 @@ describe('Enhanced Individual Gradebook', () => {
       expect(gradebookExportLink).toHaveTextContent('Download Scores Generated on')
 
       // content selection query params
-      await new Promise(resolve => setTimeout(resolve, 0))
+      await new Promise(resolve => setTimeout(resolve, CUSTOM_TIMEOUT_LIMIT))
       const contentSelectionStudent = getByTestId('content-selection-student')
       expect(contentSelectionStudent).toBeInTheDocument()
       expect(within(contentSelectionStudent).getByText('Student 1')).toBeInTheDocument()
@@ -276,7 +278,7 @@ describe('Enhanced Individual Gradebook', () => {
     it('renders a dropped message if the assignment is being dropped from grade calculation for the current student', async () => {
       mockUserSettings()
       const {getByTestId} = renderEnhancedIndividualGradebook()
-      await new Promise(resolve => setTimeout(resolve, 0))
+      await new Promise(resolve => setTimeout(resolve, CUSTOM_TIMEOUT_LIMIT))
       fireEvent.change(getByTestId('content-selection-assignment-select'), {target: {value: '1'}})
       fireEvent.change(getByTestId('content-selection-student-select'), {target: {value: '5'}})
       await new Promise(resolve => setTimeout(resolve, 0))
@@ -304,7 +306,7 @@ describe('Enhanced Individual Gradebook', () => {
     it('does not render another flash message when switching students after setting default grades for the assignment', async () => {
       mockUserSettings()
       const {getByTestId, getByRole} = renderEnhancedIndividualGradebook()
-      await new Promise(resolve => setTimeout(resolve, 0))
+      await new Promise(resolve => setTimeout(resolve, CUSTOM_TIMEOUT_LIMIT))
       mockedExecuteApiRequest.mockResolvedValue({
         data: [],
         status: 201,
@@ -327,7 +329,7 @@ describe('Enhanced Individual Gradebook', () => {
       const {getByTestId} = renderEnhancedIndividualGradebook()
       await new Promise(resolve => setTimeout(resolve, 0))
       expect(searchParamsMock.get('student')).toBe(null)
-      await new Promise(resolve => setTimeout(resolve, 0))
+      await new Promise(resolve => setTimeout(resolve, CUSTOM_TIMEOUT_LIMIT))
       const contentSelectionStudent = getByTestId('content-selection-student-select')
       expect(contentSelectionStudent).toBeInTheDocument()
       fireEvent.change(contentSelectionStudent, {target: {value: '5'}})
@@ -338,7 +340,7 @@ describe('Enhanced Individual Gradebook', () => {
       const {searchParamsMock, setSearchParamsMock} = mockSearchParams({student: '5'})
       await new Promise(resolve => setTimeout(resolve, 0))
       const {getByTestId} = renderEnhancedIndividualGradebook()
-      await new Promise(resolve => setTimeout(resolve, 0))
+      await new Promise(resolve => setTimeout(resolve, CUSTOM_TIMEOUT_LIMIT))
       expect(searchParamsMock.get('student')).toBe('5')
       const contentSelectionStudent = getByTestId('content-selection-student-select')
       fireEvent.change(contentSelectionStudent, {target: {value: '-1'}})
@@ -350,7 +352,7 @@ describe('Enhanced Individual Gradebook', () => {
       const {getByTestId} = renderEnhancedIndividualGradebook()
       await new Promise(resolve => setTimeout(resolve, 0))
       expect(searchParamsMock.get('assignment')).toBe(null)
-      await new Promise(resolve => setTimeout(resolve, 0))
+      await new Promise(resolve => setTimeout(resolve, CUSTOM_TIMEOUT_LIMIT))
       const contentSelectionAssignment = getByTestId('content-selection-assignment-select')
       expect(contentSelectionAssignment).toBeInTheDocument()
       fireEvent.change(contentSelectionAssignment, {target: {value: '1'}})
@@ -362,7 +364,7 @@ describe('Enhanced Individual Gradebook', () => {
       const {getByTestId} = renderEnhancedIndividualGradebook()
       await new Promise(resolve => setTimeout(resolve, 0))
       expect(searchParamsMock.get('assignment')).toBe('1')
-      await new Promise(resolve => setTimeout(resolve, 0))
+      await new Promise(resolve => setTimeout(resolve, CUSTOM_TIMEOUT_LIMIT))
       const contentSelectionAssignment = getByTestId('content-selection-assignment-select')
       expect(contentSelectionAssignment).toBeInTheDocument()
       fireEvent.change(contentSelectionAssignment, {target: {value: '-1'}})

@@ -20,7 +20,6 @@
 import React from 'react'
 import Focus from '../Focus'
 import {render} from '@testing-library/react'
-import {act} from 'react-test-renderer'
 
 jest.useFakeTimers()
 
@@ -31,7 +30,7 @@ describe('Focus', () => {
         <button type="button">focus me</button>
       </Focus>
     )
-    act(jest.runOnlyPendingTimers)
+    jest.runOnlyPendingTimers()
     expect(getByText('focus me')).toHaveFocus()
   })
 
@@ -41,9 +40,9 @@ describe('Focus', () => {
         <button type="button">focus me</button>
       </Focus>
     )
-    act(() => jest.advanceTimersByTime(99))
+    jest.advanceTimersByTime(99)
     expect(getByText('focus me')).not.toHaveFocus()
-    act(() => jest.advanceTimersByTime(1))
+    jest.advanceTimersByTime(1)
     expect(getByText('focus me')).toHaveFocus()
   })
 })

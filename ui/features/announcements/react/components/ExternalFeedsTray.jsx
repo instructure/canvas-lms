@@ -18,7 +18,7 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {Component} from 'react'
-import {string} from 'prop-types'
+import {bool, string} from 'prop-types'
 
 import {Tray} from '@instructure/ui-tray'
 import {Link} from '@instructure/ui-link'
@@ -37,19 +37,21 @@ export default class ExternalFeedsTray extends Component {
   static propTypes = {
     atomFeedUrl: string,
     permissions: propTypes.permissions.isRequired,
+    defaultOpen: bool, // facilitates testing
   }
 
   static defaultProps = {
     atomFeedUrl: null,
+    defaultOpen: false,
   }
 
   state = {
-    open: false,
+    open: this.props.defaultOpen,
   }
 
   renderTrayContent() {
     return (
-      <View>
+      <View data-testid="announcements-tray__content">
         {this.renderHeader()}
         {this.renderRssFeedLink()}
         {this.props.permissions.create && this.renderAddExternalFeed()}
@@ -73,6 +75,7 @@ export default class ExternalFeedsTray extends Component {
         <View margin="medium" as="div" textAlign="start">
           <Link
             id="rss-feed-link"
+            data-testid="rss-feed-link"
             elementRef={link => {
               this.rssFeedLink = link
             }}
@@ -97,6 +100,7 @@ export default class ExternalFeedsTray extends Component {
         display="block"
         textAlign="start"
         className="announcements-tray__add-rss-root"
+        data-testid="announcements-tray__add-rss-root"
       >
         <Text size="medium" as="h3" weight="bold">
           {I18n.t('Feeds')}
@@ -116,6 +120,7 @@ export default class ExternalFeedsTray extends Component {
         <Link
           as="button"
           id="external_feed"
+          data-testid="external-feed-link"
           isWithinText={false}
           aria-haspopup="dialog"
           elementRef={link => (this.externalFeedRef = link)}

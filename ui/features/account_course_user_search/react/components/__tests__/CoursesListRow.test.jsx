@@ -17,9 +17,16 @@
  */
 
 import React from 'react'
-import {shallow, mount} from 'enzyme'
+import {render} from '@testing-library/react'
 import CoursesListRow from '../CoursesListRow'
-import {renderRow} from '@canvas/util/react/testing/TableHelper'
+
+function renderRow(row) {
+  return render(
+    <table>
+      <tbody>{row}</tbody>
+    </table>
+  )
+}
 
 const props = {
   id: '1',
@@ -43,25 +50,23 @@ const props = {
   concluded: false,
 }
 
-it('indicates if a course is a blueprint course', () => {
-  const tooltip = 'Tooltip[renderTip="This is a blueprint course"] IconBlueprintLine'
-  expect(
-    shallow(<CoursesListRow {...props} />)
-      .find(tooltip)
-      .exists()
-  ).toBe(false)
+it('does not indicate a course is not blueprint course', () => {
+  const {queryByText} = renderRow(<CoursesListRow {...props} />)
 
-  expect(
-    shallow(<CoursesListRow {...props} blueprint={true} />)
-      .find(tooltip)
-      .exists()
-  ).toBe(true)
+  expect(queryByText('This is a blueprint course')).toBeNull()
+})
+
+it('indicates if a course is a blueprint course', () => {
+  const {getAllByText} = renderRow(<CoursesListRow {...props} blueprint={true} />)
+
+  expect(getAllByText('This is a blueprint course').length).toBeGreaterThan(0)
 })
 
 it('filters addable roles by blueprint and permissions', () => {
-  const add_users_button = 'Tooltip[renderTip="Add Users to A"] IconButton'
-  const wrapper = shallow(
+  const ref = React.createRef()
+  const wrapper = renderRow(
     <CoursesListRow
+      ref={ref}
       {...props}
       blueprint={true}
       can_create_enrollments={true}
@@ -75,101 +80,88 @@ it('filters addable roles by blueprint and permissions', () => {
       ]}
     />
   )
-  const role_ids = wrapper
-    .instance()
+  const role_ids = ref.current
     .getAvailableRoles()
     .map(role => role.id)
     .sort()
   expect(role_ids).toEqual(['1', '2'])
 })
 
-it('indicates if a course is a course template', () => {
-  const tooltip = 'Tooltip[renderTip="This is a course template"] IconCollectionSolid'
-  expect(
-    shallow(<CoursesListRow {...props} />)
-      .find(tooltip)
-      .exists()
-  ).toBe(false)
+it('does not indicate a course is a course template if it is not', () => {
+  const {queryByText} = renderRow(<CoursesListRow {...props} />)
+  expect(queryByText('This is a course template')).toBeNull()
+})
 
-  expect(
-    shallow(<CoursesListRow {...props} template={true} />)
-      .find(tooltip)
-      .exists()
-  ).toBe(true)
+it('indiates a course is a course template if it is', () => {
+  const {getAllByText} = renderRow(<CoursesListRow {...props} template={true} />)
+  expect(getAllByText('This is a course template').length).toBeGreaterThan(0)
 })
 
 it('shows add-enrollment if it makes sense', () => {
-  const tooltip = 'Tooltip[renderTip="Add Users to A"] IconPlusLine'
-  expect(
-    shallow(<CoursesListRow {...props} can_create_enrollments={true} concluded={false} />)
-      .find(tooltip)
-      .exists()
-  ).toBe(true)
+  const tooltip = 'Add Users to A'
+
+  const {getAllByText} = renderRow(
+    <CoursesListRow {...props} can_create_enrollments={true} concluded={false} />
+  )
+  expect(getAllByText(tooltip).length).toBeGreaterThan(0)
 })
 
 it('does not show add-enrollment when not allowed', () => {
-  const tooltip = 'Tooltip[renderTip="Add Users to A"] IconPlusLine'
-  expect(
-    shallow(
-      <CoursesListRow
-        {...props}
-        can_create_enrollments={false}
-        workflow_state="active"
-        concluded={false}
-      />
-    )
-      .find(tooltip)
-      .exists()
-  ).toBe(false)
+  const tooltip = 'Add Users to A'
+  const {queryByText, rerender} = renderRow(
+    <CoursesListRow
+      {...props}
+      can_create_enrollments={false}
+      workflow_state="active"
+      concluded={false}
+    />
+  )
+  expect(queryByText(tooltip)).toBeNull()
+})
 
-  expect(
-    shallow(
-      <CoursesListRow
-        {...props}
-        can_create_enrollments={true}
-        workflow_state="completed"
-        concluded={true}
-      />
-    )
-      .find(tooltip)
-      .exists()
-  ).toBe(false)
+it('does not show add-enrollment when concluded', () => {
+  const tooltip = 'Add Users to A'
+  const {queryByText} = renderRow(
+    <CoursesListRow
+      {...props}
+      can_create_enrollments={true}
+      workflow_state="completed"
+      concluded={true}
+    />
+  )
+  expect(queryByText(tooltip)).toBeNull()
+})
 
-  expect(
-    shallow(<CoursesListRow {...props} can_create_enrollments={true} template={true} />)
-      .find(tooltip)
-      .exists()
-  ).toBe(false)
+it('does not show add-enrollment when a template course', () => {
+  const tooltip = 'Add Users to A'
+  const {queryByText} = renderRow(
+    <CoursesListRow {...props} can_create_enrollments={true} template={true} />
+  )
+  expect(queryByText(tooltip)).toBeNull()
 })
 
 it('shows the teacher count when needed', () => {
-  const wrapper = mount(renderRow(<CoursesListRow {...props} teacher_count={3} teachers={null} />))
-  expect(wrapper.text()).toContain('3 teachers')
+  const {getByText} = renderRow(<CoursesListRow {...props} teacher_count={3} teachers={null} />)
+  expect(getByText('3 teachers', {exact: false})).toBeInTheDocument()
 })
 
 it('shows published icon and tooltip for published course', () => {
-  const tooltip = 'Tooltip[renderTip="Published"] IconPublishSolid'
-  expect(
-    shallow(<CoursesListRow {...props} />)
-      .find(tooltip)
-      .exists()
-  ).toBe(true)
+  const { queryAllByText} = renderRow(
+    <CoursesListRow {...props} />
+  )
+  expect(queryAllByText('Published').length).toBeGreaterThan(0)
 })
 
 it('shows unpublished icon and tooltip for unpublished course', () => {
-  const tooltip = 'Tooltip[renderTip="Unpublished"] IconUnpublishedLine'
-  expect(
-    shallow(<CoursesListRow {...props} workflow_state={"unpublished"} />)
-      .find(tooltip)
-      .exists()
-  ).toBe(true)
+  const { queryAllByText} = renderRow(
+    <CoursesListRow {...props} workflow_state={"unpublished"} />
+  )
+  expect(queryAllByText('Unpublished').length).toBeGreaterThan(0)
 })
 
 it('shows completed icon and tooltip for concluded course', () => {
-  const tooltip = 'Tooltip[renderTip="Concluded"] IconCheckSolid'
-  expect(
-    shallow(<CoursesListRow {...props} workflow_state={"completed"} />)
-      .find(tooltip)
-      .exists()
-  ).toBe(true)
+  const { queryAllByText} = renderRow(
+    <CoursesListRow {...props} workflow_state={"completed"} />
+  )
+  expect(queryAllByText('Concluded').length).toBeGreaterThan(0)
 })

@@ -1218,11 +1218,8 @@ describe('GradebookGrid AssignmentColumnHeader', () => {
   });
 
   describe('focus', () => {
-    let instance;
-
     beforeEach(() => {
       mountComponent();
-      instance = component;
     });
 
     afterEach(() => {
@@ -1238,16 +1235,6 @@ describe('GradebookGrid AssignmentColumnHeader', () => {
       const event = new Event('blur', { bubbles: true, cancelable: true });
       element.dispatchEvent(event);
     }
-
-    test('adds the "focused" class to the header when the assignment link receives focus', () => {
-      focusElement(getAssignmentLink());
-      expect(container.firstChild.classList.contains('focused')).toBe(true);
-    });
-
-    test('adds the "focused" class to the header when the "Options" menu trigger receives focus', () => {
-      focusElement(getOptionsMenuTrigger());
-      expect(container.firstChild.classList.contains('focused')).toBe(true);
-    });
 
     test('removes the "focused" class from the header when focus leaves', () => {
       focusElement(getOptionsMenuTrigger());

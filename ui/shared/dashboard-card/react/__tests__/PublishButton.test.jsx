@@ -30,7 +30,7 @@ function createMockProps(opts = {}) {
     pagesUrl: '',
     defaultView: 'modules',
     frontPageTitle: '',
-    courseNickname: 'nickname',
+    courseNickname: 'the_course_nickname',
     onSuccess: null,
     ...opts,
   }

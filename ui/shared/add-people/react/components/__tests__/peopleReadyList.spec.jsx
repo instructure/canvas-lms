@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {shallow, mount} from 'enzyme'
+import {render} from '@testing-library/react'
 import PeopleReadyList from '../people_ready_list'
 
 const props = {
@@ -53,54 +53,52 @@ const props = {
 
 describe('PeopleReadyList', () => {
   test('renders the component', () => {
-    const wrapper = shallow(<PeopleReadyList {...props} />)
-    expect(wrapper.exists()).toBeTruthy()
+    const wrapper = render(<PeopleReadyList {...props} />)
+    expect(wrapper.getByTestId('people_ready_list')).toBeInTheDocument()
   })
 
   test('sets the correct values', () => {
-    const wrapper = mount(<PeopleReadyList {...props} />)
-    const peopleReadyList = wrapper.find('.addpeople__peoplereadylist')
+    const wrapper = render(<PeopleReadyList {...props} />)
+    const peopleReadyList = wrapper.container.querySelector('.addpeople__peoplereadylist')
 
-    const cols = peopleReadyList.find('thead th')
+    const cols = peopleReadyList.querySelectorAll('thead th')
     expect(cols).toHaveLength(5) // 5 columns
 
-    const rows = peopleReadyList.find('tbody tr')
+    const rows = peopleReadyList.querySelectorAll('tbody tr')
     expect(rows).toHaveLength(3) // 3 rows
 
-    const inst0 = rows.first().children().last().text()
+    const inst0 = rows[0].lastChild.textContent
     expect(inst0).toEqual(props.nameList[0].account_name) // first user has correct institution
 
-    const inst2 = rows.at(2).children().last().text()
+    const inst2 = rows[2].lastChild.textContent
     expect(inst2).toEqual(props.defaultInstitutionName) // last user has default institution name
 
-    const sisid = rows.at(1).children().at(3).text()
+    const sisid = rows[1].children[3].textContent
     expect(sisid).toEqual(props.nameList[1].sis_user_id) // 'middle user has sis id displayed'
   })
 
   test('shows no users message when no users', () => {
-    const wrapper = shallow(<PeopleReadyList nameList={[]} />)
-    const peopleReadyList = wrapper.find('.addpeople__peoplereadylist')
+    const wrapper = render(<PeopleReadyList nameList={[]} />)
+    const peopleReadyList = wrapper.container.querySelector('.addpeople__peoplereadylist')
 
-    const tbls = peopleReadyList.find('table')
-    expect(tbls.exists()).toBeFalsy()
+    const tbls = peopleReadyList.querySelector('table')
+    expect(tbls).toBeFalsy()
 
-    expect(peopleReadyList.find('Alert').prop('children')).toEqual(
-      'No users were selected to add to the course'
-    )
+    expect(wrapper.getByText('No users were selected to add to the course')).toBeInTheDocument()
   })
 
   test('hides SIS ID column if not permitted', () => {
-    let wrapper = mount(<PeopleReadyList {...props} canReadSIS={true} />)
-    let peopleReadyList = wrapper.find('.addpeople__peoplereadylist')
+    let wrapper = render(<PeopleReadyList {...props} canReadSIS={true} />)
+    let peopleReadyList = wrapper.container.querySelector('.addpeople__peoplereadylist')
 
-    let cols = peopleReadyList.find('thead th')
+    let cols = peopleReadyList.querySelectorAll('thead th')
     expect(cols.length).toEqual(5) // incluldes SIS ID column
-    expect(cols.at(3).text()).toEqual('SIS ID')
+    expect(cols[3].textContent).toEqual('SIS ID')
 
-    wrapper = mount(<PeopleReadyList {...props} canReadSIS={false} />)
-    peopleReadyList = wrapper.find('.addpeople__peoplereadylist')
+    wrapper.rerender(<PeopleReadyList {...props} canReadSIS={false} />)
+    peopleReadyList = wrapper.container.querySelector('.addpeople__peoplereadylist')
 
-    cols = peopleReadyList.find('thead th')
+    cols = peopleReadyList.querySelectorAll('thead th')
     expect(cols).toHaveLength(4) // does not inclulde SIS ID column
   })
 })

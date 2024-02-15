@@ -18,9 +18,11 @@
 
 import '@instructure/canvas-theme'
 import React from 'react'
-import {mount, shallow} from 'enzyme'
+import {render} from '@testing-library/react'
+import {Provider} from 'react-redux'
+import moxios from 'moxios'
+import configureStore from '../../store'
 import ExternalFeedsTray from '../ExternalFeedsTray'
-import {ConnectedRSSFeedList} from '../RSSFeedList'
 
 const defaultProps = () => ({
   atomFeedUrl: 'www.test.com',
@@ -32,12 +34,31 @@ const defaultProps = () => ({
   },
 })
 
-test('renders the ExternalFeedsTray component', () => {
-  const tree = mount(<ExternalFeedsTray {...defaultProps()} />)
-  expect(tree.exists()).toBe(true)
+const renderWithRedux = ui => {
+  const store = configureStore({})
+
+  const result = render(<Provider store={store}>{ui}</Provider>)
+
+  return result
+}
+
+beforeAll(() => {
+  moxios.install()
+  moxios.stubRequest('/api/v1/courses/1/external_feeds')
 })
 
-test('renders the AddExternalFeed component when user has permissions', () => {
+afterAll(() => {
+  moxios.uninstall()
+})
+
+it('renders the ExternalFeedsTray component', () => {
+  const ref = React.createRef()
+  const {getByText} = render(<ExternalFeedsTray {...defaultProps()} ref={ref} />)
+  expect(ref.current).not.toBeNull()
+  expect(getByText('External Feeds')).toBeInTheDocument()
+})
+
+it('renders the AddExternalFeed component when user has permissions', async () => {
   const props = defaultProps()
   props.permissions = {
     create: true,
@@ -45,12 +66,12 @@ test('renders the AddExternalFeed component when user has permissions', () => {
     manage_course_content_delete: false,
     moderate: false,
   }
-  const tree = shallow(<ExternalFeedsTray {...props} />)
-  const node = tree.find('.announcements-tray__add-rss-root')
-  expect(node).toHaveLength(1)
+  const tree = renderWithRedux(<ExternalFeedsTray {...props} defaultOpen={true} />)
+  await tree.findByTestId('announcements-tray__content')
+  expect(tree.getByTestId('announcements-tray__add-rss-root')).toBeInTheDocument()
 })
 
-test('does not render the AddExternalFeed component when user is student', () => {
+it('does not render the AddExternalFeed component when user is student', async () => {
   const props = defaultProps()
   props.permissions = {
     create: false,
@@ -58,12 +79,12 @@ test('does not render the AddExternalFeed component when user is student', () =>
     manage_course_content_delete: false,
     moderate: false,
   }
-  const tree = shallow(<ExternalFeedsTray {...props} />)
-  const node = tree.find('.announcements-tray__add-rss-root')
-  expect(node).toHaveLength(0)
+  const tree = renderWithRedux(<ExternalFeedsTray {...props} defaultOpen={true} />)
+  await tree.findByTestId('announcements-tray__content')
+  expect(tree.queryByTestId('announcements-tray__add-rss-root')).not.toBeInTheDocument()
 })
 
-test('does not render the RSSFeedList component when user is student', () => {
+it('does not render the RSSFeedList component when user is student', () => {
   const props = defaultProps()
   props.permissions = {
     create: false,
@@ -71,18 +92,18 @@ test('does not render the RSSFeedList component when user is student', () => {
     manage_course_content_delete: false,
     moderate: false,
   }
-  const tree = shallow(<ExternalFeedsTray {...props} />)
-  const node = tree.find(ConnectedRSSFeedList)
-  expect(node).toHaveLength(0)
+  const tree = renderWithRedux(<ExternalFeedsTray {...props} defaultOpen={true} />)
+  expect(tree.queryByTestId('external-rss-feed')).not.toBeInTheDocument()
 })
 
-test('renders the external feeds link', () => {
-  const tree = mount(<ExternalFeedsTray {...defaultProps()} />)
-  const node = tree.find('Link').first()
-  expect(node.text()).toBe('External Feeds')
+it('renders the external feeds link', async () => {
+  const tree = renderWithRedux(<ExternalFeedsTray {...defaultProps()} defaultOpen={true} />)
+  expect(await tree.findByTestId('external-feed-link')).toBeInTheDocument()
+  expect(tree.getAllByText('External Feeds')).toHaveLength(2) // the Link and the Tray
 })
 
-test('renders the RSS feed link', () => {
-  const tree = shallow(<ExternalFeedsTray {...defaultProps()} />)
-  expect(tree.find('#rss-feed-link').prop('children')).toMatch('RSS Feed')
+it('renders the RSS feed link', async () => {
+  const tree = renderWithRedux(<ExternalFeedsTray {...defaultProps()} defaultOpen={true} />)
+  expect(await tree.findByTestId('rss-feed-link')).toBeInTheDocument()
+  expect(tree.getByText('RSS Feed')).toBeInTheDocument()
 })

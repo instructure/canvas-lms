@@ -25,7 +25,9 @@ import fetchOutcomes from '../fetchOutcomes'
 jest.mock('../fetchOutcomes')
 
 beforeEach(() => {
-  fetchOutcomes.mockImplementation(() => Promise.resolve(null))
+  fetchOutcomes.mockImplementation(() => {
+    return Promise.resolve({outcomeGroups: [], outcomes: []})
+  })
 })
 
 const props = {
@@ -43,7 +45,6 @@ it('attempts to load when mounted', () => {
   render(<IndividualStudentMastery {...props} />)
   expect(fetchOutcomes).toHaveBeenCalled()
 })
-
 it('renders error when error occurs during fetch', async () => {
   fetchOutcomes.mockImplementation(() => Promise.reject(new Error('foo')))
   const {findByText} = render(<IndividualStudentMastery {...props} />)

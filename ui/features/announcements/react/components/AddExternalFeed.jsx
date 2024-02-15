@@ -229,7 +229,12 @@ export default class AddExternalFeed extends React.Component {
 
   render() {
     return (
-      <View id="external-rss-feed__header" display="block" textAlign="start">
+      <View
+        id="external-rss-feed__header"
+        data-testid="external-rss-feed"
+        display="block"
+        textAlign="start"
+      >
         <span id="external-rss-feed__toggle-button" ref={this.toggleRef}>
           <ToggleDetails
             id="external-rss-feed__toggle"

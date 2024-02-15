@@ -157,7 +157,7 @@ class FileUpload extends React.Component {
     return (
       <>
         {isUploading || (
-          <div className={classes} onDrop={this.handleParentDrop}>
+          <div data-testid="fileUpload" className={classes} onDrop={this.handleParentDrop}>
             {this.renderDropZone()}
           </div>
         )}

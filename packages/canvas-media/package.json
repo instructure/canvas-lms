@@ -69,12 +69,14 @@
     "format-message-generate-id": "^6",
     "lodash": "^4",
     "prop-types": "^15",
-    "react": "^16",
-    "react-dom": "^16"
+    "react": "^18",
+    "react-dom": "^18"
   },
   "devDependencies": {
     "@testing-library/dom": "^8",
+    "@testing-library/jest-dom": "^5",
     "@testing-library/react": "^12",
+    "@testing-library/user-event": "^14",
     "moxios": "^0.4",
     "shelljs": "^0.8.4",
     "sinon": "^7"

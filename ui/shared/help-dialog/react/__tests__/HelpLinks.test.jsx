@@ -86,7 +86,6 @@ describe('HelpLinks', () => {
   })
 
   afterEach(() => {
-    window.ENV = {}
     global.window.location = savedLocation
   })
 
