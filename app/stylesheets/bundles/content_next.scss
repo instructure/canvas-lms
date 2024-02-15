@@ -117,7 +117,17 @@
   }
 
   .view_assign {
-    margin-inline-end: 12px;
+    margin-inline-end: 9px;
+    a {
+      @include ic-focus-base;
+      border-radius: 3px;
+      padding: 3px;
+      &:focus {
+        @include button-focus-light;
+        position: relative;
+        text-decoration: none;
+      }
+    }
   }
 
   .module_header_items{
