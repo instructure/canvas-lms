@@ -82,9 +82,17 @@ export const CriterionModal = ({criterion, isOpen, onDismiss, onSave}: Criterion
   const [draggedOverIndex, setDraggedOverIndex] = useState<number>()
 
   const addRating = (index: number) => {
+    const isFirstIndex = index === 0
+    const isLastIndex = index === ratings.length
+    const points = isFirstIndex
+      ? ratings[0].points + 1
+      : isLastIndex
+      ? Math.max(ratings[index - 1].points - 1, 0)
+      : Math.round((ratings[index].points + ratings[index - 1].points) / 2)
+
     const newRating = {
       id: '-1',
-      points: 0,
+      points,
       description: '',
       longDescription: '',
     }
@@ -124,7 +132,31 @@ export const CriterionModal = ({criterion, isOpen, onDismiss, onSave}: Criterion
   const updateRating = (index: number, rating: RubricRating) => {
     const newRatings = [...ratings]
     newRatings[index] = rating
+
     setRatings(newRatings)
+  }
+
+  const reorderRatings = () => {
+    const newRatings = [...ratings]
+
+    const ratingPoints = newRatings.map(r => ({points: r.points, id: r.id}))
+    const ratingNameAndDescription = newRatings.map(r => ({
+      description: r.description,
+      longDescription: r.longDescription,
+    }))
+
+    const ratingPointsReordered = ratingPoints.sort((a, b) => b.points - a.points)
+
+    const finalRatings: RubricRating[] = ratingPointsReordered.map((r, index) => {
+      return {
+        id: r.id,
+        points: r.points,
+        description: ratingNameAndDescription[index].description,
+        longDescription: ratingNameAndDescription[index].longDescription,
+      }
+    })
+
+    setRatings(finalRatings)
   }
 
   const saveChanges = () => {
@@ -315,6 +347,7 @@ export const CriterionModal = ({criterion, isOpen, onDismiss, onSave}: Criterion
                   onDragStart={() => setDraggedRatingIndex(index)}
                   onDragEnd={handleDragEnd}
                   onDragLeave={handleDragLeave}
+                  onPointsBlur={reorderRatings}
                 />
               </View>
             )
@@ -369,6 +402,7 @@ type RatingRowProps = {
   onDragDrop: (e: React.DragEvent, index: number) => void
   onDragLeave: (e: React.DragEvent) => void
   onDragEnd: () => void
+  onPointsBlur: () => void
 }
 const RatingRow = ({
   criterionUseRange,
@@ -385,8 +419,9 @@ const RatingRow = ({
   onDragDrop,
   onDragEnd,
   onDragLeave,
+  onPointsBlur,
 }: RatingRowProps) => {
-  const setRatingForm = <K extends keyof RubricRating>(key: K, value: RubricRating[K]) => {
+  function setRatingForm<K extends keyof RubricRating>(key: K, value: RubricRating[K]) {
     onChange({...rating, [key]: value})
   }
 
@@ -441,6 +476,7 @@ const RatingRow = ({
                 onChange={(e, value) => setRatingForm('points', setNumber(Number(value ?? 0)))}
                 data-testid="rating-points"
                 width="4.938rem"
+                onBlur={onPointsBlur}
               />
             </Flex.Item>
           </Flex>

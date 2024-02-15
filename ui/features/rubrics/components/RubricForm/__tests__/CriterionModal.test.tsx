@@ -75,7 +75,7 @@ describe('CriterionModal tests', () => {
       const ratingName = totalRatingNames[1] as HTMLInputElement
       const ratingPoints = queryAllByTestId(`rating-points`)[1] as HTMLInputElement
       const ratingScale = queryAllByTestId(`rating-scale`)[1] as HTMLInputElement
-      expect(ratingPoints.value).toEqual('0')
+      expect(ratingPoints.value).toEqual(DEFAULT_RUBRIC_RATINGS[0].points.toString())
       expect(ratingName.value).toEqual('')
       expect(ratingScale.value).toEqual((DEFAULT_RUBRIC_RATINGS.length - 1).toString())
     })
@@ -143,6 +143,60 @@ describe('CriterionModal tests', () => {
 
       expect(newFirstIndex).toEqual(2)
       expect(newLastIndex).toEqual(1)
+    })
+
+    it('should reorder ratings when a rating is changed to be higher than the top rating', () => {
+      const ratings = [
+        {id: '1', description: 'First Rating', points: 10, longDescription: ''},
+        {id: '1', description: 'Second Rating', points: 8, longDescription: ''},
+        {id: '1', description: 'Third Rating', points: 6, longDescription: ''},
+        {id: '1', description: 'Fourth Rating', points: 4, longDescription: ''},
+      ]
+      const criterion = getCriterion({ratings})
+      const {queryAllByTestId} = renderComponent({criterion})
+      const ratingPoints = queryAllByTestId(`rating-points`)[2] as HTMLInputElement
+
+      fireEvent.change(ratingPoints, {target: {value: '20'}})
+      fireEvent.blur(ratingPoints)
+
+      const totalRatingNames = queryAllByTestId('rating-name') as HTMLInputElement[]
+      expect(totalRatingNames[0].value).toEqual(ratings[0].description)
+      expect(totalRatingNames[1].value).toEqual(ratings[1].description)
+      expect(totalRatingNames[2].value).toEqual(ratings[2].description)
+      expect(totalRatingNames[3].value).toEqual(ratings[3].description)
+
+      const totalRatingPoints = queryAllByTestId('rating-points') as HTMLInputElement[]
+      expect(totalRatingPoints[0].value).toEqual('20')
+      expect(totalRatingPoints[1].value).toEqual('10')
+      expect(totalRatingPoints[2].value).toEqual('8')
+      expect(totalRatingPoints[3].value).toEqual('4')
+    })
+
+    it('should reorder ratings when a rating is changed to be lower than a previous rating', () => {
+      const ratings = [
+        {id: '1', description: 'First Rating', points: 10, longDescription: ''},
+        {id: '1', description: 'Second Rating', points: 8, longDescription: ''},
+        {id: '1', description: 'Third Rating', points: 6, longDescription: ''},
+        {id: '1', description: 'Fourth Rating', points: 4, longDescription: ''},
+      ]
+      const criterion = getCriterion({ratings})
+      const {queryAllByTestId} = renderComponent({criterion})
+      const ratingPoints = queryAllByTestId(`rating-points`)[0] as HTMLInputElement
+
+      fireEvent.change(ratingPoints, {target: {value: '2'}})
+      fireEvent.blur(ratingPoints)
+
+      const totalRatingNames = queryAllByTestId('rating-name') as HTMLInputElement[]
+      expect(totalRatingNames[0].value).toEqual(ratings[0].description)
+      expect(totalRatingNames[1].value).toEqual(ratings[1].description)
+      expect(totalRatingNames[2].value).toEqual(ratings[2].description)
+      expect(totalRatingNames[3].value).toEqual(ratings[3].description)
+
+      const totalRatingPoints = queryAllByTestId('rating-points') as HTMLInputElement[]
+      expect(totalRatingPoints[0].value).toEqual('8')
+      expect(totalRatingPoints[1].value).toEqual('6')
+      expect(totalRatingPoints[2].value).toEqual('4')
+      expect(totalRatingPoints[3].value).toEqual('2')
     })
   })
 
