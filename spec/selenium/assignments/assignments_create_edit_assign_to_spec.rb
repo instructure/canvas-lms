@@ -61,7 +61,7 @@ shared_examples_for "item assign to tray during assignment creation/update" do
     update_until_date(1, "1/7/2023")
     update_until_time(1, "9:00 PM")
 
-    click_save_button
+    click_save_button("Apply")
 
     keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
     expect(AssignmentCreateEditPage.pending_changes_pill_exists?).to be_truthy
@@ -100,7 +100,7 @@ shared_examples_for "item assign to tray during assignment creation/update" do
     update_until_date(1, "1/7/2023")
     update_until_time(1, "9:00 PM")
 
-    click_save_button
+    click_save_button("Apply")
 
     keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
 
@@ -188,7 +188,7 @@ describe "assignments show page assign to", :ignore_js_errors do
       click_add_assign_to_card
       select_module_item_assignee(1, @student1.name)
 
-      click_save_button
+      click_save_button("Apply")
 
       keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
 
@@ -219,7 +219,7 @@ describe "assignments show page assign to", :ignore_js_errors do
       @student2 = student_in_course(course: @course, active_all: true, name: "Student 2").user
     end
 
-    it "assigns student to NQ assignment and saves" do
+    it "assigns student to NQ assignment and saves", :ignore_js_errors do
       AssignmentCreateEditPage.visit_assignment_edit_page(@course.id, @nq_assignment.id)
       AssignmentCreateEditPage.click_manage_assign_to_button
 
@@ -235,7 +235,7 @@ describe "assignments show page assign to", :ignore_js_errors do
       update_until_date(1, "1/7/2023")
       update_until_time(1, "9:00 PM")
 
-      click_save_button
+      click_save_button("Apply")
 
       keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
 

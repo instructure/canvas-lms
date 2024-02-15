@@ -310,6 +310,7 @@ const DifferentiatedModulesSection = ({
         iconType={type}
         itemContentId={assignmentId}
         pointsPossible={pointsPossible}
+        useApplyButton={true}
         locale={ENV.LOCALE || 'en'}
         timezone={ENV.TIMEZONE || 'UTC'}
         defaultCards={cards}
