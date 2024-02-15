@@ -96,7 +96,7 @@ describe('DifferentiatedModulesSection', () => {
         const {getByRole, getByTestId} = render(<DifferentiatedModulesSection {...props} onSync={onSyncMock} />)
 
         getByTestId('manage-assign-to').click()
-        getByRole('button', {name: 'Save'}).click()
+        getByRole('button', {name: 'Apply'}).click()
         expect(onSyncMock).toHaveBeenCalledWith(assignmentcollection.models, props.importantDates)
     })
 

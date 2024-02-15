@@ -139,6 +139,7 @@ export interface ItemAssignToTrayProps {
   defaultCards?: ItemAssignToCardSpec[]
   defaultDisabledOptionIds?: string[]
   defaultSectionId?: string
+  useApplyButton: boolean
   onAddCard?: () => void
   onAssigneesChange?: (
     cardId: string,
@@ -169,6 +170,7 @@ export default function ItemAssignToTray({
   onDatesChange,
   onCardRemove,
   defaultSectionId,
+  useApplyButton = false,
 }: ItemAssignToTrayProps) {
   const [assignToCards, setAssignToCards] = useState<ItemAssignToCardSpec[]>(defaultCards ?? [])
   const [initialCards, setInitialCards] = useState<ItemAssignToCardSpec[]>([])
@@ -557,10 +559,10 @@ export default function ItemAssignToTray({
 
   function Footer() {
     return (
-      <Flex.Item width="100%">
+      <Flex.Item data-testid="module-item-edit-tray-footer" width="100%">
         <TrayFooter
           updateInteraction={allCardsValid() ? 'enabled' : 'inerror'}
-          saveButtonLabel={I18n.t('Save')}
+          saveButtonLabel={useApplyButton ? I18n.t('Apply') : I18n.t('Save')}
           onDismiss={handleDismiss}
           onUpdate={handleUpdate}
         />

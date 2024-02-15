@@ -135,6 +135,21 @@ describe('ItemAssignToTray', () => {
     expect(getByText('Quiz | 10 pts')).toBeInTheDocument()
   })
 
+  it('renders Save button', () => {
+    const {getByText} = renderComponent({useApplyButton: false})
+    expect(getByText('Save')).toBeInTheDocument()
+  })
+
+  it("renders Save button when it hasn't been passed", () => {
+    const {getByText} = renderComponent()
+    expect(getByText('Save')).toBeInTheDocument()
+  })
+
+  it('renders Apply button', () => {
+    const {getByText} = renderComponent({useApplyButton: true})
+    expect(getByText('Apply')).toBeInTheDocument()
+  })
+
   describe('pointsPossible display', () => {
     it('does not render points display if undefined', () => {
       const {getByText, queryByText, getByLabelText} = renderComponent({pointsPossible: undefined})
