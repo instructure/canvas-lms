@@ -50,20 +50,12 @@ QUnit.test('tooltip shows on mouseenter', function (assert) {
 QUnit.test('tooltip hides on mouseleave', function (assert) {
   const done = assert.async()
   const $tooltipTarget = $('#test-tooltip')
-  let tooltipClosed = false
   $tooltipTarget.tooltip('open')
   $tooltipTarget.on('tooltipclose', function () {
-    // this flag prevents “Too many calls to the `assert.async` callback” error
-    if (!tooltipClosed) {
-      assert.ok(true, 'tooltip is hidden on mouseleave')
-      tooltipClosed = true
-      done()
-    }
+    assert.ok(true, 'tooltip is hidden on mouseleave')
+    done()
   })
-  // trigger mouseleave event after a delay to allow time for tooltipclose event to be triggered
-  setTimeout(function () {
-    $tooltipTarget.trigger('mouseleave')
-  }, 1000)
+  $tooltipTarget.trigger('mouseleave')
 })
 
 QUnit.test('Custom content is displayed', function (assert) {
