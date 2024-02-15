@@ -919,6 +919,46 @@ describe "discussions" do
         expect(dt.assignment.automatic_peer_reviews).to be true
       end
 
+      describe "when updating Assign To" do
+        before do
+          course.course_sections.create!(name: "Section 3")
+          course.course_sections.create!(name: "Section 4")
+
+          get "/courses/#{course.id}/discussion_topics/new"
+          f("input[placeholder='Topic Title']").send_keys "Assign To warning in topic creation"
+
+          force_click('input[type=checkbox][value="graded"]')
+          wait_for_ajaximations
+
+          f("button[title='Remove Everyone']").click
+        end
+
+        it "shows warning when not all sections are assigned" do
+          f("button[data-testid='save-and-publish-button']").click
+
+          expect(fj("span:contains('Not all sections will be assigned this item.')")).to be_present
+          course.course_sections.each do |section|
+            expect(fj("span:contains('#{section.name}')")).to be_present
+          end
+        end
+
+        it "shows warning when not all sections are assigned but then, continues to create the discussion topic" do
+          # Assigns to one of the sections
+          f("input[data-testid='assign-to-select']").click
+          ff("span[data-testid='assign-to-select-option']")[1].click
+
+          f("button[data-testid='save-and-publish-button']").click
+
+          expect(fj("span:contains('Not all sections will be assigned this item.')")).to be_present
+
+          f("button[data-testid='continue-button']").click
+          wait_for_ajaximations
+
+          dt = DiscussionTopic.last
+          expect(dt.title).to eq "Assign To warning in topic creation"
+        end
+      end
+
       it "creates a discussion topic with an assignment with manual peer reviews" do
         get "/courses/#{course.id}/discussion_topics/new"
 
@@ -1168,6 +1208,9 @@ describe "discussions" do
           f("button[data-testid='save-and-publish-button']").click
           wait_for_ajaximations
 
+          f("button[data-testid='continue-button']").click
+          wait_for_ajaximations
+
           dt = DiscussionTopic.last
           expect(dt.title).to eq title
           expect(dt.assignment.name).to eq title
@@ -1204,6 +1247,9 @@ describe "discussions" do
           assign_to_element.send_keys :enter
 
           f("button[data-testid='save-and-publish-button']").click
+          wait_for_ajaximations
+
+          f("button[data-testid='continue-button']").click
           wait_for_ajaximations
 
           dt = DiscussionTopic.last
@@ -1251,6 +1297,9 @@ describe "discussions" do
           f("button[data-testid='save-and-publish-button']").click
           wait_for_ajaximations
 
+          f("button[data-testid='continue-button']").click
+          wait_for_ajaximations
+
           dt = Assignment.last.discussion_topic
           expect(dt.title).to eq title
           expect(dt.assignment.name).to eq title
@@ -1291,6 +1340,9 @@ describe "discussions" do
           assign_to_element.send_keys :enter
 
           f("button[data-testid='save-and-publish-button']").click
+          wait_for_ajaximations
+
+          f("button[data-testid='continue-button']").click
           wait_for_ajaximations
 
           dt = DiscussionTopic.last
@@ -1345,6 +1397,9 @@ describe "discussions" do
           assign_to_element.send_keys :enter
 
           f("button[data-testid='save-and-publish-button']").click
+          wait_for_ajaximations
+
+          f("button[data-testid='continue-button']").click
           wait_for_ajaximations
 
           dt = Assignment.last.discussion_topic
@@ -1415,6 +1470,9 @@ describe "discussions" do
           f("button[data-testid='save-and-publish-button']").click
           wait_for_ajaximations
 
+          f("button[data-testid='continue-button']").click
+          wait_for_ajaximations
+
           dt = Assignment.last.discussion_topic
           expect(dt.title).to eq title
           expect(dt.assignment.name).to eq title
@@ -1462,6 +1520,9 @@ describe "discussions" do
           assign_to_element.send_keys :enter
 
           f("button[data-testid='save-and-publish-button']").click
+          wait_for_ajaximations
+
+          f("button[data-testid='continue-button']").click
           wait_for_ajaximations
 
           dt = Assignment.last.discussion_topic

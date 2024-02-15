@@ -55,6 +55,8 @@ import {
   buildAssignmentOverrides,
   buildDefaultAssignmentOverride,
 } from '../../util/utils'
+import {MissingSectionsWarningModal} from '../MissingSectionsWarningModal/MissingSectionsWarningModal'
+import {flushSync} from 'react-dom'
 
 const I18n = useI18nScope('discussion_create')
 
@@ -237,6 +239,10 @@ export default function DiscussionTopicForm({
     !!currentDiscussionTopic?.assignment?.peerReviews?.intraReviews || false
   )
 
+  const [lastShouldPublish, setLastShouldPublish] = useState(false)
+  const [missingSections, setMissingSections] = useState([])
+  const [shouldShowMissingSectionsWarning, setShouldShowMissingSectionsWarning] = useState(false)
+
   const handleSettingUsageRightsData = data => {
     setUsageRightsErrorState(false)
     setUsageRightsData(data)
@@ -367,7 +373,7 @@ export default function DiscussionTopicForm({
 
   const validatePostToSections = () => {
     // If the PostTo section is not available, no need to validate
-    if (!(!isGraded && !isGroupDiscussion && !isGroupContext)) {
+    if (!shouldShowPostToSectionOption) {
       return true
     }
 
@@ -628,13 +634,44 @@ export default function DiscussionTopicForm({
     }
   }
 
-  const submitForm = shouldPublish => {
+  const continueSubmitForm = shouldPublish => {
     if (validateFormFields()) {
       const payload = createSubmitPayload(shouldPublish)
       onSubmit(payload)
       return true
     }
     return false
+  }
+
+  const submitForm = shouldPublish => {
+    if (shouldShowAvailabilityOptions && isGraded) {
+      const selectedAssignedTo = assignedInfoList.map(info => info.assignedList).flatMap(x => x)
+      const isEveryoneOrEveryoneElseSelected = selectedAssignedTo.some(
+        assignedTo =>
+          assignedTo === defaultEveryoneOption.assetCode ||
+          assignedTo === defaultEveryoneElseOption.assetCode
+      )
+
+      if (!isEveryoneOrEveryoneElseSelected) {
+        const selectedSectionIds = selectedAssignedTo
+          .filter(assignedTo => String(assignedTo).startsWith('course_section_'))
+          .map(assignedTo => assignedTo.split('_')[2])
+
+        const missingSectionObjs = sections.filter(
+          section => !selectedSectionIds.includes(section.id)
+        )
+
+        if (missingSectionObjs.length > 0) {
+          setLastShouldPublish(shouldPublish)
+          setMissingSections(missingSectionObjs)
+          setShouldShowMissingSectionsWarning(true)
+
+          return false
+        }
+      }
+    }
+
+    return continueSubmitForm(shouldPublish)
   }
 
   const renderLabelWithPublishStatus = () => {
@@ -678,6 +715,14 @@ export default function DiscussionTopicForm({
     } else {
       setPostToValidationMessages([])
     }
+  }
+
+  const closeMissingSectionsWarningModal = () => {
+    // If we don't do this, the focus will not go to the correct field if there is a validation error.
+    flushSync(() => {
+      setShouldShowMissingSectionsWarning(false)
+      setMissingSections([])
+    })
   }
 
   return (
@@ -1179,6 +1224,16 @@ export default function DiscussionTopicForm({
           )}
         </View>
       </FormFieldGroup>
+      {shouldShowMissingSectionsWarning && (
+        <MissingSectionsWarningModal
+          sections={missingSections}
+          onClose={closeMissingSectionsWarningModal}
+          onContinue={() => {
+            closeMissingSectionsWarningModal()
+            continueSubmitForm(lastShouldPublish)
+          }}
+        />
+      )}
     </>
   )
 }
