@@ -9850,6 +9850,7 @@ el:
   move_dialog_select: 
     move_to_end: "-- Στο κάτω μέρος --"
   move_module_item_77754119: "Μετακίνηση Ενότητας/Στοιχείου"
+  move_name_to_a_new_group_acabed4e: "Μετακίνηση του/της %{name} σε νέα ομάδα"
   move_outcome_ce497e6c: "Μετακίνηση Αποτελέσματος"
   move_outcome_group_cfa1a505: "Μετακίνηση Ομάδας Αποτελεσμάτων"
   move_to_1c208ae5: "Μεταφορά Προς..."
@@ -12770,6 +12771,8 @@ el:
   remove_icon_a4646413: "αφαίρεση εικονιδίου"
   remove_image_341340b3: "Αφαίρεση Εικόνας"
   remove_media_comment_f4afdb4b: "Αφαίρεση πολυμεσιτικού σχόλιου"
+  remove_name_as_leader_3e03780a: "Αφαίρεση %{name} από αρχηγό"
+  remove_name_from_group_487cce74: "Αφαίρεση %{name} από την ομάδα"
   remove_recipient_name_a6b83cef: "Αφαίρεση παραλήπτη %{name}"
   remove_row_c198da5a: "Αφαίρεση σειράς"
   remove_student_from_recipients_4b206e35: "Αφαίρεση του/της %{student} από τους παραλήπτες"
