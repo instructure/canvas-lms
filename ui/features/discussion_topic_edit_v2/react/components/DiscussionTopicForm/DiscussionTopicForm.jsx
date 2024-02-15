@@ -57,6 +57,7 @@ import {
 } from '../../util/utils'
 import {MissingSectionsWarningModal} from '../MissingSectionsWarningModal/MissingSectionsWarningModal'
 import {flushSync} from 'react-dom'
+import {SavingDiscussionTopicOverlay} from '../SavingDiscussionTopicOverlay/SavingDiscussionTopicOverlay'
 
 const I18n = useI18nScope('discussion_create')
 
@@ -71,6 +72,8 @@ export default function DiscussionTopicForm({
   onSubmit,
   isGroupContext,
   apolloClient,
+  isSubmitting,
+  setIsSubmitting,
 }) {
   const rceRef = useRef()
   const textInputRef = useRef()
@@ -635,11 +638,20 @@ export default function DiscussionTopicForm({
   }
 
   const continueSubmitForm = shouldPublish => {
+    setTimeout(() => {
+      setIsSubmitting(true)
+    }, 0)
+
     if (validateFormFields()) {
       const payload = createSubmitPayload(shouldPublish)
       onSubmit(payload)
       return true
     }
+
+    setTimeout(() => {
+      setIsSubmitting(false)
+    }, 0)
+
     return false
   }
 
@@ -1178,6 +1190,7 @@ export default function DiscussionTopicForm({
               onClick={() => {
                 window.location.assign(ENV.CANCEL_TO)
               }}
+              disabled={isSubmitting}
             >
               {I18n.t('Cancel')}
             </Button>
@@ -1190,6 +1203,7 @@ export default function DiscussionTopicForm({
                 color="secondary"
                 margin="xxx-small"
                 data-testid="save-and-publish-button"
+                disabled={isSubmitting}
               >
                 {I18n.t('Save and Publish')}
               </Button>
@@ -1204,6 +1218,7 @@ export default function DiscussionTopicForm({
               color="primary"
               margin="xxx-small"
               data-testid="announcement-submit-button"
+              disabled={isSubmitting}
             >
               {willAnnouncementPostRightAway ? I18n.t('Publish') : I18n.t('Save')}
             </Button>
@@ -1218,6 +1233,7 @@ export default function DiscussionTopicForm({
                 submitForm(isEditing ? published : !ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MODERATE)
               }
               color="primary"
+              disabled={isSubmitting}
             >
               {I18n.t('Save')}
             </Button>
@@ -1234,6 +1250,7 @@ export default function DiscussionTopicForm({
           }}
         />
       )}
+      <SavingDiscussionTopicOverlay open={isSubmitting} />
     </>
   )
 }
@@ -1249,6 +1266,8 @@ DiscussionTopicForm.propTypes = {
   onSubmit: PropTypes.func,
   isGroupContext: PropTypes.bool,
   apolloClient: PropTypes.object,
+  isSubmitting: PropTypes.bool,
+  setIsSubmitting: PropTypes.func,
 }
 
 DiscussionTopicForm.defaultProps = {
@@ -1258,4 +1277,6 @@ DiscussionTopicForm.defaultProps = {
   sections: [],
   groupCategories: [],
   onSubmit: () => {},
+  isSubmitting: false,
+  setIsSubmitting: () => {},
 }
