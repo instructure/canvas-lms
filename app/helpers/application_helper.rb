@@ -196,7 +196,7 @@ module ApplicationHelper
     # if there is a moment locale besides english set, put a script tag for it
     # so it is loaded and ready before we run any of our app code
     if js_env[:MOMENT_LOCALE] && js_env[:MOMENT_LOCALE] != "en"
-      paths << ::Canvas::Cdn.registry.scripts_for(
+      paths += ::Canvas::Cdn.registry.scripts_for(
         "moment/locale/#{js_env[:MOMENT_LOCALE]}"
       )
     end

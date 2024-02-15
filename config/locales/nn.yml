@@ -2118,6 +2118,7 @@ nn:
   active_directory_lookup_attribute_d317cb60: "Active Directory oppslagsattributt"
   active_directory_lookup_attribute_selector_d56a326f: "Active Directory oppslagsattributtveljar"
   active_enrollments_count_report_66bc3cae: "Rapport over antal aktive medlemskap"
+  active_grading_schemes_ae18f35e: "Aktive vurderingsskjema"
   active_students_e4c48a06: "Aktive studentar"
   active_terms_83df727e: "Aktive semester"
   activerecord: 
@@ -2892,9 +2893,12 @@ nn:
   allows_user_to_remove_a_course_as_a_course_templat_15e653d3: "Lar brukaren fjerne valet av eit emne som mal-emne i Emne Innstillingar"
   allows_user_to_remove_a_student_s_section_enrollme_78d1916e: "Lar brukaren fjerne ein student sitt seksjonsmedlemskap eller rolle"
   allows_user_to_remove_and_merge_users_in_an_accoun_b7e1aec7: "Lar brukaren fjerne og slå saman brukarar i ein konto."
+  allows_user_to_remove_assignment_blackout_dates_804b1d6d: "Lar brukar fjerne utestengelsesdatoar for oppgåver."
+  allows_user_to_remove_collaborators_on_all_collabo_b9ce6f29: "Lar brukar fjerne medarbeidarar på alle samarbeid."
   allows_user_to_remove_designers_from_a_course_fa9e887e: "Lar brukaren fjerne designarar frå eit emne."
   allows_user_to_remove_group_members_from_course_gr_4f745b58: "Lar brukaren fjerne gruppemedlemmar frå emnegrupper."
   allows_user_to_remove_observers_from_a_course_e090d53e: "Lar brukaren fjerne observatørar i eit emne."
+  allows_user_to_remove_selected_announcements_indiv_e238bba7: "Lar brukar fjerne valgte kunngjeringar enkeltvis eller fleire samtidig."
   allows_user_to_remove_students_from_a_course_70952ba6: "Lar brukaren fjerne studentar frå eit emne."
   allows_user_to_remove_students_from_account_or_cou_845945f9: "Lar brukaren fjerne studentar frå konto- eller emnegrupper."
   allows_user_to_remove_tas_from_a_course_c8002894: "Lar brukaren fjerne undervisingsassistentar frå eit emne."
@@ -2944,6 +2948,9 @@ nn:
   allows_user_to_start_conferences_they_created_281b03ea: "Lar brukarar starte konferanser som dei har oppretta."
   allows_user_to_sync_blueprint_courses_db4fcc03: "Lar brukaren synkronisere blåkopi-emner."
   allows_user_to_update_a_student_s_section_enrollme_80420ac9: "Lar brukaren oppdatere ein student sitt seksjonsmedlemskap eller rolle"
+  allows_user_to_update_modules_edit_module_settings_1f5cf0ae: "Lar brukar oppdatere modulane (redigere modulinnstillingar, publisere, avpublisere, endre fleire samtidig)."
+  allows_user_to_view_a_content_migration_content_li_6906f889: "Lar brukar sjå ei migrasjonsliste etter type."
+  allows_user_to_view_a_content_migration_notice_to__f4759b8a: "Lar brukar sjå ein merknad om migrering av innhald til ein \"pågåande import\"."
   allows_user_to_view_a_course_s_sis_id_5c4a4c50: "Gir ein brukar løyve til å sjå SIS-ID-ane til emna."
   allows_user_to_view_a_link_to_speedgrader_from_ass_8ed9b342: "Gir ein brukar løyve til å sjå lenke til SpeedGrader frå ei oppgåve."
   allows_user_to_view_a_link_to_the_faculty_journal__13b353a8: |-
@@ -2970,6 +2977,7 @@ nn:
   allows_user_to_view_and_configure_reports_in_accou_d3cee49f: "Lar brukaren sjå og håndtera rapportar i Konto Innstillingar"
   allows_user_to_view_and_edit_the_sis_id_and_integr_af6dc3f3: "Lar brukaren sjå og endre SIS-ID og integrasjons-ID i innloggingsdetaljane til ein brukar. "
   allows_user_to_view_and_edit_the_sis_id_and_integr_f206fdcb: "Gir brukarar løyve til å sjå og endre SIS-ID og integrasjons-ID i innloggingsdetaljane til ein brukar. "
+  allows_user_to_view_and_initiate_course_link_valid_982986c9: "Lar brukar sjå og starte validering av kurslenke."
   allows_user_to_view_and_insert_data_in_the_sis_id__921967c: "Gir ein brukar løyve til å sjå og legge inn data i SIS-ID-feltet."
   allows_user_to_view_and_link_questions_in_a_quiz_t_b899a247: "Gir ein brukar løyve til å sjå og lenke spørsmål i ein quiz til ein spørsmålsbank på kontinivå. Dersom deaktivert, vil brukaren kun sjå og lenke til spørsmålsbankar på eit emne. Aktiverer Administrer spørsmålsbanker-lenka på quizoversiktssida. "
   allows_user_to_view_and_link_questions_in_a_quiz_t_b971e002: |-
@@ -2977,6 +2985,8 @@ nn:
       bank på kontinivå. Dersom deaktivert, vil brukaren kun sjå og lenke til spørsmålsbankar på eit emne. Aktiverer Administrer spørsmålsbanker-lenka på quizoversiktssida.
   allows_user_to_view_and_link_questions_in_a_quiz_t_f6795580: "Gir ein brukar løyve til å sjå og lenke spørsmål i ein quiz til ein spørsmålsbank på kontonivå."
   allows_user_to_view_and_link_questions_in_a_quiz_t_f8c3d8de: "Lar brukaren sjå og lage lenke mellom spørsmål i ein quiz og ein spørsmålsbank på emnenivå"
+  allows_user_to_view_and_list_content_migrations_12449d80: "Lar brukar sjå og liste innhaldsmigrasjonar."
+  allows_user_to_view_and_list_course_paces_via_cour_e0cecf54: "Lar brukar vise og liste opp emnegjennomføring."
   allows_user_to_view_and_manage_authentication_opti_e1bb0ad3: "Gir brukar løyve til å sjå og administrere autentiseringsalternativ for heile kontoen."
   allows_user_to_view_and_manage_courses_in_the_acco_12333da2: "Gir ein brukar løyve til å sjå og administrere emne innafor ein konto."
   allows_user_to_view_and_manage_permissions_bdc80a1d: "Gir ein brukar løyve til å sjå og administrere løyve."
