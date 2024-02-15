@@ -24,7 +24,7 @@ require_relative "pages/new_user_edit_modal_page"
 require_relative "pages/edit_existing_user_modal_page"
 require_relative "pages/masquerade_page"
 
-describe "new account user search" do
+shared_examples_for "new account user search" do
   include_context "in-process server selenium tests"
   include NewUserSearchPage
   include NewCourseSearchPage
@@ -226,5 +226,23 @@ describe "new account user search" do
       new_pseudonym = Pseudonym.where(unique_id: email).first
       expect(new_pseudonym.user.name).to eq name
     end
+  end
+end
+
+describe "new account user search" do
+  context "when deleted_user_tools FF is ON" do
+    before(:once) do
+      Account.site_admin.enable_feature!(:deleted_user_tools)
+    end
+
+    include_examples "new account user search"
+  end
+
+  context "when deleted_user_tools FF is OFF" do
+    before(:once) do
+      Account.site_admin.disable_feature!(:deleted_user_tools)
+    end
+
+    include_examples "new account user search"
   end
 end
