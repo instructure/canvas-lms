@@ -173,9 +173,9 @@ GEM
       psych (>= 4.0.0)
     redis (5.1.0)
       redis-client (>= 0.17.0)
-    redis-client (0.19.1)
+    redis-client (0.20.0)
       connection_pool
-    redis-cluster-client (0.7.5)
+    redis-cluster-client (0.7.11)
       redis-client (~> 0.12)
     redis-clustering (5.1.0)
       redis (= 5.1.0)
