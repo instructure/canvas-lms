@@ -33,6 +33,16 @@ jest.mock('@canvas/do-fetch-api-effect/apiRequest', () => ({
 }))
 
 const mockedAxios = axios as jest.Mocked<typeof axios>
+
+const mockSearchParams = (defaultSearchParams = {}) => {
+  const setSearchParamsMock = jest.fn()
+  const searchParamsMock = new URLSearchParams(defaultSearchParams)
+  jest
+    .spyOn(ReactRouterDom, 'useSearchParams')
+    .mockReturnValue([searchParamsMock, setSearchParamsMock])
+  return {searchParamsMock, setSearchParamsMock}
+}
+
 describe('Enhanced Individual Wrapper Gradebook', () => {
   beforeEach(() => {
     ;(window.ENV as any) = setGradebookOptions()
@@ -43,10 +53,10 @@ describe('Enhanced Individual Wrapper Gradebook', () => {
     $.subscribe = jest.fn()
 
     setupCanvasQueries()
+    mockSearchParams()
   })
   afterEach(() => {
-    jest.spyOn(ReactRouterDom, 'useSearchParams').mockClear()
-    jest.resetAllMocks()
+    jest.clearAllMocks()
   })
 
   const renderEnhancedIndividualGradebookWrapper = (mockOverrides = []) => {

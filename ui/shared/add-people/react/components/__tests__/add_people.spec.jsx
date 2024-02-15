@@ -55,7 +55,7 @@ describe('Focus Handling', () => {
     expect(within(document.activeElement).queryByText('Cancel')).toBeInTheDocument()
   })
 
-  it('sends focus to the modal close button when people validation issues happen', () => {
+  it('sends focus to the modal close button when people validation issues happen', async () => {
     const props = {
       isOpen: true,
       courseParams: {

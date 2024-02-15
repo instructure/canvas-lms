@@ -4,6 +4,7 @@ The process of testing JavaScript sometimes confuses people. This document's goa
 is to alleviate that confusion and establish how to run JavaScript tests.
 
 ## Jest
+
 Whenever possible, which for now means when you are testing something that only imports
 stuff that does not use AMD imports (eg, it only requires
 stuff from app/jsx or node_modules), you should write your js tests for
@@ -35,7 +36,7 @@ it('sums numbers', () => {
 All `expect()` matchers supported by Jest are [extensively documented here](http://facebook.github.io/jest/docs/api.html#expect-value).<br>
 You can also use [`jest.fn()` and `expect(fn).toBeCalled()`](http://facebook.github.io/jest/docs/api.html#tobecalled) to create “spies” or mock functions and in jest tests you should probably use that instead of sinon mocks/spies/stubs like we use in our QUnit tests.
 
-*NOTE: You cannot run jest if there is anything with AMD, CoffeeScript, or some of the Webpack aliases (which lead to AMD or CoffeeScript).
+\*NOTE: You cannot run jest if there is anything with AMD, CoffeeScript, or some of the Webpack aliases (which lead to AMD or CoffeeScript).
 
 ### Testing Components
 
@@ -49,30 +50,14 @@ import ReactDOM from 'react-dom'
 import SomeComponent from './SomeComponent'
 
 it('renders without crashing', () => {
-  const div = document.createElement('div');
-  ReactDOM.render(<App />, div);
-});
+  const div = document.createElement('div')
+  ReactDOM.render(<App />, div)
+})
 ```
 
 This test mounts a component and makes sure that it didn’t throw during rendering. Tests like this provide a lot value with very little effort so they are great as a starting point.
 
 When you encounter bugs caused by changing components, you will gain a deeper insight into which parts of them are worth testing in your application. This might be a good time to introduce more specific tests asserting specific expected output or behavior.
-
-If you’d like to test components in isolation from the child components they render, we recommend using [`shallow()` rendering API](http://airbnb.io/enzyme/docs/api/shallow.html) from [Enzyme](http://airbnb.io/enzyme/). You can write a smoke test with it too:
-
-```js
-import React from 'react';
-import { shallow } from 'enzyme';
-import App from './App';
-
-it('renders without crashing', () => {
-  shallow(<App />);
-});
-```
-
-Unlike the previous smoke test using `ReactDOM.render()`, this test only renders `<App>` and doesn’t go deeper. For example, even if `<App>` itself renders a `<Button>` that throws, this test will pass. Shallow rendering is great for isolated unit tests, but you may still want to create some full rendering tests to ensure the components integrate correctly. Enzyme supports [full rendering with `mount()`](http://airbnb.io/enzyme/docs/api/mount.html), and you can also use it for testing state changes and component lifecycle.
-
-You can read the [Enzyme documentation](http://airbnb.io/enzyme/) for more testing techniques. Enzyme documentation uses Chai and Sinon for assertions but you don’t have to use them because Jest provides built-in `expect()` and `jest.fn()` for spies.
 
 All Jest matchers are [extensively documented here](http://facebook.github.io/jest/docs/api.html#expect-value).
 
@@ -84,16 +69,19 @@ Similarly, `fit()` lets you focus on a specific test without running any other t
 ### Running Tests
 
 To run all tests:
+
 ```
 yarn test:jest
 ```
 
 To run a subset of files or directories:
+
 ```
 yarn test:jest path/to/components/__tests__/spec.js path/to/other_component/ ...
 ```
 
 To rerun tests on a file change and/or debug remotely:
+
 ```
 yarn test:jest:debug path/to/components/__tests__/spec.js
 ```
@@ -116,7 +104,7 @@ notified without manually writing any assertions on the component output.
 
 ## Running QUnit Karma Tests
 
-A lot of the older stuff is still QUnit.  For more info on running those older tests, see the "Running js tests with webpack" section of [working_with_webpack.md](https://github.com/instructure/canvas-lms/blob/master/doc/working_with_webpack.md).
+A lot of the older stuff is still QUnit. For more info on running those older tests, see the "Running js tests with webpack" section of [working_with_webpack.md](https://github.com/instructure/canvas-lms/blob/master/doc/working_with_webpack.md).
 
 Tl;dr: run a single test in watch mode like:
 

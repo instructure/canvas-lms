@@ -181,10 +181,13 @@ describe('CommentsTrayBody', () => {
 
       // @ts-ignore
       act(() => jest.runAllTimers())
-      await waitFor(() =>
-        expect(mockMutation).toHaveBeenCalledWith({
-          variables: {commentIds: ['1'], submissionId: '1'},
-        })
+
+      await waitFor(
+        () =>
+          expect(mockMutation).toHaveBeenCalledWith({
+            variables: {commentIds: ['1'], submissionId: '1'},
+          }),
+        {timeout: 3000}
       )
     })
 

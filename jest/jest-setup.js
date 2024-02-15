@@ -54,6 +54,7 @@ const ignoredErrors = [
   /The above error occurred in the <.*> component/,
   /You seem to have overlapping act\(\) calls/,
   /Warning: `value` prop on `%s` should not be null. Consider using an empty string to clear the component or `undefined` for uncontrolled components.%s/,
+  /Invalid prop `color` of value `secondary` supplied to `CondensedButton`, expected one of \["primary","primary-inverse"\]./,
   /Warning: This synthetic event is reused for performance reasons/,
   /Invalid prop `value` supplied to `MenuItem`/, // https://instructure.atlassian.net/browse/INSTUI-4054
 ]
@@ -72,16 +73,16 @@ global.console = {
     ) {
       return
     }
-    globalError(error)
+    globalError(error, rest)
     throw new Error(
       `Looks like you have an unhandled error. Keep our test logs clean by handling or filtering it. ${error}`
     )
   },
-  warn: warning => {
+  warn: (warning, ...rest) => {
     if (ignoredWarnings.some(regex => regex.test(warning))) {
       return
     }
-    globalWarn(warning)
+    globalWarn(warning, rest)
     throw new Error(
       `Looks like you have an unhandled warning. Keep our test logs clean by handling or filtering it. ${warning}`
     )

@@ -108,7 +108,7 @@ export default class EquationEditorModal extends Component {
 
   handleModalDone = () => {
     const {onModalDismiss, onEquationSubmit} = this.props
-    const output = this.state.advanced ? this.state.workingFormula : this.mathField.getValue()
+    const output = this.state.advanced ? this.state.workingFormula : this.getMathFiled()
 
     if (output) {
       onEquationSubmit(output)
@@ -142,10 +142,10 @@ export default class EquationEditorModal extends Component {
   toggleAdvanced = () => {
     this.setState(state => {
       if (state.advanced) {
-        this.mathField.setValue(state.workingFormula || '')
+        this.setMathField(state.workingFormula || '')
         return {advanced: false, workingFormula: ''}
       } else {
-        return {advanced: true, workingFormula: this.mathField.getValue()}
+        return {advanced: true, workingFormula: this.getMathFiled()}
       }
     })
     this.setPreviewElementContent()
@@ -217,7 +217,7 @@ export default class EquationEditorModal extends Component {
     this.registerBasicEditorListener()
     this.setPreviewElementContent()
     this.stubMacros()
-    if (!this.state.advanced) this.mathField.setValue(this.state.workingFormula)
+    if (!this.state.advanced) this.setMathField(this.state.workingFormula)
     this.insertNewRange()
   }
 
@@ -233,6 +233,14 @@ export default class EquationEditorModal extends Component {
     // This effectively disables all of them to prevent
     // weird behaviors that users don't expect.
     this.mathField?.setOptions({macros: {}})
+  }
+
+  setMathField(formula){
+    this.mathField.setValue(formula)
+  }
+
+  getMathFiled(){
+    return this.mathField.getValue()
   }
 
   render = () => {

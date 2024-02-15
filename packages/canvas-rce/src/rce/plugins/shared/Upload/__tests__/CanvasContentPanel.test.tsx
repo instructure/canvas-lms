@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, screen, fireEvent, waitFor} from '@testing-library/react'
+import {render, screen, fireEvent, waitFor, act} from '@testing-library/react'
 import CanvasContentPanel from '../CanvasContentPanel'
 
 let files: any[]
@@ -150,8 +150,12 @@ describe('CanvasContentPanel', () => {
     const plugin = 'course_images'
 
     it('should update context on load', async () => {
-      renderComponent({plugin})
+      await act(async () => {
+        renderComponent({plugin})
+      })
+
       await waitForLoading()
+
       await waitFor(() => {
         expect(mockContent.onChangeContext).toHaveBeenCalledWith({
           contextType: 'course',

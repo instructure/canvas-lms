@@ -84,7 +84,11 @@ export default class RSSFeedList extends React.Component {
 
   renderFeedRow({display_name, id, external_feed_entries_count = 0, url}, index) {
     return (
-      <div key={id} className="announcements-tray-feed-row">
+      <div
+        key={id}
+        className="announcements-tray-feed-row"
+        data-testid="announcements-tray-feed-row"
+      >
         <View margin="small 0" display="block">
           <Grid
             startAt="medium"
@@ -131,13 +135,13 @@ export default class RSSFeedList extends React.Component {
   render() {
     if (!this.props.hasLoadedFeed) {
       return (
-        <div style={{textAlign: 'center'}}>
+        <div style={{textAlign: 'center'}} data-testid="rss-feed-list">
           <Spinner size="small" renderTitle={I18n.t('Adding RSS Feed')} />
         </div>
       )
     } else {
       return (
-        <View id="external_rss_feed__rss-list" display="block" textAlign="start">
+        <View id="external_rss_feed__rss-list" display="block" textAlign="start" data-testid="rss-feed-list">
           {this.props.feeds.map((feed, index) => this.renderFeedRow(feed, index))}
           <div className="announcements-tray-row" />
         </View>

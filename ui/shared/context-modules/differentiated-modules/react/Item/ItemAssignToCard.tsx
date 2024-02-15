@@ -352,9 +352,7 @@ export default forwardRef(function ItemAssignToCard(
       const unparsedFieldExists = unparsedFieldKeys.has(unparsedFieldKey)
       const newUnparsedFieldKeys = new Set(Array.from(unparsedFieldKeys))
 
-      // e.target is not working in the onBlur event from the DateTimeInput component.
-      // so if we get a null target, we asumme it's the time field
-      if (!target && timeInputRefs.current[unparsedFieldKey].value.length > 0) {
+      if (target && timeInputRefs.current[unparsedFieldKey].value.length > 0) {
         if (isEmpty && !unparsedFieldExists) {
           newUnparsedFieldKeys.add(unparsedFieldKey)
         }

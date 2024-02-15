@@ -545,6 +545,16 @@ describe('ViewRubrics Tests', () => {
     })
   })
 
+  describe('canManageRubrics permissions is false', () => {
+    it('should not render popover or create button', () => {
+      queryClient.setQueryData(['accountRubrics-1'], RUBRICS_QUERY_RESPONSE)
+      const {queryByTestId} = renderComponent({canManageRubrics: false})
+
+      expect(queryByTestId('rubric-options-1-button')).toBeNull()
+      expect(queryByTestId('create-new-rubric-button')).not.toBeInTheDocument()
+    })
+  })
+
   describe('archiving and un-archiving rubrics', () => {
     afterEach(() => {
       jest.clearAllMocks()
@@ -641,16 +651,6 @@ describe('ViewRubrics Tests', () => {
       getByText('Saved').click()
       expect(getByTestId('rubric-row-2')).toHaveTextContent('Rubric 2')
       expect(getByTestId('saved-rubrics-panel').querySelectorAll('tr').length).toEqual(4)
-    })
-  })
-
-  describe('canManageRubrics permissions is false', () => {
-    it('should not render popover or create button', () => {
-      queryClient.setQueryData(['accountRubrics-1'], RUBRICS_QUERY_RESPONSE)
-      const {queryByTestId} = renderComponent({canManageRubrics: false})
-
-      expect(queryByTestId('rubric-options-1-button')).toBeNull()
-      expect(queryByTestId('create-new-rubric-button')).not.toBeInTheDocument()
     })
   })
 })
