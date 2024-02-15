@@ -815,7 +815,7 @@ GEM
       hashery (~> 2.0)
       ruby-rc4
       ttfunk
-    pg (1.5.4)
+    pg (1.5.5)
     pg_query (5.1.0)
       google-protobuf (>= 3.22.3)
     prawn (2.4.0)
