@@ -26,7 +26,7 @@
 class UserPreferenceValue < ActiveRecord::Base
   belongs_to :user
   serialize :value
-  serialize :sub_key, JSON # i'm too lazy to force a distinction between integer and string/symbol keys
+  serialize :sub_key, coder: JSON # i'm too lazy to force a distinction between integer and string/symbol keys
 
   # this means that the preference value is no longer stored on the user object
   # and is in it's own record in the db

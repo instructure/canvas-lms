@@ -358,7 +358,10 @@ export const getLabelForFilter = (
     return assignmentGroups.find(a => a.id === filter.value)?.name || I18n.t('Assignment Group')
   } else if (filter.type === 'grading-period') {
     if (filter.value === '0') return I18n.t('All Grading Periods')
-    return gradingPeriods.find(g => g.id === filter.value)?.title || I18n.t('Grading Period')
+    return (
+      formatGradingPeriodTitleForDisplay(gradingPeriods.find(g => g.id === filter.value)) ||
+      I18n.t('Grading Period')
+    )
   } else if (filter.type === 'student-group') {
     const studentGroups: StudentGroup[] = Object.values(studentGroupCategories)
       .map((c: StudentGroupCategory) => c.groups)
@@ -608,23 +611,34 @@ export const categorizeFilters = (appliedFilters: Filter[], customStatuses: Grad
     appliedFilters
   ) as SubmissionFilterValue[]
   const customStatusIds = getCustomStatusIdStrings(customStatuses)
-  const filtersNeedingSome: SubmissionFilterValue[] = submissionFilters.filter(filter =>
-    [
-      'dropped',
-      'excused',
-      'extended',
-      'has-submissions',
-      'has-ungraded-submissions',
-      'has-unposted-grades',
-      'late',
-      'missing',
-      'resubmitted',
-      ...customStatusIds,
-    ].includes(filter)
-  )
 
-  const filtersNeedingEvery = submissionFilters.filter(filter =>
-    ['has-no-submissions'].includes(filter)
+  const possibleSomeFilters = [
+    'dropped',
+    'excused',
+    'extended',
+    'has-submissions',
+    'has-ungraded-submissions',
+    'has-unposted-grades',
+    'late',
+    'missing',
+    'resubmitted',
+    ...customStatusIds,
+  ]
+
+  let filtersNeedingEvery: SubmissionFilterValue[] = []
+
+  const {multiselect_gradebook_filters_enabled} = ENV.GRADEBOOK_OPTIONS ?? {}
+
+  if (multiselect_gradebook_filters_enabled) {
+    possibleSomeFilters.push('has-no-submissions')
+  } else {
+    filtersNeedingEvery = submissionFilters.filter(filter =>
+      ['has-no-submissions'].includes(filter)
+    )
+  }
+
+  const filtersNeedingSome: SubmissionFilterValue[] = submissionFilters.filter(filter =>
+    possibleSomeFilters.includes(filter)
   )
 
   return {filtersNeedingSome, filtersNeedingEvery}
@@ -639,7 +653,11 @@ export function filterSubmission(
     return true
   }
   const customStatusIds = getCustomStatusIdStrings(customStatuses)
-  return filters.every(filter => {
+
+  const {multiselect_gradebook_filters_enabled} = ENV.GRADEBOOK_OPTIONS ?? {}
+  const filterOperation = multiselect_gradebook_filters_enabled ? 'some' : 'every'
+
+  return filters[filterOperation](filter => {
     if (filter === 'has-ungraded-submissions') {
       return doesSubmissionNeedGrading(submission)
     } else if (filter === 'has-submissions') {
@@ -735,9 +753,13 @@ export const filterStudentBySectionFn = (
     if (sectionFilters.length === 0) {
       return true
     }
+    const {multiselect_gradebook_filters_enabled} = ENV.GRADEBOOK_OPTIONS ?? {}
     const includedEnrollmentStates = getIncludedEnrollmentStates(enrollmentFilter)
+    const sectionFiltersToApply = multiselect_gradebook_filters_enabled
+      ? sectionFilters
+      : [sectionFilters[0]]
     const enrollmentStates = student.enrollments
-      .filter(e => e.course_section_id === sectionFilters[0])
+      .filter(e => sectionFiltersToApply.includes(e.course_section_id as SubmissionFilterValue))
       .map(enrollment => enrollment.enrollment_state)
     return student.sections
       ? enrollmentStates.length > 0 &&
@@ -778,4 +800,29 @@ export const filterAssignmentsBySubmissionsFn = (
     )
     return result
   }
+}
+export function formatGradingPeriodTitleForDisplay(
+  gradingPeriod: GradingPeriod | undefined | null
+) {
+  if (!gradingPeriod) return null
+
+  let title = gradingPeriod.title
+
+  if (ENV.GRADEBOOK_OPTIONS?.grading_periods_filter_dates_enabled) {
+    const formatter = Intl.DateTimeFormat(I18n.currentLocale(), {
+      year: '2-digit',
+      month: 'numeric',
+      day: 'numeric',
+      timezone: ENV.TIMEZONE,
+    })
+
+    title = I18n.t('%{title}: %{start} - %{end} | %{closed}', {
+      title: gradingPeriod.title,
+      start: formatter.format(gradingPeriod.startDate),
+      end: formatter.format(gradingPeriod.endDate),
+      closed: formatter.format(gradingPeriod.closeDate),
+    })
+  }
+
+  return title
 }

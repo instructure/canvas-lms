@@ -38,6 +38,8 @@ module Importers
         end
 
         data[:locked_folders]&.each do |path|
+          next if migration.migration_settings[:importer_skips]&.include?("folders")
+
           # TODO: i18n
           if (f = migration.context.active_folders.where(full_name: "course files/#{path}").first)
             f.locked = true
@@ -46,6 +48,8 @@ module Importers
         end
 
         data[:hidden_folders]&.each do |path|
+          next if migration.migration_settings[:importer_skips]&.include?("folders")
+
           # TODO: i18n
           if (f = migration.context.active_folders.where(full_name: "course files/#{path}").first)
             f.workflow_state = "hidden"

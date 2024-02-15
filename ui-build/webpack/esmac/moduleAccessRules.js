@@ -32,6 +32,13 @@ module.exports = [
   },
 
   {
+    rule: 'Allow extensions to dynamically import from gems/plugins',
+    source: 'ui/shared/bundles/**',
+    target: '**',
+    specifier: 'any',
+  },
+
+  {
     rule: 'Allow engine entrypoints to source everything there',
     source: 'ui/engine/{index.ts,capabilities/index.ts}',
     target: 'ui/engine/**',

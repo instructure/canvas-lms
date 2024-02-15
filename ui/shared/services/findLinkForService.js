@@ -169,5 +169,7 @@ export function findLinkForService(service_type, callback) {
       $dialog.find('input:visible:first').focus().select()
     },
     width: 400,
+    modal: true,
+    zIndex: 1000,
   })
 }

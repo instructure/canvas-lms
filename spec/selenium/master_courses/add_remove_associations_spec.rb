@@ -61,7 +61,7 @@ describe "master courses - add and remove course associations" do
   end
 
   it "adds associated courses", priority: "1" do
-    get "/courses/#{@master_course.id}"
+    get "/courses/#{@master_course.id}/settings"
     open_associations
     open_courses_list
 
@@ -94,13 +94,14 @@ describe "master courses - add and remove course associations" do
     expect(minions.length).to eq(2)
     expect(minions[0].attribute("id")).to eq(course0_id)
     expect(minions[1].attribute("id")).to eq(course1_id)
+    close_associations
   end
 
   it "removes an associated course", priority: "1" do
     @minion0 = @template.add_child_course!(@course0).child_course
     @minion1 = @template.add_child_course!(@course1).child_course
 
-    get "/courses/#{@master_course.id}"
+    get "/courses/#{@master_course.id}/settings"
     driver.execute_script("ENV.flashAlertTimeout = 2000") # shorten flash alert timeout
     open_associations
 
@@ -128,10 +129,11 @@ describe "master courses - add and remove course associations" do
     # course0 is back in the available course list
     table = available_courses_table
     expect(f("#course_#{@course0.id}", table)).to be_displayed
+    close_associations
   end
 
   it "adds and remove a to-be-added course", priority: "1" do
-    get "/courses/#{@master_course.id}"
+    get "/courses/#{@master_course.id}/settings"
     open_associations
     open_courses_list
 
@@ -160,5 +162,6 @@ describe "master courses - add and remove course associations" do
     expect(to_be_added.length).to eq(1)
     expect(f("##{leave_me_id}", to_be_added_table)).to be_displayed
     expect(f("##{remove_me_id}", available_courses_table)).to be_displayed
+    close_associations
   end
 end

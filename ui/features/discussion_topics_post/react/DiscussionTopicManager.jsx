@@ -33,7 +33,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import LoadingIndicator from '@canvas/loading-indicator'
 import {NoResultsFound} from './components/NoResultsFound/NoResultsFound'
 import PropTypes from 'prop-types'
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import {useQuery} from 'react-apollo'
 import {SplitScreenViewContainer} from './containers/SplitScreenViewContainer/SplitScreenViewContainer'
 import {DrawerLayout} from '@instructure/ui-drawer-layout'
@@ -41,6 +41,7 @@ import {Mask} from '@instructure/ui-overlays'
 import {Responsive} from '@instructure/ui-responsive'
 import {View} from '@instructure/ui-view'
 import useCreateDiscussionEntry from './hooks/useCreateDiscussionEntry'
+import {flushSync} from 'react-dom'
 
 const I18n = useI18nScope('discussion_topics_post')
 
@@ -107,6 +108,8 @@ const DiscussionTopicManager = props => {
   // The DrawTray will cause the DiscussionEdit to mount first when it starts transitioning open, then un-mount and remount when it finishes opening
   const [isTrayFinishedOpening, setIsTrayFinishedOpening] = useState(false)
 
+  const usedThreadingToolbarChildRef = useRef(null)
+
   const discussionManagerUtilities = {
     replyFromId,
     setReplyFromId,
@@ -116,7 +119,10 @@ const DiscussionTopicManager = props => {
     setHighlightEntryId,
     setIsGradedDiscussion,
     isGradedDiscussion,
+    usedThreadingToolbarChildRef,
   }
+
+  const isModuleItem = ENV.SEQUENCE != null
 
   // Unread filter
   // This introduces a double query for DISCUSSION_QUERY when filter changes
@@ -175,8 +181,13 @@ const DiscussionTopicManager = props => {
   }
 
   const closeView = () => {
-    setIsTrayFinishedOpening(false)
-    setSplitScreenViewOpen(false)
+    flushSync(() => {
+      setIsTrayFinishedOpening(false)
+      setSplitScreenViewOpen(false)
+    })
+
+    usedThreadingToolbarChildRef?.current?.focus()
+    usedThreadingToolbarChildRef.current = null
   }
 
   const variables = {
@@ -308,7 +319,7 @@ const DiscussionTopicManager = props => {
                   <View
                     display="block"
                     padding="medium medium 0 small"
-                    height={isSplitScreenViewOpen ? '100vh' : '100%'}
+                    height={isModuleItem ? '85vh' : '90vh'}
                   >
                     <DiscussionTopicToolbarContainer
                       discussionTopic={discussionTopicQuery.data.legacyNode}

@@ -58,7 +58,6 @@ const useToggleCourseNav = (): IUseToggleCourseNav => {
         stickyFrame.classList.remove('has-scrollbar')
       }
     }
-
     // setSetting({setting: 'collapse_course_nav', newState: !isCourseMenuExpanded})
     // TO DO: Update aria-label for hamburger button (evaluate options)
   }

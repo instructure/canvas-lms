@@ -724,8 +724,8 @@ describe Types::DiscussionType do
         expect(@delayed_type_with_teacher.resolve("title")).to eq @delayed_discussion.title
       end
 
-      it "returns nil for message and emtpy entries array for student" do
-        expect(@delayed_type_with_student.resolve("message")).to be_nil
+      it "returns lock_reason for message and emtpy entries array for student" do
+        expect(@delayed_type_with_student.resolve("message")).not_to eq @delayed_discussion.message
         expect(@delayed_type_with_student.resolve("discussionEntriesConnection { nodes { message } }")).to eq []
       end
 
@@ -772,6 +772,36 @@ describe Types::DiscussionType do
 
     it "doesn't show child topic associated to a deleted group" do
       expect(discussion_type.resolve("childTopics { contextName }")).to match_array(["group 1", "group 2"])
+    end
+  end
+
+  context "discussion within modules" do
+    before do
+      student_in_course(active_all: true)
+      @topic = @course.discussion_topics.create!(
+        title: "Ya Ya Ding Dong",
+        user: @teacher,
+        message: "By Will Ferrell and My Marianne",
+        workflow_state: "published"
+      )
+      @context_module = @course.context_modules.create!(name: "some module")
+      @context_module.unlock_at = Time.now + 1.day
+      @context_module.add_item(type: "discussion_topic", id: @topic.id)
+      @context_module.save!
+    end
+
+    it "returns module lock information" do
+      type_with_student = GraphQLTypeTester.new(@topic, current_user: @student)
+      resolved_message = type_with_student.resolve("message")
+
+      canvaslms_url = resolved_message.match(/x-canvaslms-trusted-url='([^']+)'/)
+      expect(canvaslms_url[1]).to include("/courses/#{@course.id}/modules/#{@context_module.id}/prerequisites/discussion_topic_#{@topic.id}")
+      expect(resolved_message).to include("id='module_prerequisites_lookup_link'")
+    end
+
+    it "does not return locked module information when you are the teacher" do
+      teacher_type = GraphQLTypeTester.new(@topic, current_user: @teacher)
+      expect(teacher_type.resolve("message")).to eq @topic.message
     end
   end
 

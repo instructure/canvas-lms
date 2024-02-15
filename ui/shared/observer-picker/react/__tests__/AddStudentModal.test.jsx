@@ -58,8 +58,7 @@ describe('Add Student Modal', () => {
     expect(getByText('Please provide a pairing code.')).toBeInTheDocument()
   })
 
-  // LF-1169 - remove or rewrite to remove spies on imports
-  it.skip('calls onStudentPaired when a new student is paired successfully', async () => {
+  it('calls onStudentPaired when a new student is paired successfully', async () => {
     const onStudentPaired = jest.fn()
     const {getByTestId} = render(
       <AddStudentModal {...defaultProps} onStudentPaired={onStudentPaired} />

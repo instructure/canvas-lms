@@ -41,7 +41,7 @@ import {ProgressCircle} from '@instructure/ui-progress'
 import {Alert} from '@instructure/ui-alerts'
 import Attachment from '../react/Attachment'
 import {EmojiPicker, EmojiQuickPicker} from '@canvas/emoji'
-import { captureException } from '@sentry/react'
+import {captureException} from '@sentry/react'
 
 const I18n = useI18nScope('submit_assignment')
 

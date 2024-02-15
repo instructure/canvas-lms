@@ -13,6 +13,8 @@ services:
     image: selenium/standalone-chrome
     # Use the seleniarm (not selenium) image on ARM architectures
     # image: seleniarm/standalone-chromium
+    # or
+    # image: seleniarm/standalone-chromium:4.16
     depends_on:
       - canvas-web
     environment:

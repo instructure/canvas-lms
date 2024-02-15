@@ -50,6 +50,7 @@ export type FiltersState = {
   addFilters: (filters: Filter[]) => void
   applyFilters: (filters: Filter[]) => void
   toggleFilter: (filter: Filter) => void
+  toggleFilterMultiSelect: (filter: Filter) => void
   initializeAppliedFilters: (
     initialRowFilterSettings: InitialRowFilterSettings,
     initialColumnFilterSettings: InitialColumnFilterSettings,
@@ -112,6 +113,23 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
       appliedFilters: [...get().appliedFilters.filter(f => f.type !== filter.type)].concat(
         existingFilter ? [] : [filter]
       ),
+    })
+  },
+
+  toggleFilterMultiSelect: (filter: Filter) => {
+    const existingFilter = get().appliedFilters.find(
+      f => f.type === filter.type && f.value === filter.value
+    )
+
+    let appliedFilters = [...get().appliedFilters]
+
+    const excludedMultiselectFilters = ['grading-period', 'student-group']
+    appliedFilters = excludedMultiselectFilters.includes(filter.type ?? '')
+      ? appliedFilters.filter(f => f.type !== filter.type)
+      : appliedFilters.filter(f => !(f.type === filter.type && f.value === filter.value))
+
+    set({
+      appliedFilters: appliedFilters.concat(existingFilter ? [] : [filter]),
     })
   },
 

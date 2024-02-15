@@ -202,6 +202,7 @@ unless $canvas_tasks_loaded
         queue = config.configuration_hash[:queue]
         ActiveRecord::Tasks::DatabaseTasks.drop(queue) if queue rescue nil
         ActiveRecord::Tasks::DatabaseTasks.drop(config) rescue nil
+        ActiveRecord::Base.connection_handler.clear_all_connections!
         Shard.default(reload: true) # make sure we know that sharding isn't set up yet
         CanvasCassandra::DatabaseBuilder.config_names.each do |cass_config|
           db = CanvasCassandra::DatabaseBuilder.from_config(cass_config)

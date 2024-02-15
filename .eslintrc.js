@@ -210,7 +210,7 @@ module.exports = {
       {js: 'never', ts: 'never', jsx: 'never', tsx: 'never', coffee: 'never'},
     ],
     'import/no-commonjs': 'off', // This is overridden where it counts
-    'import/no-extraneous-dependencies': ['error', {devDependencies: true}],
+    'import/no-extraneous-dependencies': 'off',
     'lodash/callback-binding': 'error',
     'lodash/collection-method-value': 'error',
     'lodash/collection-return': 'error',
@@ -273,7 +273,7 @@ module.exports = {
       },
     },
     {
-      files: ['ui/**/*', 'spec/**/*', 'public/**/*'],
+      files: ['ui/**/*', 'spec/**/*', 'public/**/*', 'packages/**/*'],
       rules: {
         // Turn off the "absolute-first" rule. Until we get rid of the `compiled/` and `jsx/`
         // stuff and use real realitive paths it will tell you to do the wrong thing

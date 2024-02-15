@@ -29,6 +29,8 @@ $.fn.openAsDialog = function (options) {
         height: 500,
         title: $link.attr('title'),
         resizable: false,
+        modal: true,
+        zIndex: 1000,
         ...options,
       }
 

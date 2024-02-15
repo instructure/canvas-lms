@@ -51,6 +51,8 @@ $(document).ready(function () {
       $dialog.find('.lock_reason_content').empty().append($reason)
       $dialog.dialog({
         title: I18n.t('titles.content_is_locked', 'Content Is Locked'),
+        modal: true,
+        zIndex: 1000,
       })
     }
   })

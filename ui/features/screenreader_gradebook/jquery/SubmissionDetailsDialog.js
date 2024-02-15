@@ -68,6 +68,8 @@ export default class SubmissionDetailsDialog {
       title: this.student.name,
       width: 600,
       resizable: false,
+      modal: true,
+      zIndex: 1000,
     })
 
     this.dialog.on('dialogclose', this.options.onClose)

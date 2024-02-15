@@ -34,7 +34,7 @@ type PathwayViewProps = {
 const PathwayView = ({pathway}: PathwayViewProps) => {
   const [zoomLevel, setZoomLevel] = useState(1)
   const [pathwayDetailsOpen, setPathwayDetailsOpen] = useState(false)
-  const [activeMilestone, setActiveMilestone] = useState<MilestoneData>(pathway.milestones[0])
+  const [activeMilestone, setActiveMilestone] = useState<MilestoneData | null>(null)
   const [milestoneDetailsOpen, setMilestoneDetailsOpen] = useState(false)
 
   const handleZoomIn = useCallback(() => {
@@ -45,20 +45,27 @@ const PathwayView = ({pathway}: PathwayViewProps) => {
     setZoomLevel(zoomLevel - 0.1)
   }, [zoomLevel])
 
-  const handleSelectFromTree = useCallback((milestone: MilestoneData | null) => {
-    if (milestone === null) {
-      setMilestoneDetailsOpen(false)
-      setPathwayDetailsOpen(true)
-    } else {
-      // in this context we know it's a MilestoneViewData
-      setActiveMilestone(milestone as MilestoneData)
-      setMilestoneDetailsOpen(true)
-      setPathwayDetailsOpen(false)
-    }
-  }, [])
+  const handleSelectFromTree = useCallback(
+    (milestone: MilestoneData | null) => {
+      if (milestone === null) {
+        setActiveMilestone(null)
+        setMilestoneDetailsOpen(false)
+        setPathwayDetailsOpen(true)
+      } else if (activeMilestone?.id === milestone.id) {
+        setActiveMilestone(null)
+        setMilestoneDetailsOpen(false)
+      } else {
+        setActiveMilestone(milestone as MilestoneData)
+        setMilestoneDetailsOpen(true)
+        setPathwayDetailsOpen(false)
+      }
+    },
+    [activeMilestone]
+  )
 
   const handleCloseMilestoneDetails = useCallback(() => {
     setMilestoneDetailsOpen(false)
+    setActiveMilestone(null)
   }, [])
 
   const renderBuilderControls = useCallback(() => {
@@ -81,7 +88,7 @@ const PathwayView = ({pathway}: PathwayViewProps) => {
         pathway={pathway}
         version="1"
         zoomLevel={zoomLevel}
-        selectedStep={null}
+        selectedStep={activeMilestone?.id || null}
         onSelected={handleSelectFromTree}
         renderTreeControls={renderBuilderControls}
       />

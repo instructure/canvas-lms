@@ -54,7 +54,7 @@ module SpeedGraderCommon
 
   def add_attachment_student_assignment(_file, student, path)
     attachment = student.attachments.new
-    attachment.uploaded_data = Rack::Test::UploadedFile.new(path, Attachment.mimetype(path))
+    attachment.uploaded_data = Canvas::UploadedFile.new(path, Attachment.mimetype(path))
     attachment.save!
     @assignment.submit_homework(student, submission_type: :online_upload, attachments: [attachment])
   end

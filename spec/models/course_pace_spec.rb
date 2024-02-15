@@ -918,4 +918,86 @@ describe CoursePace do
       expect(InstStatsd::Statsd).to have_received(:count).with("course.paced.all_module_item_count", 2)
     end
   end
+
+  describe "student_enrollments" do
+    before :once do
+      @student1 = @student
+      @student2 = student_in_course(course: @course, active_all: true).user
+      @section1 = @course.default_section
+      @section2 = @course.course_sections.create!
+    end
+
+    describe "on a student pace" do
+      it "returns the student's pace if they have one" do
+        pace = @course.course_paces.create!(user_id: @student1)
+        expect(pace.student_enrollments.pluck(:user_id)).to contain_exactly(@student1.id)
+      end
+
+      it "does not include deleted enrollments" do
+        pace = @course.course_paces.create!(user_id: @student1)
+        @student1.enrollments.where(course: @course).first.destroy
+        expect(pace.student_enrollments.pluck(:user_id)).to be_empty
+      end
+    end
+
+    describe "on a section pace" do
+      it "returns all the section's students when nobody has an individual pace" do
+        section_pace = @course.course_paces.create!(course_section: @section1)
+        expect(section_pace.student_enrollments.pluck(:user_id)).to contain_exactly(@student1.id, @student2.id)
+      end
+
+      it "doesn't include students who have their own pace" do
+        section_pace = @course.course_paces.create!(course_section: @section1)
+        @course.course_paces.create!(user_id: @student1)
+        expect(section_pace.student_enrollments.pluck(:user_id)).to contain_exactly(@student2.id)
+      end
+
+      it "does not include deleted enrollments" do
+        section_pace = @course.course_paces.create!(course_section: @section1)
+        @student2.enrollments.where(course: @course).first.destroy
+        expect(section_pace.student_enrollments.pluck(:user_id)).to contain_exactly(@student1.id)
+      end
+
+      it "still includes students with deleted student paces" do
+        section_pace = @course.course_paces.create!(course_section: @section1)
+        @course.course_paces.create!(user_id: @student1, workflow_state: "deleted")
+        expect(section_pace.student_enrollments.pluck(:user_id)).to contain_exactly(@student1.id, @student2.id)
+      end
+    end
+
+    describe "on the (default) course pace" do
+      it "returns all enrollments if there's no section/student paces" do
+        expect(@course_pace.student_enrollments.pluck(:user_id)).to contain_exactly(@student1.id, @student2.id)
+      end
+
+      it "does not include students who have their own pace" do
+        @course.course_paces.create!(user_id: @student1)
+        expect(@course_pace.student_enrollments.pluck(:user_id)).to contain_exactly(@student2.id)
+      end
+
+      it "does not include students in sections with a section pace" do
+        student3 = student_in_course(course: @course, section: @section2, active_all: true).user
+        @course.course_paces.create!(course_section: @section1)
+        expect(@course_pace.student_enrollments.pluck(:user_id)).to contain_exactly(student3.id)
+      end
+
+      it "includes only students with no section or student pace" do
+        student_in_course(course: @course, section: @section2, active_all: true).user
+        @course.course_paces.create!(course_section: @section2)
+        @course.course_paces.create!(user_id: @student1)
+        expect(@course_pace.student_enrollments.pluck(:user_id)).to contain_exactly(@student2.id)
+      end
+
+      it "does not include deleted enrollments" do
+        @student2.enrollments.where(course: @course).first.destroy
+        expect(@course_pace.student_enrollments.pluck(:user_id)).to contain_exactly(@student1.id)
+      end
+
+      it "still includes students with deleted student or section paces" do
+        @course.course_paces.create!(course_section: @section1, workflow_state: "deleted")
+        @course.course_paces.create!(user_id: @student1, workflow_state: "deleted")
+        expect(@course_pace.student_enrollments.pluck(:user_id)).to contain_exactly(@student1.id, @student2.id)
+      end
+    end
+  end
 end

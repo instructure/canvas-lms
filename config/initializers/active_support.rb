@@ -47,42 +47,47 @@ end
 
 module IgnoreMonkeyPatchesInDeprecations
   def extract_callstack(callstack)
+    return [] if callstack.empty?
     return _extract_callstack(callstack) if callstack.first.is_a?(String)
 
+    method = ($canvas_rails == "7.1") ? :ignored_callstack? : :ignored_callstack
     offending_line = callstack.find do |frame|
       # pass the whole frame to the filter function, so we can ignore specific methods
-      !ignored_callstack(frame)
+      !send(method, frame)
     end || callstack.first
 
     [offending_line.path, offending_line.lineno, offending_line.label]
   end
 
-  def ignored_callstack(frame)
-    if frame.is_a?(String)
-      if (md = frame.match(/^(.+?):(\d+)(?::in `(.*?)')?/))
-        path, _, label = md.captures
+  class_eval <<~RUBY, __FILE__, __LINE__ + 1
+    def ignored_callstack#{"?" if $canvas_rails == "7.1"}(frame)
+      if frame.is_a?(String)
+        if (md = frame.match(/^(.+?):(\d+)(?::in `(.*?)')?/))
+          path, _, label = md.captures
+        else
+          return false
+        end
       else
-        return false
+        path, _, label = frame.absolute_path || frame.path, frame.lineno, frame.label
+        return false unless path
       end
-    else
-      path, _, label = frame.absolute_path, frame.lineno, frame.label
+      return true if path&.start_with?(File.dirname(__FILE__) + "/active_record.rb")
+      return true if path&.start_with?(File.expand_path(File.dirname(__FILE__) + "/../../gems/activesupport-suspend_callbacks"))
+      return true if path == File.expand_path(File.dirname(__FILE__) + "/../../spec/support/blank_slate_protection.rb")
+      return true if path == File.expand_path(File.dirname(__FILE__) + "/../../spec/selenium/common.rb")
+
+      @switchman ||= File.expand_path(Gem.loaded_specs["switchman"].full_gem_path) + "/"
+      return true if path&.start_with?(@switchman)
+      return true if label == "render" && path&.end_with?("application_controller.rb")
+      return true if label == "named_context_url" && path&.end_with?("application_controller.rb")
+      return true if label == "redirect_to" && path&.end_with?("application_controller.rb")
+      return true if label == "block in wrap_block_in_transaction" && path == File.expand_path(File.dirname(__FILE__) + "/../../spec/spec_helper.rb")
+
+      return false unless path
+
+      super(path)
     end
-    return true if path&.start_with?(File.dirname(__FILE__) + "/active_record.rb")
-    return true if path&.start_with?(File.expand_path(File.dirname(__FILE__) + "/../../gems/activesupport-suspend_callbacks"))
-    return true if path == File.expand_path(File.dirname(__FILE__) + "/../../spec/support/blank_slate_protection.rb")
-    return true if path == File.expand_path(File.dirname(__FILE__) + "/../../spec/selenium/common.rb")
-
-    @switchman ||= File.expand_path(Gem.loaded_specs["switchman"].full_gem_path) + "/"
-    return true if path&.start_with?(@switchman)
-    return true if label == "render" && path&.end_with?("application_controller.rb")
-    return true if label == "named_context_url" && path&.end_with?("application_controller.rb")
-    return true if label == "redirect_to" && path&.end_with?("application_controller.rb")
-    return true if label == "block in wrap_block_in_transaction" && path == File.expand_path(File.dirname(__FILE__) + "/../../spec/spec_helper.rb")
-
-    return false unless path
-
-    super(path)
-  end
+  RUBY
 end
 ActiveSupport::Deprecation.prepend(IgnoreMonkeyPatchesInDeprecations)
 

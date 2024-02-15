@@ -22,7 +22,7 @@ import QuizItemGroupView from 'ui/features/quizzes_index/backbone/views/QuizItem
 import NoQuizzesView from 'ui/features/quizzes_index/backbone/views/NoQuizzesView'
 import $ from 'jquery'
 import fakeENV from 'helpers/fakeENV'
-import 'helpers/jquery.simulate'
+import '@canvas/jquery/jquery.simulate'
 import ReactDOM from 'react-dom'
 
 let fixtures = null

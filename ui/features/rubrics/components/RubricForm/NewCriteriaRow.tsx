@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {
@@ -28,67 +29,83 @@ import {
 } from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {Pill} from '@instructure/ui-pill'
+import {View} from '@instructure/ui-view'
 
-export const NewCriteriaRow = () => {
+const I18n = useI18nScope('rubrics-criteria-new-row')
+
+type NewCriteriaRowProps = {
+  rowIndex: number
+  onEditCriterion: () => void
+}
+
+export const NewCriteriaRow = ({rowIndex, onEditCriterion}: NewCriteriaRowProps) => {
   return (
-    <Flex>
-      <Flex.Item align="start" margin="small 0 0 0">
-        <Text weight="bold">2.</Text>
-      </Flex.Item>
-      <Flex.Item margin="0 small" align="start" shouldGrow={true}>
-        <Button renderIcon={IconEditLine}>Draft New Criterion</Button>
-        <Button renderIcon={IconOutcomesLine} margin="0 0 0 small">
-          Create From Outcome
-        </Button>
-      </Flex.Item>
-      <Flex.Item align="start">
-        <Pill
-          color="info"
-          margin="0 large 0 0"
-          themeOverride={{
-            background: '#C7CDD1',
-            infoColor: 'white',
-          }}
-        >
-          <Text size="x-small">-- pts</Text>
-        </Pill>
-        <IconButton
-          disabled={true}
-          withBackground={false}
-          withBorder={false}
-          screenReaderLabel=""
-          size="small"
-        >
-          <IconDragHandleLine />
-        </IconButton>
-        <IconButton
-          disabled={true}
-          withBackground={false}
-          withBorder={false}
-          screenReaderLabel=""
-          size="small"
-        >
-          <IconEditLine />
-        </IconButton>
-        <IconButton
-          disabled={true}
-          withBackground={false}
-          withBorder={false}
-          screenReaderLabel=""
-          size="small"
-        >
-          <IconTrashLine />
-        </IconButton>
-        <IconButton
-          disabled={true}
-          withBackground={false}
-          withBorder={false}
-          screenReaderLabel=""
-          size="small"
-        >
-          <IconDuplicateLine />
-        </IconButton>
-      </Flex.Item>
-    </Flex>
+    <View>
+      <Flex>
+        <Flex.Item align="start" margin="small 0 0 0">
+          <Text weight="bold">{rowIndex}.</Text>
+        </Flex.Item>
+        <Flex.Item margin="0 small" align="start" shouldGrow={true}>
+          <Button
+            renderIcon={IconEditLine}
+            onClick={onEditCriterion}
+            data-testid="add-criterion-button"
+          >
+            {I18n.t('Draft New Criterion')}
+          </Button>
+          <Button renderIcon={IconOutcomesLine} margin="0 0 0 small">
+            {I18n.t('Create From Outcome')}
+          </Button>
+        </Flex.Item>
+        <Flex.Item align="start">
+          <Pill
+            color="info"
+            margin="0 large 0 0"
+            themeOverride={{
+              background: '#C7CDD1',
+              infoColor: 'white',
+            }}
+          >
+            <Text size="x-small">-- pts</Text>
+          </Pill>
+          <IconButton
+            disabled={true}
+            withBackground={false}
+            withBorder={false}
+            screenReaderLabel=""
+            size="small"
+          >
+            <IconDragHandleLine />
+          </IconButton>
+          <IconButton
+            disabled={true}
+            withBackground={false}
+            withBorder={false}
+            screenReaderLabel=""
+            size="small"
+          >
+            <IconEditLine />
+          </IconButton>
+          <IconButton
+            disabled={true}
+            withBackground={false}
+            withBorder={false}
+            screenReaderLabel=""
+            size="small"
+          >
+            <IconTrashLine />
+          </IconButton>
+          <IconButton
+            disabled={true}
+            withBackground={false}
+            withBorder={false}
+            screenReaderLabel=""
+            size="small"
+          >
+            <IconDuplicateLine />
+          </IconButton>
+        </Flex.Item>
+      </Flex>
+    </View>
   )
 }

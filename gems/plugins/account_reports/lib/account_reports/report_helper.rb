@@ -428,7 +428,7 @@ module AccountReports::ReportHelper
 
     @account_report = report_runner.account_report
     begin
-      if @account_report.aborted? || @account_report.deleted?
+      if @account_report.aborted? || @account_report.deleted? || @account_report.error?
         report_runner.abort
         return
       end
@@ -442,11 +442,11 @@ module AccountReports::ReportHelper
       fail_with_error(e)
     ensure
       update_parallel_progress(account_report: @account_report, report_runner:)
-      compile_parallel_report(headers, files:) if last_account_report_runner?(@account_report)
+      compile_parallel_report(report_runner, headers, files:) if last_account_report_runner?(@account_report)
     end
   end
 
-  def compile_parallel_report(headers, files: nil)
+  def compile_parallel_report(report_runner, headers, files: nil)
     GuardRail.activate(:primary) { @account_report.update(total_lines: @account_report.account_report_rows.count + 1) }
     xlog_location = AccountReport.current_xlog_location
     # wait 2 minutes for report db to catch up, if it does not catch up, use the
@@ -499,9 +499,6 @@ module AccountReports::ReportHelper
 
   def fail_with_error(error)
     GuardRail.activate(:primary) do
-      # this should leave the runner that caused a failure to be in running or error state.
-      @account_report.account_report_runners.in_progress.update_all(workflow_state: "aborted")
-      @account_report.delete_account_report_rows
       Canvas::Errors.capture_exception(:account_report, error)
       @account_report.workflow_state = "error"
       @account_report.save!
@@ -519,7 +516,7 @@ module AccountReports::ReportHelper
   end
 
   def update_parallel_progress(account_report: @account_report, report_runner:)
-    return if runner_aborted?(report_runner)
+    return if runner_aborted?(report_runner) || report_runner.error?
 
     report_runner.complete
     # let the regular report process update progress to 100 percent, cap at 99.
@@ -538,7 +535,7 @@ module AccountReports::ReportHelper
   end
 
   def last_account_report_runner?(account_report)
-    return false if account_report.account_report_runners.incomplete.exists?
+    return false if account_report.account_report_runners.incomplete_or_failed.exists?
 
     AccountReport.transaction do
       @account_report.reload(lock: true)

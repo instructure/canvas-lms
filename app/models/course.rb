@@ -32,7 +32,7 @@ class Course < ActiveRecord::Base
   include OutcomeImportContext
   include MaterialChanges
 
-  attr_accessor :teacher_names, :master_course, :primary_enrollment_role
+  attr_accessor :teacher_names, :master_course, :primary_enrollment_role, :saved_by
   attr_writer :student_count, :teacher_count, :primary_enrollment_type, :primary_enrollment_role_id, :primary_enrollment_rank, :primary_enrollment_state, :primary_enrollment_date, :invitation, :master_migration
 
   time_zone_attribute :time_zone
@@ -47,7 +47,7 @@ class Course < ActiveRecord::Base
   end
 
   serialize :tab_configuration
-  serialize :settings, Hash
+  serialize :settings, type: Hash
   belongs_to :root_account, class_name: "Account"
   belongs_to :abstract_course
   belongs_to :enrollment_term
@@ -224,7 +224,6 @@ class Course < ActiveRecord::Base
   has_many :appointment_group_contexts, as: :context, inverse_of: :context
   has_many :appointment_groups, through: :appointment_group_contexts
   has_many :appointment_participants, -> { where("workflow_state = 'locked' AND parent_calendar_event_id IS NOT NULL") }, class_name: "CalendarEvent", foreign_key: :effective_context_code, primary_key: :asset_string
-  attr_accessor :import_source
 
   has_many :content_participation_counts, as: :context, inverse_of: :context, dependent: :destroy
   has_many :poll_sessions, class_name: "Polling::PollSession", dependent: :destroy
@@ -4457,8 +4456,13 @@ class Course < ActiveRecord::Base
       content_migration.copy_options = { everything: true }
       content_migration.migration_settings[:migration_ids_to_import] = { copy: { everything: true } }
       content_migration.workflow_state = "importing"
+      priority = Delayed::LOW_PRIORITY
+      if saved_by == :sis_import
+        priority += 5
+        content_migration.strand = "sis_import_course_templates"
+      end
       content_migration.save!
-      content_migration.queue_migration
+      content_migration.queue_migration(priority:)
     end
   end
 

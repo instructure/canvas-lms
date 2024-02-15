@@ -19,6 +19,7 @@
 import {
   addReplyToDiscussionEntry,
   getSpeedGraderUrl,
+  updateDiscussionEntryRootEntryCounts,
   updateDiscussionTopicEntryCounts,
   responsiveQuerySizes,
   isTopicAuthor,
@@ -76,12 +77,13 @@ const defaultExpandedReplies = id => {
 
 export const DiscussionThreadContainer = props => {
   const replyButtonRef = useRef()
+  const expansionButtonRef = useRef()
   const moreOptionsButtonRef = useRef()
 
   const {searchTerm, filter, allThreadsStatus, expandedThreads, setExpandedThreads} =
     useContext(SearchContext)
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
-  const {replyFromId, setReplyFromId} = useContext(DiscussionManagerUtilityContext)
+  const {replyFromId, setReplyFromId, usedThreadingToolbarChildRef} = useContext(DiscussionManagerUtilityContext)
   const [expandReplies, setExpandReplies] = useState(
     defaultExpandedReplies(props.discussionEntry._id)
   )
@@ -101,6 +103,29 @@ export const DiscussionThreadContainer = props => {
           !!updatedEntry.rootEntryId && entry.id === updatedEntry.id ? updatedEntry : entry
         )
       })
+    }
+  }
+
+  const updateDiscussionEntryParticipantCache = (cache, result) => {
+    if (
+      props.discussionEntry.entryParticipant?.read !==
+      result.data.updateDiscussionEntryParticipant.discussionEntry.entryParticipant?.read
+    ) {
+      const discussionUnreadCountchange = result.data.updateDiscussionEntryParticipant
+        .discussionEntry.entryParticipant?.read
+        ? -1
+        : 1
+      updateDiscussionTopicEntryCounts(cache, props.discussionTopic.id, {
+        unreadCountChange: discussionUnreadCountchange,
+      })
+
+      if (result.data.updateDiscussionEntryParticipant.discussionEntry.rootEntryId) {
+        updateDiscussionEntryRootEntryCounts(
+          cache,
+          result.data.updateDiscussionEntryParticipant.discussionEntry,
+          discussionUnreadCountchange
+        )
+      }
     }
   }
 
@@ -167,21 +192,6 @@ export const DiscussionThreadContainer = props => {
       setOnFailure(I18n.t('There was an unexpected error while updating the reply.'))
     },
   })
-
-  const updateDiscussionEntryParticipantCache = (cache, result) => {
-    if (
-      props.discussionEntry.entryParticipant?.read !==
-      result.data.updateDiscussionEntryParticipant.discussionEntry.entryParticipant?.read
-    ) {
-      const discussionUnreadCountchange = result.data.updateDiscussionEntryParticipant
-        .discussionEntry.entryParticipant?.read
-        ? -1
-        : 1
-      updateDiscussionTopicEntryCounts(cache, props.discussionTopic.id, {
-        unreadCountChange: discussionUnreadCountchange,
-      })
-    }
-  }
 
   const [updateDiscussionEntryParticipant] = useMutation(UPDATE_DISCUSSION_ENTRY_PARTICIPANT, {
     update: updateDiscussionEntryParticipantCache,
@@ -269,7 +279,7 @@ export const DiscussionThreadContainer = props => {
   const splitScreenOn = props.userSplitScreenPreference
 
   const threadActions = []
-  if (props.discussionEntry.permissions.reply) {
+  if (props?.discussionEntry?.permissions?.reply) {
     threadActions.push(
       <ThreadingToolbar.Reply
         replyButtonRef={replyButtonRef}
@@ -281,6 +291,7 @@ export const DiscussionThreadContainer = props => {
           setEditorExpanded(newEditorExpanded)
 
           if (splitScreenOn) {
+            usedThreadingToolbarChildRef.current = replyButtonRef.current
             props.onOpenSplitView(props.discussionEntry._id, true)
           }
         }}
@@ -307,6 +318,7 @@ export const DiscussionThreadContainer = props => {
   if (props.depth === 0 && props.discussionEntry.lastReply) {
     threadActions.push(
       <ThreadingToolbar.Expansion
+        expansionButtonRef={expansionButtonRef}
         key={`expand-${props.discussionEntry._id}`}
         delimiterKey={`expand-delimiter-${props.discussionEntry._id}`}
         authorName={getDisplayName(props.discussionEntry)}
@@ -318,6 +330,7 @@ export const DiscussionThreadContainer = props => {
         }
         onClick={() => {
           if (splitScreenOn) {
+            usedThreadingToolbarChildRef.current = expansionButtonRef.current
             props.onOpenSplitView(props.discussionEntry._id, false)
           } else {
             setExpandReplies(!expandReplies)
@@ -359,6 +372,13 @@ export const DiscussionThreadContainer = props => {
     setThreadRefCurrent(refCurrent)
   }, [])
 
+  const updateReadState = discussionEntry => {
+    props.markAsRead(discussionEntry._id)
+    // manually update this entry's read state, then updateLoadedSubentry
+    discussionEntry.entryParticipant.read = !discussionEntry.entryParticipant?.read
+    updateLoadedSubentry(discussionEntry)
+  }
+
   useEffect(() => {
     if (
       !ENV.manual_mark_as_read &&
@@ -366,7 +386,7 @@ export const DiscussionThreadContainer = props => {
       !props.discussionEntry?.entryParticipant?.forcedReadState
     ) {
       const observer = new IntersectionObserver(
-        ([entry]) => entry.isIntersecting && props.markAsRead(props.discussionEntry._id),
+        ([entry]) => entry.isIntersecting && updateReadState(props.discussionEntry),
         {
           root: null,
           rootMargin: '0px',
@@ -505,14 +525,18 @@ export const DiscussionThreadContainer = props => {
                               : null
                           }
                           isReported={props.discussionEntry?.entryParticipant?.reportType != null}
-                          onQuoteReply={() => {
-                            setReplyFromId(props.discussionEntry._id)
-                            if (splitScreenOn) {
-                              props.onOpenSplitView(props.discussionEntry._id, true)
-                            } else {
-                              setEditorExpanded(true)
-                            }
-                          }}
+                          onQuoteReply={
+                            props?.discussionEntry?.permissions?.reply
+                              ? () => {
+                                  setReplyFromId(props.discussionEntry._id)
+                                  if (splitScreenOn) {
+                                    props.onOpenSplitView(props.discussionEntry._id, true)
+                                  } else {
+                                    setEditorExpanded(true)
+                                  }
+                                }
+                              : null
+                          }
                           onMarkThreadAsRead={readState =>
                             updateDiscussionThreadReadState({
                               variables: {
@@ -619,9 +643,12 @@ export const DiscussionThreadContainer = props => {
                   }}
                   quotedEntry={buildQuotedReply([props.discussionEntry], replyFromId)}
                   value={
-                    props.discussionEntry.depth > 2
+                    !!ENV.rce_mentions_in_discussions && props.discussionEntry.depth > 2
                       ? ReactDOMServer.renderToString(
-                          <span className="mceNonEditable mention" data-mention="1">
+                          <span
+                            className="mceNonEditable mention"
+                            data-mention={props.discussionEntry.author?._id}
+                          >
                             @{getDisplayName(props.discussionEntry)}
                           </span>
                         )

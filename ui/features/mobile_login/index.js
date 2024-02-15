@@ -17,7 +17,7 @@
  */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import signupDialog from '@canvas/signup-dialog'
+import {loadSignupDialog} from '@canvas/signup-dialog'
 import ready from '@instructure/ready'
 
 const I18n = useI18nScope('pseudonyms_mobile_login')
@@ -36,7 +36,13 @@ function setupParentSignup() {
       e.preventDefault()
       const template = element.getAttribute('data-template')
       const path = element.getAttribute('data-path')
-      signupDialog(template, I18n.t('parent_signup', 'Parent Signup'), path)
+      loadSignupDialog
+        .then(signupDialog => {
+          signupDialog(template, I18n.t('parent_signup', 'Parent Signup'), path)
+        })
+        .catch(error => {
+          throw new Error('Error loading signup dialog: ', error)
+        })
     })
   }
 }

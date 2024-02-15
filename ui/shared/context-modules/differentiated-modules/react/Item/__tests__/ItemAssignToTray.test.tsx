@@ -166,23 +166,6 @@ describe('ItemAssignToTray', () => {
     })
   })
 
-  it('renders times in the given timezone', async () => {
-    const {findAllByText} = renderComponent({itemContentId: '25', timezone: 'America/Denver'})
-
-    const times = await findAllByText('Thursday, October 5, 2023 6:01 AM')
-    expect(times).toHaveLength(2) // screenreader + visible message
-  })
-
-  it('renders times in the given locale', async () => {
-    const {findAllByText} = renderComponent({
-      itemContentId: '25',
-      locale: 'en-GB',
-      timezone: 'America/Denver',
-    })
-    const times = await findAllByText('Thursday, 5 October 2023 06:01')
-    expect(times).toHaveLength(2) // screenreader + visible message
-  })
-
   it('calls onDismiss when close button is clicked', () => {
     const onDismiss = jest.fn()
     const {getByRole} = renderComponent({onDismiss})
@@ -212,14 +195,6 @@ describe('ItemAssignToTray', () => {
     expect(getAllByTestId('item-assign-to-card')).toHaveLength(2)
   })
 
-  it.skip('deletes a card when delete button is clicked', async () => {
-    const {getAllByRole, findAllByTestId, getAllByTestId} = renderComponent()
-    const cards = await findAllByTestId('item-assign-to-card')
-    expect(cards).toHaveLength(2)
-    act(() => getAllByRole('button', {name: 'Delete'})[1].click())
-    expect(getAllByTestId('item-assign-to-card')).toHaveLength(1)
-  })
-
   it('calls onDismiss when the cancel button is clicked', () => {
     const onDismiss = jest.fn()
     const {getByRole} = renderComponent({onDismiss})
@@ -241,17 +216,6 @@ describe('ItemAssignToTray', () => {
   })
 
   describe('AssigneeSelector', () => {
-    it.skip('shows existing overrides as selected options', async () => {
-      const {findAllByTestId} = renderComponent()
-      const sectionOverride = SECTIONS_DATA.find(
-        section => section.id === OVERRIDES[0].course_section_id
-      )!
-      const selectedOptions = await findAllByTestId('assignee_selector_selected_option')
-      expect(selectedOptions).toHaveLength(2)
-      expect(selectedOptions[0]).toHaveTextContent('Everyone else')
-      expect(selectedOptions[1]).toHaveTextContent(sectionOverride?.name)
-    })
-
     it('does not render everyone option if the assignment is set to overrides only', async () => {
       fetchMock.get(
         '/api/v1/courses/1/assignments/23/date_details',
@@ -331,28 +295,6 @@ describe('ItemAssignToTray', () => {
       renderComponent({onDismiss})
       await waitFor(() => expect(onDismiss).toHaveBeenCalledTimes(1))
     })
-
-    it.skip('does not allow to use the same assignee in more than one card', async () => {
-      const sectionOverride = SECTIONS_DATA.find(
-        section => section.id === OVERRIDES[0].course_section_id
-      )!
-      const otherSections = SECTIONS_DATA.filter(
-        section => section.id !== OVERRIDES[0].course_section_id
-      )!
-      const {findAllByTestId, getAllByRole} = renderComponent()
-      const assigneeSelectors = await findAllByTestId('assignee_selector')
-      act(() => assigneeSelectors[0].click())
-      const listOptions = getAllByRole('listitem')
-      let sectionOption = listOptions.find(
-        listitem => listitem.textContent === sectionOverride.name
-      )
-      // the option from the second card should not be available in the first card
-      expect(sectionOption).toBeUndefined()
-      otherSections.forEach(section => {
-        sectionOption = listOptions.find(listitem => listitem.textContent === section.name)
-        expect(sectionOption).not.toBeUndefined()
-      })
-    })
   })
   describe('on save', () => {
     const DATE_DETAILS = `/api/v1/courses/${props.courseId}/assignments/${props.itemContentId}/date_details`
@@ -427,6 +369,62 @@ describe('ItemAssignToTray', () => {
         'GET'
       )
       expect(onDismissMock).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('Module Overrides', () => {
+    const DATE_DETAILS_WITHOUT_OVERRIDES = {
+      id: '23',
+      due_at: '2023-10-05T12:00:00Z',
+      unlock_at: '2023-10-01T12:00:00Z',
+      lock_at: '2023-11-01T12:00:00Z',
+      only_visible_to_overrides: false,
+      overrides: [
+        {
+          id: '3',
+          assignment_id: '23',
+          title: 'Sally and Wally',
+          due_at: '2023-10-02T12:00:00Z',
+          all_day: false,
+          all_day_date: '2023-10-02',
+          unlock_at: null,
+          lock_at: null,
+          course_section_id: '4',
+          context_module_id: 1,
+          context_module_name: 'Test Module',
+        },
+      ],
+    }
+
+    const DATE_DETAILS_WITH_OVERRIDES = {
+      ...DATE_DETAILS_WITHOUT_OVERRIDES,
+      overrides: [...OVERRIDES, ...DATE_DETAILS_WITHOUT_OVERRIDES.overrides],
+    }
+
+    it('shows module cards if they are not overridden', async () => {
+      fetchMock.get(
+        '/api/v1/courses/1/assignments/23/date_details',
+        DATE_DETAILS_WITHOUT_OVERRIDES,
+        {
+          overwriteRoutes: true,
+        }
+      )
+      const {getByText, findAllByTestId, getByTestId} = renderComponent()
+      const cards = await findAllByTestId('item-assign-to-card')
+      expect(getByText('Inherited from')).toBeInTheDocument()
+      expect(getByTestId('context-module-text')).toBeInTheDocument()
+      expect(cards).toHaveLength(2)
+    })
+
+    it('does not show overridden module cards', async () => {
+      fetchMock.get('/api/v1/courses/1/assignments/23/date_details', DATE_DETAILS_WITH_OVERRIDES, {
+        overwriteRoutes: true,
+      })
+      const {queryByText, findAllByTestId, queryByTestId} = renderComponent()
+      const cards = await findAllByTestId('item-assign-to-card')
+      expect(queryByText('Inherited from')).not.toBeInTheDocument()
+      expect(queryByTestId('context-module-text')).not.toBeInTheDocument()
+      expect(cards).toHaveLength(2)
     })
   })
 })

@@ -798,6 +798,7 @@ module UsefulFindInBatches
     else
       enum_for(:find_each, start:, finish:, order:, **kwargs) do
         relation = self
+        order = build_batch_orders(order) if $canvas_rails == "7.1"
         apply_limits(relation, start, finish, order).size
       end
     end
@@ -808,6 +809,7 @@ module UsefulFindInBatches
     relation = self
     unless block_given?
       return to_enum(:find_in_batches, start:, finish:, order:, batch_size:, **kwargs) do
+        order = build_batch_orders(order) if $canvas_rails == "7.1"
         total = apply_limits(relation, start, finish, order).size
         (total - 1).div(batch_size) + 1
       end
@@ -879,6 +881,7 @@ module UsefulFindInBatches
 
   def in_batches_with_cursor(of: 1000, start: nil, finish: nil, order: :asc, load: false)
     klass.transaction do
+      order = build_batch_orders(order) if $canvas_rails == "7.1"
       relation = apply_limits(clone, start, finish, order)
 
       relation.skip_query_cache!
@@ -919,6 +922,7 @@ module UsefulFindInBatches
     limited_query = limit(0).to_sql
 
     relation = self
+    order = build_batch_orders(order) if $canvas_rails == "7.1"
     relation_for_copy = apply_limits(relation, start, finish, order)
     unless load
       relation_for_copy = relation_for_copy.except(:select).select(primary_key)
@@ -1013,6 +1017,7 @@ module UsefulFindInBatches
   # and yields the objects in batches in the same order as the scope specified
   # so the DB connection can be fully recycled during each block.
   def in_batches_with_pluck_ids(of: 1000, start: nil, finish: nil, order: :asc, load: false)
+    order = build_batch_orders(order) if $canvas_rails == "7.1"
     relation = apply_limits(self, start, finish, order)
     all_object_ids = relation.pluck(:id)
     current_order_values = order_values
@@ -1041,6 +1046,7 @@ module UsefulFindInBatches
              group, or order)."
       end
 
+      order = build_batch_orders(order) if $canvas_rails == "7.1"
       relation = apply_limits(self, start, finish, order)
       sql = relation.to_sql
       table = "#{table_name}_in_batches_temp_table_#{sql.hash.abs.to_s(36)}"
@@ -1335,7 +1341,7 @@ ActiveRecord::Relation.class_eval do
   def union(*scopes, from: false)
     table = connection.quote_local_table_name(table_name)
     scopes.unshift(self)
-    scopes = scopes.reject { |s| (Rails.version < "7.1") ? s.is_a?(ActiveRecord::NullRelation) : s.null_relation? }
+    scopes = scopes.reject(&:null_relation?)
     return scopes.first if scopes.length == 1
     return self if scopes.empty?
 
@@ -1902,7 +1908,7 @@ module IgnoreOutOfSequenceMigrationDates
   def current_migration_number(dirname)
     migration_lookup_at(dirname).filter_map do |file|
       digits = File.basename(file).split("_").first
-      next if ActiveRecord::Base.timestamped_migrations && digits.length != 14
+      next if ActiveRecord.timestamped_migrations && digits.length != 14
 
       digits.to_i
     end.max.to_i
@@ -1916,7 +1922,7 @@ Autoextend.hook(:"ActiveRecord::Generators::MigrationGenerator",
 
 module AlwaysUseMigrationDates
   def next_migration_number(number)
-    if ActiveRecord::Base.timestamped_migrations
+    if ActiveRecord.timestamped_migrations
       Time.now.utc.strftime("%Y%m%d%H%M%S")
     else
       SchemaMigration.normalize_migration_number(number)
@@ -2136,7 +2142,11 @@ Rails.application.config.after_initialize do
     cache = MultiCache.fetch("schema_cache")
     next if cache.nil?
 
-    connection_pool.set_schema_cache(cache)
+    if $canvas_rails == "7.1"
+      connection_pool.schema_reflection.set_schema_cache(cache)
+    else
+      connection_pool.set_schema_cache(cache)
+    end
     LoadAccount.schema_cache_loaded!
   end
 end
@@ -2256,3 +2266,15 @@ module AdditionalIgnoredColumns
   end
 end
 ActiveRecord::Base.singleton_class.include(AdditionalIgnoredColumns)
+
+if $canvas_rails == "7.0"
+  module SerializeCompat
+    def serialize(attr_name, *args, coder: nil, type: Object, **kwargs)
+      args = [coder || type] if args.empty?
+      super(attr_name, *args, **kwargs)
+    end
+  end
+  ActiveRecord::Base.singleton_class.prepend(SerializeCompat)
+
+  ActiveRecord::Relation.send(:public, :null_relation?)
+end

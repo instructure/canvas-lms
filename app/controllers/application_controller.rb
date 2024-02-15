@@ -153,6 +153,13 @@ class ApplicationController < ActionController::Base
     @js_env = nil
   end
 
+  def page_has_instui_topnav
+    return unless @domain_root_account.try(:feature_enabled?, :instui_nav)
+
+    @instui_topnav = true
+    js_env breadcrumbs: crumbs[1..]&.map { |crumb| { name: crumb[0], url: crumb[1] } }
+  end
+
   def set_normalized_route
     # Presently used only by Sentry, and not needed for API requests
     return unless request.format.html? && SentryExtensions::Settings.settings[:frontend_dsn]
@@ -251,7 +258,7 @@ class ApplicationController < ActionController::Base
             release_notes_badge_disabled: @current_user&.release_notes_badge_disabled?,
           },
           FULL_STORY_ENABLED: fullstory_enabled_for_session?(session),
-          RAILS_ENVIRONMENT: Canvas.environment
+          RAILS_ENVIRONMENT: Canvas.environment,
         }
         @js_env[:IN_PACED_COURSE] = @context.account.feature_enabled?(:course_paces) && @context.enable_course_paces? if @context.is_a?(Course)
         unless SentryExtensions::Settings.settings.blank?

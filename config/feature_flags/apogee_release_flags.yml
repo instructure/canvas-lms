@@ -351,3 +351,13 @@ platform_service_speedgrader:
       state: allowed
     development:
       state: allowed
+grading_periods_filter_dates:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Add dates to Gradebook Grading Period Filter
+  description: This feature adds the start, end, and close dates of grading periods to the grading period filter.
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on

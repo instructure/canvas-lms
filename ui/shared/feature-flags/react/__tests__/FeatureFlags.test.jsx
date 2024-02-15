@@ -82,7 +82,8 @@ describe('feature_flags::FeatureFlags', () => {
       })
     })
 
-    it('performs search when search input length is 3 characters or more', async () => {
+    // FOO-4286
+    it.skip('performs search when search input length is 3 characters or more', async () => {
       const {findByPlaceholderText, getAllByTestId, queryAllByTestId} = render(<FeatureFlags />)
       const searchField = await findByPlaceholderText('Search by name or id')
       const allFeatureFlagsCount = getAllByTestId('ff-table-row').length

@@ -71,6 +71,8 @@ const StudentView = createReactClass({
         ReactDOM.unmountComponentAtNode($dialog[0])
         $(this).remove()
       },
+      modal: true,
+      zIndex: 1000,
     })
 
     const closeDialog = e => {

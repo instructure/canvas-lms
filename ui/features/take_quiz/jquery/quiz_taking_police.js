@@ -1,3 +1,5 @@
+/* eslint-disable import/no-commonjs */
+/* eslint-disable no-inner-declarations */
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -48,14 +50,12 @@ The quiz taking police has arrived.
      }
 */
 
-/* eslint-disable no-restricted-globals, import/no-amd */
+/* eslint-disable no-restricted-globals */
 
-define([], function () {
-  if (!window.Worker) {
-    // if this browser doesn't support web workers, this module does nothing
-    return
-  }
-
+if (!window.Worker) {
+  // If this browser doesn't support web workers, this module does nothing
+  module.exports = null
+} else {
   function worker() {
     let stopwatch
 
@@ -77,10 +77,12 @@ define([], function () {
       false
     )
   }
+
   let code = worker.toString()
   code = code.substring(code.indexOf('{') + 1, code.lastIndexOf('}'))
 
   const blob = new Blob([code], {type: 'application/javascript'})
   const quizTakingPolice = new Worker(URL.createObjectURL(blob))
-  return quizTakingPolice
-})
+
+  module.exports = quizTakingPolice
+}

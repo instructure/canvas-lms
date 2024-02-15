@@ -134,6 +134,27 @@ describe "Discussion Topic Show" do
       expect(f("a[aria-label='Previous Module Item']")).to be_present
     end
 
+    it "displays module prerequisites" do
+      student_in_course(active_all: true)
+      user_session(@student)
+      module1 = @course.context_modules.create!(name: "module1")
+      module1.unlock_at = Time.now + 1.day
+
+      topic = @course.discussion_topics.create!(
+        title: "Ya Ya Ding Dong",
+        user: @teacher,
+        message: "By Will Ferrell and My Marianne",
+        workflow_state: "published"
+      )
+      module1.add_item(type: "discussion_topic", id: topic.id)
+      module1.save!
+
+      get "/courses/#{@course.id}/discussion_topics/#{topic.id}"
+      wait_for_ajaximations
+
+      expect(fj("span:contains('This topic is part of the module #{module1.name}, which is locked')")).to be_present
+    end
+
     it "open Find Outcome dialog when adding a rubric" do
       assignment = @course.assignments.create!(
         name: "Assignment",

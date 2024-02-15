@@ -519,6 +519,19 @@ describe Types::CourseType do
         ).to eq [@teacher, @student1, other_teacher, @student2, @inactive_user].map(&:to_param)
       end
 
+      it "returns all visible users in alphabetical order by the sortable_name" do
+        expected_users = [@teacher, @student1, other_teacher, @student2, @inactive_user]
+                         .sort_by(&:sortable_name)
+                         .map(&:to_param)
+
+        actual_user_response = course_type.resolve(
+          "usersConnection { edges { node { _id } } }",
+          current_user: @teacher
+        )
+
+        expect(actual_user_response).to eq(expected_users)
+      end
+
       it "returns only the specified users" do
         # deprecated method
         expect(

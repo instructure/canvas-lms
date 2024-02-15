@@ -231,6 +231,8 @@ DialogFormView.prototype.setupDialog = function () {
         return _this.trigger('open')
       }
     })(this),
+    modal: true,
+    zIndex: 1000,
   }
   opts.width = this.options.width
   opts.height = this.options.height

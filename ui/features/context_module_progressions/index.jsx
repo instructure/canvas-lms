@@ -23,6 +23,18 @@ import progressionsIndexTemplate from './jst/ProgressionsIndex.handlebars'
 import PaginatedCollectionView from '@canvas/pagination/backbone/views/PaginatedCollectionView'
 import ProgressionStudentView from './backbone/views/ProgressionStudentView'
 
+import React from 'react'
+import ReactDOM from 'react-dom'
+import ProgressionModuleHeader from './react/components/ProgressionModuleHeader'
+
+class IndexView extends PaginatedCollectionView {
+  // needed to render the react component at the top of the page
+  // in the right lifecycle method of backbone
+  afterRender() {
+    return ReactDOM.render(<ProgressionModuleHeader bridge={this.collection} />, document.getElementById('progression-module-header-root'))
+  }
+}
+
 ready(() => {
   let students
   $(document.body).addClass('context_modules2')
@@ -39,14 +51,14 @@ ready(() => {
     })
   }
 
-  const indexView = new PaginatedCollectionView({
+  const indexView = new IndexView({
     collection: students,
     itemView: ProgressionStudentView,
     template: progressionsIndexTemplate,
     modules_url: ENV.MODULES_URL,
     autoFetch: true,
   })
-
+ 
   if (!ENV.RESTRICTED_LIST) {
     // attach the view's scroll container once it's populated
     students.fetch({
@@ -59,9 +71,12 @@ ready(() => {
     })
   }
 
+  // we need to have the backbone view in the dom before we can render the react component
+  indexView.$el.appendTo($('#content'))
+  
   indexView.render()
+
   if (ENV.RESTRICTED_LIST && ENV.VISIBLE_STUDENTS.length === 1) {
     indexView.$el.find('#progression_students').hide()
   }
-  indexView.$el.appendTo($('#content'))
 })

@@ -72,7 +72,7 @@ class FileInContext
         end
       end
 
-      uploaded_data = Rack::Test::UploadedFile.new(filename, Attachment.mimetype(explicit_filename || filename))
+      uploaded_data = Canvas::UploadedFile.new(filename, Attachment.mimetype(explicit_filename || filename))
 
       @attachment = Attachment.new(context:, display_name:, folder:)
       Attachments::Storage.store_for_attachment(@attachment, uploaded_data)

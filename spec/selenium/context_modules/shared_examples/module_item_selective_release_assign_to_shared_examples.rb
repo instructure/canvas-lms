@@ -93,9 +93,10 @@ shared_examples_for "module item assign to tray" do |context|
 
     expect(assign_to_due_date(0).attribute("value")).to eq("Dec 31, 2022")
     expect(assign_to_due_time(0).attribute("value")).to eq("5:00 PM")
-    expect(assign_to_date_and_time[0].text).to include("Saturday, December 31, 2022 5:00 PM")
-    expect(assign_to_date_and_time[1].text).to include("Tuesday, December 27, 2022 8:00 AM")
-    expect(assign_to_date_and_time[2].text).to include("Saturday, January 7, 2023 9:00 PM")
+    expect(assign_to_available_from_date(0).attribute("value")).to eq("Dec 27, 2022")
+    expect(assign_to_available_from_time(0).attribute("value")).to eq("8:00 AM")
+    expect(assign_to_until_date(0).attribute("value")).to eq("Jan 7, 2023")
+    expect(assign_to_until_time(0).attribute("value")).to eq("9:00 PM")
   end
 
   it "adds to an assignment override and saves" do
@@ -141,6 +142,31 @@ shared_examples_for "module item assign to tray" do |context|
     expect(wait_for_no_such_element { module_item_edit_tray }).to be_truthy
     expect(@module_item1.assignment.assignment_overrides.last.assignment_override_students.count).to eq(1)
     # TODO: check that the dates are saved with date under the title of the item
+  end
+
+  it "creates an override for a section and saves" do
+    section1 = @course.course_sections.create!(name: "section1")
+    @course.course_sections.create!
+
+    @course.enroll_user(@student1, "StudentEnrollment", section: section1, enrollment_state: "active")
+
+    get @mod_url
+
+    manage_module_item_button(@module_item1).click
+    click_manage_module_item_assign_to(@module_item1)
+    click_add_assign_to_card
+    select_module_item_assignee(1, section1.name)
+    update_due_date(1, "12/31/2022")
+    update_due_time(1, "5:00 PM")
+    update_available_date(1, "12/27/2022")
+    update_available_time(1, "8:00 AM")
+    update_until_date(1, "1/7/2023")
+    update_until_time(1, "9:00 PM")
+    click_save_button
+
+    expect(wait_for_no_such_element { module_item_edit_tray }).to be_truthy
+    expect(@module_item1.assignment.assignment_overrides.count).to eq(1)
+    expect(@module_item1.assignment.assignment_overrides.last.set_type).to eq("CourseSection")
   end
 
   it "adds all data and cancels" do

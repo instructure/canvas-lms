@@ -56,6 +56,8 @@ $(document).ready(() => {
       close() {
         $(event.target).focus()
       },
+      modal: true,
+      zIndex: 1000,
     })
   })
   $('.grading_standard .delete_grading_standard_link').click(function (event) {

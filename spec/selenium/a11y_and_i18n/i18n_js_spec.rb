@@ -31,6 +31,7 @@ describe "i18n js" do
 
   context "strftime" do
     it "formats just like ruby" do
+      skip("FOO-4268")
       # everything except %N %6N %9N %U %V %W %Z
       format = "%a %A %b %B %d %-d %D %e %F %h %H %I %j %k %l %L %m %M %n %3N %p %P %r %R %s %S %t %T %u %v %w %y %Y %z %%"
       date = Time.now

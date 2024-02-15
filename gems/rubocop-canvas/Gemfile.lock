@@ -43,12 +43,12 @@ GEM
     debug (1.9.1)
       irb (~> 1.10)
       reline (>= 0.3.8)
-    diff-lcs (1.5.0)
+    diff-lcs (1.5.1)
     erubi (1.12.0)
     i18n (1.14.1)
       concurrent-ruby (~> 1.0)
     io-console (0.7.2)
-    irb (1.11.1)
+    irb (1.11.2)
       rdoc
       reline (>= 0.4.2)
     jira_ref_parser (1.0.1)
@@ -59,7 +59,7 @@ GEM
       nokogiri (>= 1.12.0)
     method_source (1.0.0)
     mini_portile2 (2.8.5)
-    minitest (5.21.2)
+    minitest (5.22.2)
     nokogiri (1.15.5)
       mini_portile2 (~> 2.8.2)
       racc (~> 1.4)
@@ -109,19 +109,19 @@ GEM
     reline (0.4.2)
       io-console (~> 0.5)
     rexml (3.2.6)
-    rspec (3.12.0)
-      rspec-core (~> 3.12.0)
-      rspec-expectations (~> 3.12.0)
-      rspec-mocks (~> 3.12.0)
-    rspec-core (3.12.2)
-      rspec-support (~> 3.12.0)
-    rspec-expectations (3.12.3)
+    rspec (3.13.0)
+      rspec-core (~> 3.13.0)
+      rspec-expectations (~> 3.13.0)
+      rspec-mocks (~> 3.13.0)
+    rspec-core (3.13.0)
+      rspec-support (~> 3.13.0)
+    rspec-expectations (3.13.0)
       diff-lcs (>= 1.2.0, < 2.0)
-      rspec-support (~> 3.12.0)
-    rspec-mocks (3.12.6)
+      rspec-support (~> 3.13.0)
+    rspec-mocks (3.13.0)
       diff-lcs (>= 1.2.0, < 2.0)
-      rspec-support (~> 3.12.0)
-    rspec-support (3.12.1)
+      rspec-support (~> 3.13.0)
+    rspec-support (3.13.0)
     rubocop (1.60.2)
       json (~> 2.3)
       language_server-protocol (>= 3.17.0)
@@ -146,7 +146,7 @@ GEM
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
     unicode-display_width (2.5.0)
-    zeitwerk (2.6.12)
+    zeitwerk (2.6.13)
 
 PLATFORMS
   aarch64-linux
@@ -164,4 +164,4 @@ DEPENDENCIES
   rubocop-canvas!
 
 BUNDLED WITH
-   2.5.3
+   2.5.6

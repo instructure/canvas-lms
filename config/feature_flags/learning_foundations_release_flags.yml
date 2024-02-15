@@ -220,13 +220,6 @@ learner_passport:
   display_name: Learner Passport Prototype
   description: An in-progress working prototype of the Learner Passport feature.
 
-learner_passport_r2:
-  state: hidden
-  applies_to: RootAccount
-  root_opt_in: true
-  display_name: Learner Passport Prototype R2
-  description: An in-progress working prototype of the Learner Passport feature, Release 2.
-
 precise_link_replacements:
   state: hidden
   display_name: Precise link replacement on content migrations
@@ -247,3 +240,11 @@ observer_appointment_groups:
       state: allowed_on
     development:
       state: allowed_on
+
+block_editor:
+  applies_to: Account
+  state: hidden
+  display_name: Block Editor
+  description: |-
+    Enable the new block editor for the rich content editor.
+  beta: true

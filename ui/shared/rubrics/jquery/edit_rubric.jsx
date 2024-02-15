@@ -803,6 +803,8 @@ rubricEditing.init = function () {
         buttons: [],
         close: closeFunction,
         beforeClose: beforeCloseFunction,
+        modal: true,
+        zIndex: 1000,
       })
 
       if (editing && !isLearningOutcome) {
@@ -868,6 +870,8 @@ rubricEditing.init = function () {
           width: 400,
           buttons: [],
           close: close_function,
+          modal: true,
+          zIndex: 1000,
         })
       $rubric_rating_dialog.fixDialogButtons()
     })
@@ -878,6 +882,8 @@ rubricEditing.init = function () {
         height: 380,
         resizable: true,
         title: I18n.t('titles.find_existing_rubric', 'Find Existing Rubric'),
+        modal: true,
+        zIndex: 1000,
       })
       if (!$rubric_dialog.hasClass('loaded')) {
         $rubric_dialog
@@ -1319,9 +1325,7 @@ rubricEditing.init = function () {
 
         if (Number.isNaN(assignmentPoints) && ENV['ASSIGNMENT_POINTS_POSSIBLE']) {
           // For 1.3 external tool assignments, we grab the points from an env variable
-          assignmentPoints = numberHelper.parse(
-            ENV['ASSIGNMENT_POINTS_POSSIBLE']
-          )
+          assignmentPoints = numberHelper.parse(ENV['ASSIGNMENT_POINTS_POSSIBLE'])
         }
         const rubricPoints = parseFloat(data.points_possible)
         if (
@@ -1361,6 +1365,8 @@ rubricEditing.init = function () {
             width: 400,
             resizable: false,
             close: $confirmDialog.remove,
+            modal: true,
+            zIndex: 1000,
           })
           return false
         }

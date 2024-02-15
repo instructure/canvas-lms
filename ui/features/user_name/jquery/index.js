@@ -35,6 +35,8 @@ $(document).ready(function () {
     event.preventDefault()
     $('#edit_student_dialog').dialog({
       width: 450,
+      modal: true,
+      zIndex: 1000,
     })
     $('#edit_student_form :text:visible:first').focus().select()
   })

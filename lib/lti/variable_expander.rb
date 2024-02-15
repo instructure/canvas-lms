@@ -92,6 +92,7 @@ module Lti
         @context.enrollment_term.end_at
     end
     TERM_NAME_GUARD = -> { @context.is_a?(Course) && @context.enrollment_term&.name }
+    TERM_ID_GUARD = -> { @context.is_a?(Course) && @context.enrollment_term_id }
     USER_GUARD = -> { @current_user }
     SIS_USER_GUARD = -> { sis_pseudonym&.sis_user_id }
     PSEUDONYM_GUARD = -> { sis_pseudonym }
@@ -971,6 +972,17 @@ module Lti
                        TERM_NAME_GUARD,
                        default_name: "canvas_term_name"
 
+    # returns the current course's term numerical id.
+    # @example
+    #   ```
+    #   123
+    #   ```
+    register_expansion "Canvas.term.id",
+                       [],
+                       -> { @context.enrollment_term_id },
+                       TERM_ID_GUARD,
+                       default_name: "canvas_term_id"
+
     # returns the current course sis source id
     # to return the section source id use Canvas.course.sectionIds
     # @launch_parameter lis_course_section_sourcedid
@@ -1782,7 +1794,7 @@ module Lti
     #   ```
     register_expansion "Canvas.assignment.lockdownEnabled",
                        [],
-                       -> { @assignment.settings&.dig("lockdown_browser", "require_lockdown_browser") || false },
+                       -> { !!@controller && @current_user == @controller.logged_in_user && (@assignment.settings&.dig("lockdown_browser", "require_lockdown_browser") || false) },
                        ASSIGNMENT_GUARD
 
     # Returns the allowed number of submission attempts.

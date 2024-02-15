@@ -201,7 +201,8 @@ describe GradingSchemesJsonController, type: :request do
                                             "permissions" => { "manage" => true },
                                             "assessed_assignment" => false,
                                             "points_based" => false,
-                                            "scaling_factor" => 1.0 })
+                                            "scaling_factor" => 1.0,
+                                            "workflow_state" => "active" })
       end
     end
 
@@ -228,7 +229,8 @@ describe GradingSchemesJsonController, type: :request do
                                       "permissions" => { "manage" => true },
                                       "assessed_assignment" => false,
                                       "points_based" => false,
-                                      "scaling_factor" => 1.0 })
+                                      "scaling_factor" => 1.0,
+                                      "workflow_state" => "active" })
       end
     end
 
@@ -256,7 +258,7 @@ describe GradingSchemesJsonController, type: :request do
     describe "get default grading scheme" do
       it "returns default grading scheme json" do
         user_session(@admin)
-        get "/accounts/" + @account.id.to_s + "/grading_schemes/default", as: :json
+        get "/accounts/#{@account.id}/grading_schemes/default", as: :json
         expect(response).to have_http_status(:ok)
         response_json = response.parsed_body
         expect(response_json["title"]).to eq "Default Canvas Grading Scheme"
@@ -393,7 +395,8 @@ describe GradingSchemesJsonController, type: :request do
                                       "permissions" => { "manage" => true },
                                       "assessed_assignment" => false,
                                       "points_based" => false,
-                                      "scaling_factor" => 1.0 })
+                                      "scaling_factor" => 1.0,
+                                      "workflow_state" => "active" })
       end
 
       it "returns success when putting account level grading scheme that is points based" do
@@ -431,7 +434,8 @@ describe GradingSchemesJsonController, type: :request do
                                       "permissions" => { "manage" => true },
                                       "assessed_assignment" => false,
                                       "points_based" => true,
-                                      "scaling_factor" => 5.0 })
+                                      "scaling_factor" => 5.0,
+                                      "workflow_state" => "active" })
       end
     end
 
@@ -493,6 +497,50 @@ describe GradingSchemesJsonController, type: :request do
         expect(course_ids).to include(another_course.id)
       end
     end
+
+    describe "#default_used_locations" do
+      let_once(:data) { [["A", 94], ["F", 0]] }
+
+      before(:once) do
+        @root_account = Account.default
+        course_with_teacher(active_all: true, account: @root_account)
+        @admin = account_admin_user(account: @root_account)
+        @student = user_factory(active_user: true)
+        @sub_account = @root_account.sub_accounts.create!
+        course_with_teacher(account: @root_account)
+        @enrollment.update(workflow_state: "active")
+        @root_account.update(grading_standard_id: nil)
+        @sub_account.update(grading_standard_id: nil)
+        @course.update(grading_standard_id: nil)
+        3.times do
+          assignment = @course.assignments.create!(title: "hi", grading_standard_id: nil, grading_type: "letter_grade")
+          assignment.submissions.create!(user: @student, workflow_state: "graded")
+        end
+      end
+
+      it "returns courses and assignments where the grading standard is used" do
+        user_session(@admin)
+        get "/accounts/#{@account.id}/grading_schemes/default_used_locations", as: :json
+        locations = response.parsed_body
+
+        expect(locations.size).to eq(1)
+        expect(locations.first["id"]).to eq(@course.id)
+        expect(locations.first["assignments"].size).to eq(3)
+      end
+
+      it "does not return courses without graded assignments" do
+        another_course = course_factory
+        another_course.assignments.create!(title: "hi")
+        @course.assignments.create!(title: "hi")
+
+        user_session(@admin)
+        get "/accounts/#{@account.id}/grading_schemes/default_used_locations", as: :json
+        locations = response.parsed_body
+
+        course_ids = locations.pluck("id")
+        expect(course_ids).not_to include(another_course.id)
+      end
+    end
   end
 
   context "course teacher" do
@@ -536,6 +584,7 @@ describe GradingSchemesJsonController, type: :request do
         response_json = response.parsed_body
 
         expect(response_json.first["title"]).to eq("My Course Level Grading Standard")
+        expect(response_json.first["workflow_state"]).to eq("archived")
       end
 
       it "returns the appropriate permissions for a teacher without 'Grades — Edit' access" do
@@ -571,7 +620,8 @@ describe GradingSchemesJsonController, type: :request do
                                             "permissions" => { "manage" => false },
                                             "assessed_assignment" => false,
                                             "points_based" => false,
-                                            "scaling_factor" => 1.0 })
+                                            "scaling_factor" => 1.0,
+                                            "workflow_state" => "active" })
 
         expect(response_json[1]).to eq({ "id" => @course_level_grading_standard.id.to_s,
                                          "title" => "My Course Level Grading Standard",
@@ -582,7 +632,8 @@ describe GradingSchemesJsonController, type: :request do
                                          "permissions" => { "manage" => true },
                                          "assessed_assignment" => false,
                                          "points_based" => false,
-                                         "scaling_factor" => 1.0 })
+                                         "scaling_factor" => 1.0,
+                                         "workflow_state" => "active" })
       end
     end
 
@@ -651,7 +702,7 @@ describe GradingSchemesJsonController, type: :request do
     describe "get default grading scheme" do
       it "returns default grading scheme json" do
         user_session(@teacher)
-        get "/courses/" + @course.id.to_s + "/grading_schemes/default", as: :json
+        get "/courses/#{@course.id}/grading_schemes/default", as: :json
         expect(response).to have_http_status(:ok)
         response_json = response.parsed_body
         expect(response_json["title"]).to eq "Default Canvas Grading Scheme"
@@ -733,7 +784,8 @@ describe GradingSchemesJsonController, type: :request do
                                       "permissions" => { "manage" => true },
                                       "assessed_assignment" => false,
                                       "points_based" => false,
-                                      "scaling_factor" => 1.0 })
+                                      "scaling_factor" => 1.0,
+                                      "workflow_state" => "active" })
       end
     end
 
@@ -761,7 +813,8 @@ describe GradingSchemesJsonController, type: :request do
                                       "permissions" => { "manage" => true },
                                       "assessed_assignment" => false,
                                       "points_based" => false,
-                                      "scaling_factor" => 1.0 })
+                                      "scaling_factor" => 1.0,
+                                      "workflow_state" => "active" })
       end
     end
   end

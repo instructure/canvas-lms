@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 - present Instructure, Inc.
+ * Copyright (C) 2023 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,4 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-module.exports = require('../../selenium/helpers/jquery.simulate')
+import React from 'react'
+import ReactDOM from 'react-dom'
+import BlockEditor from './BlockEditor'
+
+export {BlockEditor}
+
+export default function renderBlockEditorApp(_, elt) {
+  ReactDOM.render(<BlockEditor />, elt)
+}

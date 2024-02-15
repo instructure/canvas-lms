@@ -43,7 +43,7 @@ class DeveloperKey < ActiveRecord::Base
   has_one :tool_consumer_profile, class_name: "Lti::ToolConsumerProfile", inverse_of: :developer_key
   has_one :tool_configuration, class_name: "Lti::ToolConfiguration", dependent: :destroy, inverse_of: :developer_key
   has_one :lti_registration, class_name: "Lti::IMS::Registration", dependent: :destroy, inverse_of: :developer_key
-  serialize :scopes, Array
+  serialize :scopes, type: Array
 
   before_validation :normalize_public_jwk_url
   before_validation :normalize_scopes

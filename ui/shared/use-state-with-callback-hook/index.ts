@@ -50,16 +50,26 @@ import {isEqual} from 'lodash'
  * by lodash isEqual) to the old value.
  */
 
-export default function useStateWithCallback(initialValue, makeMultipleCallbacks = false) {
-  const [value, setValue] = useState(initialValue)
-  const curValue = useRef(value)
-  const callbackList = useRef([])
+export default function useStateWithCallback<T>(
+  initialValue: T,
+  makeMultipleCallbacks: boolean = false
+) {
+  type Callback = (arg: T) => void
+  type BoundCallback = () => void // argument is bound when the callback is created
+  type ValOrFunc = T | ((arg: T) => T)
 
-  function ourSetter(valOrFunc, callback) {
+  const [value, setValue] = useState(initialValue)
+  const curValue = useRef<T>(value)
+  const callbackList = useRef<Array<BoundCallback>>([])
+
+  function ourSetter(valOrFunc: ValOrFunc, callback?: Callback) {
     setValue(valOrFunc)
     const oldValue = curValue.current
-    curValue.current = typeof valOrFunc === 'function' ? valOrFunc(oldValue) : valOrFunc
+    curValue.current = valOrFunc instanceof Function ? valOrFunc(oldValue) : valOrFunc
     if (typeof callback === 'undefined' || isEqual(oldValue, curValue.current)) return
+    // The following check would be unnecessary in a pure typescript environment
+    // because anything other than a function would be a type error, but alas, we
+    // still have to watch our backs
     if (typeof callback !== 'function') throw new TypeError('callback must be a function')
     if (makeMultipleCallbacks) {
       callbackList.current.push(callback.bind(null, curValue.current))

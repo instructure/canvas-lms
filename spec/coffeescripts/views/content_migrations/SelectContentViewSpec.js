@@ -21,7 +21,7 @@ import SelectContentView from 'ui/features/content_migrations/backbone/views/Sel
 import ProgressingMigration from 'ui/features/content_migrations/backbone/models/ProgressingContentMigration'
 import fakeENV from 'helpers/fakeENV'
 import assertions from 'helpers/assertions'
-import 'helpers/jquery.simulate'
+import '@canvas/jquery/jquery.simulate'
 
 class SelectContentHelper {
   static initClass() {
@@ -136,6 +136,7 @@ QUnit.module('SelectContentView: Integration Tests', {
   },
 })
 
+// eslint-disable-next-line qunit/resolve-async
 test('it should be accessible', function (assert) {
   const done = assert.async()
   return assertions.isAccessible(this.selectContentView, done, {a11yReport: true})
@@ -165,12 +166,11 @@ test('changes parents to intermediate when not all of the sublevel checkboxes ar
     .first()
     .prop('indeterminate')
 
-  ok(indeterminate || indeterminate === 'true', 'Parent changed to intermediate')
+  ok(indeterminate, 'Parent changed to intermediate')
 })
 
 test('clicking the caret shows and hides checkboxes', function () {
   const $caret = this.selectContentView.$el.find('[data-type=assignments] .checkbox-caret').first()
-  const $sublevelCheckboxes = $caret.closest('div').siblings('ul').first()
 
   equal($caret.parents('[role=treeitem]').attr('aria-expanded'), 'false')
   $caret.simulate('click')
@@ -245,8 +245,8 @@ test('select content button is disabled unless content is selected', function ()
 })
 
 test('pressing the up/down arrow selects the next treeitem', function () {
-  const downEvent = jQuery.Event('keyup', {which: 40})
-  const upEvent = jQuery.Event('keyup', {which: 38})
+  const downEvent = $.Event('keyup', {which: 40})
+  const upEvent = $.Event('keyup', {which: 38})
 
   const $treeitems = this.selectContentView.$el.find('[role=treeitem]:visible')
   this.tree = this.selectContentView.$el.find('ul[role=tree]')
@@ -262,8 +262,8 @@ test('pressing the up/down arrow selects the next treeitem', function () {
 })
 
 test('pressing home/end buttons move you to the first and last treeitem', function () {
-  const homeEvent = jQuery.Event('keyup', {which: 36})
-  const endEvent = jQuery.Event('keyup', {which: 35})
+  const homeEvent = $.Event('keyup', {which: 36})
+  const endEvent = $.Event('keyup', {which: 35})
   const $treeitems = this.selectContentView.$el.find('[role=treeitem]:visible')
 
   this.tree.trigger(endEvent)
@@ -280,8 +280,8 @@ test('pressing home/end buttons move you to the first and last treeitem', functi
 })
 
 test('pressing right arrow expands', function () {
-  const rightEvent = jQuery.Event('keyup', {which: 39})
-  const downEvent = jQuery.Event('keyup', {which: 40})
+  const rightEvent = $.Event('keyup', {which: 39})
+  const downEvent = $.Event('keyup', {which: 40})
 
   this.tree.trigger(downEvent)
   this.tree.trigger(downEvent)

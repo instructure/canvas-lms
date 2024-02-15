@@ -26,7 +26,7 @@ import '@canvas/jquery/jquery.ajaxJSON'
 import 'jqueryui/dialog'
 import '@canvas/jquery/jquery.instructure_misc_helpers' /* /\$\.h/ */
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* .dim, /\.log\(/ */
-import 'jqueryui/progressbar'
+import 'jqueryui-unpatched/progressbar'
 import {each} from 'lodash'
 
 const I18n = useI18nScope('media_comments_publicjs')
@@ -315,6 +315,7 @@ $.mediaComment.init = function (mediaType, opts) {
           width: 560,
           height: 475,
           modal: true,
+          zIndex: 1000,
         })
         $dialog.dialog('option', 'close', () => {
           $('#audio_record').before("<div id='audio_record'/>").remove()

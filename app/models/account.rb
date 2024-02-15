@@ -176,7 +176,7 @@ class Account < ActiveRecord::Base
 
   after_create :create_default_objects
 
-  serialize :settings, Hash
+  serialize :settings, type: Hash
   include TimeZoneHelper
 
   time_zone_attribute :default_time_zone, default: "America/Denver"
@@ -1018,7 +1018,7 @@ class Account < ActiveRecord::Base
   end
 
   def self.account_chain_ids(starting_account_id)
-    block = lambda do |_name|
+    block = proc do
       original_shard = Shard.current
       Shard.shard_for(starting_account_id).activate do
         id_chain = []
@@ -1044,7 +1044,7 @@ class Account < ActiveRecord::Base
       end
     end
     key = Account.cache_key_for_id(starting_account_id, :account_chain)
-    key ? Rails.cache.fetch(["account_chain_ids", key], &block) : block.call(nil)
+    key ? Rails.cache.fetch(["account_chain_ids", key], &block) : block.call
   end
 
   def self.multi_account_chain_ids(starting_account_ids)

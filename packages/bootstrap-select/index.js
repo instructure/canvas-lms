@@ -5,7 +5,6 @@
 /* eslint-disable prefer-spread */
 /* eslint-disable no-unneeded-ternary */
 /* eslint-disable no-useless-concat */
-/* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable radix */
 /* eslint-disable vars-on-top */
 /* eslint-disable object-shorthand */

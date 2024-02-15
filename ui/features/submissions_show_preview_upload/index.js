@@ -47,6 +47,8 @@ $(document).ready(() => {
       }),
       width: $(document).width() * 0.95,
       height: $(document).height() * 0.75,
+      modal: true,
+      zIndex: 1000,
     })
     loadDocPreview(dialog[0], $.extend({height: '100%'}, $(this).data()))
     $('.submission_annotation.unread_indicator').hide()

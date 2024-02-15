@@ -233,6 +233,7 @@ $(document).ready(function () {
             .submit()
         },
       },
+      zIndex: 1000,
     })
 
     $lock_at.datetime_field()

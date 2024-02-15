@@ -32,12 +32,12 @@ const DEFAULT_LIST_OPTIONS = {
     {id: '2', name: 'Section 2'},
   ],
   Students: [
-    {user: {_id: 'u_1', name: 'Jason'}},
-    {user: {_id: 'u_2', name: 'Drake'}},
-    {user: {_id: 'u_3', name: 'Caleb'}},
-    {user: {_id: 'u_4', name: 'Aaron'}},
-    {user: {_id: 'u_5', name: 'Chawn'}},
-    {user: {_id: 'u_6', name: 'Omar'}},
+    {_id: 'u_1', name: 'Jason'},
+    {_id: 'u_2', name: 'Drake'},
+    {_id: 'u_3', name: 'Caleb'},
+    {_id: 'u_4', name: 'Aaron'},
+    {_id: 'u_5', name: 'Chawn'},
+    {_id: 'u_6', name: 'Omar'},
   ],
   Groups: [
     {_id: '1', name: 'Group 1'},
@@ -49,10 +49,11 @@ const DEFAULT_LIST_OPTIONS = {
 const setup = ({
   assignedInfoList = [{assignedList: [defaultEveryoneOption.assetCode], dueDateId: 'uniqueID'}],
   setAssignedInfoList = () => {},
-  dueDateErrorMessages = [],
   students = DEFAULT_LIST_OPTIONS.Students,
   courseSections = DEFAULT_LIST_OPTIONS['Course Sections'],
   courseGroups = DEFAULT_LIST_OPTIONS.Groups,
+  gradedDiscussionRefMap = new Map(),
+  setGradedDiscussionRefMap = () => {},
 } = {}) => {
   return render(
     <GradedDiscussionDueDatesContext.Provider
@@ -61,8 +62,9 @@ const setup = ({
         setAssignedInfoList,
         studentEnrollments: students,
         sections: courseSections,
-        dueDateErrorMessages,
         groups: courseGroups,
+        gradedDiscussionRefMap,
+        setGradedDiscussionRefMap,
       }}
     >
       <AssignmentDueDatesManager />
@@ -159,38 +161,6 @@ describe('AssignmentDueDatesManager', () => {
     fireEvent.click(assignToOptionTwo)
     availableOptions = screen.getAllByTestId('assign-to-select-option')
     expect(availableOptions.length).toBe(11)
-  })
-
-  it('displays dueDateErrorMessages for the assignmentDueDate component', () => {
-    // Define the error messages
-    const dueDateErrorMessages = [
-      {
-        dueDateId: 'uniqueID',
-        message: {
-          text: 'Error for uniqueID',
-          type: 'error',
-        },
-      },
-      {
-        dueDateId: 'uniqueID2',
-        message: {
-          text: 'Error for uniqueID2',
-          type: 'error',
-        },
-      },
-    ]
-
-    // Setup the component with the error messages in the context
-    const {getByText} = setup({
-      assignedInfoList: [{dueDateId: 'uniqueID'}, {dueDateId: 'uniqueID2'}],
-      dueDateErrorMessages,
-    })
-
-    const errorMessageComponent1 = getByText('Error for uniqueID')
-    const errorMessageComponent2 = getByText('Error for uniqueID2')
-
-    expect(errorMessageComponent1).toBeInTheDocument()
-    expect(errorMessageComponent2).toBeInTheDocument()
   })
 
   describe('everyone option', () => {

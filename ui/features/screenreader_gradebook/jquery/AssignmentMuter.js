@@ -90,6 +90,8 @@ export default class AssignmentMuter {
       close: () => this.$dialog.remove(),
       resizable: false,
       width: 400,
+      modal: true,
+      zIndex: 1000,
     })
     this.$dialog.on('dialogclose', onClose)
   }

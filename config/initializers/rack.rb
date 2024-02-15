@@ -18,7 +18,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-Rack::Utils.key_space_limit = 128.kilobytes # default is 64KB
+Rack::Utils.key_space_limit = 128.kilobytes if $canvas_rails == "7.0" # default is 64KB
 Rack::Utils.multipart_part_limit = 256 # default is 128
 
 module EnableRackChunking

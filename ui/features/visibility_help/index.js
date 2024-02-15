@@ -29,6 +29,8 @@ $(document).on('click', '.visibility_help_link', event => {
       autoOpen: false,
       title: '',
       width: 330,
+      modal: true,
+      zIndex: 1000,
     })
 
     $('#course_course_visibility option').each((_i, element) => {

@@ -72,6 +72,22 @@ describe('ViewRubrics Tests', () => {
       expect(getByTestId('rubric-criterion-count-2')).toHaveTextContent('3')
       expect(getByTestId('rubric-locations-2')).toHaveTextContent('-')
     })
+
+    it('renders a popover menu with access to the rubric edit modal', () => {
+      const mockNavigate = jest.fn()
+      jest.spyOn(Router, 'useNavigate').mockReturnValue(mockNavigate)
+
+      queryClient.setQueryData(['accountRubrics-1'], RUBRICS_QUERY_RESPONSE)
+      const {getByTestId} = renderComponent()
+
+      const popover = getByTestId('rubric-options-1-button')
+      popover.click()
+      const editButton = getByTestId('edit-rubric-button')
+      editButton.click()
+
+      expect(Router.useNavigate).toHaveBeenCalledWith()
+      expect(Router.useNavigate).toHaveReturnedWith(expect.any(Function))
+    })
   })
 
   describe('course level rubrics', () => {
@@ -104,6 +120,22 @@ describe('ViewRubrics Tests', () => {
       expect(getByTestId('rubric-points-2')).toHaveTextContent('30')
       expect(getByTestId('rubric-criterion-count-2')).toHaveTextContent('3')
       expect(getByTestId('rubric-locations-2')).toHaveTextContent('-')
+    })
+
+    it('renders a popover menu with access to the rubric edit modal', () => {
+      const mockNavigate = jest.fn()
+      jest.spyOn(Router, 'useNavigate').mockReturnValue(mockNavigate)
+
+      queryClient.setQueryData(['courseRubrics-1'], RUBRICS_QUERY_RESPONSE)
+      const {getByTestId} = renderComponent()
+
+      const popover = getByTestId('rubric-options-1-button')
+      popover.click()
+      const editButton = getByTestId('edit-rubric-button')
+      editButton.click()
+
+      expect(Router.useNavigate).toHaveBeenCalledWith()
+      expect(Router.useNavigate).toHaveReturnedWith(expect.any(Function))
     })
   })
 })

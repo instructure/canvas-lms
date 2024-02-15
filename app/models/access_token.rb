@@ -35,7 +35,7 @@ class AccessToken < ActiveRecord::Base
   belongs_to :real_user, inverse_of: :masquerade_tokens, class_name: "User"
   has_one :account, through: :developer_key
 
-  serialize :scopes, Array
+  serialize :scopes, type: Array
 
   validates :purpose, length: { maximum: maximum_string_length }
   validate :must_only_include_valid_scopes, unless: :deleted?

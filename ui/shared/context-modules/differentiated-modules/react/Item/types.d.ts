@@ -61,6 +61,7 @@ export interface ItemAssignToCardSpec {
   overrideId?: string
   key: string
   isValid: boolean
+  isEdited?: boolean
   hasAssignees: boolean
   due_at: string | null
   unlock_at: string | null

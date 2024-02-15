@@ -16,16 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Backbone from '@canvas/backbone'
 import Conference from 'ui/features/conferences/backbone/models/Conference'
 import ConferenceView from 'ui/features/conferences/backbone/views/ConferenceView'
 import $ from 'jquery'
-import I18nStubber from 'helpers/I18nStubber'
 import fakeENV from 'helpers/fakeENV'
 import assertions from 'helpers/assertions'
-import 'helpers/jquery.simulate'
+import '@canvas/jquery/jquery.simulate'
 
-const fixtures = $('#fixtures')
 const conferenceView = function (conferenceOpts = {}) {
   if (!('id' in conferenceOpts)) conferenceOpts.id = null
   if (!('recordings' in conferenceOpts)) conferenceOpts.recordings = []
@@ -66,6 +63,7 @@ QUnit.module('ConferenceView', {
   },
 })
 
+// eslint-disable-next-line qunit/resolve-async
 test('it should be accessible', assert => {
   const done = assert.async()
   assertions.isAccessible(conferenceView(), done, {a11yReport: true})

@@ -18,6 +18,7 @@
 import $ from 'jquery'
 import {pick} from 'lodash'
 import Account from './models/Account'
+import extensions from '@canvas/bundles/extensions'
 import QuotasView from '@canvas/account-quota-settings-view'
 import ManualQuotasView from './views/ManualQuotasView'
 import ready from '@instructure/ready'
@@ -48,4 +49,15 @@ if (ENV.ACCOUNT) {
   })
 }
 
-export default {}
+const loadExtension =
+  extensions['ui/features/account_settings/backbone/account_quota_settings.js']?.()
+if (loadExtension) {
+  loadExtension
+    .then(module => module.default())
+    .catch(error => {
+      throw new Error(
+        `Failed to load extension for ui/features/account_settings/backbone/account_quota_settings.js`,
+        error
+      )
+    })
+}

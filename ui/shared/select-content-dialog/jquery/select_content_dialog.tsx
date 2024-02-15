@@ -419,6 +419,8 @@ export const Events = {
               window.addEventListener('message', ltiPostMessageHandlerForTool)
             },
             title: I18n.t('link_from_external_tool', 'Link Resource from External Tool'),
+            modal: true,
+            zIndex: 1000,
           })
           .bind('dialogresize', function () {
             $(this)
@@ -602,6 +604,8 @@ export const selectContentDialog = function (options?: SelectContentDialogOption
         }
         upload_form?.onClose()
       },
+      modal: true,
+      zIndex: 1000,
     })
     .fixDialogButtons()
 

@@ -16,9 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import jQuery from 'jquery'
+import $ from 'jquery'
+import ready from '@instructure/ready'
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* fillWindowWithMe */
 
-jQuery($ => {
+ready(() => {
   $('#file_content').css('width', '100%').fillWindowWithMe()
 })

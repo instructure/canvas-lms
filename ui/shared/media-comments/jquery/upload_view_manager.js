@@ -19,7 +19,7 @@ import $ from 'jquery'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import fileSize from '@canvas/util/fileSize'
-import 'jqueryui/progressbar'
+import 'jqueryui-unpatched/progressbar'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 
 const I18n = useI18nScope('media_comments_upload_view_manager')

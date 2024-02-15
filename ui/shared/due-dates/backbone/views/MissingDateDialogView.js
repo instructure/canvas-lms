@@ -95,6 +95,7 @@ MissingDateDialogView.prototype.showDialog = function () {
       modal: true,
       resizable: false,
       title: $(this.dialogTitle),
+      zIndex: 1000,
     })
     .fixDialogButtons()
     .on('click', '.btn', this.onAction)

@@ -21,11 +21,10 @@ import {useNavigate} from 'react-router-dom'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import type {Rubric} from '@canvas/rubrics/react/types/rubric'
 import {Table} from '@instructure/ui-table'
-import {IconButton} from '@instructure/ui-buttons'
-import {IconMoreLine} from '@instructure/ui-icons'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {Link} from '@instructure/ui-link'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {RubricPopover} from './RubricPopover'
 
 const I18n = useI18nScope('rubrics-list-table')
 
@@ -101,13 +100,7 @@ export const RubricTable = ({rubrics}: RubricTableProps) => {
               )}
             </Cell>
             <Cell data-testid={`rubric-options-${rubric.id}`}>
-              <IconButton
-                withBackground={false}
-                withBorder={false}
-                screenReaderLabel={I18n.t('Rubric Options')}
-              >
-                <IconMoreLine />
-              </IconButton>
+              <RubricPopover rubricId={rubric.id} />
             </Cell>
           </Row>
         ))}

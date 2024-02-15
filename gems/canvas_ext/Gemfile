@@ -2,3 +2,5 @@
 
 source "https://rubygems.org"
 gemspec
+
+eval_gemfile(gemfile.dirname.join("../gemfile_prefix.rb"))

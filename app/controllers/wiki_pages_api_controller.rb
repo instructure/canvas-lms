@@ -354,7 +354,9 @@ class WikiPagesApiController < ApplicationController
     @wiki = @context.wiki
     @page = @wiki.build_wiki_page(@current_user, initial_params)
     if authorized_action(@page, @current_user, :create)
-      update_params = get_update_params(Set[:title, :body])
+      allowed_fields = Set[:title, :body]
+      allowed_fields << :block_editor_attributes if @context.account.feature_enabled?(:block_editor)
+      update_params = get_update_params(allowed_fields)
       assign_todo_date
       if !update_params.is_a?(Symbol) && @page.update(update_params) && process_front_page
         log_asset_access(@page, "wiki", @wiki, "participate")
@@ -434,6 +436,7 @@ class WikiPagesApiController < ApplicationController
     if @page.new_record?
       perform_update = true if authorized_action(@page, @current_user, [:create])
       allowed_fields = Set[:title, :body]
+      allowed_fields << :block_editor_attributes if @context.account.feature_enabled?(:block_editor)
     elsif authorized_action(@page, @current_user, [:update, :update_content])
       perform_update = true
       allowed_fields = Set[]
@@ -639,7 +642,9 @@ class WikiPagesApiController < ApplicationController
 
   def get_update_params(allowed_fields = Set[])
     # normalize parameters
-    page_params = params[:wiki_page] ? params[:wiki_page].permit(*%w[title body notify_of_update published front_page editing_roles publish_at]) : {}
+    wiki_page_params = %w[title body notify_of_update published front_page editing_roles publish_at]
+    wiki_page_params += [block_editor_attributes: [:time, :version, { blocks: [:id, :type, { data: strong_anything }] }]] if @context.account.feature_enabled?(:block_editor)
+    page_params = params[:wiki_page] ? params[:wiki_page].permit(*wiki_page_params) : {}
 
     if page_params.key?(:published)
       published_value = page_params.delete(:published)
@@ -665,6 +670,10 @@ class WikiPagesApiController < ApplicationController
     end
     change_front_page = !!@set_front_page
 
+    if page_params.key?(:block_editor_attributes)
+      page_params[:block_editor_attributes][:root_account_id] = @context.root_account_id
+    end
+
     # check user permissions
     rejected_fields = Set[]
     if @wiki.grants_right?(@current_user, session, :update)
@@ -683,6 +692,7 @@ class WikiPagesApiController < ApplicationController
 
       unless @page.grants_right?(@current_user, session, :update)
         allowed_fields << :body
+        allowed_fields << :block_editor_attributes if @context.account.feature_enabled?(:block_editor)
         rejected_fields << :title if page_params.include?(:title) && page_params[:title] != @page.title
 
         rejected_fields << :front_page if change_front_page && !@wiki.grants_right?(@current_user, session, :update)

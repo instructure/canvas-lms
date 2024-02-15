@@ -78,23 +78,7 @@ const SideNav = () => {
   const calendarRef = useRef<Element | null>(null)
   const inboxRef = useRef<Element | null>(null)
   const helpRef = useRef<Element | null>(null)
-  const avatarRef = useRef<Element | null>(null)
-  const canvasLogo = useRef<Element | null>(null)
-  const brandLogo = useRef<Element | null>(null)
   const logoRef = useRef<Element | null>(null)
-
-  if (avatarRef.current instanceof HTMLElement)
-    avatarRef.current.setAttribute('user-avatar', 'true')
-
-  if (canvasLogo.current instanceof HTMLElement)
-    canvasLogo.current.setAttribute('canvas-logo', 'true')
-
-  if (brandLogo.current instanceof HTMLElement) brandLogo.current.setAttribute('brand-logo', 'true')
-
-  if (logoRef.current instanceof HTMLElement) logoRef.current.setAttribute('logo-tray', 'true')
-
-  if (accountRef.current instanceof HTMLElement)
-    accountRef.current.setAttribute('account-tray', 'true')
 
   // after tray is closed, eventually set activeTray to null
   // we don't do this immediately in order to maintain animation of closing tray
@@ -255,15 +239,33 @@ const SideNav = () => {
   }
 
   useLayoutEffect(() => {
+    /** New SideNav CSS  */
+    const sideNavTrays = [
+      document.querySelector('#admin-tray'),
+      document.querySelector('#dashboard-tray'),
+      document.querySelector('#courses-tray'),
+      document.querySelector('#calendar-tray'),
+      document.querySelector('#inbox-tray'),
+      document.querySelector('#help-tray'),
+    ]
+    if (Array.isArray(sideNavTrays))
+      sideNavTrays.forEach(sideNavTray => sideNavTray?.classList.add('ic-sidenav-tray'))
+
+    document.querySelector('#user-tray')?.classList.add('ic-user-tray')
+    document.querySelector('#canvas-logo')?.classList.add('ic-canvas-logo')
+    document.querySelector('#brand-logo')?.classList.add('ic-brand-logo')
+    document.querySelector('#user-avatar')?.classList.add('ic-user-avatar')
+
     const collapseDiv = document.querySelectorAll('[aria-label="Main navigation"]')[0]
       .childNodes[1] as HTMLElement
-    collapseDiv.setAttribute('collapse-div', 'true')
-
     const collapseButton = collapseDiv.childNodes[0] as HTMLElement
-    collapseButton.setAttribute('collapse-button', 'true')
+    collapseDiv.classList.add('ic-collapse-div')
+    collapseButton.classList.add('ic-collapse-button')
 
     if (collapseGlobalNav) document.body.classList.remove('primary-nav-expanded')
     else document.body.classList.add('primary-nav-expanded')
+
+    /** New SideNav CSS  */
   }, [collapseGlobalNav])
 
   return (
@@ -274,55 +276,6 @@ const SideNav = () => {
       data-testid="sidenav-container"
     >
       <style>{`
-        .sidenav-container a {
-          padding: 0.4735rem 0 !important;
-          font-weight: 400;
-          transition: background-color 0.3s;
-
-          ${
-            !collapseGlobalNav
-              ? `width: auto !important;
-          height: 63.55px !important;`
-              : ''
-          }
-        }
-        .sidenav-container a:hover {
-          text-decoration: inherit;
-          color: white !important;
-          background-color: rgba(0, 0, 0, 0.2);
-        }
-        .sidenav-container a > div:first-child {
-          display: flex;
-          justify-content: center;
-
-          > svg {
-            width: 1.625rem !important;
-            height: 1.625rem !important;
-          }
-        }
-        .sidenav-container a[data-selected="true"]:hover {
-          color: var(--ic-brand-primary) !important;
-          background-color: var(--ic-brand-global-nav-menu-item__text-color);
-        }
-        .sidenav-container div[canvas-logo="true"] {
-          margin: ${!collapseGlobalNav ? '0.825rem' : '0.5395rem'} 0 ${
-        !collapseGlobalNav ? '0.535rem' : '0.4rem'
-      } 0;
-        }
-        .sidenav-container div[canvas-logo="true"] > svg {
-            width: ${!collapseGlobalNav ? '2.63rem' : '1.695rem'} !important;
-            height: ${!collapseGlobalNav ? '2.63rem' : '1.695rem'} !important;
-        }
-        .sidenav-container div[brand-logo="true"] {
-          margin: ${!collapseGlobalNav ? '-0.4rem' : '0.275rem'} 0 ${
-        !collapseGlobalNav ? '-0.905rem' : '-0.275rem'
-      } 0;
-        }
-        .sidenav-container span[user-avatar="true"] {
-          width: ${!collapseGlobalNav ? '2.25rem' : '1.875rem'};
-          height: ${!collapseGlobalNav ? '2.25rem' : '1.875rem'};
-          border: 2px solid var(--ic-brand-global-nav-avatar-border) !important;
-        }
         ${
           !collapseGlobalNav
             ? `
@@ -333,17 +286,6 @@ const SideNav = () => {
           height: 72.59px !important;
         }`
             : ''
-        }
-        .sidenav-container div[collapse-div="true"] {
-          display: flex;
-          align-items: end;
-          overflow: auto;
-          width: 100%;
-          height: 100%;
-        }
-        .sidenav-container button[collapse-button="true"] {
-          width: 100%;
-          padding: 0.75rem !important;
         }
       `}</style>
       <SideNavBar
@@ -362,11 +304,11 @@ const SideNav = () => {
           elementRef={el => (logoRef.current = el)}
           icon={
             !logoUrl ? (
-              <div ref={el => (canvasLogo.current = el)}>
+              <div id="canvas-logo">
                 <IconCanvasLogoSolid data-testid="sidenav-canvas-logo" />
               </div>
             ) : (
-              <div ref={el => (brandLogo.current = el)}>
+              <div id="brand-logo">
                 <Img
                   display="inline-block"
                   alt="sidenav-brand-logomark"
@@ -385,6 +327,7 @@ const SideNav = () => {
           data-testid="sidenav-header-logo"
         />
         <SideNavBar.Item
+          id="user-tray"
           icon={
             <Badge
               count={unreadContentSharesCount}
@@ -407,11 +350,13 @@ const SideNav = () => {
               }
             >
               <Avatar
-                elementRef={el => (avatarRef.current = el)}
+                id="user-avatar"
                 name={window.ENV.current_user.display_name}
                 size="x-small"
                 src={window.ENV.current_user.avatar_image_url}
                 data-testid="sidenav-user-avatar"
+                showBorder="always"
+                frameBorder={2}
                 themeOverride={{
                   background: 'transparent',
                 }}
@@ -429,6 +374,7 @@ const SideNav = () => {
           themeOverride={navItemThemeOverride}
         />
         <SideNavBar.Item
+          id="admin-tray"
           elementRef={el => (adminRef.current = el)}
           icon={<IconAdminLine />}
           label={I18n.t('Admin')}
@@ -441,6 +387,7 @@ const SideNav = () => {
           themeOverride={navItemThemeOverride}
         />
         <SideNavBar.Item
+          id="dashboard-tray"
           elementRef={el => (dashboardRef.current = el)}
           icon={isK5User ? <IconHomeLine data-testid="K5HomeIcon" /> : <IconDashboardLine />}
           label={isK5User ? I18n.t('Home') : I18n.t('Dashboard')}
@@ -449,8 +396,9 @@ const SideNav = () => {
           selected={selectedNavItem === 'dashboard'}
         />
         <SideNavBar.Item
+          id="courses-tray"
+          // id={selectedNavItem === 'courses' ? 'active-courses' : ''}
           elementRef={el => (coursesRef.current = el)}
-          id={selectedNavItem === 'courses' ? 'active-courses' : ''}
           icon={<IconCoursesLine />}
           label={isK5User ? I18n.t('Subjects') : I18n.t('Courses')}
           href="/courses"
@@ -462,6 +410,7 @@ const SideNav = () => {
           themeOverride={navItemThemeOverride}
         />
         <SideNavBar.Item
+          id="calendar-tray"
           elementRef={el => (calendarRef.current = el)}
           icon={<IconCalendarMonthLine />}
           label={I18n.t('Calendar')}
@@ -470,6 +419,7 @@ const SideNav = () => {
           selected={selectedNavItem === 'calendar'}
         />
         <SideNavBar.Item
+          id="inbox-tray"
           icon={
             <Badge
               count={unreadConversationsCount}
@@ -501,6 +451,7 @@ const SideNav = () => {
           themeOverride={navItemThemeOverride}
         />
         <SideNavBar.Item
+          id="help-tray"
           icon={
             <Badge
               count={unreadReleaseNotesCount}

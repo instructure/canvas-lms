@@ -738,6 +738,15 @@ returns the current course's term name.
 ```
 "W1 2017"
 ```
+## Canvas.term.id
+returns the current course's term numerical id.
+
+**Availability**: **  
+**Launch Parameter**: *canvas_term_id*  
+
+```
+123
+```
 ## CourseSection.sourcedId
 returns the current course sis source id
 to return the section source id use Canvas.course.sectionIds.
