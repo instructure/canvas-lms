@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useEffect, useMemo, useState} from 'react'
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {ApplyLocale} from '@instructure/ui-i18n'
 import {Flex} from '@instructure/ui-flex'
@@ -176,6 +176,7 @@ export default function ItemAssignToTray({
   const [initialCards, setInitialCards] = useState<ItemAssignToCardSpec[]>([])
   const [fetchInFlight, setFetchInFlight] = useState(false)
   const [disabledOptionIds, setDisabledOptionIds] = useState<string[]>(defaultDisabledOptionIds)
+  const [shouldFocusCard, setShouldFocusCard] = useState<boolean>(false)
   const everyoneOption = useMemo(() => {
     const hasOverrides =
       (disabledOptionIds.length === 1 && !disabledOptionIds.includes('everyone')) ||
@@ -197,6 +198,10 @@ export default function ItemAssignToTray({
     defaultValues: [],
     onError: handleDismiss,
   })
+
+  useEffect(() => {
+    if (shouldFocusCard) setShouldFocusCard(false)
+  }, [shouldFocusCard])
 
   useEffect(() => {
     if (defaultCards !== undefined) {
@@ -323,6 +328,13 @@ export default function ItemAssignToTray({
   }
 
   const handleUpdate = useCallback(() => {
+    const hasErrors = assignToCards.some(card => !card.isValid)
+    // If a card has errors it should not save and the respective card should be focused
+    if (hasErrors) {
+      setShouldFocusCard(true)
+      return
+    }
+
     if (onSave !== undefined) {
       onSave(assignToCards)
       return
@@ -503,6 +515,7 @@ export default function ItemAssignToTray({
 
   function renderCards(isOpen?: boolean) {
     const cardCount = assignToCards.length
+    const firstCardWithError = assignToCards.find(card => !card.isValid)
     return assignToCards.map(card => {
       return (
         <View key={card.key} as="div" margin="small 0 0 0">
@@ -526,6 +539,7 @@ export default function ItemAssignToTray({
             customIsLoading={isLoading}
             customSetSearchTerm={setSearchTerm}
             highlightCard={card.highlightCard}
+            focus={shouldFocusCard && firstCardWithError?.key === card.key}
           />
         </View>
       )
@@ -561,10 +575,10 @@ export default function ItemAssignToTray({
     return (
       <Flex.Item data-testid="module-item-edit-tray-footer" width="100%">
         <TrayFooter
-          updateInteraction={allCardsValid() ? 'enabled' : 'inerror'}
           saveButtonLabel={useApplyButton ? I18n.t('Apply') : I18n.t('Save')}
           onDismiss={handleDismiss}
           onUpdate={handleUpdate}
+          hasErrors={!allCardsValid()}
         />
       </Flex.Item>
     )

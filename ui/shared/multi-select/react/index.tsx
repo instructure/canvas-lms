@@ -65,6 +65,7 @@ type Props = {
   isLoading: boolean
   isShowingOptions?: boolean
   label: React.ReactNode
+  inputRef?: (inputElement: HTMLInputElement | null) => void
   listRef?: (ref: HTMLUListElement | null) => void
   noOptionsLabel: string
   onChange: (ids: string[]) => void

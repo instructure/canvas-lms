@@ -32,36 +32,30 @@ export interface FooterProps {
   saveButtonLabel: string
   onDismiss: () => void
   onUpdate: () => void
-  updateInteraction?: 'enabled' | 'inerror'
+  hasErrors?: boolean
 }
 
 export default function Footer({
   saveButtonLabel,
   onDismiss,
   onUpdate,
-  updateInteraction = 'enabled',
+  hasErrors = false,
 }: FooterProps) {
-  const handleUpdate = useCallback(() => {
-    if (updateInteraction === 'enabled') {
-      onUpdate()
-    }
-  }, [onUpdate, updateInteraction])
-
   const updateButton = () => {
-    if (updateInteraction === 'inerror') {
+    if (hasErrors) {
       return (
         <Tooltip
           renderTip={I18n.t('Please fix errors before continuing')}
           on={['click', 'focus', 'hover']}
         >
-          <Button color="primary" onClick={handleUpdate}>
+          <Button color="primary" onClick={onUpdate}>
             {saveButtonLabel}
           </Button>
         </Tooltip>
       )
     } else {
       return (
-        <Button color="primary" onClick={handleUpdate}>
+        <Button color="primary" onClick={onUpdate}>
           {saveButtonLabel}
         </Button>
       )

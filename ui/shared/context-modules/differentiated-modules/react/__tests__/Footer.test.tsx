@@ -57,13 +57,10 @@ describe('Footer', () => {
     expect(props.onUpdate).toHaveBeenCalled()
   })
 
-  it('does not call onUpdate when in-error', () => {
-    const {getByRole, getByText} = renderComponent({updateInteraction: 'inerror'})
-    const savebtn = getByRole('button', {name: 'Save'})
-    savebtn.click()
-    expect(props.onUpdate).not.toHaveBeenCalled()
-    savebtn.focus()
-    expect(getByText('Please fix errors before continuing')).toBeInTheDocument()
+  it('calls onUpdate when in-error', () => {
+    const {getByRole} = renderComponent({hasErrors: true})
+    getByRole('button', {name: 'Save'}).click()
+    expect(props.onUpdate).toHaveBeenCalled()
   })
 
   it('does not display the error tooltip when not in-error', () => {
@@ -74,7 +71,7 @@ describe('Footer', () => {
   })
 
   it('displays the error tooltip when in-error', () => {
-    const {getByRole, queryByText} = renderComponent({updateInteraction: 'inerror'})
+    const {getByRole, queryByText} = renderComponent({hasErrors: true})
     const savebtn = getByRole('button', {name: 'Save'})
     savebtn.focus()
     expect(queryByText('Please fix errors before continuing')).toBeInTheDocument()
