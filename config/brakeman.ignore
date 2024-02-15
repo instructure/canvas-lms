@@ -643,7 +643,7 @@
       "check_name": "SendFile",
       "message": "Model attribute used in file name",
       "file": "app/controllers/files_controller.rb",
-      "line": 1568,
+      "line": 1571,
       "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
       "code": "send_file(Thumbnail.where(:id => params[:id], :uuid => params[:uuid]).first.full_filename, :content_type => Thumbnail.where(:id => params[:id], :uuid => params[:uuid]).first.content_type)",
       "render_path": null,
@@ -978,7 +978,7 @@
       "check_name": "UnsafeReflection",
       "message": "Unsafe reflection method `const_get` called with parameter value",
       "file": "app/controllers/application_controller.rb",
-      "line": 1461,
+      "line": 1468,
       "link": "https://brakemanscanner.org/docs/warning_types/remote_code_execution/",
       "code": "Object.const_get((params[:feed_code].split(\"_\", 2) or [\"group_membership\", params[:feed_code].split(\"_\", 3)[-1]])[0].classify, false)",
       "render_path": null,
@@ -1104,6 +1104,25 @@
         "method": "record_due_date_changes_for_auditable_assignments!"
       },
       "user_input": "assignment_and_student_id_values(:entries => entries).join(\",\")",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "b6f831712d0a04b2fcc4efc4a94c6b022740cd92bef1cd6dbadf32e7f7ad8f77",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "config/initializers/active_record.rb",
+      "line": 1530,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "lock(\"#{lock_type_clause(lock_type)} OF #{connection.quote_local_table_name(klass.table_name)}\")",
+      "render_path": null,
+      "location": null,
+      "user_input": "lock_type_clause(lock_type)",
       "confidence": "Medium",
       "cwe_id": [
         89
@@ -1481,7 +1500,7 @@
       "check_name": "SQL",
       "message": "Possible SQL injection",
       "file": "config/initializers/active_record.rb",
-      "line": 1606,
+      "line": 1623,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
       "code": "connection.select_value(\"SELECT COUNT(*) FROM pg_proc WHERE proname='#{procname}'\")",
       "render_path": null,
