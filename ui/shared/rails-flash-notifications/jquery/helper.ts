@@ -95,19 +95,15 @@ class RailsFlashNotificationsHelper {
     const icon = this.getIconType(type)
 
     // See generateScreenreaderNodeHtml for SR features
-    return `
-        <div class="ic-flash-${htmlEscape(type)} flash-message-container" aria-hidden="true">
-          <div class="ic-flash__icon">
-            <i class="icon-${htmlEscape(icon)}"></i>
-          </div>
-          ${this.escapeContent(content)}
-          <button type="button" class="Button Button--icon-action close_link" aria-label="${htmlEscape(
-            I18n.t('Close')
-          )}">
-            <i class="icon-x"></i>
-          </button>
-        </div>
-      `
+    return `<div class="ic-flash-${htmlEscape(
+      type
+    )} flash-message-container" aria-hidden="true"><div class="ic-flash__icon"><i class="icon-${htmlEscape(
+      icon
+    )}"></i></div>${this.escapeContent(
+      content
+    )}<button type="button" class="Button Button--icon-action close_link" aria-label="${htmlEscape(
+      I18n.t('Close')
+    )}"><i class="icon-x"></i></button></div>`
   }
 
   getIconType(type) {
