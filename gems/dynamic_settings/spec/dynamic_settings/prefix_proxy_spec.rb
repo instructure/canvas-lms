@@ -77,22 +77,26 @@ module DynamicSettings
       end
 
       it "must fall back to expired cached values when consul can't be contacted" do
-        DynamicSettings.cache.write(DynamicSettings::CACHE_KEY_PREFIX + "foo/bar/baz", "qux", expires_in: -3.minutes)
+        DynamicSettings.cache.write(DynamicSettings::CACHE_KEY_PREFIX + "foo/bar/baz", "qux", expires_in: 0)
         expect(Diplomat::Kv).to receive(:get_all).and_raise(Diplomat::KeyNotFound)
-        val = proxy.fetch("baz")
-        expect(val).to eq "qux"
+        Timecop.travel(3.minutes) do
+          val = proxy.fetch("baz")
+          expect(val).to eq "qux"
+        end
       end
 
       it "must log the connection failure when consul can't be contacted" do
-        DynamicSettings.cache.write(DynamicSettings::CACHE_KEY_PREFIX + "foo/bar/baz", "qux", expires_in: -3.minutes)
+        DynamicSettings.cache.write(DynamicSettings::CACHE_KEY_PREFIX + "foo/bar/baz", "qux", expires_in: 0)
         invoked = false
         DynamicSettings.fallback_recovery_lambda = lambda do |e|
           invoked = true
           expect(e.class).to eq(Diplomat::KeyNotFound)
         end
         allow(Diplomat::Kv).to receive(:get_all).and_raise(Diplomat::KeyNotFound)
-        proxy.fetch("baz")
-        expect(invoked).to be_truthy
+        Timecop.travel(3.minutes) do
+          proxy.fetch("baz")
+          expect(invoked).to be_truthy
+        end
       end
 
       it "must raise an exception when consul can't be reached and no previous value is found" do

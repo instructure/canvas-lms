@@ -113,7 +113,7 @@ describe CanvasCache::Redis do
         let(:cache) { ActiveSupport::Cache::RedisCacheStore.new(url: "redis://localhost:1234", circuit_breaker: { error_threshold: 1, error_timeout: 2 }) }
 
         before do
-          expect(RedisClient::RubyConnection).to receive(:new).and_raise(RedisClient::TimeoutError)
+          allow(RedisClient::RubyConnection).to receive(:new).and_raise(RedisClient::TimeoutError)
         end
 
         it "does not fail cache.read" do
@@ -285,7 +285,7 @@ describe CanvasCache::Redis do
       end
 
       it "uses the circuit breaker properly" do
-        expect(ConfigFile).to receive(:load).with("redis").and_return(url: ["redis://redis-test-node-42:9999/"])
+        expect(ConfigFile).to receive(:load).with("redis").and_return(url: ["redis://redis-test-node-42:9999/"], reconnect_attempts: 0)
         expect(RedisClient::RubyConnection).to receive(:new).and_raise(RedisClient::TimeoutError, "intentional failure").twice
 
         now = Process.clock_gettime(Process::CLOCK_MONOTONIC)
