@@ -110,6 +110,7 @@ QUnit.module('SpeedGrader', rootHooks => {
   rootHooks.afterEach(() => {
     teardownFixtures()
     fakeENV.teardown()
+    $('#fixtures').nextAll().not('#qunit-fixture').remove()
   })
 
   QUnit.module('SpeedGrader options menu', hooks => {
