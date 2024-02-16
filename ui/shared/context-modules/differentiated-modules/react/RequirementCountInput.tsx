@@ -72,18 +72,18 @@ export default function RequirementCountInput({
               {I18n.t('Students must complete all of these requirements.')}
             </Text>
           </View>
+          {requirementCount === 'all' && (
+            <View as="div" margin="small small 0 0">
+              <Checkbox
+                data-testid="sequential-progress-checkbox"
+                checked={requireSequentialProgress}
+                onChange={onToggleSequentialProgress}
+                label={I18n.t('Students must move through requirements in sequential order')}
+              />
+            </View>
+          )}
         </Flex.Item>
       </Flex>
-      {requirementCount === 'all' && (
-        <View as="div" padding="0 0 0 medium">
-          <Checkbox
-            data-testid="sequential-progress-checkbox"
-            checked={requireSequentialProgress}
-            onChange={onToggleSequentialProgress}
-            label={I18n.t('Students must move through requirements in sequential order')}
-          />
-        </View>
-      )}
       <Flex>
         <Flex.Item align="start">
           <RadioInput
