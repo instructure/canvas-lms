@@ -3846,7 +3846,8 @@ QUnit.module('SpeedGrader', rootHooks => {
 
       hooks.afterEach(function () {
         SpeedGrader.teardown()
-        $('.ui-dialog').remove()
+        const $dialog = $('.ui-dialog')
+        if ($dialog) $dialog.remove()
       })
 
       QUnit.module('PostPolicy setup', ({beforeEach, afterEach}) => {
@@ -4005,7 +4006,8 @@ QUnit.module('SpeedGrader', rootHooks => {
         delete SpeedGrader.EG.currentStudent
         window.jsonData = jsonData
         SpeedGrader.teardown()
-        document.querySelector('.ui-selectmenu-menu').remove()
+        const menu = document.querySelector('.ui-selectmenu-menu')
+        if (menu) menu.remove()
       })
 
       test("the iframe src points to a user's submission", () => {
@@ -4754,7 +4756,8 @@ QUnit.module('SpeedGrader', rootHooks => {
           })
 
           hooks.afterEach(() => {
-            document.querySelector('.ui-selectmenu-menu').remove()
+            const menu = document.querySelector('.ui-selectmenu-menu')
+            if (menu) menu.remove()
           })
 
           test('Students are listed anonymously', () => {
@@ -5114,7 +5117,8 @@ QUnit.module('SpeedGrader', rootHooks => {
         hooks.afterEach(() => {
           SpeedGrader.teardown()
           window.jsonData = originalJsonData
-          document.querySelector('.ui-selectmenu-menu').remove()
+          const menu = document.querySelector('.ui-selectmenu-menu')
+          if (menu) menu.remove()
         })
 
         test('default avatar image is hidden', () => {
@@ -5909,7 +5913,8 @@ QUnit.module('SpeedGrader', rootHooks => {
           window.jsonData = originalJsonData
           delete SpeedGrader.EG.currentStudent
           SpeedGrader.teardown()
-          document.querySelector('.ui-selectmenu-menu').remove()
+          const menu = document.querySelector('.ui-selectmenu-menu')
+          if (menu) menu.remove()
         })
 
         test('calls updateSelectMenuStatus with "anonymous_id"', assert => {
@@ -6326,7 +6331,8 @@ QUnit.module('SpeedGrader', rootHooks => {
 
       hooks.beforeEach(() => {
         // A lot of these are polluting the space prior to execution, make sure things are clean
-        $('.score').remove()
+        const $score = $('.score')
+        if ($score) $score.remove()
         setupFixtures(`
         <div id='grading_details_mount_point'></div>
         <div id='grading-box-selected-grader'></div>
@@ -8298,7 +8304,8 @@ QUnit.module('SpeedGrader', rootHooks => {
       handleStudentChangedHooks.afterEach(() => {
         SpeedGrader.teardown()
         userSettingsStub.restore()
-        document.querySelector('.ui-selectmenu-menu').remove()
+        const menu = document.querySelector('.ui-selectmenu-menu')
+        if (menu) menu.remove()
       })
 
       test('avatar is shown if the current student has an avatar and student names are not hidden', () => {
