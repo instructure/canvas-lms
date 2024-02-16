@@ -34,7 +34,7 @@ describe LocalCache do
       rc = CanvasCache::Redis.config
       {
         store: "redis",
-        redis_url: rc.fetch("servers", ["redis://redis"]).first,
+        redis_url: Array(rc.fetch("url", "redis://redis")).first,
         redis_db: rc.fetch("database", 1)
       }
     end

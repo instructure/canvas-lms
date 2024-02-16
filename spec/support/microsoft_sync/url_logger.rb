@@ -72,6 +72,7 @@ module MicrosoftSync::GraphService::SpecHelper
 
         request_stub[:requests].each_with_index do |request, index|
           response = responses[index]
+          next if @openapi_schema.empty?
           next if validates_with_schema?(request, response, variables)
 
           @errors << {

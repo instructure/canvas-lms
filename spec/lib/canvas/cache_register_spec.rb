@@ -35,7 +35,7 @@ describe Canvas::CacheRegister do
   let(:time2) { 2.minutes.from_now }
 
   def to_stamp(time)
-    time.to_s(User.cache_timestamp_format)
+    time.to_fs(User.cache_timestamp_format)
   end
 
   context "reading" do
