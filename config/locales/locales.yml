@@ -933,6 +933,49 @@ hy:
   number:
     format:
       round_mode: default
+id:
+  bigeasy_locale: id_ID
+  date:
+    abbr_month_names:
+    -
+    - Jan
+    - Feb
+    - Mac
+    - Apr
+    - Mei
+    - Jun
+    - Jul
+    - Agt
+    - Sep
+    - Okt
+    - Nov
+    - Des
+    formats:
+      date_at_time: "%b %-d %H.%M"
+      default: "%d/%m/%Y"
+      full: "%-d %b %Y pukul %H.%M"
+      full_with_weekday: "%a, %-d %b %Y pukul %H.%M"
+      long: "%-d %B %Y"
+      long_with_weekday: "%A, %-d %B"
+      medium: "%-d %b %Y"
+      medium_month: "%b %Y"
+      medium_with_weekday: "%a, %-d %b %Y"
+      short: "%-d %b"
+      short_month: "%b"
+      short_weekday: "%a"
+      short_with_weekday: "%a, %-d %b"
+      weekday: "%A"
+  fullcalendar_locale: id
+  dow_offset: 1
+  locales:
+    id: Bahasa Indonesia
+  moment_locale: id
+  time:
+    event: "%{date} pukul %{time} "
+    formats:
+      tiny: "%H.%M"
+      tiny_on_the_hour: "%H.%M"
+  proper_noun_singular_genitive: "%{noun}"
 is:
   bigeasy_locale: is_IS
   date:
