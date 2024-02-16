@@ -111,19 +111,19 @@ export const DiscussionThreadContainer = props => {
       props.discussionEntry.entryParticipant?.read !==
       result.data.updateDiscussionEntryParticipant.discussionEntry.entryParticipant?.read
     ) {
-      const discussionUnreadCountchange = result.data.updateDiscussionEntryParticipant
+      const discussionUnreadCountChange = result.data.updateDiscussionEntryParticipant
         .discussionEntry.entryParticipant?.read
         ? -1
         : 1
       updateDiscussionTopicEntryCounts(cache, props.discussionTopic.id, {
-        unreadCountChange: discussionUnreadCountchange,
+        unreadCountChange: discussionUnreadCountChange,
       })
 
       if (result.data.updateDiscussionEntryParticipant.discussionEntry.rootEntryId) {
         updateDiscussionEntryRootEntryCounts(
           cache,
           result.data.updateDiscussionEntryParticipant.discussionEntry,
-          discussionUnreadCountchange
+          discussionUnreadCountChange
         )
       }
     }
