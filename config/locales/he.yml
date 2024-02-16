@@ -2938,6 +2938,14 @@ he:
       assignment_delete: "המשימה הזו בוטלה"
       assignment_not_available: "המשימה שבקשת אינה זמינה להקבצה שלך בקורס הזה."
       created: "המשימה נוצרה בהצלחה"
+      quizzes_published: 
+        one: "בוחן אחד פורסם בהצלחה!"
+        other: "%{count} בחנים פורסמו בהצלחה!"
+        two: "%{count} בחנים פורסמו בהצלחה!"
+      quizzes_unpublished: 
+        one: "בוחן אחד הוסר מפירסום בהצלחה!"
+        other: "%{count} בחנים הוסרו מפירסום בהצלחה!"
+        two: "%{count} בחנים הוסרו מפירסום בהצלחה!"
       updated: "המשימה עודכנה בהצלחה"
     number_of_assignments: 
       one: "משימה אחת"
@@ -5558,7 +5566,7 @@ he:
     other: "%{count} תלמידים"
     two: "%{count} תלמידים"
   count_students_c9920376: 
-    one: "%{count} תלמידים"
+    one: "חניך אחד"
     other: "%{count} תלמידים"
   count_students_in_percentile_percentile_d0adecfe: 
     many: "%{count} תלמידים באחוזון %{percentile}. "
@@ -12882,6 +12890,10 @@ he:
       unrecognized: "דפדפן לא מזוהה"
   modelsQuiz: 
     cant_unpublish_when_students_submit: "אין אפשרות לבטל פרסום אם ישנן הגשות תלמידים"
+    question_count: 
+      one: "שאלה אחת"
+      other: "%{count} שאלות"
+      two: "%{count} שאלות"
   modelsSection: 
     overrides: 
       everyone: "כל אחד"
