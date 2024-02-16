@@ -300,7 +300,7 @@ function openDialogsWhenClicked() {
     $('#' + $(this).attr('aria-controls')).ifExists($dialog => {
       event.preventDefault()
       // if the linked dialog has not already been initialized, initialize it (passing in opts)
-      if (!$dialog.data('dialog')) {
+      if (!$dialog.data('ui-dialog')) {
         $dialog.dialog(
           $.extend(
             {
