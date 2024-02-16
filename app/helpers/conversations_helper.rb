@@ -281,14 +281,23 @@ module ConversationsHelper
   end
 
   def soft_concluded_course_for_user?(course, user)
-    enrollment_types = course.enrollments.active.where(user_id: user.id).map(&:type)
+    # Fetch active enrollments for the user in the course and map to their types
+    user_enrollment_types = course.enrollments.active.where(user_id: user.id).map(&:type)
+    return course.soft_concluded? if user_enrollment_types.empty?
 
-    if enrollment_types.empty?
-      course.soft_concluded?
-    else
-      # Course is only soft_concluded for a user if all of their enrollments are soft_concluded
-      enrollment_types.all? { |enrollment_name| course.soft_concluded?(enrollment_name) }
-    end
+    # If the user has an active enrollment type or active section, the course is not soft concluded for that user
+    !(has_active_enrollment_type?(course, user_enrollment_types) || user_has_active_section?(course, user))
+  end
+
+  def user_has_active_section?(course, user)
+    visible_sections = course.sections_visible_to(user)
+    visible_sections.any? { |section| !section.concluded? }
+  end
+
+  def has_active_enrollment_type?(course, enrollment_types)
+    return false if enrollment_types.empty?
+
+    !enrollment_types.all? { |enrollment_name| course.soft_concluded?(enrollment_name) }
   end
 
   def validate_context(context, recipients)
