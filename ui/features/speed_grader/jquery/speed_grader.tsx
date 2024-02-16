@@ -565,7 +565,7 @@ function initDropdown() {
     window.jsonData.context.active_course_sections.length > 1 &&
     !window.jsonData.GROUP_GRADING_MODE
   ) {
-    const $selectmenu_list = $selectmenu?.data('selectmenu').list
+    const $selectmenu_list = $selectmenu?.data('ui-selectmenu').list
     const $menu = $('#section-menu')
 
     $menu

@@ -110,7 +110,7 @@ QUnit.module('SpeedGraderSelectMenu', () => {
           anonymizableId: 'id',
         })
 
-        const entry = selectMenu.data('selectmenu').list.find('li:eq(0)').children()
+        const entry = selectMenu.data('ui-selectmenu').list.find('li:eq(0)').children()
         strictEqual(
           entry.find('span.ui-selectmenu-item-icon.speedgrader-selectmenu-icon i.icon-check')
             .length,
@@ -139,7 +139,7 @@ QUnit.module('SpeedGraderSelectMenu', () => {
           anonymizableId: 'id',
         })
 
-        const entry = selectMenu.data('selectmenu').list.find('li:eq(1)').children()
+        const entry = selectMenu.data('ui-selectmenu').list.find('li:eq(1)').children()
         strictEqual(
           entry.find('span.ui-selectmenu-item-icon.speedgrader-selectmenu-icon:contains("●")')
             .length,
@@ -168,7 +168,7 @@ QUnit.module('SpeedGraderSelectMenu', () => {
           anonymizableId: 'id',
         })
 
-        const entry = selectMenu.data('selectmenu').list.find('li:eq(0)').children()
+        const entry = selectMenu.data('ui-selectmenu').list.find('li:eq(0)').children()
         strictEqual(
           entry.find('span.ui-selectmenu-item-icon.speedgrader-selectmenu-icon').length,
           1
@@ -199,7 +199,7 @@ QUnit.module('SpeedGraderSelectMenu', () => {
           anonymizableId: 'id',
         })
 
-        const entry = selectMenu.data('selectmenu').list.find('li:eq(0)').children()
+        const entry = selectMenu.data('ui-selectmenu').list.find('li:eq(0)').children()
         strictEqual(
           entry.find('span.ui-selectmenu-item-icon.speedgrader-selectmenu-icon:contains("●")')
             .length,
@@ -231,7 +231,7 @@ QUnit.module('SpeedGraderSelectMenu', () => {
           anonymizableId: 'id',
         })
 
-        const entry = selectMenu.data('selectmenu').list.find('li:eq(0)').children()
+        const entry = selectMenu.data('ui-selectmenu').list.find('li:eq(0)').children()
         strictEqual(
           entry.find('span.ui-selectmenu-item-icon.speedgrader-selectmenu-icon > i.icon-check')
             .length,
@@ -284,7 +284,7 @@ QUnit.module('SpeedGraderSelectMenu', () => {
           anonymizableId: 'id',
         })
 
-        const entry = selectMenu.data('selectmenu').list.find('li:eq(0)').children()
+        const entry = selectMenu.data('ui-selectmenu').list.find('li:eq(0)').children()
         strictEqual(
           entry.find('span.ui-selectmenu-item-icon.speedgrader-selectmenu-icon i.icon-check')
             .length,
