@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {render, act} from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
+import userEvent, {PointerEventsCheckLevel} from '@testing-library/user-event'
 
 import {UnpublishedChangesTrayContents} from '../unpublished_changes_tray_contents'
 
@@ -64,11 +64,11 @@ describe('UnpublishedChangesTrayContents', () => {
     expect(getByText('Unpublished Changes')).toBeInTheDocument()
   })
 
-  it('calls the handleTrayDismiss when the close button is clicked', () => {
+  it('calls the handleTrayDismiss when the close button is clicked', async () => {
     const {getByText} = render(<UnpublishedChangesTrayContents {...defaultProps} />)
 
     const closeButton = getByText('Close')
-    act(() => userEvent.click(closeButton))
+    await userEvent.setup({pointerEventsCheck: PointerEventsCheckLevel.Never}).click(closeButton)
     expect(onTrayDismiss).toHaveBeenCalledWith(false)
   })
 

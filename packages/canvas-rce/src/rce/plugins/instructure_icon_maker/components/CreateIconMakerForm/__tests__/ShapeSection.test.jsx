@@ -38,13 +38,13 @@ jest.mock('../../../../shared/fileUtils', () => {
   }
 })
 
-function selectOption(button, option) {
-  userEvent.click(
+const selectOption = async (button, option) => {
+  await userEvent.click(
     screen.getByRole('combobox', {
       name: button,
     })
   )
-  userEvent.click(
+  await userEvent.click(
     screen.getByRole('option', {
       name: option,
     })
@@ -52,17 +52,17 @@ function selectOption(button, option) {
 }
 
 describe('<ShapeSection />', () => {
-  it('changes the icon shape', () => {
+  it('changes the icon shape', async () => {
     const onChange = jest.fn()
     render(<ShapeSection settings={{...DEFAULT_SETTINGS, shape: 'circle'}} onChange={onChange} />)
-    selectOption(/icon shape/i, /triangle/i)
+    await selectOption(/icon shape/i, /triangle/i)
     expect(onChange).toHaveBeenCalledWith({shape: 'triangle'})
   })
 
-  it('changes the icon size', () => {
+  it('changes the icon size', async () => {
     const onChange = jest.fn()
     render(<ShapeSection settings={{...DEFAULT_SETTINGS, size: 'small'}} onChange={onChange} />)
-    selectOption(/icon size/i, /extra small/i)
+    await selectOption(/icon size/i, /extra small/i)
     expect(onChange).toHaveBeenCalledWith({size: 'x-small'})
   })
 })

@@ -82,7 +82,7 @@ describe('ContentMigrationForm', () => {
   it('Populates select with migrator options', async () => {
     render(<ContentMigrationsForm setMigrations={jest.fn()} />)
     const selectOne = await screen.findByTitle('Select one')
-    userEvent.click(selectOne)
+    await userEvent.click(selectOne)
     expect(screen.getByText('Copy a Canvas Course')).toBeInTheDocument()
     expect(screen.getByText('Canvas Course Export Package')).toBeInTheDocument()
   })
@@ -90,15 +90,15 @@ describe('ContentMigrationForm', () => {
   it('performs POST when submitting', async () => {
     renderComponent()
 
-    userEvent.click(await screen.findByTitle('Select one'))
-    userEvent.click(screen.getByText('Copy a Canvas Course'))
+    await userEvent.click(await screen.findByTitle('Select one'))
+    await userEvent.click(screen.getByText('Copy a Canvas Course'))
 
-    userEvent.type(screen.getByPlaceholderText('Search...'), 'MyCourse')
-    userEvent.click(await screen.findByRole('option', {name: 'MyCourse'}))
+    await userEvent.type(screen.getByPlaceholderText('Search...'), 'MyCourse')
+    await userEvent.click(await screen.findByRole('option', {name: 'MyCourse'}))
 
-    userEvent.click(screen.getByText('All content'))
+    await userEvent.click(screen.getByText('All content'))
 
-    userEvent.click(screen.getByTestId('submitMigration'))
+    await userEvent.click(screen.getByTestId('submitMigration'))
 
     // @ts-expect-error
     const [url, response] = fetchMock.lastCall()
@@ -141,17 +141,17 @@ describe('ContentMigrationForm', () => {
 
     renderComponent()
 
-    userEvent.click(await screen.findByTitle('Select one'))
-    userEvent.click(screen.getByText('Canvas Course Export Package'))
+    await userEvent.click(await screen.findByTitle('Select one'))
+    await userEvent.click(screen.getByText('Canvas Course Export Package'))
 
     const file = new File(['blah, blah, blah'], 'my_file.zip', {type: 'application/zip'})
     Object.defineProperty(file, 'size', {value: 1024})
     const input = screen.getByTestId('migrationFileUpload')
-    userEvent.upload(input, file)
+    await userEvent.upload(input, file)
 
-    userEvent.click(screen.getByText('All content'))
+    await userEvent.click(screen.getByText('All content'))
 
-    userEvent.click(screen.getByTestId('submitMigration'))
+    await userEvent.click(screen.getByTestId('submitMigration'))
 
     await waitFor(() => {
       expect(completeUpload).toHaveBeenCalledWith(
@@ -172,15 +172,15 @@ describe('ContentMigrationForm', () => {
   it('calls setMigrations when submitting', async () => {
     renderComponent()
 
-    userEvent.click(await screen.findByTitle('Select one'))
-    userEvent.click(screen.getByText('Copy a Canvas Course'))
+    await userEvent.click(await screen.findByTitle('Select one'))
+    await userEvent.click(screen.getByText('Copy a Canvas Course'))
 
-    userEvent.type(screen.getByPlaceholderText('Search...'), 'MyCourse')
-    userEvent.click(await screen.findByRole('option', {name: 'MyCourse'}))
+    await userEvent.type(screen.getByPlaceholderText('Search...'), 'MyCourse')
+    await userEvent.click(await screen.findByRole('option', {name: 'MyCourse'}))
 
-    userEvent.click(screen.getByText('All content'))
+    await userEvent.click(screen.getByText('All content'))
 
-    userEvent.click(screen.getByTestId('submitMigration'))
+    await userEvent.click(screen.getByTestId('submitMigration'))
 
     expect(setMigrationsMock).toHaveBeenCalled()
   })
@@ -188,15 +188,15 @@ describe('ContentMigrationForm', () => {
   it('resets form after submitting', async () => {
     renderComponent()
 
-    userEvent.click(await screen.findByTitle('Select one'))
-    userEvent.click(screen.getByText('Copy a Canvas Course'))
+    await userEvent.click(await screen.findByTitle('Select one'))
+    await userEvent.click(screen.getByText('Copy a Canvas Course'))
 
-    userEvent.type(screen.getByPlaceholderText('Search...'), 'MyCourse')
-    userEvent.click(await screen.findByRole('option', {name: 'MyCourse'}))
+    await userEvent.type(screen.getByPlaceholderText('Search...'), 'MyCourse')
+    await userEvent.click(await screen.findByRole('option', {name: 'MyCourse'}))
 
-    userEvent.click(screen.getByText('All content'))
+    await userEvent.click(screen.getByText('All content'))
 
-    userEvent.click(screen.getByTestId('submitMigration'))
-    await waitForElementToBeRemoved(() => screen.getByTestId('submitMigration'))
+    await userEvent.click(screen.getByTestId('submitMigration'))
+    expect(screen.queryByTestId('submitMigration')).not.toBeInTheDocument()
   })
 })

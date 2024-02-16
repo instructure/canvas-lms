@@ -15,9 +15,9 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react'
-import {act, render} from '@testing-library/react'
+import {act, render, waitFor} from '@testing-library/react'
 import fetchMock from 'fetch-mock'
-import userEvent from '@testing-library/user-event'
+import userEvent, {PointerEventsCheckLevel} from '@testing-library/user-event'
 import GroupCategoryCloneModal from '../GroupCategoryCloneModal'
 
 describe('GroupCategoryCloneModal', () => {
@@ -82,7 +82,7 @@ describe('GroupCategoryCloneModal', () => {
       expect(getByText('Submit').closest('button').hasAttribute('disabled')).toBeTruthy()
     })
 
-    it('enables the submit button if group name is provided', () => {
+    it('enables the submit button if group name is provided', async () => {
       const {getByText, getByPlaceholderText} = render(
         <GroupCategoryCloneModal
           groupCategory={groupCategory}
@@ -91,7 +91,7 @@ describe('GroupCategoryCloneModal', () => {
           onDismiss={onDismiss}
         />
       )
-      userEvent.type(getByPlaceholderText('Name'), 'enabled')
+      await userEvent.setup({delay: null}).type(getByPlaceholderText('Name'), 'enabled')
       expect(getByText('Submit').closest('button').hasAttribute('disabled')).toBeFalsy()
     })
 
@@ -108,7 +108,9 @@ describe('GroupCategoryCloneModal', () => {
           onDismiss={onDismiss}
         />
       )
-      userEvent.click(getByText('Submit'))
+      await userEvent
+        .setup({pointerEventsCheck: PointerEventsCheckLevel.Never})
+        .click(getByText('Submit'))
       const [, fetchOptions] = fetchMock.lastCall()
       expect(fetchOptions.method).toBe('POST')
       expect(JSON.parse(fetchOptions.body)).toMatchObject({
@@ -141,7 +143,9 @@ describe('GroupCategoryCloneModal', () => {
           onDismiss={onDismiss}
         />
       )
-      userEvent.click(getByText('Submit'))
+      await userEvent
+        .setup({pointerEventsCheck: PointerEventsCheckLevel.Never})
+        .click(getByText('Submit'))
       await act(() => fetchMock.flush(true))
       expect(getByText(/error/i)).toBeInTheDocument()
     })

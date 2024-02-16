@@ -133,8 +133,8 @@ describe('FilterNavFilter', () => {
       const {getByRole} = render(
         <FilterNavFilter {...props} onChange={onChange} onDelete={onDelete} />
       )
-      userEvent.click(getByRole('combobox', {name: 'Submissions'}))
-      userEvent.click(getByRole('option', {name: 'Has ungraded submissions'}))
+      await userEvent.click(getByRole('combobox', {name: 'Submissions'}))
+      await userEvent.click(getByRole('option', {name: 'Has ungraded submissions'}))
       expect(onChange).toHaveBeenLastCalledWith(
         expect.objectContaining({
           type: 'submissions',
@@ -178,8 +178,8 @@ describe('FilterNavFilter', () => {
       const {getByRole} = render(
         <FilterNavFilter {...props} onChange={onChange} onDelete={onDelete} />
       )
-      userEvent.click(getByRole('combobox', {name: 'Sections'}))
-      userEvent.click(getByRole('option', {name: 'Section 1'}))
+      await userEvent.click(getByRole('combobox', {name: 'Sections'}))
+      await userEvent.click(getByRole('option', {name: 'Section 1'}))
       expect(onChange).toHaveBeenLastCalledWith(
         expect.objectContaining({
           id: '456',
@@ -225,8 +225,8 @@ describe('FilterNavFilter', () => {
       const {getByRole} = render(
         <FilterNavFilter {...props} onChange={onChange} onDelete={onDelete} />
       )
-      userEvent.click(getByRole('combobox', {name: 'Grading Periods'}))
-      userEvent.click(getByRole('option', {name: 'Grading Period 1'}))
+      await userEvent.click(getByRole('combobox', {name: 'Grading Periods'}))
+      await userEvent.click(getByRole('option', {name: 'Grading Period 1'}))
       expect(onChange).toHaveBeenLastCalledWith(
         expect.objectContaining({
           id: '456',
@@ -285,8 +285,8 @@ describe('FilterNavFilter', () => {
       const {getByRole} = render(
         <FilterNavFilter {...props} onChange={onChange} onDelete={onDelete} />
       )
-      userEvent.click(getByRole('combobox', {name: 'Student Groups'}))
-      userEvent.click(getByRole('option', {name: 'Student Group 1'}))
+      await userEvent.click(getByRole('combobox', {name: 'Student Groups'}))
+      await userEvent.click(getByRole('option', {name: 'Student Group 1'}))
       expect(onChange).toHaveBeenLastCalledWith(
         expect.objectContaining({
           id: '456',

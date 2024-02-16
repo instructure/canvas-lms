@@ -20,7 +20,7 @@ import React from 'react'
 import {render, screen, waitFor} from '@testing-library/react'
 import {EnrollmentTree, type Props} from '../EnrollmentTree'
 import type {Enrollment} from '../types'
-import userEvent from '@testing-library/user-event'
+import userEvent, {PointerEventsCheckLevel} from '@testing-library/user-event'
 
 const mockEnrollment = {
   enrollment_state: 'active',
@@ -160,6 +160,8 @@ const props: Props = {
   createEnroll: jest.fn(),
 }
 
+const USER_EVENT_OPTIONS = {pointerEventsCheck: PointerEventsCheckLevel.Never}
+
 describe('EnrollmentTree', () => {
   afterEach(() => {
     jest.clearAllMocks()
@@ -173,18 +175,20 @@ describe('EnrollmentTree', () => {
   })
 
   it('renders children after clicking toggle', async () => {
+    const user = userEvent.setup(USER_EVENT_OPTIONS)
     render(<EnrollmentTree {...props} />)
     expect(await screen.findByText('Toggle group SubTeacherRole')).toBeInTheDocument()
-    userEvent.click(await screen.findByText('Toggle group StudentRole'))
+    await user.click(await screen.findByText('Toggle group StudentRole'))
     expect(await screen.findByText('Apple Music - Section 1')).toBeInTheDocument()
   })
 
   it('hides children after clicking toggle', async () => {
+    const user = userEvent.setup(USER_EVENT_OPTIONS)
     render(<EnrollmentTree {...props} />)
     expect(await screen.findByText('Toggle group SubTeacherRole')).toBeInTheDocument()
-    userEvent.click(screen.getByText('Toggle group StudentRole'))
+    await user.click(screen.getByText('Toggle group StudentRole'))
     expect(await screen.findByText('Apple Music - Section 1')).toBeInTheDocument()
-    userEvent.click(screen.getByText('Toggle group StudentRole'))
+    await user.click(screen.getByText('Toggle group StudentRole'))
     expect(screen.queryByText('Apple Music - Section 1')).not.toBeInTheDocument()
   })
 
@@ -218,21 +222,23 @@ describe('EnrollmentTree', () => {
   })
 
   it('shows enrollments in one section with different roles under respective role groups', async () => {
+    const user = userEvent.setup(USER_EVENT_OPTIONS)
     render(<EnrollmentTree {...props} />)
     await screen.findByText('Toggle group StudentRole')
-    userEvent.click(screen.getByText('Toggle group StudentRole'))
+    await user.click(screen.getByText('Toggle group StudentRole'))
     expect(screen.queryByText('Apple Music - Section 1')).toBeInTheDocument()
-    userEvent.click(screen.getByText('Toggle group DesignRole'))
+    await user.click(screen.getByText('Toggle group DesignRole'))
     expect(screen.queryByText('Apple Music - Section 2')).toBeInTheDocument()
   })
 
   it('checks children when group is checked', async () => {
+    const user = userEvent.setup(USER_EVENT_OPTIONS)
     render(<EnrollmentTree {...props} />)
     expect(screen.queryByText('SubTeacherRole')).toBeInTheDocument()
-    userEvent.click(screen.getByTestId('check-r1'))
+    await user.click(screen.getByTestId('check-r1'))
     // includes default teacher check
     expect(screen.getAllByRole('checkbox', {checked: true}).length).toBe(2)
-    userEvent.click(screen.getByText('Toggle group StudentRole'))
+    await user.click(screen.getByText('Toggle group StudentRole'))
     // parent + child + default
     expect(screen.getAllByRole('checkbox', {checked: true}).length).toBe(3)
   })
@@ -354,9 +360,10 @@ describe('EnrollmentTree', () => {
       }
     })
 
-    it('renders multiple courses with the same label', () => {
+    it('renders multiple courses with the same label', async () => {
+      const user = userEvent.setup(USER_EVENT_OPTIONS)
       render(<EnrollmentTree {...tempProps} />)
-      userEvent.click(screen.getByText('Toggle group SubTeacherRole'))
+      await user.click(screen.getByText('Toggle group SubTeacherRole'))
       expect(screen.getAllByText('Second Grade Math - Second Grade Math')).toHaveLength(3)
     })
   })
@@ -405,9 +412,10 @@ describe('EnrollmentTree', () => {
     })
 
     it('verifies initial state of checkboxes and presence of tooltips', async () => {
+      const user = userEvent.setup(USER_EVENT_OPTIONS)
       render(<EnrollmentTree {...tempProps} />)
-      userEvent.click(screen.getByText('Toggle group TeacherRole'))
-      userEvent.click(screen.getByText('Toggle group History of Art Period 1'))
+      await user.click(screen.getByText('Toggle group TeacherRole'))
+      await user.click(screen.getByText('Toggle group History of Art Period 1'))
       // teacher roles/enrollments are checked by default if not in edit mode
       expect(screen.getByTestId('check-c1')).toBeChecked()
       expect(screen.getByTestId('tip-c1')).toBeInTheDocument()
@@ -418,10 +426,11 @@ describe('EnrollmentTree', () => {
     })
 
     it('updates isMismatch property and indeterminate state based on section check status', async () => {
+      const user = userEvent.setup(USER_EVENT_OPTIONS)
       render(<EnrollmentTree {...tempProps} />)
-      userEvent.click(screen.getByText('Toggle group TeacherRole'))
-      userEvent.click(screen.getByText('Toggle group History of Art Period 1'))
-      userEvent.click(screen.getByTestId('check-s1'))
+      await user.click(screen.getByText('Toggle group TeacherRole'))
+      await user.click(screen.getByText('Toggle group History of Art Period 1'))
+      await user.click(screen.getByTestId('check-s1'))
       expect(screen.getByTestId('check-s1')).not.toBeChecked()
       expect(screen.queryByTestId('tip-s1')).not.toBeInTheDocument()
       const courseCheckbox = screen.getByTestId('check-c1') as HTMLInputElement
@@ -432,9 +441,10 @@ describe('EnrollmentTree', () => {
     })
 
     it('toggles the parent checkbox to control all children and verifies tooltips', async () => {
+      const user = userEvent.setup(USER_EVENT_OPTIONS)
       render(<EnrollmentTree {...tempProps} />)
-      userEvent.click(screen.getByText('Toggle group TeacherRole'))
-      userEvent.click(screen.getByText('Toggle group History of Art Period 1'))
+      await user.click(screen.getByText('Toggle group TeacherRole'))
+      await user.click(screen.getByText('Toggle group History of Art Period 1'))
       // check initial state of parent and children
       expect(screen.getByTestId('check-c1')).toBeChecked()
       expect(screen.getByTestId('check-s1')).toBeChecked()
@@ -443,7 +453,7 @@ describe('EnrollmentTree', () => {
       expect(screen.getByTestId('tip-s1')).toBeInTheDocument()
       expect(screen.getByTestId('tip-s2')).toBeInTheDocument()
       // uncheck all children
-      userEvent.click(screen.getByTestId('check-c1'))
+      await user.click(screen.getByTestId('check-c1'))
       await waitFor(() => {
         expect(screen.getByTestId('check-c1')).not.toBeChecked()
         expect(screen.getByTestId('check-s1')).not.toBeChecked()
@@ -453,7 +463,7 @@ describe('EnrollmentTree', () => {
         expect(screen.queryByTestId('tip-s2')).not.toBeInTheDocument()
       })
       // check all children
-      userEvent.click(screen.getByTestId('check-c1'))
+      await user.click(screen.getByTestId('check-c1'))
       await waitFor(() => {
         expect(screen.getByTestId('check-c1')).toBeChecked()
         expect(screen.getByTestId('check-s1')).toBeChecked()
@@ -465,9 +475,10 @@ describe('EnrollmentTree', () => {
     })
 
     it('removes tooltips when role changes to TeacherRole', async () => {
+      const user = userEvent.setup(USER_EVENT_OPTIONS)
       const {rerender} = render(<EnrollmentTree {...tempProps} />)
-      userEvent.click(screen.getByText('Toggle group TeacherRole'))
-      userEvent.click(screen.getByText('Toggle group History of Art Period 1'))
+      await user.click(screen.getByText('Toggle group TeacherRole'))
+      await user.click(screen.getByText('Toggle group History of Art Period 1'))
       expect(screen.getByTestId('tip-c1')).toBeInTheDocument()
       expect(screen.getByTestId('tip-s1')).toBeInTheDocument()
       expect(screen.getByTestId('tip-s2')).toBeInTheDocument()

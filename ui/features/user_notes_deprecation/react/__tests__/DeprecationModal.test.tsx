@@ -41,14 +41,14 @@ describe('DeprecationModal', () => {
   it('closes when close button is pressed', async () => {
     const {getByRole, queryByText} = render(<DeprecationModal {...defaultProps} />)
     const button = getByRole('button', {name: 'Close'})
-    userEvent.click(button)
+    await userEvent.click(button)
     await waitFor(() => expect(queryByText('Deprecated Tool')).not.toBeInTheDocument())
   })
 
   it('immediately closes when acknowledge button is pressed without checking suppression box', async () => {
     const {getByRole, queryByText} = render(<DeprecationModal {...defaultProps} />)
     const button = getByRole('button', {name: 'I Understand'})
-    userEvent.click(button)
+    await userEvent.click(button)
     await waitFor(() => expect(queryByText('Deprecated Tool')).not.toBeInTheDocument())
     await fetchMock.flush(true)
     expect(fetchMock.calls().length).toBe(0)
@@ -59,8 +59,8 @@ describe('DeprecationModal', () => {
     const {getByRole, queryByText} = render(<DeprecationModal {...defaultProps} />)
     const checkbox = getByRole('checkbox', {name: "Don't show this again"})
     const button = getByRole('button', {name: 'I Understand'})
-    userEvent.click(checkbox)
-    userEvent.click(button)
+    await userEvent.click(checkbox)
+    await userEvent.click(button)
     await fetchMock.flush(true)
     expect(fetchMock.calls().length).toBe(1)
     await waitFor(() => expect(queryByText('Deprecated Tool')).not.toBeInTheDocument())

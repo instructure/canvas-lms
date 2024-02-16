@@ -49,12 +49,11 @@ describe('ComposeActionButtons', () => {
       const file = new File(['my-image'], 'my-image.png', {type: 'image/png'})
       const input = getByTestId('attachment-input')
 
-      userEvent.upload(input, file)
+      await userEvent.upload(input, file)
 
       input.value = ''
-      input.files = []
 
-      userEvent.upload(input, file)
+      await userEvent.upload(input, file)
 
       expect(props.onAttachmentUpload).toHaveBeenCalledTimes(2)
     })

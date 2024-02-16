@@ -247,7 +247,7 @@ describe('DiscussionTopicForm', () => {
       const {getByText, getByLabelText} = setup()
       const titleInput = getByLabelText(/Topic Title/)
       fireEvent.input(titleInput, {target: {value: 'A'.repeat(260)}})
-      userEvent.type(titleInput, 'A')
+      await userEvent.type(titleInput, 'A')
       await waitFor(() =>
         expect(getByText('Title must be less than 255 characters.')).toBeInTheDocument()
       )

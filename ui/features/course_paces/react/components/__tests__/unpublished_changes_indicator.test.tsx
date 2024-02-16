@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {act, render} from '@testing-library/react'
+import {render} from '@testing-library/react'
 import {UnpublishedChangesIndicator} from '../unpublished_changes_indicator'
 import React from 'react'
 import userEvent from '@testing-library/user-event'
@@ -59,21 +59,21 @@ describe('UnpublishedChangesIndicator', () => {
     let onClick: () => void
     beforeEach(() => (onClick = jest.fn()))
 
-    it('is called when clicked if there are pending changes', () => {
+    it('is called when clicked if there are pending changes', async () => {
       const {getByRole} = render(
         <UnpublishedChangesIndicator {...defaultProps} changeCount={3} onClick={onClick} />
       )
 
-      act(() => userEvent.click(getByRole('button', {name: '3 unpublished changes'})))
+      await userEvent.click(getByRole('button', {name: '3 unpublished changes'}))
       expect(onClick).toHaveBeenCalled()
     })
 
-    it('is not called when clicked if there are no pending changes', () => {
+    it('is not called when clicked if there are no pending changes', async () => {
       const {getByText} = render(
         <UnpublishedChangesIndicator {...defaultProps} changeCount={0} onClick={onClick} />
       )
 
-      act(() => userEvent.click(getByText('All changes published')))
+      await userEvent.click(getByText('All changes published'))
       expect(onClick).not.toHaveBeenCalled()
     })
   })

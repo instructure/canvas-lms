@@ -27,47 +27,50 @@ const renderComponent = (overrideProps?: any) =>
   render(<QuestionBankSelector onChange={onChange} {...overrideProps} />)
 
 describe('QuestionBankSelector', () => {
-  it('calls onChange with question bank', () => {
+  it('calls onChange with question bank', async () => {
     window.ENV.QUESTION_BANKS = [{assessment_question_bank: {id: 1, title: 'My Question Bank'}}]
 
     renderComponent()
 
-    userEvent.click(screen.getByRole('combobox', {name: 'Default Question bank'}))
-    userEvent.click(screen.getByRole('option', {name: 'My Question Bank'}))
+    await userEvent.click(screen.getByRole('combobox', {name: 'Default Question bank'}))
+    await userEvent.click(screen.getByRole('option', {name: 'My Question Bank'}))
 
     expect(onChange).toHaveBeenCalledWith({question_bank_id: 1})
   })
 
-  it('calls onChange with new question bank name', () => {
+  it('calls onChange with new question bank name', async () => {
     window.ENV.QUESTION_BANKS = [{assessment_question_bank: {id: 1, title: 'My Question Bank'}}]
 
     renderComponent()
 
-    userEvent.click(screen.getByRole('combobox', {name: 'Default Question bank'}))
-    userEvent.click(screen.getByRole('option', {name: 'Create new question bank...'}))
+    await userEvent.click(screen.getByRole('combobox', {name: 'Default Question bank'}))
+    await userEvent.click(screen.getByRole('option', {name: 'Create new question bank...'}))
 
     expect(onChange).toHaveBeenCalledWith({question_bank_name: ''})
   })
 
-  it('calls onChange with new question bank name when input changes', () => {
+  it('calls onChange with new question bank name when input changes', async () => {
     window.ENV.QUESTION_BANKS = [{assessment_question_bank: {id: 1, title: 'My Question Bank'}}]
 
     renderComponent()
 
-    userEvent.click(screen.getByRole('combobox', {name: 'Default Question bank'}))
-    userEvent.click(screen.getByRole('option', {name: 'Create new question bank...'}))
-    userEvent.type(screen.getByPlaceholderText('New question bank'), 'This is a new question bank!')
+    await userEvent.click(screen.getByRole('combobox', {name: 'Default Question bank'}))
+    await userEvent.click(screen.getByRole('option', {name: 'Create new question bank...'}))
+    await userEvent.type(
+      screen.getByPlaceholderText('New question bank'),
+      'This is a new question bank!'
+    )
 
     expect(onChange).toHaveBeenCalledWith({question_bank_name: 'This is a new question bank!'})
   })
 
-  it('calls onChange with null', () => {
+  it('calls onChange with null', async () => {
     window.ENV.QUESTION_BANKS = [{assessment_question_bank: {id: 1, title: 'My Question Bank'}}]
 
     renderComponent()
 
-    userEvent.click(screen.getByRole('combobox', {name: 'Default Question bank'}))
-    userEvent.click(screen.getByRole('option', {name: 'Select question bank'}))
+    await userEvent.click(screen.getByRole('combobox', {name: 'Default Question bank'}))
+    await userEvent.click(screen.getByRole('option', {name: 'Select question bank'}))
 
     expect(onChange).toHaveBeenCalledWith(null)
   })
