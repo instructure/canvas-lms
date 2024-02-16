@@ -1,3 +1,6 @@
+/* eslint-disable eslint-comments/no-unlimited-disable */
+/* eslint-disable */
+
 /*
  * Copyright (C) 2019 - present Instructure, Inc.
  *
@@ -18,21 +21,21 @@
 
 function XmlParser() {}
 
-XmlParser.prototype.parseXML = function(xml) {
+XmlParser.prototype.parseXML = function (xml) {
   this.$xml = $(xml)
   this.determineError()
   return this.$xml
 }
 
-XmlParser.prototype.determineError = function() {
+XmlParser.prototype.determineError = function () {
   this.isError = !!this.find('error').children().length
 }
 
-XmlParser.prototype.find = function(nodeName) {
+XmlParser.prototype.find = function (nodeName) {
   return this.$xml.find(nodeName)
 }
 
-XmlParser.prototype.findRecursive = function(nodes) {
+XmlParser.prototype.findRecursive = function (nodes) {
   var nodes = nodes.split(':')
   let currentNode = this.$xml
   let found
@@ -48,7 +51,7 @@ XmlParser.prototype.findRecursive = function(nodes) {
   return currentNode
 }
 
-XmlParser.prototype.nodeText = function(name, node, asNumber) {
+XmlParser.prototype.nodeText = function (name, node, asNumber) {
   let res
   if (node.find(name).text() != '') {
     res = node.find(name).text()

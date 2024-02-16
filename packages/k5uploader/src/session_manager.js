@@ -24,7 +24,7 @@ function SessionManager() {
   this.sessionData = new KalturaSession()
 }
 
-SessionManager.prototype.loadSession = function() {
+SessionManager.prototype.loadSession = function () {
   const xhr = new XMLHttpRequest()
   xhr.open('POST', k5Options.sessionUrl, true)
   xhr.responseType = 'json'
@@ -32,7 +32,7 @@ SessionManager.prototype.loadSession = function() {
   xhr.send()
 }
 
-SessionManager.prototype.onSessionLoaded = function(e) {
+SessionManager.prototype.onSessionLoaded = function (e) {
   const xhr = e.target
   if (xhr.status == 200) {
     this.sessionData.setSession(xhr.response)
@@ -42,7 +42,7 @@ SessionManager.prototype.onSessionLoaded = function(e) {
   }
 }
 
-SessionManager.prototype.getSession = function() {
+SessionManager.prototype.getSession = function () {
   return this.sessionData
 }
 

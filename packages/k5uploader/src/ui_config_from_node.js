@@ -19,13 +19,13 @@
 import UiConfig from './ui_config'
 import filterFromNode from './filter_from_node'
 
-export default function(xml) {
+export default function (xml) {
   const limits = xml.find('limits')
 
   const config = new UiConfig({
     maxUploads: limits.attr('maxUploads'),
     maxFileSize: limits.attr('maxFileSize'),
-    maxTotalSize: limits.attr('maxTotalSize')
+    maxTotalSize: limits.attr('maxTotalSize'),
   })
 
   const filters = xml.find('fileFilters').children()

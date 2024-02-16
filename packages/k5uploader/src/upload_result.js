@@ -27,7 +27,7 @@ function UploadResult() {
   this.xmlParser = new XmlParser()
 }
 
-UploadResult.prototype.parseXML = function(xml) {
+UploadResult.prototype.parseXML = function (xml) {
   const $xml = this.xmlParser.parseXML(xml)
   this.isError = this.xmlParser.isError
   if (!this.xmlParser.isError) {
@@ -35,18 +35,18 @@ UploadResult.prototype.parseXML = function(xml) {
   }
 }
 
-UploadResult.prototype.pullData = function() {
+UploadResult.prototype.pullData = function () {
   const $resultOk = this.xmlParser.find('result_ok')
   this.token = this.xmlParser.nodeText('token', $resultOk, true)
   this.fileId = this.xmlParser.nodeText('filename', $resultOk, true)
   this.filename = this.xmlParser.nodeText('origFilename', $resultOk)
 }
 
-UploadResult.prototype.asEntryParams = function() {
+UploadResult.prototype.asEntryParams = function () {
   return {
     entry1_name: this.filename,
     entry1_filename: this.fileId,
-    entry1_realFilename: this.filename
+    entry1_realFilename: this.filename,
   }
 }
 

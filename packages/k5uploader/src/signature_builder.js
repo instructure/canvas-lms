@@ -18,7 +18,7 @@
 
 import MD5 from './md5'
 
-export default function(params) {
+export default function (params) {
   let names = []
   for (const prop in params) {
     names.push(prop)
