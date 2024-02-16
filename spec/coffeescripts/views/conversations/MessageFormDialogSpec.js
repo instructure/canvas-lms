@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import fakeENV from 'helpers/fakeENV'
 import MessageFormDialog from 'ui/features/conversations/backbone/views/MessageFormDialog'
 import FavoriteCourseCollection from 'ui/features/conversations/backbone/collections/FavoriteCourseCollection'

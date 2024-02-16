@@ -189,12 +189,7 @@ class RailsFlashNotificationsHelper {
       closeContent = ''
     }
 
-    return `
-        <span>
-          ${this.escapeContent(content)}
-          ${htmlEscape(closeContent)}
-        </span>
-      `
+    return `<span>${this.escapeContent(content)}${htmlEscape(closeContent)}</span>`
   }
 
   /*

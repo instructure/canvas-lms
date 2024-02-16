@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 
 import SetDefaultGradeDialog from '@canvas/grading/jquery/SetDefaultGradeDialog'
 

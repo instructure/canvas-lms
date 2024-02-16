@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import {get} from 'lodash'
 import WikiPageRevisionsCollection from 'ui/features/wiki_page_revisions/backbone/collections/WikiPageRevisionsCollection'
 import WikiPageRevisionsView from 'ui/features/wiki_page_revisions/backbone/views/WikiPageRevisionsView'

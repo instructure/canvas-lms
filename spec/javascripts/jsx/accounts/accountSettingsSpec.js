@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import {addUsersLink, openReportDescriptionLink} from 'ui/features/account_settings/jquery/index'
 
 QUnit.module('AccountSettings.openReportDescriptionLink', {

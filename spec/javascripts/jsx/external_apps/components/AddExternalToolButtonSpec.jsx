@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import React from 'react'
 import {mount} from 'enzyme'
 import AddExternalToolButton from 'ui/features/external_apps/react/components/AddExternalToolButton'

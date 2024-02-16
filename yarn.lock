@@ -17576,6 +17576,11 @@ jquery-getscrollbarwidth@^1.0.0:
   dependencies:
     jquery ">=1.5"
 
+jquery-migrate@1.4.1:
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/jquery-migrate/-/jquery-migrate-1.4.1.tgz#85152f3ec99a95625f4f7d0bcf62e9b8638f5a76"
+  integrity sha512-RwIqqAaEC1gQ9KFtdw69wse2bUGQnGNwbkZBkCwSCYkAICMlpVxAbHmfvWaS7SfLGJrYd13FZTuuQgZ6gBotJQ==
+
 jquery-ui-touch-punch@^0.2.3:
   version "0.2.3"
   resolved "https://registry.yarnpkg.com/jquery-ui-touch-punch/-/jquery-ui-touch-punch-0.2.3.tgz#eed82242733ba243f46b3e87c1841b308191da68"

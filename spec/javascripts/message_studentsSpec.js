@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import fakeENV from 'helpers/fakeENV'
 import messageStudents from 'message_students'
 

@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import React from 'react'
 import {shallow, mount} from 'enzyme'
 import UsageRightsSelectBox from '@canvas/files/react/components/UsageRightsSelectBox'

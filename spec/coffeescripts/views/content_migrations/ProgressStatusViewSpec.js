@@ -1,3 +1,4 @@
+/* eslint-disable qunit/resolve-async */
 /*
  * Copyright (C) 2013 - present Instructure, Inc.
  *
@@ -17,6 +18,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import ProgressStatusView from 'ui/features/content_migrations/backbone/views/ProgressStatusView'
 import ProgressingModel from 'ui/features/content_migrations/backbone/models/ProgressingContentMigration'
 import assertions from 'helpers/assertions'

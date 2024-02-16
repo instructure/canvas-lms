@@ -27,6 +27,7 @@ import {
   setupAnonymizableAuthorId,
 } from 'ui/features/speed_grader/jquery/speed_grader.utils'
 import $ from 'jquery'
+import 'jquery-migrate'
 
 QUnit.module('SpeedGrader', hooks => {
   let $container

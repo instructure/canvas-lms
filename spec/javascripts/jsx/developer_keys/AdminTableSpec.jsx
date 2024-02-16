@@ -20,6 +20,7 @@ import React from 'react'
 import TestUtils from 'react-dom/test-utils'
 import AdminTable from 'ui/features/developer_keys_v2/react/AdminTable'
 import $ from 'jquery'
+import 'jquery-migrate'
 
 QUnit.module('AdminTable', {
   teardown() {

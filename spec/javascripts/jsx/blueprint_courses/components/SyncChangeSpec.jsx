@@ -23,6 +23,7 @@ import {Pill} from '@instructure/ui-pill'
 import getSampleData from '../getSampleData'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
+import 'jquery-migrate'
 
 QUnit.module('SyncChange component')
 

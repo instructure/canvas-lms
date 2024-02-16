@@ -1,3 +1,4 @@
+/* eslint-disable qunit/no-ok-equality */
 /*
  * Copyright (C) 2016 - present Instructure, Inc.
  *
@@ -18,6 +19,7 @@
 
 import moveMultipleQuestionBanks from 'ui/features/question_bank/jquery/moveMultipleQuestionBanks'
 import $ from 'jquery'
+import 'jquery-migrate'
 
 let $modal = null
 

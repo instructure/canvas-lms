@@ -17,13 +17,14 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import 'ui/features/manage_groups/jquery/outerclick'
 
 QUnit.module('outerclick')
 
 test('should work', () => {
   const handler = sinon.spy()
-  const $doc = $(document)
+  const $doc = $(document.body)
   const $foo = $('<b>hello <i>world</i></b>').appendTo($doc)
   $foo.on('outerclick', handler)
 

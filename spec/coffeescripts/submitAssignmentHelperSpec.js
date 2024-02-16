@@ -21,6 +21,7 @@ import {
   verifyPledgeIsChecked,
 } from 'ui/features/submit_assignment/jquery/helper'
 import $ from 'jquery'
+import 'jquery-migrate'
 
 QUnit.module('SubmitAssignmentHelper', {
   teardown() {

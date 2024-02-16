@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import CalendarNavigator from 'ui/features/calendar/backbone/views/CalendarNavigator'
 import assertions from 'helpers/assertions'
 

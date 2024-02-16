@@ -21,6 +21,7 @@ import Sidebar from '@canvas/rce/Sidebar'
 import editorUtils from 'helpers/editorUtils'
 import fixtures from 'helpers/fixtures'
 import $ from 'jquery'
+import 'jquery-migrate'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
 
 QUnit.module('SyllabusBehaviors.bindToEditSyllabus', {

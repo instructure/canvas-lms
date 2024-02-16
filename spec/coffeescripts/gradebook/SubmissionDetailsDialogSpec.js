@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import SubmissionDetailsDialog from 'ui/features/screenreader_gradebook/jquery/SubmissionDetailsDialog'
 import qs from 'qs'

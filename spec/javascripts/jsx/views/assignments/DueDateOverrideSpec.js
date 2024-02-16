@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import DateValidator from '@canvas/grading/DateValidator'
 import DueDateOverrideView from '@canvas/due-dates'
 import fakeENV from 'helpers/fakeENV'

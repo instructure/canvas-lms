@@ -18,6 +18,7 @@
 
 import QuizRubric from '@canvas/quizzes/jquery/quiz_rubric'
 import $ from 'jquery'
+import 'jquery-migrate'
 
 const assignmentRubricHtml = `
   <div id='test-rubrics-wrapper'>

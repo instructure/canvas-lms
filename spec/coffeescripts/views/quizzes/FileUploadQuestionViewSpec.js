@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Backbone from '@canvas/backbone'
 import FileUploadQuestion from 'ui/features/take_quiz/backbone/views/FileUploadQuestionView'
 import File from '@canvas/files/backbone/models/File'
 import $ from 'jquery'
+import 'jquery-migrate'
 
 QUnit.module('FileUploadQuestionView', {
   setup() {

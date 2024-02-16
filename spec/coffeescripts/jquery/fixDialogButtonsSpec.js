@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import '@canvas/util/jquery/fixDialogButtons'
 import '@canvas/jquery/jquery.disableWhileLoading'
 import '@canvas/jquery/jquery.simulate'

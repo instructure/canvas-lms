@@ -18,6 +18,7 @@
 
 import GradingForm from 'ui/features/quiz_history/jquery/grading_form'
 import $ from 'jquery'
+import 'jquery-migrate'
 
 const gradingFormHtml = `
   <form id='update_history_form'>

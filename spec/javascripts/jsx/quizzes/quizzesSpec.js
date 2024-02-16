@@ -19,6 +19,7 @@
 /* eslint-disable import/no-dynamic-require */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 
 /* NOTE: this test is meant to test 'quizzes', but you'll notice that the define
    does not include the 'quizzes' module. this is because simply including the

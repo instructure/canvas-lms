@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import React from 'react'
 import RCELoader from '@canvas/rce/serviceRCELoader'
 import SectionCollection from '@canvas/sections/backbone/collections/SectionCollection'

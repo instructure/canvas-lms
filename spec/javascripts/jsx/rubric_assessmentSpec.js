@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import '@canvas/rails-flash-notifications'
 
 import fakeENV from 'helpers/fakeENV'

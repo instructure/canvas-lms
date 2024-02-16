@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import fakeENV from 'helpers/fakeENV'
 import GradebookHeaderMenu from 'ui/features/screenreader_gradebook/jquery/GradebookHeaderMenu'
 import SetDefaultGradeDialog from '@canvas/grading/jquery/SetDefaultGradeDialog'

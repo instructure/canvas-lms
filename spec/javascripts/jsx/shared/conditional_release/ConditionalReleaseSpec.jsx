@@ -21,6 +21,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
 import $ from 'jquery'
+import 'jquery-migrate'
 import ConditionalRelease from '@canvas/conditional-release-editor'
 
 let editor = null
