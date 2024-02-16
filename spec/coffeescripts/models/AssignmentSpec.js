@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import '@canvas/jquery/jquery.ajaxJSON'
 import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import Submission from '@canvas/assignments/backbone/models/Submission'

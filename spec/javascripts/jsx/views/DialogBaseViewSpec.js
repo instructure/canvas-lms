@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import DialogBaseView from '@canvas/dialog-base-view'
 
 QUnit.module('DialogBaseView', {

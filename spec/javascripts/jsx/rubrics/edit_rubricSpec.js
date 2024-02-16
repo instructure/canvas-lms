@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import $ from 'jquery'
+import 'jquery-migrate'
 import rubricEditing from '@canvas/rubrics/jquery/edit_rubric'
 
 QUnit.module('edit_rubric', {

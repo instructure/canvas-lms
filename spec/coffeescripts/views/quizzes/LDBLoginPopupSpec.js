@@ -1,3 +1,4 @@
+/* eslint-disable qunit/no-test-expect-argument */
 /*
  * Copyright (C) 2014 - present Instructure, Inc.
  *
@@ -18,12 +19,12 @@
 
 import {defer} from 'lodash'
 import $ from 'jquery'
+import 'jquery-migrate'
 import LDBLoginPopup from 'ui/features/take_quiz/backbone/views/LDBLoginPopup'
 
 let whnd
 let popup
 let server
-const root = this
 
 QUnit.module('LDBLoginPopup', {
   setup() {
@@ -123,7 +124,7 @@ test('it should pop back in if student closes it', function (assert) {
   const originalOpen = window.open
 
   // needed for proper cleanup of windows
-  const openStub = sandbox.stub(window, 'open').callsFake(function () {
+  sandbox.stub(window, 'open').callsFake(function () {
     return (latestWindow = originalOpen.apply(this, arguments))
   })
 

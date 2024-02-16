@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import UserSearchResultsView from 'ui/features/account_admin_tools/backbone/views/UserSearchResultsView'
 import UserRestore from 'ui/features/account_admin_tools/backbone/models/UserRestore'
 import {initFlashContainer} from '@canvas/rails-flash-notifications'

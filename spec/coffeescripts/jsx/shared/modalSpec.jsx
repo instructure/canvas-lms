@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import Modal from '@canvas/modal'
 import React from 'react'
 import ReactDOM from 'react-dom'

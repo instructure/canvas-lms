@@ -19,6 +19,7 @@
 import Subject from '@canvas/quiz-log-auditing/jquery/event_trackers/page_focused'
 import K from '@canvas/quiz-log-auditing/jquery/constants'
 import $ from 'jquery'
+import 'jquery-migrate'
 
 const capture = sinon.spy()
 const tracker = new Subject()

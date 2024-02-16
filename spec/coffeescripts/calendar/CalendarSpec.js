@@ -26,6 +26,7 @@ import timezone from 'timezone'
 import denver from 'timezone/America/Denver'
 import fixtures from 'helpers/fixtures'
 import $ from 'jquery'
+import 'jquery-migrate'
 import {subscribe} from 'jquery-tinypubsub'
 import fakeENV from 'helpers/fakeENV'
 

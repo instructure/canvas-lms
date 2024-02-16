@@ -19,6 +19,7 @@
 /* eslint-disable qunit/no-global-expect */
 /* eslint-disable jest/valid-expect */
 import $ from 'jquery'
+import 'jquery-migrate'
 import _ from 'lodash'
 import tzInTest from '@canvas/datetime/specHelpers'
 import timezone from 'timezone'

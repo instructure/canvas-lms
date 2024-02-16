@@ -17,9 +17,8 @@
  */
 
 import $ from 'jquery'
-import _ from 'lodash'
+import 'jquery-migrate'
 import GroupCategoryView from 'ui/features/manage_groups/backbone/views/GroupCategoryView'
-import RandomlyAssignMembersView from 'ui/features/manage_groups/backbone/views/RandomlyAssignMembersView'
 import GroupCategory from '@canvas/groups/backbone/models/GroupCategory'
 import 'helpers/fakeENV'
 

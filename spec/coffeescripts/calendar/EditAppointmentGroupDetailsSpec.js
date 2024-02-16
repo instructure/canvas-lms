@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import EditAppointmentGroupDetails from 'ui/features/calendar/jquery/EditAppointmentGroupDetails'
 import fcUtil from '@canvas/calendar/jquery/fcUtil'
 import * as tz from '@canvas/datetime'

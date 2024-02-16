@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 
 import updateSubnavMenuToggle from '../../../../ui/shared/courses/jquery/updateSubnavMenuToggle'
 

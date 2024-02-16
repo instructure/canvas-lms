@@ -18,6 +18,7 @@
 
 import collaborations from 'ui/features/collaborations/jquery/index'
 import $ from 'jquery'
+import 'jquery-migrate'
 import '@canvas/jquery/jquery.ajaxJSON'
 
 let oldAjaxJSON = null

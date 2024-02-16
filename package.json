@@ -159,6 +159,7 @@
     "invariant": "^2.2.2",
     "is-valid-domain": "^0.0.11",
     "jquery-getscrollbarwidth": "^1.0.0",
+    "jquery-migrate": "1.4.1",
     "jquery-ui-touch-punch": "^0.2.3",
     "jquery.cookie": "^1.4.1",
     "jquery.elastic": "1.0.0",

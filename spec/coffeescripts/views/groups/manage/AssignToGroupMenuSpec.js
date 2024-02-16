@@ -1,3 +1,4 @@
+/* eslint-disable qunit/resolve-async */
 /*
  * Copyright (C) 2013 - present Instructure, Inc.
  *
@@ -17,6 +18,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import AssignToGroupMenu from 'ui/features/manage_groups/backbone/views/AssignToGroupMenu'
 import GroupCollection from '@canvas/groups/backbone/collections/GroupCollection'
 import Group from '@canvas/groups/backbone/models/Group'

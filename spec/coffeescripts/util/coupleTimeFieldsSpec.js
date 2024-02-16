@@ -21,6 +21,7 @@ import * as tz from '@canvas/datetime'
 import coupleTimeFields from '@canvas/calendar/jquery/coupleTimeFields'
 import DatetimeField from '@canvas/datetime/jquery/DatetimeField'
 import $ from 'jquery'
+import 'jquery-migrate'
 import fakeENV from 'helpers/fakeENV'
 
 // make sure this is on today date but without seconds/milliseconds, so we

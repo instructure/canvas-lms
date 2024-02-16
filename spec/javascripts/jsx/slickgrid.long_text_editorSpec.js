@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import 'jqueryui/menu'
 import LongTextEditor from 'ui/features/gradebook/jquery/slickgrid.long_text_editor'
 

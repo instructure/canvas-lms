@@ -1,3 +1,4 @@
+/* eslint-disable babel/no-unused-expressions */
 /*
  * Copyright (C) 2012 - present Instructure, Inc.
  *
@@ -17,6 +18,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import Backbone from '@canvas/backbone'
 
 class TestCollection extends Backbone.Collection {}

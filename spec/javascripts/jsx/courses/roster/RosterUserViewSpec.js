@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 
 import RosterUserView from 'ui/features/roster/backbone/views/RosterUserView'
 import RosterUser from 'ui/features/roster/backbone/models/RosterUser'

@@ -19,6 +19,7 @@
 import Subject from '@canvas/quiz-log-auditing/jquery/event_trackers/question_viewed'
 import K from '@canvas/quiz-log-auditing/jquery/constants'
 import $ from 'jquery'
+import 'jquery-migrate'
 
 const scrollSelector = 'html, body'
 const $scrollContainer = $(scrollSelector)

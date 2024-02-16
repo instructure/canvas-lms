@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import EditHeaderView from 'ui/features/assignment_edit/backbone/views/EditHeaderView'
 import editViewTemplate from 'ui/features/assignment_edit/jst/EditView.handlebars'

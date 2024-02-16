@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import {isUndefined} from 'lodash'
 import Outcome from '@canvas/grade-summary/backbone/models/Outcome'
 import OutcomeResultCollection from 'ui/features/grade_summary/backbone/collections/OutcomeResultCollection'

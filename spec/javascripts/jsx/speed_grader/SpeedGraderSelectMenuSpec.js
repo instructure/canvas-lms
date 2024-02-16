@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import SpeedGraderHelpers from 'ui/features/speed_grader/jquery/speed_grader_helpers'
 import SpeedGraderSelectMenu, {
   replaceDropdownIcon,

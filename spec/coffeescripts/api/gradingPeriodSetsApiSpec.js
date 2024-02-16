@@ -20,6 +20,7 @@ import axios from '@canvas/axios'
 import fakeENV from 'helpers/fakeENV'
 import api from '@canvas/grading/jquery/gradingPeriodSetsApi'
 import $ from 'jquery'
+import 'jquery-migrate'
 import '@canvas/jquery/jquery.ajaxJSON'
 
 const deserializedSets = [

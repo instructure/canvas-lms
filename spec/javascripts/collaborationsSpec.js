@@ -1,3 +1,4 @@
+/* eslint-disable no-global-assign */
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -17,11 +18,11 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import fakeENV from 'helpers/fakeENV'
 import CollaborationsPage from 'collaborations'
 
 let fixtures
-let view
 let el
 let iframe
 

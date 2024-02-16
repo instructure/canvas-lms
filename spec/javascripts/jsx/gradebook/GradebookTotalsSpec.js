@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import UserSettings from '@canvas/user-settings'
 import {
   createGradebook,

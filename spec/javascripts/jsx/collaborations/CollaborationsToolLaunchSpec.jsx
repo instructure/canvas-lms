@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import React from 'react'
 import {mount} from 'enzyme'
 import CollaborationsToolLaunch from 'ui/features/lti_collaborations/react/CollaborationsToolLaunch'

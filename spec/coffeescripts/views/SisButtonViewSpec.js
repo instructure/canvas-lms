@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import SisButtonView from '@canvas/sis/backbone/views/SisButtonView'
 import Backbone from '@canvas/backbone'
 

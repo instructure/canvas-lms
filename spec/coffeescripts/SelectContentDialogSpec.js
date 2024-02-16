@@ -25,6 +25,7 @@ import {
   selectContentDialog,
 } from '@canvas/select-content-dialog'
 import $ from 'jquery'
+import 'jquery-migrate'
 import fakeENV from './helpers/fakeENV'
 
 let fixtures = null

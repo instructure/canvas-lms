@@ -1,3 +1,4 @@
+/* eslint-disable qunit/no-global-stop-start */
 /*
  * Copyright (C) 2016 - present Instructure, Inc.
  *
@@ -17,6 +18,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import fakeENV from 'helpers/fakeENV'
 import api from 'ui/features/account_grading_standards/enrollmentTermsApi'
 import '@canvas/jquery/jquery.ajaxJSON'

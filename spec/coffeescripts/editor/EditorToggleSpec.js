@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import EditorToggle from '@canvas/editor-toggle'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
 

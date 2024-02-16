@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import sinon from 'sinon'
 import {ltiMessageHandler} from '@canvas/lti/jquery/messages'
 

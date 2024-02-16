@@ -20,6 +20,7 @@ import React from 'react'
 
 import {mount} from 'enzyme'
 import $ from 'jquery'
+import 'jquery-migrate'
 import _ from 'lodash'
 import CourseTabContainer from 'ui/features/course_grading_standards/react/CourseTabContainer'
 import 'jqueryui/tabs'

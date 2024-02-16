@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
 import * as RceCommandShim from '@canvas/rce-command-shim'
 import RCELoader from '@canvas/rce/serviceRCELoader'
