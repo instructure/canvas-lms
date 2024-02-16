@@ -280,6 +280,17 @@ module ConversationsHelper
     Array(params[key].presence || []).compact
   end
 
+  def soft_concluded_course_for_user?(course, user)
+    enrollment_types = course.enrollments.active.where(user_id: user.id).map(&:type)
+
+    if enrollment_types.empty?
+      course.soft_concluded?
+    else
+      # Course is only soft_concluded for a user if all of their enrollments are soft_concluded
+      enrollment_types.all? { |enrollment_name| course.soft_concluded?(enrollment_name) }
+    end
+  end
+
   def validate_context(context, recipients)
     recipients_are_instructors = all_recipients_are_instructors?(context, recipients)
 
@@ -293,7 +304,7 @@ module ConversationsHelper
       raise InvalidContextError
     end
 
-    if context.is_a?(Course) && (context.workflow_state == "completed" || context.soft_concluded?)
+    if context.is_a?(Course) && (context.workflow_state == "completed" || soft_concluded_course_for_user?(context, @current_user))
       raise CourseConcludedError
     end
   end
