@@ -83,6 +83,8 @@ class LearningOutcomeGroup < ActiveRecord::Base
     )
   end
 
+  Struct.new("OutcomeLink", :id, :content_id, :associated_asset_id, :context_id, :context_type, :workflow_state)
+
   def self.bulk_link_outcome(outcome, groups, root_account_id:)
     groups = groups.preload(:learning_outcome_group, :context)
     timestamp = Time.now.utc
@@ -114,8 +116,6 @@ class LearningOutcomeGroup < ActiveRecord::Base
     end
 
     tags = ContentTag.insert_all(new_tags, returning: %w[id content_id associated_asset_id context_id context_type workflow_state])
-
-    Struct.new("OutcomeLink", :id, :content_id, :associated_asset_id, :context_id, :context_type, :workflow_state)
 
     tags.rows.each do |tag|
       link = Struct::OutcomeLink.new(tag[0], tag[1], tag[2], tag[3], tag[4], tag[5])
