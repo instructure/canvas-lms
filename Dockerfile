@@ -81,9 +81,6 @@ RUN set -eux; \
     packages/js-utils/es \
     packages/js-utils/lib \
     packages/js-utils/node_modules \
-    packages/k5uploader/es \
-    packages/k5uploader/lib \
-    packages/k5uploader/node_modules \
     pacts \
     public/dist \
     public/doc/api \

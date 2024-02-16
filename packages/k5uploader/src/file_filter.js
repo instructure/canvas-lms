@@ -25,18 +25,18 @@ function FileFilter(params) {
   this.type = params.type
 }
 
-FileFilter.prototype.parseExtensions = function(extString) {
+FileFilter.prototype.parseExtensions = function (extString) {
   return extString.split(';').map(ext => ext.substring(2))
 }
 
-FileFilter.prototype.includesExtension = function(extension) {
+FileFilter.prototype.includesExtension = function (extension) {
   return this.extensions.indexOf(extension.toLowerCase()) !== -1
 }
 
-FileFilter.prototype.toParams = function() {
+FileFilter.prototype.toParams = function () {
   const params = {
     entry1_type: this.entryType,
-    entry1_mediaType: this.mediaType
+    entry1_mediaType: this.mediaType,
   }
 
   return params
