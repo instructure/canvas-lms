@@ -983,6 +983,8 @@ describe "Users API", type: :request do
       end
 
       it "404s on a deleted user" do
+        Account.site_admin.enable_feature!(:deleted_user_tools)
+
         @other_user.destroy
         account_admin_user
         json = api_call(:get,
@@ -990,7 +992,20 @@ describe "Users API", type: :request do
                         { controller: "users", action: "api_show", id: @other_user.id.to_param, format: "json" },
                         {},
                         expected_status: 404)
-        expect(json.keys).to eq ["errors"]
+        expect(json.keys).to include("id")
+      end
+
+      it "doesn't error on a user when the feature flag is off" do
+        Account.site_admin.disable_feature!(:deleted_user_tools)
+
+        @other_user.destroy
+        account_admin_user
+        json = api_call(:get,
+                        "/api/v1/users/#{@other_user.id}",
+                        { controller: "users", action: "api_show", id: @other_user.id.to_param, format: "json" },
+                        {},
+                        expected_status: 404)
+        expect(json.keys).not_to include("error_report_id")
       end
 
       it "404s but still returns the user on a deleted user for a site admin" do
