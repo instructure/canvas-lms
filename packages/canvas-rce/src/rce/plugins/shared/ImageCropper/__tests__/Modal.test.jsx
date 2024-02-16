@@ -62,7 +62,7 @@ describe('ImageCropperModal', () => {
   it('calls onSubmit function', async () => {
     renderComponent()
     const button = screen.getByRole('button', {name: /save/i})
-    userEvent.click(button)
+    await userEvent.click(button)
     await waitFor(() => {
       expect(props.onSubmit).toHaveBeenCalled()
     })
@@ -71,7 +71,7 @@ describe('ImageCropperModal', () => {
   it('calls onClose function', async () => {
     renderComponent()
     const button = screen.getByRole('button', {name: /save/i})
-    userEvent.click(button)
+    await userEvent.click(button)
     await waitFor(() => {
       expect(props.onClose).toHaveBeenCalled()
     })
@@ -80,7 +80,7 @@ describe('ImageCropperModal', () => {
   it('call onSubmit function with correct args', async () => {
     renderComponent({shape: 'circle'})
     const button = screen.getByRole('button', {name: /save/i})
-    userEvent.click(button)
+    await userEvent.click(button)
     await waitFor(() => {
       expect(props.onSubmit).toHaveBeenCalledWith({
         rotation: 0,

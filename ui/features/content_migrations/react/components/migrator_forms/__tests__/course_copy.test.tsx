@@ -52,7 +52,7 @@ describe('CourseCopyImporter', () => {
 
   it('searches for matching courses', async () => {
     renderComponent()
-    userEvent.type(screen.getByRole('combobox', {name: 'Search for a course'}), 'math')
+    await userEvent.type(screen.getByRole('combobox', {name: 'Search for a course'}), 'math')
     await waitFor(() => {
       expect(doFetchApi).toHaveBeenCalledWith({path: '/users/0/manageable_courses?term=math'})
     })
@@ -61,8 +61,8 @@ describe('CourseCopyImporter', () => {
 
   it('searches for matching courses including concluded', async () => {
     renderComponent()
-    userEvent.click(screen.getByRole('checkbox', {name: 'Include completed courses'}))
-    userEvent.type(screen.getByRole('combobox', {name: 'Search for a course'}), 'math')
+    await userEvent.click(screen.getByRole('checkbox', {name: 'Include completed courses'}))
+    await userEvent.type(screen.getByRole('combobox', {name: 'Search for a course'}), 'math')
     await waitFor(() => {
       expect(doFetchApi).toHaveBeenCalledWith({
         path: '/users/0/manageable_courses?term=math&include=concluded',
@@ -73,9 +73,9 @@ describe('CourseCopyImporter', () => {
 
   it('calls onSubmit', async () => {
     renderComponent()
-    userEvent.type(screen.getByRole('combobox', {name: 'Search for a course'}), 'math')
-    userEvent.click(await screen.findByText('Mathmatics'))
-    userEvent.click(screen.getByRole('button', {name: 'Add to Import Queue'}))
+    await userEvent.type(screen.getByRole('combobox', {name: 'Search for a course'}), 'math')
+    await userEvent.click(await screen.findByText('Mathmatics'))
+    await userEvent.click(screen.getByRole('button', {name: 'Add to Import Queue'}))
     expect(onSubmit).toHaveBeenCalledWith(
       expect.objectContaining({
         settings: expect.objectContaining({
@@ -85,9 +85,9 @@ describe('CourseCopyImporter', () => {
     )
   })
 
-  it('calls onCancel', () => {
+  it('calls onCancel', async () => {
     renderComponent()
-    userEvent.click(screen.getByRole('button', {name: 'Cancel'}))
+    await userEvent.click(screen.getByRole('button', {name: 'Cancel'}))
     expect(onCancel).toHaveBeenCalled()
   })
 })

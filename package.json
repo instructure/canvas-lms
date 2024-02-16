@@ -252,7 +252,7 @@
     "@testing-library/jest-dom": "^5",
     "@testing-library/react": "^12",
     "@testing-library/react-hooks": "^5",
-    "@testing-library/user-event": "^12",
+    "@testing-library/user-event": "^14",
     "@types/enzyme": "^3.10.16",
     "@types/enzyme-adapter-react-16": "^1.0.9",
     "@types/jquery": "^3.5.6",

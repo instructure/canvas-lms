@@ -135,9 +135,7 @@ describe('UploadFile', () => {
       )
 
       const urlTab = getByText('URL')
-      act(() => {
-        userEvent.click(urlTab)
-      })
+      await userEvent.click(urlTab)
       const urlInput = await waitFor(() => getByLabelText('URL'))
       expect(urlInput).toBeVisible()
     })
@@ -155,9 +153,7 @@ describe('UploadFile', () => {
       )
 
       const computerTab = getByText('Computer')
-      act(() => {
-        userEvent.click(computerTab)
-      })
+      await userEvent.click(computerTab)
       const fileDrop = await waitFor(() => getByText(/browse your computer/))
       expect(fileDrop).toBeVisible()
     })
@@ -175,15 +171,11 @@ describe('UploadFile', () => {
       )
 
       const urlTab = getByText('URL')
-      act(() => {
-        userEvent.click(urlTab)
-      })
+      await userEvent.click(urlTab)
       await waitFor(() => getByLabelText('URL'))
 
       const computerTab = getByText('Computer')
-      act(() => {
-        userEvent.click(computerTab)
-      })
+      await userEvent.click(computerTab)
       const fileDrop = await waitFor(() =>
         getByText('Drag and drop, or click to browse your computer')
       )
@@ -373,22 +365,18 @@ describe('UploadFile', () => {
     })
 
     describe('Computer Panel', () => {
-      it('disables the submit button when there is no file uploaded', () => {
+      it('disables the submit button when there is no file uploaded', async () => {
         const {getByText, getByLabelText} = renderReturnOptions
         const computerTab = getByLabelText('Computer')
-        act(() => {
-          userEvent.click(computerTab)
-        })
+        await userEvent.click(computerTab)
         const submitBtn = getByText('Submit').closest('button')
         expect(submitBtn).toBeDisabled()
       })
 
-      it('does not allow Enter to submit the form when no file is uploaded', () => {
+      it('does not allow Enter to submit the form when no file is uploaded', async () => {
         const {getByLabelText} = renderReturnOptions
         const computerTab = getByLabelText('Computer')
-        act(() => {
-          userEvent.click(computerTab)
-        })
+        await userEvent.click(computerTab)
         const form = getByLabelText('Test')
         act(() => {
           fireEvent.keyDown(form, {keyCode: 13})
@@ -398,12 +386,10 @@ describe('UploadFile', () => {
     })
 
     describe('URL Panel', () => {
-      it('disables the submit button when there is no URL entered', () => {
+      it('disables the submit button when there is no URL entered', async () => {
         const {getByText, getByLabelText} = renderReturnOptions
         const urlTab = getByLabelText('URL')
-        act(() => {
-          userEvent.click(urlTab)
-        })
+        await userEvent.click(urlTab)
         const submitBtn = getByText('Submit').closest('button')
         expect(submitBtn).toBeDisabled()
       })

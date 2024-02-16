@@ -65,11 +65,11 @@ describe('DateAdjustment', () => {
     expect(screen.getByRole('radio', {name: 'Remove dates', hidden: false})).toBeInTheDocument()
   })
 
-  it('Renders/hides date shifting UI when appropriate', () => {
+  it('Renders/hides date shifting UI when appropriate', async () => {
     render(
       <DateAdjustments dateAdjustments={dateAdjustments} setDateAdjustments={setDateAdjustments} />
     )
-    userEvent.click(screen.getByRole('radio', {name: 'Shift dates', hidden: false}))
+    await userEvent.click(screen.getByRole('radio', {name: 'Shift dates', hidden: false}))
     expect(
       screen.getByRole('combobox', {name: 'Select original beginning date', hidden: false})
     ).toBeInTheDocument()
@@ -82,7 +82,7 @@ describe('DateAdjustment', () => {
     expect(
       screen.getByRole('combobox', {name: 'Select new end date', hidden: false})
     ).toBeInTheDocument()
-    userEvent.click(screen.getByRole('radio', {name: 'Remove dates', hidden: false}))
+    await userEvent.click(screen.getByRole('radio', {name: 'Remove dates', hidden: false}))
     expect(
       screen.queryByRole('combobox', {name: 'Select original beginning date', hidden: false})
     ).not.toBeInTheDocument()
@@ -97,29 +97,29 @@ describe('DateAdjustment', () => {
     ).not.toBeInTheDocument()
   })
 
-  it('Allows adding multiple weekday substitutions', () => {
+  it('Allows adding multiple weekday substitutions', async () => {
     render(
       <DateAdjustments dateAdjustments={dateAdjustments} setDateAdjustments={setDateAdjustments} />
     )
-    userEvent.click(screen.getByRole('radio', {name: 'Shift dates', hidden: false}))
-    userEvent.click(screen.getByRole('button', {name: 'Add substitution', hidden: false}))
+    await userEvent.click(screen.getByRole('radio', {name: 'Shift dates', hidden: false}))
+    await userEvent.click(screen.getByRole('button', {name: 'Add substitution', hidden: false}))
     expect(setDateAdjustments).toHaveBeenCalledWith(dateAdjustmentsWithSub)
   })
 
-  it('Allows removing multiple weekday substitutions', () => {
+  it('Allows removing multiple weekday substitutions', async () => {
     render(
       <DateAdjustments
         dateAdjustments={dateAdjustmentsWithSub}
         setDateAdjustments={setDateAdjustments}
       />
     )
-    userEvent.click(screen.getByRole('radio', {name: 'Shift dates', hidden: false}))
+    await userEvent.click(screen.getByRole('radio', {name: 'Shift dates', hidden: false}))
     const remove_sub_button = screen.getByRole('button', {
       name: "Remove 'Sunday' to 'Sunday' from substitutes",
       hidden: false,
     })
     expect(remove_sub_button).toBeInTheDocument()
-    userEvent.click(remove_sub_button)
+    await userEvent.click(remove_sub_button)
     expect(setDateAdjustments).toHaveBeenCalledWith(dateAdjustments)
   })
 })

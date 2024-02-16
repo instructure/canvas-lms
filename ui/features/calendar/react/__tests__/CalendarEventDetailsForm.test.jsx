@@ -35,7 +35,7 @@ let defaultProps = eventFormProps()
 const changeValue = (component, testid, value) => {
   const child = component.getByTestId(testid)
   expect(child).toBeInTheDocument()
-  userEvent.click(child)
+  act(() => child.click())
   fireEvent.change(child, {target: {value}})
   act(() => child.blur())
   return child
@@ -310,14 +310,14 @@ describe('CalendarEventDetailsForm', () => {
     expect(errMessage).not.toBeInTheDocument()
   })
 
-  it('allows setting arbitrary start/ end times', () => {
+  it('allows setting arbitrary start/ end times', async () => {
+    const user = userEvent.setup({delay: null})
     const {getByTestId} = render(<CalendarEventDetailsForm {...defaultProps} />)
     const startInput = getByTestId('event-form-start-time')
     const endInput = getByTestId('event-form-end-time')
-    userEvent.clear(startInput)
-    userEvent.type(startInput, '8:14 AM')
-    userEvent.clear(endInput)
-    userEvent.type(endInput, '9:38 AM')
+    await user.type(startInput, '8:14 AM')
+    await user.tripleClick(endInput)
+    await user.type(endInput, '9:38 AM')
     expect(startInput.value).toBe('8:14 AM')
     expect(endInput.value).toBe('9:38 AM')
   })
@@ -365,11 +365,12 @@ describe('CalendarEventDetailsForm', () => {
     expect(component.getByTestId('edit-calendar-event-form-date')).toHaveValue('avocado')
   })
 
-  it('does not show error with when choosing another date time format', () => {
+  it('does not show error with when choosing another date time format', async () => {
+    const user = userEvent.setup({delay: null})
     jest.spyOn(window.navigator, 'language', 'get').mockReturnValue('en-AU')
     const component = render(<CalendarEventDetailsForm {...defaultProps} />)
-    userEvent.click(component.getByTestId('edit-calendar-event-form-date'))
-    userEvent.click(component.getByTestId('edit-calendar-event-form-title'))
+    await user.click(component.getByTestId('edit-calendar-event-form-date'))
+    await user.click(component.getByTestId('edit-calendar-event-form-title'))
     expect(component.getByTestId('edit-calendar-event-form-date').value).toMatch(
       /^(Sun|Mon|Tue|Wed|Thu|Fri|Sat), \d{1,2} (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d{4}$/
     )

@@ -92,17 +92,19 @@ it('renders Add To Do header when creating a new to do', () => {
   expect(wrapper.find('h2').text()).toBe('Add To Do')
 })
 
-it('shows title inputs', () => {
+it('shows title inputs', async () => {
+  const user = userEvent.setup({delay: null})
   const {getAllByRole} = render(<UpdateItemTray {...defaultProps} />)
   const input = getAllByRole('textbox')[0]
-  userEvent.type(input, 'New Text')
+  await user.type(input, 'New Text')
   expect(input).toHaveValue('New Text')
 })
 
-it('shows details inputs', () => {
+it('shows details inputs', async () => {
+  const user = userEvent.setup({delay: null})
   const {getAllByRole} = render(<UpdateItemTray {...defaultProps} />)
   const input = getAllByRole('textbox')[0]
-  userEvent.type(input, 'New Details')
+  await user.type(input, 'New Details')
   expect(input).toHaveValue('New Details')
 })
 
@@ -291,17 +293,19 @@ it('does render the delete button if an item is specified', () => {
   expect(deleteButton).toHaveLength(1)
 })
 
-it('renders just an optional option when no courses', () => {
+it('renders just an optional option when no courses', async () => {
+  const user = userEvent.setup({delay: null})
   const {getByTitle, getByRole} = render(<UpdateItemTray {...defaultProps} />)
   const option = getByTitle('Optional: Add Course')
-  userEvent.click(option)
+  await user.click(option)
   const listbox = getByRole('listbox', {hidden: true})
   const {getAllByRole} = within(listbox)
   const listItems = getAllByRole('option')
   expect(listItems).toHaveLength(1)
 })
 
-it('renders course options plus an optional option when provided with courses', () => {
+it('renders course options plus an optional option when provided with courses', async () => {
+  const user = userEvent.setup({delay: null})
   const {getByTitle, getByRole} = render(
     <UpdateItemTray
       {...defaultProps}
@@ -312,7 +316,7 @@ it('renders course options plus an optional option when provided with courses', 
     />
   )
   const option = getByTitle('Optional: Add Course')
-  userEvent.click(option)
+  await user.click(option)
   const listbox = getByRole('listbox', {hidden: true})
   const {getAllByRole} = within(listbox)
   const listItems = getAllByRole('option')

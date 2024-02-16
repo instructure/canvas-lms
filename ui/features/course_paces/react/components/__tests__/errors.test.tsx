@@ -53,10 +53,10 @@ describe('Errors', () => {
     }
   })
 
-  it('triggers a re-publish when the retry button is clicked', () => {
+  it('triggers a re-publish when the retry button is clicked', async () => {
     const {getByRole} = render(<Errors {...defaultProps} />)
 
-    act(() => userEvent.click(getByRole('button', {name: 'Retry'})))
+    await userEvent.click(getByRole('button', {name: 'Retry'}))
     expect(syncUnpublishedChanges).toHaveBeenCalled()
   })
 })

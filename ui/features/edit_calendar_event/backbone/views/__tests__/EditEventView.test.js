@@ -339,7 +339,7 @@ describe('EditEventView', () => {
       expect(section_checkbox).toBeVisible()
       expect(document.getElementById('duplicate_event')).not.toBeVisible()
 
-      userEvent.click(section_checkbox)
+      await userEvent.click(section_checkbox)
 
       expect(document.getElementById('duplicate_event')).toBeVisible()
     })

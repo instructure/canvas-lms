@@ -40,15 +40,15 @@ describe('<Footer />', () => {
 
   afterEach(() => jest.clearAllMocks())
 
-  it('calls "onSubmit" when pressing create button', () => {
+  it('calls "onSubmit" when pressing create button', async () => {
     const {getByTestId} = subject()
-    userEvent.click(getByTestId('create-icon-button'))
+    await userEvent.click(getByTestId('create-icon-button'))
     expect(defaults.onSubmit).toHaveBeenCalled()
   })
 
-  it('calls "onCancel" when pressing cancel button', () => {
+  it('calls "onCancel" when pressing cancel button', async () => {
     const {getByTestId} = subject()
-    userEvent.click(getByTestId('icon-maker-cancel'))
+    await userEvent.click(getByTestId('icon-maker-cancel'))
     expect(defaults.onCancel).toHaveBeenCalled()
   })
 
@@ -106,7 +106,7 @@ describe('<Footer />', () => {
 
     it('calls "onSubmit" when "Save" is pressed"', async () => {
       const {findByTestId} = subject({isModified: true})
-      userEvent.click(await findByTestId('icon-maker-save'))
+      await userEvent.click(await findByTestId('icon-maker-save'))
       expect(defaults.onSubmit).toHaveBeenCalled()
     })
   })

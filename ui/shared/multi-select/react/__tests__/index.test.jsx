@@ -128,24 +128,24 @@ describe('CanvasMultiSelect', () => {
     expect(queryByRole('option', {name: 'Cucumber'})).not.toBeInTheDocument()
   })
 
-  it('calls customOnRequestShowOptions when clicking the input', () => {
+  it('calls customOnRequestShowOptions when clicking the input', async () => {
     const customOnRequestShowOptions = jest.fn()
     props.customOnRequestShowOptions = customOnRequestShowOptions
     const {getByRole} = renderComponent()
     const combobox = getByRole('combobox', {name: 'Vegetables'})
-    userEvent.click(combobox)
+    await userEvent.click(combobox)
     expect(customOnRequestShowOptions).toHaveBeenCalled()
   })
 
-  it('calls customOnRequestHideOptions when blurring the input', () => {
+  it('calls customOnRequestHideOptions when blurring the input', async () => {
     const customOnRequestHideOptions = jest.fn()
     props.customOnRequestHideOptions = customOnRequestHideOptions
     const {getByRole} = renderComponent()
     const combobox = getByRole('combobox', {name: 'Vegetables'})
-    userEvent.click(combobox)
+    await userEvent.click(combobox)
     expect(getByRole('option', {name: 'Broccoli'})).toBeInTheDocument()
     expect(customOnRequestHideOptions).not.toHaveBeenCalled()
-    userEvent.tab()
+    await userEvent.tab()
     expect(customOnRequestHideOptions).toHaveBeenCalled()
   })
 })

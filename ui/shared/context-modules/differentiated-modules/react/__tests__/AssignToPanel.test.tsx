@@ -114,7 +114,7 @@ describe('AssignToPanel', () => {
   it('calls updateParentData on unmount with changes', async () => {
     const updateParentDataMock = jest.fn()
     const {unmount, findByTestId} = renderComponent({updateParentData: updateParentDataMock})
-    userEvent.click(await findByTestId('custom-option'))
+    await userEvent.click(await findByTestId('custom-option'))
     unmount()
     expect(updateParentDataMock).toHaveBeenCalledWith(
       {
@@ -262,10 +262,10 @@ describe('AssignToPanel', () => {
         onDidSubmit: onDidSubmitMock,
         onDismiss: onDismissMock,
       })
-      userEvent.click(await findByTestId('custom-option'))
-      userEvent.click(await findByTestId('assignee_selector'))
-      userEvent.click(await findByText(SECTIONS_DATA[0].name))
-      userEvent.click(getByRole('button', {name: 'Save'}))
+      await userEvent.click(await findByTestId('custom-option'))
+      await userEvent.click(await findByTestId('assignee_selector'))
+      await userEvent.click(await findByText(SECTIONS_DATA[0].name))
+      await userEvent.click(getByRole('button', {name: 'Save'}))
 
       await waitFor(() => {
         expect(onDidSubmitMock).toHaveBeenCalled()

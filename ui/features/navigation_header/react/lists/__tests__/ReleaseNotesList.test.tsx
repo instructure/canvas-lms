@@ -98,9 +98,7 @@ describe('ReleaseNotesList', () => {
 
     expect(checkbox).toBeChecked()
 
-    act(() => {
-      userEvent.click(checkbox)
-    })
+    await userEvent.click(checkbox)
 
     await waitFor(() => {
       const value2 = queryClient.getQueryData(['settings', 'release_notes_badge_disabled'])

@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
+import userEvent, {PointerEventsCheckLevel} from '@testing-library/user-event'
 import TagThrottle from '../TagThrottle'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
@@ -36,6 +36,8 @@ const fakeJobs = [
     shard_id: '102',
   },
 ]
+
+const USER_EVENT_OPTIONS = {pointerEventsCheck: PointerEventsCheckLevel.Never, delay: null}
 
 describe('TagThrottle', () => {
   beforeAll(() => {
@@ -60,10 +62,11 @@ describe('TagThrottle', () => {
   })
 
   it("doesn't call /throttle/check until modal opened", async () => {
+    const user = userEvent.setup(USER_EVENT_OPTIONS)
     const onUpdate = jest.fn()
     const {getByText} = render(<TagThrottle tag="foobar" jobs={fakeJobs} onUpdate={onUpdate} />)
     expect(doFetchApi).not.toHaveBeenCalled()
-    userEvent.click(getByText('Throttle tag "foobar"', {selector: 'button span'}))
+    await user.click(getByText('Throttle tag "foobar"', {selector: 'button span'}))
     expect(doFetchApi).toHaveBeenCalledWith(
       expect.objectContaining({
         path: '/api/v1/jobs2/throttle/check',
@@ -77,18 +80,19 @@ describe('TagThrottle', () => {
   })
 
   it('performs a throttle job', async () => {
+    const user = userEvent.setup(USER_EVENT_OPTIONS)
     const onUpdate = jest.fn()
     const {getByText, getByLabelText} = render(
       <TagThrottle tag="foobar" jobs={fakeJobs} onUpdate={onUpdate} />
     )
-    userEvent.click(getByText('Throttle tag "foobar"', {selector: 'button span'}))
+    await user.click(getByText('Throttle tag "foobar"', {selector: 'button span'}))
     await jest.runOnlyPendingTimers()
 
-    userEvent.clear(getByLabelText('Tag starts with'))
-    userEvent.type(getByLabelText('Tag starts with'), 'foo')
-    userEvent.clear(getByLabelText('Shard ID (optional)'))
-    userEvent.clear(getByLabelText('New Concurrency'))
-    userEvent.type(getByLabelText('New Concurrency'), '2')
+    await user.clear(getByLabelText('Tag starts with'))
+    await user.type(getByLabelText('Tag starts with'), 'foo')
+    await user.clear(getByLabelText('Shard ID (optional)'))
+    await user.clear(getByLabelText('New Concurrency'))
+    await user.type(getByLabelText('New Concurrency'), '2')
     await jest.advanceTimersByTime(1000)
 
     expect(doFetchApi).toHaveBeenCalledWith(
@@ -99,7 +103,7 @@ describe('TagThrottle', () => {
     )
 
     expect(getByText('Matched 27 jobs with 3 tags')).toBeInTheDocument()
-    userEvent.click(getByText('Throttle Jobs', {selector: 'button span'}))
+    await user.click(getByText('Throttle Jobs', {selector: 'button span'}))
     await jest.runOnlyPendingTimers()
 
     expect(doFetchApi).toHaveBeenCalledWith({
