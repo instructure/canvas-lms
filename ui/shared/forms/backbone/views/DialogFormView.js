@@ -242,7 +242,7 @@ DialogFormView.prototype.setupDialog = function () {
   if (this.options.fixDialogButtons) {
     this.$el.fixDialogButtons()
   }
-  this.dialog = this.$el.data('dialog')
+  this.dialog = this.$el.data('ui-dialog')
   return $('.ui-resizable-handle').attr('aria-hidden', true)
 }
 
