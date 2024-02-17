@@ -20,8 +20,9 @@ import React from 'react'
 
 import {DynamicRegistrationModal} from '../DynamicRegistrationModal'
 import {useDynamicRegistrationState} from '../DynamicRegistrationState'
-import type {LtiRegistration} from 'features/developer_keys_v2/model/LtiRegistration'
+import type {LtiRegistration} from '../../../model/LtiRegistration'
 import {createRegistrationOverlayStore} from '../../RegistrationSettings/RegistrationOverlayState'
+import type {Configuration} from '../../../model/api/LtiToolConfiguration'
 
 describe('DynamicRegistrationModal', () => {
   let error: (...data: any[]) => void
@@ -78,6 +79,36 @@ describe('DynamicRegistrationModal', () => {
     })
 
     it('brings up the confirmation screen', async () => {
+      const tool_configuration: Configuration = {
+        custom_fields: {},
+        description: 'test',
+        icon_url: 'http://localhost',
+        is_lti_key: true,
+        oidc_initiation_url: 'http://localhost',
+        public_jwk_url: 'http://localhost',
+        scopes: [],
+        extensions: [
+          {
+            platform: 'canvas.instructure.com',
+            settings: {
+              text: 'Lti Tool',
+              icon_url: 'http://localhost',
+              placements: [
+                {
+                  enabled: true,
+                  icon_url: 'http://localhost',
+                  message_type: 'LtiDeepLinkingRequest',
+                  placement: 'course_navigation',
+                  target_link_uri: 'http://localhost',
+                  text: 'test',
+                },
+              ],
+            },
+          },
+        ],
+        title: 'test',
+        target_link_uri: 'http://localhost',
+      }
       const registration: LtiRegistration = {
         application_type: 'web',
         client_name: 'test',
@@ -110,6 +141,8 @@ describe('DynamicRegistrationModal', () => {
           ],
           target_link_uri: 'http://localhost',
         },
+        tool_configuration,
+        default_configuration: tool_configuration,
         overlay: null,
         response_types: ['id_token'],
         scopes: [],

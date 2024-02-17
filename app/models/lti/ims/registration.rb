@@ -67,14 +67,16 @@ class Lti::IMS::Registration < ApplicationRecord
   # Canvas' proprietary representation of a tool's configuration, which predates
   # the dynamic registration specification. This method converts an ims registration
   # into the Canvas proprietary configuration format.
-  def canvas_configuration
+  def canvas_configuration(apply_overlay: true)
     config = lti_tool_configuration
 
     overlay = registration_overlay
 
     {
       title: client_name,
-      scopes: scopes.reject { |s| overlay["disabledScopes"]&.include?(s) || false },
+      scopes: scopes.reject do |s|
+        apply_overlay ? (overlay["disabledScopes"]&.include?(s) || false) : false
+      end,
       public_jwk_url: jwks_uri,
       description: config["description"],
       custom_fields: config["custom_parameters"],
@@ -91,7 +93,7 @@ class Lti::IMS::Registration < ApplicationRecord
           text: client_name,
           icon_url: config["icon_uri"],
           platform: "canvas.instructure.com",
-          placements:
+          placements: placements(apply_overlay:)
         }
       }]
     }.with_indifferent_access
@@ -115,35 +117,56 @@ class Lti::IMS::Registration < ApplicationRecord
 
   delegate :update_external_tools!, to: :developer_key
 
-  def placements
+  def placements(apply_overlay: true)
     lti_tool_configuration["messages"].map do |message|
-      if message["placements"].nil?
-        []
+      if message["placements"].blank?
+        # default to link_selection if no placements are specified
+        [build_placement_for("link_selection", message)]
       else
-        message["placements"].map do |placement|
-          display_type = message["https://#{CANVAS_EXTENSION_LABEL}/lti/display_type"]
-          window_target = nil
-          if display_type == "new_window"
-            display_type = "default"
-            window_target = "_blank"
-          end
-
-          placement_name = canvas_placement_name(placement)
-          placement_overlay = lookup_placement_overlay(placement) || {}
-          {
-            placement: placement_name,
-            enabled: !placement_disabled?(placement),
-            message_type: message["type"],
-            target_link_uri: message["target_link_uri"],
-            text: placement_overlay["label"] || message["label"],
-            icon_url: placement_overlay["icon_url"] || message["icon_uri"],
-            custom_fields: message["custom_parameters"],
-            display_type:,
-            windowTarget: window_target,
-          }.merge(width_and_height_settings(message, placement_name)).compact
+        message["placements"].flat_map do |placement|
+          build_placement_for(placement, message, apply_overlay:)
         end
       end
-    end.flatten
+    end.flatten.uniq { |p| p[:placement] }
+  end
+
+  # Builds a placement object for a given message and placement type
+  # returns a list with one item, or an empty list if the placement
+  # type is not supported by Canvas
+  def build_placement_for(placement_type, message, apply_overlay: true)
+    placement_name = canvas_placement_name(placement_type)
+
+    # Return no placement if the placement type is not supported by Canvas
+    unless Lti::ResourcePlacement::PLACEMENTS.include?(placement_name.to_sym)
+      return []
+    end
+
+    display_type = message["https://#{CANVAS_EXTENSION_LABEL}/lti/display_type"]
+    window_target = nil
+    if display_type == "new_window"
+      display_type = "default"
+      window_target = "_blank"
+    end
+
+    placement_overlay = lookup_placement_overlay(placement_type) || {}
+
+    text = apply_overlay ? (placement_overlay["label"] || message["label"]) : message["label"]
+    icon_url = apply_overlay ? (placement_overlay["icon_url"] || message["icon_uri"]) : message["icon_uri"]
+    enabled = apply_overlay ? !placement_disabled?(placement_type) : true
+
+    [
+      {
+        placement: placement_name,
+        enabled:,
+        message_type: message["type"],
+        target_link_uri: message["target_link_uri"],
+        text:,
+        icon_url:,
+        custom_fields: message["custom_parameters"],
+        display_type:,
+        windowTarget: window_target,
+      }.merge(width_and_height_settings(message, placement_name)).compact
+    ]
   end
 
   def lookup_placement_overlay(placement_type)
@@ -209,6 +232,8 @@ class Lti::IMS::Registration < ApplicationRecord
       created_at:,
       updated_at:,
       guid:,
+      tool_configuration: canvas_configuration,
+      default_configuration: canvas_configuration(apply_overlay: false)
     }.as_json(options)
   end
 

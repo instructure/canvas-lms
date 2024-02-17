@@ -242,119 +242,207 @@ module Lti::IMS
     describe "canvas_configuration" do
       subject { registration.canvas_configuration }
 
-      context "should return a correct configuration" do
-        it do
-          expect(subject).to eq({
-                                  "custom_fields" => nil,
-                                  "description" => nil,
-                                  "extensions" => [{
-                                    "domain" => "example.com",
-                                    "platform" => "canvas.instructure.com",
-                                    "privacy_level" => "public",
-                                    "settings" => {
-                                      "icon_url" => nil,
-                                      "placements" => [],
-                                      "platform" => "canvas.instructure.com",
-                                      "text" => "Example Tool",
-                                    },
-                                    "tool_id" => "Example Tool"
-                                  }],
-                                  "oidc_initiation_url" => "http://example.com/login",
-                                  "privacy_level" => "anonymous",
-                                  "public_jwk_url" => "http://example.com/jwks",
-                                  "scopes" => [],
-                                  "target_link_uri" => nil,
-                                  "title" => "Example Tool",
-                                  "url" => nil,
-                                })
-        end
-      end
-    end
-
-    describe "placements" do
-      let(:lti_tool_configuration) do
-        {
-          domain: "example.com",
-          messages: [{
-            type: "LtiResourceLinkRequest",
-            target_link_uri: "http://example.com/launch",
-            custom_parameters: {
-              "foo" => "bar"
-            },
-            icon_uri: "http://example.com/icon.png",
-            "https://canvas.instructure.com/lti/launch_width": "200",
-            "https://canvas.instructure.com/lti/launch_height": "300",
-            "https://canvas.instructure.com/lti/display_type": "full_width",
-            placements: [
-              "https://canvas.instructure.com/lti/assignment_edit",
-              "global_navigation",
-              "course_navigation",
-              "ContentArea",
-              "RichTextEditor",
-            ],
-          }],
-          claims: []
-        }
-      end
-
-      subject { registration.placements }
-
-      context "convert messages to placements" do
-        it "accepts valid placements" do
-          canvas_placement_hash = {
-            custom_fields: { "foo" => "bar" },
-            enabled: true,
-            icon_url: "http://example.com/icon.png",
-            message_type: "LtiResourceLinkRequest",
-            target_link_uri: "http://example.com/launch",
-            display_type: "full_width",
+      it "should return a correct configuration" do
+        expect(subject).to eq(
+          {
+            "custom_fields" => nil,
+            "description" => nil,
+            "extensions" => [{
+              "domain" => "example.com",
+              "platform" => "canvas.instructure.com",
+              "privacy_level" => "public",
+              "settings" => {
+                "icon_url" => nil,
+                "placements" => [],
+                "platform" => "canvas.instructure.com",
+                "text" => "Example Tool",
+              },
+              "tool_id" => "Example Tool"
+            }],
+            "oidc_initiation_url" => "http://example.com/login",
+            "privacy_level" => "anonymous",
+            "public_jwk_url" => "http://example.com/jwks",
+            "scopes" => [],
+            "target_link_uri" => nil,
+            "title" => "Example Tool",
+            "url" => nil,
           }
-          expect(subject).to eq [
-            canvas_placement_hash.merge(placement: "assignment_edit", launch_width: 200, launch_height: 300),
-            canvas_placement_hash.merge(placement: "global_navigation", selection_width: 200, selection_height: 300),
-            canvas_placement_hash.merge(placement: "course_navigation", selection_width: 200, selection_height: 300),
-            canvas_placement_hash.merge(placement: "link_selection", selection_width: 200, selection_height: 300),
-            canvas_placement_hash.merge(placement: "editor_button", selection_width: 200, selection_height: 300),
-          ]
+        )
+      end
+
+      context "a placement isn't defined" do
+        let(:lti_tool_configuration) do
+          {
+            domain: "example.com",
+            messages: [
+              {
+                type: "LtiResourceLinkRequest",
+                target_link_uri: "http://example.com/launch",
+                placements: ["link_selection"]
+              },
+              {
+                type: "LtiDeepLinkingRequest",
+                target_link_uri: "http://example.com/deep_linking",
+              }
+            ],
+            claims: []
+          }
         end
 
-        it "sets windowTarget if display_type is new_window" do
-          message = registration.lti_tool_configuration["messages"].first
-          message["https://canvas.instructure.com/lti/display_type"] = "new_window"
-          expect(subject.first).to include({ windowTarget: "_blank", display_type: "default" })
+        it "defaults to link_selection" do
+          expect(subject["extensions"][0][:settings][:placements]).to eq(
+            [
+              {
+                "enabled" => true,
+                "message_type" => "LtiResourceLinkRequest",
+                "placement" => "link_selection",
+                "target_link_uri" => "http://example.com/launch"
+              }
+            ]
+          )
         end
 
-        it "rejects invalid placements" do
-          bad_placement_name = "course_navigationhttps://canvas.instructure.com/lti/"
-          registration.lti_tool_configuration["messages"].first["placements"] << bad_placement_name
-          expect { registration.save! }.to raise_error(ActiveRecord::RecordInvalid)
+        context "when multiple are defined" do
+          let(:lti_tool_configuration) do
+            {
+              domain: "example.com",
+              messages: [
+                {
+                  type: "LtiResourceLinkRequest",
+                  target_link_uri: "http://example.com/launch",
+                  placements: ["link_selection", "global_navigation"]
+                },
+                {
+                  type: "LtiResourceLinkRequest",
+                  target_link_uri: "http://example.com/launch_another_one",
+                  placements: %w[link_selection global_navigation assignment_menu]
+                },
+                {
+                  type: "LtiDeepLinkingRequest",
+                  target_link_uri: "http://example.com/deep_linking",
+                  placements: %w[link_selection homework_submission assignment_menu]
+                }
+              ],
+              claims: []
+            }
+          end
+
+          it "should choose the first placement" do
+            expect(subject["extensions"][0][:settings][:placements]).to eq(
+              [
+                {
+                  "enabled" => true,
+                  "message_type" => "LtiResourceLinkRequest",
+                  "placement" => "link_selection",
+                  "target_link_uri" => "http://example.com/launch"
+                },
+                {
+                  "enabled" => true,
+                  "message_type" => "LtiResourceLinkRequest",
+                  "placement" => "global_navigation",
+                  "target_link_uri" => "http://example.com/launch"
+                },
+                {
+                  "enabled" => true,
+                  "message_type" => "LtiResourceLinkRequest",
+                  "placement" => "assignment_menu",
+                  "target_link_uri" => "http://example.com/launch_another_one"
+                },
+                {
+                  "enabled" => true,
+                  "message_type" => "LtiDeepLinkingRequest",
+                  "placement" => "homework_submission",
+                  "target_link_uri" => "http://example.com/deep_linking"
+                }
+              ]
+            )
+          end
         end
       end
-    end
 
-    describe "importable_configuration" do
-      subject { registration.importable_configuration }
-      let(:lti_tool_configuration) do
-        {
-          domain: "example.com",
-          custom_parameters: {
-            "global_foo" => "global_bar"
-          },
-          messages: [{
-            type: "LtiResourceLinkRequest",
-            target_link_uri: "http://example.com/launch",
+      describe "placements" do
+        let(:lti_tool_configuration) do
+          {
+            domain: "example.com",
+            messages: [{
+              type: "LtiResourceLinkRequest",
+              target_link_uri: "http://example.com/launch",
+              custom_parameters: {
+                "foo" => "bar"
+              },
+              icon_uri: "http://example.com/icon.png",
+              "https://canvas.instructure.com/lti/launch_width": "200",
+              "https://canvas.instructure.com/lti/launch_height": "300",
+              "https://canvas.instructure.com/lti/display_type": "full_width",
+              placements: [
+                "https://canvas.instructure.com/lti/assignment_edit",
+                "global_navigation",
+                "course_navigation",
+                "ContentArea",
+                "RichTextEditor",
+              ],
+            }],
+            claims: []
+          }
+        end
+
+        subject { registration.placements }
+
+        context "convert messages to placements" do
+          it "accepts valid placements" do
+            canvas_placement_hash = {
+              custom_fields: { "foo" => "bar" },
+              enabled: true,
+              icon_url: "http://example.com/icon.png",
+              message_type: "LtiResourceLinkRequest",
+              target_link_uri: "http://example.com/launch",
+              display_type: "full_width",
+            }
+            expect(subject).to eq [
+              canvas_placement_hash.merge(placement: "assignment_edit", launch_width: 200, launch_height: 300),
+              canvas_placement_hash.merge(placement: "global_navigation", selection_width: 200, selection_height: 300),
+              canvas_placement_hash.merge(placement: "course_navigation", selection_width: 200, selection_height: 300),
+              canvas_placement_hash.merge(placement: "link_selection", selection_width: 200, selection_height: 300),
+              canvas_placement_hash.merge(placement: "editor_button", selection_width: 200, selection_height: 300),
+            ]
+          end
+
+          it "sets windowTarget if display_type is new_window" do
+            message = registration.lti_tool_configuration["messages"].first
+            message["https://canvas.instructure.com/lti/display_type"] = "new_window"
+            expect(subject.first).to include({ windowTarget: "_blank", display_type: "default" })
+          end
+
+          it "rejects invalid placements" do
+            bad_placement_name = "course_navigationhttps://canvas.instructure.com/lti/"
+            registration.lti_tool_configuration["messages"].first["placements"] << bad_placement_name
+            expect { registration.save! }.to raise_error(ActiveRecord::RecordInvalid)
+          end
+        end
+      end
+
+      describe "importable_configuration" do
+        subject { registration.importable_configuration }
+        let(:lti_tool_configuration) do
+          {
+            domain: "example.com",
             custom_parameters: {
-              "foo" => "bar"
+              "global_foo" => "global_bar"
             },
-            icon_uri: "http://example.com/icon.png",
-            placements: ["global_navigation", "course_navigation"],
-          }],
-          claims: []
-        }
-      end
+            messages: [{
+              type: "LtiResourceLinkRequest",
+              target_link_uri: "http://example.com/launch",
+              custom_parameters: {
+                "foo" => "bar"
+              },
+              icon_uri: "http://example.com/icon.png",
+              placements: ["global_navigation", "course_navigation"],
+            }],
+            claims: []
+          }
+        end
 
-      context "should return a correct configuration" do
-        it do
+        it "should return a correct configuration" do
           expect(subject).to eq(
             {
               "custom_fields" => {

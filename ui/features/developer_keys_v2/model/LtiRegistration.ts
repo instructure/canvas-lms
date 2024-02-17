@@ -19,6 +19,7 @@ import {type RegistrationOverlay} from '../react/RegistrationSettings/Registrati
 import {type LtiPlacement} from './LtiPlacements'
 import {type LtiPrivacyLevel} from './LtiPrivacyLevel'
 import {type LtiScope} from './LtiScopes'
+import type {Configuration} from './api/LtiToolConfiguration'
 
 export type SubClaims = Array<string>
 export type MessageType = 'LtiResourceLinkRequest' | 'LtiDeepLinkingRequest'
@@ -28,7 +29,7 @@ export type LtiMessage = {
   label: string
   roles: Array<string>
   icon_uri: string
-  placements: Array<LtiPlacement>
+  placements?: Array<LtiPlacement>
   target_link_uri: string
   custom_parameters: Record<string, string>
 }
@@ -61,4 +62,12 @@ export type LtiRegistration = {
   created_at: string
   updated_at: string
   guid: string
+  /**
+   * Tool configuration with overlay applied
+   */
+  tool_configuration: Configuration
+  /**
+   * The configuration without the overlay applied
+   */
+  default_configuration: Configuration
 }
