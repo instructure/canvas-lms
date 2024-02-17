@@ -18,6 +18,7 @@
 
 import type {LtiScope} from '../LtiScopes'
 import type {LtiRegistration} from '../LtiRegistration'
+import type {Configuration} from './LtiToolConfiguration'
 
 export interface DeveloperKeyAccountBinding {
   account_id: string
@@ -48,9 +49,7 @@ export interface DeveloperKey {
   email: string | null
   name: string | null
   require_scopes: boolean | null
-  tool_configuration: {
-    oidc_initiation_url: string
-  } | null
+  tool_configuration: Configuration | null
   test_cluster_only?: boolean
   client_credentials_audience: string | null
   is_lti_key: boolean
