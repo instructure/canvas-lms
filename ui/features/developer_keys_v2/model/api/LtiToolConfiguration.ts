@@ -65,12 +65,12 @@ export interface PlatformSettings {
 
 export interface PlacementConfig {
   placement: LtiPlacement
-  enabled: boolean
+  enabled?: boolean
   message_type: string
-  target_link_uri: string
-  text: string
-  icon_url: string
-  custom_fields: Record<string, string>
+  target_link_uri?: string
+  text?: string
+  icon_url?: string
+  custom_fields?: Record<string, string>
 }
 
 /// @see lib/schemas/lti/public_jwk.rb
