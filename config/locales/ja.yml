@@ -4045,7 +4045,7 @@ ja:
   argentina_54_375d6af4: "アルゼンチン (+54)"
   armenian_12da6118: 英語（米語）
   arrange_by_34a545de: 以下によって手配
-  arrange_by_a121617c: ～で並べ替え
+  arrange_by_a121617c: 並べ替え
   arrange_columns_by_assignment_group_33acdf03: 課題グループで列を並べ替え
   arrange_columns_by_assignment_group_59bbddd0: 課題グループで列を並べ替え
   arrange_columns_by_due_date_888f2551: 期日で列を並べ替え
@@ -4729,7 +4729,7 @@ ja:
       other: "%{count} 件のルール"
     select_assignment: "[課題の選択]"
     show: 
-      allowed_attempts: 試行許可数
+      allowed_attempts: 試行許可回数
       assignment_locked: この課題は現在ロックされています。
       attempts: 回数
       available_from: 提出開始日時
@@ -4768,7 +4768,7 @@ ja:
     status: 
       deleting_group: グループを削除しています...
     student_assignment_overview: 
-      allowed_attempts: 試行許可数
+      allowed_attempts: 試行許可回数
       attempts: 回数
       date_time_by: "%{date}（%{time}までに）"
       due_at: 期限
@@ -5290,7 +5290,7 @@ ja:
   automatically_apply_deduction_to_late_submissions_2b68166e: 遅れた提出に減点を自動的に適用します
   automatically_apply_grade_for_missing_submissions_2b5c1a72: 未提出の物に採点を自動的に適用します
   automatically_assign_709c6ddb: 自動割当て
-  automatically_assign_a_student_group_leader_29448649: "自動的に受講者グループ リーダーを割り当て"
+  automatically_assign_a_student_group_leader_29448649: "自動的にグループ リーダーを割り当てる"
   automatically_dff02416: 自動
   automatically_disable_post_to_sis_on_assignments_w_dd7e873a: "採点期間終了時に、課題の[SISに投稿]を自動的に無効にする"
   automatically_launch_the_canvas_app_when_a_user_lo_a9541f04: "ユーザがログインすると、Canvas アプリが自動的に起動します。"
@@ -6670,19 +6670,19 @@ ja:
   click_to_sort_by_enrollments_descending_3e5c80ee: クリックして登録を降順で並べ替える
   click_to_sort_by_last_login_ascending_eafcbee4: クリックして最後のログイン順で昇順で並べ替える
   click_to_sort_by_last_login_descending_61fdadc: クリックして最後のログイン順で降順で並べ替える
-  click_to_sort_by_name_ascending_739c011e: クリックして氏名を昇順で並べ替える
+  click_to_sort_by_name_ascending_739c011e: クリックしてコース名の昇順で並べ替える
   click_to_sort_by_name_descending_b6262093: クリックして氏名を降順で並べ替える
   click_to_sort_by_number_of_students_ascending_d09bea31: クリックして受講生を昇順で並べ替える
   click_to_sort_by_number_of_students_descending_3600dc1f: クリックして受講生を降順で並べ替える
   click_to_sort_by_sis_id_ascending_832c870: "クリックしてSIS ID順で昇順で並べ替える"
   click_to_sort_by_sis_id_descending_2d611236: "クリックしてSIS ID順で降順で並べ替える"
-  click_to_sort_by_sub_account_ascending_989b1ab: クリックしてサブアカウントを昇順で並べ替える
+  click_to_sort_by_sub_account_ascending_989b1ab: クリックしてサブアカウント名の昇順で並べ替える
   click_to_sort_by_sub_account_descending_88c611db: クリックしてサブアカウントを降順で並べ替える
   click_to_sort_by_subaccount_ascending_11252bc4: クリックしてサブアカウントを昇順で並べ替える
   click_to_sort_by_subaccount_descending_3d8a2381: クリックしてサブアカウントを降順で並べ替える
-  click_to_sort_by_teacher_ascending_cda7a18c: クリックして教員を昇順で並べ替える
+  click_to_sort_by_teacher_ascending_cda7a18c: クリックして教員名の昇順で並べ替える
   click_to_sort_by_teacher_descending_45ef0d1e: クリックして教員を降順で並べ替える
-  click_to_sort_by_term_ascending_c3ef1eb7: クリックして項目を昇順で並べ替える
+  click_to_sort_by_term_ascending_c3ef1eb7: クリックして学期名の昇順で並べ替える
   click_to_sort_by_term_descending_199c48c0: クリックして項目を降順で並べ替える
   click_to_sort_c81ff8c8: クリックして並べ替える
   click_to_split_set_here_9c35462a: ここをクリックしてセットを分割します
@@ -6711,7 +6711,7 @@ ja:
   close_details_sidebar_ff8f663d: 詳細のサイドバーを閉じる
   close_discussion_settings_e6f4b31f: ディスカッション設定を閉じる
   close_discussion_title_for_comments_adde43bc: "ディスカッション %{title} のコメントを閉じる"
-  close_for_comments_37783f56: コメントを締め切る
+  close_for_comments_37783f56: コメントを許可しない
   close_for_comments_ce0e5d00: コメントを閉じる
   close_grade_info_58ef5a20: 評定についての情報を閉じる
   close_move_tray_8609e988: 移動トレイを閉じる
@@ -7402,7 +7402,7 @@ ja:
       page_locked_module: "このページはモジュール *%{module}* の一部で、まだロックが解除されていません。"
       page_locked_no_reason: このページはロックされています。別の理由は提供されていません。
       page_locked_until: "%{date} まで、このページはロックされています。"
-      quiz_locked_at: "この小テストは %{at} にロックされました。"
+      quiz_locked_at: "この小テストは %{at} に締め切られました。"
       quiz_locked_module: "この小テストはモジュール *%{module}* の一部で、まだロックが解除されていません。"
       quiz_locked_no_reason: この小テストはロックされています。別の理由は提供されていません。
       quiz_locked_until: "%{date} まで、この小テストはロックされています。"
@@ -8960,7 +8960,7 @@ ja:
     invitation_sent_now: 今すぐ
     link_students_placeholder: 受講者名を入力する
     links: 
-      fewer_options: 少ないオプション
+      fewer_options: その他のオプションを閉じる
       more_options: その他のオプション
       publish: "成績表を SIS に公開"
       publishing: "成績表を SIS に公開しています..."
@@ -10768,7 +10768,7 @@ ja:
       topic_title: トピックのタイトル
       until: 利用終了日時
       use_for_grading: 採点済み
-      users_must_post_before_seeing_replies: ユーザは返信を表示する前に投稿する必要があります
+      users_must_post_before_seeing_replies: 投稿するまで、他ユーザーの返信は表示しない
     entry: 
       authors_name: 作成者名
       delete_message: このメッセージの削除
@@ -10871,7 +10871,7 @@ ja:
       links: 
         peer_reviews: "ピア レビュー"
       loading_replies: 返信を読み込んでいます...
-      lock_topic: コメントを締め切る
+      lock_topic: コメントを許可しない
       locked: このトピックへのコメントは締め切られています
       manage_announcement: アナウンスの管理
       manage_discussion: ディスカッションの管理
@@ -10893,7 +10893,7 @@ ja:
       topic_subscribed_tooltip: 購読されました。新しいコメントが通知されます
       topic_time_locked: "このトピックは %{time} までロックされています"
       topic_unsubscribe: 購読済み
-      unlock_topic: コメントを受け付ける
+      unlock_topic: コメントを許可する
       unread: 未読
     sub_entry: 
       authors_name: 作成者名
@@ -10908,7 +10908,7 @@ ja:
       open_to_comments: コメントを受け付ける
       this_topic_is_used_for_grading: このトピックは採点に使用されます。
       topic_podcast_feed: "トピックのポッドキャスト フィード"
-    this_is_a_group_discussion: "これはグループ ディスカッションです"
+    this_is_a_group_discussion: "グループ ディスカッションを作成する"
     topic_deleted_notice: "%{topic_title} は正常に削除されました"
     unread_count_tooltip: 
       one: "1 件の未読の返信があります。"
@@ -13186,10 +13186,10 @@ ja:
     other: "%{formattedPoints} 点"
   formattedpoints_points_possible_1d93043f: 
     one: "*%{formattedPoints}* 配点"
-    other: "*%{formattedPoints}* 配点"
+    other: "配点 *%{formattedPoints}*"
   formattedpoints_points_possible_dad9d40a: 
     one: "%{formattedPoints}の可能なポイント"
-    other: "%{formattedPoints}の可能なポイント"
+    other: "配点 %{formattedPoints}"
   formattedpoints_possible_points_b0473a26: 
     one: "*%{formattedPoints}*つの考えられるポイント"
     other: "*%{formattedPoints}*つの考えられるポイント"
@@ -13231,7 +13231,7 @@ ja:
   full_name_23fdfb6d: "フル ネーム"
   full_name_83cf5453: "フル ネーム"
   full_name_is_required_8efbdc84: フルネームは必須項目です
-  full_student_names_and_profile_pictures_will_be_hi_ddfba94e: "全部: 生徒の名前とプロフィール写真は非表示になります。"
+  full_student_names_and_profile_pictures_will_be_hi_ddfba94e: "オン: 生徒の名前とプロフィール写真は非表示になります。"
   fun_quiz_47ab0b0: 楽しい小テスト
   future_5416ea92: 今後
   future_jobs_cf2964a1: 将来のジョブ
@@ -13377,8 +13377,8 @@ ja:
   grade_info_19fb9875: 評定についての情報
   grade_loading_bc1ad721: 評価の読み込み
   grade_low_to_high_1678b713: "グレード - 低から高"
-  grade_out_of_percentage_1972bf52: "～のグレード%{percentage}"
-  grade_out_of_points_d401b79d: "～のグレード%{points}"
+  grade_out_of_percentage_1972bf52: "配点%{percentage}"
+  grade_out_of_points_d401b79d: "配点%{points}"
   grade_percentage_for_missing_submissions_dc7ccac: 不足している提出物の成績割合
   grade_point_average_2976cc59: 成績平均点
   grade_posting_policy_42c8a94b: 評定掲示ポリシー
@@ -14090,7 +14090,7 @@ ja:
   grades_edit_773dfc24: "評定 - 編集"
   grades_edit_must_also_be_enabled_c025f45d: "評定 - 編集も有効にされていなければなりません。"
   grades_for_coursename_f5c92045: "%{courseName}の評定"
-  grades_for_student_aff00ba: "～の評定%{student}"
+  grades_for_student_aff00ba: "%{student}の評定"
   grades_for_student_d4adfb55: 受講者の評定
   grades_for_this_assignment_are_now_visible_to_stud_623efda0: この課題の評定は受講者に表示されるようになりました。
   grades_loaded_5056277c: 評定が読み込まれました
@@ -14626,9 +14626,9 @@ ja:
         assign_user_to_group_name: "ユーザをグループ %{name} に割り当て"
         no_groups_created: ユーザを追加する前に、グループを作成する必要があります。
       auto_leadership_controls: 
-        auto_first_group_leader: "最初の受講者をグループ リーダーとして参加するように設定"
-        auto_group_leader: "自動的に受講者グループ リーダーを割り当て"
-        auto_random_group_leader: "受講者をランダムにグループ リーダーに設定"
+        auto_first_group_leader: 最初に参加した受講者をグループリーダーに割り当てる
+        auto_group_leader: "自動的にグループ リーダーを割り当てる"
+        auto_random_group_leader: "グループ リーダーをランダムに割り当てる"
         leadership: リーダー
       edit_group_assignment: 
         all_available_groups_full: 利用可能などのグループにも空きがありません。
@@ -14728,7 +14728,7 @@ ja:
         set_as_leader: リーダーとして設定
         set_user_as_leader: "%{name} をリーダーとして設定"
       group_users: 
-        add_student: 最初に、受講者を追加します。
+        add_student: 未割り当ての受講者はいません。
         add_user: 最初に、ユーザを追加します。
         greater_than_three: "検索語を 3 文字以上で入力してください"
         no_matching_students: 一致する受講者はいません。
@@ -15542,7 +15542,7 @@ ja:
   if_users_manage_login_details_or_statistics_view_i_22ca94b8: "ユーザー - ログインの詳細の管理または統計 - 表示が有効になっている場合、ユーザーは管理ツールでログイン/ログアウトアクティビティを生成できます。管理ツールでログイン/ログアウトアクティビティオプションを非表示にするには、これらの権限が両方とも無効にされていなければなりません。"
   if_users_manage_login_details_or_statistics_view_i_c5c82003: "ユーザー - ログインの詳細の管理または統計 - 表示が有効になっている場合、ユーザーは管理ツールでログイン/ログアウトアクティビティを生成できます。管理ツールでログイン/ログアウトアクティビティオプションを非表示にするには、これらの権限が両方とも無効にされていなければなりません。"
   if_users_manage_login_details_or_statistics_view_i_cff4155d: "ユーザー - ログインの詳細の管理または統計 - 表示が有効になっている場合、ユーザーは管理ツールでログイン/ログアウトアクティビティを生成できます。管理ツールでログイン/ログアウトアクティビティオプションを非表示にするには、これらの権限が両方とも無効にされていなければなりません。"
-  if_you_are_going_to_define_a_limit_group_members_i_655dd628: グループメンバーの制限を定義する場合は、1より大きくする必要があります。
+  if_you_are_going_to_define_a_limit_group_members_i_655dd628: グループのメンバー数を設定する場合は、１以上を入力する必要があります。
   if_you_change_an_assignment_s_points_possible_exis_505e6015: 課題の配点を変更する場合、既存の成績は自動的に調整されます。
   if_you_change_an_assignment_s_points_possible_you__25a0edad: 課題の配点を変更する場合は、課題を再評価する必要があります。
   if_you_change_an_assignment_s_points_possible_you__dba531cb: 課題の配点を変更する場合は、すべての提出物を再評価する必要があります。
@@ -16354,7 +16354,7 @@ ja:
   label_values_76f4b5fa: ラベル値
   labels: 
     due: 期限
-    lock_module_until: ロック終了時刻
+    lock_module_until: 公開日時
   labels_292cd90b: ラベル
   language_6b3e2c7c: 言語
   language_arts_35b79a8b: 国語
@@ -16543,7 +16543,7 @@ ja:
   less_than_a_minute_f938af3a: 1分未満
   let_students_see_the_correct_answers_dacc2faf: 受講者に正解を表示
   let_students_see_their_quiz_responses_fbc07d14: 受講生にクイズの結果を表示
-  let_students_see_their_quiz_responses_incorrect_qu_f5c9cb70: 受講者に小テスト回答を見せる（不正解の質問は、受講者のフィードバック内でマークされる）
+  let_students_see_their_quiz_responses_incorrect_qu_f5c9cb70: 受講者に小テストの正解を見せる（不正解の問題は、コメントが表示される）
   let_the_site_administrator_select_up_to_2_lti_apps_df016781: サイト管理者が最大2つのLTIアプリをお気に入りとして選択できるようにします。これは、RCEのツールバーに表示されます。
   letter_12ff3510: 手紙
   letter_grade_29ff1938: "レター グレード"
@@ -19003,7 +19003,7 @@ ja:
       twitter: 
         body: "Canvas アラート - %{account}のCanvasアカウントに登録されています！"
     quiz_locked: この小テストは現在ロックされています。
-    quiz_locked_at: "この小テストは %{at} にロックされました。"
+    quiz_locked_at: "この小テストは %{at} に締め切られました。"
     quiz_locked_module: "この小テストはモジュール *%{module}* の一部で、まだロックが解除されていません。"
     quiz_locked_until: "%{date} まで、この小テストはロックされています。"
     quiz_module_time_locked: "この小テストはモジュール *%{module}* の一部です。%{time} までロックされています。"
@@ -19926,7 +19926,7 @@ ja:
   n_a_d6f6c42f: N/A
   n_contextscount_more_2f708db4: "+ %{n_contextsCount} より多く"
   n_count_alignments_a45bebe7: "*%{n_count}* アライメント"
-  n_groupweight_percentage_of_total_2ae4d996: "%{n_groupWeight_percentage} 合計の"
+  n_groupweight_percentage_of_total_2ae4d996: "合計の%{n_groupWeight_percentage}"
   n_irrelevant_enrollments_irrelevant_enrollments_en_1db72153: "%{n_irrelevant_enrollments}の関連性のない登録（同期対象外の登録）ユーザー："
   n_irrelevant_enrollments_irrelevant_enrollments_en_6ff5027c: "%{n_irrelevant_enrollments}の関連性のない登録（同期対象外の登録）最初の%{max_shown_users}名のユーザー："
   n_number_of_times_c2e78b72: "n 回数"
@@ -20080,7 +20080,7 @@ ja:
   new_gradebook_plagiarism_indicator_8dd22971: 新しい評定表盗作インジケータ
   new_grading_scheme_ab1a3301: 新しい採点スキーム
   new_group_8d6ad781: 新しいグループ
-  new_group_category_66be9cbd: "新しいグループ カテゴリ"
+  new_group_category_66be9cbd: "グループ セットを作成する"
   new_group_set_7241a581: "新しいグループ セット"
   new_instui_navbar_72a69783: "新しい InstUI ナビゲーションバー"
   new_mention_ad04b872: 新しい言及
@@ -20360,7 +20360,7 @@ ja:
   not_all_of_these_services_may_be_supported_by_your_155d9f70: |-
       これらすべてのサービスには、お客様の学校でサポートされていないものがある場合があります。詳細については、学校の
                 管理者にお問い合わせください。
-  not_all_sections_will_be_assigned_this_item_4e2b8eaa: このアイテムにすべてのセクションが割り当てられるわけではありません。
+  not_all_sections_will_be_assigned_this_item_4e2b8eaa: 割り当てられていないセクションがあります。
   not_all_settings_options_are_available_at_the_suba_20efaa98: 通知のタブを含め、サブアカウントレベルですべての設定オプションを利用できるわけではありません。
   not_anonymously_graded_87574f91: 匿名で採点されていない
   not_applicable_d5dfd285: 該当しない
@@ -21015,7 +21015,7 @@ ja:
   open_event_menu_e9a21e39: イベントメニューを開く
   open_event_menu_for_783510e3: （）のイベントメニューを開く
   open_for_comments_1810648: コメント用に開く
-  open_for_comments_f8f7641e: コメントを受け付ける
+  open_for_comments_f8f7641e: コメントを許可する
   open_grading_scheme_menu_5f889203: 採点スキームメニューを開く
   open_in_speedgrader_506a4ad5: Speedgraderで開く
   open_in_speedgrader_57c64fe3: "SpeedGrader で開く"
@@ -21486,7 +21486,7 @@ ja:
   parent_references_not_found_prior_to_this_row_miss_31723438: "この行の前にペアレントの参照が見つかりません： %{missing}"
   parent_signup_b7c6bf0a: 親のサインアップ
   parents_sign_up_here_f0aa8f4f: 親のサインアップはこちらです
-  partial_students_can_choose_to_reveal_their_name_a_baa936d4: 部分的：生徒が自分の名前とプロフィール写真を公開するかを選択できる
+  partial_students_can_choose_to_reveal_their_name_a_baa936d4: 選択可能：生徒が自分の名前とプロフィール写真を公開するかを選択できる
   partially_anonymous_483a892d: 一部匿名
   partially_anonymous_discussion_13ceb585: "一部匿名のディスカッション "
   partially_anonymous_discussion_e821cf85: 一部匿名でのディスカッション
@@ -24277,7 +24277,7 @@ ja:
         submission_thirty_minutes_left: "この小テストは、30 分後に提出されます"
       question_answered: 解答済み
       question_unanswered: まだ解答していない
-      saved_at: "小テストの保存場所: %{t}"
+      saved_at: "%{t} に保存しました。"
       saving: 保存しています...
       saving_not_needed: "保存する新しいデータはありません。最終確認時刻: %{t}"
       seconds_count: 
@@ -24906,16 +24906,16 @@ ja:
     other: "%{replyCount}の返信"
   replycount_replies_e8c8953d: 
     one: "%{replyCount} の返信"
-    other: "%{replyCount} の返信"
+    other: "%{replyCount} 件の返信"
   replycount_replies_unreadcount_39489e1a: 
     one: "%{replyCount}の返信 (%{unreadCount})"
-    other: "%{replyCount}の返信 (%{unreadCount})"
+    other: "%{replyCount}件の返信 (%{unreadCount})"
   replycount_replies_unreadcount_c79e6060: 
     one: "%{replyCount}の返信(%{unreadCount})"
     other: "%{replyCount}の返信(%{unreadCount})"
   replycount_replies_unreadcount_unread_4e2876fa: 
     one: "%{replyCount}の返信、%{unreadCount}の未読"
-    other: "%{replyCount}の返信、%{unreadCount}の未読"
+    other: "%{replyCount}件の返信、%{unreadCount}件の未読"
   replycount_replies_unreadcount_unread_a85c0bc8: 
     one: "%{replyCount}の返信、%{unreadCount}未読"
     other: "%{replyCount}の返信、%{unreadCount}未読"
@@ -26115,7 +26115,7 @@ ja:
   services_ccd7bca0: サービス
   services_must_be_supported_by_the_tool_in_order_to_1f194a36: 機能するには、サービスがツールによってサポートされていなければなりません。あなたのベンダーツールでチェックして、サービス機能を確実にしてください。
   session_expired_12aaf414: セッションの有効期限切れ
-  set_a_random_student_as_group_leader_663dcfd5: "受講者をランダムにグループ リーダーに設定"
+  set_a_random_student_as_group_leader_663dcfd5: "グループ リーダーをランダムに割り当てる"
   set_as_default_email_address_bd3b9b8f: "デフォルト電子メール アドレスに設定する"
   set_course_color_to_a_custom_hexadecimal_code_c8a50918: コースカラーをカスタムの16進コードに設定します
   set_course_color_to_a_preset_hexadecimal_color_cod_97608d8: コースカラーをプリセットの16進カラーコードに設定します。左右の矢印キーを使用して、プリセットをナビゲートします。
@@ -26131,7 +26131,7 @@ ja:
     set_grades_button_loading: 評定を設定しています...
   set_email_address_as_default_954d284: 電子メールのアドレスをデフォルトに設定する
   set_email_as_default_5b4a28e: 電子メールをデフォルトに設定する
-  set_first_student_to_join_as_group_leader_5cfc206f: "最初の受講者をグループ リーダーとして参加するように設定"
+  set_first_student_to_join_as_group_leader_5cfc206f: 最初に参加した受講者をグループリーダーに割り当てる
   set_group_weights_fd41c1f: グループの重み付けの設定
   set_last_attended_date_8fb30092: 最終出席日を設定する
   set_name_d14182d7: 名前を設定する...
@@ -26571,7 +26571,7 @@ ja:
         dashboard: ダッシュボード
         skip_to_content: コンテンツまでスキップする
     no_recent_activity: 
-      empty_stream_message: ストリームには、まだ表示するメッセージがありません。コースに参加し始めると、ディスカッションからのメッセージ、採点の更新、ご自分と他のユーザとの間で交わされる非公開メッセージなどで、このストリームが埋まっていきます。
+      empty_stream_message: 最近のお知らせはありません。使用していくと、ディスカッション、課題の通知、メッセージ、アナウンス等のお知らせが表示されます。
       no_recent_messages: 最近のメッセージはありません
     pending_enrollment: 
       designer: "%{course} (設計者として)"
@@ -27970,7 +27970,7 @@ ja:
     resubmitted_to_turnitin: "turnitin に正常に再提出されました。"
     see_attached_files: 添付ファイルを参照してください。
     show: 
-      allowed_attempts: 試行許可数
+      allowed_attempts: 試行許可回数
       anonymous_user: 匿名のユーザー
       attach_file: ファイルを添付
       attempts: 回数
@@ -28504,7 +28504,7 @@ ja:
   text_entry_submission_cannot_be_empty_3d187cae: テキスト入力送信は、空にすることはできません
   text_file_73d8d08c: テキストファイル
   text_input_d3480b8c: テキスト入力
-  text_no_question_has_moved_to_a_stimulus_please_ad_aab69d0e: "Text No Question（テキスト質問なし）はStimulus（スティミュラス）に移動しました。小テストの中で表示できるように質問を追加してください。"
+  text_no_question_has_moved_to_a_stimulus_please_ad_aab69d0e: 「テキスト（問題ではない）」は「文章参照問題」に移行されました。小テストの中で表示できるように質問を追加してください。
   thai_8f9bc548: タイ語
   thailand_66_5b3ef324: タイ（+66）
   that_s_not_a_date_3f350dba: それは日付けではありません!
@@ -28795,7 +28795,7 @@ ja:
   the_roles_held_by_the_reporting_user_student_teach_8fa5a269: レポーティングユーザのロール(生徒、教員、管理者等)
   the_salesforce_account_id_if_it_exists_e7949706: セールスフォースアカウントID(もしあれば)
   the_scheduler_tool_lets_you_set_up_time_slots_that_233345b1: スケジューラーツールを使用すると、受講生(または受講生のグループ)がサインアップすることができるタイムスロットを設定できます。下のボタンをクリックして開始できます。
-  the_search_returned_no_results_c2e4d13c: 検索結果は返されませんでした。
+  the_search_returned_no_results_c2e4d13c: 検索結果はありません。
   the_search_returned_no_results_cd9eee1e: 検索結果は返されませんでした
   the_section_to_report_on_11e3757b: レポートの対象となるセクション
   the_selected_calculation_method_is_no_longer_avail_e42ee80d: 選択された計算方法は使用できなくなりました
@@ -30712,7 +30712,7 @@ ja:
   unlimited_attempts_81a37d4: 試行回数の制限なし
   unlimited_ff19e96d: 無制限
   unlock_562bc4cb: ロック解除する
-  unlock_at_bb930b34: ロック解除の日時
+  unlock_at_bb930b34: 公開日時
   unlock_at_time_a0bbfb9: "次の時間で締切解除: %{time}"
   unlock_date_cannot_be_after_due_date_8829d9ca: ロック解除日を期日より後にすることはできません
   unlock_date_cannot_be_after_lock_date_591f7fda: ロック解除日をロック日より後にすることはできません
@@ -30808,7 +30808,7 @@ ja:
   unsyncable_message_95faa75d: "同期できない：%{message}"
   unsynced_changes_4ddaec76: 同期されていない変更内容
   unsynched_changes_867a1790: 同期されていない変更
-  until_4a1f8cda: 次の日時まで
+  until_4a1f8cda: 終了日時
   until_6437a827: まで
   until_8bdea3de: まで
   until_date_949017c4: "%{date} まで"
@@ -31701,7 +31701,7 @@ ja:
   view_rubric_d71cce10: ルーブリックを見る
   view_rubric_evaluation_b1b0db2a: 注釈の評価の表示
   view_scoring_details_9fb7a0a5: 採点の詳細を表示
-  view_split_screen_ca35b78a: 分割スクリーンを表示する
+  view_split_screen_ca35b78a: 分割画面で表示する
   view_student_analytics_6b8ccd42: 受講生分析の表示
   view_student_submission_5beaf78: 受講生の提出を見る
   view_submission_ff3da5d: 提出を見る
@@ -32206,7 +32206,7 @@ ja:
   working_b1f63edf: 作業中...
   would_you_like_to_accept_or_dismiss_this_update_9009d696: このアップグレードを受け入れますか、または却下しますか？
   would_you_like_to_enable_this_app_ccdf735d: このアプリを有効にしますか?
-  would_you_like_to_go_back_to_include_1d279044: "戻って次を含めますか:"
+  would_you_like_to_go_back_to_include_1d279044: 戻って以下を割り当てますか。
   would_you_like_to_let_students_continue_in_the_cou_a4c36171: "受講者がコースを続行できるようにしますか? または、新しい要件が完了するまで、これらのモジュールを再度ロックしますか?"
   would_you_like_to_remove_these_count_outcomes_5075697d: 
     one: "これら%{count}の成果を削除しますか？"
@@ -32263,7 +32263,7 @@ ja:
   you_are_logged_out_of_canvas_8b5fc59a: Canvasからログアウトしています。
   you_are_not_able_to_create_an_anonymous_discussion_1d06f9a7: グループに匿名ディスカッションを作成することができません。
   you_are_not_able_to_create_an_anonymous_discussion_d2e8f591: あなたは匿名のディスカッションを作成することができません。
-  you_are_not_allowed_to_create_an_anonymous_graded__3eeb1382: あなたが匿名の採点されるディスカッションを作成することは許可されていません。
+  you_are_not_allowed_to_create_an_anonymous_graded__3eeb1382: 匿名のディスカッションの場合には、採点対象にすることはできません。
   you_are_not_authorized_to_disable_the_sync_to_name_d283c3e0: "あなたは %{name} へ同期化するオプションを無効にする権限がありません。"
   you_are_not_authorized_to_disable_the_sync_to_sisn_54aebeb0: "あなたは %{sisName} へ同期化するオプションを無効にする権限がありません。"
   you_are_not_authorized_to_perform_that_action_6c659f40: あなたにはそのアクションを行う権限がありません
@@ -32334,7 +32334,7 @@ ja:
   you_can_view_dismissed_announcements_by_going_to_a_7f6f4f08: |-
       アカウントに移動し、メニューからグローバル
                   通知を選択すると、却下された通知を表示できます。
-  you_can_view_your_grades_based_on_what_if_scores_s_a1aeae72: "今後の課題や再提出された課題の評定がどのように影響を受けるかを知ることができるよう、What-If スコアに基づいて評定を見ることができます。すでにスコアが含まれている課題、またはまだ採点されていない課題のスコアをテストすることができます。"
+  you_can_view_your_grades_based_on_what_if_scores_s_a1aeae72: 今後の課題や再提出された課題の評定がどのように影響を受けるかを知ることができるよう、仮のスコアに基づいて評定を見ることができます。採点済みの課題、またはまだ採点されていない課題のスコアをテストすることができます。
   you_cannot_assign_sections_to_a_group_discussion_t_fec73e05: セクションをグループディスカッションのトピックに割り当てることはできません
   you_cannot_assign_to_a_group_outside_of_the_assign_7869eb3b: 外部に設定されている課題のグループに割り当てることはできません
   you_cannot_cancel_while_loading_the_pace_c6ccf2cc: ペースの読み込み中にキャンセルすることはできません
@@ -32473,7 +32473,7 @@ ja:
   you_must_input_a_section_b8d370fe: セクションを入力してください
   you_must_log_in_to_view_replies_9ccd4da0: 返信を見るには、ログインが必要です
   you_must_post_before_seeing_replies_24f8bcd4: 返信を見る前に投稿しなければなりません。
-  you_must_post_before_seeing_replies_edit_history_w_187aa561: 返信を見る前に投稿しなければなりません。編集履歴は、講師が見ることができます。
+  you_must_post_before_seeing_replies_edit_history_w_187aa561: 投稿するまで、他の返信は表示されません。編集履歴は、教員が見ることができます。
   you_must_provide_a_date_and_time_a86839d2: 日時を指定する必要があります。
   you_must_provide_a_date_with_a_time_ec369ff4: 日時を指定する必要があります。
   you_must_provide_a_name_for_the_group_set_9e4cc97a: "グループ セットの名前を指定する必要があります"
@@ -32580,7 +32580,7 @@ ja:
   your_azure_active_directory_tenant_name_d8bb31fa: "Azure Active Directoryテナント名"
   your_browser_connectivity_may_be_slow_or_unstable__97c1f4c5: ブラウザの接続が遅いか、不安定な状態かもしれません。ブラウザのタイマーが切断されていますが、この試みでは、元の制限時間を超えてさらに5分間、回答が記録されます。
   your_browser_does_not_meet_the_minimum_requirement_2fa7c11f: "ご利用のブラウザは Canvas の最小要件を満たしていません。サポートされるブラウザについては *Canvas コミュニティー* を参照してください。"
-  your_classic_quizzes_have_been_migrated_to_new_qui_e49244da: "Classic Quizは、New Quizに移行されました。"
+  your_classic_quizzes_have_been_migrated_to_new_qui_e49244da: クラシック小テストは、新しい小テストに移行されました。
   your_comment_is_not_posted_12677035: あなたのコメントは投稿されていません
   your_comment_was_auto_saved_as_a_draft_c49d3510: コメントは下書きとして自動的に保存されました。
   your_content_has_been_exported_bbb57764: コンテンツがエクスポートされました。
@@ -32628,7 +32628,7 @@ ja:
   your_search_encountered_the_following_errors_fc3e5e7f: 
     one: "検索で以下のエラーが発生しました:"
     other: "検索で以下のエラーが発生しました:"
-  your_search_returned_no_results_383a30cf: 検索結果は返されませんでした。
+  your_search_returned_no_results_383a30cf: 検索結果はありません。
   your_student_submissions_are_being_gathered_9c9ff764: あなたの受講者の提出物を収集中です
   your_submission_has_not_been_graded_yet_d6963e53: 提出物はまだ採点されていません
   your_time_for_this_quiz_has_been_reduced_394652e9: この小テストの回答時間が少なくなっています。
