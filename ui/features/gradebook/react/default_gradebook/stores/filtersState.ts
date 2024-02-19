@@ -71,15 +71,19 @@ export type FiltersState = {
 
 export type InitialColumnFilterSettings = {
   assignment_group_id: null | string
+  assignment_group_ids?: string[]
   context_module_id: null | string
+  context_module_ids?: string[]
   grading_period_id: null | string
   submissions: null | SubmissionFilterValue
+  submission_filters?: SubmissionFilterValue[]
   start_date: null | string
   end_date: null | string
 }
 
 export type InitialRowFilterSettings = {
   section_id: null | string
+  section_ids?: string[]
   student_group_id: null | string
   student_group_ids?: null | string[]
 }
@@ -143,18 +147,39 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
   ) => {
     const appliedFilters: Filter[] = []
 
-    if (typeof initialRowFilterSettings.section_id === 'string') {
-      appliedFilters.push({
-        id: uuid.v4(),
-        value: initialRowFilterSettings.section_id,
-        type: 'section',
-        created_at: new Date().toISOString(),
+    if (multiselectGradebookFiltersEnabled) {
+      initialColumnFilterSettings.context_module_ids?.forEach(value => {
+        appliedFilters.push({
+          id: uuid.v4(),
+          value,
+          type: 'module',
+          created_at: new Date().toISOString(),
+        })
       })
-    }
-    if (
-      multiselectGradebookFiltersEnabled &&
-      typeof initialRowFilterSettings.student_group_ids === 'object'
-    ) {
+      initialColumnFilterSettings.assignment_group_ids?.forEach(value => {
+        appliedFilters.push({
+          id: uuid.v4(),
+          value,
+          type: 'assignment-group',
+          created_at: new Date().toISOString(),
+        })
+      })
+      initialColumnFilterSettings.submission_filters?.forEach(value => {
+        appliedFilters.push({
+          id: uuid.v4(),
+          value,
+          type: 'submissions',
+          created_at: new Date().toISOString(),
+        })
+      })
+      initialRowFilterSettings.section_ids?.forEach(value => {
+        appliedFilters.push({
+          id: uuid.v4(),
+          value,
+          type: 'section',
+          created_at: new Date().toISOString(),
+        })
+      })
       initialRowFilterSettings.student_group_ids?.forEach(value => {
         appliedFilters.push({
           id: uuid.v4(),
@@ -163,90 +188,103 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
           created_at: new Date().toISOString(),
         })
       })
-    } else if (
-      !multiselectGradebookFiltersEnabled &&
-      typeof initialRowFilterSettings.student_group_id === 'string'
-    ) {
-      appliedFilters.push({
-        id: uuid.v4(),
-        value: initialRowFilterSettings.student_group_id,
-        type: 'student-group',
-        created_at: new Date().toISOString(),
-      })
-    }
+      // NOTE: all "saved" filters will be wiped out when multi select
+      // filters are enabled, could look into preserving this when
+      // the feature gets turned on if it is an issue
+    } else {
+      if (typeof initialRowFilterSettings.section_id === 'string') {
+        appliedFilters.push({
+          id: uuid.v4(),
+          value: initialRowFilterSettings.section_id,
+          type: 'section',
+          created_at: new Date().toISOString(),
+        })
+      }
+      if (typeof initialRowFilterSettings.student_group_id === 'string') {
+        appliedFilters.push({
+          id: uuid.v4(),
+          value: initialRowFilterSettings.student_group_id,
+          type: 'student-group',
+          created_at: new Date().toISOString(),
+        })
+      }
 
-    if (
-      typeof initialColumnFilterSettings.assignment_group_id === 'string' &&
-      initialColumnFilterSettings.assignment_group_id !== '0'
-    ) {
-      appliedFilters.push({
-        id: uuid.v4(),
-        value: initialColumnFilterSettings.assignment_group_id,
-        type: 'assignment-group',
-        created_at: new Date().toISOString(),
-      })
-    }
-    const customStatusIds = getCustomStatusIdStrings(customStatuses)
-    if (
-      [
-        'has-ungraded-submissions',
-        'has-submissions',
-        'has-no-submissions',
-        'has-unposted-grades',
-        'late',
-        'missing',
-        'resubmitted',
-        'dropped',
-        'excused',
-        'extended',
-        ...customStatusIds,
-      ].includes(initialColumnFilterSettings.submissions || '')
-    ) {
-      appliedFilters.push({
-        id: uuid.v4(),
-        value: initialColumnFilterSettings.submissions || undefined,
-        type: 'submissions',
-        created_at: new Date().toISOString(),
-      })
-    }
+      if (
+        typeof initialColumnFilterSettings.assignment_group_id === 'string' &&
+        initialColumnFilterSettings.assignment_group_id !== '0'
+      ) {
+        appliedFilters.push({
+          id: uuid.v4(),
+          value: initialColumnFilterSettings.assignment_group_id,
+          type: 'assignment-group',
+          created_at: new Date().toISOString(),
+        })
+      }
+      const customStatusIds = getCustomStatusIdStrings(customStatuses)
+      if (
+        [
+          'has-ungraded-submissions',
+          'has-submissions',
+          'has-no-submissions',
+          'has-unposted-grades',
+          'late',
+          'missing',
+          'resubmitted',
+          'dropped',
+          'excused',
+          'extended',
+          ...customStatusIds,
+        ].includes(initialColumnFilterSettings.submissions || '')
+      ) {
+        appliedFilters.push({
+          id: uuid.v4(),
+          value: initialColumnFilterSettings.submissions || undefined,
+          type: 'submissions',
+          created_at: new Date().toISOString(),
+        })
+      }
 
-    if (
-      typeof initialColumnFilterSettings.context_module_id === 'string' &&
-      initialColumnFilterSettings.context_module_id !== '0'
-    ) {
-      appliedFilters.push({
-        id: uuid.v4(),
-        value: initialColumnFilterSettings.context_module_id,
-        type: 'module',
-        created_at: new Date().toISOString(),
-      })
-    }
+      if (
+        typeof initialColumnFilterSettings.context_module_id === 'string' &&
+        initialColumnFilterSettings.context_module_id !== '0'
+      ) {
+        appliedFilters.push({
+          id: uuid.v4(),
+          value: initialColumnFilterSettings.context_module_id,
+          type: 'module',
+          created_at: new Date().toISOString(),
+        })
+      }
 
-    if (initialColumnFilterSettings.start_date && initialColumnFilterSettings.start_date !== '0') {
-      appliedFilters.push({
-        id: uuid.v4(),
-        value: initialColumnFilterSettings.start_date,
-        type: 'start-date',
-        created_at: new Date().toISOString(),
-      })
-    }
+      if (
+        initialColumnFilterSettings.start_date &&
+        initialColumnFilterSettings.start_date !== '0'
+      ) {
+        appliedFilters.push({
+          id: uuid.v4(),
+          value: initialColumnFilterSettings.start_date,
+          type: 'start-date',
+          created_at: new Date().toISOString(),
+        })
+      }
 
-    if (initialColumnFilterSettings.end_date && initialColumnFilterSettings.end_date !== '0') {
-      appliedFilters.push({
-        id: uuid.v4(),
-        value: initialColumnFilterSettings.end_date,
-        type: 'end-date',
-        created_at: new Date().toISOString(),
-      })
-    }
+      if (initialColumnFilterSettings.end_date && initialColumnFilterSettings.end_date !== '0') {
+        appliedFilters.push({
+          id: uuid.v4(),
+          value: initialColumnFilterSettings.end_date,
+          type: 'end-date',
+          created_at: new Date().toISOString(),
+        })
+      }
 
-    if (typeof initialColumnFilterSettings.grading_period_id === 'string') {
-      appliedFilters.push({
-        id: uuid.v4(),
-        value: initialColumnFilterSettings.grading_period_id,
-        type: 'grading-period',
-        created_at: new Date().toISOString(),
-      })
+      if (typeof initialColumnFilterSettings.grading_period_id === 'string') {
+        appliedFilters.push({
+          id: uuid.v4(),
+          value: initialColumnFilterSettings.grading_period_id,
+          type: 'grading-period',
+          created_at: new Date().toISOString(),
+        })
+      }
     }
 
     set({appliedFilters})

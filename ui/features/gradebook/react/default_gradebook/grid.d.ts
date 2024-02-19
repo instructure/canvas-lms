@@ -98,26 +98,35 @@ export type RowFilterKey = 'sectionId' | 'studentGroupId' | 'studentGroupIds'
 
 export type ColumnFilterKey =
   | 'assignmentGroupId'
+  | 'assignmentGroupIds'
   | 'contextModuleId'
+  | 'contextModuleIds'
   | 'gradingPeriodId'
   | 'submissions'
+  | 'submissionFilters'
   | 'startDate'
   | 'endDate'
 
 export type FilterColumnsOptions = {
   assignmentGroupId: null | string
+  assignmentGroupIds: null | string[]
   contextModuleId: null | string
+  contextModuleIds: null | string[]
   gradingPeriodId: null | string
   submissions: null | SubmissionFilterValue
+  submissionFilters: null | SubmissionFilterValue[]
   startDate: null | string
   endDate: null | string
 }
 
 export type FilterRowsBy = {
   sectionId: string | null
+  sectionIds: string[] | null
   studentGroupId: string | null
   studentGroupIds: string[] | null
 }
+
+export type FilterColumnsBy = {}
 
 export type GridDisplaySettings = {
   colors: StatusColors

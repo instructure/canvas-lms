@@ -433,7 +433,7 @@ describe('FilterNav', () => {
       expect(getByTestId(`applied-filter-${defaultProps.sections[0].name}`)).toBeVisible()
       userEvent.click(getByTestId(`applied-filter-${defaultProps.sections[0].name}`))
       userEvent.click(getByTestId(`${defaultProps.sections[1].name}-filter-type`))
-      expect(getByTestId(`applied-filter-${defaultProps.sections[1].name}`)).toBeVisible()
+      expect(getByTestId(`applied-filter-Sections (2)`)).toBeVisible()
     })
 
     it('clicking on another popover trigger will close the current popover', () => {
@@ -480,6 +480,29 @@ describe('FilterNav', () => {
       expect(getByTestId('Student Group 2-sorted-filter-group-item')).toBeVisible()
       expect(getByTestId('Student Group 3-sorted-filter-group-item')).toBeVisible()
       expect(getByTestId('Student Group 4-sorted-filter-group-item')).toBeVisible()
+    })
+
+    it('renders the name of the filter value when only 1 is selected', () => {
+      const {getByText, getByTestId, getByRole} = render(<FilterNav {...filterProps} />)
+      userEvent.click(getByText('Apply Filters'))
+      userEvent.click(getByRole('menuitemradio', {name: 'Sections'}))
+      userEvent.click(getByRole('menuitemcheckbox', {name: 'Section 7'}))
+      const popover = getByTestId(`applied-filter-${defaultProps.sections[0].name}`)
+      expect(popover).toBeVisible()
+      expect(popover).toHaveTextContent(defaultProps.sections[0].name)
+    })
+
+    it('renders the name of the filter type with how many are selected when multiple are selected', () => {
+      const {getByText, getByTestId, getByRole} = render(<FilterNav {...filterProps} />)
+      userEvent.click(getByText('Apply Filters'))
+      userEvent.click(getByRole('menuitemradio', {name: 'Sections'}))
+      userEvent.click(getByRole('menuitemcheckbox', {name: 'Section 7'}))
+      expect(getByTestId(`applied-filter-${defaultProps.sections[0].name}`)).toBeVisible()
+      userEvent.click(getByTestId(`applied-filter-${defaultProps.sections[0].name}`))
+      userEvent.click(getByTestId(`${defaultProps.sections[1].name}-filter-type`))
+      const popover = getByTestId(`applied-filter-Sections (2)`)
+      expect(popover).toBeVisible()
+      expect(popover).toHaveTextContent('Sections (2)')
     })
   })
 })
