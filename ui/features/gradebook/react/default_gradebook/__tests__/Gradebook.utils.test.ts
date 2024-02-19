@@ -29,7 +29,7 @@ import {
   getDefaultSettingKeyForColumnType,
   getGradeAsPercent,
   getStudentGradeForColumn,
-  groupIdsMatch,
+  idArraysEqual,
   isGradedOrExcusedSubmissionUnposted,
   maxAssignmentCount,
   onGridKeyDown,
@@ -160,21 +160,21 @@ describe('getStudentGradeForColumn', () => {
   })
 })
 
-describe('groupIdsMatch', () => {
+describe('idArraysEqual', () => {
   it('returns true when passed two sets of ids with the same contents', () => {
-    expect(groupIdsMatch(['1', '2'], ['1', '2'])).toStrictEqual(true)
+    expect(idArraysEqual(['1', '2'], ['1', '2'])).toStrictEqual(true)
   })
 
   it('returns true when passed two sets of ids with the same contents in different order', () => {
-    expect(groupIdsMatch(['2', '1'], ['1', '2'])).toStrictEqual(true)
+    expect(idArraysEqual(['2', '1'], ['1', '2'])).toStrictEqual(true)
   })
 
   it('returns true when passed two empty arrays', () => {
-    expect(groupIdsMatch([], [])).toStrictEqual(true)
+    expect(idArraysEqual([], [])).toStrictEqual(true)
   })
 
   it('returns false when passed two different sets of ids', () => {
-    expect(groupIdsMatch(['1'], ['1', '2'])).toStrictEqual(false)
+    expect(idArraysEqual(['1'], ['1', '2'])).toStrictEqual(false)
   })
 })
 
