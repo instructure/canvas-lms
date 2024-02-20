@@ -28,9 +28,10 @@ import {captureException} from '@sentry/browser'
 const I18n = useI18nScope('speed_grader')
 
 ready(() => {
-  if (window.ENV.FEATURES.platform_service_speedgrader) {
+  // The feature must be enabled AND we must be handed the speedgrader platform URL
+  if (window.ENV.FEATURES.platform_service_speedgrader && window.REMOTES?.speedgrader) {
     const theme = getCurrentTheme()
-    const mountPoint = document.querySelector('#content')
+    const mountPoint = document.querySelector('#react-router-portals')
     import('speedgrader/appInjector')
       .then(module => {
         module.render(mountPoint, theme)

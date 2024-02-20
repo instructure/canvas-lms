@@ -516,6 +516,13 @@ module ApplicationHelper
     global_inst_object
   end
 
+  def remote_env(hash = nil)
+    @remote_env ||= {}
+    @remote_env.merge!(hash) if hash
+
+    @remote_env
+  end
+
   def editor_buttons
     # called outside of Lti::ContextToolFinder to make sure that
     # @context is non-nil and also a type of Context that would have
