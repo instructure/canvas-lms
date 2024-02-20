@@ -1276,8 +1276,9 @@ class DiscussionTopicsController < ApplicationController
   protected
 
   def cancel_redirect_url
+    query_params = request.query_parameters.empty? ? {} : request.query_parameters
     topic_type = @topic.is_announcement ? :announcements : :discussion_topics
-    @topic.new_record? ? polymorphic_url([@context, topic_type]) : polymorphic_url([@context, @topic])
+    @topic.new_record? ? polymorphic_url([@context, topic_type], query_params) : polymorphic_url([@context, @topic], query_params)
   end
 
   def pinned_topics
