@@ -86,6 +86,23 @@ export type SectionConnection = {
   name: string
 }
 
+export type Outcome = {
+  id: string
+  assessed?: boolean
+  calculationInt?: number | null
+  calculationMethod?: string | null
+  description?: string | null
+  displayName?: string | null
+  masteryPoints?: number | null
+  pointsPossible?: number | null
+  title: string
+  ratings: {
+    color: string | null
+    description?: string | null
+    mastery?: boolean | null
+    points?: number | null
+  }[]
+}
 export type SubmissionConnection = {
   assignmentId: string
   id: string
@@ -132,6 +149,11 @@ export type GradebookQueryResponse = {
     }
     submissionsConnection: {
       nodes: SubmissionConnection[]
+    }
+    rootOutcomeGroup: {
+      outcomes: {
+        nodes: Outcome[]
+      }
     }
     assignmentGroupsConnection: {
       nodes: AssignmentGroupConnection[]

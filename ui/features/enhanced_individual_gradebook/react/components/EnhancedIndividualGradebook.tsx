@@ -22,7 +22,6 @@ import {useSearchParams} from 'react-router-dom'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import userSettings from '@canvas/user-settings'
 import {View} from '@instructure/ui-view'
-import {Text} from '@instructure/ui-text'
 import gradingHelpers from '@canvas/grading/AssignmentGroupGradeCalculator'
 
 import type {AssignmentGroupCriteriaMap} from '../../../../shared/grading/grading.d'
@@ -66,8 +65,8 @@ export default function EnhancedIndividualGradebook() {
   const [students, setStudents] = useState<SortableStudent[]>()
   const [assignments, setAssignments] = useState<SortableAssignment[]>()
   const [assignmentDropped, setAssignmentDropped] = useState<boolean>(false)
-
   const courseId = ENV.GRADEBOOK_OPTIONS?.context_id || ''
+
   const [searchParams, setSearchParams] = useSearchParams()
   const studentIdQueryParam = searchParams.get(STUDENT_SEARCH_PARAM)
   const [selectedStudentId, setSelectedStudentId] = useState<string | null | undefined>(
@@ -77,7 +76,6 @@ export default function EnhancedIndividualGradebook() {
     useCurrentStudentInfo(courseId, selectedStudentId)
 
   const [assignmentGroupMap, setAssignmentGroupMap] = useState<AssignmentGroupCriteriaMap>({})
-
   const assignmentIdQueryParam = searchParams.get(ASSIGNMENT_SEARCH_PARAM)
   const [selectedAssignmentId, setSelectedAssignmentId] = useState<string | null | undefined>(
     assignmentIdQueryParam
@@ -105,6 +103,7 @@ export default function EnhancedIndividualGradebook() {
   )?.id
 
   const [currentStudentHiddenName, setCurrentStudentHiddenName] = useState<string>('')
+
   useEffect(() => {
     if (!currentStudent || !students) {
       return
@@ -270,21 +269,6 @@ export default function EnhancedIndividualGradebook() {
 
   return (
     <>
-      {/* EVAL-3711 Remove ICE Feature Flag */}
-      <View as="div" margin={window.ENV.FEATURES.instui_nav ? 'small 0 large 0' : '0'}>
-        {!window.ENV.FEATURES.instui_nav && (
-          <View as="h1">{I18n.t('Gradebook: Individual View')}</View>
-        )}
-        {/* Was not able to manually change lineHeight in View so used div to modify lineHeight */}
-        <div style={{lineHeight: 1.25}}>
-          <Text size={window.ENV.FEATURES.instui_nav ? 'large' : 'medium'}>
-            {I18n.t(
-              'Note: Grades and notes will be saved automatically after moving out of the field.'
-            )}
-          </Text>
-        </div>
-      </View>
-
       <View as="div">
         <GlobalSettings
           sections={sections}

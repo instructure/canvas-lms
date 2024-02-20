@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 - present Instructure, Inc.
+ * Copyright (C) 2024 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -19,50 +19,43 @@
 import React, {useEffect, useRef, useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import LoadingIndicator from '@canvas/loading-indicator'
-
-import type {GradebookOptions, SortableAssignment, SortableStudent} from '../../../types'
 import {View} from '@instructure/ui-view'
-import {useCurrentStudentInfo} from '../../hooks/useCurrentStudentInfo'
+import type {GradebookOptions, Outcome, SortableStudent} from '../../../types'
+import {studentDisplayName} from '../../../utils/gradebookUtils'
 import {
-  useAssignmentDropdownOptions,
+  useOutcomeDropdownOptions,
   useUserDropdownOptions,
 } from '../../hooks/useContentDropdownOptions'
-import {studentDisplayName} from '../../../utils/gradebookUtils'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
 export type ContentSelectionComponentProps = {
-  courseId: string
-  assignments?: SortableAssignment[]
   students?: SortableStudent[]
+  outcomes?: Outcome[]
   selectedStudentId?: string | null
-  selectedAssignmentId?: string | null
+  selectedOutcomeId?: string | null
   gradebookOptions: GradebookOptions
   onStudentChange: (studentId?: string) => void
-  onAssignmentChange: (assignmentId?: string) => void
+  onOutcomeChange: (outcomeId?: string) => void
 }
 
 export default function ContentSelection({
-  courseId,
   students,
-  assignments,
-  selectedAssignmentId,
+  outcomes,
   selectedStudentId,
+  selectedOutcomeId,
   gradebookOptions,
-  onAssignmentChange,
   onStudentChange,
+  onOutcomeChange,
 }: ContentSelectionComponentProps) {
   const [selectedStudentIndex, setSelectedStudentIndex] = useState<number>(0)
-  const [selectedAssignmentIndex, setSelectedAssignmentIndex] = useState<number>(0)
-  const {studentSubmissions} = useCurrentStudentInfo(courseId, selectedStudentId)
-  const nextAssignmentRef = useRef<HTMLButtonElement>(null)
+  const [selectedOutcomeIndex, setSelectedOutcomeIndex] = useState<number>(0)
   const nextStudentRef = useRef<HTMLButtonElement>(null)
-  const previousAssignmentRef = useRef<HTMLButtonElement>(null)
   const previousStudentRef = useRef<HTMLButtonElement>(null)
+  const nextOucomeRef = useRef<HTMLButtonElement>(null)
+  const previousOucomeRef = useRef<HTMLButtonElement>(null)
 
   const {
-    sortOrder,
-    selectedGradingPeriodId,
     selectedSection,
     customOptions: {showConcludedEnrollments},
   } = gradebookOptions
@@ -71,13 +64,27 @@ export default function ContentSelection({
     selectedSection,
     showConcludedEnrollments,
   })
-  const {assignmentDropdownOptions} = useAssignmentDropdownOptions({
-    assignments,
-    sortOrder,
-    studentSubmissions,
-    selectedStudentId,
-    selectedGradingPeriodId,
-  })
+
+  const {outcomeDropdownOptions} = useOutcomeDropdownOptions({outcomes, selectedOutcomeId})
+
+  useEffect(() => {
+    if (!outcomeDropdownOptions) {
+      return
+    }
+
+    if (selectedOutcomeId) {
+      const outcomeIndex = outcomeDropdownOptions.findIndex(
+        outcomeOption => outcomeOption.id === selectedOutcomeId
+      )
+
+      if (outcomeIndex !== -1) {
+        setSelectedOutcomeIndex(outcomeIndex)
+      } else {
+        setSelectedOutcomeIndex(0)
+        onOutcomeChange(undefined)
+      }
+    }
+  }, [selectedOutcomeId, outcomeDropdownOptions, setSelectedOutcomeIndex, onOutcomeChange])
 
   useEffect(() => {
     if (!studentDropdownOptions) {
@@ -92,39 +99,28 @@ export default function ContentSelection({
       if (studentIndex !== -1) {
         setSelectedStudentIndex(studentIndex)
       } else {
+        // if the student is not in the dropdown, reset the student dropdown
         setSelectedStudentIndex(0)
         onStudentChange(undefined)
       }
     }
   }, [selectedStudentId, studentDropdownOptions, setSelectedStudentIndex, onStudentChange])
 
-  useEffect(() => {
-    if (!assignmentDropdownOptions) {
-      return
-    }
-
-    if (selectedAssignmentId) {
-      const assignmentIndex = assignmentDropdownOptions.findIndex(
-        assignmentOption => assignmentOption.id === selectedAssignmentId
-      )
-
-      if (assignmentIndex >= 0) {
-        setSelectedAssignmentIndex(assignmentIndex)
-      } else {
-        // if the assignment is not in the dropdown, reset the assignment dropdown
-        setSelectedAssignmentIndex(0)
-        onAssignmentChange(undefined)
-      }
-    }
-  }, [
-    assignmentDropdownOptions,
-    selectedAssignmentId,
-    onAssignmentChange,
-    setSelectedAssignmentIndex,
-  ])
-
-  if (!studentDropdownOptions || !assignmentDropdownOptions) {
+  if (!studentDropdownOptions || !outcomeDropdownOptions) {
     return <LoadingIndicator />
+  }
+
+  const handleChangeOutcome = (event?: React.ChangeEvent<HTMLSelectElement>, newIndex?: number) => {
+    const selectedIndex = (event ? event.target.selectedIndex : newIndex) ?? 0
+    setSelectedOutcomeIndex(selectedIndex)
+    const selectedOutcome = outcomeDropdownOptions[selectedIndex]?.data
+    onOutcomeChange(selectedOutcome?.id)
+
+    if (selectedIndex <= 0) {
+      nextOucomeRef.current?.focus()
+    } else if (selectedIndex >= outcomeDropdownOptions.length - 1) {
+      previousOucomeRef.current?.focus()
+    }
   }
 
   const handleChangeStudent = (event?: React.ChangeEvent<HTMLSelectElement>, newIndex?: number) => {
@@ -141,22 +137,6 @@ export default function ContentSelection({
     }
   }
 
-  const handleChangeAssignment = (
-    event?: React.ChangeEvent<HTMLSelectElement>,
-    newIndex?: number
-  ) => {
-    const selectedIndex = (event ? event.target.selectedIndex : newIndex) ?? 0
-    setSelectedAssignmentIndex(selectedIndex)
-    const selectedAssignment = assignmentDropdownOptions[selectedIndex]?.data
-    onAssignmentChange(selectedAssignment?.id)
-
-    if (selectedIndex <= 0) {
-      nextAssignmentRef.current?.focus()
-    }
-    if (selectedIndex >= assignmentDropdownOptions.length - 1) {
-      previousAssignmentRef.current?.focus()
-    }
-  }
   const {hideStudentNames} = gradebookOptions.customOptions
 
   return (
@@ -170,7 +150,7 @@ export default function ContentSelection({
       <View
         as="div"
         className="row-fluid pad-box bottom-only"
-        data-testid="content-selection-student"
+        data-testid="learning-mastery-content-selection-student"
       >
         <View as="div" className="span4 text-right-responsive">
           <label htmlFor="student_select" style={{textAlign: 'right', display: 'block'}}>
@@ -182,7 +162,7 @@ export default function ContentSelection({
             className="student_select"
             onChange={handleChangeStudent}
             value={studentDropdownOptions[selectedStudentIndex]?.id}
-            data-testid="content-selection-student-select"
+            data-testid="learning-mastery-content-selection-student-select"
           >
             {studentDropdownOptions.map(option => (
               <option key={option.id} value={option.id}>
@@ -195,7 +175,7 @@ export default function ContentSelection({
           <View as="div" className="row-fluid pad-box bottom-only student_navigation">
             <View as="div" className="span4">
               <button
-                data-testid="previous-student-button"
+                data-testid="learning-mastery-previous-student-button"
                 type="button"
                 className="btn btn-block next_object"
                 disabled={selectedStudentIndex <= 0}
@@ -207,7 +187,7 @@ export default function ContentSelection({
             </View>
             <View as="div" className="span4">
               <button
-                data-testid="next-student-button"
+                data-testid="learning-mastery-next-student-button"
                 type="button"
                 className="btn btn-block next_object"
                 disabled={selectedStudentIndex >= studentDropdownOptions.length - 1}
@@ -224,49 +204,49 @@ export default function ContentSelection({
       <View
         as="div"
         className="row-fluid pad-box bottom-only"
-        data-testid="content-selection-assignment"
+        data-testid="learning-mastery-content-selection-outcome"
       >
         <View as="div" className="span4 text-right-responsive">
-          <label htmlFor="assignment_select" style={{textAlign: 'right', display: 'block'}}>
-            {I18n.t('Select an assignment')}
+          <label htmlFor="outcome_select" style={{textAlign: 'right', display: 'block'}}>
+            {I18n.t('Select an outcome')}
           </label>
         </View>
         <View as="div" className="span8">
           <select
-            className="assignment_select"
-            onChange={handleChangeAssignment}
-            value={assignmentDropdownOptions[selectedAssignmentIndex]?.id}
-            data-testid="content-selection-assignment-select"
+            className="outcome_select"
+            onChange={handleChangeOutcome}
+            value={outcomeDropdownOptions[selectedOutcomeIndex]?.id}
+            data-testid="learning-mastery-content-selection-outcome-select"
           >
-            {assignmentDropdownOptions.map(option => (
+            {outcomeDropdownOptions.map(option => (
               <option key={option.id} value={option.id}>
                 {option.name}
               </option>
             ))}
           </select>
-          <View as="div" className="row-fluid pad-box bottom-only assignment_navigation">
+          <View as="div" className="row-fluid pad-box bottom-only outcome_navigation">
             <View as="div" className="span4">
               <button
-                data-testid="previous-assignment-button"
+                data-testid="learning-mastery-previous-outcome-button"
                 type="button"
                 className="btn btn-block next_object"
-                disabled={selectedAssignmentIndex <= 0}
-                onClick={() => handleChangeAssignment(undefined, selectedAssignmentIndex - 1)}
-                ref={previousAssignmentRef}
+                disabled={selectedOutcomeIndex <= 0}
+                onClick={() => handleChangeOutcome(undefined, selectedOutcomeIndex - 1)}
+                ref={previousOucomeRef}
               >
-                {I18n.t('Previous Assignment')}
+                {I18n.t('Previous Outcome')}
               </button>
             </View>
             <View as="div" className="span4">
               <button
-                data-testid="next-assignment-button"
+                data-testid="learning-mastery-next-outcome-button"
                 type="button"
                 className="btn btn-block next_object"
-                disabled={selectedAssignmentIndex >= assignmentDropdownOptions.length - 1}
-                onClick={() => handleChangeAssignment(undefined, selectedAssignmentIndex + 1)}
-                ref={nextAssignmentRef}
+                disabled={selectedOutcomeIndex >= outcomeDropdownOptions.length - 1}
+                onClick={() => handleChangeOutcome(undefined, selectedOutcomeIndex + 1)}
+                ref={nextOucomeRef}
               >
-                {I18n.t('Next Assignment')}
+                {I18n.t('Next Outcome')}
               </button>
             </View>
           </View>
