@@ -103,11 +103,17 @@ class UserNotesController < ApplicationController
     end
   end
 
+  def suppress_deprecation_notice
+    @current_user&.set_preference(:suppress_faculty_journal_deprecation_notice, true)
+    head :no_content
+  end
+
   private
 
   def add_deprecation_warning
     js_env USER_NOTES_DEPRECATION: {
-      deprecation_date: Setting.get("user_notes_deprecation_date", "2024-06-15T15:00Z")
+      deprecation_date: Setting.get("user_notes_deprecation_date", "2024-06-15T15:00Z"),
+      suppress_notice: @current_user&.get_preference(:suppress_faculty_journal_deprecation_notice) || false
     }
     js_bundle :user_notes_deprecation
   end

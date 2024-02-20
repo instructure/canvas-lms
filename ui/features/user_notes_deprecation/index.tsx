@@ -20,21 +20,28 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import ready from '@instructure/ready'
 import DeprecationAlert from './react/DeprecationAlert'
+import DeprecationModal from './react/DeprecationModal'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 
-declare const ENV: GlobalEnv & {USER_NOTES_DEPRECATION: {deprecation_date: string}}
+declare const ENV: GlobalEnv & {
+  USER_NOTES_DEPRECATION: {deprecation_date: string; suppress_notice: boolean}
+}
+
+const PROPS = {
+  deprecationDate: ENV.USER_NOTES_DEPRECATION.deprecation_date,
+  timezone: ENV.TIMEZONE,
+}
 
 ready(() => {
-  const container = document.createElement('div')
   const content = document.getElementById('content')
   if (content) {
-    content.prepend(container)
-    ReactDOM.render(
-      <DeprecationAlert
-        deprecationDate={ENV.USER_NOTES_DEPRECATION.deprecation_date}
-        timezone={ENV.TIMEZONE}
-      />,
-      container
-    )
+    const alertContainer = document.createElement('div')
+    const modalContainer = document.createElement('div')
+    content.prepend(alertContainer)
+    content.appendChild(modalContainer)
+    ReactDOM.render(<DeprecationAlert {...PROPS} />, alertContainer)
+    if (!ENV.USER_NOTES_DEPRECATION.suppress_notice) {
+      ReactDOM.render(<DeprecationModal {...PROPS} />, modalContainer)
+    }
   }
 })
