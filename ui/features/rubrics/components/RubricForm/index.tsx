@@ -33,6 +33,7 @@ import {Text} from '@instructure/ui-text'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Flex} from '@instructure/ui-flex'
 import {
+  IconEyeLine,
   IconTableLeftHeaderSolid,
   IconTableRowPropertiesSolid,
   IconTableTopHeaderSolid,
@@ -214,147 +215,84 @@ export const RubricForm = () => {
         </Flex.Item>
 
         <Flex.Item>
-          <Heading level="h1" as="h1" margin="small 0" themeOverride={{h1FontWeight: 700}}>
+          <Heading level="h1" as="h1" themeOverride={{h1FontWeight: 700}}>
             {header}
           </Heading>
         </Flex.Item>
 
         <Flex.Item>
-          <View as="div" display="block" margin="large 0 small 0" maxWidth="45rem">
-            <TextInput
-              data-testid="rubric-form-title"
-              renderLabel={I18n.t('Rubric Name')}
-              onChange={e => setRubricFormField('title', e.target.value)}
-              value={rubricForm.title}
-            />
-          </View>
-          <View as="div" margin="medium 0" maxWidth="45rem">
-            <Flex wrap="wrap" justifyItems="space-between">
-              <Flex.Item>
-                <Flex>
-                  <Flex.Item>
-                    <Text weight="bold">{I18n.t('Type')}:</Text>
-                  </Flex.Item>
-                  <Flex.Item margin="0 0 0 small">
-                    <RubricHidePointsSelect
-                      hidePoints={rubricForm.hidePoints}
-                      onChangeHidePoints={hidePoints =>
-                        setRubricFormField('hidePoints', hidePoints)
-                      }
-                    />
-                  </Flex.Item>
-                </Flex>
-              </Flex.Item>
-              <Flex.Item>
-                <Flex>
-                  <Flex.Item>
-                    <Text weight="bold">{I18n.t('Rating Order')}:</Text>
-                  </Flex.Item>
-                  <Flex.Item margin="0 0 0 small">
-                    <RubricRatingOrderSelect 
-                      ratingOrder={rubricForm.ratingOrder}
-                      onChangeOrder={ratingOrder => setRubricFormField('ratingOrder', ratingOrder)} 
-                    />
-                  </Flex.Item>
-                </Flex>
-              </Flex.Item>
-              <Flex.Item>
-                <Flex>
-                  <Flex.Item>
-                    <Text weight="bold">{I18n.t('Button Display')}:</Text>
-                  </Flex.Item>
-                  <Flex.Item margin="0 0 0 small">
-                    <RubricButtonDisplaySelect
-                      button_display={rubricForm.buttonDisplay}
-                      onChangeButtonDisplay={buttonDisplay =>
-                        setRubricFormField('buttonDisplay', buttonDisplay)
-                      }
-                    />
-                  </Flex.Item>
-                </Flex>
-              </Flex.Item>
-            </Flex>
-          </View>
+          <Flex margin="large 0 0 0">
+            <Flex.Item shouldGrow={true} shouldShrink={true}>
+              <TextInput
+                data-testid="rubric-form-title"
+                renderLabel={I18n.t('Rubric Name')}
+                onChange={e => setRubricFormField('title', e.target.value)}
+                value={rubricForm.title}
+              />
+            </Flex.Item>
+            <Flex.Item margin="0 0 0 small">
+              <RubricHidePointsSelect
+                hidePoints={rubricForm.hidePoints}
+                onChangeHidePoints={hidePoints => setRubricFormField('hidePoints', hidePoints)}
+              />
+            </Flex.Item>
+            <Flex.Item margin="0 0 0 small">
+              <RubricRatingOrderSelect
+                ratingOrder={rubricForm.ratingOrder}
+                onChangeOrder={ratingOrder => setRubricFormField('ratingOrder', ratingOrder)}
+              />
+            </Flex.Item>
+          </Flex>
 
-          <View as="hr" margin="large 0 small 0" />
-
-          <View as="div">
+          <View as="div" margin="large 0 large 0">
             <Flex>
               <Flex.Item shouldGrow={true}>
-                <Heading level="h2" as="h2" themeOverride={{h2FontWeight: 700}}>
+                <Heading
+                  level="h2"
+                  as="h2"
+                  themeOverride={{h2FontWeight: 700, h2FontSize: '22px', lineHeight: '1.75rem'}}
+                >
                   {I18n.t('Criteria Builder')}
                 </Heading>
               </Flex.Item>
               <Flex.Item>
-                <Text weight="bold" size="xx-large" themeOverride={{fontWeightBold: 400}}>
-                  {rubricForm.pointsPossible}
-                </Text>
-                <View as="span" margin="0 0 0 small">
-                  <Text weight="light" size="x-large">
-                    {I18n.t('Possible Points')}
-                  </Text>
-                </View>
+                <Heading
+                  level="h2"
+                  as="h2"
+                  themeOverride={{h2FontWeight: 700, h2FontSize: '22px', lineHeight: '1.75rem'}}
+                >
+                  {rubricForm.pointsPossible} {I18n.t('Points Possible')}
+                </Heading>
               </Flex.Item>
             </Flex>
           </View>
         </Flex.Item>
 
-        <Flex.Item margin="medium 0 0 0" shouldGrow={true} shouldShrink={true} as="main">
-          {rubricForm.criteria.map((criterion, index) => (
-            <RubricCriteriaRow
-              key={criterion.id}
-              criterion={criterion}
-              rowIndex={index + 1}
-              onDeleteCriterion={() => deleteCriterion(criterion)}
-              onDuplicateCriterion={() => duplicateCriterion(criterion)}
-              onEditCriterion={() => openCriterionModal(criterion)}
-            />
-          ))}
+        <Flex.Item shouldGrow={true} shouldShrink={true} as="main">
+          <View as="div" margin="0 0 small 0">
+            {rubricForm.criteria.map((criterion, index) => (
+              <RubricCriteriaRow
+                key={criterion.id}
+                criterion={criterion}
+                rowIndex={index + 1}
+                onDeleteCriterion={() => deleteCriterion(criterion)}
+                onDuplicateCriterion={() => duplicateCriterion(criterion)}
+                onEditCriterion={() => openCriterionModal(criterion)}
+              />
+            ))}
 
-          <NewCriteriaRow
-            rowIndex={rubricForm.criteria.length + 1}
-            onEditCriterion={() => openCriterionModal()}
-          />
+            <NewCriteriaRow
+              rowIndex={rubricForm.criteria.length + 1}
+              onEditCriterion={() => openCriterionModal()}
+            />
+          </View>
         </Flex.Item>
 
         <Flex.Item as="footer" height="75px">
           <View as="hr" margin="0 0 small 0" />
 
-          <Flex alignItems="end" margin="0 0 medium 0">
-            <Flex.Item>
-              <Text weight="bold">{I18n.t('Select Rubric Display Type')}:</Text>
-            </Flex.Item>
-            <Flex.Item margin="0 0 0 small">
-              <SimpleSelect renderLabel="" size="small" width="8.125rem">
-                <SimpleSelectOption
-                  id="traditionalOption"
-                  value="traditional"
-                  renderBeforeLabel={<IconTableLeftHeaderSolid />}
-                >
-                  {I18n.t('Traditional')}
-                </SimpleSelectOption>
-                <SimpleSelectOption
-                  id="verticalOption"
-                  value="vertical"
-                  renderBeforeLabel={<IconTableTopHeaderSolid />}
-                >
-                  {I18n.t('Vertical')}
-                </SimpleSelectOption>
-                <SimpleSelectOption
-                  id="horizontalOption"
-                  value="horizontal"
-                  renderBeforeLabel={<IconTableRowPropertiesSolid />}
-                >
-                  {I18n.t('Horizontal')}
-                </SimpleSelectOption>
-              </SimpleSelect>
-            </Flex.Item>
-            <Flex.Item shouldGrow={true} margin="0 0 0 small">
-              <Link as="button" isWithinText={false}>
-                {I18n.t('Preview')}
-              </Link>
-            </Flex.Item>
-            <Flex.Item>
+          <Flex justifyItems="end" margin="0 0 medium 0">
+            <Flex.Item margin="0 medium 0 0">
               <Button onClick={() => navigate(navigateUrl)}>{I18n.t('Cancel')}</Button>
 
               <Button
@@ -366,6 +304,18 @@ export const RubricForm = () => {
               >
                 {I18n.t('Save Rubric')}
               </Button>
+            </Flex.Item>
+            <Flex.Item>
+              <View
+                as="div"
+                padding="0 0 0 medium"
+                borderWidth="none none none medium"
+                height="2.375rem"
+              >
+                <Link as="button" isWithinText={false} margin="x-small 0 0 0">
+                  <IconEyeLine /> {I18n.t('Preview Rubric')}
+                </Link>
+              </View>
             </Flex.Item>
           </Flex>
         </Flex.Item>
@@ -392,9 +342,8 @@ const RubricHidePointsSelect = ({hidePoints, onChangeHidePoints}: RubricHidePoin
 
   return (
     <SimpleSelect
-      renderLabel={<ScreenReaderContent>{I18n.t('Rubric Type')}</ScreenReaderContent>}
-      size="small"
-      width="8.125rem"
+      renderLabel={I18n.t('Type')}
+      width="10.563rem"
       value={hidePoints ? 'unscored' : 'scored'}
       onChange={(e, {value}) => onChange(value)}
     >
@@ -420,9 +369,8 @@ const RubricRatingOrderSelect = ({ratingOrder, onChangeOrder}: RubricRatingOrder
 
   return (
     <SimpleSelect
-      renderLabel={<ScreenReaderContent>{I18n.t('Rubric Rating Order')}</ScreenReaderContent>}
-      size="small"
-      width="8.125rem"
+      renderLabel={I18n.t('Rating Order')}
+      width="10.563rem"
       value={ratingOrder}
       onChange={(e, {value}) => onChange(value !== undefined ? value.toString() : '')}
     >
@@ -431,39 +379,6 @@ const RubricRatingOrderSelect = ({ratingOrder, onChangeOrder}: RubricRatingOrder
       </SimpleSelectOption>
       <SimpleSelectOption id="lowToHighOption" value="ascending">
         {I18n.t('Low < High')}
-      </SimpleSelectOption>
-    </SimpleSelect>
-  )
-}
-
-type RubricButtonDisplaySelectProps = {
-  button_display: string
-  onChangeButtonDisplay: (button_display: string) => void
-}
-const RubricButtonDisplaySelect = ({
-  button_display,
-  onChangeButtonDisplay,
-}: RubricButtonDisplaySelectProps) => {
-  const onChange = (value: string) => {
-    onChangeButtonDisplay(value)
-  }
-
-  return (
-    <SimpleSelect
-      renderLabel={<ScreenReaderContent>{I18n.t('Rubric Button Display')}</ScreenReaderContent>}
-      size="small"
-      width="8.125rem"
-      value={button_display}
-      onChange={(e, {value}) => onChange(value !== undefined ? value.toString() : '')}
-    >
-      <SimpleSelectOption id="numericOption" value="numeric">
-        {I18n.t('Numeric')}
-      </SimpleSelectOption>
-      <SimpleSelectOption id="emojiOption" value="emoji">
-        {I18n.t('Emoji')}
-      </SimpleSelectOption>
-      <SimpleSelectOption id="letterOption" value="letter">
-        {I18n.t('Letter')}
       </SimpleSelectOption>
     </SimpleSelect>
   )

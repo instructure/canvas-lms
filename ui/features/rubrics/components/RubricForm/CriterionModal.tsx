@@ -77,6 +77,7 @@ export const CriterionModal = ({criterion, isOpen, onDismiss, onSave}: Criterion
   const [ratings, setRatings] = useState<RubricRating[]>([])
   const [criterionDescription, setCriterionDescription] = useState('')
   const [criterionLongDescription, setCriterionLongDescription] = useState('')
+  const [criterionUseRange, setCriterionUseRange] = useState(false)
   const [draggedRatingIndex, setDraggedRatingIndex] = useState<number>()
   const [draggedOverIndex, setDraggedOverIndex] = useState<number>()
 
@@ -102,15 +103,23 @@ export const CriterionModal = ({criterion, isOpen, onDismiss, onSave}: Criterion
     description: existingDescription,
     longDescription: existingLongDescription,
     ratings: existingRatings,
+    criterionUseRange: existingCriterionUseRange,
   } = criterion ?? {}
 
   useEffect(() => {
     if (isOpen) {
       setCriterionDescription(existingDescription ?? '')
       setCriterionLongDescription(existingLongDescription ?? '')
+      setCriterionUseRange(existingCriterionUseRange ?? false)
       setRatings(existingRatings ?? DEFAULT_RUBRIC_RATINGS)
     }
-  }, [existingDescription, existingLongDescription, existingRatings, isOpen])
+  }, [
+    existingCriterionUseRange,
+    existingDescription,
+    existingLongDescription,
+    existingRatings,
+    isOpen,
+  ])
 
   const updateRating = (index: number, rating: RubricRating) => {
     const newRatings = [...ratings]
@@ -192,6 +201,8 @@ export const CriterionModal = ({criterion, isOpen, onDismiss, onSave}: Criterion
     ? []
     : [{text: 'Criteria Name Required', type: 'error'}]
 
+  const maxRatingPoints = ratings.length ? Math.max(...ratings.map(r => r.points), 0) : '--'
+
   return (
     <Modal
       open={isOpen}
@@ -232,16 +243,37 @@ export const CriterionModal = ({criterion, isOpen, onDismiss, onSave}: Criterion
           </View>
         </View>
 
-        <View as="div" margin="medium 0 0 0">
+        <View as="div" margin="medium 0 0 0" themeOverride={{marginMedium: '1.25rem'}}>
+          <Flex>
+            <Flex.Item shouldGrow={true}>
+              <Checkbox
+                label="Enable Range"
+                checked={criterionUseRange}
+                onChange={e => setCriterionUseRange(e.target.checked)}
+              />
+            </Flex.Item>
+            <Flex.Item>
+              <Heading
+                level="h2"
+                as="h2"
+                themeOverride={{h2FontWeight: 700, h2FontSize: '22px', lineHeight: '1.75rem'}}
+              >
+                {maxRatingPoints} {I18n.t('Points Possible')}
+              </Heading>
+            </Flex.Item>
+          </Flex>
+        </View>
+
+        <View as="div" margin="medium 0 0 0" themeOverride={{marginMedium: '1.25rem'}}>
           <Flex>
             <Flex.Item>
-              <View as="div" width="3.938rem">
-                {I18n.t('Scale')}
+              <View as="div" width="4.125rem">
+                {I18n.t('Display')}
               </View>
             </Flex.Item>
             <Flex.Item>
-              <View as="div" width="7.938rem">
-                {I18n.t('Points')}
+              <View as="div" width={criterionUseRange ? '12.375rem' : '7.938rem'}>
+                {criterionUseRange ? I18n.t('Point Range') : I18n.t('Points')}
               </View>
             </Flex.Item>
             <Flex.Item>
@@ -257,9 +289,12 @@ export const CriterionModal = ({criterion, isOpen, onDismiss, onSave}: Criterion
           </Flex>
         </View>
 
-        <View as="div">
+        <View as="div" position="relative">
+          <DragVerticalLineBreak criterionUseRange={criterionUseRange} />
           {ratings.map((rating, index) => {
             const scale = ratings.length - (index + 1)
+            const nextRating = ratings[index + 1]
+            const rangeStart = nextRating ? nextRating.points + 0.1 : undefined
 
             return (
               // eslint-disable-next-line react/no-array-index-key
@@ -271,6 +306,8 @@ export const CriterionModal = ({criterion, isOpen, onDismiss, onSave}: Criterion
                   isDraggedOver={draggedOverIndex === index && draggedRatingIndex !== index}
                   rating={rating}
                   scale={scale}
+                  criterionUseRange={criterionUseRange}
+                  rangeStart={rangeStart}
                   onRemove={() => removeRating(index)}
                   onChange={updatedRating => updateRating(index, updatedRating)}
                   onDragDrop={handleDragDrop}
@@ -318,9 +355,11 @@ export const CriterionModal = ({criterion, isOpen, onDismiss, onSave}: Criterion
 }
 
 type RatingRowProps = {
+  criterionUseRange: boolean
   index: number
   isDragging: boolean
   isDraggedOver: boolean
+  rangeStart?: number
   rating: RubricRating
   scale: number
   onChange: (rating: RubricRating) => void
@@ -332,6 +371,8 @@ type RatingRowProps = {
   onDragEnd: () => void
 }
 const RatingRow = ({
+  criterionUseRange,
+  rangeStart,
   index,
   isDragging,
   isDraggedOver,
@@ -368,9 +409,9 @@ const RatingRow = ({
       onDragLeave={onDragLeave}
     >
       <Flex.Item align="start">
-        <View as="div" width="3.938rem">
+        <View as="div" width="4.125rem">
           <TextInput
-            renderLabel={<ScreenReaderContent>{I18n.t('Rating Scale')}</ScreenReaderContent>}
+            renderLabel={<ScreenReaderContent>{I18n.t('Rating Display')}</ScreenReaderContent>}
             display="inline-block"
             width="3.125rem"
             disabled={true}
@@ -382,15 +423,27 @@ const RatingRow = ({
         </View>
       </Flex.Item>
       <Flex.Item align="start">
-        <View as="div" width="4.938rem">
-          <NumberInput
-            renderLabel={<ScreenReaderContent>{I18n.t('Rating Points')}</ScreenReaderContent>}
-            value={rating.points}
-            onIncrement={() => setRatingForm('points', setNumber(rating.points + 1))}
-            onDecrement={() => setRatingForm('points', setNumber(rating.points - 1))}
-            onChange={(e, value) => setRatingForm('points', setNumber(Number(value ?? 0)))}
-            data-testid="rating-points"
-          />
+        <View as="div" width={criterionUseRange ? '9.375rem' : '5.938rem'}>
+          <Flex alignItems="end">
+            {criterionUseRange && (
+              <Flex.Item width="55px" textAlign="end" margin="0 0 x-small 0">
+                <View as="span" margin="0 small 0 0">
+                  {rangeStart ? `${rangeStart} to ` : `--`}
+                </View>
+              </Flex.Item>
+            )}
+            <Flex.Item>
+              <NumberInput
+                renderLabel={<ScreenReaderContent>{I18n.t('Rating Points')}</ScreenReaderContent>}
+                value={rating.points}
+                onIncrement={() => setRatingForm('points', setNumber(rating.points + 1))}
+                onDecrement={() => setRatingForm('points', setNumber(rating.points - 1))}
+                onChange={(e, value) => setRatingForm('points', setNumber(Number(value ?? 0)))}
+                data-testid="rating-points"
+                width="4.938rem"
+              />
+            </Flex.Item>
+          </Flex>
         </View>
       </Flex.Item>
       <Flex.Item align="start" draggable={true} data-testid="rating-drag-handle">
@@ -488,5 +541,24 @@ const AddRatingRow = ({onClick}: AddRatingRowProps) => {
         </View>
       )}
     </View>
+  )
+}
+
+type DragVerticalLineBreakProps = {
+  criterionUseRange: boolean
+}
+const DragVerticalLineBreak = ({criterionUseRange}: DragVerticalLineBreakProps) => {
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        width: '1px',
+        height: 'auto',
+        backgroundColor: '#C7CDD1',
+        left: criterionUseRange ? '13.75rem' : '10.313rem',
+        top: '1.688rem',
+        bottom: '1.688rem',
+      }}
+    />
   )
 }
