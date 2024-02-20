@@ -239,7 +239,7 @@ class ContextExternalTool < ActiveRecord::Base
           width: tool.editor_button(:selection_width),
           height: tool.editor_button(:selection_height),
           use_tray: tool.editor_button(:use_tray) == "true",
-          always_on: always_on_ids.include?(tool.developer_key&.global_id),
+          always_on: always_on_ids.include?(tool.global_developer_key_id),
           description: if tool.description
                          Sanitize.clean(markdown.render(tool.description), CanvasSanitize::SANITIZE)
                        else
