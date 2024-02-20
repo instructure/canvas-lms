@@ -223,7 +223,7 @@ const CourseSelect = props => {
         ) : null
       }
       messages={props.courseMessages}
-      data-testid="course-select"
+      data-testid={props.mainPage ? 'course-select' : 'course-select-modal'}
     >
       {renderGroups()}
     </Select>
