@@ -212,8 +212,9 @@ module DynamicSettings
             return result
           end
         end
-        nil
-      rescue Diplomat::KeyNotFound, Diplomat::UnknownStatus, Diplomat::PathNotFound, Errno::ECONNREFUSED => e
+
+        check_cache(failsafe_cache_file, nil)
+      rescue Diplomat::KeyNotFound, Diplomat::UnknownStatus, Diplomat::PathNotFound, Faraday::ConnectionFailed, Errno::ECONNREFUSED => e
         if cache.respond_to?(:fetch_without_expiration)
           cache.fetch_without_expiration(CACHE_KEY_PREFIX + keys.first).tap do |val|
             if val
@@ -239,7 +240,7 @@ module DynamicSettings
         # retries failed; trip the circuit breaker and avoid retries for some amount of time
         circuit_breaker&.trip unless circuit_breaker&.tripped?
 
-        return failsafe_cache_file.read if failsafe_cache_file&.exist?
+        return YAML.safe_load_file(failsafe_cache_file) if failsafe_cache_file&.exist?
         return kwargs[:failsafe] if kwargs.key?(:failsafe)
 
         raise
@@ -249,8 +250,11 @@ module DynamicSettings
     def check_cache(failsafe_cache_file, value)
       return unless failsafe_cache_file
 
-      cached_value = failsafe_cache_file.read if failsafe_cache_file.exist?
-      failsafe_cache_file.write(value) if cached_value != value
+      cache_exists = failsafe_cache_file.exist?
+      cached_value = YAML.safe_load_file(failsafe_cache_file) if cache_exists
+
+      failsafe_cache_file.write(YAML.dump(value)) if !cache_exists || cached_value != value
+      value
     rescue Errno::EACCES
       # ignore permission errors
     end

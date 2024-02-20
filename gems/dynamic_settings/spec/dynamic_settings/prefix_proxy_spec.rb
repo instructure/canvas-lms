@@ -38,6 +38,8 @@ module DynamicSettings
         DynamicSettings.fallback_recovery_lambda = nil
       end
 
+      let(:failsafe_cache) { Pathname.new(__dir__).join("config") }
+
       it "must return nil when no value was found" do
         allow(Diplomat::Kv).to receive(:get_all) { |key| raise Diplomat::KeyNotFound, key }
         allow(Diplomat::Kv).to receive(:get) { |key| raise Diplomat::KeyNotFound, key }
@@ -108,6 +110,15 @@ module DynamicSettings
         expect(Diplomat::Kv).to receive(:get_all).twice.and_raise(Diplomat::KeyNotFound)
         expect(proxy.fetch("baz", failsafe: nil)).to be_nil
         expect(proxy.fetch("baz", failsafe: "a")).to eq "a"
+      end
+
+      it "returns from the failsafe cache when consul can't be reached and no previous value is found" do
+        allow(Diplomat::Kv).to receive_messages(get_all: nil, get: nil)
+
+        expect(proxy.fetch("baz", failsafe_cache:)).to be_nil
+        DynamicSettings.cache.clear
+        expect(Diplomat::Kv).to receive(:get_all).and_raise(Diplomat::KeyNotFound)
+        expect(proxy.fetch("baz", failsafe_cache:)).to be_nil
       end
 
       it "falls back to global settings" do
