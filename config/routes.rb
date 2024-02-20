@@ -2619,6 +2619,10 @@ CanvasRails::Application.routes.draw do
       get "courses/:course_id/smartsearch", action: :search, as: :course_smart_search_query
       # TODO: add account level search
     end
+
+    scope(controller: "user_notes") do
+      put "users/:user_id/user_notes/suppress_deprecation_notice", action: :suppress_deprecation_notice
+    end
   end
 
   # this is not a "normal" api endpoint in the sense that it is not documented or
