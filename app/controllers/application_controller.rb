@@ -367,6 +367,7 @@ class ApplicationController < ActionController::Base
     enhanced_rubrics
     multiselect_gradebook_filters
     assignment_edit_placement_not_on_announcements
+    platform_service_speedgrader
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     product_tours
