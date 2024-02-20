@@ -136,6 +136,61 @@ shared_examples_for "item assign to tray during assignment creation/update" do
     click_cancel_button
     expect(AssignmentCreateEditPage.assignment_save_button).to be_enabled
   end
+
+  it "clears tray when canceling" do
+    AssignmentCreateEditPage.click_manage_assign_to_button
+
+    wait_for_assign_to_tray_spinner
+    keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+    click_add_assign_to_card
+    select_module_item_assignee(1, @section1.name)
+    update_due_date(1, "12/31/2022")
+    update_due_time(1, "5:00 PM")
+    update_available_date(1, "12/27/2022")
+    update_available_time(1, "8:00 AM")
+    update_until_date(1, "1/7/2023")
+    update_until_time(1, "9:00 PM")
+
+    click_cancel_button
+
+    keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
+
+    expect(AssignmentCreateEditPage.pending_changes_pill_exists?).to be_falsey
+  end
+
+  it "reverts last session changes only" do
+    # APPLY changes
+    AssignmentCreateEditPage.click_manage_assign_to_button
+
+    wait_for_assign_to_tray_spinner
+    keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+    click_add_assign_to_card
+    select_module_item_assignee(1, @section1.name)
+    update_due_date(1, "12/31/2022")
+    update_due_time(1, "5:00 PM")
+
+    click_save_button("Apply")
+
+    keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
+
+    expect(AssignmentCreateEditPage.pending_changes_pill_exists?).to be_truthy
+    # CANCEL changes
+    AssignmentCreateEditPage.click_manage_assign_to_button
+
+    wait_for_assign_to_tray_spinner
+    keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+    update_available_date(1, "12/27/2022")
+    update_available_time(1, "8:00 AM")
+
+    click_cancel_button
+
+    keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
+
+    expect(AssignmentCreateEditPage.pending_changes_pill_exists?).to be_truthy
+  end
 end
 
 describe "assignments show page assign to", :ignore_js_errors do
