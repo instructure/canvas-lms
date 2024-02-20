@@ -461,10 +461,10 @@ GEM
     canvas_webex (0.18.2)
       railties
     chunky_png (1.4.0)
-    code_ownership (1.36.1)
+    code_ownership (1.36.2)
       code_teams (~> 1.0)
       packs-specification
-      sorbet-runtime (>= 0.5.10821)
+      sorbet-runtime (>= 0.5.11249)
     code_teams (1.0.2)
       sorbet-runtime
     coercible (1.0.0)
@@ -1073,7 +1073,7 @@ GEM
     soap4r-middleware (0.8.7)
       soap4r-ruby1.9 (= 2.0.5)
     soap4r-ruby1.9 (2.0.5)
-    sorbet-runtime (0.5.10965)
+    sorbet-runtime (0.5.11262)
     spring (4.1.3)
     spring-commands-parallel-rspec (1.1.0)
       spring (>= 0.9.1)
