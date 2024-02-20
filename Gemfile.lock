@@ -1274,6 +1274,7 @@ DEPENDENCIES
   neighbor (~> 0.3)
   net-http (~> 0.1)
   net-ldap (~> 0.18)
+  nokogiri (= 1.15.5)
   oauth (~> 1.1)
   oauth2 (~> 2.0)
   oj (~> 3.16)
