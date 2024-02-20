@@ -1152,7 +1152,7 @@ GEM
       coercible (~> 1.0)
       descendants_tracker (~> 0.0, >= 0.0.3)
     wcag_color_contrast (0.1.0)
-    webmock (3.20.0)
+    webmock (3.21.2)
       addressable (>= 2.8.0)
       crack (>= 0.3.2)
       hashdiff (>= 0.4.0, < 2.0.0)

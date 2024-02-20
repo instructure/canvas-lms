@@ -150,7 +150,7 @@ GEM
     thor (1.3.0)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
-    webmock (3.20.0)
+    webmock (3.21.2)
       addressable (>= 2.8.0)
       crack (>= 0.3.2)
       hashdiff (>= 0.4.0, < 2.0.0)
