@@ -17,7 +17,7 @@ GEM
       tzinfo (~> 2.0)
     aes_key_wrap (1.1.0)
     base64 (0.2.0)
-    bindata (2.4.15)
+    bindata (2.5.0)
     concurrent-ruby (1.2.3)
     diff-lcs (1.5.1)
     faraday (2.9.0)

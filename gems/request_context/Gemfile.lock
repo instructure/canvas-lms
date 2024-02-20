@@ -68,7 +68,7 @@ GEM
     after_transaction_commit (2.2.2)
       activerecord (>= 5.2)
     base64 (0.2.0)
-    bindata (2.4.15)
+    bindata (2.5.0)
     builder (3.2.4)
     code_ownership (1.36.1)
       code_teams (~> 1.0)
