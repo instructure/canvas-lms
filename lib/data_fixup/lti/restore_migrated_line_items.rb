@@ -43,16 +43,31 @@ module DataFixup::Lti::RestoreMigratedLineItems
       .where(workflow_state: :deleted, content_type: "ContextExternalTool", context_type: "Assignment", context_id: assignment_ids)
       .update_all(workflow_state: :active)
 
-    # always restore all primary line items
-    line_item_ids = Lti::LineItem.where(workflow_state: :deleted, coupled: true, assignment_id: assignment_ids).ids
+    # always restore all primary line items, meaning:
+    # the earliest created line item for each assignment
+    line_item_ids = Lti::LineItem
+                    .where(workflow_state: :deleted, assignment_id: assignment_ids)
+                    .order(:assignment_id, :created_at)
+                    .select("DISTINCT ON (assignment_id) id")
+                    .map(&:id) # can't just use .ids because it ruins the "select DISTINCT ON ..."
     Lti::LineItem.where(id: line_item_ids).update_all(workflow_state: :active)
 
     # restore any extra line items that were not user-deleted via AGS, meaning:
-    # line items that were deleted at roughly the same time as the assignment and primary line item
-    extra_line_item_ids = Assignment.joins(:line_items).preload(:line_items).where(id: assignment_ids).group("assignments.id").having("count(assignment_id) > 1").flat_map do |assignment|
+    # extra line items that were deleted at roughly the same time as the assignment and primary line item
+    extra_line_item_ids = Assignment
+                          .joins(:line_items)
+                          .preload(:line_items)
+                          .where(id: assignment_ids)
+                          .group("assignments.id")
+                          .having("count(assignment_id) > 1")
+                          .flat_map do |assignment|
       # use array methods instead of SQL to avoid a subquery
-      t = assignment.line_items.find(&:coupled).updated_at
-      assignment.line_items.filter { |li| !li.coupled && li.updated_at.between?(t - 1.second, t + 1.second) }.pluck(:id)
+      primary = assignment.line_items.min_by(&:created_at)
+      t = primary.updated_at
+
+      assignment.line_items.filter do |li|
+        li.id != primary.id && li.updated_at.between?(t - 1.second, t + 1.second)
+      end.pluck(:id)
     end
     Lti::LineItem.where(id: extra_line_item_ids).update_all(workflow_state: :active) if extra_line_item_ids.present?
 
