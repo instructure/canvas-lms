@@ -43,6 +43,7 @@ const RUBRIC_QUERY = gql`
         points
         longDescription
         description
+        criterionUseRange
       }
     }
   }

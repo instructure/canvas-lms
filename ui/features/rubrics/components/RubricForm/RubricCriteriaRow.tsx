@@ -58,10 +58,17 @@ export const RubricCriteriaRow = ({
   return (
     <>
       <Flex data-testid="rubric-criteria-row">
+        <Flex.Item align="start" draggable={true}>
+          <View as="div" cursor="pointer">
+            <IconDragHandleLine />
+          </View>
+        </Flex.Item>
         <Flex.Item align="start" shouldShrink={true}>
-          <Text weight="bold" data-testid="rubric-criteria-row-index">
-            {rowIndex}.
-          </Text>
+          <View as="div" margin="xxx-small 0 0 small" themeOverride={{marginSmall: '1.5rem'}}>
+            <Text weight="bold" data-testid="rubric-criteria-row-index">
+              {rowIndex}.
+            </Text>
+          </View>
         </Flex.Item>
         <Flex.Item margin="0 small" align="start" shouldGrow={true} shouldShrink={true}>
           <View as="div">
@@ -91,7 +98,6 @@ export const RubricCriteriaRow = ({
         <Flex.Item align="start">
           <Pill
             color="info"
-            margin="0 large 0 0"
             disabled={true}
             themeOverride={{
               background: 'rgb(3, 116, 181)',
@@ -102,49 +108,52 @@ export const RubricCriteriaRow = ({
               {possibleString(points)}
             </Text>
           </Pill>
-          <IconButton
-            withBackground={false}
-            withBorder={false}
-            screenReaderLabel={I18n.t('Move Criterion')}
-            size="small"
-          >
-            <IconDragHandleLine />
-          </IconButton>
-          <IconButton
-            withBackground={false}
-            withBorder={false}
-            screenReaderLabel={I18n.t('Edit Criterion')}
-            onClick={onEditCriterion}
-            size="small"
-            data-testid="rubric-criteria-row-edit-button"
-          >
-            <IconEditLine />
-          </IconButton>
-          <IconButton
-            withBackground={false}
-            withBorder={false}
-            screenReaderLabel={I18n.t('Delete Criterion')}
-            onClick={onDeleteCriterion}
-            size="small"
-            data-testid="rubric-criteria-row-delete-button"
-          >
-            <IconTrashLine />
-          </IconButton>
-          <IconButton
-            withBackground={false}
-            withBorder={false}
-            screenReaderLabel={I18n.t('Duplicate Criterion')}
-            onClick={onDuplicateCriterion}
-            size="small"
-            data-testid="rubric-criteria-row-duplicate-button"
-          >
-            <IconDuplicateLine />
-          </IconButton>
+          <View as="span" margin="0 0 0 medium">
+            <IconButton
+              withBackground={false}
+              withBorder={false}
+              screenReaderLabel={I18n.t('Edit Criterion')}
+              onClick={onEditCriterion}
+              size="small"
+              themeOverride={{smallHeight: '18px'}}
+              data-testid="rubric-criteria-row-edit-button"
+            >
+              <IconEditLine />
+            </IconButton>
+          </View>
+
+          <View as="span" margin="0 0 0 medium">
+            <IconButton
+              withBackground={false}
+              withBorder={false}
+              screenReaderLabel={I18n.t('Delete Criterion')}
+              onClick={onDeleteCriterion}
+              size="small"
+              themeOverride={{smallHeight: '18px'}}
+              data-testid="rubric-criteria-row-delete-button"
+            >
+              <IconTrashLine />
+            </IconButton>
+          </View>
+
+          <View as="span" margin="0 0 0 medium">
+            <IconButton
+              withBackground={false}
+              withBorder={false}
+              screenReaderLabel={I18n.t('Duplicate Criterion')}
+              onClick={onDuplicateCriterion}
+              size="small"
+              themeOverride={{smallHeight: '18px'}}
+              data-testid="rubric-criteria-row-duplicate-button"
+            >
+              <IconDuplicateLine />
+            </IconButton>
+          </View>
         </Flex.Item>
       </Flex>
       <RatingScaleAccordion ratings={criterion.ratings} />
 
-      <View as="hr" margin="medium 0 small 0" />
+      <View as="hr" margin="medium 0 medium 0" />
     </>
   )
 }
@@ -156,7 +165,11 @@ const RatingScaleAccordion = ({ratings}: RatingScaleAccordionProps) => {
   const [ratingsOpen, setRatingsOpen] = useState(false)
 
   return (
-    <View as="div" padding="medium 0 0 medium" themeOverride={{paddingMedium: '1.5rem'}}>
+    <View
+      as="div"
+      padding="medium 0 0 large"
+      themeOverride={{paddingMedium: '1.5rem', paddingLarge: '3.35rem'}}
+    >
       <View
         as="button"
         cursor="pointer"
@@ -208,7 +221,7 @@ const RatingScaleAccordionItem = ({rating, scale, spacing}: RatingScaleAccordion
   return (
     <View
       as="div"
-      margin="small 0 0 0"
+      margin="small 0 0 xx-small"
       themeOverride={{marginSmall: spacing}}
       data-testid="rating-scale-accordion-item"
     >
