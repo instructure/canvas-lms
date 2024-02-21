@@ -46,6 +46,7 @@ export function initSentry() {
       release: sentrySettings.revision,
 
       denyUrls,
+      ignoreErrors: ['ChunkLoadError'],
       integrations,
 
       sampleRate: errorsSampleRate,
