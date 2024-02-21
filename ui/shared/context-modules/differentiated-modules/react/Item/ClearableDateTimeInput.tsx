@@ -114,7 +114,7 @@ function ClearableDateTimeInput({
         <DateTimeInput
           allowNonStepInput={true}
           colSpacing="small"
-          dateFormat="MMM D, YYYY"
+          dateFormat="ll"
           description={<ScreenReaderContent>{description}</ScreenReaderContent>}
           dateRenderLabel={dateRenderLabel}
           timeRenderLabel={I18n.t('Time')}

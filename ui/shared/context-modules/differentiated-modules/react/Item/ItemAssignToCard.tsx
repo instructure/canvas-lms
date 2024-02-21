@@ -163,7 +163,7 @@ export default function ItemAssignToCard({
       if (!target || target !== dateInputRefs.current[unparsedFieldKey]) return
       const unparsedFieldExists = unparsedFieldKeys.has(unparsedFieldKey)
       const isEmpty = target.value.trim() === ''
-      const isValid = moment(target.value).isValid()
+      const isValid = moment(target.value, 'll').isValid()
       if ((isEmpty || isValid) && unparsedFieldExists) {
         unparsedFieldKeys.delete(unparsedFieldKey)
         setUnparsedFieldKeys(new Set([...unparsedFieldKeys]))
