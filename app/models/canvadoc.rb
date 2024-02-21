@@ -113,6 +113,9 @@ class Canvadoc < ActiveRecord::Base
     application/vnd.openxmlformats-officedocument.wordprocessingml.document
     application/vnd.oasis.opendocument.graphics
     application/vnd.oasis.opendocument.formula
+    application/vnd.oasis.opendocument.presentation
+    application/vnd.oasis.opendocument.spreadsheet
+    application/vnd.oasis.opendocument.text
   ].freeze
 
   DEFAULT_SUBMISSION_MIME_TYPES = %w[
@@ -126,6 +129,9 @@ class Canvadoc < ActiveRecord::Base
     application/vnd.openxmlformats-officedocument.wordprocessingml.document
     application/vnd.oasis.opendocument.graphics
     application/vnd.oasis.opendocument.formula
+    application/vnd.oasis.opendocument.presentation
+    application/vnd.oasis.opendocument.spreadsheet
+    application/vnd.oasis.opendocument.text
     image/bmp
     image/jpeg
     image/jpg
