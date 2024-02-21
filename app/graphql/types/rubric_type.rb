@@ -48,6 +48,11 @@ module Types
       !!object.hide_score_total
     end
 
+    field :unassessed, Boolean, null: false
+    def unassessed
+      Rubric.active.unassessed.where(id: object.id).exists?
+    end
+
     field :button_display, String, null: false
     field :hide_points, Boolean, null: true
     field :rating_order, String, null: false

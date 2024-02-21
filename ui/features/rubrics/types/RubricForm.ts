@@ -28,4 +28,5 @@ export type RubricFormProps = {
   pointsPossible: number
   buttonDisplay: string
   ratingOrder: string
+  unassessed: boolean
 }

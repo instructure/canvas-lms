@@ -41,6 +41,7 @@ const I18n = useI18nScope('rubrics-criteria-row')
 type RubricCriteriaRowProps = {
   criterion: RubricCriterion
   rowIndex: number
+  unassessed: boolean
   onDeleteCriterion: () => void
   onDuplicateCriterion: () => void
   onEditCriterion: () => void
@@ -49,6 +50,7 @@ type RubricCriteriaRowProps = {
 export const RubricCriteriaRow = ({
   criterion,
   rowIndex,
+  unassessed,
   onDeleteCriterion,
   onDuplicateCriterion,
   onEditCriterion,
@@ -58,7 +60,7 @@ export const RubricCriteriaRow = ({
   return (
     <>
       <Flex data-testid="rubric-criteria-row">
-        <Flex.Item align="start" draggable={true}>
+        <Flex.Item align="start" draggable={unassessed}>
           <View as="div" cursor="pointer">
             <IconDragHandleLine />
           </View>
@@ -122,33 +124,37 @@ export const RubricCriteriaRow = ({
             </IconButton>
           </View>
 
-          <View as="span" margin="0 0 0 medium">
-            <IconButton
-              withBackground={false}
-              withBorder={false}
-              screenReaderLabel={I18n.t('Delete Criterion')}
-              onClick={onDeleteCriterion}
-              size="small"
-              themeOverride={{smallHeight: '18px'}}
-              data-testid="rubric-criteria-row-delete-button"
-            >
-              <IconTrashLine />
-            </IconButton>
-          </View>
+          {unassessed && (
+            <View as="span" margin="0 0 0 medium">
+              <IconButton
+                withBackground={false}
+                withBorder={false}
+                screenReaderLabel={I18n.t('Delete Criterion')}
+                onClick={onDeleteCriterion}
+                size="small"
+                themeOverride={{smallHeight: '18px'}}
+                data-testid="rubric-criteria-row-delete-button"
+              >
+                <IconTrashLine />
+              </IconButton>
+            </View>
+          )}
 
-          <View as="span" margin="0 0 0 medium">
-            <IconButton
-              withBackground={false}
-              withBorder={false}
-              screenReaderLabel={I18n.t('Duplicate Criterion')}
-              onClick={onDuplicateCriterion}
-              size="small"
-              themeOverride={{smallHeight: '18px'}}
-              data-testid="rubric-criteria-row-duplicate-button"
-            >
-              <IconDuplicateLine />
-            </IconButton>
-          </View>
+          {unassessed && (
+            <View as="span" margin="0 0 0 medium">
+              <IconButton
+                withBackground={false}
+                withBorder={false}
+                screenReaderLabel={I18n.t('Duplicate Criterion')}
+                onClick={onDuplicateCriterion}
+                size="small"
+                themeOverride={{smallHeight: '18px'}}
+                data-testid="rubric-criteria-row-duplicate-button"
+              >
+                <IconDuplicateLine />
+              </IconButton>
+            </View>
+          )}
         </Flex.Item>
       </Flex>
       <RatingScaleAccordion ratings={criterion.ratings} />

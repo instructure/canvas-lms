@@ -25,6 +25,9 @@ describe Types::RubricType do
   let_once(:student) { student_in_course(course:, active_all: true).user }
   let(:rubric) { rubric_for_course }
   let(:rubric_type) { GraphQLTypeTester.new(rubric, current_user: student) }
+  let(:assignment) { assignment_model(course: @course) }
+  let(:association) { rubric_association_model(rubric:, association_object: assignment, purpose: "grading") }
+  let(:assessment) { rubric_assessment_model(rubric:, rubric_association: association) }
 
   it "works" do
     expect(rubric_type.resolve("_id")).to eq rubric.id.to_s
@@ -78,6 +81,10 @@ describe Types::RubricType do
     it "rating_order" do
       rubric.update!(rating_order: "descending")
       expect(rubric_type.resolve("ratingOrder")).to eq rubric.rating_order
+    end
+
+    it "unassessed" do
+      expect(rubric_type.resolve("unassessed")).to be true
     end
   end
 end

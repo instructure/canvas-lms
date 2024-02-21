@@ -57,6 +57,7 @@ const defaultRubricForm: RubricFormProps = {
   pointsPossible: 0,
   buttonDisplay: 'numeric',
   ratingOrder: 'descending',
+  unassessed: true,
 }
 
 const translateRubricData = (fields: RubricQueryResponse): RubricFormProps => {
@@ -68,6 +69,7 @@ const translateRubricData = (fields: RubricQueryResponse): RubricFormProps => {
     pointsPossible: fields.pointsPossible ?? 0,
     buttonDisplay: fields.buttonDisplay ?? 'numeric',
     ratingOrder: fields.ratingOrder ?? 'descending',
+    unassessed: fields.unassessed ?? true,
   }
 }
 
@@ -220,6 +222,16 @@ export const RubricForm = () => {
           </Heading>
         </Flex.Item>
 
+        {!rubricForm.unassessed && (
+          <Flex.Item>
+            <Alert variant="info" margin="medium 0 0 0">
+              {I18n.t(
+                'Editing is limited for this rubric as it has already been used for grading.'
+              )}
+            </Alert>
+          </Flex.Item>
+        )}
+
         <Flex.Item>
           <Flex margin="large 0 0 0">
             <Flex.Item shouldGrow={true} shouldShrink={true}>
@@ -230,18 +242,22 @@ export const RubricForm = () => {
                 value={rubricForm.title}
               />
             </Flex.Item>
-            <Flex.Item margin="0 0 0 small">
-              <RubricHidePointsSelect
-                hidePoints={rubricForm.hidePoints}
-                onChangeHidePoints={hidePoints => setRubricFormField('hidePoints', hidePoints)}
-              />
-            </Flex.Item>
-            <Flex.Item margin="0 0 0 small">
-              <RubricRatingOrderSelect
-                ratingOrder={rubricForm.ratingOrder}
-                onChangeOrder={ratingOrder => setRubricFormField('ratingOrder', ratingOrder)}
-              />
-            </Flex.Item>
+            {rubricForm.unassessed && (
+              <>
+                <Flex.Item margin="0 0 0 small">
+                  <RubricHidePointsSelect
+                    hidePoints={rubricForm.hidePoints}
+                    onChangeHidePoints={hidePoints => setRubricFormField('hidePoints', hidePoints)}
+                  />
+                </Flex.Item>
+                <Flex.Item margin="0 0 0 small">
+                  <RubricRatingOrderSelect
+                    ratingOrder={rubricForm.ratingOrder}
+                    onChangeOrder={ratingOrder => setRubricFormField('ratingOrder', ratingOrder)}
+                  />
+                </Flex.Item>
+              </>
+            )}
           </Flex>
 
           <View as="div" margin="large 0 large 0">
@@ -275,16 +291,19 @@ export const RubricForm = () => {
                 key={criterion.id}
                 criterion={criterion}
                 rowIndex={index + 1}
+                unassessed={rubricForm.unassessed}
                 onDeleteCriterion={() => deleteCriterion(criterion)}
                 onDuplicateCriterion={() => duplicateCriterion(criterion)}
                 onEditCriterion={() => openCriterionModal(criterion)}
               />
             ))}
 
-            <NewCriteriaRow
-              rowIndex={rubricForm.criteria.length + 1}
-              onEditCriterion={() => openCriterionModal()}
-            />
+            {rubricForm.unassessed && (
+              <NewCriteriaRow
+                rowIndex={rubricForm.criteria.length + 1}
+                onEditCriterion={() => openCriterionModal()}
+              />
+            )}
           </View>
         </Flex.Item>
 
@@ -324,6 +343,7 @@ export const RubricForm = () => {
       <CriterionModal
         criterion={selectedCriterion}
         isOpen={isCriterionModalOpen}
+        unassessed={rubricForm.unassessed}
         onDismiss={() => setIsCriterionModalOpen(false)}
         onSave={(updatedCriteria: RubricCriterion) => handleSaveCriterion(updatedCriteria)}
       />
@@ -346,6 +366,7 @@ const RubricHidePointsSelect = ({hidePoints, onChangeHidePoints}: RubricHidePoin
       width="10.563rem"
       value={hidePoints ? 'unscored' : 'scored'}
       onChange={(e, {value}) => onChange(value)}
+      data-testid="rubric-hide-points-select"
     >
       <SimpleSelectOption id="scoredOption" value="scored">
         {I18n.t('Scored')}
@@ -373,6 +394,7 @@ const RubricRatingOrderSelect = ({ratingOrder, onChangeOrder}: RubricRatingOrder
       width="10.563rem"
       value={ratingOrder}
       onChange={(e, {value}) => onChange(value !== undefined ? value.toString() : '')}
+      data-testid="rubric-rating-order-select"
     >
       <SimpleSelectOption id="highToLowOption" value="descending">
         {I18n.t('High < Low')}
