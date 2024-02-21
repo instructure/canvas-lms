@@ -121,14 +121,34 @@ describe DataFixup::Lti::RestoreMigratedLineItems do
       end
     end
 
+    context "when assignment was created via Line Item API" do
+      let(:pre_import_setup) do
+        lambda do
+          Timecop.travel(20.seconds.ago) do
+            assignment.line_items.first.update! coupled: false
+          end
+        end
+      end
+
+      it "undeletes line items" do
+        expect(Lti::LineItem.find_by(assignment:)).to be_deleted
+        subject
+        expect(Lti::LineItem.find_by(assignment:)).to be_active
+      end
+    end
+
     context "when assignment has deleted extra line item" do
       let(:resource_link) { Lti::ResourceLink.find_by(context: assignment) }
+      let(:primary) { assignment.line_items.first }
       let(:extra_deleted) { Lti::LineItem.create!(assignment:, resource_link:, score_maximum: 42, label: "extra deleted", client_id: tool.developer_key.global_id, coupled: false) }
       let(:extra_active) { Lti::LineItem.create!(assignment:, resource_link:, score_maximum: 42, label: "extra active", client_id: tool.developer_key.global_id, coupled: false) }
       let(:pre_import_setup) do
         lambda do
           # simulate real world time passing between AGS delete
           # and assignment delete/re-import
+          Timecop.travel(20.seconds.ago) do
+            primary.update! created_at: Time.zone.now
+          end
           Timecop.travel(10.seconds.ago) do
             # create extra line items and delete one,
             # acting as a tool would via AGS
@@ -140,8 +160,34 @@ describe DataFixup::Lti::RestoreMigratedLineItems do
 
       it "only undeletes affected line items" do
         subject
+        expect(primary.reload).to be_active
         expect(extra_active.reload).to be_active
         expect(extra_deleted.reload).to be_deleted
+      end
+
+      context "when primary line item is not marked coupled" do
+        let(:pre_import_setup) do
+          lambda do
+            # simulate real world time passing between AGS delete
+            # and assignment delete/re-import
+            Timecop.travel(20.seconds.ago) do
+              primary.update! created_at: Time.zone.now, coupled: false
+            end
+            Timecop.travel(10.seconds.ago) do
+              # create extra line items and delete one,
+              # acting as a tool would via AGS
+              extra_active
+              extra_deleted.destroy
+            end
+          end
+        end
+
+        it "undeletes affected line items" do
+          subject
+          expect(primary.reload).to be_active
+          expect(extra_active.reload).to be_active
+          expect(extra_deleted.reload).to be_deleted
+        end
       end
     end
   end
