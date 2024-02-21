@@ -284,6 +284,34 @@ describe "selective_release module item assign to tray" do
       expect(assign_to_until_time(0).attribute("value")).to eq("9:00 PM")
     end
 
+    it "does not display an error when user uses other English locale" do
+      @user.update! locale: "en-GB"
+
+      go_to_modules
+
+      manage_module_item_button(@module_item1).click
+      click_manage_module_item_assign_to(@module_item1)
+      update_due_date(0, "15 April 2024")
+      # Blurs the due date input
+      assign_to_due_time(0).click
+
+      expect(assign_to_date_and_time[0].text).not_to include("Invalid date")
+    end
+
+    it "does not display an error when user uses other language" do
+      @user.update! locale: "es"
+
+      go_to_modules
+
+      manage_module_item_button(@module_item1).click
+      click_manage_module_item_assign_to(@module_item1)
+      update_due_date(0, "15 de abr. de 2024")
+      # Blurs the due date input
+      assign_to_due_time(0).click
+
+      expect(assign_to_date_and_time[0].text).not_to include("Fecha no válida")
+    end
+
     it "displays an error when due date is invalid" do
       go_to_modules
 
