@@ -119,6 +119,7 @@ module CanvasPartman
           else
             [reflection.klass]
           end
+        klasses = klasses.map(&:base_class).uniq
         klasses.filter_map { |klass| klass.maximum(klass.primary_key) }.max
       end
 
