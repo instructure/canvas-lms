@@ -605,6 +605,43 @@ describe SIS::CSV::EnrollmentImporter do
     expect(e.completed_at).to be_present
   end
 
+  it "enrolls observers when observer is added before restoring enrollment" do
+    process_csv_data_cleanly(
+      "course_id,short_name,long_name,status",
+      "tc101,TC 101,Test Course 101,active"
+    )
+
+    process_csv_data_cleanly(
+      "user_id,login_id,full_name,email,status",
+      "user1,user1,User One,user1@example.com,active",
+      "user2,user2,User Two,user2@example.com,active"
+    )
+
+    process_csv_data_cleanly(
+      "course_id,user_id,role,status",
+      "tc101,user1,student,deleted_last_completed"
+    )
+
+    process_csv_data_cleanly(
+      "observer_id,student_id,status",
+      "user2,user1,active"
+    )
+
+    process_csv_data_cleanly(
+      "course_id,user_id,role,status",
+      "tc101,user1,student,active"
+    )
+
+    course = Course.where(sis_source_id: "tc101").first
+    student = Pseudonym.where(unique_id: "user1").first.user
+    observer = Pseudonym.where(unique_id: "user2").first.user
+    observations = observer.observer_enrollments
+
+    expect(observations.count).to eq 1
+    expect(observations.first.course).to eq course
+    expect(observations.first.associated_user).to eq student
+  end
+
   it "only queues up one SubmissionLifecycleManager job per course" do
     course1 = course_model(account: @account, sis_source_id: "C001")
     course2 = course_model(account: @account, sis_source_id: "C002")
