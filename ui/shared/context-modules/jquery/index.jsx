@@ -1221,7 +1221,9 @@ modules.initModuleManagement = function (duplicate) {
     if (data.graded === '1') {
       $option.find('.type option.graded').show().attr('disabled', false)
     }
-    $option.find('.type').val($option.find('.type option.' + data.criterion_type + ':first').val())
+    if (data.criterion_type) {
+      $option.find('.type').val($option.find('.type option.' + data.criterion_type + ':first').val())
+    }
     $option.find('.type').change()
   })
 
