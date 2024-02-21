@@ -33,6 +33,7 @@ const RUBRIC_QUERY = gql`
       ratingOrder
       workflowState
       pointsPossible
+      unassessed
       criteria {
         id: _id
         ratings {
@@ -51,8 +52,15 @@ const RUBRIC_QUERY = gql`
 
 export type RubricQueryResponse = Pick<
   Rubric,
-  'id' | 'title' | 'criteria' | 'hidePoints' | 'pointsPossible' | 'buttonDisplay' | 'ratingOrder'
->
+  | 'id'
+  | 'title'
+  | 'criteria'
+  | 'hidePoints'
+  | 'pointsPossible'
+  | 'buttonDisplay'
+  | 'ratingOrder'
+  | 'workflowState'
+> & {unassessed: boolean}
 
 type FetchRubricResponse = {
   rubric: RubricQueryResponse
@@ -80,6 +88,7 @@ export const saveRubric = async (rubric: RubricFormProps): Promise<RubricQueryRe
       long_description: criterion.longDescription,
       points: criterion.points,
       learning_outcome_id: criterion.learningOutcomeId,
+      criterion_use_range: criterion.criterionUseRange,
       ratings: criterion.ratings.map(rating => ({
         description: rating.description,
         long_description: rating.longDescription,
@@ -129,5 +138,7 @@ export const saveRubric = async (rubric: RubricFormProps): Promise<RubricQueryRe
     pointsPossible: savedRubric.points_possible,
     buttonDisplay: savedRubric.button_display,
     ratingOrder: savedRubric.rating_order,
+    workflowState: savedRubric.workflow_state,
+    unassessed: rubric.unassessed,
   }
 }
