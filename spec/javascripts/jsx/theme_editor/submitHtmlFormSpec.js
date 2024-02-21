@@ -21,12 +21,13 @@ import 'jquery.cookie'
 
 import {submitHtmlForm} from '@canvas/theme-editor/submitHtmlForm'
 
-let action, method, md5, csrfToken
+let action, method, md5, csrfToken, triggerStub
 
 QUnit.module('submitHtmlForm', {
   setup() {
     sandbox.spy(jQuery.fn, 'appendTo')
     sandbox.stub(jQuery.fn, 'submit')
+    triggerStub = sandbox.stub(jQuery.fn, 'trigger')
     action = '/foo'
     method = 'PUT'
     md5 = '0123456789abcdef0123456789abcdef'
@@ -76,7 +77,7 @@ test('appends form to body', () => {
   ok(jQuery.fn.appendTo.calledWith('body'), 'appends form to body')
 })
 
-test('submits the form', () => {
-  const form = getForm()
-  ok(jQuery.fn.submit.calledOn(form), 'submits the form')
+test('submits the form', assert => {
+  getForm()
+  assert.ok(triggerStub.calledWith('submit'), 'submit event triggered')
 })
