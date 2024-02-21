@@ -65,6 +65,7 @@ export function getInitialGridDisplaySettings(
   const filterRowsBy = {
     sectionId: null,
     studentGroupId: null,
+    studentGroupIds: [],
   }
   if (settings.filter_rows_by != null) {
     Object.assign(filterRowsBy, camelizeProperties(settings.filter_rows_by))

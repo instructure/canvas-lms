@@ -54,7 +54,8 @@ export type FiltersState = {
   initializeAppliedFilters: (
     initialRowFilterSettings: InitialRowFilterSettings,
     initialColumnFilterSettings: InitialColumnFilterSettings,
-    customGradeStatuses: GradeStatus[]
+    customGradeStatuses: GradeStatus[],
+    multiselectGradebookFiltersEnabled: boolean
   ) => void
   initializeStagedFilters: () => void
   fetchFilters: () => Promise<void>
@@ -80,6 +81,7 @@ export type InitialColumnFilterSettings = {
 export type InitialRowFilterSettings = {
   section_id: null | string
   student_group_id: null | string
+  student_group_ids?: null | string[]
 }
 
 export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): FiltersState => ({
@@ -123,7 +125,7 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
 
     let appliedFilters = [...get().appliedFilters]
 
-    const excludedMultiselectFilters = ['grading-period', 'student-group']
+    const excludedMultiselectFilters = ['grading-period']
     appliedFilters = excludedMultiselectFilters.includes(filter.type ?? '')
       ? appliedFilters.filter(f => f.type !== filter.type)
       : appliedFilters.filter(f => !(f.type === filter.type && f.value === filter.value))
@@ -136,7 +138,8 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
   initializeAppliedFilters: (
     initialRowFilterSettings: InitialRowFilterSettings,
     initialColumnFilterSettings: InitialColumnFilterSettings,
-    customStatuses: GradeStatus[]
+    customStatuses: GradeStatus[],
+    multiselectGradebookFiltersEnabled: boolean
   ) => {
     const appliedFilters: Filter[] = []
 
@@ -148,8 +151,22 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
         created_at: new Date().toISOString(),
       })
     }
-
-    if (typeof initialRowFilterSettings.student_group_id === 'string') {
+    if (
+      multiselectGradebookFiltersEnabled &&
+      typeof initialRowFilterSettings.student_group_ids === 'object'
+    ) {
+      initialRowFilterSettings.student_group_ids?.forEach(value => {
+        appliedFilters.push({
+          id: uuid.v4(),
+          value,
+          type: 'student-group',
+          created_at: new Date().toISOString(),
+        })
+      })
+    } else if (
+      !multiselectGradebookFiltersEnabled &&
+      typeof initialRowFilterSettings.student_group_id === 'string'
+    ) {
       appliedFilters.push({
         id: uuid.v4(),
         value: initialRowFilterSettings.student_group_id,

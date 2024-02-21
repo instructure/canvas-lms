@@ -119,7 +119,8 @@ export default function GradebookData(props: Props) {
       props.gradebookEnv.settings.filter_columns_by || {},
       props.gradebookEnv.custom_grade_statuses_enabled
         ? props.gradebookEnv.custom_grade_statuses
-        : []
+        : [],
+      props.gradebookEnv.multiselect_gradebook_filters_enabled
     )
   }, [
     courseId,
@@ -132,6 +133,7 @@ export default function GradebookData(props: Props) {
     initializeAppliedFilters,
     props.gradebookEnv.custom_grade_statuses_enabled,
     props.gradebookEnv.custom_grade_statuses,
+    props.gradebookEnv.multiselect_gradebook_filters_enabled,
   ])
 
   // Data loading logic goes here
