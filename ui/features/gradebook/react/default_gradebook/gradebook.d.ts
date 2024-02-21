@@ -46,14 +46,18 @@ export type GradebookSettings = {
   enter_grades_as: any
   filter_columns_by: {
     assignment_group_id: string | null
+    assignment_group_ids?: string[] | null
     grading_period_id: string | null
     context_module_id: string | null
+    context_module_ids?: string[] | null
     end_date: string | null
     start_date: string | null
     submissions: SubmissionFilterValue | null // affects rows too
+    submission_filters?: SubmissionFilterValue[] | null
   }
   filter_rows_by: {
     section_id: string | null
+    section_ids?: string[] | null
     student_group_id: string | null
     student_group_ids?: string[] | null
   }
