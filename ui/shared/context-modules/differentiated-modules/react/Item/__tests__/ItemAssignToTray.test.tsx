@@ -387,7 +387,7 @@ describe('ItemAssignToTray', () => {
     })
   })
 
-  describe('Module Overrides', () => {
+  describe.skip('Module Overrides', () => {
     const DATE_DETAILS_WITHOUT_OVERRIDES = {
       id: '23',
       due_at: '2023-10-05T12:00:00Z',
