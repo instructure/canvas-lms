@@ -179,6 +179,9 @@ const CourseSelect = props => {
               isSelected={option.assetString === selectedOptionId}
             >
               {option.courseNickname || option.contextName}
+              <ScreenReaderContent>
+                {I18n.t(` in %{listHeading}`, {listHeading: getGroupLabel(key)})}
+              </ScreenReaderContent>
             </Select.Option>
           ))}
         </Select.Group>
