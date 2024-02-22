@@ -69,7 +69,7 @@ class CalendarEvent < ActiveRecord::Base
              polymorphic_prefix: true
   belongs_to :user
   belongs_to :parent_event, class_name: "CalendarEvent", foreign_key: :parent_calendar_event_id, inverse_of: :child_events
-  has_many :child_events, -> { where("calendar_events.workflow_state <> 'deleted'") }, class_name: "CalendarEvent", foreign_key: :parent_calendar_event_id, inverse_of: :parent_event
+  has_many :child_events, -> { where.not(workflow_state: "deleted") }, class_name: "CalendarEvent", foreign_key: :parent_calendar_event_id, inverse_of: :parent_event
   belongs_to :web_conference, autosave: true
   belongs_to :root_account, class_name: "Account"
 
