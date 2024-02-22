@@ -143,7 +143,7 @@ const speedGraderHelpers = {
         $(element).removeClass('ui-state-disabled')
         $(element).removeAttr('aria-disabled')
         $(element).removeAttr('readonly')
-        $(element).removeProp('disabled')
+        $(element).prop('disabled', false)
       }
     })
   },
