@@ -65,7 +65,7 @@ describe "Grading quizzes" do
         it "displays the selected regrade option on the correct answer" do
           option_text = f(".regrade_enabled .regrade_option_text").text
           select_regrade_option
-          expect(f(".correct_answer .regrade_option_text").text).to eq option_text
+          expect(f(".correct_answer #regrade_info_span").text).to eq option_text
         end
 
         it "remembers the selected regrade option", priority: "1" do
