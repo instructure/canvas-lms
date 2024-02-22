@@ -137,7 +137,15 @@ const ComposeModalContainer = props => {
   }
 
   useEffect(() => {
-    if (props.contextIdFromUrl) {
+    if (
+      (props.isReply || props.isForward) &&
+      ['Course', 'Group'].includes(props.pastConversation?.contextType)
+    ) {
+      setSelectedContext({
+        contextID: props.pastConversation?.contextAssetString,
+        contextName: props.pastConversation?.contextName,
+      })
+    } else if (props.contextIdFromUrl) {
       setSelectedContext({
         contextID: props.contextIdFromUrl,
         contextName: getContextName(props.contextIdFromUrl),

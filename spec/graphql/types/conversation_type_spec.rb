@@ -191,4 +191,12 @@ describe Types::ConversationType do
       expect(result_after).to eq(2)
     end
   end
+
+  context "context asset string" do
+    it "returns the correct context asset string" do
+      @conversation.conversation.update_attribute(:context, @course)
+      result = conversation_type.resolve("contextAssetString")
+      expect(result).to eq(@course.asset_string)
+    end
+  end
 end
