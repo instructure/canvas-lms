@@ -106,38 +106,62 @@ class Canvadoc < ActiveRecord::Base
     application/excel
     application/msword
     application/pdf
+    application/postscript
+    application/rtf
+    application/mspowerpoint
     application/vnd.ms-excel
     application/vnd.ms-powerpoint
     application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
     application/vnd.openxmlformats-officedocument.presentationml.presentation
     application/vnd.openxmlformats-officedocument.wordprocessingml.document
+    application/vnd.openxmlformats-officedocument.spreadsheetml.template
+    application/vnd.openxmlformats-officedocument.presentationml.slideshow
+    application/vnd.openxmlformats-officedocument.presentationml.template
+    application/vnd.openxmlformats-officedocument.wordprocessingml.template
     application/vnd.oasis.opendocument.graphics
     application/vnd.oasis.opendocument.formula
     application/vnd.oasis.opendocument.presentation
     application/vnd.oasis.opendocument.spreadsheet
     application/vnd.oasis.opendocument.text
+    application/vnd.sun.xml.writer
+    application/vnd.sun.xml.impress
+    application/vnd.sun.xml.calc
+    text/rtf
+    text/plain
   ].freeze
 
   DEFAULT_SUBMISSION_MIME_TYPES = %w[
     application/excel
     application/msword
     application/pdf
+    application/postscript
+    application/rtf
+    application/mspowerpoint
     application/vnd.ms-excel
     application/vnd.ms-powerpoint
     application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
     application/vnd.openxmlformats-officedocument.presentationml.presentation
     application/vnd.openxmlformats-officedocument.wordprocessingml.document
+    application/vnd.openxmlformats-officedocument.spreadsheetml.template
+    application/vnd.openxmlformats-officedocument.presentationml.slideshow
+    application/vnd.openxmlformats-officedocument.presentationml.template
+    application/vnd.openxmlformats-officedocument.wordprocessingml.template
     application/vnd.oasis.opendocument.graphics
     application/vnd.oasis.opendocument.formula
     application/vnd.oasis.opendocument.presentation
     application/vnd.oasis.opendocument.spreadsheet
     application/vnd.oasis.opendocument.text
+    application/vnd.sun.xml.writer
+    application/vnd.sun.xml.impress
+    application/vnd.sun.xml.calc
     image/bmp
     image/jpeg
     image/jpg
     image/png
     image/tif
     image/tiff
+    text/rtf
+    text/plain
   ].freeze
 
   def self.mime_types
