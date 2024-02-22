@@ -1392,7 +1392,7 @@ describe "RCE next tests", :ignore_js_errors do
         rce_wysiwyg_state_setup(@course, text)
         select_all_in_tiny(f("#wiki_page_body"))
         click_menubar_submenu_item("Format", "Fonts")
-        menu_option_by_name("Architect's Daughter").click
+        menu_option_by_name("Architect\\'s Daughter").click
         fj('button:contains("Save")').click
         wait_for_ajaximations
         expect(f(".show-content.user_content p span").attribute("style")).to eq(
