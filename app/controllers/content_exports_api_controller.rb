@@ -81,8 +81,10 @@
 #
 class ContentExportsApiController < ApplicationController
   include ContentExportApiHelper
+  include SupportHelpers::ControllerHelpers
   include Api::V1::ContentExport
   before_action :require_context
+  before_action :require_site_admin, only: :update
 
   # @API List content exports
   #
@@ -184,5 +186,20 @@ class ContentExportsApiController < ApplicationController
 
       render json: formatter.get_content_list(params[:type], @context)
     end
+  end
+
+  def update
+    export = @context.content_exports.common_cartridge.find(params[:id])
+    if export.update(update_params)
+      render json: content_export_json(export, @current_user, session, ["new_quizzes_export_settings"])
+    else
+      render json: export.errors, status: :bad_request
+    end
+  end
+
+  private
+
+  def update_params
+    params.require(:content_export).permit(:new_quizzes_export_state, :new_quizzes_export_url)
   end
 end

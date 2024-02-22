@@ -541,4 +541,47 @@ describe ContentExport do
         .from("created").to("waiting_for_external_tool")
     end
   end
+
+  describe "set new quizzes export settings on save" do
+    context "when the export_type is 'common_cartridge'" do
+      let(:content_export) { create_content_export(export_type: ContentExport::COMMON_CARTRIDGE, settings: {}) }
+
+      context "and is updated with new quizzes export settings" do
+        it "sets appropriate settings" do
+          content_export.update!(new_quizzes_export_url: "https://some.url", new_quizzes_export_state: "completed")
+          expect(content_export.settings[:new_quizzes_export_url]).to eq("https://some.url")
+          expect(content_export.settings[:new_quizzes_export_state]).to eq("completed")
+        end
+      end
+
+      context "and new_quizzes_export_state is not provided on update" do
+        it "does not set new quizzes export settings" do
+          content_export.update!(new_quizzes_export_url: "https://some.url")
+          expect(content_export.settings[:new_quizzes_export_url]).to be_nil
+          expect(content_export.settings[:new_quizzes_export_state]).to be_nil
+        end
+      end
+
+      context "and new_quizzes_export_state is provided on update" do
+        it "sets appropriate settings even with new_quizzes_export_url set as nil" do
+          content_export.update!(new_quizzes_export_state: "failed")
+
+          expect(content_export.settings[:new_quizzes_export_state]).to eq "failed"
+          expect(content_export.settings[:new_quizzes_export_url]).to be_nil
+        end
+      end
+    end
+
+    context "when the export_type is not 'common_cartridge'" do
+      let(:content_export) { create_content_export(export_type: ContentExport::COURSE_COPY, settings: {}) }
+
+      context "and is updated with new quizzes export settings" do
+        it "does not set new quizzes export settings" do
+          content_export.update!(new_quizzes_export_url: "https://some.url", new_quizzes_export_state: "completed")
+          expect(content_export.settings[:new_quizzes_export_url]).to be_nil
+          expect(content_export.settings[:new_quizzes_export_state]).to be_nil
+        end
+      end
+    end
+  end
 end

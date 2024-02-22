@@ -19,10 +19,13 @@
 #
 
 require_relative "../api_spec_helper"
+require_relative "../../lti2_spec_helper"
 
 require "nokogiri"
 
 describe ContentExportsApiController, type: :request do
+  include_context "lti2_spec_helper"
+
   let_once(:t_teacher) do
     user_factory(active_all: true)
   end
@@ -148,6 +151,58 @@ describe ContentExportsApiController, type: :request do
       )
 
       expect(json[0]["attachment"]).to be_nil
+    end
+  end
+
+  describe "update" do
+    let(:user) { site_admin_user }
+
+    it "does not find exports other than common cartridges" do
+      @cc = course_copy_export
+      api_call_as_user(user,
+                       :put,
+                       "/api/v1/courses/#{t_course.id}/content_exports/#{@cc.id}",
+                       { controller: "content_exports_api", action: "update", format: "json", course_id: t_course.to_param, id: @cc.to_param },
+                       {},
+                       {},
+                       { expected_status: 404 })
+    end
+
+    it "requires an content_export parameter" do
+      @past = past_export
+      api_call_as_user(user,
+                       :put,
+                       "/api/v1/courses/#{t_course.id}/content_exports/#{@past.id}",
+                       { controller: "content_exports_api", action: "update", format: "json", course_id: t_course.to_param, id: @past.to_param },
+                       { new_quizzes_export_url: "https://some.url", new_quizzes_export_state: "completed" },
+                       {},
+                       { expected_status: 400 })
+    end
+
+    it "returns the correct data" do
+      @past = past_export
+      json = api_call_as_user(user,
+                              :put,
+                              "/api/v1/courses/#{t_course.id}/content_exports/#{@past.id}",
+                              { controller: "content_exports_api", action: "update", format: "json", course_id: t_course.to_param, id: @past.to_param },
+                              { content_export: { new_quizzes_export_url: "https://some.url", new_quizzes_export_state: "completed" } })
+
+      expect(json["id"]).to eql @past.id
+      expect(json["export_type"]).to eql "common_cartridge"
+      expect(json["course_id"]).to eql t_course.id
+      expect(json["new_quizzes_export_url"]).to eql "https://some.url"
+      expect(json["new_quizzes_export_state"]).to eql "completed"
+    end
+
+    it "returns status 401 if the request is not from a site admin user" do
+      @past = past_export
+      api_call_as_user(t_teacher,
+                       :put,
+                       "/api/v1/courses/#{t_course.id}/content_exports/#{@past.id}",
+                       { controller: "content_exports_api", action: "update", format: "json", course_id: t_course.to_param, id: @past.to_param },
+                       { new_quizzes_export_url: "https://some.url", new_quizzes_export_state: "completed" },
+                       {},
+                       { expected_status: 401 })
     end
   end
 

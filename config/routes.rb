@@ -2321,6 +2321,7 @@ CanvasRails::Application.routes.draw do
         put "#{prefix}/:id/fail", action: :fail
       end
       get "courses/:course_id/content_list", action: :content_list, as: "course_content_list"
+      put "courses/:course_id/content_exports/:id", action: :update
     end
 
     scope(controller: :epub_exports) do
