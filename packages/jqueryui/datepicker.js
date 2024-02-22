@@ -1778,17 +1778,17 @@ import './widget'
 
   /*
    * Bind hover events for datepicker elements.
-   * Done via delegate so the binding only occurs once in the lifetime of the parent div.
+   * Done via a delegated handler so the binding only occurs once in the lifetime of the parent div.
    * Global instActive, set by _updateDatepicker allows the handlers to find their way back to the active picker.
    */
   function bindHover(dpDiv) {
     var selector = 'button, .ui-datepicker-prev, .ui-datepicker-next, .ui-datepicker-calendar td a';
-    return dpDiv.delegate(selector, 'mouseout', function() {
+    return dpDiv.on('mouseout', selector, function() {
       $(this).removeClass('ui-state-hover');
       if (this.className.indexOf('ui-datepicker-prev') != -1) $(this).removeClass('ui-datepicker-prev-hover');
       if (this.className.indexOf('ui-datepicker-next') != -1) $(this).removeClass('ui-datepicker-next-hover');
     })
-      .delegate(selector, 'mouseover', function(){
+      .on('mouseover', selector, function(){
         if (!$.datepicker._isDisabledDatepicker( instActive.inline ? dpDiv.parent()[0] : instActive.input[0])) {
           $(this).parents('.ui-datepicker-calendar').find('a').removeClass('ui-state-hover');
           $(this).addClass('ui-state-hover');
