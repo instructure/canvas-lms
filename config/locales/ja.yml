@@ -571,7 +571,7 @@ ja:
   account_level_mastery_scales_a5bdff29: アカウントレベルの習熟度スケール
   account_level_notification_preferences_require_an__66467cd7: "アカウントレベルの通知設定を更新するには account_id が必要です。"
   account_level_notification_preferences_ui_update_f5e189a4: アカウントレベルの通知設定UIの更新
-  account_level_notifications_apply_to_all_courses_n_8b99c5b0: アカウントレベルの通知はすべてのコースに適用されます。個々のコースの通知は各コース内で変更でき、これらの通知を上書きします。
+  account_level_notifications_apply_to_all_courses_n_8b99c5b0: アカウントの通知設定はすべてのコースに適用されます。個々のコースの通知設定は各コース内で変更でき、そちらが有効となります。
   account_level_settings_manage_4fca6f8e: "アカウントレベルの設定 - 管理"
   account_name_13ed649: "%{account_name}"
   account_name_7f63a13: アカウント名
@@ -8774,7 +8774,7 @@ ja:
   course_is_ineligible_to_be_set_as_a_blueprint_8e25ebcc: コースにはブループリントとして設定される資格がありません
   course_landing_page_49a53ade: コースのランディングページ
   course_level_notification_preferences_require_a_co_2f0a618: "コースレベルの通知設定を更新するには course_id が必要です。"
-  course_level_notifications_are_inherited_from_your_7ae3c0c2: コースレベルの通知は、アカウントレベルの通知設定から引き継がれます。このコースの通知を調整すると、アカウントレベルの通知が上書きされます。
+  course_level_notifications_are_inherited_from_your_7ae3c0c2: コースの通知設定は、アカウントの通知設定の内容が適用されていますが、各コースの通知設定を有効にした場合には、各コースの通知設定が適用されます。
   course_level_overrides_for_notification_preference_e86d1725: 通知設定のコースレベル上書き
   course_list: 
     favorited_tooltip: "クリックすると、%{course_name}がコースメニューから削除されます。"
@@ -14405,7 +14405,7 @@ ja:
       not_in_group_section: "%{student} は、%{group} の他のメンバーと、どのセクションも共有していません。"
   group_membership_assignment_will_continue_in_the_b_bda6b408: グループメンバーの割り当てがバックグラウンドで継続されます
   group_membership_count_is_invalid_cc6b2d47: グループメンバー数が無効です
-  group_membership_limit_54e165b: グループメンバーシップの制限
+  group_membership_limit_54e165b: グループのメンバー数
   group_membership_limit_must_be_equal_to_or_greater_c52e0d7b: グループのメンバー数の上限は、現在のメンバー数以上でなければなりません。
   group_membership_limit_must_be_greater_than_1_5e95fc69: グループメンバー数の上限は1以上である必要があります。
   group_name_b69c144: グループ名
@@ -14517,7 +14517,7 @@ ja:
       buttons: 
         create: グループの作成
       course_groups: "コース グループ"
-      group_explanation: "グループは、プロジェクトのコラボレーションを行ったり、勉強会などのスケジュールを立てたりするのに適した場所です。どのグループも、カレンダー、Wiki、ディスカッション、わずかながらファイルの保管場所も手に入れることができます。グループでは、文書を共同制作することや、Web 会議を計画することだってできます。まさにミニコースのようなもので、より焦点を絞ったプロジェクトで、少数の受講者と一緒に作業することができます。"
+      group_explanation: "グループは、プロジェクトでの共同作業、勉強会、その他の目的で利用されます。 どのグループでもカレンダー、ページ、ディスカッション が利用できます。また、ファイルを保存するスペースがあります。 グループはドキュメントで共同作業をしたり、Web 会議を開催したりすることができます。"
       groups_disabled: 受講生が組織したグループは、このコースでは使用不可になっています。そのため、講師が作ったグループで満足しなければなりません。
       headings: 
         available_groups: 利用できるグループ
@@ -16107,7 +16107,7 @@ ja:
   invite_5b1fcbcd: 招待
   invite_all_course_members_a0a13bc6: コースメンバーを全員招待する
   invite_all_group_members_3182f61a: グループメンバーを全員招待する
-  invite_students_a4873a50: 新入生を招待する
+  invite_students_a4873a50: 招待する受講者
   ip_filter_is_not_valid_152a46d8: "IP フィルタは無効です。"
   ireland_353_3cd32cc0: "アイルランド (+353)"
   ireland_f7bb9899: アイルランド
@@ -16253,7 +16253,7 @@ ja:
   join_this_course_7d26a944: このコースに参加
   join_this_subject_ef4b8845: この課題科目に参加する
   joined_group_group_name_e3802c04: "グループ %{group_name} に参加しました"
-  joining_81f8b6c9: 参加しています
+  joining_81f8b6c9: 参加者
   joplin_assignment_submission_a4cf7899: "Joplin の課題提出"
   jpg_903bacff: JPG
   jpg_png_or_gif_files_14e360d2: "jpg、 png、または gif ファイル"
@@ -19441,8 +19441,8 @@ ja:
   minutes_per_slot_5b7169e5: スロットあたりの分
   missing_1a256b3b: 未提出(提出期限切れ)
   missing_count_or_until_62ad480c: カウント数または期限の欠落
-  missing_d59852a7: 欠如
-  missing_eaddacbd: 欠如
+  missing_d59852a7: 未提出
+  missing_eaddacbd: 未提出
   missing_interval_70679242: インターバルの欠落
   missing_items_for_title_c16a3e87: "%{title}に不足しているアイテム"
   missing_key_s_4be3dc31: 不足しているキー
@@ -20786,7 +20786,7 @@ ja:
     precision: 
       format: 
         delimiter: ""
-  number_a6dc44e: 数・番号
+  number_a6dc44e: メンバー数
   number_between_1_and_16_inclusive_31f5468d: 1から16までの間の数
   number_each_event_d934cd65: 各イベントに番号を付ける
   number_is_too_large_4da4af0a: 数字が大きすぎます
@@ -26564,7 +26564,7 @@ ja:
         name: コース名
       new_course_name_placeholder: コース名
       sample_course_code: コース-101
-      start_a_new_course: 新しいコースの開始
+      start_a_new_course: コースの作成
     new_nav_header: 
       default_page_title: "Canvas LMS"
       links: 
@@ -31323,7 +31323,7 @@ ja:
     dashboard_sidebar: 
       coming_up: 次の予定
       recent_feedback: 最近のフィードバック
-      start_new_course: 新しいコースの開始
+      start_new_course: コースの作成
     delete: 
       are_you_sure: "このユーザ アカウントを削除してもよろしいですか?"
       buttons: 
