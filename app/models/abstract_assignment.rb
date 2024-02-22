@@ -3897,7 +3897,7 @@ class AbstractAssignment < ActiveRecord::Base
   end
 
   def user_is_moderation_grader?(user)
-    moderation_grader_users.exists?(user)
+    moderation_grader_users.where(id: user).exists?
   end
 
   # This is a helper method intended to ensure the number of provisional graders

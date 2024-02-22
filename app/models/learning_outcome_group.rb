@@ -83,7 +83,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
     )
   end
 
-  Struct.new("OutcomeLink", :id, :content_id, :associated_asset_id, :context_id, :context_type, :workflow_state)
+  OutcomeLink = Struct.new(:id, :content_id, :associated_asset_id, :context_id, :context_type, :workflow_state)
 
   def self.bulk_link_outcome(outcome, groups, root_account_id:)
     groups = groups.preload(:learning_outcome_group, :context)
@@ -118,7 +118,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
     tags = ContentTag.insert_all(new_tags, returning: %w[id content_id associated_asset_id context_id context_type workflow_state])
 
     tags.rows.each do |tag|
-      link = Struct::OutcomeLink.new(tag[0], tag[1], tag[2], tag[3], tag[4], tag[5])
+      link = OutcomeLink.new(tag[0], tag[1], tag[2], tag[3], tag[4], tag[5])
       Canvas::LiveEvents.learning_outcome_link_created(link)
     rescue => e
       Canvas::Errors.capture_exception(:learning_outcome_link_creation, e, :error)

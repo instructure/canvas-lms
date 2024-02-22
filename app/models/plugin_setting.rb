@@ -31,7 +31,7 @@
 class PluginSetting < ActiveRecord::Base
   validates :name, uniqueness: { if: :validate_uniqueness_of_name? }
   before_save :validate_posted_settings
-  serialize :settings
+  serialize :settings, yaml: { permitted_classes: [Symbol, Class] }
   attr_accessor :posted_settings
 
   attr_writer :plugin
