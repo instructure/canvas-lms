@@ -641,7 +641,6 @@ describe GradebooksController do
                                                                          "context_name" => @course.name,
                                                                          "data" => data,
                                                                          "permissions" => { "manage" => false },
-                                                                         "assessed_assignment" => false,
                                                                          "points_based" => grading_standard.points_based,
                                                                          "scaling_factor" => grading_standard.scaling_factor,
                                                                          "workflow_state" => "active" })
@@ -660,7 +659,6 @@ describe GradebooksController do
                                                                          "context_name" => @course.name,
                                                                          "data" => [{ "name" => "A", "value" => 0.94 }, { "name" => "A-", "value" => 0.9 }, { "name" => "B+", "value" => 0.87 }, { "name" => "B", "value" => 0.84 }, { "name" => "B-", "value" => 0.8 }, { "name" => "C+", "value" => 0.77 }, { "name" => "C", "value" => 0.74 }, { "name" => "C-", "value" => 0.7 }, { "name" => "D+", "value" => 0.67 }, { "name" => "D", "value" => 0.64 }, { "name" => "D-", "value" => 0.61 }, { "name" => "F", "value" => 0.0 }],
                                                                          "permissions" => { "manage" => false },
-                                                                         "assessed_assignment" => false,
                                                                          "points_based" => false,
                                                                          "scaling_factor" => 1.0,
                                                                          "workflow_state" => nil })
@@ -694,7 +692,6 @@ describe GradebooksController do
                                                                          "context_name" => @course.name,
                                                                          "data" => [{ "name" => "A", "value" => 0.94 }, { "name" => "A-", "value" => 0.9 }, { "name" => "B+", "value" => 0.87 }, { "name" => "B", "value" => 0.84 }, { "name" => "B-", "value" => 0.8 }, { "name" => "C+", "value" => 0.77 }, { "name" => "C", "value" => 0.74 }, { "name" => "C-", "value" => 0.7 }, { "name" => "D+", "value" => 0.67 }, { "name" => "D", "value" => 0.64 }, { "name" => "D-", "value" => 0.61 }, { "name" => "F", "value" => 0.0 }],
                                                                          "permissions" => { "manage" => false },
-                                                                         "assessed_assignment" => false,
                                                                          "points_based" => false,
                                                                          "scaling_factor" => 1.0,
                                                                          "workflow_state" => nil })

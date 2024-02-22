@@ -133,16 +133,13 @@ export default function FilterNav({
     onToggleDateModal: () => setIsDateModalOpen(true),
   })
   let activeFilters = appliedFilters.filter(isFilterNotEmpty)
+  const filterCounts: Record<string, number> = {}
   if (multiselectGradebookFiltersEnabled) {
-    // remove duplicate type filters
-    const seenTypes: string[] = []
+    // remove duplicate type filters and count number for each filter type
     activeFilters = activeFilters.filter(filter => {
       const type = getFilterKey(filter)
-      if (seenTypes.includes(type)) {
-        return false
-      }
-      seenTypes.push(type)
-      return true
+      filterCounts[type] = (filterCounts[type] || 0) + 1
+      return filterCounts[type] === 1
     })
   }
   const activeFilterComponents = activeFilters.map((filter, i) => {
@@ -160,9 +157,9 @@ export default function FilterNav({
     const selectedFilterItem = filterItems[filterKey]
     const menuItems = selectedFilterItem?.items ?? []
     const menuGroups = selectedFilterItem?.itemGroups ?? []
-    const selectedMenuItems = menuItems.filter(item => item.isSelected)
-    if (multiselectGradebookFiltersEnabled && selectedMenuItems.length > 1) {
-      label = `${selectedFilterItem?.name} (${selectedMenuItems.length})`
+    const numFiltersSelected = filterCounts[filterKey] || 0
+    if (multiselectGradebookFiltersEnabled && numFiltersSelected > 1) {
+      label = `${selectedFilterItem?.name} (${numFiltersSelected})`
     }
 
     const handleDeleteFilterClick = () => {
@@ -183,11 +180,10 @@ export default function FilterNav({
     const handleSelectFilterClick = () => {
       if (filter.type === 'start-date' || filter.type === 'end-date') {
         setIsDateModalOpen(true)
-      } else {
-        setAnnouncement(I18n.t('Added %{filterName} Filter', {filterName: label}))
+        return
       }
+      setAnnouncement(I18n.t('Added %{filterName} Filter', {filterName: label}))
     }
-
     const handlePopoverClick = () => {
       if (openFilterKey !== filterKey) {
         setIsFilterNavPopoverOpen(true)
