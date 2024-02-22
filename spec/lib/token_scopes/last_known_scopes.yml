@@ -1691,6 +1691,8 @@
   path: "/api/v1/users/:user_id/content_exports/:id"
 - verb: PUT
   path: "/api/v1/users/:user_id/content_exports/:id/fail"
+- verb: PUT
+  path: "/api/v1/courses/:course_id/content_exports/:id"
 - verb: GET
   path: "/api/v1/courses/:course_id/content_list"
 - verb: GET
