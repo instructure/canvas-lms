@@ -65,6 +65,7 @@ export const DiscussionTopicToolbarContainer = props => {
         <h1>{props.discussionTopic.title}</h1>
       </ScreenReaderContent>
       <DiscussionPostToolbar
+        isAdmin={props.discussionTopic.permissions.readAsAdmin}
         childTopics={getGroupsMenuTopics()}
         selectedView={filter}
         sortDirection={sort}
