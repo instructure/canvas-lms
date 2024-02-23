@@ -53,7 +53,7 @@ export function generateIcon(role: string | null) {
   }
 }
 
-export function generateTooltip(enrollmentType: EnrollmentType, name: string): JSX.Element {
+export function generateTooltipText(enrollmentType: EnrollmentType, name: string): string {
   let message
   switch (enrollmentType) {
     case PROVIDER:
@@ -65,11 +65,7 @@ export function generateTooltip(enrollmentType: EnrollmentType, name: string): J
     default:
       message = I18n.t('Create Temporary Enrollment Pairing for %{name}', {name})
   }
-  return (
-    <View as="div" textAlign="center" maxWidth={TOOLTIP_MAX_WIDTH}>
-      <Text size="small">{message}</Text>
-    </View>
-  )
+  return message
 }
 
 interface Props {
@@ -135,7 +131,12 @@ export default function TempEnrollUsersListRow(props: Props) {
     editModeStatus: boolean,
     toggleOrSetEditModeFunction: () => boolean | void
   ): JSX.Element {
-    const tooltipText: JSX.Element = generateTooltip(enrollmentType, props.user.name)
+    const tooltipText = generateTooltipText(enrollmentType, props.user.name)
+    const tooltipJsx = (
+      <View as="div" textAlign="center" maxWidth={TOOLTIP_MAX_WIDTH}>
+        <Text size="small">{tooltipText}</Text>
+      </View>
+    )
 
     return (
       <TempEnrollModal
@@ -148,7 +149,7 @@ export default function TempEnrollUsersListRow(props: Props) {
         onToggleEditMode={toggleOrSetEditModeFunction}
         tempEnrollPermissions={tempEnrollPermissions}
       >
-        <Tooltip data-testid="user-list-row-tooltip" renderTip={tooltipText}>
+        <Tooltip data-testid="user-list-row-tooltip" renderTip={tooltipJsx}>
           <IconButton
             {...analyticProps(icon.type.displayName)}
             withBorder={false}
@@ -198,6 +199,9 @@ export default function TempEnrollUsersListRow(props: Props) {
         </>
       )
     }
+    // default return statement to ensure a value is always returned
+    return null
   }
-  return renderTempEnrollIcon()
+  // ensure the component always returns a valid JSX element or null
+  return renderTempEnrollIcon() || null
 }
