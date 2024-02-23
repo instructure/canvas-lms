@@ -126,6 +126,9 @@ class ContextModulesController < ApplicationController
         module_file_details = load_module_file_details
       end
 
+      @allow_menu_tools = @context.grants_any_right?(@current_user, session, :manage_content, :manage_course_content_add) &&
+                          (@menu_tools[:module_index_menu].present? || @menu_tools[:module_index_menu_modal].present?)
+
       hash = {
         course_id: @context.id,
         CONTEXT_URL_ROOT: polymorphic_path([@context]),

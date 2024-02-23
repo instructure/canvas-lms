@@ -34,8 +34,7 @@ import vddTooltipView from '../jst/_vddTooltip.handlebars'
 import Publishable from '../backbone/models/Publishable'
 import PublishButtonView from '@canvas/publish-button-view'
 import htmlEscape from '@instructure/html-escape'
-import ContentTypeExternalToolTray from '@canvas/trays/react/ContentTypeExternalToolTray'
-import {monitorLtiMessages, ltiState} from '@canvas/lti/jquery/messages'
+import {monitorLtiMessages} from '@canvas/lti/jquery/messages'
 import get from 'lodash/get'
 import axios from '@canvas/axios'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
@@ -55,8 +54,6 @@ import 'jqueryui/sortable'
 import '@canvas/rails-flash-notifications'
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
 import DirectShareUserModal from '@canvas/direct-sharing/react/components/DirectShareUserModal'
-import {addDeepLinkingListener} from '@canvas/deep-linking/DeepLinking'
-import ExternalToolModalLauncher from '@canvas/external-tools/react/components/ExternalToolModalLauncher'
 import {
   initPublishButton,
   onContainerOverlapped,
@@ -65,7 +62,9 @@ import {
   refreshDuplicateLinkStatus,
   scrollTo,
   setExpandAllButton,
+  setExpandAllButtonHandler,
   updateProgressionState,
+  openExternalTool,
 } from './utils'
 import ContextModulesPublishMenu from '../react/ContextModulesPublishMenu'
 import {renderContextModulesPublishIcon} from '../utils/publishOneModuleHelper'
@@ -1327,11 +1326,13 @@ modules.initModuleManagement = function (duplicate) {
           modules.updateAssignmentData()
           // Without these 'off' commands, the event handler happens twice after
           // initModuleManagement is called.
-          $('.delete_module_link').off()
-          $('.duplicate_module_link').off()
-          $('.duplicate_item_link').off()
-          $('.add_module_link').off()
-          $('.edit_module_link').off()
+          $('.delete_module_link').die()
+          $('.duplicate_module_link').die()
+          $('.duplicate_item_link').die()
+          if (!ENV.FEATURES.instui_header) {
+            $('.add_module_link').die()
+          }
+          $('.edit_module_link').die()
           $('#context_modules').off('addFileToModule')
           $('#add_context_module_form .add_prerequisite_link').off()
           $('#add_context_module_form .add_completion_criterion_link').off()
@@ -1368,7 +1369,10 @@ modules.initModuleManagement = function (duplicate) {
             }
           })
           const $prevModule = $(this).prev()
-          const $addModuleButton = $('#content .header-bar .add_module_link')
+          const $addModuleButton = ENV.FEATURES.instui_header ? 
+            $('#context-modules-header-add-module-button') :
+            $('#content .header-bar .add_module_link')
+          
           const $toFocus = $prevModule.length
             ? $('.ig-header-admin .al-trigger', $prevModule)
             : $addModuleButton
@@ -1699,7 +1703,7 @@ modules.initModuleManagement = function (duplicate) {
     $(event.currentTarget).addClass('screenreader-only')
   })
 
-  $(document).on('click', '.add_module_link', event => {
+  const add_module_link_handler = (event) => {
     event.preventDefault()
     const addModuleCallback = (data, $moduleElement) =>
       addModuleElement(
@@ -1710,7 +1714,15 @@ modules.initModuleManagement = function (duplicate) {
         moduleItems
       )
     modules.addModule(addModuleCallback)
-  })
+  }
+
+  if (ENV.FEATURES.instui_header) {
+    setTimeout(() => { // export for react, use timer to avoid race conditions.
+      document.add_module_link_handler = add_module_link_handler
+    }, 300)
+  } else {
+    $(document).on('click', '.add_module_link', add_module_link_handler)
+  }
 
   // This allows ModuleFileDrop to create module items
   // once a file is uploaded. See ModuleFileDrop#handleDrop
@@ -2288,7 +2300,12 @@ $(document).ready(function () {
 
     // "n" opens up the Add Module form
     $document.keycodes('n', event => {
-      $('.add_module_link:visible:first').click()
+      if (ENV.FEATURES.instui_header) {
+        $('#context-modules-header-add-module-button:visible').click()
+      } else {
+        $('.add_module_link:visible:first').click()
+      }      
+
       event.preventDefault()
     })
 
@@ -2352,162 +2369,19 @@ $(document).ready(function () {
     updateProgressionState($(this))
   })
 
-  setExpandAllButton()
-
-  $('#expand_collapse_all').click(function () {
-    const shouldExpand = $(this).data('expand')
-
-    $(this).text(shouldExpand ? I18n.t('Collapse All') : I18n.t('Expand All'))
-    $(this).attr(
-      'aria-label',
-      shouldExpand ? I18n.t('Collapse All Modules') : I18n.t('Expand All Modules')
-    )
-    $(this).data('expand', !shouldExpand)
-    $(this).attr('aria-expanded', shouldExpand ? 'true' : 'false')
-
-    $('.context_module').each(function () {
-      const $module = $(this)
-      if (
-        (shouldExpand && $module.find('.content:visible').length === 0) ||
-        (!shouldExpand && $module.find('.content:visible').length > 0)
-      ) {
-        const callback = function () {
-          $module
-            .find('.collapse_module_link')
-            .css('display', shouldExpand ? 'inline-block' : 'none')
-          $module.find('.expand_module_link').css('display', shouldExpand ? 'none' : 'inline-block')
-          $module.find('.footer .manage_module').css('display', '')
-          $module.toggleClass('collapsed_module', shouldExpand)
-        }
-        $module.find('.content').slideToggle({
-          queue: false,
-          done: callback(),
-        })
-      }
-    })
-
-    const url = $(this).data('url')
-    const collapse = shouldExpand ? '0' : '1'
-    $.ajaxJSON(url, 'POST', {collapse})
-  })
-
-  function setExternalToolTray(tool, moduleData, placement = 'module_index_menu', returnFocusTo) {
-    const handleDismiss = () => {
-      setExternalToolTray(null)
-      returnFocusTo.focus()
-      if (ltiState?.tray?.refreshOnClose) {
-        window.location.reload()
-      }
-    }
-
-    ReactDOM.render(
-      <ContentTypeExternalToolTray
-        tool={tool}
-        placement={placement}
-        acceptedResourceTypes={[
-          'assignment',
-          'audio',
-          'discussion_topic',
-          'document',
-          'image',
-          'module',
-          'quiz',
-          'page',
-          'video',
-        ]}
-        targetResourceType="module"
-        allowItemSelection={placement === 'module_index_menu'}
-        selectableItems={moduleData}
-        onDismiss={handleDismiss}
-        open={tool !== null}
-      />,
-      $('#external-tool-mount-point')[0]
-    )
+  if (ENV.FEATURES.instui_header) {
+    setTimeout(() => {
+      setExpandAllButton()
+    }, 300)
+  }
+  else {
+    setExpandAllButton()
+    setExpandAllButtonHandler()
   }
 
-  function setExternalToolModal({
-    tool,
-    launchType,
-    returnFocusTo,
-    isOpen = true,
-    contextModuleId = null,
-  }) {
-    if (isOpen) {
-      addDeepLinkingListener(() => {
-        window.location.reload()
-      })
-    }
-
-    const handleDismiss = () => {
-      setExternalToolModal({tool, launchType, returnFocusTo, contextModuleId, isOpen: false})
-      returnFocusTo.focus()
-    }
-
-    ReactDOM.render(
-      <ExternalToolModalLauncher
-        tool={tool}
-        launchType={launchType}
-        isOpen={isOpen}
-        contextType="course"
-        contextId={parseInt(ENV.COURSE_ID, 10)}
-        title={tool.name}
-        onRequestClose={handleDismiss}
-        contextModuleId={contextModuleId}
-      />,
-      $('#external-tool-mount-point')[0]
-    )
+  if (!ENV.FEATURES.instui_header) {
+    $('.menu_tray_tool_link').click(openExternalTool)
   }
-
-  function findToolFromEvent(collection, idAttribute, event) {
-    return (collection || []).find(t => t[idAttribute] === event.target.dataset.toolId)
-  }
-
-  function openExternalTool(ev) {
-    if (ev != null) {
-      ev.preventDefault()
-    }
-    const launchType = ev.target.dataset.toolLaunchType
-    // modal placements use ExternalToolModalLauncher which expects a tool in the launch_definition format
-    const idAttribute = launchType.includes('modal') ? 'definition_id' : 'id'
-    const tool = findToolFromEvent(ENV.MODULE_TOOLS[launchType], idAttribute, ev)
-
-    const currentModule = $(ev.target).parents('.context_module')
-    const currentModuleId =
-      currentModule.length > 0 && currentModule.attr('id').substring('context_module_'.length)
-
-    if (launchType === 'module_index_menu_modal') {
-      setExternalToolModal({tool, launchType, returnFocusTo: $('.al-trigger')[0]})
-      return
-    }
-
-    if (launchType === 'module_menu_modal') {
-      setExternalToolModal({
-        tool,
-        launchType,
-        returnFocusTo: $('.al-trigger')[0],
-        contextModuleId: currentModuleId,
-      })
-      return
-    }
-
-    const moduleData = []
-    if (launchType === 'module_index_menu') {
-      // include all modules
-      moduleData.push({
-        course_id: ENV.COURSE_ID,
-        type: 'module',
-      })
-    } else if (launchType === 'module_group_menu') {
-      // just include the one module whose menu we're on
-      moduleData.push({
-        id: currentModuleId,
-        name: currentModule.find('.name').attr('title'),
-      })
-    }
-    setExternalToolTray(tool, moduleData, launchType, $('.al-trigger')[0])
-  }
-
-  $('.menu_tray_tool_link').click(openExternalTool)
   monitorLtiMessages()
 
   function renderCopyToTray(open, contentSelection, returnFocusTo) {

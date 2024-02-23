@@ -327,3 +327,14 @@ input.move-module-label-spacer {
     border: none;
   }
 }
+
+.context-modules-header-publish-menu-responsive button,
+  .context-modules-header-more-menu-responsive button {
+    display: block;
+    width: 100% !important;
+  }
+
+  #context-modules-header-view-progress-button,
+  #context-modules-header-export-course-button {
+    text-decoration: none;
+  }
