@@ -70,31 +70,15 @@ describe('DateAdjustment', () => {
       <DateAdjustments dateAdjustments={dateAdjustments} setDateAdjustments={setDateAdjustments} />
     )
     await userEvent.click(screen.getByRole('radio', {name: 'Shift dates', hidden: false}))
-    expect(
-      screen.getByRole('combobox', {name: 'Select original beginning date', hidden: false})
-    ).toBeInTheDocument()
-    expect(
-      screen.getByRole('combobox', {name: 'Select new beginning date', hidden: false})
-    ).toBeInTheDocument()
-    expect(
-      screen.getByRole('combobox', {name: 'Select original end date', hidden: false})
-    ).toBeInTheDocument()
-    expect(
-      screen.getByRole('combobox', {name: 'Select new end date', hidden: false})
-    ).toBeInTheDocument()
+    expect(screen.getByLabelText('Select original beginning date')).toBeInTheDocument()
+    expect(screen.getByLabelText('Select new beginning date')).toBeInTheDocument()
+    expect(screen.getByLabelText('Select original end date')).toBeInTheDocument()
+    expect(screen.getByLabelText('Select new end date')).toBeInTheDocument()
     await userEvent.click(screen.getByRole('radio', {name: 'Remove dates', hidden: false}))
-    expect(
-      screen.queryByRole('combobox', {name: 'Select original beginning date', hidden: false})
-    ).not.toBeInTheDocument()
-    expect(
-      screen.queryByRole('combobox', {name: 'Select new beginning date', hidden: false})
-    ).not.toBeInTheDocument()
-    expect(
-      screen.queryByRole('combobox', {name: 'Select original end date', hidden: false})
-    ).not.toBeInTheDocument()
-    expect(
-      screen.queryByRole('combobox', {name: 'Select new end date', hidden: false})
-    ).not.toBeInTheDocument()
+    expect(screen.queryByLabelText('Select original beginning date')).not.toBeInTheDocument()
+    expect(screen.queryByLabelText('Select new beginning date')).not.toBeInTheDocument()
+    expect(screen.queryByLabelText('Select original end date')).not.toBeInTheDocument()
+    expect(screen.queryByLabelText('Select new end date')).not.toBeInTheDocument()
   })
 
   it('Allows adding multiple weekday substitutions', async () => {
