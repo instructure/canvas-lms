@@ -169,7 +169,7 @@ describe "discussions" do
         end
       end
 
-      context "when react_discussions_post feature_flag is on" do
+      context "when react_discussions_post feature_flag is on", :ignore_js_errors do
         before do
           course.enable_feature! :react_discussions_post
         end

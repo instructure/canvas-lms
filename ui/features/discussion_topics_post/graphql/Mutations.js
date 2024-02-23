@@ -54,16 +54,9 @@ export const UPDATE_DISCUSSION_ENTRY_PARTICIPANT = gql`
     ) {
       discussionEntry {
         ...DiscussionEntry
-        editor {
-          ...User
-        }
-        author {
-          ...User
-        }
       }
     }
   }
-  ${User.fragment}
   ${DiscussionEntry.fragment}
 `
 export const DELETE_DISCUSSION_ENTRY = gql`
@@ -71,19 +64,12 @@ export const DELETE_DISCUSSION_ENTRY = gql`
     deleteDiscussionEntry(input: {id: $id}) {
       discussionEntry {
         ...DiscussionEntry
-        editor {
-          ...User
-        }
-        author {
-          ...User
-        }
       }
       errors {
         ...Error
       }
     }
   }
-  ${User.fragment}
   ${DiscussionEntry.fragment}
   ${Error.fragment}
 `
@@ -94,16 +80,9 @@ export const UPDATE_DISCUSSION_TOPIC = gql`
     ) {
       discussionTopic {
         ...Discussion
-        editor {
-          ...User
-        }
-        author {
-          ...User
-        }
       }
     }
   }
-  ${User.fragment}
   ${Discussion.fragment}
 `
 export const SUBSCRIBE_TO_DISCUSSION_TOPIC = gql`
@@ -113,16 +92,9 @@ export const SUBSCRIBE_TO_DISCUSSION_TOPIC = gql`
     ) {
       discussionTopic {
         ...Discussion
-        editor {
-          ...User
-        }
-        author {
-          ...User
-        }
       }
     }
   }
-  ${User.fragment}
   ${Discussion.fragment}
 `
 
@@ -133,7 +105,6 @@ export const CREATE_DISCUSSION_ENTRY = gql`
     $parentEntryId: ID
     $fileId: ID
     $isAnonymousAuthor: Boolean
-    $courseID: String
     $quotedEntryId: ID
   ) {
     createDiscussionEntry(
@@ -148,12 +119,6 @@ export const CREATE_DISCUSSION_ENTRY = gql`
     ) {
       discussionEntry {
         ...DiscussionEntry
-        editor(courseId: $courseID) {
-          ...User
-        }
-        author(courseId: $courseID) {
-          ...User
-        }
         anonymousAuthor {
           ...AnonymousUser
         }
@@ -164,7 +129,6 @@ export const CREATE_DISCUSSION_ENTRY = gql`
     }
   }
   ${AnonymousUser.fragment}
-  ${User.fragment}
   ${DiscussionEntry.fragment}
   ${Error.fragment}
 `
@@ -186,19 +150,12 @@ export const UPDATE_DISCUSSION_ENTRY = gql`
     ) {
       discussionEntry {
         ...DiscussionEntry
-        editor {
-          ...User
-        }
-        author {
-          ...User
-        }
       }
       errors {
         ...Error
       }
     }
   }
-  ${User.fragment}
   ${DiscussionEntry.fragment}
   ${Error.fragment}
 `
@@ -210,16 +167,9 @@ export const UPDATE_DISCUSSION_ENTRIES_READ_STATE = gql`
     ) {
       discussionEntries {
         ...DiscussionEntry
-        editor {
-          ...User
-        }
-        author {
-          ...User
-        }
       }
     }
   }
-  ${User.fragment}
   ${DiscussionEntry.fragment}
 `
 

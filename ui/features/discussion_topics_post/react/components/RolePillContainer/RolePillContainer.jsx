@@ -30,7 +30,11 @@ const I18n = useI18nScope('discussion_posts')
 const ROLE_HIERARCHY = ['Author', 'TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment']
 
 export function RolePillContainer({...props}) {
-  const baseRolesToDisplay = sortDiscussionRoles(props.discussionRoles)
+  // Filter out roles that aren't found in the role hierarchy
+  const filteredRoles = props.discussionRoles
+    ? props.discussionRoles.filter(role => ROLE_HIERARCHY.includes(role))
+    : []
+  const baseRolesToDisplay = sortDiscussionRoles(filteredRoles)
   const hasMultipleRoles = baseRolesToDisplay?.length > 1
   return (
     <Responsive
@@ -92,7 +96,7 @@ function roleName(baseRole) {
     },
   }
 
-  return types[baseRole] || baseRole
+  return types[baseRole]
 }
 
 function sortDiscussionRoles(roleNameArray) {
