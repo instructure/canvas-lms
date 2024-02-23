@@ -69,9 +69,7 @@ if (!('require' in window)) {
         'JavaScript that uses it continues to work.'
     )
     if (deps.includes('jquery')) {
-      console.error(
-        "You don't need to `require(['jquery...`, just use the global `$` variable directly."
-      )
+      console.error("Support for require('jquery') is deprecated and will be removed.")
       captureException(new Error('require("jquery")'))
     }
     Promise.all(deps.map(getModule)).then(modules => {
