@@ -41,12 +41,10 @@ import {AnonymousUser} from './AnonymousUser'
 
 /* Query Mocks */
 export const getDiscussionQueryMock = ({
-  courseID = '1',
   discussionID = 'Discussion-default-mock',
   filter = 'all',
   page = 'MA==',
   perPage = 20,
-  rolePillTypes = ['TaEnrollment', 'TeacherEnrollment', 'DesignerEnrollment'],
   rootEntries = true,
   searchTerm = '',
   sort = 'desc',
@@ -58,12 +56,10 @@ export const getDiscussionQueryMock = ({
     request: {
       query: DISCUSSION_QUERY,
       variables: {
-        courseID,
         discussionID,
         filter,
         page,
         perPage,
-        rolePillTypes,
         rootEntries,
         searchTerm,
         sort,
@@ -136,12 +132,10 @@ export const getDiscussionQueryMock = ({
 ]
 
 export const getAnonymousDiscussionQueryMock = ({
-  courseID = '1',
   discussionID = 'Discussion-default-mock',
   filter = 'all',
   page = 'MA==',
   perPage = 20,
-  rolePillTypes = ['TaEnrollment', 'TeacherEnrollment', 'DesignerEnrollment'],
   rootEntries = true,
   searchTerm = '',
   sort = 'desc',
@@ -152,12 +146,10 @@ export const getAnonymousDiscussionQueryMock = ({
     request: {
       query: DISCUSSION_QUERY,
       variables: {
-        courseID,
         discussionID,
         filter,
         page,
         perPage,
-        rolePillTypes,
         rootEntries,
         searchTerm,
         sort,
@@ -197,13 +189,11 @@ export const getDiscussionSubentriesQueryMock = ({
   after = null,
   before = null,
   beforeRelativeEntry = null,
-  courseID = '1',
   discussionEntryID = 'DiscussionEntry-default-mock',
   first = null,
   includeRelativeEntry = null,
   last = null,
   relativeEntryId = null,
-  rolePillTypes = ['TaEnrollment', 'TeacherEnrollment', 'DesignerEnrollment'],
   sort = 'asc',
   shouldError = false,
 } = {}) => [
@@ -214,13 +204,11 @@ export const getDiscussionSubentriesQueryMock = ({
         ...(after !== null && {after}),
         ...(before !== null && {before}),
         ...(beforeRelativeEntry !== null && {beforeRelativeEntry}),
-        courseID,
         discussionEntryID,
         ...(first !== null && {first}),
         ...(includeRelativeEntry !== null && {includeRelativeEntry}),
         ...(last !== null && {last}),
         ...(relativeEntryId !== null && {relativeEntryId}),
-        ...(rolePillTypes !== null && {rolePillTypes}),
         sort,
       },
     },
@@ -291,18 +279,14 @@ export const getDiscussionSubentriesQueryMock = ({
 ]
 
 export const getDiscussionEntryAllRootEntriesQueryMock = ({
-  courseID = '1',
   discussionEntryID = 'DiscussionEntry-default-mock',
-  rolePillTypes = ['TaEnrollment', 'TeacherEnrollment', 'DesignerEnrollment'],
   shouldError = false,
 } = {}) => [
   {
     request: {
       query: DISCUSSION_ENTRY_ALL_ROOT_ENTRIES_QUERY,
       variables: {
-        courseID,
         discussionEntryID,
-        ...(rolePillTypes !== null && {rolePillTypes}),
       },
     },
     result: {
@@ -457,7 +441,6 @@ export const createDiscussionEntryMock = ({
   parentEntryId = null,
   fileId = null,
   isAnonymousAuthor = false,
-  courseID = '1',
   quotedEntryId = undefined,
 } = {}) => [
   {
@@ -469,7 +452,6 @@ export const createDiscussionEntryMock = ({
         isAnonymousAuthor,
         ...(parentEntryId !== null && {parentEntryId}),
         ...(fileId !== null && {fileId}),
-        ...(courseID !== null && {courseID}),
         ...(quotedEntryId !== undefined && {quotedEntryId}),
       },
     },
