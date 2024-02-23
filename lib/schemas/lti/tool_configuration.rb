@@ -46,32 +46,6 @@ module Schemas::Lti
         }.freeze,
       }.freeze
 
-    SUBMISSION_LAUNCH_POINTS_SCHEMA =
-      {
-        "type" => "array",
-        "items" => {
-          "type" => "object",
-          "required" => %w[target_link_uri].freeze,
-          "additionalProperties" => false,
-          "properties" => {
-            "target_link_uri" => {
-              "type" => "string",
-              "format" => "uri"
-            }.freeze,
-            "title" => {
-              "type" => "string"
-            }.freeze,
-            "icon_url" => {
-              "type" => "string",
-              "format" => "uri"
-            }.freeze,
-            "description" => {
-              "type" => "string"
-            }.freeze
-          }
-        }
-      }.freeze
-
     SCHEMA = {
       "type" => "object",
       "required" => [
@@ -159,9 +133,13 @@ module Schemas::Lti
                             "placement" => {
                               "type" => "string",
                               "pattern" => "^submission_type_selection$"
-                            },
+                            }.freeze,
+                            "description" => {
+                              "type" => "string",
+                              "maxLength" => 255,
+                              "errorMessage" => "description must be a string with a maximum length of 255 characters"
+                            }.freeze,
                             **LAUNCH_INFO_SCHEMA,
-                            "submission_type_selection_launch_points" => SUBMISSION_LAUNCH_POINTS_SCHEMA
                           }.freeze
                         }.freeze
                       ].freeze }.freeze

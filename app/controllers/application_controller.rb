@@ -530,8 +530,8 @@ class ApplicationController < ActionController::Base
     end
     hash[:base_title] = tool.default_label(I18n.locale) if custom_settings.include?(:base_title)
     hash[:external_url] = tool.url if custom_settings.include?(:external_url)
-    if type == :submission_type_selection && tool.submission_type_selection[:submission_type_selection_launch_points].present?
-      hash[:submission_type_selection_launch_points] = tool.submission_type_selection[:submission_type_selection_launch_points]
+    if type == :submission_type_selection && tool.submission_type_selection[:description].present?
+      hash[:description] = tool.submission_type_selection[:description]
     end
 
     hash

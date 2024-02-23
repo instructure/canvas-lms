@@ -2297,26 +2297,19 @@ describe AssignmentsController do
           )
         end
 
-        context "the tool includes a submission_type_selection_launch_points" do
-          let(:launch_point) do
-            {
-              "target_link_uri" => "https://example.com/launch?placement=submission_type_selection",
-              "title" => "Launch",
-              "description" => "Launch the tool",
-              "icon_url" => "https://example.com/icon.png",
-            }
-          end
+        context "the tool includes a description propery" do
+          let(:description) { "This is a description" }
           let(:tool_settings) do
-            super().tap do |options|
-              options[:submission_type_selection_launch_points] = [launch_point]
-            end
+            res = super()
+            res[:description] = description
+            res
           end
 
           it "includes the launch points" do
             tool
             subject
             expect(assigns[:js_env][:SUBMISSION_TYPE_SELECTION_TOOLS][0])
-              .to include(submission_type_selection_launch_points: [launch_point])
+              .to include(description:)
           end
         end
       end
