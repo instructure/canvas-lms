@@ -1200,13 +1200,6 @@ class AccountsController < ApplicationController
           @account.trusted_referers = trusted_referers
         end
 
-        # privacy settings
-        unless @account.grants_right?(@current_user, :manage_privacy_settings)
-          %w[enable_fullstory].each do |setting|
-            params[:account][:settings].try(:delete, setting)
-          end
-        end
-
         # don't accidentally turn the default help link name into a custom one and thereby break i18n
         help_link_name = params.dig(:account, :settings, :help_link_name)
         params[:account][:settings][:help_link_name] = nil if help_link_name == default_help_link_name
@@ -1932,7 +1925,6 @@ class AccountsController < ApplicationController
                                    :default_dashboard_view,
                                    :force_default_dashboard_view,
                                    :smart_alerts_threshold,
-                                   :enable_fullstory,
                                    :enable_push_notifications,
                                    :teachers_can_create_courses_anywhere,
                                    :students_can_create_courses_anywhere,
