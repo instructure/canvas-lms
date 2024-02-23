@@ -23,4 +23,5 @@ ActiveRecord::Base.singleton_class.include(AdheresToPolicy::ClassMethods)
 
 AdheresToPolicy.configure do |config|
   config.cache_related_permissions = false
+  config.blacklist = ["discussion_entry.reply"]
 end
