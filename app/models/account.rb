@@ -894,6 +894,7 @@ class Account < ActiveRecord::Base
         role_scope = role_scope.where(:account_id => self.account_chain.map(&:id))
       end
 
+      role_scope = role_scope.order("workflow_state ASC") # active before inactive
       role_scope.first
     end
   end
