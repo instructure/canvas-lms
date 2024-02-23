@@ -60,7 +60,9 @@ describe Types::DiscussionEntryType do
     expect(type.resolve("ratingCount")).to eq parent_entry.rating_count
     expect(type.resolve("deleted")).to eq parent_entry.deleted?
     expect(type.resolve("author { _id }")).to eq parent_entry.user_id.to_s
+    expect(type.resolve("author { courseRoles }")).to eq ["TeacherEnrollment"]
     expect(type.resolve("editor { _id }")).to eq parent_entry.editor_id.to_s
+    expect(type.resolve("editor { courseRoles }")).to eq ["TeacherEnrollment"]
     expect(type.resolve("discussionTopic { _id }")).to eq parent_entry.discussion_topic.id.to_s
     expect(type.resolve("depth")).to eq parent_entry.depth
   end
