@@ -215,6 +215,7 @@ export type SiteAdminFeatureId =
   | 'permanent_page_links'
   | 'platform_service_speedgrader'
   | 'render_both_to_do_lists'
+  | 'instui_header'
 
 /**
  * From ApplicationController#JS_ENV_ROOT_ACCOUNT_FEATURES
