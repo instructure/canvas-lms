@@ -77,6 +77,9 @@ module Types
     end
     def author(course_id: nil, role_types: nil, built_in_only: false)
       load_association(:discussion_topic).then do |topic|
+        course_id = topic&.course&.id if course_id.nil?
+        # Set the graphql context so it can be used downstream
+        context[:course_id] = course_id
         if topic.anonymous? && object.is_anonymous_author
           nil
         else
@@ -84,7 +87,6 @@ module Types
             if !topic.anonymous? || !user
               user
             else
-              course_id = topic.course.id if course_id.nil?
               Loaders::CourseRoleLoader.for(course_id:, role_types:, built_in_only:).load(user).then do |roles|
                 if roles&.include?("TeacherEnrollment") || roles&.include?("TaEnrollment") || roles&.include?("DesignerEnrollment") || (topic.anonymous_state == "partial_anonymity" && !object.is_anonymous_author)
                   user
@@ -127,6 +129,9 @@ module Types
     end
     def editor(course_id: nil, role_types: nil, built_in_only: false)
       load_association(:discussion_topic).then do |topic|
+        course_id = topic&.course&.id if course_id.nil?
+        # Set the graphql context so it can be used downstream
+        context[:course_id] = course_id
         if topic.anonymous? && !course_id
           nil
         else
