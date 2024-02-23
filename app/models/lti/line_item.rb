@@ -58,11 +58,9 @@ class Lti::LineItem < ApplicationRecord
     assignment.line_items.order(:created_at).first.id == id
   end
 
-  alias_method :original_undestroy, :undestroy
-  private :original_undestroy
   def undestroy
     results.find_each(&:undestroy)
-    original_undestroy
+    super
   end
 
   def launch_url_extension

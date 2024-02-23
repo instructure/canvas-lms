@@ -17,28 +17,34 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-module Canvas::SoftDeletable
-  extend ActiveSupport::Concern
+module Canvas
+  module SoftDeletable
+    include Switchman::CallSuper
 
-  included do
-    include Workflow
+    def self.included(klass)
+      super
 
-    workflow do
-      state :active
-      state :deleted
+      klass.include Workflow
+
+      klass.workflow do
+        state :active
+        state :deleted
+      end
+
+      klass.scope :active, -> { where workflow_state: "active" }
     end
 
-    scope :active, -> { where workflow_state: "active" }
-
-    # save the previous definition of `destroy` and alias it to `destroy_permanently!`
-    # Note: `destroy_permanently!` now does NOT throw errors while the newly defined
+    # NOTE: `destroy_permanently!` now does NOT throw errors while
     # `destroy` DOES throw errors due to `save!`
-    alias_method :destroy_permanently!, :destroy
     def destroy
       return true if deleted?
 
       self.workflow_state = "deleted"
       run_callbacks(:destroy) { save! }
+    end
+
+    def destroy_permanently!
+      call_super(:destroy, SoftDeletable)
     end
 
     # `restore` was taken by too many other methods...
