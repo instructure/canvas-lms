@@ -32,6 +32,7 @@ describe('CommonMigratorControls', () => {
   beforeAll(() => {
     window.ENV.QUIZZES_NEXT_ENABLED = true
     window.ENV.NEW_QUIZZES_MIGRATION_DEFAULT = false
+    window.ENV.SHOW_BP_SETTINGS_IMPORT_OPTION = true
   })
 
   afterEach(() => jest.clearAllMocks())
@@ -93,6 +94,22 @@ describe('CommonMigratorControls', () => {
     await userEvent.click(screen.getByRole('button', {name: 'Add to Import Queue'}))
 
     expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({selective_import: true}))
+  })
+
+  it('calls onSubmit with import_blueprint_settings', async () => {
+    renderComponent({canSelectContent: true, canImportBPSettings: true})
+
+    await userEvent.click(screen.getByRole('radio', {name: 'All content'}))
+    await userEvent.click(
+      await screen.getByRole('checkbox', {name: 'Import Blueprint Course settings'})
+    )
+    await userEvent.click(screen.getByRole('button', {name: 'Add to Import Queue'}))
+
+    expect(onSubmit).toHaveBeenCalledWith(
+      expect.objectContaining({
+        settings: expect.objectContaining({import_blueprint_settings: true}),
+      })
+    )
   })
 
   it('calls onSubmit with all data', async () => {
