@@ -119,7 +119,7 @@ li[id$=service_google_docs] {
     visibility: hidden;
   }
 
-  &:hover .icon-edit {
+  &:hover .icon-edit, &:focus .icon-edit {
     visibility: visible;
   }
 }
