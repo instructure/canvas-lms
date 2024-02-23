@@ -19,8 +19,6 @@
 
 module Lti::IMS::Concerns
   module DeepLinkingModules
-    extend ActiveSupport::Concern
-
     CREATE_NEW_MODULE_PLACEMENTS = %w[course_assignments_menu module_index_menu_modal].freeze
     ALLOW_LINE_ITEM_PLACEMENTS = %w[course_assignments_menu module_index_menu_modal assignment_selection link_selection module_menu_modal].freeze
 

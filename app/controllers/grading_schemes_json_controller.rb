@@ -19,7 +19,7 @@
 #
 
 class GradingSchemesJsonController < ApplicationController
-  include GradingSchemeSerializer
+  extend GradingSchemeSerializer::ClassMethods
 
   GRADING_SCHEMES_LIMIT = 100
   USED_LOCATIONS_PER_PAGE = 100

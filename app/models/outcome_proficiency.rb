@@ -45,20 +45,16 @@ class OutcomeProficiency < ApplicationRecord
   after_save :clear_cached_proficiencies
   after_save :propagate_changes_to_rubrics
 
-  alias_method :original_destroy_permanently!, :destroy_permanently!
-  private :original_destroy_permanently!
   def destroy_permanently!
     outcome_proficiency_ratings.delete_all
-    original_destroy_permanently!
+    super
   end
 
-  alias_method :original_undestroy, :undestroy
-  private :original_undestroy
   def undestroy
     transaction do
       OutcomeProficiencyRating.where(outcome_proficiency: self).update_all(workflow_state: "active", updated_at: Time.zone.now.utc)
       reload
-      original_undestroy
+      super
     end
   end
 

@@ -18,12 +18,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module K5Mode
-  extend ActiveSupport::Concern
-
   K5_JS_BUNDLE = [:k5_theme, nil, false].freeze
 
-  included do
-    set_callback :html_render, :before, :set_k5_mode
+  def self.included(klass)
+    super
+
+    klass.set_callback :html_render, :before, :set_k5_mode
   end
 
   private

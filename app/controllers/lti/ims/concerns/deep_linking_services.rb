@@ -19,8 +19,6 @@
 
 module Lti::IMS::Concerns
   module DeepLinkingServices
-    extend ActiveSupport::Concern
-
     CLAIM_PREFIX = "https://purl.imsglobal.org/spec/lti-dl/claim/"
 
     def return_url_parameters
