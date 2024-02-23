@@ -931,38 +931,6 @@ describe "Accounts API", type: :request do
       end
     end
 
-    describe "privacy settings" do
-      let(:account) { @a1 }
-      let(:site_admin) { site_admin_user }
-      let(:payload) do
-        {
-          account: {
-            settings: {
-              enable_fullstory: false,
-            }
-          }
-        }
-      end
-
-      it "ignores changes made through the API" do
-        user_session(site_admin)
-
-        expect do
-          api_call(:put,
-                   "/api/v1/accounts/#{account.to_param}",
-                   {
-                     controller: "accounts",
-                     action: "update",
-                     id: account.to_param,
-                     format: "json"
-                   },
-                   payload)
-        end.to change { response&.status }.to(200).and not_change {
-          account.reload.settings.fetch(:enable_fullstory, true)
-        }
-      end
-    end
-
     context "with course_template_id" do
       before do
         @a2.root_account.enable_feature!(:course_templates)

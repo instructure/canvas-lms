@@ -374,9 +374,6 @@ class Account < ActiveRecord::Base
 
   add_setting :disable_post_to_sis_when_grading_period_closed, boolean: true, root_only: true, default: false
 
-  # privacy settings for root accounts
-  add_setting :enable_fullstory, boolean: true, root_only: true, default: true
-
   add_setting :rce_favorite_tool_ids, inheritable: true
 
   add_setting :enable_as_k5_account, boolean: true, default: false, inheritable: true
@@ -1483,9 +1480,6 @@ class Account < ActiveRecord::Base
     # any user with an admin enrollment in one of the courses can read
     given { |user| !site_admin? && user && courses.where(id: user.enrollments.active.admin.pluck(:course_id)).exists? }
     can [:read, :read_files]
-
-    given { |user| !site_admin? && primary_settings_root_account? && grants_right?(user, :manage_site_settings) }
-    can :manage_privacy_settings
 
     given do |user|
       root_account? && grants_right?(user, :read_roster) &&

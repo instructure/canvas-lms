@@ -17,7 +17,6 @@
   },
   "dependencies": {
     "@apollo/client": "^3.4.16",
-    "@fullstory/browser": "^1.4.10",
     "@instructure/brandable_css": "^3",
     "@instructure/canvas-media": "*",
     "@instructure/debounce": "^8",

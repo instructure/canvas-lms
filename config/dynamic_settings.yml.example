@@ -63,9 +63,6 @@ development:
         app-host: "http://rce.canvas.docker:3000"
       common_cartridge_viewer:
         base_url: "http://localhost:3300"
-      fullstory:
-        sampling_rate: '0.0' # randomly inject this fraction of the time
-        app_key: 'xyzzy'
     # another service
     pandata:
       ios-pandata-key: IOS_pandata_key
