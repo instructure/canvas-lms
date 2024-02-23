@@ -24,8 +24,8 @@ describe "external tool assignments" do
 
   before do
     course_with_teacher_logged_in
-    @t1 = factory_with_protected_attributes(@course.context_external_tools, url: "http://www.justanexamplenotarealwebsite.com/tool1", shared_secret: "test123", consumer_key: "test123", name: "tool 1")
-    @t2 = factory_with_protected_attributes(@course.context_external_tools, url: "http://www.justanexamplenotarealwebsite.com/tool2", shared_secret: "test123", consumer_key: "test123", name: "tool 2")
+    @t1 = factory_with_protected_attributes(@course.context_external_tools, url: "http://www.justanexamplenotarealwebsite.com/tool1", domain: "justanexamplenotarealwebsite.com", shared_secret: "test123", consumer_key: "test123", name: "tool 1")
+    @t2 = factory_with_protected_attributes(@course.context_external_tools, url: "http://www.justanexamplenotarealwebsite.com/tool2", domain: "justanexamplenotarealwebsite.com", shared_secret: "test123", consumer_key: "test123", name: "tool 2")
   end
 
   it "allows creating through index", priority: "2" do
@@ -134,6 +134,11 @@ describe "external tool assignments" do
         tool.submission_type_selection = { text: "link to #{tool.name} or whatever" }
         tool.save!
       end
+      Setting.set("submission_type_selection_allowed_launch_domains", "justanexamplenotarealwebsite.com")
+    end
+
+    after do
+      Setting.remove("submission_type_selection_allowed_launch_domains")
     end
 
     it "is able to select the tool directly from the submission type drop-down" do

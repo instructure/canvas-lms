@@ -2275,8 +2275,11 @@ describe AssignmentsController do
           }
         end
 
+        let(:domain) { "justanexamplenotarealwebsite.com" }
+
         let(:tool) do
           factory_with_protected_attributes(@course.context_external_tools,
+                                            domain:,
                                             url: "http://www.justanexamplenotarealwebsite.com/tool1",
                                             shared_secret: "test123",
                                             consumer_key: "test123",
@@ -2288,6 +2291,7 @@ describe AssignmentsController do
 
         it "is correctly set" do
           tool
+          Setting.set("submission_type_selection_allowed_launch_domains", domain)
           subject
           expect(assigns[:js_env][:SUBMISSION_TYPE_SELECTION_TOOLS][0]).to include(
             base_title: tool_settings[:base_title],
@@ -2307,6 +2311,7 @@ describe AssignmentsController do
 
           it "includes the launch points" do
             tool
+            Setting.set("submission_type_selection_allowed_launch_domains", domain)
             subject
             expect(assigns[:js_env][:SUBMISSION_TYPE_SELECTION_TOOLS][0])
               .to include(description:)

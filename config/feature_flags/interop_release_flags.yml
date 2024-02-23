@@ -246,3 +246,18 @@ allow_lti_tools_editor_button_placement_without_icon:
       state: allowed_on
     ci:
       state: allowed_on
+lti_placement_restrictions:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Limit certain LTI placements to authorized tools
+  description: |-
+    When enabled, Submission_type_selection placement usage will be
+    limited with an allow list.
+  shadow: true
+  environments:
+    development:
+      state: allowed_on
+    test:
+      state: allowed_on
+    ci:
+      state: allowed_on

@@ -505,6 +505,10 @@ class ApplicationController < ActionController::Base
         tool.feature_flag_enabled?(context)
     end
 
+    if Account.site_admin.feature_enabled?(:lti_placement_restrictions)
+      tools.select! { |tool| tool.placement_allowed?(type) }
+    end
+
     tools.map do |tool|
       external_tool_display_hash(tool, type, {}, context, custom_settings)
     end
