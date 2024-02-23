@@ -127,9 +127,11 @@ describe('FilterNavFilter', () => {
 
   it('clicking save after change triggers onSave', async () => {
     const onUpdate = jest.fn(() => Promise.resolve())
-    const {getByRole} = render(<FilterNavFilter {...defaultProps} onUpdate={onUpdate} />)
-    await userEvent.click(getByRole('combobox', {name: 'Sections'}))
-    await userEvent.click(getByRole('option', {name: 'Section 7'}))
+    const {getByRole, getByLabelText, getByText} = render(
+      <FilterNavFilter {...defaultProps} onUpdate={onUpdate} />
+    )
+    await userEvent.click(getByLabelText('Sections'))
+    await userEvent.click(getByText('Section 7'))
     await userEvent.click(getByRole('button', {name: 'Save Filter Preset'}))
     expect(onUpdate).toHaveBeenCalledTimes(1)
   })
