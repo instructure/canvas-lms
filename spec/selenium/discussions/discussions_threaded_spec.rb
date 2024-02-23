@@ -1040,5 +1040,17 @@ describe "threaded discussions" do
         expect(f("body")).to contain_jqcss("div:contains('student here')")
       end
     end
+
+    context "locked for comments" do
+      it "displays message for students in a discussion that is closed for comments" do
+        @topic.lock!
+        @topic.message = "This is visible"
+        @topic.save!
+        user_session(@student)
+
+        get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+        expect(fj("span:contains('#{@topic.message}')")).to be_present
+      end
+    end
   end
 end

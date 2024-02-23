@@ -71,10 +71,15 @@ module Types
 
     field :message, String, null: true
     def message
-      # lock_information is populated if the discussion is locked.
-      # In those cases we do not want to send the discussion's message
-      # Instead we send a lock_explanation message
-      lock_information || object.message
+      # A discussion can be locked but still allow users to view the discussion
+      # In these cases we want to return the discussion message, otherwise we want to
+      # return the lock explanation
+      locked_info = object.locked_for?(current_user, check_policies: true)
+      if locked_info && !locked_info[:can_view]
+        return lock_explanation(locked_info, "topic", object.context, { only_path: true, include_js: false })
+      end
+
+      object.message
     end
 
     field :lock_information, String, null: true
