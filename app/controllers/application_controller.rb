@@ -32,7 +32,6 @@ class ApplicationController < ActionController::Base
   include Api::V1::User
   include Api::V1::WikiPage
   include LegalInformationHelper
-  include FullStoryHelper
   include ObserverEnrollmentsHelper
   include LtiLaunchDebugLoggerHelper
 
