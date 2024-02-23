@@ -158,4 +158,9 @@ describe('ZipFileImporter', () => {
       expect(screen.getByText('course files')).toBeInTheDocument()
     })
   })
+
+  it('renders the progressbar info', async () => {
+    renderComponent({fileUploadProgress: 10})
+    expect(screen.getByText('Uploading File')).toBeInTheDocument()
+  })
 })

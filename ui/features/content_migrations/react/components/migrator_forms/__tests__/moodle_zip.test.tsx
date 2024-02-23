@@ -57,4 +57,9 @@ describe('CanvasCartridgeImporter', () => {
     await userEvent.click(screen.getByRole('button', {name: 'Cancel'}))
     expect(onCancel).toHaveBeenCalled()
   })
+
+  it('renders the progressbar info', async () => {
+    renderComponent({fileUploadProgress: 10})
+    expect(screen.getByText('Uploading File')).toBeInTheDocument()
+  })
 })

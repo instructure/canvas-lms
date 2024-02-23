@@ -22,6 +22,7 @@ import {Text} from '@instructure/ui-text'
 import {Link} from '@instructure/ui-link'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {IconAddSolid} from '@instructure/ui-icons'
+import {Spinner} from '@instructure/ui-spinner'
 import {Checkbox, CheckboxGroup} from '@instructure/ui-checkbox'
 import {Button} from '@instructure/ui-buttons'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
@@ -42,6 +43,7 @@ type CommonMigratorControlsProps = {
   canAdjustDates?: boolean
   onSubmit: onSubmitMigrationFormCallback
   onCancel: () => void
+  fileUploadProgress: number | null
 }
 
 const generateNewQuizzesLabel = () => (
@@ -101,6 +103,7 @@ export const CommonMigratorControls = ({
   canAdjustDates = false,
   onSubmit,
   onCancel,
+  fileUploadProgress,
 }: CommonMigratorControlsProps) => {
   const [selectiveImport, setSelectiveImport] = useState<null | boolean>(null)
   const [importAsNewQuizzes, setImportAsNewQuizzes] = useState<boolean>(false)
@@ -156,7 +159,7 @@ export const CommonMigratorControls = ({
           value="existing_quizzes_as_new_quizzes"
           label={generateNewQuizzesLabel()}
           disabled={!ENV.QUIZZES_NEXT_ENABLED}
-          defaultChecked={ENV.NEW_QUIZZES_MIGRATION_DEFAULT}
+          defaultChecked={!!ENV.NEW_QUIZZES_MIGRATION_DEFAULT}
           onChange={(e: React.SyntheticEvent<Element, Event>) => {
             const target = e.target as HTMLInputElement
             setImportAsNewQuizzes(target.checked)
@@ -250,9 +253,24 @@ export const CommonMigratorControls = ({
 
       <View as="div" margin="medium none none none">
         <Button onClick={onCancel}>{I18n.t('Cancel')}</Button>
-        <Button data-testid="submitMigration" onClick={handleSubmit} margin="small" color="primary">
-          <IconAddSolid /> &nbsp;
-          {I18n.t('Add to Import Queue')}
+        <Button
+          disabled={!!(fileUploadProgress && fileUploadProgress < 100)}
+          data-testid="submitMigration"
+          onClick={handleSubmit}
+          margin="small"
+          color="primary"
+        >
+          {fileUploadProgress && fileUploadProgress < 100 ? (
+            <>
+              <Spinner size="x-small" renderTitle={I18n.t('Adding')} /> &nbsp;
+              {I18n.t('Adding...')}
+            </>
+          ) : (
+            <>
+              <IconAddSolid /> &nbsp;
+              {I18n.t('Add to Import Queue')}
+            </>
+          )}
         </Button>
       </View>
     </>

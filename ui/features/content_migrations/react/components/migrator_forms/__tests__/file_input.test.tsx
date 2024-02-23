@@ -107,4 +107,9 @@ describe('MigrationFileInput', () => {
 
     expect(onChange).toHaveBeenCalledWith(null)
   })
+
+  it('renders the progressbar with the passed progress', async () => {
+    renderComponent({fileUploadProgress: 29})
+    expect(screen.getByText('29%')).toBeInTheDocument()
+  })
 })

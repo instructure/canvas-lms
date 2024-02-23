@@ -27,6 +27,12 @@ jest.mock('@canvas/upload-file', () => ({
   completeUpload: jest.fn(),
 }))
 
+const CommonCartridgeImporter = jest.fn()
+jest.mock('../migrator_forms/common_cartridge', () => props => {
+  CommonCartridgeImporter(props)
+  return <mock-CommonCartridgeImporter />
+})
+
 const setMigrationsMock = jest.fn()
 
 const renderComponent = (overrideProps?: any) =>
@@ -48,6 +54,10 @@ describe('ContentMigrationForm', () => {
         name: 'Canvas Course Export Package',
         type: 'canvas_cartridge_importer',
       },
+      {
+        name: 'Common Course Export Package',
+        type: 'common_cartridge_importer',
+      },
     ])
     fetchMock.mock(
       '/api/v1/courses/0/content_migrations',
@@ -55,6 +65,7 @@ describe('ContentMigrationForm', () => {
         id: '4',
         migration_type: 'course_copy_importer',
         migration_type_title: 'Test',
+        pre_attachment: true,
       },
       {
         overwriteRoutes: true,
@@ -183,6 +194,14 @@ describe('ContentMigrationForm', () => {
     await userEvent.click(screen.getByTestId('submitMigration'))
 
     expect(setMigrationsMock).toHaveBeenCalled()
+  })
+
+  it('passes the file upload progress to the migrator component', async () => {
+    renderComponent()
+    await userEvent.click(await screen.findByTitle('Select one'))
+    await userEvent.click(screen.getByText('Common Course Export Package'))
+    // would be undefined otherwise
+    expect(CommonCartridgeImporter.mock.calls[0][0].fileUploadProgress).toEqual(null)
   })
 
   it('resets form after submitting', async () => {
