@@ -41,6 +41,7 @@ type CommonMigratorControlsProps = {
   canImportAsNewQuizzes?: boolean
   canOverwriteAssessmentContent?: boolean
   canAdjustDates?: boolean
+  canImportBPSettings?: boolean
   onSubmit: onSubmitMigrationFormCallback
   onCancel: () => void
   fileUploadProgress: number | null
@@ -101,11 +102,13 @@ export const CommonMigratorControls = ({
   canImportAsNewQuizzes = false,
   canOverwriteAssessmentContent = false,
   canAdjustDates = false,
+  canImportBPSettings = false,
   onSubmit,
   onCancel,
   fileUploadProgress,
 }: CommonMigratorControlsProps) => {
   const [selectiveImport, setSelectiveImport] = useState<null | boolean>(null)
+  const [importBPSettings, setImportBPSettings] = useState<null | boolean>(null)
   const [importAsNewQuizzes, setImportAsNewQuizzes] = useState<boolean>(false)
   const [overwriteAssessmentContent, setOverwriteAssessmentContent] = useState<boolean>(false)
   const [showAdjustDates, setShowAdjustDates] = useState<boolean>(false)
@@ -130,6 +133,7 @@ export const CommonMigratorControls = ({
     setContentError(selectiveImport === null)
     data.errored = canSelectContent && selectiveImport === null // So the parent form can guard submit and show it's own errors
     canSelectContent && (data.selective_import = selectiveImport)
+    canImportBPSettings && (data.settings.import_blueprint_settings = importBPSettings)
     if (canAdjustDates && dateAdjustments) {
       dateAdjustments.adjust_dates && (data.adjust_dates = dateAdjustments.adjust_dates)
       remapSubstitutions(data, dateAdjustments)
@@ -138,8 +142,10 @@ export const CommonMigratorControls = ({
     canOverwriteAssessmentContent && (data.settings.overwrite_quizzes = overwriteAssessmentContent)
     onSubmit(data)
   }, [
-    canSelectContent,
     selectiveImport,
+    canSelectContent,
+    canImportBPSettings,
+    importBPSettings,
     canAdjustDates,
     dateAdjustments,
     canImportAsNewQuizzes,
@@ -218,6 +224,20 @@ export const CommonMigratorControls = ({
               }}
               checked={selectiveImport === true}
             />
+            <>
+              {selectiveImport === false && canImportBPSettings ? (
+                <View as="div" padding="0 medium">
+                  <Checkbox
+                    label={I18n.t('Import Blueprint Course settings')}
+                    value="medium"
+                    onChange={(e: React.SyntheticEvent<Element, Event>) => {
+                      const target = e.target as HTMLInputElement
+                      setImportBPSettings(target.checked)
+                    }}
+                  />
+                </View>
+              ) : null}
+            </>
             <RadioInput
               name="selective_import"
               value="selective"
