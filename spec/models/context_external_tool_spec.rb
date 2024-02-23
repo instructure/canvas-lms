@@ -4066,4 +4066,40 @@ describe ContextExternalTool do
       end
     end
   end
+
+  describe "#placement_allowed?" do
+    subject { tool.placement_allowed?(placement) }
+
+    let(:developer_key) { DeveloperKey.create! }
+    let(:domain) { "http://example.com" }
+    let(:tool) { external_tool_1_3_model(developer_key:, opts: { domain: }) }
+
+    context "when the tool has a submission_type_selection placement" do
+      let(:placement) { :submission_type_selection }
+
+      context "when the placement is not on any allow list" do
+        it { is_expected.to be false }
+      end
+
+      context "when the placement is allowed by developer_key_id" do
+        before do
+          Setting.set("submission_type_selection_allowed_dev_keys", developer_key.id.to_s)
+        end
+
+        it { is_expected.to be true }
+      end
+
+      context "when the placement is allowed by the domain" do
+        before do
+          Setting.set("submission_type_selection_allowed_launch_domains", domain)
+        end
+
+        it { is_expected.to be true }
+      end
+    end
+
+    it "return true for all placements other than submission_type_selection" do
+      expect(tool.placement_allowed?(:collaboration)).to be true
+    end
+  end
 end
