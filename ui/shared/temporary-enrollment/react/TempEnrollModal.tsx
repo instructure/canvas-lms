@@ -184,6 +184,7 @@ export function TempEnrollModal(props: Props) {
   const handleCloseModal = () => {
     if (open) {
       setOpen(false)
+      handleModalReset()
     }
   }
 
@@ -363,34 +364,36 @@ export function TempEnrollModal(props: Props) {
 
   return (
     <>
-      <Modal
-        overflow="scroll"
-        open={open}
-        size="large"
-        label={I18n.t('Create a Temporary Enrollment')}
-        shouldCloseOnDocumentClick={false}
-        themeOverride={{smallMaxWidth: '30em'}}
-        onEnter={handleModalEnter}
-        onEntered={handleModalEntered}
-        onExit={handleModalExit}
-        onDismiss={handleCloseModal}
-        onExited={handleModalReset}
-      >
-        <Modal.Header>
-          {renderCloseButton()}
-          <Heading tabIndex={-1} level="h2">
-            {title}
-          </Heading>
-        </Modal.Header>
+      {open && (
+        <Modal
+          overflow="scroll"
+          open={open}
+          size="large"
+          label={I18n.t('Create a Temporary Enrollment')}
+          shouldCloseOnDocumentClick={false}
+          themeOverride={{smallMaxWidth: '30em'}}
+          onEnter={handleModalEnter}
+          onEntered={handleModalEntered}
+          onExit={handleModalExit}
+          onDismiss={handleCloseModal}
+          onExited={handleModalReset}
+        >
+          <Modal.Header>
+            {renderCloseButton()}
+            <Heading tabIndex={-1} level="h2">
+              {title}
+            </Heading>
+          </Modal.Header>
 
-        <Modal.Body>
-          {errorMessage ? renderError() : loading ? renderLoader() : renderBody()}
-        </Modal.Body>
+          <Modal.Body>
+            {errorMessage ? renderError() : loading ? renderLoader() : renderBody()}
+          </Modal.Body>
 
-        <Modal.Footer>
-          <Flex gap="small">{renderButtons()}</Flex>
-        </Modal.Footer>
-      </Modal>
+          <Modal.Footer>
+            <Flex gap="small">{renderButtons()}</Flex>
+          </Modal.Footer>
+        </Modal>
+      )}
 
       {cloneElement(props.children, {
         onClick: handleChildClick(props.children.props.onClick),
