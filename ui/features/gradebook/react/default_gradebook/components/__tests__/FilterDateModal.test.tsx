@@ -51,7 +51,7 @@ describe('FilterDateModal', () => {
     )
     const startDateInput = getByLabelText('Start Date') as HTMLInputElement
 
-    await userEvent.click(startDateInput)
+    await userEvent.setup({delay: null}).click(startDateInput)
     expect(await findByText('9')).toBeInTheDocument()
     expect(getByText('10')).toBeInTheDocument()
     expect(getByText('11')).toBeInTheDocument()
