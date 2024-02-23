@@ -66,6 +66,7 @@ type MigratorProps = {
   value: string
   onSubmit: onSubmitMigrationFormCallback
   onCancel: () => void
+  fileUploadProgress: number | null
 }
 
 const renderMigrator = (props: MigratorProps) => {
@@ -73,6 +74,7 @@ const renderMigrator = (props: MigratorProps) => {
     case 'zip_file_importer':
       return <ZipFileImporter {...props} />
     case 'course_copy_importer':
+      delete props.fileUploadProgress
       return <CourseCopyImporter {...props} />
     case 'moodle_converter':
       return <MoodleZipImporter {...props} />
@@ -85,6 +87,7 @@ const renderMigrator = (props: MigratorProps) => {
     case 'angel_exporter':
     case 'blackboard_exporter':
     case 'd2l_exporter':
+      delete props.fileUploadProgress
       return <LegacyMigratorWrapper {...props} />
     default:
       return null
@@ -98,8 +101,15 @@ export const ContentMigrationsForm = ({
 }) => {
   const [migrators, setMigrators] = useState<any>([])
   const [chosenMigrator, setChosenMigrator] = useState<string | null>(null)
-  const handleFileProgress = (_: AttachmentProgressResponse) => {}
-  // console.log(`${(response.loaded / response.total) * 100}%`)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const handleFileProgress = (json, {loaded, total}: AttachmentProgressResponse) => {
+    setFileUploadProgress(Math.trunc((loaded / total) * 100))
+    if (loaded === total) {
+      onResetForm()
+      setMigrations(prevMigrations => [json as ContentMigrationItem].concat(prevMigrations))
+    }
+  }
+  const [fileUploadProgress, setFileUploadProgress] = useState<number | null>(null)
 
   const onResetForm = useCallback(() => setChosenMigrator(null), [])
 
@@ -124,13 +134,16 @@ export const ContentMigrationsForm = ({
       if (preAttachmentFile && json.pre_attachment) {
         completeUpload(json.pre_attachment, preAttachmentFile, {
           ignoreResult: true,
-          onProgress: handleFileProgress,
+          onProgress: response => {
+            handleFileProgress(json, response)
+          },
         })
+      } else {
+        onResetForm()
+        setMigrations(prevMigrations => [json as ContentMigrationItem].concat(prevMigrations))
       }
-      setMigrations(prevMigrations => [json as ContentMigrationItem].concat(prevMigrations))
-      onResetForm()
     },
-    [chosenMigrator, setMigrations, onResetForm]
+    [chosenMigrator, handleFileProgress, onResetForm, setMigrations]
   )
 
   useEffect(() => {
@@ -194,6 +207,7 @@ export const ContentMigrationsForm = ({
             value: chosenMigrator,
             onSubmit: onSubmitForm,
             onCancel: onResetForm,
+            fileUploadProgress,
           })}
           <hr role="presentation" aria-hidden="true" />
         </>

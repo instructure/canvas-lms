@@ -29,9 +29,14 @@ const I18n = useI18nScope('content_migrations_redesign')
 type CommonCartridgeImporterProps = {
   onSubmit: onSubmitMigrationFormCallback
   onCancel: () => void
+  fileUploadProgress: number | null
 }
 
-const CommonCartridgeImporter = ({onSubmit, onCancel}: CommonCartridgeImporterProps) => {
+const CommonCartridgeImporter = ({
+  onSubmit,
+  onCancel,
+  fileUploadProgress,
+}: CommonCartridgeImporterProps) => {
   const [file, setFile] = useState<File | null>(null)
   const [fileError, setFileError] = useState<boolean>(false)
   const [questionBankError, setQuestionBankError] = useState<boolean>(false)
@@ -64,7 +69,7 @@ const CommonCartridgeImporter = ({onSubmit, onCancel}: CommonCartridgeImporterPr
 
   return (
     <>
-      <MigrationFileInput onChange={setFile} />
+      <MigrationFileInput fileUploadProgress={fileUploadProgress} onChange={setFile} />
       {fileError && (
         <p>
           <Text color="danger">{I18n.t('You must select a file to import content from')}</Text>
@@ -81,6 +86,7 @@ const CommonCartridgeImporter = ({onSubmit, onCancel}: CommonCartridgeImporterPr
         canAdjustDates={true}
         onSubmit={handleSubmit}
         onCancel={onCancel}
+        fileUploadProgress={fileUploadProgress}
       />
     </>
   )
