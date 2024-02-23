@@ -692,6 +692,16 @@ describe Types::DiscussionType do
       expect(GraphQLTypeTester.new(discussion, current_user: @teacher).resolve("availableForUser")).to be true
     end
 
+    it "returns the correct data for a discussion that is closed for comments" do
+      discussion.lock!
+      course_with_student(course: discussion.context)
+      allow_any_instantiation_of(discussion).to receive(:locked_for?)
+        .with(@student, check_policies: true)
+        .and_return({ can_view: true })
+
+      expect(GraphQLTypeTester.new(discussion, current_user: @student).resolve("message")).to eq discussion.message
+    end
+
     describe "delayed post" do
       before do
         @delayed_discussion = DiscussionTopic.create!(title: "Welcome whoever you are",
