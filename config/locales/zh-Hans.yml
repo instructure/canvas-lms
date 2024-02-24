@@ -362,8 +362,10 @@ zh-Hans:
         partner_key: 合作伙伴密钥
   academic_engagement_capella_74946a80: 学业投入（卡佩拉大学）
   academic_engagement_capella_v2_2023_08_28_5c92fd3f: "学业 (Capella V2-2023-08-28)"
+  academic_engagement_capella_v3_2024_02_05_775b9f21: "学业 (Capella V3-2024-02-05)"
   academic_engagement_detail_capella_e76c939d: "学业详情 (Capella)"
   academic_engagement_detail_capella_v2_2023_08_28_3ba31c31: "学业详情 (Capella V2-2023-08-28)"
+  academic_engagement_detail_capella_v3_2024_02_05_106a7e2f: "学业详情 (Capella V3-2024-02-05)"
   academic_engagement_detail_sei_31f8f271: "学习积极性详情 - SEI"
   academic_engagement_detail_strayer_1f80cba4: "学业详情 (Strayer)"
   academic_engagement_detail_strayer_v3_2023_08_28_cea3521c: "学业详情 (Strayer V3-2023-08-28)"
@@ -2289,6 +2291,7 @@ zh-Hans:
   add_courses_c0696323: 添加课程
   add_criterion_eb9587ef: 添加标准
   add_custom_link_22059c0: 添加自定义链接
+  add_dates_to_gradebook_grading_period_filter_b47b6a14: 添加日期到评分册评定时间段筛选器
   add_delete_b82d05f8: 添加/删除
   add_delete_edit_7dbc9c5b: 添加/删除/编辑
   add_delete_manage_d65e235: 添加/删除/管理
@@ -2351,6 +2354,7 @@ zh-Hans:
   add_new_caption_or_subtitle_59d2d044: 添加新标题或副标题
   add_new_domain_e097d4a0: 添加新域
   add_new_group_7ac49f31: 添加新组
+  add_new_rating_9fb7ec89: 添加新评级
   add_new_row_for_a_letter_grade_to_grading_scheme_a_1472479e: 在此行后面添加新的行，用于字母评级方案
   add_new_set_of_due_dates_e8e240f: 添加新的截止日期
   add_new_term_d2217c0d: 添加新学期
@@ -5398,6 +5402,7 @@ zh-Hans:
   belarusian_b2f19c76: 白俄罗斯语
   belgium_32_e5f5b598: 比利时(+32)
   belgium_ef8739b6: 比利时
+  below_81d4dceb: 下方
   below_is_an_example_of_how_students_will_see_their_8f7e7971: 以下示例显示了学生如何查看日程规划
   below_mastery_abd1dca5: 未掌握
   below_min_rating_78a742c3: 低于最低等级
@@ -5430,6 +5435,7 @@ zh-Hans:
   blackout_date_title_was_edited_31752bc9: "已编辑不适用日期 %{title}。"
   blackout_dates_4a140a72: 封锁日期
   blank_38df4238: 空白
+  block_editor_2e266d9c: 区块编辑器
   blocked_30d0fb62: 阻止
   blocked_by_running_migration_d8a57cb7: 多个迁移进行中，排队等候
   blocked_domain_name_b5b93150: 锁定的域名
@@ -8677,6 +8683,7 @@ zh-Hans:
   course_copy_no_course_error: 源课程未找到。
   course_copy_not_allowed_error: 不允许您复制源课程。
   course_course_d1c78210: "课程：%{course}"
+  course_datetime_c0c32b02: "课程：%{datetime}"
   course_default_fd054879: （课程默认）
   course_default_grading_scheme_6b902d8: 课程默认评分方案
   course_details_25cdf103: 课程详细信息
@@ -9670,6 +9677,7 @@ zh-Hans:
   create_file_s_188549e6: "[创建文件]"
   create_files_after_rce_media_upload_recording_77d75a96: "在上传/录制 RCE 媒体后创建文件"
   create_filter_preset_d6f28bc4: 创建过滤器预设
+  create_from_outcome_3f29e594: 从成绩创建
   create_group_set_7fe1cd53: 创建小组集
   create_groups_later_6ce36058: 稍后创建组
   create_groups_now_d59bf70b: 立即创建组
@@ -9697,7 +9705,9 @@ zh-Hans:
     url: URL
   create_new_assignment_d77dfc4: 创建新作业
   create_new_attempt_19c96c03: 新建尝试
+  create_new_calendar_event_f933f209: 新建日历事件
   create_new_course_e3ef9cd0: 创建新课程
+  create_new_criterion_1a4efd4: 新建标准
   create_new_discussions_6ab69da2: 创建新讨论
   create_new_e0946c49: 新建
   create_new_filter_c244aa92: 创建新过滤器
@@ -9757,7 +9767,9 @@ zh-Hans:
   criteria_builder_b214069e: 标准生成器
   criterion_5f0b62f8: 标准
   criterion_created_42669293: 创建的标准
+  criterion_description_757741c3: 标准描述
   criterion_long_description_e9a97247: 标准长说明
+  criterion_name_92e1c426: 标准名称
   criterion_ratings_3eed22e2: 标准等级
   criterion_updated_36c0b3dc: 更新的标准
   croatian_d713d655: 克罗地亚语
@@ -10232,6 +10244,7 @@ zh-Hans:
   delete_course_files_ee9e769: 删除课程文件
   delete_course_templates_bb966d27: 删除课程模板
   delete_courses_9ac148e3: 删除课程
+  delete_criterion_2181295b: 删除标准
   delete_criterion_row_80c3b3b: 删除条件列
   delete_current_message_5da0221a: 删除目前信息
   delete_current_module_item_21fefc54: 删除目前单元/项目
@@ -11157,6 +11170,7 @@ zh-Hans:
   draft_comment_b2376ea4: 草稿评论
   draft_comment_warning_modal_in_speedgrader_ded232c1: "SpeedGrader 中的草稿评论警告模态"
   draft_discussion_entries_98d93a9d: 撰写讨论条目草稿
+  draft_new_criterion_95ed3c89: 拟定新标准
   draft_saved_eba9cfeb: 保存的草稿
   drag_a_file_here_39357b48: 把文件拖动到此处
   drag_a_file_here_or_1aaf19c1: 将文件拖到此处，或者
@@ -11249,6 +11263,7 @@ zh-Hans:
   duplicate_31cec192: 复制、重复
   duplicate_assignment_name_3ca7d753: "复制作业%{name}"
   duplicate_c4bb7d3a: "复制 "
+  duplicate_criterion_601aa3cf: 复制标准
   duplicate_discussion_title_43b39959: "重复讨论%{title}"
   duplicate_discussion_title_6537ef4d: "复制讨论%{title}"
   duplicate_grading_scheme_d0e57758: 重复的评分方案
@@ -11420,6 +11435,7 @@ zh-Hans:
   edit_user_c46cf103: 编辑用户
   edit_user_details_4d7b63ff: 编辑用户详细信息
   edit_user_details_9af7819b: 编辑用户详情
+  edit_username_s_membership_3969048c: "编辑%{userName}的成员身份"
   edit_value_7911ae4f: 编辑值
   edit_value_for_name_d9e25af1: "编辑 %{name} 的值"
   edit_video_conference_5ceec91c: 编辑视频会议
@@ -11583,6 +11599,7 @@ zh-Hans:
   enable_the_creation_of_master_courses_8205b155: 启用创建主课程
   enable_the_deprecation_of_the_faculty_journal_func_78b3344d: 启用教师期刊功能的弃用。
   enable_the_module_publish_menus_to_make_mass_publi_b32f0c52: 启用单元发布菜单，以便于批量发布和取消发布。
+  enable_the_new_block_editor_for_the_rich_content_e_6a0d0031: 为富内容编辑器启用新的区块编辑器。
   enable_the_plagiarism_detection_platform_7c3b6195: 启用剽窃检测平台
   enable_the_redesigned_course_pacing_user_experienc_21618a38: 启用重新设计的课程进度用户体验。
   enable_the_security_tab_on_the_settings_page_to_ad_eab7c954: "启用设置页上的安全标签，以调整 CSP 设置"
@@ -11829,6 +11846,7 @@ zh-Hans:
                           了解如何**生成访问令牌**。
   enter_the_access_token_for_your_organization_from__cc77493d: "在 *eduappcenter.com* 输入您的机构的访问令牌。一旦适用，只有您的机构在EduAppCenter批准的应用程序才会在外部应用程序的页面中列出。了解如何**生成一个访问令牌**。"
   enter_the_access_token_for_your_organization_from__f1c71941: 输入来自*eduappcenter.com*的贵组织的访问令牌。一旦应用，仅贵组织在EduAppCenter中批准的应用程序会列在外部应用程序页面上。了解如何**生成访问令牌**。
+  enter_the_description_91ececc1: 输入描述
   enter_the_email_address_of_the_user_you_would_like_92112560: 输入您希望临时注册的用户的电子邮件地址
   enter_the_email_addresses_of_the_users_you_would_l_17cef6a0: 输入您要添加的用户的电子邮件地址，用逗号隔开
   enter_the_email_addresses_of_the_users_you_would_l_f76448a6: 输入您要添加的用户的电子邮件地址，用逗号或换行符隔开
@@ -11836,6 +11854,7 @@ zh-Hans:
   enter_the_login_id_of_the_user_you_would_like_to_t_46938400: "输入您希望临时注册的用户的登录 ID"
   enter_the_login_ids_of_the_users_you_would_like_to_502fcbc5: "输入您要添加的用户的登录 ID，用逗号或换行符隔开"
   enter_the_login_ids_of_the_users_you_would_like_to_d39fb0f7: "输入您要添加的用户的登录 ID，用逗号隔开"
+  enter_the_name_c86bd140: 输入名称
   enter_the_sis_id_of_the_user_you_would_like_to_tem_efab1e87: "输入您希望临时注册的用户的 SIS ID"
   enter_the_sis_ids_of_the_users_you_would_like_to_a_1bdce982: "输入您要添加的用户的 SIS ID，用逗号隔开"
   enter_the_sis_ids_of_the_users_you_would_like_to_a_25e441f1: "输入您要添加的用户的 SIS ID，用逗号或换行符隔开"
@@ -12379,6 +12398,7 @@ zh-Hans:
   example_item_scores_6726c689: 项目分数示例
   example_school_of_rock_41f32c31: 示例：“摇滚教室”
   exceeded_the_maximum_length_number_characters_2d25611e: "超过最大长度（%{number} 个字符）"
+  exceeds_1dfdae30: 超出
   exceeds_expectations_5910fc3a: 超出预期
   exceeds_mastery_1f995dce: 超过掌握
   exceeds_max_events_28f19b04: "超过 %{max} 个事件。"
@@ -15304,6 +15324,7 @@ zh-Hans:
   if_enabled_canvas_will_allow_tools_to_return_multi_fe7b6678: |-
       如果启用，Canvas 将允许工具在一次请求中在课程模块页面
       返回多个内容项
+  if_enabled_canvas_will_be_able_to_export_new_quizz_504132df: "如果启用，Canvas 将导出新测验作为 Common Cartridge Export Packages 的一部分。"
   if_enabled_common_cartridge_importers_will_convert_9bffff09: 如果启用，公共弹夹导入程序会将HTML文件转换为网页
   if_enabled_content_designers_must_provide_copyrigh_eca21f5e: 如果启用，在发布前内容设计者必须提供版权和许可信息的文件。此仅适用于，如果同时启用更好的文件浏览。
   if_enabled_copyright_and_license_information_must__2a551827: 如果启用，则必须提供文件的版权和许可证信息才能发布。
@@ -16028,7 +16049,7 @@ zh-Hans:
   invalid_fields_for_an_outcome_invalid_fafdf0df: "无效的结果字段：%{invalid}"
   invalid_file_type_881cc9b2: 无效的文件类型
   invalid_freq_freq_84b0427d: "无效的FREQ '%{freq}'"
-  invalid_grade_9726cbc6: 无效的年级
+  invalid_grade_9726cbc6: 无效的成绩
   invalid_grade_passback_setting_a1d209d1: "无效的 grade_passback_setting"
   invalid_grading_scheme_4a95ba92: 无效的评分方案
   invalid_hexcode_9124519f: 无效的十六进制代码
@@ -16851,6 +16872,7 @@ zh-Hans:
   loading_unsynced_changes_b5d7b202: 正在加载未同步的更改
   loading_unsynched_changes_688434f2: 正在加载未同步的更改
   local_4ee321b1: 当地时间
+  local_datetime_ce5ffddd: "本地：%{datetime}"
   locales: 
     zh-Hans: 简体中文
   location_3b6ff307: 位置：
@@ -19537,6 +19559,7 @@ zh-Hans:
   module_name_1127ebdb: 单元名字
   module_name_is_required_de75de0a: 模块名称必填。
   module_navigation_97043417: 单元导航
+  module_progress_for_name_fbff0ccb: "*%{name}*的模块进度"
   module_publish_menu_30b638dd: 单元发布菜单
   module_publish_menu_88b54c1b: 单元发布菜单
   module_published_80f0b9b8: 已发布单元
@@ -19746,6 +19769,7 @@ zh-Hans:
   move_count_outcomes_c0ca2b30: 
     one: "是否移动 %{count} 个结果？"
     other: "是否移动 %{count} 个结果？"
+  move_criterion_9b2965d9: 移动标准
   move_dialog: 
     cancel: 取消
     save: 保存
@@ -19771,6 +19795,7 @@ zh-Hans:
   move_module_item_after_bbcfe2d6: 把模块项后移至
   move_module_item_before_13e940eb: 把模块项前移至
   move_module_item_f525d6c8: 移动单元项目
+  move_name_to_a_new_group_acabed4e: "将%{name}移至新组"
   move_navigation_item_f034cd8a: 移动导航项目
   move_outcome_ce497e6c: 移动结果
   move_outcome_group_cfa1a505: 移动结果组
@@ -19986,6 +20011,7 @@ zh-Hans:
   navigation_allows_user_to_view_the_people_link_in__dd533d29: 导航允许用户在“课程导航”中查看“人员”链接。
   navigation_icon_45db938e: 导航图标
   navigation_menu_fd782ff8: 导航菜单
+  near_3282280c: 接近
   near_mastery_f25174a4: 最接近的掌握
   need_a_canvas_account_221d18ed: 需要一个Canvas帐户吗？
   need_help_setting_up_your_course_2b763141: 需要帮助设置您的课程吗？
@@ -20083,6 +20109,7 @@ zh-Hans:
   new_quizzes_banks_migrations_9ab4de4a: 新测验库迁移
   new_quizzes_build_button_in_module_items_10f651fb: 模块项母中的“新测验生成”按钮
   new_quizzes_build_button_on_list_views_62c7c0e8: 列表视图上的新测验生成按钮
+  new_quizzes_common_cartridge_support_250780be: "新测验 Common Cartridge 支持"
   new_quizzes_dbda7e0a: 新测验
   new_quizzes_description: "此功能改进了 Canvas 的测验体验。启用此标记后，新测验工具将可用。有关完整详情，请参阅 Canvas 社区中的*新测验用户组*。"
   new_quizzes_embedded_module_progression_cd2307b6: 新测验嵌入模块进度
@@ -21291,6 +21318,7 @@ zh-Hans:
   outcomes_and_rubrics_account_course_f0d23419: 结果和评价量规（帐户、课程）
   outcomes_and_rubrics_f893d141: 结果和评价量规
   outcomes_are_created_here_to_track_mastery_in_a_co_2f487549: "在此处创建结果以跟踪课程掌握程度。要开始使用，请查看顶部的菜单栏。单击New Outcome(新结果)按钮可创建新结果，或单击New Group(新组)按钮可创建新组，以整理您的结果。使用Find(查找)按钮可使用您所在的州或机构创建的结果。在您创建和使用结果时，您可以使用左侧面板在结果中导航。您可以将结果拖放到不同级别，以创建结构。"
+  outcomes_averages_report_34199e77: 平均成绩报告
   outcomes_csv_format_9005acfb: 结果CSV格式
   outcomes_d1b18d33: 结果
   outcomes_for_student_9f91d4d: 学生结果
@@ -22310,11 +22338,13 @@ zh-Hans:
   presents_the_quiz_setting_to_avoid_automatic_submi_363b91ff: 显示测验设置，以避免在可用时间结束时自动提交计时测验。
   press_alt_f8_to_see_a_list_of_keyboard_shortcuts_2a8c7bc0: "按 ALT + F8 可查看快捷键列表"
   press_space_to_start_over_d4b8a2da: 按“space”重新开始
+  press_tab_for_more_options_f087f5c2: "按 tab 键显示更多选项"
   press_the_comma_key_or_shift_question_mark_to_see__930af9df: "按逗号键或转换键 + 问号就可看到的键盘快捷键列表"
   press_the_comma_key_or_shift_to_see_a_list_of_keyb_155d8ca3: "按逗号键或转换键 + ？就可看到的键盘快捷键列表"
   press_the_esc_key_to_close_this_modal_14d10601: 按ESC键，关闭此模式
   prev_f82cbc48: 上一个
   prev_month_34bd934c: 上一个月
+  prevent_deletion_of_outcomes_with_alignments_in_os_65020476: "阻止在 OS 中删除带校正的成绩"
   prevents_students_from_leaving_annotations_in_assi_cb188d2: 阻止学生在作业中留下评论。不适用于同伴互评的作业。
   preview_53003fd2: 预览
   preview_a3f8f854: 预览
@@ -22357,6 +22387,7 @@ zh-Hans:
   primary_color_button_b75db628: 主要颜色按钮
   primary_color_button_disabled_9081ddff: 主要颜色按钮被禁用
   primary_email_address_mail_9018f: 第一电子邮件地址（邮件）
+  print_d0e3d53f: 打印
   print_grades_9d5dd50f: 打印评分
   prioritize_individual_overrides_6be735e1: 优先单独置换项
   priority_dd4381ee: 优先级
@@ -24434,7 +24465,10 @@ zh-Hans:
   rating_description_db6adf39: 评分描述
   rating_max_score_eade1523: 评分最高分数
   rating_min_score_3d35a762: 评分最低分数
+  rating_name_6f633d52: 评定名称
   rating_order_e57f63ed: 评分顺序
+  rating_points_be3e8682: 评定分数
+  rating_scale_fc10d5f1: 评定量表
   rating_score_22cfc724: 评分分数
   rating_selected_85c31e4c: 已选择等级
   rating_tier_index_threshold_3f02a6d7: "等级%{index}阈值"
@@ -24719,6 +24753,7 @@ zh-Hans:
   remove_all_group_observer_members_af5675f3: 删除所有小组观察员
   remove_as_front_page_2698aa12: 移除封面
   remove_as_frontpagetext_133cdaee: "作为%{frontPageText}删除"
+  remove_as_leader_22d1a7d8: 作为组长删除
   remove_association_1412eabf: 移除关联
   remove_attachment_ceae0973: 删除附件
   remove_attendee_name_55165070: "删除参加者%{name}"
@@ -24768,8 +24803,10 @@ zh-Hans:
   remove_missing_status_when_graded_d0755cc7: 评分时移除缺失状态
   remove_name_624e06be: "移除 %{name}"
   remove_name_as_an_admin_c296cf49: "以管理员身份删除 %{name}"
+  remove_name_as_leader_3e03780a: "作为组长删除%{name}"
   remove_name_calendar_bdc329d9: "删除 %{name} 日历"
   remove_name_content_requirement_7af56c50: "删除 %{name} 内容要求"
+  remove_name_from_group_487cce74: "从小组删除%{name}"
   remove_name_prerequisite_98377b60: "删除 %{name} 先决条件"
   remove_null_values_from_live_event_payloads_3c826f: 从实时活动有效负荷中删除空值
   remove_observers_from_courses_703edc34: 移除课程中的观察员
@@ -24788,6 +24825,7 @@ zh-Hans:
   remove_prerequisite_13ab96eb: 删除先决条件
   remove_pronouns_5ff760ff: 删除代词
   remove_pronouns_pronoun_c8b03d78: "删除代词%{pronoun}"
+  remove_rating_cf9378eb: 删除评级
   remove_recipient_name_a6b83cef: "删除收件人的 %{name}"
   remove_removablecount_out_of_totalcount_outcomes_3270d9c0: "是否删除 %{removableCount} 个结果？共 %{totalCount} 个结果。"
   remove_requirement_32a89e23: 移除要求
@@ -25276,6 +25314,7 @@ zh-Hans:
     no_details: 无详细信息
   rubric_button_display_4e4a26fe: 评分细则按钮显示
   rubric_created_64980593: 已创建评价量规
+  rubric_criterion_modal_32377665: 评价量规标准模式
   rubric_criterion_range_12499bf1: Rubric标准范围
   rubric_deleted_3d9efc18: 已删除评价量规
   rubric_enhancements_73bf351c: 评价量规增强
@@ -25375,6 +25414,7 @@ zh-Hans:
   save_and_customize_19eb7a7b: 保存并自定义
   save_and_publish_1b765e7: 保存并发布
   save_changes_698abe77: 保存更改
+  save_criterion_cce60085: 保存标准
   save_customizations_dde779d8: 保持自定义
   save_failed_463cb2a8: 保存失败。
   save_filter_preset_37f32c02: 保存过滤器预设
@@ -25394,6 +25434,7 @@ zh-Hans:
   save_theme_f706116e: 保存主题
   save_these_conditions_as_a_filter_a31bbbf8: 将这些条件保存为过滤器
   save_this_comment_for_reuse_5eda0b70: 保存此评论供重复使用
+  save_this_rating_scale_as_default_a3f27305: 默认保存该评定量表
   save_your_type_to_begin_specifying_conditional_con_9e4f536a: "保存您的 %{type} 以开始具体条件的内容。"
   save_yourself_a_lot_of_time_by_only_adding_the_out_33293248: 仅添加与您的课程内容有关的结果，以节省您的时间。
   saved_3cd67a7c: 已保存
@@ -25418,6 +25459,7 @@ zh-Hans:
   saving_recording_e111cb05: 保存录制...
   saving_statusname_status_8f923edb: "正在保存 %{statusName} 状态"
   saving_the_csp_status_failed_please_try_again_8275aaa4: "保存 CSP 状态失败，请重试。"
+  scale_29738cdd: 评分范围
   scale_mathman_equation_images_to_match_the_size_of_2bca4e2e: 缩放数学方程图像以匹配背景字体的大小。
   scantron_quiz_4a97a17a: "Scantron 测验"
   schedule_availability_ad09a2e5: 计划表可用性
@@ -26094,6 +26136,7 @@ zh-Hans:
   session_expired_12aaf414: 会话已过期
   set_a_random_student_as_group_leader_663dcfd5: 将一个随机的学生设置为组长
   set_as_default_email_address_bd3b9b8f: 设置为默认的电子邮件地址
+  set_as_leader_f710dcec: 设置为组长
   set_course_color_to_a_custom_hexadecimal_code_c8a50918: 将课程颜色设置为自定义十六进制代码
   set_course_color_to_a_preset_hexadecimal_color_cod_97608d8: 将课程颜色设置为预设的十六进制颜色代码。使用左/右箭头键浏览预设。
   set_created_createdat_895e2243: "集已创建%{createdAt}"
@@ -26111,6 +26154,7 @@ zh-Hans:
   set_first_student_to_join_as_group_leader_5cfc206f: 将第一个加入的学生设置为组长
   set_group_weights_fd41c1f: 设置小组加权
   set_last_attended_date_8fb30092: 设置上次出勤日期
+  set_name_as_leader_591c8009: "将%{name}设置为组长"
   set_name_d14182d7: 设置名称...
   set_name_f83b658: 设置名称
   set_of_grading_periods_545b37e9: 评分周期的集合
@@ -29114,6 +29158,7 @@ zh-Hans:
   this_eportfolio_has_been_identified_as_spam_and_is_8430467: 此ePortfolio已被识别为垃圾邮件，仅您可见。若有问题，请联系管理员。
   this_eportfolio_has_been_identified_as_spam_it_is__f927947b: 此ePortfolio已被识别为垃圾邮件。目前仅管理员和作者可见。若您确定此内容不是垃圾邮件，您可标记为安全。
   this_event_b437db90: 此事件
+  this_feature_adds_the_start_end_and_close_dates_of_221c79cc: 此功能向评定时间段筛选器添加评定时间段的开始日期、结束日期和关闭日期
   this_feature_affects_existing_data_for_all_courses_4fc75fe1: 此功能影响帐户中所有课程的现有数据。
   this_feature_affects_existing_data_for_an_entire_a_2372dc52: 此功能影响整个帐户中的现有数据。
   this_feature_allows_teachers_to_create_anonymous_d_ea364dca: 该功能允许教师创建匿名讨论，并允许教师为学生启用课程级设置以创建匿名讨论
@@ -29177,6 +29222,7 @@ zh-Hans:
   this_feature_provides_a_new_speedgrader_platform_e_e7d740bd: 此功能提供新的SpeedGrader平台体验。
   this_feature_provides_visual_and_functional_enhanc_e5e57a21: "该功能对 Canvas 的评价量规进行视觉和功能增强。"
   this_feature_will_hide_all_quantitative_values_fro_6f006665: 该功能将对用户隐藏所有定量值
+  this_ff_is_for_development_purposes_only_and_shoul_f77938ba: "此 FF 仅用于开发目的，在调整前应先咨询产品和工程部门。此标记将阻止在成绩服务中删除具有校正的成绩，用于新测验。"
   this_field_is_required_fa58c4a: 此字段为必填字段
   this_field_name_is_required_988caebc: "此字段“%{name}”必填。"
   this_field_name_is_required_b9196401: 此字段“name”必填。
@@ -29705,6 +29751,7 @@ zh-Hans:
   title_outcomes_7adbd9cc: "%{title} 结果"
   title_required_3ff5969: 标题是必填项
   title_separator: ": "
+  title_start_end_closed_def2bf1f: "%{title}：%{start} - %{end} | %{closed}"
   title_tray_ec9f7488: "%{title}托盘"
   title_unpublished_51ddbc6a: "%{title}（已取消发布）"
   title_was_successfully_created_f2a07c56: "“%{title}” 已创建成功。"
