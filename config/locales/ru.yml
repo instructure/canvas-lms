@@ -379,8 +379,10 @@ ru:
         partner_key: "Ключ партнера"
   academic_engagement_capella_74946a80: "Академическая вовлеченность (Capella)"
   academic_engagement_capella_v2_2023_08_28_5c92fd3f: "Академическая вовлеченность (Capella V2-2023-08-28)"
+  academic_engagement_capella_v3_2024_02_05_775b9f21: "Академическая вовлеченность (Capella V3-2024-02-05)"
   academic_engagement_detail_capella_e76c939d: "Информация об академической вовлеченности (Capella)"
   academic_engagement_detail_capella_v2_2023_08_28_3ba31c31: "Академическая вовлеченность, информация (Capella V2-2023-08-28)"
+  academic_engagement_detail_capella_v3_2024_02_05_106a7e2f: "Академическая вовлеченность, информация (Capella V3-2024-02-05)"
   academic_engagement_detail_sei_31f8f271: "Информация об академической вовлеченности - SEI"
   academic_engagement_detail_strayer_1f80cba4: "Информация об академической вовлеченности (Strayer)"
   academic_engagement_detail_strayer_v3_2023_08_28_cea3521c: "Академическая вовлеченность, информация (Strayer V3-2023-08-28)"
@@ -2320,6 +2322,7 @@ ru:
   add_courses_c0696323: "Добавить курсы"
   add_criterion_eb9587ef: "Добавить критерий"
   add_custom_link_22059c0: "Добавить пользовательскую ссылку"
+  add_dates_to_gradebook_grading_period_filter_b47b6a14: "Добавить даты в Фильтр периодов оценивания журнала оценок"
   add_delete_b82d05f8: "добавить / удалить"
   add_delete_edit_7dbc9c5b: "добавить / удалить / редактировать"
   add_delete_manage_d65e235: "добавить / удалить / управлять"
@@ -2382,6 +2385,7 @@ ru:
   add_new_caption_or_subtitle_59d2d044: "Добавить новый заголовок или подзаголовок"
   add_new_domain_e097d4a0: "Добавить новый домен"
   add_new_group_7ac49f31: "Добавить новую группу"
+  add_new_rating_9fb7ec89: "Добавить новую оценку"
   add_new_row_for_a_letter_grade_to_grading_scheme_a_1472479e: "Добавить новую строку для оценки по буквенной системе в схему оценивания после этой строки"
   add_new_set_of_due_dates_e8e240f: "Добавить новый набор установленных сроков"
   add_new_term_d2217c0d: "Добавить новый семестр"
@@ -5496,6 +5500,7 @@ ru:
   belarusian_b2f19c76: Белорусский
   belgium_32_e5f5b598: "Бельгия (+32)"
   belgium_ef8739b6: Бельгия
+  below_81d4dceb: Ниже
   below_is_an_example_of_how_students_will_see_their_8f7e7971: "Ниже приводится пример того, в каком виде будет отображаться расписание для студентов"
   below_mastery_abd1dca5: "Ниже уровня усвоения"
   below_min_rating_78a742c3: "Ниже минимальной оценки"
@@ -5528,6 +5533,7 @@ ru:
   blackout_date_title_was_edited_31752bc9: "Была изменена закрытая дата %{title}."
   blackout_dates_4a140a72: "Даты временной приостановки работы"
   blank_38df4238: "не заполнен"
+  block_editor_2e266d9c: "Редактор блоков"
   blocked_30d0fb62: Заблокировано
   blocked_by_running_migration_d8a57cb7: "Заблокировано путем запуска миграции"
   blocked_domain_name_b5b93150: "Заблокированное имя домена"
@@ -8938,6 +8944,7 @@ ru:
   course_copy_no_course_error: "Исходный курс не найден."
   course_copy_not_allowed_error: "Вам не разрешено копировать исходный курс."
   course_course_d1c78210: "Курс: %{course}"
+  course_datetime_c0c32b02: "Курс: %{datetime}"
   course_default_fd054879: "(курс по умолчанию)"
   course_default_grading_scheme_6b902d8: "Курс по умолчанию Схема выставления оценок"
   course_details_25cdf103: "Сведения о курсе"
@@ -9937,6 +9944,7 @@ ru:
   create_file_s_188549e6: "[ Создать файл(-ы) ]"
   create_files_after_rce_media_upload_recording_77d75a96: "Создать файлы после загрузки/записи RCE Media"
   create_filter_preset_d6f28bc4: "Создать заранее настроенный фильтр"
+  create_from_outcome_3f29e594: "Создать из результата"
   create_group_set_7fe1cd53: "Создать набор групп"
   create_groups_later_6ce36058: "Создать группы позднее"
   create_groups_now_d59bf70b: "Создать группы сейчас"
@@ -9964,7 +9972,9 @@ ru:
     url: URL-адрес
   create_new_assignment_d77dfc4: "Создать новое Задание"
   create_new_attempt_19c96c03: "Создать новую попытку"
+  create_new_calendar_event_f933f209: "Создать новое событие в календаре"
   create_new_course_e3ef9cd0: "Создать новый курс"
+  create_new_criterion_1a4efd4: "Создать новый критерий"
   create_new_discussions_6ab69da2: "Создать новые обсуждения"
   create_new_e0946c49: "Создать новый"
   create_new_filter_c244aa92: "Создать новый фильтр"
@@ -10025,7 +10035,9 @@ ru:
   criteria_builder_b214069e: "Конструктор критериев"
   criterion_5f0b62f8: Критерий
   criterion_created_42669293: "Критерий создан"
+  criterion_description_757741c3: "Описание критерия"
   criterion_long_description_e9a97247: "Длинное описание критерия"
+  criterion_name_92e1c426: "Имя критерия"
   criterion_ratings_3eed22e2: "Рейтинги критерия"
   criterion_updated_36c0b3dc: "Критерий обновлен"
   croatian_d713d655: Хорватский
@@ -10538,6 +10550,7 @@ ru:
   delete_course_files_ee9e769: "Удалить файлы курса"
   delete_course_templates_bb966d27: "Удалить шаблоны курса"
   delete_courses_9ac148e3: "Удалить курсы"
+  delete_criterion_2181295b: "Удалить критерий"
   delete_criterion_row_80c3b3b: "Удалить строку критериев"
   delete_current_message_5da0221a: "Удалить текущее сообщение"
   delete_current_module_item_21fefc54: "Удалить текущий модуль/элемент"
@@ -11479,6 +11492,7 @@ ru:
   draft_comment_b2376ea4: "Черновой комментарий"
   draft_comment_warning_modal_in_speedgrader_ded232c1: "Диалоговое окно предупреждения к черновому комментарию в SpeedGrader"
   draft_discussion_entries_98d93a9d: "Черновые статьи для обсуждения"
+  draft_new_criterion_95ed3c89: "Черновик нового критерия"
   draft_saved_eba9cfeb: "Черновик сохранен"
   drag_a_file_here_39357b48: "Перетащите файл сюда"
   drag_a_file_here_or_1aaf19c1: "Перетащите файл сюда или"
@@ -11571,6 +11585,7 @@ ru:
   duplicate_31cec192: Дубликат
   duplicate_assignment_name_3ca7d753: "Дублировать задание %{name}"
   duplicate_c4bb7d3a: "Дубликат "
+  duplicate_criterion_601aa3cf: "Дублировать критерий"
   duplicate_discussion_title_43b39959: "Сделать дубликат дискуссии %{title}"
   duplicate_discussion_title_6537ef4d: "Дублировать обсуждение %{title}"
   duplicate_grading_scheme_d0e57758: "Дублировать схему оценивания"
@@ -11746,6 +11761,7 @@ ru:
   edit_user_c46cf103: "Редактировать данные пользователя"
   edit_user_details_4d7b63ff: "Редактировать информацию о пользователе"
   edit_user_details_9af7819b: "Редактировать сведения о пользователе"
+  edit_username_s_membership_3969048c: "Редактировать членство %{userName}"
   edit_value_7911ae4f: "Редактировать значение"
   edit_value_for_name_d9e25af1: "Редактировать значение для «%{name}»"
   edit_video_conference_5ceec91c: "Редактировать видеоконференцию"
@@ -11909,6 +11925,7 @@ ru:
   enable_the_creation_of_master_courses_8205b155: "Разрешить создание основных курсов"
   enable_the_deprecation_of_the_faculty_journal_func_78b3344d: "Активировать депрекацию функционирования журнала факультета."
   enable_the_module_publish_menus_to_make_mass_publi_b32f0c52: "Включите меню публикации модуля, чтобы облегчить массовую публикацию и отмену публикации."
+  enable_the_new_block_editor_for_the_rich_content_e_6a0d0031: "Включить новый редактор блоков для редактора форматированного контента."
   enable_the_plagiarism_detection_platform_7c3b6195: "Активировать систему обнаружения плагиата"
   enable_the_redesigned_course_pacing_user_experienc_21618a38: "Активировать возможность использования перекомпонованного плана прохождения курса."
   enable_the_security_tab_on_the_settings_page_to_ad_eab7c954: "Включите вкладку «Безопасность» на странице настроек, чтобы настроить параметры CSP"
@@ -12157,6 +12174,7 @@ ru:
                           Ознакомьтесь с порядком **генерирования токена доступа**.
   enter_the_access_token_for_your_organization_from__cc77493d: "Введите маркер доступа для вашей организации от *eduappcenter.com*. После применения на странице Внешние Приложения будут перечислены только те приложения, которые ваша организация одобрила в EduAppCenter. Узнайте, как **генерировать маркер доступа**."
   enter_the_access_token_for_your_organization_from__f1c71941: "Введите токен доступа для своей организации из *eduappcenter.com*. После применения только приложения, одобренные вашей организацией в EduAppCenter, будут отображаться на странице внешних приложений.                       Ознакомьтесь с порядком **генерирования токена доступа**."
+  enter_the_description_91ececc1: "Введите описание"
   enter_the_email_address_of_the_user_you_would_like_92112560: "Введите адрес электронной почты пользователя, которого вы хотите временно зарегистрировать."
   enter_the_email_addresses_of_the_users_you_would_l_17cef6a0: "Введите через запятую адреса электронной почты пользователей, которых вы хотите добавить"
   enter_the_email_addresses_of_the_users_you_would_l_f76448a6: "Введите адреса электронной почты пользователей, которых вы хотите добавить, разделив их запятыми или разрывами строки"
@@ -12164,6 +12182,7 @@ ru:
   enter_the_login_id_of_the_user_you_would_like_to_t_46938400: "Введите идентификатор для входа в систему пользователя, которого вы хотите временно зарегистрировать."
   enter_the_login_ids_of_the_users_you_would_like_to_502fcbc5: "Введите имена пользователей, которых вы хотите добавить, разделив их запятыми или разрывами строки"
   enter_the_login_ids_of_the_users_you_would_like_to_d39fb0f7: "Введите через запятую имена пользователей, которых вы хотите добавить"
+  enter_the_name_c86bd140: "Введите имя"
   enter_the_sis_id_of_the_user_you_would_like_to_tem_efab1e87: "Введите идентификатор SIS пользователя, которого вы хотите временно зарегистрировать."
   enter_the_sis_ids_of_the_users_you_would_like_to_a_1bdce982: "Введите через запятую идентификаторы SIS пользователей, которых вы хотите добавить"
   enter_the_sis_ids_of_the_users_you_would_like_to_a_25e441f1: "Введите идентификаторы SIS пользователей, которых вы хотите добавить, разделив их запятыми или разрывами строки"
@@ -12763,6 +12782,7 @@ ru:
   example_item_scores_6726c689: "Пример оценок за элемент"
   example_school_of_rock_41f32c31: "пример: «Школа рока»"
   exceeded_the_maximum_length_number_characters_2d25611e: "Превышена максимальная длина (%{number} символа(-ов))"
+  exceeds_1dfdae30: Превышает
   exceeds_expectations_5910fc3a: "Превышает ожидания"
   exceeds_mastery_1f995dce: "Превышает проходной балл"
   exceeds_max_events_28f19b04: "Превышает %{max} событий(-я)."
@@ -15748,6 +15768,7 @@ ru:
   if_enabled_canvas_will_allow_tools_to_return_multi_fe7b6678: |-
       В случае активации Canvas позволяет пользователям возвращать несколько элементов курса
       за один запрос на странице модулей курса
+  if_enabled_canvas_will_be_able_to_export_new_quizz_504132df: "Если эта функция включена, Canvas сможет экспортировать новые тесты как часть пакетов экспорта Common Cartridge."
   if_enabled_common_cartridge_importers_will_convert_9bffff09: "Если включено, модули импорта Common Cartridge преобразуют HTML-файлы в станицы"
   if_enabled_content_designers_must_provide_copyrigh_eca21f5e: "Если опция включена, дизайнеры контента должны предоставить информацию об авторских правах и лицензии для файлов, прежде чем они будут опубликованы. Применяется только если также включен Просмотр лучшего файла."
   if_enabled_copyright_and_license_information_must__2a551827: "Если включено, информация об авторских правах и лицензии должна предоставляться для файлов до их публикации."
@@ -17327,6 +17348,7 @@ ru:
   loading_unsynced_changes_b5d7b202: "Загрузка несинхронизированных изменений"
   loading_unsynched_changes_688434f2: "Загрузка несинхрониз. изменений"
   local_4ee321b1: Местный
+  local_datetime_ce5ffddd: "Локально: %{datetime}"
   locales: 
     ru: pу́сский
   location_3b6ff307: "Местоположение:"
@@ -20048,6 +20070,7 @@ ru:
   module_name_1127ebdb: "Название модуля"
   module_name_is_required_de75de0a: "Необходимо указать имя модуля."
   module_navigation_97043417: "Навигация по модулю"
+  module_progress_for_name_fbff0ccb: "Прохождение модуля для *%{name}*"
   module_publish_menu_30b638dd: "Меню публикации модулей"
   module_publish_menu_88b54c1b: "Меню публикации модулей"
   module_published_80f0b9b8: "Модуль опубликована"
@@ -20263,6 +20286,7 @@ ru:
     many: "Переместить %{count} Результаты?"
     one: "Переместить «%{outcomeTitle}»?"
     other: "Переместить %{count} Результаты?"
+  move_criterion_9b2965d9: "Переместить критерий"
   move_dialog: 
     cancel: Отменить
     save: Сохранить
@@ -20288,6 +20312,7 @@ ru:
   move_module_item_after_bbcfe2d6: "Переместить элемент модуля после"
   move_module_item_before_13e940eb: "Переместить элемент модуля перед"
   move_module_item_f525d6c8: "Переместить элемент модуля"
+  move_name_to_a_new_group_acabed4e: "Переместить %{name} в новую группу"
   move_navigation_item_f034cd8a: "Переместить элемент навигации"
   move_outcome_ce497e6c: "Переместить результат"
   move_outcome_group_cfa1a505: "Переместить группу результатов"
@@ -20505,6 +20530,7 @@ ru:
   navigation_allows_user_to_view_the_people_link_in__dd533d29: "Навигация позволяет пользователю отобразить ссылку «Люди» в навигации по курсу."
   navigation_icon_45db938e: "Иконка Навигации"
   navigation_menu_fd782ff8: "Меню навигации"
+  near_3282280c: Рядом
   near_mastery_f25174a4: "Почти усвоено"
   need_a_canvas_account_221d18ed: "Нужен аккаунт на Canvas?"
   need_help_setting_up_your_course_2b763141: "Нужна помощь в настройке вашего курса?"
@@ -20602,6 +20628,7 @@ ru:
   new_quizzes_banks_migrations_9ab4de4a: "Новые миграции банков тестирований"
   new_quizzes_build_button_in_module_items_10f651fb: "Кнопка создания новых контрольных тестов в элементах модуля"
   new_quizzes_build_button_on_list_views_62c7c0e8: "Кнопка создания новых контрольных тестов в просмотрах списка"
+  new_quizzes_common_cartridge_support_250780be: "Новые тесты, поддержка Common Cartridge"
   new_quizzes_dbda7e0a: "Новые тестирования"
   new_quizzes_description: "Эта функция улучшает работу в Canvas в ходе обсуждений. Если этот флажок установлен, будет доступен инструмент New Quizzes (Новые тесты). Более подробная информация находится в *Новые тесты для группы пользователей* в сообществе Canvas."
   new_quizzes_embedded_module_progression_cd2307b6: "Встроенная обработка новых тестов"
@@ -21825,6 +21852,7 @@ ru:
   outcomes_and_rubrics_account_course_f0d23419: "Результаты и рубрики (учетная запись, курс)"
   outcomes_and_rubrics_f893d141: "Результаты и рубрики"
   outcomes_are_created_here_to_track_mastery_in_a_co_2f487549: "Результаты создаются здесь для отслеживания усвоения по ходу курса. Чтобы начать, проверьте строку меню вверху. Нажмите кнопку «Новый результат», чтобы создать новый результат, или кнопку «Новая группа», чтобы создать новую группу для упорядочивания ваших результатов. Кнопка «Найти» позволит вам использовать результаты, созданные вашим государственным органом или учебным заведением. Когда вы создаете и используете результаты, вы сможете использовать панель слева для просмотра своих результатов. Вы можете перетаскивать результаты между различными уровнями для создания структуры."
+  outcomes_averages_report_34199e77: "Отчет о средних результатах"
   outcomes_csv_format_9005acfb: "CSV-формат результатов"
   outcomes_d1b18d33: Результаты
   outcomes_for_student_9f91d4d: "Результаты для студента"
@@ -22845,11 +22873,13 @@ ru:
   presents_the_quiz_setting_to_avoid_automatic_submi_363b91ff: "Представляет настройку теста для исключения автоматической отправки теста с привязкой ко времени при истечении доступного периода времени."
   press_alt_f8_to_see_a_list_of_keyboard_shortcuts_2a8c7bc0: "Нажмите ALT + F8 для просмотра списка клавиш быстрого доступа"
   press_space_to_start_over_d4b8a2da: "Нажмите «пробел», чтобы начать сначала"
+  press_tab_for_more_options_f087f5c2: "Щелкните по вкладке, чтобы открыть дополнительные варианты"
   press_the_comma_key_or_shift_question_mark_to_see__930af9df: "Нажмите клавишу запятой или Shift + знак вопроса, чтобы увидеть список горячих клавиш"
   press_the_comma_key_or_shift_to_see_a_list_of_keyb_155d8ca3: "Нажмите клавишу запятой или Shift + ?, чтобы увидеть список горячих клавиш"
   press_the_esc_key_to_close_this_modal_14d10601: "Нажмите клавишу Esc, чтобы закрыть этот модуль"
   prev_f82cbc48: Назад
   prev_month_34bd934c: "Пред месяц"
+  prevent_deletion_of_outcomes_with_alignments_in_os_65020476: "Предотвращение удаления результатов с согласованием в ОС"
   prevents_students_from_leaving_annotations_in_assi_cb188d2: "Запрещает учащимся оставлять аннотации в заданиях. Не применяется к рецензированным коллегами заданиям."
   preview_53003fd2: "Предварительный просмотр"
   preview_a3f8f854: ПРЕДПРОСМОТР
@@ -22892,6 +22922,7 @@ ru:
   primary_color_button_b75db628: "Кнопка основного цвета"
   primary_color_button_disabled_9081ddff: "Кнопка основного цвета отключена"
   primary_email_address_mail_9018f: "Основной адрес электронной почты (почта)"
+  print_d0e3d53f: Печать
   print_grades_9d5dd50f: "Печать оценок"
   prioritize_individual_overrides_6be735e1: "Приоритизация индивидуальных переопределений"
   priority_dd4381ee: Приоритет
@@ -25056,7 +25087,10 @@ ru:
   rating_description_db6adf39: "Описание оценки"
   rating_max_score_eade1523: "Максимальная оценка"
   rating_min_score_3d35a762: "Минимальная оценка"
+  rating_name_6f633d52: "Имя рейтинга"
   rating_order_e57f63ed: "Порядок оценивания"
+  rating_points_be3e8682: "Баллы рейтинга"
+  rating_scale_fc10d5f1: "Шкала рейтинга"
   rating_score_22cfc724: Оценка
   rating_selected_85c31e4c: "Выбранная оценка"
   rating_tier_index_threshold_3f02a6d7: "оценочный уровень %{index} порог"
@@ -25355,6 +25389,7 @@ ru:
   remove_all_group_observer_members_af5675f3: "Удалить всех наблюдающих участников группы"
   remove_as_front_page_2698aa12: "Удалить в качестве титульной страницы"
   remove_as_frontpagetext_133cdaee: "Удалить как %{frontPageText}"
+  remove_as_leader_22d1a7d8: "Снять с позиции лидера"
   remove_association_1412eabf: "Удалить ассоциацию"
   remove_attachment_ceae0973: "Удалить вложение"
   remove_attendee_name_55165070: "Удалить участника %{name}"
@@ -25404,8 +25439,10 @@ ru:
   remove_missing_status_when_graded_d0755cc7: "Удалить статус отсутствия при выставлении оценки"
   remove_name_624e06be: "Удалить %{name}"
   remove_name_as_an_admin_c296cf49: "Удалить %{name} в качестве администратора"
+  remove_name_as_leader_3e03780a: "Снять %{name} с позиции лидера"
   remove_name_calendar_bdc329d9: "Удалить календарь %{name}"
   remove_name_content_requirement_7af56c50: "Убрать %{name} требование к содержанию"
+  remove_name_from_group_487cce74: "Удалить %{name} из группы"
   remove_name_prerequisite_98377b60: "Удалить %{name} предварительное условие"
   remove_null_values_from_live_event_payloads_3c826f: "Удалить нулевые значения из интерактивных событий"
   remove_observers_from_courses_703edc34: "Удалить наблюдателей из курсов"
@@ -25428,6 +25465,7 @@ ru:
   remove_prerequisite_13ab96eb: "Удалить предварительное условие"
   remove_pronouns_5ff760ff: "Удалить местоимения"
   remove_pronouns_pronoun_c8b03d78: "Удалить местоимения %{pronoun}"
+  remove_rating_cf9378eb: "Удалить рейтинг"
   remove_recipient_name_a6b83cef: "Удалить получателя %{name}"
   remove_removablecount_out_of_totalcount_outcomes_3270d9c0: "Удалить %{removableCount} из %{totalCount} результатов?"
   remove_requirement_32a89e23: "Удалить требование"
@@ -25932,6 +25970,7 @@ ru:
     no_details: "Нет сведений"
   rubric_button_display_4e4a26fe: "Дисплей с кнопками рубрики"
   rubric_created_64980593: "Создана рубрика"
+  rubric_criterion_modal_32377665: "Модальный критерий рубрики"
   rubric_criterion_range_12499bf1: "Диапазон критериев рубрики"
   rubric_deleted_3d9efc18: "Удалена рубрика"
   rubric_enhancements_73bf351c: "Усовершенствования рубрик"
@@ -26037,6 +26076,7 @@ ru:
   save_and_customize_19eb7a7b: "Сохранить и настроить"
   save_and_publish_1b765e7: "Сохранить и опубликовать"
   save_changes_698abe77: "Сохранить изменения"
+  save_criterion_cce60085: "Сохранить критерий"
   save_customizations_dde779d8: "Сохранить настройки"
   save_failed_463cb2a8: "Не удалось сохранить."
   save_filter_preset_37f32c02: "Сохранить заранее настроенный фильтр"
@@ -26056,6 +26096,7 @@ ru:
   save_theme_f706116e: "Сохранить тему"
   save_these_conditions_as_a_filter_a31bbbf8: "Сохранить эти условия в качестве фильтра"
   save_this_comment_for_reuse_5eda0b70: "Сохранить этот комментарий для повторного использования"
+  save_this_rating_scale_as_default_a3f27305: "Сохранить эту шкалу рейтинга как параметр по умолчанию"
   save_your_type_to_begin_specifying_conditional_con_9e4f536a: "Сохраните %{type} для начала указания условного контента."
   save_yourself_a_lot_of_time_by_only_adding_the_out_33293248: "Экономьте время, добавляя только результаты, связанные с содержанием вашего курса."
   saved_3cd67a7c: Сохранено
@@ -26080,6 +26121,7 @@ ru:
   saving_recording_e111cb05: "Сохранение записи..."
   saving_statusname_status_8f923edb: "Сохранение статуса %{statusName}"
   saving_the_csp_status_failed_please_try_again_8275aaa4: "Не удалось сохранить статус CSP, повторите попытку."
+  scale_29738cdd: Шкала
   scale_mathman_equation_images_to_match_the_size_of_2bca4e2e: "Масштабирование изображений уравнений mathman в соответствии с размером окружающего шрифта."
   scantron_quiz_4a97a17a: "Контрольный тест Scantron"
   schedule_availability_ad09a2e5: "Доступность расписания"
@@ -26770,6 +26812,7 @@ ru:
   session_expired_12aaf414: "Срок действия сессии истек"
   set_a_random_student_as_group_leader_663dcfd5: "Установить случайного студента в качестве лидера группы"
   set_as_default_email_address_bd3b9b8f: "Установить, как адрес электронной почты по умолчанию"
+  set_as_leader_f710dcec: "Выбрать в качестве лидера"
   set_course_color_to_a_custom_hexadecimal_code_c8a50918: "Установите цвет курса как настраиваемый шестнадцатеричный код"
   set_course_color_to_a_preset_hexadecimal_color_cod_97608d8: "Установите цвет курса как предустановленный шестнадцатеричный код. Используйте левые и правые клавиши для настройки предустановленных параметров."
   set_created_createdat_895e2243: "Установить создание %{createdAt}"
@@ -26787,6 +26830,7 @@ ru:
   set_first_student_to_join_as_group_leader_5cfc206f: "Установить первого присоединившегося студента в качестве лидера группы"
   set_group_weights_fd41c1f: "Установить оценки группы"
   set_last_attended_date_8fb30092: "Задать дату последнего посещения"
+  set_name_as_leader_591c8009: "Выбрать %{name} в качестве лидера"
   set_name_d14182d7: "Установить имя..."
   set_name_f83b658: "Установить имя"
   set_of_grading_periods_545b37e9: "Набор Оценочных периодов"
@@ -29869,6 +29913,7 @@ ru:
   this_eportfolio_has_been_identified_as_spam_and_is_8430467: "Это ePortfolio было идентифицировано как «спам», доступ к его просмотру имеется только у вас. При наличии вопросов обращайтесь к администратору."
   this_eportfolio_has_been_identified_as_spam_it_is__f927947b: "Это ePortfolio было идентифицировано как « спам». В настоящее время оно доступно для просмотра только для администраторов и автора. Если вы уверены, в том, что данный контент не является спамом, вы можете пометить его как «безопасное»."
   this_event_b437db90: "Это событие"
+  this_feature_adds_the_start_end_and_close_dates_of_221c79cc: "Эта функция добавляет даты начала, окончания и закрытия периодов обучения в фильтр периодов оценивания."
   this_feature_affects_existing_data_for_all_courses_4fc75fe1: "Эта функция влияет на существующие данные для всех курсов в учетной записи."
   this_feature_affects_existing_data_for_an_entire_a_2372dc52: "Эта функция влияет на существующие данные для всей учетной записи."
   this_feature_allows_teachers_to_create_anonymous_d_ea364dca: "Эта функция позволяет преподавателям создавать анонимные обсуждения и включить настройку на уровне курса, чтобы учащиеся могли создавать анонимные обсуждения."
@@ -29932,6 +29977,7 @@ ru:
   this_feature_provides_a_new_speedgrader_platform_e_e7d740bd: "Эта функция обеспечивает новые возможности платформы SpeedGrader."
   this_feature_provides_visual_and_functional_enhanc_e5e57a21: "Эта функция обеспечивает визуальное и функциональное усовершенствование рубрик в системе Canvas."
   this_feature_will_hide_all_quantitative_values_fro_6f006665: "Эта функция скроет от пользователей все количественные значения"
+  this_ff_is_for_development_purposes_only_and_shoul_f77938ba: "Этот FF предназначен только для целей разработки и не должен корректироваться без предварительной консультации с производителем и инженерами. Этот флажок предотвращает удаление результатов, которые имеют соответствия в службе результатов, которая используется для новых тестов."
   this_field_is_required_fa58c4a: "Необходимо заполнить это поле"
   this_field_name_is_required_988caebc: "Необходимо заполнить поле \"%{name}\""
   this_field_name_is_required_b9196401: "Необходимо заполнить поле \" name\""
@@ -30466,6 +30512,7 @@ ru:
   title_outcomes_7adbd9cc: "%{title} Результаты"
   title_required_3ff5969: "Необходим заголовок"
   title_separator: ": "
+  title_start_end_closed_def2bf1f: "%{title}: %{start} - %{end} | %{closed}"
   title_tray_ec9f7488: "%{title} панель"
   title_unpublished_51ddbc6a: "%{title} (публикация отменена)"
   title_was_successfully_created_f2a07c56: "\"%{title}\" был успешно создан."
