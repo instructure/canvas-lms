@@ -363,8 +363,10 @@ en-AU:
         partner_key: "Partner Key"
   academic_engagement_capella_74946a80: "Academic Engagement (Capella)"
   academic_engagement_capella_v2_2023_08_28_5c92fd3f: "Academic Engagement (Capella V2-2023-08-28)"
+  academic_engagement_capella_v3_2024_02_05_775b9f21: "Academic Engagement (Capella V3-2024-02-05)"
   academic_engagement_detail_capella_e76c939d: "Academic Engagement Detail (Capella)"
   academic_engagement_detail_capella_v2_2023_08_28_3ba31c31: "Academic Engagement Detail (Capella V2-2023-08-28)"
+  academic_engagement_detail_capella_v3_2024_02_05_106a7e2f: "Academic Engagement Detail (Capella V3-2024-02-05)"
   academic_engagement_detail_sei_31f8f271: "Academic Engagement Detail - SEI"
   academic_engagement_detail_strayer_1f80cba4: "Academic Engagement Detail (Strayer)"
   academic_engagement_detail_strayer_v3_2023_08_28_cea3521c: "Academic Engagement Detail (Strayer V3-2023-08-28)"
@@ -2290,6 +2292,7 @@ en-AU:
   add_courses_c0696323: "Add courses"
   add_criterion_eb9587ef: "Add Criterion"
   add_custom_link_22059c0: "Add Custom Link"
+  add_dates_to_gradebook_grading_period_filter_b47b6a14: "Add dates to Gradebook Grading Period Filter"
   add_delete_b82d05f8: "add / delete"
   add_delete_edit_7dbc9c5b: "add / delete / edit"
   add_delete_manage_d65e235: "add / delete / manage"
@@ -2352,6 +2355,7 @@ en-AU:
   add_new_caption_or_subtitle_59d2d044: "Add new caption or subtitle"
   add_new_domain_e097d4a0: "Add new domain"
   add_new_group_7ac49f31: "Add new group"
+  add_new_rating_9fb7ec89: "Add new rating"
   add_new_row_for_a_letter_grade_to_grading_scheme_a_1472479e: "Add new row for a letter grade to grading scheme after this row"
   add_new_set_of_due_dates_e8e240f: "Add a new set of due dates"
   add_new_term_d2217c0d: "Add New Term"
@@ -5412,6 +5416,7 @@ en-AU:
   belarusian_b2f19c76: Belarusian
   belgium_32_e5f5b598: "Belgium (+32)"
   belgium_ef8739b6: Belgium
+  below_81d4dceb: Below
   below_is_an_example_of_how_students_will_see_their_8f7e7971: "Below is an example of how students will see their schedule"
   below_mastery_abd1dca5: "Below Mastery"
   below_min_rating_78a742c3: "Below min rating"
@@ -5444,6 +5449,7 @@ en-AU:
   blackout_date_title_was_edited_31752bc9: "Blackout date %{title} was edited."
   blackout_dates_4a140a72: "Blackout Dates"
   blank_38df4238: blank
+  block_editor_2e266d9c: "Block Editor"
   blocked_30d0fb62: Blocked
   blocked_by_running_migration_d8a57cb7: "Blocked by running migration"
   blocked_domain_name_b5b93150: "Blocked Domain Name"
@@ -8705,6 +8711,7 @@ en-AU:
   course_copy_no_course_error: "The source course was not found."
   course_copy_not_allowed_error: "You are not allowed to copy the source course."
   course_course_d1c78210: "Course: %{course}"
+  course_datetime_c0c32b02: "Course: %{datetime}"
   course_default_fd054879: "(course default)"
   course_default_grading_scheme_6b902d8: "Course Default Grading Scheme"
   course_details_25cdf103: "Course Details"
@@ -9703,6 +9710,7 @@ en-AU:
   create_file_s_188549e6: "[ Create File(s) ]"
   create_files_after_rce_media_upload_recording_77d75a96: "Create Files After RCE Media Upload/Recording"
   create_filter_preset_d6f28bc4: "Create Filter Preset"
+  create_from_outcome_3f29e594: "Create From Outcome"
   create_group_set_7fe1cd53: "Create Group Set"
   create_groups_later_6ce36058: "Create groups later"
   create_groups_now_d59bf70b: "Create groups now"
@@ -9730,7 +9738,9 @@ en-AU:
     url: URL
   create_new_assignment_d77dfc4: "Create New Assignment"
   create_new_attempt_19c96c03: "Create New Attempt"
+  create_new_calendar_event_f933f209: "Create New Calendar Event"
   create_new_course_e3ef9cd0: "Create new course"
+  create_new_criterion_1a4efd4: "Create New Criterion"
   create_new_discussions_6ab69da2: "Create new discussions"
   create_new_e0946c49: "Create new"
   create_new_filter_c244aa92: "Create New Filter"
@@ -9791,7 +9801,9 @@ en-AU:
   criteria_builder_b214069e: "Criteria Builder"
   criterion_5f0b62f8: Criterion
   criterion_created_42669293: "Criterion Created"
+  criterion_description_757741c3: "Criterion Description"
   criterion_long_description_e9a97247: "Criterion Long Description"
+  criterion_name_92e1c426: "Criterion Name"
   criterion_ratings_3eed22e2: "Criterion Ratings"
   criterion_updated_36c0b3dc: "Criterion Updated"
   croatian_d713d655: Croatian
@@ -10266,6 +10278,7 @@ en-AU:
   delete_course_files_ee9e769: "Delete course files"
   delete_course_templates_bb966d27: "Delete Course Templates"
   delete_courses_9ac148e3: "Delete courses"
+  delete_criterion_2181295b: "Delete Criterion"
   delete_criterion_row_80c3b3b: "Delete criterion row"
   delete_current_message_5da0221a: "Delete Current Message"
   delete_current_module_item_21fefc54: "Delete Current Module/Item"
@@ -11193,6 +11206,7 @@ en-AU:
   draft_comment_b2376ea4: "Draft comment"
   draft_comment_warning_modal_in_speedgrader_ded232c1: "Draft Comment Warning Modal in SpeedGrader"
   draft_discussion_entries_98d93a9d: "Draft Discussion Entries"
+  draft_new_criterion_95ed3c89: "Draft New Criterion"
   draft_saved_eba9cfeb: "Draft Saved"
   drag_a_file_here_39357b48: "Drag a File Here"
   drag_a_file_here_or_1aaf19c1: "Drag a file here, or"
@@ -11285,6 +11299,7 @@ en-AU:
   duplicate_31cec192: Duplicate
   duplicate_assignment_name_3ca7d753: "Duplicate Assignment %{name}"
   duplicate_c4bb7d3a: "Duplicate "
+  duplicate_criterion_601aa3cf: "Duplicate Criterion"
   duplicate_discussion_title_43b39959: "Duplicate Discussion %{title}"
   duplicate_discussion_title_6537ef4d: "Duplicate discussion %{title}"
   duplicate_grading_scheme_d0e57758: "Duplicate Grading Scheme"
@@ -11456,6 +11471,7 @@ en-AU:
   edit_user_c46cf103: "Edit User"
   edit_user_details_4d7b63ff: "Edit User Details"
   edit_user_details_9af7819b: "Edit user details"
+  edit_username_s_membership_3969048c: "Edit %{userName}'s membership"
   edit_value_7911ae4f: "Edit value"
   edit_value_for_name_d9e25af1: "Edit value for \"%{name}\""
   edit_video_conference_5ceec91c: "Edit Video Conference"
@@ -11619,6 +11635,7 @@ en-AU:
   enable_the_creation_of_master_courses_8205b155: "Enable the creation of Master Courses"
   enable_the_deprecation_of_the_faculty_journal_func_78b3344d: "Enable the deprecation of the faculty journal functionality."
   enable_the_module_publish_menus_to_make_mass_publi_b32f0c52: "Enable the module publish menus to make mass publishing and unpublishing easier."
+  enable_the_new_block_editor_for_the_rich_content_e_6a0d0031: "Enable the new block editor for the rich content editor."
   enable_the_plagiarism_detection_platform_7c3b6195: "Enable the plagiarism detection platform"
   enable_the_redesigned_course_pacing_user_experienc_21618a38: "Enable the redesigned course pacing user experience."
   enable_the_security_tab_on_the_settings_page_to_ad_eab7c954: "Enable the Security tab on the settings page to adjust CSP settings"
@@ -11865,6 +11882,7 @@ en-AU:
                           Learn how to **generate an access token**.
   enter_the_access_token_for_your_organization_from__cc77493d: "Enter the access token for your organisation from *eduappcenter.com*. Once applied, only apps your organisation has approved in the EduAppCenter will be listed on the External Apps page.                         Learn how to **generate an access token**."
   enter_the_access_token_for_your_organization_from__f1c71941: "Enter the access token for your organisation from                       *eduappcenter.com*. Once applied, only apps your organisation has approved in the                       EduAppCenter will be listed on the External Apps page.                       Learn how to **generate an access token**."
+  enter_the_description_91ececc1: "Enter the description"
   enter_the_email_address_of_the_user_you_would_like_92112560: "Enter the email address of the user you would like to temporarily enrol"
   enter_the_email_addresses_of_the_users_you_would_l_17cef6a0: "Enter the Email addresses of the users you would like to add, separated by commas"
   enter_the_email_addresses_of_the_users_you_would_l_f76448a6: "Enter the email addresses of the users you would like to add, separated by commas or line breaks"
@@ -11872,6 +11890,7 @@ en-AU:
   enter_the_login_id_of_the_user_you_would_like_to_t_46938400: "Enter the login ID of the user you would like to temporarily enrol"
   enter_the_login_ids_of_the_users_you_would_like_to_502fcbc5: "Enter the login IDs of the users you would like to add, separated by commas or line breaks"
   enter_the_login_ids_of_the_users_you_would_like_to_d39fb0f7: "Enter the login IDs of the users you would like to add, separated by commas"
+  enter_the_name_c86bd140: "Enter the name"
   enter_the_sis_id_of_the_user_you_would_like_to_tem_efab1e87: "Enter the SIS ID of the user you would like to temporarily enrol"
   enter_the_sis_ids_of_the_users_you_would_like_to_a_1bdce982: "Enter the SIS IDs of the users you would like to add, separated by commas"
   enter_the_sis_ids_of_the_users_you_would_like_to_a_25e441f1: "Enter the SIS IDs of the users you would like to add, separated by commas or line breaks"
@@ -12415,6 +12434,7 @@ en-AU:
   example_item_scores_6726c689: "Example item scores"
   example_school_of_rock_41f32c31: "example: \"School of Rock\""
   exceeded_the_maximum_length_number_characters_2d25611e: "Exceeded the maximum length (%{number} characters)"
+  exceeds_1dfdae30: Exceeds
   exceeds_expectations_5910fc3a: "Exceeds Expectations"
   exceeds_mastery_1f995dce: "Exceeds Mastery"
   exceeds_max_events_28f19b04: "Exceeds %{max} events."
@@ -15351,6 +15371,7 @@ en-AU:
   if_enabled_canvas_will_allow_tools_to_return_multi_fe7b6678: |-
       If enabled, Canvas will allow tools to return multiple content items
       in a single request at the course modules page
+  if_enabled_canvas_will_be_able_to_export_new_quizz_504132df: "If enabled, Canvas will be able to export New Quizzes as a part of Common Cartridge Export Packages."
   if_enabled_common_cartridge_importers_will_convert_9bffff09: "If enabled, Common Cartridge importers will convert HTML files into Pages"
   if_enabled_content_designers_must_provide_copyrigh_eca21f5e: "If enabled, content designers must provide copyright and license information for files before they are published. This only applies if Better File Browsing is also enabled."
   if_enabled_copyright_and_license_information_must__2a551827: "If enabled, copyright and licence information must be provided for files before they are published."
@@ -16921,6 +16942,7 @@ en-AU:
   loading_unsynced_changes_b5d7b202: "Loading Unsynced Changes"
   loading_unsynched_changes_688434f2: "Loading Unsynched Changes"
   local_4ee321b1: Local
+  local_datetime_ce5ffddd: "Local: %{datetime}"
   locales: 
     en-AU: "English (Australia)"
   location_3b6ff307: "Location:"
@@ -19608,6 +19630,7 @@ en-AU:
   module_name_1127ebdb: "Module Name"
   module_name_is_required_de75de0a: "Module Name is required."
   module_navigation_97043417: "Module Navigation"
+  module_progress_for_name_fbff0ccb: "Module Progress for *%{name}*"
   module_publish_menu_30b638dd: "Module Publish Menu"
   module_publish_menu_88b54c1b: "Module publish menu"
   module_published_80f0b9b8: "Module published"
@@ -19817,6 +19840,7 @@ en-AU:
   move_count_outcomes_c0ca2b30: 
     one: "Move \"%{outcomeTitle}\"?"
     other: "Move %{count} Outcomes?"
+  move_criterion_9b2965d9: "Move Criterion"
   move_dialog: 
     cancel: Cancel
     save: Save
@@ -19842,6 +19866,7 @@ en-AU:
   move_module_item_after_bbcfe2d6: "Move Module Item After"
   move_module_item_before_13e940eb: "Move Module Item Before"
   move_module_item_f525d6c8: "Move Module Item"
+  move_name_to_a_new_group_acabed4e: "Move %{name} to a new group"
   move_navigation_item_f034cd8a: "Move Navigation Item"
   move_outcome_ce497e6c: "Move Outcome"
   move_outcome_group_cfa1a505: "Move Outcome Group"
@@ -20057,6 +20082,7 @@ en-AU:
   navigation_allows_user_to_view_the_people_link_in__dd533d29: "Navigation Allows user to view the People link in Course Navigation."
   navigation_icon_45db938e: "Navigation icon"
   navigation_menu_fd782ff8: "Navigation Menu"
+  near_3282280c: Near
   near_mastery_f25174a4: "Near Mastery"
   need_a_canvas_account_221d18ed: "Need a Canvas Account?"
   need_help_setting_up_your_course_2b763141: "Need help setting up your course?"
@@ -20154,6 +20180,7 @@ en-AU:
   new_quizzes_banks_migrations_9ab4de4a: "New Quizzes Banks Migrations"
   new_quizzes_build_button_in_module_items_10f651fb: "New Quizzes Build Button In Module Items"
   new_quizzes_build_button_on_list_views_62c7c0e8: "New Quizzes Build Button On List Views"
+  new_quizzes_common_cartridge_support_250780be: "New Quizzes Common Cartridge Support"
   new_quizzes_dbda7e0a: "New Quizzes"
   new_quizzes_description: "This feature enhances the Canvas experience for quizzing. When this flag is enabled, the New Quizzes tool will be available. For full details, please see the *New Quizzes user group* in the Canvas Community."
   new_quizzes_embedded_module_progression_cd2307b6: "New Quizzes Embedded Module Progression"
@@ -21368,6 +21395,7 @@ en-AU:
   outcomes_and_rubrics_account_course_f0d23419: "Outcomes and Rubrics (Account, Course)"
   outcomes_and_rubrics_f893d141: "Outcomes and Rubrics"
   outcomes_are_created_here_to_track_mastery_in_a_co_2f487549: "Outcomes are created here to track mastery in a course. To get started, checkout the menu bar along the top. Click on the New Outcome button to create a new outcome, or the New Group button to create a new group to organise your outcomes into. The Find button will allow you to use outcomes that have been created by your state or institution. As you create and use outcomes you will be able to use the panel to the left to navigate through your outcomes. You can drag and drop outcomes between the different levels to create structure."
+  outcomes_averages_report_34199e77: "Outcomes Averages Report"
   outcomes_csv_format_9005acfb: "Outcomes CSV Format"
   outcomes_d1b18d33: Outcomes
   outcomes_for_student_9f91d4d: "Outcomes for Student"
@@ -22388,11 +22416,13 @@ en-AU:
   presents_the_quiz_setting_to_avoid_automatic_submi_363b91ff: "Presents the quiz setting to avoid automatic submission of a timed quiz when the available time has ended."
   press_alt_f8_to_see_a_list_of_keyboard_shortcuts_2a8c7bc0: "Press ALT + F8 to see a list of keyboard shortcuts"
   press_space_to_start_over_d4b8a2da: "Press 'space' to start over"
+  press_tab_for_more_options_f087f5c2: "Press tab for more options"
   press_the_comma_key_or_shift_question_mark_to_see__930af9df: "Press the comma key or shift + question mark to see a list of keyboard shortcuts."
   press_the_comma_key_or_shift_to_see_a_list_of_keyb_155d8ca3: "Press the comma key or shift + ? to see a list of keyboard shortcuts."
   press_the_esc_key_to_close_this_modal_14d10601: "Press the esc key to close this modal."
   prev_f82cbc48: Prev
   prev_month_34bd934c: "Prev. month"
+  prevent_deletion_of_outcomes_with_alignments_in_os_65020476: "Prevent deletion of outcomes with alignments in OS"
   prevents_students_from_leaving_annotations_in_assi_cb188d2: "Prevents students from leaving annotations in assignments. Does not apply to peer-reviewed assignments."
   preview_53003fd2: Preview
   preview_a3f8f854: PREVIEW
@@ -22435,6 +22465,7 @@ en-AU:
   primary_color_button_b75db628: "Primary colour button"
   primary_color_button_disabled_9081ddff: "Primary colour button disabled"
   primary_email_address_mail_9018f: "Primary Email Address (mail)"
+  print_d0e3d53f: Print
   print_grades_9d5dd50f: "Print Marks"
   prioritize_individual_overrides_6be735e1: "Prioritise Individual Overrides"
   priority_dd4381ee: Priority
@@ -24519,7 +24550,10 @@ en-AU:
   rating_description_db6adf39: "Rating Description"
   rating_max_score_eade1523: "Rating max score"
   rating_min_score_3d35a762: "Rating min score"
+  rating_name_6f633d52: "Rating Name"
   rating_order_e57f63ed: "Rating Order"
+  rating_points_be3e8682: "Rating Points"
+  rating_scale_fc10d5f1: "Rating Scale"
   rating_score_22cfc724: "Rating Score"
   rating_selected_85c31e4c: "Rating selected"
   rating_tier_index_threshold_3f02a6d7: "rating tier %{index} threshold"
@@ -24804,6 +24838,7 @@ en-AU:
   remove_all_group_observer_members_af5675f3: "Remove All Group Observer Members"
   remove_as_front_page_2698aa12: "Remove as Front Page"
   remove_as_frontpagetext_133cdaee: "Remove as %{frontPageText}"
+  remove_as_leader_22d1a7d8: "Remove as Leader"
   remove_association_1412eabf: "Remove Association"
   remove_attachment_ceae0973: "Remove Attachment"
   remove_attendee_name_55165070: "Remove attendee %{name}"
@@ -24853,8 +24888,10 @@ en-AU:
   remove_missing_status_when_graded_d0755cc7: "Remove Missing Status When Graded"
   remove_name_624e06be: "Remove %{name}"
   remove_name_as_an_admin_c296cf49: "Remove %{name} as an admin"
+  remove_name_as_leader_3e03780a: "Remove %{name} as leader"
   remove_name_calendar_bdc329d9: "Remove %{name} Calendar"
   remove_name_content_requirement_7af56c50: "Remove %{name} Content Requirement"
+  remove_name_from_group_487cce74: "Remove %{name} from group"
   remove_name_prerequisite_98377b60: "Remove %{name} Prerequisite"
   remove_null_values_from_live_event_payloads_3c826f: "Remove null values from live event payloads"
   remove_observers_from_courses_703edc34: "Remove Observers from courses"
@@ -24873,6 +24910,7 @@ en-AU:
   remove_prerequisite_13ab96eb: "Remove Prerequisite"
   remove_pronouns_5ff760ff: "Remove Pronouns"
   remove_pronouns_pronoun_c8b03d78: "Remove Pronouns %{pronoun}"
+  remove_rating_cf9378eb: "Remove Rating"
   remove_recipient_name_a6b83cef: "Remove recipient %{name}"
   remove_removablecount_out_of_totalcount_outcomes_3270d9c0: "Remove %{removableCount} out of %{totalCount} Outcomes?"
   remove_requirement_32a89e23: "Remove Requirement"
@@ -25363,6 +25401,7 @@ en-AU:
     no_details: "No details"
   rubric_button_display_4e4a26fe: "Rubric Button Display"
   rubric_created_64980593: "Rubric created"
+  rubric_criterion_modal_32377665: "Rubric Criterion Modal"
   rubric_criterion_range_12499bf1: "Rubric Criterion Range"
   rubric_deleted_3d9efc18: "Rubric deleted"
   rubric_enhancements_73bf351c: "Rubric Enhancements"
@@ -25462,6 +25501,7 @@ en-AU:
   save_and_customize_19eb7a7b: "Save and Customise"
   save_and_publish_1b765e7: "Save and Publish"
   save_changes_698abe77: "Save Changes"
+  save_criterion_cce60085: "Save Criterion"
   save_customizations_dde779d8: "Save Customisations"
   save_failed_463cb2a8: "Save failed."
   save_filter_preset_37f32c02: "Save Filter Preset"
@@ -25481,6 +25521,7 @@ en-AU:
   save_theme_f706116e: "Save theme."
   save_these_conditions_as_a_filter_a31bbbf8: "Save these conditions as a filter"
   save_this_comment_for_reuse_5eda0b70: "Save this comment for reuse"
+  save_this_rating_scale_as_default_a3f27305: "Save this rating scale as default"
   save_your_type_to_begin_specifying_conditional_con_9e4f536a: "Save your %{type} to begin specifying conditional content."
   save_yourself_a_lot_of_time_by_only_adding_the_out_33293248: "Save yourself a lot of time by only adding the outcomes that are specific to your course content."
   saved_3cd67a7c: Saved
@@ -25505,6 +25546,7 @@ en-AU:
   saving_recording_e111cb05: "Saving Recording..."
   saving_statusname_status_8f923edb: "Saving %{statusName} status"
   saving_the_csp_status_failed_please_try_again_8275aaa4: "Saving the CSP status failed, please try again."
+  scale_29738cdd: Scale
   scale_mathman_equation_images_to_match_the_size_of_2bca4e2e: "Scale mathman equation images to match the size of the surrounding font."
   scantron_quiz_4a97a17a: "Scantron Quiz"
   schedule_availability_ad09a2e5: "Schedule availability"
@@ -26183,6 +26225,7 @@ en-AU:
   session_expired_12aaf414: "Session expired"
   set_a_random_student_as_group_leader_663dcfd5: "Set a random student as group leader"
   set_as_default_email_address_bd3b9b8f: "Set as default email address"
+  set_as_leader_f710dcec: "Set as Leader"
   set_course_color_to_a_custom_hexadecimal_code_c8a50918: "Set course colour to a custom hexadecimal code"
   set_course_color_to_a_preset_hexadecimal_color_cod_97608d8: "Set course colour to a preset hexadecimal colour code. Use the left and right arrow keys to navigate presets."
   set_created_createdat_895e2243: "Set created %{createdAt}"
@@ -26200,6 +26243,7 @@ en-AU:
   set_first_student_to_join_as_group_leader_5cfc206f: "Set first student to join as group leader"
   set_group_weights_fd41c1f: "Set Group Weights"
   set_last_attended_date_8fb30092: "Set last attended date"
+  set_name_as_leader_591c8009: "Set %{name} as leader"
   set_name_d14182d7: "Set name..."
   set_name_f83b658: "Set name"
   set_of_grading_periods_545b37e9: "Set of Marking Periods"
@@ -29226,6 +29270,7 @@ en-AU:
   this_eportfolio_has_been_identified_as_spam_and_is_8430467: "This ePortfolio has been identified as spam, and is only visible to you. Please contact an administrator if you have any questions."
   this_eportfolio_has_been_identified_as_spam_it_is__f927947b: "This ePortfolio has been identified as spam. It is currently only visible to administrators and the author. If you're sure this content is not spam, you can mark it as safe."
   this_event_b437db90: "This event"
+  this_feature_adds_the_start_end_and_close_dates_of_221c79cc: "This feature adds the start, end, and close dates of grading periods to the grading period filter."
   this_feature_affects_existing_data_for_all_courses_4fc75fe1: "This feature affects existing data for all courses in the account."
   this_feature_affects_existing_data_for_an_entire_a_2372dc52: "This feature affects existing data for an entire account."
   this_feature_allows_teachers_to_create_anonymous_d_ea364dca: "This feature allows Teachers to create anonymous discussions and allows teachers to enable a course level setting for students to create anonymous discussions"
@@ -29289,6 +29334,7 @@ en-AU:
   this_feature_provides_a_new_speedgrader_platform_e_e7d740bd: "This feature provides a new SpeedGrader platform experience."
   this_feature_provides_visual_and_functional_enhanc_e5e57a21: "This feature provides visual and functional enhancements to rubrics across Canvas."
   this_feature_will_hide_all_quantitative_values_fro_6f006665: "This feature will hide all quantitative values from users"
+  this_ff_is_for_development_purposes_only_and_shoul_f77938ba: "This FF is for development purposes only and should not be adjusted without first consulting product and engineering. This flag will prevent deletion of outcomes that have alignments within the outcomes service, which is used for New Quizzes."
   this_field_is_required_fa58c4a: "This field is required"
   this_field_name_is_required_988caebc: "This field \"%{name}\" is required."
   this_field_name_is_required_b9196401: "This field \"name\" is required."
@@ -29817,6 +29863,7 @@ en-AU:
   title_outcomes_7adbd9cc: "%{title} Outcomes"
   title_required_3ff5969: "Title required"
   title_separator: ": "
+  title_start_end_closed_def2bf1f: "%{title}: %{start} - %{end} | %{closed}"
   title_tray_ec9f7488: "%{title} tray"
   title_unpublished_51ddbc6a: "%{title} (unpublished)"
   title_was_successfully_created_f2a07c56: "\"%{title}\" was successfully created."
