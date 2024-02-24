@@ -39,7 +39,7 @@ $(document).ready(function (_event) {
           htmlEscape(I18n.t('messages.this_may_take_a_bit', 'this may take a bit...')) +
           '</div>'
       )
-      .attr('disabled', true)
+      .prop('disabled', true)
     $('.instruction').hide()
     $('.progress_bar_holder').slideDown()
     $('.export_progress').progressbar()
@@ -132,7 +132,7 @@ $(document).ready(function (_event) {
     error(_data) {
       $(this)
         .find('.submit_button')
-        .attr('disabled', false)
+        .prop('disabled', false)
         .text(I18n.t('buttons.process', 'Process Data'))
     },
   })

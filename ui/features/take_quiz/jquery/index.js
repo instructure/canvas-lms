@@ -805,7 +805,7 @@ $(function () {
           .parents('.question')
           .find('.question_input')
           .each(function () {
-            if ($(this).attr('checked') || $(this).attr('selected')) {
+            if ($(this).prop('checked') || $(this).prop('selected')) {
               val = true
             }
           })

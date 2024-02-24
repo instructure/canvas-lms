@@ -346,7 +346,7 @@ $(document).ready(function () {
   $('#edit_page_form')
     .find('.allow_comments')
     .change(function () {
-      $('#edit_page_form .show_comments_box').showIf($(this).attr('checked'))
+      $('#edit_page_form .show_comments_box').showIf($(this).prop('checked'))
     })
     .change()
   $('#edit_page_sidebar .submit_button').click(() => {

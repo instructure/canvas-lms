@@ -136,7 +136,7 @@ test('renders hidden checkbox if group graded group assignment', function () {
   equal(dialog.dialog.find('input[type="radio"][name="comment[group_comment]"]').length, 0)
   const $chk = dialog.dialog.find('input[type="checkbox"][name="comment[group_comment]"]')
   equal($chk.length, 1)
-  equal($chk.attr('checked'), 'checked')
+  equal($chk.prop('checked'), true)
 })
 
 QUnit.module('_submission_detail', {

@@ -203,7 +203,7 @@ window.rubricAssessment = {
   highlightCriterionScore($criterion, val) {
     $criterion.find('.rating').each(function () {
       const rating_val = numberHelper.parse($(this).find('.points').text())
-      const use_range = $criterion.find('.criterion_use_range').attr('checked')
+      const use_range = $criterion.find('.criterion_use_range').prop('checked')
       if (rating_val === val) {
         $(this).addClass('selected')
       } else if (use_range) {
@@ -290,7 +290,7 @@ window.rubricAssessment = {
         }
         if ($(this).find('.custom_rating_field:visible').length > 0) {
           data[pre + '[comments]'] = $(this).find('.custom_rating_field:visible').val()
-          data[pre + '[save_comment]'] = $(this).find('.save_custom_rating').attr('checked')
+          data[pre + '[save_comment]'] = $(this).find('.save_custom_rating').prop('checked')
             ? '1'
             : '0'
         }
@@ -420,7 +420,7 @@ window.rubricAssessment = {
       .text('')
       .end()
       .find('.save_custom_rating')
-      .attr('checked', false)
+      .prop('checked', false)
     $rubric.find('.criterion_comments').addClass('empty')
     if (data) {
       const assessment = data
@@ -470,7 +470,7 @@ window.rubricAssessment = {
           .toggleClass('empty', !comments)
           .end()
           .find('.save_custom_rating')
-          .attr('checked', false)
+          .prop('checked', false)
         if (ratingHasScore(rating)) {
           $criterion
             .find('.criterion_description')

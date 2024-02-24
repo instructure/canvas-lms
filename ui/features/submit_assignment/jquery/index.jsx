@@ -142,7 +142,7 @@ $(document).ready(function () {
     $(this)
       .find("button[type='submit']")
       .text(I18n.t('messages.submitting', 'Submitting...'))
-      .attr('disabled', true)
+      .prop('disabled', true)
 
     if ($(this).attr('id') === 'submit_online_upload_form') {
       event.preventDefault() && event.stopPropagation()
@@ -278,7 +278,7 @@ $(document).ready(function () {
           submissionForm
             .find("button[type='submit']")
             .text(I18n.t('messages.submit_failed', 'Submit Failed, please try again'))
-          submissionForm.find('button').attr('disabled', false)
+          submissionForm.find('button').prop('disabled', false)
         },
       })
     } else {
@@ -468,7 +468,7 @@ $(document).ready(function () {
   }
   function checkAllowUploadSubmit() {
     // disable the submit button if any extensions are bad
-    $('#submit_online_upload_form button[type=submit]').attr(
+    $('#submit_online_upload_form button[type=submit]').prop(
       'disabled',
       !!$('.bad_ext_msg:visible').length
     )
@@ -532,19 +532,19 @@ $(document).ready(function () {
 
 $(document).ready(() => {
   $('#submit_media_recording_form .submit_button')
-    .attr('disabled', true)
+    .prop('disabled', true)
     .text(I18n.t('messages.record_before_submitting', 'Record Before Submitting'))
   $('#media_media_recording_submission_holder .record_media_comment_link').click(event => {
     event.preventDefault()
     $('#media_media_recording_submission').mediaComment('create', 'any', (id, type) => {
       $('#submit_media_recording_form .submit_button')
-        .attr('disabled', false)
+        .prop('disabled', false)
         .text(I18n.t('buttons.submit_assignment', 'Submit Assignment'))
       $('#submit_media_recording_form .media_comment_id').val(id)
       $('#submit_media_recording_form .media_comment_type').val(type)
       $('#media_media_recording_submission_holder').children().hide()
       $('#media_media_recording_ready').show()
-      $('#media_comment_submit_button').attr('disabled', false)
+      $('#media_comment_submit_button').prop('disabled', false)
       $('#media_media_recording_thumbnail').attr('id', 'media_comment_' + id)
     })
   })

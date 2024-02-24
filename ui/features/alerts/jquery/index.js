@@ -142,12 +142,12 @@ $(function () {
       }
     }
     if (data.repetition) {
-      $alert.find('input[name="repetition"][value="value"]').attr('checked', true)
+      $alert.find('input[name="repetition"][value="value"]').prop('checked', true)
       $alert.find('input[name="alert[repetition]"]').attr('value', data.repetition)
       $alert.find('.repetition_group .no_repetition').toggle(false)
       $alert.find('.repetition_group .repetition').toggle(true).find('span').text(data.repetition)
     } else {
-      $alert.find('input[name="repetition"][value="none"]').attr('checked', true)
+      $alert.find('input[name="repetition"][value="none"]').prop('checked', true)
       $alert.find('.repetition_group .no_repetition').toggle(true)
       $alert.find('.repetition_group .repetition').toggle(false)
     }

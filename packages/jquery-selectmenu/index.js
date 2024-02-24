@@ -64,7 +64,7 @@ $.widget('ui.selectmenu', {
       id: this.ids[1],
       role: 'button',
       href: '#nogo',
-      tabindex: this.element.attr('disabled') ? 1 : 0,
+      tabindex: this.element.prop('disabled') ? 1 : 0,
       'aria-haspopup': true,
       'aria-owns': this.ids[2],
     })
@@ -316,8 +316,8 @@ $.widget('ui.selectmenu', {
       selectOptionData.push({
         value: opt.attr('value'),
         text: self._formatText(opt.text()),
-        selected: opt.attr('selected'),
-        disabled: opt.attr('disabled'),
+        selected: opt.prop('selected'),
+        disabled: opt.prop('disabled'),
         classes: opt.attr('class'),
         typeahead: opt.attr('typeahead'),
         parentOptGroup: opt.parent('optgroup'),
@@ -417,7 +417,7 @@ $.widget('ui.selectmenu', {
                 self.widgetBaseClass +
                 '-group ' +
                 optGroupName +
-                (selectOptionData[i].parentOptGroup.attr('disabled')
+                (selectOptionData[i].parentOptGroup.prop('disabled')
                   ? ' ' + this.namespace + '-state-disabled" aria-disabled="true"'
                   : '"') +
                 '><span class="' +
@@ -509,7 +509,7 @@ $.widget('ui.selectmenu', {
     this._optionLis = this.list.find('li:not(.' + self.widgetBaseClass + '-group)')
 
     // transfer disabled state
-    if (this.element.attr('disabled')) {
+    if (this.element.prop('disabled')) {
       this.disable()
     } else {
       this.enable()
@@ -885,7 +885,7 @@ $.widget('ui.selectmenu', {
         .addClass(this.namespace + '-state-disabled')
         .find('a')
         .attr('aria-disabled', true)
-      this.element.find('option').eq(index).attr('disabled', 'disabled')
+      this.element.find('option').eq(index).prop('disabled', true)
     }
   },
 
@@ -904,7 +904,7 @@ $.widget('ui.selectmenu', {
     const optGroupElem = this.list.find('li.' + this.widgetBaseClass + '-group-' + index)
     if (optGroupElem) {
       optGroupElem.addClass(this.namespace + '-state-disabled').attr('aria-disabled', true)
-      this.element.find('optgroup').eq(index).attr('disabled', 'disabled')
+      this.element.find('optgroup').eq(index).prop('disabled', true)
     }
   },
 

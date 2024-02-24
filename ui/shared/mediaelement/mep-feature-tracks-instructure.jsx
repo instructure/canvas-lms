@@ -394,7 +394,7 @@ const I18n = useI18nScope('mepfeaturetracksinstructure')
       let t = this,
         i
 
-      $(this).attr('aria-selected', true).attr('checked', 'checked')
+      $(this).attr('aria-selected', true).prop('checked', true)
       $(this)
         .closest('.mejs-captions-selector')
         .find('input[type=radio]')

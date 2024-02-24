@@ -63,7 +63,7 @@ export default class ToolbarView extends Backbone.View {
 
   disable() {
     return this.$el.find('button').each((i, button) => {
-      $(button).attr('disabled', 'disabled')
+      $(button).prop('disabled', true)
       $(button).attr('aria-disabled', 'true')
     })
   }

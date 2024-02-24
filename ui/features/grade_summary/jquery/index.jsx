@@ -562,7 +562,7 @@ function updateStudentGrades() {
   const droppedMessage = I18n.t(
     'This assignment is dropped and will not be considered in the total calculation'
   )
-  const ignoreUngradedSubmissions = $('#only_consider_graded_assignments').attr('checked')
+  const ignoreUngradedSubmissions = $('#only_consider_graded_assignments').prop('checked')
   const currentOrFinal = ignoreUngradedSubmissions ? 'current' : 'final'
   const groupWeightingScheme = ENV.group_weighting_scheme
   const includeTotal = !ENV.exclude_total

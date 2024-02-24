@@ -121,7 +121,7 @@ export default class DiscussionToolbarView extends View {
   }
 
   maybeDisableFields() {
-    return this.$disableWhileFiltering.attr('disabled', this.model.hasFilter())
+    return this.$disableWhileFiltering.prop('disabled', this.model.hasFilter())
   }
 }
 DiscussionToolbarView.initClass()

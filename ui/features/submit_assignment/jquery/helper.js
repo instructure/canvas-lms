@@ -29,7 +29,7 @@ export function recordEulaAgreement(querySelector, checked) {
 }
 
 export function verifyPledgeIsChecked(checkbox) {
-  if (checkbox.length > 0 && !checkbox.attr('checked')) {
+  if (checkbox.length > 0 && !checkbox.prop('checked')) {
     alert(
       I18n.t(
         'messages.agree_to_pledge',
