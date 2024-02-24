@@ -47,10 +47,3 @@ QUnit.test('jquery can select stuff', async function (assert) {
   assert.equal($div.text(), 'Test JQuery')
   done()
 })
-
-QUnit.test('jquery can use (removed in 1.9) $.browser', async function (assert) {
-  const done = assert.async() // Get the async function from assert
-  const isMsie = $.browser.msie
-  ok(!isMsie)
-  done()
-})
