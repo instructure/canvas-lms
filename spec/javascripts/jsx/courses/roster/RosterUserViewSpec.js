@@ -61,7 +61,7 @@ QUnit.module('RosterUserViewSpec', {
 
     server = sinon.fakeServer.create()
 
-    server.respondWith('POST', /unenroll/, [200, {'Content-Type': 'application/json'}, ''])
+    server.respondWith('POST', /unenroll/, [200, {'Content-Type': 'application/json'}, '{}'])
 
     $('#fixtures').append($('<button id="addUsers">'))
 
