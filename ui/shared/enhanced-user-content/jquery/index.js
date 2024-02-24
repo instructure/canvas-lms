@@ -412,7 +412,7 @@ function showAndHideRCEWhenAsked() {
 function doThingsWhenDiscussionTopicSubMessageIsPosted() {
   $('.communication_sub_message .add_sub_message_form').formSubmit({
     beforeSubmit(_data) {
-      $(this).find('button').attr('disabled', true)
+      $(this).find('button').prop('disabled', true)
       $(this).find('.submit_button').text(I18n.t('status.posting_message', 'Posting Message...'))
       $(this).loadingImage()
     },
@@ -464,7 +464,7 @@ function doThingsWhenDiscussionTopicSubMessageIsPosted() {
     },
     error(data) {
       $(this).loadingImage('remove')
-      $(this).find('button').attr('disabled', false)
+      $(this).find('button').prop('disabled', false)
       $(this)
         .find('.submit_button')
         .text(I18n.t('errors.posting_message_failed', 'Post Failed, Try Again'))

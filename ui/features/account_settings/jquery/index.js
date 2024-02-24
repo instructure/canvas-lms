@@ -159,7 +159,7 @@ $(document).ready(function () {
         )
       )
       if (!result) {
-        $('#account_settings_suppress_notifications').attr('checked', false)
+        $('#account_settings_suppress_notifications').prop('checked', false)
       }
     }
   })
@@ -311,10 +311,10 @@ $(document).ready(function () {
   $('#account_settings_restrict_quantitative_data_value').click(event => {
     const lockbox = $('#account_settings_restrict_quantitative_data_locked')
     if (event.target.checked) {
-      lockbox.attr('disabled', false)
+      lockbox.prop('disabled', false)
     } else {
-      lockbox.attr('checked', false)
-      lockbox.attr('disabled', true)
+      lockbox.prop('checked', false)
+      lockbox.prop('disabled', true)
     }
   })
   $('.add_ip_filter_link').click(event => {
@@ -427,7 +427,7 @@ $(document).ready(function () {
     .change(function () {
       const attr_id = $(this).attr('id')
       const $myFieldset = $('#' + attr_id + '_settings')
-      const iAmChecked = $(this).attr('checked')
+      const iAmChecked = $(this).prop('checked')
       $myFieldset.showIf(iAmChecked)
     })
     .change()
@@ -520,10 +520,10 @@ $(document).ready(function () {
   $('.notification_from_name_option').on('change', () => {
     const $useCustom = $('#account_settings_outgoing_email_default_name_option_custom')
     const $customName = $('#account_settings_outgoing_email_default_name')
-    if ($useCustom.attr('checked')) {
+    if ($useCustom.prop('checked')) {
       $customName.removeAttr('disabled')
     } else {
-      $customName.attr('disabled', 'disabled')
+      $customName.prop('disabled', true)
     }
   })
   $('#account_settings_outgoing_email_default_name').on('keyup', () => {

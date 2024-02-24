@@ -130,7 +130,7 @@ $('.jit_provisioning_checkbox').click(function () {
   const $provisioning_elements = $(this)
     .closest('.authentication_provider_form')
     .find('.provisioning_only_column')
-  if ($(this).attr('checked')) {
+  if ($(this).prop('checked')) {
     $provisioning_elements.show()
   } else {
     $provisioning_elements.hide()

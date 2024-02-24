@@ -138,7 +138,7 @@ const rubricEditing = {
       })
       rubricEditing.flagInfinitesimalRating(
         $td,
-        $criterion.find('.criterion_use_range').attr('checked')
+        $criterion.find('.criterion_use_range').prop('checked')
       )
       if (hasClassAddLeft) {
         $this.before($td)
@@ -248,7 +248,7 @@ const rubricEditing = {
     const ratings = $.makeArray($criterion.find('.rating')).reverse()
     let rating_points = -1
     let points = numberHelper.parse($criterion.find('.criterion_points').val())
-    const use_range = $criterion.find('.criterion_use_range').attr('checked')
+    const use_range = $criterion.find('.criterion_use_range').prop('checked')
     if (Number.isNaN(points)) {
       points = 5
     } else {
@@ -387,28 +387,28 @@ const rubricEditing = {
     data['rubric[points_possible]'] = vals.rubric_total
     data['rubric_association[use_for_grading]'] = $rubric
       .find('.grading_rubric_checkbox')
-      .attr('checked')
+      .prop('checked')
       ? '1'
       : '0'
     data['rubric_association[hide_score_total]'] = '0'
     if (data['rubric_association[use_for_grading]'] === '0') {
       data['rubric_association[hide_score_total]'] = $rubric
         .find('.totalling_rubric_checkbox')
-        .attr('checked')
+        .prop('checked')
         ? '1'
         : '0'
     }
-    data['rubric_association[hide_points]'] = $rubric.find('.hide_points_checkbox').attr('checked')
+    data['rubric_association[hide_points]'] = $rubric.find('.hide_points_checkbox').prop('checked')
       ? '1'
       : '0'
     data['rubric_association[hide_outcome_results]'] = $rubric
       .find('.hide_outcome_results_checkbox')
-      .attr('checked')
+      .prop('checked')
       ? '1'
       : '0'
     data['rubric[free_form_criterion_comments]'] = $rubric
       .find('.rubric_custom_rating')
-      .attr('checked')
+      .prop('checked')
       ? '1'
       : '0'
     data['rubric_association[id]'] = vals.rubric_association_id
@@ -418,7 +418,7 @@ const rubricEditing = {
     let criterion_idx = 0
     $rubric.find('.criterion:not(.blank)').each(function () {
       const $criterion = $(this)
-      const use_range = !!$criterion.find('.criterion_use_range').attr('checked')
+      const use_range = !!$criterion.find('.criterion_use_range').prop('checked')
       if (!$criterion.hasClass('learning_outcome_criterion')) {
         const masteryPoints = $criterion.find('input.mastery_points').val()
         $criterion
@@ -553,23 +553,23 @@ const rubricEditing = {
     $rubric.find(':text:first').focus().select()
     $form
       .find('.grading_rubric_checkbox')
-      .attr('checked', data.use_for_grading === 'true')
+      .prop('checked', data.use_for_grading === 'true')
       .triggerHandler('change')
     $form
       .find('.rubric_custom_rating')
-      .attr('checked', data.free_form_criterion_comments === 'true')
+      .prop('checked', data.free_form_criterion_comments === 'true')
       .triggerHandler('change')
     $form
       .find('.totalling_rubric_checkbox')
-      .attr('checked', data.hide_score_total === 'true')
+      .prop('checked', data.hide_score_total === 'true')
       .triggerHandler('change')
     $form
       .find('.hide_points_checkbox')
-      .attr('checked', data.hide_points === 'true')
+      .prop('checked', data.hide_points === 'true')
       .triggerHandler('change')
     $form
       .find('.hide_outcome_results_checkbox')
-      .attr('checked', data.hide_outcome_results === 'true')
+      .prop('checked', data.hide_outcome_results === 'true')
       .triggerHandler('change')
     const createText = I18n.t('buttons.create_rubric', 'Create Rubric')
     const updateText = I18n.t('buttons.update_rubric', 'Update Rubric')
@@ -643,7 +643,7 @@ const rubricEditing = {
       $criterion.find('.long_description_holder').toggleClass('empty', !criterion.long_description)
       $criterion
         .find('.criterion_use_range')
-        .attr('checked', criterion.criterion_use_range === true)
+        .prop('checked', criterion.criterion_use_range === true)
       $criterion.find('.ratings').empty()
       $criterion.find('.hide_when_learning_outcome').showIf(!criterion.learning_outcome_id)
       $criterion.toggleClass('learning_outcome_criterion', !!criterion.learning_outcome_id)
@@ -827,7 +827,7 @@ rubricEditing.init = function () {
         return
       }
       const $nextRating = $rating.closest('td').next('.rating')
-      const use_range = $rating.parents('.criterion').find('.criterion_use_range').attr('checked')
+      const use_range = $rating.parents('.criterion').find('.criterion_use_range').prop('checked')
       $rubric_rating_dialog.find('.range_rating').showIf(use_range)
       $rubric_rating_dialog.find('.min_points').prop('disabled', !$nextRating.length)
       rubricEditing.hideCriterionAdd($rating.parents('.rubric'))
@@ -1021,7 +1021,7 @@ rubricEditing.init = function () {
     const $rating = $rubric_rating_dialog.data('current_rating')
     const $criterion = $rubric_rating_dialog.data('current_criterion')
     const $target = $rating.find('.edit_rating_link')
-    const use_range = $criterion.find('.criterion_use_range').attr('checked')
+    const use_range = $criterion.find('.criterion_use_range').prop('checked')
     const $nextRating = $rating.next('.rating')
     const $previousRating = $rating.prev('.rating')
     data.points = round(numberHelper.parse(data.points), 2)
@@ -1504,7 +1504,7 @@ rubricEditing.init = function () {
           const $criterion = $(this).parents('.criterion')
           rubricEditing.flagInfinitesimalRating(
             $previousRating,
-            $criterion.find('.criterion_use_range').attr('checked')
+            $criterion.find('.criterion_use_range').prop('checked')
           )
           $(this).remove()
           rubricEditing.sizeRatings($criterion)
@@ -1539,17 +1539,17 @@ rubricEditing.init = function () {
         .parents('.rubric')
         .find('tr.criterion')
         .find('.ratings')
-        .showIf(!$(this).attr('checked'))
+        .showIf(!$(this).prop('checked'))
         .end()
         .find('.criterion_use_range_div')
-        .showIf(!$(this).attr('checked'))
+        .showIf(!$(this).prop('checked'))
         .end()
         .find('.custom_ratings')
-        .showIf($(this).attr('checked'))
+        .showIf($(this).prop('checked'))
     })
     .triggerHandler('change')
   $('#edit_rubric_form #totalling_rubric').change(function () {
-    $(this).parents('.rubric').find('.total_points_holder').showIf(!$(this).attr('checked'))
+    $(this).parents('.rubric').find('.total_points_holder').showIf(!$(this).prop('checked'))
   })
   $('#edit_rubric_form #hide_points').change(function (e) {
     if (e.target.checked) {
@@ -1560,9 +1560,9 @@ rubricEditing.init = function () {
   })
   $('#edit_rubric_form .hide_points_checkbox').change(function () {
     if ($(this).is(':visible')) {
-      const checked = $(this).attr('checked')
+      const checked = $(this).prop('checked')
       if (checked) {
-        $(this).parents('.rubric').find('.grading_rubric_checkbox').attr('checked', false)
+        $(this).parents('.rubric').find('.grading_rubric_checkbox').prop('checked', false)
         $(this).parents('.rubric').find('.grading_rubric_checkbox').triggerHandler('change')
       }
       $(this)
@@ -1581,14 +1581,14 @@ rubricEditing.init = function () {
         $(this)
           .parents('.rubric')
           .find('.totalling_rubric')
-          .css('visibility', $(this).attr('checked') ? 'hidden' : 'visible')
-        $(this).parents('.rubric').find('.totalling_rubric_checkbox').attr('checked', false)
+          .css('visibility', $(this).prop('checked') ? 'hidden' : 'visible')
+        $(this).parents('.rubric').find('.totalling_rubric_checkbox').prop('checked', false)
       }
     })
     .triggerHandler('change')
   $('.criterion_use_range')
     .change(function () {
-      const checked = $(this).attr('checked')
+      const checked = $(this).prop('checked')
       $(this)
         .parents('tr.criterion')
         .find('.rating')

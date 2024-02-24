@@ -672,7 +672,7 @@ export default class AutocompleteView extends Backbone.View {
   //
   // Returns nothing.
   _onSearch(_e) {
-    if (this.$searchBtn.attr('disabled')) return
+    if (this.$searchBtn.prop('disabled')) return
     this._fetchResults(true)
     return this.$input.focus()
   }

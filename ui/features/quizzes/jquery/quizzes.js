@@ -136,13 +136,13 @@ const renderDueDates = lockedItems => {
 
     if (ENV.FEATURES?.differentiated_modules) {
       overrideView.bind('tray:open', () => {
-        $('#quiz_edit_wrapper .btn.save_quiz_button').attr('disabled', true)
-        $('#quiz_edit_wrapper .btn.save_and_publish').attr('disabled', true)
+        $('#quiz_edit_wrapper .btn.save_quiz_button').prop('disabled', true)
+        $('#quiz_edit_wrapper .btn.save_and_publish').prop('disabled', true)
       })
 
       overrideView.bind('tray:close', () => {
-        $('#quiz_edit_wrapper .btn.save_quiz_button').attr('disabled', false)
-        $('#quiz_edit_wrapper .btn.save_and_publish').attr('disabled', false)
+        $('#quiz_edit_wrapper .btn.save_quiz_button').prop('disabled', false)
+        $('#quiz_edit_wrapper .btn.save_and_publish').prop('disabled', false)
       })
     }
 
@@ -1963,21 +1963,21 @@ ready(function () {
   $quiz_options_form
     .find('#extend_due_at')
     .change(function () {
-      $('#quiz_lock_after').showIf($(this).attr('checked'))
+      $('#quiz_lock_after').showIf($(this).prop('checked'))
     })
     .change()
 
   $quiz_options_form
     .find('#time_limit_option')
     .change(function () {
-      $('label[for="quiz_disable_timer_autosubmission"]').showIf($(this).attr('checked'))
+      $('label[for="quiz_disable_timer_autosubmission"]').showIf($(this).prop('checked'))
     })
     .change()
 
   $quiz_options_form
     .find('#multiple_attempts_option')
     .change(function (event) {
-      $('#multiple_attempts_suboptions').showIf($(this).attr('checked'))
+      $('#multiple_attempts_suboptions').showIf($(this).prop('checked'))
       const $text = $('#multiple_attempts_suboptions #quiz_allowed_attempts')
 
       if ($text.val() == '-1') {
@@ -1989,7 +1989,7 @@ ready(function () {
   $quiz_options_form
     .find('#time_limit_option')
     .change(function (event, noFocus) {
-      if (!$(this).attr('checked')) {
+      if (!$(this).prop('checked')) {
         $('#quiz_time_limit').val('')
       } else if (!noFocus) {
         $('#quiz_time_limit').focus()
@@ -2000,7 +2000,7 @@ ready(function () {
   $('#limit_attempts_option')
     .change(function (event, noFocus) {
       const $item = $('#quiz_allowed_attempts')
-      if ($(this).attr('checked')) {
+      if ($(this).prop('checked')) {
         let val = parseInt($item.data('saved_value') || $item.val() || '2', 10)
         if (val == -1 || Number.isNaN(Number(val))) {
           val = 1
@@ -2075,17 +2075,17 @@ ready(function () {
   })
 
   $('#quiz_require_lockdown_browser').change(function () {
-    $('#lockdown_browser_suboptions').showIf($(this).attr('checked'))
-    $('#quiz_require_lockdown_browser_for_results').attr('checked', true).change()
+    $('#lockdown_browser_suboptions').showIf($(this).prop('checked'))
+    $('#quiz_require_lockdown_browser_for_results').prop('checked', true).change()
   })
 
-  $('#lockdown_browser_suboptions').showIf($('#quiz_require_lockdown_browser').attr('checked'))
+  $('#lockdown_browser_suboptions').showIf($('#quiz_require_lockdown_browser').prop('checked'))
 
   $('#ip_filters_dialog').delegate('.ip_filter', 'click', function (event) {
     event.preventDefault()
     const filter = $(this).getTemplateData({textValues: ['filter']}).filter
-    $('#protect_quiz').attr('checked', true).triggerHandler('change')
-    $('#ip_filter').attr('checked', true).triggerHandler('change')
+    $('#protect_quiz').prop('checked', true).triggerHandler('change')
+    $('#ip_filter').prop('checked', true).triggerHandler('change')
     $('#quiz_ip_filter').val(filter)
     $('#ip_filters_dialog').dialog('close')
   })
@@ -2136,9 +2136,9 @@ ready(function () {
   $('#quiz_one_question_at_a_time')
     .change(function () {
       const $this = $(this)
-      $('#one_question_at_a_time_options').showIf($this.attr('checked'))
-      if (!$this.attr('checked')) {
-        $('#quiz_cant_go_back').attr('checked', false)
+      $('#one_question_at_a_time_options').showIf($this.prop('checked'))
+      if (!$this.prop('checked')) {
+        $('#quiz_cant_go_back').prop('checked', false)
       }
     })
     .triggerHandler('change')
@@ -2179,7 +2179,7 @@ ready(function () {
           $attempts.val('')
         }
       } else {
-        $('#hide_results_only_after_last').attr('checked', false)
+        $('#hide_results_only_after_last').prop('checked', false)
         $('#hide_results_only_after_last_holder').hide()
       }
     })
@@ -2328,8 +2328,8 @@ ready(function () {
     },
 
     beforeSubmit(data) {
-      $quiz_edit_wrapper.find('.btn.save_quiz_button').attr('disabled', true)
-      $quiz_edit_wrapper.find('.btn.save_and_publish').attr('disabled', true)
+      $quiz_edit_wrapper.find('.btn.save_quiz_button').prop('disabled', true)
+      $quiz_edit_wrapper.find('.btn.save_and_publish').prop('disabled', true)
     },
 
     onSubmit(promise, data) {
@@ -2388,12 +2388,12 @@ ready(function () {
       function error(data) {
         $('#quiz_edit_wrapper')
           .find('.btn.save_quiz_button')
-          .attr('disabled', false)
+          .prop('disabled', false)
           .removeClass('saving')
           .text(I18n.t('buttons.save', 'Save'))
         $('#quiz_edit_wrapper')
           .find('.btn.save_and_publish')
-          .attr('disabled', false)
+          .prop('disabled', false)
           .removeClass('saving')
           .text(I18n.t('buttons.save_and_publish', 'Save & Publish'))
         $('#quiz_edit_wrapper').find('input[name="publish"]').remove()
@@ -2441,7 +2441,7 @@ ready(function () {
 
   $('#show_question_details')
     .change(function (event) {
-      $('#questions').toggleClass('brief', !$(this).attr('checked'))
+      $('#questions').toggleClass('brief', !$(this).prop('checked'))
     })
     .triggerHandler('change')
 
@@ -2947,15 +2947,15 @@ ready(function () {
   function disableRegrade(holder) {
     holder.find('.regrade_enabled').hide()
     holder.find('.regrade_disabled').show()
-    holder.find('input[name="regrade_option"]').attr('disabled', true)
-    holder.find('input[name="regrade_option"]').attr('checked', false)
+    holder.find('input[name="regrade_option"]').prop('disabled', true)
+    holder.find('input[name="regrade_option"]').prop('checked', false)
     holder.find('input[name="regrade_disabled"]').val('1')
   }
 
   function disableQuestionForm() {
     $('.question_form')
       .find('.submit_button')
-      .attr('disabled', true)
+      .prop('disabled', true)
       .addClass('disabled')
       .removeClass('button_primary btn-primary')
   }
@@ -3143,7 +3143,7 @@ ready(function () {
       )
     }
     $dialog.find('.bank.selected').removeClass('selected')
-    $dialog.find('.submit_button').attr('disabled', true)
+    $dialog.find('.submit_button').prop('disabled', true)
     $dialog.dialog({
       title: I18n.t('titles.find_question_bank', 'Find Question Bank'),
       width: 600,
@@ -3159,7 +3159,7 @@ ready(function () {
       if (e.type === 'click' || keyboardClick) {
         $findBankDialog.find('.bank.selected').removeClass('selected')
         $(this).addClass('selected')
-        $findBankDialog.find('.submit_button').attr('disabled', false)
+        $findBankDialog.find('.submit_button').prop('disabled', false)
       }
     })
     .delegate('.submit_button', 'click', () => {
@@ -3272,7 +3272,7 @@ ready(function () {
       $dialog.find('.questions_count').text(question_ids.length)
       $dialog
         .find('button')
-        .attr('disabled', false)
+        .prop('disabled', false)
         .filter('.submit_button')
         .text(I18n.t('buttons.create_group', 'Create Group'))
       $dialog.dialog({
@@ -3287,7 +3287,7 @@ ready(function () {
     const $dialog = $('#add_question_group_dialog')
     $dialog
       .find('button')
-      .attr('disabled', true)
+      .prop('disabled', true)
       .filter('.submit_button')
       .text(I18n.t('buttons.creating_group', 'Creating Group...'))
 
@@ -3315,7 +3315,7 @@ ready(function () {
       data => {
         $dialog
           .find('button')
-          .attr('disabled', false)
+          .prop('disabled', false)
           .filter('.submit_button')
           .text(I18n.t('buttons.create_group', 'Create Group'))
 
@@ -3340,7 +3340,7 @@ ready(function () {
       data => {
         $dialog
           .find('button')
-          .attr('disabled', false)
+          .prop('disabled', false)
           .filter('.submit_button')
           .text(I18n.t('errors.creating_group_failed', 'Create Group Failed, Please Try Again'))
       }
@@ -3476,13 +3476,13 @@ ready(function () {
       event.preventDefault()
       $findQuestionDialog
         .find('.question_list .found_question:not(.blank) :checkbox')
-        .attr('checked', true)
+        .prop('checked', true)
     })
     .delegate('.clear_all_link', 'click', event => {
       event.preventDefault()
       $findQuestionDialog
         .find('.question_list .found_question:not(.blank) :checkbox')
-        .attr('checked', false)
+        .prop('checked', false)
     })
     .delegate('.cancel_button', 'click', event => {
       $findQuestionDialog.dialog('close')
@@ -3516,7 +3516,7 @@ ready(function () {
       const url = $findQuestionDialog.find('.add_questions_url').attr('href')
       $findQuestionDialog
         .find('button')
-        .attr('disabled', true)
+        .prop('disabled', true)
         .filter('.submit_button')
         .text(I18n.t('buttons.adding_questions', 'Adding Questions...'))
       $.ajaxJSON(
@@ -3526,7 +3526,7 @@ ready(function () {
         question_results => {
           $findQuestionDialog
             .find('button')
-            .attr('disabled', false)
+            .prop('disabled', false)
             .filter('.submit_button')
             .text(I18n.t('buttons.add_selected_questions', 'Add Selected Questions'))
           $findQuestionDialog.find('.selected_side_tab').removeClass('selected_side_tab')
@@ -3549,7 +3549,7 @@ ready(function () {
         data => {
           $findQuestionDialog
             .find('button')
-            .attr('disabled', false)
+            .prop('disabled', false)
             .filter('.submit_button')
             .text(
               I18n.t('errors.adding_questions_failed', 'Adding Questions Failed, please try again')
@@ -4924,7 +4924,7 @@ $.fn.formulaQuestion = function () {
   })
   $question.find('.compute_combinations').click(function () {
     const $button = $(this)
-    $button.text(I18n.t('buttons.generating', 'Generating...')).attr('disabled', true)
+    $button.text(I18n.t('buttons.generating', 'Generating...')).prop('disabled', true)
     const question_type = $question.find('.question_type').val()
     if (question_type !== 'calculated_question') {
       return
@@ -4953,7 +4953,7 @@ $.fn.formulaQuestion = function () {
     const mod = 0
     const finished = function () {
       $question.find('.supercalc').superCalc('clear_cached_finds')
-      $button.text('Generate').attr('disabled', false)
+      $button.text('Generate').prop('disabled', false)
       if (succeeded == 0) {
         alert(
           I18n.t(
@@ -5074,7 +5074,7 @@ $.fn.formulaQuestion = function () {
     const variables = $question.find('.variables tbody tr.variable').length > 0
     const formulas = $question.find('.formulas .formula').length > 0
 
-    $question.find('.combinations_option').attr('disabled', !variables || !formulas)
+    $question.find('.combinations_option').prop('disabled', !variables || !formulas)
     $question.find('.variables_specified').showIf(variables)
     $question.find('.formulas_specified').showIf(formulas)
     if ($question.hasClass('ready') && remove) {
@@ -5132,7 +5132,7 @@ $.fn.formulaQuestion = function () {
       zIndex: 1000,
     })
   })
-  $question.find('.combinations_option').attr('disabled', true)
+  $question.find('.combinations_option').prop('disabled', true)
   $question.find('.question_content').bind('keypress', event => {
     setTimeout(() => {
       $(event.target).triggerHandler('change')

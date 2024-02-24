@@ -47,7 +47,7 @@ function setup(EG, $iframe_holder, registerCb, refreshGradesCb, speedGraderWindo
     if (submission && submission.submission_history) {
       const lastIndex = submission.submission_history.length - 1
       // set submission to selected in dropdown
-      $('#submission_to_view option:eq(' + lastIndex + ')').attr('selected', 'selected')
+      $('#submission_to_view option:eq(' + lastIndex + ')').prop('selected', true)
     }
     EG.showGrade()
     EG.showDiscussion()

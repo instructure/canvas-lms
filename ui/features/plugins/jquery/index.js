@@ -26,14 +26,14 @@ const I18n = useI18nScope('plugins')
 $(document).on('submit', 'form.edit_plugin_setting', function () {
   $(this)
     .find('button')
-    .attr('disabled', true)
+    .prop('disabled', true)
     .filter('.save_button')
     .text(I18n.t('buttons.saving', 'Saving...'))
 })
 $(document).ready(function () {
   $('.disabled_checkbox')
     .change(function () {
-      $('#settings .plugin_settings').showIf(!$(this).attr('checked'))
+      $('#settings .plugin_settings').showIf(!$(this).prop('checked'))
     })
     .change()
 })

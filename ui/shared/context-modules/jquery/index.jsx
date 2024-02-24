@@ -210,7 +210,7 @@ window.modules = (function () {
       }
       const url = $('.progression_list_url').attr('href')
       if ($('.context_module_item.progression_requirement:visible').length > 0) {
-        $('.loading_module_progressions_link').show().attr('disabled', true)
+        $('.loading_module_progressions_link').show().prop('disabled', true)
       }
       $.ajaxJSON(
         url,
@@ -410,13 +410,13 @@ window.modules = (function () {
       $form.find('#unlock_module_at').prop('checked', data.unlock_at).change()
       $form
         .find('#require_sequential_progress')
-        .attr(
+        .prop(
           'checked',
           data.require_sequential_progress === 'true' || data.require_sequential_progress === '1'
         )
       $form
         .find('#publish_final_grade')
-        .attr('checked', data.publish_final_grade === 'true' || data.publish_final_grade === '1')
+        .prop('checked', data.publish_final_grade === 'true' || data.publish_final_grade === '1')
 
       const has_predecessors =
         $('#context_modules .context_module').length > 1 &&
@@ -983,9 +983,9 @@ modules.initModuleManagement = function (duplicate) {
     .change(function () {
       const $this = $(this)
       const $unlock_module_at_details = $('.unlock_module_at_details')
-      $unlock_module_at_details.showIf($this.attr('checked'))
+      $unlock_module_at_details.showIf($this.prop('checked'))
 
-      if ($this.attr('checked')) {
+      if ($this.prop('checked')) {
         if (!$context_module_unlocked_at.val()) {
           $context_module_unlocked_at.val(valCache)
         }
@@ -1209,20 +1209,22 @@ modules.initModuleManagement = function (duplicate) {
     $option
       .find('.type option')
       .hide()
-      .attr('disabled', true)
+      .prop('disabled', true)
       .end()
       .find('.type option.any')
       .show()
-      .attr('disabled', false)
+      .prop('disabled', false)
       .end()
       .find('.type option.' + data.type)
       .show()
-      .attr('disabled', false)
+      .prop('disabled', false)
     if (data.graded === '1') {
-      $option.find('.type option.graded').show().attr('disabled', false)
+      $option.find('.type option.graded').show().prop('disabled', false)
     }
     if (data.criterion_type) {
-      $option.find('.type').val($option.find('.type option.' + data.criterion_type + ':first').val())
+      $option
+        .find('.type')
+        .val($option.find('.type option.' + data.criterion_type + ':first').val())
     }
     $option.find('.type').change()
   })
@@ -1449,7 +1451,7 @@ modules.initModuleManagement = function (duplicate) {
     const restrictions = $item.data().master_course_restrictions
     const isDisabled =
       !get(ENV, 'MASTER_COURSE_SETTINGS.IS_MASTER_COURSE') && !!get(restrictions, 'content')
-    $titleInput.attr('disabled', isDisabled)
+    $titleInput.prop('disabled', isDisabled)
 
     $('#edit_item_form')
       .dialog({

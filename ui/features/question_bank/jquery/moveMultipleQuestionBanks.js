@@ -62,7 +62,7 @@ const moveQuestions = {
     this.elements.$questions().show()
     this.elements.$questions().find('.list_question:not(.blank)').remove()
     this.elements.$dialog().find('.question_name').text(this.messages.multiple_questions)
-    this.elements.$dialog().find('.copy_option').hide().find(':checkbox').attr('checked', false)
+    this.elements.$dialog().find('.copy_option').hide().find(':checkbox').prop('checked', false)
     this.elements.$dialog().find('.submit_button').text(this.messages.move_questions)
     this.elements.$dialog().find('.multiple_questions').val('1')
     this.elements.$dialog().data('question', null)

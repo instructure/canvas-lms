@@ -244,10 +244,10 @@ describe('EditEventView', () => {
         'calendar_event_conference_field',
       ]
       ids.forEach(id => expectEnabled(id))
-      $('#calendar_event_blackout_date').attr('checked', true)
+      $('#calendar_event_blackout_date').prop('checked', true)
       $('#calendar_event_blackout_date').trigger('change')
       ids.forEach(id => expectDisabled(id))
-      $('#calendar_event_blackout_date').attr('checked', false)
+      $('#calendar_event_blackout_date').prop('checked', false)
       $('#calendar_event_blackout_date').trigger('change')
       ids.forEach(id => expectEnabled(id))
     })

@@ -40,7 +40,8 @@ describe "sis imports ui" do
     expect(f("#override_sis_stickiness")).to be_enabled
     expect(is_checked("#add_sis_stickiness")).to be_falsey
     expect(is_checked("#clear_sis_stickiness")).to be_falsey
-    expect(driver.execute_script("return $('#override_sis_stickiness').attr('checked')")).to be_falsey
+    # #override_sis_stickiness is an <input> element, so .prop('checked') is appropriate
+    expect(driver.execute_script("return $('#override_sis_stickiness').prop('checked')")).to be false
     expect(is_checked("#override_sis_stickiness")).to be_falsey
     f("#override_sis_stickiness").click
     expect(f("#add_sis_stickiness")).to be_displayed

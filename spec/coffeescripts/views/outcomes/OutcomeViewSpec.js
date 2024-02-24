@@ -122,7 +122,7 @@ function commonTests() {
       state: 'show',
     })
     ok(view.$('.delete_button').length > 0)
-    ok(view.$('.delete_button').attr('disabled'))
+    ok(view.$('.delete_button').prop('disabled'))
     view.remove()
   })
 
@@ -143,7 +143,7 @@ function commonTests() {
       state: 'show',
     })
     ok(view.$('.delete_button').length > 0)
-    notOk(view.$('.delete_button').attr('disabled'))
+    notOk(view.$('.delete_button').prop('disabled'))
     view.remove()
   })
 
@@ -164,7 +164,7 @@ function commonTests() {
       state: 'show',
     })
     ok(view.$('.edit_button').length > 0)
-    notOk(view.$('.edit_button').attr('disabled'))
+    notOk(view.$('.edit_button').prop('disabled'))
     view.remove()
   })
 
@@ -317,7 +317,7 @@ function commonTests() {
       state: 'show',
     })
     ok(view.$el.find('.delete_button').length > 0)
-    ok(view.$el.find('.delete_button').attr('disabled'))
+    ok(view.$el.find('.delete_button').prop('disabled'))
     view.remove()
   })
 
@@ -338,7 +338,7 @@ function commonTests() {
       state: 'show',
     })
     ok(view.$el.find('.delete_button').length > 0)
-    ok(!view.$el.find('.delete_button').attr('disabled'))
+    ok(!view.$el.find('.delete_button').prop('disabled'))
     view.remove()
   })
 

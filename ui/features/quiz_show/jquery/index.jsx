@@ -254,7 +254,7 @@ $(document).ready(function () {
     beforeSubmit(_data) {
       $(this)
         .find('button')
-        .attr('disabled', true)
+        .prop('disabled', true)
         .text(I18n.t('buttons.publishing', 'Publishing...'))
     },
     success(_data) {

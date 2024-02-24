@@ -44,14 +44,14 @@ $(document).ready(function () {
     beforeSubmit(_data) {
       $(this)
         .find('button')
-        .attr('disabled', true)
+        .prop('disabled', true)
         .filter('.submit_button')
         .text(I18n.t('messages.updating_user_details', 'Updating User Details...'))
     },
     success(data) {
       $(this)
         .find('button')
-        .attr('disabled', false)
+        .prop('disabled', false)
         .filter('.submit_button')
         .text(I18n.t('buttons.update_user', 'Update User'))
       $('#name_and_email .user_details').fillTemplateData({data})
@@ -60,7 +60,7 @@ $(document).ready(function () {
     error(_data) {
       $(this)
         .find('button')
-        .attr('disabled', false)
+        .prop('disabled', false)
         .filter('.submit_button')
         .text(
           I18n.t(
