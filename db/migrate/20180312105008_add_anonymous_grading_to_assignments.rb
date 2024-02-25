@@ -27,7 +27,7 @@ class AddAnonymousGradingToAssignments < ActiveRecord::Migration[5.0]
 
     reversible do |dir|
       dir.up do
-        DataFixup::BackfillNulls.run(Assignment, :anonymous_grading)
+        DataFixup::BackfillNulls.run(AbstractAssignment, :anonymous_grading)
       end
     end
   end

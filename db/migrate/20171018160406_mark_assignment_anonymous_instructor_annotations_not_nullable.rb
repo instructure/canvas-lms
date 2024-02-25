@@ -23,7 +23,7 @@ class MarkAssignmentAnonymousInstructorAnnotationsNotNullable < ActiveRecord::Mi
 
   def up
     # In case we missed something in 20170824064214_backfill_assignment_anonymous_instructor_annotations.rb
-    DataFixup::BackfillNulls.run(Assignment, :anonymous_instructor_annotations, default_value: false)
+    DataFixup::BackfillNulls.run(AbstractAssignment, :anonymous_instructor_annotations, default_value: false)
 
     change_column_null :assignments, :anonymous_instructor_annotations, false
   end
