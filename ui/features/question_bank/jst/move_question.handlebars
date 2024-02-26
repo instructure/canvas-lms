@@ -1,6 +1,6 @@
 {{#each questions}}
 <li class="list_question">
-  <input type="checkbox" id="list_question_{{assessment_question.id}}" class="list_question_checkbox" name="questions[{{assessment_question.id}}" value="{{assessment_question.id}}" />
+  <input type="checkbox" id="list_question_{{assessment_question.id}}" class="list_question_checkbox" name="questions[{{assessment_question.id}}]" value="{{assessment_question.id}}" />
   <label for="list_question_{{assessment_question.id}}" class="list_question_name">{{assessment_question.question_data.question_name}}</label>
   <div class="list_question_text">{{{assessment_question.question_data.question_text}}}</div>
 </li>
