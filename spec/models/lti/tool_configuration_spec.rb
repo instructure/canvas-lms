@@ -649,6 +649,71 @@ module Lti
       end
     end
 
+    describe "domain" do
+      subject { tool_configuration.domain }
+
+      it { is_expected.to eq(settings["extensions"].first["domain"]) }
+    end
+
+    describe "verify_placements" do
+      subject { tool_configuration.verify_placements }
+
+      before do
+        tool_configuration.developer_key = developer_key
+        tool_configuration.save!
+      end
+
+      context "when the lti_placement_restrictions feature flag is disabled" do
+        before do
+          Account.site_admin.disable_feature!(:lti_placement_restrictions)
+        end
+
+        it { is_expected.to be_nil }
+      end
+
+      context "when the lti_placement_restrictions feature flag is enabled" do
+        before do
+          Account.site_admin.enable_feature!(:lti_placement_restrictions)
+        end
+
+        it "returns nil when there are no submission_type_selection placements" do
+          expect(subject).to be_nil
+        end
+
+        context "when the tool is allowed to use the submission_type_selection placement through it's dev key" do
+          before do
+            Setting.set("submission_type_selection_allowed_dev_keys", tool_configuration.developer_key.global_id.to_s)
+          end
+
+          it { is_expected.to be_nil }
+        end
+
+        context "when the tool is allowed to use the submission_type_selection placement through it's domain" do
+          before do
+            Setting.set("submission_type_selection_allowed_launch_domains", tool_configuration.domain)
+          end
+
+          it { is_expected.to be_nil }
+        end
+
+        context "when the configuration has a submission_type_selection placement" do
+          let(:tool_configuration) do
+            tc = super()
+
+            tc.settings["extensions"].first["settings"]["placements"] << {
+              "placement" => "submission_type_selection",
+              "message_type" => "LtiResourceLinkRequest",
+              "target_link_uri" => "http://example.com/launch?placement=submission_type_selection"
+            }
+
+            tc
+          end
+
+          it { is_expected.to include("Warning").and include("submission_type_selection") }
+        end
+      end
+    end
+
     describe "privacy_level" do
       subject do
         extensions["privacy_level"] = extension_privacy_level

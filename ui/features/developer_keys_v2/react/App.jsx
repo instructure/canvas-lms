@@ -31,7 +31,7 @@ import AdminTable from './AdminTable'
 import InheritedTable from './InheritedTable'
 import DeveloperKey from './DeveloperKey'
 import NewKeyModal from './NewKeyModal'
-import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import DateHelper from '@canvas/datetime/dateHelper'
 import {DynamicRegistrationModal} from './dynamic_registration/DynamicRegistrationModal'
 
@@ -139,9 +139,15 @@ class DeveloperKeysApp extends React.Component {
    * workaround and do it.
    * @todo Find a better way to avoid modal-focus-screenreader-bulldozing so
    * this isn't necessary.
+   * @param {string} warningMessage - A warning message to show to the user.
    */
-  developerKeySaveSuccessfulHandler() {
-    setTimeout(showFlashSuccess(I18n.t('Save successful.')), ALERT_WAIT_TIME)
+  developerKeySaveSuccessfulHandler(warningMessage) {
+    setTimeout(() => {
+      showFlashSuccess(I18n.t('Save successful.'))()
+      if (warningMessage) {
+        showFlashAlert({message: warningMessage, type: 'warning'})
+      }
+    }, ALERT_WAIT_TIME)
   }
 
   render() {

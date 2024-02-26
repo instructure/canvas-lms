@@ -60,6 +60,7 @@ RSpec.shared_context "lti_1_3_tool_configuration_spec_helper", shared_context: :
           "tool_id" => "LTI 1.3 Test Tool",
           "domain" => "http://lti13testtool.docker",
           "settings" => {
+            "domain" => "lti13testtool.docker",
             "icon_url" => "https://static.thenounproject.com/png/131630-200.png",
             "selection_height" => 500,
             "selection_width" => 500,
