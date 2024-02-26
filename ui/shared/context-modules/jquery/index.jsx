@@ -1325,13 +1325,13 @@ modules.initModuleManagement = function (duplicate) {
           }
           $newModule.find('.collapse_module_link').focus()
           modules.updateAssignmentData()
-          // Without these 'die'/'off' commands, the event handler happens twice after
+          // Without these 'off' commands, the event handler happens twice after
           // initModuleManagement is called.
-          $('.delete_module_link').die()
-          $('.duplicate_module_link').die()
-          $('.duplicate_item_link').die()
-          $('.add_module_link').die()
-          $('.edit_module_link').die()
+          $('.delete_module_link').off()
+          $('.duplicate_module_link').off()
+          $('.duplicate_item_link').off()
+          $('.add_module_link').off()
+          $('.edit_module_link').off()
           $('#context_modules').off('addFileToModule')
           $('#add_context_module_form .add_prerequisite_link').off()
           $('#add_context_module_form .add_completion_criterion_link').off()
