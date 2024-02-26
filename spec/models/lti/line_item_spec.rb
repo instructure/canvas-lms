@@ -112,35 +112,14 @@ RSpec.describe Lti::LineItem do
     let(:creation_arguments) { base_line_item_params(assignment_model, DeveloperKey.create!) }
   end
 
-  describe "when destroying" do
-    subject { line_item.destroy }
-
-    let(:line_item) { line_item_model }
-    let(:result) { lti_result_model(line_item:) }
-
-    it "destroys associated results" do
-      expect(result).to be_active
-      subject
-      expect(result.reload).to be_deleted
-    end
-  end
-
-  describe "when undestroying" do
-    subject { line_item.undestroy }
-
-    let(:line_item) { line_item_model }
-    let(:result) { lti_result_model(line_item:) }
-
-    before do
-      result
-      line_item.destroy
-    end
-
-    it "undestroys associated results" do
-      expect(result.reload).to be_deleted
-      subject
-      expect(result.reload).to be_active
-    end
+  it "destroys and undestroys associated results" do
+    line_item = line_item_model
+    result = lti_result_model(line_item:)
+    expect(result).to be_active
+    line_item.destroy
+    expect(result.reload).to be_deleted
+    line_item.reload.undestroy
+    expect(result.reload).to be_active
   end
 
   context "when updating the associated assignment" do

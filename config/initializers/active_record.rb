@@ -753,8 +753,8 @@ class ActiveRecord::Base
             .transform_values { |attr| attr.is_a?(ActiveModel::Attribute) ? attr.value : attr }
         )
       else
-        returning_values = returning_columns = self.class._returning_columns_for_insert
-        self.class._insert_record(
+        returning_columns = self.class._returning_columns_for_insert
+        returning_values = self.class._insert_record(
           attributes_with_values(attribute_names_for_partial_inserts)
             .transform_values { |attr| attr.is_a?(ActiveModel::Attribute) ? attr.value : attr },
           returning_columns
