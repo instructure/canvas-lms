@@ -66,7 +66,9 @@ describe "security" do
       post "/login/canvas", params: { "pseudonym_session[unique_id]" => "nobody@example.com",
                                       "pseudonym_session[password]" => "asdfasdf" }
       assert_response 302
-      c = response["Set-Cookie"].lines.grep(/\A_normandy_session=/).first
+      lines = response["Set-Cookie"]
+      lines = lines.lines if $canvas_rails == "7.0"
+      c = lines.grep(/\A_normandy_session=/).first
       expect(c).not_to match(/expires=/)
       reset!
       https!
@@ -76,7 +78,9 @@ describe "security" do
                                       "pseudonym_session[password]" => "asdfasdf",
                                       "pseudonym_session[remember_me]" => "1" }
       assert_response 302
-      c = response["Set-Cookie"].lines.grep(/\A_normandy_session=/).first
+      lines = response["Set-Cookie"]
+      lines = lines.lines if $canvas_rails == "7.0"
+      c = lines.grep(/\A_normandy_session=/).first
       expect(c).not_to match(/expires=/)
     end
 
@@ -89,8 +93,10 @@ describe "security" do
       post "/login/canvas", params: { "pseudonym_session[unique_id]" => "nobody@example.com",
                                       "pseudonym_session[password]" => "asdfasdf" }
       assert_response 302
-      c1 = response["Set-Cookie"].lines.grep(/\Apseudonym_credentials=/).first
-      c2 = response["Set-Cookie"].lines.grep(/\A_normandy_session=/).first
+      lines = response["Set-Cookie"]
+      lines = lines.lines if $canvas_rails == "7.0"
+      c1 = lines.grep(/\Apseudonym_credentials=/).first
+      c2 = lines.grep(/\A_normandy_session=/).first
       expect(c1).not_to be_present
       expect(c2).to be_present
     end
