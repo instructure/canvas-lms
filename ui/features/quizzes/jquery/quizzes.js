@@ -2428,7 +2428,7 @@ ready(function () {
       event.stopPropagation()
 
       const $publish_input = $(document.createElement('input'))
-      $publish_input.attr('type', 'hidden').attr('name', 'publish').attr('value', 'true')
+      $publish_input.attr('type', 'hidden').attr('name', 'publish').prop('value', 'true')
       $quiz_options_form.append($publish_input)
 
       $quiz_edit_wrapper
@@ -4294,7 +4294,7 @@ ready(function () {
 
     buildPlaceMenu(event) {
       const option = $(event.target).find('option:selected')
-      const value = option.length > 0 ? option.attr('value') : 'top'
+      const value = option.length > 0 ? option.prop('value') : 'top'
 
       // filter by selected
       const filtered = this.itemsInGroup(value)
@@ -4365,7 +4365,7 @@ ready(function () {
 
       // get selected values
       const option = this.$form.find('#move_select_group option:selected')
-      const group = option.length > 0 ? option.attr('value') : 'top'
+      const group = option.length > 0 ? option.prop('value') : 'top'
 
       this.reorderDom(group)
       this.ajaxPostReorder(group)
@@ -4376,7 +4376,7 @@ ready(function () {
 
     reorderDom(group) {
       const option = this.$form.find('#move_select_question option:selected')
-      const place = option.attr('value')
+      const place = option.prop('value')
       const bottom = this.selected.sortable.nextAll('.group_bottom').first()
 
       // move to bottom of the group
@@ -4460,7 +4460,7 @@ ready(function () {
 
     buildGroupParams(group) {
       const option = this.$form.find('#move_select_question option:selected')
-      const place = option.attr('value')
+      const place = option.prop('value')
 
       // rebuild the group list adding in our selection
       const selected = this.selected

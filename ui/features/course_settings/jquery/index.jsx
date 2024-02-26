@@ -445,7 +445,7 @@ $(document).ready(function () {
     beforeSubmit(data) {
       // If Restrict Quantitative Data is checked, then the course must have a default grading scheme selected
       const rqdEnabled =
-        $course_form.find('#course_restrict_quantitative_data')?.attr('value') === 'true'
+        $course_form.find('#course_restrict_quantitative_data')?.prop('value') === 'true'
       const hasCourseDefaultGradingScheme = !!$course_form
         .find('.grading_standard_checkbox')
         .prop('checked')
