@@ -41,14 +41,14 @@ window.rubricAssessment = {
     const $rubric_criterion_comments_dialog = $('#rubric_criterion_comments_dialog')
 
     $('.rubric')
-      .delegate('.rating', 'click', function (_event) {
+      .on('click', '.rating', function (_event) {
         $(this)
           .parents('.criterion')
           .find('.criterion_points')
           .val($(this).find('.points').text())
           .change()
       })
-      .delegate('.long_description_link', 'click', function (event) {
+      .on('click', '.long_description_link', function (event) {
         event.preventDefault()
         if (!$(this).parents('.rubric').hasClass('editing')) {
           const data = $(this)
@@ -73,7 +73,7 @@ window.rubricAssessment = {
             })
         }
       })
-      .delegate('.criterion .saved_custom_rating', 'change', function () {
+      .on('change', '.criterion .saved_custom_rating', function () {
         if ($(this).parents('.rubric').hasClass('assessing')) {
           const val = $(this).val()
           if (val && val.length > 0) {
@@ -81,7 +81,7 @@ window.rubricAssessment = {
           }
         }
       })
-      .delegate('.criterion_comments_link', 'click', function (event) {
+      .on('click', '.criterion_comments_link', function (event) {
         event.preventDefault()
         const $rubric_criterion_comments_link = $(this)
         const $criterion = $(this).parents('.criterion')
@@ -110,7 +110,7 @@ window.rubricAssessment = {
       })
       // cant use a .delegate because up above when we delegate '.rating' 'click' it calls .change() and that doesnt bubble right so it doesen't get caught
       .find('.criterion_points')
-      .bind('keyup change blur', function (event) {
+      .on('keyup change blur', function (event) {
         const $obj = $(event.target)
         if ($obj.parents('.rubric').hasClass('assessing')) {
           let val = numberHelper.parse($obj.val())
@@ -141,7 +141,7 @@ window.rubricAssessment = {
         }
       })
 
-    $('.rubric_summary').delegate('.rating_comments_dialog_link', 'click', function (event) {
+    $('.rubric_summary').on('click', '.rating_comments_dialog_link', function (event) {
       event.preventDefault()
       const $rubric_rating_comments_link = $(this)
       const $criterion = $(this).parents('.criterion')

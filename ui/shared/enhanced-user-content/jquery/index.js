@@ -547,7 +547,7 @@ function doThingsToModuleSequenceFooter() {
 function showHideRemoveThingsToRightSideMoreLinksWhenClicked() {
   // this is for things like the to-do, recent items and upcoming, it
   // happend a lot so rather than duplicating it everywhere I stuck it here
-  $('#right-side').delegate('.more_link', 'click', function (event) {
+  $('#right-side').on('click', '.more_link', function (event) {
     const $this = $(this)
     const $children = $this.parents('ul').children(':hidden').show()
     $this.closest('li').remove()

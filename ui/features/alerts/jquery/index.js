@@ -181,7 +181,7 @@ $(function () {
   })
 
   $list
-    .delegate('.edit_link', 'click', function () {
+    .on('click', '.edit_link', function () {
       const $alert = $(this).parents('.alert')
       const data = getAlertData($alert)
       $alert.data('data', data)
@@ -226,7 +226,7 @@ $(function () {
       $alert.toggleClass('displaying')
       return false
     })
-    .delegate('.delete_link', 'click', function () {
+    .on('click', '.delete_link', function () {
       const $alert = $(this).parents('.alert')
       if (!$alert.hasClass('new')) {
         $alert.find('input[name="_method"]').prop('value', 'DELETE')
@@ -248,7 +248,7 @@ $(function () {
       }
       return false
     })
-    .delegate('.cancel_button', 'click', function () {
+    .on('click', '.cancel_button', function () {
       $(this).parent().hideErrors()
       const $alert = $(this).parents('.alert')
       if ($alert.hasClass('new')) {
@@ -267,7 +267,7 @@ $(function () {
       }
       return false
     })
-    .delegate('.alert', 'submit', function () {
+    .on('submit', '.alert', function () {
       const $alert = $(this)
 
       // Validation (validateForm doesn't support arrays, and formErrors
@@ -332,7 +332,7 @@ $(function () {
       )
       return false
     })
-    .delegate('.recipients .delete_item_link', 'click', function () {
+    .on('click', '.recipients .delete_item_link', function () {
       const $li = $(this).parents('li')
       const $add_link = $(this).parents('.alert').find('.add_recipient_link')
       addRecipientInOrder($add_link.prev(), createRecipient($li.data('value'), 'option'))
@@ -345,7 +345,7 @@ $(function () {
       })
       return false
     })
-    .delegate('.add_recipient_link', 'click', function () {
+    .on('click', '.add_recipient_link', function () {
       const $recipients = $(this).parents('.alert').find('.recipients')
       const $select = $(this).prev()
       const recipient = $select.prop('value')
@@ -364,7 +364,7 @@ $(function () {
       }
       return false
     })
-    .delegate('.criteria .delete_item_link', 'click', function () {
+    .on('click', '.criteria .delete_item_link', function () {
       const $li = $(this).parents('li')
       const $add_link = $(this).parents('.alert').find('.add_criterion_link')
       addRecipientInOrder($add_link.prev(), createCriterion($li.data('value'), 'option'))
@@ -377,7 +377,7 @@ $(function () {
       })
       return false
     })
-    .delegate('.add_criterion_link', 'click', function () {
+    .on('click', '.add_criterion_link', function () {
       const $criteria = $(this).parents('.alert').find('.criteria')
       const $select = $(this).prev()
       const criterion = $select.prop('value')
@@ -396,7 +396,7 @@ $(function () {
       }
       return false
     })
-    .delegate('input[name="repetition"]', 'click', function () {
+    .on('click', 'input[name="repetition"]', function () {
       const $error_box = $(this)
         .parents('.alert')
         .find('input[name="alert[repetition]"]')
@@ -407,7 +407,7 @@ $(function () {
         })
       }
     })
-    .delegate('label.repetition', 'click', function (event) {
+    .on('click', 'label.repetition', function (event) {
       event.preventDefault()
       $(this).parents('.alert').find('input[name="repetition"]').prop('checked', true)
     })
