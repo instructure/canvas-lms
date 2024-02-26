@@ -875,7 +875,7 @@ function setup() {
       $assignment.triggerHandler('score_change', {update: true, refocus: true})
     })
 
-    $('#grades_summary').delegate('.revert_score_link', 'click', function (event, options) {
+    $('#grades_summary').on('click', '.revert_score_link', function (event, options) {
       event.preventDefault()
       event.stopPropagation()
 

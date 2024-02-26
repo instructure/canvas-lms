@@ -666,10 +666,10 @@ PROTOTYPE._createTitle = function()
 	.insertBefore(elements.content)
 
 	// Button-specific events
-	.delegate('.qtip-close', 'mousedown keydown mouseup keyup mouseout', function(event) {
+	.on('mousedown keydown mouseup keyup mouseout', '.qtip-close', function(event) {
 		$(this).toggleClass('ui-state-active ui-state-focus', event.type.substr(-4) === 'down')
 	})
-	.delegate('.qtip-close', 'mouseover mouseout', function(event){
+	.on('mouseover mouseout', '.qtip-close', function(event){
 		$(this).toggleClass('ui-state-hover', event.type === 'mouseover')
 	})
 
@@ -1374,10 +1374,12 @@ PROTOTYPE._unbind = function(targets, suffix) {
 }
 
 // Apply common event handlers using delegate (avoids excessive .bind calls!)
-var ns = '.'+NAMESPACE
-function delegate(selector, events, method) {	
-	$(document.body).delegate(selector,
-		(events.split ? events : events.join(ns + ' ')) + ns,
+// (rewritten using `on()` for jQuery 3.0)
+// TODO are these shenanigans still even necessary?
+function delegatedOn(selector, events, method) {	
+	$(document.body).on(
+		(events.split ? events : events.join(SELECTOR + ' ')) + SELECTOR,
+		selector,
 		function() {
 			var api = QTIP.api[ $.attr(this, ATTR_ID) ]
 			api && !api.disabled && method.apply(api, arguments)
@@ -1386,7 +1388,7 @@ function delegate(selector, events, method) {
 }
 
 $(function() {
-	delegate(SELECTOR, ['mouseenter', 'mouseleave'], function(event) {
+	delegatedOn(SELECTOR, ['mouseenter', 'mouseleave'], function(event) {
 		var state = event.type === 'mouseenter',
 			tooltip = $(event.currentTarget),
 			target = $(event.relatedTarget || event.target),
@@ -1415,7 +1417,7 @@ $(function() {
 	})
 
 	// Define events which reset the 'inactive' event handler
-	delegate('['+ATTR_ID+']', INACTIVE_EVENTS, inactiveMethod)
+	delegatedOn('['+ATTR_ID+']', INACTIVE_EVENTS, inactiveMethod)
 })
 
 // Event trigger
