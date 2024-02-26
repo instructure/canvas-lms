@@ -362,8 +362,10 @@ ja:
         partner_key: パートナーキー
   academic_engagement_capella_74946a80: "アカデミックな予定 (Capella)"
   academic_engagement_capella_v2_2023_08_28_5c92fd3f: "アカデミックエンゲージメント (Capella V2-2023-08-28)"
+  academic_engagement_capella_v3_2024_02_05_775b9f21: "アカデミックエンゲージメント (Capella V3-2024-02-05)"
   academic_engagement_detail_capella_e76c939d: アカデミックエンゲージメント詳細（Capella）
   academic_engagement_detail_capella_v2_2023_08_28_3ba31c31: "アカデミックエンゲージメント詳細 (Capella V2-2023-08-28)"
+  academic_engagement_detail_capella_v3_2024_02_05_106a7e2f: "アカデミックエンゲージメント詳細 (Capella V3-2024-02-05)"
   academic_engagement_detail_sei_31f8f271: "アカデミック・エンゲージメント詳細 - SEI"
   academic_engagement_detail_strayer_1f80cba4: アカデミックエンゲージメント詳細（Strayer）
   academic_engagement_detail_strayer_v3_2023_08_28_cea3521c: "アカデミックエンゲージメント詳細 (Strayer V3-2023-08-28)"
@@ -2289,6 +2291,7 @@ ja:
   add_courses_c0696323: コースを追加する
   add_criterion_eb9587ef: 基準を追加する
   add_custom_link_22059c0: カスタムリンクを追加する
+  add_dates_to_gradebook_grading_period_filter_b47b6a14: 成績表評定期間フィルターに日付を追加する
   add_delete_b82d05f8: 追加/削除
   add_delete_edit_7dbc9c5b: 追加/削除/編集
   add_delete_manage_d65e235: 追加/削除/管理
@@ -2351,6 +2354,7 @@ ja:
   add_new_caption_or_subtitle_59d2d044: 新しいキャプションまたはサブタイトルを追加する
   add_new_domain_e097d4a0: 新しいドメインを追加
   add_new_group_7ac49f31: 新規グループの追加
+  add_new_rating_9fb7ec89: 新しい評価を追加する
   add_new_row_for_a_letter_grade_to_grading_scheme_a_1472479e: この行の後に、文字による評定のための新しい行を評定スキームに追加する。
   add_new_set_of_due_dates_e8e240f: 新しい期日を追加
   add_new_term_d2217c0d: 新しい期間の追加
@@ -5404,6 +5408,7 @@ ja:
   belarusian_b2f19c76: ベラルーシ語
   belgium_32_e5f5b598: "ベルギー (+32)"
   belgium_ef8739b6: ベルギー
+  below_81d4dceb: 下の
   below_is_an_example_of_how_students_will_see_their_8f7e7971: 以下は、学生が自分のスケジュールを見る方法の一例です。
   below_mastery_abd1dca5: 熟達していない
   below_min_rating_78a742c3: 最低評価未満
@@ -5436,6 +5441,7 @@ ja:
   blackout_date_title_was_edited_31752bc9: "ブラックアウト日%{title}が編集されました。"
   blackout_dates_4a140a72: ブラックアウト日
   blank_38df4238: ブランク
+  block_editor_2e266d9c: ブロックエディタ
   blocked_30d0fb62: ブロックされています
   blocked_by_running_migration_d8a57cb7: 移行の実行でブロックされました
   blocked_domain_name_b5b93150: ブロックされたドメイン名
@@ -8686,6 +8692,7 @@ ja:
   course_copy_no_course_error: コピー元のコースが見つかりませんでした。
   course_copy_not_allowed_error: コピー元のコースのコピーが許可されていません。
   course_course_d1c78210: "コース：%{course}"
+  course_datetime_c0c32b02: "コース：%{datetime}"
   course_default_fd054879: (コースデフォルト)
   course_default_grading_scheme_6b902d8: コースデフォルト評定スキーム
   course_details_25cdf103: コースの詳細情報
@@ -9681,6 +9688,7 @@ ja:
   create_file_s_188549e6: "[ ファイルを作成 ]"
   create_files_after_rce_media_upload_recording_77d75a96: RCEメディアのアップロード/記録後にファイルを作成する
   create_filter_preset_d6f28bc4: フィルタープリセットを作成する
+  create_from_outcome_3f29e594: アウトカムから作成する
   create_group_set_7fe1cd53: "グループ セットの作成"
   create_groups_later_6ce36058: グループを後で作成する
   create_groups_now_d59bf70b: 今すぐグループを作成する
@@ -9708,7 +9716,9 @@ ja:
     url: URL
   create_new_assignment_d77dfc4: 新しい割り当てを作成する
   create_new_attempt_19c96c03: 新しい試行を作成する
+  create_new_calendar_event_f933f209: 新しい予定表イベントを作成する
   create_new_course_e3ef9cd0: 新しいコースを作成する
+  create_new_criterion_1a4efd4: 新しいクライテリアを作成する
   create_new_discussions_6ab69da2: 新しいディスカッションを作成する
   create_new_e0946c49: 新規作成
   create_new_filter_c244aa92: 新しいフィルタを作成する
@@ -9768,7 +9778,9 @@ ja:
   criteria_builder_b214069e: 基準ビルダー
   criterion_5f0b62f8: 基準
   criterion_created_42669293: 基準を作成
+  criterion_description_757741c3: クライテリア説明
   criterion_long_description_e9a97247: 基準の長い説明
+  criterion_name_92e1c426: クライテリア名
   criterion_ratings_3eed22e2: 基準の評価
   criterion_updated_36c0b3dc: 基準を更新済み
   croatian_d713d655: クロアチア語
@@ -10243,6 +10255,7 @@ ja:
   delete_course_files_ee9e769: コースファイルを削除
   delete_course_templates_bb966d27: コーステンプレートを削除
   delete_courses_9ac148e3: コースを削除
+  delete_criterion_2181295b: クライテリアを削除する
   delete_criterion_row_80c3b3b: 基準の列を削除する
   delete_current_message_5da0221a: 現在のメッセージの削除
   delete_current_module_item_21fefc54: 現在のモジュール/アイテムを削除
@@ -11168,6 +11181,7 @@ ja:
   draft_comment_b2376ea4: コメントの下書き
   draft_comment_warning_modal_in_speedgrader_ded232c1: SpeedGrader　のドラフトコメント警告モーダル
   draft_discussion_entries_98d93a9d: 下書きディスカッションのエントリ
+  draft_new_criterion_95ed3c89: 新しいクライテリアを下書きする
   draft_saved_eba9cfeb: ドラフトを保存しました
   drag_a_file_here_39357b48: ファイルをここにドラッグする
   drag_a_file_here_or_1aaf19c1: ファイルをここにドラッグするか、
@@ -11260,6 +11274,7 @@ ja:
   duplicate_31cec192: 複製
   duplicate_assignment_name_3ca7d753: "重複する課題%{name}"
   duplicate_c4bb7d3a: "複製する "
+  duplicate_criterion_601aa3cf: 重複するクライテリア
   duplicate_discussion_title_43b39959: "ディスカッションを複製する%{title}"
   duplicate_discussion_title_6537ef4d: "ディスカッションを複製する%{title}"
   duplicate_grading_scheme_d0e57758: 評定スキームを複製
@@ -11431,6 +11446,7 @@ ja:
   edit_user_c46cf103: ユーザーを編集
   edit_user_details_4d7b63ff: ユーザの詳細の編集
   edit_user_details_9af7819b: ユーザー詳細を編集する
+  edit_username_s_membership_3969048c: "%{userName}のメンバーシップを編集する"
   edit_value_7911ae4f: 値の編集
   edit_value_for_name_d9e25af1: "\"%{name}\"の値の編集"
   edit_video_conference_5ceec91c: ビデオ会議を編集する
@@ -11594,6 +11610,7 @@ ja:
   enable_the_creation_of_master_courses_8205b155: マスターコース作成を有効化する
   enable_the_deprecation_of_the_faculty_journal_func_78b3344d: 教員ジャーナル機能の非推奨を有効にします。
   enable_the_module_publish_menus_to_make_mass_publi_b32f0c52: モジュールの公開メニューを有効にして、大量公開と公開解除をより簡単に行うことができます。
+  enable_the_new_block_editor_for_the_rich_content_e_6a0d0031: リッチコンテンツエディタの新しいブロックエディタを有効にします。
   enable_the_plagiarism_detection_platform_7c3b6195: 盗作検出プラットフォームを有効にする
   enable_the_redesigned_course_pacing_user_experienc_21618a38: 再設計されたコースペーシングのユーザエクスペリエンスを有効にします。
   enable_the_security_tab_on_the_settings_page_to_ad_eab7c954: "設定ページの[セキュリティ]タブを有効にし、CSP設定を調整する"
@@ -11842,6 +11859,7 @@ ja:
       *eduappcenter.com*から、あなたの組織にアクセストークンを入力しでください。一度適用されると、EduAppCenter 内であなたの組織が所持する
       アプリのみが承認されたことが、External Appsページに表記されます。どのように**アクセストークンを作成**するかを学びましょう。
   enter_the_access_token_for_your_organization_from__f1c71941: "*eduappcenter.com*から組織のアクセストークンを入力します。                       適用されると、あなたの組織が                       EduAppCenterで承認したアプリのみが外部アプリページに表示されます。                       **アクセストークンの生成**方法については、こちらをご覧ください。"
+  enter_the_description_91ececc1: 説明を入力する
   enter_the_email_address_of_the_user_you_would_like_92112560: 一時的に登録したいユーザーのメールアドレスを入力します
   enter_the_email_addresses_of_the_users_you_would_l_17cef6a0: 追加したいユーザーのメールアドレスを、コンマで区切って入力します
   enter_the_email_addresses_of_the_users_you_would_l_f76448a6: 追加したいユーザーのメールアドレスを、コンマまたは改行で区切って入力します
@@ -11849,6 +11867,7 @@ ja:
   enter_the_login_id_of_the_user_you_would_like_to_t_46938400: "一時的に登録したいユーザーのログイン ID を入力します"
   enter_the_login_ids_of_the_users_you_would_like_to_502fcbc5: "追加したいユーザーのログイン ID を、コンマまたは改行で区切って入力します"
   enter_the_login_ids_of_the_users_you_would_like_to_d39fb0f7: "追加したいユーザーのログイン ID をコンマで区切って入力します"
+  enter_the_name_c86bd140: 名前を入力する
   enter_the_sis_id_of_the_user_you_would_like_to_tem_efab1e87: "一時的に登録したいユーザーの SIS ID を入力します"
   enter_the_sis_ids_of_the_users_you_would_like_to_a_1bdce982: "追加したいユーザーの SIS ID をコンマで区切って入力します"
   enter_the_sis_ids_of_the_users_you_would_like_to_a_25e441f1: "追加したいユーザーの SIS ID を、コンマまたは改行で区切って入力します"
@@ -12392,6 +12411,7 @@ ja:
   example_item_scores_6726c689: アイテムのスコアの例
   example_school_of_rock_41f32c31: 例：「ロックスクール」
   exceeded_the_maximum_length_number_characters_2d25611e: "最大長 (%{number} 文字) を超えました"
+  exceeds_1dfdae30: 超過
   exceeds_expectations_5910fc3a: 期待値を超えている
   exceeds_mastery_1f995dce: 十分熟達している
   exceeds_max_events_28f19b04: "%{max}イベントを超えています。"
@@ -15320,6 +15340,7 @@ ja:
   if_enabled_canvas_will_allow_tools_to_return_multi_fe7b6678: |-
       有効にすると、Canvas はツールがコースモジュールページで、1つのリクエストで複数のコンテンツアイテムを
       返すことを許可します
+  if_enabled_canvas_will_be_able_to_export_new_quizz_504132df: "有効にすると、CanvasはCommon Cartridge Export Packagesの一部としてNew Quizzesをエクスポートできるようになります。"
   if_enabled_common_cartridge_importers_will_convert_9bffff09: "有効にすると、Common CartridgeインポータがHTMLファイルをページに変換します"
   if_enabled_content_designers_must_provide_copyrigh_eca21f5e: 有効な場合、コンテンツの設計者は公開される前にファイルの著作権とライセンス情報を指定する必要があります。より良いファイルのブラウジングも有効になっている場合にのみ適用されます。
   if_enabled_copyright_and_license_information_must__2a551827: 有効にした場合、ファイルを公開する前に著作権とライセンス情報をファイルに提供しなければなりません。
@@ -16872,6 +16893,7 @@ ja:
   loading_unsynced_changes_b5d7b202: 同期されていない変更を読み込み中
   loading_unsynched_changes_688434f2: 同期されていない変更の読み込み
   local_4ee321b1: ローカル
+  local_datetime_ce5ffddd: "ローカル：%{datetime}"
   locales: 
     ja: 日本語
   location_3b6ff307: "場所:"
@@ -19558,6 +19580,7 @@ ja:
   module_name_1127ebdb: モジュール名
   module_name_is_required_de75de0a: モジュール名は必須です。
   module_navigation_97043417: モジュールネビゲーション
+  module_progress_for_name_fbff0ccb: "*%{name}*モジュールの進行状況"
   module_publish_menu_30b638dd: モジュール公開メニュー
   module_publish_menu_88b54c1b: モジュール公開メニュー
   module_published_80f0b9b8: モジュールは公開
@@ -19767,6 +19790,7 @@ ja:
   move_count_outcomes_c0ca2b30: 
     one: "%{count}成果を移動しますか？"
     other: "%{count}アウトカムを移動しますか？"
+  move_criterion_9b2965d9: クライテリアを移動する
   move_dialog: 
     cancel: キャンセル
     save: 保存
@@ -19792,6 +19816,7 @@ ja:
   move_module_item_after_bbcfe2d6: モジュール項目を～の後に移動
   move_module_item_before_13e940eb: モジュール項目を～の前に移動
   move_module_item_f525d6c8: モジュール項目を移動
+  move_name_to_a_new_group_acabed4e: "%{name}を新しいグループに移動する"
   move_navigation_item_f034cd8a: ナビゲーション項目を移動
   move_outcome_ce497e6c: アウトカムの移動
   move_outcome_group_cfa1a505: アウトカムグループの移動
@@ -20007,6 +20032,7 @@ ja:
   navigation_allows_user_to_view_the_people_link_in__dd533d29: ユーザーがコースナビゲーションの人物のリンクを表示できるようにします。
   navigation_icon_45db938e: ナビゲーションのアイコン
   navigation_menu_fd782ff8: ナビゲーションメニュー
+  near_3282280c: 近く
   near_mastery_f25174a4: 熟達に近い
   need_a_canvas_account_221d18ed: "Canvas アカウントが必要ですか？"
   need_help_setting_up_your_course_2b763141: コースの設定でヘルプが必要ですか？
@@ -20104,6 +20130,7 @@ ja:
   new_quizzes_banks_migrations_9ab4de4a: 新しい小テストバンクの移行
   new_quizzes_build_button_in_module_items_10f651fb: モジュールアイテムの新しいクイズ作成ボタン
   new_quizzes_build_button_on_list_views_62c7c0e8: 新しい小テスト作成ボタンビュー
+  new_quizzes_common_cartridge_support_250780be: "新しい小テスト共通カートリッジ サポート"
   new_quizzes_dbda7e0a: 新しい小テスト
   new_quizzes_description: "この機能は、ディスカッション内の Canvas エクスペリエンスを強化します。このフラグを有効にすると、新しい小テストツールが使用可能になります。詳細については、Canvas コミュニティの*新しい小テストユーザーグループ*を参照してください。"
   new_quizzes_embedded_module_progression_cd2307b6: 新しいクイズ組み込みモジュールの進行
@@ -21314,6 +21341,7 @@ ja:
   outcomes_and_rubrics_account_course_f0d23419: 成果とルーブリック（アカウント、コース）
   outcomes_and_rubrics_f893d141: 成果とルーブリック
   outcomes_are_created_here_to_track_mastery_in_a_co_2f487549: "コースの習得を追跡するため、ここにアウトカムが作成されます。上部にあるメニューバーをチェックアウトして開始します。新しいアウトカムを作成するには、「新しいアウトカム」ボタンをクリックするか、またはアウトカムを振り当てる新しいグループを作成するには「新しいグループ」ボタンをクリックしてください。[Find]（検索）ボタンを使用すると、あなたの州または機関によって作成されたアウトカムを使用することができます。アウトカムを作成して使用する際には、左側のパネルを使用してアウトカムをナビゲートすることができます。アウトカムをさまざまなレベル間でドラッグアンドドロップして構造を作成することができます。"
+  outcomes_averages_report_34199e77: アウトカム平均レポート
   outcomes_csv_format_9005acfb: アウトカムCSV形式
   outcomes_d1b18d33: アウトカム
   outcomes_for_student_9f91d4d: 受講者のアウトカム
@@ -22331,11 +22359,13 @@ ja:
   presents_the_quiz_setting_to_avoid_automatic_submi_363b91ff: 制限時間が終了したときに時間指定の小テストの自動提出を回避するように小テスト設定を表示します。
   press_alt_f8_to_see_a_list_of_keyboard_shortcuts_2a8c7bc0: "Alt + F8キーを押すと、キーボードショートカットのリストが表示されます"
   press_space_to_start_over_d4b8a2da: 「スペース」を押して、もう一度やり直してください
+  press_tab_for_more_options_f087f5c2: タブを押してオプションを追加する
   press_the_comma_key_or_shift_question_mark_to_see__930af9df: "コンマキー、またはシフト + クエスチョンマークを押して、キーボードのショートカットのリストを表示する。"
   press_the_comma_key_or_shift_to_see_a_list_of_keyb_155d8ca3: "コンマキー、またはシフト + ？を押して、キーボードのショートカットのリストを表示する。　"
   press_the_esc_key_to_close_this_modal_14d10601: エスケープキーを押して、このモーダルを閉じてください
   prev_f82cbc48: 前へ
   prev_month_34bd934c: 前月
+  prevent_deletion_of_outcomes_with_alignments_in_os_65020476: OSで整列されたアウトカムの削除を防ぐ
   prevents_students_from_leaving_annotations_in_assi_cb188d2: 受講者が課題に注釈を残せないようにします。ピア評価済みの課題には適用されません。
   preview_53003fd2: プレビュー
   preview_a3f8f854: プレビュー
@@ -22378,6 +22408,7 @@ ja:
   primary_color_button_b75db628: 原色ボタン
   primary_color_button_disabled_9081ddff: 原色ボタンは無効になっています
   primary_email_address_mail_9018f: プライマリメールアドレス（メール）
+  print_d0e3d53f: プリント
   print_grades_9d5dd50f: 評定を印刷する
   prioritize_individual_overrides_6be735e1: 個々の上書きを優先する
   priority_dd4381ee: 優先順位
@@ -24456,7 +24487,10 @@ ja:
   rating_description_db6adf39: 文章を評価する
   rating_max_score_eade1523: 最大スコアを評価する
   rating_min_score_3d35a762: 最小スコアを評価する
+  rating_name_6f633d52: 評価名
   rating_order_e57f63ed: 評価順
+  rating_points_be3e8682: 評価ポイント
+  rating_scale_fc10d5f1: 評価の尺度
   rating_score_22cfc724: スコアを評価する
   rating_selected_85c31e4c: 選択された評価
   rating_tier_index_threshold_3f02a6d7: "採点層 %{index} の閾値"
@@ -24741,6 +24775,7 @@ ja:
   remove_all_group_observer_members_af5675f3: すべてのグループオブザーバーメンバーを削除
   remove_as_front_page_2698aa12: フロントページとして削除
   remove_as_frontpagetext_133cdaee: "%{frontPageText}として削除する"
+  remove_as_leader_22d1a7d8: リーダーとしての指定を削除
   remove_association_1412eabf: 関連付けを削除
   remove_attachment_ceae0973: 添付ファイルの削除
   remove_attendee_name_55165070: "出席者を削除する%{name}"
@@ -24790,8 +24825,10 @@ ja:
   remove_missing_status_when_graded_d0755cc7: 採点時に不足しているステータスを削除する
   remove_name_624e06be: "%{name}を削除する"
   remove_name_as_an_admin_c296cf49: "%{name}管理者として削除"
+  remove_name_as_leader_3e03780a: "%{name}のリーダーとしての指定を削除"
   remove_name_calendar_bdc329d9: "%{name}カレンダーを削除する"
   remove_name_content_requirement_7af56c50: "%{name} コンテンツ証明書要求を削除する"
+  remove_name_from_group_487cce74: "%{name}をグループから削除"
   remove_name_prerequisite_98377b60: "%{name} 前提条件の削除"
   remove_null_values_from_live_event_payloads_3c826f: ライブイベントペイロードからゼロ値を削除する
   remove_observers_from_courses_703edc34: オブザーバーをコースから削除
@@ -24810,6 +24847,7 @@ ja:
   remove_prerequisite_13ab96eb: 前提条件を削除する
   remove_pronouns_5ff760ff: 代名詞を削除する
   remove_pronouns_pronoun_c8b03d78: "代名詞%{pronoun}を削除する"
+  remove_rating_cf9378eb: 評価を削除する
   remove_recipient_name_a6b83cef: "受信者%{name}を削除する"
   remove_removablecount_out_of_totalcount_outcomes_3270d9c0: "%{removableCount}を%{totalCount}アウトカムから削除しますか？"
   remove_requirement_32a89e23: 要件の削除
@@ -25299,6 +25337,7 @@ ja:
     no_details: 詳細情報なし
   rubric_button_display_4e4a26fe: ルーブリックボタン表示
   rubric_created_64980593: ルーブリックが作成しました
+  rubric_criterion_modal_32377665: ルーブリッククライテリアモダル
   rubric_criterion_range_12499bf1: 試験指示基準範囲
   rubric_deleted_3d9efc18: ルーブリックが削除されました
   rubric_enhancements_73bf351c: ルーブリックの強化
@@ -25398,6 +25437,7 @@ ja:
   save_and_customize_19eb7a7b: 保存してカスタマイズする
   save_and_publish_1b765e7: 保存して公開
   save_changes_698abe77: 変更内容の保存
+  save_criterion_cce60085: クライテリアを保存する
   save_customizations_dde779d8: カスタマイズを保存
   save_failed_463cb2a8: 保存に失敗しました。
   save_filter_preset_37f32c02: フィルタープリセットを保存する
@@ -25417,6 +25457,7 @@ ja:
   save_theme_f706116e: テーマを保存
   save_these_conditions_as_a_filter_a31bbbf8: この条件をフィルタとして保存する
   save_this_comment_for_reuse_5eda0b70: このコメントを再使用できるように保存
+  save_this_rating_scale_as_default_a3f27305: この評価をデフォルトとして保存する
   save_your_type_to_begin_specifying_conditional_con_9e4f536a: "Save your %{type} を保存し、条件付きコンテンツの特定を始めます。"
   save_yourself_a_lot_of_time_by_only_adding_the_out_33293248: コースの内容に固有のアウトカムを追加するだけ、時間を大幅に節約できます。
   saved_3cd67a7c: 保存済み
@@ -25441,6 +25482,7 @@ ja:
   saving_recording_e111cb05: 録音を保存しています...
   saving_statusname_status_8f923edb: "ステータス %{statusName} の保存"
   saving_the_csp_status_failed_please_try_again_8275aaa4: CSPステータスの保存に失敗しました。もう一度やり直してください。
+  scale_29738cdd: スケール
   scale_mathman_equation_images_to_match_the_size_of_2bca4e2e: 周囲のフォントサイズに合わせて、数学式の画像を拡大・縮小することができます。
   scantron_quiz_4a97a17a: "Scantron 小テスト"
   schedule_availability_ad09a2e5: 期間を設定する
@@ -26117,6 +26159,7 @@ ja:
   session_expired_12aaf414: セッションの有効期限切れ
   set_a_random_student_as_group_leader_663dcfd5: "グループ リーダーをランダムに割り当てる"
   set_as_default_email_address_bd3b9b8f: "デフォルト電子メール アドレスに設定する"
+  set_as_leader_f710dcec: リーダーとして設定
   set_course_color_to_a_custom_hexadecimal_code_c8a50918: コースカラーをカスタムの16進コードに設定します
   set_course_color_to_a_preset_hexadecimal_color_cod_97608d8: コースカラーをプリセットの16進カラーコードに設定します。左右の矢印キーを使用して、プリセットをナビゲートします。
   set_created_createdat_895e2243: "セットが %{createdAt} に作成されました"
@@ -26134,6 +26177,7 @@ ja:
   set_first_student_to_join_as_group_leader_5cfc206f: 最初に参加した受講者をグループリーダーに割り当てる
   set_group_weights_fd41c1f: グループの重み付けの設定
   set_last_attended_date_8fb30092: 最終出席日を設定する
+  set_name_as_leader_591c8009: "%{name}をリーダーとして設定"
   set_name_d14182d7: 名前を設定する...
   set_name_f83b658: 名前を設定する
   set_of_grading_periods_545b37e9: 採点期間のセット
@@ -29147,6 +29191,7 @@ ja:
   this_eportfolio_has_been_identified_as_spam_and_is_8430467: "この ePortfolio はスパムとして識別されており、あなただけに表示されています。ご質問がある場合は、管理者にお問い合わせください。"
   this_eportfolio_has_been_identified_as_spam_it_is__f927947b: "この ePortfolio は、スパムとして識別されています。現在、管理者と作成者にのみ表示されています。このコンテンツがスパムではない確信がある場合は、「安全」としてマークできます。"
   this_event_b437db90: このイベント
+  this_feature_adds_the_start_end_and_close_dates_of_221c79cc: この機能は評定期間の開始日、終了日、終了日を評定期間フィルタに追加します。
   this_feature_affects_existing_data_for_all_courses_4fc75fe1: この機能は、アカウント内のすべてのコースの既存データに影響します。
   this_feature_affects_existing_data_for_an_entire_a_2372dc52: この機能は、アカウント全体の既存のデータに影響します。
   this_feature_allows_teachers_to_create_anonymous_d_ea364dca: この機能では、教員が匿名のディスカッションを作成したり、コースレベルの設定で教員が学生が匿名のディスカッションを作成できるようにすることができます。
@@ -29210,6 +29255,7 @@ ja:
   this_feature_provides_a_new_speedgrader_platform_e_e7d740bd: この機能は新しいSpeedGraderプラットフォーム体験を提供します。
   this_feature_provides_visual_and_functional_enhanc_e5e57a21: この機能により、Canvas全体のルーブリックが視覚的および機能的に強化されます。
   this_feature_will_hide_all_quantitative_values_fro_6f006665: これは、ユーザーからすべての定量的な値を隠す機能です
+  this_ff_is_for_development_purposes_only_and_shoul_f77938ba: このFFは開発目的のみであり、プロダクトおよびエンジニアリングに相談せずに調整することはできません。このフラグにより、新しい小テストに使用されるアウトカムサービス内で整列された成果の削除を防ぐことができます。
   this_field_is_required_fa58c4a: このフィールドは必須項目です
   this_field_name_is_required_988caebc: "このフィールド \"%{name}\" は必須です。"
   this_field_name_is_required_b9196401: "このフィールド \"名前\" は必須です。"
@@ -29738,6 +29784,7 @@ ja:
   title_outcomes_7adbd9cc: "%{title}アウトカム"
   title_required_3ff5969: タイトルが必要です
   title_separator: ": "
+  title_start_end_closed_def2bf1f: "%{title}:%{start} - %{end} | %{closed}"
   title_tray_ec9f7488: "%{title}トレイ"
   title_unpublished_51ddbc6a: "%{title}（非公開）"
   title_was_successfully_created_f2a07c56: "\"%{title}\" は正常に作成されました。"
