@@ -824,7 +824,9 @@ class GradebooksController < ApplicationController
         return
       end
 
-      submissions = if params[:submissions]
+      submissions = if $canvas_rails == "7.1"
+                      params[:submissions] ? params[:submissions].values : [params[:submission]]
+                    elsif params[:submissions]
                       params[:submissions].values.map { |s| ActionController::Parameters.new(s) }
                     else
                       [params[:submission]]
