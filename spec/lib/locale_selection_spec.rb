@@ -199,7 +199,8 @@ describe LocaleSelection do
       allow(I18n).to receive(:t).with(:custom, locale: :ja).and_return(true)
       expect(ls.available_locales).to eq("en" => "English")
 
-      PluginSetting.create!(name: "i18n", settings: { "ja" => true })
+      ps = PluginSetting.new(name: "i18n", settings: { "ja" => true })
+      allow(Canvas::Plugin).to receive(:find).with(:i18n).and_return(ps)
       expect(ls.available_locales).to eq("en" => "English", "ja" => "Japanese")
     end
   end
