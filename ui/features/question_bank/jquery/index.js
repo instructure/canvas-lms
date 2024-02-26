@@ -267,7 +267,7 @@ export function attachPageEvents(_e) {
   })
   $('#show_question_details')
     .on('change', function () {
-      $('#questions').toggleClass('brief', !$(this).attr('checked'))
+      $('#questions').toggleClass('brief', !$(this).prop('checked'))
     })
     .trigger('change')
 
