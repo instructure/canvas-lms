@@ -818,6 +818,7 @@ describe "Default Account Reports" do
                                         nil,
                                         nil,
                                         nil,
+                                        nil,
                                         "true"],
                                        [@course1.id.to_s,
                                         "SIS_COURSE_ID_1",
@@ -832,6 +833,7 @@ describe "Default Account Reports" do
                                         @course1.start_at.iso8601,
                                         @course1.conclude_at.iso8601,
                                         @course1.course_format,
+                                        nil,
                                         nil,
                                         "true"],
                                        [@course2.id.to_s,
@@ -848,6 +850,7 @@ describe "Default Account Reports" do
                                         @course2.conclude_at.iso8601,
                                         @course2.course_format,
                                         nil,
+                                        nil,
                                         "true"],
                                        [@course3.id.to_s,
                                         "SIS_COURSE_ID_3",
@@ -863,6 +866,7 @@ describe "Default Account Reports" do
                                         nil,
                                         nil,
                                         nil,
+                                        nil,
                                         "true"],
                                        [@course4.id.to_s,
                                         nil,
@@ -874,6 +878,7 @@ describe "Default Account Reports" do
                                         @default_term.id.to_s,
                                         nil,
                                         "deleted",
+                                        nil,
                                         nil,
                                         nil,
                                         nil,
@@ -910,6 +915,7 @@ describe "Default Account Reports" do
                                         @course1.start_at.iso8601,
                                         @course1.conclude_at.iso8601,
                                         @course1.course_format,
+                                        nil,
                                         nil,
                                         "true"]]
       end
@@ -951,6 +957,7 @@ describe "Default Account Reports" do
         expect(parsed.detect { |r| r["course_id"] == @ac1_a.sis_source_id }["blueprint_course_id"]).to eq @bc1.sis_source_id
         expect(parsed.detect { |r| r["course_id"] == @ac1_b.sis_source_id }["blueprint_course_id"]).to eq @bc1.sis_source_id
         expect(parsed.detect { |r| r["course_id"] == @ac2.sis_source_id }["blueprint_course_id"]).to eq @bc2.sis_source_id
+        expect(parsed.detect { |r| r["course_id"] == @ac2.sis_source_id }["canvas_blueprint_course_id"]).to eq @bc2.id.to_s
       end
     end
 

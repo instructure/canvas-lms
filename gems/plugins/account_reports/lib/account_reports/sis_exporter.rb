@@ -309,11 +309,14 @@ module AccountReports
             sub_data = MasterCourses::ChildSubscription.active.where(child_course_id: batch).pluck(:child_course_id, :master_template_id).to_h
             template_data = MasterCourses::MasterTemplate.active.for_full_course.where(id: sub_data.values).pluck(:id, :course_id).to_h if sub_data.present?
             course_sis_data = Course.where(id: template_data.values).where.not(sis_source_id: nil).pluck(:id, :sis_source_id).to_h if template_data.present?
-            if course_sis_data.present?
-              sub_data.each do |child_course_id, template_id|
-                sis_id = course_sis_data[template_data[template_id]]
-                blueprint_map[child_course_id] = sis_id if sis_id
-              end
+
+            sub_data.each do |child_course_id, template_id|
+              blueprint_canvas_id = template_data[template_id]
+              blueprint_sis_id = course_sis_data[blueprint_canvas_id]
+              blueprint_map[child_course_id] = {
+                id: blueprint_canvas_id,
+                sis_id: blueprint_sis_id,
+              }
             end
           end
 
@@ -353,6 +356,7 @@ module AccountReports
         headers << "start_date"
         headers << "end_date"
         headers << "course_format"
+        headers << "canvas_blueprint_course_id"
         headers << "blueprint_course_id"
         headers << "created_by_sis"
       end
@@ -409,7 +413,8 @@ module AccountReports
         row << nil
       end
       row << c.course_format
-      row << blueprint_map[c.id]
+      row << blueprint_map[c.id]&.[](:id) unless @sis_format
+      row << blueprint_map[c.id]&.[](:sis_id)
       row << c.sis_batch_id? unless @sis_format
       row
     end
