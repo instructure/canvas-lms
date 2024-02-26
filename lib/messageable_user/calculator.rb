@@ -535,14 +535,19 @@ class MessageableUser
       discussion = discussion_or_id.is_a?(DiscussionTopic) ? discussion_or_id : DiscussionTopic.where(id: discussion_or_id).first
       context = discussion.address_book_context_for(@user)
 
-      case context
-      when Course
-        messageable_users_in_course_scope(context, nil, options)
-      when Group
-        messageable_users_in_group_scope(context, options)
-      else
-        messageable_users_in_section_scope(context, nil, options)
-      end
+      scope = case context
+              when Course
+                messageable_users_in_course_scope(context, nil, options)
+              when Group
+                messageable_users_in_group_scope(context, options)
+              else
+                messageable_users_in_section_scope(context, nil, options)
+              end
+
+      visible_user_ids = scope.to_a.select { |u| discussion.visible_for?(u) }.map(&:id)
+
+      # We need to convert it back to a scope.
+      MessageableUser.where(id: visible_user_ids)
     end
 
     def search_scope(scope, search, global_exclude_ids)

@@ -85,6 +85,34 @@ describe AddressBook::MessageableUser do
       expect(known_users.map(&:id)).not_to include(student3.id)
     end
 
+    it "works for a graded discussion topic" do
+      course = course_factory(active_all: true)
+      topic = graded_discussion_topic(context: course)
+
+      teacher = teacher_in_course(course:, active_all: true).user
+      student1 = student_in_course(course:, active_all: true).user
+      student2 = student_in_course(course:, active_all: true).user
+      student3 = student_in_course(course:, active_all: true).user
+      student4 = student_in_course(course:, active_all: true).user
+      student5 = student_in_course(course:, active_all: true).user
+
+      assignment = topic.assignment
+      assignment.only_visible_to_overrides = true
+      assignment.save
+
+      create_adhoc_override_for_assignment(assignment, [student1, student2])
+
+      address_book = AddressBook::MessageableUser.new(teacher)
+      known_users = address_book.known_users([student1, student2, student3, student4, student5], context: topic)
+      known_user_ids = known_users.map(&:id)
+
+      expect(known_user_ids).to include(student1.id)
+      expect(known_user_ids).to include(student2.id)
+      expect(known_user_ids).not_to include(student3.id)
+      expect(known_user_ids).not_to include(student4.id)
+      expect(known_user_ids).not_to include(student5.id)
+    end
+
     it "caches the results for known users" do
       teacher = teacher_in_course(active_all: true).user
       student = student_in_course(active_all: true).user
