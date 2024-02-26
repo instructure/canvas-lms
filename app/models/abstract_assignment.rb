@@ -2689,7 +2689,7 @@ class AbstractAssignment < ActiveRecord::Base
 
       candidate_students = visible_group_students.select { |u| user_ids_who_arent_excused.include?(u.id) }
       candidate_students = visible_group_students if candidate_students.empty?
-      candidate_students.sort_by! { |s| enrollment_priority[enrollment_state[s.id]] }
+      candidate_students.sort_by! { |s| [enrollment_priority[enrollment_state[s.id]], s.sortable_name, s.id] }
 
       representative   = candidate_students.detect { |u| user_ids_with_turnitin_data.include?(u.id) || user_ids_with_vericite_data.include?(u.id) }
       representative ||= candidate_students.detect { |u| user_ids_with_submissions.include?(u.id) }
