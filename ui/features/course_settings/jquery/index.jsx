@@ -375,7 +375,7 @@ $(document).ready(function () {
       })
       .fixDialogButtons()
   })
-  $('#move_course_dialog').delegate('.cancel_button', 'click', () => {
+  $('#move_course_dialog').on('click', '.cancel_button', () => {
     $('#move_course_dialog').dialog('close')
   })
 

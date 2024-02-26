@@ -594,7 +594,7 @@ function initDropdown() {
       .find('ul')
       .hide()
       .menu()
-      .delegate('a', 'click mousedown', function (this: HTMLAnchorElement) {
+      .on('click mousedown', 'a', function (_event) {
         EG.changeToSection($(this).data('section-id'))
       })
 
@@ -3781,13 +3781,11 @@ EG = {
       fileIndex++
       $('#comment_attachments').append($attachment.show())
     })
-    $comment_attachment_input_blank
-      .find('a')
-      .click(function (this: HTMLAnchorElement, event: JQuery.ClickEvent) {
-        event.preventDefault()
-        $(this).parents('.comment_attachment_input').remove()
-      })
-    $right_side.delegate('.play_comment_link', 'click', function (this: HTMLAnchorElement) {
+    $comment_attachment_input_blank.find('a').on('click', function (event: JQuery.ClickEvent) {
+      event.preventDefault()
+      $(this).parents('.comment_attachment_input').remove()
+    })
+    $right_side.on('click', '.play_comment_link', function (_event) {
       if ($(this).data('media_comment_id')) {
         $(this)
           .parents('.comment')

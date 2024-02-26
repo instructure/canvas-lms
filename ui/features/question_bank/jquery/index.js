@@ -104,7 +104,7 @@ export function updateAlignments(alignments) {
 }
 
 export function attachPageEvents(_e) {
-  $('#aligned_outcomes_list').delegate('.delete_outcome_link', 'click', function (event) {
+  $('#aligned_outcomes_list').on('click', '.delete_outcome_link', function (event) {
     event.preventDefault()
     const result = window.confirm(
         I18n.t(
@@ -266,14 +266,14 @@ export function attachPageEvents(_e) {
     },
   })
   $('#show_question_details')
-    .change(function () {
+    .on('change', function () {
       $('#questions').toggleClass('brief', !$(this).attr('checked'))
     })
-    .change()
+    .trigger('change')
 
   moveMultipleQuestionBanks.addEvents()
 
-  $('#questions').delegate('.move_question_link', 'click', function (event) {
+  $('#questions').on('click', '.move_question_link', function (event) {
     event.preventDefault()
     const $dialog = $('#move_question_dialog')
     $dialog.find('.question_text').show().end().find('.questions').hide()
