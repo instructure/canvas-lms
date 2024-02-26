@@ -1817,6 +1817,15 @@ class RoleOverride < ActiveRecord::Base
         account_only: true,
         account_allows: ->(a) { a.feature_enabled?(:admin_analytics_view_permission) }
       },
+      view_ask_questions_analytics: {
+        label: -> { t("Ask Questions") },
+        group: "view_advanced_analytics",
+        group_label: -> { t("Advanced Analytics") },
+        available_to: %w[AccountAdmin AccountMembership],
+        true_for: %w[AccountAdmin],
+        account_only: true,
+        account_allows: ->(a) { a.feature_enabled?(:advanced_analytics_ask_questions) }
+      },
       manage_impact: {
         label: -> { t("Manage Impact") },
         label_v2: -> { t("Impact - Manage") },
