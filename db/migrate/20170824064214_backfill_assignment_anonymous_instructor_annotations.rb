@@ -22,6 +22,6 @@ class BackfillAssignmentAnonymousInstructorAnnotations < ActiveRecord::Migration
   tag :postdeploy
 
   def up
-    DataFixup::BackfillNulls.run(Assignment, :anonymous_instructor_annotations, default_value: false)
+    DataFixup::BackfillNulls.run(AbstractAssignment, :anonymous_instructor_annotations, default_value: false)
   end
 end
