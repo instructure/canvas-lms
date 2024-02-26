@@ -120,7 +120,9 @@ module CustomWaitMethods
     bridge = driver if bridge.nil?
 
     res = StatePoller.await(0) { bridge.execute_script(AJAX_REQUESTS_SCRIPT) || 0 }
-    raise SlowCodePerformance, "AJAX requests not done after #{res[:spent]}s: #{res[:got]}" if res[:got] > 0
+    if res[:got] > 0 && !NoRaiseTimeoutsWhileDebugging.ever_run_a_debugger?
+      raise SlowCodePerformance, "AJAX requests not done after #{res[:spent]}s: #{res[:got]}"
+    end
   end
 
   # NOTE: for "$.timers" see https://github.com/jquery/jquery/blob/6c2c7362fb18d3df7c2a7b13715c2763645acfcb/src/effects.js#L638
