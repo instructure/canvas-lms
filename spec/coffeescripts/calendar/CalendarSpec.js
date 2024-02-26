@@ -74,8 +74,6 @@ const makeMockHeader = () => ({
   hidePrevNext: sinon.spy(),
   hideAgendaRecommendation: sinon.spy(),
   showAgendaRecommendation: sinon.spy(),
-  showSchedulerTitle: sinon.spy(),
-  showDoneButton: sinon.spy(),
 })
 const makeCal = () =>
   new Calendar('#fixtures', [], null, makeMockDataSource(), {header: makeMockHeader()})
