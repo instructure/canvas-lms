@@ -234,6 +234,7 @@ class MediaObject < ActiveRecord::Base
 
   def retrieve_details_ensure_codecs(attempt = 0)
     retrieve_details
+    request_captions
     if !transcoded_details && created_at > 6.hours.ago
       if attempt < 10
         delay(run_at: (5 * attempt).minutes.from_now).retrieve_details_ensure_codecs(attempt + 1)
@@ -331,6 +332,12 @@ class MediaObject < ActiveRecord::Base
     self.workflow_state = "deleted"
     attachment&.destroy
     save!
+  end
+
+  def request_captions
+    return unless Account.site_admin.feature_enabled?(:speedgrader_studio_media_capture)
+
+    VideoCaptionService.call(self)
   end
 
   def data
