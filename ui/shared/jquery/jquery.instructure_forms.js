@@ -402,7 +402,7 @@ $.ajaxJSONFiles = function (url, submit_type, formData, files, success, error, o
   for (const idx in formData) {
     if (!fileNames[idx]) {
       const $input = $(document.createElement('input'))
-      $input.attr('type', 'hidden').attr('name', idx).attr('value', formData[idx])
+      $input.attr('type', 'hidden').attr('name', idx).prop('value', formData[idx])
       $newForm.append($input)
     }
   }

@@ -94,7 +94,7 @@ $.each(ENV.LDAP_TESTS, (i, test) => {
   }
 })
 function testLDAPLogin() {
-  $('#ldap_test_login').prop('disabled', true).attr('value', I18n.t('testing', 'Testing...'))
+  $('#ldap_test_login').prop('disabled', true).prop('value', I18n.t('testing', 'Testing...'))
   $('#ldap_login_result').html("<img src='/images/ajax-loader.gif'/>")
   const username = $('#ldap_test_login_user').val()
   const password = $('#ldap_test_login_pass').val()
@@ -123,7 +123,7 @@ function testLDAPLogin() {
         )
         $('#ldap_test_login')
           .prop('disabled', false)
-          .attr('value', I18n.t('test_login', 'Test Login'))
+          .prop('value', I18n.t('test_login', 'Test Login'))
       } else {
         $('#ldap_login_result').html(
           "<h4 style='color:red'>" + h(I18n.t('test_ldap_result_failed', 'Failed')) + '</h4>'
@@ -131,7 +131,7 @@ function testLDAPLogin() {
         $('#ldap_login_help').show()
         $('#ldap_test_login')
           .prop('disabled', false)
-          .attr('value', I18n.t('retry_login', 'Retry Login'))
+          .prop('value', I18n.t('retry_login', 'Retry Login'))
         $('#ldap_login_help_error').text(message)
       }
     }
