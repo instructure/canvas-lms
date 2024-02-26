@@ -49,8 +49,7 @@ describe OAuth2ProviderController do
           response_type: "code",
           scope: "not|valid"
         }
-        assert_status(302)
-        expect(response.body).to include "invalid_scope"
+        expect(response).to redirect_to(/invalid_scope/)
       end
 
       it "renders 302 when scopes empty" do
@@ -59,8 +58,7 @@ describe OAuth2ProviderController do
           redirect_uri: dev_key.redirect_uri,
           response_type: "code"
         }
-        assert_status(302)
-        expect(response.body).to include "invalid_scope"
+        expect(response).to redirect_to(/invalid_scope/)
       end
     end
 
