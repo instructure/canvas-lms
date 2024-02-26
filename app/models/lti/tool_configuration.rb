@@ -113,6 +113,25 @@ module Lti
       configuration["extensions"]&.find { |e| e["platform"] == CANVAS_EXTENSION_LABEL }&.dig("settings", "placements")&.deep_dup || []
     end
 
+    def domain
+      return [] if configuration.blank?
+
+      configuration["extensions"]&.find { |e| e["platform"] == CANVAS_EXTENSION_LABEL }&.dig("domain") || ""
+    end
+
+    # @return [String | nil] A warning message about any disallowed placements
+    def verify_placements
+      return unless placements.any? { |p| p["placement"] == "submission_type_selection" }
+      return unless Account.site_admin.feature_enabled?(:lti_placement_restrictions)
+
+      allowed_domains = Setting.get("submission_type_selection_allowed_launch_domains", "").split(",")
+
+      allowed_dev_keys = Setting.get("submission_type_selection_allowed_dev_keys", "").split(",")
+      return if allowed_domains.include?(domain) || allowed_dev_keys.include?(Shard.global_id_for(developer_key_id).to_s)
+
+      t("Warning: the submission_type_selection placement is only allowed for Instructure approved LTI tools. If you believe you have received this message in error, please contact your support team.")
+    end
+
     private
 
     def self.retrieve_and_extract_configuration(url)

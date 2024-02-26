@@ -16,33 +16,50 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import type {LtiPlacement} from './LtiPlacements'
+import type {LtiPlacement} from '../LtiPlacements'
+import type {LtiPrivacyLevel} from '../LtiPrivacyLevel'
+import type {LtiScope} from '../LtiScopes'
 
+/// @see lib/schemas/lti/tool_configuration.rb
 export interface LtiToolConfiguration {
+  id: string
+  privacy_level: LtiPrivacyLevel
+  developer_key_id: string
+  disabled_placements: string[]
+  settings: Configuration
+  /// ISO8601 timestamp.
+  created_at: string
+  /// ISO8601 timestamp.
+  updated_at: string
+}
+
+export interface Configuration {
   title: string
-  scopes: string[]
-  public_jwk_url?: string
-  public_jwk?: string
-  description: string | null
-  custom_parameters: Record<string, string> | null
+  description: string
   target_link_uri: string
   oidc_initiation_url: string
-  url: string
-  extensions: Extension[]
+  custom_fields?: Record<string, string>
+  oidc_initiation_urls?: Record<string, unknown>
+  public_jwk_url?: string
+  is_lti_key?: boolean
+  icon_url?: string
+  scopes?: LtiScope[]
+  extensions?: Extension[]
 }
 
 export interface Extension {
-  domain: string
+  domain?: string
   platform: string
-  tool_id: string
-  privacy_level: string
-  settings: Settings
+  /// This is *not* the actual meaningful id of any tool, but rather a tool provided value.
+  tool_id?: string
+  privacy_level?: LtiPrivacyLevel
+  settings: PlatformSettings
 }
 
-export interface Settings {
+export interface PlatformSettings {
   text: string
   icon_url: any
-  platform: string
+  platform?: string
   placements: PlacementConfig[]
 }
 
@@ -54,4 +71,14 @@ export interface PlacementConfig {
   text: string
   icon_url: string
   custom_fields: Record<string, string>
+}
+
+/// @see lib/schemas/lti/public_jwk.rb
+export interface PublicJwk {
+  kty: 'RSA'
+  alg: 'RS256'
+  e: string
+  n: string
+  kid: string
+  use: string
 }
