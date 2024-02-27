@@ -28,6 +28,7 @@ const RUBRIC_QUERY = gql`
     rubric(id: $id) {
       id: _id
       title
+      hasRubricAssociations
       hidePoints
       buttonDisplay
       ratingOrder
@@ -60,7 +61,10 @@ export type RubricQueryResponse = Pick<
   | 'buttonDisplay'
   | 'ratingOrder'
   | 'workflowState'
-> & {unassessed: boolean}
+> & {
+  unassessed: boolean
+  hasRubricAssociations: boolean
+}
 
 type FetchRubricResponse = {
   rubric: RubricQueryResponse
@@ -76,7 +80,8 @@ export const fetchRubric = async (id?: string): Promise<RubricQueryResponse | nu
 }
 
 export const saveRubric = async (rubric: RubricFormProps): Promise<RubricQueryResponse> => {
-  const {id, title, hidePoints, accountId, courseId, ratingOrder, buttonDisplay} = rubric
+  const {id, title, hidePoints, accountId, courseId, ratingOrder, buttonDisplay, workflowState} =
+    rubric
   const urlPrefix = accountId ? `/accounts/${accountId}` : `/courses/${courseId}`
   const url = `${urlPrefix}/rubrics/${id ?? ''}`
   const method = id ? 'PATCH' : 'POST'
@@ -112,6 +117,7 @@ export const saveRubric = async (rubric: RubricFormProps): Promise<RubricQueryRe
         criteria,
         button_display: buttonDisplay,
         rating_order: ratingOrder,
+        workflow_state: workflowState,
       },
       rubric_association: {
         association_id: accountId ?? courseId,
@@ -140,5 +146,6 @@ export const saveRubric = async (rubric: RubricFormProps): Promise<RubricQueryRe
     ratingOrder: savedRubric.rating_order,
     workflowState: savedRubric.workflow_state,
     unassessed: rubric.unassessed,
+    hasRubricAssociations: rubric.hasRubricAssociations,
   }
 }

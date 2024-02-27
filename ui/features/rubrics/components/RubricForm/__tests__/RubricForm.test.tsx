@@ -66,6 +66,7 @@ describe('RubricForm Tests', () => {
       expect(getByTestId('rubric-form-title')).toHaveValue('')
       expect(getByTestId('rubric-hide-points-select')).toBeInTheDocument()
       expect(getByTestId('rubric-rating-order-select')).toBeInTheDocument()
+      expect(getByTestId('save-as-draft-button')).toBeInTheDocument()
     })
   })
 
@@ -123,6 +124,7 @@ describe('RubricForm Tests', () => {
           buttonDisplay: 'numeric',
           ratingOrder: 'descending',
           unassessed: true,
+          hasRubricAssociations: false,
         })
       )
       const {getByTestId} = renderComponent()
@@ -132,6 +134,18 @@ describe('RubricForm Tests', () => {
 
       await new Promise(resolve => setTimeout(resolve, 0))
       expect(getSRAlert()).toEqual('Rubric saved successfully')
+    })
+
+    it('does not display save as draft button if rubric has associations', () => {
+      jest.spyOn(Router, 'useParams').mockReturnValue({accountId: '1', rubricId: '1'})
+
+      queryClient.setQueryData(['fetch-rubric-1'], {
+        ...RUBRICS_QUERY_RESPONSE,
+        hasRubricAssociations: true,
+      })
+
+      const {queryByTestId} = renderComponent()
+      expect(queryByTestId('save-as-draft-button')).toBeNull()
     })
   })
 

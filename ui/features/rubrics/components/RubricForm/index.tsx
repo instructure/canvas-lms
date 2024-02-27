@@ -25,19 +25,13 @@ import LoadingIndicator from '@canvas/loading-indicator/react'
 import {useQuery, useMutation, queryClient} from '@canvas/query'
 import type {RubricCriterion} from '@canvas/rubrics/react/types/rubric'
 import {Alert} from '@instructure/ui-alerts'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {View} from '@instructure/ui-view'
 import {TextInput} from '@instructure/ui-text-input'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Flex} from '@instructure/ui-flex'
-import {
-  IconEyeLine,
-  IconTableLeftHeaderSolid,
-  IconTableRowPropertiesSolid,
-  IconTableTopHeaderSolid,
-} from '@instructure/ui-icons'
+import {IconEyeLine} from '@instructure/ui-icons'
 import {Button} from '@instructure/ui-buttons'
 import {Link} from '@instructure/ui-link'
 import {RubricCriteriaRow} from './RubricCriteriaRow'
@@ -52,24 +46,28 @@ const {Option: SimpleSelectOption} = SimpleSelect
 
 const defaultRubricForm: RubricFormProps = {
   title: '',
+  hasRubricAssociations: false,
   hidePoints: false,
   criteria: [],
   pointsPossible: 0,
   buttonDisplay: 'numeric',
   ratingOrder: 'descending',
   unassessed: true,
+  workflowState: 'active',
 }
 
 const translateRubricData = (fields: RubricQueryResponse): RubricFormProps => {
   return {
     id: fields.id,
     title: fields.title ?? '',
+    hasRubricAssociations: fields.hasRubricAssociations ?? false,
     hidePoints: fields.hidePoints ?? false,
     criteria: fields.criteria ?? [],
     pointsPossible: fields.pointsPossible ?? 0,
     buttonDisplay: fields.buttonDisplay ?? 'numeric',
     ratingOrder: fields.ratingOrder ?? 'descending',
     unassessed: fields.unassessed ?? true,
+    workflowState: fields.workflowState ?? 'active',
   }
 }
 
@@ -155,6 +153,16 @@ export const RubricForm = () => {
     setRubricFormField('pointsPossible', newPointsPossible)
     setRubricFormField('criteria', criteria)
     setIsCriterionModalOpen(false)
+  }
+
+  const handleSaveAsDraft = () => {
+    setRubricFormField('workflowState', 'draft')
+    mutate()
+  }
+
+  const handleSave = () => {
+    setRubricFormField('workflowState', 'active')
+    mutate()
   }
 
   useEffect(() => {
@@ -314,10 +322,21 @@ export const RubricForm = () => {
             <Flex.Item margin="0 medium 0 0">
               <Button onClick={() => navigate(navigateUrl)}>{I18n.t('Cancel')}</Button>
 
+              {!rubricForm.hasRubricAssociations && (
+                <Button
+                  margin="0 0 0 small"
+                  disabled={saveLoading || !formValid()}
+                  onClick={handleSaveAsDraft}
+                  data-testid="save-as-draft-button"
+                >
+                  {I18n.t('Save as Draft')}
+                </Button>
+              )}
+
               <Button
                 margin="0 0 0 small"
                 color="primary"
-                onClick={() => mutate()}
+                onClick={handleSave}
                 disabled={saveLoading || !formValid()}
                 data-testid="save-rubric-button"
               >

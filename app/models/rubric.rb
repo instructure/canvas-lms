@@ -78,7 +78,7 @@ class Rubric < ActiveRecord::Base
   scope :publicly_reusable, -> { where(reusable: true).order(best_unicode_collation_key("title")) }
   scope :matching, ->(search) { where(wildcard("rubrics.title", search)).order("rubrics.association_count DESC") }
   scope :before, ->(date) { where("rubrics.created_at<?", date) }
-  scope :active, -> { where.not(workflow_state: "deleted") }
+  scope :active, -> { where.not(workflow_state: ["deleted", "draft"]) }
 
   set_policy do
     given { |user, session| context.grants_right?(user, session, :manage_rubrics) }
@@ -117,6 +117,7 @@ class Rubric < ActiveRecord::Base
     state :archived do
       event :unarchive, transitions_to: :active
     end
+    state :draft
     state :deleted
   end
 
@@ -127,6 +128,10 @@ class Rubric < ActiveRecord::Base
   end
 
   def unarchive
+    super if enhanced_rubrics_enabled?
+  end
+
+  def draft
     super if enhanced_rubrics_enabled?
   end
 
@@ -336,6 +341,7 @@ class Rubric < ActiveRecord::Base
     self.points_possible = data.points_possible
     self.hide_points = params[:hide_points]
     self.rating_order = params[:rating_order] if params.key?(:rating_order)
+    self.workflow_state = params[:workflow_state] if params[:workflow_state]
     save
     self
   end
@@ -547,5 +553,9 @@ class Rubric < ActiveRecord::Base
 
   def learning_outcome_ids_from_results
     learning_outcome_results.select(:learning_outcome_id).distinct.pluck(:learning_outcome_id)
+  end
+
+  def rubric_assignment_associations?
+    rubric_associations.where(association_type: "Assignment", workflow_state: "active").any?
   end
 end
