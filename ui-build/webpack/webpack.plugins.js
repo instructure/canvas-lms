@@ -41,7 +41,6 @@ const {canvasDir} = require('../params')
 exports.provideJQuery = new ProvidePlugin({
   $: 'jquery',
   jQuery: 'jquery',
-  'window.jQuery': 'jquery',
 })
 
 // sets these environment variables in compiled code.
