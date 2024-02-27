@@ -18,7 +18,12 @@
 
 import React from 'react'
 import {fireEvent, render} from '@testing-library/react'
-import {CriterionModal, DEFAULT_RUBRIC_RATINGS, type CriterionModalProps} from '../CriterionModal'
+import {
+  CriterionModal,
+  DEFAULT_RUBRIC_RATINGS,
+  reorder,
+  type CriterionModalProps,
+} from '../CriterionModal'
 import type {RubricCriterion} from '@canvas/rubrics/react/types/rubric'
 
 describe('CriterionModal tests', () => {
@@ -121,34 +126,29 @@ describe('CriterionModal tests', () => {
       expect(removedRating).toBeUndefined()
     })
 
-    it('should drag and drop a rating to a new index', () => {
+    it('should reorder ratings after drag and drop, but keep point values at the same index', () => {
       const ratings = [
-        {id: '1', description: 'Rating 1', points: 0, longDescription: ''},
-        {id: '2', description: 'Rating 2', points: 0, longDescription: ''},
-        {id: '3', description: 'Rating 3', points: 0, longDescription: ''},
+        {id: '1', points: 4, description: 'Exceeds', longDescription: ''},
+        {id: '2', points: 3, description: 'Mastery', longDescription: ''},
+        {id: '3', points: 2, description: 'Near', longDescription: ''},
+        {id: '4', points: 1, description: 'Below', longDescription: ''},
+        {id: '5', points: 0, description: 'No Evidence', longDescription: ''},
       ]
-      const {queryAllByTestId} = renderComponent({criterion: getCriterion({ratings})})
-      const dragRating = queryAllByTestId('rating-drag-handle')[0]
-      const dropRating = queryAllByTestId('rating-drag-handle')[2]
 
-      fireEvent.dragStart(dragRating)
-      fireEvent.dragOver(dropRating)
-      fireEvent.drop(dropRating)
+      const startIndex = 0
+      const endIndex = 3
 
-      const totalRatingNames = queryAllByTestId('rating-name').map(
-        ratingName => (ratingName as HTMLInputElement).value
-      )
-      expect(totalRatingNames.length).toEqual(ratings.length)
+      const reorderedRatings = reorder({list: ratings, startIndex, endIndex})
 
-      const newFirstIndex = totalRatingNames.findIndex(
-        ratingName => ratingName === ratings[0].description
-      )
-      const newLastIndex = totalRatingNames.findIndex(
-        ratingName => ratingName === ratings[2].description
-      )
+      const expectedRatings = [
+        {id: '2', points: 4, description: 'Mastery', longDescription: ''},
+        {id: '3', points: 3, description: 'Near', longDescription: ''},
+        {id: '4', points: 2, description: 'Below', longDescription: ''},
+        {id: '1', points: 1, description: 'Exceeds', longDescription: ''},
+        {id: '5', points: 0, description: 'No Evidence', longDescription: ''},
+      ]
 
-      expect(newFirstIndex).toEqual(2)
-      expect(newLastIndex).toEqual(1)
+      expect(reorderedRatings).toEqual(expectedRatings)
     })
 
     it('should reorder ratings when a rating is changed to be higher than the top rating', () => {
