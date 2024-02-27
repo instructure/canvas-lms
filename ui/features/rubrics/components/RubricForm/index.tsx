@@ -39,6 +39,8 @@ import {NewCriteriaRow} from './NewCriteriaRow'
 import {fetchRubric, saveRubric, type RubricQueryResponse} from '../../queries/RubricFormQueries'
 import type {RubricFormProps} from '../../types/RubricForm'
 import {CriterionModal} from './CriterionModal'
+import {DragDropContext as DragAndDrop, Droppable} from 'react-beautiful-dnd'
+import type {DropResult} from 'react-beautiful-dnd'
 import {RubricAssessmentTray} from '@canvas/rubrics/react/RubricAssessment'
 
 const I18n = useI18nScope('rubrics-form')
@@ -70,6 +72,20 @@ const translateRubricData = (fields: RubricQueryResponse): RubricFormProps => {
     unassessed: fields.unassessed ?? true,
     workflowState: fields.workflowState ?? 'active',
   }
+}
+
+type ReorderProps = {
+  list: RubricCriterion[]
+  startIndex: number
+  endIndex: number
+}
+
+export const reorder = ({list, startIndex, endIndex}: ReorderProps) => {
+  const result = Array.from(list)
+  const [removed] = result.splice(startIndex, 1)
+  result.splice(endIndex, 0, removed)
+
+  return result
 }
 
 export const RubricForm = () => {
@@ -165,6 +181,26 @@ export const RubricForm = () => {
   const handleSave = () => {
     setRubricFormField('workflowState', 'active')
     mutate()
+  }
+
+  const handleDragEnd = (result: DropResult) => {
+    const {source, destination} = result
+    if (!destination) {
+      return
+    }
+
+    const reorderedItems = reorder({
+      list: rubricForm.criteria,
+      startIndex: source.index,
+      endIndex: destination.index,
+    })
+
+    const newRubricFormProps = {
+      ...rubricForm,
+      criteria: reorderedItems,
+    }
+
+    setRubricForm(newRubricFormProps)
   }
 
   useEffect(() => {
@@ -296,18 +332,30 @@ export const RubricForm = () => {
 
         <Flex.Item shouldGrow={true} shouldShrink={true} as="main">
           <View as="div" margin="0 0 small 0">
-            {rubricForm.criteria.map((criterion, index) => (
-              <RubricCriteriaRow
-                key={criterion.id}
-                criterion={criterion}
-                rowIndex={index + 1}
-                unassessed={rubricForm.unassessed}
-                onDeleteCriterion={() => deleteCriterion(criterion)}
-                onDuplicateCriterion={() => duplicateCriterion(criterion)}
-                onEditCriterion={() => openCriterionModal(criterion)}
-              />
-            ))}
-
+            <DragAndDrop onDragEnd={handleDragEnd}>
+              <Droppable droppableId="droppable-id">
+                {provided => {
+                  return (
+                    <div ref={provided.innerRef} {...provided.droppableProps}>
+                      {rubricForm.criteria.map((criterion, index) => {
+                        return (
+                          <RubricCriteriaRow
+                            key={criterion.id}
+                            criterion={criterion}
+                            rowIndex={index + 1}
+                            unassessed={rubricForm.unassessed}
+                            onDeleteCriterion={() => deleteCriterion(criterion)}
+                            onDuplicateCriterion={() => duplicateCriterion(criterion)}
+                            onEditCriterion={() => openCriterionModal(criterion)}
+                          />
+                        )
+                      })}
+                      {provided.placeholder}
+                    </div>
+                  )
+                }}
+              </Droppable>
+            </DragAndDrop>
             {rubricForm.unassessed && (
               <NewCriteriaRow
                 rowIndex={rubricForm.criteria.length + 1}

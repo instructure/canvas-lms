@@ -1,0 +1,11 @@
+
+
+  .draggable.dragging {
+    background: white;
+    box-shadow: 2px 2px 4px grey;
+    padding: 1rem;
+  }
+
+  .dragging.rubric-divider {
+    display: none;
+  }

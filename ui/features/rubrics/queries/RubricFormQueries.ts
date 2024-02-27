@@ -41,6 +41,7 @@ const RUBRIC_QUERY = gql`
           description
           longDescription
           points
+          id: _id
         }
         points
         longDescription

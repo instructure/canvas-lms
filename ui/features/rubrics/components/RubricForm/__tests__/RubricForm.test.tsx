@@ -21,7 +21,7 @@ import Router from 'react-router'
 import {BrowserRouter} from 'react-router-dom'
 import {fireEvent, render} from '@testing-library/react'
 import {QueryProvider, queryClient} from '@canvas/query'
-import {RubricForm} from '../index'
+import {RubricForm, reorder} from '../index'
 import {RUBRICS_QUERY_RESPONSE} from './fixtures'
 import * as RubricFormQueries from '../../../queries/RubricFormQueries'
 
@@ -214,6 +214,89 @@ describe('RubricForm Tests', () => {
 
       const ratingScaleAccordionItems = queryAllByTestId('rating-scale-accordion-item')
       expect(ratingScaleAccordionItems.length).toEqual(0)
+    })
+
+    it('should reorder all criteria after drag and drop, but keep original point values of criteria', () => {
+      const criteria = [
+        {
+          id: '1',
+          points: 5,
+          description: 'Criterion 1',
+          longDescription: 'Long description for criterion 1',
+          ignoreForScoring: false,
+          masteryPoints: 3,
+          criterionUseRange: false,
+          ratings: [
+            {
+              id: '1',
+              description: 'Rating 1',
+              longDescription: 'Long description for rating 1',
+              points: 5,
+            },
+            {
+              id: '2',
+              description: 'Rating 2',
+              longDescription: 'Long description for rating 2',
+              points: 0,
+            },
+          ],
+        },
+        {
+          id: '2',
+          points: 15,
+          description: 'Criterion 2',
+          longDescription: 'Long description for criterion 2',
+          ignoreForScoring: false,
+          masteryPoints: 3,
+          criterionUseRange: false,
+          ratings: [
+            {
+              id: '1',
+              description: 'Rating 1',
+              longDescription: 'Long description for rating 1',
+              points: 15,
+            },
+            {
+              id: '2',
+              description: 'Rating 2',
+              longDescription: 'Long description for rating 2',
+              points: 0,
+            },
+          ],
+        },
+        {
+          id: '3',
+          points: 10,
+          description: 'Criterion 3',
+          longDescription: 'Long description for criterion 3',
+          ignoreForScoring: false,
+          masteryPoints: 3,
+          criterionUseRange: false,
+          ratings: [
+            {
+              id: '1',
+              description: 'Rating 1',
+              longDescription: 'Long description for rating 1',
+              points: 10,
+            },
+            {
+              id: '2',
+              description: 'Rating 2',
+              longDescription: 'Long description for rating 2',
+              points: 0,
+            },
+          ],
+        },
+      ]
+
+      const startIndex = 0
+      const endIndex = 2
+
+      const reorderedCriteria = reorder({list: criteria, startIndex, endIndex})
+
+      expect(reorderedCriteria[0]).toEqual(criteria[1])
+      expect(reorderedCriteria[1]).toEqual(criteria[2])
+      expect(reorderedCriteria[2]).toEqual(criteria[0])
     })
 
     describe('criterion modal', () => {
