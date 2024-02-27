@@ -34,12 +34,12 @@ const DateHelper = {
     return $.datetimeString(date, {format, timezone: ENV.CONTEXT_TIMEZONE})
   },
 
-  formatDatetimeForDiscussions(datetime, format = '') {
-    return $.discussionsDatetimeString(datetime, {format, timezone: ENV.CONTEXT_TIMEZONE})
+  formatDatetimeForDiscussions(datetime, format = '', timezone = ENV.TIMEZONE) {
+    return $.discussionsDatetimeString(datetime, {format, timezone})
   },
 
-  formatDateForDisplay(date, format = 'medium') {
-    return $.dateString(date, {format, timezone: ENV.CONTEXT_TIMEZONE})
+  formatDateForDisplay(date, format = 'medium', timezone = ENV.CONTEXT_TIMEZONE) {
+    return $.dateString(date, {format, timezone})
   },
 
   isMidnight(date) {

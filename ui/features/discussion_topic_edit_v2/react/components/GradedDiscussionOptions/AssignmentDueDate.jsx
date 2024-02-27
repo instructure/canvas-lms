@@ -139,6 +139,7 @@ export const AssignmentDueDate = ({
           }}
         />
         <DateTimeInput
+          timezone={ENV.TIMEZONE}
           description={I18n.t('Due')}
           prevMonthLabel={I18n.t('previous')}
           nextMonthLabel={I18n.t('next')}
@@ -159,6 +160,7 @@ export const AssignmentDueDate = ({
           }}
         />
         <DateTimeInput
+          timezone={ENV.TIMEZONE}
           description={I18n.t('Available from')}
           prevMonthLabel={I18n.t('previous')}
           nextMonthLabel={I18n.t('next')}
@@ -179,6 +181,7 @@ export const AssignmentDueDate = ({
           }}
         />
         <DateTimeInput
+          timezone={ENV.TIMEZONE}
           description={I18n.t('Until')}
           prevMonthLabel={I18n.t('previous')}
           nextMonthLabel={I18n.t('next')}

@@ -65,7 +65,7 @@ export function AssignmentDueDate({...props}) {
               >
                 <Text weight="normal" size={responsiveProps.textSize}>
                   {I18n.t('Due %{date}', {
-                    date: DateHelper.formatDateForDisplay(props.dueDate, 'short'),
+                    date: DateHelper.formatDateForDisplay(props.dueDate, 'short', ENV.TIMEZONE),
                   })}
                 </Text>
               </Link>
