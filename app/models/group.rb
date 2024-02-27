@@ -518,7 +518,7 @@ class Group < ActiveRecord::Base
     # group, the student must be able to :participate, and the teacher should be able to add students while the course
     # is unpublished and therefore unreadable to said students) unless their containing context can be read by the user
     # in question
-    given { |user, session| context.is_a?(Account) || context.grants_right?(user, session, :read) }
+    given { |user, session| context.is_a?(Account) || context&.grants_right?(user, session, :read) || false }
 
     use_additional_policy do
       given { |user| user && has_member?(user) }
