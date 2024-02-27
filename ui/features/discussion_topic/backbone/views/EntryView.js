@@ -176,6 +176,10 @@ EntryView.prototype.bypass = function (event) {
 
 EntryView.prototype.toJSON = function () {
   const json = this.model.attributes
+  // for discussion entries, do not make the avatar a link
+  if (json.author) {
+    json.author.no_avatar_link = true
+  }
   json.edited_at = $.datetimeString(json.updated_at)
   if (json.editor) {
     json.editor_name = json.editor.display_name
