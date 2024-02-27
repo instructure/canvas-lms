@@ -74,7 +74,8 @@ describe ContextExternalToolsHelper do
             id: 1,
             launch_type: :awesome_type
           },
-          canvas_icon_class: "icon-course_home_sub_navigation"
+          canvas_icon_class: "icon-course_home_sub_navigation",
+          launch_method: "tray"
         },
 
         {
@@ -100,6 +101,10 @@ describe ContextExternalToolsHelper do
           icon_url: "http://example.com/icon.png"
         }
       ]
+    end
+
+    it "includes data-tool-launch-method" do
+      expect(@parsed_html.css("[data-tool-launch-method='tray']").count).to eq 1
     end
 
     include_examples "#external_tools_menu_items"

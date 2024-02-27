@@ -91,6 +91,7 @@ class ContextExternalTool < ActiveRecord::Base
     :required_permissions,
     :launch_height,
     :launch_width,
+    :launch_method,
     :selection_height,
     :selection_width,
     :text,

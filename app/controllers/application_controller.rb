@@ -560,6 +560,8 @@ class ApplicationController < ActionController::Base
     if tool_postmessage_scopes.present?
       add_lti_tool_scopes_to_js_env(tool.launch_url(extension_type: type), tool_postmessage_scopes)
     end
+    launch_method = tool.extension_setting(type, "launch_method")
+    hash[:launch_method] = launch_method if launch_method
 
     hash
   end
