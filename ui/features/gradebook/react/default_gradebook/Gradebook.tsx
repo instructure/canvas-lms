@@ -4428,7 +4428,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       let ref2
       const assignment = this.assignments[submission.assignment_id]
       const student = this.student(submission.user_id)
-      if (student != null ? student.isConcluded : undefined) {
+      if (!assignment || student?.isConcluded) {
         return
       }
       if (
