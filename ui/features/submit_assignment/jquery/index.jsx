@@ -42,6 +42,7 @@ import {Alert} from '@instructure/ui-alerts'
 import Attachment from '../react/Attachment'
 import {EmojiPicker, EmojiQuickPicker} from '@canvas/emoji'
 import {captureException} from '@sentry/react'
+import ready from '@instructure/ready'
 
 const I18n = useI18nScope('submit_assignment')
 
@@ -52,10 +53,10 @@ RichContentEditor.preloadRemoteModule()
 function insertEmoji(emoji) {
   const $textarea = $(this).find('.submission_comment_textarea')
   $textarea.val((_i, text) => text + emoji.native)
-  $textarea.focus()
+  $textarea.trigger('focus')
 }
 
-$(document).ready(function () {
+ready(function () {
   let submitting = false
   const submissionForm = $('.submit_assignment_form')
 
@@ -76,7 +77,7 @@ $(document).ready(function () {
     )
   }
 
-  submissionForm.delegate('.textarea-emoji-container', 'focus', function (_e) {
+  submissionForm.on('focus', '.textarea-emoji-container', function (_e) {
     const $container = $(this)
     const box = $container.find('.submission_comment_textarea')
     if (box.length && !box.hasClass('focus_or_content')) {
@@ -297,7 +298,7 @@ $(document).ready(function () {
   })
 
   $(document).fragmentChange((event, hash) => {
-    if (hash && hash.indexOf('#submit') == 0) {
+    if (hash && hash.indexOf('#submit') === 0) {
       $('.submit_assignment_link').triggerHandler('click', true)
     }
   })
@@ -320,6 +321,7 @@ $(document).ready(function () {
     if (late && !skipConfirmation) {
       let result
       if ($('.resubmit_link').length > 0) {
+        // eslint-disable-next-line no-alert
         result = window.confirm(
           I18n.t(
             'messages.now_overdue',
@@ -327,6 +329,7 @@ $(document).ready(function () {
           )
         )
       } else {
+        // eslint-disable-next-line no-alert
         result = window.confirm(
           I18n.t('messages.overdue', 'This assignment is overdue.  Do you still want to submit it?')
         )
@@ -530,7 +533,7 @@ $(document).ready(function () {
   }
 })
 
-$(document).ready(() => {
+ready(() => {
   $('#submit_media_recording_form .submit_button')
     .prop('disabled', true)
     .text(I18n.t('messages.record_before_submitting', 'Record Before Submitting'))
