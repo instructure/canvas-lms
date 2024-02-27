@@ -1094,14 +1094,17 @@ class Account < ActiveRecord::Base
   end
 
   def account_chain_ids(include_federated_parent_id: false)
-    @cached_account_chain_ids ||= Account.account_chain_ids(self).freeze
+    @cached_account_chain_ids ||= {}
+
+    result = (@cached_account_chain_ids[Shard.current.id] ||= Account.account_chain_ids(self).freeze)
 
     if include_federated_parent_id
-      return @cached_account_chain_ids_with_federated_parent ||=
-               Account.add_federated_parent_id_to_chain!(@cached_account_chain_ids.dup).freeze
+      @cached_account_chain_ids_with_federated_parent ||= {}
+      result = (@cached_account_chain_ids_with_federated_parent[Shard.current.id] ||=
+                  Account.add_federated_parent_id_to_chain!(result.dup).freeze)
     end
 
-    @cached_account_chain_ids
+    result
   end
 
   def account_chain_loop
