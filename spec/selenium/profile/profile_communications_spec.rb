@@ -120,7 +120,7 @@ describe "profile communication settings" do
     it "loads an existing frequency setting and save a change" do
       channel = communication_channel(@user, { username: "8011235555@vtext.com", active_cc: true })
       # Create a notification policy entry as an existing setting.
-      policy = NotificationPolicy.new(communication_channel_id: channel.id, notification_id: @sub_comment.id)
+      policy = channel.notification_policies.where(notification_id: @sub_comment.id).first
       policy.frequency = Notification::FREQ_DAILY
       policy.save!
       desired_setting = "Notify immediately"

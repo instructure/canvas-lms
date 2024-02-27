@@ -371,7 +371,7 @@ describe SplitUsers do
       end
 
       it "moves ccs to the new user (but only if they don't already exist)" do
-        notification = Notification.where(name: "Report Generated").first_or_create
+        Notification.where(name: "Report Generated").first_or_create
         # unconfirmed: active conflict
         communication_channel(restored_user, { username: "a@instructure.com" })
         communication_channel(source_user, { username: "A@instructure.com", active_cc: true })
@@ -380,8 +380,11 @@ describe SplitUsers do
         cc1 = communication_channel(source_user, { username: "B@instructure.com" })
         # active: active conflict + notification policy copy
         np_cc = communication_channel(restored_user, { username: "c@instructure.com", active_cc: true })
-        np_cc.notification_policies.create!(notification_id: notification.id, frequency: "weekly")
+        np_cc.notification_policies.first.update!(frequency: "weekly")
+
+        # Since active communication_channels have their policies, we need to delete it to have a CC that doens't have a policy
         needs_np = communication_channel(source_user, { username: "C@instructure.com", active_cc: true })
+        needs_np.notification_policies.first.destroy!
         # unconfirmed: unconfirmed conflict
         communication_channel(restored_user, { username: "d@instructure.com" })
         communication_channel(source_user, { username: "D@instructure.com" })
@@ -703,7 +706,6 @@ describe SplitUsers do
           UserMerge.from(restored_user).into(shard1_source_user)
           cc = shard1_source_user.reload.communication_channels.where(path: "a@example.com").take
           n = Notification.create!(name: "Assignment Createds", subject: "Tests", category: "TestNevers")
-          NotificationPolicy.create(notification: n, communication_channel: cc, frequency: "immediately")
           NotificationPolicyOverride.create(notification: n, communication_channel: cc, frequency: "immediately", context: shard1_course)
           SplitUsers.split_db_users(shard1_source_user)
         end
@@ -737,10 +739,9 @@ describe SplitUsers do
       end
 
       it "copies notification policies" do
-        og_cc = communication_channel(restored_user, { username: "a@example.com", active_cc: true })
+        communication_channel(restored_user, { username: "a@example.com", active_cc: true })
 
-        n = Notification.create!(name: "Assignment", subject: "Tests", category: "TestNevers")
-        NotificationPolicy.create!(notification: n, communication_channel: og_cc, frequency: "immediately")
+        Notification.create!(name: "Assignment", subject: "Tests", category: "TestNevers")
 
         @shard1.activate do
           UserMerge.from(restored_user).into(shard1_source_user)
@@ -753,10 +754,9 @@ describe SplitUsers do
       end
 
       it "copies notification policies on conflict" do
-        og_cc = communication_channel(restored_user, { username: "a@example.com", active_cc: true })
+        communication_channel(restored_user, { username: "a@example.com", active_cc: true })
 
-        n = Notification.create!(name: "Assignment", subject: "Tests", category: "TestNevers")
-        NotificationPolicy.create!(notification: n, communication_channel: og_cc, frequency: "immediately")
+        Notification.create!(name: "Assignment", subject: "Tests", category: "TestNevers")
         # conflict_cc
         cc = communication_channel(shard1_source_user, { username: "a@example.com", active_cc: true })
 

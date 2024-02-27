@@ -33,9 +33,6 @@ describe Collaborator do
     it "notifies collaborating users", priority: "1" do
       user = user_with_pseudonym(active_all: true)
       @course.enroll_student(user, enrollment_state: "active")
-      NotificationPolicy.create(notification: @notification,
-                                communication_channel: user.communication_channel,
-                                frequency: "immediately")
       @collaboration.update_members([user])
       expect(@collaboration.collaborators.detect { |c| c.user_id == user.id }
         .messages_sent.keys).to eq ["Collaboration Invitation"]

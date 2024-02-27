@@ -460,12 +460,10 @@ describe Conversation do
     end
 
     it "broadcasts conversation created", priority: "1" do
-      n2 = Notification.create(name: "Conversation Created", category: "TestImmediately")
+      Notification.create(name: "Conversation Created", category: "TestImmediately")
 
       [sender].each do |user|
-        channel = communication_channel(user, { username: "test_channel_email_#{user.id}@test.com", active_cc: true })
-
-        NotificationPolicy.create(notification: n2, communication_channel: channel, frequency: "immediately")
+        communication_channel(user, { username: "test_channel_email_#{user.id}@test.com", active_cc: true })
       end
 
       recipients = create_users(5, return_type: :record)
