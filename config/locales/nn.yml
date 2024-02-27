@@ -2745,6 +2745,7 @@ nn:
   allows_user_to_configure_alerts_in_course_settings_c6b938ab: "Lar brukaren konfigurere varsler i emneinnstillingane."
   allows_user_to_configure_alerts_in_course_settings_f8acd7ba: "Lar ein brukar konfigurere varslingar i emneinnstillinger. Varslingar er ein lite brukt funksjon designa for å sende eit varsel til studentar, lærarar eller administratorar for spesifikke utløysarar (f.eks. ingen lærar-student-interaksjon i løpet av 7 dagar). Dei sjekkast kvar dag og varslingar vil sendast ut til studenten og/eller læraren fram til det utløysande problemet er løyst."
   allows_user_to_copy_individual_course_items_to_ano_46ba40d6: "Lar brukaren kopiere individuelle emneelement til eit anna emne."
+  allows_user_to_create_a_course_pace_via_course_pac_2ec549c: "Lar brukar opprette ein emneframdrift via Emneframdrift."
   allows_user_to_create_account_or_course_groups_1d5c4aaf: "Lar brukaren opprette konto- eller emnegrupper."
   allows_user_to_create_accounts_for_new_users_e4ec27c3: "Lar brukaren opprette kontoar for nye brukarar."
   allows_user_to_create_accounts_for_new_users_with__30b55094: "Lar ein brukaren legge til nye brukarar i denne kontoen. Lar brukaren slette eller slå saman brukarar i denne kontoen. Lar brukaren endre opplysingar om andre brukarar, som namn og e-post. Lar brukaren sjå og endre påloggingsinformasjon for andre brukarar."
@@ -2809,6 +2810,7 @@ nn:
   allows_user_to_duplicate_quizzes_in_a_course_1d3437f2: "Lar brukaren duplisere quizar i eit emne."
   allows_user_to_edit_a_user_s_section_or_role_if_no_cf272262: "Lar brukar endre på ein brukar sin seksjon eller rolle (dersom den ikkje kjem frå SIS)"
   allows_user_to_edit_account_and_course_groups_259139c0: "Lar brukaren redigere konto- og emnegrupper."
+  allows_user_to_edit_and_publish_a_course_pace_via__1ccb27ef: "Lar brukar redigere og publisere ein emneframdrift via Emneframdrift."
   allows_user_to_edit_and_publish_unpublish_assignme_54d13630: "Lar brukaren redigere og publisere/oppheve publisering av oppgåver."
   allows_user_to_edit_and_publish_unpublish_quizzes_bdc5b306: "Lar brukaren redigere og publisere/oppheve publisering av quiz'ar."
   allows_user_to_edit_assignment_details_on_individu_3e50993a: "Gir ein brukar løyve til å endre oppgåvedetaljar for individuelle diskusjonar. Modular: Gir ein brukar løyve til å legge til nye oppgåver til ein modul."
@@ -2994,7 +2996,7 @@ nn:
   allows_user_to_view_and_link_questions_in_a_quiz_t_f6795580: "Gir ein brukar løyve til å sjå og lenke spørsmål i ein quiz til ein spørsmålsbank på kontonivå."
   allows_user_to_view_and_link_questions_in_a_quiz_t_f8c3d8de: "Lar brukaren sjå og lage lenke mellom spørsmål i ein quiz og ein spørsmålsbank på emnenivå"
   allows_user_to_view_and_list_content_migrations_12449d80: "Lar brukar sjå og liste innhaldsmigrasjonar."
-  allows_user_to_view_and_list_course_paces_via_cour_e0cecf54: "Lar brukar vise og liste opp emnegjennomføring."
+  allows_user_to_view_and_list_course_paces_via_cour_e0cecf54: "Lar brukar vise og liste opp emneframdrift."
   allows_user_to_view_and_manage_authentication_opti_e1bb0ad3: "Gir brukar løyve til å sjå og administrere autentiseringsalternativ for heile kontoen."
   allows_user_to_view_and_manage_courses_in_the_acco_12333da2: "Gir ein brukar løyve til å sjå og administrere emne innafor ein konto."
   allows_user_to_view_and_manage_permissions_bdc80a1d: "Gir ein brukar løyve til å sjå og administrere løyve."
@@ -3642,6 +3644,7 @@ nn:
   assign_to_6b806cd9: "Tilordne til: "
   assign_to_95404a83: "Tilordne til"
   assign_to_c46e21: "Tilordne til"
+  assigned_pace_e954962a: "Tildelt Emneframdrift"
   assigned_permissions_6f6fecb6: "Tilordna løyve"
   assigned_roles_ace6c950: "Tilordna roller"
   assignment: 
@@ -4829,6 +4832,8 @@ nn:
   blueprint_courses_must_be_enabled_for_an_account_b_edd8f7d3: "Blåkopiemner må være aktivert for ein konto av ein administrator."
   blueprint_courses_must_be_enabled_for_an_account_b_ffb3ac4b: "Blueprint-emne må aktiverast på kontonivå av ein administrator. Emneroller kan kun administrere innhald i Blueprint-emne dersom dei er lagde til eit Blueprint-emne som faglærar, undervisingsassistent eller designar."
   blueprint_information_95dcef55: Blueprint-informasjon
+  blueprint_locking_is_only_available_for_published__c8c97e3f: "Låsing for Blåkopi er berre tilgjengeleg for publiserte Emneframdrift."
+  blueprint_locking_is_only_available_for_the_course_68ec4266: "Låsing for Blåkopi er berre tilgjengeleg for framdriftsplanar på emnenivå."
   blueprint_settings_233e909a: Blueprint-innstillingar
   blueprint_sync_90d0dfd5: "Synkronisering av Blueprint"
   bmp_e297149c: BMP
@@ -7731,6 +7736,7 @@ nn:
   course_paces_4396b508: Emnetempo
   course_pacing_40c14b61: Emnetempo
   course_pacing_adds_support_for_rolling_enrollments_3331cbaa: "Framdriftsplan gir støtte til påmelding til Canvas; tillet magisk fordeling av fristar for studentar med ulik startdato basert på ein framdriftsplan satt av faglærar. Lær meir og gi tilbakemelding ved å bli med i diskusjonsforumet Course Pacing User Group"
+  course_pacing_is_an_automated_tool_that_sets_diffe_e8d03c93: "Emneframdriftsplan er eit automatisert verktøy som set differensierte fristar for vurderingar og læringsaktivitetar basert på kvar student sin startdato, og gjer det mogleg med strukturert, sjølvstyrt læring i emne med kontinuerleg påmelding."
   course_pacing_is_in_active_development_348e33cf: "Framdriftsplan er i aktiv utvikling"
   course_pages_449f1dd4: Emnesider
   course_participation_and_access_settings_7a3d6297: "Emnedeltaking og tilgangsinnstillingar"
@@ -8410,6 +8416,7 @@ nn:
   create_132b3be1: Opprett
   create_14873ed7: opprett
   create_a_64f6f82: Opprett
+  create_a_course_pace_333b0911: "Lag ein framdriftsplan for emne"
   create_a_friendly_display_name_c1036ed: "Lag eit venleg visningsnamn"
   create_a_new_account_4cf7c0f9: "Opprett ny konto"
   create_a_new_announcement_for_coursename_8dede2d0: "Lag ei ny kunngjering for %{courseName}"
@@ -8436,6 +8443,7 @@ nn:
       eller Quizar. Oppgåvegrupper kan vektast.
   create_content_for_your_course_500a7032: "Opprett emneinnhald"
   create_course_9a69b32c: "Opprett emne"
+  create_course_pace_3dff129: "Lag ein framdriftsplan for emne"
   create_criterion_6df4d4ad: "Opprett kriterium"
   create_delete_edit_157bb1a3: "opprett / slett / rediger"
   create_delete_update_4ff115bf: "opprett / slett / oppdater"
@@ -8458,6 +8466,7 @@ nn:
   create_new_group_fca5cc73: "Opprett ny gruppe"
   create_new_group_set_13b1f62a: "Opprett nytt gruppesett"
   create_outcome_4dac05a0: "Opprett læringsmål"
+  create_pace_4ff3e9c: "Lag Framdriftsplan"
   create_pages_581a4d59: "Opprett sider"
   create_slots_71dbb2f8: "Opprett tidslukar"
   create_subject_86de5618: "Opprett emne"
@@ -8644,6 +8653,7 @@ nn:
   customize_course_details_26fd4afe: "Tilpass emnedetaljar"
   customize_help_link_62cd05eb: "Eigendefiner Hjelp-kopling"
   customize_learning_mastery_ratings_4ace142a: "Eigendefiner meistringsnivå"
+  customize_section_and_student_paces_f63f930f: "Tilpass seksjon-og studentframdrift"
   customize_this_menu_efa72a9: "Tilpass denne menyen"
   cutoff_score_74254c89: grenseverdi
   cyan_c1d5f68a: Cyan
@@ -8868,6 +8878,7 @@ nn:
   deeply_nested_replies_are_no_longer_supported_your_e84c6796: "Djupt nøsta svar er ikkje lenger støtta. Svaret ditt vil bli vist på første sida av denne tråden."
   default_9db103d: Standard
   default_conference_title: "%{course_name} konferanse"
+  default_course_pace_ce0ba0f3: "Standard emneframdrift"
   default_dates_a0a2ae26: Standarddatoar
   default_due_time_9d0e9140: "Standard forfallstidspunkt"
   default_email_5cb9fa04: "Standard e-post:"
@@ -9110,7 +9121,7 @@ nn:
   details_98a31b68: Detaljar
   details_a6f427c3: "Detaljar:"
   determined_by_course_end_date_5e3ffb4f: "Fastsatt av emnets sluttdato"
-  determined_by_course_pace_45063fa8: "Fastsatt av emnegjennomføring"
+  determined_by_course_pace_45063fa8: "Fastsatt av emneframdrift"
   determined_by_course_start_date_fc1a8ecf: "Fastsatt av emnet sin startdato"
   determined_by_section_end_date_3cda3832: "Fastsatt av seksjonen sin sluttdato"
   determined_by_section_start_date_65850a18: "Fastsatt av startdato for seksjonen"
@@ -9904,6 +9915,7 @@ nn:
   edit_criterion_description_5828919: "Rediger skildring av kriterium"
   edit_current_message_da650d4c: "Rediger denne meldinga"
   edit_dates_ed31061: "Endre datoar"
+  edit_default_course_pace_e00f1b5b: "Endre standard emneframdrift"
   edit_developer_key_d8fa33c4: "Rediger utviklarnøkkel"
   edit_disabled_e6a5ea0a: "Endre (slått av)"
   edit_discussion_settings_1bbb03d: "Rediger diskusjonsinnstillingar"
@@ -10115,6 +10127,7 @@ nn:
   enable_the_plagiarism_detection_platform_7c3b6195: "Aktiver plattform for plagiatkontroll"
   enable_the_security_tab_on_the_settings_page_to_ad_eab7c954: "Slå på tryggleiksknappen i innstillingar for å tilpasse CSP-innstillingane"
   enable_toolname_dc64c25a: "Aktiver %{toolName}"
+  enable_unique_course_paces_for_students_7beac4f3: "Mogleggjer unike emneframdriftsplanar for studentar."
   enabled_and_locked_49ff3de4: "Slått på og låst"
   enabled_ba7cab66: "Slått på"
   enabled_by_default_e530d6ed: "Slått på som standard"
@@ -10585,6 +10598,7 @@ nn:
   error_the_tool_did_not_return_a_url_to_canvas_a9afa641: "Feil: Verktøyet returnerte ikkje ein URL til Canvas"
   error_the_tool_returned_an_invalid_content_type_co_10a11c07: "Feil: Verktøyet returnerte ein ugyldeg innhaldstype \"%{contentType}\""
   error_updating_comment_4b80c76d: "Feil under oppdatering av kommentar"
+  error_updating_pacename_ad07f9df: "Feil ved oppdatering av %{paceName}"
   error_updating_status_of_module_item_80336274: "Feil under oppdatering av status for modulelement"
   error_updating_submission_draft_1d40ade7: "Det oppstod ein feil under oppdatering av innleveringsutkast"
   error_uploading_file_e2d31b56: "Feil under opplasting av fil."
@@ -11264,6 +11278,7 @@ nn:
   germany_b02d91c9: Tyskland
   get_help_on_how_to_use_and_configure_conferences_i_e90d9ed5: "Få hjelp til korleis å bruke og konfigurere konferansar i canvas."
   get_started_b9507525: "Kom i gang"
+  get_started_by_creating_a_course_pace_that_will_se_ed56e531: "Kom i gang ved å opprette ein framdriftsplan som vil fungere som standard framdrift for alle seksjonar og studentar i emnet."
   get_started_by_finding_importing_or_creating_your__380b6cfb: "Begynn med å finne, importere eller lage læringsmål for kontoen."
   get_started_by_finding_importing_or_creating_your__6b62c1d9: "Begynn med å finne, importere eller lage læringsmål for emnet."
   get_the_following_from_your_salesforce_connected_a_881fc9a3: "Få følgande frå tilknytt Salesforce-app"
@@ -17016,6 +17031,7 @@ nn:
   newest_first_87672763: "Nyaste først"
   newest_oldest_d768cf1a: "Nyast - eldst"
   next_40e12421: Neste
+  next_adjust_the_paces_for_individual_sections_and__a9e72b7: "Deretter, tilpass framdrifta for individuelle seksjonar og/eller studentar for å tilpasse framdrifta ytterligere basert på dine behov (dette trinnet er valfritt)."
   next_announcement_6e6e0f17: "Neste kunngjering"
   next_announcements_page_3956eb11: "Neste side med kunngjeringar"
   next_assignment_8ec51175: "Neste oppgåve"
@@ -18058,6 +18074,15 @@ nn:
   own_copyright_cc59db55: "Eigen opphavsrett"
   owner_email_236d1b2: "Eigar sin e-post"
   owner_email_4d02f795: "Eigar sin e-post:"
+  pace_duration_cb8f5de7: "Varigheit for framdrift"
+  pace_is_new_and_unpublished_9aa68306: "Framdriftsplanen er ny og upublisert"
+  pace_type_76cf749: "Framdriftsplan type"
+  pacename_pace_created_75aa4eda: "%{paceName} Framdriftsplan oppretta"
+  pacename_pace_removed_79fb031f: "%{paceName} Framdriftsplan fjerna"
+  pacename_pace_updated_10c6f95: "%{paceName} Framdriftsplan oppdatert"
+  pacename_pace_will_be_removed_this_pace_will_rever_14b1b38: "%{paceName} Framdriftsplan vil bli fjerna. Framdrifta vil gå tilbake til den tidligare tildelte framdriftsplanen."
+  pacename_pace_will_be_removed_this_pace_will_rever_5f793b5: "%{paceName} Framdriftsplan vil bli fjerna. Framdrifta vil gå tilbake til standard framdrift."
+  pacetype_paces_sorted_by_sortby_in_ordertype_order_842abe59: "%{paceType} framdrift: sortert etter %{sortBy} i %{orderType} rekkefølge"
   package_error: "Feil ved identifisering av pakketype: %{error}"
   package_export_from_d6e2b073: "Pakke eksportert frå"
   page_50c4823d: Side
@@ -18230,6 +18255,7 @@ nn:
   people_page_upgrade_4adc3c37: "Folk Sida Oppgradering"
   people_tutorial_tray_a87a6c48: "Personar opplæringsmeny"
   people_will_see_this_name_in_discussions_messages__fca9ebb2: "Namnet vil vere synleg for alle i diskusjonar, meldingar og kommentarar."
+  per_student_course_paces_159026d2: "Studentvis emneframdrift"
   percent_448ea947: prosent
   percent_af88d1b1: "%{percent}%"
   percent_complete_3a7edc20: "%{percent} fullført"
@@ -18332,6 +18358,7 @@ nn:
   please_log_in_to_view_this_content_eec6cd0: "Logg inn for å sjå innhaldet"
   please_make_sure_no_one_is_able_to_capture_the_ima_3d6498e7: "Ver sikker på at iingen kan kopiere bildet på skjermen, anten ved å vere fysisk nær, eller ved skjerm-deling."
   please_note_fbb62e4c: "Legg merke til:"
+  please_note_that_once_a_course_pace_is_saved_all_d_319cd267: "Ver merksam på at når ein emneframdrift er lagra, vil alle fristar for eksisterande vurderingar og læremiddel bli kontrollert av emneframdrifta. Les meir om emneframdrift i *Brukargruppa for emneframdrift*."
   please_pick_an_earlier_date_98ba37e5: "Vennligst velg en tidligere dato"
   please_provide_a_field_e5a7d0b3: "Legg til %{field}"
   please_provide_a_pairing_code_530d1e9d: "Ver venleg og oppgi ein paringskode."
@@ -18935,6 +18962,7 @@ nn:
   practice_quiz_19a8505d: Øvingsquiz
   pre_processing_92865c1d: "Førebur behandling"
   prerequisite_completion_period_c562d63: "Periode føresetnaden må ferdigstillast innanfor"
+  prerequisite_f361cd61: Forhåndskrav
   prerequisites_49659f16: "Føresetnader:"
   prerequisites_98b324e0: Føresetnader
   prerequisites_list_62d66d12: "Føresetnader: %{list}"
@@ -18943,6 +18971,7 @@ nn:
       completion_prerequisites: Fullføringsvilkår
     labels: 
       requirements_must_be_completed: "Følgande vilkår må oppfyllast før denne sida kan låsast opp"
+  prerequisites_names_e4fffb88: "Forhåndskrav: %{names}"
   presentation_2d9387ca: Presentasjon
   presents_the_quiz_setting_to_avoid_automatic_submi_363b91ff: "Viser quiz-innstillinga for å kunne unngå at innlevering skjer automatisk i ein tidsstyrt quiz når tida er ute.  "
   press_alt_f8_to_see_a_list_of_keyboard_shortcuts_2a8c7bc0: "Trykk ALT + F8 for å sjå ei liste med hurtigtastar"
@@ -19342,6 +19371,8 @@ nn:
       frå attkjenningstenesta.
   provide_tutorial_information_for_instructors_new_t_163c8ed4: "Gi opplæringsinformasjon til instruktører som er nye på Canvas."
   provide_tutorial_information_for_new_users_in_a_fl_c23462ac: "Legg til opplæringsinformasjon for nye brukarar i ein undermeny"
+  provider_2d212e55: Leverandør
+  provider_35796463: "I%{provider}"
   provider_attribute_b1cad655: Tilbyderattributt
   provider_icon_5064fa6e: Leverandørikon
   provides_a_button_which_navigates_straight_to_the__ec46e3b7: "Gir ein knapp som leiar rett til opprettbildet i kebabmenyen for New Quizzes element på Modulsida, Oppgåvesida, og Quizzar."
@@ -21068,6 +21099,7 @@ nn:
   remove_outcomes_9abcc8fd: 
     one: "Fjern Læringsmål? "
     other: "Fjern Læringsmål?"
+  remove_pace_97381e05: "Fjern emneframdriftsplan"
   remove_placement_90862c13: "Fjern %{placement}"
   remove_points_from_rubric_dcd4b585: "Fjern poeng frå vurderingskategori"
   remove_recipient_name_a6b83cef: "Fjern mottakar %{name}"
@@ -21090,12 +21122,15 @@ nn:
   remove_this_item_from_the_module_4b2ceab7: "Fjern elementet frå modulen"
   remove_this_rubric_from_my_list_c7d80704: "Fjern dette vurderingsskjemaet frå lista"
   remove_this_section_9a88ca43: "Fjern denne klassa"
+  remove_this_section_pace_ba87ad3c: "Fjern denne seksjonensframdrifta?"
+  remove_this_student_pace_a5e7b3c5: "Fjern denne Studentframdrifta?"
   remove_user_from_section_5556f465: "Fjern brukaren frå klassa"
   remove_webcam_image_count_efee4a11: "Fjern bilde frå webkamera %{count}"
   removed_assignment_assignment_name_835cc776: "Fjern oppgåve %{assignment_name}"
   removed_course_association_course_a233342c: "Fjerna emneforbindelse %{course}"
   removed_filename_a8634af3: "fjerna %{filename}"
   removed_user_as_group_leader_bb69330f: "Fjern %{user} som gruppeleiar"
+  removing_pace_9493910c: "Fjerner framdrift . . ."
   rename_45608f54: "Gi nytt namn"
   rename_c_name_section_e0e92c97: "Gi nytt namn til klassa %{c.name}"
   rename_filter_c6cc8efc: "Gi filter nytt namn"
@@ -21824,6 +21859,7 @@ nn:
   section_id_b5aad4a7: Seksjon-ID
   section_name_b6d82574: Seksjonsnamn
   section_name_edb51b2: "namn på seksjon"
+  section_pace_989d2856: Seksjonsframdrift
   section_removed_2ac72a79: "%{section} fjerna"
   section_section_names_98f172e6: "Seksjon: %{section_names}"
   section_sis_2a80d2fa: Seksjon-SIS
@@ -23511,6 +23547,7 @@ nn:
       i forhold til læringsmål for emnet. Måla er presenterte i eit karakterbokliknande
       format, og framgangen blir vist både som numerisk resultat og som meistring/nær
       meistring/trengst forbetring.
+  student_pace_2200bf85: Studentframdrift
   student_page_history_ce86b3c2: "Student sidehistorikk"
   student_paired_successfully_a88def61: "Paring av studentar vellukka"
   student_planner_date_4cc73abb: "Studenttimeplan dato:"
@@ -24742,6 +24779,10 @@ nn:
   this_course_is_claimed_and_ready_but_you_ll_need_t_25b95a0a: "Emnet er fullført og klargjort, men du må avslutte registreringsprosessen før du kan publisere det. Du skal ha mottatt ein e-post frå Canvas med ei lenke for å avslutte prosessen. Hugs å sjekke Søppelpost."
   this_course_is_visible_only_to_teachers_until_it_i_ce972f0: "Emnet er synleg berre for faglærarar før det er publisert."
   this_criterion_is_linked_to_a_learning_outcome_c8aa57bf: "Kriteriet er kopla til eit læringsmål"
+  this_date_is_invalid_ae413346: "Denne datoen er ugyldig."
+  this_due_date_is_managed_by_cfbb698c: "Denne forfallsdatoen blir administrert av"
+  this_due_date_is_managed_by_course_pacing_d9f9ce1d: "Denne forfallsdatoen blir administrert av Emnegjennomføring."
+  this_duration_does_not_take_into_account_weekends__19209a71: "Denne varigheita tar ikkje hensyn til helgar og svartelista dagar."
   this_element_is_a_more_accessible_alternative_to_d_e17b4e51: "Dette elementet er ei meir tilgjengeleg løysing for omorganisering enn å dra og sleppe. Trykk Enter eller Mellomromtasten for å flytte dette spørsmålet. "
   this_email_address_is_unconfirmed_f0fc8c6e: "E-postadressa er ikkje stadfesta"
   this_enables_an_updated_navigation_new_dashboard_a_8bd4cae: "Dette mogleggjer ein oppdatert navigasjon, nytt dashbord og eit enklare, meir moderne uttrykk."
@@ -24751,6 +24792,8 @@ nn:
   this_eportfolio_has_been_identified_as_possible_sp_b5eb6605: "Denne ePortfolioen har blitt identifisert som mulig spam. Per no er det kun administratorar og forfattaren som kan sjå den. Dersom du veit ePortfolioen ikkje er spam, kan du markere den som trygg. Ellers kan du bekrefte den som spam."
   this_eportfolio_has_been_identified_as_spam_and_is_8430467: "Denne ePortfolioen har blitt identifisert som spam og er kun synleg for deg. Kontakt ein administrator dersom du har spørsmål."
   this_eportfolio_has_been_identified_as_spam_it_is__f927947b: "Denne ePortfolioen har blitt identifisert som spam. Per no er det kun administratorar og forfattaren som kan sjå den. Dersom du veit ePortfolioen ikkje er spam, kan du markere den som trygg. "
+  this_event_b437db90: "Denne hendinga"
+  this_feature_adds_the_start_end_and_close_dates_of_221c79cc: "Denne funksjonen legge til start-, slutt- og lukkedatoar for vurderingsperiodar i filteret til vurderingsperioden."
   this_feature_affects_existing_data_for_all_courses_4fc75fe1: "Denne funksjonaliteten påverkar eksisterande data for alle emner i kontoen"
   this_feature_affects_existing_data_for_an_entire_a_2372dc52: "Denne funksjonaliteten påverkar eksisterande data for ein heil konto."
   this_feature_allows_teachers_to_create_anonymous_d_ea364dca: "Denne funksjonaliteten lar faglærarar lage anonyme diskusjonar og lar faglærarane slå på ei innstilling for emnet slik at studentar får laga anonyme diskusjonar"
@@ -24761,18 +24804,28 @@ nn:
   this_feature_can_t_be_enabled_while_semicolons_are_2e0adb54: "Denne funksjonen kan ikkje vere slått på samstundes som semikolon er i bruk som feltskilje"
   this_feature_cannot_be_disabled_once_it_has_been_t_db7cc39e: "Funksjonen kan ikkje slåast av når den først er aktivert."
   this_feature_creates_a_siteadmin_release_flag_tab__15215be9: "Funksjonen opprettar ein eigen release-merknadsfane sånn at SiteAdmin kan lansere funksjonar til brukarane via brukargrensesnittet. Brukargrensesnittet er samstundes endra for den gamle funksjonsval-fana. "
+  this_feature_enables_multi_select_filters_in_the_g_c7904e35: "Denne funksjonen gjer det mogleg å velge fleire filter i Vurderingsoversikta."
   this_feature_flag_enables_discussions_reporting_in_ad613bb9: |-
       Denne funksjonaliteten slår på rapportering for diskusjonar inni det nye
       Discussions Redesign arbeidet
   this_feature_flag_enables_isolated_view_inside_the_3db3f6f2: |-
       Denne funksjonaliteten slår på Isolert Visning inni det nye
       Discussions Redesign arbeidet.
+  this_feature_flag_enables_the_react_instui_and_gra_ec5ad0da: "Dette funksjonsflagget aktiverar oppgraderinga av React/InstUI og GraphQL Personsida."
+  this_feature_flag_enables_the_use_of_the_updated_d_b78aa2b8: "Dette funksjonsflagget gjer det mogleg å bruke den oppdaterte diskusjonen for å opprette/redigere side."
+  this_feature_introduces_performance_and_maintenanc_50c325aa: "Denne funksjonen introduserer ytelses- og vedlikeholdsforbedringer til Individuell vurderingsoversikt"
+  this_feature_makes_it_so_that_when_multiple_files__1973ed91: "Denne funksjonen gjer det slik at når fleire filar vert sendt inn samtidig av eit tredjepartsverktøy via APIet for Oppgåver og Vurderingar, så vil dei bli oppfatta som éi innlevering i staden for at det vert oppretta fleire separate innleveringar."
   this_feature_makes_the_submissions_file_upload_api_aeb97ad6: "Funksjonen gjer at oppgåveinnleverings-API-et kontrollerer at filtypane er innafor dei gyldige filendingane angitt for oppgåva."
   this_feature_option_is_only_visible_to_users_with__d5e21cee: |-
       Denne funksjonaliteten er berre synleg for brukarar med Site Admin tilgang
       Sluttbrukar vil ikkje kunne sjå den før den er slått på av ein Site Admin.
       Før du slår på for ein heil institusjon sørg for at du forstår
       funksjonen og mogleg innverknad for alle brukarar.
+  this_feature_provides_a_new_speedgrader_platform_e_e7d740bd: "Denne funksjonen gir ein ny opplevelse av SpeedGraderverktøyet."
+  this_feature_provides_the_ability_to_capture_media_918c06c6: "Denne funksjonen gjer det mogleg å gjere opptak i SpeedGrader med bruk av Studio Screen Capture."
+  this_feature_provides_visual_and_functional_enhanc_e5e57a21: "Denne funksjonen gir visuelle og funksjonelle forbedringar til Vurderingsskjema i Canvas."
+  this_feature_will_hide_all_quantitative_values_fro_6f006665: "Denne funksjonen vil skjule alle kvantitative verdier fra bruker."
+  this_ff_is_for_development_purposes_only_and_shoul_f77938ba: "Dette FF er kun for utviklingsformål og bør ikkje endrast uten å først konsultere produkt- og ingeniøravdelinga. Denne funksjonen vil forhindre sletting av resultat som har justeringar innenfor læringsmål, som brukes for Nye Quizzar."
   this_field_is_required_fa58c4a: "Dette feltet er obligatorisk"
   this_field_name_is_required_988caebc: "Feltet \"%{name}\" er obligatorisk."
   this_field_name_is_required_b9196401: "Feltet \"name\" er obligatorisk."
@@ -24787,6 +24840,7 @@ nn:
   this_grade_differs_from_the_student_s_view_of_the__f78d0023: "Denne vurderinga er ulik vurderinga som er synleg for studentane fordi nokre vurderingsresultat ikkje er posta enno"
   this_grade_has_negative_points_496400d4: "Vurderinga har negative poeng"
   this_grade_is_invalid_8ab192c7: "Denne vurderinga er ugyldig"
+  this_grade_is_unread_fb79c002: "Denne vurderinga er ulest"
   this_grade_is_unusually_high_60533c20: "Dette vurderingsresultatat er unormalt høgt"
   this_group_was_successfully_removed_81178d51: "Fjerninga av denne gruppa var vellykka."
   this_has_more_question_types_like_hotspot_categori_620e9df6: |-
@@ -24798,17 +24852,22 @@ nn:
   this_image_has_been_reported_9360e581: "Dette bildet har blitt rapportert."
   this_image_is_currently_unavailable_25c68857: "Dette bildet er for tida utilgjengeleg"
   this_influences_the_user_interface_for_setting_due_12b7e7c0: "Dette påverkar brukargrensesnittet ved setting av innleveringsfristar. Det forandrar ikkje på eksisterande fristar."
+  this_influences_the_user_interface_for_setting_due_be0f0273: "Dette påverkar brukargrensesnittet ved setting av innleveringsfristar. Det forandrar ikkje på frista som er sett for eksisterande oppgåver."
   this_integration_is_not_enabled_please_enable_it_t_b9e8a997: "Denne integrasjonen er ikkje aktivert. Aktiver den for å samhandle med innstillingar."
   this_is_a_blueprint_course_5e7b47fe: Blueprint-emne
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "Dette er ei kommadelt liste med klarerte URL-adresser. URL-adresser frå denne lista omgår CSRF-token ved pålogging i Canvas."
   this_is_a_concluded_course_so_only_concluded_enrol_e6e3a9d9: "Dette er eit avslutta kurs og difor er berre avslutta påmeldingar tilgjengelege."
   this_is_a_course_template_99bbe698: "Dette er ein emnemal"
   this_is_a_feature_to_allow_the_development_of_a_re_8452eb0d: "Funksjonen tillet utvikling av responsive nettsider "
+  this_is_a_graded_discussion_28ad2728: "Dette er ein vurdert diskusjon"
   this_is_a_group_discussion_2f9acdae: "Dette er ein gruppediskusjon"
   this_is_a_media_comment_click_here_to_view_c297bf62: "Dette er ein mediekommentar, *klikk her for å sjå*."
   this_is_a_message_for_name_7abf1e39: "Dette er ei melding til *%{name}*"
   this_is_a_message_from_canvas_administration_dbd63778: "Dette er ei melding frå *Canvas Administrator*"
   this_is_a_message_from_name_ec0cdfac: "Dette er ei melding frå *%{name}*"
+  this_is_a_new_course_pace_and_all_changes_are_unpu_78532778: "Dette er ein ny Emneframdrift og alle endringar er upubliserte. Publiser for å lagre eventuelle endringar og opprette framdrifta i Emnegjennomføringa."
+  this_is_a_new_section_pace_and_all_changes_are_unp_df916ec6: "Dette er ein ny seksjonsframdriftsplan og alle endringar er upubliserte. Publiser for å lagre eventuelle endringar og opprette framdrifta."
+  this_is_a_new_student_pace_and_all_changes_are_unp_b0e4ee70: "Dette er ein ny studentframdriftsplan og alle endringar er upubliserte. Publiser for å lagre eventuelle endringar og opprette framdrifta."
   this_is_a_preview_of_the_draft_version_of_the_quiz_910a02e0: "Dette er ei førehandsvising av utkastet til quizen"
   this_is_a_preview_of_the_published_version_of_the__70e0c8: "Dette er ei førehandsvising av den publiserte versjonen av quizen"
   this_is_a_report_of_all_students_enrolled_in_a_cou_d0137d3c: |-
@@ -25394,6 +25453,7 @@ nn:
   to_edit_lock_settings_on_the_pages_index_page_page_5e65b3d6: "For å endre på låseinnstillingar på personoversikta må \"Personar - oppdater\",  \"Blåkopi -   legg til / endre / slett\" og \"Emner - administrer\" vere slått på."
   to_edit_quizzes_assignments_and_quizzes_manage_edi_d57651dd: "For å redigere ein quiz må \"Oppgåver og quizar - administrer / rediger\" også vere slått på"
   to_edit_the_course_sis_id_courses_manage_and_sis_d_dfe90e4e: "For å endre SIS id på eit emne må \"Emner - administrer\" og \"SIS data - administrer\" vere slått på."
+  to_edit_the_due_date_go_to_course_pacing_change_th_bae45346: "For å endre forfallsdatoen, gå til Emnefremdrift, endre antall dagar som er tildelt denne oppgåva, og publiser den oppdaterte fremdriftsplanen."
   to_edit_user_details_modify_login_details_or_chang_381a5b72: |-
       For å endre brukardetaljar, modifisere innloggingsdetaljar eller endre brukarpassord, må 'Brukarar - administrere innloggingsdeltajar' òg vere slått på.
       For å sjå sidevisingar for ein brukar, må 'Statistikk - vis' òg vere slått på.
@@ -27294,8 +27354,8 @@ nn:
   you_cannot_assign_to_a_group_outside_of_the_assign_7869eb3b: "Du kan ikkje tilordne ei gruppe utanfor oppgåva sitt gruppesett"
   you_cannot_cancel_while_loading_the_pace_c6ccf2cc: "Du kan ikkje avbryte under lasting av tempo"
   you_cannot_cancel_while_publishing_5a920ae1: "Du kan ikkje kansellere medan du publiserar"
-  you_cannot_delete_the_default_course_pace_ee7bede4: "Du kan ikkje slette standard emnegjennomføring."
-  you_cannot_edit_a_locked_pace_41b5f6d7: "Du kan ikkje redigere ei låst emnegjennomføring"
+  you_cannot_delete_the_default_course_pace_ee7bede4: "Du kan ikkje slette standard emneframdrift."
+  you_cannot_edit_a_locked_pace_41b5f6d7: "Du kan ikkje redigere ei låst emneframdrift"
   you_cannot_edit_themes_on_this_subaccount_63ceaaf3: "Du kan ikkje redigere emne for denne underkontoen."
   you_cannot_leave_comments_until_reviewer_and_revie_4c158058: "Du kan ikkje legge igjen kommentarar før rettleiaren og den som blir rettleidd har levert oppgåva."
   you_cannot_leave_comments_until_you_submit_the_ass_82c3ad79: "Du kan ikkje kommentere før du har levert oppgåva"
@@ -27304,9 +27364,9 @@ nn:
   you_cannot_publish_this_assignment_while_there_are_e3dee69a: "Du kan ikkje publisere oppgåve med feil"
   you_cannot_publish_while_loading_the_pace_c5682dbc: "Du kan ikkje publisere under lasting av tempo"
   you_cannot_publish_while_publishing_2f65264b: "Du kan ikkje publisere medan du publiserer"
-  you_cannot_remove_a_locked_pace_150675e9: "Du kan ikkje fjerne ei låst emnegjennomføring."
-  you_cannot_remove_the_pace_while_it_is_still_loadi_887e92ac: "Du kan ikkje fjerne ei emnegjennomføring medan den framleis lastar."
-  you_cannot_remove_the_pace_while_publishing_e25eb076: "Du kan ikkje fjerne ei emnegjennomføring medan du publiserer"
+  you_cannot_remove_a_locked_pace_150675e9: "Du kan ikkje fjerne ei låst emneframdrift."
+  you_cannot_remove_the_pace_while_it_is_still_loadi_887e92ac: "Du kan ikkje fjerne ei emneframdrift medan den framleis lastar."
+  you_cannot_remove_the_pace_while_publishing_e25eb076: "Du kan ikkje fjerne ei emneframdrift medan du publiserer"
   you_cannot_remove_this_enrollment_c87be1cb: "Du kan ikkje fjerne denne påmeldinga."
   you_cannot_remove_your_default_email_address_8ed68e52: "Du kan ikkje fjerne standard e-postadresse"
   you_cannot_save_while_there_are_errors_b86585e9: "Du kan ikkje lagre med feil"
@@ -27378,6 +27438,9 @@ nn:
   you_have_successfully_unsubscribed_from_the_discus_883e8326: "Du vil no ikkje få varslar om denne diskusjonen."
   you_have_successfully_updated_the_discussion_topic_b2910500: "Diskusjonstemaet er no oppdatert."
   you_have_unpublished_changes_to_your_course_pace_c_90d5a4b1: "Du har upubliserte endringar på emnets tempo. Ved å fortsette mister du endringane."
+  you_have_unpublished_changes_to_your_course_pace_c_fe6db8c0: "Du har upubliserte endringar på emnets framdriftsplan. Ved å fortsette mister du endringane."
+  you_have_unpublished_changes_to_your_section_pace__9cf0aed: "Du har upubliserte endringar på seksjonens framdriftsplan. Ved å fortsette mister du endringane."
+  you_have_unpublished_changes_to_your_student_pace__41f251bd: "Du har upubliserte endringar på studentframdriftsplanen. Ved å fortsette mister du endringane."
   you_have_unsynced_changes_that_will_sync_to_all_as_9028e711: "Du har usynkroniserte endringar som vert synkronisert til alle tilknytta emne når ein ny forbindelse er lagra. "
   you_just_sent_a_message_in_canvas_86b4945c: "Du sendte nettopp ei melding i Canvas"
   you_left_the_required_name_field_empty_8f9bce5c: "Du lét det obligatoriske namnnefeltet stå tomt"
