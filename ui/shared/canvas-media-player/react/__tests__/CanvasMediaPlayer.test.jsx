@@ -142,6 +142,18 @@ describe('CanvasMediaPlayer', () => {
       expect(divWithAria.length).toBe(0)
     })
 
+    it('renders and overlay to prevent media right clicks', () => {
+      const {container} = render(
+        <CanvasMediaPlayer
+          media_id="dummy_media_id"
+          media_sources={[defaultMediaObject(), defaultMediaObject(), defaultMediaObject()]}
+        />
+      )
+      const video = container.querySelector("video")
+      const overlay = video.parentElement.parentElement.parentElement.children[1].children[0]
+      expect(overlay.children.length).toEqual(0)
+    })
+
     describe('dealing with media_sources', () => {
       it.skip('renders loading if there are no media sources', async () => {
         // MAT-885
