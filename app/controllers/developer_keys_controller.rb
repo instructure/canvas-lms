@@ -123,7 +123,7 @@ class DeveloperKeysController < ApplicationController
 
     # query for parent keys is most likely cross-shard,
     # so doesn't fit into the scope cases above
-    if params[:inherited].present? && !@context.primary_settings_root_account?
+    if params[:inherited].present? && !@context.root_account.primary_settings_root_account?
       federated_parent = @context.account_chain(include_federated_parent: true).last
       parent_keys = DeveloperKey
                     .shard(federated_parent.shard)
