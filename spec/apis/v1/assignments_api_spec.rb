@@ -3169,20 +3169,16 @@ describe AssignmentsApiController, type: :request do
         course_with_ta(course: @course, active_enrollment: true)
         @course.course_sections.create!
 
-        @notification = Notification.create! name: "Assignment Created"
+        @notification = Notification.create!(name: "Assignment Created", category: "TestImmediately")
 
         @student.register!
         @student.communication_channels.create(path: "student@instructure.com").confirm!
-        @student.email_channel.notification_policies.create!(notification: @notification,
-                                                             frequency: "immediately")
       end
 
       it "takes overrides into account in the assignment-created notification " \
          "for assignments created with overrides" do
         @ta.register!
         @ta.communication_channels.create(path: "ta@instructure.com").confirm!
-        @ta.email_channel.notification_policies.create!(notification: @notification,
-                                                        frequency: "immediately")
 
         @override_due_at = Time.parse("2002 Jun 22 12:00:00")
 
@@ -3216,7 +3212,6 @@ describe AssignmentsApiController, type: :request do
       it "only notifies students with visibility on creation" do
         section2 = @course.course_sections.create!
         student2 = student_in_section(section2, user: user_with_communication_channel(active_all: true))
-        student2.email_channel.notification_policies.create!(notification: @notification, frequency: "immediately")
 
         @user = @teacher
         api_call(:post,
@@ -3304,7 +3299,6 @@ describe AssignmentsApiController, type: :request do
 
         section2 = @course.course_sections.create!
         student2 = student_in_section(section2, user: user_with_communication_channel(active_all: true))
-        student2.email_channel.notification_policies.create!(notification: @notification, frequency: "immediately")
 
         @user = @teacher
         api_call(:put,
@@ -4822,11 +4816,10 @@ describe AssignmentsApiController, type: :request do
 
     context "broadcasting while updating overrides" do
       before :once do
-        @notification = Notification.create! name: "Assignment Changed"
+        @notification = Notification.create!(name: "Assignment Changed", category: "TestImmediately")
         student_in_course(course: @course, active_all: true)
         @student.communication_channels.create(path: "student@instructure.com").confirm!
-        @student.email_channel.notification_policies.create!(notification: @notification,
-                                                             frequency: "immediately")
+
         @assignment = @course.assignments.create!
         @assignment.unmute!
         Assignment.where(id: @assignment).update_all(created_at: 1.day.ago)
