@@ -66,7 +66,7 @@ GEM
     rspec-mocks (3.13.0)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.13.0)
-    rspec-support (3.13.0)
+    rspec-support (3.13.1)
     stringio (3.1.0)
     timeout (0.4.1)
     tzinfo (2.0.6)
