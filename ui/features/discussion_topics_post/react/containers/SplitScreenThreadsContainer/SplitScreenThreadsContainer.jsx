@@ -81,7 +81,7 @@ export const SplitScreenThreadsContainer = props => {
         data,
       })
 
-      if (discussionEntry.rootEntryId) {
+      if (discussionEntry.rootEntryId && !discussionEntry.deleted) {
         const discussionUnreadCountChange = discussionEntry.entryParticipant.read ? -1 : 1
         updateDiscussionEntryRootEntryCounts(cache, discussionEntry, discussionUnreadCountChange)
       }
