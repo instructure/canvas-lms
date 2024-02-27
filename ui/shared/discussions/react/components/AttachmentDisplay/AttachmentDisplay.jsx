@@ -77,11 +77,19 @@ export function AttachmentDisplay(props) {
         // If the file is submitted in a graded discussion, a different path is used that requires different information
         // This is required to get the file to be uploaded to the submissions folder and ignore the quota limits
 
+        const assetString = ENV?.DISCUSSION?.ASSIGNMENT
+        const discussionContext = ENV?.context_asset_string
+        const userContext = ENV?.current_user?.id ? `user_${ENV?.current_user?.id}` : null
+
+        // If the assetString is not present, use the discussion context directly which should be the course.
+        // This is useful for making it work with usage rights and the Discussion Topic Create/Edit process.
+        const context = !assetString ? discussionContext : userContext || discussionContext
+
         attachmentInformation['attachment[filename]'] = fileToUpload.name
         attachmentInformation['attachment[content_type]'] = fileToUpload.type
         attachmentInformation['attachment[intent]'] = 'submit' // directs the logic in the files_controller to skip quota checks
-        attachmentInformation['attachment[context_code]'] = `${ENV?.context_asset_string}` // used to find the correct course folder
-        attachmentInformation['attachment[asset_string]'] = `${ENV?.DISCUSSION?.ASSIGNMENT}` // required for downloads to go to submission folder; Doesn't Apply to Topic attachments, but Legacy Topic Attachments don't apply to user quota.
+        attachmentInformation['attachment[context_code]'] = `${context}` // used to find the correct course folder
+        attachmentInformation['attachment[asset_string]'] = `${assetString}` // required for downloads to go to submission folder; Doesn't Apply to Topic attachments, but Legacy Topic Attachments don't apply to user quota.
       } else {
         // If uploading file to the attachment folder, only name and type are required
         attachmentInformation = {
