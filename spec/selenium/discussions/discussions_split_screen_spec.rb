@@ -46,6 +46,15 @@ describe "threaded discussions" do
       root_entry_id: @first_reply.id,
       parent_id: @first_reply.id
     )
+
+    @deleted_reply = DiscussionEntry.create!(
+      message: "1.2 reply",
+      discussion_topic_id: @first_reply.discussion_topic_id,
+      user_id: @first_reply.user_id,
+      root_entry_id: @first_reply.id,
+      parent_id: @first_reply.id
+    )
+    @deleted_reply.destroy
   end
 
   it "toggles from inline to split-screen" do
@@ -122,6 +131,7 @@ describe "threaded discussions" do
     Discussion.visit(@course, @topic)
     wait_for_ajaximations
     expect(f("div[data-testid='replies-counter']")).to include_text("2 Replies, 2 Unread")
+    expect(f("div[data-testid='is-unread']")).to be_displayed
     f("button[data-testid='expand-button']").click
     wait_for_ajaximations
     # Auto read has a 3 second delay before firing off the read event
@@ -131,6 +141,8 @@ describe "threaded discussions" do
     expect(@second_reply.discussion_entry_participants.where(user: @teacher).first.workflow_state).to eq "read"
     expect(f("div[data-testid='replies-counter']")).to include_text("2 Replies")
     expect(f("div[data-testid='replies-counter']")).not_to include_text("2 Replies, 2 Unread")
+    wait_for_ajaximations
+    expect(f("body")).not_to contain_jqcss("div[data-testid='is-unread']")
   end
 
   it "auto reads splitscreen entries" do
@@ -143,6 +155,7 @@ describe "threaded discussions" do
     Discussion.visit(@course, @topic)
     wait_for_ajaximations
     expect(f("div[data-testid='replies-counter']")).to include_text("2 Replies, 2 Unread")
+    expect(f("div[data-testid='is-unread']")).to be_displayed
     f("button[data-testid='expand-button']").click
     wait_for_ajaximations
     wait_for_ajax_requests
@@ -154,6 +167,8 @@ describe "threaded discussions" do
     expect(@second_reply.discussion_entry_participants.where(user: @teacher).first&.workflow_state).to eq "read"
     expect(f("div[data-testid='replies-counter']")).to include_text("2 Replies")
     expect(f("div[data-testid='replies-counter']")).not_to include_text("2 Replies, 2 Unread")
+    wait_for_ajaximations
+    expect(f("body")).not_to contain_jqcss("div[data-testid='is-unread']")
   end
 
   it "allows you to click the mobile RCE without closing", :ignore_js_errors do
