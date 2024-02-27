@@ -42,7 +42,7 @@
   "content_type_2cf90d95": { "message": "סוג תוכן" },
   "copyright_holder_66ee111": { "message": "בעלים של זכויות יוצרים:" },
   "count_plural_one_item_loaded_other_items_loaded_857023b7": {
-    "message": "{ count, plural,\n    one {}\n    two {}\n   many {}\n  other {}\n}"
+    "message": "{ count, plural,\n    one {}\n    two {}\n  other {}\n}"
   },
   "course_files_62deb8f8": { "message": "קובצי קורס" },
   "course_files_a31f97fc": { "message": "קבצי קורס" },
