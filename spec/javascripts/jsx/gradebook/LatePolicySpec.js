@@ -90,6 +90,19 @@ QUnit.module('Gradebook#applyLatePolicy', {
   },
 })
 
+test('skips submissions for which assignments are not loaded', function () {
+  this.gradebook.assignments = {assignment_2: 'assignment2value'}
+  this.gradebook.applyLatePolicy()
+  notOk(
+    this.latePolicyApplicator.calledWith(
+      this.submission1,
+      'assignment1value',
+      this.gradingStandard,
+      'latepolicy'
+    )
+  )
+})
+
 test('does not affect submissions in closed grading periods', function () {
   this.gradebook.applyLatePolicy()
   notOk(
