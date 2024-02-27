@@ -93,7 +93,7 @@ $(document).ready(function () {
     $('#edit_section_form :text:visible:first').focus().select()
   })
 
-  $('.user_list').delegate('.unenroll_user_link', 'click', function (event) {
+  $('.user_list').on('click', '.unenroll_user_link', function (event) {
     event.preventDefault()
     $(this)
       .parents('.user')
