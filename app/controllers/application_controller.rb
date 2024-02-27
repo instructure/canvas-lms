@@ -377,7 +377,6 @@ class ApplicationController < ActionController::Base
     lti_dynamic_registration
     lti_multiple_assignment_deep_linking
     lti_overwrite_user_url_input_select_content_dialog
-    lti_unique_tool_form_ids
     buttons_and_icons_root_account
     extended_submission_state
     scheduled_page_publication
@@ -2123,10 +2122,8 @@ class ApplicationController < ActionController::Base
           include_module_context: true
         }
 
-        if @tool.root_account.feature_enabled?(:lti_unique_tool_form_ids)
-          @tool_form_id = random_lti_tool_form_id
-          js_env(LTI_TOOL_FORM_ID: @tool_form_id)
-        end
+        @tool_form_id = random_lti_tool_form_id
+        js_env(LTI_TOOL_FORM_ID: @tool_form_id)
 
         variable_expander = Lti::VariableExpander.new(@domain_root_account, @context, self, {
                                                         current_user: @current_user,
