@@ -1070,16 +1070,9 @@ RSpec.describe ApplicationController do
             end
 
             context "ENV.LTI_TOOL_FORM_ID" do
-              it "with the lti_unique_tool_form_ids flag on, sets a random id" do
-                course.account.enable_feature!(:lti_unique_tool_form_ids)
+              it "sets a random id" do
                 expect(controller).to receive(:random_lti_tool_form_id).and_return("1")
                 expect(controller).to receive(:js_env).with(LTI_TOOL_FORM_ID: "1")
-                controller.send(:content_tag_redirect, course, content_tag, nil)
-              end
-
-              it "with the lti_unique_tool_form_ids flag off, does not set a random it" do
-                course.account.disable_feature!(:lti_unique_tool_form_ids)
-                expect(controller).not_to receive(:js_env).with(LTI_TOOL_FORM_ID: anything)
                 controller.send(:content_tag_redirect, course, content_tag, nil)
               end
             end
