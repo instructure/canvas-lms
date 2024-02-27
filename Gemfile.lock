@@ -945,7 +945,7 @@ GEM
       rspec-expectations (~> 3.12)
       rspec-mocks (~> 3.12)
       rspec-support (~> 3.12)
-    rspec-support (3.13.0)
+    rspec-support (3.13.1)
     rspec_around_all (0.2.0)
       rspec (>= 2.0)
     rspec_junit_formatter (0.6.0)
