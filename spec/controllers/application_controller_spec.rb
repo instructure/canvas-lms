@@ -1831,6 +1831,17 @@ RSpec.describe ApplicationController do
           expect(controller.js_env[:LTI_TOOL_SCOPES]).to eq("http://example.com" => [TokenScopes::LTI_PAGE_CONTENT_SHOW_SCOPE])
         end
       end
+
+      it "includes launch_method if set" do
+        @tool_settings.each do |setting|
+          setting_hash = tool_settings(setting, true).merge(launch_method: "tray")
+          @tool.send(:"#{setting}=", setting_hash)
+          @tool.save!
+
+          hash = controller.external_tool_display_hash(@tool, setting)
+          expect(hash[:launch_method]).to eq "tray"
+        end
+      end
     end
 
     describe "verify_authenticity_token" do
