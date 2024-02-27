@@ -25,6 +25,7 @@ import {TruncateText} from '@instructure/ui-truncate-text'
 import {Link} from '@instructure/ui-link'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {RubricPopover} from './RubricPopover'
+import {Pill} from '@instructure/ui-pill'
 
 const I18n = useI18nScope('rubrics-list-table')
 
@@ -88,6 +89,7 @@ export const RubricTable = ({rubrics}: RubricTableProps) => {
               >
                 {rubric.title}
               </Link>
+              {rubric.workflowState === 'draft' && <Pill margin="x-small">{I18n.t('Draft')}</Pill>}
             </Cell>
             <Cell data-testid={`rubric-points-${rubric.id}`}>{rubric.pointsPossible}</Cell>
             <Cell data-testid={`rubric-criterion-count-${rubric.id}`}>{rubric.criteriaCount}</Cell>
