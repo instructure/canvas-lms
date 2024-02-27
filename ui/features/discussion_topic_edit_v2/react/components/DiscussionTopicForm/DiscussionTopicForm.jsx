@@ -896,6 +896,7 @@ export default function DiscussionTopicForm({
           )}
           {delayPosting && shouldShowAnnouncementOnlyOptions && (
             <DateTimeInput
+              timezone={ENV.TIMEZONE}
               description={I18n.t('Post At')}
               prevMonthLabel={I18n.t('previous')}
               nextMonthLabel={I18n.t('next')}
@@ -1005,6 +1006,7 @@ export default function DiscussionTopicForm({
                   margin="small 0 0 0"
                 >
                   <DateTimeInput
+                    timezone={ENV.TIMEZONE}
                     description=""
                     dateRenderLabel={I18n.t('Date')}
                     timeRenderLabel={I18n.t('Time')}
@@ -1141,6 +1143,7 @@ export default function DiscussionTopicForm({
           ) : (
             <FormFieldGroup description="" width={inputWidth}>
               <DateTimeInput
+                timezone={ENV.TIMEZONE}
                 description={I18n.t('Available from')}
                 dateRenderLabel={I18n.t('Date')}
                 timeRenderLabel={I18n.t('Time')}
@@ -1156,6 +1159,7 @@ export default function DiscussionTopicForm({
                 layout="columns"
               />
               <DateTimeInput
+                timezone={ENV.TIMEZONE}
                 description={I18n.t('Until')}
                 dateRenderLabel={I18n.t('Date')}
                 timeRenderLabel={I18n.t('Time')}
