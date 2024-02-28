@@ -37,6 +37,7 @@ class WikiPage < ActiveRecord::Base
   include SearchTermHelper
   include LockedFor
   include HtmlTextHelper
+  include DatesOverridable
 
   include MasterCourses::Restrictor
   restrict_columns :content, [:body, :title]
@@ -57,8 +58,6 @@ class WikiPage < ActiveRecord::Base
   has_many :wiki_page_lookups, inverse_of: :wiki_page
   has_many :wiki_page_embeddings, inverse_of: :wiki_page
   has_one :master_content_tag, class_name: "MasterCourses::MasterContentTag", inverse_of: :wiki_page
-  has_many :assignment_overrides, dependent: :destroy, inverse_of: :wiki_page
-  has_many :assignment_override_students, dependent: :destroy
   has_one :block_editor, as: :context, dependent: :destroy
   accepts_nested_attributes_for :block_editor, allow_destroy: true
   acts_as_url :title, sync_url: true

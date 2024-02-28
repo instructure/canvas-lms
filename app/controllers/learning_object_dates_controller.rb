@@ -20,7 +20,7 @@
 
 # @API Learning Object Dates
 #
-# API for accessing date-related attributes on assignments, quizzes, and modules.
+# API for accessing date-related attributes on assignments, quizzes, modules, discussions, pages, and files.
 #
 # @model LearningObjectDates
 #     {
@@ -33,7 +33,7 @@
 #           "type": "integer"
 #         },
 #         "due_at": {
-#           "description": "the due date for the learning object. returns null if not present or applicable",
+#           "description": "the due date for the learning object. returns null if not present or applicable. never applicable for ungraded discussions, pages, and files",
 #           "example": "2012-07-01T23:59:00-06:00",
 #           "type": "datetime"
 #         },
@@ -79,9 +79,9 @@ class LearningObjectDatesController < ApplicationController
   # @returns LearningObjectDates
   def show
     route = polymorphic_url([:api_v1, @context, asset, :date_details])
-    overrides = Api.paginate(asset.all_assignment_overrides.active, self, route)
+    overrides = Api.paginate(overridable.all_assignment_overrides.active, self, route)
     render json: {
-      **learning_object_dates_json(asset, @current_user, session),
+      **learning_object_dates_json(asset, overridable),
       overrides: assignment_overrides_json(overrides, @current_user, include_names: true)
     }
   end
@@ -161,7 +161,20 @@ class LearningObjectDatesController < ApplicationController
                  @context.active_quizzes.find(params[:quiz_id])
                elsif params[:context_module_id]
                  @context.context_modules.not_deleted.find(params[:context_module_id])
+               elsif params[:discussion_topic_id]
+                 @context.discussion_topics.find(params[:discussion_topic_id])
+               elsif params[:page_id]
+                 @context.wiki_pages.not_deleted.find(params[:page_id])
+               elsif params[:attachment_id]
+                 @context.attachments.not_deleted.find(params[:attachment_id])
                end
+  end
+
+  # this is the object that has the overrides and the base dates (usually the same as the asset, but not always)
+  def overridable
+    # graded discussions have an assignment and are differentiated solely via that assignment
+    # ungraded topics do not have an assignment and have direct overrides and availability dates
+    @overridable ||= (asset.is_a?(DiscussionTopic) && asset.assignment) ? asset.assignment : asset
   end
 
   def update_assignment(assignment, params)
