@@ -39,6 +39,7 @@ const mapping = {
   fi: 'fi',
   fr: 'fr_FR',
   'fr-CA': 'fr_FR',
+  ga: 'ga',
   he: 'he_IL',
   ht: undefined, // tiny doesn't have Haitian Creole
   hu: 'hu_HU',
