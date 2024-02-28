@@ -29,21 +29,19 @@ import {
   outcomeGroupsMocks,
 } from '@canvas/outcomes/mocks/Outcomes'
 import {createCache} from '@canvas/apollo'
-import * as OutcomesImporter from '@canvas/outcomes/react/OutcomesImporter'
+import {showOutcomesImporter, showOutcomesImporterIfInProgress} from '@canvas/outcomes/react/OutcomesImporter'
 import {courseMocks, groupDetailMocks, groupMocks} from '@canvas/outcomes/mocks/Management'
 
-jest.mock('@canvas/outcomes/react/OutcomesImporter')
+jest.mock('@canvas/outcomes/react/OutcomesImporter', () => ({
+  showOutcomesImporter: jest.fn(() => jest.fn(() => {})),
+  showOutcomesImporterIfInProgress: jest.fn(() => jest.fn(() => {})),
+}))
 
 describe('OutcomeManagement', () => {
-  let cache, showOutcomesImporterMock, showOutcomesImporterIfInProgressMock
+  let cache
 
   beforeEach(() => {
     cache = createCache()
-    showOutcomesImporterMock = jest.spyOn(OutcomesImporter, 'showOutcomesImporter')
-    showOutcomesImporterIfInProgressMock = jest.spyOn(
-      OutcomesImporter,
-      'showOutcomesImporterIfInProgress'
-    )
     jest.useFakeTimers()
   })
 
@@ -51,6 +49,81 @@ describe('OutcomeManagement', () => {
     jest.clearAllMocks()
     jest.useRealTimers()
   })
+
+  /*
+    This test takes an average of 5.5 seconds to run.
+    For now, we are increaseing the timeout interval to 7.5 seconds
+  */
+  it('renders ManagementHeader with lhsGroupId if selected a group in lhs', async () => {
+    const rceEnv = {
+      RICH_CONTENT_CAN_UPLOAD_FILES: true,
+      RICH_CONTENT_APP_HOST: 'rce-host',
+      JWT: 'test-jwt',
+      current_user_id: '1',
+    }
+    window.ENV = {
+      context_asset_string: 'course_2',
+      CONTEXT_URL_ROOT: '/course/2',
+      IMPROVED_OUTCOMES_MANAGEMENT: true,
+      PERMISSIONS: {
+        manage_proficiency_calculations: true,
+        manage_outcomes: true,
+      },
+      current_user: {id: '1'},
+      ...rceEnv,
+    }
+    const mocks = [
+      ...courseMocks({childGroupsCount: 2}),
+      ...groupMocks({
+        title: 'Course folder 0',
+        groupId: '200',
+        parentOutcomeGroupTitle: 'Root course folder',
+        parentOutcomeGroupId: '2',
+      }),
+      ...groupDetailMocks({
+        title: 'Course folder 0',
+        groupId: '200',
+        contextType: 'Course',
+        contextId: '2',
+        withMorePage: false,
+      }),
+      ...groupMocks({
+        groupId: '300',
+        childGroupOffset: 400,
+        parentOutcomeGroupTitle: 'Course folder 0',
+        parentOutcomeGroupId: '200',
+      }),
+      ...groupDetailMocks({
+        groupId: '300',
+        contextType: 'Course',
+        contextId: '2',
+        withMorePage: false,
+      }),
+    ]
+    const {findByText, findByTestId, getByTestId} = render(
+      <MockedProvider cache={cache} mocks={mocks}>
+        <OutcomeManagement breakpoints={{tablet: true}} />
+      </MockedProvider>
+    )
+    jest.runAllTimers()
+
+    // Select a group in the lsh
+    const cf0 = await findByText('Course folder 0')
+    fireEvent.click(cf0)
+    jest.runAllTimers()
+
+    // The easy way to determine if lsh is passing to ManagementHeader is
+    // to open the create outcome modal and check if the lhs group was loaded
+    // by checking if the child of the lhs group is there
+    fireEvent.click(within(getByTestId('managementHeader')).getByText('Create'))
+    jest.runAllTimers()
+    // there's something weird going on in the test here that while we find the modal
+    // .toBeInTheDocument() fails, even though a findBy for it fails before ^that click.
+    // We can test that the elements expected to be within it exist.
+    const modal = await findByTestId('createOutcomeModal')
+    expect(within(modal).getByText('Course folder 0')).not.toBeNull()
+    expect(within(modal).getByText('Group 200 folder 0')).not.toBeNull()
+  }, 7500)  // Increase time to 7.5 seconds
 
   const sharedExamples = () => {
     beforeEach(() => {
@@ -101,7 +174,7 @@ describe('OutcomeManagement', () => {
         value: [file],
       })
       fireEvent.change(fileDrop)
-      expect(showOutcomesImporterMock).toHaveBeenCalled()
+      expect(showOutcomesImporter).toHaveBeenCalled()
     })
 
     it('checks for existing outcome imports when the user switches to the manage tab and renders the OutcomeManagementPanel', async () => {
@@ -112,8 +185,8 @@ describe('OutcomeManagement', () => {
       )
       expect(getByText(/^Loading$/)).toBeInTheDocument() // spinner
       await act(async () => jest.runAllTimers())
-      expect(showOutcomesImporterIfInProgressMock).toHaveBeenCalledTimes(1)
-      expect(showOutcomesImporterIfInProgressMock).toHaveBeenCalledWith(
+      expect(showOutcomesImporterIfInProgress).toHaveBeenCalledTimes(1)
+      expect(showOutcomesImporterIfInProgress).toHaveBeenCalledWith(
         {
           disableOutcomeViews: expect.any(Function),
           resetOutcomeViews: expect.any(Function),
@@ -126,7 +199,7 @@ describe('OutcomeManagement', () => {
       )
       fireEvent.click(getByText('Calculation'))
       fireEvent.click(getByText('Manage'))
-      expect(showOutcomesImporterIfInProgressMock).toHaveBeenCalledTimes(2)
+      expect(showOutcomesImporterIfInProgress).toHaveBeenCalledTimes(2)
       await act(async () => jest.runAllTimers())
       expect(getByTestId('outcomeManagementPanel')).toBeInTheDocument()
     })
@@ -395,89 +468,28 @@ describe('OutcomeManagement', () => {
     sharedExamples()
     courseOnlyTests()
   })
-
-  it.skip('renders ManagementHeader with lhsGroupId if selected a group in lhs', async () => {
-    window.ENV = {
-      context_asset_string: 'course_2',
-      CONTEXT_URL_ROOT: '/course/2',
-      IMPROVED_OUTCOMES_MANAGEMENT: true,
-      PERMISSIONS: {
-        manage_proficiency_calculations: true,
-        manage_outcomes: true,
-      },
-      current_user: {id: '1'},
-    }
-    const mocks = [
-      ...courseMocks({childGroupsCount: 2}),
-      ...groupMocks({
-        title: 'Course folder 0',
-        groupId: '200',
-        parentOutcomeGroupTitle: 'Root course folder',
-        parentOutcomeGroupId: '2',
-      }),
-      ...groupDetailMocks({
-        title: 'Course folder 0',
-        groupId: '200',
-        contextType: 'Course',
-        contextId: '2',
-        withMorePage: false,
-      }),
-      ...groupMocks({
-        groupId: '300',
-        childGroupOffset: 400,
-        parentOutcomeGroupTitle: 'Course folder 0',
-        parentOutcomeGroupId: '200',
-      }),
-      ...groupDetailMocks({
-        groupId: '300',
-        contextType: 'Course',
-        contextId: '2',
-        withMorePage: false,
-      }),
-    ]
-    const {findByText, findByTestId, getByTestId} = render(
-      <MockedProvider cache={cache} mocks={mocks}>
-        <OutcomeManagement breakpoints={{tablet: true}} />
-      </MockedProvider>
-    )
-    jest.runAllTimers()
-
-    // Select a group in the lsh
-    const cf0 = await findByText('Course folder 0')
-    fireEvent.click(cf0)
-    jest.runAllTimers()
-
-    // The easy way to determine if lsh is passing to ManagementHeader is
-    // to open the create outcome modal and check if the lhs group was loaded
-    // by checking if the child of the lhs group is there
-    fireEvent.click(within(getByTestId('managementHeader')).getByText('Create'))
-    jest.runAllTimers()
-    // there's something weird going on in the test here that while we find the modal
-    // .toBeInTheDocument() fails, even though a findBy for it fails before ^that click.
-    // We can test that the elements expected to be within it exist.
-    const modal = await findByTestId('createOutcomeModal')
-    expect(within(modal).getByText('Course folder 0')).not.toBeNull()
-    expect(within(modal).getByText('Group 200 folder 0')).not.toBeNull()
-  })
 })
 
 describe('OutcomePanel', () => {
   beforeEach(() => {
     document.body.innerHTML = '<div id="outcomes" style="display:none">Outcomes Tab</div>'
+    jest.useFakeTimers()
   })
 
   afterEach(() => {
     document.body.innerHTML = ''
   })
 
-  it.skip('sets style on mount', () => {
+  it('sets style on mount', () => {
     render(<OutcomePanel />)
-    expect(document.getElementById('outcomes').style.display).toBe('block')
+    jest.runAllTimers()
+    expect(document.getElementById('outcomes').style.display).toEqual('block')
   })
 
   it('sets style on unmount', () => {
     const {unmount} = render(<OutcomePanel />)
     unmount()
-    expect(document.getElementById('outcomes').style.display).toBe('none')
+    jest.runAllTimers()
+    expect(document.getElementById('outcomes').style.display).toEqual('none')
   })
 })
