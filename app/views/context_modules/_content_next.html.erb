@@ -38,8 +38,6 @@
 <% end %>
 
 <% if Account.site_admin.feature_enabled?(:instui_header) %>
-<% js_bundle :context_modules_header %>
-
 <%
 context_modules_header_props = {
   title: t("Modules"),

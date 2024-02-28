@@ -193,6 +193,13 @@ export function initPublishButton($el, data) {
   return view
 }
 
+export function setExpandAllButtonVisible(visible) {
+  const element = ENV.FEATURES.instui_header ? 
+    $('#expand_collapse_all').parent() : 
+    $('#expand_collapse_all')
+  visible ? element.show() : element.hide()
+}
+
 export function setExpandAllButton() {
   let someVisible = false
   $('#context_modules .context_module .content').each(function () {
