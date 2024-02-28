@@ -33,7 +33,7 @@ QUnit.module('PostAssignmentGradesTray Layout', suiteHooks => {
 
   function getAnonymousText() {
     const postText =
-      'When posting grades for anonymous assignments, grades will be posted for everyone in the course. Anonymity will be removed.'
+      'When posting grades for this anonymous assignment, grades will be posted for everyone assigned this item. Anonymity will be removed.'
     return [...$container.querySelectorAll('div')].find($el => $el.textContent === postText)
   }
 
