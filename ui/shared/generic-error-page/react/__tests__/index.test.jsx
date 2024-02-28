@@ -34,6 +34,7 @@ afterEach(() => {
 const defaultProps = () => ({
   errorSubject: 'Testing Stuff',
   errorCategory: 'Error Category',
+  errorMessage: 'Test Message',
   imageUrl: 'testurl',
 })
 
@@ -101,6 +102,7 @@ describe('GenericErrorPage component', () => {
     })
     const modifiedProps = defaultProps()
     modifiedProps.errorSubject = 'Testing Stuff'
+    modifiedProps.errorMessage = 'Test Message'
     const {getByText, getByPlaceholderText} = render(<GenericErrorPage {...modifiedProps} />)
     userEvent.click(getByText('Report Issue'))
     userEvent.type(getByPlaceholderText('email@example.com'), 'foo@bar.com')
@@ -109,6 +111,7 @@ describe('GenericErrorPage component', () => {
       const moxItem = moxios.requests.mostRecent()
       const requestData = JSON.parse(moxItem.config.data)
       expect(requestData.error.subject).toEqual(modifiedProps.errorSubject)
+      expect(requestData.error.message).toEqual(modifiedProps.errorMessage)
       expect(getByText('Comment submitted!')).toBeInTheDocument()
       done()
     })
@@ -124,6 +127,7 @@ describe('GenericErrorPage component', () => {
     })
     const modifiedProps = defaultProps()
     modifiedProps.errorSubject = 'Testing Stuff'
+    modifiedProps.errorMessage = 'Test Message'
     const {getByText, getByPlaceholderText} = render(<GenericErrorPage {...modifiedProps} />)
     userEvent.click(getByText('Report Issue'))
     userEvent.type(getByPlaceholderText('email@example.com'), 'foo@bar.com')
@@ -132,6 +136,7 @@ describe('GenericErrorPage component', () => {
       const moxItem = moxios.requests.mostRecent()
       const requestData = JSON.parse(moxItem.config.data)
       expect(requestData.error.subject).toEqual(modifiedProps.errorSubject)
+      expect(requestData.error.message).toEqual(modifiedProps.errorMessage)
       expect(getByText('Comment failed to post! Please try again later.')).toBeInTheDocument()
       done()
     })

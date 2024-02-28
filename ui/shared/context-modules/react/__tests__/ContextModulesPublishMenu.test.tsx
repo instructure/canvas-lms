@@ -21,7 +21,7 @@ import React from 'react'
 import {act, render, waitFor} from '@testing-library/react'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import ContextModulesPublishMenu from '../ContextModulesPublishMenu'
-import publishAllModulesHelperModule from '../../utils/publishAllModulesHelper'
+import {updateModulePendingPublishedStates} from '../../utils/publishAllModulesHelper'
 
 jest.mock('@canvas/do-fetch-api-effect')
 jest.mock('../../utils/publishAllModulesHelper', () => {
@@ -29,6 +29,7 @@ jest.mock('../../utils/publishAllModulesHelper', () => {
   return {
     __esmodule: true,
     ...originalModule,
+    updateModulePendingPublishedStates: jest.fn(),
   }
 })
 
@@ -84,11 +85,10 @@ describe('ContextModulesPublishMenu', () => {
           workflow_state: 'completed',
         },
       })
-      const spy = jest.spyOn(publishAllModulesHelperModule, 'updateModulePendingPublishedStates')
       render(<ContextModulesPublishMenu {...defaultProps} runningProgressId="17" />)
-      expect(spy).not.toHaveBeenCalled()
+      expect(updateModulePendingPublishedStates).not.toHaveBeenCalled()
       window.dispatchEvent(new Event('module-publish-models-ready'))
-      await waitFor(() => expect(spy).toHaveBeenCalled())
+      await waitFor(() => expect(updateModulePendingPublishedStates).toHaveBeenCalled())
     })
 
     describe('progress', () => {

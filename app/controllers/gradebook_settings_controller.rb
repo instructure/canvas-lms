@@ -38,17 +38,22 @@ class GradebookSettingsController < ApplicationController
   def gradebook_settings_params
     gradebook_settings_params = params.require(:gradebook_settings).permit(
       {
-        filter_columns_by: %i[
-          context_module_id
-          grading_period_id
-          assignment_group_id
-          submissions
-          start_date
-          end_date
+        filter_columns_by: [
+          :context_module_id,
+          { context_module_ids: [] },
+          :grading_period_id,
+          :assignment_group_id,
+          { assignment_group_ids: [] },
+          :submissions,
+          { submission_filters: [] },
+          :start_date,
+          :end_date
         ],
         filter_rows_by: [
           :section_id,
-          :student_group_id
+          { section_ids: [] },
+          :student_group_id,
+          { student_group_ids: [] }
         ],
         selected_view_options_filters: []
       },

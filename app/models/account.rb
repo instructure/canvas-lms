@@ -176,7 +176,7 @@ class Account < ActiveRecord::Base
 
   after_create :create_default_objects
 
-  serialize :settings, Hash
+  serialize :settings, type: Hash
   include TimeZoneHelper
 
   time_zone_attribute :default_time_zone, default: "America/Denver"
@@ -373,9 +373,6 @@ class Account < ActiveRecord::Base
   add_setting :smart_alerts_threshold, default: 36, root_only: true
 
   add_setting :disable_post_to_sis_when_grading_period_closed, boolean: true, root_only: true, default: false
-
-  # privacy settings for root accounts
-  add_setting :enable_fullstory, boolean: true, root_only: true, default: true
 
   add_setting :rce_favorite_tool_ids, inheritable: true
 
@@ -1018,7 +1015,7 @@ class Account < ActiveRecord::Base
   end
 
   def self.account_chain_ids(starting_account_id)
-    block = lambda do |_name|
+    block = proc do
       original_shard = Shard.current
       Shard.shard_for(starting_account_id).activate do
         id_chain = []
@@ -1044,7 +1041,7 @@ class Account < ActiveRecord::Base
       end
     end
     key = Account.cache_key_for_id(starting_account_id, :account_chain)
-    key ? Rails.cache.fetch(["account_chain_ids", key], &block) : block.call(nil)
+    key ? Rails.cache.fetch(["account_chain_ids", key], &block) : block.call
   end
 
   def self.multi_account_chain_ids(starting_account_ids)
@@ -1483,9 +1480,6 @@ class Account < ActiveRecord::Base
     # any user with an admin enrollment in one of the courses can read
     given { |user| !site_admin? && user && courses.where(id: user.enrollments.active.admin.pluck(:course_id)).exists? }
     can [:read, :read_files]
-
-    given { |user| !site_admin? && primary_settings_root_account? && grants_right?(user, :manage_site_settings) }
-    can :manage_privacy_settings
 
     given do |user|
       root_account? && grants_right?(user, :read_roster) &&

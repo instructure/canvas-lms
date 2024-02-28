@@ -25,7 +25,7 @@ import {changeTimezone} from '../changeTimezone'
 import DatetimeField from './DatetimeField'
 import renderDatepickerTime from '../react/components/render-datepicker-time'
 import '@canvas/jquery-keycodes'
-import 'jqueryui/datepicker'
+import 'jqueryui-unpatched/datepicker'
 
 const I18n = useI18nScope('instructure_date_and_time')
 

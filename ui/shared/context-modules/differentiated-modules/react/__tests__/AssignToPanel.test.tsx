@@ -24,6 +24,16 @@ import * as utils from '../../utils/assignToHelper'
 import fetchMock from 'fetch-mock'
 import userEvent from '@testing-library/user-event'
 
+jest.mock('../../utils/assignToHelper', () => {
+  const originalModule = jest.requireActual('../../utils/assignToHelper')
+
+  return {
+    __esModule: true,
+    ...originalModule,
+    updateModuleUI: jest.fn(),
+  }
+})
+
 describe('AssignToPanel', () => {
   const props: AssignToPanelProps = {
     courseId: '1',
@@ -236,10 +246,8 @@ describe('AssignToPanel', () => {
       expect(requestBody).toEqual(expectedPayload)
     })
 
-    // LF-1169 - remove or rewrite to remove spies on imports
-    it.skip('updates the modules UI', async () => {
+    it('updates the modules UI', async () => {
       fetchMock.put(ASSIGNMENT_OVERRIDES_URL, {})
-      jest.spyOn(utils, 'updateModuleUI')
       const {findByRole} = renderComponent()
       const updateButton = await findByRole('button', {name: 'Save'})
       updateButton.click()

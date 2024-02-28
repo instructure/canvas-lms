@@ -22,6 +22,7 @@ module Canvas
     include TextHelper
     def lock_explanation(hash, type, context = nil, options = {})
       include_js = options.fetch(:include_js, true)
+      url_options = options.key?(:only_path) ? { only_path: options[:only_path] } : {}
       # Any additions to this function should also be made in javascripts/content_locks.js
       if hash[:lock_at]
         case type
@@ -153,7 +154,7 @@ module Canvas
           html << "<div class='spinner'></div>".html_safe
           html << I18n.t("messages.visit_modules_page",
                          "*Visit the course modules page for information on how to unlock this content.*",
-                         wrapper: "<a #{"style='display: none;'" if include_js} class='module_prerequisites_fallback' href='#{course_context_modules_url((context || obj.context), anchor: "module_#{obj.id}")}'>\\1</a>")
+                         wrapper: "<a #{"style='display: none;'" if include_js} class='module_prerequisites_fallback' href='#{course_context_modules_url((context || obj.context), anchor: "module_#{obj.id}", **url_options)}'>\\1</a>")
           html << "<a x-canvaslms-trusted-url='#{course_context_module_prerequisites_needing_finishing_path((context || obj.context).id, obj.id, hash[:asset_string])}' style='display: none;' id='module_prerequisites_lookup_link'>&nbsp;</a>".html_safe
           js_bundle :prerequisites_lookup if include_js
         end

@@ -910,6 +910,17 @@ describe SectionsController, type: :request do
                  expected_status: 404)
       end
 
+      it "fails if the destination course is a blueprint" do
+        MasterCourses::MasterTemplate.set_as_master_course(@dest_course)
+        json = api_call(:post,
+                        "/api/v1/sections/#{@section.id}/crosslist/#{@dest_course.id}",
+                        @params.merge(id: @section.to_param, new_course_id: @dest_course.to_param),
+                        {},
+                        {},
+                        expected_status: 403)
+        expect(json["error"]).to eq "cannot crosslist into blueprint courses"
+      end
+
       it "fails if the destination course is under a different root account" do
         foreign_account = Account.create!
         foreign_course = foreign_account.courses.create!
@@ -928,6 +939,15 @@ describe SectionsController, type: :request do
                         "/courses/#{@course.id}/sections/#{@section.id}/crosslist/confirm/#{@dest_course.sis_source_id}",
                         @params.merge(action: "crosslist_check", course_id: @course.to_param, section_id: @section.to_param, new_course_id: @dest_course.sis_source_id))
         expect(json["course"]["id"]).to eql @dest_course.id
+      end
+
+      it "does not confirm crosslisting if the destination course is a blueprint" do
+        MasterCourses::MasterTemplate.set_as_master_course(@dest_course)
+        user_session(@admin)
+        json = api_call(:get,
+                        "/courses/#{@course.id}/sections/#{@section.id}/crosslist/confirm/#{@dest_course.id}",
+                        @params.merge(action: "crosslist_check", course_id: @course.to_param, section_id: @section.to_param, new_course_id: @dest_course.id))
+        expect(json["allowed"]).to be false
       end
 
       it "does not confirm crosslisting when the caller lacks :manage rights on the destination course" do

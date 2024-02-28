@@ -30,7 +30,7 @@ const TopNav = () => {
     <TopNavBar inverseColor={true} width="100%">
       {() => (
         <TopNavBar.Layout
-          navLabel="Change this"
+          navLabel="Top Navigation"
           desktopConfig={{
             hideActionsUserSeparator: false,
           }}
@@ -42,7 +42,9 @@ const TopNav = () => {
             <TopNavBar.Breadcrumb onClick={() => toggle()}>
               <Breadcrumb label="test">
                 {breadCrumbs?.map(crumb => (
-                  <Breadcrumb.Link key={crumb.name}>{crumb.name}</Breadcrumb.Link>
+                  <Breadcrumb.Link key={crumb.name} href={crumb.url}>
+                    {crumb.name}
+                  </Breadcrumb.Link>
                 ))}
               </Breadcrumb>
             </TopNavBar.Breadcrumb>

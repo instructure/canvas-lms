@@ -6,3 +6,5 @@ source "https://rubygems.org"
 gemspec
 
 gem "canvas_text_helper", path: "../canvas_text_helper"
+
+eval_gemfile(gemfile.dirname.join("../gemfile_prefix.rb"))

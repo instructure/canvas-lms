@@ -30,11 +30,26 @@ const RUBRIC_QUERY = gql`
       title
       hidePoints
       workflowState
+      pointsPossible
+      criteria {
+        id: _id
+        ratings {
+          description
+          longDescription
+          points
+        }
+        points
+        longDescription
+        description
+      }
     }
   }
 `
 
-export type RubricQueryResponse = Pick<Rubric, 'id' | 'title' | 'criteria' | 'hidePoints'>
+export type RubricQueryResponse = Pick<
+  Rubric,
+  'id' | 'title' | 'criteria' | 'hidePoints' | 'pointsPossible'
+>
 
 type FetchRubricResponse = {
   rubric: RubricQueryResponse
@@ -55,6 +70,22 @@ export const saveRubric = async (rubric: RubricFormProps): Promise<RubricQueryRe
   const url = `${urlPrefix}/rubrics/${id ?? ''}`
   const method = id ? 'PATCH' : 'POST'
 
+  const criteria = rubric.criteria.map(criterion => {
+    return {
+      id: criterion.id,
+      description: criterion.description,
+      long_description: criterion.longDescription,
+      points: criterion.points,
+      learning_outcome_id: criterion.learningOutcomeId,
+      ratings: criterion.ratings.map(rating => ({
+        description: rating.description,
+        long_description: rating.longDescription,
+        points: rating.points,
+        id: rating.id,
+      })),
+    }
+  })
+
   const response = await fetch(url, {
     method,
     headers: {
@@ -66,6 +97,7 @@ export const saveRubric = async (rubric: RubricFormProps): Promise<RubricQueryRe
       rubric: {
         title,
         hide_points: hidePoints,
+        criteria,
       },
       rubric_association: {
         association_id: accountId ?? courseId,
@@ -89,5 +121,6 @@ export const saveRubric = async (rubric: RubricFormProps): Promise<RubricQueryRe
     title: savedRubric.title,
     hidePoints: savedRubric.hide_points,
     criteria: savedRubric.criteria,
+    pointsPossible: savedRubric.points_possible,
   }
 }

@@ -23,6 +23,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
 import LoadingIndicator from '@canvas/loading-indicator/react'
 import {useQuery, useMutation, queryClient} from '@canvas/query'
+import type {RubricCriterion} from '@canvas/rubrics/react/types/rubric'
 import {Alert} from '@instructure/ui-alerts'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {View} from '@instructure/ui-view'
@@ -41,7 +42,8 @@ import {Link} from '@instructure/ui-link'
 import {RubricCriteriaRow} from './RubricCriteriaRow'
 import {NewCriteriaRow} from './NewCriteriaRow'
 import {fetchRubric, saveRubric, type RubricQueryResponse} from '../../queries/RubricFormQueries'
-import {type RubricFormProps, type RubricFormValueTypes} from '../../types/RubricForm'
+import type {RubricFormProps} from '../../types/RubricForm'
+import {CriterionModal} from './CriterionModal'
 
 const I18n = useI18nScope('rubrics-form')
 
@@ -50,6 +52,8 @@ const {Option: SimpleSelectOption} = SimpleSelect
 const defaultRubricForm: RubricFormProps = {
   title: '',
   hidePoints: false,
+  criteria: [],
+  pointsPossible: 0,
 }
 
 const translateRubricData = (fields: RubricQueryResponse): RubricFormProps => {
@@ -57,6 +61,8 @@ const translateRubricData = (fields: RubricQueryResponse): RubricFormProps => {
     id: fields.id,
     title: fields.title ?? '',
     hidePoints: fields.hidePoints ?? false,
+    criteria: fields.criteria ?? [],
+    pointsPossible: fields.pointsPossible ?? 0,
   }
 }
 
@@ -69,6 +75,9 @@ export const RubricForm = () => {
     accountId,
     courseId,
   })
+
+  const [selectedCriterion, setSelectedCriterion] = useState<RubricCriterion>()
+  const [isCriterionModalOpen, setIsCriterionModalOpen] = useState(false)
 
   const header = rubricId ? I18n.t('Edit Rubric') : I18n.t('Create New Rubric')
 
@@ -94,13 +103,38 @@ export const RubricForm = () => {
     },
   })
 
-  const setRubricFormField = (field: keyof RubricFormProps, value: RubricFormValueTypes) => {
-    setRubricForm(prevState => ({...prevState, [field]: value}))
+  const setRubricFormField = <K extends keyof RubricFormProps>(
+    key: K,
+    value: RubricFormProps[K]
+  ) => {
+    setRubricForm(prevState => ({...prevState, [key]: value}))
   }
 
   const formValid = () => {
     // Add more form validation here
     return rubricForm.title.trim().length > 0
+  }
+
+  const openCriterionModal = (criterion?: RubricCriterion) => {
+    setSelectedCriterion(criterion)
+    setIsCriterionModalOpen(true)
+  }
+
+  const handleSaveCriterion = (updatedCriteria: RubricCriterion) => {
+    const criteria = [...rubricForm.criteria]
+
+    const criterionIndexToUpdate = criteria.findIndex(c => c.id === updatedCriteria.id)
+
+    if (criterionIndexToUpdate < 0) {
+      criteria.push(updatedCriteria)
+    } else {
+      criteria[criterionIndexToUpdate] = updatedCriteria
+    }
+
+    const newPointsPossible = criteria.reduce((acc, c) => acc + c.points, 0)
+    setRubricFormField('pointsPossible', newPointsPossible)
+    setRubricFormField('criteria', criteria)
+    setIsCriterionModalOpen(false)
   }
 
   useEffect(() => {
@@ -194,7 +228,7 @@ export const RubricForm = () => {
           </Flex.Item>
           <Flex.Item>
             <Text weight="bold" size="xx-large" themeOverride={{fontWeightBold: 400}}>
-              10
+              {rubricForm.pointsPossible}
             </Text>
             <View as="span" margin="0 0 0 small">
               <Text weight="light" size="x-large">
@@ -213,9 +247,19 @@ export const RubricForm = () => {
           overflowX="hidden"
           as="main"
         >
-          <RubricCriteriaRow />
+          {rubricForm.criteria.map((criterion, index) => (
+            <RubricCriteriaRow
+              key={criterion.id}
+              criterion={criterion}
+              rowIndex={index + 1}
+              onEditCriterion={() => openCriterionModal(criterion)}
+            />
+          ))}
 
-          <NewCriteriaRow />
+          <NewCriteriaRow
+            rowIndex={rubricForm.criteria.length + 1}
+            onEditCriterion={() => openCriterionModal()}
+          />
         </Flex.Item>
       </Flex>
 
@@ -272,6 +316,13 @@ export const RubricForm = () => {
           </Flex.Item>
         </Flex>
       </div>
+
+      <CriterionModal
+        criterion={selectedCriterion}
+        isOpen={isCriterionModalOpen}
+        onDismiss={() => setIsCriterionModalOpen(false)}
+        onSave={(updatedCriteria: RubricCriterion) => handleSaveCriterion(updatedCriteria)}
+      />
     </View>
   )
 }

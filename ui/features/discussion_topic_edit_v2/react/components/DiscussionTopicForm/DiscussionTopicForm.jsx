@@ -48,6 +48,7 @@ import {AttachmentDisplay} from '@canvas/discussions/react/components/Attachment
 import {responsiveQuerySizes} from '@canvas/discussions/react/utils'
 import {UsageRightsContainer} from '../../containers/usageRights/UsageRightsContainer'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 import {
   addNewGroupCategoryToCache,
@@ -70,12 +71,17 @@ export default function DiscussionTopicForm({
   apolloClient,
 }) {
   const rceRef = useRef()
+  const textInputRef = useRef()
+  const sectionInputRef = useRef()
+  const dateInputRef = useRef()
+  const groupOptionsRef = useRef()
+  const gradedDiscussionRef = useRef()
   const {setOnFailure} = useContext(AlertManagerContext)
 
-  const isAnnouncement = ENV.DISCUSSION_TOPIC?.ATTRIBUTES?.is_announcement ?? false
+  const isAnnouncement = ENV?.DISCUSSION_TOPIC?.ATTRIBUTES?.is_announcement ?? false
   const isUnpublishedAnnouncement =
     isAnnouncement && !ENV.DISCUSSION_TOPIC?.ATTRIBUTES.course_published
-  const isEditingAnnouncement = isAnnouncement && ENV.DISCUSSION_TOPIC?.ATTRIBUTES.id
+  const isEditingAnnouncement = isAnnouncement && ENV?.DISCUSSION_TOPIC?.ATTRIBUTES.id
   const published = currentDiscussionTopic?.published ?? false
 
   const announcementAlertProps = () => {
@@ -187,24 +193,25 @@ export default function DiscussionTopicForm({
   const [peerReviewDueDate, setPeerReviewDueDate] = useState(
     currentDiscussionTopic?.assignment?.peerReviews?.dueAt || ''
   )
-  const [dueDateErrorMessages, setDueDateErrorMessages] = useState([])
   const [assignedInfoList, setAssignedInfoList] = useState(
     isEditing
       ? buildAssignmentOverrides(currentDiscussionTopic?.assignment)
       : buildDefaultAssignmentOverride()
   )
 
+  const [gradedDiscussionRefMap, setGradedDiscussionRefMap] = useState(new Map())
+
   const assignmentDueDateContext = {
     assignedInfoList,
     setAssignedInfoList,
-    dueDateErrorMessages,
-    setDueDateErrorMessages,
     studentEnrollments,
     sections,
     groups:
       groupCategories.find(groupCategory => groupCategory._id === groupCategoryId)?.groupsConnection
         ?.nodes || [],
     groupCategoryId,
+    gradedDiscussionRefMap,
+    setGradedDiscussionRefMap,
   }
   const [showGroupCategoryModal, setShowGroupCategoryModal] = useState(false)
 
@@ -315,6 +322,10 @@ export default function DiscussionTopicForm({
   }
 
   const validateAvailability = (newAvailableFrom, newAvailableUntil) => {
+    if (isGraded) {
+      return true
+    }
+
     if (newAvailableFrom === null || newAvailableUntil === null) {
       setAvailabilityValidationMessages([{text: '', type: 'success'}])
       return true
@@ -367,78 +378,50 @@ export default function DiscussionTopicForm({
     }
   }
 
+  const validateGradedDiscussionFields = () => {
+    if (!isGraded) {
+      return true
+    }
+
+    for (const refMap of gradedDiscussionRefMap.values()) {
+      for (const value of Object.values(refMap)) {
+        if (value !== null) {
+          gradedDiscussionRef.current = value.current
+          return false
+        }
+      }
+    }
+    gradedDiscussionRef.current = null
+    return true
+  }
+
   const validateFormFields = () => {
     let isValid = true
 
-    if (!validateTitle(title)) isValid = false
-    if (!validateAvailability(availableFrom, availableUntil)) isValid = false
-    if (!validateSelectGroup()) isValid = false
-    if (!validateAssignToFields()) isValid = false
-    if (!validateUsageRights()) isValid = false
-    if (!validatePostToSections()) isValid = false
+    const validationRefs = [
+      {validationFunction: validateTitle(title), ref: textInputRef.current},
+      {validationFunction: validatePostToSections(), ref: sectionInputRef.current},
+      {validationFunction: validateSelectGroup(), ref: groupOptionsRef.current},
+      {
+        validationFunction: validateAvailability(availableFrom, availableUntil),
+        ref: dateInputRef.current,
+      },
+      {validationFunction: validateGradedDiscussionFields(), ref: gradedDiscussionRef.current},
+      {validationFunction: validateUsageRights(), ref: null},
+    ]
+
+    const inValidFields = []
+
+    validationRefs.forEach(({validationFunction, ref}) => {
+      if (!validationFunction) {
+        if (ref) inValidFields.push(ref)
+        isValid = false
+      }
+    })
+
+    inValidFields[0]?.focus()
 
     return isValid
-  }
-
-  const validateAssignToFields = () => {
-    // as validation is not required if not graded.
-    if (!isGraded) return true
-
-    const missingAssignToOptionError = {
-      text: I18n.t('Please select at least one option.'),
-      type: 'error',
-    }
-
-    // Validate each assignedInfo and collect errors.
-    const errors = assignedInfoList.reduce((foundErrors, currentAssignedInfo) => {
-      const isAssignedListInvalid =
-        !currentAssignedInfo.assignedList ||
-        !Array.isArray(currentAssignedInfo.assignedList) ||
-        currentAssignedInfo.assignedList.length === 0
-
-      if (isAssignedListInvalid) {
-        foundErrors.push({
-          dueDateId: currentAssignedInfo.dueDateId,
-          message: missingAssignToOptionError,
-        })
-      }
-
-      const illegalGroupCategoryError = {
-        text: I18n.t('Groups can only be part of the actively selected group set.'),
-        type: 'error',
-      }
-
-      const availableAssetCodes =
-        groupCategories
-          .find(groupCategory => groupCategory._id === groupCategoryId)
-          ?.groupsConnection?.nodes.map(group => `group_${group._id}`) || []
-
-      if (
-        currentAssignedInfo.assignedList.filter(assetCode => {
-          if (assetCode.includes('group')) {
-            return !availableAssetCodes.includes(assetCode)
-          } else {
-            return false
-          }
-        }).length > 0
-      ) {
-        foundErrors.push({
-          dueDateId: currentAssignedInfo.dueDateId,
-          message: illegalGroupCategoryError,
-        })
-      }
-
-      return foundErrors
-    }, [])
-
-    // If there are errors, set the error state and return false.
-    if (errors.length > 0) {
-      setDueDateErrorMessages(errors)
-      return false
-    }
-
-    // All assignedLists are valid if no errors were found.
-    return true
   }
 
   const prepareOverride = (
@@ -554,7 +537,7 @@ export default function DiscussionTopicForm({
       ? null
       : {
           automaticReviews: peerReviewAssignment === 'automatically',
-          count: peerReviewsPerStudent,
+          count: !isEditing && peerReviewAssignment === 'manually' ? 0 : peerReviewsPerStudent,
           enabled: true,
           dueAt: peerReviewDueDate || null,
           intraReviews: intraGroupPeerReviews,
@@ -583,10 +566,7 @@ export default function DiscussionTopicForm({
       dueAt: everyoneOverride.dueDate || null,
       lockAt: everyoneOverride.availableUntil || null,
       unlockAt: everyoneOverride.availableFrom || null,
-      onlyVisibleToOverrides: assignedInfoList.every(
-        info =>
-          info.assignedList.length === 1 && info.assignedList[0] === defaultEveryoneOption.assetCode
-      ),
+      onlyVisibleToOverrides: !Object.keys(everyoneOverride).length,
       gradingStandardId: gradingSchemeId || null,
     }
     // Additional properties for creation of a graded assignment
@@ -595,7 +575,6 @@ export default function DiscussionTopicForm({
         ...payload,
         courseId: ENV.context_id,
         name: title,
-        groupCategoryId: isGroupDiscussion ? groupCategoryId : null,
       }
     }
     return payload
@@ -703,6 +682,13 @@ export default function DiscussionTopicForm({
 
   return (
     <>
+      <ScreenReaderContent>
+        {title ? (
+          <h1>{title}</h1>
+        ) : (
+          <h1>{isAnnouncement ? I18n.t('New Announcement') : I18n.t('New Discussion')}</h1>
+        )}
+      </ScreenReaderContent>
       <FormFieldGroup description="" rowSpacing="small">
         {(isUnpublishedAnnouncement || isEditingAnnouncement) && (
           <Alert variant={announcementAlertProps().variant}>{announcementAlertProps().text}</Alert>
@@ -712,6 +698,7 @@ export default function DiscussionTopicForm({
           type={I18n.t('text')}
           placeholder={I18n.t('Topic Title')}
           value={title}
+          ref={textInputRef}
           onChange={(_event, value) => {
             validateTitle(value)
             const newTitle = value.substring(0, 255)
@@ -759,6 +746,9 @@ export default function DiscussionTopicForm({
               selectedOptionIds={sectionIdsToPostTo}
               onChange={handlePostToSelect}
               width={inputWidth}
+              setInputRef={ref => {
+                sectionInputRef.current = ref
+              }}
             >
               {[allSectionsOption, ...sections].map(({id, name: label}) => (
                 <CanvasMultiSelect.Option
@@ -857,8 +847,8 @@ export default function DiscussionTopicForm({
               invalidDateTimeMessage={I18n.t('Invalid date and time')}
               layout="columns"
               datePlaceholder={I18n.t('Select Date')}
-              dateRenderLabel=""
-              timeRenderLabel=""
+              dateRenderLabel={I18n.t('Date')}
+              timeRenderLabel={I18n.t('Time')}
             />
           )}
           {shouldShowAnnouncementOnlyOptions && (
@@ -955,11 +945,12 @@ export default function DiscussionTopicForm({
                   display="block"
                   padding="none none none large"
                   data-testid="todo-date-section"
+                  margin="small 0 0 0"
                 >
                   <DateTimeInput
                     description=""
-                    dateRenderLabel=""
-                    timeRenderLabel=""
+                    dateRenderLabel={I18n.t('Date')}
+                    timeRenderLabel={I18n.t('Time')}
                     prevMonthLabel={I18n.t('previous')}
                     nextMonthLabel={I18n.t('next')}
                     onChange={(_event, newDate) => setTodoDate(newDate)}
@@ -1004,6 +995,9 @@ export default function DiscussionTopicForm({
                 placeholder={I18n.t('Select a group category')}
                 width={inputWidth}
                 disabled={!canGroupDiscussion}
+                inputRef={ref => {
+                  groupOptionsRef.current = ref
+                }}
               >
                 {groupCategories.map(({_id: id, name: label}) => (
                   <SimpleSelect.Option
@@ -1091,8 +1085,8 @@ export default function DiscussionTopicForm({
             <FormFieldGroup description="" width={inputWidth}>
               <DateTimeInput
                 description={I18n.t('Available from')}
-                dateRenderLabel=""
-                timeRenderLabel=""
+                dateRenderLabel={I18n.t('Date')}
+                timeRenderLabel={I18n.t('Time')}
                 prevMonthLabel={I18n.t('previous')}
                 nextMonthLabel={I18n.t('next')}
                 value={availableFrom}
@@ -1106,9 +1100,9 @@ export default function DiscussionTopicForm({
               />
               <DateTimeInput
                 description={I18n.t('Until')}
-                dateRenderLabel=""
-                timeRenderLabel=""
-                prevMonthLabel={I18n.t('previous')}
+                dateRenderLabel={I18n.t('Date')}
+                timeRenderLabel={I18n.t('Time')}
+                prevMonthLabel={I18n.t('Time')}
                 nextMonthLabel={I18n.t('next')}
                 value={availableUntil}
                 onChange={(_event, newAvailableUntil) => {
@@ -1119,6 +1113,9 @@ export default function DiscussionTopicForm({
                 invalidDateTimeMessage={I18n.t('Invalid date and time')}
                 messages={availabilityValidationMessages}
                 layout="columns"
+                dateInputRef={ref => {
+                  dateInputRef.current = ref
+                }}
               />
             </FormFieldGroup>
           ))}

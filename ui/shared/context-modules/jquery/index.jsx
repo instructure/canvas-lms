@@ -46,6 +46,7 @@ import 'jqueryui/dialog'
 import '@canvas/util/jquery/fixDialogButtons'
 import '@canvas/jquery/jquery.instructure_misc_helpers' /* /\$\.underscore/ */
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* .dim, confirmDelete, fragmentChange, showIf */
+import '@canvas/jquery/jquery.simulate'
 import '@canvas/jquery-keycodes'
 import '@canvas/loading-image'
 import '@canvas/util/templateData' /* fillTemplateData, getTemplateData */
@@ -515,6 +516,7 @@ window.modules = (function () {
               $('#context_modules_sortable_container').removeClass('item-group-container--is-empty')
             }
           },
+          zIndex: 1000,
         })
         .dialog('open')
       $module.removeClass('dont_remove')
@@ -611,7 +613,10 @@ window.modules = (function () {
           const $a = $assignToMenuItem.find('a')
           $a.attr('data-item-id', data.id)
           $a.attr('data-item-name', data.title)
-          $a.attr('data-item-type', data.quiz_lti ? 'lti-quiz' : data.content_type == 'Quizzes::Quiz' ? 'quiz' : data.type)
+          $a.attr(
+            'data-item-type',
+            data.quiz_lti ? 'lti-quiz' : data.content_type == 'Quizzes::Quiz' ? 'quiz' : data.type
+          )
           $a.attr('data-item-context-id', data.context_id)
           $a.attr('data-item-context-type', data.context_type)
           $a.attr('data-item-content-id', data.content_id)
@@ -663,7 +668,7 @@ window.modules = (function () {
       if (cyoe.isReleased) {
         const fullText = I18n.t('Released by Mastery Path: %{path}', {path: cyoe.releasedLabel})
         const $pathIcon = $(
-          '<span class="pill mastery-path-icon" aria-hidden="true" data-tooltip><i class="icon-mastery-path" /></span>'
+          '<span class="pill mastery-path-icon" aria-hidden="true" data-tooltip><i class="icon-mastery-paths" /></span>'
         )
           .attr('title', fullText)
           .append(htmlEscape(cyoe.releasedLabel))
@@ -1451,7 +1456,14 @@ modules.initModuleManagement = function (duplicate) {
           $('#edit_item_form').hideErrors()
           $cogLink.focus()
         },
+        open() {
+          const titleClose = $(this).parent().find('.ui-dialog-titlebar-close')
+          if (titleClose.length) {
+            titleClose.trigger('focus')
+          }
+        },
         minWidth: 320,
+        modal: true,
       })
       .fixDialogButtons()
   })

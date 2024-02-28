@@ -6,7 +6,7 @@ module Bundler
       module Source
         ::Bundler::Source.prepend(self)
 
-        def print_using_message(...)
+        def print_using_message(*)
           return if Bundler.settings[:suppress_install_using_messages]
 
           super

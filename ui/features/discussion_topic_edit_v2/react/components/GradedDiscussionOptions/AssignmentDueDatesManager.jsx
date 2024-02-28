@@ -47,16 +47,16 @@ export const AssignmentDueDatesManager = () => {
     studentEnrollments,
     sections,
     groups,
-    dueDateErrorMessages,
-    setDueDateErrorMessages,
+    gradedDiscussionRefMap,
+    setGradedDiscussionRefMap,
   } = useContext(GradedDiscussionDueDatesContext)
   const [listOptions, setListOptions] = useState({
     '': getDefaultBaseOptions(ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED, defaultEveryoneOption),
     'Course Sections': sections.map(section => {
       return {assetCode: `course_section_${section?.id}`, label: section?.name}
     }),
-    Students: studentEnrollments.map(enrollment => {
-      return {assetCode: `user_${enrollment?.user?._id}`, label: enrollment?.user?.name}
+    Students: studentEnrollments.map(user => {
+      return {assetCode: `user_${user?._id}`, label: user?.name}
     }),
     Groups: groups?.map(group => {
       return {assetCode: `group_${group?._id}`, label: group?.name}
@@ -68,9 +68,6 @@ export const AssignmentDueDatesManager = () => {
       info.dueDateId === dueDateId ? {...info, ...newInfo} : info
     )
     setAssignedInfoList(updatedInfoList)
-    // Remove the error message for the dueDateId if it exists
-    const updatedErrorMessages = dueDateErrorMessages.filter(error => error.dueDateId !== dueDateId)
-    setDueDateErrorMessages(updatedErrorMessages)
   }
 
   const handleAddAssignment = () => {
@@ -89,6 +86,8 @@ export const AssignmentDueDatesManager = () => {
   const handleCloseAssignmentDueDate = dueDateId => () => {
     const updatedInfoList = assignedInfoList.filter(info => info.dueDateId !== dueDateId)
     setAssignedInfoList(updatedInfoList)
+    gradedDiscussionRefMap.delete(dueDateId)
+    setGradedDiscussionRefMap(new Map(gradedDiscussionRefMap))
   }
 
   const getAvailableOptionsFor = dueDateId => {
@@ -126,8 +125,8 @@ export const AssignmentDueDatesManager = () => {
       'Course Sections': sections.map(section => {
         return {assetCode: `course_section_${section?.id}`, label: section?.name}
       }),
-      Students: studentEnrollments.map(enrollment => {
-        return {assetCode: `user_${enrollment?.user?._id}`, label: enrollment?.user?.name}
+      Students: studentEnrollments.map(user => {
+        return {assetCode: `user_${user?._id}`, label: user?.name}
       }),
       Groups: groups?.map(group => {
         return {assetCode: `group_${group?._id}`, label: group?.name}
@@ -181,9 +180,6 @@ export const AssignmentDueDatesManager = () => {
                   onAssignedInfoChange={newInfo =>
                     handleAssignedInfoChange(newInfo, info.dueDateId)
                   }
-                  assignToErrorMessages={dueDateErrorMessages
-                    ?.filter(element => element.dueDateId === info.dueDateId && element.message)
-                    .map(element => element.message)}
                 />
               </div>
             </View>

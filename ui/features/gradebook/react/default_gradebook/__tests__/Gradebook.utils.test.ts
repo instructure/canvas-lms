@@ -29,20 +29,22 @@ import {
   getDefaultSettingKeyForColumnType,
   getGradeAsPercent,
   getStudentGradeForColumn,
+  idArraysEqual,
   isGradedOrExcusedSubmissionUnposted,
   maxAssignmentCount,
   onGridKeyDown,
   otherGradingPeriodAssignmentIds,
   sectionList,
   getLabelForFilter,
+  formatGradingPeriodTitleForDisplay,
 } from '../Gradebook.utils'
 import {isDefaultSortOrder, localeSort} from '../Gradebook.sorting'
 import {createGradebook} from './GradebookSpecHelper'
 import {fireEvent, screen, waitFor} from '@testing-library/dom'
 import type {FilterPreset, Filter} from '../gradebook.d'
 import type {SlickGridKeyboardEvent} from '../grid.d'
-import type {Submission, Student, Enrollment} from '../../../../../api.d'
-import {enrollment, student, enrollmentFilter, appliedFilters} from './fixtures'
+import type {Submission, Student, Enrollment, GradingPeriod} from '../../../../../api.d'
+import {enrollment, student, enrollmentFilter, appliedFilters, student2} from './fixtures'
 
 const unsubmittedSubmission: Submission = {
   anonymous_id: 'dNq5T',
@@ -155,6 +157,24 @@ describe('getStudentGradeForColumn', () => {
     const grade = getStudentGradeForColumn(student, 'total_grade')
     expect(grade.score).toStrictEqual(null)
     expect(grade.possible).toStrictEqual(0)
+  })
+})
+
+describe('idArraysEqual', () => {
+  it('returns true when passed two sets of ids with the same contents', () => {
+    expect(idArraysEqual(['1', '2'], ['1', '2'])).toStrictEqual(true)
+  })
+
+  it('returns true when passed two sets of ids with the same contents in different order', () => {
+    expect(idArraysEqual(['2', '1'], ['1', '2'])).toStrictEqual(true)
+  })
+
+  it('returns true when passed two empty arrays', () => {
+    expect(idArraysEqual([], [])).toStrictEqual(true)
+  })
+
+  it('returns false when passed two different sets of ids', () => {
+    expect(idArraysEqual(['1'], ['1', '2'])).toStrictEqual(false)
   })
 })
 
@@ -629,6 +649,12 @@ describe('filterStudentBySectionFn', () => {
     const enrollmentFilterTest = {...enrollmentFilter}
     const appliedFilterTest = [...appliedFilters]
     let modifiedStudents: Student[]
+    const enrollment3: Enrollment = {
+      ...enrollment,
+      course_section_id: 'section2',
+      enrollment_state: 'active',
+    }
+    const modifiedStudent2: Student = {...student2, enrollments: [enrollment3]}
     beforeEach(() => {
       const enrollment1: Enrollment = {
         ...enrollment,
@@ -667,6 +693,52 @@ describe('filterStudentBySectionFn', () => {
       )
       expect(filteredStudentsSection2[0].name).toBe('Jim Doe')
     })
+
+    it('filteredStudents include all students when appliedFilters includes multiple sections when multiselect_gradebook_filters_enabled is true', () => {
+      modifiedStudents.push(modifiedStudent2)
+      ENV.GRADEBOOK_OPTIONS = {multiselect_gradebook_filters_enabled: true}
+      const appliedFilters: Filter[] = [
+        {
+          id: '1',
+          type: 'section',
+          created_at: '',
+          value: 'section1',
+        },
+        {
+          id: '1',
+          type: 'section',
+          created_at: '',
+          value: 'section2',
+        },
+      ]
+      const filteredStudents = modifiedStudents.filter(
+        filterStudentBySectionFn(appliedFilters, enrollmentFilterTest)
+      )
+      expect(filteredStudents.length).toBe(2)
+    })
+
+    it('filteredStudents does not include all students when appliedFilters includes multiple sections when multiselect_gradebook_filters_enabled is false', () => {
+      modifiedStudents.push(modifiedStudent2)
+      ENV.GRADEBOOK_OPTIONS = {multiselect_gradebook_filters_enabled: false}
+      const appliedFilters: Filter[] = [
+        {
+          id: '1',
+          type: 'section',
+          created_at: '',
+          value: 'section1',
+        },
+        {
+          id: '1',
+          type: 'section',
+          created_at: '',
+          value: 'section2',
+        },
+      ]
+      const filteredStudents = modifiedStudents.filter(
+        filterStudentBySectionFn(appliedFilters, enrollmentFilterTest)
+      )
+      expect(filteredStudents.length).toBe(1)
+    })
   })
 
   describe('filter start and end date pill display', () => {
@@ -695,5 +767,40 @@ describe('filterStudentBySectionFn', () => {
       const result = getLabelForFilter(endFilter, [], [], [], [], {}, [])
       expect(result).toEqual('End Date 12/16/2023')
     })
+  })
+})
+
+describe('formatGradingPeriodTitleForDisplay', () => {
+  ENV.GRADEBOOK_OPTIONS = {grading_periods_filter_dates_enabled: true}
+  const gp: GradingPeriod = {
+    id: '1',
+    title: 'GP1',
+    startDate: new Date('2021-01-01'),
+    endDate: new Date('2021-01-31'),
+    closeDate: new Date('2021-02-01'),
+  }
+
+  it('returns null if handed a null grading period', () => {
+    const result = formatGradingPeriodTitleForDisplay(null)
+    expect(result).toBeNull()
+  })
+
+  it('returns null if handed an undefined grading period', () => {
+    const result = formatGradingPeriodTitleForDisplay(undefined)
+    expect(result).toBeNull()
+  })
+
+  // TODO: remove "with the feature flag" from the test description when the feature flag is removed
+  it('returns the grading period title with the start, end, and close dates with the feature flag', () => {
+    ENV.GRADEBOOK_OPTIONS = {grading_periods_filter_dates_enabled: true}
+    const result = formatGradingPeriodTitleForDisplay(gp)
+    expect(result).toEqual('GP1: 1/1/21 - 1/31/21 | 2/1/21')
+  })
+
+  // TODO: remove this test when we remove the feature flag
+  it('returns only the grading period title without the feature flag', () => {
+    ENV.GRADEBOOK_OPTIONS = {grading_periods_filter_dates_enabled: false}
+    const result = formatGradingPeriodTitleForDisplay(gp)
+    expect(result).toEqual('GP1')
   })
 })

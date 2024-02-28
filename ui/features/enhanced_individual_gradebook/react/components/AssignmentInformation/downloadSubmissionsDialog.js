@@ -21,7 +21,7 @@ import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
 import htmlEscape, {raw} from '@instructure/html-escape'
 import 'jqueryui/dialog'
-import 'jqueryui/progressbar'
+import 'jqueryui-unpatched/progressbar'
 
 const I18n = useI18nScope('submissions')
 
@@ -38,6 +38,8 @@ export default function (url, onClose) {
       close() {
         cancelled = true
       },
+      modal: true,
+      zIndex: 1000,
     })
     .on('dialogclose', onClose)
   $('#download_submissions_dialog .progress').progressbar({value: 0})

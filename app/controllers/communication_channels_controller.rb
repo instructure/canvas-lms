@@ -441,7 +441,6 @@ class CommunicationChannelsController < ApplicationController
             failed = true
           end
         else
-          @request = request
           return # render
         end
       end

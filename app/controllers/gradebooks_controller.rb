@@ -151,7 +151,9 @@ class GradebooksController < ApplicationController
           display_updated_at: datetime_string(comment.updated_at),
           is_read: comment.read?(@current_user) || (!@presenter.student_is_user? && !@presenter.user_an_observer_of_student?),
         }
-        comment_map[:media_object] = SubmissionComment.serialize_media_comment(comment.media_comment_id) if comment.media_comment?
+        if comment.media_comment? && (media_object = SubmissionComment.serialize_media_comment(comment.media_comment_id))
+          comment_map[:media_object] = media_object
+        end
         comment_map
       end.as_json
       json[:assignment_url] = context_url(@context, :context_assignment_url, submission.assignment_id)
@@ -209,7 +211,7 @@ class GradebooksController < ApplicationController
                                        end
                                      end
     course_active_grading_scheme = if course_active_grading_standard
-                                     GradingSchemesJsonController.to_grading_scheme_json(course_active_grading_standard, @current_user)
+                                     GradingSchemesJsonController.gradebook_grading_scheme_json(course_active_grading_standard, @current_user)
                                    else
                                      nil
                                    end
@@ -576,6 +578,7 @@ class GradebooksController < ApplicationController
       user_asset_string: @current_user&.asset_string,
       version: params.fetch(:version, nil),
       assignment_missing_shortcut: Account.site_admin.feature_enabled?(:assignment_missing_shortcut),
+      grading_periods_filter_dates_enabled: Account.site_admin.feature_enabled?(:grading_periods_filter_dates),
     }
 
     js_env({

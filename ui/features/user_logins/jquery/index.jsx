@@ -142,6 +142,8 @@ $(function () {
           }
           window.canvas_pseudonyms.jqInterface.onCancel()
         },
+        modal: true,
+        zIndex: 1000,
       })
       $form
         .dialog('option', 'title', I18n.t('titles.update_login', 'Update Login'))
@@ -187,7 +189,7 @@ $(function () {
     .delegate('.add_pseudonym_link', 'click', function (event) {
       event.preventDefault()
       $('#login_information .login.blank .edit_pseudonym_link').click()
-      window.canvas_pseudonyms.jqInterface.onAdd({ canEditSisUserId: $(this).data('can-manage-sis') })
+      window.canvas_pseudonyms.jqInterface.onAdd({canEditSisUserId: $(this).data('can-manage-sis')})
       $form.attr('action', $(this).attr('rel')).attr('method', 'POST')
       $form.fillFormData({'pseudonym[unique_id]': ''})
       $form

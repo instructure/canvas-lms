@@ -61,11 +61,8 @@ def import_example_questions
   Importers::AssessmentQuestionImporter.process_migration(hash, @migration)
 end
 
-def get_import_context(system = nil)
-  context = course_model
-  context.import_source == :webct if system == "vista"
-
-  context
+def get_import_context(_system = nil)
+  course_model
 end
 
 class ImportHelper

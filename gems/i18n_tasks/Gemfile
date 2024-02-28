@@ -8,3 +8,5 @@ gem "i18n_extraction", path: "../i18n_extraction"
 gem "utf8_cleaner", path: "../utf8_cleaner"
 
 gem "i18nliner", "~> 0.2.4"
+
+eval_gemfile(gemfile.dirname.join("../gemfile_prefix.rb"))

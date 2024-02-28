@@ -133,6 +133,19 @@ const renderDueDates = lockedItems => {
       isModuleItem: ENV.IS_MODULE_ITEM,
       courseId: ENV.COURSE_ID,
     })
+
+    if (ENV.FEATURES?.differentiated_modules) {
+      overrideView.bind('tray:open', () => {
+        $('#quiz_edit_wrapper .btn.save_quiz_button').attr('disabled', true)
+        $('#quiz_edit_wrapper .btn.save_and_publish').attr('disabled', true)
+      })
+
+      overrideView.bind('tray:close', () => {
+        $('#quiz_edit_wrapper .btn.save_quiz_button').attr('disabled', false)
+        $('#quiz_edit_wrapper .btn.save_and_publish').attr('disabled', false)
+      })
+    }
+
     overrideView.render()
   }
 }
@@ -2083,6 +2096,8 @@ ready(function () {
     $dialog.dialog({
       width: 400,
       title: I18n.t('titles.ip_address_filtering', 'IP Address Filtering'),
+      modal: true,
+      zIndex: 1000,
     })
     if (!$dialog.hasClass('loaded')) {
       $dialog.find('.searching_message').text(I18n.t('retrieving_filters', 'Retrieving Filters...'))
@@ -3131,6 +3146,8 @@ ready(function () {
       title: I18n.t('titles.find_question_bank', 'Find Question Bank'),
       width: 600,
       height: 400,
+      modal: true,
+      zIndex: 1000,
     })
   })
 
@@ -3215,6 +3232,8 @@ ready(function () {
       },
       width: 600,
       height: 400,
+      modal: true,
+      zIndex: 1000,
     })
   })
 
@@ -3256,6 +3275,8 @@ ready(function () {
         .text(I18n.t('buttons.create_group', 'Create Group'))
       $dialog.dialog({
         width: 400,
+        modal: true,
+        zIndex: 1000,
       })
     }
   })
@@ -3474,6 +3495,8 @@ ready(function () {
       $dialog.dialog({
         autoOpen: false,
         title: I18n.t('titles.add_questions_as_group', 'Add Questions as a Group'),
+        modal: true,
+        zIndex: 1000,
       })
     })
     .delegate('.submit_button', 'click', function (event) {

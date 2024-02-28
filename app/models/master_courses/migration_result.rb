@@ -26,7 +26,7 @@ class MasterCourses::MigrationResult < ActiveRecord::Base
 
   before_create :set_root_account_id
 
-  serialize :results, Hash
+  serialize :results, type: Hash
 
   def skipped_items
     results[:skipped] || []

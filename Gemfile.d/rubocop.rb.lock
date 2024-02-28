@@ -58,7 +58,7 @@ GEM
     method_source (1.0.0)
     mini_mime (1.1.5)
     mini_portile2 (2.8.5)
-    minitest (5.21.2)
+    minitest (5.22.2)
     multi_xml (0.6.0)
     nokogiri (1.15.5)
       mini_portile2 (~> 2.8.2)
@@ -147,7 +147,7 @@ GEM
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
     unicode-display_width (2.5.0)
-    zeitwerk (2.6.12)
+    zeitwerk (2.6.13)
 
 PLATFORMS
   aarch64-linux
@@ -167,4 +167,4 @@ DEPENDENCIES
   rubocop-rspec (~> 2.22)
 
 BUNDLED WITH
-   2.5.3
+   2.5.6

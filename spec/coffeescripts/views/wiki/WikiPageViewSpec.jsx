@@ -20,7 +20,7 @@ import WikiPage from '@canvas/wiki/backbone/models/WikiPage'
 import WikiPageView from 'ui/features/wiki_page_show/backbone/views/WikiPageView'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
-import 'helpers/jquery.simulate'
+import '@canvas/jquery/jquery.simulate'
 import '@canvas/module-sequence-footer'
 import fakeENV from 'helpers/fakeENV'
 

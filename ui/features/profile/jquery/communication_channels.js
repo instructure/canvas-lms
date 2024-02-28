@@ -78,6 +78,7 @@ $(document).ready(function () {
         width: 600,
         resizable: false,
         modal: true,
+        zIndex: 1000,
       })
     if ($(this).hasClass('add_contact_link')) {
       $('#communication_channels').tabs('select', '#register_sms_number')

@@ -86,7 +86,7 @@ export const SplitScreenParent = props => {
     },
   })
 
-  if (props.discussionEntry.permissions.reply) {
+  if (props?.discussionEntry?.permissions?.reply) {
     threadActions.push(
       <ThreadingToolbar.Reply
         key={`reply-${props.discussionEntry.id}`}
@@ -229,10 +229,14 @@ export const SplitScreenParent = props => {
                             },
                           })
                         }
-                        onQuoteReply={() => {
-                          setReplyFromId(props.discussionEntry._id)
-                          props.setRCEOpen(true)
-                        }}
+                        onQuoteReply={
+                          props?.discussionEntry?.permissions?.reply
+                            ? () => {
+                                setReplyFromId(props.discussionEntry._id)
+                                props.setRCEOpen(true)
+                              }
+                            : null
+                        }
                         onReport={
                           props.discussionTopic.permissions?.studentReporting
                             ? () => {

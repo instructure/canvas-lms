@@ -16,7 +16,7 @@
 import $ from 'jquery'
 import 'jqueryui/core'
 import 'jqueryui/widget'
-import 'jqueryui/position'
+import 'jqueryui-unpatched/position'
 
 let idIncrement = 0,
   suppressExpandOnFocus = false
@@ -26,20 +26,20 @@ $.widget('ui.popup', {
   options: {
     position: {
       my: 'left top',
-      at: 'left bottom'
+      at: 'left bottom',
     },
     managed: false,
     expandOnFocus: false,
     show: {
       effect: 'slideDown',
       // duration: "fast"
-      duration: 0
+      duration: 0,
     },
     hide: {
       effect: 'fadeOut',
       // duration: "fast"
-      duration: 0
-    }
+      duration: 0,
+    },
   },
   _create() {
     if (!this.options.trigger) {
@@ -129,7 +129,7 @@ $.widget('ui.popup', {
           onMouseDown.call(this, event)
         }
       },
-      mousedown: onMouseDown
+      mousedown: onMouseDown,
     })
 
     if (this.options.expandOnFocus) {
@@ -148,7 +148,7 @@ $.widget('ui.popup', {
         },
         blur(event) {
           suppressExpandOnFocus = false
-        }
+        },
       })
     }
     if (!this.options.managed) {
@@ -168,7 +168,7 @@ $.widget('ui.popup', {
             last.focus(1)
             event.preventDefault()
           }
-        }
+        },
       })
     }
 
@@ -185,7 +185,7 @@ $.widget('ui.popup', {
       },
       mouseup(event) {
         clearTimeout(this.closeTimer)
-      }
+      },
     })
 
     this._on({
@@ -194,7 +194,7 @@ $.widget('ui.popup', {
           this.close(event)
           this.focusTrigger()
         }
-      }
+      },
     })
 
     this._on(this.document, {
@@ -205,7 +205,7 @@ $.widget('ui.popup', {
         ) {
           this.close(event)
         }
-      }
+      },
     })
   },
 
@@ -231,7 +231,7 @@ $.widget('ui.popup', {
     const position = $.extend(
       {},
       {
-        of: this.options.trigger
+        of: this.options.trigger,
       },
       this.options.position
     )
@@ -283,5 +283,5 @@ $.widget('ui.popup', {
 
   _beforeClose() {
     this.element.attr('aria-hidden', 'true').attr('aria-expanded', 'false')
-  }
+  },
 })

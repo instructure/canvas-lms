@@ -19,7 +19,17 @@
 import React from 'react'
 import {mount} from 'enzyme'
 import ModuleFileDrop from '../index'
-import * as apiClient from '../apiClient'
+
+jest.mock('../apiClient', () => {
+  const originalModule = jest.requireActual('../apiClient')
+  return {
+    ...originalModule,
+    getCourseRootFolder: jest
+      .fn()
+      .mockImplementation(() => Promise.resolve({context_id: '1', context_type: 'Course'})),
+    getFolderFiles: jest.fn().mockImplementation(() => Promise.resolve(['a.txt'])),
+  }
+})
 
 let component
 
@@ -40,14 +50,10 @@ afterEach(() => {
   jest.restoreAllMocks()
 })
 
-// LF-1169 - remove or rewrite to remove spies on imports
-it.skip('fetchRootFolder sets folderState ', done => {
+it('fetchRootFolder sets folderState ', done => {
   component = mount(<ModuleFileDrop {...props} />)
   jest.restoreAllMocks()
-  jest
-    .spyOn(apiClient, 'getCourseRootFolder')
-    .mockImplementation(() => Promise.resolve({context_id: '1', context_type: 'Course'}))
-  jest.spyOn(apiClient, 'getFolderFiles').mockImplementation(() => Promise.resolve(['a.txt']))
+
   component
     .instance()
     .fetchRootFolder()

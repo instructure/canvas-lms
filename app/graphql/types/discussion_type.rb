@@ -42,6 +42,9 @@ module Types
     implements Interfaces::ModuleItemInterface
     implements Interfaces::LegacyIDInterface
 
+    include Rails.application.routes.url_helpers
+    include Canvas::LockExplanation
+
     global_id_field :id
     field :title, String, null: true
     field :context_id, ID, null: false
@@ -68,13 +71,28 @@ module Types
 
     field :message, String, null: true
     def message
-      available_for_user ? object.message : nil
+      # A discussion can be locked but still allow users to view the discussion
+      # In these cases we want to return the discussion message, otherwise we want to
+      # return the lock explanation
+      locked_info = object.locked_for?(current_user, check_policies: true)
+      if locked_info && !locked_info[:can_view]
+        return lock_explanation(locked_info, "topic", object.context, { only_path: true, include_js: false })
+      end
+
+      object.message
+    end
+
+    field :lock_information, String, null: true
+    def lock_information
+      locked_info = object.locked_for?(current_user, check_policies: true)
+      return nil unless locked_info
+
+      lock_explanation(locked_info, "topic", object.context, { only_path: true, include_js: false })
     end
 
     field :available_for_user, Boolean, null: false
     def available_for_user
       locked_info = object.locked_for?(current_user, check_policies: true)
-
       if locked_info
         !locked_info[:unlock_at]
       else

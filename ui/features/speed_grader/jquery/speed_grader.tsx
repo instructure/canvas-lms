@@ -682,6 +682,7 @@ function setupHeader() {
           modal: true,
           resizable: false,
           width: 400,
+          zIndex: 1000,
         })
         .fixDialogButtons()
       // FF hack - when reloading the page, firefox seems to "remember" the disabled state of this
@@ -935,6 +936,8 @@ function initCommentBox() {
           recognition.stop()
           $(this).dialog('close').remove()
         },
+        modal: true,
+        zIndex: 1000,
       })
       return false
     })
@@ -1523,6 +1526,7 @@ EG = {
             },
           },
         ],
+        zIndex: 1000,
       })
     } else {
       nextStudent(offset)

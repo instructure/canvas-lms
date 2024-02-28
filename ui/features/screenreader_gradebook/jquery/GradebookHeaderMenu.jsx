@@ -340,6 +340,7 @@ export default class GradebookHeaderMenu {
           modal: true,
           resizable: false,
           autoOpen: false,
+          zIndex: 1000,
         })
         .submit(function () {
           const data = $(this).getFormData()

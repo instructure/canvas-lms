@@ -20,7 +20,6 @@ import $ from 'jquery'
 import GroupView from 'ui/features/manage_groups/backbone/views/GroupView'
 import GroupUsersView from 'ui/features/manage_groups/backbone/views/GroupUsersView'
 import GroupDetailView from 'ui/features/manage_groups/backbone/views/GroupDetailView'
-import GroupCollection from '@canvas/groups/backbone/collections/GroupCollection'
 import GroupUserCollection from '@canvas/groups/backbone/collections/GroupUserCollection'
 import Group from '@canvas/groups/backbone/models/Group'
 import fakeENV from 'helpers/fakeENV'
@@ -80,7 +79,7 @@ QUnit.module('GroupView', {
     document.getElementById('fixtures').innerHTML = ''
   },
 })
-
+// eslint-disable-next-line qunit/resolve-async
 test('it should be accessible', assert => {
   const done = assert.async()
   assertions.isAccessible(view, done, {a11yReport: true})
@@ -104,8 +103,6 @@ test('expand/collpase buttons', () => {
 
 test('renders groupUsers', () => {
   ok(view.$('.group-user').length)
-  ok(view.$('.remove-as-leader').length === 1)
-  ok(view.$('.set-as-leader').length === 1)
 })
 
 test('removes the group after successful deletion', () => {
@@ -117,16 +114,4 @@ test('removes the group after successful deletion', () => {
   server.respond()
   ok(!view.$el.hasClass('hidden'), 'group hidden')
   server.restore()
-})
-
-test('remove team leader', () => {
-  const url = `api/v1/groups/${view.model.get('id')}`
-  const server = sinon.fakeServer.create()
-  server.respondWith(url, [200, {'Content-Type': 'application/json'}, JSON.stringify({})])
-
-  // Test that remove team lead button ends up with 0 team leads
-  view.$('.remove-as-leader').click()
-  server.respond()
-  ok(view.$('.remove-as-leader').length === 0)
-  ok(view.$('.set-as-leader').length === 2)
 })

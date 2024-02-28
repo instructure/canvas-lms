@@ -93,18 +93,21 @@ describe GradebooksController do
         attachment = attachment_model(context: @assignment)
         attachment2 = attachment_model(context: @assignment)
         other_student = @course.enroll_user(User.create!(name: "some other user")).user
+        deleted_media_object = factory_with_protected_attributes(MediaObject, media_id: "m-someid2", media_type: "video", title: "Example Media Object 2", context: @course)
         submission_to_comment = @assignment.grade_student(@student, grade: 10, grader: @teacher).first
         comment_1 = submission_to_comment.add_comment(comment: "a student comment", author: @teacher, attachments: [attachment])
         comment_2 = submission_to_comment.add_comment(comment: "another student comment", author: @teacher, attachments: [attachment, attachment2])
         comment_3 = submission_to_comment.add_comment(comment: "an anonymous comment", author: other_student)
         comment_4 = submission_to_comment.add_comment(media_comment_id: "m-someid", media_comment_type: "video", author: @student)
+        submission_to_comment.add_comment(media_comment_id: "m-someid2", media_comment_type: "video", author: @student)
+        deleted_media_object.destroy_permanently!
         comment_1.mark_read!(@student)
 
         get "grade_summary", params: { course_id: @course.id, id: @student.id }
         submission = assigns[:js_env][:submissions].find { |s| s[:assignment_id] == @assignment.id }
         aggregate_failures do
           expect(submission[:score]).to be 10.0
-          expect(submission[:submission_comments].length).to be 4
+          expect(submission[:submission_comments].length).to be 5
 
           submission_comment_1 = submission[:submission_comments].first
           expect(submission_comment_1).to include({
@@ -626,7 +629,8 @@ describe GradebooksController do
         grading_standard = @course.grading_standards.build({ title: "My Grading Scheme",
                                                              data: GradingSchemesJsonController.to_grading_standard_data(data),
                                                              points_based: true,
-                                                             scaling_factor: 4.0 })
+                                                             scaling_factor: 4.0,
+                                                             workflow_state: "active" })
         @course.update!(grading_standard:)
         all_grading_periods_id = 0
         get "grade_summary", params: { course_id: @course.id, id: @student.id, grading_period_id: all_grading_periods_id }
@@ -637,9 +641,9 @@ describe GradebooksController do
                                                                          "context_name" => @course.name,
                                                                          "data" => data,
                                                                          "permissions" => { "manage" => false },
-                                                                         "assessed_assignment" => false,
                                                                          "points_based" => grading_standard.points_based,
-                                                                         "scaling_factor" => grading_standard.scaling_factor })
+                                                                         "scaling_factor" => grading_standard.scaling_factor,
+                                                                         "workflow_state" => "active" })
         expect(controller.js_env[:grading_scheme]).to be_nil
       end
 
@@ -655,9 +659,9 @@ describe GradebooksController do
                                                                          "context_name" => @course.name,
                                                                          "data" => [{ "name" => "A", "value" => 0.94 }, { "name" => "A-", "value" => 0.9 }, { "name" => "B+", "value" => 0.87 }, { "name" => "B", "value" => 0.84 }, { "name" => "B-", "value" => 0.8 }, { "name" => "C+", "value" => 0.77 }, { "name" => "C", "value" => 0.74 }, { "name" => "C-", "value" => 0.7 }, { "name" => "D+", "value" => 0.67 }, { "name" => "D", "value" => 0.64 }, { "name" => "D-", "value" => 0.61 }, { "name" => "F", "value" => 0.0 }],
                                                                          "permissions" => { "manage" => false },
-                                                                         "assessed_assignment" => false,
                                                                          "points_based" => false,
-                                                                         "scaling_factor" => 1.0 })
+                                                                         "scaling_factor" => 1.0,
+                                                                         "workflow_state" => nil })
 
         expect(controller.js_env[:grading_scheme]).to be_nil
       end
@@ -688,9 +692,9 @@ describe GradebooksController do
                                                                          "context_name" => @course.name,
                                                                          "data" => [{ "name" => "A", "value" => 0.94 }, { "name" => "A-", "value" => 0.9 }, { "name" => "B+", "value" => 0.87 }, { "name" => "B", "value" => 0.84 }, { "name" => "B-", "value" => 0.8 }, { "name" => "C+", "value" => 0.77 }, { "name" => "C", "value" => 0.74 }, { "name" => "C-", "value" => 0.7 }, { "name" => "D+", "value" => 0.67 }, { "name" => "D", "value" => 0.64 }, { "name" => "D-", "value" => 0.61 }, { "name" => "F", "value" => 0.0 }],
                                                                          "permissions" => { "manage" => false },
-                                                                         "assessed_assignment" => false,
                                                                          "points_based" => false,
-                                                                         "scaling_factor" => 1.0 })
+                                                                         "scaling_factor" => 1.0,
+                                                                         "workflow_state" => nil })
         expect(controller.js_env[:grading_scheme]).to be_nil
       end
 

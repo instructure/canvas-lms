@@ -9,21 +9,19 @@ GEM
   specs:
     addressable (2.8.6)
       public_suffix (>= 2.0.2, < 6.0)
-    base64 (0.2.0)
     bigdecimal (3.1.6)
-    crack (0.4.6)
+    crack (1.0.0)
       bigdecimal
       rexml
     debug (1.9.1)
       irb (~> 1.10)
       reline (>= 0.3.8)
     declarative (0.0.20)
-    diff-lcs (1.5.0)
-    faraday (2.7.12)
-      base64
-      faraday-net_http (>= 2.0, < 3.1)
-      ruby2_keywords (>= 0.0.4)
-    faraday-net_http (3.0.2)
+    diff-lcs (1.5.1)
+    faraday (2.9.0)
+      faraday-net_http (>= 2.0, < 3.2)
+    faraday-net_http (3.1.0)
+      net-http
     google-apis-core (0.13.0)
       addressable (~> 2.5, >= 2.5.1)
       googleauth (~> 1.9)
@@ -34,9 +32,9 @@ GEM
       rexml
     google-apis-drive_v3 (0.48.0)
       google-apis-core (>= 0.12.0, < 2.a)
-    google-cloud-env (2.1.0)
+    google-cloud-env (2.1.1)
       faraday (>= 1.0, < 3.a)
-    googleauth (1.9.2)
+    googleauth (1.10.0)
       faraday (>= 1.0, < 3.a)
       google-cloud-env (~> 2.1)
       jwt (>= 1.4, < 3.0)
@@ -46,12 +44,14 @@ GEM
     hashdiff (1.1.0)
     httpclient (2.8.3)
     io-console (0.7.2)
-    irb (1.11.1)
+    irb (1.11.2)
       rdoc
       reline (>= 0.4.2)
     jwt (2.7.1)
     mini_mime (1.1.5)
     multi_json (1.15.0)
+    net-http (0.4.1)
+      uri
     os (1.1.4)
     psych (5.1.2)
       stringio
@@ -67,20 +67,19 @@ GEM
       uber (< 0.2.0)
     retriable (3.1.2)
     rexml (3.2.6)
-    rspec (3.12.0)
-      rspec-core (~> 3.12.0)
-      rspec-expectations (~> 3.12.0)
-      rspec-mocks (~> 3.12.0)
-    rspec-core (3.12.2)
-      rspec-support (~> 3.12.0)
-    rspec-expectations (3.12.3)
+    rspec (3.13.0)
+      rspec-core (~> 3.13.0)
+      rspec-expectations (~> 3.13.0)
+      rspec-mocks (~> 3.13.0)
+    rspec-core (3.13.0)
+      rspec-support (~> 3.13.0)
+    rspec-expectations (3.13.0)
       diff-lcs (>= 1.2.0, < 2.0)
-      rspec-support (~> 3.12.0)
-    rspec-mocks (3.12.6)
+      rspec-support (~> 3.13.0)
+    rspec-mocks (3.13.0)
       diff-lcs (>= 1.2.0, < 2.0)
-      rspec-support (~> 3.12.0)
-    rspec-support (3.12.1)
-    ruby2_keywords (0.0.5)
+      rspec-support (~> 3.13.0)
+    rspec-support (3.13.0)
     signet (0.18.0)
       addressable (~> 2.8)
       faraday (>= 0.17.5, < 3.a)
@@ -90,7 +89,8 @@ GEM
     timecop (0.9.8)
     trailblazer-option (0.1.2)
     uber (0.1.0)
-    webmock (3.19.1)
+    uri (0.13.0)
+    webmock (3.20.0)
       addressable (>= 2.8.0)
       crack (>= 0.3.2)
       hashdiff (>= 0.4.0, < 2.0.0)
@@ -112,4 +112,4 @@ DEPENDENCIES
   webmock
 
 BUNDLED WITH
-   2.5.3
+   2.5.6

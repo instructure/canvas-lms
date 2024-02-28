@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render} from '@testing-library/react'
+import {render, fireEvent} from '@testing-library/react'
 import React from 'react'
 
 import {PointsPossible} from '../PointsPossible'
@@ -33,5 +33,20 @@ describe('PointsPossible', () => {
   it('renders', () => {
     const {getByText} = renderPointsPossible()
     expect(getByText('Points Possible')).toBeInTheDocument()
+  })
+
+  it('does not allow negative values on decrement', () => {
+    const mockSetPointsPossible = jest.fn()
+    const {getByTestId} = render(
+      <PointsPossible pointsPossible={0} setPointsPossible={mockSetPointsPossible} />
+    )
+
+    // Assuming your decrement button has a test id of 'decrement-button', adjust if necessary
+    const input = getByTestId('points-possible-input')
+    fireEvent.click(input)
+    fireEvent.keyDown(input, {keyCode: 40})
+
+    expect(mockSetPointsPossible).not.toHaveBeenCalledWith(-1)
+    expect(mockSetPointsPossible).toHaveBeenCalledWith(0)
   })
 })

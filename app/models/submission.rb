@@ -185,7 +185,7 @@ class Submission < ActiveRecord::Base
            dependent: :destroy,
            inverse_of: :submission
 
-  serialize :turnitin_data, Hash
+  serialize :turnitin_data, type: Hash
 
   validates :assignment_id, :user_id, presence: true
   validates :body, length: { maximum: maximum_long_text_length, allow_blank: true }

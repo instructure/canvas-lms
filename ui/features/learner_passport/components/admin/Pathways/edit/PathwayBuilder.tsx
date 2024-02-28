@@ -157,7 +157,9 @@ const PathwayBuilder = ({pathway, mode, onChange}: PathwayBuilderProps) => {
         currentRoot.next_milestones = []
         pathway.timestamp = Date.now()
       }
-      if (step) {
+      if (step?.id === currentRoot?.id) {
+        setCurrentRoot(null)
+      } else if (step) {
         setCurrentRoot(step)
         if (step.next_milestones.length === 0) {
           step.next_milestones.push('blank')
@@ -179,13 +181,7 @@ const PathwayBuilder = ({pathway, mode, onChange}: PathwayBuilderProps) => {
   )
 
   return (
-    <View
-      as="div"
-      data-compid="pathway-builder"
-      borderWidth="small 0 0 0"
-      height="100%"
-      position="relative"
-    >
+    <View as="div" id="pathway-builder" borderWidth="small 0 0 0" height="100%" position="relative">
       <div
         style={{
           position: 'absolute',

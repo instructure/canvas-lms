@@ -17,3 +17,5 @@ gem "config_file", path: "../config_file"
 gem "json_token", path: "../json_token"
 gem "paginated_collection", path: "../paginated_collection"
 # rubocop:enable Bundler/OrderedGems
+
+eval_gemfile(gemfile.dirname.join("../gemfile_prefix.rb"))

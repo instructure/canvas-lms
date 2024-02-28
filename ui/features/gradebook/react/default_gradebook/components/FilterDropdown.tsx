@@ -39,6 +39,7 @@ type Props = {
   filterItems: FilterDrilldownData
   changeAnnouncement: (filterAnnouncement) => void
   applyFiltersButtonRef: React.RefObject<HTMLButtonElement>
+  multiselectGradebookFiltersEnabled?: boolean
 }
 
 const TruncateWithTooltip = ({children}: {children: React.ReactNode}) => {
@@ -63,6 +64,7 @@ const FilterDropdown = ({
   filterItems,
   changeAnnouncement,
   applyFiltersButtonRef,
+  multiselectGradebookFiltersEnabled = false,
 }: Props) => {
   const [currentItemId, setTempItemId] = useState<string>(rootId)
   const [isOpen, setIsOpen] = useState(false)
@@ -259,10 +261,15 @@ const FilterDropdown = ({
 
                 return (
                   <Menu.Group
+                    allowMultiple={multiselectGradebookFiltersEnabled}
                     key={itemGroup.id}
                     label={itemGroup.name}
                     selected={selectedIndices2}
                     onSelect={(_event, updated) => {
+                      if (multiselectGradebookFiltersEnabled) {
+                        return
+                      }
+
                       itemGroup.items[updated[0]].onToggle()
                     }}
                   >
@@ -275,6 +282,13 @@ const FilterDropdown = ({
                           data-testid={`${item.name}-sorted-filter`}
                           key={item.id}
                           as="div"
+                          onSelect={() => {
+                            if (!multiselectGradebookFiltersEnabled) {
+                              return
+                            }
+
+                            item.onToggle()
+                          }}
                         >
                           <Flex as="div" justifyItems="space-between">
                             <TruncateText position="middle">{unescapedName}</TruncateText>
@@ -288,9 +302,14 @@ const FilterDropdown = ({
 
             {items.length > 0 && (
               <Menu.Group
+                allowMultiple={multiselectGradebookFiltersEnabled}
                 label={currentObj.name}
                 selected={selectedIndices}
                 onSelect={(_event: MouseEvent, updated: [number, ...number[]]) => {
+                  if (multiselectGradebookFiltersEnabled) {
+                    return
+                  }
+
                   if (items[updated[0]].isSelected) {
                     changeAnnouncement(
                       I18n.t('Removed %{filterName} Filter', {filterName: items[updated[0]].name})
@@ -304,10 +323,31 @@ const FilterDropdown = ({
                 }}
               >
                 <Menu.Separator />
-                {items.map(a => {
+                {items.map(item => {
                   return (
-                    <Menu.Item data-testid={`${a.name}-filter`} key={a.id} as="div">
-                      <TruncateWithTooltip>{a.name}</TruncateWithTooltip>
+                    <Menu.Item
+                      data-testid={`${item.name}-filter`}
+                      key={item.id}
+                      as="div"
+                      onSelect={() => {
+                        if (!multiselectGradebookFiltersEnabled) {
+                          return
+                        }
+
+                        if (item.isSelected) {
+                          changeAnnouncement(
+                            I18n.t('Removed %{filterName} Filter', {filterName: item.name})
+                          )
+                        } else {
+                          changeAnnouncement(
+                            I18n.t('Added %{filterName} Filter', {filterName: item.name})
+                          )
+                        }
+
+                        item.onToggle?.()
+                      }}
+                    >
+                      <TruncateWithTooltip>{item.name}</TruncateWithTooltip>
                     </Menu.Item>
                   )
                 })}

@@ -25,6 +25,7 @@ import {Provider} from 'react-redux'
 import {ConnectedPermissionsIndex} from './components/PermissionsIndex'
 
 import createStore from './store'
+import TopNavPortal from '@canvas/top-navigation/react/TopNavPortal'
 
 export default function createPermissionsIndex(root, data = {}) {
   const store = createStore(data)
@@ -35,9 +36,12 @@ export default function createPermissionsIndex(root, data = {}) {
 
   function render() {
     ReactDOM.render(
-      <Provider store={store}>
-        <ConnectedPermissionsIndex />
-      </Provider>,
+      <>
+        <TopNavPortal />
+        <Provider store={store}>
+          <ConnectedPermissionsIndex />
+        </Provider>
+      </>,
       root
     )
   }

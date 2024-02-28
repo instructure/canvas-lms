@@ -29,6 +29,6 @@ paths:
                 - oidc_configuration_url
                 - token
               example:
-                uuid: 0d3f7978-8635-44dd-aec1-8a63f7520c8f
-                oidc_configuration_url: https://canvas.instructure.com/api/lti/security/openid-configuration
-                token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1dWlkIjoiMGQzZjc5NzgtODYzNS00NGRkLWFlYzEtOGE2M2Y3NTIwYzhmIiwiaW5pdGlhdGVkX2F0IjoiMjAyMy0xMi0zMVQwNDo1MTo1NyswMDowMCIsInVzZXJfaWQiOjE4NDksInJvb3RfYWNjb3VudF9nbG9iYWxfaWQiOjIwMDAwMDAwMDAwMzA3MywiZXhwIjoxNzA0MDAxOTE3fQ.Q_JjbjAYQZTkacPq64y2qa3PqCCrQhTEKp25RAyNy34
+                uuid: a98d2e39-b22d-45f8-9479-ac1f7546363d
+                oidc_configuration_url: https://canvas.instructure.com/api/lti/security/openid-configuration?registration_token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1dWlkIjoiYTk4ZDJlMzktYjIyZC00NWY4LTk0NzktYWMxZjc1NDYzNjNkIiwiaW5pdGlhdGVkX2F0IjoiMjAyNC0wMS0zMVQyMzoxNzowOSswMDowMCIsInVzZXJfaWQiOjE5MjAsInJvb3RfYWNjb3VudF9nbG9iYWxfaWQiOjIwMDAwMDAwMDAwMzE5MiwiZXhwIjoxNzA2NzQ2NjI5fQ.O4e4sWZWX1SEP-8n4jLxxmUbrOskgUa87OuRz6_hrdw
+                token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1dWlkIjoiYTk4ZDJlMzktYjIyZC00NWY4LTk0NzktYWMxZjc1NDYzNjNkIiwiaW5pdGlhdGVkX2F0IjoiMjAyNC0wMS0zMVQyMzoxNzowOSswMDowMCIsInVzZXJfaWQiOjE5MjAsInJvb3RfYWNjb3VudF9nbG9iYWxfaWQiOjIwMDAwMDAwMDAwMzE5MiwiZXhwIjoxNzA2NzQ2NjI5fQ.O4e4sWZWX1SEP-8n4jLxxmUbrOskgUa87OuRz6_hrdw

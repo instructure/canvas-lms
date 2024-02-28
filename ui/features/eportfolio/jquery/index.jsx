@@ -47,7 +47,7 @@ import '@canvas/jquery/jquery.instructure_misc_plugins' /* confirmDelete, showIf
 import '@canvas/loading-image'
 import '@canvas/util/templateData' /* fillTemplateData, getTemplateData */
 import 'jquery-scroll-to-visible/jquery.scrollTo'
-import 'jqueryui/progressbar'
+import 'jqueryui-unpatched/progressbar'
 import 'jqueryui/sortable'
 
 const I18n = useI18nScope('eportfolio')
@@ -273,6 +273,8 @@ $(document).ready(function () {
       .dialog({
         width: 'auto',
         title: I18n.t('eportfolio_settings', 'ePortfolio Settings'),
+        modal: true,
+        zIndex: 1000,
       })
       .fixDialogButtons()
   })
@@ -702,6 +704,8 @@ $(document).ready(function () {
             $(this).find(':text:visible:first').val(assignment).focus().select()
             $(document).triggerHandler('submission_dialog_opened')
           },
+          modal: true,
+          zIndex: 1000,
         })
         .fixDialogButtons()
     }
@@ -1257,6 +1261,8 @@ $(document).ready(function () {
   $('.download_eportfolio_link').click(() => {
     $('#downloading_eportfolio_dialog').dialog({
       title: I18n.t('titles.download_eportfolio', 'Download ePortfolio'),
+      modal: true,
+      zIndex: 1000,
     })
   })
 })

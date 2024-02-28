@@ -581,6 +581,7 @@ QUnit.module('Gradebook#filterAssignments', {
             posted_at: null,
             score: 10,
             user_id: '1101',
+            late: true,
             workflow_state: 'graded',
           },
           {
@@ -823,6 +824,172 @@ test('includes no assignments when filtered by existing status but searchFiltere
   this.gradebook.setFilterColumnsBySetting('submissions', 'missing')
   const filteredAssignments = this.gradebook.filterAssignments(this.assignments)
   deepEqual(map(filteredAssignments, 'id'), [])
+})
+
+test('allows for multiselect when filtering by status and multiselect_gradebook_filters_enabled', function () {
+  window.ENV.GRADEBOOK_OPTIONS = {
+    multiselect_gradebook_filters_enabled: true,
+  }
+  this.gradebook.props.appliedFilters = [
+    {
+      id: '1',
+      type: 'submissions',
+      value: 'late',
+      created_at: new Date().toISOString(),
+    },
+    {
+      id: '2',
+      type: 'submissions',
+      value: 'missing',
+      created_at: new Date().toISOString(),
+    },
+  ]
+  const filteredAssignments = this.gradebook.filterAssignments(this.assignments)
+  deepEqual(map(filteredAssignments, 'id'), ['2301', '2302'])
+})
+
+test('does not allows for multiselect when filtering by status and multiselect_gradebook_filters_enabled is false', function () {
+  window.ENV.GRADEBOOK_OPTIONS = {
+    multiselect_gradebook_filters_enabled: false,
+  }
+  this.gradebook.props.appliedFilters = [
+    {
+      id: '1',
+      type: 'submissions',
+      value: 'late',
+      created_at: new Date().toISOString(),
+    },
+    {
+      id: '2',
+      type: 'submissions',
+      value: 'missing',
+      created_at: new Date().toISOString(),
+    },
+  ]
+  const filteredAssignments = this.gradebook.filterAssignments(this.assignments)
+  deepEqual(map(filteredAssignments, 'id'), [])
+})
+
+QUnit.module('Gradebook#filterStudents', {
+  setup() {
+    this.students = [
+      {
+        id: '1',
+        sections: ['section1', 'section2', 'section3'],
+        enrollments: [
+          {
+            id: '',
+            user_id: '1',
+            enrollment_state: 'active',
+            type: 'StudentEnrollment',
+            course_section_id: 'section1',
+          },
+          {
+            id: '',
+            user_id: '1',
+            enrollment_state: 'completed',
+            type: 'StudentEnrollment',
+            course_section_id: 'section2',
+          },
+          {
+            id: '',
+            user_id: '1',
+            enrollment_state: 'inactive',
+            type: 'StudentEnrollment',
+            course_section_id: 'section3',
+          },
+        ],
+      },
+    ]
+    this.gradebook = createGradebook({
+      settings: {
+        show_concluded_enrollments: 'false',
+        show_inactive_enrollments: 'false',
+      },
+    })
+  },
+})
+
+test('returns selected student when filtering by student and section with an active enrollment ', function () {
+  this.gradebook.props.appliedFilters = [
+    {
+      id: '1',
+      type: 'section',
+      created_at: '',
+      value: 'section1',
+    },
+  ]
+  this.gradebook.searchFilteredStudentIds = ['1']
+  const filteredStudents = this.gradebook.filterStudents(this.students)
+  deepEqual(map(filteredStudents, 'id'), ['1'])
+})
+
+test('does not return selected student when filtering by student and section with a concluded enrollment', function () {
+  this.gradebook.props.appliedFilters = [
+    {
+      id: '1',
+      type: 'section',
+      created_at: '',
+      value: 'section2',
+    },
+  ]
+  this.gradebook.searchFilteredStudentIds = ['1']
+  const filteredStudents = this.gradebook.filterStudents(this.students)
+  deepEqual(map(filteredStudents, 'id'), [])
+})
+
+test('returns selected student when filtering by student and section with a concluded enrollment and the show concluded enrollments filter on', function () {
+  const gradebook = createGradebook({
+    settings: {
+      show_concluded_enrollments: 'true',
+      show_inactive_enrollments: 'false',
+    },
+  })
+  gradebook.props.appliedFilters = [
+    {
+      id: '1',
+      type: 'section',
+      created_at: '',
+      value: 'section2',
+    },
+  ]
+  gradebook.searchFilteredStudentIds = ['1']
+  const filteredStudents = gradebook.filterStudents(this.students)
+  deepEqual(map(filteredStudents, 'id'), ['1'])
+})
+
+test('does not return selected student when filtering by student and section with an inactive enrollment', function () {
+  this.gradebook.props.appliedFilters = [
+    {
+      id: '1',
+      type: 'section',
+      created_at: '',
+      value: 'section3',
+    },
+  ]
+  this.gradebook.searchFilteredStudentIds = ['1']
+  const filteredStudents = this.gradebook.filterStudents(this.students)
+  deepEqual(map(filteredStudents, 'id'), [])
+})
+
+test('returns selected student when filtering by student and section with an inactive enrollment and the show inactive enrollments filter on', function () {
+  const gradebook = createGradebook({
+    settings: {
+      show_concluded_enrollments: 'false',
+      show_inactive_enrollments: 'true',
+    },
+  })
+  gradebook.props.appliedFilters = [
+    {
+      id: '1',
+      type: 'section',
+      created_at: '',
+      value: 'section3',
+    },
+  ]
+  gradebook.searchFilteredStudentIds = ['1']
+  const filteredStudents = gradebook.filterStudents(this.students)
+  deepEqual(map(filteredStudents, 'id'), ['1'])
 })
 
 QUnit.module('Gradebook#getSelectedEnrollmentFilters')

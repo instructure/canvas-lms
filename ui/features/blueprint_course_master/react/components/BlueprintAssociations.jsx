@@ -81,7 +81,7 @@ export default class BlueprintAssociations extends React.Component {
     }
 
     if (this.props.isSavingAssociations && !nextProps.isSavingAssociations) {
-      $.screenReaderFlashMessageExclusive(I18n.t('Saving associations complete'))
+      $.screenReaderFlashMessage(I18n.t('Saving associations complete'))
 
       // when saving is done, reload courses in course picker
       // this will remove courses we just associated from the picker

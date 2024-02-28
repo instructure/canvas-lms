@@ -40,7 +40,7 @@ import '@canvas/util/jquery/fixDialogButtons'
 import '@canvas/media-comments/jquery/mediaCommentThumbnail'
 import 'date-js'
 import 'jquery-tinypubsub' /* /\.publish\(/ */
-import 'jqueryui/resizable'
+import 'jqueryui-unpatched/resizable'
 import 'jqueryui/sortable'
 import 'jqueryui/tabs'
 import {captureException} from '@sentry/browser'
@@ -113,7 +113,10 @@ function enhanceUserJQueryWidgetContent() {
         .find("a[href='#" + $dialog.attr('id') + "']")
         .on('click', event => {
           event.preventDefault()
-          $dialog.dialog()
+          $dialog.dialog({
+            modal: true,
+            zIndex: 1000,
+          })
         })
     })
     .end()
@@ -268,6 +271,8 @@ function previewEquellaContentWhenClicked() {
         close() {
           $dialog.find('iframe').attr('src', 'about:blank')
         },
+        modal: true,
+        zIndex: 1000,
       })
     }
     $dialog.find('.original_link').attr('href', $(this).attr('href'))
@@ -301,6 +306,7 @@ function openDialogsWhenClicked() {
             {
               autoOpen: false,
               modal: true,
+              zIndex: 1000,
             },
             $(link).data('dialogOpts')
           )

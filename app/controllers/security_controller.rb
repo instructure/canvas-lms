@@ -85,7 +85,7 @@ class SecurityController < ApplicationController
       authorization_endpoint: lti_authorize_redirect_url(host: Lti::Oidc.auth_domain(account_domain)),
       # TODO: use a path helper for this when this path gets created
       registration_endpoint: "#{HostUrl.protocol}://#{account_domain}/api/lti/registrations",
-      jwks_uri: oauth2_jwks_url(host: Lti::Oidc.auth_domain(account_domain)),
+      jwks_uri: lti_jwks_url(host: Lti::Oidc.auth_domain(account_domain)),
       token_endpoint: oauth2_token_url(host: Lti::Oidc.auth_domain(account_domain)),
       token_endpoint_auth_methods_supported: ["private_key_jwt"],
       token_endpoint_auth_signing_alg_values_supported: ["RS256"],

@@ -19,7 +19,7 @@
 import React from 'react'
 import Router from 'react-router'
 import {BrowserRouter} from 'react-router-dom'
-import {fireEvent, render} from '@testing-library/react'
+import {fireEvent, render, waitFor} from '@testing-library/react'
 import {QueryProvider, queryClient} from '@canvas/query'
 import {RubricForm} from '../index'
 import {RUBRICS_QUERY_RESPONSE} from './fixtures'
@@ -115,7 +115,7 @@ describe('RubricForm Tests', () => {
     it('will navigate back to /rubrics after successfully saving', async () => {
       jest
         .spyOn(RubricFormQueries, 'saveRubric')
-        .mockImplementation(() => Promise.resolve({id: '1', title: 'Rubric 1'}))
+        .mockImplementation(() => Promise.resolve({id: '1', title: 'Rubric 1', pointsPossible: 10}))
       const {getByTestId} = renderComponent()
       const titleInput = getByTestId('rubric-form-title')
       fireEvent.change(titleInput, {target: {value: 'Rubric 1'}})
@@ -123,6 +123,158 @@ describe('RubricForm Tests', () => {
 
       await new Promise(resolve => setTimeout(resolve, 0))
       expect(getSRAlert()).toEqual('Rubric saved successfully')
+    })
+  })
+
+  describe('rubric criteria', () => {
+    beforeEach(() => {
+      jest.spyOn(Router, 'useParams').mockReturnValue({rubricId: '1'})
+    })
+
+    it('renders all criteria rows for a rubric', () => {
+      queryClient.setQueryData(['fetch-rubric-1'], RUBRICS_QUERY_RESPONSE)
+
+      const {criteria = []} = RUBRICS_QUERY_RESPONSE
+
+      const {queryAllByTestId} = renderComponent()
+      const criteriaRows = queryAllByTestId('rubric-criteria-row')
+      const criteriaRowDescriptions = queryAllByTestId('rubric-criteria-row-description')
+      const criteriaRowLongDescriptions = queryAllByTestId('rubric-criteria-row-long-description')
+      const criteriaRowPoints = queryAllByTestId('rubric-criteria-row-points')
+      const criteriaRowIndexes = queryAllByTestId('rubric-criteria-row-index')
+      expect(criteriaRows.length).toEqual(2)
+      expect(criteriaRowDescriptions[0]).toHaveTextContent(criteria[0].description)
+      expect(criteriaRowDescriptions[1]).toHaveTextContent(criteria[1].description)
+      expect(criteriaRowLongDescriptions[0]).toHaveTextContent(criteria[0].longDescription)
+      expect(criteriaRowLongDescriptions[1]).toHaveTextContent(criteria[1].longDescription)
+      expect(criteriaRowPoints[0]).toHaveTextContent(criteria[0].points.toString())
+      expect(criteriaRowPoints[1]).toHaveTextContent(criteria[1].points.toString())
+      expect(criteriaRowIndexes[0]).toHaveTextContent('1.')
+      expect(criteriaRowIndexes[1]).toHaveTextContent('2')
+    })
+
+    it('renders the criterion ratings accordion button', () => {
+      queryClient.setQueryData(['fetch-rubric-1'], RUBRICS_QUERY_RESPONSE)
+
+      const {criteria = []} = RUBRICS_QUERY_RESPONSE
+
+      const {queryAllByTestId} = renderComponent()
+      const ratingScaleAccordion = queryAllByTestId('criterion-row-rating-accordion')
+      expect(ratingScaleAccordion.length).toEqual(2)
+      expect(ratingScaleAccordion[0]).toHaveTextContent(
+        `Rating Scale: ${criteria[0].ratings.length}`
+      )
+      expect(ratingScaleAccordion[1]).toHaveTextContent(
+        `Rating Scale: ${criteria[0].ratings.length}`
+      )
+    })
+
+    it('renders the criterion ratings accordion items when button is clicked', () => {
+      queryClient.setQueryData(['fetch-rubric-1'], RUBRICS_QUERY_RESPONSE)
+
+      const {criteria = []} = RUBRICS_QUERY_RESPONSE
+
+      const {queryAllByTestId} = renderComponent()
+      const ratingScaleAccordion = queryAllByTestId('criterion-row-rating-accordion')
+      fireEvent.click(ratingScaleAccordion[0])
+      const ratingScaleAccordionItems = queryAllByTestId('rating-scale-accordion-item')
+      expect(ratingScaleAccordionItems.length).toEqual(criteria[0].ratings.length)
+    })
+
+    it('does not render the criterion ratings accordion items when accordion is closed', () => {
+      queryClient.setQueryData(['fetch-rubric-1'], RUBRICS_QUERY_RESPONSE)
+
+      const {queryAllByTestId} = renderComponent()
+      const ratingScaleAccordion = queryAllByTestId('criterion-row-rating-accordion')
+      fireEvent.click(ratingScaleAccordion[0])
+      fireEvent.click(ratingScaleAccordion[0])
+
+      const ratingScaleAccordionItems = queryAllByTestId('rating-scale-accordion-item')
+      expect(ratingScaleAccordionItems.length).toEqual(0)
+    })
+
+    describe('criterion modal', () => {
+      it('opens the criterion modal when the add criterion button is clicked', async () => {
+        queryClient.setQueryData(['fetch-rubric-1'], RUBRICS_QUERY_RESPONSE)
+
+        const {getByTestId, queryByTestId} = renderComponent()
+        expect(queryByTestId('rubric-criterion-modal')).toBeNull()
+        fireEvent.click(getByTestId('add-criterion-button'))
+
+        await new Promise(resolve => setTimeout(resolve, 0))
+        expect(getByTestId('rubric-criterion-modal')).toBeInTheDocument()
+      })
+
+      it('does not save new criterion when the cancel button is clicked', async () => {
+        queryClient.setQueryData(['fetch-rubric-1'], RUBRICS_QUERY_RESPONSE)
+
+        const {getByTestId, queryAllByTestId} = renderComponent()
+        fireEvent.click(getByTestId('add-criterion-button'))
+        await new Promise(resolve => setTimeout(resolve, 0))
+        expect(getByTestId('rubric-criterion-modal')).toBeInTheDocument()
+        fireEvent.change(getByTestId('rubric-criterion-description'), {
+          target: {value: 'New Criterion Test'},
+        })
+        fireEvent.click(getByTestId('rubric-criterion-cancel'))
+        expect(queryAllByTestId('rubric-criteria-row').length).toEqual(2)
+      })
+
+      it('saves new criterion when the save button is clicked', async () => {
+        queryClient.setQueryData(['fetch-rubric-1'], RUBRICS_QUERY_RESPONSE)
+
+        const {getByTestId, queryAllByTestId} = renderComponent()
+        expect(queryAllByTestId('rubric-criteria-row').length).toEqual(2)
+
+        fireEvent.click(getByTestId('add-criterion-button'))
+        await new Promise(resolve => setTimeout(resolve, 0))
+        expect(getByTestId('rubric-criterion-modal')).toBeInTheDocument()
+        fireEvent.change(getByTestId('rubric-criterion-description'), {
+          target: {value: 'New Criterion Test'},
+        })
+        fireEvent.click(getByTestId('rubric-criterion-save'))
+
+        expect(queryAllByTestId('rubric-criteria-row').length).toEqual(3)
+        const criteriaRowDescriptions = queryAllByTestId('rubric-criteria-row-description')
+        expect(criteriaRowDescriptions[2]).toHaveTextContent('New Criterion Test')
+      })
+
+      it('updates existing criterion when the save button is clicked', async () => {
+        queryClient.setQueryData(['fetch-rubric-1'], RUBRICS_QUERY_RESPONSE)
+
+        const {getByTestId, queryAllByTestId} = renderComponent()
+        expect(queryAllByTestId('rubric-criteria-row').length).toEqual(2)
+
+        fireEvent.click(queryAllByTestId('rubric-criteria-row-edit-button')[0])
+        await new Promise(resolve => setTimeout(resolve, 0))
+        expect(getByTestId('rubric-criterion-modal')).toBeInTheDocument()
+        fireEvent.change(getByTestId('rubric-criterion-description'), {
+          target: {value: 'Updated Criterion Test'},
+        })
+        fireEvent.click(getByTestId('rubric-criterion-save'))
+
+        expect(queryAllByTestId('rubric-criteria-row').length).toEqual(2)
+        const criteriaRowDescriptions = queryAllByTestId('rubric-criteria-row-description')
+        expect(criteriaRowDescriptions[0]).toHaveTextContent('Updated Criterion Test')
+      })
+
+      it('does not update existing criterion when the cancel button is clicked', async () => {
+        queryClient.setQueryData(['fetch-rubric-1'], RUBRICS_QUERY_RESPONSE)
+
+        const {getByTestId, queryAllByTestId} = renderComponent()
+        expect(queryAllByTestId('rubric-criteria-row').length).toEqual(2)
+
+        fireEvent.click(queryAllByTestId('rubric-criteria-row-edit-button')[0])
+        await new Promise(resolve => setTimeout(resolve, 0))
+        expect(getByTestId('rubric-criterion-modal')).toBeInTheDocument()
+        fireEvent.change(getByTestId('rubric-criterion-description'), {
+          target: {value: 'Updated Criterion Test'},
+        })
+        fireEvent.click(getByTestId('rubric-criterion-cancel'))
+
+        expect(queryAllByTestId('rubric-criteria-row').length).toEqual(2)
+        const criteriaRowDescriptions = queryAllByTestId('rubric-criteria-row-description')
+        expect(criteriaRowDescriptions[0]).not.toHaveTextContent('Updated Criterion Test')
+      })
     })
   })
 })

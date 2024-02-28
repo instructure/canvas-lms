@@ -38,9 +38,7 @@ QUnit.module('Shared > SetDefaultGradeDialog', suiteHooks => {
   }
 
   function closeDialog() {
-    Array.from(getDialog().querySelectorAll('button'))
-      .find(node => node.innerText === 'close')
-      .click()
+    getDialog().querySelector('.ui-dialog-titlebar-close').click()
   }
 
   test('#gradeIsExcused returns true if grade is EX', () => {

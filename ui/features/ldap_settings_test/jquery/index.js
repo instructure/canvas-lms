@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-shadow */
 /*
  * Copyright (C) 2013 - present Instructure, Inc.
  *
@@ -30,6 +31,8 @@ function testLDAP() {
   $('#test_ldap_dialog').dialog({
     title: I18n.t('test_ldap_dialog_title', 'Test LDAP Settings'),
     width: 600,
+    modal: true,
+    zIndex: 1000,
   })
   ENV.LDAP_TESTS[0].js_function()
 }

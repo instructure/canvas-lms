@@ -28,7 +28,11 @@ import OutcomeGroupIconView from './OutcomeGroupIconView'
 import OutcomeIconView from './OutcomeIconView'
 import {publish} from 'jquery-tinypubsub'
 import '@canvas/jquery/jquery.disableWhileLoading'
-import 'jqueryui/droppable'
+import 'jqueryui-unpatched/core'
+import 'jqueryui-unpatched/widget'
+import 'jqueryui-unpatched/mouse'
+import 'jqueryui-unpatched/draggable'
+import 'jqueryui-unpatched/droppable'
 import '@canvas/rails-flash-notifications'
 
 const I18n = useI18nScope('OutcomesDirectoryView')

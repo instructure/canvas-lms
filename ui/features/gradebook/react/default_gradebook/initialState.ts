@@ -53,9 +53,12 @@ export function getInitialGridDisplaySettings(
   const sortRowsByDirection = settings.sort_rows_by_direction || 'ascending'
   const filterColumnsBy: FilterColumnsOptions = {
     assignmentGroupId: null,
+    assignmentGroupIds: null,
     contextModuleId: null,
+    contextModuleIds: null,
     gradingPeriodId: null,
     submissions: null,
+    submissionFilters: null,
     startDate: null,
     endDate: null,
   }
@@ -64,7 +67,9 @@ export function getInitialGridDisplaySettings(
   }
   const filterRowsBy = {
     sectionId: null,
+    sectionIds: null,
     studentGroupId: null,
+    studentGroupIds: [],
   }
   if (settings.filter_rows_by != null) {
     Object.assign(filterRowsBy, camelizeProperties(settings.filter_rows_by))

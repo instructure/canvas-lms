@@ -83,9 +83,9 @@ describe "manage groups" do
       # Remove added user from the group
       fj(".groups .group .toggle-group:first").click
       wait_for_ajaximations
-      fj(".groups .group .group-user-actions:first").click
+      fj("[data-testid=groupUserMenu]:first").click
       wait_for_ajaximations
-      fj(".remove-from-group:first").click
+      f("[data-testid=removeFromGroup]").click
       wait_for_ajaximations
       expect(fj(".group-summary:visible:first").text).to eq "0 students"
       # should re-appear in unassigned
@@ -185,8 +185,8 @@ describe "manage groups" do
       expect(fj(".group-summary:visible:last").text).to eq "0 students"
 
       # Move the user from one group into the other
-      f(".groups .group .group-user .group-user-actions").click
-      fj(".edit-group-assignment:first").click
+      f("[data-testid=groupUserMenu]").click
+      f("[data-testid=moveTo]").click
       f("div[aria-label='Move Student']") # wait for element
       f(".move-select .move-select__group option:last-child").click
       expect(f("body")).to contain_jqcss(".move-select button[type='submit']:visible")
@@ -197,9 +197,8 @@ describe "manage groups" do
       expect(fj(".group-summary:visible:last").text).to eq "1 student"
 
       # Move the user back
-      f(".groups .group .group-user .group-user-actions").click
-      scroll_into_view(".edit-group-assignment:first")
-      fj(".edit-group-assignment:first").click
+      f("[data-testid=groupUserMenu]").click
+      f("[data-testid=moveTo]").click
       f("div[aria-label='Move Student']") # wait for element
       ff(".move-select .move-select__group option").last.click
       expect(f("body")).to contain_jqcss(".move-select button[type='submit']:visible")

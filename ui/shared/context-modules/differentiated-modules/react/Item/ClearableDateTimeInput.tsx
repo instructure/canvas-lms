@@ -24,6 +24,7 @@ import {Flex} from '@instructure/ui-flex'
 import WithBreakpoints from '@canvas/with-breakpoints'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import type {Breakpoints} from '@canvas/with-breakpoints'
+import type {FormMessage} from '@instructure/ui-form-field'
 
 const I18n = useI18nScope('differentiated_modules')
 
@@ -31,10 +32,15 @@ export interface ClearableDateTimeInputProps {
   description: string
   dateRenderLabel: string
   value: string | null
-  messages: Array<{type: 'error'; text: string}>
+  messages: Array<FormMessage>
   onChange: (event: React.SyntheticEvent, value: string | undefined) => void
+  onBlur?: (event: React.SyntheticEvent) => void
   onClear: () => void
   breakpoints: Breakpoints
+  showMessages?: boolean
+  locale?: string
+  timezone?: string
+  dateInputRef?: (el: HTMLInputElement | null) => void
 }
 
 function ClearableDateTimeInput({
@@ -43,8 +49,13 @@ function ClearableDateTimeInput({
   value,
   messages,
   onChange,
+  onBlur,
   onClear,
   breakpoints,
+  showMessages,
+  locale,
+  timezone,
+  dateInputRef,
 }: ClearableDateTimeInputProps) {
   const determineHeight = () => {
     if (breakpoints?.mobileOnly) {
@@ -84,7 +95,12 @@ function ClearableDateTimeInput({
           value={value ?? undefined}
           layout="columns"
           messages={messages}
+          showMessages={showMessages}
+          locale={locale}
+          timezone={timezone}
           onChange={onChange}
+          onBlur={onBlur}
+          dateInputRef={dateInputRef}
         />
       </Flex.Item>
       <Flex.Item overflowX="visible" overflowY="visible">

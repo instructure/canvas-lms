@@ -23,7 +23,9 @@ module SIS
     def process
       importer = Work.new(@batch, @root_account, @logger)
       EnrollmentTerm.process_as_sis(@sis_options) do
-        yield importer
+        EnrollmentDatesOverride.process_as_sis(@sis_options) do
+          yield importer
+        end
       end
       SisBatchRollBackData.bulk_insert_roll_back_data(importer.roll_back_data)
 
@@ -56,11 +58,15 @@ module SIS
             raise ImportError, "Invalid date_override_enrollment_type"
           end
 
-          case status
-          when /active/i
-            term.set_overrides(@root_account, { date_override_enrollment_type => { start_at: start_date, end_at: end_date } })
-          when /deleted/i
-            term.enrollment_dates_overrides.where(enrollment_type: date_override_enrollment_type).destroy_all
+          date_override = term.enrollment_dates_overrides.where(enrollment_type: date_override_enrollment_type).order(:id).first
+          unless date_override&.stuck_sis_fields&.intersect?(%i[start_at end_at])
+            case status
+            when /active/i
+              date_override ||= term.enrollment_dates_overrides.build(context: @root_account, enrollment_type: date_override_enrollment_type)
+              date_override.update!(start_at: start_date, end_at: end_date)
+            when /deleted/i
+              term.enrollment_dates_overrides.where(enrollment_type: date_override_enrollment_type).destroy_all
+            end
           end
         else
           raise ImportError, "No name given for term #{term_id}" if name.blank?

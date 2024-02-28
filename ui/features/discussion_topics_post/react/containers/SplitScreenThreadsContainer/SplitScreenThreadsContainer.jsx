@@ -270,7 +270,7 @@ const SplitScreenThreadContainer = props => {
     })
   }
 
-  if (props.discussionEntry.permissions.reply) {
+  if (props?.discussionEntry?.permissions?.reply) {
     threadActions.push(
       <ThreadingToolbar.Reply
         key={`reply-${props.discussionEntry.id}`}
@@ -374,10 +374,14 @@ const SplitScreenThreadContainer = props => {
                               }
                             : null
                         }
-                        onQuoteReply={() => {
-                          setReplyFromId(props.discussionEntry._id)
-                          props.onOpenSplitScreenView(props.discussionEntry._id, true)
-                        }}
+                        onQuoteReply={
+                          props?.discussionEntry?.permissions?.reply
+                            ? () => {
+                                setReplyFromId(props.discussionEntry._id)
+                                props.onOpenSplitScreenView(props.discussionEntry._id, true)
+                              }
+                            : null
+                        }
                         onReport={
                           props.discussionTopic.permissions?.studentReporting
                             ? () => {

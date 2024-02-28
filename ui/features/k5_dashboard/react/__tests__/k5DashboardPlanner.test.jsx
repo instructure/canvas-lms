@@ -92,8 +92,7 @@ describe('K5Dashboard Schedule Section', () => {
     expect(header).toBeInTheDocument()
   })
 
-  // LF-1169 - remove or rewrite to remove spies on imports
-  it.skip('renders an "jump to navigation" button at the bottom of the schedule tab', async () => {
+  it('renders an "jump to navigation" button at the bottom of the schedule tab', async () => {
     const {findByTestId} = render(
       <K5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnabled={true} />
     )
@@ -106,8 +105,7 @@ describe('K5Dashboard Schedule Section', () => {
     expect(jumpToNavButton).not.toBeVisible()
   })
 
-  // LF-1169 - remove or rewrite to remove spies on imports
-  it.skip('allows navigating to next/previous weeks if there are plannable items in the future/past', async () => {
+  it('allows navigating to next/previous weeks if there are plannable items in the future/past', async () => {
     const {findByTestId, getByTestId} = render(
       <K5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnabled={true} />
     )

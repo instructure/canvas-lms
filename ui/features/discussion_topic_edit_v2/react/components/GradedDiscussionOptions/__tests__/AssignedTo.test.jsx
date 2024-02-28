@@ -100,11 +100,6 @@ describe('AssignTo', () => {
     expect(onOptionDismiss).toHaveBeenCalledWith('u_2')
   })
 
-  it('shows an error message when provided', () => {
-    const {queryByText} = setup({errorMessage: [{type: 'error', text: 'Some error occurred'}]})
-    expect(queryByText('Some error occurred')).toBeInTheDocument()
-  })
-
   it('keyboard navigation does not affect option filtering', () => {
     const {getByTestId, getAllByTestId} = setup()
 

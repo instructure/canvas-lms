@@ -112,6 +112,27 @@ describe "threaded discussions" do
     expect(f("body")).not_to contain_jqcss("div[data-testid='drawer-layout-tray']")
   end
 
+  it "auto reads inline entries" do
+    # initially set user preference discussions_split_screen, so 'Inline will be the initial View'
+    @teacher.preferences[:discussions_splitscreen_view] = false
+    @teacher.save!
+    user_session(@teacher)
+    expect(@first_reply.discussion_entry_participants.where(user: @teacher).count).to eq 0
+    expect(@second_reply.discussion_entry_participants.where(user: @teacher).count).to eq 0
+    Discussion.visit(@course, @topic)
+    wait_for_ajaximations
+    expect(f("div[data-testid='replies-counter']")).to include_text("2 Replies, 2 Unread")
+    f("button[data-testid='expand-button']").click
+    wait_for_ajaximations
+    # Auto read has a 3 second delay before firing off the read event
+    keep_trying_until { @first_reply.discussion_entry_participants.where(user: @teacher).first.workflow_state == "read" }
+    wait_for_ajaximations
+    expect(@first_reply.discussion_entry_participants.where(user: @teacher).first.workflow_state).to eq "read"
+    expect(@second_reply.discussion_entry_participants.where(user: @teacher).first.workflow_state).to eq "read"
+    expect(f("div[data-testid='replies-counter']")).to include_text("2 Replies")
+    expect(f("div[data-testid='replies-counter']")).not_to include_text("2 Replies, 2 Unread")
+  end
+
   it "allows you to click the mobile RCE without closing", :ignore_js_errors do
     driver.manage.window.resize_to(565, 836)
 

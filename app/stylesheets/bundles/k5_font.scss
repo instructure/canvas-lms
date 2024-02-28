@@ -40,6 +40,14 @@
   & input, button, select, textarea, a, span {
     font-family: "Balsamiq Sans", $ic-font-family;
   }
+
+  // The RCE uses a and span tags in user content and we don't want to override
+  // a different font they may have set.
+  .user_content {
+    a, span {
+      font-family: inherit;
+    }
+  }
 }
 
 // These overrides are only here because the Dashboard cards don't fully use InstUI.

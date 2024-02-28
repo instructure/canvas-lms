@@ -106,11 +106,13 @@ import type {
 } from '@canvas/grading/grading.d'
 import type {
   ColumnFilterKey,
+  FilterRowsBy,
   GridColumn,
   GridData,
   GridDataColumnsWithObjects,
   GridDisplaySettings,
   GridLocation,
+  FilterColumnsOptions,
   RowFilterKey,
 } from './grid.d'
 import type GradebookGridType from './GradebookGrid/index'
@@ -186,7 +188,7 @@ import 'jqueryui/tooltip'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 import 'jquery-tinypubsub'
-import 'jqueryui/position'
+import 'jqueryui-unpatched/position'
 import '@canvas/util/jquery/fixDialogButtons'
 
 import {
@@ -214,6 +216,7 @@ import {
   getDefaultSettingKeyForColumnType,
   getGradeAsPercent,
   getStudentGradeForColumn,
+  idArraysEqual,
   hiddenStudentIdsForAssignment,
   htmlDecode,
   isAdmin,
@@ -1232,9 +1235,11 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   }
 
   filterStudents = (students: Student[]): Student[] => {
-    // If we're filtering by search term, we don't need to apply other frontend filters.
+    // need to apply row specific filters here as well, such as the student groups filter when it becomes a frontend filter
     if (this.isFilteringRowsBySearchTerm()) {
-      return students.filter(student => this.searchFilteredStudentIds.includes(student.id))
+      return students
+        .filter(student => this.searchFilteredStudentIds.includes(student.id))
+        .filter(filterStudentBySectionFn(this.props.appliedFilters, this.getEnrollmentFilters()))
     }
 
     return students
@@ -1599,6 +1604,17 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
   }
 
+  updateCurrentSections = (sectionIds: string[]) => {
+    const savedSetting = this.getFilterRowsBySetting('sectionIds') || []
+    if (!idArraysEqual(sectionIds, savedSetting)) {
+      this.setFilterRowsBySetting('sectionIds', sectionIds)
+      const sectionId = sectionIds.length > 0 ? sectionIds[sectionIds.length - 1] : null
+      this.setFilterRowsBySetting('sectionId', sectionId)
+      this.props.postGradesStore.setSelectedSection(sectionId)
+      this.saveSettings()
+    }
+  }
+
   showSections = () => this.sections_enabled
 
   updateStudentGroupFilterVisibility = () => {
@@ -1638,6 +1654,19 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   updateCurrentStudentGroup = (groupId: string | null) => {
     groupId = groupId === '0' ? null : groupId
     if (this.getFilterRowsBySetting('studentGroupId') !== groupId) {
+      this.setFilterRowsBySetting('studentGroupId', groupId)
+      return this.saveSettings({}).then(() => {
+        this.updateStudentGroupFilterVisibility()
+        this.props.reloadStudentData()
+      })
+    }
+  }
+
+  updateCurrentStudentGroups = (groupIds: string[]) => {
+    const savedSetting = this.getFilterRowsBySetting('studentGroupIds') || []
+    if (!idArraysEqual(groupIds, savedSetting)) {
+      this.setFilterRowsBySetting('studentGroupIds', groupIds)
+      const groupId = groupIds.length > 0 ? groupIds[groupIds.length - 1] : null
       this.setFilterRowsBySetting('studentGroupId', groupId)
       return this.saveSettings({}).then(() => {
         this.updateStudentGroupFilterVisibility()
@@ -1687,10 +1716,38 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
   }
 
+  updateCurrentAssignmentGroups = (groupIds: string[]) => {
+    const savedSetting = this.getFilterColumnsBySetting('assignmentGroupIds') || []
+    if (!idArraysEqual(groupIds, savedSetting)) {
+      this.setFilterColumnsBySetting('assignmentGroupIds', groupIds)
+      const groupId = groupIds.length > 0 ? groupIds[groupIds.length - 1] : null
+      this.setFilterColumnsBySetting('assignmentGroupId', groupId)
+      this.saveSettings()
+      this.resetGrading()
+      this.updateFilteredContentInfo()
+      this.updateColumnsAndRenderViewOptionsMenu()
+      this.updateAssignmentGroupFilterVisibility()
+    }
+  }
+
   updateSubmissionsFilter = async (submissionFilter: SubmissionFilterValue) => {
     if (this.getFilterColumnsBySetting('submissions') !== submissionFilter) {
       const originalValue = this.gridDisplaySettings.filterColumnsBy.submissions
       this.gridDisplaySettings.filterColumnsBy.submissions = submissionFilter || null
+      await this.saveSettings({}).catch(() => {
+        this.gridDisplaySettings.filterColumnsBy.submissions = originalValue
+      })
+    }
+  }
+
+  updateSubmissionsFilters = async (submissionFilters: SubmissionFilterValue[]) => {
+    const savedSetting = this.getFilterColumnsBySetting('submissionFilters') || []
+    if (!idArraysEqual(submissionFilters, savedSetting)) {
+      this.setFilterColumnsBySetting('submissionFilters', submissionFilters)
+      const submissionFilter =
+        submissionFilters.length > 0 ? submissionFilters[submissionFilters.length - 1] : null
+      const originalValue = this.gridDisplaySettings.filterColumnsBy.submissions
+      this.setFilterColumnsBySetting('submissions', submissionFilter)
       await this.saveSettings({}).catch(() => {
         this.gridDisplaySettings.filterColumnsBy.submissions = originalValue
       })
@@ -1739,6 +1796,19 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   updateCurrentModule = (moduleId: string | null) => {
     if (this.getFilterColumnsBySetting('contextModuleId') !== moduleId) {
       this.gridDisplaySettings.filterColumnsBy.contextModuleId = moduleId
+      this.saveSettings()
+      this.updateFilteredContentInfo()
+      this.updateColumnsAndRenderViewOptionsMenu()
+      this.updateModulesFilterVisibility()
+    }
+  }
+
+  updateCurrentModules = (moduleIds: string[]) => {
+    const savedSetting = this.getFilterColumnsBySetting('contextModuleIds') || []
+    if (!idArraysEqual(moduleIds, savedSetting)) {
+      this.setFilterColumnsBySetting('contextModuleIds', moduleIds)
+      const moduleId = moduleIds.length > 0 ? moduleIds[moduleIds.length - 1] : null
+      this.setFilterColumnsBySetting('contextModuleId', moduleId)
       this.saveSettings()
       this.updateFilteredContentInfo()
       this.updateColumnsAndRenderViewOptionsMenu()
@@ -2898,6 +2968,20 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       view_ungraded_as_zero: viewUngradedAsZero ? 'true' : 'false',
       colors,
     }
+
+    if (this.options.multiselect_gradebook_filters_enabled) {
+      gradebook_settings.filter_rows_by.student_group_ids =
+        this.gridDisplaySettings.filterRowsBy.studentGroupIds
+      gradebook_settings.filter_rows_by.section_ids =
+        this.gridDisplaySettings.filterRowsBy.sectionIds
+      gradebook_settings.filter_columns_by.assignment_group_ids =
+        this.gridDisplaySettings.filterColumnsBy.assignmentGroupIds
+      gradebook_settings.filter_columns_by.context_module_ids =
+        this.gridDisplaySettings.filterColumnsBy.contextModuleIds
+      gradebook_settings.filter_columns_by.submission_filters =
+        this.gridDisplaySettings.filterColumnsBy.submissionFilters
+    }
+
     if (this.options.enhanced_gradebook_filters) {
       return GradebookApi.saveUserSettings(this.options.context_id, gradebook_settings)
     } else {
@@ -2933,7 +3017,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       }
     }
     this.gridData.rows.sort(respectorOfPersonsSort())
-    this.courseContent.students.setStudentIds(map(this.gridData.rows, 'id'))
     this.gradebookGrid?.invalidate()
   }
 
@@ -3977,22 +4060,28 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   }
 
   // Grid Display Settings Access Methods
-  getFilterColumnsBySetting = (filterKey: ColumnFilterKey) => {
+  getFilterColumnsBySetting = <K extends keyof FilterColumnsOptions>(
+    filterKey: K
+  ): FilterColumnsOptions[K] => {
     return this.gridDisplaySettings?.filterColumnsBy[filterKey]
   }
 
   // Grid Display Settings Access Methods
   // Kept only for tests
   // TODO: Remove when moving tests to Jest
-  setFilterColumnsBySetting = (filterKey: ColumnFilterKey, value: null | SubmissionFilterValue) => {
+  setFilterColumnsBySetting = <K extends keyof FilterColumnsOptions>(
+    filterKey: K,
+    value: FilterColumnsOptions[K]
+  ) => {
     this.gridDisplaySettings.filterColumnsBy[filterKey] = value
     this.updateFilterAssignmentIds()
   }
 
-  getFilterRowsBySetting = (filterKey: RowFilterKey): string | null =>
-    this.gridDisplaySettings.filterRowsBy[filterKey]
+  getFilterRowsBySetting = <K extends keyof FilterRowsBy>(filterKey: K): FilterRowsBy[K] => {
+    return this.gridDisplaySettings.filterRowsBy[filterKey]
+  }
 
-  setFilterRowsBySetting = (filterKey: RowFilterKey, value: null | string) => {
+  setFilterRowsBySetting = <K extends keyof FilterRowsBy>(filterKey: K, value: FilterRowsBy[K]) => {
     this.gridDisplaySettings.filterRowsBy[filterKey] = value
   }
 
@@ -4892,7 +4981,12 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       // section
       const prevSectionIds = findFilterValuesOfType('section', prevProps.appliedFilters)
       const sectionIds = findFilterValuesOfType('section', this.props.appliedFilters)
-      if (prevSectionIds[0] !== sectionIds[0]) {
+      if (
+        this.options.multiselect_gradebook_filters_enabled &&
+        !idArraysEqual(prevSectionIds, sectionIds)
+      ) {
+        this.updateCurrentSections(sectionIds)
+      } else if (prevSectionIds[0] !== sectionIds[0]) {
         if (sectionIds.length === 0) {
           this.updateCurrentSection(null)
         } else {
@@ -4903,7 +4997,12 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       // modules
       const prevModulesIds = findFilterValuesOfType('module', prevProps.appliedFilters)
       const moduleIds = findFilterValuesOfType('module', this.props.appliedFilters)
-      if (prevModulesIds[0] !== moduleIds[0]) {
+      if (
+        this.options.multiselect_gradebook_filters_enabled &&
+        !idArraysEqual(prevModulesIds, moduleIds)
+      ) {
+        this.updateCurrentModules(moduleIds)
+      } else if (prevModulesIds[0] !== moduleIds[0]) {
         if (moduleIds.length === 0 || !moduleIds[0]) {
           this.updateCurrentModule(null)
         } else {
@@ -4920,7 +5019,12 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         'assignment-group',
         this.props.appliedFilters
       )
-      if (prevAssignmentGroupIds[0] !== assignmentGroupIds[0]) {
+      if (
+        this.options.multiselect_gradebook_filters_enabled &&
+        !idArraysEqual(prevAssignmentGroupIds, assignmentGroupIds)
+      ) {
+        this.updateCurrentAssignmentGroups(assignmentGroupIds)
+      } else if (prevAssignmentGroupIds[0] !== assignmentGroupIds[0]) {
         if (assignmentGroupIds.length === 0 || !assignmentGroupIds[0]) {
           this.updateCurrentAssignmentGroup(null)
         } else {
@@ -4931,7 +5035,11 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       // student groups
       const prevStudentGroupIds = findFilterValuesOfType('student-group', prevProps.appliedFilters)
       const studentGroupIds = findFilterValuesOfType('student-group', this.props.appliedFilters)
-      if (prevStudentGroupIds[0] !== studentGroupIds[0]) {
+      if (this.options.multiselect_gradebook_filters_enabled) {
+        if (!idArraysEqual(prevStudentGroupIds, studentGroupIds)) {
+          this.updateCurrentStudentGroups(studentGroupIds)
+        }
+      } else if (prevStudentGroupIds[0] !== studentGroupIds[0]) {
         if (studentGroupIds.length === 0 || !studentGroupIds[0]) {
           this.updateCurrentStudentGroup(null)
         } else {
@@ -4976,10 +5084,15 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       }
 
       // submissions
-      const prevSubmissionsFilter = findSubmissionFilterValue(prevProps.appliedFilters)
-      const submissionFilter = findSubmissionFilterValue(this.props.appliedFilters)
-      if (prevSubmissionsFilter !== submissionFilter) {
-        this.updateSubmissionsFilter(submissionFilter)
+      const prevSubmissionsFilters = findFilterValuesOfType('submissions', prevProps.appliedFilters)
+      const submissionFilters = findFilterValuesOfType('submissions', this.props.appliedFilters)
+      if (
+        this.options.multiselect_gradebook_filters_enabled &&
+        !idArraysEqual(prevSubmissionsFilters, submissionFilters)
+      ) {
+        this.updateSubmissionsFilters(submissionFilters as SubmissionFilterValue[])
+      } else if (prevSubmissionsFilters[0] !== submissionFilters[0]) {
+        this.updateSubmissionsFilter(submissionFilters[0] as SubmissionFilterValue)
       }
 
       this.updateColumns()

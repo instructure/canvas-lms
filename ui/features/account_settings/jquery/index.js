@@ -49,6 +49,8 @@ export function openReportDescriptionLink(event) {
   $desc.clone().dialog({
     title,
     width: responsiveWidth,
+    modal: true,
+    zIndex: 1000,
   })
 }
 
@@ -246,6 +248,8 @@ $(document).ready(function () {
                     autoOpen: false,
                     width: responsiveWidth,
                     title: I18n.t('titles.configure_report', 'Configure Report'),
+                    modal: true,
+                    zIndex: 1000,
                   })
               }
               $dialog.dialog('open')
@@ -330,6 +334,8 @@ $(document).ready(function () {
     $('#ip_filters_dialog').dialog({
       title: I18n.t('titles.what_are_quiz_ip_filters', 'What are Quiz IP Filters?'),
       width: 400,
+      modal: true,
+      zIndex: 1000,
     })
   })
   $('.rqd_help_btn').click(event => {
@@ -337,6 +343,8 @@ $(document).ready(function () {
     $('#rqd_dialog').dialog({
       title: I18n.t('titles.rqd_help', 'Restrict Quantitative Data'),
       width: 400,
+      modal: true,
+      zIndex: 1000,
     })
   })
 
@@ -348,6 +356,8 @@ $(document).ready(function () {
         'An External Identity Provider is Enabled'
       ),
       width: 400,
+      modal: true,
+      zIndex: 1000,
     })
   })
 
@@ -485,6 +495,8 @@ $(document).ready(function () {
     $dialog.dialog({
       autoOpen: false,
       width: 560,
+      modal: true,
+      zIndex: 1000,
     })
 
     $(`<button class="Button Button--icon-action" type="button">

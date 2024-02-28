@@ -42,7 +42,7 @@ class CustomData < ActiveRecord::Base
 
   belongs_to :user
 
-  serialize :data, Hash
+  serialize :data, type: Hash
 
   validates :user, :namespace, presence: true
 

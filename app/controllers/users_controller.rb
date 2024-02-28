@@ -1355,9 +1355,10 @@ class UsersController < ApplicationController
       get_context(user_scope: User) if params[:account_id] || params[:course_id] || params[:group_id]
 
       @context_account = @context.is_a?(Account) ? @context : @domain_root_account
-      all_users = @context&.all_users
-      all_users = all_users&.except(:limit)&.union(@context.deleted_users) if @context.is_a?(Account) && Account.site_admin.feature_enabled?(:deleted_user_tools)
-      @user = api_find_all(all_users || User, [params[:id]]).first
+      @user = api_find_all(@context&.all_users || User, [params[:id]]).first
+      if !@user && @context.is_a?(Account) && Account.site_admin.feature_enabled?(:deleted_user_tools)
+        @user = api_find_all(@context&.deleted_users, [params[:id]]).first
+      end
       allowed = @user&.grants_right?(@current_user, session, :read_full_profile)
 
       return render_unauthorized_action unless allowed
@@ -1407,10 +1408,12 @@ class UsersController < ApplicationController
           render status:
         end
         format.json do
+          includes = %w[locale avatar_url]
+          includes << "deleted_pseudonyms" if @context.is_a?(Account)
           render json: user_json(@user,
                                  @current_user,
                                  session,
-                                 %w[locale avatar_url],
+                                 includes,
                                  @current_user.pseudonym.account),
                  status:
         end

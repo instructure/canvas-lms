@@ -497,27 +497,38 @@ describe "Files API", type: :request do
       expect(existing.replacement_attachment).to eq attachment
     end
 
-    it "reuses the Attachment if a file is re-uploaded to the same folder" do
-      existing = Attachment.create!(
-        context: @course,
-        folder:,
-        uploaded_data: StringIO.new("a file"),
-        filename: base_params[:name],
-        display_name: base_params[:name],
-        instfs_uuid: "old-instfs-uuid"
-      )
+    describe "re-uploading a file" do
+      before :once do
+        @existing = Attachment.create!(
+          context: @course,
+          folder:,
+          uploaded_data: StringIO.new("a file"),
+          filename: base_params[:name],
+          display_name: base_params[:name],
+          instfs_uuid: "old-instfs-uuid"
+        )
+        @capture_params = base_params.merge(controller: "files",
+                                            action: "api_capture",
+                                            format: "json",
+                                            size: @existing.size,
+                                            sha512: @existing.md5,
+                                            instfs_uuid: "new-instfs-uuid",
+                                            on_duplicate: "overwrite")
+      end
 
-      capture_params = base_params.merge(controller: "files",
-                                         action: "api_capture",
-                                         format: "json",
-                                         size: existing.size,
-                                         sha512: existing.md5,
-                                         instfs_uuid: "new-instfs-uuid",
-                                         on_duplicate: "overwrite")
-      expect(InstFS).to receive(:delete_file).with("old-instfs-uuid")
-      json = api_call(:post, "/api/v1/files/capture?#{capture_params.to_query}", capture_params)
-      expect(json["id"]).to eq existing.id
-      expect(existing.reload.instfs_uuid).to eq "new-instfs-uuid"
+      it "reuses the Attachment if a file is re-uploaded to the same folder" do
+        expect(InstFS).to receive(:delete_file).with("old-instfs-uuid")
+        json = api_call(:post, "/api/v1/files/capture?#{@capture_params.to_query}", @capture_params)
+        expect(json["id"]).to eq @existing.id
+        expect(@existing.reload.instfs_uuid).to eq "new-instfs-uuid"
+      end
+
+      it "does not reuse a deleted Attachment" do
+        @existing.destroy
+        expect(InstFS).not_to receive(:delete_file)
+        json = api_call(:post, "/api/v1/files/capture?#{@capture_params.to_query}", @capture_params)
+        expect(json["id"]).not_to eq @existing.id
+      end
     end
 
     it "redirect has preview_url include if requested" do

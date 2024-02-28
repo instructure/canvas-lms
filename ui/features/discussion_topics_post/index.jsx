@@ -41,7 +41,7 @@ if (ENV.SEQUENCE != null && !urlParams.get('embed')) {
   // eslint-disable-next-line promise/catch-or-return
   import('@canvas/module-sequence-footer').then(() => {
     $(() => {
-      $('<div id="module_sequence_footer" style="margin-top: 30px" />')
+      $('<div id="module_sequence_footer" style="margin-right: 30px" />')
         .appendTo('#content')
         .moduleSequenceFooter({
           assetType: 'Discussion',

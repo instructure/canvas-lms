@@ -1,3 +1,4 @@
+/* eslint-disable eqeqeq */
 /*
  * Copyright (C) 2011 - present Instructure, Inc.
  *
@@ -122,6 +123,7 @@ window.messageStudents = function (settings) {
       close: (_event, _ui) => {
         $message_students_dialog.closest('.ui-dialog').removeAttr('role').removeAttr('aria-label')
       },
+      zIndex: 1000,
     })
     .dialog('open')
     .dialog('option', 'title', dialogTitle)

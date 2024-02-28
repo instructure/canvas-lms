@@ -890,7 +890,10 @@ class FilesController < ApplicationController
       # despite name, this is really just asking if the assignment expects an
       # upload
       # The discussion_topic check is to allow attachments to graded discussions to not count against the user's quota.
-      if asset.allow_google_docs_submission? || asset.submission_types == "discussion_topic"
+      if asset.submission_types == "discussion_topic"
+        any_entry = asset.discussion_topic.discussion_entries.temp_record
+        authorized_action(any_entry, @current_user, :attach)
+      elsif asset.allow_google_docs_submission?
         authorized_action(asset, @current_user, :submit)
       else
         authorized_action(asset, @current_user, :nothing)
@@ -1059,11 +1062,11 @@ class FilesController < ApplicationController
                     @context.shard.activate do
                       # avoid creating an identical Attachment
                       unless params[:on_duplicate] == "rename"
-                        att = Attachment.find_by(context: @context,
-                                                 folder_id: params[:folder_id],
-                                                 display_name: params[:display_name] || params[:name],
-                                                 size: params[:size],
-                                                 md5: params[:sha512])
+                        att = Attachment.active.find_by(context: @context,
+                                                        folder_id: params[:folder_id],
+                                                        display_name: params[:display_name] || params[:name],
+                                                        size: params[:size],
+                                                        md5: params[:sha512])
                         overwritten_instfs_uuid = att.instfs_uuid if att
                       end
                       att || Attachment.where(context: @context).build

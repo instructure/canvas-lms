@@ -2100,6 +2100,7 @@ tr:
   add_users_to_name_b8109bbb: "%{name}'a Kullanıcıları Ekle"
   add_your_assignments_you_can_just_make_a_long_list_8a7862dd: "Ödevlerinizi ekleyin. Yalnızca uzun bir liste yapabilir ya da bunları gruplara ayırabilirsiniz- ve hatta her ödev grubu için ağırlıkları belirleyebilirsiniz."
   add_your_zendesk_instance_s_custom_field_id_for_ea_3aeb75f4: "Aşağıdakilerin her biri için Zendesk yapılandırılmanızın isteğe bağlı alan ID'sini ekleyin (ID'si olamayan alanların logları tutulmayacak):"
+  adding_efca307a: Ekleniyor...
   additional_comments_9aed10bb: "Ek Yorumlar"
   additional_occurrence_s_7b5b0173: "ek oluşum(lar)"
   additional_outcomes_options_6df428f1: "Ek öğrenme çıktısı seçenekleri"

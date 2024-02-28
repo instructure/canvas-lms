@@ -363,8 +363,10 @@ pt:
         partner_key: "Chave de parceiro"
   academic_engagement_capella_74946a80: "Envolvimento académico (Capella)"
   academic_engagement_capella_v2_2023_08_28_5c92fd3f: "Compromisso académico (Capella V2-2023-08-28)"
+  academic_engagement_capella_v3_2024_02_05_775b9f21: "Compromisso académico (Capella V3-2024-02-05)"
   academic_engagement_detail_capella_e76c939d: "Detalhe do envolvimento académico (Capella)"
   academic_engagement_detail_capella_v2_2023_08_28_3ba31c31: "Detalhe do Compromisso académico (Capella V2-2023-08-28)"
+  academic_engagement_detail_capella_v3_2024_02_05_106a7e2f: "Detalhe do Compromisso académico (Capella V3-2024-02-05)"
   academic_engagement_detail_sei_31f8f271: "Detalhe do empenho académico - SEI"
   academic_engagement_detail_strayer_1f80cba4: "Detalhe do envolvimento académico (Strayer)"
   academic_engagement_detail_strayer_v3_2023_08_28_cea3521c: "Detalhe do Compromisso académico (Strayer V3-2023-08-28)"
@@ -2290,6 +2292,7 @@ pt:
   add_courses_c0696323: "Adicionar disciplinas"
   add_criterion_eb9587ef: "Adicionar Critério"
   add_custom_link_22059c0: "Adicionar uma ligação personalizada"
+  add_dates_to_gradebook_grading_period_filter_b47b6a14: "Adicionar datas ao Filtro do período de classificação de notas"
   add_delete_b82d05f8: "adicionar / eliminar"
   add_delete_edit_7dbc9c5b: "adicionar / eliminar / editar"
   add_delete_manage_d65e235: "adicionar / Eeliminar / gerir"
@@ -2352,6 +2355,7 @@ pt:
   add_new_caption_or_subtitle_59d2d044: "Adicionar nova legenda ou subtítulo"
   add_new_domain_e097d4a0: "Adicionar novo domínio"
   add_new_group_7ac49f31: "Adicionar novo grupo"
+  add_new_rating_9fb7ec89: "Adicionar nova classificação"
   add_new_row_for_a_letter_grade_to_grading_scheme_a_1472479e: "Adicionar nova linha para uma nota de carta ao sistema de classificação após esta linha"
   add_new_set_of_due_dates_e8e240f: "Adicionar nova definição depois das datas marcadas"
   add_new_term_d2217c0d: "Adicionar novo período"
@@ -5408,6 +5412,7 @@ pt:
   belarusian_b2f19c76: Bielorrusso
   belgium_32_e5f5b598: "Bélgica (+32)"
   belgium_ef8739b6: Bélgica
+  below_81d4dceb: Abaixo
   below_is_an_example_of_how_students_will_see_their_8f7e7971: "Abaixo está um exemplo de como os alunos verão a sua agenda"
   below_mastery_abd1dca5: "Abaixo do domínio"
   below_min_rating_78a742c3: "Abaixo da classificação mín."
@@ -5440,6 +5445,7 @@ pt:
   blackout_date_title_was_edited_31752bc9: "Datas de blackout %{title} foi editada."
   blackout_dates_4a140a72: "Datas de Blackout"
   blank_38df4238: "em branco"
+  block_editor_2e266d9c: "Editor de blocos"
   blocked_30d0fb62: Bloqueado
   blocked_by_running_migration_d8a57cb7: "Bloqueado pela atual migração"
   blocked_domain_name_b5b93150: "Nome de domínio bloqueado"
@@ -8698,6 +8704,7 @@ pt:
   course_copy_no_course_error: "A disciplina de origem não foi encontrada."
   course_copy_not_allowed_error: "Não tem permissão para copiar a disciplina de origem."
   course_course_d1c78210: "Disciplina: %{course}"
+  course_datetime_c0c32b02: "Disciplina: %{datetime}"
   course_default_fd054879: "(predefinição da disciplina)"
   course_default_grading_scheme_6b902d8: "Esquema de classificação predefinido da disciplina"
   course_details_25cdf103: "Detalhes da disciplina"
@@ -9696,6 +9703,7 @@ pt:
   create_file_s_188549e6: "[ Criar Ficheiro(s) ]"
   create_files_after_rce_media_upload_recording_77d75a96: "Criar ficheiros após o Carregamento/Regravação do RCE Media"
   create_filter_preset_d6f28bc4: "Criar Pré-definição do filtro"
+  create_from_outcome_3f29e594: "Criar a partir de um resultado"
   create_group_set_7fe1cd53: "Criar conjunto de grupos"
   create_groups_later_6ce36058: "Criar grupos mais tarde"
   create_groups_now_d59bf70b: "Criar grupos agora"
@@ -9723,7 +9731,9 @@ pt:
     url: URL
   create_new_assignment_d77dfc4: "Criar Nova Tarefa"
   create_new_attempt_19c96c03: "Criar nova tentativa"
+  create_new_calendar_event_f933f209: "Criar novo evento de calendário"
   create_new_course_e3ef9cd0: "Criar nova disciplina"
+  create_new_criterion_1a4efd4: "Criar novo critério"
   create_new_discussions_6ab69da2: "Criar novas discussões"
   create_new_e0946c49: "Criar novo"
   create_new_filter_c244aa92: "Criar Novo Filtro"
@@ -9783,7 +9793,9 @@ pt:
   criteria_builder_b214069e: "Criador de critérios"
   criterion_5f0b62f8: Critério
   criterion_created_42669293: "Critério criado"
+  criterion_description_757741c3: "Descrição do critério"
   criterion_long_description_e9a97247: "Descrição longa de criação"
+  criterion_name_92e1c426: "Nome do critério"
   criterion_ratings_3eed22e2: "Classificações do critério"
   criterion_updated_36c0b3dc: "Critério atualizado"
   croatian_d713d655: Croata
@@ -10258,6 +10270,7 @@ pt:
   delete_course_files_ee9e769: "Eliminar ficheiros da disciplina"
   delete_course_templates_bb966d27: "Eliminar Modelos de Disciplinas"
   delete_courses_9ac148e3: "Eliminar disciplinas"
+  delete_criterion_2181295b: "Eliminar Critério"
   delete_criterion_row_80c3b3b: "Eliminar linha de critério"
   delete_current_message_5da0221a: "Excluir mensagem atual"
   delete_current_module_item_21fefc54: "Excluir módulo/item atual"
@@ -11185,6 +11198,7 @@ pt:
   draft_comment_b2376ea4: "Rascunho de comentário"
   draft_comment_warning_modal_in_speedgrader_ded232c1: "Rascunho de Aviso de Comentário Modal no SpeedGrader"
   draft_discussion_entries_98d93a9d: "Esboço de entradas de discussão"
+  draft_new_criterion_95ed3c89: "Redigir novo critério"
   draft_saved_eba9cfeb: "Projeto Guardado"
   drag_a_file_here_39357b48: "Arraste um ficheiro aqui"
   drag_a_file_here_or_1aaf19c1: "Arraste um ficheiro aqui, ou"
@@ -11277,6 +11291,7 @@ pt:
   duplicate_31cec192: Duplicado
   duplicate_assignment_name_3ca7d753: "Tarefa duplicada %{name}"
   duplicate_c4bb7d3a: "Duplicado "
+  duplicate_criterion_601aa3cf: "Duplicar critério"
   duplicate_discussion_title_43b39959: "Discussão Duplicada %{title}"
   duplicate_discussion_title_6537ef4d: "Duplicar discussão %{title}"
   duplicate_grading_scheme_d0e57758: "Duplicar o esquema de avaliação"
@@ -11448,6 +11463,7 @@ pt:
   edit_user_c46cf103: "Editar Utilizador"
   edit_user_details_4d7b63ff: "Editar detalhes do utilizador"
   edit_user_details_9af7819b: "Editar detalhes do utilizador"
+  edit_username_s_membership_3969048c: "Editar associação %{userName}"
   edit_value_7911ae4f: "Valor de edição"
   edit_value_for_name_d9e25af1: "Valor de edição para \"%{name}\""
   edit_video_conference_5ceec91c: "Editar Vídeo Conferência"
@@ -11608,6 +11624,7 @@ pt:
   enable_the_creation_of_master_courses_8205b155: "Permitir a criação de Disciplinas Mestre"
   enable_the_deprecation_of_the_faculty_journal_func_78b3344d: "Permitir a desvalorização da funcionalidade do jornal da faculdade."
   enable_the_module_publish_menus_to_make_mass_publi_b32f0c52: "Habilitar o módulo publicar menus para facilitar a publicação em massa e a não publicação."
+  enable_the_new_block_editor_for_the_rich_content_e_6a0d0031: "Ativar o novo editor de blocos para o editor de conteúdos avançados."
   enable_the_plagiarism_detection_platform_7c3b6195: "Permitir a plataforma de detecção de plágio"
   enable_the_redesigned_course_pacing_user_experienc_21618a38: "Habilitar a experiência do utilizador do novo projeto de disciplina de estimulação."
   enable_the_security_tab_on_the_settings_page_to_ad_eab7c954: "Ative a guia Segurança na página de configurações para ajustar as configurações de CSP"
@@ -11854,6 +11871,7 @@ pt:
                           Saiba como **gerar um token de acesso**.
   enter_the_access_token_for_your_organization_from__cc77493d: "Insira o seu token de acesso para a sua organização de *eduappcenter.com*. Uma vez aplicado, apenas serão listadas as aplicações que a sua organização tenha aprovado no EduAppCenter na página External Apps. Aprenda como **gerar o seu token de acesso**."
   enter_the_access_token_for_your_organization_from__f1c71941: "Digite o token de acesso para sua organização no                       *eduappcenter.com*. Depois de aplicados, somente as aplicações aprovadas pela                       EduAppCenter sua organização serão listadas na página Aplicações externas.                       Aprenda como **gerar um token de acesso**."
+  enter_the_description_91ececc1: "Introduzir a descrição"
   enter_the_email_address_of_the_user_you_would_like_92112560: "Introduza o endereço de e-mail do utilizador que pretende inscrever temporariamente"
   enter_the_email_addresses_of_the_users_you_would_l_17cef6a0: "Digite os endereços de e-mail dos utilizadores que você deseja adicionar, separados por vírgulas"
   enter_the_email_addresses_of_the_users_you_would_l_f76448a6: "Digite os endereços de e-mail dos utilizadores que você deseja adicionar, separados por vírgulas ou quebras de linha"
@@ -11861,6 +11879,7 @@ pt:
   enter_the_login_id_of_the_user_you_would_like_to_t_46938400: "Introduza o ID de início de sessão do utilizador que pretende inscrever temporariamente"
   enter_the_login_ids_of_the_users_you_would_like_to_502fcbc5: "Digite as IDs de login dos utilizadores que você deseja adicionar, separados por vírgulas ou quebras de linha"
   enter_the_login_ids_of_the_users_you_would_like_to_d39fb0f7: "Digite as IDs de login dos utilizadores que você gostaria de adicionar, separados por vírgulas"
+  enter_the_name_c86bd140: "Introduzir o nome"
   enter_the_sis_id_of_the_user_you_would_like_to_tem_efab1e87: "Introduza o ID SIS do utilizador que pretende inscrever temporariamente"
   enter_the_sis_ids_of_the_users_you_would_like_to_a_1bdce982: "Digite as IDs SIS dos utilizadores que você gostaria de adicionar, separados por vírgulas"
   enter_the_sis_ids_of_the_users_you_would_like_to_a_25e441f1: "Digite as IDs SIS dos utilizadores que você gostaria de adicionar, separados por vírgulas ou quebras de linha"
@@ -12404,6 +12423,7 @@ pt:
   example_item_scores_6726c689: "Exemplo de pontuações de itens"
   example_school_of_rock_41f32c31: "exemplo: \"Escola do Rock\""
   exceeded_the_maximum_length_number_characters_2d25611e: "Excedeu o comprimento máximo (%{number} caracteres)"
+  exceeds_1dfdae30: Excede
   exceeds_expectations_5910fc3a: "Excede às expectativas"
   exceeds_mastery_1f995dce: "Excede a Excelência"
   exceeds_max_events_28f19b04: "Excede %{max} eventos."
@@ -15335,6 +15355,7 @@ pt:
   if_enabled_canvas_will_allow_tools_to_return_multi_fe7b6678: |-
       Se ativado, o Canvas permitirá ferramentas para retornar múltiplos itens
       de conteúdo em um único pedido na página de módulos da disciplina
+  if_enabled_canvas_will_be_able_to_export_new_quizz_504132df: "Se ativado, o Canvas poderá exportar Novos Questionários como parte dos Pacotes de Exportação de Cartuchos Comuns."
   if_enabled_common_cartridge_importers_will_convert_9bffff09: "Se ativado, os importadores de Cartucho Comum converterão ficheiros HTML em Páginas"
   if_enabled_content_designers_must_provide_copyrigh_eca21f5e: "Se permitido, os criadores do conteúdo têm de fornecer direitos de autor e licença de informação para os ficheiros antes de serem publicados. Apenas se aplica se também for permitido Procurar Melhor Ficheiro."
   if_enabled_copyright_and_license_information_must__2a551827: "Se ativado, as informações sobre direitos autorais e licença devem ser fornecidas para os ficheiros antes de serem publicados."
@@ -16890,6 +16911,7 @@ pt:
   loading_unsynced_changes_b5d7b202: "A carregar alterações não sincronizadas"
   loading_unsynched_changes_688434f2: "A carregar alterações não sincronizadas"
   local_4ee321b1: Local
+  local_datetime_ce5ffddd: "Local: %{datetime}"
   locales: 
     pt: Português
   location_3b6ff307: "Local:"
@@ -19575,6 +19597,7 @@ pt:
   module_name_1127ebdb: "Nome do módulo"
   module_name_is_required_de75de0a: "O nome do módulo é obrigatório."
   module_navigation_97043417: "Navegação Módulo"
+  module_progress_for_name_fbff0ccb: "Progresso do módulo para *%{name}*"
   module_publish_menu_30b638dd: "Menu de Publicação do Módulo"
   module_publish_menu_88b54c1b: "Menu de publicação do módulo"
   module_published_80f0b9b8: "Módulo publicado"
@@ -19784,6 +19807,7 @@ pt:
   move_count_outcomes_c0ca2b30: 
     one: "Mover \"%{outcomeTitle}\"?"
     other: "Mover %{count} Resultados?"
+  move_criterion_9b2965d9: "Critério de deslocação"
   move_dialog: 
     cancel: Cancelar
     save: Guardar
@@ -19809,6 +19833,7 @@ pt:
   move_module_item_after_bbcfe2d6: "Mover Item Módulo Posterior"
   move_module_item_before_13e940eb: "Mover Item Módulo Anterior"
   move_module_item_f525d6c8: "Mover item do módulo"
+  move_name_to_a_new_group_acabed4e: "Mudar %{name} para um novo grupo"
   move_navigation_item_f034cd8a: "Mover item de navegação"
   move_outcome_ce497e6c: "Mover resultado"
   move_outcome_group_cfa1a505: "Mover grupo de resultados"
@@ -20024,6 +20049,7 @@ pt:
   navigation_allows_user_to_view_the_people_link_in__dd533d29: "Navegação Permite ao utilizador visualize a ligação Pessoas na Navegação da disciplina."
   navigation_icon_45db938e: "Ícone de Navegação"
   navigation_menu_fd782ff8: "Menu de Navegação"
+  near_3282280c: Próximo
   near_mastery_f25174a4: "Perto do Domínio"
   need_a_canvas_account_221d18ed: "Precisa de uma conta Canvas?"
   need_help_setting_up_your_course_2b763141: "Precisa de ajuda a configurara sua diciplina?"
@@ -20121,6 +20147,7 @@ pt:
   new_quizzes_banks_migrations_9ab4de4a: "Novas Migrações de Bancos de Testes"
   new_quizzes_build_button_in_module_items_10f651fb: "Botão Construir Novos Questionários em Itens do Módulo"
   new_quizzes_build_button_on_list_views_62c7c0e8: "Novos Testes Construir Botão em Visualizações de Lista"
+  new_quizzes_common_cartridge_support_250780be: "Novos questionários Suporte do cartucho comum"
   new_quizzes_dbda7e0a: "Novos testes"
   new_quizzes_description: "Este recurso melhora a experiência do Canvas para a testagem. Quando esta bandeira estiver ativada, a nova ferramenta Questionários estará disponível. Para mais detalhes, consulte o *grupo de utilizadores do Novo Questionário* na Comunidade do Canvas."
   new_quizzes_embedded_module_progression_cd2307b6: "Progressão do Módulo Embutido de Novos Questionários"
@@ -21334,6 +21361,7 @@ pt:
   outcomes_and_rubrics_account_course_f0d23419: "Resultados e rubricas (conta, disciplina)"
   outcomes_and_rubrics_f893d141: "Resultados e Rubricas"
   outcomes_are_created_here_to_track_mastery_in_a_co_2f487549: "Os resultados são criados aqui para rastrear o domínio em uma disciplina. Para começar, marque a barra de menu no topo. Clique no botão Novo Resultado para criar um novo resultado ou no botão Novo Grupo para criar um novo grupo para organizar seus resultados. O botão Localizar permitirá que você use os resultados que foram criados pelo seu estado ou instituição. À medida que você cria e usa resultados, você poderá usar o painel à esquerda para navegar pelos seus resultados. Você pode arrastar e largar resultados entre os diferentes níveis para criar a estrutura."
+  outcomes_averages_report_34199e77: "Relatório de médias de resultados"
   outcomes_csv_format_9005acfb: "Formato do CSV de resultados"
   outcomes_d1b18d33: Resultados
   outcomes_for_student_9f91d4d: "Resultados para o aluno"
@@ -22354,11 +22382,13 @@ pt:
   presents_the_quiz_setting_to_avoid_automatic_submi_363b91ff: "Apresenta a definição do teste para evitar a submissão automática de um teste cronometrado quando o tempo disponível tiver terminado."
   press_alt_f8_to_see_a_list_of_keyboard_shortcuts_2a8c7bc0: "Prima ALT + F8 para ver uma lista de atalhos de teclado"
   press_space_to_start_over_d4b8a2da: "Prima \"espaço\" para recomeçar"
+  press_tab_for_more_options_f087f5c2: "Premir o separador para mais opções"
   press_the_comma_key_or_shift_question_mark_to_see__930af9df: "Pressione a tecla de vírgula ou shift + ponto de interrogação para ver uma lista de atalhos do teclado"
   press_the_comma_key_or_shift_to_see_a_list_of_keyb_155d8ca3: "Pressione a tecla de vírgula ou shift + ? para ver a lista de atalhos de teclado"
   press_the_esc_key_to_close_this_modal_14d10601: "Pressione a tecla esc para fechar este modelo"
   prev_f82cbc48: Voltar
   prev_month_34bd934c: "Mês anterior"
+  prevent_deletion_of_outcomes_with_alignments_in_os_65020476: "Impedir a eliminação de resultados com alinhamentos no SO"
   prevents_students_from_leaving_annotations_in_assi_cb188d2: "Impedir que os alunos deixem anotações em tarefas. Não se aplica a tarefas revisadas por pares."
   preview_53003fd2: Visualizar
   preview_a3f8f854: VISUALIZAÇÃO
@@ -22401,6 +22431,7 @@ pt:
   primary_color_button_b75db628: "Botão de cor primária"
   primary_color_button_disabled_9081ddff: "Botão de cor primária desativada"
   primary_email_address_mail_9018f: "Endereço de e-mail primário (mail)"
+  print_d0e3d53f: Imprimir
   print_grades_9d5dd50f: "Notas de impressão"
   prioritize_individual_overrides_6be735e1: "Dar prioridade a substituições individuais"
   priority_dd4381ee: Prioridade
@@ -24482,7 +24513,10 @@ pt:
   rating_description_db6adf39: "Descrição da classificação"
   rating_max_score_eade1523: "Pontuação máxima da classificação"
   rating_min_score_3d35a762: "Pontuação mínima de classificação"
+  rating_name_6f633d52: "Nome da classificação"
   rating_order_e57f63ed: "Ordem de classificação"
+  rating_points_be3e8682: "Pontos de classificação"
+  rating_scale_fc10d5f1: "Escala de classificação"
   rating_score_22cfc724: "Pontuação de classificação"
   rating_selected_85c31e4c: "Classificação selecionada"
   rating_tier_index_threshold_3f02a6d7: "limite de nível de %{index} classificação"
@@ -24767,6 +24801,7 @@ pt:
   remove_all_group_observer_members_af5675f3: "Remover todos os membros observadores do grupo"
   remove_as_front_page_2698aa12: "Remover como página inicial"
   remove_as_frontpagetext_133cdaee: "Remover como %{frontPageText}"
+  remove_as_leader_22d1a7d8: "Remover como líder"
   remove_association_1412eabf: "Remover Associação"
   remove_attachment_ceae0973: "Remover anexo"
   remove_attendee_name_55165070: "Remover o participante %{name}"
@@ -24816,8 +24851,10 @@ pt:
   remove_missing_status_when_graded_d0755cc7: "Remover o estado de falta quando classificcado"
   remove_name_624e06be: "Remover %{name}"
   remove_name_as_an_admin_c296cf49: "Remover %{name} como administrador"
+  remove_name_as_leader_3e03780a: "Remover %{name} como líder"
   remove_name_calendar_bdc329d9: "Remover %{name} Calendário"
   remove_name_content_requirement_7af56c50: "Remover requisito de conteúdo do %{name}"
+  remove_name_from_group_487cce74: "Remover %{name} do grupo"
   remove_name_prerequisite_98377b60: "Remover pré-requisito do %{name}"
   remove_null_values_from_live_event_payloads_3c826f: "Remover valores nulos das cargas úteis do evento em direto"
   remove_observers_from_courses_703edc34: "Retirar Observadores das disciplinas"
@@ -24836,6 +24873,7 @@ pt:
   remove_prerequisite_13ab96eb: "Remover pré-requisito"
   remove_pronouns_5ff760ff: "Remover Pronomes"
   remove_pronouns_pronoun_c8b03d78: "Remover Pronomes %{pronoun}"
+  remove_rating_cf9378eb: "Remover Classificação"
   remove_recipient_name_a6b83cef: "Remover recetor %{name}"
   remove_removablecount_out_of_totalcount_outcomes_3270d9c0: "Remover %{removableCount} de %{totalCount} Resultados?"
   remove_requirement_32a89e23: "Remover requisito"
@@ -25325,6 +25363,7 @@ pt:
     no_details: "Nenhum detalhe"
   rubric_button_display_4e4a26fe: "Ecrã do botão da grelha de avaliação"
   rubric_created_64980593: "Rubrica criada"
+  rubric_criterion_modal_32377665: "Critério de avaliação Modal"
   rubric_criterion_range_12499bf1: "Intervalo critério rubrica"
   rubric_deleted_3d9efc18: "Rubrica eliminada"
   rubric_enhancements_73bf351c: "Melhorias nas rubricas"
@@ -25424,6 +25463,7 @@ pt:
   save_and_customize_19eb7a7b: "Guardar e Personalizar"
   save_and_publish_1b765e7: "Guardar e publicar"
   save_changes_698abe77: "Guardar alterações"
+  save_criterion_cce60085: "Salvar critério"
   save_customizations_dde779d8: "Guardar personalizações"
   save_failed_463cb2a8: "Guardar falhou."
   save_filter_preset_37f32c02: "Salvar Pré-definição do Filtro"
@@ -25443,6 +25483,7 @@ pt:
   save_theme_f706116e: "Guardar tema"
   save_these_conditions_as_a_filter_a31bbbf8: "Guarde estas condições como um filtro"
   save_this_comment_for_reuse_5eda0b70: "Guardar este comentário para reutilização"
+  save_this_rating_scale_as_default_a3f27305: "Guardar esta escala de classificação como predefinição"
   save_your_type_to_begin_specifying_conditional_con_9e4f536a: "Guarde o seu %{type} para começar a especificar o conteúdo condicional."
   save_yourself_a_lot_of_time_by_only_adding_the_out_33293248: "Poupe muito tempo adicionando apenas os resultados que são específicos ao conteúdo da sua disciplina."
   saved_3cd67a7c: Guardou
@@ -25467,6 +25508,7 @@ pt:
   saving_recording_e111cb05: "Guardando Gravações..."
   saving_statusname_status_8f923edb: "Guardar estado %{statusName}"
   saving_the_csp_status_failed_please_try_again_8275aaa4: "A guardar o estado do CSP falhou, por favor, tente novamente."
+  scale_29738cdd: Escala
   scale_mathman_equation_images_to_match_the_size_of_2bca4e2e: "Escala de imagens da equação matemática para corresponder ao tamanho da fonte circundante."
   scantron_quiz_4a97a17a: "Teste Scantron"
   schedule_availability_ad09a2e5: "Disponibilidade de horários"
@@ -26145,6 +26187,7 @@ pt:
   session_expired_12aaf414: "Sessão expirou"
   set_a_random_student_as_group_leader_663dcfd5: "Definir um aluno aleatoriamente como líder do grupo"
   set_as_default_email_address_bd3b9b8f: "Definir endereço de email padrão"
+  set_as_leader_f710dcec: "Definir como líder"
   set_course_color_to_a_custom_hexadecimal_code_c8a50918: "Definir a cor da disciplina para um código hexadecimal personalizado"
   set_course_color_to_a_preset_hexadecimal_color_cod_97608d8: "Definir a cor da disciplina para um código de cor hexadecimal pré-definido. Utilizar as teclas de seta para a esquerda e direita para navegar nas predefinições."
   set_created_createdat_895e2243: "Grupo criado %{createdAt}"
@@ -26162,6 +26205,7 @@ pt:
   set_first_student_to_join_as_group_leader_5cfc206f: "Definir primeiro aluno para aderir como líder do grupo"
   set_group_weights_fd41c1f: "Definir ponderação de grupo"
   set_last_attended_date_8fb30092: "Definir a Última Data Atendida"
+  set_name_as_leader_591c8009: "Definir %{name} como líder"
   set_name_d14182d7: "Definir nome..."
   set_name_f83b658: "Definir nome"
   set_of_grading_periods_545b37e9: "Definir Períodos de Classificação"
@@ -29187,6 +29231,7 @@ pt:
   this_eportfolio_has_been_identified_as_spam_and_is_8430467: "Este ePortfolio foi identificado como spam, e só está visível para si. Por favor contacte um administrador se tiver alguma dúvida."
   this_eportfolio_has_been_identified_as_spam_it_is__f927947b: "Este ePortfolio foi identificado como spam. No momento, ele só está visível para os administradores e para o autor. Se tem a certeza que este conteúdo não é spam, pode marcá-lo como seguro."
   this_event_b437db90: "Este evento"
+  this_feature_adds_the_start_end_and_close_dates_of_221c79cc: "Esta funcionalidade adiciona as datas de início, fim e fecho dos períodos de avaliação ao filtro do período de avaliação."
   this_feature_affects_existing_data_for_all_courses_4fc75fe1: "Este recurso afeta os dados existentes para todos as Disciplinas na conta."
   this_feature_affects_existing_data_for_an_entire_a_2372dc52: "Este recurso afeta os dados existentes para uma conta inteira."
   this_feature_allows_teachers_to_create_anonymous_d_ea364dca: "Este recurso permite aos professores criar discussões anónimas e permite aos professores criar discussões anónimas a nível da disciplina"
@@ -29250,6 +29295,7 @@ pt:
   this_feature_provides_a_new_speedgrader_platform_e_e7d740bd: "Esta funcionalidade proporciona uma nova experiência na plataforma SpeedGrader."
   this_feature_provides_visual_and_functional_enhanc_e5e57a21: "Este recurso fornece melhorias visuais e funcionais para rubricas no Canvas."
   this_feature_will_hide_all_quantitative_values_fro_6f006665: "Esta funcionalidade irá esconder todos os valores quantitativos dos utilizadores"
+  this_ff_is_for_development_purposes_only_and_shoul_f77938ba: "Esta FF é apenas para fins de desenvolvimento e não deve ser ajustada sem consultar primeiro o departamento de produto e engenharia. Este sinalizador impedirá a eliminação de resultados que tenham alinhamentos dentro do serviço de resultados, que é utilizado para Novos Questionários."
   this_field_is_required_fa58c4a: "Este campo é obrigatório"
   this_field_name_is_required_988caebc: "O campo \"%{name}\" é obrigatório."
   this_field_name_is_required_b9196401: "O campo \"nome\" é obrigatório."
@@ -29778,6 +29824,7 @@ pt:
   title_outcomes_7adbd9cc: "%{title} Resultados"
   title_required_3ff5969: "Título requerido"
   title_separator: ": "
+  title_start_end_closed_def2bf1f: "%{title}: %{start} - %{end} | %{closed}"
   title_tray_ec9f7488: "%{title} bandeja"
   title_unpublished_51ddbc6a: "%{title} (não publicado)"
   title_was_successfully_created_f2a07c56: "\"%{title}\" foi criada com sucesso."

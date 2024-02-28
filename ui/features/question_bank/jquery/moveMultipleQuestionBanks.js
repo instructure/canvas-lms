@@ -77,6 +77,8 @@ const moveQuestions = {
     this.elements.$dialog().dialog({
       title: this.messages.move_copy_questions,
       width: 600,
+      modal: true,
+      zIndex: 1000,
     })
   },
   loadData() {

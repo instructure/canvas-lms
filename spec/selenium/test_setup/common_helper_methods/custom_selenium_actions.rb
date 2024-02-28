@@ -578,21 +578,10 @@ module CustomSeleniumActions
     dialog.find_elements(:css, submit_button_css).last.click
   end
 
-  ##
-  # load the simulate plugin to simulate a drag events (among other things)
-  # will only load it once even if its called multiple times
-  def load_simulate_js
-    @load_simulate_js ||= begin
-      js = File.read("spec/selenium/helpers/jquery.simulate.js")
-      driver.execute_script js
-    end
-  end
-
   # when selenium fails you, reach for .simulate
   # takes a CSS selector for jQuery to find the element you want to drag
   # and then the change in x and y you want to drag
   def drag_with_js(selector, x, y)
-    load_simulate_js
     driver.execute_script "$('#{selector}').simulate('drag', { dx: #{x}, dy: #{y} })"
   end
 

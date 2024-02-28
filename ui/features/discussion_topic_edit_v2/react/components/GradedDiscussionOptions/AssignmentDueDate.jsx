@@ -16,12 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useRef, useContext} from 'react'
 import PropTypes from 'prop-types'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {DateTimeInput} from '@instructure/ui-date-time-input'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {AssignedTo} from './AssignedTo'
+import {GradedDiscussionDueDatesContext} from '../../util/constants'
 
 const I18n = useI18nScope('discussion_create')
 
@@ -29,11 +30,17 @@ export const AssignmentDueDate = ({
   initialAssignedInformation,
   availableAssignToOptions,
   onAssignedInfoChange,
-  assignToErrorMessages,
 }) => {
+  const dueAtRef = useRef()
+  const unlockAtRef = useRef()
+
   const [assignedInformation, setAssignedInformation] = useState(initialAssignedInformation)
   const [dueDateErrorMessage, setDueDateErrorMessage] = useState([])
   const [availableFromAndUntilErrorMessage, setAvailableFromAndUntilErrorMessage] = useState([])
+
+  const {gradedDiscussionRefMap, setGradedDiscussionRefMap} = useContext(
+    GradedDiscussionDueDatesContext
+  )
 
   const validateDueDate = (dueDate, availableFrom, availableUntil) => {
     const due = new Date(dueDate)
@@ -59,6 +66,12 @@ export const AssignmentDueDate = ({
     return null
   }
 
+  const setRefMap = (field, ref) => {
+    const refMap = gradedDiscussionRefMap.get(initialAssignedInformation.dueDateId)
+    refMap[field] = ref
+    setGradedDiscussionRefMap(new Map(gradedDiscussionRefMap))
+  }
+
   useEffect(() => {
     const {dueDate, availableFrom, availableUntil} = assignedInformation
 
@@ -72,8 +85,10 @@ export const AssignmentDueDate = ({
           type: 'error',
         },
       ])
+      setRefMap('dueAtRef', dueAtRef)
     } else {
       setDueDateErrorMessage([])
+      setRefMap('dueAtRef', null)
     }
 
     if (availableFromAndUntilError) {
@@ -83,8 +98,10 @@ export const AssignmentDueDate = ({
           type: 'error',
         },
       ])
+      setRefMap('unlockAtRef', unlockAtRef)
     } else {
       setAvailableFromAndUntilErrorMessage([])
+      setRefMap('unlockAtRef', null)
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -99,6 +116,7 @@ export const AssignmentDueDate = ({
     <>
       <FormFieldGroup description="" width="100%" data-testid="assignment-due-date">
         <AssignedTo
+          dueDateId={initialAssignedInformation.dueDateId}
           availableAssignToOptions={availableAssignToOptions}
           initialAssignedToInformation={initialAssignedInformation.assignedList}
           onOptionSelect={selectedOption => {
@@ -119,7 +137,6 @@ export const AssignmentDueDate = ({
             setAssignedInformation(newInfo)
             onAssignedInfoChange(newInfo)
           }}
-          errorMessage={assignToErrorMessages}
         />
         <DateTimeInput
           description={I18n.t('Due')}
@@ -134,9 +151,12 @@ export const AssignmentDueDate = ({
           invalidDateTimeMessage={I18n.t('Invalid date and time')}
           layout="columns"
           datePlaceholder={I18n.t('Select Assignment Due Date')}
-          dateRenderLabel=""
-          timeRenderLabel=""
+          dateRenderLabel={I18n.t('Date')}
+          timeRenderLabel={I18n.t('Time')}
           messages={dueDateErrorMessage}
+          dateInputRef={ref => {
+            dueAtRef.current = ref
+          }}
         />
         <DateTimeInput
           description={I18n.t('Available from')}
@@ -151,9 +171,12 @@ export const AssignmentDueDate = ({
           invalidDateTimeMessage={I18n.t('Invalid date and time')}
           layout="columns"
           datePlaceholder={I18n.t('Select Assignment Available From Date')}
-          dateRenderLabel=""
-          timeRenderLabel=""
+          dateRenderLabel={I18n.t('Date')}
+          timeRenderLabel={I18n.t('Time')}
           messages={availableFromAndUntilErrorMessage}
+          dateInputRef={ref => {
+            unlockAtRef.current = ref
+          }}
         />
         <DateTimeInput
           description={I18n.t('Until')}
@@ -168,8 +191,8 @@ export const AssignmentDueDate = ({
           invalidDateTimeMessage={I18n.t('Invalid date and time')}
           layout="columns"
           datePlaceholder={I18n.t('Select Assignment Available Until Date')}
-          dateRenderLabel=""
-          timeRenderLabel=""
+          dateRenderLabel={I18n.t('Date')}
+          timeRenderLabel={I18n.t('Time')}
           messages={availableFromAndUntilErrorMessage}
         />
       </FormFieldGroup>
@@ -187,18 +210,19 @@ AssignmentDueDate.propTypes = {
     )
   ).isRequired,
   initialAssignedInformation: PropTypes.shape({
+    dueDateId: PropTypes.string,
     assignedList: PropTypes.arrayOf(PropTypes.string),
     dueDate: PropTypes.string,
     availableFrom: PropTypes.string,
     availableUntil: PropTypes.string,
   }),
   onAssignedInfoChange: PropTypes.func,
-  assignToErrorMessages: PropTypes.arrayOf(PropTypes.object),
 }
 
 AssignmentDueDate.defaultProps = {
   availableAssignToOptions: {},
   initialAssignedInformation: {
+    dueDateId: '',
     assignedList: [],
     dueDate: '',
     availableFrom: '',

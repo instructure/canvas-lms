@@ -161,6 +161,8 @@ class SubmissionComment < ActiveRecord::Base
 
   def self.serialize_media_comment(media_comment_id)
     media_object = MediaObject.by_media_id(media_comment_id).first
+    return nil unless media_object.present?
+
     media_tracks = media_object&.media_tracks&.map { |media_track| media_track.as_json(only: %i[id locale content kind], include_root: false) }
     media_sources = media_object.media_sources
     {

@@ -5,3 +5,5 @@ source "https://rubygems.org"
 git_source(:github) { |repo_name| "https://github.com/#{repo_name}" }
 
 gemspec
+
+eval_gemfile(gemfile.dirname.join("../gemfile_prefix.rb"))

@@ -115,6 +115,7 @@ export default class UserDateRangeSearchFormView extends Backbone.View {
         height: 'auto',
         width: 400,
         modal: true,
+        zIndex: 1000,
         dialogClass: 'userDateRangeSearchModal',
         close() {
           return self.$el.find(`.roster_user_name[data-user-id=${id}]`).focus()

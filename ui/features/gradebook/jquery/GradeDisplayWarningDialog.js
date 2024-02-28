@@ -60,6 +60,8 @@ function GradeDisplayWarningDialog(options) {
         }
       }
     })(this),
+    modal: true,
+    zIndex: 1000,
   })
 }
 

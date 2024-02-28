@@ -71,11 +71,41 @@ export default function FilterNav({
   const filterTagRef = useRef<(HTMLElement | null)[]>([])
   const [isFilterNavPopoverOpen, setIsFilterNavPopoverOpen] = useState<boolean>(false)
   const [openFilterKey, setOpenFilterKey] = useState<string | null>(null)
-
+  const {setState} = useStore
   const handleClearFilters = () => {
     setAnnouncement(I18n.t('All Filters Have Been Cleared'))
     applyFilters([])
     applyFiltersButtonRef.current?.focus()
+  }
+
+  const getFilterKey = (filter: Filter) => {
+    const submissionStateFilterValues = [
+      'has-ungraded-submissions',
+      'has-submissions',
+      'has-no-submissions',
+      'has-unposted-grades',
+    ]
+
+    switch (filter.type) {
+      case 'section':
+        return 'sections'
+      case 'assignment-group':
+        return 'assignment-groups'
+      case 'module':
+        return 'modules'
+      case 'grading-period':
+        return 'grading-periods'
+      case 'student-group':
+        return 'student-groups'
+      case 'start-date':
+        return 'start-date'
+      case 'end-date':
+        return 'end-date'
+      case 'submissions':
+        return submissionStateFilterValues.includes(filter.value ?? '') ? 'submissions' : 'status'
+      default:
+        return ''
+    }
   }
 
   const onToggleFilterPreset = useCallback(
@@ -99,11 +129,21 @@ export default function FilterNav({
     studentGroupCategories,
     onToggleFilterPreset,
     customStatuses,
+    multiselectGradebookFiltersEnabled,
     onToggleDateModal: () => setIsDateModalOpen(true),
   })
-
-  const activeFilterComponents = appliedFilters.filter(isFilterNotEmpty).map((filter, i) => {
-    const label = getLabelForFilter(
+  let activeFilters = appliedFilters.filter(isFilterNotEmpty)
+  const filterCounts: Record<string, number> = {}
+  if (multiselectGradebookFiltersEnabled) {
+    // remove duplicate type filters and count number for each filter type
+    activeFilters = activeFilters.filter(filter => {
+      const type = getFilterKey(filter)
+      filterCounts[type] = (filterCounts[type] || 0) + 1
+      return filterCounts[type] === 1
+    })
+  }
+  const activeFilterComponents = activeFilters.map((filter, i) => {
+    let label = getLabelForFilter(
       filter,
       assignmentGroups,
       gradingPeriods,
@@ -113,23 +153,37 @@ export default function FilterNav({
       customStatuses
     )
 
+    const filterKey = getFilterKey(filter)
+    const selectedFilterItem = filterItems[filterKey]
+    const menuItems = selectedFilterItem?.items ?? []
+    const menuGroups = selectedFilterItem?.itemGroups ?? []
+    const numFiltersSelected = filterCounts[filterKey] || 0
+    if (multiselectGradebookFiltersEnabled && numFiltersSelected > 1) {
+      label = `${selectedFilterItem?.name} (${numFiltersSelected})`
+    }
+
     const handleDeleteFilterClick = () => {
       setAnnouncement(I18n.t('Removed %{filterName} Filter', {filterName: label}))
-      useStore.setState({
-        appliedFilters: appliedFilters.filter(c => c.id !== filter.id),
-      })
+      if (multiselectGradebookFiltersEnabled) {
+        setState({
+          appliedFilters: appliedFilters.filter(c => getFilterKey(c) !== filterKey),
+        })
+      } else {
+        setState({
+          appliedFilters: appliedFilters.filter(c => c.id !== filter.id),
+        })
+      }
       setIsFilterNavPopoverOpen(false)
       setOpenFilterKey('')
     }
 
     const handleSelectFilterClick = () => {
-      setAnnouncement(I18n.t('Added %{filterName} Filter', {filterName: label}))
-
       if (filter.type === 'start-date' || filter.type === 'end-date') {
         setIsDateModalOpen(true)
+        return
       }
+      setAnnouncement(I18n.t('Added %{filterName} Filter', {filterName: label}))
     }
-
     const handlePopoverClick = () => {
       if (openFilterKey !== filterKey) {
         setIsFilterNavPopoverOpen(true)
@@ -139,41 +193,6 @@ export default function FilterNav({
       setIsFilterNavPopoverOpen(false)
       setOpenFilterKey('')
     }
-
-    const getFilterKey = () => {
-      const submissionStateFilterValues = [
-        'has-ungraded-submissions',
-        'has-submissions',
-        'has-no-submissions',
-        'has-unposted-grades',
-      ]
-
-      switch (filter.type) {
-        case 'section':
-          return 'sections'
-        case 'assignment-group':
-          return 'assignment-groups'
-        case 'module':
-          return 'modules'
-        case 'grading-period':
-          return 'grading-periods'
-        case 'student-group':
-          return 'student-groups'
-        case 'start-date':
-          return 'start-date'
-        case 'end-date':
-          return 'end-date'
-        case 'submissions':
-          return submissionStateFilterValues.includes(filter.value ?? '') ? 'submissions' : 'status'
-        default:
-          return ''
-      }
-    }
-
-    const filterKey = getFilterKey()
-    const selectedFilterItem = filterItems[filterKey]
-    const menuItems = selectedFilterItem?.items ?? []
-    const menuGroups = selectedFilterItem?.itemGroups ?? []
 
     return multiselectGradebookFiltersEnabled ? (
       <FilterNavPopover
@@ -197,7 +216,7 @@ export default function FilterNav({
               </AccessibleContent>
             }
             onClick={handlePopoverClick}
-            margin="0 xx-small 0 0"
+            margin="0 small 0 0"
           />
         }
         isOpen={isFilterNavPopoverOpen && openFilterKey === filterKey}
@@ -255,6 +274,7 @@ export default function FilterNav({
               filterItems={filterItems}
               changeAnnouncement={changeAnnouncement}
               applyFiltersButtonRef={applyFiltersButtonRef}
+              multiselectGradebookFiltersEnabled={multiselectGradebookFiltersEnabled}
             />
           </Flex.Item>
           <Flex.Item data-testid="filter-tags">

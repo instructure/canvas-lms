@@ -29,7 +29,7 @@ import EditView from 'ui/features/discussion_topic_edit/backbone/views/EditView'
 import AssignmentGroupCollection from '@canvas/assignments/backbone/collections/AssignmentGroupCollection'
 import fakeENV from 'helpers/fakeENV'
 import assertions from 'helpers/assertions'
-import 'helpers/jquery.simulate'
+import '@canvas/jquery/jquery.simulate'
 
 const currentOrigin = window.location.origin
 

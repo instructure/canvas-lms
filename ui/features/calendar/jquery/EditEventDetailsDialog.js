@@ -43,6 +43,8 @@ const dialog = $('<div id="edit_event"><div /></div>')
       document.addEventListener('keydown', EditEventDetailsDialog.prototype.handleKeyDown),
     close: () =>
       document.removeEventListener('keydown', EditEventDetailsDialog.prototype.handleKeyDown),
+    modal: true,
+    zIndex: 1000,
   })
 
 export default class EditEventDetailsDialog {

@@ -29,9 +29,11 @@ class AccountReport < ActiveRecord::Base
   has_many :account_report_runners, inverse_of: :account_report, autosave: false
   has_many :account_report_rows, inverse_of: :account_report, autosave: false
 
+  after_save :abort_incomplete_runners_if_needed
+
   validates :account_id, :user_id, :workflow_state, presence: true
 
-  serialize :parameters, Hash
+  serialize :parameters, type: Hash
 
   attr_accessor :runners
 
@@ -70,12 +72,7 @@ class AccountReport < ActiveRecord::Base
   alias_method :destroy_permanently!, :destroy
   def destroy
     self.workflow_state = "deleted"
-    result = save!
-    if saved_change_to_workflow_state?
-      abort_incomplete_runners
-      delay.delete_account_report_rows
-    end
-    result
+    save!
   end
 
   def self.delete_old_rows_and_runners
@@ -141,6 +138,13 @@ class AccountReport < ActiveRecord::Base
   def self.available_reports
     # check if there is a reports plugin for this account
     AccountReports.available_reports
+  end
+
+  def abort_incomplete_runners_if_needed
+    if saved_change_to_workflow_state? && (deleted? || aborted? || error?)
+      abort_incomplete_runners
+      delay(priority: Delayed::LOWER_PRIORITY).delete_account_report_rows
+    end
   end
 
   def abort_incomplete_runners

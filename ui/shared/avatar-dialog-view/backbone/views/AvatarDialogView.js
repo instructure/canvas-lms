@@ -71,6 +71,8 @@ export default class AvatarDialogView extends DialogBaseView {
       ],
       height: 500,
       width: 600,
+      modal: true,
+      zIndex: 1000,
     }
   }
 

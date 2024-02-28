@@ -33,8 +33,8 @@ export const PointsPossible = ({pointsPossible, setPointsPossible}: Props) => {
     <NumberInput
       data-testid="points-possible-input"
       renderLabel={I18n.t('Points Possible')}
-      onIncrement={() => setPointsPossible(pointsPossible + 1)}
-      onDecrement={() => setPointsPossible(pointsPossible - 1)}
+      onIncrement={() => setPointsPossible(Math.max(0, pointsPossible + 1))}
+      onDecrement={() => setPointsPossible(Math.max(0, pointsPossible - 1))}
       value={pointsPossible.toString()}
       onChange={event => {
         // don't allow non-numeric values

@@ -46,6 +46,7 @@ import {
 } from '@canvas/calendar/react/RecurringEvents/FrequencyPicker/utils'
 import {CommonEventShowError} from '@canvas/calendar/jquery/CommonEvent/CommonEvent'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import EditCalendarEventHeader from '../../react/components/EditCalendarEventHeader'
 
 const I18n = useI18nScope('calendar.edit')
 
@@ -258,6 +259,17 @@ export default class EditCalendarEventView extends Backbone.View {
     }
   }
 
+  renderHeaderComponent() {
+    const title = this.model.id == null ? 
+      I18n.t('Create New Calendar Event') : 
+      I18n.t('Edit [%{title}]', {title: this.model.get('title')})
+
+    ReactDOM.render(
+      <EditCalendarEventHeader title={title} />,
+      document.getElementById('header_component_root')
+    )
+  }
+
   renderRecurringEventFrequencyPicker() {
     if (!this.model.get('use_section_dates')) {
       const pickerNode = document.getElementById('recurring_event_frequency_picker')
@@ -299,6 +311,7 @@ export default class EditCalendarEventView extends Backbone.View {
 
   afterRender() {
     this.handleFrequencyChange = this._handleFrequencyChange.bind(this)
+    this.renderHeaderComponent()
     this.renderRecurringEventFrequencyPicker()
     this.showDuplicates(this.model.get('use_section_dates'))
 

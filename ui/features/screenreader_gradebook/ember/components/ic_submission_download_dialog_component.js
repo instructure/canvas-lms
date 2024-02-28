@@ -20,7 +20,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import Ember from 'ember'
 import register from '../helpers/register'
 import '../../jst/components/ic-submission-download-dialog.hbs'
-import 'jqueryui/progressbar'
+import 'jqueryui-unpatched/progressbar'
 import 'jqueryui/dialog'
 
 const I18n = useI18nScope('submissions')
@@ -136,6 +136,8 @@ export default register(
           this.dialogOptions = {
             title: 'Download Assignment Submissions',
             resizable: false,
+            modal: true,
+            zIndex: 1000,
           }
         }
         if (this.$dialog == null) {
