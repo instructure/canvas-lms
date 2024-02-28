@@ -21,11 +21,11 @@
 module Api::V1::AssignmentOverride
   include Api::V1::Json
 
+  OVERRIDABLE_ID_FIELDS = %i[assignment_id quiz_id context_module_id discussion_topic_id wiki_page_id attachment_id].freeze
+
   def assignment_override_json(override, visible_users = nil, student_names: nil, module_names: nil)
-    # gave notice in API docs that effective 03/01/2024, the assignment_id field will only be included
-    # if the override targets an assignment
-    fields = %i[id assignment_id title]
-    %i[quiz_id context_module_id].each { |f| fields << f if override.send(f).present? }
+    fields = %i[id title]
+    OVERRIDABLE_ID_FIELDS.each { |f| fields << f if override.send(f).present? }
     fields.push(:due_at, :all_day, :all_day_date) if override.due_at_overridden
     fields << :unlock_at if override.unlock_at_overridden
     fields << :lock_at if override.lock_at_overridden

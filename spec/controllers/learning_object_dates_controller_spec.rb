@@ -79,7 +79,6 @@ describe LearningObjectDatesController do
                                  "only_visible_to_overrides" => false,
                                  "overrides" => [{
                                    "id" => @override.id,
-                                   "assignment_id" => nil,
                                    "quiz_id" => @quiz.id,
                                    "title" => "Unnamed Course",
                                    "course_section_id" => @course.default_section.id,
@@ -101,9 +100,9 @@ describe LearningObjectDatesController do
       expect(json_parse).to eq({
                                  "id" => context_module.id,
                                  "unlock_at" => nil,
+                                 "only_visible_to_overrides" => true,
                                  "overrides" => [{
                                    "id" => @override.id,
-                                   "assignment_id" => nil,
                                    "context_module_id" => context_module.id,
                                    "context_module_name" => "module",
                                    "title" => "Unnamed Course",
@@ -111,6 +110,114 @@ describe LearningObjectDatesController do
                                    "due_at" => "2022-02-01T01:00:00Z",
                                    "all_day" => false,
                                    "all_day_date" => "2022-02-01"
+                                 }]
+                               })
+    end
+
+    it "returns date details for a graded discussion" do
+      discussion = DiscussionTopic.create_graded_topic!(course: @course, title: "graded topic")
+      assignment = discussion.assignment
+      assignment.update!(due_at: "2022-05-06T12:00:00Z",
+                         unlock_at: "2022-05-05T12:00:00Z",
+                         lock_at: "2022-05-07T12:00:00Z")
+      override = assignment.assignment_overrides.create!(set: @course.default_section,
+                                                         due_at: "2022-04-06T12:00:00Z",
+                                                         unlock_at: "2022-04-05T12:00:00Z",
+                                                         lock_at: "2022-04-07T12:00:00Z",
+                                                         due_at_overridden: true,
+                                                         unlock_at_overridden: true,
+                                                         lock_at_overridden: true)
+      get :show, params: { course_id: @course.id, discussion_topic_id: discussion.id }
+      expect(response).to be_successful
+      expect(json_parse).to eq({
+                                 "id" => discussion.id,
+                                 "due_at" => "2022-05-06T12:00:00Z",
+                                 "unlock_at" => "2022-05-05T12:00:00Z",
+                                 "lock_at" => "2022-05-07T12:00:00Z",
+                                 "only_visible_to_overrides" => false,
+                                 "overrides" => [{
+                                   "id" => override.id,
+                                   "assignment_id" => assignment.id,
+                                   "title" => "Unnamed Course",
+                                   "course_section_id" => @course.default_section.id,
+                                   "due_at" => "2022-04-06T12:00:00Z",
+                                   "unlock_at" => "2022-04-05T12:00:00Z",
+                                   "lock_at" => "2022-04-07T12:00:00Z",
+                                   "all_day" => false,
+                                   "all_day_date" => "2022-04-06"
+                                 }]
+                               })
+    end
+
+    it "returns date details for an ungraded discussion" do
+      discussion = @course.discussion_topics.create!(title: "ungraded topic",
+                                                     unlock_at: "2022-01-05T12:00:00Z",
+                                                     lock_at: "2022-03-05T12:00:00Z")
+      override = discussion.assignment_overrides.create!(set: @course.default_section,
+                                                         lock_at: "2022-01-04T12:00:00Z",
+                                                         lock_at_overridden: true)
+      get :show, params: { course_id: @course.id, discussion_topic_id: discussion.id }
+      expect(response).to be_successful
+      expect(json_parse).to eq({
+                                 "id" => discussion.id,
+                                 "unlock_at" => "2022-01-05T12:00:00Z",
+                                 "lock_at" => "2022-03-05T12:00:00Z",
+                                 "only_visible_to_overrides" => false,
+                                 "overrides" => [{
+                                   "id" => override.id,
+                                   "discussion_topic_id" => discussion.id,
+                                   "title" => "Unnamed Course",
+                                   "course_section_id" => @course.default_section.id,
+                                   "lock_at" => "2022-01-04T12:00:00Z"
+                                 }]
+                               })
+    end
+
+    it "returns date details for a page" do
+      wiki_page = @course.wiki_pages.create!(title: "My Page",
+                                             unlock_at: "2022-01-05T00:00:00Z",
+                                             lock_at: "2022-03-05T00:00:00Z")
+      override = wiki_page.assignment_overrides.create!(set: @course.default_section,
+                                                        unlock_at: "2022-01-04T00:00:00Z",
+                                                        unlock_at_overridden: true)
+      get :show, params: { course_id: @course.id, page_id: wiki_page.id }
+      expect(response).to be_successful
+      expect(json_parse).to eq({
+                                 "id" => wiki_page.id,
+                                 "unlock_at" => "2022-01-05T00:00:00Z",
+                                 "lock_at" => "2022-03-05T00:00:00Z",
+                                 "only_visible_to_overrides" => false,
+                                 "overrides" => [{
+                                   "id" => override.id,
+                                   "wiki_page_id" => wiki_page.id,
+                                   "title" => "Unnamed Course",
+                                   "course_section_id" => @course.default_section.id,
+                                   "unlock_at" => "2022-01-04T00:00:00Z"
+                                 }]
+                               })
+    end
+
+    it "returns date details for a file" do
+      attachment = @course.attachments.create!(filename: "coolpdf.pdf",
+                                               uploaded_data: StringIO.new("test"),
+                                               unlock_at: "2022-01-05T00:00:00Z",
+                                               lock_at: "2022-03-05T00:00:00Z")
+      override = attachment.assignment_overrides.create!(set: @course.default_section,
+                                                         unlock_at: "2022-01-04T00:00:00Z",
+                                                         unlock_at_overridden: true)
+      get :show, params: { course_id: @course.id, attachment_id: attachment.id }
+      expect(response).to be_successful
+      expect(json_parse).to eq({
+                                 "id" => attachment.id,
+                                 "unlock_at" => "2022-01-05T00:00:00Z",
+                                 "lock_at" => "2022-03-05T00:00:00Z",
+                                 "only_visible_to_overrides" => false,
+                                 "overrides" => [{
+                                   "id" => override.id,
+                                   "attachment_id" => attachment.id,
+                                   "title" => "Unnamed Course",
+                                   "course_section_id" => @course.default_section.id,
+                                   "unlock_at" => "2022-01-04T00:00:00Z"
                                  }]
                                })
     end

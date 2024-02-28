@@ -46,6 +46,9 @@ module DatesOverridable
   end
 
   def overridden_for(user, skip_clone: false)
+    # TODO: support DiscussionTopic, WikiPage, Attachment in AssignmentOverrideApplicator (LF-1048)
+    return self if is_a?(DiscussionTopic) || is_a?(WikiPage) || is_a?(Attachment)
+
     AssignmentOverrideApplicator.assignment_overridden_for(self, user, skip_clone:)
   end
 

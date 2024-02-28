@@ -83,6 +83,7 @@ class Attachment < ActiveRecord::Base
   include ContextModuleItem
   include SearchTermHelper
   include MasterCourses::Restrictor
+  include DatesOverridable
   restrict_columns :content, %i[display_name uploaded_data media_track_content]
   restrict_columns :settings, %i[folder_id locked lock_at unlock_at usage_rights_id]
   restrict_columns :state, [:locked, :file_state]
@@ -138,8 +139,6 @@ class Attachment < ActiveRecord::Base
   has_many :canvadocs_annotation_contexts, inverse_of: :attachment
   has_many :discussion_entry_drafts, inverse_of: :attachment
   has_one :master_content_tag, class_name: "MasterCourses::MasterContentTag", inverse_of: :attachment
-  has_many :assignment_overrides, dependent: :destroy, inverse_of: :attachment
-  has_many :assignment_override_students, dependent: :destroy
 
   before_save :set_root_account_id
   before_save :infer_display_name

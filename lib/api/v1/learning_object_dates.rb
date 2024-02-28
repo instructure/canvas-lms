@@ -21,15 +21,19 @@
 module Api::V1::LearningObjectDates
   include Api::V1::Json
 
+  BASE_FIELDS = %w[id].freeze
   LEARNING_OBJECT_DATES_FIELDS = %w[
-    id
     due_at
     unlock_at
     lock_at
     only_visible_to_overrides
   ].freeze
 
-  def learning_object_dates_json(learning_object, user, session)
-    api_json(learning_object, user, session, only: LEARNING_OBJECT_DATES_FIELDS)
+  def learning_object_dates_json(learning_object, overridable)
+    hash = learning_object.slice(BASE_FIELDS)
+    LEARNING_OBJECT_DATES_FIELDS.each do |field|
+      hash[field] = overridable.send(field) if overridable.respond_to?(field)
+    end
+    hash
   end
 end
