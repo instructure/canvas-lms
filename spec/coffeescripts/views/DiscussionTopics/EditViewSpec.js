@@ -223,9 +223,10 @@ test('shows todo checkbox', function () {
 test('shows todo input when todo checkbox is selected', function () {
   ENV.STUDENT_PLANNER_ENABLED = true
   const view = this.editView()
+  equal(view.$el.find('#todo_date_input')[0].style.display, 'none')
   view.$el.find('#allow_todo_date').prop('checked', true)
   view.$el.find('#allow_todo_date').trigger('change')
-  equal(view.$el.find('#todo_date_input')[0].style.display, 'block')
+  notStrictEqual(view.$el.find('#todo_date_input')[0].style.display, 'none')
 })
 
 test('shows todo input with date when given date', function () {
