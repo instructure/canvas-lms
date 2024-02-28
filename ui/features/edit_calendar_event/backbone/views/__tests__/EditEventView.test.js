@@ -20,7 +20,7 @@ import $ from 'jquery'
 import '@canvas/backbone'
 import {defer} from 'lodash'
 import moment from 'moment-timezone'
-import {fireEvent, within, getByText, waitFor} from '@testing-library/dom'
+import {fireEvent, within, getByText, waitFor, screen} from '@testing-library/dom'
 import userEvent from '@testing-library/user-event'
 import CalendarEvent from '../../models/CalendarEvent'
 import EditEventView from '../EditEventView'
@@ -44,6 +44,7 @@ describe('EditEventView', () => {
 
   afterEach(() => {
     window.ENV = null
+    jest.clearAllMocks()
   })
 
   function render(overrides = {}) {
@@ -345,13 +346,37 @@ describe('EditEventView', () => {
     })
 
     it('renders update calendar event dialog', async () => {
-      const view = render({series_uuid: '123'})
+      const view = render({series_uuid: '123', rrule: 'FREQ=WEEKLY;BYDAY=MO;INTERVAL=1;COUNT=5'})
       view.submit(null)
 
       await waitFor(() =>
         expect(
           UpdateCalendarEventDialogModule.renderUpdateCalendarEventDialog
         ).toHaveBeenCalledWith(expect.objectContaining(view.model.attributes))
+      )
+    })
+
+    it('does not render update calendar event dialog when saving a single event', async () => {
+      render({series_uuid: null, rrule: null})
+      userEvent.click(await screen.findByText('Update Event'))
+
+      await waitFor(() =>
+        expect(
+          UpdateCalendarEventDialogModule.renderUpdateCalendarEventDialog
+        ).not.toHaveBeenCalled()
+      )
+    })
+
+    it('does not render update calendar event dialog when changing series to a single event', async () => {
+      render({series_uuid: '123', rrule: 'FREQ=WEEKLY;BYDAY=MO;INTERVAL=1;COUNT=5'})
+      userEvent.click(await screen.findByText('Frequency'))
+      userEvent.click(await screen.findByText('Does not repeat'))
+      userEvent.click(await screen.findByText('Update Event'))
+
+      await waitFor(() =>
+        expect(
+          UpdateCalendarEventDialogModule.renderUpdateCalendarEventDialog
+        ).not.toHaveBeenCalled()
       )
     })
 

@@ -157,9 +157,9 @@ describe('CalendarEventDetailsForm', () => {
     const props = eventFormProps()
     props.event.calendarEvent = {
       ...props.event.calendarEvent,
-      rrule: 'FREQ=DAILY;INTERVAL=1;COUNT=3',
       series_uuid: '123',
     }
+    props.event.object = {rrule: 'FREQ=DAILY;INTERVAL=1;COUNT=3'}
 
     const component = render(<CalendarEventDetailsForm {...props} />)
     component.getByText('Submit').click()
@@ -172,6 +172,38 @@ describe('CalendarEventDetailsForm', () => {
         expect.any(Function)
       )
     )
+  })
+
+  it('does not show UpdateCalendarEventsDialog when saving a single event', async () => {
+    const props = eventFormProps()
+    props.event.calendarEvent = {
+      ...props.event.calendarEvent,
+      series_uuid: null,
+    }
+    props.event.object = {rrule: null}
+
+    const component = render(<CalendarEventDetailsForm {...props} />)
+    component.getByText('Submit').click()
+
+    expect(UpdateCalendarEventDialogModule.renderUpdateCalendarEventDialog).not.toHaveBeenCalled()
+    await waitFor(() => expect(props.event.save).toHaveBeenCalled())
+  })
+
+  it('does not show UpdateCalendarEventsDialog when changing series to a single event', async () => {
+    const props = eventFormProps()
+    props.event.calendarEvent = {
+      ...props.event.calendarEvent,
+      series_uuid: '123',
+    }
+    props.event.object = {rrule: 'FREQ=DAILY;INTERVAL=1;COUNT=3'}
+
+    const component = render(<CalendarEventDetailsForm {...props} />)
+    component.getByText('Frequency').click() // open the dropdown
+    component.getByText('Does not repeat').click() // select the option
+    component.getByText('Submit').click()
+
+    expect(UpdateCalendarEventDialogModule.renderUpdateCalendarEventDialog).not.toHaveBeenCalled()
+    await waitFor(() => expect(props.event.save).toHaveBeenCalled())
   })
 
   it('can change the date multiple times', async () => {
