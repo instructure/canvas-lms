@@ -262,4 +262,64 @@ describe Assignment do
       end
     end
   end
+
+  # TODO: move all these specs from old file to here
+  describe "Lti::Migratable" do
+    let(:url) { "http://www.example.com" }
+    let(:account) { account_model }
+    let(:course) { course_model(account:) }
+    let(:developer_key) { dev_key_model_1_3(account:) }
+    let(:old_tool) { external_tool_model(context: course, opts: { url: }) }
+    let(:new_tool) { external_tool_1_3_model(context: course, developer_key:, opts: { url:, name: "1.3 tool" }) }
+    let(:direct_assignment) do
+      assignment_model(
+        context: course,
+        name: "Direct Assignment",
+        submission_types: "external_tool",
+        external_tool_tag_attributes: { content: old_tool },
+        lti_context_id: SecureRandom.uuid
+      )
+    end
+    let(:unpublished_direct) do
+      a = direct_assignment.dup
+      a.update!(lti_context_id: SecureRandom.uuid, workflow_state: "unpublished", external_tool_tag_attributes: { content: old_tool })
+      a
+    end
+    let(:indirect_assignment) do
+      assign = assignment_model(
+        context: course,
+        name: "Indirect Assignment",
+        submission_types: "external_tool",
+        external_tool_tag_attributes: { url: },
+        lti_context_id: SecureRandom.uuid
+      )
+      # There's an before_save hook that looks up the appropriate tool
+      # based on the URL. Great for production, bad for testing :(
+      assign.external_tool_tag.update_column(:content_id, nil)
+      assign
+    end
+    let(:unpublished_indirect) do
+      a = indirect_assignment.dup
+      a.update!(lti_context_id: SecureRandom.uuid, workflow_state: "unpublished", external_tool_tag_attributes: { url: })
+      a.external_tool_tag.update_column(:content_id, nil)
+      a
+    end
+
+    describe "#migrate_to_1_3_if_needed!" do
+      subject { direct_assignment.migrate_to_1_3_if_needed!(new_tool) }
+      # existing specs in spec/models/assignment_spec.rb:11448
+
+      context "when the line item fails to save" do
+        before do
+          allow(direct_assignment.line_items).to receive(:create!).and_raise(ActiveRecord::RecordInvalid)
+        end
+
+        it "rolls back the resource link creation" do
+          expect { subject }.to raise_error(ActiveRecord::RecordInvalid)
+          expect(direct_assignment.lti_resource_links).to be_empty
+          expect(direct_assignment.line_items).to be_empty
+        end
+      end
+    end
+  end
 end
