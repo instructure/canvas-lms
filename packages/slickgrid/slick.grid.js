@@ -147,7 +147,7 @@ if (typeof Slick === 'undefined') {
 
     var columnDefaults = {
       name: '',
-      resizable: true,
+      resizable: false,
       sortable: false,
       minWidth: 30,
       rerenderOnResize: false,

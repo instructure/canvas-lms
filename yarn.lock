@@ -14788,12 +14788,10 @@ fsevents@^2.1.2, fsevents@^2.3.2, fsevents@~2.3.2, fsevents@~2.3.3:
   resolved "https://registry.yarnpkg.com/fsevents/-/fsevents-2.3.3.tgz#cac6407785d03675a2a5e1a5305c697b347d90d6"
   integrity sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==
 
-"fullcalendar@https://github.com/instructure/fullcalendar.git#1108dd1c991a029ec6fd7de3337737ec5295ba97":
-  version "2.4.0"
-  resolved "https://github.com/instructure/fullcalendar.git#1108dd1c991a029ec6fd7de3337737ec5295ba97"
-  dependencies:
-    jquery ">=1.7.1"
-    moment ">=2.5.0"
+fullcalendar@3.10.5:
+  version "3.10.5"
+  resolved "https://registry.yarnpkg.com/fullcalendar/-/fullcalendar-3.10.5.tgz#57a3a64d7d744181582bb9e1be32d1846e1db53a"
+  integrity sha512-JGWpECKgza/344bbF5QT0hBJpx04DZ/7QGPlR1ZbAwrG6Yz6mWEkQd+NnZUh1sK6HCBIPnPRW2x53aJxeLGvvQ==
 
 function-bind@^1.1.1, function-bind@^1.1.2:
   version "1.1.2"
@@ -18227,10 +18225,10 @@ jest@^29.7.0:
     import-local "^3.0.2"
     jest-cli "^29.7.0"
 
-jquery-migrate@1.4.1:
-  version "1.4.1"
-  resolved "https://registry.yarnpkg.com/jquery-migrate/-/jquery-migrate-1.4.1.tgz#85152f3ec99a95625f4f7d0bcf62e9b8638f5a76"
-  integrity sha512-RwIqqAaEC1gQ9KFtdw69wse2bUGQnGNwbkZBkCwSCYkAICMlpVxAbHmfvWaS7SfLGJrYd13FZTuuQgZ6gBotJQ==
+jquery-migrate@3.4.1:
+  version "3.4.1"
+  resolved "https://registry.yarnpkg.com/jquery-migrate/-/jquery-migrate-3.4.1.tgz#6a7114626b80e0d9e1cb77f170623efd85c5fc9c"
+  integrity sha512-6RaV23lLAYccu8MtLfy2sIxOvx+bulnWHm/pvffAi7KOzPk1sN9IYglpkl1ZNCj1FSgSNDPS2fSZ1hWsXc200Q==
 
 jquery-ui-touch-punch@^0.2.3:
   version "0.2.3"
@@ -20102,7 +20100,7 @@ moment-timezone@^0.5, moment-timezone@^0.5.43:
   dependencies:
     moment "^2.29.4"
 
-moment@>=1.6.0, moment@>=2.5.0, moment@^2.10.3, moment@^2.14.1, moment@^2.29.4:
+moment@>=1.6.0, moment@^2.10.3, moment@^2.14.1, moment@^2.29.4:
   version "2.29.4"
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.29.4.tgz#3dbe052889fe7c1b2ed966fcb3a77328964ef108"
   integrity sha512-5LC9SOxjSc2HF6vO2CyuTDNivEdoz2IvyJJGj6X8DJ0eFyfszE0QiEd+iXmBvUP3WHxSjFH/vIsA0EN00cgr8w==

@@ -210,7 +210,7 @@ describe "calendar2" do
           date_of_middle_day = find_middle_day.attribute("data-date")
           date_of_next_day = (date_of_middle_day.to_datetime + 1.day).strftime("%Y-%m-%d")
           f(".fc-content-skeleton .fc-event-container .fc-resizer")
-          next_day = fj("[data-date = #{date_of_next_day}]")
+          next_day = fj("[data-date=#{date_of_next_day}]")
           drag_and_drop_element(f(".fc-content-skeleton .fc-event-container .fc-resizer"), next_day)
           fj(".fc-event:visible").click
           # observe the event details show date range from event start to date to end date
@@ -302,10 +302,10 @@ describe "calendar2" do
 
         # Verify known dates in calendar header and grid
         expect(header_text).to include("February 2012")
-        first_wednesday = ".fc-day-number.fc-wed:first"
+        first_wednesday = ".fc-day-top.fc-wed:first"
         expect(fj(first_wednesday).text).to eq("1")
         expect(fj(first_wednesday)).to have_attribute("data-date", "2012-02-01")
-        last_thursday = ".fc-day-number.fc-thu:last"
+        last_thursday = ".fc-day-top.fc-thu:last"
         expect(fj(last_thursday).text).to eq("1")
         expect(fj(last_thursday)).to have_attribute("data-date", "2012-03-01")
       end
@@ -317,10 +317,10 @@ describe "calendar2" do
 
         # Verify known dates in calendar header and grid
         expect(header_text).to include("December 2011")
-        first_thursday = ".fc-day-number.fc-thu:first"
+        first_thursday = ".fc-day-top.fc-thu:first"
         expect(fj(first_thursday).text).to eq("1")
         expect(fj(first_thursday)).to have_attribute("data-date", "2011-12-01")
-        last_saturday = ".fc-day-number.fc-sat:last"
+        last_saturday = ".fc-day-top.fc-sat:last"
         expect(fj(last_saturday).text).to eq("31")
         expect(fj(last_saturday)).to have_attribute("data-date", "2011-12-31")
       end
@@ -385,17 +385,17 @@ describe "calendar2" do
         # Check for highlight to be present on this month
         # this class is also present on the mini calendar so we need to make
         #   sure that they are both present
-        expect(find_all(".fc-state-highlight").size).to eq 4
+        expect(find_all(".fc-today").size).to eq 4
 
         # Switch the month and verify that there is no highlighted day
         2.times { change_calendar }
-        expect(f("body")).not_to contain_css(".fc-state-highlight")
+        expect(f("body")).not_to contain_css(".fc-today")
 
         # Go back to the present month. Verify that there is a highlighted day
         change_calendar(:today)
-        expect(find_all(".fc-state-highlight").size).to eq 4
+        expect(find_all(".fc-today").size).to eq 4
         # Check the date in the second instance which is the main calendar
-        expect(ffj(".fc-state-highlight")[1].text).to include(date)
+        expect(ff(".fc-today")[1].text).to include(date)
       end
 
       it "shows the location when clicking on a calendar event" do

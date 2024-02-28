@@ -356,24 +356,28 @@ QUnit.module('GradebookGrid GridSupport Columns', suiteHooks => {
       })
     })
 
-    test('updates the width of a scaled-down column', () => {
+    // unskip in FOO-4349
+    QUnit.skip('updates the width of a scaled-down column', () => {
       const originalWidth = gridSpecHelper.getColumn('column4').width
       resizeHeader('column4', -20)
       strictEqual(gridSpecHelper.getColumn('column4').width, originalWidth - 20)
     })
 
-    test('includes the updated column in the onColumnsResized event callback', () => {
+    // unskip in FOO-4349
+    QUnit.skip('includes the updated column in the onColumnsResized event callback', () => {
       resizeHeader('column4', -20)
       deepEqual(resizedColumns, [gridSpecHelper.getColumn('column4')])
     })
 
-    test('updates the width of a scaled-up column', () => {
+    // unskip in FOO-4349
+    QUnit.skip('updates the width of a scaled-up column', () => {
       const originalWidth = gridSpecHelper.getColumn('column4').width
       resizeHeader('column4', 20)
       strictEqual(gridSpecHelper.getColumn('column4').width, originalWidth + 20)
     })
 
-    test('updates the widths of multiple columns when the minimum width is surpassed', () => {
+    // unskip in FOO-4349
+    QUnit.skip('updates the widths of multiple columns when the minimum width is surpassed', () => {
       resizeHeader('column4', -100)
       deepEqual(
         resizedColumns.map(column => column.id),

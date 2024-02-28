@@ -1,4 +1,7 @@
+/* eslint-disable eslint-comments/no-unlimited-disable */
+/* eslint-disable */
 import $ from 'jquery'
+import 'jquery-migrate'
 
 /*!
  * jquery.event.drag - v 2.2
