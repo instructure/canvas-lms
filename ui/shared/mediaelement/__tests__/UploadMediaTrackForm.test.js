@@ -18,6 +18,9 @@
 
 import UploadMediaTrackForm from '../UploadMediaTrackForm'
 import $ from 'jquery'
+import 'jquery-migrate'
+
+$.migrateMute = true
 
 jest.mock('react-dom', () => ({render: jest.fn()}))
 $.ajaxJSON = jest.fn().mockImplementation(() => ({}))
