@@ -32,11 +32,6 @@ QUnit.module('LDBLoginPopup', {
   },
 
   teardown() {
-    if (whnd && !whnd.closed) {
-      whnd.close()
-      whnd = null
-    }
-
     if (server) server.restore()
   },
 })
@@ -68,15 +63,18 @@ test('it should trigger the @open and @close events', () => {
 
 test('it should close after a successful login', 1, () => {
   const onClose = sinon.spy()
+  const clock = sinon.useFakeTimers()
 
   server = sinon.fakeServer.create()
   server.respondWith('POST', /login/, [200, {}, 'OK'])
 
   popup.on('close', onClose)
   popup.on('open', (e, document) => {
-    $(document).find('.btn-primary').click()
+    $(document).find('.btn-primary').trigger('click')
     server.respond()
+    clock.tick(1)
     ok(onClose.called, 'popup should be closed')
+    clock.restore()
   })
 
   whnd = popup.exec()
@@ -84,15 +82,18 @@ test('it should close after a successful login', 1, () => {
 
 test('it should trigger the @login_success event', 1, () => {
   const onSuccess = sinon.spy()
+  const clock = sinon.useFakeTimers()
 
   server = sinon.fakeServer.create()
   server.respondWith('POST', /login/, [200, {}, 'OK'])
 
   popup.on('login_success', onSuccess)
   popup.on('open', (e, document) => {
-    $(document).find('.btn-primary').click()
+    $(document).find('.btn-primary').trigger('click')
     server.respond()
+    clock.tick(1)
     ok(onSuccess.called, '@login_success handler gets called')
+    clock.restore()
   })
 
   whnd = popup.exec()
@@ -106,7 +107,7 @@ test('it should trigger the @login_failure event', 1, () => {
 
   popup.on('login_failure', onFailure)
   popup.on('open', (e, document) => {
-    $(document).find('.btn-primary').click()
+    $(document).find('.btn-primary').trigger('click')
     server.respond()
     ok(onFailure.called, '@login_failure handler gets called')
   })
@@ -137,7 +138,7 @@ test('it should pop back in if student closes it', function (assert) {
   popup.on('open', onOpen)
   popup.on('close', onClose)
   popup.one('open', (e, document) => {
-    $(document).find('.btn-primary').click()
+    $(document).find('.btn-primary').trigger('click')
     server.respond()
     ok(onFailure.calledOnce, 'logged out by passing in bad credentials')
 
