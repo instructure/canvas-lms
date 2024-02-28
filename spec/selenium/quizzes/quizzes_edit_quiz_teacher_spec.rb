@@ -213,6 +213,18 @@ describe "editing a quiz" do
       expect(f("#quiz_edit_actions #cancel_button").attribute("href")).to eq(course_quiz_url(@course, @quiz))
     end
 
+    it "doesn't allow XSS via the return_to query param on Save" do
+      # NOTE: the _=1 is required because the deparam method does not correctly parse the first query param
+      # canvas-lms/packages/deparam/index.js
+      get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit?_=1&return_to=javascript%3Aalert('sadness')"
+
+      test_text = "changed description for XSS test"
+      type_in_tiny "#quiz_description", test_text, clear: true
+
+      click_save_settings_button
+      expect(alert_present?).to be_falsey
+    end
+
     context "in a paced course" do
       before(:once) do
         @course.enable_course_paces = true
