@@ -17,31 +17,82 @@
  */
 
 import {z} from 'zod'
+import {executeQuery} from '@canvas/query/graphql'
+import gql from 'graphql-tag'
+
+const SUBMISSION_QUERY = gql`
+  query SubmissionQuery($assignmentId: ID!, $userId: ID!) {
+    assignment(id: $assignmentId) {
+      id
+      submissionsConnection(
+        filter: {includeUnsubmitted: true, userId: $userId, applyGradebookEnrollmentFilters: true}
+      ) {
+        nodes {
+          id
+          cachedDueDate
+          gradingStatus
+          user {
+            avatarUrl
+            name
+          }
+          gradeMatchesCurrentSubmission
+          score
+          excused
+          id
+          postedAt
+          commentsConnection {
+            nodes {
+              id
+              comment
+              attempt
+              author {
+                name
+                updatedAt
+                avatarUrl
+              }
+            }
+          }
+        }
+      }
+      name
+      gradingType
+      pointsPossible
+    }
+  }
+`
+
+function transform(result: any) {
+  if (result.assignment?.submissionsConnection?.nodes?.[0]) {
+    const submission = result.assignment?.submissionsConnection?.nodes?.[0]
+    const comments = submission?.commentsConnection?.nodes
+    delete submission?.commentsConnection
+    return {
+      ...submission,
+      comments,
+    }
+  }
+  return null
+}
 
 export const ZGetSubmissionParams = z.object({
-  courseId: z.string(),
   assignmentId: z.string(),
   userId: z.string(),
 })
 
 type GetSubmissionParams = z.infer<typeof ZGetSubmissionParams>
 
-export function getSubmission<T extends GetSubmissionParams>({
+export async function getSubmission<T extends GetSubmissionParams>({
   queryKey,
 }: {
   queryKey: [string, T]
 }): Promise<any> {
   ZGetSubmissionParams.parse(queryKey[1])
-  const {courseId, assignmentId, userId} = queryKey[1]
+  const {assignmentId, userId} = queryKey[1]
 
-  const include = ['submission_comments', 'submission_history', 'user']
-  const includeParams = include.map(i => `include[]=${i}`).join('&')
-  const url = `/api/v1/courses/${courseId}/assignments/${assignmentId}/submissions/${userId}?${includeParams}`
+  const result = await executeQuery<any>(SUBMISSION_QUERY, {
+    assignmentId,
+    userId,
+  })
 
-  return fetch(url)
-    .then(res => res.json())
-    .then(data => {
-      // later: transform
-      return data
-    })
+  return transform(result)
 }

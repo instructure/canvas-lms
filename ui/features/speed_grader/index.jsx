@@ -24,7 +24,9 @@ import ready from '@instructure/ready'
 import speedGrader from './jquery/speed_grader'
 import {getCurrentTheme} from '@instructure/theme-registry'
 import {captureException} from '@sentry/browser'
+import {getAssignment} from './queries/assignmentQuery'
 import {getSubmission} from './queries/submissionQuery'
+import {getSubmissionsByAssignment} from './queries/submissionsByAssignmentQuery'
 
 const I18n = useI18nScope('speed_grader')
 
@@ -35,7 +37,10 @@ ready(() => {
     const mountPoint = document.querySelector('#react-router-portals')
     import('speedgrader/appInjector')
       .then(module => {
-        module.render(mountPoint, {theme, queries: {getSubmission}})
+        module.render(mountPoint, {
+          theme,
+          queries: {getAssignment, getSubmission, getSubmissionsByAssignment},
+        })
       })
       .catch(error => {
         // eslint-disable-next-line no-console
