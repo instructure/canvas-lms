@@ -24,7 +24,12 @@ import ModuleFile from '@canvas/files/backbone/models/ModuleFile'
 import $, * as JQuery from 'jquery'
 import {renderContextModulesPublishIcon} from './publishOneModuleHelper'
 import setupContentIds from '../jquery/setupContentIds'
-import {initPublishButton, overrideModel, setExpandAllButton} from '../jquery/utils'
+import {
+  initPublishButton,
+  overrideModel,
+  setExpandAllButton,
+  setExpandAllButtonVisible,
+} from '../jquery/utils'
 import RelockModulesDialog from '@canvas/relock-modules-dialog'
 
 export function addModuleElement(
@@ -59,7 +64,7 @@ export function addModuleElement(
   }
 
   $('#no_context_modules_message').slideUp()
-  $('#expand_collapse_all').show()
+  setExpandAllButtonVisible(true)
   setExpandAllButton()
   const published = data.context_module.workflow_state === 'active'
   const $publishIcon = $module.find('.publish-icon')
