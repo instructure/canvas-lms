@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 - present Instructure, Inc.
+ * Copyright (C) 2024 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -57,6 +57,7 @@ export const ViewRubrics = () => {
   const [selectedTab, setSelectedTab] = useState<string | undefined>(TABS.saved)
   const [isPreviewTrayOpen, setIsPreviewTrayOpen] = useState(false)
   const [rubricIdForPreview, setRubricIdForPreview] = useState<string | undefined>(undefined)
+  const [searchQuery, setSearchQuery] = useState('')
 
   let queryVariables: FetchRubricVariables
   let fetchQuery: (queryVariables: FetchRubricVariables) => Promise<RubricQueryResponse>
@@ -126,6 +127,19 @@ export const ViewRubrics = () => {
     setRubricIdForPreview(rubricId)
     setIsPreviewTrayOpen(true)
   }
+  const filteredActiveRubrics =
+    searchQuery.trim() !== ''
+      ? activeRubrics.filter(rubric =>
+          rubric.title.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+      : activeRubrics
+
+  const filteredArchivedRubrics =
+    searchQuery.trim() !== ''
+      ? archivedRubrics.filter(rubric =>
+          rubric.title.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+      : archivedRubrics
 
   return (
     <View as="div">
@@ -139,9 +153,11 @@ export const ViewRubrics = () => {
           <TextInput
             renderLabel={<ScreenReaderContent>{I18n.t('Search Rubrics')}</ScreenReaderContent>}
             placeholder={I18n.t('Search...')}
-            value=""
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
             width="17"
             renderBeforeInput={<IconSearchLine inline={false} />}
+            data-testid="rubric-search-bar"
           />
         </FlexItem>
         <FlexItem>
@@ -170,7 +186,7 @@ export const ViewRubrics = () => {
         >
           <View as="div" margin="medium 0" data-testid="saved-rubrics-table">
             <RubricTable
-              rubrics={activeRubrics}
+              rubrics={filteredActiveRubrics}
               onPreviewClick={rubricId => handlePreviewClick(rubricId)}
             />
           </View>
@@ -184,7 +200,7 @@ export const ViewRubrics = () => {
         >
           <View as="div" margin="medium 0" data-testid="archived-rubrics-table">
             <RubricTable
-              rubrics={archivedRubrics}
+              rubrics={filteredArchivedRubrics}
               onPreviewClick={rubricId => handlePreviewClick(rubricId)}
             />
           </View>

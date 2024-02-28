@@ -232,6 +232,21 @@ describe('ViewRubrics Tests', () => {
         expect(getByTestId('rubric-locations-0')).toHaveTextContent(sortedLocations[0])
         expect(getByTestId('rubric-locations-1')).toHaveTextContent(sortedLocations[1])
       })
+
+      it('filters rubrics based on search query at account level', () => {
+        queryClient.setQueryData(['accountRubrics-1'], RUBRICS_QUERY_RESPONSE)
+        const {getByTestId, queryByText} = renderComponent()
+
+        expect(getByTestId('saved-rubrics-panel').querySelectorAll('tr').length).toBe(3)
+
+        const searchInput = getByTestId('rubric-search-bar')
+        fireEvent.change(searchInput, {target: {value: '1'}})
+
+        expect(getByTestId('saved-rubrics-panel').querySelectorAll('tr').length).toBe(2)
+        expect(queryByText('Rubric 1')).not.toBeNull()
+        expect(queryByText('Rubric 2')).toBeNull()
+        expect(queryByText('Rubric 3')).toBeNull()
+      })
     })
   })
 
@@ -460,6 +475,21 @@ describe('ViewRubrics Tests', () => {
 
       previewCell.click()
       await waitFor(() => expect(getPreviewTray()).not.toBeInTheDocument())
+    })
+
+    it('filters rubrics based on search query at course level', () => {
+      queryClient.setQueryData(['courseRubrics-1'], RUBRICS_QUERY_RESPONSE)
+      const {getByTestId, queryByText} = renderComponent()
+
+      expect(getByTestId('saved-rubrics-panel').querySelectorAll('tr').length).toBe(3)
+
+      const searchInput = getByTestId('rubric-search-bar')
+      fireEvent.change(searchInput, {target: {value: '1'}})
+
+      expect(getByTestId('saved-rubrics-panel').querySelectorAll('tr').length).toBe(2)
+      expect(queryByText('Rubric 1')).not.toBeNull()
+      expect(queryByText('Rubric 2')).toBeNull()
+      expect(queryByText('Rubric 3')).toBeNull()
     })
   })
 })
