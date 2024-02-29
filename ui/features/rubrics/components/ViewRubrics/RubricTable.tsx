@@ -113,6 +113,7 @@ export const RubricTable = ({rubrics}: RubricTableProps) => {
                 pointsPossible={rubric.pointsPossible}
                 buttonDisplay={rubric.buttonDisplay}
                 ratingOrder={rubric.ratingOrder}
+                hasRubricAssociations={rubric.hasRubricAssociations}
               />
             </Cell>
           </Row>

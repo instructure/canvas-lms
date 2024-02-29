@@ -27,6 +27,7 @@ export type Rubric = {
   pointsPossible: number
   title: string
   workflowState?: string
+  hasRubricAssociations?: boolean
 }
 
 export type RubricCriterion = {

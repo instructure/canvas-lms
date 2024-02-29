@@ -94,6 +94,7 @@ export const ViewRubrics = () => {
         workflowState: curr.workflowState,
         buttonDisplay: curr.buttonDisplay,
         criteria: curr.criteria,
+        hasRubricAssociations: curr.hasRubricAssociations,
       }
 
       const activeStates = ['active', 'draft']
