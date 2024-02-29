@@ -11549,60 +11549,106 @@ describe Assignment do
       end
 
       describe "#directly_associated_items" do
-        it "finds all active assignments in the same course" do
-          create_misc_assignments
-          direct_assignment
-          indirect_assignment
+        subject { Assignment.scope_to_context(Assignment.directly_associated_items(old_tool.id), context) }
 
-          expect(Assignment.directly_associated_items(old_tool.id, course))
-            .to contain_exactly(direct_assignment, unpublished_direct)
+        context "in course" do
+          let(:context) { course }
+
+          it "finds all active assignments in the same course" do
+            create_misc_assignments
+            direct_assignment
+            indirect_assignment
+
+            expect(subject).to contain_exactly(direct_assignment, unpublished_direct)
+          end
         end
 
-        it "finds all active assignments in the same account" do
-          create_misc_assignments
-          direct_assignment
-          indirect_assignment
+        context "in account" do
+          let(:context) { account }
 
-          new_course = course_model(account:)
-          other_assign = assignment_model(
-            context: new_course,
-            submission_types: "external_tool",
-            external_tool_tag_attributes: { content: old_tool },
-            lti_context_id: SecureRandom.uuid
-          )
+          it "finds all active assignments in the same account" do
+            create_misc_assignments
+            direct_assignment
+            indirect_assignment
 
-          expect(Assignment.directly_associated_items(old_tool.id, account))
-            .to contain_exactly(direct_assignment, other_assign, unpublished_direct)
+            new_course = course_model(account:)
+            other_assign = assignment_model(
+              context: new_course,
+              submission_types: "external_tool",
+              external_tool_tag_attributes: { content: old_tool },
+              lti_context_id: SecureRandom.uuid
+            )
+
+            expect(subject).to contain_exactly(direct_assignment, other_assign, unpublished_direct)
+          end
         end
       end
 
       describe "#indirectly_associated_items" do
-        it "finds all active assignments in the same course" do
-          create_misc_assignments
-          direct_assignment
-          indirect_assignment
+        subject { Assignment.scope_to_context(Assignment.indirectly_associated_items(old_tool.id), context) }
 
-          expect(Assignment.indirectly_associated_items(old_tool.id, course))
-            .to contain_exactly(indirect_assignment, unpublished_indirect)
+        context "in course" do
+          let(:context) { course }
+
+          it "finds all active assignments in the same course" do
+            create_misc_assignments
+            direct_assignment
+            indirect_assignment
+
+            expect(subject).to contain_exactly(indirect_assignment, unpublished_indirect)
+          end
         end
 
-        it "finds all active assignments in the same account" do
-          create_misc_assignments
-          direct_assignment
-          indirect_assignment
+        context "in account" do
+          let(:context) { account }
 
-          new_course = course_model(account:)
-          other_assign = assignment_model(
-            context: new_course,
-            title: "Indirect Assignment, Same Account",
-            submission_types: "external_tool",
-            external_tool_tag_attributes: { url: },
-            lti_context_id: SecureRandom.uuid
-          )
-          other_assign.external_tool_tag.update_column(:content_id, nil)
+          it "finds all active assignments in the same account" do
+            create_misc_assignments
+            direct_assignment
+            indirect_assignment
 
-          expect(Assignment.indirectly_associated_items(old_tool.id, account))
-            .to contain_exactly(indirect_assignment, other_assign, unpublished_indirect)
+            new_course = course_model(account:)
+            other_assign = assignment_model(
+              context: new_course,
+              title: "Indirect Assignment, Same Account",
+              submission_types: "external_tool",
+              external_tool_tag_attributes: { url: },
+              lti_context_id: SecureRandom.uuid
+            )
+            other_assign.external_tool_tag.update_column(:content_id, nil)
+
+            expect(subject).to contain_exactly(indirect_assignment, other_assign, unpublished_indirect)
+          end
+        end
+
+        context "in subaccount" do
+          let(:context) { account_model(parent_account: account) }
+
+          it "finds all active assignment in the current account" do
+            create_misc_assignments
+            direct_assignment
+            indirect_assignment
+
+            new_course = course_model(account: context)
+            other_assign = assignment_model(
+              context: new_course,
+              title: "Indirect Assignment, Same Account",
+              submission_types: "external_tool",
+              external_tool_tag_attributes: { url: },
+              lti_context_id: SecureRandom.uuid
+            )
+            other_assign.external_tool_tag.update_column(:content_id, nil)
+
+            expect(subject).to contain_exactly(other_assign)
+          end
+
+          it "does not find assignments outside of the account" do
+            create_misc_assignments
+            direct_assignment
+            indirect_assignment
+
+            expect(subject).to be_empty
+          end
         end
       end
     end

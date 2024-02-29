@@ -1487,13 +1487,17 @@ class ContextExternalTool < ActiveRecord::Base
       VALID_MIGRATION_TYPES.each do |type|
         next unless type.include?(Lti::Migratable)
 
-        type.directly_associated_items(tool_id, context)&.find_ids_in_batches do |ids|
+        type.scope_to_context(
+          type.directly_associated_items(tool_id), context
+        ).find_ids_in_batches do |ids|
           delay_if_production(
             priority: Delayed::LOW_PRIORITY,
             n_strand: ["ContextExternalTool#migrate_content_to_1_3", tool_id]
           ).prepare_direct_batch_for_migration(ids, type)
         end
-        type.indirectly_associated_items(tool_id, context)&.find_ids_in_batches do |ids|
+        type.scope_to_context(
+          type.indirectly_associated_items(tool_id), context
+        ).find_ids_in_batches do |ids|
           delay_if_production(
             priority: Delayed::LOW_PRIORITY,
             n_strand: ["ContextExternalTool#migrate_content_to_1_3", tool_id]

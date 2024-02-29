@@ -1219,6 +1219,7 @@ class AbstractAssignment < ActiveRecord::Base
     end
   end
 
+  # @see Lti::Migratable
   def migrate_to_1_3_if_needed!(tool)
     # Don't do anything unless the tool is actually a 1.3 tool
     return unless tool&.use_1_3? && tool.developer_key.present?
@@ -1233,45 +1234,29 @@ class AbstractAssignment < ActiveRecord::Base
     update_line_items(tool, lti_1_1_id: lti_resource_link_id)
   end
 
-  def self.directly_associated_items(tool_id, context)
-    assignment_scope = Assignment.nondeleted.joins(:external_tool_tag)
-    # limit to assignments in the tool's context
-    case context
-    when Course
-      assignment_scope = assignment_scope.where(context_id: context.id)
-    when Account
-      root_account_id = context.root_account? ? context.id : context.root_account_id
-      assignment_scope = assignment_scope.where(root_account_id:, content_tags: { root_account_id: })
-    end
-
-    assignment_scope
-      .where(content_tags: { content_id: tool_id })
+  # filtered by context during migrate_content_to_1_3
+  # @see Lti::Migratable
+  def self.directly_associated_items(tool_id)
+    Assignment.nondeleted.joins(:external_tool_tag).where(content_tags: { content_id: tool_id })
   end
 
-  def self.indirectly_associated_items(_tool_id, context)
-    assignment_scope = Assignment.nondeleted.joins(:external_tool_tag)
-    # limit to assignments in the tool's context
-    case context
-    when Course
-      assignment_scope = assignment_scope.where(context_id: context.id)
-    when Account
-      root_account_id = context.root_account? ? context.id : context.root_account_id
-      assignment_scope = assignment_scope.where(root_account_id:, content_tags: { root_account_id: })
-    end
-
+  # filtered by context during migrate_content_to_1_3
+  # @see Lti::Migratable
+  def self.indirectly_associated_items(_tool_id)
     # TODO: this does not account for assignments that _are_ linked to a
     # tool and the tag has a content_id, but the content_id doesn't match
     # the current tool
-    assignment_scope
-      .where(content_tags: { content_id: nil })
+    Assignment.nondeleted.joins(:external_tool_tag).where(content_tags: { content_id: nil })
   end
 
+  # @see Lti::Migratable
   def self.fetch_direct_batch(ids, &)
     return to_enum(:fetch_direct_batch, ids) unless block_given?
 
     Assignment.where(id: ids).find_each(&)
   end
 
+  # @see Lti::Migratable
   def self.fetch_indirect_batch(tool_id, new_tool_id, ids, &)
     return to_enum(:fetch_indirect_batch, tool_id, new_tool_id, ids) unless block_given?
 
