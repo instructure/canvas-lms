@@ -244,6 +244,7 @@ test('randomly assigns unassigned users', () => {
   )
   queueResponse('GET', /progress/, partialProgressResponse)
   server.respond()
+  clock.tick(1)
 
   // #
   // verify that there is progress bar
@@ -253,15 +254,10 @@ test('randomly assigns unassigned users', () => {
   equal($groups.length, 0, 'Hides groups during assigning process')
 
   // #
-  // forward the clock so that we get another request for progress, and reset
-  // the stored responses so that we can respond with complete progress (from
-  // the same url)
-  clock.tick(1001)
-
-  // #
   // progressable mixin ensures that the progress model is now polling, respond to it with a 100% completion
   queueResponse('GET', /progress/, progressResponse)
   server.respond()
+  clock.tick(1)
 
   // #
   // the 100% completion response will cascade a model.fetch request
@@ -276,9 +272,11 @@ test('randomly assigns unassigned users', () => {
     }
   )
   server.respond()
+  clock.tick(1)
 
   queueResponse('GET', '/api/v1/group_categories/20/groups?per_page=50', groupsResponse)
   server.respond()
+  clock.tick(1)
 
   queueResponse(
     'GET',
@@ -286,6 +284,7 @@ test('randomly assigns unassigned users', () => {
     []
   )
   server.respond()
+  clock.tick(1)
 
   // #
   // verify that the groups are shown again and the progress bar is hidden

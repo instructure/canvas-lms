@@ -19,6 +19,7 @@
 
 import {NetworkFake} from '@canvas/network/NetworkFake/index'
 import store from '../index'
+import sinon from 'sinon'
 
 describe('Gradebook > DataLoader > GradingPeriodAssignmentsLoader', () => {
   const gradingPeriodAssignmentsUrl = '/courses/1201/gradebook/grading_period_assignments'
@@ -57,11 +58,15 @@ describe('Gradebook > DataLoader > GradingPeriodAssignmentsLoader', () => {
   })
 
   describe('#loadGradingPeriodAssignments()', () => {
+    let clock
+
     beforeEach(() => {
+      clock = sinon.useFakeTimers()
       network = new NetworkFake()
     })
 
     afterEach(() => {
+      clock.restore()
       network.restore()
     })
 
@@ -94,12 +99,14 @@ describe('Gradebook > DataLoader > GradingPeriodAssignmentsLoader', () => {
         grading_period_assignments: exampleData.gradingPeriodAssignments,
       })
       request.response.send()
+      clock.tick()
     }
 
     function resolveAssignmentGroupRequest() {
       const [request] = getAssignmentGroupRequests()
       request.response.setJson(exampleData.assignmentGroups)
       request.response.send()
+      clock.tick()
     }
 
     test('sends the request using the given course id', async () => {
