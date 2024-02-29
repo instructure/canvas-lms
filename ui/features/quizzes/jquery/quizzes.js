@@ -68,6 +68,7 @@ import 'jqueryui/tabs'
 import AssignmentExternalTools from '@canvas/assignments/react/AssignmentExternalTools'
 import {underscoreString} from '@canvas/convert-case'
 import replaceTags from '@canvas/util/replaceTags'
+import * as returnToHelper from '@canvas/util/validateReturnToURL'
 
 const I18n = useI18nScope('quizzes_public')
 
@@ -2377,8 +2378,10 @@ ready(function () {
         $('#quiz_assignment_id')
           .val(data.quiz.quiz_type || 'practice_quiz')
           .change()
-        if (deparam().return_to) {
-          location.href = deparam().return_to
+
+        const return_to = deparam().return_to
+        if (return_to && returnToHelper.isValid(return_to)) {
+          location.href = return_to
         } else {
           location.href = $(this).attr('action')
         }
