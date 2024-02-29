@@ -16,7 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 <% provide :page_title, "User Profile" %>
-
+<% if flash.key?(:success) %>
+  <div id="profile_alert_holder_<%= flash[:success] ? 'success' : 'failed'%>"></div>
+<% end %>
 <div class="ic-Profile-layout">
   <h1 class="screenreader-only"><%= t("User Profile") %></h1>
   <div class="ic-Profile-layout__Primary">

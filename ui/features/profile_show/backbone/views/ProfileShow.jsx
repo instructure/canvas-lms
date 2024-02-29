@@ -23,6 +23,10 @@ import Backbone from '@canvas/backbone'
 import '@canvas/jquery/jquery.instructure_forms'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDialog'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import {Alert} from '@instructure/ui-alerts'
+import {Text} from '@instructure/ui-text'
 
 const I18n = useI18nScope('user_profile')
 
@@ -42,7 +46,40 @@ export default class ProfileShow extends Backbone.View {
 
   initialize() {
     super.initialize(...arguments)
+    this.displayAlertOnSave()
     return new AvatarWidget('.profile-link')
+  }
+
+  renderAlert(message, container, variant) {
+    ReactDOM.render(
+      <Alert
+        variant={variant}
+        liveRegionPoliteness="assertive"
+        liveRegion={() => document.getElementById('flash_screenreader_holder')}
+        margin="small"
+        timeout={5000}
+      >
+        {message}
+      </Alert>,
+      this.$el.find(container)[0]
+    )
+  }
+
+  displayAlertOnSave() {
+    const saveSuccessContainer = '#profile_alert_holder_success'
+    const saveFailedContainer = '#profile_alert_holder_failed'
+    const saveSuccessDiv = this.$el.find(saveSuccessContainer)
+    const saveFailedDiv = this.$el.find(saveFailedContainer)
+
+    if (saveSuccessDiv.length > 0) {
+      this.renderAlert(
+        I18n.t('Profile has been saved successfully'),
+        saveSuccessContainer,
+        'success'
+      )
+    } else if (saveFailedDiv.length > 0) {
+      this.renderAlert(I18n.t('Profile save was unsuccessful'), saveFailedContainer, 'error')
+    }
   }
 
   async removeAvatarLink(e) {
