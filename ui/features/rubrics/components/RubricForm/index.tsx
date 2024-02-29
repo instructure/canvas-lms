@@ -23,7 +23,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
 import LoadingIndicator from '@canvas/loading-indicator/react'
 import {useQuery, useMutation, queryClient} from '@canvas/query'
-import type {RubricCriterion} from '@canvas/rubrics/react/types/rubric'
+import type {RubricAssessmentData, RubricCriterion} from '@canvas/rubrics/react/types/rubric'
 import {Alert} from '@instructure/ui-alerts'
 import {View} from '@instructure/ui-view'
 import {TextInput} from '@instructure/ui-text-input'
@@ -39,6 +39,7 @@ import {NewCriteriaRow} from './NewCriteriaRow'
 import {fetchRubric, saveRubric, type RubricQueryResponse} from '../../queries/RubricFormQueries'
 import type {RubricFormProps} from '../../types/RubricForm'
 import {CriterionModal} from './CriterionModal'
+import {RubricAssessmentTray} from '@canvas/rubrics/react/RubricAssessment'
 
 const I18n = useI18nScope('rubrics-form')
 
@@ -83,6 +84,7 @@ export const RubricForm = () => {
 
   const [selectedCriterion, setSelectedCriterion] = useState<RubricCriterion>()
   const [isCriterionModalOpen, setIsCriterionModalOpen] = useState(false)
+  const [isPreviewTrayOpen, setIsPreviewTrayOpen] = useState(false)
 
   const header = rubricId ? I18n.t('Edit Rubric') : I18n.t('Create New Rubric')
 
@@ -350,7 +352,12 @@ export const RubricForm = () => {
                 borderWidth="none none none medium"
                 height="2.375rem"
               >
-                <Link as="button" isWithinText={false} margin="x-small 0 0 0">
+                <Link
+                  as="button"
+                  isWithinText={false}
+                  margin="x-small 0 0 0"
+                  onClick={() => setIsPreviewTrayOpen(true)}
+                >
                   <IconEyeLine /> {I18n.t('Preview Rubric')}
                 </Link>
               </View>
@@ -365,6 +372,13 @@ export const RubricForm = () => {
         unassessed={rubricForm.unassessed}
         onDismiss={() => setIsCriterionModalOpen(false)}
         onSave={(updatedCriteria: RubricCriterion) => handleSaveCriterion(updatedCriteria)}
+      />
+      <RubricAssessmentTray
+        isOpen={isPreviewTrayOpen}
+        isPreviewMode={true}
+        rubric={rubricForm}
+        rubricAssessmentData={[]}
+        onDismiss={() => setIsPreviewTrayOpen(false)}
       />
     </View>
   )
