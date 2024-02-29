@@ -48,3 +48,24 @@ export type RubricRating = {
   longDescription: string
   points: number
 }
+
+export type RubricAssessment = {
+  id: string
+  rubricId: string
+  rubricAssociationId: string
+  artifactType: string
+  artifactId: string
+  artifactOutcomeId: string
+  assessmentType: string
+  data: RubricAssessmentData[]
+  workflowState: string
+}
+
+export type RubricAssessmentData = {
+  id: string
+  points: number
+  criterionId: string
+  learningOutcomeId?: string
+  comments: string
+  commentsEnabled: boolean
+}
