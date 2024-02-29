@@ -392,68 +392,52 @@ export default function loadLocale(locale: string) {
       return import(/* webpackChunkName: "moment/locale/zh-tw" */ 'moment/locale/zh-tw')
 
     case 'moment/locale/ca':
-      return import(
-        /* webpackChunkName: "ext/custom_moment_locales/ca" */ './ext/custom_moment_locales/ca'
-      )
+      return import(/* webpackChunkName: "moment/locale/ca" */ './ext/custom_moment_locales/ca')
 
     case 'moment/locale/de':
-      return import(
-        /* webpackChunkName: "ext/custom_moment_locales/de" */ './ext/custom_moment_locales/de'
-      )
+      return import(/* webpackChunkName: "moment/locale/de" */ './ext/custom_moment_locales/de')
 
     case 'moment/locale/fa':
-      return import(
-        /* webpackChunkName: "ext/custom_moment_locales/fa" */ './ext/custom_moment_locales/fa'
-      )
+      return import(/* webpackChunkName: "moment/locale/fa" */ './ext/custom_moment_locales/fa')
 
     case 'moment/locale/fr':
-      return import(
-        /* webpackChunkName: "ext/custom_moment_locales/fr" */ './ext/custom_moment_locales/fr'
-      )
+      return import(/* webpackChunkName: "moment/locale/fr" */ './ext/custom_moment_locales/fr')
 
     case 'moment/locale/fr-ca':
       return import(
-        /* webpackChunkName: "ext/custom_moment_locales/fr-ca" */ './ext/custom_moment_locales/fr_ca'
+        /* webpackChunkName: "moment/locale/fr-ca" */ './ext/custom_moment_locales/fr_ca'
       )
 
     case 'moment/locale/he':
-      return import(
-        /* webpackChunkName: "ext/custom_moment_locales/he" */ './ext/custom_moment_locales/he'
-      )
+      return import(/* webpackChunkName: "moment/locale/he" */ './ext/custom_moment_locales/he')
 
     case 'moment/locale/ht-ht':
       return import(
-        /* webpackChunkName: "ext/custom_moment_locales/ht-ht" */ './ext/custom_moment_locales/ht_ht'
+        /* webpackChunkName: "moment/locale/ht-ht" */ './ext/custom_moment_locales/ht_ht'
       )
 
     case 'moment/locale/hy-am':
       return import(
-        /* webpackChunkName: "ext/custom_moment_locales/hy-am" */ './ext/custom_moment_locales/hy_am'
+        /* webpackChunkName: "moment/locale/hy-am" */ './ext/custom_moment_locales/hy_am'
       )
 
     case 'moment/locale/mi-nz':
       return import(
-        /* webpackChunkName: "ext/custom_moment_locales/mi-nz" */ './ext/custom_moment_locales/mi_nz'
+        /* webpackChunkName: "moment/locale/mi-nz" */ './ext/custom_moment_locales/mi_nz'
       )
 
     case 'moment/locale/pl':
-      return import(
-        /* webpackChunkName: "ext/custom_moment_locales/pl" */ './ext/custom_moment_locales/pl'
-      )
+      return import(/* webpackChunkName: "moment/locale/pl" */ './ext/custom_moment_locales/pl')
 
     case 'moment/locale/sl':
-      return import(
-        /* webpackChunkName: "ext/custom_moment_locales/sl" */ './ext/custom_moment_locales/sl'
-      )
+      return import(/* webpackChunkName: "moment/locale/sl" */ './ext/custom_moment_locales/sl')
 
     case 'moment/locale/ja':
-      return import(
-        /* webpackChunkName: "ext/custom_moment_locales/ja" */ './ext/custom_moment_locales/ja'
-      )
+      return import(/* webpackChunkName: "moment/locale/ja" */ './ext/custom_moment_locales/ja')
 
     case 'moment/locale/zh-cn':
       return import(
-        /* webpackChunkName: "ext/custom_moment_locales/zh-cn" */ './ext/custom_moment_locales/zh_cn'
+        /* webpackChunkName: "moment/locale/zh-cn" */ './ext/custom_moment_locales/zh_cn'
       )
 
     default:
