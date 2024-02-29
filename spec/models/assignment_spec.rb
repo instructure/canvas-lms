@@ -11672,8 +11672,9 @@ describe Assignment do
           lti_context_id: SecureRandom.uuid
         )
 
-        expect(Assignment.fetch_indirect_batch(old_tool.id, new_tool.id, [indirect_assignment.id, invalid_assign.id]).to_a)
-          .to contain_exactly(indirect_assignment)
+        assignments = []
+        Assignment.fetch_indirect_batch(old_tool.id, new_tool.id, [indirect_assignment.id, invalid_assign.id]) { |a| assignments << a }
+        expect(assignments).to contain_exactly(indirect_assignment)
       end
     end
   end

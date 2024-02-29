@@ -152,9 +152,11 @@ describe ExternalToolCollaboration do
 
     describe "#fetch_indirect_batch" do
       it "ignores collaborations that can't be associated with the tool being migrated" do
-        tags = described_class.fetch_indirect_batch(tool_1p1.id, tool_1p3.id, [indirect_collaboration, other_tool_collaboration].pluck(:id)).to_a
-        expect(tags)
-          .to contain_exactly(indirect_collaboration)
+        collaborations = []
+        described_class.fetch_indirect_batch(tool_1p1.id, tool_1p3.id, [indirect_collaboration, other_tool_collaboration].pluck(:id)) do |collaboration|
+          collaborations << collaboration
+        end
+        expect(collaborations).to contain_exactly(indirect_collaboration)
       end
     end
   end

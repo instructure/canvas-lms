@@ -1366,9 +1366,9 @@ describe ContentTag do
     describe "#fetch_indirect_batch" do
       it "ignores tags that can't be associated with the tool being migrated" do
         diff_url = ContentTag.create!(context: course, url: "http://notreallythere.com")
-        tags = ContentTag.fetch_indirect_batch(tool.id, tool_1_3.id, [indirect_tag, diff_url].pluck(:id)).to_a
-        expect(tags)
-          .to contain_exactly(indirect_tag)
+        tags = []
+        ContentTag.fetch_indirect_batch(tool.id, tool_1_3.id, [indirect_tag, diff_url].pluck(:id)) { |tag| tags << tag }
+        expect(tags).to contain_exactly(indirect_tag)
       end
     end
   end
