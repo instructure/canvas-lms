@@ -3,7 +3,7 @@ Course
 
 <h2 id="course_completed">course_completed</h2>
 
-**Definition:** The event is emitted anytime a course module's completion requirements are met.
+**Definition:** The event is emitted when all of the module requirements in a course are met.
 
 **Trigger:** Triggered when all the module requirements of a course have been met. Also gets triggered when a module has a set completion time or when the completion time gets updated.
 
@@ -142,12 +142,14 @@ Course
 
 <h2 id="course_progress">course_progress</h2>
 
-**Definition:** The event is emitted anytime a course module progression requirements are met.
+**Definition:** The event is emitted when a course module requirement is met.
 
-**Trigger:** Triggered when a user makes progress in a course by completing a module requirement. The following setup should be enabled in Canvas in order for this event to get triggered:
+**Trigger:** Triggered when a user makes progress in a course by completing a module requirement, unless the completed requirement is the last remaining requirement in the course (in this case, a `course_completed` event is emitted). The following setup should be enabled in Canvas in order for this event to get triggered:
 1. Module is set to be published
 2. Module has at least one requirement enabled
 3. Student completed at least one requirement in Module
+
+Note that these events have a 2-minute debounce, meaning that a single `course_progress` event will be emitted per student per course 2 minutes after the student has finished completing requirements.
 
 
 
