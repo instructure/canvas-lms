@@ -56,7 +56,9 @@ test('set progress_url', () => {
   model.on('progressResolved', spy)
   model.set({progress_url: progressUrl})
   server.respond() // respond to progress, which queues model fetch
+  clock.tick(1)
   server.respond() // respond to model fetch
+  clock.tick(1)
   ok(spy.calledTwice, 'complete and progressResolved handlers called')
   equal(model.progressModel.get('workflow_state'), 'completed')
   equal(model.get('csv'), 'one,two,three')
@@ -68,7 +70,9 @@ test('set progress.url', () => {
   model.on('progressResolved', spy)
   model.progressModel.set({url: progressUrl, workflow_state: 'queued'})
   server.respond() // respond to progress, which queues model fetch
+  clock.tick(1)
   server.respond() // respond to model fetch
+  clock.tick(1)
   ok(spy.calledTwice, 'complete and progressResolved handlers called')
   equal(model.progressModel.get('workflow_state'), 'completed')
   equal(model.get('csv'), 'one,two,three')
