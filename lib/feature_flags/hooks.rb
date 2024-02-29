@@ -143,5 +143,12 @@ module FeatureFlags
                                 )
       end
     end
+
+    def self.lti_registrations_discover_page_hook(_user, context, _from_state, transitions)
+      unless context.feature_enabled?(:lti_registrations_page)
+        transitions["on"] ||= {}
+        transitions["on"]["message"] = I18n.t("The LTI Extensions Discover page won't be accessible unless the LTI Registrations page is enabled")
+      end
+    end
   end
 end

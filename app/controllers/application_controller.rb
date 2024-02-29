@@ -387,6 +387,7 @@ class ApplicationController < ActionController::Base
     react_discussions_post
     instui_nav
     enhanced_developer_keys_tables
+    lti_registrations_discover_page
   ].freeze
   JS_ENV_BRAND_ACCOUNT_FEATURES = [
     :embedded_release_notes

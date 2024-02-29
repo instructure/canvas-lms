@@ -216,6 +216,7 @@ export type SiteAdminFeatureId =
   | 'platform_service_speedgrader'
   | 'render_both_to_do_lists'
   | 'instui_header'
+  | 'lti_registrations_discover_page'
 
 /**
  * From ApplicationController#JS_ENV_ROOT_ACCOUNT_FEATURES
