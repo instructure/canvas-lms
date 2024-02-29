@@ -143,7 +143,7 @@ const subsystems: {[subsys: string]: Capability} = {
     subsysName: 'PluralRules',
     should: spfPR,
     polyfill: () => import('@formatjs/intl-pluralrules/polyfill-force'),
-    localeLoader: (l: string) => import(/* webpackIgnore: true */ localeDataFor('pluralrules', l)),
+    localeLoader: (l: string) => import(localeDataFor('pluralrules', l)),
   }),
 
   datetimeformat: polyfillerFactory({
@@ -151,25 +151,23 @@ const subsystems: {[subsys: string]: Capability} = {
     should: spfDTF,
     polyfill: async () => {
       await import('@formatjs/intl-datetimeformat/polyfill-force')
-      await import(/* webpackIgnore: true */ `${FORMAT_JS_DIR}/intl-datetimeformat/add-all-tz.js`)
+      await import('@formatjs/intl-datetimeformat/add-all-tz')
     },
-    localeLoader: (l: string) =>
-      import(/* webpackIgnore: true */ localeDataFor('datetimeformat', l)),
+    localeLoader: (l: string) => import(localeDataFor('datetimeformat', l)),
   }),
 
   numberformat: polyfillerFactory({
     subsysName: 'NumberFormat',
     should: spfNF,
     polyfill: () => import('@formatjs/intl-numberformat/polyfill-force'),
-    localeLoader: (l: string) => import(/* webpackIgnore: true */ localeDataFor('numberformat', l)),
+    localeLoader: (l: string) => import(localeDataFor('numberformat', l)),
   }),
 
   relativetimeformat: polyfillerFactory({
     subsysName: 'RelativeTimeFormat',
     should: spfRTF,
     polyfill: () => import('@formatjs/intl-relativetimeformat/polyfill-force'),
-    localeLoader: (l: string) =>
-      import(/* webpackIgnore: true */ localeDataFor('relativetimeformat', l)),
+    localeLoader: (l: string) => import(localeDataFor('relativetimeformat', l)),
   }),
 }
 
