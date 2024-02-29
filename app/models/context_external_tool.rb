@@ -1511,7 +1511,7 @@ class ContextExternalTool < ActiveRecord::Base
   # from 1.1 to 1.3 according to the types migration method.
   # @see Lti::Migratable
   def prepare_direct_batch_for_migration(ids, content_type)
-    content_type.fetch_direct_batch(ids).each do |item|
+    content_type.fetch_direct_batch(ids) do |item|
       prepare_content_for_migration(item)
     end
   end
@@ -1520,7 +1520,7 @@ class ContextExternalTool < ActiveRecord::Base
   # from 1.1 to 1.3 according to the types migration method.
   # @see Lti::Migratable
   def prepare_indirect_batch_for_migration(tool_id, ids, content_type)
-    content_type.fetch_indirect_batch(tool_id, id, ids).each do |item|
+    content_type.fetch_indirect_batch(tool_id, id, ids) do |item|
       prepare_content_for_migration(item)
     end
   end

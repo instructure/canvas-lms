@@ -741,8 +741,6 @@ class ContentTag < ActiveRecord::Base
   # @param [Array<Integer>] ids The IDs of the resources to fetch for this batch
   # @see Lti::Migratable
   def self.fetch_direct_batch(ids, &)
-    return to_enum(:fetch_direct_batch, ids) unless block_given?
-
     ContentTag
       .where(id: ids)
       .preload(:associated_asset, :context)
@@ -754,8 +752,6 @@ class ContentTag < ActiveRecord::Base
   # @param [Array<Integer>] ids The IDs of the resources to fetch for this batch
   # @see Lti::Migratable
   def self.fetch_indirect_batch(tool_id, new_tool_id, ids)
-    return to_enum(:fetch_indirect_batch, tool_id, new_tool_id, ids) unless block_given?
-
     ContentTag
       .where(id: ids)
       .preload(:associated_asset, :context)

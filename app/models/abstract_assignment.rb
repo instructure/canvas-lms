@@ -1251,15 +1251,11 @@ class AbstractAssignment < ActiveRecord::Base
 
   # @see Lti::Migratable
   def self.fetch_direct_batch(ids, &)
-    return to_enum(:fetch_direct_batch, ids) unless block_given?
-
     Assignment.where(id: ids).find_each(&)
   end
 
   # @see Lti::Migratable
-  def self.fetch_indirect_batch(tool_id, new_tool_id, ids, &)
-    return to_enum(:fetch_indirect_batch, tool_id, new_tool_id, ids) unless block_given?
-
+  def self.fetch_indirect_batch(tool_id, new_tool_id, ids)
     Assignment
       .where(id: ids)
       .preload(:external_tool_tag)
