@@ -23,9 +23,10 @@ import gql from 'graphql-tag'
 const ASSIGNMENT_QUERY = gql`
   query AssignmentQuery($assignmentId: ID!) {
     assignment(id: $assignmentId) {
+      dueAt
+      gradingType
       id
       name
-      gradingType
       pointsPossible
     }
   }
