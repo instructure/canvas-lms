@@ -70,6 +70,7 @@ export interface ItemAssignToCardSpec {
   defaultOptions?: string[]
   contextModuleId?: string | null
   contextModuleName?: string | null
+  highlightCard?: boolean
 }
 
 export interface DateDetails extends BaseDateDetails {

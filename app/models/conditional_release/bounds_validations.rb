@@ -20,14 +20,13 @@
 # Basic bounds validations for classes including :upper_bound and :lower_bound attributes
 module ConditionalRelease
   module BoundsValidations
-    extend ActiveSupport::Concern
-    include ActiveModel::Validations
+    def self.included(klass)
+      super
 
-    included do
-      validates :lower_bound, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
-      validates :upper_bound, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
-      validate :lower_bound_less_than_upper_bound
-      validate :bound_must_exist
+      klass.validates :lower_bound, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
+      klass.validates :upper_bound, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
+      klass.validate :lower_bound_less_than_upper_bound
+      klass.validate :bound_must_exist
     end
 
     private

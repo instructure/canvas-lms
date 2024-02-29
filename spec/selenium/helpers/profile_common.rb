@@ -33,11 +33,8 @@ shared_examples "profile_settings_page" do
     driver.action.move_to(f(".avatar.profile_pic_link.none")).perform
     wait_for_ajaximations
 
-    # We want to make sure the tooltip is displayed,
-    # but are limited to assuming that with almost all popular browsers...
-    # "The information is most often shown as a tooltip text when the mouse moves over the element."
-    # ...as shown in HTML title attribute at http://www.w3schools.com/tags/att_global_title.asp
-    expect(f(".avatar.profile_pic_link.none")).to have_attribute("title", "Click to change profile pic")
+    # We want to make sure the pencil icon is visible
+    expect(fj(".avatar.profile_pic_link.none:contains('Click to change profile picture')")).to be_displayed
   end
 end
 
@@ -53,7 +50,7 @@ shared_examples "profile_user_about_page" do
 
     # We are checking the title in this tooltip like we do in the one above,
     # given the same limitation.
-    expect(f(".avatar.profile-link")).to have_attribute("title", "Click to change profile pic")
+    expect(f(".avatar.profile-link i")).to be_displayed
   end
 end
 
@@ -80,7 +77,7 @@ shared_examples "user settings page change pic window" do
     expect(fj('.nav.nav-pills li :contains("From Gravatar")')).to include_text("From Gravatar")
 
     # There are 'X', Save, and Cancel buttons
-    expect(f("button.ui-dialog-titlebar-close")).to be_truthy
+    expect(f(".ui-dialog-titlebar-close")).to be_truthy
     expect(fj('.ui-button :contains("Cancel")')).to be_truthy
     expect(fj('.ui-button :contains("Save")')).to be_truthy
   end

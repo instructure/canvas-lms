@@ -36,12 +36,19 @@ describe('CourseCopyImporter', () => {
     window.ENV.current_user = {
       id: '0',
     }
+    window.ENV.SHOW_BP_SETTINGS_IMPORT_OPTION = true
     doFetchApi.mockReturnValue(
       Promise.resolve({
         json: [
           {
             id: '0',
             label: 'Mathmatics',
+            blueprint: true,
+          },
+          {
+            id: '1',
+            label: 'Biology',
+            blueprint: false,
           },
         ],
       })
@@ -52,7 +59,7 @@ describe('CourseCopyImporter', () => {
 
   it('searches for matching courses', async () => {
     renderComponent()
-    userEvent.type(screen.getByRole('combobox', {name: 'Search for a course'}), 'math')
+    await userEvent.type(screen.getByRole('combobox', {name: 'Search for a course'}), 'math')
     await waitFor(() => {
       expect(doFetchApi).toHaveBeenCalledWith({path: '/users/0/manageable_courses?term=math'})
     })
@@ -61,8 +68,8 @@ describe('CourseCopyImporter', () => {
 
   it('searches for matching courses including concluded', async () => {
     renderComponent()
-    userEvent.click(screen.getByRole('checkbox', {name: 'Include completed courses'}))
-    userEvent.type(screen.getByRole('combobox', {name: 'Search for a course'}), 'math')
+    await userEvent.click(screen.getByRole('checkbox', {name: 'Include completed courses'}))
+    await userEvent.type(screen.getByRole('combobox', {name: 'Search for a course'}), 'math')
     await waitFor(() => {
       expect(doFetchApi).toHaveBeenCalledWith({
         path: '/users/0/manageable_courses?term=math&include=concluded',
@@ -73,9 +80,9 @@ describe('CourseCopyImporter', () => {
 
   it('calls onSubmit', async () => {
     renderComponent()
-    userEvent.type(screen.getByRole('combobox', {name: 'Search for a course'}), 'math')
-    userEvent.click(await screen.findByText('Mathmatics'))
-    userEvent.click(screen.getByRole('button', {name: 'Add to Import Queue'}))
+    await userEvent.type(screen.getByRole('combobox', {name: 'Search for a course'}), 'math')
+    await userEvent.click(await screen.findByText('Mathmatics'))
+    await userEvent.click(screen.getByRole('button', {name: 'Add to Import Queue'}))
     expect(onSubmit).toHaveBeenCalledWith(
       expect.objectContaining({
         settings: expect.objectContaining({
@@ -85,9 +92,37 @@ describe('CourseCopyImporter', () => {
     )
   })
 
-  it('calls onCancel', () => {
+  it('calls onCancel', async () => {
     renderComponent()
-    userEvent.click(screen.getByRole('button', {name: 'Cancel'}))
+    await userEvent.click(screen.getByRole('button', {name: 'Cancel'}))
     expect(onCancel).toHaveBeenCalled()
+  })
+
+  // The testing of onCancel and onSubmit above need the actual common migrator controls
+  // So instead of mocking it here and testing the prop being passed to the mock
+  // we're following the precedent and testing all the way to the child in this suite
+  it('Renders BP settings import option if appropriate', async () => {
+    renderComponent()
+    await userEvent.type(screen.getByRole('combobox', {name: 'Search for a course'}), 'math')
+    await userEvent.click(await screen.findByText('Mathmatics'))
+    await userEvent.click(screen.getByRole('radio', {name: 'All content'}))
+    await expect(await screen.getByText('Import Blueprint Course settings')).toBeInTheDocument()
+  })
+
+  it('Does not renders BP settings import option when the destination course is marked ineligible', async () => {
+    window.ENV.SHOW_BP_SETTINGS_IMPORT_OPTION = false
+    renderComponent()
+    await userEvent.type(screen.getByRole('combobox', {name: 'Search for a course'}), 'math')
+    await userEvent.click(await screen.findByText('Mathmatics'))
+    await userEvent.click(screen.getByRole('radio', {name: 'All content'}))
+    expect(screen.queryByText('Import Blueprint Course settings')).toBeNull()
+  })
+
+  it('Does not render BP settings import option when the selected course is not a blueprint', async () => {
+    renderComponent()
+    await userEvent.type(screen.getByRole('combobox', {name: 'Search for a course'}), 'biol')
+    await userEvent.click(await screen.findByText('Biology'))
+    await userEvent.click(screen.getByRole('radio', {name: 'All content'}))
+    expect(screen.queryByText('Import Blueprint Course settings')).toBeNull()
   })
 })

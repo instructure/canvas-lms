@@ -29,9 +29,10 @@ const I18n = useI18nScope('content_migrations_redesign')
 type QTIZipImporterProps = {
   onSubmit: onSubmitMigrationFormCallback
   onCancel: () => void
+  fileUploadProgress: number | null
 }
 
-const QTIZipImporter = ({onSubmit, onCancel}: QTIZipImporterProps) => {
+const QTIZipImporter = ({onSubmit, onCancel, fileUploadProgress}: QTIZipImporterProps) => {
   const [file, setFile] = useState<File | null>(null)
   const [fileError, setFileError] = useState<boolean>(false)
   const [questionBankSettings, setQuestionBankSettings] = useState<QuestionBankSettings | null>()
@@ -64,7 +65,7 @@ const QTIZipImporter = ({onSubmit, onCancel}: QTIZipImporterProps) => {
 
   return (
     <>
-      <MigrationFileInput onChange={setFile} />
+      <MigrationFileInput fileUploadProgress={fileUploadProgress} onChange={setFile} />
       {fileError && (
         <p>
           <Text color="danger">{I18n.t('You must select a file to import content from')}</Text>
@@ -75,6 +76,7 @@ const QTIZipImporter = ({onSubmit, onCancel}: QTIZipImporterProps) => {
         questionBankError={questionBankError}
       />
       <CommonMigratorControls
+        fileUploadProgress={fileUploadProgress}
         canImportAsNewQuizzes={ENV.NEW_QUIZZES_IMPORT}
         canOverwriteAssessmentContent={true}
         onSubmit={handleSubmit}

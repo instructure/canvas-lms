@@ -173,6 +173,18 @@ describe SplitUsers do
         expect(restored_user.lti_context_id).to eq restored_lti_context_id
       end
 
+      it "doesn't raise if restored user uuid matches source user receiving merge data item uuid" do
+        UserMerge.from(restored_user).into(source_user)
+        merge_data = UserMergeData.active.splitable.find_by(user: source_user, from_user: restored_user)
+        old_uuid = merge_data.items.where(item_type: "uuid").pick(:item)
+        source_user.update!(uuid: old_uuid)
+        allow(InstStatsd::Statsd).to receive(:increment)
+        expect { SplitUsers.split_db_users(source_user, merge_data) }.not_to raise_error
+        expect(InstStatsd::Statsd).to have_received(:increment).once.with("split_users.undo_move_lti_ids.unique_constraint_failure")
+        expect(restored_user.reload).not_to be_deleted
+        expect(source_user).not_to be_deleted
+      end
+
       it "splits multiple users if no merge_data is specified" do
         enrollment1 = course1.enroll_student(restored_user, enrollment_state: "active")
         enrollment2 = course1.enroll_student(source_user, enrollment_state: "active")

@@ -118,19 +118,21 @@ const defaultProps: FilterTrayPresetProps = {
 }
 
 describe('FilterNavFilter', () => {
-  it('clicking delete triggers onDelete', () => {
+  it('clicking delete triggers onDelete', async () => {
     const onDelete = jest.fn()
     const {getByTestId} = render(<FilterNavFilter {...defaultProps} onDelete={onDelete} />)
-    userEvent.click(getByTestId('delete-filter-preset-button'))
+    await userEvent.click(getByTestId('delete-filter-preset-button'))
     expect(onDelete).toHaveBeenCalledTimes(1)
   })
 
-  it('clicking save after change triggers onSave', () => {
+  it('clicking save after change triggers onSave', async () => {
     const onUpdate = jest.fn(() => Promise.resolve())
-    const {getByRole} = render(<FilterNavFilter {...defaultProps} onUpdate={onUpdate} />)
-    userEvent.click(getByRole('combobox', {name: 'Sections'}))
-    userEvent.click(getByRole('option', {name: 'Section 7'}))
-    userEvent.click(getByRole('button', {name: 'Save Filter Preset'}))
+    const {getByRole, getByLabelText, getByText} = render(
+      <FilterNavFilter {...defaultProps} onUpdate={onUpdate} />
+    )
+    await userEvent.click(getByLabelText('Sections'))
+    await userEvent.click(getByText('Section 7'))
+    await userEvent.click(getByRole('button', {name: 'Save Filter Preset'}))
     expect(onUpdate).toHaveBeenCalledTimes(1)
   })
 })

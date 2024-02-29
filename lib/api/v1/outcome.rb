@@ -72,7 +72,7 @@ module Api::V1::Outcome
       hash["has_updateable_rubrics"] = outcome.updateable_rubrics?
       unless opts[:outcome_style] == :abbrev
         hash["description"] = outcome.description
-        hash["friendly_description"] = opts.dig(:friendly_descriptions, outcome.id)
+        hash["friendly_description"] = opts.dig(:friendly_descriptions, outcome.id.to_s)
         context = opts[:context]
         mastery_scale_opts = mastery_scale_opts(context)
         if mastery_scale_opts.any?

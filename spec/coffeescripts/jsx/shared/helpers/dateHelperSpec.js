@@ -22,6 +22,7 @@ import tzInTest from '@canvas/datetime/specHelpers'
 import timezone from 'timezone'
 import detroit from 'timezone/America/Detroit'
 import juneau from 'timezone/America/Juneau'
+import tokyo from 'timezone/Asia/Tokyo'
 import {getI18nFormats} from 'ui/boot/initializers/configureDateTime'
 
 const defaultAssignment = () => ({
@@ -130,6 +131,29 @@ test('formats the date for display, adjusted for the timezone, excluding the tim
   })
   formattedDate = DateHelper.formatDateForDisplay(assignment.due_at)
   equal(formattedDate, 'Jul 14, 2015')
+})
+
+QUnit.module('DateHelper#formatDatetimeForDiscussions', {
+  setup() {},
+  teardown() {
+    tzInTest.restore()
+  },
+})
+test('formats the date for display, adjusted for the user settings timezone', () => {
+  const assignment = defaultAssignment()
+  tzInTest.configureAndRestoreLater({
+    tzData: {
+      'America/Detroit': detroit,
+      'Asia/Tokyo': tokyo,
+    },
+    formats: getI18nFormats(),
+  })
+  ENV.TIMEZONE = 'Asia/Tokyo'
+  let formattedDate = DateHelper.formatDatetimeForDiscussions(assignment.due_at)
+  equal(formattedDate, 'Jul 15, 2015 3:35am')
+  ENV.TIMEZONE = 'America/Detroit'
+  formattedDate = DateHelper.formatDatetimeForDiscussions(assignment.due_at)
+  equal(formattedDate, 'Jul 14, 2015 2:35pm')
 })
 
 QUnit.module('DateHelper#isMidnight', {

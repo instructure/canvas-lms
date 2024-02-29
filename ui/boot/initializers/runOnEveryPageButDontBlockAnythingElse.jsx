@@ -23,7 +23,7 @@
 // the critical code to display a page will be executed sooner
 
 import $ from 'jquery'
-
+import 'jquery-migrate'
 // modules that do their own thing on every page that simply need to be required
 import './addBrowserClasses'
 import '@canvas/media-comments'

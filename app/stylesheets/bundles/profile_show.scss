@@ -71,6 +71,10 @@
   }
 }
 
+.profile-link:focus i {
+  visibility: visible;
+}
+
 .report_picture {
   margin: 0;
   text-align: center;

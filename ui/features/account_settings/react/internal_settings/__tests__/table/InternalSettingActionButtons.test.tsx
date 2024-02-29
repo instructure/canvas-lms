@@ -19,7 +19,7 @@
 import {render} from '@testing-library/react'
 import {InternalSettingActionButtons} from '../../table/InternalSettingActionButtons'
 import React from 'react'
-import userEvent from '@testing-library/user-event'
+import userEvent, {PointerEventsCheckLevel} from '@testing-library/user-event'
 
 const onSubmitChanges = jest.fn()
 const onClearChanges = jest.fn()
@@ -57,7 +57,8 @@ describe('InternalSettingActionButtons', () => {
     expect(getByText('Delete "my_setting"')).toBeInTheDocument()
   })
 
-  it('buttons call the appropriate callbacks', () => {
+  it('buttons call the appropriate callbacks', async () => {
+    const user = userEvent.setup({pointerEventsCheck: PointerEventsCheckLevel.Never})
     const {getByText, rerender} = render(
       <InternalSettingActionButtons
         name="my_setting"
@@ -67,7 +68,7 @@ describe('InternalSettingActionButtons', () => {
       />
     )
 
-    userEvent.click(getByText('Delete "my_setting"'))
+    await user.click(getByText('Delete "my_setting"'))
     expect(onDelete).toHaveBeenCalled()
 
     rerender(
@@ -80,14 +81,14 @@ describe('InternalSettingActionButtons', () => {
       />
     )
 
-    userEvent.click(getByText('Save "my_setting"'))
+    await user.click(getByText('Save "my_setting"'))
     expect(onSubmitChanges).toHaveBeenCalled()
 
-    userEvent.click(getByText('Reset "my_setting"'))
+    await user.click(getByText('Reset "my_setting"'))
     expect(onClearChanges).toHaveBeenCalled()
   })
 
-  it('displays only a tooltip and no buttons when the setting is secret', () => {
+  it('displays only a tooltip and no buttons when the setting is secret', async () => {
     const {container, queryByText, getByText} = render(
       <InternalSettingActionButtons
         name="my_setting"
@@ -100,7 +101,7 @@ describe('InternalSettingActionButtons', () => {
 
     expect(queryByText('Delete "my_setting"')).not.toBeInTheDocument()
 
-    userEvent.hover(container)
+    await userEvent.hover(container)
 
     expect(
       getByText('This is a secret setting, and may only be modified from the console')

@@ -99,10 +99,10 @@ describe('CollapsableList', () => {
     expect(component.getAllByText('My parent item 2')[1]).toBeInTheDocument()
   })
 
-  it('render children items on un-collapsed parent', () => {
+  it('render children items on un-collapsed parent', async () => {
     const component = renderComponent()
-    userEvent.click(component.getByTestId('toggle-parent-item-1'))
-    userEvent.click(component.getByTestId('toggle-parent-item-2'))
+    await userEvent.click(component.getByTestId('toggle-parent-item-1'))
+    await userEvent.click(component.getByTestId('toggle-parent-item-2'))
     expect(component.getByTestId('checkbox-child-item-1')).toBeInTheDocument()
     expect(component.getByTestId('checkbox-child-item-2')).toBeInTheDocument()
     expect(component.getByTestId('checkbox-child-item-3')).toBeInTheDocument()
@@ -114,10 +114,10 @@ describe('CollapsableList', () => {
     expect(component.getAllByText('My child item 4')[1]).toBeInTheDocument()
   })
 
-  it('render children of children items on un-collapsed parent', () => {
+  it('render children of children items on un-collapsed parent', async () => {
     const component = renderComponent()
-    userEvent.click(component.getByTestId('toggle-parent-item-1'))
-    userEvent.click(component.getByTestId('toggle-child-item-3'))
+    await userEvent.click(component.getByTestId('toggle-parent-item-1'))
+    await userEvent.click(component.getByTestId('toggle-child-item-3'))
     expect(component.getByTestId('checkbox-sub-child-item-1')).toBeInTheDocument()
     expect(component.getByTestId('checkbox-sub-child-item-2')).toBeInTheDocument()
     expect(component.getByTestId('checkbox-sub-child-item-3')).toBeInTheDocument()
@@ -127,7 +127,7 @@ describe('CollapsableList', () => {
     expect(component.getAllByText('My sub-child item 3')[1]).toBeInTheDocument()
   })
 
-  it('checks/un-checks box for single item', () => {
+  it('checks/un-checks box for single item', async () => {
     const component = renderComponent({
       items: [
         {
@@ -136,13 +136,13 @@ describe('CollapsableList', () => {
         },
       ],
     })
-    userEvent.click(component.getByTestId('checkbox-single-item-1'))
+    await userEvent.click(component.getByTestId('checkbox-single-item-1'))
     expect(component.container.querySelectorAll('svg[name="IconCheckMark"]').length).toBe(1)
-    userEvent.click(component.getByTestId('checkbox-single-item-1'))
+    await userEvent.click(component.getByTestId('checkbox-single-item-1'))
     expect(component.container.querySelectorAll('svg[name="IconCheckMark"]').length).toBe(0)
   })
 
-  it('checks/un-checks box for parent item', () => {
+  it('checks/un-checks box for parent item', async () => {
     const component = renderComponent({
       items: [
         {
@@ -157,18 +157,18 @@ describe('CollapsableList', () => {
         },
       ],
     })
-    userEvent.click(component.getByTestId('toggle-parent-item-1'))
+    await userEvent.click(component.getByTestId('toggle-parent-item-1'))
 
-    userEvent.click(component.getByTestId('checkbox-parent-item-1'))
-    userEvent.click(component.getByTestId('toggle-parent-item-1'))
+    await userEvent.click(component.getByTestId('checkbox-parent-item-1'))
+    await userEvent.click(component.getByTestId('toggle-parent-item-1'))
     expect(component.container.querySelectorAll('svg[name="IconCheckMark"]').length).toBe(2)
 
-    userEvent.click(component.getByTestId('checkbox-parent-item-1'))
-    userEvent.click(component.getByTestId('toggle-parent-item-1'))
+    await userEvent.click(component.getByTestId('checkbox-parent-item-1'))
+    await userEvent.click(component.getByTestId('toggle-parent-item-1'))
     expect(component.container.querySelectorAll('svg[name="IconCheckMark"]').length).toBe(0)
   })
 
-  it('checks/un-checks box for child item', () => {
+  it('checks/un-checks box for child item', async () => {
     const component = renderComponent({
       items: [
         {
@@ -183,15 +183,15 @@ describe('CollapsableList', () => {
         },
       ],
     })
-    userEvent.click(component.getByTestId('toggle-parent-item-1'))
-    userEvent.click(component.getByTestId('checkbox-child-item-1'))
+    await userEvent.click(component.getByTestId('toggle-parent-item-1'))
+    await userEvent.click(component.getByTestId('checkbox-child-item-1'))
     expect(component.container.querySelectorAll('svg[name="IconCheckMark"]').length).toBe(2)
 
-    userEvent.click(component.getByTestId('checkbox-child-item-1'))
+    await userEvent.click(component.getByTestId('checkbox-child-item-1'))
     expect(component.container.querySelectorAll('svg[name="IconCheckMark"]').length).toBe(0)
   })
 
-  it('checks/un-checks box for child of child item', () => {
+  it('checks/un-checks box for child of child item', async () => {
     const component = renderComponent({
       items: [
         {
@@ -212,51 +212,51 @@ describe('CollapsableList', () => {
         },
       ],
     })
-    userEvent.click(component.getByTestId('toggle-parent-item-1'))
-    userEvent.click(component.getByTestId('toggle-child-item-1'))
-    userEvent.click(component.getByTestId('checkbox-sub-child-item-1'))
+    await userEvent.click(component.getByTestId('toggle-parent-item-1'))
+    await userEvent.click(component.getByTestId('toggle-child-item-1'))
+    await userEvent.click(component.getByTestId('checkbox-sub-child-item-1'))
     expect(component.container.querySelectorAll('svg[name="IconCheckMark"]').length).toBe(3)
 
-    userEvent.click(component.getByTestId('checkbox-sub-child-item-1'))
+    await userEvent.click(component.getByTestId('checkbox-sub-child-item-1'))
     expect(component.container.querySelectorAll('svg[name="IconCheckMark"]').length).toBe(0)
   })
 
-  it('calls onChange with correct params for single item', () => {
+  it('calls onChange with correct params for single item', async () => {
     const component = renderComponent()
-    userEvent.click(component.getByTestId('checkbox-single-item-1'))
+    await userEvent.click(component.getByTestId('checkbox-single-item-1'))
     expect(defaultProps.onChange).toHaveBeenCalledWith(['single-item-1'])
-    userEvent.click(component.getByTestId('checkbox-single-item-1'))
+    await userEvent.click(component.getByTestId('checkbox-single-item-1'))
     expect(defaultProps.onChange).toHaveBeenCalledWith([])
   })
 
-  it('calls onChange with correct params for parent item', () => {
+  it('calls onChange with correct params for parent item', async () => {
     const component = renderComponent()
-    userEvent.click(component.getByTestId('checkbox-parent-item-1'))
+    await userEvent.click(component.getByTestId('checkbox-parent-item-1'))
     expect(defaultProps.onChange).toHaveBeenCalledWith(['parent-item-1'])
-    userEvent.click(component.getByTestId('checkbox-parent-item-1'))
+    await userEvent.click(component.getByTestId('checkbox-parent-item-1'))
     expect(defaultProps.onChange).toHaveBeenCalledWith([])
   })
 
-  it('calls onChange with correct params for child item', () => {
+  it('calls onChange with correct params for child item', async () => {
     const component = renderComponent()
-    userEvent.click(component.getByTestId('toggle-parent-item-1'))
-    userEvent.click(component.getByTestId('checkbox-child-item-1'))
+    await userEvent.click(component.getByTestId('toggle-parent-item-1'))
+    await userEvent.click(component.getByTestId('checkbox-child-item-1'))
     expect(defaultProps.onChange).toHaveBeenCalledWith(['child-item-1'])
-    userEvent.click(component.getByTestId('checkbox-child-item-2'))
+    await userEvent.click(component.getByTestId('checkbox-child-item-2'))
     expect(defaultProps.onChange).toHaveBeenCalledWith(['child-item-1', 'child-item-2'])
-    userEvent.click(component.getByTestId('checkbox-child-item-3'))
+    await userEvent.click(component.getByTestId('checkbox-child-item-3'))
     expect(defaultProps.onChange).toHaveBeenCalledWith(['parent-item-1'])
   })
 
-  it('calls onChange with correct params for child of child item', () => {
+  it('calls onChange with correct params for child of child item', async () => {
     const component = renderComponent()
-    userEvent.click(component.getByTestId('toggle-parent-item-1'))
-    userEvent.click(component.getByTestId('toggle-child-item-3'))
-    userEvent.click(component.getByTestId('checkbox-sub-child-item-1'))
+    await userEvent.click(component.getByTestId('toggle-parent-item-1'))
+    await userEvent.click(component.getByTestId('toggle-child-item-3'))
+    await userEvent.click(component.getByTestId('checkbox-sub-child-item-1'))
     expect(defaultProps.onChange).toHaveBeenCalledWith(['sub-child-item-1'])
-    userEvent.click(component.getByTestId('checkbox-sub-child-item-2'))
+    await userEvent.click(component.getByTestId('checkbox-sub-child-item-2'))
     expect(defaultProps.onChange).toHaveBeenCalledWith(['sub-child-item-1', 'sub-child-item-2'])
-    userEvent.click(component.getByTestId('checkbox-sub-child-item-3'))
+    await userEvent.click(component.getByTestId('checkbox-sub-child-item-3'))
     expect(defaultProps.onChange).toHaveBeenCalledWith(['child-item-3'])
   })
 })

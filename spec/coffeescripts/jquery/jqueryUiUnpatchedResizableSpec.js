@@ -17,10 +17,7 @@
  */
 
 import $ from 'jquery'
-import 'jqueryui-unpatched/core'
-import 'jqueryui-unpatched/widget'
-import 'jqueryui-unpatched/mouse'
-import 'jqueryui-unpatched/resizable'
+import 'jqueryui/resizable'
 
 QUnit.module('Resizable Widget', {
   beforeEach() {

@@ -32,11 +32,11 @@
     </table>
   </td>
   <td>
-    <a href="#" rel="<%= profile_token_url(access_token || "{{ id }}") %>" class="show_token_link"><%= t('links.token_details', "details") %></a>
+    <a href="#" aria-label="<%= t('%{appName} Details', appName: access_token&.app_name) %>" rel="<%= profile_token_url(access_token || "{{ id }}") %>" class="show_token_link"><%= t('links.token_details', "details") %></a>
   </td>
   <td class="links">
     <% unless @real_current_user %>
-      <a href="#" class="delete_key_link" rel="<%= profile_token_url(access_token || "{{ id }}") %>" title="<%= t('titles.delete_this_token', "Delete this Token") %>"><i class="icon-trash" role="presentation"></i></a>
+      <a href="#" aria-label="<%= t('Delete %{appName} Token', appName: access_token&.app_name) %>" class="delete_key_link" rel="<%= profile_token_url(access_token || "{{ id }}") %>" title="<%= t('titles.delete_this_token', "Delete this Token") %>"><i class="icon-trash" role="presentation"></i></a>
     <% end %>
   </td>
 </tr>

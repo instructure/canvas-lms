@@ -104,6 +104,8 @@ GradingTypeSelector.prototype.showGpaDialog = function (ev) {
     close() {
       return $(ev.target).focus()
     },
+    modal: true,
+    zIndex: 1000,
   })
 }
 
@@ -120,6 +122,8 @@ GradingTypeSelector.prototype.showGradingSchemeDialog = function (ev) {
       close() {
         return $(ev.target).focus()
       },
+      modal: true,
+      zIndex: 1000,
     })
     .fixDialogButtons()
 }

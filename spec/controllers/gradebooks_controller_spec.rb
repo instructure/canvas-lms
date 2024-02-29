@@ -3108,6 +3108,13 @@ describe GradebooksController do
       expect(response).not_to be_redirect
     end
 
+    it "loads the platform speedgreader when the feature flag is on and the platform_sg flag is passed" do
+      @assignment.publish
+      Account.site_admin.enable_feature!(:platform_service_speedgrader)
+      get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id, platform_sg: true }
+      expect(response).to render_template(:bare, locals: { anonymous_grading: false })
+    end
+
     describe "js_env" do
       let(:js_env) { assigns[:js_env] }
 

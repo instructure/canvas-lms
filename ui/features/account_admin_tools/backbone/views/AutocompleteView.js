@@ -18,8 +18,8 @@
 import Backbone from '@canvas/backbone'
 import $ from 'jquery'
 import template from '../../jst/autocomplete.handlebars'
-import 'jqueryui-unpatched/menu'
-import 'jqueryui-unpatched/autocomplete'
+import 'jqueryui/menu'
+import 'jqueryui/autocomplete'
 import _inherits from '@babel/runtime/helpers/esm/inheritsLoose'
 
 _inherits(AutocompleteView, Backbone.View)

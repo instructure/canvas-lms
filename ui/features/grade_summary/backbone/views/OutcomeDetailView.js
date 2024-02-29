@@ -30,6 +30,8 @@ class OutcomeDetailView extends DialogBaseView {
       close: this.onClose,
       buttons: [],
       width: 640,
+      modal: true,
+      zIndex: 1000,
     }
   }
 

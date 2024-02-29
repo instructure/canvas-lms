@@ -58,6 +58,7 @@ $('#registration_video a').click(
       close() {
         return $(this).remove()
       },
+      zIndex: 1000,
     })
   })
 )

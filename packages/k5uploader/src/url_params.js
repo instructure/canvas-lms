@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export default function(params) {
+export default function (params) {
   let queryUrl = '?'
   for (const prop in params) {
     queryUrl += prop + '=' + encodeURIComponent(params[prop]) + '&'

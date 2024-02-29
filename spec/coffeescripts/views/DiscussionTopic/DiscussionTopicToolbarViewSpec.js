@@ -1,3 +1,5 @@
+/* eslint-disable qunit/resolve-async */
+/* eslint-disable qunit/no-ok-equality */
 /*
  * Copyright (C) 2015 - present Instructure, Inc.
  *
@@ -17,6 +19,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import assertions from 'helpers/assertions'
 import DiscussionTopicToolbarView from 'ui/features/discussion_topic/backbone/views/DiscussionTopicToolbarView'
 

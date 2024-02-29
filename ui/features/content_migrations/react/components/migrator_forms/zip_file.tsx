@@ -32,12 +32,14 @@ import {TreeBrowser, Collection} from '@instructure/ui-tree-browser'
 import {View} from '@instructure/ui-view'
 import type {FetchLinkHeader} from '@canvas/do-fetch-api-effect/types'
 import type {onSubmitMigrationFormCallback} from '../types'
+import MigrationFileInput from './file_input'
 
 const I18n = useI18nScope('content_migrations_redesign')
 
 type ZipFileImporterProps = {
   onSubmit: onSubmitMigrationFormCallback
   onCancel: () => void
+  fileUploadProgress: number | null
 }
 
 type Folder = {
@@ -71,7 +73,7 @@ type FetchFoldersResponse = {
   link: FetchLinkHeader
 }
 
-const ZipFileImporter = ({onSubmit, onCancel}: ZipFileImporterProps) => {
+const ZipFileImporter = ({onSubmit, onCancel, fileUploadProgress}: ZipFileImporterProps) => {
   const [folders, setFolders] = useState<Array<Folder>>([])
   const [folder, setFolder] = useState<Folder | null>(null)
   const fileInput = createRef<HTMLInputElement>()
@@ -226,28 +228,11 @@ const ZipFileImporter = ({onSubmit, onCancel}: ZipFileImporterProps) => {
 
   return (
     <>
-      <View margin="none none x-small none" style={{display: 'block'}}>
-        <label htmlFor="migrationFileUpload">
-          <Text weight="bold">{I18n.t('Source')}</Text>
-        </label>
-      </View>
-      <input
-        id="migrationFileUpload"
-        data-testid="migrationFileUpload"
-        type="file"
-        ref={fileInput}
-        accept=".zip"
-        onChange={handleSelectFile}
-        style={{display: 'none'}}
+      <MigrationFileInput
+        fileUploadProgress={fileUploadProgress}
+        accepts=".zip"
+        onChange={setFile}
       />
-      <Button color="secondary" onClick={() => fileInput.current?.click()}>
-        <IconUploadLine />
-        &nbsp;
-        {I18n.t('Choose File')}
-      </Button>
-      <View margin="none none none medium">
-        <Text>{file ? file.name : I18n.t('No file chosen')}</Text>
-      </View>
       {fileError && (
         <p>
           <Text color="danger">{I18n.t('You must select a file to import content from')}</Text>
@@ -267,7 +252,7 @@ const ZipFileImporter = ({onSubmit, onCancel}: ZipFileImporterProps) => {
               renderBeforeInput={<IconSearchLine inline={false} />}
               renderAfterInput={renderClearButton()}
             />
-            <View as="div" height="320px" overflowY="auto" overflowX="visible">
+            <View as="div" height="320px" padding="xx-small" overflowY="auto" overflowX="visible">
               <TreeBrowser
                 collections={folderCollection()}
                 items={{}}
@@ -292,6 +277,7 @@ const ZipFileImporter = ({onSubmit, onCancel}: ZipFileImporterProps) => {
         </p>
       )}
       <CommonMigratorControls
+        fileUploadProgress={fileUploadProgress}
         canSelectContent={false}
         onSubmit={handleSubmit}
         onCancel={onCancel}

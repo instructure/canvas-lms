@@ -19,27 +19,29 @@
 import Subject from '@canvas/quiz-log-auditing/jquery/event_trackers/page_focused'
 import K from '@canvas/quiz-log-auditing/jquery/constants'
 import $ from 'jquery'
+import 'jquery-migrate'
 
-QUnit.module('Quizzes::LogAuditing::EventTrackers::PageFocused')
+const capture = sinon.spy()
+const tracker = new Subject()
+tracker.install(capture)
+
+QUnit.module('Quizzes::LogAuditing::EventTrackers::PageFocused', {
+  afterEach() {
+    sinon.restore()
+  },
+})
 
 test('#constructor: it sets up the proper context', () => {
-  const tracker = new Subject()
   equal(tracker.eventType, K.EVT_PAGE_FOCUSED)
   equal(tracker.priority, K.EVT_PRIORITY_LOW)
 })
 
 test('capturing: it works', () => {
-  const tracker = new Subject()
-  const capture = sinon.stub()
-  tracker.install(capture)
   $(window).focus()
   ok(capture.called, 'it captures page focus')
 })
 
 test('capturing: it throttles captures', () => {
-  const capture = sinon.spy()
-  const tracker = new Subject()
-  tracker.install(capture)
   $(window).focus()
   $(window).blur()
   $(window).focus()

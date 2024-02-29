@@ -21,7 +21,7 @@ import $ from 'jquery'
 import htmlEscape from '@instructure/html-escape'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.instructure_forms' /* formSubmit */
-import 'jqueryui-unpatched/progressbar'
+import 'jqueryui/progressbar'
 
 const I18n = useI18nScope('content_exports')
 
@@ -39,7 +39,7 @@ $(document).ready(function (_event) {
           htmlEscape(I18n.t('messages.this_may_take_a_bit', 'this may take a bit...')) +
           '</div>'
       )
-      .attr('disabled', true)
+      .prop('disabled', true)
     $('.instruction').hide()
     $('.progress_bar_holder').slideDown()
     $('.export_progress').progressbar()
@@ -132,22 +132,22 @@ $(document).ready(function (_event) {
     error(_data) {
       $(this)
         .find('.submit_button')
-        .attr('disabled', false)
+        .prop('disabled', false)
         .text(I18n.t('buttons.process', 'Process Data'))
     },
   })
 
-  $exporter_form.delegate('.copy_all', 'click', function () {
+  $exporter_form.on('click', '.copy_all', function () {
     $('.quiz_item').prop('checked', $(this).prop('checked'))
   })
 
-  $exporter_form.delegate('.quiz_item', 'click', function () {
+  $exporter_form.on('click', '.quiz_item', function () {
     if (!$(this).prop('checked')) {
       $('.copy_all').prop('checked', false)
     }
   })
 
-  $exporter_form.delegate('input[name=export_type]', 'click', function () {
+  $exporter_form.on('click', 'input[name=export_type]', function () {
     if ($(this).val() === 'qti') {
       $quiz_selection.show()
     } else {

@@ -20,6 +20,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import {isArray, isObject, uniq} from 'lodash'
 import tzInTest from '@canvas/datetime/specHelpers'
 import timezone from 'timezone'

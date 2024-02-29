@@ -1,3 +1,6 @@
+/* eslint-disable qunit/no-test-expect-argument */
+/* eslint-disable qunit/literal-compare-order */
+/* eslint-disable qunit/no-ok-equality */
 /*
  * Copyright (C) 2012 - present Instructure, Inc.
  *
@@ -17,6 +20,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import {Model} from '@canvas/backbone'
 import ValidatedFormView from '@canvas/forms/backbone/views/ValidatedFormView'
 

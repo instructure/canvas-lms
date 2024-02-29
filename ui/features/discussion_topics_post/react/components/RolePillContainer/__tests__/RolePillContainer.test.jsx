@@ -96,9 +96,9 @@ describe('RolePillContainer', () => {
   })
 
   describe('Will not break if given non-default values', () => {
-    it('Pill will render with the text', () => {
+    it('Pill will not render unaccepted roles', () => {
       const {queryByText} = setup({discussionRoles: ['Custom Name']})
-      expect(queryByText('Custom Name')).toBeTruthy()
+      expect(queryByText('Custom Name')).toBeFalsy()
     })
   })
 

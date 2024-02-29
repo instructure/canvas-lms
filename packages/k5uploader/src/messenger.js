@@ -16,15 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-Messenger.decorate = function(instance) {
+Messenger.decorate = function (instance) {
   instance.messenger = new Messenger()
-  instance.addEventListener = function(eventName, method) {
+  instance.addEventListener = function (eventName, method) {
     instance.messenger.addEventListener(eventName, method)
   }
-  instance.dispatchEvent = function(eventName, data, context) {
+  instance.dispatchEvent = function (eventName, data, context) {
     instance.messenger.dispatchEvent(eventName, data, context)
   }
-  instance.removeEventListener = function(eventName, targetMethod) {
+  instance.removeEventListener = function (eventName, targetMethod) {
     instance.messenger.removeEventListener(eventName, targetMethod)
   }
 }
@@ -33,7 +33,7 @@ function Messenger() {
   this.events = {}
 }
 
-Messenger.prototype.killAllListeners = function(eventName) {
+Messenger.prototype.killAllListeners = function (eventName) {
   if (this.events[eventName]) {
     this.events[eventName] = []
   } else {
@@ -41,11 +41,11 @@ Messenger.prototype.killAllListeners = function(eventName) {
   }
 }
 
-Messenger.prototype.destroy = function() {
+Messenger.prototype.destroy = function () {
   this.events = {}
 }
 
-Messenger.prototype.dispatchEvent = function(eventName, data, context) {
+Messenger.prototype.dispatchEvent = function (eventName, data, context) {
   if (this.events[eventName]) {
     this.events[eventName].forEach(eventHandler => {
       eventHandler.call(context, data)
@@ -53,7 +53,7 @@ Messenger.prototype.dispatchEvent = function(eventName, data, context) {
   }
 }
 
-Messenger.prototype.addEventListener = function(eventName, method) {
+Messenger.prototype.addEventListener = function (eventName, method) {
   if (!method) {
     return false
   }
@@ -64,7 +64,7 @@ Messenger.prototype.addEventListener = function(eventName, method) {
   return method
 }
 
-Messenger.prototype.removeEventListener = function(eventName, targetMethod) {
+Messenger.prototype.removeEventListener = function (eventName, targetMethod) {
   if (this.events[eventName]) {
     const eventHandlers = this.events[eventName]
     const removalQueue = []

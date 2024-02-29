@@ -224,22 +224,30 @@ class ContextExternalTool < ActiveRecord::Base
       false
     end
 
-    def editor_button_json(tools, context, user, session = nil)
+    def editor_button_json(tools, context, user, session, default_tool_icon_base_url)
       tools.select! { |tool| visible?(tool.editor_button["visibility"], user, context, session) }
       markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML.new({ link_attributes: { target: "_blank" } }))
       always_on_ids = Setting.get("rce_always_on_developer_key_ids", "").split(",").map(&:to_i)
       tools.map do |tool|
+        canvas_icon_class = tool.editor_button(:canvas_icon_class)
+        icon_url = tool.editor_button(:icon_url)
+        if canvas_icon_class.blank? && icon_url.blank?
+          # Default tool icons are served by canvas; some users of this method
+          # may need a full URL rather than path.
+          icon_url = default_tool_icon_base_url + tool.default_icon_path
+        end
+
         {
           name: tool.label_for(:editor_button, I18n.locale),
           id: tool.id,
           favorite: tool.is_rce_favorite_in_context?(context),
           url: tool.editor_button(:url),
-          icon_url: tool.editor_button(:icon_url),
-          canvas_icon_class: tool.editor_button(:canvas_icon_class),
+          icon_url:,
+          canvas_icon_class:,
           width: tool.editor_button(:selection_width),
           height: tool.editor_button(:selection_height),
           use_tray: tool.editor_button(:use_tray) == "true",
-          always_on: always_on_ids.include?(tool.developer_key&.global_id),
+          always_on: always_on_ids.include?(tool.global_developer_key_id),
           description: if tool.description
                          Sanitize.clean(markdown.render(tool.description), CanvasSanitize::SANITIZE)
                        else
@@ -827,7 +835,9 @@ class ContextExternalTool < ActiveRecord::Base
       settings.delete(type) unless extension_setting(type, :url)
     end
 
-    settings.delete(:editor_button) unless editor_button(:icon_url) || editor_button(:canvas_icon_class)
+    unless root_account.feature_enabled?(:allow_lti_tools_editor_button_placement_without_icon)
+      settings.delete(:editor_button) unless editor_button(:icon_url) || editor_button(:canvas_icon_class)
+    end
 
     sync_placements!(Lti::ResourcePlacement::PLACEMENTS.select { |type| settings[type] }.map(&:to_s))
     true
@@ -1446,7 +1456,7 @@ class ContextExternalTool < ActiveRecord::Base
 
   # Add new types to this as we finish their migration methods
   # and they'll be automagically migrated.
-  VALID_MIGRATION_TYPES = [Assignment, ContentTag].freeze
+  VALID_MIGRATION_TYPES = [Assignment, ContentTag, ExternalToolCollaboration].freeze
 
   # for helping tool providers upgrade from 1.1 to 1.3.
   # this method will upgrade all related content to 1.3,
@@ -1477,13 +1487,13 @@ class ContextExternalTool < ActiveRecord::Base
       VALID_MIGRATION_TYPES.each do |type|
         next unless type.include?(Lti::Migratable)
 
-        type.directly_associated_items(tool_id, context).find_ids_in_batches do |ids|
+        type.directly_associated_items(tool_id, context)&.find_ids_in_batches do |ids|
           delay_if_production(
             priority: Delayed::LOW_PRIORITY,
             n_strand: ["ContextExternalTool#migrate_content_to_1_3", tool_id]
           ).prepare_direct_batch_for_migration(ids, type)
         end
-        type.indirectly_associated_items(tool_id, context).find_ids_in_batches do |ids|
+        type.indirectly_associated_items(tool_id, context)&.find_ids_in_batches do |ids|
           delay_if_production(
             priority: Delayed::LOW_PRIORITY,
             n_strand: ["ContextExternalTool#migrate_content_to_1_3", tool_id]
@@ -1512,7 +1522,9 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def prepare_content_for_migration(content)
-    content.migrate_to_1_3_if_needed!(self)
+    GuardRail.activate(:primary) do
+      content.migrate_to_1_3_if_needed!(self)
+    end
   rescue ActiveRecord::RecordInvalid, PG::UniqueViolation => e
     Sentry.with_scope do |scope|
       scope.set_tags(content_id: content.global_id)
@@ -1585,6 +1597,15 @@ class ContextExternalTool < ActiveRecord::Base
 
   def associated_1_1_tool(context, launch_url = nil)
     ContextExternalTool.associated_1_1_tool(self, context, launch_url || url || domain)
+  end
+
+  # Icon for tools which don't provide one, based on the DeveloperKey or tool
+  # id, and the tool name
+  def default_icon_path
+    Rails.application.routes.url_helpers.lti_tool_default_icon_path(
+      id: global_developer_key_id || global_id,
+      name:
+    )
   end
 
   private

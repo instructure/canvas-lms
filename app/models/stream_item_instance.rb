@@ -34,7 +34,6 @@ class StreamItemInstance < ActiveRecord::Base
   end
 
   class << self
-    alias_method :original_update_all, :update_all
     # Don't use update_all() because there is an observer
     # on StreamItemInstance to invalidate some cache keys.
     # Use update_all_with_invalidation() instead.

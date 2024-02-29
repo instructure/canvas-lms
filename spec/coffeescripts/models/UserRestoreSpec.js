@@ -18,6 +18,7 @@
 
 import UserRestoreModel from 'ui/features/account_admin_tools/backbone/models/UserRestore'
 import $ from 'jquery'
+import 'jquery-migrate'
 
 const userJSON = {
   id: 17,

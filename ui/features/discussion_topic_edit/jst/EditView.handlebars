@@ -361,7 +361,11 @@
   {{/if}}
 </div>
 
-<div id="assignment_external_tools"></div>
+{{#ifAll isAnnouncement ENV.FEATURES.assignment_edit_placement_not_on_announcements }}
+  <div id="assignment_external_tools" style="display: none"></div>
+  {{else}}
+  <div id="assignment_external_tools"></div>
+{{/ifAll}}
 
 <div id="edit_discussion_form_buttons" class="form-actions flush" style="padding-left: 0px; margin-right: -0.75em">
   <button type="button" class="btn cancel_button">

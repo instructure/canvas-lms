@@ -49,7 +49,7 @@ describe ExternalToolsController do
       post(
         "/api/v1/courses/#{@course.id}/external_tools",
         params: post_body,
-        headers: { "CONTENT_TYPE" => "application/x-www-form-urlencoded " }
+        headers: { "CONTENT_TYPE" => "application/x-www-form-urlencoded" }
       )
       expect(response).to be_successful
       expect(assigns[:tool]).not_to be_nil
@@ -60,7 +60,7 @@ describe ExternalToolsController do
       post(
         "/api/v1/courses/#{@course.id}/external_tools",
         params: post_body,
-        headers: { "CONTENT_TYPE" => "application/x-www-form-urlencoded " }
+        headers: { "CONTENT_TYPE" => "application/x-www-form-urlencoded" }
       )
       tool = assigns[:tool]
       expect(tool.settings[:custom_fields]["Complex!@#$^*(){}[]KEY"]).to eq 'Complex!@#$^*;(){}[]½Value'
@@ -88,7 +88,7 @@ describe ExternalToolsController do
       put(
         "/api/v1/courses/#{@course.id}/external_tools/#{tool.id}",
         params: post_body,
-        headers: { "CONTENT_TYPE" => "application/x-www-form-urlencoded " }
+        headers: { "CONTENT_TYPE" => "application/x-www-form-urlencoded" }
       )
       assert_status(401)
     end
@@ -99,7 +99,7 @@ describe ExternalToolsController do
       put(
         "/api/v1/courses/#{@course.id}/external_tools/#{tool.id}",
         params: post_body,
-        headers: { "CONTENT_TYPE" => "application/x-www-form-urlencoded " }
+        headers: { "CONTENT_TYPE" => "application/x-www-form-urlencoded" }
       )
       assert_status(200)
     end
@@ -110,7 +110,7 @@ describe ExternalToolsController do
       put(
         "/api/v1/courses/#{@course.id}/external_tools/#{tool.id}",
         params: post_body,
-        headers: { "CONTENT_TYPE" => "application/x-www-form-urlencoded " }
+        headers: { "CONTENT_TYPE" => "application/x-www-form-urlencoded" }
       )
       expect(response).to be_successful
       expect(assigns[:tool]).not_to be_nil
@@ -122,7 +122,7 @@ describe ExternalToolsController do
       put(
         "/api/v1/courses/#{@course.id}/external_tools/#{tool.id}",
         params: post_body,
-        headers: { "CONTENT_TYPE" => "application/x-www-form-urlencoded " }
+        headers: { "CONTENT_TYPE" => "application/x-www-form-urlencoded" }
       )
 
       expect(assigns[:tool].settings[:custom_fields]["Complex!@#$^*(){}[]KEY"]).to eq 'Complex!@#$^*;(){}[]½Value'

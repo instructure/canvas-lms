@@ -20,7 +20,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import Ember from 'ember'
 import register from '../helpers/register'
 import '../../jst/components/ic-submission-download-dialog.hbs'
-import 'jqueryui-unpatched/progressbar'
+import 'jqueryui/progressbar'
 import 'jqueryui/dialog'
 
 const I18n = useI18nScope('submissions')
@@ -143,7 +143,10 @@ export default register(
         if (this.$dialog == null) {
           this.$dialog = $('#submissions_download_dialog form').dialog(this.dialogOptions)
         }
-        this.$dialog.dialog()
+        this.$dialog.dialog({
+          modal: true,
+          zIndex: 1000,
+        })
         return this.checkForChange()
       },
 

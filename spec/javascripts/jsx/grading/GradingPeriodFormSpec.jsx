@@ -18,6 +18,7 @@
 
 import React from 'react'
 import $ from 'jquery'
+import 'jquery-migrate'
 import {mount} from 'enzyme'
 import GradingPeriodForm from 'ui/features/account_grading_standards/react/GradingPeriodForm'
 import chicago from 'timezone/America/Chicago'

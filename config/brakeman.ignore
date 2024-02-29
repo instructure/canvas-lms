@@ -208,6 +208,29 @@
       "note": ""
     },
     {
+      "warning_type": "Mass Assignment",
+      "warning_code": 70,
+      "fingerprint": "20234c20551af8a01f9b7e12a20a6677af395d7057a648a04eee3cb3d6a0808b",
+      "check_name": "MassAssignment",
+      "message": "Specify exact keys allowed for mass assignment instead of using `permit!` which allows any keys",
+      "file": "app/controllers/gradebook_settings_controller.rb",
+      "line": 76,
+      "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
+      "code": "params.require(:gradebook_settings).permit({ :filter_columns_by => ([:context_module_id, { :context_module_ids => ([]) }, :grading_period_id, :assignment_group_id, { :assignment_group_ids => ([]) }, :submissions, { :submission_filters => ([]) }, :start_date, :end_date]), :filter_rows_by => ([:section_id, { :section_ids => ([]) }, :student_group_id, { :student_group_ids => ([]) }]), :selected_view_options_filters => ([]) }, :enter_grades_as, :hide_assignment_group_totals, :hide_total, :show_concluded_enrollments, :show_inactive_enrollments, :show_unpublished_assignments, :show_separate_first_last_names, :student_column_display_as, :student_column_secondary_info, :sort_rows_by_column_id, :sort_rows_by_setting_key, :sort_rows_by_direction, :view_ungraded_as_zero, :colors => ([:late, :missing, :resubmitted, :dropped, :excused, :extended])).permit!",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "GradebookSettingsController",
+        "method": "gradebook_settings_params"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": [
+        915
+      ],
+      "note": ""
+    },
+    {
       "warning_type": "SQL Injection",
       "warning_code": 0,
       "fingerprint": "20b8d23d190696275c75e615ce298a65e6e199f6d783cd7dc415be3756fe8eb0",
@@ -296,29 +319,6 @@
       "confidence": "Medium",
       "cwe_id": [
         89
-      ],
-      "note": ""
-    },
-    {
-      "warning_type": "Mass Assignment",
-      "warning_code": 70,
-      "fingerprint": "32b64d41a0918e3360b4d3396a3031784769aed85f82338ab2c4f409b28cc9f6",
-      "check_name": "MassAssignment",
-      "message": "Specify exact keys allowed for mass assignment instead of using `permit!` which allows any keys",
-      "file": "app/controllers/gradebook_settings_controller.rb",
-      "line": 72,
-      "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
-      "code": "params.require(:gradebook_settings).permit({ :filter_columns_by => ([:context_module_id, :grading_period_id, :assignment_group_id, :submissions, :start_date, :end_date]), :filter_rows_by => ([:section_id, :student_group_id, { :student_group_ids => ([]) }]), :selected_view_options_filters => ([]) }, :enter_grades_as, :hide_assignment_group_totals, :hide_total, :show_concluded_enrollments, :show_inactive_enrollments, :show_unpublished_assignments, :show_separate_first_last_names, :student_column_display_as, :student_column_secondary_info, :sort_rows_by_column_id, :sort_rows_by_setting_key, :sort_rows_by_direction, :view_ungraded_as_zero, :colors => ([:late, :missing, :resubmitted, :dropped, :excused, :extended])).permit!",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "GradebookSettingsController",
-        "method": "gradebook_settings_params"
-      },
-      "user_input": null,
-      "confidence": "Medium",
-      "cwe_id": [
-        915
       ],
       "note": ""
     },
@@ -509,7 +509,7 @@
       "check_name": "Redirect",
       "message": "Possible unprotected redirect",
       "file": "app/controllers/users_controller.rb",
-      "line": 2291,
+      "line": 2294,
       "link": "https://brakemanscanner.org/docs/warning_types/redirect/",
       "code": "redirect_to(MediaSourceFetcher.new(CanvasKaltura::ClientV3.new).fetch_preferred_source_url(:media_id => params[:entryId], :file_extension => ((params[:type] or params[:format])), :media_type => params[:media_type]))",
       "render_path": null,
@@ -532,7 +532,7 @@
       "check_name": "SQL",
       "message": "Possible SQL injection",
       "file": "lib/effective_due_dates.rb",
-      "line": 318,
+      "line": 340,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
       "code": "ActiveRecord::Base.connection.select_all(\"/* fetch the assignment itself */\\nWITH models AS (\\n  SELECT *\\n  FROM #{AbstractAssignment.quoted_table_name}\\n  WHERE\\n    id IN (#{(([context.active_assignments] or assignment_collection).first.except(:order).select(:id).to_sql or AbstractAssignment.where(:id => ([context.active_assignments] or assignment_collection).first.except(:order).select(:id).to_sql).pluck(:id)).join(\",\")}) AND\\n    workflow_state <> 'deleted' AND\\n    context_id = #{context.id} AND context_type = 'Course'\\n),\\n\\n/* fetch all overrides for this assignment */\\nassignment_overrides AS (\\n  SELECT\\n    o.id,\\n    o.assignment_id,\\n    o.set_type,\\n    o.set_id,\\n    o.due_at_overridden,\\n    CASE WHEN o.due_at_overridden IS TRUE THEN o.due_at ELSE a.due_at END AS due_at,\\n    o.unassign_item\\n  FROM\\n    models a\\n  INNER JOIN #{AssignmentOverride.quoted_table_name} o ON o.assignment_id = a.id\\n  WHERE\\n    o.workflow_state = 'active'\\n),\\n\\n#{context_module_overrides}\\n\\n#{union_all_overrides}\\n\\n/* fetch all students affected by adhoc overrides */\\noverride_adhoc_students AS (\\n  SELECT\\n    os.user_id AS student_id,\\n    TRUE as active_in_section,\\n    o.assignment_id,\\n    o.id AS override_id,\\n    date_trunc('minute', o.due_at) AS trunc_due_at,\\n    o.due_at,\\n    o.set_type AS override_type,\\n    o.due_at_overridden,\\n    o.unassign_item,\\n    1 AS priority\\n  FROM\\n    overrides o\\n  INNER JOIN #{AssignmentOverrideStudent.quoted_table_name} os ON os.assignment_override_id = o.id AND\\n    os.workflow_state = 'active'\\n  WHERE\\n    o.set_type = 'ADHOC'\\n    #{filter_students_sql(\"os\")}\\n),\\n\\n/* fetch all students affected by group overrides */\\noverride_groups_students AS (\\n  SELECT\\n    gm.user_id AS student_id,\\n    TRUE as active_in_section,\\n    o.assignment_id,\\n    o.id AS override_id,\\n    date_trunc('minute', o.due_at) AS trunc_due_at,\\n    o.due_at,\\n    o.set_type AS override_type,\\n    o.due_at_overridden,\\n    o.unassign_item,\\n    2 AS priority\\n  FROM\\n    overrides o\\n  INNER JOIN #{Group.quoted_table_name} g ON g.id = o.set_id\\n  INNER JOIN #{GroupMembership.quoted_table_name} gm ON gm.group_id = g.id\\n  WHERE\\n    o.set_type = 'Group' AND\\n    g.workflow_state <> 'deleted' AND\\n    gm.workflow_state = 'accepted'\\n    #{filter_students_sql(\"gm\")}\\n),\\n\\n/* fetch all students affected by section overrides */\\noverride_sections_students AS (\\n  SELECT\\n    e.user_id AS student_id,\\n    #{active_in_section_sql} AS active_in_section,\\n    o.assignment_id,\\n    o.id AS override_id,\\n    date_trunc('minute', o.due_at) AS trunc_due_at,\\n    o.due_at,\\n    o.set_type AS override_type,\\n    o.due_at_overridden,\\n    o.unassign_item,\\n    2 AS priority\\n  FROM\\n    overrides o\\n  INNER JOIN #{CourseSection.quoted_table_name} s ON s.id = o.set_id\\n  INNER JOIN #{Enrollment.quoted_table_name} e ON e.course_section_id = s.id\\n  WHERE\\n    o.set_type = 'CourseSection' AND\\n    s.workflow_state <> 'deleted' AND\\n    e.workflow_state NOT IN ('rejected', 'deleted') AND\\n    e.type IN ('StudentEnrollment', 'StudentViewEnrollment')\\n    #{filter_students_sql(\"e\")}\\n),\\n\\n#{course_overrides}\\n\\n/* fetch all students who have an 'Everyone Else'\\n  due date applied to them from the assignment */\\noverride_everyonelse_students AS (\\n  SELECT\\n    e.user_id AS student_id,\\n    TRUE as active_in_section,\\n    a.id as assignment_id,\\n    NULL::integer AS override_id,\\n    date_trunc('minute', a.due_at) AS trunc_due_at,\\n    a.due_at,\\n    'Everyone Else'::varchar AS override_type,\\n    FALSE AS due_at_overridden,\\n    FALSE AS unassign_item,\\n    3 AS priority\\n  FROM\\n    models a\\n  INNER JOIN #{Enrollment.quoted_table_name} e ON e.course_id = a.context_id\\n  WHERE\\n    e.workflow_state NOT IN ('rejected', 'deleted') AND\\n    e.type IN ('StudentEnrollment', 'StudentViewEnrollment') AND\\n    #{visible_to_everyone}\\n    #{filter_students_sql(\"e\")}\\n),\\n\\n/* join all these students together into a single table */\\noverride_all_students AS (\\n  SELECT * FROM override_adhoc_students\\n  UNION ALL\\n  SELECT * FROM override_groups_students\\n  UNION ALL\\n  SELECT * FROM override_sections_students\\n  UNION ALL\\n  #{union_course_overrides}\\n  SELECT * FROM override_everyonelse_students\\n),\\n\\n/* and pick the latest override date as the effective due date */\\ncalculated_overrides AS (\\n  SELECT DISTINCT ON (student_id, assignment_id)\\n    *\\n  FROM override_all_students\\n  ORDER BY student_id ASC, assignment_id ASC, active_in_section DESC, due_at_overridden DESC, priority ASC, due_at DESC NULLS FIRST\\n),\\n\\n/* now find all grading periods, including both\\n   legacy course periods and newer account-level periods */\\ncourse_and_account_grading_periods AS (\\n    SELECT DISTINCT ON (gp.id)\\n      gp.id,\\n      date_trunc('minute', gp.start_date) AS start_date,\\n      date_trunc('minute', gp.end_date) AS end_date,\\n      date_trunc('minute', gp.close_date) AS close_date,\\n      gpg.course_id,\\n      gpg.account_id\\n    FROM\\n      models a\\n    INNER JOIN #{Course.quoted_table_name} c ON c.id = a.context_id\\n    INNER JOIN #{EnrollmentTerm.quoted_table_name} term ON c.enrollment_term_id = term.id\\n    LEFT OUTER JOIN #{GradingPeriodGroup.quoted_table_name} gpg ON\\n        gpg.course_id = c.id OR gpg.id = term.grading_period_group_id\\n    LEFT OUTER JOIN #{GradingPeriod.quoted_table_name} gp ON gp.grading_period_group_id = gpg.id\\n    WHERE\\n      gpg.workflow_state = 'active' AND\\n      gp.workflow_state = 'active'\\n),\\n\\n/* then filter down to the grading periods we care about:\\n   if legacy periods exist, only return those. Otherwise,\\n   return the account-level periods. */\\napplied_grading_periods AS (\\n  SELECT *\\n  FROM course_and_account_grading_periods\\n  WHERE\\n    EXISTS (\\n      SELECT 1 FROM course_and_account_grading_periods WHERE course_id IS NOT NULL\\n    ) AND course_id IS NOT NULL\\n  UNION ALL\\n  SELECT *\\n  FROM course_and_account_grading_periods\\n  WHERE\\n    NOT EXISTS (\\n      SELECT 1 FROM course_and_account_grading_periods WHERE course_id IS NOT NULL\\n    ) AND account_id IS NOT NULL\\n),\\n\\n/* infinite due dates are put in the last grading period.\\n   better to fetch it once since we'll likely reference it multiple times below */\\nlast_period AS (\\n  SELECT id, close_date FROM applied_grading_periods ORDER BY end_date DESC LIMIT 1\\n)\\n\\n/* finally bring it all together! */\\nSELECT\\n  overrides.assignment_id,\\n  overrides.student_id,\\n  overrides.due_at,\\n  overrides.override_type,\\n  overrides.override_id,\\n  CASE\\n    /* check whether or not this due date falls in a closed grading period */\\n    WHEN overrides.due_at IS NOT NULL AND '#{Time.zone.now.iso8601}'::timestamptz >= periods.close_date THEN TRUE\\n    /* when no explicit due date is provided, we treat it as if it's in the latest grading period */\\n    WHEN overrides.due_at IS NULL AND\\n        overrides.override_type <> 'Submission' AND\\n        '#{Time.zone.now.iso8601}'::timestamptz >= (SELECT close_date FROM last_period) THEN TRUE\\n    ELSE FALSE\\n  END AS closed,\\n  CASE\\n    /* if infinite due date, put it in the last grading period */\\n    WHEN overrides.due_at IS NULL AND\\n        overrides.override_type <> 'Submission' THEN (SELECT id FROM last_period)\\n    /* otherwise, put it in whatever grading period id we found for it */\\n    ELSE periods.id\\n  END AS grading_period_id\\nFROM calculated_overrides overrides\\n/* match the effective due date with its grading period */\\nLEFT OUTER JOIN applied_grading_periods periods ON\\n    periods.start_date < overrides.trunc_due_at AND overrides.trunc_due_at <= periods.end_date\\n#{unassign_item}\\n\".squish)",
       "render_path": null,
@@ -666,7 +666,7 @@
       "check_name": "SendFile",
       "message": "Model attribute used in file name",
       "file": "app/controllers/files_controller.rb",
-      "line": 1568,
+      "line": 1571,
       "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
       "code": "send_file(Thumbnail.where(:id => params[:id], :uuid => params[:uuid]).first.full_filename, :content_type => Thumbnail.where(:id => params[:id], :uuid => params[:uuid]).first.content_type)",
       "render_path": null,
@@ -821,7 +821,7 @@
       "check_name": "Redirect",
       "message": "Possible unprotected redirect",
       "file": "app/controllers/users_controller.rb",
-      "line": 2481,
+      "line": 2484,
       "link": "https://brakemanscanner.org/docs/warning_types/redirect/",
       "code": "redirect_to(User.avatar_fallback_url(Shard.shard_for(Shard.global_id_for(User.user_id_from_avatar_key(params[:user_id]))).activate do\n Rails.cache.fetch(Cacher.avatar_cache_key(Shard.global_id_for(User.user_id_from_avatar_key(params[:user_id])), ((request.env[\"canvas.domain_root_account\"] or LoadAccount.default_domain_root_account).settings[:avatars] or \"enabled\"))) do\n user = User.where(:id => Shard.global_id_for(User.user_id_from_avatar_key(params[:user_id]))).first\nif User.where(:id => Shard.global_id_for(User.user_id_from_avatar_key(params[:user_id]))).first then\n  User.where(:id => Shard.global_id_for(User.user_id_from_avatar_key(params[:user_id]))).first.avatar_url(nil, ((request.env[\"canvas.domain_root_account\"] or LoadAccount.default_domain_root_account).settings[:avatars] or \"enabled\"))\nelse\n  \"/images/messages/avatar-50.png\"\nend\n end\n end, request))",
       "render_path": null,
@@ -1001,7 +1001,7 @@
       "check_name": "UnsafeReflection",
       "message": "Unsafe reflection method `const_get` called with parameter value",
       "file": "app/controllers/application_controller.rb",
-      "line": 1461,
+      "line": 1470,
       "link": "https://brakemanscanner.org/docs/warning_types/remote_code_execution/",
       "code": "Object.const_get((params[:feed_code].split(\"_\", 2) or [\"group_membership\", params[:feed_code].split(\"_\", 3)[-1]])[0].classify, false)",
       "render_path": null,
@@ -1127,6 +1127,25 @@
         "method": "record_due_date_changes_for_auditable_assignments!"
       },
       "user_input": "assignment_and_student_id_values(:entries => entries).join(\",\")",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "b6f831712d0a04b2fcc4efc4a94c6b022740cd92bef1cd6dbadf32e7f7ad8f77",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "config/initializers/active_record.rb",
+      "line": 1530,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "lock(\"#{lock_type_clause(lock_type)} OF #{connection.quote_local_table_name(klass.table_name)}\")",
+      "render_path": null,
+      "location": null,
+      "user_input": "lock_type_clause(lock_type)",
       "confidence": "Medium",
       "cwe_id": [
         89
@@ -1481,7 +1500,7 @@
       "check_name": "SQL",
       "message": "Possible SQL injection",
       "file": "config/initializers/active_record.rb",
-      "line": 1606,
+      "line": 1623,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
       "code": "connection.select_value(\"SELECT COUNT(*) FROM pg_proc WHERE proname='#{procname}'\")",
       "render_path": null,
@@ -1633,6 +1652,6 @@
       "note": ""
     }
   ],
-  "updated": "2024-02-05 15:44:13 -0700",
+  "updated": "2024-02-21 18:22:27 -0600",
   "brakeman_version": "6.1.2"
 }

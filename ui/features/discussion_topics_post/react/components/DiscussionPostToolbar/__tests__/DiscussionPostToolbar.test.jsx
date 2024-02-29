@@ -165,18 +165,28 @@ describe('DiscussionPostToolbar', () => {
   })
 
   describe('Groups Menu Button', () => {
-    it('should not render when there are no child topics', () => {
+    it('should not render when there are no child topics and the user is an admin', () => {
       const container = setup({
         childTopics: [],
+        isAdmin: true,
       })
       expect(container.queryByTestId('groups-menu-button')).toBeNull()
     })
 
-    it('should render when there are child topics', () => {
+    it('should render when there are child topics and the user is an admin', () => {
       const container = setup({
         childTopics: [ChildTopic.mock()],
+        isAdmin: true,
       })
       expect(container.queryByTestId('groups-menu-button')).toBeTruthy()
+    })
+
+    it('should not render when the user is not an admin', () => {
+      const container = setup({
+        childTopics: [ChildTopic.mock()],
+        isAdmin: false,
+      })
+      expect(container.queryByTestId('groups-menu-button')).toBeNull()
     })
   })
 

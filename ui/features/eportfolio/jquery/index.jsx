@@ -47,7 +47,7 @@ import '@canvas/jquery/jquery.instructure_misc_plugins' /* confirmDelete, showIf
 import '@canvas/loading-image'
 import '@canvas/util/templateData' /* fillTemplateData, getTemplateData */
 import 'jquery-scroll-to-visible/jquery.scrollTo'
-import 'jqueryui-unpatched/progressbar'
+import 'jqueryui/progressbar'
 import 'jqueryui/sortable'
 
 const I18n = useI18nScope('eportfolio')
@@ -346,7 +346,7 @@ $(document).ready(function () {
   $('#edit_page_form')
     .find('.allow_comments')
     .change(function () {
-      $('#edit_page_form .show_comments_box').showIf($(this).attr('checked'))
+      $('#edit_page_form .show_comments_box').showIf($(this).prop('checked'))
     })
     .change()
   $('#edit_page_sidebar .submit_button').click(() => {
@@ -510,7 +510,7 @@ $(document).ready(function () {
       }
     })
   })
-  $('.delete_page_section_link').click(function (event) {
+  $('.delete_page_section_link').on('click', function (event) {
     event.preventDefault()
     $(this)
       .parents('.section')
@@ -542,7 +542,7 @@ $(document).ready(function () {
     },
   })
   $('#page_content')
-    .delegate('.cancel_content_button', 'click', function (event) {
+    .on('click', '.cancel_content_button', function (event) {
       event.preventDefault()
       $(this)
         .parents('.section')
@@ -550,7 +550,7 @@ $(document).ready(function () {
           $(this).remove()
         })
     })
-    .delegate('.select_submission_button', 'click', function (event) {
+    .on('click', '.select_submission_button', function (event) {
       event.preventDefault()
       const $section = $(this).parents('.section')
       const $selection = $section.find('.submission_list li.active-leaf:first')
@@ -572,7 +572,7 @@ $(document).ready(function () {
       $(this).focus()
       $.screenReaderFlashMessage(I18n.t('submission added: %{title}', {title}))
     })
-    .delegate('.upload_file_button', 'click', function (event) {
+    .on('click', '.upload_file_button', function (event) {
       event.preventDefault()
       event.stopPropagation()
       const $section = $(this).parents('.section')
@@ -866,7 +866,7 @@ $(document).ready(function () {
       $('#section_pages').addClass('editing')
     }
   })
-  $('#page_list').delegate('.edit_page_link', 'click', function (event) {
+  $('#page_list').on('click', '.edit_page_link', function (event) {
     if ($(this).parents('li').hasClass('unsaved')) {
       event.preventDefault()
     }
@@ -1150,7 +1150,7 @@ $(document).ready(function () {
     }
     showMoveDialog(source, destinations, triggerElement, dialogLabel, onMove)
   })
-  $('#section_list').delegate('.edit_section_link', 'click', function (event) {
+  $('#section_list').on('click', '.edit_section_link', function (event) {
     if ($(this).parents('li').hasClass('unsaved')) {
       event.preventDefault()
     }

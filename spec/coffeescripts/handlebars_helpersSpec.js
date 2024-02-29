@@ -18,6 +18,7 @@
 
 import Handlebars from '@canvas/handlebars-helpers'
 import $ from 'jquery'
+import 'jquery-migrate'
 import _ from 'lodash'
 import assertions from 'helpers/assertions'
 import fakeENV from 'helpers/fakeENV'

@@ -18,9 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module Canvas::GradeValidations
-  extend ActiveSupport::Concern
+  def self.included(klass)
+    super
 
-  included do
-    validates_length_of :grade, maximum: maximum_string_length, allow_nil: true, allow_blank: true
+    klass.validates_length_of :grade, maximum: klass.maximum_string_length, allow_nil: true, allow_blank: true
   end
 end

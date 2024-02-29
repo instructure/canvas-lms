@@ -23,6 +23,10 @@ module QuizzesEditPage
     "[data-testid='manage-assign-to']"
   end
 
+  def pending_changes_pill_selector
+    "[data-testid='pending_changes_pill']"
+  end
+
   def quiz_save_button_selector
     ".save_quiz_button"
   end
@@ -41,6 +45,10 @@ module QuizzesEditPage
     f(manage_assign_to_button_selector)
   end
 
+  def pending_changes_pill
+    f(pending_changes_pill_selector)
+  end
+
   def quiz_edit_form
     "form#quiz_options_form"
   end
@@ -57,6 +65,10 @@ module QuizzesEditPage
 
   def click_quiz_save_button
     quiz_save_button.click
+  end
+
+  def pending_changes_pill_exists?
+    element_exists?(pending_changes_pill_selector)
   end
 
   def retrieve_quiz_due_date_table_row(row_item)

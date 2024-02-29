@@ -17,11 +17,7 @@
  */
 
 import $ from 'jquery'
-import 'jqueryui-unpatched/core'
-import 'jqueryui-unpatched/widget'
-import 'jqueryui-unpatched/position'
-import 'jqueryui-unpatched/menu'
-import 'jqueryui-unpatched/autocomplete'
+import 'jqueryui/autocomplete'
 import '@canvas/jquery/jquery.simulate'
 
 QUnit.module('Autocomplete Widget', {
@@ -40,7 +36,7 @@ QUnit.module('Autocomplete Widget', {
 })
 
 QUnit.test('Autocomplete widget is initialized', function (assert) {
-  assert.ok(this.$input.data('uiAutocomplete'), 'Autocomplete widget is initialized')
+  assert.ok(this.$input.data('ui-autocomplete'), 'Autocomplete widget is initialized')
 })
 
 QUnit.test('Autocomplete suggests available tags', function (assert) {

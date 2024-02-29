@@ -22,13 +22,13 @@ import userEvent from '@testing-library/user-event'
 import {DEFAULT_SETTINGS} from '../../../svg/constants'
 import {ColorSection} from '../ColorSection'
 
-function selectOption(button, option) {
-  userEvent.click(
+const selectOption = async (button, option) => {
+  await userEvent.click(
     screen.getByRole('combobox', {
       name: button,
     })
   )
-  userEvent.click(
+  await userEvent.click(
     screen.getByRole('option', {
       name: option,
     })
@@ -52,14 +52,14 @@ describe('<ColorSection />', () => {
     expect(onChange).toHaveBeenCalledWith({outlineColor: '#000'})
   })
 
-  it('changes the icon outline size', () => {
+  it('changes the icon outline size', async () => {
     const onChange = jest.fn()
     render(
       <ColorSection settings={{...DEFAULT_SETTINGS, outlineSize: 'medium'}} onChange={onChange} />
     )
-    selectOption(/outline size/i, /small/i)
+    await selectOption(/outline size/i, /small/i)
     expect(onChange).toHaveBeenCalledWith({outlineSize: 'small'})
-    selectOption(/outline size/i, /none/i)
+    await selectOption(/outline size/i, /none/i)
     expect(onChange).toHaveBeenCalledWith({outlineSize: 'none'})
   })
 })

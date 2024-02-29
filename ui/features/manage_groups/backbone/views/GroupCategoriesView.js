@@ -71,7 +71,7 @@ export default class GroupCategoriesView extends CollectionView {
       this.$tabs.find('ul.ui-tabs-nav').prepend(this.$static)
     }
     // setup the tabs
-    if (this.$tabs.data('tabs')) {
+    if (this.$tabs.data('ui-tabs')) {
       this.$tabs.tabs('refresh').show()
     } else {
       this.$tabs.tabs({cookie: {}}).show()

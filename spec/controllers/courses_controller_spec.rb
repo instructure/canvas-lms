@@ -4170,6 +4170,19 @@ describe CoursesController do
     end
   end
 
+  describe "GET start_offline_web_export" do
+    it "starts a web zip export" do
+      course_with_student_logged_in(active_all: true)
+      @course.root_account.settings[:enable_offline_web_export] = true
+      @course.root_account.save!
+      @course.update_attribute(:enable_offline_web_export, true)
+      @course.save!
+      expect { get "start_offline_web_export", params: { course_id: @course.id } }
+        .to change { @course.reload.web_zip_exports.count }.by(1)
+      expect(response).to be_redirect
+    end
+  end
+
   describe "#users" do
     let(:course) { Course.create! }
 
@@ -4208,7 +4221,7 @@ describe CoursesController do
         per_page: 1
       }
       expect(response).to be_successful
-      expect(response.headers.to_a.find { |a| a.first == "Link" }.last).to_not include("last")
+      expect(response.headers.to_a.find { |a| a.first.downcase == "link" }.last).to_not include("last")
     end
 
     it "only returns group_ids for active group memberships when requested" do

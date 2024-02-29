@@ -358,7 +358,7 @@ const GradebookUploader = {
                   $(`#${thing}_resolution_template select`)
                     .not(this)
                     .find(`option[value='${$(this).val()}']`)
-                    .attr('disabled', true)
+                    .prop('disabled', true)
                 }
               })
             } else if ($(this).val() === 'new') {

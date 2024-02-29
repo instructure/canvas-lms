@@ -65,6 +65,7 @@ type Props = {
   isLoading: boolean
   isShowingOptions?: boolean
   label: React.ReactNode
+  inputRef?: (inputElement: HTMLInputElement | null) => void
   listRef?: (ref: HTMLUListElement | null) => void
   noOptionsLabel: string
   onChange: (ids: string[]) => void
@@ -310,6 +311,7 @@ function CanvasMultiSelect(props: Props) {
 
   function onRequestHideOptions() {
     setIsShowingOptions(false)
+    customOnRequestHideOptions()
     if (!highlightedOptionId) return
     setInputValue('')
     if (filteredOptionIds?.length === 1) {
@@ -320,7 +322,6 @@ function CanvasMultiSelect(props: Props) {
       onChange([...selectedOptionIds, filteredOptionIds[0]])
     }
     setFilteredOptionIds(null)
-    customOnRequestHideOptions()
   }
 
   function onRequestHighlightOption(e: any, {id}: any) {

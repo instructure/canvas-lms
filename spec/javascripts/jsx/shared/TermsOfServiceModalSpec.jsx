@@ -18,6 +18,7 @@
 
 import React from 'react'
 import $ from 'jquery'
+import 'jquery-migrate'
 import {mount} from 'enzyme'
 import TermsOfServiceModal from 'ui/features/terms_of_service_modal/react/TermsOfServiceModal'
 

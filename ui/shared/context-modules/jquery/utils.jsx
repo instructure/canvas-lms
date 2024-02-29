@@ -26,6 +26,10 @@ import PublishCloud from '@canvas/files/react/components/PublishCloud'
 import PublishableModuleItem from '../backbone/models/PublishableModuleItem'
 import PublishIconView from '@canvas/publish-icon-view'
 import {underscoreString} from '@canvas/convert-case'
+import ContentTypeExternalToolTray from '@canvas/trays/react/ContentTypeExternalToolTray'
+import {ltiState} from '@canvas/lti/jquery/messages'
+import {addDeepLinkingListener} from '@canvas/deep-linking/DeepLinking'
+import ExternalToolModalLauncher from '@canvas/external-tools/react/components/ExternalToolModalLauncher'
 
 const I18n = useI18nScope('context_modulespublic')
 
@@ -196,13 +200,69 @@ export function setExpandAllButton() {
       someVisible = true
     }
   })
-  $('#expand_collapse_all').text(someVisible ? I18n.t('Collapse All') : I18n.t('Expand All'))
+
+  if (ENV.FEATURES.instui_header) {
+    $('#expand_collapse_all').children().children().text(someVisible ? I18n.t('Collapse All') : I18n.t('Expand All'))
+  }
+  else {
+    $('#expand_collapse_all').text(someVisible ? I18n.t('Collapse All') : I18n.t('Expand All'))
+  }
+  
   $('#expand_collapse_all').attr(
     'aria-label',
     someVisible ? I18n.t('Collapse All Modules') : I18n.t('Expand All Modules')
   )
   $('#expand_collapse_all').data('expand', !someVisible)
   $('#expand_collapse_all').attr('aria-expanded', someVisible ? 'true' : 'false')
+}
+
+export function setExpandAllButtonHandler() {
+  $('#expand_collapse_all').click(function () {
+    const shouldExpand = $(this).data('expand')
+
+    if (ENV.FEATURES.instui_header) {
+      $(this).children().children().text(shouldExpand ? I18n.t('Collapse All') : I18n.t('Expand All'))
+    }
+    else {
+      $(this).text(shouldExpand ? I18n.t('Collapse All') : I18n.t('Expand All'))
+    }
+
+    $(this).attr(
+      'aria-label',
+      shouldExpand ? I18n.t('Collapse All Modules') : I18n.t('Expand All Modules')
+    )
+    $(this).data('expand', !shouldExpand)
+    $(this).attr('aria-expanded', shouldExpand ? 'true' : 'false')
+
+    $('.context_module').each(function () {
+      const $module = $(this)
+      if (
+        (shouldExpand && $module.find('.content:visible').length === 0) ||
+        (!shouldExpand && $module.find('.content:visible').length > 0)
+      ) {
+        const callback = function () {
+          $module
+            .find('.collapse_module_link')
+            .css('display', shouldExpand ? 'inline-block' : 'none')
+          $module.find('.expand_module_link').css('display', shouldExpand ? 'none' : 'inline-block')
+          $module.find('.footer .manage_module').css('display', '')
+          $module.toggleClass('collapsed_module', shouldExpand)
+        }
+        $module.find('.content').slideToggle({
+          queue: false,
+          done: callback(),
+        })
+      }
+    })
+
+    const url = $(this).data('url')
+    const collapse = shouldExpand ? '0' : '1'
+    $.ajaxJSON(url, 'POST', {collapse})
+  })
+}
+
+export function resetExpandAllButtonBindings() {
+  $('#expand_collapse_all').off('click');
 }
 
 export function updateProgressionState($module) {
@@ -414,4 +474,120 @@ export function overrideModel(moduleItems, relock_modules_dialog, model, view) {
 
   moduleItems[contentKey] || (moduleItems[contentKey] = [])
   moduleItems[contentKey].push({model, view})
+}
+
+export function openExternalTool(ev) {
+  if (ev != null) {
+    ev.preventDefault()
+  }
+  const launchType = ev.target.dataset.toolLaunchType
+  // modal placements use ExternalToolModalLauncher which expects a tool in the launch_definition format
+  const idAttribute = launchType.includes('modal') ? 'definition_id' : 'id'
+  const tool = findToolFromEvent(ENV.MODULE_TOOLS[launchType], idAttribute, ev)
+
+  const currentModule = $(ev.target).parents('.context_module')
+  const currentModuleId =
+    currentModule.length > 0 && currentModule.attr('id').substring('context_module_'.length)
+
+  if (launchType === 'module_index_menu_modal') {
+    setExternalToolModal({tool, launchType, returnFocusTo: $('.al-trigger')[0]})
+    return
+  }
+
+  if (launchType === 'module_menu_modal') {
+    setExternalToolModal({
+      tool,
+      launchType,
+      returnFocusTo: $('.al-trigger')[0],
+      contextModuleId: currentModuleId,
+    })
+    return
+  }
+
+  const moduleData = []
+  if (launchType === 'module_index_menu') {
+    // include all modules
+    moduleData.push({
+      course_id: ENV.COURSE_ID,
+      type: 'module',
+    })
+  } else if (launchType === 'module_group_menu') {
+    // just include the one module whose menu we're on
+    moduleData.push({
+      id: currentModuleId,
+      name: currentModule.find('.name').attr('title'),
+    })
+  }
+  setExternalToolTray(tool, moduleData, launchType, $('.al-trigger')[0])
+}
+
+function setExternalToolTray(tool, moduleData, placement = 'module_index_menu', returnFocusTo) {
+  const handleDismiss = () => {
+    setExternalToolTray(null)
+    returnFocusTo.focus()
+    if (ltiState?.tray?.refreshOnClose) {
+      window.location.reload()
+    }
+  }
+
+  ReactDOM.render(
+    <ContentTypeExternalToolTray
+      tool={tool}
+      placement={placement}
+      acceptedResourceTypes={[
+        'assignment',
+        'audio',
+        'discussion_topic',
+        'document',
+        'image',
+        'module',
+        'quiz',
+        'page',
+        'video',
+      ]}
+      targetResourceType="module"
+      allowItemSelection={placement === 'module_index_menu'}
+      selectableItems={moduleData}
+      onDismiss={handleDismiss}
+      open={tool !== null}
+    />,
+    $('#external-tool-mount-point')[0]
+  )
+}
+
+function setExternalToolModal({
+  tool,
+  launchType,
+  returnFocusTo,
+  isOpen = true,
+  contextModuleId = null,
+}) {
+  if (isOpen) {
+    addDeepLinkingListener(() => {
+      window.location.reload()
+    })
+  }
+
+  const handleDismiss = () => {
+    setExternalToolModal({tool, launchType, returnFocusTo, contextModuleId, isOpen: false})
+    returnFocusTo.focus()
+  }
+
+  ReactDOM.render(
+    <ExternalToolModalLauncher
+      tool={tool}
+      launchType={launchType}
+      isOpen={isOpen}
+      contextType="course"
+      contextId={parseInt(ENV.COURSE_ID, 10)}
+      title={tool.name}
+      onRequestClose={handleDismiss}
+      contextModuleId={contextModuleId}
+    />,
+    $('#external-tool-mount-point')[0]
+  )
+}
+
+function findToolFromEvent(collection, idAttribute, event) {
+  return (collection || []).find(t => t[idAttribute] === event.target.dataset.toolId)
 }

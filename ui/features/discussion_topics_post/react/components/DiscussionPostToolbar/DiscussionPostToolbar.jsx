@@ -148,7 +148,7 @@ export const DiscussionPostToolbar = props => {
             >
               <Flex>
                 {/* Groups */}
-                {props.childTopics?.length && (
+                {props.childTopics?.length && props.isAdmin && (
                   <Flex.Item
                     data-testid="groups-menu-button"
                     margin={responsiveProps?.groupSelect?.margin}
@@ -293,6 +293,7 @@ export const DiscussionPostToolbar = props => {
 export default DiscussionPostToolbar
 
 DiscussionPostToolbar.propTypes = {
+  isAdmin: PropTypes.bool,
   childTopics: PropTypes.arrayOf(ChildTopic.shape),
   selectedView: PropTypes.string,
   sortDirection: PropTypes.string,

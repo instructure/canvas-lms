@@ -42,9 +42,9 @@ describe "jquery" do
     expect(driver.execute_script("return $('form input[name=_method]').val()")).to eq "delete"
   end
 
-  it "is able to handle ':hidden' and ':visible' pseudo-selector on window" do
+  it "is able to handle ':hidden' and ':visible' pseudo-selector on document body" do
     get("/login")
-    expect(driver.execute_script("return $(window).is(':visible')")).to be true
-    expect(driver.execute_script("return $(window).is(':hidden')")).to be false
+    expect(driver.execute_script("return $(document.body).is(':visible')")).to be true
+    expect(driver.execute_script("return $(document.body).is(':hidden')")).to be false
   end
 end

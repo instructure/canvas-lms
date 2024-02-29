@@ -18,6 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require "redis/cluster"
 require "spec_helper"
 require "timecop"
 
@@ -113,7 +114,7 @@ describe CanvasCache::Redis do
         let(:cache) { ActiveSupport::Cache::RedisCacheStore.new(url: "redis://localhost:1234", circuit_breaker: { error_threshold: 1, error_timeout: 2 }) }
 
         before do
-          expect(RedisClient::RubyConnection).to receive(:new).and_raise(RedisClient::TimeoutError)
+          allow(RedisClient::RubyConnection).to receive(:new).and_raise(RedisClient::TimeoutError)
         end
 
         it "does not fail cache.read" do
@@ -285,7 +286,7 @@ describe CanvasCache::Redis do
       end
 
       it "uses the circuit breaker properly" do
-        expect(ConfigFile).to receive(:load).with("redis").and_return(url: ["redis://redis-test-node-42:9999/"])
+        expect(ConfigFile).to receive(:load).with("redis").and_return(url: ["redis://redis-test-node-42:9999/"], reconnect_attempts: 0)
         expect(RedisClient::RubyConnection).to receive(:new).and_raise(RedisClient::TimeoutError, "intentional failure").twice
 
         now = Process.clock_gettime(Process::CLOCK_MONOTONIC)
@@ -310,22 +311,49 @@ describe CanvasCache::Redis do
   describe "#disconnect_if_idle" do
     let(:redis) { CanvasCache::Redis.redis }
     let(:client) { redis._client }
+    let(:raw_client) { client }
 
-    it "closes the connection if no command was ever received" do
-      expect(client).to receive(:close)
-      client.disconnect_if_idle(Process.clock_gettime(Process::CLOCK_MONOTONIC))
+    shared_examples "disconnect_if_idle" do
+      it "closes the connection if no command was ever received" do
+        expect(raw_client).to receive(:close)
+        client.disconnect_if_idle(Process.clock_gettime(Process::CLOCK_MONOTONIC))
+      end
+
+      it "does not close the connection if a commmand was recently received" do
+        redis.get("key")
+        expect(raw_client).not_to receive(:close)
+        client.disconnect_if_idle(Process.clock_gettime(Process::CLOCK_MONOTONIC) - 10)
+      end
+
+      it "closes the connection if a commmand was received, but not recently" do
+        redis.get("key")
+        expect(raw_client).to receive(:close)
+        client.disconnect_if_idle(Process.clock_gettime(Process::CLOCK_MONOTONIC) + 10)
+      end
     end
 
-    it "does not close the connection if a commmand was recently received" do
-      redis.get("key")
-      expect(client).not_to receive(:close)
-      client.disconnect_if_idle(Process.clock_gettime(Process::CLOCK_MONOTONIC) - 10)
-    end
+    include_examples "disconnect_if_idle"
 
-    it "closes the connection if a commmand was received, but not recently" do
-      redis.get("key")
-      expect(client).to receive(:close)
-      client.disconnect_if_idle(Process.clock_gettime(Process::CLOCK_MONOTONIC) + 10)
+    context "with a cluster" do
+      let(:redis) do
+        allow_any_instance_of(RedisClient::Cluster::Node).to receive(:refetch_node_info_list).and_return(
+          [RedisClient::Cluster::Node::Info.new(
+            id: "id",
+            node_key: "#{CanvasCache::Redis.redis._client.host}:#{CanvasCache::Redis.redis._client.port}",
+            role: "master",
+            primary_id: "-",
+            slots: [[0, 16_383]]
+          )]
+        )
+        Redis::Cluster.new(nodes: [CanvasCache::Redis.redis.id], connect_with_original_config: true)
+      end
+
+      let(:raw_client) do
+        router = client.instance_variable_get(:@router)
+        router.find_node(router.find_node_key(""))
+      end
+
+      include_examples "disconnect_if_idle"
     end
   end
 end

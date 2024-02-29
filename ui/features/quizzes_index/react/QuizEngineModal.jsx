@@ -57,8 +57,8 @@ function QuizEngineModal({setOpen, onDismiss}) {
   const classicDesc = (
     <div style={{paddingLeft: '1.75rem', maxWidth: '23.5rem'}}>
       <Text weight="light">
-        {I18n.t(`At this time, CSV downloads for quiz and item analysis 
-        or student analysis are available through Classic Quizzes.`)}
+        {I18n.t(`Currently, Student Analysis Report (CSV format)
+        is available through Classic Quizzes.`)}
       </Text>
     </div>
   )

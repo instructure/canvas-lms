@@ -19,7 +19,7 @@
 import React from 'react'
 import Router from 'react-router'
 import {BrowserRouter} from 'react-router-dom'
-import {fireEvent, render, waitFor} from '@testing-library/react'
+import {fireEvent, render} from '@testing-library/react'
 import {QueryProvider, queryClient} from '@canvas/query'
 import {RubricForm} from '../index'
 import {RUBRICS_QUERY_RESPONSE} from './fixtures'
@@ -64,6 +64,8 @@ describe('RubricForm Tests', () => {
       const {getByTestId, getByText} = renderComponent()
       expect(getByText('Create New Rubric')).toBeInTheDocument()
       expect(getByTestId('rubric-form-title')).toHaveValue('')
+      expect(getByTestId('rubric-hide-points-select')).toBeInTheDocument()
+      expect(getByTestId('rubric-rating-order-select')).toBeInTheDocument()
     })
   })
 
@@ -113,9 +115,16 @@ describe('RubricForm Tests', () => {
     })
 
     it('will navigate back to /rubrics after successfully saving', async () => {
-      jest
-        .spyOn(RubricFormQueries, 'saveRubric')
-        .mockImplementation(() => Promise.resolve({id: '1', title: 'Rubric 1', pointsPossible: 10}))
+      jest.spyOn(RubricFormQueries, 'saveRubric').mockImplementation(() =>
+        Promise.resolve({
+          id: '1',
+          title: 'Rubric 1',
+          pointsPossible: 10,
+          buttonDisplay: 'numeric',
+          ratingOrder: 'descending',
+          unassessed: true,
+        })
+      )
       const {getByTestId} = renderComponent()
       const titleInput = getByTestId('rubric-form-title')
       fireEvent.change(titleInput, {target: {value: 'Rubric 1'}})
@@ -275,6 +284,29 @@ describe('RubricForm Tests', () => {
         const criteriaRowDescriptions = queryAllByTestId('rubric-criteria-row-description')
         expect(criteriaRowDescriptions[0]).not.toHaveTextContent('Updated Criterion Test')
       })
+    })
+  })
+
+  describe('assessed rubrics', () => {
+    beforeEach(() => {
+      jest.spyOn(Router, 'useParams').mockReturnValue({rubricId: '1'})
+    })
+
+    afterEach(() => {
+      jest.resetAllMocks()
+    })
+
+    it('only renders text inputs for an assessed rubric', () => {
+      const rubricQueryResponse = {...RUBRICS_QUERY_RESPONSE, unassessed: false}
+      queryClient.setQueryData(['fetch-rubric-1'], rubricQueryResponse)
+
+      const {getByTestId, queryByTestId, queryAllByTestId} = renderComponent()
+      expect(getByTestId('rubric-form-title')).toHaveValue('Rubric 1')
+      expect(queryByTestId('rubric-hide-points-select')).toBeNull()
+      expect(queryByTestId('rubric-rating-order-select')).toBeNull()
+      expect(queryByTestId('add-criterion-button')).toBeNull()
+      expect(queryAllByTestId('rubric-criteria-row-delete-button')).toHaveLength(0)
+      expect(queryAllByTestId('rubric-criteria-row-duplicate-button')).toHaveLength(0)
     })
   })
 })

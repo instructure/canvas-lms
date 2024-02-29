@@ -461,10 +461,6 @@ describe "submissions" do
     end
 
     describe "uploaded files for submission" do
-      def fixture_file_path(file)
-        RSpec.configuration.fixture_path.join(file).to_s
-      end
-
       def make_folder_actions_visible
         driver.execute_script("$('.folder_item').addClass('folder_item_hover')")
       end
@@ -475,7 +471,6 @@ describe "submissions" do
         add_file(fixture_file_upload("html-editing-test.html", "text/html"),
                  @student,
                  "html-editing-test.html")
-        File.read(fixture_file_path("files/html-editing-test.html"))
         assignment = @course.assignments.create!(title: "assignment 1",
                                                  name: "assignment 1",
                                                  submission_types: "online_upload",
@@ -498,14 +493,12 @@ describe "submissions" do
       it "does not allow a user to submit a file-submission assignment from previously uploaded files with an illegal file extension", priority: "1" do
         skip_if_safari(:alert)
         filename = "hello-world.sh"
-        fixture_fn = "files/#{filename}"
 
         local_storage!
 
         add_file(fixture_file_upload(filename, "application/x-sh"),
                  @student,
                  filename)
-        File.read(fixture_file_path(fixture_fn))
         assignment = @course.assignments.create!(title: "assignment 1",
                                                  name: "assignment 1",
                                                  submission_types: "online_upload",

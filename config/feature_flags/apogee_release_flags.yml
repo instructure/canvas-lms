@@ -361,3 +361,13 @@ grading_periods_filter_dates:
       state: allowed_on
     development:
       state: allowed_on
+speedgrader_studio_media_capture:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: SpeedGrader Studio Media Capture
+  description: This feature provides the ability to capture media in SpeedGrader using Studio Screen Capture.
+  environments:
+    ci:
+      state: allowed
+    development:
+      state: allowed

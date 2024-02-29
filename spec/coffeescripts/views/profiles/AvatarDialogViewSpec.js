@@ -1,3 +1,4 @@
+/* eslint-disable qunit/resolve-async */
 /*
  * Copyright (C) 2015 - present Instructure, Inc.
  *
@@ -17,6 +18,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import AvatarDialogView from '@canvas/avatar-dialog-view/backbone/views/AvatarDialogView'
 import assertions from 'helpers/assertions'
 

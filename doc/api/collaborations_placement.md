@@ -41,3 +41,9 @@ This example would create a collaboration associated with the launch `url` and i
 The IDs in the `users` array are the same IDs available in the <a href="https://canvas.instructure.com/doc/api/names_and_role.html">Names & Roles Provisioning Service</a>. These IDs are also the value of the `sub` claim in an LTI 1.3 launch.
 
 The IDs in the `groups` array are also IDs available in the <a href="https://canvas.instructure.com/doc/api/names_and_role.html">Names & Roles Provisioning Service</a>. When making a request in the NRPS to list Group Memberships, the response's `context.id` attribute is the ID to include.
+
+### Migrating from LTI 1.1 to 1.3
+
+A quirk of Canvas' LTI 1.1 implementation means that 1.1 collaboration launches do not send a unique `resource_link_id`. The 1.1 collaboration `resource_link_id` is always the LTI id of the collaboration's context (either a Course or Group).
+
+When a 1.1 tool is upgraded to 1.3, the 1.1 resource link id is sent in the `https://purl.imsglobal.org/spec/lti/claim/lti1p1` ID token claim. For migrated collaborations, this will always be the context's LTI id and will not be unique.

@@ -187,14 +187,19 @@ module Types
       argument :built_in_only, Boolean, "Only return default/built_in roles", required: false
     end
     def author(course_id: nil, role_types: nil, built_in_only: false)
-      if object.anonymous? && !course_id
+      # Conditionally set course_id based on whether it's provided or should be inferred from the object
+      resolved_course_id = course_id.nil? ? object&.course&.id : course_id
+      # Set the graphql context so it can be used downstream
+      context[:course_id] = resolved_course_id
+
+      if object.anonymous? && resolved_course_id.nil?
         nil
       else
         load_association(:user).then do |user|
-          if !object.anonymous? || !user
+          if !object.anonymous? || user.nil?
             user
           else
-            Loaders::CourseRoleLoader.for(course_id:, role_types:, built_in_only:).load(user).then do |roles|
+            Loaders::CourseRoleLoader.for(course_id: resolved_course_id, role_types:, built_in_only:).load(user).then do |roles|
               if roles&.include?("TeacherEnrollment") || roles&.include?("TaEnrollment") || roles&.include?("DesignerEnrollment") || (object.anonymous_state == "partial_anonymity" && !object.is_anonymous_author)
                 user
               end
@@ -229,7 +234,11 @@ module Types
       argument :built_in_only, Boolean, "Only return default/built_in roles", required: false
     end
     def editor(course_id: nil, role_types: nil, built_in_only: false)
-      if object.anonymous? && !course_id
+      # Conditionally set course_id based on whether it's provided or should be inferred from the object
+      resolved_course_id = course_id.nil? ? object&.course&.id : course_id
+      # Set the graphql context so it can be used downstream
+      context[:course_id] = resolved_course_id
+      if object.anonymous? && !resolved_course_id
         nil
       else
         load_association(:editor).then do |user|

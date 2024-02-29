@@ -632,6 +632,20 @@ describe ApplicationHelper do
 
       expect(editor_buttons).to be_empty
     end
+
+    it "passes in the base url for use with default tool icons" do
+      @course = course_model
+      @context = @course
+
+      expect(ContextExternalTool).to receive(:editor_button_json).with(
+        an_instance_of(Array),
+        anything,
+        anything,
+        anything,
+        "http://test.host"
+      )
+      editor_buttons
+    end
   end
 
   describe "UI path checking" do

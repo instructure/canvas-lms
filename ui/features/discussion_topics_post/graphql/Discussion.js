@@ -56,6 +56,12 @@ export const Discussion = {
       lockAt
       availableForUser
       userCount
+      editor {
+        ...User
+      }
+      author {
+        ...User
+      }
       entryCounts {
         unreadCount
         repliesCount
@@ -82,6 +88,7 @@ export const Discussion = {
         ...RootTopic
       }
     }
+    ${User.fragment}
     ${Attachment.fragment}
     ${Assignment.fragment}
     ${DiscussionPermissions.fragment}

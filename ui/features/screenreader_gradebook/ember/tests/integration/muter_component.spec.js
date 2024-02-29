@@ -44,7 +44,7 @@ function checkDialogClosed() {
 }
 
 function closeDialog(dialog) {
-  click(find('button.ui-dialog-titlebar-close', dialog))
+  click(find('.ui-dialog-titlebar-close', dialog))
   return checkDialogClosed()
 }
 

@@ -1108,8 +1108,8 @@ EditView.prototype.handleExternalContentReady = function (data) {
 
 EditView.prototype.handleOnlineSubmissionTypeChange = function (_env) {
   const showConfigTools =
-    this.$onlineSubmissionTypes.find(ALLOW_FILE_UPLOADS).attr('checked') ||
-    this.$onlineSubmissionTypes.find(ALLOW_TEXT_ENTRY).attr('checked')
+    this.$onlineSubmissionTypes.find(ALLOW_FILE_UPLOADS).prop('checked') ||
+    this.$onlineSubmissionTypes.find(ALLOW_TEXT_ENTRY).prop('checked')
   return this.$similarityDetectionTools.toggleAccessibly(
     showConfigTools && ENV.PLAGIARISM_DETECTION_PLATFORM
   )
@@ -1209,8 +1209,7 @@ EditView.prototype.toJSON = function () {
       (typeof ENV !== 'undefined' && ENV !== null
         ? ENV.ANONYMOUS_INSTRUCTOR_ANNOTATIONS_ENABLED
         : void 0) || false,
-        differentiatedModulesEnabled: ENV.FEATURES.differentiated_modules
-    
+    differentiatedModulesEnabled: ENV.FEATURES.differentiated_modules,
   })
 }
 

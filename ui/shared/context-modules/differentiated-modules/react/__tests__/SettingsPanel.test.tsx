@@ -162,7 +162,7 @@ describe('SettingsPanel', () => {
   it('calls updateParentData on unmount with changes', async () => {
     const updateParentDataMock = jest.fn()
     const {unmount, findByTestId} = renderComponent({updateParentData: updateParentDataMock})
-    userEvent.type(await findByTestId('module-name-input'), '2')
+    await userEvent.type(await findByTestId('module-name-input'), '2')
     unmount()
     expect(updateParentDataMock).toHaveBeenCalledWith(
       {
@@ -290,7 +290,7 @@ describe('SettingsPanel', () => {
         onDidSubmit: onDidSubmitMock,
         onDismiss: onDismissMock,
       })
-      userEvent.click(getByRole('button', {name: 'Save'}))
+      await userEvent.click(getByRole('button', {name: 'Save'}))
 
       expect(await findByTestId('loading-overlay')).toBeInTheDocument()
       expect(onDidSubmitMock).toHaveBeenCalled()
@@ -323,7 +323,7 @@ describe('SettingsPanel', () => {
         onDidSubmit: onDidSubmitMock,
         onDismiss: onDismissMock,
       })
-      userEvent.click(getByRole('button', {name: 'Add Module'}))
+      await userEvent.click(getByRole('button', {name: 'Add Module'}))
 
       expect(await findByTestId('loading-overlay')).toBeInTheDocument()
       expect(onDidSubmitMock).toHaveBeenCalled()

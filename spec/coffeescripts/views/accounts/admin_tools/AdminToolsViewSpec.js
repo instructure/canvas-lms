@@ -18,6 +18,7 @@
 
 import Backbone from '@canvas/backbone'
 import $ from 'jquery'
+import 'jquery-migrate'
 import AdminToolsView from 'ui/features/account_admin_tools/backbone/views/AdminToolsView'
 import assertions from 'helpers/assertions'
 
@@ -40,9 +41,15 @@ QUnit.module('AdminToolsViewSpec', {
 
 test('should be accessible', function (assert) {
   const done = assert.async()
-  assertions.isAccessible(this.admin_tools_view, done, {a11yReport: true})
+  assertions.isAccessible(
+    this.admin_tools_view,
+    function () {
+      done()
+    },
+    {a11yReport: true}
+  )
 })
 
 test('creates a new jquery tabs', function () {
-  ok(this.admin_tools_view.$adminToolsTabs.data('tabs'), 'There should be 2 tabs initialized')
+  ok(this.admin_tools_view.$adminToolsTabs.data('ui-tabs'), 'There should be 2 tabs initialized')
 })

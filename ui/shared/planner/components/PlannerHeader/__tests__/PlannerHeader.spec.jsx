@@ -124,16 +124,16 @@ it('does not render the Add To Do option when isObserving', () => {
   expect(AddToDoButton.exists()).toBeFalsy()
 })
 
-it('toggles the new item tray', () => {
+it('toggles the new item tray', async () => {
   const mockCancel = jest.fn()
   const {getByTestId} = render(
     <PlannerHeader {...defaultProps()} cancelEditingPlannerItem={mockCancel} />
   )
   const button = getByTestId('add-to-do-button')
-  userEvent.click(button)
+  await userEvent.click(button)
   const heading1 = screen.getByRole('heading', {name: /Add To Do/i})
   expect(heading1).toBeInTheDocument()
-  userEvent.click(button)
+  await userEvent.click(button)
   const heading2 = screen.queryByRole('heading', {name: /Add To Do/i})
   expect(heading2).not.toBeInTheDocument()
   expect(mockCancel).toHaveBeenCalled()
@@ -670,16 +670,16 @@ it('opens the tray when it gets an updateTodoItem prop', () => {
   expect(findEditTray(wrapper).prop('open')).toBe(true)
 })
 
-it('toggles the grades tray', () => {
+it('toggles the grades tray', async () => {
   const {getByTestId} = render(<PlannerHeader {...defaultProps()} />)
 
   const button = getByTestId('show-my-grades-button')
-  userEvent.click(button)
+  await userEvent.click(button)
 
   const heading1 = screen.getByRole('heading', {name: /My Grades/i})
   expect(heading1).toBeInTheDocument()
 
-  userEvent.click(button)
+  await userEvent.click(button)
 
   const heading2 = screen.queryByRole('heading', {name: /My Grades/i})
   expect(heading2).not.toBeInTheDocument()

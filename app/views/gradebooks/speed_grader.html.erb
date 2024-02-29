@@ -23,7 +23,8 @@
     :RUBRIC_ASSESSMENT => {
       :assessor_id => @current_user.id.to_s,
       :assessment_type => can_do(@assignment, @current_user, :grade) ? "grading" : "peer_review"
-    }
+    },
+    studio_media_capture_enabled: Account.site_admin.feature_enabled?(:speedgrader_studio_media_capture)
   })
   @show_left_side = false
   @show_embedded_chat = false

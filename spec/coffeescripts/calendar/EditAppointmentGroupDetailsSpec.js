@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import EditAppointmentGroupDetails from 'ui/features/calendar/jquery/EditAppointmentGroupDetails'
 import fcUtil from '@canvas/calendar/jquery/fcUtil'
 import * as tz from '@canvas/datetime'
@@ -73,6 +74,6 @@ test('disable context and group controls when editing an existing appointment', 
     this.contexts,
     null
   )
-  equal(instance.form.find('#option_course_1').attr('disabled'), 'disabled')
-  equal(instance.form.find('.group-signup-checkbox').attr('disabled'), 'disabled')
+  equal(instance.form.find('#option_course_1').prop('disabled'), true)
+  equal(instance.form.find('.group-signup-checkbox').prop('disabled'), true)
 })

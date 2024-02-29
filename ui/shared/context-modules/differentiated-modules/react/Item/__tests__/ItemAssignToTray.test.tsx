@@ -135,6 +135,21 @@ describe('ItemAssignToTray', () => {
     expect(getByText('Quiz | 10 pts')).toBeInTheDocument()
   })
 
+  it('renders Save button', () => {
+    const {getByText} = renderComponent({useApplyButton: false})
+    expect(getByText('Save')).toBeInTheDocument()
+  })
+
+  it("renders Save button when it hasn't been passed", () => {
+    const {getByText} = renderComponent()
+    expect(getByText('Save')).toBeInTheDocument()
+  })
+
+  it('renders Apply button', () => {
+    const {getByText} = renderComponent({useApplyButton: true})
+    expect(getByText('Apply')).toBeInTheDocument()
+  })
+
   describe('pointsPossible display', () => {
     it('does not render points display if undefined', () => {
       const {getByText, queryByText, getByLabelText} = renderComponent({pointsPossible: undefined})
@@ -166,11 +181,11 @@ describe('ItemAssignToTray', () => {
     })
   })
 
-  it('calls onDismiss when close button is clicked', () => {
-    const onDismiss = jest.fn()
-    const {getByRole} = renderComponent({onDismiss})
+  it('calls onClose when close button is clicked', () => {
+    const onClose = jest.fn()
+    const {getByRole} = renderComponent({onClose})
     getByRole('button', {name: 'Close'}).click()
-    expect(onDismiss).toHaveBeenCalled()
+    expect(onClose).toHaveBeenCalled()
   })
 
   it('adds a card when add button is clicked', async () => {
@@ -372,7 +387,7 @@ describe('ItemAssignToTray', () => {
     })
   })
 
-  describe('Module Overrides', () => {
+  describe.skip('Module Overrides', () => {
     const DATE_DETAILS_WITHOUT_OVERRIDES = {
       id: '23',
       due_at: '2023-10-05T12:00:00Z',

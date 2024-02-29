@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import TimeBlockList from 'ui/features/calendar/jquery/TimeBlockList'
 import moment from 'moment'
 import fcUtil from '@canvas/calendar/jquery/fcUtil'

@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class CreateModuleStudentVisibilities < ActiveRecord::Migration[7.0]
-  tag :predeploy
+  tag :postdeploy
 
   def up
     connection.execute(MigrationHelpers::StudentVisibilities::StudentVisibilitiesV5.new(connection.quote_table_name("module_student_visibilities"), ContextModule).view_sql)

@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import '@canvas/module-sequence-footer'
 
 const default_course_url =
@@ -425,7 +426,10 @@ test('properly disables the next button when path locked and modules tab disable
   this.$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
   this.server.respond()
 
-  ok(nextButton(this.$testEl).find('a').attr('disabled'), 'disables the button')
+  // we’re adding the 'disabled' attribute to the <a> tag to simulate a disabled state
+  // although <a> tags cannot have a 'disabled' attribute (according to HTML specifications),
+  // we’re using it here to control the behavior via custom CSS and JavaScript
+  equal(nextButton(this.$testEl).find('a').attr('disabled'), 'disabled', 'disables the button')
 })
 
 test('does not disable the next button when path locked and modules tab disabled and not a student', function () {
@@ -436,7 +440,13 @@ test('does not disable the next button when path locked and modules tab disabled
   this.$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
   this.server.respond()
 
-  ok(!nextButton(this.$testEl).find('a').attr('disabled'), 'does not disable the button')
+  // since <a> tags cannot have a disabled attribute, we're checking for the absence of the
+  // attribute to ensure the button is not disabled
+  equal(
+    nextButton(this.$testEl).find('a').attr('disabled'),
+    undefined,
+    'does not disable the button'
+  )
 })
 
 test('properly disables the next button when path processing and modules tab disabled', function () {
@@ -447,7 +457,10 @@ test('properly disables the next button when path processing and modules tab dis
   this.$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
   this.server.respond()
 
-  ok(nextButton(this.$testEl).find('a').attr('disabled'), 'disables the button')
+  // we’re adding the 'disabled' attribute to the <a> tag to simulate a disabled state
+  // although <a> tags cannot have a 'disabled' attribute (according to HTML specifications),
+  // we’re using it here to control the behavior via custom CSS and JavaScript
+  equal(nextButton(this.$testEl).find('a').attr('disabled'), 'disabled', 'disables the button')
 })
 
 test('does not disable the next button when path processing and modules tab disabled and not a student', function () {
@@ -462,7 +475,13 @@ test('does not disable the next button when path processing and modules tab disa
   this.$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
   this.server.respond()
 
-  ok(!nextButton(this.$testEl).find('a').attr('disabled'), 'does not disable the button')
+  // since <a> tags cannot have a disabled attribute, we're checking for the absence of the
+  // attribute to ensure the button is not disabled
+  equal(
+    nextButton(this.$testEl).find('a').attr('disabled'),
+    undefined,
+    'does not disable the button'
+  )
 })
 
 test('does not disable the next button when awaiting choice and modules tab disabled', function () {
@@ -473,7 +492,13 @@ test('does not disable the next button when awaiting choice and modules tab disa
   this.$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
   this.server.respond()
 
-  ok(!nextButton(this.$testEl).find('a').attr('disabled'), 'does not disable the button')
+  // since <a> tags cannot have a disabled attribute, we're checking for the absence of the
+  // attribute to ensure the button is not disabled
+  equal(
+    nextButton(this.$testEl).find('a').attr('disabled'),
+    undefined,
+    'does not disable the button'
+  )
 })
 
 test('properly shows next button when no next items yet exist and paths are locked', function () {

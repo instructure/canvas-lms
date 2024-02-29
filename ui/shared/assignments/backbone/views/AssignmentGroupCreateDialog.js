@@ -53,6 +53,7 @@ AssignmentGroupCreateDialog.prototype.render = function () {
       title: I18n.t('titles.add_assignment_group', 'Add Assignment Group'),
       width: 'auto',
       modal: true,
+      zIndex: 1000,
     })
     .fixDialogButtons()
   this.$el

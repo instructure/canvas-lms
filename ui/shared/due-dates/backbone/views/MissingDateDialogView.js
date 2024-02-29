@@ -111,7 +111,7 @@ MissingDateDialogView.prototype.onAction = function (e) {
 }
 
 MissingDateDialogView.prototype.cancel = function (_e) {
-  if (this.$dialog != null && this.$dialog.data('dialog')) {
+  if (this.$dialog != null && this.$dialog.data('ui-dialog')) {
     this.$dialog.dialog('close').remove()
   }
   if (this.invalidFields[0] != null) {

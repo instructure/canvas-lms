@@ -63,6 +63,8 @@ class PostGradesApp extends React.Component<Props> {
           returnFocusTo.focus()
         }
       },
+      modal: true,
+      zIndex: 1000,
     })
 
     function closeDialog(e) {

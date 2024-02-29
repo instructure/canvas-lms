@@ -108,7 +108,7 @@ export default class PaginatedList {
   // attach events to DOM objects
   // @api private
   addEvents() {
-    this.el.wrapper.delegate('.view-more-link', 'click', this.getData.bind(this))
+    this.el.wrapper.on('click', '.view-more-link', this.getData.bind(this))
   }
 
   // #

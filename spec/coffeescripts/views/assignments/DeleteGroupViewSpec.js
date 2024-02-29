@@ -21,6 +21,7 @@ import AssignmentGroup from '@canvas/assignments/backbone/models/AssignmentGroup
 import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import DeleteGroupView from 'ui/features/assignment_index/backbone/views/DeleteGroupView'
 import $ from 'jquery'
+import 'jquery-migrate'
 import assertions from 'helpers/assertions'
 import '@canvas/jquery/jquery.simulate'
 

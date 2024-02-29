@@ -27,6 +27,7 @@ import {
   setupAnonymizableAuthorId,
 } from 'ui/features/speed_grader/jquery/speed_grader.utils'
 import $ from 'jquery'
+import 'jquery-migrate'
 
 QUnit.module('SpeedGrader', hooks => {
   let $container
@@ -432,7 +433,7 @@ test('disables the button', () => {
     target: $('#resubmit-button'),
   }
   SpeedgraderHelpers.plagiarismResubmitHandler(event, 'http://www.test.com')
-  equal($('#resubmit-button').attr('disabled'), 'disabled')
+  equal($('#resubmit-button').prop('disabled'), true)
   $.ajaxJSON = previousAjaxJson
 })
 

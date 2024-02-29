@@ -2661,7 +2661,7 @@ describe Attachment do
 
       describe "integrity_check" do
         before do
-          allow(@attachment).to receive(:full_filename).and_return(File.join(RSpec.configuration.fixture_path, "good_data.txt"))
+          allow(@attachment).to receive(:full_filename).and_return(file_fixture("good_data.txt").to_s)
         end
 
         include_examples "non-streaming integrity_check"

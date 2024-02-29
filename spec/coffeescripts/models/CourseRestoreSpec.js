@@ -18,6 +18,7 @@
 
 import CourseRestoreModel from 'ui/features/account_admin_tools/backbone/models/CourseRestore'
 import $ from 'jquery'
+import 'jquery-migrate'
 
 const progressCompletedJSON = {
   completion: 0,

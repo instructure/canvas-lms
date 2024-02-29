@@ -443,11 +443,12 @@ class Enrollment < ActiveRecord::Base
   end
 
   def update_linked_enrollments(restore: false)
+    restorable_states = %w[inactive deleted completed]
     observers.each do |observer|
       enrollment = restore ? linked_enrollment_for(observer) : active_linked_enrollment_for(observer)
       if enrollment
         enrollment.update_from(self)
-      elsif restore || (saved_change_to_workflow_state? && ["inactive", "deleted"].include?(workflow_state_before_last_save))
+      elsif restore || (saved_change_to_workflow_state? && restorable_states.include?(workflow_state_before_last_save))
         create_linked_enrollment_for(observer)
       end
     end

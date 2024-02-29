@@ -19,8 +19,6 @@
 
 module Lti::Concerns
   module SessionlessLaunches
-    extend ActiveSupport::Concern
-
     class UnauthorizedClient < StandardError
     end
 

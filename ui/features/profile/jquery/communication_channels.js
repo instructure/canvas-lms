@@ -110,7 +110,7 @@ $(document).ready(function () {
     if (useEmail) {
       $form.find('.sms_email_group').show()
       let email = $form.find('.carrier').val()
-      $form.find('.sms_email').attr('disabled', email !== 'other')
+      $form.find('.sms_email').prop('disabled', email !== 'other')
       if (email === 'other') {
         return
       }

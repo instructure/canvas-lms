@@ -2219,6 +2219,15 @@ class AbstractAssignment < ActiveRecord::Base
     actl&.associated_tool_proxy
   end
 
+  def are_previous_versions_graded(submission)
+    submission.versions.each do |versions|
+      if versions.model.grade.present?
+        return true
+      end
+    end
+    false
+  end
+
   def save_grade_to_submission(submission, original_student, group, opts)
     unless submission.grader_can_grade?
       error_details = submission.grading_error_message
@@ -2227,7 +2236,7 @@ class AbstractAssignment < ActiveRecord::Base
 
     submission.skip_grade_calc = opts[:skip_grade_calc]
 
-    previously_graded = submission.grade.present? || submission.excused?
+    previously_graded = submission.grade.present? || submission.excused? || are_previous_versions_graded(submission)
     return if previously_graded && opts[:dont_overwrite_grade]
     return if submission.user != original_student && submission.excused?
 
@@ -2680,7 +2689,7 @@ class AbstractAssignment < ActiveRecord::Base
 
       candidate_students = visible_group_students.select { |u| user_ids_who_arent_excused.include?(u.id) }
       candidate_students = visible_group_students if candidate_students.empty?
-      candidate_students.sort_by! { |s| enrollment_priority[enrollment_state[s.id]] }
+      candidate_students.sort_by! { |s| [enrollment_priority[enrollment_state[s.id]], s.sortable_name, s.id] }
 
       representative   = candidate_students.detect { |u| user_ids_with_turnitin_data.include?(u.id) || user_ids_with_vericite_data.include?(u.id) }
       representative ||= candidate_students.detect { |u| user_ids_with_submissions.include?(u.id) }
@@ -3897,7 +3906,7 @@ class AbstractAssignment < ActiveRecord::Base
   end
 
   def user_is_moderation_grader?(user)
-    moderation_grader_users.exists?(user)
+    moderation_grader_users.where(id: user).exists?
   end
 
   # This is a helper method intended to ensure the number of provisional graders

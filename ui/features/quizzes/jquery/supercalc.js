@@ -98,10 +98,10 @@ $.fn.superCalc = function (options, more_options) {
     $table.find('tfoot tr:last td:first').append($input.hide())
     $entryBox.data('supercalc_options', options)
     $entryBox.data('supercalc_answer', $input)
-    $table.delegate('.save_formula_button', 'click', () => {
+    $table.on('click', '.save_formula_button', () => {
       $displayBox.triggerHandler('keypress', true)
     })
-    $table.delegate('.delete_formula_row_link', 'click', event => {
+    $table.on('click', '.delete_formula_row_link', event => {
       event.preventDefault()
       $(event.target).parents('tr').remove()
       $entryBox.triggerHandler('calculate')
@@ -112,7 +112,7 @@ $.fn.superCalc = function (options, more_options) {
         $entryBox.triggerHandler('calculate')
       },
     })
-    $table.delegate('.round', 'change', () => {
+    $table.on('change', '.round', () => {
       $entryBox.triggerHandler('calculate')
     })
     $entryBox.bind('calculate', function (event, no_dom) {

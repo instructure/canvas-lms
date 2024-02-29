@@ -20,8 +20,6 @@
 module ConditionalRelease
   module Concerns
     module ApiToNestedAttributes
-      extend ActiveSupport::Concern
-
       ##
       # Transforms an input hash into a form acceptable to accepts_nested_attributes_for
       # and adds destroy requests for any associations not specified.

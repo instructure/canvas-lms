@@ -22,7 +22,7 @@ import htmlEscape, {raw} from '@instructure/html-escape'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.instructure_forms' /* formSubmit, formErrors */
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* showIf, disableIf */
-import 'jqueryui-unpatched/progressbar'
+import 'jqueryui/progressbar'
 
 const I18n = useI18nScope('sis_import')
 
@@ -31,8 +31,8 @@ $(document).ready(function (_event) {
 
   $('#batch_mode')
     .change(function (__event) {
-      $('#batch_mode_term_id_label').showIf($(this).attr('checked'))
-      $('#batch_mode_term_id').showIf($(this).attr('checked'))
+      $('#batch_mode_term_id_label').showIf($(this).prop('checked'))
+      $('#batch_mode_term_id').showIf($(this).prop('checked'))
     })
     .change()
 
@@ -42,10 +42,10 @@ $(document).ready(function (_event) {
   const $add_sis_stickiness_container = $('#add_sis_stickiness_container')
   const $clear_sis_stickiness_container = $('#clear_sis_stickiness_container')
   function updateSisCheckboxes(__event) {
-    $add_sis_stickiness_container.showIf($override_sis_stickiness.attr('checked'))
-    $clear_sis_stickiness_container.showIf($override_sis_stickiness.attr('checked'))
-    $add_sis_stickiness.disableIf($clear_sis_stickiness.attr('checked'))
-    $clear_sis_stickiness.disableIf($add_sis_stickiness.attr('checked'))
+    $add_sis_stickiness_container.showIf($override_sis_stickiness.prop('checked'))
+    $clear_sis_stickiness_container.showIf($override_sis_stickiness.prop('checked'))
+    $add_sis_stickiness.disableIf($clear_sis_stickiness.prop('checked'))
+    $clear_sis_stickiness.disableIf($add_sis_stickiness.prop('checked'))
   }
 
   $override_sis_stickiness.change(updateSisCheckboxes)
@@ -205,7 +205,7 @@ $(document).ready(function (_event) {
           htmlEscape(I18n.t('notices.processing_takes_awhile', 'this may take a bit...')) +
           '</div>'
       )
-      .attr('disabled', true)
+      .prop('disabled', true)
     $('.instruction').hide()
     $('.progress_bar_holder').slideDown()
     $('.copy_progress').progressbar()
@@ -331,7 +331,7 @@ $(document).ready(function (_event) {
     error(data) {
       $(this)
         .find('.submit_button')
-        .attr('disabled', false)
+        .prop('disabled', false)
         .text(I18n.t('buttons.process_data', 'Process Data'))
       $(this).formErrors(data)
     },

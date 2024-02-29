@@ -474,6 +474,7 @@ CanvasRails::Application.routes.draw do
     resources :content_exports, only: %i[create index destroy show]
     get "offline_web_exports" => "courses#offline_web_exports"
     post "start_offline_web_export" => "courses#start_offline_web_export"
+    get "start_offline_web_export" => "courses#start_offline_web_export"
     get "modules/items/assignment_info" => "context_modules#content_tag_assignment_data", :as => :context_modules_assignment_info
     get "modules/items/master_course_info" => "context_modules#content_tag_master_course_data", :as => :context_modules_master_course_info
     get "modules/items/:id" => "context_modules#item_redirect", :as => :context_modules_item_redirect
@@ -2619,6 +2620,10 @@ CanvasRails::Application.routes.draw do
       get "courses/:course_id/smartsearch", action: :search, as: :course_smart_search_query
       # TODO: add account level search
     end
+
+    scope(controller: "user_notes") do
+      put "users/:user_id/user_notes/suppress_deprecation_notice", action: :suppress_deprecation_notice
+    end
   end
 
   # this is not a "normal" api endpoint in the sense that it is not documented or
@@ -2665,6 +2670,8 @@ CanvasRails::Application.routes.draw do
   get "login/oauth2/jwks" => "security#jwks", :as => :oauth2_jwks
 
   get "post_message_forwarding", controller: "lti/platform_storage", action: :post_message_forwarding, as: :lti_post_message_forwarding
+
+  get "lti/tool_default_icon" => "lti/tool_default_icon#show"
 
   ApiRouteSet.draw(self, "/api/lti/v1") do
     post "tools/:tool_id/grade_passback", controller: :lti_api, action: :grade_passback, as: "lti_grade_passback_api"
@@ -2792,7 +2799,7 @@ CanvasRails::Application.routes.draw do
       get "accounts/:account_id/registrations/uuid/:registration_uuid", action: :registration_by_uuid
       put "accounts/:account_id/registrations/:registration_id/overlay", action: :update_registration_overlay
       get "registrations/:registration_id/view", action: :registration_view, as: :lti_registration_config
-      post "registrations", action: :create
+      post "registrations", action: :create, as: :create_lti_registration
     end
 
     # Public JWK Service

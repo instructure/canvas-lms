@@ -31,6 +31,7 @@ export const Conversation = {
       contextId
       contextType
       contextName
+      contextAssetString
       subject
       canReply
       isPrivate
@@ -49,6 +50,7 @@ export const Conversation = {
     contextId: string,
     contextType: string,
     contextName: string,
+    contextAssetString: string,
     subject: string,
     canReply: bool,
     isPrivate: bool,
@@ -67,6 +69,7 @@ export const Conversation = {
     contextId = '195',
     contextType = 'Course',
     contextName = 'XavierSchool',
+    contextAssetString = 'course_195',
     subject = 'testing 123',
     canReply = true,
     isPrivate = false,
@@ -129,6 +132,7 @@ export const Conversation = {
     contextId,
     contextType,
     contextName,
+    contextAssetString,
     subject,
     conversationMessagesConnection,
     conversationMessagesCount,

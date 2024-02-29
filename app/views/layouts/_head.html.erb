@@ -47,6 +47,7 @@
     INST = <%= benchmark("rendering INST") { raw(inst_env.to_json) } %>;
     ENV = <%= benchmark("rendering ENV") { raw(render_js_env) } %>;
     BRANDABLE_CSS_HANDLEBARS_INDEX = <%= benchmark("rendering BRANDABLE_CSS_HANDLEBARS_INDEX") { raw(BrandableCSS.handlebars_index_json) } %>
+    REMOTES = <%= benchmark("rendering REMOTES") { raw(remote_env.to_json) } %>;
   </script>
   <%= benchmark("include_head_js") { include_head_js } %>
   <% @xhrs_to_prefetch_from_controller&.each do |(args, kwargs)| -%>

@@ -639,7 +639,7 @@ RSpec.configure do |config|
   end
 
   def fixture_file_upload(path, mime_type = nil, binary = false)
-    Rack::Test::UploadedFile.new(File.join(RSpec.configuration.fixture_path, path), mime_type, binary)
+    Rack::Test::UploadedFile.new(file_fixture(path), mime_type, binary)
   end
 
   def default_uploaded_data

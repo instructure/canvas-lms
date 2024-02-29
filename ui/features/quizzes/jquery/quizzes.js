@@ -136,13 +136,13 @@ const renderDueDates = lockedItems => {
 
     if (ENV.FEATURES?.differentiated_modules) {
       overrideView.bind('tray:open', () => {
-        $('#quiz_edit_wrapper .btn.save_quiz_button').attr('disabled', true)
-        $('#quiz_edit_wrapper .btn.save_and_publish').attr('disabled', true)
+        $('#quiz_edit_wrapper .btn.save_quiz_button').prop('disabled', true)
+        $('#quiz_edit_wrapper .btn.save_and_publish').prop('disabled', true)
       })
 
       overrideView.bind('tray:close', () => {
-        $('#quiz_edit_wrapper .btn.save_quiz_button').attr('disabled', false)
-        $('#quiz_edit_wrapper .btn.save_and_publish').attr('disabled', false)
+        $('#quiz_edit_wrapper .btn.save_quiz_button').prop('disabled', false)
+        $('#quiz_edit_wrapper .btn.save_and_publish').prop('disabled', false)
       })
     }
 
@@ -1948,14 +1948,14 @@ ready(function () {
   const $quiz_edit_wrapper = $('#quiz_edit_wrapper')
   $('.datetime_field').datetime_field()
   $('#questions')
-    .delegate('.group_top,.question,.answer_select,.comment', 'mouseover', function (event) {
+    .on('mouseover', '.group_top,.question,.answer_select,.comment', function (event) {
       $(this).addClass('hover')
     })
-    .delegate('.group_top,.question,.answer_select,.comment', 'mouseout', function (event) {
+    .on('mouseout', '.group_top,.question,.answer_select,.comment', function (event) {
       $(this).removeClass('hover')
     })
 
-  $('#questions').delegate('.answer', 'mouseover', function (event) {
+  $('#questions').on('mouseover', '.answer', function (event) {
     $('#questions .answer.hover').removeClass('hover')
     $(this).addClass('hover')
   })
@@ -1963,21 +1963,21 @@ ready(function () {
   $quiz_options_form
     .find('#extend_due_at')
     .change(function () {
-      $('#quiz_lock_after').showIf($(this).attr('checked'))
+      $('#quiz_lock_after').showIf($(this).prop('checked'))
     })
     .change()
 
   $quiz_options_form
     .find('#time_limit_option')
     .change(function () {
-      $('label[for="quiz_disable_timer_autosubmission"]').showIf($(this).attr('checked'))
+      $('label[for="quiz_disable_timer_autosubmission"]').showIf($(this).prop('checked'))
     })
     .change()
 
   $quiz_options_form
     .find('#multiple_attempts_option')
     .change(function (event) {
-      $('#multiple_attempts_suboptions').showIf($(this).attr('checked'))
+      $('#multiple_attempts_suboptions').showIf($(this).prop('checked'))
       const $text = $('#multiple_attempts_suboptions #quiz_allowed_attempts')
 
       if ($text.val() == '-1') {
@@ -1989,7 +1989,7 @@ ready(function () {
   $quiz_options_form
     .find('#time_limit_option')
     .change(function (event, noFocus) {
-      if (!$(this).attr('checked')) {
+      if (!$(this).prop('checked')) {
         $('#quiz_time_limit').val('')
       } else if (!noFocus) {
         $('#quiz_time_limit').focus()
@@ -2000,7 +2000,7 @@ ready(function () {
   $('#limit_attempts_option')
     .change(function (event, noFocus) {
       const $item = $('#quiz_allowed_attempts')
-      if ($(this).attr('checked')) {
+      if ($(this).prop('checked')) {
         let val = parseInt($item.data('saved_value') || $item.val() || '2', 10)
         if (val == -1 || Number.isNaN(Number(val))) {
           val = 1
@@ -2075,17 +2075,17 @@ ready(function () {
   })
 
   $('#quiz_require_lockdown_browser').change(function () {
-    $('#lockdown_browser_suboptions').showIf($(this).attr('checked'))
-    $('#quiz_require_lockdown_browser_for_results').attr('checked', true).change()
+    $('#lockdown_browser_suboptions').showIf($(this).prop('checked'))
+    $('#quiz_require_lockdown_browser_for_results').prop('checked', true).change()
   })
 
-  $('#lockdown_browser_suboptions').showIf($('#quiz_require_lockdown_browser').attr('checked'))
+  $('#lockdown_browser_suboptions').showIf($('#quiz_require_lockdown_browser').prop('checked'))
 
-  $('#ip_filters_dialog').delegate('.ip_filter', 'click', function (event) {
+  $('#ip_filters_dialog').on('click', '.ip_filter', function (event) {
     event.preventDefault()
     const filter = $(this).getTemplateData({textValues: ['filter']}).filter
-    $('#protect_quiz').attr('checked', true).triggerHandler('change')
-    $('#ip_filter').attr('checked', true).triggerHandler('change')
+    $('#protect_quiz').prop('checked', true).triggerHandler('change')
+    $('#ip_filter').prop('checked', true).triggerHandler('change')
     $('#quiz_ip_filter').val(filter)
     $('#ip_filters_dialog').dialog('close')
   })
@@ -2136,9 +2136,9 @@ ready(function () {
   $('#quiz_one_question_at_a_time')
     .change(function () {
       const $this = $(this)
-      $('#one_question_at_a_time_options').showIf($this.attr('checked'))
-      if (!$this.attr('checked')) {
-        $('#quiz_cant_go_back').attr('checked', false)
+      $('#one_question_at_a_time_options').showIf($this.prop('checked'))
+      if (!$this.prop('checked')) {
+        $('#quiz_cant_go_back').prop('checked', false)
       }
     })
     .triggerHandler('change')
@@ -2179,7 +2179,7 @@ ready(function () {
           $attempts.val('')
         }
       } else {
-        $('#hide_results_only_after_last').attr('checked', false)
+        $('#hide_results_only_after_last').prop('checked', false)
         $('#hide_results_only_after_last_holder').hide()
       }
     })
@@ -2328,8 +2328,8 @@ ready(function () {
     },
 
     beforeSubmit(data) {
-      $quiz_edit_wrapper.find('.btn.save_quiz_button').attr('disabled', true)
-      $quiz_edit_wrapper.find('.btn.save_and_publish').attr('disabled', true)
+      $quiz_edit_wrapper.find('.btn.save_quiz_button').prop('disabled', true)
+      $quiz_edit_wrapper.find('.btn.save_and_publish').prop('disabled', true)
     },
 
     onSubmit(promise, data) {
@@ -2388,12 +2388,12 @@ ready(function () {
       function error(data) {
         $('#quiz_edit_wrapper')
           .find('.btn.save_quiz_button')
-          .attr('disabled', false)
+          .prop('disabled', false)
           .removeClass('saving')
           .text(I18n.t('buttons.save', 'Save'))
         $('#quiz_edit_wrapper')
           .find('.btn.save_and_publish')
-          .attr('disabled', false)
+          .prop('disabled', false)
           .removeClass('saving')
           .text(I18n.t('buttons.save_and_publish', 'Save & Publish'))
         $('#quiz_edit_wrapper').find('input[name="publish"]').remove()
@@ -2417,7 +2417,7 @@ ready(function () {
         .find('.btn.save_quiz_button')
         .addClass('saving')
         .text(I18n.t('buttons.saving', 'Saving...'))
-      $quiz_options_form.data('submit_type', 'save_only').submit()
+      $quiz_options_form.data('submit_type', 'save_only').trigger('submit')
     })
     .end()
 
@@ -2428,20 +2428,20 @@ ready(function () {
       event.stopPropagation()
 
       const $publish_input = $(document.createElement('input'))
-      $publish_input.attr('type', 'hidden').attr('name', 'publish').attr('value', 'true')
+      $publish_input.attr('type', 'hidden').attr('name', 'publish').prop('value', 'true')
       $quiz_options_form.append($publish_input)
 
       $quiz_edit_wrapper
         .find('.btn.save_and_publish')
         .addClass('saving')
         .text(I18n.t('buttons.saving', 'Saving...'))
-      $quiz_options_form.data('submit_type', 'save_only').submit()
+      $quiz_options_form.data('submit_type', 'save_only').trigger('submit')
     })
     .end()
 
   $('#show_question_details')
     .change(function (event) {
-      $('#questions').toggleClass('brief', !$(this).attr('checked'))
+      $('#questions').toggleClass('brief', !$(this).prop('checked'))
     })
     .triggerHandler('change')
 
@@ -2514,7 +2514,7 @@ ready(function () {
       .click()
   })
 
-  $(document).delegate('.blank_id_select', 'change', function () {
+  $(document).on('change', '.blank_id_select', function () {
     const variable = $(this).val()
     const idx = $(this)[0].selectedIndex
     $(this).closest('.question').find('.answer').css('display', 'none')
@@ -2549,7 +2549,7 @@ ready(function () {
 
   $('.blank_id_select').change()
 
-  $(document).delegate('.delete_question_link', 'click', function (event) {
+  $(document).on('click', '.delete_question_link', function (event) {
     event.preventDefault()
     $(this)
       .parents('.question_holder')
@@ -2566,7 +2566,7 @@ ready(function () {
       })
   })
 
-  $(document).delegate('.edit_question_link', 'click', function (event) {
+  $(document).on('click', '.edit_question_link', function (event) {
     event.preventDefault()
     var $question = $(this).parents('.question')
     setQuestionID($question)
@@ -2776,7 +2776,7 @@ ready(function () {
   })
 
   // attach HTML answers but only when they click the button
-  $('#questions').delegate('.edit_html', 'click', function (event) {
+  $('#questions').on('click', '.edit_html', function (event) {
     event.preventDefault()
     const $this = $(this)
     let toggler = $this.data('editorToggle')
@@ -2795,7 +2795,7 @@ ready(function () {
     toggler.toggle()
   })
 
-  $(document).delegate('div.answer_comments, a.comment_focus', 'click', function (event) {
+  $(document).on('click', 'div.answer_comments, a.comment_focus', function (event) {
     event.preventDefault()
     const $link = $(this)
     const $comment = $link.closest('.question_comment, .answer_comments')
@@ -2833,18 +2833,18 @@ ready(function () {
 
   // while focusing on an answer comment box, trigger its click event when the
   // Space or Enter key is pressed
-  $(document).delegate('.answer_comments', 'keyup', function (event) {
+  $(document).on('keyup', '.answer_comments', function (event) {
     const keycode = event.keyCode || event.which
     if ([13, 32].indexOf(keycode) > -1) $(this).click()
   })
 
   $(document)
-    .delegate('.numerical_answer_type', 'change', function () {
+    .on('change', '.numerical_answer_type', function () {
       numericalAnswerTypeChange($(this))
     })
     .change()
 
-  $(document).delegate('.select_answer_link', 'click', function (event) {
+  $(document).on('click', '.select_answer_link', function (event) {
     event.preventDefault()
 
     const $question = $(this).parents('.question')
@@ -2914,7 +2914,9 @@ ready(function () {
     const optionText = option.next('span')
     REGRADE_OPTIONS[$question.data('questionID')] = option.val()
     $question.find('.' + optionText.attr('class')).remove()
-    $(newAnswerData.newAnswer).append(htmlEscape(option.next('span')))
+    const $regradeInfoSpan = $('<span id="regrade_info_span">')
+    $regradeInfoSpan.append(htmlEscape(option.next('span').text()))
+    $(newAnswerData.newAnswer).append($regradeInfoSpan)
     $(newAnswerData.newAnswer).parents('.answer').append(htmlEscape(optionText))
     option.hide()
     $question.append(htmlEscape(option))
@@ -2945,15 +2947,15 @@ ready(function () {
   function disableRegrade(holder) {
     holder.find('.regrade_enabled').hide()
     holder.find('.regrade_disabled').show()
-    holder.find('input[name="regrade_option"]').attr('disabled', true)
-    holder.find('input[name="regrade_option"]').attr('checked', false)
+    holder.find('input[name="regrade_option"]').prop('disabled', true)
+    holder.find('input[name="regrade_option"]').prop('checked', false)
     holder.find('input[name="regrade_disabled"]').val('1')
   }
 
   function disableQuestionForm() {
     $('.question_form')
       .find('.submit_button')
-      .attr('disabled', true)
+      .prop('disabled', true)
       .addClass('disabled')
       .removeClass('button_primary btn-primary')
   }
@@ -3042,7 +3044,7 @@ ready(function () {
     if (questionLimitReached()) return
     $('.question_form .submit_button:visible,.quiz_group_form .submit_button:visible').each(
       function () {
-        $(this).parents('form').submit()
+        $(this).parents('form').trigger('submit')
       }
     )
     const $group_top = $('#group_top_template').clone(true).attr('id', 'group_top_new')
@@ -3059,7 +3061,7 @@ ready(function () {
   $('.add_question_link').click(function (event) {
     event.preventDefault()
     if (questionLimitReached()) return
-    $('.question_form:visible,.group_top.editing .quiz_group_form:visible').submit()
+    $('.question_form:visible,.group_top.editing .quiz_group_form:visible').trigger('submit')
     const $question = makeQuestion()
     if ($(this).parents('.group_top').length > 0) {
       const groupID = $(this).parents('.group_top')[0].id.replace('group_top_', '')
@@ -3086,16 +3088,15 @@ ready(function () {
     $question.find(':input:first').focus().select()
   })
 
-  quiz.$questions.delegate('.group_top input[name="quiz_group[pick_count]"]', {
-    focus() {
+  quiz.$questions
+    .on('focus', '.group_top input[name="quiz_group[pick_count]"]', function () {
       $(this).data('prev-value', this.value)
-    },
-    change() {
+    })
+    .on('change', '.group_top input[name="quiz_group[pick_count]"]', function () {
       if (questionLimitReached(true)) {
         this.value = $(this).data('prev-value')
       }
-    },
-  })
+    })
 
   const $findBankDialog = $('#find_bank_dialog')
 
@@ -3141,7 +3142,7 @@ ready(function () {
       )
     }
     $dialog.find('.bank.selected').removeClass('selected')
-    $dialog.find('.submit_button').attr('disabled', true)
+    $dialog.find('.submit_button').prop('disabled', true)
     $dialog.dialog({
       title: I18n.t('titles.find_question_bank', 'Find Question Bank'),
       width: 600,
@@ -3152,15 +3153,15 @@ ready(function () {
   })
 
   $findBankDialog
-    .delegate('.bank', 'click keydown', function (e) {
+    .on('click keydown', '.bank', function (e) {
       const keyboardClick = e.type === 'keydown' && (e.keyCode === 13 || e.keyCode === 32)
       if (e.type === 'click' || keyboardClick) {
         $findBankDialog.find('.bank.selected').removeClass('selected')
         $(this).addClass('selected')
-        $findBankDialog.find('.submit_button').attr('disabled', false)
+        $findBankDialog.find('.submit_button').prop('disabled', false)
       }
     })
-    .delegate('.submit_button', 'click', () => {
+    .on('click', '.submit_button', () => {
       const $bank = $findBankDialog.find('.bank.selected:first')
       const bank = $bank.data('bank_data')
       const $form = $findBankDialog.data('form')
@@ -3174,7 +3175,7 @@ ready(function () {
       $formBank.show().fillTemplateData({data: bank}).data('bank_data', bank)
       $findBankDialog.dialog('close')
     })
-    .delegate('.cancel_button', 'click', () => {
+    .on('click', '.cancel_button', () => {
       $findBankDialog.dialog('close')
     })
 
@@ -3270,7 +3271,7 @@ ready(function () {
       $dialog.find('.questions_count').text(question_ids.length)
       $dialog
         .find('button')
-        .attr('disabled', false)
+        .prop('disabled', false)
         .filter('.submit_button')
         .text(I18n.t('buttons.create_group', 'Create Group'))
       $dialog.dialog({
@@ -3285,7 +3286,7 @@ ready(function () {
     const $dialog = $('#add_question_group_dialog')
     $dialog
       .find('button')
-      .attr('disabled', true)
+      .prop('disabled', true)
       .filter('.submit_button')
       .text(I18n.t('buttons.creating_group', 'Creating Group...'))
 
@@ -3313,7 +3314,7 @@ ready(function () {
       data => {
         $dialog
           .find('button')
-          .attr('disabled', false)
+          .prop('disabled', false)
           .filter('.submit_button')
           .text(I18n.t('buttons.create_group', 'Create Group'))
 
@@ -3338,7 +3339,7 @@ ready(function () {
       data => {
         $dialog
           .find('button')
-          .attr('disabled', false)
+          .prop('disabled', false)
           .filter('.submit_button')
           .text(I18n.t('errors.creating_group_failed', 'Create Group Failed, Please Try Again'))
       }
@@ -3394,7 +3395,7 @@ ready(function () {
   }
 
   $('#find_question_dialog')
-    .delegate('.bank', 'click', function (event) {
+    .on('click', '.bank', function (event) {
       event.preventDefault()
       const id = $(this).getTemplateData({textValues: ['id']}).id
       const data = $findQuestionDialog.data('banks')[id]
@@ -3418,7 +3419,7 @@ ready(function () {
         showQuestions(data)
       }
     })
-    .delegate('.page_link', 'click', function (event) {
+    .on('click', '.page_link', function (event) {
       event.preventDefault()
       const $link = $(this)
       if ($link.hasClass('loading')) {
@@ -3470,22 +3471,22 @@ ready(function () {
         }
       )
     })
-    .delegate('.select_all_link', 'click', event => {
+    .on('click', '.select_all_link', event => {
       event.preventDefault()
       $findQuestionDialog
         .find('.question_list .found_question:not(.blank) :checkbox')
-        .attr('checked', true)
+        .prop('checked', true)
     })
-    .delegate('.clear_all_link', 'click', event => {
+    .on('click', '.clear_all_link', event => {
       event.preventDefault()
       $findQuestionDialog
         .find('.question_list .found_question:not(.blank) :checkbox')
-        .attr('checked', false)
+        .prop('checked', false)
     })
-    .delegate('.cancel_button', 'click', event => {
+    .on('click', '.cancel_button', event => {
       $findQuestionDialog.dialog('close')
     })
-    .delegate('.group_button', 'click', function (event) {
+    .on('click', '.group_button', function (event) {
       const $dialog = $('#add_found_questions_as_group_dialog')
       const question_ids = []
       $findQuestionDialog.find('.question_list :checkbox:checked').each(function () {
@@ -3499,7 +3500,7 @@ ready(function () {
         zIndex: 1000,
       })
     })
-    .delegate('.submit_button', 'click', function (event) {
+    .on('click', '.submit_button', function (event) {
       const question_ids = []
       $findQuestionDialog.find('.question_list :checkbox:checked').each(function () {
         question_ids.push($(this).parents('.found_question').data('question_data').id)
@@ -3514,7 +3515,7 @@ ready(function () {
       const url = $findQuestionDialog.find('.add_questions_url').attr('href')
       $findQuestionDialog
         .find('button')
-        .attr('disabled', true)
+        .prop('disabled', true)
         .filter('.submit_button')
         .text(I18n.t('buttons.adding_questions', 'Adding Questions...'))
       $.ajaxJSON(
@@ -3524,7 +3525,7 @@ ready(function () {
         question_results => {
           $findQuestionDialog
             .find('button')
-            .attr('disabled', false)
+            .prop('disabled', false)
             .filter('.submit_button')
             .text(I18n.t('buttons.add_selected_questions', 'Add Selected Questions'))
           $findQuestionDialog.find('.selected_side_tab').removeClass('selected_side_tab')
@@ -3547,7 +3548,7 @@ ready(function () {
         data => {
           $findQuestionDialog
             .find('button')
-            .attr('disabled', false)
+            .prop('disabled', false)
             .filter('.submit_button')
             .text(
               I18n.t('errors.adding_questions_failed', 'Adding Questions Failed, please try again')
@@ -3708,7 +3709,7 @@ ready(function () {
     }
   })
 
-  $(document).delegate('.answer_comment_holder', 'click', function (event) {
+  $(document).on('click', '.answer_comment_holder', function (event) {
     $(this).find('.answer_comment').slideToggle()
   })
 
@@ -3994,12 +3995,12 @@ ready(function () {
   })
 
   $(document)
-    .delegate('input.float_value', 'keydown', event => {
+    .on('keydown', 'input.float_value', event => {
       if (event.keyCode > 57 && event.keyCode < 91 && event.keyCode != 69) {
         event.preventDefault()
       }
     })
-    .delegate('input.float_value', 'change blur focus', function (event) {
+    .on('change blur focus', 'input.float_value', function (event) {
       const $el = $(this)
 
       if ($el.hasClass('long')) {
@@ -4014,20 +4015,20 @@ ready(function () {
     })
 
   $(document)
-    .delegate('input.precision_value', 'keydown', event => {
+    .on('keydown', 'input.precision_value', event => {
       // unless movement key || '0' through '9' || '-' || '+'
       if (event.keyCode > 57 && event.keyCode != 189 && event.keyCode != 187) {
         event.preventDefault()
       }
     })
-    .delegate('input.precision_value', 'change blur focus', function (event) {
+    .on('change blur focus', 'input.precision_value', function (event) {
       const $el = $(this)
       quiz.parseInputRange($el, 'int', 1, 16)
       $el.siblings('.float_value.precision').change()
     })
 
   $('#questions')
-    .delegate('.question_teaser_link', 'click', function (event) {
+    .on('click', '.question_teaser_link', function (event) {
       event.preventDefault()
       const $teaser = $(this).parents('.question_teaser')
       const question_data = $teaser.data('question')
@@ -4079,11 +4080,11 @@ ready(function () {
         }
       }
     })
-    .delegate('.teaser.question_text', 'click', function (event) {
+    .on('click', '.teaser.question_text', function (event) {
       event.preventDefault()
       $(this).parents('.question_teaser').find('.question_teaser_link').click()
     })
-    .delegate('.edit_teaser_link', 'click', function (event) {
+    .on('click', '.edit_teaser_link', function (event) {
       event.preventDefault()
       $(this).parents('.question_teaser').addClass('to_edit')
       $(this).parents('.question_teaser').find('.question_teaser_link').click()
@@ -4292,7 +4293,7 @@ ready(function () {
 
     buildPlaceMenu(event) {
       const option = $(event.target).find('option:selected')
-      const value = option.length > 0 ? option.attr('value') : 'top'
+      const value = option.length > 0 ? option.prop('value') : 'top'
 
       // filter by selected
       const filtered = this.itemsInGroup(value)
@@ -4335,6 +4336,7 @@ ready(function () {
           height: displayGroupSelector ? 345 : 265,
           close: this.removeEventListeners.bind(this),
           open: this.focusDialog.bind(this),
+          zIndex: 1000,
         })
         .dialog('open')
 
@@ -4362,7 +4364,7 @@ ready(function () {
 
       // get selected values
       const option = this.$form.find('#move_select_group option:selected')
-      const group = option.length > 0 ? option.attr('value') : 'top'
+      const group = option.length > 0 ? option.prop('value') : 'top'
 
       this.reorderDom(group)
       this.ajaxPostReorder(group)
@@ -4373,7 +4375,7 @@ ready(function () {
 
     reorderDom(group) {
       const option = this.$form.find('#move_select_question option:selected')
-      const place = option.attr('value')
+      const place = option.prop('value')
       const bottom = this.selected.sortable.nextAll('.group_bottom').first()
 
       // move to bottom of the group
@@ -4457,7 +4459,7 @@ ready(function () {
 
     buildGroupParams(group) {
       const option = this.$form.find('#move_select_question option:selected')
-      const place = option.attr('value')
+      const place = option.prop('value')
 
       // rebuild the group list adding in our selection
       const selected = this.selected
@@ -4626,7 +4628,7 @@ ready(function () {
   })
 
   $(document)
-    .delegate('.edit_group_link', 'click', function (event) {
+    .on('click', '.edit_group_link', function (event) {
       if ($(this).closest('.group_top').length === 0) {
         return
       }
@@ -4642,7 +4644,7 @@ ready(function () {
         .attr('method', 'PUT')
       $top.find('.submit_button').text(I18n.t('buttons.update_group', 'Update Group'))
     })
-    .delegate('.delete_group_link', 'click', function (event) {
+    .on('click', '.delete_group_link', function (event) {
       if ($(this).closest('.group_top').length === 0) {
         return
       }
@@ -4668,7 +4670,7 @@ ready(function () {
         },
       })
     })
-    .delegate('.group_edit.cancel_button', 'click', function (event) {
+    .on('click', '.group_edit.cancel_button', function (event) {
       if ($(this).closest('.group_top').length === 0) {
         return
       }
@@ -4689,7 +4691,7 @@ ready(function () {
       }
       quiz.updateDisplayComments()
     })
-    .delegate('.collapse_link', 'click', function (event) {
+    .on('click', '.collapse_link', function (event) {
       if ($(this).closest('.group_top').length === 0) {
         return
       }
@@ -4708,7 +4710,7 @@ ready(function () {
         $obj = $obj.next()
       }
     })
-    .delegate('.expand_link', 'click', function (event) {
+    .on('click', '.expand_link', function (event) {
       if ($(this).closest('.group_top').length === 0) {
         return
       }
@@ -4921,7 +4923,7 @@ $.fn.formulaQuestion = function () {
   })
   $question.find('.compute_combinations').click(function () {
     const $button = $(this)
-    $button.text(I18n.t('buttons.generating', 'Generating...')).attr('disabled', true)
+    $button.text(I18n.t('buttons.generating', 'Generating...')).prop('disabled', true)
     const question_type = $question.find('.question_type').val()
     if (question_type !== 'calculated_question') {
       return
@@ -4950,7 +4952,7 @@ $.fn.formulaQuestion = function () {
     const mod = 0
     const finished = function () {
       $question.find('.supercalc').superCalc('clear_cached_finds')
-      $button.text('Generate').attr('disabled', false)
+      $button.text('Generate').prop('disabled', false)
       if (succeeded == 0) {
         alert(
           I18n.t(
@@ -5071,7 +5073,7 @@ $.fn.formulaQuestion = function () {
     const variables = $question.find('.variables tbody tr.variable').length > 0
     const formulas = $question.find('.formulas .formula').length > 0
 
-    $question.find('.combinations_option').attr('disabled', !variables || !formulas)
+    $question.find('.combinations_option').prop('disabled', !variables || !formulas)
     $question.find('.variables_specified').showIf(variables)
     $question.find('.formulas_specified').showIf(formulas)
     if ($question.hasClass('ready') && remove) {
@@ -5082,7 +5084,7 @@ $.fn.formulaQuestion = function () {
       .showIf($question.find('.combinations tbody tr').length > 0)
   })
 
-  $question.find('.variables').delegate('.variable_setting', 'change', (event, options) => {
+  $question.find('.variables').on('change', '.variable_setting', (event, options) => {
     const question_type = $question.find('.question_type').val()
     if (question_type !== 'calculated_question') {
       return
@@ -5125,9 +5127,11 @@ $.fn.formulaQuestion = function () {
     $('#help_with_equations_dialog').dialog({
       title: I18n.t('titles.help_with_formulas', 'Help with Quiz Question Formulas'),
       width: 500,
+      modal: true,
+      zIndex: 1000,
     })
   })
-  $question.find('.combinations_option').attr('disabled', true)
+  $question.find('.combinations_option').prop('disabled', true)
   $question.find('.question_content').bind('keypress', event => {
     setTimeout(() => {
       $(event.target).triggerHandler('change')

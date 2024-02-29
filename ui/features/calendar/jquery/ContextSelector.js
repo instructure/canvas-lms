@@ -134,7 +134,7 @@ class ContextSelectorItem {
     const checked = this.$sectionCheckboxes.filter(':checked')
     if (
       checked.length === this.$sectionCheckboxes.length &&
-      !this.$contentCheckbox.attr('disabled')
+      !this.$contentCheckbox.prop('disabled')
     ) {
       return []
     } else {

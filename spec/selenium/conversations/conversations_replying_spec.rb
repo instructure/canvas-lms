@@ -61,6 +61,27 @@ describe "conversations new" do
         expect(ffj("span:contains('Please select a recipient.')")[1]).to be_displayed
       end
 
+      it "only displays students in the selected course context when selecting students to reply to", :ignore_js_errors do
+        @course1 = @course
+        @course2 = course_factory(active_course: true, course_name: "Course 2")
+        @s3 = user_factory(name: "second student")
+        teacher_in_course(user: @teacher, course: @course2, active_all: true)
+        student_in_course(user: @s3, active_all: true, course: @course2)
+
+        @convo.update_attribute(:context, @course1)
+        get "/conversations"
+        f("div[data-testid='conversation']").click
+        wait_for_ajaximations
+        f("button[data-testid='message-reply']").click
+
+        ff("input[aria-label='Search']")[1].click
+        expect(f("body")).not_to contain_jqcss("div[data-testid='address-book-item']:contains('Users')")
+        fj("div[data-testid='address-book-item']:contains('Students')").click
+        expect(fj("div[data-testid='address-book-item']:contains('first student')")).to be_present
+        expect(fj("div[data-testid='address-book-item']:contains('second student')")).to be_present
+        expect(f("body")).not_to contain_jqcss("div[data-testid='address-book-item']:contains('third student')")
+      end
+
       it "allows adding a new recipient", :ignore_js_errors do
         get "/conversations"
         f("div[data-testid='conversation']").click
@@ -72,7 +93,6 @@ describe "conversations new" do
 
         f("textarea[data-testid='message-body']").send_keys("new recipient")
         ff("input[aria-label='Search']")[1].click
-        fj("div[data-testid='address-book-item']:contains('Users')").click
         fj("div[data-testid='address-book-item']:contains('first student')").click
         f("button[data-testid='send-button']").click
         wait_for_ajaximations

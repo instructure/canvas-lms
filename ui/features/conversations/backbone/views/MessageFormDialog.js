@@ -109,6 +109,8 @@ export default class MessageFormDialog extends DialogBaseView {
           click: e => this.sendMessage(e),
         },
       ],
+      modal: true,
+      zIndex: 1000,
     }
   }
 
@@ -588,7 +590,7 @@ export default class MessageFormDialog extends DialogBaseView {
   }
 
   removeEmptyAttachments() {
-    each(this.$attachments.find('input[value=]'), node => this.removeAttachment(node))
+    each(this.$attachments.find('input:not([value])'), node => this.removeAttachment(node))
   }
 
   removeAttachment(node) {

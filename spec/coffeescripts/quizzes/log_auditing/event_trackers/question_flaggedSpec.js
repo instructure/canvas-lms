@@ -19,6 +19,7 @@
 import Subject from '@canvas/quiz-log-auditing/jquery/event_trackers/question_flagged'
 import K from '@canvas/quiz-log-auditing/jquery/constants'
 import $ from 'jquery'
+import 'jquery-migrate'
 
 QUnit.module('Quizzes::LogAuditing::EventTrackers::QuestionFlagged', {
   setup() {},

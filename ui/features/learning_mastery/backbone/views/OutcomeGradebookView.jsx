@@ -503,7 +503,12 @@ OutcomeGradebookView.prototype.setOutcomeOrder = function () {
     }
   })
 
-  $.post(this._assignOrderUrl(course_id), JSON.stringify(outcomes))
+  $.ajax({
+    url: this._assignOrderUrl(course_id),
+    type: 'POST',
+    data: JSON.stringify(outcomes),
+    contentType: 'application/json; charset=utf-8'
+  })
 
   return Grid.View.redrawHeader(this.grid, Grid.averageFn)
 }

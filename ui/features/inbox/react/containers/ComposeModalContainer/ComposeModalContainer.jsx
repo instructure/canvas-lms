@@ -116,29 +116,52 @@ const ComposeModalContainer = props => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [recipientsObserversData, recipientsObserversDataLoading, recipientsObserversError])
 
+  const getContextName = contextId => {
+    const courseOptions = [
+      props.courses?.favoriteCoursesConnection?.nodes,
+      props.courses?.favoriteGroupsConnection.nodes,
+    ]
+
+    const mergeOptions = lists => {
+      return lists.flatMap(list =>
+        list.map(option => ({
+          assetString: option.assetString,
+          contextName: option.contextName,
+        }))
+      )
+    }
+
+    const mergedOptions = mergeOptions(courseOptions)
+
+    return mergedOptions.find(item => item.assetString === contextId)?.contextName
+  }
+
   useEffect(() => {
-    if (!props.isReply && !props.isForward && props.currentCourseFilter) {
-      const courseOptions = [
-        props.courses?.favoriteCoursesConnection?.nodes,
-        props.courses?.favoriteGroupsConnection.nodes,
-      ]
-
-      const mergeOptions = lists => {
-        return lists.flatMap(list =>
-          list.map(option => ({
-            assetString: option.assetString,
-            contextName: option.contextName,
-          }))
-        )
-      }
-
-      const mergedOptions = mergeOptions(courseOptions)
+    if (
+      (props.isReply || props.isForward) &&
+      ['Course', 'Group'].includes(props.pastConversation?.contextType)
+    ) {
       setSelectedContext({
-        contextID: props.currentCourseFilter,
-        contextName: mergedOptions.find(item => item.assetString === props.currentCourseFilter)
-          ?.contextName,
+        contextID: props.pastConversation?.contextAssetString,
+        contextName: props.pastConversation?.contextName,
+      })
+    } else if (props.contextIdFromUrl) {
+      setSelectedContext({
+        contextID: props.contextIdFromUrl,
+        contextName: getContextName(props.contextIdFromUrl),
       })
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => {
+    if (!props.isReply && !props.isForward && props.currentCourseFilter) {
+      setSelectedContext({
+        contextID: props.currentCourseFilter,
+        contextName: getContextName(props.currentCourseFilter),
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.courses, props.currentCourseFilter, props.isForward, props.isReply])
 
   const getRecipientsObserver = () => {
@@ -501,6 +524,7 @@ ComposeModalContainer.propTypes = {
   setSendingMessage: PropTypes.func,
   onSelectedIdsChange: PropTypes.func,
   selectedIds: PropTypes.array,
+  contextIdFromUrl: PropTypes.string,
   maxGroupRecipientsMet: PropTypes.bool,
   submissionCommentsHeader: PropTypes.string,
   modalError: PropTypes.string,

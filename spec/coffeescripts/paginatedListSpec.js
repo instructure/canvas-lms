@@ -1,3 +1,4 @@
+/* eslint-disable qunit/no-ok-equality */
 /*
  * Copyright (C) 2012 - present Instructure, Inc.
  *
@@ -17,6 +18,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import PaginatedList from 'ui/features/section/jquery/PaginatedList'
 
 const paginatedListFixture = `

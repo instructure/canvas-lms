@@ -29,8 +29,6 @@
 #    set_extra_csp_frame_ancestor!
 module Lti::Concerns
   module ParentFrame
-    extend ActiveSupport::Concern
-
     private
 
     # Can be overridden by controller if the parent_frame_context (tool ID)

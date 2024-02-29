@@ -229,4 +229,50 @@ describe NewQuizzesFeaturesHelper do
       end
     end
   end
+
+  describe "#new_quizzes_common_cartridge_enabled?" do
+    def flag_state(value)
+      Account.site_admin.set_feature_flag!(:new_quizzes_common_cartridge, value)
+    end
+
+    context "quizzes_next is true" do
+      before do
+        allow(@context).to receive(:feature_enabled?).with(:quizzes_next).and_return(true)
+      end
+
+      context "flag is off" do
+        it "returns false" do
+          flag_state Feature::STATE_OFF
+          expect(NewQuizzesFeaturesHelper.new_quizzes_common_cartridge_enabled?(@context)).to be false
+        end
+      end
+
+      context "flag is on" do
+        it "returns true" do
+          flag_state Feature::STATE_ON
+          expect(NewQuizzesFeaturesHelper.new_quizzes_common_cartridge_enabled?(@context)).to be true
+        end
+      end
+    end
+
+    context "quizzes_next is false" do
+      before do
+        allow(@context).to receive(:feature_enabled?).with(:quizzes_next).and_return(false)
+      end
+
+      context "flag is off" do
+        it "returns false" do
+          flag_state Feature::STATE_OFF
+          expect(NewQuizzesFeaturesHelper.new_quizzes_common_cartridge_enabled?(@context)).to be false
+        end
+      end
+
+      context "flag is on" do
+        it "returns false" do
+          flag_state Feature::STATE_ON
+          expect(NewQuizzesFeaturesHelper.new_quizzes_common_cartridge_enabled?(@context)).to be false
+        end
+      end
+    end
+  end
 end

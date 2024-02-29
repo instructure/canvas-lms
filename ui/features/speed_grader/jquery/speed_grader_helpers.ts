@@ -143,7 +143,7 @@ const speedGraderHelpers = {
         $(element).removeClass('ui-state-disabled')
         $(element).removeAttr('aria-disabled')
         $(element).removeAttr('readonly')
-        $(element).removeProp('disabled')
+        $(element).prop('disabled', false)
       }
     })
   },
@@ -211,9 +211,7 @@ const speedGraderHelpers = {
   plagiarismResubmitHandler: (event: any, resubmitUrl: string) => {
     event.preventDefault()
 
-    $(event.target)
-      .attr('disabled', 'disabled')
-      .text(I18n.t('turnitin.resubmitting', 'Resubmitting...'))
+    $(event.target).prop('disabled', true).text(I18n.t('turnitin.resubmitting', 'Resubmitting...'))
     $.ajaxJSON(resubmitUrl, 'POST', {}, () => {
       speedGraderHelpers.reloadPage()
     })

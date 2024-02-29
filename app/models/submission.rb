@@ -3171,6 +3171,7 @@ class Submission < ActiveRecord::Base
   def handle_posted_at_changed
     previously_posted = posted_at_before_last_save.present?
 
+    # Outdated
     # If this submission is part of an assignment associated with a quiz, the
     # quiz object might be in a modified/readonly state (due to trying to load
     # a copy with override dates for this particular student) depending on what
@@ -3179,10 +3180,23 @@ class Submission < ActiveRecord::Base
     # of the assignment to make sure we pick up any changes to the muted status.
     if posted? && !previously_posted
       AbstractAssignment.find(assignment_id).post_submissions(submission_ids: [id], skip_updating_timestamp: true, skip_muted_changed: true)
-      assignment.reload
+      # This rescure is because of an error in the production environment where
+      # the when a student that is also an admin creates a submission of an assignment
+      # it throws a undefined method `owner' for nil:NilClass error when trying to
+      # reload the assignment. This is fix to prevent the error from
+      # crashing the server.
+      begin
+        assignment.reload
+      rescue
+        nil
+      end
     elsif !posted? && previously_posted
       AbstractAssignment.find(assignment_id).hide_submissions(submission_ids: [id], skip_updating_timestamp: true, skip_muted_changed: true)
-      assignment.reload
+      begin
+        assignment.reload
+      rescue
+        nil
+      end
     end
   end
 

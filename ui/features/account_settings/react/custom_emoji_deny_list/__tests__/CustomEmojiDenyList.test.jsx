@@ -42,29 +42,29 @@ describe('CustomEmojiDenyList', () => {
     expect(getByRole('button', {name: /Remove emoji "Aubergine"/})).toBeInTheDocument()
   })
 
-  it('removes a tag when it is clicked', () => {
+  it('removes a tag when it is clicked', async () => {
     window.ENV.EMOJI_DENY_LIST = 'middle_finger,eggplant'
     const {getByRole, queryByRole} = render(<CustomEmojiDenyList />)
     const tagCriteria = {name: /Remove emoji "Reversed Hand with Middle Finger Extended"/}
     const tag = getByRole('button', tagCriteria)
-    userEvent.click(tag)
+    await userEvent.click(tag)
     expect(queryByRole('button', tagCriteria)).not.toBeInTheDocument()
   })
 
-  it.skip('adds a tag to the list when an emoji is clicked', () => {
+  it.skip('adds a tag to the list when an emoji is clicked', async () => {
     const {getByRole} = render(<CustomEmojiDenyList />)
-    userEvent.click(getByRole('button', {name: /Open emoji menu/}))
-    userEvent.click(getByRole('button', {name: /😘, kissing_heart/}))
+    await userEvent.click(getByRole('button', {name: /Open emoji menu/}))
+    await userEvent.click(getByRole('button', {name: /😘, kissing_heart/}))
     expect(getByRole('button', {name: /Remove emoji "Face Throwing a Kiss"/})).toBeInTheDocument()
   })
 
-  it.skip('maintains the deny list value in a hidden input', () => {
+  it.skip('maintains the deny list value in a hidden input', async () => {
     const {getByRole, getByTestId} = render(<CustomEmojiDenyList />)
     const button = getByRole('button', {name: /Open emoji menu/})
-    userEvent.click(button)
-    userEvent.click(getByRole('button', {name: /😘, kissing_heart/}))
-    userEvent.click(button)
-    userEvent.click(getByRole('button', {name: /😝, stuck_out_tongue_closed_eyes/}))
+    await userEvent.click(button)
+    await userEvent.click(getByRole('button', {name: /😘, kissing_heart/}))
+    await userEvent.click(button)
+    await userEvent.click(getByRole('button', {name: /😝, stuck_out_tongue_closed_eyes/}))
     const input = getByTestId('account-settings-emoji-deny-list', {hidden: true})
     expect(input.value).toEqual('kissing_heart,stuck_out_tongue_closed_eyes')
   })

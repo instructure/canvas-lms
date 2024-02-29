@@ -66,7 +66,8 @@ export default (function (superClass) {
 
   PublishButton.prototype.events = {
     click: 'click',
-    hover: 'hover',
+    mouseenter: 'handleMouseEnter',
+    mouseleave: 'handleMouseLeave',
   }
 
   PublishButton.prototype.els = {
@@ -100,22 +101,21 @@ export default (function (superClass) {
   }
 
   // events
-  PublishButton.prototype.hover = function (arg) {
-    const type = arg.type
+  PublishButton.prototype.handleMouseEnter = function () {
     if (this.isDelayedPublish()) {
       return
     }
-    if (type === 'mouseenter') {
-      if (this.keepState || this.isPublish() || this.isDisabled()) {
-        return
-      }
-      this.renderUnpublish()
-      return (this.keepState = true)
-    } else {
-      this.keepState = false
-      if (!(this.isPublish() || this.isDisabled())) {
-        return this.renderPublished()
-      }
+    if (this.keepState || this.isPublish() || this.isDisabled()) {
+      return
+    }
+    this.renderUnpublish()
+    this.keepState = true
+  }
+
+  PublishButton.prototype.handleMouseLeave = function () {
+    this.keepState = false
+    if (!(this.isPublish() || this.isDisabled())) {
+      this.renderPublished()
     }
   }
 

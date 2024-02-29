@@ -54,12 +54,12 @@ describe('MigrationFileInput', () => {
     expect(screen.getByText('No file chosen')).toBeInTheDocument()
   })
 
-  it('renders file name if file is chosen', () => {
+  it('renders file name if file is chosen', async () => {
     renderComponent()
 
     const file = new File(['blah, blah, blah'], 'my_file.zip', {type: 'application/zip'})
     const input = screen.getByTestId('migrationFileUpload')
-    userEvent.upload(input, file)
+    await userEvent.upload(input, file)
 
     expect(screen.getByText('my_file.zip')).toBeInTheDocument()
   })
@@ -70,7 +70,7 @@ describe('MigrationFileInput', () => {
     const file = new File(['blah, blah, blah'], 'my_file.zip', {type: 'application/zip'})
     Object.defineProperty(file, 'size', {value: 1024 + 1})
     const input = screen.getByTestId('migrationFileUpload')
-    userEvent.upload(input, file)
+    await userEvent.upload(input, file)
 
     expect(screen.getByText('No file chosen')).toBeInTheDocument()
   })
@@ -81,30 +81,35 @@ describe('MigrationFileInput', () => {
     const file = new File(['blah, blah, blah'], 'my_file.zip', {type: 'application/zip'})
     Object.defineProperty(file, 'size', {value: 1024 + 1})
     const input = screen.getByTestId('migrationFileUpload')
-    userEvent.upload(input, file)
+    await userEvent.upload(input, file)
 
     expect(showFlashError).toHaveBeenCalledWith('Your migration can not exceed 1.0 KB')
   })
 
-  it('calls onChange with file', () => {
+  it('calls onChange with file', async () => {
     renderComponent()
 
     const file = new File(['blah, blah, blah'], 'my_file.zip', {type: 'application/zip'})
     const input = screen.getByTestId('migrationFileUpload')
-    userEvent.upload(input, file)
+    await userEvent.upload(input, file)
 
     expect(onChange).toHaveBeenCalledWith(expect.any(File))
   })
 
-  it('calls onChange with null', () => {
+  it('calls onChange with null', async () => {
     renderComponent()
 
     const file = new File(['blah, blah, blah'], 'my_file.zip', {type: 'application/zip'})
     const input = screen.getByTestId('migrationFileUpload')
-    userEvent.upload(input, file)
+    await userEvent.upload(input, file)
     // This is needed to clear input
     fireEvent.change(input, {target: {files: []}})
 
     expect(onChange).toHaveBeenCalledWith(null)
+  })
+
+  it('renders the progressbar with the passed progress', async () => {
+    renderComponent({fileUploadProgress: 29})
+    expect(screen.getByText('29%')).toBeInTheDocument()
   })
 })

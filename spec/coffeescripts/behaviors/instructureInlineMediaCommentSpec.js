@@ -1,3 +1,4 @@
+/* eslint-disable qunit/literal-compare-order */
 /*
  * Copyright (C) 2015 - present Instructure, Inc.
  *
@@ -17,6 +18,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import inlineMediaComment from '../../../ui/boot/initializers/loadInlineMediaComments'
 
 QUnit.module('inlineMediaComment', {

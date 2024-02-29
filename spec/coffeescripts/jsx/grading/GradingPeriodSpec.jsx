@@ -19,6 +19,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
+import 'jquery-migrate'
 import {defaults} from 'lodash'
 import GradingPeriod from 'ui/features/course_grading_standards/react/gradingPeriod'
 import fakeENV from 'helpers/fakeENV'

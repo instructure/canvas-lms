@@ -1,3 +1,4 @@
+/* eslint-disable qunit/no-compare-relation-boolean */
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -16,6 +17,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import $ from 'jquery'
+import 'jquery-migrate'
 import JQuerySelectorCache from 'ui/features/speed_grader/JQuerySelectorCache'
 
 QUnit.module('JQuerySelectorCache', hooks => {

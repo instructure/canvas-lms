@@ -273,7 +273,12 @@ describe('Studio LTI content items', () => {
     }
     const contentItem = RceLti11ContentItem.fromJSON(
       itemData,
-      createDeepMockProxy<ExternalToolsEnv>()
+      createDeepMockProxy<ExternalToolsEnv>(
+        {},
+        {
+          ltiIframeAllowPolicy: 'undefined',
+        }
+      )
     )
 
     equalHtmlIgnoringAttributeOrder(
@@ -289,7 +294,12 @@ describe('Studio LTI content items', () => {
     }
     const contentItem = RceLti11ContentItem.fromJSON(
       itemData,
-      createDeepMockProxy<ExternalToolsEnv>()
+      createDeepMockProxy<ExternalToolsEnv>(
+        {},
+        {
+          ltiIframeAllowPolicy: 'undefined',
+        }
+      )
     )
 
     equalHtmlIgnoringAttributeOrder(

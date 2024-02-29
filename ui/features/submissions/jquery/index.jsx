@@ -92,7 +92,7 @@ function submissionLoaded(data) {
       }
     }
     $('.comments .comment_list .play_comment_link').mediaCommentThumbnail('small')
-    $('.save_comment_button').attr('disabled', null)
+    $('.save_comment_button').prop('disabled', false)
     if (submission) {
       showGrade(submission)
       $('.submission_details').fillTemplateData({
@@ -267,13 +267,13 @@ export function setup() {
     })
     // post new comment but no grade
     $(document).bind('comment_change', _event => {
-      $('.save_comment_button').attr('disabled', 'disabled')
+      $('.save_comment_button').prop('disabled', true)
       $('.submission_header').loadingImage()
       const url = $('.update_submission_url').attr('href')
       const method = $('.update_submission_url').attr('title')
       const formData = {
         'submission[assignment_id]': ENV.SUBMISSION.assignment_id,
-        'submission[group_comment]': $('#submission_group_comment').attr('checked') ? '1' : '0',
+        'submission[group_comment]': $('#submission_group_comment').prop('checked') ? '1' : '0',
       }
 
       const anonymizableIdKey = ENV.SUBMISSION.user_id ? 'user_id' : 'anonymous_id'
@@ -301,7 +301,7 @@ export function setup() {
       }
       if (!formData['submission[comment]'] && !formData['submission[media_comment_id]']) {
         $('.submission_header').loadingImage('remove')
-        $('.save_comment_button').attr('disabled', null)
+        $('.save_comment_button').prop('disabled', false)
         return
       }
       if ($("#add_comment_form input[type='file']").length > 0) {
@@ -325,21 +325,21 @@ export function setup() {
     })
     // post new grade but no comments
     $(document).bind('grading_change', _event => {
-      $('.save_comment_button').attr('disabled', 'disabled')
+      $('.save_comment_button').prop('disabled', true)
       $('.submission_header').loadingImage()
       const url = $('.update_submission_url').attr('href')
       const method = $('.update_submission_url').attr('title')
       const formData = {
         'submission[assignment_id]': ENV.SUBMISSION.assignment_id,
         'submission[user_id]': ENV.SUBMISSION.user_id,
-        'submission[group_comment]': $('#submission_group_comment').attr('checked') ? '1' : '0',
+        'submission[group_comment]': $('#submission_group_comment').prop('checked') ? '1' : '0',
       }
       if ($('.grading_value:visible').length > 0) {
         formData['submission[grade]'] = GradeFormatHelper.delocalizeGrade($('.grading_value').val())
         $.ajaxJSON(url, method, formData, submissionLoaded)
       } else {
         $('.submission_header').loadingImage('remove')
-        $('.save_comment_button').attr('disabled', null)
+        $('.save_comment_button').prop('disabled', false)
       }
     })
     $('.attach_comment_file_link').click(event => {

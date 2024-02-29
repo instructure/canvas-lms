@@ -29,13 +29,11 @@ class OutcomeProficiencyRating < ApplicationRecord
   validates :color, presence: true, format: /\A([A-Fa-f0-9]{6})\z/i
   resolves_root_account through: :outcome_proficiency
 
-  alias_method :original_destroy, :destroy
-  private :original_destroy
   def destroy
     if marked_for_destruction?
       destroy_permanently!
     else
-      original_destroy
+      super
     end
   end
 

@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 
 export function closeDialog() {
   return $('.ui-dialog-content').dialog('close')

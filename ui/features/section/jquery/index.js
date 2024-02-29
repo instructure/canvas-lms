@@ -28,8 +28,8 @@ import '@canvas/jquery/jquery.instructure_misc_plugins' /* confirmDelete, showIf
 import '@canvas/jquery-keycodes'
 import '@canvas/loading-image'
 import '@canvas/util/templateData'
-import 'jqueryui-unpatched/menu'
-import 'jqueryui-unpatched/autocomplete'
+import 'jqueryui/menu'
+import 'jqueryui/autocomplete'
 import PaginatedList from './PaginatedList'
 import enrollmentTemplate from '../jst/enrollment.handlebars'
 import sectionEnrollmentPresenter from '../sectionEnrollmentPresenter'
@@ -93,7 +93,7 @@ $(document).ready(function () {
     $('#edit_section_form :text:visible:first').focus().select()
   })
 
-  $('.user_list').delegate('.unenroll_user_link', 'click', function (event) {
+  $('.user_list').on('click', '.unenroll_user_link', function (event) {
     event.preventDefault()
     $(this)
       .parents('.user')
@@ -126,7 +126,7 @@ $(document).ready(function () {
     .submit(function () {
       $(this)
         .find('button')
-        .attr('disabled', true)
+        .prop('disabled', true)
         .filter('.submit_button')
         .text(I18n.t('status.removing_crosslisting_of_section', 'De-Cross-Listing Section...'))
     })
@@ -137,7 +137,7 @@ $(document).ready(function () {
       modal: true,
       zIndex: 1000,
     })
-    $('#crosslist_course_form .submit_button').attr('disabled', true)
+    $('#crosslist_course_form .submit_button').prop('disabled', true)
     $('#course_autocomplete_id_lookup').val('')
     $('#course_id').val('').change()
   })
@@ -164,7 +164,7 @@ $(document).ready(function () {
     if (course.id == latest_course_id) {
       return
     }
-    $('#crosslist_course_form .submit_button').attr('disabled', true)
+    $('#crosslist_course_form .submit_button').prop('disabled', true)
     $('#course_autocomplete_id').val('')
     if (!course.id) {
       $('#sis_id_holder,#account_name_holder').hide()
@@ -205,7 +205,7 @@ $(document).ready(function () {
           $('#account_name_holder').showIf(template_data.account_name)
 
           $('#course_autocomplete_id').val(data.course.id)
-          $('#crosslist_course_form .submit_button').attr('disabled', false)
+          $('#crosslist_course_form .submit_button').prop('disabled', false)
         } else {
           const errorText = I18n.t(
             'errors.course_not_authorized_for_crosslist',

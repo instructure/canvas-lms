@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {useNavigate} from 'react-router-dom'
+import {useNavigate, useParams} from 'react-router-dom'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import type {Rubric} from '@canvas/rubrics/react/types/rubric'
 import {Table} from '@instructure/ui-table'
@@ -36,6 +36,7 @@ export type RubricTableProps = {
 
 export const RubricTable = ({rubrics}: RubricTableProps) => {
   const navigate = useNavigate()
+  const {accountId, courseId} = useParams()
 
   return (
     <Table caption="Set text-align for columns">
@@ -100,7 +101,17 @@ export const RubricTable = ({rubrics}: RubricTableProps) => {
               )}
             </Cell>
             <Cell data-testid={`rubric-options-${rubric.id}`}>
-              <RubricPopover rubricId={rubric.id} />
+              <RubricPopover
+                id={rubric.id}
+                title={rubric.title}
+                accountId={accountId}
+                courseId={courseId}
+                hidePoints={rubric.hidePoints}
+                criteria={rubric.criteria}
+                pointsPossible={rubric.pointsPossible}
+                buttonDisplay={rubric.buttonDisplay}
+                ratingOrder={rubric.ratingOrder}
+              />
             </Cell>
           </Row>
         ))}

@@ -23,11 +23,8 @@ import GroupUserView from './GroupUserView'
 import GroupCategoryCloneView from './GroupCategoryCloneView'
 import template from '../../jst/groupUsers.handlebars'
 import groupHasSubmissions from '../../groupHasSubmissions'
-import 'jqueryui-unpatched/core'
-import 'jqueryui-unpatched/widget'
-import 'jqueryui-unpatched/mouse'
-import 'jqueryui-unpatched/draggable'
-import 'jqueryui-unpatched/droppable'
+import 'jqueryui/draggable'
+import 'jqueryui/droppable'
 
 const I18n = useI18nScope('GroupUsersView')
 

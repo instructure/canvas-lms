@@ -27,21 +27,75 @@
   })
 %>
 <% js_bundle :module_student_view_peer_reviews %>
-<% js_bundle :context_modules_publish_menu %>
 <% js_bundle :module_dnd %>
 <% css_bundle :react_files %>
-<% if course_home %>
-  <div class="screenreader-only"><%= @context.name %></div>
-  <h2 class="context-modules-title screenreader-only"><%= t('headings.course_modules', %{Course Modules}) %></h2>
-<% else %>
-  <h1 class="context-modules-title screenreader-only"><%= t('headings.course_modules', %{Course Modules}) %></h1>
-<% end %>
 
 <% if @can_edit %>
   <div tabindex="0" class="drag_and_drop_warning screenreader-only" >
     <%= t('modules_keyboard_hint_updated',
           'Warning: For improved accessibility in reordering Modules (or Module items), please use the Move To Dialog option found in the menu.') %>
   </div>
+<% end %>
+
+<% if Account.site_admin.feature_enabled?(:instui_header) %>
+<% js_bundle :context_modules_header %>
+
+<%
+context_modules_header_props = {
+  title: t("Modules"),
+  viewProgress: {
+    label: t('links.student_progress', 'View Progress'),
+    url: progressions_course_context_modules_path(@context),
+    visible: @can_view_grades,
+  },
+  publishMenu: {
+    courseId: @context.id,
+    runningProgressId: @progress&.id,
+    disabled: @modules.empty?,
+    visible: @context.grants_any_right?(@current_user, session, :manage_content, :manage_course_content_edit),
+  },
+  expandCollapseAll: {
+    label: t('Collapse All'),
+    dataUrl: context_url(@context, :context_url) + '/collapse_all_modules',
+    dataExpand: false,
+    ariaExpanded: false,
+    ariaLabel: t('Collapse All Modules'),
+  },
+  addModule: {
+    label: t('Add Module'),
+    visible: @can_add,
+  },
+  moreMenu: {
+    label: t("Modules Settings"),
+    menuTools: {
+      items: external_tools_menu_items_raw_with_modules(@menu_tools, %i[module_index_menu module_index_menu_modal]),
+      visible: @allow_menu_tools,
+    },
+    exportCourseContent: {
+      label: t("Export Course Content"),
+      url: context_url(@context, :context_start_offline_web_export_url),
+      visible: @allow_web_export_download,
+    },
+  },
+  lastExport: {
+    label: t("Last Export: "),
+    url: context_url(@context, :context_offline_web_exports_url),
+    date: @last_web_export.nil? ? nil : datetime_string(force_zone(@last_web_export.created_at)),
+    visible: !@last_web_export.nil?
+  },
+}
+%>
+<div id="context-modules-header-root" data-props='<%=context_modules_header_props.to_json%>'></div>
+
+<% else %>
+
+<% js_bundle :context_modules_publish_menu %>
+
+<% if course_home %>
+  <div class="screenreader-only"><%= @context.name %></div>
+  <h2 class="context-modules-title screenreader-only"><%= t('headings.course_modules', %{Course Modules}) %></h2>
+<% else %>
+  <h1 class="context-modules-title screenreader-only"><%= t('headings.course_modules', %{Course Modules}) %></h1>
 <% end %>
 
 <div class="header-bar">
@@ -66,7 +120,7 @@
         <button class="btn btn-primary add_module_link">
           <i class="icon-plus" role="presentation"></i>
           <span class="screenreader-only"><%= t("Add") %></span>
-          <%= t('#context_modules.buttons.add_module', 'Module') %>
+          <%= t('Module') %>
         </button>
       <% end %>
       <% if @context.grants_any_right?(@current_user, session, :manage_content, :manage_course_content_add) && (@menu_tools[:module_index_menu].present? || @menu_tools[:module_index_menu_modal].present?) %>
@@ -93,6 +147,7 @@
     <% end %>
   </div>
 </div>
+<% end %>
 
 <div id="external-tool-mount-point"></div>
 <div id="direct-share-mount-point"></div>

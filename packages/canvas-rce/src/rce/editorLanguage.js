@@ -43,6 +43,7 @@ const mapping = {
   ht: undefined, // tiny doesn't have Haitian Creole
   hu: 'hu_HU',
   hy: 'hy',
+  id: 'id',
   is: undefined, // tiny doesn't have Icelandic
   it: 'it',
   ja: 'ja',

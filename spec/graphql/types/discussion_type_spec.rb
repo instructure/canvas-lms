@@ -411,8 +411,8 @@ RSpec.shared_examples "DiscussionType" do
       )
     end
 
-    it "author is nil" do
-      expect(@anon_discussion_type.resolve("author { shortName }")).to be_nil
+    it "teacher author is not nil" do
+      expect(@anon_discussion_type.resolve("author { shortName }")).to eq @teacher.short_name
     end
 
     it "editor is nil" do
@@ -753,6 +753,25 @@ describe Types::DiscussionType do
       it "returns correct message and entries of topics when delayed_post_at is past" do
         expect(@past_delayed_type_with_student.resolve("message")).to eq @past_delayed_discussion.message
         expect(@past_delayed_type_with_student.resolve("discussionEntriesConnection { nodes { message } }").count).to eq 1
+      end
+    end
+
+    describe "discussion user roles" do
+      before do
+        authored_discussion = DiscussionTopic.create!(title: "Welcome whoever you are",
+                                                      message: "authored",
+                                                      context: @course,
+                                                      user: @teacher,
+                                                      editor: @teacher)
+        @discusion_teacher_author = GraphQLTypeTester.new(authored_discussion, current_user: @teacher)
+      end
+
+      it "finds author course roles without extra variables" do
+        expect(@discusion_teacher_author.resolve("author { courseRoles }")).to eq(["TeacherEnrollment"])
+      end
+
+      it "finds editor course roles without extra variables" do
+        expect(@discusion_teacher_author.resolve("editor { courseRoles }")).to eq(["TeacherEnrollment"])
       end
     end
   end

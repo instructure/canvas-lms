@@ -197,6 +197,12 @@ describe CollaborationsController do
       ).tap { |c| c.update_attribute :url, "http://www.example.com" }
     end
 
+    let(:url) { "http://www.example.com/launch" }
+    let(:domain) { "example.com" }
+    let(:developer_key) { dev_key_model_1_3(account: @course.account) }
+    let(:new_tool) { external_tool_1_3_model(context: @course, developer_key:, opts: { url:, name: "1.3 tool" }) }
+    let(:old_tool) { external_tool_model(context: @course, opts: { url:, domain: }) }
+
     context "when the collaboration includes a resource_link_lookup_uuid" do
       subject { get "show", params: { course_id: @course.id, id: collaboration.id } }
 
@@ -211,7 +217,10 @@ describe CollaborationsController do
         )
       end
 
-      before { user_session(@teacher) }
+      before do
+        user_session(@teacher)
+        new_tool
+      end
 
       it "adds the lookup ID to the redirect URL" do
         url = CGI.escape(collaboration[:url])
@@ -221,9 +230,32 @@ describe CollaborationsController do
       end
     end
 
+    context "when the original tool is 1.1 and there is a 1.3 tool" do
+      let(:collaboration) do
+        ExternalToolCollaboration.create!(
+          title: "my collab",
+          user: @teacher,
+          url:,
+          context: @course
+        )
+      end
+
+      before do
+        user_session(@teacher)
+        old_tool
+        new_tool
+      end
+
+      it "migrates the collaboration to 1.3" do
+        get "show", params: { course_id: @course.id, id: collaboration.id }
+        expect(collaboration.reload.resource_link_lookup_uuid).to eq(Lti::ResourceLink.last.lookup_uuid)
+      end
+    end
+
     it "redirects to the lti launch url for ExternalToolCollaborations" do
       course_with_teacher(active_all: true)
       user_session(@teacher)
+      old_tool
       collab = ExternalToolCollaboration.new(
         title: "my collab",
         user: @teacher,

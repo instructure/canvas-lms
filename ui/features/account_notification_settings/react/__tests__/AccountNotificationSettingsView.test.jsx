@@ -129,7 +129,7 @@ describe('Notification Settings page', () => {
     )
 
     const dropdown = await findByTestId('settings-for-label')
-    userEvent.click(dropdown)
+    await userEvent.click(dropdown)
 
     const terms = await screen.findAllByText('Term Name')
     expect(terms.length).toEqual(1)
@@ -155,7 +155,7 @@ describe('Notification Settings page', () => {
     )
 
     const dropdown = await findByTestId('settings-for-label')
-    userEvent.click(dropdown)
+    await userEvent.click(dropdown)
 
     expect((await screen.findAllByText('Duplicate enrollment course')).length).toEqual(1)
   })
@@ -180,10 +180,10 @@ describe('Notification Settings page', () => {
 
     // Switch to a course
     const dropdown = await findByTestId('settings-for-label')
-    userEvent.click(dropdown)
+    await userEvent.click(dropdown)
 
     const courseOption = await screen.findByText('My favorite course 💕')
-    userEvent.click(courseOption)
+    await userEvent.click(courseOption)
 
     expect(
       await screen.findByText(

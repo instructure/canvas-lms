@@ -489,9 +489,11 @@ class AppointmentGroup < ActiveRecord::Base
       # participants_per_appointment can change after the fact, so a given
       # could exceed it and we can't just say:
       #   appointments.size * participants_per_appointment
-      filtered_appointments.inject(0) do |total, appointment|
-        total + [participants_per_appointment - appointment.child_events.size, 0].max
-      end
+      CalendarEvent.from(
+        filtered_appointments.left_joins(:child_events)
+                             .group("calendar_events.id")
+                             .select("GREATEST(0, #{participants_per_appointment} - COUNT(child_events_calendar_events.id)) AS count")
+      ).sum(:count).to_i
     end
   end
 

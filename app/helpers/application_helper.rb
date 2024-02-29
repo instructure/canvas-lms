@@ -516,6 +516,13 @@ module ApplicationHelper
     global_inst_object
   end
 
+  def remote_env(hash = nil)
+    @remote_env ||= {}
+    @remote_env.merge!(hash) if hash
+
+    @remote_env
+  end
+
   def editor_buttons
     # called outside of Lti::ContextToolFinder to make sure that
     # @context is non-nil and also a type of Context that would have
@@ -532,9 +539,14 @@ module ApplicationHelper
         # force the YAML to be deserialized before caching, since it's expensive
         tools.each(&:settings)
       end
+
+    # Default tool icons need to have a hostname (cannot just be a path)
+    # because they are used externally via ServicesApiController endpoints
+    default_icon_base_url = "#{request.protocol}#{request.host_with_port}"
+
     ContextExternalTool
       .shard(@context.shard)
-      .editor_button_json(cached_tools.dup, @context, @current_user, session)
+      .editor_button_json(cached_tools.dup, @context, @current_user, session, default_icon_base_url)
   end
 
   def nbsp

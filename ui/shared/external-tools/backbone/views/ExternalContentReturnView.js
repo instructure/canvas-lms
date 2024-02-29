@@ -107,6 +107,8 @@ ExternalContentReturnView.prototype.afterRender = function () {
       resizable: true,
       close: this.removeDialog,
       open: focusOnOpen,
+      modal: true,
+      zIndex: 1000,
     })
   }
 }

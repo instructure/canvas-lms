@@ -19,6 +19,7 @@
 import actions from 'ui/features/discussion_topics_index/react/actions'
 import * as apiClient from 'ui/features/discussion_topics_index/react/apiClient'
 import $ from 'jquery'
+import 'jquery-migrate'
 import '@canvas/rails-flash-notifications'
 
 function getState() {

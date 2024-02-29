@@ -38,6 +38,8 @@ module DynamicSettings
         DynamicSettings.fallback_recovery_lambda = nil
       end
 
+      let(:failsafe_cache) { Pathname.new(__dir__).join("config") }
+
       it "must return nil when no value was found" do
         allow(Diplomat::Kv).to receive(:get_all) { |key| raise Diplomat::KeyNotFound, key }
         allow(Diplomat::Kv).to receive(:get) { |key| raise Diplomat::KeyNotFound, key }
@@ -77,22 +79,26 @@ module DynamicSettings
       end
 
       it "must fall back to expired cached values when consul can't be contacted" do
-        DynamicSettings.cache.write(DynamicSettings::CACHE_KEY_PREFIX + "foo/bar/baz", "qux", expires_in: -3.minutes)
+        DynamicSettings.cache.write(DynamicSettings::CACHE_KEY_PREFIX + "foo/bar/baz", "qux", expires_in: 0)
         expect(Diplomat::Kv).to receive(:get_all).and_raise(Diplomat::KeyNotFound)
-        val = proxy.fetch("baz")
-        expect(val).to eq "qux"
+        Timecop.travel(3.minutes) do
+          val = proxy.fetch("baz")
+          expect(val).to eq "qux"
+        end
       end
 
       it "must log the connection failure when consul can't be contacted" do
-        DynamicSettings.cache.write(DynamicSettings::CACHE_KEY_PREFIX + "foo/bar/baz", "qux", expires_in: -3.minutes)
+        DynamicSettings.cache.write(DynamicSettings::CACHE_KEY_PREFIX + "foo/bar/baz", "qux", expires_in: 0)
         invoked = false
         DynamicSettings.fallback_recovery_lambda = lambda do |e|
           invoked = true
           expect(e.class).to eq(Diplomat::KeyNotFound)
         end
         allow(Diplomat::Kv).to receive(:get_all).and_raise(Diplomat::KeyNotFound)
-        proxy.fetch("baz")
-        expect(invoked).to be_truthy
+        Timecop.travel(3.minutes) do
+          proxy.fetch("baz")
+          expect(invoked).to be_truthy
+        end
       end
 
       it "must raise an exception when consul can't be reached and no previous value is found" do
@@ -104,6 +110,15 @@ module DynamicSettings
         expect(Diplomat::Kv).to receive(:get_all).twice.and_raise(Diplomat::KeyNotFound)
         expect(proxy.fetch("baz", failsafe: nil)).to be_nil
         expect(proxy.fetch("baz", failsafe: "a")).to eq "a"
+      end
+
+      it "returns from the failsafe cache when consul can't be reached and no previous value is found" do
+        allow(Diplomat::Kv).to receive_messages(get_all: nil, get: nil)
+
+        expect(proxy.fetch("baz", failsafe_cache:)).to be_nil
+        DynamicSettings.cache.clear
+        expect(Diplomat::Kv).to receive(:get_all).and_raise(Diplomat::KeyNotFound)
+        expect(proxy.fetch("baz", failsafe_cache:)).to be_nil
       end
 
       it "falls back to global settings" do

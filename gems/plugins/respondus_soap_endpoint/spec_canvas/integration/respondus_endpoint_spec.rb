@@ -50,7 +50,7 @@ describe "Respondus SOAP API", type: :request do
     streamHandler = soap.proxy.streamhandler
     method_args = [userName, password, context, *args.map(&:last)]
     streamHandler.capture(soap, method, *method_args) do |s_body, s_headers|
-      post "/api/respondus/soap", params: s_body, headers: s_headers
+      post "/api/respondus/soap", params: s_body, headers: s_headers.merge("Content-Type" => "application/soap+xml")
       response
     end
   end
