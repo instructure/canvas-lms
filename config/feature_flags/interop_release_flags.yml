@@ -261,3 +261,22 @@ lti_placement_restrictions:
       state: allowed_on
     ci:
       state: allowed_on
+lti_registrations_page:
+  state: hidden
+  applies_to: RootAccount
+  display_name: LTI Extensions Page
+  description: |-
+    When enabled, the LTI Extensions page will be available in the Account navigation.
+  environments:
+    development:
+      state: hidden
+lti_registrations_discover_page:
+  state: hidden
+  applies_to: RootAccount
+  display_name: LTI Extensions Discover Page
+  description: |-
+    When enabled, the LTI Extensions Discover page will be available in the Extensions view.
+  environments:
+    development:
+      state: hidden
+  custom_transition_proc: lti_registrations_discover_page_hook
