@@ -21,11 +21,7 @@
 require "syslog"
 
 class SyslogWrapper
-  attr_accessor :level, :datetime_format
-
-  def formatter
-    nil
-  end
+  attr_accessor :level, :datetime_format, :formatter
 
   @@silencer = true
   def self.silencer
