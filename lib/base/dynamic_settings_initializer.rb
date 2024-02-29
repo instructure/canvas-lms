@@ -52,5 +52,6 @@ module DynamicSettingsInitializer
     ::DynamicSettings.retry_lambda = ->(e) { Canvas::Errors.capture_exception(:consul, e, :warn) if defined?(Canvas::Errors) }
     ::DynamicSettings.logger = Rails.logger
     reloader.call
+    reloader
   end
 end
