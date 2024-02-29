@@ -40,6 +40,7 @@ const SUBMISSION_QUERY = gql`
           excused
           id
           postedAt
+          previewUrl
           commentsConnection {
             nodes {
               id
