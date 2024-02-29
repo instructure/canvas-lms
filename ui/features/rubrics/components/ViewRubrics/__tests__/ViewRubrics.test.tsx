@@ -112,6 +112,18 @@ describe('ViewRubrics Tests', () => {
 
       expect(getByTestId('delete-rubric-modal')).toBeInTheDocument()
     })
+
+    it('disables the delete option in the popover menu if the rubric has rubric associations active', () => {
+      queryClient.setQueryData(['accountRubrics-1'], RUBRICS_QUERY_RESPONSE)
+      const {getByTestId} = renderComponent()
+
+      getByTestId('rubric-options-1-button').click()
+      expect(getByTestId('delete-rubric-button')).not.toHaveAttribute('aria-disabled')
+      getByTestId('rubric-options-1-button').click()
+
+      getByTestId('rubric-options-3-button').click()
+      expect(getByTestId('delete-rubric-button')).toHaveAttribute('aria-disabled', 'true')
+    })
   })
 
   describe('course level rubrics', () => {
@@ -184,6 +196,18 @@ describe('ViewRubrics Tests', () => {
       deleteButton.click()
 
       expect(getByTestId('delete-rubric-modal')).toBeInTheDocument()
+    })
+
+    it('disables the delete option in the popover menu if the rubric has rubric associations active', () => {
+      queryClient.setQueryData(['courseRubrics-1'], RUBRICS_QUERY_RESPONSE)
+      const {getByTestId} = renderComponent()
+
+      getByTestId('rubric-options-1-button').click()
+      expect(getByTestId('delete-rubric-button')).not.toHaveAttribute('aria-disabled')
+      getByTestId('rubric-options-1-button').click()
+
+      getByTestId('rubric-options-3-button').click()
+      expect(getByTestId('delete-rubric-button')).toHaveAttribute('aria-disabled', 'true')
     })
   })
 })
