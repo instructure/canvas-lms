@@ -27,6 +27,7 @@ class ExternalToolCollaboration < Collaboration
     data["updateUrl"]
   end
 
+  # @see Lti::Migratable
   def migrate_to_1_3_if_needed!(tool)
     #  Don't migrate if the tool is not 1.3
     return unless tool&.use_1_3? && tool.developer_key.present?
@@ -39,20 +40,27 @@ class ExternalToolCollaboration < Collaboration
     update!(resource_link_lookup_uuid: resource_link.lookup_uuid)
   end
 
-  def self.directly_associated_items(_tool_id, _context)
-    # direct is not applicable
-    nil
+  # filtered by context during migrate_content_to_1_3
+  # @see Lti::Migratable
+  def self.directly_associated_items(_tool_id)
+    # direct is not applicable since the only link to tool is url
+    none
   end
 
-  def self.indirectly_associated_items(_tool_id, context)
-    possibly_related_items(context)
+  # filtered by context during migrate_content_to_1_3
+  # @see Lti::Migratable
+  def self.indirectly_associated_items(_tool_id)
+    # since the only link to tool is url, _all_ LTI collaborations are possibly associated
+    ExternalToolCollaboration.active
   end
 
+  # @see Lti::Migratable
   def self.fetch_direct_batch(_ids, &)
-    # direct is not applicable
-    nil
+    # direct is not applicable since the only link to tool is url
+    []
   end
 
+  # @see Lti::Migratable
   def self.fetch_indirect_batch(tool_id, new_tool_id, ids, &)
     return to_enum(:fetch_indirect_batch, tool_id, new_tool_id, ids) unless block_given?
 
@@ -63,18 +71,4 @@ class ExternalToolCollaboration < Collaboration
       yield collaboration
     end
   end
-
-  def self.possibly_related_items(context)
-    collaboration_scope = ExternalToolCollaboration.active
-
-    case context
-    when Course
-      collaboration_scope = collaboration_scope.where(context_type: "Course", context_id: context.id)
-    when Account
-      course_ids = context.courses.map(&:id)
-      collaboration_scope = collaboration_scope.where(context_type: "Course", context_id: course_ids)
-    end
-    collaboration_scope
-  end
-  private_class_method :possibly_related_items
 end

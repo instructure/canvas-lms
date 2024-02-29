@@ -97,23 +97,56 @@ describe ExternalToolCollaboration do
     end
 
     describe "finding items" do
-      def create_misc_collaborations
+      subject { described_class.scope_to_context(described_class.indirectly_associated_items(tool_1p1.id), context) }
+
+      let(:context) { nil }
+
+      before do
         indirect_collaboration
         deleted_collaboration.update!(workflow_state: "deleted")
         other_course_collaboration
         other_tool_collaboration
       end
 
-      it "finds all collaborations in the same course" do
-        create_misc_collaborations
-        expect(described_class.indirectly_associated_items(tool_1p1.id, course))
-          .to contain_exactly(indirect_collaboration, other_tool_collaboration)
+      context "in a course" do
+        let(:context) { course }
+
+        it "finds all collaborations in the same course" do
+          expect(subject).to contain_exactly(indirect_collaboration, other_tool_collaboration)
+        end
       end
 
-      it "finds all collaborations in the same account" do
-        create_misc_collaborations
-        collaborations = described_class.indirectly_associated_items(tool_1p1.id, account)
-        expect(collaborations).to contain_exactly(indirect_collaboration, other_tool_collaboration, other_course_collaboration)
+      context "in an account" do
+        let(:context) { account }
+
+        it "finds all collaborations in the same account" do
+          expect(subject).to contain_exactly(indirect_collaboration, other_tool_collaboration, other_course_collaboration)
+        end
+      end
+
+      context "in subaccount" do
+        let(:context) { account_model(parent_account: account) }
+
+        it "finds all collaborations in the current account" do
+          sub_course = course_model(account: context)
+          sub_collab = external_tool_collaboration_model(
+            context: sub_course,
+            title: "Sub Collaboration",
+            url:
+          )
+          sub_sub_account = account_model(parent_account: context)
+          sub_sub_course = course_model(account: sub_sub_account)
+          sub_sub_collab = external_tool_collaboration_model(
+            context: sub_sub_course,
+            title: "Sub-Sub Collaboration",
+            url:
+          )
+          expect(subject).to contain_exactly(sub_collab, sub_sub_collab)
+        end
+
+        it "does not find collaborations outside of the account" do
+          expect(subject).to be_empty
+        end
       end
     end
 

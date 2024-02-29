@@ -707,6 +707,7 @@ class ContentTag < ActiveRecord::Base
   # support 1.3. Fully support in this case means the associated resource link
   # has the LTI 1.1 resource_link_id stored on it. Will only migrate tags that
   # are module items that are associated with ContextExternalTools.
+  # @see Lti::Migratable
   def migrate_to_1_3_if_needed!(tool)
     return if !tool&.use_1_3? || associated_asset_lti_resource_link&.lti_1_1_id.present?
 
@@ -722,33 +723,23 @@ class ContentTag < ActiveRecord::Base
     end
   end
 
-  def self.directly_associated_items(tool_id, context)
-    module_item_scope = ContentTag.nondeleted.where(tag_type: :context_module)
-    case context
-    when Course
-      module_item_scope = module_item_scope.where(context_id: context.id)
-    when Account
-      module_item_scope = module_item_scope.where(root_account_id: context.root_account? ? context.id : context.root_account_id)
-    end
-
-    module_item_scope.where(content_id: tool_id)
+  # filtered by context during migrate_content_to_1_3
+  # @see Lti::Migratable
+  def self.directly_associated_items(tool_id)
+    ContentTag.nondeleted.where(tag_type: :context_module, content_id: tool_id)
   end
 
-  def self.indirectly_associated_items(_tool_id, context)
-    module_item_scope = ContentTag.nondeleted.where(tag_type: :context_module)
-    case context
-    when Course
-      module_item_scope = module_item_scope.where(context_id: context.id)
-    when Account
-      module_item_scope = module_item_scope.where(root_account_id: context.root_account? ? context.id : context.root_account_id)
-    end
-    # TODO: this does not account for content tagsthat _are_ linked to a
+  # filtered by context during migrate_content_to_1_3
+  # @see Lti::Migratable
+  def self.indirectly_associated_items(_tool_id)
+    # TODO: this does not account for content tags that _are_ linked to a
     # tool and the tag has a content_id, but the content_id doesn't match
     # the current tool
-    module_item_scope.where(content_id: nil)
+    ContentTag.nondeleted.where(tag_type: :context_module, content_id: nil)
   end
 
   # @param [Array<Integer>] ids The IDs of the resources to fetch for this batch
+  # @see Lti::Migratable
   def self.fetch_direct_batch(ids, &)
     return to_enum(:fetch_direct_batch, ids) unless block_given?
 
@@ -761,6 +752,7 @@ class ContentTag < ActiveRecord::Base
   # @param [Integer] tool_id The ID of the LTI 1.1 tool that the resource is indirectly
   # associated with
   # @param [Array<Integer>] ids The IDs of the resources to fetch for this batch
+  # @see Lti::Migratable
   def self.fetch_indirect_batch(tool_id, new_tool_id, ids)
     return to_enum(:fetch_indirect_batch, tool_id, new_tool_id, ids) unless block_given?
 

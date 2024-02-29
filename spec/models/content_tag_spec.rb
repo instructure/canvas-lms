@@ -1269,48 +1269,87 @@ describe ContentTag do
       end
 
       describe "#directly_associated_items" do
-        it "finds all active directly associated items within a course" do
-          create_misc_content_tags
-          indirect_tag
-          direct_tag
+        subject { ContentTag.scope_to_context(ContentTag.directly_associated_items(tool.id), context) }
 
-          expect(ContentTag.directly_associated_items(tool.id, course))
-            .to contain_exactly(direct_tag, unpublished_direct)
+        context "in course" do
+          let(:context) { course }
+
+          it "finds all active directly associated items within a course" do
+            create_misc_content_tags
+            indirect_tag
+            direct_tag
+
+            expect(subject).to contain_exactly(direct_tag, unpublished_direct)
+          end
         end
 
-        it "finds all active directly associated items within an account" do
-          create_misc_content_tags
-          direct_tag
-          indirect_tag
-          course = course_model(account:)
-          context_module = course.context_modules.create!(name: "other module")
-          other_direct_tag = ContentTag.create!(context: course, content: tool, context_module:, tag_type:)
+        context "in account" do
+          let(:context) { account }
 
-          tags = ContentTag.directly_associated_items(tool.id, account)
-          expect(tags).to contain_exactly(direct_tag, other_direct_tag, unpublished_direct)
+          it "finds all active directly associated items within an account" do
+            create_misc_content_tags
+            direct_tag
+            indirect_tag
+            course = course_model(account:)
+            context_module = course.context_modules.create!(name: "other module")
+            other_direct_tag = ContentTag.create!(context: course, content: tool, context_module:, tag_type:)
+
+            expect(subject).to contain_exactly(direct_tag, other_direct_tag, unpublished_direct)
+          end
         end
       end
 
       describe "#indirectly_associated_items" do
-        it "finds all active indirectly associated items only within a course" do
-          create_misc_content_tags
-          indirect_tag
-          direct_tag
+        subject { ContentTag.scope_to_context(ContentTag.indirectly_associated_items(tool.id), context) }
 
-          tags = ContentTag.indirectly_associated_items(tool.id, course)
-          expect(tags).to contain_exactly(indirect_tag, unpublished_indirect)
+        context "in course" do
+          let(:context) { course }
+
+          it "finds all active indirectly associated items only within a course" do
+            create_misc_content_tags
+            indirect_tag
+            direct_tag
+
+            expect(subject).to contain_exactly(indirect_tag, unpublished_indirect)
+          end
         end
 
-        it "finds all active indirectly associated items only within an account" do
-          create_misc_content_tags
-          indirect_tag
-          direct_tag
-          course = course_model(account:)
-          context_module = course.context_modules.create!(name: "other module")
-          other_indirect_tag = ContentTag.create!(context: course, context_module:, url:, tag_type:)
+        context "in account" do
+          let(:context) { account }
 
-          tags = ContentTag.indirectly_associated_items(tool.id, account)
-          expect(tags).to contain_exactly(indirect_tag, other_indirect_tag, unpublished_indirect)
+          it "finds all active indirectly associated items only within an account" do
+            create_misc_content_tags
+            indirect_tag
+            direct_tag
+            course = course_model(account:)
+            context_module = course.context_modules.create!(name: "other module")
+            other_indirect_tag = ContentTag.create!(context: course, context_module:, url:, tag_type:)
+
+            expect(subject).to contain_exactly(indirect_tag, other_indirect_tag, unpublished_indirect)
+          end
+        end
+
+        context "in subaccount" do
+          let(:context) { account_model(parent_account: account) }
+
+          it "finds all active items in the current account" do
+            create_misc_content_tags
+            indirect_tag
+            direct_tag
+            course = course_model(account: context)
+            context_module = course.context_modules.create!(name: "other module")
+            other_indirect_tag = ContentTag.create!(context: course, context_module:, url:, tag_type:)
+
+            expect(subject).to contain_exactly(other_indirect_tag)
+          end
+
+          it "does not find items outside of the account" do
+            create_misc_content_tags
+            indirect_tag
+            direct_tag
+
+            expect(subject).to be_empty
+          end
         end
       end
     end
