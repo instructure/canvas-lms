@@ -379,6 +379,24 @@ describe "Admins API", type: :request do
 
           expect(json.first["id"]).to eq au.id
         end
+
+        it "ignores dangling account users" do
+          @shard1.activate { @other_admin = user_factory }
+          au = Account.default.account_users.create!(user: @other_admin)
+
+          @shard1.activate do
+            @other_admin.user_account_associations.delete_all
+            @other_admin.user_shard_associations.delete_all
+
+            @other_admin.destroy_permanently!
+          end
+
+          @user = @admin
+          json = api_call(:get, @path, @path_opts)
+
+          expect(response).to be_successful
+          expect(json.pluck(:id.to_s)).not_to include au.id
+        end
       end
 
       it "paginates" do
