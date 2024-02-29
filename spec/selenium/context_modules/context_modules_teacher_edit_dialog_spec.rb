@@ -408,7 +408,6 @@ describe "context modules" do
       end
 
       it "only displays out-of on an assignment min score restriction when the assignment has a total with differentiated modules enabled" do
-        skip("LF-963 Show at least is currently always showing point possible on tray")
         ag = @course.assignment_groups.create!
         a1 = ag.assignments.create!(context: @course)
         a1.points_possible = 10
