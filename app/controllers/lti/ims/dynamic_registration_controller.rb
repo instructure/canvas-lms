@@ -210,7 +210,7 @@ module Lti
             { messages: [:type, :target_link_uri, :label, :icon_uri, { custom_parameters: ArbitraryStrongishParams::ANYTHING }, { roles: [] }, { placements: [] }] },
             { claims: [] },
             :target_link_uri,
-            :custom_parameters,
+            { custom_parameters: ArbitraryStrongishParams::ANYTHING },
             "https://#{Lti::IMS::Registration::CANVAS_EXTENSION_LABEL}/lti/privacy_level"
           ] },
           :client_uri,
