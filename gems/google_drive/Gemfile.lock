@@ -48,7 +48,7 @@ GEM
     irb (1.11.2)
       rdoc
       reline (>= 0.4.2)
-    jwt (2.8.0)
+    jwt (2.8.1)
       base64
     mini_mime (1.1.5)
     multi_json (1.15.0)
