@@ -34,7 +34,7 @@ describe LearningObjectDatesController do
         title: "Locked Assignment",
         due_at: "2022-01-02T00:00:00Z",
         unlock_at: "2022-01-01T00:00:00Z",
-        lock_at: "2022-01-03T00:00:00Z",
+        lock_at: "2022-01-03T01:00:00Z",
         only_visible_to_overrides: true
       )
       @override = @assignment.assignment_overrides.create!(course_section: @course.default_section,
@@ -49,7 +49,7 @@ describe LearningObjectDatesController do
                                  "id" => @assignment.id,
                                  "due_at" => "2022-01-02T00:00:00Z",
                                  "unlock_at" => "2022-01-01T00:00:00Z",
-                                 "lock_at" => "2022-01-03T00:00:00Z",
+                                 "lock_at" => "2022-01-03T01:00:00Z",
                                  "only_visible_to_overrides" => true,
                                  "overrides" => [{
                                    "id" => @override.id,
@@ -312,19 +312,21 @@ describe LearningObjectDatesController do
       request.content_type = "application/json"
     end
 
-    shared_examples_for "learning object updates" do
+    shared_examples_for "learning object updates" do |support_due_at|
       it "updates base dates" do
-        put :update, params: { **default_params,
+        request_params = { **default_params,
           due_at: "2023-01-02T05:00:00Z",
           unlock_at: "2023-01-01T00:00:00Z",
           lock_at: "2023-01-07T08:00:00Z",
           only_visible_to_overrides: false }
+        request_params.delete(:due_at) unless support_due_at
+        put :update, params: request_params
         expect(response).to be_no_content
-        learning_object.reload
-        expect(learning_object.due_at.iso8601).to eq "2023-01-02T05:00:00Z"
-        expect(learning_object.unlock_at.iso8601).to eq "2023-01-01T00:00:00Z"
-        expect(learning_object.lock_at.iso8601).to eq "2023-01-07T08:00:00Z"
-        expect(learning_object.only_visible_to_overrides).to be false
+        differentiable.reload
+        expect(differentiable.due_at.iso8601).to eq "2023-01-02T05:00:00Z" if support_due_at
+        expect(differentiable.unlock_at.iso8601).to eq "2023-01-01T00:00:00Z"
+        expect(differentiable.lock_at.iso8601).to eq "2023-01-07T08:00:00Z"
+        expect(differentiable.only_visible_to_overrides).to be false
       end
 
       it "does not touch other object attributes" do
@@ -335,44 +337,43 @@ describe LearningObjectDatesController do
       end
 
       it "works if only some arguments are passed" do
-        learning_object.assignment_overrides.create!(course_section: @course.default_section)
-        put :update, params: { **default_params,
-          due_at: nil,
-          unlock_at: "2023-01-01T00:00:00Z" }
+        differentiable.assignment_overrides.create!(course_section: @course.default_section)
+        put :update, params: { **default_params, unlock_at: "2020-01-01T00:00:00Z" }
         expect(response).to be_no_content
-        learning_object.reload
-        expect(learning_object.due_at).to be_nil
-        expect(learning_object.unlock_at.iso8601).to eq "2023-01-01T00:00:00Z"
-        expect(learning_object.lock_at.iso8601).to eq "2022-01-03T00:00:00Z"
-        expect(learning_object.assignment_overrides.active.count).to eq 1
+        differentiable.reload
+        expect(differentiable.unlock_at.iso8601).to eq "2020-01-01T00:00:00Z"
+        expect(differentiable.lock_at.iso8601).to eq "2022-01-03T01:00:00Z"
+        expect(differentiable.assignment_overrides.active.count).to eq 1
       end
 
       it "removes overrides" do
-        learning_object.assignment_overrides.create!(course_section: @course.default_section)
+        differentiable.assignment_overrides.create!(course_section: @course.default_section)
         put :update, params: { **default_params, assignment_overrides: [] }
         expect(response).to be_no_content
-        learning_object.reload
-        expect(learning_object.assignment_overrides.active.count).to eq 0
+        differentiable.reload
+        expect(differentiable.assignment_overrides.active.count).to eq 0
       end
 
       it "updates overrides" do
-        override1 = learning_object.assignment_overrides.create!(course_section: @course.default_section,
-                                                                 due_at: "2022-02-01T01:00:00Z",
-                                                                 due_at_overridden: true)
-        override2 = learning_object.assignment_overrides.create!(unlock_at: "2022-02-01T01:00:00Z",
-                                                                 unlock_at_overridden: true,
-                                                                 lock_at: "2022-02-02T01:00:00Z",
-                                                                 lock_at_overridden: true)
+        override1 = differentiable.assignment_overrides.create!(course_section: @course.default_section,
+                                                                unlock_at: nil,
+                                                                unlock_at_overridden: true)
+        override1.update!(due_at: "2022-02-01T01:00:00Z", due_at_overridden: true) if support_due_at
+        override2 = differentiable.assignment_overrides.create!(unlock_at: "2022-02-01T01:00:00Z",
+                                                                unlock_at_overridden: true,
+                                                                lock_at: "2022-02-02T01:00:00Z",
+                                                                lock_at_overridden: true)
         override2.assignment_override_students.create!(user: student_in_course.user)
-        put :update, params: { **default_params,
-          assignment_overrides: [{ id: override1.id, due_at: "2024-02-01T01:00:00Z" },
-                                 { id: override2.id, unlock_at: "2022-03-01T01:00:00Z" }] }
+        override_params = [{ id: override1.id, unlock_at: "2020-02-01T01:00:00Z" },
+                           { id: override2.id, unlock_at: "2022-03-01T01:00:00Z" }]
+        override_params[0][:due_at] = "2024-02-01T01:00:00Z" if support_due_at
+        put :update, params: { **default_params, assignment_overrides: override_params }
         expect(response).to be_no_content
-        expect(learning_object.assignment_overrides.active.count).to eq 2
+        expect(differentiable.assignment_overrides.active.count).to eq 2
         override1.reload
-        expect(override1.due_at.iso8601).to eq "2024-02-01T01:00:00Z"
-        expect(override1.due_at_overridden).to be true
-        expect(override1.unlock_at).to be_nil
+        expect(override1.due_at.iso8601).to eq "2024-02-01T01:00:00Z" if support_due_at
+        expect(override1.due_at_overridden).to be true if support_due_at
+        expect(override1.unlock_at).to eq "2020-02-01T01:00:00Z"
         expect(override1.lock_at).to be_nil
         override2.reload
         expect(override2.unlock_at.iso8601).to eq "2022-03-01T01:00:00Z"
@@ -382,26 +383,26 @@ describe LearningObjectDatesController do
       end
 
       it "updates multiple overrides" do
-        override1 = learning_object.assignment_overrides.create!(course_section: @course.default_section,
-                                                                 due_at: "2022-02-01T01:00:00Z",
-                                                                 due_at_overridden: true)
+        override1 = differentiable.assignment_overrides.create!(course_section: @course.default_section,
+                                                                unlock_at: "2020-04-01T00:00:00Z",
+                                                                unlock_at_overridden: true)
         student1 = student_in_course(name: "Student 1").user
         student2 = student_in_course(name: "Student 2").user
         section2 = @course.course_sections.create!(name: "Section 2")
-        override2 = learning_object.assignment_overrides.create!(lock_at: "2022-02-02T01:00:00Z", lock_at_overridden: true)
+        override2 = differentiable.assignment_overrides.create!(lock_at: "2022-02-02T01:00:00Z", lock_at_overridden: true)
         override2.assignment_override_students.create!(user: student1)
         put :update, params: { **default_params,
-          assignment_overrides: [{ course_section_id: section2.id, due_at: "2024-01-01T01:00:00Z" },
+          assignment_overrides: [{ course_section_id: section2.id, unlock_at: "2024-01-01T01:00:00Z" },
                                  { id: override2.id, student_ids: [student2.id] }] }
         expect(response).to be_no_content
-        expect(learning_object.assignment_overrides.active.count).to eq 2
+        expect(differentiable.assignment_overrides.active.count).to eq 2
         expect(override1.reload).to be_deleted
         override2.reload
         expect(override2.assignment_override_students.pluck(:user_id)).to eq [student2.id]
         expect(override2.lock_at).to be_nil
-        new_override = learning_object.assignment_overrides.active.last
+        new_override = differentiable.assignment_overrides.active.last
         expect(new_override.course_section.id).to eq section2.id
-        expect(new_override.due_at.iso8601).to eq "2024-01-01T01:00:00Z"
+        expect(new_override.unlock_at.iso8601).to eq "2024-01-01T01:00:00Z"
       end
 
       it "returns bad_request if trying to create duplicate overrides" do
@@ -436,15 +437,45 @@ describe LearningObjectDatesController do
       end
     end
 
+    shared_examples_for "learning objects without due dates" do
+      it "returns 422 if due_at is passed in an override" do
+        put :update, params: { **default_params,
+          assignment_overrides: [{ course_section_id: @course.default_section.id, due_at: "2022-01-02T05:00:00Z" }] }
+        expect(response).to be_unprocessable
+      end
+
+      it "ignores base due_at if provided" do
+        put :update, params: { **default_params, unlock_at: "2022-01-01T05:00:00Z", due_at: "2022-01-02T05:00:00Z" }
+        expect(response).to be_no_content
+        expect(differentiable.reload.unlock_at.iso8601).to eq "2022-01-01T05:00:00Z"
+      end
+    end
+
+    let(:default_availability_dates) do
+      {
+        unlock_at: "2022-01-01T00:00:00Z",
+        lock_at: "2022-01-03T01:00:00Z",
+        only_visible_to_overrides: true
+      }
+    end
+
+    let(:default_due_date) do
+      {
+        due_at: "2022-01-02T00:00:00Z"
+      }
+    end
+
     context "assignments" do
       let_once(:learning_object) do
         @course.assignments.create!(
           title: "Locked Assignment",
-          due_at: "2022-01-02T00:00:00Z",
-          unlock_at: "2022-01-01T00:00:00Z",
-          lock_at: "2022-01-03T00:00:00Z",
-          only_visible_to_overrides: true
+          **default_availability_dates,
+          **default_due_date
         )
+      end
+
+      let_once(:differentiable) do
+        learning_object
       end
 
       let_once(:default_params) do
@@ -454,7 +485,7 @@ describe LearningObjectDatesController do
         }
       end
 
-      include_examples "learning object updates"
+      include_examples "learning object updates", true
 
       it "returns bad_request if dates are invalid" do
         put :update, params: { **default_params, unlock_at: "2023-01-" }
@@ -467,11 +498,13 @@ describe LearningObjectDatesController do
       let_once(:learning_object) do
         @course.quizzes.create!(
           title: "Locked Assignment",
-          due_at: "2022-01-02T00:00:00Z",
-          unlock_at: "2022-01-01T00:00:00Z",
-          lock_at: "2022-01-03T00:00:00Z",
-          only_visible_to_overrides: true
+          **default_availability_dates,
+          **default_due_date
         )
+      end
+
+      let_once(:differentiable) do
+        learning_object
       end
 
       let_once(:default_params) do
@@ -481,7 +514,101 @@ describe LearningObjectDatesController do
         }
       end
 
-      include_examples "learning object updates"
+      include_examples "learning object updates", true
+    end
+
+    context "graded discussions" do
+      let_once(:learning_object) do
+        discussion = DiscussionTopic.create_graded_topic!(course: @course, title: "graded discussion")
+        assignment = discussion.assignment
+        assignment.update!(**default_availability_dates, **default_due_date)
+        discussion
+      end
+
+      let_once(:differentiable) do
+        learning_object.assignment
+      end
+
+      let_once(:default_params) do
+        {
+          course_id: @course.id,
+          discussion_topic_id: learning_object.id
+        }
+      end
+
+      include_examples "learning object updates", true
+
+      it "removes base dates on DiscussionTopic object if it has any" do
+        learning_object.update!(**default_availability_dates)
+        put :update, params: { **default_params, unlock_at: "2019-01-02T05:00:00Z" }
+        expect(response).to be_no_content
+        learning_object.reload
+        expect(learning_object.unlock_at).to be_nil
+        expect(learning_object.lock_at).to be_nil
+        expect(differentiable.reload.unlock_at.iso8601).to eq "2019-01-02T05:00:00Z"
+      end
+    end
+
+    context "ungraded discussions" do
+      let_once(:learning_object) do
+        @course.discussion_topics.create!(**default_availability_dates)
+      end
+
+      let_once(:differentiable) do
+        learning_object
+      end
+
+      let_once(:default_params) do
+        {
+          course_id: @course.id,
+          discussion_topic_id: learning_object.id
+        }
+      end
+
+      include_examples "learning object updates", false
+      include_examples "learning objects without due dates"
+    end
+
+    context "pages" do
+      let_once(:learning_object) do
+        @course.wiki_pages.create!(title: "My Page", **default_availability_dates)
+      end
+
+      let_once(:differentiable) do
+        learning_object
+      end
+
+      let_once(:default_params) do
+        {
+          course_id: @course.id,
+          page_id: learning_object.id
+        }
+      end
+
+      include_examples "learning object updates", false
+      include_examples "learning objects without due dates"
+    end
+
+    context "files" do
+      let_once(:learning_object) do
+        @course.attachments.create!(filename: "coolpdf.pdf",
+                                    uploaded_data: StringIO.new("test"),
+                                    **default_availability_dates)
+      end
+
+      let_once(:differentiable) do
+        learning_object
+      end
+
+      let_once(:default_params) do
+        {
+          course_id: @course.id,
+          attachment_id: learning_object.id
+        }
+      end
+
+      include_examples "learning object updates", false
+      include_examples "learning objects without due dates"
     end
   end
 end

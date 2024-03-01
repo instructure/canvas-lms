@@ -96,7 +96,7 @@ class LearningObjectDatesController < ApplicationController
   # Note: this API is still under development and will not function until the feature is enabled.
   #
   # @argument due_at [DateTime]
-  #   The learning object's due date.
+  #   The learning object's due date. Not applicable for ungraded discussions, pages, and files.
   #
   # @argument unlock_at [DateTime]
   #   The learning object's unlock date. Must be before the due date if there is one.
@@ -141,6 +141,15 @@ class LearningObjectDatesController < ApplicationController
       update_assignment(asset, object_update_params)
     when "Quizzes::Quiz"
       update_quiz(asset, object_update_params)
+    when "DiscussionTopic"
+      if asset == overridable
+        update_ungraded_object(asset, object_update_params)
+      else
+        update_assignment(overridable, object_update_params)
+        prefer_assignment_availability_dates(asset, overridable)
+      end
+    when "WikiPage", "Attachment"
+      update_ungraded_object(asset, object_update_params)
     end
   end
 
@@ -211,11 +220,35 @@ class LearningObjectDatesController < ApplicationController
     head :no_content
   end
 
+  def update_ungraded_object(object, params)
+    overrides = params.delete :assignment_overrides
+    batch = prepare_assignment_overrides_for_batch_update(object, overrides, @current_user) if overrides
+    object.transaction do
+      object.update!(params)
+      perform_batch_update_assignment_overrides(object, batch) if overrides
+    end
+    head :no_content
+  end
+
+  def prefer_assignment_availability_dates(object, assignment)
+    return unless object.is_a?(DiscussionTopic) && assignment
+
+    object.delayed_post_at = nil if assignment.unlock_at.present?
+    object.unlock_at = nil if assignment.unlock_at.present?
+    object.lock_at = nil if assignment.lock_at.present?
+    object.save! if object.changed?
+  end
+
+  def allow_due_at?
+    asset.is_a?(Assignment) || asset.is_a?(Quizzes::Quiz) || (asset.is_a?(DiscussionTopic) && asset.assignment)
+  end
+
   def object_update_params
-    params.permit(:due_at,
-                  :unlock_at,
-                  :lock_at,
-                  :only_visible_to_overrides,
-                  assignment_overrides: strong_anything)
+    allowed_params = [:unlock_at,
+                      :lock_at,
+                      :only_visible_to_overrides,
+                      { assignment_overrides: strong_anything }]
+    allowed_params.unshift(:due_at) if allow_due_at?
+    params.permit(*allowed_params)
   end
 end
