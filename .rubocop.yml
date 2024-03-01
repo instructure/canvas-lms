@@ -245,9 +245,6 @@ Layout/LineLength:
   Enabled: false
   AutoCorrect: false
 
-Lint/UriEscapeUnescape:
-  Severity: warning
-
 Naming/AccessorMethodName:
   Severity: convention
 Naming/BinaryOperatorParameterName:
