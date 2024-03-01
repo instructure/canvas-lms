@@ -91,9 +91,13 @@ export default class RosterUserView extends Backbone.View {
     if (!json.isInactive) {
       json.enrollments = reject(json.enrollments, en => en.enrollment_state === 'inactive') // if not _completely_ inactive, treat the inactive enrollments as deleted
     }
-
     json.canRemoveUsers = every(this.model.get('enrollments'), e => e.can_be_removed)
-    json.canResendInvitation = !json.isInactive
+    json.canResendInvitation =
+      !json.isInactive && (ENV.FEATURES.granular_permissions_manage_users
+        ? some(this.model.get('enrollments'), en =>
+            ENV.permissions.active_granular_enrollment_permissions.includes(en.type)
+          )
+        : true)
 
     if (json.canRemoveUsers && !ENV.course.concluded) {
       json.canEditRoles = !some(
