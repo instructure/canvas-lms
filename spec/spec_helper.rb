@@ -479,9 +479,7 @@ RSpec.configure do |config|
 
   config.around do |example|
     Rails.logger.info "STARTING SPEC #{example.full_description}"
-    SpecTimeLimit.enforce(example) do
-      example.run
-    end
+    SpecTimeLimit.enforce(example, &example)
   end
 
   def reset_all_the_things!

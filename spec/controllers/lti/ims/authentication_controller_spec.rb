@@ -204,9 +204,7 @@ describe Lti::IMS::AuthenticationController do
       let(:lti_message_hint_jwt_params) { super().merge({ debug_trace: "fake debug_trace" }) }
 
       around do |example|
-        override_dynamic_settings(private: { canvas: { "frontend_data_collection_endpoint" => "fake endpoint" } }) do
-          example.run
-        end
+        override_dynamic_settings(private: { canvas: { "frontend_data_collection_endpoint" => "fake endpoint" } }, &example)
       end
 
       context "when log level is less then #{min_enabled_level}" do
