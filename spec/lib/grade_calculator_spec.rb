@@ -398,8 +398,7 @@ describe GradeCalculator do
       end
 
       it "emits one live event per student" do
-        expect(Canvas::LiveEvents).to receive(:course_grade_change).exactly(1).times \
-          do |score, old_score_values, enrollment|
+        expect(Canvas::LiveEvents).to receive(:course_grade_change).once do |score, old_score_values, enrollment|
           expect(enrollment.user_id).to eq(@student.id)
           expect(enrollment.course_id).to eq(@course.id)
           expect(score.current_score).to eq(60)

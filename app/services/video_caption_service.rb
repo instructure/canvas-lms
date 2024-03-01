@@ -19,6 +19,8 @@
 
 class VideoCaptionService < ApplicationService
   def initialize(media_object, skip_polling: false)
+    super()
+
     @skip_polling = skip_polling # for testing purposes
     @media_object = media_object
     @type = media_object.media_type
