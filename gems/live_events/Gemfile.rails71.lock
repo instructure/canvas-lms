@@ -49,8 +49,7 @@ GEM
       reline (>= 0.3.8)
     diff-lcs (1.5.1)
     dogstatsd-ruby (5.6.1)
-    drb (2.2.0)
-      ruby2_keywords
+    drb (2.2.1)
     i18n (1.14.1)
       concurrent-ruby (~> 1.0)
     inst_statsd (3.0.4)
@@ -97,7 +96,6 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.13.0)
     rspec-support (3.13.0)
-    ruby2_keywords (0.0.5)
     statsd-ruby (1.5.0)
     stringio (3.1.0)
     timeout (0.4.1)

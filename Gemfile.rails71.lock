@@ -516,8 +516,7 @@ GEM
       rubyzip (~> 2.0)
     dogstatsd-ruby (5.6.1)
     dotenv (3.0.2)
-    drb (2.2.0)
-      ruby2_keywords
+    drb (2.2.1)
     dress_code (1.2.1)
       colored
       mustache
@@ -1013,7 +1012,6 @@ GEM
     ruby-progressbar (1.13.0)
     ruby-rc4 (0.1.5)
     ruby-rtf (0.0.5)
-    ruby2_keywords (0.0.5)
     ruby2ruby (2.5.0)
       ruby_parser (~> 3.1)
       sexp_processor (~> 4.6)
