@@ -128,7 +128,7 @@ class AssignmentOverridesController < ApplicationController
   #
   # @returns [AssignmentOverride]
   def index
-    @overrides = assignment_override_collection(@assignment, true)
+    @overrides = assignment_override_collection(@assignment, include_students: true)
     render json: assignment_overrides_json(@overrides, @current_user)
   end
 
