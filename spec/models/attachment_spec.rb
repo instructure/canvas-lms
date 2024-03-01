@@ -2954,7 +2954,9 @@ describe Attachment do
   end
 
   describe ".clone_url" do
-    subject { attachment.clone_url(url, handling, check_quota, opts) }
+    def clone_it
+      attachment.clone_url(url, handling, check_quota, opts)
+    end
 
     let(:attachment) { attachment_model }
     let(:url) { "https://www.test.com/file.jpg" }
@@ -2974,7 +2976,7 @@ describe Attachment do
           expect(Canvas::Errors).to receive(:capture).with(
             error, attachment.clone_url_error_info(error, url)
           )
-          subject
+          clone_it
           expect(attachment.upload_error_message).to include(url)
         end
       end
@@ -2986,7 +2988,7 @@ describe Attachment do
           expect(Canvas::Errors).to receive(:capture).with(
             error, attachment.clone_url_error_info(error, url)
           )
-          subject
+          clone_it
           expect(attachment.upload_error_message).to include(url)
         end
       end
