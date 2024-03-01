@@ -77,12 +77,22 @@ export default class InvitationsView extends DialogBaseView {
     return this.$el.parent().next('.ui-dialog-buttonpane').hide()
   }
 
+  sendInvitation(e) {
+    const url = `/confirmations/${this.model.get('id')}/re_send?enrollment_id=${e.id}`
+    $.ajaxJSON(url)
+  }
+
   resend(e) {
     e.preventDefault()
     this.close()
     for (e of this.model.get('enrollments')) {
-      const url = `/confirmations/${this.model.get('id')}/re_send?enrollment_id=${e.id}`
-      $.ajaxJSON(url)
+      if (ENV.FEATURES.granular_permissions_manage_users) {
+        if (ENV.permissions.active_granular_enrollment_permissions.includes(e.type)) {
+          this.sendInvitation(e)
+        }
+      } else {
+        this.sendInvitation(e)
+      }
     }
     return $.flashMessage(I18n.t('flash.invitation', 'Invitation sent.'))
   }
