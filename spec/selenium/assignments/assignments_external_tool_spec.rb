@@ -145,7 +145,7 @@ describe "external tool assignments" do
       get "/courses/#{@course.id}/assignments/new"
 
       click_option("#assignment_submission_type", @t1.name) # should use the tool name for drop-down
-      button = f("#assignment_submission_type_selection_tool_launch_container .btn-primary")
+      button = f("#assignment_submission_type_selection_launch_button")
 
       expect(button).to be_displayed
       expect(button.text).to include("link to #{@t1.name} or whatever") # the launch button uses the placement text
@@ -169,7 +169,7 @@ describe "external tool assignments" do
       get "/courses/#{@course.id}/assignments/#{assmt.id}/edit"
       selected = first_selected_option(f("#assignment_submission_type"))
       expect(selected.text.strip).to eq @t1.name
-      button = f("#assignment_submission_type_selection_tool_launch_container .btn-primary")
+      button = f("#assignment_submission_type_selection_launch_button")
       expect(button).to be_displayed
       expect(button.text).to include("link to #{@t1.name} or whatever") # the launch button uses the placement text
     end
@@ -203,7 +203,7 @@ describe "external tool assignments" do
     it "is bring up modal when submission type link is clicked" do
       get "/courses/#{@course.id}/assignments/new"
       click_option("#assignment_submission_type", @t1.name) # should use the tool name for drop-down
-      f("#assignment_submission_type_selection_tool_launch_container .btn-primary").click
+      f("#assignment_submission_type_selection_launch_button").click
       expect(fxpath("//span[@aria-label = 'Launch External Tool']//h2").text).to include("link to #{@t1.name} or whatever")
 
       close_button_selector = "//span[@aria-label = 'Launch External Tool']//button[//*[text() = 'Close']]"
