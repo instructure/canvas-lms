@@ -1477,8 +1477,10 @@ class ApplicationController < ActionController::Base
                 t "#application.errors.quota_exceeded", "Storage quota exceeded"
               end
       respond_to do |format|
-        flash[:error] = error unless request.format.to_s == "text/plain"
-        format.html { redirect_to redirect }
+        format.html do
+          flash[:error] = error
+          redirect_to redirect
+        end
         format.json { render json: { errors: { base: error } }, status: :bad_request }
         format.text { render json: { errors: { base: error } }, status: :bad_request }
       end
