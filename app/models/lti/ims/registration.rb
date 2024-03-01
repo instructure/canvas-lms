@@ -77,7 +77,7 @@ class Lti::IMS::Registration < ApplicationRecord
       scopes: scopes.reject { |s| overlay["disabledScopes"]&.include?(s) || false },
       public_jwk_url: jwks_uri,
       description: config["description"],
-      custom_parameters: config["custom_parameters"],
+      custom_fields: config["custom_parameters"],
       target_link_uri: config["target_link_uri"],
       oidc_initiation_url: initiate_login_uri,
       url: config["target_link_uri"],
