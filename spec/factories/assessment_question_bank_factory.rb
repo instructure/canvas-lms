@@ -24,12 +24,12 @@ module Factories
     @bank = @course.assessment_question_banks.create!(title: "Test Bank")
   end
 
-  def assessment_question_bank_with_questions
+  def assessment_question_bank_with_questions(count: 10)
     @bank ||= assessment_question_bank_model
 
     # create a bunch of questions to make it more likely that they'll shuffle randomly
     # define @q1..@q10
-    (1..10).each do |i|
+    (1..count).each do |i|
       q = @bank.assessment_questions.create!(
         question_data: {
           "name" => "test question #{i}",
