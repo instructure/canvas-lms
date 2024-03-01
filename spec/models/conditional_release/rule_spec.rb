@@ -26,7 +26,7 @@ module ConditionalRelease
 
     describe "rule definition" do
       it "must have a root account id" do
-        rule = build :rule
+        rule = build(:rule)
         rule.root_account_id = nil
         expect(rule.valid?).to be false
         rule.root_account_id = ""
@@ -36,32 +36,32 @@ module ConditionalRelease
 
     describe "assignment_sets_for_score" do
       before :once do
-        @rule = create :rule
-        create :scoring_range_with_assignments,
+        @rule = create(:rule)
+        create(:scoring_range_with_assignments,
                rule: @rule,
                lower_bound: 90,
                upper_bound: nil,
-               assignment_set_count: 1
-        create :scoring_range_with_assignments,
+               assignment_set_count: 1)
+        create(:scoring_range_with_assignments,
                rule: @rule,
                lower_bound: 70,
                upper_bound: 90,
-               assignment_set_count: 1
-        create :scoring_range_with_assignments,
+               assignment_set_count: 1)
+        create(:scoring_range_with_assignments,
                rule: @rule,
                lower_bound: 50,
                upper_bound: 70,
-               assignment_set_count: 1
+               assignment_set_count: 1)
       end
 
       it "must apply all scoring ranges" do
         expect(@rule.assignment_sets_for_score(91).length).to eq(1)
         # create a range that crosses the ranges above
-        create :scoring_range_with_assignments,
+        create(:scoring_range_with_assignments,
                rule: @rule,
                lower_bound: 80,
                upper_bound: 95,
-               assignment_set_count: 2
+               assignment_set_count: 2)
         expect(@rule.assignment_sets_for_score(91).length).to eq(3)
       end
 
@@ -70,22 +70,22 @@ module ConditionalRelease
       end
 
       it "must return [] if no scoring ranges are defined" do
-        rule = create :rule
+        rule = create(:rule)
         expect(rule.assignment_sets_for_score(10)).to eq([])
       end
     end
 
     describe "with_assignments" do
       before do
-        @rule1 = create :rule_with_scoring_ranges
+        @rule1 = create(:rule_with_scoring_ranges)
         @rule1.scoring_ranges.last.assignment_sets.destroy_all
-        @rule2 = create :rule_with_scoring_ranges, assignment_set_count: 0
-        @rule3 = create :rule_with_scoring_ranges, assignment_count: 0
-        @rule4 = create :rule_with_scoring_ranges,
+        @rule2 = create(:rule_with_scoring_ranges, assignment_set_count: 0)
+        @rule3 = create(:rule_with_scoring_ranges, assignment_count: 0)
+        @rule4 = create(:rule_with_scoring_ranges,
                         scoring_range_count: 1,
                         assignment_set_count: 1,
-                        assignment_count: 1
-        @rule5 = create :rule
+                        assignment_count: 1)
+        @rule5 = create(:rule)
       end
 
       let(:rules) { Rule.with_assignments.to_a }

@@ -25,7 +25,7 @@ module ConditionalRelease
     it_behaves_like "a soft-deletable model"
 
     it "must have a scoring_range_id" do
-      assignment_set = build :assignment_set, scoring_range_id: nil
+      assignment_set = build(:assignment_set, scoring_range_id: nil)
       expect(assignment_set.valid?).to be false
     end
   end

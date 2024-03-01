@@ -22,6 +22,9 @@ Bundler:
 Capybara:
   Enabled: false # we don't use capybara (it's automatically included by rubocop-rspec until they hit 3.0)
 
+FactoryBot:
+  Severity: error
+
 Gemspec:
   Severity: error
 Gemspec/RequireMFA:
@@ -220,13 +223,6 @@ Style/WordArray:
 # we should eventually either fix them, or turn them off completely (and move
 # them to the section above)
 # auto-correct needs to be disabled for any that support it in the meantime
-
-FactoryBot/ConsistentParenthesesStyle:
-  AutoCorrect: false
-FactoryBot/CreateList:
-  AutoCorrect: false
-FactoryBot/SyntaxMethods:
-  AutoCorrect: false
 
 GraphQL/FieldMethod:
   AutoCorrect: false

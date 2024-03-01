@@ -33,7 +33,7 @@ module ConditionalRelease
 
     context "rules stats" do
       before(:once) do
-        @rule = create :rule, course: @course
+        @rule = create(:rule, course: @course)
       end
 
       describe "GET students_per_range" do

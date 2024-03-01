@@ -32,14 +32,14 @@ RSpec.shared_examples "a soft-deletable model" do
   end
 
   it "soft deletes" do
-    instance = create described_class.name.underscore.sub("conditional_release/", "").to_sym
+    instance = create(described_class.name.underscore.sub("conditional_release/", "").to_sym)
     instance.destroy!
     expect(described_class.exists?(instance.id)).to be true
     expect(described_class.active.exists?(instance.id)).to be false
   end
 
   it "allows duplicates on unique attributes when one instance is soft deleted" do
-    instance = create described_class.name.underscore.sub("conditional_release/", "").to_sym
+    instance = create(described_class.name.underscore.sub("conditional_release/", "").to_sym)
     copy = instance.clone
     instance.destroy!
     expect { copy.save! }.to_not raise_error
