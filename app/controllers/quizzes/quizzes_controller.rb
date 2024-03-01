@@ -330,7 +330,7 @@ class Quizzes::QuizzesController < ApplicationController
       @banks_hash = get_banks(@quiz)
 
       if (@has_student_submissions = @quiz.has_student_submissions?)
-        flash[:notice] = t("notices.has_submissions_already", "Keep in mind, some students have already taken or started taking this quiz")
+        flash.now[:notice] = t("notices.has_submissions_already", "Keep in mind, some students have already taken or started taking this quiz")
       end
 
       regrade_options = @quiz.current_quiz_question_regrades.to_h do |qqr|
@@ -560,8 +560,10 @@ class Quizzes::QuizzesController < ApplicationController
           SubmissionLifecycleManager.recompute(@quiz.assignment, update_grades: true, executing_user: @current_user)
         end
 
-        flash[:notice] = t("Quiz successfully updated")
-        format.html { redirect_to named_context_url(@context, :context_quiz_url, @quiz) }
+        format.html do
+          flash[:notice] = t("Quiz successfully updated")
+          redirect_to named_context_url(@context, :context_quiz_url, @quiz)
+        end
         format.json { render json: @quiz.as_json(include: { assignment: { include: :assignment_group } }) }
       end
     end
@@ -732,7 +734,7 @@ class Quizzes::QuizzesController < ApplicationController
       js_env GRADE_BY_QUESTION: @current_user&.preferences&.dig(:enable_speedgrader_grade_by_question)
       if authorized_action(@submission, @current_user, :read)
         if @current_user && !@quiz.visible_to_user?(@current_user)
-          flash[:notice] = t "notices.submission_doesnt_count", "This quiz will no longer count towards your grade."
+          flash.now[:notice] = t "notices.submission_doesnt_count", "This quiz will no longer count towards your grade."
         end
         dont_show_user_name = @submission.quiz.anonymous_submissions || (!@submission.user || @submission.user == @current_user)
         add_crumb((dont_show_user_name ? t(:default_history_crumb, "History") : @submission.user.name))
@@ -963,7 +965,7 @@ class Quizzes::QuizzesController < ApplicationController
     return unless quiz_submission_active?
 
     @show_embedded_chat = false
-    flash[:notice] = t("notices.less_than_allotted_time", "You started this quiz near when it was due, so you won't have the full amount of time to take the quiz.") if @submission.less_than_allotted_time?
+    flash.now[:notice] = t("notices.less_than_allotted_time", "You started this quiz near when it was due, so you won't have the full amount of time to take the quiz.") if @submission.less_than_allotted_time?
     if params[:question_id] && !valid_question?(@submission, params[:question_id])
       redirect_to course_quiz_url(@context, @quiz) and return
     end

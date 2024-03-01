@@ -208,10 +208,8 @@ class AssignmentGroupsController < ApplicationController
   def show
     @assignment_group = @context.assignment_groups.find(params[:id])
     if @assignment_group.deleted?
-      respond_to do |format|
-        flash[:notice] = t "notices.deleted", "This group has been deleted"
-        format.html { redirect_to named_context_url(@context, :assignments_url) }
-      end
+      flash[:notice] = t "notices.deleted", "This group has been deleted"
+      redirect_to named_context_url(@context, :assignments_url)
       return
     end
     if authorized_action(@assignment_group, @current_user, :read)

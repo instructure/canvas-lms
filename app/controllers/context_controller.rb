@@ -257,6 +257,7 @@ class ContextController < ApplicationController
       end
 
       @user = @membership.user rescue nil
+      # rubocop:disable Rails/ActionControllerFlashBeforeRender
       unless @user
         case @context
         when Course
@@ -267,6 +268,7 @@ class ContextController < ApplicationController
         redirect_to named_context_url(@context, :context_users_url)
         return
       end
+      # rubocop:enable Rails/ActionControllerFlashBeforeRender
 
       js_env(CONTEXT_USER_DISPLAY_NAME: @user.short_name)
 

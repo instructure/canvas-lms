@@ -41,7 +41,7 @@ class Quizzes::QuizSubmissionsController < ApplicationController
   def create
     delete_session_access_key!
     if @quiz.ip_filter && !@quiz.valid_ip?(request.remote_ip)
-      flash[:error] = t("errors.protected_quiz", "This quiz is protected and is only available from certain locations.  The computer you are currently using does not appear to be at a valid location for taking this quiz.")
+      flash[:error] = t("errors.protected_quiz", "This quiz is protected and is only available from certain locations.  The computer you are currently using does not appear to be at a valid location for taking this quiz.") # rubocop:disable Rails/ActionControllerFlashBeforeRender
     elsif @quiz.grants_right?(@current_user, :submit)
       # If the submission is a preview, we don't add it to the user's submission history,
       # and it actually gets keyed by the temporary_user_code column instead of

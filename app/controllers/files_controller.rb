@@ -659,7 +659,7 @@ class FilesController < ApplicationController
           render status: :not_found, template: "shared/errors/404_message", formats: [:html]
           return
         end
-        flash[:notice] = t "notices.deleted", "The file %{display_name} has been deleted", display_name: @attachment.display_name
+        flash[:notice] = t "notices.deleted", "The file %{display_name} has been deleted", display_name: @attachment.display_name unless request.format == :json # rubocop:disable Rails/ActionControllerFlashBeforeRender
         if params[:preview] && @attachment.mime_class == "image"
           redirect_to "/images/blank.png"
         elsif request.format == :json
