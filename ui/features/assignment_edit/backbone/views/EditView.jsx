@@ -45,6 +45,7 @@ import SisValidationHelper from '@canvas/sis/SisValidationHelper'
 import SimilarityDetectionTools from '../../react/AssignmentConfigurationTools'
 import ModeratedGradingFormFieldGroup from '../../react/ModeratedGradingFormFieldGroup'
 import AllowedAttemptsWithState from '../../react/allowed_attempts/AllowedAttemptsWithState'
+import AssignmentSubmissionTypeSelectionLaunchButton from '../../react/AssignmentSubmissionTypeSelectionLaunchButton'
 import DefaultToolForm from '../../react/DefaultToolForm'
 import UsageRightsSelectBox from '@canvas/files/react/components/UsageRightsSelectBox'
 import AssignmentExternalTools from '@canvas/assignments/react/AssignmentExternalTools'
@@ -86,9 +87,7 @@ const EXTERNAL_TOOL_SETTINGS_NEW_TAB = '#external_tool_new_tab_container'
 const DEFAULT_EXTERNAL_TOOL_CONTAINER = '#default_external_tool_container'
 const EXTERNAL_TOOL_PLACEMENT_LAUNCH_CONTAINER =
   '#assignment_submission_type_selection_tool_launch_container'
-const EXTERNAL_TOOL_PLACEMENT_LAUNCH_BUTTON = '#assignment_submission_type_selection_launch_button'
-const EXTERNAL_TOOL_PLACEMENT_LAUNCH_BUTTON_TEXT =
-  '#assignment_submission_type_selection_launch_button_text'
+
 const EXTERNAL_TOOL_DATA = '#assignment_submission_type_external_data'
 const ALLOWED_ATTEMPTS_CONTAINER = '#allowed_attempts_fields'
 const GROUP_CATEGORY_SELECTOR = '#group_category_selector'
@@ -167,6 +166,7 @@ function EditView() {
   this.handleGradingTypeChange = this.handleGradingTypeChange.bind(this)
   this.handleRestrictFileUploadsChange = this.handleRestrictFileUploadsChange.bind(this)
   this.renderDefaultExternalTool = this.renderDefaultExternalTool.bind(this)
+  this.renderAssignmentSubmissionTypeSelectionLaunchButton = this.renderAssignmentSubmissionTypeSelectionLaunchButton.bind(this)
   this.defaultExternalToolName = this.defaultExternalToolName.bind(this)
   this.defaultExternalToolUrl = this.defaultExternalToolUrl.bind(this)
   this.defaultExternalToolEnabled = this.defaultExternalToolEnabled.bind(this)
@@ -242,8 +242,6 @@ EditView.prototype.els = {
     els['' + EXTERNAL_TOOL_SETTINGS_NEW_TAB] = '$externalToolNewTabContainer'
     els['' + DEFAULT_EXTERNAL_TOOL_CONTAINER] = '$defaultExternalToolContainer'
     els['' + EXTERNAL_TOOL_PLACEMENT_LAUNCH_CONTAINER] = '$externalToolPlacementLaunchContainer'
-    els['' + EXTERNAL_TOOL_PLACEMENT_LAUNCH_BUTTON] = '$externalToolPlacementLaunchButton'
-    els['' + EXTERNAL_TOOL_PLACEMENT_LAUNCH_BUTTON_TEXT] = '$externalToolPlacementLaunchButtonText'
     els['' + ALLOWED_ATTEMPTS_CONTAINER] = '$allowedAttemptsContainer'
     els['' + ASSIGNMENT_POINTS_POSSIBLE] = '$assignmentPointsPossible'
     els['' + ASSIGNMENT_POINTS_CHANGE_WARN] = '$pointsChangeWarning'
@@ -900,6 +898,18 @@ EditView.prototype.toggleAdvancedTurnitinSettings = function (ev) {
   )
 }
 
+EditView.prototype.renderAssignmentSubmissionTypeSelectionLaunchButton = function () {
+  const tool = this.selectedTool
+  const props = {
+    tool,
+    onClick: this.handleSubmissionTypeSelectionLaunch,
+  }
+  return ReactDOM.render(
+    React.createElement(AssignmentSubmissionTypeSelectionLaunchButton, props),
+    document.querySelector('[data-component="AssignmentSubmissionTypeSelectionLaunchButton"]')
+  )
+}
+
 EditView.prototype.defaultExternalToolEnabled = function () {
   return !!this.defaultExternalToolUrl()
 }
@@ -1013,14 +1023,7 @@ EditView.prototype.handlePlacementExternalToolSelect = function (selection) {
     this.$externalToolsIframeHeight.val('')
   }
 
-  this.$externalToolPlacementLaunchButtonText.text(this.selectedTool.title)
-  return this.$externalToolPlacementLaunchButton.click(
-    (function (_this) {
-      return function () {
-        return _this.handleSubmissionTypeSelectionLaunch()
-      }
-    })(this)
-  )
+    this.renderAssignmentSubmissionTypeSelectionLaunchButton()
 }
 
 EditView.prototype.handleSubmissionTypeSelectionLaunch = function () {

@@ -828,7 +828,9 @@ class AssignmentsController < ApplicationController
         GRADING_SCHEME_UPDATES_ENABLED:
           Account.site_admin.feature_enabled?(:grading_scheme_updates),
         OUTCOMES_NEW_DECAYING_AVERAGE_CALCULATION:
-          @context.root_account.feature_enabled?(:outcomes_new_decaying_average_calculation)
+          @context.root_account.feature_enabled?(:outcomes_new_decaying_average_calculation),
+        UPDATE_ASSIGNMENT_SUBMISSION_TYPE_LAUNCH_BUTTON_ENABLED:
+          Account.site_admin.feature_enabled?(:update_assignment_submission_type_launch_button)
       }
 
       if @context.root_account.feature_enabled?(:instui_nav)
