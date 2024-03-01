@@ -31,10 +31,10 @@ FactoryBot.define do
       end
 
       after(:create) do |range, evaluator|
-        create_list :assignment_set_with_assignments,
+        create_list(:assignment_set_with_assignments,
                     evaluator.assignment_set_count,
                     scoring_range: range,
-                    assignment_count: evaluator.assignment_count
+                    assignment_count: evaluator.assignment_count)
       end
     end
   end

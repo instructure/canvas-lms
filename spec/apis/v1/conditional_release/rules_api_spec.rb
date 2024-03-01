@@ -43,17 +43,17 @@ module ConditionalRelease
 
     describe "GET index" do
       before(:once) do
-        create :rule_with_scoring_ranges,
+        create(:rule_with_scoring_ranges,
                course: @course,
-               trigger_assignment: @assignment
-        create :rule_with_scoring_ranges,
+               trigger_assignment: @assignment)
+        create(:rule_with_scoring_ranges,
                course: @course,
                trigger_assignment: @assignment,
-               assignment_count: 0
-        create :rule_with_scoring_ranges, course: @course
+               assignment_count: 0)
+        create(:rule_with_scoring_ranges, course: @course)
 
         other_course = Course.create!
-        create :rule_with_scoring_ranges, course: other_course
+        create(:rule_with_scoring_ranges, course: other_course)
 
         @url = "/api/v1/courses/#{@course.id}/mastery_paths/rules"
         @base_params = {
@@ -107,11 +107,11 @@ module ConditionalRelease
 
     describe "GET show" do
       before :once do
-        @rule = create :rule_with_scoring_ranges,
+        @rule = create(:rule_with_scoring_ranges,
                        course: @course,
                        scoring_range_count: 2,
                        assignment_set_count: 2,
-                       assignment_count: 3
+                       assignment_count: 3)
 
         @url = "/api/v1/courses/#{@course.id}/mastery_paths/rules/#{@rule.id}"
         @base_params = {
@@ -247,7 +247,7 @@ module ConditionalRelease
 
     describe "PUT update" do
       before :once do
-        @rule = create :rule, course: @course, trigger_assignment: @assignment
+        @rule = create(:rule, course: @course, trigger_assignment: @assignment)
         @url = "/api/v1/courses/#{@course.id}/mastery_paths/rules/#{@rule.id}"
         @other_assignment = @course.assignments.create!
         @base_params = {
@@ -283,10 +283,10 @@ module ConditionalRelease
       end
 
       it "updates with scoring ranges" do
-        rule = create :rule_with_scoring_ranges,
+        rule = create(:rule_with_scoring_ranges,
                       course: @course,
                       scoring_range_count: 2,
-                      assignment_count: 3
+                      assignment_count: 3)
         range = rule.scoring_ranges[0]
         range.upper_bound = 99
         rule_params = rule.as_json(include: :scoring_ranges, include_root: false)
@@ -305,9 +305,9 @@ module ConditionalRelease
       end
 
       it "updates removes scoring ranges" do
-        rule = create :rule_with_scoring_ranges,
+        rule = create(:rule_with_scoring_ranges,
                       course: @course,
-                      scoring_range_count: 2
+                      scoring_range_count: 2)
         rule_params = rule.as_json(include: :scoring_ranges, include_root: false)
         rule_params["scoring_ranges"].shift
 
@@ -322,11 +322,11 @@ module ConditionalRelease
       end
 
       it "updates with assignments in order" do
-        rule = create :rule_with_scoring_ranges,
+        rule = create(:rule_with_scoring_ranges,
                       course: @course,
                       scoring_range_count: 2,
                       assignment_set_count: 2,
-                      assignment_count: 1
+                      assignment_count: 1)
         rule_params = rule.as_json(include: { scoring_ranges: { include: { assignment_sets: { include: :assignment_set_associations } } } }, include_root: false)
 
         changed_assignment = @course.assignments.create!
@@ -357,11 +357,11 @@ module ConditionalRelease
       end
 
       it "updates with assignments in rearranged order" do
-        rule = create :rule_with_scoring_ranges,
+        rule = create(:rule_with_scoring_ranges,
                       course: @course,
                       scoring_range_count: 1,
                       assignment_set_count: 1,
-                      assignment_count: 3
+                      assignment_count: 3)
         rule_params = rule.as_json(include_root: false, include: { scoring_ranges: { include: { assignment_sets: { include: :assignment_set_associations } } } })
 
         assignments = rule_params["scoring_ranges"][0]["assignment_sets"][0]["assignment_set_associations"]
@@ -387,7 +387,7 @@ module ConditionalRelease
 
     describe "DELETE destroy" do
       before :once do
-        @rule = create :rule, course: @course
+        @rule = create(:rule, course: @course)
         @url = "/api/v1/courses/#{@course.id}/mastery_paths/rules/#{@rule.id}"
         @base_params = {
           controller: "conditional_release/rules",
