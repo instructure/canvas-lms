@@ -344,8 +344,8 @@ module MicrosoftSync
     end
 
     def step_check_team_exists(_mem_data, _job_state_data)
-      if course.enrollments.where(type: MembershipDiff::OWNER_ENROLLMENT_TYPES).any? \
-          && !graph_service.teams.team_exists?(group.ms_group_id)
+      if course.enrollments.where(type: MembershipDiff::OWNER_ENROLLMENT_TYPES).any? &&
+         !graph_service.teams.team_exists?(group.ms_group_id)
         StateMachineJob::DelayedNextStep.new(:step_create_team, DELAY_BEFORE_CREATE_TEAM)
       else
         StateMachineJob::COMPLETE
