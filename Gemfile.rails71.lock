@@ -707,7 +707,7 @@ GEM
       net-imap
       net-pop
       net-smtp
-    marcel (1.0.2)
+    marcel (1.0.4)
     marginalia (1.11.1)
       actionpack (>= 5.2)
       activerecord (>= 5.2)
