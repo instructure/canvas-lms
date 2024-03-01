@@ -23,7 +23,7 @@ require "spec_helper"
 describe CanvasSecurity::JWKKeyPair do
   describe "#to_jwk" do
     it "has the private key in the JWK format" do
-      Timecop.freeze(Time.zone.now) do
+      Timecop.freeze do
         keys = CanvasSecurity::RSAKeyPair.new
         jwk = keys.to_jwk
         expect(jwk).to include(keys.private_key.to_jwk(kid: jwk["kid"]))
@@ -34,7 +34,7 @@ describe CanvasSecurity::JWKKeyPair do
 
   describe "#public_jwk" do
     it "includes the public key in JWK format" do
-      Timecop.freeze(Time.zone.now) do
+      Timecop.freeze do
         keys = CanvasSecurity::RSAKeyPair.new
         jwk = keys.public_jwk
         expect(jwk).to include(keys.private_key.public_key.to_jwk(kid: jwk["kid"]))
@@ -43,7 +43,7 @@ describe CanvasSecurity::JWKKeyPair do
     end
 
     it "does not include the private key claims in JWK format" do
-      Timecop.freeze(Time.zone.now) do
+      Timecop.freeze do
         keys = CanvasSecurity::RSAKeyPair.new
         expect(keys.public_jwk.keys).not_to include "d", "p", "q", "dp", "dq", "qi"
       end

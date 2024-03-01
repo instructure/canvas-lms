@@ -501,14 +501,12 @@ describe RequestThrottle do
         end
 
         it "clamps a negative increment to 0" do
-          Timecop.safe_mode = false
           Timecop.freeze("2013-01-01 3:00:00 UTC") do
             @bucket.reserve_capacity(20) do
               # finishing 6 seconds later, so final cost with leak is < 0
-              Timecop.freeze(Time.now + 6.seconds)
+              Timecop.travel(6.seconds)
               5
             end
-            Timecop.return
           end
           expect(@bucket.count).to eq 0
           expect(@bucket.redis.hget(@bucket.cache_key, "count").to_f).to eq 0
@@ -552,10 +550,6 @@ describe RequestThrottle do
           allow(req).to receive_messages(fullpath: "/", env: { "canvas.request_throttle.user_id" => ["123"] })
           allow(@bucket).to receive(:full?).and_return(true)
           expect(throttler.allowed?(request_logged_out, @bucket)).to be_truthy
-        end
-
-        after do
-          Timecop.safe_mode = true
         end
       end
     end

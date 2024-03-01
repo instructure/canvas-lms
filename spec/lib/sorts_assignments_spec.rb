@@ -18,11 +18,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 describe SortsAssignments do
+  around do |example|
+    Timecop.freeze(&example)
+  end
+
   before do
     @course = course_factory(active_all: true)
     @student = student_in_course(course: @course, active_all: true).user
-    @now = Time.zone.now
-    @assignment = @course.assignments.create!(due_at: 1.day.ago(@now), submission_types: "online_text_entry")
+    @assignment = @course.assignments.create!(due_at: 1.day.ago, submission_types: "online_text_entry")
   end
 
   context "as a student" do
@@ -37,90 +40,68 @@ describe SortsAssignments do
 
     describe "past" do
       it "excludes assignments that do not have a due date" do
-        Timecop.freeze(@now) do
-          create_adhoc_override_for_assignment(@assignment, @student, due_at: nil)
-          expect(sorter.assignments(:past)).to be_empty
-        end
+        create_adhoc_override_for_assignment(@assignment, @student, due_at: nil)
+        expect(sorter.assignments(:past)).to be_empty
       end
 
       it "excludes assignments due in the future" do
-        Timecop.freeze(@now) do
-          create_adhoc_override_for_assignment(@assignment, @student, due_at: 1.day.from_now)
-          expect(sorter.assignments(:past)).to be_empty
-        end
+        create_adhoc_override_for_assignment(@assignment, @student, due_at: 1.day.from_now)
+        expect(sorter.assignments(:past)).to be_empty
       end
 
       it "includes assignments due in the past" do
-        Timecop.freeze(@now) do
-          @assignment.update!(due_at: 1.day.from_now)
-          create_adhoc_override_for_assignment(@assignment, @student, due_at: 1.day.ago)
-          expect(sorter.assignments(:past)).to include @assignment
-        end
+        @assignment.update!(due_at: 1.day.from_now)
+        create_adhoc_override_for_assignment(@assignment, @student, due_at: 1.day.ago)
+        expect(sorter.assignments(:past)).to include @assignment
       end
     end
 
     describe "overdue" do
       it "excludes assignments that do not have a due date" do
-        Timecop.freeze(@now) do
-          create_adhoc_override_for_assignment(@assignment, @student, due_at: nil)
-          expect(sorter.assignments(:overdue)).to be_empty
-        end
+        create_adhoc_override_for_assignment(@assignment, @student, due_at: nil)
+        expect(sorter.assignments(:overdue)).to be_empty
       end
 
       it "excludes assignments due in the future" do
-        Timecop.freeze(@now) do
-          create_adhoc_override_for_assignment(@assignment, @student, due_at: 1.day.from_now)
-          expect(sorter.assignments(:overdue)).to be_empty
-        end
+        create_adhoc_override_for_assignment(@assignment, @student, due_at: 1.day.from_now)
+        expect(sorter.assignments(:overdue)).to be_empty
       end
 
       it "excludes assignments that don't expect a submission" do
-        Timecop.freeze(@now) do
-          @assignment.update!(submission_types: "on_paper")
-          create_adhoc_override_for_assignment(@assignment, @student, due_at: 1.day.ago)
-          expect(sorter.assignments(:overdue)).to be_empty
-        end
+        @assignment.update!(submission_types: "on_paper")
+        create_adhoc_override_for_assignment(@assignment, @student, due_at: 1.day.ago)
+        expect(sorter.assignments(:overdue)).to be_empty
       end
 
       it "excludes assignments that the student does not have permission to submit to" do
-        Timecop.freeze(@now) do
-          # excused students can not submit to an assignment
-          @assignment.grade_student(@student, grader: @teacher, excused: true)
-          create_adhoc_override_for_assignment(@assignment, @student, due_at: 1.day.ago)
-          expect(sorter.assignments(:overdue)).to be_empty
-        end
+        # excused students can not submit to an assignment
+        @assignment.grade_student(@student, grader: @teacher, excused: true)
+        create_adhoc_override_for_assignment(@assignment, @student, due_at: 1.day.ago)
+        expect(sorter.assignments(:overdue)).to be_empty
       end
 
       it "excludes assignments that the student has submitted to" do
-        Timecop.freeze(@now) do
-          create_adhoc_override_for_assignment(@assignment, @student, due_at: 1.day.ago)
-          @assignment.submit_homework(@student, body: "my submission")
-          expect(sorter.assignments(:overdue)).to be_empty
-        end
+        create_adhoc_override_for_assignment(@assignment, @student, due_at: 1.day.ago)
+        @assignment.submit_homework(@student, body: "my submission")
+        expect(sorter.assignments(:overdue)).to be_empty
       end
 
       it "includes past due assignments, expecting a submission, that the student has not submitted to" do
-        Timecop.freeze(@now) do
-          create_adhoc_override_for_assignment(@assignment, @student, due_at: 1.day.ago)
-          expect(sorter.assignments(:overdue)).to include @assignment
-        end
+        create_adhoc_override_for_assignment(@assignment, @student, due_at: 1.day.ago)
+        expect(sorter.assignments(:overdue)).to include @assignment
       end
     end
 
     describe "undated" do
       it "excludes assignments that have a due date" do
-        Timecop.freeze(@now) do
-          @assignment.update!(due_at: nil)
-          create_adhoc_override_for_assignment(@assignment, @student, due_at: 1.day.from_now)
-          expect(sorter.assignments(:undated)).to be_empty
-        end
+        @assignment.update!(due_at: nil)
+        create_adhoc_override_for_assignment(@assignment, @student, due_at: 1.day.from_now)
+        expect(sorter.assignments(:undated)).to be_empty
       end
 
       it "includes assignments that do not have a due date" do
-        Timecop.freeze(@now) do
-          create_adhoc_override_for_assignment(@assignment, @student, due_at: nil)
-          expect(sorter.assignments(:undated)).to include @assignment
-        end
+        create_adhoc_override_for_assignment(@assignment, @student, due_at: nil)
+        expect(sorter.assignments(:undated)).to include @assignment
       end
     end
 
@@ -164,58 +145,44 @@ describe SortsAssignments do
 
     describe "upcoming" do
       it "excludes assignments that don't have a due date" do
-        Timecop.freeze(@now) do
-          @assignment.update!(due_at: 1.day.from_now)
-          create_adhoc_override_for_assignment(@assignment, @student, due_at: nil)
-          expect(sorter.assignments(:upcoming)).to be_empty
-        end
+        @assignment.update!(due_at: 1.day.from_now)
+        create_adhoc_override_for_assignment(@assignment, @student, due_at: nil)
+        expect(sorter.assignments(:upcoming)).to be_empty
       end
 
       it "excludes assignments that are due in the past" do
-        Timecop.freeze(@now) do
-          @assignment.update!(due_at: 1.day.from_now)
-          create_adhoc_override_for_assignment(@assignment, @student, due_at: 1.day.ago)
-          expect(sorter.assignments(:upcoming)).to be_empty
-        end
+        @assignment.update!(due_at: 1.day.from_now)
+        create_adhoc_override_for_assignment(@assignment, @student, due_at: 1.day.ago)
+        expect(sorter.assignments(:upcoming)).to be_empty
       end
 
       it "excludes assignments that are due more than one week out" do
-        Timecop.freeze(@now) do
-          @assignment.update!(due_at: 1.day.from_now)
-          create_adhoc_override_for_assignment(@assignment, @student, due_at: 8.days.from_now)
-          expect(sorter.assignments(:upcoming)).to be_empty
-        end
+        @assignment.update!(due_at: 1.day.from_now)
+        create_adhoc_override_for_assignment(@assignment, @student, due_at: 8.days.from_now)
+        expect(sorter.assignments(:upcoming)).to be_empty
       end
 
       it "includes assignments that are due within the next week" do
-        Timecop.freeze(@now) do
-          create_adhoc_override_for_assignment(@assignment, @student, due_at: 1.day.from_now)
-          expect(sorter.assignments(:upcoming)).to include @assignment
-        end
+        create_adhoc_override_for_assignment(@assignment, @student, due_at: 1.day.from_now)
+        expect(sorter.assignments(:upcoming)).to include @assignment
       end
     end
 
     describe "future" do
       it "excludes assignments due in the past" do
-        Timecop.freeze(@now) do
-          @assignment.update!(due_at: 1.day.from_now)
-          create_adhoc_override_for_assignment(@assignment, @student, due_at: 1.day.ago)
-          expect(sorter.assignments(:future)).to be_empty
-        end
+        @assignment.update!(due_at: 1.day.from_now)
+        create_adhoc_override_for_assignment(@assignment, @student, due_at: 1.day.ago)
+        expect(sorter.assignments(:future)).to be_empty
       end
 
       it "includes assignments without a due date" do
-        Timecop.freeze(@now) do
-          create_adhoc_override_for_assignment(@assignment, @student, due_at: nil)
-          expect(sorter.assignments(:future)).to include @assignment
-        end
+        create_adhoc_override_for_assignment(@assignment, @student, due_at: nil)
+        expect(sorter.assignments(:future)).to include @assignment
       end
 
       it "includes assignments with a due date in the future" do
-        Timecop.freeze(@now) do
-          create_adhoc_override_for_assignment(@assignment, @student, due_at: 1.day.from_now)
-          expect(sorter.assignments(:future)).to include @assignment
-        end
+        create_adhoc_override_for_assignment(@assignment, @student, due_at: 1.day.from_now)
+        expect(sorter.assignments(:future)).to include @assignment
       end
     end
   end
@@ -237,90 +204,68 @@ describe SortsAssignments do
     context "observing a single student in a course" do
       describe "past" do
         it "excludes assignments that do not have a due date for the student" do
-          Timecop.freeze(@now) do
-            create_adhoc_override_for_assignment(@assignment, @student, due_at: nil)
-            expect(sorter.assignments(:past)).to be_empty
-          end
+          create_adhoc_override_for_assignment(@assignment, @student, due_at: nil)
+          expect(sorter.assignments(:past)).to be_empty
         end
 
         it "excludes assignments due in the future for the student" do
-          Timecop.freeze(@now) do
-            create_adhoc_override_for_assignment(@assignment, @student, due_at: 1.day.from_now)
-            expect(sorter.assignments(:past)).to be_empty
-          end
+          create_adhoc_override_for_assignment(@assignment, @student, due_at: 1.day.from_now)
+          expect(sorter.assignments(:past)).to be_empty
         end
 
         it "includes assignments due in the past for the student" do
-          Timecop.freeze(@now) do
-            @assignment.update!(due_at: 1.day.from_now)
-            create_adhoc_override_for_assignment(@assignment, @student, due_at: 1.day.ago)
-            expect(sorter.assignments(:past)).to include @assignment
-          end
+          @assignment.update!(due_at: 1.day.from_now)
+          create_adhoc_override_for_assignment(@assignment, @student, due_at: 1.day.ago)
+          expect(sorter.assignments(:past)).to include @assignment
         end
       end
 
       describe "overdue" do
         it "excludes assignments that do not have a due date for the student" do
-          Timecop.freeze(@now) do
-            create_adhoc_override_for_assignment(@assignment, @student, due_at: nil)
-            expect(sorter.assignments(:overdue)).to be_empty
-          end
+          create_adhoc_override_for_assignment(@assignment, @student, due_at: nil)
+          expect(sorter.assignments(:overdue)).to be_empty
         end
 
         it "excludes assignments due in the future for the student" do
-          Timecop.freeze(@now) do
-            create_adhoc_override_for_assignment(@assignment, @student, due_at: 1.day.from_now)
-            expect(sorter.assignments(:overdue)).to be_empty
-          end
+          create_adhoc_override_for_assignment(@assignment, @student, due_at: 1.day.from_now)
+          expect(sorter.assignments(:overdue)).to be_empty
         end
 
         it "excludes assignments that don't expect a submission for the student" do
-          Timecop.freeze(@now) do
-            @assignment.update!(submission_types: "on_paper")
-            create_adhoc_override_for_assignment(@assignment, @student, due_at: 1.day.ago)
-            expect(sorter.assignments(:overdue)).to be_empty
-          end
+          @assignment.update!(submission_types: "on_paper")
+          create_adhoc_override_for_assignment(@assignment, @student, due_at: 1.day.ago)
+          expect(sorter.assignments(:overdue)).to be_empty
         end
 
         it "excludes assignments that the student does not have permission to submit to" do
-          Timecop.freeze(@now) do
-            # excused students can not submit to an assignment
-            @assignment.grade_student(@student, grader: @teacher, excused: true)
-            create_adhoc_override_for_assignment(@assignment, @student, due_at: 1.day.ago)
-            expect(sorter.assignments(:overdue)).to be_empty
-          end
+          # excused students can not submit to an assignment
+          @assignment.grade_student(@student, grader: @teacher, excused: true)
+          create_adhoc_override_for_assignment(@assignment, @student, due_at: 1.day.ago)
+          expect(sorter.assignments(:overdue)).to be_empty
         end
 
         it "excludes assignments that the student has submitted to" do
-          Timecop.freeze(@now) do
-            create_adhoc_override_for_assignment(@assignment, @student, due_at: 1.day.ago)
-            @assignment.submit_homework(@student, body: "my submission")
-            expect(sorter.assignments(:overdue)).to be_empty
-          end
+          create_adhoc_override_for_assignment(@assignment, @student, due_at: 1.day.ago)
+          @assignment.submit_homework(@student, body: "my submission")
+          expect(sorter.assignments(:overdue)).to be_empty
         end
 
         it "includes past due assignments, expecting a submission, that the student has not submitted to" do
-          Timecop.freeze(@now) do
-            create_adhoc_override_for_assignment(@assignment, @student, due_at: 1.day.ago)
-            expect(sorter.assignments(:overdue)).to include @assignment
-          end
+          create_adhoc_override_for_assignment(@assignment, @student, due_at: 1.day.ago)
+          expect(sorter.assignments(:overdue)).to include @assignment
         end
       end
 
       describe "undated" do
         it "excludes assignments that have a due date for the student" do
-          Timecop.freeze(@now) do
-            @assignment.update!(due_at: nil)
-            create_adhoc_override_for_assignment(@assignment, @student, due_at: 1.day.from_now)
-            expect(sorter.assignments(:undated)).to be_empty
-          end
+          @assignment.update!(due_at: nil)
+          create_adhoc_override_for_assignment(@assignment, @student, due_at: 1.day.from_now)
+          expect(sorter.assignments(:undated)).to be_empty
         end
 
         it "includes assignments that do not have a due date for the student" do
-          Timecop.freeze(@now) do
-            create_adhoc_override_for_assignment(@assignment, @student, due_at: nil)
-            expect(sorter.assignments(:undated)).to include @assignment
-          end
+          create_adhoc_override_for_assignment(@assignment, @student, due_at: nil)
+          expect(sorter.assignments(:undated)).to include @assignment
         end
       end
 
@@ -364,58 +309,44 @@ describe SortsAssignments do
 
       describe "upcoming" do
         it "excludes assignments that don't have a due date for the student" do
-          Timecop.freeze(@now) do
-            @assignment.update!(due_at: 1.day.from_now)
-            create_adhoc_override_for_assignment(@assignment, @student, due_at: nil)
-            expect(sorter.assignments(:upcoming)).to be_empty
-          end
+          @assignment.update!(due_at: 1.day.from_now)
+          create_adhoc_override_for_assignment(@assignment, @student, due_at: nil)
+          expect(sorter.assignments(:upcoming)).to be_empty
         end
 
         it "excludes assignments that are due in the past for the student" do
-          Timecop.freeze(@now) do
-            @assignment.update!(due_at: 1.day.from_now)
-            create_adhoc_override_for_assignment(@assignment, @student, due_at: 1.day.ago)
-            expect(sorter.assignments(:upcoming)).to be_empty
-          end
+          @assignment.update!(due_at: 1.day.from_now)
+          create_adhoc_override_for_assignment(@assignment, @student, due_at: 1.day.ago)
+          expect(sorter.assignments(:upcoming)).to be_empty
         end
 
         it "excludes assignments that are due more than a week out for the student" do
-          Timecop.freeze(@now) do
-            @assignment.update!(due_at: 1.day.from_now)
-            create_adhoc_override_for_assignment(@assignment, @student, due_at: 8.days.from_now)
-            expect(sorter.assignments(:upcoming)).to be_empty
-          end
+          @assignment.update!(due_at: 1.day.from_now)
+          create_adhoc_override_for_assignment(@assignment, @student, due_at: 8.days.from_now)
+          expect(sorter.assignments(:upcoming)).to be_empty
         end
 
         it "includes assignments that are due within the next week for the student" do
-          Timecop.freeze(@now) do
-            create_adhoc_override_for_assignment(@assignment, @student, due_at: 1.day.from_now)
-            expect(sorter.assignments(:upcoming)).to include @assignment
-          end
+          create_adhoc_override_for_assignment(@assignment, @student, due_at: 1.day.from_now)
+          expect(sorter.assignments(:upcoming)).to include @assignment
         end
       end
 
       describe "future" do
         it "excludes assignments due in the past for the student" do
-          Timecop.freeze(@now) do
-            @assignment.update!(due_at: 1.day.from_now)
-            create_adhoc_override_for_assignment(@assignment, @student, due_at: 1.day.ago)
-            expect(sorter.assignments(:future)).to be_empty
-          end
+          @assignment.update!(due_at: 1.day.from_now)
+          create_adhoc_override_for_assignment(@assignment, @student, due_at: 1.day.ago)
+          expect(sorter.assignments(:future)).to be_empty
         end
 
         it "includes assignments without a due date for the student" do
-          Timecop.freeze(@now) do
-            create_adhoc_override_for_assignment(@assignment, @student, due_at: nil)
-            expect(sorter.assignments(:future)).to include @assignment
-          end
+          create_adhoc_override_for_assignment(@assignment, @student, due_at: nil)
+          expect(sorter.assignments(:future)).to include @assignment
         end
 
         it "includes assignments with a due date in the future for the student" do
-          Timecop.freeze(@now) do
-            create_adhoc_override_for_assignment(@assignment, @student, due_at: 1.day.from_now)
-            expect(sorter.assignments(:future)).to include @assignment
-          end
+          create_adhoc_override_for_assignment(@assignment, @student, due_at: 1.day.from_now)
+          expect(sorter.assignments(:future)).to include @assignment
         end
       end
     end
@@ -436,81 +367,63 @@ describe SortsAssignments do
       end
 
       it "does not return duplicate assignments" do
-        Timecop.freeze(@now) do
-          create_adhoc_override_for_assignment(@assignment, @first_student, due_at: 2.days.ago)
-          expect(sorter.assignments(:past).count).to eq 1
-        end
+        create_adhoc_override_for_assignment(@assignment, @first_student, due_at: 2.days.ago)
+        expect(sorter.assignments(:past).count).to eq 1
       end
 
       it "does not consider assigned deactivated students" do
-        Timecop.freeze(@now) do
-          create_adhoc_override_for_assignment(@assignment, @first_student, due_at: 2.days.ago)
-          create_adhoc_override_for_assignment(@assignment, @second_student, due_at: 1.day.from_now)
-          @course.enrollments.find_by(user: @first_student).deactivate
-          expect(sorter.assignments(:past)).to be_empty
-        end
+        create_adhoc_override_for_assignment(@assignment, @first_student, due_at: 2.days.ago)
+        create_adhoc_override_for_assignment(@assignment, @second_student, due_at: 1.day.from_now)
+        @course.enrollments.find_by(user: @first_student).deactivate
+        expect(sorter.assignments(:past)).to be_empty
       end
 
       it "does not consider assigned concluded students" do
-        Timecop.freeze(@now) do
-          create_adhoc_override_for_assignment(@assignment, @first_student, due_at: 2.days.ago)
-          create_adhoc_override_for_assignment(@assignment, @second_student, due_at: 1.day.from_now)
-          @course.enrollments.find_by(user: @first_student).conclude
-          expect(sorter.assignments(:past)).to be_empty
-        end
+        create_adhoc_override_for_assignment(@assignment, @first_student, due_at: 2.days.ago)
+        create_adhoc_override_for_assignment(@assignment, @second_student, due_at: 1.day.from_now)
+        @course.enrollments.find_by(user: @first_student).conclude
+        expect(sorter.assignments(:past)).to be_empty
       end
 
       describe "past" do
         it "excludes assignments where no observed students have a due date in the past" do
-          Timecop.freeze(@now) do
-            create_adhoc_override_for_assignment(@assignment, @first_student, due_at: nil)
-            create_section_override_for_assignment(@assignment, course_section: @second_section, due_at: 1.day.from_now)
-            expect(sorter.assignments(:past)).to be_empty
-          end
+          create_adhoc_override_for_assignment(@assignment, @first_student, due_at: nil)
+          create_section_override_for_assignment(@assignment, course_section: @second_section, due_at: 1.day.from_now)
+          expect(sorter.assignments(:past)).to be_empty
         end
 
         it "includes assignments due in the past for at least one observed student" do
-          Timecop.freeze(@now) do
-            @assignment.update!(due_at: 1.day.from_now)
-            create_adhoc_override_for_assignment(@assignment, @second_student, due_at: 1.day.ago)
-            expect(sorter.assignments(:past)).to include @assignment
-          end
+          @assignment.update!(due_at: 1.day.from_now)
+          create_adhoc_override_for_assignment(@assignment, @second_student, due_at: 1.day.ago)
+          expect(sorter.assignments(:past)).to include @assignment
         end
       end
 
       describe "overdue" do
         it "excludes assignments where no observed students are overdue" do
-          Timecop.freeze(@now) do
-            create_adhoc_override_for_assignment(@assignment, @first_student, due_at: nil)
-            create_adhoc_override_for_assignment(@assignment, @second_student, due_at: 1.day.from_now)
-            expect(sorter.assignments(:overdue)).to be_empty
-          end
+          create_adhoc_override_for_assignment(@assignment, @first_student, due_at: nil)
+          create_adhoc_override_for_assignment(@assignment, @second_student, due_at: 1.day.from_now)
+          expect(sorter.assignments(:overdue)).to be_empty
         end
 
         it "includes assignments where at least one observed student is overdue" do
-          Timecop.freeze(@now) do
-            create_adhoc_override_for_assignment(@assignment, @first_student, due_at: 1.day.from_now)
-            create_adhoc_override_for_assignment(@assignment, @second_student, due_at: 1.day.ago)
-            expect(sorter.assignments(:overdue)).to include @assignment
-          end
+          create_adhoc_override_for_assignment(@assignment, @first_student, due_at: 1.day.from_now)
+          create_adhoc_override_for_assignment(@assignment, @second_student, due_at: 1.day.ago)
+          expect(sorter.assignments(:overdue)).to include @assignment
         end
       end
 
       describe "undated" do
         it "excludes assignments where no observed students have a blank due date" do
-          Timecop.freeze(@now) do
-            @assignment.update!(due_at: nil)
-            create_adhoc_override_for_assignment(@assignment, @first_student, due_at: 1.day.from_now)
-            create_adhoc_override_for_assignment(@assignment, @second_student, due_at: 1.day.ago)
-            expect(sorter.assignments(:undated)).to be_empty
-          end
+          @assignment.update!(due_at: nil)
+          create_adhoc_override_for_assignment(@assignment, @first_student, due_at: 1.day.from_now)
+          create_adhoc_override_for_assignment(@assignment, @second_student, due_at: 1.day.ago)
+          expect(sorter.assignments(:undated)).to be_empty
         end
 
         it "includes assignments where at least one observed student has a blank due date" do
-          Timecop.freeze(@now) do
-            create_adhoc_override_for_assignment(@assignment, @first_student, due_at: nil)
-            expect(sorter.assignments(:undated)).to include @assignment
-          end
+          create_adhoc_override_for_assignment(@assignment, @first_student, due_at: nil)
+          expect(sorter.assignments(:undated)).to include @assignment
         end
       end
 
@@ -551,44 +464,34 @@ describe SortsAssignments do
 
       describe "upcoming" do
         it "excludes assignments where no observed students are due within the next week" do
-          Timecop.freeze(@now) do
-            @assignment.update!(due_at: 1.day.from_now)
-            create_adhoc_override_for_assignment(@assignment, @first_student, due_at: nil)
-            create_adhoc_override_for_assignment(@assignment, @second_student, due_at: 8.days.from_now)
-            expect(sorter.assignments(:upcoming)).to be_empty
-          end
+          @assignment.update!(due_at: 1.day.from_now)
+          create_adhoc_override_for_assignment(@assignment, @first_student, due_at: nil)
+          create_adhoc_override_for_assignment(@assignment, @second_student, due_at: 8.days.from_now)
+          expect(sorter.assignments(:upcoming)).to be_empty
         end
 
         it "includes assignments where at least one observed student is due within the next week" do
-          Timecop.freeze(@now) do
-            create_adhoc_override_for_assignment(@assignment, @second_student, due_at: 1.day.from_now)
-            expect(sorter.assignments(:upcoming)).to include @assignment
-          end
+          create_adhoc_override_for_assignment(@assignment, @second_student, due_at: 1.day.from_now)
+          expect(sorter.assignments(:upcoming)).to include @assignment
         end
       end
 
       describe "future" do
         it "excludes assignments where no observed students are due in the future" do
-          Timecop.freeze(@now) do
-            @assignment.update!(due_at: 1.day.from_now)
-            create_adhoc_override_for_assignment(@assignment, @first_student, due_at: 1.day.ago)
-            create_adhoc_override_for_assignment(@assignment, @second_student, due_at: 2.days.ago)
-            expect(sorter.assignments(:future)).to be_empty
-          end
+          @assignment.update!(due_at: 1.day.from_now)
+          create_adhoc_override_for_assignment(@assignment, @first_student, due_at: 1.day.ago)
+          create_adhoc_override_for_assignment(@assignment, @second_student, due_at: 2.days.ago)
+          expect(sorter.assignments(:future)).to be_empty
         end
 
         it "includes assignments where at least one observed student is without a due date" do
-          Timecop.freeze(@now) do
-            create_adhoc_override_for_assignment(@assignment, @first_student, due_at: nil)
-            expect(sorter.assignments(:future)).to include @assignment
-          end
+          create_adhoc_override_for_assignment(@assignment, @first_student, due_at: nil)
+          expect(sorter.assignments(:future)).to include @assignment
         end
 
         it "includes assignments where at least one observed student has a due date in the future" do
-          Timecop.freeze(@now) do
-            create_adhoc_override_for_assignment(@assignment, @first_student, due_at: 1.day.from_now)
-            expect(sorter.assignments(:future)).to include @assignment
-          end
+          create_adhoc_override_for_assignment(@assignment, @first_student, due_at: 1.day.from_now)
+          expect(sorter.assignments(:future)).to include @assignment
         end
       end
     end
@@ -612,10 +515,8 @@ describe SortsAssignments do
     end
 
     it "does not return duplicate assignments (when the given scope does not have duplicates)" do
-      Timecop.freeze(@now) do
-        create_adhoc_override_for_assignment(@assignment, @first_student, due_at: 2.days.ago)
-        expect(sorter.assignments(:past).count).to eq 1
-      end
+      create_adhoc_override_for_assignment(@assignment, @first_student, due_at: 2.days.ago)
+      expect(sorter.assignments(:past).count).to eq 1
     end
 
     it "returns the original scope" do
@@ -631,8 +532,8 @@ describe SortsAssignments do
     end
 
     it "can optionally be passed a block to modify and return the scope used for sorting" do
-      earlier_assignment = @course.assignments.create!(due_at: 2.days.ago(@now))
-      create_adhoc_override_for_assignment(earlier_assignment, @first_student, due_at: 1.hour.ago(@now))
+      earlier_assignment = @course.assignments.create!(due_at: 2.days.ago)
+      create_adhoc_override_for_assignment(earlier_assignment, @first_student, due_at: 1.hour.ago)
       sorted = sorter.assignments(:past) do |assignments|
         assignments.group("assignments.id").order("MIN(submissions.cached_due_date)")
       end
@@ -640,74 +541,58 @@ describe SortsAssignments do
     end
 
     it "does not consider assigned deactivated students" do
-      Timecop.freeze(@now) do
-        create_adhoc_override_for_assignment(@assignment, @first_student, due_at: 2.days.ago)
-        create_adhoc_override_for_assignment(@assignment, @second_student, due_at: 1.day.from_now)
-        @course.enrollments.find_by(user: @first_student).deactivate
-        expect(sorter.assignments(:past)).to be_empty
-      end
+      create_adhoc_override_for_assignment(@assignment, @first_student, due_at: 2.days.ago)
+      create_adhoc_override_for_assignment(@assignment, @second_student, due_at: 1.day.from_now)
+      @course.enrollments.find_by(user: @first_student).deactivate
+      expect(sorter.assignments(:past)).to be_empty
     end
 
     it "does not consider assigned concluded students" do
-      Timecop.freeze(@now) do
-        create_adhoc_override_for_assignment(@assignment, @first_student, due_at: 2.days.ago)
-        create_adhoc_override_for_assignment(@assignment, @second_student, due_at: 1.day.from_now)
-        @course.enrollments.find_by(user: @first_student).conclude
-        expect(sorter.assignments(:past)).to be_empty
-      end
+      create_adhoc_override_for_assignment(@assignment, @first_student, due_at: 2.days.ago)
+      create_adhoc_override_for_assignment(@assignment, @second_student, due_at: 1.day.from_now)
+      @course.enrollments.find_by(user: @first_student).conclude
+      expect(sorter.assignments(:past)).to be_empty
     end
 
     describe "past" do
       it "excludes assignments where no assigned students have a due date in the past" do
-        Timecop.freeze(@now) do
-          create_adhoc_override_for_assignment(@assignment, @first_student, due_at: nil)
-          create_section_override_for_assignment(@assignment, course_section: @second_section, due_at: 1.day.from_now)
-          expect(sorter.assignments(:past)).to be_empty
-        end
+        create_adhoc_override_for_assignment(@assignment, @first_student, due_at: nil)
+        create_section_override_for_assignment(@assignment, course_section: @second_section, due_at: 1.day.from_now)
+        expect(sorter.assignments(:past)).to be_empty
       end
 
       it "includes assignments due in the past for at least one assigned student" do
-        Timecop.freeze(@now) do
-          @assignment.update!(due_at: 1.day.from_now)
-          create_adhoc_override_for_assignment(@assignment, @second_student, due_at: 1.day.ago)
-          expect(sorter.assignments(:past)).to include @assignment
-        end
+        @assignment.update!(due_at: 1.day.from_now)
+        create_adhoc_override_for_assignment(@assignment, @second_student, due_at: 1.day.ago)
+        expect(sorter.assignments(:past)).to include @assignment
       end
     end
 
     describe "overdue" do
       it "excludes assignments where no assigned students are overdue" do
-        Timecop.freeze(@now) do
-          create_adhoc_override_for_assignment(@assignment, @first_student, due_at: nil)
-          create_adhoc_override_for_assignment(@assignment, @second_student, due_at: 1.day.from_now)
-          expect(sorter.assignments(:overdue)).to be_empty
-        end
+        create_adhoc_override_for_assignment(@assignment, @first_student, due_at: nil)
+        create_adhoc_override_for_assignment(@assignment, @second_student, due_at: 1.day.from_now)
+        expect(sorter.assignments(:overdue)).to be_empty
       end
 
       it "includes assignments where at least one assigned student is overdue" do
-        Timecop.freeze(@now) do
-          create_adhoc_override_for_assignment(@assignment, @first_student, due_at: 1.day.from_now)
-          create_adhoc_override_for_assignment(@assignment, @second_student, due_at: 1.day.ago)
-          expect(sorter.assignments(:overdue)).to include @assignment
-        end
+        create_adhoc_override_for_assignment(@assignment, @first_student, due_at: 1.day.from_now)
+        create_adhoc_override_for_assignment(@assignment, @second_student, due_at: 1.day.ago)
+        expect(sorter.assignments(:overdue)).to include @assignment
       end
     end
 
     describe "undated" do
       it "excludes assignments where no assigned students have a blank due date" do
-        Timecop.freeze(@now) do
-          @assignment.update!(due_at: nil)
-          create_adhoc_override_for_assignment(@assignment, @first_student, due_at: 1.day.from_now)
-          create_adhoc_override_for_assignment(@assignment, @second_student, due_at: 1.day.ago)
-          expect(sorter.assignments(:undated)).to be_empty
-        end
+        @assignment.update!(due_at: nil)
+        create_adhoc_override_for_assignment(@assignment, @first_student, due_at: 1.day.from_now)
+        create_adhoc_override_for_assignment(@assignment, @second_student, due_at: 1.day.ago)
+        expect(sorter.assignments(:undated)).to be_empty
       end
 
       it "includes assignments where at least one assigned student has a blank due date" do
-        Timecop.freeze(@now) do
-          create_adhoc_override_for_assignment(@assignment, @first_student, due_at: nil)
-          expect(sorter.assignments(:undated)).to include @assignment
-        end
+        create_adhoc_override_for_assignment(@assignment, @first_student, due_at: nil)
+        expect(sorter.assignments(:undated)).to include @assignment
       end
     end
 
@@ -748,44 +633,34 @@ describe SortsAssignments do
 
     describe "upcoming" do
       it "excludes assignments where no assigned students are due within the next week" do
-        Timecop.freeze(@now) do
-          @assignment.update!(due_at: 1.day.from_now)
-          create_adhoc_override_for_assignment(@assignment, @first_student, due_at: nil)
-          create_adhoc_override_for_assignment(@assignment, @second_student, due_at: 8.days.from_now)
-          expect(sorter.assignments(:upcoming)).to be_empty
-        end
+        @assignment.update!(due_at: 1.day.from_now)
+        create_adhoc_override_for_assignment(@assignment, @first_student, due_at: nil)
+        create_adhoc_override_for_assignment(@assignment, @second_student, due_at: 8.days.from_now)
+        expect(sorter.assignments(:upcoming)).to be_empty
       end
 
       it "includes assignments where at least one assigned student is due within the next week" do
-        Timecop.freeze(@now) do
-          create_adhoc_override_for_assignment(@assignment, @second_student, due_at: 1.day.from_now)
-          expect(sorter.assignments(:upcoming)).to include @assignment
-        end
+        create_adhoc_override_for_assignment(@assignment, @second_student, due_at: 1.day.from_now)
+        expect(sorter.assignments(:upcoming)).to include @assignment
       end
     end
 
     describe "future" do
       it "excludes assignments where no assigned students are due in the future" do
-        Timecop.freeze(@now) do
-          @assignment.update!(due_at: 1.day.from_now)
-          create_adhoc_override_for_assignment(@assignment, @first_student, due_at: 1.day.ago)
-          create_adhoc_override_for_assignment(@assignment, @second_student, due_at: 2.days.ago)
-          expect(sorter.assignments(:future)).to be_empty
-        end
+        @assignment.update!(due_at: 1.day.from_now)
+        create_adhoc_override_for_assignment(@assignment, @first_student, due_at: 1.day.ago)
+        create_adhoc_override_for_assignment(@assignment, @second_student, due_at: 2.days.ago)
+        expect(sorter.assignments(:future)).to be_empty
       end
 
       it "includes assignments where at least one assigned student is without a due date" do
-        Timecop.freeze(@now) do
-          create_adhoc_override_for_assignment(@assignment, @first_student, due_at: nil)
-          expect(sorter.assignments(:future)).to include @assignment
-        end
+        create_adhoc_override_for_assignment(@assignment, @first_student, due_at: nil)
+        expect(sorter.assignments(:future)).to include @assignment
       end
 
       it "includes assignments where at least one assigned student has a due date in the future" do
-        Timecop.freeze(@now) do
-          create_adhoc_override_for_assignment(@assignment, @first_student, due_at: 1.day.from_now)
-          expect(sorter.assignments(:future)).to include @assignment
-        end
+        create_adhoc_override_for_assignment(@assignment, @first_student, due_at: 1.day.from_now)
+        expect(sorter.assignments(:future)).to include @assignment
       end
     end
   end
@@ -808,81 +683,63 @@ describe SortsAssignments do
     end
 
     it "does not return duplicate assignments" do
-      Timecop.freeze(@now) do
-        create_adhoc_override_for_assignment(@assignment, @first_student, due_at: 2.days.ago)
-        expect(sorter.assignments(:past).count).to eq 1
-      end
+      create_adhoc_override_for_assignment(@assignment, @first_student, due_at: 2.days.ago)
+      expect(sorter.assignments(:past).count).to eq 1
     end
 
     it "does not consider assigned deactivated students" do
-      Timecop.freeze(@now) do
-        create_adhoc_override_for_assignment(@assignment, @first_student, due_at: 2.days.ago)
-        create_adhoc_override_for_assignment(@assignment, @second_student, due_at: 1.day.from_now)
-        @course.enrollments.find_by(user: @first_student).deactivate
-        expect(sorter.assignments(:past)).to be_empty
-      end
+      create_adhoc_override_for_assignment(@assignment, @first_student, due_at: 2.days.ago)
+      create_adhoc_override_for_assignment(@assignment, @second_student, due_at: 1.day.from_now)
+      @course.enrollments.find_by(user: @first_student).deactivate
+      expect(sorter.assignments(:past)).to be_empty
     end
 
     it "does not consider assigned concluded students" do
-      Timecop.freeze(@now) do
-        create_adhoc_override_for_assignment(@assignment, @first_student, due_at: 2.days.ago)
-        create_adhoc_override_for_assignment(@assignment, @second_student, due_at: 1.day.from_now)
-        @course.enrollments.find_by(user: @first_student).conclude
-        expect(sorter.assignments(:past)).to be_empty
-      end
+      create_adhoc_override_for_assignment(@assignment, @first_student, due_at: 2.days.ago)
+      create_adhoc_override_for_assignment(@assignment, @second_student, due_at: 1.day.from_now)
+      @course.enrollments.find_by(user: @first_student).conclude
+      expect(sorter.assignments(:past)).to be_empty
     end
 
     describe "past" do
       it "excludes assignments where no assigned students have a due date in the past" do
-        Timecop.freeze(@now) do
-          create_adhoc_override_for_assignment(@assignment, @first_student, due_at: nil)
-          create_section_override_for_assignment(@assignment, course_section: @second_section, due_at: 1.day.from_now)
-          expect(sorter.assignments(:past)).to be_empty
-        end
+        create_adhoc_override_for_assignment(@assignment, @first_student, due_at: nil)
+        create_section_override_for_assignment(@assignment, course_section: @second_section, due_at: 1.day.from_now)
+        expect(sorter.assignments(:past)).to be_empty
       end
 
       it "includes assignments due in the past for at least one assigned student" do
-        Timecop.freeze(@now) do
-          @assignment.update!(due_at: 1.day.from_now)
-          create_adhoc_override_for_assignment(@assignment, @second_student, due_at: 1.day.ago)
-          expect(sorter.assignments(:past)).to include @assignment
-        end
+        @assignment.update!(due_at: 1.day.from_now)
+        create_adhoc_override_for_assignment(@assignment, @second_student, due_at: 1.day.ago)
+        expect(sorter.assignments(:past)).to include @assignment
       end
     end
 
     describe "overdue" do
       it "excludes assignments where no assigned students are overdue" do
-        Timecop.freeze(@now) do
-          create_adhoc_override_for_assignment(@assignment, @first_student, due_at: nil)
-          create_adhoc_override_for_assignment(@assignment, @second_student, due_at: 1.day.from_now)
-          expect(sorter.assignments(:overdue)).to be_empty
-        end
+        create_adhoc_override_for_assignment(@assignment, @first_student, due_at: nil)
+        create_adhoc_override_for_assignment(@assignment, @second_student, due_at: 1.day.from_now)
+        expect(sorter.assignments(:overdue)).to be_empty
       end
 
       it "includes assignments where at least one assigned student is overdue" do
-        Timecop.freeze(@now) do
-          create_adhoc_override_for_assignment(@assignment, @first_student, due_at: 1.day.from_now)
-          create_adhoc_override_for_assignment(@assignment, @second_student, due_at: 1.day.ago)
-          expect(sorter.assignments(:overdue)).to include @assignment
-        end
+        create_adhoc_override_for_assignment(@assignment, @first_student, due_at: 1.day.from_now)
+        create_adhoc_override_for_assignment(@assignment, @second_student, due_at: 1.day.ago)
+        expect(sorter.assignments(:overdue)).to include @assignment
       end
     end
 
     describe "undated" do
       it "excludes assignments where no assigned students have a blank due date" do
-        Timecop.freeze(@now) do
-          @assignment.update!(due_at: nil)
-          create_adhoc_override_for_assignment(@assignment, @first_student, due_at: 1.day.from_now)
-          create_adhoc_override_for_assignment(@assignment, @second_student, due_at: 1.day.ago)
-          expect(sorter.assignments(:undated)).to be_empty
-        end
+        @assignment.update!(due_at: nil)
+        create_adhoc_override_for_assignment(@assignment, @first_student, due_at: 1.day.from_now)
+        create_adhoc_override_for_assignment(@assignment, @second_student, due_at: 1.day.ago)
+        expect(sorter.assignments(:undated)).to be_empty
       end
 
       it "includes assignments where at least one assigned student has a blank due date" do
-        Timecop.freeze(@now) do
-          create_adhoc_override_for_assignment(@assignment, @first_student, due_at: nil)
-          expect(sorter.assignments(:undated)).to include @assignment
-        end
+        create_adhoc_override_for_assignment(@assignment, @first_student, due_at: nil)
+        expect(sorter.assignments(:undated)).to include @assignment
       end
     end
 
@@ -923,44 +780,34 @@ describe SortsAssignments do
 
     describe "upcoming" do
       it "excludes assignments where no assigned students are due within the next week" do
-        Timecop.freeze(@now) do
-          @assignment.update!(due_at: 1.day.from_now)
-          create_adhoc_override_for_assignment(@assignment, @first_student, due_at: nil)
-          create_adhoc_override_for_assignment(@assignment, @second_student, due_at: 8.days.from_now)
-          expect(sorter.assignments(:upcoming)).to be_empty
-        end
+        @assignment.update!(due_at: 1.day.from_now)
+        create_adhoc_override_for_assignment(@assignment, @first_student, due_at: nil)
+        create_adhoc_override_for_assignment(@assignment, @second_student, due_at: 8.days.from_now)
+        expect(sorter.assignments(:upcoming)).to be_empty
       end
 
       it "includes assignments where at least one assigned student is due within the next week" do
-        Timecop.freeze(@now) do
-          create_adhoc_override_for_assignment(@assignment, @second_student, due_at: 1.day.from_now)
-          expect(sorter.assignments(:upcoming)).to include @assignment
-        end
+        create_adhoc_override_for_assignment(@assignment, @second_student, due_at: 1.day.from_now)
+        expect(sorter.assignments(:upcoming)).to include @assignment
       end
     end
 
     describe "future" do
       it "excludes assignments where no assigned students are due in the future" do
-        Timecop.freeze(@now) do
-          @assignment.update!(due_at: 1.day.from_now)
-          create_adhoc_override_for_assignment(@assignment, @first_student, due_at: 1.day.ago)
-          create_adhoc_override_for_assignment(@assignment, @second_student, due_at: 2.days.ago)
-          expect(sorter.assignments(:future)).to be_empty
-        end
+        @assignment.update!(due_at: 1.day.from_now)
+        create_adhoc_override_for_assignment(@assignment, @first_student, due_at: 1.day.ago)
+        create_adhoc_override_for_assignment(@assignment, @second_student, due_at: 2.days.ago)
+        expect(sorter.assignments(:future)).to be_empty
       end
 
       it "includes assignments where at least one assigned student is without a due date" do
-        Timecop.freeze(@now) do
-          create_adhoc_override_for_assignment(@assignment, @first_student, due_at: nil)
-          expect(sorter.assignments(:future)).to include @assignment
-        end
+        create_adhoc_override_for_assignment(@assignment, @first_student, due_at: nil)
+        expect(sorter.assignments(:future)).to include @assignment
       end
 
       it "includes assignments where at least one assigned student has a due date in the future" do
-        Timecop.freeze(@now) do
-          create_adhoc_override_for_assignment(@assignment, @first_student, due_at: 1.day.from_now)
-          expect(sorter.assignments(:future)).to include @assignment
-        end
+        create_adhoc_override_for_assignment(@assignment, @first_student, due_at: 1.day.from_now)
+        expect(sorter.assignments(:future)).to include @assignment
       end
     end
   end

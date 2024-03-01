@@ -35,7 +35,7 @@ RSpec.describe SecurityController, type: :request do
   end
 
   around do |example|
-    Timecop.freeze { example.run }
+    Timecop.freeze(&example)
   end
 
   before do

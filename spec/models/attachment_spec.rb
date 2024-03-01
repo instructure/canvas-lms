@@ -2171,7 +2171,7 @@ describe Attachment do
     end
 
     around do |example|
-      Timecop.freeze(Time.now.utc, &example)
+      Timecop.freeze(&example)
     end
 
     it "uses the default size if an unknown size is passed in" do

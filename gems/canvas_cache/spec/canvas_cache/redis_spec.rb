@@ -201,41 +201,38 @@ describe CanvasCache::Redis do
         end
 
         it "logs the cache fetch block generation time" do
-          Timecop.safe_mode = false
-          Timecop.freeze
-          log_lines = capture_log_messages do
-            # make sure this works with fetching nested fetches
-            cache.fetch(key, force: true) do
-              val = +"a1"
-              val << cache.fetch(key2, force: true) do
-                Timecop.travel(Time.now.utc + 1.second)
+          Timecop.freeze do
+            log_lines = capture_log_messages do
+              # make sure this works with fetching nested fetches
+              cache.fetch(key, force: true) do
+                val = +"a1"
+                val << cache.fetch(key2, force: true) do
+                  Timecop.travel(Time.now.utc + 1.second)
+                  # Cheat to cover the missing ActiveSupport::Notifications.subscription in config/inititalizers/cache_store.rb
+                  # TODO: remove this hack when initializer is ported to gem and incorporated
+                  Thread.current[:last_cache_generate] = 1
+                  "b1"
+                end
+                Timecop.travel(Time.now.utc + 2.seconds)
                 # Cheat to cover the missing ActiveSupport::Notifications.subscription in config/inititalizers/cache_store.rb
                 # TODO: remove this hack when initializer is ported to gem and incorporated
-                Thread.current[:last_cache_generate] = 1
-                "b1"
+                Thread.current[:last_cache_generate] = 3
+                val << "a2"
               end
-              Timecop.travel(Time.now.utc + 2.seconds)
-              # Cheat to cover the missing ActiveSupport::Notifications.subscription in config/inititalizers/cache_store.rb
-              # TODO: remove this hack when initializer is ported to gem and incorporated
-              Thread.current[:last_cache_generate] = 3
-              val << "a2"
             end
-          end
-          outer_message = JSON.parse(log_lines.pop)
-          expect(outer_message["command"]).to eq("set")
-          expect(outer_message["key"]).to end_with(key)
-          expect(outer_message["request_time_ms"]).to be_a(Float)
-          # 3000 (3s) == 2s outer fetch + 1s inner fetch
-          expect(outer_message["generate_time_ms"]).to be_within(500).of(3000)
+            outer_message = JSON.parse(log_lines.pop)
+            expect(outer_message["command"]).to eq("set")
+            expect(outer_message["key"]).to end_with(key)
+            expect(outer_message["request_time_ms"]).to be_a(Float)
+            # 3000 (3s) == 2s outer fetch + 1s inner fetch
+            expect(outer_message["generate_time_ms"]).to be_within(500).of(3000)
 
-          inner_message = JSON.parse(log_lines.pop)
-          expect(inner_message["command"]).to eq("set")
-          expect(inner_message["key"]).to end_with(key2)
-          expect(inner_message["request_time_ms"]).to be_a(Float)
-          expect(inner_message["generate_time_ms"]).to be_within(500).of(1000)
-        ensure
-          Timecop.return
-          Timecop.safe_mode = true
+            inner_message = JSON.parse(log_lines.pop)
+            expect(inner_message["command"]).to eq("set")
+            expect(inner_message["key"]).to end_with(key2)
+            expect(inner_message["request_time_ms"]).to be_a(Float)
+            expect(inner_message["generate_time_ms"]).to be_within(500).of(1000)
+          end
         end
 
         it "logs zero response size on cache miss" do
