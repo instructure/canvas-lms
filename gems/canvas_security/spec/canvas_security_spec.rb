@@ -125,9 +125,7 @@ describe CanvasSecurity do
       end
 
       around do |example|
-        Timecop.freeze(Time.utc(2013, 3, 13, 9, 12)) do
-          example.run
-        end
+        Timecop.freeze(Time.utc(2013, 3, 13, 9, 12), &example)
       end
 
       it "decodes token" do

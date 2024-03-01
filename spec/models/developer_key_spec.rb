@@ -191,11 +191,7 @@ describe DeveloperKey do
       end
 
       around do |example|
-        Timecop.freeze(Time.zone.now, &example)
-      end
-
-      after do
-        Timecop.return
+        Timecop.freeze(&example)
       end
 
       context "when method succeeds" do

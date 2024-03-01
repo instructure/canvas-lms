@@ -34,10 +34,6 @@ describe AssessmentQuestionBank do
       @group.save
     end
 
-    after do
-      Timecop.return
-    end
-
     it "returns the desired count of questions" do
       expect(@bank.select_for_submission(@quiz.id, nil, 0).length).to eq 0
       expect(@bank.select_for_submission(@quiz.id, nil, 2).length).to eq 2

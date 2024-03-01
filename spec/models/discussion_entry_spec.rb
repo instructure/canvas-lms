@@ -433,22 +433,20 @@ describe DiscussionEntry do
       # scenario: you visit a page for unread entries;
       # as you scroll the page you read entries at (later times, then you go to next page and entries are now read AFTER your initial QUERY time.
 
-      Timecop.safe_mode = false
-      Timecop.freeze(Time.utc(2013, 3, 13, 9, 12))
-      @entry1 = @topic.discussion_entries.create!(message: "entry 1 outside", user: @teacher)
-      @entry1.change_read_state("read", @student)
+      Timecop.freeze(Time.utc(2013, 3, 13, 9, 12)) do
+        @entry1 = @topic.discussion_entries.create!(message: "entry 1 outside", user: @teacher)
+        @entry1.change_read_state("read", @student)
+      end
 
-      Timecop.freeze(Time.utc(2013, 3, 13, 10, 12))
-      @entry2 = @topic.discussion_entries.create!(message: "entry 2", user: @teacher)
-      @entry3 = @topic.discussion_entries.create!(message: "entry 3", user: @teacher)
+      Timecop.freeze(Time.utc(2013, 3, 13, 10, 12)) do
+        @entry2 = @topic.discussion_entries.create!(message: "entry 2", user: @teacher)
+        @entry3 = @topic.discussion_entries.create!(message: "entry 3", user: @teacher)
 
-      @entry2.change_read_state("read", @student)
+        @entry2.change_read_state("read", @student)
 
-      # Notice we read the entries 1 min after the the query issues
-      expect(DiscussionEntry.unread_for_user_before(@student, Time.utc(2013, 3, 13, 10, 11)).order("id").map(&:message)).to eq(["entry 2", "entry 3"])
-    ensure
-      Timecop.return
-      Timecop.safe_mode = true
+        # Notice we read the entries 1 min after the the query issues
+        expect(DiscussionEntry.unread_for_user_before(@student, Time.utc(2013, 3, 13, 10, 11)).order("id").map(&:message)).to eq(["entry 2", "entry 3"])
+      end
     end
   end
 
