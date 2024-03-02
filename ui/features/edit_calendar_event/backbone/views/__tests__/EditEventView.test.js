@@ -160,9 +160,10 @@ describe('EditEventView', () => {
       expect(view.model.save).toHaveBeenCalled()
     })
 
-    it('submits empty web_conference params when no current conference', () => {
+    it('submits empty web_conference params when no current conference', async () => {
       enableConferences()
       const view = render()
+      await waitForRender()
       view.model.save = jest.fn(params => {
         expect(params.web_conference).toEqual('')
       })
@@ -364,6 +365,7 @@ describe('EditEventView', () => {
 
     it('renders update calendar event dialog', async () => {
       const view = render({series_uuid: '123', rrule: 'FREQ=WEEKLY;BYDAY=MO;INTERVAL=1;COUNT=5'})
+      await waitForRender()
       view.submit(null)
 
       await waitFor(() =>
@@ -405,6 +407,7 @@ describe('EditEventView', () => {
         rrule: 'FREQ=DAILY;INTERVAL=1;COUNT=3',
         series_uuid: '123',
       })
+      await waitForRender()
       view.renderWhichEditDialog = jest.fn(() => Promise.resolve('all'))
       view.model.save = jest.fn(() => {
         expect(view.model.get('which')).toEqual('all')
