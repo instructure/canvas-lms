@@ -93,6 +93,16 @@ module Types
                required: false
     end
 
+    class CourseSectionsFilterInputType < Types::BaseInputObject
+      graphql_name "CourseSectionsFilter"
+
+      argument :assignment_id,
+               ID,
+               "Only include sections associated with users assigned to this assignment",
+               prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Assignment"),
+               required: false
+    end
+
     implements GraphQL::Types::Relay::Node
     implements Interfaces::TimestampInterface
     implements Interfaces::LegacyIDInterface
@@ -151,10 +161,21 @@ module Types
       Loaders::CourseOutcomeAlignmentStatsLoader.load(course) if course&.grants_right?(current_user, session, :manage_outcomes)
     end
 
-    field :sections_connection, SectionType.connection_type, null: true
-    def sections_connection
-      course.active_course_sections
-            .order(CourseSection.best_unicode_collation_key("name"))
+    field :sections_connection, SectionType.connection_type, null: true do
+      argument :filter, CourseSectionsFilterInputType, required: false
+    end
+
+    def sections_connection(filter: {})
+      scope = course.active_course_sections
+
+      if filter[:assignment_id]
+        assignment = course.assignments.active.find(filter[:assignment_id])
+        scope = scope.where(id: assignment.sections_for_assigned_students) if assignment.only_visible_to_overrides?
+      end
+
+      scope.order(CourseSection.best_unicode_collation_key("name"))
+    rescue ActiveRecord::RecordNotFound
+      raise GraphQL::ExecutionError, "assignment not found"
     end
 
     field :modules_connection, ModuleType.connection_type, null: true

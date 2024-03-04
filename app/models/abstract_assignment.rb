@@ -138,6 +138,8 @@ class AbstractAssignment < ActiveRecord::Base
   belongs_to :final_grader, class_name: "User", optional: true
   has_many :active_groups, -> { merge(GroupCategory.active).merge(Group.active) }, through: :group_category, source: :groups
   has_many :assigned_students, through: :submissions, source: :user
+  has_many :enrollments_for_assigned_students, -> { active.not_fake.where("enrollments.course_id = submissions.course_id") }, through: :assigned_students, source: :enrollments
+  has_many :sections_for_assigned_students, -> { active.distinct }, through: :enrollments_for_assigned_students, source: :course_section
 
   belongs_to :duplicate_of, class_name: "Assignment", optional: true, inverse_of: :duplicates
   has_many :duplicates, class_name: "Assignment", inverse_of: :duplicate_of, foreign_key: "duplicate_of_id"
