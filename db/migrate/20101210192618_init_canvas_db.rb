@@ -166,10 +166,14 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.datetime "created_at"
       t.datetime "updated_at"
       t.integer  "role_id", limit: 8, null: false
+      t.string :workflow_state, default: "active", null: false
+      t.integer :sis_batch_id, limit: 8
     end
 
     add_index "account_users", ["account_id"], name: "index_account_users_on_account_id"
     add_index "account_users", ["user_id"], name: "index_account_users_on_user_id"
+    add_index :account_users, :workflow_state
+    add_index :account_users, :sis_batch_id, where: "sis_batch_id IS NOT NULL"
 
     create_table "accounts", force: true do |t|
       t.string   "name", limit: 255
@@ -366,13 +370,17 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
 
     create_table :assignment_configuration_tool_lookups do |t|
       t.integer :assignment_id, limit: 8, null: false
-      t.integer :tool_id, limit: 8, null: false
+      t.integer :tool_id, limit: 8
       t.string :tool_type, null: false, limit: 255
       t.string :subscription_id
+      t.string :tool_product_code
+      t.string :tool_vendor_code
+      t.string :tool_resource_type_code
     end
 
     add_index :assignment_configuration_tool_lookups, %i[tool_id tool_type assignment_id], unique: true, name: "index_tool_lookup_on_tool_assignment_id"
     add_index :assignment_configuration_tool_lookups, :assignment_id
+    add_index :assignment_configuration_tool_lookups, %i[tool_product_code tool_vendor_code tool_resource_type_code], name: "index_resource_codes_on_assignment_configuration_tool_lookups"
 
     create_table "assignment_groups", force: true do |t|
       t.string   "name", limit: 255
@@ -563,7 +571,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index "attachments", ["workflow_state", "updated_at"], name: "index_attachments_on_workflow_state_and_updated_at"
     execute %{create index index_attachments_on_root_attachment_id_not_null on #{Attachment.quoted_table_name} (root_attachment_id) where root_attachment_id is not null}
     if (collkey = connection.extension(:pg_collkey)&.schema)
-      execute("CREATE INDEX index_attachments_on_folder_id_and_file_state_and_display_name ON #{Attachment.quoted_table_name} (folder_id, file_state, #{collkey}.collkey(display_name, 'root', false, 0, true)) WHERE folder_id IS NOT NULL")
+      execute("CREATE INDEX index_attachments_on_folder_id_and_file_state_and_display_name ON #{Attachment.quoted_table_name} (folder_id, file_state, #{collkey}.collkey(display_name, 'root', false, 3, true)) WHERE folder_id IS NOT NULL")
     else
       execute("CREATE INDEX index_attachments_on_folder_id_and_file_state_and_display_name ON #{Attachment.quoted_table_name} (folder_id, file_state, CAST(LOWER(replace(display_name, '\\', '\\\\')) AS bytea)) WHERE folder_id IS NOT NULL")
     end
@@ -731,6 +739,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       # last_transient_bounce_details was originally intended to have limit:
       # 32768, but it was typoed as "length" instead of "limit" so it did not apply
       t.text     "last_transient_bounce_details"
+      t.datetime :confirmation_code_expires_at
     end
 
     add_index "communication_channels", ["pseudonym_id", "position"]
@@ -1183,8 +1192,6 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.string   "workflow_state", null: false, limit: 255
       t.datetime "created_at"
       t.datetime "updated_at"
-      t.string   "asset_context_type", limit: 255
-      t.integer  "asset_context_id", limit: 8
     end
 
     create_table "developer_keys", force: true do |t|
@@ -1207,7 +1214,9 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.string   "redirect_uris", array: true, default: [], null: false, limit: 255
       t.text :notes
       t.integer :access_token_count, default: 0, null: false
+      t.string :vendor_code
     end
+    add_index :developer_keys, :vendor_code
 
     create_table "discussion_entries", force: true do |t|
       t.text     "message"
@@ -2168,8 +2177,6 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer  "communication_channel_id", limit: 8
       t.integer  "context_id", limit: 8
       t.string   "context_type", limit: 255
-      t.integer  "asset_context_id", limit: 8
-      t.string   "asset_context_type", limit: 255
       t.integer  "user_id", limit: 8
       t.datetime "created_at"
       t.datetime "updated_at"
@@ -2177,7 +2184,6 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.text     "url"
       t.string   "path_type", limit: 255
       t.text     "from_name"
-      t.string   "asset_context_code", limit: 255
       t.boolean  "to_email"
       t.text     "html_body"
       t.integer  "root_account_id", limit: 8
@@ -2376,6 +2382,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.datetime :deleted_at
 
       t.timestamps null: false
+      t.boolean :dismissed, default: false, null: false
     end
     add_index :planner_overrides, %i[plannable_type plannable_id user_id], unique: true, name: "index_planner_overrides_on_plannable_and_user"
 
@@ -3200,7 +3207,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index "users", ["avatar_state", "avatar_image_updated_at"], name: "index_users_on_avatar_state_and_avatar_image_updated_at"
     add_index "users", ["uuid"], name: "index_users_on_uuid"
     if (collkey = connection.extension(:pg_collkey)&.schema)
-      execute("CREATE INDEX index_users_on_sortable_name ON #{User.quoted_table_name} (#{collkey}.collkey(sortable_name, 'root', false, 0, true))")
+      execute("CREATE INDEX index_users_on_sortable_name ON #{User.quoted_table_name} (#{collkey}.collkey(sortable_name, 'root', false, 3, true))")
     else
       execute("CREATE INDEX index_users_on_sortable_name ON #{User.quoted_table_name} (CAST(LOWER(replace(sortable_name, '\\', '\\\\')) AS bytea))")
     end
@@ -3308,7 +3315,10 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer  "assignment_id", limit: 8
       t.integer  "old_assignment_id", limit: 8
       t.datetime :todo_date
+      t.integer :context_id, limit: 8
+      t.string :context_type
     end
+    add_index :wiki_pages, [:context_id, :context_type]
 
     add_index "wiki_pages", ["user_id"], name: "index_wiki_pages_on_user_id"
     add_index "wiki_pages", ["wiki_id"], name: "index_wiki_pages_on_wiki_id"
