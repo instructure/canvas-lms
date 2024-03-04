@@ -352,6 +352,25 @@ describe Types::CourseType do
         course_type.resolve("sectionsConnection { edges { node { _id } } }")
       ).to match_array course.course_sections.active.map(&:to_param)
     end
+
+    describe "assignmentId filter" do
+      before do
+        other_section_student = course_with_student(active_all: true, course:, section: other_section).user
+        @assignment = course.assignments.create!(only_visible_to_overrides: true)
+        create_adhoc_override_for_assignment(@assignment, other_section_student)
+      end
+
+      let(:query) { "sectionsConnection(filter: { assignmentId: #{@assignment.id} }) { edges { node { _id } } }" }
+
+      it "returns course sections associated with the assignment's assigned students" do
+        expect(course_type.resolve(query)).to match_array [other_section.to_param]
+      end
+
+      it "raises an error if the provided assignment is soft-deleted" do
+        @assignment.destroy
+        expect { course_type.resolve(query) }.to raise_error(/assignment not found/)
+      end
+    end
   end
 
   describe "modulesConnection" do
