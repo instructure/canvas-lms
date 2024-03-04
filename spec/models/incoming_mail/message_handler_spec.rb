@@ -296,6 +296,40 @@ describe IncomingMail::MessageHandler do
           end
         end
 
+        context "with an IncomingMail::Errors::InvalidParticipant error" do
+          it "sends the appropriate message" do
+            allow(InstStatsd::Statsd).to receive(:increment)
+            allow(subject).to receive(:get_original_message).with(original_message_id, timestamp).and_return(original_message)
+            expect(context).to receive(:reply_from).and_raise(IncomingMail::Errors::InvalidParticipant.new)
+
+            email_subject = "Undelivered message"
+            body = <<~TEXT.strip
+              The message you sent with the subject line "some subject" was not delivered because you are not a valid participant in the conversation.
+
+              Thank you,
+              Canvas Support
+            TEXT
+
+            message_attributes = {
+              to: "lucy@example.com",
+              from: "no-reply@example.com",
+              subject: email_subject,
+              body:,
+              delay_for: 0,
+              context: nil,
+              path_type: "email",
+              from_name: "Instructure",
+            }
+
+            expected_bounce_message = Message.new(message_attributes)
+            expect(Message).to receive(:new).with(message_attributes).and_return(expected_bounce_message)
+            expect(expected_bounce_message).to receive(:deliver)
+
+            subject.handle(outgoing_from_address, body, html_body, incoming_message, tag)
+            expect(InstStatsd::Statsd).to have_received(:increment).with("incoming_mail_processor.message_processing_error.invalid_participant")
+          end
+        end
+
         context "with a generic reply to error" do
           it "constructs the message correctly" do
             allow(InstStatsd::Statsd).to receive(:increment)
