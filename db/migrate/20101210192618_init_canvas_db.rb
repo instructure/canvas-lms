@@ -1158,6 +1158,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer :course_id, limit: 8, null: false
       t.timestamps null: false
       t.boolean :teacher_notes, default: false, null: false
+      t.boolean :read_only, default: false, null: false
     end
     add_index :custom_gradebook_columns, :course_id
 
@@ -1330,6 +1331,9 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :discussion_topics, :old_assignment_id, where: "old_assignment_id IS NOT NULL"
     add_index :discussion_topics, :external_feed_id, where: "external_feed_id IS NOT NULL"
     add_index :discussion_topics, :editor_id, where: "editor_id IS NOT NULL"
+    if (trgm = connection.extension(:pg_trgm)&.schema)
+      add_index :discussion_topics, "LOWER(title) #{trgm}.gist_trgm_ops", name: "index_trgm_discussion_topics_title", using: :gist
+    end
 
     create_table :discussion_topic_materialized_views, id: false do |t|
       t.integer :discussion_topic_id, limit: 8, null: false
@@ -1462,6 +1466,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
               name: "index_enrollments_on_user_type_role_section",
               unique: true
     add_index :enrollments, [:course_id, :user_id]
+    add_index :enrollments, :sis_pseudonym_id
 
     create_table "eportfolio_categories", force: true do |t|
       t.integer  "eportfolio_id", limit: 8, null: false
@@ -1788,9 +1793,13 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.timestamps null: true
       t.string :sis_source_id
       t.integer :root_account_id, limit: 8
+      t.integer :sis_batch_id, limit: 8
     end
     add_index :group_categories, [:context_id, :context_type], name: "index_group_categories_on_context"
     add_index :group_categories, :role, name: "index_group_categories_on_role"
+    add_index :group_categories, [:root_account_id, :sis_source_id], where: "sis_source_id IS NOT NULL", unique: true
+    add_index :group_categories, :sis_batch_id
+    add_index :group_categories, :root_account_id
 
     create_table :ignores do |t|
       t.string :asset_type, null: false, limit: 255
@@ -2439,6 +2448,20 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index "page_views", ["user_id", "created_at"], name: "index_page_views_on_user_id_and_created_at"
     add_index :page_views, :real_user_id, where: "real_user_id IS NOT NULL"
 
+    create_table :parallel_importers do |t|
+      t.integer :sis_batch_id, null: false, limit: 8
+      t.string :workflow_state, null: false, limit: 255
+      t.integer :index, null: false, limit: 8
+      t.integer :batch_size, null: false, limit: 8
+      t.timestamps null: false
+      t.datetime :started_at
+      t.datetime :ended_at
+      t.string :importer_type, null: false, limit: 255
+      t.integer :attachment_id, limit: 8, null: false
+      t.integer :rows_processed, default: 0, null: false
+    end
+    add_index :parallel_importers, :sis_batch_id
+
     create_table :planner_notes do |t|
       t.datetime :todo_date, null: false
       t.string :title, null: false
@@ -2917,8 +2940,10 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.json :calculation_details, default: {}, null: false
 
       t.timestamps null: false
+      t.string :workflow_state, default: "active"
     end
     add_index :score_metadata, :score_id, unique: true
+    add_index :score_metadata, :workflow_state
 
     create_table :scores do |t|
       t.integer :enrollment_id, limit: 8, null: false
@@ -2931,6 +2956,10 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.boolean :course_score, default: false
       t.float :unposted_current_score
       t.float :unposted_final_score
+      t.float :current_points
+      t.float :unposted_current_points
+      t.float :final_points
+      t.float :unposted_final_points
     end
     add_index :scores, :enrollment_id, name: :index_enrollment_scores
     add_index :scores,
@@ -2980,6 +3009,19 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.timestamps null: false
     end
 
+    create_table :sis_batch_errors do |t|
+      t.integer :sis_batch_id, limit: 8, null: false
+      t.integer :root_account_id, null: false, limit: 8
+      t.string :message, null: false, limit: 255
+      t.text :backtrace
+      t.string :file, limit: 255
+      t.boolean :failure, default: false, null: false
+      t.integer :row
+      t.datetime :created_at, null: false
+    end
+    add_index :sis_batch_errors, :sis_batch_id
+    add_index :sis_batch_errors, :root_account_id
+
     create_table "sis_batches", force: true do |t|
       t.integer  "account_id", limit: 8, null: false
       t.datetime "ended_at"
@@ -3010,6 +3052,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
               name: "index_sis_batches_diffing"
     add_index :sis_batches, :errors_attachment_id
     add_index :sis_batches, :user_id, where: "user_id IS NOT NULL"
+    add_index :sis_batches, :attachment_id
 
     create_table :sis_post_grades_statuses do |t|
       t.integer :course_id, null: false, limit: 8
@@ -3749,6 +3792,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :grading_period_groups, :courses
     add_foreign_key :grading_periods, :grading_period_groups
     add_foreign_key :grading_standards, :users
+    add_foreign_key :group_categories, :sis_batches
+    add_foreign_key :group_categories, :accounts, column: :root_account_id
     add_foreign_key :group_memberships, :groups
     add_foreign_key :group_memberships, :sis_batches
     add_foreign_key :group_memberships, :users
@@ -3810,6 +3855,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :page_comments, :users
     add_foreign_key :page_views, :users
     add_foreign_key :page_views, :users, column: :real_user_id
+    add_foreign_key :parallel_importers, :attachments
+    add_foreign_key :parallel_importers, :sis_batches
     add_foreign_key :planner_notes, :users
     add_foreign_key :planner_overrides, :users
     add_foreign_key :polling_poll_choices, :polling_polls, column: :poll_id
@@ -3855,6 +3902,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :scores, :grading_periods
     add_foreign_key :session_persistence_tokens, :pseudonyms
     add_foreign_key :shared_brand_configs, :brand_configs, column: "brand_config_md5", primary_key: "md5"
+    add_foreign_key :sis_batch_errors, :sis_batches
+    add_foreign_key :sis_batch_errors, :accounts, column: :root_account_id
     add_foreign_key :sis_batches, :attachments, column: :errors_attachment_id
     add_foreign_key :sis_batches, :enrollment_terms, column: :batch_mode_term_id
     add_foreign_key :sis_batches, :users
