@@ -5247,6 +5247,7 @@ ko:
   domain_3b54c511: 도메인
   done_we_took_the_files_you_uploaded_and_attached_t_e529cfc0: "마쳤습니다. 업로드한 파일을 받아 간단한 의견과 함께 각 사용자의 이 과제에 대한 제출물 페이지에 첨부했습니다. 학생은 새 의견이 추가되었다는 알림을 받게 됩니다."
   download_submissions_7454665f: "제출물 다운로드"
+  draft_83493fcd: 초안
   due_5d7267be: "기한:"
   due_a73610f6: 기한
   due_date_2c6e4cfb: "기한 %{date}"
