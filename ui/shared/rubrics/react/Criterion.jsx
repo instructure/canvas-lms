@@ -243,7 +243,7 @@ export default class Criterion extends React.Component {
             </Text>
           </div>
           <div className="long-description">
-            {longDescription !== '' ? (
+            {longDescription?.trim() ? (
               <LongDescription showLongDescription={this.openModal} />
             ) : null}
             <LongDescriptionDialog
