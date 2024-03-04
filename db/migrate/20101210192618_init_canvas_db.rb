@@ -77,11 +77,13 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.text :scopes
       t.boolean :remember_access
       t.string :crypted_refresh_token, limit: 255
+      t.string :workflow_state, default: "active", null: false
     end
     add_index :access_tokens, [:crypted_token], unique: true
     add_index :access_tokens, [:crypted_refresh_token], unique: true
     add_index :access_tokens, :user_id
     add_index :access_tokens, [:developer_key_id, :last_used_at]
+    add_index :access_tokens, :workflow_state
 
     create_table "authentication_providers", force: true do |t|
       t.integer  "account_id", limit: 8, null: false
@@ -218,6 +220,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.string   "brand_config_md5", limit: 32
       t.string   "turnitin_originality", limit: 255
       t.string   "account_calendar_subscription_type", default: "manual", null: false, limit: 255
+      t.integer :latest_outcome_import_id, limit: 8
     end
 
     add_index "accounts", ["name", "parent_account_id"], name: "index_accounts_on_name_and_parent_account_id"
@@ -510,6 +513,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.boolean  "intra_group_peer_reviews", default: false, null: false
       t.string   "lti_context_id"
       t.boolean :anonymous_instructor_annotations, default: false, null: false
+      t.references :duplicate_of, type: :bigint, index: false, foreign_key: { to_table: :assignments }
     end
 
     add_index "assignments", ["assignment_group_id"], name: "index_assignments_on_assignment_group_id"
@@ -519,6 +523,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index "assignments", ["grading_standard_id"], name: "index_assignments_on_grading_standard_id"
     add_index :assignments, :turnitin_id, unique: true, where: "turnitin_id IS NOT NULL"
     add_index :assignments, :lti_context_id, unique: true
+    add_index :assignments, :duplicate_of_id, where: "duplicate_of_id IS NOT NULL"
 
     create_table "attachment_associations", force: true do |t|
       t.integer "attachment_id", limit: 8
@@ -1109,6 +1114,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer  "turnitin_id", limit: 8, unique: true
       t.boolean  "show_announcements_on_home_page"
       t.integer  "home_page_announcement_limit"
+      t.integer :latest_outcome_import_id, limit: 8
     end
 
     add_index "courses", ["account_id"], name: "index_courses_on_account_id"
@@ -1438,7 +1444,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.datetime "last_publish_attempt_at"
       t.text     "stuck_sis_fields"
       t.text     "grade_publishing_message"
-      t.boolean  "limit_privileges_to_course_section"
+      t.boolean :limit_privileges_to_course_section, default: false, null: false
       t.datetime "last_activity_at"
       t.integer  "total_activity_time"
       t.integer  "role_id", limit: 8, null: false
@@ -1851,6 +1857,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :learning_outcome_groups, [:context_id, :context_type]
     add_index :learning_outcome_groups, :root_learning_outcome_group_id, where: "root_learning_outcome_group_id IS NOT NULL"
     add_index :learning_outcome_groups, :vendor_guid_2, name: "index_learning_outcome_groups_on_vendor_guid_2"
+    add_index :learning_outcome_groups, %i[context_type context_id vendor_guid_2], name: "index_learning_outcome_groups_on_context_and_vendor_guid"
 
     create_table :learning_outcome_question_results do |t|
       t.integer :learning_outcome_result_id, limit: 8
@@ -1967,6 +1974,19 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :live_assessments_submissions, [:assessment_id, :user_id], unique: true
     add_index :live_assessments_submissions, :user_id
 
+    create_table :lti_line_items do |t|
+      t.float :score_maximum, null: false
+      t.string :label, null: false
+      t.string :resource_id, null: true
+      t.string :tag, null: true
+      t.integer :lti_resource_link_id, limit: 8
+      t.references :assignment, foreign_key: true, null: false, limit: 8, index: true
+      t.timestamps null: false
+    end
+    add_index :lti_line_items, :tag
+    add_index :lti_line_items, :resource_id
+    add_index :lti_line_items, :lti_resource_link_id
+
     create_table :lti_links do |t|
       t.string :resource_link_id, null: false
       t.string :vendor_code, null: false
@@ -2020,6 +2040,12 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     end
     add_index :lti_resource_handlers, [:tool_proxy_id, :resource_type_code], name: "index_lti_resource_handlers_on_tool_proxy_and_type_code", unique: true
 
+    create_table :lti_resource_links do |t|
+      t.string :resource_link_id, null: false
+      t.timestamps null: false
+    end
+    add_index :lti_resource_links, :resource_link_id, unique: true
+
     create_table :lti_resource_placements do |t|
       t.string :placement, null: false, limit: 255
       t.timestamps null: false
@@ -2030,6 +2056,21 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
               unique: true,
               where: "message_handler_id IS NOT NULL",
               name: "index_resource_placements_on_placement_and_message_handler"
+
+    create_table :lti_results do |t|
+      t.float :result_score
+      t.float :result_maximum
+      t.text :comment
+      t.string :activity_progress
+      t.string :grading_progress
+      t.references :lti_line_item, foreign_key: true, null: false, limit: 8, index: true
+      t.integer :submission_id, limit: 8
+      t.integer :user_id, limit: 8, null: false
+      t.timestamps null: false
+    end
+    add_index :lti_results, %i[lti_line_item_id user_id], unique: true
+    add_index :lti_results, :submission_id
+    add_index :lti_results, :user_id
 
     create_table :lti_tool_consumer_profiles do |t|
       t.text :services
@@ -2338,8 +2379,10 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.string :token, null: false, limit: 255
       t.string :arn, null: false, limit: 255
       t.timestamps null: false
+      t.string :workflow_state, default: "active", null: false
     end
     add_index :notification_endpoints, :access_token_id
+    add_index :notification_endpoints, :workflow_state
 
     create_table "notification_policies", force: true do |t|
       t.integer  "notification_id", limit: 8
@@ -2396,10 +2439,33 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.string :workflow_state, null: false, default: "pending"
       t.text :link_id
     end
-    add_index :originality_reports, :attachment_id, unique: true
+    add_index :originality_reports, :attachment_id
     add_index :originality_reports, :originality_report_attachment_id, unique: true
     add_index :originality_reports, :submission_id
     add_index :originality_reports, [:workflow_state]
+
+    create_table :outcome_import_errors do |t|
+      t.integer :outcome_import_id, limit: 8, null: false
+      t.string :message, null: false, limit: 255
+
+      t.timestamps null: false
+    end
+    add_index :outcome_import_errors, :outcome_import_id
+
+    create_table :outcome_imports do |t|
+      t.string :workflow_state, null: false
+      t.integer :context_id, limit: 8, null: false
+      t.string :context_type, null: false
+      t.integer :user_id, limit: 8
+      t.references :attachment, foreign_key: true, limit: 8, index: true
+      t.integer :progress
+      t.timestamp :ended_at
+
+      t.timestamps null: false
+      t.json :data
+    end
+    add_index :outcome_imports, %i[context_type context_id]
+    add_index :outcome_imports, :user_id
 
     create_table "page_comments", force: true do |t|
       t.text     "message"
@@ -2940,7 +3006,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.json :calculation_details, default: {}, null: false
 
       t.timestamps null: false
-      t.string :workflow_state, default: "active"
+      t.string :workflow_state, default: "active", null: false
     end
     add_index :score_metadata, :score_id, unique: true
     add_index :score_metadata, :workflow_state
@@ -3021,6 +3087,22 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     end
     add_index :sis_batch_errors, :sis_batch_id
     add_index :sis_batch_errors, :root_account_id
+
+    create_table :sis_batch_roll_back_data do |t|
+      t.integer :sis_batch_id, null: false, limit: 8
+      t.string :context_type, null: false, limit: 255
+      t.integer :context_id, null: false, limit: 8
+      t.string :previous_workflow_state, null: false, limit: 255
+      t.string :updated_workflow_state, null: false, limit: 255
+      t.boolean :batch_mode_delete, null: false, default: false
+      t.string :workflow_state, null: false, limit: 255, default: "active"
+      t.timestamps null: false
+    end
+    add_index :sis_batch_roll_back_data, :sis_batch_id
+    add_index :sis_batch_roll_back_data, :workflow_state
+    add_index :sis_batch_roll_back_data,
+              %i[updated_workflow_state previous_workflow_state],
+              name: "index_sis_batch_roll_back_context_workflow_states"
 
     create_table "sis_batches", force: true do |t|
       t.integer  "account_id", limit: 8, null: false
@@ -3180,6 +3262,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer :grading_period_id, limit: 8
       t.integer :seconds_late_override, limit: 8
       t.string :lti_user_id
+      t.string :anonymous_id, limit: 5
     end
 
     add_index "submissions", ["assignment_id", "submission_type"], name: "index_submissions_on_assignment_id_and_submission_type"
@@ -3216,6 +3299,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
               name: "index_active_submissions_gp"
     add_index :submissions, :cached_due_date
     add_index :submissions, :late_policy_status, where: "workflow_state<>'deleted' and late_policy_status IS NOT NULL"
+    add_index :submissions, %i[assignment_id anonymous_id], unique: true, where: "anonymous_id IS NOT NULL"
 
     create_table :switchman_shards do |t|
       t.string :name, limit: 255
@@ -3663,6 +3747,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :accounts, :accounts, column: :parent_account_id
     add_foreign_key :accounts, :accounts, column: :root_account_id, deferrable: true
     add_foreign_key :accounts, :brand_configs, column: "brand_config_md5", primary_key: "md5"
+    add_foreign_key :accounts, :outcome_imports, column: "latest_outcome_import_id"
     add_foreign_key :accounts, :sis_batches
     add_foreign_key :alert_criteria, :alerts
     add_foreign_key :assessment_requests, :rubric_associations
@@ -3729,6 +3814,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :courses, :accounts, column: :root_account_id
     add_foreign_key :courses, :courses, column: :template_course_id
     add_foreign_key :courses, :enrollment_terms
+    add_foreign_key :courses, :outcome_imports, column: "latest_outcome_import_id"
     add_foreign_key :courses, :sis_batches
     add_foreign_key :courses, :wikis
     add_foreign_key :custom_gradebook_column_data, :custom_gradebook_columns
@@ -3813,11 +3899,14 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :live_assessments_results, :users, column: :assessor_id
     add_foreign_key :live_assessments_submissions, :live_assessments_assessments, column: :assessment_id
     add_foreign_key :live_assessments_submissions, :users
+    add_foreign_key :lti_line_items, :lti_resource_links
     add_foreign_key :lti_message_handlers, :lti_resource_handlers, column: :resource_handler_id
     add_foreign_key :lti_message_handlers, :lti_tool_proxies, column: :tool_proxy_id
     add_foreign_key :lti_product_families, :accounts, column: :root_account_id
     add_foreign_key :lti_resource_handlers, :lti_tool_proxies, column: :tool_proxy_id
     add_foreign_key :lti_resource_placements, :lti_message_handlers, column: :message_handler_id
+    add_foreign_key :lti_results, :submissions
+    add_foreign_key :lti_results, :users
     add_foreign_key :lti_tool_consumer_profiles, :developer_keys
     add_foreign_key :lti_tool_proxies, :lti_product_families, column: :product_family_id
     add_foreign_key :lti_tool_proxy_bindings, :lti_tool_proxies, column: :tool_proxy_id
@@ -3852,6 +3941,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :originality_reports, :attachments
     add_foreign_key :originality_reports, :attachments, column: :originality_report_attachment_id
     add_foreign_key :originality_reports, :submissions
+    add_foreign_key :outcome_import_errors, :outcome_imports
+    add_foreign_key :outcome_imports, :users
     add_foreign_key :page_comments, :users
     add_foreign_key :page_views, :users
     add_foreign_key :page_views, :users, column: :real_user_id
@@ -3883,6 +3974,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :quiz_submission_events, :quiz_submissions
     add_foreign_key :quiz_submissions, :quizzes
     add_foreign_key :quiz_submissions, :users
+    alter_constraint :quiz_submissions, "fk_rails_04850db4b4", deferrable: true
     add_foreign_key :quizzes, :assignments
     add_foreign_key :quizzes, :cloned_items
     add_foreign_key :report_snapshots, :accounts
@@ -3904,6 +3996,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :shared_brand_configs, :brand_configs, column: "brand_config_md5", primary_key: "md5"
     add_foreign_key :sis_batch_errors, :sis_batches
     add_foreign_key :sis_batch_errors, :accounts, column: :root_account_id
+    add_foreign_key :sis_batch_roll_back_data, :sis_batches
     add_foreign_key :sis_batches, :attachments, column: :errors_attachment_id
     add_foreign_key :sis_batches, :enrollment_terms, column: :batch_mode_term_id
     add_foreign_key :sis_batches, :users
@@ -3920,6 +4013,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :submissions, :media_objects
     add_foreign_key :submissions, :quiz_submissions
     add_foreign_key :submissions, :users
+    alter_constraint :submissions, "fk_rails_8d85741475", deferrable: true
     add_foreign_key :switchman_shards, :switchman_shards, column: :delayed_jobs_shard_id
     add_foreign_key :terms_of_service_contents, :accounts
     add_foreign_key :terms_of_services, :accounts
