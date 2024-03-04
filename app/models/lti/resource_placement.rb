@@ -37,6 +37,9 @@ module Lti
     # Default placements for LTI 1 and LTI 2, ignored for LTI 1.3
     LEGACY_DEFAULT_PLACEMENTS = [ASSIGNMENT_SELECTION, LINK_SELECTION].freeze
 
+    # Placements restricted so not advertised in the UI
+    NON_PUBLIC_PLACEMENTS = [:submission_type_selection].freeze
+
     PLACEMENTS_BY_MESSAGE_TYPE = {
       LtiAdvantage::Messages::ResourceLinkRequest::MESSAGE_TYPE => %i[
         account_navigation
@@ -115,6 +118,14 @@ module Lti
     def self.valid_placements(_root_account)
       PLACEMENTS.dup.tap do |p|
         p.delete(:conference_selection) unless Account.site_admin.feature_enabled?(:conference_selection_lti_placement)
+      end
+    end
+
+    def self.public_placements(root_account)
+      if root_account.feature_enabled?(:remove_submission_type_selection_from_dev_keys_edit_page)
+        valid_placements(root_account) - NON_PUBLIC_PLACEMENTS
+      else
+        valid_placements(root_account)
       end
     end
 
