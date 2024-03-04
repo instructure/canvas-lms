@@ -141,6 +141,14 @@ module IncomingMail
                      Thank you,
                      Canvas Support
                    TEXT
+                 when IncomingMail::Errors::InvalidParticipant
+                   InstStatsd::Statsd.increment("incoming_mail_processor.message_processing_error.invalid_participant")
+                   I18n.t(<<~TEXT, subject:).gsub(/^ +/, "")
+                     The message you sent with the subject line "%{subject}" was not delivered because you are not a valid participant in the conversation.
+
+                     Thank you,
+                     Canvas Support
+                   TEXT
                  else # including IncomingMessageProcessor::UnknownAddressError
                    InstStatsd::Statsd.increment("incoming_mail_processor.message_processing_error.catch_all")
                    error_info = { tags: { type: :message_processing_error_catch_all }, extra: { ref: get_ref_uuid } }
