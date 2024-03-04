@@ -28,7 +28,7 @@ GEM
       net-http
     i18n (1.14.1)
       concurrent-ruby (~> 1.0)
-    json-jwt (1.16.5)
+    json-jwt (1.16.6)
       activesupport (>= 4.2)
       aes_key_wrap
       base64
