@@ -3349,6 +3349,11 @@ describe UsersController do
 
     before do
       user.access_tokens.create!
+
+      @sns_client = double
+      allow(DeveloperKey).to receive(:sns).and_return(@sns_client)
+      expect(@sns_client).to receive(:create_platform_endpoint).and_return(endpoint_arn: "arn")
+      user.access_tokens.each_with_index { |ac, i| ac.notification_endpoints.create!(token: "token #{i}") }
     end
 
     it "rejects unauthenticated users" do
@@ -3375,10 +3380,13 @@ describe UsersController do
 
     it "allows admin to expire mobile sessions" do
       user_session(admin)
+      starting_notification_endpoints_count = user.notification_endpoints.count
+      expect(starting_notification_endpoints_count).to be > 0
       delete "expire_mobile_sessions", format: :json
 
       expect(response).to have_http_status :ok
       expect(user.reload.access_tokens.take.permanent_expires_at).to be <= Time.zone.now
+      expect(user.reload.notification_endpoints.count).to be < starting_notification_endpoints_count
     end
 
     it "only expires access tokens associated to mobile app developer keys" do
