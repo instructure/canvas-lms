@@ -1595,6 +1595,7 @@ CanvasRails::Application.routes.draw do
 
       get "users/:id", action: :api_show
       put "users/:id", action: :update
+      delete "users/mobile_sessions", action: :expire_mobile_sessions
       delete "users/:id", action: :destroy, as: "destroy_user"
       delete "users/:id/sessions", action: :terminate_sessions
 
@@ -1632,8 +1633,6 @@ CanvasRails::Application.routes.draw do
       get "show_k5_dashboard", controller: "users", action: "show_k5_dashboard"
 
       post "users/:id/clear_cache", action: :clear_cache, as: "clear_cache"
-
-      delete "users/mobile_sessions", controller: "users", action: :expire_mobile_sessions
 
       scope(controller: :user_observees) do
         get    "users/:user_id/observers", action: :observers, as: "user_observers"
