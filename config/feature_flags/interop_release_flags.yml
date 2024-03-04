@@ -1,4 +1,22 @@
 ---
+remove_submission_type_selection_from_dev_keys_edit_page:
+  state: hidden
+  shadow: true
+  applies_to: RootAccount
+  display_name: Remove submission_type_selection from Dev Keys edit page UI
+  description: |-
+    When enabled, the submission_type_selection placement will not show up in
+    the UI for Dev Keys which do not already have it. Tools can still have the
+    placement by editing the JSON, and it will still show up for Dev Keys which
+    already have it. This flag is to be removed when after it is completely
+    turned on in roughly April-May 2024.
+  environments:
+    development:
+      state: allowed_on
+    test:
+      state: allowed_on
+    ci:
+      state: allowed_on
 developer_key_support_includes:
   state: hidden
   display_name: Developer Key Include Parameter Support
