@@ -509,6 +509,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.boolean  "vericite_enabled", default: false, null: false
       t.boolean  "intra_group_peer_reviews", default: false, null: false
       t.string   "lti_context_id"
+      t.boolean :anonymous_instructor_annotations, default: false
     end
 
     add_index "assignments", ["assignment_group_id"], name: "index_assignments_on_assignment_group_id"
@@ -563,6 +564,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer  "usage_rights_id", limit: 8
       t.datetime "modified_at"
       t.timestamp "viewed_at"
+      t.string :instfs_uuid
     end
     add_index "attachments", ["cloned_item_id"], name: "index_attachments_on_cloned_item_id"
     add_index "attachments", ["context_id", "context_type"], name: "index_attachments_on_context_id_and_context_type"
@@ -584,6 +586,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
               %i[context_id context_type migration_id],
               where: "migration_id IS NOT NULL",
               name: "index_attachments_on_context_and_migration_id"
+    add_index :attachments, :instfs_uuid, where: "instfs_uuid IS NOT NULL"
 
     create_table "calendar_events", force: true do |t|
       t.string   "title", limit: 255
@@ -949,6 +952,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.boolean :generate_user_note
     end
     add_index :conversation_batches, [:user_id, :workflow_state]
+    add_index :conversation_batches, :root_conversation_message_id
 
     create_table "conversation_participants" do |t|
       t.integer  "conversation_id", limit: 8, null: false
@@ -1916,6 +1920,22 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     end
     add_index :live_assessments_submissions, [:assessment_id, :user_id], unique: true
 
+    create_table :lti_links do |t|
+      t.string :resource_link_id, null: false
+      t.string :vendor_code, null: false
+      t.string :product_code, null: false
+      t.string :resource_type_code, null: false
+      t.integer :linkable_id, limit: 8
+      t.string :linkable_type
+      t.text :custom_parameters
+      t.text :resource_url
+
+      t.timestamps null: false
+    end
+
+    add_index :lti_links, [:linkable_id, :linkable_type]
+    add_index :lti_links, :resource_link_id, unique: true
+
     create_table :lti_message_handlers do |t|
       t.string :message_type, null: false, limit: 255
       t.string :launch_path, null: false, limit: 255
@@ -2078,6 +2098,22 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
               unique: true,
               name: "index_master_content_tags_on_template_id_and_content"
     add_index :master_courses_master_content_tags, :migration_id, unique: true, name: "index_master_content_tags_on_migration_id"
+
+    create_table :master_courses_migration_results do |t|
+      t.integer :master_migration_id, limit: 8, null: false
+      t.integer :content_migration_id, limit: 8, null: false
+      t.integer :child_subscription_id, limit: 8, null: false
+      t.string :import_type, null: false
+      t.string :state, null: false
+      t.text :results
+    end
+    add_index :master_courses_migration_results,
+              [:master_migration_id, :state],
+              name: "index_mc_migration_results_on_master_mig_id_and_state"
+    add_index :master_courses_migration_results,
+              [:master_migration_id, :content_migration_id],
+              unique: true,
+              name: "index_mc_migration_results_on_master_and_content_migration_ids"
 
     create_table :master_courses_master_migrations do |t|
       t.integer :master_template_id, limit: 8, null: false
@@ -2833,10 +2869,21 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.float   :current_score
       t.float   :final_score
       t.timestamps null: true
+      t.references :assignment_group, limit: 8, index: true, null: true
+      t.boolean :course_score, default: false
     end
-
-    add_index :scores, [:enrollment_id, :grading_period_id], unique: true
-    add_index :scores, :enrollment_id, unique: true, where: "grading_period_id is null"
+    add_index :scores, :enrollment_id, name: :index_enrollment_scores
+    add_index :scores,
+              %i[enrollment_id grading_period_id],
+              unique: true,
+              where: "grading_period_id IS NOT NULL",
+              name: :index_grading_period_scores
+    add_index :scores,
+              %i[enrollment_id assignment_group_id],
+              unique: true,
+              where: "assignment_group_id IS NOT NULL",
+              name: :index_assignment_group_scores
+    add_index :scores, :enrollment_id, unique: true, where: "course_score", name: :index_course_scores
 
     create_table "scribd_mime_types", force: true do |t|
       t.string   "extension", limit: 255
@@ -3041,6 +3088,15 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       )
     SQL
     add_index :submissions, :grading_period_id, where: "grading_period_id IS NOT NULL"
+    add_index :submissions, :assignment_id, name: "index_submissions_needs_grading", where: <<~SQL.squish
+      submissions.submission_type IS NOT NULL
+      AND (submissions.excused = 'f' OR submissions.excused IS NULL)
+      AND (submissions.workflow_state = 'pending_review'
+        OR (submissions.workflow_state IN ('submitted', 'graded')
+          AND (submissions.score IS NULL OR NOT submissions.grade_matches_current_submission)
+        )
+      )
+    SQL
 
     create_table :switchman_shards do |t|
       t.string :name, limit: 255
@@ -3315,8 +3371,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer  "assignment_id", limit: 8
       t.integer  "old_assignment_id", limit: 8
       t.datetime :todo_date
-      t.integer :context_id, limit: 8
-      t.string :context_type
+      t.integer :context_id, limit: 8, null: false
+      t.string :context_type, null: false
     end
     add_index :wiki_pages, [:context_id, :context_type]
 
@@ -3388,7 +3444,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
         LEFT JOIN #{Submission.quoted_table_name} s
           ON s.user_id = e.user_id
           AND s.assignment_id = a.id
-          AND s.score IS NOT NULL
+          AND s.workflow_state != 'deleted'
 
         WHERE a.workflow_state NOT IN ('deleted','unpublished')
           AND(
@@ -3438,7 +3494,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
         LEFT JOIN #{Submission.quoted_table_name} s
           ON s.user_id = e.user_id
           AND s.assignment_id = a.id
-          AND s.score IS NOT NULL
+          AND s.workflow_state != 'deleted'
 
         WHERE q.workflow_state NOT IN ('deleted','unpublished')
           AND(
@@ -3626,6 +3682,9 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :master_courses_child_subscriptions, :courses, column: "child_course_id"
     add_foreign_key :master_courses_master_content_tags, :master_courses_master_migrations, column: "current_migration_id"
     add_foreign_key :master_courses_master_content_tags, :master_courses_master_templates, column: "master_template_id"
+    add_foreign_key :master_courses_migration_results, :master_courses_master_migrations, column: "master_migration_id"
+    add_foreign_key :master_courses_migration_results, :master_courses_child_subscriptions, column: "child_subscription_id"
+    add_foreign_key :master_courses_migration_results, :content_migrations
     add_foreign_key :master_courses_master_migrations, :master_courses_master_templates, column: "master_template_id"
     add_foreign_key :master_courses_master_templates, :courses
     add_foreign_key :master_courses_master_templates, :master_courses_master_migrations, column: "active_migration_id"
