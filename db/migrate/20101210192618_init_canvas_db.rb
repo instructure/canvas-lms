@@ -542,6 +542,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.bigint :final_grader_id
       t.boolean :grader_names_visible_to_final_grader, default: false
       t.datetime :duplication_started_at
+      t.datetime :importing_started_at
     end
 
     add_index "assignments", ["assignment_group_id"], name: "index_assignments_on_assignment_group_id"
@@ -555,6 +556,11 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :assignments,
               :duplication_started_at,
               where: "duplication_started_at IS NOT NULL AND workflow_state = 'duplicating'"
+    add_index :assignments, :grader_section_id, where: "grader_section_id IS NOT NULL"
+    add_index :assignments, :final_grader_id, where: "final_grader_id IS NOT NULL"
+    add_index :assignments,
+              :importing_started_at,
+              where: "importing_started_at IS NOT NULL AND workflow_state = 'importing'"
 
     create_table "attachment_associations", force: true do |t|
       t.integer "attachment_id", limit: 8
@@ -2478,6 +2484,47 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     end
     add_index :oauth_requests, :user_id, where: "user_id IS NOT NULL"
 
+    create_table :observer_alert_thresholds do |t|
+      t.string :alert_type, null: false
+      t.string :threshold
+      t.string :workflow_state, default: "active", null: false, index: true
+
+      t.timestamps null: false
+      t.integer :user_id, limit: 8, null: false
+      t.integer :observer_id, limit: 8, null: false
+    end
+    add_index :observer_alert_thresholds, %i[alert_type user_id observer_id], unique: true, name: "observer_alert_thresholds_on_alert_type_and_observer_and_user"
+    add_index :observer_alert_thresholds, :user_id
+    add_index :observer_alert_thresholds, :observer_id
+
+    create_table :observer_alerts do |t|
+      t.references :observer_alert_threshold, null: false, foreign_key: true, limit: 8, index: true
+
+      t.references :context, polymorphic: true, limit: 8, index: true
+
+      t.string :alert_type, null: false
+      t.string :workflow_state, default: "unread", null: false
+      t.timestamp :action_date, null: false
+      t.string :title, null: false
+
+      t.timestamps null: false
+      t.integer :user_id, limit: 8, null: false
+      t.integer :observer_id, limit: 8, null: false
+    end
+    add_index :observer_alerts, :workflow_state
+    add_index :observer_alerts, :user_id
+    add_index :observer_alerts, :observer_id
+
+    create_table :observer_pairing_codes do |t|
+      t.integer :user_id, null: false, limit: 8
+      t.string :code, null: false, limit: 10
+      t.timestamp :expires_at, null: false, index: true
+      t.string :workflow_state, default: "active", null: false, index: true
+
+      t.timestamps null: false
+    end
+    add_index :observer_pairing_codes, :user_id
+
     create_table :one_time_passwords do |t|
       t.integer :user_id, limit: 8, null: false
       t.string :code, null: false
@@ -2784,6 +2831,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.timestamps null: false
       t.string :workflow_state, null: false, default: "active"
       t.string :old_filename, null: false
+      t.string :old_display_name, limit: 255
+      t.string :old_content_type, limit: 255
     end
     add_index :purgatories, :attachment_id, unique: true
     add_index :purgatories, :deleted_by_user_id
@@ -3788,7 +3837,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
         JOIN #{Enrollment.quoted_table_name} e
           ON e.course_id = c.id
           AND e.type IN ('StudentEnrollment', 'StudentViewEnrollment')
-          AND e.workflow_state != 'deleted'
+          AND e.workflow_state NOT IN ('deleted', 'rejected', 'inactive')
 
         JOIN #{CourseSection.quoted_table_name} cs
           ON cs.course_id = c.id
@@ -3821,7 +3870,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
         LEFT JOIN #{Submission.quoted_table_name} s
           ON s.user_id = e.user_id
           AND s.assignment_id = a.id
-          AND s.workflow_state != 'deleted'
+          AND s.workflow_state NOT IN ('deleted', 'unsubmitted')
 
         WHERE a.workflow_state NOT IN ('deleted','unpublished')
           AND(
@@ -4096,6 +4145,11 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :notification_endpoints, :access_tokens
     add_foreign_key :notification_policies, :communication_channels
     add_foreign_key :oauth_requests, :users
+    add_foreign_key :observer_alert_thresholds, :users
+    add_foreign_key :observer_alert_thresholds, :users, column: :observer_id
+    add_foreign_key :observer_alerts, :users
+    add_foreign_key :observer_alerts, :users, column: :observer_id
+    add_foreign_key :observer_pairing_codes, :users
     add_foreign_key :one_time_passwords, :users
     add_foreign_key :originality_reports, :submissions
     add_foreign_key :outcome_import_errors, :outcome_imports
