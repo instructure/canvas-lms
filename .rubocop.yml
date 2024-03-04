@@ -152,10 +152,6 @@ RSpec/InstanceVariable:
   Enabled: false # legacy code
 RSpec/MultipleMemoizedHelpers:
   Enabled: false # complicated setup is sometimes necessary
-RSpec/RepeatedSubjectCall:
-  Enabled: false # referencing and calling methods on the subject multiple times is fine;
-                 # depending on calling `subject` multiple times having side effects is not.
-                 # unfortunately the cop can't tell the difference.
 RSpec/SubjectStub:
   Enabled: false # yes, canvas is big and complicated sometimes
 
