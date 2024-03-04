@@ -107,9 +107,9 @@ class Enrollment < ActiveRecord::Base
   end
 
   def cant_observe_observer
-    if course.enrollments.where(type: "ObserverEnrollment",
-                                user_id: associated_user_id,
-                                associated_user_id: user_id).exists?
+    if !deleted? && course.enrollments.where(type: "ObserverEnrollment",
+                                             user_id: associated_user_id,
+                                             associated_user_id: user_id).exists?
       errors.add(:associated_user_id, "Cannot observe observer observing self")
     end
   end
