@@ -44,7 +44,7 @@ class Login::CasController < ApplicationController
 
     st = CASClient::ServiceTicket.new(params[:ticket], cas_login_url)
     begin
-      timeout_options = { raise_on_timeout: true, fallback_timeout_length: 10.0 }
+      timeout_options = { raise_on_timeout: true, capture_stats: true, fallback_timeout_length: 10.0 }
 
       Canvas.timeout_protection("cas:#{aac.global_id}", timeout_options) do
         client.validate_service_ticket(st)

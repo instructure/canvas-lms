@@ -234,6 +234,7 @@ describe Login::CasController do
     cas_client = double
     allow(controller).to receive(:client).and_return(cas_client)
     start = Time.now.utc
+    allow(InstStatsd::Statsd).to receive(:increment).and_call_original
     expect(cas_client).to receive(:validate_service_ticket) { sleep 5 }
     session[:sentinel] = true
     get "new", params: { ticket: "ST-abcd" }
@@ -241,6 +242,7 @@ describe Login::CasController do
     expect(flash[:delegated_message]).to_not be_blank
     expect(Time.now.utc - start).to be < 1
     expect(session[:sentinel]).to be true
+    expect(InstStatsd::Statsd).to have_received(:increment).with("timeout_protection.cas.timeout")
   end
 
   it "sets a cookie for site admin login" do
