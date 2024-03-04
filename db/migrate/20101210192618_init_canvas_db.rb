@@ -562,6 +562,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.boolean :grader_names_visible_to_final_grader, default: true
       t.datetime :duplication_started_at
       t.datetime :importing_started_at
+      t.integer :allowed_attempts
     end
 
     add_index "assignments", ["assignment_group_id"], name: "index_assignments_on_assignment_group_id"
@@ -878,6 +879,10 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
 
     add_index "content_participations", %w[content_id content_type user_id], name: "index_content_participations_uniquely", unique: true
     add_index :content_participations, :user_id
+    add_index :content_participations,
+              :user_id,
+              name: "index_content_participations_on_user_id_unread",
+              where: "workflow_state = 'unread'"
 
     create_table "content_tags", force: true do |t|
       t.integer  "content_id", limit: 8
@@ -1213,6 +1218,15 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :crocodoc_documents, :uuid
     add_index :crocodoc_documents, :attachment_id
     add_index :crocodoc_documents, :process_state
+
+    create_table :csp_domains do |t|
+      t.references :account, null: false, foreign_key: true, index: false, limit: 8
+      t.string :domain, null: false, limit: 255
+      t.string :workflow_state, null: false, limit: 255
+      t.timestamps null: false
+    end
+    add_index :csp_domains, [:account_id, :domain], unique: true
+    add_index :csp_domains, [:account_id, :workflow_state]
 
     create_table :custom_gradebook_columns do |t|
       t.string :title, null: false, limit: 255
@@ -2117,7 +2131,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     create_table :lti_resource_links do |t|
       t.string :resource_link_id, null: false
       t.timestamps null: false
-      t.references :context_external_tool, type: :bigint, foreign_key: { to_table: :context_external_tools }, index: true
+      t.references :context_external_tool, type: :bigint, foreign_key: { to_table: :context_external_tools }, index: true, null: false
     end
     add_index :lti_resource_links, :resource_link_id, unique: true
 
@@ -2404,6 +2418,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index "messages", %w[user_id to_email dispatch_at], name: "index_messages_user_id_dispatch_at_to_email"
     add_index :messages, :root_account_id
     add_index :messages, :sent_at, where: "sent_at IS NOT NULL"
+    add_index :messages, :created_at
 
     create_table :migration_issues do |t|
       t.integer :content_migration_id, limit: 8, null: false
@@ -3438,6 +3453,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.string :lti_user_id
       t.string :anonymous_id, limit: 5
       t.datetime :last_comment_at
+      t.integer :extra_attempts
     end
 
     add_index "submissions", ["assignment_id", "submission_type"], name: "index_submissions_on_assignment_id_and_submission_type"
