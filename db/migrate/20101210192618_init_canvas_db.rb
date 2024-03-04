@@ -157,6 +157,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.timestamps null: false
       t.string :required_account_service, limit: 255
       t.integer :months_in_display_cycle
+      t.boolean :domain_specific, default: false, null: false
     end
 
     add_index :account_notifications, %i[account_id end_at start_at], name: "index_account_notifications_by_account_and_timespan"
@@ -882,10 +883,12 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.string :tool_id, limit: 255
       t.boolean :not_selectable
       t.string :app_center_id, limit: 255
+      t.boolean :allow_membership_service_access, default: false, null: false
     end
     add_index :context_external_tools, [:tool_id]
     add_index :context_external_tools, [:context_id, :context_type]
     add_index :context_external_tools, %i[context_id context_type migration_id], where: "migration_id IS NOT NULL", name: "index_external_tools_on_context_and_migration_id"
+    add_index :context_external_tools, :consumer_key
 
     create_table "context_module_progressions", force: true do |t|
       t.integer  "context_module_id", limit: 8
@@ -1260,6 +1263,19 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index "discussion_entry_participants", ["discussion_entry_id", "user_id"], name: "index_entry_participant_on_entry_id_and_user_id", unique: true
     add_index :discussion_entry_participants, :user_id
 
+    create_table :discussion_topic_section_visibilities do |t|
+      t.integer :discussion_topic_id, null: false, limit: 8
+      t.integer :course_section_id, null: false, limit: 8
+      t.timestamps null: false
+      t.string :workflow_state, null: false, limit: 255
+    end
+    add_index :discussion_topic_section_visibilities,
+              :discussion_topic_id,
+              name: "idx_discussion_topic_section_visibility_on_topic"
+    add_index :discussion_topic_section_visibilities,
+              :course_section_id,
+              name: "idx_discussion_topic_section_visibility_on_section"
+
     create_table "discussion_topics", force: true do |t|
       t.string   "title", limit: 255
       t.text     "message", limit: 16_777_215
@@ -1299,6 +1315,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.boolean  "only_graders_can_rate", default: false, null: false
       t.boolean  "sort_by_rating", default: false, null: false
       t.datetime :todo_date
+      t.boolean :is_section_specific, default: false, null: false
     end
 
     add_index "discussion_topics", ["context_id", "position"], name: "index_discussion_topics_on_context_id_and_position"
@@ -1423,6 +1440,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer  "role_id", limit: 8, null: false
       t.datetime "graded_at"
       t.integer :sis_pseudonym_id, limit: 8
+      t.datetime :last_attended_at
     end
 
     add_index "enrollments", ["course_id", "workflow_state"], name: "index_enrollments_on_course_id_and_workflow_state"
@@ -1639,6 +1657,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer :course_id, limit: 8, null: false
     end
     add_index :gradebook_csvs, [:user_id, :course_id]
+    add_index :gradebook_csvs, :course_id
 
     create_table "gradebook_uploads", force: true do |t|
       t.datetime "created_at"
@@ -2358,7 +2377,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :one_time_passwords, [:user_id, :code], unique: true
 
     create_table :originality_reports do |t|
-      t.integer :attachment_id, limit: 8, null: false
+      t.integer :attachment_id, limit: 8
       t.float :originality_score
       t.integer :originality_report_attachment_id, limit: 8
       t.text :originality_report_url
@@ -3153,6 +3172,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
               where: "workflow_state<>'deleted' AND grading_period_id IS NOT NULL",
               name: "index_active_submissions_gp"
     add_index :submissions, :cached_due_date
+    add_index :submissions, :late_policy_status, where: "workflow_state<>'deleted' and late_policy_status IS NOT NULL"
 
     create_table :switchman_shards do |t|
       t.string :name, limit: 255
@@ -3508,6 +3528,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
         LEFT JOIN #{AssignmentOverrideStudent.quoted_table_name} aos
           ON aos.assignment_id = a.id
           AND aos.user_id = e.user_id
+          AND aos.workflow_state = 'active'
 
         LEFT JOIN #{AssignmentOverride.quoted_table_name} ao
           ON ao.assignment_id = a.id
@@ -3682,6 +3703,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :discussion_topic_materialized_views, :discussion_topics
     add_foreign_key :discussion_topic_participants, :discussion_topics
     add_foreign_key :discussion_topic_participants, :users
+    add_foreign_key :discussion_topic_section_visibilities, :discussion_topics
+    add_foreign_key :discussion_topic_section_visibilities, :course_sections
     add_foreign_key :discussion_topics, :assignments
     add_foreign_key :discussion_topics, :assignments, column: :old_assignment_id
     add_foreign_key :discussion_topics, :attachments
