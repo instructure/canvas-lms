@@ -950,19 +950,24 @@ const newPillMessage = function ($module, requirement_count) {
 }
 
 const updatePublishMenuDisabledState = function (disabled) {
-  // Update the top level publish menu to reflect the new module
-  const publishMenu = document.getElementById('context-modules-publish-menu')
-  if (publishMenu) {
-    const $publishMenu = $(publishMenu)
-    $publishMenu.data('disabled', disabled)
-    ReactDOM.render(
-      <ContextModulesPublishMenu
-        courseId={$publishMenu.data('courseId')}
-        runningProgressId={$publishMenu.data('progressId')}
-        disabled={disabled}
-      />,
-      publishMenu
-    )
+  if (ENV.FEATURES.instui_header) {
+    // Send event to ContextModulesHeader component to update the publish menu
+    window.dispatchEvent(new CustomEvent('update-publish-menu-disabled-state', {detail: {disabled}}))
+  } else {
+    // Update the top level publish menu to reflect the new module
+    const publishMenu = document.getElementById('context-modules-publish-menu')
+    if (publishMenu) {
+      const $publishMenu = $(publishMenu)
+      $publishMenu.data('disabled', disabled)
+      ReactDOM.render(
+        <ContextModulesPublishMenu
+          courseId={$publishMenu.data('courseId')}
+          runningProgressId={$publishMenu.data('progressId')}
+          disabled={disabled}
+        />,
+        publishMenu
+      )
+    } 
   }
 }
 
