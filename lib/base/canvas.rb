@@ -170,7 +170,7 @@ module Canvas
   # all the configurable params have service-specific Settings with fallback to
   # generic Settings.
   def self.timeout_protection(service_name, options = {}, &)
-    timeout = (Setting.get("service_#{service_name}_timeout", nil) || options[:fallback_timeout_length] || Setting.get("service_generic_timeout", 15.seconds.to_s)).to_f
+    timeout = (Setting.get("service_#{service_name}_timeout", nil) || options[:fallback_timeout_length] || 15).to_f
 
     if Canvas.redis_enabled?
       if timeout_protection_method(service_name) == "percentage"
