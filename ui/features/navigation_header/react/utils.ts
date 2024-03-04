@@ -20,10 +20,12 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('Navigation')
 
-type CommonProperties = {
+export type CommonProperties = {
   href: string | null | undefined
   isActive: boolean
   label: string
+  svgPath?: string
+  imgSrc?: string
 }
 
 type SvgTool = CommonProperties & {svgPath: string}

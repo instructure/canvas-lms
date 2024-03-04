@@ -26,6 +26,7 @@ import MobileNavigation from './react/MobileNavigation'
 import ready from '@instructure/ready'
 import NewTabIndicator from './react/NewTabIndicator'
 import {QueryProvider} from '@canvas/query'
+import {getExternalTools} from './react/utils'
 
 const I18n = useI18nScope('common')
 
@@ -73,7 +74,7 @@ ready(() => {
     const mobileContextNavContainer = document.getElementById('mobileContextNavContainer')
     ReactDOM.render(
       <QueryProvider>
-        <SideNav />
+        <SideNav externalTools={getExternalTools()} />
       </QueryProvider>,
       mobileContextNavContainer,
       () => {

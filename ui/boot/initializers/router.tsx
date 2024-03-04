@@ -49,7 +49,7 @@ const portalRouter = createBrowserRouter(
       {accountGradingSettingsRoutes}
 
       {(window.ENV.FEATURES.instui_nav || localStorage.instui_nav_dev) &&
-        ['/', '/accounts/*', '/calendar/*', '/courses/*', '/conversations/*'].map(path => (
+        ['/', '/*', '/*/*'].map(path => (
           <Route
             key={`key-to-${path}`}
             path={path}
