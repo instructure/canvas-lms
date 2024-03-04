@@ -182,12 +182,13 @@ module Canvas
       Timeout.timeout(timeout, &)
     end
   rescue TimeoutCutoff, Timeout::Error => e
-    log_message = if e.is_a?(TimeoutCutoff)
-                    "Skipping service call due to error count: #{service_name} #{e.error_count}"
-                  else
-                    "Timeout during service call: #{service_name}"
-                  end
+    log_message, stat = if e.is_a?(TimeoutCutoff)
+                          ["Skipping service call due to error count: #{service_name} #{e.error_count}", "cutoff"]
+                        else
+                          ["Timeout during service call: #{service_name}", "timeout"]
+                        end
     Rails.logger.error(log_message)
+    InstStatsd::Statsd.increment("timeout_protection.#{service_name.split(":").first}.#{stat}") if options[:capture_stats]
     Canvas::Errors.capture_exception(:service_timeout, e, :warn)
     raise if options[:raise_on_timeout]
 
