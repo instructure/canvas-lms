@@ -591,6 +591,13 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index "attachment_associations", ["attachment_id"], name: "index_attachment_associations_on_attachment_id"
     add_index "attachment_associations", ["context_id", "context_type"], name: "attachment_associations_a_id_a_type"
 
+    create_table :attachment_upload_statuses do |t|
+      t.integer :attachment_id, limit: 8, null: false
+      t.text :error, null: false
+      t.datetime :created_at, null: false
+    end
+    add_index :attachment_upload_statuses, :attachment_id
+
     create_table "attachments", force: true do |t|
       t.integer  "context_id", limit: 8
       t.string   "context_type", limit: 255
@@ -805,6 +812,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       # 32768, but it was typoed as "length" instead of "limit" so it did not apply
       t.text     "last_transient_bounce_details"
       t.datetime :confirmation_code_expires_at
+      t.integer :confirmation_sent_count, default: 0, null: false
     end
 
     add_index "communication_channels", ["pseudonym_id", "position"]
@@ -2070,10 +2078,12 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer :lti_resource_link_id, limit: 8
       t.references :assignment, foreign_key: true, null: false, limit: 8, index: true
       t.timestamps null: false
+      t.integer :client_id, limit: 8, null: false
     end
     add_index :lti_line_items, :tag
     add_index :lti_line_items, :resource_id
     add_index :lti_line_items, :lti_resource_link_id
+    add_index :lti_line_items, :client_id
 
     create_table :lti_links do |t|
       t.string :resource_link_id, null: false
@@ -3276,6 +3286,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     end
     add_index :sis_batch_errors, :sis_batch_id
     add_index :sis_batch_errors, :root_account_id
+    add_index :sis_batch_errors, :created_at
 
     create_table :sis_batch_roll_back_data do |t|
       t.integer :sis_batch_id, null: false, limit: 8
@@ -3738,6 +3749,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.timestamp "last_logged_out"
       t.string   "lti_context_id", limit: 255
       t.integer  "turnitin_id", limit: 8
+      t.text :lti_id
     end
 
     add_index "users", ["avatar_state", "avatar_image_updated_at"], name: "index_users_on_avatar_state_and_avatar_image_updated_at"
@@ -3759,6 +3771,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :users, :lti_context_id, unique: true
     add_index :users, :turnitin_id, unique: true, where: "turnitin_id IS NOT NULL"
     add_index :users, :workflow_state
+    add_index :users, :lti_id
 
     create_table :user_profiles do |t|
       t.text   :bio
@@ -4100,6 +4113,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :assignments, :course_sections, column: :grader_section_id
     add_foreign_key :assignments, :group_categories
     add_foreign_key :assignments, :users, column: :final_grader_id
+    add_foreign_key :attachment_upload_statuses, :attachments
     add_foreign_key :attachments, :attachments, column: :replacement_attachment_id
     add_foreign_key :attachments, :attachments, column: :root_attachment_id
     add_foreign_key :attachments, :usage_rights, column: :usage_rights_id
