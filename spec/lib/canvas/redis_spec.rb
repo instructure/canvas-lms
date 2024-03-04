@@ -19,7 +19,7 @@
 #
 
 describe "CanvasCache::Redis", if: Canvas.redis_enabled? do
-  subject(:store) { Canvas.lookup_cache_store({ cache_store: :redis_cache_store, url: "redis://doesntexist:9873/0" }, Rails.env) }
+  subject(:store) { Canvas.lookup_cache_store({ cache_store: :redis_cache_store, url: "redis://doesntexist:9873/1" }, Rails.env) }
 
   it "skips setting cache on error" do
     expect(Setting).to receive(:get).with(anything, anything, skip_cache: true).at_least(:once)
@@ -33,7 +33,7 @@ describe "CanvasCache::Redis", if: Canvas.redis_enabled? do
 
   it "logs to statsd on error" do
     expect(InstStatsd::Statsd).to receive(:increment).with("redis.errors.all")
-    expect(InstStatsd::Statsd).to receive(:increment).with("redis.errors.redis://doesntexist:9873/0", anything)
+    expect(InstStatsd::Statsd).to receive(:increment).with("redis.errors.redis://doesntexist:9873/1", anything)
     expect(InstStatsd::Statsd).to receive(:increment).with("errors.warn", anything).at_least(:once)
     store.read("foo")
   end
