@@ -478,6 +478,10 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :assignment_overrides, :quiz_id
     add_index :assignment_overrides, :assignment_id
 
+    add_check_constraint :assignment_overrides,
+                         "workflow_state='deleted' OR quiz_id IS NOT NULL OR assignment_id IS NOT NULL",
+                         name: "require_quiz_or_assignment"
+
     create_table "assignments", force: true do |t|
       t.string   "title", limit: 255
       t.text     "description", limit: 16_777_215
@@ -537,10 +541,10 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.boolean :anonymous_grading, default: false
       t.boolean :graders_anonymous_to_graders, default: false
       t.integer :grader_count, default: 0
-      t.boolean :grader_comments_visible_to_graders, default: false
+      t.boolean :grader_comments_visible_to_graders, default: true
       t.bigint :grader_section_id
       t.bigint :final_grader_id
-      t.boolean :grader_names_visible_to_final_grader, default: false
+      t.boolean :grader_names_visible_to_final_grader, default: true
       t.datetime :duplication_started_at
       t.datetime :importing_started_at
     end
@@ -792,7 +796,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index "communication_channels", ["user_id", "position"]
     connection.execute("CREATE INDEX index_communication_channels_on_path_and_path_type ON #{CommunicationChannel.quoted_table_name} (LOWER(path), path_type)")
     if (trgm = connection.extension(:pg_trgm)&.schema)
-      add_index :communication_channels, "lower(path) #{trgm}.gist_trgm_ops", name: "index_trgm_communication_channels_path", using: :gist
+      add_index :communication_channels, "lower(path) #{trgm}.gin_trgm_ops", name: "index_gin_trgm_communication_channels_path", using: :gin
     end
     add_index :communication_channels, :confirmation_code
     connection.execute("CREATE UNIQUE INDEX index_communication_channels_on_user_id_and_path_and_path_type ON #{CommunicationChannel.quoted_table_name} (user_id, LOWER(path), path_type)")
@@ -1171,9 +1175,9 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
           coalesce(lower(name), '') || ' ' ||
           coalesce(lower(sis_source_id), '') || ' ' ||
           coalesce(lower(course_code), '')
-        ) #{trgm}.gist_trgm_ops",
-                name: "index_trgm_courses_composite_search",
-                using: :gist
+        ) #{trgm}.gin_trgm_ops",
+                name: "index_gin_trgm_courses_composite_search",
+                using: :gin
     end
     add_index :courses,
               [:integration_id, :root_account_id],
@@ -1282,6 +1286,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.boolean :visible, default: false, null: false
       t.text :scopes
       t.boolean :require_scopes, default: false, null: false
+      t.boolean :test_cluster_only, default: false, null: false
     end
     add_index :developer_keys, :vendor_code
 
@@ -1387,7 +1392,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :discussion_topics, :external_feed_id, where: "external_feed_id IS NOT NULL"
     add_index :discussion_topics, :editor_id, where: "editor_id IS NOT NULL"
     if (trgm = connection.extension(:pg_trgm)&.schema)
-      add_index :discussion_topics, "LOWER(title) #{trgm}.gist_trgm_ops", name: "index_trgm_discussion_topics_title", using: :gist
+      add_index :discussion_topics, "LOWER(title) #{trgm}.gin_trgm_ops", name: "index_gin_trgm_discussion_topics_title", using: :gin
     end
 
     create_table :discussion_topic_materialized_views, id: false do |t|
@@ -1961,8 +1966,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer  "associated_asset_id", limit: 8
       t.string   "associated_asset_type", limit: 255
       t.datetime "submitted_at"
-      t.boolean :hide_points, default: false
-      t.boolean :hidden, default: false
+      t.boolean :hide_points, default: false, null: false
+      t.boolean :hidden, default: false, null: false
     end
 
     add_index :learning_outcome_results,
@@ -2779,8 +2784,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index "pseudonyms", ["single_access_token"], name: "index_pseudonyms_on_single_access_token"
     add_index "pseudonyms", ["user_id"], name: "index_pseudonyms_on_user_id"
     if (trgm = connection.extension(:pg_trgm)&.schema)
-      add_index :pseudonyms, "lower(sis_user_id) #{trgm}.gist_trgm_ops", name: "index_trgm_pseudonyms_sis_user_id", using: :gist
-      add_index :pseudonyms, "lower(unique_id) #{trgm}.gist_trgm_ops", name: "index_trgm_pseudonyms_unique_id", using: :gist
+      add_index :pseudonyms, "lower(sis_user_id) #{trgm}.gin_trgm_ops", name: "index_gin_trgm_pseudonyms_sis_user_id", using: :gin
+      add_index :pseudonyms, "lower(unique_id) #{trgm}.gin_trgm_ops", name: "index_gin_trgm_pseudonyms_unique_id", using: :gin
     end
     add_index :pseudonyms, :sis_communication_channel_id
     add_index :pseudonyms, [:sis_user_id, :account_id], where: "sis_user_id IS NOT NULL", unique: true
@@ -3075,7 +3080,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.string   "assessment_type", null: false, limit: 255
       t.integer  "assessor_id", limit: 8
       t.integer  "artifact_attempt"
-      t.boolean :hide_points, default: false
+      t.boolean :hide_points, default: false, null: false
     end
 
     add_index "rubric_assessments", ["artifact_id", "artifact_type"], name: "index_rubric_assessments_on_artifact_id_and_artifact_type"
@@ -3691,12 +3696,12 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       execute("CREATE INDEX index_users_on_sortable_name ON #{User.quoted_table_name} (CAST(LOWER(replace(sortable_name, '\\', '\\\\')) AS bytea))")
     end
     if (trgm = connection.extension(:pg_trgm)&.schema)
-      add_index :users, "lower(name) #{trgm}.gist_trgm_ops", name: "index_trgm_users_name", using: :gist
-      add_index :users, "LOWER(short_name) #{trgm}.gist_trgm_ops", name: "index_trgm_users_short_name", using: :gist
+      add_index :users, "lower(name) #{trgm}.gin_trgm_ops", name: "index_gin_trgm_users_name", using: :gin
+      add_index :users, "LOWER(short_name) #{trgm}.gin_trgm_ops", name: "index_gin_trgm_users_short_name", using: :gin
       add_index :users,
-                "LOWER(name) #{trgm}.gist_trgm_ops",
-                name: "index_trgm_users_name_active_only",
-                using: :gist,
+                "LOWER(name) #{trgm}.gin_trgm_ops",
+                name: "index_gin_trgm_users_name_active_only",
+                using: :gin,
                 where: "workflow_state IN ('registered', 'pre_registered')"
     end
     add_index :users, :lti_context_id, unique: true
@@ -3824,7 +3829,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
 
     connection.execute <<~SQL.squish
       CREATE VIEW #{connection.quote_table_name("assignment_student_visibilities")} AS
-        SELECT DISTINCT a.id as assignment_id,
+      SELECT DISTINCT a.id as assignment_id,
         e.user_id as user_id,
         c.id as course_id
 
@@ -3843,14 +3848,14 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
           ON cs.course_id = c.id
           AND e.course_section_id = cs.id
 
-        LEFT JOIN #{GroupMembership.quoted_table_name} gm
-          ON gm.user_id = e.user_id
-          AND gm.workflow_state = 'accepted'
-
         LEFT JOIN #{Group.quoted_table_name} g
           ON g.context_type = 'Course'
           AND g.context_id = c.id
           AND g.workflow_state = 'available'
+
+        LEFT JOIN #{GroupMembership.quoted_table_name} gm
+          ON gm.user_id = e.user_id
+          AND gm.workflow_state = 'accepted'
           AND gm.group_id = g.id
 
         LEFT JOIN #{AssignmentOverrideStudent.quoted_table_name} aos
@@ -3864,7 +3869,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
           AND (
             (ao.set_type = 'CourseSection' AND ao.set_id = cs.id)
             OR (ao.set_type = 'ADHOC' AND ao.set_id IS NULL AND ao.id = aos.assignment_override_id)
-            OR (ao.set_type = 'Group' AND ao.set_id = g.id)
+            OR (ao.set_type = 'Group' AND ao.set_id = g.id AND gm.id IS NOT NULL)
           )
 
         LEFT JOIN #{Submission.quoted_table_name} s
