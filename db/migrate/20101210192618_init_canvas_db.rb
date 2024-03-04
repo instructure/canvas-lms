@@ -407,12 +407,14 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer  :assignment_override_id, null: false, limit: 8
       t.integer  :user_id, null: false, limit: 8
       t.integer  :quiz_id, limit: 8
+      t.string :workflow_state, default: "active", null: false
     end
 
-    add_index :assignment_override_students, [:assignment_id, :user_id], unique: true
+    add_index :assignment_override_students, [:assignment_id, :user_id], unique: true, where: "workflow_state = 'active'"
     add_index :assignment_override_students, :assignment_override_id
     add_index :assignment_override_students, :user_id
     add_index :assignment_override_students, :quiz_id
+    add_index :assignment_override_students, :workflow_state
 
     create_table :assignment_overrides do |t|
       t.timestamps null: false
@@ -613,6 +615,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.string   "timetable_code", limit: 255
     end
     add_index :calendar_events, %i[context_id context_type timetable_code], where: "timetable_code IS NOT NULL", unique: true, name: "index_calendar_events_on_context_and_timetable_code"
+    add_index :calendar_events, :start_at, where: "workflow_state<>'deleted'"
 
     create_table :bookmarks_bookmarks do |t|
       t.integer :user_id, limit: 8, null: false
@@ -1643,7 +1646,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer  "course_id", limit: 8, null: false
       t.integer  "user_id", limit: 8, null: false
       t.integer  "progress_id", limit: 8, null: false
-      t.text     "gradebook", limit: 10.megabytes
+      t.text     "gradebook"
     end
 
     add_index :gradebook_uploads, [:course_id, :user_id], unique: true
@@ -1764,6 +1767,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer :group_limit
       t.string :auto_leader, limit: 255
       t.timestamps null: true
+      t.string :sis_source_id
+      t.integer :root_account_id, limit: 8
     end
     add_index :group_categories, [:context_id, :context_type], name: "index_group_categories_on_context"
     add_index :group_categories, :role, name: "index_group_categories_on_role"
@@ -3143,6 +3148,11 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
               [:assignment_id, :grading_period_id],
               name: "index_active_submissions",
               where: "workflow_state <> 'deleted'"
+    add_index :submissions,
+              [:assignment_id, :grading_period_id],
+              where: "workflow_state<>'deleted' AND grading_period_id IS NOT NULL",
+              name: "index_active_submissions_gp"
+    add_index :submissions, :cached_due_date
 
     create_table :switchman_shards do |t|
       t.string :name, limit: 255
@@ -3343,6 +3353,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     end
     add_index :users, :lti_context_id, unique: true
     add_index :users, :turnitin_id, unique: true, where: "turnitin_id IS NOT NULL"
+    add_index :users, :workflow_state
 
     create_table :user_profiles do |t|
       t.text   :bio
