@@ -228,9 +228,9 @@ describe Login::CasController do
   end
 
   it "times out correctly" do
-    Setting.set("cas_timelimit", 0.01)
     account_with_cas(account: Account.default)
-
+    ap = Account.default.authentication_providers.detect { |a| a.auth_type == "cas" }
+    Setting.set("service_cas:#{ap.global_id}_timeout", "0.01")
     cas_client = double
     allow(controller).to receive(:client).and_return(cas_client)
     start = Time.now.utc

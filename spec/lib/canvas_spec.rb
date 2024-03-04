@@ -21,8 +21,7 @@
 describe Canvas do
   describe ".timeout_protection" do
     it "wraps the block in a timeout" do
-      Setting.set("service_generic_timeout", "2")
-      expect(Timeout).to receive(:timeout).with(2).and_yield
+      expect(Timeout).to receive(:timeout).with(15.0).and_yield
       ran = false
       Canvas.timeout_protection("spec") { ran = true }
       expect(ran).to be true
