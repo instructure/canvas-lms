@@ -16,11 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useMemo} from 'react'
 import {Portal} from '@instructure/ui-portal'
 import SideNav from './SideNav'
+import {getExternalTools, type ExternalTool} from './utils'
 
 export function Component() {
+  const externalTools = useMemo<ExternalTool[]>(() => getExternalTools(), [])
   const mountPoint: HTMLElement | null = document.getElementById('header')
   if (!mountPoint) {
     return null
@@ -28,7 +30,7 @@ export function Component() {
   mountPoint.innerHTML = ''
   return (
     <Portal open={true} mountNode={mountPoint}>
-      <SideNav />
+      <SideNav externalTools={externalTools} />
     </Portal>
   )
 }
