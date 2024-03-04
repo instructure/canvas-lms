@@ -1583,6 +1583,17 @@ in Canvas-side GET request that triggers the LTI launch.
 ```
 page
 ```
+## com.instructure.Course.canvas_resource_id
+Returns the target resource id for the current page, forwarded from the request. Only functional when
+`com_instructure_course_canvas_resource_type` is included as a query param. Currently, this is not
+supported generally, and is only implemented for specific use cases.
+
+**Availability**: *always*  
+
+
+```
+123123
+```
 ## com.instructure.Course.allow_canvas_resource_selection
 Returns whether a content can be imported into a specific group on the page, forwarded from the request.
 True for Modules page and Assignment Groups page. False for other content index pages.
