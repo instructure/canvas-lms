@@ -1981,6 +1981,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.string :name, limit: 255
       t.text :description
       t.text :update_payload
+      t.text :registration_url
     end
     add_index :lti_tool_proxies, [:guid]
 
@@ -2371,7 +2372,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer :plannable_id, limit: 8, null: false
       t.integer :user_id, limit: 8, null: false
       t.string :workflow_state
-      t.boolean :visible, null: false, default: true
+      t.boolean :marked_complete, null: false, default: false
       t.datetime :deleted_at
 
       t.timestamps null: false
@@ -2881,6 +2882,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.string   "diffing_data_set_identifier", limit: 255
       t.boolean  "diffing_remaster"
       t.integer  "generated_diff_id", limit: 8
+      t.integer :errors_attachment_id, limit: 8
+      t.integer :change_threshold
     end
     add_index :sis_batches, [:account_id, :created_at], where: "workflow_state='created'", name: "index_sis_batches_pending_for_accounts"
     add_index :sis_batches, [:account_id, :created_at], name: "index_sis_batches_account_id_created_at"
@@ -2888,6 +2891,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :sis_batches,
               %i[account_id diffing_data_set_identifier created_at],
               name: "index_sis_batches_diffing"
+    add_index :sis_batches, :errors_attachment_id
 
     create_table :sis_post_grades_statuses do |t|
       t.integer :course_id, null: false, limit: 8
@@ -3010,9 +3014,9 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.boolean  "excused"
       t.boolean  "graded_anonymously"
       t.string :late_policy_status, limit: 16
-      t.timestamp :accepted_at
       t.decimal :points_deducted, precision: 6, scale: 2
       t.integer :grading_period_id, limit: 8
+      t.integer :seconds_late_override, limit: 8
     end
 
     add_index "submissions", ["assignment_id", "submission_type"], name: "index_submissions_on_assignment_id_and_submission_type"
@@ -3029,6 +3033,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
         )
       )
     SQL
+    add_index :submissions, :grading_period_id, where: "grading_period_id IS NOT NULL"
 
     create_table :switchman_shards do |t|
       t.string :name, limit: 255
@@ -3680,6 +3685,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :scores, :grading_periods
     add_foreign_key :session_persistence_tokens, :pseudonyms
     add_foreign_key :shared_brand_configs, :brand_configs, column: "brand_config_md5", primary_key: "md5"
+    add_foreign_key :sis_batches, :attachments, column: :errors_attachment_id
     add_foreign_key :sis_batches, :enrollment_terms, column: :batch_mode_term_id
     add_foreign_key :sis_batches, :users
     add_foreign_key :sis_post_grades_statuses, :courses
