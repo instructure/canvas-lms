@@ -541,6 +541,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.bigint :grader_section_id
       t.bigint :final_grader_id
       t.boolean :grader_names_visible_to_final_grader, default: false
+      t.datetime :duplication_started_at
     end
 
     add_index "assignments", ["assignment_group_id"], name: "index_assignments_on_assignment_group_id"
@@ -551,6 +552,9 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :assignments, :turnitin_id, unique: true, where: "turnitin_id IS NOT NULL"
     add_index :assignments, :lti_context_id, unique: true
     add_index :assignments, :duplicate_of_id, where: "duplicate_of_id IS NOT NULL"
+    add_index :assignments,
+              :duplication_started_at,
+              where: "duplication_started_at IS NOT NULL AND workflow_state = 'duplicating'"
 
     create_table "attachment_associations", force: true do |t|
       t.integer "attachment_id", limit: 8
@@ -1951,6 +1955,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer  "associated_asset_id", limit: 8
       t.string   "associated_asset_type", limit: 255
       t.datetime "submitted_at"
+      t.boolean :hide_points, default: false
+      t.boolean :hidden, default: false
     end
 
     add_index :learning_outcome_results,
@@ -2375,6 +2381,17 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     end
     add_index :migration_issues, :content_migration_id
 
+    create_table :moderation_graders do |t|
+      t.column :anonymous_id, :string, limit: 5, null: false
+
+      t.references :assignment, null: false, foreign_key: true, index: false, limit: 8
+      t.integer :user_id, limit: 8, null: false
+
+      t.index [:assignment_id, :anonymous_id], unique: true
+      t.index [:user_id, :assignment_id], unique: true
+      t.timestamps null: false
+    end
+
     create_table :moderated_grading_provisional_grades do |t|
       t.string     :grade, limit: 255
       t.float      :score
@@ -2491,6 +2508,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
 
       t.timestamps null: false
       t.integer :row
+      t.boolean :failure, default: false, null: false
     end
     add_index :outcome_import_errors, :outcome_import_id
 
@@ -2508,6 +2526,26 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     end
     add_index :outcome_imports, %i[context_type context_id]
     add_index :outcome_imports, :user_id
+
+    create_table :outcome_proficiencies do |t|
+      t.belongs_to :account, index: { unique: true }, foreign_key: true, null: false
+
+      t.timestamps null: false
+    end
+
+    create_table :outcome_proficiency_ratings do |t|
+      t.references :outcome_proficiency, foreign_key: true, null: false, index: true, limit: 8
+      t.string :description, null: false, limit: 255
+      t.float :points, null: false
+      t.boolean :mastery, null: false
+      t.string :color, null: false
+
+      t.timestamps null: false
+    end
+
+    add_index :outcome_proficiency_ratings,
+              [:outcome_proficiency_id, :points],
+              name: "index_outcome_proficiency_ratings_on_proficiency_and_points"
 
     create_table "page_comments", force: true do |t|
       t.text     "message"
@@ -2569,6 +2607,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer :rows_processed, default: 0, null: false
     end
     add_index :parallel_importers, :sis_batch_id
+    add_index :parallel_importers, :attachment_id
 
     create_table :planner_notes do |t|
       t.datetime :todo_date, null: false
@@ -2987,6 +3026,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.string   "assessment_type", null: false, limit: 255
       t.integer  "assessor_id", limit: 8
       t.integer  "artifact_attempt"
+      t.boolean :hide_points, default: false
     end
 
     add_index "rubric_assessments", ["artifact_id", "artifact_type"], name: "index_rubric_assessments_on_artifact_id_and_artifact_type"
@@ -3011,6 +3051,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.boolean  "hide_score_total"
       t.boolean  "bookmarked", default: true
       t.string   "context_code", limit: 255
+      t.boolean :hide_points, default: false
+      t.boolean :hide_outcome_results, default: false
     end
 
     add_index "rubric_associations", ["association_id", "association_type"], name: "index_rubric_associations_on_aid_and_atype"
@@ -3094,13 +3136,6 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_check_constraint :scores,
                          "course_score IS NOT NULL",
                          name: "course_score_not_null"
-
-    create_table "scribd_mime_types", force: true do |t|
-      t.string   "extension", limit: 255
-      t.string   "name", limit: 255
-      t.datetime "created_at"
-      t.datetime "updated_at"
-    end
 
     create_table "sessions", force: true do |t|
       t.string   "session_id", null: false, limit: 255
@@ -3944,7 +3979,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :custom_gradebook_columns, :courses, dependent: true
     add_foreign_key :delayed_messages, :communication_channels
     add_foreign_key :delayed_messages, :notification_policies
-    add_foreign_key :developer_key_account_bindings, :developer_keys
+    add_foreign_key :developer_key_account_bindings, :accounts
     add_foreign_key :discussion_entries, :discussion_entries, column: :parent_id
     add_foreign_key :discussion_entries, :discussion_entries, column: :root_entry_id
     add_foreign_key :discussion_entries, :discussion_topics
@@ -4057,12 +4092,11 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :moderated_grading_selections, :assignments
     add_foreign_key :moderated_grading_selections, :users, column: :student_id
     add_foreign_key :moderated_grading_selections, :moderated_grading_provisional_grades, column: :selected_provisional_grade_id
+    add_foreign_key :moderation_graders, :users
     add_foreign_key :notification_endpoints, :access_tokens
     add_foreign_key :notification_policies, :communication_channels
     add_foreign_key :oauth_requests, :users
     add_foreign_key :one_time_passwords, :users
-    add_foreign_key :originality_reports, :attachments
-    add_foreign_key :originality_reports, :attachments, column: :originality_report_attachment_id
     add_foreign_key :originality_reports, :submissions
     add_foreign_key :outcome_import_errors, :outcome_imports
     add_foreign_key :outcome_imports, :users
