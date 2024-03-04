@@ -271,6 +271,20 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.float :threshold
     end
 
+    create_table :anonymous_or_moderation_events do |t|
+      t.integer :assignment_id, limit: 8, null: false
+      t.integer :user_id, limit: 8, null: false
+      t.integer :submission_id, limit: 8
+      t.integer :canvadoc_id, limit: 8
+      t.string :event_type, null: false
+      t.jsonb :payload, null: false, default: {}
+      t.timestamps null: false
+    end
+    add_index :anonymous_or_moderation_events, :assignment_id
+    add_index :anonymous_or_moderation_events, :user_id
+    add_index :anonymous_or_moderation_events, :submission_id
+    add_index :anonymous_or_moderation_events, :canvadoc_id
+
     create_table :appointment_groups do |t|
       t.string :title, limit: 255
       t.text :description
@@ -439,6 +453,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :assignment_override_students, :user_id
     add_index :assignment_override_students, :quiz_id
     add_index :assignment_override_students, :workflow_state
+    add_index :assignment_override_students, [:user_id, :quiz_id]
 
     create_table :assignment_overrides do |t|
       t.timestamps null: false
@@ -594,8 +609,6 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer  "position"
       t.datetime "lock_at"
       t.datetime "unlock_at"
-      t.datetime "last_lock_at"
-      t.datetime "last_unlock_at"
       t.boolean  "could_be_locked"
       t.integer  "root_attachment_id", limit: 8
       t.integer  "cloned_item_id", limit: 8
@@ -725,6 +738,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :canvadocs_submissions,
               :crocodoc_document_id,
               where: "crocodoc_document_id IS NOT NULL"
+    add_index :canvadocs_submissions, :canvadoc_id
 
     create_table "cloned_items", force: true do |t|
       t.integer  "original_item_id", limit: 8
@@ -930,11 +944,13 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.boolean :not_selectable
       t.string :app_center_id, limit: 255
       t.boolean :allow_membership_service_access, default: false, null: false
+      t.integer :developer_key_id, limit: 8
     end
     add_index :context_external_tools, [:tool_id]
     add_index :context_external_tools, [:context_id, :context_type]
     add_index :context_external_tools, %i[context_id context_type migration_id], where: "migration_id IS NOT NULL", name: "index_external_tools_on_context_and_migration_id"
     add_index :context_external_tools, :consumer_key
+    add_index :context_external_tools, :developer_key_id
 
     create_table "context_module_progressions", force: true do |t|
       t.integer  "context_module_id", limit: 8
@@ -1287,6 +1303,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.text :scopes
       t.boolean :require_scopes, default: false, null: false
       t.boolean :test_cluster_only, default: false, null: false
+      t.jsonb :public_jwk
     end
     add_index :developer_keys, :vendor_code
 
@@ -1702,8 +1719,6 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.boolean  "locked"
       t.datetime "lock_at"
       t.datetime "unlock_at"
-      t.datetime "last_lock_at"
-      t.datetime "last_unlock_at"
       t.integer  "cloned_item_id", limit: 8
       t.integer  "position"
       t.string   "submission_context_code", limit: 255
@@ -2401,7 +2416,9 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.index [:assignment_id, :anonymous_id], unique: true
       t.index [:user_id, :assignment_id], unique: true
       t.timestamps null: false
+      t.boolean :slot_taken, default: true, null: false
     end
+    add_index :moderation_graders, :assignment_id
 
     create_table :moderated_grading_provisional_grades do |t|
       t.string     :grade, limit: 255
@@ -3048,8 +3065,10 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.boolean  "applies_to_descendants", default: true, null: false
       t.integer  "role_id", limit: 8, null: false
     end
-
-    add_index "role_overrides", ["context_id", "context_type"], name: "index_role_overrides_on_context_id_and_context_type"
+    add_index :role_overrides,
+              %i[context_id context_type role_id permission],
+              unique: true,
+              name: "index_role_overrides_on_context_role_permission"
 
     create_table :roles do |t|
       t.string :name, null: false, limit: 255
@@ -3268,7 +3287,6 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer :errors_attachment_id, limit: 8
       t.integer :change_threshold
     end
-    add_index :sis_batches, [:account_id, :created_at], where: "workflow_state='created'", name: "index_sis_batches_pending_for_accounts"
     add_index :sis_batches, [:account_id, :created_at], name: "index_sis_batches_account_id_created_at"
     add_index :sis_batches, :batch_mode_term_id, where: "batch_mode_term_id IS NOT NULL"
     add_index :sis_batches,
@@ -3277,6 +3295,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :sis_batches, :errors_attachment_id
     add_index :sis_batches, :user_id, where: "user_id IS NOT NULL"
     add_index :sis_batches, :attachment_id
+    add_index :sis_batches, %i[account_id workflow_state created_at], name: "index_sis_batches_workflow_state_for_accounts"
 
     create_table :sis_post_grades_statuses do |t|
       t.integer :course_id, null: false, limit: 8
@@ -3445,6 +3464,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :submissions, %i[assignment_id anonymous_id], unique: true, where: "anonymous_id IS NOT NULL"
     add_index :submissions, :graded_at, using: :brin
     add_index :submissions, "user_id, GREATEST(submitted_at, created_at)", name: "index_submissions_on_user_and_greatest_dates"
+    add_index :submissions, [:user_id, :context_code]
 
     # rubocop:disable Rails/SquishedSQLHeredocs
     execute(<<~SQL)
@@ -3827,111 +3847,180 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
 
     change_column :schema_migrations, :version, :string, limit: 255
 
-    connection.execute <<~SQL.squish
+    connection.execute(<<~SQL.squish)
       CREATE VIEW #{connection.quote_table_name("assignment_student_visibilities")} AS
       SELECT DISTINCT a.id as assignment_id,
         e.user_id as user_id,
-        c.id as course_id
+        e.course_id as course_id
+      FROM #{Assignment.quoted_table_name} a
+      JOIN #{Enrollment.quoted_table_name} e
+        ON e.course_id = a.context_id
+        AND a.context_type = 'Course'
+        AND e.type IN ('StudentEnrollment', 'StudentViewEnrollment')
+        AND e.workflow_state NOT IN ('deleted', 'rejected', 'inactive')
+      WHERE a.workflow_state NOT IN ('deleted','unpublished')
+        AND COALESCE(a.only_visible_to_overrides, 'false') = 'false'
 
-        FROM #{Assignment.quoted_table_name} a
+      UNION
 
-        JOIN #{Course.quoted_table_name} c
-          ON a.context_id = c.id
-          AND a.context_type = 'Course'
+      SELECT DISTINCT a.id as assignment_id,
+        e.user_id as user_id,
+        e.course_id as course_id
+      FROM #{Assignment.quoted_table_name} a
+      JOIN #{Enrollment.quoted_table_name} e
+        ON e.course_id = a.context_id
+        AND a.context_type = 'Course'
+        AND e.type IN ('StudentEnrollment', 'StudentViewEnrollment')
+        AND e.workflow_state NOT IN ('deleted', 'rejected', 'inactive')
+      INNER JOIN #{AssignmentOverride.quoted_table_name} ao
+        ON a.id = ao.assignment_id
+        AND ao.set_type = 'ADHOC'
+      INNER JOIN #{AssignmentOverrideStudent.quoted_table_name} aos
+        ON ao.id = aos.assignment_override_id
+        AND aos.user_id = e.user_id
+      WHERE ao.workflow_state = 'active'
+        AND aos.workflow_state <> 'deleted'
+        AND a.workflow_state NOT IN ('deleted','unpublished')
+        AND a.only_visible_to_overrides = 'true'
 
-        JOIN #{Enrollment.quoted_table_name} e
-          ON e.course_id = c.id
-          AND e.type IN ('StudentEnrollment', 'StudentViewEnrollment')
-          AND e.workflow_state NOT IN ('deleted', 'rejected', 'inactive')
+      UNION
 
-        JOIN #{CourseSection.quoted_table_name} cs
-          ON cs.course_id = c.id
-          AND e.course_section_id = cs.id
+      SELECT DISTINCT a.id as assignment_id,
+        e.user_id as user_id,
+        e.course_id as course_id
+      FROM #{Assignment.quoted_table_name} a
+      JOIN #{Enrollment.quoted_table_name} e
+        ON e.course_id = a.context_id
+        AND a.context_type = 'Course'
+        AND e.type IN ('StudentEnrollment', 'StudentViewEnrollment')
+        AND e.workflow_state NOT IN ('deleted', 'rejected', 'inactive')
+      INNER JOIN #{AssignmentOverride.quoted_table_name} ao
+        ON a.id = ao.assignment_id
+        AND ao.set_type = 'Group'
+      INNER JOIN #{Group.quoted_table_name} g
+        ON g.id = ao.set_id
+      INNER JOIN #{GroupMembership.quoted_table_name} gm
+        ON gm.group_id = g.id
+        AND gm.user_id = e.user_id
+      WHERE gm.workflow_state <> 'deleted'
+        AND g.workflow_state <> 'deleted'
+        AND ao.workflow_state = 'active'
+        AND a.workflow_state NOT IN ('deleted','unpublished')
+        AND a.only_visible_to_overrides = 'true'
 
-        LEFT JOIN #{Group.quoted_table_name} g
-          ON g.context_type = 'Course'
-          AND g.context_id = c.id
-          AND g.workflow_state = 'available'
+      UNION
 
-        LEFT JOIN #{GroupMembership.quoted_table_name} gm
-          ON gm.user_id = e.user_id
-          AND gm.workflow_state = 'accepted'
-          AND gm.group_id = g.id
+      SELECT DISTINCT a.id as assignment_id,
+        e.user_id as user_id,
+        e.course_id as course_id
+      FROM #{Assignment.quoted_table_name} a
+      JOIN #{Enrollment.quoted_table_name} e
+        ON e.course_id = a.context_id
+        AND a.context_type = 'Course'
+        AND e.type IN ('StudentEnrollment', 'StudentViewEnrollment')
+        AND e.workflow_state NOT IN ('deleted', 'rejected', 'inactive')
+      INNER JOIN #{AssignmentOverride.quoted_table_name} ao
+         ON e.course_section_id = ao.set_id
+         AND ao.set_type = 'CourseSection'
+         AND ao.assignment_id = a.id
+      WHERE a.workflow_state NOT IN ('deleted','unpublished')
+        AND a.only_visible_to_overrides = 'true'
+        AND ao.workflow_state = 'active'
 
-        LEFT JOIN #{AssignmentOverrideStudent.quoted_table_name} aos
-          ON aos.assignment_id = a.id
-          AND aos.user_id = e.user_id
-          AND aos.workflow_state = 'active'
+      UNION
 
-        LEFT JOIN #{AssignmentOverride.quoted_table_name} ao
-          ON ao.assignment_id = a.id
-          AND ao.workflow_state = 'active'
-          AND (
-            (ao.set_type = 'CourseSection' AND ao.set_id = cs.id)
-            OR (ao.set_type = 'ADHOC' AND ao.set_id IS NULL AND ao.id = aos.assignment_override_id)
-            OR (ao.set_type = 'Group' AND ao.set_id = g.id AND gm.id IS NOT NULL)
-          )
-
-        LEFT JOIN #{Submission.quoted_table_name} s
-          ON s.user_id = e.user_id
-          AND s.assignment_id = a.id
-          AND s.workflow_state NOT IN ('deleted', 'unsubmitted')
-
-        WHERE a.workflow_state NOT IN ('deleted','unpublished')
-          AND(
-            ( a.only_visible_to_overrides = 'true' AND (ao.id IS NOT NULL OR s.id IS NOT NULL))
-            OR (COALESCE(a.only_visible_to_overrides, 'false') = 'false')
-          )
+      SELECT DISTINCT a.id as assignment_id,
+        e.user_id as user_id,
+        e.course_id as course_id
+      FROM #{Assignment.quoted_table_name} a
+      JOIN #{Enrollment.quoted_table_name} e
+        ON e.course_id = a.context_id
+        AND a.context_type = 'Course'
+        AND e.type IN ('StudentEnrollment', 'StudentViewEnrollment')
+        AND e.workflow_state NOT IN ('deleted', 'rejected', 'inactive')
+      INNER JOIN #{Submission.quoted_table_name} s
+        ON s.user_id = e.user_id
+        AND s.assignment_id = a.id
+        AND s.workflow_state NOT IN ('deleted', 'unsubmitted')
+      WHERE a.workflow_state NOT IN ('deleted','unpublished')
+        AND a.only_visible_to_overrides = 'true'
     SQL
 
-    connection.execute <<~SQL.squish
+    connection.execute(<<~SQL.squish)
       CREATE VIEW #{connection.quote_table_name("quiz_student_visibilities")} AS
         SELECT DISTINCT q.id as quiz_id,
-        e.user_id as user_id,
-        c.id as course_id
-
+          e.user_id as user_id,
+          e.course_id as course_id
         FROM #{Quizzes::Quiz.quoted_table_name} q
-
-        JOIN #{Course.quoted_table_name} c
-          ON q.context_id = c.id
-          AND q.context_type = 'Course'
-
         JOIN #{Enrollment.quoted_table_name} e
-          ON e.course_id = c.id
+          ON e.course_id = q.context_id
+          AND q.context_type = 'Course'
           AND e.type IN ('StudentEnrollment', 'StudentViewEnrollment')
-          AND e.workflow_state != 'deleted'
+          AND e.workflow_state NOT IN ('deleted', 'rejected', 'inactive')
+        WHERE q.workflow_state NOT IN ('deleted','unpublished')
+          AND COALESCE(q.only_visible_to_overrides, 'false') = 'false'
 
-        JOIN #{CourseSection.quoted_table_name} cs
-          ON cs.course_id = c.id
-          AND e.course_section_id = cs.id
+        UNION
 
-        LEFT JOIN #{AssignmentOverrideStudent.quoted_table_name} aos
-          ON aos.quiz_id = q.id
+        SELECT DISTINCT q.id as quiz_id,
+          e.user_id as user_id,
+          e.course_id as course_id
+        FROM #{Quizzes::Quiz.quoted_table_name} q
+        JOIN #{Enrollment.quoted_table_name} e
+          ON e.course_id = q.context_id
+          AND q.context_type = 'Course'
+          AND e.type IN ('StudentEnrollment', 'StudentViewEnrollment')
+          AND e.workflow_state NOT IN ('deleted', 'rejected', 'inactive')
+        INNER JOIN #{AssignmentOverride.quoted_table_name} ao
+          ON q.id = ao.quiz_id
+          AND ao.set_type = 'ADHOC'
+        INNER JOIN #{AssignmentOverrideStudent.quoted_table_name} aos
+          ON ao.id = aos.assignment_override_id
           AND aos.user_id = e.user_id
+        WHERE ao.workflow_state = 'active'
+          AND aos.workflow_state <> 'deleted'
+          AND q.workflow_state NOT IN ('deleted','unpublished')
+          AND q.only_visible_to_overrides = 'true'
 
-        LEFT JOIN #{AssignmentOverride.quoted_table_name} ao
-          ON ao.quiz_id = q.id
+        UNION
+
+        SELECT DISTINCT q.id as quiz_id,
+          e.user_id as user_id,
+          e.course_id as course_id
+        FROM #{Quizzes::Quiz.quoted_table_name} q
+        JOIN #{Enrollment.quoted_table_name} e
+          ON e.course_id = q.context_id
+          AND q.context_type = 'Course'
+          AND e.type IN ('StudentEnrollment', 'StudentViewEnrollment')
+          AND e.workflow_state NOT IN ('deleted', 'rejected', 'inactive')
+        INNER JOIN #{AssignmentOverride.quoted_table_name} ao
+          ON e.course_section_id = ao.set_id
+          AND ao.set_type = 'CourseSection'
+          AND ao.quiz_id = q.id
+        WHERE q.workflow_state NOT IN ('deleted','unpublished')
+          AND q.only_visible_to_overrides = 'true'
           AND ao.workflow_state = 'active'
-          AND (
-            (ao.set_type = 'CourseSection' AND ao.set_id = cs.id)
-            OR (ao.set_type = 'ADHOC' AND ao.set_id IS NULL AND ao.id = aos.assignment_override_id)
-          )
 
-        LEFT JOIN #{Assignment.quoted_table_name} a
-          ON a.context_id = q.context_id
-          AND a.submission_types LIKE 'online_quiz'
-          AND a.id = q.assignment_id
+        UNION
 
-        LEFT JOIN #{Submission.quoted_table_name} s
+        SELECT DISTINCT q.id as quiz_id,
+          e.user_id as user_id,
+          e.course_id as course_id
+        FROM #{Quizzes::Quiz.quoted_table_name} q
+        JOIN #{Enrollment.quoted_table_name} e
+          ON e.course_id = q.context_id
+          AND q.context_type = 'Course'
+          AND e.type IN ('StudentEnrollment', 'StudentViewEnrollment')
+          AND e.workflow_state NOT IN ('deleted', 'rejected', 'inactive')
+        INNER JOIN #{Assignment.quoted_table_name} a
+          ON q.assignment_id = a.id
+        INNER JOIN #{Submission.quoted_table_name} s
           ON s.user_id = e.user_id
           AND s.assignment_id = a.id
-          AND s.workflow_state != 'deleted'
-
-        WHERE q.workflow_state NOT IN ('deleted','unpublished')
-          AND(
-            ( q.only_visible_to_overrides = 'true' AND (ao.id IS NOT NULL OR s.id IS NOT NULL))
-            OR (COALESCE(q.only_visible_to_overrides, 'false') = 'false')
-          )
+          AND s.workflow_state <> 'deleted'
+        WHERE a.workflow_state NOT IN ('deleted', 'unpublished')
+          AND q.workflow_state NOT IN ('deleted','unpublished')
+          AND q.only_visible_to_overrides = 'true'
     SQL
 
     add_foreign_key :abstract_courses, :accounts
@@ -3959,6 +4048,10 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :accounts, :outcome_imports, column: "latest_outcome_import_id"
     add_foreign_key :accounts, :sis_batches
     add_foreign_key :alert_criteria, :alerts
+    add_foreign_key :anonymous_or_moderation_events, :assignments
+    add_foreign_key :anonymous_or_moderation_events, :canvadocs
+    add_foreign_key :anonymous_or_moderation_events, :submissions
+    add_foreign_key :anonymous_or_moderation_events, :users
     add_foreign_key :assessment_requests, :rubric_associations
     add_foreign_key :assessment_requests, :submissions, column: :asset_id
     add_foreign_key :assessment_requests, :users
