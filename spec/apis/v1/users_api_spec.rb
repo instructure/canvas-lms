@@ -2652,6 +2652,25 @@ describe "Users API", type: :request do
     end
   end
 
+  describe "DELETE expire_mobile_sessions" do
+    let_once(:user) { user_with_pseudonym(active_all: true)  }
+    let_once(:admin) { account_admin_user(active_all: true)  }
+    let_once(:path) { "/api/v1/users/mobile_sessions" }
+    let_once(:path_options) { { controller: "users", action: "expire_mobile_sessions", format: "json" } }
+
+    before do
+      user.access_tokens.create!
+    end
+
+    it "allows admin to expire mobile sessions" do
+      user_session(admin)
+      raw_api_call(:delete, path, path_options)
+
+      expect(response).to have_http_status :ok
+      expect(user.reload.access_tokens.take.permanent_expires_at).to be <= Time.zone.now
+    end
+  end
+
   context "user files" do
     before do
       @context = @user
