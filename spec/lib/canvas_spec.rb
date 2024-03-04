@@ -36,7 +36,16 @@ describe Canvas do
 
     it "raises on timeout if raise_on_timeout option is specified" do
       expect(Timeout).to receive(:timeout).and_raise(Timeout::Error)
+      allow(InstStatsd::Statsd).to receive(:increment).and_call_original
       expect { Canvas.timeout_protection("spec", raise_on_timeout: true) { nil } }.to raise_error(Timeout::Error)
+      expect(InstStatsd::Statsd).not_to have_received(:increment).with("timeout_protection.spec.timeout")
+    end
+
+    it "captures stats if asked for" do
+      expect(Timeout).to receive(:timeout).and_raise(Timeout::Error)
+      allow(InstStatsd::Statsd).to receive(:increment).and_call_original
+      expect { Canvas.timeout_protection("spec", raise_on_timeout: true, capture_stats: true) { nil } }.to raise_error(Timeout::Error)
+      expect(InstStatsd::Statsd).to have_received(:increment).with("timeout_protection.spec.timeout")
     end
 
     it "uses the timeout argument over the generic default" do
@@ -58,8 +67,10 @@ describe Canvas do
         Canvas.timeout_protection("spec") { nil }
         ran = false
         # third time, won't call timeout
-        Canvas.timeout_protection("spec") { ran = true }
+        allow(InstStatsd::Statsd).to receive(:increment).and_call_original
+        Canvas.timeout_protection("spec", capture_stats: true) { ran = true }
         expect(ran).to be false
+        expect(InstStatsd::Statsd).to have_received(:increment).with("timeout_protection.spec.cutoff")
         # verify the redis key has a ttl
         key = "service:timeouts:spec:error_count"
         expect(Canvas.redis.get(key)).to eq "2"
