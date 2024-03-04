@@ -1304,6 +1304,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.boolean :require_scopes, default: false, null: false
       t.boolean :test_cluster_only, default: false, null: false
       t.jsonb :public_jwk
+      t.boolean :internal_service, default: false, null: false
     end
     add_index :developer_keys, :vendor_code
 
@@ -2116,6 +2117,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     create_table :lti_resource_links do |t|
       t.string :resource_link_id, null: false
       t.timestamps null: false
+      t.references :context_external_tool, type: :bigint, foreign_key: { to_table: :context_external_tools }, index: true
     end
     add_index :lti_resource_links, :resource_link_id, unique: true
 
@@ -2144,6 +2146,15 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :lti_results, %i[lti_line_item_id user_id], unique: true
     add_index :lti_results, :submission_id
     add_index :lti_results, :user_id
+
+    create_table :lti_tool_configurations do |t|
+      t.references :developer_key, null: false, foreign_key: true, index: false, limit: 8
+      t.jsonb :settings, null: false
+      t.timestamps null: false
+      t.string :disabled_placements, array: true, default: []
+      t.text :custom_fields
+    end
+    add_index :lti_tool_configurations, :developer_key_id, unique: true
 
     create_table :lti_tool_consumer_profiles do |t|
       t.text :services
@@ -2929,6 +2940,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.boolean :anonymous
       t.timestamps null: false
       t.string :report_type, limit: 255
+      t.boolean :includes_sis_ids
     end
     add_index :quiz_statistics, [:quiz_id, :report_type]
 
@@ -3193,6 +3205,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.float :unposted_current_points
       t.float :final_points
       t.float :unposted_final_points
+      t.float :override_score
     end
     add_index :scores, :enrollment_id, name: :index_enrollment_scores
     add_index :scores,
@@ -3470,9 +3483,9 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     execute(<<~SQL)
       CREATE FUNCTION #{connection.quote_table_name("submission_comment_after_save_set_last_comment_at__tr_fn")} () RETURNS trigger AS $$
       BEGIN
-        UPDATE #{Submission.quoted_table_name}
+        UPDATE submissions
         SET last_comment_at = (
-           SELECT MAX(submission_comments.created_at) FROM #{SubmissionComment.quoted_table_name}
+           SELECT MAX(submission_comments.created_at) FROM submission_comments
             WHERE submission_comments.submission_id=submissions.id AND
             submission_comments.author_id <> submissions.user_id AND
             submission_comments.draft <> 't' AND
@@ -3486,9 +3499,9 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     execute(<<~SQL)
       CREATE FUNCTION #{connection.quote_table_name("submission_comment_after_delete_set_last_comment_at__tr_fn")} () RETURNS trigger AS $$
       BEGIN
-        UPDATE #{Submission.quoted_table_name}
+        UPDATE submissions
         SET last_comment_at = (
-           SELECT MAX(submission_comments.created_at) FROM #{SubmissionComment.quoted_table_name}
+           SELECT MAX(submission_comments.created_at) FROM submission_comments
             WHERE submission_comments.submission_id=submissions.id AND
             submission_comments.author_id <> submissions.user_id AND
             submission_comments.draft <> 't' AND
@@ -3499,6 +3512,9 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       $$ LANGUAGE plpgsql;
     SQL
     # rubocop:enable Rails/SquishedSQLHeredocs
+
+    set_search_path("submission_comment_after_save_set_last_comment_at__tr_fn", "()")
+    set_search_path("submission_comment_after_delete_set_last_comment_at__tr_fn", "()")
 
     execute(<<~SQL.squish)
       CREATE TRIGGER submission_comment_after_insert_set_last_comment_at__tr
