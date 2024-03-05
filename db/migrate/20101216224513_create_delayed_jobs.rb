@@ -18,6 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+# rubocop:disable Migration/Execute, Migration/RootAccountId
 class CreateDelayedJobs < ActiveRecord::Migration[4.2]
   tag :predeploy
 
@@ -32,10 +33,10 @@ class CreateDelayedJobs < ActiveRecord::Migration[4.2]
       # reason for last failure (See Note below)
       table.text     :last_error
       # The queue that this job is in
-      table.string   :queue, limit: 255
+      table.string   :queue, limit: 255, null: false
       # When to run.
       # Could be Time.zone.now for immediately, or sometime in the future.
-      table.datetime :run_at
+      table.datetime :run_at, null: false
       # Set when a client is working on this object
       table.datetime :locked_at
       # Set when all retries have failed
@@ -92,13 +93,15 @@ class CreateDelayedJobs < ActiveRecord::Migration[4.2]
       BEGIN
         IF NEW.strand IS NOT NULL THEN
           PERFORM pg_advisory_xact_lock(half_md5_as_bigint(NEW.strand));
-          IF (SELECT COUNT(*) FROM delayed_jobs WHERE strand = NEW.strand) >= NEW.max_concurrent THEN
+          IF (SELECT COUNT(*) FROM (
+              SELECT 1 AS one FROM delayed_jobs WHERE strand = NEW.strand LIMIT NEW.max_concurrent
+            ) subquery_for_count) = NEW.max_concurrent THEN
             NEW.next_in_strand := 'f';
           END IF;
         END IF;
         RETURN NEW;
       END;
-      $$ LANGUAGE plpgsql SET search_path TO #{search_path};
+      $$ LANGUAGE plpgsql SET search_path TO #{search_path};;
     SQL
     execute("CREATE TRIGGER delayed_jobs_before_insert_row_tr BEFORE INSERT ON #{connection.quote_table_name(Delayed::Job.table_name)} FOR EACH ROW WHEN (NEW.strand IS NOT NULL) EXECUTE PROCEDURE #{connection.quote_table_name("delayed_jobs_before_insert_row_tr_fn")}()")
 
@@ -110,12 +113,20 @@ class CreateDelayedJobs < ActiveRecord::Migration[4.2]
       BEGIN
         IF OLD.strand IS NOT NULL THEN
           PERFORM pg_advisory_xact_lock(half_md5_as_bigint(OLD.strand));
-          running_count := (SELECT COUNT(*) FROM delayed_jobs WHERE strand = OLD.strand AND next_in_strand = 't');
-          IF running_count < OLD.max_concurrent THEN
-            UPDATE delayed_jobs SET next_in_strand = 't' WHERE id IN (
-              SELECT id FROM delayed_jobs j2 WHERE next_in_strand = 'f' AND
-              j2.strand = OLD.strand ORDER BY j2.id ASC LIMIT (OLD.max_concurrent - running_count) FOR UPDATE
-            );
+          IF OLD.id % 20 = 0 THEN
+            running_count := (SELECT COUNT(*) FROM (
+              SELECT 1 as one FROM delayed_jobs WHERE strand = OLD.strand AND next_in_strand = 't' LIMIT OLD.max_concurrent
+            ) subquery_for_count);
+            IF running_count < OLD.max_concurrent THEN
+              UPDATE delayed_jobs SET next_in_strand = 't' WHERE id IN (
+                SELECT id FROM delayed_jobs j2 WHERE next_in_strand = 'f' AND
+                j2.strand = OLD.strand ORDER BY j2.id ASC LIMIT (OLD.max_concurrent - running_count) FOR UPDATE
+              );
+            END IF;
+          ELSE
+            UPDATE delayed_jobs SET next_in_strand = 't' WHERE id =
+              (SELECT id FROM delayed_jobs j2 WHERE next_in_strand = 'f' AND
+                j2.strand = OLD.strand ORDER BY j2.id ASC LIMIT 1 FOR UPDATE);
           END IF;
         END IF;
         RETURN OLD;
@@ -127,7 +138,7 @@ class CreateDelayedJobs < ActiveRecord::Migration[4.2]
     create_table :failed_jobs do |t|
       t.integer  "priority",    default: 0
       t.integer  "attempts",    default: 0
-      t.string   "handler",     limit: 512_000
+      t.text     "handler"
       t.text     "last_error"
       t.string   "queue", limit: 255
       t.datetime "run_at"
@@ -150,3 +161,4 @@ class CreateDelayedJobs < ActiveRecord::Migration[4.2]
     raise ActiveRecord::IrreversibleMigration
   end
 end
+# rubocop:enable Migration/Execute, Migration/RootAccountId
