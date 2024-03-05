@@ -19,6 +19,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {debounce} from 'lodash'
 import * as tz from '../index'
+import fallbacks from 'translations/en.json'
 import datePickerFormat from '../datePickerFormat'
 import {isRTL} from '@canvas/i18n/rtlHelper'
 
@@ -56,34 +57,59 @@ function formatter(zone, formatOptions = DATETIME_FORMAT_OPTIONS) {
 
 let datepickerDefaults
 
-const computeDatepickerDefaults = () => ({
-  constrainInput: false,
-  dateFormat: datePickerFormat(I18n.lookup('date.formats.medium')),
-  showOn: 'button',
-  buttonText: '<i class="icon-calendar-month"></i>',
-  buttonImageOnly: false,
-  disableButton: false,
+function computeDatepickerDefaults() {
+  datepickerDefaults = {
+    constrainInput: false,
+    showOn: 'button',
+    buttonText: '<i class="icon-calendar-month"></i>',
+    buttonImageOnly: false,
+    disableButton: false,
 
-  // localization values understood by $.datepicker
-  isRTL: isRTL(),
-  get prevText() {
-    return I18n.t('prevText', 'Prev')
-  }, // title text for previous month icon
-  get nextText() {
-    return I18n.t('nextText', 'Next')
-  }, // title text for next month icon
-  monthNames: I18n.lookup('date.month_names').slice(1), // names of months
-  monthNamesShort: I18n.lookup('date.abbr_month_names').slice(1), // abbreviated names of months
-  dayNames: I18n.lookup('date.day_names'), // title text for column headings
-  dayNamesShort: I18n.lookup('date.abbr_day_names'), // title text for column headings
-  dayNamesMin: I18n.lookup('date.datepicker.column_headings'), // column headings for days (Sunday = 0)
-  get firstDay() {
-    return I18n.t('first_day_index', '0')
-  }, // first day of the week (Sun = 0)
-  get showMonthAfterYear() {
-    return I18n.t('#date.formats.medium_month').slice(0, 2) === '%Y'
-  }, // "month year" or "year month"
-})
+    // localization values understood by $.datepicker
+    isRTL: isRTL(),
+    get prevText() {
+      return I18n.t('prevText', 'Prev')
+    }, // title text for previous month icon
+    get nextText() {
+      return I18n.t('nextText', 'Next')
+    }, // title text for next month icon
+    get firstDay() {
+      return I18n.t('first_day_index', '0')
+    }, // first day of the week (Sun = 0)
+    get showMonthAfterYear() {
+      try {
+        return I18n.lookup('date.formats.medium_month').slice(0, 2) === '%Y'
+      } catch {
+        // eslint-disable-next-line no-console
+        console.warn('WARNING Missing required datepicker keys in locale file')
+        return false // Assume English
+      }
+    }, // is it "year month" in this locale as opposed to "month year"?
+  }
+
+  // Fill in the rest from the locale date keys; if anything throws
+  // an error, then something is missing from the locale file, so just
+  // fall back to English
+  try {
+    datepickerDefaults.dateFormat = datePickerFormat(I18n.lookup('date.formats.medium')) // date format for input field
+    datepickerDefaults.monthNames = I18n.lookup('date.month_names').slice(1) // names of months
+    datepickerDefaults.monthNamesShort = I18n.lookup('date.abbr_month_names').slice(1) // abbreviated names of months
+    datepickerDefaults.dayNames = I18n.lookup('date.day_names') // title text for column headings
+    datepickerDefaults.dayNamesShort = I18n.lookup('date.abbr_day_names') // title text for column headings
+    datepickerDefaults.dayNamesMin = I18n.lookup('date.datepicker.column_headings') // column headings for days (Sunday = 0)
+  } catch {
+    // eslint-disable-next-line no-console
+    console.warn(
+      'WARNING Missing required datepicker keys in locale file, using US English datepicker'
+    )
+    datepickerDefaults.dateFormat = datePickerFormat(fallbacks['date.formats.medium'])
+    datepickerDefaults.monthNames = fallbacks['date.month_names'].slice(1)
+    datepickerDefaults.monthNamesShort = fallbacks['date.abbr_month_names'].slice(1)
+    datepickerDefaults.dayNames = fallbacks['date.day_names']
+    datepickerDefaults.dayNamesShort = fallbacks['date.abbr_day_names']
+    datepickerDefaults.dayNamesMin = fallbacks['date.datepicker.column_headings']
+  }
+}
 
 // adds datepicker and suggest functionality to the specified $field
 export default class DatetimeField {
@@ -406,9 +432,7 @@ export default class DatetimeField {
   }
 
   getDatepickerDefaults() {
-    if (!datepickerDefaults) {
-      datepickerDefaults = computeDatepickerDefaults()
-    }
+    if (!datepickerDefaults) computeDatepickerDefaults()
 
     return datepickerDefaults
   }
