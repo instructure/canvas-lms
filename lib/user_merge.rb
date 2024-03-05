@@ -69,12 +69,8 @@ class UserMerge
       merge_data.items.create!(user: from_user, item_type: "user_preferences", item: from_user.preferences)
       merge_data.items.create!(user: target_user, item_type: "user_preferences", item: target_user.preferences)
 
-      if from_user.needs_preference_migration?
-        prefs = shard_aware_preferences
-      else
-        copy_migrated_preferences # uses new rows to store preferences
-        prefs = from_user.preferences
-      end
+      copy_migrated_preferences # uses new rows to store preferences
+      prefs = from_user.preferences
       target_user.preferences = target_user.preferences.merge(prefs)
       target_user.save if target_user.changed?
 
@@ -225,25 +221,7 @@ class UserMerge
     key.is_a?(String) ? [key.split("_").first, new_id].join("_") : new_id
   end
 
-  # can remove when all preferences have been migrated
-  def shard_aware_preferences
-    return from_user.preferences if from_user.shard == target_user.shard
-
-    preferences = from_user.preferences.dup
-    %i[custom_colors course_nicknames].each do |pref|
-      preferences.delete(pref)
-      new_pref = {}
-      from_user.preferences[pref]&.each do |key, value|
-        new_key = translate_course_id_or_asset_string(key)
-        new_pref[new_key] = value
-      end
-      preferences[pref] = new_pref unless new_pref.empty?
-    end
-    preferences
-  end
-
   def copy_migrated_preferences
-    target_user.migrate_preferences_if_needed # may as well
     from_values = from_user.user_preference_values.to_a
     target_values = target_user.user_preference_values.to_a.index_by { |r| [r.key, r.sub_key] }
 
@@ -255,7 +233,6 @@ class UserMerge
       sub_key = from_record.sub_key
       value = from_record.value
       if from_user.shard != target_user.shard
-        # tl;dr do the same thing as shard_aware_preferences
         case key
         when "custom_colors"
           value = value.transform_keys { |id| translate_course_id_or_asset_string(id) }
