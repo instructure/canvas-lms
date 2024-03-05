@@ -39,6 +39,7 @@ const SUBMISSION_QUERY = gql`
           score
           excused
           id
+          _id
           postedAt
           previewUrl
           commentsConnection {
@@ -58,6 +59,8 @@ const SUBMISSION_QUERY = gql`
       name
       gradingType
       pointsPossible
+      late
+      submissionStatus
     }
   }
 `
