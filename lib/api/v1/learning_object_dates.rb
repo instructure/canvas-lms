@@ -27,6 +27,7 @@ module Api::V1::LearningObjectDates
     unlock_at
     lock_at
     only_visible_to_overrides
+    visible_to_everyone
   ].freeze
   LOCKABLE_PSEUDO_COLUMNS = %i[due_dates availability_dates].freeze
 

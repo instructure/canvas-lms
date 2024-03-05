@@ -432,6 +432,86 @@ shared_examples_for "an object whose dates are overridable" do
     end
   end
 
+  describe "visible_to_everyone" do
+    before do
+      Account.site_admin.enable_feature!(:differentiated_modules)
+      student_in_course(course:)
+
+      @module1 = @course.context_modules.create!(name: "Module 1")
+      @module2 = @course.context_modules.create!(name: "Module 2")
+    end
+
+    context "only_visible_to_overrides is false" do
+      before do
+        overridable.only_visible_to_overrides = false
+      end
+
+      it "returns true when there are no related context modules" do
+        expect(overridable.visible_to_everyone).to be_truthy
+      end
+
+      it "returns true when there are related context modules without overrides" do
+        overridable.context_module_tags.create! context_module: @module1, context: @course, tag_type: "context_module"
+        overridable.context_module_tags.create! context_module: @module2, context: @course, tag_type: "context_module"
+
+        module_override = @module1.assignment_overrides.create!
+        override_student = module_override.assignment_override_students.build
+        override_student.user = @student
+        override_student.save!
+
+        expect(overridable.visible_to_everyone).to be_truthy
+      end
+
+      it "returns true when there are related context modules with only deleted overrides" do
+        overridable.context_module_tags.create! context_module: @module1, context: @course, tag_type: "context_module"
+
+        module_override = @module1.assignment_overrides.create!
+        override_student = module_override.assignment_override_students.build
+        override_student.user = @student
+        override_student.save!
+
+        expect(overridable.visible_to_everyone).to be_falsey
+
+        module_override.destroy
+
+        expect(overridable.visible_to_everyone).to be_truthy
+      end
+
+      it "returns false when all related context modules have overrides" do
+        overridable.context_module_tags.create! context_module: @module1, context: @course, tag_type: "context_module"
+
+        module_override = @module1.assignment_overrides.create!
+        override_student = module_override.assignment_override_students.build
+        override_student.user = @student
+        override_student.save!
+
+        expect(overridable.visible_to_everyone).to be_falsey
+      end
+
+      it "returns true when there is a course override" do
+        overridable.context_module_tags.create! context_module: @module1, context: @course, tag_type: "context_module"
+
+        module_override = @module1.assignment_overrides.create!
+        override_student = module_override.assignment_override_students.build
+        override_student.user = @student
+        override_student.save!
+
+        override.set_type = "Course"
+        override.set = @course
+        override.save!
+
+        expect(overridable.visible_to_everyone).to be_truthy
+      end
+    end
+
+    context "only_visible_to_overrides is true" do
+      it "returns false" do
+        overridable.only_visible_to_overrides = true
+        expect(overridable.visible_to_everyone).to be_falsey
+      end
+    end
+  end
+
   describe "due_date_hash" do
     it "returns the due at, lock_at, unlock_at, all day, and all day fields" do
       due = 5.days.from_now

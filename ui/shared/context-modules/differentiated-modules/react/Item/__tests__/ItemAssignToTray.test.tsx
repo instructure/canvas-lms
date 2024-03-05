@@ -86,6 +86,7 @@ describe('ItemAssignToTray', () => {
         unlock_at: '2023-10-01T12:00:00Z',
         lock_at: '2023-11-01T12:00:00Z',
         only_visible_to_overrides: false,
+        visible_to_everyone: true,
         overrides: OVERRIDES,
       })
       // an assignment with invalid dates
@@ -95,6 +96,7 @@ describe('ItemAssignToTray', () => {
         unlock_at: '2023-10-01T12:00:00Z',
         lock_at: '2023-11-01T12:00:00Z',
         only_visible_to_overrides: false,
+        visible_to_everyone: true,
         overrides: [],
       })
       // an assignment with valid dates and no overrides
@@ -104,6 +106,7 @@ describe('ItemAssignToTray', () => {
         unlock_at: null,
         lock_at: null,
         only_visible_to_overrides: false,
+        visible_to_everyone: true,
         overrides: [],
       })
       .get('/api/v1/courses/1/quizzes/23/date_details', {})
@@ -200,6 +203,7 @@ describe('ItemAssignToTray', () => {
         unlock_at: '2023-10-01T12:00:00Z',
         lock_at: '2023-11-01T12:00:00Z',
         only_visible_to_overrides: false,
+        visible_to_everyone: true,
         overrides: [],
       },
       {
@@ -270,6 +274,7 @@ describe('ItemAssignToTray', () => {
           unlock_at: null,
           lock_at: null,
           only_visible_to_overrides: true,
+          visible_to_everyone: false,
           overrides: OVERRIDES,
         },
         {
@@ -297,6 +302,7 @@ describe('ItemAssignToTray', () => {
           unlock_at: '2023-10-01T12:00:00Z',
           lock_at: '2023-11-01T12:00:00Z',
           only_visible_to_overrides: false,
+          visible_to_everyone: true,
           overrides: [],
         },
         {
@@ -318,6 +324,7 @@ describe('ItemAssignToTray', () => {
           unlock_at: '2023-10-01T12:00:00Z',
           lock_at: '2023-11-01T12:00:00Z',
           only_visible_to_overrides: false,
+          visible_to_everyone: true,
           overrides: [],
         },
         {
@@ -349,6 +356,7 @@ describe('ItemAssignToTray', () => {
       unlock_at: '2023-10-01T12:00:00Z',
       lock_at: '2023-11-01T12:00:00Z',
       only_visible_to_overrides: false,
+      visible_to_everyone: true,
       overrides: [],
     }
 
@@ -369,7 +377,8 @@ describe('ItemAssignToTray', () => {
       getByRole('button', {name: 'Save'}).click()
       expect((await findAllByText(`${props.itemName} updated`))[0]).toBeInTheDocument()
       const requestBody = fetchMock.lastOptions(DATE_DETAILS)?.body
-      const {id, overrides, only_visible_to_overrides, ...payloadValues} = DATE_DETAILS_OBJ
+      const {id, overrides, only_visible_to_overrides, visible_to_everyone, ...payloadValues} =
+        DATE_DETAILS_OBJ
       const expectedPayload = JSON.stringify({
         ...payloadValues,
         only_visible_to_overrides,

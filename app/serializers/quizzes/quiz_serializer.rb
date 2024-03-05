@@ -79,6 +79,7 @@ module Quizzes
                :assignment_id,
                :one_time_results,
                :only_visible_to_overrides,
+               :visible_to_everyone,
                :assignment_group_id,
                :show_correct_answers_last_attempt,
                :version_number,
@@ -354,6 +355,10 @@ module Quizzes
 
     def only_visible_to_overrides
       quiz.only_visible_to_overrides || false
+    end
+
+    def visible_to_everyone
+      quiz.visible_to_everyone || false
     end
 
     def stringify_ids?

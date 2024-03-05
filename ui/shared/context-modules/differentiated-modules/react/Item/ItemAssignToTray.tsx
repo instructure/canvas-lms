@@ -240,7 +240,7 @@ export default function ItemAssignToTray({
         const overriddenTargets = getOverriddenAssignees(overrides)
         delete dateDetailsApiResponse.overrides
         const baseDates: BaseDateDetails = dateDetailsApiResponse
-        const onlyOverrides = dateDetailsApiResponse.only_visible_to_overrides
+        const onlyOverrides = !dateDetailsApiResponse.visible_to_everyone
 
         const cards: ItemAssignToCardSpec[] = []
         const selectedOptionIds: string[] = []

@@ -58,6 +58,11 @@
 #           "type": "array",
 #           "items": {"type": "string"}
 #         },
+#         "visible_to_everyone": {
+#           "description": "whether the learning object is visible to everyone",
+#           "example": true,
+#           "type": "boolean"
+#         },
 #         "overrides": {
 #           "description": "paginated list of AssignmentOverride objects",
 #           "type": "array",
