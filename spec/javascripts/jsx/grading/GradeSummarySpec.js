@@ -729,51 +729,58 @@ QUnit.module('GradeSummary.setup', {
   },
 })
 
-test('sends an axios request to mark unread submissions as read', function () {
+test('sends an axios request to mark unread submissions as read', async function () {
   ENV.assignments_2_student_enabled = true
   const axiosSpy = sandbox.spy(axios, 'put')
   GradeSummary.setup()
+  await awhile()
   const expectedUrl = `/api/v1/courses/1/submissions/bulk_mark_read`
   equal(axiosSpy.callCount, 1)
   deepEqual(axiosSpy.getCall(0).args, [expectedUrl, {submissionIds: ['123', '456']}])
 })
 
-test('does not mark unread submissions as read if assignments_2_student_enabled feature flag off', function () {
+test('does not mark unread submissions as read if assignments_2_student_enabled feature flag off', async function () {
   ENV.assignments_2_student_enabled = false
   const axiosSpy = sandbox.spy(axios, 'put')
   GradeSummary.setup()
+  await awhile()
   equal(axiosSpy.callCount, 0)
 })
 
-test('shows the "Show Saved What-If Scores" button when any assignment has a What-If score', function () {
+test('shows the "Show Saved What-If Scores" button when any assignment has a What-If score', async function () {
   GradeSummary.setup()
+  await awhile()
   ok(this.$showWhatIfScoresContainer.is(':visible'), 'button container is visible')
 })
 
-test('uses I18n to parse the .student_entered_score value', function () {
+test('uses I18n to parse the .student_entered_score value', async function () {
   sandbox.spy(GradeSummary, 'parseScoreText')
   this.$assignment.find('.student_entered_score').text('7')
   GradeSummary.setup()
+  await awhile()
   equal(GradeSummary.parseScoreText.callCount, 1, 'GradeSummary.parseScoreText was called once')
   const [value] = GradeSummary.parseScoreText.getCall(0).args
   equal(value, '7', 'GradeSummary.parseScoreText was called with the .student_entered_score')
 })
 
-test('shows the "Show Saved What-If Scores" button for assignments with What-If scores of "0"', function () {
+test('shows the "Show Saved What-If Scores" button for assignments with What-If scores of "0"', async function () {
   this.$assignment.find('.student_entered_score').text('0')
   GradeSummary.setup()
+  await awhile()
   ok(this.$showWhatIfScoresContainer.is(':visible'), 'button container is visible')
 })
 
-test('does not show the "Show Saved What-If Scores" button for assignments without What-If scores', function () {
+test('does not show the "Show Saved What-If Scores" button for assignments without What-If scores', async function () {
   this.$assignment.find('.student_entered_score').text('')
   GradeSummary.setup()
+  await awhile()
   ok(this.$showWhatIfScoresContainer.is(':hidden'), 'button container is hidden')
 })
 
-test('does not show the "Show Saved What-If Scores" button for assignments with What-If invalid scores', function () {
+test('does not show the "Show Saved What-If Scores" button for assignments with What-If invalid scores', async function () {
   this.$assignment.find('.student_entered_score').text('null')
   GradeSummary.setup()
+  await awhile()
   ok(this.$showWhatIfScoresContainer.is(':hidden'), 'button container is hidden')
 })
 
@@ -1800,3 +1807,5 @@ QUnit.module('GradeSummary', () => {
     })
   })
 })
+
+const awhile = (milliseconds = 2) => new Promise(resolve => setTimeout(resolve, milliseconds))
