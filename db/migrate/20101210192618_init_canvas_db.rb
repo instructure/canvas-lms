@@ -173,7 +173,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.string :icon, default: "warning", limit: 255
       t.text :message
       t.integer :account_id, limit: 8, null: false
-      t.integer :user_id, limit: 8
+      t.integer :user_id, limit: 8, null: false
       t.datetime :start_at, null: false
       t.datetime :end_at, null: false
       t.timestamps null: false
@@ -1334,7 +1334,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.boolean :test_cluster_only, default: false, null: false
       t.jsonb :public_jwk
       t.boolean :internal_service, default: false, null: false
-      t.string :oidc_login_uri
+      t.text :oidc_initiation_url
     end
     add_index :developer_keys, :vendor_code
 
@@ -2184,7 +2184,6 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.jsonb :settings, null: false
       t.timestamps null: false
       t.string :disabled_placements, array: true, default: []
-      t.text :custom_fields
       t.string :privacy_level
     end
     add_index :lti_tool_configurations, :developer_key_id, unique: true
@@ -3419,6 +3418,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer  "provisional_grade_id", limit: 8
       t.boolean  "draft", default: false, null: false
       t.datetime :edited_at
+      t.integer :attempt
     end
 
     add_index "submission_comments", ["author_id"], name: "index_submission_comments_on_author_id"
@@ -3426,6 +3426,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index "submission_comments", ["submission_id"], name: "index_submission_comments_on_submission_id"
     add_index :submission_comments, :draft
     add_index :submission_comments, :provisional_grade_id, where: "provisional_grade_id IS NOT NULL"
+    add_index :submission_comments, :attempt
 
     create_table :submission_versions do |t|
       t.integer  "context_id", limit: 8
@@ -3713,8 +3714,19 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
               unique: true,
               name: "index_user_observers_on_user_id_and_observer_id_and_ra"
 
+    create_table :user_past_lti_ids do |t|
+      t.integer :user_id, null: false, limit: 8
+      t.integer :context_id, null: false, limit: 8
+      t.string :context_type, null: false, limit: 255
+      t.string :user_uuid, null: false, limit: 255
+      t.text :user_lti_id, null: false
+      t.string :user_lti_context_id, limit: 255, index: true
+    end
+    add_index :user_past_lti_ids, %w[user_id context_id context_type], name: "user_past_lti_ids_index", unique: true
+    add_index :user_past_lti_ids, :user_id
+
     create_table "user_services", force: true do |t|
-      t.integer  "user_id", limit: 8, null: false
+      t.integer "user_id", limit: 8, null: false
       t.text     "token"
       t.string   "secret", limit: 255
       t.string   "protocol", limit: 255
@@ -4413,6 +4425,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :user_notes, :users, column: :created_by_id
     add_foreign_key :user_observers, :users
     add_foreign_key :user_observers, :users, column: :observer_id
+    add_foreign_key :user_past_lti_ids, :users
     add_foreign_key :user_profile_links, :user_profiles
     add_foreign_key :user_profiles, :users
     add_foreign_key :user_services, :users
