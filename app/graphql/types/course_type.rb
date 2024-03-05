@@ -71,6 +71,15 @@ module Types
       value "StudentViewEnrollment"
     end
 
+    class CourseGradeStatus < BaseEnum
+      description "Grade statuses that can be applied to submissions in a course"
+      value "late"
+      value "missing"
+      value "none"
+      value "excused"
+      value "extended"
+    end
+
     class CourseUsersFilterInputType < Types::BaseInputObject
       graphql_name "CourseUsersFilter"
 
@@ -236,6 +245,15 @@ module Types
     field :enrollments_connection, EnrollmentType.connection_type, null: true do
       argument :filter, EnrollmentFilterInputType, required: false
     end
+
+    field :custom_grade_statuses_connection, CustomGradeStatusType.connection_type, null: true
+    def custom_grade_statuses_connection
+      return unless Account.site_admin.feature_enabled?(:custom_gradebook_statuses)
+      return unless course.grants_any_right?(current_user, session, :manage_grades, :view_all_grades)
+
+      course.custom_grade_statuses.active.order(:id)
+    end
+
     def enrollments_connection(filter: {})
       return nil unless course.grants_any_right?(
         current_user,
@@ -413,5 +431,7 @@ module Types
     end
 
     field :root_outcome_group, LearningOutcomeGroupType, null: false
+
+    field :grade_statuses, [CourseGradeStatus], null: false
   end
 end
