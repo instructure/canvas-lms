@@ -40,7 +40,7 @@ class AuthenticationProvider::Microsoft < AuthenticationProvider::OpenIDConnect
 
   # see {Facebooke#client_secret} for the reasoning here
   def client_secret
-    application_secret_dec
+    application_secret
   end
 
   def self.recognized_params
