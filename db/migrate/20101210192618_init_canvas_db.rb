@@ -1604,6 +1604,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
               unique: true
     add_index :enrollments, [:course_id, :user_id]
     add_index :enrollments, :sis_pseudonym_id
+    add_index :enrollments, [:role_id, :user_id]
 
     create_table "eportfolio_categories", force: true do |t|
       t.integer  "eportfolio_id", limit: 8, null: false
@@ -3492,6 +3493,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer :submission_id, limit: 8, null: false
       t.integer :submission_attempt, index: true, null: false
       t.text :body
+      t.text :url
     end
     add_index :submission_drafts, :submission_id
 
