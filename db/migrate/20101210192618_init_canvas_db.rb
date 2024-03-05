@@ -273,12 +273,14 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
 
     create_table :anonymous_or_moderation_events do |t|
       t.integer :assignment_id, limit: 8, null: false
-      t.integer :user_id, limit: 8, null: false
+      t.integer :user_id, limit: 8
       t.integer :submission_id, limit: 8
       t.integer :canvadoc_id, limit: 8
       t.string :event_type, null: false
       t.jsonb :payload, null: false, default: {}
       t.timestamps null: false
+      t.integer :context_external_tool_id, limit: 8
+      t.integer :quiz_id, limit: 8
     end
     add_index :anonymous_or_moderation_events, :assignment_id
     add_index :anonymous_or_moderation_events, :user_id
@@ -1134,6 +1136,11 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
               where: "integration_id IS NOT NULL"
     add_index :course_sections, :sis_batch_id, where: "sis_batch_id IS NOT NULL"
     add_index :course_sections, :enrollment_term_id
+    add_index :course_sections,
+              :course_id,
+              unique: true,
+              where: "default_section = 't' AND workflow_state <> 'deleted'",
+              name: "index_course_sections_unique_default_section"
 
     create_table "courses", force: true do |t|
       t.string   "name", limit: 255
@@ -1327,6 +1334,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.boolean :test_cluster_only, default: false, null: false
       t.jsonb :public_jwk
       t.boolean :internal_service, default: false, null: false
+      t.string :oidc_login_uri
     end
     add_index :developer_keys, :vendor_code
 
@@ -2177,6 +2185,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.timestamps null: false
       t.string :disabled_placements, array: true, default: []
       t.text :custom_fields
+      t.string :privacy_level
     end
     add_index :lti_tool_configurations, :developer_key_id, unique: true
 
@@ -2800,6 +2809,16 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
 
     add_index :polling_polls, :user_id
 
+    create_table :post_policies do |t|
+      t.column :post_manually, :boolean, null: false, default: false
+
+      t.references :course, foreign_key: true, index: true, limit: 8
+      t.references :assignment, foreign_key: true, index: true, limit: 8
+
+      t.index [:course_id, :assignment_id], unique: true
+      t.timestamps null: false
+    end
+
     create_table "pseudonyms", force: true do |t|
       t.integer  "user_id", limit: 8, null: false
       t.integer  "account_id", limit: 8, null: false
@@ -2852,6 +2871,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :pseudonyms, :authentication_provider_id, where: "authentication_provider_id IS NOT NULL"
     execute "CREATE UNIQUE INDEX index_pseudonyms_on_unique_id_and_account_id_and_authentication_provider_id ON #{Pseudonym.quoted_table_name} (LOWER(unique_id), account_id, authentication_provider_id) WHERE workflow_state='active'"
     execute "CREATE UNIQUE INDEX index_pseudonyms_on_unique_id_and_account_id_no_authentication_provider_id ON #{Pseudonym.quoted_table_name} (LOWER(unique_id), account_id) WHERE workflow_state='active' AND authentication_provider_id IS NULL"
+    add_index :pseudonyms, "LOWER(unique_id), account_id", name: "index_pseudonyms_on_unique_id_and_account_id"
 
     create_table :profiles do |t|
       t.integer  :root_account_id, limit: 8, null: false
@@ -3465,6 +3485,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.string :anonymous_id, limit: 5
       t.datetime :last_comment_at
       t.integer :extra_attempts
+      t.datetime :posted_at
     end
 
     add_index "submissions", ["assignment_id", "submission_type"], name: "index_submissions_on_assignment_id_and_submission_type"
@@ -4097,6 +4118,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :anonymous_or_moderation_events, :canvadocs
     add_foreign_key :anonymous_or_moderation_events, :submissions
     add_foreign_key :anonymous_or_moderation_events, :users
+    add_foreign_key :anonymous_or_moderation_events, :context_external_tools, name: "fk_rails_f492821432"
+    add_foreign_key :anonymous_or_moderation_events, :quizzes, name: "fk_rails_a862303024"
     add_foreign_key :assessment_requests, :rubric_associations
     add_foreign_key :assessment_requests, :submissions, column: :asset_id
     add_foreign_key :assessment_requests, :users
