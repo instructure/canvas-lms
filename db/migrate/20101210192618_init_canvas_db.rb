@@ -18,7 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-# rubocop:disable Migration/PrimaryKey
+# rubocop:disable Migration/ChangeColumn, Migration/Execute, Migration/IdColumn
+# rubocop:disable Migration/PrimaryKey, Migration/RootAccountId, Rails/CreateTableWithTimestamps
 class InitCanvasDb < ActiveRecord::Migration[4.2]
   tag :predeploy
 
@@ -4449,4 +4450,5 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     raise ActiveRecord::IrreversibleMigration
   end
 end
-# rubocop:enable Migration/PrimaryKey
+# rubocop:enable Migration/ChangeColumn, Migration/Execute, Migration/IdColumn
+# rubocop:enable Migration/PrimaryKey, Migration/RootAccountId, Rails/CreateTableWithTimestamps
