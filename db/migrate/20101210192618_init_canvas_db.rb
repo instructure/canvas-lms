@@ -582,6 +582,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.references :root_account, type: :bigint, index: true, foreign_key: { to_table: :accounts }, null: false
       t.string :sis_source_id
       t.bigint :migrate_from_id
+      t.jsonb :settings
     end
 
     add_index "assignments", ["assignment_group_id"], name: "index_assignments_on_assignment_group_id"
@@ -601,6 +602,10 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
               :importing_started_at,
               where: "importing_started_at IS NOT NULL AND workflow_state = 'importing'"
     add_index :assignments, [:sis_source_id, :root_account_id], where: "sis_source_id IS NOT NULL", unique: true
+    add_index :assignments,
+              :duplication_started_at,
+              where: "workflow_state = 'migrating' AND duplication_started_at IS NOT NULL",
+              name: "index_assignments_duplicating_on_started_at"
 
     create_table "attachment_associations", force: true do |t|
       t.integer "attachment_id", limit: 8
@@ -1096,6 +1101,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index "conversation_participants", ["user_id", "last_message_at"]
     add_index :conversation_participants, [:conversation_id, :user_id], unique: true
     add_index :conversation_participants, [:private_hash, :user_id], where: "private_hash IS NOT NULL", unique: true
+    add_index :conversation_participants, :user_id, where: "workflow_state = 'unread'", name: "index_conversation_participants_unread_on_user_id"
 
     create_table "conversation_messages" do |t|
       t.integer  "conversation_id", limit: 8
@@ -1403,6 +1409,10 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :discussion_entries, %i[root_entry_id workflow_state created_at], name: "index_discussion_entries_root_entry"
     add_index :discussion_entries, %i[discussion_topic_id updated_at created_at], name: "index_discussion_entries_for_topic"
     add_index :discussion_entries, :editor_id, where: "editor_id IS NOT NULL"
+    add_index :discussion_entries,
+              [:user_id, :discussion_topic_id],
+              where: "workflow_state <> 'deleted'",
+              name: "index_discussion_entries_active_on_user_id_and_topic"
 
     create_table "discussion_entry_participants" do |t|
       t.integer "discussion_entry_id", limit: 8, null: false
@@ -1656,9 +1666,11 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.string   "uuid", limit: 255
       t.string   "workflow_state", default: "active", null: false, limit: 255
       t.datetime "deleted_at"
+      t.string :spam_status
     end
 
     add_index "eportfolios", ["user_id"], name: "index_eportfolios_on_user_id"
+    add_index :eportfolios, :spam_status
 
     create_table :epub_exports do |t|
       t.integer :content_export_id, :course_id, :user_id, limit: 8
@@ -3612,6 +3624,10 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :submissions, :graded_at, using: :brin
     add_index :submissions, "user_id, GREATEST(submitted_at, created_at)", name: "index_submissions_on_user_and_greatest_dates"
     add_index :submissions, [:user_id, :context_code]
+    add_index :submissions,
+              :user_id,
+              where: "(score IS NOT NULL AND workflow_state = 'graded') OR excused = TRUE",
+              name: "index_submissions_graded_or_excused_on_user_id"
 
     # rubocop:disable Rails/SquishedSQLHeredocs
     execute(<<~SQL)
