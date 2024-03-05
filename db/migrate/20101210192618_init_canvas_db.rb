@@ -126,9 +126,11 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer :row_number
       t.string :row, array: true, default: []
       t.datetime :created_at, null: false
+      t.string :file
     end
     add_index :account_report_rows, :account_report_id
     add_index :account_report_rows, :account_report_runner_id
+    add_index :account_report_rows, :file
 
     create_table :account_report_runners do |t|
       t.integer :account_report_id, null: false, limit: 8
@@ -184,6 +186,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.string :required_account_service, limit: 255
       t.integer :months_in_display_cycle
       t.boolean :domain_specific, default: false, null: false
+      t.boolean :send_message, default: false, null: false
+      t.datetime :messages_sent_at
     end
 
     add_index :account_notifications, %i[account_id end_at start_at], name: "index_account_notifications_by_account_and_timespan"
@@ -417,6 +421,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.string :tool_product_code
       t.string :tool_vendor_code
       t.string :tool_resource_type_code
+      t.string :context_type, default: "Account", null: false
     end
 
     add_index :assignment_configuration_tool_lookups, %i[tool_id tool_type assignment_id], unique: true, name: "index_tool_lookup_on_tool_assignment_id"
@@ -460,6 +465,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :assignment_override_students, :quiz_id
     add_index :assignment_override_students, :workflow_state
     add_index :assignment_override_students, [:user_id, :quiz_id]
+    add_index :assignment_override_students, :assignment_id
 
     create_table :assignment_overrides do |t|
       t.timestamps null: false
@@ -498,6 +504,10 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :assignment_overrides, [:set_type, :set_id]
     add_index :assignment_overrides, :quiz_id
     add_index :assignment_overrides, :assignment_id
+    add_index :assignment_overrides,
+              :due_at,
+              name: "index_assignment_overrides_due_at_when_overridden",
+              where: "due_at_overridden"
 
     add_check_constraint :assignment_overrides,
                          "workflow_state='deleted' OR quiz_id IS NOT NULL OR assignment_id IS NOT NULL",
@@ -571,6 +581,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer :allowed_attempts
       t.references :root_account, type: :bigint, index: true, foreign_key: { to_table: :accounts }, null: false
       t.string :sis_source_id
+      t.bigint :migrate_from_id
     end
 
     add_index "assignments", ["assignment_group_id"], name: "index_assignments_on_assignment_group_id"
@@ -663,6 +674,9 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
               where: "migration_id IS NOT NULL",
               name: "index_attachments_on_context_and_migration_id"
     add_index :attachments, :instfs_uuid, where: "instfs_uuid IS NOT NULL"
+    add_index :attachments,
+              %i[md5 namespace content_type],
+              where: "root_attachment_id IS NULL and filename IS NOT NULL"
 
     create_table "calendar_events", force: true do |t|
       t.string   "title", limit: 255
@@ -3494,6 +3508,9 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer :submission_attempt, index: true, null: false
       t.text :body
       t.text :url
+      t.string :active_submission_type
+      # This is actually the media_id e.g. m-123456 rather than the media_object.id
+      t.string :media_object_id
     end
     add_index :submission_drafts, :submission_id
 
@@ -3860,6 +3877,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.string   "lti_context_id", limit: 255
       t.integer  "turnitin_id", limit: 8
       t.text :lti_id
+      t.string :pronouns
     end
 
     add_index "users", ["avatar_state", "avatar_image_updated_at"], name: "index_users_on_avatar_state_and_avatar_image_updated_at"
@@ -4231,6 +4249,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :assignments, :cloned_items
     add_foreign_key :assignments, :course_sections, column: :grader_section_id
     add_foreign_key :assignments, :group_categories
+    add_foreign_key :assignments, :quizzes, column: :migrate_from_id
     add_foreign_key :assignments, :users, column: :final_grader_id
     add_foreign_key :attachment_upload_statuses, :attachments
     add_foreign_key :attachments, :attachments, column: :replacement_attachment_id
