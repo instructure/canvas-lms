@@ -54,7 +54,12 @@ module Lti
       let(:score_max) { 50 }
       let(:scope_to_remove) { "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem" }
 
-      before { assignment }
+      before do
+        allow_any_instance_of(Account).to receive(:environment_specific_domain)
+          .and_return("test.host")
+
+        assignment
+      end
 
       shared_examples "assignment with wrong tool" do
         let(:other_tool) do
@@ -150,26 +155,12 @@ module Lti
             expect(parsed_response_body).to eq expected_response
           end
 
-          context "when the consistent_ags_ids_based_on_account_principal_domain feature flag is on" do
-            it "uses the Account#domain in the line item id" do
-              course.root_account.enable_feature!(:consistent_ags_ids_based_on_account_principal_domain)
-              allow_any_instance_of(Account).to receive(:environment_specific_domain).and_return("canonical.host")
-              send_request
-              expect(parsed_response_body["id"]).to start_with(
-                "http://canonical.host/api/lti/courses/#{course.id}/line_items/"
-              )
-            end
-          end
-
-          context "when the consistent_ags_ids_based_on_account_principal_domain feature flag is off" do
-            it "uses the host domain in the line item id" do
-              course.root_account.disable_feature!(:consistent_ags_ids_based_on_account_principal_domain)
-              allow_any_instance_of(Account).to receive(:environment_specific_domain).and_return("canonical.host")
-              send_request
-              expect(parsed_response_body["id"]).to start_with(
-                "http://test.host/api/lti/courses/#{course.id}/line_items/"
-              )
-            end
+          it "uses the Account#domain in the line item id" do
+            allow_any_instance_of(Account).to receive(:environment_specific_domain).and_return("canonical.host")
+            send_request
+            expect(parsed_response_body["id"]).to start_with(
+              "http://canonical.host/api/lti/courses/#{course.id}/line_items/"
+            )
           end
 
           it "associates the line item with the correct assignment" do

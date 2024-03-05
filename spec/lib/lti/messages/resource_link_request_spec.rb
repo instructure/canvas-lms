@@ -183,8 +183,7 @@ describe Lti::Messages::ResourceLinkRequest do
       end
 
       let(:line_items_url_params) do
-        # When we remove the feature flag we'll need to add "host: any" to this
-        { course_id: course.id }
+        { course_id: course.id, host: "test.host" }
       end
 
       before do
@@ -197,6 +196,9 @@ describe Lti::Messages::ResourceLinkRequest do
             id: expected_assignment_line_item.id
           )
         ).and_return("lti_line_item_show_url")
+
+        allow_any_instance_of(Account).to receive(:environment_specific_domain)
+          .and_return("test.host")
       end
 
       shared_examples_for "an authorized launch" do
@@ -224,36 +226,14 @@ describe Lti::Messages::ResourceLinkRequest do
             allow_any_instance_of(Account).to receive(:environment_specific_domain).and_return("canonical-account-domain")
           end
 
-          context "when the consistent_ags_ids_based_on_account_principal_domain feature flag is off" do
-            # NOTE: when we remove the feature flag we'll have to modify the let(:line_items_url_params) above
+          let(:line_items_url_params) { { host: "canonical-account-domain", course_id: course.id } }
 
-            before do
-              course.account.disable_feature!(:consistent_ags_ids_based_on_account_principal_domain)
-            end
-
-            it "uses the current domain in the line_items URL" do
-              expect_assignment_and_grade_line_items_url(jws)
-            end
-
-            it "uses the current domain in the line_item URL" do
-              expect_assignment_and_grade_line_item_url(jws)
-            end
+          it "uses the Account#domain in the line_items URL" do
+            expect_assignment_and_grade_line_items_url(jws)
           end
 
-          context "when the consistent_ags_ids_based_on_account_principal_domain feature flag is on" do
-            let(:line_items_url_params) { { host: "canonical-account-domain", course_id: course.id } }
-
-            before do
-              course.account.enable_feature!(:consistent_ags_ids_based_on_account_principal_domain)
-            end
-
-            it "uses the Account#domain in the line_items URL" do
-              expect_assignment_and_grade_line_items_url(jws)
-            end
-
-            it "uses the Account#domain in the line_item URL" do
-              expect_assignment_and_grade_line_item_url(jws)
-            end
+          it "uses the Account#domain in the line_item URL" do
+            expect_assignment_and_grade_line_item_url(jws)
           end
         end
       end
