@@ -197,7 +197,7 @@ const ContextModulesHeaderContent = ({responsive, ...props}: ContentProps) => {
             withVisualDebug={false}
             direction={responsive.matches.includes('small') ? 'column-reverse' : 'row'}
           >
-            {(props.moreMenu.menuTools.visible || props.moreMenu.exportCourseContent.visible) && (
+            {props.moreMenu.menuTools.visible && (
               <Flex.Item overflowY="visible">
                 <View
                   as="div"
@@ -251,6 +251,19 @@ const ContextModulesHeaderContent = ({responsive, ...props}: ContentProps) => {
                   href={props.viewProgress.url}
                 >
                   {props.viewProgress.label}
+                </Button>
+              </Flex.Item>
+            )}
+
+            {!props.moreMenu.menuTools.visible && props.moreMenu.exportCourseContent.visible && (
+              <Flex.Item overflowY="visible">
+                <Button
+                  renderIcon={IconExportLine}
+                  href={props.moreMenu.exportCourseContent.url}
+                  id="context-modules-header-export-course-button"
+                  display={responsive.props.display}
+                >
+                  {props.moreMenu.exportCourseContent.label}
                 </Button>
               </Flex.Item>
             )}
