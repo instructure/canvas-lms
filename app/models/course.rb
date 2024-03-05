@@ -374,6 +374,12 @@ class Course < ActiveRecord::Base
     (attr.to_s == "asset_string") ? asset_string : super
   end
 
+  def grade_statuses
+    statuses = %w[late missing none excused]
+    statuses << "extended" if root_account.feature_enabled?(:extended_submission_state)
+    statuses
+  end
+
   def events_for(user)
     if user
       CalendarEvent
