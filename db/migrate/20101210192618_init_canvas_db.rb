@@ -569,6 +569,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.datetime :duplication_started_at
       t.datetime :importing_started_at
       t.integer :allowed_attempts
+      t.references :root_account, type: :bigint, index: true, foreign_key: { to_table: :accounts }, null: false
+      t.string :sis_source_id
     end
 
     add_index "assignments", ["assignment_group_id"], name: "index_assignments_on_assignment_group_id"
@@ -587,6 +589,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :assignments,
               :importing_started_at,
               where: "importing_started_at IS NOT NULL AND workflow_state = 'importing'"
+    add_index :assignments, [:sis_source_id, :root_account_id], where: "sis_source_id IS NOT NULL", unique: true
 
     create_table "attachment_associations", force: true do |t|
       t.integer "attachment_id", limit: 8
@@ -1199,6 +1202,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.boolean  "show_announcements_on_home_page"
       t.integer  "home_page_announcement_limit"
       t.integer :latest_outcome_import_id, limit: 8
+      t.string :grade_passback_setting, limit: 255
     end
 
     add_index "courses", ["account_id"], name: "index_courses_on_account_id"
@@ -1498,6 +1502,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.boolean :access_is_current, null: false, default: false
 
       t.integer :lock_version, default: 0, null: false
+      t.datetime :updated_at
     end
 
     add_index :enrollment_states, :enrollment_id, unique: true, name: "index_enrollment_states"
@@ -2938,9 +2943,11 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.string :old_filename, null: false
       t.string :old_display_name, limit: 255
       t.string :old_content_type, limit: 255
+      t.string :new_instfs_uuid
     end
     add_index :purgatories, :attachment_id, unique: true
     add_index :purgatories, :deleted_by_user_id
+    add_index :purgatories, :workflow_state
 
     create_table "quiz_groups", force: true do |t|
       t.integer  "quiz_id", limit: 8, null: false
@@ -3503,7 +3510,6 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer  "group_id", limit: 8
       t.text     "attachment_ids"
       t.boolean  "processed"
-      t.integer  "process_attempts", default: 0
       t.boolean  "grade_matches_current_submission"
       t.float    "published_score"
       t.string   "published_grade", limit: 255
@@ -3514,12 +3520,10 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.string   "media_comment_type", limit: 255
       t.integer  "quiz_submission_id", limit: 8
       t.integer  "submission_comments_count"
-      t.boolean  "has_rubric_assessment"
       t.integer  "attempt"
       t.string   "context_code", limit: 255
       t.integer  "media_object_id", limit: 8
       t.text     "turnitin_data"
-      t.boolean  "has_admin_comment", default: false, null: false
       t.datetime "cached_due_date"
       t.boolean  "excused"
       t.boolean  "graded_anonymously"
@@ -3769,6 +3773,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     end
     add_index :user_past_lti_ids, %w[user_id context_id context_type], name: "user_past_lti_ids_index", unique: true
     add_index :user_past_lti_ids, :user_id
+    add_index :user_past_lti_ids, :user_uuid
 
     create_table "user_services", force: true do |t|
       t.integer "user_id", limit: 8, null: false
@@ -3894,6 +3899,13 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     end
 
     add_index :versions, %i[versionable_id versionable_type number], unique: true, name: "index_versions_on_versionable_object_and_number"
+
+    create_table :viewed_submission_comments do |t|
+      t.integer :user_id, limit: 8, null: false
+      t.integer :submission_comment_id, limit: 8, null: false
+      t.datetime :viewed_at, null: false
+    end
+    add_index :viewed_submission_comments, [:user_id, :submission_comment_id], name: "index_viewed_submission_comments_user_comment", unique: true
 
     create_table "web_conference_participants", force: true do |t|
       t.integer  "user_id", limit: 8
@@ -4472,6 +4484,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :user_profile_links, :user_profiles
     add_foreign_key :user_profiles, :users
     add_foreign_key :user_services, :users
+    add_foreign_key :viewed_submission_comments, :submission_comments
+    add_foreign_key :viewed_submission_comments, :users
     add_foreign_key :web_conference_participants, :users
     add_foreign_key :web_conference_participants, :web_conferences
     add_foreign_key :web_conferences, :users
