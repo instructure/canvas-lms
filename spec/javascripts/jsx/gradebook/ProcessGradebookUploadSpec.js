@@ -556,7 +556,7 @@ test('handles a grade change to a single existing assignment', () => {
   requests[0].respond(200, {}, JSON.stringify(progressCompleted))
   clock.tick(3)
 
-  ok(goToGradebookStub.called, 'hyuka')
+  ok(goToGradebookStub.called)
 })
 
 test('handles a change to excused to a single existing assignment', () => {
