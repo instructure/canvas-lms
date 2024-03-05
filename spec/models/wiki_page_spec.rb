@@ -1150,7 +1150,9 @@ describe WikiPage do
     end
 
     it "generates multiple embeddings and doesn't split words" do
-      wiki_page_model(title: "test", body: "supercalifragilisticexpialidocious " * 228)
+      # 7997 bytes in total, would fit into two 4000-byte pages,
+      # but word splitting will push it into 3
+      wiki_page_model(title: "test", body: "testing123 " * 727)
       run_jobs
       expect(@page.reload.wiki_page_embeddings.count).to eq 3
     end
