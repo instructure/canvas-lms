@@ -51,6 +51,7 @@ describe LearningObjectDatesController do
                                  "unlock_at" => "2022-01-01T00:00:00Z",
                                  "lock_at" => "2022-01-03T01:00:00Z",
                                  "only_visible_to_overrides" => true,
+                                 "visible_to_everyone" => false,
                                  "overrides" => [{
                                    "id" => @override.id,
                                    "assignment_id" => @assignment.id,
@@ -77,6 +78,7 @@ describe LearningObjectDatesController do
                                  "unlock_at" => nil,
                                  "lock_at" => nil,
                                  "only_visible_to_overrides" => false,
+                                 "visible_to_everyone" => true,
                                  "overrides" => [{
                                    "id" => @override.id,
                                    "quiz_id" => @quiz.id,
@@ -135,6 +137,7 @@ describe LearningObjectDatesController do
                                  "unlock_at" => "2022-05-05T12:00:00Z",
                                  "lock_at" => "2022-05-07T12:00:00Z",
                                  "only_visible_to_overrides" => false,
+                                 "visible_to_everyone" => true,
                                  "overrides" => [{
                                    "id" => override.id,
                                    "assignment_id" => assignment.id,
@@ -163,6 +166,7 @@ describe LearningObjectDatesController do
                                  "unlock_at" => "2022-01-05T12:00:00Z",
                                  "lock_at" => "2022-03-05T12:00:00Z",
                                  "only_visible_to_overrides" => false,
+                                 "visible_to_everyone" => true,
                                  "overrides" => [{
                                    "id" => override.id,
                                    "discussion_topic_id" => discussion.id,
@@ -187,6 +191,7 @@ describe LearningObjectDatesController do
                                  "unlock_at" => "2022-01-05T00:00:00Z",
                                  "lock_at" => "2022-03-05T00:00:00Z",
                                  "only_visible_to_overrides" => false,
+                                 "visible_to_everyone" => true,
                                  "overrides" => [{
                                    "id" => override.id,
                                    "wiki_page_id" => wiki_page.id,
@@ -212,6 +217,7 @@ describe LearningObjectDatesController do
                                  "unlock_at" => "2022-01-05T00:00:00Z",
                                  "lock_at" => "2022-03-05T00:00:00Z",
                                  "only_visible_to_overrides" => false,
+                                 "visible_to_everyone" => true,
                                  "overrides" => [{
                                    "id" => override.id,
                                    "attachment_id" => attachment.id,

@@ -24,6 +24,7 @@ export interface BaseDateDetails {
   unlock_at: string | null
   lock_at: string | null
   only_visible_to_overrides: boolean
+  visible_to_everyone: boolean
 }
 
 export interface StudentInfo {
