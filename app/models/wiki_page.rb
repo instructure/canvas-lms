@@ -108,7 +108,7 @@ class WikiPage < ActiveRecord::Base
 
   def should_generate_embeddings?
     return false if deleted?
-    return false unless OpenAi.smart_search_available?(root_account)
+    return false unless OpenAi.smart_search_available?(context)
 
     saved_change_to_body? ||
       saved_change_to_title? ||
