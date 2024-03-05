@@ -42,6 +42,7 @@ const SUBMISSION_QUERY = gql`
           _id
           postedAt
           previewUrl
+          wordCount
           commentsConnection {
             nodes {
               id

@@ -742,4 +742,11 @@ describe Types::SubmissionType do
       expect(submission_type.resolve("previewUrl")).to eq expected_url
     end
   end
+
+  describe "wordCount" do
+    it "returns the word count" do
+      @submission.update!(body: "word " * 100)
+      expect(submission_type.resolve("wordCount")).to eq 100
+    end
+  end
 end

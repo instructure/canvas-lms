@@ -433,4 +433,7 @@ module Interfaces::SubmissionInterface
       )
     end
   end
+
+  field :word_count, Float, null: true
+  delegate :word_count, to: :object
 end
