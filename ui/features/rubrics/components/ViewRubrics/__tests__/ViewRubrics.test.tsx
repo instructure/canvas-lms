@@ -60,12 +60,12 @@ describe('ViewRubrics Tests', () => {
       expect(getByTestId('rubric-title-1')).toHaveTextContent('Rubric 3')
       expect(getByTestId('rubric-points-1')).toHaveTextContent('15')
       expect(getByTestId('rubric-criterion-count-1')).toHaveTextContent('3')
-      expect(getByTestId('rubric-locations-1')).toHaveTextContent('-')
+      expect(getByTestId('rubric-locations-1')).toHaveTextContent('courses and assignments')
 
       expect(getByTestId('rubric-title-1')).toHaveTextContent('Rubric 3')
       expect(getByTestId('rubric-points-1')).toHaveTextContent('15')
       expect(getByTestId('rubric-criterion-count-1')).toHaveTextContent('3')
-      expect(getByTestId('rubric-locations-1')).toHaveTextContent('-')
+      expect(getByTestId('rubric-locations-1')).toHaveTextContent('courses and assignments')
 
       const archivedRubricsTab = getByText('Archived')
       archivedRubricsTab.click()
@@ -206,6 +206,31 @@ describe('ViewRubrics Tests', () => {
         const sortedCriterion = ['3', '1']
         expect(getByTestId('rubric-criterion-count-0')).toHaveTextContent(sortedCriterion[1])
         expect(getByTestId('rubric-criterion-count-1')).toHaveTextContent(sortedCriterion[0])
+      })
+
+      it('sorts rubrics by Location Used in ascending order', () => {
+        queryClient.setQueryData(['accountRubrics-1'], RUBRICS_QUERY_RESPONSE)
+        const {getByTestId, getByText} = renderComponent()
+
+        const locationUsedHeader = getByText('Location Used')
+        fireEvent.click(locationUsedHeader)
+
+        const sortedLocations = ['courses and assignments', '-']
+        expect(getByTestId('rubric-locations-0')).toHaveTextContent(sortedLocations[0])
+        expect(getByTestId('rubric-locations-1')).toHaveTextContent(sortedLocations[1])
+      })
+
+      it('sorts rubrics by Location Used in descending order', () => {
+        queryClient.setQueryData(['accountRubrics-1'], RUBRICS_QUERY_RESPONSE)
+        const {getByTestId, getByText} = renderComponent()
+
+        const locationUsedHeader = getByText('Location Used')
+        fireEvent.click(locationUsedHeader)
+        fireEvent.click(locationUsedHeader)
+
+        const sortedLocations = ['-', 'courses and assignments']
+        expect(getByTestId('rubric-locations-0')).toHaveTextContent(sortedLocations[0])
+        expect(getByTestId('rubric-locations-1')).toHaveTextContent(sortedLocations[1])
       })
     })
   })
@@ -229,12 +254,12 @@ describe('ViewRubrics Tests', () => {
       expect(getByTestId('rubric-title-1')).toHaveTextContent('Rubric 3')
       expect(getByTestId('rubric-points-1')).toHaveTextContent('15')
       expect(getByTestId('rubric-criterion-count-1')).toHaveTextContent('3')
-      expect(getByTestId('rubric-locations-1')).toHaveTextContent('-')
+      expect(getByTestId('rubric-locations-1')).toHaveTextContent('courses and assignments')
 
       expect(getByTestId('rubric-title-1')).toHaveTextContent('Rubric 3')
       expect(getByTestId('rubric-points-1')).toHaveTextContent('15')
       expect(getByTestId('rubric-criterion-count-1')).toHaveTextContent('3')
-      expect(getByTestId('rubric-locations-1')).toHaveTextContent('-')
+      expect(getByTestId('rubric-locations-1')).toHaveTextContent('courses and assignments')
 
       const archivedRubricsTab = getByText('Archived')
       archivedRubricsTab.click()
@@ -375,6 +400,31 @@ describe('ViewRubrics Tests', () => {
         const sortedCriterion = ['3', '1']
         expect(getByTestId('rubric-criterion-count-0')).toHaveTextContent(sortedCriterion[1])
         expect(getByTestId('rubric-criterion-count-1')).toHaveTextContent(sortedCriterion[0])
+      })
+
+      it('sorts rubrics by Location Used in ascending order', () => {
+        queryClient.setQueryData(['courseRubrics-1'], RUBRICS_QUERY_RESPONSE)
+        const {getByTestId, getByText} = renderComponent()
+
+        const locationUsedHeader = getByText('Location Used')
+        fireEvent.click(locationUsedHeader)
+
+        const sortedLocations = ['courses and assignments', '-']
+        expect(getByTestId('rubric-locations-0')).toHaveTextContent(sortedLocations[0])
+        expect(getByTestId('rubric-locations-1')).toHaveTextContent(sortedLocations[1])
+      })
+
+      it('sorts rubrics by Location Used in descending order', () => {
+        queryClient.setQueryData(['courseRubrics-1'], RUBRICS_QUERY_RESPONSE)
+        const {getByTestId, getByText} = renderComponent()
+
+        const locationUsedHeader = getByText('Location Used')
+        fireEvent.click(locationUsedHeader)
+        fireEvent.click(locationUsedHeader)
+
+        const sortedLocations = ['-', 'courses and assignments']
+        expect(getByTestId('rubric-locations-0')).toHaveTextContent(sortedLocations[0])
+        expect(getByTestId('rubric-locations-1')).toHaveTextContent(sortedLocations[1])
       })
     })
   })

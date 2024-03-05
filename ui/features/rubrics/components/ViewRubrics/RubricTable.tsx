@@ -21,7 +21,6 @@ import {useNavigate, useParams} from 'react-router-dom'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import type {Rubric} from '@canvas/rubrics/react/types/rubric'
 import {Table} from '@instructure/ui-table'
-import {TruncateText} from '@instructure/ui-truncate-text'
 import {Link} from '@instructure/ui-link'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {RubricPopover} from './RubricPopover'
@@ -63,14 +62,15 @@ export const RubricTable = ({rubrics, onPreviewClick}: RubricTableProps) => {
       return sortDirection === 'ascending'
         ? a.criteriaCount - b.criteriaCount
         : b.criteriaCount - a.criteriaCount
-    }
-    // TODO - EVAL-3966 - Add sorting for LocationUsed by using hasRubricAssociations
-    // else if (sortedColumn === 'LocationUsed') {
-    // return sortDirection === 'ascending'
-    //   ? a.locations.join(', ').localeCompare(b.locations.join(', '))
-    //   : b.locations.join(', ').localeCompare(a.locations.join(', '))
-    // }
-    else {
+    } else if (sortedColumn === 'LocationUsed') {
+      return sortDirection === 'ascending'
+        ? a.hasRubricAssociations
+          ? -1
+          : 1
+        : a.hasRubricAssociations
+        ? 1
+        : -1
+    } else {
       // Default sorting by ID if no specific column is selected
       return a.id.localeCompare(b.id)
     }
@@ -132,9 +132,9 @@ export const RubricTable = ({rubrics, onPreviewClick}: RubricTableProps) => {
             <Cell data-testid={`rubric-points-${index}`}>{rubric.pointsPossible}</Cell>
             <Cell data-testid={`rubric-criterion-count-${index}`}>{rubric.criteriaCount}</Cell>
             <Cell data-testid={`rubric-locations-${index}`}>
-              {rubric.locations.length > 0 ? (
+              {rubric.hasRubricAssociations ? (
                 <Link forceButtonRole={true} isWithinText={false} onClick={() => {}}>
-                  <TruncateText>{rubric.locations.join(', ')}...</TruncateText>
+                  {I18n.t('courses and assignments')}
                 </Link>
               ) : (
                 '-'
