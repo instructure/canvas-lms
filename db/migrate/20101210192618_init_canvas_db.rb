@@ -838,6 +838,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer :content_migration_id, limit: 8
       t.string :context_type, limit: 255
       t.integer :context_id, limit: 8
+      t.boolean :global_identifiers, default: false, null: false
     end
 
     add_index :content_exports, :attachment_id
@@ -1734,6 +1735,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.string :feature, null: false, limit: 255
       t.string :state, default: "allowed", null: false, limit: 255
       t.timestamps null: false
+      t.string :visibility, limit: 255
+      t.string :manipulate, limit: 255
     end
     add_index :feature_flags, %i[context_id context_type feature], unique: true, name: "index_feature_flags_on_context_and_feature"
 
@@ -1753,6 +1756,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer  "cloned_item_id", limit: 8
       t.integer  "position"
       t.string   "submission_context_code", limit: 255
+      t.string :unique_type
     end
 
     add_index "folders", ["cloned_item_id"], name: "index_folders_on_cloned_item_id"
@@ -1760,6 +1764,10 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index "folders", ["parent_folder_id"], name: "index_folders_on_parent_folder_id"
     add_index :folders, [:context_id, :context_type], unique: true, name: "index_folders_on_context_id_and_context_type_for_root_folders", where: "parent_folder_id IS NULL AND workflow_state<>'deleted'"
     add_index :folders, [:submission_context_code, :parent_folder_id], unique: true
+    add_index :folders,
+              %i[unique_type context_id context_type],
+              unique: true,
+              where: "unique_type IS NOT NULL AND workflow_state <> 'deleted'"
 
     create_table :gradebook_csvs do |t|
       t.integer :user_id, limit: 8, null: false
@@ -2398,6 +2406,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.text :content,            null: false
 
       t.timestamps null: false
+      t.text :webvtt_content
     end
 
     add_index :media_tracks, [:media_object_id, :locale], name: "media_object_id_locale"
@@ -2609,6 +2618,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer :submission_id, limit: 8, null: false
       t.string :workflow_state, null: false, default: "pending"
       t.text :link_id
+      t.text :error_message
     end
     add_index :originality_reports, :attachment_id
     add_index :originality_reports, :originality_report_attachment_id, unique: true
@@ -4172,12 +4182,9 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :collaborators, :users
     add_foreign_key :communication_channels, :users
     add_foreign_key :content_exports, :attachments
-    add_foreign_key :content_exports, :content_migrations
     add_foreign_key :content_exports, :users
-    add_foreign_key :content_migrations, :attachments
     add_foreign_key :content_migrations, :attachments, column: :exported_attachment_id
     add_foreign_key :content_migrations, :attachments, column: :overview_attachment_id
-    add_foreign_key :content_migrations, :courses, column: :source_course_id
     add_foreign_key :content_migrations, :master_courses_child_subscriptions, column: :child_subscription_id
     add_foreign_key :content_migrations, :users
     add_foreign_key :content_participations, :users
@@ -4261,7 +4268,6 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :external_feed_entries, :users
     add_foreign_key :external_feeds, :users
     add_foreign_key :favorites, :users
-    add_foreign_key :folders, :cloned_items
     add_foreign_key :folders, :folders, column: :parent_folder_id
     add_foreign_key :gradebook_csvs, :courses
     add_foreign_key :gradebook_csvs, :progresses
