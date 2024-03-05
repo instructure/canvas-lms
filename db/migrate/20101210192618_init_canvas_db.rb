@@ -682,6 +682,11 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :attachments,
               %i[md5 namespace content_type],
               where: "root_attachment_id IS NULL and filename IS NOT NULL"
+    add_index :attachments,
+              %i[context_id context_type migration_id],
+              opclass: { migration_id: :text_pattern_ops },
+              where: "migration_id IS NOT NULL",
+              name: "index_attachments_on_context_and_migration_id_pattern_ops"
 
     create_table "calendar_events", force: true do |t|
       t.string   "title", limit: 255
@@ -870,6 +875,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :content_exports, :attachment_id
     add_index :content_exports, :content_migration_id
     add_index :content_exports, :user_id, where: "user_id IS NOT NULL"
+    add_index :content_exports, [:context_id, :context_type]
 
     create_table "content_migrations", force: true do |t|
       t.integer  "context_id", limit: 8, null: false
@@ -961,6 +967,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer  "associated_asset_id", limit: 8
       t.string   "associated_asset_type", limit: 255
       t.boolean  "new_tab"
+      t.jsonb :link_settings
     end
 
     add_index "content_tags", ["content_id", "content_type"], name: "index_content_tags_on_content_id_and_content_type"
@@ -1383,6 +1390,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.text :oidc_initiation_url
       t.string :public_jwk_url
       t.boolean :is_lti_key, default: false, null: false
+      t.boolean :allow_includes, default: false, null: false
     end
     add_index :developer_keys, :vendor_code
 
@@ -2077,6 +2085,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.datetime "submitted_at"
       t.boolean :hide_points, default: false, null: false
       t.boolean :hidden, default: false, null: false
+      t.string :user_uuid, limit: 255
     end
 
     add_index :learning_outcome_results,
@@ -2328,6 +2337,10 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
               name: "index_child_content_tags_on_content"
     add_index :master_courses_child_content_tags, :child_subscription_id, name: "index_child_content_tags_on_subscription"
     add_index :master_courses_child_content_tags, :migration_id, name: "index_child_content_tags_on_migration_id"
+    add_index :master_courses_child_content_tags,
+              [:child_subscription_id, :migration_id],
+              opclass: { migration_id: :text_pattern_ops },
+              name: "index_mc_child_content_tags_on_sub_and_migration_id_pattern_ops"
 
     create_table :master_courses_child_subscriptions do |t|
       t.integer :master_template_id, limit: 8, null: false
@@ -2585,6 +2598,33 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     end
     add_index :notification_endpoints, :access_token_id
     add_index :notification_endpoints, :workflow_state
+
+    create_table :notification_policy_overrides do |t|
+      t.belongs_to :context,
+                   polymorphic: { default: "Course" },
+                   null: false,
+                   index: { name: "index_notification_policy_overrides_on_context" },
+                   limit: 8
+      t.belongs_to :communication_channel, null: false, foreign_key: true, limit: 8, index: true
+      t.integer :notification_id, limit: 8
+      t.string :workflow_state, default: "active", null: false, index: true
+      t.string :frequency
+      t.timestamps null: false
+    end
+    add_index :notification_policy_overrides, :notification_id
+    add_index :notification_policy_overrides,
+              %i[communication_channel_id notification_id],
+              name: "index_notification_policies_overrides_on_cc_id_and_notification"
+    add_index :notification_policy_overrides,
+              %i[context_id context_type communication_channel_id notification_id],
+              where: "notification_id IS NOT NULL",
+              unique: true,
+              name: "index_notification_policies_overrides_uniq_context_notification"
+    add_index :notification_policy_overrides,
+              %i[context_id context_type communication_channel_id],
+              where: "notification_id IS NULL",
+              unique: true,
+              name: "index_notification_policies_overrides_uniq_context_and_cc"
 
     create_table "notification_policies", force: true do |t|
       t.integer  "notification_id", limit: 8
@@ -3584,6 +3624,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer :extra_attempts
       t.datetime :posted_at
       t.boolean :cached_quiz_lti, default: false, null: false
+      t.string :cached_tardiness, limit: 16
     end
 
     add_index "submissions", ["assignment_id", "submission_type"], name: "index_submissions_on_assignment_id_and_submission_type"
@@ -3628,6 +3669,10 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
               :user_id,
               where: "(score IS NOT NULL AND workflow_state = 'graded') OR excused = TRUE",
               name: "index_submissions_graded_or_excused_on_user_id"
+    add_index :submissions,
+              :assignment_id,
+              where: "workflow_state <> 'deleted' AND ((score IS NOT NULL AND workflow_state = 'graded') OR excused = TRUE)",
+              name: "index_submissions_graded_or_excused_on_assignment_id"
 
     # rubocop:disable Rails/SquishedSQLHeredocs
     execute(<<~SQL)
@@ -3825,6 +3870,14 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :user_past_lti_ids, %w[user_id context_id context_type], name: "user_past_lti_ids_index", unique: true
     add_index :user_past_lti_ids, :user_id
     add_index :user_past_lti_ids, :user_uuid
+
+    create_table :user_preference_values do |t|
+      t.integer :user_id, limit: 8, null: false
+      t.string :key, null: false
+      t.string :sub_key
+      t.text :value
+    end
+    add_index :user_preference_values, %i[user_id key sub_key], unique: true, name: "index_user_preference_values_on_keys"
 
     create_table "user_services", force: true do |t|
       t.integer "user_id", limit: 8, null: false
@@ -4440,6 +4493,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :moderation_graders, :users
     add_foreign_key :notification_endpoints, :access_tokens
     add_foreign_key :notification_policies, :communication_channels
+    add_foreign_key :notification_policy_overrides, :notifications
     add_foreign_key :oauth_requests, :users
     add_foreign_key :observer_alert_thresholds, :users
     add_foreign_key :observer_alert_thresholds, :users, column: :observer_id
@@ -4536,6 +4590,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :user_observers, :users
     add_foreign_key :user_observers, :users, column: :observer_id
     add_foreign_key :user_past_lti_ids, :users
+    add_foreign_key :user_preference_values, :users
     add_foreign_key :user_profile_links, :user_profiles
     add_foreign_key :user_profiles, :users
     add_foreign_key :user_services, :users

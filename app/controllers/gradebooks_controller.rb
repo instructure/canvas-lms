@@ -1230,7 +1230,6 @@ class GradebooksController < ApplicationController
 
   def change_gradebook_column_size
     if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
-      @current_user.migrate_preferences_if_needed
       sub_key = @current_user.shared_gradebook_column?(params[:column_id]) ? "shared" : @context.global_id
       size_hash = @current_user.get_preference(:gradebook_column_size, sub_key) || {}
       size_hash[params[:column_id]] = params[:column_size]
@@ -1409,7 +1408,6 @@ class GradebooksController < ApplicationController
 
   def change_gradebook_version
     update_preferred_gradebook_view!("gradebook")
-    @current_user.migrate_preferences_if_needed
     @current_user.set_preference(:gradebook_version, params[:version])
     redirect_to polymorphic_url([@context, :gradebook])
   end
@@ -1712,7 +1710,6 @@ class GradebooksController < ApplicationController
   end
 
   def gradebook_column_size_preferences
-    @current_user.migrate_preferences_if_needed
     @current_user.save if @current_user.changed?
     shared_settings = @current_user.get_preference(:gradebook_column_size, "shared") || {}
     course_settings = @current_user.get_preference(:gradebook_column_size, @context.global_id) || {}

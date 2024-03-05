@@ -69,34 +69,6 @@ class UserPreferenceValue < ActiveRecord::Base
   end
 
   module UserMethods
-    # i could just stuff all this in user.rb directly but it's so full already
-    def needs_preference_migration?
-      preferences.any? do |key, value|
-        UserPreferenceValue.settings[key] && value.present? && value != EXTERNAL
-      end
-    end
-
-    # can remove these when all preferences have been migrated
-    def migrate_preferences_if_needed
-      return unless needs_preference_migration?
-
-      reorganize_gradebook_preferences # may as well while we're at it
-      UserPreferenceValue.settings.each do |key, settings|
-        value = preferences[key]
-        next unless value.present?
-        next if value == EXTERNAL
-
-        if settings[:use_sub_keys]
-          value.each do |sub_key, sub_value|
-            create_user_preference_value(key, sub_key, sub_value)
-          end
-        else
-          create_user_preference_value(key, nil, value)
-        end
-        preferences[key] = EXTERNAL
-      end
-    end
-
     def get_preference(key, sub_key = nil)
       value = preferences[key]
       if value == EXTERNAL
@@ -121,9 +93,6 @@ class UserPreferenceValue < ActiveRecord::Base
         raise "wrong number of arguments"
       end
       raise "invalid key `#{key}`" unless UserPreferenceValue.settings[key]
-
-      # don't bother trying to merge things in - just move everything over
-      migrate_preferences_if_needed
 
       if value.present? || sub_key
         if value.nil?
