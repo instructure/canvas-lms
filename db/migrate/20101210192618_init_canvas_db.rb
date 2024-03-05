@@ -902,6 +902,21 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
               name: "index_content_participations_on_user_id_unread",
               where: "workflow_state = 'unread'"
 
+    create_table :content_shares do |t|
+      t.string :name, limit: 255, null: false
+      t.datetime :created_at, null: false
+      t.datetime :updated_at, null: false
+      t.integer :user_id, limit: 8, null: false
+      t.integer :content_export_id, limit: 8, null: false
+      t.integer :sender_id, limit: 8
+      t.string :read_state, limit: 255, null: false
+      t.string :type, limit: 255, null: false
+    end
+    add_index :content_shares,
+              %i[user_id content_export_id sender_id],
+              unique: true,
+              name: "index_content_shares_on_user_and_content_export_and_sender_ids"
+
     create_table "content_tags", force: true do |t|
       t.integer  "content_id", limit: 8
       t.string   "content_type", limit: 255
@@ -3476,6 +3491,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     create_table :submission_drafts do |t|
       t.integer :submission_id, limit: 8, null: false
       t.integer :submission_attempt, index: true, null: false
+      t.text :body
     end
     add_index :submission_drafts, :submission_id
 
@@ -4235,6 +4251,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :content_migrations, :master_courses_child_subscriptions, column: :child_subscription_id
     add_foreign_key :content_migrations, :users
     add_foreign_key :content_participations, :users
+    add_foreign_key :content_shares, :users
+    add_foreign_key :content_shares, :users, column: :sender_id
     add_foreign_key :content_tags, :cloned_items
     add_foreign_key :content_tags, :context_modules
     add_foreign_key :content_tags, :learning_outcomes
