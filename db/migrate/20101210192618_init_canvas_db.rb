@@ -1342,6 +1342,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.jsonb :public_jwk
       t.boolean :internal_service, default: false, null: false
       t.text :oidc_initiation_url
+      t.string :public_jwk_url
+      t.boolean :is_lti_key, default: false, null: false
     end
     add_index :developer_keys, :vendor_code
 
@@ -2102,6 +2104,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.timestamps null: false
       t.integer :client_id, limit: 8, null: false
       t.string :workflow_state, default: "active", null: false
+      t.jsonb :extensions, default: {}
     end
     add_index :lti_line_items, :tag
     add_index :lti_line_items, :resource_id
@@ -2193,6 +2196,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer :user_id, limit: 8, null: false
       t.timestamps null: false
       t.string :workflow_state, default: "active", null: false
+      t.jsonb :extensions, default: {}
     end
     add_index :lti_results, %i[lti_line_item_id user_id], unique: true
     add_index :lti_results, :submission_id
@@ -2631,11 +2635,13 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.string :workflow_state, null: false, default: "pending"
       t.text :link_id
       t.text :error_message
+      t.datetime :submission_time
     end
     add_index :originality_reports, :attachment_id
     add_index :originality_reports, :originality_report_attachment_id
     add_index :originality_reports, :submission_id
     add_index :originality_reports, [:workflow_state]
+    add_index :originality_reports, :submission_time
 
     create_table :outcome_import_errors do |t|
       t.integer :outcome_import_id, limit: 8, null: false
@@ -3526,6 +3532,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.datetime :last_comment_at
       t.integer :extra_attempts
       t.datetime :posted_at
+      t.boolean :cached_quiz_lti, default: false, null: false
     end
 
     add_index "submissions", ["assignment_id", "submission_type"], name: "index_submissions_on_assignment_id_and_submission_type"
