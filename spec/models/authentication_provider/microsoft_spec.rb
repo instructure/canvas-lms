@@ -18,33 +18,33 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-describe AuthenticationProvider::Facebook do
+describe AuthenticationProvider::Microsoft do
   it "accesses client_id from plugin settings" do
-    PluginSetting.create!(name: "facebook", settings: { app_id: "1234", app_secret: "secret" })
-    ap = AuthenticationProvider::Facebook.new
-    expect(ap.app_id).to eq "1234"
+    PluginSetting.create!(name: "microsoft", settings: { application_id: "1234", application_secret: "secret" })
+    ap = AuthenticationProvider::Microsoft.new
+    expect(ap.application_id).to eq "1234"
     expect(ap.client_id).to eq "1234"
-    expect(ap.app_secret).to eq "secret"
+    expect(ap.application_secret).to eq "secret"
     expect(ap.client_secret).to eq "secret"
-    ap.app_id = "5678"
-    ap.app_secret = "bogus"
-    expect(ap.app_id).to eq "1234"
+    ap.application_id = "5678"
+    ap.application_secret = "bogus"
+    expect(ap.application_id).to eq "1234"
     expect(ap.client_id).to eq "1234"
-    expect(ap.app_secret).to eq "secret"
+    expect(ap.application_secret).to eq "secret"
     expect(ap.client_secret).to eq "secret"
   end
 
   it "accesses client_id from itself" do
-    ap = AuthenticationProvider::Facebook.new
-    expect(ap.app_id).to be_nil
+    ap = AuthenticationProvider::Microsoft.new
+    expect(ap.application_id).to be_nil
     expect(ap.client_id).to be_nil
-    expect(ap.app_secret).to be_nil
+    expect(ap.application_secret).to be_nil
     expect(ap.client_secret).to be_nil
-    ap.app_id = "5678"
-    ap.app_secret = "secret"
-    expect(ap.app_id).to eq "5678"
+    ap.application_id = "5678"
+    ap.application_secret = "secret"
+    expect(ap.application_id).to eq "5678"
     expect(ap.client_id).to eq "5678"
-    expect(ap.app_secret).to eq "secret"
+    expect(ap.application_secret).to eq "secret"
     expect(ap.client_secret).to eq "secret"
   end
 end
