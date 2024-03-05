@@ -157,8 +157,11 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.datetime :end_at
     end
     add_index :account_reports, :attachment_id
-    add_index :account_reports, %i[account_id report_type updated_at], order: { updated_at: :desc }, name: "index_account_reports_latest_per_account"
     add_index :account_reports, :user_id
+    add_index :account_reports,
+              %i[account_id report_type created_at],
+              order: { created_at: :desc },
+              name: "index_account_reports_latest_of_type_per_account"
 
     create_table :account_notification_roles do |t|
       t.integer :account_notification_id, limit: 8, null: false
@@ -962,12 +965,14 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.string :app_center_id, limit: 255
       t.boolean :allow_membership_service_access, default: false, null: false
       t.integer :developer_key_id, limit: 8
+      t.integer :root_account_id, limit: 8
     end
     add_index :context_external_tools, [:tool_id]
     add_index :context_external_tools, [:context_id, :context_type]
     add_index :context_external_tools, %i[context_id context_type migration_id], where: "migration_id IS NOT NULL", name: "index_external_tools_on_context_and_migration_id"
     add_index :context_external_tools, :consumer_key
     add_index :context_external_tools, :developer_key_id
+    add_index :context_external_tools, :root_account_id
 
     create_table "context_module_progressions", force: true do |t|
       t.integer  "context_module_id", limit: 8
@@ -2096,11 +2101,13 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.references :assignment, foreign_key: true, null: false, limit: 8, index: true
       t.timestamps null: false
       t.integer :client_id, limit: 8, null: false
+      t.string :workflow_state, default: "active", null: false
     end
     add_index :lti_line_items, :tag
     add_index :lti_line_items, :resource_id
     add_index :lti_line_items, :lti_resource_link_id
     add_index :lti_line_items, :client_id
+    add_index :lti_line_items, :workflow_state
 
     create_table :lti_links do |t|
       t.string :resource_link_id, null: false
@@ -2159,8 +2166,10 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.string :resource_link_id, null: false
       t.timestamps null: false
       t.references :context_external_tool, type: :bigint, foreign_key: { to_table: :context_external_tools }, index: true, null: false
+      t.string :workflow_state, default: "active", null: false
     end
     add_index :lti_resource_links, :resource_link_id, unique: true
+    add_index :lti_resource_links, :workflow_state
 
     create_table :lti_resource_placements do |t|
       t.string :placement, null: false, limit: 255
@@ -2183,10 +2192,12 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer :submission_id, limit: 8
       t.integer :user_id, limit: 8, null: false
       t.timestamps null: false
+      t.string :workflow_state, default: "active", null: false
     end
     add_index :lti_results, %i[lti_line_item_id user_id], unique: true
     add_index :lti_results, :submission_id
     add_index :lti_results, :user_id
+    add_index :lti_results, :workflow_state
 
     create_table :lti_tool_configurations do |t|
       t.references :developer_key, null: false, foreign_key: true, index: false, limit: 8
@@ -2622,7 +2633,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.text :error_message
     end
     add_index :originality_reports, :attachment_id
-    add_index :originality_reports, :originality_report_attachment_id, unique: true
+    add_index :originality_reports, :originality_report_attachment_id
     add_index :originality_reports, :submission_id
     add_index :originality_reports, [:workflow_state]
 
@@ -3438,6 +3449,22 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :submission_comments, :draft
     add_index :submission_comments, :provisional_grade_id, where: "provisional_grade_id IS NOT NULL"
     add_index :submission_comments, :attempt
+
+    create_table :submission_draft_attachments do |t|
+      t.integer :submission_draft_id, limit: 8, null: false
+      t.integer :attachment_id, limit: 8, index: true, null: false
+    end
+    add_index :submission_draft_attachments, :submission_draft_id
+    add_index :submission_draft_attachments,
+              [:submission_draft_id, :attachment_id],
+              name: "index_submission_draft_and_attachment_unique",
+              unique: true
+
+    create_table :submission_drafts do |t|
+      t.integer :submission_id, limit: 8, null: false
+      t.integer :submission_attempt, index: true, null: false
+    end
+    add_index :submission_drafts, :submission_id
 
     create_table :submission_versions do |t|
       t.integer  "context_id", limit: 8
@@ -4413,6 +4440,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :submission_comments, :moderated_grading_provisional_grades, column: :provisional_grade_id
     add_foreign_key :submission_comments, :submissions
     add_foreign_key :submission_comments, :users, column: :author_id
+    add_foreign_key :submission_draft_attachments, :submission_drafts
+    add_foreign_key :submission_drafts, :submissions
     add_foreign_key :submissions, :assignments
     add_foreign_key :submissions, :grading_periods
     add_foreign_key :submissions, :groups
