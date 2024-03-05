@@ -272,18 +272,11 @@ module Lti
       end
 
       def line_item_id(line_item)
-        if line_item.root_account.feature_enabled?(:consistent_ags_ids_based_on_account_principal_domain)
-          lti_line_item_show_url(
-            host: line_item.root_account.environment_specific_domain,
-            course_id: params[:course_id],
-            id: line_item.id
-          )
-        else
-          lti_line_item_show_url(
-            course_id: params[:course_id],
-            id: line_item.id
-          )
-        end
+        lti_line_item_show_url(
+          host: line_item.root_account.environment_specific_domain,
+          course_id: params[:course_id],
+          id: line_item.id
+        )
       end
 
       def update_assignment!
