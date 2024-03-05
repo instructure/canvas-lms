@@ -3440,6 +3440,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
               name: "index_submission_versions",
               where: "context_type='Course'",
               unique: true
+    add_index :submission_versions, :version_id
 
     create_table "submissions", force: true do |t|
       t.text     "body", limit: 16_777_215
@@ -3661,6 +3662,14 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :user_merge_data, :user_id
     add_index :user_merge_data, :from_user_id
 
+    create_table :user_merge_data_items do |t|
+      t.references :user_merge_data, foreign_key: true, index: true, null: false, limit: 8
+      t.integer :user_id, limit: 8, null: false
+      t.string :item_type, null: false, limit: 255
+      t.text :item, null: false
+    end
+    add_index :user_merge_data_items, :user_id
+
     create_table :user_merge_data_records do |t|
       t.integer :user_merge_data_id, limit: 8, null: false
       t.integer :context_id, limit: 8, null: false
@@ -3694,7 +3703,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.string  :workflow_state, default: "active", null: false, limit: 255
       t.timestamps null: true
       t.integer :sis_batch_id, limit: 8
-      t.integer :root_account_id, limit: 8
+      t.integer :root_account_id, limit: 8, null: false
     end
     add_index :user_observers, :observer_id
     add_index :user_observers, :workflow_state
@@ -4398,6 +4407,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :user_account_associations, :accounts
     add_foreign_key :user_account_associations, :users
     add_foreign_key :user_merge_data, :users
+    add_foreign_key :user_merge_data_items, :users
     add_foreign_key :user_merge_data_records, :user_merge_data, column: :user_merge_data_id
     add_foreign_key :user_notes, :users
     add_foreign_key :user_notes, :users, column: :created_by_id
