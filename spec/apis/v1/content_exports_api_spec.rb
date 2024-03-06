@@ -221,6 +221,23 @@ describe ContentExportsApiController, type: :request do
         expect(json["new_quizzes_export_url"]).to eql ""
       end
     end
+
+    context "when the new_quizzes_export succeeds" do
+      it "exports the export" do
+        @past = past_export
+        json = api_call_as_user(user,
+                                :put,
+                                "/api/v1/courses/#{t_course.id}/content_exports/#{@past.id}",
+                                { controller: "content_exports_api", action: "update", format: "json", course_id: t_course.to_param, id: @past.to_param },
+                                { content_export: { new_quizzes_export_url: "https://some.url", new_quizzes_export_state: "completed" } })
+        expect(json["id"]).to eql @past.id
+        expect(json["export_type"]).to eql "common_cartridge"
+        expect(json["course_id"]).to eql t_course.id
+        expect(json["new_quizzes_export_state"]).to eql "completed"
+        expect(json["workflow_state"]).to eql "exported"
+        expect(json["new_quizzes_export_url"]).to eql "https://some.url"
+      end
+    end
   end
 
   describe "show" do
