@@ -25,7 +25,7 @@ import type {
 } from '../types/Rubric'
 import getCookie from '@instructure/get-cookie'
 import qs from 'qs'
-import type {RubricCriterion} from '@canvas/rubrics/react/types/rubric'
+import type {Rubric, RubricCriterion} from '@canvas/rubrics/react/types/rubric'
 
 const COURSE_RUBRICS_QUERY = gql`
   query CourseRubricsQuery($courseId: ID!) {
@@ -89,6 +89,27 @@ const ACCOUNT_RUBRICS_QUERY = gql`
   }
 `
 
+const RUBRIC_PREVIEW_QUERY = gql`
+  query RubricQuery($id: ID!) {
+    rubric(id: $id) {
+      criteria {
+        id: _id
+        ratings {
+          description
+          longDescription
+          points
+        }
+        points
+        longDescription
+        description
+        criterionUseRange
+      }
+      title
+      ratingOrder
+    }
+  }
+`
+
 type AccountRubricsQueryVariables = {
   accountId: string
   courseId?: never
@@ -101,6 +122,10 @@ type CourseRubricsQueryVariables = {
 
 type CourseRubricQueryResponse = {
   course: RubricQueryResponse
+}
+
+type RubricPreviewQueryResponse = {
+  rubric: Pick<Rubric, 'criteria' | 'title' | 'ratingOrder'>
 }
 
 type AccountRubricQueryResponse = {
@@ -141,6 +166,13 @@ export const fetchAccountRubrics = async (queryVariables: FetchRubricVariables) 
     queryVariables
   )
   return account
+}
+
+export const fetchRubricCriterion = async (id?: string) => {
+  if (!id) return
+
+  const {rubric} = await executeQuery<RubricPreviewQueryResponse>(RUBRIC_PREVIEW_QUERY, {id})
+  return rubric
 }
 
 export const deleteRubric = async ({

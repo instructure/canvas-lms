@@ -207,3 +207,9 @@ export const RUBRICS_QUERY_RESPONSE: RubricQueryResponse = {
     nodes: RUBRICS_DATA,
   },
 }
+
+export const RUBRIC_PREVIEW_QUERY_RESPONSE: Pick<Rubric, 'criteria' | 'title' | 'ratingOrder'> = {
+  criteria: RUBRICS_DATA[0].criteria,
+  title: RUBRICS_DATA[0].title,
+  ratingOrder: RUBRICS_DATA[0].ratingOrder,
+}

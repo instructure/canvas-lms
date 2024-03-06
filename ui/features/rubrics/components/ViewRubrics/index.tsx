@@ -36,7 +36,9 @@ import {
   type FetchRubricVariables,
   fetchAccountRubrics,
   fetchCourseRubrics,
+  fetchRubricCriterion,
 } from '../../queries/ViewRubricQueries'
+import {RubricAssessmentTray} from '@canvas/rubrics/react/RubricAssessment'
 
 const {Item: FlexItem} = Flex
 
@@ -53,6 +55,8 @@ export const ViewRubrics = () => {
   const isAccount = !!accountId
   const isCourse = !!courseId
   const [selectedTab, setSelectedTab] = useState<string | undefined>(TABS.saved)
+  const [isPreviewTrayOpen, setIsPreviewTrayOpen] = useState(false)
+  const [rubricIdForPreview, setRubricIdForPreview] = useState<string | undefined>(undefined)
 
   let queryVariables: FetchRubricVariables
   let fetchQuery: (queryVariables: FetchRubricVariables) => Promise<RubricQueryResponse>
@@ -71,6 +75,12 @@ export const ViewRubrics = () => {
   const {data, isLoading} = useQuery({
     queryKey: [queryKey],
     queryFn: async () => fetchQuery(queryVariables),
+  })
+
+  const {data: rubricPreview, isLoading: isLoadingPreview} = useQuery({
+    queryKey: [`rubric-preview-${rubricIdForPreview}`],
+    queryFn: async () => fetchRubricCriterion(rubricIdForPreview),
+    enabled: !!rubricIdForPreview,
   })
 
   if (isLoading) {
@@ -105,6 +115,17 @@ export const ViewRubrics = () => {
     },
     {activeRubrics: [] as Rubric[], archivedRubrics: [] as Rubric[]}
   )
+
+  const handlePreviewClick = (rubricId: string) => {
+    if (rubricIdForPreview === rubricId) {
+      setRubricIdForPreview(undefined)
+      setIsPreviewTrayOpen(false)
+      return
+    }
+
+    setRubricIdForPreview(rubricId)
+    setIsPreviewTrayOpen(true)
+  }
 
   return (
     <View as="div">
@@ -148,7 +169,10 @@ export const ViewRubrics = () => {
           padding="none"
         >
           <View as="div" margin="medium 0" data-testid="saved-rubrics-table">
-            <RubricTable rubrics={activeRubrics} />
+            <RubricTable
+              rubrics={activeRubrics}
+              onPreviewClick={rubricId => handlePreviewClick(rubricId)}
+            />
           </View>
         </Tabs.Panel>
         <Tabs.Panel
@@ -159,10 +183,22 @@ export const ViewRubrics = () => {
           padding="none"
         >
           <View as="div" margin="medium 0" data-testid="archived-rubrics-table">
-            <RubricTable rubrics={archivedRubrics} />
+            <RubricTable
+              rubrics={archivedRubrics}
+              onPreviewClick={rubricId => handlePreviewClick(rubricId)}
+            />
           </View>
         </Tabs.Panel>
       </Tabs>
+
+      <RubricAssessmentTray
+        isLoading={isLoadingPreview}
+        isOpen={isPreviewTrayOpen}
+        isPreviewMode={true}
+        rubric={rubricPreview}
+        rubricAssessmentData={[]}
+        onDismiss={() => setIsPreviewTrayOpen(false)}
+      />
     </View>
   )
 }

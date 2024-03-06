@@ -33,10 +33,10 @@ const {Head, Row, Cell, ColHeader, Body} = Table
 
 export type RubricTableProps = {
   rubrics: Rubric[]
+  onPreviewClick: (rubricId: string) => void
 }
 
-export const RubricTable = ({rubrics}: RubricTableProps) => {
-  const navigate = useNavigate()
+export const RubricTable = ({rubrics, onPreviewClick}: RubricTableProps) => {
   const {accountId, courseId} = useParams()
   const [sortDirection, setSortDirection] = useState<'ascending' | 'descending' | 'none'>('none')
   const [sortedColumn, setSortedColumn] = useState<string>() // Track the column being sorted
@@ -122,7 +122,8 @@ export const RubricTable = ({rubrics}: RubricTableProps) => {
               <Link
                 forceButtonRole={true}
                 isWithinText={false}
-                onClick={() => navigate(`./${rubric.id}`)}
+                data-testid={`rubric-title-preview-${rubric.id}`}
+                onClick={() => onPreviewClick(rubric.id)}
               >
                 {rubric.title}
               </Link>
