@@ -119,6 +119,8 @@ window.messageStudents = function (settings) {
           .closest('.ui-dialog')
           .attr('role', 'dialog')
           .attr('aria-label', dialogTitle)
+          .find('select')
+          .trigger('change')
       },
       close: (_event, _ui) => {
         $message_students_dialog.closest('.ui-dialog').removeAttr('role').removeAttr('aria-label')
