@@ -797,6 +797,41 @@ describe "conversations new" do
           expect(ff("[data-testid='address-book-tag']").count).to eq 2
         end
       end
+
+      it "clears out selected recipients when user changes the course" do
+        @course1 = @course
+        @course2 = course_factory(active_course: true, course_name: "Course 2")
+        @course2.enroll_teacher(@teacher)
+        @course3 = course_factory(active_course: true, course_name: "Course 3")
+        @course3.enroll_teacher(@teacher).update_attribute(:workflow_state, "active")
+        @course3.enroll_student(@s1).update_attribute(:workflow_state, "active")
+
+        get "/conversations"
+
+        # Select course with student
+        f("button[data-testid='compose']").click
+        f("input[placeholder='Select Course']").click
+        fj("li:contains('#{@course3.name}')").click
+        wait_for_ajaximations
+
+        # Select student, verify that the recipient role pill is displayed
+        ff("input[aria-label='Search']")[1].click
+        fj("div[data-testid='address-book-item']:contains('Students')").click
+        wait_for_ajaximations
+        fj("div[data-testid='address-book-item']:contains('#{@s1.name}')").click
+        expect(fj("span[data-testid='address-book-tag']:contains('#{@s1.name}')")).to be_present
+
+        # Change the course by clicking the course dropdown without clearing course
+        f("input[placeholder='Select Course']").click
+        f("input[placeholder='Select Course']").send_keys :backspace
+
+        # Select a new course, should clear out recipients
+        ffj("li:contains('#{@course2.name}')")[1].click
+
+        # Verify that the send validations verify that there are no selected recipients
+        fj("button:contains('Send')").click
+        expect(ffj("span:contains('Please select a recipient.')")[1]).to be_displayed
+      end
     end
   end
 

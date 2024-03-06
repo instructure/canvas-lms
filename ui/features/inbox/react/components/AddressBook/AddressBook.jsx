@@ -251,12 +251,7 @@ export const AddressBook = ({
   }, [fetchMoreMenuData, hasMoreMenuData, menuItemCurrent])
 
   useEffect(() => {
-    if (
-      activeCourseFilter?.contextID === null &&
-      activeCourseFilter?.contextName === null &&
-      selectedRecipients.length === 0 &&
-      selectedMenuItems.length !== 0
-    ) {
+    if (selectedRecipients.length === 0 && selectedMenuItems.length !== 0) {
       onSelectedIdsChange([])
       setSelectedMenuItems([])
     }
