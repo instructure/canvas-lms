@@ -19,10 +19,10 @@
 import React from 'react'
 import Router from 'react-router'
 import {BrowserRouter} from 'react-router-dom'
-import {fireEvent, render} from '@testing-library/react'
+import {fireEvent, render, waitFor} from '@testing-library/react'
 import {QueryProvider, queryClient} from '@canvas/query'
 import {ViewRubrics} from '../index'
-import {RUBRICS_QUERY_RESPONSE} from './fixtures'
+import {RUBRICS_QUERY_RESPONSE, RUBRIC_PREVIEW_QUERY_RESPONSE} from './fixtures'
 
 jest.mock('react-router', () => ({
   ...jest.requireActual('react-router'),
@@ -376,6 +376,40 @@ describe('ViewRubrics Tests', () => {
         expect(getByTestId('rubric-criterion-count-0')).toHaveTextContent(sortedCriterion[1])
         expect(getByTestId('rubric-criterion-count-1')).toHaveTextContent(sortedCriterion[0])
       })
+    })
+  })
+
+  describe('preview tray', () => {
+    beforeAll(() => {
+      jest.spyOn(Router, 'useParams').mockReturnValue({accountId: '1'})
+    })
+
+    const getPreviewTray = () => {
+      return document.querySelector('[role="dialog"][aria-label="Rubric Assessment Tray"]')
+    }
+
+    queryClient.setQueryData(['accountRubrics-1'], RUBRICS_QUERY_RESPONSE)
+    queryClient.setQueryData(['rubric-preview-1'], RUBRIC_PREVIEW_QUERY_RESPONSE)
+
+    it('opens the preview tray when a rubric is clicked', () => {
+      const {getByTestId} = renderComponent()
+
+      const previewCell = getByTestId('rubric-title-preview-1')
+      previewCell.click()
+
+      expect(getPreviewTray()).toBeInTheDocument()
+      expect(getByTestId('traditional-criterion-1-ratings-0')).toBeInTheDocument()
+    })
+
+    it('closes the preview tray when the same rubric is clicked again', async () => {
+      const {getByTestId} = renderComponent()
+
+      const previewCell = getByTestId('rubric-title-preview-1')
+      previewCell.click()
+      expect(getByTestId('traditional-criterion-1-ratings-0')).toBeInTheDocument()
+
+      previewCell.click()
+      await waitFor(() => expect(getPreviewTray()).not.toBeInTheDocument())
     })
   })
 })

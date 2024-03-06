@@ -18,6 +18,7 @@
 
 import React, {useEffect, useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import LoadingIndicator from '@canvas/loading-indicator'
 import {Tray} from '@instructure/ui-tray'
 import {RubricAssessmentContainer, type ViewMode} from './RubricAssessmentContainer'
 import type {Rubric, RubricAssessmentData} from '../types/rubric'
@@ -25,14 +26,16 @@ import type {Rubric, RubricAssessmentData} from '../types/rubric'
 const I18n = useI18nScope('rubrics-assessment-tray')
 
 export type RubricAssessmentTrayProps = {
+  isLoading?: boolean
   isOpen: boolean
   isPreviewMode: boolean
-  rubric: Pick<Rubric, 'title' | 'criteria' | 'ratingOrder'>
+  rubric?: Pick<Rubric, 'title' | 'criteria' | 'ratingOrder'>
   rubricAssessmentData: RubricAssessmentData[]
   onDismiss: () => void
 }
 export const RubricAssessmentTray = ({
   isOpen,
+  isLoading = false,
   isPreviewMode,
   rubric,
   rubricAssessmentData,
@@ -73,24 +76,28 @@ export const RubricAssessmentTray = ({
 
   return (
     <Tray
-      label={I18n.t('Rubric Assessment')}
+      label={I18n.t('Rubric Assessment Tray')}
       open={isOpen}
       onDismiss={onDismiss}
       placement="end"
       shouldCloseOnDocumentClick={false}
       size={viewMode === 'traditional' ? 'large' : 'small'}
     >
-      <RubricAssessmentContainer
-        criteria={rubric.criteria ?? []}
-        isPreviewMode={isPreviewMode}
-        ratingOrder={rubric.ratingOrder ?? 'descending'}
-        rubricTitle={rubric.title}
-        rubricAssessmentData={rubricAssessmentDraftData}
-        selectedViewMode={viewMode}
-        onDismiss={onDismiss}
-        onViewModeChange={mode => setViewMode(mode)}
-        onUpdateAssessmentData={onUpdateAssessmentData}
-      />
+      {isLoading || !rubric ? (
+        <LoadingIndicator />
+      ) : (
+        <RubricAssessmentContainer
+          criteria={rubric.criteria ?? []}
+          isPreviewMode={isPreviewMode}
+          ratingOrder={rubric.ratingOrder ?? 'descending'}
+          rubricTitle={rubric.title}
+          rubricAssessmentData={rubricAssessmentDraftData}
+          selectedViewMode={viewMode}
+          onDismiss={onDismiss}
+          onViewModeChange={mode => setViewMode(mode)}
+          onUpdateAssessmentData={onUpdateAssessmentData}
+        />
+      )}
     </Tray>
   )
 }
