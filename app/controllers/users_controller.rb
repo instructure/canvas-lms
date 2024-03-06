@@ -1356,7 +1356,7 @@ class UsersController < ApplicationController
 
       @context_account = @context.is_a?(Account) ? @context : @domain_root_account
       @user = api_find_all(@context&.all_users || User, [params[:id]]).first
-      if !@user && @context.is_a?(Account) && Account.site_admin.feature_enabled?(:deleted_user_tools)
+      if !@user && @context.is_a?(Account)
         @user = api_find_all(@context&.deleted_users, [params[:id]]).first
       end
       allowed = @user&.grants_right?(@current_user, session, :read_full_profile)

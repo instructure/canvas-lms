@@ -352,7 +352,6 @@ class ApplicationController < ActionController::Base
   JS_ENV_SITE_ADMIN_FEATURES = %i[
     featured_help_links
     account_level_blackout_dates
-    deleted_user_tools
     render_both_to_do_lists
     course_paces_redesign
     course_paces_for_students
