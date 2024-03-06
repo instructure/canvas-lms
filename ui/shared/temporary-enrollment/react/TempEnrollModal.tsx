@@ -95,6 +95,7 @@ export function TempEnrollModal(props: Props) {
   const [isViewingAssignFromEdit, setIsViewingAssignFromEdit] = useState(false)
   const [buttonsDisabled, setButtonsDisabled] = useState(true)
   const [loading, setLoading] = useState(false)
+  const [wasReset, setWasReset] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isModalOpenAnimationComplete, setIsModalOpenAnimationComplete] = useState(false)
   const [tempEnrollmentsPairing, setTempEnrollmentsPairing] = useState<Enrollment[] | null>(null)
@@ -143,6 +144,7 @@ export function TempEnrollModal(props: Props) {
   const handleModalReset = () => {
     setPage(0)
     setEnrollment(null)
+    setWasReset(true)
     setTempEnrollmentsPairing(null)
     setIsViewingAssignFromEdit(false)
     setIsFetchEnrollmentDataComplete(false)
@@ -292,6 +294,7 @@ export function TempEnrollModal(props: Props) {
           searchFail={handleModalReset}
           searchSuccess={handleSetEnrollmentFromSearch}
           foundUser={enrollment}
+          wasReset={wasReset}
         />
       )
     }
@@ -333,7 +336,7 @@ export function TempEnrollModal(props: Props) {
         !props.isEditMode && (
           <Flex.Item key="nextOrSubmit">
             <Button
-              disabled={buttonsDisabled}
+              disabled={buttonsDisabled || (enrollment === null && page === 1)}
               color="primary"
               onClick={handleGoForward}
               {...analyticProps(page === 2 ? 'Submit' : 'Next')}
