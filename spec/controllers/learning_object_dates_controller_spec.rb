@@ -305,6 +305,31 @@ describe LearningObjectDatesController do
       get :show, params: { course_id: @course.id, assignment_id: @assignment.id }
       expect(response).to be_not_found
     end
+
+    context "on blueprint child courses" do
+      before :once do
+        @child_course = @course
+        @child_assignment = @assignment
+        master_template = MasterCourses::MasterTemplate.set_as_master_course(course_model)
+        child_subscription = master_template.add_child_course!(@child_course)
+        MasterCourses::ChildContentTag.create!(child_subscription:, content: @child_assignment)
+        @mct = MasterCourses::MasterContentTag.create!(master_template:, content: assignment_model)
+        @child_assignment.update! migration_id: @mct.migration_id
+      end
+
+      it "returns an empty blueprint_date_locks prop for unlocked child content" do
+        get :show, params: { course_id: @child_course.id, assignment_id: @child_assignment.id }
+        expect(response).to be_successful
+        expect(json_parse).to include({ "blueprint_date_locks" => [] })
+      end
+
+      it "returns the proper blueprint_locks for locked child content" do
+        @mct.update_attribute(:restrictions, { availability_dates: true })
+        get :show, params: { course_id: @child_course.id, assignment_id: @child_assignment.id }
+        expect(response).to be_successful
+        expect(json_parse).to include({ "blueprint_date_locks" => ["availability_dates"] })
+      end
+    end
   end
 
   describe "PUT 'update'" do

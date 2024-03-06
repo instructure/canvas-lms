@@ -73,8 +73,11 @@ export interface ItemAssignToCardSpec {
   highlightCard?: boolean
 }
 
+export type DateLockTypes = 'due_dates' | 'availability_dates'
+
 export interface DateDetails extends BaseDateDetails {
   overrides?: DateDetailsOverride[]
+  blueprint_date_locks?: DateLockTypes[]
 }
 
 export interface DateDetailsPayload extends BaseDateDetails {

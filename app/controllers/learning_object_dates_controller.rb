@@ -52,6 +52,12 @@
 #           "example": false,
 #           "type": "boolean"
 #         },
+#         "blueprint_date_locks": {
+#           "description": "[exclusive to blueprint child content only] list of lock types",
+#           "example": ["due_dates", "availability_dates"],
+#           "type": "array",
+#           "items": {"type": "string"}
+#         },
 #         "overrides": {
 #           "description": "paginated list of AssignmentOverride objects",
 #           "type": "array",
@@ -82,7 +88,8 @@ class LearningObjectDatesController < ApplicationController
     overrides = Api.paginate(overridable.all_assignment_overrides.active, self, route)
     render json: {
       **learning_object_dates_json(asset, overridable),
-      overrides: assignment_overrides_json(overrides, @current_user, include_names: true)
+      **blueprint_date_locks_json(asset),
+      overrides: assignment_overrides_json(overrides, @current_user, include_names: true),
     }
   end
 

@@ -28,6 +28,7 @@ module Api::V1::LearningObjectDates
     lock_at
     only_visible_to_overrides
   ].freeze
+  LOCKABLE_PSEUDO_COLUMNS = %i[due_dates availability_dates].freeze
 
   def learning_object_dates_json(learning_object, overridable)
     hash = learning_object.slice(BASE_FIELDS)
@@ -35,5 +36,11 @@ module Api::V1::LearningObjectDates
       hash[field] = overridable.send(field) if overridable.respond_to?(field)
     end
     hash
+  end
+
+  def blueprint_date_locks_json(learning_object)
+    return {} unless learning_object.try(:is_child_content?)
+
+    { blueprint_date_locks: learning_object.child_content_restrictions.filter_map { |k, v| k if LOCKABLE_PSEUDO_COLUMNS.include?(k) && v } }
   end
 end
