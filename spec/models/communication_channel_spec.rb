@@ -130,6 +130,16 @@ describe CommunicationChannel do
     expect(@cc.state).to be(:active)
   end
 
+  it "creates notification policies when confirmed if there are Notifications" do
+    Notification.create!(name: "Confirm Email Communication Channel", category: "Registration")
+    communication_channel_model
+    expect(@cc.state).to be(:unconfirmed)
+    expect(@cc.notification_policies).to be_empty
+
+    @cc.confirm
+    expect(@cc.notification_policies).not_to be_empty
+  end
+
   it "resets the bounce count when being reactivated" do
     communication_channel_model
     @cc.confirm
