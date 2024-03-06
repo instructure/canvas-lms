@@ -188,7 +188,7 @@ $(document).ready(function () {
       const tabId =
         event.type === 'tabscreate'
           ? window.location.hash.replace('#', '') + '-link'
-          : ui.newTab.context.id
+          : $(ui.newTab.get(0)).children('a').get(0).id
 
       if (tabId === 'tab-reports-link' && !reportsTabHasLoaded) {
         reportsTabHasLoaded = true
