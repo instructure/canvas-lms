@@ -66,7 +66,7 @@ $(function () {
     // see placeholder in _alerts.html.erb
     contentHtml = contentHtml.replace(
       '%{count}',
-      "<span class='displaying' /><input type='text' name='alert[criteria][][threshold]' class='editing' size='2' />"
+      "<span class='displaying'></span><input type='text' name='alert[criteria][][threshold]' class='editing' size='2'></input>"
     )
     $element.html(contentHtml)
     if (element === 'li') {
@@ -114,7 +114,7 @@ $(function () {
         .prop('value', threshold)
         .attr('title', ENV.ALERTS.POSSIBLE_CRITERIA[criterion_type].title)
       $element.prepend(
-        $("<input type='hidden' name='alert[criteria][][criterion_type]' />").attr(
+        $("<input type='hidden' name='alert[criteria][][criterion_type]' />").prop(
           'value',
           criterion_type
         )
