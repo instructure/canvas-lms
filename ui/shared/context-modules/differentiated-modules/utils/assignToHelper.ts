@@ -72,9 +72,9 @@ export const generateDateDetailsPayload = (cards: ItemAssignToCardSpec[]) => {
   const everyoneCard = cards.find(card => card.selectedAssigneeIds.includes('everyone'))
   const overrideCards = cards.filter(card => card.key !== 'everyone')
   if (everyoneCard !== undefined) {
-    payload.due_at = everyoneCard.due_at
-    payload.unlock_at = everyoneCard.unlock_at
-    payload.lock_at = everyoneCard.lock_at
+    payload.due_at = everyoneCard.due_at || null
+    payload.unlock_at = everyoneCard.unlock_at || null
+    payload.lock_at = everyoneCard.lock_at || null
     payload.only_visible_to_overrides = false
   } else {
     payload.only_visible_to_overrides = true
