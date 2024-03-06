@@ -661,6 +661,10 @@ class ContentExport < ActiveRecord::Base
     settings[:new_quizzes_export_state] == "failed"
   end
 
+  def new_quizzes_export_state_completed?
+    settings[:new_quizzes_export_state] == "completed"
+  end
+
   private
 
   def is_set?(option)

@@ -192,6 +192,7 @@ class ContentExportsApiController < ApplicationController
     export = @context.content_exports.common_cartridge.find(params[:id])
 
     if export.update(update_params)
+      export.export if export.new_quizzes_export_state_completed?
       export_fail_with_error(export, "New Quizzes failed to export") if export.new_quizzes_export_state_failed?
       render json: content_export_json(export, @current_user, session, ["new_quizzes_export_settings"])
     else
