@@ -260,7 +260,7 @@ const ComposeModalContainer = props => {
     if (context && context?.contextID) {
       setCourseMessages([])
     }
-
+    props.onSelectedIdsChange([])
     setSelectedContext({contextID: context.contextID, contextName: context.contextName})
   }
 
