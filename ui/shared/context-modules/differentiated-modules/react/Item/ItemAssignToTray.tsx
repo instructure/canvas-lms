@@ -144,7 +144,7 @@ export interface ItemAssignToTrayProps {
   defaultCards?: ItemAssignToCardSpec[]
   defaultDisabledOptionIds?: string[]
   defaultSectionId?: string
-  useApplyButton: boolean
+  useApplyButton?: boolean
   onAddCard?: () => void
   onAssigneesChange?: (
     cardId: string,
@@ -185,6 +185,8 @@ export default function ItemAssignToTray({
   const [blueprintDateLocks, setBlueprintDateLocks] = useState<DateLockTypes[] | undefined>(
     undefined
   )
+  const [shouldFocusDeleteButton, setShouldFocusDeleteButton] = useState<boolean>(false)
+  const addCardButtonRef = useRef<Element | null>(null)
   const everyoneOption = useMemo(() => {
     const hasOverrides =
       (disabledOptionIds.length === 1 && !disabledOptionIds.includes('everyone')) ||
@@ -314,6 +316,7 @@ export default function ItemAssignToTray({
   }, [courseId, itemContentId, itemType, JSON.stringify(defaultCards)])
 
   const handleAddCard = () => {
+    setShouldFocusDeleteButton(true)
     if (onAddCard) {
       onAddCard()
       return
@@ -373,6 +376,10 @@ export default function ItemAssignToTray({
       setAssignToCards(cards)
       setDisabledOptionIds(newDisabled)
       onCardRemove?.(cardId)
+      if (addCardButtonRef?.current instanceof HTMLButtonElement) {
+        addCardButtonRef.current.disabled = false // so it can be focused
+        addCardButtonRef.current.focus()
+      }
     },
     [assignToCards, disabledOptionIds, onCardRemove]
   )
@@ -533,7 +540,7 @@ export default function ItemAssignToTray({
   function renderCards(isOpen?: boolean) {
     const cardCount = assignToCards.length
     const firstCardWithError = assignToCards.find(card => !card.isValid)
-    return assignToCards.map(card => {
+    return assignToCards.map((card, i) => {
       return (
         <View key={card.key} as="div" margin="small 0 0 0">
           <ItemAssignToCard
@@ -558,6 +565,7 @@ export default function ItemAssignToTray({
             highlightCard={card.highlightCard}
             focus={shouldFocusCard && firstCardWithError?.key === card.key}
             blueprintDateLocks={blueprintDateLocks}
+            shouldFocusDeleteButton={shouldFocusDeleteButton && i === assignToCards.length - 1}
           />
         </View>
       )
@@ -582,6 +590,7 @@ export default function ItemAssignToTray({
           margin="small 0 0 0"
           renderIcon={IconAddLine}
           interaction={!allCardsAssigned() || !!blueprintDateLocks?.length ? 'disabled' : 'enabled'}
+          elementRef={el => (addCardButtonRef.current = el)}
         >
           {I18n.t('Add')}
         </Button>

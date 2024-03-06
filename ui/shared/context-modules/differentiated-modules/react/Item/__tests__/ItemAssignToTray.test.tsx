@@ -18,9 +18,12 @@
 
 import React from 'react'
 import {act, fireEvent, render, waitFor} from '@testing-library/react'
+import userEvent, {PointerEventsCheckLevel} from '@testing-library/user-event'
 import fetchMock from 'fetch-mock'
 import ItemAssignToTray, {type ItemAssignToTrayProps} from '../ItemAssignToTray'
 import {SECTIONS_DATA, STUDENTS_DATA} from '../../__tests__/mocks'
+
+const USER_EVENT_OPTIONS = {pointerEventsCheck: PointerEventsCheckLevel.Never, delay: null}
 
 describe('ItemAssignToTray', () => {
   const props: ItemAssignToTrayProps = {
@@ -468,5 +471,23 @@ describe('ItemAssignToTray', () => {
       expect(queryByTestId('context-module-text')).not.toBeInTheDocument()
       expect(cards).toHaveLength(2)
     })
+  })
+
+  it('focuses on the add button when deleting a card', async () => {
+    const user = userEvent.setup(USER_EVENT_OPTIONS)
+    const {findAllByText, getByTestId} = renderComponent()
+    const deleteButton = (await findAllByText('Delete'))[1]
+    const addButton = getByTestId('add-card')
+    await user.click(deleteButton)
+    expect(addButton).toHaveFocus()
+  })
+
+  it("focuses on the newly-created card's delete button when adding a card", async () => {
+    const user = userEvent.setup(USER_EVENT_OPTIONS)
+    const {findAllByText, getByTestId} = renderComponent()
+    const addButton = getByTestId('add-card')
+    await user.click(addButton)
+    const deleteButtons = await findAllByText('Delete')
+    expect(deleteButtons[deleteButtons.length - 1].closest('button')).toHaveFocus()
   })
 })
