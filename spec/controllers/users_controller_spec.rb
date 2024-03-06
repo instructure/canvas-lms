@@ -2302,8 +2302,6 @@ describe UsersController do
     end
 
     it "404s, but still shows, on a deleted user for admins" do
-      Account.site_admin.enable_feature!(:deleted_user_tools)
-
       course_with_teacher(active_all: 1, user: user_with_pseudonym)
 
       account_admin_user
@@ -2356,8 +2354,6 @@ describe UsersController do
     end
 
     it "shows a deleted user from the account context if they have a deleted pseudonym for that account" do
-      Account.site_admin.enable_feature!(:deleted_user_tools)
-
       course_with_teacher(active_all: 1, user: user_with_pseudonym)
       account_admin_user(active_all: true)
       user_session(@admin)
@@ -2371,7 +2367,6 @@ describe UsersController do
       specs_require_sharding
 
       before do
-        Account.site_admin.enable_feature!(:deleted_user_tools)
         @shard1.activate do
           course_with_teacher(active_all: 1, user: user_with_pseudonym)
         end
