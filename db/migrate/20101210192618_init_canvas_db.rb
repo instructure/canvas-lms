@@ -240,7 +240,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.string   "sis_source_id", limit: 255
       t.integer  "sis_batch_id", limit: 8
       t.integer  "current_sis_batch_id", limit: 8
-      t.integer  "root_account_id", limit: 8
+      t.integer  "root_account_id", limit: 8, null: false
       t.integer  "last_successful_sis_batch_id", limit: 8
       t.string   "membership_types", limit: 255
       t.string   "default_time_zone", limit: 255
@@ -272,12 +272,13 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.string   "account_calendar_subscription_type", default: "manual", null: false, limit: 255
       t.integer :latest_outcome_import_id, limit: 8
       t.references :course_template, type: :bigint, index: { where: "course_template_id IS NOT NULL" }
+
+      t.replica_identity_index
     end
 
     add_index "accounts", ["name", "parent_account_id"], name: "index_accounts_on_name_and_parent_account_id"
     add_index "accounts", ["parent_account_id", "root_account_id"], name: "index_accounts_on_parent_account_id_and_root_account_id"
     add_index :accounts, [:sis_source_id, :root_account_id], where: "sis_source_id IS NOT NULL", unique: true
-    add_index :accounts, :root_account_id
     add_index :accounts,
               [:integration_id, :root_account_id],
               unique: true,
@@ -981,16 +982,16 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :collaborators, [:group_id], name: "index_collaborators_on_group_id"
 
     create_table :comment_bank_items do |t|
-      t.references :course, index: false, null: false, foreign_key: false, type: :bigint
+      t.references :course, index: true, null: false, foreign_key: false, type: :bigint
       t.references :root_account, foreign_key: { to_table: :accounts }, null: false, type: :bigint, index: true
-      t.references :user, null: false, foreign_key: false, index: false, type: :bigint
+      t.references :user, null: false, foreign_key: false, index: true, type: :bigint
       t.text :comment, null: false
       t.timestamps null: false, precision: 6
       t.string :workflow_state, null: false, default: "active"
 
-      t.index [:course_id, :user_id],
+      t.index :user_id,
               where: "workflow_state <> 'deleted'",
-              name: "index_comment_bank_items_on_course_and_user"
+              name: "index_active_comment_bank_items_on_user"
       t.replica_identity_index
     end
 
@@ -1550,6 +1551,9 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer :latest_outcome_import_id, limit: 8
       t.string :grade_passback_setting, limit: 255
       t.boolean :template, default: false, null: false
+      t.boolean :homeroom_course, default: false, null: false
+      t.boolean :sync_enrollments_from_homeroom, default: false, null: false
+      t.references :homeroom_course, type: :bigint, foreign_key: { to_table: :courses }, index: false
 
       t.replica_identity_index
     end
@@ -1582,6 +1586,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :courses, :lti_context_id, unique: true
     add_index :courses, :sis_batch_id, where: "sis_batch_id IS NOT NULL"
     add_index :courses, :abstract_course_id, where: "abstract_course_id IS NOT NULL"
+    add_index :courses, :sync_enrollments_from_homeroom, where: "sync_enrollments_from_homeroom"
+    add_index :courses, :homeroom_course, where: "homeroom_course"
 
     create_table :crocodoc_documents do |t|
       t.string :uuid, limit: 255
@@ -2881,6 +2887,16 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
 
     add_index :media_tracks, [:media_object_id, :locale], name: "media_object_id_locale"
 
+    create_table :mentions do |t|
+      t.references :discussion_entry, foreign_key: true, index: true, null: false, type: :bigint
+      t.references :user, foreign_key: false, index: true, null: false, type: :bigint
+      t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false, type: :bigint
+      t.string :workflow_state, default: "active", null: false, limit: 255
+      t.timestamps null: false, precision: 6
+
+      t.replica_identity_index
+    end
+
     create_table "messages", force: true do |t|
       t.text     "to"
       t.text     "from"
@@ -2929,6 +2945,21 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.string :ms_group_id
       t.integer :last_error_report_id, limit: 8
 
+      t.replica_identity_index
+    end
+
+    create_table :microsoft_sync_partial_sync_changes do |t|
+      t.references :course, foreign_key: true, null: false, type: :bigint, index: true
+      t.references :user, foreign_key: false, null: false, type: :bigint, index: true
+      t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false, type: :bigint
+
+      t.string :enrollment_type, null: false
+
+      t.timestamps null: false, precision: 6
+
+      t.index %i[course_id user_id enrollment_type],
+              unique: true,
+              name: "index_microsoft_sync_partial_sync_changes_course_user_enroll"
       t.replica_identity_index
     end
 
@@ -4926,7 +4957,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :courses, :accounts
     add_foreign_key :courses, :accounts, column: :root_account_id
     add_foreign_key :courses, :courses, column: :template_course_id
-    add_foreign_key :courses, :enrollment_terms
+    add_foreign_key :courses, :enrollment_terms, deferrable: true
     add_foreign_key :courses, :outcome_imports, column: "latest_outcome_import_id"
     add_foreign_key :courses, :sis_batches
     add_foreign_key :courses, :wikis
@@ -5039,6 +5070,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :master_courses_master_templates, :master_courses_master_migrations, column: "active_migration_id"
     add_foreign_key :media_objects, :accounts, column: :root_account_id
     add_foreign_key :media_objects, :users
+    add_foreign_key :mentions, :users
+    add_foreign_key :microsoft_sync_partial_sync_changes, :users
     add_foreign_key :microsoft_sync_user_mappings, :users
     add_foreign_key :migration_issues, :content_migrations
     add_foreign_key :moderated_grading_provisional_grades,
