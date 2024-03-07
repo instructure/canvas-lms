@@ -27,6 +27,7 @@ import moment from 'moment'
 import AssigneeSelector, {type AssigneeOption} from '../AssigneeSelector'
 import type {FormMessage} from '@instructure/ui-form-field'
 import ContextModuleLink from './ContextModuleLink'
+import {DateLockTypes} from './types'
 
 const I18n = useI18nScope('differentiated_modules')
 
@@ -72,6 +73,7 @@ export type ItemAssignToCardProps = {
   customSetSearchTerm?: (term: string) => void
   highlightCard?: boolean
   focus?: boolean
+  blueprintDateLocks?: DateLockTypes[]
 }
 
 function setTimeToStringDate(time: string, date: string | undefined): string | undefined {
@@ -133,6 +135,7 @@ export default function ItemAssignToCard({
   customSetSearchTerm,
   highlightCard,
   focus,
+  blueprintDateLocks,
 }: ItemAssignToCardProps) {
   const [dueDate, setDueDate] = useState<string | null>(due_at)
   const [availableFromDate, setAvailableFromDate] = useState<string | null>(unlock_at)
@@ -291,6 +294,7 @@ export default function ItemAssignToCard({
   const dateTimeInputs: DateTimeInput[] = [
     {
       key: 'due_at',
+      disabledByBPLock: blueprintDateLocks && blueprintDateLocks.includes('due_dates'),
       description: I18n.t('Choose a due date and time'),
       dateRenderLabel: I18n.t('Due Date'),
       value: dueDate,
@@ -304,6 +308,7 @@ export default function ItemAssignToCard({
     },
     {
       key: 'unlock_at',
+      disabledByBPLock: blueprintDateLocks && blueprintDateLocks.includes('availability_dates'),
       description: I18n.t('Choose an available from date and time'),
       dateRenderLabel: I18n.t('Available from'),
       value: availableFromDate,
@@ -317,6 +322,7 @@ export default function ItemAssignToCard({
     },
     {
       key: 'lock_at',
+      disabledByBPLock: blueprintDateLocks && blueprintDateLocks.includes('availability_dates'),
       description: I18n.t('Choose an available to date and time'),
       dateRenderLabel: I18n.t('Until'),
       value: availableToDate,

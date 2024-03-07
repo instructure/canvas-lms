@@ -210,6 +210,33 @@ describe('ItemAssignToTray', () => {
     expect(getAllByTestId('item-assign-to-card')).toHaveLength(2)
   })
 
+  it('renders blueprint locking info when there are locked dates', async () => {
+    fetchMock.get('/api/v1/courses/1/assignments/31/date_details', {
+      blueprint_date_locks: ['availability_dates'],
+    })
+    const {getAllByText, findAllByTestId} = renderComponent({itemContentId: '31'})
+    await findAllByTestId('item-assign-to-card')
+    expect(
+      getAllByText((_, e) => e.textContent === 'Locked: Availability Dates')[0]
+    ).toBeInTheDocument()
+  })
+
+  it('does not render blueprint locking info when locked with unlocked due dates', async () => {
+    fetchMock.get('/api/v1/courses/1/assignments/31/date_details', {blueprint_date_locks: []})
+    const {findAllByTestId, queryByText} = renderComponent({itemContentId: '31'})
+    await findAllByTestId('item-assign-to-card')
+    await expect(queryByText('Locked:')).not.toBeInTheDocument()
+  })
+
+  it('disables add button if there are blueprint-locked dates', async () => {
+    fetchMock.get('/api/v1/courses/1/assignments/31/date_details', {
+      blueprint_date_locks: ['availability_dates'],
+    })
+    const {getByRole, findAllByText} = renderComponent({itemContentId: '31'})
+    await findAllByText('Locked:')
+    await expect(getByRole('button', {name: 'Add'})).toBeDisabled()
+  })
+
   it('calls onDismiss when the cancel button is clicked', () => {
     const onDismiss = jest.fn()
     const {getByRole} = renderComponent({onDismiss})
