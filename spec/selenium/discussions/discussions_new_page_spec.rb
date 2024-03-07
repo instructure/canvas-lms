@@ -181,7 +181,7 @@ describe "discussions" do
           expect_new_page_load { submit_form(".form-actions") }
           expect(DiscussionTopic.last.anonymous_state).to eq "full_anonymity"
           expect(f("span[data-testid='anon-conversation']").text).to(
-            eq("This is an anonymous Discussion. Though student names and profile pictures will be hidden, your name and profile picture will be visible to all course members.")
+            eq("This is an anonymous Discussion. Though student names and profile pictures will be hidden, your name and profile picture will be visible to all course members. Mentions have also been disabled.")
           )
           expect(f("span[data-testid='author_name']").text).to eq teacher.short_name
         end
@@ -231,7 +231,7 @@ describe "discussions" do
           expect_new_page_load { submit_form(".form-actions") }
           expect(DiscussionTopic.last.anonymous_state).to eq "full_anonymity"
           expect(f("span[data-testid='anon-conversation']").text).to(
-            eq("This is an anonymous Discussion, Your name and profile picture will be hidden from other course members.")
+            eq("This is an anonymous Discussion. Your name and profile picture will be hidden from other course members. Mentions have also been disabled.")
           )
         end
 
@@ -450,7 +450,7 @@ describe "discussions" do
         force_click_native("input[value='full_anonymity']")
         f("button[data-testid='save-button']").click
         wait_for_ajaximations
-        expect(f("span[data-testid='anon-conversation']").text).to eq "This is an anonymous Discussion, Your name and profile picture will be hidden from other course members."
+        expect(f("span[data-testid='anon-conversation']").text).to eq "This is an anonymous Discussion. Your name and profile picture will be hidden from other course members. Mentions have also been disabled."
         expect(f("span[data-testid='author_name']").text).to include "Anonymous"
       end
 
@@ -462,7 +462,7 @@ describe "discussions" do
         force_click_native("input[value='partial_anonymity']")
         f("button[data-testid='save-button']").click
         wait_for_ajaximations
-        expect(f("span[data-testid='anon-conversation']").text).to eq "When creating a reply, you will have the option to show your name and profile picture to other course members or remain anonymous."
+        expect(f("span[data-testid='anon-conversation']").text).to eq "When creating a reply, you will have the option to show your name and profile picture to other course members or remain anonymous. Mentions have also been disabled."
         expect(f("span[data-testid='author_name']").text).to include "Anonymous"
       end
 
@@ -480,7 +480,7 @@ describe "discussions" do
 
         f("button[data-testid='save-button']").click
         wait_for_ajaximations
-        expect(f("span[data-testid='anon-conversation']").text).to eq "When creating a reply, you will have the option to show your name and profile picture to other course members or remain anonymous."
+        expect(f("span[data-testid='anon-conversation']").text).to eq "When creating a reply, you will have the option to show your name and profile picture to other course members or remain anonymous. Mentions have also been disabled."
         expect(f("span[data-testid='author_name']").text).to include "student"
       end
 
@@ -501,7 +501,7 @@ describe "discussions" do
 
         f("button[data-testid='save-button']").click
         wait_for_ajaximations
-        expect(f("span[data-testid='anon-conversation']").text).to eq "When creating a reply, you will have the option to show your name and profile picture to other course members or remain anonymous."
+        expect(f("span[data-testid='anon-conversation']").text).to eq "When creating a reply, you will have the option to show your name and profile picture to other course members or remain anonymous. Mentions have also been disabled."
         expect(f("span[data-testid='author_name']").text).to include "Anonymous"
       end
 
@@ -614,7 +614,7 @@ describe "discussions" do
         force_click_native("input[value='full_anonymity']")
         f("button[data-testid='save-and-publish-button']").click
         wait_for_ajaximations
-        expect(f("span[data-testid='anon-conversation']").text).to eq "This is an anonymous Discussion. Though student names and profile pictures will be hidden, your name and profile picture will be visible to all course members."
+        expect(f("span[data-testid='anon-conversation']").text).to eq "This is an anonymous Discussion. Though student names and profile pictures will be hidden, your name and profile picture will be visible to all course members. Mentions have also been disabled."
         expect(f("span[data-testid='author_name']").text).to eq "teacher"
       end
 
@@ -624,7 +624,7 @@ describe "discussions" do
         force_click_native("input[value='partial_anonymity']")
         f("button[data-testid='save-and-publish-button']").click
         wait_for_ajaximations
-        expect(f("span[data-testid='anon-conversation']").text).to eq "When creating a reply, students will have the option to show their name and profile picture or remain anonymous. Your name and profile picture will be visible to all course members."
+        expect(f("span[data-testid='anon-conversation']").text).to eq "When creating a reply, students will have the option to show their name and profile picture or remain anonymous. Your name and profile picture will be visible to all course members. Mentions have also been disabled."
         expect(f("span[data-testid='author_name']").text).to eq "teacher"
       end
 

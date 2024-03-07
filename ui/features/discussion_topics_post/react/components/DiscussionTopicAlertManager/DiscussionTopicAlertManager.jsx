@@ -32,19 +32,19 @@ const I18n = useI18nScope('discussion_posts')
 export const DiscussionTopicAlertManager = props => {
   const getAnonymousAlertText = () => {
     const teacherFullAnonAlert = I18n.t(
-      'This is an anonymous Discussion. Though student names and profile pictures will be hidden, your name and profile picture will be visible to all course members.'
+      'This is an anonymous Discussion. Though student names and profile pictures will be hidden, your name and profile picture will be visible to all course members. Mentions have also been disabled.'
     )
     const studentFullAnonAlert = I18n.t(
-      'This is an anonymous Discussion, Your name and profile picture will be hidden from other course members.'
+      'This is an anonymous Discussion. Your name and profile picture will be hidden from other course members. Mentions have also been disabled.'
     )
     const observerFullAnonAlert = I18n.t(
       'This is an anonymous Discussion. Student names and profile pictures are hidden.'
     )
     const teacherPartialAnonAlert = I18n.t(
-      'When creating a reply, students will have the option to show their name and profile picture or remain anonymous. Your name and profile picture will be visible to all course members.'
+      'When creating a reply, students will have the option to show their name and profile picture or remain anonymous. Your name and profile picture will be visible to all course members. Mentions have also been disabled.'
     )
     const studentPartialAnonAlert = I18n.t(
-      'When creating a reply, you will have the option to show your name and profile picture to other course members or remain anonymous.'
+      'When creating a reply, you will have the option to show your name and profile picture to other course members or remain anonymous. Mentions have also been disabled.'
     )
     const observerPartialAnonAlert = I18n.t(
       'Students have the option to reply anonymously. Some names and profile pictures may be hidden.'
