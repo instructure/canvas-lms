@@ -198,6 +198,7 @@ hy:
     tab_authentication: "Իսկության հաստատում"
     tab_courses: Դասընթացներ
     tab_developer_keys: "Մշակումների բանալիներ"
+    tab_extensions: Ընդլայնումներ
     tab_faculty_journal: "Դասավանդողների մատյան"
     tab_grading_standards: Գնահատականներ
     tab_jobs: Առաջադրանքներ
@@ -5414,6 +5415,7 @@ hy:
   crumbs: 
     access_report: "Հասանելիության մասին հաշվետվություն"
     announcements: Հայտարարություններ
+    apps: Ընդլայնումներ
     assignments: Հանձնարարություններ
     calendar_events: "Օրացուցային միջոցառումներ"
     collaborations: "Համատեղ աշխատանքներ"
@@ -6784,6 +6786,7 @@ hy:
   expanded_f4493860: "Բացված է"
   export_de71cd8e: Արտահանում
   exporting_b1eab154: "Արտահանվում է"
+  extensions_7250a0bb: Ընդլայնումներ
   external_apps_f5490181: "Արտաքին հավելվածներ"
   external_content: 
     cancel: 
@@ -8962,6 +8965,9 @@ hy:
       new_tab_loaded: "Այս գործիքը հաջողությամբ բեռնվել է բրաուզերի նոր պատուհանում: Կրկին բեռնեք էջը գործիք նորից մուտք գործելու համար:"
   lti2: 
     register_tool: "Գրանցել գործիքը"
+  lti_registrations: 
+    index: 
+      title: Ընդլայնումներ
   m2c_file_description: "Moodle 1.9/2.x"
   m2c_name: "Moodle ներմուծող"
   main_navigation_3f080c80: "Հիմնական նավարկում"
