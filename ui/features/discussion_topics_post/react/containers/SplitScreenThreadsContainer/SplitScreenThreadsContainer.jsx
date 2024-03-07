@@ -432,6 +432,8 @@ const SplitScreenThreadContainer = props => {
                     editor={props.discussionEntry.editor}
                     isUnread={!props.discussionEntry.entryParticipant?.read}
                     isForcedRead={props.discussionEntry.entryParticipant?.forcedReadState}
+                    createdAt={props.discussionEntry.createdAt}
+                    updatedAt={props.discussionEntry.updatedAt}
                     timingDisplay={DateHelper.formatDatetimeForDiscussions(
                       props.discussionEntry.createdAt
                     )}
