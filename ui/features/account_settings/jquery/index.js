@@ -172,11 +172,12 @@ $(document).ready(function () {
 
   $('#account_settings_tabs').on('tabsactivate', (event, ui) => {
     try {
-      const hash = new URL(ui.newTab.context.href).hash
+      const $tabLink = ui.newTab.children('a:first-child')
+      const hash = new URL($tabLink.prop('href')).hash
       if (window.location.hash !== hash) {
         window.history.pushState(null, null, hash)
       }
-      ui.newTab.focus(0)
+      $tabLink.focus()
     } catch (_ignore) {
       // get here if `new URL` throws, but it shouldn't, and
       // there's really nothing we need to do about it
