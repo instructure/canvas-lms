@@ -1324,13 +1324,14 @@ class RCEWrapper extends React.Component {
     }
   }
 
-  onA11yChecker = () => {
+  onA11yChecker = (triggerElementId) => {
     const editor = this.mceInstance()
     editor.execCommand(
       'openAccessibilityChecker',
       false,
       {
         mountNode: instuiPopupMountNode,
+        triggerElementId,
         onFixError: errors => {
           this.setState({a11yErrorsCount: errors.length})
         },
