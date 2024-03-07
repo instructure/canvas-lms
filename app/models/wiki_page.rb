@@ -108,7 +108,7 @@ class WikiPage < ActiveRecord::Base
 
   def should_generate_embeddings?
     return false if deleted?
-    return false unless OpenAi.smart_search_available?(context)
+    return false unless SmartSearch.smart_search_available?(context)
 
     saved_change_to_body? ||
       saved_change_to_title? ||
@@ -143,7 +143,7 @@ class WikiPage < ActiveRecord::Base
   def generate_embeddings
     delete_embeddings
     chunk_content do |chunk|
-      embedding = OpenAi.generate_embedding(chunk)
+      embedding = SmartSearch.generate_embedding(chunk)
       wiki_page_embeddings.create!(embedding:)
     end
   end
