@@ -28,6 +28,7 @@ import {getAssignment} from './queries/assignmentQuery'
 import {getSubmission} from './queries/submissionQuery'
 import {getSubmissionsByAssignment} from './queries/submissionsByAssignmentQuery'
 import {updateSubmissionGrade} from './mutations/updateSubmissionGradeMutation'
+import {createSubmissionComment} from './mutations/createSubmissionCommentMutation'
 
 const I18n = useI18nScope('speed_grader')
 
@@ -47,6 +48,7 @@ ready(() => {
           },
           mutations: {
             updateSubmissionGrade,
+            createSubmissionComment,
           },
         })
       })
