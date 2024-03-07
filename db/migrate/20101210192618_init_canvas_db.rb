@@ -714,6 +714,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.timestamp "viewed_at"
       t.string :instfs_uuid
       t.references :root_account, type: :bigint, foreign_key: false, index: true
+      t.string :category, default: "uncategorized", null: false
+      t.integer :word_count
     end
     add_index "attachments", ["cloned_item_id"], name: "index_attachments_on_cloned_item_id"
     add_index "attachments", ["context_id", "context_type"], name: "index_attachments_on_context_id_and_context_type"
@@ -1337,12 +1339,14 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer :developer_key_id, limit: 8
       t.integer :root_account_id, limit: 8, null: false
       t.boolean :is_rce_favorite, default: false, null: false
+      t.string :identity_hash, limit: 64
     end
     add_index :context_external_tools, [:tool_id]
     add_index :context_external_tools, [:context_id, :context_type]
     add_index :context_external_tools, %i[context_id context_type migration_id], where: "migration_id IS NOT NULL", name: "index_external_tools_on_context_and_migration_id"
     add_index :context_external_tools, :consumer_key
     add_index :context_external_tools, :developer_key_id
+    add_index :context_external_tools, :identity_hash, where: "identity_hash <> 'duplicate'"
     add_replica_identity_index :context_external_tools
 
     create_table "context_module_progressions", force: true do |t|
@@ -4110,6 +4114,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer  "generated_diff_id", limit: 8
       t.integer :errors_attachment_id, limit: 8
       t.integer :change_threshold
+      t.boolean :diffing_threshold_exceeded, default: false, null: false
     end
     add_index :sis_batches, [:account_id, :created_at], name: "index_sis_batches_account_id_created_at"
     add_index :sis_batches, :batch_mode_term_id, where: "batch_mode_term_id IS NOT NULL"
