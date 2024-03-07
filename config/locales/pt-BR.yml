@@ -1621,7 +1621,7 @@ pt-BR:
         can_change_pronouns: "Permitir que os usuários alterem seus pronomes no Canvas"
         canvadocs_prefer_office_online: "Prefira o visualizador de arquivos do Office 365"
         canvas_authentication: "Autenticação Canvas"
-        course_template_id: "O modelo de curso selecionado será usado para todos os novos cursos"
+        course_template_id: "O template de curso selecionado será usado para todos os novos cursos"
         default_language: "Idioma padrão"
         default_time_zone: "Fuso horário padrão"
         domain: "Domínio:"
@@ -2777,7 +2777,7 @@ pt-BR:
   allows_an_account_administrator_to_manage_the_impa_71112028: "Permite que um administrador de conta gerencie a integração do serviço Impact."
   allows_assessors_to_view_the_assessment_audit_tray_84c0c4c2: "Permite que avaliadores visualizem a bandeja de auditoria da avaliação no SpeedGrader para tarefas anônimas ou moderadas."
   allows_blueprint_course_settings_to_be_exported_an_a34bb7f: "Permite que as configurações do Curso do Modelo sejam exportadas e copiadas para outro Curso do Modelo"
-  allows_blueprint_courses_to_keep_track_of_assignme_3faaa416: "Permite que os cursos de modelo acompanhem as alterações de ID de recurso da tarefa."
+  allows_blueprint_courses_to_keep_track_of_assignme_3faaa416: "Permite que os cursos blueprint acompanhem as alterações de ID de recurso da tarefa."
   allows_canvas_to_send_iwork_files_to_docviewer_220f4753: "Permite que o Canvas envie arquivos do iWork para o visualizador de documentos."
   allows_course_pages_to_be_published_on_a_schedule_7e12fd52: "Permite que as páginas do curso sejam publicadas em um cronograma"
   allows_course_student_groups_to_be_created_by_csv__bb0c8456: "Permite que grupos de alunos do curso sejam criados por carregamento de csv"
@@ -3046,7 +3046,7 @@ pt-BR:
   allows_user_to_delete_course_sections_allows_user__649d2d0d: "Permite que o usuário exclua seções do curso. Permite que o usuário exclua um usuário de uma seção do curso."
   allows_user_to_delete_question_banks_in_a_course_o_d9cd0b2f: "Permite ao usuário excluir bancos de perguntas a um curso ou conta."
   allows_user_to_delete_quizzes_in_a_course_acdbdfba: "Permite ao usuário excluir testes em um curso."
-  allows_user_to_designate_a_course_as_a_blueprint_c_15109885: "Permite que o usuário designe um curso como Curso modelo."
+  allows_user_to_designate_a_course_as_a_blueprint_c_15109885: "Permite que o usuário designe um curso como Curso Blueprint."
   allows_user_to_designate_a_course_as_a_blueprint_c_208ec223: "Permite que o usuário designe um curso como Curso modelo. Permite que o usuário gerencie as configurações de Cursos Modelo em Configurações do curso. Permite que o usuário adicione cursos associados."
   allows_user_to_designate_a_course_as_a_blueprint_c_255aca84: |-
       Permite ao usuário designar um curso como um Curso Blueprint. Permite que o usuário gerencie as configurações do Curso Blueprint em Configurações do Curso.
@@ -3069,8 +3069,8 @@ pt-BR:
   allows_user_to_edit_assignment_details_on_individu_3e50993a: "Permite que o usuário edite detalhes da tarefa em fóruns individuais. Módulos: Permite que o usuário adicione novas tarefas em um módulo."
   allows_user_to_edit_assignment_details_on_individu_ecf19e63: "Permite que o usuário edite detalhes da tarefa em fóruns individuais."
   allows_user_to_edit_blueprint_content_lock_setting_25128c82: "Permite que o usuário edite configurações de bloqueio de conteúdo de modelo em fóruns individuais."
-  allows_user_to_edit_blueprint_content_lock_setting_58a85315: "Permite que o usuário edite configurações de bloqueio de conteúdo de modelo em configurações individuais se o usuário estiver matriculado em um curso matriz de modelo."
-  allows_user_to_edit_blueprint_content_lock_setting_cbbf55ee: "Permite que o usuário edite configurações de bloqueio de conteúdo de modelo em fóruns individuais."
+  allows_user_to_edit_blueprint_content_lock_setting_58a85315: "Permite que o usuário edite configurações de bloqueio de conteúdo Blueprint em configurações individuais se o usuário estiver matriculado em um curso matriz Blueprint."
+  allows_user_to_edit_blueprint_content_lock_setting_cbbf55ee: "Permite que o usuário edite configurações de bloqueio de conteúdo Blueprint em fóruns individuais."
   allows_user_to_edit_blueprint_content_lock_setting_fd580fab: "Permite que o usuário edite configurações de bloqueio de conteúdo de modelo em configurações individuais se o usuário estiver matriculado em um curso matriz de modelo."
   allows_user_to_edit_blueprint_course_lock_settings_c89e1787: "Permite que o usuário edite configurações de bloqueio do Curso Blueprint na página de índice Páginas e para uma página individual em um curso matriz de Blueprint."
   allows_user_to_edit_blueprint_lock_settings_for_in_95db0d27: "Permite que o usuário edite as configurações de bloqueio do blueprint para páginas individuais em um Blueprint Master Course."
@@ -3079,8 +3079,8 @@ pt-BR:
   allows_user_to_edit_blueprint_lock_settings_on_the_3a90958b: |-
       Permite que o usuário edite configurações de bloqueio de modelo nas páginas de índice Tarefas e Testes
       em um curso matriz de modelo.
-  allows_user_to_edit_blueprint_lock_settings_on_the_43278a22: "Permite que o usuário edite configurações de bloqueio de modelo nas páginas de índice Tarefas e Testesem um curso matriz de modelo."
-  allows_user_to_edit_blueprint_lock_settings_on_the_5b5edb55: "Permite que o usuário edite configurações de bloqueio de modelo na página de índice Fóruns em um curso matriz de modelo."
+  allows_user_to_edit_blueprint_lock_settings_on_the_43278a22: "Permite que o usuário edite configurações de bloqueio Blueprint nas páginas de índice Tarefas e Testesem um curso matriz Blueprint."
+  allows_user_to_edit_blueprint_lock_settings_on_the_5b5edb55: "Permite que o usuário edite configurações de bloqueio Blueprint na página de índice Fóruns em um curso matriz Blueprint."
   allows_user_to_edit_blueprint_lock_settings_on_the_94a44495: "Permite que o usuário edite configurações de bloqueio de modelo na página de índice Fóruns em um curso matriz de modelo."
   allows_user_to_edit_blueprint_lock_settings_on_the_9f51663c: "Permite que o usuário edite configurações de bloqueio de modelo na página Arquivos em um curso matriz de modelo."
   allows_user_to_edit_blueprint_lock_settings_on_the_a2534937: "Permite que o usuário edite configurações de bloqueio de modelo nas páginas de índice Tarefas e Questionários em um curso de domínio de modelo."
@@ -3121,7 +3121,7 @@ pt-BR:
   allows_user_to_enable_and_edit_assignment_group_we_87c09b9f: "Permite que o usuário habilite e edite o peso do grupo de tarefas em um curso."
   allows_user_to_export_the_gradebook_to_a_comma_sep_1c6fefef: "Permite que o usuário exporte o Boletim para um arquivo com valores separados por vírgulas (CSV). Permite que o usuário acesse o Boletim de Domínio do Aprendizado (se habilitado)."
   allows_user_to_export_the_gradebook_to_a_comma_sep_e52259a3: "Permite que o usuário exporte o Boletim para um arquivo com valores separados por vírgulas (CSV)."
-  allows_user_to_filter_for_blueprint_courses_as_the_2b3d864e: "Permite que o usuário filtre para cursos modelo como o nível da conta. Permite que o usuário adicione cursos associados."
+  allows_user_to_filter_for_blueprint_courses_as_the_2b3d864e: "Permite que o usuário filtre para cursos Blueprint como o nível da conta. Permite que o usuário adicione cursos associados."
   allows_user_to_filter_for_blueprint_courses_as_the_45dc2c3d: "Permite que o usuário filtre para cursos modelo como o nível da conta. Permite que o usuário adicione cursos associados."
   allows_user_to_filter_for_blueprint_courses_as_the_a67832c8: |-
       Permite que o usuário filtre para cursos modelo como o nível da conta.
@@ -3145,7 +3145,7 @@ pt-BR:
   allows_user_to_like_discussion_posts_when_the_only_7390d91c: "Permite que o usuário curta postagens de fóruns quando a caixa de seleção “Apenas avaliadores podem curtir” estiver selecionada."
   allows_user_to_lock_unlock_selected_announcements__fbe4df6a: "Permite que o usuário bloqueie/desbloqueie anúncios selecionados individualmente ou em massa."
   allows_user_to_manage_assignment_settings_35d94690: "Permite que o usuário gerencie configurações da tarefa."
-  allows_user_to_manage_blueprint_course_settings_in_697362c5: "Permite que o usuário gerencie as configurações de Cursos Modelo em Configurações do curso."
+  allows_user_to_manage_blueprint_course_settings_in_697362c5: "Permite que o usuário gerencie as configurações de Cursos Blueprint em Configurações do curso."
   allows_user_to_manage_feature_options_in_account_s_c3c8ee03: "Permite que o usuário gerencie as Opções de funcionalidades nas Configurações da conta."
   allows_user_to_manage_feature_previews_in_account__3c90a6f: "Permite que o usuário gerencie visualizações de recursos nas configurações da conta."
   allows_user_to_manage_modules_create_add_items_edi_1afafd65: |-
@@ -3172,7 +3172,7 @@ pt-BR:
   allows_user_to_publish_conclude_and_delete_courses_336cf352: "Permite que o usuário publique, encerre e exclua cursos."
   allows_user_to_randomly_assign_users_to_a_course_g_e866fc4: "Permite ao usuário atribuir usuários aleatoriamente a um grupo de cursos."
   allows_user_to_randomly_assign_users_to_an_account_f6f24e8b: "Permite ao usuário atribuir usuários aleatoriamente a uma conta ou grupo de cursos."
-  allows_user_to_remove_a_course_as_a_course_templat_15e653d3: "Permite que o usuário remova um curso como modelo de curso nas Configurações do Curso."
+  allows_user_to_remove_a_course_as_a_course_templat_15e653d3: "Permite que o usuário remova um curso como template de curso nas Configurações do Curso."
   allows_user_to_remove_a_course_as_a_course_templat_5a171e4c: "Permite que o usuário remova um curso como modelo de curso nas Configurações do Curso. Permite que o usuário defina uma conta para não usar um modelo."
   allows_user_to_remove_a_student_s_section_enrollme_78d1916e: "Permite que o usuário remova a matrícula ou função da seção de um aluno."
   allows_user_to_remove_and_merge_users_in_an_accoun_b7e1aec7: "Permite que o usuário remova e mescle usuários em uma conta."
@@ -3222,7 +3222,7 @@ pt-BR:
   allows_user_to_see_the_list_of_courses_in_the_acco_5fa0142f: "Permite que o usuário veja a lista de cursos na conta."
   allows_user_to_see_the_list_of_recently_started_an_f6d3fe6: "Permite que o usuário veja a lista de cursos recentemente iniciados e encerrados nas estatísticas da conta."
   allows_user_to_see_the_list_of_recently_started_en_1012704d: "Permite que o usuário veja a lista de cursos recentemente iniciados/encerrados nas estatísticas da conta."
-  allows_user_to_select_a_course_as_a_course_templat_547e203f: "Permite que o usuário selecione um curso como modelo de curso nas Configurações do Curso."
+  allows_user_to_select_a_course_as_a_course_templat_547e203f: "Permite que o usuário selecione um curso como template de curso nas Configurações do Curso."
   allows_user_to_select_final_grade_for_moderated_as_c5e28a9c: "Permite que o usuário selecione a nota final para tarefas moderadas."
   allows_user_to_send_a_message_in_conversations_wit_d48abf1a: "Permite que o usuário envie uma mensagem em Caixa de Entrada sem selecionar um curso."
   allows_user_to_send_a_message_to_all_in_course_nam_29ffb3b1: "Permite que o usuário envie uma mensagem para “Todos em [course name]”. Permite que o usuário envie uma mensagem para “Todos em [course group]”."
@@ -3369,7 +3369,7 @@ pt-BR:
       Permite que o usuário procure registros de alterações de notas pelo avaliador ou aluno nas Ferramentas do administrador
   allows_user_to_view_login_logout_activity_of_users_e11dd2de: "Permite que o usuário visualize a atividade de entrada/saída dos usuários nas ferramentas do Administrador."
   allows_user_to_view_login_logout_activity_of_users_e4ff7ca: "Permite que o usuário visualize a atividade de entrada/saída dos usuários nas ferramentas do Administrador. Permite que o usuário procure registros de alterações de notas pelo avaliador ou aluno nas Ferramentas do administrador. (Indisponível no nível da subconta.)"
-  allows_user_to_view_names_of_course_templates_in_t_12b87e7e: "Permitir ao usuário visualizar nomes de modelos de cursos na conta raiz."
+  allows_user_to_view_names_of_course_templates_in_t_12b87e7e: "Permitir ao usuário visualizar nomes de templates de cursos na conta raiz."
   allows_user_to_view_or_retrieve_a_list_of_assignme_8ff6b0ec: "Permite que o usuário visualize ou recupere uma lista de datas de indisponibilidade da tarefa."
   allows_user_to_view_page_history_and_set_front_pag_c2321326: "Permite que o usuário visualize o histórico da página e defina a página frontal."
   allows_user_to_view_previously_created_collaborati_31f4cfe2: |-
@@ -5451,18 +5451,18 @@ pt-BR:
   blocked_strands_faece22a: "Fios bloqueados"
   blue_daf8fea9: Azul
   blueprint_5cca2ef: Modelo
-  blueprint_course_associations_72c9609: "Associações de Curso Modelo"
-  blueprint_course_e16ed131: "Curso Modelo"
+  blueprint_course_associations_72c9609: "Associações de Curso Blueprint"
+  blueprint_course_e16ed131: "Curso Blueprint"
   blueprint_course_id_9ee357fb: blueprint_course_id
-  blueprint_course_information_term_course_10d5cf30: "Informações do curso modelo: %{term} - %{course}"
+  blueprint_course_information_term_course_10d5cf30: "Informações do curso Blueprint: %{term} - %{course}"
   blueprint_course_sync_finished_80cd9509: "Sincronização de curso modelo terminada"
   blueprint_course_sync_in_progress_a1e2622b: "Sincronização de curso modelo em andamento"
-  blueprint_courses_9dd321b8: "Cursos de modelo"
-  blueprint_courses_add_edit_associate_delete_bc26d5c2: "Cursos de Modelo - adicionar/editar/associar/excluir"
+  blueprint_courses_9dd321b8: "Cursos Blueprint"
+  blueprint_courses_add_edit_associate_delete_bc26d5c2: "Cursos Blueprint - adicionar/editar/associar/excluir"
   blueprint_courses_are_an_account_level_feature_opt_3388f731: "Cursos modelo são uma opção de funcionalidade do nível da conta.\n\n\
       Para editar configurações de bloqueio do modelo na página de índice de Fóruns, Curso - adicionar/editar/excluir e Fóruns - moderar também devem ser habilitadas. "
   blueprint_courses_are_an_account_level_feature_opt_e1f9ec2d: "Cursos modelo são uma opção de recurso do nível da conta. Para editar configurações de bloqueio do modelo na página de índice de Discussões, Curso - adicionar/editar/excluir e Discussões - moderar também devem ser habilitadas. "
-  blueprint_courses_create_edit_associate_delete_bf41988e: "Cursos de Modelo (criar/editar/associar/excluir)"
+  blueprint_courses_create_edit_associate_delete_bf41988e: "Cursos Blueprint (criar/editar/associar/excluir)"
   blueprint_courses_is_an_account_level_feature_opti_38676924: "Cursos modelo são uma opção de funcionalidade do nível da conta. Os papéis no curso só podem gerenciar Cursos modelo se forem adicionadas ao Curso modelo como um professor, assistente ou designer. Para acessar a barra lateral de Cursos modelo, Cursos - adicionar/editar/excluir cursos deve ser habilitada. Para adicionar um curso associado, Cursos - visualizar lista e Cursos - adicionar/editar/excluir também deve ser habilitada. Para editar configurações de bloqueio em qualquer tipo de objeto do modelo, Cursos - adicionar/editar/excluir deve ser habilitada."
   blueprint_courses_is_an_account_level_feature_opti_390ed2e7: "Cursos modelo são uma opção de funcionalidade do nível da conta. Para adicionar cursos associados, Cursos modelo - adicionar/editar/associar/excluir e Cursos - adicionar/editar/excluir também devem ser habilitadas."
   blueprint_courses_is_an_account_level_feature_opti_3a0161d3: "Cursos modelo são uma opção de funcionalidade do nível da conta. Funções do curso só podem gerenciar Cursos modelo se forem adicionadas ao Curso modelo como um professor, assistente do professor ou função de designer. Para acessar a barra lateral de Cursos modelo, Cursos - adicionar/editar/excluir cursos deve ser habilitada. Para adicionar um curso associado, Cursos - visualizar lista e Cursos - adicionar/editar/excluir também deve ser habilitada. Para editar configurações de bloqueio em qualquer tipo de objeto do modelo, Cursos - adicionar/editar/excluir deve ser habilitada."
@@ -5510,20 +5510,20 @@ pt-BR:
   blueprint_courses_must_be_enabled_for_an_account_b_aae26429: |-
       Os cursos do Blueprint devem ser habilitados para uma conta por um administrador. Para editar as configurações de bloqueio na página de índice de Páginas, Páginas - Atualizar, Cursos Blueprint - adicionar/editar/associar/excluir e Gerenciar Cursos: Administração - gerenciar/atualizar.
               No entanto, se essas permissões adicionais estiverem habilitadas, mas a permissão Páginas - atualizar não estiver habilitada, o usuário ainda pode ajustar as configurações de bloqueio de conteúdo em páginas individuais em um curso Blueprint primário.
-  blueprint_courses_must_be_enabled_for_an_account_b_c630f425: "Cursos modelo devem ser habilitados para uma conta por um administrador."
+  blueprint_courses_must_be_enabled_for_an_account_b_c630f425: "Cursos Blueprint devem ser habilitados para uma conta por um administrador."
   blueprint_courses_must_be_enabled_for_an_account_b_e8e1984d: |-
       Cursos modelo devem ser habilitados para uma conta por um administrador.
       Os papéis no curso só podem gerenciar conteúdo em Cursos modelo se forem adicionadas ao Curso modelo como um professor, assistente ou designer.
       Se esta permissão for desabilitada, e Fóruns - visualizar estiver habilitado, um usuário ainda pode ajustar as configurações de bloqueio do modelo em fóruns individuais em um curso matriz de modelo.
-  blueprint_courses_must_be_enabled_for_an_account_b_edd8f7d3: "Cursos modelo devem ser habilitados para uma conta por um administrador."
+  blueprint_courses_must_be_enabled_for_an_account_b_edd8f7d3: "Cursos Blueprint devem ser habilitados para uma conta por um administrador."
   blueprint_courses_must_be_enabled_for_an_account_b_fa574265: "Cursos modelo devem ser habilitados para uma conta por um administrador. Funções do curso só podem gerenciar conteúdo em Cursos modelo se forem adicionadas ao Curso modelo com uma função de professor, assistente do professor ou designer. Para editar configurações de bloqueio do modelo na página de índice de Discussões, Discussões - moderar também deve ser habilitada."
-  blueprint_courses_must_be_enabled_for_an_account_b_ffb3ac4b: "Cursos modelo devem ser habilitados para uma conta por um administrador. Funções do curso só podem gerenciar conteúdo em Cursos modelo se forem adicionadas ao Curso modelo como um professor, assistente do professor ou função de designer."
-  blueprint_information_95dcef55: "Informações do curso modelo"
-  blueprint_locking_is_only_available_for_published__c8c97e3f: "O bloqueio de modelo está disponível apenas para ritmos publicados"
-  blueprint_locking_is_only_available_for_the_course_68ec4266: "O bloqueio de modelo está disponível apenas para o ritmo do nível do curso"
-  blueprint_resource_id_support_ae48c0b9: "Suporte de ID de recurso de Modelo"
-  blueprint_settings_233e909a: "Configurações do Modelo"
-  blueprint_sync_90d0dfd5: "Sincronização do modelo"
+  blueprint_courses_must_be_enabled_for_an_account_b_ffb3ac4b: "Cursos Blueprint devem ser habilitados para uma conta por um administrador. Funções do curso só podem gerenciar conteúdo em Cursos Blueprint se forem adicionadas ao Curso Blueprint como um professor, assistente do professor ou função de designer."
+  blueprint_information_95dcef55: "Informações do curso Blueprint"
+  blueprint_locking_is_only_available_for_published__c8c97e3f: "O bloqueio Blueprint está disponível apenas para ritmos publicados"
+  blueprint_locking_is_only_available_for_the_course_68ec4266: "O bloqueio Blueprint está disponível apenas para o ritmo do nível do curso"
+  blueprint_resource_id_support_ae48c0b9: "Suporte de ID de recurso Blueprint"
+  blueprint_settings_233e909a: "Configurações Blueprint"
+  blueprint_sync_90d0dfd5: "Sincronização Blueprint"
   bmp_e297149c: BMP
   body_9f663faf: Corpo
   body_f48fe5cd: "Corpo:"
@@ -6289,8 +6289,8 @@ pt-BR:
   cannot_delete_an_override_with_a_due_date_within_a_fa94ca3b: "Não é possível excluir uma substituição com um prazo de entrega dentro de um período de avaliação fechado"
   cannot_give_outcomes_extra_credit_696208f0: "Não é possível dar crédito extra de objetivos"
   cannot_grade_at_this_time_489744b0: "Não é possível dar nota neste momento"
-  cannot_have_a_blueprint_course_with_observers_d00b3deb: "Não é possível ter um curso de modelo com observadores"
-  cannot_have_a_blueprint_course_with_students_248e3e76: "Não é possível ter um curso modelo com alunos"
+  cannot_have_a_blueprint_course_with_observers_d00b3deb: "Não é possível ter um curso blueprint com observadores"
+  cannot_have_a_blueprint_course_with_students_248e3e76: "Não é possível ter um curso blueprint com alunos"
   cannot_have_duplicate_or_empty_row_names_fix_the_n_4fce15dd: "Não pode ter nomes de linha duplicados ou vazios. Corrija os nomes e tente clicar em 'Salvar' novamente."
   cannot_have_negative_ranges_or_ranges_that_are_gre_1086d6db: "Não pode ter intervalos negativos ou intervalos superiores a 100. Corrija os intervalos e tente clicar em 'Salvar' novamente."
   cannot_have_overlapping_or_empty_ranges_fix_the_ra_18ce528b: "Não pode haver intervalos sobrepostos ou vazios. Corrija os intervalos e tente clicar em 'Salvar' novamente."
@@ -8849,7 +8849,7 @@ pt-BR:
       storage_quota: "Cota de armazenamento"
       syllabus_body: syllabus_body
       tab_configuration: "Configuração da aba"
-      template_course_id: "ID de curso modelo"
+      template_course_id: "ID de Template de Curso"
       turnitin_comments: "Comentários de envio do Turnitin"
       updated_at: "Atualizado em"
       uuid: UUID
@@ -8907,11 +8907,11 @@ pt-BR:
   course_results_updated_df9d1c95: "Resultados do curso atualizados."
   course_role_role_type_119c2f64: "Papel no curso: %{role_type}"
   course_roles_1314f962: "Papéis no curso"
-  course_roles_can_only_manage_blueprint_courses_if__12964fbb: "Funções do curso só podem gerenciar Cursos modelo se forem adicionadas ao Curso modelo como um professor, assistente do professor ou função de designer."
+  course_roles_can_only_manage_blueprint_courses_if__12964fbb: "Funções do curso só podem gerenciar Cursos Blueprint se forem adicionadas ao Curso Blueprint como um professor, assistente do professor ou função de designer."
   course_roles_can_only_manage_blueprint_courses_if__4902d00b: "Funções do curso só podem gerenciar Cursos modelo se forem adicionadas ao Curso modelo como um professor, assistente do professor ou função de designer. Para acessar a barra lateral de Cursos modelo, Cursos - adicionar/editar/excluir cursos deve ser habilitada. Para adicionar um curso associado, Cursos - visualizar lista e Cursos - adicionar/editar/excluir também deve ser habilitada. Para editar configurações de bloqueio em qualquer tipo de objeto do modelo, Cursos - adicionar/editar/excluir deve ser habilitada."
   course_roles_can_only_manage_blueprint_courses_if__9e80fcc5: "Funções do curso só podem gerenciar Cursos modelo se forem adicionadas ao Curso modelo como um professor, assistente do professor ou função de designer. Para gerenciar os cursos associados, Cursos - visualizar lista e Gerenciar Cursos - adicionar também deve estar habilitado. Para editar as configurações de bloqueio em arquivos, Gerenciar Cursos: Administração - gerenciar/atualizar e Arquivos do Curso - editar também devem estar habilitados. Para editar as configurações de bloqueio em testes, Gerenciar Cursos: Administração - gerenciar/atualizar e Tarefas e Testes - adicionar/editar/excluir também deve estar ativado."
-  course_roles_can_only_manage_content_in_blueprint__a37c5e0a: "Funções do curso só podem gerenciar conteúdo em Cursos modelo se forem adicionadas ao Curso modelo como um professor, assistente do professor ou função de designer."
-  course_roles_can_only_manage_content_in_blueprint__c4b14b26: "Funções do curso só podem gerenciar conteúdo em Cursos modelo se forem adicionadas ao Curso modelo com uma função de professor, assistente do professor ou designer."
+  course_roles_can_only_manage_content_in_blueprint__a37c5e0a: "Funções do curso só podem gerenciar conteúdo em Cursos Blueprint se forem adicionadas ao Curso Blueprint como um professor, assistente do professor ou função de designer."
+  course_roles_can_only_manage_content_in_blueprint__c4b14b26: "Funções do curso só podem gerenciar conteúdo em Cursos Blueprint se forem adicionadas ao Curso Blueprint com uma função de professor, assistente do professor ou designer."
   course_roles_d2d5d666: "Papéis do curso"
   course_roster_78f70e97: "Lista de cursos"
   course_rubrics_881dcf0: "Rubricas do curso"
@@ -9005,13 +9005,13 @@ pt-BR:
   course_syllabus_report_becker_92173e15: "Relatório do programa do curso - Becker"
   course_syllabus_report_johnson_county_cc_32ed83a6: "Relatório do programa do curso - CC condado de Johnson"
   course_syllabus_report_molloy_19e0a3b0: "Relatório do programa do curso - Molloy"
-  course_template_84f504be: "Modelo de curso"
-  course_template_must_be_in_the_same_root_account_4cfdb933: "O modelo de curso deve estar na mesma conta-raiz"
-  course_template_must_be_marked_as_a_template_5292f500: "O modelo de curso deve ser marcado como um modelo"
-  course_templates_create_eb00e263: "Modelos de curso - criar"
-  course_templates_ddd579e6: "Modelos de curso"
-  course_templates_delete_5ec47e1f: "Modelos de curso - excluir"
-  course_templates_edit_fd44b74c: "Modelos de curso - editar"
+  course_template_84f504be: "Template de curso"
+  course_template_must_be_in_the_same_root_account_4cfdb933: "O template de curso deve estar na mesma conta-raiz"
+  course_template_must_be_marked_as_a_template_5292f500: "O template de curso deve ser marcado como um modelo"
+  course_templates_create_eb00e263: "Templates de curso - criar"
+  course_templates_ddd579e6: "Templates de curso"
+  course_templates_delete_5ec47e1f: "Templates de curso - excluir"
+  course_templates_edit_fd44b74c: "Templates de curso - editar"
   course_to_do_26919792: "LISTA DE TAREFAS DE %{course}"
   course_usage_report_2e9d9da9: "Relatório de uso do curso"
   course_usage_report_florida_southwestern_8c7c1a6d: "Relatório de uso do curso - Sudoeste da Flórida"
@@ -9349,7 +9349,7 @@ pt-BR:
         allow_student_organized_groups: "Permitir que os alunos organizem os seus próprios grupos"
         banner_image: "Imagem de banner largo"
         blueprint: "Habilitar curso como um Curso de Modelo"
-        blueprint_course: "Curso Modelo"
+        blueprint_course: "Curso Blueprint"
         card_image: "Imagem do cartão"
         conclude_at: Termina
         conditional_release: "Caminhos de Domínio"
@@ -9366,7 +9366,7 @@ pt-BR:
         course_section_name: "Adicionar uma nova turma"
         course_status_published: "Curso publicado"
         course_status_unpublished: "O curso tem sua publicação cancelada"
-        course_template: "Modelo de curso"
+        course_template: "Template de curso"
         course_visibility: Visibilidade
         custom_course_visibility: Personalizar
         default_due_time: "Prazo padrão"
@@ -11565,8 +11565,8 @@ pt-BR:
   enable_cbcd2eef: "Ativar "
   enable_close_e8001638: "Ativar e fechar"
   enable_content_security_policy_8bd0b492: "Habilitar Política de segurança do conteúdo"
-  enable_course_as_a_blueprint_course_8515ffd5: "Habilitar curso como um Curso Modelo"
-  enable_course_as_a_course_template_5299afb6: "Ativar curso como um Modelo de Curso"
+  enable_course_as_a_blueprint_course_8515ffd5: "Habilitar curso como um Curso Blueprint"
+  enable_course_as_a_course_template_5299afb6: "Ativar curso como um Template de Curso"
   enable_dashboard_images_for_courses_5af458b0: "Habilitar imagens no painel de controle para cursos"
   enable_distributed_internal_analytics_29e76618: "Ativar análises internas distribuídas"
   enable_extra_filter_options_b52c23e6: "habilitar opções extras de filtro"
@@ -16028,8 +16028,8 @@ pt-BR:
   invalid_authenticity_token_b753558c: "Token com autenticidade inválida"
   invalid_aws_configuration_e8a6ae0f: "Configuração AWS inválida"
   invalid_blueprint_locked_item_type_type_for_item_i_4d2b053d: "Tipo de item bloqueado de esquema inválido %{type} para o item %{id}"
-  invalid_blueprint_restriction_types_in_imported_pa_e714d929: "Tipos de restrição de modelo inválidos no pacote importado; usando padrões"
-  invalid_blueprint_restrictions_for_item_id_63aae663: "Restrições de modelo inválidas para o item %{id}"
+  invalid_blueprint_restriction_types_in_imported_pa_e714d929: "Tipos de restrição blueprint inválidos no pacote importado; usando padrões"
+  invalid_blueprint_restrictions_for_item_id_63aae663: "Restrições blueprint inválidas para o item %{id}"
   invalid_byday_byday_6e361e78: "BYDAY '%{byday}' inválido"
   invalid_bymonth_bymonth_91f621b3: "BYMONTH '%{bymonth}' inválido"
   invalid_bymonthday_bymonthday_87791c1b: "BYMONTHDAY '%{bymonthday}' inválido"
@@ -18065,38 +18065,38 @@ pt-BR:
     assignment_unpublished_module: "Esta tarefa faz parte do módulo não publicado e não está disponível ainda."
     blueprint_content_added: 
       email: 
-        body: "Alterações ao curso modelo foram sincronizadas a %{name}."
+        body: "Alterações ao curso Blueprint foram sincronizadas a %{name}."
         details_link: "Visualizar alterações: %{link}"
         html: 
-          body: "Alterações ao curso modelo foram sincronizadas a %{name}."
+          body: "Alterações ao curso Blueprint foram sincronizadas a %{name}."
           details_link: "Visualizar alterações"
           subject: "Sincronização do modelo: %{name}"
         subject: "Sincronização do modelo: %{name}"
       sms: 
-        body: "Alterações ao curso modelo sincronizadas a %{name}."
+        body: "Alterações ao curso Blueprint sincronizadas a %{name}."
         link_message: "Mais informações em %{url}"
       summary: 
         body: "Sincronização do modelo: Alterações sincronizadas a %{name}."
         subject: "Sincronização do modelo: %{name}"
       twitter: 
-        tweet: "Alerta do Canvas - Alterações do curso modelo sincronizadas a %{name}"
+        tweet: "Alerta do Canvas - Alterações do curso Blueprint sincronizadas a %{name}"
     blueprint_sync_complete: 
       email: 
-        body: "O seu curso modelo, %{name}, sincronizou alterações a todos os cursos associados."
+        body: "O seu curso blueprint, %{name}, sincronizou alterações a todos os cursos associados."
         details_link: "Mais informações: %{link}"
         html: 
-          body: "O seu curso modelo, %{name}, sincronizou alterações a todos os cursos associados."
+          body: "O seu curso blueprint, %{name}, sincronizou alterações a todos os cursos associados."
           details_link: "Mais informações"
-          subject: "Sincronização de curso modelo falhou: %{name}"
-        subject: "Sincronização de curso modelo falhou: %{name}"
+          subject: "Sincronização de curso Blueprint falhou: %{name}"
+        subject: "Sincronização de curso Blueprint falhou: %{name}"
       sms: 
-        body: "Alterações ao curso modelo sincronizadas de %{name}."
+        body: "Alterações ao curso Blueprint sincronizadas de %{name}."
         link_message: "Mais informações em %{url}"
       summary: 
         body: "Sincronização do modelo: Alterações sincronizadas de %{name}."
-        subject: "Sincronização de curso modelo falhou: %{name}"
+        subject: "Sincronização de curso Blueprint falhou: %{name}"
       twitter: 
-        tweet: "Alerta do Canvas - Alterações do curso modelo sincronizadas de %{name}."
+        tweet: "Alerta do Canvas - Alterações do curso Blueprint sincronizadas de %{name}."
     collaboration_invitation: 
       email: 
         body: |-
@@ -20499,7 +20499,7 @@ pt-BR:
     blueprint_description: |-
         *Instrutor e Administrador somente:*
         
-        Conteúdo foi sincronizado a partir de um curso modelo a cursos associados
+        Conteúdo foi sincronizado a partir de um curso blueprint a cursos associados
     blueprint_display: "Sincronização do modelo"
     calendar_description: "Itens novos e alterados no calendário do seu curso"
     calendar_display: Calendário
@@ -20615,8 +20615,8 @@ pt-BR:
       assignment_resubmitted: "Tarefa reenviada"
       assignment_submitted: "Tarefa Enviada"
       assignment_submitted_late: "Tarefa enviada atrasada"
-      blueprint_content_added: "Conteúdo do modelo adicionado"
-      blueprint_sync_complete: "Sincronização de curso modelo completa"
+      blueprint_content_added: "Conteúdo Blueprint adicionado"
+      blueprint_sync_complete: "Sincronização de curso Blueprint completa"
       collaboration_invitation: "Convite de colaboração"
       confirm_email_communication_channel: "Confirmar canal de comunicação por e-mail"
       confirm_registration: "Confirmar registro"
@@ -29283,10 +29283,10 @@ pt-BR:
   this_influences_the_user_interface_for_setting_due_12b7e7c0: "Isso influencia a interface do usuário para definir datas de vencimento. Ele não muda quando qualquer tarefa existente é devida."
   this_influences_the_user_interface_for_setting_due_be0f0273: "Isso influencia a interface do usuário para definir datas de vencimento. Não altera o prazo para quaisquer tarefas existentes."
   this_integration_is_not_enabled_please_enable_it_t_b9e8a997: "Esta integração não está habilitada. Ative-a para interagir com as configurações."
-  this_is_a_blueprint_course_5e7b47fe: "Este é um curso modelo"
+  this_is_a_blueprint_course_5e7b47fe: "Este é um curso blueprint"
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "Essa é uma lista separada por vírgula de URLs de confiança. Confiar em qualquer URL desta lista irá desviar do token CSRF ao efetuar login no Canvas."
   this_is_a_concluded_course_so_only_concluded_enrol_e6e3a9d9: "Este é um curso concluído, portanto, somente inscrições concluídas estão disponíveis."
-  this_is_a_course_template_99bbe698: "Este é um modelo de curso"
+  this_is_a_course_template_99bbe698: "Este é um template de curso"
   this_is_a_feature_to_allow_product_design_to_remov_e92ea1c3: "Esse é um recurso para permitir que o design de produtos remova todas as várias substituições de tamanho e fonte pelo aplicativo."
   this_is_a_feature_to_allow_the_development_of_a_re_8452eb0d: "Essa é uma funcionalidade para permitir o desenvolvimento de um layout responsivo"
   this_is_a_graded_discussion_28ad2728: "Esse é um fórum avaliado"
@@ -29942,7 +29942,7 @@ pt-BR:
   to_create_a_link_you_can_use_in_canvas_you_ll_need_5c6d93e4: "para criar um link que você pode usar no Canvas. Será necessário se registrar para uma conta da Zoom se já não tiver uma."
   to_create_a_link_you_can_use_in_canvas_you_ll_need_7dd85497: "para criar um link que você pode usar no Canvas. Será necessária uma conta da Google para usar o Google Meet."
   to_create_a_new_course_to_use_as_a_course_template_9e7e2c6c: "Para criar um novo curso para usar como modelo de curso, Gerenciar Cursos - adicionar também deve estar habilitado."
-  to_create_a_new_course_to_use_as_a_course_template_aa0ff48e: "Para criar um novo curso para usar como modelo de curso, Cursos - adicionar também deve estar habilitado."
+  to_create_a_new_course_to_use_as_a_course_template_aa0ff48e: "Para criar um novo curso para usar como template de curso, Cursos - adicionar também deve estar habilitado."
   to_create_announcements_discussions_manage_must_al_932ac38f: "Para criar anúncios, Discussões - gerenciar também deve ser habilitada."
   to_create_announcements_discussions_moderate_must__8a8278f2: "Para criar avisos, Fóruns - moderar também deve ser habilitado."
   to_cross_list_a_section_course_sections_add_edit_d_160006f7: "Para realizar a listagem cruzada de uma seção, Seções do curso - adicionar/editar/excluir também deve ser habilitada. Para editar a ID SIS do curso, Dados SIS - gerenciar também deve ser habilitada. Para permitir que um usuário do nível da conta exclua um curso, Estado do curso - gerenciar também deve habilitada."
@@ -30004,7 +30004,7 @@ pt-BR:
   to_edit_assignment_details_on_individual_discussio_99f718a7: "Para editar os detalhes da tarefa em fóruns individuais, Fóruns - gerenciar também deve estar habilitado."
   to_edit_blueprint_course_settings_in_course_settin_59befcfa: "Para editar configurações de cursos modelo nas Configurações do curso, Cursos modelo - adicionar/editar/associar/excluir - também deve ser habilitada. Para adicionar um curso associado, Cursos modelo - adicionar/editar/associar/excluir - e Curso - visualizar lista também deve ser habilitada. Para editar configurações de bloqueio em qualquer objeto do modelo, esta permissão deve ser habilitada. Para editar configurações de bloqueio em arquivos, Arquivos do curso - adicionar/editar/excluir também deve ser habilitada. Para editar configurações de bloqueio em testes, Tarefas e Testes - adicionar/editar/excluir também deve ser habilitada."
   to_edit_blueprint_lock_settings_from_the_assignmen_ac5af0f5: "Para editar configurações de bloqueio de modelo na página de índice de Tarefas, Cursos - adicionar/editar/excluir também devem ser habilitadas. Se esta permissão não estiver habilitada, e Cursos - adicionar/editar/excluir estiver habilitado, as configurações de bloqueio do modelo para uma tarefa podem ser gerenciadas a partir da página de detalhes da tarefa. Para editar configurações de bloqueio do modelo em um questionário individual, ou na página de índice de Questionários, Cursos - adicionar/editar/excluir também devem ser habilitadas."
-  to_edit_blueprint_lock_settings_from_the_discussio_66c1f4d3: "Para editar configurações de bloqueio de modelo na página de índice de Fóruns, Fóruns - moderar também devem ser habilitadas."
+  to_edit_blueprint_lock_settings_from_the_discussio_66c1f4d3: "Para editar configurações de bloqueio Blueprint na página de índice de Fóruns, Fóruns - moderar também devem ser habilitadas."
   to_edit_blueprint_lock_settings_from_the_discussio_cf8c75a5: "Para editar configurações de bloqueio do modelo na página de índice de Discussões, Cursos - adicionar/editar/excluir e Discussões - moderar também devem ser habilitadas. "
   to_edit_blueprint_lock_settings_on_the_discussions_9dfd2c8f: "Para editar configurações de bloqueio de modelo na página de índice de Discussões, Cursos - adicionar/editar/excluir e Discussões - visualizar também devem ser habilitadas. Se esta permissão não estiver habilitada, e Cursos - adicionar/editar/excluir e Discussões - visualizar estiverem habilitados, as configurações de bloqueio do modelo podem ser editadas em discussões individuais."
   to_edit_blueprint_lock_settings_on_the_pages_index_c5a9d588: "Para editar configurações de bloqueio de modelo na página de índice de Páginas, Cursos - adicionar/editar/excluir também deve ser habilitada. Se esta permissão não estiver habilitada, e Cursos - adicionar/editar/excluir estiver habilitado, as configurações de bloqueio do modelo podem ser editadas em páginas individuais."
@@ -32407,7 +32407,7 @@ pt-BR:
   you_do_not_have_access_to_the_requested_discussion_90d8ec99: "Você não tem acesso ao fórum solicitado."
   you_do_not_have_access_to_the_requested_quiz_d3659e4b: "Você não tem acesso ao teste solicitado."
   you_do_not_have_access_to_the_requested_resource_316ce49a: "Você não tem acesso ao recurso solicitado."
-  you_do_not_have_blueprint_course_management_permis_51ae6ef5: "Você não tem permissões de gerenciamento do Curso de Modelo"
+  you_do_not_have_blueprint_course_management_permis_51ae6ef5: "Você não tem permissões de gerenciamento do Curso Blueprint"
   you_do_not_have_permission_to_add_this_topic_to_th_fc8622a0: "Você não tem permissão para adicionar este assunto à lista de tarefas do aluno."
   you_do_not_have_permission_to_change_this_488c536: "Você não tem permissão para alterar isto"
   you_do_not_have_permission_to_delete_file_please_c_3b0abf50: "Você não tem permissão para excluir %{file}. Entre em contato com seu administrador."

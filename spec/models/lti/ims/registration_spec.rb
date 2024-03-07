@@ -245,7 +245,7 @@ module Lti::IMS
       context "should return a correct configuration" do
         it do
           expect(subject).to eq({
-                                  "custom_parameters" => nil,
+                                  "custom_fields" => nil,
                                   "description" => nil,
                                   "extensions" => [{
                                     "domain" => "example.com",
@@ -337,6 +337,9 @@ module Lti::IMS
       let(:lti_tool_configuration) do
         {
           domain: "example.com",
+          custom_parameters: {
+            "global_foo" => "global_bar"
+          },
           messages: [{
             type: "LtiResourceLinkRequest",
             target_link_uri: "http://example.com/launch",
@@ -354,7 +357,9 @@ module Lti::IMS
         it do
           expect(subject).to eq(
             {
-              "custom_parameters" => nil,
+              "custom_fields" => {
+                "global_foo" => "global_bar"
+              },
               "description" => nil,
               "domain" => "example.com",
               "extensions" => [{

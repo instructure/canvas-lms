@@ -2610,7 +2610,7 @@ ja:
   all_configured_apps_a14eef0a: すべての設定済みのアプリ
   all_configured_apps_or_course_apps_only_1ccda005: 設定されたすべてのアプリ、またはコースアプリのみ
   all_content_3f06eb2a: すべてのコンテンツ
-  all_course_members_must_be_invited_to_calendar_eve_73984f29: すべてのコースメンバーがカレンダーのイベントに招待される必要があります。
+  all_course_members_must_be_invited_to_calendar_eve_73984f29: すべてのコースメンバーがカレンダーのイベントに招待されます。
   all_courses_80701c6f: すべてのコース。
   all_courses_a7dbb853: すべてのコース
   all_dates_fields_must_be_present_and_formatted_cor_3a0fe925: すべての日付け欄は現在の日付けで、正しいフォーマットである必要があります
@@ -25865,7 +25865,7 @@ ja:
   see_example_below_to_see_how_different_calculation_618de98d: さまざまな計算パラメータが受講者の達成度の計算にどのように影響するかについては、以下の例を参照してください。
   see_more_in_canvas_guides_fc90a457: "詳細については Canvas ガイドをご覧ください"
   see_other_users_primary_email_address_59c8473f: 他のユーザーのプライマリ電子メールアドレスを表示する
-  see_other_viewers_webcams_f10f8fd3: 他の視聴者のウェブカメラを見る
+  see_other_viewers_webcams_f10f8fd3: 他の視聴者のウェブカメラ画像を見る
   see_rubric_results_62a6447d: ルーブリックの結果を参照
   see_scoring_details_f7fd1f3b: 採点の詳細を参照
   see_some_lti_tools_that_work_great_with_canvas_16ef75a0: "Canvasと素晴らしい働きをする*いくつかのLTI ツールを見る*。"

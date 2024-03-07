@@ -358,6 +358,7 @@ nn:
     tab_brand_configs: Tema
     tab_courses: Emne
     tab_developer_keys: Utviklarnøklar
+    tab_extensions: Utvidingar
     tab_faculty_journal: Faglærarprotokoll
     tab_grading_standards: Karaktersetjing
     tab_jobs: Jobbar
@@ -8592,6 +8593,7 @@ nn:
   crumbs: 
     access_report: Tilgangsrapport
     announcements: Kunngjeringar
+    apps: Utvidingar
     assignments: Oppgåver
     calendar_events: Kalenderhendingar
     collaborations: Samarbeid
@@ -10814,6 +10816,7 @@ nn:
   exporting_b1eab154: Eksporterer
   extend_due_date_20651e76: "Utvid innleveringsfrist"
   extended_9a58dcb6: Utvida
+  extensions_7250a0bb: Utvidingar
   external_apps_account_course_settings_78de2b2f: "Eksterne appar (Konto, Emneinnstillingar)"
   external_apps_account_course_settings_c44af5ef: "Eksterne appar (Konto-/Emneinnstillingar)"
   external_apps_course_settings_1f045644: "Eksterne appar (emneinnstillingar)"
@@ -14559,6 +14562,9 @@ nn:
   lti_launch_error_41eac9a: "Feil under oppstart av LTI-verktøy"
   lti_multiple_assignment_deep_linking_b7d641d7: "LTI fleire oppgåver djup lenking"
   lti_platform_storage_9d11dc60: "LTI plattformlagring"
+  lti_registrations: 
+    index: 
+      title: Utvidingar
   lti_report_2b6193ab: LTI-rapport
   lti_submissions_require_a_url_to_submit_85ca9988: "LTI-innleveringar krev ein URL for å levere"
   lti_tool_report_f13213b3: "LTI verktøyrapport"
