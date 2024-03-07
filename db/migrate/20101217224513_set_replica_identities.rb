@@ -31,6 +31,7 @@ class SetReplicaIdentities < ActiveRecord::Migration[7.0]
     set_replica_identity :account_users
     set_replica_identity :accounts
     set_replica_identity :asset_user_accesses
+    set_replica_identity :blackout_dates
     set_replica_identity :comment_bank_items
     set_replica_identity :content_tags
     set_replica_identity :context_external_tools
