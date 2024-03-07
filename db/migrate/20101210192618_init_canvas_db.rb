@@ -560,7 +560,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.float    "mastery_score"
       t.string   "grading_type", limit: 255
       t.string   "submission_types", limit: 255
-      t.string   "workflow_state", null: false, limit: 255
+      t.string   "workflow_state", null: false, limit: 255, default: "published"
       t.integer  "context_id", limit: 8, null: false
       t.string   "context_type", null: false, limit: 255
       t.integer  "assignment_group_id", limit: 8
@@ -806,23 +806,6 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :auditor_grade_change_records, :student_id
     add_index :auditor_grade_change_records, :grader_id
 
-    create_table :auditor_migration_cells do |t|
-      t.references :account, null: false, index: true
-      t.integer :year, null: false
-      t.integer :month, null: false
-      t.integer :day, null: false
-      t.boolean :completed, null: false, default: false
-      t.boolean :failed, null: false, default: false
-      t.string :auditor_type, null: false
-      t.timestamps null: false
-      t.bigint :job_id
-      t.boolean :repaired
-      t.boolean :queued
-      t.boolean :audited
-      t.boolean :missing_count
-    end
-    add_index :auditor_migration_cells, %i[auditor_type account_id year month day], name: "index_auditor_migration_cells_by_primary_access_path", unique: true
-
     create_table "calendar_events", force: true do |t|
       t.string "title", limit: 255
       t.text "description", limit: 16_777_215
@@ -992,6 +975,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.datetime :confirmation_code_expires_at
       t.integer :confirmation_sent_count, default: 0, null: false
       t.bigint :root_account_ids, array: true
+      t.string :confirmation_redirect
     end
 
     add_index "communication_channels", ["pseudonym_id", "position"]
