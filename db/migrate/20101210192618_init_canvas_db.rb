@@ -1244,7 +1244,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
               where: "workflow_state = 'unread'"
 
     create_table :content_shares do |t|
-      t.string :name, limit: 255, null: false
+      t.text :name, null: false
       t.datetime :created_at, null: false
       t.datetime :updated_at, null: false
       t.integer :user_id, limit: 8, null: false
@@ -1493,6 +1493,34 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index "course_account_associations", ["account_id", "depth"], name: "index_course_account_associations_on_account_id_and_depth_id"
     add_index :course_account_associations, %i[course_id course_section_id account_id], unique: true, name: "index_caa_on_course_id_and_section_id_and_account_id"
     add_index :course_account_associations, :course_section_id
+
+    create_table :course_paces do |t|
+      t.references :course, null: false, foreign_key: false, type: :bigint, index: true
+      t.references :course_section, null: true, index: false, type: :bigint
+      t.references :user, null: true, index: false, foreign_key: false, type: :bigint
+      t.string :workflow_state, default: "unpublished", null: false, limit: 255
+      t.date :end_date
+      t.boolean :exclude_weekends, null: false, default: true
+      t.boolean :hard_end_dates, null: false, default: false
+      t.timestamps null: false, precision: 6
+      t.datetime :published_at
+      t.references :root_account, foreign_key: { to_table: :accounts }, null: false, index: false, type: :bigint
+
+      t.index :course_id, unique: true, where: "course_section_id IS NULL AND user_id IS NULL AND workflow_state='active'", name: "course_paces_unique_primary_plan_index"
+      t.index :course_section_id, unique: true, where: "workflow_state='active'"
+      t.index [:course_id, :user_id], unique: true, where: "workflow_state='active'"
+      t.replica_identity_index
+    end
+
+    create_table :course_pace_module_items do |t|
+      t.references :course_pace, foreign_key: true, index: true, type: :bigint
+      t.integer :duration, null: false, default: 0
+      t.references :module_item, foreign_key: { to_table: :content_tags }, index: true, type: :bigint
+      t.references :root_account, foreign_key: { to_table: :accounts }, null: false, index: false, type: :bigint
+      t.timestamps null: false, precision: 6
+
+      t.replica_identity_index
+    end
 
     create_table :course_score_statistics do |t|
       t.integer :course_id, limit: 8, null: false
@@ -3346,36 +3374,6 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
               [:outcome_proficiency_id, :points],
               name: "index_outcome_proficiency_ratings_on_proficiency_and_points"
 
-    create_table :pace_plans do |t|
-      t.belongs_to :course, null: false, foreign_key: true, type: :bigint, index: true
-      t.references :course_section, null: true, index: false, type: :bigint
-      t.references :user, null: true, index: false, foreign_key: false
-      t.string :workflow_state, default: "unpublished", null: false, limit: 255
-      t.date :end_date
-      t.boolean :exclude_weekends, null: false, default: true
-      t.boolean :hard_end_dates, null: false, default: false
-      t.timestamps null: false, precision: 6
-      t.datetime :published_at
-      t.references :root_account, foreign_key: { to_table: "accounts" }, null: false, index: false
-
-      t.index :course_id,
-              unique: true,
-              where: "course_section_id IS NULL AND user_id IS NULL AND workflow_state='active'",
-              name: "pace_plans_unique_primary_plan_index"
-      t.index :course_section_id, unique: true, where: "workflow_state='active'"
-      t.index [:course_id, :user_id], unique: true, where: "workflow_state='active'"
-      t.replica_identity_index
-    end
-
-    create_table :pace_plan_module_items do |t|
-      t.belongs_to :pace_plan, foreign_key: true, index: true, type: :bigint
-      t.integer :duration, null: false, default: 0
-      t.references :module_item, foreign_key: { to_table: "content_tags" }
-      t.references :root_account, foreign_key: { to_table: "accounts" }, null: false, index: false
-
-      t.replica_identity_index
-    end
-
     create_table "page_comments", force: true do |t|
       t.text     "message"
       t.integer  "page_id", limit: 8
@@ -5075,6 +5073,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :course_account_associations, :accounts
     add_foreign_key :course_account_associations, :course_sections
     add_foreign_key :course_account_associations, :courses
+    add_foreign_key :course_paces, :courses
     add_foreign_key :course_score_statistics, :courses
     add_foreign_key :course_sections, :accounts, column: :root_account_id
     add_foreign_key :course_sections, :courses
@@ -5227,7 +5226,6 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :originality_reports, :submissions
     add_foreign_key :outcome_import_errors, :outcome_imports
     add_foreign_key :outcome_imports, :users
-    add_foreign_key :pace_plans, :users
     add_foreign_key :page_comments, :users
     add_foreign_key :page_views, :users
     add_foreign_key :page_views, :users, column: :real_user_id

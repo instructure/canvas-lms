@@ -36,6 +36,8 @@ class SetReplicaIdentities < ActiveRecord::Migration[7.0]
     set_replica_identity :content_tags
     set_replica_identity :context_external_tools
     set_replica_identity :course_account_associations
+    set_replica_identity :course_pace_module_items
+    set_replica_identity :course_paces
     set_replica_identity :course_sections
     set_replica_identity :courses
     set_replica_identity :developer_key_account_bindings
@@ -61,8 +63,6 @@ class SetReplicaIdentities < ActiveRecord::Migration[7.0]
     set_replica_identity :microsoft_sync_partial_sync_changes
     set_replica_identity :microsoft_sync_user_mappings
     set_replica_identity :originality_reports
-    set_replica_identity :pace_plans
-    set_replica_identity :pace_plan_module_items
     set_replica_identity :pseudonyms
     set_replica_identity :role_overrides
     set_replica_identity :roles
