@@ -1,6 +1,6 @@
 ---
 mobile_offline_mode:
-  state: hidden
+  state: allowed
   applies_to: RootAccount
   display_name: "Mobile offline mode"
   description: "Allow students to sync their course content in the mobile apps and view them while offline."
