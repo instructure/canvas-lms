@@ -884,6 +884,22 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :canvadocs, :document_id, unique: true
     add_index :canvadocs, :attachment_id
 
+    create_table :canvadocs_annotation_contexts do |t|
+      t.references :attachment, foreign_key: true, index: true, null: false, type: :bigint
+      t.references :submission, foreign_key: false, index: true, null: false, type: :bigint
+      t.references :root_account, index: true, foreign_key: { to_table: :accounts }, null: false, type: :bigint
+
+      t.string :launch_id, null: false
+      t.integer :submission_attempt
+      t.timestamps null: false
+
+      t.index(
+        %i[attachment_id submission_attempt submission_id],
+        name: "index_attachment_attempt_submission",
+        unique: true
+      )
+    end
+
     create_table :canvadocs_submissions do |t|
       t.integer :canvadoc_id, limit: 8
       t.integer :crocodoc_document_id, limit: 8
@@ -937,6 +953,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.datetime "deleted_at"
       t.string   "context_code", limit: 255
       t.string   "type", limit: 255
+      t.uuid :resource_link_lookup_uuid
     end
 
     add_index "collaborations", ["context_id", "context_type"], name: "index_collaborations_on_context_id_and_context_type"
@@ -2536,7 +2553,6 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :lti_resource_handlers, [:tool_proxy_id, :resource_type_code], name: "index_lti_resource_handlers_on_tool_proxy_and_type_code", unique: true
 
     create_table :lti_resource_links do |t|
-      t.string :resource_link_id, null: false
       t.timestamps null: false
       t.references :context_external_tool, type: :bigint, foreign_key: { to_table: :context_external_tools }, index: true, null: false
       t.string :workflow_state, default: "active", null: false
@@ -2544,12 +2560,16 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.bigint :context_id, type: :bigint, null: false
       t.string :context_type, limit: 255, null: false
       t.jsonb :custom
-      t.string :lookup_id, limit: 255, null: false
+      t.uuid :lookup_uuid, null: false
+      t.uuid :resource_link_uuid, null: false
     end
-    add_index :lti_resource_links, :resource_link_id, unique: true
     add_index :lti_resource_links, :workflow_state
     add_index :lti_resource_links, [:context_id, :context_type], name: "index_lti_resource_links_by_context_id_context_type"
-    add_index :lti_resource_links, :lookup_id, unique: true
+    add_index :lti_resource_links,
+              %i[lookup_uuid context_id context_type],
+              unique: true,
+              name: "index_lti_resource_links_unique_lookup_uuid_on_context"
+    add_index :lti_resource_links, :resource_link_uuid, unique: true
     add_replica_identity_index :lti_resource_links
 
     create_table :lti_resource_placements do |t|
@@ -4033,6 +4053,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.references :course, type: :bigint, foreign_key: true, index: false, null: false
       t.references :root_account, type: :bigint, foreign_key: { to_table: :accounts }, index: true
       t.boolean :redo_request, default: false, null: false
+      t.uuid :resource_link_lookup_uuid
     end
 
     add_index "submissions", ["assignment_id", "submission_type"], name: "index_submissions_on_assignment_id_and_submission_type"
@@ -4788,6 +4809,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :calendar_events, :users
     add_foreign_key :calendar_events, :web_conferences
     add_foreign_key :canvadocs, :attachments
+    add_foreign_key :canvadocs_annotation_contexts, :submissions
     add_foreign_key :collaborations, :users
     add_foreign_key :collaborators, :collaborations
     add_foreign_key :collaborators, :groups
