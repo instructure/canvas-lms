@@ -28,12 +28,14 @@ QUnit.module('HelpDialog', {
   setup() {
     fakeENV.setup({help_link_name: 'Links'})
     helpDialog.animateDuration = 0
+    this.clock = sinon.useFakeTimers()
     this.server = sinon.fakeServer.create()
     this.server.respondWith('/help_links', '[]')
     return this.server.respondWith('/api/v1/courses.json', '[]')
   },
   teardown() {
     fakeENV.teardown()
+    this.clock.restore()
     this.server.restore()
 
     // if we don't close it after each test, subsequent tests get messed up.
@@ -69,6 +71,7 @@ test('teacher feedback', function () {
 test('focus management', function () {
   helpDialog.open()
   this.server.respond()
+  this.clock.tick(1)
   helpDialog.switchTo('#create_ticket')
   equal(document.activeElement, helpDialog.$dialog.find('#error_subject')[0], 'focuses first input')
   ok(
