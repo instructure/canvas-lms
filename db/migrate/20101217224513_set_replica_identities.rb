@@ -31,10 +31,21 @@ class SetReplicaIdentities < ActiveRecord::Migration[7.0]
     set_replica_identity :context_external_tools
     set_replica_identity :developer_key_account_bindings
     set_replica_identity :developer_keys
+    set_replica_identity :discussion_entries
+    set_replica_identity :discussion_entry_participants
+    set_replica_identity :discussion_topic_participants
+    set_replica_identity :discussion_topics
+    set_replica_identity :favorites
+    set_replica_identity :folders
+    set_replica_identity :group_categories
+    set_replica_identity :group_memberships
+    set_replica_identity :groups
     set_replica_identity :lti_line_items
     set_replica_identity :lti_resource_links
     set_replica_identity :lti_results
     set_replica_identity :originality_reports
+    set_replica_identity :web_conference_participants
+    set_replica_identity :web_conferences
   end
 
   def down
