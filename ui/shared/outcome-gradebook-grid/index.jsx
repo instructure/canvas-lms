@@ -40,7 +40,7 @@ import {
   extend as lodashExtend,
   escape as lodashEscape,
 } from 'lodash'
-import HeaderFilterView from './backbone/views/HeaderFilterView'
+import HeaderFilterView from './react/HeaderFilterView'
 import OutcomeFilterView from './react/OutcomeFilterView'
 import OutcomeColumnView from './backbone/views/OutcomeColumnView'
 import listFormatterPolyfill from '@canvas/util/listFormatter'
@@ -502,13 +502,16 @@ const Grid = {
       ReactDOM.render(menu, node)
     },
     studentHeaderRowCell(node, _column, grid) {
-      $(node).addClass('average-filter')
-      const view = new HeaderFilterView({
-        grid,
-        redrawFn: Grid.View.redrawHeader,
-      })
-      view.render()
-      return $(node).append(view.$el)
+      const menu = React.createElement(
+        HeaderFilterView,
+        {
+          grid,
+          averageFn: Grid.averageFn,
+          redrawFn: Grid.View.redrawHeader
+        },
+        null
+      )
+      ReactDOM.render(menu, node)
     },
     headerCell({node, column, grid}, _fn = Grid.averageFn) {
       if (column.field === 'student') {
