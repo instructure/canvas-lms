@@ -61,6 +61,8 @@ class SetReplicaIdentities < ActiveRecord::Migration[7.0]
     set_replica_identity :microsoft_sync_partial_sync_changes
     set_replica_identity :microsoft_sync_user_mappings
     set_replica_identity :originality_reports
+    set_replica_identity :pace_plans
+    set_replica_identity :pace_plan_module_items
     set_replica_identity :pseudonyms
     set_replica_identity :role_overrides
     set_replica_identity :roles

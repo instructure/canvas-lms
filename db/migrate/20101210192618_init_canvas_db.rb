@@ -1787,6 +1787,30 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :discussion_entries, :legacy, where: "legacy"
     add_replica_identity_index :discussion_entries
 
+    create_table :discussion_entry_drafts do |t|
+      t.references :discussion_topic, null: false, foreign_key: false, index: true, type: :bigint
+      t.references :discussion_entry, null: true, foreign_key: true, index: false, type: :bigint
+      t.references :root_entry, foreign_key: { to_table: "discussion_entries" }, null: true, index: true, type: :bigint
+      t.references :parent, foreign_key: { to_table: "discussion_entries" }, null: true, index: true, type: :bigint
+      t.references :attachment, null: true, foreign_key: true, index: true, type: :bigint
+      t.references :user, null: false, foreign_key: false, index: true, type: :bigint
+      t.text :message
+      t.boolean :include_reply_preview, null: false, default: false
+      t.timestamps null: false, precision: 6
+
+      t.index %i[discussion_topic_id user_id],
+              name: "unique_index_on_topic_and_user",
+              where: "discussion_entry_id IS NULL AND root_entry_id IS NULL",
+              unique: true
+      t.index %i[root_entry_id user_id],
+              name: "unique_index_on_root_entry_and_user",
+              where: "discussion_entry_id IS NULL",
+              unique: true
+      t.index %i[discussion_entry_id user_id],
+              name: "unique_index_on_entry_and_user",
+              unique: true
+    end
+
     create_table "discussion_entry_participants" do |t|
       t.integer "discussion_entry_id", limit: 8, null: false
       t.integer "user_id", limit: 8, null: false
@@ -3272,6 +3296,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
 
       t.timestamps null: false
       t.json :data
+      t.references :learning_outcome_group, foreign_key: false, index: true, type: :bigint
     end
     add_index :outcome_imports, %i[context_type context_id]
     add_index :outcome_imports, :user_id
@@ -3315,7 +3340,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.boolean :hard_end_dates, null: false, default: false
       t.timestamps null: false, precision: 6
       t.datetime :published_at
-      t.references :root_account, foreign_key: { to_table: "accounts" }, null: false, index: true
+      t.references :root_account, foreign_key: { to_table: "accounts" }, null: false, index: false
 
       t.index :course_id,
               unique: true,
@@ -3323,13 +3348,16 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
               name: "pace_plans_unique_primary_plan_index"
       t.index :course_section_id, unique: true, where: "workflow_state='active'"
       t.index [:course_id, :user_id], unique: true, where: "workflow_state='active'"
+      t.replica_identity_index
     end
 
     create_table :pace_plan_module_items do |t|
       t.belongs_to :pace_plan, foreign_key: true, index: true, type: :bigint
       t.integer :duration, null: false, default: 0
       t.references :module_item, foreign_key: { to_table: "content_tags" }
-      t.references :root_account, foreign_key: { to_table: "accounts" }, null: false, index: true
+      t.references :root_account, foreign_key: { to_table: "accounts" }, null: false, index: false
+
+      t.replica_identity_index
     end
 
     create_table "page_comments", force: true do |t|
@@ -3522,6 +3550,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.text     "stuck_sis_fields"
       t.string   "integration_id", limit: 255
       t.integer  "authentication_provider_id", limit: 8
+      t.string :declared_user_type, limit: 255
 
       t.replica_identity_index :account_id
     end
@@ -4164,6 +4193,9 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.string :active_submission_type
       # This is actually the media_id e.g. m-123456 rather than the media_object.id
       t.string :media_object_id
+      t.bigint :context_external_tool_id
+      t.text :lti_launch_url
+      t.uuid :resource_link_lookup_uuid
     end
     add_index :submission_drafts, :submission_id
 
@@ -4396,13 +4428,6 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
 
     add_index "thumbnails", ["parent_id"], name: "index_thumbnails_on_parent_id"
     add_index :thumbnails, [:parent_id, :thumbnail], unique: true, name: "index_thumbnails_size"
-
-    create_table :trophies do |t|
-      t.bigint :user_id, null: false
-      t.string :name
-      t.timestamps null: false
-    end
-    add_index :trophies, :user_id
 
     create_table :usage_rights do |t|
       t.integer :context_id, limit: 8, null: false
@@ -5045,6 +5070,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :delayed_messages, :notification_policies
     add_foreign_key :delayed_messages, :notification_policy_overrides
     add_foreign_key :developer_key_account_bindings, :accounts
+    add_foreign_key :discussion_entry_drafts, :discussion_topics
+    add_foreign_key :discussion_entry_drafts, :users
     add_foreign_key :discussion_entries, :discussion_entries, column: :parent_id
     add_foreign_key :discussion_entries, :discussion_entries, column: :root_entry_id
     add_foreign_key :discussion_entries, :discussion_topics
@@ -5250,7 +5277,6 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :switchman_shards, :switchman_shards, column: :delayed_jobs_shard_id
     add_foreign_key :terms_of_service_contents, :accounts
     add_foreign_key :terms_of_services, :accounts
-    add_foreign_key :trophies, :users
     add_foreign_key :user_account_associations, :accounts
     add_foreign_key :user_account_associations, :users
     add_foreign_key :user_merge_data, :users
