@@ -25,5 +25,6 @@ export default function getTextWidth(text: string) {
       '#content'
     )
   }
-  return $textMeasure.text(text).outerWidth()
+  // convert to integer to maintain backwards compatibility
+  return Math.floor($textMeasure?.text(text).outerWidth() ?? 0)
 }
