@@ -255,8 +255,8 @@ module PostgreSQLAdapterExtensions
     super
   end
 
-  def add_replica_identity_index(table, **kwargs)
-    add_index table, [:root_account_id, :id], unique: true, name: "index_#{table}_replica_identity", **kwargs
+  def add_replica_identity_index(table, column = :root_account_id, primary_key: :id, **kwargs)
+    add_index table, [column, primary_key], unique: true, name: "index_#{table}_replica_identity", **kwargs
   end
 
   def add_column(table_name, column_name, type, if_not_exists: false, **options)
@@ -551,8 +551,16 @@ module IndexDefinitionExtensions
   end
 end
 
+module TableDefinitionExtensions
+  def replica_identity_index(column = :root_account_id)
+    primary_keys = self.primary_keys&.name || [columns.find(&:primary_key?)&.name || :id]
+    index([column] + primary_keys, unique: true, name: "index_#{name}_replica_identity")
+  end
+end
+
 ActiveRecord::ConnectionAdapters::PostgreSQL::SchemaCreation.prepend(SchemaCreationExtensions)
 ActiveRecord::ConnectionAdapters::ColumnDefinition.prepend(ColumnDefinitionExtensions)
 ActiveRecord::ConnectionAdapters::IndexDefinition.prepend(IndexDefinitionExtensions)
 ActiveRecord::ConnectionAdapters::ReferenceDefinition.prepend(ReferenceDefinitionExtensions)
+ActiveRecord::ConnectionAdapters::TableDefinition.prepend(TableDefinitionExtensions)
 ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.prepend(SchemaStatementsExtensions)

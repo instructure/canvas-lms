@@ -27,14 +27,24 @@ class SetReplicaIdentities < ActiveRecord::Migration[7.0]
   def up
     return if connection.index_exists?(:content_tags, replica_identity: true)
 
+    set_replica_identity :access_tokens
+    set_replica_identity :account_users
+    set_replica_identity :asset_user_accesses
     set_replica_identity :content_tags
     set_replica_identity :context_external_tools
+    set_replica_identity :course_account_associations
+    set_replica_identity :course_sections
+    set_replica_identity :courses
     set_replica_identity :developer_key_account_bindings
     set_replica_identity :developer_keys
     set_replica_identity :discussion_entries
     set_replica_identity :discussion_entry_participants
     set_replica_identity :discussion_topic_participants
     set_replica_identity :discussion_topics
+    set_replica_identity :enrollment_dates_overrides
+    set_replica_identity :enrollment_states
+    set_replica_identity :enrollment_terms
+    set_replica_identity :enrollments
     set_replica_identity :favorites
     set_replica_identity :folders
     set_replica_identity :group_categories
@@ -43,7 +53,15 @@ class SetReplicaIdentities < ActiveRecord::Migration[7.0]
     set_replica_identity :lti_line_items
     set_replica_identity :lti_resource_links
     set_replica_identity :lti_results
+    set_replica_identity :microsoft_sync_groups
+    set_replica_identity :microsoft_sync_user_mappings
     set_replica_identity :originality_reports
+    set_replica_identity :pseudonyms
+    set_replica_identity :role_overrides
+    set_replica_identity :roles
+    set_replica_identity :user_account_associations
+    set_replica_identity :user_notes
+    set_replica_identity :users
     set_replica_identity :web_conference_participants
     set_replica_identity :web_conferences
   end
