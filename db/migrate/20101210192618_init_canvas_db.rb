@@ -662,6 +662,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
               where: "context_type='Course' AND workflow_state<>'deleted'",
               name: "index_assignments_active"
     add_index :assignments, :important_dates, where: "important_dates"
+    add_index :assignments, :workflow_state
 
     create_table "attachment_associations", force: true do |t|
       t.integer "attachment_id", limit: 8
@@ -838,6 +839,21 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :auditor_grade_change_records, :student_id
     add_index :auditor_grade_change_records, :grader_id
 
+    create_table :auditor_pseudonym_records do |t|
+      t.references :pseudonym, foreign_key: false, null: false, type: :bigint, index: true
+      t.references :root_account, foreign_key: { to_table: :accounts }, null: false, type: :bigint, index: true
+      t.bigint :performing_user_id, null: false
+      t.string :action, null: false
+      t.string :hostname, null: false
+      t.string :pid, null: false
+      t.string :uuid, null: false
+      t.string :event_type, null: false
+      t.string :request_id
+
+      t.datetime :created_at, null: false
+    end
+    add_index :auditor_pseudonym_records, :uuid
+
     create_table "calendar_events", force: true do |t|
       t.string "title", limit: 255
       t.text "description", limit: 16_777_215
@@ -867,11 +883,15 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.bigint :web_conference_id
       t.references :root_account, type: :bigint, foreign_key: { to_table: :accounts }, index: true
       t.boolean :important_dates, default: false, null: false
+      t.string :rrule, limit: 255
+      t.uuid :series_uuid
+      t.boolean :series_head
     end
     add_index :calendar_events, %i[context_id context_type timetable_code], where: "timetable_code IS NOT NULL", unique: true, name: "index_calendar_events_on_context_and_timetable_code"
     add_index :calendar_events, :start_at, where: "workflow_state<>'deleted'"
     add_index :calendar_events, :web_conference_id, where: "web_conference_id IS NOT NULL"
     add_index :calendar_events, :important_dates, where: "important_dates"
+    add_index :calendar_events, :series_uuid
 
     create_table :blackout_dates do |t|
       t.belongs_to :context, polymorphic: true, index: true, null: false, type: :bigint
@@ -885,8 +905,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
 
     create_table :bookmarks_bookmarks do |t|
       t.integer :user_id, limit: 8, null: false
-      t.string :name, null: false, limit: 255
-      t.string :url, null: false, limit: 255
+      t.text :name, null: false
+      t.text :url, null: false
       t.integer :position
       t.text :json
     end
@@ -1506,6 +1526,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.timestamps null: false, precision: 6
       t.datetime :published_at
       t.references :root_account, foreign_key: { to_table: :accounts }, null: false, index: false, type: :bigint
+      t.string :migration_id
 
       t.index :course_id, unique: true, where: "course_section_id IS NULL AND user_id IS NULL AND workflow_state='active'", name: "course_paces_unique_primary_plan_index"
       t.index :course_section_id, unique: true, where: "workflow_state='active'"
@@ -1519,6 +1540,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.references :module_item, foreign_key: { to_table: :content_tags }, index: true, type: :bigint
       t.references :root_account, foreign_key: { to_table: :accounts }, null: false, index: false, type: :bigint
       t.timestamps null: false, precision: 6
+      t.string :migration_id
 
       t.replica_identity_index
     end
@@ -2148,7 +2170,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.text     "user_agent"
       t.string   "request_method", limit: 255
       t.text     "http_env", limit: 16_777_215
-      t.string   "subject", limit: 255
+      t.text     "subject"
       t.string   "request_context_id", limit: 255
       t.integer  "account_id", limit: 8
       t.integer  "zendesk_ticket_id", limit: 8
@@ -3082,6 +3104,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.references :user, null: false, foreign_key: false, index: false, type: :bigint
       t.string :aad_id
       t.timestamps null: false, precision: 6
+      t.boolean :needs_updating, default: false, null: false
 
       t.index [:user_id, :root_account_id], unique: true, name: "index_microsoft_sync_user_mappings_ra_id_user_id"
       t.replica_identity_index
@@ -3641,6 +3664,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.string :old_display_name, limit: 255
       t.string :old_content_type, limit: 255
       t.string :new_instfs_uuid
+      t.string :old_file_state
+      t.string :old_workflow_state
     end
     add_index :purgatories, :attachment_id, unique: true
     add_index :purgatories, :deleted_by_user_id
@@ -4997,6 +5022,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :auditor_grade_change_records, :users, column: :grader_id
     add_foreign_key :auditor_grade_change_records, :users, column: :student_id
     add_foreign_key :auditor_grade_change_records, :submissions
+    add_foreign_key :auditor_pseudonym_records, :pseudonyms
     add_foreign_key :bookmarks_bookmarks, :users
     add_foreign_key :calendar_events, :calendar_events, column: :parent_calendar_event_id
     add_foreign_key :calendar_events, :cloned_items
