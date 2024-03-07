@@ -78,12 +78,12 @@ class CreateDelayedJobs < ActiveRecord::Migration[4.2]
               where: "strand IS NOT NULL"
     add_index :delayed_jobs,
               :singleton,
-              where: "singleton IS NOT NULL AND locked_by IS NULL",
+              where: "singleton IS NOT NULL AND (locked_by IS NULL OR locked_by = '#{::Delayed::Backend::Base::ON_HOLD_LOCKED_BY}')",
               unique: true,
               name: "index_delayed_jobs_on_singleton_not_running"
     add_index :delayed_jobs,
               :singleton,
-              where: "singleton IS NOT NULL AND locked_by IS NOT NULL",
+              where: "singleton IS NOT NULL AND locked_by IS NOT NULL AND locked_by <> '#{::Delayed::Backend::Base::ON_HOLD_LOCKED_BY}'",
               unique: true,
               name: "index_delayed_jobs_on_singleton_running"
 
@@ -127,7 +127,7 @@ class CreateDelayedJobs < ActiveRecord::Migration[4.2]
           PERFORM pg_advisory_xact_lock(half_md5_as_bigint(CONCAT('singleton:', NEW.singleton)));
           -- this condition seems silly, but it forces postgres to use the two partial indexes on singleton,
           -- rather than doing a seq scan
-          PERFORM 1 FROM delayed_jobs WHERE singleton = NEW.singleton AND (locked_by IS NULL OR locked_by IS NOT NULL);
+          PERFORM 1 FROM delayed_jobs WHERE singleton = NEW.singleton AND (locked_by IS NULL OR locked_by = '#{::Delayed::Backend::Base::ON_HOLD_LOCKED_BY}' OR locked_by <> '#{::Delayed::Backend::Base::ON_HOLD_LOCKED_BY}');
           IF FOUND THEN
             NEW.next_in_strand := false;
           END IF;
@@ -173,7 +173,7 @@ class CreateDelayedJobs < ActiveRecord::Migration[4.2]
             SELECT id FROM delayed_jobs j2
               WHERE next_in_strand=false AND
                 j2.strand=$1.strand AND
-                (j2.singleton IS NULL OR NOT EXISTS (SELECT 1 FROM delayed_jobs j3 WHERE j3.singleton=j2.singleton AND j3.id<>j2.id AND (j3.locked_by IS NULL OR j3.locked_by IS NOT NULL)))
+                (j2.singleton IS NULL OR NOT EXISTS (SELECT 1 FROM delayed_jobs j3 WHERE j3.singleton=j2.singleton AND j3.id<>j2.id AND (j3.locked_by IS NULL OR j3.locked_by = ''#{::Delayed::Backend::Base::ON_HOLD_LOCKED_BY}'' OR j3.locked_by <> ''#{::Delayed::Backend::Base::ON_HOLD_LOCKED_BY}'')))
               ORDER BY j2.strand_order_override ASC, j2.id ASC
               LIMIT ';
 
