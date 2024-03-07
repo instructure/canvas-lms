@@ -1773,6 +1773,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.references :root_account, type: :bigint, foreign_key: { to_table: :accounts }, index: false, null: false
       t.boolean :legacy, default: true, null: false
       t.boolean :include_reply_preview, default: false, null: false
+      t.boolean :is_anonymous_author, default: false, null: false
     end
 
     add_index "discussion_entries", ["user_id"], name: "index_discussion_entries_on_user_id"
@@ -1818,6 +1819,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.boolean "forced_read_state"
       t.integer "rating"
       t.references :root_account, type: :bigint, foreign_key: { to_table: :accounts }, index: false, null: false
+      t.string :report_type, limit: 255
     end
     add_index "discussion_entry_participants", ["discussion_entry_id", "user_id"], name: "index_entry_participant_on_entry_id_and_user_id", unique: true
     add_index :discussion_entry_participants, :user_id
@@ -1877,6 +1879,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.datetime :todo_date
       t.boolean :is_section_specific, default: false, null: false
       t.references :root_account, type: :bigint, foreign_key: { to_table: :accounts }, index: false, null: false
+      t.string :anonymous_state, limit: 255
+      t.boolean :is_anonymous_author, default: false, null: false
     end
 
     add_index "discussion_topics", ["context_id", "position"], name: "index_discussion_topics_on_context_id_and_position"
@@ -2251,6 +2255,15 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :gradebook_csvs, [:user_id, :course_id]
     add_index :gradebook_csvs, :course_id
     add_index :gradebook_csvs, :progress_id
+
+    create_table :gradebook_filters do |t|
+      t.references :course, null: false, foreign_key: true, index: false, type: :bigint
+      t.references :user, null: false, foreign_key: false, type: :bigint, index: true
+      t.string :name, limit: 255, null: false
+      t.jsonb :payload, null: false, default: {}
+      t.timestamps null: false, precision: 6
+    end
+    add_index :gradebook_filters, [:course_id, :user_id]
 
     create_table "gradebook_uploads", force: true do |t|
       t.datetime "created_at", null: false
@@ -3334,7 +3347,6 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.references :course_section, null: true, index: false, type: :bigint
       t.references :user, null: true, index: false, foreign_key: false
       t.string :workflow_state, default: "unpublished", null: false, limit: 255
-      t.date :start_date
       t.date :end_date
       t.boolean :exclude_weekends, null: false, default: true
       t.boolean :hard_end_dates, null: false, default: false
@@ -3643,6 +3655,15 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     end
 
     add_index "quiz_groups", ["quiz_id"], name: "index_quiz_groups_on_quiz_id"
+
+    create_table :quiz_migration_alerts do |t|
+      t.references :migration, polymorphic: true, type: :bigint, index: true
+      t.references :user, null: false, foreign_key: false, type: :bigint, index: true
+      t.references :course, null: false, foreign_key: true, type: :bigint
+      t.timestamps null: false, precision: 6
+    end
+    add_index :quiz_migration_alerts, :user_id, if_not_exists: true
+    add_index :quiz_migration_alerts, :course_id, if_not_exists: true
 
     create_table :quiz_question_regrades do |t|
       t.integer :quiz_regrade_id, limit: 8, null: false
@@ -5120,6 +5141,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :gradebook_csvs, :courses
     add_foreign_key :gradebook_csvs, :progresses
     add_foreign_key :gradebook_csvs, :users
+    add_foreign_key :gradebook_filters, :users
     add_foreign_key :gradebook_uploads, :courses
     add_foreign_key :gradebook_uploads, :users
     add_foreign_key :gradebook_uploads, :progresses
@@ -5223,6 +5245,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :pseudonyms, :users
     add_foreign_key :purgatories, :users, column: :deleted_by_user_id
     add_foreign_key :purgatories, :attachments
+    add_foreign_key :quiz_migration_alerts, :users
     add_foreign_key :quiz_question_regrades, :quiz_questions
     add_foreign_key :quiz_question_regrades, :quiz_regrades
     add_foreign_key :quiz_regrade_runs, :quiz_regrades

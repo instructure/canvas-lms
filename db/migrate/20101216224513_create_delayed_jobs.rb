@@ -124,6 +124,7 @@ class CreateDelayedJobs < ActiveRecord::Migration[4.2]
           END IF;
         END IF;
         IF NEW.singleton IS NOT NULL THEN
+          PERFORM pg_advisory_xact_lock(half_md5_as_bigint(CONCAT('singleton:', NEW.singleton)));
           -- this condition seems silly, but it forces postgres to use the two partial indexes on singleton,
           -- rather than doing a seq scan
           PERFORM 1 FROM delayed_jobs WHERE singleton = NEW.singleton AND (locked_by IS NULL OR locked_by IS NOT NULL);
@@ -141,11 +142,13 @@ class CreateDelayedJobs < ActiveRecord::Migration[4.2]
     execute(<<~SQL) # rubocop:disable Rails/SquishedSQLHeredocs
       CREATE FUNCTION #{connection.quote_table_name("delayed_jobs_after_delete_row_tr_fn")} () RETURNS trigger AS $$
       DECLARE
+        next_strand varchar;
         running_count integer;
         should_lock boolean;
         should_be_precise boolean;
         update_query varchar;
         skip_locked varchar;
+        transition boolean;
       BEGIN
         IF OLD.strand IS NOT NULL THEN
           should_lock := true;
@@ -170,7 +173,7 @@ class CreateDelayedJobs < ActiveRecord::Migration[4.2]
             SELECT id FROM delayed_jobs j2
               WHERE next_in_strand=false AND
                 j2.strand=$1.strand AND
-                (j2.singleton IS NULL OR NOT EXISTS (SELECT 1 FROM delayed_jobs j3 WHERE j3.singleton=j2.singleton AND j3.id<>j2.id))
+                (j2.singleton IS NULL OR NOT EXISTS (SELECT 1 FROM delayed_jobs j3 WHERE j3.singleton=j2.singleton AND j3.id<>j2.id AND (j3.locked_by IS NULL OR j3.locked_by IS NOT NULL)))
               ORDER BY j2.strand_order_override ASC, j2.id ASC
               LIMIT ';
 
@@ -195,8 +198,42 @@ class CreateDelayedJobs < ActiveRecord::Migration[4.2]
 
           update_query := update_query || ' FOR UPDATE' || COALESCE(skip_locked, '') || ')';
           EXECUTE update_query USING OLD, running_count;
-        ELSIF OLD.singleton IS NOT NULL THEN
-          UPDATE delayed_jobs SET next_in_strand = 't' WHERE singleton=OLD.singleton AND next_in_strand=false;
+        END IF;
+
+        IF OLD.singleton IS NOT NULL THEN
+          PERFORM pg_advisory_xact_lock(half_md5_as_bigint(CONCAT('singleton:', OLD.singleton)));
+
+          transition := EXISTS (SELECT 1 FROM delayed_jobs AS j1 WHERE j1.singleton = OLD.singleton AND j1.strand IS DISTINCT FROM OLD.strand AND locked_by IS NULL);
+
+          IF transition THEN
+            next_strand := (SELECT j1.strand FROM delayed_jobs AS j1 WHERE j1.singleton = OLD.singleton AND j1.strand IS DISTINCT FROM OLD.strand AND locked_by IS NULL AND j1.strand IS NOT NULL LIMIT 1);
+
+            IF next_strand IS NOT NULL THEN
+              -- if the singleton has a new strand defined, we need to lock it to ensure we obey n_strand constraints --
+              IF NOT pg_try_advisory_xact_lock(half_md5_as_bigint(next_strand)) THEN
+                -- a failure to acquire the lock means that another process already has it and will thus handle this singleton --
+                RETURN OLD;
+              END IF;
+            END IF;
+          ELSIF OLD.strand IS NOT NULL THEN
+            -- if there is no transition and there is a strand then we have already handled this singleton in the case above --
+            RETURN OLD;
+          END IF;
+
+          -- handles transitioning a singleton from stranded to not stranded --
+          -- handles transitioning a singleton from unstranded to stranded --
+          -- handles transitioning a singleton from strand A to strand B --
+          -- these transitions are a relatively rare case, so we take a shortcut and --
+          -- only start the next singleton if its strand does not currently have any running jobs --
+          -- if it does, the next stranded job that finishes will start this singleton if it can --
+          UPDATE delayed_jobs SET next_in_strand=true WHERE id IN (
+            SELECT id FROM delayed_jobs j2
+              WHERE next_in_strand=false AND
+                j2.singleton=OLD.singleton AND
+                j2.locked_by IS NULL AND
+                (j2.strand IS NULL OR NOT EXISTS (SELECT 1 FROM delayed_jobs j3 WHERE j3.strand=j2.strand AND j3.id<>j2.id))
+              FOR UPDATE
+            );
         END IF;
         RETURN OLD;
       END;
