@@ -124,7 +124,9 @@ class CreateDelayedJobs < ActiveRecord::Migration[4.2]
           END IF;
         END IF;
         IF NEW.singleton IS NOT NULL THEN
-          PERFORM 1 FROM delayed_jobs WHERE singleton = NEW.singleton;
+          -- this condition seems silly, but it forces postgres to use the two partial indexes on singleton,
+          -- rather than doing a seq scan
+          PERFORM 1 FROM delayed_jobs WHERE singleton = NEW.singleton AND (locked_by IS NULL OR locked_by IS NOT NULL);
           IF FOUND THEN
             NEW.next_in_strand := false;
           END IF;
@@ -201,6 +203,22 @@ class CreateDelayedJobs < ActiveRecord::Migration[4.2]
       $$ LANGUAGE plpgsql SET search_path TO #{::Switchman::Shard.current.name};
     SQL
     execute("CREATE TRIGGER delayed_jobs_after_delete_row_tr AFTER DELETE ON #{connection.quote_table_name(Delayed::Job.table_name)} FOR EACH ROW WHEN ((OLD.strand IS NOT NULL OR OLD.singleton IS NOT NULL) AND OLD.next_in_strand=true) EXECUTE PROCEDURE #{connection.quote_table_name("delayed_jobs_after_delete_row_tr_fn")}()")
+
+    execute(<<~SQL) # rubocop:disable Rails/SquishedSQLHeredocs
+      CREATE FUNCTION #{connection.quote_table_name("delayed_jobs_before_unlock_delete_conflicting_singletons_row_fn")} () RETURNS trigger AS $$
+      BEGIN
+        DELETE FROM delayed_jobs WHERE id<>OLD.id AND singleton=OLD.singleton AND locked_by IS NULL;
+        RETURN NEW;
+      END;
+      $$ LANGUAGE plpgsql SET search_path TO #{::Switchman::Shard.current.name};
+    SQL
+    execute(<<~SQL) # rubocop:disable Rails/SquishedSQLHeredocs
+      CREATE TRIGGER delayed_jobs_before_unlock_delete_conflicting_singletons_row_tr BEFORE UPDATE ON #{connection.quote_table_name(Delayed::Job.table_name)} FOR EACH ROW WHEN (
+        OLD.singleton IS NOT NULL AND
+        OLD.singleton=NEW.singleton AND
+        OLD.locked_by IS NOT NULL AND
+        NEW.locked_by IS NULL) EXECUTE PROCEDURE #{connection.quote_table_name("delayed_jobs_before_unlock_delete_conflicting_singletons_row_fn")}();
+    SQL
 
     create_table :failed_jobs do |t|
       t.integer  "priority",    default: 0
