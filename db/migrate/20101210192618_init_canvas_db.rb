@@ -94,6 +94,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.string :workflow_state, default: "active", null: false
       t.bigint :root_account_id, null: false
       t.bigint :real_user_id
+      t.datetime :permanent_expires_at
 
       t.replica_identity_index
     end
@@ -629,6 +630,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
                    type: :bigint,
                    foreign_key: false,
                    index: { where: "annotatable_attachment_id IS NOT NULL" }
+      t.boolean :important_dates, default: false, null: false
     end
 
     add_index "assignments", ["assignment_group_id"], name: "index_assignments_on_assignment_group_id"
@@ -658,6 +660,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
               :context_id,
               where: "context_type='Course' AND workflow_state<>'deleted'",
               name: "index_assignments_active"
+    add_index :assignments, :important_dates, where: "important_dates"
 
     create_table "attachment_associations", force: true do |t|
       t.integer "attachment_id", limit: 8
@@ -774,6 +777,26 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :auditor_course_records, :sis_batch_id
     add_index :auditor_course_records, :user_id
 
+    create_table :auditor_feature_flag_records do |t|
+      t.string :uuid, null: false
+      t.bigint :feature_flag_id, null: false
+      t.bigint :root_account_id, null: false
+      t.string :context_type
+      t.bigint :context_id
+      t.string :feature_name
+      t.string :event_type, null: false
+      t.string :state_before, null: false
+      t.string :state_after, null: false
+      t.string :request_id, null: false
+      t.bigint :user_id
+      t.datetime :created_at, null: false
+    end
+    add_index :auditor_feature_flag_records, :uuid
+    add_index :auditor_feature_flag_records, :feature_flag_id
+    add_index :auditor_feature_flag_records, :root_account_id
+    add_index :auditor_feature_flag_records, :user_id
+    add_foreign_key :auditor_feature_flag_records, :accounts, column: :root_account_id
+
     create_table :auditor_grade_change_records do |t|
       t.string :uuid, null: false
       t.bigint :account_id, null: false
@@ -845,10 +868,12 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.string   "timetable_code", limit: 255
       t.bigint :web_conference_id
       t.references :root_account, type: :bigint, foreign_key: { to_table: :accounts }, index: true
+      t.boolean :important_dates, default: false, null: false
     end
     add_index :calendar_events, %i[context_id context_type timetable_code], where: "timetable_code IS NOT NULL", unique: true, name: "index_calendar_events_on_context_and_timetable_code"
     add_index :calendar_events, :start_at, where: "workflow_state<>'deleted'"
     add_index :calendar_events, :web_conference_id, where: "web_conference_id IS NOT NULL"
+    add_index :calendar_events, :important_dates, where: "important_dates"
 
     create_table :bookmarks_bookmarks do |t|
       t.integer :user_id, limit: 8, null: false
@@ -1588,6 +1613,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :courses, :abstract_course_id, where: "abstract_course_id IS NOT NULL"
     add_index :courses, :sync_enrollments_from_homeroom, where: "sync_enrollments_from_homeroom"
     add_index :courses, :homeroom_course, where: "homeroom_course"
+    add_index :courses, :homeroom_course_id, where: "homeroom_course_id IS NOT NULL"
 
     create_table :crocodoc_documents do |t|
       t.string :uuid, limit: 255
@@ -1695,7 +1721,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.boolean  "force_token_reuse"
       t.string   "workflow_state", default: "active", null: false, limit: 255
       t.boolean  "replace_tokens"
-      t.boolean  "auto_expire_tokens"
+      t.boolean  :auto_expire_tokens, default: false, null: false
       t.string   "redirect_uris", array: true, default: [], null: false, limit: 255
       t.text :notes
       t.integer :access_token_count, default: 0, null: false
@@ -1733,6 +1759,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer  "rating_count"
       t.integer  "rating_sum"
       t.references :root_account, type: :bigint, foreign_key: { to_table: :accounts }, index: false, null: false
+      t.boolean :legacy, default: true, null: false
     end
 
     add_index "discussion_entries", ["user_id"], name: "index_discussion_entries_on_user_id"
@@ -1744,6 +1771,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
               [:user_id, :discussion_topic_id],
               where: "workflow_state <> 'deleted'",
               name: "index_discussion_entries_active_on_user_id_and_topic"
+    add_index :discussion_entries, :legacy, where: "legacy"
     add_replica_identity_index :discussion_entries
 
     create_table "discussion_entry_participants" do |t|
@@ -4528,6 +4556,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :users, :workflow_state
     add_index :users, :lti_id
     add_index :users, "#{User.best_unicode_collation_key("sortable_name")}, id", name: :index_users_on_sortable_name
+    add_index :users, :id, where: "workflow_state <> 'deleted'", name: "index_active_users_on_id"
 
     create_table :user_profiles do |t|
       t.text   :bio
@@ -4899,6 +4928,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :auditor_course_records, :accounts
     add_foreign_key :auditor_course_records, :courses
     add_foreign_key :auditor_course_records, :users
+    add_foreign_key :auditor_feature_flag_records, :users
     add_foreign_key :auditor_grade_change_records, :accounts
     add_foreign_key :auditor_grade_change_records, :accounts, column: :root_account_id
     add_foreign_key :auditor_grade_change_records, :assignments
