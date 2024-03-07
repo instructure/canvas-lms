@@ -1103,8 +1103,8 @@ describe WikiPage do
     before do
       skip "not available" unless ActiveRecord::Base.connection.table_exists?("wiki_page_embeddings")
 
-      allow(OpenAi).to receive(:generate_embedding).and_return([1] * 1536)
-      expect(OpenAi).to receive(:api_key).at_least(:once).and_return("fake_api_key")
+      allow(SmartSearch).to receive(:generate_embedding).and_return([1] * 1536)
+      expect(SmartSearch).to receive(:api_key).at_least(:once).and_return("fake_api_key")
     end
 
     before :once do
@@ -1128,7 +1128,7 @@ describe WikiPage do
 
     it "strips HTML from the body before indexing" do
       wiki_page_model(title: "test", body: "<ul><li>foo</li></ul>")
-      expect(OpenAi).to receive(:generate_embedding).with("test\n* foo")
+      expect(SmartSearch).to receive(:generate_embedding).with("test\n* foo")
       run_jobs
     end
 

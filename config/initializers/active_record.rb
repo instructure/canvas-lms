@@ -786,6 +786,11 @@ class ActiveRecord::Base
     # Just return something that isn't an ar connection object so consoles don't explode
     override
   end
+
+  def self.with_pgvector(&)
+    vector_schema = connection.extension("vector").schema
+    connection.add_schema_to_search_path(vector_schema, &)
+  end
 end
 
 module UsefulFindInBatches

@@ -111,9 +111,9 @@ module FeatureFlags
     def self.smart_search_after_state_change_hook(_user, context, old_state, new_state)
       if %w[off allowed].include?(old_state) && %w[on allowed_on].include?(new_state)
         if context.is_a?(Account) && !context.site_admin?
-          OpenAi.delay(priority: Delayed::LOW_PRIORITY).index_account(context)
+          SmartSearch.delay(priority: Delayed::LOW_PRIORITY).index_account(context)
         elsif context.is_a?(Course)
-          OpenAi.delay(priority: Delayed::LOW_PRIORITY).index_course(context)
+          SmartSearch.delay(priority: Delayed::LOW_PRIORITY).index_course(context)
         end
       end
     end
