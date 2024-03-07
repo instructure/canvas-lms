@@ -9,5 +9,8 @@ RUN echo "max_locks_per_transaction = 640" >> /usr/share/postgresql/$PG_MAJOR/po
  && echo "shared_buffers = 256MB" >> /usr/share/postgresql/$PG_MAJOR/postgresql.conf.sample \
  && echo "effective_cache_size = 256MB" >> /usr/share/postgresql/$PG_MAJOR/postgresql.conf.sample
 
+RUN apt-get update -qq \
+ && apt-get install -qqy --no-install-recommends postgresql-$PG_MAJOR-pgvector
+
 COPY /create-dbs.sh /docker-entrypoint-initdb.d/
 COPY /wait-for-it /
