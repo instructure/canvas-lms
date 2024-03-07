@@ -156,55 +156,89 @@ module PostgreSQLAdapterExtensions
     infer_group_by_columns(columns).flatten.join(", ")
   end
 
-  # ActiveRecord 3.2 ignores indexes if it cannot parse the column names
-  # (for instance when using functions like LOWER)
-  # this will lead to problems if we try to remove the index (index_exists? will return false)
-  def indexes(table_name)
-    schema = shard.name
+  def indexes(table_name) # :nodoc:
+    scope = quoted_scope(table_name)
 
     result = query(<<~SQL.squish, "SCHEMA")
-       SELECT distinct i.relname, d.indisunique, d.indkey, pg_get_indexdef(d.indexrelid), t.oid
-       FROM pg_class t
-       INNER JOIN pg_index d ON t.oid = d.indrelid
-       INNER JOIN pg_class i ON d.indexrelid = i.oid
-       WHERE i.relkind = 'i'
-         AND d.indisprimary = 'f'
-         AND t.relname = '#{table_name}'
-         AND t.relnamespace IN (SELECT oid FROM pg_namespace WHERE nspname = #{schema ? "'#{schema}'" : "ANY (current_schemas(false))"} )
+      SELECT distinct i.relname, d.indisunique, d.indkey, pg_get_indexdef(d.indexrelid), t.oid,
+                      pg_catalog.obj_description(i.oid, 'pg_class') AS comment, d.indisvalid, d.indisreplident
+      FROM pg_class t
+      INNER JOIN pg_index d ON t.oid = d.indrelid
+      INNER JOIN pg_class i ON d.indexrelid = i.oid
+      LEFT JOIN pg_namespace n ON n.oid = t.relnamespace
+      WHERE i.relkind IN ('i', 'I')
+        AND d.indisprimary = 'f'
+        AND t.relname = #{scope[:name]}
+        AND n.nspname = #{scope[:schema]}
       ORDER BY i.relname
     SQL
 
     result.map do |row|
       index_name = row[0]
-      unique = row[1] == "t" || row[1] == true
-      indkey = row[2].split
+      unique = row[1]
+      indkey = row[2].split.map(&:to_i)
       inddef = row[3]
       oid = row[4]
+      comment = row[5]
+      valid = row[6]
+      replica_identity = row[7]
+      using, expressions, include, nulls_not_distinct, where = inddef.scan(/ USING (\w+?) \((.+?)\)(?: INCLUDE \((.+?)\))?( NULLS NOT DISTINCT)?(?: WHERE (.+))?\z/m).flatten
 
-      columns = query(<<~SQL.squish, "SCHEMA").to_h
-        SELECT a.attnum, a.attname
-        FROM pg_attribute a
-        WHERE a.attrelid = #{oid}
-        AND a.attnum IN (#{indkey.join(",")})
-      SQL
+      orders = {}
+      opclasses = {}
+      include_columns = include ? include.split(",").map(&:strip) : []
 
-      column_names = columns.stringify_keys.values_at(*indkey).compact
+      if indkey.include?(0)
+        columns = expressions
+      else
+        columns = if $canvas_rails == "7.0"
+                    query(<<~SQL.squish, "SCHEMA").to_h.values_at(*indkey).compact
+                      SELECT a.attnum, a.attname
+                      FROM pg_attribute a
+                      WHERE a.attrelid = #{oid}
+                      AND a.attnum IN (#{indkey.join(",")})
+                    SQL
+                  else
+                    column_names_from_column_numbers(oid, indkey)
+                  end
 
-      # add info on sort order for columns (only desc order is explicitly specified, asc is the default)
-      desc_order_columns = inddef.scan(/(\w+) DESC/).flatten
-      orders = desc_order_columns.any? ? desc_order_columns.index_with { :desc } : {}
+        # prevent INCLUDE columns from being matched
+        columns.reject! { |c| include_columns.include?(c) }
 
-      ActiveRecord::ConnectionAdapters::IndexDefinition.new(table_name, index_name, unique, column_names, orders:)
+        # add info on sort order (only desc order is explicitly specified, asc is the default)
+        # and non-default opclasses
+        expressions.scan(/(?<column>\w+)"?\s?(?<opclass>\w+_ops(?:_\w+)?)?\s?(?<desc>DESC)?\s?(?<nulls>NULLS (?:FIRST|LAST))?/).each do |column, opclass, desc, nulls|
+          opclasses[column] = opclass.to_sym if opclass
+          if nulls
+            orders[column] = [desc, nulls].compact.join(" ")
+          elsif desc
+            orders[column] = :desc
+          end
+        end
+      end
+
+      ActiveRecord::ConnectionAdapters::IndexDefinition.new(
+        table_name,
+        index_name,
+        unique,
+        columns,
+        orders:,
+        opclasses:,
+        where:,
+        using: using.to_sym,
+        include: include_columns.presence,
+        nulls_not_distinct: nulls_not_distinct.present?,
+        comment: comment.presence,
+        valid:,
+        replica_identity:
+      )
     end
   end
 
-  def index_exists?(table_name, columns, **options)
-    # This makes up for a rails bug where column as an option does not work correctly with `if_exists` on `remove_index`
-    columns ||= options[:column]
-    raise ArgumentError, "if you're identifying an index by name only, you should use index_name_exists?" if columns.is_a?(Hash) && columns[:name]
-    raise ArgumentError, "columns should be a string, a symbol, or an array of those " unless columns.nil? || columns.is_a?(String) || columns.is_a?(Symbol) || columns.is_a?(Array)
+  def index_exists?(table_name, column_name = nil, **options)
+    raise ArgumentError, "if you're identifying an index by name only, you should use index_name_exists?" if column_name.nil? && options.size == 1 && options.key?(:name)
 
-    super(table_name, columns, **options)
+    super
   end
 
   # some migration specs test migrations that add concurrent indexes; detect that, and strip the concurrent
@@ -219,6 +253,10 @@ module PostgreSQLAdapterExtensions
     return nil if open_transactions > 0
 
     super
+  end
+
+  def add_replica_identity_index(table, **kwargs)
+    add_index table, [:root_account_id, :id], unique: true, name: "index_#{table}_replica_identity", **kwargs
   end
 
   def add_column(table_name, column_name, type, if_not_exists: false, **options)
@@ -488,7 +526,33 @@ module SchemaStatementsExtensions
   end
 end
 
+module IndexDefinitionExtensions
+  def self.prepended(klass)
+    super
+
+    klass.attr_reader :replica_identity
+  end
+
+  def initialize(*args, replica_identity: false, **kwargs)
+    @replica_identity = replica_identity
+    if $canvas_rails == "7.0"
+      kwargs.delete(:include)
+      kwargs.delete(:nulls_not_distinct)
+      kwargs.delete(:valid)
+    end
+
+    super(*args, **kwargs)
+  end
+
+  def defined_for?(*, replica_identity: nil, **)
+    return false unless replica_identity.nil? || self.replica_identity == replica_identity
+
+    super
+  end
+end
+
 ActiveRecord::ConnectionAdapters::PostgreSQL::SchemaCreation.prepend(SchemaCreationExtensions)
 ActiveRecord::ConnectionAdapters::ColumnDefinition.prepend(ColumnDefinitionExtensions)
+ActiveRecord::ConnectionAdapters::IndexDefinition.prepend(IndexDefinitionExtensions)
 ActiveRecord::ConnectionAdapters::ReferenceDefinition.prepend(ReferenceDefinitionExtensions)
 ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.prepend(SchemaStatementsExtensions)
