@@ -180,6 +180,8 @@ export const AuthorInfo = props => {
                 <Timestamps
                   author={props.author}
                   editor={props.editor}
+                  createdAt={props.createdAt}
+                  updatedAt={props.updatedAt}
                   timingDisplay={props.timingDisplay}
                   editedTimingDisplay={props.editedTimingDisplay}
                   lastReplyAtDisplay={props.lastReplyAtDisplay}
@@ -227,6 +229,8 @@ AuthorInfo.propTypes = {
    * Boolean to determine if we are in the split view
    */
   isSplitView: PropTypes.bool,
+  createdAt: PropTypes.string,
+  updatedAt: PropTypes.string,
   /**
    * Display text for the relative time information. This prop is expected
    * to be provided as a string of the exact text to be displayed, not a
@@ -260,7 +264,7 @@ AuthorInfo.propTypes = {
 
 const Timestamps = props => {
   const editText = useMemo(() => {
-    if (!props.editedTimingDisplay || props.editedTimingDisplay === props.timingDisplay) {
+    if (!props.editedTimingDisplay || props.createdAt === props.updatedAt) {
       return null
     }
 
@@ -274,7 +278,7 @@ const Timestamps = props => {
         editedTimingDisplay: props.editedTimingDisplay,
       })
     }
-  }, [props.editedTimingDisplay, props.timingDisplay, props.editor, props.author])
+  }, [props.editedTimingDisplay, props.createdAt, props.updatedAt, props.editor, props.author])
 
   return (
     <Flex wrap="wrap">
@@ -316,6 +320,8 @@ const Timestamps = props => {
 Timestamps.propTypes = {
   author: User.shape,
   editor: User.shape,
+  createdAt: PropTypes.string,
+  updatedAt: PropTypes.string,
   timingDisplay: PropTypes.string,
   editedTimingDisplay: PropTypes.string,
   lastReplyAtDisplay: PropTypes.string,
