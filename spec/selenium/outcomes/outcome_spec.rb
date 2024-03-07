@@ -276,7 +276,6 @@ describe "outcomes" do
       end
 
       it "bulk removes outcomes at the course level as a teacher" do
-        skip("Skipping due to click event not selecting checkboxes. Will be fixed in FOO-4338")
         create_bulk_outcomes_groups(@course, 1, 5)
         get outcome_url
         select_outcome_group_with_text(@course.name).click
@@ -291,7 +290,6 @@ describe "outcomes" do
 
       # Can't reproduce the js error locally
       it "bulk moves outcomes at the course level as a teacher", :ignore_js_errors do
-        skip("Skipping due to click event not selecting checkboxes. Will be fixed in FOO-4338")
         create_bulk_outcomes_groups(@course, 1, 3)
         get outcome_url
         select_outcome_group_with_text(@course.name).click

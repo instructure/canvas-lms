@@ -92,7 +92,7 @@ module ImprovedOutcomeManagementPage
   def select_nth_outcome_for_bulk_action(index)
     # This button is obscured by an overlaying element, so we use force_click, which just
     # takes a jquery selector
-    "input[type='checkbox']:eq(#{index})"
+    "label[for='Checkbox_#{index}']"
   end
 
   def tree_browser_root_group
