@@ -54,6 +54,7 @@ class CreateDelayedJobs < ActiveRecord::Migration[4.2]
       table.string   :source, limit: 255
       table.integer  :max_concurrent, default: 1, null: false
       table.datetime :expires_at
+      table.integer :strand_order_override, default: 0, null: false
     end
 
     add_index :delayed_jobs,
@@ -66,6 +67,10 @@ class CreateDelayedJobs < ActiveRecord::Migration[4.2]
     add_index :delayed_jobs, :locked_by, where: "locked_by IS NOT NULL"
     add_index :delayed_jobs, %w[run_at tag]
     add_index :delayed_jobs, :shard_id
+    add_index :delayed_jobs,
+              %i[strand strand_order_override id],
+              where: "strand IS NOT NULL",
+              name: "next_in_strand_index"
 
     search_path = Shard.current.name
 
@@ -111,26 +116,48 @@ class CreateDelayedJobs < ActiveRecord::Migration[4.2]
 
     # create the delete trigger
     execute(<<~SQL) # rubocop:disable Rails/SquishedSQLHeredocs
-      CREATE FUNCTION #{connection.quote_table_name("delayed_jobs_after_delete_row_tr_fn")} () RETURNS trigger AS $$
+      CREATE OR REPLACE FUNCTION #{connection.quote_table_name("delayed_jobs_after_delete_row_tr_fn")} () RETURNS trigger AS $$
       DECLARE
         running_count integer;
+        should_lock boolean;
+        should_be_precise boolean;
       BEGIN
         IF OLD.strand IS NOT NULL THEN
-          PERFORM pg_advisory_xact_lock(half_md5_as_bigint(OLD.strand));
-          IF OLD.id % 20 = 0 THEN
+          should_lock := true;
+          should_be_precise := OLD.id % (OLD.max_concurrent * 4) = 0;
+
+          IF NOT should_be_precise AND OLD.max_concurrent > 16 THEN
+            running_count := (SELECT COUNT(*) FROM (
+              SELECT 1 as one FROM delayed_jobs WHERE strand = OLD.strand AND next_in_strand = 't' LIMIT OLD.max_concurrent
+            ) subquery_for_count);
+            should_lock := running_count < OLD.max_concurrent;
+          END IF;
+
+          IF should_lock THEN
+            PERFORM pg_advisory_xact_lock(half_md5_as_bigint(OLD.strand));
+          END IF;
+
+          IF should_be_precise THEN
             running_count := (SELECT COUNT(*) FROM (
               SELECT 1 as one FROM delayed_jobs WHERE strand = OLD.strand AND next_in_strand = 't' LIMIT OLD.max_concurrent
             ) subquery_for_count);
             IF running_count < OLD.max_concurrent THEN
               UPDATE delayed_jobs SET next_in_strand = 't' WHERE id IN (
                 SELECT id FROM delayed_jobs j2 WHERE next_in_strand = 'f' AND
-                j2.strand = OLD.strand ORDER BY j2.id ASC LIMIT (OLD.max_concurrent - running_count) FOR UPDATE
+                j2.strand = OLD.strand ORDER BY j2.strand_order_override ASC, j2.id ASC LIMIT (OLD.max_concurrent - running_count) FOR UPDATE
               );
             END IF;
           ELSE
-            UPDATE delayed_jobs SET next_in_strand = 't' WHERE id =
+            -- n-strands don't require precise ordering; we can make this query more performant
+            IF OLD.max_concurrent > 1 THEN
+              UPDATE delayed_jobs SET next_in_strand = 't' WHERE id =
               (SELECT id FROM delayed_jobs j2 WHERE next_in_strand = 'f' AND
-                j2.strand = OLD.strand ORDER BY j2.id ASC LIMIT 1 FOR UPDATE);
+                j2.strand = OLD.strand ORDER BY j2.strand_order_override ASC, j2.id ASC LIMIT 1 FOR UPDATE SKIP LOCKED);
+            ELSE
+              UPDATE delayed_jobs SET next_in_strand = 't' WHERE id =
+                (SELECT id FROM delayed_jobs j2 WHERE next_in_strand = 'f' AND
+                  j2.strand = OLD.strand ORDER BY j2.strand_order_override ASC, j2.id ASC LIMIT 1 FOR UPDATE);
+            END IF;
           END IF;
         END IF;
         RETURN OLD;
@@ -158,6 +185,7 @@ class CreateDelayedJobs < ActiveRecord::Migration[4.2]
       t.integer  "original_job_id", limit: 8
       t.string   "source", limit: 255
       t.datetime "expires_at"
+      t.integer :strand_order_override, default: 0, null: false
     end
   end
 

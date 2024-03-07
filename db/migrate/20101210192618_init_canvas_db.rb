@@ -137,6 +137,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :account_report_rows, :account_report_id
     add_index :account_report_rows, :account_report_runner_id
     add_index :account_report_rows, :file
+    add_index :account_report_rows, :created_at
 
     create_table :account_report_runners do |t|
       t.integer :account_report_id, null: false, limit: 8
@@ -623,6 +624,10 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
               name: "index_assignments_duplicating_on_started_at"
     add_index :assignments, :migrate_from_id, where: "migrate_from_id IS NOT NULL"
     add_index :assignments, :group_category_id, where: "group_category_id IS NOT NULL"
+    add_index :assignments,
+              :context_id,
+              where: "context_type='Course' AND workflow_state<>'deleted'",
+              name: "index_assignments_active"
 
     create_table "attachment_associations", force: true do |t|
       t.integer "attachment_id", limit: 8
@@ -1156,7 +1161,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer :sender_id, limit: 8
       t.string :read_state, limit: 255, null: false
       t.string :type, limit: 255, null: false
-      t.references :root_account, type: :bigint, foreign_key: { to_table: :accounts }, index: true
+      t.references :root_account, type: :bigint, foreign_key: false, index: true
     end
     add_index :content_shares,
               %i[user_id content_export_id sender_id],
@@ -3969,7 +3974,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.datetime :posted_at
       t.boolean :cached_quiz_lti, default: false, null: false
       t.string :cached_tardiness, limit: 16
-      t.references :course, type: :bigint, foreign_key: true, index: true, null: false
+      t.references :course, type: :bigint, foreign_key: true, index: false, null: false
       t.references :root_account, type: :bigint, foreign_key: { to_table: :accounts }, index: true
     end
 
@@ -4020,6 +4025,11 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
               name: "index_submissions_graded_or_excused_on_assignment_id"
     add_index :submissions, [:user_id, :cached_due_date]
     add_index :submissions, [:user_id, :course_id]
+    add_index :submissions,
+              [:user_id, :course_id],
+              where: "(score IS NOT NULL OR grade IS NOT NULL) AND workflow_state<>'deleted'",
+              name: "index_submissions_with_grade"
+    add_index :submissions, [:course_id, :cached_due_date]
 
     # rubocop:disable Rails/SquishedSQLHeredocs
     execute(<<~SQL)
@@ -4087,7 +4097,14 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.boolean :default, default: false, null: false
       t.text :settings
       t.integer :delayed_jobs_shard_id, limit: 8
+      t.timestamps null: false
+      t.boolean :block_stranded, default: false
+      t.boolean :jobs_held, default: false
     end
+    add_index :switchman_shards, [:database_server_id, :name], unique: true
+    add_index :switchman_shards, :database_server_id, unique: true, where: "name IS NULL", name: "index_switchman_shards_unique_primary_shard"
+    add_index :switchman_shards, "(true)", unique: true, where: "database_server_id IS NULL AND name IS NULL", name: "index_switchman_shards_unique_primary_db_and_shard"
+    add_index :switchman_shards, :default, unique: true, where: '"default"'
 
     create_table :terms_of_service_contents do |t|
       t.text :content, null: false
@@ -4330,6 +4347,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :users, :workflow_state
     add_index :users, :lti_id
     add_index :users, "#{User.best_unicode_collation_key("sortable_name")}, id", name: :index_users_on_sortable_name
+    add_index :users, :root_account_ids, using: :gin
 
     create_table :user_profiles do |t|
       t.text   :bio
@@ -4439,11 +4457,11 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.references :root_account, type: :bigint, foreign_key: { to_table: :accounts }, index: true
     end
     add_index :wiki_pages, [:context_id, :context_type]
-
     add_index "wiki_pages", ["user_id"], name: "index_wiki_pages_on_user_id"
     add_index "wiki_pages", ["wiki_id"], name: "index_wiki_pages_on_wiki_id"
     add_index :wiki_pages, [:assignment_id]
     add_index :wiki_pages, [:old_assignment_id]
+    add_index :wiki_pages, [:wiki_id, :todo_date], where: "todo_date IS NOT NULL"
 
     create_table "wikis", force: true do |t|
       t.string   "title", limit: 255
