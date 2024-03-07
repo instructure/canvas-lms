@@ -27,6 +27,7 @@ import {captureException} from '@sentry/browser'
 import {getAssignment} from './queries/assignmentQuery'
 import {getSubmission} from './queries/submissionQuery'
 import {getSubmissionsByAssignment} from './queries/submissionsByAssignmentQuery'
+import {updateSubmissionGrade} from './mutations/updateSubmissionGradeMutation'
 
 const I18n = useI18nScope('speed_grader')
 
@@ -39,7 +40,14 @@ ready(() => {
       .then(module => {
         module.render(mountPoint, {
           theme,
-          queries: {getAssignment, getSubmission, getSubmissionsByAssignment},
+          queries: {
+            getAssignment,
+            getSubmission,
+            getSubmissionsByAssignment,
+          },
+          mutations: {
+            updateSubmissionGrade,
+          },
         })
       })
       .catch(error => {
