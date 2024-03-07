@@ -1697,8 +1697,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     create_table :developer_key_account_bindings do |t|
       t.integer :account_id, limit: 8, null: false
       t.integer :developer_key_id, limit: 8, null: false
-      t.string :workflow_state, null: false
-      t.timestamps null: true
+      t.string :workflow_state, null: false, default: "off"
+      t.timestamps null: false
       t.references :root_account, type: :bigint, foreign_key: { to_table: :accounts }, index: false, null: false
     end
     add_index :developer_key_account_bindings, :developer_key_id
@@ -1760,6 +1760,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer  "rating_sum"
       t.references :root_account, type: :bigint, foreign_key: { to_table: :accounts }, index: false, null: false
       t.boolean :legacy, default: true, null: false
+      t.boolean :include_reply_preview, default: false, null: false
     end
 
     add_index "discussion_entries", ["user_id"], name: "index_discussion_entries_on_user_id"
@@ -3502,6 +3503,16 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :pseudonyms, :authentication_provider_id, where: "authentication_provider_id IS NOT NULL"
     execute "CREATE UNIQUE INDEX index_pseudonyms_on_unique_id_and_account_id_and_authentication_provider_id ON #{Pseudonym.quoted_table_name} (LOWER(unique_id), account_id, authentication_provider_id) WHERE workflow_state='active'"
     execute "CREATE UNIQUE INDEX index_pseudonyms_on_unique_id_and_account_id_no_authentication_provider_id ON #{Pseudonym.quoted_table_name} (LOWER(unique_id), account_id) WHERE workflow_state='active' AND authentication_provider_id IS NULL"
+    add_index :pseudonyms,
+              "LOWER(unique_id), account_id, authentication_provider_id",
+              name: "index_pseudonyms_unique_with_auth_provider",
+              unique: true,
+              where: "workflow_state IN ('active', 'suspended')"
+    add_index :pseudonyms,
+              "LOWER(unique_id), account_id",
+              name: "index_pseudonyms_unique_without_auth_provider",
+              unique: true,
+              where: "workflow_state IN ('active', 'suspended') AND authentication_provider_id IS NULL"
     add_index :pseudonyms, "LOWER(unique_id), account_id", name: "index_pseudonyms_on_unique_id_and_account_id"
 
     create_table :profiles do |t|
