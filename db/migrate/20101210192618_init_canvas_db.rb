@@ -980,6 +980,20 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index "collaborators", ["user_id"], name: "index_collaborators_on_user_id"
     add_index :collaborators, [:group_id], name: "index_collaborators_on_group_id"
 
+    create_table :comment_bank_items do |t|
+      t.references :course, index: false, null: false, foreign_key: false, type: :bigint
+      t.references :root_account, foreign_key: { to_table: :accounts }, null: false, type: :bigint, index: true
+      t.references :user, null: false, foreign_key: false, index: false, type: :bigint
+      t.text :comment, null: false
+      t.timestamps null: false, precision: 6
+      t.string :workflow_state, null: false, default: "active"
+
+      t.index [:course_id, :user_id],
+              where: "workflow_state <> 'deleted'",
+              name: "index_comment_bank_items_on_course_and_user"
+      t.replica_identity_index
+    end
+
     create_table "communication_channels", force: true do |t|
       t.string   "path", null: false, limit: 255
       t.string   "path_type", default: "email", null: false, limit: 255
@@ -2372,6 +2386,9 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :learning_outcome_groups, :root_learning_outcome_group_id, where: "root_learning_outcome_group_id IS NOT NULL"
     add_index :learning_outcome_groups, :vendor_guid_2, name: "index_learning_outcome_groups_on_vendor_guid_2"
     add_index :learning_outcome_groups, %i[context_type context_id vendor_guid_2], name: "index_learning_outcome_groups_on_context_and_vendor_guid"
+    add_index :learning_outcome_groups,
+              :source_outcome_group_id,
+              where: "source_outcome_group_id IS NOT NULL"
 
     create_table :learning_outcome_question_results do |t|
       t.integer :learning_outcome_result_id, limit: 8
@@ -2910,6 +2927,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false, type: :bigint
       t.timestamps null: false, precision: 6
       t.string :ms_group_id
+      t.integer :last_error_report_id, limit: 8
 
       t.replica_identity_index
     end
@@ -3154,7 +3172,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer :context_id, null: false, limit: 8
       t.string :workflow_state, null: false, default: "active"
       t.references :root_account, index: true, foreign_key: { to_table: :accounts }, type: :bigint
-      t.string :description, null: false, limit: 255
+      t.text :description, null: false
       t.timestamps null: false
       t.references :learning_outcome, foreign_key: true, index: true, null: false, type: :bigint
     end
@@ -4453,6 +4471,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.text :lti_id
       t.string :pronouns
       t.bigint :root_account_ids, array: true, null: false, default: []
+      t.references :merged_into_user, foreign_key: { to_table: :users }, index: false, type: :bigint
 
       t.replica_identity_index :root_account_ids
     end
@@ -4867,6 +4886,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :collaborators, :collaborations
     add_foreign_key :collaborators, :groups
     add_foreign_key :collaborators, :users
+    add_foreign_key :comment_bank_items, :courses
+    add_foreign_key :comment_bank_items, :users
     add_foreign_key :communication_channels, :users
     add_foreign_key :conditional_release_rules, :courses
     add_foreign_key :content_exports, :attachments
