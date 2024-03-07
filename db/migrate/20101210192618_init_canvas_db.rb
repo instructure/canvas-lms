@@ -23,7 +23,18 @@
 class InitCanvasDb < ActiveRecord::Migration[4.2]
   tag :predeploy
 
-  def self.up
+  def create_aua_log_partition(index)
+    table_name = :"aua_logs_#{index}"
+    create_table table_name do |t|
+      t.bigint :asset_user_access_id, null: false
+      t.datetime :created_at, null: false
+    end
+    # Intentionally not adding FK on asset_user_access_id as the records are transient
+    # and we're trying to do as little work as possible on the insert to these
+    # and can be thrown away if they don't match anything anyway as the log is compacted.
+  end
+
+  def up
     connection.transaction(requires_new: true) do
       create_extension(:pg_collkey, schema: connection.shard.name, if_not_exists: true)
     rescue ActiveRecord::StatementInvalid
@@ -425,6 +436,14 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
 
     add_index "asset_user_accesses", ["user_id", "asset_code"], name: "index_asset_user_accesses_on_user_id_and_asset_code"
     add_index :asset_user_accesses, %i[context_id context_type user_id updated_at], name: "index_asset_user_accesses_on_ci_ct_ui_ua"
+    add_index :asset_user_accesses,
+              %i[user_id context_id asset_code id],
+              name: "index_asset_user_accesses_on_user_id_context_id_asset_code"
+
+    # one table for each day of week, they'll periodically
+    # be compacted and truncated.  This prevents having to
+    # create and drop true partitions at a high rate
+    (0..6).each { |i| create_aua_log_partition(i) }
 
     create_table :assignment_configuration_tool_lookups do |t|
       t.integer :assignment_id, limit: 8, null: false
@@ -899,6 +918,13 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
               :crocodoc_document_id,
               where: "crocodoc_document_id IS NOT NULL"
     add_index :canvadocs_submissions, :canvadoc_id
+
+    create_table :canvas_metadata do |t|
+      t.string :key, null: false
+      t.jsonb :payload, null: false
+      t.timestamps null: false
+    end
+    add_index :canvas_metadata, :key, unique: true
 
     create_table "cloned_items", force: true do |t|
       t.integer  "original_item_id", limit: 8
@@ -2192,6 +2218,14 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :group_memberships, :uuid, unique: true
     add_index :group_memberships, [:group_id, :user_id], unique: true, where: "workflow_state <> 'deleted'"
 
+    create_table :group_and_membership_importers do |t|
+      t.bigint :group_category_id, null: false
+      t.references :attachment, foreign_key: true, index: false, type: :bigint
+      t.string :workflow_state, null: false, default: "active"
+      t.timestamps null: false
+    end
+    add_index :group_and_membership_importers, :group_category_id
+
     create_table "groups", force: true do |t|
       t.string   "name", limit: 255
       t.string   "workflow_state", null: false, limit: 255
@@ -3391,7 +3425,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.string   "migration_id", limit: 255
       t.string   "workflow_state", limit: 255
       t.integer  "duplicate_index"
-      t.references :root_account, type: :bigint, foreign_key: { to_table: :accounts }, index: true
+      t.references :root_account, type: :bigint, foreign_key: false, index: true
     end
 
     add_index "quiz_questions", ["quiz_group_id"], name: "quiz_questions_quiz_group_id"
@@ -3436,6 +3470,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.text :event_data
       t.datetime :created_at, null: false
       t.datetime :client_timestamp
+      t.references :root_account, type: :bigint, foreign_key: { to_table: :accounts }, index: true
     end
     add_index :quiz_submission_events, :created_at
     add_index :quiz_submission_events,
@@ -3557,8 +3592,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.string   "permission", limit: 255
       t.boolean  "enabled", default: true, null: false
       t.boolean  "locked", default: false, null: false
-      t.integer  "context_id", limit: 8
-      t.string   "context_type", limit: 255
+      t.integer  "context_id", limit: 8, null: false
+      t.string   "context_type", limit: 255, null: false
       t.datetime "created_at"
       t.datetime "updated_at"
       t.boolean  "applies_to_self", default: true, null: false
@@ -3579,7 +3614,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.datetime :created_at
       t.datetime :updated_at
       t.datetime :deleted_at
-      t.integer :root_account_id, limit: 8
+      t.integer :root_account_id, limit: 8, null: false
     end
     add_index :roles, [:name], name: "index_roles_on_name"
     add_index :roles, [:account_id], name: "index_roles_on_account_id"
@@ -4030,6 +4065,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
               where: "(score IS NOT NULL OR grade IS NOT NULL) AND workflow_state<>'deleted'",
               name: "index_submissions_with_grade"
     add_index :submissions, [:course_id, :cached_due_date]
+    add_index :submissions, :user_id, where: "late_policy_status='missing'", name: "index_on_submissions_missing_for_user"
 
     # rubocop:disable Rails/SquishedSQLHeredocs
     execute(<<~SQL)
@@ -4199,7 +4235,6 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :user_merge_data_records, :user_merge_data_id
     add_index :user_merge_data_records,
               %i[context_id context_type user_merge_data_id previous_user_id],
-              unique: true,
               name: "index_user_merge_data_records_on_context_id_and_context_type"
 
     create_table "user_notes", force: true do |t|
@@ -4444,7 +4479,6 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.text     "url"
       t.boolean  "protected_editing", default: false
       t.string   "editing_roles", limit: 255
-      t.integer  "view_count", default: 0
       t.datetime "revised_at"
       t.boolean  "could_be_locked"
       t.integer  "cloned_item_id", limit: 8
@@ -4837,6 +4871,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :grading_period_groups, :courses
     add_foreign_key :grading_periods, :grading_period_groups
     add_foreign_key :grading_standards, :users
+    add_foreign_key :group_and_membership_importers, :group_categories
     add_foreign_key :group_categories, :sis_batches
     add_foreign_key :group_categories, :accounts, column: :root_account_id
     add_foreign_key :group_memberships, :groups
@@ -5009,7 +5044,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :wiki_pages, :wikis
   end
 
-  def self.down
+  def down
     raise ActiveRecord::IrreversibleMigration
   end
 end
