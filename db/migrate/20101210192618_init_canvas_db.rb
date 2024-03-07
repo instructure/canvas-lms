@@ -618,6 +618,10 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.string :sis_source_id
       t.bigint :migrate_from_id
       t.jsonb :settings
+      t.references :annotatable_attachment,
+                   type: :bigint,
+                   foreign_key: false,
+                   index: { where: "annotatable_attachment_id IS NOT NULL" }
     end
 
     add_index "assignments", ["assignment_group_id"], name: "index_assignments_on_assignment_group_id"
@@ -4028,6 +4032,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.string :cached_tardiness, limit: 16
       t.references :course, type: :bigint, foreign_key: true, index: false, null: false
       t.references :root_account, type: :bigint, foreign_key: { to_table: :accounts }, index: true
+      t.boolean :redo_request, default: false, null: false
     end
 
     add_index "submissions", ["assignment_id", "submission_type"], name: "index_submissions_on_assignment_id_and_submission_type"
@@ -4754,6 +4759,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :assignment_override_students, :users
     add_foreign_key :assignment_overrides, :assignments
     add_foreign_key :assignment_overrides, :quizzes
+    add_foreign_key :assignments, :attachments, column: :annotatable_attachment_id
     add_foreign_key :assignments, :cloned_items
     add_foreign_key :assignments, :course_sections, column: :grader_section_id
     add_foreign_key :assignments, :group_categories
