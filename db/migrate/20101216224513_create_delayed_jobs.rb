@@ -279,6 +279,13 @@ class CreateDelayedJobs < ActiveRecord::Migration[4.2]
       t.integer :strand_order_override, default: 0, null: false
       t.string :singleton
     end
+    add_index :failed_jobs, :failed_at
+    add_index :failed_jobs, :strand, where: "strand IS NOT NULL"
+    add_index :failed_jobs, :singleton, where: "singleton IS NOT NULL"
+    add_index :failed_jobs, :tag
+    # This column exists in switchman-inst-jobs, although not in Canvas. For the purposes of this migration, mirror
+    # the lack of a WHERE constraint to mirror switchman-inst-jobs to prevent any surprises later.
+    add_index :failed_jobs, :shard_id
   end
 
   def self.down
