@@ -278,6 +278,7 @@ class CreateDelayedJobs < ActiveRecord::Migration[4.2]
       t.datetime "expires_at"
       t.integer :strand_order_override, default: 0, null: false
       t.string :singleton
+      t.integer :requeued_job_id, limit: 8
     end
     add_index :failed_jobs, :failed_at
     add_index :failed_jobs, :strand, where: "strand IS NOT NULL"
