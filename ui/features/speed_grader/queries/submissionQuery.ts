@@ -28,6 +28,7 @@ const SUBMISSION_QUERY = gql`
         filter: {includeUnsubmitted: true, userId: $userId, applyGradebookEnrollmentFilters: true}
       ) {
         nodes {
+          _id
           id
           cachedDueDate
           gradingStatus
