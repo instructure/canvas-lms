@@ -5237,7 +5237,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :account_users, :roles
     add_foreign_key :account_users, :users
     add_foreign_key :accounts, :accounts, column: :parent_account_id
-    add_foreign_key :accounts, :accounts, column: :root_account_id, deferrable: true
+    add_foreign_key :accounts, :accounts, column: :root_account_id, deferrable: :immediate
     add_foreign_key :accounts, :courses, column: :course_template_id
     add_foreign_key :accounts, :brand_configs, column: "brand_config_md5", primary_key: "md5"
     add_foreign_key :accounts, :grading_standards
@@ -5260,7 +5260,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :assignment_override_students, :assignments
     add_foreign_key :assignment_override_students, :context_modules
     add_foreign_key :assignment_override_students, :quizzes
-    add_foreign_key :assignment_override_students, :users, deferrable: true
+    add_foreign_key :assignment_override_students, :users, deferrable: :immediate
     add_foreign_key :assignment_overrides, :assignments
     add_foreign_key :assignment_overrides, :context_modules
     add_foreign_key :assignment_overrides, :quizzes
@@ -5339,7 +5339,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :courses, :accounts
     add_foreign_key :courses, :accounts, column: :root_account_id
     add_foreign_key :courses, :courses, column: :template_course_id
-    add_foreign_key :courses, :enrollment_terms, deferrable: true
+    add_foreign_key :courses, :enrollment_terms, deferrable: :immediate
     add_foreign_key :courses, :outcome_imports, column: "latest_outcome_import_id"
     add_foreign_key :courses, :sis_batches
     add_foreign_key :courses, :wikis
@@ -5517,8 +5517,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :quiz_statistics, :quizzes
     add_foreign_key :quiz_submission_events, :quiz_submissions
     add_foreign_key :quiz_submissions, :quizzes
-    add_foreign_key :quiz_submissions, :users
-    alter_constraint :quiz_submissions, "fk_rails_04850db4b4", deferrable: true
+    add_foreign_key :quiz_submissions, :users, deferrable: :immediate
     add_foreign_key :quizzes, :assignments
     add_foreign_key :quizzes, :cloned_items
     add_foreign_key :report_snapshots, :accounts
@@ -5557,9 +5556,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :submissions, :groups
     add_foreign_key :submissions, :media_objects
     add_foreign_key :submissions, :quiz_submissions
-    add_foreign_key :submissions, :users
+    add_foreign_key :submissions, :users, deferrable: :immediate
     add_foreign_key :submissions, :users, column: :proxy_submitter_id
-    alter_constraint :submissions, "fk_rails_8d85741475", deferrable: true
     add_foreign_key :switchman_shards, :switchman_shards, column: :delayed_jobs_shard_id
     add_foreign_key :terms_of_service_contents, :accounts
     add_foreign_key :terms_of_services, :accounts
