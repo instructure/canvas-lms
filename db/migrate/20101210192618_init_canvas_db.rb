@@ -577,6 +577,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer  :quiz_id, limit: 8
       t.string :workflow_state, default: "active", null: false
       t.references :root_account, type: :bigint, foreign_key: { to_table: :accounts }, index: true
+      t.references :context_module, type: :bigint, foreign_key: false, index: false
     end
 
     add_index :assignment_override_students, [:assignment_id, :user_id], unique: true, where: "workflow_state = 'active'"
@@ -586,6 +587,11 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :assignment_override_students, :workflow_state
     add_index :assignment_override_students, [:user_id, :quiz_id]
     add_index :assignment_override_students, :assignment_id
+    add_index :assignment_override_students,
+              [:context_module_id, :user_id],
+              where: "context_module_id IS NOT NULL",
+              unique: true,
+              name: "index_assignment_override_students_on_context_module_and_user"
 
     create_table :assignment_overrides do |t|
       t.timestamps null: false
@@ -615,6 +621,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer  :quiz_id, limit: 8
       t.integer  :quiz_version
       t.references :root_account, type: :bigint, foreign_key: { to_table: :accounts }, index: true
+      t.references :context_module, type: :bigint, foreign_key: false, index: { where: "context_module_id IS NOT NULL" }
+      t.boolean :unassign_item, default: false, null: false
     end
 
     add_index :assignment_overrides,
@@ -629,10 +637,13 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
               :due_at,
               name: "index_assignment_overrides_due_at_when_overridden",
               where: "due_at_overridden"
-
+    add_index :assignment_overrides,
+              [:context_module_id, :set_id],
+              where: "context_module_id IS NOT NULL AND workflow_state = 'active' AND set_type IN ('CourseSection', 'Group')",
+              unique: true
     add_check_constraint :assignment_overrides,
-                         "workflow_state='deleted' OR quiz_id IS NOT NULL OR assignment_id IS NOT NULL",
-                         name: "require_quiz_or_assignment"
+                         "workflow_state='deleted' OR quiz_id IS NOT NULL OR assignment_id IS NOT NULL OR context_module_id IS NOT NULL",
+                         name: "require_quiz_or_assignment_or_module"
 
     create_table "assignments", force: true do |t|
       t.string   "title", limit: 255
@@ -709,6 +720,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
                    index: { where: "annotatable_attachment_id IS NOT NULL" }
       t.boolean :important_dates, default: false, null: false
       t.boolean :hide_in_gradebook, default: false, null: false
+      t.string :ab_guid, array: true, default: [], null: false
     end
 
     add_index "assignments", ["assignment_group_id"], name: "index_assignments_on_assignment_group_id"
@@ -822,6 +834,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
               name: "index_attachments_on_context_and_migration_id_pattern_ops"
     add_index :attachments, :media_entry_id
     add_index :attachments, :usage_rights_id, where: "usage_rights_id IS NOT NULL"
+    add_index :attachments, :created_at, where: "context_type IN ('ContentExport', 'ContentMigration') and file_state NOT IN ('deleted', 'broken') and root_attachment_id is null"
+    add_index :attachments, :context_type, where: "workflow_state = 'deleted' and file_state = 'deleted'"
 
     execute(<<~SQL) # rubocop:disable Rails/SquishedSQLHeredocs
       CREATE FUNCTION #{connection.quote_table_name("attachment_before_insert_verify_active_folder__tr_fn")} () RETURNS trigger AS $$
@@ -5246,9 +5260,11 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :assignment_groups, :cloned_items
     add_foreign_key :assignment_override_students, :assignment_overrides
     add_foreign_key :assignment_override_students, :assignments
+    add_foreign_key :assignment_override_students, :context_modules
     add_foreign_key :assignment_override_students, :quizzes
     add_foreign_key :assignment_override_students, :users, deferrable: true
     add_foreign_key :assignment_overrides, :assignments
+    add_foreign_key :assignment_overrides, :context_modules
     add_foreign_key :assignment_overrides, :quizzes
     add_foreign_key :assignments, :attachments, column: :annotatable_attachment_id
     add_foreign_key :assignments, :cloned_items
