@@ -1408,6 +1408,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
               unique: true,
               name: "index_content_shares_on_user_and_content_export_and_sender_ids"
     add_index :content_shares, :sender_id, where: "sender_id IS NOT NULL"
+    add_index :content_shares, :content_export_id
 
     create_table "content_tags", force: true do |t|
       t.integer  "content_id", limit: 8
@@ -4258,7 +4259,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.float   :final_score
       t.timestamps null: true
       t.references :assignment_group, limit: 8, index: true, null: true
-      t.boolean :course_score, default: false
+      t.boolean :course_score, default: false, null: false
       t.float :unposted_current_score
       t.float :unposted_final_score
       t.float :current_points
@@ -4282,9 +4283,6 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
               name: :index_assignment_group_scores
     add_index :scores, :enrollment_id, unique: true, where: "course_score", name: :index_course_scores
     add_index :scores, :grading_period_id, where: "grading_period_id IS NOT NULL"
-    add_check_constraint :scores,
-                         "course_score IS NOT NULL",
-                         name: "course_score_not_null"
 
     create_table "sessions", force: true do |t|
       t.string   "session_id", null: false, limit: 255

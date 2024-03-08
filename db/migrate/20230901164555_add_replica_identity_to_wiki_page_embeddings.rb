@@ -24,10 +24,10 @@ class AddReplicaIdentityToWikiPageEmbeddings < ActiveRecord::Migration[7.0]
   end
 
   def up
-    add_replica_identity "WikiPageEmbedding", :root_account_id
+    set_replica_identity :wiki_page_embeddings
   end
 
   def down
-    remove_replica_identity "WikiPageEmbedding"
+    set_replica_identity :wiki_page_embeddings, :default
   end
 end
