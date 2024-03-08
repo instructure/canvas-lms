@@ -21,13 +21,13 @@ class AddAvailabilityColumns < ActiveRecord::Migration[7.0]
 
   def change
     change_table :wiki_pages, bulk: true do |t|
-      t.datetime :unlock_at
-      t.datetime :lock_at
+      t.timestamp :unlock_at, precision: 6
+      t.timestamp :lock_at, precision: 6
       t.boolean :only_visible_to_overrides, default: false, null: false
     end
 
     change_table :discussion_topics, bulk: true do |t|
-      t.datetime :unlock_at
+      t.timestamp :unlock_at, precision: 6
       t.boolean :only_visible_to_overrides, default: false, null: false
     end
 
