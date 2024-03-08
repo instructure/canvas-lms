@@ -612,6 +612,14 @@ class ContentExport < ActiveRecord::Base
     context.assignments.active.type_quiz_lti.count.positive?
   end
 
+  def include_new_quizzes_in_export?
+    return false unless new_quizzes_common_cartridge_enabled?
+    return false unless settings[:new_quizzes_export_state] == "completed"
+    return false unless settings[:new_quizzes_export_url].present?
+
+    true
+  end
+
   scope :active, -> { where("content_exports.workflow_state<>'deleted'") }
   scope :not_for_copy, -> { where.not(content_exports: { export_type: [COURSE_COPY, MASTER_COURSE_COPY] }) }
   scope :common_cartridge, -> { where(export_type: COMMON_CARTRIDGE) }
