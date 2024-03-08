@@ -746,6 +746,27 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
               where: "migration_id IS NOT NULL",
               name: "index_attachments_on_context_and_migration_id_pattern_ops"
 
+    execute(<<~SQL) # rubocop:disable Rails/SquishedSQLHeredocs
+      CREATE FUNCTION #{connection.quote_table_name("attachment_before_insert_verify_active_folder__tr_fn")} () RETURNS trigger AS $$
+      DECLARE
+        folder_state text;
+      BEGIN
+        SELECT workflow_state INTO folder_state FROM #{Folder.quoted_table_name} WHERE folders.id = NEW.folder_id FOR SHARE;
+        if folder_state = 'deleted' then
+          RAISE EXCEPTION 'Cannot create attachments in deleted folders --> %', NEW.folder_id;
+        end if;
+        RETURN NEW;
+      END;
+      $$ LANGUAGE plpgsql;
+    SQL
+
+    execute(<<~SQL.squish)
+      CREATE TRIGGER attachment_before_insert_verify_active_folder__tr
+        BEFORE INSERT ON #{Attachment.quoted_table_name}
+        FOR EACH ROW
+        EXECUTE PROCEDURE #{connection.quote_table_name("attachment_before_insert_verify_active_folder__tr_fn")}()
+    SQL
+
     create_table :auditor_authentication_records do |t|
       t.string :uuid, null: false
       t.bigint :account_id, null: false
@@ -935,7 +956,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index "calendar_events", ["context_id", "context_type"], name: "index_calendar_events_on_context_id_and_context_type"
     add_index "calendar_events", ["user_id"], name: "index_calendar_events_on_user_id"
     add_index :calendar_events, [:parent_calendar_event_id]
-    connection.execute("CREATE INDEX index_calendar_events_on_effective_context_code ON #{CalendarEvent.quoted_table_name}(effective_context_code) WHERE effective_context_code IS NOT NULL")
+    execute("CREATE INDEX index_calendar_events_on_effective_context_code ON #{CalendarEvent.quoted_table_name}(effective_context_code) WHERE effective_context_code IS NOT NULL")
 
     create_table :canvadocs do |t|
       t.string :document_id, limit: 255
@@ -1080,12 +1101,12 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
 
     add_index "communication_channels", ["pseudonym_id", "position"]
     add_index "communication_channels", ["user_id", "position"]
-    connection.execute("CREATE INDEX index_communication_channels_on_path_and_path_type ON #{CommunicationChannel.quoted_table_name} (LOWER(path), path_type)")
+    execute("CREATE INDEX index_communication_channels_on_path_and_path_type ON #{CommunicationChannel.quoted_table_name} (LOWER(path), path_type)")
     if (trgm = connection.extension(:pg_trgm)&.schema)
       add_index :communication_channels, "lower(path) #{trgm}.gin_trgm_ops", name: "index_gin_trgm_communication_channels_path", using: :gin
     end
     add_index :communication_channels, :confirmation_code
-    connection.execute("CREATE UNIQUE INDEX index_communication_channels_on_user_id_and_path_and_path_type ON #{CommunicationChannel.quoted_table_name} (user_id, LOWER(path), path_type)")
+    execute("CREATE UNIQUE INDEX index_communication_channels_on_user_id_and_path_and_path_type ON #{CommunicationChannel.quoted_table_name} (user_id, LOWER(path), path_type)")
     add_index :communication_channels, :last_bounce_at, where: "bounce_count > 0"
 
     create_table :conditional_release_rules do |t|
@@ -1670,10 +1691,10 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       add_index :courses, "LOWER(course_code) #{trgm}.gin_trgm_ops", name: "index_trgm_courses_course_code", using: :gin
       add_index :courses,
                 "(
-          coalesce(lower(name), '') || ' ' ||
-          coalesce(lower(sis_source_id), '') || ' ' ||
-          coalesce(lower(course_code), '')
-        ) #{trgm}.gin_trgm_ops",
+            coalesce(lower(name), '') || ' ' ||
+            coalesce(lower(sis_source_id), '') || ' ' ||
+            coalesce(lower(course_code), '')
+          ) #{trgm}.gin_trgm_ops",
                 name: "index_gin_trgm_courses_composite_search",
                 using: :gin
     end
@@ -1796,7 +1817,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.string   "workflow_state", default: "active", null: false, limit: 255
       t.boolean  "replace_tokens"
       t.boolean  :auto_expire_tokens, default: false, null: false
-      t.string   "redirect_uris", array: true, default: [], null: false, limit: 255
+      t.string   "redirect_uris", array: true, default: [], null: false, limit: 4096
       t.text :notes
       t.integer :access_token_count, default: 0, null: false
       t.string :vendor_code
@@ -1882,10 +1903,22 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer "rating"
       t.references :root_account, type: :bigint, foreign_key: { to_table: :accounts }, index: false, null: false
       t.string :report_type, limit: 255
+      t.datetime :read_at
     end
     add_index "discussion_entry_participants", ["discussion_entry_id", "user_id"], name: "index_entry_participant_on_entry_id_and_user_id", unique: true
     add_index :discussion_entry_participants, :user_id
     add_replica_identity_index :discussion_entry_participants
+
+    create_table :discussion_entry_versions do |t|
+      t.references :discussion_entry, null: false, foreign_key: true, index: false, type: :bigint
+      t.references :root_account, foreign_key: { to_table: :accounts }, null: false, index: false, type: :bigint
+      t.references :user, null: true, foreign_key: false, index: true, type: :bigint
+      t.integer :version, limit: 8
+      t.text :message
+      t.timestamps null: false, precision: 6
+
+      t.replica_identity_index
+    end
 
     create_table :discussion_topic_section_visibilities do |t|
       t.integer :discussion_topic_id, null: false, limit: 8
@@ -1965,9 +1998,9 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
 
     create_table :discussion_topic_materialized_views, id: false do |t|
       t.integer :discussion_topic_id, limit: 8, null: false
-      t.text :json_structure, limit: 10.megabytes
-      t.text :participants_array, limit: 10.megabytes
-      t.text :entry_ids_array, limit: 10.megabytes
+      t.text :json_structure
+      t.text :participants_array
+      t.text :entry_ids_array
 
       t.timestamps null: false
       t.timestamp :generation_started_at
@@ -1996,6 +2029,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.datetime "end_at"
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
+      t.references :root_account, type: :bigint, foreign_key: { to_table: :accounts }, index: true
 
       t.replica_identity_index :context_id
     end
@@ -2307,6 +2341,27 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
               unique: true,
               where: "unique_type IS NOT NULL AND workflow_state <> 'deleted'"
     add_replica_identity_index :folders
+
+    execute(<<~SQL) # rubocop:disable Rails/SquishedSQLHeredocs
+      CREATE FUNCTION #{connection.quote_table_name("folder_before_insert_verify_active_parent_folder__tr_fn")} () RETURNS trigger AS $$
+      DECLARE
+        parent_state text;
+      BEGIN
+        SELECT workflow_state INTO parent_state FROM #{Folder.quoted_table_name} WHERE folders.id = NEW.parent_folder_id FOR SHARE;
+        if parent_state = 'deleted' then
+          RAISE EXCEPTION 'Cannot create sub-folders in deleted folders --> %', NEW.parent_folder_id;
+        end if;
+        RETURN NEW;
+      END;
+      $$ LANGUAGE plpgsql;
+    SQL
+
+    execute(<<~SQL.squish)
+      CREATE TRIGGER folder_before_insert_verify_active_parent_folder__tr
+        BEFORE INSERT ON #{Folder.quoted_table_name}
+        FOR EACH ROW
+        EXECUTE PROCEDURE #{connection.quote_table_name("folder_before_insert_verify_active_parent_folder__tr_fn")}()
+    SQL
 
     create_table :gradebook_csvs do |t|
       t.integer :user_id, limit: 8, null: false
@@ -3930,7 +3985,6 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer  "rubric_association_id", limit: 8
       t.float    "score"
       t.text     "data"
-      t.text     "comments"
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
       t.integer  "artifact_id", limit: 8, null: false
@@ -4321,6 +4375,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.references :root_account, type: :bigint, foreign_key: { to_table: :accounts }, index: true
       t.boolean :redo_request, default: false, null: false
       t.uuid :resource_link_lookup_uuid
+      t.references :proxy_submitter, foreign_key: false, index: true, type: :bigint
     end
 
     add_index "submissions", ["assignment_id", "submission_type"], name: "index_submissions_on_assignment_id_and_submission_type"
@@ -4823,7 +4878,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
 
     change_column :schema_migrations, :version, :string, limit: 255
 
-    connection.execute(<<~SQL.squish)
+    execute(<<~SQL.squish)
       CREATE VIEW #{connection.quote_table_name("assignment_student_visibilities")} AS
       SELECT DISTINCT a.id as assignment_id,
         e.user_id as user_id,
@@ -4834,6 +4889,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
         AND a.context_type = 'Course'
         AND e.type IN ('StudentEnrollment', 'StudentViewEnrollment')
         AND e.workflow_state NOT IN ('deleted', 'rejected', 'inactive')
+        AND NOT (e.workflow_state = 'completed' AND a.due_at > e.completed_at)
       WHERE a.workflow_state NOT IN ('deleted','unpublished')
         AND COALESCE(a.only_visible_to_overrides, 'false') = 'false'
 
@@ -4851,6 +4907,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       INNER JOIN #{AssignmentOverride.quoted_table_name} ao
         ON a.id = ao.assignment_id
         AND ao.set_type = 'ADHOC'
+        AND NOT (e.workflow_state = 'completed' AND ao.due_at > e.completed_at)
       INNER JOIN #{AssignmentOverrideStudent.quoted_table_name} aos
         ON ao.id = aos.assignment_override_id
         AND aos.user_id = e.user_id
@@ -4873,6 +4930,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       INNER JOIN #{AssignmentOverride.quoted_table_name} ao
         ON a.id = ao.assignment_id
         AND ao.set_type = 'Group'
+        AND NOT (e.workflow_state = 'completed' AND ao.due_at > e.completed_at)
       INNER JOIN #{Group.quoted_table_name} g
         ON g.id = ao.set_id
       INNER JOIN #{GroupMembership.quoted_table_name} gm
@@ -4896,15 +4954,16 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
         AND e.type IN ('StudentEnrollment', 'StudentViewEnrollment')
         AND e.workflow_state NOT IN ('deleted', 'rejected', 'inactive')
       INNER JOIN #{AssignmentOverride.quoted_table_name} ao
-        ON e.course_section_id = ao.set_id
-        AND ao.set_type = 'CourseSection'
-        AND ao.assignment_id = a.id
+         ON e.course_section_id = ao.set_id
+         AND ao.set_type = 'CourseSection'
+         AND ao.assignment_id = a.id
+         AND NOT (e.workflow_state = 'completed' AND ao.due_at > e.completed_at)
       WHERE a.workflow_state NOT IN ('deleted','unpublished')
         AND a.only_visible_to_overrides = 'true'
         AND ao.workflow_state = 'active'
     SQL
 
-    connection.execute(<<~SQL.squish)
+    execute(<<~SQL.squish)
       CREATE VIEW #{connection.quote_table_name("quiz_student_visibilities")} AS
       SELECT DISTINCT q.id as quiz_id,
         e.user_id as user_id,
@@ -5103,6 +5162,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :discussion_entries, :users, column: :editor_id
     add_foreign_key :discussion_entry_participants, :discussion_entries
     add_foreign_key :discussion_entry_participants, :users
+    add_foreign_key :discussion_entry_versions, :users
     add_foreign_key :discussion_topic_materialized_views, :discussion_topics
     add_foreign_key :discussion_topic_participants, :discussion_topics
     add_foreign_key :discussion_topic_participants, :users
@@ -5298,6 +5358,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_foreign_key :submissions, :media_objects
     add_foreign_key :submissions, :quiz_submissions
     add_foreign_key :submissions, :users
+    add_foreign_key :submissions, :users, column: :proxy_submitter_id
     alter_constraint :submissions, "fk_rails_8d85741475", deferrable: true
     add_foreign_key :switchman_shards, :switchman_shards, column: :delayed_jobs_shard_id
     add_foreign_key :terms_of_service_contents, :accounts
