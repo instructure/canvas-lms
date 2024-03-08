@@ -27,6 +27,7 @@
 # bump the version in the filename of this migration so it runs again.
 class ValidateMigrationIntegrity < ActiveRecord::Migration[4.2]
   tag :predeploy
+  disable_ddl_transaction!
 
   def self.up
     initial_migration_version = "20101210192618"
