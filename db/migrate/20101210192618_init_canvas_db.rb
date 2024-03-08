@@ -1012,7 +1012,7 @@ class InitCanvasDb < ActiveRecord::Migration[5.0]
     add_index :calendar_events, :cloned_item_id, where: "cloned_item_id IS NOT NULL"
 
     create_table :blackout_dates do |t|
-      t.belongs_to :context, polymorphic: true, index: true, null: false, type: :bigint
+      t.references :context, polymorphic: true, index: true, null: false, type: :bigint
       t.date :start_date, :end_date, null: false
       t.string :event_title, limit: 255, null: false
       t.timestamps precision: 6
@@ -2683,7 +2683,7 @@ class InitCanvasDb < ActiveRecord::Migration[5.0]
     add_index :ignores, :user_id
 
     create_table :late_policies do |t|
-      t.belongs_to :course, foreign_key: true, type: :bigint, null: false, index: { unique: true }
+      t.references :course, foreign_key: true, type: :bigint, null: false, index: { unique: true }
 
       t.boolean :missing_submission_deduction_enabled, null: false, default: false
       t.decimal :missing_submission_deduction, precision: 5, scale: 2, null: false, default: 100
@@ -3426,12 +3426,12 @@ class InitCanvasDb < ActiveRecord::Migration[5.0]
               unique: true
 
     create_table :notification_policy_overrides do |t|
-      t.belongs_to :context,
+      t.references :context,
                    polymorphic: { default: "Course" },
                    null: false,
                    index: { name: "index_notification_policy_overrides_on_context" },
                    type: :bigint
-      t.belongs_to :communication_channel, null: false, foreign_key: true, type: :bigint, index: true
+      t.references :communication_channel, null: false, foreign_key: true, type: :bigint, index: true
       t.bigint :notification_id
       t.string :workflow_state, default: "active", null: false
       t.string :frequency
@@ -4258,7 +4258,7 @@ class InitCanvasDb < ActiveRecord::Migration[5.0]
     add_index :score_metadata, :score_id, unique: true
 
     create_table :score_statistics do |t|
-      t.belongs_to :assignment, null: false, index: { unique: true }, foreign_key: true, type: :bigint
+      t.references :assignment, null: false, index: { unique: true }, foreign_key: true, type: :bigint
       t.float :minimum, null: false
       t.float :maximum, null: false
       t.float :mean, null: false
