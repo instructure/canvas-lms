@@ -187,6 +187,9 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.boolean  "jit_provisioning", default: false, null: false
       t.string   "metadata_uri", limit: 255
       t.json     "settings", default: {}, null: false
+      t.text :internal_ca
+      # this field will be removed after VERIFY_NONE is removed entirely
+      t.boolean :verify_tls_cert_opt_in, default: false, null: false
     end
 
     add_index "authentication_providers", ["account_id"], name: "index_authentication_providers_on_account_id"
@@ -328,6 +331,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer :latest_outcome_import_id, limit: 8
       t.references :course_template, type: :bigint, index: { where: "course_template_id IS NOT NULL" }
       t.boolean :account_calendar_visible, default: false, null: false
+      t.string :account_calendar_subscription_type, default: "manual", null: false, limit: 255
 
       t.replica_identity_index
     end
@@ -344,6 +348,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :accounts, :sis_batch_id, where: "sis_batch_id IS NOT NULL"
     add_index :accounts, :brand_config_md5, where: "brand_config_md5 IS NOT NULL"
     add_index :accounts, :uuid, unique: true
+    add_index :accounts, :account_calendar_subscription_type, where: "account_calendar_subscription_type <> 'manual'"
 
     create_table :alerts do |t|
       t.integer :context_id, limit: 8, null: false
@@ -2738,11 +2743,13 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.string   "migration_id_2", limit: 255
       t.integer :outcome_import_id, limit: 8
       t.bigint :root_account_ids, array: true
+      t.bigint :copied_from_outcome_id
     end
     add_index :learning_outcomes, [:context_id, :context_type]
     add_index :learning_outcomes, :vendor_guid, name: "index_learning_outcomes_on_vendor_guid"
     add_index :learning_outcomes, :vendor_guid_2, name: "index_learning_outcomes_on_vendor_guid_2"
     add_index :learning_outcomes, :root_account_ids, using: :gin
+    add_index :learning_outcomes, :copied_from_outcome_id, where: "copied_from_outcome_id IS NOT NULL"
 
     create_table :live_assessments_assessments do |t|
       t.string :key, null: false, limit: 255
