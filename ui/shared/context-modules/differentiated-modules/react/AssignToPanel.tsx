@@ -30,6 +30,7 @@ import {showFlashAlert, showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {generateAssignmentOverridesPayload, updateModuleUI} from '../utils/assignToHelper'
 import type {AssignmentOverride} from './types'
 import LoadingOverlay from './LoadingOverlay'
+import type {FormMessage} from '@instructure/ui-form-field'
 
 const I18n = useI18nScope('differentiated_modules')
 
@@ -68,6 +69,11 @@ const CUSTOM_OPTION: Option = {
   value: 'custom',
   getLabel: () => I18n.t('Assign To'),
   getDescription: () => I18n.t('Assign module to individuals or sections.'),
+}
+
+const EMPTY_ASSIGNEE_ERROR_MESSAGE: FormMessage = {
+  text: I18n.t('A student or section must be selected'),
+  type: 'error',
 }
 
 export const updateModuleAssignees = ({
@@ -123,6 +129,9 @@ export default function AssignToPanel({
   )
   const [isLoading, setIsLoading] = useState(false)
   const changed = useRef(false)
+  const [isInitialLoad, setIsInitialLoad] = useState(true)
+  const [error, setError] = useState<FormMessage[]>([])
+  const assigneeSelectorRef = useRef<HTMLInputElement | null>(null)
 
   useEffect(() => {
     // If defaultOption and defaultAssignees are passed, there is no need to fetch the data again.
@@ -170,14 +179,19 @@ export default function AssignToPanel({
       })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+  const hasErrors = error.length > 0
 
   const handleSave = useCallback(() => {
+    if (hasErrors) {
+      assigneeSelectorRef.current?.focus()
+      return
+    }
     setIsLoading(true)
     // eslint-disable-next-line promise/catch-or-return
     updateModuleAssignees({courseId, moduleId, moduleElement, selectedAssignees})
       .finally(() => setIsLoading(false))
       .then(() => (onDidSubmit ? onDidSubmit() : onDismiss()))
-  }, [courseId, moduleElement, moduleId, onDidSubmit, onDismiss, selectedAssignees])
+  }, [hasErrors, courseId, moduleId, moduleElement, selectedAssignees, onDidSubmit, onDismiss])
 
   const handleChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const value = (event.target as HTMLInputElement).value
@@ -193,6 +207,20 @@ export default function AssignToPanel({
     () => () => updateParentData?.({selectedOption, selectedAssignees}, changed.current),
     [selectedOption, selectedAssignees, updateParentData]
   )
+
+  // cannot handle in onSelect because of infinite rerenders due to messages prop
+  useEffect(() => {
+    if (selectedAssignees.length > 0) setError([])
+    else if (selectedAssignees.length === 0 && !isInitialLoad)
+      setError([EMPTY_ASSIGNEE_ERROR_MESSAGE])
+  }, [selectedAssignees, isInitialLoad])
+
+  const handleBlur = () => {
+    setIsInitialLoad(false)
+    if (selectedAssignees.length === 0) {
+      setError([EMPTY_ASSIGNEE_ERROR_MESSAGE])
+    }
+  }
 
   return (
     <Flex direction="column">
@@ -230,13 +258,17 @@ export default function AssignToPanel({
                       selectedOption === CUSTOM_OPTION.value && (
                         <View as="div" margin="small 0 0">
                           <ModuleAssignments
+                            inputRef={el => (assigneeSelectorRef.current = el)}
+                            messages={error}
                             courseId={courseId}
                             onSelect={assignees => {
+                              if (selectedAssignees && !assignees) setIsInitialLoad(false)
                               setSelectedAssignees(assignees)
                               changed.current = true
                             }}
                             defaultValues={selectedAssignees}
                             onDismiss={onDismiss}
+                            onBlur={handleBlur}
                           />
                         </View>
                       )}
@@ -249,6 +281,7 @@ export default function AssignToPanel({
       </Flex.Item>
       <Flex.Item margin="auto none none none" size={footerHeight}>
         <Footer
+          hasErrors={hasErrors}
           saveButtonLabel={moduleId ? I18n.t('Save') : I18n.t('Add Module')}
           onDismiss={onDismiss}
           onUpdate={handleSave}

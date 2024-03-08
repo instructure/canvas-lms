@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {act, render, waitFor} from '@testing-library/react'
+import {act, screen, render, waitFor} from '@testing-library/react'
 import AssignToPanel, {type AssignToPanelProps} from '../AssignToPanel'
 import {ASSIGNMENT_OVERRIDES_DATA, SECTIONS_DATA, STUDENTS_DATA} from './mocks'
 import * as utils from '../../utils/assignToHelper'
@@ -33,6 +33,8 @@ jest.mock('../../utils/assignToHelper', () => {
     updateModuleUI: jest.fn(),
   }
 })
+
+const errorText = 'A student or section must be selected'
 
 describe('AssignToPanel', () => {
   const props: AssignToPanelProps = {
@@ -200,6 +202,79 @@ describe('AssignToPanel', () => {
     })
   })
 
+  it('does not display empty assignee error on open', async () => {
+    renderComponent()
+    const customOption = await screen.findByTestId('custom-option')
+    await userEvent.click(customOption)
+    await waitFor(() => expect(screen.queryByText(errorText)).toBeNull())
+  })
+
+  it('does display empty assignee error on blur', async () => {
+    renderComponent()
+    const customOption = await screen.findByTestId('custom-option')
+    await userEvent.click(customOption)
+    const assigneeSelector = await screen.findByTestId('assignee_selector')
+    await userEvent.click(assigneeSelector)
+    await userEvent.click(customOption)
+    expect(await screen.findByText(errorText)).toBeInTheDocument()
+  })
+
+  it('clears empty assignee error on selection', async () => {
+    renderComponent()
+    const customOption = await screen.findByTestId('custom-option')
+    await userEvent.click(customOption)
+    const assigneeSelector = await screen.findByTestId('assignee_selector')
+    await userEvent.click(assigneeSelector)
+    await userEvent.click(customOption)
+    expect(await screen.findByText(errorText)).toBeInTheDocument()
+
+    await userEvent.click(assigneeSelector)
+    const option = await screen.findByText(STUDENTS_DATA[0].name)
+    await userEvent.click(option)
+    await waitFor(() => expect(screen.queryByText(errorText)).toBeNull())
+  })
+
+  it('does not save when empty assignee error is displayed', async () => {
+    renderComponent()
+    const customOption = await screen.findByTestId('custom-option')
+    await userEvent.click(customOption)
+    const assigneeSelector = await screen.findByTestId('assignee_selector')
+    await userEvent.click(assigneeSelector)
+    await userEvent.click(customOption)
+    expect(await screen.findByText(errorText)).toBeInTheDocument()
+    const saveButton = screen.getByRole('button', {name: 'Save'})
+    await userEvent.click(saveButton)
+    expect(assigneeSelector).toHaveFocus()
+  })
+
+  it('displays empty assignee error on clearAll', async () => {
+    renderComponent()
+    const customOption = await screen.findByTestId('custom-option')
+    await userEvent.click(customOption)
+    const assigneeSelector = await screen.findByTestId('assignee_selector')
+    await userEvent.click(assigneeSelector)
+
+    const clearAllButton = screen.getByTestId('clear_selection_button')
+    await userEvent.click(clearAllButton)
+    expect(await screen.findByText(errorText)).toBeInTheDocument()
+  })
+
+  it('displays empty assignee error after switching options', async () => {
+    renderComponent()
+    const customOption = await screen.findByTestId('custom-option')
+    await userEvent.click(customOption)
+    const assigneeSelector = await screen.findByTestId('assignee_selector')
+    await userEvent.click(assigneeSelector)
+    await userEvent.click(customOption)
+    expect(await screen.findByText(errorText)).toBeInTheDocument()
+
+    const everyoneOption = await screen.findByTestId('everyone-option')
+    await userEvent.click(everyoneOption)
+    expect(screen.queryByText(errorText)).toBeNull()
+    await userEvent.click(customOption)
+    expect(await screen.findByText(errorText)).toBeInTheDocument()
+  })
+
   describe('on update', () => {
     it('creates new assignment overrides', async () => {
       fetchMock.put(ASSIGNMENT_OVERRIDES_URL, {})
@@ -258,19 +333,16 @@ describe('AssignToPanel', () => {
       fetchMock.put(ASSIGNMENT_OVERRIDES_URL, {})
       const onDidSubmitMock = jest.fn()
       const onDismissMock = jest.fn()
-      const {findByTestId, findByText, getByRole} = renderComponent({
+      renderComponent({
         onDidSubmit: onDidSubmitMock,
         onDismiss: onDismissMock,
       })
-      await userEvent.click(await findByTestId('custom-option'))
-      await userEvent.click(await findByTestId('assignee_selector'))
-      await userEvent.click(await findByText(SECTIONS_DATA[0].name))
-      await userEvent.click(getByRole('button', {name: 'Save'}))
-
-      await waitFor(() => {
-        expect(onDidSubmitMock).toHaveBeenCalled()
-        expect(onDismissMock).not.toHaveBeenCalled()
-      })
+      await userEvent.click(screen.getByTestId('custom-option'))
+      await userEvent.click(screen.getByTestId('assignee_selector'))
+      await userEvent.click(screen.getByText(SECTIONS_DATA[0].name))
+      await userEvent.click(screen.getByTestId('differentiated_modules_save_button'))
+      expect(onDidSubmitMock).toHaveBeenCalled()
+      expect(onDismissMock).not.toHaveBeenCalled()
     })
   })
 })

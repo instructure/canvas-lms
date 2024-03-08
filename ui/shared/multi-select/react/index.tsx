@@ -60,6 +60,7 @@ type Props = {
   customOnRequestSelectOption: (ids: string[]) => void
   customOnRequestShowOptions: () => void
   customRenderBeforeInput: (tags: any) => React.ReactNode
+  customOnBlur?: () => void
   disabled: boolean
   id?: string
   isLoading: boolean
@@ -94,6 +95,7 @@ function CanvasMultiSelect(props: Props) {
     customOnRequestShowOptions,
     customOnRequestHideOptions,
     customOnRequestSelectOption,
+    customOnBlur,
     isLoading,
     onUpdateHighlightedOption,
     setInputRef,
@@ -367,6 +369,7 @@ function CanvasMultiSelect(props: Props) {
 
   function onBlur() {
     setHighlightedOptionId(null)
+    customOnBlur?.()
   }
 
   return (

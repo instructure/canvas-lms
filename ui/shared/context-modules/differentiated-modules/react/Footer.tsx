@@ -48,14 +48,18 @@ export default function Footer({
           renderTip={I18n.t('Please fix errors before continuing')}
           on={['click', 'focus', 'hover']}
         >
-          <Button color="primary" onClick={onUpdate}>
+          <Button
+            color="primary"
+            onClick={onUpdate}
+            data-testid="differentiated_modules_save_button"
+          >
             {saveButtonLabel}
           </Button>
         </Tooltip>
       )
     } else {
       return (
-        <Button color="primary" onClick={onUpdate}>
+        <Button color="primary" onClick={onUpdate} data-testid="differentiated_modules_save_button">
           {saveButtonLabel}
         </Button>
       )

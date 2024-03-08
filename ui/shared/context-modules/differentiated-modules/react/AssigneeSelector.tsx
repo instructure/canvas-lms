@@ -50,6 +50,7 @@ interface Props {
   onError?: () => void
   showVisualLabel?: boolean
   inputRef?: (inputElement: HTMLInputElement | null) => void
+  onBlur?: () => void
 }
 
 export interface AssigneeOption {
@@ -77,6 +78,7 @@ const AssigneeSelector = ({
   onError,
   showVisualLabel = true,
   inputRef,
+  onBlur,
 }: Props) => {
   const listElementRef = useRef<HTMLElement | null>(null)
   const [options, setOptions] = useState<AssigneeOption[]>(defaultValues)
@@ -181,6 +183,7 @@ const AssigneeSelector = ({
         }
         customMatcher={optionMatcher}
         onUpdateHighlightedOption={setHighlightedOptionId}
+        customOnBlur={onBlur}
       >
         {options.map(option => {
           return (
