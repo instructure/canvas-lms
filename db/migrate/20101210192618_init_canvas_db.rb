@@ -81,11 +81,11 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
           SELECT count(*) FROM oldtbl INTO record_count;
           max_record_count := COALESCE(setting_as_int('inst.max_update_limit.' || TG_TABLE_NAME), setting_as_int('inst.max_update_limit'), '#{PostgreSQLAdapterExtensions::DEFAULT_MAX_UPDATE_LIMIT}');
           IF record_count > max_record_count THEN
-              IF current_setting('inst.max_update_fail', true) IS NOT DISTINCT FROM 'true' THEN
-                  RAISE EXCEPTION 'guard_excessive_updates: % to %.% failed. Would update % records but max is %', TG_OP, TG_TABLE_SCHEMA, TG_TABLE_NAME, record_count, max_record_count;
-              ELSE
-                  RAISE WARNING 'guard_excessive_updates: % to %.% was dangerous. Updated % records but threshold is %', TG_OP, TG_TABLE_SCHEMA, TG_TABLE_NAME, record_count, max_record_count;
-              END IF;
+            IF current_setting('inst.max_update_fail', true) IS NOT DISTINCT FROM 'true' THEN
+                RAISE EXCEPTION 'guard_excessive_updates: % to %.% failed', TG_OP, TG_TABLE_SCHEMA, TG_TABLE_NAME USING DETAIL = 'Would update ' || record_count || ' records but max is ' || max_record_count || ', orig query: ' || current_query();
+            ELSE
+                RAISE WARNING 'guard_excessive_updates: % to %.% was dangerous', TG_OP, TG_TABLE_SCHEMA, TG_TABLE_NAME USING DETAIL = 'Updated ' || record_count || ' records but threshold is ' || max_record_count || ', orig query: ' || current_query();
+            END IF;
           END IF;
           RETURN NULL;
       END
@@ -2606,7 +2606,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.belongs_to :course, foreign_key: true, limit: 8, null: false
 
       t.boolean :missing_submission_deduction_enabled, null: false, default: false
-      t.decimal :missing_submission_deduction, precision: 5, scale: 2, null: false, default: 0
+      t.decimal :missing_submission_deduction, precision: 5, scale: 2, null: false, default: 100
 
       t.boolean :late_submission_deduction_enabled, null: false, default: false
       t.decimal :late_submission_deduction, precision: 5, scale: 2, null: false, default: 0
@@ -2773,6 +2773,30 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     end
     add_index :live_assessments_submissions, [:assessment_id, :user_id], unique: true
     add_index :live_assessments_submissions, :user_id
+
+    create_table :lti_ims_registrations do |t|
+      t.jsonb :lti_tool_configuration, null: false
+      t.references :developer_key, null: false, foreign_key: true, index: true, type: :bigint
+      t.string :application_type, null: false
+      t.text :grant_types, array: true, default: [], null: false
+      t.text :response_types, array: true, default: [], null: false
+      t.text :redirect_uris, array: true, default: [], null: false
+      t.text :initiate_login_uri, null: false
+      t.string :client_name, null: false
+      t.text :jwks_uri, null: false
+      t.text :logo_uri
+      t.string :token_endpoint_auth_method, null: false
+      t.string :contacts, array: true, default: [], null: false, limit: 255
+      t.text :client_uri
+      t.text :policy_uri
+      t.text :tos_uri
+      t.text :scopes, array: true, default: [], null: false
+
+      t.references :root_account, foreign_key: { to_table: :accounts }, null: false, index: false, type: :bigint
+      t.timestamps null: false, precision: 6
+
+      t.replica_identity_index
+    end
 
     create_table :lti_line_items do |t|
       t.float :score_maximum, null: false
@@ -4949,7 +4973,6 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
         AND a.context_type = 'Course'
         AND e.type IN ('StudentEnrollment', 'StudentViewEnrollment')
         AND e.workflow_state NOT IN ('deleted', 'rejected', 'inactive')
-        AND NOT (e.workflow_state = 'completed' AND a.due_at > e.completed_at)
       WHERE a.workflow_state NOT IN ('deleted','unpublished')
         AND COALESCE(a.only_visible_to_overrides, 'false') = 'false'
 
@@ -4967,7 +4990,6 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       INNER JOIN #{AssignmentOverride.quoted_table_name} ao
         ON a.id = ao.assignment_id
         AND ao.set_type = 'ADHOC'
-        AND NOT (e.workflow_state = 'completed' AND ao.due_at > e.completed_at)
       INNER JOIN #{AssignmentOverrideStudent.quoted_table_name} aos
         ON ao.id = aos.assignment_override_id
         AND aos.user_id = e.user_id
@@ -4990,7 +5012,6 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       INNER JOIN #{AssignmentOverride.quoted_table_name} ao
         ON a.id = ao.assignment_id
         AND ao.set_type = 'Group'
-        AND NOT (e.workflow_state = 'completed' AND ao.due_at > e.completed_at)
       INNER JOIN #{Group.quoted_table_name} g
         ON g.id = ao.set_id
       INNER JOIN #{GroupMembership.quoted_table_name} gm
@@ -5014,10 +5035,9 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
         AND e.type IN ('StudentEnrollment', 'StudentViewEnrollment')
         AND e.workflow_state NOT IN ('deleted', 'rejected', 'inactive')
       INNER JOIN #{AssignmentOverride.quoted_table_name} ao
-         ON e.course_section_id = ao.set_id
-         AND ao.set_type = 'CourseSection'
-         AND ao.assignment_id = a.id
-         AND NOT (e.workflow_state = 'completed' AND ao.due_at > e.completed_at)
+        ON e.course_section_id = ao.set_id
+        AND ao.set_type = 'CourseSection'
+        AND ao.assignment_id = a.id
       WHERE a.workflow_state NOT IN ('deleted','unpublished')
         AND a.only_visible_to_overrides = 'true'
         AND ao.workflow_state = 'active'

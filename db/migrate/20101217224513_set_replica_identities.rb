@@ -56,6 +56,7 @@ class SetReplicaIdentities < ActiveRecord::Migration[7.0]
     set_replica_identity :group_categories
     set_replica_identity :group_memberships
     set_replica_identity :groups
+    set_replica_identity :lti_ims_registrations
     set_replica_identity :lti_line_items
     set_replica_identity :lti_resource_links
     set_replica_identity :lti_results
