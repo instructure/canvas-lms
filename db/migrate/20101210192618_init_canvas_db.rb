@@ -1622,7 +1622,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.datetime :deleted_at
       t.text :root_account_ids
     end
-    add_index :conversation_message_participants, [:conversation_participant_id, :conversation_message_id], name: :index_cmp_on_cpi_and_cmi
+    add_index :conversation_message_participants, [:conversation_participant_id, :conversation_message_id], name: "index_cmp_on_cpi_and_cmi"
     add_index :conversation_message_participants, [:user_id, :conversation_message_id], name: "index_conversation_message_participants_on_uid_and_message_id", unique: true
     add_index :conversation_message_participants, :conversation_message_id, name: "index_conversation_message_participants_on_message_id"
     add_index :conversation_message_participants, :deleted_at
@@ -1912,7 +1912,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.replica_identity_index
     end
     add_index :developer_key_account_bindings, :developer_key_id
-    add_index :developer_key_account_bindings, %i[account_id developer_key_id], name: :index_dev_key_bindings_on_account_id_and_developer_key_id, unique: true
+    add_index :developer_key_account_bindings, %i[account_id developer_key_id], name: "index_dev_key_bindings_on_account_id_and_developer_key_id", unique: true
 
     create_table :developer_keys, force: true do |t|
       t.string :api_key, limit: 255
@@ -3386,11 +3386,11 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
               :submission_id,
               unique: true,
               where: "final = TRUE",
-              name: :idx_mg_provisional_grades_unique_submission_when_final
+              name: "idx_mg_provisional_grades_unique_submission_when_final"
     add_index :moderated_grading_provisional_grades,
               [:submission_id, :scorer_id],
               unique: true,
-              name: :idx_mg_provisional_grades_unique_sub_scorer_when_not_final,
+              name: "idx_mg_provisional_grades_unique_sub_scorer_when_not_final",
               where: "final = FALSE"
     add_index :moderated_grading_provisional_grades, :source_provisional_grade_id, name: "index_provisional_grades_on_source_grade", where: "source_provisional_grade_id IS NOT NULL"
     add_index :moderated_grading_provisional_grades, :scorer_id
@@ -3405,7 +3405,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :moderated_grading_selections,
               [:assignment_id, :student_id],
               unique: true,
-              name: :idx_mg_selections_unique_on_assignment_and_student
+              name: "idx_mg_selections_unique_on_assignment_and_student"
     add_index :moderated_grading_selections, :selected_provisional_grade_id, name: "index_moderated_grading_selections_on_selected_grade", where: "selected_provisional_grade_id IS NOT NULL"
     add_index :moderated_grading_selections, :student_id
 
@@ -4287,18 +4287,18 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.references :root_account, type: :bigint, foreign_key: { to_table: :accounts }, index: true
       t.references :custom_grade_status, foreign_key: true, index: { where: "custom_grade_status_id IS NOT NULL" }, type: :bigint
     end
-    add_index :scores, :enrollment_id, name: :index_enrollment_scores
+    add_index :scores, :enrollment_id, name: "index_enrollment_scores"
     add_index :scores,
               %i[enrollment_id grading_period_id],
               unique: true,
               where: "grading_period_id IS NOT NULL",
-              name: :index_grading_period_scores
+              name: "index_grading_period_scores"
     add_index :scores,
               %i[enrollment_id assignment_group_id],
               unique: true,
               where: "assignment_group_id IS NOT NULL",
-              name: :index_assignment_group_scores
-    add_index :scores, :enrollment_id, unique: true, where: "course_score", name: :index_course_scores
+              name: "index_assignment_group_scores"
+    add_index :scores, :enrollment_id, unique: true, where: "course_score", name: "index_course_scores"
     add_index :scores, :grading_period_id, where: "grading_period_id IS NOT NULL"
 
     create_table :sessions, force: true do |t|
@@ -4941,7 +4941,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :users, :turnitin_id, unique: true, where: "turnitin_id IS NOT NULL"
     add_index :users, :workflow_state
     add_index :users, :lti_id, unique: true, name: "index_users_on_unique_lti_id"
-    add_index :users, "#{User.best_unicode_collation_key("sortable_name")}, id", name: :index_users_on_sortable_name
+    add_index :users, "#{User.best_unicode_collation_key("sortable_name")}, id", name: "index_users_on_sortable_name"
     add_index :users, :id, where: "workflow_state <> 'deleted'", name: "index_active_users_on_id"
     add_index :users, :merged_into_user_id, where: "merged_into_user_id IS NOT NULL"
 
