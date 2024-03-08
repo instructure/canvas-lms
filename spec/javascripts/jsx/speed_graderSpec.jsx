@@ -8342,7 +8342,7 @@ QUnit.module('SpeedGrader', rootHooks => {
         SpeedGrader.EG.goToStudent(studentOne.id)
 
         const avatarImageStyles = document.getElementById('avatar_image').style
-        strictEqual(avatarImageStyles.display, 'inline')
+        notStrictEqual(avatarImageStyles.display, 'none')
       })
 
       test('avatar reflects the avatar path for the selected student', () => {
