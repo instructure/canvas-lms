@@ -108,8 +108,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
     create_table :settings do |t|
       t.string :name, limit: 255
       t.text :value
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
       t.boolean :secret, default: false, null: false
     end
     add_index :settings, :name, unique: true
@@ -121,8 +120,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.bigint :root_account_id, null: false
       t.string :short_name, limit: 255
       t.string :name, limit: 255
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
       t.bigint :enrollment_term_id, null: false
       t.string :workflow_state, null: false, limit: 255
       t.text :stuck_sis_fields
@@ -170,8 +168,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.string :auth_password_salt, limit: 255
       t.string :auth_type, limit: 255
       t.string :auth_over_tls, limit: 255, default: "start_tls"
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
       t.string :log_in_url, limit: 255
       t.string :log_out_url, limit: 255
       t.string :identifier_format, limit: 255
@@ -229,8 +226,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.string :workflow_state, default: "created", null: false, limit: 255
       t.string :report_type, limit: 255
       t.integer :progress
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
       t.text :parameters
       t.integer :current_line
       t.integer :total_lines
@@ -280,8 +276,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
     create_table :account_users do |t|
       t.bigint :account_id, null: false
       t.bigint :user_id, null: false
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
       t.bigint :role_id, null: false
       t.string :workflow_state, default: "active", null: false
       t.bigint :sis_batch_id
@@ -298,8 +293,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
 
     create_table :accounts do |t|
       t.string :name, limit: 255
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
       t.string :workflow_state, default: "active", null: false, limit: 255
       t.timestamp :deleted_at
       t.bigint :parent_account_id
@@ -404,8 +398,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.string :context_code, limit: 255
       t.string :sub_context_code, limit: 255
       t.string :workflow_state, null: false, limit: 255
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
       t.timestamp :start_at
       t.timestamp :end_at
       t.integer :participants_per_appointment
@@ -436,8 +429,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
     create_table :assessment_question_bank_users do |t|
       t.bigint :assessment_question_bank_id, null: false
       t.bigint :user_id, null: false
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
     end
 
     add_index :assessment_question_bank_users, :assessment_question_bank_id, name: "assessment_qbu_aqb_id"
@@ -449,8 +441,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.text :title
       t.string :workflow_state, null: false, limit: 255
       t.timestamp :deleted_at
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
       t.string :migration_id, limit: 255
       t.references :root_account, foreign_key: { to_table: :accounts }
     end
@@ -466,8 +457,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.bigint :context_id
       t.string :context_type, limit: 255
       t.string :workflow_state, limit: 255
-      t.timestamp :created_at
-      t.timestamp :updated_at
+      t.timestamps null: true, precision: nil
       t.bigint :assessment_question_bank_id
       t.timestamp :deleted_at
       t.string :migration_id, limit: 255
@@ -485,8 +475,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.bigint :assessor_asset_id, null: false
       t.string :assessor_asset_type, null: false, limit: 255
       t.string :workflow_state, null: false, limit: 255
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
       t.string :uuid, limit: 255
       t.bigint :rubric_association_id
       t.bigint :assessor_id, null: false
@@ -506,8 +495,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.bigint :context_id
       t.string :context_type, limit: 255
       t.timestamp :last_access
-      t.timestamp :created_at
-      t.timestamp :updated_at
+      t.timestamps null: true, precision: nil
       t.string :asset_category, limit: 255
       t.float :view_score
       t.float :participate_score
@@ -555,8 +543,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.bigint :context_id, null: false
       t.string :context_type, null: false, limit: 255
       t.string :workflow_state, null: false, limit: 255
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
       t.bigint :cloned_item_id
       t.string :context_code, limit: 255
       t.string :migration_id, limit: 255
@@ -661,8 +648,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.string :context_type, null: false, limit: 255
       t.bigint :assignment_group_id
       t.bigint :grading_standard_id
-      t.timestamp :created_at
-      t.timestamp :updated_at
+      t.timestamps null: true, precision: nil
       t.string :group_category, limit: 255
       t.integer :submissions_downloads, default: 0
       t.integer :peer_review_count, default: 0
@@ -776,8 +762,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.text :filename
       t.string :uuid, limit: 255
       t.text :display_name
-      t.timestamp :created_at
-      t.timestamp :updated_at
+      t.timestamps null: true, precision: nil
       t.string :workflow_state, limit: 255
       t.bigint :user_id
       t.boolean :locked, default: false
@@ -978,8 +963,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.bigint :context_id, null: false
       t.string :context_type, null: false, limit: 255
       t.string :workflow_state, null: false, limit: 255
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
       t.bigint :user_id
       t.boolean :all_day
       t.date :all_day_date
@@ -1110,8 +1094,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
     create_table :cloned_items do |t|
       t.bigint :original_item_id
       t.string :original_item_type, limit: 255
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
     end
 
     create_table :collaborations do |t|
@@ -1123,8 +1106,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.string :url, limit: 255
       t.string :uuid, limit: 255
       t.text :data
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
       t.text :description
       t.string :title, null: false, limit: 255
       t.string :workflow_state, default: "active", null: false, limit: 255
@@ -1140,8 +1122,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
     create_table :collaborators do |t|
       t.bigint :user_id
       t.bigint :collaboration_id
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
       t.string :authorized_service_user_id, limit: 255
       t.bigint :group_id
     end
@@ -1173,8 +1154,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.integer :bounce_count, default: 0
       t.string :workflow_state, null: false, limit: 255
       t.string :confirmation_code, limit: 255
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
       t.boolean :build_pseudonym_on_confirm
       t.timestamp :last_bounce_at
       # last_bounce_details was originally intended to have limit: 32768, but
@@ -1331,8 +1311,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.text :migration_settings
       t.timestamp :started_at
       t.timestamp :finished_at
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
       t.float :progress
       t.string :context_type, limit: 255
       t.bigint :attachment_id
@@ -1389,8 +1368,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
 
     create_table :content_shares do |t|
       t.text :name, null: false
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
       t.bigint :user_id, null: false
       t.bigint :content_export_id, null: false
       t.bigint :sender_id
@@ -1413,8 +1391,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.text :title
       t.string :tag, limit: 255
       t.text :url
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
       t.text :comments
       t.string :tag_type, default: "default", limit: 255
       t.bigint :context_module_id
@@ -1498,8 +1475,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.bigint :user_id
       t.text :requirements_met
       t.string :workflow_state, null: false, limit: 255
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
       t.boolean :collapsed
       t.integer :current_position
       t.timestamp :completed_at
@@ -1520,8 +1496,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.integer :position
       t.text :prerequisites
       t.text :completion_requirements
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
       t.string :workflow_state, default: "active", null: false, limit: 255
       t.timestamp :deleted_at
       t.timestamp :unlock_at
@@ -1626,8 +1601,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.bigint :course_id, null: false
       t.bigint :account_id, null: false
       t.integer :depth, null: false
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
       t.bigint :course_section_id
       t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
 
@@ -1689,8 +1663,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.boolean :can_manually_enroll
       t.timestamp :start_at
       t.timestamp :end_at
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
       t.string :workflow_state, default: "active", null: false, limit: 255
       t.boolean :restrict_enrollments_to_section_dates
       t.bigint :nonxlist_course_id
@@ -1727,8 +1700,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.bigint :grading_standard_id
       t.boolean :is_public
       t.boolean :allow_student_wiki_edits
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
       t.boolean :show_public_context_messages
       t.text :syllabus_body, limit: 16_777_215
       t.boolean :allow_student_forum_attachments, default: false
@@ -1870,8 +1842,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.string :frequency, limit: 255
       t.string :workflow_state, limit: 255
       t.timestamp :batched_at
-      t.timestamp :created_at
-      t.timestamp :updated_at
+      t.timestamps null: true, precision: nil
       t.timestamp :send_at
       t.text :link
       t.text :name_of_topic
@@ -1893,8 +1864,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.string :asset_type, null: false, limit: 255
       t.text :recipient_keys
       t.string :workflow_state, null: false, limit: 255
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
     end
 
     create_table :developer_key_account_bindings do |t|
@@ -1914,8 +1884,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.string :email, limit: 255
       t.string :user_name, limit: 255
       t.bigint :account_id
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
       t.bigint :user_id
       t.string :name, limit: 255
       t.string :redirect_uri, limit: 255
@@ -1953,8 +1922,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.bigint :discussion_topic_id
       t.bigint :user_id
       t.bigint :parent_id
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
       t.bigint :attachment_id
       t.string :workflow_state, default: "active", limit: 255
       t.timestamp :deleted_at
@@ -2055,8 +2023,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.bigint :user_id
       t.string :workflow_state, null: false, limit: 255
       t.timestamp :last_reply_at
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
       t.timestamp :delayed_post_at
       t.timestamp :posted_at
       t.bigint :assignment_id
@@ -2143,8 +2110,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.string :context_type, limit: 255
       t.timestamp :start_at
       t.timestamp :end_at
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
       t.references :root_account, foreign_key: { to_table: :accounts }
 
       t.replica_identity_index :context_id
@@ -2185,8 +2151,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.timestamp :end_at
       t.boolean :accepting_enrollments
       t.boolean :can_manually_enroll
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
       t.string :workflow_state, default: "active", null: false, limit: 255
       t.text :stuck_sis_fields
       t.string :integration_id, limit: 255
@@ -2210,8 +2175,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.string :type, null: false, limit: 255
       t.string :uuid, limit: 255
       t.string :workflow_state, null: false, limit: 255
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
       t.bigint :associated_user_id
       t.bigint :sis_batch_id
       t.timestamp :start_at
@@ -2273,8 +2237,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.string :name, limit: 255
       t.integer :position
       t.string :slug, limit: 255
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
     end
 
     add_index :eportfolio_categories, :eportfolio_id
@@ -2288,8 +2251,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.boolean :show_comments
       t.string :slug, limit: 255
       t.text :content, limit: 16_777_215
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
     end
 
     add_index :eportfolio_entries, :eportfolio_category_id
@@ -2299,8 +2261,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.bigint :user_id, null: false
       t.string :name, limit: 255
       t.boolean :public
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
       t.string :uuid, limit: 255
       t.string :workflow_state, default: "active", null: false, limit: 255
       t.timestamp :deleted_at
@@ -2326,8 +2287,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.text :message
       t.text :comments
       t.bigint :user_id
-      t.timestamp :created_at
-      t.timestamp :updated_at
+      t.timestamps null: true, precision: nil
       t.string :email, limit: 255
       t.boolean :during_tests, default: false
       t.text :user_agent
@@ -2371,8 +2331,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.bigint :asset_id
       t.string :asset_type, limit: 255
       t.string :uuid, limit: 255
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
     end
 
     add_index :external_feed_entries, :external_feed_id
@@ -2390,8 +2349,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.string :title, limit: 255
       t.string :url, null: false, limit: 255
       t.string :header_match, limit: 255
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
       t.string :verbosity, limit: 255
       t.string :migration_id, limit: 255
     end
@@ -2441,8 +2399,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.string :context_type, null: false, limit: 255
       t.bigint :parent_folder_id
       t.string :workflow_state, null: false, limit: 255
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
       t.timestamp :deleted_at
       t.boolean :locked
       t.timestamp :lock_at
@@ -2508,8 +2465,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
     add_index :gradebook_filters, [:course_id, :user_id]
 
     create_table :gradebook_uploads do |t|
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
       t.bigint :course_id, null: false
       t.bigint :user_id, null: false
       t.bigint :progress_id, null: false
@@ -2556,8 +2512,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.text :data
       t.bigint :context_id, null: false
       t.string :context_type, null: false, limit: 255
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
       t.bigint :user_id
       t.integer :usage_count
       t.string :context_code, limit: 255
@@ -2576,8 +2531,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
     create_table :group_memberships do |t|
       t.bigint :group_id, null: false
       t.string :workflow_state, null: false, limit: 255
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
       t.bigint :user_id, null: false
       t.string :uuid, null: false, limit: 255
       t.bigint :sis_batch_id
@@ -2605,8 +2559,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
     create_table :groups do |t|
       t.string :name, limit: 255
       t.string :workflow_state, null: false, limit: 255
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
       t.bigint :context_id, null: false
       t.string :context_type, null: false, limit: 255
       t.string :category, limit: 255
@@ -2699,8 +2652,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.bigint :root_learning_outcome_group_id
       t.string :workflow_state, null: false, limit: 255
       t.text :description
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
       t.string :migration_id, limit: 255
       t.string :vendor_guid, limit: 255
       t.string :low_grade, limit: 255
@@ -2739,8 +2691,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.boolean :original_mastery
 
       t.timestamp :assessed_at
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
       t.timestamp :submitted_at
       t.references :root_account, foreign_key: { to_table: :accounts }
     end
@@ -2759,8 +2710,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.boolean :mastery
       t.bigint :user_id
       t.float :score
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
       t.integer :attempt
       t.float :possible
       t.float :original_score
@@ -2796,8 +2746,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.text :description
       t.text :data
       t.string :workflow_state, null: false, limit: 255
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
       t.string :migration_id, limit: 255
       t.string :vendor_guid, limit: 255
       t.string :low_grade, limit: 255
@@ -3221,8 +3170,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.integer :max_size
       t.bigint :root_account_id
       t.text :data
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
       t.bigint :attachment_id
       t.integer :total_size
       t.string :old_media_id, limit: 255
@@ -3276,8 +3224,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.bigint :context_id
       t.string :context_type, limit: 255
       t.bigint :user_id
-      t.timestamp :created_at
-      t.timestamp :updated_at
+      t.timestamps null: true, precision: nil
       t.string :notification_name, limit: 255
       t.text :url
       t.string :path_type, limit: 255
@@ -3448,8 +3395,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.bigint :notification_id
       t.bigint :communication_channel_id, null: false
       t.string :frequency, default: "immediately", null: false, limit: 255
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
     end
 
     add_index :notification_policies, :notification_id
@@ -3460,8 +3406,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.string :subject, limit: 255
       t.string :category, limit: 255
       t.integer :delay_for, default: 120
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
       t.string :main_link, limit: 255
       t.boolean :priority, default: false, null: false
     end
@@ -3476,8 +3421,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.bigint :user_id
       t.string :original_host_with_port, limit: 255
       t.string :service, limit: 255
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
     end
     add_index :oauth_requests, :user_id, where: "user_id IS NOT NULL"
 
@@ -3633,8 +3577,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.bigint :page_id
       t.string :page_type, limit: 255
       t.bigint :user_id
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
     end
 
     add_index :page_comments, [:page_id, :page_type]
@@ -3654,8 +3597,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.string :controller, limit: 255
       t.string :action, limit: 255
       t.float :interaction_seconds
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
       t.bigint :developer_key_id
       t.boolean :user_request
       t.float :render_time
@@ -3727,8 +3669,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
     create_table :plugin_settings do |t|
       t.string :name, default: "", null: false, limit: 255
       t.text :settings
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
       t.boolean :disabled
     end
 
@@ -3809,8 +3750,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.string :current_login_ip, limit: 255
       t.string :reset_password_token, default: "", null: false, limit: 255
       t.integer :position
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
       t.boolean :password_auto_generated
       t.timestamp :deleted_at
       t.bigint :sis_batch_id
@@ -3878,8 +3818,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.float :completion
       t.string :delayed_job_id, limit: 255
       t.string :workflow_state, null: false, limit: 255
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
       t.text :message
       t.string :cache_key_context, limit: 255
       t.text :results
@@ -3908,8 +3847,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.integer :pick_count
       t.float :question_points
       t.integer :position
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
       t.string :migration_id, limit: 255
       t.bigint :assessment_question_bank_id
       t.references :root_account, foreign_key: { to_table: :accounts }
@@ -3944,8 +3882,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.text :question_data
       t.integer :assessment_question_version
       t.integer :position
-      t.timestamp :created_at
-      t.timestamp :updated_at
+      t.timestamps null: true, precision: nil
       t.string :migration_id, limit: 255
       t.string :workflow_state, limit: 255
       t.integer :duplicate_index
@@ -4006,8 +3943,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.bigint :quiz_submission_id
       t.integer :attempt
       t.text :data
-      t.timestamp :created_at
-      t.timestamp :updated_at
+      t.timestamps null: true, precision: nil
     end
 
     add_index :quiz_submission_snapshots, :quiz_submission_id
@@ -4026,8 +3962,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.timestamp :finished_at
       t.integer :attempt
       t.string :workflow_state, null: false, limit: 255
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
       t.integer :fudge_points, default: 0
       t.float :quiz_points_possible
       t.integer :extra_attempts
@@ -4067,8 +4002,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.integer :allowed_attempts
       t.string :scoring_policy, limit: 255
       t.string :quiz_type, limit: 255
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
       t.timestamp :lock_at
       t.timestamp :unlock_at
       t.timestamp :deleted_at
@@ -4108,8 +4042,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
     create_table :report_snapshots do |t|
       t.string :report_type, limit: 255
       t.text :data, limit: 16_777_215
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
       t.bigint :account_id
     end
     add_index :report_snapshots, %i[report_type account_id created_at], name: "index_on_report_snapshots"
@@ -4121,8 +4054,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.boolean :locked, default: false, null: false
       t.bigint :context_id, null: false
       t.string :context_type, limit: 255, null: false
-      t.timestamp :created_at
-      t.timestamp :updated_at
+      t.timestamps null: true, precision: nil
       t.boolean :applies_to_self, default: true, null: false
       t.boolean :applies_to_descendants, default: true, null: false
       t.bigint :role_id, null: false
@@ -4141,8 +4073,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.string :base_role_type, null: false, limit: 255
       t.bigint :account_id, null: true
       t.string :workflow_state, null: false, limit: 255
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
       t.timestamp :deleted_at
       t.bigint :root_account_id, null: false
 
@@ -4158,8 +4089,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.bigint :rubric_association_id
       t.float :score
       t.text :data
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
       t.bigint :artifact_id, null: false
       t.string :artifact_type, null: false, limit: 255
       t.string :assessment_type, null: false, limit: 255
@@ -4180,8 +4110,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.bigint :association_id, null: false
       t.string :association_type, null: false, limit: 255
       t.boolean :use_for_grading
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
       t.string :title, limit: 255
       t.text :summary_data
       t.string :purpose, null: false, limit: 255
@@ -4211,8 +4140,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.float :points_possible
       t.string :title, limit: 255
       t.text :description
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
       t.boolean :reusable, default: false
       t.boolean :public, default: false
       t.boolean :read_only, default: false
@@ -4299,8 +4227,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
     create_table :sessions do |t|
       t.string :session_id, null: false, limit: 255
       t.text :data
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
     end
 
     add_index :sessions, :session_id
@@ -4357,8 +4284,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.timestamp :ended_at
       t.string :workflow_state, null: false, limit: 255
       t.text :data
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
       t.bigint :attachment_id
       t.integer :progress
       t.text :processing_errors, limit: 16_777_215
@@ -4427,8 +4353,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
 
     create_table :stream_items do |t|
       t.text :data, null: false
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
       t.string :context_type, limit: 255
       t.bigint :context_id
       t.string :asset_type, null: false, limit: 255
@@ -4445,8 +4370,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.bigint :author_id
       t.string :author_name, limit: 255
       t.string :group_comment_id, limit: 255
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
       t.text :attachment_ids
       t.bigint :assessment_request_id
       t.string :media_comment_id, limit: 255
@@ -4523,8 +4447,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.bigint :user_id, null: false
       t.string :submission_type, limit: 255
       t.string :workflow_state, null: false, limit: 255
-      t.timestamp :created_at
-      t.timestamp :updated_at
+      t.timestamps null: true, precision: nil
       t.bigint :group_id
       t.text :attachment_ids
       t.boolean :processed
@@ -4715,8 +4638,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.integer :size, null: false
       t.integer :width
       t.integer :height
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
       t.string :uuid, limit: 255
       t.string :namespace, null: true, limit: 255
     end
@@ -4737,8 +4659,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.bigint :user_id, null: false
       t.bigint :account_id, null: false
       t.integer :depth
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
       t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
 
       t.replica_identity_index
@@ -4799,8 +4720,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.bigint :created_by_id
       t.string :workflow_state, default: "active", null: false, limit: 255
       t.timestamp :deleted_at
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
       t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
 
       t.replica_identity_index
@@ -4855,8 +4775,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.string :secret, limit: 255
       t.string :protocol, limit: 255
       t.string :service, null: false, limit: 255
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
       t.string :service_user_url, limit: 255
       t.string :service_user_id, null: false, limit: 255
       t.string :service_user_name, limit: 255
@@ -4879,8 +4798,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.string :workflow_state, null: false, limit: 255
       t.string :time_zone, limit: 255
       t.string :uuid, limit: 255
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
       t.string :avatar_image_url, limit: 255
       t.string :avatar_image_source, limit: 255
       t.timestamp :avatar_image_updated_at
@@ -4986,8 +4904,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.bigint :user_id
       t.bigint :web_conference_id
       t.string :participation_type, limit: 255
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
       t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
 
       t.replica_identity_index
@@ -5008,8 +4925,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.timestamp :started_at
       t.text :description
       t.float :duration
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
       t.string :uuid, limit: 255
       t.string :invited_user_ids, limit: 255
       t.timestamp :ended_at
@@ -5033,8 +4949,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.text :body, limit: 16_777_215
       t.string :workflow_state, null: false, limit: 255
       t.bigint :user_id
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
       t.text :url
       t.boolean :protected_editing, default: false
       t.string :editing_roles, limit: 255
@@ -5076,8 +4991,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
 
     create_table :wikis do |t|
       t.string :title, limit: 255
-      t.timestamp :created_at, null: false
-      t.timestamp :updated_at, null: false
+      t.timestamps precision: nil
       t.text :front_page_url
       t.boolean :has_no_front_page
       t.references :root_account, foreign_key: { to_table: :accounts }

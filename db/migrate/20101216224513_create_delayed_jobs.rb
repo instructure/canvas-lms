@@ -267,8 +267,7 @@ class CreateDelayedJobs < ActiveRecord::Migration[4.2]
       t.timestamp :locked_at
       t.timestamp :failed_at
       t.string :locked_by, limit: 255
-      t.timestamp :created_at
-      t.timestamp :updated_at
+      t.timestamps null: true
       t.string :tag, limit: 255
       t.integer :max_attempts
       t.string :strand, limit: 255
