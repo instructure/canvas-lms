@@ -20,7 +20,7 @@
 
 # rubocop:disable Migration/AddIndex, Migration/ChangeColumn, Migration/Execute, Migration/IdColumn
 # rubocop:disable Migration/PrimaryKey, Migration/RootAccountId, Rails/CreateTableWithTimestamps
-class InitCanvasDb < ActiveRecord::Migration[6.1]
+class InitCanvasDb < ActiveRecord::Migration[7.0]
   tag :predeploy
 
   def create_aua_log_partition(index)
