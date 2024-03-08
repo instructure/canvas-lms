@@ -110,7 +110,7 @@ export function PostMessage({...props}) {
                 attachment={props.attachment}
                 onSubmit={props.onSave}
                 isEdit={true}
-                isAnnouncement={props.isAnnouncement}
+                isAnnouncement={props.discussionTopic?.isAnnouncement}
               />
             </View>
           ) : (
@@ -125,6 +125,11 @@ export function PostMessage({...props}) {
                   isSplitView={props.isSplitView}
                   searchTerm={searchTerm}
                   text={props.message}
+                  isAnnouncement={props.discussionTopic?.isAnnouncement}
+                  isTopic={props.isTopic}
+                  resourceId={
+                    props.isTopic ? props.discussionTopic?._id : props.discussionEntry?._id
+                  }
                 />
               </div>
               <View display="block">{props.children}</View>
@@ -174,12 +179,11 @@ PostMessage.propTypes = {
   canReplyAnonymously: PropTypes.bool,
   threadMode: PropTypes.bool,
   isTopic: PropTypes.bool,
-  isAnnouncement: PropTypes.bool,
+  discussionTopic: PropTypes.object,
 }
 
 PostMessage.defaultProps = {
   isSplitView: false,
-  isAnnouncement: false,
 }
 
 export default PostMessage

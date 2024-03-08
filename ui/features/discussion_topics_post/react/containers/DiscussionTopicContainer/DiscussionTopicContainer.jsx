@@ -408,6 +408,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                             )}
                             isTopicAuthor={true}
                             attachment={props.discussionTopic.attachment}
+                            discussionTopic={props.discussionTopic}
                           >
                             {props.discussionTopic.permissions?.reply && !expandedReply && (
                               <>
