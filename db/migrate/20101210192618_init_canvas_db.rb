@@ -20,7 +20,7 @@
 
 # rubocop:disable Migration/AddIndex, Migration/ChangeColumn, Migration/Execute, Migration/IdColumn
 # rubocop:disable Migration/PrimaryKey, Migration/RootAccountId, Rails/CreateTableWithTimestamps
-class InitCanvasDb < ActiveRecord::Migration[6.0]
+class InitCanvasDb < ActiveRecord::Migration[6.1]
   tag :predeploy
 
   def create_aua_log_partition(index)
@@ -1010,7 +1010,7 @@ class InitCanvasDb < ActiveRecord::Migration[6.0]
     add_index :calendar_events, :cloned_item_id, where: "cloned_item_id IS NOT NULL"
 
     create_table :blackout_dates do |t|
-      t.references :context, polymorphic: true, index: true, null: false
+      t.references :context, polymorphic: true, index: { name: "index_blackout_dates_on_context_type_and_context_id" }, null: false
       t.date :start_date, :end_date, null: false
       t.string :event_title, limit: 255, null: false
       t.timestamps precision: 6
@@ -3497,7 +3497,7 @@ class InitCanvasDb < ActiveRecord::Migration[6.0]
     create_table :observer_alerts do |t|
       t.references :observer_alert_threshold, null: false, foreign_key: true
 
-      t.references :context, polymorphic: true
+      t.references :context, polymorphic: true, index: { name: "index_observer_alerts_on_context_type_and_context_id" }
 
       t.string :alert_type, null: false
       t.string :workflow_state, default: "unread", null: false
@@ -3918,7 +3918,7 @@ class InitCanvasDb < ActiveRecord::Migration[6.0]
     add_index :quiz_groups, :quiz_id
 
     create_table :quiz_migration_alerts do |t|
-      t.references :migration, polymorphic: true
+      t.references :migration, polymorphic: true, index: { name: "index_quiz_migration_alerts_on_migration_type_and_migration_id" }
       t.references :user, null: false, foreign_key: false
       t.references :course, null: false, foreign_key: true, index: false
       t.timestamps precision: 6
