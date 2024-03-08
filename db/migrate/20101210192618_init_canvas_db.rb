@@ -274,6 +274,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.string   "account_calendar_subscription_type", default: "manual", null: false, limit: 255
       t.integer :latest_outcome_import_id, limit: 8
       t.references :course_template, type: :bigint, index: { where: "course_template_id IS NOT NULL" }
+      t.boolean :account_calendar_visible, default: false, null: false
 
       t.replica_identity_index
     end
@@ -718,6 +719,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.references :root_account, type: :bigint, foreign_key: false, index: true
       t.string :category, default: "uncategorized", null: false
       t.integer :word_count
+      t.string :visibility_level, limit: 32, default: "inherit", null: false
     end
     add_index "attachments", ["cloned_item_id"], name: "index_attachments_on_cloned_item_id"
     add_index "attachments", ["context_id", "context_type"], name: "index_attachments_on_context_id_and_context_type"
@@ -886,6 +888,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.string :rrule, limit: 255
       t.uuid :series_uuid
       t.boolean :series_head
+      t.boolean :blackout_date, default: false, null: false
     end
     add_index :calendar_events, %i[context_id context_type timetable_code], where: "timetable_code IS NOT NULL", unique: true, name: "index_calendar_events_on_context_and_timetable_code"
     add_index :calendar_events, :start_at, where: "workflow_state<>'deleted'"
@@ -1255,9 +1258,12 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer "user_id", limit: 8, null: false
       t.string "workflow_state", null: false, limit: 255
       t.references :root_account, type: :bigint, foreign_key: { to_table: :accounts }, index: true
+      t.string :content_item, null: false, default: "grade"
     end
-
-    add_index "content_participations", %w[content_id content_type user_id], name: "index_content_participations_uniquely", unique: true
+    add_index :content_participations,
+              %w[content_id content_type user_id content_item],
+              name: "index_content_participations_by_type_uniquely",
+              unique: true
     add_index :content_participations, :user_id
     add_index :content_participations,
               :user_id,
@@ -1361,6 +1367,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer :root_account_id, limit: 8, null: false
       t.boolean :is_rce_favorite, default: false, null: false
       t.string :identity_hash, limit: 64
+      t.text :lti_version, null: false, limit: 8, default: "1.1"
     end
     add_index :context_external_tools, [:tool_id]
     add_index :context_external_tools, [:context_id, :context_type]
@@ -4790,6 +4797,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer :context_id, limit: 8, null: false
       t.string :context_type, null: false
       t.references :root_account, type: :bigint, foreign_key: { to_table: :accounts }, index: true
+      t.datetime :publish_at
     end
     add_index :wiki_pages, [:context_id, :context_type]
     add_index "wiki_pages", ["user_id"], name: "index_wiki_pages_on_user_id"
