@@ -879,11 +879,14 @@ class ContentTag < ActiveRecord::Base
     else
       return unless context_module.assignment_overrides.active.exists?
     end
+
+    content.clear_cache_key(:availability)
+
     if content_type == "Assignment"
       SubmissionLifecycleManager.recompute(content, update_grades: true)
-      # TODO: recompute quiz submissions
-      # else
-      # SubmissionLifecycleManager.recompute(content.assignment, update_grades: true)
+    elsif content_type == "Quizzes::Quiz" && content.assignment
+      content.assignment.clear_cache_key(:availability)
+      SubmissionLifecycleManager.recompute(content.assignment, update_grades: true)
     end
   end
 

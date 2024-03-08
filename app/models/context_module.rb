@@ -989,6 +989,7 @@ class ContextModule < ActiveRecord::Base
 
   def update_assignment_submissions(module_assignments_quizzes = current_assignments_and_quizzes)
     if Account.site_admin.feature_enabled?(:differentiated_modules)
+      module_assignments_quizzes.clear_cache_keys(:availability)
       SubmissionLifecycleManager.recompute_course(context, assignments: module_assignments_quizzes, update_grades: true)
     end
   end
@@ -996,11 +997,10 @@ class ContextModule < ActiveRecord::Base
   def current_assignments_and_quizzes
     return unless Account.site_admin.feature_enabled?(:differentiated_modules)
 
-    module_assignments = Assignment.active.where(id: content_tags.active.where(content_type: "Assignment").select(:content_id)).pluck(:id)
-    # TODO: Include quizzes in the slm call.
-    # Need to account for quiz context module overrides in EDD first
-    # module_quizzes = Assignment.active.where(id: Quizzes::Quiz.active.where(id: content_tags.active.where(content_type: "Quizzes::Quiz").select(:content_id)).select(:assignment_id)).pluck(:id)
-    assignments_quizzes = module_assignments # + module_quizzes
+    module_assignments = Assignment.active.where(id: content_tags.not_deleted.where(content_type: "Assignment").select(:content_id)).pluck(:id)
+    module_quizzes_assignment_ids = Quizzes::Quiz.active.where(id: content_tags.not_deleted.where(content_type: "Quizzes::Quiz").select(:content_id)).select(:assignment_id)
+    module_quizzes = Assignment.active.where(id: module_quizzes_assignment_ids).pluck(:id)
+    assignments_quizzes = module_assignments + module_quizzes
     Assignment.where(id: assignments_quizzes)
   end
 end
