@@ -20,13 +20,22 @@ import React from 'react'
 import Router from 'react-router'
 import {BrowserRouter} from 'react-router-dom'
 import {fireEvent, render, waitFor} from '@testing-library/react'
+import {RUBRICS_QUERY_RESPONSE, RUBRIC_PREVIEW_QUERY_RESPONSE} from './fixtures'
 import {QueryProvider, queryClient} from '@canvas/query'
 import {ViewRubrics} from '../index'
-import {RUBRICS_QUERY_RESPONSE, RUBRIC_PREVIEW_QUERY_RESPONSE} from './fixtures'
+import * as ViewRubricQueries from '../../../queries/ViewRubricQueries'
 
 jest.mock('react-router', () => ({
   ...jest.requireActual('react-router'),
   useParams: jest.fn(),
+}))
+
+const archiveRubricMock = jest.fn()
+const unarchiveRubricMock = jest.fn()
+jest.mock('../../../queries/ViewRubricQueries', () => ({
+  ...jest.requireActual('../../../queries/ViewRubricQueries'),
+  archiveRubric: () => archiveRubricMock,
+  unarchiveRubric: () => unarchiveRubricMock,
 }))
 
 describe('ViewRubrics Tests', () => {
@@ -490,6 +499,105 @@ describe('ViewRubrics Tests', () => {
       expect(queryByText('Rubric 1')).not.toBeNull()
       expect(queryByText('Rubric 2')).toBeNull()
       expect(queryByText('Rubric 3')).toBeNull()
+    })
+  })
+
+  describe('archiving and un-archiving rubrics', () => {
+    afterEach(() => {
+      jest.clearAllMocks()
+      queryClient.clear()
+    })
+
+    it('allows archiving an account rubric', async () => {
+      jest.spyOn(Router, 'useParams').mockReturnValue({accountId: '1'})
+      jest.spyOn(ViewRubricQueries, 'archiveRubric').mockImplementation(() =>
+        Promise.resolve({
+          _id: '1',
+          workflowState: 'archived',
+        })
+      )
+      queryClient.setQueryData(['accountRubrics-1'], RUBRICS_QUERY_RESPONSE)
+      const {getByTestId, getByText, getAllByText, queryByTestId} = renderComponent()
+
+      getByTestId('rubric-options-1-button').click()
+      getByTestId('archive-rubric-button').click()
+      await new Promise(resolve => setTimeout(resolve, 0))
+      waitFor(() => getAllByText('Rubric archived successfully'))
+      expect(queryByTestId('rubric-row-1')).not.toBeInTheDocument()
+      getByText('Archived').click()
+      expect(getByTestId('rubric-row-1')).toHaveTextContent('Rubric 1')
+      expect(getByTestId('archived-rubrics-panel').querySelectorAll('tr').length).toEqual(3)
+    })
+
+    it('allows un-archiving an account rubric', async () => {
+      jest.spyOn(Router, 'useParams').mockReturnValue({accountId: '1'})
+      jest.spyOn(ViewRubricQueries, 'unarchiveRubric').mockImplementation(() =>
+        Promise.resolve({
+          _id: '2',
+          workflowState: 'active',
+        })
+      )
+      queryClient.setQueryData(['accountRubrics-1'], RUBRICS_QUERY_RESPONSE)
+      const {getByTestId, getByText, getAllByText, queryByTestId} = renderComponent()
+
+      getByText('Archived').click()
+      getByTestId('rubric-options-2-button').click()
+      expect(getByTestId('archive-rubric-button')).toHaveTextContent('Un-Archive')
+
+      getByTestId('archive-rubric-button').click()
+      await new Promise(resolve => setTimeout(resolve, 0))
+      waitFor(() => getAllByText('Rubric un-archived successfully'))
+      expect(queryByTestId('rubric-row-2')).not.toBeInTheDocument()
+
+      getByText('Saved').click()
+      expect(getByTestId('rubric-row-2')).toHaveTextContent('Rubric 2')
+      expect(getByTestId('saved-rubrics-panel').querySelectorAll('tr').length).toEqual(4)
+    })
+
+    it('allows archiving a course rubric', async () => {
+      jest.spyOn(Router, 'useParams').mockReturnValue({courseId: '1'})
+      jest.spyOn(ViewRubricQueries, 'archiveRubric').mockImplementation(() =>
+        Promise.resolve({
+          _id: '1',
+          workflowState: 'archived',
+        })
+      )
+      queryClient.setQueryData(['courseRubrics-1'], RUBRICS_QUERY_RESPONSE)
+      const {getByTestId, getByText, getAllByText, queryByTestId} = renderComponent()
+
+      getByTestId('rubric-options-1-button').click()
+      getByTestId('archive-rubric-button').click()
+      await new Promise(resolve => setTimeout(resolve, 0))
+      waitFor(() => getAllByText('Rubric archived successfully'))
+      expect(queryByTestId('rubric-row-1')).not.toBeInTheDocument()
+      getByText('Archived').click()
+      expect(getByTestId('rubric-row-1')).toHaveTextContent('Rubric 1')
+      expect(getByTestId('archived-rubrics-panel').querySelectorAll('tr').length).toEqual(3)
+    })
+
+    it('allows un-archiving a course rubric', async () => {
+      jest.spyOn(Router, 'useParams').mockReturnValue({courseId: '1'})
+      jest.spyOn(ViewRubricQueries, 'unarchiveRubric').mockImplementation(() =>
+        Promise.resolve({
+          _id: '2',
+          workflowState: 'active',
+        })
+      )
+      queryClient.setQueryData(['courseRubrics-1'], RUBRICS_QUERY_RESPONSE)
+      const {getByTestId, getByText, getAllByText, queryByTestId} = renderComponent()
+
+      getByText('Archived').click()
+      getByTestId('rubric-options-2-button').click()
+      expect(getByTestId('archive-rubric-button')).toHaveTextContent('Un-Archive')
+
+      getByTestId('archive-rubric-button').click()
+      await new Promise(resolve => setTimeout(resolve, 0))
+      waitFor(() => getAllByText('Rubric un-archived successfully'))
+      expect(queryByTestId('rubric-row-2')).not.toBeInTheDocument()
+
+      getByText('Saved').click()
+      expect(getByTestId('rubric-row-2')).toHaveTextContent('Rubric 2')
+      expect(getByTestId('saved-rubrics-panel').querySelectorAll('tr').length).toEqual(4)
     })
   })
 })

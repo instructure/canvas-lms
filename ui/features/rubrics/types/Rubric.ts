@@ -33,3 +33,8 @@ export type DuplicateRubricQueryResponse = Pick<
   Rubric,
   'id' | 'title' | 'criteria' | 'hidePoints' | 'pointsPossible'
 >
+
+export type archiveRubricResponse = {
+  _id: string
+  workflowState: string
+}

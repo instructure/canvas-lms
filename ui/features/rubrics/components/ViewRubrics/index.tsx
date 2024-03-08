@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import {useNavigate, useParams} from 'react-router-dom'
 import {useQuery} from '@canvas/query'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -37,8 +37,11 @@ import {
   fetchAccountRubrics,
   fetchCourseRubrics,
   fetchRubricCriterion,
+  archiveRubric,
+  unarchiveRubric,
 } from '../../queries/ViewRubricQueries'
 import {RubricAssessmentTray} from '@canvas/rubrics/react/RubricAssessment'
+import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 
 const {Item: FlexItem} = Flex
 
@@ -58,6 +61,40 @@ export const ViewRubrics = () => {
   const [isPreviewTrayOpen, setIsPreviewTrayOpen] = useState(false)
   const [rubricIdForPreview, setRubricIdForPreview] = useState<string | undefined>(undefined)
   const [searchQuery, setSearchQuery] = useState('')
+  const [activeRubrics, setActiveRubrics] = useState<Rubric[]>([])
+  const [archivedRubrics, setArchivedRubrics] = useState<Rubric[]>([])
+
+  const handleArchiveRubric = async (rubricId: string) => {
+    try {
+      await archiveRubric(rubricId)
+
+      const updatedActiveRubrics = activeRubrics.filter(rubric => rubric.id !== rubricId)
+      const archivedRubric = activeRubrics.find(rubric => rubric.id === rubricId)
+      if (archivedRubric) {
+        setArchivedRubrics(prevState => [...prevState, archivedRubric])
+      }
+      setActiveRubrics(updatedActiveRubrics)
+      showFlashSuccess(I18n.t('Rubric archived successfully'))()
+    } catch (error) {
+      showFlashError(I18n.t('Error Archiving Rubric'))()
+    }
+  }
+
+  const handleUnarchiveRubric = async (rubricId: string) => {
+    try {
+      await unarchiveRubric(rubricId)
+
+      const updatedArchivedRubrics = archivedRubrics.filter(rubric => rubric.id !== rubricId)
+      const activeRubric = archivedRubrics.find(rubric => rubric.id === rubricId)
+      if (activeRubric) {
+        setActiveRubrics(prevState => [...prevState, activeRubric])
+      }
+      setArchivedRubrics(updatedArchivedRubrics)
+      showFlashSuccess(I18n.t('Rubric un-archived successfully'))()
+    } catch (error) {
+      showFlashError(I18n.t('Error Un-Archiving Rubric'))()
+    }
+  }
 
   let queryVariables: FetchRubricVariables
   let fetchQuery: (queryVariables: FetchRubricVariables) => Promise<RubricQueryResponse>
@@ -84,6 +121,38 @@ export const ViewRubrics = () => {
     enabled: !!rubricIdForPreview,
   })
 
+  useEffect(() => {
+    if (data) {
+      const {activeRubricsInitialState, archivedRubricsInitialState} =
+        data.rubricsConnection.nodes.reduce(
+          (prev, curr) => {
+            const rubric: Rubric = {
+              id: curr.id,
+              title: curr.title,
+              pointsPossible: curr.pointsPossible,
+              criteriaCount: curr.criteriaCount,
+              locations: [], // TODO: add locations once we have them
+              ratingOrder: curr.ratingOrder,
+              hidePoints: curr.hidePoints,
+              workflowState: curr.workflowState,
+              buttonDisplay: curr.buttonDisplay,
+              criteria: curr.criteria ?? [],
+              hasRubricAssociations: curr.hasRubricAssociations,
+            }
+
+            const activeStates = ['active', 'draft']
+            activeStates.includes(curr.workflowState ?? '')
+              ? prev.activeRubricsInitialState.push(rubric)
+              : prev.archivedRubricsInitialState.push(rubric)
+            return prev
+          },
+          {activeRubricsInitialState: [] as Rubric[], archivedRubricsInitialState: [] as Rubric[]}
+        )
+      setActiveRubrics(activeRubricsInitialState)
+      setArchivedRubrics(archivedRubricsInitialState)
+    }
+  }, [data])
+
   if (isLoading) {
     return <LoadingIndicator />
   }
@@ -91,31 +160,6 @@ export const ViewRubrics = () => {
   if (!data) {
     return null
   }
-
-  const {activeRubrics, archivedRubrics} = data.rubricsConnection.nodes.reduce(
-    (prev, curr) => {
-      const rubric: Rubric = {
-        id: curr.id,
-        title: curr.title,
-        pointsPossible: curr.pointsPossible,
-        criteriaCount: curr.criteriaCount,
-        locations: [], // TODO: add locations once we have them
-        ratingOrder: curr.ratingOrder,
-        hidePoints: curr.hidePoints,
-        workflowState: curr.workflowState,
-        buttonDisplay: curr.buttonDisplay,
-        criteria: curr.criteria,
-        hasRubricAssociations: curr.hasRubricAssociations,
-      }
-
-      const activeStates = ['active', 'draft']
-      activeStates.includes(curr.workflowState ?? '')
-        ? prev.activeRubrics.push(rubric)
-        : prev.archivedRubrics.push(rubric)
-      return prev
-    },
-    {activeRubrics: [] as Rubric[], archivedRubrics: [] as Rubric[]}
-  )
 
   const handlePreviewClick = (rubricId: string) => {
     if (rubricIdForPreview === rubricId) {
@@ -188,6 +232,8 @@ export const ViewRubrics = () => {
             <RubricTable
               rubrics={filteredActiveRubrics}
               onPreviewClick={rubricId => handlePreviewClick(rubricId)}
+              handleArchiveRubricChange={handleArchiveRubric}
+              active={true}
             />
           </View>
         </Tabs.Panel>
@@ -202,6 +248,8 @@ export const ViewRubrics = () => {
             <RubricTable
               rubrics={filteredArchivedRubrics}
               onPreviewClick={rubricId => handlePreviewClick(rubricId)}
+              handleArchiveRubricChange={handleUnarchiveRubric}
+              active={false}
             />
           </View>
         </Tabs.Panel>

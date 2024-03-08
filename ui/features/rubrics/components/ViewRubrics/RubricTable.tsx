@@ -33,9 +33,17 @@ const {Head, Row, Cell, ColHeader, Body} = Table
 export type RubricTableProps = {
   rubrics: Rubric[]
   onPreviewClick: (rubricId: string) => void
+  handleArchiveRubricChange: (rubricId: string) => void
+  active: boolean
 }
 
-export const RubricTable = ({rubrics, onPreviewClick}: RubricTableProps) => {
+export const RubricTable = ({
+  rubrics,
+  handleArchiveRubricChange,
+  active,
+  onPreviewClick,
+}: RubricTableProps) => {
+  const navigate = useNavigate()
   const {accountId, courseId} = useParams()
   const [sortDirection, setSortDirection] = useState<'ascending' | 'descending' | 'none'>('none')
   const [sortedColumn, setSortedColumn] = useState<string>() // Track the column being sorted
@@ -117,7 +125,7 @@ export const RubricTable = ({rubrics, onPreviewClick}: RubricTableProps) => {
       </Head>
       <Body>
         {sortedRubrics.map((rubric, index) => (
-          <Row key={rubric.id}>
+          <Row key={rubric.id} data-testid={`rubric-row-${rubric.id}`}>
             <Cell data-testid={`rubric-title-${index}`}>
               <Link
                 forceButtonRole={true}
@@ -152,6 +160,8 @@ export const RubricTable = ({rubrics, onPreviewClick}: RubricTableProps) => {
                 buttonDisplay={rubric.buttonDisplay}
                 ratingOrder={rubric.ratingOrder}
                 hasRubricAssociations={rubric.hasRubricAssociations}
+                onArchiveRubricChange={() => handleArchiveRubricChange(rubric.id)}
+                active={active}
               />
             </Cell>
           </Row>

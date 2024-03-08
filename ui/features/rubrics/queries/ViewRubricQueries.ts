@@ -22,6 +22,7 @@ import type {
   RubricQueryResponse,
   DeleteRubricQueryResponse,
   DuplicateRubricQueryResponse,
+  archiveRubricResponse,
 } from '../types/Rubric'
 import getCookie from '@instructure/get-cookie'
 import qs from 'qs'
@@ -110,6 +111,21 @@ const RUBRIC_PREVIEW_QUERY = gql`
   }
 `
 
+const UPDATE_RUBRIC_ARCHIVE_STATE = gql`
+  mutation UpdateRubricArchivedState($id: ID!, $archived: Boolean!) {
+    updateRubricArchivedState(input: {id: $id, archived: $archived}) {
+      rubric {
+        _id
+        workflowState
+      }
+      errors {
+        attribute
+        message
+      }
+    }
+  }
+`
+
 type AccountRubricsQueryVariables = {
   accountId: string
   courseId?: never
@@ -148,6 +164,18 @@ type DuplicateRubricProps = {
   pointsPossible: number
   buttonDisplay?: string
   ratingOrder?: string
+}
+
+type RubricArchiveResponse = {
+  rubric: {
+    _id: string
+    workflowState: string
+  }
+
+  errors: {
+    attribute: string
+    message: string
+  }
 }
 
 export type FetchRubricVariables = AccountRubricsQueryVariables | CourseRubricsQueryVariables
@@ -273,4 +301,22 @@ export const duplicateRubric = async ({
   }
 
   return duplicatedRubric
+}
+
+export const archiveRubric = async (rubricId: string): Promise<archiveRubricResponse> => {
+  const {rubric} = await executeQuery<RubricArchiveResponse>(UPDATE_RUBRIC_ARCHIVE_STATE, {
+    id: rubricId,
+    archived: true,
+  })
+
+  return rubric
+}
+
+export const unarchiveRubric = async (rubricId: string): Promise<archiveRubricResponse> => {
+  const {rubric} = await executeQuery<RubricArchiveResponse>(UPDATE_RUBRIC_ARCHIVE_STATE, {
+    id: rubricId,
+    archived: false,
+  })
+
+  return rubric
 }

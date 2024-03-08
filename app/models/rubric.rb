@@ -78,7 +78,7 @@ class Rubric < ActiveRecord::Base
   scope :publicly_reusable, -> { where(reusable: true).order(best_unicode_collation_key("title")) }
   scope :matching, ->(search) { where(wildcard("rubrics.title", search)).order("rubrics.association_count DESC") }
   scope :before, ->(date) { where("rubrics.created_at<?", date) }
-  scope :active, -> { where.not(workflow_state: ["deleted", "draft"]) }
+  scope :active, -> { where.not(workflow_state: %w[archived deleted draft]) }
 
   set_policy do
     given { |user, session| context.grants_right?(user, session, :manage_rubrics) }
@@ -108,6 +108,12 @@ class Rubric < ActiveRecord::Base
 
     given { |user, session| context.grants_right?(user, session, :read) }
     can :read
+
+    given { |user, session| context.grants_right?(user, session, :manage_rubrics) }
+    can :archive
+
+    given { |user, session| context.grants_right?(user, session, :manage_rubrics) }
+    can :unarchive
   end
 
   workflow do
