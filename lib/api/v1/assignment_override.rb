@@ -427,7 +427,7 @@ module Api::V1::AssignmentOverride
   end
 
   def prepare_assignment_overrides_for_batch_update(learning_object, overrides_params, user)
-    existing_overrides = learning_object.assignment_overrides.active
+    existing_overrides = learning_object.all_assignment_overrides.active
     invisible_user_ids, invisible_override_ids = invisible_users_and_overrides_for_user(
       learning_object.context, user, existing_overrides
     )

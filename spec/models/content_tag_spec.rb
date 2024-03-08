@@ -1061,6 +1061,18 @@ describe ContentTag do
       expect(@assignment2.submissions.length).to eq 1
     end
 
+    it "quiz is added to a module" do
+      adhoc_override = @context_module.assignment_overrides.create!(set_type: "ADHOC")
+      adhoc_override.assignment_override_students.create!(user: @student1)
+
+      @quiz = @course.quizzes.create!(quiz_type: "assignment")
+      expect(@quiz.assignment.submissions.length).to eq 2
+
+      @context_module.add_item(id: @quiz.id, type: "quiz")
+      @quiz.assignment.submissions.reload
+      expect(@quiz.assignment.submissions.length).to eq 1
+    end
+
     it "assignment is removed from a module" do
       adhoc_override = @context_module.assignment_overrides.create!(set_type: "ADHOC")
       adhoc_override.assignment_override_students.create!(user: @student1)
@@ -1072,6 +1084,23 @@ describe ContentTag do
       @tag.destroy
       @assignment.submissions.reload
       expect(@assignment.submissions.length).to eq 2
+    end
+
+    it "quiz is removed from a module" do
+      @quiz = @course.quizzes.create!(quiz_type: "assignment")
+      @context_module.add_item(id: @quiz.id, type: "quiz")
+      quiz_tag = @context_module.content_tags.last
+
+      adhoc_override = @context_module.assignment_overrides.create!(set_type: "ADHOC")
+      adhoc_override.assignment_override_students.create!(user: @student1)
+
+      @context_module.update_assignment_submissions(@context_module.current_assignments_and_quizzes)
+      @quiz.assignment.submissions.reload
+      expect(@quiz.assignment.submissions.length).to eq 1
+
+      quiz_tag.destroy
+      @quiz.assignment.submissions.reload
+      expect(@quiz.assignment.submissions.length).to eq 2
     end
 
     it "assignment is moved from one module to another" do
