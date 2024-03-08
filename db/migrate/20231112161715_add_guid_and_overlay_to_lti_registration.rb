@@ -22,8 +22,8 @@ class AddGuidAndOverlayToLtiRegistration < ActiveRecord::Migration[7.0]
 
   def change
     change_table :lti_ims_registrations, bulk: true do |t|
-      t.column :guid, :string, default: nil, if_not_exists: true
-      t.column :registration_overlay, :jsonb, default: nil, if_not_exists: true
+      t.string :guid, default: nil, if_not_exists: true
+      t.jsonb :registration_overlay, default: nil, if_not_exists: true
     end
   end
 end
