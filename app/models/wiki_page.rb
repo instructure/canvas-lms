@@ -46,6 +46,9 @@ class WikiPage < ActiveRecord::Base
   restrict_columns :state, [:workflow_state]
   restrict_columns :availability_dates, [:publish_at]
 
+  include SmartSearchable
+  use_smart_search :title, :body
+
   after_update :post_to_pandapub_when_revised
 
   belongs_to :wiki, touch: true
@@ -56,7 +59,6 @@ class WikiPage < ActiveRecord::Base
 
   belongs_to :current_lookup, class_name: "WikiPageLookup"
   has_many :wiki_page_lookups, inverse_of: :wiki_page
-  has_many :wiki_page_embeddings, inverse_of: :wiki_page
   has_one :master_content_tag, class_name: "MasterCourses::MasterContentTag", inverse_of: :wiki_page
   has_one :block_editor, as: :context, dependent: :destroy
   accepts_nested_attributes_for :block_editor, allow_destroy: true
@@ -77,8 +79,6 @@ class WikiPage < ActiveRecord::Base
               if: proc { context.try(:conditional_release?) }
   after_save :create_lookup, if: :should_create_lookup?
   after_save :delete_lookups, if: -> { !Account.site_admin.feature_enabled?(:permanent_page_links) && saved_change_to_workflow_state? && deleted? }
-  after_save :generate_embeddings, if: :should_generate_embeddings?
-  after_save :delete_embeddings, if: -> { deleted? && saved_change_to_workflow_state? }
 
   scope :starting_with_title, lambda { |title|
     where("title ILIKE ?", "#{title}%")
@@ -104,60 +104,6 @@ class WikiPage < ActiveRecord::Base
 
   def ensure_wiki_and_context
     self.wiki_id ||= context.wiki_id || context.wiki.id
-  end
-
-  def should_generate_embeddings?
-    return false if deleted?
-    return false unless SmartSearch.smart_search_available?(context)
-
-    saved_change_to_body? ||
-      saved_change_to_title? ||
-      (saved_change_to_workflow_state? && workflow_state_before_last_save == "deleted")
-  end
-
-  def chunk_content(max_character_length = 4000)
-    if body_text.length > max_character_length
-      # Chunk
-      # Hard split on character length, back up to the nearest word boundary
-      remaining_text = body_text
-      while remaining_text
-        # Find the last space before the max length
-        last_space = remaining_text.rindex(/\b/, max_character_length)
-        if last_space.nil? || last_space < max_character_length / 2
-          # No space found, or no space found in a reasonable distance, so just split at max length
-          last_space = max_character_length
-        end
-        yield title + "\n" + remaining_text[0..last_space]
-        remaining_text = remaining_text[(last_space + 1)..]
-      end
-    else
-      # No need for chunking
-      yield title + "\n" + body_text
-    end
-  end
-
-  def body_text
-    html_to_text(body)
-  end
-
-  def generate_embeddings
-    delete_embeddings
-    chunk_content do |chunk|
-      embedding = SmartSearch.generate_embedding(chunk)
-      wiki_page_embeddings.create!(embedding:)
-    end
-  end
-  handle_asynchronously :generate_embeddings, priority: Delayed::LOW_PRIORITY
-
-  def delete_embeddings
-    return unless ActiveRecord::Base.connection.table_exists?("wiki_page_embeddings")
-
-    # TODO: delete via the association once pgvector is available everywhere
-    # (without :dependent, that would try to nullify the fk in violation of the constraint
-    #  but with :dependent, instances without pgvector would try to access the nonexistent table when a page is deleted)
-    shard.activate do
-      WikiPageEmbedding.where(wiki_page_id: self).delete_all
-    end
   end
 
   def context

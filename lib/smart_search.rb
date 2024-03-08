@@ -75,7 +75,7 @@ module SmartSearch
     def index_course(course)
       # index non-deleted pages (that have not already been indexed)
       course.wiki_pages.not_deleted
-            .where.missing(:wiki_page_embeddings)
+            .where.missing(:embeddings)
             .find_each do |page|
         page.generate_embeddings(synchronous: true)
       end
