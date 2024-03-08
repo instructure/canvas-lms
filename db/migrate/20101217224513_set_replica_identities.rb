@@ -73,6 +73,7 @@ class SetReplicaIdentities < ActiveRecord::Migration[7.0]
     set_replica_identity :users
     set_replica_identity :web_conference_participants
     set_replica_identity :web_conferences
+    set_replica_identity :wiki_page_lookups
   end
 
   def down
