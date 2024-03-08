@@ -5071,8 +5071,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     end
 
     if Rails.env.test?
-      create_table :stories do |table|
-        table.string :text
+      create_table :stories do |t|
+        t.string :text
       end
     end
 
