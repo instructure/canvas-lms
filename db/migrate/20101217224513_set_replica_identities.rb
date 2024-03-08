@@ -40,6 +40,7 @@ class SetReplicaIdentities < ActiveRecord::Migration[7.0]
     set_replica_identity :course_paces
     set_replica_identity :course_sections
     set_replica_identity :courses
+    set_replica_identity :custom_grade_statuses
     set_replica_identity :developer_key_account_bindings
     set_replica_identity :developer_keys
     set_replica_identity :discussion_entries
@@ -68,7 +69,9 @@ class SetReplicaIdentities < ActiveRecord::Migration[7.0]
     set_replica_identity :pseudonyms
     set_replica_identity :role_overrides
     set_replica_identity :roles
+    set_replica_identity :standard_grade_statuses
     set_replica_identity :user_account_associations
+    set_replica_identity :user_lmgb_outcome_orderings
     set_replica_identity :user_notes
     set_replica_identity :users
     set_replica_identity :web_conference_participants
