@@ -43,6 +43,7 @@ class SetReplicaIdentities < ActiveRecord::Migration[7.0]
     set_replica_identity :developer_key_account_bindings
     set_replica_identity :developer_keys
     set_replica_identity :discussion_entries
+    set_replica_identity :discussion_entry_versions
     set_replica_identity :discussion_entry_participants
     set_replica_identity :discussion_topic_participants
     set_replica_identity :discussion_topics
