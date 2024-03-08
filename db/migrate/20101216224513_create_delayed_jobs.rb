@@ -25,15 +25,15 @@ class CreateDelayedJobs < ActiveRecord::Migration[4.2]
   def self.up
     create_table :delayed_jobs do |t|
       # Allows some jobs to jump to the front of the queue
-      t.integer  :priority, default: 0
+      t.integer :priority, default: 0
       # Provides for retries, but still fail eventually.
-      t.integer  :attempts, default: 0
+      t.integer :attempts, default: 0
       # YAML-encoded string of the object that will do work
-      t.text     :handler
+      t.text :handler
       # reason for last failure (See Note below)
-      t.text     :last_error
+      t.text :last_error
       # The queue that this job is in
-      t.string   :queue, limit: 255, null: false
+      t.string :queue, limit: 255, null: false
       # When to run.
       # Could be Time.zone.now for immediately, or sometime in the future.
       t.datetime :run_at, null: false
@@ -42,17 +42,17 @@ class CreateDelayedJobs < ActiveRecord::Migration[4.2]
       # Set when all retries have failed
       t.datetime :failed_at
       # Who is working on this object (if locked)
-      t.string   :locked_by, limit: 255
+      t.string :locked_by, limit: 255
 
       t.timestamps null: false
 
-      t.string   :tag, limit: 255
-      t.integer  :max_attempts
-      t.string   :strand, limit: 255
-      t.boolean  :next_in_strand, default: true, null: false
-      t.integer  :shard_id, limit: 8
-      t.string   :source, limit: 255
-      t.integer  :max_concurrent, default: 1, null: false
+      t.string :tag, limit: 255
+      t.integer :max_attempts
+      t.string :strand, limit: 255
+      t.boolean :next_in_strand, default: true, null: false
+      t.integer :shard_id, limit: 8
+      t.string :source, limit: 255
+      t.integer :max_concurrent, default: 1, null: false
       t.datetime :expires_at
       t.integer :strand_order_override, default: 0, null: false
       t.string :singleton
@@ -64,9 +64,9 @@ class CreateDelayedJobs < ActiveRecord::Migration[4.2]
               where: "queue = 'canvas_queue' AND locked_at IS NULL AND next_in_strand",
               name: "get_delayed_jobs_index"
     add_index :delayed_jobs, [:tag]
-    add_index :delayed_jobs, %w[strand id], name: "index_delayed_jobs_on_strand"
+    add_index :delayed_jobs, %i[strand id], name: "index_delayed_jobs_on_strand"
     add_index :delayed_jobs, :locked_by, where: "locked_by IS NOT NULL"
-    add_index :delayed_jobs, %w[run_at tag]
+    add_index :delayed_jobs, %i[run_at tag]
     add_index :delayed_jobs, :shard_id
     add_index :delayed_jobs,
               %i[strand strand_order_override id],
@@ -258,24 +258,24 @@ class CreateDelayedJobs < ActiveRecord::Migration[4.2]
     SQL
 
     create_table :failed_jobs do |t|
-      t.integer  "priority",    default: 0
-      t.integer  "attempts",    default: 0
-      t.text     "handler"
-      t.text     "last_error"
-      t.string   "queue", limit: 255
-      t.datetime "run_at"
-      t.datetime "locked_at"
-      t.datetime "failed_at"
-      t.string   "locked_by", limit: 255
-      t.datetime "created_at"
-      t.datetime "updated_at"
-      t.string   "tag", limit: 255
-      t.integer  "max_attempts"
-      t.string   "strand", limit: 255
-      t.integer  "shard_id", limit: 8
-      t.integer  "original_job_id", limit: 8
-      t.string   "source", limit: 255
-      t.datetime "expires_at"
+      t.integer :priority, default: 0
+      t.integer :attempts, default: 0
+      t.text :handler
+      t.text :last_error
+      t.string :queue, limit: 255
+      t.datetime :run_at
+      t.datetime :locked_at
+      t.datetime :failed_at
+      t.string :locked_by, limit: 255
+      t.datetime :created_at
+      t.datetime :updated_at
+      t.string :tag, limit: 255
+      t.integer :max_attempts
+      t.string :strand, limit: 255
+      t.integer :shard_id, limit: 8
+      t.integer :original_job_id, limit: 8
+      t.string :source, limit: 255
+      t.datetime :expires_at
       t.integer :strand_order_override, default: 0, null: false
       t.string :singleton
       t.integer :requeued_job_id, limit: 8
