@@ -20,10 +20,6 @@
 class SetReplicaIdentities < ActiveRecord::Migration[7.0]
   tag :predeploy
 
-  def set_replica_identity(table, identity = "index_#{table}_replica_identity")
-    super
-  end
-
   def up
     return if connection.index_exists?(:content_tags, replica_identity: true)
 

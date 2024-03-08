@@ -36,14 +36,14 @@ describe RuboCop::Cop::Migration::SetReplicaIdentityInSeparateTransaction do
     expect(cop.offenses.first.severity.name).to eq(:error)
   end
 
-  it "complains if creating a table and setting its replica identity in the same transaction with add_replica_identity" do
+  it "complains if creating a table and setting its replica identity in the same transaction with set_replica_identity" do
     inspect_source(<<~RUBY)
       class MyMigration < ActiveRecord::Migration
         tag :predeploy
 
         def change
           create_table(:xes) { |t| t.integer :y }
-          add_replica_identity "X", :y
+          set_replica_identity :xes
         end
       end
     RUBY

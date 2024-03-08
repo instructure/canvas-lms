@@ -31,8 +31,8 @@ describe RuboCop::Cop::Migration::RootAccountId do
       end
     RUBY
     expect(cop.offenses.size).to eq 2
-    expect(cop.offenses.first.message).to include "Ensure another migration in this commit uses `add_replica_identity`"
-    expect(cop.offenses.first.message).to include %(add_replica_identity "Widget")
+    expect(cop.offenses.first.message).to include "Ensure another migration in this commit uses `set_replica_identity`"
+    expect(cop.offenses.first.message).to include %(set_replica_identity :widgets)
     expect(cop.offenses.first.severity.name).to eq(:info)
     expect(cop.offenses.last.message).to include "New tables need a root_account reference"
     expect(cop.offenses.last.severity.name).to eq(:warning)
@@ -46,7 +46,7 @@ describe RuboCop::Cop::Migration::RootAccountId do
             t.boolean :purple, default: true, null: false
             t.bigint :root_account_id
           end
-          add_replica_identity "Quizzes::Quiz", :root_account_id
+          set_replica_identity :quizzes
         end
       end
     RUBY
@@ -63,13 +63,15 @@ describe RuboCop::Cop::Migration::RootAccountId do
             t.boolean :purple, default: true, null: false
             t.references :root_account, index: false
           end
-          add_replica_identity "MasterCourses::MasterTemplate", :root_account_id
+          set_replica_identity :master_courses_master_templates
         end
       end
     RUBY
-    expect(cop.offenses.size).to eq 1
-    expect(cop.messages.first).to include "Use `foreign_key: { to_table: :accounts }`"
+    expect(cop.offenses.size).to eq 2
+    expect(cop.messages.first).to include "Add a replica identity index"
     expect(cop.offenses.first.severity.name).to eq(:warning)
+    expect(cop.messages.last).to include "Use `foreign_key: { to_table: :accounts }`"
+    expect(cop.offenses.last.severity.name).to eq(:warning)
   end
 
   it "complains if `t.references` is missing `null: false`" do
@@ -80,13 +82,15 @@ describe RuboCop::Cop::Migration::RootAccountId do
             t.boolean :purple, default: true, null: false
             t.references :root_account, foreign_key: { to_table: :accounts }, index: false
           end
-          add_replica_identity "Widget", :root_account_id
+          set_replica_identity :widgets
         end
       end
     RUBY
-    expect(cop.offenses.size).to eq 1
-    expect(cop.messages.first).to include "Use `null: false`"
+    expect(cop.offenses.size).to eq 2
+    expect(cop.messages.first).to include "Add a replica identity index"
     expect(cop.offenses.first.severity.name).to eq(:warning)
+    expect(cop.messages.last).to include "Use `null: false`"
+    expect(cop.offenses.last.severity.name).to eq(:warning)
   end
 
   it "complains if `t.references` is missing `index: false`" do
@@ -97,13 +101,15 @@ describe RuboCop::Cop::Migration::RootAccountId do
             t.boolean :purple, default: true, null: false
             t.references :root_account, foreign_key: { to_table: :accounts }, null: false
           end
-          add_replica_identity "Widget", :root_account_id
+          set_replica_identity :widgets
         end
       end
     RUBY
-    expect(cop.offenses.size).to eq 1
-    expect(cop.messages.first).to include "Use `index: false` (the replica identity index should suffice)"
+    expect(cop.offenses.size).to eq 2
+    expect(cop.messages.first).to include "Add a replica identity index"
     expect(cop.offenses.first.severity.name).to eq(:convention)
+    expect(cop.messages.last).to include "Use `index: false` (the replica identity index should suffice)"
+    expect(cop.offenses.last.severity.name).to eq(:warning)
   end
 
   it "complains if `t.references` has `index: true`" do
@@ -117,12 +123,14 @@ describe RuboCop::Cop::Migration::RootAccountId do
         end
       end
     RUBY
-    expect(cop.offenses.size).to eq 2
-    expect(cop.offenses.first.message).to include "Use `index: false` (the replica identity index should suffice)"
-    expect(cop.offenses.first.severity.name).to eq(:convention)
-    expect(cop.offenses.last.message).to include "Ensure another migration in this commit uses `add_replica_identity`"
-    expect(cop.offenses.last.message).to include %(add_replica_identity "PingPongBall")
-    expect(cop.offenses.last.severity.name).to eq(:info)
+    expect(cop.offenses.size).to eq 3
+    expect(cop.offenses[0].message).to include "Use `index: false` (the replica identity index should suffice)"
+    expect(cop.offenses[0].severity.name).to eq(:convention)
+    expect(cop.offenses[1].message).to include "Add a replica identity index"
+    expect(cop.offenses[1].severity.name).to eq(:warning)
+    expect(cop.offenses[2].message).to include "Ensure another migration in this commit uses `set_replica_identity`"
+    expect(cop.offenses[2].message).to include "set_replica_identity :ping_pong_balls"
+    expect(cop.offenses[2].severity.name).to eq(:info)
   end
 
   it "complains if the replica identity index is missing" do
@@ -136,9 +144,11 @@ describe RuboCop::Cop::Migration::RootAccountId do
         end
       end
     RUBY
-    expect(cop.offenses.size).to eq 1
-    expect(cop.messages.first).to include "Ensure another migration in this commit uses `add_replica_identity`"
-    expect(cop.offenses.first.severity.name).to eq(:info)
+    expect(cop.offenses.size).to eq 2
+    expect(cop.messages.first).to include "Add a replica identity index"
+    expect(cop.offenses.first.severity.name).to eq(:warning)
+    expect(cop.messages.last).to include "Ensure another migration in this commit uses `set_replica_identity`"
+    expect(cop.offenses.last.severity.name).to eq(:info)
   end
 
   it "gives no complaints if requirements are satisfied" do
@@ -148,8 +158,10 @@ describe RuboCop::Cop::Migration::RootAccountId do
           create_table :widgets do |t|
             t.boolean :purple, default: true, null: false
             t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
+
+            t.replica_identity_index
           end
-          add_replica_identity "Widget", :root_account_id
+          set_replica_identity :widgets
         end
       end
     RUBY
@@ -163,8 +175,10 @@ describe RuboCop::Cop::Migration::RootAccountId do
           create_table :widgets do |t|
             t.boolean :purple, default: true, null: false
             t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
+
+            t.replica_identity_index
           end
-          add_replica_identity "Widget", :root_account_id
+          set_replica_identity :widgets
         end
       end
     RUBY
@@ -186,13 +200,14 @@ describe RuboCop::Cop::Migration::RootAccountId do
             t.timestamps
           end
 
-          add_replica_identity "Wicket", :root_account_id
+          set_replica_identity :wickets
         end
       end
     RUBY
-    expect(cop.offenses.size).to eq 3
+    expect(cop.offenses.size).to eq 4
     expect(cop.offenses[0].message).to include "New tables need a root_account reference"
     expect(cop.offenses[1].message).to include "Use `index: false`"
-    expect(cop.offenses[2].message).to include "Ensure another migration in this commit uses `add_replica_identity`"
+    expect(cop.offenses[2].message).to include "Add a replica identity index"
+    expect(cop.offenses[3].message).to include "Ensure another migration in this commit uses `set_replica_identity`"
   end
 end

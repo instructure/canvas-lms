@@ -35,6 +35,8 @@ class CreateRubricCriteria < ActiveRecord::Migration[7.0]
       t.references :created_by, null: false, foreign_key: { to_table: :users }, index: true
       t.references :deleted_by, null: true, foreign_key: { to_table: :users }, index: true
       t.timestamps
+
+      t.replica_identity_index
     end
   end
 end
