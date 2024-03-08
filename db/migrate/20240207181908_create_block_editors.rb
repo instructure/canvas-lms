@@ -30,6 +30,8 @@ class CreateBlockEditors < ActiveRecord::Migration[7.0]
       t.string :editor_version
 
       t.timestamps
+
+      t.replica_identity_index
     end
   end
 end

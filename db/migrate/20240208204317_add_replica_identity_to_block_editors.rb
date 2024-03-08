@@ -21,7 +21,11 @@
 class AddReplicaIdentityToBlockEditors < ActiveRecord::Migration[7.0]
   tag :predeploy
 
-  def change
-    add_replica_identity "BlockEditor", :root_account_id
+  def up
+    set_replica_identity :block_editors
+  end
+
+  def down
+    set_replica_identity :block_editors, :default
   end
 end

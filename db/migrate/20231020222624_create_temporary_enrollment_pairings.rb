@@ -25,6 +25,8 @@ class CreateTemporaryEnrollmentPairings < ActiveRecord::Migration[7.0]
       t.references :root_account, foreign_key: { to_table: :accounts }, null: false, index: false
       t.string :workflow_state, null: false, default: "active", limit: 255
       t.timestamps
+
+      t.replica_identity_index
     end
 
     add_reference :enrollments,

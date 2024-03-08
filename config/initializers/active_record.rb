@@ -1773,27 +1773,6 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
 
     execute schema_creation.accept(at)
   end
-
-  def add_replica_identity(model_name, column_name, default_value = 0)
-    klass = model_name.constantize
-    if columns(klass.table_name).find { |c| c.name == column_name.to_s }.null
-      DataFixup::BackfillNulls.run(klass, column_name, default_value:)
-    end
-    change_column_null klass.table_name, column_name, false
-    primary_column = klass.primary_key
-    index_name = "index_#{klass.table_name}_replica_identity"
-    options = { name: index_name, unique: true, if_not_exists: true }.tap do |hash|
-      hash[:algorithm] = :concurrently if klass.exists?
-    end
-    add_index klass.table_name, [column_name, primary_column], **options
-    set_replica_identity klass.table_name, index_name
-  end
-
-  def remove_replica_identity(model_name)
-    klass = model_name.constantize
-    set_replica_identity klass.table_name, :default
-    remove_index klass.table_name, name: "index_#{klass.table_name}_replica_identity", if_exists: true
-  end
 end
 
 # yes, various versions of rails supports various if_exists/if_not_exists options,

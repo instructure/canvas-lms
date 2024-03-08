@@ -33,7 +33,7 @@ module RuboCop
         self.legacy_cutoff_date = "20230817180016"
 
         def_node_search :set_replica_identity, <<~PATTERN
-          (send _ ${:set_replica_identity | :add_replica_identity} $_ ...)
+          (send _ ${:set_replica_identity} $_ ...)
         PATTERN
 
         def on_class(node)
@@ -43,9 +43,8 @@ module RuboCop
         def on_send(node)
           return if @current_def == :down
 
-          set_replica_identity(node) do |method, table|
+          set_replica_identity(node) do |_method, table|
             table = table.indifferent
-            table = AST::StrNode.new(:str, [table.indifferent.value.tableize]) if method == :add_replica_identity
             add_offense(node, severity: :error) if @new_tables.include?(table)
           end
         end
