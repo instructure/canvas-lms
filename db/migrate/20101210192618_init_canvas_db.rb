@@ -1031,6 +1031,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :bookmarks_bookmarks, :user_id
 
     create_table :brand_configs, id: false do |t|
+      t.primary_keys [:md5]
+
       t.string :md5, limit: 32, null: false, unique: true
       t.column :variables, :text
       t.boolean :share, default: false, null: false
@@ -1042,8 +1044,6 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.text :mobile_css_overrides
       t.string :parent_md5, limit: 255
     end
-    # because we didn't use the rails default `id` int primary key, we have to add it manually
-    execute %{ ALTER TABLE #{BrandConfig.quoted_table_name} ADD PRIMARY KEY (md5); }
     add_index :brand_configs, :share
 
     add_index :calendar_events, :context_code
@@ -2117,6 +2117,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :discussion_topics, :cloned_item_id, where: "cloned_item_id IS NOT NULL"
 
     create_table :discussion_topic_materialized_views, id: false do |t|
+      t.primary_keys [:discussion_topic_id]
+
       t.bigint :discussion_topic_id, null: false
       t.text :json_structure
       t.text :participants_array
@@ -2125,8 +2127,6 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.timestamps null: false
       t.timestamp :generation_started_at
     end
-    add_index :discussion_topic_materialized_views, :discussion_topic_id, unique: true, name: "index_discussion_topic_materialized_views"
-    execute("ALTER TABLE #{DiscussionTopic::MaterializedView.quoted_table_name} ADD CONSTRAINT discussion_topic_materialized_views_pkey PRIMARY KEY USING INDEX index_discussion_topic_materialized_views")
 
     create_table :discussion_topic_participants do |t|
       t.bigint :discussion_topic_id, null: false
@@ -3647,6 +3647,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :page_comments, :user_id
 
     create_table :page_views, id: false, force: true do |t|
+      t.primary_keys [:request_id]
+
       t.string :request_id, limit: 255
       t.string :session_id, limit: 255
       t.bigint :user_id, null: false
@@ -3672,7 +3674,6 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.string :http_method, limit: 255
       t.string :remote_ip, limit: 255
     end
-    execute("ALTER TABLE #{PageView.quoted_table_name} ADD PRIMARY KEY (request_id)")
 
     add_index :page_views, [:account_id, :created_at]
     add_index :page_views, :asset_user_access_id, name: "index_page_views_asset_user_access_id"
