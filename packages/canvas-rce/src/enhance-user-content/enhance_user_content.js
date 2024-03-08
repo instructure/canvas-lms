@@ -122,6 +122,32 @@ function buildUrl(url) {
   }
 }
 
+const addResourceIdentifiersToStudioContent = content => {
+  content.querySelectorAll('iframe.lti-embed').forEach(iframe => {
+    const url = buildUrl(iframe.getAttribute('src'))
+    if (
+      !url ||
+      !url.pathname.includes('external_tools/retrieve') ||
+      !url.search.includes('instructuremedia.com') ||
+      !url.search.includes('custom_arc_media_id')
+    ) {
+      return
+    }
+    const userContentContainer = iframe.closest('.user_content')
+    if (userContentContainer?.dataset?.resourceType && userContentContainer?.dataset?.resourceId) {
+      url.searchParams.set(
+        'com_instructure_course_canvas_resource_type',
+        userContentContainer.dataset.resourceType
+      )
+      url.searchParams.set(
+        'com_instructure_course_canvas_resource_id',
+        userContentContainer.dataset.resourceId
+      )
+      iframe.src = url.href
+    }
+  })
+}
+
 export function enhanceUserContent(container = document, opts = {}) {
   const {
     customEnhanceFunc,
@@ -240,6 +266,8 @@ export function enhanceUserContent(container = document, opts = {}) {
       const externalLinkIcon = makeExternalLinkIcon(childLink)
       childLink.appendChild(externalLinkIcon)
     })
+
+    addResourceIdentifiersToStudioContent(unenhanced_elem)
   })
 
   content

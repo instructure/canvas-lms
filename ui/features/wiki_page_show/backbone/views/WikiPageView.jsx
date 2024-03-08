@@ -280,6 +280,7 @@ export default class WikiPageView extends Backbone.View {
 
   toJSON() {
     const json = super.toJSON(...arguments)
+    json.page_id = this.model.get('page_id')
     json.modules_path = this.modules_path
     json.wiki_pages_path = this.wiki_pages_path
     json.wiki_page_edit_path = this.wiki_page_edit_path
