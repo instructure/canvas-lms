@@ -36,7 +36,7 @@ describe RuboCop::Cop::Migration::IdColumn do
       expect(cop.offenses.first.severity.name).to eq(:warning)
     end
 
-    it "doesn't complain if limit: 8 is given" do
+    it "still complains if limit: 8 is given" do
       inspect_source(<<~RUBY)
         class TestMigration < ActiveRecord::Migration
           def up
@@ -46,7 +46,9 @@ describe RuboCop::Cop::Migration::IdColumn do
           end
         end
       RUBY
-      expect(cop.offenses.size).to eq 0
+      expect(cop.offenses.size).to eq 1
+      expect(cop.messages.first).to eq "Migration/IdColumn: Use `:bigint` for id columns"
+      expect(cop.offenses.first.severity.name).to eq(:warning)
     end
 
     it "doesn't complain if type :bigint is given" do
@@ -92,7 +94,7 @@ describe RuboCop::Cop::Migration::IdColumn do
       expect(cop.offenses.first.severity.name).to eq(:warning)
     end
 
-    it "doesn't complain if limit: 8 is given" do
+    it "still complains if limit: 8 is given" do
       inspect_source(<<~RUBY)
         class TestMigration < ActiveRecord::Migration
           def change
@@ -102,7 +104,9 @@ describe RuboCop::Cop::Migration::IdColumn do
           end
         end
       RUBY
-      expect(cop.offenses.size).to eq 0
+      expect(cop.offenses.size).to eq 1
+      expect(cop.messages.first).to eq "Migration/IdColumn: Use `:bigint` for id columns"
+      expect(cop.offenses.first.severity.name).to eq(:warning)
     end
 
     it "doesn't complain if type :bigint is given" do
@@ -146,7 +150,7 @@ describe RuboCop::Cop::Migration::IdColumn do
       expect(cop.offenses.first.severity.name).to eq(:warning)
     end
 
-    it "doesn't complain if limit: 8 is given" do
+    it "still complains if limit: 8 is given" do
       inspect_source(<<~RUBY)
         class TestMigration < ActiveRecord::Migration
           def change
@@ -154,7 +158,9 @@ describe RuboCop::Cop::Migration::IdColumn do
           end
         end
       RUBY
-      expect(cop.offenses.size).to eq 0
+      expect(cop.offenses.size).to eq 1
+      expect(cop.messages.first).to eq "Migration/IdColumn: Use `:bigint` for id columns"
+      expect(cop.offenses.first.severity.name).to eq(:warning)
     end
 
     it "doesn't complain if type :bigint is given" do

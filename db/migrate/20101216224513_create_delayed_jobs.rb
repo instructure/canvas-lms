@@ -50,7 +50,7 @@ class CreateDelayedJobs < ActiveRecord::Migration[4.2]
       t.integer :max_attempts
       t.string :strand, limit: 255
       t.boolean :next_in_strand, default: true, null: false
-      t.integer :shard_id, limit: 8
+      t.bigint :shard_id
       t.string :source, limit: 255
       t.integer :max_concurrent, default: 1, null: false
       t.datetime :expires_at
@@ -272,13 +272,13 @@ class CreateDelayedJobs < ActiveRecord::Migration[4.2]
       t.string :tag, limit: 255
       t.integer :max_attempts
       t.string :strand, limit: 255
-      t.integer :shard_id, limit: 8
-      t.integer :original_job_id, limit: 8
+      t.bigint :shard_id
+      t.bigint :original_job_id
       t.string :source, limit: 255
       t.datetime :expires_at
       t.integer :strand_order_override, default: 0, null: false
       t.string :singleton
-      t.integer :requeued_job_id, limit: 8
+      t.bigint :requeued_job_id
     end
     add_index :failed_jobs, :failed_at
     add_index :failed_jobs, :strand, where: "strand IS NOT NULL"
