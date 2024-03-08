@@ -3365,8 +3365,8 @@ class InitCanvasDb < ActiveRecord::Migration[6.0]
 
     create_table :moderated_grading_provisional_grades do |t|
       t.string :grade, limit: 255
-      t.float      :score
-      t.timestamp  :graded_at
+      t.float :score
+      t.timestamp :graded_at
       t.references :scorer, null: false, index: false
       t.references :submission, null: false, index: false
 
@@ -4267,8 +4267,8 @@ class InitCanvasDb < ActiveRecord::Migration[6.0]
       t.bigint :enrollment_id, null: false
       t.bigint :grading_period_id
       t.string :workflow_state, default: :active, null: false, limit: 255
-      t.float   :current_score
-      t.float   :final_score
+      t.float :current_score
+      t.float :final_score
       t.timestamps null: true, precision: nil
       t.references :assignment_group, null: true
       t.boolean :course_score, default: false, null: false
@@ -4941,7 +4941,7 @@ class InitCanvasDb < ActiveRecord::Migration[6.0]
     add_index :users, :merged_into_user_id, where: "merged_into_user_id IS NOT NULL"
 
     create_table :user_profiles do |t|
-      t.text   :bio
+      t.text :bio
       t.string :title, limit: 255
       t.references :user, index: false
     end
@@ -5060,9 +5060,9 @@ class InitCanvasDb < ActiveRecord::Migration[6.0]
     add_index :wiki_pages, :cloned_item_id, where: "cloned_item_id IS NOT NULL"
 
     create_table :wiki_page_lookups do |t|
-      t.text        :slug, null: false, index: false
-      t.references  :wiki_page, null: false, foreign_key: false
-      t.references  :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
+      t.text :slug, null: false, index: false
+      t.references :wiki_page, null: false, foreign_key: false
+      t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
       t.bigint :context_id, null: false
       t.string :context_type, null: false, limit: 255
       t.timestamps precision: 6
