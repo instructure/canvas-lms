@@ -2289,3 +2289,13 @@ if $canvas_rails == "7.0"
 
   ActiveRecord::Relation.send(:public, :null_relation?)
 end
+
+module CreateIcuCollationsBeforeMigrations
+  def migrate_without_lock(*)
+    c = ($canvas_rails == "7.1") ? connection : ActiveRecord::Base.connection
+    c.create_icu_collations if up?
+
+    super
+  end
+end
+ActiveRecord::Migrator.prepend(CreateIcuCollationsBeforeMigrations)
