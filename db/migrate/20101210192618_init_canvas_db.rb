@@ -1032,7 +1032,7 @@ class InitCanvasDb < ActiveRecord::Migration[6.0]
       t.primary_keys [:md5]
 
       t.string :md5, limit: 32, null: false, unique: true
-      t.column :variables, :text
+      t.text :variables
       t.boolean :share, default: false, null: false
       t.string :name, limit: 255
       t.datetime :created_at, null: false
@@ -2566,7 +2566,7 @@ class InitCanvasDb < ActiveRecord::Migration[6.0]
       t.integer :version
       t.references :root_account, foreign_key: { to_table: :accounts }
       t.boolean :points_based, default: false, null: false
-      t.column :scaling_factor, :decimal, precision: 5, scale: 2, default: 1.0, null: false
+      t.decimal :scaling_factor, precision: 5, scale: 2, default: 1.0, null: false
     end
 
     add_index :grading_standards, :context_code
@@ -3351,7 +3351,7 @@ class InitCanvasDb < ActiveRecord::Migration[6.0]
     add_index :migration_issues, :content_migration_id
 
     create_table :moderation_graders do |t|
-      t.column :anonymous_id, :string, limit: 5, null: false
+      t.string :anonymous_id, limit: 5, null: false
 
       t.references :assignment, null: false, foreign_key: true, index: false
       t.bigint :user_id, null: false
@@ -3780,7 +3780,7 @@ class InitCanvasDb < ActiveRecord::Migration[6.0]
     add_index :polling_polls, :user_id
 
     create_table :post_policies do |t|
-      t.column :post_manually, :boolean, null: false, default: false
+      t.boolean :post_manually, null: false, default: false
 
       t.references :course, foreign_key: true
       t.references :assignment, foreign_key: true

@@ -22,9 +22,9 @@ class AddBooleanFieldsToCustomGradeStatuses < ActiveRecord::Migration[7.0]
 
   def change
     change_table :custom_grade_statuses, bulk: true do |t|
-      t.column :applies_to_submissions, :boolean, default: true, null: false
-      t.column :applies_to_final_grade, :boolean, default: true, null: false
-      t.column :allow_final_grade_value, :boolean, default: true, null: false
+      t.boolean :applies_to_submissions, default: true, null: false
+      t.boolean :applies_to_final_grade, default: true, null: false
+      t.boolean :allow_final_grade_value, default: true, null: false
     end
   end
 end
