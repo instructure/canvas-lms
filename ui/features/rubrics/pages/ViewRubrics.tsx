@@ -19,6 +19,7 @@
 import React from 'react'
 import {Portal} from '@instructure/ui-portal'
 import {ViewRubrics} from '../components/ViewRubrics'
+import {ApolloProvider, createClient} from '@canvas/apollo'
 
 export const Component = () => {
   const mountPoint: HTMLElement | null = document.querySelector('#content')
@@ -28,7 +29,9 @@ export const Component = () => {
 
   return (
     <Portal open={true} mountNode={mountPoint}>
-      <ViewRubrics />
+      <ApolloProvider client={createClient()}>
+        <ViewRubrics />
+      </ApolloProvider>
     </Portal>
   )
 }
