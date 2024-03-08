@@ -813,7 +813,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :attachments, [:md5, :namespace]
     add_index :attachments, :user_id
     add_index :attachments, [:workflow_state, :updated_at]
-    execute %{create index index_attachments_on_root_attachment_id_not_null on #{Attachment.quoted_table_name} (root_attachment_id) where root_attachment_id is not null}
+    add_index :attachments, :root_attachment_id, where: "root_attachment_id IS NOT NULL", name: "index_attachments_on_root_attachment_id_not_null"
     add_index :attachments, %i[folder_id file_state position]
     add_index :attachments, :need_notify, where: "need_notify"
     add_index :attachments, :replacement_attachment_id, where: "replacement_attachment_id IS NOT NULL"
@@ -1050,7 +1050,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :calendar_events, [:context_id, :context_type]
     add_index :calendar_events, :user_id
     add_index :calendar_events, :parent_calendar_event_id
-    execute("CREATE INDEX index_calendar_events_on_effective_context_code ON #{CalendarEvent.quoted_table_name}(effective_context_code) WHERE effective_context_code IS NOT NULL")
+    add_index :calendar_events, :effective_context_code, where: "effective_context_code IS NOT NULL"
 
     create_table :canvadocs do |t|
       t.string :document_id, limit: 255
@@ -1195,12 +1195,15 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
 
     add_index :communication_channels, [:pseudonym_id, :position]
     add_index :communication_channels, [:user_id, :position]
-    execute("CREATE INDEX index_communication_channels_on_path_and_path_type ON #{CommunicationChannel.quoted_table_name} (LOWER(path), path_type)")
+    add_index :communication_channels, "LOWER(path), path_type", name: "index_communication_channels_on_path_and_path_type"
     if (trgm = connection.extension(:pg_trgm)&.schema)
       add_index :communication_channels, "lower(path) #{trgm}.gin_trgm_ops", name: "index_gin_trgm_communication_channels_path", using: :gin
     end
     add_index :communication_channels, :confirmation_code
-    execute("CREATE UNIQUE INDEX index_communication_channels_on_user_id_and_path_and_path_type ON #{CommunicationChannel.quoted_table_name} (user_id, LOWER(path), path_type)")
+    add_index :communication_channels,
+              "user_id, LOWER(path), path_type",
+              unique: true,
+              name: "index_communication_channels_on_user_id_and_path_and_path_type"
     add_index :communication_channels, :last_bounce_at, where: "bounce_count > 0"
 
     create_table :conditional_release_rules do |t|
