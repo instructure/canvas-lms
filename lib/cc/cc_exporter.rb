@@ -177,6 +177,14 @@ module CC
       @content_export && !(@qti_only_export || epub_export?)
     end
 
+    def include_new_quizzes_in_export?
+      @content_export.include_new_quizzes_in_export?
+    end
+
+    def new_quizzes_export_url
+      @content_export.settings[:new_quizzes_export_url]
+    end
+
     private
 
     def copy_all_to_zip
