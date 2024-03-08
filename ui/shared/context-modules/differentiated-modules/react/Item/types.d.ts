@@ -39,6 +39,7 @@ export interface exportedOverride {
   student_id?: string
   name: string
   type: string
+  noop_id: string
 }
 
 export interface DateDetailsOverride {
@@ -56,6 +57,7 @@ export interface DateDetailsOverride {
   all_day_date?: string | null
   context_module_id?: string | null
   context_module_name?: string | null
+  noop_id?: number
 }
 
 export interface ItemAssignToCardSpec {

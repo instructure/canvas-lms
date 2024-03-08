@@ -79,6 +79,7 @@ describe('ItemAssignToTray', () => {
     ENV.POST_TO_SIS = false
     ENV.DUE_DATE_REQUIRED_FOR_ACCOUNT = false
     // an assignment with valid dates and overrides
+    fetchMock.get('/api/v1/courses/1/settings', {conditional_release: false})
     fetchMock
       .get('/api/v1/courses/1/assignments/23/date_details', {
         id: '23',
@@ -315,6 +316,33 @@ describe('ItemAssignToTray', () => {
       const selectedOptions = await findAllByTestId('assignee_selector_selected_option')
       expect(selectedOptions).toHaveLength(1)
       waitFor(() => expect(selectedOptions[0]).toHaveTextContent('Everyone'))
+    })
+
+    it('renders mastery paths option for noop 1 overrides', async () => {
+      fetchMock.get(
+        '/api/v1/courses/1/settings',
+        {conditional_release: true},
+        {overwriteRoutes: true}
+      )
+      fetchMock.get(
+        '/api/v1/courses/1/assignments/23/date_details',
+        {
+          overrides: [
+            {
+              due_at: null,
+              id: undefined,
+              lock_at: null,
+              noop_id: 1,
+              unlock_at: null,
+            },
+          ],
+        },
+        {overwriteRoutes: true}
+      )
+      const {findAllByTestId} = renderComponent()
+      const selectedOptions = await findAllByTestId('assignee_selector_selected_option')
+      expect(selectedOptions).toHaveLength(1)
+      waitFor(() => expect(selectedOptions[0]).toHaveTextContent('Mastery Paths'))
     })
 
     it('renders everyone option if there are more than 1 card', async () => {

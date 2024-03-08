@@ -71,7 +71,8 @@ export const areCardsEqual = (preSavedCard, currentCard) => {
   const {index, ...preSaved} = preSavedCard
   const {index: indexb, ...current} = currentCard
   preSaved.overrides = preSaved.overrides.map(({assignment_override}) => {
-    const {course_section_id, student_ids, due_at, lock_at, unlock_at, rowKey} = assignment_override
+    const {course_section_id, student_ids, due_at, lock_at, unlock_at, rowKey, noop_id} =
+      assignment_override
     const params = {due_at, lock_at, unlock_at, rowKey}
     if (course_section_id) {
       params.course_section_id = course_section_id
@@ -79,21 +80,30 @@ export const areCardsEqual = (preSavedCard, currentCard) => {
     if (student_ids) {
       return {...params, student_ids: student_ids.filter(s => s).sort()}
     }
+    if (noop_id === '1') {
+      params.noop_id = '1'
+    }
     return params
   })
-
   current.overrides = current.overrides
     .filter(
-      override => override?.attributes?.course_section_id || override?.attributes?.student_ids
+      override =>
+        override?.attributes?.course_section_id ||
+        override?.attributes?.student_ids ||
+        override?.attributes?.noop_id
     )
     .map(({attributes}) => {
-      const {course_section_id, student_ids, due_at, lock_at, unlock_at, rowKey} = attributes
+      const {course_section_id, student_ids, due_at, lock_at, unlock_at, rowKey, noop_id} =
+        attributes
       const params = {due_at, lock_at, unlock_at, rowKey}
       if (course_section_id) {
         params.course_section_id = course_section_id
       }
       if (student_ids) {
         return {...params, student_ids: student_ids.filter(s => s).sort()}
+      }
+      if (noop_id === '1') {
+        params.noop_id = '1'
       }
       return params
     })
