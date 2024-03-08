@@ -68,11 +68,11 @@ const DifferentiatedModulesSection = ({
     if(stagedOverrides === null) return
 
     const parsedOverrides = getParsedOverrides(stagedOverrides, stagedCards)
-    
+
     setStagedCards(parsedOverrides)
     if(initialState === null){
       const state = cloneObject(parsedOverrides);
-      // initialState is set only 1 time to check if the overrides have pending changes 
+      // initialState is set only 1 time to check if the overrides have pending changes
       setInitialState(state)
       // checkPoint is set every time the user applies changes to the overrides
       setCheckPoint(state)
@@ -92,7 +92,10 @@ const DifferentiatedModulesSection = ({
       const rowOverrides = row.overrides || []
       const dates = row.dates || {}
       rowOverrides.forEach(override => {
-        if (override?.attributes?.course_section_id === defaultSectionId) {
+        if (override?.attributes?.noop_id === "1") {
+          defaultOptions.push('mastery_paths')
+          selectedOptionIds.push(...defaultOptions)
+        } else if (override?.attributes?.course_section_id === defaultSectionId) {
           row.index = 0
           defaultOptions.push(everyoneOptionKey)
           selectedOptionIds.push(...defaultOptions)
@@ -140,7 +143,7 @@ const DifferentiatedModulesSection = ({
   useEffect(()=>{
     if(!open && ![undefined, null].includes(initialState)){
       const hasChanges = cards.some(({highlightCard}) => highlightCard) || cards.length < Object.entries(initialState).length
-        setShowPendingChangesPill(hasChanges)
+      setShowPendingChangesPill(hasChanges)
     }
 }, [cards, open])
 
@@ -155,9 +158,9 @@ const DifferentiatedModulesSection = ({
     resetOverrides(overrides, preSavedOverrides)
     // revert changes in the tray cards
     const preSaved = stagedOverrides.filter(o => preSavedOverrides.find(({assignment_override}) => o.attributes.stagedOverrideId === assignment_override.stagedOverrideId))
-    const defaultState = getParsedOverrides(preSaved, checkPoint)    
+    const defaultState = getParsedOverrides(preSaved, checkPoint)
     const checkPointOverrides = getAllOverrides(defaultState).filter(
-      row => row.attributes.course_section_id || row.attributes.student_ids
+      row => row.attributes.course_section_id || row.attributes.student_ids || row.attributes.noop_id
     )
     setStagedOverrides(checkPointOverrides);
     const newStagedCards = resetStagedCards(stagedCards, checkPoint, defaultState)
@@ -171,7 +174,7 @@ const DifferentiatedModulesSection = ({
     newRow.draft = true
     newRow.index = stagedOverrides.length + 1
     const oldOverrides = getAllOverrides(stagedCards).filter(
-      row => row.attributes.course_section_id || row.attributes.student_ids
+      row => row.attributes.course_section_id || row.attributes.student_ids || row.attributes.noop_id
     )
     const newStageOverrides = [...oldOverrides, newRow]
     setStagedOverrides(newStageOverrides)
@@ -238,7 +241,7 @@ const DifferentiatedModulesSection = ({
     const newOverride = newOverridesForRow[newOverridesForRow.length - 1]
     newOverride.set('stagedOverrideId', uid())
     const uniqueOverrides = [...new Set([...stagedOverrides, newOverride])]
-    
+
     setStagedOverrides(uniqueOverrides)
   }
 
@@ -258,7 +261,7 @@ const DifferentiatedModulesSection = ({
 
   const handleSave = () => {
     const newOverrides = getAllOverrides(stagedCards).filter(
-      row => row.attributes.course_section_id || row.attributes.student_ids
+      row => row.attributes.course_section_id || row.attributes.student_ids || row.attributes.noop_id
     )
     setStagedOverrides(newOverrides)
     setPreSavedOverrides(cloneObject(newOverrides))

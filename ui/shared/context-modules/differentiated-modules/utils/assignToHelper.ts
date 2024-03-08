@@ -111,6 +111,19 @@ export const generateDateDetailsPayload = (cards: ItemAssignToCardSpec[]) => {
       return overrides
     })
     .flat()
+
+  const masteryPathsCard = cards.find(card => card.selectedAssigneeIds.includes('mastery_paths'))
+  if (masteryPathsCard !== undefined) {
+    payload.assignment_overrides.push({
+      id: masteryPathsCard.overrideId,
+      title: 'Mastery Paths',
+      due_at: masteryPathsCard.due_at || null,
+      unlock_at: masteryPathsCard.unlock_at || null,
+      lock_at: masteryPathsCard.lock_at || null,
+      noop_id: 1,
+    })
+  }
+
   return payload
 }
 

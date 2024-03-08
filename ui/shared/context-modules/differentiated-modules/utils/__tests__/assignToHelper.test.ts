@@ -42,4 +42,29 @@ describe('generateDateDetailsPayload', () => {
     }
     expect(generateDateDetailsPayload(cards)).toEqual(expectedPayload)
   })
+
+  it('returns a mastery paths override if a MP card was setup', () => {
+    const cards: ItemAssignToCardSpec[] = [
+      {
+        overrideId: undefined,
+        isValid: true,
+        hasAssignees: true,
+        selectedAssigneeIds: ['mastery_paths'] as string[],
+      } as ItemAssignToCardSpec,
+    ]
+    const expectedPayload = <DateDetailsPayload>{
+      assignment_overrides: [
+        {
+          due_at: null,
+          id: undefined,
+          lock_at: null,
+          noop_id: 1,
+          unlock_at: null,
+          title: 'Mastery Paths',
+        },
+      ] as unknown as DateDetailsOverride[],
+      only_visible_to_overrides: true,
+    }
+    expect(generateDateDetailsPayload(cards)).toEqual(expectedPayload)
+  })
 })
