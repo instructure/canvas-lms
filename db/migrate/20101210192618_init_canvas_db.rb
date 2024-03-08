@@ -745,13 +745,14 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
               opclass: { migration_id: :text_pattern_ops },
               where: "migration_id IS NOT NULL",
               name: "index_attachments_on_context_and_migration_id_pattern_ops"
+    add_index :attachments, :media_entry_id
 
     execute(<<~SQL) # rubocop:disable Rails/SquishedSQLHeredocs
       CREATE FUNCTION #{connection.quote_table_name("attachment_before_insert_verify_active_folder__tr_fn")} () RETURNS trigger AS $$
       DECLARE
         folder_state text;
       BEGIN
-        SELECT workflow_state INTO folder_state FROM #{Folder.quoted_table_name} WHERE folders.id = NEW.folder_id FOR SHARE;
+        SELECT workflow_state INTO folder_state FROM folders WHERE folders.id = NEW.folder_id FOR SHARE;
         if folder_state = 'deleted' then
           RAISE EXCEPTION 'Cannot create attachments in deleted folders --> %', NEW.folder_id;
         end if;
@@ -759,6 +760,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       END;
       $$ LANGUAGE plpgsql;
     SQL
+    set_search_path("attachment_before_insert_verify_active_folder__tr_fn")
 
     execute(<<~SQL.squish)
       CREATE TRIGGER attachment_before_insert_verify_active_folder__tr
@@ -1247,6 +1249,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.string   "migration_type", limit: 255
       t.integer :child_subscription_id, limit: 8
       t.references :root_account, type: :bigint, foreign_key: { to_table: :accounts }, index: true
+      t.references :asset_map_attachment, null: true, index: false, foreign_key: { to_table: :attachments }, type: :bigint
     end
     add_index :content_migrations, :context_id
     add_index :content_migrations, :attachment_id, where: "attachment_id IS NOT NULL"
@@ -1857,6 +1860,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.boolean :legacy, default: true, null: false
       t.boolean :include_reply_preview, default: false, null: false
       t.boolean :is_anonymous_author, default: false, null: false
+      t.references :quoted_entry, index: false, foreign_key: { to_table: :discussion_entries }, type: :bigint
     end
 
     add_index "discussion_entries", ["user_id"], name: "index_discussion_entries_on_user_id"
@@ -2347,7 +2351,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       DECLARE
         parent_state text;
       BEGIN
-        SELECT workflow_state INTO parent_state FROM #{Folder.quoted_table_name} WHERE folders.id = NEW.parent_folder_id FOR SHARE;
+        SELECT workflow_state INTO parent_state FROM folders WHERE folders.id = NEW.parent_folder_id FOR SHARE;
         if parent_state = 'deleted' then
           RAISE EXCEPTION 'Cannot create sub-folders in deleted folders --> %', NEW.parent_folder_id;
         end if;
@@ -2355,6 +2359,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       END;
       $$ LANGUAGE plpgsql;
     SQL
+    set_search_path("folder_before_insert_verify_active_parent_folder__tr_fn")
 
     execute(<<~SQL.squish)
       CREATE TRIGGER folder_before_insert_verify_active_parent_folder__tr
@@ -3081,9 +3086,11 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
 
       t.timestamps null: false
       t.text :webvtt_content
+      t.integer :attachment_id, limit: 8
     end
 
     add_index :media_tracks, [:media_object_id, :locale], name: "media_object_id_locale"
+    add_index :media_tracks, [:attachment_id, :locale], where: "attachment_id IS NOT NULL", unique: true
 
     create_table :mentions do |t|
       t.references :discussion_entry, foreign_key: true, index: true, null: false, type: :bigint
