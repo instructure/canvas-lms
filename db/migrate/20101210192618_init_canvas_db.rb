@@ -47,8 +47,6 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       raise ActiveRecord::Rollback
     end
 
-    create_icu_collations
-
     # everything else is alphabetical,
     # sometimes defining classes try to access
     # this table def and it needs to exist first
