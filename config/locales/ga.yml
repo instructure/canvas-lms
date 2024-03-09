@@ -11785,9 +11785,9 @@ ga:
         details: 
           mfa_enrollment: |-
               Méadaíonn fíordheimhniú ilfhachtóir an tslándáil trí éileamh a dhéanamh go bhfuil rud éigin i do sheilbh fhisiciúil agat,
-              chomh maith le do phasfhocal a bheith ar eolas agat, chun logáil isteach ar Canvas. Is feiste é seo gur féidir cóid fíoraithe 
-               a ghiniúint, nó guthán ar féidir leo teachtaireachtaí téacs a fháil. Is féidir FDI a chumrú tríd an gcód QR a scanadh
-              thíos ag baint úsáide as aip fíordheimhnitheora pasfhocal aonuaire () bunaithe ar Am ar iPhone nó Android (mar shampla: Google Authenticator,
+              chomh maith le do phasfhocal a bheith ar eolas agat, chun logáil isteach ar Canvas. %{otp_via_sms_message} Is feiste é seo gur féidir cóid fíoraithe 
+              a ghiniúint, nó guthán ar féidir leo teachtaireachtaí téacs a fháil. Is féidir FDI a chumrú tríd an gcód QR a scanadh
+              thíos ag baint úsáide as aip fíordheimhnitheora pasfhocal aonuaire (TOTP) bunaithe ar Am ar iPhone nó Android (mar shampla: Google Authenticator,
               Microsoft Authenticator, Údar). Is féidir comharthaí eile a chumrú tríd an eochair rúnda a iontráil **%{secret_key}**.
               Nuair a bheidh fíordheimhniú ilfhachtóir cumraithe agat, moltar duit dul chuig do leathanach próifíle agus a phriontáil
               amach sraith de chóid chúltaca, ar eagla nach bhfuil do ghléas ilfhachtóiriúil ar fáil.
@@ -23354,7 +23354,7 @@ ga:
       in Ardsocruithe.  Ba cheart duit a chumrú %{callback_url} mar an URI atreoraithe OAuth bailí.
       Tar éis duit d’aip a shábháil, déan nóta de aitheantas na haipe agus Rún Aip, agus cuir isteach anseo iad.
   you_will_need_to_create_a_service_id_apple_develop_4e684a7a: |-
-      Beidh ort aitheantas Seirbhíse [Apple Developer Console] a chruthú(%{apple_url}).
+      Beidh ort aitheantas Seirbhíse a chruthú [Apple Developer Console](%{apple_url}).
       Cumasaigh Sínigh isteach le Apple, agus cuir %{callback_url} leis mar URL tuairisceáin. Cuir isteach an tAitheantóir anseo.
   you_will_need_to_create_a_web_application_in_the_g_43f753ec: |-
       Beidh ort aip gréasáin a chruthú sa [Google Developer Console](%{google_url}).
