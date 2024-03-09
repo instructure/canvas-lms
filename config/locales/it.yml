@@ -376,6 +376,7 @@ it:
   access_denied_f922a9ff: "Accesso negato"
   access_report_80d28095: "Report di accesso"
   access_reports_66128235: "Report di accesso"
+  access_to_faculty_journal_will_end_on_deprecationd_a0774848: "L’accesso al registro note terminerà il %{deprecationDate}. Contatta l’amministratore Canvas per qualsiasi domanda."
   access_to_these_tabs_requires_the_outcome_proficie_dd8ca732: "L’accesso a queste schede richiede le autorizzazioni Calcolo competenze risultato - Aggiungi/Modifica e Scale di padronanza degli esiti - Aggiungi/Modifica."
   access_token_3be22221: "Token di accesso"
   access_token_count_access_token_count_dfb5463c: "Conteggio token di accesso: %{access_token_count}"
@@ -2289,6 +2290,8 @@ it:
   added_mastery_level_dd4792d1: "Aggiungi livello padronanza"
   added_new_proficiency_rating_e30cab8a: "Aggiunta nuova valutazione livello di preparazione"
   added_outcome_title_3c258a9: "Risultato aggiunto %{title}"
+  adding_59cf55e2: Aggiunta
+  adding_efca307a: "Aggiunta in corso..."
   adding_rss_feed_f1202567: "Aggiungi feed RSS"
   adding_to_library_b552868: "Aggiunta alla libreria"
   additional_comments_9aed10bb: "Commenti aggiuntivi"
@@ -2365,6 +2368,9 @@ it:
   admins_3e1dce15: Amministratori
   admins_add_remove_26811ce5: "Amministratori - aggiungi/rimuovi"
   advanced_36b35b8: Avanzate
+  advanced_analytics_6a2419af: "Analisi avanzate"
+  advanced_analytics_ask_questions: "Abilita Analisi avanzate - Poni domande e l’autorizzazione correlata."
+  advanced_analytics_ask_questions_26553cd2: "Analisi analisi avanzate - Poni domande"
   advanced_analytics_course_readiness_and_students_i_6b3c439f: "Analisi avanzate - Disponibilità dei corsi e studenti che necessitano di attenzione"
   advanced_analytics_course_readiness_closed_alpha_13c8aaf: "Advanced Analytics - Alfa disponibilità corso chiusa"
   advertise_release_notes_via_the_ui_9254bc6c: "Annunciare le note sulla versione tramite l'interfaccia utente"
@@ -2564,6 +2570,7 @@ it:
       Consenti l'impostazione dell’invio dell’abbonamento agli eventi in diretta
       tramite HTTPS webhooks
   allow_lor_tools: "Consenti agli utenti di visualizzare e utilizzare strumenti esterni configurati per LOR."
+  allow_lti_tools_to_have_an_editor_button_icon_with_15c1342a: "Consenti agli strumenti LTI di avere un’icona del pulsante Editor senza posizionamento (usa icona strumento predefinita)"
   allow_migration_of_quizzes_during_course_copy_and__35d80756: "Consente la migrazione di quiz durante la copia e l’importazione di un corso"
   allow_moderator_to_review_multiple_independent_gra_c59d64f6: "Consenti al moderatore di rivedere più voti indipendenti per le consegne selezionate"
   allow_multiple_attempts_e67a0a37: "Consenti tentativi multipli"
@@ -2597,6 +2604,7 @@ it:
   allow_switching_to_the_new_assignments_page_9ac0ad93: "Consenti di passare alla pagina dei nuovi compiti"
   allow_teachers_to_change_the_dates_on_a_set_of_ass_4d48baec: "Consenti a insegnanti di cambiare le date su una serie di compiti in un solo step"
   allow_the_ability_to_send_notifications_through_ou_13cc8537: "Consenti l'invio delle notifiche attraverso la nostra coda di invio"
+  allow_the_item_banks_share_with_subaccounts_permis_a8a6e87f: "Consenti autorizzazione \"Banche degli elementi - Condividi con subaccount\""
   allow_this_tool_to_access_the_ims_names_and_role_p_33e16d7f: "Consenti a questo strumento di accedere ai nomi IMS e al servizio di provisioning dei ruoli"
   allow_to_clone_alignments_after_the_course_copy_pr_2f3a6421: "Consenti clonare allineamenti dopo il processo di copia del corso"
   allow_unconfirmed_e_mail_addresses_when_adding_use_47b7d5a2: "Consenti indirizzi e-mail non confermati quando aggiungi gli utenti"
@@ -2611,6 +2619,7 @@ it:
   allowed_for_subaccounts_courses_default_on_e485ec7f: "Consentito per i subaccount/corsi, impostazione predefinita on"
   allows_a_grader_to_grade_discussions_as_they_read_e5af3b34: "Consente a un valutatore di valutare le discussioni quando vengono lette"
   allows_a_user_to_access_the_act_as_user_link_on_st_7d3e3e3d: "Consente a un utente di accedere al link Agisci come utente nelle schede del contesto dello studente"
+  allows_a_user_to_manage_sharing_of_item_banks_with_d107172f: "Consente a un utente di gestire la condivisione delle banche degli elementi con subaccount."
   allows_a_user_to_view_and_manage_all_item_banks_in_9368284f: "Consente a un utente di visualizzare e gestire tutte le banche elementi in un account direttamente dall’interno di un corso e un account."
   allows_a_user_to_view_and_manage_all_item_banks_in_ae99d718: "Consente a un utente di visualizzare e gestire tutte le banche elementi in un account direttamente dall’interno di un corso."
   allows_a_user_to_view_the_sis_id_in_a_user_s_login_802288b9: "Consente a un utente di visualizzare l'ID SIS nei dettagli di accesso dell'utente."
@@ -2644,6 +2653,7 @@ it:
   allows_instructors_to_enable_anonymous_grading_for_b852c884: "Consenti agli istruttori di abilitare valutazioni anonime per i Nuovi corsi."
   allows_instructors_to_submit_file_attachments_on_b_e39f2ca8: "Consente agli istruttori di inviare gli allegati file per conto di uno studente."
   allows_learning_outcomes_to_be_selectable_when_mig_acf15555: "Consente di selezionare i risultati dell'apprendimento quando si migra il contenuto del corso"
+  allows_lti_tools_with_assignment_edit_placement_to_2be71949: "Consente di avviare gli strumenti LTI con posizionamento assignment_edit nella pagina Annunci"
   allows_modifying_notification_settings_for_any_cou_5004ac71: "Consente di modificare le impostazioni di notifica per il corso dalla pagina delle impostazioni di notifica a livello di account."
   allows_result_data_stored_in_the_outcomes_service__69c12c18: "Consente la visualizzazione dei dati sui risultati memorizzati nel Servizio Risultati nei report Canvas (report amministratore relativo a LMGB, sLMGB e risultati)."
   allows_setting_account_course_level_mastery_scales_1939e0fd: "Consente di impostare le scale di padronanza risultato di livello account e corso e i metodi di calcolo, sostituendo i criteri di valutazione per risultato e metodi di calcolo."
@@ -3762,6 +3772,7 @@ it:
   applying_new_styles_to_subaccounts_e8aeeef2: "Applicazione di nuovi stile ai subaccount"
   applying_please_be_patient_f7b5f244: "Attendi. Applicazione in corso"
   applying_score_to_ungraded_7311df9a: "Applicazione del punteggio ai non valutati"
+  appname_details_be277e5d: "Dettagli %{appName}"
   appointment_group: 
     errors: 
       invalid_end_at: "L'ora di fine dell'appuntamento precede l'ora di inizio"
@@ -3841,6 +3852,7 @@ it:
   are_you_sure_you_want_to_delete_this_planner_item_b71e330c: "Vuoi eliminare questo elemento dell'agenda?"
   are_you_sure_you_want_to_delete_this_recording_a4aab14b: "Vuoi eliminare questa registrazione?"
   are_you_sure_you_want_to_delete_this_rubric_any_co_29d7ac76: "Vuoi eliminare questa rubrica? Qualsiasi corso attualmente associato a questa rubrica avrà ancora accesso alla rubrica, ma i nuovi corsi non potranno utilizzarla."
+  are_you_sure_you_want_to_delete_this_rubric_f1c9eaa2: "Vuoi eliminare questa rubrica?"
   are_you_sure_you_want_to_delete_this_rubric_this_a_d4ff43c7: "Vuoi eliminare questa rubrica? Questa azione rimuoverà questa associazione della rubrica da tutti i compiti nel corso corrente ed eliminerà tutte le valutazioni associate esistenti."
   are_you_sure_you_want_to_delete_this_setting_be350e82: "Eliminare questa impostazione?"
   are_you_sure_you_want_to_delete_this_to_do_item_497016ea: "Vuoi eliminare questo elemento dell'elenco di attività?"
@@ -3856,6 +3868,7 @@ it:
   are_you_sure_you_want_to_display_grades_for_this_a_c1c618c6: "Vuoi mostrare i voti per questo compito agli studenti?"
   are_you_sure_you_want_to_do_this_it_cannot_be_undo_3379a544: "Vuoi eseguire questa operazione? L'azione non può essere annullata e sostituirà i voti esistenti nel registro dei voti."
   are_you_sure_you_want_to_duplicate_this_grading_sc_d97f78cc: "Duplicare questo schema di valutazione?"
+  are_you_sure_you_want_to_duplicate_this_rubric_b8d7aefa: "Vuoi duplicare questa rubrica?"
   are_you_sure_you_want_to_permanently_remove_the_us_e6b84ce0: "Vuoi rimuovere definitivamente l'utente da TUTTI gli account?"
   are_you_sure_you_want_to_post_grades_for_this_assi_bafe5753: "Vuoi pubblicare i voti per questo compito per gli studenti?"
   are_you_sure_you_want_to_proceed_changes_you_made__2f87f0e7: "Procedere? Le modifiche apportate non saranno salvate."
@@ -3894,6 +3907,7 @@ it:
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: "Mentre digiti in questo campo, l'elenco dei gruppi viene automaticamente filtrato per includere solo quelli con nomi corrispondenti al tuo input."
   as_you_type_in_this_field_the_list_of_results_will_c1a1a3e4: "Mentre digiti in questo campo, l'elenco dei risultati viene automaticamente aggiornato."
   ascending_b3c87427: "In ordine crescente"
+  ask_questions_f6b301fe: "Poni domande"
   ask_your_instructor_a_question_a61ca5e9: "Fai una domanda al tuo istruttore"
   assess_and_survey_your_students_ce8172a9: "Valuta ed esamina i tuoi studenti"
   assess_student_understanding_1e0b8d7f: "Valuta la comprensione degli studenti"
@@ -9185,6 +9199,9 @@ it:
   current_volume_level_c55ab825: "Livello di volume corrente"
   currently_assigned_to_tokenname_click_to_remove_5a853a84: "Attualmente assegnato %{tokenName}. Fai clic per rimuovere"
   currently_selected_color_93f44b9f: "Colore attualmente selezionato"
+  currently_student_analysis_report_csv_format_is_av_4e24fa59: |-
+      Attualmente, il report di analisi studenti (formato CSV)
+              è disponibile tramite Quiz classici.
   currently_the_add_remove_students_permission_overr_fcd0f6bc: "Attualmente, l’autorizzazione Aggiungi/Rimuovi studenti sostituisce l’autorizzazione di gruppo. La gestione degli osservatori tramite l’autorizzazione studenti alla fine sarà rimossa."
   currently_visible_to_e2f85345: "Attualmente visibile a"
   curso_f0ee9b5: Curso
@@ -9506,6 +9523,7 @@ it:
   delete_alignment_f33c97d5: "Elimina allineamento"
   delete_all_other_course_content_721e0ae3: "Elimina tutti gli altri contenuti del corso"
   delete_announcement_title_756a9d1f: "Elimina annuncio %{title}"
+  delete_appname_token_4f712df9: "Elimina token %{appName}"
   delete_assignment_5d3f3f15: "elimina assegnazione"
   delete_assignment_group_7c3b01c4: "Elimina gruppo di compiti"
   delete_assignment_name_deec56e3: "Elimina compito %{name}"
@@ -9565,6 +9583,7 @@ it:
   delete_requirement_item_type_d7453a69: "Elimina requisito %{item} (%{type})"
   delete_role_label_succeeded_1690aa28: "Eliminazione ruolo %{label} riuscita"
   delete_rubric_9b66412d: "Elimina rubrica"
+  delete_rubric_modal_f2e85b85: "Elimina modale rubrica"
   delete_rubric_title_ac3a24e6: "Elimina rubrica: %{title}"
   delete_section_name_a48d9d79: "Elimina sezione \"%{name}\""
   delete_selected_a023ccf8: "Elimina selezionato"
@@ -9702,6 +9721,7 @@ it:
   deployment_id_for_toolname_app_e54a7364: "ID implementazione per app %{toolName}"
   deprecate_sms_be6b00a: "Ritira SMS"
   deprecated_59e99d2a: Obsoleto
+  deprecated_tool_5bd97988: "Strumento superato"
   deprioritize_section_overrides_for_nonactive_enrol_9aa72d60: "Rimuovi priorità dalle sostituzioni di sezione per le iscrizioni non attive"
   desc_12ad2869: "%{desc}"
   descending_b7828162: "In ordine decrescente"
@@ -10253,6 +10273,7 @@ it:
   display_as_percentage_3e755dc: "Visualizza come percentuale"
   display_as_points_63084235: "Visualizza come punti"
   display_course_catalog: "Mostra un elenco di corsi disponibile per la ricerca in questo account radice con il flag \"Includi questo corso nell'indice dei corsi pubblico\" abilitato."
+  display_e6546241: Visualizza
   display_filter_options_34fb6be2: "Visualizza opzioni filtro"
   display_grade_as_7b5376a6: "Visualizza voto come"
   display_grades_as_points_percentages_complete_inco_fa848380: |-
@@ -10336,6 +10357,7 @@ it:
   don_t_move_lti_query_params_to_post_body_5c80e037: "Non spostare i parametri di query LTI nel corpo POST"
   don_t_post_outcomes_results_to_learning_mastery_gr_d0b85a19: "Non pubblicare gli esiti nel registro dei livelli di padronanza delle competenze"
   don_t_show_again_8c7b7297: "Non mostrarlo di nuovo"
+  don_t_show_this_again_2c3ba281: "Non mostrarlo di nuovo"
   done_54e3d4b6: Fatto
   done_8af51c9b: Fatto.
   done_editing_9f7379d9: "Modifica terminata"
@@ -10472,7 +10494,9 @@ it:
   duplicate_name_dd0c8801: "Duplica %{name}"
   duplicate_provider_provider_d9842134: "Duplica provider %{provider}"
   duplicate_quiz_name_79fdcb3e: "Duplica il Quiz %{name}"
+  duplicate_rubric_modal_5da8dd0e: "Duplica modale rubrica"
   duplicate_this_module_79ca8243: "Duplica questo modulo"
+  duplicate_title_c5157fcc: "Duplica %{title}"
   duplicating_calendar_events_9932cd37: "Duplicazione eventi del calendario"
   duplicating_module_9727f5e4: "Duplicazione modulo in corso..."
   duplicating_module_ae6670b0: "Duplicazione modulo"
@@ -10529,6 +10553,7 @@ it:
   edit_comment_comment_e74afa04: "Modifica commento: %{comment}"
   edit_comment_ed0f05b3: "Modifica commento"
   edit_conference_title_6e234815: "Modifica \"%{conference_title}\""
+  edit_conference_title_91360c08: "Modifica %{conference_title}"
   edit_course_files_d046ef82: "Modifica file corso"
   edit_course_role_3b992fc2: "Modifica ruolo corso"
   edit_course_templates_7e12613: "Modifica modelli corsi"
@@ -10632,6 +10657,7 @@ it:
   edited_editedtimingdisplay_85d8f1db: "%{editedTimingDisplay} modificato"
   edited_editedtimingdisplay_8788890e: ", modificato %{editedTimingDisplay}"
   editing_an_announcement_will_create_a_notification_cbb5377a: "La modifica di un annuncio creerà una notifica nella Dashboard utente e nel Flusso attività corsi. Se desideri che gli utenti ricevano i propri annunci modificati tramite le impostazioni relative alle notifiche, dovrai creare un nuovo annuncio."
+  editing_is_limited_for_this_rubric_as_it_has_alrea_a3f4b6a0: "La modifica è limitata per questa rubrica poiché è già stata utilizzata per la valutazione."
   editing_permissions_for_name_3503e235: "Modifica autorizzazioni per: %{name}"
   editor: 
     alt_text: "Testo alternativo:"
@@ -11311,6 +11337,7 @@ it:
   error_duplicating_module_4b023042: "Errore durante la duplicazione del modulo"
   error_during_group_creation_f232994b: "Errore durante la creazione di gruppi"
   error_embedding_content_from_tool_49bb698e: "Errore durante l’incorporamento del contenuto dallo strumento"
+  error_exporting_gradebook_b6558e60: "Errore di esportazione registro dei voti"
   error_exporting_gradebook_msg_6ea31e2f: "Errore durante l'esportazione del registro dei voti: %{msg}"
   error_fetching_access_token_1445a9e3: "Errore durante il recupero del token di accesso"
   error_fetching_rubric_data_66432f54: "Errore di recupero dati rubrica"
@@ -11689,7 +11716,9 @@ it:
   extreme_critical_emergency_80b3dbda: "EMERGENZA CRITICA."
   faculty_journal_5634938e: "Registro note"
   faculty_journal_deprecation_1f18f7ab: "Ritiro registro note"
+  faculty_journal_has_been_deprecated_70c65772: "Il registro note è superato!"
   faculty_journal_manage_entries_efc09599: "Giornale della facoltà - gestisci voci"
+  faculty_journal_will_be_discontinued_on_deprecatio_d5d1e8b3: "Il registro note sarà dismesso il %{deprecationDate}."
   fail_62dbb06a: "non riuscito"
   failed_276786d: "Non riuscito"
   failed_307449e1: "Non riuscito:"
@@ -12200,6 +12229,7 @@ it:
   friday_2c4f6d5a: Venerdì
   friendly_description_57f7fdde: Descrizione
   friendly_description_for_parent_student_display_e608ecf3: "Descrizione (per visualizzazione genitore/studente)"
+  friendly_description_is_too_long_maximum_is_255_ch_c65d0a34: "La descrizione è troppo lunga (il massimo è 255 caratteri)"
   friendly_name_601153fb: "Nome descrittivo"
   friendly_panda_3a0df50e: "Panda facile da usare"
   from_8187f4fb: "Da:"
@@ -13702,6 +13732,7 @@ it:
   i_ll_create_groups_later_673c78da: "Creerò dei gruppi successivamente"
   i_ll_write_free_form_comments_when_assessing_stude_5cf50d06: "Scriverò commenti in formato libero durante la valutazione degli studenti"
   i_need_some_help_but_it_is_not_urgent_d967ea0a: "Ho bisogno di aiuto ma non è urgente"
+  i_understand_5c85e920: "Ho capito"
   i_understand_continue_a8261425: "Comprendo, continua"
   i_understand_the_risks_of_this_action_fb257656: "Ho compreso i rischi di questa azione"
   iceland_354_1a03c558: "Islanda (+354)"
@@ -13836,6 +13867,7 @@ it:
       Se abilitato, gli endpoint oEmbed richiedono un
       token generato da uno strumento per verificare l’origine
       di una richieste di risorsa oEmbed.
+  if_enabled_pages_will_use_the_new_instui_headers_44a42c92: "Se abilitato, le pagine utilizzeranno le nuove intestazioni InstUI"
   if_enabled_prefills_the_assignment_form_with_value_edb8ebda: "Se abilitato, compila in anteprima il modulo del compito con i valori derivati dai messaggi di deep linking sulla pagina di creazione/modifica compito."
   if_enabled_query_parameters_will_not_be_copied_to__4c6ed625: "Se questa opzione è abilitata, i parametri di query non verranno copiati nel corpo della richiesta POST durante l'avvio di LTI."
   if_enabled_root_accounts_and_subaccounts_will_see__84cd42e5: |-
@@ -14015,6 +14047,8 @@ it:
   if_this_permission_is_disabled_users_can_still_cre_76a2d4b8: "Se questa autorizzazione è disattivata, gli utenti possono comunque creare o aggiungere rubriche ai compiti se l'autorizzazione Compiti e quiz - Aggiungi/Modifica/Elimina è abilitata."
   if_this_permission_is_disabled_users_can_still_ins_4e3cef83: "Se questa autorizzazione è disattivata, gli utenti possono comunque installare le app approvate tramite il Canvas App Center (se abilitato per l'istituto). Inoltre, se questa autorizzazione è disattivata, gli utenti non possono eliminare le app esterne aggiunte manualmente."
   if_this_permission_is_disabled_users_can_still_ins_e9c4269f: "Se questa autorizzazione è disattivata, gli utenti possono comunque installare le app approvate tramite il Canvas App Center (se abilitato per l'istituto)."
+  if_this_permission_is_disabled_users_cannot_share__72d86ee6: "Se questa autorizzazione è disabilitata, gli utenti non possono condividere le banche degli elementi con i subaccount. Quando a un utente con un ruolo di amministratore si concede questa autorizzazione, l’utente può condividere le banche degli elementi con i subaccount che amministra."
+  if_this_permission_is_disabled_users_cannot_share__be8b1061: "Se questa autorizzazione è disabilitata, gli utenti non possono condividere le banche degli elementi con i subaccount. Quando a un utente con un ruolo di corso si concede questa autorizzazione, l’utente può condividere le banche degli elementi con i subaccount a cui è associato."
   if_this_permission_is_enabled_and_courses_view_lis_cdf22691: "Se questa autorizzazione è abilitata e l'opzione Corsi - Visualizza elenco è disattivata, gli utenti possono aggiungere un nuovo corso con il pulsante Aggiungi un nuovo corso in Impostazioni account."
   if_this_permission_is_enabled_and_if_users_view_pr_9ba99d6: "Se questa autorizzazione è abilitata e l'opzione Utenti - Visualizza indirizzo e-mail principale è disabilitata, gli utenti visualizzeranno l'indirizzo e-mail utilizzato come ID di accesso."
   if_this_permission_is_enabled_but_blueprint_course_ccc15486: "Se questa autorizzazione è abilitata, ma Modelli di corso di base - Aggiungi/Modifica/Associa/Elimina non è abilitato, gli utenti possono ancora sincronizzare i Modelli di corso di base e visualizzare la cronologia della sincronizzazione."
@@ -14100,6 +14134,7 @@ it:
   import_anyway_8c996ef6: "Importa comunque"
   import_assessment_as_new_quizzes_help_icon_3e49480f: "Importa valutazione come icona della Guida di New Quizzes"
   import_assessment_as_new_quizzes_help_modal_918a543d: "Importa valutazione come modale della Guida di New Quizzes"
+  import_blueprint_course_settings_f6195365: "Importa impostazioni del Modello di corso di base"
   import_commons_favorites_e68fce81: "Importa preferiti Commons"
   import_content_b2fd6620: "Importa contenuto"
   import_course_student_groups_by_csv_d2cde97d: "Importa gruppi di studenti del corso tramite csv"
@@ -14174,6 +14209,7 @@ it:
   in_class_23eeca38: "In classe"
   in_closed_grading_period_dc717846: "Nel periodo di valutazione chiuso"
   in_less_than_a_minute_c8595a28: "tra meno di un minuto"
+  in_listheading_dd5acd48: " tra %{listHeading}"
   in_order_to_complete_the_process_you_will_be_redir_83376e10: "Per completare il processo, verrai reindirizzato a una pagina di accesso in cui devi effettuare l'accesso con le credenziali dell'elemento secondario."
   in_order_to_import_a_large_quantity_of_outcomes_at_c0d587e3: "Per importare più esiti contemporaneamente o aggiornare gli esiti esistenti, *segui il formato CSV*."
   in_product_training_walkthrough_and_tourpoints_for_2e185119: "Percorso di formazione dedicato ai prodotti e tour per gli insegnanti"
@@ -14588,6 +14624,7 @@ it:
   item_5bd51103: Elemento
   item_banks_1db48044: "Banche elementi"
   item_banks_manage_account_e8040580: "Banche elementi - Gestisci account"
+  item_banks_share_with_subaccounts_1374caab: "Banche degli elementi - Condividi con subaccount"
   item_cannot_be_duplicated_cebf3109: "Impossibile duplicare l'elemento"
   item_category_category_icon_for_item_name_item_nam_ff2b97f0: "Icona categoria %{item_category} per nome elemento %{item_name}"
   item_complete_d334fd43: "(Elemento completato)"
@@ -17672,6 +17709,7 @@ it:
   missing_required_ratings_9b19e66: "Valutazioni richieste mancanti"
   missing_required_title_ca06a6de: "Titolo richiesto mancante"
   missing_required_values_missing_values_f3be2ff8: "Valori obbligatori mancanti: %{missing_values}"
+  missing_sections_warning_fecaaade: "Avvertenza per sessioni mancanti"
   missing_submission_ec204c33: "Consegna mancante"
   missing_submission_grade_ed2756d1: "Voto consegna mancante"
   missing_submission_grade_must_be_between_0_and_100_ae0dd8bd: "Il voto della consegna mancante deve essere compreso tra 0 e 100"
@@ -18191,6 +18229,7 @@ it:
   new_quizzes_public_api_quiz_items_16bc741d: "API pubblica Nuovi quiz: Elementi quiz"
   new_quizzes_service_jwt_refresh_ca28ca8: "Aggiornamento JWT servizio per nuovi quiz"
   new_quizzes_site_admin_service_user_a331233a: "Utente del servizio amministratore sito nuovi quiz"
+  new_quizzes_subaccount_sharing_permission_1c296735: "Autorizzazione di condivisione subaccount Nuovi quiz"
   new_quizzes_submission_274b5c57: "Invio nuovi quiz"
   new_quizzes_submission_history_d81b477b: "Cronologia degli invii  di New Quizzes"
   new_quizzes_support_for_modules_7b81eee9: "Supporto Nuovi quiz per Moduli"
@@ -19556,6 +19595,7 @@ it:
   peer_services_102357e3: "Servizi tra pari"
   peer_submissions_ready_for_review_availablecount_3ac80091: "Consegne tra pari pronte per la revisione: %{availableCount}"
   pending_3e506a5b: "In attesa"
+  pending_changes_3dcfed35: "Modifiche in attesa"
   pending_enforcement_eb32e3d: "In attesa di applicazione"
   pending_f1ed53c7: "in attesa"
   pending_message_2d9a8796: "In attesa: %{message}"
@@ -20184,6 +20224,7 @@ it:
         user_severity: "Livello gravità utente"
         username: "Nome utente"
   png_55cbb586: PNG
+  point_range_258f423b: "Intervallo punti"
   points_based_letter_grading_schemes_e65127d5: "Schemi di valutazione con voto in lettere basati sui punti"
   points_bb475533: Punti
   points_bceb5005: punti
@@ -20313,6 +20354,7 @@ it:
   preview_filename_f1b58572: "Anteprima %{filename}"
   preview_files_linked_in_the_rce_in_an_overlay_rath_92ef91d1: "Visualizza in anteprima i file collegati in RCE in una sovrapposizione piuttosto che in una nuova scheda browser."
   preview_removal_998101a9: "Rimozione anteprima"
+  preview_rubric_267b2a9d: "Visualizza rubrica in anteprima"
   preview_unavailable_aacd459a: "Anteprima non disponibile"
   preview_ungraded_as_0_e3b97df6: "Visualizza in anteprima non valutato come 0"
   preview_website_url_eb5b8a5f: "Anteprima url sito web"
@@ -22131,6 +22173,7 @@ it:
       alle persone che possono creare manualmente i corsi di mettere tali corsi in qualsiasi subaccount
       in cui abbiamo delle iscrizioni.
   rating_description_db6adf39: "Descrizione valutazione"
+  rating_display_b0b574be: "Display valutazione"
   rating_max_score_eade1523: "Punteggio massimo valutazione"
   rating_min_score_3d35a762: "Punteggio minimo valutazione"
   rating_name_6f633d52: "Nome valutazione"
@@ -22815,6 +22858,7 @@ it:
       read_roster: "Visualizza l'elenco degli utenti"
       send_messages: "Invia messaggi ai singoli membri del corso"
       send_messages_all: "Invia messaggi all'intera classe"
+      share_banks_with_subaccounts: "Condividi banche degli elementi con subaccount"
       suspend_accounts: "Sospendi account"
       temporary_enrollments_add: "Aggiungi iscrizioni temporanee"
       temporary_enrollments_delete: "Elimina iscrizioni temporanee"
@@ -22941,6 +22985,8 @@ it:
   rubric_criterion_modal_32377665: "Modale criterio rubrica"
   rubric_criterion_range_12499bf1: "Intervallo criterio rubrica"
   rubric_deleted_3d9efc18: "Rubrica eliminata"
+  rubric_deleted_successfully_4421ff6e: "Rubrica eliminata correttamente"
+  rubric_duplicated_successfully_952ece8: "Rubrica duplicata correttamente"
   rubric_enhancements_73bf351c: "Miglioramenti rubrica"
   rubric_fc39da76: Rubrica
   rubric_name_e11b76de: "Nome rubrica"
@@ -23071,6 +23117,7 @@ it:
   saving_custom_status_name_e1b66f6e: "Salvataggio stato personalizzato %{name}"
   saving_d55dd90e: "Salvataggio in corso..."
   saving_dates_2472a539: "Salvataggio date"
+  saving_discussion_topic_a3cb589e: "Salvataggio argomento di discussione"
   saving_draft_c97afab3: "Salvataggio bozza"
   saving_group_230707e6: "Salvataggio del gruppo"
   saving_key_921f302b: "Salvataggio chiave"
@@ -24869,6 +24916,7 @@ it:
   speedgrader_de0affa6: SpeedGrader
   speedgrader_settings_4195099b: "SpeedGrader Impostazioni"
   speedgrader_settings_c9503705: "Impostazioni SpeedGrader"
+  speedgrader_studio_media_capture_3fd8aa93: "Acquisizione supporti multimediali Studio SpeedGrader"
   speedgrader_tm_44688790: SpeedGrader™
   split_74c03348: Dividi
   split_merged_users_6b81c595: "Dividi utenti uniti"
@@ -26309,6 +26357,8 @@ it:
   there_was_an_error_checking_plan_publishing_status_e7edfd25: "Si è verificato un errore di controllo dello stato di pubblicazione piano."
   there_was_an_error_creating_a_new_filter_e93bb765: "Si è verificato un errore durante la creazione di un nuovo filtro."
   there_was_an_error_deleting_name_aa3050e5: "Si è verificato un errore durante l'eliminazione di “%{name}”."
+  there_was_an_error_deleting_the_rubric_ffbb1f85: "Si è verificato un errore durante l’eliminazione della rubrica."
+  there_was_an_error_duplicating_the_rubric_16bb6a02: "Si è verificato un errore durante la duplicazione della rubrica."
   there_was_an_error_exporting_the_gradebook_30f4a95: "Si è verificato un errore durante l'esportazione del registro dei voti"
   there_was_an_error_fetching_assignment_groups_data_bdb14b5a: "Si è verificato un errore durante il recupero dei dati dei gruppi di compiti."
   there_was_an_error_fetching_course_statistics_96e9dbad: "Si è verificato un errore durante il riporto delle statistiche del corso"
@@ -26557,6 +26607,7 @@ it:
                                   Prima dell’abilitazione per un istituto, assicurarsi di comprendere completamente
                                   la funzionalità e i possibili impatti sugli utenti.
   this_feature_provides_a_new_speedgrader_platform_e_e7d740bd: "Questa funzione fornisce una nuova esperienza con piattaforma SpeedGrader."
+  this_feature_provides_the_ability_to_capture_media_918c06c6: "Questa funzione fornisce la capacità di acquisire i supporti multimediali in SpeedGrader usando l’Acquisizione schermo Studio."
   this_feature_provides_visual_and_functional_enhanc_e5e57a21: "Questa funzione fornisce miglioramenti visivi e funzionali alle rubriche in Canvas."
   this_feature_will_hide_all_quantitative_values_fro_6f006665: "Questa funzione nasconderà la visualizzazione di tutti i valori quantitativi agli utenti"
   this_ff_is_for_development_purposes_only_and_shoul_f77938ba: "Questo FF serve solo per scopi di sviluppo e non deve essere regolato senza prima consultare il prodotto e la progettazione. Questo flag impedirà l’eliminazione dei risultati che hanno degli allineamenti all’interno del servizio risultati, utilizzato per Nuovi quiz."
@@ -28242,6 +28293,7 @@ it:
   uploading_19e8a4e7: Caricamento
   uploading_ee585874: "Caricamento in corso..."
   uploading_file_5c7e14fd: "Caricamento file"
+  uploading_file_fc4cbbc3: "Caricamento file"
   uploading_file_in_progress_5c09e0c9: "Caricamento file in corso"
   uploading_files_5ff8f4fd: "Caricamento file"
   uploading_files_9e39dbf9: "Caricamento file"
@@ -28292,6 +28344,7 @@ it:
   use_improved_placeholders_for_inserted_content_in__433adfaa: "Usare i segnaposto migliorati per i contenuti inseriti nell’RCE."
   use_instui_for_the_course_import_page_1906ef55: "Utilizzare InstUI per la pagina di importazione corso"
   use_instui_for_tool_installation_and_configuration_36de63e9: "Usa InstUI per i moduli di installazione e configurazione strumento"
+  use_instui_new_headers_c7b09284: "Usa nuove intestazioni InstUI"
   use_internal_access_manager_8edb42a5: "Utilizza gestione accesso interno"
   use_mathman_to_convert_latex_to_mathml_680ef7b0: "Utilizzare MathMan per convertire LaTeX in MathML?"
   use_mathman_to_convert_latex_to_svg_3f61c9b: "Utilizzare MathMan per convertire LaTeX in SVG?"
@@ -29128,12 +29181,20 @@ it:
   when_adding_multiple_users_use_a_comma_or_line_bre_67f9c87d: "Quando aggiungi più utenti, utilizza una virgola o un'interruzione di linea per separare gli utenti."
   when_creating_a_reply_students_will_have_the_optio_716eb2f4: "Quando si crea una risposta, gli studenti avranno la possibilità di mostrare il loro nome e l’immagine del profilo o rimanere anonimi. Il tuo nome e la tua immagine profilo saranno visibili a tutti i membri del corso."
   when_creating_a_reply_you_will_have_the_option_to__8607ac10: "Quando si crea una risposta, avrai la possibilità di mostrare il tuo nome e l’immagine del profilo agli altri membri del corso o rimanere anonimo."
+  when_disabled_new_or_updated_contextexternaltool_i_27e19300: |-
+      Quando disabilitato, le installazioni ContextExternalTool nuove o aggiornate (compresi gli strumenti
+      LTI 1.3 aggiornati automaticamente a causa degli aggiornamenti alle chiavi sviluppatore)
+      avranno il loro editor_button posizionamento rimosso se non vi è icon_url o
+      canvas_icon_class fornito nelle impostazioni (comportamento tradizionale). Quando abilitato,
+      il posizionamento non viene rimosso, quindi gli strumenti senza icone mostreranno un’icona
+      predefinita (con un colore / una lettera in base al nome strumento e all’ID strumento/chiave sviluppatore).
   when_disabled_students_can_still_send_individual_m_3bf396f2: "Quando è disattivato, gli studenti possono comunque inviare messaggi individuali ai docenti del corso, agli assistenti dei docenti del corso e agli studenti che appartengono agli stessi gruppi a livello di account."
   when_disabled_students_can_still_send_individual_m_567a911c: "Se l'opzione è disattivata, gli utenti possono comunque inviare singoli messaggi a insegnanti del corso, assistenti del corso e studenti che appartengono agli stessi gruppi a livello di account."
   when_enabled_accesstoken_reads_will_be_cached_usin_917f3375: "Quando abilitato, le letture AccessToken saranno messe in cache (tramite MultiCache) durante l’autenticazione della richiesta."
   when_enabled_allows_the_tables_on_the_developer_ke_530070d: |-
       Quando attivato, consente di ordinare e filtrare le tabelle nella pagina delle
       chiavi sviluppatore.
+  when_enabled_an_lti_tool_with_the_assignment_edit__cd60b1a0: "Quando abilitato, uno strumento LTI con il posizionamento assignment_edit sarà avviato nella pagina Annuncio."
   when_enabled_collect_internal_analytics_metrics_us_88e81ee5: "Quando abilitato, raccogliere le metriche di analisi interne usando un sistema distribuito."
   when_enabled_it_deprecates_the_short_message_servi_18c6ee3f: "Se abilitato, ritira il servizio di messaggio breve (SMS)."
   when_enabled_lti_1_1_speedgrader_launches_will_set_47dcded1: |-
