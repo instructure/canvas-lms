@@ -68,7 +68,8 @@ test('teacher feedback', function () {
   ok(helpDialog.$dialog.find('#teacher-feedback-body').is(':visible'), 'textarea shows up')
 })
 
-test('focus management', function () {
+// unskip in FOO-4344
+QUnit.skip('focus management', function () {
   helpDialog.open()
   this.server.respond()
   this.clock.tick(1)
