@@ -463,7 +463,7 @@ export function buildStudentColumn(
     headerCssClass: 'primary-column student',
     id: columnId,
     object: {},
-    resizable: true,
+    resizable: false,
     type: columnId,
     width: studentColumnWidth,
   }
@@ -481,7 +481,7 @@ export function buildCustomColumn(customColumn: CustomColumn): GridColumn {
     id: columnId,
     object: {},
     maxLength: 255,
-    resizable: true,
+    resizable: false,
     type: 'custom_column',
     width: 100,
   }
