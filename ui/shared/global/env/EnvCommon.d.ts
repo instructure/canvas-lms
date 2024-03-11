@@ -102,6 +102,7 @@ export interface EnvCommon {
   disable_celebrations: boolean
   disable_keyboard_shortcuts: boolean
   LTI_LAUNCH_FRAME_ALLOWANCES: string[]
+  LTI_TOOL_SCOPES?: {[key: string]: string[]}
   DEEP_LINKING_POST_MESSAGE_ORIGIN: string
   comment_library_suggestions_enabled: boolean
   INCOMPLETE_REGISTRATION: boolean

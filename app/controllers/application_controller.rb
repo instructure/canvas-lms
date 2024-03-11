@@ -554,9 +554,28 @@ class ApplicationController < ActionController::Base
       hash[:description] = tool.submission_type_selection[:description]
     end
 
+    # Add the tool's postmessage scopes to the JS environment, if present.
+    # These are used to authorize access to certain postMessage APIs.
+    tool_postmessage_scopes = tool.developer_key&.scopes&.intersection(TokenScopes::LTI_POSTMESSAGE_SCOPES)
+    if tool_postmessage_scopes.present?
+      add_lti_tool_scopes_to_js_env(tool.launch_url(extension_type: type), tool_postmessage_scopes)
+    end
+
     hash
   end
   helper_method :external_tool_display_hash
+
+  def add_lti_tool_scopes_to_js_env(tool_url, tool_scopes)
+    return unless tool_url && tool_scopes
+
+    uri = URI.parse(tool_url)
+    origin = URI("#{uri.scheme}://#{uri.host}:#{uri.port}").to_s
+
+    js_env_scopes = js_env[:LTI_TOOL_SCOPES] || {}
+    js_env_scopes[origin] = tool_scopes
+
+    js_env[:LTI_TOOL_SCOPES] = js_env_scopes
+  end
 
   def k12?
     @domain_root_account&.feature_enabled?(:k12)
