@@ -134,4 +134,14 @@ module Login::Shared
   def delegated_auth_redirect_uri(uri)
     uri
   end
+
+  protected
+
+  def statsd_timeout_error
+    "auth.timeout_error"
+  end
+
+  def statsd_timeout_cutoff
+    "auth.timeout_cutoff"
+  end
 end
