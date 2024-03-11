@@ -63,7 +63,7 @@ export default class GradebookGrid {
       editable: this.options.editable,
       editorFactory: new CellEditorFactory(),
       enableCellNavigation: true,
-      enableColumnReorder: true,
+      enableColumnReorder: false,
       formatterFactory: this.options.formatterFactory,
       headerHeight: 38,
       numberOfColumnsToFreeze: this.gridData.columns.frozen.length,
