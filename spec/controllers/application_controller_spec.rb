@@ -1812,6 +1812,25 @@ RSpec.describe ApplicationController do
           expect(hash[:canvas_icon_class]).to eq "icon-#{setting}"
         end
       end
+
+      it "does not add tool postMessage scopes to the js_env" do
+        expect(controller).not_to receive(:add_lti_tool_scopes_to_js_env).with("http://example.com", [TokenScopes::LTI_PAGE_CONTENT_SHOW_SCOPE]).and_call_original
+
+        controller.external_tools_display_hashes(:account_navigation, @course)
+
+        expect(controller.js_env[:LTI_TOOL_SCOPES]).to be_nil
+      end
+
+      context "when external tool has postMessage scopes" do
+        it "adds tool scopes to the js_env" do
+          @tool.developer_key = DeveloperKey.create!(scopes: TokenScopes::LTI_POSTMESSAGE_SCOPES)
+          @tool.save!
+
+          controller.external_tools_display_hashes(:account_navigation, @course)
+
+          expect(controller.js_env[:LTI_TOOL_SCOPES]).to eq("http://example.com" => [TokenScopes::LTI_PAGE_CONTENT_SHOW_SCOPE])
+        end
+      end
     end
 
     describe "verify_authenticity_token" do

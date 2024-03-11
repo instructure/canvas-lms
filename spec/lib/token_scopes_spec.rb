@@ -57,6 +57,10 @@ describe TokenScopes do
       expect(TokenScopes.all_scopes).to include(*TokenScopes::LTI_HIDDEN_SCOPES.keys)
     end
 
+    it "includes the lti scopes" do
+      expect(TokenScopes.all_scopes).to include(*TokenScopes::LTI_SCOPES.keys)
+    end
+
     describe "generated_scopes" do
       let!(:generated_scopes) do
         TokenScopes.all_scopes - [
@@ -78,6 +82,14 @@ describe TokenScopes do
           expect(scope.include?("(.:format)")).to be false
         end
       end
+    end
+  end
+
+  describe "lti_scopes" do
+    # Make sure the LTI_POSTMESSAGE_SCOPES are also included in LTI_HIDDEN_SCOPES
+    # as this list is used to validate tool configurations.
+    it "includes the postMessage scopes" do
+      expect(TokenScopes::LTI_HIDDEN_SCOPES.keys).to include(*TokenScopes::LTI_POSTMESSAGE_SCOPES)
     end
   end
 end

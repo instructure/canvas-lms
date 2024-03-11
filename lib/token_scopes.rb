@@ -50,6 +50,7 @@ class TokenScopes
   LTI_LIST_ACCOUNT_EXTERNAL_TOOLS_SCOPE = "https://canvas.instructure.com/lti/account_external_tools/scope/list"
   LTI_SHOW_ACCOUNT_EXTERNAL_TOOLS_SCOPE = "https://canvas.instructure.com/lti/account_external_tools/scope/show"
   LTI_UPDATE_ACCOUNT_EXTERNAL_TOOLS_SCOPE = "https://canvas.instructure.com/lti/account_external_tools/scope/update"
+  LTI_PAGE_CONTENT_SHOW_SCOPE = "http://canvas.instructure.com/lti/page_content/show"
   LTI_SCOPES = {
     LTI_AGS_LINE_ITEM_SCOPE => I18n.t("Can create and view assignment data in the gradebook associated with the tool."),
     LTI_AGS_LINE_ITEM_READ_ONLY_SCOPE => I18n.t("Can view assignment data in the gradebook associated with the tool."),
@@ -60,6 +61,11 @@ class TokenScopes
     LTI_ACCOUNT_LOOKUP_SCOPE => I18n.t("Can lookup Account information"),
     LTI_AGS_SHOW_PROGRESS_SCOPE => I18n.t("Can view Progress records associated with the context the tool is installed in"),
   }.freeze
+  # These are scopes that are used to authorize postMessage calls
+  # Any scopes here also need to be added to LTI_SCOPES above
+  LTI_POSTMESSAGE_SCOPES = [
+    LTI_PAGE_CONTENT_SHOW_SCOPE
+  ].freeze
   LTI_AGS_SCOPES = [
     LTI_AGS_LINE_ITEM_SCOPE,
     LTI_AGS_LINE_ITEM_READ_ONLY_SCOPE,
@@ -80,6 +86,7 @@ class TokenScopes
     LTI_DESTROY_DATA_SERVICE_SUBSCRIPTION_SCOPE => I18n.t("Can destroy subscription to data service data."),
     LTI_LIST_EVENT_TYPES_DATA_SERVICE_SUBSCRIPTION_SCOPE => I18n.t("Can list categorized event types."),
     LTI_SHOW_FEATURE_FLAG_SCOPE => I18n.t("Can view feature flags"),
+    LTI_PAGE_CONTENT_SHOW_SCOPE => I18n.t("Can request page content using postMessage API."),
   }.freeze
 
   def self.named_scopes

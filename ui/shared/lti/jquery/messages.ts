@@ -49,9 +49,14 @@ const SUBJECT_ALLOW_LIST = [
   'lti.capabilities',
   'lti.get_data',
   'lti.put_data',
+  'lti.getPageContent',
   'requestFullWindowLaunch',
   'toggleCourseNavigationMenu',
 ] as const
+
+const SCOPE_REQUIRED_SUBJECTS: {[key: string]: string[]} = {
+  'lti.getPageContent': ['http://canvas.instructure.com/lti/page_content/show'],
+}
 
 type SubjectId = (typeof SUBJECT_ALLOW_LIST)[number]
 
@@ -63,6 +68,15 @@ const isIgnoredSubject = (subject: unknown): subject is SubjectId =>
 
 const isUnsupportedInRCE = (subject: unknown): subject is SubjectId =>
   typeof subject === 'string' && (UNSUPPORTED_IN_RCE as ReadonlyArray<string>).includes(subject)
+
+const toolIsAuthorized = (subject: string, tool_id: string) => {
+  const tool_scopes = ENV.LTI_TOOL_SCOPES?.[tool_id]
+  if (SCOPE_REQUIRED_SUBJECTS[subject]) {
+    return SCOPE_REQUIRED_SUBJECTS[subject].every(scope => tool_scopes?.includes(scope))
+  } else {
+    return true
+  }
+}
 
 // These are handled elsewhere so ignore them
 const SUBJECT_IGNORE_LIST = [
@@ -121,6 +135,7 @@ const handlers: Record<
   'lti.capabilities': () => import(`./subjects/lti.capabilities`),
   'lti.get_data': () => import(`./subjects/lti.get_data`),
   'lti.put_data': () => import(`./subjects/lti.put_data`),
+  'lti.getPageContent': () => import(`./subjects/lti.getPageContent`),
   requestFullWindowLaunch: () => import(`./subjects/requestFullWindowLaunch`),
   toggleCourseNavigationMenu: () => import(`./subjects/toggleCourseNavigationMenu`),
 }
@@ -172,6 +187,9 @@ async function ltiMessageHandler(e: MessageEvent<unknown>) {
     return false
   } else if (!isAllowedSubject(subject)) {
     responseMessages.sendUnsupportedSubjectError()
+    return false
+  } else if (!toolIsAuthorized(subject, e.origin)) {
+    responseMessages.sendUnauthorizedError()
     return false
   } else if (isUnsupportedInRCE(subject) && isFromRce) {
     // Since tools launched from within an active RCE are inside a nested
