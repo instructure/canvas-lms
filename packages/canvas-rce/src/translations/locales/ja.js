@@ -368,7 +368,7 @@ const locale = {
   },
   "files_c300e900": { "message": "ファイル" },
   "files_index_af7c662b": { "message": "ファイルのインデックス" },
-  "finish_bc343002": { "message": "フィニッシュ" },
+  "finish_bc343002": { "message": "完了" },
   "fix_heading_hierarchy_f60884c4": {
     "message": "見出しヒエアルキーを修正する"
   },
