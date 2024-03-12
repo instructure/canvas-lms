@@ -102,16 +102,235 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       add_guard_excessive_updates(table)
     end
 
-    # everything else is alphabetical,
-    # sometimes defining classes try to access
-    # this table def and it needs to exist first
-    create_table :settings do |t|
-      t.string :name, limit: 255, index: { unique: true }
-      t.text :value
+    # these tables are referenced the most, so it's nice to put them first so we
+    # don't have to defer creation of foreign keys to them
+    create_table :accounts do |t|
+      t.string :name, limit: 255
       t.timestamps precision: nil
-      t.boolean :secret, default: false, null: false
+      t.string :workflow_state, default: "active", null: false, limit: 255
+      t.timestamp :deleted_at
+      t.bigint :parent_account_id
+      t.string :sis_source_id, limit: 255
+      t.bigint :sis_batch_id, index: { where: "sis_batch_id IS NOT NULL" }
+      t.bigint :current_sis_batch_id
+      t.bigint :root_account_id, null: false
+      t.bigint :last_successful_sis_batch_id
+      t.string :membership_types, limit: 255
+      t.string :default_time_zone, limit: 255
+      t.string :external_status, default: "active", limit: 255
+      t.bigint :storage_quota
+      t.bigint :default_storage_quota
+      t.boolean :enable_user_notes, default: false
+      t.string :allowed_services, limit: 255
+      t.text :turnitin_pledge
+      t.text :turnitin_comments
+      t.string :turnitin_account_id, limit: 255
+      t.string :turnitin_salt, limit: 255
+      t.string :turnitin_crypted_secret, limit: 255
+      t.boolean :show_section_name_as_course_name, default: false
+      t.boolean :allow_sis_import, default: false
+      t.string :equella_endpoint, limit: 255
+      t.text :settings
+      t.string :uuid, limit: 255, index: { unique: true }
+      t.string :default_locale, limit: 255
+      t.text :stuck_sis_fields
+      t.bigint :default_user_storage_quota
+      t.string :lti_guid, limit: 255
+      t.bigint :default_group_storage_quota
+      t.string :turnitin_host, limit: 255
+      t.string :integration_id, limit: 255
+      t.string :lti_context_id, limit: 255, index: { unique: true }
+      t.string :brand_config_md5, limit: 32, index: { where: "brand_config_md5 IS NOT NULL" }
+      t.string :turnitin_originality, limit: 255
+      t.string :account_calendar_subscription_type,
+               default: "manual",
+               null: false,
+               limit: 255,
+               index: { where: "account_calendar_subscription_type <> 'manual'" }
+      t.bigint :latest_outcome_import_id, index: { where: "latest_outcome_import_id IS NOT NULL" }
+      t.references :course_template, index: { where: "course_template_id IS NOT NULL" }
+      t.boolean :account_calendar_visible, default: false, null: false
+      t.references :grading_standard, index: { where: "grading_standard_id IS NOT NULL" }
+
+      t.replica_identity_index
+      t.index [:name, :parent_account_id]
+      t.index [:parent_account_id, :root_account_id]
+      t.index [:sis_source_id, :root_account_id], where: "sis_source_id IS NOT NULL", unique: true
+      t.index [:integration_id, :root_account_id],
+              unique: true,
+              name: "index_accounts_on_integration_id",
+              where: "integration_id IS NOT NULL"
     end
 
+    create_table :cloned_items do |t|
+      t.bigint :original_item_id
+      t.string :original_item_type, limit: 255
+      t.timestamps precision: nil
+    end
+
+    create_table :courses do |t|
+      t.string :name, limit: 255
+      t.bigint :account_id, null: false, index: true
+      t.string :group_weighting_scheme, limit: 255
+      t.string :workflow_state, null: false, limit: 255
+      t.string :uuid, limit: 255, index: true
+      t.timestamp :start_at
+      t.timestamp :conclude_at
+      t.bigint :grading_standard_id
+      t.boolean :is_public
+      t.boolean :allow_student_wiki_edits
+      t.timestamps precision: nil
+      t.boolean :show_public_context_messages
+      t.text :syllabus_body, limit: 16_777_215
+      t.boolean :allow_student_forum_attachments, default: false
+      t.string :default_wiki_editing_roles, limit: 255
+      t.bigint :wiki_id, index: { where: "wiki_id IS NOT NULL" }
+      t.boolean :allow_student_organized_groups, default: true
+      t.string :course_code, limit: 255
+      t.string :default_view, limit: 255
+      t.bigint :abstract_course_id, index: { where: "abstract_course_id IS NOT NULL" }
+      t.bigint :root_account_id, null: false
+      t.bigint :enrollment_term_id, null: false, index: true
+      t.string :sis_source_id, limit: 255
+      t.bigint :sis_batch_id, index: { where: "sis_batch_id IS NOT NULL" }
+      t.boolean :open_enrollment
+      t.bigint :storage_quota
+      t.text :tab_configuration
+      t.boolean :allow_wiki_comments
+      t.text :turnitin_comments
+      t.boolean :self_enrollment
+      t.string :license, limit: 255
+      t.boolean :indexed
+      t.boolean :restrict_enrollments_to_course_dates
+      t.bigint :template_course_id, index: true
+      t.string :locale, limit: 255
+      t.text :settings
+      t.bigint :replacement_course_id
+      t.text :stuck_sis_fields
+      t.text :public_description
+      t.string :self_enrollment_code, limit: 255, index: { unique: true, where: "self_enrollment_code IS NOT NULL" }
+      t.integer :self_enrollment_limit
+      t.string :integration_id, limit: 255
+      t.string :time_zone, limit: 255
+      t.string :lti_context_id, limit: 255, index: { unique: true }
+      t.bigint :turnitin_id, unique: true
+      t.boolean :show_announcements_on_home_page
+      t.integer :home_page_announcement_limit
+      t.bigint :latest_outcome_import_id, index: { where: "latest_outcome_import_id IS NOT NULL" }
+      t.string :grade_passback_setting, limit: 255
+      t.boolean :template, default: false, null: false
+      t.boolean :homeroom_course, default: false, null: false, index: { where: "homeroom_course" }
+      t.boolean :sync_enrollments_from_homeroom, default: false, null: false, index: { where: "sync_enrollments_from_homeroom" }
+      t.references :homeroom_course, index: { where: "homeroom_course_id IS NOT NULL" }
+      t.timestamp :deleted_at, precision: 6
+
+      t.replica_identity_index
+      t.index [:sis_source_id, :root_account_id], where: "sis_source_id IS NOT NULL", unique: true
+      if (trgm = connection.extension(:pg_trgm)&.schema)
+        t.index "(
+            coalesce(lower(name), '') || ' ' ||
+            coalesce(lower(sis_source_id), '') || ' ' ||
+            coalesce(lower(course_code), '')
+          ) #{trgm}.gin_trgm_ops",
+                name: "index_gin_trgm_courses_composite_search",
+                using: :gin
+        t.index [:integration_id, :root_account_id],
+                unique: true,
+                name: "index_courses_on_integration_id",
+                where: "integration_id IS NOT NULL"
+      end
+    end
+
+    create_table :sis_batches do |t|
+      t.bigint :account_id, null: false
+      t.timestamp :ended_at
+      t.string :workflow_state, null: false, limit: 255
+      t.text :data
+      t.timestamps precision: nil
+      t.bigint :attachment_id, index: true
+      t.integer :progress
+      t.text :processing_errors, limit: 16_777_215
+      t.text :processing_warnings, limit: 16_777_215
+      t.boolean :batch_mode
+      t.bigint :batch_mode_term_id, index: { where: "batch_mode_term_id IS NOT NULL" }
+      t.text :options
+      t.bigint :user_id, index: { where: "user_id IS NOT NULL" }
+      t.timestamp :started_at
+      t.string :diffing_data_set_identifier, limit: 255
+      t.boolean :diffing_remaster
+      t.bigint :generated_diff_id
+      t.bigint :errors_attachment_id, index: true
+      t.integer :change_threshold
+      t.boolean :diffing_threshold_exceeded, default: false, null: false
+      t.bigint :job_ids, array: true, default: [], null: false
+
+      t.index [:account_id, :created_at], name: "index_sis_batches_account_id_created_at"
+      t.index %i[account_id diffing_data_set_identifier created_at],
+              name: "index_sis_batches_diffing"
+      t.index %i[account_id workflow_state created_at], name: "index_sis_batches_workflow_state_for_accounts"
+    end
+
+    create_table :users do |t|
+      t.string :name, limit: 255
+      t.string :sortable_name, limit: 255
+      t.string :workflow_state, null: false, limit: 255, index: true
+      t.string :time_zone, limit: 255
+      t.string :uuid, limit: 255, index: { unique: true, name: "index_users_on_unique_uuid" }
+      t.timestamps precision: nil
+      t.string :avatar_image_url, limit: 255
+      t.string :avatar_image_source, limit: 255
+      t.timestamp :avatar_image_updated_at
+      t.string :phone, limit: 255
+      t.string :school_name, limit: 255
+      t.string :school_position, limit: 255
+      t.string :short_name, limit: 255
+      t.timestamp :deleted_at
+      t.boolean :show_user_services, default: true
+      t.integer :page_views_count, default: 0
+      t.integer :reminder_time_for_due_dates, default: 172_800
+      t.integer :reminder_time_for_grading, default: 0
+      t.bigint :storage_quota
+      t.string :visible_inbox_types, limit: 255
+      t.timestamp :last_user_note
+      t.boolean :subscribe_to_emails
+      t.text :features_used
+      t.text :preferences
+      t.string :avatar_state, limit: 255
+      t.string :locale, limit: 255
+      t.string :browser_locale, limit: 255
+      t.integer :unread_conversations_count, default: 0
+      t.text :stuck_sis_fields
+      t.boolean :public
+      t.string :otp_secret_key_enc, limit: 255
+      t.string :otp_secret_key_salt, limit: 255
+      t.bigint :otp_communication_channel_id
+      t.string :initial_enrollment_type, limit: 255
+      t.integer :crocodoc_id
+      t.timestamp :last_logged_out
+      t.string :lti_context_id, limit: 255, index: { unique: true }
+      t.bigint :turnitin_id, index: { unique: true, where: "turnitin_id IS NOT NULL" }
+      t.text :lti_id, index: { unique: true, name: "index_users_on_unique_lti_id" }
+      t.string :pronouns
+      t.bigint :root_account_ids, array: true, null: false, default: []
+      t.references :merged_into_user,
+                   foreign_key: { to_table: :users },
+                   index: { where: "merged_into_user_id IS NOT NULL" }
+
+      t.replica_identity_index :root_account_ids
+      t.index [:avatar_state, :avatar_image_updated_at]
+      if (trgm = connection.extension(:pg_trgm)&.schema)
+        t.index "lower(name) #{trgm}.gin_trgm_ops", name: "index_gin_trgm_users_name", using: :gin
+        t.index "LOWER(short_name) #{trgm}.gin_trgm_ops", name: "index_gin_trgm_users_short_name", using: :gin
+        t.index "LOWER(name) #{trgm}.gin_trgm_ops",
+                name: "index_gin_trgm_users_name_active_only",
+                using: :gin,
+                where: "workflow_state IN ('registered', 'pre_registered')"
+      end
+      t.index "#{User.best_unicode_collation_key("sortable_name")}, id", name: "index_users_on_sortable_name"
+      t.index :id, where: "workflow_state <> 'deleted'", name: "index_active_users_on_id"
+    end
+
+    # everything else is alphabetical
     create_table :abstract_courses do |t|
       t.string :sis_source_id, limit: 255, index: true
       t.bigint :sis_batch_id, index: { where: "sis_batch_id IS NOT NULL" }
@@ -257,64 +476,6 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.bigint :root_account_id, null: false
 
       t.replica_identity_index
-    end
-
-    create_table :accounts do |t|
-      t.string :name, limit: 255
-      t.timestamps precision: nil
-      t.string :workflow_state, default: "active", null: false, limit: 255
-      t.timestamp :deleted_at
-      t.bigint :parent_account_id
-      t.string :sis_source_id, limit: 255
-      t.bigint :sis_batch_id, index: { where: "sis_batch_id IS NOT NULL" }
-      t.bigint :current_sis_batch_id
-      t.bigint :root_account_id, null: false
-      t.bigint :last_successful_sis_batch_id
-      t.string :membership_types, limit: 255
-      t.string :default_time_zone, limit: 255
-      t.string :external_status, default: "active", limit: 255
-      t.bigint :storage_quota
-      t.bigint :default_storage_quota
-      t.boolean :enable_user_notes, default: false
-      t.string :allowed_services, limit: 255
-      t.text :turnitin_pledge
-      t.text :turnitin_comments
-      t.string :turnitin_account_id, limit: 255
-      t.string :turnitin_salt, limit: 255
-      t.string :turnitin_crypted_secret, limit: 255
-      t.boolean :show_section_name_as_course_name, default: false
-      t.boolean :allow_sis_import, default: false
-      t.string :equella_endpoint, limit: 255
-      t.text :settings
-      t.string :uuid, limit: 255, index: { unique: true }
-      t.string :default_locale, limit: 255
-      t.text :stuck_sis_fields
-      t.bigint :default_user_storage_quota
-      t.string :lti_guid, limit: 255
-      t.bigint :default_group_storage_quota
-      t.string :turnitin_host, limit: 255
-      t.string :integration_id, limit: 255
-      t.string :lti_context_id, limit: 255, index: { unique: true }
-      t.string :brand_config_md5, limit: 32, index: { where: "brand_config_md5 IS NOT NULL" }
-      t.string :turnitin_originality, limit: 255
-      t.string :account_calendar_subscription_type,
-               default: "manual",
-               null: false,
-               limit: 255,
-               index: { where: "account_calendar_subscription_type <> 'manual'" }
-      t.bigint :latest_outcome_import_id, index: { where: "latest_outcome_import_id IS NOT NULL" }
-      t.references :course_template, index: { where: "course_template_id IS NOT NULL" }
-      t.boolean :account_calendar_visible, default: false, null: false
-      t.references :grading_standard, index: { where: "grading_standard_id IS NOT NULL" }
-
-      t.replica_identity_index
-      t.index [:name, :parent_account_id]
-      t.index [:parent_account_id, :root_account_id]
-      t.index [:sis_source_id, :root_account_id], where: "sis_source_id IS NOT NULL", unique: true
-      t.index [:integration_id, :root_account_id],
-              unique: true,
-              name: "index_accounts_on_integration_id",
-              where: "integration_id IS NOT NULL"
     end
 
     create_table :alerts do |t|
@@ -935,12 +1096,6 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.timestamps precision: nil
     end
 
-    create_table :cloned_items do |t|
-      t.bigint :original_item_id
-      t.string :original_item_type, limit: 255
-      t.timestamps precision: nil
-    end
-
     create_table :collaborations do |t|
       t.string :collaboration_type, limit: 255
       t.string :document_id, limit: 255
@@ -1475,79 +1630,6 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
               unique: true,
               where: "default_section = 't' AND workflow_state <> 'deleted'",
               name: "index_course_sections_unique_default_section"
-    end
-
-    create_table :courses do |t|
-      t.string :name, limit: 255
-      t.bigint :account_id, null: false, index: true
-      t.string :group_weighting_scheme, limit: 255
-      t.string :workflow_state, null: false, limit: 255
-      t.string :uuid, limit: 255, index: true
-      t.timestamp :start_at
-      t.timestamp :conclude_at
-      t.bigint :grading_standard_id
-      t.boolean :is_public
-      t.boolean :allow_student_wiki_edits
-      t.timestamps precision: nil
-      t.boolean :show_public_context_messages
-      t.text :syllabus_body, limit: 16_777_215
-      t.boolean :allow_student_forum_attachments, default: false
-      t.string :default_wiki_editing_roles, limit: 255
-      t.bigint :wiki_id, index: { where: "wiki_id IS NOT NULL" }
-      t.boolean :allow_student_organized_groups, default: true
-      t.string :course_code, limit: 255
-      t.string :default_view, limit: 255
-      t.bigint :abstract_course_id, index: { where: "abstract_course_id IS NOT NULL" }
-      t.bigint :root_account_id, null: false
-      t.bigint :enrollment_term_id, null: false, index: true
-      t.string :sis_source_id, limit: 255
-      t.bigint :sis_batch_id, index: { where: "sis_batch_id IS NOT NULL" }
-      t.boolean :open_enrollment
-      t.bigint :storage_quota
-      t.text :tab_configuration
-      t.boolean :allow_wiki_comments
-      t.text :turnitin_comments
-      t.boolean :self_enrollment
-      t.string :license, limit: 255
-      t.boolean :indexed
-      t.boolean :restrict_enrollments_to_course_dates
-      t.bigint :template_course_id, index: true
-      t.string :locale, limit: 255
-      t.text :settings
-      t.bigint :replacement_course_id
-      t.text :stuck_sis_fields
-      t.text :public_description
-      t.string :self_enrollment_code, limit: 255, index: { unique: true, where: "self_enrollment_code IS NOT NULL" }
-      t.integer :self_enrollment_limit
-      t.string :integration_id, limit: 255
-      t.string :time_zone, limit: 255
-      t.string :lti_context_id, limit: 255, index: { unique: true }
-      t.bigint :turnitin_id, unique: true
-      t.boolean :show_announcements_on_home_page
-      t.integer :home_page_announcement_limit
-      t.bigint :latest_outcome_import_id, index: { where: "latest_outcome_import_id IS NOT NULL" }
-      t.string :grade_passback_setting, limit: 255
-      t.boolean :template, default: false, null: false
-      t.boolean :homeroom_course, default: false, null: false, index: { where: "homeroom_course" }
-      t.boolean :sync_enrollments_from_homeroom, default: false, null: false, index: { where: "sync_enrollments_from_homeroom" }
-      t.references :homeroom_course, index: { where: "homeroom_course_id IS NOT NULL" }
-      t.timestamp :deleted_at, precision: 6
-
-      t.replica_identity_index
-      t.index [:sis_source_id, :root_account_id], where: "sis_source_id IS NOT NULL", unique: true
-      if (trgm = connection.extension(:pg_trgm)&.schema)
-        t.index "(
-            coalesce(lower(name), '') || ' ' ||
-            coalesce(lower(sis_source_id), '') || ' ' ||
-            coalesce(lower(course_code), '')
-          ) #{trgm}.gin_trgm_ops",
-                name: "index_gin_trgm_courses_composite_search",
-                using: :gin
-        t.index [:integration_id, :root_account_id],
-                unique: true,
-                name: "index_courses_on_integration_id",
-                where: "integration_id IS NOT NULL"
-      end
     end
 
     create_table :crocodoc_documents do |t|
@@ -3712,6 +3794,13 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.timestamps precision: nil
     end
 
+    create_table :settings do |t|
+      t.string :name, limit: 255, index: { unique: true }
+      t.text :value
+      t.timestamps precision: nil
+      t.boolean :secret, default: false, null: false
+    end
+
     create_table :shared_brand_configs do |t|
       t.string :name, limit: 255
       t.references :account, foreign_key: true
@@ -3742,35 +3831,6 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
 
       t.index %i[updated_workflow_state previous_workflow_state],
               name: "index_sis_batch_roll_back_context_workflow_states"
-    end
-
-    create_table :sis_batches do |t|
-      t.bigint :account_id, null: false
-      t.timestamp :ended_at
-      t.string :workflow_state, null: false, limit: 255
-      t.text :data
-      t.timestamps precision: nil
-      t.bigint :attachment_id, index: true
-      t.integer :progress
-      t.text :processing_errors, limit: 16_777_215
-      t.text :processing_warnings, limit: 16_777_215
-      t.boolean :batch_mode
-      t.bigint :batch_mode_term_id, index: { where: "batch_mode_term_id IS NOT NULL" }
-      t.text :options
-      t.bigint :user_id, index: { where: "user_id IS NOT NULL" }
-      t.timestamp :started_at
-      t.string :diffing_data_set_identifier, limit: 255
-      t.boolean :diffing_remaster
-      t.bigint :generated_diff_id
-      t.bigint :errors_attachment_id, index: true
-      t.integer :change_threshold
-      t.boolean :diffing_threshold_exceeded, default: false, null: false
-      t.bigint :job_ids, array: true, default: [], null: false
-
-      t.index [:account_id, :created_at], name: "index_sis_batches_account_id_created_at"
-      t.index %i[account_id diffing_data_set_identifier created_at],
-              name: "index_sis_batches_diffing"
-      t.index %i[account_id workflow_state created_at], name: "index_sis_batches_workflow_state_for_accounts"
     end
 
     create_table :sis_post_grades_statuses do |t|
@@ -4205,66 +4265,6 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.boolean :visible
 
       t.index [:id, :type]
-    end
-
-    create_table :users do |t|
-      t.string :name, limit: 255
-      t.string :sortable_name, limit: 255
-      t.string :workflow_state, null: false, limit: 255, index: true
-      t.string :time_zone, limit: 255
-      t.string :uuid, limit: 255, index: { unique: true, name: "index_users_on_unique_uuid" }
-      t.timestamps precision: nil
-      t.string :avatar_image_url, limit: 255
-      t.string :avatar_image_source, limit: 255
-      t.timestamp :avatar_image_updated_at
-      t.string :phone, limit: 255
-      t.string :school_name, limit: 255
-      t.string :school_position, limit: 255
-      t.string :short_name, limit: 255
-      t.timestamp :deleted_at
-      t.boolean :show_user_services, default: true
-      t.integer :page_views_count, default: 0
-      t.integer :reminder_time_for_due_dates, default: 172_800
-      t.integer :reminder_time_for_grading, default: 0
-      t.bigint :storage_quota
-      t.string :visible_inbox_types, limit: 255
-      t.timestamp :last_user_note
-      t.boolean :subscribe_to_emails
-      t.text :features_used
-      t.text :preferences
-      t.string :avatar_state, limit: 255
-      t.string :locale, limit: 255
-      t.string :browser_locale, limit: 255
-      t.integer :unread_conversations_count, default: 0
-      t.text :stuck_sis_fields
-      t.boolean :public
-      t.string :otp_secret_key_enc, limit: 255
-      t.string :otp_secret_key_salt, limit: 255
-      t.bigint :otp_communication_channel_id
-      t.string :initial_enrollment_type, limit: 255
-      t.integer :crocodoc_id
-      t.timestamp :last_logged_out
-      t.string :lti_context_id, limit: 255, index: { unique: true }
-      t.bigint :turnitin_id, index: { unique: true, where: "turnitin_id IS NOT NULL" }
-      t.text :lti_id, index: { unique: true, name: "index_users_on_unique_lti_id" }
-      t.string :pronouns
-      t.bigint :root_account_ids, array: true, null: false, default: []
-      t.references :merged_into_user,
-                   foreign_key: { to_table: :users },
-                   index: { where: "merged_into_user_id IS NOT NULL" }
-
-      t.replica_identity_index :root_account_ids
-      t.index [:avatar_state, :avatar_image_updated_at]
-      if (trgm = connection.extension(:pg_trgm)&.schema)
-        t.index "lower(name) #{trgm}.gin_trgm_ops", name: "index_gin_trgm_users_name", using: :gin
-        t.index "LOWER(short_name) #{trgm}.gin_trgm_ops", name: "index_gin_trgm_users_short_name", using: :gin
-        t.index "LOWER(name) #{trgm}.gin_trgm_ops",
-                name: "index_gin_trgm_users_name_active_only",
-                using: :gin,
-                where: "workflow_state IN ('registered', 'pre_registered')"
-      end
-      t.index "#{User.best_unicode_collation_key("sortable_name")}, id", name: "index_users_on_sortable_name"
-      t.index :id, where: "workflow_state <> 'deleted'", name: "index_active_users_on_id"
     end
 
     create_table :user_profiles do |t|
