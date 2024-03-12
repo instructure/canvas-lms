@@ -24,20 +24,14 @@ class AddCreatedByAndDeletedByToTemporaryEnrollmentPairings < ActiveRecord::Migr
   def change
     change_table :temporary_enrollment_pairings, bulk: true do |t|
       t.references :created_by,
-                   null: true,
-                   foreign_key: {
-                     to_table: :users
-                   },
+                   foreign_key: { to_table: :users },
                    index: {
                      algorithm: :concurrently,
                      if_not_exists: true
                    },
                    if_not_exists: true
       t.references :deleted_by,
-                   null: true,
-                   foreign_key: {
-                     to_table: :users
-                   },
+                   foreign_key: { to_table: :users },
                    index: {
                      algorithm: :concurrently,
                      if_not_exists: true
