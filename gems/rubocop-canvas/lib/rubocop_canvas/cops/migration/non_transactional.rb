@@ -33,7 +33,7 @@ module RuboCop
             @disable_ddl_transaction = true
           when :add_index
             check_add_index(node, args)
-          when :add_column, :add_column_and_fk, :add_foreign_key
+          when :add_column, :add_foreign_key
             check_add_column(node, args)
           when :add_reference
             check_add_index(node, args)
