@@ -23,17 +23,8 @@ class CreateInitialPartitions < ActiveRecord::Migration[7.0]
   def up
     [Auditors::ActiveRecord::AuthenticationRecord,
      Auditors::ActiveRecord::CourseRecord,
-     Auditors::ActiveRecord::GradeChangeRecord].each do |klass|
-      partman = CanvasPartman::PartitionManager.create(klass)
-      partman.create_initial_partitions
-      current_partition_time = Time.zone.now
-      Auditors::ActiveRecord::Partitioner.retention_months.times do
-        # we're going to backfill these from cassandra, so let's create them now
-        current_partition_time -= 1.send(klass.partitioning_interval)
-        partman.create_partition(current_partition_time, graceful: true)
-      end
-    end
-    [Auditors::ActiveRecord::FeatureFlagRecord,
+     Auditors::ActiveRecord::FeatureFlagRecord,
+     Auditors::ActiveRecord::GradeChangeRecord,
      Auditors::ActiveRecord::PseudonymRecord].each do |klass|
       CanvasPartman::PartitionManager.create(klass).create_initial_partitions
     end
