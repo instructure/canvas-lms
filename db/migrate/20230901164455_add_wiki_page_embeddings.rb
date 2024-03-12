@@ -24,6 +24,8 @@ class AddWikiPageEmbeddings < ActiveRecord::Migration[7.0]
   end
 
   def change
+    create_extension(:vector, if_not_exists: true, schema: "public")
+
     create_table :wiki_page_embeddings do |t|
       t.references :wiki_page, null: false, foreign_key: true
       t.column :embedding, "#{connection.extension("vector").schema}.vector", limit: 1536, null: false
