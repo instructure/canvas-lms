@@ -28,6 +28,22 @@ const ASSIGNMENT_QUERY = gql`
       id
       name
       pointsPossible
+      rubric {
+        _id
+        pointsPossible
+        criteria {
+          description
+          longDescription
+          points
+          ratings {
+            description
+            longDescription
+            points
+            _id
+            rubricId
+          }
+        }
+      }
     }
   }
 `
