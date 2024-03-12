@@ -4485,6 +4485,22 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       end
     end
 
+    unless Rails.env.production?
+      # this user is *not* used in production! it's only used to simulate a read-only secondary database in dev/test
+
+      # the user is cluster-wide ...
+      unless readonly_user_exists?
+        execute("CREATE USER canvas_readonly_user")
+      end
+
+      quoted_schema = connection.quote_local_table_name(Shard.current.name)
+
+      # ... but needs permissions on each shard's schema
+      execute("GRANT USAGE ON SCHEMA #{quoted_schema} TO canvas_readonly_user")
+      execute("GRANT SELECT ON ALL TABLES IN SCHEMA #{quoted_schema} TO canvas_readonly_user")
+      execute("ALTER DEFAULT PRIVILEGES IN SCHEMA #{quoted_schema} GRANT SELECT ON TABLES TO canvas_readonly_user")
+    end
+
     change_column :schema_migrations, :version, :string, limit: 255
 
     execute(<<~SQL.squish)
@@ -4623,6 +4639,10 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
         AND q.only_visible_to_overrides = 'true'
         AND ao.workflow_state = 'active'
     SQL
+  end
+
+  def readonly_user_exists?
+    !!connection.select_value("SELECT 1 AS one FROM pg_roles WHERE rolname='canvas_readonly_user'")
   end
 
   def down
