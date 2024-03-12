@@ -14,7 +14,7 @@ ja:
     feed_entry_title_with_course: "割り当て%{course}:%{assignment}"
     labels: 
       due: 期限
-    student_annotation: 受講者の注釈
+    student_annotation: ファイルへの書き込み
     submission_action_take_quiz: "受験: %{title}"
     submission_action_turn_in_assignment: "提出する%{title}"
     submission_types: 
@@ -4287,7 +4287,7 @@ ja:
     errors: 
       frozen_assignments_error: ロックされている課題のあるグループは削除できません。
   assignment_groups_bc9cc3c9: 課題グループ
-  assignment_groups_weight_2f1a5a7c: 課題グループ重量
+  assignment_groups_weight_2f1a5a7c: 課題グループの重み付け
   assignment_has_a_locked_date_due_date_cannot_be_se_2e2e3389: 課題にはロックされた日付があります。期日をロックされた日付の範囲外に設定することはできません。
   assignment_has_been_graded_for_name_4384f9b: "%{assignment}は %{name}と採点されました。"
   assignment_id_96baa1b7: "課題 ID"
@@ -4847,7 +4847,7 @@ ja:
         allow_text_entry: テキスト入力
         allow_url: "Web サイトの URL"
         allowed_extensions: 許可されるファイル拡張子
-        allows_annotated_document: 受講者の注釈
+        allows_annotated_document: ファイルへの書き込み
         restrict_file_extensions: "アップロードするファイル タイプを制限"
       online_entry_options: オンライン入力オプション
       submission_type: 提出物のタイプ
@@ -4868,7 +4868,7 @@ ja:
       instructions: 
         from_external_tool: そのツールから提供されるリソースを読み込みまたは提出するには、下記のリストからツールを選択してください。
         google_docs: 下のリストからファイルを選択します。
-        media_recording: "下のリンクを使用して、提出を記録します。完了して提出の準備ができたら、\"Save\" をクリックします。"
+        media_recording: "下のボタンを使用して記録します。完了して提出の準備ができたら、\"Save\" をクリックします。"
         online_text_entry: ここに提出物をコピーして貼り付けるか、または正確に入力してください。
         online_url: "この課題に対して、提出する Web サイトへのリンクをコピーして貼り付けます。"
       invalid_google_docs_domain: 無効なドメイン
@@ -6235,7 +6235,7 @@ ja:
   can_destroy_external_tools_cdb0e734: 外部ツールを破棄できます。
   can_destroy_subscription_to_data_service_data_b8dfca27: データサービスデータへのサブスクリプションを廃棄ことができます。
   can_edit_this_page_role_selection_6ccec3c7: このページの役割の選択を編集できます
-  can_interact_with_users_in_their_section_only_48cb8c43: セクション内のユーザーのみと対話することができます
+  can_interact_with_users_in_their_section_only_48cb8c43: 他のセクションのユーザーとのやり取りを許可しない
   can_list_categorized_event_types_52596f7: イベントタイプを分類して記載できます。
   can_list_external_tools_9132ad0f: 外部ツールを記載できます。
   can_list_subscriptions_to_data_service_data_b52d5e37: データサービスデータへのサブスクリプションをリストアップできます。
@@ -6934,7 +6934,7 @@ ja:
   comment_failed_to_post_please_try_again_later_e2d19a0a: コメントの掲示に失敗しました！後ほどもういちど試してください。
   comment_input_box_b8c7e58b: コメント入力ボックス
   comment_library_84735835: コメントライブラリ
-  comment_library_suggestions_disabled_ae04eb77: コメントライブラリ（提案は無効）
+  comment_library_suggestions_disabled_ae04eb77: コメントライブラリ（オフ）
   comment_submitted_d9934b: コメントを掲示しました！
   comment_suggestions_554a0dc6: コメントの提案
   comment_updated_2cd56fe2: コメントを更新
@@ -7328,7 +7328,7 @@ ja:
   confirmation_code_required_22984955: "確認コード (必須)"
   confirmation_failed_please_try_again_ae566d37: 確認に失敗しました。もう一度、試してください。
   confused_panda_questioning_what_to_do_next_42941484: 次に何をすべきか質問する「困惑したパンダ」
-  consider_selecting_multiple_submission_types_to_ac_f7e624d5: 注釈を作成できない可能性のある受講者に対応するために、複数の提出タイプを選択することを検討してください。
+  consider_selecting_multiple_submission_types_to_ac_f7e624d5: ファイルへの書き込みができない可能性のある受講者に対応するために、複数の提出タイプを選択することを検討してください。
   consistent_lti_ags_ids_based_on_account_s_principa_b93fa45: "アカウントの主なドメインに基づく一貫した LTI AGS ID"
   consortium_parent_keys_803547b: コンソーシアムペアレント（上位）キー
   consumer_key_57d9fcf1: コンシューマ鍵
@@ -8028,7 +8028,7 @@ ja:
   contexttype_notification_settings_d72acd58: "%{contextType}通知設定"
   continue_ac067716: 続行
   continue_draft_6166ea79: 下書きを続ける
-  continue_typing_to_find_additional_sections_or_stu_49786085: 更にタイプして、追加のセクションまたは生徒を見つける
+  continue_typing_to_find_additional_sections_or_stu_49786085: セクション名や生徒名を入力して検索する。
   contribute_4730e633: 投稿する
   contribute_to_the_page_2116bf3b: ページに投稿する
   contributed_to_this_module_item_and_is_complete_2799d5c: このモジュールアイテムに貢献し、完了しました
@@ -8663,7 +8663,7 @@ ja:
   course_activity_bfe11267: コースのアクティビティ
   course_activity_lewisville_72cef091: "コースアクティビティ - Lewisville"
   course_activity_report_74cfd58f: "コースアクティビティ レポート"
-  course_activity_stream_40091c17: "コースのアクティビティ ストリーム"
+  course_activity_stream_40091c17: コースの最近のアクティビティ
   course_add_edit_delete_101dde06: "コース - 追加/編集/削除"
   course_add_remove_students_8d03ba9d: "コース - 受講生の追加/削除"
   course_add_remove_teachers_course_designers_or_ta__d6aca35f: "コース - 講師、コースデザイナー、またはTAの追加/削除"
@@ -9109,7 +9109,7 @@ ja:
         new_announcement: 新規アナウンスメント
         view_course_calendar: コースカレンダーを表示
         view_course_notification_settings: コース通知を表示する
-        view_course_stream: "コース ストリームを表示"
+        view_course_stream: コースの最近のアクティビティを表示
     description: 
       links: 
         join_course: このコースに参加
@@ -13150,7 +13150,7 @@ ja:
   find_your_canvas_institution_45af99af: "あなたの%{canvas}教育機関を見つける"
   find_your_classes_or_subjects_in_the_dashboard_72e1ed47: クラスまたは科目は、ダッシュボード…
   finding_matched_jobs_f7cd0e6d: マッチするジョブを探す
-  finish_bc343002: フィニッシュ
+  finish_bc343002: 完了
   finished_19aaf6f5: 完了
   finished_publishing_pace_597ffc4f: ペース公開が終了しました
   finished_publishing_plan_f443d416: 最終的な公開プラン
@@ -13217,7 +13217,7 @@ ja:
   for_more_information_see_the_canvas_api_documentat_f07307bf: "詳しくは、*Canvas APIのドキュメント*を参照してください。"
   for_name_calendar_subscription_options_e60aa15f: "%{name}カレンダーの購読オプション用"
   for_name_d5684bfd: "対象%{name}"
-  for_students_who_d0fd45d0: 次の状態の受講者に...
+  for_students_who_d0fd45d0: 次の状態の受講者にメッセージを送る
   for_the_time_being_if_you_need_security_from_3rd_p_95f5c0d4: |-
       とりあえず、受講者の回答分析に
               サードパーティ製ツール、Speedgrader、またはCSV
@@ -25587,11 +25587,11 @@ ja:
   score_to_ungraded_process_failed_reason_788f9030: "未採点のプロセスのスコアに失敗:%{reason}"
   score_to_ungraded_process_finished_successfully_6689b418: 未採点のプロセスのスコアを正常に完了
   scored_187e6983: 採点済み
-  scored_less_than_2427896c: "次のスコアに満たない: "
+  scored_less_than_2427896c: 次のスコア未満
   scored_less_than_cutoff_on_assignment_5f5c4303: "%{assignment}の%{cutoff}未満のスコア"
   scored_less_than_score_on_assignmenttitle_5a011033: "%{assignmentTitle}の%{score}未満のスコア"
   scored_more_than_cutoff_on_assignment_f422fec: "%{assignment}の%{cutoff}を上回るスコア"
-  scored_more_than_d1646bd5: ～を上回るスコアを
+  scored_more_than_d1646bd5: 次のスコア以上
   scored_more_than_score_on_assignmenttitle_2afa1d32: "%{assignmentTitle}の%{score}を上回るスコア"
   scoring_range_upperbound_to_lowerbound_c017669b: "スコア範囲%{upperBound} ～ %{lowerBound}"
   screenreader_gradebook: 
@@ -26710,7 +26710,7 @@ ja:
       date_column: 日付
       message_column: メッセージ
       recent_activity: 最近のアクティビティ
-      recent_activity_in_course: "%{course_or_group} での最近のアクティビティ"
+      recent_activity_in_course: "%{course_or_group}の最近のアクティビティ"
       unread_column: 未読
       unread_count_badge: 
         one: "%{count} 件の*未読アイテム*"
@@ -27176,7 +27176,7 @@ ja:
   show_saved_what_if_scores_358bfe5f: "保存済みの \"仮りの\" スコアを表示"
   show_student_names_dcb40934: 受講生の名前を表示
   show_sub_accounts_for_account_name_fa71a658: "サブアカウントを表示する%{account_name}"
-  show_suggestions_when_typing_b72545de: 入力時に提案を表示する
+  show_suggestions_when_typing_b72545de: 登録したコメントを表示する
   show_to_d57767f: 表示先：
   show_to_everyone_94d66d01: 全員に表示する
   show_totals_as_points_on_student_grade_page_d9cb4207: 受講者の評定ページに合計を点数として表示
@@ -27495,8 +27495,8 @@ ja:
     no_submission_time: 提出の時間がない
     nodetect_message: 音声が検出されませんでした。マイク設定の調整が必要な場合があります。
     portion_graded: "%{x}/%{y}"
-    recording_expired_message: 音声認識はしばらく使用していないため、有効期限切れとなりました。「停止」ボタンをクリックして、現在のコメント用テキストを使用するか、「取消」で廃棄します。
-    recording_message: 録音中...
+    recording_expired_message: 音声認識は一定時間使用していないため、タイムアウトしました。「■」ボタンをクリックして、入力済みのコメントを使用するか、「キャンセル」ボタンで取り消します。
+    recording_message: 音声入力中...
     student: 受講者
     student_index: "受講生 %{index}"
     submissions_dropdown: 
@@ -27712,9 +27712,9 @@ ja:
   student_activity_tracking_90bdd519: 受講者アクティビティの追跡
   student_analytics_614304ee: 受講者分析
   student_annotation_assignments_are_not_currently_s_d840064b: 受講者の注釈の課題は、現在、グループの割り当てではサポートされていません
-  student_annotation_b9dc088c: 受講者の注釈
+  student_annotation_b9dc088c: ファイルへの書き込み
   student_annotation_documents_c0f5c4ec: 受講者の注釈文書
-  student_annotation_f6810b5c: 受講者の注釈
+  student_annotation_f6810b5c: ファイルへの書き込み
   student_annotation_submission_d0025105: 受講者の注釈提出
   student_annotation_submissions_4f8898d8: 受講生の注釈提出
   student_annotation_submissions_require_an_annotata_6759f3e6: 受講者の注釈提出には、annotatable_attachment_idの提出が必要です
@@ -29985,7 +29985,7 @@ ja:
   to_assign_students_to_a_group_enter_group_names_in_913d06fb: 受講者をグループに割り当てるには、「group_name」欄にグループ名を入力します。
   to_be_added_2959cc72: 追加される
   to_be_removed_d4b48586: 削除するもの
-  to_c4c44f4b: 移動先
+  to_c4c44f4b: から
   to_change_sis_account_id_the_user_must_have_manage_4b8a37a8: sis_account_id変更するにはユーザーにはmanage_sis許可が必要です。
   to_change_user_passwords_users_view_must_also_be_e_6aeea86c: "ユーザーのパスワードを変更するには、[ユーザー - 表示]も有効でなければなりません。"
   to_check_for_other_broken_links_visit_the_course_l_ace6921d: 他のリンク切れをチェックするには、コースリンクバリデーターにアクセスしてください
