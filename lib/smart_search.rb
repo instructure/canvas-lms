@@ -23,7 +23,7 @@ module SmartSearch
     end
 
     def smart_search_available?(context)
-      api_key.present? && context&.feature_enabled?(:smart_search)
+      context&.feature_enabled?(:smart_search) && api_key.present?
     end
 
     def register_class(klass, index_scope_proc, search_scope_proc)
@@ -93,7 +93,7 @@ module SmartSearch
     def index_course(course)
       index_scopes(course) do |scope|
         scope.where.missing(:embeddings)
-             .find_each do |item|
+             .find_each(strategy: :pluck_ids) do |item|
           item.generate_embeddings(synchronous: true)
         end
       end

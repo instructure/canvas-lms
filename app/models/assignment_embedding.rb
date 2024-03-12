@@ -16,23 +16,10 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class AddWikiPageEmbeddings < ActiveRecord::Migration[7.0]
-  tag :predeploy
+class AssignmentEmbedding < ApplicationRecord
+  belongs_to :assignment, inverse_of: :embeddings
+  has_neighbors :embedding
 
-  def self.runnable?
-    connection.extension_available?(:vector)
-  end
-
-  def change
-    create_extension(:vector, if_not_exists: true, schema: "public")
-
-    create_table :wiki_page_embeddings do |t|
-      t.references :wiki_page, null: false, foreign_key: true
-      t.column :embedding, "#{connection.extension("vector").schema}.vector", limit: 1536, null: false
-      t.timestamps
-      t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
-
-      t.replica_identity_index
-    end
-  end
+  extend RootAccountResolver
+  resolves_root_account through: :assignment
 end
