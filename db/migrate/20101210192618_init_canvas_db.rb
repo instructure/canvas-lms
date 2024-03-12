@@ -388,7 +388,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
     end
 
     create_table :account_notification_roles do |t|
-      t.bigint :account_notification_id, null: false
+      t.references :account_notification, null: false, foreign_key: true, index: false
       t.bigint :role_id, index: { where: "role_id IS NOT NULL", name: "index_account_notification_roles_only_on_role_id" }
 
       t.index [:account_notification_id, :role_id],
@@ -418,7 +418,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
     end
 
     create_table :account_report_runners do |t|
-      t.bigint :account_report_id, null: false, index: true
+      t.references :account_report, null: false, foreign_key: true
       t.string :workflow_state, null: false, default: "created", limit: 255
       t.string :batch_items, array: true, default: []
       t.timestamps precision: nil
@@ -428,8 +428,8 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
     end
 
     create_table :account_report_rows do |t|
-      t.bigint :account_report_id, null: false, index: true
-      t.bigint :account_report_runner_id, null: false, index: true
+      t.references :account_report, null: false, foreign_key: true
+      t.references :account_report_runner, null: false, foreign_key: true
       t.integer :row_number
       t.string :row, array: true, default: []
       t.timestamp :created_at, null: false, index: true
@@ -697,7 +697,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
     end
 
     create_table :assignment_configuration_tool_lookups do |t|
-      t.bigint :assignment_id, null: false, index: true
+      t.references :assignment, null: false, foreign_key: true
       t.bigint :tool_id
       t.string :tool_type, null: false, limit: 255
       t.string :subscription_id
@@ -713,7 +713,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
     create_table :assignment_overrides do |t|
       t.timestamps precision: nil
       # generic info
-      t.bigint :assignment_id, index: true
+      t.references :assignment, foreign_key: true
       t.integer :assignment_version
       t.references :set,
                    polymorphic: { limit: 255 },
@@ -751,8 +751,8 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
 
     create_table :assignment_override_students do |t|
       t.timestamps precision: nil
-      t.bigint :assignment_id, index: true
-      t.bigint :assignment_override_id, null: false, index: true
+      t.references :assignment, foreign_key: true
+      t.references :assignment_override, null: false, foreign_key: true
       t.references :user, null: false, foreign_key: { deferrable: :immediate }
       t.bigint :quiz_id, index: true
       t.string :workflow_state, default: "active", null: false, index: true
@@ -1428,7 +1428,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
 
     create_table :context_external_tool_placements do |t|
       t.string :placement_type, limit: 255
-      t.bigint :context_external_tool_id, null: false, index: { name: "external_tool_placements_tool_id" }
+      t.references :context_external_tool, null: false, foreign_key: true, index: { name: "external_tool_placements_tool_id" }
 
       t.index [:placement_type, :context_external_tool_id], unique: true, name: "external_tool_placements_type_and_tool_id"
     end
@@ -1455,7 +1455,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
     end
 
     create_table :context_module_progressions do |t|
-      t.bigint :context_module_id, index: true
+      t.references :context_module, foreign_key: true
       t.references :user, foreign_key: true, index: false
       t.text :requirements_met
       t.string :workflow_state, null: false, limit: 255
@@ -1919,7 +1919,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
     create_table :discussion_topic_materialized_views, id: false do |t|
       t.primary_keys [:discussion_topic_id]
 
-      t.bigint :discussion_topic_id, null: false
+      t.references :discussion_topic, null: false, foreign_key: true, index: false
       t.text :json_structure
       t.text :participants_array
       t.text :entry_ids_array
@@ -1929,7 +1929,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
     end
 
     create_table :discussion_topic_participants do |t|
-      t.bigint :discussion_topic_id, null: false
+      t.references :discussion_topic, null: false, foreign_key: true, index: false
       t.references :user, null: false, foreign_key: true
       t.integer :unread_entry_count, default: 0, null: false
       t.string :workflow_state, null: false, limit: 255
@@ -1941,7 +1941,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
     end
 
     create_table :discussion_topic_section_visibilities do |t|
-      t.bigint :discussion_topic_id, null: false, index: { name: "idx_discussion_topic_section_visibility_on_topic" }
+      t.references :discussion_topic, null: false, foreign_key: true, index: { name: "idx_discussion_topic_section_visibility_on_topic" }
       t.references :course_section, null: false, foreign_key: true, index: { name: "idx_discussion_topic_section_visibility_on_section" }
       t.timestamps precision: nil
       t.string :workflow_state, null: false, limit: 255
@@ -2065,7 +2065,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
     end
 
     create_table :eportfolio_categories do |t|
-      t.bigint :eportfolio_id, null: false, index: true
+      t.references :eportfolio, null: false, foreign_key: true
       t.string :name, limit: 255
       t.integer :position
       t.string :slug, limit: 255
@@ -2073,7 +2073,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
     end
 
     create_table :eportfolio_entries do |t|
-      t.bigint :eportfolio_id, null: false, index: true
+      t.references :eportfolio, null: false, foreign_key: true
       t.references :eportfolio_category, null: false, foreign_key: true
       t.integer :position
       t.string :name, limit: 255
@@ -2144,7 +2144,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
 
     create_table :external_feed_entries do |t|
       t.references :user, foreign_key: true, index: { where: "user_id IS NOT NULL" }
-      t.bigint :external_feed_id, null: false, index: true
+      t.references :external_feed, null: false, foreign_key: true
       t.text :title
       t.text :message
       t.string :source_name, limit: 255
@@ -2355,7 +2355,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.string :sis_source_id, limit: 255
       t.references :sis_batch, foreign_key: true, index: { where: "sis_batch_id IS NOT NULL" }
       t.text :stuck_sis_fields
-      t.bigint :group_category_id, index: true
+      t.references :group_category, foreign_key: true
       t.text :description
       t.bigint :avatar_attachment_id
       t.references :leader, foreign_key: { to_table: :users }, index: { where: "leader_id IS NOT NULL" }
@@ -2367,7 +2367,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
     end
 
     create_table :group_memberships do |t|
-      t.bigint :group_id, null: false, index: true
+      t.references :group, null: false, foreign_key: true
       t.string :workflow_state, null: false, limit: 255, index: true
       t.timestamps precision: nil
       t.references :user, null: false, foreign_key: true
@@ -2381,7 +2381,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
     end
 
     create_table :group_and_membership_importers do |t|
-      t.bigint :group_category_id, null: false, index: true
+      t.references :group_category, null: false, foreign_key: true
       t.references :attachment, foreign_key: true, index: { where: "attachment_id IS NOT NULL" }
       t.string :workflow_state, null: false, default: "active"
       t.timestamps precision: nil
@@ -2489,7 +2489,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.bigint :association_id
       t.string :association_type, limit: 255
       t.references :content_tag, foreign_key: true
-      t.bigint :learning_outcome_id, index: { where: "learning_outcome_id IS NOT NULL" }
+      t.references :learning_outcome, foreign_key: true, index: { where: "learning_outcome_id IS NOT NULL" }
       t.boolean :mastery
       t.references :user, foreign_key: true, index: false
       t.float :score
@@ -3205,7 +3205,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
     end
 
     create_table :outcome_import_errors do |t|
-      t.bigint :outcome_import_id, null: false, index: true
+      t.references :outcome_import, null: false, foreign_key: true
       t.string :message, null: false, limit: 255
       t.timestamps precision: nil
       t.integer :row
@@ -3340,7 +3340,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
     create_table :polling_poll_choices do |t|
       t.string :text, limit: 255
       t.boolean :is_correct, null: false, default: false
-      t.bigint :poll_id, null: false, index: true
+      t.references :poll, null: false, foreign_key: { to_table: :polling_polls }
       t.timestamps precision: nil
       t.integer :position
     end
@@ -3355,7 +3355,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
     end
 
     create_table :polling_poll_submissions do |t|
-      t.bigint :poll_id, null: false, index: true
+      t.references :poll, null: false, foreign_key: { to_table: :polling_polls }
       t.references :poll_choice, null: false, foreign_key: { to_table: :polling_poll_choices }
       t.references :user, null: false, foreign_key: true
       t.timestamps precision: nil
@@ -3478,7 +3478,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.float :points_possible
       t.bigint :context_id, null: false
       t.string :context_type, null: false, limit: 255
-      t.bigint :assignment_id, index: { unique: true }
+      t.references :assignment, foreign_key: true, index: { unique: true }
       t.string :workflow_state, null: false, limit: 255
       t.boolean :shuffle_answers, default: false, null: false
       t.boolean :show_correct_answers, default: true, null: false
@@ -3562,7 +3562,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
 
     create_table :quiz_regrades do |t|
       t.references :user, null: false, foreign_key: true
-      t.bigint :quiz_id, null: false
+      t.references :quiz, null: false, foreign_key: true, index: false
       t.integer :quiz_version, null: false
       t.timestamps precision: nil
 
@@ -3570,8 +3570,8 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
     end
 
     create_table :quiz_question_regrades do |t|
-      t.bigint :quiz_regrade_id, null: false
-      t.bigint :quiz_question_id, null: false, index: { name: "index_qqr_on_qq_id" }
+      t.references :quiz_regrade, null: false, foreign_key: true, index: false
+      t.references :quiz_question, null: false, foreign_key: true, index: { name: "index_qqr_on_qq_id" }
       t.string :regrade_option, null: false, limit: 255
       t.timestamps precision: nil
 
@@ -3579,14 +3579,14 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
     end
 
     create_table :quiz_regrade_runs do |t|
-      t.bigint :quiz_regrade_id, null: false, index: true
+      t.references :quiz_regrade, null: false, foreign_key: true
       t.timestamp :started_at
       t.timestamp :finished_at
       t.timestamps precision: nil
     end
 
     create_table :quiz_statistics do |t|
-      t.bigint :quiz_id
+      t.references :quiz, foreign_key: true, index: false
       t.boolean :includes_all_versions
       t.boolean :anonymous
       t.timestamps precision: nil
@@ -3597,7 +3597,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
     end
 
     create_table :quiz_submissions do |t|
-      t.bigint :quiz_id, null: false
+      t.references :quiz, null: false, foreign_key: true, index: false
       t.integer :quiz_version
       t.references :user, foreign_key: { deferrable: :immediate }
       t.text :submission_data, limit: 16_777_215
@@ -3634,7 +3634,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
     create_table :quiz_submission_events do |t|
       t.integer :attempt, null: false
       t.string :event_type, null: false, limit: 255
-      t.bigint :quiz_submission_id, null: false
+      t.references :quiz_submission, null: false, foreign_key: true, index: false
       t.text :event_data
       t.timestamp :created_at, null: false, index: true
       t.timestamp :client_timestamp
@@ -3682,7 +3682,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.timestamps null: true, precision: nil
       t.boolean :applies_to_self, default: true, null: false
       t.boolean :applies_to_descendants, default: true, null: false
-      t.bigint :role_id, null: false, index: true
+      t.references :role, null: false, foreign_key: true
       t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
 
       t.replica_identity_index
@@ -3716,7 +3716,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
     end
 
     create_table :rubric_associations do |t|
-      t.bigint :rubric_id, null: false, index: true
+      t.references :rubric, null: false, foreign_key: true
       t.bigint :association_id, null: false
       t.string :association_type, null: false, limit: 255
       t.boolean :use_for_grading
@@ -3741,8 +3741,8 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
 
     create_table :rubric_assessments do |t|
       t.references :user, foreign_key: true
-      t.bigint :rubric_id, null: false, index: true
-      t.bigint :rubric_association_id, index: true
+      t.references :rubric, null: false, foreign_key: true
+      t.references :rubric_association, foreign_key: true
       t.float :score
       t.text :data
       t.timestamps precision: nil
@@ -3799,7 +3799,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
     end
 
     create_table :score_metadata do |t|
-      t.bigint :score_id, null: false, index: { unique: true }
+      t.references :score, null: false, foreign_key: true, index: { unique: true }
       t.json :calculation_details, default: {}, null: false
       t.timestamps precision: nil
       t.string :workflow_state, default: "active", null: false
@@ -4005,7 +4005,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
 
     create_table :submission_comments do |t|
       t.text :comment
-      t.bigint :submission_id, index: true
+      t.references :submission, foreign_key: true
       t.references :author, foreign_key: { to_table: :users }
       t.string :author_name, limit: 255
       t.string :group_comment_id, limit: 255
@@ -4031,7 +4031,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
     end
 
     create_table :submission_drafts do |t|
-      t.bigint :submission_id, null: false, index: true
+      t.references :submission, null: false, foreign_key: true
       t.integer :submission_attempt, index: true, null: false
       t.text :body
       t.text :url
@@ -4373,7 +4373,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
 
     create_table :web_conference_participants do |t|
       t.references :user, foreign_key: true
-      t.bigint :web_conference_id, index: true
+      t.references :web_conference, foreign_key: true
       t.string :participation_type, limit: 255
       t.timestamps precision: nil
       t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
@@ -4390,7 +4390,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
     end
 
     create_table :wiki_pages do |t|
-      t.bigint :wiki_id, null: false, index: true
+      t.references :wiki, null: false, foreign_key: true
       t.string :title, limit: 255
       t.text :body, limit: 16_777_215
       t.string :workflow_state, null: false, limit: 255
@@ -4576,11 +4576,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
     SQL
 
     add_foreign_key :abstract_courses, :enrollment_terms
-    add_foreign_key :account_notification_roles, :account_notifications
     add_foreign_key :account_notification_roles, :roles
-    add_foreign_key :account_report_rows, :account_reports
-    add_foreign_key :account_report_rows, :account_report_runners
-    add_foreign_key :account_report_runners, :account_reports
     add_foreign_key :account_reports, :attachments
     add_foreign_key :account_users, :roles
     add_foreign_key :accounts, :courses, column: :course_template_id
@@ -4595,12 +4591,8 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
     add_foreign_key :anonymous_or_moderation_events, :quizzes, name: "fk_rails_a862303024"
     add_foreign_key :assessment_requests, :rubric_associations
     add_foreign_key :assessment_requests, :submissions, column: :asset_id
-    add_foreign_key :assignment_configuration_tool_lookups, :assignments
-    add_foreign_key :assignment_override_students, :assignment_overrides
-    add_foreign_key :assignment_override_students, :assignments
     add_foreign_key :assignment_override_students, :context_modules
     add_foreign_key :assignment_override_students, :quizzes
-    add_foreign_key :assignment_overrides, :assignments
     add_foreign_key :assignment_overrides, :context_modules
     add_foreign_key :assignment_overrides, :quizzes
     add_foreign_key :assignments, :attachments, column: :annotatable_attachment_id
@@ -4619,8 +4611,6 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
     add_foreign_key :content_migrations, :master_courses_child_subscriptions, column: :child_subscription_id
     add_foreign_key :content_tags, :context_modules
     add_foreign_key :content_tags, :learning_outcomes
-    add_foreign_key :context_external_tool_placements, :context_external_tools
-    add_foreign_key :context_module_progressions, :context_modules
     add_foreign_key :conversation_batches, :conversation_messages, column: :root_conversation_message_id
     add_foreign_key :course_account_associations, :course_sections
     add_foreign_key :course_sections, :enrollment_terms
@@ -4633,25 +4623,15 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
     add_foreign_key :delayed_messages, :notification_policy_overrides
     add_foreign_key :discussion_entry_drafts, :discussion_topics
     add_foreign_key :discussion_entries, :discussion_topics
-    add_foreign_key :discussion_topic_materialized_views, :discussion_topics
-    add_foreign_key :discussion_topic_participants, :discussion_topics
-    add_foreign_key :discussion_topic_section_visibilities, :discussion_topics
     add_foreign_key :discussion_topics, :external_feeds
     add_foreign_key :discussion_topics, :group_categories
     add_foreign_key :enrollment_dates_overrides, :enrollment_terms
     add_foreign_key :enrollment_states, :enrollments
     add_foreign_key :enrollment_terms, :grading_period_groups
     add_foreign_key :enrollments, :roles
-    add_foreign_key :eportfolio_categories, :eportfolios
-    add_foreign_key :eportfolio_entries, :eportfolios
-    add_foreign_key :external_feed_entries, :external_feeds
     add_foreign_key :gradebook_csvs, :progresses
     add_foreign_key :gradebook_uploads, :progresses
-    add_foreign_key :group_and_membership_importers, :group_categories
-    add_foreign_key :group_memberships, :groups
-    add_foreign_key :groups, :group_categories
     add_foreign_key :groups, :wikis
-    add_foreign_key :learning_outcome_results, :learning_outcomes
     add_foreign_key :lti_line_items, :lti_resource_links
     add_foreign_key :lti_message_handlers, :lti_resource_handlers, column: :resource_handler_id
     add_foreign_key :lti_message_handlers, :lti_tool_proxies, column: :tool_proxy_id
@@ -4665,31 +4645,11 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
     add_foreign_key :master_courses_master_migrations, :master_courses_master_templates, column: :master_template_id
     add_foreign_key :moderated_grading_provisional_grades, :submissions
     add_foreign_key :originality_reports, :submissions
-    add_foreign_key :outcome_import_errors, :outcome_imports
-    add_foreign_key :polling_poll_choices, :polling_polls, column: :poll_id
-    add_foreign_key :polling_poll_submissions, :polling_polls, column: :poll_id
-    add_foreign_key :quiz_question_regrades, :quiz_questions
-    add_foreign_key :quiz_question_regrades, :quiz_regrades
-    add_foreign_key :quiz_regrade_runs, :quiz_regrades
-    add_foreign_key :quiz_regrades, :quizzes
-    add_foreign_key :quiz_statistics, :quizzes
-    add_foreign_key :quiz_submission_events, :quiz_submissions
-    add_foreign_key :quiz_submissions, :quizzes
-    add_foreign_key :quizzes, :assignments
     add_foreign_key :role_overrides, :accounts, column: :context_id
-    add_foreign_key :role_overrides, :roles
-    add_foreign_key :rubric_assessments, :rubric_associations
-    add_foreign_key :rubric_assessments, :rubrics
-    add_foreign_key :rubric_associations, :rubrics
-    add_foreign_key :score_metadata, :scores
     add_foreign_key :sis_batches, :attachments, column: :errors_attachment_id
     add_foreign_key :sis_batches, :enrollment_terms, column: :batch_mode_term_id
     add_foreign_key :sis_batches, :users
-    add_foreign_key :submission_comments, :submissions
-    add_foreign_key :submission_drafts, :submissions
-    add_foreign_key :web_conference_participants, :web_conferences
     add_foreign_key :wiki_pages, :wiki_page_lookups, column: :current_lookup_id
-    add_foreign_key :wiki_pages, :wikis
   end
 
   def down
