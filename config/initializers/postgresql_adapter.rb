@@ -286,12 +286,6 @@ module PostgreSQLAdapterExtensions
 
     ["UPDATE", "DELETE"].each do |operation|
       trigger_name = "guard_excessive_#{operation.downcase}s"
-      already_installed_sql = <<~SQL.squish
-        SELECT count(*) FROM pg_trigger
-          WHERE tgrelid = '#{quote_table_name(table_name)}'::regclass
-            AND tgname = '#{trigger_name}'
-      SQL
-      next if select_value(already_installed_sql).to_i.positive?
 
       execute(<<~SQL.squish)
         CREATE TRIGGER #{trigger_name}
