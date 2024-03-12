@@ -256,7 +256,7 @@ module ActiveRecord
           "created_at" => DateTime.now.utc
         }
         attrs_2 = attrs_1.merge({
-                                  "created_at" => 40.days.ago
+                                  "created_at" => 40.days.from_now
                                 })
         ar_type = Auditors::ActiveRecord::AuthenticationRecord
         expect { ar_type.bulk_insert([attrs_1, attrs_2]) }.to_not raise_error
