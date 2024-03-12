@@ -4375,7 +4375,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
 
     create_table :wiki_page_lookups do |t|
       t.text :slug, null: false, index: false
-      t.references :wiki_page, null: false
+      t.references :wiki_page, null: false, foreign_key: { deferrable: :deferred, on_delete: :cascade }
       t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
       t.bigint :context_id, null: false
       t.string :context_type, null: false, limit: 255
@@ -4386,7 +4386,6 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
               name: "unique_index_on_context_and_slug",
               unique: true
     end
-    add_foreign_key :wiki_page_lookups, :wiki_pages, deferrable: :deferred, on_delete: :cascade
 
     create_table :wikis do |t|
       t.string :title, limit: 255

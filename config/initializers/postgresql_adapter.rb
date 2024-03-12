@@ -458,6 +458,8 @@ module SchemaCreationExtensions
     sql << " REFERENCES #{quote_table_name(o.to_table)} (#{quote_column_name(o.primary_key)})"
     sql << " #{action_sql("DELETE", o.on_delete)}" if o.on_delete
     sql << " #{action_sql("UPDATE", o.on_update)}" if o.on_update
+    sql << " DEFERRABLE INITIALLY #{o.deferrable.to_s.upcase}" if o.deferrable
+
     sql
   end
 
