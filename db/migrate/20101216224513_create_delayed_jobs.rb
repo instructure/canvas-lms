@@ -42,32 +42,30 @@ class CreateDelayedJobs < ActiveRecord::Migration[7.0]
       # Set when all retries have failed
       t.timestamp :failed_at
       # Who is working on this object (if locked)
-      t.string :locked_by, limit: 255
+      t.string :locked_by, limit: 255, index: { where: "locked_by IS NOT NULL" }
 
       t.timestamps precision: nil
 
-      t.string :tag, limit: 255
+      t.string :tag, limit: 255, index: true
       t.integer :max_attempts
       t.string :strand, limit: 255
       t.boolean :next_in_strand, default: true, null: false
-      t.bigint :shard_id
+      t.bigint :shard_id, index: true
       t.string :source, limit: 255
       t.integer :max_concurrent, default: 1, null: false
       t.timestamp :expires_at
       t.integer :strand_order_override, default: 0, null: false
-      t.string :singleton
+      t.string :singleton, index: { where: "singleton IS NOT NULL AND (locked_by IS NULL OR locked_by = '#{::Delayed::Backend::Base::ON_HOLD_LOCKED_BY}')",
+                                    unique: true,
+                                    name: "index_delayed_jobs_on_singleton_not_running" }
     end
-
     add_index :delayed_jobs,
               %i[priority run_at id],
               algorithm: :concurrently,
               where: "queue = 'canvas_queue' AND locked_at IS NULL AND next_in_strand",
               name: "get_delayed_jobs_index"
-    add_index :delayed_jobs, [:tag]
     add_index :delayed_jobs, %i[strand id], name: "index_delayed_jobs_on_strand"
-    add_index :delayed_jobs, :locked_by, where: "locked_by IS NOT NULL"
     add_index :delayed_jobs, %i[run_at tag]
-    add_index :delayed_jobs, :shard_id
     add_index :delayed_jobs,
               %i[strand strand_order_override id],
               where: "strand IS NOT NULL",
@@ -76,11 +74,6 @@ class CreateDelayedJobs < ActiveRecord::Migration[7.0]
               %i[strand next_in_strand id],
               name: "n_strand_index",
               where: "strand IS NOT NULL"
-    add_index :delayed_jobs,
-              :singleton,
-              where: "singleton IS NOT NULL AND (locked_by IS NULL OR locked_by = '#{::Delayed::Backend::Base::ON_HOLD_LOCKED_BY}')",
-              unique: true,
-              name: "index_delayed_jobs_on_singleton_not_running"
     add_index :delayed_jobs,
               :singleton,
               where: "singleton IS NOT NULL AND locked_by IS NOT NULL AND locked_by <> '#{::Delayed::Backend::Base::ON_HOLD_LOCKED_BY}'",
