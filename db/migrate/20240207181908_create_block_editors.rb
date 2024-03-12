@@ -28,7 +28,6 @@ class CreateBlockEditors < ActiveRecord::Migration[7.0]
       t.bigint :time
       t.jsonb :blocks, default: [], null: false
       t.string :editor_version
-
       t.timestamps
 
       t.replica_identity_index
