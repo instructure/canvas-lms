@@ -24,7 +24,7 @@ class CreateBlockEditors < ActiveRecord::Migration[7.0]
   def change
     create_table :block_editors do |t|
       t.references :root_account, null: false, foreign_key: { to_table: :accounts }, index: false
-      t.references :context, polymorphic: true, null: false, index: true
+      t.references :context, polymorphic: true, null: false
       t.bigint :time
       t.jsonb :blocks, default: [], null: false
       t.string :editor_version
