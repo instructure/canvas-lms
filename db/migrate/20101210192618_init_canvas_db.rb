@@ -518,8 +518,9 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       # generic info
       t.bigint :assignment_id, index: true
       t.integer :assignment_version
-      t.string :set_type, null: true, limit: 255
-      t.bigint :set_id
+      t.references :set,
+                   polymorphic: { limit: 255 },
+                   index: { name: "index_assignment_overrides_on_set_type_and_set_id" }
       t.string :title, null: false, limit: 255
       t.string :workflow_state, null: false, limit: 255
 
@@ -548,7 +549,6 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
               name: "index_assignment_overrides_on_assignment_and_set",
               unique: true,
               where: "workflow_state='active' and set_id is not null"
-    add_index :assignment_overrides, [:set_type, :set_id]
     add_index :assignment_overrides,
               [:context_module_id, :set_id],
               where: "context_module_id IS NOT NULL AND workflow_state = 'active' AND set_type IN ('CourseSection', 'Group')",
@@ -762,8 +762,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.string :uuid, null: false, index: true
       t.bigint :feature_flag_id, null: false, index: true
       t.bigint :root_account_id, null: false, index: true
-      t.string :context_type
-      t.bigint :context_id
+      t.references :context, polymorphic: true, index: false
       t.string :feature_name
       t.string :event_type, null: false
       t.string :state_before, null: false
@@ -1136,8 +1135,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.string :workflow_state, null: false, limit: 255
       t.timestamps precision: nil
       t.bigint :content_migration_id, index: true
-      t.string :context_type, limit: 255
-      t.bigint :context_id
+      t.references :context, polymorphic: { limit: 255 }, index: false
       t.boolean :global_identifiers, default: false, null: false
     end
     add_index :content_exports, [:context_id, :context_type]
@@ -1170,8 +1168,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
 
     create_table :content_participation_counts do |t|
       t.string :content_type, limit: 255
-      t.string :context_type, limit: 255
-      t.bigint :context_id
+      t.references :context, polymorphic: { limit: 255 }, index: false
       t.bigint :user_id
       t.integer :unread_count, default: 0
       t.timestamps precision: nil
@@ -1180,8 +1177,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
     add_index :content_participation_counts, %i[context_id context_type user_id content_type], name: "index_content_participation_counts_uniquely", unique: true
 
     create_table :content_participations do |t|
-      t.string :content_type, null: false, limit: 255
-      t.bigint :content_id, null: false
+      t.references :content, polymorphic: { limit: 255 }, null: false, index: false
       t.bigint :user_id, null: false, index: true
       t.string :workflow_state, null: false, limit: 255
       t.references :root_account, foreign_key: { to_table: :accounts }
@@ -1333,8 +1329,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.text :tags
       t.text :root_account_ids
       t.string :subject, limit: 255
-      t.string :context_type, limit: 255
-      t.bigint :context_id
+      t.references :context, polymorphic: { limit: 255 }, index: false
       t.timestamp :updated_at
     end
 
@@ -1346,8 +1341,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.text :conversation_message_ids
       t.text :tags
       t.timestamps precision: nil
-      t.string :context_type, limit: 255
-      t.bigint :context_id
+      t.references :context, polymorphic: { limit: 255 }, index: false
       t.string :subject, limit: 255
       t.boolean :group
       t.boolean :generate_user_note
@@ -2302,8 +2296,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
     add_index :group_categories, [:root_account_id, :sis_source_id], where: "sis_source_id IS NOT NULL", unique: true
 
     create_table :ignores do |t|
-      t.string :asset_type, null: false, limit: 255
-      t.bigint :asset_id, null: false
+      t.references :asset, polymorphic: { limit: 255 }, null: false, index: false
       t.bigint :user_id, null: false, index: true
       t.string :purpose, null: false, limit: 255
       t.boolean :permanent, null: false, default: false
@@ -2667,17 +2660,15 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       # mainly for bulk loading on import
       t.bigint :child_subscription_id, null: false, index: { name: "index_child_content_tags_on_subscription" }
 
-      t.string :content_type, null: false, limit: 255
-      t.bigint :content_id, null: false
+      t.references :content,
+                   polymorphic: { limit: 255 },
+                   null: false,
+                   index: { unique: true, name: "index_child_content_tags_on_content" }
 
       t.text :downstream_changes
       t.string :migration_id, index: { name: "index_child_content_tags_on_migration_id" }
       t.references :root_account, foreign_key: { to_table: :accounts }
     end
-    add_index :master_courses_child_content_tags,
-              [:content_type, :content_id],
-              unique: true,
-              name: "index_child_content_tags_on_content"
     add_index :master_courses_child_content_tags,
               [:child_subscription_id, :migration_id],
               opclass: { migration_id: :text_pattern_ops },
@@ -2708,8 +2699,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       # should we add a workflow state and make this soft-deletable?
       # maybe someday if we decide to use these to define the template content aets
 
-      t.string :content_type, null: false, limit: 255
-      t.bigint :content_id, null: false
+      t.references :content, polymorphic: { limit: 255 }, null: false, index: false
 
       # when we export an object for a master migration we'll set this column on the tag
       # when we update the content we'll erase this
@@ -3093,19 +3083,19 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
     end
 
     create_table :outcome_calculation_methods do |t|
-      t.string :context_type, null: false, limit: 255
-      t.bigint :context_id, null: false
+      t.references :context,
+                   polymorphic: { limit: 255 },
+                   null: false,
+                   index: { unique: true, name: "index_outcome_calculation_methods_on_context" }
       t.integer :calculation_int, limit: 2
       t.string :calculation_method, null: false, limit: 255
       t.string :workflow_state, null: false, default: "active"
       t.references :root_account, foreign_key: { to_table: :accounts }, null: false
       t.timestamps precision: nil
     end
-    add_index :outcome_calculation_methods, [:context_type, :context_id], unique: true, name: "index_outcome_calculation_methods_on_context"
 
     create_table :outcome_friendly_descriptions do |t|
-      t.string :context_type, null: false, limit: 255
-      t.bigint :context_id, null: false
+      t.references :context, polymorphic: { limit: 255 }, null: false, index: false
       t.string :workflow_state, null: false, default: "active"
       t.references :root_account, foreign_key: { to_table: :accounts }
       t.text :description, null: false
@@ -3228,8 +3218,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.bigint :course_id
       t.string :workflow_state, null: false
       t.timestamps precision: nil
-      t.string :linked_object_type
-      t.bigint :linked_object_id
+      t.references :linked_object, polymorphic: true, index: false
     end
     add_index :planner_notes,
               %i[user_id linked_object_id linked_object_type],
@@ -3238,8 +3227,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
               name: "index_planner_notes_on_user_id_and_linked_object"
 
     create_table :planner_overrides do |t|
-      t.string :plannable_type, null: false
-      t.bigint :plannable_id, null: false
+      t.references :plannable, polymorphic: true, null: false, index: false
       t.bigint :user_id, null: false, index: true
       t.string :workflow_state
       t.boolean :marked_complete, null: false, default: false
@@ -3360,8 +3348,10 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
 
     create_table :profiles do |t|
       t.bigint :root_account_id, null: false
-      t.string :context_type, null: false, limit: 255
-      t.bigint :context_id, null: false
+      t.references :context,
+                   polymorphic: { limit: 255 },
+                   null: false,
+                   index: { unique: true, name: "index_profiles_on_context_type_and_context_id" }
       t.string :title, limit: 255
       t.string :path, limit: 255
       t.text :description
@@ -3370,7 +3360,6 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.integer :position
     end
     add_index :profiles, [:root_account_id, :path], unique: true
-    add_index :profiles, [:context_type, :context_id], unique: true
 
     create_table :progresses do |t|
       t.bigint :context_id, null: false
@@ -3777,8 +3766,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
 
     create_table :sis_batch_roll_back_data do |t|
       t.bigint :sis_batch_id, null: false, index: true
-      t.string :context_type, null: false, limit: 255
-      t.bigint :context_id, null: false
+      t.references :context, polymorphic: { limit: 255 }, null: false, index: false
       t.string :previous_workflow_state, null: false, limit: 255
       t.string :updated_workflow_state, null: false, limit: 255
       t.boolean :batch_mode_delete, null: false, default: false
@@ -3844,18 +3832,15 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.bigint :stream_item_id, null: false, index: true
       t.boolean :hidden, default: false, null: false
       t.string :workflow_state, limit: 255
-      t.string :context_type, limit: 255
-      t.bigint :context_id
+      t.references :context, polymorphic: { limit: 255 }, index: { name: "index_stream_item_instances_on_context_type_and_context_id" }
     end
     add_index :stream_item_instances, %i[user_id hidden id stream_item_id], name: "index_stream_item_instances_global"
-    add_index :stream_item_instances, [:context_type, :context_id]
     add_index :stream_item_instances, [:stream_item_id, :user_id], unique: true
 
     create_table :stream_items do |t|
       t.text :data, null: false
       t.timestamps precision: nil
-      t.string :context_type, limit: 255
-      t.bigint :context_id
+      t.references :context, polymorphic: { limit: 255 }, index: false
       t.string :asset_type, null: false, limit: 255
       t.bigint :asset_id
       t.string :notification_category, limit: 255
