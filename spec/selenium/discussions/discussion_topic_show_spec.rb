@@ -96,7 +96,9 @@ describe "Discussion Topic Show" do
         @group_discussion_topic = group_discussion_assignment
         get "/courses/#{@course.id}/discussion_topics/#{@group_discussion_topic.id}"
         f("button[data-testid='groups-menu-btn']").click
-        fj("a:contains('group 1')").click
+
+        # NOTE: this is not 10 Unread, it's 2 sibling elements, 1 is group 1, the other is 0 Unread
+        fj("a:contains('group 10 Unread')").click
         wait_for_ajaximations
         expect(fj("h1:contains('topic - group 1')")).to be_present
         expect_no_flash_message :error
