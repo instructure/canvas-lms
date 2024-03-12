@@ -737,6 +737,9 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.references :context_module, index: { where: "context_module_id IS NOT NULL" }
       t.boolean :unassign_item, default: false, null: false
 
+      t.check_constraint "workflow_state='deleted' OR quiz_id IS NOT NULL OR assignment_id IS NOT NULL OR context_module_id IS NOT NULL",
+                         name: "require_quiz_or_assignment_or_module"
+
       t.index %i[assignment_id set_type set_id],
               name: "index_assignment_overrides_on_assignment_and_set",
               unique: true,
@@ -745,9 +748,6 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
               where: "context_module_id IS NOT NULL AND workflow_state = 'active' AND set_type IN ('CourseSection', 'Group')",
               unique: true
     end
-    add_check_constraint :assignment_overrides,
-                         "workflow_state='deleted' OR quiz_id IS NOT NULL OR assignment_id IS NOT NULL OR context_module_id IS NOT NULL",
-                         name: "require_quiz_or_assignment_or_module"
 
     create_table :assignment_override_students do |t|
       t.timestamps precision: nil
