@@ -2154,7 +2154,7 @@ class User < ActiveRecord::Base
     RequestCache.cache("cached_current_enrollments", self, opts) do
       enrollments = shard.activate do
         res = Rails.cache.fetch_with_batched_keys(
-          ["current_enrollments4", opts[:include_future], ApplicationController.region].cache_key,
+          ["current_enrollments5", opts[:include_future], ApplicationController.region].cache_key,
           batch_object: self,
           batched_keys: :enrollments
         ) do
