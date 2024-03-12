@@ -33,6 +33,7 @@ describe "Smart Search API", type: :request do
     @user = @teacher
     wiki_page_model(title: "foo", body: "...")
     wiki_page_model(title: "bar", body: "...")
+    assignment_model(title: "goo", description: "...", course: @course)
     @path = "/api/v1/courses/#{@course.id}/smartsearch"
     @params = { controller: "smart_search", course_id: @course.to_param, action: "search", format: "json" }
   end
@@ -56,16 +57,16 @@ describe "Smart Search API", type: :request do
     it "returns results in order of relevance" do
       stub_smart_search
       SmartSearch.index_course(@course)
+      expect(AssignmentEmbedding.count).to be >= 1
       expect(WikiPageEmbedding.count).to be >= 2
 
       response = api_call(:get, @path + "?q=foo", @params.merge(q: "foo"))
       results = response["results"].map { |row| [row["title"], row["readable_type"]] }
       expect(results).to eq(
         [["foo", "Page"],
+         ["goo", "Assignment"],
          ["bar", "Page"]]
       )
-      expect(response["results"][0]["title"]).to eq "foo"
-      expect(response["results"][0]["readable_type"]).to eq "Page"
     end
   end
 end
