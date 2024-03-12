@@ -51,6 +51,17 @@ class Login::CasController < ApplicationController
       end
     rescue => e
       logger.warn "Failed to validate CAS ticket: #{e.inspect}"
+
+      if e.is_a?(Timeout::Error)
+        tags = { auth_type: aac.auth_type, auth_provider_id: aac.global_id }
+        if e.respond_to?(:error_count)
+          tags[:error_count] = e.error_count
+          InstStatsd::Statsd.increment(statsd_timeout_cutoff, tags:)
+        else
+          InstStatsd::Statsd.increment(statsd_timeout_error, tags:)
+        end
+      end
+
       aac.debug_set(:validate_service_ticket, t("Failed to validate CAS ticket: %{error}", error: e)) if debugging
       flash[:delegated_message] = t("There was a problem logging in at %{institution}",
                                     institution: @domain_root_account.display_name)
