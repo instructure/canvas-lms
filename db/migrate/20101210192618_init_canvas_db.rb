@@ -3370,7 +3370,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
                    null: false,
                    index: { name: "index_notification_policy_overrides_on_context" }
 
-      t.references :communication_channel, null: false, foreign_key: true, index: true
+      t.references :communication_channel, null: false, foreign_key: true
       t.bigint :notification_id
       t.string :workflow_state, default: "active", null: false
       t.string :frequency
