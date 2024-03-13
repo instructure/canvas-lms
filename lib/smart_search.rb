@@ -26,6 +26,23 @@ module SmartSearch
       api_key.present? && context&.feature_enabled?(:smart_search)
     end
 
+    def register_class(klass, index_scope_proc, search_scope_proc)
+      @search_info ||= []
+      @search_info << [klass, index_scope_proc, search_scope_proc]
+    end
+
+    def index_scopes(course)
+      @search_info.each do |_, proc, _|
+        yield proc.call(course)
+      end
+    end
+
+    def search_scopes(course, user)
+      @search_info.each do |klass, _, proc|
+        yield klass, proc.call(course, user)
+      end
+    end
+
     def generate_embedding(input)
       url = "https://api.openai.com/v1/embeddings"
       headers = {
@@ -70,15 +87,17 @@ module SmartSearch
               singleton: "smart_search_index_course:#{course.global_id}",
               n_strand: "smart_search_index_course").index_course(course)
       end
+      nil
     end
 
     def index_course(course)
-      # index non-deleted pages (that have not already been indexed)
-      course.wiki_pages.not_deleted
-            .where.missing(:embeddings)
-            .find_each do |page|
-        page.generate_embeddings(synchronous: true)
+      index_scopes(course) do |scope|
+        scope.where.missing(:embeddings)
+             .find_each do |item|
+          item.generate_embeddings(synchronous: true)
+        end
       end
+      nil
     end
   end
 end
