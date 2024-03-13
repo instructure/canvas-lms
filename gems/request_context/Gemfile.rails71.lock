@@ -101,7 +101,7 @@ GEM
       faraday (>= 0.9, < 3.0, != 2.0.0)
     drb (2.2.1)
     erubi (1.12.0)
-    et-orbi (1.2.7)
+    et-orbi (1.2.9)
       tzinfo
     faraday (2.9.0)
       faraday-net_http (>= 2.0, < 3.2)
