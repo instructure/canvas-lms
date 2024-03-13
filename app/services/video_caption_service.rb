@@ -91,17 +91,13 @@ class VideoCaptionService < ApplicationService
 
   def poll_for_captions_ready
     if @skip_polling
-      response = media
-      return response.dig("media", "captions", 0, "language")
+      return get_media
     end
 
     10.times do |i|
       response = media
       if response.dig("media", "captions", 0, "language") && response.dig("media", "captions", 0, "status") == "succeeded"
-        src_lang = response.dig("media", "captions", 0, "language")
-        # dont' proceed if the language is not detected as English
-        src_lang = nil unless src_lang.start_with?("en")
-        return src_lang
+        return response.dig("media", "captions", 0, "language")
       end
 
       sleep(1.minute * (i + 1))
