@@ -2430,7 +2430,7 @@ $(document).ready(function () {
 
   function renderHeaderComponent() {
     const root = $('#context-modules-header-root')
-    if (root) {
+    if (root[0]) {
       ReactDOM.render(<ContextModulesHeader {...root.data('props')} />, root[0])
     }
   }
