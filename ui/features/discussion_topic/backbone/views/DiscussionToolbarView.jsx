@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import {View} from '@canvas/backbone'
-import 'jqueryui-unpatched/button'
+import 'jqueryui/button'
 import $ from 'jquery'
 import {debounce} from 'lodash'
 import React from 'react'
@@ -121,7 +121,7 @@ export default class DiscussionToolbarView extends View {
   }
 
   maybeDisableFields() {
-    return this.$disableWhileFiltering.attr('disabled', this.model.hasFilter())
+    return this.$disableWhileFiltering.prop('disabled', this.model.hasFilter())
   }
 }
 DiscussionToolbarView.initClass()

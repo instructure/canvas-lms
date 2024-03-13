@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
 import {fetchContent} from 'ui/features/eportfolio/jquery/eportfolio_section'
 import fixtures from 'helpers/fixtures'
 

@@ -32,13 +32,13 @@ describe('CanvasCartridgeImporter', () => {
 
   afterEach(() => jest.clearAllMocks())
 
-  it('calls onSubmit', () => {
+  it('calls onSubmit', async () => {
     renderComponent()
 
     const file = new File(['blah, blah, blah'], 'my_file.zip', {type: 'application/zip'})
     const input = screen.getByTestId('migrationFileUpload')
-    userEvent.upload(input, file)
-    userEvent.click(screen.getByRole('button', {name: 'Add to Import Queue'}))
+    await userEvent.upload(input, file)
+    await userEvent.click(screen.getByRole('button', {name: 'Add to Import Queue'}))
     expect(onSubmit).toHaveBeenCalledWith(
       expect.objectContaining({
         pre_attachment: {
@@ -51,10 +51,15 @@ describe('CanvasCartridgeImporter', () => {
     )
   })
 
-  it('calls onCancel', () => {
+  it('calls onCancel', async () => {
     renderComponent()
 
-    userEvent.click(screen.getByRole('button', {name: 'Cancel'}))
+    await userEvent.click(screen.getByRole('button', {name: 'Cancel'}))
     expect(onCancel).toHaveBeenCalled()
+  })
+
+  it('renders the progressbar info', async () => {
+    renderComponent({fileUploadProgress: 10})
+    expect(screen.getByText('Uploading File')).toBeInTheDocument()
   })
 })

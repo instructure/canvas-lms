@@ -402,11 +402,6 @@ module Lti
         expect(Lti::Link.find_by(id: lti_link_id)).to be_nil
       end
 
-      it "requires the plagiarism feature flag" do
-        put @endpoints[:udpate], params: { originality_report: { originality_report_lti_url: "http://www.lti-test.com" } }, headers: request_headers
-        expect(response).not_to be_successful
-      end
-
       it "verifies the report is in the same context as the assignment" do
         @submission.attachments = []
         @submission.save!
@@ -542,11 +537,6 @@ module Lti
           expect(response).to be_successful
           lti_link = OriginalityReport.find(@report.id).lti_link
           expect(lti_link.resource_url).to eq "http://www.lti-test.com"
-        end
-
-        it "requires the plagiarism feature flag" do
-          put @endpoints[:udpate], params: { originality_report: { originality_report_lti_url: "http://www.lti-test.com" } }, headers: request_headers
-          expect(response).not_to be_successful
         end
 
         it "verifies the report is in the same context as the assignment" do

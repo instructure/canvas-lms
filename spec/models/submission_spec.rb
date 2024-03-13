@@ -8843,6 +8843,19 @@ describe Submission do
     end
 
     describe "#handle_posted_at_changed" do
+      describe "when an studen that is also admin posts an submission" do
+        it "unmutes the assignment if all submissions are now posted" do
+          admin = account_admin_user(account: @account, name: "default admin")
+          @course.enroll_student(admin)
+          assignment = @course.assignments.create!(
+            title: "some assignment",
+            workflow_state: "published"
+          )
+          submission_model(user: admin, assignment:, body: "first student submission text")
+          expect { assignment.reload }.not_to raise_error
+        end
+      end
+
       context "when posting an individual submission" do
         context "when post policies are enabled" do
           it "unmutes the assignment if all submissions are now posted" do

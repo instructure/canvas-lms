@@ -96,14 +96,14 @@ describe('Account Grading Status Management', () => {
       expect(standardStatusItem).toBeInTheDocument()
       const standardEditButton = standardStatusItem?.querySelector('button') as Element
       expect(standardEditButton).toBeInTheDocument()
-      userEvent.click(standardEditButton)
+      await userEvent.click(standardEditButton)
       expect(queryAllByTestId('edit-status-popover')).toHaveLength(1)
 
       const customStatusItem = getByTestId('custom-status-1')
       expect(customStatusItem).toBeInTheDocument()
       const customEditButton = customStatusItem?.querySelector('button') as Element
       expect(customEditButton).toBeInTheDocument()
-      userEvent.click(customEditButton)
+      await userEvent.click(customEditButton)
       expect(queryAllByTestId('edit-status-popover')).toHaveLength(1)
     })
 
@@ -131,11 +131,11 @@ describe('Account Grading Status Management', () => {
       expect(standardStatusItem.firstChild).toHaveStyle('background-color: #E40606')
 
       const standardEditButton = standardStatusItem?.querySelector('button') as Element
-      userEvent.click(standardEditButton)
+      await userEvent.click(standardEditButton)
       const newColor = getByTestId('color-picker-#F0E8EF')
-      userEvent.click(newColor)
+      await userEvent.click(newColor)
       const saveButton = getByTestId('save-status-button')
-      userEvent.click(saveButton)
+      await userEvent.click(saveButton)
 
       await act(async () => {
         await new Promise(resolve => setTimeout(resolve, 0))
@@ -154,12 +154,12 @@ describe('Account Grading Status Management', () => {
       const statusToDelete = getByTestId('custom-status-2')
 
       const deleteButton = statusToDelete?.querySelectorAll('button')[1]
-      userEvent.click(deleteButton)
+      await userEvent.click(deleteButton)
       await act(async () => {
         await new Promise(resolve => setTimeout(resolve, 0))
       })
       const confirmDeleteButton = getByTestId('confirm-button')
-      userEvent.click(confirmDeleteButton)
+      await userEvent.click(confirmDeleteButton)
       await waitFor(() => expect(queryAllByTestId(/custom\-status\-[0-9]/)).toHaveLength(1))
       expect(queryAllByTestId(/custom\-status\-new\-[0-2]/)).toHaveLength(2)
 
@@ -174,15 +174,15 @@ describe('Account Grading Status Management', () => {
       const customStatusItem = getByTestId('custom-status-1')
 
       const customEditButton = customStatusItem?.querySelector('button') as Element
-      userEvent.click(customEditButton)
+      await userEvent.click(customEditButton)
       const newColor = getByTestId('color-picker-#E5F3FC')
-      userEvent.click(newColor)
+      await userEvent.click(newColor)
       const nameInput = getByTestId('custom-status-name-input')
       fireEvent.change(nameInput, {target: {value: 'New Status 10'}})
       expect(nameInput).toHaveValue('New Status 10')
 
       const saveButton = getByTestId('save-status-button')
-      userEvent.click(saveButton)
+      await userEvent.click(saveButton)
       await act(async () => {
         await new Promise(resolve => setTimeout(resolve, 0))
       })
@@ -199,16 +199,16 @@ describe('Account Grading Status Management', () => {
         await new Promise(resolve => setTimeout(resolve, 0))
       })
       const newStatusItem = getByTestId('custom-status-new-0').querySelector('span') as Element
-      userEvent.click(newStatusItem)
+      await userEvent.click(newStatusItem)
 
       const newColor = getByTestId('color-picker-#E5F3FC')
-      userEvent.click(newColor)
+      await userEvent.click(newColor)
       const nameInput = getByTestId('custom-status-name-input')
       fireEvent.change(nameInput, {target: {value: 'New Status 11'}})
       expect(nameInput).toHaveValue('New Status 11')
 
       const saveButton = getByTestId('save-status-button')
-      userEvent.click(saveButton)
+      await userEvent.click(saveButton)
       await act(async () => {
         await new Promise(resolve => setTimeout(resolve, 0))
       })

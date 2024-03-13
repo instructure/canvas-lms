@@ -20,6 +20,7 @@ import {waitFor} from '@testing-library/dom'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
 import RCELoader from '@canvas/rce/serviceRCELoader'
 import $ from 'jquery'
+import 'jquery-migrate'
 import fakeENV from 'helpers/fakeENV'
 import editorUtils from 'helpers/editorUtils'
 

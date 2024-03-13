@@ -37,34 +37,34 @@ describe('EnrollmentStateSelect', () => {
     expect(comboboxElement).toHaveValue(firstOptionLabel)
   })
 
-  it('calls onChange when an option is selected', () => {
+  it('calls onChange when an option is selected', async () => {
     const handleChange = jest.fn()
     render(<EnrollmentStateSelect onChange={handleChange} label="Select State" />)
     const comboboxElement = screen.getByRole('combobox')
-    userEvent.click(comboboxElement)
+    await userEvent.click(comboboxElement)
     const optionLabel = enrollmentStates.find(state => state.value === 'inactive')?.label
     const option = screen.getByRole('option', {name: optionLabel})
-    userEvent.click(option)
+    await userEvent.click(option)
     expect(handleChange).toHaveBeenCalledWith('inactive')
   })
 
-  it('displays all the options', () => {
+  it('displays all the options', async () => {
     render(<EnrollmentStateSelect label="Select State" />)
     const comboboxElement = screen.getByRole('combobox')
-    userEvent.click(comboboxElement)
+    await userEvent.click(comboboxElement)
     enrollmentStates.forEach(state => {
       expect(screen.getByRole('option', {name: state.label})).toBeInTheDocument()
     })
   })
 
-  it('updates the displayed value when an option is selected', () => {
+  it('updates the displayed value when an option is selected', async () => {
     render(<EnrollmentStateSelect label="Select State" />)
     const comboboxElement = screen.getByRole('combobox')
     expect(comboboxElement).toHaveValue('Deleted')
-    userEvent.click(comboboxElement)
+    await userEvent.click(comboboxElement)
     const optionLabel = 'Completed'
     const option = screen.getByRole('option', {name: optionLabel})
-    userEvent.click(option)
+    await userEvent.click(option)
     expect(comboboxElement).toHaveValue(optionLabel)
   })
 

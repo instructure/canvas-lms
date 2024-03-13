@@ -41,6 +41,8 @@ export default class InvitationsView extends DialogBaseView {
           click: this.resend.bind(this),
         },
       ],
+      modal: true,
+      zIndex: 1000,
     }
   }
 

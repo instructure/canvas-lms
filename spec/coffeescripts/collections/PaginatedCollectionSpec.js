@@ -1,3 +1,4 @@
+/* eslint-disable qunit/no-test-expect-argument */
 /*
  * Copyright (C) 2012 - present Instructure, Inc.
  *
@@ -17,6 +18,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import Backbone from '@canvas/backbone'
 import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection'
 import getFakePage from 'helpers/getFakePage'

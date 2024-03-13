@@ -46,7 +46,7 @@ describe CrocodocSessionsController do
 
     it "works for the user in the blob" do
       get :show, params: { blob: @blob, hmac: @hmac }
-      expect(response.body).to include "https://crocodoc.com/view/SESSION"
+      expect(response).to redirect_to "https://crocodoc.com/view/SESSION"
     end
 
     it "doesn't work for others" do
@@ -120,12 +120,12 @@ describe CrocodocSessionsController do
     it "redirects to a canvadocs session instead of crocodoc when enabled" do
       allow(Canvadocs).to receive(:hijack_crocodoc_sessions?).and_return true
       get :show, params: { blob: @blob, hmac: @hmac }
-      expect(response.body).to include "https://canvadocs.instructure.docker/sessions/SESSION/view"
+      expect(response).to redirect_to(%r{^https://canvadocs.instructure.docker/sessions/SESSION/view})
     end
 
     it "does not redirect to a canvadocs session instead of crocodoc when disabled" do
       get :show, params: { blob: @blob, hmac: @hmac }
-      expect(response.body).to_not include "https://canvadocs.instructure.docker/sessions/SESSION/view"
+      expect(response).not_to redirect_to(%r{^https://canvadocs.instructure.docker/sessions/SESSION/view})
     end
   end
 end

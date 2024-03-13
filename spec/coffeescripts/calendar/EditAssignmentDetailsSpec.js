@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import EditAssignmentDetails from 'ui/features/calendar/backbone/views/EditAssignmentDetails'
 import fcUtil from '@canvas/calendar/jquery/fcUtil'
 import timezone from 'timezone'

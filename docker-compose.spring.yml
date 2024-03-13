@@ -28,9 +28,6 @@ services:
       - js-utils_es:/usr/src/app/packages/js-utils/es
       - js-utils_lib:/usr/src/app/packages/js-utils/lib
       - js-utils_node_modules:/usr/src/app/packages/js-utils/node_modules
-      - k5uploader_es:/usr/src/app/packages/k5uploader/es
-      - k5uploader_lib:/usr/src/app/packages/k5uploader/lib
-      - k5uploader_node_modules:/usr/src/app/packages/k5uploader/node_modules
       - locales:/usr/src/app/config/locales/generated
       - log:/usr/src/app/log
       - node_modules:/usr/src/app/node_modules

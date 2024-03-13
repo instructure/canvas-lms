@@ -17,8 +17,7 @@
  */
 
 import $ from 'jquery'
-import 'jqueryui-unpatched/widget'
-import 'jqueryui-unpatched/mouse'
+import 'jqueryui/mouse'
 
 QUnit.module('Mouse Widget', {
   beforeEach() {

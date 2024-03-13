@@ -50,10 +50,10 @@ describe('FlaggableNumberInput', () => {
     expect(input.value).toBe('5')
   })
 
-  it('calls onChange when the value is changed', () => {
+  it('calls onChange when the value is changed', async () => {
     const {getByLabelText} = render(<FlaggableNumberInput {...defaultProps} />)
     const input = getByLabelText('Duration for assignment 3') as HTMLInputElement
-    userEvent.type(input, '{selectall}{backspace}4')
+    await userEvent.type(input, '{selectall}{backspace}4')
     expect(onChange).toHaveBeenCalled()
   })
 

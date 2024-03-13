@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import RCELoader from '@canvas/rce/serviceRCELoader'
 import editorUtils from 'helpers/editorUtils'
 import fakeENV from 'helpers/fakeENV'

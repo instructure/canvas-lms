@@ -2565,10 +2565,25 @@ describe ContextExternalTool do
       expect(tool.editor_button).to be_nil
       tool.settings = { editor_button: { url: "http://www.example.com" } }
       tool.save
-      expect(tool.editor_button).to be_nil
+      # icon_url now optional, a default will be provided
+      expect(tool.editor_button).not_to be_nil
       tool.settings = { editor_button: { url: "http://www.example.com", icon_url: "http://www.example.com", selection_width: 100, selection_height: 100 } }
       tool.save
       expect(tool.editor_button).not_to be_nil
+    end
+
+    context "when allow_lti_tools_editor_button_placement_without_icon FF is disabled" do
+      let(:ff) { :allow_lti_tools_editor_button_placement_without_icon }
+
+      before { @root_account.disable_feature! ff }
+      after { @root_account.enable_feature! ff }
+
+      it "deletes the editor_button if icon_url is not present" do
+        tool = new_external_tool
+        tool.settings = { editor_button: { url: "http://www.example.com" } }
+        tool.save
+        expect(tool.editor_button).to be_nil
+      end
     end
 
     it "sets user_navigation if navigation configured" do
@@ -3446,40 +3461,85 @@ describe ContextExternalTool do
 
     it "includes a boolean false for use_tray" do
       tool.editor_button = { use_tray: "false" }
-      json = ContextExternalTool.editor_button_json([tool], @course, user_with_pseudonym)
+      json = ContextExternalTool.editor_button_json([tool], @course, user_with_pseudonym, nil, "")
       expect(json[0][:use_tray]).to be false
     end
 
     it "includes a boolean true for use_tray" do
       tool.editor_button = { use_tray: "true" }
-      json = ContextExternalTool.editor_button_json([tool], @course, user_with_pseudonym)
+      json = ContextExternalTool.editor_button_json([tool], @course, user_with_pseudonym, nil, "")
       expect(json[0][:use_tray]).to be true
     end
 
     it "includes a boolean false for always_on" do
       Setting.set("rce_always_on_developer_key_ids", "90000000000001,90000000000002")
-      json = ContextExternalTool.editor_button_json([tool], @course, user_with_pseudonym)
+      json = ContextExternalTool.editor_button_json([tool], @course, user_with_pseudonym, nil, "")
       expect(json[0][:always_on]).to be false
     end
 
     it "includes a boolean true for always_on" do
       Setting.set("rce_always_on_developer_key_ids", "90000000000001,#{tool.developer_key.global_id}")
-      json = ContextExternalTool.editor_button_json([tool], @course, user_with_pseudonym)
+      json = ContextExternalTool.editor_button_json([tool], @course, user_with_pseudonym, nil, "")
       expect(json[0][:always_on]).to be true
     end
 
     describe "includes the description" do
       it "parsed into HTML" do
         tool.description = "the first paragraph.\n\nthe second paragraph."
-        json = ContextExternalTool.editor_button_json([tool], @course, user_with_pseudonym)
+        json = ContextExternalTool.editor_button_json([tool], @course, user_with_pseudonym, nil, "")
         expect(json[0][:description]).to eq "<p>the first paragraph.</p>\n\n<p>the second paragraph.</p>\n"
       end
 
       it 'with target="_blank" on links' do
         tool.description = "[link text](http://the.url)"
-        json = ContextExternalTool.editor_button_json([tool], @course, user_with_pseudonym)
+        json = ContextExternalTool.editor_button_json([tool], @course, user_with_pseudonym, nil, "")
         expect(json[0][:description]).to eq "<p><a href=\"http://the.url\" target=\"_blank\">link text</a></p>\n"
       end
+    end
+
+    describe "icon_url" do
+      let(:base_url) { "https://myexampleschool.instructure.com" }
+
+      def editor_button_icon_url(tool)
+        ContextExternalTool.editor_button_json([tool], @course, user_with_pseudonym, nil, base_url)[0][:icon_url]
+      end
+
+      it "includes an icon_url when a tool has an top-level icon_url" do
+        tool.editor_button = {}
+        tool.settings[:icon_url] = "https://example.com/icon.png"
+        expect(editor_button_icon_url(tool)).to eq("https://example.com/icon.png")
+      end
+
+      it "includes an icon_url when a tool has an icon_url in editor_button" do
+        tool.editor_button = { icon_url: "https://example.com/icon.png" }
+        expect(editor_button_icon_url(tool)).to eq("https://example.com/icon.png")
+      end
+
+      it "doesn't include an icon_url when the tool has a canvas_icon_class and no icon_url" do
+        tool.editor_button = { canvas_icon_class: "icon_lti" }
+        expect(editor_button_icon_url(tool)).to be_nil
+      end
+
+      it "uses a default tool icon_url when the tool has no icon_url or canvas_icon_class" do
+        tool.editor_button = {}
+        expect(editor_button_icon_url(tool)).to match(
+          %r{^https://myexampleschool.instructure.com/.*tool_default_icon.*name=editor.thing}
+        )
+      end
+    end
+  end
+
+  describe "#default_icon_path" do
+    it "references the lti_tool_default_icon_path, tool name, and tool developer key id" do
+      tool = external_tool_1_3_model(opts: { name: "foo" })
+      expect(tool.developer_key.global_id).to be_a(Integer)
+      expect(tool.default_icon_path).to eq("/lti/tool_default_icon?id=#{tool.developer_key.global_id}&name=foo")
+    end
+
+    it "uses tool ID if there is no developer key id" do
+      tool = external_tool_model(opts: { name: "foo" })
+      expect(tool.global_id).to be_a(Integer)
+      expect(tool.default_icon_path).to eq("/lti/tool_default_icon?id=#{tool.global_id}&name=foo")
     end
   end
 
@@ -3595,6 +3655,7 @@ describe ContextExternalTool do
 
       let(:course) { course_model(account:) }
       let(:account) { account_model }
+      let(:url) { "https://special.url" }
       let(:direct_assignment) do
         a = assignment_model(context: course, title: "direct", submission_types: "external_tool")
         a.external_tool_tag = ContentTag.create!(context: a, content: old_tool)
@@ -3607,7 +3668,14 @@ describe ContextExternalTool do
         a.save!
         a
       end
-      let(:old_tool) { external_tool_model(context: course, opts: { url: "https://special.url" }) }
+      let(:indirect_collaboration) do
+        external_tool_collaboration_model(
+          context: course,
+          title: "Indirect Collaboration",
+          url:
+        )
+      end
+      let(:old_tool) { external_tool_model(context: course, opts: { url: }) }
       let(:tool) do
         t = old_tool.dup
         t.lti_version = "1.3"
@@ -3622,6 +3690,13 @@ describe ContextExternalTool do
         subject
         expect(direct_assignment.line_items.count).to eq 1
         expect(indirect_assignment.line_items.count).to eq 1
+      end
+
+      it "calls external_tool_collaboration#migrate_to_1_3_if_needed!" do
+        indirect_collaboration
+        expect(course.lti_resource_links.count).to eq 0
+        subject
+        expect(course.lti_resource_links.count).to eq 1
       end
 
       shared_examples_for "finds related content" do
@@ -3684,6 +3759,12 @@ describe ContextExternalTool do
           subject
           expect(tool).to have_received(:prepare_content_for_migration).with(direct)
           expect(tool).to have_received(:prepare_content_for_migration).with(indirect)
+        end
+
+        it "finds indirect collaboration" do
+          indirect_collaboration
+          subject
+          expect(tool).to have_received(:prepare_content_for_migration).with(indirect_collaboration)
         end
       end
 

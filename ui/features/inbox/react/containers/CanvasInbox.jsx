@@ -70,6 +70,7 @@ const CanvasInbox = () => {
   const [messageOpenEvent, setMessageOpenEvent] = useState(false)
   const userID = ENV.current_user_id?.toString()
   const [urlUserRecipient, setUrlUserRecepient] = useState()
+  const [urlContextId, setUrlContextId] = useState()
   const [selectedIds, setSelectedIds] = useState([])
   const [maxGroupRecipientsMet, setMaxGroupRecipientsMet] = useState(false)
   const [conversationIdToGoBackTo, setConversationIdToGoBackTo] = useState(null)
@@ -94,6 +95,7 @@ const CanvasInbox = () => {
     const urlData = new URLSearchParams(window.location.search)
     const userIdFromUrlData = urlData.get('user_id')
     const userNameFromUrlData = urlData.get('user_name')
+    const contextIdFromUrlData = urlData.get('context_id')
     if (userIdFromUrlData && userNameFromUrlData) {
       setUrlUserRecepient({
         _id: userIdFromUrlData,
@@ -101,6 +103,9 @@ const CanvasInbox = () => {
         commonCoursesInfo: [],
         itemType: 'user',
       })
+      if (contextIdFromUrlData) {
+        setUrlContextId(contextIdFromUrlData)
+      }
       setComposeModal(true)
     }
   }
@@ -130,6 +135,7 @@ const CanvasInbox = () => {
   useEffect(() => {
     if (urlUserRecipient && !composeModal) {
       setUrlUserRecepient(null)
+      setUrlContextId(null)
       setSelectedIds([])
     }
   }, [composeModal, urlUserRecipient])
@@ -831,6 +837,7 @@ const CanvasInbox = () => {
             conversationsQueryOption={conversationsQueryOption}
             onSelectedIdsChange={setSelectedIds}
             selectedIds={selectedIds}
+            contextIdFromUrl={urlContextId}
             maxGroupRecipientsMet={maxGroupRecipientsMet}
             currentCourseFilter={courseFilter}
           />

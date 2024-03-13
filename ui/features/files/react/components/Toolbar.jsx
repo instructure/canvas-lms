@@ -94,13 +94,14 @@ export default class Toolbar extends React.Component {
           itemName: this.props.selectedItems[0].displayName(),
         }
       ),
-
       width: 800,
       minHeight: 400,
       close() {
         ReactDOM.unmountComponentAtNode(this)
         $(this).remove()
       },
+      modal: true,
+      zIndex: 1000,
     })
 
     ReactDOM.render(

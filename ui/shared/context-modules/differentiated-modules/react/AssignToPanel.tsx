@@ -195,17 +195,17 @@ export default function AssignToPanel({
   )
 
   return (
-    <Flex direction="column" justifyItems="start">
+    <Flex direction="column">
       <LoadingOverlay showLoadingOverlay={isLoading} mountNode={mountNodeRef.current} />
       <Flex.Item padding="medium medium small" size={bodyHeight}>
-        <Flex direction="column" justifyItems="start">
+        <Flex direction="column">
           <Flex.Item>
             <Text>{I18n.t('By default, this module is visible to everyone.')}</Text>
           </Flex.Item>
           <Flex.Item overflowX="hidden" margin="small 0 0 0">
             <RadioInputGroup description={I18n.t('Set Visibility')} name="access_type">
               {[EVERYONE_OPTION, CUSTOM_OPTION].map(option => (
-                <Flex key={option.value} justifyItems="start">
+                <Flex key={option.value} margin="0 xx-small 0 0">
                   <Flex.Item align="start">
                     <View as="div" margin="xx-small">
                       <RadioInput
@@ -217,18 +217,18 @@ export default function AssignToPanel({
                       />
                     </View>
                   </Flex.Item>
-                  <Flex.Item>
-                    <View as="div" margin="none">
+                  <Flex.Item shouldGrow={true} shouldShrink={true}>
+                    <View as="div">
                       <Text>{option.getLabel()}</Text>
                     </View>
-                    <View as="div" margin="none x-large none none">
+                    <View as="div">
                       <Text color="secondary" size="small">
                         {option.getDescription()}
                       </Text>
                     </View>
                     {option.value === CUSTOM_OPTION.value &&
                       selectedOption === CUSTOM_OPTION.value && (
-                        <View as="div" margin="small x-large none none">
+                        <View as="div" margin="small 0 0">
                           <ModuleAssignments
                             courseId={courseId}
                             onSelect={assignees => {

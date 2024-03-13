@@ -25,6 +25,8 @@ export const RUBRICS_QUERY_RESPONSE: Rubric = {
   locations: [],
   pointsPossible: 10,
   workflowState: 'active',
+  buttonDisplay: 'numeric',
+  ratingOrder: 'ascending',
   criteria: [
     {
       id: '1',

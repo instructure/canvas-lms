@@ -93,13 +93,13 @@ $(document).ready(() => {
         .parents('.student_reviews')
         .getTemplateData({textValues: ['student_review_id']}).student_review_id
       url = replaceTags(url, 'reviewer_id', user_id)
-      $form.find(`select option.student_${user_id}`).attr('disabled', true)
+      $form.find(`select option.student_${user_id}`).prop('disabled', true)
       $(this)
         .parents('.student_reviews')
         .find('.peer_review')
         .each(function () {
           ;({user_id} = $(this).getTemplateData({textValues: ['user_id']}))
-          $form.find(`select option.student_${user_id}`).attr('disabled', true)
+          $form.find(`select option.student_${user_id}`).prop('disabled', true)
         })
       $form.attr('action', url)
       $(this).parents('.student_reviews').find('.form_content').empty().append($form)

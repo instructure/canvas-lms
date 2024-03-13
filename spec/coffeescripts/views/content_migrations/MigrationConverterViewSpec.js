@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import Backbone from '@canvas/backbone'
 import MigrationConverterView from 'ui/features/content_migrations/backbone/views/MigrationConverterView'
 

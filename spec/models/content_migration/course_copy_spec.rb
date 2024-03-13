@@ -506,6 +506,7 @@ describe ContentMigration do
       @copy_from.alt_name = "drama"
       @copy_from.time_zone = "Alaska"
       @copy_from.save!
+      @copy_from.allow_student_discussion_reporting = true
 
       tool = external_tool_1_3_model(context: @copy_from)
 

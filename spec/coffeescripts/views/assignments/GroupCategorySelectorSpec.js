@@ -20,6 +20,7 @@ import GroupCategorySelector from '@canvas/groups/backbone/views/GroupCategorySe
 import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import StudentGroupStore from '@canvas/due-dates/react/StudentGroupStore'
 import $ from 'jquery'
+import 'jquery-migrate'
 import fakeENV from 'helpers/fakeENV'
 
 /* eslint-disable object-shorthand */

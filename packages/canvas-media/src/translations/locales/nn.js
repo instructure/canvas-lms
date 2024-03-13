@@ -89,7 +89,10 @@ const locale = {
   "ukrainian_945b00b7": { "message": "Ukrainsk" },
   "vietnamese_e7a76583": { "message": "Vietnamesisk" },
   "welsh_42ab94b1": { "message": "Walisisk" },
-  "yiddish_f96986df": { "message": "Jiddisk" }
+  "yiddish_f96986df": { "message": "Jiddisk" },
+  "you_can_replace_by_uploading_a_new_caption_file_6c88ce00": {
+    "message": "Du kan erstatte ved å laste opp ei ny fil med undertekstar."
+  }
 }
 
 

@@ -7670,6 +7670,7 @@ tr:
   download_student_analysis_report_statuslabel_1471c8c2: "%{statusLabel} öğrenci analiz raporunu indirin"
   download_submissions_7454665f: "Gönderileri İndir"
   download_this_file_669f9174: "Bu dosyayı indir"
+  draft_83493fcd: Taslak
   draft_92507c72: (taslak)
   draft_comment_b2376ea4: "Taslak yorum"
   drag_a_file_here_39357b48: "Buraya bir Dosya Sürükleyin"
@@ -14694,7 +14695,7 @@ tr:
       unregister_service: "Bu serviste kayıtlanmamak istediğinize emin misiniz? "
     content_shares: 
       page_title: "Paylaşılan İçerik"
-    crumb: "%{user}'nın ayarları"
+    crumb: "%{user}'in ayarları"
     crumbs: 
       observees: Gözlemleniyor
       settings_frd: "%{user}'ın Profili"

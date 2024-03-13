@@ -1,3 +1,4 @@
+/* eslint-disable qunit/resolve-async */
 /*
  * Copyright (C) 2015 - present Instructure, Inc.
  *
@@ -17,9 +18,9 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import Entry from 'ui/features/discussion_topic/backbone/models/Entry'
 import EntryView from 'ui/features/discussion_topic/backbone/views/EntryView'
-import Reply from 'ui/features/discussion_topic/backbone/Reply'
 import fakeENV from 'helpers/fakeENV'
 import assertions from 'helpers/assertions'
 

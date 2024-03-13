@@ -28,6 +28,9 @@ module FilesHelper
       @media_object = MediaObject.by_media_id(@attachment&.media_entry_id).take
       # Look on attachment's shard
       @media_object ||= @attachment&.media_object_by_media_id
+      # Look on attachment's root account and user shards
+      @media_object ||= Shard.shard_for(@attachment.root_account).activate { MediaObject.by_media_id(@attachment.media_entry_id).take }
+      @media_object ||= Shard.shard_for(@attachment.user).activate { MediaObject.by_media_id(@attachment.media_entry_id).take }
       @media_object.current_attachment = @attachment unless @media_object.nil?
       @media_id = @media_object&.id
     elsif params[:media_object_id].present?

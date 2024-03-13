@@ -18,6 +18,7 @@
 
 import MessageStudentsDialog from '@canvas/message-students-dialog'
 import $ from 'jquery'
+import 'jquery-migrate'
 import {map} from 'lodash'
 
 QUnit.module('MessageStudentsDialog', {

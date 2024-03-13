@@ -18,6 +18,7 @@
 
 import React from 'react'
 import $ from 'jquery'
+import 'jquery-migrate'
 import {Provider} from 'react-redux'
 import * as enzyme from 'enzyme'
 import moxios from 'moxios'

@@ -83,8 +83,7 @@ class SecurityController < ApplicationController
     render json: {
       issuer: Canvas::Security.config["lti_iss"],
       authorization_endpoint: lti_authorize_redirect_url(host: Lti::Oidc.auth_domain(account_domain)),
-      # TODO: use a path helper for this when this path gets created
-      registration_endpoint: "#{HostUrl.protocol}://#{account_domain}/api/lti/registrations",
+      registration_endpoint: create_lti_registration_url(host: account_domain),
       jwks_uri: lti_jwks_url(host: Lti::Oidc.auth_domain(account_domain)),
       token_endpoint: oauth2_token_url(host: Lti::Oidc.auth_domain(account_domain)),
       token_endpoint_auth_methods_supported: ["private_key_jwt"],

@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import EditPlannerNoteDetails from 'ui/features/calendar/backbone/views/EditPlannerNoteDetails'
 import tzInTest from '@canvas/datetime/specHelpers'
 import fakeENV from 'helpers/fakeENV'

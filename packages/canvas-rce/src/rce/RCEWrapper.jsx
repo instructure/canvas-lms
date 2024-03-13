@@ -69,6 +69,7 @@ import {transformRceContentForEditing} from './transformContent'
 import {IconMoreSolid} from '@instructure/ui-icons/es/svg'
 import EncryptedStorage from '../util/encrypted-storage'
 import buildStyle from './style'
+import {externalToolsForToolbar} from './plugins/instructure_rce_external_tools/RceToolWrapper'
 
 const RestoreAutoSaveModal = React.lazy(() => import('./RestoreAutoSaveModal'))
 const RceHtmlEditor = React.lazy(() => import('./RceHtmlEditor'))
@@ -264,12 +265,9 @@ class RCEWrapper extends React.Component {
 
     this.pendingEventHandlers = []
 
-    // Get top 2 favorited LTI Tools
-    this.ltiToolFavorites =
-      this.props.ltiTools
-        .filter(e => e.favorite)
-        .map(e => `instructure_external_button_${e.id}`)
-        .slice(0, 2) || []
+    this.ltiToolFavorites = externalToolsForToolbar(this.props.ltiTools).map(
+      e => `instructure_external_button_${e.id}`
+    )
 
     this.pluginsToExclude = parsePluginsToExclude(props.editorOptions?.plugins || [])
 

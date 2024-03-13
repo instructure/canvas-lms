@@ -17,6 +17,7 @@
 /* eslint-disable no-throw-literal */
 /* eslint-disable linebreak-style */
 /* eslint-disable vars-on-top */
+/* eslint-disable  no-constant-condition */
 /*
  * Copyright (c) 2010 Michael Leibman, http://github.com/mleibman/slickgrid
  *
@@ -515,8 +516,8 @@ if (typeof Slick === 'undefined') {
         $headerScroller_1
           .bind('contextmenu', handleHeaderContextMenu)
           .bind('click', handleHeaderClick)
-          .delegate('.slick-header-column', 'mouseenter', handleHeaderMouseEnter)
-          .delegate('.slick-header-column', 'mouseleave', handleHeaderMouseLeave)
+          .on('mouseenter', '.slick-header-column', handleHeaderMouseEnter)
+          .on('mouseleave', '.slick-header-column', handleHeaderMouseLeave)
         $headerRowScroller_1.bind('scroll', handleHeaderRowScroll)
         $focusSink.add($focusSink2).bind('keydown', handleKeyDown)
         $canvas_1
@@ -528,8 +529,8 @@ if (typeof Slick === 'undefined') {
           .bind('dragstart', {distance: 3}, handleDragStart)
           .bind('drag', handleDrag)
           .bind('dragend', handleDragEnd)
-          .delegate('.slick-cell', 'mouseenter', handleMouseEnter)
-          .delegate('.slick-cell', 'mouseleave', handleMouseLeave)
+          .on('mouseenter', '.slick-cell', handleMouseEnter)
+          .on('mouseleave', '.slick-cell', handleMouseLeave)
 
         if (options.numberOfColumnsToFreeze > 0) {
           $container_0.bind('resize.slickgrid', resizeCanvas)
@@ -544,8 +545,8 @@ if (typeof Slick === 'undefined') {
           $headerScroller_0
             .bind('contextmenu', handleHeaderContextMenu)
             .bind('click', handleHeaderClick)
-            .delegate('.slick-header-column', 'mouseenter', handleHeaderMouseEnter)
-            .delegate('.slick-header-column', 'mouseleave', handleHeaderMouseLeave)
+            .on('mouseenter', '.slick-header-column', handleHeaderMouseEnter)
+            .on('mouseleave', '.slick-header-column', handleHeaderMouseLeave)
           $headerRowScroller_0.bind('scroll', handleHeaderRowScroll)
           $canvas_0
             .bind('keydown', handleKeyDown)
@@ -556,8 +557,8 @@ if (typeof Slick === 'undefined') {
             .bind('dragstart', {distance: 3}, handleDragStart)
             .bind('drag', handleDrag)
             .bind('dragend', handleDragEnd)
-            .delegate('.slick-cell', 'mouseenter', handleMouseEnter)
-            .delegate('.slick-cell', 'mouseleave', handleMouseLeave)
+            .on('mouseenter', '.slick-cell', handleMouseEnter)
+            .on('mouseleave', '.slick-cell', handleMouseLeave)
         }
       }
     }

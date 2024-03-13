@@ -26,15 +26,24 @@ class AuthenticationProvider::Facebook < AuthenticationProvider::OAuth2
 
   SENSITIVE_PARAMS = [:app_secret].freeze
 
-  alias_attribute :app_id, :client_id
-  alias_attribute :app_secret, :client_secret
+  alias_attribute :app_id, :entity_id
+  alias_method :app_secret, :client_secret
+  alias_method :app_secret=, :client_secret=
 
   def client_id
-    self.class.globally_configured? ? app_id : super
+    app_id
   end
 
+  # yes this seems duplicative of the alias_method above, but it's necessary.
+  # PluginSettings will define a method app_secret in a module prepended to
+  # this class; that method will call super, which needs to call the "raw"
+  # app_secret method created above. But OAuth2 (the parent to this class)
+  # will call client_secret, and we need it to return the app_secret, as
+  # defined by PluginSettings. We also can't simply use alias_method, since
+  # that will copy app_secret (back!) in this class, instead of calling
+  # app_secret as defined in the prepended module
   def client_secret
-    self.class.globally_configured? ? app_secret : super
+    app_secret
   end
 
   def self.recognized_params

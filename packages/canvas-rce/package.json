@@ -177,7 +177,7 @@
     "@testing-library/jest-dom": "^5",
     "@testing-library/react": "^12",
     "@testing-library/react-hooks": "^5",
-    "@testing-library/user-event": "^12",
+    "@testing-library/user-event": "^14",
     "axe-testcafe": "^3",
     "babel-loader": "^9.1.3",
     "babel-plugin-dynamic-import-node": "^2.2.0",

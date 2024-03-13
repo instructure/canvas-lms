@@ -225,9 +225,13 @@ class CollaborationsController < ApplicationController
           @collaboration.authorize_user(@current_user)
           log_asset_access(@collaboration, "collaborations", "other", "participate")
           url = if @collaboration.is_a? ExternalToolCollaboration
+                  tool = ContextExternalTool.find_external_tool(@collaboration.url, @context)
+                  @collaboration.migrate_to_1_3_if_needed!(tool)
+                  resource_link_lookup_uuid = @collaboration.resource_link_lookup_uuid if tool.use_1_3?
+
                   external_tool_launch_url(
                     @collaboration.url,
-                    @collaboration.resource_link_lookup_uuid
+                    resource_link_lookup_uuid
                   )
                 else
                   @collaboration.url

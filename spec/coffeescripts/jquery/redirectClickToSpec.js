@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import 'ui/features/wiki_page_index/jquery/redirectClickTo'
 
 QUnit.module('redirectClickTo')

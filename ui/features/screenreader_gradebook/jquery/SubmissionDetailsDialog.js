@@ -78,12 +78,12 @@ export default class SubmissionDetailsDialog {
       this.$el.remove()
     })
     this.dialog
-      .delegate('select[id="submission_to_view"]', 'change', event =>
+      .on('change', 'select[id="submission_to_view"]', event =>
         this.dialog.find('.submission_detail').each(function (index) {
           $(this).showIf(index === event.currentTarget.selectedIndex)
         })
       )
-      .delegate('.submission_details_grade_form', 'submit', event => {
+      .on('submit', '.submission_details_grade_form', event => {
         event.preventDefault()
         let formData = $(event.currentTarget).getFormData()
         const rawGrade = formData['submission[posted_grade]']
@@ -109,7 +109,7 @@ export default class SubmissionDetailsDialog {
           })
         )
       })
-      .delegate('.submission_details_add_comment_form', 'submit', event => {
+      .on('submit', '.submission_details_add_comment_form', event => {
         event.preventDefault()
         $(event.currentTarget).disableWhileLoading(
           $.ajaxJSON(this.url, 'PUT', $(event.currentTarget).getFormData(), data => {

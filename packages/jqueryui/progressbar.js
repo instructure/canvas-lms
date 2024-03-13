@@ -1,11 +1,14 @@
+/* eslint-disable eslint-comments/no-unlimited-disable */
+/* eslint-disable */
 /*!
- * jQuery UI Progressbar @VERSION
+ * jQuery UI Progressbar 1.9.2
+ * http://jqueryui.com
  *
- * Copyright 2012, AUTHORS.txt (http://jqueryui.com/about)
- * Dual licensed under the MIT or GPL Version 2 licenses.
+ * Copyright 2012 jQuery Foundation and other contributors
+ * Released under the MIT license.
  * http://jquery.org/license
  *
- * http://docs.jquery.com/UI/Progressbar
+ * http://api.jqueryui.com/progressbar/
  *
  * Depends:
  *   jquery.ui.core.js
@@ -15,92 +18,95 @@ import $ from 'jquery'
 import './core'
 import './widget'
 
-$.widget( "ui.progressbar", {
-	version: "@VERSION",
-	options: {
-		value: 0,
-		max: 100
-	},
+// (function( $, undefined ) {
 
-	min: 0,
+  $.widget( "ui.progressbar", {
+    version: "1.9.2",
+    options: {
+      value: 0,
+      max: 100
+    },
 
-	_create: function() {
-		this.element
-			.addClass( "ui-progressbar ui-widget ui-widget-content ui-corner-all" )
-			.attr({
-				role: "progressbar",
-				"aria-valuemin": this.min,
-				"aria-valuemax": this.options.max,
-				"aria-valuenow": this._value()
-			});
+    min: 0,
 
-		this.valueDiv = $( "<div class='ui-progressbar-value ui-widget-header ui-corner-left'></div>" )
-			.appendTo( this.element );
+    _create: function() {
+      this.element
+        .addClass( "ui-progressbar ui-widget ui-widget-content ui-corner-all" )
+        .attr({
+          role: "progressbar",
+          "aria-valuemin": this.min,
+          "aria-valuemax": this.options.max,
+          "aria-valuenow": this._value()
+        });
 
-		this.oldValue = this._value();
-		this._refreshValue();
-	},
+      this.valueDiv = $( "<div class='ui-progressbar-value ui-widget-header ui-corner-left'></div>" )
+        .appendTo( this.element );
 
-	_destroy: function() {
-		this.element
-			.removeClass( "ui-progressbar ui-widget ui-widget-content ui-corner-all" )
-			.removeAttr( "role" )
-			.removeAttr( "aria-valuemin" )
-			.removeAttr( "aria-valuemax" )
-			.removeAttr( "aria-valuenow" );
+      this.oldValue = this._value();
+      this._refreshValue();
+    },
 
-		this.valueDiv.remove();
-	},
+    _destroy: function() {
+      this.element
+        .removeClass( "ui-progressbar ui-widget ui-widget-content ui-corner-all" )
+        .removeAttr( "role" )
+        .removeAttr( "aria-valuemin" )
+        .removeAttr( "aria-valuemax" )
+        .removeAttr( "aria-valuenow" );
 
-	value: function( newValue ) {
-		if ( newValue === undefined ) {
-			return this._value();
-		}
+      this.valueDiv.remove();
+    },
 
-		this._setOption( "value", newValue );
-		return this;
-	},
+    value: function( newValue ) {
+      if ( newValue === undefined ) {
+        return this._value();
+      }
 
-	_setOption: function( key, value ) {
-		if ( key === "value" ) {
-			this.options.value = value;
-			this._refreshValue();
-			if ( this._value() === this.options.max ) {
-				this._trigger( "complete" );
-			}
-		}
+      this._setOption( "value", newValue );
+      return this;
+    },
 
-		this._super( key, value );
-	},
+    _setOption: function( key, value ) {
+      if ( key === "value" ) {
+        this.options.value = value;
+        this._refreshValue();
+        if ( this._value() === this.options.max ) {
+          this._trigger( "complete" );
+        }
+      }
 
-	_value: function() {
-		var val = this.options.value;
-		// normalize invalid value
-		if ( typeof val !== "number" ) {
-			val = 0;
-		}
-		return Math.min( this.options.max, Math.max( this.min, val ) );
-	},
+      this._super( key, value );
+    },
 
-	_percentage: function() {
-		return 100 * this._value() / this.options.max;
-	},
+    _value: function() {
+      var val = this.options.value;
+      // normalize invalid value
+      if ( typeof val !== "number" ) {
+        val = 0;
+      }
+      return Math.min( this.options.max, Math.max( this.min, val ) );
+    },
 
-	_refreshValue: function() {
-		var value = this.value(),
-			percentage = this._percentage();
+    _percentage: function() {
+      return 100 * this._value() / this.options.max;
+    },
 
-		if ( this.oldValue !== value ) {
-			this.oldValue = value;
-			this._trigger( "change" );
-		}
+    _refreshValue: function() {
+      var value = this.value(),
+        percentage = this._percentage();
 
-		this.valueDiv
-			.toggle( value > this.min )
-			.toggleClass( "ui-corner-right", value === this.options.max )
-			.width( percentage.toFixed(0) + "%" );
-		this.element.attr( "aria-valuenow", value );
-	}
-});
+      if ( this.oldValue !== value ) {
+        this.oldValue = value;
+        this._trigger( "change" );
+      }
 
+      this.valueDiv
+        .toggle( value > this.min )
+        .toggleClass( "ui-corner-right", value === this.options.max )
+        .width( percentage.toFixed(0) + "%" );
+      this.element.attr( "aria-valuenow", value );
+    }
+  });
+
+// })( jQuery );
 

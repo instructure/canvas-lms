@@ -57,6 +57,7 @@ export default class IndividualStudentView extends Backbone.View {
       collapseToggle.removeAttr('disabled')
       collapseToggle.attr('aria-disabled', 'false')
     } else {
+      // disabled attribute on <a> is invalid per the HTML spec
       collapseToggle.attr('disabled', 'disabled')
       collapseToggle.attr('aria-disabled', 'true')
     }
@@ -65,6 +66,7 @@ export default class IndividualStudentView extends Backbone.View {
       expandToggle.removeAttr('disabled')
       return expandToggle.attr('aria-disabled', 'false')
     } else {
+      // disabled attribute on <a> is invalid per the HTML spec
       expandToggle.attr('disabled', 'disabled')
       return expandToggle.attr('aria-disabled', 'true')
     }

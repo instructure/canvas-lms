@@ -66,6 +66,13 @@ describe AvatarHelper do
         expect(html).not_to match(/href/)
       end
 
+      it "leaves off the href and creates a span if skip_url = true" do
+        html = avatar(user, url: "/test_url", skip_url: true)
+        expect(html).not_to match(/<a/)
+        expect(html).to match(/<span/)
+        expect(html).not_to match(/href/)
+      end
+
       it "sets the href to the given url" do
         expect(avatar(user, url: "/test_url")).to match(%r{href="/test_url"})
       end

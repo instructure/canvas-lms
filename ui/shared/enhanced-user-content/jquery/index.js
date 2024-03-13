@@ -40,7 +40,7 @@ import '@canvas/util/jquery/fixDialogButtons'
 import '@canvas/media-comments/jquery/mediaCommentThumbnail'
 import 'date-js'
 import 'jquery-tinypubsub' /* /\.publish\(/ */
-import 'jqueryui-unpatched/resizable'
+import 'jqueryui/resizable'
 import 'jqueryui/sortable'
 import 'jqueryui/tabs'
 import {captureException} from '@sentry/browser'
@@ -300,7 +300,7 @@ function openDialogsWhenClicked() {
     $('#' + $(this).attr('aria-controls')).ifExists($dialog => {
       event.preventDefault()
       // if the linked dialog has not already been initialized, initialize it (passing in opts)
-      if (!$dialog.data('dialog')) {
+      if (!$dialog.data('ui-dialog')) {
         $dialog.dialog(
           $.extend(
             {
@@ -412,7 +412,7 @@ function showAndHideRCEWhenAsked() {
 function doThingsWhenDiscussionTopicSubMessageIsPosted() {
   $('.communication_sub_message .add_sub_message_form').formSubmit({
     beforeSubmit(_data) {
-      $(this).find('button').attr('disabled', true)
+      $(this).find('button').prop('disabled', true)
       $(this).find('.submit_button').text(I18n.t('status.posting_message', 'Posting Message...'))
       $(this).loadingImage()
     },
@@ -464,7 +464,7 @@ function doThingsWhenDiscussionTopicSubMessageIsPosted() {
     },
     error(data) {
       $(this).loadingImage('remove')
-      $(this).find('button').attr('disabled', false)
+      $(this).find('button').prop('disabled', false)
       $(this)
         .find('.submit_button')
         .text(I18n.t('errors.posting_message_failed', 'Post Failed, Try Again'))
@@ -547,7 +547,7 @@ function doThingsToModuleSequenceFooter() {
 function showHideRemoveThingsToRightSideMoreLinksWhenClicked() {
   // this is for things like the to-do, recent items and upcoming, it
   // happend a lot so rather than duplicating it everywhere I stuck it here
-  $('#right-side').delegate('.more_link', 'click', function (event) {
+  $('#right-side').on('click', '.more_link', function (event) {
     const $this = $(this)
     const $children = $this.parents('ul').children(':hidden').show()
     $this.closest('li').remove()

@@ -364,14 +364,14 @@ module PostgreSQLAdapterExtensions
   def execute(...)
     super
   rescue AbortExceptionMatcher
-    @connection.cancel
+    (($canvas_rails == "7.1") ? @raw_connection : @connection).cancel
     raise
   end
 
   def exec_query(...)
     super
   rescue AbortExceptionMatcher
-    @connection.cancel
+    (($canvas_rails == "7.1") ? @raw_connection : @connection).cancel
     raise
   end
 

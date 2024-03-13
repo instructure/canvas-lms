@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import _ from 'lodash'
 import Outcome from '@canvas/grade-summary/backbone/models/Outcome'
 import OutcomeDialogView from 'ui/features/grade_summary/backbone/views/OutcomeDialogView'

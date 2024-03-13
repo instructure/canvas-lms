@@ -616,7 +616,6 @@ form.ic-Form-group { margin: 0; }
   .ic-Label {
     margin: 0;
     position: relative;
-    z-index: 1;
     padding: direction-sides(math.div($ic-sp, 3) 0 math.div($ic-sp, 3) $ic-radio-checkbox-left-offset);
     font-weight: normal;
     display: inline-block;
@@ -763,7 +762,6 @@ form.ic-Form-group { margin: 0; }
   .ic-Label {
     margin-bottom: 0;
     position: relative;
-    z-index: 1;
     padding: direction-sides(math.div($ic-sp, 3) 0 math.div($ic-sp, 3) $ic-radio-checkbox-left-offset);
     font-weight: normal;
     display: inline-block;

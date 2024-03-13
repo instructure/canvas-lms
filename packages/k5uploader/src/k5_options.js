@@ -20,11 +20,11 @@ import defaults from './defaults'
 
 function K5Options() {}
 
-K5Options.prototype.setOptions = function(options) {
+K5Options.prototype.setOptions = function (options) {
   this.mergeDefaults(options)
 }
 
-K5Options.prototype.mergeDefaults = function(options) {
+K5Options.prototype.mergeDefaults = function (options) {
   this.allowedMediaTypes = ['video', 'audio']
   this.sessionUrl = '/api/v1/services/kaltura_session'
   this.uploadUrl = ''
@@ -35,7 +35,7 @@ K5Options.prototype.mergeDefaults = function(options) {
     conversionProfile: 2,
     source: 1,
     kshow_id: -1,
-    quick_edit: true
+    quick_edit: true,
   }
   defaults('allowedMediaTypes', this, options)
   defaults('sessionUrl', this, options)
@@ -49,13 +49,13 @@ K5Options.prototype.mergeDefaults = function(options) {
   defaults('quick_edit', this.entryDefaults, options.entryDefaults)
 }
 
-K5Options.prototype.asEntryParams = function() {
+K5Options.prototype.asEntryParams = function () {
   return {
     entry1_partnerData: this.entryDefaults.partnerData,
     entry1_conversionProfile: this.entryDefaults.conversionProfile,
     entry1_source: this.entryDefaults.source,
     kshow_id: this.entryDefaults.kshow_id,
-    quick_edit: this.entryDefaults.quick_edit
+    quick_edit: this.entryDefaults.quick_edit,
   }
 }
 

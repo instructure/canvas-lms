@@ -1,3 +1,4 @@
+/* eslint-disable qunit/resolve-async */
 /*
  * Copyright (C) 2014 - present Instructure, Inc.
  *
@@ -17,6 +18,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import InvitationsView from 'ui/features/roster/backbone/views/InvitationsView'
 import RosterUser from 'ui/features/roster/backbone/models/RosterUser'
 import assertions from 'helpers/assertions'

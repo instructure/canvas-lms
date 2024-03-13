@@ -4425,6 +4425,14 @@ class Course < ActiveRecord::Base
     completed_ids
   end
 
+  # fix for appointment_participants using asset_string as primary key, even though it's
+  # not a real column
+  def _read_attribute(attr_name)
+    return asset_string if attr_name == "asset_string"
+
+    super
+  end
+
   private
 
   def effective_due_dates

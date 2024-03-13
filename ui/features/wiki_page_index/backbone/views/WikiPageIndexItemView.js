@@ -285,7 +285,7 @@ export default class WikiPageIndexItemView extends Backbone.View {
         delete this.selectedPages[pageId]
       }
     }
-    $('.delete_pages').attr('disabled', Object.keys(this.selectedPages).length === 0)
+    $('.delete_pages').prop('disabled', Object.keys(this.selectedPages).length === 0)
   }
 }
 WikiPageIndexItemView.initClass()

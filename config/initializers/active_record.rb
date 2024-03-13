@@ -753,8 +753,8 @@ class ActiveRecord::Base
             .transform_values { |attr| attr.is_a?(ActiveModel::Attribute) ? attr.value : attr }
         )
       else
-        returning_values = returning_columns = self.class._returning_columns_for_insert
-        self.class._insert_record(
+        returning_columns = self.class._returning_columns_for_insert
+        returning_values = self.class._insert_record(
           attributes_with_values(attribute_names_for_partial_inserts)
             .transform_values { |attr| attr.is_a?(ActiveModel::Attribute) ? attr.value : attr },
           returning_columns
@@ -1271,9 +1271,17 @@ end
 
 module LockForNoKeyUpdate
   def lock(lock_type = true)
-    lock_type = "FOR NO KEY UPDATE" if lock_type == :no_key_update
-    lock_type = "FOR NO KEY UPDATE SKIP LOCKED" if lock_type == :no_key_update_skip_locked
-    super(lock_type)
+    super(lock_type_clause(lock_type))
+  end
+
+  private
+
+  def lock_type_clause(lock_type)
+    return "FOR NO KEY UPDATE" if lock_type == :no_key_update
+    return "FOR NO KEY UPDATE SKIP LOCKED" if lock_type == :no_key_update_skip_locked
+    return "FOR UPDATE" if lock_type == true
+
+    lock_type
   end
 end
 ActiveRecord::Relation.prepend(LockForNoKeyUpdate)
@@ -1303,8 +1311,8 @@ ActiveRecord::Relation.class_eval do
   end
 
   def update_all_locked_in_order(lock_type: :no_key_update, **updates)
-    locked_scope = lock(lock_type).order(primary_key.to_sym)
-    unscoped.where(primary_key => locked_scope).update_all(updates)
+    locked_scope = lock_for_subquery_update(lock_type).order(primary_key.to_sym)
+    base_class.unscoped.where(primary_key => locked_scope).update_all(updates)
   end
 
   def touch_all(*names, time: nil)
@@ -1499,18 +1507,27 @@ Switchman::ActiveRecord::Relation.include(UpdateAndDeleteWithJoins)
 module UpdateAndDeleteAllWithLimit
   def delete_all(*args)
     if limit_value || offset_value
-      scope = except(:select).select(primary_key).lock
-      return unscoped.where(primary_key => scope).delete_all
+      scope = lock_for_subquery_update.except(:select).select(primary_key)
+      return base_class.unscoped.where(primary_key => scope).delete_all
     end
     super
   end
 
   def update_all(updates, *args)
     if limit_value || offset_value
-      scope = except(:select).select(primary_key).lock
-      return unscoped.where(primary_key => scope).update_all(updates)
+      scope = lock_for_subquery_update.except(:select).select(primary_key)
+      return base_class.unscoped.where(primary_key => scope).update_all(updates)
     end
     super
+  end
+
+  private
+
+  def lock_for_subquery_update(lock_type = true)
+    return lock(lock_type) if !lock_type || joins_values.empty?
+
+    # make sure to lock the proper table
+    lock("#{lock_type_clause(lock_type)} OF #{connection.quote_local_table_name(klass.table_name)}")
   end
 end
 Switchman::ActiveRecord::Relation.include(UpdateAndDeleteAllWithLimit)

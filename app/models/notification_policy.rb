@@ -139,12 +139,7 @@ class NotificationPolicy < ActiveRecord::Base
         np = communication_channel.notification_policies.where(notification_id: notification).first
         unless np
           np = communication_channel.notification_policies.build(notification:)
-          frequency ||= if communication_channel == communication_channel.user.communication_channel
-                          notification.default_frequency(communication_channel.user)
-                        else
-                          "never"
-                        end
-
+          frequency ||= notification.default_frequency(communication_channel.user) || "never"
         end
         if frequency
           np.frequency = frequency
@@ -172,13 +167,7 @@ class NotificationPolicy < ActiveRecord::Base
         np = nil
         NotificationPolicy.transaction(requires_new: true) do
           np = communication_channel.notification_policies.build(notification:)
-          np.frequency = if frequencies[notification]
-                           frequencies[notification]
-                         elsif communication_channel == communication_channel.user.communication_channel
-                           notification.default_frequency(communication_channel.user)
-                         else
-                           "never"
-                         end
+          np.frequency = (frequencies[notification] || notification.default_frequency(communication_channel.user) || "never")
           np.save!
         rescue ActiveRecord::RecordNotUnique, ActiveRecord::InvalidForeignKey
           np = nil

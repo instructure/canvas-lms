@@ -85,6 +85,7 @@ export const PeerReviewOptions = ({
           </View>
           <View as="div" margin="small 0 small large" data-testid="peer-review-due-date-container">
             <DateTimeInput
+              timezone={ENV.TIMEZONE}
               description={I18n.t('Reviews Due')}
               prevMonthLabel={I18n.t('previous')}
               nextMonthLabel={I18n.t('next')}

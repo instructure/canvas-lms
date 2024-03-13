@@ -1,3 +1,4 @@
+/* eslint-disable qunit/resolve-async */
 /*
  * Copyright (C) 2013 - present Instructure, Inc.
  *
@@ -17,6 +18,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import Backbone from '@canvas/backbone'
 import CourseSearchResultsView from 'ui/features/account_admin_tools/backbone/views/CourseSearchResultsView'
 import CourseRestore from 'ui/features/account_admin_tools/backbone/models/CourseRestore'

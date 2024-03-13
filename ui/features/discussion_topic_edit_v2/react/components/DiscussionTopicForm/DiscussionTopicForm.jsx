@@ -55,6 +55,9 @@ import {
   buildAssignmentOverrides,
   buildDefaultAssignmentOverride,
 } from '../../util/utils'
+import {MissingSectionsWarningModal} from '../MissingSectionsWarningModal/MissingSectionsWarningModal'
+import {flushSync} from 'react-dom'
+import {SavingDiscussionTopicOverlay} from '../SavingDiscussionTopicOverlay/SavingDiscussionTopicOverlay'
 
 const I18n = useI18nScope('discussion_create')
 
@@ -69,6 +72,8 @@ export default function DiscussionTopicForm({
   onSubmit,
   isGroupContext,
   apolloClient,
+  isSubmitting,
+  setIsSubmitting,
 }) {
   const rceRef = useRef()
   const textInputRef = useRef()
@@ -237,6 +242,10 @@ export default function DiscussionTopicForm({
     !!currentDiscussionTopic?.assignment?.peerReviews?.intraReviews || false
   )
 
+  const [lastShouldPublish, setLastShouldPublish] = useState(false)
+  const [missingSections, setMissingSections] = useState([])
+  const [shouldShowMissingSectionsWarning, setShouldShowMissingSectionsWarning] = useState(false)
+
   const handleSettingUsageRightsData = data => {
     setUsageRightsErrorState(false)
     setUsageRightsData(data)
@@ -367,7 +376,7 @@ export default function DiscussionTopicForm({
 
   const validatePostToSections = () => {
     // If the PostTo section is not available, no need to validate
-    if (!(!isGraded && !isGroupDiscussion && !isGroupContext)) {
+    if (!shouldShowPostToSectionOption) {
       return true
     }
 
@@ -628,13 +637,53 @@ export default function DiscussionTopicForm({
     }
   }
 
-  const submitForm = shouldPublish => {
+  const continueSubmitForm = shouldPublish => {
+    setTimeout(() => {
+      setIsSubmitting(true)
+    }, 0)
+
     if (validateFormFields()) {
       const payload = createSubmitPayload(shouldPublish)
       onSubmit(payload)
       return true
     }
+
+    setTimeout(() => {
+      setIsSubmitting(false)
+    }, 0)
+
     return false
+  }
+
+  const submitForm = shouldPublish => {
+    if (shouldShowAvailabilityOptions && isGraded) {
+      const selectedAssignedTo = assignedInfoList.map(info => info.assignedList).flatMap(x => x)
+      const isEveryoneOrEveryoneElseSelected = selectedAssignedTo.some(
+        assignedTo =>
+          assignedTo === defaultEveryoneOption.assetCode ||
+          assignedTo === defaultEveryoneElseOption.assetCode
+      )
+
+      if (!isEveryoneOrEveryoneElseSelected) {
+        const selectedSectionIds = selectedAssignedTo
+          .filter(assignedTo => String(assignedTo).startsWith('course_section_'))
+          .map(assignedTo => assignedTo.split('_')[2])
+
+        const missingSectionObjs = sections.filter(
+          section => !selectedSectionIds.includes(section.id)
+        )
+
+        if (missingSectionObjs.length > 0) {
+          setLastShouldPublish(shouldPublish)
+          setMissingSections(missingSectionObjs)
+          setShouldShowMissingSectionsWarning(true)
+
+          return false
+        }
+      }
+    }
+
+    return continueSubmitForm(shouldPublish)
   }
 
   const renderLabelWithPublishStatus = () => {
@@ -678,6 +727,14 @@ export default function DiscussionTopicForm({
     } else {
       setPostToValidationMessages([])
     }
+  }
+
+  const closeMissingSectionsWarningModal = () => {
+    // If we don't do this, the focus will not go to the correct field if there is a validation error.
+    flushSync(() => {
+      setShouldShowMissingSectionsWarning(false)
+      setMissingSections([])
+    })
   }
 
   return (
@@ -839,6 +896,7 @@ export default function DiscussionTopicForm({
           )}
           {delayPosting && shouldShowAnnouncementOnlyOptions && (
             <DateTimeInput
+              timezone={ENV.TIMEZONE}
               description={I18n.t('Post At')}
               prevMonthLabel={I18n.t('previous')}
               nextMonthLabel={I18n.t('next')}
@@ -948,6 +1006,7 @@ export default function DiscussionTopicForm({
                   margin="small 0 0 0"
                 >
                   <DateTimeInput
+                    timezone={ENV.TIMEZONE}
                     description=""
                     dateRenderLabel={I18n.t('Date')}
                     timeRenderLabel={I18n.t('Time')}
@@ -1084,6 +1143,7 @@ export default function DiscussionTopicForm({
           ) : (
             <FormFieldGroup description="" width={inputWidth}>
               <DateTimeInput
+                timezone={ENV.TIMEZONE}
                 description={I18n.t('Available from')}
                 dateRenderLabel={I18n.t('Date')}
                 timeRenderLabel={I18n.t('Time')}
@@ -1099,6 +1159,7 @@ export default function DiscussionTopicForm({
                 layout="columns"
               />
               <DateTimeInput
+                timezone={ENV.TIMEZONE}
                 description={I18n.t('Until')}
                 dateRenderLabel={I18n.t('Date')}
                 timeRenderLabel={I18n.t('Time')}
@@ -1133,6 +1194,7 @@ export default function DiscussionTopicForm({
               onClick={() => {
                 window.location.assign(ENV.CANCEL_TO)
               }}
+              disabled={isSubmitting}
             >
               {I18n.t('Cancel')}
             </Button>
@@ -1145,6 +1207,7 @@ export default function DiscussionTopicForm({
                 color="secondary"
                 margin="xxx-small"
                 data-testid="save-and-publish-button"
+                disabled={isSubmitting}
               >
                 {I18n.t('Save and Publish')}
               </Button>
@@ -1159,6 +1222,7 @@ export default function DiscussionTopicForm({
               color="primary"
               margin="xxx-small"
               data-testid="announcement-submit-button"
+              disabled={isSubmitting}
             >
               {willAnnouncementPostRightAway ? I18n.t('Publish') : I18n.t('Save')}
             </Button>
@@ -1173,12 +1237,24 @@ export default function DiscussionTopicForm({
                 submitForm(isEditing ? published : !ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MODERATE)
               }
               color="primary"
+              disabled={isSubmitting}
             >
               {I18n.t('Save')}
             </Button>
           )}
         </View>
       </FormFieldGroup>
+      {shouldShowMissingSectionsWarning && (
+        <MissingSectionsWarningModal
+          sections={missingSections}
+          onClose={closeMissingSectionsWarningModal}
+          onContinue={() => {
+            closeMissingSectionsWarningModal()
+            continueSubmitForm(lastShouldPublish)
+          }}
+        />
+      )}
+      <SavingDiscussionTopicOverlay open={isSubmitting} />
     </>
   )
 }
@@ -1194,6 +1270,8 @@ DiscussionTopicForm.propTypes = {
   onSubmit: PropTypes.func,
   isGroupContext: PropTypes.bool,
   apolloClient: PropTypes.object,
+  isSubmitting: PropTypes.bool,
+  setIsSubmitting: PropTypes.func,
 }
 
 DiscussionTopicForm.defaultProps = {
@@ -1203,4 +1281,6 @@ DiscussionTopicForm.defaultProps = {
   sections: [],
   groupCategories: [],
   onSubmit: () => {},
+  isSubmitting: false,
+  setIsSubmitting: () => {},
 }

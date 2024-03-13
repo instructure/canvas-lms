@@ -198,7 +198,6 @@ const DiscussionTopicManager = props => {
     rootEntries: !searchTerm && filter === 'all',
     filter,
     sort,
-    courseID: window.ENV?.course_id,
     unreadBefore,
   }
 
@@ -335,7 +334,6 @@ const DiscussionTopicManager = props => {
                             discussionTopicId: ENV.discussion_topic_id,
                             message,
                             fileId: file?._id,
-                            courseID: ENV.course_id,
                             isAnonymousAuthor,
                           },
                           optimisticResponse: getOptimisticResponse({

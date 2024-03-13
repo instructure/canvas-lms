@@ -28,9 +28,14 @@ const I18n = useI18nScope('content_migrations_redesign')
 type CanvasCartridgeImporterProps = {
   onSubmit: onSubmitMigrationFormCallback
   onCancel: () => void
+  fileUploadProgress: number | null
 }
 
-const CanvasCartridgeImporter = ({onSubmit, onCancel}: CanvasCartridgeImporterProps) => {
+const CanvasCartridgeImporter = ({
+  onSubmit,
+  onCancel,
+  fileUploadProgress,
+}: CanvasCartridgeImporterProps) => {
   const [file, setFile] = useState<File | null>(null)
   const [fileError, setFileError] = useState<boolean>(false)
 
@@ -53,13 +58,14 @@ const CanvasCartridgeImporter = ({onSubmit, onCancel}: CanvasCartridgeImporterPr
 
   return (
     <>
-      <MigrationFileInput onChange={setFile} />
+      <MigrationFileInput fileUploadProgress={fileUploadProgress} onChange={setFile} />
       {fileError && (
         <p>
           <Text color="danger">{I18n.t('You must select a file to import content from')}</Text>
         </p>
       )}
       <CommonMigratorControls
+        fileUploadProgress={fileUploadProgress}
         canSelectContent={true}
         canImportAsNewQuizzes={ENV.NEW_QUIZZES_MIGRATION}
         canAdjustDates={true}

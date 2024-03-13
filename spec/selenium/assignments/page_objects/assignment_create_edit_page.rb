@@ -27,6 +27,10 @@ class AssignmentCreateEditPage
       "[data-testid='manage-assign-to']"
     end
 
+    def pending_changes_pill_selector
+      "[data-testid='pending_changes_pill']"
+    end
+
     def submission_type_selector
       "#assignment_submission_type"
     end
@@ -141,6 +145,10 @@ class AssignmentCreateEditPage
       f(text_entry_submission_type_toggle_selector)
     end
 
+    def pending_changes_pill
+      f(pending_changes_pill_selector)
+    end
+
     # Methods & Actions
     def visit_assignment_edit_page(course, assignment)
       get "/courses/#{course}/assignments/#{assignment}/edit"
@@ -200,6 +208,10 @@ class AssignmentCreateEditPage
 
     def select_submission_type(type, select_by = :text)
       click_option(submission_type, type, select_by)
+    end
+
+    def pending_changes_pill_exists?
+      element_exists?(pending_changes_pill_selector)
     end
   end
 end

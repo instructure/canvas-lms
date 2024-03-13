@@ -179,6 +179,9 @@ const CourseSelect = props => {
               isSelected={option.assetString === selectedOptionId}
             >
               {option.courseNickname || option.contextName}
+              <ScreenReaderContent>
+                {I18n.t(` in %{listHeading}`, {listHeading: getGroupLabel(key)})}
+              </ScreenReaderContent>
             </Select.Option>
           ))}
         </Select.Group>
@@ -223,7 +226,7 @@ const CourseSelect = props => {
         ) : null
       }
       messages={props.courseMessages}
-      data-testid="course-select"
+      data-testid={props.mainPage ? 'course-select' : 'course-select-modal'}
     >
       {renderGroups()}
     </Select>

@@ -31,19 +31,14 @@ module Tracers
       if key == "validate"
         tags = {}
 
-        if @third_party
-          tags[:operation_name] = "3rdparty"
-        else
-          tags[:operation_name] = metadata[:query].operation_name || "unnamed"
-          tags[:operation_md5] = Digest::MD5.hexdigest(metadata[:query].query_string).to_s
-        end
+        tags[:operation_name] = @third_party ? "3rdparty" : metadata[:query].operation_name || "unnamed"
 
         op, fields = op_type_and_fields(metadata)
         fields.each do |field|
           InstStatsd::Statsd.increment("graphql.#{op}.count", tags: tags.merge(field:))
         end
-        InstStatsd::Statsd.increment("graphql.operation.count", tags: tags.merge(domain: @domain))
-        InstStatsd::Statsd.time("graphql.operation.time", tags: tags.merge(domain: @domain), &)
+        InstStatsd::Statsd.increment("graphql.operation.count", tags:)
+        InstStatsd::Statsd.time("graphql.operation.time", tags:, &)
       else
         yield
       end

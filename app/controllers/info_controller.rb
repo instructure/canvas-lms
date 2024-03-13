@@ -64,7 +64,7 @@ class InfoController < ApplicationController
     end
     # consul works; we don't really care about the result, but it should not error trying to
     # get the result
-    DynamicSettings.find(tree: :private)["enable_rack_brotli"]
+    DynamicSettings.find(tree: :private)["enable_rack_brotli", failsafe: true]
     # vault works; asserting a hash is returned that is not null
     !Canvas::Vault.read("#{Canvas::Vault.kv_mount}/data/secrets").nil? if Canvas::Vault
 

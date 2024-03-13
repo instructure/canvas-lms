@@ -22,6 +22,8 @@ export type Rubric = {
   criteriaCount: number
   hidePoints?: boolean
   locations: string[]
+  buttonDisplay?: string
+  ratingOrder?: string
   pointsPossible: number
   title: string
   workflowState?: string

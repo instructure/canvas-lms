@@ -1,3 +1,4 @@
+/* eslint-disable qunit/no-identical-names */
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -16,7 +17,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
 import SisValidationHelper from '@canvas/sis/SisValidationHelper'
 import Backbone from '@canvas/backbone'
 

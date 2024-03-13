@@ -20,8 +20,6 @@
 module ConditionalRelease
   module Concerns
     module PermittedApiParameters
-      extend ActiveSupport::Concern
-
       def rule_params_for_create
         params.permit(rule_keys_for_create)
       end

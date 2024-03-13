@@ -46,6 +46,10 @@ const dialog = $('<div id="edit_event"><div /></div>')
     modal: true,
     zIndex: 1000,
   })
+  // these classes were added in dialog.js with the jquery 1.9.2 upgrade
+  // they're not needed for this dialog and cause styling issues
+  .removeClass('ui-dialog-content')
+  .removeClass('ui-widget-content')
 
 export default class EditEventDetailsDialog {
   constructor(event, useScheduler) {

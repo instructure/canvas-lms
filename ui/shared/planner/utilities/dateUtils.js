@@ -69,7 +69,8 @@ export function isThisWeek(day) {
 // determines if the checkMoment falls on or inbetween the firstMoment and the lastMoment
 export function isInMomentRange(checkMoment, firstMoment, lastMoment) {
   const isOnOrAfterFirst = checkMoment.isAfter(firstMoment) || checkMoment.isSame(firstMoment)
-  const isOnOrBeforeLast = checkMoment.isBefore(lastMoment) || checkMoment.isSame(lastMoment)
+  const isOnOrBeforeLast =
+    checkMoment.isBefore(lastMoment) || checkMoment.isSame(lastMoment) || !lastMoment
   return isOnOrAfterFirst && isOnOrBeforeLast
 }
 

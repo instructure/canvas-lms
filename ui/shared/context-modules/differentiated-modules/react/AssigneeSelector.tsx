@@ -48,6 +48,7 @@ interface Props {
   customSetSearchTerm?: (term: string) => void
   onError?: () => void
   showVisualLabel?: boolean
+  inputRef?: (inputElement: HTMLInputElement | null) => void
 }
 
 export interface AssigneeOption {
@@ -74,6 +75,7 @@ const AssigneeSelector = ({
   customSetSearchTerm,
   onError,
   showVisualLabel = true,
+  inputRef,
 }: Props) => {
   const listElementRef = useRef<HTMLElement | null>(null)
   const [options, setOptions] = useState<AssigneeOption[]>(defaultValues)
@@ -152,6 +154,7 @@ const AssigneeSelector = ({
         customOnInputChange={handleInputChange}
         visibleOptionsCount={10}
         isLoading={isLoading}
+        inputRef={inputRef}
         listRef={e => (listElementRef.current = e)}
         isShowingOptions={isShowingOptions}
         customOnRequestShowOptions={handleShowOptions}

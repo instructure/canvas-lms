@@ -24,14 +24,17 @@ import {Button} from '@instructure/ui-buttons'
 import {IconUploadLine} from '@instructure/ui-icons'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {humanReadableSize} from '../utils'
+import {ProgressBar} from '@instructure/ui-progress'
 
 const I18n = useI18nScope('content_migrations_redesign')
 
 type MigrationFileInputProps = {
   onChange: (file: File | null) => void
+  accepts?: string | undefined
+  fileUploadProgress: number | null
 }
 
-const MigrationFileInput = ({onChange}: MigrationFileInputProps) => {
+const MigrationFileInput = ({onChange, accepts, fileUploadProgress}: MigrationFileInputProps) => {
   const fileInput = createRef<HTMLInputElement>()
   const [file, setFile] = useState<File | null>(null)
 
@@ -71,11 +74,15 @@ const MigrationFileInput = ({onChange}: MigrationFileInputProps) => {
         data-testid="migrationFileUpload"
         type="file"
         ref={fileInput}
-        accept=".zip,.imscc,.mbz,.xml"
+        accept={accepts || '.zip,.imscc,.mbz,.xml'}
         onChange={handleSelectFile}
         style={{display: 'none'}}
       />
-      <Button color="secondary" onClick={() => fileInput.current?.click()}>
+      <Button
+        color="secondary"
+        disabled={!!(fileUploadProgress && fileUploadProgress < 100)}
+        onClick={() => fileInput.current?.click()}
+      >
         <IconUploadLine />
         &nbsp;
         {I18n.t('Choose File')}
@@ -83,6 +90,23 @@ const MigrationFileInput = ({onChange}: MigrationFileInputProps) => {
       <View margin="none none none medium">
         <Text>{file ? file.name : I18n.t('No file chosen')}</Text>
       </View>
+      {fileUploadProgress && fileUploadProgress < 100 && (
+        <View as="div" margin="small 0 0" style={{position: 'relative'}}>
+          {I18n.t('Uploading File')}
+          <ProgressBar
+            size="small"
+            meterColor="info"
+            screenReaderLabel={I18n.t('Loading completion')}
+            valueNow={fileUploadProgress || 0}
+            valueMax={100}
+            // @ts-ignore
+            shouldAnimate={true}
+          />
+          <span style={{top: '25px', right: '-45px', position: 'absolute'}}>
+            {fileUploadProgress}%
+          </span>
+        </View>
+      )}
     </>
   )
 }

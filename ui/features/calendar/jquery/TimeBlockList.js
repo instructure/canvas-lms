@@ -34,7 +34,7 @@ export default class TimeBlockList {
     this.splitterDiv.find('.split-link').click(this.handleSplitClick)
     this.blankRow = blankRow
 
-    this.element.delegate('input', 'change', event => {
+    this.element.on('change', 'input', event => {
       if ($(event.currentTarget).closest('tr').is(':last-child')) this.addRow()
     })
     this.render()
@@ -91,9 +91,11 @@ export default class TimeBlockList {
     })
 
     if (this.blocksManager.blocks.length === 0) {
+      // eslint-disable-next-line no-alert
       alert(I18n.t('no_dates_error', 'You need to specify at least one date and time'))
       valid = false
     } else if (!valid) {
+      // eslint-disable-next-line no-alert
       alert(I18n.t('time_block_errors', 'There are errors in your time block selections.'))
     }
     return valid

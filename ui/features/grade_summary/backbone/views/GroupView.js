@@ -45,6 +45,7 @@ class GroupView extends View {
 
     const $collapseToggle = $('div.outcome-toggles a.icon-collapse')
     if ($('li.group.expanded').length === 0) {
+      // disabled attribute on <a> is invalid per the HTML spec
       $collapseToggle.attr('disabled', 'disabled')
       $collapseToggle.attr('aria-disabled', 'true')
     } else {
@@ -54,6 +55,7 @@ class GroupView extends View {
 
     const $expandToggle = $('div.outcome-toggles a.icon-expand')
     if ($('li.group:not(.expanded)').length === 0) {
+      // disabled attribute on <a> is invalid per the HTML spec
       $expandToggle.attr('disabled', 'disabled')
       return $expandToggle.attr('aria-disabled', 'true')
     } else {

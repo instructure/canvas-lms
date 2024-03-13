@@ -1,3 +1,4 @@
+/* eslint-disable qunit/resolve-async */
 /*
  * Copyright (C) 2013 - present Instructure, Inc.
  *
@@ -17,6 +18,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import GroupView from 'ui/features/manage_groups/backbone/views/GroupView'
 import GroupUsersView from 'ui/features/manage_groups/backbone/views/GroupUsersView'
 import GroupDetailView from 'ui/features/manage_groups/backbone/views/GroupDetailView'
@@ -79,7 +81,6 @@ QUnit.module('GroupView', {
     document.getElementById('fixtures').innerHTML = ''
   },
 })
-// eslint-disable-next-line qunit/resolve-async
 test('it should be accessible', assert => {
   const done = assert.async()
   assertions.isAccessible(view, done, {a11yReport: true})

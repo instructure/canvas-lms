@@ -80,7 +80,7 @@ module AdminDeveloperKeysPage
   end
 
   def close_dialog_button
-    f(".ui-dialog button.ui-dialog-titlebar-close")
+    f(".ui-dialog .ui-dialog-titlebar-close")
   end
 
   def loading_div

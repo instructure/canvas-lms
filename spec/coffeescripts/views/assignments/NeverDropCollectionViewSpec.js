@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import Backbone from '@canvas/backbone'
 import NeverDropCollection from 'ui/features/assignment_index/backbone/collections/NeverDropCollection'
 import NeverDropCollectionView from 'ui/features/assignment_index/backbone/views/NeverDropCollectionView'

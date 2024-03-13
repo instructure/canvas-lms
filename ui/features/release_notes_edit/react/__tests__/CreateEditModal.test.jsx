@@ -37,7 +37,7 @@ describe('create modal', () => {
   })
 
   // TODO unskip and finish these tests after upgrading jest/jsdom
-  it.skip('It blocks submission unless the basic english fields are completed', () => {
+  it.skip('It blocks submission unless the basic english fields are completed', async () => {
     const onSubmit = jest.fn()
     const {getByLabelText, getByText} = render(
       <CreateEditModal
@@ -50,15 +50,15 @@ describe('create modal', () => {
       />
     )
     expect(getByText('Save').closest('button')).toBeDisabled()
-    userEvent.type(getByLabelText('Title'), 'A great english title')
+    await userEvent.type(getByLabelText('Title'), 'A great english title')
     expect(getByText('Save').closest('button')).toBeDisabled()
-    userEvent.type(getByLabelText('Description'), 'A great english description')
+    await userEvent.type(getByLabelText('Description'), 'A great english description')
     expect(getByText('Save').closest('button')).not.toBeDisabled()
-    userEvent.type(getByLabelText('Link URL'), 'https://whatever.com')
+    await userEvent.type(getByLabelText('Link URL'), 'https://whatever.com')
     expect(getByText('Save').closest('button')).not.toBeDisabled()
   })
 
-  it.skip('It submits the expected object', () => {
+  it.skip('It submits the expected object', async () => {
     const onSubmit = jest.fn()
     const {getByLabelText, getByText} = render(
       <CreateEditModal
@@ -70,10 +70,10 @@ describe('create modal', () => {
         langs={['en', 'es']}
       />
     )
-    userEvent.type(getByLabelText('Title'), 'A great english title')
-    userEvent.type(getByLabelText('Description'), 'A great english description')
-    userEvent.type(getByLabelText('Link URL'), 'https://whatever.com')
-    userEvent.click(getByText('Save').closest('button'))
+    await userEvent.type(getByLabelText('Title'), 'A great english title')
+    await userEvent.type(getByLabelText('Description'), 'A great english description')
+    await userEvent.type(getByLabelText('Link URL'), 'https://whatever.com')
+    await userEvent.click(getByText('Save').closest('button'))
 
     expect(onSubmit).toHaveBeenCalledTimes(1)
     expect(onSubmit).toHaveBeenCalledWith({})

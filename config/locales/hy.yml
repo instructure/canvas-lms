@@ -198,6 +198,7 @@ hy:
     tab_authentication: "Իսկության հաստատում"
     tab_courses: Դասընթացներ
     tab_developer_keys: "Մշակումների բանալիներ"
+    tab_extensions: Ընդլայնումներ
     tab_faculty_journal: "Դասավանդողների մատյան"
     tab_grading_standards: Գնահատականներ
     tab_jobs: Առաջադրանքներ
@@ -5414,6 +5415,7 @@ hy:
   crumbs: 
     access_report: "Հասանելիության մասին հաշվետվություն"
     announcements: Հայտարարություններ
+    apps: Ընդլայնումներ
     assignments: Հանձնարարություններ
     calendar_events: "Օրացուցային միջոցառումներ"
     collaborations: "Համատեղ աշխատանքներ"
@@ -6214,6 +6216,7 @@ hy:
   download_scores_generated_on_date_ff5b9cd2: "Ներբեռնել այն գնահատականները, որոնք գեներացվել են  %{date}-ին"
   download_submissions_7454665f: "Ներբեռնել ուղարկված փաստաթղթերը"
   downloading_course_content_allows_access_to_conten_164d9336: "Դասընթացի բովանդակության ներբեռնումը հասանելի է դարձնում դասընթացի բովանդակությունը առանց համացանցում գտնվելու: Բովանդակությունը կարող է ներառել ֆայլեր, էջեր, հանձնարարություններ, քննարկման թեմաներ կամ թեստեր: Սեղմեք \"գեներացնել ePub-ը\" յուրաքանչյուր դասընթացի համար եւ դրանք դիտելու համար բացել ցանկացած Էլեկտրոնային ընթերցման ծրագրով:"
+  draft_83493fcd: Սևագիր
   dropdown_option_1_e6ff2fc: "Ընկնող տարբերակ 1"
   dropdown_option_2_9766a346: "Ընկնող տարբերակ 2"
   due_5d7267be: Մինչև
@@ -6783,6 +6786,7 @@ hy:
   expanded_f4493860: "Բացված է"
   export_de71cd8e: Արտահանում
   exporting_b1eab154: "Արտահանվում է"
+  extensions_7250a0bb: Ընդլայնումներ
   external_apps_f5490181: "Արտաքին հավելվածներ"
   external_content: 
     cancel: 
@@ -8961,6 +8965,9 @@ hy:
       new_tab_loaded: "Այս գործիքը հաջողությամբ բեռնվել է բրաուզերի նոր պատուհանում: Կրկին բեռնեք էջը գործիք նորից մուտք գործելու համար:"
   lti2: 
     register_tool: "Գրանցել գործիքը"
+  lti_registrations: 
+    index: 
+      title: Ընդլայնումներ
   m2c_file_description: "Moodle 1.9/2.x"
   m2c_name: "Moodle ներմուծող"
   main_navigation_3f080c80: "Հիմնական նավարկում"

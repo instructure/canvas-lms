@@ -46,10 +46,10 @@ describe('EmojiQuickPicker', () => {
     expect(getByRole('button', {name: /😘, kissing_heart/})).toBeInTheDocument()
   })
 
-  it('calls insertEmoji with the emoji that is clicked', () => {
+  it('calls insertEmoji with the emoji that is clicked', async () => {
     store.set('last', 'kissing_heart')
     const {getByRole} = render(<EmojiQuickPicker insertEmoji={insertEmoji} />)
-    userEvent.click(getByRole('button', {name: /😘, kissing_heart/}))
+    await userEvent.click(getByRole('button', {name: /😘, kissing_heart/}))
     expect(insertEmoji).toHaveBeenCalledWith(
       expect.objectContaining({id: 'kissing_heart', native: '😘'})
     )

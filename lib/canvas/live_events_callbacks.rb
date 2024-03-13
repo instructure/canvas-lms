@@ -22,6 +22,8 @@ module Canvas::LiveEventsCallbacks
 
   def self.after_create(obj)
     case obj
+    when ContentExport
+      Canvas::LiveEvents.content_export_created(obj)
     when Course
       Canvas::LiveEvents.course_created(obj)
     when Conversation

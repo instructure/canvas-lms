@@ -68,7 +68,7 @@ const UL = (INST.UserLists = {
       UL.$form
         .find('.add_users_button')
         .text(I18n.t('adding_users', 'Adding Users...'))
-        .attr('disabled', true)
+        .prop('disabled', true)
       return $.ajaxJSON(
         UL.$form.attr('action'),
         'POST',
@@ -164,7 +164,7 @@ const UL = (INST.UserLists = {
       .removeAttr('disabled')
     UL.$form
       .find('.verify_syntax_button')
-      .attr('disabled', false)
+      .prop('disabled', false)
       .text(I18n.t('buttons.continue', 'Continue...'))
     const $user_list = UL.$form
       .find('.user_list')
@@ -178,16 +178,16 @@ const UL = (INST.UserLists = {
   showProcessing() {
     UL.$form
       .find('.verify_syntax_button')
-      .attr('disabled', true)
+      .prop('disabled', true)
       .text(I18n.t('messages.processing', 'Processing...'))
-    return UL.$form.find('.user_list').attr('disabled', true).loadingImage()
+    return UL.$form.find('.user_list').prop('disabled', true).loadingImage()
   },
   showResults(userList) {
     const $user_lists_processed_people = $('#user_lists_processed_people')
     UL.$form.find('.add_users_button, .go_back_button, #user_list_parsed').show()
     UL.$form
       .find('.add_users_button')
-      .attr('disabled', false)
+      .prop('disabled', false)
       .focus()
       .text(
         I18n.t(

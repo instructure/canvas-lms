@@ -1,3 +1,5 @@
+/* eslint-disable qunit/no-global-stop-start */
+/* eslint-disable qunit/no-ok-equality */
 /*
  * Copyright (C) 2013 - present Instructure, Inc.
  *
@@ -17,6 +19,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import SectionMenuView from 'ui/features/learning_mastery/backbone/views/SectionMenuView'
 import 'jquery-tinypubsub'
 

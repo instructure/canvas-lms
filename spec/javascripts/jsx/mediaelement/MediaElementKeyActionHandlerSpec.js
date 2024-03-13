@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import MediaElementKeyActionHandler from '@canvas/media-comments/jquery/MediaElementKeyActionHandler'
 
 let handler

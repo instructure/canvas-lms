@@ -41,11 +41,11 @@ ready(() => {
     $toolForm.show()
 
     // Firefox remembers disabled state after page reloads
-    $button.attr('disabled', false)
+    $button.prop('disabled', false)
     setTimeout(() => {
       // LTI links have a time component in the signature and will
       // expire after a few minutes.
-      $button.attr('disabled', true).text($button.data('expired_message'))
+      $button.prop('disabled', true).text($button.data('expired_message'))
     }, 60 * 2.5 * 1000)
 
     if (formSubmissionDelay) {

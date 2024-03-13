@@ -25,7 +25,10 @@ import {User} from '../../../../graphql/User'
 import {DiscussionEntryVersion} from '../../../../graphql/DiscussionEntryVersion'
 
 const setup = ({
-  author = User.mock({displayName: 'Harry Potter', courseRoles: ['Student', 'TA']}),
+  author = User.mock({
+    displayName: 'Harry Potter',
+    courseRoles: ['StudentEnrollment', 'TaEnrollment'],
+  }),
   anonymousAuthor = null,
   editor = User.mock({_id: '1', displayName: 'Severus Snape'}),
   isUnread = false,
@@ -83,7 +86,6 @@ describe('AuthorInfo', () => {
     const container = setup()
     expect(container.getByTestId('mobile-Author')).toBeInTheDocument()
     expect(container.getByTestId('pill-container')).toBeInTheDocument()
-    expect(container.getByTestId('mobile-Student')).toBeInTheDocument()
     expect(container.getByTestId('mobile-TA')).toBeInTheDocument()
   })
 
@@ -99,7 +101,6 @@ describe('AuthorInfo', () => {
     const container = setup({isTopicAuthor: false})
     expect(container.queryByTestId('mobile-Author')).toBeNull()
     expect(container.getByTestId('pill-container')).toBeInTheDocument()
-    expect(container.getByTestId('mobile-Student')).toBeInTheDocument()
     expect(container.getByTestId('mobile-TA')).toBeInTheDocument()
   })
 

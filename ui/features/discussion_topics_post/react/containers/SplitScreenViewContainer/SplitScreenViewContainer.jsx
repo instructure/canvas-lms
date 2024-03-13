@@ -69,7 +69,6 @@ export const SplitScreenViewContainer = props => {
       discussionEntryID: newDiscussionEntry.parentId,
       last: ENV.split_screen_view_initial_page_size,
       sort: 'asc',
-      courseID: window.ENV?.course_id,
       includeRelativeEntry: false,
     }
 
@@ -223,7 +222,6 @@ export const SplitScreenViewContainer = props => {
       isAnonymousAuthor,
       message,
       fileId: file?._id,
-      courseID: ENV.course_id,
       quotedEntryId,
     }
     const optimisticResponse = getOptimisticResponse({
@@ -267,7 +265,6 @@ export const SplitScreenViewContainer = props => {
       discussionEntryID: props.discussionEntryId,
       last: ENV.split_screen_view_initial_page_size,
       sort: 'asc',
-      courseID: window.ENV?.course_id,
       ...(props.relativeEntryId &&
         props.relativeEntryId !== props.discussionEntryId && {
           relativeEntryId: props.relativeEntryId,
@@ -282,7 +279,6 @@ export const SplitScreenViewContainer = props => {
       discussionEntryID: props.discussionEntryId,
       first: 0,
       sort: 'asc',
-      courseID: window.ENV?.course_id,
       ...(props.relativeEntryId && {relativeEntryId: props.relativeEntryId}),
       includeRelativeEntry: false,
       beforeRelativeEntry: false,
@@ -298,7 +294,6 @@ export const SplitScreenViewContainer = props => {
           splitScreenEntryOlderDirection.data.legacyNode.discussionSubentriesConnection.pageInfo
             .startCursor,
         sort: 'asc',
-        courseID: window.ENV?.course_id,
       },
       updateQuery: (previousResult, {fetchMoreResult}) => {
         setFetchingMoreOlderReplies(false)
@@ -328,7 +323,6 @@ export const SplitScreenViewContainer = props => {
           splitScreenEntryNewerDirection.data.legacyNode.discussionSubentriesConnection.pageInfo
             .endCursor,
         sort: 'asc',
-        courseID: window.ENV?.course_id,
         beforeRelativeEntry: false,
         includeRelativeEntry: false,
       },

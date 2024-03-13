@@ -176,6 +176,8 @@ export default class ContentView extends Backbone.View {
       close(_e) {
         $(this).remove()
       },
+      modal: true,
+      zIndex: 1000,
     })
     return dialog
   }

@@ -19,8 +19,6 @@
 
 module Lti::Concerns
   module Oembed
-    extend ActiveSupport::Concern
-
     class OembedAuthorizationError < StandardError; end
 
     # Does standard JWT validation and also verifies

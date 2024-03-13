@@ -41,7 +41,11 @@ export const PeerReview = props => {
           textNotCompleted: props.dueAtDisplayText
             ? I18n.t('Peer review due %{dueAtText}', {
                 name: props.revieweeName,
-                dueAtText: DateHelper.formatDateForDisplay(props.dueAtDisplayText, 'short'),
+                dueAtText: DateHelper.formatDateForDisplay(
+                  props.dueAtDisplayText,
+                  'short',
+                  ENV.TIMEZONE
+                ),
               })
             : I18n.t('Peer review due', {name: props.revieweeName}),
           textSize: 'x-small',

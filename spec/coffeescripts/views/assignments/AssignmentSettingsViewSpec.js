@@ -22,6 +22,7 @@ import AssignmentGroup from '@canvas/assignments/backbone/models/AssignmentGroup
 import AssignmentSettingsView from 'ui/features/assignment_index/backbone/views/AssignmentSettingsView'
 import AssignmentGroupWeightsView from 'ui/features/assignment_index/backbone/views/AssignmentGroupWeightsView'
 import $ from 'jquery'
+import 'jquery-migrate'
 import fakeENV from 'helpers/fakeENV'
 import assertions from 'helpers/assertions'
 import '@canvas/jquery/jquery.simulate'

@@ -19,6 +19,7 @@
 import Backbone from '@canvas/backbone'
 import PublishIconView from '@canvas/publish-icon-view'
 import $ from 'jquery'
+import 'jquery-migrate'
 import '@canvas/jquery/jquery.simulate'
 import fakeENV from 'helpers/fakeENV'
 

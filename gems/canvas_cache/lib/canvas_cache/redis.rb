@@ -49,6 +49,12 @@ module CanvasCache
       end
     end
 
+    module Cluster
+      def disconnect_if_idle(since_when)
+        @router.instance_variable_get(:@node).clients.each { |c| c.disconnect_if_idle(since_when) }
+      end
+    end
+
     module IgnorePipelinedKey
       def pipelined(_key = nil, **kwargs, &)
         # ignore key; only useful for distributed
@@ -159,7 +165,8 @@ module CanvasCache
         ::Redis::Scripting::Module.prepend(Scripting::Module) if defined?(::Redis::Scripting::Module)
         ::Redis.prepend(Redis)
         ::Redis.prepend(IgnorePipelinedKey)
-        ::RedisClient::Cluster.prepend(Client)
+        ::RedisClient.prepend(Client)
+        ::Redis::Cluster::Client.prepend(Cluster)
         ::RedisClient::Cluster.prepend(IgnorePipelinedKey)
         ::Redis::Client.prepend(Client)
         ::Redis::Distributed.prepend(Distributed)

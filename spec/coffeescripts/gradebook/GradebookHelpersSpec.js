@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import GradebookHelpers from 'ui/features/screenreader_gradebook/helpers'
 import GradebookConstants from 'ui/features/screenreader_gradebook/constants'
 

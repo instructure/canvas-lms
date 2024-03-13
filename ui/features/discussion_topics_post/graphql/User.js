@@ -26,6 +26,7 @@ export const User = {
       _id
       avatarUrl
       displayName: shortName
+      courseRoles
       pronouns
     }
   `,

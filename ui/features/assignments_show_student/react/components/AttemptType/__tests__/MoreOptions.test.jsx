@@ -149,6 +149,7 @@ describe('MoreOptions', () => {
     })
 
     it('renders user and group folders', async () => {
+      const user = userEvent.setup({delay: null})
       const mocks = await createGraphqlMocks()
       const {findAllByText, findByRole} = render(
         <MockedProvider mocks={mocks}>
@@ -161,7 +162,7 @@ describe('MoreOptions', () => {
         </MockedProvider>
       )
       const canvasFilesButton = await findByRole('button', {name: /Files/})
-      userEvent.click(canvasFilesButton)
+      await user.click(canvasFilesButton)
 
       expect((await findAllByText('my files'))[0]).toBeInTheDocument()
       expect(
@@ -170,6 +171,7 @@ describe('MoreOptions', () => {
     })
 
     it('renders the folder contents when a folder is selected', async () => {
+      const user = userEvent.setup({delay: null})
       const mocks = await createGraphqlMocks()
       const {findAllByText, findByRole, findByTestId} = render(
         <MockedProvider mocks={mocks}>
@@ -182,10 +184,10 @@ describe('MoreOptions', () => {
         </MockedProvider>
       )
       const canvasFilesButton = await findByRole('button', {name: /Files/})
-      userEvent.click(canvasFilesButton)
+      await user.click(canvasFilesButton)
 
       const myFilesButton = (await findAllByText('my files'))[0]
-      userEvent.click(myFilesButton)
+      await user.click(myFilesButton)
 
       const fileSelect = await findByTestId('upload-file-modal')
       expect(fileSelect).toContainElement((await findAllByText('dank memes'))[0])
@@ -195,6 +197,7 @@ describe('MoreOptions', () => {
     }, 10000)
 
     it('filters out files with disallowed extensions when allowedExtensions is provided', async () => {
+      const user = userEvent.setup({delay: null})
       const mocks = await createGraphqlMocks()
       const {findAllByText, findByRole, findByTestId, queryByText} = render(
         <MockedProvider mocks={mocks}>
@@ -208,10 +211,10 @@ describe('MoreOptions', () => {
         </MockedProvider>
       )
       const canvasFilesButton = await findByRole('button', {name: /Files/})
-      userEvent.click(canvasFilesButton)
+      await user.click(canvasFilesButton)
 
       const myFilesButton = (await findAllByText('my files'))[0]
-      userEvent.click(myFilesButton)
+      await user.click(myFilesButton)
 
       const fileSelect = await findByTestId('upload-file-modal')
       expect(fileSelect).not.toContainElement(
@@ -220,6 +223,7 @@ describe('MoreOptions', () => {
     }, 10000)
 
     it('includes files with allowed extensions when allowedExtensions is provided', async () => {
+      const user = userEvent.setup({delay: null})
       const mocks = await createGraphqlMocks()
       const {findAllByText, findByRole, findByTestId} = render(
         <MockedProvider mocks={mocks}>
@@ -233,10 +237,10 @@ describe('MoreOptions', () => {
         </MockedProvider>
       )
       const canvasFilesButton = await findByRole('button', {name: /Files/})
-      userEvent.click(canvasFilesButton)
+      await user.click(canvasFilesButton)
 
       const myFilesButton = (await findAllByText('my files'))[0]
-      userEvent.click(myFilesButton)
+      await user.click(myFilesButton)
 
       const fileSelect = await findByTestId('upload-file-modal')
       expect(fileSelect).toContainElement(
@@ -245,6 +249,7 @@ describe('MoreOptions', () => {
     }, 10000)
 
     it('allows folder navigation through breadcrumbs', async () => {
+      const user = userEvent.setup({delay: null})
       const mocks = await createGraphqlMocks()
       const {findAllByText, findByRole, findByTestId} = render(
         <MockedProvider mocks={mocks}>
@@ -257,16 +262,16 @@ describe('MoreOptions', () => {
         </MockedProvider>
       )
       const canvasFilesButton = await findByRole('button', {name: /Files/})
-      userEvent.click(canvasFilesButton)
+      await user.click(canvasFilesButton)
 
       const myFilesButton = (await findAllByText('my files'))[0]
-      userEvent.click(myFilesButton)
+      await user.click(myFilesButton)
 
       const fileSelect = await findByTestId('upload-file-modal')
       expect(fileSelect).toContainElement((await findAllByText('dank memes'))[0])
 
       const rootFolderBreadcrumbLink = (await findAllByText('Root'))[0]
-      userEvent.click(rootFolderBreadcrumbLink)
+      await user.click(rootFolderBreadcrumbLink)
 
       expect((await findAllByText('my files'))[0]).toBeInTheDocument()
       expect(
@@ -275,6 +280,7 @@ describe('MoreOptions', () => {
     })
 
     it('hides the upload button until a file has been selected', async () => {
+      const user = userEvent.setup({delay: null})
       const mocks = await createGraphqlMocks()
       const {findAllByText, findByRole, findByText, queryByText} = render(
         <MockedProvider mocks={mocks}>
@@ -287,21 +293,22 @@ describe('MoreOptions', () => {
         </MockedProvider>
       )
       const canvasFilesButton = await findByRole('button', {name: /Files/})
-      userEvent.click(canvasFilesButton)
+      await user.click(canvasFilesButton)
 
       const myFilesButton = (await findAllByText('my files'))[0]
-      userEvent.click(myFilesButton)
+      await user.click(myFilesButton)
 
       const file = (await findAllByText('www.creedthoughts.gov.www/creedthoughts'))[0]
       expect(file).toBeInTheDocument()
 
       expect(queryByText('Upload')).not.toBeInTheDocument()
 
-      userEvent.click(file)
+      await user.click(file)
       expect(await findByText('Upload')).toBeInTheDocument()
     })
 
     it('calls the handleCanvasFiles prop function when the upload button is clicked', async () => {
+      const user = userEvent.setup({delay: null})
       const mocks = await createGraphqlMocks()
       const {findAllByText, findByRole} = render(
         <MockedProvider mocks={mocks}>
@@ -314,16 +321,16 @@ describe('MoreOptions', () => {
         </MockedProvider>
       )
       const canvasFilesButton = await findByRole('button', {name: /Files/})
-      userEvent.click(canvasFilesButton)
+      await user.click(canvasFilesButton)
 
       const myFilesButton = (await findAllByText('my files'))[0]
-      userEvent.click(myFilesButton)
+      await user.click(myFilesButton)
 
       const file = (await findAllByText('www.creedthoughts.gov.www/creedthoughts'))[0]
-      userEvent.click(file)
+      await user.click(file)
 
       const uploadButton = await findByRole('button', {name: 'Upload'})
-      userEvent.click(uploadButton)
+      await user.click(uploadButton)
 
       expect(selectedCanvasFiles).toEqual(['11'])
     })
@@ -373,31 +380,33 @@ describe('MoreOptions', () => {
     })
 
     it('shows the webcam capture view when the user clicks the button', async () => {
+      const user = userEvent.setup({delay: null})
       const {findByRole} = await renderComponent()
 
       const webcamButton = await findByRole('button', {name: /Webcam/})
-      userEvent.click(webcamButton)
+      await user.click(webcamButton)
 
       const modal = await findByRole('dialog')
       expect(modal).toContainHTML('Take a Photo via Webcam')
     })
 
     it('calls the handleWebcamPhotoUpload when the user has taken a photo and saved it', async () => {
+      const user = userEvent.setup({delay: null})
       // unskip in EVAL-2661 (9/27/22)
       const {findByRole} = await renderComponent()
 
       const webcamButton = await findByRole('button', {name: /Webcam/})
-      userEvent.click(webcamButton)
+      await user.click(webcamButton)
 
       const recordButton = await findByRole('button', {name: 'Take Photo'})
-      userEvent.click(recordButton)
+      await user.click(recordButton)
 
       act(() => {
         jest.advanceTimersByTime(10000)
       })
 
       const saveButton = await findByRole('button', {name: 'Save'})
-      userEvent.click(saveButton)
+      await user.click(saveButton)
 
       expect(handleWebcamPhotoUpload).toHaveBeenCalledTimes(1)
     })

@@ -31,7 +31,11 @@ const I18n = useI18nScope('temporary_enrollment')
 // initialize analytics props
 const analyticProps = createAnalyticPropsGenerator(MODULE_NAME)
 
-export default function RoleMismatchToolTip() {
+interface Props {
+  testId?: string
+}
+
+export default function RoleMismatchToolTip(props: Props) {
   const tipText = (
     <View as="div" textAlign="center" maxWidth={TOOLTIP_MAX_WIDTH}>
       <Text size="small">
@@ -53,6 +57,7 @@ export default function RoleMismatchToolTip() {
           withBackground={false}
           withBorder={false}
           screenReaderLabel={I18n.t('Toggle tooltip')}
+          data-testid={props.testId}
           {...analyticProps('Tooltip')}
         />
       </Tooltip>

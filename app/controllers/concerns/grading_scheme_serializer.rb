@@ -19,11 +19,9 @@
 #
 
 module GradingSchemeSerializer
-  extend ActiveSupport::Concern
+  module ClassMethods
+    JSON_METHODS = %i[context_name].freeze
 
-  JSON_METHODS = %i[context_name].freeze
-
-  class_methods do
     def to_grading_scheme_summary_json(grading_standard)
       {
         title: grading_standard.title,

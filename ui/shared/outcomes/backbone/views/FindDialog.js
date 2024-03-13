@@ -52,6 +52,8 @@ export default class FindDialog extends DialogBaseView {
           click: e => this.import(e),
         },
       ],
+      modal: true,
+      zIndex: 1000,
     }
   }
 

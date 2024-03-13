@@ -48,7 +48,7 @@ describe('EnrollmentTreeItem', () => {
 
   it('calls updateCheck when checkbox is clicked', () => {
     const {getByTestId} = render(<EnrollmentTreeItem {...props} />)
-    const checkBox = getByTestId('check s1')
+    const checkBox = getByTestId('check-s1')
     fireEvent.click(checkBox)
     expect(callback).toHaveBeenCalled()
   })

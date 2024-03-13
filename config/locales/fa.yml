@@ -284,6 +284,7 @@ fa:
     tab_brand_configs: "زمینه ها"
     tab_courses: درس‌ها
     tab_developer_keys: "کلیدهای توسعه دهنده"
+    tab_extensions: پسوندها
     tab_faculty_journal: "ژورنال هیات علمی"
     tab_grading_standards: "نمره گذاری"
     tab_jobs: کارها
@@ -8100,6 +8101,7 @@ fa:
   crumbs: 
     access_report: "گزارش دسترسی"
     announcements: "اطلاعیه ها"
+    apps: پسوندها
     assignments: "تکلیف ها"
     calendar_events: "رویدادهای تقویم"
     collaborations: "همکاری ها"
@@ -9238,6 +9240,7 @@ fa:
   download_these_results_as_csv_9a890883: "این نتایج را به صورت CSV دانلود کنید"
   download_this_file_669f9174: "بارگیری این فایل"
   downloading_course_content_allows_access_to_conten_164d9336: "بارگیری محتوای درس امکان دسترسی به محتوا در هنگام آفلاین بودن را می دهد. محتوا می تواند شامل فایل ها، صفحه ها، تکلیف ها، موضوع های بحث یا آزمون ها باشد. برای هر درس روی «ایجاد ePub» کلیک کنید و با استفاده از هر گونه کتابخوان الکترونیکی برای مشاهده، باز کنید."
+  draft_83493fcd: "پیش نویس"
   draft_92507c72: "(پیش نویس)"
   draft_comment_b2376ea4: "پیش نویش نظر"
   draft_comment_warning_modal_in_speedgrader_ded232c1: "مدال هشدار پیش نویس نظر در اسپید گریدر"
@@ -10175,6 +10178,7 @@ fa:
   exported_package_history_bfca44b9: "تاریخچه بسته صادر شده"
   exporting_b1eab154: "در حال صدور"
   extend_due_date_20651e76: "تمدید تاریخ مهلت"
+  extensions_7250a0bb: پسوندها
   external_apps_account_course_settings_78de2b2f: "برنامه های خارجی (حساب، تنظیمات درس)"
   external_apps_account_course_settings_c44af5ef: "برنامه های خارجی ( حساب / تنظیماتدوره)"
   external_apps_course_settings_1f045644: "برنامه های خارجی (تنظیمات دوره)"
@@ -13642,6 +13646,9 @@ fa:
   lti_launch_af082dc3: "راه اندازی LTI"
   lti_launch_error_41eac9a: "خطای راه اندازی LTI"
   lti_platform_storage_9d11dc60: "ذخیره سازی پلت فرم LTI "
+  lti_registrations: 
+    index: 
+      title: پسوندها
   lti_report_2b6193ab: "گزارش LTI"
   lti_tool_report_f13213b3: "گزارش ابزار LTI"
   luxembourg_352_85f4124d: "لوگزامبورگ (+352)"

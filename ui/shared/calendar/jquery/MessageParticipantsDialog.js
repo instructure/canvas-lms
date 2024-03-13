@@ -78,6 +78,8 @@ export default class MessageParticipantsDialog {
       close() {
         $(this).remove()
       },
+      modal: true,
+      zIndex: 1000,
     })
     return this.loadParticipants()
   }

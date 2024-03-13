@@ -71,7 +71,7 @@ describe "root account basic settings" do
       # click then close restrict quantitative data helper dialog
       fj("button:contains('About restrict quantitative data')").click
       expect(fj("div.ui-dialog-titlebar:contains('Restrict Quantitative Data')")).to be_present
-      force_click("button.ui-dialog-titlebar-close")
+      force_click(".ui-dialog-titlebar-close")
 
       f("#account_settings_restrict_quantitative_data_value").click
       submit_form("#account_settings")

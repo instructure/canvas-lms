@@ -32,6 +32,8 @@ export default class LinkToStudentsView extends DialogBaseView {
     this.prototype.dialogOptions = {
       id: 'link_students',
       title: I18n.t('titles.link_to_students', 'Link to Students'),
+      modal: true,
+      zIndex: 1000,
     }
   }
 

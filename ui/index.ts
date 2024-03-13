@@ -87,7 +87,9 @@ up({
   requires: [C.I18n],
 }).catch((e: Error) => {
   // eslint-disable-next-line no-console
-  console.error(`Canvas front-end did not successfully start! (${e.message})`)
+  console.error(
+    `Canvas front-end did not successfully start! Did you add any new bundles to ui/featureBundles.ts? (${e.message})`
+  )
   captureException(e)
 })
 

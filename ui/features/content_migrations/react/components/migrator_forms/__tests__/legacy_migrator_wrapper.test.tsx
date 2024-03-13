@@ -89,13 +89,13 @@ describe('LegacyMigratorWrapper', () => {
     `)
   })
 
-  it('calls onSubmit', () => {
+  it('calls onSubmit', async () => {
     renderComponent()
 
     const file = new File(['blah, blah, blah'], 'my_file.zip', {type: 'application/zip'})
-    userEvent.upload(document.querySelector('input[type="file"]') as HTMLInputElement, file)
+    await userEvent.upload(document.querySelector('input[type="file"]') as HTMLInputElement, file)
 
-    userEvent.click(screen.getByRole('button', {name: 'Add to Import Queue'}))
+    await userEvent.click(screen.getByRole('button', {name: 'Add to Import Queue'}))
     expect(onSubmit).toHaveBeenCalledWith(
       {
         date_shift_options: {},
@@ -112,10 +112,10 @@ describe('LegacyMigratorWrapper', () => {
     )
   })
 
-  it('calls onCancel', () => {
+  it('calls onCancel', async () => {
     renderComponent()
 
-    userEvent.click(screen.getByRole('button', {name: 'Cancel'}))
+    await userEvent.click(screen.getByRole('button', {name: 'Cancel'}))
     expect(onCancel).toHaveBeenCalled()
   })
 })

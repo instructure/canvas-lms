@@ -120,7 +120,7 @@ describe('MediaAttempt', () => {
       const props = await makeProps(submissionDraftOverrides)
       const {getByTestId} = render(<MediaAttempt {...props} />)
       const trashButton = getByTestId('remove-media-recording')
-      userEvent.click(trashButton)
+      await userEvent.click(trashButton)
 
       expect(props.createSubmissionDraft).toHaveBeenCalledWith({
         variables: {

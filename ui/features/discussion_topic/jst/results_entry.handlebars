@@ -1,10 +1,6 @@
 <article class="discussion_entry">
-  <a href="#"
-     class="discussion-read-state-btn"
-     role="button"
-     title=""
-     data-tooltip='{ "position": "top", "collision": "none" }'
-     data-event="toggleRead">
+  <a href="#" class="discussion-read-state-btn" role="button" title=""
+    data-tooltip='{ "position": "top", "collision": "none" }' data-event="toggleRead">
     <div class="discussion-read-state tooltip data-tooltip"></div>
   </a>
   <div class="entry-content">
@@ -15,21 +11,23 @@
           <div class="discussion-title">
             {{>ui/features/discussion_topic/jst/_author_link.handlebars}}
           </div>
-          <div class="discussion-pubdate hide-if-collapsed">{{friendlyDatetime created_at pubdate=true contextSensitive=true}}</div>
+          <div class="discussion-pubdate hide-if-collapsed">{{friendlyDatetime created_at pubdate=true
+            contextSensitive=true}}</div>
         </div>
       </div>
     </header>
     <div class="discussion-section message_wrapper">
       <div class="message user_content">{{convertApiUserContent message}}</div>
       {{#if editor}}
-       <div class="discussion-fyi">{{#t "edited_comment"}}Edited by <a href="{{editor_href}}">{{editor.display_name}}</a> on {{edited_at}}{{/t}}</div>
+      <div class="discussion-fyi">{{#t "edited_comment"}}Edited by <a href="{{editor_href}}">{{editor.display_name}}</a>
+        on {{edited_at}}{{/t}}</div>
       {{/if}}
       {{#if attachments}}
-        <div class="comment_attachments">
-          {{#each attachments}}
-            <div><a href="{{url}}" class="{{mimeClass content-type}}" title="{{filename}}">{{display_name}}</a></div>
-          {{/each}}
-        </div>
+      <div class="comment_attachments">
+        {{#each attachments}}
+        <div><a href="{{url}}" class="{{mimeClass content-type}}" title="{{filename}}">{{display_name}}</a></div>
+        {{/each}}
+      </div>
       {{/if}}
     </div>
     <div class="entry-controls">

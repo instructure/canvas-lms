@@ -66,7 +66,7 @@ describe('CanvasInbox App Container', () => {
     mswClient.cache.reset()
     window.location.hash = ''
     window.ENV = {
-      current_user_id: 9,
+      current_user_id: '9',
       current_user: {
         id: '9',
       },
@@ -207,6 +207,22 @@ describe('CanvasInbox App Container', () => {
         const mailboxDropdown = await container.findByTestId('course-select')
         expect(window.location.hash).toBe('#filter=type=inbox')
         expect(mailboxDropdown.getAttribute('value')).toBe('')
+      })
+      it('should set course select in compose modal to course name when the context id param is in the url', async () => {
+        const originalLocation = window.location
+        delete window.location
+        window.location = {
+          search: '',
+          hash: '',
+        }
+        window.location.hash = '#filter=type=inbox'
+        window.location.search = '?context_id=course_195&user_id=9&user_name=Ally'
+        const container = setup()
+        await waitForApolloLoading()
+
+        const courseSelectModal = await container.findByTestId('course-select-modal')
+        expect(courseSelectModal.getAttribute('value')).toBe('XavierSchool')
+        window.location = originalLocation
       })
     })
   })

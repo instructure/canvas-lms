@@ -77,7 +77,7 @@ export default class GradebookHeaderMenu {
     // need it to be a child of #gradebook_grid (not the header cell) to get over overflow:hidden obstacles.
     this.$menu
       .appendTo('#gradebook_grid')
-      .delegate('a', 'click', event => {
+      .on('click', 'a', event => {
         const action = this[$(event.target).data('action')]
         if (action) {
           action()

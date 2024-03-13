@@ -20,6 +20,7 @@ import React from 'react'
 import {mount, shallow} from 'enzyme'
 import merge from 'lodash/merge'
 import $ from 'jquery'
+import 'jquery-migrate'
 
 import DiscussionSettings from 'ui/features/discussion_topics_index/react/components/DiscussionSettings'
 

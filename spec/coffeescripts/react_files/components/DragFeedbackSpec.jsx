@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import React from 'react'
 import {mount} from 'enzyme'
 import File from '@canvas/files/backbone/models/File'

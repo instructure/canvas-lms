@@ -19,6 +19,7 @@
 
 require "dynamic_settings"
 require "rails"
+require "timecop"
 
 Rails.env = "test"
 

@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import FindFlickrImageView from '@canvas/rce/backbone/views/FindFlickrImageView'
 import '@canvas/jquery/jquery.simulate'
 

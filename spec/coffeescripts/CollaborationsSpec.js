@@ -18,6 +18,7 @@
 
 import collaborations from 'ui/features/collaborations/jquery/index'
 import $ from 'jquery'
+import 'jquery-migrate'
 import '@canvas/jquery/jquery.ajaxJSON'
 
 let oldAjaxJSON = null
@@ -33,6 +34,8 @@ QUnit.module('Collaborations', {
       width: 550,
       height: 500,
       resizable: false,
+      modal: true,
+      zIndex: 1000,
     })
     const dom = $('<div></div>')
     dom.append(dialog)

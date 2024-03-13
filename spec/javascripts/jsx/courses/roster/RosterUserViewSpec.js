@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 
 import RosterUserView from 'ui/features/roster/backbone/views/RosterUserView'
 import RosterUser from 'ui/features/roster/backbone/models/RosterUser'
@@ -60,7 +61,7 @@ QUnit.module('RosterUserViewSpec', {
 
     server = sinon.fakeServer.create()
 
-    server.respondWith('POST', /unenroll/, [200, {'Content-Type': 'application/json'}, ''])
+    server.respondWith('POST', /unenroll/, [200, {'Content-Type': 'application/json'}, '{}'])
 
     $('#fixtures').append($('<button id="addUsers">'))
 

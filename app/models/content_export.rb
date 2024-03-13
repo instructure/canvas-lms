@@ -54,6 +54,7 @@ class ContentExport < ActiveRecord::Base
 
   workflow do
     state :created
+    state :waiting_for_external_tool
     state :exporting
     state :exported
     state :exported_for_course_copy
@@ -167,6 +168,10 @@ class ContentExport < ActiveRecord::Base
   def reset_and_start_job_progress
     job_progress.try :reset!
     job_progress.try :start!
+  end
+
+  def mark_waiting_for_external_tool
+    self.workflow_state = "waiting_for_external_tool"
   end
 
   def mark_exporting
@@ -595,6 +600,16 @@ class ContentExport < ActiveRecord::Base
     end
   end
 
+  def set_contains_new_quizzes_settings
+    settings[:contains_new_quizzes] = contains_new_quizzes?
+  end
+
+  def contains_new_quizzes?
+    return false unless new_quizzes_common_cartridge_enabled?
+
+    context.assignments.active.type_quiz_lti.count.positive?
+  end
+
   scope :active, -> { where("content_exports.workflow_state<>'deleted'") }
   scope :not_for_copy, -> { where.not(content_exports: { export_type: [COURSE_COPY, MASTER_COURSE_COPY] }) }
   scope :common_cartridge, -> { where(export_type: COMMON_CARTRIDGE) }
@@ -633,5 +648,9 @@ class ContentExport < ActiveRecord::Base
 
   def new_quizzes_bank_migration_enabled?
     context_type == "Course" && NewQuizzesFeaturesHelper.new_quizzes_bank_migrations_enabled?(context)
+  end
+
+  def new_quizzes_common_cartridge_enabled?
+    context_type == "Course" && NewQuizzesFeaturesHelper.new_quizzes_common_cartridge_enabled?(context)
   end
 end

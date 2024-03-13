@@ -353,5 +353,18 @@ describe NotificationPolicy do
       expect(policies.count).to eq 1
       expect(policies.first.notification.name).to eq course_type_notification.name
     end
+
+    it "creates NotificationPolicies with default frequencies when they don't exist" do
+      student = factory_with_protected_attributes(User, name: "student", workflow_state: "registered")
+      channel = communication_channel(student, { username: "default@example.com", active_cc: true })
+      notification = Notification.create!(name: "Panda Express", subject: "Test", category: "Whatever")
+
+      # No existing policie with active communication channel
+      expect(channel.notification_policies.count).to eq 0
+      NotificationPolicy.find_all_for(channel)
+
+      expect(channel.notification_policies.count).to eq 1
+      expect(channel.notification_policies.first.frequency).to eq notification.default_frequency(channel.user)
+    end
   end
 end

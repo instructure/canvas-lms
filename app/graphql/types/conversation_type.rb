@@ -86,6 +86,13 @@ module Types
       end
     end
 
+    field :context_asset_string, String, null: true
+    def context_asset_string
+      load_association(:context).then do |context|
+        context&.asset_string
+      end
+    end
+
     def should_return_message?(message)
       participants = message.conversation_message_participants.pluck(:user_id, :workflow_state)
       participants.include?([current_user.id, "active"]) || participants.include?([current_user.id, nil])

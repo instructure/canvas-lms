@@ -17,12 +17,9 @@
  */
 
 import $ from 'jquery'
+
 import '@canvas/jquery/jquery.simulate'
-import 'jqueryui-unpatched/core'
-import 'jqueryui-unpatched/widget'
-import 'jqueryui-unpatched/mouse'
-import 'jqueryui-unpatched/draggable'
-import 'jqueryui-unpatched/droppable'
+import 'jqueryui/droppable'
 
 QUnit.module('droppable widget', {
   beforeEach() {

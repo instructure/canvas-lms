@@ -1877,6 +1877,25 @@ describe CalendarEventsApiController, type: :request do
           expect(json["start_at"]).to eql new_start_at
         end
 
+        it "updates one event from the series and change it to a single event" do
+          target_event = @event_series["duplicates"][1]["calendar_event"]
+          target_event_id = target_event["id"]
+          new_start_at = (Time.parse(target_event["start_at"]) + 15.minutes).iso8601
+
+          json = api_call(:put,
+                          "/api/v1/calendar_events/#{target_event_id}",
+                          { controller: "calendar_events_api", action: "update", id: target_event_id.to_s, format: "json" },
+                          { calendar_event: { start_at: new_start_at, title: "this is different", rrule: nil } })
+          assert_status(200)
+          expect(json.length).to be 1
+          json.each do |event|
+            expect(event.keys).to match_array expected_fields
+            expect(event["id"]).to eql target_event_id
+            expect(event["title"]).to eql "this is different"
+            expect(event["start_at"]).to eql new_start_at
+          end
+        end
+
         it "updates all events in the series with the second event in the event list" do
           orig_events = [@event_series.except("duplicates")]
           orig_events += @event_series["duplicates"].pluck("calendar_event")

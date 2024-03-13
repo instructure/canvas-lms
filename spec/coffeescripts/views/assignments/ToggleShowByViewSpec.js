@@ -1,3 +1,4 @@
+/* eslint-disable qunit/resolve-async */
 //
 // Copyright (C) 2013 - present Instructure, Inc.
 //
@@ -21,6 +22,7 @@ import Course from '@canvas/courses/backbone/models/Course'
 import AssignmentGroupCollection from '@canvas/assignments/backbone/collections/AssignmentGroupCollection'
 import ToggleShowByView from 'ui/features/assignment_index/backbone/views/ToggleShowByView'
 import $ from 'jquery'
+import 'jquery-migrate'
 import fakeENV from 'helpers/fakeENV'
 import assertions from 'helpers/assertions'
 

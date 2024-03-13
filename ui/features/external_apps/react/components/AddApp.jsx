@@ -171,7 +171,7 @@ export default createReactClass({
     newTool.set('app_center_id', this.props.app.short_name)
     newTool.set('config_settings', this.configSettings())
 
-    $(e.target).attr('disabled', 'disabled')
+    $(e.target).prop('disabled', true)
 
     newTool.save()
   },

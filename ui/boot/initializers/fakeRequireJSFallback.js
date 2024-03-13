@@ -26,13 +26,12 @@
   eg:
 
   require([
-    'underscore',
     'jquery',
     'https://code.jquery.com/color/jquery.color.js'
   ], function(_, $) {
     console.log('got', $, _, $.Color.names)
   })
-  should log: underscore, jquery and the colors
+  should log: jquery and the colors
 */
 import $ from 'jquery'
 import {captureException} from '@sentry/browser'
@@ -46,7 +45,6 @@ if (!('require' in window)) {
     i18nObj: () =>
       import(/* webpackChunkName: "[request]" */ '@canvas/i18n').then(getDefaultExport),
 
-    underscore: () => import('underscore').then(getDefaultExport),
     'jsx/course_wizard/ListItems': () =>
       import('../../features/course_wizard/react/ListItems').then(getDefaultExport),
   }
@@ -70,14 +68,8 @@ if (!('require' in window)) {
         'things can change in any release and you are responsible for making sure your custom ' +
         'JavaScript that uses it continues to work.'
     )
-    if (deps.includes('underscore')) {
-      console.error("Support for require('underscore') is deprecated and will be removed.")
-      captureException(new Error('require("underscore")'))
-    }
     if (deps.includes('jquery')) {
-      console.error(
-        "You don't need to `require(['jquery...`, just use the global `$` variable directly."
-      )
+      console.error("Support for require('jquery') is deprecated and will be removed.")
       captureException(new Error('require("jquery")'))
     }
     Promise.all(deps.map(getModule)).then(modules => {

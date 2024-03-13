@@ -1004,6 +1004,34 @@ describe ConversationsController do
       end
     end
 
+    context "soft-concluded course with with active enrollment overrides" do
+      before do
+        course_with_student_logged_in(active_all: true)
+        @course.enrollment_term.start_at = 2.days.ago
+        @course.enrollment_term.end_at = 1.day.ago
+        @course.restrict_student_future_view = true
+        @course.restrict_student_past_view = true
+        @course.enrollment_term.set_overrides(Account.default, "TeacherEnrollment" => { start_at: 1.day.ago, end_at: 2.days.from_now })
+        @course.enrollment_term.set_overrides(Account.default, "StudentEnrollment" => { start_at: 1.day.ago, end_at: 2.days.from_now })
+        @course.save!
+        @course.enrollment_term.save!
+      end
+
+      it "allows a teacher to create a new conversation in soft_concluded course if enrollment override is active" do
+        user_session(@teacher)
+        expect(@course.soft_concluded?).to be_truthy
+        post "create", params: { recipients: [@student.id.to_s], body: "yo", context_code: @course.asset_string }
+        expect(response).to be_successful
+      end
+
+      it "allows a student to create a new conversation in soft_concluded course if enrollment override is active" do
+        user_session(@student)
+        expect(@course.soft_concluded?).to be_truthy
+        post "create", params: { recipients: [@teacher.id.to_s], body: "yo", context_code: @course.asset_string }
+        expect(response).to be_successful
+      end
+    end
+
     context "soft concluded course" do
       before do
         course_with_student_logged_in(active_all: true)

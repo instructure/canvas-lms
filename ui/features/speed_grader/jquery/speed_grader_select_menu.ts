@@ -311,12 +311,12 @@ export default class SpeedgraderSelectMenu {
   }) {
     if (!student) return
     const optionIndex = this.student_id_map[student[anonymizableId]]
-    let $query = this.$el.data('selectmenu').list.find(`li:eq(${optionIndex})`)
+    let $query = this.$el.data('ui-selectmenu').list.find(`li:eq(${optionIndex})`)
     const className = SpeedgraderHelpers.classNameBasedOnStudent(student)
     const submissionStates = 'not_graded not_submitted graded resubmitted'
 
     if (isCurrentStudent) {
-      $query = $query.add(this.$el.data('selectmenu').newelement)
+      $query = $query.add(this.$el.data('ui-selectmenu').newelement)
     }
     $query.removeClass(submissionStates).addClass(className.raw)
 
@@ -349,9 +349,9 @@ export default class SpeedgraderSelectMenu {
 
     // this is because selectmenu.js uses .data('optionClasses' on the
     // li to keep track of what class to put on the selected option (
-    // aka: $selectmenu.data('selectmenu').newelement ) when this li
+    // aka: $selectmenu.data('ui-selectmenu').newelement ) when this li
     // is selected.  so even though we set the class of the li and the
-    // $selectmenu.data('selectmenu').newelement when it is graded, we
+    // $selectmenu.data('ui-selectmenu').newelement when it is graded, we
     // need to also set the data() so that if you skip back to this
     // student it doesnt show the old checkbox status.
     $.each(submissionStates.split(' '), function () {

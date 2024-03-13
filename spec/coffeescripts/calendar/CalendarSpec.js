@@ -26,6 +26,7 @@ import timezone from 'timezone'
 import denver from 'timezone/America/Denver'
 import fixtures from 'helpers/fixtures'
 import $ from 'jquery'
+import 'jquery-migrate'
 import {subscribe} from 'jquery-tinypubsub'
 import fakeENV from 'helpers/fakeENV'
 
@@ -73,8 +74,6 @@ const makeMockHeader = () => ({
   hidePrevNext: sinon.spy(),
   hideAgendaRecommendation: sinon.spy(),
   showAgendaRecommendation: sinon.spy(),
-  showSchedulerTitle: sinon.spy(),
-  showDoneButton: sinon.spy(),
 })
 const makeCal = () =>
   new Calendar('#fixtures', [], null, makeMockDataSource(), {header: makeMockHeader()})

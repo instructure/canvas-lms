@@ -37,7 +37,7 @@ class ContentMigration < ActiveRecord::Base
   has_many :migration_issues, dependent: :destroy
   has_many :quiz_migration_alerts, as: :migration, inverse_of: :migration, dependent: :destroy
   has_one :job_progress, class_name: "Progress", as: :context, inverse_of: :context
-  serialize :migration_settings
+  serialize :migration_settings, yaml: { permitted_classes: [Symbol, Class] }
   cattr_accessor :export_file_path
   before_save :assign_quiz_migration_limitation_alert
   before_save :set_started_at_and_finished_at

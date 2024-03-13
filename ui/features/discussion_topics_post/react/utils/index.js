@@ -184,7 +184,6 @@ export const addReplyToAllRootEntries = (cache, newDiscussionEntry) => {
       query: DISCUSSION_ENTRY_ALL_ROOT_ENTRIES_QUERY,
       variables: {
         discussionEntryID: newDiscussionEntry.rootEntryId,
-        courseID: window.ENV?.course_id,
       },
     }
     const rootEntry = JSON.parse(JSON.stringify(cache.readQuery(options)))

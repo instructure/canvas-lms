@@ -35,33 +35,13 @@ RSpec.describe Lti::ResourceLink do
 
     it { is_expected.to have_many(:line_items) }
 
-    describe "when destroying" do
-      subject { resource_link.destroy }
-
-      let(:line_item) { line_item_model(resource_link:) }
-
-      it "destroys associated line items" do
-        expect(line_item).to be_active
-        subject
-        expect(line_item.reload).to be_deleted
-      end
-    end
-
-    describe "when undestroying" do
-      subject { resource_link.undestroy }
-
-      let(:line_item) { line_item_model(resource_link:) }
-
-      before do
-        line_item
-        resource_link.destroy
-      end
-
-      it "undestroys associated line items" do
-        expect(line_item.reload).to be_deleted
-        subject
-        expect(line_item.reload).to be_active
-      end
+    it "maintains associated line items when destroying and undestroying" do
+      line_item = line_item_model(resource_link:)
+      expect(line_item).to be_active
+      resource_link.destroy
+      expect(line_item.reload).to be_deleted
+      resource_link.reload.undestroy
+      expect(line_item.reload).to be_active
     end
   end
 

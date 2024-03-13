@@ -24,7 +24,13 @@ import type {RubricCriterion} from '@canvas/rubrics/react/types/rubric'
 describe('CriterionModal tests', () => {
   const renderComponent = (props?: Partial<CriterionModalProps>) => {
     return render(
-      <CriterionModal isOpen={true} onDismiss={() => {}} onSave={() => {}} {...props} />
+      <CriterionModal
+        isOpen={true}
+        unassessed={true}
+        onDismiss={() => {}}
+        onSave={() => {}}
+        {...props}
+      />
     )
   }
 
@@ -75,7 +81,7 @@ describe('CriterionModal tests', () => {
       const ratingName = totalRatingNames[1] as HTMLInputElement
       const ratingPoints = queryAllByTestId(`rating-points`)[1] as HTMLInputElement
       const ratingScale = queryAllByTestId(`rating-scale`)[1] as HTMLInputElement
-      expect(ratingPoints.value).toEqual('0')
+      expect(ratingPoints.value).toEqual(DEFAULT_RUBRIC_RATINGS[0].points.toString())
       expect(ratingName.value).toEqual('')
       expect(ratingScale.value).toEqual((DEFAULT_RUBRIC_RATINGS.length - 1).toString())
     })
@@ -113,6 +119,90 @@ describe('CriterionModal tests', () => {
           (ratingName as HTMLInputElement).value === DEFAULT_RUBRIC_RATINGS[2].description
       )
       expect(removedRating).toBeUndefined()
+    })
+
+    it('should drag and drop a rating to a new index', () => {
+      const ratings = [
+        {id: '1', description: 'Rating 1', points: 0, longDescription: ''},
+        {id: '2', description: 'Rating 2', points: 0, longDescription: ''},
+        {id: '3', description: 'Rating 3', points: 0, longDescription: ''},
+      ]
+      const {queryAllByTestId} = renderComponent({criterion: getCriterion({ratings})})
+      const dragRating = queryAllByTestId('rating-drag-handle')[0]
+      const dropRating = queryAllByTestId('rating-drag-handle')[2]
+
+      fireEvent.dragStart(dragRating)
+      fireEvent.dragOver(dropRating)
+      fireEvent.drop(dropRating)
+
+      const totalRatingNames = queryAllByTestId('rating-name').map(
+        ratingName => (ratingName as HTMLInputElement).value
+      )
+      expect(totalRatingNames.length).toEqual(ratings.length)
+
+      const newFirstIndex = totalRatingNames.findIndex(
+        ratingName => ratingName === ratings[0].description
+      )
+      const newLastIndex = totalRatingNames.findIndex(
+        ratingName => ratingName === ratings[2].description
+      )
+
+      expect(newFirstIndex).toEqual(2)
+      expect(newLastIndex).toEqual(1)
+    })
+
+    it('should reorder ratings when a rating is changed to be higher than the top rating', () => {
+      const ratings = [
+        {id: '1', description: 'First Rating', points: 10, longDescription: ''},
+        {id: '1', description: 'Second Rating', points: 8, longDescription: ''},
+        {id: '1', description: 'Third Rating', points: 6, longDescription: ''},
+        {id: '1', description: 'Fourth Rating', points: 4, longDescription: ''},
+      ]
+      const criterion = getCriterion({ratings})
+      const {queryAllByTestId} = renderComponent({criterion})
+      const ratingPoints = queryAllByTestId(`rating-points`)[2] as HTMLInputElement
+
+      fireEvent.change(ratingPoints, {target: {value: '20'}})
+      fireEvent.blur(ratingPoints)
+
+      const totalRatingNames = queryAllByTestId('rating-name') as HTMLInputElement[]
+      expect(totalRatingNames[0].value).toEqual(ratings[0].description)
+      expect(totalRatingNames[1].value).toEqual(ratings[1].description)
+      expect(totalRatingNames[2].value).toEqual(ratings[2].description)
+      expect(totalRatingNames[3].value).toEqual(ratings[3].description)
+
+      const totalRatingPoints = queryAllByTestId('rating-points') as HTMLInputElement[]
+      expect(totalRatingPoints[0].value).toEqual('20')
+      expect(totalRatingPoints[1].value).toEqual('10')
+      expect(totalRatingPoints[2].value).toEqual('8')
+      expect(totalRatingPoints[3].value).toEqual('4')
+    })
+
+    it('should reorder ratings when a rating is changed to be lower than a previous rating', () => {
+      const ratings = [
+        {id: '1', description: 'First Rating', points: 10, longDescription: ''},
+        {id: '1', description: 'Second Rating', points: 8, longDescription: ''},
+        {id: '1', description: 'Third Rating', points: 6, longDescription: ''},
+        {id: '1', description: 'Fourth Rating', points: 4, longDescription: ''},
+      ]
+      const criterion = getCriterion({ratings})
+      const {queryAllByTestId} = renderComponent({criterion})
+      const ratingPoints = queryAllByTestId(`rating-points`)[0] as HTMLInputElement
+
+      fireEvent.change(ratingPoints, {target: {value: '2'}})
+      fireEvent.blur(ratingPoints)
+
+      const totalRatingNames = queryAllByTestId('rating-name') as HTMLInputElement[]
+      expect(totalRatingNames[0].value).toEqual(ratings[0].description)
+      expect(totalRatingNames[1].value).toEqual(ratings[1].description)
+      expect(totalRatingNames[2].value).toEqual(ratings[2].description)
+      expect(totalRatingNames[3].value).toEqual(ratings[3].description)
+
+      const totalRatingPoints = queryAllByTestId('rating-points') as HTMLInputElement[]
+      expect(totalRatingPoints[0].value).toEqual('8')
+      expect(totalRatingPoints[1].value).toEqual('6')
+      expect(totalRatingPoints[2].value).toEqual('4')
+      expect(totalRatingPoints[3].value).toEqual('2')
     })
   })
 
@@ -174,6 +264,32 @@ describe('CriterionModal tests', () => {
       fireEvent.click(getByTestId('rubric-criterion-cancel'))
 
       expect(onDismiss).toHaveBeenCalled()
+    })
+  })
+
+  describe('Assessed rubric tests', () => {
+    it('should not render editable inputs if the rubric is assessed', () => {
+      const {queryByTestId, queryAllByTestId} = renderComponent({unassessed: false})
+
+      expect(queryByTestId('enable-range-checkbox')).toBeNull()
+      expect(queryAllByTestId('rating-points').length).toEqual(0)
+      expect(queryAllByTestId('rating-points-assessed').length).toEqual(5)
+    })
+
+    it('should not add a new rating if the rubric is assessed', () => {
+      const {queryAllByTestId} = renderComponent({unassessed: false})
+      const addRatingRow = queryAllByTestId('add-rating-row')[1]
+
+      fireEvent.mouseOver(addRatingRow)
+      expect(addRatingRow).toBeEmptyDOMElement()
+    })
+
+    it('should not add a new rating if the rubric is assessed when hovering over the last add rating row', () => {
+      const {queryAllByTestId} = renderComponent({unassessed: false})
+      const addRatingRow = queryAllByTestId('add-rating-row')[DEFAULT_RUBRIC_RATINGS.length]
+
+      fireEvent.mouseOver(addRatingRow)
+      expect(addRatingRow).toBeEmptyDOMElement()
     })
   })
 })

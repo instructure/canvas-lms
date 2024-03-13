@@ -88,9 +88,14 @@ gem "prawn-emoji", "~> 5.3", require: false
 gem "prawn-rails", "~> 1.4"
   gem "matrix", "0.4.2" # Used to be a default gem but is no more, but prawn depends on it implicitly
 gem "prosopite", "~> 1.3"
-gem "rack-brotli", "~> 1.2"
+if $canvas_rails == "7.1"
+  gem "rack3-brotli", "~> 1.0", require: "rack/brotli"
+else
+  gem "rack-brotli", "~> 1.2"
+end
 gem "rails-observers", "0.1.5"
 gem "ratom-nokogiri", "0.10.11", require: false
+  gem "nokogiri", "1.15.5" # see https://github.com/sparklemotion/nokogiri/issues/3102
 gem "redcarpet", "~> 3.6", require: false
 gem "retriable", "~> 3.1"
 gem "ritex", "1.0.1", require: false

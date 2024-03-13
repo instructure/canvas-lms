@@ -319,9 +319,8 @@ class ContentTag < ActiveRecord::Base
     end
   end
 
-  alias_method :old_content, :content
   def content
-    TABLELESS_CONTENT_TYPES.include?(content_type) ? nil : old_content
+    TABLELESS_CONTENT_TYPES.include?(content_type) ? nil : super
   end
 
   def content_or_self

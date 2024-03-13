@@ -1,3 +1,4 @@
+/* eslint-disable qunit/resolve-async */
 /*
  * Copyright (C) 2016 - present Instructure, Inc.
  *
@@ -19,6 +20,7 @@
 import GradeChangeLoggingCollection from 'ui/features/account_admin_tools/backbone/collections/GradeChangeLoggingCollection'
 import GradeChangeLoggingContentView from 'ui/features/account_admin_tools/backbone/views/GradeChangeLoggingContentView'
 import $ from 'jquery'
+import 'jquery-migrate'
 import fakeENV from 'helpers/fakeENV'
 import assertions from 'helpers/assertions'
 

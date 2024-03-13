@@ -25,6 +25,7 @@ import {
   selectContentDialog,
 } from '@canvas/select-content-dialog'
 import $ from 'jquery'
+import 'jquery-migrate'
 import fakeENV from './helpers/fakeENV'
 
 let fixtures = null
@@ -53,7 +54,7 @@ QUnit.module('SelectContentDialog', {
     $(window).off('beforeunload')
     clickEvent = {}
     fixtures.innerHTML = ''
-    $('#resource_selection_dialog').parent().remove()
+    $('#resource_selection_dialog').remove()
   },
 })
 

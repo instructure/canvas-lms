@@ -28,4 +28,15 @@ module Factories
     mo.save!
     mo
   end
+
+  def media_object_model(opts = {})
+    mo = MediaObject.new
+    mo.context = opts[:context] || @course
+    mo.media_id = opts[:media_id] || "1234"
+    mo.media_type = opts[:media_type] || "video/mp4"
+    mo.title = opts[:title] || "my_media_title"
+    mo.user = opts[:user] || @user
+    mo.save!
+    mo
+  end
 end

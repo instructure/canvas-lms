@@ -84,7 +84,7 @@ test('#show sets the proper title for new conferences', function () {
 })
 
 test('#show sets the proper title for editing conferences', function () {
-  const expectedTitle = 'Edit &quot;InstructureCon&quot;'
+  const expectedTitle = 'Edit InstructureCon'
   const attributes = {
     title: 'InstructureCon',
     recordings: [],

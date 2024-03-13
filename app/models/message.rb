@@ -488,11 +488,37 @@ class Message < ActiveRecord::Base
     end
   end
 
-  class UnescapedBuffer < String # acts like safe buffer except for the actually being safe part
+  # acts like safe buffer except for the actually being safe part
+  class UnescapedBuffer
+    def initialize(buffer = "")
+      @raw_buffer = String.new(buffer)
+      @raw_buffer.encode!
+    end
+
+    delegate :concat, :<<, :length, :empty?, :blank?, :encoding, :encode!, :force_encoding, to: :@raw_buffer
+
+    def to_s
+      @raw_buffer.dup
+    end
+    alias_method :html_safe, :to_s
+    alias_method :to_str, :to_s
+
+    def html_safe?
+      true
+    end
+
     alias_method :append=, :<<
     alias_method :safe_concat, :concat
     alias_method :safe_append=, :concat
   end
+
+  module OutputBufferDeleteSuffix
+    def delete_suffix(str)
+      self.class.new(@raw_buffer.delete_suffix(str))
+    end
+  end
+  UnescapedBuffer.include(OutputBufferDeleteSuffix)
+  ActionView::OutputBuffer.include(OutputBufferDeleteSuffix) if $canvas_rails == "7.1"
 
   # Public: Store content in a message_content_... instance variable.
   #
@@ -503,7 +529,7 @@ class Message < ActiveRecord::Base
     if name == :subject || name == :user_name
       old_output_buffer, @output_buffer = [@output_buffer, UnescapedBuffer.new]
     else
-      old_output_buffer, @output_buffer = [@output_buffer, @output_buffer.dup.clear]
+      old_output_buffer, @output_buffer = [@output_buffer, @output_buffer.class.new]
     end
 
     yield

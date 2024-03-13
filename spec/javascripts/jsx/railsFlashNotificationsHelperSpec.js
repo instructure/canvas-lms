@@ -19,6 +19,7 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import htmlEscape from '@instructure/html-escape'
 import NotificationsHelper from '@canvas/rails-flash-notifications/jquery/helper'
 
@@ -151,33 +152,6 @@ test('closes when the close button is clicked', () => {
   $(button[0]).click()
 
   equal(holder.firstChild, null)
-})
-
-test('respects timeout parameter if ENV.flashAlertTimeout variable is not set', () => {
-  const clock = sinon.useFakeTimers()
-
-  helper.initHolder()
-  helper.createNode('success', 'Closable Alert', 11000)
-
-  clock.tick(12000)
-  const holder = document.getElementById('flash_message_holder')
-
-  equal(holder.firstChild, null)
-  clock.restore()
-})
-
-test('forces ENV.flashAlertTimeout if variable is set', () => {
-  const clock = sinon.useFakeTimers()
-  ENV.flashAlertTimeout = 86400000
-
-  helper.initHolder()
-  helper.createNode('success', 'Closable Alert', 11000)
-
-  clock.tick(12000)
-  const holder = document.getElementById('flash_message_holder')
-
-  notEqual(holder.firstChild, null)
-  clock.restore()
 })
 
 test('closes when the alert is clicked', () => {
@@ -437,4 +411,82 @@ test('returns escaped content if content has no string or html property', () => 
   const result = helper.escapeContent(content)
 
   equal(result, htmlEscape(content))
+})
+
+QUnit.module('flash alert tests', function (hooks) {
+  let initialFxOff
+  let clock
+
+  hooks.beforeEach(function () {
+    fixtures = document.getElementById('fixtures')
+    fixtures.innerHTML = '<div id="flash_message_holder"></div>'
+    helper = new NotificationsHelper()
+    // disable jQuery animations as the Sinon clock was breaking fadeOut() callback
+    // by disabling animations/FX, we can more precisely control the clock and ensure
+    // the node is removed after the specified delay/timeout duration
+    initialFxOff = $.fx.off
+    $.fx.off = true
+    clock = sinon.useFakeTimers()
+    // we must reset the ENV.flashAlertTimeout variable after each test
+    ENV.flashAlertTimeout = undefined
+  })
+
+  hooks.afterEach(function () {
+    fixtures.innerHTML = ''
+    $.fx.off = initialFxOff
+    clock.restore()
+  })
+
+  test('forces ENV.flashAlertTimeout if variable is set', () => {
+    const desiredTimeout = 100
+    const ignoredTimeout = 500
+    // set the global which will override parameter and the default delay durations
+    ENV.flashAlertTimeout = desiredTimeout
+    helper.initHolder()
+    helper.createNode('success', 'Closable Alert', ignoredTimeout)
+    // check that the node is present before advancing the clock
+    let holder = document.getElementById('flash_message_holder')
+    ok(holder.firstChild, 'node should be present when delay duration starts')
+    // advance the clock slightly before the delay duration
+    clock.tick(desiredTimeout - 1)
+    // ensure the node is still present before the delay duration completes
+    holder = document.getElementById('flash_message_holder')
+    ok(holder.firstChild, 'node should still be present before delay duration ends')
+    // advance the clock to exactly the delay duration
+    clock.tick(1)
+    // ensure the node is removed after the default delay duration completes
+    holder = document.getElementById('flash_message_holder')
+    equal(holder.firstChild, null, 'node should be removed when delay duration is completed')
+  })
+
+  test('respects timeout parameter if ENV.flashAlertTimeout variable is not set', () => {
+    const desiredTimeout = 100
+    helper.initHolder()
+    // use parameter instead of ENV.flashAlertTimeout or createNode()’s 7000 default
+    helper.createNode('success', 'Closable Alert', desiredTimeout)
+    let holder = document.getElementById('flash_message_holder')
+    ok(holder.firstChild, 'node should be present when delay duration starts')
+    clock.tick(desiredTimeout - 1)
+    holder = document.getElementById('flash_message_holder')
+    ok(holder.firstChild, 'node should still be present before delay duration ends')
+    clock.tick(1)
+    holder = document.getElementById('flash_message_holder')
+    equal(holder.firstChild, null, 'node should be removed when delay duration is completed')
+  })
+
+  test('respects default timeout parameter of 7000 milliseconds if ENV.flashAlertTimeout OR parameter variables are not set', () => {
+    const defaultTimeout = 7000
+    // force createNode() to use the default of 7000 milliseconds
+    const desiredTimeout = undefined
+    helper.initHolder()
+    helper.createNode('success', 'Closable Alert', desiredTimeout)
+    let holder = document.getElementById('flash_message_holder')
+    ok(holder.firstChild, 'node should be present when delay duration starts')
+    clock.tick(defaultTimeout - 1)
+    holder = document.getElementById('flash_message_holder')
+    ok(holder.firstChild, 'node should still be present before delay duration ends')
+    clock.tick(1)
+    holder = document.getElementById('flash_message_holder')
+    equal(holder.firstChild, null, 'node should be removed when delay duration is completed')
+  })
 })

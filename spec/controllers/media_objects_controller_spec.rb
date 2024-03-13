@@ -212,9 +212,13 @@ describe MediaObjectsController do
         end
       end
 
-      it "finds media object when media object is on its own shard" do
-        skip "LF-1251"
+      it "finds media object when media object is on the attachment root account shard" do
         @shard1.activate do
+          @root_acc = Account.create! name: "second root_account"
+          @mo = MediaObject.create! media_id: "_media_id"
+        end
+
+        @shard2.activate do
           user_model
           user_session(@user)
           @att = Folder.media_folder(@user).attachments.create!(
@@ -225,48 +229,42 @@ describe MediaObjectsController do
             file_state: "hidden",
             workflow_state: "pending_upload"
           )
-        end
+          @mo.attachment = @att
+          @mo.save!
+          @att.root_account_id = @root_acc.id
+          @att.media_entry_id = @mo.media_id
+          @att.save!
 
-        @shard2.activate do
-          @mo = MediaObject.create! media_id: "_media_id"
-        end
-
-        @mo.attachment = @att
-        @mo.save!
-        @att.media_entry_id = @mo.media_id
-        @att.save!
-
-        @shard1.activate do
           get "show", params: { attachment_id: @mo.attachment.id }
           assert_status(200)
         end
       end
 
-      it "finds media object when all shards are different" do
-        skip "LF-1251"
+      it "finds media object when media object is on the attachment user shard" do
         @shard1.activate do
           @mo = MediaObject.create! media_id: "_media_id"
+          user_model
         end
 
         @shard2.activate do
-          user_model
           user_session(@user)
-          @att = Folder.media_folder(@user).attachments.create!(
+          @att = Attachment.create!(
             context: @user,
             display_name: "file.mp4",
             filename: "file.mp4",
             content_type: "video/mp4",
-            media_entry_id: @mo.media_id,
             file_state: "hidden",
             workflow_state: "pending_upload"
           )
-        end
-        @mo.attachment = @att
-        @mo.save!
+          @mo.attachment = @att
+          @mo.save!
+          @att.user_id = @user.id
+          @att.media_entry_id = @mo.media_id
+          @att.save!
 
-        # Shard.active is different than shard1/2 if this isn't wrapped in a shard.activate
-        get "show", params: { attachment_id: @mo.attachment.id }
-        assert_status(200)
+          get "show", params: { attachment_id: @mo.attachment.id }
+          assert_status(200)
+        end
       end
     end
   end

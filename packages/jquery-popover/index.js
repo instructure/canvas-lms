@@ -86,7 +86,7 @@ export default class Popover {
         } else if (!this.focusTrapped && index === tabbables.length - 1) this.hide()
       })
 
-    this.el.delegate('.popover_close', 'keyclick click', event => {
+    this.el.on('keyclick click', '.popover_close', event => {
       event.preventDefault()
       this.hide()
     })
@@ -111,28 +111,15 @@ export default class Popover {
     const id = `popover-${idCounter++}`
     this.trigger.attr({
       'aria-expanded': true,
-      'aria-controls': id
+      'aria-controls': id,
     })
     this.previousTarget = triggerEvent.currentTarget
 
-    this.el
-      .attr({id})
-      .appendTo(document.body)
-      .show()
+    this.el.attr({id}).appendTo(document.body).show()
     this.position()
     if (triggerEvent.type !== 'mouseenter') {
-      this.el
-        .find(':tabbable')
-        .first()
-        .focus()
-      setTimeout(
-        () =>
-          this.el
-            .find(':tabbable')
-            .first()
-            .focus(),
-        100
-      )
+      this.el.find(':tabbable').first().focus()
+      setTimeout(() => this.el.find(':tabbable').first().focus(), 100)
     }
 
     document.querySelector('#application').setAttribute('aria-hidden', 'true')
@@ -148,9 +135,7 @@ export default class Popover {
       Math.min(Math.max(leftBound, actualOffset), rightBound) +
       differenceInOffset +
       additionalOffset
-    $('<span class="ui-menu-carat"><span /></span>')
-      .css('left', caratOffset)
-      .prependTo(this.el)
+    $('<span class="ui-menu-carat"><span /></span>').css('left', caratOffset).prependTo(this.el)
 
     this.positionInterval = setInterval(this.position, 200)
     $(window).click(this.outsideClickHandler)
@@ -194,7 +179,7 @@ export default class Popover {
       offset: `0px ${this.offsetPx()}px`,
       within: 'body',
       collision: `flipfit ${this.options.verticalSide ? 'none' : 'flipfit'}`,
-      using
+      using,
     })
 
   offsetPx() {

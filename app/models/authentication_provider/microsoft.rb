@@ -29,24 +29,18 @@ class AuthenticationProvider::Microsoft < AuthenticationProvider::OpenIDConnect
     false
   end
 
-  # Rename db fields
-  alias_attribute :application_id, :client_id
-  alias_attribute :application_secret, :client_secret
+  alias_attribute :application_id, :entity_id
+  alias_attribute :tenant, :auth_filter
+  alias_method :application_secret, :client_secret
+  alias_method :application_secret=, :client_secret=
 
   def client_id
-    self.class.globally_configured? ? application_id : super
+    application_id
   end
 
+  # see {Facebooke#client_secret} for the reasoning here
   def client_secret
-    self.class.globally_configured? ? application_secret : super
-  end
-
-  def tenant=(val)
-    self.auth_filter = val
-  end
-
-  def tenant
-    auth_filter
+    application_secret
   end
 
   def self.recognized_params

@@ -20,25 +20,15 @@
 require "json_schemer"
 
 module OpenApiSpecHelper
-  RSpec.configuration.after do
-    SchemaVerifier.verify(request, response) if response.sent?
-  end
+  class SchemaVerifier
+    attr_accessor :errors
 
-  module SchemaVerifier
-    def self.initialize
-      openapi_dir = Rails.root.join("doc/openapi/**/*.yaml")
+    def initialize(openapi_spec)
       @errors = {}
-      @openapi_spec = {}
-      Dir.glob(openapi_dir).each do |filename|
-        @openapi_spec.deep_merge!(YAML.load_file(filename))
-      end
-
-      @openapi_spec
+      @openapi_spec = openapi_spec
     end
 
-    def self.verify(request, response)
-      @openapi_spec ||= initialize
-
+    def verify(request, response)
       spec_for_path = @openapi_spec["paths"][request.path]
       unless spec_for_path
         @errors[request.path] = "This URL is not documented."
@@ -80,7 +70,7 @@ module OpenApiSpecHelper
       end
     end
 
-    def self.request_errors(spec_at_method, request)
+    def request_errors(spec_at_method, request)
       errors = {}
       if spec_at_method["parameters"]
         parameter_schemas = parameter_schemas_by_name(spec_at_method["parameters"])
@@ -105,7 +95,7 @@ module OpenApiSpecHelper
       errors
     end
 
-    def self.response_errors(spec_at_response_code, response)
+    def response_errors(spec_at_response_code, response)
       errors = []
 
       header_schema = spec_at_response_code["headers"]
@@ -127,7 +117,7 @@ module OpenApiSpecHelper
       errors
     end
 
-    def self.response_header_errors(header_schemas_by_name, headers)
+    def response_header_errors(header_schemas_by_name, headers)
       errors = []
 
       header_schemas_by_name.each_pair do |header_name, header_spec|
@@ -140,11 +130,11 @@ module OpenApiSpecHelper
       errors
     end
 
-    def self.response_body_errors(body_schema, body)
-      JSONSchemer.schema(body_schema).validate(as_hash_if_json(body)).to_a
+    def response_body_errors(body_schema, body)
+      JSONSchemer.schema(body_schema).validate(JSON.parse(body)).to_a
     end
 
-    def self.request_query_param_errors(parameter_schemas, query_params)
+    def request_query_param_errors(parameter_schemas, query_params)
       errors = []
       parameter_schemas.each_pair do |param_name, schema|
         value = query_params[param_name]
@@ -156,25 +146,19 @@ module OpenApiSpecHelper
       errors
     end
 
-    def self.request_body_errors(body_schema, body)
+    def request_body_errors(body_schema, body)
       JSONSchemer.schema(body_schema).validate(body).to_a
     end
+
+    private
 
     # parameters array is an array like
     # [ { name: "paramName", schema: schemaObj } ]
     # which this returns as { "paramName" => schemaObj }
-    def self.parameter_schemas_by_name(parameters_array)
+    def parameter_schemas_by_name(parameters_array)
       parameters_array.to_h do |parameter|
         [parameter["name"], parameter["schema"]]
       end
-    end
-
-    # Returns a hash if the string can be parsed as JSON,
-    # otherwise returns the string
-    def self.as_hash_if_json(string)
-      JSON.parse(string)
-    rescue JSON::ParserError
-      string
     end
   end
 end

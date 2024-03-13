@@ -31,6 +31,7 @@ import {Flex} from '@instructure/ui-flex'
 import {InstUISettingsProvider} from '@instructure/emotion'
 import {IconButton} from '@instructure/ui-buttons'
 import LMGBContext, {getLMGBContext} from '@canvas/outcomes/react/contexts/LMGBContext'
+import ExportCSVButton from './ExportCSVButton'
 
 const I18n = useI18nScope('LearningMasteryGradebook')
 
@@ -95,27 +96,36 @@ const LearningMastery = ({courseId}) => {
           height="100%"
           display="flex"
           alignItems="center"
-          justifyItems="start"
+          justifyItems="space-between"
           padding="medium 0 0 0"
-          data-testid="lmgb-gradebook-menu"
+          data-testid="lmgb-menu-and-settings"
         >
-          <Text size="xx-large" weight="bold">
-            {I18n.t('Learning Mastery Gradebook')}
-          </Text>
-          <View padding="xx-small">
-            <GradebookMenu
-              courseUrl={contextURL}
-              learningMasteryEnabled={true}
-              variant="DefaultGradebookLearningMastery"
-              customTrigger={
-                <IconButton
-                  withBorder={false}
-                  withBackground={false}
-                  screenReaderLabel={I18n.t('Gradebook Menu Dropdown')}
-                >
-                  <IconArrowOpenDownSolid size="x-small" />
-                </IconButton>
-              }
+          <Flex alignItems="center" data-testid="lmgb-gradebook-menu">
+            <Text size="xx-large" weight="bold">
+              {I18n.t('Learning Mastery Gradebook')}
+            </Text>
+            <View padding="xx-small">
+              <GradebookMenu
+                courseUrl={contextURL}
+                learningMasteryEnabled={true}
+                variant="DefaultGradebookLearningMastery"
+                customTrigger={
+                  <IconButton
+                    withBorder={false}
+                    withBackground={false}
+                    screenReaderLabel={I18n.t('Gradebook Menu Dropdown')}
+                  >
+                    <IconArrowOpenDownSolid size="x-small" />
+                  </IconButton>
+                }
+              />
+            </View>
+          </Flex>
+          <View>
+            <ExportCSVButton
+              courseId={courseId}
+              gradebookFilters={gradebookFilters}
+              data-testid="export-csv-button"
             />
           </View>
         </Flex>

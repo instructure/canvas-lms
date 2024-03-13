@@ -16,9 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import htmlEscape from 'str/htmlEscape'
-
-const {unescape} = htmlEscape
+import $ from 'jquery'
+import htmlEscape, {unescape} from '@instructure/html-escape'
 
 QUnit.module('htmlEscape', () => {
   QUnit.module('.htmlEscape()', () => {
@@ -57,6 +56,18 @@ QUnit.module('htmlEscape', () => {
     test('replaces any combination of known replaceable values', () => {
       const value = '& < > " \' / ` ='
       equal(htmlEscape(value), '&amp; &lt; &gt; &quot; &#x27; &#x2F; &#x60; &#x3D;')
+    })
+
+    test('htmlEscape with jQuery object', function (assert) {
+      const $regradeInfoSpan = $('<span id="regrade_info_span">This is a test</span>')
+      // attempt to escape jQuery object, this should be a no-op
+      const result = htmlEscape($regradeInfoSpan)
+
+      assert.strictEqual(
+        result,
+        $regradeInfoSpan,
+        `Passing a jQuery object should return ${$regradeInfoSpan}`
+      )
     })
   })
 

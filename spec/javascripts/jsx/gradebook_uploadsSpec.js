@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import gradebook_uploads from 'ui/features/gradebook_uploads/jquery/index'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import * as waitForProcessing from 'ui/features/gradebook_uploads/jquery/wait_for_processing'

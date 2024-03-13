@@ -248,3 +248,10 @@ block_editor:
   description: |-
     Enable the new block editor for the rich content editor.
   beta: true
+
+instui_header:
+  state: hidden
+  display_name: Use InstUI new headers
+  description: |-
+    If enabled, pages will use the new InstUI headers
+  applies_to: SiteAdmin

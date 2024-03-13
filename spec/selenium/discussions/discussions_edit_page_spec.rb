@@ -214,6 +214,14 @@ describe "discussions" do
           confirm(:on)
         end
 
+        it "preserves query parameters in the URL when you CANCEL", :ignore_js_errors do
+          get "/courses/#{course.id}/discussion_topics/#{topic.id}/edit?embed=true"
+          force_click("button:contains('Cancel')")
+          wait_for_ajaximations
+          expect(driver.current_url).not_to include("edit")
+          expect(driver.current_url).to include("?embed=true")
+        end
+
         it "shows correct date when saving" do
           Timecop.freeze do
             topic.lock_at = 5.days.ago
@@ -540,6 +548,15 @@ describe "discussions" do
           expect(@topic_all_options.allow_rating).to be_falsey
           expect(@topic_all_options.only_graders_can_rate).to be_falsey
           expect(@topic_all_options.todo_date).to be_nil
+        end
+
+        # ignore js errors in unrelated discussion show page
+        it "preserves URL query parameters on CANCEL", :ignore_js_errors do
+          get "/courses/#{course.id}/discussion_topics/#{@topic_all_options.id}/edit?embed=true"
+          fj("button:contains('Cancel')").click
+          wait_for_ajaximations
+          expect(driver.current_url).not_to include("edit")
+          expect(driver.current_url).to include("?embed=true")
         end
       end
 

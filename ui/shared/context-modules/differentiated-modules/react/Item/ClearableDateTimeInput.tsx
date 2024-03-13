@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useCallback, useEffect, useRef, useState} from 'react'
 import {DateTimeInput} from '@instructure/ui-date-time-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {CondensedButton} from '@instructure/ui-buttons'
@@ -27,6 +27,26 @@ import type {Breakpoints} from '@canvas/with-breakpoints'
 import type {FormMessage} from '@instructure/ui-form-field'
 
 const I18n = useI18nScope('differentiated_modules')
+
+function useElementResize(
+  onResize: (element: Element) => void
+): [(element: Element | null) => void] {
+  const observer = useRef(
+    new ResizeObserver(entries => entries.forEach(entry => onResize(entry.target)))
+  )
+
+  const listenElement = (element: Element | null) => {
+    if (!element) return
+    observer.current.observe(element)
+  }
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    return () => observer.current.disconnect()
+  }, [])
+
+  return [listenElement]
+}
 
 export interface ClearableDateTimeInputProps {
   description: string
@@ -57,35 +77,44 @@ function ClearableDateTimeInput({
   timezone,
   dateInputRef,
 }: ClearableDateTimeInputProps) {
-  const determineHeight = () => {
-    if (breakpoints?.mobileOnly) {
-      return 'auto'
-    } else if (messages.length > 0) {
-      return '134px'
-    } else {
-      return '97px'
-    }
-  }
+  const [hasErrorBorder, setHasErrorBorder] = useState(false)
+  const clearButtonContainer = useRef<HTMLElement | null>()
+
+  const handleResize = useCallback((element: Element) => {
+    // Selector for the date time input that is affected by the red border and padding
+    const container = element.querySelector('fieldset > span > span:first-child > span > span')
+    if (!container) return
+    // If padding is cero means that the error border does not exist
+    setHasErrorBorder(getComputedStyle(container).padding !== '0px')
+  }, [])
+
+  // We used this instead of checking messages since we can't control internal error messages
+  const [listenElement] = useElementResize(handleResize)
+
+  useEffect(() => {
+    if (!clearButtonContainer.current) return
+    // labels + labels margins + 0.5rem (padding when the date time input has errors)
+    clearButtonContainer.current.style.paddingTop = hasErrorBorder ? '2.75rem' : '2.25rem'
+  }, [hasErrorBorder])
 
   return (
     <Flex
       data-testid="clearable-date-time-input"
       as="div"
-      margin="small none"
-      height={determineHeight()}
-      direction={breakpoints?.mobileOnly ? 'column' : 'row'}
-      alignItems={breakpoints?.mobileOnly ? undefined : 'center'}
+      display="flex"
+      padding="small none"
+      alignItems="start"
+      elementRef={listenElement}
     >
       <Flex.Item
+        direction={breakpoints?.mobileOnly ? 'column' : 'row'}
         shouldShrink={true}
-        overflowX="visible"
-        overflowY="visible"
-        align={breakpoints?.mobileOnly ? undefined : 'start'}
+        shouldGrow={true}
       >
         <DateTimeInput
           allowNonStepInput={true}
           colSpacing="small"
-          dateFormat="MMM D, YYYY"
+          dateFormat="ll"
           description={<ScreenReaderContent>{description}</ScreenReaderContent>}
           dateRenderLabel={dateRenderLabel}
           timeRenderLabel={I18n.t('Time')}
@@ -103,13 +132,12 @@ function ClearableDateTimeInput({
           dateInputRef={dateInputRef}
         />
       </Flex.Item>
-      <Flex.Item overflowX="visible" overflowY="visible">
-        <CondensedButton
-          onClick={onClear}
-          margin={breakpoints?.mobileOnly ? 'small 0 0 0' : '0 0 0 small'}
-        >
-          {I18n.t('Clear')}
-        </CondensedButton>
+
+      <Flex.Item
+        margin="0 0 0 small"
+        elementRef={e => (clearButtonContainer.current = e as HTMLElement)}
+      >
+        <CondensedButton onClick={onClear}>{I18n.t('Clear')}</CondensedButton>
       </Flex.Item>
     </Flex>
   )

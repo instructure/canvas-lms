@@ -29,9 +29,10 @@ const I18n = useI18nScope('content_migrations_redesign')
 type MoodleZipImporterProps = {
   onSubmit: onSubmitMigrationFormCallback
   onCancel: () => void
+  fileUploadProgress: number | null
 }
 
-const MoodleZipImporter = ({onSubmit, onCancel}: MoodleZipImporterProps) => {
+const MoodleZipImporter = ({onSubmit, onCancel, fileUploadProgress}: MoodleZipImporterProps) => {
   const [file, setFile] = useState<File | null>(null)
   const [fileError, setFileError] = useState<boolean>(false)
   const [questionBankSettings, setQuestionBankSettings] = useState<QuestionBankSettings | null>()
@@ -64,7 +65,7 @@ const MoodleZipImporter = ({onSubmit, onCancel}: MoodleZipImporterProps) => {
 
   return (
     <>
-      <MigrationFileInput onChange={setFile} />
+      <MigrationFileInput fileUploadProgress={fileUploadProgress} onChange={setFile} />
       {fileError && (
         <p>
           <Text color="danger">{I18n.t('You must select a file to import content from')}</Text>
@@ -74,7 +75,12 @@ const MoodleZipImporter = ({onSubmit, onCancel}: MoodleZipImporterProps) => {
         onChange={setQuestionBankSettings}
         questionBankError={questionBankError}
       />
-      <CommonMigratorControls canAdjustDates={true} onSubmit={handleSubmit} onCancel={onCancel} />
+      <CommonMigratorControls
+        fileUploadProgress={fileUploadProgress}
+        canAdjustDates={true}
+        onSubmit={handleSubmit}
+        onCancel={onCancel}
+      />
     </>
   )
 }

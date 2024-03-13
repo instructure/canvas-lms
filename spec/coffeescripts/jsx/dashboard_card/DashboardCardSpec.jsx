@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import React from 'react'
 import moxios from 'moxios'
 import sinon from 'sinon'

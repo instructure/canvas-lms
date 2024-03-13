@@ -73,10 +73,10 @@ ready(() => {
     const endAt = $end.data('unfudged-date')
 
     if (startAt && endAt && endAt < startAt) {
-      $('button[type=submit]').attr('disabled', true)
+      $('button[type=submit]').prop('disabled', true)
       return $end.errorBox(I18n.t('End date cannot be before start date'))
     }
-    $('button[type=submit]').attr('disabled', false)
+    $('button[type=submit]').prop('disabled', false)
     return $('#copy_course_form').hideErrors()
   }
 

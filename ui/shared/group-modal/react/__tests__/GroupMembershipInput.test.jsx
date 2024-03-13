@@ -28,19 +28,19 @@ describe('GroupMembershipInput', () => {
     expect(onChange).toHaveBeenNthCalledWith(2, 5)
   })
 
-  it('handles incrementing the number input', () => {
+  it('handles incrementing the number input', async () => {
     const onChange = jest.fn()
     const {container} = render(<GroupMembershipInput onChange={onChange} value="" />)
     const upArrow = container.querySelector("svg[name='IconArrowOpenUp']").parentElement
-    userEvent.click(upArrow)
+    await userEvent.click(upArrow)
     expect(onChange).toHaveBeenNthCalledWith(2, 1)
   })
 
-  it('handles decrementing the number input', () => {
+  it('handles decrementing the number input', async () => {
     const onChange = jest.fn()
     const {container} = render(<GroupMembershipInput onChange={onChange} value="3" />)
     const downArrow = container.querySelector("svg[name='IconArrowOpenDown']").parentElement
-    userEvent.click(downArrow)
+    await userEvent.click(downArrow)
     expect(onChange).toHaveBeenNthCalledWith(2, 2)
   })
 

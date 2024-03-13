@@ -60,7 +60,7 @@ module HealthChecks
         # ensures webpack worked; returns a string, treated as truthy
         common_js: -> { Canvas::Cdn.registry.scripts_available? },
         # returns a PrefixProxy instance, treated as truthy
-        consul: -> { DynamicSettings.find(tree: :private)[:readiness].nil? },
+        consul: -> { DynamicSettings.find(tree: :private)[:readiness, failsafe: nil].nil? },
         # returns the value of the block <integer>, treated as truthy
         filesystem: lambda do
           !!Tempfile.open("readiness", ENV["TMPDIR"] || Dir.tmpdir) { |f| f.write("readiness") }
@@ -137,6 +137,14 @@ module HealthChecks
           ).nil?
         end
       end
+
+      if DynamicSettings.config.present?
+        ret[:consul] = lambda do
+          DynamicSettings.find(tree: :private)["health_check", ttl: 0.1]
+          true
+        end
+      end
+
       ret
     end
 
@@ -187,6 +195,7 @@ module HealthChecks
           IncomingMailProcessor::IncomingMessageProcessor.healthy?
         end
       end
+
       ret
     end
 

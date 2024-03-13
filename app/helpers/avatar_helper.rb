@@ -55,15 +55,19 @@ module AvatarHelper
     avatar_url, display_name = avatar_image_attrs(user_or_id)
     context_code = opts[:context_code] if opts[:context_code]
     url = nil
-    if opts.key? :url
-      url = opts[:url]
-    elsif user_or_id
-      url = if context_code
-              context_prefix(context_code) + user_path(user_or_id)
-            else
-              user_url(user_or_id)
-            end
+
+    unless opts[:skip_url]
+      if opts.key? :url
+        url = opts[:url]
+      elsif user_or_id
+        url = if context_code
+                context_prefix(context_code) + user_path(user_or_id)
+              else
+                user_url(user_or_id)
+              end
+      end
     end
+
     link_opts = {}
     link_opts[:class] = "fs-exclude avatar " + opts[:class].to_s
     link_opts[:style] = "background-image: url(#{avatar_url})"

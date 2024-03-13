@@ -18,7 +18,14 @@
 
 import gql from 'graphql-tag'
 import {executeQuery} from '@canvas/query/graphql'
-import type {RubricQueryResponse} from '../types/Rubric'
+import type {
+  RubricQueryResponse,
+  DeleteRubricQueryResponse,
+  DuplicateRubricQueryResponse,
+} from '../types/Rubric'
+import getCookie from '@instructure/get-cookie'
+import qs from 'qs'
+import type {RubricCriterion} from '@canvas/rubrics/react/types/rubric'
 
 const COURSE_RUBRICS_QUERY = gql`
   query CourseRubricsQuery($courseId: ID!) {
@@ -26,8 +33,22 @@ const COURSE_RUBRICS_QUERY = gql`
       rubricsConnection {
         nodes {
           id: _id
+          buttonDisplay
           criteriaCount
+          criteria {
+            id: _id
+            ratings {
+              description
+              longDescription
+              points
+            }
+            points
+            longDescription
+            description
+          }
+          hidePoints
           pointsPossible
+          ratingOrder
           title
           workflowState
         }
@@ -42,8 +63,22 @@ const ACCOUNT_RUBRICS_QUERY = gql`
       rubricsConnection {
         nodes {
           id: _id
+          buttonDisplay
           criteriaCount
+          criteria {
+            id: _id
+            ratings {
+              description
+              longDescription
+              points
+            }
+            points
+            longDescription
+            description
+          }
+          hidePoints
           pointsPossible
+          ratingOrder
           title
           workflowState
         }
@@ -70,6 +105,24 @@ type AccountRubricQueryResponse = {
   account: RubricQueryResponse
 }
 
+type DeleteRubricProps = {
+  id?: string
+  accountId?: string
+  courseId?: string
+}
+
+type DuplicateRubricProps = {
+  id?: string
+  accountId?: string
+  courseId?: string
+  title: string
+  hidePoints?: boolean
+  criteria?: RubricCriterion[]
+  pointsPossible: number
+  buttonDisplay: string
+  ratingOrder: string
+}
+
 export type FetchRubricVariables = AccountRubricsQueryVariables | CourseRubricsQueryVariables
 
 export const fetchCourseRubrics = async (queryVariables: FetchRubricVariables) => {
@@ -86,4 +139,104 @@ export const fetchAccountRubrics = async (queryVariables: FetchRubricVariables) 
     queryVariables
   )
   return account
+}
+
+export const deleteRubric = async ({
+  id,
+  accountId,
+  courseId,
+}: DeleteRubricProps): Promise<DeleteRubricQueryResponse> => {
+  const urlPrefix = accountId ? `/accounts/${accountId}` : `/courses/${courseId}`
+  const url = `${urlPrefix}/rubrics/${id ?? ''}`
+  const method = 'DELETE'
+
+  const response = await fetch(url, {
+    method,
+    headers: {
+      'X-CSRF-Token': getCookie('_csrf_token'),
+      'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+    },
+    body: qs.stringify({
+      _method: method,
+      rubric: {
+        id,
+      },
+    }),
+  })
+
+  if (!response.ok) {
+    throw new Error(`Failed to delete rubric: ${response.statusText}`)
+  }
+
+  const {rubric: deletedRubric, error} = await response.json()
+
+  if (error) {
+    throw new Error(`Failed to delete rubric`)
+  }
+
+  return deletedRubric
+}
+
+export const duplicateRubric = async ({
+  title,
+  hidePoints,
+  accountId,
+  courseId,
+  criteria,
+  ratingOrder,
+  buttonDisplay,
+}: DuplicateRubricProps): Promise<DuplicateRubricQueryResponse> => {
+  const urlPrefix = accountId ? `/accounts/${accountId}` : `/courses/${courseId}`
+  const url = `${urlPrefix}/rubrics/`
+  const method = 'POST'
+
+  const duplicateCriteria = criteria?.map(criterion => {
+    return {
+      id: criterion.id,
+      description: criterion.description,
+      long_description: criterion.longDescription,
+      points: criterion.points,
+      learning_outcome_id: criterion.learningOutcomeId,
+      ratings: criterion.ratings.map(rating => ({
+        description: rating.description,
+        long_description: rating.longDescription,
+        points: rating.points,
+        id: rating.id,
+      })),
+    }
+  })
+
+  const response = await fetch(url, {
+    method,
+    headers: {
+      'X-CSRF-Token': getCookie('_csrf_token'),
+      'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+    },
+    body: qs.stringify({
+      _method: method,
+      rubric: {
+        title: title + ' Copy',
+        hide_points: hidePoints,
+        criteria: duplicateCriteria,
+        button_display: buttonDisplay,
+        rating_order: ratingOrder,
+      },
+      rubric_association: {
+        association_id: accountId ?? courseId,
+        association_type: accountId ? 'Account' : 'Course',
+      },
+    }),
+  })
+
+  if (!response.ok) {
+    throw new Error(`Failed to duplicate rubric: ${response.statusText}`)
+  }
+
+  const {rubric: duplicatedRubric, error} = await response.json()
+
+  if (error) {
+    throw new Error(`Failed to duplicate rubric`)
+  }
+
+  return duplicatedRubric
 }

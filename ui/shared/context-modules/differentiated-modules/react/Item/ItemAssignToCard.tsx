@@ -34,6 +34,10 @@ function arrayEquals(a: any[], b: any[]) {
   return a.length === b.length && a.every((v, i) => v === b[i])
 }
 
+function setEquals(a: Set<any>, b: Set<any>) {
+  return a.size === b.size && Array.from(a).every(x => b.has(x))
+}
+
 export interface DateValidatorInputArgs {
   lock_at: string | null
   unlock_at: string | null
@@ -66,6 +70,8 @@ export type ItemAssignToCardProps = {
   customAllOptions?: AssigneeOption[]
   customIsLoading?: boolean
   customSetSearchTerm?: (term: string) => void
+  highlightCard?: boolean
+  focus?: boolean
 }
 
 function setTimeToStringDate(time: string, date: string | undefined): string | undefined {
@@ -125,8 +131,19 @@ export default function ItemAssignToCard({
   customAllOptions,
   customIsLoading,
   customSetSearchTerm,
+  highlightCard,
+  focus,
 }: ItemAssignToCardProps) {
-  const [dateValidator] = useState<DateValidator>(
+  const [dueDate, setDueDate] = useState<string | null>(due_at)
+  const [availableFromDate, setAvailableFromDate] = useState<string | null>(unlock_at)
+  const [availableToDate, setAvailableToDate] = useState<string | null>(lock_at)
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({})
+  const [unparsedFieldKeys, setUnparsedFieldKeys] = useState<Set<string>>(new Set())
+  const [error, setError] = useState<FormMessage[]>([])
+
+  const assigneeSelectorRef = useRef<HTMLInputElement | null>(null)
+  const dateInputRefs = useRef<Record<string, HTMLInputElement | null>>({})
+  const dateValidator = useRef<DateValidator>(
     new DateValidator({
       date_range: {...ENV.VALID_DATE_RANGE},
       hasGradingPeriods: ENV.HAS_GRADING_PERIODS,
@@ -135,97 +152,51 @@ export default function ItemAssignToCard({
       postToSIS: ENV.POST_TO_SIS && ENV.DUE_DATE_REQUIRED_FOR_ACCOUNT,
     })
   )
-  const [dueDate, setDueDate] = useState<string | null>(due_at)
-  const [availableFromDate, setAvailableFromDate] = useState<string | null>(unlock_at)
-  const [availableToDate, setAvailableToDate] = useState<string | null>(lock_at)
-  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({})
-  const [unparsedFieldKeys, setUnparsedFieldKeys] = useState<Set<string>>(new Set())
-  const [error, setError] = useState<FormMessage[]>([])
-  const dateInputRefs = useRef<Record<string, HTMLInputElement | null>>({})
 
-  const handleSelect = (newSelectedAssignees: AssigneeOption[]) => {
-    const errorMessage: FormMessage = {
-      text: I18n.t('A student or section must be selected'),
-      type: 'error',
-    }
-    const deletedAssigneeIds = selectedAssigneeIds.filter(
-      assigneeId => newSelectedAssignees.find(({id}) => id === assigneeId) === undefined
+  useEffect(() => {
+    onValidityChange?.(
+      cardId,
+      error.length === 0 &&
+        Object.keys(validationErrors).length === 0 &&
+        unparsedFieldKeys.size === 0
     )
-    setError(newSelectedAssignees.length > 0 ? [] : [errorMessage])
-    onCardAssignmentChange?.(cardId, newSelectedAssignees, deletedAssigneeIds)
-  }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [error.length, Object.keys(validationErrors).length, unparsedFieldKeys.size])
 
-  const handleBlur = useCallback(
-    (unparsedFieldKey: string) => (e: SyntheticEvent) => {
-      const target = e.target as HTMLInputElement
-      if (!target || target !== dateInputRefs.current[unparsedFieldKey]) return
-      const unparsedFieldExists = unparsedFieldKeys.has(unparsedFieldKey)
-      const isEmpty = target.value.trim() === ''
-      const isValid = moment(target.value).isValid()
-      if ((isEmpty || isValid) && unparsedFieldExists) {
-        unparsedFieldKeys.delete(unparsedFieldKey)
-        setUnparsedFieldKeys(new Set([...unparsedFieldKeys]))
-      } else if (!isEmpty && !isValid && !unparsedFieldExists) {
-        setUnparsedFieldKeys(new Set([unparsedFieldKey, ...unparsedFieldKeys]))
-      }
-    },
-    [unparsedFieldKeys]
-  )
+  useEffect(() => {
+    if (!focus) {
+      return
+    }
+    if (error.length > 0) {
+      assigneeSelectorRef.current?.focus()
+      return
+    }
 
-  const handleDelete = useCallback(() => {
-    onDelete?.(cardId)
-  }, [cardId, onDelete])
+    const dateInputKeys = ['due_at', 'unlock_at', 'lock_at']
+    let key
+    if (Object.keys(validationErrors).length > 0) {
+      key = dateInputKeys.find(k => validationErrors[k] !== undefined)
+    } else if (unparsedFieldKeys.size > 0) {
+      key = dateInputKeys.find(k => unparsedFieldKeys.has(k))
+    }
+    if (key) dateInputRefs.current[key]?.focus()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [focus])
 
-  const handleDueAtChange = useCallback(
-    (newDate: string | null) => {
-      setDueDate(newDate)
-      onCardDatesChange?.(cardId, 'due_at', newDate)
-    },
-    [cardId, onCardDatesChange]
-  )
+  useEffect(() => {
+    onCardDatesChange?.(cardId, 'due_at', dueDate)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dueDate])
 
-  const handleDueDateChange = useCallback(
-    (_event: React.SyntheticEvent, value: string | undefined) => {
-      const defaultDueTime = ENV.DEFAULT_DUE_TIME ?? '23:59:00'
-      const newDueDate = dueDate ? value : setTimeToStringDate(defaultDueTime, value)
-      handleDueAtChange(newDueDate || null)
-    },
-    [dueDate, handleDueAtChange]
-  )
+  useEffect(() => {
+    onCardDatesChange?.(cardId, 'unlock_at', availableFromDate)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [availableFromDate])
 
-  const handleUnlockAtChange = useCallback(
-    (newDate: string | null) => {
-      setAvailableFromDate(newDate)
-      onCardDatesChange?.(cardId, 'unlock_at', newDate)
-    },
-    [cardId, onCardDatesChange]
-  )
-
-  const handleAvailableFromDateChange = useCallback(
-    (_event: React.SyntheticEvent, value: string | undefined) => {
-      const newAvailableFromDate = availableFromDate
-        ? value
-        : setTimeToStringDate('00:00:00', value)
-      handleUnlockAtChange(newAvailableFromDate || null)
-    },
-    [availableFromDate, handleUnlockAtChange]
-  )
-
-  const handleLockAtChange = useCallback(
-    (newDate: string | null) => {
-      setAvailableToDate(newDate)
-      onCardDatesChange?.(cardId, 'lock_at', newDate)
-    },
-    [cardId, onCardDatesChange]
-  )
-
-  const handleAvailableToDateChange = useCallback(
-    (_event: React.SyntheticEvent, value: string | undefined) => {
-      const newAvailableToDate = availableToDate ? value : setTimeToStringDate('23:59:00', value)
-      handleLockAtChange(newAvailableToDate || null)
-    },
-    [availableToDate, handleLockAtChange]
-  )
+  useEffect(() => {
+    onCardDatesChange?.(cardId, 'lock_at', availableToDate)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [availableToDate])
 
   useEffect(() => {
     const data: DateValidatorInputArgs = {
@@ -235,22 +206,77 @@ export default function ItemAssignToCard({
       student_ids: [],
       course_section_id: '2',
     }
-    const newErrors = dateValidator.validateDatetimes(data)
+    const newErrors = dateValidator.current.validateDatetimes(data)
     const newBadDates = Object.keys(newErrors)
     const oldBadDates = Object.keys(validationErrors)
-    if (!arrayEquals(newBadDates, oldBadDates)) {
-      onValidityChange?.(cardId, newBadDates.length === 0)
-      setValidationErrors(newErrors)
+    if (!arrayEquals(newBadDates, oldBadDates)) setValidationErrors(newErrors)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dueDate, availableFromDate, availableToDate])
+
+  useEffect(() => {
+    const errorMessage: FormMessage = {
+      text: I18n.t('A student or section must be selected'),
+      type: 'error',
     }
-  }, [
-    availableFromDate,
-    availableToDate,
-    cardId,
-    dateValidator,
-    dueDate,
-    onValidityChange,
-    validationErrors,
-  ])
+    const newError = selectedAssigneeIds.length > 0 ? [] : [errorMessage]
+    if (newError.length !== error.length) setError(newError)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedAssigneeIds.length])
+
+  const handleSelect = (newSelectedAssignees: AssigneeOption[]) => {
+    const deletedAssigneeIds = selectedAssigneeIds.filter(
+      assigneeId => newSelectedAssignees.find(({id}) => id === assigneeId) === undefined
+    )
+    onCardAssignmentChange?.(cardId, newSelectedAssignees, deletedAssigneeIds)
+  }
+
+  const handleBlur = useCallback(
+    (unparsedFieldKey: string) => (e: SyntheticEvent) => {
+      const target = e.target as HTMLInputElement
+      if (!target || target !== dateInputRefs.current[unparsedFieldKey]) return
+      const unparsedFieldExists = unparsedFieldKeys.has(unparsedFieldKey)
+      const isEmpty = target.value.trim() === ''
+      const isValid = moment(target.value, 'll').isValid()
+      const newUnparsedFieldKeys = new Set(Array.from(unparsedFieldKeys))
+      if ((isEmpty || isValid) && unparsedFieldExists) {
+        newUnparsedFieldKeys.delete(unparsedFieldKey)
+      } else if (!isEmpty && !isValid && !unparsedFieldExists) {
+        newUnparsedFieldKeys.add(unparsedFieldKey)
+      }
+      if (!setEquals(newUnparsedFieldKeys, unparsedFieldKeys))
+        setUnparsedFieldKeys(newUnparsedFieldKeys)
+    },
+    [unparsedFieldKeys]
+  )
+
+  const handleDelete = useCallback(() => onDelete?.(cardId), [cardId, onDelete])
+
+  const handleDueDateChange = useCallback(
+    (_event: React.SyntheticEvent, value: string | undefined) => {
+      const defaultDueTime = ENV.DEFAULT_DUE_TIME ?? '23:59:00'
+      const newDueDate = dueDate ? value : setTimeToStringDate(defaultDueTime, value)
+      setDueDate(newDueDate || null)
+    },
+    [dueDate]
+  )
+
+  const handleAvailableFromDateChange = useCallback(
+    (_event: React.SyntheticEvent, value: string | undefined) => {
+      const newAvailableFromDate = availableFromDate
+        ? value
+        : setTimeToStringDate('00:00:00', value)
+      setAvailableFromDate(newAvailableFromDate || null)
+    },
+    [availableFromDate]
+  )
+
+  const handleAvailableToDateChange = useCallback(
+    (_event: React.SyntheticEvent, value: string | undefined) => {
+      const newAvailableToDate = availableToDate ? value : setTimeToStringDate('23:59:00', value)
+      setAvailableToDate(newAvailableToDate || null)
+    },
+    [availableToDate]
+  )
 
   type DateTimeInput = {
     key: string
@@ -269,7 +295,7 @@ export default function ItemAssignToCard({
       dateRenderLabel: I18n.t('Due Date'),
       value: dueDate,
       onChange: handleDueDateChange,
-      onClear: () => handleDueAtChange(null),
+      onClear: () => setDueDate(null),
       messages: generateMessages(
         dueDate,
         validationErrors.due_at ?? null,
@@ -282,7 +308,7 @@ export default function ItemAssignToCard({
       dateRenderLabel: I18n.t('Available from'),
       value: availableFromDate,
       onChange: handleAvailableFromDateChange,
-      onClear: () => handleUnlockAtChange(null),
+      onClear: () => setAvailableFromDate(null),
       messages: generateMessages(
         availableFromDate,
         validationErrors.unlock_at ?? null,
@@ -295,7 +321,7 @@ export default function ItemAssignToCard({
       dateRenderLabel: I18n.t('Until'),
       value: availableToDate,
       onChange: handleAvailableToDateChange,
-      onClear: () => handleLockAtChange(null),
+      onClear: () => setAvailableToDate(null),
       messages: generateMessages(
         availableToDate,
         validationErrors.lock_at ?? null,
@@ -304,68 +330,80 @@ export default function ItemAssignToCard({
     },
   ]
 
+  const wrapperProps = highlightCard
+    ? {
+        borderWidth: 'none none none large',
+        'data-testid': 'highlighted_card',
+        borderColor: 'brand',
+        borderRadius: 'medium',
+      }
+    : {borderWidth: 'none', borderColor: 'primary', borderRadius: 'medium'}
   return (
-    <View
-      data-testid="item-assign-to-card"
-      as="div"
-      position="relative"
-      padding="medium small small small"
-      borderWidth="small"
-      borderColor="primary"
-      borderRadius="medium"
-    >
-      {typeof onDelete === 'function' && (
-        <div
-          style={{
-            position: 'absolute',
-            insetInlineEnd: '.75rem',
-            insetBlockStart: '.75rem',
-            zIndex: 2,
-          }}
-        >
-          <IconButton
-            color="danger"
-            screenReaderLabel={I18n.t('Delete')}
-            size="small"
-            withBackground={false}
-            withBorder={false}
-            onClick={handleDelete}
+    <View as="div" {...wrapperProps}>
+      <View
+        data-testid="item-assign-to-card"
+        as="div"
+        position="relative"
+        padding="medium small small small"
+        borderWidth="small"
+        borderColor="primary"
+        borderRadius="none medium medium none"
+      >
+        {highlightCard && <View height="100%" background="brand" width="1rem" />}
+        {typeof onDelete === 'function' && (
+          <div
+            style={{
+              position: 'absolute',
+              insetInlineEnd: '.75rem',
+              insetBlockStart: '.75rem',
+              zIndex: 2,
+            }}
           >
-            <IconTrashLine />
-          </IconButton>
-        </div>
-      )}
-      <AssigneeSelector
-        onSelect={handleSelect}
-        selectedOptionIds={selectedAssigneeIds}
-        everyoneOption={everyoneOption}
-        courseId={courseId}
-        defaultValues={[]}
-        clearAllDisabled={true}
-        size="medium"
-        messages={error}
-        disabledOptionIds={disabledOptionIds}
-        disableFetch={!isOpen}
-        customAllOptions={customAllOptions}
-        customIsLoading={customIsLoading}
-        customSetSearchTerm={customSetSearchTerm}
-      />
-      {dateTimeInputs.map((props: DateTimeInput) => (
-        <ClearableDateTimeInput
-          breakpoints={{}}
-          {...props}
-          showMessages={false}
-          locale={ENV.LOCALE || 'en'}
-          timezone={ENV.TIMEZONE || 'UTC'}
-          onBlur={handleBlur(props.key)}
-          dateInputRef={el => (dateInputRefs.current[props.key] = el)}
+            <IconButton
+              color="danger"
+              screenReaderLabel={I18n.t('Delete')}
+              size="small"
+              withBackground={false}
+              withBorder={false}
+              onClick={handleDelete}
+            >
+              <IconTrashLine />
+            </IconButton>
+          </div>
+        )}
+        <AssigneeSelector
+          onSelect={handleSelect}
+          selectedOptionIds={selectedAssigneeIds}
+          everyoneOption={everyoneOption}
+          courseId={courseId}
+          defaultValues={[]}
+          clearAllDisabled={true}
+          size="medium"
+          messages={error}
+          disabledOptionIds={disabledOptionIds}
+          disableFetch={!isOpen}
+          customAllOptions={customAllOptions}
+          customIsLoading={customIsLoading}
+          customSetSearchTerm={customSetSearchTerm}
+          inputRef={el => (assigneeSelectorRef.current = el)}
         />
-      ))}
-      <ContextModuleLink
-        courseId={courseId}
-        contextModuleId={contextModuleId}
-        contextModuleName={contextModuleName}
-      />
+        {dateTimeInputs.map((props: DateTimeInput) => (
+          <ClearableDateTimeInput
+            breakpoints={{}}
+            {...props}
+            showMessages={false}
+            locale={ENV.LOCALE || 'en'}
+            timezone={ENV.TIMEZONE || 'UTC'}
+            onBlur={handleBlur(props.key)}
+            dateInputRef={el => (dateInputRefs.current[props.key] = el)}
+          />
+        ))}
+        <ContextModuleLink
+          courseId={courseId}
+          contextModuleId={contextModuleId}
+          contextModuleName={contextModuleName}
+        />
+      </View>
     </View>
   )
 }

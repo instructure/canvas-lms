@@ -199,7 +199,7 @@ export default class InboxHeaderView extends View {
     if (msg.get('canArchive')) {
       this.$archiveBtn.removeAttr('disabled')
     } else {
-      this.$archiveBtn.attr('disabled', true)
+      this.$archiveBtn.prop('disabled', true)
     }
     return this.refreshMenu()
   }

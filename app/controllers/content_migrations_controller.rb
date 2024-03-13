@@ -151,6 +151,9 @@ class ContentMigrationsController < ApplicationController
       js_env COURSE_ID: @context.id
       js_env UPLOAD_LIMIT: Attachment.quota_available(@context)
       js_env QUESTION_BANKS: @context.assessment_question_banks.except(:preload).select([:title, :id]).active
+      js_env(SHOW_BP_SETTINGS_IMPORT_OPTION: MasterCourses::MasterTemplate.blueprint_eligible?(@context) &&
+        @context.account.grants_any_right?(@current_user, session, :manage_courses, :manage_courses_admin) &&
+        @context.account.grants_right?(@current_user, :manage_master_courses))
 
       # These values are used based on the same logic as ui/features/content_migrations/setup.js do.
       js_env(QUIZZES_NEXT_ENABLED: new_quizzes_enabled?)

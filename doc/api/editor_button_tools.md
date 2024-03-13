@@ -197,9 +197,10 @@ All of these settings are configurable for the "editor_button" placement in the 
   
 -   icon_url: &lt;url&gt; (optional)
 
-    This is the URL of the icon that will be shown on the button in the rich editor. Icons should be 16x16 in size, and can be any standard web image format (png, gif, ico, etc.). It is recommended that this URL be over SSL (https).
-    This is required if an icon_url is not set on the main tool configuration.
-  
+    The URL for an icon that identifies your tool in the RCE toolbar. The icon will be shown at 16x16 pixels in the editor toolbar, and at 28x28 pixels in the editor's listing of all tools. It is recommended that this icon be in PNG or SVG format. The url must be an https (SSL) URL.
+
+    After April 2024, if a tool does not provide an icon_url on the editor_button placement or the main tool configuration, a default icon based on the first letter of the tool's name will be used. Before this change, if a tool does not provide an icon_url, the editor_button placement will be removed from the tool install configuration, and the tool will not be shown in the editor_button placement.
+
 -   text: &lt;text&gt; (optional)
 
     This is the default text that will be shown if a user hovers over the editor button. This can be overridden by language-specific settings if desired by using the labels setting. This text will also be shown next to the icon if there are too many buttons and the tool is available in the "more tools" dropdown.

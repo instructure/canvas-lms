@@ -38,6 +38,8 @@ export default class EditSectionsView extends DialogBaseView {
     this.prototype.dialogOptions = {
       id: 'edit_sections',
       title: I18n.t('titles.section_enrollments', 'Section Enrollments'),
+      modal: true,
+      zIndex: 1000,
     }
   }
 

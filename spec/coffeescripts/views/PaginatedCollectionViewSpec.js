@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import Backbone from '@canvas/backbone'
 import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection'
 import PaginatedCollectionView from '@canvas/pagination/backbone/views/PaginatedCollectionView'

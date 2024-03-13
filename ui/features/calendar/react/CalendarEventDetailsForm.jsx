@@ -311,7 +311,7 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
       'calendar_event[blackout_date]': isBlackout,
     }
 
-    if (rrule) params['calendar_event[rrule]'] = rrule
+    params['calendar_event[rrule]'] = rrule
 
     if (canUpdateConference()) {
       if (webConference && shouldEnableConferenceField()) {
@@ -385,7 +385,7 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
         params['calendar_event[context_code]'] = context.asset_string
       }
 
-      if (event.calendarEvent?.series_uuid) {
+      if (event.calendarEvent?.series_uuid && rrule) {
         const which = await renderUpdateCalendarEventDialog(event)
         if (which === undefined) return
         params.which = which

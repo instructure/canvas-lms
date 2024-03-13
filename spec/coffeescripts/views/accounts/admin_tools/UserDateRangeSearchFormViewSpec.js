@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import usersTemplate from 'ui/features/account_admin_tools/jst/usersList.handlebars'
 import CommMessageCollection from 'ui/features/account_admin_tools/backbone/collections/CommMessageCollection'
 import AccountUserCollection from 'ui/features/account_admin_tools/backbone/collections/AccountUserCollection'

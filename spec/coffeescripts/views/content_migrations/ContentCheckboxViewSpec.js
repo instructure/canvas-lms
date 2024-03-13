@@ -20,6 +20,7 @@ import CheckboxCollection from 'ui/features/content_migrations/backbone/collecti
 import CheckboxView from 'ui/features/content_migrations/backbone/views/ContentCheckboxView'
 import CheckboxModel from 'ui/features/content_migrations/backbone/models/ContentCheckbox'
 import $ from 'jquery'
+import 'jquery-migrate'
 import fakeENV from 'helpers/fakeENV'
 import '@canvas/jquery/jquery.simulate'
 

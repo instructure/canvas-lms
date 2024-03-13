@@ -21,6 +21,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {Simulate} from 'react-dom/test-utils'
 import $ from 'jquery'
+import 'jquery-migrate'
 import RestrictedDialogForm from '@canvas/files/react/components/RestrictedDialogForm'
 import Folder from '@canvas/files/backbone/models/Folder'
 

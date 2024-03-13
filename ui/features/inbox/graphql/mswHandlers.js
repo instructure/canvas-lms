@@ -676,7 +676,6 @@ export const handlers = [
     // Remove uneeded fields from response that are
     // automatically included through mocks
     delete data.legacyNode.contextId
-    delete data.legacyNode.contextType
     delete data.legacyNode.conversationParticipantsConnection
 
     return HttpResponse.json({data})

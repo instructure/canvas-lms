@@ -936,7 +936,7 @@ describe "assignments" do
     end
 
     it "cancels adding new assignment group via the x button", priority: "2" do
-      fj("button.ui-dialog-titlebar-close:visible").click
+      fj(".ui-dialog-titlebar-close:visible").click
       wait_for_ajaximations
 
       expect(f("#assignment_group_id")).not_to include_text(@new_group)

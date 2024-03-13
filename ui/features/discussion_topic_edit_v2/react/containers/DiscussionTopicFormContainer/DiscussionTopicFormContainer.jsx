@@ -33,6 +33,7 @@ const I18n = useI18nScope('discussion_create')
 export default function DiscussionTopicFormContainer({apolloClient}) {
   const {setOnFailure} = useContext(AlertManagerContext)
   const [usageRightData, setUsageRightData] = useState()
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const contextType = ENV.context_is_not_group ? 'Course' : 'Group'
   const {contextQueryToUse, contextQueryVariables} = getContextQuery(contextType)
 
@@ -107,25 +108,28 @@ export default function DiscussionTopicFormContainer({apolloClient}) {
         navigateToDiscussionTopic(discussionContextType, discussionTopicId)
       }
     } else {
+      setIsSubmitting(false)
       setOnFailure(I18n.t('Error with discussion topic'))
     }
   }
 
   const [createDiscussionTopic] = useMutation(CREATE_DISCUSSION_TOPIC, {
     onCompleted: completionData => {
-      const new_discussion_topic = completionData?.createDiscussionTopic?.discussionTopic
+      const newDiscussionTopic = completionData?.createDiscussionTopic?.discussionTopic
       const errors = completionData?.createDiscussionTopic?.errors
 
       if (errors) {
+        setIsSubmitting(false)
         setOnFailure(errors.map(error => error.message).join(', '))
         return
       }
 
-      handleDiscussionTopicMutationCompletion(new_discussion_topic).catch(() => {
+      handleDiscussionTopicMutationCompletion(newDiscussionTopic).catch(() => {
         setOnFailure(I18n.t('Error updating file usage rights'))
       })
     },
     onError: () => {
+      setIsSubmitting(false)
       setOnFailure(I18n.t('Error creating discussion topic'))
     },
   })
@@ -139,6 +143,7 @@ export default function DiscussionTopicFormContainer({apolloClient}) {
       })
     },
     onError: () => {
+      setIsSubmitting(false)
       setOnFailure(I18n.t('Error updating discussion topic'))
     },
   })
@@ -159,6 +164,8 @@ export default function DiscussionTopicFormContainer({apolloClient}) {
       studentEnrollments={currentContext?.usersConnection?.nodes}
       apolloClient={apolloClient}
       onSubmit={handleFormSubmit}
+      isSubmitting={isSubmitting}
+      setIsSubmitting={setIsSubmitting}
     />
   )
 }

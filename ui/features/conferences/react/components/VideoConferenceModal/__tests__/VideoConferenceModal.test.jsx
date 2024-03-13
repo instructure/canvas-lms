@@ -93,21 +93,24 @@ describe('VideoConferenceModal', () => {
     expect(onDismiss).toHaveBeenCalled()
   })
 
-  it('do not submit without a conference name', () => {
+  it('do not submit without a conference name', async () => {
     const container = setup()
     expect(container.getByLabelText('Name')).toHaveValue('Amazing Course Conference')
-    userEvent.clear(container.getByLabelText('Name'))
+    await userEvent.clear(container.getByLabelText('Name'))
     fireEvent.click(container.getByTestId('submit-button'))
     expect(onSubmit).not.toHaveBeenCalled()
   })
 
-  it.skip('submit when correct fields are filled (flaky)', () => {
+  it.skip('submit when correct fields are filled (flaky)', async () => {
     const container = setup()
 
-    userEvent.clear(container.getByLabelText('Name'))
-    userEvent.type(container.getByLabelText('Name'), 'A great video conference name')
-    userEvent.type(container.getByLabelText('Description'), 'A great video conference description')
-    userEvent.click(container.getByTestId('submit-button'))
+    await userEvent.clear(container.getByLabelText('Name'))
+    await userEvent.type(container.getByLabelText('Name'), 'A great video conference name')
+    await userEvent.type(
+      container.getByLabelText('Description'),
+      'A great video conference description'
+    )
+    await userEvent.click(container.getByTestId('submit-button'))
 
     expect(onSubmit).toHaveBeenCalled()
     expect(onSubmit.mock.calls[0][1]).toStrictEqual({

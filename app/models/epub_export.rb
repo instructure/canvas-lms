@@ -31,7 +31,7 @@ class EpubExport < ActiveRecord::Base
   has_one :job_progress, as: :context, inverse_of: :context, class_name: "Progress"
   validates :course_id, :workflow_state, presence: true
   has_a_broadcast_policy
-  alias_attribute :context, :course # context is needed for the content export notification
+  alias_method :context, :course # context is needed for the content export notification
 
   PERCENTAGE_COMPLETE = {
     created: 0,

@@ -18,6 +18,7 @@
 
 import Backbone from '@canvas/backbone'
 import $ from 'jquery'
+import 'jquery-migrate'
 import InputView from '@canvas/backbone-input-view'
 
 let view = null

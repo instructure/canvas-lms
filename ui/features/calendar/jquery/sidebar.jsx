@@ -182,6 +182,7 @@ function setupCalendarFeedsWithSpecialAccessibilityConsiderationsForNVDA() {
       {
         autoOpen: false,
         modal: true,
+        zIndex: 1000,
         create: (e, _ui) => {
           e.target.parentElement.setAttribute(
             'aria-labelledby',

@@ -19,6 +19,7 @@
 import CourseRestore from 'ui/features/account_admin_tools/backbone/models/CourseRestore'
 import CourseSearchFormView from 'ui/features/account_admin_tools/backbone/views/CourseSearchFormView'
 import $ from 'jquery'
+import 'jquery-migrate'
 import assertions from 'helpers/assertions'
 
 QUnit.module('CourseSearchFormView', {

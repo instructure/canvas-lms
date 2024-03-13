@@ -458,6 +458,18 @@ describe Outcomes::CSVImporter do
       )
     end
 
+    it "raises a line error when friendly_description is too long" do
+      expect_import_error(
+        [
+          headers + ["friendly_description"],
+          outcome_row + ["l" * 256]
+        ],
+        [
+          [2, "Friendly description is too long (maximum is 255 characters)"],
+        ]
+      )
+    end
+
     it "if a group receives invalid fields" do
       expect_import_error(
         [

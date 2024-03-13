@@ -1,9 +1,14 @@
+/* eslint-disable eslint-comments/no-unlimited-disable */
+/* eslint-disable */
 /*!
- * jQuery UI Tooltip @VERSION
+ * jQuery UI Tooltip 1.9.2
+ * http://jqueryui.com
  *
- * Copyright 2012, AUTHORS.txt (http://jqueryui.com/about)
- * Dual licensed under the MIT or GPL Version 2 licenses.
+ * Copyright 2012 jQuery Foundation and other contributors
+ * Released under the MIT license.
  * http://jquery.org/license
+ *
+ * http://api.jqueryui.com/tooltip/
  *
  * Depends:
  *	jquery.ui.core.js
@@ -14,315 +19,388 @@ import $ from 'jquery'
 import './core'
 import './widget'
 import './position'
-import {isRTL} from '@canvas/i18n/rtlHelper'
 
-const flipPositionIfRTL = (() => {
-  const leftRightOpposites = {
-    'left+': 'right-',
-    'left-': 'right+',
-    'left': 'right',
-    'right+': 'left-',
-    'right-': 'left+',
-    'right': 'left'
+// (function( $ ) {
+
+  var increments = 0;
+
+  function addDescribedBy( elem, id ) {
+    var describedby = (elem.attr( "aria-describedby" ) || "").split( /\s+/ );
+    describedby.push( id );
+    elem
+      .data( "ui-tooltip-id", id )
+      .attr( "aria-describedby", $.trim( describedby.join( " " ) ) );
   }
-  const escapePlusAndMinus = str => str.replace(/[\-\+]/g, '\\$&')
-  const regexLeftRight = new RegExp(Object.keys(leftRightOpposites).map(escapePlusAndMinus).join('|'))
-  const flip = string => string.replace(regexLeftRight, match => leftRightOpposites[match] || match)
 
-  return (element, position) => {
-    if (isRTL(element)) {
-      position.my = flip(position.my)
-      position.at = flip(position.at)
+  function removeDescribedBy( elem ) {
+    var id = elem.data( "ui-tooltip-id" ),
+      describedby = (elem.attr( "aria-describedby" ) || "").split( /\s+/ ),
+      index = $.inArray( id, describedby );
+    if ( index !== -1 ) {
+      describedby.splice( index, 1 );
+    }
+
+    elem.removeData( "ui-tooltip-id" );
+    describedby = $.trim( describedby.join( " " ) );
+    if ( describedby ) {
+      elem.attr( "aria-describedby", describedby );
+    } else {
+      elem.removeAttr( "aria-describedby" );
     }
   }
-})()
 
-var increments = 0;
+  $.widget( "ui.tooltip", {
+    version: "1.9.2",
+    options: {
+      content: function() {
+        return $( this ).attr( "title" );
+      },
+      hide: true,
+      // Disabled elements have inconsistent behavior across browsers (#8661)
+      items: "[title]:not([disabled])",
+      position: {
+        my: "left top+15",
+        at: "left bottom",
+        collision: "flipfit flip"
+      },
+      show: true,
+      tooltipClass: null,
+      track: false,
 
-function addDescribedBy( elem, id ) {
-	var describedby = (elem.attr( "aria-describedby" ) || "").split( /\s+/ );
-	describedby.push( id );
-	elem
-		.data( "ui-tooltip-id", id )
-		.attr( "aria-describedby", $.trim( describedby.join( " " ) ) );
-}
+      // callbacks
+      close: null,
+      open: null
+    },
 
-function removeDescribedBy( elem ) {
-	var id = elem.data( "ui-tooltip-id" ),
-		describedby = (elem.attr( "aria-describedby" ) || "").split( /\s+/ ),
-		index = $.inArray( id, describedby );
-	if ( index !== -1 ) {
-		describedby.splice( index, 1 );
-	}
+    _create: function() {
+      this._on({
+        mouseover: "open",
+        focusin: "open"
+      });
 
-	elem.removeData( "ui-tooltip-id" );
-	describedby = $.trim( describedby.join( " " ) );
-	if ( describedby ) {
-		elem.attr( "aria-describedby", describedby );
-	} else {
-		elem.removeAttr( "aria-describedby" );
-	}
-}
+      // IDs of generated tooltips, needed for destroy
+      this.tooltips = {};
+      // IDs of parent tooltips where we removed the title attribute
+      this.parents = {};
 
-$.widget( "ui.tooltip", {
-	version: "@VERSION",
-	options: {
-		content: function() {
-			return $( this ).attr( "title" );
-		},
-		hide: true,
-		items: "[title]",
-		position: {
-			my: "left+15 center",
-			at: "right center",
-			collision: "flipfit flipfit"
-		},
-		show: true,
-		tooltipClass: null,
-		track: false,
+      if ( this.options.disabled ) {
+        this._disable();
+      }
+    },
 
-		// callbacks
-		close: null,
-		open: null
-	},
+    _setOption: function( key, value ) {
+      var that = this;
 
-	_create: function() {
-    flipPositionIfRTL(this.element[0], this.options.position)
-		this._on({
-			mouseover: "open",
-			focusin: "open"
-		});
+      if ( key === "disabled" ) {
+        this[ value ? "_disable" : "_enable" ]();
+        this.options[ key ] = value;
+        // disable element style changes
+        return;
+      }
 
-		// IDs of generated tooltips, needed for destroy
-		this.tooltips = {};
-	},
+      this._super( key, value );
 
-	_setOption: function( key, value ) {
-		if ( key === "disabled" ) {
-			this[ value ? "_disable" : "_enable" ]();
-			this.options[ key ] = value;
-			// disable element style changes
-			return;
-		}
-		this._super( key, value );
-	},
+      if ( key === "content" ) {
+        $.each( this.tooltips, function( id, element ) {
+          that._updateContent( element );
+        });
+      }
+    },
 
-	_disable: function() {
-		var that = this;
+    _disable: function() {
+      var that = this;
 
-		// close open tooltips
-		$.each( this.tooltips, function( id, element ) {
-			var event = $.Event( "blur" );
-			event.target = event.currentTarget = element[0];
-			that.close( event, true );
-		});
+      // close open tooltips
+      $.each( this.tooltips, function( id, element ) {
+        var event = $.Event( "blur" );
+        event.target = event.currentTarget = element[0];
+        that.close( event, true );
+      });
 
-		// remove title attributes to prevent native tooltips
-		this.element.find( this.options.items ).andSelf().each(function() {
-			var element = $( this );
-			if ( element.is( "[title]" ) ) {
-				element
-					.data( "ui-tooltip-title", element.attr( "title" ) )
-					.attr( "title", "" );
-			}
-		});
-	},
+      // remove title attributes to prevent native tooltips
+      this.element.find( this.options.items ).andSelf().each(function() {
+        var element = $( this );
+        if ( element.is( "[title]" ) ) {
+          element
+            .data( "ui-tooltip-title", element.attr( "title" ) )
+            .attr( "title", "" );
+        }
+      });
+    },
 
-	_enable: function() {
-		// restore title attributes
-		this.element.find( this.options.items ).andSelf().each(function() {
-			var element = $( this );
-			if ( element.data( "ui-tooltip-title" ) ) {
-				element.attr( "title", element.data( "ui-tooltip-title" ) );
-			}
-		});
-	},
+    _enable: function() {
+      // restore title attributes
+      this.element.find( this.options.items ).andSelf().each(function() {
+        var element = $( this );
+        if ( element.data( "ui-tooltip-title" ) ) {
+          element.attr( "title", element.data( "ui-tooltip-title" ) );
+        }
+      });
+    },
 
-	open: function( event ) {
-		var content,
-			that = this,
-			target = $( event ? event.target : this.element )
-				.closest( this.options.items );
+    open: function( event ) {
+      var that = this,
+        target = $( event ? event.target : this.element )
+          // we need closest here due to mouseover bubbling,
+          // but always pointing at the same event target
+          .closest( this.options.items );
 
-		// No element to show a tooltip for
-		if ( !target.length ) {
-			return;
-		}
+      // No element to show a tooltip for or the tooltip is already open
+      if ( !target.length || target.data( "ui-tooltip-id" ) ) {
+        return;
+      }
 
-		// If the tooltip is open and we're tracking then reposition the tooltip.
-		// This makes sure that a tracking tooltip doesn't obscure a focused element
-		// if the user was hovering when the element gained focused.
-		if ( this.options.track && target.data( "ui-tooltip-id" ) ) {
-			this._find( target ).position( $.extend({
-				of: target
-			}, this.options.position ) );
-			return;
-		}
+      if ( target.attr( "title" ) ) {
+        target.data( "ui-tooltip-title", target.attr( "title" ) );
+      }
 
-		if ( target.attr( "title" ) ) {
-			target.data( "ui-tooltip-title", target.attr( "title" ) );
-		}
+      target.data( "ui-tooltip-open", true );
 
-		target.data( "tooltip-open", true );
+      // kill parent tooltips, custom or native, for hover
+      if ( event && event.type === "mouseover" ) {
+        target.parents().each(function() {
+          var parent = $( this ),
+            blurEvent;
+          if ( parent.data( "ui-tooltip-open" ) ) {
+            blurEvent = $.Event( "blur" );
+            blurEvent.target = blurEvent.currentTarget = this;
+            that.close( blurEvent, true );
+          }
+          if ( parent.attr( "title" ) ) {
+            parent.uniqueId();
+            that.parents[ this.id ] = {
+              element: this,
+              title: parent.attr( "title" )
+            };
+            parent.attr( "title", "" );
+          }
+        });
+      }
 
-		content = this.options.content.call( target[0], function( response ) {
-			// ignore async response if tooltip was closed already
-			if ( !target.data( "tooltip-open" ) ) {
-				return;
-			}
-			// IE may instantly serve a cached response for ajax requests
-			// delay this call to _open so the other call to _open runs first
-			setTimeout(function() {
-				that._open( event, target, response );
-			}, 1 );
-		});
-		if ( content ) {
-			that._open( event, target, content );
-		}
-	},
+      this._updateContent( target, event );
+    },
 
-	_open: function( event, target, content ) {
-		var tooltip, positionOption;
-		if ( !content ) {
-			return;
-		}
+    _updateContent: function( target, event ) {
+      var content,
+        contentOption = this.options.content,
+        that = this,
+        eventType = event ? event.type : null;
 
-		// Content can be updated multiple times. If the tooltip already
-		// exists, then just update the content and bail.
-		tooltip = this._find( target );
-		if ( tooltip.length ) {
-			tooltip.find( ".ui-tooltip-content" ).html( content );
-			return;
-		}
+      if ( typeof contentOption === "string" ) {
+        return this._open( event, target, contentOption );
+      }
 
-		// if we have a title, clear it to prevent the native tooltip
-		// we have to check first to avoid defining a title if none exists
-		// (we don't want to cause an element to start matching [title])
-		//
-		// We use removeAttr only for key events, to allow IE to export the correct
-		// accessible attributes. For mouse events, set to empty string to avoid
-		// native tooltip showing up (happens only when removing inside mouseover).
-		if ( target.is( "[title]" ) ) {
-			if ( event && event.type === "mouseover" ) {
-				target.attr( "title", "" );
-			} else {
-				target.removeAttr( "title" );
-			}
-		}
+      content = contentOption.call( target[0], function( response ) {
+        // ignore async response if tooltip was closed already
+        if ( !target.data( "ui-tooltip-open" ) ) {
+          return;
+        }
+        // IE may instantly serve a cached response for ajax requests
+        // delay this call to _open so the other call to _open runs first
+        that._delay(function() {
+          // jQuery creates a special event for focusin when it doesn't
+          // exist natively. To improve performance, the native event
+          // object is reused and the type is changed. Therefore, we can't
+          // rely on the type being correct after the event finished
+          // bubbling, so we set it back to the previous value. (#8740)
+          if ( event ) {
+            event.type = eventType;
+          }
+          this._open( event, target, response );
+        });
+      });
+      if ( content ) {
+        this._open( event, target, content );
+      }
+    },
 
-		tooltip = this._tooltip( target );
-		addDescribedBy( target, tooltip.attr( "id" ) );
-		tooltip.find( ".ui-tooltip-content" ).html( content );
+    _open: function( event, target, content ) {
+      var tooltip, events, delayedShow,
+        positionOption = $.extend( {}, this.options.position );
 
-		function position( event ) {
-			positionOption.of = event;
-			tooltip.position( positionOption );
-		}
-		if ( this.options.track && event && /^mouse/.test( event.originalEvent.type ) ) {
-			positionOption = $.extend( {}, this.options.position );
-			this._on( this.document, {
-				mousemove: position
-			});
-			// trigger once to override element-relative positioning
-			position( event );
-		} else {
-			tooltip.position( $.extend({
-				of: target
-			}, this.options.position ) );
-		}
+      if ( !content ) {
+        return;
+      }
 
-		tooltip.hide();
+      // Content can be updated multiple times. If the tooltip already
+      // exists, then just update the content and bail.
+      tooltip = this._find( target );
+      if ( tooltip.length ) {
+        tooltip.find( ".ui-tooltip-content" ).html( content );
+        return;
+      }
 
-		this._show( tooltip, this.options.show );
+      // if we have a title, clear it to prevent the native tooltip
+      // we have to check first to avoid defining a title if none exists
+      // (we don't want to cause an element to start matching [title])
+      //
+      // We use removeAttr only for key events, to allow IE to export the correct
+      // accessible attributes. For mouse events, set to empty string to avoid
+      // native tooltip showing up (happens only when removing inside mouseover).
+      if ( target.is( "[title]" ) ) {
+        if ( event && event.type === "mouseover" ) {
+          target.attr( "title", "" );
+        } else {
+          target.removeAttr( "title" );
+        }
+      }
 
-		this._trigger( "open", event, { tooltip: tooltip } );
+      tooltip = this._tooltip( target );
+      addDescribedBy( target, tooltip.attr( "id" ) );
+      tooltip.find( ".ui-tooltip-content" ).html( content );
 
-		this._on( target, {
-			mouseleave: "close",
-			focusout: "close",
-			keyup: function( event ) {
-				if ( event.keyCode === $.ui.keyCode.ESCAPE ) {
-					var fakeEvent = $.Event(event);
-					fakeEvent.currentTarget = target[0];
-					this.close( fakeEvent, true );
-				}
-			}
-		});
-	},
+      function position( event ) {
+        positionOption.of = event;
+        if ( tooltip.is( ":hidden" ) ) {
+          return;
+        }
+        tooltip.position( positionOption );
+      }
+      if ( this.options.track && event && /^mouse/.test( event.type ) ) {
+        this._on( this.document, {
+          mousemove: position
+        });
+        // trigger once to override element-relative positioning
+        position( event );
+      } else {
+        tooltip.position( $.extend({
+          of: target
+        }, this.options.position ) );
+      }
 
-	close: function( event, force ) {
-		var that = this,
-			target = $( event ? event.currentTarget : this.element ),
-			tooltip = this._find( target );
+      tooltip.hide();
 
-		// disabling closes the tooltip, so we need to track when we're closing
-		// to avoid an infinite loop in case the tooltip becomes disabled on close
-		if ( this.closing ) {
-			return;
-		}
+      this._show( tooltip, this.options.show );
+      // Handle tracking tooltips that are shown with a delay (#8644). As soon
+      // as the tooltip is visible, position the tooltip using the most recent
+      // event.
+      if ( this.options.show && this.options.show.delay ) {
+        delayedShow = setInterval(function() {
+          if ( tooltip.is( ":visible" ) ) {
+            position( positionOption.of );
+            clearInterval( delayedShow );
+          }
+        }, $.fx.interval );
+      }
 
-		// don't close if the element has focus
-		// this prevents the tooltip from closing if you hover while focused
-		//
-		// we have to check the event type because tabbing out of the document
-		// may leave the element as the activeElement
-		if ( !force && event && event.type !== "focusout" &&
-				this.document[0].activeElement === target[0] ) {
-			return;
-		}
+      this._trigger( "open", event, { tooltip: tooltip } );
 
-		// only set title if we had one before (see comment in _open())
-		if ( target.data( "ui-tooltip-title" ) ) {
-			target.attr( "title", target.data( "ui-tooltip-title" ) );
-		}
+      events = {
+        keyup: function( event ) {
+          if ( event.keyCode === $.ui.keyCode.ESCAPE ) {
+            var fakeEvent = $.Event(event);
+            fakeEvent.currentTarget = target[0];
+            this.close( fakeEvent, true );
+          }
+        },
+        remove: function() {
+          this._removeTooltip( tooltip );
+        }
+      };
+      if ( !event || event.type === "mouseover" ) {
+        events.mouseleave = "close";
+      }
+      if ( !event || event.type === "focusin" ) {
+        events.focusout = "close";
+      }
+      this._on( true, target, events );
+    },
 
-		removeDescribedBy( target );
+    close: function( event ) {
+      var that = this,
+        target = $( event ? event.currentTarget : this.element ),
+        tooltip = this._find( target );
 
-		tooltip.stop( true );
-		this._hide( tooltip, this.options.hide, function() {
-			$( this ).remove();
-			delete that.tooltips[ this.id ];
-		});
+      // disabling closes the tooltip, so we need to track when we're closing
+      // to avoid an infinite loop in case the tooltip becomes disabled on close
+      if ( this.closing ) {
+        return;
+      }
 
-		target.removeData( "tooltip-open" );
-		this._off( target, "mouseleave focusout keyup" );
-		this._off( this.document, "mousemove" );
+      // only set title if we had one before (see comment in _open())
+      if ( target.data( "ui-tooltip-title" ) ) {
+        target.attr( "title", target.data( "ui-tooltip-title" ) );
+      }
 
-		this.closing = true;
-		this._trigger( "close", event, { tooltip: tooltip } );
-		this.closing = false;
-	},
+      removeDescribedBy( target );
 
-	_tooltip: function( element ) {
-		var id = "ui-tooltip-" + increments++,
-			tooltip = $( "<div>" )
-				.attr({
-					id: id,
-					role: "tooltip"
-				})
-				.addClass( "ui-tooltip ui-widget ui-corner-all ui-widget-content " +
-					( this.options.tooltipClass || "" ) );
-		$( "<div>" )
-			.addClass( "ui-tooltip-content" )
-			.appendTo( tooltip );
-		tooltip.appendTo( this.document[0].body );
-		if ( $.fn.bgiframe ) {
-			tooltip.bgiframe();
-		}
-		this.tooltips[ id ] = element;
-		return tooltip;
-	},
+      tooltip.stop( true );
+      this._hide( tooltip, this.options.hide, function() {
+        that._removeTooltip( $( this ) );
+      });
 
-	_find: function( target ) {
-		var id = target.data( "ui-tooltip-id" );
-		return id ? $( "#" + id ) : $();
-	},
+      target.removeData( "ui-tooltip-open" );
+      this._off( target, "mouseleave focusout keyup" );
+      // Remove 'remove' binding only on delegated targets
+      if ( target[0] !== this.element[0] ) {
+        this._off( target, "remove" );
+      }
+      this._off( this.document, "mousemove" );
 
-	_destroy: function() {
-		$.each( this.tooltips, function( id ) {
-			$( "#" + id ).remove();
-		});
-	}
-});
+      if ( event && event.type === "mouseleave" ) {
+        $.each( this.parents, function( id, parent ) {
+          $( parent.element ).attr( "title", parent.title );
+          delete that.parents[ id ];
+        });
+      }
 
+      this.closing = true;
+      this._trigger( "close", event, { tooltip: tooltip } );
+      this.closing = false;
+    },
+
+    _tooltip: function( element ) {
+      var id = "ui-tooltip-" + increments++,
+        tooltip = $( "<div>" )
+          .attr({
+            id: id,
+            role: "tooltip"
+          })
+          .addClass( "ui-tooltip ui-widget ui-corner-all ui-widget-content " +
+            ( this.options.tooltipClass || "" ) );
+      $( "<div>" )
+        .addClass( "ui-tooltip-content" )
+        .appendTo( tooltip );
+      tooltip.appendTo( this.document[0].body );
+      if ( $.fn.bgiframe ) {
+        tooltip.bgiframe();
+      }
+      this.tooltips[ id ] = element;
+      return tooltip;
+    },
+
+    _find: function( target ) {
+      var id = target.data( "ui-tooltip-id" );
+      return id ? $( "#" + id ) : $();
+    },
+
+    _removeTooltip: function( tooltip ) {
+      tooltip.remove();
+      delete this.tooltips[ tooltip.attr( "id" ) ];
+    },
+
+    _destroy: function() {
+      var that = this;
+
+      // close open tooltips
+      $.each( this.tooltips, function( id, element ) {
+        // Delegate to close method to handle common cleanup
+        var event = $.Event( "blur" );
+        event.target = event.currentTarget = element[0];
+        that.close( event, true );
+
+        // Remove immediately; destroying an open tooltip doesn't use the
+        // hide animation
+        $( "#" + id ).remove();
+
+        // Restore the title
+        if ( element.data( "ui-tooltip-title" ) ) {
+          element.attr( "title", element.data( "ui-tooltip-title" ) );
+          element.removeData( "ui-tooltip-title" );
+        }
+      });
+    }
+  });
+
+// }( jQuery ) );
 

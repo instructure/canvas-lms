@@ -91,12 +91,12 @@ describe('ZipFileImporter', () => {
     expect(screen.getByText('No file chosen')).toBeInTheDocument()
   })
 
-  it('renders file name if file is chosen', () => {
+  it('renders file name if file is chosen', async () => {
     renderComponent()
 
     const file = new File(['blah, blah, blah'], 'my_file.zip', {type: 'application/zip'})
     const input = screen.getByTestId('migrationFileUpload')
-    userEvent.upload(input, file)
+    await userEvent.upload(input, file)
     expect(screen.getByText('my_file.zip')).toBeInTheDocument()
   })
 
@@ -106,7 +106,7 @@ describe('ZipFileImporter', () => {
     const file = new File(['blah, blah, blah'], 'my_file.zip', {type: 'application/zip'})
     Object.defineProperty(file, 'size', {value: 1024 + 1})
     const input = screen.getByTestId('migrationFileUpload')
-    userEvent.upload(input, file)
+    await userEvent.upload(input, file)
     expect(screen.getByText('No file chosen')).toBeInTheDocument()
   })
 
@@ -116,7 +116,7 @@ describe('ZipFileImporter', () => {
     const file = new File(['blah, blah, blah'], 'my_file.zip', {type: 'application/zip'})
     Object.defineProperty(file, 'size', {value: 1024 + 1})
     const input = screen.getByTestId('migrationFileUpload')
-    userEvent.upload(input, file)
+    await userEvent.upload(input, file)
     expect(showFlashError).toHaveBeenCalledWith('Your migration can not exceed 1.0 KB')
   })
 
@@ -125,11 +125,9 @@ describe('ZipFileImporter', () => {
 
     const file = new File(['blah, blah, blah'], 'my_file.zip', {type: 'application/zip'})
     const input = screen.getByTestId('migrationFileUpload')
-    userEvent.upload(input, file)
-    await waitFor(() => {
-      userEvent.click(screen.getByText('course files'))
-    })
-    userEvent.click(screen.getByRole('button', {name: 'Add to Import Queue'}))
+    await userEvent.upload(input, file)
+    await userEvent.click(screen.getByText('course files'))
+    await userEvent.click(screen.getByRole('button', {name: 'Add to Import Queue'}))
     expect(onSubmit).toHaveBeenCalledWith(
       expect.objectContaining({
         pre_attachment: {
@@ -142,10 +140,10 @@ describe('ZipFileImporter', () => {
     )
   })
 
-  it('calls onCancel', () => {
+  it('calls onCancel', async () => {
     renderComponent()
 
-    userEvent.click(screen.getByRole('button', {name: 'Cancel'}))
+    await userEvent.click(screen.getByRole('button', {name: 'Cancel'}))
     expect(onCancel).toHaveBeenCalled()
   })
 
@@ -155,11 +153,14 @@ describe('ZipFileImporter', () => {
     await waitFor(() => {
       expect(screen.getByText('Upload to')).toBeInTheDocument()
     })
-    await waitFor(() => {
-      userEvent.click(screen.getByText('course files'))
-    })
+    await userEvent.click(screen.getByText('course files'))
     await waitFor(() => {
       expect(screen.getByText('course files')).toBeInTheDocument()
     })
+  })
+
+  it('renders the progressbar info', async () => {
+    renderComponent({fileUploadProgress: 10})
+    expect(screen.getByText('Uploading File')).toBeInTheDocument()
   })
 })

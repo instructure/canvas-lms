@@ -17,8 +17,8 @@
  */
 
 import React from 'react'
-import {render, screen} from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
+import {render, screen, waitFor} from '@testing-library/react'
+import userEvent, {PointerEventsCheckLevel} from '@testing-library/user-event'
 import {Text} from '@instructure/ui-text'
 import InfoButton from '../info_button'
 
@@ -34,33 +34,39 @@ const renderComponent = (overrideProps?: any) =>
   )
 
 describe('InfoButton', () => {
-  it('opens on click', () => {
+  it('opens on click', async () => {
     renderComponent()
-    userEvent.click(screen.getByRole('button', {name: 'info button'}))
+    await userEvent.click(screen.getByRole('button', {name: 'info button'}))
     expect(screen.getByRole('heading', {name: 'Info heading'})).toBeInTheDocument()
   })
 
-  it('renders body', () => {
+  it('renders body', async () => {
     renderComponent()
-    userEvent.click(screen.getByRole('button', {name: 'info button'}))
+    await userEvent.click(screen.getByRole('button', {name: 'info button'}))
     expect(screen.getByText('Info body')).toBeInTheDocument()
   })
 
-  it('closes with x button', () => {
+  it('closes with x button', async () => {
+    const user = userEvent.setup({pointerEventsCheck: PointerEventsCheckLevel.Never})
     renderComponent()
-    userEvent.click(screen.getByRole('button', {name: 'info button'}))
-    const xButton = screen.queryAllByText('Close')[0]
-    userEvent.click(xButton)
+    await user.click(screen.getByRole('button', {name: 'info button'}))
+    const xButton = screen.getAllByText('Close')[0]
+    await user.click(xButton)
 
-    expect(screen.queryByRole('heading', {name: 'Info heading'})).not.toBeInTheDocument()
+    await waitFor(() =>
+      expect(screen.queryByRole('heading', {name: 'Info heading'})).not.toBeInTheDocument()
+    )
   })
 
-  it('closes with close button', () => {
+  it('closes with close button', async () => {
+    const user = userEvent.setup({pointerEventsCheck: PointerEventsCheckLevel.Never})
     renderComponent()
-    userEvent.click(screen.getByRole('button', {name: 'info button'}))
-    const closeButton = screen.queryAllByText('Close')[1]
-    userEvent.click(closeButton)
+    await user.click(screen.getByRole('button', {name: 'info button'}))
+    const closeButton = screen.getAllByText('Close')[1]
+    await user.click(closeButton)
 
-    expect(screen.queryByRole('heading', {name: 'Info heading'})).not.toBeInTheDocument()
+    await waitFor(() =>
+      expect(screen.queryByRole('heading', {name: 'Info heading'})).not.toBeInTheDocument()
+    )
   })
 })

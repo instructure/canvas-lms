@@ -99,7 +99,7 @@ describe('setupSubmitHandler', () => {
     beforeEach(() => {
       errorFn = setupSubmitHandler(formId, 'user_1').error.bind($(`#${formId}`))
       const submitButton = $('button[type="submit"]')
-      submitButton.attr('disabled', true)
+      submitButton.prop('disabled', true)
       submitButton.text('Uploading...')
     })
 

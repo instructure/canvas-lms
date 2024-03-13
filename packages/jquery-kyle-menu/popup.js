@@ -14,9 +14,7 @@
  */
 // INSTRUCTURE modified
 import $ from 'jquery'
-import 'jqueryui/core'
-import 'jqueryui/widget'
-import 'jqueryui-unpatched/position'
+import 'jqueryui/position'
 
 let idIncrement = 0,
   suppressExpandOnFocus = false

@@ -19,6 +19,7 @@
 import Conference from 'ui/features/conferences/backbone/models/Conference'
 import ConferenceView from 'ui/features/conferences/backbone/views/ConferenceView'
 import $ from 'jquery'
+import 'jquery-migrate'
 import fakeENV from 'helpers/fakeENV'
 import assertions from 'helpers/assertions'
 import '@canvas/jquery/jquery.simulate'

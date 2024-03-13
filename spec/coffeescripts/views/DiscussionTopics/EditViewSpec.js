@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import {extend, defer} from 'lodash'
 import RCELoader from '@canvas/rce/serviceRCELoader'
 import SectionCollection from '@canvas/sections/backbone/collections/SectionCollection'
@@ -222,9 +223,10 @@ test('shows todo checkbox', function () {
 test('shows todo input when todo checkbox is selected', function () {
   ENV.STUDENT_PLANNER_ENABLED = true
   const view = this.editView()
+  equal(view.$el.find('#todo_date_input')[0].style.display, 'none')
   view.$el.find('#allow_todo_date').prop('checked', true)
   view.$el.find('#allow_todo_date').trigger('change')
-  equal(view.$el.find('#todo_date_input')[0].style.display, 'block')
+  notStrictEqual(view.$el.find('#todo_date_input')[0].style.display, 'none')
 })
 
 test('shows todo input with date when given date', function () {
@@ -745,5 +747,15 @@ test('it attaches assignment external tools component in course context', functi
 test('it does not attach assignment external tools component in group context', function () {
   ENV.context_asset_string = 'group_1'
   const view = this.editView()
+  equal(view.$AssignmentExternalTools.children().size(), 0)
+})
+
+test('it renders assignment external tools on announcements page when assignment_edit_placement_not_on_announcements flag is on', function () {
+  const view = this.editView({isAnnouncement: true})
+  equal(view.$AssignmentExternalTools.children().size(), 0)
+})
+
+test('it does not render assignment external tools on announcements page when assignment_edit_placement_not_on_announcements flag is off', function () {
+  const view = this.editView({isAnnouncement: false})
   equal(view.$AssignmentExternalTools.children().size(), 0)
 })

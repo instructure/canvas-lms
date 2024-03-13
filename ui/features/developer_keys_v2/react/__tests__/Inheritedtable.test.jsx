@@ -103,43 +103,43 @@ describe('InheritedTable', () => {
       expect(firstRow(wrapper)).toHaveTextContent('9')
     })
 
-    it('allows sorting by name', () => {
+    it('allows sorting by name', async () => {
       const wrapper = component()
 
-      userEvent.click(wrapper.getByText('Name')) // ascending
+      await userEvent.click(wrapper.getByText('Name')) // ascending
       expect(firstRow(wrapper)).toHaveTextContent('key-0')
 
-      userEvent.click(wrapper.getByText('Name')) // descending
+      await userEvent.click(wrapper.getByText('Name')) // descending
       expect(firstRow(wrapper)).toHaveTextContent('key-9')
     })
 
-    it('allows sorting by id', () => {
+    it('allows sorting by id', async () => {
       const wrapper = component()
 
-      userEvent.click(wrapper.getByText('Id')) // ascending
+      await userEvent.click(wrapper.getByText('Id')) // ascending
       expect(firstRow(wrapper)).toHaveTextContent(idFor(0))
 
-      userEvent.click(wrapper.getByText('Id')) // descending
+      await userEvent.click(wrapper.getByText('Id')) // descending
       expect(firstRow(wrapper)).toHaveTextContent(idFor(9))
     })
 
-    it('allows sorting by type', () => {
+    it('allows sorting by type', async () => {
       const wrapper = component()
 
-      userEvent.click(wrapper.getByText('Type')) // ascending
+      await userEvent.click(wrapper.getByText('Type')) // ascending
       expect(firstRow(wrapper)).toHaveTextContent('key-0')
 
-      userEvent.click(wrapper.getByText('Type')) // descending
+      await userEvent.click(wrapper.getByText('Type')) // descending
       expect(firstRow(wrapper)).toHaveTextContent('key-3')
     })
 
-    it('allows sorting by state', () => {
+    it('allows sorting by state', async () => {
       const wrapper = component()
 
-      userEvent.click(wrapper.getByText('State')) // ascending
+      await userEvent.click(wrapper.getByText('State')) // ascending
       expect(firstRow(wrapper)).toHaveTextContent('off')
 
-      userEvent.click(wrapper.getByText('State')) // descending
+      await userEvent.click(wrapper.getByText('State')) // descending
       expect(firstRow(wrapper)).toHaveTextContent('on')
     })
   })
@@ -147,18 +147,18 @@ describe('InheritedTable', () => {
   describe('when filtering table', () => {
     const waitForDebounce = () => new Promise(resolve => setTimeout(resolve, 400))
 
-    it('filters by selecting type', () => {
+    it('filters by selecting type', async () => {
       const wrapper = component()
 
-      userEvent.click(wrapper.getByRole('combobox'))
-      userEvent.click(wrapper.getByRole('option', {name: 'LTI Keys'}))
+      await userEvent.click(wrapper.getByRole('combobox'))
+      await userEvent.click(wrapper.getByRole('option', {name: 'LTI Keys'}))
       expect(wrapper.getAllByRole('row')).toHaveLength(2)
     })
 
     it('filters by searching for name', async () => {
       const wrapper = component()
 
-      userEvent.type(wrapper.getByRole('searchbox'), 'key-1')
+      await userEvent.type(wrapper.getByRole('searchbox'), 'key-1')
       await waitForDebounce()
       expect(wrapper.getAllByRole('row')).toHaveLength(2)
     })
@@ -166,7 +166,7 @@ describe('InheritedTable', () => {
     it('filters by searching for id', async () => {
       const wrapper = component()
 
-      userEvent.type(wrapper.getByRole('searchbox'), idFor(1))
+      await userEvent.type(wrapper.getByRole('searchbox'), idFor(1))
       await waitForDebounce()
       console.log(wrapper.getAllByRole('row').map(r => r.textContent))
       expect(wrapper.getAllByRole('row')).toHaveLength(2)

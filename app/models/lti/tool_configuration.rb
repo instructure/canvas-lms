@@ -35,12 +35,13 @@ module Lti
     validate :validate_placements
     validate :validate_oidc_initiation_urls
 
-    attr_accessor :configuration_url, :settings_url
+    attr_accessor :settings_url
 
     # settings* was an unfortunate naming choice as there is a settings hash per placement that
     # made it confusing, as well as this being a configuration, not a settings, hash
     alias_attribute :configuration, :settings
-    alias_attribute :configuration_url, :settings_url
+    alias_method :configuration_url, :settings_url
+    alias_method :configuration_url=, :settings_url=
 
     def new_external_tool(context, existing_tool: nil)
       # disabled tools should stay disabled while getting updated

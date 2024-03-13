@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import * as tz from '@canvas/datetime'
 import tzInTest from '@canvas/datetime/specHelpers'
 import timezone from 'timezone'

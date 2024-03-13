@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import '../../../ui/boot/initializers/activateElementToggler'
 
 QUnit.module('elementToggler', {

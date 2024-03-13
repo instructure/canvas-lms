@@ -37,7 +37,7 @@ ready(() => {
   $('#back_to_choose_number_link').click(event => {
     $new_phone_form.hide()
     $select_phone_form.show()
-    $phone_select.find('option:first').attr('selected', 'selected')
+    $phone_select.find('option:first').prop('selected', true)
     event.preventDefault()
   })
 })

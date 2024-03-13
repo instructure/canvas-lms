@@ -19,8 +19,7 @@
 import React, {useCallback, useEffect, useState} from 'react'
 import type {CanvasId, CanvasProgress} from './types'
 import {
-  IconMiniArrowDownLine,
-  IconPublishLine,
+  IconArrowOpenDownLine,
   IconPublishSolid,
   IconUnpublishedLine,
   // @ts-ignore
@@ -92,7 +91,7 @@ const ContextModulesPublishMenu = ({courseId, runningProgressId, disabled}: Prop
     if (isPublishing) {
       return <Spinner renderTitle={I18n.t('Loading')} size="x-small" />
     } else {
-      return <IconPublishLine size="x-small" color="success" />
+      return <IconPublishSolid size="x-small" color="success" />
     }
   }
 
@@ -305,7 +304,7 @@ const ContextModulesPublishMenu = ({courseId, runningProgressId, disabled}: Prop
         placement="bottom"
         trigger={
           <Button renderIcon={statusIcon}>
-            {I18n.t('Publish All')} <IconMiniArrowDownLine size="x-small" />
+            {I18n.t('Publish All')} <IconArrowOpenDownLine size="x-small" />
           </Button>
         }
         show={isPublishing ? false : undefined}

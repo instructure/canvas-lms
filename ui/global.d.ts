@@ -19,6 +19,7 @@
 import {sendMessageStudentsWho} from './shared/grading/messageStudentsWhoHelper'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 import {GlobalInst} from '@canvas/global/inst/GlobalInst'
+import {GlobalRemotes} from '@canvas/global/remotes/GlobalRemotes'
 
 declare global {
   interface Global {
@@ -32,6 +33,11 @@ declare global {
      * some by client code.
      */
     readonly INST?: GlobalInst
+
+    /**
+     * Remote locations for various pure front-end functionality.
+     */
+    readonly REMOTES?: GlobalRemotes
   }
 
   interface Window {
@@ -69,6 +75,11 @@ declare global {
    * some by client code.
    */
   const INST: GlobalInst
+
+  /**
+   * Remote locations for various pure front-end functionality.
+   */
+  const REMOTES: GlobalRemotes
 
   type ShowIf = {
     (bool?: boolean): JQuery<HTMLElement>

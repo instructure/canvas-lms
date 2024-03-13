@@ -104,10 +104,10 @@ describe('CourseFilter', () => {
       props.onChange = onChangeMock
       const {findByTitle, findByRole} = render(<CourseFilter {...props} />)
       const button = await findByTitle('Any Term')
-      userEvent.click(button)
+      await userEvent.click(button)
       const option = await findByRole('option', {name: 'Term One'})
       expect(option).toBeInTheDocument()
-      userEvent.click(option)
+      await userEvent.click(option)
     })
 
     it('onChange fires with subaccount filter when a subaccount is selected', async () => {
@@ -118,10 +118,10 @@ describe('CourseFilter', () => {
       props.onChange = onChangeMock
       const {findByTitle, findByRole} = render(<CourseFilter {...props} />)
       const button = await findByTitle('Any Sub-Account')
-      userEvent.click(button)
+      await userEvent.click(button)
       const option = await findByRole('option', {name: 'Account One'})
       expect(option).toBeInTheDocument()
-      userEvent.click(option)
+      await userEvent.click(option)
     })
   })
 })

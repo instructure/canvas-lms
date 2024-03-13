@@ -37,6 +37,12 @@ export const DiscussionEntry = {
       ratingCount
       ratingSum
       subentriesCount
+      editor {
+        ...User
+      }
+      author {
+        ...User
+      }
       attachment {
         ...Attachment
       }
@@ -89,6 +95,7 @@ export const DiscussionEntry = {
       }
       depth
     }
+    ${User.fragment}
     ${Attachment.fragment}
     ${DiscussionEntryPermissions.fragment}
     ${DiscussionEntryVersion.fragment}

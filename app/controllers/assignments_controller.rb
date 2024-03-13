@@ -799,7 +799,8 @@ class AssignmentsController < ApplicationController
         ASSIGNMENT_INDEX_URL: polymorphic_url([@context, :assignments]),
         ASSIGNMENT_OVERRIDES: assignment_overrides_json(
           @assignment.overrides_for(@current_user, ensure_set_not_empty: true),
-          @current_user
+          @current_user,
+          include_names: true
         ),
         AVAILABLE_MODERATORS: @assignment.available_moderators.map { |user| { name: user.name, id: user.id } },
         COURSE_ID: @context.id,

@@ -1,3 +1,4 @@
+/* eslint-disable qunit/no-identical-names */
 /*
  * Copyright (C) 2013 - present Instructure, Inc.
  *
@@ -16,7 +17,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
 import WikiPage from '@canvas/wiki/backbone/models/WikiPage'
 import WikiPageContentView from 'ui/features/wiki_page_revisions/backbone/views/WikiPageContentView'
 import {subscribe} from 'jquery-tinypubsub'

@@ -70,7 +70,7 @@ class Reply {
       // todo: replace .andSelf with .addBack when JQuery is upgraded.
       return $(e.currentTarget).siblings('a').andSelf().toggle()
     })
-    this.form.delegate('.alert .close', 'click', preventDefault(this.hideNotification))
+    this.form.on('click', '.alert .close', preventDefault(this.hideNotification))
     this.form.on('change', 'ul.discussion-reply-attachments input[type=file]', e => {
       this.form.find('ul.discussion-reply-attachments input[type=file]').focus()
       if (e.target.files.length > 0) {

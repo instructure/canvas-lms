@@ -19,6 +19,7 @@
 import _ from 'lodash'
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import axios from '@canvas/axios'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import fakeENV from 'helpers/fakeENV'

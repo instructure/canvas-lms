@@ -534,7 +534,7 @@ function handleStudentOrSectionSelected(
 
 function initDropdown() {
   const hideStudentNames = utils.shouldHideStudentNames()
-  $('#hide_student_names').attr('checked', hideStudentNames ? 'checked' : null)
+  $('#hide_student_names').prop('checked', hideStudentNames)
 
   const optionsArray = window.jsonData.studentsWithSubmissions.map(
     (student: StudentWithSubmission) => {
@@ -565,7 +565,7 @@ function initDropdown() {
     window.jsonData.context.active_course_sections.length > 1 &&
     !window.jsonData.GROUP_GRADING_MODE
   ) {
-    const $selectmenu_list = $selectmenu?.data('selectmenu').list
+    const $selectmenu_list = $selectmenu?.data('ui-selectmenu').list
     const $menu = $('#section-menu')
 
     $menu
@@ -594,7 +594,7 @@ function initDropdown() {
       .find('ul')
       .hide()
       .menu()
-      .delegate('a', 'click mousedown', function (this: HTMLAnchorElement) {
+      .on('click mousedown', 'a', function (_event) {
         EG.changeToSection($(this).data('section-id'))
       })
 
@@ -726,7 +726,7 @@ function setupHeader() {
       if (needsReload) {
         $(e.target)
           .find('.submit_button')
-          .attr('disabled', 'true')
+          .prop('disabled', true)
           .text(I18n.t('buttons.saving_settings', 'Saving Settings...'))
       } else {
         this.elements.settings.form.dialog('close')
@@ -1776,7 +1776,7 @@ EG = {
           }
         }
       }
-      $reassign_assignment.attr('disabled', disableReassign ? 'disabled' : null)
+      $reassign_assignment.prop('disabled', disableReassign)
       $reassign_assignment.text(redoRequest ? I18n.t('Reassigned') : I18n.t('Reassign Assignment'))
       if (disableReassign) {
         if (redoRequest) {
@@ -2185,7 +2185,7 @@ EG = {
         )
         $vericiteInfo.find('.vericite_resubmit_button').click(function (event) {
           event.preventDefault()
-          $(this).attr('disabled', 'true').text(I18n.t('vericite.resubmitting', 'Resubmitting...'))
+          $(this).prop('disabled', true).text(I18n.t('vericite.resubmitting', 'Resubmitting...'))
 
           $.ajaxJSON(resubmitUrl, 'POST', {}, () => {
             SpeedgraderHelpers.reloadPage()
@@ -2597,7 +2597,7 @@ EG = {
         delete EG.initialVersion
       }
 
-      $(`#submission_to_view option:eq(${index})`).attr('selected', 'selected')
+      $(`#submission_to_view option:eq(${index})`).prop('selected', true)
       $submission_details.show()
       if (allowsReassignment(currentSubmission)) {
         $reassign_assignment.show()
@@ -3323,7 +3323,7 @@ EG = {
       }
       reassignAssignmentInProgress = false
     }
-    $reassign_assignment.attr('disabled', 'disabled')
+    $reassign_assignment.prop('disabled', true)
     $reassign_assignment.text(I18n.t('Reassigning ...'))
     $.ajaxJSON(
       url,
@@ -3366,7 +3366,7 @@ EG = {
     const method = 'PUT'
     const formData = {
       'submission[assignment_id]': window.jsonData.id,
-      'submission[group_comment]': $('#submission_group_comment').attr('checked') ? '1' : '0',
+      'submission[group_comment]': $('#submission_group_comment').prop('checked') ? '1' : '0',
       'submission[comment]': $add_a_comment_textarea.val(),
       'submission[draft_comment]': draftComment,
       [`submission[${anonymizableId}]`]: EG.currentStudent[anonymizableId],
@@ -3781,13 +3781,11 @@ EG = {
       fileIndex++
       $('#comment_attachments').append($attachment.show())
     })
-    $comment_attachment_input_blank
-      .find('a')
-      .click(function (this: HTMLAnchorElement, event: JQuery.ClickEvent) {
-        event.preventDefault()
-        $(this).parents('.comment_attachment_input').remove()
-      })
-    $right_side.delegate('.play_comment_link', 'click', function (this: HTMLAnchorElement) {
+    $comment_attachment_input_blank.find('a').on('click', function (event: JQuery.ClickEvent) {
+      event.preventDefault()
+      $(this).parents('.comment_attachment_input').remove()
+    })
+    $right_side.on('click', '.play_comment_link', function (_event) {
       if ($(this).data('media_comment_id')) {
         $(this)
           .parents('.comment')

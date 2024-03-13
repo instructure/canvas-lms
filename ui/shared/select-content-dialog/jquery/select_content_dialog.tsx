@@ -504,7 +504,7 @@ export function extractContextExternalToolItemData() {
   return {
     'item[type]': tool_type,
     'item[id]': tool_id,
-    'item[new_tab]': $('#external_tool_create_new_tab').attr('checked') ? '1' : '0',
+    'item[new_tab]': $('#external_tool_create_new_tab').prop('checked') ? '1' : '0',
     'item[indent]': $('#content_tag_indent').val(),
     'item[url]': $('#external_tool_create_url').val(),
     'item[title]': $('#external_tool_create_title').val(),
@@ -662,7 +662,7 @@ $(document).ready(function () {
         'item[id]': $(
           '#select_context_content_dialog .module_item_option:visible:first .module_item_select'
         ).val(),
-        'item[new_tab]': $('#external_url_create_new_tab').attr('checked') ? '1' : '0',
+        'item[new_tab]': $('#external_url_create_new_tab').prop('checked') ? '1' : '0',
         'item[indent]': $('#content_tag_indent').val(),
       }
 

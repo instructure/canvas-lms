@@ -739,6 +739,102 @@ fr-CA:
       separator: ","
       round_mode: default
   proper_noun_singular_genitive: de %{noun}
+ga:
+  bigeasy_locale: ga_IE
+  moment_locale: ga
+  fullcalendar_locale: ga
+  date:
+    days:
+      today: Inniu
+      today_lower: inniu
+      tomorrow: Amárach
+      yesterday: Inné
+    datepicker:
+      column_headings:
+        - Do
+        - Lu
+        - Má
+        - Cé
+        - Dé
+        - A
+        - Sa
+    month_names:
+      -
+      - Eanáir
+      - Feabhra
+      - Márta
+      - Aibreán
+      - Bealtaine
+      - Meitheamh
+      - Iúil
+      - Lúnasa
+      - Meán Fómhair
+      - Deireadh Fómhair
+      - Samhain
+      - Nollaig
+    abbr_month_names:
+      -
+      - Ean
+      - Feabh
+      - Márta
+      - Aib
+      - Beal
+      - Meith
+      - Iúil
+      - Lún
+      - MFómh
+      - DFómh
+      - Samh
+      - Noll
+    day_names:
+      - Dé Domhnaigh
+      - Dé Luain
+      - Dé Máirt
+      - Dé Céadaoin
+      - Déardaoin
+      - Dé hAoine
+      - Dé Sathairn
+    abbr_day_names:
+      - Domh
+      - Luan
+      - Máirt
+      - Céad
+      - Déar
+      - Aoine
+      - Sath
+    formats:
+      date_at_time: "%b %-d ag %k:%M"
+      default: "%d/%m/%y"
+      full: "%d %b %Y %T"
+      full_with_weekday: "%a %d %b %Y %T"
+      long: "%d %b %Y %T %Z"
+      long_with_weekday: "%a %d %b %Y %T %Z"
+      medium: "%d %b %Y"
+      medium_month: "%b %Y"
+      medium_with_weekday: "%a %d %b %Y"
+      short: "%b %-d"
+      short_month: "%b"
+      short_weekday: "%a"
+      short_with_weekday: "%a %d %b"
+      weekday: "%A"
+  time:
+    formats:
+      default: "%a, %d %b %Y %H:%M:%S %z"
+      short: "%d %b %H:%M"
+      long: "%B %d, %Y %H:%M"
+      tiny: "%l:%M%P"
+      tiny_on_the_hour: "%l%P"
+  dow_offset: 1
+  locales:
+    ga: Irish (Gaeilge)
+  time:
+    event: "%{date} ag %{time}"
+    formats:
+      tiny: "%k:%M"
+      tiny_on_the_hour: "%k:%M"
+  number:
+    format:
+      round_mode: default
 he:
   bigeasy_locale: he_IL
   crowdsourced: true
@@ -933,6 +1029,49 @@ hy:
   number:
     format:
       round_mode: default
+id:
+  bigeasy_locale: id_ID
+  date:
+    abbr_month_names:
+    -
+    - Jan
+    - Feb
+    - Mac
+    - Apr
+    - Mei
+    - Jun
+    - Jul
+    - Agt
+    - Sep
+    - Okt
+    - Nov
+    - Des
+    formats:
+      date_at_time: "%b %-d %H.%M"
+      default: "%d/%m/%Y"
+      full: "%-d %b %Y pukul %H.%M"
+      full_with_weekday: "%a, %-d %b %Y pukul %H.%M"
+      long: "%-d %B %Y"
+      long_with_weekday: "%A, %-d %B"
+      medium: "%-d %b %Y"
+      medium_month: "%b %Y"
+      medium_with_weekday: "%a, %-d %b %Y"
+      short: "%-d %b"
+      short_month: "%b"
+      short_weekday: "%a"
+      short_with_weekday: "%a, %-d %b"
+      weekday: "%A"
+  fullcalendar_locale: id
+  dow_offset: 1
+  locales:
+    id: Bahasa Indonesia
+  moment_locale: id
+  time:
+    event: "%{date} pukul %{time} "
+    formats:
+      tiny: "%H.%M"
+      tiny_on_the_hour: "%H.%M"
+  proper_noun_singular_genitive: "%{noun}"
 is:
   bigeasy_locale: is_IS
   date:
@@ -1068,7 +1207,7 @@ ja:
   locales:
     ja: 日本語
   time:
-    event: "%{date} 日  %{time}"
+    event: "%{date} %{time}"
     formats:
       tiny: "%k.%M"
       tiny_on_the_hour: "%k.%M"

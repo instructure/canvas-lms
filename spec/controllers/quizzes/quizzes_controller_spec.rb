@@ -1064,6 +1064,7 @@ describe Quizzes::QuizzesController do
       end
 
       before do
+        allow(RequestContext::Generator).to receive(:request_id).and_return(SecureRandom.uuid)
         user_session(@teacher)
       end
 

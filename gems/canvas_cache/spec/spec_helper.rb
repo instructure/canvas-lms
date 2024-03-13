@@ -27,6 +27,7 @@ Rails.env = "test"
 # give the logger some implementation since
 # we aren't initializing a full app in these specs
 Rails.logger = Logger.new($stdout)
+ActiveSupport::Cache.format_version = 7.0
 
 RSpec.shared_context "caching_helpers", shared_context: :metadata do
   # provide a way to temporarily replace the rails

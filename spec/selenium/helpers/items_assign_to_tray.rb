@@ -85,8 +85,8 @@ module ItemsAssignToTray
     "[data-testid='module-item-edit-tray']"
   end
 
-  def save_button_selector
-    "//*[@data-testid = 'module-item-edit-tray']//button[.//*[contains(text(), 'Save')]]"
+  def save_button_selector(save_button_text = "Save")
+    "//*[@data-testid = 'module-item-edit-tray-footer']//button[.//*[contains(text(), '#{save_button_text}')]]"
   end
 
   def tray_header_selector
@@ -174,8 +174,8 @@ module ItemsAssignToTray
     f(module_item_edit_tray_selector)
   end
 
-  def save_button
-    fxpath(save_button_selector)
+  def save_button(save_button_text = "Save")
+    fxpath(save_button_selector(save_button_text))
   end
 
   def tray_header
@@ -196,8 +196,8 @@ module ItemsAssignToTray
     cancel_button.click
   end
 
-  def click_save_button
-    save_button.click
+  def click_save_button(save_button_text = "Save")
+    save_button(save_button_text).click
   end
 
   def icon_type_exists?(icon_type)

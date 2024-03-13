@@ -18,6 +18,7 @@
 
 import {map} from 'lodash'
 import $ from 'jquery'
+import 'jquery-migrate'
 import {
   createGradebook,
   setFixtureHtml,

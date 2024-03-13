@@ -89,6 +89,7 @@ QUnit.module('Quizzes::LogAuditing::EventManager - Event delivery', {
 })
 
 test('it should deliver events', function () {
+  const clock = sinon.useFakeTimers()
   this.evtManager = new EventManager({
     autoDeliver: false,
     deliveryUrl: '/events',
@@ -112,8 +113,10 @@ test('it should deliver events', function () {
   )
   ok(this.evtManager.isDelivering(), 'it correctly reports whether a delivery is in progress')
   this.server.requests[0].respond(204)
+  clock.tick(1)
   ok(!this.evtManager.isDelivering(), "it untracks the delivery once it's synced with the server")
   ok(!this.evtManager.isDirty(), 'it flushes its buffer when sync is complete')
+  clock.restore()
 })
 
 test('should ignore EVT_PAGE_FOCUSED events that are not preceded by EVT_PAGE_BLURRED', function () {

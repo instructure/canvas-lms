@@ -19,7 +19,7 @@ import $ from 'jquery'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import fileSize from '@canvas/util/fileSize'
-import 'jqueryui-unpatched/progressbar'
+import 'jqueryui/progressbar'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 
 const I18n = useI18nScope('media_comments_upload_view_manager')
@@ -99,7 +99,7 @@ export default class UploadViewManager {
     $('#media_upload_file_size').text(fileSize(file.size))
     $('#media_upload_settings .icon').attr('src', `/images/file-${this.allowedMedia[0]}.png`)
     $('#media_upload_submit')
-      .attr('disabled', true)
+      .prop('disabled', true)
       .text(I18n.t('messages.submitting', 'Submitting Media File...'))
   }
 

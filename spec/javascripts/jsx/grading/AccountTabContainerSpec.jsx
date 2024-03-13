@@ -20,6 +20,7 @@ import React from 'react'
 
 import {mount} from 'enzyme'
 import $ from 'jquery'
+import 'jquery-migrate'
 import axios from '@canvas/axios'
 import {defaults} from 'lodash'
 import AccountTabContainer from 'ui/features/account_grading_standards/react/AccountTabContainer'

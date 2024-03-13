@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import AvatarWidget from '@canvas/avatar-dialog-view'
 
 QUnit.module('AvatarWidget', {
@@ -32,6 +33,7 @@ test('opens dialog on element click', () => {
   const targetElement = $("<a href='#' id='avatar-opener'>Click</a>")
   $('#fixtures').append(targetElement)
   const wrappedElement = $('a#avatar-opener')
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const widget = new AvatarWidget(wrappedElement)
   wrappedElement.click()
   ok($('.avatar-nav').length > 0)

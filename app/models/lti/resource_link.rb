@@ -52,11 +52,9 @@ class Lti::ResourceLink < ApplicationRecord
   before_validation :generate_lookup_uuid, on: :create
   before_save :set_root_account
 
-  alias_method :original_undestroy, :undestroy
-  private :original_undestroy
   def undestroy
     line_items.find_each(&:undestroy)
-    original_undestroy
+    super
   end
 
   def self.create_with(context, tool, custom_params = nil, url = nil, title = nil, lti_1_1_id: nil)

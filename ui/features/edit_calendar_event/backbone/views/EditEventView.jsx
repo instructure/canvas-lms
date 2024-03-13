@@ -262,7 +262,7 @@ export default class EditCalendarEventView extends Backbone.View {
   renderHeaderComponent() {
     const title = this.model.id == null ? 
       I18n.t('Create New Calendar Event') : 
-      I18n.t('Edit [%{title}]', {title: this.model.get('title')})
+      I18n.t('Edit %{title}', {title: this.model.get('title')})
 
     ReactDOM.render(
       <EditCalendarEventHeader title={title} />,
@@ -567,7 +567,7 @@ export default class EditCalendarEventView extends Backbone.View {
   async saveEvent(eventData) {
     RichContentEditor.closeRCE(this.$('textarea'))
 
-    if (this.model.get('series_uuid')) {
+    if (this.model.get('series_uuid') && this.model.get('rrule')) {
       const which = await renderUpdateCalendarEventDialog(this.model.attributes)
       if (which === undefined) return
       this.model.set('which', which)
@@ -656,10 +656,7 @@ export default class EditCalendarEventView extends Backbone.View {
     }
 
     data.important_dates = this.$el.find('#calendar_event_important_dates').prop('checked')
-
-    if (this.model.get('rrule')) {
-      data.rrule = this.model.get('rrule')
-    }
+    data.rrule = this.model.get('rrule')
     return data
   }
 

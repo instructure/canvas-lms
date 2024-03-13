@@ -59,7 +59,7 @@ describe "quiz edit page assign to" do
     expect(icon_type_exists?("Quiz")).to be true
   end
 
-  it "assigns student and saves assignment" do
+  it "assigns student and saves assignment", :ignore_js_errors do
     get "/courses/#{@course.id}/quizzes/#{@classic_quiz.id}/edit"
 
     click_manage_assign_to_button
@@ -76,9 +76,9 @@ describe "quiz edit page assign to" do
     update_until_date(1, "1/7/2023")
     update_until_time(1, "9:00 PM")
 
-    click_save_button
+    click_save_button("Apply")
     keep_trying_until { expect(item_tray_exists?).to be_falsey }
-    expect(manage_assign_to_button.text).to include("2 Assigned")
+    expect(pending_changes_pill_exists?).to be_truthy
 
     submit_page
 
@@ -110,7 +110,7 @@ describe "quiz edit page assign to" do
     update_until_date(0, "1/7/2023")
     update_until_time(0, "9:00 PM")
 
-    click_save_button
+    click_save_button("Apply")
     keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
 
     click_manage_assign_to_button
@@ -141,7 +141,7 @@ describe "quiz edit page assign to" do
     update_until_date(0, "1/7/2023")
     update_until_time(0, "9:00 PM")
 
-    click_save_button
+    click_save_button("Apply")
     keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
     expect(@classic_quiz.assignment_overrides.count).to eq(0)
 

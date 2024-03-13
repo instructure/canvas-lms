@@ -215,7 +215,7 @@ class AccountNotification < ActiveRecord::Base
     end
     all_visible_account_ids = nil if account_ids == root_account_ids
 
-    block = lambda do |_key|
+    block = proc do
       now = Time.now.utc
       start_at = include_past ? now : now.end_of_day
 
@@ -276,7 +276,7 @@ class AccountNotification < ActiveRecord::Base
       Rails.cache.fetch(["account_notifications5", root_account, all_account_ids_hash, include_past].cache_key, expires_in: 10.minutes, &block)
     else
       # no point in doing an additional layer of caching for _only_ root accounts when root accounts are explicitly cached
-      block.call(nil)
+      block.call
     end
   end
 

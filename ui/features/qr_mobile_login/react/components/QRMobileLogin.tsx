@@ -21,6 +21,7 @@ import React, {useState, useEffect} from 'react'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
+import TopNavPortal from '@canvas/top-navigation/react/TopNavPortal'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {Img} from '@instructure/ui-img'
@@ -176,6 +177,7 @@ export function QRMobileLogin({
 
   return (
     <>
+      <TopNavPortal />
       <Flex direction="column" justifyItems="center" margin="none medium">
         <Flex.Item margin="xx-small" padding="xx-small">
           <Heading level="h1">{I18n.t('QR for Mobile Login')}</Heading>

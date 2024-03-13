@@ -368,6 +368,7 @@ fi:
   access_denied_f922a9ff: "Pääsy kielletty."
   access_report_80d28095: Käyttöraporttia
   access_reports_66128235: "Käytä raportteja"
+  access_to_faculty_journal_will_end_on_deprecationd_a0774848: "Käyttöoikeus tiedekunnan lehteen päättyy %{deprecationDate}. Ota yhteyttä Canvas-järjestelmäkäyttäjään, jos sinulla on kysyttävää."
   access_to_these_tabs_requires_the_outcome_proficie_dd8ca732: "Näitä välilehtien käyttöön vaaditaan tulon tuottavuuslaskentoja - lisää/muokkaa tulon tuottavuuslaskentoja - lisää/muokkaa käyttöoikeuksia."
   access_token_3be22221: Käyttöoikeustietue
   access_token_count_access_token_count_dfb5463c: "Käyttöoikeustunnusten määrä: %{access_token_count}"
@@ -2105,6 +2106,8 @@ fi:
   added_mastery_level_dd4792d1: "Lisää hallinnan taso"
   added_new_proficiency_rating_e30cab8a: "Lisättiin uusi osaamisen luokitus"
   added_outcome_title_3c258a9: "Lisää tulos %{title}"
+  adding_59cf55e2: Lisätään
+  adding_efca307a: Lisätään...
   adding_rss_feed_f1202567: "Lisätään RSS-syötettä"
   adding_to_library_b552868: "Lisätään kirjastoon"
   additional_comments_9aed10bb: Lisäkommentit
@@ -2179,6 +2182,9 @@ fi:
   admins_3e1dce15: Järjestelmäkäyttäjät
   admins_add_remove_26811ce5: "Pääkäyttäjät - lisää/poista"
   advanced_36b35b8: Edistyneet
+  advanced_analytics_6a2419af: Lisäanalyysi
+  advanced_analytics_ask_questions: "Ottaa käyttöön edistyneet analyysit - Kysy kysymyksia ja mukana seuraavia käyttöoikeuksia."
+  advanced_analytics_ask_questions_26553cd2: "Edistynyt analyysi - Kysy kysymyksiä"
   advanced_analytics_course_readiness_and_students_i_6b3c439f: "Lisäanalyysi - Kurssin valmius ja opiskelijat, jotka tarvitsevat huomiota"
   advanced_analytics_course_readiness_closed_alpha_13c8aaf: "Lisäanayysi - Kurssin valmiuden suljettu Alpha"
   advertise_release_notes_via_the_ui_9254bc6c: "Mainosta julkaisuilmoituksia käyttöliittymän kautta"
@@ -2374,6 +2380,7 @@ fi:
       Salli Live-tapahtuman tilauksen toimittaminen
       HTTPS- webhookien kautta
   allow_lor_tools: "Salli käyttäjien tarkastelevan ja käyttävän LOR:lle konfiguroituja ulkoisia työkaluja."
+  allow_lti_tools_to_have_an_editor_button_icon_with_15c1342a: "Salli LTI-työkaluissa muokkauspainikekuvake ilman paikkaa (käytä oletustyökalukuvaketta)"
   allow_migration_of_quizzes_during_course_copy_and__35d80756: "Salli testien siirto kurssin kopioinnin ja tuonnin aikana"
   allow_moderator_to_review_multiple_independent_gra_c59d64f6: "Salli moderoijan nähdä useampia erillisiä arvosanoja valituille tehtäväpalautuksille"
   allow_multiple_attempts_e67a0a37: "Salli useita yrityksiä"
@@ -2402,6 +2409,7 @@ fi:
   allow_switching_to_the_new_assignments_page_9ac0ad93: "Salli vaihtaminen Uudet tehtävät -sivulle"
   allow_teachers_to_change_the_dates_on_a_set_of_ass_4d48baec: "Salli opettajien vaihtaa päivämääriä sarjassa tehtäviä yhdessä vaiheessa"
   allow_the_ability_to_send_notifications_through_ou_13cc8537: "Salli mahdollisuus lähettää ilmoituksia lähetysjonoon"
+  allow_the_item_banks_share_with_subaccounts_permis_a8a6e87f: "Salli ”Kohdepankit - jaa alitilien kanssa” -käyttöoikeus"
   allow_this_tool_to_access_the_ims_names_and_role_p_33e16d7f: "Salli tämän työkalun käyttää IMS-nimiä ja roolin valmistelupalvelua"
   allow_to_clone_alignments_after_the_course_copy_pr_2f3a6421: "Salli kloonien linjaukset kurssin kopiointiprosessin jälkeen"
   allow_unconfirmed_e_mail_addresses_when_adding_use_47b7d5a2: "Salli vahvistamattomat sähköpostiosoitteet, kun käyttäjiä lisätään"
@@ -2416,6 +2424,7 @@ fi:
   allowed_for_subaccounts_courses_default_on_e485ec7f: "Sallittu alitileille/kursseille, oletuksena päällä"
   allows_a_grader_to_grade_discussions_as_they_read_e5af3b34: "Sallii arvosanan antajan antavan arvosanan keskustelun sen jälkeen, kun ne luetaan"
   allows_a_user_to_access_the_act_as_user_link_on_st_7d3e3e3d: "Sallii Toimi käyttäjänä -linkin näkymisen opiskelijan kontekstikortilla"
+  allows_a_user_to_manage_sharing_of_item_banks_with_d107172f: "Sallii käyttävän hallitsevan kohdepankin jakamisen alitilien kanssa."
   allows_a_user_to_view_and_manage_all_item_banks_in_9368284f: "Sallii käyttäjien tarkastelevan ja hallitsevan kaikkia kohdepankkeja suoraan kurssin ja tilin sisällä."
   allows_a_user_to_view_and_manage_all_item_banks_in_ae99d718: "Sallii käyttäjien tarkastelevan ja hallitsevan kaikkia kohdepankkeja suoraan kurssin sisällä."
   allows_account_course_level_mastery_scales_and_cal_da88d5a0: "Mahdollistaa tili- ja kurssitason hallinnan asteikot ja laskelman, ja korvaa tulokohtaisen ehdon luokitukset ja laskentamenetelmät"
@@ -2444,6 +2453,7 @@ fi:
   allows_instructors_to_enable_anonymous_grading_for_b852c884: "Salli ohjaajien ottavan käyttöön nimettömän arvosanojen annon uusille testeille."
   allows_instructors_to_submit_file_attachments_on_b_e39f2ca8: "Salli ohjaajien lähettävän tiedoston liitteet opiskelijan puolesta."
   allows_learning_outcomes_to_be_selectable_when_mig_acf15555: "Sallii oppimistulosten olevan valittavissa, kun kurssin sisältöä siirretään"
+  allows_lti_tools_with_assignment_edit_placement_to_2be71949: "Sallii LTI-työkalut assignment_edit -paikan lanseerattavaksi ilmoitukset-sivulla"
   allows_modifying_notification_settings_for_any_cou_5004ac71: "Sallii kurssien ilmoitusasetukset tilitason ilmoitusten asetussivulta."
   allows_result_data_stored_in_the_outcomes_service__69c12c18: "Mahdollistaa tulosten palvelussa säilytettyjen tietojen esittämisen Canvas-raportoinnissa (LMGB, sLMGB ja järjestelmäkäyttäjän raportointiin liittyvät tulokset)."
   allows_setting_account_course_level_mastery_scales_1939e0fd: "Mahdollistaa tili- ja kurssitason hallinnan asteikkojen määrittämisen ja laskentamenetelmät, ja korvaa tulokohtaisen ehdon luokitukset ja laskentamenetelmät"
@@ -3514,6 +3524,7 @@ fi:
   applying_new_styles_to_subaccounts_e8aeeef2: "Otetaan käyttöön uusia tyylejä alatileiillä"
   applying_please_be_patient_f7b5f244: "Otetaan käyttöön, odota hetki"
   applying_score_to_ungraded_7311df9a: "Käytetään pistemäärää arvostelemattomiin"
+  appname_details_be277e5d: "%{appName} Lisätiedot"
   appointment_group: 
     errors: 
       invalid_end_at: "Tapaamisajan päättymisaika on ennen alkamisaikaa"
@@ -3590,6 +3601,7 @@ fi:
   are_you_sure_you_want_to_delete_this_planner_item_b71e330c: "Haluatko varmasti poistaa tämän kalenterin kohteen?"
   are_you_sure_you_want_to_delete_this_recording_a4aab14b: "Haluatko varmasti poistaa tämän nauhoituksen?"
   are_you_sure_you_want_to_delete_this_rubric_any_co_29d7ac76: "Haluatko varmasti poistaa tämän arviointitaulukon? Kaikki kurssit, jotka tällä hetkellä käyttävät tätä arviointitaulukkoa, voivat jatkaa sen käyttämistä, mutta uudet kurssit eivät pysty käyttämään sitä."
+  are_you_sure_you_want_to_delete_this_rubric_f1c9eaa2: "Haluatko varmasti poistaa tämän arviointitaulukon?"
   are_you_sure_you_want_to_delete_this_rubric_this_a_d4ff43c7: "Haluatko varmasti poistaa tämän arviointitaulukon? Tämä toimenpide poistaa arviointitaulukon käytön kaikista nykyisen kurssin tehtävistä ja poistaa kaikki olemassa olevat siihen liitetyt arvioinnit."
   are_you_sure_you_want_to_delete_this_setting_be350e82: "Haluatko varmasti poistaa tämän asetuksen?"
   are_you_sure_you_want_to_delete_this_to_do_item_497016ea: "Haluatko varmasti poistaa tämän kohteen tehtävälistalta?"
@@ -3605,6 +3617,7 @@ fi:
   are_you_sure_you_want_to_display_grades_for_this_a_c1c618c6: "Haluatko varmasti näyttää tämän tehtävän arvosanat opiskelijoille?"
   are_you_sure_you_want_to_do_this_it_cannot_be_undo_3379a544: "Haluatko varmasti tehdä näin? Toimintoa ei voi kumota ja se korvaa arvosanakirjassa jo olevat arvosanat."
   are_you_sure_you_want_to_duplicate_this_grading_sc_d97f78cc: "Haluatko varmasti kopioida tämän arvosana-asteikon antaimisen vaiheen?"
+  are_you_sure_you_want_to_duplicate_this_rubric_b8d7aefa: "Haluatko varmasti kopioida tämän rubriikin?"
   are_you_sure_you_want_to_permanently_remove_the_us_e6b84ce0: "Haluatko varmasti poistaa tämän resurssin pysyvästi KAIKISTA tileistä"
   are_you_sure_you_want_to_post_grades_for_this_assi_bafe5753: "Haluatko varmasti lähettää tämän tehtävän arvosanat opiskelijoille?"
   are_you_sure_you_want_to_proceed_changes_you_made__2f87f0e7: "Haluatko varmasti jatkaa? Tekemiäsi muutoksia ei tallenneta."
@@ -3641,6 +3654,7 @@ fi:
   as_of_date_the_lti_1_3_platform_storage_specificat_74b82d8d: "%{date} lähetien LTI 1.3 käyttöympäristön tallennustilan tekniset tiedot ovat täysin Canvasin tukemia. Työkalut, joilla tämä halutaan toteuttaa, täytyy muuttaa  OIDC Auth -päätepiste, jonka ne säilyttävät  Canvasia varten osoitteesta *https://canvas.instructure.com/api/lti/authorize_redirect* päätepisteeksi osoitteessa *https://sso.canvaslms.com/api/lti/authorize_redirect*. Uusille 1.3 -työkalun asennuksille suositellut OIDC Auth asennukset ovat myös muuttuneet, ja on suositeltavaa, että kaikki 1.3-työkalujen asetukset vaihdetaan näihin mahdollisuuksiin mahdollsimman pian."
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: "Kun kirjoitat tähän kenttään hakusanan, ryhmien luettelo suodatetaan automaattisesti sisältämään vain ne nimet, jotka täsmäävät hakuun."
   ascending_b3c87427: Nouseva
+  ask_questions_f6b301fe: "Esitä kysymyksiä"
   ask_your_instructor_a_question_a61ca5e9: "Kysy ohjaajaltasi kysymys"
   assess_and_survey_your_students_ce8172a9: "Arvioi ja kartoita opiskelijasi"
   assess_student_understanding_1e0b8d7f: "Arvioi opiskelijan ymmärrystä"
@@ -8651,6 +8665,9 @@ fi:
   current_volume_level_c55ab825: "Nykyinen äänenvoimakkuuden taso"
   currently_assigned_to_tokenname_click_to_remove_5a853a84: "Kohdistettu parhaillaan kohteeseen %{tokenName}, poista napsauttamalla"
   currently_selected_color_93f44b9f: "Parhaillaan valittu väri"
+  currently_student_analysis_report_csv_format_is_av_4e24fa59: |-
+      Opiskelijoiden analyysiraportti (CSV-muodossa)
+              on parhaillaan saatavissa klassisten testin kautta.
   currently_the_add_remove_students_permission_overr_fcd0f6bc: "Tällä hetkellä lisää/poista opiskelijoiden käyttöoikeuksia korvaa tämän ryhmitellyn käyttöoikeuden. Havainnoijien hallitseminen opiskelijoiden käyttöoikeudella poistetaan lopulta."
   currently_visible_to_e2f85345: "Näkyy tällä hetkellä seuraaville: "
   curso_f0ee9b5: Curso
@@ -8977,6 +8994,7 @@ fi:
   delete_alignment_f33c97d5: "Poista kohdistus"
   delete_all_other_course_content_721e0ae3: "Poista kaikki muu kurssin sisältö"
   delete_announcement_title_756a9d1f: "Poista ilmoitus %{title}"
+  delete_appname_token_4f712df9: "Poista %{appName} tunnus"
   delete_assignment_5d3f3f15: "Poista tehtävä"
   delete_assignment_group_7c3b01c4: "Poista tehtäväryhmä"
   delete_assignment_name_deec56e3: "Poista tehtävä %{name}"
@@ -9035,6 +9053,7 @@ fi:
   delete_requirement_item_type_d7453a69: "Poista vaatimus %{item} (%{type})"
   delete_role_label_succeeded_1690aa28: "Rooli %{label} poistettu onnistuneesti"
   delete_rubric_9b66412d: "Poista arviointitaulukko"
+  delete_rubric_modal_f2e85b85: "Poista rubriikkimodaali"
   delete_rubric_title_ac3a24e6: "Poista arviointitaulukko: %{title}"
   delete_section_name_a48d9d79: "Poista osio ”%{name}\""
   delete_selected_a023ccf8: "Poista valittu"
@@ -9092,6 +9111,7 @@ fi:
   deployment_id_for_toolname_app_e54a7364: "Käyttöönoton tunnus sovellukselle %{toolName}"
   deprecate_sms_be6b00a: "Vanhennuta SMS: "
   deprecated_59e99d2a: Vanhentunut
+  deprecated_tool_5bd97988: "Vanhentunut työkalu"
   deprioritize_section_overrides_for_nonactive_enrol_9aa72d60: "Alenna osioiden ohitusten arvojärjestystä passiivisille ilmoittautumisille"
   desc_12ad2869: "%{desc}"
   descending_b7828162: Laskeva
@@ -9562,6 +9582,7 @@ fi:
   display_as_percentage_3e755dc: "Näytä prosentteina"
   display_as_points_63084235: "Näytä pisteintä"
   display_course_catalog: "Näytä haettavaa kurssilistaa tällä juuritilillä ”Sisällytä tämä kurssi julkisen kurssin indeksiin\" .merkki käytössä."
+  display_e6546241: Näytä
   display_filter_options_34fb6be2: "Näytön suodatusasetukset"
   display_grade_as_7b5376a6: "Näytä arvosana seuraavasti"
   display_grades_as_points_percentages_complete_inco_fa848380: |-
@@ -9644,6 +9665,7 @@ fi:
   don_t_move_lti_query_params_to_post_body_5c80e037: "Älä siirrä LTI-kyselyn parametreja POST runkoon"
   don_t_post_outcomes_results_to_learning_mastery_gr_d0b85a19: "Älä lähetä tuloksia osaamisen hallinnan arvosanakirjaan"
   don_t_show_again_8c7b7297: "Älä näytä uudelleen"
+  don_t_show_this_again_2c3ba281: "Älä näytä tätä uudelleen"
   done_54e3d4b6: Valmis
   done_8af51c9b: Valmis.
   done_editing_9f7379d9: "Muokkaus valmis"
@@ -9776,7 +9798,9 @@ fi:
   duplicate_name_dd0c8801: "Kopioi %{name}"
   duplicate_provider_provider_d9842134: "Kopioi palveluntarjoaja %{provider}"
   duplicate_quiz_name_79fdcb3e: "Kopioi testi %{name}"
+  duplicate_rubric_modal_5da8dd0e: "Kopioi rubriikkimalli"
   duplicate_this_module_79ca8243: "Kopioi tämä moduuli"
+  duplicate_title_c5157fcc: "Kopioi %{title}"
   duplicating_calendar_events_9932cd37: "Kalenteritapahtumia kopioidaan"
   duplicating_module_9727f5e4: "Moduulia kopioidaan..."
   duplicating_module_ae6670b0: "Moduulia kopioidaan"
@@ -9829,6 +9853,7 @@ fi:
   edit_comment_comment_e74afa04: "Muokkaa kommenttia: %{comment}"
   edit_comment_ed0f05b3: "Muokkaa kommenttia"
   edit_conference_title_6e234815: "Muokkaa ”%{conference_title}\""
+  edit_conference_title_91360c08: "Muokkaa %{conference_title}"
   edit_course_files_d046ef82: "Muokkaa kurssitiedostoja"
   edit_course_role_3b992fc2: "Muokkaa kurssiroolia"
   edit_course_templates_7e12613: "Muokkaa kurssin malleja"
@@ -9928,6 +9953,7 @@ fi:
   edited_editedtimingdisplay_85d8f1db: "Muokattu %{editedTimingDisplay}"
   edited_editedtimingdisplay_8788890e: ", muokkaaja %{editedTimingDisplay}"
   editing_an_announcement_will_create_a_notification_cbb5377a: "jos ilmoitusta muokataan, tämä luo ilmoituksen käyttäjän koontinäytössä ja kurssin aktiviteettivirrassa Jos haluat, että käyttäjä saa muokatun ilmoituksen ilmoitusasetuksten kautta, sinun täytyy luoda uusi ilmoitus."
+  editing_is_limited_for_this_rubric_as_it_has_alrea_a3f4b6a0: "Muokkaus on rajoitettu tähän rubriikiin, koska sitä on jo käytetty arvosanan antoon."
   editing_permissions_for_name_3503e235: "Muokataan käyttöoikeuksia kohteelle: %{name}"
   editor: 
     alt_text: "Vaihtoehtoinen teksti:"
@@ -10593,6 +10619,7 @@ fi:
   error_duplicating_module_4b023042: "Virhe moduulin kopioinnissa"
   error_during_group_creation_f232994b: "Virhe ryhmän luonnin aikana"
   error_embedding_content_from_tool_49bb698e: "Virhe sisällön upottamisessa työkalusta"
+  error_exporting_gradebook_b6558e60: "Virhe arvosanakirjan viennissä"
   error_exporting_gradebook_msg_6ea31e2f: "Virhe arvosanakirjan viennissä: %{msg}"
   error_fetching_access_token_1445a9e3: "Virhe käyttöoikeustietuetta noudettaessa"
   error_fetching_rubric_data_66432f54: "Virhe rubriikkitietojen noudossa."
@@ -10941,7 +10968,9 @@ fi:
   extreme_critical_emergency_80b3dbda: "Erittäin kiireellinen hätätapaus!"
   faculty_journal_5634938e: "Opetushenkilökunnan loki"
   faculty_journal_deprecation_1f18f7ab: "Tiedekunnan lehden käytöstä poistaminen"
+  faculty_journal_has_been_deprecated_70c65772: "Tiedekunnan lehti on vanhentunut!"
   faculty_journal_manage_entries_efc09599: "Opetushenkilökunnan loki - hallitse merkintöjä"
+  faculty_journal_will_be_discontinued_on_deprecatio_d5d1e8b3: "Tiedekunnan lehti keskeytetään  %{deprecationDate}."
   fail_62dbb06a: hylätty
   failed_276786d: Epäonnistui
   failed_307449e1: "Epäonnistui:"
@@ -11427,6 +11456,7 @@ fi:
   friday_2c4f6d5a: Perjantai
   friendly_description_57f7fdde: "Ystävällinen kuvaus"
   friendly_description_for_parent_student_display_e608ecf3: "Ystävällinen kuvaus (vanhemman/opiskelijan näyttö)"
+  friendly_description_is_too_long_maximum_is_255_ch_c65d0a34: "Ystävällinen kuvays on liian pitkä (maksimi on 255 merkkiä)"
   friendly_name_601153fb: Kutsumanimi
   friendly_panda_3a0df50e: "Ystävällinen panda"
   from_8187f4fb: "Klo:"
@@ -12857,6 +12887,7 @@ fi:
   i_ll_create_groups_later_673c78da: "Luon ryhmät myöhemmin"
   i_ll_write_free_form_comments_when_assessing_stude_5cf50d06: "Kirjoitan vapaamuotoisia kommentteja, kun arvioin opiskelijoita"
   i_need_some_help_but_it_is_not_urgent_d967ea0a: "Tarvitsen apua, mutta tämä ei ole kiireellistä"
+  i_understand_5c85e920: Ymmärrän
   i_understand_continue_a8261425: "Ymmärrän, jatka"
   i_understand_the_risks_of_this_action_fb257656: "Ymmärrän tämän toiminnon riskit"
   iceland_354_1a03c558: "Islanti (+354)"
@@ -12988,6 +13019,7 @@ fi:
       Jos käytössä, oEmbedin päätepisteet vaativat 
       työkalun luoman tunnuksen vahvistaakseen Embedin resurssipyynnön alkuperän
       .
+  if_enabled_pages_will_use_the_new_instui_headers_44a42c92: "Jos tämä on käytössä, sivut käyttävät uusia InstUI-otsikoita"
   if_enabled_prefills_the_assignment_form_with_value_edb8ebda: "Peritty päätililtä"
   if_enabled_query_parameters_will_not_be_copied_to__4c6ed625: "Jos käytössä, kyselyn parametreja ei kopioida POST runkoon LTI-käynnistyksen aikana."
   if_enabled_root_accounts_and_subaccounts_will_see__84cd42e5: |-
@@ -13165,6 +13197,8 @@ fi:
   if_this_permission_is_disabled_users_can_still_cre_76a2d4b8: "Jos tämä käyttöoikeus on poistettu käytöstä, käyttäjät voivat yhä luoda ja lisätä rubriikkeja tehtäviin, jos Tehtävät ja kyselyt - lisää/muokkaa/poista on käytössä."
   if_this_permission_is_disabled_users_can_still_ins_4e3cef83: "Jos tämä käyttöoikeus on poistettu käytöstä, käyttäjät voivat yhä asentaa hyväksyttyjä sovelluksia Canvasin sovelluskeskuksen kautta (jos organisaatiosi on ottanut sen käyttöön). Lisäksi, jos tämä käyttöoikeus on pois käytöstä, käyttäjät eivät voi poistaa manuaalisesti lisättyjä ulkoisia sovelluksia."
   if_this_permission_is_disabled_users_can_still_ins_e9c4269f: "Jos tämä käyttöoikeus on poistettu käytöstä, käyttäjät voivat yhä asentaa hyväksyttyjä sovelluksia Canvasin sovelluskeskuksen kautta (jos organisaatiosi on ottanut sen käyttöön)."
+  if_this_permission_is_disabled_users_cannot_share__72d86ee6: "Jos tämä käyttöoikeus ei ole käytössä, käyttäjät eivät voi jakaa kohdepankkeja alitileille. Kun järjestelmäkäyttäjäroolin omistava käyttäjä saa tämän käyttöoikeuden, käyttäjä voi jakaa kohdepankkeja alitileille, joita he hallitsevat."
+  if_this_permission_is_disabled_users_cannot_share__be8b1061: "Jos tämä käyttöoikeus ei ole käytössä, käyttäjät eivät voi jakaa kohdepankkeja alitileille. Kun kurssiroolin omistava käyttäjä saa tämän käyttöoikeuden, käyttäjä voi jakaa kohdepankkeja alitileille, joihin heidät on liitetty."
   if_this_permission_is_enabled_and_courses_view_lis_cdf22691: "Jos tämä käyttöoikeus on käytössä ja Kurssit - tarkastele -luettelo on pois käytöstä, käyttäjät voivat lisätä uuden kurssin Lisää uusi kurssi -painikkeella tilin asetuksissa."
   if_this_permission_is_enabled_and_if_users_view_pr_9ba99d6: "Jos tämä käyttöoikeus on käytössä ja jos Käyttäjät - tarkastele ensisijaista sähköpostiosoitetta on pois käytöstä, käyttäjät näkevät sisäänkirjautumistunnuksina käytetyt sähköpostiosoitteet."
   if_this_permission_is_enabled_but_blueprint_course_ccc15486: "Jos tämä käyttöoikeus on käytössä, mutta Blueprint-kurssit - lisää/muokkaa/liitä/poista ei ole käytössä, käyttäjät voivat yhä synkronoida Blueprint-kursseja ja tarkastella synkronointihistoriaa."
@@ -13249,6 +13283,7 @@ fi:
   import_anyway_8c996ef6: "Tuo joka tapauksessa"
   import_assessment_as_new_quizzes_help_icon_3e49480f: "Tuo arviointi Uusina testeinä Ohje-kuvake"
   import_assessment_as_new_quizzes_help_modal_918a543d: "Tuo arviointi Uusina testeinä Ohje-modaali"
+  import_blueprint_course_settings_f6195365: "Tuo Blueprint-kurssiasetukset"
   import_commons_favorites_e68fce81: "Tuo Commons-suosikit"
   import_content_b2fd6620: "Tuo sisältö"
   import_course_student_groups_by_csv_d2cde97d: "Tuo kurssin opiskelijaryhmät csv:n perusteella"
@@ -13323,6 +13358,7 @@ fi:
   in_class_23eeca38: Luokassa
   in_closed_grading_period_dc717846: "Suljetulla arvosanojen antojaksolla"
   in_less_than_a_minute_c8595a28: "alle minuutissa"
+  in_listheading_dd5acd48: " mobiiliviestinnän, %{listHeading}"
   in_order_to_complete_the_process_you_will_be_redir_83376e10: "Jotta voit suorittaa prosessin loppuun, sinut ohjataan uudelleen sisäänkirjautumissivulle, jossa sinun täytyy kirjautua sisään lapsesi tunnuksilla."
   in_order_to_import_a_large_quantity_of_outcomes_at_c0d587e3: "Jos haluat tuoda suuren määrän osaamistuloksia kerralla tai päivittää olemassa olevia tuloksia, *käytä CSV-muotoa*."
   in_product_training_walkthrough_and_tourpoints_for_2e185119: "Tuotteen läpikulku ja kiertueen pisteet opettajille"
@@ -13727,6 +13763,7 @@ fi:
   item_5bd51103: Kohde
   item_banks_1db48044: "Kohteen pankit"
   item_banks_manage_account_e8040580: "Kohdepankit - hallitse tiliä"
+  item_banks_share_with_subaccounts_1374caab: "Kohdepankit - jaa alitilien kanssa"
   item_cannot_be_duplicated_cebf3109: "Kohdetta ei voi kopioida"
   item_category_category_icon_for_item_name_item_nam_ff2b97f0: "%{item_category} luokkakuvake tehtävän nimelle %{item_name}"
   item_complete_d334fd43: "(kohde valmis)"
@@ -16702,6 +16739,7 @@ fi:
   missing_required_ratings_9b19e66: "Pakollisia pistemääriä puuttuu"
   missing_required_title_ca06a6de: "Puuttuva pakollinen otsikko"
   missing_required_values_missing_values_f3be2ff8: "Puuttuvat pakolliset arvot: %{missing_values}"
+  missing_sections_warning_fecaaade: "Puuttuvien osioiden varoitus"
   missing_submission_ec204c33: "Puuttuva tehtäväpalautus"
   missing_submission_grade_must_be_between_0_and_100_ae0dd8bd: "Puuttuvan arvosanan lähetyksen täytyy olla välilä 0 ja 100."
   missing_submission_grade_must_be_numeric_1a142ef2: "Puuttuvan tehtäväpalautuksen arvosanan täytyy olla numeerinen"
@@ -17189,6 +17227,7 @@ fi:
   new_quizzes_public_api_quiz_items_16bc741d: "Uusien kyselyiden julkinen API: Kyselykohteet"
   new_quizzes_service_jwt_refresh_ca28ca8: "Uusien testitulosten JWT-virkistys"
   new_quizzes_site_admin_service_user_a331233a: "Uuden testisivuston järjestelmäkäyttäjän palvelukäyttäjä"
+  new_quizzes_subaccount_sharing_permission_1c296735: "Uusien testien alitilin jakamisen käyttöoikeus"
   new_quizzes_submission_274b5c57: "Uusien testien lähetys"
   new_quizzes_submission_history_d81b477b: "Uusien testien tehtäväpalautushistoria."
   new_quizzes_support_for_modules_7b81eee9: "Uusien kyselyiden tuki moduuleille"
@@ -18511,6 +18550,7 @@ fi:
   peer_services_102357e3: "Kollegan palvelut"
   peer_submissions_ready_for_review_availablecount_3ac80091: "Vertaislähetykset valmiita tarkastelua varten: %{availableCount}"
   pending_3e506a5b: Odottaa
+  pending_changes_3dcfed35: "Odottavat muutokset"
   pending_enforcement_eb32e3d: "Odottava vahvistus"
   pending_f1ed53c7: odottaa
   pending_message_2d9a8796: "Odottaa: %{message}"
@@ -19113,6 +19153,7 @@ fi:
         user_severity: "Käyttäjän vakavuus"
         username: Käyttäjätunnus
   png_55cbb586: PNG
+  point_range_258f423b: "Pisteiden alue"
   points_based_letter_grading_schemes_e65127d5: "Pisteet, jotka perustuvat kirjeen arvosanan anto-ohjelmiin"
   points_bb475533: Pisteet
   points_bceb5005: pistettä
@@ -19238,6 +19279,7 @@ fi:
   preview_filename_f1b58572: "Esikatsele %{filename}"
   preview_files_linked_in_the_rce_in_an_overlay_rath_92ef91d1: "Esikatsele tiedostoja, jotka on linkitetty RCE:hen peittokuvassa uuden selaimen välilehden sijasta."
   preview_removal_998101a9: "Esikatselun poisto"
+  preview_rubric_267b2a9d: "Esikatsele rubriikkia"
   preview_unavailable_aacd459a: "Esikatselua ei saatavissa"
   preview_ungraded_as_0_e3b97df6: "Esikatsele arvostelematonta arvolla 0"
   preview_website_url_eb5b8a5f: "Esikatsele verkkosivuston url-osoite"
@@ -21026,6 +21068,7 @@ fi:
       ihmisillä, jotka voivat manuaalisesti luoda kursseja, on mahdollisuus panna kyseisiä kursseja alitilille,
       jossa heillä on ilmoittautumisia.
   rating_description_db6adf39: "Luokituksen kuvaus"
+  rating_display_b0b574be: "Arvosanojen näyttö"
   rating_max_score_eade1523: "Luokituksen maksimipistemäärä"
   rating_min_score_3d35a762: "Luokituksen minimipistemäärä"
   rating_name_6f633d52: "Arvostelun nimi"
@@ -21696,6 +21739,7 @@ fi:
       read_roster: "Katso käyttäjien luetteloa"
       send_messages: "Lähetä viestejä yksittäisille kurssin jäsenille"
       send_messages_all: "Lähetä viestejä koko luokalle"
+      share_banks_with_subaccounts: "Jaa kohdepankkeja alitilien kanssa"
       suspend_accounts: "Keskeytä tilit"
       temporary_enrollments_add: "Lisää tilapäisiä ilmoittautumisia"
       temporary_enrollments_delete: "Poista väliaikaiset ilmoittautumiset"
@@ -21791,6 +21835,8 @@ fi:
   rubric_criterion_modal_32377665: "Rubriikin kriteerien modaali"
   rubric_criterion_range_12499bf1: "Arviointitaulukon kriteerien vaihteluväli"
   rubric_deleted_3d9efc18: "Arviointitaulukko poistettu"
+  rubric_deleted_successfully_4421ff6e: "Rubriikin poisto onnistui"
+  rubric_duplicated_successfully_952ece8: "Rubriikin kopiointi onnistui"
   rubric_enhancements_73bf351c: "Rubriikin tehostukset"
   rubric_fc39da76: Arviointitaulukko
   rubric_name_e11b76de: "Rubriikin nimi"
@@ -21914,6 +21960,7 @@ fi:
   saving_custom_status_name_e1b66f6e: "Tallennetaan mukautettua tilaa %{name}"
   saving_d55dd90e: Tallennetaan...
   saving_dates_2472a539: "Päivämääriä tallennetaan"
+  saving_discussion_topic_a3cb589e: "Tallennetaan keskustelun aihetta"
   saving_draft_c97afab3: "Tallenna luonnos"
   saving_group_230707e6: "Ryhmää tallennetaan"
   saving_key_921f302b: "Tunnusta tallennetaan"
@@ -23609,6 +23656,7 @@ fi:
   speedgrader_d9a6fa90: SpeedGrader
   speedgrader_de0affa6: SpeedGrader
   speedgrader_settings_4195099b: "SpeedGrader Asetukset"
+  speedgrader_studio_media_capture_3fd8aa93: "SpeedGrader Studion mediasieppaus"
   speedgrader_tm_44688790: SpeedGrader™
   split_74c03348: Jaa
   split_merged_users_6b81c595: "Jaa yhdistetyt käyttäjät"
@@ -25022,6 +25070,8 @@ fi:
   there_was_an_error_checking_plan_publishing_status_e7edfd25: "Ilmeni virhe suunnitelman julkaisun tilaa tarkistettaessa"
   there_was_an_error_creating_a_new_filter_e93bb765: "Uuden suodattimen luomisessa tapahtui virhe."
   there_was_an_error_deleting_name_aa3050e5: "%{name} poistamisessa ilmeni virhe."
+  there_was_an_error_deleting_the_rubric_ffbb1f85: "Rubriikin poistossa tapahtui virhe."
+  there_was_an_error_duplicating_the_rubric_16bb6a02: "Rubriikin kopioinnissa tapahtui virhe."
   there_was_an_error_exporting_the_gradebook_30f4a95: "Arvosanakirjan viennissä ilmeni virhe"
   there_was_an_error_fetching_assignment_groups_data_bdb14b5a: "Tehtäväryhmien tietojen noutamisessa tapahtui virhe."
   there_was_an_error_fetching_course_statistics_96e9dbad: "kurssitilastojen noudossa ilmeni virhe"
@@ -25251,6 +25301,7 @@ fi:
                                   Ennen kuin otat laitoksen käyttöön, varmista, että ymmärrät
                                   täysin toiminnollisuuden ja mahdolliset vaikutukset käyttäjille.
   this_feature_provides_a_new_speedgrader_platform_e_e7d740bd: "Tämä ominaisuus tarjoaa uuden SpeedGrader käyttöympäristökokemuksen."
+  this_feature_provides_the_ability_to_capture_media_918c06c6: "Tämä ominaisuus antaa mahdollisuuden siepata media SpeedGrader Studion näyttökaappauksen avulla."
   this_feature_provides_visual_and_functional_enhanc_e5e57a21: "Tämä ominaisuus tarjoaa visuaalisia ja toiminnollisia parannuksia rubriikkiin Canvasissa."
   this_feature_will_hide_all_quantitative_values_fro_6f006665: "Tämä ominaisuus piilottaa kaikki kvantitaaviset arvot käyttäjiltä"
   this_ff_is_for_development_purposes_only_and_shoul_f77938ba: "Tämä FF on vain kehitystarkoituksia varten eikä sitä pitäisi suodattaa ilman, että tuote ja suunnittelu on ensin käsitelty. Tämä merkintä estää sellaisten tulosten poiston, joilla on linjaus tulospalvelussa, joita käytetään uusille testeille."
@@ -26885,6 +26936,7 @@ fi:
   uploading_19e8a4e7: Ladataan
   uploading_ee585874: Ladataan...
   uploading_file_5c7e14fd: "Ladataan tiedostoa"
+  uploading_file_fc4cbbc3: "Ladataan tiedostoa"
   uploading_file_in_progress_5c09e0c9: "Tiedoston lataus käynnissä"
   uploading_files_5ff8f4fd: "Ladataan tiedostoja"
   uploading_files_9e39dbf9: "Ladataan tiedostoja"
@@ -26935,6 +26987,7 @@ fi:
   use_improved_placeholders_for_inserted_content_in__433adfaa: "Käytä parempia paikkamerkkejä RCE:ssä lis’tylle sisällölle."
   use_instui_for_the_course_import_page_1906ef55: "Käytä InstUI:a kurssin tuontisivulle"
   use_instui_for_tool_installation_and_configuration_36de63e9: "Käytä InstUI-työkalun asennus- ja konfigurointilomakkeita"
+  use_instui_new_headers_c7b09284: "Käytä uusia InstUI-otsikoita"
   use_internal_access_manager_8edb42a5: "Käytä sisäistä käyttöoikeuksien hallintatoimintoa"
   use_mathman_to_convert_latex_to_mathml_680ef7b0: "Käytetäänkö kohdetta MathMan muuntamaan LaTeX MathML:ksi?"
   use_mathman_to_convert_latex_to_svg_3f61c9b: "Käytetäänkö kohdetta MathMan muuntamaan LaTeX SVG:ksi?"
@@ -27747,12 +27800,20 @@ fi:
   when_adding_multiple_users_use_a_comma_or_line_bre_67f9c87d: "Kun lisäät useita käyttäjiä, käytä pilkkua tai rivinvaihtoa käyttäjien erottamiseen."
   when_creating_a_reply_students_will_have_the_optio_716eb2f4: "Kun vastausta luodaan, opiskelijoilla on mahdollisuus näyttää nimensä ja profiilikuvansa tai pysyä nimettöminä. Nimesi ja profiilikuvasi on näkyvissä kaikille kurssin jäsenille."
   when_creating_a_reply_you_will_have_the_option_to__8607ac10: "Kun vastausta luodaan, sinulla on mahdollisuus näyttää nimesi ja profiilikuvasi muille kurssin jäsenille tai pysyä nimettöminä."
+  when_disabled_new_or_updated_contextexternaltool_i_27e19300: |-
+      Kun tämä ominaisuus on pois käytöstä, uusien tai päivitettyjen ContextExternalTool-asennusten (mukaan lukien
+      kehittäjä-avaimien mukaan automaattisesti päivitetyt LTI 1.3 -tyäkalut)
+      editor_button paikka poistetaan, jos icon_url tai
+      canvas_icon_class ei ole määritetty asetuksissa (vanha toiminto). Kun tämä ominaisuus on käytössä,
+      paikkaa ei poisteta, joten työkalut ilman kuvakkeita näyttävät oletus
+      kuvakkeen (väri/kirjain työkalun nimessä ja työkalun/kehittäjän tunnuksessa).
   when_disabled_students_can_still_send_individual_m_3bf396f2: "Kun pois käytöstä, opiskelijat voivat yhä lähettää yksilöllisiä viestejä kurssin opettajille, kurssin apuopettajille, ja opiskelijoille, jotka kuuluvat samoihin ryhmiin tilitasolla."
   when_disabled_students_can_still_send_individual_m_567a911c: "Kun pois käytöstä, opiskelijat voivat yhä lähettää yksilöllisiä viestejä kurssin opettajille, kurssin apuopettajille, ja opiskelijoille, jotka kuuluvat samoihin ryhmiin tilitasolla."
   when_enabled_accesstoken_reads_will_be_cached_usin_917f3375: "Kun tämä on käytössä, AccessToken lukemat tallennetaan välimuistiin (MultiCachen avulla) todennuksen pyynnön yhteydessä."
   when_enabled_allows_the_tables_on_the_developer_ke_530070d: |-
       Kun tämä ominaisuus on käytössä, Sovelluskehittäijien sivun taulukoita
       voidaan lajitella ja suodattaa.
+  when_enabled_an_lti_tool_with_the_assignment_edit__cd60b1a0: "Kun tämä ominaisuus on käytössä, assignment_edit paikka käynnistetään ilmoitus-sivulla."
   when_enabled_collect_internal_analytics_metrics_us_88e81ee5: "Kun toiminto on käytössä, kerää sisäisen analyysin mittarit hajautetun järjestelmän avulla."
   when_enabled_it_deprecates_the_short_message_servi_18c6ee3f: "Kun tämä on käytössä, se vanhentaa pikaviestipalvelun (SMS)."
   when_enabled_lti_1_1_speedgrader_launches_will_set_47dcded1: |-

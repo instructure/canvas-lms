@@ -26,7 +26,7 @@ import '@canvas/jquery/jquery.ajaxJSON'
 import 'jqueryui/dialog'
 import '@canvas/jquery/jquery.instructure_misc_helpers' /* /\$\.h/ */
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* .dim, /\.log\(/ */
-import 'jqueryui-unpatched/progressbar'
+import 'jqueryui/progressbar'
 import {each} from 'lodash'
 
 const I18n = useI18nScope('media_comments_publicjs')
@@ -191,7 +191,7 @@ $.mediaComment.upload_delegate = {
     }
     $('#media_upload_progress').css('visibility', 'visible').progressbar({value: 1})
     $('#media_upload_submit')
-      .attr('disabled', true)
+      .prop('disabled', true)
       .text(I18n.t('messages.submitting', 'Submitting Media File...'))
     $('#' + type + '_upload')[0].upload()
   },
@@ -210,7 +210,7 @@ $.mediaComment.upload_delegate = {
     const file = $('#' + type + '_upload')[0].getFiles()[0]
     $('#media_upload_settings .icon').attr('src', '/images/file-' + type + '.png')
     $('#media_upload_submit').show()
-    $('#media_upload_submit').attr('disabled', !file)
+    $('#media_upload_submit').prop('disabled', !file)
     $('#media_upload_settings').css('visibility', file ? 'visible' : 'hidden')
     $('#media_upload_title').val(file.title)
     $('#media_upload_display_title').text(file.title)
@@ -618,6 +618,7 @@ $.mediaComment.init = function (mediaType, opts) {
           width: 470,
           height: 300,
           modal: true,
+          zIndex: 1000,
         })
 
         // **********************************************************************
@@ -699,7 +700,7 @@ $(document).ready(function () {
       .removeClass('with_volume')
     $('#media_upload_submit')
       .text(I18n.t('buttons.submit', 'Submit Media File'))
-      .attr('disabled', true)
+      .prop('disabled', true)
     $('#media_upload_settings').css('visibility', 'hidden')
     $('#media_upload_progress')
       .css('visibility', 'hidden')

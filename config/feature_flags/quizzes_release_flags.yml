@@ -70,3 +70,8 @@ new_quizzes_common_cartridge:
   display_name: New Quizzes Common Cartridge Support
   description: If enabled, Canvas will be able to export New Quizzes as a part of Common Cartridge Export Packages.
   applies_to: SiteAdmin
+new_quizzes_subaccount_sharing_permission:
+  state: hidden
+  display_name: New Quizzes Subaccount Sharing Permission
+  description: Allow the "Item Banks - share with subaccounts" permission
+  applies_to: SiteAdmin

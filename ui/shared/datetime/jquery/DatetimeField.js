@@ -172,7 +172,7 @@ export default class DatetimeField {
       const $datepickerButton = this.$field.next()
       $datepickerButton.attr('aria-hidden', 'true')
       $datepickerButton.attr('tabindex', '-1')
-      if (options.disableButton) $datepickerButton.attr('disabled', 'true')
+      if (options.disableButton) $datepickerButton.prop('disabled', true)
     }
     return $wrapper
   }

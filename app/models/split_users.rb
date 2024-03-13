@@ -162,9 +162,18 @@ class SplitUsers
       # if these merge items are here, we moved LTI IDs as part of the merge
       # and we need to move them back now
       UserMerge.from(source_user).move_lti_ids_to(restored_user)
-      source_user.override_lti_id_lock = true
-      source_user.update(lti_id: old_lti_id, uuid: old_uuid)
+      # ask for a real sub-transaction to avoid rolling back the parent transaction
+      User.transaction(requires_new: true) do
+        source_user.override_lti_id_lock = true
+        source_user.update!(lti_id: old_lti_id, uuid: old_uuid)
+      end
     end
+  rescue ActiveRecord::RecordNotUnique
+    # if we get a unique constraint failure, track via a statsd counter
+    # and move on. this is a rare case, but it can happen if we swap source user lti/uuid
+    # values (to the restored/target user) that match the merge data items we're trying to restore
+    # to the source user.
+    InstStatsd::Statsd.increment("split_users.undo_move_lti_ids.unique_constraint_failure")
   end
 
   def check_and_update_local_ids(records)
@@ -411,9 +420,17 @@ class SplitUsers
             # also swap restored user's deleted/unsubmitted submissions that need to be moved out of the way
             other_ids += model.where(user_id: restored_user,
                                      workflow_state: %w[deleted unsubmitted],
-                                     assignment_id: Submission.where(id: ids).select(:assignment_id))
+                                     assignment_id: model.where(id: ids).select(:assignment_id))
                               .where.not(id: other_ids)
                               .pluck(:id)
+            # Delete existing source_user unsubmitted/deleted submissions that would otherwise
+            # clash with the restored_user submission user_id swap to the source_user.
+            # Exclude known submission ids present in the user merge data records.
+            conflicting_submissions = model.where(user_id: source_user,
+                                                  workflow_state: %w[deleted unsubmitted],
+                                                  assignment_id: model.where(id: other_ids).select(:assignment_id))
+                                           .where.not(id: ids)
+            conflicting_submissions.delete_all if conflicting_submissions.exists?
           end
           swap_records(model, ids, other_ids)
         end

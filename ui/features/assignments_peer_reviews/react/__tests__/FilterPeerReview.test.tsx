@@ -71,7 +71,7 @@ describe('Filter Peer Review Tests', () => {
     })
   })
   describe('peer review submit button', () => {
-    it('reloads the page that contains a url with the search term and the selected option as the parameters', () => {
+    it('reloads the page that contains a url with the search term and the selected option as the parameters', async () => {
       ENV.ASSIGNMENT_ID = 1
       ENV.COURSE_ID = '1'
       // @ts-expect-error
@@ -79,8 +79,8 @@ describe('Filter Peer Review Tests', () => {
       const {getByTestId} = render(<FilterPeerReview />)
       const searchBar = getByTestId('peer-review-search') as HTMLInputElement
       const submitButton = getByTestId('peer-review-submit') as HTMLInputElement
-      userEvent.type(searchBar, 'Jonathan')
-      userEvent.click(submitButton)
+      await userEvent.type(searchBar, 'Jonathan')
+      await userEvent.click(submitButton)
       expect(window.location.href).toBe(
         'http://localhost/courses/1/assignments/1/peer_reviews?selected_option=all&search_term=Jonathan'
       )

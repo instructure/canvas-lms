@@ -48,18 +48,22 @@ module Lti
 
         it { is_expected.to be true }
 
-        context "with a valid submission_type_selection_launch_points" do
+        context "with a description property at the submission_type_selection placement" do
           let(:settings) do
-            super().tap do |c|
-              c["extensions"].first["settings"]["submission_type_selection_launch_points"] = [
-                {
-                  "target_link_uri" => "http://example.com/launch?placement=submission_type_selection",
-                  "title" => "Test Title",
-                  "icon_url" => "https://static.thenounproject.com/png/131630-211.png",
-                  "description" => "Test Description"
-                }
-              ]
-            end
+            res = super()
+
+            res["extensions"].first["settings"]["placements"].push(
+              {
+                "target_link_uri" => "http://example.com/launch?placement=submission_type_selection",
+                "text" => "Test Title",
+                "message_type" => "LtiResourceLinkRequest",
+                "icon_url" => "https://static.thenounproject.com/png/131630-211.png",
+                "description" => "Test Description",
+                "placement" => "submission_type_selection",
+              }
+            )
+
+            res
           end
 
           it { is_expected.to be true }
@@ -67,50 +71,44 @@ module Lti
       end
 
       context "with non-matching schema" do
-        let(:settings) do
-          s = super()
-          s.delete("target_link_uri")
-          s
-        end
-
         before do
           tool_configuration.developer_key = developer_key
         end
 
-        it { is_expected.to be false }
+        context "a missing target_link_uri" do
+          let(:settings) do
+            s = super()
+            s.delete("target_link_uri")
+            s
+          end
 
-        it "is contains a message about missing target_link_uri" do
-          tool_configuration.valid?
-          expect(tool_configuration.errors[:configuration].first.message).to include("target_link_uri,")
-        end
-      end
+          it { is_expected.to be false }
 
-      context "with an invalid submission_type_selection_launch_points" do
-        let(:settings) do
-          s = super()
-          s["extensions"].first["settings"]["placements"] << {
-            "placement" => "submission_type_selection",
-            "message_type" => "LtiResourceLinkRequest",
-            "submission_type_selection_launch_points" => [{
-              # Invalid target_link_uri
-              "target_link_uri" => "",
-              "title" => 4,
-              "icon_url" => "https://static.thenounproject.com/png/131630-211.png",
-              "description" => "Test Description"
-            }]
-          }
-          s
+          it "contains a message about a missing target_link_uri" do
+            tool_configuration.valid?
+            expect(tool_configuration.errors[:configuration].first.message).to include("target_link_uri,")
+          end
         end
 
-        before do
-          tool_configuration.developer_key = developer_key
-        end
+        context "when the submission_type_selection description is longer than 255 characters" do
+          let(:settings) do
+            s = super()
 
-        it { is_expected.to be false }
+            s["extensions"].first["settings"]["placements"].push(
+              {
+                "target_link_uri" => "http://example.com/launch?placement=submission_type_selection",
+                "text" => "Test Title",
+                "message_type" => "LtiResourceLinkRequest",
+                "icon_url" => "https://static.thenounproject.com/png/131630-211.png",
+                "description" => "a" * 256,
+                "placement" => "submission_type_selection",
+              }
+            )
 
-        it "contains a message about invalid submission_type_selection placement" do
-          tool_configuration.valid?
-          expect(tool_configuration.errors[:configuration].first.message).to include("submission_type_selection")
+            s
+          end
+
+          it { is_expected.to be false }
         end
       end
 

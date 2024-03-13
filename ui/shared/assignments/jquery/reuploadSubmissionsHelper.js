@@ -33,7 +33,7 @@ function beforeSubmit({submissions_zip: submissionsZip}) {
   }
 
   const submitButton = this.find('button[type="submit"]')
-  submitButton.attr('disabled', true)
+  submitButton.prop('disabled', true)
   submitButton.text(I18n.t('Uploading...'))
 
   return true
@@ -55,7 +55,7 @@ function success(attachment) {
 
 function error(_data) {
   const submitButton = this.find('button[type="submit"]')
-  submitButton.attr('disabled', false)
+  submitButton.prop('disabled', false)
   submitButton.text(I18n.t('Upload Files'))
   return this
 }

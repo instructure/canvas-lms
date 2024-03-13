@@ -166,6 +166,7 @@ export default function SettingsPanel({
   }, [moduleList, moduleName])
 
   const handleSave = useCallback(() => {
+    if (state.nameInputMessages.length > 0) return
     if (state.moduleName.length === 0) {
       dispatch({
         type: actions.SET_NAME_INPUT_MESSAGES,
@@ -354,7 +355,7 @@ export default function SettingsPanel({
           saveButtonLabel={moduleId ? I18n.t('Save') : I18n.t('Add Module')}
           onDismiss={customOnDismiss}
           onUpdate={handleSave}
-          updateInteraction={state.nameInputMessages.length > 0 ? 'inerror' : 'enabled'}
+          hasErrors={state.nameInputMessages.length > 0}
         />
       </Flex.Item>
     </Flex>

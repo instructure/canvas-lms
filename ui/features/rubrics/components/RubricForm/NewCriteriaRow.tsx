@@ -42,8 +42,15 @@ export const NewCriteriaRow = ({rowIndex, onEditCriterion}: NewCriteriaRowProps)
   return (
     <View>
       <Flex>
-        <Flex.Item align="start" margin="small 0 0 0">
-          <Text weight="bold">{rowIndex}.</Text>
+        <Flex.Item align="start">
+          <View as="div" cursor="pointer">
+            <IconDragHandleLine />
+          </View>
+        </Flex.Item>
+        <Flex.Item align="start">
+          <View as="div" margin="xxx-small 0 0 small" themeOverride={{marginSmall: '1.5rem'}}>
+            <Text weight="bold">{rowIndex}.</Text>
+          </View>
         </Flex.Item>
         <Flex.Item margin="0 small" align="start" shouldGrow={true}>
           <Button
@@ -60,7 +67,6 @@ export const NewCriteriaRow = ({rowIndex, onEditCriterion}: NewCriteriaRowProps)
         <Flex.Item align="start">
           <Pill
             color="info"
-            margin="0 large 0 0"
             themeOverride={{
               background: '#C7CDD1',
               infoColor: 'white',
@@ -68,42 +74,44 @@ export const NewCriteriaRow = ({rowIndex, onEditCriterion}: NewCriteriaRowProps)
           >
             <Text size="x-small">-- pts</Text>
           </Pill>
-          <IconButton
-            disabled={true}
-            withBackground={false}
-            withBorder={false}
-            screenReaderLabel=""
-            size="small"
-          >
-            <IconDragHandleLine />
-          </IconButton>
-          <IconButton
-            disabled={true}
-            withBackground={false}
-            withBorder={false}
-            screenReaderLabel=""
-            size="small"
-          >
-            <IconEditLine />
-          </IconButton>
-          <IconButton
-            disabled={true}
-            withBackground={false}
-            withBorder={false}
-            screenReaderLabel=""
-            size="small"
-          >
-            <IconTrashLine />
-          </IconButton>
-          <IconButton
-            disabled={true}
-            withBackground={false}
-            withBorder={false}
-            screenReaderLabel=""
-            size="small"
-          >
-            <IconDuplicateLine />
-          </IconButton>
+          <View as="span" margin="0 0 0 medium">
+            <IconButton
+              disabled={true}
+              withBackground={false}
+              withBorder={false}
+              screenReaderLabel=""
+              themeOverride={{smallHeight: '18px'}}
+              size="small"
+            >
+              <IconEditLine />
+            </IconButton>
+          </View>
+
+          <View as="span" margin="0 0 0 medium">
+            <IconButton
+              disabled={true}
+              withBackground={false}
+              withBorder={false}
+              screenReaderLabel=""
+              themeOverride={{smallHeight: '18px'}}
+              size="small"
+            >
+              <IconTrashLine />
+            </IconButton>
+          </View>
+
+          <View as="span" margin="0 0 0 medium">
+            <IconButton
+              disabled={true}
+              withBackground={false}
+              withBorder={false}
+              screenReaderLabel=""
+              themeOverride={{smallHeight: '18px'}}
+              size="small"
+            >
+              <IconDuplicateLine />
+            </IconButton>
+          </View>
         </Flex.Item>
       </Flex>
     </View>

@@ -17,6 +17,7 @@
  */
 
 import formatMessage from '../../format-message'
+import '../tinymce/id'
 
 const locale = {
   "count_plural_one_item_loaded_other_items_loaded_857023b7": {

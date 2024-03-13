@@ -69,7 +69,9 @@ export default function loadFullCalendarLocaleData(locale) {
     'zh-tw',
   ]
 
-  if (!FULLCALENDAR_LOCALES.includes(locale)) {
+  if (locale === 'ga') {
+    return import('../../../ext/custom_fullcalendar_locales/ga')
+  } else if (!FULLCALENDAR_LOCALES.includes(locale)) {
     return Promise.resolve()
   }
 

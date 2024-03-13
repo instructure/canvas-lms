@@ -143,7 +143,7 @@ const signupDialog = function (id, title, path) {
       let $captchaId
       $(this).find('a').eq(0).blur()
       // on open, provide focus to first focusable item for ease of accessibility
-      $(this).find('button.ui-dialog-titlebar-close').focus()
+      $(this).find('.ui-dialog-titlebar-close').focus()
       if (ENV.ACCOUNT.recaptcha_key) {
         $(this)
           .find('.g-recaptcha')[0]
@@ -183,6 +183,8 @@ const signupDialog = function (id, title, path) {
       }
       return $('.error_box').filter(':visible').remove()
     },
+    modal: true,
+    zIndex: 1000,
   })
   $node.fixDialogButtons()
   // re-disable after fixing

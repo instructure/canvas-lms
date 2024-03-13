@@ -1,3 +1,6 @@
+/* eslint-disable eslint-comments/no-unlimited-disable */
+/* eslint-disable */
+
 /*
  * Copyright (C) 2019 - present Instructure, Inc.
  *
@@ -27,12 +30,12 @@ function EntryService() {
   this.xmlParser = new XmlParser()
 }
 
-EntryService.prototype.addEntry = function(allParams) {
+EntryService.prototype.addEntry = function (allParams) {
   this.formData = objectMerge(allParams)
   this.createEntryRequest()
 }
 
-EntryService.prototype.createEntryRequest = function() {
+EntryService.prototype.createEntryRequest = function () {
   const data = this.formData
   data.kalsig = signatureBuilder(data)
 
@@ -43,7 +46,7 @@ EntryService.prototype.createEntryRequest = function() {
   this.xhr.send(data)
 }
 
-EntryService.prototype.onEntryRequestLoaded = function(e) {
+EntryService.prototype.onEntryRequestLoaded = function (e) {
   this.xmlParser.parseXML(this.xhr.response)
   var ent = this.xmlParser.findRecursive('result:entries:entry1_')
   if (ent) {
@@ -54,7 +57,7 @@ EntryService.prototype.onEntryRequestLoaded = function(e) {
       context_code: ent.find('partnerData').text(),
       mediaType: ent.find('mediatype').text(),
       entryId: ent.find('id').text(),
-      userTitle: undefined
+      userTitle: undefined,
     }
     mBus.dispatchEvent('Entry.success', ent, this)
   } else {

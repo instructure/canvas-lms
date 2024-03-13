@@ -82,6 +82,49 @@ describe "discussion_topics/show" do
     expect(response).to have_tag("div.discussion-tododate")
   end
 
+  context "external tools" do
+    def basic_announcement_model(opts = {})
+      opts.reverse_merge!({
+                            title: "Default title",
+                            message: "Default message",
+                            is_section_specific: false
+                          })
+      announcement = Announcement.create!(
+        title: opts[:title],
+        message: opts[:message],
+        user: @teacher,
+        context: opts[:course],
+        workflow_state: "published"
+      )
+      announcement.is_section_specific = opts[:is_section_specific]
+      announcement
+    end
+
+    it "does not render assignment_edit placement lti tools with flag on" do
+      Account.site_admin.enable_feature! :assignment_edit_placement_not_on_announcements
+      course_with_teacher
+      basic_announcement_model(course: @course)
+      @topic = Announcement.new({ title: "some title", context: @course, user: @teacher, message: "some message" })
+      @topic.save!
+      assign(:topic, @topic)
+      view_context
+      render "discussion_topics/show"
+      expect(response).not_to have_tag("div#assignment_external_tools")
+    end
+
+    it "renders assignment_edit placement lti tools with flag off" do
+      Account.site_admin.disable_feature! :assignment_edit_placement_not_on_announcements
+      course_with_teacher
+      basic_announcement_model(course: @course)
+      @topic = Announcement.new({ title: "some title", context: @course, user: @teacher, message: "some message" })
+      @topic.save!
+      assign(:topic, @topic)
+      view_context
+      render "discussion_topics/show"
+      expect(response).to have_tag("div#assignment_external_tools")
+    end
+  end
+
   context "for TAs" do
     it "renders a speedgrader link if user can manage grades but not view all grades" do
       course_with_teacher

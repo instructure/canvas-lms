@@ -250,7 +250,7 @@ describe('GradingSchemeInput', () => {
     })
   })
 
-  it('data is accurate when a new row is added', () => {
+  it('data is accurate when a new row is added', async () => {
     const gradingSchemeInputRef = React.createRef<GradingSchemeInputHandle>()
     render(
       <GradingSchemeInput
@@ -272,7 +272,7 @@ describe('GradingSchemeInput', () => {
     act(() => addRowButtons[0].click()) // add a row after the first row
     const letterGradeInputs = screen.getAllByLabelText('Letter Grade')
     expect(letterGradeInputs.length).toBe(3) // we've added a row between the initial two
-    userEvent.type(letterGradeInputs[1], 'X') // give the new row a letter grade
+    await userEvent.type(letterGradeInputs[1], 'X') // give the new row a letter grade
 
     act(() => gradingSchemeInputRef.current?.savePressed())
     expect(onSave).toHaveBeenCalledWith({
@@ -287,7 +287,7 @@ describe('GradingSchemeInput', () => {
     })
   })
 
-  it('data is accurate when a new row is added to points based scheme', () => {
+  it('data is accurate when a new row is added to points based scheme', async () => {
     const gradingSchemeInputRef = React.createRef<GradingSchemeInputHandle>()
     render(
       <GradingSchemeInput
@@ -308,7 +308,7 @@ describe('GradingSchemeInput', () => {
     act(() => addRowButtons[0].click()) // add a row after the first row
     const letterGradeInputs = screen.getAllByLabelText<HTMLInputElement>('Letter Grade')
     expect(letterGradeInputs.length).toBe(3) // we've added a row between the initial two
-    userEvent.type(letterGradeInputs[1], 'X') // give the new row a letter grade
+    await userEvent.type(letterGradeInputs[1], 'X') // give the new row a letter grade
 
     act(() => gradingSchemeInputRef.current?.savePressed())
     expect(onSave).toHaveBeenCalledWith({
@@ -323,7 +323,7 @@ describe('GradingSchemeInput', () => {
     })
   })
 
-  it('validation error displayed for points scheme when a max range is not a number', () => {
+  it('validation error displayed for points scheme when a max range is not a number', async () => {
     const gradingSchemeInputRef = React.createRef<GradingSchemeInputHandle>()
     render(
       <GradingSchemeInput
@@ -341,8 +341,8 @@ describe('GradingSchemeInput', () => {
 
     // note: only the first row allows high range input
     // simulate user input
-    userEvent.clear(rangeInputs[0])
-    userEvent.type(rangeInputs[0], 'foo') // give the 1st highRange an invalid value
+    await userEvent.clear(rangeInputs[0])
+    await userEvent.type(rangeInputs[0], 'foo') // give the 1st highRange an invalid value
 
     act(() => gradingSchemeInputRef.current?.savePressed())
     const validationError = screen.getByText(
@@ -352,7 +352,7 @@ describe('GradingSchemeInput', () => {
     expect(onSave).toHaveBeenCalledTimes(0)
   })
 
-  it('validation error displayed for points scheme when upper range is over 100', () => {
+  it('validation error displayed for points scheme when upper range is over 100', async () => {
     const gradingSchemeInputRef = React.createRef<GradingSchemeInputHandle>()
     render(
       <GradingSchemeInput
@@ -369,8 +369,8 @@ describe('GradingSchemeInput', () => {
     const rangeInputs = screen.getAllByLabelText('Upper limit of range')
 
     // simulate user input
-    userEvent.clear(rangeInputs[0])
-    userEvent.type(rangeInputs[0], '300') // give the 1st row an invalid value
+    await userEvent.clear(rangeInputs[0])
+    await userEvent.type(rangeInputs[0], '300') // give the 1st row an invalid value
 
     act(() => gradingSchemeInputRef.current?.savePressed())
     const validationError = screen.getByText(
@@ -380,7 +380,7 @@ describe('GradingSchemeInput', () => {
     expect(onSave).toHaveBeenCalledTimes(0)
   })
 
-  it('validation error displayed for points scheme when a lower range is not a number', () => {
+  it('validation error displayed for points scheme when a lower range is not a number', async () => {
     const gradingSchemeInputRef = React.createRef<GradingSchemeInputHandle>()
     render(
       <GradingSchemeInput
@@ -396,7 +396,7 @@ describe('GradingSchemeInput', () => {
     )
 
     const rangeInputs = screen.getAllByLabelText<HTMLInputElement>('Lower limit of range')
-    userEvent.type(rangeInputs[0], 'foo') // give the 1st row a non numeric value
+    await userEvent.type(rangeInputs[0], 'foo') // give the 1st row a non numeric value
 
     act(() => gradingSchemeInputRef.current?.savePressed())
     const validationError = screen.getByText(
@@ -406,7 +406,7 @@ describe('GradingSchemeInput', () => {
     expect(onSave).toHaveBeenCalledTimes(0)
   })
 
-  it('validation error displayed for points scheme when a lower range is below 0', () => {
+  it('validation error displayed for points scheme when a lower range is below 0', async () => {
     const gradingSchemeInputRef = React.createRef<GradingSchemeInputHandle>()
     render(
       <GradingSchemeInput
@@ -421,7 +421,7 @@ describe('GradingSchemeInput', () => {
       />
     )
     const rangeInputs = screen.getAllByLabelText<HTMLInputElement>('Lower limit of range')
-    userEvent.type(rangeInputs[0], '-1') // give the 1st row an invalid value
+    await userEvent.type(rangeInputs[0], '-1') // give the 1st row an invalid value
 
     act(() => gradingSchemeInputRef.current?.savePressed())
     const validationError = screen.getByText(
@@ -431,7 +431,7 @@ describe('GradingSchemeInput', () => {
     expect(onSave).toHaveBeenCalledTimes(0)
   })
 
-  it('validation error displayed for points scheme when a lower range is above 100', () => {
+  it('validation error displayed for points scheme when a lower range is above 100', async () => {
     const gradingSchemeInputRef = React.createRef<GradingSchemeInputHandle>()
     render(
       <GradingSchemeInput
@@ -446,7 +446,7 @@ describe('GradingSchemeInput', () => {
       />
     )
     const rangeInputs = screen.getAllByLabelText<HTMLInputElement>('Lower limit of range')
-    userEvent.type(rangeInputs[0], '101') // give the 1st row an invalid value
+    await userEvent.type(rangeInputs[0], '101') // give the 1st row an invalid value
 
     act(() => gradingSchemeInputRef.current?.savePressed())
     const validationError = screen.getByText(
@@ -456,7 +456,7 @@ describe('GradingSchemeInput', () => {
     expect(onSave).toHaveBeenCalledTimes(0)
   })
 
-  it('validation error displayed when a lower range is not a number', () => {
+  it('validation error displayed when a lower range is not a number', async () => {
     const gradingSchemeInputRef = React.createRef<GradingSchemeInputHandle>()
     render(
       <GradingSchemeInput
@@ -473,8 +473,8 @@ describe('GradingSchemeInput', () => {
     const rangeInputs = screen.getAllByLabelText<HTMLInputElement>('Lower limit of range')
 
     // simulate user input
-    userEvent.clear(rangeInputs[0])
-    userEvent.type(rangeInputs[0], 'foo') // give the 1st row an invalid value
+    await userEvent.clear(rangeInputs[0])
+    await userEvent.type(rangeInputs[0], 'foo') // give the 1st row an invalid value
 
     // ensure that this value shows in the next row's max range as a string
     const maxRangeCells = screen.getAllByLabelText('Upper limit of range')
@@ -493,7 +493,7 @@ describe('GradingSchemeInput', () => {
     expect(onSave).toHaveBeenCalledTimes(0)
   })
 
-  it('validation error displayed when a lower range is below 0', () => {
+  it('validation error displayed when a lower range is below 0', async () => {
     const gradingSchemeInputRef = React.createRef<GradingSchemeInputHandle>()
     render(
       <GradingSchemeInput
@@ -508,7 +508,7 @@ describe('GradingSchemeInput', () => {
       />
     )
     const rangeInputs = screen.getAllByLabelText<HTMLInputElement>('Lower limit of range')
-    userEvent.type(rangeInputs[0], '-1') // give the 1st row an invalid value
+    await userEvent.type(rangeInputs[0], '-1') // give the 1st row an invalid value
 
     act(() => gradingSchemeInputRef.current?.savePressed())
     const validationError = screen.getByText(
@@ -518,7 +518,7 @@ describe('GradingSchemeInput', () => {
     expect(onSave).toHaveBeenCalledTimes(0)
   })
 
-  it('validation error displayed when a lower range is above 100', () => {
+  it('validation error displayed when a lower range is above 100', async () => {
     const gradingSchemeInputRef = React.createRef<GradingSchemeInputHandle>()
     render(
       <GradingSchemeInput
@@ -533,7 +533,7 @@ describe('GradingSchemeInput', () => {
       />
     )
     const rangeInputs = screen.getAllByLabelText<HTMLInputElement>('Lower limit of range')
-    userEvent.type(rangeInputs[0], '101') // give the 1st row an invalid value
+    await userEvent.type(rangeInputs[0], '101') // give the 1st row an invalid value
 
     act(() => gradingSchemeInputRef.current?.savePressed())
     const validationError = screen.getByText(

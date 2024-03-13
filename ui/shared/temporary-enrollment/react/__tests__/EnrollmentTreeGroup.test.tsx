@@ -116,7 +116,7 @@ describe('EnrollmentTreeGroup', () => {
 
   it('calls updateCheck when checked', () => {
     const {getByTestId} = render(<EnrollmentTreeGroup {...rProps} />)
-    const checkBox = getByTestId('check r1')
+    const checkBox = getByTestId('check-r1')
     fireEvent.click(checkBox)
     expect(checkCallback).toHaveBeenCalled()
   })

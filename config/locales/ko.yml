@@ -170,6 +170,7 @@ ko:
     tab_brand_configs: 테마
     tab_courses: 과목
     tab_developer_keys: "개발자 키"
+    tab_extensions: 확장
     tab_faculty_journal: "교원 일지"
     tab_grading_standards: 평가
     tab_jobs: 작업
@@ -4621,6 +4622,7 @@ ko:
   crumbs: 
     access_report: "액세스 보고서"
     announcements: 공지
+    apps: 확장
     assignments: 과제
     calendar_events: 행사
     collaborations: 협업
@@ -5247,6 +5249,7 @@ ko:
   domain_3b54c511: 도메인
   done_we_took_the_files_you_uploaded_and_attached_t_e529cfc0: "마쳤습니다. 업로드한 파일을 받아 간단한 의견과 함께 각 사용자의 이 과제에 대한 제출물 페이지에 첨부했습니다. 학생은 새 의견이 추가되었다는 알림을 받게 됩니다."
   download_submissions_7454665f: "제출물 다운로드"
+  draft_83493fcd: 초안
   due_5d7267be: "기한:"
   due_a73610f6: 기한
   due_date_2c6e4cfb: "기한 %{date}"
@@ -5713,6 +5716,7 @@ ko:
   example_84698b7d: 예
   exceeds_expectations_5910fc3a: "기대를 초과함"
   expand_all_bb64d2ea: "모두 확장"
+  extensions_7250a0bb: 확장
   external_apps_f5490181: "외부 앱"
   external_content: 
     cancel: 
@@ -7439,6 +7443,9 @@ ko:
       new_tab: "이 도구는 새 브라우저 창에 로드해야 함"
       new_tab_expired: "이 도구의 세션이 만료되었습니다. 도구를 다시 액세스하려면 페이지를 다시 로드하십시오."
       new_tab_loaded: "이 도구를 새 브라우저 창에 성공적으로 로드했습니다. 도구를 다시 액세스하려면 페이지를 다시 로드하십시오."
+  lti_registrations: 
+    index: 
+      title: 확장
   m2c_name: "Moodle 가져오기"
   make_sure_you_choose_the_most_appropiate_option_as_93079937: "학생의 점수에 영향을 미치므로 가장 적절한 옵션을 선택하십시오."
   manage_all_other_course_content_d77de830: "모든 기타 과목 내용을 관리"

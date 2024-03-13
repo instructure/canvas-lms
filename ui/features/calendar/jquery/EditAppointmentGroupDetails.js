@@ -106,7 +106,7 @@ export default class EditAppointmentGroupDetails {
       this.form.attr('action', this.apptGroup.url)
 
       // Don't let them change a bunch of fields once it's created
-      this.form.find('.context_id').val(this.apptGroup.context_code).attr('disabled', true)
+      this.form.find('.context_id').val(this.apptGroup.context_code).prop('disabled', true)
       this.form.find('select.context_id').change()
 
       this.disableGroups()
@@ -166,7 +166,7 @@ export default class EditAppointmentGroupDetails {
       $perSlotCheckbox.prop('checked', true)
       $perSlotInput.val(this.apptGroup.participants_per_appointment)
     } else {
-      $perSlotInput.attr('disabled', true)
+      $perSlotInput.prop('disabled', true)
     }
 
     const $maxPerStudentCheckbox = this.form.find('.max-per-student-option')
@@ -182,13 +182,13 @@ export default class EditAppointmentGroupDetails {
         $maxPerStudentInput.val('1')
       }
     } else {
-      $maxPerStudentInput.attr('disabled', true)
+      $maxPerStudentInput.prop('disabled', true)
     }
 
     if (this.apptGroup.workflow_state === 'active') {
       this.form
         .find('#appointment-blocks-active-button')
-        .attr('disabled', true)
+        .prop('disabled', true)
         .prop('checked', true)
     }
 
@@ -257,6 +257,8 @@ export default class EditAppointmentGroupDetails {
     return $('#options_help_dialog').dialog({
       title: I18n.t('affect_reservations', 'How will this affect reservations?'),
       width: 400,
+      modal: true,
+      zIndex: 1000,
     })
   }
 
@@ -443,12 +445,12 @@ export default class EditAppointmentGroupDetails {
   }
 
   disableGroups() {
-    this.form.find('.group-signup-checkbox').attr('disabled', true).prop('checked', false)
+    this.form.find('.group-signup-checkbox').prop('disabled', true).prop('checked', false)
     this.form.find('.group-signup').hide()
   }
 
   enableGroups(contextInfo) {
-    this.form.find('.group-signup-checkbox').attr('disabled', false)
+    this.form.find('.group-signup-checkbox').prop('disabled', false)
     const groupsInfo = {
       cssClass: 'group_category',
       name: 'group_category_id',

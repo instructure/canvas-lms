@@ -893,6 +893,7 @@ describe "threaded discussions" do
       driver.switch_to.alert.accept
       wait_for_ajax_requests
       entry.reload
+      expect(fj("span:contains('Deleted by teacher')")).to be_present
       expect(entry.workflow_state).to eq "deleted"
     end
 

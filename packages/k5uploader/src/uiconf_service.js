@@ -19,7 +19,6 @@
 import urlParams from './url_params'
 import signatureBuilder from './signature_builder'
 import XmlParser from './xml_parser'
-import UiConfig from './ui_config'
 import uiConfigFromNode from './ui_config_from_node'
 import mBus from './message_bus'
 import k5Options from './k5_options'
@@ -28,7 +27,7 @@ function UiconfService() {
   this.xmlParser = new XmlParser()
 }
 
-UiconfService.prototype.load = function(sessionSettings) {
+UiconfService.prototype.load = function (sessionSettings) {
   const data = sessionSettings.getSession()
   data.kalsig = signatureBuilder(data)
   this.xhr = new XMLHttpRequest()
@@ -37,18 +36,13 @@ UiconfService.prototype.load = function(sessionSettings) {
   this.xhr.send(data)
 }
 
-UiconfService.prototype.createUiConfig = function(xml) {
+UiconfService.prototype.createUiConfig = function (xml) {
   this.config = uiConfigFromNode(xml)
 }
 
-UiconfService.prototype.onXhrLoad = function(event) {
+UiconfService.prototype.onXhrLoad = function (event) {
   this.xmlParser.parseXML(this.xhr.response)
-  const conf = this.xmlParser
-    .find('result')
-    .find('ui_conf')
-    .find('confFile')
-    .first()
-    .text()
+  const conf = this.xmlParser.find('result').find('ui_conf').find('confFile').first().text()
   if (conf) {
     this.xmlParser = new XmlParser()
     this.xmlParser.parseXML(conf)

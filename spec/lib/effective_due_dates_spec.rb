@@ -659,7 +659,7 @@ describe Course do
             @assignment1.only_visible_to_overrides = false
             @assignment1.save!
             @module = @test_course.context_modules.create!(name: "Module 1")
-            @assignment1.context_module_tags.create! context_module: @module, context: @test_course, tag_type: "context_module"
+            @assignment1_tag = @assignment1.context_module_tags.create! context_module: @module, context: @test_course, tag_type: "context_module"
 
             @module_override = @module.assignment_overrides.create!
             @module_override.assignment_override_students.create!(user: @student1)
@@ -689,6 +689,162 @@ describe Course do
                   in_closed_grading_period: false,
                   override_id: @module_override.id,
                   override_source: "ADHOC"
+                }
+              }
+            }
+            expect(result).to eq expected
+          end
+
+          it "applies unpublished context module adhoc overrides" do
+            @module.workflow_state = "unpublished"
+            @module.save!
+
+            edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+            result = edd.to_hash
+            expected = {
+              @assignment1.id => {
+                @student1.id => {
+                  due_at: @assignment1.due_at,
+                  grading_period_id: nil,
+                  in_closed_grading_period: false,
+                  override_id: @module_override.id,
+                  override_source: "ADHOC"
+                }
+              }
+            }
+            expect(result).to eq expected
+          end
+
+          it "applies an assignment's quiz's context module overrides" do
+            module2 = @test_course.context_modules.create!(name: "Module 2")
+            module2_override = module2.assignment_overrides.create!
+            module2_override.assignment_override_students.create!(user: @student1)
+
+            @quiz = quiz_model(course: @test_course, assignment: @assignment2)
+            @quiz.context_module_tags.create! context_module: module2, context: @test_course, tag_type: "context_module"
+
+            edd = EffectiveDueDates.for_course(@test_course, @assignment2)
+            result = edd.to_hash
+            expected = {
+              @assignment2.id => {
+                @student1.id => {
+                  due_at: @assignment2.due_at,
+                  grading_period_id: nil,
+                  in_closed_grading_period: false,
+                  override_id: module2_override.id,
+                  override_source: "ADHOC"
+                }
+              }
+            }
+            expect(result).to eq expected
+          end
+
+          it "applies correct context module overrides for multiple assignments and modules" do
+            module2 = @test_course.context_modules.create!(name: "Module 2")
+            module2_override = module2.assignment_overrides.create!
+            module2_override.assignment_override_students.create!(user: @student1)
+
+            @assignment2.only_visible_to_overrides = false
+            @assignment2.save!
+            @assignment2.context_module_tags.create! context_module: module2, context: @test_course, tag_type: "context_module"
+
+            edd = EffectiveDueDates.for_course(@test_course, @assignment1, @assignment2)
+            result = edd.to_hash
+            expected = {
+              @assignment1.id => {
+                @student1.id => {
+                  due_at: @assignment1.due_at,
+                  grading_period_id: nil,
+                  in_closed_grading_period: false,
+                  override_id: @module_override.id,
+                  override_source: "ADHOC"
+                }
+              },
+              @assignment2.id => {
+                @student1.id => {
+                  due_at: @assignment2.due_at,
+                  grading_period_id: nil,
+                  in_closed_grading_period: false,
+                  override_id: module2_override.id,
+                  override_source: "ADHOC"
+                }
+              }
+            }
+            expect(result).to eq expected
+          end
+
+          it "applies correct context module overrides for multiple assignments and one override" do
+            module2 = @test_course.context_modules.create!(name: "Module 2")
+
+            @assignment2.only_visible_to_overrides = false
+            @assignment2.save!
+            @assignment2.context_module_tags.create! context_module: module2, context: @test_course, tag_type: "context_module"
+
+            edd = EffectiveDueDates.for_course(@test_course, @assignment1, @assignment2)
+            result = edd.to_hash
+            expected = {
+              @assignment1.id => {
+                @student1.id => {
+                  due_at: @assignment1.due_at,
+                  grading_period_id: nil,
+                  in_closed_grading_period: false,
+                  override_id: @module_override.id,
+                  override_source: "ADHOC"
+                }
+              },
+              @assignment2.id => {
+                @student1.id => {
+                  due_at: @assignment2.due_at,
+                  grading_period_id: nil,
+                  in_closed_grading_period: false,
+                  override_id: nil,
+                  override_source: "Everyone Else"
+                },
+                @student2.id => {
+                  due_at: @assignment2.due_at,
+                  grading_period_id: nil,
+                  in_closed_grading_period: false,
+                  override_id: nil,
+                  override_source: "Everyone Else"
+                },
+                @student3.id => {
+                  due_at: @assignment2.due_at,
+                  grading_period_id: nil,
+                  in_closed_grading_period: false,
+                  override_id: nil,
+                  override_source: "Everyone Else"
+                }
+              }
+            }
+            expect(result).to eq expected
+          end
+
+          it "does not include deleted content tags" do
+            @assignment1_tag.destroy
+            edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+            result = edd.to_hash
+            expected = {
+              @assignment1.id => {
+                @student1.id => {
+                  due_at: @assignment1.due_at,
+                  grading_period_id: nil,
+                  in_closed_grading_period: false,
+                  override_id: nil,
+                  override_source: "Everyone Else"
+                },
+                @student2.id => {
+                  due_at: @assignment1.due_at,
+                  grading_period_id: nil,
+                  in_closed_grading_period: false,
+                  override_id: nil,
+                  override_source: "Everyone Else"
+                },
+                @student3.id => {
+                  due_at: @assignment1.due_at,
+                  grading_period_id: nil,
+                  in_closed_grading_period: false,
+                  override_id: nil,
+                  override_source: "Everyone Else"
                 }
               }
             }

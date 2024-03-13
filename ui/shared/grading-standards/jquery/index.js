@@ -119,7 +119,7 @@ $(document).ready(() => {
     function removed() {
       $('#edit_assignment_form .grading_standard_id').val('')
       $('#assignment_grading_type').val('points').change()
-      $('#course_course_grading_standard_enabled').attr('checked', false).change()
+      $('#course_course_grading_standard_enabled').prop('checked', false).change()
       $('#course_form .grading_scheme_set').text(I18n.t('grading_scheme_not_set', 'Not Set'))
       $standard.addClass('editing')
       $standard
@@ -430,7 +430,7 @@ $(document).ready(() => {
     })
     $standard
       .find('button')
-      .attr('disabled', true)
+      .prop('disabled', true)
       .filter('.save_button')
       .text(I18n.t('status.saving', 'Saving...'))
     $.ajaxJSON(
@@ -441,7 +441,7 @@ $(document).ready(() => {
         const standard = data_.grading_standard
         $standard
           .find('button')
-          .attr('disabled', false)
+          .prop('disabled', false)
           .filter('.save_button')
           .text(I18n.t('buttons.save', 'Save'))
         $standard.triggerHandler('grading_standard_updated', standard)
@@ -449,7 +449,7 @@ $(document).ready(() => {
       () => {
         $standard
           .find('button')
-          .attr('disabled', false)
+          .prop('disabled', false)
           .filter('.save_button')
           .text(I18n.t('errors.save_failed', 'Save Failed'))
       }

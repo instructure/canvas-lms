@@ -125,7 +125,7 @@ export default class HomeworkSubmissionLtiContainer {
 
           // Disable submit button if the file does not match the required type
           if (!isValidFileSubmission(homeworkSubmissionView.model.attributes)) {
-            $('.external-tool-submission button[type=submit]').attr('disabled', true)
+            $('.external-tool-submission button[type=submit]').prop('disabled', true)
             $.flashError(I18n.t('Invalid submission file type'))
           }
 

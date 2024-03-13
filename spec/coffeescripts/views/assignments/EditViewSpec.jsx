@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import React from 'react'
 import RCELoader from '@canvas/rce/serviceRCELoader'
 import SectionCollection from '@canvas/sections/backbone/collections/SectionCollection'
@@ -524,7 +525,7 @@ test('does not disable post to sis when inClosedGradingPeriod', function () {
   ENV.POST_TO_SIS = true
   const view = this.editView({in_closed_grading_period: true})
   view.$el.appendTo($('#fixtures'))
-  notOk(view.$el.find('#assignment_post_to_sis').attr('disabled'))
+  notOk(view.$el.find('#assignment_post_to_sis').prop('disabled'))
 })
 
 test('disableCheckbox is called for a disabled checkbox', function () {
@@ -1371,23 +1372,23 @@ test('it is hidden if submission type is not online with a file upload', functio
   equal(view.$('#similarity_detection_tools').css('display'), 'none')
 
   view.$('#assignment_submission_type').val('online')
-  view.$('#assignment_online_upload').attr('checked', false)
+  view.$('#assignment_online_upload').prop('checked', false)
   view.handleSubmissionTypeChange()
   equal(view.$('#similarity_detection_tools').css('display'), 'none')
 
   view.$('#assignment_submission_type').val('online')
-  view.$('#assignment_online_upload').attr('checked', true)
+  view.$('#assignment_online_upload').prop('checked', true)
   view.handleSubmissionTypeChange()
   equal(view.$('#similarity_detection_tools').css('display'), 'block')
 
   view.$('#assignment_submission_type').val('online')
-  view.$('#assignment_text_entry').attr('checked', false)
-  view.$('#assignment_online_upload').attr('checked', false)
+  view.$('#assignment_text_entry').prop('checked', false)
+  view.$('#assignment_online_upload').prop('checked', false)
   view.handleSubmissionTypeChange()
   equal(view.$('#similarity_detection_tools').css('display'), 'none')
 
   view.$('#assignment_submission_type').val('online')
-  view.$('#assignment_text_entry').attr('checked', true)
+  view.$('#assignment_text_entry').prop('checked', true)
   view.handleSubmissionTypeChange()
   equal(view.$('#similarity_detection_tools').css('display'), 'block')
 })
@@ -1396,7 +1397,7 @@ test('it is hidden if the plagiarism_detection_platform flag is disabled', funct
   ENV.PLAGIARISM_DETECTION_PLATFORM = false
   const view = this.editView()
   view.$('#assignment_submission_type').val('online')
-  view.$('#assignment_online_upload').attr('checked', true)
+  view.$('#assignment_online_upload').prop('checked', true)
   view.handleSubmissionTypeChange()
   equal(view.$('#similarity_detection_tools').css('display'), 'none')
 })

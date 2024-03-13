@@ -19,6 +19,7 @@
 import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {MediaCapture, canUseMediaCapture} from '@instructure/media-capture'
+import {ScreenCapture, canUseScreenCapture} from '@instructure/media-capture-new'
 import {func} from 'prop-types'
 import {mediaExtension} from '../../mimetypes'
 const I18n = useI18nScope('media_recorder')
@@ -73,6 +74,15 @@ export default class CanvasMediaRecorder extends React.Component {
   }
 
   render() {
+    if (ENV.studio_media_capture_enabled) {
+      return (
+        <div>
+          {canUseScreenCapture() && (
+          <ScreenCapture translations={translations} onCompleted={this.saveFile} />
+        )}
+        </div>
+      )
+    }
     return (
       <div>
         {canUseMediaCapture() && (

@@ -233,6 +233,7 @@ he:
     tab_brand_configs: "ערכות נושא"
     tab_courses: קורסים
     tab_developer_keys: "מפתחות פיתוח"
+    tab_extensions: תוספות
     tab_faculty_journal: "יומן פקולטה"
     tab_grading_standards: "חישוב הציון"
     tab_jobs: "תהליכי עיבוד"
@@ -6461,6 +6462,7 @@ he:
   crumbs: 
     access_report: "דוח התחברויות "
     announcements: הודעות
+    apps: תוספות
     assignments: משימות
     calendar_events: "אירועי יומן"
     collaborations: "שיתופי פעולה"
@@ -7418,6 +7420,7 @@ he:
   download_the_complete_list_of_errors_and_warnings__7d993f7b: "הורדת הרשימה המלאה של שגיאות ואתראות לכאן."
   download_this_file_669f9174: "הורדת קובץ זה"
   downloading_course_content_allows_access_to_conten_164d9336: "הורדת תוכן קורס מאפשרת גישה לתוכן גם ללא חיבור לאינטרנט. התוכן יכול לכלול קבצים, דפים, משימות, נושאי דיון או בחנים. יש להקליק \"יצירת ePub\" לכל קורס ולפתוח בכל תוכנה התואמת eReader"
+  draft_83493fcd: טיוטה
   draft_comment_b2376ea4: "הערה במצב טיוטה"
   drag_and_drop_your_image_here_or_7fba7c14: "גרירת ושחרור תמונתך כאן, או"
   drag_to_rearrange_sections_637efee3: "גרירה לארגון מחדש של הקבצות"
@@ -8143,6 +8146,7 @@ he:
   export_to_quizzes_2_format_45b3ec25: "שדרוג הבחנים לפורמט גירסה 2"
   exported_package_history_bfca44b9: "היסטורית ייצוא חבילת התוכנה "
   exporting_b1eab154: מייצא
+  extensions_7250a0bb: תוספות
   external_apps_f5490181: "אפליקציות חיצוניות"
   external_collaborations_tool_a4899abb: "כלי שיתופי פעולה חיצוניים"
   external_content: 
@@ -10938,6 +10942,9 @@ he:
     register_tool: "רישום כלי"
   lti_2_reregistration_afabde25: "הרשמת LTI 2"
   lti_add_and_edit_a359d8da: "הוספת ועריכת LTI"
+  lti_registrations: 
+    index: 
+      title: תוספות
   lti_report_2b6193ab: "דוח LTI"
   luxembourg_352_85f4124d: "לוכסמבורג (+352)"
   luxembourg_3bc645af: לוקסמבורג

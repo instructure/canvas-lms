@@ -65,7 +65,7 @@ export const DiscussionTopicRepliesContainer = props => {
         data,
       })
 
-      if (discussionEntry.rootEntryId) {
+      if (discussionEntry.rootEntryId && !discussionEntry.deleted) {
         const discussionUnreadCountchange = discussionEntry.entryParticipant.read ? -1 : 1
         updateDiscussionEntryRootEntryCounts(cache, discussionEntry, discussionUnreadCountchange)
       }

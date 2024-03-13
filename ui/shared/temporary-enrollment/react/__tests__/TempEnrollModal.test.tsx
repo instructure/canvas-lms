@@ -154,7 +154,7 @@ describe('TempEnrollModal', () => {
     fetchMock.restore()
   })
 
-  it('displays the modal upon clicking the child element', () => {
+  it('displays the modal upon clicking the child element', async () => {
     render(
       <TempEnrollModal {...modalProps}>
         <p>child_element</p>
@@ -164,7 +164,7 @@ describe('TempEnrollModal', () => {
     expect(screen.queryByText('Find a recipient of Temporary Enrollments')).toBeNull()
 
     // trigger the modal to open and display the search screen (page 1)
-    userEvent.click(screen.getByText('child_element'))
+    await userEvent.click(screen.getByText('child_element'))
 
     expect(screen.getByText('Find a recipient of Temporary Enrollments')).toBeInTheDocument()
   })
@@ -193,7 +193,7 @@ describe('TempEnrollModal', () => {
       expect(cancel).not.toBeDisabled()
     })
 
-    userEvent.click(cancel)
+    await userEvent.click(cancel)
 
     // wait for the modal to close (including animation)
     await waitFor(() => {
@@ -220,13 +220,13 @@ describe('TempEnrollModal', () => {
     })
 
     // click next to go to the search results screen (page 2)
-    userEvent.click(next)
+    await userEvent.click(next)
     expect(
       await screen.findByText(/is ready to be assigned temporary enrollments/)
     ).toBeInTheDocument()
 
     // click next to go to the assign screen (page 3)
-    userEvent.click(next)
+    await userEvent.click(next)
     await waitFor(() => {
       expect(screen.queryByText('Back')).toBeInTheDocument()
       expect(screen.queryByText(/is ready to be assigned temporary enrollments/)).toBeNull()
@@ -257,12 +257,12 @@ describe('TempEnrollModal', () => {
     })
 
     // click next to go to the search results screen (page 2)
-    userEvent.click(next)
+    await userEvent.click(next)
     expect(
       await screen.findByText(/is ready to be assigned temporary enrollments/)
     ).toBeInTheDocument()
 
-    userEvent.click(await screen.findByRole('button', {name: 'Start Over'}))
+    await userEvent.click(await screen.findByRole('button', {name: 'Start Over'}))
     // modal is back on the search screen (page 1)
     await waitFor(() => {
       expect(screen.queryByText('Start Over')).toBeNull()
@@ -290,19 +290,19 @@ describe('TempEnrollModal', () => {
     })
 
     // click next to go to the search results screen (page 2)
-    userEvent.click(next)
+    await userEvent.click(next)
     expect(
       await screen.findByText(/is ready to be assigned temporary enrollments/)
     ).toBeInTheDocument()
 
     // click next to go to the assign screen (page 3)
-    userEvent.click(next)
+    await userEvent.click(next)
     await waitFor(() => {
       expect(screen.queryByText('Back')).toBeInTheDocument()
       expect(screen.queryByText(/is ready to be assigned temporary enrollments/)).toBeNull()
     })
 
-    userEvent.click(await screen.findByRole('button', {name: 'Back'}))
+    await userEvent.click(await screen.findByRole('button', {name: 'Back'}))
     // modal is back on the search results screen (page 2)
     await waitFor(() => {
       expect(screen.queryByText('Back')).toBeNull()

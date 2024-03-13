@@ -35,79 +35,77 @@ describe('FilterBar', () => {
     expect(getByRole('searchbox')).toBeInTheDocument()
   })
 
-  it('always includes an "All" option', () => {
+  it('always includes an "All" option', async () => {
     const {getByRole} = render(
       <FilterBar onFilter={() => {}} onSearch={() => {}} filterOptions={[]} />
     )
-    userEvent.click(getByRole('combobox', {name: 'Filter by'}))
+    await userEvent.click(getByRole('combobox', {name: 'Filter by'}))
     expect(getByRole('option', {name: 'All'})).toBeInTheDocument()
   })
 
   describe('when the filter dropdown changes', () => {
-    it('calls onFilter', () => {
+    it('calls onFilter', async () => {
       const onFilter = jest.fn()
       const {getByRole} = render(
         <FilterBar onFilter={onFilter} onSearch={() => {}} filterOptions={filterOptions} />
       )
-      userEvent.click(getByRole('combobox', {name: 'Filter by'}))
-      userEvent.click(getByRole('option', {name: 'Active'}))
+      await userEvent.click(getByRole('combobox', {name: 'Filter by'}))
+      await userEvent.click(getByRole('option', {name: 'Active'}))
       expect(onFilter).toHaveBeenCalledWith('active')
     })
   })
 
   describe('when the search input changes', () => {
-    const waitForDebounce = () => new Promise(resolve => setTimeout(resolve, 100))
-    const delay = 50
+    beforeEach(() => {
+      jest.useFakeTimers()
+    })
+
+    afterEach(() => {
+      jest.useRealTimers()
+    })
 
     it('calls onSearch after debounce', async () => {
+      const user = userEvent.setup({delay: null})
       const onSearch = jest.fn()
       const {getByRole} = render(
-        <FilterBar
-          onFilter={() => {}}
-          onSearch={onSearch}
-          filterOptions={[]}
-          searchDebounceDelay={delay}
-        />
+        <FilterBar onFilter={() => {}} onSearch={onSearch} filterOptions={[]} />
       )
-      userEvent.type(getByRole('searchbox'), 'hello')
+      await user.click(getByRole('searchbox'))
+      await user.keyboard('hello')
       expect(onSearch).not.toHaveBeenCalled()
-      await waitForDebounce()
+      jest.runOnlyPendingTimers()
       expect(onSearch).toHaveBeenCalledWith('hello')
     })
 
     it('ignores search queries with < 3 characters', async () => {
+      const user = userEvent.setup({delay: null})
       const onSearch = jest.fn()
       const {getByRole} = render(
-        <FilterBar
-          onFilter={() => {}}
-          onSearch={onSearch}
-          filterOptions={[]}
-          searchDebounceDelay={delay}
-        />
+        <FilterBar onFilter={() => {}} onSearch={onSearch} filterOptions={[]} />
       )
-      userEvent.type(getByRole('searchbox'), 'h')
-      await waitForDebounce()
+      await user.type(getByRole('searchbox'), 'h')
+      jest.runOnlyPendingTimers()
       expect(onSearch).not.toHaveBeenCalled()
     })
   })
 
   describe('when cleared', () => {
-    it('calls onFilter with "all"', () => {
+    it('calls onFilter with "all"', async () => {
       const onFilter = jest.fn()
       const {getByRole} = render(
         <FilterBar onFilter={onFilter} onSearch={() => {}} filterOptions={filterOptions} />
       )
-      userEvent.click(getByRole('button', {name: 'Clear'}))
+      await userEvent.click(getByRole('button', {name: 'Clear'}))
       expect(onFilter).toHaveBeenCalledWith('all')
     })
 
-    it('calls onSearch with ""', () => {
+    it('calls onSearch with ""', async () => {
       const onSearch = jest.fn()
       const {getByRole} = render(
         <FilterBar onFilter={() => {}} onSearch={onSearch} filterOptions={[]} />
       )
-      userEvent.type(getByRole('searchbox'), 'hello')
-      userEvent.click(getByRole('button', {name: 'Clear'}))
+      await userEvent.type(getByRole('searchbox'), 'hello')
+      await userEvent.click(getByRole('button', {name: 'Clear'}))
       expect(onSearch).toHaveBeenCalledWith('')
     })
   })

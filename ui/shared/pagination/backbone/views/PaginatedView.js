@@ -31,7 +31,8 @@ function PaginatedView() {
 
 PaginatedView.prototype.paginationLoaderTemplate = template
 
-PaginatedView.prototype.paginationScrollContainer = window
+// set default scroll container to window.document.body, because as of jquery 2.0, $(window).is(':visible') is no longer supported, see https://bugs.jquery.com/ticket/14709/
+PaginatedView.prototype.paginationScrollContainer = window.document.body
 
 PaginatedView.prototype.distanceTillFetchNextPage = 100
 

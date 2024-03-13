@@ -1,3 +1,4 @@
+/* eslint-disable qunit/resolve-async */
 /*
  * Copyright (C) 2016 - present Instructure, Inc.
  *
@@ -17,6 +18,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery-migrate'
 import ProfileShow from 'ui/features/profile_show/backbone/views/ProfileShow'
 import assertions from 'helpers/assertions'
 

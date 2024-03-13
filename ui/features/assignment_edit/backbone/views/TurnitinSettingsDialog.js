@@ -95,6 +95,7 @@ TurnitinSettingsDialog.prototype.renderEl = function () {
     .dialog({
       width: 'auto',
       modal: true,
+      zIndex: 1000,
     })
     .fixDialogButtons()
 }

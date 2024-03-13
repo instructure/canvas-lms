@@ -18,7 +18,7 @@
 
 import React from 'react'
 import moment from 'moment-timezone'
-import {render, screen} from '@testing-library/react'
+import {render, screen, waitFor} from '@testing-library/react'
 import FrequencyPicker, {
   FrequencyPickerErrorBoundary,
   type FrequencyPickerProps,
@@ -41,13 +41,13 @@ const defaultProps = (overrides: UnknownSubset<FrequencyPickerProps> = {}) => {
   }
 }
 
-const selectOption = (buttonName: RegExp, optionName: RegExp) => {
-  userEvent.click(
+const selectOption = async (buttonName: RegExp, optionName: RegExp) => {
+  await userEvent.click(
     screen.getByRole('combobox', {
       name: buttonName,
     })
   )
-  userEvent.click(
+  await userEvent.click(
     screen.getByRole('option', {
       name: optionName,
     })
@@ -87,11 +87,11 @@ describe('FrequencyPicker', () => {
           expect(getByDisplayValue('Every weekday (Monday to Friday)')).toBeInTheDocument()
         })
 
-        it('with open modal with the current selected frequency', () => {
+        it('with open modal with the current selected frequency', async () => {
           const props = defaultProps({timezone: TZ})
           const {getByText, getByDisplayValue} = render(<FrequencyPicker {...props} />)
-          selectOption(/frequency/i, /weekly on thursday/i)
-          selectOption(/frequency/i, /custom/i)
+          await selectOption(/frequency/i, /weekly on thursday/i)
+          await selectOption(/frequency/i, /custom/i)
           const modal = getByText('Custom Repeating Event')
           expect(modal).toBeInTheDocument()
 
@@ -100,7 +100,7 @@ describe('FrequencyPicker', () => {
           expect(thursdayCheckbox).toBeChecked()
         })
 
-        it('the modal with the given custom rrule', () => {
+        it('the modal with the given custom rrule', async () => {
           const props = defaultProps({timezone: TZ})
           const {getByText, getByDisplayValue} = render(
             <FrequencyPicker
@@ -111,8 +111,8 @@ describe('FrequencyPicker', () => {
           )
           expect(getByDisplayValue('Weekly on Mon, Wed, 5 times')).toBeInTheDocument()
 
-          selectOption(/frequency/i, /Weekly on Mon, Wed, 5 times/)
-          selectOption(/frequency/i, /custom/i)
+          await selectOption(/frequency/i, /Weekly on Mon, Wed, 5 times/)
+          await selectOption(/frequency/i, /custom/i)
           const modal = getByText('Custom Repeating Event')
           expect(modal).toBeInTheDocument()
           expect(getByDisplayValue('Week')).toBeInTheDocument()
@@ -136,14 +136,15 @@ describe('FrequencyPicker', () => {
       expect(modal).toBeInTheDocument()
     })
 
-    it('returns focus to the frequency picker button when the modal is closed', () => {
+    it('returns focus to the frequency picker button when the modal is closed', async () => {
+      const user = userEvent.setup({delay: null})
       const props = defaultProps()
-      const {getByText, getByRole} = render(<FrequencyPicker {...props} />)
-      selectOption(/frequency/i, /custom/i)
+      const {getByText, getByRole, getByLabelText} = render(<FrequencyPicker {...props} />)
+      await selectOption(/frequency/i, /custom/i)
       const modal = getByText('Custom Repeating Event')
       expect(modal).toBeInTheDocument()
-      userEvent.click(getByRole('button', {name: /cancel/i}))
-      expect(getByRole('combobox', {name: /frequency/i})).toHaveFocus()
+      await user.click(getByRole('button', {name: /cancel/i}))
+      await waitFor(() => expect(getByLabelText('Frequency')).toHaveFocus())
     })
 
     it('sets width to auto', () => {
@@ -158,13 +159,13 @@ describe('FrequencyPicker', () => {
       expect(container.querySelector('label')?.getAttribute('style')).toMatch(/width: \d+px/)
     })
 
-    it('retains auto width after selecting a custom frequency', () => {
+    it('retains auto width after selecting a custom frequency', async () => {
       const props = defaultProps({width: 'auto'})
       const {container, getByText, getByRole} = render(<FrequencyPicker {...props} />)
-      selectOption(/frequency/i, /custom/i)
+      await selectOption(/frequency/i, /custom/i)
       const modal = getByText('Custom Repeating Event')
       expect(modal).toBeInTheDocument()
-      userEvent.click(getByRole('button', {name: /done/i}))
+      await userEvent.click(getByRole('button', {name: /done/i}))
       expect(container.querySelector('label')).toHaveStyle({width: 'auto'})
     })
 
@@ -234,10 +235,10 @@ describe('FrequencyPicker', () => {
       )
     })
 
-    it('when user changes frequency', () => {
+    it('when user changes frequency', async () => {
       const props = defaultProps()
       render(<FrequencyPicker {...props} />)
-      selectOption(/frequency/i, /annually on april 12/i)
+      await selectOption(/frequency/i, /annually on april 12/i)
       expect(props.onChange).toHaveBeenCalledWith(
         'annually',
         'FREQ=YEARLY;BYMONTH=04;BYMONTHDAY=12;INTERVAL=1;COUNT=5'

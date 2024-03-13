@@ -19,6 +19,7 @@
 import React from 'react'
 import {mount} from 'enzyme'
 import $ from 'jquery'
+import 'jquery-migrate'
 import PostGradesApp from 'ui/features/gradebook/react/SISGradePassback/PostGradesApp'
 import GradebookExportManager from 'ui/features/gradebook/react/shared/GradebookExportManager'
 import ActionMenu from 'ui/features/gradebook/react/default_gradebook/components/ActionMenu'

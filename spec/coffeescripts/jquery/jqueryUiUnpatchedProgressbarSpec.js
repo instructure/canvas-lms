@@ -17,9 +17,7 @@
  */
 
 import $ from 'jquery'
-import 'jqueryui-unpatched/core'
-import 'jqueryui-unpatched/widget'
-import 'jqueryui-unpatched/progressbar'
+import 'jqueryui/progressbar'
 
 QUnit.module('Progressbar Widget', {
   beforeEach() {
