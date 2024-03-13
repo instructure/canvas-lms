@@ -14695,7 +14695,7 @@ tr:
       unregister_service: "Bu serviste kayıtlanmamak istediğinize emin misiniz? "
     content_shares: 
       page_title: "Paylaşılan İçerik"
-    crumb: "%{user}'nın ayarları"
+    crumb: "%{user}'in ayarları"
     crumbs: 
       observees: Gözlemleniyor
       settings_frd: "%{user}'ın Profili"
