@@ -26,6 +26,7 @@ import {Popover} from '@instructure/ui-popover'
 import {Tray} from '@instructure/ui-tray'
 import PropTypes from 'prop-types'
 import {Badge} from '@instructure/ui-badge'
+import {Flex} from '@instructure/ui-flex'
 import {momentObj} from 'react-moment-proptypes'
 import UpdateItemTray from '../UpdateItemTray'
 import Opportunities from '../Opportunities'
@@ -307,6 +308,40 @@ export class PlannerHeader extends Component {
     return 'none'
   }
 
+  getPopupVerticalProperties() {
+    let verticalRoom = this.getPopupVerticalRoom()
+    let buttonMarginRight = 'medium'
+    if (this.props.responsiveSize === 'medium') {
+      buttonMarginRight = 'small'
+    } else if (this.props.responsiveSize === 'small') {
+      buttonMarginRight = 'x-small'
+    }
+    const buttonMargin = `0 ${buttonMarginRight} 0 0`
+
+    let withArrow = true
+    let positionTarget = null
+    let placement = 'bottom end'
+    let offsetY = 0
+    if (window.innerWidth < 400) {
+      // there's not enough room to position the popover with an arrow, so turn off the arrow,
+      // cover up the header, and center the popover in the window instead
+      withArrow = false
+      positionTarget = document.getElementById('dashboard_header_container')
+      placement = 'bottom center'
+      offsetY = -positionTarget.offsetHeight
+      verticalRoom += positionTarget.offsetHeight
+    }
+
+    return {
+      verticalRoom,
+      buttonMargin,
+      withArrow,
+      positionTarget,
+      placement,
+      offsetY,
+    }
+  }
+
   newActivityAboveView() {
     if (this.props.loading.isLoading) return false
     if (!this.props.firstNewActivityDate) return false
@@ -336,7 +371,7 @@ export class PlannerHeader extends Component {
     )
   }
 
-  renderToday(buttonMargin) {
+  renderToday(buttonMargin, isSmallSize = null) {
     // if we're not displaying any items, don't show the today button
     // this is true if the planner is completely empty, or showing the balloons
     // because everything is in the past when first loaded
@@ -344,9 +379,10 @@ export class PlannerHeader extends Component {
       return (
         <Button
           id="planner-today-btn"
-          color="primary-inverse"
+          color={ENV.FEATURES?.instui_header ? 'secondary' : "primary-inverse"}
           margin={buttonMargin}
           onClick={this.handleTodayClick}
+          display={isSmallSize ? 'block' : 'inline-block'}
         >
           {I18n.t('Today')}
         </Button>
@@ -355,8 +391,8 @@ export class PlannerHeader extends Component {
     return null
   }
 
-  renderOpportunitiesButton(margin) {
-    const badgeProps = {margin, countUntil: 100}
+  renderOpportunitiesButton(margin, isSmallSize=false) {
+    const badgeProps = {margin, countUntil: 100, display:(isSmallSize ? 'block' : 'inline-block')}
     if (this.props.loading.allOpportunitiesLoaded && this.state.newOpportunities.length) {
       badgeProps.count = this.state.newOpportunities.length
       badgeProps.formatOutput = formattedCount => {
@@ -370,46 +406,49 @@ export class PlannerHeader extends Component {
 
     return (
       <Badge {...badgeProps}>
-        <IconButton
+        {ENV.FEATURES?.instui_header ? 
+          <Button
           renderIcon={IconAlertsLine}
           screenReaderLabel={I18n.t('opportunities popup')}
-          withBorder={false}
-          withBackground={false}
           onClick={this.toggleOpportunitiesDropdown}
+          display={isSmallSize ? 'block' : 'inline-block'}
           ref={b => {
             this.opportunitiesButton = b
           }}
           elementRef={b => {
             this.opportunitiesHtmlButton = b
           }}
-        />
+          >
+            {I18n.t('Opportunities')}
+          </Button>
+        : 
+          <IconButton
+            renderIcon={IconAlertsLine}
+            screenReaderLabel={I18n.t('opportunities popup')}
+            withBorder={false}
+            withBackground={false}
+            onClick={this.toggleOpportunitiesDropdown}
+            ref={b => {
+              this.opportunitiesButton = b
+            }}
+            elementRef={b => {
+              this.opportunitiesHtmlButton = b
+            }}
+          />
+        }
       </Badge>
     )
   }
 
-  render() {
-    let verticalRoom = this.getPopupVerticalRoom()
-    let buttonMarginRight = 'medium'
-    if (this.props.responsiveSize === 'medium') {
-      buttonMarginRight = 'small'
-    } else if (this.props.responsiveSize === 'small') {
-      buttonMarginRight = 'x-small'
-    }
-    const buttonMargin = `0 ${buttonMarginRight} 0 0`
-
-    let withArrow = true
-    let positionTarget = null
-    let placement = 'bottom end'
-    let offsetY = 0
-    if (window.innerWidth < 400) {
-      // there's not enough room to position the popover with an arrow, so turn off the arrow,
-      // cover up the header, and center the popover in the window instead
-      withArrow = false
-      positionTarget = document.getElementById('dashboard_header_container')
-      placement = 'bottom center'
-      offsetY = -positionTarget.offsetHeight
-      verticalRoom += positionTarget.offsetHeight
-    }
+  renderLegacy() {
+    const {
+      verticalRoom,
+      buttonMargin,
+      withArrow,
+      positionTarget,
+      placement,
+      offsetY
+    } = this.getPopupVerticalProperties()
 
     return (
       <>
@@ -507,6 +546,134 @@ export class PlannerHeader extends Component {
           {this.renderNewActivity()}
         </div>
       </>
+    )
+  }
+
+  render() {
+    if (!ENV.FEATURES?.instui_header) {
+      return this.renderLegacy()
+    }
+
+    const {
+      verticalRoom,
+      withArrow,
+      positionTarget,
+      placement,
+      offsetY
+    } = this.getPopupVerticalProperties()
+
+    const isSmallSize = this.props.responsiveSize === 'small'
+    const renderTodayButton = this.renderToday('none', isSmallSize)
+    
+    return (
+      <Flex
+        gap="small"
+        withVisualDebug={false}
+        direction={isSmallSize ? 'column' : 'row'}
+      >
+        {renderTodayButton &&
+          <Flex.Item overflowY="visible">{renderTodayButton}</Flex.Item>
+        }
+        
+        {!this.props.isObserving && (
+          <Flex.Item overflowY="visible">
+            <Button
+              renderIcon={IconPlusLine}
+              data-testid="add-to-do-button"
+              screenReaderLabel={I18n.t('Add To Do')}
+              onClick={this.handleToggleTray}
+              ref={b => {
+                this.addNoteBtn = b
+              }}
+              display={isSmallSize ? 'block' : 'inline-block'}
+            >
+              {I18n.t('Add To Do')}
+            </Button>
+          </Flex.Item>
+        )}
+        
+        <Flex.Item overflowY="visible">
+          <Button
+            data-testid="show-my-grades-button"
+            renderIcon={IconGradebookLine}
+            screenReaderLabel={I18n.t('Show My Grades')}
+            onClick={this.toggleGradesTray}
+            display={isSmallSize ? 'block' : 'inline-block'}
+          >
+            {I18n.t('My Grades')}
+          </Button>
+        </Flex.Item>
+        
+        <Flex.Item overflowY="visible">
+          <Popover
+            onHideContent={this.closeOpportunitiesDropdown}
+            isShowingContent={this.state.opportunitiesOpen}
+            on="click"
+            renderTrigger={this.renderOpportunitiesButton('none', isSmallSize)}
+            withArrow={withArrow}
+            positionTarget={positionTarget}
+            constrain="window"
+            placement={placement}
+            offsetY={offsetY}
+          >
+            <Opportunities
+              togglePopover={this.closeOpportunitiesDropdown}
+              newOpportunities={this.state.newOpportunities}
+              dismissedOpportunities={this.state.dismissedOpportunities}
+              courses={this.props.courses}
+              timeZone={this.props.timeZone}
+              dismiss={this.props.dismissOpportunity}
+              maxHeight={verticalRoom}
+              isObserving={this.props.isObserving}
+            />
+          </Popover>        
+        </Flex.Item>
+          
+        <Tray
+          open={this.state.trayOpen}
+          label={this.getTrayLabel()}
+          placement="end"
+          shouldContainFocus={true}
+          shouldReturnFocus={false}
+          onDismiss={this.handleCloseTray}
+        >
+          <CloseButton
+            placement="start"
+            onClick={this.handleCloseTray}
+            screenReaderLabel={I18n.t('Close')}
+          />
+          <UpdateItemTray
+            locale={this.props.locale}
+            timeZone={this.props.timeZone}
+            noteItem={this.props.todo.updateTodoItem}
+            onSavePlannerItem={this.handleSavePlannerItem}
+            onDeletePlannerItem={this.handleDeletePlannerItem}
+            courses={this.props.courses}
+          />
+        </Tray>
+        <Tray
+          label={I18n.t('My Grades')}
+          open={this.state.gradesTrayOpen}
+          placement="end"
+          shouldContainFocus={true}
+          shouldReturnFocus={true}
+          onDismiss={this.toggleGradesTray}
+        >
+          <View as="div" padding="large large medium">
+            <CloseButton
+              placement="start"
+              onClick={this.toggleGradesTray}
+              screenReaderLabel={I18n.t('Close')}
+            />
+            <GradesDisplay
+              courses={this.props.courses}
+              loading={this.props.loading.loadingGrades}
+              loadingError={this.props.loading.gradesLoadingError}
+            />
+          </View>
+        </Tray>
+        {this.renderNewActivity()}
+      </Flex>
     )
   }
 }

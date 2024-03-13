@@ -43,6 +43,7 @@ import {fetchShowK5Dashboard} from '@canvas/observer-picker/react/utils'
 import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
 import {Flex} from '@instructure/ui-flex'
+import {Button} from '@instructure/ui-buttons'
 
 const I18n = useI18nScope('dashboard')
 
@@ -66,6 +67,8 @@ class DashboardHeader extends React.Component {
     env: object,
     loadDashboardSidebar: func,
     responsiveSize: oneOf(['small', 'medium', 'large']),
+    startNewCourseVisible: bool,
+    viewGradesUrl: string,
   }
 
   static defaultProps = {
@@ -305,10 +308,7 @@ class DashboardHeader extends React.Component {
     })
   }
 
-  render() {
-    const canEnableElementaryDashboard =
-      this.props.allowElementaryDashboard &&
-      (!observerMode() || this.state.selectedObserveeId === ENV.current_user_id)
+  renderLegacy(canEnableElementaryDashboard) {
     return (
       <div className={classnames(this.props.responsiveSize, 'ic-Dashboard-header__layout')}>
         <Flex direction="row" alignItems="center" justifyItems="space-between" width="100%">
@@ -355,6 +355,107 @@ class DashboardHeader extends React.Component {
       </div>
     )
   }
+
+  renderResponsiveContent(canEnableElementaryDashboard) {
+    return (
+      <div style={{backgroundColor: 'white', paddingBottom: 'small'}}>
+        <Flex
+          margin="0 0 medium"
+          as="div"
+          direction={this.props.responsiveSize == 'large' ? 'row' : 'column'}
+          withVisualDebug={false}
+          alignItems="stretch"
+        >
+          <Flex.Item
+            shouldGrow={true}
+            shouldShrink={false}
+            margin={this.props.responsiveSize == 'large' ? '0' : '0 0 medium 0'}
+          >
+            <Heading level="h1" margin="0 0 small 0">
+              {I18n.t('Dashboard')}
+            </Heading>
+          </Flex.Item>
+          <Flex.Item
+            overflowY="visible"
+            margin={this.props.responsiveSize == 'large' ? 'x-small 0 0 0' : '0'}
+          >
+            <Flex
+              gap="small"
+              withVisualDebug={false}
+              direction={this.props.responsiveSize == 'small' ? 'column-reverse' : 'row'}
+            >
+              {observerMode() && (
+                <Flex.Item overflowY="visible">
+                  <ObserverOptions
+                      currentUser={ENV.current_user}
+                      currentUserRoles={ENV.current_user_roles}
+                      observedUsersList={ENV.OBSERVED_USERS_LIST}
+                      canAddObservee={ENV.CAN_ADD_OBSERVEE}
+                      handleChangeObservedUser={id => this.handleChangeObservedUser(id)}
+                    />
+                </Flex.Item>
+              )}
+              <Flex.Item overflowY="visible">
+                <div id="DashboardOptionsMenu_Container">
+                  <DashboardOptionsMenu
+                    view={this.state.currentDashboard}
+                    planner_enabled={this.props.planner_enabled}
+                    onDashboardChange={this.changeDashboard}
+                    menuButtonRef={ref => {
+                      this.menuButtonFocusable = ref
+                    }}
+                    canEnableElementaryDashboard={canEnableElementaryDashboard}
+                    responsiveSize={this.props.responsiveSize}
+                  />
+                </div>
+              </Flex.Item>
+              <span style={{display: (this.props.planner_enabled && this.state.currentDashboard == 'planner' ? 'block' : 'none')}}>
+                <Flex.Item overflowY="visible">
+                  <span id="dashboard-planner-header"></span>
+                  <span id="dashboard-planner-header-aux"></span>
+                </Flex.Item>
+              </span>
+              {(this.props.startNewCourseVisible) && (
+                <Flex.Item overflowY="visible">
+                  <Button 
+                    display={this.props.responsiveSize == 'small' ? 'block' : 'inline-block'}
+                    onclick={() => {}}
+                    id="start_new_course"
+                    aria-controls="new_course_form"
+                  >
+                    {I18n.t('Start a New Course')}
+                  </Button>
+                </Flex.Item>
+              )}
+              {this.state.currentDashboard != 'planner' && (
+              <Flex.Item overflowY="visible">
+                <Button 
+                  id="ic-Dashboard-header__view_grades_button"
+                  display={this.props.responsiveSize == 'small' ? 'block' : 'inline-block'}
+                  href={this.props.viewGradesUrl}
+                >
+                  {I18n.t('View Grades')}
+                </Button>
+              </Flex.Item>
+              )}
+            </Flex>
+          </Flex.Item>
+        </Flex>
+      </div>
+    )
+  }
+
+  render() {
+    const canEnableElementaryDashboard =
+      this.props.allowElementaryDashboard &&
+      (!observerMode() || this.state.selectedObserveeId === ENV.current_user_id)
+
+    if (!ENV.FEATURES?.instui_header) {
+      return this.renderLegacy(canEnableElementaryDashboard)
+    }
+
+    return this.renderResponsiveContent(canEnableElementaryDashboard)
+  }
 }
 
 export {DashboardHeader}
@@ -386,24 +487,33 @@ function loadDashboardSidebar(observedUserId) {
       const container = document.querySelector('.Sidebar__TodoListContainer')
       if (container) renderToDoSidebar(container)
 
-      const startButton = document.getElementById('start_new_course')
-      const modalContainer = document.getElementById('create_course_modal_container')
-      if (startButton && modalContainer && ENV.FEATURES?.create_course_subaccount_picker) {
-        startButton.addEventListener('click', () => {
-          ReactDOM.render(
-            <CreateCourseModal
-              isModalOpen={true}
-              setModalOpen={isOpen => {
-                if (!isOpen) ReactDOM.unmountComponentAtNode(modalContainer)
-              }}
-              permissions={ENV.CREATE_COURSES_PERMISSIONS.PERMISSION}
-              restrictToMCCAccount={ENV.CREATE_COURSES_PERMISSIONS.RESTRICT_TO_MCC_ACCOUNT}
-              isK5User={false} // can't be k5 user if classic dashboard is showing
-            />,
-            modalContainer
-          )
-        })
-      }
+      loadStartNewCourseHandler()
     })
   )
+}
+
+function loadStartNewCourseHandler() {
+  const startButton = document.getElementById('start_new_course')
+  if (ENV.FEATURES?.instui_header && startButton) {
+    // class name cannot be added to the Button component
+    $(startButton).addClass('element_toggler')
+  }
+
+  const modalContainer = document.getElementById('create_course_modal_container')
+  if (startButton && modalContainer && ENV.FEATURES?.create_course_subaccount_picker) {
+    startButton.addEventListener('click', () => {
+      ReactDOM.render(
+        <CreateCourseModal
+          isModalOpen={true}
+          setModalOpen={isOpen => {
+            if (!isOpen) ReactDOM.unmountComponentAtNode(modalContainer)
+          }}
+          permissions={ENV.CREATE_COURSES_PERMISSIONS.PERMISSION}
+          restrictToMCCAccount={ENV.CREATE_COURSES_PERMISSIONS.RESTRICT_TO_MCC_ACCOUNT}
+          isK5User={false} // can't be k5 user if classic dashboard is showing
+        />,
+        modalContainer
+      )
+    })
+  }
 }

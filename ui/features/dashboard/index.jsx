@@ -42,6 +42,7 @@ ready(() => {
         flashMessage={$.flashMessage}
         screenReaderFlashMessage={$.screenReaderFlashMessage}
         env={window.ENV}
+        {...$(dashboardHeaderContainer).data('props')}
       />,
       dashboardHeaderContainer
     )
