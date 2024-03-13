@@ -2283,3 +2283,36 @@ module CreateIcuCollationsBeforeMigrations
   end
 end
 ActiveRecord::Migrator.prepend(CreateIcuCollationsBeforeMigrations)
+
+module RollbackIgnoreNonDatedMigrations
+  def move(direction, steps)
+    if direction == :down
+      # we need to back up over any migrations that are not dated
+      steps += migrations.count { |migration| migration.version.to_s.length > 14 && migration.runnable? }
+      args = [direction, migrations, schema_migration]
+      args << internal_metadata if $canvas_rails == "7.1"
+      migrator = ActiveRecord::Migrator.new(*args)
+
+      if current_version != 0 && !migrator.current_migration
+        raise ActiveRecord::UnknownMigrationVersionError, current_version
+      end
+
+      start_index =
+        if current_version == 0
+          0
+        else
+          migrator.migrations.index(migrator.current_migration) || 0
+        end
+
+      finish = migrator.migrations[start_index + steps]
+      version = finish ? finish.version : 0
+      return public_send(direction, version) do |migration|
+        # but don't actually run the non-dated migrations
+        migration.version.to_s.length <= 14
+      end
+    end
+
+    super
+  end
+end
+ActiveRecord::MigrationContext.prepend(RollbackIgnoreNonDatedMigrations)
