@@ -19,7 +19,7 @@ GEM
       tzinfo (~> 2.0)
     concurrent-ruby (1.2.3)
     diff-lcs (1.5.1)
-    i18n (1.14.1)
+    i18n (1.14.4)
       concurrent-ruby (~> 1.0)
     mini_portile2 (2.8.5)
     minitest (5.22.2)

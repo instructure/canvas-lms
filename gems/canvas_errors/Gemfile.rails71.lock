@@ -70,7 +70,7 @@ GEM
     fugit (1.10.1)
       et-orbi (~> 1, >= 1.2.7)
       raabro (~> 1.4)
-    i18n (1.14.1)
+    i18n (1.14.4)
       concurrent-ruby (~> 1.0)
     inst-jobs (3.1.14)
       activerecord (>= 6.0)
