@@ -21,10 +21,6 @@ module RuboCop
   module Cop
     module Migration
       class NonTransactional < Cop
-        prepend RuboCop::Canvas::LegacyMigrations
-
-        self.legacy_cutoff_date = "20230830143713"
-
         def on_send(node)
           _receiver, method_name, *args = *node
 

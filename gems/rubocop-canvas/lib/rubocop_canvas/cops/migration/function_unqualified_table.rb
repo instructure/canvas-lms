@@ -22,9 +22,6 @@ module RuboCop
     module Migration
       class FunctionUnqualifiedTable < Cop
         include RuboCop::Canvas::CurrentDef
-        prepend RuboCop::Canvas::LegacyMigrations
-
-        self.legacy_cutoff_date = "20221108225723"
 
         MSG = <<~'TEXT'.tr("\n", " ")
           Use unqualified table names in function creation to be compatible with beta/test refresh.
