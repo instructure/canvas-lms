@@ -31,7 +31,7 @@ module Canvas::Builders
     end
 
     def self.preload(enrollments, use_cache = true)
-      raise "call #to_a first before preloading enrollment scope" if enrollments.is_a?(ActiveRecord::Relation)
+      raise "call #to_a first before preloading enrollment scope" if enrollments.is_a?(::ActiveRecord::Relation)
       # if enrollments is still a relation, we'll be unnecessarily calling the query multiple times
       # below with `enrollments.empty?` and `enrollments.first`
       return if enrollments.empty?
@@ -39,22 +39,22 @@ module Canvas::Builders
       preload_state(enrollments)
 
       courses_loaded = enrollments.first.association(:course).loaded?
-      ActiveRecord::Associations.preload(enrollments, :course) unless courses_loaded
+      ::ActiveRecord::Associations.preload(enrollments, :course) unless courses_loaded
 
       to_preload = use_cache ? enrollments.reject { |e| fetch(e) } : enrollments
       return if to_preload.empty?
 
-      ActiveRecord::Associations.preload(to_preload, :course_section)
-      ActiveRecord::Associations.preload(to_preload.map(&:course).uniq, :enrollment_term)
+      ::ActiveRecord::Associations.preload(to_preload, :course_section)
+      ::ActiveRecord::Associations.preload(to_preload.map(&:course).uniq, :enrollment_term)
       to_preload.each { |e| build(e, use_cache) }
     end
 
     def self.preload_state(enrollments)
-      raise "call #to_a first before preloading enrollment scope" if enrollments.is_a?(ActiveRecord::Relation)
+      raise "call #to_a first before preloading enrollment scope" if enrollments.is_a?(::ActiveRecord::Relation)
       return if enrollments.empty?
 
       unless enrollments.first.association(:enrollment_state).loaded?
-        ActiveRecord::Associations.preload(enrollments, :enrollment_state)
+        ::ActiveRecord::Associations.preload(enrollments, :enrollment_state)
       end
     end
 
