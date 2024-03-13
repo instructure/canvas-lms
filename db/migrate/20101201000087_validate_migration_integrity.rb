@@ -25,11 +25,11 @@
 #
 # To squash more migrations, update the `last_squashed_migration_version` and
 # bump the version in the filename of this migration so it runs again.
-class ValidateMigrationIntegrity < ActiveRecord::Migration[4.2]
+class ValidateMigrationIntegrity < ActiveRecord::Migration[7.0]
   tag :predeploy
   disable_ddl_transaction!
 
-  def self.up
+  def up
     initial_migration_version = "20101210192618"
     last_squashed_migration_version = "20230921192335"
 
