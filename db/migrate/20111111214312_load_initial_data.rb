@@ -23,6 +23,10 @@ class LoadInitialData < ActiveRecord::Migration[7.0]
   def up
     create_dummy_data
     create_default_shard
+    # all we want in the test env is the dummy root account and the default shard
+    # everything else will get truncated anyway
+    return if Rails.env.test?
+
     create_k12_theme
     create_minimalist_theme
     create_state_theme
@@ -35,6 +39,8 @@ class LoadInitialData < ActiveRecord::Migration[7.0]
       Account.create_with(name: "Dummy Root Account", workflow_state: "deleted", root_account_id: 0)
              .find_or_create_by!(id: 0)
     end
+    return if Rails.env.test? # all we want in the test env is the dummy root account
+
     EnrollmentTerm.ensure_dummy_enrollment_term
     Course.ensure_dummy_course
   end
