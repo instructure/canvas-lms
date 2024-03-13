@@ -7001,7 +7001,8 @@ ga:
         course_status: "Stádas an Chúrsa"
       headings: 
         current_users: "Úsáideoirí Reatha"
-      help: ~
+      help: 
+        reset_course_content: "Má athshocraítear ábhar an chúrsa, scriosfar go buan gach tasc gaolmhar, plé, tráth na gceist, modúil, rúibricí, leathanaigh, comhaid, torthaí foghlama, bainc ceisteanna, comhoibrithe, comhdhálacha, nó aon ábhar eile. Tá an gníomh seo do-aisiompaithe, agus ní *féidir* na sonraí a aisghabháil. An bhfuil tú cinnte gur mian leat leanúint ar aghaidh?"
       links: 
         calendar: "Féilire an Chúrsa"
         conclude: "Críochnaigh an Cúrsa seo"
