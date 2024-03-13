@@ -518,6 +518,7 @@ describe DiscussionTopicsController do
     end
 
     it "logs an asset_user_access on show" do
+      allow(@course).to receive(:feature_enabled?).and_call_original
       allow(@course).to receive(:feature_enabled?).with("react_discussions_post").and_return(true)
       user_session @student
       @discussion = @course.discussion_topics.create!(user: @teacher, message: "hello")

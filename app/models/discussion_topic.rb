@@ -133,6 +133,12 @@ class DiscussionTopic < ActiveRecord::Base
   after_create :create_participant
   after_create :create_materialized_view
 
+  include SmartSearchable
+  use_smart_search title_column: :title,
+                   body_column: :message,
+                   index_scope: ->(course) { course.discussion_topics.active },
+                   search_scope: ->(course, user) { DiscussionTopic::ScopedToUser.new(course, user, course.discussion_topics.active).scope }
+
   def section_specific_topics_must_have_sections
     if !deleted? && is_section_specific && discussion_topic_section_visibilities.none?(&:active?)
       errors.add(:is_section_specific, t("Section specific topics must have sections"))

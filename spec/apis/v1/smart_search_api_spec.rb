@@ -31,9 +31,11 @@ describe "Smart Search API", type: :request do
   before :once do
     course_factory(active_all: true)
     @user = @teacher
-    wiki_page_model(title: "foo", body: "...")
-    wiki_page_model(title: "bar", body: "...")
+    wiki_page_model(title: "foo", body: "...", course: @course)
+    wiki_page_model(title: "bar", body: "...", course: @course)
     assignment_model(title: "goo", description: "...", course: @course)
+    discussion_topic_model(title: "hoo", message: "...", context: @course)
+    announcement_model(title: "boo", message: "...", context: @course)
     @path = "/api/v1/courses/#{@course.id}/smartsearch"
     @params = { controller: "smart_search", course_id: @course.to_param, action: "search", format: "json" }
   end
@@ -59,12 +61,15 @@ describe "Smart Search API", type: :request do
       SmartSearch.index_course(@course)
       expect(AssignmentEmbedding.count).to be >= 1
       expect(WikiPageEmbedding.count).to be >= 2
+      expect(DiscussionTopicEmbedding.count).to be >= 2
 
       response = api_call(:get, @path + "?q=foo", @params.merge(q: "foo"))
       results = response["results"].map { |row| [row["title"], row["readable_type"]] }
       expect(results).to eq(
         [["foo", "Page"],
          ["goo", "Assignment"],
+         ["hoo", "Discussion Topic"],
+         ["boo", "Announcement"],
          ["bar", "Page"]]
       )
     end
