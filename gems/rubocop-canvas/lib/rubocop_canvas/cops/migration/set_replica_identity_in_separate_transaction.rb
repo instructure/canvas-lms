@@ -28,9 +28,6 @@ module RuboCop
 
         include RuboCop::Canvas::CurrentDef
         include RuboCop::Canvas::NewTables
-        prepend RuboCop::Canvas::LegacyMigrations
-
-        self.legacy_cutoff_date = "20230817180016"
 
         def_node_search :set_replica_identity, <<~PATTERN
           (send _ ${:set_replica_identity} $_ ...)

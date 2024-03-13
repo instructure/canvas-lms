@@ -60,7 +60,6 @@ class CreateDelayedJobs < ActiveRecord::Migration[7.0]
                                     name: "index_delayed_jobs_on_singleton_not_running" }
 
       t.index %i[priority run_at id],
-              algorithm: :concurrently,
               where: "queue = 'canvas_queue' AND locked_at IS NULL AND next_in_strand",
               name: "get_delayed_jobs_index"
       t.index %i[strand id], name: "index_delayed_jobs_on_strand"
