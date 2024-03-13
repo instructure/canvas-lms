@@ -18,10 +18,10 @@
 
 # to add smart search to a model:
 #  1. `include SmartSearchable`
-#  2. `use_smart_search :title, :body` # replace with the actual column names in the model
+#  2. `use_smart_search` and supply the title and body columns
+#     as well as the scopes used for indexing (->(course) {...})
+#     and searching (->(course, user), {...})
 #  3. create the embeddings model and table (with fk/index)
-#  4. add to `index_course` in lib/smart_search.rb
-#  5. add a query in SmartSearchController
 
 # model requirements:
 #  1. Course association
@@ -36,16 +36,17 @@ module SmartSearchable
   end
 
   module ClassMethods
-    def use_smart_search(title_column, body_column)
+    def use_smart_search(title_column:, body_column:, index_scope:, search_scope:)
       class_eval do
         include HtmlTextHelper
         has_many :embeddings, class_name: embedding_class_name, inverse_of: table_name.singularize.to_sym
-        cattr_accessor :smart_search_title_column, :smart_search_body_column
+        cattr_accessor :search_title_column, :search_body_column
         after_save :generate_embeddings, if: :should_generate_embeddings?
         after_save :delete_embeddings, if: -> { deleted? && saved_change_to_workflow_state? }
       end
-      self.smart_search_title_column = title_column.to_s
-      self.smart_search_body_column = body_column.to_s
+      self.search_title_column = title_column.to_s
+      self.search_body_column = body_column.to_s
+      SmartSearch.register_class(self, index_scope, search_scope)
     end
 
     def embedding_class_name
@@ -65,7 +66,7 @@ module SmartSearchable
     return false if deleted?
     return false unless SmartSearch.smart_search_available?(context)
 
-    saved_changes.key?(self.class.smart_search_title_column) || saved_changes.key?(self.class.smart_search_body_column) ||
+    saved_changes.key?(self.class.search_title_column) || saved_changes.key?(self.class.search_body_column) ||
       (saved_change_to_workflow_state? && workflow_state_before_last_save == "deleted")
   end
 
@@ -79,7 +80,7 @@ module SmartSearchable
   handle_asynchronously :generate_embeddings, priority: Delayed::LOW_PRIORITY
 
   def chunk_content(max_character_length = 4000)
-    title = attributes[self.class.smart_search_title_column]
+    title = attributes[self.class.search_title_column]
     content = body_text
     if content.length > max_character_length
       # Chunk
@@ -103,7 +104,7 @@ module SmartSearchable
   end
 
   def body_text
-    html_to_text(attributes[self.class.smart_search_body_column])
+    html_to_text(attributes[self.class.search_body_column])
   end
 
   def delete_embeddings

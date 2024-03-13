@@ -81,7 +81,7 @@ class SmartSearchController < ApplicationController
     return render_unauthorized_action unless SmartSearch.smart_search_available?(@context)
     return render json: { error: "missing 'q' param" }, status: :bad_request unless params.key?(:q)
 
-    WikiPageEmbedding.with_pgvector do
+    ActiveRecord::Base.with_pgvector do
       response = {
         results: []
       }
@@ -89,18 +89,23 @@ class SmartSearchController < ApplicationController
       if params[:q].present?
         embedding = SmartSearch.generate_embedding(params[:q])
 
-        # Prototype query using "neighbor". Embedding is now on join table so manual SQL for now
-        # wiki_pages = WikiPage.nearest_neighbors(:embedding, embedding, distance: "inner_product")
-        # response[:results].concat( wiki_pages.select { |x| x.neighbor_distance >= MIN_DISTANCE }.first(MAX_RESULT))
-        # Wiki Pages
-        scope = @context.wiki_pages.not_deleted
-        scope = WikiPages::ScopedToUser.new(@context, @current_user, scope).scope
-                                       .select(WikiPage.send(:sanitize_sql, ["wiki_pages.*, MIN(wpe.embedding <=> ?) AS distance", embedding.to_s]))
-                                       .joins("INNER JOIN #{WikiPageEmbedding.quoted_table_name} wpe ON wiki_pages.id = wpe.wiki_page_id")
-                                       .group("wiki_pages.id")
-                                       .order("distance ASC")
-        wiki_pages = Api.paginate(scope, self, api_v1_course_smart_search_query_url(@context))
-        response[:results].concat(search_results_json(wiki_pages))
+        collections = []
+        SmartSearch.search_scopes(@context, @current_user) do |klass, item_scope|
+          item_scope = item_scope.select(
+            ActiveRecord::Base.send(:sanitize_sql, ["#{klass.table_name}.*, MIN(embedding <=> ?) AS distance", embedding.to_s])
+          )
+                                 .joins(:embeddings)
+                                 .group("#{klass.table_name}.id")
+                                 .order("distance ASC")
+          collections << [klass.name,
+                          BookmarkedCollection.wrap(
+                            BookmarkedCollection::SimpleBookmarker.new(klass, { distance: { type: :float, null: false } }, :id),
+                            item_scope
+                          )]
+        end
+        scope = BookmarkedCollection.merge(*collections)
+        items = Api.paginate(scope, self, api_v1_course_smart_search_query_url(@context))
+        response[:results].concat(search_results_json(items))
       end
 
       render json: response

@@ -54,39 +54,27 @@ export default function SearchResult(props) {
     )
   }
 
-  if (props.searchResult.content_type === 'WikiPage') {
-    // id, wiki_id, title, body, etc.
-    const wiki_page = props.searchResult
-    return (
-      <View
-        as="div"
-        margin="small"
-        padding="small"
-        borderWidth="small"
-        borderRadius="medium"
-        shadow="resting"
-      >
-        <h3>{wiki_page.title}</h3>
-        <h4>{I18n.t('Course Page')}</h4>
-        <Text as="div" size="medium" color="secondary">
-          {ellipsize(wiki_page.body, 1000)}
-        </Text>
-        <View as="div">{getRelevance(wiki_page)}</View>
-        <View as="div">
-          <a href={wiki_page.html_url} target="_blank">
-            {I18n.t('View Full Page')}
-          </a>
-        </View>
+  const item = props.searchResult
+  return (
+    <View
+      as="div"
+      margin="small"
+      padding="small"
+      borderWidth="small"
+      borderRadius="medium"
+      shadow="resting"
+    >
+      <h3>{item.title}</h3>
+      <h4>{item.readable_type}</h4>
+      <Text as="div" size="medium" color="secondary">
+        {ellipsize(item.body, 1000)}
+      </Text>
+      <View as="div">{getRelevance(item)}</View>
+      <View as="div">
+        <a href={item.html_url} target="_blank">
+          {I18n.t('View Full Page')}
+        </a>
       </View>
-    )
-  } else if (props.searchResult.discussion_topic) {
-    // TODO: implement discussion_topic or other record type
-  } else {
-    // Unknown type, just dump json
-    return (
-      <View as="div" margin="small" padding="small">
-        <TextArea value={JSON.stringify(props.searchResult)} />
-      </View>
-    )
-  }
+    </View>
+  )
 }

@@ -47,7 +47,10 @@ class WikiPage < ActiveRecord::Base
   restrict_columns :availability_dates, [:publish_at]
 
   include SmartSearchable
-  use_smart_search :title, :body
+  use_smart_search title_column: :title,
+                   body_column: :body,
+                   index_scope: ->(course) { course.wiki_pages.not_deleted },
+                   search_scope: ->(course, user) { WikiPages::ScopedToUser.new(course, user, course.wiki_pages.not_deleted).scope }
 
   after_update :post_to_pandapub_when_revised
 
