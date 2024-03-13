@@ -280,7 +280,7 @@ module PostgreSQLAdapterExtensions
   def add_guard_excessive_updates(table_name)
     # Don't try to install this on rails-internal tables; they need to be created for
     # internal_metadata to exist and this guard isn't really useful there either
-    return if ["schema_migrations", "internal_metadata"].include?(table_name)
+    return if [ActiveRecord::Base.internal_metadata_table_name, ActiveRecord::Base.schema_migrations_table_name].include?(table_name)
     # If the function doesn't exist yet it will be backfilled
     return unless ((Rails.version < "7.1") ? ::ActiveRecord::InternalMetadata : ::ActiveRecord::InternalMetadata.new(self))[:guard_dangerous_changes_installed]
 
