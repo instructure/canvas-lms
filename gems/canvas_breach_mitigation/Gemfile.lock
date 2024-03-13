@@ -15,7 +15,7 @@ GEM
     concurrent-ruby (1.2.3)
     diff-lcs (1.5.1)
     docile (1.4.0)
-    i18n (1.14.1)
+    i18n (1.14.4)
       concurrent-ruby (~> 1.0)
     minitest (5.22.2)
     rspec (3.13.0)
