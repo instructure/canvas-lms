@@ -43,7 +43,7 @@ GEM
       rdoc
       reline (>= 0.4.2)
     method_source (1.0.0)
-    minitest (5.22.2)
+    minitest (5.22.3)
     mutex_m (0.2.0)
     pry (0.14.2)
       coderay (~> 1.1)
