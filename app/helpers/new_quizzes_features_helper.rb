@@ -42,7 +42,7 @@ module NewQuizzesFeaturesHelper
   module_function
 
   def new_quizzes_enabled?(context = @context)
-    context.feature_enabled?(:quizzes_next) && context.quiz_lti_tool.present? && !new_quizzes_require_migration?(context)
+    context.feature_enabled?(:quizzes_next) && context.quiz_lti_tool.present?
   end
 
   def new_quizzes_require_migration?(context = @context)
