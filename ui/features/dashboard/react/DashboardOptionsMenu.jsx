@@ -23,8 +23,8 @@ import axios from '@canvas/axios'
 
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Menu} from '@instructure/ui-menu'
-import {IconButton} from '@instructure/ui-buttons'
-import {IconMoreLine} from '@instructure/ui-icons'
+import {Button, IconButton} from '@instructure/ui-buttons'
+import {IconMoreLine, IconArrowOpenDownLine} from '@instructure/ui-icons'
 
 const I18n = useI18nScope('dashboard')
 
@@ -35,6 +35,7 @@ export default class DashboardOptionsMenu extends React.Component {
     onDashboardChange: PropTypes.func.isRequired,
     menuButtonRef: PropTypes.func,
     canEnableElementaryDashboard: PropTypes.bool,
+    responsiveSize: PropTypes.string,
   }
 
   static defaultProps = {
@@ -85,13 +86,23 @@ export default class DashboardOptionsMenu extends React.Component {
     return (
       <Menu
         trigger={
-          <IconButton
-            renderIcon={IconMoreLine}
-            withBackground={false}
-            withBorder={false}
-            elementRef={this.props.menuButtonRef}
-            screenReaderLabel={I18n.t('Dashboard Options')}
-          />
+          this.props.responsiveSize == 'small' ? (
+            <Button 
+              elementRef={this.props.menuButtonRef}
+              screenReaderLabel={I18n.t('Dashboard Options')}
+              display="block"
+            >
+              More <IconArrowOpenDownLine size="x-small" />
+            </Button>
+          ) : (
+            <IconButton
+              renderIcon={IconMoreLine}
+              withBackground={ENV.FEATURES?.instui_header}
+              withBorder={ENV.FEATURES?.instui_header}
+              elementRef={this.props.menuButtonRef}
+              screenReaderLabel={I18n.t('Dashboard Options')}
+            />
+          )
         }
         contentRef={el => (this.menuContentRef = el)}
       >
