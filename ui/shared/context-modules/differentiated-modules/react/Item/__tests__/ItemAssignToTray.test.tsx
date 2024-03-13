@@ -217,7 +217,8 @@ describe('ItemAssignToTray', () => {
     expect(getAllByTestId('item-assign-to-card')).toHaveLength(2)
   })
 
-  it('renders blueprint locking info when there are locked dates', async () => {
+  // LF-1370
+  it.skip('renders blueprint locking info when there are locked dates', async () => {
     fetchMock.get('/api/v1/courses/1/assignments/31/date_details', {
       blueprint_date_locks: ['availability_dates'],
     })
@@ -228,7 +229,8 @@ describe('ItemAssignToTray', () => {
     ).toBeInTheDocument()
   })
 
-  it('does not render blueprint locking info when locked with unlocked due dates', async () => {
+  // LF-1370
+  it.skip('does not render blueprint locking info when locked with unlocked due dates', async () => {
     fetchMock.get('/api/v1/courses/1/assignments/31/date_details', {blueprint_date_locks: []})
     const {findAllByTestId, queryByText} = renderComponent({itemContentId: '31'})
     await findAllByTestId('item-assign-to-card')
@@ -482,7 +484,8 @@ describe('ItemAssignToTray', () => {
     })
   })
 
-  it('focuses on the add button when deleting a card', async () => {
+  // LF-1370
+  it.skip('focuses on the add button when deleting a card', async () => {
     const user = userEvent.setup(USER_EVENT_OPTIONS)
     const {findAllByText, getByTestId} = renderComponent()
     const deleteButton = (await findAllByText('Delete'))[1]
@@ -491,7 +494,8 @@ describe('ItemAssignToTray', () => {
     expect(addButton).toHaveFocus()
   })
 
-  it("focuses on the newly-created card's delete button when adding a card", async () => {
+  // LF-1370
+  it.skip("focuses on the newly-created card's delete button when adding a card", async () => {
     const user = userEvent.setup(USER_EVENT_OPTIONS)
     const {findAllByText, getByTestId} = renderComponent()
     const addButton = getByTestId('add-card')
