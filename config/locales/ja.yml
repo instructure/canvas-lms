@@ -2834,8 +2834,8 @@ ja:
   allows_user_to_access_and_edit_the_admin_settings__b3390b66: ユーザーがCommonsの管理者設定にアクセスして編集できるようにします。ユーザーがグループを作成・管理できるようにします。ユーザーがアカウント内の共有リソースを管理できるようにします。
   allows_user_to_access_and_edit_the_admin_settings__e45da9d7: ユーザーがCommonsの管理者設定にアクセスして編集できるようにします。
   allows_user_to_access_and_manage_canvas_data_servi_ee75e004: キャンバスデータサービスにアクセスし、管理できるようになります。
-  allows_user_to_access_gradebook_history_9d599681: ユーザーがグレードブック履歴にアクセスできるようにします。
-  allows_user_to_access_gradebook_history_allows_use_79dfddd: ユーザーがグレードブック履歴にアクセスできるようにします。ユーザーが学習習熟グレードブック履歴にアクセスできるようにします（対応している場合）。
+  allows_user_to_access_gradebook_history_9d599681: ユーザーが評定表履歴にアクセスできるようにします。
+  allows_user_to_access_gradebook_history_allows_use_79dfddd: ユーザーが評定表履歴にアクセスできるようにします。ユーザーが学習習熟評定表履歴にアクセスできるようにします（対応している場合）。
   allows_user_to_access_speedgrader_from_an_assignme_3b908f7: ユーザーが課題からSpeedGraderにアクセスできるようにします。
   allows_user_to_access_student_view_test_student_co_35fbd387: ユーザーが学生ビュー（テスト学生）、このコースのコピー、およびコースの完全削除ボタンにアクセスできるようにします。
   allows_user_to_access_student_view_test_student_co_8b57e87c: ユーザーが受講生ビュー（受講生のテスト）、このコースのコピー、コースの内容のリセット、コースの完全削除ボタンにアクセスできるようにします。
@@ -2850,7 +2850,7 @@ ja:
   allows_user_to_access_the_blueprint_courses_sideba_cb5f6a46: "ユーザーが Blueprint コースのサイドバーにアクセスできるようにします。コース設定で Blueprint コースのコンテンツ設定を管理できるようにします。ユーザーが関連するコースを削除できるようにします。ユーザーが個々の課題、ページ、またはディスカッションで Blueprint ロック設定を編集できるようにすします"
   allows_user_to_access_the_chat_tool_48d5f5c4: ユーザーがチャットツールにアクセスできるようにします。
   allows_user_to_access_the_files_tab_in_the_content_a5187929: ユーザーがコンテンツのファイルタブにアクセスできるようにします。
-  allows_user_to_access_the_learning_mastery_gradebo_3c1fc35b: ユーザーが学習習熟グレードブック履歴にアクセスできるようにします（対応している場合）。
+  allows_user_to_access_the_learning_mastery_gradebo_3c1fc35b: ユーザーが学習習熟評定表履歴にアクセスできるようにします（対応している場合）。
   allows_user_to_access_the_manage_question_banks_li_616d45c8: 小テストインデックスページの問題バンクの管理のリンクをユーザーがアクセスできるようにします。
   allows_user_to_access_the_navigation_tab_68efd3f: ユーザーがナビゲーションタブにアクセスできるようにします。
   allows_user_to_access_the_navigation_tab_in_course_9ae8a05b: ユーザーがコースナ設定でナビゲーションタブにアクセスできるようにします。ユーザーが受講生ビュー（受講生のテスト）、このコースのコピー、コースの内容のリセット、コースの完全削除ボタンにアクセスできるようにします。コース詳細のタブで、コース画像、名前、コースコード、タイムゾーン、サブカウント、用語、その他のオプションを編集できるようにします。
@@ -2908,7 +2908,7 @@ ja:
       ユーザーがグレードブック履歴にアクセスできるようにします。
       ユーザーが学習習熟グレードブック履歴にアクセスできるようにします（対応している場合）。
   allows_user_to_add_edit_and_update_grades_in_the_g_5d50d581: ユーザーがグレードブック内で成績を追加、編集、更新することがでるようにします。ユーザーがグレードブック履歴にアクセスできるようにします。ユーザーが学習習熟グレードブック履歴にアクセスできるようにします（対応している場合）。
-  allows_user_to_add_edit_and_update_grades_in_the_g_e7707f35: ユーザーがグレードブック内で評定を追加、編集、更新することがでるようにします。
+  allows_user_to_add_edit_and_update_grades_in_the_g_e7707f35: ユーザーが評定表内で評定を追加、編集、更新することがでるようにします。
   allows_user_to_add_edit_and_update_grades_in_the_g_f9c62224: |-
       ユーザーがグレードブックやSpeedGrader内で成績を追加、編集、更新することがでるようにします。
       ユーザーがグレードブック履歴にアクセスできるようにします。
@@ -3112,7 +3112,7 @@ ja:
   allows_user_to_edit_course_tabs_95968064: ユーザーがコースタブを編集できるようにします。
   allows_user_to_edit_discussion_topics_5576aeb1: ユーザーがディスカッショントピックを編集できるようにします。
   allows_user_to_edit_grades_and_add_comments_in_spe_dc18e3c0: ユーザーがSpeedGrader内で評定を編集し、コメントを追加できるようにします。
-  allows_user_to_edit_grades_in_the_gradebook_83fa5c4f: ユーザーがグレードブック内で評定を編集できるようにします。
+  allows_user_to_edit_grades_in_the_gradebook_83fa5c4f: ユーザーが評定表内で評定を編集できるようにします。
   allows_user_to_edit_grades_in_the_gradebook_allows_432849ce: ユーザーがグレードブック内で成績を編集できるようにします。ユーザーがグレードブック履歴にアクセスできるようにします。ユーザーが学習習熟グレードブック履歴にアクセスできるようにします（対応している場合）。
   allows_user_to_edit_grades_in_the_gradebook_allows_74c2723: |-
       ユーザーがグレードブック内で成績を編集できるようにします。
@@ -3130,7 +3130,7 @@ ja:
   allows_user_to_edit_to_do_date_on_a_course_page_th_10b5c738: "To-do をサポートするコースページでユーザーが to-do を編集できるようにします。"
   allows_user_to_enable_and_edit_assignment_group_we_87c09b9f: ユーザーがコースで課題グループの重み付けを有効にして編集できるようにします。
   allows_user_to_export_the_gradebook_to_a_comma_sep_1c6fefef: ユーザーがグレードブックをコンマ区切り値（CSV）ファイルにエクスポート表示できるようにします。ユーザーが学習習熟グレードブック履歴にアクセスできるようにします（対応している場合）。
-  allows_user_to_export_the_gradebook_to_a_comma_sep_e52259a3: ユーザーがグレードブックをコンマ区切り値（CSV）ファイルにエクスポート表示できるようにします。
+  allows_user_to_export_the_gradebook_to_a_comma_sep_e52259a3: ユーザーが評定表をコンマ区切り値（CSV）ファイルにエクスポート表示できるようにします。
   allows_user_to_filter_for_blueprint_courses_as_the_2b3d864e: "ユーザーがアカウントレベルで Blueprint コースをフィルタリングすることができます。ユーザーが関連するコースを追加できるようにします。"
   allows_user_to_filter_for_blueprint_courses_as_the_45dc2c3d: "ユーザーがアカウントレベルで Blueprint コースをフィルタリングすることができます。ユーザーが関連するコースを追加できるようにします。"
   allows_user_to_filter_for_blueprint_courses_as_the_a67832c8: |-
@@ -7601,7 +7601,7 @@ ja:
   content_security_policy_settings_3e87fcb2: コンテンツセキュリティポリシーの設定
   content_selection_4aad6732: コンテンツの選択
   content_share_preview_166f6562: コンテンツ共有プレビュー
-  content_share_started_successfully_2c37fb79: コンテンツの共有が正常に開始されました
+  content_share_started_successfully_2c37fb79: コンテンツが共有できました
   content_shared_by_others_to_you_5a40bb2c: 他の人があなたと共有しているコンテンツ
   content_shares_e1e1: コンテンツ共有
   content_shares_received_view_error_page_c7021a4a: 受信したコンテンツ共有ビューエラーページ
@@ -8221,7 +8221,7 @@ ja:
   copy_assignment_name_to_another_course_b62d0a54: "課題 %{name} を別のコースにコピーする"
   copy_blueprint_course_settings_31a97e96: "Blueprint Course 設定をコピーする"
   copy_list_of_shard_ids_d51cd846: シャードIDのリストをコピーする
-  copy_operation_started_successfully_b2f236a1: コピー操作が正常に開始しました
+  copy_operation_started_successfully_b2f236a1: コピーが完了しました
   copy_page_to_another_course_405cc07c: ページを別のコースにコピーする
   copy_quiz_to_course_74f9c8c1: 小テストをコースにコピーする
   copy_the_video_url_dd509606: ビデオのURLをコピーする
@@ -9954,7 +9954,7 @@ ja:
   custom_access_84b29d73: カスタムアクセス
   custom_css_and_javascript_may_cause_accessibility__93d2a823: カスタムCSSやJavascriptは、アクセスの問題や、今後のキャンバスの更新との競合の原因となることがあります！
   custom_fields_fc3e55af: "カスタム フィールド"
-  custom_gradebook_columns_81944594: カスタムグレードブックの列
+  custom_gradebook_columns_81944594: カスタム評定表の列
   custom_link_details_35fd38fc: カスタムリンク詳細
   custom_links_to_include_in_the_help_dialog_popup_e48ff8b6: "ヘルプ ダイアログ ポップアップに含めるカスタム リンク"
   custom_lti_usage_uwf_b63978a5: "カスタムLTIの使用状況 - UWF"
@@ -11161,7 +11161,7 @@ ja:
   don_t_miss_notifications_from_your_students_900e9e30: 受講者からの通知を見逃さないようにしましょう。
   don_t_move_lti_query_params_to_post_body_21744487: LTIクエリーパラメーターをポストボディーに移動させないでください。
   don_t_move_lti_query_params_to_post_body_5c80e037: LTIクエリーパラメーターをポストボディーに移動させないでください。
-  don_t_post_outcomes_results_to_learning_mastery_gr_d0b85a19: 学習熟達度グレードブックにアウトカムを投稿しない
+  don_t_post_outcomes_results_to_learning_mastery_gr_d0b85a19: 学習熟達度評定表にアウトカムを投稿しない
   don_t_show_again_15d8253e: 再度表示しない
   don_t_show_again_8c7b7297: 今後表示しない
   don_t_show_this_again_2c3ba281: 今後表示しない
@@ -12206,7 +12206,7 @@ ja:
   error_during_group_creation_f232994b: グループ作成中にエラーが発生しました
   error_embedding_content_from_tool_49bb698e: ツールからのコンテンツの埋め込みエラー
   error_exporting_gradebook_b6558e60: 成績表エクスポート中にエラーが発生しました
-  error_exporting_gradebook_msg_6ea31e2f: "グレードブックエクスポート中にエラーが発生しました：%{msg}"
+  error_exporting_gradebook_msg_6ea31e2f: "評定表エクスポート中にエラーが発生しました：%{msg}"
   error_fetching_access_token_1445a9e3: アクセストークン取得中のエラー
   error_fetching_rubric_data_66432f54: ルーブリックデータの捕捉エラー
   error_fetching_user_details_7c85d23: ユーザーの詳細取得中のエラー
@@ -13742,7 +13742,7 @@ ja:
   gradebook_and_speedgrader_3b122556: グレードブックとSpeedGrader
   gradebook_and_speedgrader_will_be_inaccessible_if__4de0e869: "グレードブックとSpeedGraderは、両方の成績 - 編集と成績 - すべての成績を表示が無効になっている場合、アクセスできなくなります。"
   gradebook_and_speedgrader_will_be_inaccessible_if__e654ff22: "グレードブックとSpeedGraderは、両方の成績 - 編集と成績 - すべての成績を表示が無効になっている場合、アクセスできなくなります。"
-  gradebook_and_speedgrader_will_be_inaccessible_if__eda88bc3: "グレードブックとSpeedGraderは、両方の評定 - 編集と評定 - すべての評定を表示が無効になっている場合、アクセスできなくなります。"
+  gradebook_and_speedgrader_will_be_inaccessible_if__eda88bc3: "評定表とSpeedGraderは、両方の評定 - 編集と評定 - すべての評定を表示が無効になっている場合、アクセスできなくなります。"
   gradebook_assignment_search_and_redesign_409c5b21: 評定表の課題検索と再設計
   gradebook_context_name_9dbae5bc: "評定表 - %{context_name}"
   gradebook_csv_export_assignment_order_matches_the__9044f08e: 評定表CSVエクスポートの課題の順番が評定表のグリッドと一致する
@@ -13751,10 +13751,10 @@ ja:
     grades_filename: 評定
   gradebook_data_loading_performance_improvements_421e1c93: 成績表データの読み込みパフォーマンスの向上
   gradebook_enhanced_individual_view_d532923f: 評定ブック...強調された個別の表示
-  gradebook_export_failed_error_57442a4c: "グレードブックエクスポートに失敗しました：%{error}"
+  gradebook_export_failed_error_57442a4c: "評定表エクスポートに失敗しました：%{error}"
   gradebook_export_failed_reason_2b0f6c53: "グレードブックエクスポートに失敗しました：%{reason}"
-  gradebook_export_has_completed_5d535028: グレードブックのエクスポートが完了しました
-  gradebook_export_has_started_this_may_take_a_few_m_11b5b7a8: グレードブックのエクスポートが開始しました。これには2～3分かかります。
+  gradebook_export_has_completed_5d535028: 評定表のエクスポートが完了しました
+  gradebook_export_has_started_this_may_take_a_few_m_11b5b7a8: 評定表のエクスポートが開始しました。これには2～3分かかります。
   gradebook_export_sort_order_bugfix_tally_219_62bfaacb: 成績表エクスポート並べ替え順のバグ修正（Tally-219）
   gradebook_export_started_723461b9: グレードブックエクスポート開始済み
   gradebook_filters_fc25f772: 評定表フィルター
@@ -13764,8 +13764,8 @@ ja:
   gradebook_individual_view_8846598e: 評定ブック...個別ビュー
   gradebook_menu_dropdown_3692d623: 成績表メニュードロップダウン
   gradebook_performance_764d8b3d: 成績表の成績
-  gradebook_settings_b45c6df9: グレードブックの設定
-  gradebook_settings_updated_fef63d60: グレードブック設定が更新されました。
+  gradebook_settings_b45c6df9: 評定表の設定
+  gradebook_settings_updated_fef63d60: 評定表の設定が更新されました。
   gradebook_speedgrader_66cb7a6a: 評定表、SpeedGrader
   gradebook_tutorial_tray_d835c750: 評定ブック.チュートリアルトレイ
   gradebook_uploads: 
@@ -14820,7 +14820,7 @@ ja:
     positive_group_count: グループ数は正の数字で入力してください
     randomly_assigning_members: 受講者を無作為に割り当て
     show: 
-      coming_up: 入手予定
+      coming_up: 次の予定
       edit_group: グループを編集
       group_atom_feed: "グループの Atom フィード"
       new_announcement: アナウンスメント
@@ -15317,7 +15317,7 @@ ja:
   if_blueprint_courses_add_edit_associate_delete_and_9ebd192d: "[Blueprint コース - 追加 / 編集 / 関連付け / 削除]および[コース - 管理 ]が有効で、[課題と小テスト - 編集]が有効でない場合、課題のブループリントロック設定は課題の詳細ページから管理することができます。"
   if_both_grades_edit_and_grades_view_all_grades_are_795578a5: "成績 - 編集と成績 - 両方の成績が表示されない場合、グレードブックはコースナビゲーションで非表示となります。"
   if_both_grades_edit_and_grades_view_all_grades_are_9bfa7a61: "成績 - 編集と成績 - 両方の成績が表示されない場合、グレードブックはコースナビゲーションで非表示となります。"
-  if_both_grades_edit_and_grades_view_all_grades_are_ed522d43: "評定 - 編集と評定 - 両方の評定が表示されない場合、グレードブックはコースナビゲーションで非表示となります。"
+  if_both_grades_edit_and_grades_view_all_grades_are_ed522d43: "評定 - 編集と評定 - 両方の評定が表示されない場合、評定表はコースナビゲーションで非表示となります。"
   if_checkpoints_are_defined_forcheckpoints_true_mus_865a0b5b: "チェックポイントが定義されている場合、forCheckpoints: true をディスカッショントピックの割り当てに指定する必要があります。"
   if_commons_is_installed_allows_importing_favorited_eff368f: Commonsがインストールされている場合、お気に入りのコンテンツアイテムをCanvasからインポートできます。
   if_course_content_add_edit_delete_is_enabled_and_s_e85a8208: "[コースの内容 - 追加/編集/削除]が有効で、[受講者コラボレーション - 作成]が無効になっている場合、ユーザーは新しいコラボレーションを作成することはできませんが、すべてのコラボレーションを表示/編集/削除できます。"
@@ -20219,14 +20219,14 @@ ja:
   new_zealand_ef5d7b74: ニュージーランド
   newest_first_87672763: 新しい順
   newest_oldest_d768cf1a: "最新 - 最古"
-  next_40e12421: 次
+  next_40e12421: 次へ
   next_adjust_the_paces_for_individual_sections_and__a9e72b7: "次に、個々のセクションおよび/または受講者のペースを調整し、ニーズに基づいてさらにカスタマイズします (このステップはオプションです)。"
   next_announcement_6e6e0f17: 次の通知
   next_announcements_page_3956eb11: 次の広告ページ
   next_assignment_8ec51175: 新しい課題
   next_assignment_c19812a5: 次の課題
-  next_e0d38b1f: 次
-  next_item_2d1ddc96: "Next（次）:*アイテム*"
+  next_e0d38b1f: 次へ
+  next_item_2d1ddc96: "Next（次へ）:*アイテム*"
   next_maintenance_at_window_59f7f603: "次のメンテナンス：%{window}"
   next_mastery_path_is_currently_locked_a9253711: 次の習得パスは現在ロックされています
   next_mastery_path_is_currently_processing_f044d7d8: 次の習得パスは現在進行中です
@@ -20254,7 +20254,7 @@ ja:
   nightingale_student_activity_tracking_f7d7c4cf: "Nightingale 受講者アクティビティの追跡"
   niles_student_activity_and_performance_eabf444d: "Niles 受講者アクティビティと評定"
   no_74e9b590: いいえ
-  no_additional_details_were_added_for_this_assignme_547c0de7: この課題の詳細は追加されていません。
+  no_additional_details_were_added_for_this_assignme_547c0de7: この課題の詳細は設定されていません。
   no_alignments_are_available_for_this_outcome_7f8346f9: このアウトカムには位置調整はありません。
   no_allowed_domains_b6633d12: 許可されていないドメイン
   no_analytics_data_available_aa32c101: 利用可能な分析データはありません。
@@ -20402,8 +20402,8 @@ ja:
   no_valid_lti_resource_was_returned_11f7f91f: 有効なLTIリソースが返されませんでした
   no_video_1ed00b26: ビデオなし
   no_violations_have_been_reported_977a08d1: 違反は報告されていません。
-  no_way_to_export_gradebooks_provided_b4c2939d: 提供されたグレードブックをエクスポートする方法がありません！
-  no_way_to_monitor_gradebook_exports_provided_b451236a: 提供されたグレードブックをモニタリングする方法がありません！
+  no_way_to_export_gradebooks_provided_b4c2939d: 提供された評定表をエクスポートする方法がありません！
+  no_way_to_monitor_gradebook_exports_provided_b451236a: 提供された評定表をモニタリングする方法がありません！
   no_way_to_monitor_score_to_ungraded_provided_9258253f: 未済点の評定表をモニタリングする方法はありません！
   non_canvas_11f36d4a: "非 Canvas"
   non_existent_content_referenced_in_this_resource_d86c6bcb: このリソースで参照されている存在しないコンテンツ：
@@ -26232,7 +26232,7 @@ ja:
   set_the_due_date_in_course_pacing_after_the_assign_b4016cb7: 課題作成後、コースペーシングで期限を設定します。
   set_the_mastery_scale_to_be_used_for_all_courses_w_a95a48a4: このアカウント内のすべてのコースで使用される熟達スコアスケールを設定します。
   set_up_how_your_proficiency_ratings_appear_inside__8139bb81: "\n\
-      \x20           あなたの熟達評価の学習熟達グレードブック内での表示方法を設定してください。\n\
+      \x20           あなたの熟達評価の学習熟達評定表内での表示方法を設定してください。\n\
       \x20           評価数、熟達度、ポイントと色を調整してください。\n\
       \x20           "
   set_up_how_your_proficiency_ratings_appear_inside__f25d5da8: あなたの熟達度が、学習熟達成績ブックの中にどのように表示されるかを設定します。評価、週達ド、ポイント、および色を調整します。
@@ -31899,8 +31899,8 @@ ja:
   we_were_unable_to_find_a_tool_profile_match_for_pr_34e6a5d2: "\"%{product_name}\"のツールプロフィールの一致が見つかりませんでした。"
   we_were_unable_to_find_a_tool_profile_match_for_pr_cd98678e: "\"%{product_name}\"のツールプロフィールの一致が見つかりませんでした。このツールを使用するには、次の登録URLを使用してインストールしてください。%{registration_url}"
   we_were_unable_to_find_a_tool_profile_match_for_ve_5645a3e0: "\"vendor_code\"のツールプロフィールの一致が見つかりませんでした：\"%{vendor_code}\" product_code：\"%{product_code}。"
-  we_were_unable_to_find_matches_below_f1c6d1ed: 以下のマッチが見つかりませんでした。
-  we_were_unable_to_find_matches_below_select_any_yo_87035b30: 以下のマッチが見つかりませんでした。新規ユーザーとして作成したいものを選択してください。未選択分はこの時点でスキップされます。
+  we_were_unable_to_find_matches_below_f1c6d1ed: 以下のユーザーは見つかりませんでした。
+  we_were_unable_to_find_matches_below_select_any_yo_87035b30: 以下のユーザーは見つかりませんでした。新規ユーザーとして作成したいものを選択してください。未選択分はこの時点でスキップされます。
   we_were_unable_to_find_matches_for_the_logins_belo_d5f79db2: 以下のログインのマッチが見つかりませんでした。新規ユーザーとして作成したいものを選択します。
   we_were_unable_to_remove_this_course_from_your_fav_70fa598d: このコースをお気に入りから移動できませんでした。
   we_were_unable_to_update_the_app_659f5bc6: アプリを更新できませんでした。
@@ -32700,7 +32700,7 @@ ja:
   your_file_is_being_uploaded_to_gradebook_and_you_c_70e80fc7: あなたのファイルは、成績表にアップロードされました。そして、いつでもこのページから出ることができます。大きなCSVファイルを所持している場合は、あなたの変更の更新に数分かかることがあります。データの重複を避けるため、更に変更する前に、アップロードが完了したことと、成績表が正しいことを確認してください。
   your_file_is_being_uploaded_to_the_gradebook_and_y_aa5edfc6: あなたのファイルは、成績表にアップロードされました。そして、いつでもこのページから出ることができます。大きなCSVファイルを所持している場合は、あなたの変更の更新に数分かかることがあります。データの重複を避けるため、更に変更する前に、アップロードが完了したことと、成績表が正しいことを確認してください。
   your_grade_has_been_updated_f1cd8f06: 評定が更新されました。
-  your_gradebook_export_has_been_cancelled_c1b99ca1: グレードブックエクスポートがキャンセルされました。
+  your_gradebook_export_has_been_cancelled_c1b99ca1: 評定表エクスポートがキャンセルされました。
   your_grading_schemes_b785: あなたの成績評定スキーム
   your_group_is_being_created_88c0c024: あなたのグループを作成中です
   your_groups_are_being_created_50156e34: あなたのグループを作成中です。

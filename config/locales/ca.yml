@@ -11181,7 +11181,7 @@ ca:
         low: Baixa
         low_q: "Quartil més baix"
         mean: Mitjana
-        median: Mitjà
+        median: Mediana
         only_graded: "Calcula només en base a les activitats qualificades"
         total: Total
         your_score: "La vostra puntuació"
