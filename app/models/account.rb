@@ -481,6 +481,7 @@ class Account < ActiveRecord::Base
 
   def enable_canvas_authentication
     return unless root_account?
+    return if dummy?
     # for migrations creating a new db
     return unless Account.connection.data_source_exists?("authentication_providers")
     return if authentication_providers.active.where(auth_type: "canvas").exists?
@@ -1525,6 +1526,7 @@ class Account < ActiveRecord::Base
 
   def default_enrollment_term
     return @default_enrollment_term if @default_enrollment_term
+    return if dummy?
 
     if root_account?
       @default_enrollment_term = GuardRail.activate(:primary) { enrollment_terms.active.where(name: EnrollmentTerm::DEFAULT_TERM_NAME).first_or_create }
@@ -2241,6 +2243,8 @@ class Account < ActiveRecord::Base
   end
 
   def create_default_objects
+    return if dummy?
+
     work = lambda do
       default_enrollment_term
       enable_canvas_authentication
@@ -2253,6 +2257,8 @@ class Account < ActiveRecord::Base
   end
 
   def create_built_in_roles
+    return if dummy?
+
     shard.activate do
       Role::BASE_TYPES.each do |base_type|
         role = Role.new

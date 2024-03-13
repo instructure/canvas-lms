@@ -23,6 +23,10 @@
 class RegenerateBrandFilesBasedOnNewDefaultsPostdeploy < ActiveRecord::Migration[5.0]
   tag :postdeploy
 
+  def self.runnable?
+    !Rails.env.test?
+  end
+
   def up
     BrandConfig.find_each(&:save_all_files!)
   end
