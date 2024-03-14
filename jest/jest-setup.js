@@ -54,7 +54,8 @@ const ignoredErrors = [
   /You seem to have overlapping act\(\) calls/,
 ]
 const globalWarn = global.console.warn
-const ignoredWarnings = []
+const ignoredWarnings = [/JQMIGRATE:/] // ignore warnings about jquery migrate; these are muted globally when not in a jest test
+
 global.console = {
   log: console.log,
   error: error => {
