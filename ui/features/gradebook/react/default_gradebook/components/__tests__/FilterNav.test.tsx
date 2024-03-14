@@ -554,7 +554,7 @@ describe('Filter dropdown', () => {
 
   it('Custom Statuses and regular statuses are shown in the status filter', async () => {
     const user = userEvent.setup(USER_EVENT_OPTIONS)
-    const {getByText} = render(<FilterNav {...defaultProps} />)
+    const {getByText, getAllByText} = render(<FilterNav {...defaultProps} />)
     await user.click(getByText('Apply Filters'))
     await user.click(getByText('Status'))
     const customStatusNames = defaultProps.customStatuses.map(status => status.name)
@@ -568,7 +568,8 @@ describe('Filter dropdown', () => {
       ...customStatusNames,
     ]
     allStatusNames.forEach(statusName => {
-      expect(getByText(statusName)).toBeVisible()
+      // We expect to find two here, the screenreader text and the actual filter line. We'll check against the later
+      expect(getAllByText(statusName).pop()).toBeVisible()
     })
   })
 
