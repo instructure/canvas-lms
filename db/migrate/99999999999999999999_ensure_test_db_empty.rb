@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require_relative "../../spec/support/test_database_utils"
+
 class EnsureTestDbEmpty < ActiveRecord::Migration[7.0]
   tag :postdeploy
   disable_ddl_transaction!
@@ -27,20 +29,13 @@ class EnsureTestDbEmpty < ActiveRecord::Migration[7.0]
   end
 
   def up
-    non_empty_tables = connection.tables.select do |t|
-      connection.select_value("SELECT COUNT(*) FROM #{connection.quote_table_name(t)}") > 0
-    end
-    non_empty_tables.delete(ActiveRecord::Base.schema_migrations_table_name)
-    non_empty_tables.delete(ActiveRecord::Base.internal_metadata_table_name)
-    non_empty_tables.delete(Shard.table_name)
-    non_empty_tables.delete(Account.table_name)
-    non_empty_tables << Account.table_name if Account.where.not(id: 0).exists?
+    non_empty_tables = TestDatabaseUtils.non_empty_tables
 
     # If you're seeing this error, you've created a migration or modified a non-migration method
     # called by a hook that creates data. Go look in the mentioned table to see what data
     # was accidentally created. The test database should be completely empty after migrations run
-    # with the exception of the core tables mentioned above, and a single row in the accounts
-    # table for the dummy root account. You can test locally by running
+    # with the exception of the core tables mentioned in the method above, and a single row in the
+    # accounts table for the dummy root account. You can test locally by running
     # `RAILS_ENV=test bin/rake db:test:reset`
     raise "Test database is not empty! Tables with data: #{non_empty_tables.join(", ")}" unless non_empty_tables.empty?
   end
