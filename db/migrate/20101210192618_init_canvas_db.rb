@@ -716,6 +716,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.boolean :checkpointed, default: false, null: false
       t.string :checkpoint_label, limit: 255
       t.references :parent_assignment, foreign_key: { to_table: :assignments }
+      t.string :type, null: false, limit: 255, default: "Assignment"
 
       t.index [:context_id, :context_type]
       t.index [:sis_source_id, :root_account_id], where: "sis_source_id IS NOT NULL", unique: true
@@ -2550,6 +2551,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.index %i[user_id content_tag_id association_id association_type associated_asset_id associated_asset_type],
               unique: true,
               name: "index_learning_outcome_results_association"
+      t.index [:artifact_id, :artifact_type], name: "lor_artifact_id_idx"
     end
 
     create_table :live_assessments_assessments do |t|
@@ -2602,6 +2604,8 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.text :scopes, array: true, default: [], null: false
       t.references :root_account, null: false, foreign_key: { to_table: :accounts }, index: false
       t.timestamps precision: 6
+      t.string :guid
+      t.jsonb :registration_overlay
 
       t.replica_identity_index
     end
@@ -3811,6 +3815,25 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.index [:artifact_id, :artifact_type]
     end
 
+    create_table :rubric_criteria do |t|
+      t.references :rubric, null: false, foreign_key: { to_table: :rubrics }
+      t.references :root_account, null: false, foreign_key: { to_table: :accounts }, index: false
+      t.text :description
+      t.text :long_description
+      t.integer :order, null: false
+      t.decimal :points, null: false
+      t.boolean :criterion_use_range, null: false, default: false
+      t.references :learning_outcome, foreign_key: { to_table: :learning_outcomes }
+      t.decimal :mastery_points
+      t.boolean :ignore_for_scoring, null: false, default: false
+      t.string :workflow_state, null: false, default: "active", limit: 255
+      t.references :created_by, null: false, foreign_key: { to_table: :users }
+      t.references :deleted_by, foreign_key: { to_table: :users }
+      t.timestamps
+
+      t.replica_identity_index
+    end
+
     create_table :scheduled_smart_alerts do |t|
       t.string :context_type, null: false
       t.string :alert_type, null: false
@@ -4652,6 +4675,9 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
         AND q.only_visible_to_overrides = 'true'
         AND ao.workflow_state = 'active'
     SQL
+
+    execute(MigrationHelpers::StudentVisibilities::StudentVisibilitiesV4.view(connection.quote_table_name("assignment_student_visibilities_v2"), Assignment.quoted_table_name, is_assignment: true))
+    execute(MigrationHelpers::StudentVisibilities::StudentVisibilitiesV4.view(connection.quote_table_name("quiz_student_visibilities_v2"), Quizzes::Quiz.quoted_table_name))
   end
 
   def readonly_user_exists?

@@ -65,6 +65,7 @@ class SetReplicaIdentities < ActiveRecord::Migration[7.0]
     set_replica_identity :pseudonyms
     set_replica_identity :role_overrides
     set_replica_identity :roles
+    set_replica_identity :rubric_criteria
     set_replica_identity :standard_grade_statuses
     set_replica_identity :temporary_enrollment_pairings
     set_replica_identity :user_account_associations
