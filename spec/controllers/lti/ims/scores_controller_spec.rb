@@ -486,7 +486,24 @@ module Lti::IMS
             let(:submitted_at) { 5.minutes.ago.iso8601(3) }
             let(:params_overrides) { super().merge(submittedAt: submitted_at) }
 
-            it_behaves_like "a request specifying when the submission occurred"
+            context "when FF is off" do
+              before do
+                Account.site_admin.disable_feature!(:lti_ags_remove_top_submitted_at)
+              end
+
+              it_behaves_like "a request specifying when the submission occurred"
+            end
+
+            context "when FF is on" do
+              before do
+                Account.site_admin.enable_feature!(:lti_ags_remove_top_submitted_at)
+              end
+
+              it "ignores submittedAt" do
+                send_request
+                expect(result.submission.reload.submitted_at).not_to eq submitted_at
+              end
+            end
           end
 
           context "with submission.submittedAt param present" do
