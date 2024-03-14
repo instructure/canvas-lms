@@ -713,6 +713,9 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.boolean :important_dates, default: false, null: false, index: { where: "important_dates" }
       t.boolean :hide_in_gradebook, default: false, null: false
       t.string :ab_guid, array: true, default: [], null: false
+      t.boolean :checkpointed, default: false, null: false
+      t.string :checkpoint_label, limit: 255
+      t.references :parent_assignment, foreign_key: { to_table: :assignments }
 
       t.index [:context_id, :context_type]
       t.index [:sis_source_id, :root_account_id], where: "sis_source_id IS NOT NULL", unique: true
@@ -1312,7 +1315,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
     end
 
     create_table :content_migrations do |t|
-      t.bigint :context_id, null: false
+      t.bigint :context_id, null: false, index: true
       t.references :user, foreign_key: true, index: { where: "user_id IS NOT NULL" }
       t.string :workflow_state, null: false, limit: 255
       t.text :migration_settings
@@ -1933,6 +1936,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
       t.string :anonymous_state, limit: 255
       t.boolean :is_anonymous_author, default: false, null: false
+      t.integer :reply_to_entry_required_count, null: false, default: 0
 
       t.replica_identity_index
       t.index [:context_id, :position]
@@ -2060,6 +2064,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.references :sis_pseudonym
       t.timestamp :last_attended_at
       t.references :temporary_enrollment_source_user, foreign_key: { to_table: :users }, index: false
+      t.references :temporary_enrollment_pairing, foreign_key: true, index: { where: "temporary_enrollment_pairing_id IS NOT NULL" }
 
       t.replica_identity_index
       t.index [:course_id, :workflow_state]
@@ -4194,6 +4199,14 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
               unique: true,
               where: "database_server_id IS NULL AND name IS NULL",
               name: "index_switchman_shards_unique_primary_db_and_shard"
+    end
+
+    create_table :temporary_enrollment_pairings, if_not_exists: true do |t|
+      t.references :root_account, foreign_key: { to_table: :accounts }, null: false, index: false
+      t.string :workflow_state, null: false, default: "active", limit: 255
+      t.timestamps
+
+      t.replica_identity_index
     end
 
     create_table :terms_of_service_contents do |t|
