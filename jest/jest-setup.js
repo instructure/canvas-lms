@@ -269,3 +269,17 @@ Document.prototype.createRange =
 
 global.TextEncoder = TextEncoder
 global.TextDecoder = TextDecoder
+
+if (!('Worker' in window)) {
+  Object.defineProperty(window, 'Worker', {
+    value: class Worker {
+      constructor() {
+        this.postMessage = () => {}
+        this.terminate = () => {}
+        this.addEventListener = () => {}
+        this.removeEventListener = () => {}
+        this.dispatchEvent = () => {}
+      }
+    },
+  })
+}

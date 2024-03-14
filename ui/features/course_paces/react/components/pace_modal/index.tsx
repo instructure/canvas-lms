@@ -162,7 +162,6 @@ export const PaceModal = ({
   return (
     <Modal
       open={props.isOpen}
-      onDismiss={handleClose}
       size="fullscreen"
       label={modalTitle()}
       shouldCloseOnDocumentClick={true}
@@ -225,7 +224,7 @@ export const PaceModal = ({
               placement={outerResponsiveSize === 'small' ? 'bottom' : 'end'}
               shouldContainFocus={true}
               shouldReturnFocus={true}
-              shouldCloseOnDocumentClick={true}
+              shouldCloseOnDocumentClick={false}
             >
               <UnpublishedChangesTrayContents
                 handleTrayDismiss={handleTrayDismiss}
