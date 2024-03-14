@@ -201,8 +201,9 @@ module Lti
           it { is_expected.to be_bad_request }
 
           it "reports error metric" do
-            expect(InstStatsd::Statsd).to receive(:increment).with("canvas.deep_linking_controller.request_error", tags: { code: 400 })
+            allow(InstStatsd::Statsd).to receive(:increment).and_call_original
             subject
+            expect(InstStatsd::Statsd).to have_received(:increment).with("canvas.deep_linking_controller.request_error", tags: { code: 400 })
           end
 
           it "responds with an error" do

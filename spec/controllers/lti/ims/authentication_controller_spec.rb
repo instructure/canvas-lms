@@ -157,7 +157,9 @@ describe Lti::IMS::AuthenticationController do
   end
 
   describe "authorize" do
-    subject { get :authorize, params: }
+    subject(:authorize) do
+      get :authorize, params:
+    end
 
     shared_examples_for "redirect_uri errors" do
       let(:expected_status) { 400 }
@@ -165,7 +167,7 @@ describe Lti::IMS::AuthenticationController do
       it { is_expected.to have_http_status(expected_status) }
 
       it "avoids rendering the redirect_uri form" do
-        expect(subject).not_to render_template("lti/ims/authentication/authorize")
+        expect(authorize).not_to render_template("lti/ims/authentication/authorize")
       end
     end
 
@@ -174,7 +176,7 @@ describe Lti::IMS::AuthenticationController do
       let(:expected_error) { raise "set in example" }
 
       let(:error_object) do
-        subject
+        authorize
         assigns[:oidc_error]
       end
 
@@ -193,7 +195,7 @@ describe Lti::IMS::AuthenticationController do
       end
 
       it "renders the redirect_uri_form" do
-        expect(subject).to render_template("lti/ims/authentication/authorize")
+        expect(authorize).to render_template("lti/ims/authentication/authorize")
       end
     end
 
@@ -204,9 +206,7 @@ describe Lti::IMS::AuthenticationController do
       let(:lti_message_hint_jwt_params) { super().merge({ debug_trace: "fake debug_trace" }) }
 
       around do |example|
-        override_dynamic_settings(private: { canvas: { "frontend_data_collection_endpoint" => "fake endpoint" } }) do
-          example.run
-        end
+        override_dynamic_settings(private: { canvas: { "frontend_data_collection_endpoint" => "fake endpoint" } }, &example)
       end
 
       context "when log level is less then #{min_enabled_level}" do
@@ -221,7 +221,7 @@ describe Lti::IMS::AuthenticationController do
         it "does not log to the front end data collection framework" do
           expect(Lti::LaunchDebugLogger).to_not receive(:decode_debug_trace)
           allow(CanvasHttp).to receive(:put).and_call_original
-          subject
+          authorize
           expect(CanvasHttp).to_not have_received(:put).with(
             anything,
             anything,
@@ -247,7 +247,7 @@ describe Lti::IMS::AuthenticationController do
             receive(:decode_debug_trace).with("fake debug_trace").and_return(debug_trace_fields)
 
           allow(CanvasHttp).to receive(:put).and_call_original
-          subject
+          authorize
           expect(CanvasHttp).to have_received(:put).at_least(:once).with(
             "fake endpoint",
             anything,
@@ -279,7 +279,7 @@ describe Lti::IMS::AuthenticationController do
     end
 
     context "when there is a cached LTI 1.3 launch" do
-      subject do
+      def authorize
         get :authorize, params:
       end
 
@@ -316,22 +316,22 @@ describe Lti::IMS::AuthenticationController do
       end
 
       it "correctly sets the nonce of the launch" do
-        subject
+        authorize
         expect(id_token["nonce"]).to eq nonce
       end
 
       it "generates an id token" do
-        subject
+        authorize
         expect(id_token.except("nonce")).to eq lti_launch.except("nonce")
       end
 
       it "sends the state" do
-        subject
+        authorize
         expect(assigns.dig(:launch_parameters, :state)).to eq state
       end
 
       it "sends the lti_storage_target" do
-        subject
+        authorize
         expect(assigns.dig(:launch_parameters, :lti_storage_target)).to eq Lti::PlatformStorage::FORWARDING_TARGET
       end
 
@@ -374,7 +374,7 @@ describe Lti::IMS::AuthenticationController do
         let(:include_storage_target) { false }
 
         it "does not send the lti_storage_target" do
-          subject
+          authorize
           expect(assigns[:launch_parameters].keys).not_to include(:lti_storage_target)
         end
       end
@@ -388,7 +388,7 @@ describe Lti::IMS::AuthenticationController do
         end
 
         it "launches succesfully" do
-          subject
+          authorize
           expect(id_token["nonce"]).to eq nonce
         end
       end
@@ -408,7 +408,9 @@ describe Lti::IMS::AuthenticationController do
         before { remove_user_session }
 
         it_behaves_like "non redirect_uri errors" do
-          subject { get :authorize, params: }
+          def authorize
+            get :authorize, params:
+          end
 
           let(:expected_message) { "Must have an active user session" }
           let(:expected_error) { "login_required" }
@@ -423,7 +425,7 @@ describe Lti::IMS::AuthenticationController do
           end
 
           it "generates an id token" do
-            subject
+            authorize
             expect(id_token.except("nonce")).to eq lti_launch.except("nonce")
           end
         end
@@ -438,7 +440,7 @@ describe Lti::IMS::AuthenticationController do
       end
 
       it_behaves_like "an endpoint which uses parent_frame_context to set the CSP header" do
-        # The shared examples require `subject` to make the request -- this is
+        # The shared examples require `authorize` to make the request -- this is
         # already set up above in the parent rspec context
 
         # Make sure user has access in the PFC tool (enrollment in tool's course)

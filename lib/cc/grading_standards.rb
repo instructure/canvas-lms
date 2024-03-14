@@ -26,13 +26,17 @@ module CC
                     (assignment.discussion_topic && export_object?(assignment.discussion_topic))
 
         gs = assignment.grading_standard
-        add_item_to_export(gs) if gs && gs.context_type == "Course" && gs.context_id == @course.id
+        next unless gs && gs.context_type == "Course" && gs.context_id == @course.id
+        next if Account.site_admin.feature_enabled?(:archived_grading_schemes) && !gs.active?
+
+        add_item_to_export(gs)
       end
     end
 
     def create_grading_standards(document = nil)
       add_referenced_grading_standards if for_course_copy
       standards_to_copy = (@course.grading_standards.to_a + [@course.grading_standard]).compact.uniq(&:id).select { |s| export_object?(s) }
+      standards_to_copy.select!(&:active?) if Account.site_admin.feature_enabled?(:archived_grading_schemes)
       return nil if standards_to_copy.empty?
 
       if document

@@ -20,14 +20,14 @@
 
 module Canvas
   module AccountCacher
-    class CacheAccountOnAssociation < ActiveRecord::Associations::BelongsToAssociation
+    class CacheAccountOnAssociation < ::ActiveRecord::Associations::BelongsToAssociation
       def find_target
         key = ["account2", owner.attribute(reflection.foreign_key)].cache_key
         RequestCache.cache([Switchman::Shard.current.id, key].cache_key) { Rails.cache.fetch(key) { super } }
       end
     end
 
-    class CacheAccountOnPolymorphicAssociation < ActiveRecord::Associations::BelongsToPolymorphicAssociation
+    class CacheAccountOnPolymorphicAssociation < ::ActiveRecord::Associations::BelongsToPolymorphicAssociation
       def find_target
         return super unless klass == Account
 

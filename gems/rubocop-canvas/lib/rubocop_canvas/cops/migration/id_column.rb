@@ -37,10 +37,6 @@ module RuboCop
           (send lvar :column (sym $_) (sym {:integer | :int}) ...)
         PATTERN
 
-        def_node_search :limit_8?, <<~PATTERN
-          (pair (sym :limit) (int 8))
-        PATTERN
-
         RESTRICT_ON_SEND = %i[add_column column integer int].freeze
 
         def on_send(node)
@@ -49,7 +45,7 @@ module RuboCop
           column_name = add_integer_column(node) || t_integer(node) || t_column_integer(node)
           return unless column_name&.to_s&.end_with?("_id")
 
-          add_offense(node, severity: :warning) unless limit_8?(node)
+          add_offense(node, severity: :warning)
         end
       end
     end

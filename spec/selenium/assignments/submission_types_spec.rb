@@ -97,7 +97,7 @@ describe "assignments" do
       external_tool_assignment.external_tool_tag.update_attribute(:content_type, "ContextExternalTool")
       get "/courses/#{@course.id}/assignments/#{external_tool_assignment.id}"
 
-      expect(f("#tool_content")).to be_displayed
+      expect(f("[id^=tool_content_]")).to be_displayed
     end
   end
 end

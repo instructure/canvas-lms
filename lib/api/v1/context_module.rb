@@ -25,6 +25,7 @@ module Api::V1::ContextModule
   include Api::V1::ExternalTools::UrlHelpers
   include Api::V1::Locked
   include Api::V1::Assignment
+  include ContextModulesHelper
 
   MODULE_JSON_ATTRS = %w[id position name unlock_at].freeze
 
@@ -156,7 +157,10 @@ module Api::V1::ContextModule
                          else
                            context_module.grants_right?(current_user, :update)
                          end
-    hash["published"] = content_tag.active? if can_view_published
+    if can_view_published
+      hash["published"] = content_tag.active?
+      hash["unpublishable"] = module_item_unpublishable?(content_tag)
+    end
 
     hash["content_details"] = content_details(content_tag, current_user) if includes.include?("content_details")
 

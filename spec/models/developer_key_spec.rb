@@ -176,7 +176,7 @@ describe DeveloperKey do
     end
 
     describe "instrumentation" do
-      subject do
+      def enable_external_tools
         developer_key.enable_external_tools!(account)
         Timecop.travel(10.seconds) do
           run_jobs
@@ -191,27 +191,23 @@ describe DeveloperKey do
       end
 
       around do |example|
-        Timecop.freeze(Time.zone.now, &example)
-      end
-
-      after do
-        Timecop.return
+        Timecop.freeze(&example)
       end
 
       context "when method succeeds" do
         it "increments success count" do
-          subject
+          enable_external_tools
           expect(InstStatsd::Statsd).to have_received(:increment).with("developer_key.manage_external_tools.count", any_args)
         end
 
         it "tracks success timing" do
-          subject
+          enable_external_tools
           expect(InstStatsd::Statsd).to have_received(:timing).with("developer_key.manage_external_tools.latency", be_within(5000).of(10_000), any_args)
         end
       end
 
       context "when method raises an exception" do
-        subject do
+        def manage_external_tools
           developer_key.send(:manage_external_tools, developer_key.send(:tool_management_enqueue_args), :nonexistent_method, account)
           Timecop.travel(10.seconds) do
             run_jobs
@@ -223,33 +219,30 @@ describe DeveloperKey do
         end
 
         it "increments error count" do
-          subject
+          manage_external_tools
           expect(InstStatsd::Statsd).to have_received(:increment).with("developer_key.manage_external_tools.error.count", any_args)
         end
 
         it "tracks success timing" do
-          subject
+          manage_external_tools
           expect(InstStatsd::Statsd).to have_received(:timing).with("developer_key.manage_external_tools.error.latency", be_within(5000).of(10_000), any_args)
         end
 
         it "sends error to sentry" do
-          subject
+          manage_external_tools
           expect(Canvas::Errors).to have_received(:capture_exception).with(:developer_keys, instance_of(NoMethodError), :error)
         end
       end
     end
 
     describe "#restore_external_tools!" do
-      before do
-        developer_key
-        @shard1.activate { tool_configuration }
-        shard_1_tool.update!(root_account: shard_1_account)
-        shard_2_tool.update!(root_account: shard_2_account)
-        subject
-      end
-
       context "when account is site admin" do
-        subject do
+        before do
+          developer_key
+          @shard1.activate { tool_configuration }
+          shard_1_tool.update!(root_account: shard_1_account)
+          shard_2_tool.update!(root_account: shard_2_account)
+
           @shard1.activate do
             developer_key.restore_external_tools!(account)
             run_jobs
@@ -274,11 +267,11 @@ describe DeveloperKey do
         @shard1.activate { tool_configuration }
         shard_1_tool
         shard_2_tool
-        subject
+        disable_external_tools
       end
 
       context "when account is site admin" do
-        subject do
+        def disable_external_tools
           @shard1.activate do
             developer_key.disable_external_tools!(account)
             run_jobs
@@ -297,7 +290,7 @@ describe DeveloperKey do
       end
 
       context "account is not site admin" do
-        subject do
+        def disable_external_tools
           @shard1.activate do
             developer_key.disable_external_tools!(account)
             run_jobs
@@ -317,19 +310,15 @@ describe DeveloperKey do
     end
 
     describe "#enable_external_tools!" do
-      subject do
-        @shard1.activate do
-          developer_key.enable_external_tools!(account)
-          run_jobs
-        end
-      end
-
       before do
         developer_key
         @shard1.activate { tool_configuration }
         shard_1_tool.update!(workflow_state: "disabled")
         shard_2_tool.update!(workflow_state: "disabled")
-        subject
+        @shard1.activate do
+          developer_key.enable_external_tools!(account)
+          run_jobs
+        end
       end
 
       context "account is site admin" do
@@ -371,7 +360,7 @@ describe DeveloperKey do
     end
 
     describe "#update_external_tools!" do
-      subject do
+      def update_external_tools
         @shard1.activate do
           tool_configuration.settings["title"] = new_title
           tool_configuration.save!
@@ -392,7 +381,7 @@ describe DeveloperKey do
       context "when site admin key" do
         before do
           developer_key.update!(account: nil)
-          subject
+          update_external_tools
           run_jobs
         end
 
@@ -413,7 +402,7 @@ describe DeveloperKey do
       context "when non-site admin key" do
         before do
           developer_key.update!(account: shard_1_account)
-          subject
+          update_external_tools
           run_jobs
         end
 
@@ -439,7 +428,7 @@ describe DeveloperKey do
             .update_all(context_id: Course.last&.id.to_i + 1, context_type: "Course")
           developer_key.tool_configuration.configuration["oidc_initiation_url"] = "example.com"
           developer_key.tool_configuration.save!
-          subject
+          update_external_tools
           run_jobs
           failed_jobs = Delayed::Job.where("tag LIKE ?", "DeveloperKey%").where.not(last_error: nil)
           expect(failed_jobs.to_a).to eq([])

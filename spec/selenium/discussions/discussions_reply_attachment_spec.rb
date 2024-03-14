@@ -149,12 +149,15 @@ describe "reply attachment" do
       Account.site_admin.enable_feature! :react_discussions_post
     end
 
-    def add_a_reply_react(message = "message!", attachment = nil)
+    def add_a_reply_react(message = "message!", attachment = nil, file = nil)
       f("button[data-testid='discussion-topic-reply']").click
       wait_for_ajaximations
       type_in_tiny "textarea", message
-      if attachment.present?
-        _filename, fullpath, _data = get_file(attachment)
+      if attachment.present? || file.present?
+        filename, fullpath, _data = file.nil? ? get_file(attachment) : file
+
+        @filename = filename
+
         f("[data-testid='attachment-input']").send_keys(fullpath)
       end
 
@@ -292,6 +295,46 @@ describe "reply attachment" do
       attachment_link = fj("a:contains('graded')")
       expect(attachment_link).to be_truthy
       expect(attachment_link.attribute("href")).to include("/courses/#{@course.id}")
+    end
+
+    it "replies to a graded discussion topic while repeating attachment names as two different students have the correct context" do
+      file_attachment = "graded.png"
+      file = get_file(file_attachment)
+
+      root_topic = group_discussion_assignment
+
+      student1 = student_in_course(active_all: true).user
+      student2 = student_in_course(active_all: true).user
+
+      @group1.add_user(student1)
+      @group1.add_user(student2)
+
+      group1_topic = root_topic.child_topics.where(context_id: @group1.id, context_type: "Group").first
+
+      user_session(student1)
+
+      get "/groups/#{@group1.id}/discussion_topics/#{group1_topic.id}"
+      wait_for_ajaximations
+
+      add_a_reply_react("1st entry by Student 1", nil, file)
+
+      attachment_link1 = fj("a:contains('#{@filename}')")
+      expect(attachment_link1).to be_truthy
+
+      user_session(student2)
+
+      get "/groups/#{@group1.id}/discussion_topics/#{group1_topic.id}"
+      wait_for_ajaximations
+
+      add_a_reply_react("2nd entry by Student 2", nil, file)
+
+      attachment_link2 = fj("a:contains('#{@filename}')")
+      expect(attachment_link2).to be_truthy
+
+      attachments = Attachment.last(2)
+
+      expect(attachments[0].context_type).to eq "User"
+      expect(attachments[1].context_type).to eq "User"
     end
 
     it "can view and delete legacy reply attachments" do

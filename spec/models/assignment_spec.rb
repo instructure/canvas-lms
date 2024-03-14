@@ -11168,21 +11168,12 @@ describe Assignment do
   end
 
   def setup_assignment_with_students
-    @graded_notify = Notification.create!(name: "Submission Graded")
-    @grade_change_notify = Notification.create!(name: "Submission Grade Changed")
+    @graded_notify = Notification.create!(name: "Submission Graded", category: "TestImmediately")
+    @grade_change_notify = Notification.create!(name: "Submission Grade Changed", category: "TestImmediately")
     @stu1 = @student
     communication_channel(@stu1, active_cc: true)
     @course.enroll_student(@stu2 = user_factory(active_user: true, active_cc: true))
     @assignment = @course.assignments.create(title: "a title", points_possible: 10)
-
-    [@stu1, @stu2].each do |stu|
-      [@graded_notify, @grade_change_notify].each do |notification|
-        notification_policy_model(
-          notification:,
-          communication_channel: stu.communication_channels.first
-        )
-      end
-    end
 
     @sub1 = @assignment.grade_student(@stu1, grade: 9, grader: @teacher).first
     @assignment.reload

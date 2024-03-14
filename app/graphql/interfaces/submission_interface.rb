@@ -419,4 +419,21 @@ module Interfaces::SubmissionInterface
   end
 
   field :assignment_id, ID, null: false
+
+  field :preview_url, String, null: true
+  def preview_url
+    Loaders::SubmissionVersionNumberLoader.load(object).then do |version_number|
+      GraphQLHelpers::UrlHelpers.course_assignment_submission_url(
+        object.course_id,
+        object.assignment_id,
+        object.user_id,
+        host: context[:request].host_with_port,
+        preview: 1,
+        version: version_number
+      )
+    end
+  end
+
+  field :word_count, Float, null: true
+  delegate :word_count, to: :object
 end

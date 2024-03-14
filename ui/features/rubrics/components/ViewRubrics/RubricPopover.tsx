@@ -38,8 +38,9 @@ export type RubricPopoverProps = {
   courseId?: string
   criteria?: RubricCriterion[]
   pointsPossible: number
-  buttonDisplay: string
-  ratingOrder: string
+  buttonDisplay?: string
+  ratingOrder?: string
+  hasRubricAssociations?: boolean
 }
 
 export const RubricPopover = ({
@@ -52,6 +53,7 @@ export const RubricPopover = ({
   pointsPossible,
   buttonDisplay,
   ratingOrder,
+  hasRubricAssociations,
 }: RubricPopoverProps) => {
   const navigate = useNavigate()
   const [isPopoverOpen, setPopoverIsOpen] = useState(false)
@@ -124,6 +126,7 @@ export const RubricPopover = ({
             {I18n.t('Print')}
           </Menu.Item>
           <Menu.Item
+            disabled={hasRubricAssociations}
             data-testid="delete-rubric-button"
             onClick={() => setIsDeleteRubricModalOpen(true)}
           >

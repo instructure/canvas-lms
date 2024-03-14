@@ -27,8 +27,8 @@ describe Types::SubmissionType do
     @submission = @assignment.grade_student(@student, score: 8, grader: @teacher, student_entered_score: 13).first
   end
 
-  let(:submission_type) { GraphQLTypeTester.new(@submission, current_user: @teacher) }
-  let(:submission_type_for_student) { GraphQLTypeTester.new(@submission, current_user: @student) }
+  let(:submission_type) { GraphQLTypeTester.new(@submission, current_user: @teacher, request: ActionDispatch::TestRequest.create) }
+  let(:submission_type_for_student) { GraphQLTypeTester.new(@submission, current_user: @student, request: ActionDispatch::TestRequest.create) }
 
   it "works" do
     expect(submission_type.resolve("user { _id }")).to eq @student.id.to_s
@@ -733,6 +733,20 @@ describe Types::SubmissionType do
     it "works" do
       result = submission_type.resolve("assignedAssessments { workflowState }")
       expect(result.count).to eq 1
+    end
+  end
+
+  describe "previewUrl" do
+    it "returns the preview URL" do
+      expected_url = "http://test.host/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}?preview=1&version=1"
+      expect(submission_type.resolve("previewUrl")).to eq expected_url
+    end
+  end
+
+  describe "wordCount" do
+    it "returns the word count" do
+      @submission.update!(body: "word " * 100)
+      expect(submission_type.resolve("wordCount")).to eq 100
     end
   end
 end

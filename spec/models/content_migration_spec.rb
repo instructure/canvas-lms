@@ -842,7 +842,7 @@ describe ContentMigration do
 
   it "delays queueing imports if one in course is already running" do
     cms = []
-    Timecop.freeze(Time.zone.now) do
+    Timecop.freeze do
       2.times do
         cm = ContentMigration.new(context: @course, user: @teacher)
         cm.migration_type = "common_cartridge_importer"

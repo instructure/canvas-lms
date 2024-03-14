@@ -19,8 +19,6 @@
 #
 
 class Conversation < ActiveRecord::Base
-  self.ignored_columns += %i[root_account_id]
-
   include SimpleTags
   include ModelCache
   include SendToStream

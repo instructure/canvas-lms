@@ -94,9 +94,11 @@ export const ViewRubrics = () => {
         workflowState: curr.workflowState,
         buttonDisplay: curr.buttonDisplay,
         criteria: curr.criteria,
+        hasRubricAssociations: curr.hasRubricAssociations,
       }
 
-      curr.workflowState === 'active'
+      const activeStates = ['active', 'draft']
+      activeStates.includes(curr.workflowState ?? '')
         ? prev.activeRubrics.push(rubric)
         : prev.archivedRubrics.push(rubric)
       return prev

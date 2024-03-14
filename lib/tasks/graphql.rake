@@ -28,7 +28,7 @@ namespace :graphql do
 
   namespace :subgraph do
     def load_config(require_keys:)
-      config = ConfigFile.load("subgraph_registry")
+      config = Rails.application.credentials.subgraph_registry&.with_indifferent_access || {}
       abort "Canvas is not configured to publish its subgraph schema" if config.blank?
 
       require_keys.each do |config_key|

@@ -44,6 +44,11 @@ describe('ClearableDateTimeInput', () => {
     expect(getByRole('button', {name: 'Clear'})).toBeInTheDocument()
   })
 
+  it('disables clear button if blueprint-locked', () => {
+    const {getByText, getByRole} = renderComponent({disabledByBPLock: true})
+    expect(getByRole('button', {name: 'Clear'})).toBeDisabled()
+  })
+
   it('calls onChange when date is changed', () => {
     const {getByLabelText, getByRole} = renderComponent()
     const dateInput = getByLabelText('Date')

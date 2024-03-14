@@ -126,6 +126,8 @@ export const DiscussionEntryContainer = props => {
                     isForcedRead={props.isForcedRead}
                     isSplitView={props.isSplitView}
                     timingDisplay={props.timingDisplay}
+                    createdAt={props.createdAt}
+                    updatedAt={props.updatedAt}
                     editedTimingDisplay={props.editedTimingDisplay}
                     lastReplyAtDisplay={props.lastReplyAtDisplay}
                     showCreatedAsTooltip={!props.isTopic}
@@ -206,6 +208,8 @@ DiscussionEntryContainer.propTypes = {
   editor: User.shape,
   isUnread: PropTypes.bool,
   isForcedRead: PropTypes.bool,
+  createdAt: PropTypes.string,
+  updatedAt: PropTypes.string,
   timingDisplay: PropTypes.string,
   editedTimingDisplay: PropTypes.string,
   lastReplyAtDisplay: PropTypes.string,

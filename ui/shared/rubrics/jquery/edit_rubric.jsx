@@ -280,7 +280,7 @@ const rubricEditing = {
       numberHelper.parse($criterion.data('criterion_points')) !== points
     ) {
       if (!$criterion.data('criterion_points')) {
-        let max = $criterion.context.defaultValue
+        let max = $criterion.find('.criterion_points').prop('defaultValue')
         if (baseOnRatings) {
           max = $criterion.find('.rating:first .points').text()
         }

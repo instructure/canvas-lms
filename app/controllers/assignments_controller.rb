@@ -275,10 +275,14 @@ class AssignmentsController < ApplicationController
         @locked = @assignment.locked_for?(@current_user, check_policies: true, deep_check_if_needed: true)
         @unlocked = !@locked || @assignment.grants_right?(@current_user, session, :update)
 
-        if @assignment.submission_types == "external_tool" && Account.site_admin.feature_enabled?(:external_tools_for_a2) && @unlocked
+        if @assignment.external_tool? && Account.site_admin.feature_enabled?(:external_tools_for_a2) && @unlocked
           @tool = ContextExternalTool.from_assignment(@assignment)
 
-          js_env({ LTI_TOOL: "true", ASSIGNMENT_POINTS_POSSIBLE: @assignment.points_possible })
+          js_env({ LTI_TOOL: "true" })
+        end
+
+        if @assignment.external_tool?
+          js_env({ ASSIGNMENT_POINTS_POSSIBLE: @assignment.points_possible })
         end
 
         unless @assignment.new_record? || (@locked && !@locked[:can_view])
@@ -828,7 +832,9 @@ class AssignmentsController < ApplicationController
         GRADING_SCHEME_UPDATES_ENABLED:
           Account.site_admin.feature_enabled?(:grading_scheme_updates),
         OUTCOMES_NEW_DECAYING_AVERAGE_CALCULATION:
-          @context.root_account.feature_enabled?(:outcomes_new_decaying_average_calculation)
+          @context.root_account.feature_enabled?(:outcomes_new_decaying_average_calculation),
+        UPDATE_ASSIGNMENT_SUBMISSION_TYPE_LAUNCH_BUTTON_ENABLED:
+          Account.site_admin.feature_enabled?(:update_assignment_submission_type_launch_button)
       }
 
       if @context.root_account.feature_enabled?(:instui_nav)

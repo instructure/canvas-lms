@@ -46,6 +46,9 @@ module DatesOverridable
   end
 
   def overridden_for(user, skip_clone: false)
+    # TODO: support DiscussionTopic, WikiPage, Attachment in AssignmentOverrideApplicator (LF-1048)
+    return self if is_a?(DiscussionTopic) || is_a?(WikiPage) || is_a?(Attachment)
+
     AssignmentOverrideApplicator.assignment_overridden_for(self, user, skip_clone:)
   end
 
@@ -88,6 +91,14 @@ module DatesOverridable
     AssignmentOverride.active.where(context_module_id: assignment_context_modules.select(:id))
   end
 
+  def visible_to_everyone
+    if Account.site_admin.feature_enabled? :differentiated_modules
+      assignment_overrides.active.where(set_type: "Course").exists? || (!only_visible_to_overrides && (assignment_context_modules.empty? || (assignment_context_modules.any? && assignment_context_modules_without_overrides.any?)))
+    else
+      !only_visible_to_overrides
+    end
+  end
+
   def assignment_context_modules
     if is_a?(Assignment) && quiz.present?
       # if it's a quiz's assignment, the context module content tags are attached to the quiz
@@ -95,6 +106,11 @@ module DatesOverridable
     else
       ContextModule.not_deleted.where(id: context_module_tags.select(:context_module_id))
     end
+  end
+
+  def assignment_context_modules_without_overrides
+    context_modules_with_overrides = context_module_overrides.select(:context_module_id)
+    assignment_context_modules.where.not(id: context_modules_with_overrides)
   end
 
   def multiple_due_dates?

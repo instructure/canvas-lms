@@ -395,6 +395,7 @@ module Api::V1::Assignment
     end
 
     hash["only_visible_to_overrides"] = value_to_boolean(assignment.only_visible_to_overrides)
+    hash["visible_to_everyone"] = assignment.visible_to_everyone
 
     if opts[:include_visibility]
       hash["assignment_visibility"] = (opts[:assignment_visibilities] || assignment.students_with_visibility.pluck(:id).uniq).map(&:to_s)

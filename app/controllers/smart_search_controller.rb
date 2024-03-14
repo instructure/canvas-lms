@@ -78,16 +78,16 @@ class SmartSearchController < ApplicationController
   # @returns [SearchResult]
   def search
     return render_unauthorized_action unless @context.grants_right?(@current_user, session, :read)
-    return render_unauthorized_action unless OpenAi.smart_search_available?(@context)
+    return render_unauthorized_action unless SmartSearch.smart_search_available?(@context)
     return render json: { error: "missing 'q' param" }, status: :bad_request unless params.key?(:q)
 
-    OpenAi.with_pgvector do
+    WikiPageEmbedding.with_pgvector do
       response = {
         results: []
       }
 
       if params[:q].present?
-        embedding = OpenAi.generate_embedding(params[:q])
+        embedding = SmartSearch.generate_embedding(params[:q])
 
         # Prototype query using "neighbor". Embedding is now on join table so manual SQL for now
         # wiki_pages = WikiPage.nearest_neighbors(:embedding, embedding, distance: "inner_product")
@@ -110,7 +110,7 @@ class SmartSearchController < ApplicationController
   def show
     @context = Course.find(params[:course_id])
 
-    render_unauthorized_action unless OpenAi.smart_search_available?(@context)
+    render_unauthorized_action unless SmartSearch.smart_search_available?(@context)
     set_active_tab("search")
     @show_left_side = true
     add_crumb(t("#crumbs.search", "Search"), named_context_url(@context, :course_search_url)) unless @skip_crumb

@@ -21,14 +21,14 @@ class AddAvailabilityColumns < ActiveRecord::Migration[7.0]
 
   def change
     change_table :wiki_pages, bulk: true do |t|
-      t.column :unlock_at, :datetime
-      t.column :lock_at, :datetime
-      t.column :only_visible_to_overrides, :boolean, default: false, null: false
+      t.timestamp :unlock_at, precision: 6
+      t.timestamp :lock_at, precision: 6
+      t.boolean :only_visible_to_overrides, default: false, null: false
     end
 
     change_table :discussion_topics, bulk: true do |t|
-      t.column :unlock_at, :datetime
-      t.column :only_visible_to_overrides, :boolean, default: false, null: false
+      t.timestamp :unlock_at, precision: 6
+      t.boolean :only_visible_to_overrides, default: false, null: false
     end
 
     add_column :attachments, :only_visible_to_overrides, :boolean, default: false, null: false

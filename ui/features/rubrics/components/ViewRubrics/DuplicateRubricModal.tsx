@@ -40,8 +40,8 @@ export type DuplicateRubricModalProps = {
   courseId?: string
   criteria?: RubricCriterion[]
   pointsPossible: number
-  buttonDisplay: string
-  ratingOrder: string
+  buttonDisplay?: string
+  ratingOrder?: string
   isOpen: boolean
   onDismiss: () => void
   setPopoverIsOpen: (isOpen: boolean) => void

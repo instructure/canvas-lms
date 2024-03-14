@@ -83,6 +83,23 @@ describe "conversations new" do
       expect(ff("[data-testid='conversation']").count).to eq 1
       expect(f("[data-testid='conversation']").text).to include "Course 2 - assignment 2"
     end
+
+    it "can reply to submission comments" do
+      get "/conversations"
+      f("input[title='Inbox']").click
+      fj("li:contains('Submission Comments')").click
+      convos = ff("[data-testid='conversation']")
+      convos[0].click
+      wait_for_ajaximations
+      f("button[data-testid='reply']").click
+      f("textarea[data-testid='message-body']").send_keys("my submission comment reply")
+      f("button[data-testid='send-button']").click
+      wait_for_ajaximations
+      # make sure compose modal is gone
+      expect(f("body")).not_to contain_jqcss("textarea[data-testid='message-body']")
+      expect(fj("span:contains('my submission comment reply')")).to be_present
+      expect(SubmissionComment.last.comment).to eq "my submission comment reply"
+    end
   end
 
   context "when react_inbox feature flag is off" do

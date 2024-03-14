@@ -225,10 +225,12 @@ function CanvasMultiSelect(props: Props) {
     return groups.length === 0 ? filteredChildren : renderGroups()
   }
 
-  function dismissTag(e: React.MouseEvent<ViewProps, MouseEvent>, id: string) {
+  function dismissTag(e: React.MouseEvent<ViewProps, MouseEvent>, id: string, label: string) {
     e.stopPropagation()
     e.preventDefault()
+    setAnnouncement(I18n.t('%{label} removed.', {label}))
     onChange(selectedOptionIds.filter(x => x !== id))
+    inputRef?.current?.focus()
   }
 
   function renderTags() {
@@ -247,7 +249,7 @@ function CanvasMultiSelect(props: Props) {
             text={tagText}
             title={I18n.t('Remove %{label}', {label: tagText})}
             margin="0 xxx-small"
-            onClick={(e: React.MouseEvent<ViewProps, MouseEvent>) => dismissTag(e, id)}
+            onClick={(e: React.MouseEvent<ViewProps, MouseEvent>) => dismissTag(e, id, tagText)}
           />
         )
       })
@@ -259,12 +261,16 @@ function CanvasMultiSelect(props: Props) {
     return customRenderBeforeInput ? customRenderBeforeInput(tags) : tags
   }
 
+  const memoizedChildprops = useMemo(() => {
+    return childProps.map(({label, ...props}) => props)
+  }, [childProps])
+
   useEffect(() => {
     if (inputValue !== '') {
       filterOptions(inputValue)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [childProps])
+  }, [JSON.stringify(memoizedChildprops)])
 
   function onInputChange(e: React.ChangeEvent<HTMLInputElement>) {
     const {value} = e.target

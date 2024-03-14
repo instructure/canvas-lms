@@ -963,22 +963,7 @@ describe UserMerge do
       end
     end
 
-    it "moves prefs over with old format" do
-      @shard1.activate do
-        @user2 = user_model
-        account = Account.create!
-        @shard_course = course_factory(account:)
-        @user2.preferences[:custom_colors] = { "course_#{@course.id}" => "#254284" }
-      end
-      course = course_factory
-      user1 = user_model
-      @user2.preferences[:custom_colors]["course_#{course.global_id}"] = "#346543"
-      @user2.save!
-      UserMerge.from(@user2).into(user1)
-      expect(user1.reload.preferences[:custom_colors].keys).to eq ["course_#{@shard_course.global_id}", "course_#{course.id}"]
-    end
-
-    it "moves prefs over with new format" do
+    it "moves prefs over" do
       @shard1.activate do
         @user2 = user_model
         account = Account.create!
@@ -994,22 +979,7 @@ describe UserMerge do
       )
     end
 
-    it "moves nicknames with old format" do
-      @shard1.activate do
-        @user2 = user_model
-        account = Account.create!
-        @shard_course = course_factory(account:)
-        @user2.preferences[:course_nicknames] = { @shard_course.id => "Marketing" }
-      end
-      course = course_factory
-      user1 = user_model
-      @user2.preferences[:course_nicknames][course.global_id] = "Math"
-      @user2.save!
-      UserMerge.from(@user2).into(user1)
-      expect(user1.reload.preferences[:course_nicknames].keys).to eq [@shard_course.global_id, course.id]
-    end
-
-    it "moves nicknames with new format" do
+    it "moves nicknames" do
       @shard1.activate do
         @user2 = user_model
         account = Account.create!

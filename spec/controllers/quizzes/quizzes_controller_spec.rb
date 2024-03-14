@@ -2181,13 +2181,11 @@ describe Quizzes::QuizzesController do
 
     context "notifications" do
       before :once do
-        @notification = Notification.create(name: "Assignment Due Date Changed")
+        @notification = Notification.create(name: "Assignment Due Date Changed", category: "TestImmediately")
 
         @section = @course.course_sections.create!
 
         communication_channel(@student, { username: "student@instructure.com", active_cc: true })
-        @student.email_channel.notification_policies.create!(notification: @notification,
-                                                             frequency: "immediately")
 
         course_quiz
         @quiz.generate_quiz_data

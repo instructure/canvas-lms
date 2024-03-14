@@ -26,11 +26,7 @@ RSpec.shared_context "InstAccess setup" do
   let(:encryption_pub_key) { encryption_keypair.public_key.to_s }
 
   around do |example|
-    InstAccess.with_config(
-      signing_key: signing_priv_key, encryption_key: encryption_pub_key
-    ) do
-      example.run
-    end
+    InstAccess.with_config(signing_key: signing_priv_key, encryption_key: encryption_pub_key, &example)
   end
 
   def decrypt_and_deserialize_token(token)

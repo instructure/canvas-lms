@@ -184,17 +184,11 @@ describe('ContextModulesHeader', () => {
       expect(getByText(defaultProps.moreMenu.menuTools.items[0].title)).toBeInTheDocument()
     })
 
-    it('"Tools menu" is not visible inside "More Menu"', () => {
+    it('"Export Course Content" is visible outside "More Menu"', () => {
       defaultProps.moreMenu.exportCourseContent.visible = true
       defaultProps.moreMenu.menuTools.visible = false
-      const {getByRole, getByText} = render(<ContextModulesHeader {...defaultProps} />)
-      const button = getByRole('button', {name: 'More'})
-
-      fireEvent.click(button)
-
-      expect(() => getByText(defaultProps.moreMenu.menuTools.items[0].title)).toThrow(
-        /Unable to find an element/
-      )
+      const {getByText} = render(<ContextModulesHeader {...defaultProps} />)
+      expect(getByText(defaultProps.moreMenu.exportCourseContent.label)).toBeInTheDocument()
     })
 
     it('"More Menu" is not visible', () => {

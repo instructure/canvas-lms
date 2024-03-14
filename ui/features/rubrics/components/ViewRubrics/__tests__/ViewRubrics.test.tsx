@@ -19,7 +19,7 @@
 import React from 'react'
 import Router from 'react-router'
 import {BrowserRouter} from 'react-router-dom'
-import {render} from '@testing-library/react'
+import {fireEvent, render} from '@testing-library/react'
 import {QueryProvider, queryClient} from '@canvas/query'
 import {ViewRubrics} from '../index'
 import {RUBRICS_QUERY_RESPONSE} from './fixtures'
@@ -52,25 +52,30 @@ describe('ViewRubrics Tests', () => {
       // total rubrics length per workflow state + header row
       expect(getByTestId('saved-rubrics-panel').querySelectorAll('tr').length).toEqual(3)
 
-      expect(getByTestId('rubric-title-1')).toHaveTextContent('Rubric 1')
-      expect(getByTestId('rubric-points-1')).toHaveTextContent('5')
-      expect(getByTestId('rubric-criterion-count-1')).toHaveTextContent('1')
+      expect(getByTestId('rubric-title-0')).toHaveTextContent('Rubric 1')
+      expect(getByTestId('rubric-points-0')).toHaveTextContent('5')
+      expect(getByTestId('rubric-criterion-count-0')).toHaveTextContent('1')
+      expect(getByTestId('rubric-locations-0')).toHaveTextContent('-')
+
+      expect(getByTestId('rubric-title-1')).toHaveTextContent('Rubric 3')
+      expect(getByTestId('rubric-points-1')).toHaveTextContent('15')
+      expect(getByTestId('rubric-criterion-count-1')).toHaveTextContent('3')
       expect(getByTestId('rubric-locations-1')).toHaveTextContent('-')
 
-      expect(getByTestId('rubric-title-3')).toHaveTextContent('Rubric 3')
-      expect(getByTestId('rubric-points-3')).toHaveTextContent('15')
-      expect(getByTestId('rubric-criterion-count-3')).toHaveTextContent('3')
-      expect(getByTestId('rubric-locations-3')).toHaveTextContent('-')
+      expect(getByTestId('rubric-title-1')).toHaveTextContent('Rubric 3')
+      expect(getByTestId('rubric-points-1')).toHaveTextContent('15')
+      expect(getByTestId('rubric-criterion-count-1')).toHaveTextContent('3')
+      expect(getByTestId('rubric-locations-1')).toHaveTextContent('-')
 
       const archivedRubricsTab = getByText('Archived')
       archivedRubricsTab.click()
 
       expect(getByTestId('archived-rubrics-table').querySelectorAll('tr').length).toEqual(2)
 
-      expect(getByTestId('rubric-title-2')).toHaveTextContent('Rubric 2')
-      expect(getByTestId('rubric-points-2')).toHaveTextContent('10')
-      expect(getByTestId('rubric-criterion-count-2')).toHaveTextContent('2')
-      expect(getByTestId('rubric-locations-2')).toHaveTextContent('-')
+      expect(getByTestId('rubric-title-0')).toHaveTextContent('Rubric 2')
+      expect(getByTestId('rubric-points-0')).toHaveTextContent('10')
+      expect(getByTestId('rubric-criterion-count-0')).toHaveTextContent('2')
+      expect(getByTestId('rubric-locations-0')).toHaveTextContent('-')
     })
 
     it('renders a popover menu with access to the rubric edit modal', () => {
@@ -111,6 +116,97 @@ describe('ViewRubrics Tests', () => {
       deleteButton.click()
 
       expect(getByTestId('delete-rubric-modal')).toBeInTheDocument()
+    })
+
+    it('disables the delete option in the popover menu if the rubric has rubric associations active', () => {
+      queryClient.setQueryData(['accountRubrics-1'], RUBRICS_QUERY_RESPONSE)
+      const {getByTestId} = renderComponent()
+
+      getByTestId('rubric-options-1-button').click()
+      expect(getByTestId('delete-rubric-button')).not.toHaveAttribute('aria-disabled')
+      getByTestId('rubric-options-1-button').click()
+
+      getByTestId('rubric-options-3-button').click()
+      expect(getByTestId('delete-rubric-button')).toHaveAttribute('aria-disabled', 'true')
+    })
+
+    describe('sorting', () => {
+      it('sorts rubrics by Rubric Name in ascending order', () => {
+        queryClient.setQueryData(['accountRubrics-1'], RUBRICS_QUERY_RESPONSE)
+        const {getByTestId, getByText} = renderComponent()
+
+        const rubricNameHeader = getByText('Rubric Name')
+        fireEvent.click(rubricNameHeader)
+
+        const sortedRubricNames = ['Rubric 1', 'Rubric 3']
+        expect(getByTestId('rubric-title-0')).toHaveTextContent(sortedRubricNames[0])
+        expect(getByTestId('rubric-title-1')).toHaveTextContent(sortedRubricNames[1])
+      })
+
+      it('sorts rubrics by Rubric Name in descending order', () => {
+        queryClient.setQueryData(['accountRubrics-1'], RUBRICS_QUERY_RESPONSE)
+        const {getByTestId, getByText} = renderComponent()
+
+        const rubricNameHeader = getByText('Rubric Name')
+        fireEvent.click(rubricNameHeader)
+        fireEvent.click(rubricNameHeader)
+        fireEvent.click(rubricNameHeader)
+
+        const sortedRubricNames = ['Rubric 3', 'Rubric 1']
+        expect(getByTestId('rubric-title-0')).toHaveTextContent(sortedRubricNames[1])
+        expect(getByTestId('rubric-title-1')).toHaveTextContent(sortedRubricNames[0])
+      })
+
+      it('sorts rubrics by Total Points in ascending order', () => {
+        queryClient.setQueryData(['accountRubrics-1'], RUBRICS_QUERY_RESPONSE)
+        const {getByTestId, getByText} = renderComponent()
+
+        const totalPointsHeader = getByText('Total Points')
+        fireEvent.click(totalPointsHeader)
+
+        const sortedTotalPoints = ['5', '15']
+        expect(getByTestId('rubric-points-0')).toHaveTextContent(sortedTotalPoints[0])
+        expect(getByTestId('rubric-points-1')).toHaveTextContent(sortedTotalPoints[1])
+      })
+
+      it('sorts rubrics by Total Points in descending order', () => {
+        queryClient.setQueryData(['accountRubrics-1'], RUBRICS_QUERY_RESPONSE)
+        const {getByTestId, getByText} = renderComponent()
+
+        const totalPointsHeader = getByText('Total Points')
+        fireEvent.click(totalPointsHeader)
+        fireEvent.click(totalPointsHeader)
+
+        const sortedTotalPoints = ['15', '5']
+        expect(getByTestId('rubric-points-0')).toHaveTextContent(sortedTotalPoints[0])
+        expect(getByTestId('rubric-points-1')).toHaveTextContent(sortedTotalPoints[1])
+      })
+
+      it('sorts rubrics by Criterion count in ascending order', () => {
+        queryClient.setQueryData(['accountRubrics-1'], RUBRICS_QUERY_RESPONSE)
+        const {getByTestId, getByText} = renderComponent()
+
+        const criterionHeader = getByText('Criterion')
+        fireEvent.click(criterionHeader)
+
+        const sortedCriterion = ['1', '3']
+        expect(getByTestId('rubric-criterion-count-0')).toHaveTextContent(sortedCriterion[0])
+        expect(getByTestId('rubric-criterion-count-1')).toHaveTextContent(sortedCriterion[1])
+      })
+
+      it('sorts rubrics by Criterion count in descending order', () => {
+        queryClient.setQueryData(['accountRubrics-1'], RUBRICS_QUERY_RESPONSE)
+        const {getByTestId, getByText} = renderComponent()
+
+        const criterionHeader = getByText('Criterion')
+        fireEvent.click(criterionHeader)
+        fireEvent.click(criterionHeader)
+        fireEvent.click(criterionHeader)
+
+        const sortedCriterion = ['3', '1']
+        expect(getByTestId('rubric-criterion-count-0')).toHaveTextContent(sortedCriterion[1])
+        expect(getByTestId('rubric-criterion-count-1')).toHaveTextContent(sortedCriterion[0])
+      })
     })
   })
 
@@ -123,27 +219,32 @@ describe('ViewRubrics Tests', () => {
       const {getByTestId, getByText} = renderComponent()
 
       // total rubrics length per workflow state + header row
-      expect(getByTestId('saved-rubrics-table').querySelectorAll('tr').length).toEqual(3)
+      expect(getByTestId('saved-rubrics-panel').querySelectorAll('tr').length).toEqual(3)
 
-      expect(getByTestId('rubric-title-1')).toHaveTextContent('Rubric 1')
-      expect(getByTestId('rubric-points-1')).toHaveTextContent('5')
-      expect(getByTestId('rubric-criterion-count-1')).toHaveTextContent('1')
+      expect(getByTestId('rubric-title-0')).toHaveTextContent('Rubric 1')
+      expect(getByTestId('rubric-points-0')).toHaveTextContent('5')
+      expect(getByTestId('rubric-criterion-count-0')).toHaveTextContent('1')
+      expect(getByTestId('rubric-locations-0')).toHaveTextContent('-')
+
+      expect(getByTestId('rubric-title-1')).toHaveTextContent('Rubric 3')
+      expect(getByTestId('rubric-points-1')).toHaveTextContent('15')
+      expect(getByTestId('rubric-criterion-count-1')).toHaveTextContent('3')
       expect(getByTestId('rubric-locations-1')).toHaveTextContent('-')
 
-      expect(getByTestId('rubric-title-3')).toHaveTextContent('Rubric 3')
-      expect(getByTestId('rubric-points-3')).toHaveTextContent('15')
-      expect(getByTestId('rubric-criterion-count-3')).toHaveTextContent('3')
-      expect(getByTestId('rubric-locations-3')).toHaveTextContent('-')
+      expect(getByTestId('rubric-title-1')).toHaveTextContent('Rubric 3')
+      expect(getByTestId('rubric-points-1')).toHaveTextContent('15')
+      expect(getByTestId('rubric-criterion-count-1')).toHaveTextContent('3')
+      expect(getByTestId('rubric-locations-1')).toHaveTextContent('-')
 
       const archivedRubricsTab = getByText('Archived')
       archivedRubricsTab.click()
 
       expect(getByTestId('archived-rubrics-table').querySelectorAll('tr').length).toEqual(2)
 
-      expect(getByTestId('rubric-title-2')).toHaveTextContent('Rubric 2')
-      expect(getByTestId('rubric-points-2')).toHaveTextContent('10')
-      expect(getByTestId('rubric-criterion-count-2')).toHaveTextContent('2')
-      expect(getByTestId('rubric-locations-2')).toHaveTextContent('-')
+      expect(getByTestId('rubric-title-0')).toHaveTextContent('Rubric 2')
+      expect(getByTestId('rubric-points-0')).toHaveTextContent('10')
+      expect(getByTestId('rubric-criterion-count-0')).toHaveTextContent('2')
+      expect(getByTestId('rubric-locations-0')).toHaveTextContent('-')
     })
 
     it('renders a popover menu with access to the rubric edit modal', () => {
@@ -184,6 +285,97 @@ describe('ViewRubrics Tests', () => {
       deleteButton.click()
 
       expect(getByTestId('delete-rubric-modal')).toBeInTheDocument()
+    })
+
+    it('disables the delete option in the popover menu if the rubric has rubric associations active', () => {
+      queryClient.setQueryData(['courseRubrics-1'], RUBRICS_QUERY_RESPONSE)
+      const {getByTestId} = renderComponent()
+
+      getByTestId('rubric-options-1-button').click()
+      expect(getByTestId('delete-rubric-button')).not.toHaveAttribute('aria-disabled')
+      getByTestId('rubric-options-1-button').click()
+
+      getByTestId('rubric-options-3-button').click()
+      expect(getByTestId('delete-rubric-button')).toHaveAttribute('aria-disabled', 'true')
+    })
+
+    describe('sorting', () => {
+      it('sorts rubrics by Rubric Name in ascending order', () => {
+        queryClient.setQueryData(['courseRubrics-1'], RUBRICS_QUERY_RESPONSE)
+        const {getByTestId, getByText} = renderComponent()
+
+        const rubricNameHeader = getByText('Rubric Name')
+        fireEvent.click(rubricNameHeader)
+
+        const sortedRubricNames = ['Rubric 1', 'Rubric 3']
+        expect(getByTestId('rubric-title-0')).toHaveTextContent(sortedRubricNames[0])
+        expect(getByTestId('rubric-title-1')).toHaveTextContent(sortedRubricNames[1])
+      })
+
+      it('sorts rubrics by Rubric Name in descending order', () => {
+        queryClient.setQueryData(['courseRubrics-1'], RUBRICS_QUERY_RESPONSE)
+        const {getByTestId, getByText} = renderComponent()
+
+        const rubricNameHeader = getByText('Rubric Name')
+        fireEvent.click(rubricNameHeader)
+        fireEvent.click(rubricNameHeader)
+        fireEvent.click(rubricNameHeader)
+
+        const sortedRubricNames = ['Rubric 3', 'Rubric 1']
+        expect(getByTestId('rubric-title-0')).toHaveTextContent(sortedRubricNames[1])
+        expect(getByTestId('rubric-title-1')).toHaveTextContent(sortedRubricNames[0])
+      })
+
+      it('sorts rubrics by Total Points in ascending order', () => {
+        queryClient.setQueryData(['courseRubrics-1'], RUBRICS_QUERY_RESPONSE)
+        const {getByTestId, getByText} = renderComponent()
+
+        const totalPointsHeader = getByText('Total Points')
+        fireEvent.click(totalPointsHeader)
+
+        const sortedTotalPoints = ['5', '15']
+        expect(getByTestId('rubric-points-0')).toHaveTextContent(sortedTotalPoints[0])
+        expect(getByTestId('rubric-points-1')).toHaveTextContent(sortedTotalPoints[1])
+      })
+
+      it('sorts rubrics by Total Points in descending order', () => {
+        queryClient.setQueryData(['courseRubrics-1'], RUBRICS_QUERY_RESPONSE)
+        const {getByTestId, getByText} = renderComponent()
+
+        const totalPointsHeader = getByText('Total Points')
+        fireEvent.click(totalPointsHeader)
+        fireEvent.click(totalPointsHeader)
+
+        const sortedTotalPoints = ['15', '5']
+        expect(getByTestId('rubric-points-0')).toHaveTextContent(sortedTotalPoints[0])
+        expect(getByTestId('rubric-points-1')).toHaveTextContent(sortedTotalPoints[1])
+      })
+
+      it('sorts rubrics by Criterion count in ascending order', () => {
+        queryClient.setQueryData(['courseRubrics-1'], RUBRICS_QUERY_RESPONSE)
+        const {getByTestId, getByText} = renderComponent()
+
+        const criterionHeader = getByText('Criterion')
+        fireEvent.click(criterionHeader)
+
+        const sortedCriterion = ['1', '3']
+        expect(getByTestId('rubric-criterion-count-0')).toHaveTextContent(sortedCriterion[0])
+        expect(getByTestId('rubric-criterion-count-1')).toHaveTextContent(sortedCriterion[1])
+      })
+
+      it('sorts rubrics by Criterion count in descending order', () => {
+        queryClient.setQueryData(['courseRubrics-1'], RUBRICS_QUERY_RESPONSE)
+        const {getByTestId, getByText} = renderComponent()
+
+        const criterionHeader = getByText('Criterion')
+        fireEvent.click(criterionHeader)
+        fireEvent.click(criterionHeader)
+        fireEvent.click(criterionHeader)
+
+        const sortedCriterion = ['3', '1']
+        expect(getByTestId('rubric-criterion-count-0')).toHaveTextContent(sortedCriterion[1])
+        expect(getByTestId('rubric-criterion-count-1')).toHaveTextContent(sortedCriterion[0])
+      })
     })
   })
 })

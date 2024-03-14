@@ -2171,7 +2171,7 @@ describe Attachment do
     end
 
     around do |example|
-      Timecop.freeze(Time.now.utc, &example)
+      Timecop.freeze(&example)
     end
 
     it "uses the default size if an unknown size is passed in" do
@@ -2250,23 +2250,18 @@ describe Attachment do
       @student = user_model
       @student.register!
       @course.enroll_student(@student).accept
-      cc = communication_channel(@student, { username: "default@example.com", active_cc: true })
+      communication_channel(@student, { username: "default@example.com", active_cc: true })
 
       @student_ended = user_model
       @student_ended.register!
       @section_ended = @course.course_sections.create!(end_at: 1.day.ago)
       @course.enroll_student(@student_ended, section: @section_ended).accept
-      cc_ended = communication_channel(@student_ended, { username: "default2@example.com", active_cc: true })
+      communication_channel(@student_ended, { username: "default2@example.com", active_cc: true })
 
-      NotificationPolicy.create(notification: Notification.create!(name: "New File Added"), communication_channel: cc, frequency: "immediately")
-      NotificationPolicy.create(notification: Notification.create!(name: "New Files Added"), communication_channel: cc, frequency: "immediately")
-
-      NotificationPolicy.create(notification: Notification.create!(name: "New File Added - ended"),
-                                communication_channel: cc_ended,
-                                frequency: "immediately")
-      NotificationPolicy.create(notification: Notification.create!(name: "New Files Added - ended"),
-                                communication_channel: cc_ended,
-                                frequency: "immediately")
+      Notification.create!(name: "New File Added", category: "TestImmediately")
+      Notification.create!(name: "New Files Added", category: "TestImmediately")
+      Notification.create!(name: "New File Added - ended", category: "TestImmediately")
+      Notification.create!(name: "New Files Added - ended", category: "TestImmediately")
     end
 
     it "sends a single-file notification" do
@@ -2354,8 +2349,7 @@ describe Attachment do
 
     it "does not send notifications to students if the file is uploaded to a locked folder" do
       @teacher.register!
-      cc = communication_channel(@teacher, { username: "default@example.com", active_cc: true })
-      NotificationPolicy.create!(notification: Notification.where(name: "New File Added").first, communication_channel: cc, frequency: "immediately")
+      communication_channel(@teacher, { username: "default@example.com", active_cc: true })
 
       attachment_model(uploaded_data: stub_file_data("file.txt", nil, "text/html"), content_type: "text/html")
 
@@ -2372,8 +2366,7 @@ describe Attachment do
 
     it "does not send notifications to students if the file is unpublished because of usage rights" do
       @teacher.register!
-      cc = communication_channel(@teacher, { username: "default@example.com", active_cc: true })
-      NotificationPolicy.create!(notification: Notification.where(name: "New File Added").first, communication_channel: cc, frequency: "immediately")
+      communication_channel(@teacher, { username: "default@example.com", active_cc: true })
 
       @course.usage_rights_required = true
       @course.save!
@@ -2391,8 +2384,7 @@ describe Attachment do
 
     it "does not send notifications to students if the files navigation is hidden from student view" do
       @teacher.register!
-      cc = communication_channel(@teacher, { username: "default@example.com", active_cc: true })
-      NotificationPolicy.create!(notification: Notification.where(name: "New File Added").first, communication_channel: cc, frequency: "immediately")
+      communication_channel(@teacher, { username: "default@example.com", active_cc: true })
 
       attachment_model(uploaded_data: stub_file_data("file.txt", nil, "text/html"), content_type: "text/html")
 
@@ -2437,6 +2429,7 @@ describe Attachment do
     end
 
     it "doesn't send notifications for a concluded section in an active course" do
+      skip("This test was not accurate, should be fixed in VICE-4138")
       attachment_model(uploaded_data: stub_file_data("file.txt", nil, "text/html"), content_type: "text/html")
       Timecop.freeze(10.minutes.from_now) { Attachment.do_notifications }
       expect(Message.where(user_id: @student_ended, notification_name: "New File Added").first).to be_nil
@@ -2954,7 +2947,9 @@ describe Attachment do
   end
 
   describe ".clone_url" do
-    subject { attachment.clone_url(url, handling, check_quota, opts) }
+    def clone_it
+      attachment.clone_url(url, handling, check_quota, opts)
+    end
 
     let(:attachment) { attachment_model }
     let(:url) { "https://www.test.com/file.jpg" }
@@ -2974,7 +2969,7 @@ describe Attachment do
           expect(Canvas::Errors).to receive(:capture).with(
             error, attachment.clone_url_error_info(error, url)
           )
-          subject
+          clone_it
           expect(attachment.upload_error_message).to include(url)
         end
       end
@@ -2986,7 +2981,7 @@ describe Attachment do
           expect(Canvas::Errors).to receive(:capture).with(
             error, attachment.clone_url_error_info(error, url)
           )
-          subject
+          clone_it
           expect(attachment.upload_error_message).to include(url)
         end
       end

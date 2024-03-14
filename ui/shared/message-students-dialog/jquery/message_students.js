@@ -38,6 +38,64 @@ function checkSendable() {
   )
 }
 
+function disableButtons(disabled, buttons) {
+  if (buttons == null) {
+    buttons = messageStudentsDialog().find('button')
+  }
+  buttons.toggleClass('disabled', disabled).attr('aria-disabled', disabled)
+}
+
+function disableSend(disabled) {
+  disableButtons(disabled, messageStudentsDialog().find('.send_button'))
+}
+
+function messageStudentsDialog() {
+  return $('#message_students_dialog')
+}
+
+function showStudentsMessageSentTo() {
+  const $message_students_dialog = messageStudentsDialog()
+  const optionIdx = parseInt($message_students_dialog.find('select').val(), 10) || 0
+  const option = currentSettings.options[optionIdx]
+  const studentsHash = $message_students_dialog.data('students_hash')
+  let cutoff = numberHelper.parse($message_students_dialog.find('.cutoff_score').val())
+  if (Number.isNaN(Number(cutoff))) {
+    cutoff = null
+  }
+
+  const studentElements = Object.values(studentsHash)
+  let selectedStudentIds = []
+  if (studentsHash) {
+    if (option && option.callback) {
+      selectedStudentIds = option.callback.call(window.messageStudents, cutoff, studentElements)
+    } else if (currentSettings.callback) {
+      selectedStudentIds = currentSettings.callback.call(
+        window.messageStudents,
+        option.text,
+        cutoff,
+        studentElements
+      )
+    }
+  }
+
+  if (currentSettings.subjectCallback) {
+    $message_students_dialog
+      .find('[name=subject]')
+      .val(currentSettings.subjectCallback(option.text, cutoff))
+  }
+  $message_students_dialog.find('.cutoff_holder').showIf(option.cutoff)
+
+  $message_students_dialog
+    .find('.student_list')
+    .toggleClass('show_score', !!(option.cutoff || option.score))
+  disableButtons(selectedStudentIds.length === 0)
+
+  const selectedIdSet = new Set(selectedStudentIds)
+  Object.entries(studentsHash).forEach(([studentId, studentElement]) => {
+    studentElement.showIf(selectedIdSet.has(studentId))
+  })
+}
+
 /* global messageStudents */
 window.messageStudents = function (settings) {
   const $message_students_dialog = messageStudentsDialog()
@@ -109,7 +167,7 @@ window.messageStudents = function (settings) {
 
   $message_students_dialog.find('textarea').val('')
   $message_students_dialog.find('select')[0].selectedIndex = 0
-  $message_students_dialog.find('select').change()
+  $message_students_dialog.find('select').trigger('change')
   $message_students_dialog
     .dialog({
       width: 600,
@@ -128,6 +186,8 @@ window.messageStudents = function (settings) {
     .dialog('open')
     .dialog('option', 'title', dialogTitle)
     .on('dialogclose', settings.onClose)
+
+  showStudentsMessageSentTo()
 }
 
 $(document).ready(() => {
@@ -169,48 +229,6 @@ $(document).ready(() => {
     },
   })
 
-  const showStudentsMessageSentTo = function () {
-    const optionIdx = parseInt($message_students_dialog.find('select').val(), 10) || 0
-    const option = currentSettings.options[optionIdx]
-    const studentsHash = $message_students_dialog.data('students_hash')
-    let cutoff = numberHelper.parse($message_students_dialog.find('.cutoff_score').val())
-    if (Number.isNaN(Number(cutoff))) {
-      cutoff = null
-    }
-
-    const studentElements = Object.values(studentsHash)
-    let selectedStudentIds = []
-    if (studentsHash) {
-      if (option && option.callback) {
-        selectedStudentIds = option.callback.call(window.messageStudents, cutoff, studentElements)
-      } else if (currentSettings.callback) {
-        selectedStudentIds = currentSettings.callback.call(
-          window.messageStudents,
-          option.text,
-          cutoff,
-          studentElements
-        )
-      }
-    }
-
-    if (currentSettings.subjectCallback) {
-      $message_students_dialog
-        .find('[name=subject]')
-        .val(currentSettings.subjectCallback(option.text, cutoff))
-    }
-    $message_students_dialog.find('.cutoff_holder').showIf(option.cutoff)
-
-    $message_students_dialog
-      .find('.student_list')
-      .toggleClass('show_score', !!(option.cutoff || option.score))
-    disableButtons(selectedStudentIds.length === 0)
-
-    const selectedIdSet = new Set(selectedStudentIds)
-    Object.entries(studentsHash).forEach(([studentId, studentElement]) => {
-      studentElement.showIf(selectedIdSet.has(studentId))
-    })
-  }
-
   const closeDialog = function () {
     $message_students_dialog.dialog('close')
   }
@@ -223,20 +241,5 @@ $(document).ready(() => {
     .bind('change blur keyup', checkSendable)
   $message_students_dialog.find('#body').bind('change blur keyup', checkSendable)
 })
-
-function disableButtons(disabled, buttons) {
-  if (buttons == null) {
-    buttons = messageStudentsDialog().find('button')
-  }
-  buttons.toggleClass('disabled', disabled).attr('aria-disabled', disabled)
-}
-
-function disableSend(disabled) {
-  disableButtons(disabled, messageStudentsDialog().find('.send_button'))
-}
-
-function messageStudentsDialog() {
-  return $('#message_students_dialog')
-}
 
 export default messageStudents

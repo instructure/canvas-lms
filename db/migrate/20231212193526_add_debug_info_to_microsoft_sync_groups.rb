@@ -21,6 +21,6 @@ class AddDebugInfoToMicrosoftSyncGroups < ActiveRecord::Migration[7.0]
   tag :predeploy
 
   def change
-    add_column :microsoft_sync_groups, :debug_info, :text, default: nil, null: true, if_not_exists: true
+    add_column :microsoft_sync_groups, :debug_info, :text, if_not_exists: true
   end
 end

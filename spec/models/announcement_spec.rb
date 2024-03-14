@@ -197,14 +197,10 @@ describe Announcement do
       course_with_observer(course: @course, active_all: true)
 
       notification_name = "New Announcement"
-      n = Notification.create(name: notification_name, category: "TestImmediately")
-      n2 = Notification.create(name: "Announcement Created By You", category: "TestImmediately")
+      Notification.create(name: notification_name, category: "TestImmediately")
+      Notification.create(name: "Announcement Created By You", category: "TestImmediately")
 
-      channel = communication_channel(@teacher, { username: "test_channel_email_#{@teacher.id}@test.com", active_cc: true })
-
-      NotificationPolicy.create(notification: n, communication_channel: @student.communication_channel, frequency: "immediately")
-      NotificationPolicy.create(notification: n, communication_channel: @observer.communication_channel, frequency: "immediately")
-      NotificationPolicy.create(notification: n2, communication_channel: channel, frequency: "immediately")
+      communication_channel(@teacher, { username: "test_channel_email_#{@teacher.id}@test.com", active_cc: true })
 
       @context = @course
       announcement_model(user: @teacher)

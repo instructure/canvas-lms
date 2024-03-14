@@ -25,21 +25,6 @@ require "crocodoc"
 class Attachment < ActiveRecord::Base
   class UniqueRenameFailure < StandardError; end
 
-  self.ignored_columns += %i[last_lock_at
-                             last_unlock_at
-                             enrollment_id
-                             cached_s3_url
-                             s3_url_cached_at
-                             scribd_account_id
-                             scribd_user
-                             scribd_mime_type_id
-                             submitted_to_scribd_at
-                             scribd_doc
-                             scribd_attempts
-                             cached_scribd_thumbnail
-                             last_inline_view
-                             local_filename]
-
   def self.display_name_order_by_clause(table = nil)
     col = table ? "#{table}.display_name" : "display_name"
     best_unicode_collation_key(col)
@@ -83,6 +68,7 @@ class Attachment < ActiveRecord::Base
   include ContextModuleItem
   include SearchTermHelper
   include MasterCourses::Restrictor
+  include DatesOverridable
   restrict_columns :content, %i[display_name uploaded_data media_track_content]
   restrict_columns :settings, %i[folder_id locked lock_at unlock_at usage_rights_id]
   restrict_columns :state, [:locked, :file_state]
@@ -138,8 +124,6 @@ class Attachment < ActiveRecord::Base
   has_many :canvadocs_annotation_contexts, inverse_of: :attachment
   has_many :discussion_entry_drafts, inverse_of: :attachment
   has_one :master_content_tag, class_name: "MasterCourses::MasterContentTag", inverse_of: :attachment
-  has_many :assignment_overrides, dependent: :destroy, inverse_of: :attachment
-  has_many :assignment_override_students, dependent: :destroy
 
   before_save :set_root_account_id
   before_save :infer_display_name
@@ -370,7 +354,7 @@ class Attachment < ActiveRecord::Base
           ) AS media_tracks_all
         SQL
       :media_tracks
-    ).where(row: 1)
+    ).select(MediaTrack.all.arel.projections, "for_att_id", "inherited").where(row: 1)
   end
 
   # this is here becase attachment_fu looks to make sure that parent_id is nil before it will create a thumbnail of something.

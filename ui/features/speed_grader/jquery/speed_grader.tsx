@@ -995,7 +995,7 @@ function initRubricStuff() {
     EG.toggleFullRubric()
   })
 
-  selectors.get('#rubric_assessments_select').change(() => {
+  $('#rubric_assessments_select').on('change', () => {
     handleSelectedRubricAssessmentChanged()
   })
 
@@ -2968,7 +2968,7 @@ EG = {
       selectMenu.find('option').remove()
       selectMenuOptions.forEach(option => {
         selectMenu.append(
-          `<option value="${htmlEscape(option.id)}">${htmlEscape(option.name)}</option>`
+          `<option value="${htmlEscape(option.id)}">${htmlEscape(option?.name || '')}</option>`
         )
       })
 

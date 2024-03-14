@@ -79,16 +79,13 @@ module CanvasRails
 
     log_config = Rails.root.join("config/logging.yml").file? && Rails.application.config_for(:logging).with_indifferent_access
     log_config = { "logger" => "rails", "log_level" => "debug" }.merge(log_config || {})
-    opts = {}
-    require "canvas_logger"
 
     config.log_level = log_config["log_level"]
-    log_level = ActiveSupport::Logger.const_get(config.log_level.to_s.upcase)
-    opts[:skip_thread_context] = true if log_config["log_context"] == false
+    log_level = Logger.const_get(config.log_level.to_s.upcase)
 
     case log_config["logger"]
     when "syslog"
-      require "syslog_wrapper"
+      require "syslog/logger"
       log_config["app_ident"] ||= "canvas-lms"
       log_config["daemon_ident"] ||= "canvas-lms-daemon"
       facilities = 0
@@ -96,17 +93,43 @@ module CanvasRails
         facilities |= Syslog.const_get :"LOG_#{facility.to_s.upcase}"
       end
       ident = (ENV["RUNNING_AS_DAEMON"] == "true") ? log_config["daemon_ident"] : log_config["app_ident"]
-      opts[:include_pid] = true if log_config["include_pid"] == true
-      config.logger = SyslogWrapper.new(ident, facilities, opts)
-      config.logger.level = log_level
+
+      config.logger = Syslog::Logger.new(ident, facilities)
+
+      syslog_options = (log_config["include_pid"] == true) ? Syslog::LOG_PID : 0
+      if (Syslog.instance.options & Syslog::LOG_PID) != syslog_options
+        config.logger.syslog = Syslog.reopen(Syslog.instance.ident,
+                                             (Syslog.instance.options & ~Syslog::LOG_PID) | syslog_options,
+                                             Syslog.instance.facility)
+      end
     else
+      require "canvas_logger"
       log_path = config.paths["log"].first
 
       if ENV["RUNNING_AS_DAEMON"] == "true"
         log_path = Rails.root.join("log/delayed_job.log")
       end
 
-      config.logger = CanvasLogger.new(log_path, log_level, opts)
+      FileUtils.mkdir_p(File.dirname(log_path))
+      config.logger = CanvasLogger.new(log_path, log_level)
+    end
+    config.logger.level = log_level
+    unless log_config["log_context"] == false
+      class ContextFormatter < Logger::Formatter
+        def initialize(parent_formatter)
+          super()
+
+          @parent_formatter = parent_formatter
+        end
+
+        def call(severity, time, progname, msg)
+          msg = @parent_formatter.call(severity, time, progname, msg)
+          context = Thread.current[:context] || {}
+          "[#{context[:session_id] || "-"} #{context[:request_id] || "-"}] #{msg}"
+        end
+      end
+
+      config.logger.formatter = ContextFormatter.new(config.logger.formatter)
     end
 
     # Activate observers that should always be running
@@ -162,7 +185,7 @@ module CanvasRails
 
             begin
               return super(conn_params)
-            rescue ::ActiveRecord::ConnectionNotEstablished => e
+            rescue ::ActiveRecord::ActiveRecordError => e
               # If exception occurs using parameters from a predefined pg service, retry without
               if conn_params.key?(:service)
                 CanvasErrors.capture(e, { tags: { pg_service: conn_params[:service] } }, :warn)
@@ -391,10 +414,10 @@ module CanvasRails
         # needs the rails app for anything.
 
         # Do it early with the wrong cache for things super early in boot
-        DynamicSettingsInitializer.bootstrap!
+        reloader = DynamicSettingsInitializer.bootstrap!
         # Do it at the end when the autoloader is set up correctly
         config.to_prepare do
-          DynamicSettingsInitializer.bootstrap!
+          reloader.call
         end
       end
     end

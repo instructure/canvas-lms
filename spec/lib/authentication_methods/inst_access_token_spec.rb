@@ -26,9 +26,7 @@ describe AuthenticationMethods::InstAccessToken do
   let(:encryption_pub_key) { encryption_keypair.public_key.to_s }
 
   around do |example|
-    InstAccess.with_config(signing_key: signing_priv_key) do
-      example.run
-    end
+    InstAccess.with_config(signing_key: signing_priv_key, &example)
   end
 
   describe ".parse" do

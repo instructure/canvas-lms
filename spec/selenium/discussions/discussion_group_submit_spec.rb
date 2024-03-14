@@ -90,8 +90,8 @@ describe "discussion assignments" do
       it "creates an ungraded group discussion in a course context" do
         get "/courses/#{@course.id}/discussion_topics/new"
         f("input[placeholder='Topic Title']").send_keys "Ungraded Group Discussion"
-        force_click("input[data-testid='group-discussion-checkbox']")
-        force_click("input[placeholder='Select a group category']")
+        force_click_native("input[data-testid='group-discussion-checkbox']")
+        force_click_native("input[placeholder='Select a group category']")
         fj("li:contains('category 1')").click
         f("button[data-testid='save-button']").click
         dt = DiscussionTopic.last
@@ -103,12 +103,12 @@ describe "discussion assignments" do
       it "creates a graded group discussion in a course context" do
         get "/courses/#{@course.id}/discussion_topics/new"
         f("input[placeholder='Topic Title']").send_keys "Graded Group Discussion"
-        force_click("input[data-testid='group-discussion-checkbox']")
-        force_click("input[placeholder='Select a group category']")
+        force_click_native("input[data-testid='group-discussion-checkbox']")
+        force_click_native("input[placeholder='Select a group category']")
         fj("li:contains('category 1')").click
         force_click("label:contains('Graded')")
         f("input[data-testid='points-possible-input']").send_keys 10
-        force_click("input[title='Points']")
+        force_click_native("input[title='Points']")
         fj("li:contains('Percentage')").click
         f("button[data-testid='save-button']").click
         expect(Assignment.count).to eq 1

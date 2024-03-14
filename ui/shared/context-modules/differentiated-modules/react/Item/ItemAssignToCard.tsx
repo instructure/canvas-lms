@@ -27,6 +27,7 @@ import moment from 'moment'
 import AssigneeSelector, {type AssigneeOption} from '../AssigneeSelector'
 import type {FormMessage} from '@instructure/ui-form-field'
 import ContextModuleLink from './ContextModuleLink'
+import {DateLockTypes} from './types'
 
 const I18n = useI18nScope('differentiated_modules')
 
@@ -72,6 +73,8 @@ export type ItemAssignToCardProps = {
   customSetSearchTerm?: (term: string) => void
   highlightCard?: boolean
   focus?: boolean
+  blueprintDateLocks?: DateLockTypes[]
+  shouldFocusDeleteButton?: boolean
 }
 
 function setTimeToStringDate(time: string, date: string | undefined): string | undefined {
@@ -133,6 +136,8 @@ export default function ItemAssignToCard({
   customSetSearchTerm,
   highlightCard,
   focus,
+  blueprintDateLocks,
+  shouldFocusDeleteButton,
 }: ItemAssignToCardProps) {
   const [dueDate, setDueDate] = useState<string | null>(due_at)
   const [availableFromDate, setAvailableFromDate] = useState<string | null>(unlock_at)
@@ -140,6 +145,7 @@ export default function ItemAssignToCard({
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({})
   const [unparsedFieldKeys, setUnparsedFieldKeys] = useState<Set<string>>(new Set())
   const [error, setError] = useState<FormMessage[]>([])
+  const deleteCardButtonRef = useRef<Element | null>(null)
 
   const assigneeSelectorRef = useRef<HTMLInputElement | null>(null)
   const dateInputRefs = useRef<Record<string, HTMLInputElement | null>>({})
@@ -223,6 +229,14 @@ export default function ItemAssignToCard({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedAssigneeIds.length])
 
+  useEffect(() => {
+    if (shouldFocusDeleteButton && deleteCardButtonRef?.current instanceof HTMLButtonElement) {
+      deleteCardButtonRef.current.focus()
+    }
+    // we only want to focus the delete button on the initial render
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   const handleSelect = (newSelectedAssignees: AssigneeOption[]) => {
     const deletedAssigneeIds = selectedAssigneeIds.filter(
       assigneeId => newSelectedAssignees.find(({id}) => id === assigneeId) === undefined
@@ -291,6 +305,7 @@ export default function ItemAssignToCard({
   const dateTimeInputs: DateTimeInput[] = [
     {
       key: 'due_at',
+      disabledByBPLock: blueprintDateLocks && blueprintDateLocks.includes('due_dates'),
       description: I18n.t('Choose a due date and time'),
       dateRenderLabel: I18n.t('Due Date'),
       value: dueDate,
@@ -304,6 +319,7 @@ export default function ItemAssignToCard({
     },
     {
       key: 'unlock_at',
+      disabledByBPLock: blueprintDateLocks && blueprintDateLocks.includes('availability_dates'),
       description: I18n.t('Choose an available from date and time'),
       dateRenderLabel: I18n.t('Available from'),
       value: availableFromDate,
@@ -317,6 +333,7 @@ export default function ItemAssignToCard({
     },
     {
       key: 'lock_at',
+      disabledByBPLock: blueprintDateLocks && blueprintDateLocks.includes('availability_dates'),
       description: I18n.t('Choose an available to date and time'),
       dateRenderLabel: I18n.t('Until'),
       value: availableToDate,
@@ -332,12 +349,16 @@ export default function ItemAssignToCard({
 
   const wrapperProps = highlightCard
     ? {
-        borderWidth: 'none none none large',
+        borderWidth: 'none none none large' as const,
         'data-testid': 'highlighted_card',
-        borderColor: 'brand',
-        borderRadius: 'medium',
+        borderColor: 'brand' as const,
+        borderRadius: 'medium' as const,
       }
-    : {borderWidth: 'none', borderColor: 'primary', borderRadius: 'medium'}
+    : {
+        borderWidth: 'none' as const,
+        borderColor: 'primary' as const,
+        borderRadius: 'medium' as const,
+      }
   return (
     <View as="div" {...wrapperProps}>
       <View
@@ -366,6 +387,7 @@ export default function ItemAssignToCard({
               withBackground={false}
               withBorder={false}
               onClick={handleDelete}
+              elementRef={el => (deleteCardButtonRef.current = el)}
             >
               <IconTrashLine />
             </IconButton>

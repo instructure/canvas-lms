@@ -24,7 +24,8 @@ module RuboCop
         include RuboCop::Canvas::CurrentDef
 
         EXAMPLE_REFERENCES_LINE = "t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false"
-        EXAMPLE_REPLICA_IDENTITY_LINE = %(add_replica_identity "%s", :root_account_id)
+        EXAMPLE_REPLICA_IDENTITY_INDEX_LINE = "t.replica_identity_index"
+        EXAMPLE_REPLICA_IDENTITY_LINE = "set_replica_identity :%s"
 
         def_node_matcher :create_table_block, <<~PATTERN
           (block (send nil? :create_table $_) ...)
@@ -40,6 +41,10 @@ module RuboCop
 
         def_node_search :root_account_reference, <<~PATTERN
           (send lvar :references (sym :root_account) ...)
+        PATTERN
+
+        def_node_search :replica_identity_index, <<~PATTERN
+          (send lvar :replica_identity_index)
         PATTERN
 
         def_node_search :foreign_key_value, <<~PATTERN
@@ -62,8 +67,8 @@ module RuboCop
           (false)
         PATTERN
 
-        def_node_search :add_replica_identity_search, <<~PATTERN
-          (send nil? :add_replica_identity (str $_) (sym :root_account_id) ...)
+        def_node_search :set_replica_identity_search, <<~PATTERN
+          (send nil? :set_replica_identity (sym $_) ...)
         PATTERN
 
         def last_line_range(node)
@@ -73,23 +78,21 @@ module RuboCop
           node.source_range.adjust(begin_pos: node.source.index(/\S/, last_newline_pos))
         end
 
-        # since cops don't run in rails and don't have access to rails inflections
-        # we will just kind of fake the mapping from model name to table name
         def on_def(node)
           super
-          @replica_identity_models = add_replica_identity_search(node).map { |n| n.split("::").last.downcase }
+          @replica_identity_tables = set_replica_identity_search(node)
         end
 
         def on_defs(node)
           super
-          @replica_identity_models = add_replica_identity_search(node).map { |n| n.split("::").last.downcase }
+          @replica_identity_tables = set_replica_identity_search(node)
         end
 
         def replica_identity_present?(table_name)
           return false unless %i[str sym].include?(table_name.type)
 
-          table_name = table_name.value.to_s.delete("_")
-          @replica_identity_models.any? { |model_name| table_name.include?(model_name) }
+          table_name = table_name.value.to_s
+          @replica_identity_tables.any? { |replica_identity_table| table_name.include?(replica_identity_table.to_s) }
         end
 
         def on_block(node)
@@ -125,6 +128,13 @@ module RuboCop
                   end
                 end
               end
+
+              unless replica_identity_index(node).first
+                add_offense(node, message: <<~TEXT, severity: :warning)
+                  Add a replica identity index
+                  e.g. `#{EXAMPLE_REPLICA_IDENTITY_INDEX_LINE}`
+                TEXT
+              end
             else
               missing_ref = true
             end
@@ -132,10 +142,10 @@ module RuboCop
             unless replica_identity_present?(table_name)
               # put the complaint on the last line of the block
               if %i[str sym].include?(table_name.type)
-                example = "e.g. `#{EXAMPLE_REPLICA_IDENTITY_LINE % table_name.value.to_s.camelcase.singularize}`"
+                example = "e.g. `#{EXAMPLE_REPLICA_IDENTITY_LINE % table_name.value}`"
               end
               add_offense nil, location: last_line_range(node), message: <<~TEXT, severity: :info
-                Ensure another migration in this commit uses `add_replica_identity`
+                Ensure another migration in this commit uses `set_replica_identity`
                 #{example}
               TEXT
             end

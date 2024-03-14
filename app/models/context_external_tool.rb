@@ -1608,6 +1608,14 @@ class ContextExternalTool < ActiveRecord::Base
     )
   end
 
+  def placement_allowed?(placement)
+    return true if placement != :submission_type_selection
+
+    allowed_domains = Setting.get("submission_type_selection_allowed_launch_domains", "").split(",")
+    allowed_dev_keys = Setting.get("submission_type_selection_allowed_dev_keys", "").split(",")
+    allowed_domains.include?(domain) || allowed_dev_keys.include?(developer_key&.id.to_s)
+  end
+
   private
 
   # Locally and in OSS installations, this can be configured in config/dynamic_settings.yml.

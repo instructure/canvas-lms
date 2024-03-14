@@ -130,6 +130,16 @@ describe CommunicationChannel do
     expect(@cc.state).to be(:active)
   end
 
+  it "creates notification policies when confirmed if there are Notifications" do
+    Notification.create!(name: "Confirm Email Communication Channel", category: "Registration")
+    communication_channel_model
+    expect(@cc.state).to be(:unconfirmed)
+    expect(@cc.notification_policies).to be_empty
+
+    @cc.confirm
+    expect(@cc.notification_policies).not_to be_empty
+  end
+
   it "resets the bounce count when being reactivated" do
     communication_channel_model
     @cc.confirm
@@ -588,6 +598,7 @@ describe CommunicationChannel do
           set_confirmation_code
           set_root_account_ids
           after_save_flag_old_microsoft_sync_user_mappings
+          consider_building_notification_policies
         ]
         expect(CommunicationChannel._save_callbacks.collect(&:filter).select { |k| k.is_a? Symbol } - accounted_for_callbacks).to eq []
       end

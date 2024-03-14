@@ -347,7 +347,7 @@ describe('a11y checks', () => {
       successfulSaveStub.mockClear()
     })
     describe('LTI Developer Key is being created', () => {
-      it('flashes an alert if the key saves successfully', async () => {
+      it('notifies if the key saves successfully', async () => {
         const saveLtiToolConfigurationStub = jest.fn().mockImplementation(() => {
           return () => {
             return Promise.resolve({
@@ -369,7 +369,7 @@ describe('a11y checks', () => {
         wrapper.unmount()
       })
 
-      it("doesn't flash an alert if the key fails to be created", async () => {
+      it("doesn't notify if the key fails to be created", async () => {
         const saveLtiToolConfigurationStub = jest.fn().mockImplementation(() => {
           return () => {
             return Promise.reject(new Error('testing'))
@@ -387,10 +387,33 @@ describe('a11y checks', () => {
         expect(successfulSaveStub).not.toHaveBeenCalled()
         wrapper.unmount()
       })
+
+      it('notifies and forwards if the API returns a warning_message', async () => {
+        const warning_message = 'This is a warning message'
+        const saveLtiToolConfigurationStub = jest.fn().mockImplementation(() => {
+          return () => {
+            return Promise.resolve({
+              developer_key: developerKey,
+              tool_configuration: validToolConfig,
+              warning_message,
+            })
+          }
+        })
+
+        const wrapper = createWrapper(
+          {isLtiKey: true},
+          {saveLtiToolConfiguration: saveLtiToolConfigurationStub}
+        )
+
+        await wrapper.instance().saveLtiToolConfiguration()
+
+        expect(saveLtiToolConfigurationStub).toHaveBeenCalled()
+        expect(successfulSaveStub).toHaveBeenCalledWith(warning_message)
+      })
     })
 
     describe('LTI Developer Key is being edited', () => {
-      it('flashes an alert if the key saves successfully', async () => {
+      it('notifies if the key saves successfully', async () => {
         const updateLtiKeyStub = jest.fn().mockResolvedValue({
           developer_key: developerKey,
           tool_configuration: validToolConfig,
@@ -407,7 +430,7 @@ describe('a11y checks', () => {
         wrapper.unmount()
       })
 
-      it("doesn't try to flash an alert if the key fails to save", async () => {
+      it("doesn't notifiy if the key fails to save", async () => {
         const updateLtiKeyStub = jest.fn().mockRejectedValue(null)
         const wrapper = createWrapper({}, {updateLtiKey: updateLtiKeyStub})
 
@@ -418,6 +441,24 @@ describe('a11y checks', () => {
         expect(updateLtiKeyStub).toHaveBeenCalled()
         expect(successfulSaveStub).not.toHaveBeenCalled()
         wrapper.unmount()
+      })
+
+      it('notifies if the API returns a warning_message', async () => {
+        const warning_message = 'This is a warning message'
+        const updateLtiKeyStub = jest.fn().mockResolvedValue({
+          developer_key: developerKey,
+          tool_configuration: validToolConfig,
+          warning_message,
+        })
+
+        const wrapper = createWrapper({isLtiKey: true}, {updateLtiKey: updateLtiKeyStub})
+
+        await wrapper
+          .instance()
+          .saveLTIKeyEdit(validToolConfig.extensions[0].settings, developerKey)
+
+        expect(updateLtiKeyStub).toHaveBeenCalled()
+        expect(successfulSaveStub).toHaveBeenCalledWith(warning_message)
       })
     })
 

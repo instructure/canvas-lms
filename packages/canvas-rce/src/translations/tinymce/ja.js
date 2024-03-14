@@ -259,7 +259,7 @@ tinymce.addI18n('ja', {
   Templates: '\u30c6\u30f3\u30d7\u30ec\u30fc\u30c8\u540d',
   Template: '\u30c6\u30f3\u30d7\u30ec\u30fc\u30c8',
   'Text color': '\u30c6\u30ad\u30b9\u30c8\u306e\u8272',
-  'Background color': '\u80cc\u666f\u8272',
+  'Background color': '\u30cf\u30a4\u30e9\u30a4\u30c8\u30ab\u30e9\u30fc',
   'Custom...': '\u30ab\u30b9\u30bf\u30e0...',
   'Custom color': '\u30ab\u30b9\u30bf\u30e0\u30ab\u30e9\u30fc',
   'No color': '\u30ab\u30e9\u30fc\u306a\u3057',

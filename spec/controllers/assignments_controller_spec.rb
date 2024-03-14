@@ -2275,8 +2275,11 @@ describe AssignmentsController do
           }
         end
 
+        let(:domain) { "justanexamplenotarealwebsite.com" }
+
         let(:tool) do
           factory_with_protected_attributes(@course.context_external_tools,
+                                            domain:,
                                             url: "http://www.justanexamplenotarealwebsite.com/tool1",
                                             shared_secret: "test123",
                                             consumer_key: "test123",
@@ -2288,6 +2291,7 @@ describe AssignmentsController do
 
         it "is correctly set" do
           tool
+          Setting.set("submission_type_selection_allowed_launch_domains", domain)
           subject
           expect(assigns[:js_env][:SUBMISSION_TYPE_SELECTION_TOOLS][0]).to include(
             base_title: tool_settings[:base_title],
@@ -2307,6 +2311,7 @@ describe AssignmentsController do
 
           it "includes the launch points" do
             tool
+            Setting.set("submission_type_selection_allowed_launch_domains", domain)
             subject
             expect(assigns[:js_env][:SUBMISSION_TYPE_SELECTION_TOOLS][0])
               .to include(description:)
@@ -2553,6 +2558,22 @@ describe AssignmentsController do
         Account.site_admin.disable_feature!(:new_quizzes_assignment_build_button)
         get "edit", params: { course_id: @course.id, id: @assignment.id }
         expect(assigns[:js_env][:NEW_QUIZZES_ASSIGNMENT_BUILD_BUTTON_ENABLED]).to be(false)
+      end
+    end
+
+    describe "js_env UPDATE_ASSIGNMENT_SUBMISSION_TYPE_LAUNCH_BUTTON_ENABLED" do
+      it "sets UPDATE_ASSIGNMENT_SUBMISSION_TYPE_LAUNCH_BUTTON_ENABLED in js_env as true if enabled" do
+        user_session(@teacher)
+        Account.site_admin.enable_feature!(:update_assignment_submission_type_launch_button)
+        get "edit", params: { course_id: @course.id, id: @assignment.id }
+        expect(assigns[:js_env][:UPDATE_ASSIGNMENT_SUBMISSION_TYPE_LAUNCH_BUTTON_ENABLED]).to be(true)
+      end
+
+      it "sets UPDATE_ASSIGNMENT_SUBMISSION_TYPE_LAUNCH_BUTTON_ENABLED in js_env as false if disabled" do
+        user_session(@teacher)
+        Account.site_admin.disable_feature!(:update_assignment_submission_type_launch_button)
+        get "edit", params: { course_id: @course.id, id: @assignment.id }
+        expect(assigns[:js_env][:UPDATE_ASSIGNMENT_SUBMISSION_TYPE_LAUNCH_BUTTON_ENABLED]).to be(false)
       end
     end
 

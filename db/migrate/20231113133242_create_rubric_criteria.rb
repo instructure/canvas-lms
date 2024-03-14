@@ -21,20 +21,22 @@ class CreateRubricCriteria < ActiveRecord::Migration[7.0]
   tag :predeploy
   def change
     create_table :rubric_criteria do |t|
-      t.references :rubric, null: false, foreign_key: { to_table: :rubrics }, index: true
+      t.references :rubric, null: false, foreign_key: { to_table: :rubrics }
       t.references :root_account, null: false, foreign_key: { to_table: :accounts }, index: false
-      t.text :description, null: true
-      t.text :long_description, null: true
+      t.text :description
+      t.text :long_description
       t.integer :order, null: false
       t.decimal :points, null: false
       t.boolean :criterion_use_range, null: false, default: false
-      t.references :learning_outcome, null: true, foreign_key: { to_table: :learning_outcomes }, index: true
-      t.decimal :mastery_points, null: true
+      t.references :learning_outcome, foreign_key: { to_table: :learning_outcomes }
+      t.decimal :mastery_points
       t.boolean :ignore_for_scoring, null: false, default: false
       t.string :workflow_state, null: false, default: "active", limit: 255
-      t.references :created_by, null: false, foreign_key: { to_table: :users }, index: true
-      t.references :deleted_by, null: true, foreign_key: { to_table: :users }, index: true
+      t.references :created_by, null: false, foreign_key: { to_table: :users }
+      t.references :deleted_by, foreign_key: { to_table: :users }
       t.timestamps
+
+      t.replica_identity_index
     end
   end
 end

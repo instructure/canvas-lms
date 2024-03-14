@@ -23,3 +23,6 @@ end
 if ENV["RAILS_DATABASE_USER"]
   ActiveRecord::Base.override_db_configs(username: ENV["RAILS_DATABASE_USER"], password: nil)
 end
+if ENV["RAILS_DATABASE_SERVICE"]
+  ActiveRecord::Base.override_db_configs(service: ENV["RAILS_DATABASE_SERVICE"])
+end

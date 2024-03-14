@@ -18,9 +18,12 @@
 
 import React from 'react'
 import {act, fireEvent, render, waitFor} from '@testing-library/react'
+import userEvent, {PointerEventsCheckLevel} from '@testing-library/user-event'
 import fetchMock from 'fetch-mock'
 import ItemAssignToTray, {type ItemAssignToTrayProps} from '../ItemAssignToTray'
 import {SECTIONS_DATA, STUDENTS_DATA} from '../../__tests__/mocks'
+
+const USER_EVENT_OPTIONS = {pointerEventsCheck: PointerEventsCheckLevel.Never, delay: null}
 
 describe('ItemAssignToTray', () => {
   const props: ItemAssignToTrayProps = {
@@ -83,6 +86,7 @@ describe('ItemAssignToTray', () => {
         unlock_at: '2023-10-01T12:00:00Z',
         lock_at: '2023-11-01T12:00:00Z',
         only_visible_to_overrides: false,
+        visible_to_everyone: true,
         overrides: OVERRIDES,
       })
       // an assignment with invalid dates
@@ -92,6 +96,7 @@ describe('ItemAssignToTray', () => {
         unlock_at: '2023-10-01T12:00:00Z',
         lock_at: '2023-11-01T12:00:00Z',
         only_visible_to_overrides: false,
+        visible_to_everyone: true,
         overrides: [],
       })
       // an assignment with valid dates and no overrides
@@ -101,6 +106,7 @@ describe('ItemAssignToTray', () => {
         unlock_at: null,
         lock_at: null,
         only_visible_to_overrides: false,
+        visible_to_everyone: true,
         overrides: [],
       })
       .get('/api/v1/courses/1/quizzes/23/date_details', {})
@@ -197,6 +203,7 @@ describe('ItemAssignToTray', () => {
         unlock_at: '2023-10-01T12:00:00Z',
         lock_at: '2023-11-01T12:00:00Z',
         only_visible_to_overrides: false,
+        visible_to_everyone: true,
         overrides: [],
       },
       {
@@ -208,6 +215,35 @@ describe('ItemAssignToTray', () => {
     expect(cards).toHaveLength(1)
     act(() => getByRole('button', {name: 'Add'}).click())
     expect(getAllByTestId('item-assign-to-card')).toHaveLength(2)
+  })
+
+  // LF-1370
+  it.skip('renders blueprint locking info when there are locked dates', async () => {
+    fetchMock.get('/api/v1/courses/1/assignments/31/date_details', {
+      blueprint_date_locks: ['availability_dates'],
+    })
+    const {getAllByText, findAllByTestId} = renderComponent({itemContentId: '31'})
+    await findAllByTestId('item-assign-to-card')
+    expect(
+      getAllByText((_, e) => e.textContent === 'Locked: Availability Dates')[0]
+    ).toBeInTheDocument()
+  })
+
+  // LF-1370
+  it.skip('does not render blueprint locking info when locked with unlocked due dates', async () => {
+    fetchMock.get('/api/v1/courses/1/assignments/31/date_details', {blueprint_date_locks: []})
+    const {findAllByTestId, queryByText} = renderComponent({itemContentId: '31'})
+    await findAllByTestId('item-assign-to-card')
+    await expect(queryByText('Locked:')).not.toBeInTheDocument()
+  })
+
+  it('disables add button if there are blueprint-locked dates', async () => {
+    fetchMock.get('/api/v1/courses/1/assignments/31/date_details', {
+      blueprint_date_locks: ['availability_dates'],
+    })
+    const {getByRole, findAllByText} = renderComponent({itemContentId: '31'})
+    await findAllByText('Locked:')
+    await expect(getByRole('button', {name: 'Add'})).toBeDisabled()
   })
 
   it('calls onDismiss when the cancel button is clicked', () => {
@@ -240,6 +276,7 @@ describe('ItemAssignToTray', () => {
           unlock_at: null,
           lock_at: null,
           only_visible_to_overrides: true,
+          visible_to_everyone: false,
           overrides: OVERRIDES,
         },
         {
@@ -267,6 +304,7 @@ describe('ItemAssignToTray', () => {
           unlock_at: '2023-10-01T12:00:00Z',
           lock_at: '2023-11-01T12:00:00Z',
           only_visible_to_overrides: false,
+          visible_to_everyone: true,
           overrides: [],
         },
         {
@@ -288,6 +326,7 @@ describe('ItemAssignToTray', () => {
           unlock_at: '2023-10-01T12:00:00Z',
           lock_at: '2023-11-01T12:00:00Z',
           only_visible_to_overrides: false,
+          visible_to_everyone: true,
           overrides: [],
         },
         {
@@ -319,6 +358,7 @@ describe('ItemAssignToTray', () => {
       unlock_at: '2023-10-01T12:00:00Z',
       lock_at: '2023-11-01T12:00:00Z',
       only_visible_to_overrides: false,
+      visible_to_everyone: true,
       overrides: [],
     }
 
@@ -339,7 +379,8 @@ describe('ItemAssignToTray', () => {
       getByRole('button', {name: 'Save'}).click()
       expect((await findAllByText(`${props.itemName} updated`))[0]).toBeInTheDocument()
       const requestBody = fetchMock.lastOptions(DATE_DETAILS)?.body
-      const {id, overrides, only_visible_to_overrides, ...payloadValues} = DATE_DETAILS_OBJ
+      const {id, overrides, only_visible_to_overrides, visible_to_everyone, ...payloadValues} =
+        DATE_DETAILS_OBJ
       const expectedPayload = JSON.stringify({
         ...payloadValues,
         only_visible_to_overrides,
@@ -441,5 +482,25 @@ describe('ItemAssignToTray', () => {
       expect(queryByTestId('context-module-text')).not.toBeInTheDocument()
       expect(cards).toHaveLength(2)
     })
+  })
+
+  // LF-1370
+  it.skip('focuses on the add button when deleting a card', async () => {
+    const user = userEvent.setup(USER_EVENT_OPTIONS)
+    const {findAllByText, getByTestId} = renderComponent()
+    const deleteButton = (await findAllByText('Delete'))[1]
+    const addButton = getByTestId('add-card')
+    await user.click(deleteButton)
+    expect(addButton).toHaveFocus()
+  })
+
+  // LF-1370
+  it.skip("focuses on the newly-created card's delete button when adding a card", async () => {
+    const user = userEvent.setup(USER_EVENT_OPTIONS)
+    const {findAllByText, getByTestId} = renderComponent()
+    const addButton = getByTestId('add-card')
+    await user.click(addButton)
+    const deleteButtons = await findAllByText('Delete')
+    expect(deleteButtons[deleteButtons.length - 1].closest('button')).toHaveFocus()
   })
 })

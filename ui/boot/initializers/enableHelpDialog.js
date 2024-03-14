@@ -26,6 +26,7 @@ import $ from 'jquery'
 import {find} from 'lodash'
 import htmlEscape, {raw} from '@instructure/html-escape'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
+import '@canvas/jquery/jquery.instructure_forms'
 import 'jqueryui/dialog'
 import '@canvas/jquery/jquery.disableWhileLoading'
 

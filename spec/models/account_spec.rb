@@ -2151,6 +2151,13 @@ describe Account do
             expect_id_chain_for_account(account1, [account1.global_id, Account.default.global_id])
           end
         end
+
+        it "returns correct global ids when used twice on different shards (doesn't cache across shards)" do
+          expect(account1.account_chain_ids).to eq([account1.id, Account.default.id])
+          @shard1.activate do
+            expect(account1.account_chain_ids).to eq([account1.id, Account.default.id])
+          end
+        end
       end
     end
   end

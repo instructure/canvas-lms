@@ -240,8 +240,11 @@ const ComposeModalManager = props => {
     const success = errorMessage ? false : !!data
 
     if (success) {
-      props.onDismiss()
-      setOnSuccess(I18n.t('Message sent!'), false)
+      // before we do anything, let's allow some time for any ModalSpinner to truly go away
+      setTimeout(() => {
+        props.onDismiss()
+        setOnSuccess(I18n.t('Message sent!'), false)
+      }, 500)
     } else {
       if (errorMessage && errorMessage[0]?.message) {
         setModalError(errorMessage[0].message)

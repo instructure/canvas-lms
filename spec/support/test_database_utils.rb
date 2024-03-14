@@ -107,8 +107,9 @@ module TestDatabaseUtils
             SELECT 1 FROM pg_depend WHERE deptype='e' AND objid=pg_class.oid
           )
       SQL
-      table_names.delete("schema_migrations")
-      table_names.delete("switchman_shards")
+      table_names.delete(ActiveRecord::Base.internal_metadata_table_name)
+      table_names.delete(ActiveRecord::Base.schema_migrations_table_name)
+      table_names.delete(Shard.table_name)
       table_names
     end
 

@@ -66,9 +66,16 @@ module HealthChecks
           !!Tempfile.open("readiness", ENV["TMPDIR"] || Dir.tmpdir) { |f| f.write("readiness") }
         end,
         # returns a boolean
-        jobs: -> { Delayed::Job.connection.active? },
+        jobs: lambda do
+                Delayed::Job.connection.verify!
+                true
+              end,
         # returns a boolean
-        postgresql: -> { Account.connection.active? && GuardRail.activate(:secondary) { Account.connection.active? } },
+        postgresql: lambda do
+                      Account.connection.verify!
+                      GuardRail.activate(:secondary) { Account.connection.verify! }
+                      true
+                    end,
         # nil response treated as truthy
         ha_cache: -> { MultiCache.cache.fetch("readiness").nil? },
         # ensures `gulp rev` has ran; returns a string, treated as truthy
@@ -80,7 +87,10 @@ module HealthChecks
 
     def critical_checks
       ret = {
-        default_shard: -> { Shard.connection.active? }
+        default_shard: lambda do
+                         Shard.connection.verify!
+                         true
+                       end
       }
 
       if InstFS.enabled?

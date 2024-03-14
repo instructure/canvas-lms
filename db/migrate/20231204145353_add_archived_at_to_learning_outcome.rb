@@ -21,7 +21,7 @@ class AddArchivedAtToLearningOutcome < ActiveRecord::Migration[7.0]
   tag :predeploy
 
   def change
-    add_column :learning_outcomes, :archived_at, :datetime, default: nil, null: true
-    add_column :learning_outcome_groups, :archived_at, :datetime, default: nil, null: true
+    add_column :learning_outcomes, :archived_at, :timestamp, default: nil, precision: 6
+    add_column :learning_outcome_groups, :archived_at, :timestamp, default: nil, precision: 6
   end
 end

@@ -31,8 +31,6 @@ class CalendarEvent < ActiveRecord::Base
 
   include MasterCourses::Restrictor
 
-  self.ignored_columns += %i[series_id]
-
   restrict_columns :content, [:title, :description]
   restrict_columns :settings, %i[location_name location_address start_at end_at all_day all_day_date series_uuid rrule]
 

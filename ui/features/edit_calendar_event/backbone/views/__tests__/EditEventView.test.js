@@ -60,21 +60,27 @@ describe('EditEventView', () => {
     return new EditEventView({el: document.getElementById('content'), model: event})
   }
 
+  // wait 2 event cycles.  Why? because EditEventView init calls its own render function,
+  // and its render function makes use of lodash defer, which defers some of its initialization
+  // for 2 additional event cycles.  TODO: rewrite EditEventView to be a react component
   async function waitForRender() {
-    let rendered
-    const promise = new Promise(resolve => {
-      rendered = resolve
+    // first wait
+    await new Promise(resolve => {
+      setTimeout(resolve)
     })
-    defer(() => rendered())
-    await promise
+    // second wait
+    await new Promise(resolve => {
+      setTimeout(resolve)
+    })
   }
 
-  it('renders', () => {
+  it('renders', async () => {
     const e = render()
+    await waitForRender()
     expect(within(document.body).getByText(`Edit ${e.model.get('title')}`)).not.toBeNull()
   })
 
-  it('defaults to today if no start date is given', () => {
+  it('defaults to today if no start date is given', async () => {
     render({start_at: undefined})
     const today = Intl.DateTimeFormat('en', {
       timeZone: defaultTZ,
@@ -82,6 +88,7 @@ describe('EditEventView', () => {
       day: 'numeric',
       year: 'numeric',
     }).format(new Date())
+    await waitForRender()
     expect(within(document.body).getByDisplayValue(today)).toBeInTheDocument()
   })
 
@@ -102,9 +109,10 @@ describe('EditEventView', () => {
       expect(conferencingNode.closest('fieldset').className).toEqual('hide')
     })
 
-    it('shows conferencing options when some conference types are enabled', () => {
+    it('shows conferencing options when some conference types are enabled', async () => {
       enableConferences()
       render()
+      await waitForRender()
       const conferencingNode = within(document.body).getByText('Conferencing:')
       expect(conferencingNode.closest('fieldset').className).not.toEqual('hide')
     })
@@ -121,6 +129,7 @@ describe('EditEventView', () => {
       it('does show current conference when there is a current conference', async () => {
         enableConferences(CONFERENCE_TYPES.slice(1))
         render({web_conference: {id: 1, conference_type: 'LtiConference', title: 'FooConf'}})
+        await waitForRender()
         const conferencingRow = within(document.body).getByText('Conferencing:').closest('fieldset')
         await waitForRender()
         expect(conferencingRow.className).not.toEqual('hide')
@@ -151,9 +160,10 @@ describe('EditEventView', () => {
       expect(view.model.save).toHaveBeenCalled()
     })
 
-    it('submits empty web_conference params when no current conference', () => {
+    it('submits empty web_conference params when no current conference', async () => {
       enableConferences()
       const view = render()
+      await waitForRender()
       view.model.save = jest.fn(params => {
         expect(params.web_conference).toEqual('')
       })
@@ -168,33 +178,37 @@ describe('EditEventView', () => {
       expect(within(document.body).queryByText('Mark as Important Date')).toBeNull()
     })
 
-    it('is shown in a k5 subject', () => {
+    it('is shown in a k5 subject', async () => {
       window.ENV.K5_SUBJECT_COURSE = true
       render()
+      await waitForRender()
       expect(
         within(document.body).getByLabelText('Mark as Important Date', {exact: false})
       ).toBeInTheDocument()
     })
 
-    it('is shown in a k5 homeroom', () => {
+    it('is shown in a k5 homeroom', async () => {
       window.ENV.K5_HOMEROOM_COURSE = true
       render()
+      await waitForRender()
       expect(
         within(document.body).getByLabelText('Mark as Important Date', {exact: false})
       ).toBeInTheDocument()
     })
 
-    it('is shown in a k5 account', () => {
+    it('is shown in a k5 account', async () => {
       window.ENV.K5_ACCOUNT = true
       render()
+      await waitForRender()
       expect(
         within(document.body).getByLabelText('Mark as Important Date', {exact: false})
       ).toBeInTheDocument()
     })
 
-    it('is shown and checked in a k5 subject with event already marked as important', () => {
+    it('is shown and checked in a k5 subject with event already marked as important', async () => {
       window.ENV.K5_SUBJECT_COURSE = true
       render({important_dates: true})
+      await waitForRender()
       const checkbox = within(document.body).getByLabelText('Mark as Important Date', {
         exact: false,
       })
@@ -220,9 +234,10 @@ describe('EditEventView', () => {
       expect(within(document.body).queryByText('Add to Course Pacing blackout dates')).toBeNull()
     })
 
-    it('is shown when account level blackout dates are enabled', () => {
+    it('is shown when account level blackout dates are enabled', async () => {
       window.ENV.FEATURES = {account_level_blackout_dates: true}
       render({context_type: 'course', course_pacing_enabled: 'true'})
+      await waitForRender()
       expect(
         within(document.body).getByLabelText('Add to Course Pacing blackout dates', {
           exact: false,
@@ -230,13 +245,14 @@ describe('EditEventView', () => {
       ).toBeInTheDocument()
     })
 
-    it('erases and renders irrelevant fields when checked', () => {
+    it('erases and renders irrelevant fields when checked', async () => {
       window.ENV.FEATURES = {account_level_blackout_dates: true}
       render({
         context_type: 'course',
         course_pacing_enabled: 'true',
         web_conference: {id: 1, conference_type: 'LtiConference', title: 'FooConf'},
       })
+      await waitForRender()
       const ids = [
         'more_options_start_time',
         'more_options_end_time',
@@ -261,14 +277,14 @@ describe('EditEventView', () => {
 
     it('displays the frequency picker', async () => {
       render()
-
+      await waitForRender()
       expect(within(document.body).getByTestId('frequency-picker')).toBeVisible()
       expect(within(document.body).getByDisplayValue('Does not repeat')).toBeVisible()
     })
 
     it('updates frequency picker values on date change', async () => {
       render()
-
+      await waitForRender()
       let dateInput = within(document.body).getByPlaceholderText('Date')
       expect(dateInput).toHaveValue('May 12, 2020')
       let frequencyPicker = within(document.body).getByTestId('frequency-picker')
@@ -305,6 +321,7 @@ describe('EditEventView', () => {
         '.hidden {display: none; visibliity: hidden;}'
 
       render({sections_url: '/api/v1/courses/21/sections'})
+      await waitForRender()
 
       // await within(document.body).findAllByText('Use a different date for each section')
       const section_checkbox = await within(document.body).findByRole('checkbox', {
@@ -315,6 +332,7 @@ describe('EditEventView', () => {
       expect(within(document.body).getByDisplayValue('Does not repeat')).toBeVisible()
 
       fireEvent.click(section_checkbox)
+      await waitForRender()
       expect(within(document.body).queryByTestId('frequency-picker')).not.toBeVisible()
     })
 
@@ -347,6 +365,7 @@ describe('EditEventView', () => {
 
     it('renders update calendar event dialog', async () => {
       const view = render({series_uuid: '123', rrule: 'FREQ=WEEKLY;BYDAY=MO;INTERVAL=1;COUNT=5'})
+      await waitForRender()
       view.submit(null)
 
       await waitFor(() =>
@@ -358,6 +377,7 @@ describe('EditEventView', () => {
 
     it('does not render update calendar event dialog when saving a single event', async () => {
       render({series_uuid: null, rrule: null})
+      await waitForRender()
       userEvent.click(await screen.findByText('Update Event'))
 
       await waitFor(() =>
@@ -369,6 +389,7 @@ describe('EditEventView', () => {
 
     it('does not render update calendar event dialog when changing series to a single event', async () => {
       render({series_uuid: '123', rrule: 'FREQ=WEEKLY;BYDAY=MO;INTERVAL=1;COUNT=5'})
+      await waitForRender()
       userEvent.click(await screen.findByText('Frequency'))
       userEvent.click(await screen.findByText('Does not repeat'))
       userEvent.click(await screen.findByText('Update Event'))
@@ -386,6 +407,7 @@ describe('EditEventView', () => {
         rrule: 'FREQ=DAILY;INTERVAL=1;COUNT=3',
         series_uuid: '123',
       })
+      await waitForRender()
       view.renderWhichEditDialog = jest.fn(() => Promise.resolve('all'))
       view.model.save = jest.fn(() => {
         expect(view.model.get('which')).toEqual('all')

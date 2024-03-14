@@ -3051,6 +3051,23 @@ describe Enrollment do
       expect { @enrollment2.save! }.to raise_error("Validation failed: Associated user Cannot observe observer observing self")
     end
 
+    it "allows existing observer enrollment cycles to be deleted" do
+      u1 = User.create!
+      u2 = User.create!
+      course = Course.create!
+
+      e1 = ObserverEnrollment.create!(course:, user: u1, associated_user_id: u2.id)
+      e2 = ObserverEnrollment.create!(course:, user: u2)
+      ObserverEnrollment.where(id: e2).update_all(associated_user_id: u1.id) # bypass the validation
+
+      expect(e1).not_to be_valid
+
+      e1.destroy
+
+      expect(e1).to be_valid
+      expect(e1).to be_deleted
+    end
+
     context "sharding" do
       specs_require_sharding
 

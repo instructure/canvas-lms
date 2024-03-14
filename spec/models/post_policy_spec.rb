@@ -69,7 +69,7 @@ describe PostPolicy do
       it "does not update the owning course's updated_at date when saved" do
         course.update!(updated_at: 1.day.ago)
 
-        Timecop.freeze(Time.zone.now) do
+        Timecop.freeze do
           expect do
             policy.update!(post_manually: true)
           end.not_to change { course.updated_at }

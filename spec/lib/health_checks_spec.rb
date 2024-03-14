@@ -28,7 +28,7 @@ describe HealthChecks do
   end
 
   it "fails the postgresql readiness check" do
-    allow(Account.connection).to receive(:active?).and_return(false)
+    allow(Account.connection).to receive(:verify!).and_raise(PG::UnableToSend)
     readiness_result = described_class.process_readiness_checks(false)
 
     expect(readiness_result.keys.sort).to eq %i[common_css common_js consul filesystem ha_cache jobs postgresql rev_manifest vault]

@@ -566,6 +566,8 @@ export const DiscussionThreadContainer = props => {
                       !!props.discussionEntry?.rootEntryParticipantCounts?.unreadCount
                     }
                     isForcedRead={props.discussionEntry.entryParticipant?.forcedReadState}
+                    createdAt={props.discussionEntry.createdAt}
+                    updatedAt={props.discussionEntry.updatedAt}
                     timingDisplay={DateHelper.formatDatetimeForDiscussions(
                       props.discussionEntry.createdAt
                     )}

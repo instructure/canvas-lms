@@ -46,6 +46,7 @@ const COURSE_RUBRICS_QUERY = gql`
             longDescription
             description
           }
+          hasRubricAssociations
           hidePoints
           pointsPossible
           ratingOrder
@@ -76,6 +77,7 @@ const ACCOUNT_RUBRICS_QUERY = gql`
             longDescription
             description
           }
+          hasRubricAssociations
           hidePoints
           pointsPossible
           ratingOrder
@@ -119,8 +121,8 @@ type DuplicateRubricProps = {
   hidePoints?: boolean
   criteria?: RubricCriterion[]
   pointsPossible: number
-  buttonDisplay: string
-  ratingOrder: string
+  buttonDisplay?: string
+  ratingOrder?: string
 }
 
 export type FetchRubricVariables = AccountRubricsQueryVariables | CourseRubricsQueryVariables

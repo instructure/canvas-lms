@@ -181,7 +181,7 @@ describe "discussions" do
           expect_new_page_load { submit_form(".form-actions") }
           expect(DiscussionTopic.last.anonymous_state).to eq "full_anonymity"
           expect(f("span[data-testid='anon-conversation']").text).to(
-            eq("This is an anonymous Discussion. Though student names and profile pictures will be hidden, your name and profile picture will be visible to all course members.")
+            eq("This is an anonymous Discussion. Though student names and profile pictures will be hidden, your name and profile picture will be visible to all course members. Mentions have also been disabled.")
           )
           expect(f("span[data-testid='author_name']").text).to eq teacher.short_name
         end
@@ -231,7 +231,7 @@ describe "discussions" do
           expect_new_page_load { submit_form(".form-actions") }
           expect(DiscussionTopic.last.anonymous_state).to eq "full_anonymity"
           expect(f("span[data-testid='anon-conversation']").text).to(
-            eq("This is an anonymous Discussion, Your name and profile picture will be hidden from other course members.")
+            eq("This is an anonymous Discussion. Your name and profile picture will be hidden from other course members. Mentions have also been disabled.")
           )
         end
 
@@ -447,10 +447,10 @@ describe "discussions" do
         course.save!
         get "/courses/#{course.id}/discussion_topics/new"
         f("input[placeholder='Topic Title']").send_keys "This is fully anonymous"
-        force_click("input[value='full_anonymity']")
+        force_click_native("input[value='full_anonymity']")
         f("button[data-testid='save-button']").click
         wait_for_ajaximations
-        expect(f("span[data-testid='anon-conversation']").text).to eq "This is an anonymous Discussion, Your name and profile picture will be hidden from other course members."
+        expect(f("span[data-testid='anon-conversation']").text).to eq "This is an anonymous Discussion. Your name and profile picture will be hidden from other course members. Mentions have also been disabled."
         expect(f("span[data-testid='author_name']").text).to include "Anonymous"
       end
 
@@ -459,10 +459,10 @@ describe "discussions" do
         course.save!
         get "/courses/#{course.id}/discussion_topics/new"
         f("input[placeholder='Topic Title']").send_keys "This is partially anonymous"
-        force_click("input[value='partial_anonymity']")
+        force_click_native("input[value='partial_anonymity']")
         f("button[data-testid='save-button']").click
         wait_for_ajaximations
-        expect(f("span[data-testid='anon-conversation']").text).to eq "When creating a reply, you will have the option to show your name and profile picture to other course members or remain anonymous."
+        expect(f("span[data-testid='anon-conversation']").text).to eq "When creating a reply, you will have the option to show your name and profile picture to other course members or remain anonymous. Mentions have also been disabled."
         expect(f("span[data-testid='author_name']").text).to include "Anonymous"
       end
 
@@ -471,16 +471,16 @@ describe "discussions" do
         course.save!
         get "/courses/#{course.id}/discussion_topics/new"
         f("input[placeholder='Topic Title']").send_keys "This is partially anonymous"
-        force_click("input[value='partial_anonymity']")
+        force_click_native("input[value='partial_anonymity']")
 
         # open anonymous selector
         # select real name to begin with
-        force_click("input[value='Anonymous']")
+        force_click_native("input[value='Anonymous']")
         fj("li:contains('student')").click
 
         f("button[data-testid='save-button']").click
         wait_for_ajaximations
-        expect(f("span[data-testid='anon-conversation']").text).to eq "When creating a reply, you will have the option to show your name and profile picture to other course members or remain anonymous."
+        expect(f("span[data-testid='anon-conversation']").text).to eq "When creating a reply, you will have the option to show your name and profile picture to other course members or remain anonymous. Mentions have also been disabled."
         expect(f("span[data-testid='author_name']").text).to include "student"
       end
 
@@ -489,19 +489,19 @@ describe "discussions" do
         course.save!
         get "/courses/#{course.id}/discussion_topics/new"
         f("input[placeholder='Topic Title']").send_keys "This is partially anonymous"
-        force_click("input[value='partial_anonymity']")
+        force_click_native("input[value='partial_anonymity']")
 
         # open anonymous selector
         # select real name to begin with
-        force_click("input[value='Anonymous']")
+        force_click_native("input[value='Anonymous']")
         fj("li:contains('student')").click
         # now go back to anonymous
-        force_click("input[value='student']")
+        force_click_native("input[value='student']")
         fj("li:contains('Anonymous')").click
 
         f("button[data-testid='save-button']").click
         wait_for_ajaximations
-        expect(f("span[data-testid='anon-conversation']").text).to eq "When creating a reply, you will have the option to show your name and profile picture to other course members or remain anonymous."
+        expect(f("span[data-testid='anon-conversation']").text).to eq "When creating a reply, you will have the option to show your name and profile picture to other course members or remain anonymous. Mentions have also been disabled."
         expect(f("span[data-testid='author_name']").text).to include "Anonymous"
       end
 
@@ -556,7 +556,7 @@ describe "discussions" do
 
         f("input[placeholder='Topic Title']").send_keys title
         type_in_tiny("textarea", message)
-        force_click("input[data-testid='require-initial-post-checkbox']")
+        force_click_native("input[data-testid='require-initial-post-checkbox']")
         f("button[data-testid='save-and-publish-button']").click
         wait_for_ajaximations
         dt = DiscussionTopic.last
@@ -598,7 +598,7 @@ describe "discussions" do
         f("input[placeholder='Topic Title']").send_keys title
         type_in_tiny("textarea", message)
 
-        force_click("input[value='add-to-student-to-do']")
+        force_click_native("input[value='add-to-student-to-do']")
         todo_input = ff("[data-testid='todo-date-section'] input")[0]
         set_datetime_input(todo_input, format_date_for_view(todo_date))
         f("button[data-testid='save-and-publish-button']").click
@@ -611,35 +611,35 @@ describe "discussions" do
       it "creates a fully anonymous discussion topic successfully" do
         get "/courses/#{course.id}/discussion_topics/new"
         f("input[placeholder='Topic Title']").send_keys "This is fully anonymous"
-        force_click("input[value='full_anonymity']")
+        force_click_native("input[value='full_anonymity']")
         f("button[data-testid='save-and-publish-button']").click
         wait_for_ajaximations
-        expect(f("span[data-testid='anon-conversation']").text).to eq "This is an anonymous Discussion. Though student names and profile pictures will be hidden, your name and profile picture will be visible to all course members."
+        expect(f("span[data-testid='anon-conversation']").text).to eq "This is an anonymous Discussion. Though student names and profile pictures will be hidden, your name and profile picture will be visible to all course members. Mentions have also been disabled."
         expect(f("span[data-testid='author_name']").text).to eq "teacher"
       end
 
       it "creates a partially anonymous discussion topic successfully" do
         get "/courses/#{course.id}/discussion_topics/new"
         f("input[placeholder='Topic Title']").send_keys "This is partially anonymous"
-        force_click("input[value='partial_anonymity']")
+        force_click_native("input[value='partial_anonymity']")
         f("button[data-testid='save-and-publish-button']").click
         wait_for_ajaximations
-        expect(f("span[data-testid='anon-conversation']").text).to eq "When creating a reply, students will have the option to show their name and profile picture or remain anonymous. Your name and profile picture will be visible to all course members."
+        expect(f("span[data-testid='anon-conversation']").text).to eq "When creating a reply, students will have the option to show their name and profile picture or remain anonymous. Your name and profile picture will be visible to all course members. Mentions have also been disabled."
         expect(f("span[data-testid='author_name']").text).to eq "teacher"
       end
 
       it "displays the grading and groups not supported in anonymous discussions message when either of the anonymous options are selected" do
         get "/courses/#{course.id}/discussion_topics/new"
-        force_click("input[value='full_anonymity']")
+        force_click_native("input[value='full_anonymity']")
         expect(f("[data-testid=groups_grading_not_allowed]")).to be_displayed
-        force_click("input[value='partial_anonymity']")
+        force_click_native("input[value='partial_anonymity']")
         expect(f("[data-testid=groups_grading_not_allowed]")).to be_displayed
       end
 
       it "creates an allow_rating discussion topic successfully" do
         get "/courses/#{course.id}/discussion_topics/new"
         f("input[placeholder='Topic Title']").send_keys "This is allow_rating"
-        force_click("input[value='allow-liking']")
+        force_click_native("input[value='allow-liking']")
         f("button[data-testid='save-and-publish-button']").click
         wait_for_ajaximations
         dt = DiscussionTopic.last
@@ -650,8 +650,8 @@ describe "discussions" do
       it "creates an only_graders_can_rate discussion topic successfully" do
         get "/courses/#{course.id}/discussion_topics/new"
         f("input[placeholder='Topic Title']").send_keys "This is only_graders_can_rate"
-        force_click("input[value='allow-liking']")
-        force_click("input[value='only-graders-can-like']")
+        force_click_native("input[value='allow-liking']")
+        force_click_native("input[value='only-graders-can-like']")
         f("button[data-testid='save-and-publish-button']").click
         wait_for_ajaximations
         dt = DiscussionTopic.last
@@ -662,9 +662,9 @@ describe "discussions" do
       it "creates a discussion topic successfully with podcast_enabled and podcast_has_student_posts" do
         get "/courses/#{course.id}/discussion_topics/new"
         f("input[placeholder='Topic Title']").send_keys "This is a topic with podcast_enabled and podcast_has_student_posts"
-        force_click("input[value='enable-podcast-feed']")
+        force_click_native("input[value='enable-podcast-feed']")
         wait_for_ajaximations
-        force_click("input[value='include-student-replies-in-podcast-feed']")
+        force_click_native("input[value='include-student-replies-in-podcast-feed']")
         f("button[data-testid='save-and-publish-button']").click
         wait_for_ajaximations
         dt = DiscussionTopic.last
@@ -698,7 +698,7 @@ describe "discussions" do
         # verify all sections exist in the dropdown
         expect(f("[data-testid='section-opt-#{default_section.id}']")).to be_present
         expect(f("[data-testid='section-opt-#{new_section.id}']")).to be_present
-        force_click("input[data-testid='group-discussion-checkbox']")
+        force_click_native("input[data-testid='group-discussion-checkbox']")
         f("input[placeholder='Select a group category']").click
         # very group category exists in the dropdown
         expect(f("[data-testid='group-category-opt-#{group_category.id}']")).to be_present
@@ -710,14 +710,14 @@ describe "discussions" do
         group
 
         get "/courses/#{course.id}/discussion_topics/new"
-        force_click("input[data-testid='group-discussion-checkbox']")
+        force_click_native("input[data-testid='group-discussion-checkbox']")
         f("input[placeholder='Select a group category']").click
         wait_for_ajaximations
-        force_click("[data-testid='group-category-opt-new-group-category']")
+        force_click_native("[data-testid='group-category-opt-new-group-category']")
         wait_for_ajaximations
         expect(f("[data-testid='modal-create-groupset']")).to be_present
         f("#new-group-set-name").send_keys("Onyx 1")
-        force_click("[data-testid='group-set-save']")
+        force_click_native("[data-testid='group-set-save']")
         wait_for_ajaximations
         new_group_category = GroupCategory.last
         expect(new_group_category.name).to eq("Onyx 1")
@@ -849,10 +849,10 @@ describe "discussions" do
 
         f("input[placeholder='Topic Title']").send_keys title
         type_in_tiny("textarea#discussion-topic-message-body", message)
-        force_click("input[value='enable-podcast-feed']")
-        force_click("input[value='allow-liking']")
-        force_click("input[value='only-graders-can-like']")
-        force_click("input[value='add-to-student-to-do']")
+        force_click_native("input[value='enable-podcast-feed']")
+        force_click_native("input[value='allow-liking']")
+        force_click_native("input[value='only-graders-can-like']")
+        force_click_native("input[value='add-to-student-to-do']")
         todo_input = ff("[data-testid='todo-date-section'] input")[0]
         set_datetime_input(todo_input, format_date_for_view(todo_date))
         f("button[data-testid='save-and-publish-button']").click
@@ -881,7 +881,7 @@ describe "discussions" do
 
         get "/courses/#{course.id}/discussion_topics/new"
 
-        force_click('input[type=checkbox][value="graded"]')
+        force_click_native('input[type=checkbox][value="graded"]')
         wait_for_ajaximations
 
         f("input[data-testid='assign-to-select']").click
@@ -899,11 +899,11 @@ describe "discussions" do
         f("input[placeholder='Topic Title']").send_keys title
         type_in_tiny("textarea", message)
 
-        force_click('input[type=checkbox][value="graded"]')
+        force_click_native('input[type=checkbox][value="graded"]')
         wait_for_ajaximations
 
         f("input[data-testid='points-possible-input']").send_keys "12"
-        force_click("input[data-testid='peer_review_auto']")
+        force_click_native("input[data-testid='peer_review_auto']")
 
         f("input[data-testid='assign-to-select']").click
         ff("span[data-testid='assign-to-select-option']")[0].click
@@ -927,7 +927,7 @@ describe "discussions" do
           get "/courses/#{course.id}/discussion_topics/new"
           f("input[placeholder='Topic Title']").send_keys "Assign To warning in topic creation"
 
-          force_click('input[type=checkbox][value="graded"]')
+          force_click_native('input[type=checkbox][value="graded"]')
           wait_for_ajaximations
 
           f("button[title='Remove Everyone']").click
@@ -968,11 +968,11 @@ describe "discussions" do
         f("input[placeholder='Topic Title']").send_keys title
         type_in_tiny("textarea", message)
 
-        force_click('input[type=checkbox][value="graded"]')
+        force_click_native('input[type=checkbox][value="graded"]')
         wait_for_ajaximations
 
         f("input[data-testid='points-possible-input']").send_keys "12"
-        force_click("input[data-testid='peer_review_manual']")
+        force_click_native("input[data-testid='peer_review_manual']")
 
         f("input[data-testid='assign-to-select']").click
         ff("span[data-testid='assign-to-select-option']")[0].click
@@ -997,11 +997,11 @@ describe "discussions" do
         f("input[placeholder='Topic Title']").send_keys title
         type_in_tiny("textarea", message)
 
-        force_click('input[type=checkbox][value="graded"]')
+        force_click_native('input[type=checkbox][value="graded"]')
         wait_for_ajaximations
 
         f("input[data-testid='points-possible-input']").send_keys "12"
-        force_click('input[type=checkbox][value="post_to_sis"]')
+        force_click_native('input[type=checkbox][value="post_to_sis"]')
 
         f("button[data-testid='save-and-publish-button']").click
         wait_for_ajaximations
@@ -1022,7 +1022,7 @@ describe "discussions" do
         f("input[placeholder='Topic Title']").send_keys title
         type_in_tiny("textarea", message)
 
-        force_click('input[type=checkbox][value="graded"]')
+        force_click_native('input[type=checkbox][value="graded"]')
         wait_for_ajaximations
 
         f("input[data-testid='display-grade-input']").click
@@ -1057,7 +1057,7 @@ describe "discussions" do
         expect(dt.assignment.post_to_sis).to be true
 
         get "/courses/#{course.id}/discussion_topics/#{dt.id}/edit"
-        force_click('input[type=checkbox][value="post_to_sis"]')
+        force_click_native('input[type=checkbox][value="post_to_sis"]')
         f("button[data-testid='save-button']").click
         wait_for_ajaximations
 
@@ -1073,8 +1073,8 @@ describe "discussions" do
 
         f("input[placeholder='Topic Title']").send_keys title
         type_in_tiny("textarea#discussion-topic-message-body", message)
-        force_click('input[type=checkbox][value="graded"]')
-        force_click("input[data-testid='group-discussion-checkbox']")
+        force_click_native('input[type=checkbox][value="graded"]')
+        force_click_native("input[data-testid='group-discussion-checkbox']")
         group_selector = f("input[placeholder='Select a group category']")
         group_selector.click
         wait_for_ajaximations
@@ -1087,7 +1087,7 @@ describe "discussions" do
         assign_to_selector.send_keys "group 1"
         assign_to_selector.send_keys :enter
         wait_for_ajaximations
-        force_click("input[data-testid='group-discussion-checkbox']")
+        force_click_native("input[data-testid='group-discussion-checkbox']")
         wait_for_ajaximations
 
         f("button[data-testid='save-and-publish-button']").click
@@ -1122,7 +1122,7 @@ describe "discussions" do
           title = "Graded Discussion Topic with Peer Reviews"
           f("input[placeholder='Topic Title']").send_keys title
 
-          force_click('input[type=checkbox][value="graded"]')
+          force_click_native('input[type=checkbox][value="graded"]')
 
           fj("button:contains('Everyone')").click
           # Verify that the error message "Please select at least one option." appears
@@ -1142,7 +1142,7 @@ describe "discussions" do
           title = "Graded Discussion Topic with due date"
           f("input[placeholder='Topic Title']").send_keys title
 
-          force_click('input[type=checkbox][value="graded"]')
+          force_click_native('input[type=checkbox][value="graded"]')
 
           due_at_input = f("input[placeholder='Select Assignment Due Date']")
           available_from_input = f("input[placeholder='Select Assignment Available From Date']")
@@ -1194,7 +1194,7 @@ describe "discussions" do
           f("input[placeholder='Topic Title']").send_keys title
           type_in_tiny("textarea", message)
 
-          force_click('input[type=checkbox][value="graded"]')
+          force_click_native('input[type=checkbox][value="graded"]')
           wait_for_ajaximations
 
           f("input[data-testid='points-possible-input']").send_keys "12"
@@ -1231,7 +1231,7 @@ describe "discussions" do
           f("input[placeholder='Topic Title']").send_keys title
           type_in_tiny("textarea", message)
 
-          force_click('input[type=checkbox][value="graded"]')
+          force_click_native('input[type=checkbox][value="graded"]')
           wait_for_ajaximations
 
           f("input[data-testid='points-possible-input']").send_keys "12"
@@ -1273,12 +1273,12 @@ describe "discussions" do
           f("input[placeholder='Topic Title']").send_keys title
           type_in_tiny("textarea", message)
 
-          force_click('input[type=checkbox][value="graded"]')
+          force_click_native('input[type=checkbox][value="graded"]')
           wait_for_ajaximations
 
           f("input[data-testid='points-possible-input']").send_keys "12"
 
-          force_click("input[data-testid='group-discussion-checkbox']")
+          force_click_native("input[data-testid='group-discussion-checkbox']")
           group_category_input = f("input[placeholder='Select a group category']")
           group_category_input.click
           group_category_input.send_keys :arrow_down
@@ -1324,7 +1324,7 @@ describe "discussions" do
           f("input[placeholder='Topic Title']").send_keys title
           type_in_tiny("textarea", message)
 
-          force_click('input[type=checkbox][value="graded"]')
+          force_click_native('input[type=checkbox][value="graded"]')
           wait_for_ajaximations
 
           f("input[data-testid='points-possible-input']").send_keys "12"
@@ -1363,10 +1363,10 @@ describe "discussions" do
           f("input[placeholder='Topic Title']").send_keys title
           type_in_tiny("textarea", message)
 
-          force_click('input[type=checkbox][value="graded"]')
+          force_click_native('input[type=checkbox][value="graded"]')
           wait_for_ajaximations
 
-          force_click("input[data-testid='group-discussion-checkbox']")
+          force_click_native("input[data-testid='group-discussion-checkbox']")
           group_category_input = f("input[placeholder='Select a group category']")
           group_category_input.click
           group_category_input.send_keys :arrow_down
@@ -1427,10 +1427,10 @@ describe "discussions" do
           f("input[placeholder='Topic Title']").send_keys title
           type_in_tiny("textarea", message)
 
-          force_click('input[type=checkbox][value="graded"]')
+          force_click_native('input[type=checkbox][value="graded"]')
           wait_for_ajaximations
 
-          force_click("input[data-testid='group-discussion-checkbox']")
+          force_click_native("input[data-testid='group-discussion-checkbox']")
           group_category_input = f("input[placeholder='Select a group category']")
           group_category_input.click
           group_category_input.send_keys :arrow_down
@@ -1498,10 +1498,10 @@ describe "discussions" do
           f("input[placeholder='Topic Title']").send_keys title
           type_in_tiny("textarea", message)
 
-          force_click('input[type=checkbox][value="graded"]')
+          force_click_native('input[type=checkbox][value="graded"]')
           wait_for_ajaximations
 
-          force_click("input[data-testid='group-discussion-checkbox']")
+          force_click_native("input[data-testid='group-discussion-checkbox']")
           group_category_input = f("input[placeholder='Select a group category']")
           group_category_input.click
           group_category_input.send_keys :arrow_down
@@ -1543,10 +1543,10 @@ describe "discussions" do
           f("input[placeholder='Topic Title']").send_keys title
           type_in_tiny("textarea", message)
 
-          force_click('input[type=checkbox][value="graded"]')
+          force_click_native('input[type=checkbox][value="graded"]')
           wait_for_ajaximations
 
-          force_click("input[data-testid='group-discussion-checkbox']")
+          force_click_native("input[data-testid='group-discussion-checkbox']")
           group_category_input = f("input[placeholder='Select a group category']")
           group_category_input.click
           group_category_input.send_keys :arrow_down

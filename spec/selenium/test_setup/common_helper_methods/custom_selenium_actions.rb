@@ -417,6 +417,11 @@ module CustomSeleniumActions
     driver.execute_script("$(#{element_jquery_finder.to_s.to_json}).click()")
   end
 
+  def force_click_native(element_finder)
+    f(element_finder)
+    driver.execute_script("document.querySelector(#{element_finder.to_s.to_json}).click();")
+  end
+
   def hover(element)
     element.with_stale_element_protection { driver.action.move_to(element).perform }
   end
