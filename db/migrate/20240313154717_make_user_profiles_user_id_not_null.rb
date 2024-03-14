@@ -22,7 +22,11 @@ class MakeUserProfilesUserIdNotNull < ActiveRecord::Migration[7.0]
   tag :postdeploy
   disable_ddl_transaction!
 
+  class UserProfile < ActiveRecord::Base
+  end
+
   def change
+    UserProfile.where(user_id: nil, bio: nil, title: nil).delete_all
     change_column_null :user_profiles, :user_id, false
   end
 end
