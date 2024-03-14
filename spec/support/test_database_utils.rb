@@ -84,6 +84,20 @@ module TestDatabaseUtils
       end
     end
 
+    def non_empty_tables
+      c = ActiveRecord::Base.connection
+      non_empty_tables = c.tables.select do |t|
+        c.select_value("SELECT COUNT(*) FROM #{c.quote_table_name(t)}") > 0
+      end
+      non_empty_tables.delete(ActiveRecord::Base.schema_migrations_table_name)
+      non_empty_tables.delete(ActiveRecord::Base.internal_metadata_table_name)
+      non_empty_tables.delete(Shard.table_name)
+      non_empty_tables.delete(Account.table_name)
+      # Only account should be the dummy account with id=0
+      non_empty_tables << Account.table_name if Account.where.not(id: 0).exists?
+      non_empty_tables
+    end
+
     private
 
     def each_connection(&)
@@ -114,8 +128,7 @@ module TestDatabaseUtils
     end
 
     def truncate_all_tables?
-      # Only account should be the dummy account with id=0
-      Account.where.not(id: 0).any? || Account.where(id: 0).none?
+      !non_empty_tables.empty? || !Account.where(id: 0).exists?
     end
 
     def truncate_all_tables!
