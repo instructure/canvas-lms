@@ -156,10 +156,6 @@ module Lti::IMS
     # @argument comment [String]
     #   Comment visible to the student about this score.
     #
-    # @argument submittedAt [String]
-    #  Date and time that the submission was originally created. Should use ISO8601-formatted date with subsecond precision.
-    #  Note: this isn't actually part of the AGS spec, and will be removed in a future release. Use submission.submittedAt instead!
-    #
     # @argument submission [Optional, Object]
     #  Contains metadata about the submission attempt. Supported fields listed below.
     #
@@ -352,7 +348,7 @@ module Lti::IMS
     end
 
     def verify_valid_submitted_at
-      submitted_at = params.dig(:submission, :submittedAt) || params[:submittedAt] || params.dig(Lti::Result::AGS_EXT_SUBMISSION, :submitted_at)
+      submitted_at = params.dig(:submission, :submittedAt) || top_level_submitted_at || params.dig(Lti::Result::AGS_EXT_SUBMISSION, :submitted_at)
       submitted_at_date = parse_timestamp(submitted_at)
 
       if submitted_at.present? && submitted_at_date.nil?
@@ -603,8 +599,14 @@ module Lti::IMS
     end
 
     def submitted_at
-      submitted_at = params.dig(:submission, :submittedAt) || params[:submittedAt] || scores_params.dig(:extensions, Lti::Result::AGS_EXT_SUBMISSION, :submitted_at)
+      submitted_at = params.dig(:submission, :submittedAt) || top_level_submitted_at || scores_params.dig(:extensions, Lti::Result::AGS_EXT_SUBMISSION, :submitted_at)
       parse_timestamp(submitted_at)
+    end
+
+    def top_level_submitted_at
+      return nil if @domain_root_account.feature_enabled?(:lti_ags_remove_top_submitted_at)
+
+      params[:submittedAt]
     end
 
     def file_content_items
