@@ -503,6 +503,13 @@ module Lti::IMS
             it_behaves_like "a request specifying when the submission occurred"
           end
 
+          context "with submission.submittedAt param present" do
+            let(:submitted_at) { 5.minutes.ago.iso8601(3) }
+            let(:params_overrides) { super().merge(submission: { submittedAt: submitted_at }) }
+
+            it_behaves_like "a request specifying when the submission occurred"
+          end
+
           context "with content items in extension" do
             let(:content_items) do
               [
