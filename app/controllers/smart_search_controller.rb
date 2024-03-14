@@ -115,7 +115,8 @@ class SmartSearchController < ApplicationController
   def show
     @context = Course.find(params[:course_id])
 
-    render_unauthorized_action unless SmartSearch.smart_search_available?(@context)
+    return render_unauthorized_action unless SmartSearch.smart_search_available?(@context)
+
     set_active_tab("search")
     @show_left_side = true
     add_crumb(t("#crumbs.search", "Search"), named_context_url(@context, :course_search_url)) unless @skip_crumb
