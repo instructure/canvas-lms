@@ -31,7 +31,7 @@ class ValidateMigrationIntegrity < ActiveRecord::Migration[7.0]
 
   def up
     initial_migration_version = "20101210192618"
-    last_squashed_migration_version = "20231220155354"
+    last_squashed_migration_version = "20231220155353"
 
     versions = if $canvas_rails == "7.1"
                  ActiveRecord::SchemaMigration.new(ActiveRecord::Base.connection).versions
@@ -42,11 +42,13 @@ class ValidateMigrationIntegrity < ActiveRecord::Migration[7.0]
     last_squashed_migration_has_run = versions.include?(last_squashed_migration_version)
 
     if initial_migration_has_run && !last_squashed_migration_has_run
-      raise <<~TEXT
+      msg = <<~TEXT
         You are trying to upgrade from a too-old version of Canvas. Please
         first upgrade to a version that includes database migration
         #{last_squashed_migration_version}.
       TEXT
+      msg += "You can reset the test database with `RAILS_ENV=test bin/rake db:test:reset`" if Rails.env.test?
+      raise msg
     end
   end
 end
