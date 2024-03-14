@@ -509,6 +509,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.integer :max_appointments_per_participant # nil means no limit
       t.integer :min_appointments_per_participant, default: 0
       t.string :participant_visibility, limit: 255
+      t.boolean :allow_observer_signup, null: false, default: false
     end
 
     create_table :appointment_group_contexts do |t|
@@ -713,10 +714,10 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.boolean :important_dates, default: false, null: false, index: { where: "important_dates" }
       t.boolean :hide_in_gradebook, default: false, null: false
       t.string :ab_guid, array: true, default: [], null: false
-      t.boolean :checkpointed, default: false, null: false
-      t.string :checkpoint_label, limit: 255
       t.references :parent_assignment, foreign_key: { to_table: :assignments }
       t.string :type, null: false, limit: 255, default: "Assignment"
+      t.string :sub_assignment_tag, limit: 255
+      t.boolean :has_sub_assignments, null: false, default: false
 
       t.index [:context_id, :context_type]
       t.index [:sis_source_id, :root_account_id], where: "sis_source_id IS NOT NULL", unique: true
@@ -765,17 +766,39 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.references :root_account, foreign_key: { to_table: :accounts }
       t.references :context_module, foreign_key: true, index: { where: "context_module_id IS NOT NULL" }
       t.boolean :unassign_item, default: false, null: false
+      t.references :wiki_page, foreign_key: true, index: { where: "wiki_page_id IS NOT NULL" }
+      t.references :discussion_topic, foreign_key: true, index: { where: "discussion_topic_id IS NOT NULL" }
+      t.references :attachment, foreign_key: true, index: { where: "attachment_id IS NOT NULL" }
 
-      t.check_constraint "workflow_state='deleted' OR quiz_id IS NOT NULL OR assignment_id IS NOT NULL OR context_module_id IS NOT NULL",
-                         name: "require_quiz_or_assignment_or_module"
+      t.check_constraint <<~SQL.squish, name: "require_association"
+        workflow_state='deleted' OR
+        assignment_id IS NOT NULL OR
+        quiz_id IS NOT NULL OR context_module_id IS NOT NULL OR
+        wiki_page_id IS NOT NULL OR
+        discussion_topic_id IS NOT NULL OR
+        attachment_id IS NOT NULL
+      SQL
 
       t.index %i[assignment_id set_type set_id],
               name: "index_assignment_overrides_on_assignment_and_set",
               unique: true,
               where: "workflow_state='active' and set_id is not null"
-      t.index [:context_module_id, :set_id],
-              where: "context_module_id IS NOT NULL AND workflow_state = 'active' AND set_type IN ('CourseSection', 'Group')",
-              unique: true
+      t.index %i[context_module_id set_id set_type],
+              unique: true,
+              where: "context_module_id IS NOT NULL AND workflow_state = 'active' AND set_id IS NOT NULL",
+              name: "index_assignment_overrides_on_context_module_id_and_set"
+      t.index %i[wiki_page_id set_id set_type],
+              unique: true,
+              where: "wiki_page_id IS NOT NULL AND workflow_state = 'active' AND set_id IS NOT NULL",
+              name: "index_assignment_overrides_on_wiki_page_id_and_set"
+      t.index %i[discussion_topic_id set_id set_type],
+              unique: true,
+              where: "discussion_topic_id IS NOT NULL AND workflow_state = 'active' AND set_id IS NOT NULL",
+              name: "index_assignment_overrides_on_discussion_topic_id_and_set"
+      t.index %i[attachment_id set_id set_type],
+              unique: true,
+              where: "attachment_id IS NOT NULL AND workflow_state = 'active' AND set_id IS NOT NULL",
+              name: "index_assignment_overrides_on_attachment_id_and_set"
     end
 
     create_table :assignment_override_students do |t|
@@ -787,6 +810,9 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.string :workflow_state, default: "active", null: false, index: true
       t.references :root_account, foreign_key: { to_table: :accounts }
       t.references :context_module, foreign_key: true, index: false
+      t.references :wiki_page, foreign_key: true, index: false
+      t.references :discussion_topic, foreign_key: true, index: false
+      t.references :attachment, foreign_key: true, index: false
 
       t.index [:assignment_id, :user_id], unique: true, where: "workflow_state = 'active'"
       t.index [:user_id, :quiz_id]
@@ -794,6 +820,14 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
               where: "context_module_id IS NOT NULL",
               unique: true,
               name: "index_assignment_override_students_on_context_module_and_user"
+      t.index [:wiki_page_id, :user_id], unique: true, where: "wiki_page_id IS NOT NULL"
+      t.index [:discussion_topic_id, :user_id],
+              unique: true,
+              where: "discussion_topic_id IS NOT NULL",
+              name: "index_assignment_override_students_on_discussion_topic_and_user"
+      t.index [:attachment_id, :user_id],
+              unique: true,
+              where: "attachment_id IS NOT NULL"
     end
 
     create_table :attachments do |t|
@@ -837,6 +871,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.string :category, default: "uncategorized", null: false
       t.integer :word_count
       t.string :visibility_level, limit: 32, default: "inherit", null: false
+      t.boolean :only_visible_to_overrides, null: false, default: false
 
       t.index [:context_id, :context_type]
       t.index [:md5, :namespace]
@@ -1710,6 +1745,9 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.references :created_by, null: false, foreign_key: { to_table: :users }
       t.references :deleted_by, foreign_key: { to_table: :users }
       t.timestamps precision: 6
+      t.boolean :applies_to_submissions, null: false, default: true
+      t.boolean :applies_to_final_grade, null: false, default: true
+      t.boolean :allow_final_grade_value, null: false, default: true
 
       t.replica_identity_index
     end
@@ -1938,6 +1976,8 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.string :anonymous_state, limit: 255
       t.boolean :is_anonymous_author, default: false, null: false
       t.integer :reply_to_entry_required_count, null: false, default: 0
+      t.timestamp :unlock_at, precision: 6
+      t.boolean :only_visible_to_overrides, null: false, default: false
 
       t.replica_identity_index
       t.index [:context_id, :position]
@@ -2466,6 +2506,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.references :outcome_import, index: false
       t.bigint :root_account_ids, array: true, index: { using: :gin }
       t.references :copied_from_outcome, index: { where: "copied_from_outcome_id IS NOT NULL" }
+      t.timestamp :archived_at, precision: 6, default: nil
 
       t.index [:context_id, :context_type]
     end
@@ -2492,6 +2533,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.references :source_outcome_group,
                    index: { where: "source_outcome_group_id IS NOT NULL" },
                    foreign_key: { to_table: :learning_outcome_groups }
+      t.timestamp :archived_at, precision: 6, default: nil
 
       t.index [:context_id, :context_type]
       t.index %i[context_type context_id vendor_guid_2], name: "index_learning_outcome_groups_on_context_and_vendor_guid"
@@ -2605,7 +2647,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.references :root_account, null: false, foreign_key: { to_table: :accounts }, index: false
       t.timestamps precision: 6
       t.string :guid
-      t.jsonb :registration_overlay
+      t.jsonb :registration_overlay, default: {}
 
       t.replica_identity_index
     end
@@ -2703,6 +2745,8 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.uuid :lookup_uuid, null: false
       t.uuid :resource_link_uuid, null: false, index: { unique: true }
       t.string :url
+      t.string :lti_1_1_id, index: { unique: true, where: "lti_1_1_id IS NOT NULL" }
+      t.string :title
 
       t.replica_identity_index
       t.index [:context_id, :context_type], name: "index_lti_resource_links_by_context_id_context_type"
@@ -3012,6 +3056,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.timestamps precision: 6
       t.string :ms_group_id
       t.references :last_error_report, index: false
+      t.text :debug_info
 
       t.replica_identity_index
     end
@@ -4228,6 +4273,8 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.references :root_account, foreign_key: { to_table: :accounts }, null: false, index: false
       t.string :workflow_state, null: false, default: "active", limit: 255
       t.timestamps
+      t.references :created_by, foreign_key: { to_table: :users }
+      t.references :deleted_by, foreign_key: { to_table: :users }
 
       t.replica_identity_index
     end
@@ -4496,6 +4543,9 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.references :root_account, foreign_key: { to_table: :accounts }
       t.timestamp :publish_at
       t.references :current_lookup, foreign_key: { to_table: :wiki_page_lookups }
+      t.timestamp :unlock_at, precision: 6
+      t.timestamp :lock_at, precision: 6
+      t.boolean :only_visible_to_overrides, null: false, default: false
 
       t.index [:context_id, :context_type]
       t.index [:wiki_id, :todo_date], where: "todo_date IS NOT NULL"
