@@ -37,18 +37,24 @@ import {DateTimeInput} from '@instructure/ui-date-time-input'
 import CanvasMultiSelect from '@canvas/multi-select'
 import CanvasRce from '@canvas/rce/react/CanvasRce'
 import {Alert} from '@instructure/ui-alerts'
+
 import {GradedDiscussionOptions} from '../GradedDiscussionOptions/GradedDiscussionOptions'
 import {
   GradedDiscussionDueDatesContext,
   defaultEveryoneOption,
   defaultEveryoneElseOption,
   masteryPathsOption,
+  shouldShowContent,
 } from '../../util/constants'
+
 import {AttachmentDisplay} from '@canvas/discussions/react/components/AttachmentDisplay/AttachmentDisplay'
 import {responsiveQuerySizes} from '@canvas/discussions/react/utils'
 import {UsageRightsContainer} from '../../containers/usageRights/UsageRightsContainer'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+
+import {prepareAssignmentPayload} from '../../util/payloadPreparations'
+import {validateTitle, validateAvailability, validateFormFields} from '../../util/formValidation'
 
 import {
   addNewGroupCategoryToCache,
@@ -265,329 +271,31 @@ export default function DiscussionTopicForm({
     if (!isGroupDiscussion) setGroupCategoryId(null)
   }, [isGroupDiscussion])
 
-  const shouldShowTodoSettings =
-    !isGraded &&
-    !isAnnouncement &&
-    ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MANAGE_CONTENT &&
-    ENV.STUDENT_PLANNER_ENABLED
-
-  const shouldShowPostToSectionOption = !isGraded && !isGroupDiscussion && !isGroupContext
-
-  const shouldShowAnonymousOptions =
-    !isGroupContext &&
-    !isAnnouncement &&
-    (ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MODERATE ||
-      ENV.allow_student_anonymous_discussion_topics)
-
-  const shouldShowAnnouncementOnlyOptions = isAnnouncement && !isGroupContext
-
-  const shouldShowGroupOptions =
-    discussionAnonymousState === 'off' &&
-    !isAnnouncement &&
-    !isGroupContext &&
-    ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_SET_GROUP
-
-  const shouldShowGradedDiscussionOptions =
-    discussionAnonymousState === 'off' &&
-    !isAnnouncement &&
-    !isGroupContext &&
-    ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_CREATE_ASSIGNMENT
-
-  const shouldShowUsageRightsOption =
-    ENV?.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_ATTACH &&
-    ENV?.FEATURES?.usage_rights_discussion_topics &&
-    ENV?.USAGE_RIGHTS_REQUIRED &&
-    ENV?.PERMISSIONS?.manage_files
-
-  const shouldShowLikingOption = !ENV.K5_HOMEROOM_COURSE
-
-  const shouldShowPartialAnonymousSelector =
-    !isEditing && discussionAnonymousState === 'partial_anonymity' && isStudent
-
-  const shouldShowAvailabilityOptions = !isAnnouncement && !isGroupContext
-
-  /* discussion moderators viewing a new or still unpublished discussion */
-  const shouldShowSaveAndPublishButton =
-    !isAnnouncement && ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MODERATE && !published
-
-  const shouldShowPodcastFeedOption =
-    ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MODERATE && !ENV.K5_HOMEROOM_COURSE
+  const {
+    shouldShowTodoSettings,
+    shouldShowPostToSectionOption,
+    shouldShowAnonymousOptions,
+    shouldShowAnnouncementOnlyOptions,
+    shouldShowGroupOptions,
+    shouldShowGradedDiscussionOptions,
+    shouldShowUsageRightsOption,
+    shouldShowLikingOption,
+    shouldShowPartialAnonymousSelector,
+    shouldShowAvailabilityOptions,
+    shouldShowSaveAndPublishButton,
+    shouldShowPodcastFeedOption,
+  } = shouldShowContent(
+    isGraded,
+    isAnnouncement,
+    isGroupDiscussion,
+    isGroupContext,
+    discussionAnonymousState,
+    isEditing,
+    isStudent,
+    published
+  )
 
   const canGroupDiscussion = !isEditing || currentDiscussionTopic?.canGroup || false
-
-  const validateTitle = newTitle => {
-    if (newTitle.length > 255) {
-      setTitleValidationMessages([
-        {text: I18n.t('Title must be less than 255 characters.'), type: 'error'},
-      ])
-      return false
-    } else if (newTitle.length === 0) {
-      setTitleValidationMessages([{text: I18n.t('Title must not be empty.'), type: 'error'}])
-      return false
-    } else {
-      setTitleValidationMessages([{text: '', type: 'success'}])
-      return true
-    }
-  }
-
-  const validateAvailability = (newAvailableFrom, newAvailableUntil) => {
-    if (isGraded) {
-      return true
-    }
-
-    if (newAvailableFrom === null || newAvailableUntil === null) {
-      setAvailabilityValidationMessages([{text: '', type: 'success'}])
-      return true
-    } else if (newAvailableUntil < newAvailableFrom) {
-      setAvailabilityValidationMessages([
-        {text: I18n.t('Date must be after date available.'), type: 'error'},
-      ])
-      return false
-    } else {
-      setAvailabilityValidationMessages([{text: '', type: 'success'}])
-      return true
-    }
-  }
-
-  const validateSelectGroup = () => {
-    if (!isGroupDiscussion) return true // if not a group discussion, no need to validate
-    if (groupCategoryId) return true // if a group category is selected, validated
-
-    // if not a group discussion and no group category is selected, show error
-    setGroupCategorySelectError([{text: I18n.t('Please select a group category.'), type: 'error'}])
-    return false
-  }
-
-  const validateUsageRights = () => {
-    // if usage rights is not enabled or there are no attachments, there is no need to validate
-    if (
-      !ENV?.FEATURES?.usage_rights_discussion_topics ||
-      !ENV?.USAGE_RIGHTS_REQUIRED ||
-      !attachment
-    ) {
-      return true
-    }
-
-    if (usageRightsData?.useJustification) return true
-    setOnFailure(I18n.t('You must set usage rights'))
-    setUsageRightsErrorState(true)
-    return false
-  }
-
-  const validatePostToSections = () => {
-    // If the PostTo section is not available, no need to validate
-    if (!shouldShowPostToSectionOption) {
-      return true
-    }
-
-    if (sectionIdsToPostTo.length === 0) {
-      return false
-    } else {
-      return true
-    }
-  }
-
-  const validateGradedDiscussionFields = () => {
-    if (!isGraded) {
-      return true
-    }
-
-    for (const refMap of gradedDiscussionRefMap.values()) {
-      for (const value of Object.values(refMap)) {
-        if (value !== null) {
-          gradedDiscussionRef.current = value.current
-          return false
-        }
-      }
-    }
-    gradedDiscussionRef.current = null
-    return true
-  }
-
-  const validateFormFields = () => {
-    let isValid = true
-
-    const validationRefs = [
-      {validationFunction: validateTitle(title), ref: textInputRef.current},
-      {validationFunction: validatePostToSections(), ref: sectionInputRef.current},
-      {validationFunction: validateSelectGroup(), ref: groupOptionsRef.current},
-      {
-        validationFunction: validateAvailability(availableFrom, availableUntil),
-        ref: dateInputRef.current,
-      },
-      {validationFunction: validateGradedDiscussionFields(), ref: gradedDiscussionRef.current},
-      {validationFunction: validateUsageRights(), ref: null},
-    ]
-
-    const inValidFields = []
-
-    validationRefs.forEach(({validationFunction, ref}) => {
-      if (!validationFunction) {
-        if (ref) inValidFields.push(ref)
-        isValid = false
-      }
-    })
-
-    inValidFields[0]?.focus()
-
-    return isValid
-  }
-
-  const prepareOverride = (
-    overrideDueDate,
-    overrideAvailableUntil,
-    overrideAvailableFrom,
-    overrideIds = {
-      groupId: null,
-      courseSectionId: null,
-      studentIds: null,
-      noopId: null,
-    },
-    overrideTitle = null
-  ) => {
-    return {
-      dueAt: overrideDueDate || null,
-      lockAt: overrideAvailableUntil || null,
-      unlockAt: overrideAvailableFrom || null,
-      groupId: overrideIds.groupIds || null,
-      courseSectionId: overrideIds.courseSectionId || null,
-      studentIds: overrideIds.studentIds || null,
-      noopId: overrideIds.noopId || null,
-      title: overrideTitle || null,
-    }
-  }
-
-  const prepareAssignmentOverridesPayload = () => {
-    const onlyVisibleToEveryone = assignedInfoList.every(
-      info =>
-        info.assignedList.length === 1 && info.assignedList[0] === defaultEveryoneOption.assetCode
-    )
-
-    if (onlyVisibleToEveryone) return null
-
-    const preparedOverrides = []
-    assignedInfoList.forEach(info => {
-      const {assignedList} = info
-      const studentIds = assignedList.filter(assetCode => assetCode.includes('user'))
-      const sectionIds = assignedList.filter(assetCode => assetCode.includes('section'))
-      const groupIds = assignedList.filter(assetCode => assetCode.includes('group'))
-
-      // override for student ids
-      if (studentIds.length > 0) {
-        preparedOverrides.push(
-          prepareOverride(
-            info.dueDate || null,
-            info.availableUntil || null,
-            info.availableFrom || null,
-            {
-              studentIds:
-                studentIds.length > 0 ? studentIds.map(id => id.split('_').reverse()[0]) : null,
-            }
-          )
-        )
-      }
-
-      // override for section ids
-      if (sectionIds.length > 0) {
-        sectionIds.forEach(sectionId => {
-          preparedOverrides.push(
-            prepareOverride(
-              info.dueDate || null,
-              info.availableUntil || null,
-              info.availableFrom || null,
-              {
-                courseSectionId: sectionId.split('_').reverse()[0] || null,
-              }
-            )
-          )
-        })
-      }
-
-      // override for group ids
-      if (groupIds.length > 0) {
-        groupIds.forEach(groupId => {
-          preparedOverrides.push(
-            prepareOverride(
-              info.dueDate || null,
-              info.availableUntil || null,
-              info.availableFrom || null,
-              {
-                groupIds: groupId.split('_').reverse()[0] || null,
-              }
-            )
-          )
-        })
-      }
-    })
-
-    const masteryPathOverride = assignedInfoList.find(info =>
-      info.assignedList.includes(masteryPathsOption.assetCode)
-    )
-
-    if (masteryPathOverride) {
-      preparedOverrides.push(
-        prepareOverride(
-          masteryPathOverride.dueDate || null,
-          masteryPathOverride.availableUntil || null,
-          masteryPathOverride.availableFrom || null,
-          {
-            noopId: '1',
-          },
-          masteryPathsOption.label
-        )
-      )
-    }
-
-    return preparedOverrides
-  }
-
-  const preparePeerReviewPayload = () => {
-    return peerReviewAssignment === 'off'
-      ? null
-      : {
-          automaticReviews: peerReviewAssignment === 'automatically',
-          count: !isEditing && peerReviewAssignment === 'manually' ? 0 : peerReviewsPerStudent,
-          enabled: true,
-          dueAt: peerReviewDueDate || null,
-          intraReviews: intraGroupPeerReviews,
-        }
-  }
-
-  const prepareAssignmentPayload = () => {
-    // Return null immediately if the assignment is not graded
-    if (!isGraded) return null
-
-    const everyoneOverride =
-      assignedInfoList.find(
-        info =>
-          info.assignedList.includes(defaultEveryoneOption.assetCode) ||
-          info.assignedList.includes(defaultEveryoneElseOption.assetCode)
-      ) || {}
-
-    // Common payload properties for graded assignments
-    let payload = {
-      pointsPossible,
-      postToSis,
-      gradingType: displayGradeAs,
-      assignmentGroupId: assignmentGroup || null,
-      peerReviews: preparePeerReviewPayload(),
-      assignmentOverrides: prepareAssignmentOverridesPayload(),
-      dueAt: everyoneOverride.dueDate || null,
-      lockAt: everyoneOverride.availableUntil || null,
-      unlockAt: everyoneOverride.availableFrom || null,
-      onlyVisibleToOverrides: !Object.keys(everyoneOverride).length,
-      gradingStandardId: gradingSchemeId || null,
-    }
-    // Additional properties for creation of a graded assignment
-    if (!isEditing) {
-      payload = {
-        ...payload,
-        courseId: ENV.context_id,
-        name: title,
-      }
-    }
-    return payload
-  }
 
   const createSubmitPayload = shouldPublish => {
     const payload = {
@@ -602,7 +310,24 @@ export default function DiscussionTopicForm({
       delayedPostAt: availableFrom,
       lockAt: availableUntil,
       // Conditional payload properties
-      assignment: prepareAssignmentPayload(),
+      assignment: prepareAssignmentPayload(
+        isEditing,
+        title,
+        pointsPossible,
+        displayGradeAs,
+        assignmentGroup,
+        gradingSchemeId,
+        isGraded,
+        assignedInfoList,
+        defaultEveryoneOption,
+        defaultEveryoneElseOption,
+        postToSis,
+        peerReviewAssignment,
+        peerReviewsPerStudent,
+        peerReviewDueDate,
+        intraGroupPeerReviews,
+        masteryPathsOption
+      ),
       groupCategoryId: isGroupDiscussion ? groupCategoryId : null,
       specificSections: shouldShowPostToSectionOption ? sectionIdsToPostTo.join() : 'all',
       locked: shouldShowAnnouncementOnlyOptions ? locked : false,
@@ -642,7 +367,31 @@ export default function DiscussionTopicForm({
       setIsSubmitting(true)
     }, 0)
 
-    if (validateFormFields()) {
+    if (
+      validateFormFields(
+        title,
+        availableFrom,
+        availableUntil,
+        isGraded,
+        textInputRef,
+        sectionInputRef,
+        groupOptionsRef,
+        dateInputRef,
+        gradedDiscussionRef,
+        gradedDiscussionRefMap,
+        attachment,
+        usageRightsData,
+        setUsageRightsErrorState,
+        setOnFailure,
+        isGroupDiscussion,
+        groupCategoryId,
+        setGroupCategorySelectError,
+        setTitleValidationMessages,
+        setAvailabilityValidationMessages,
+        shouldShowPostToSectionOption,
+        sectionIdsToPostTo
+      )
+    ) {
       const payload = createSubmitPayload(shouldPublish)
       onSubmit(payload)
       return true
@@ -757,7 +506,7 @@ export default function DiscussionTopicForm({
           value={title}
           ref={textInputRef}
           onChange={(_event, value) => {
-            validateTitle(value)
+            validateTitle(value, setTitleValidationMessages)
             const newTitle = value.substring(0, 255)
             setTitle(newTitle)
           }}
@@ -1151,7 +900,12 @@ export default function DiscussionTopicForm({
                 nextMonthLabel={I18n.t('next')}
                 value={availableFrom}
                 onChange={(_event, newAvailableFrom) => {
-                  validateAvailability(newAvailableFrom, availableUntil)
+                  validateAvailability(
+                    newAvailableFrom,
+                    availableUntil,
+                    isGraded,
+                    setAvailabilityValidationMessages
+                  )
                   setAvailableFrom(newAvailableFrom)
                 }}
                 datePlaceholder={I18n.t('Select Date')}
@@ -1167,7 +921,12 @@ export default function DiscussionTopicForm({
                 nextMonthLabel={I18n.t('next')}
                 value={availableUntil}
                 onChange={(_event, newAvailableUntil) => {
-                  validateAvailability(availableFrom, newAvailableUntil)
+                  validateAvailability(
+                    availableFrom,
+                    newAvailableUntil,
+                    isGraded,
+                    setAvailabilityValidationMessages
+                  )
                   setAvailableUntil(newAvailableUntil)
                 }}
                 datePlaceholder={I18n.t('Select Date')}
