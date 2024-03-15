@@ -18,18 +18,15 @@
 
 import React, {useState, useRef, useEffect, useContext} from 'react'
 import PropTypes from 'prop-types'
-import AnonymousResponseSelector from '@canvas/discussions/react/components/AnonymousResponseSelector/AnonymousResponseSelector'
 import {CreateOrEditSetModal} from '@canvas/groups/react/CreateOrEditSetModal'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
-
 import {TextInput} from '@instructure/ui-text-input'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {Button} from '@instructure/ui-buttons'
 import {IconAddLine, IconPublishSolid, IconUnpublishedLine} from '@instructure/ui-icons'
-import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
 import {Text} from '@instructure/ui-text'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {SimpleSelect} from '@instructure/ui-simple-select'
@@ -38,13 +35,14 @@ import CanvasMultiSelect from '@canvas/multi-select'
 import CanvasRce from '@canvas/rce/react/CanvasRce'
 import {Alert} from '@instructure/ui-alerts'
 
-import {GradedDiscussionOptions} from '../GradedDiscussionOptions/GradedDiscussionOptions'
+import {GradedDiscussionOptions} from '../DiscussionOptions/GradedDiscussionOptions'
+import {AnonymousSelector} from '../DiscussionOptions/AnonymousSelector'
 import {
   GradedDiscussionDueDatesContext,
   defaultEveryoneOption,
   defaultEveryoneElseOption,
   masteryPathsOption,
-  shouldShowContent,
+  useShouldShowContent,
 } from '../../util/constants'
 
 import {AttachmentDisplay} from '@canvas/discussions/react/components/AttachmentDisplay/AttachmentDisplay'
@@ -284,7 +282,7 @@ export default function DiscussionTopicForm({
     shouldShowAvailabilityOptions,
     shouldShowSaveAndPublishButton,
     shouldShowPodcastFeedOption,
-  } = shouldShowContent(
+  } = useShouldShowContent(
     isGraded,
     isAnnouncement,
     isGroupDiscussion,
@@ -585,51 +583,17 @@ export default function DiscussionTopicForm({
         )}
         <Text size="large">{I18n.t('Options')}</Text>
         {shouldShowAnonymousOptions && (
-          <View display="block" margin="medium 0">
-            <RadioInputGroup
-              name="anonymous"
-              description={I18n.t('Anonymous Discussion')}
-              value={discussionAnonymousState}
-              onChange={(_event, value) => {
-                if (value !== 'off') {
-                  setIsGraded(false)
-                  setIsGroupDiscussion(false)
-                  setGroupCategoryId(null)
-                }
-                setDiscussionAnonymousState(value)
-              }}
-              disabled={isEditing || isGraded}
-            >
-              <RadioInput
-                key="off"
-                value="off"
-                label={I18n.t(
-                  'Off: student names and profile pictures will be visible to other members of this course'
-                )}
-              />
-              <RadioInput
-                key="partial_anonymity"
-                value="partial_anonymity"
-                label={I18n.t(
-                  'Partial: students can choose to reveal their name and profile picture'
-                )}
-              />
-              <RadioInput
-                key="full_anonymity"
-                value="full_anonymity"
-                label={I18n.t('Full: student names and profile pictures will be hidden')}
-              />
-            </RadioInputGroup>
-            {shouldShowPartialAnonymousSelector && (
-              <View display="block" margin="medium 0">
-                <AnonymousResponseSelector
-                  username={ENV.current_user.display_name}
-                  setAnonymousAuthorState={setAnonymousAuthorState}
-                  discussionAnonymousState={discussionAnonymousState}
-                />
-              </View>
-            )}
-          </View>
+          <AnonymousSelector
+            discussionAnonymousState={discussionAnonymousState}
+            setDiscussionAnonymousState={setDiscussionAnonymousState}
+            isEditing={isEditing}
+            isGraded={isGraded}
+            setIsGraded={setIsGraded}
+            setIsGroupDiscussion={setIsGroupDiscussion}
+            setGroupCategoryId={setGroupCategoryId}
+            shouldShowPartialAnonymousSelector={shouldShowPartialAnonymousSelector}
+            setAnonymousAuthorState={setAnonymousAuthorState}
+          />
         )}
         <FormFieldGroup description="" rowSpacing="small">
           {shouldShowAnnouncementOnlyOptions && (

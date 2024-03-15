@@ -54,7 +54,7 @@ export const ASSIGNMENT_OVERRIDE_GRAPHQL_TYPENAMES = {
   GROUP: 'Group',
 }
 
-export const shouldShowContent = (
+export const useShouldShowContent = (
   isGraded,
   isAnnouncement,
   isGroupDiscussion,
