@@ -96,7 +96,7 @@ class SmartSearchController < ApplicationController
           )
                                  .joins(:embeddings)
                                  .group("#{klass.table_name}.id")
-                                 .order("distance ASC")
+                                 .reorder("distance ASC")
           collections << [klass.name,
                           BookmarkedCollection.wrap(
                             BookmarkedCollection::SimpleBookmarker.new(klass, { distance: { type: :float, null: false } }, :id),

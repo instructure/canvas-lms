@@ -34,6 +34,7 @@ describe "Smart Search API", type: :request do
     wiki_page_model(title: "foo", body: "...", course: @course)
     wiki_page_model(title: "bar", body: "...", course: @course)
     assignment_model(title: "goo", description: "...", course: @course)
+    discussion_topic_model(title: "baz", message: "...", context: @course)
     discussion_topic_model(title: "hoo", message: "...", context: @course)
     announcement_model(title: "boo", message: "...", context: @course)
     @path = "/api/v1/courses/#{@course.id}/smartsearch"
@@ -70,8 +71,11 @@ describe "Smart Search API", type: :request do
          ["goo", "Assignment"],
          ["hoo", "Discussion Topic"],
          ["boo", "Announcement"],
-         ["bar", "Page"]]
+         ["bar", "Page"],
+         ["baz", "Discussion Topic"]]
       )
+      distances = response["results"].pluck("distance")
+      expect(distances).to eq(distances.sort)
     end
   end
 end
