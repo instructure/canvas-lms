@@ -87,7 +87,7 @@ module ActiveSupport
               Canvas::CacheRegister.lua.run(:get_with_batched_keys, keys, [now], redis)
             end
 
-            cached_entry = Marshal.load(cached_entry) if cached_entry # rubocop:disable Security/MarshalLoad
+            cached_entry = deserialize_entry(cached_entry, **options)
 
             entry = handle_expired_entry(cached_entry, frd_key, options)
             if payload
@@ -105,7 +105,7 @@ module ActiveSupport
             instrument(:write, name, **options) do
               entry = ::ActiveSupport::Cache::Entry.new(result, **options)
               failsafe :write_entry, returning: false do
-                redis.set(frd_key, Marshal.dump(entry)) # write to the key generated in the lua script
+                redis.set(frd_key, serialize_entry(entry, **options)) # write to the key generated in the lua script
               end
             end
             result
