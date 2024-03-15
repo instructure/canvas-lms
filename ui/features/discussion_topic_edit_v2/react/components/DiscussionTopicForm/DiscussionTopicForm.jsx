@@ -36,6 +36,7 @@ import CanvasRce from '@canvas/rce/react/CanvasRce'
 import {Alert} from '@instructure/ui-alerts'
 
 import {GradedDiscussionOptions} from '../DiscussionOptions/GradedDiscussionOptions'
+import {NonGradedDateOptions} from '../DiscussionOptions/NonGradedDateOptions'
 import {AnonymousSelector} from '../DiscussionOptions/AnonymousSelector'
 import {
   GradedDiscussionDueDatesContext,
@@ -52,7 +53,7 @@ import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 import {prepareAssignmentPayload} from '../../util/payloadPreparations'
-import {validateTitle, validateAvailability, validateFormFields} from '../../util/formValidation'
+import {validateTitle, validateFormFields} from '../../util/formValidation'
 
 import {
   addNewGroupCategoryToCache,
@@ -854,54 +855,19 @@ export default function DiscussionTopicForm({
               </GradedDiscussionDueDatesContext.Provider>
             </View>
           ) : (
-            <FormFieldGroup description="" width={inputWidth}>
-              <DateTimeInput
-                timezone={ENV.TIMEZONE}
-                description={I18n.t('Available from')}
-                dateRenderLabel={I18n.t('Date')}
-                timeRenderLabel={I18n.t('Time')}
-                prevMonthLabel={I18n.t('previous')}
-                nextMonthLabel={I18n.t('next')}
-                value={availableFrom}
-                onChange={(_event, newAvailableFrom) => {
-                  validateAvailability(
-                    newAvailableFrom,
-                    availableUntil,
-                    isGraded,
-                    setAvailabilityValidationMessages
-                  )
-                  setAvailableFrom(newAvailableFrom)
-                }}
-                datePlaceholder={I18n.t('Select Date')}
-                invalidDateTimeMessage={I18n.t('Invalid date and time')}
-                layout="columns"
-              />
-              <DateTimeInput
-                timezone={ENV.TIMEZONE}
-                description={I18n.t('Until')}
-                dateRenderLabel={I18n.t('Date')}
-                timeRenderLabel={I18n.t('Time')}
-                prevMonthLabel={I18n.t('Time')}
-                nextMonthLabel={I18n.t('next')}
-                value={availableUntil}
-                onChange={(_event, newAvailableUntil) => {
-                  validateAvailability(
-                    availableFrom,
-                    newAvailableUntil,
-                    isGraded,
-                    setAvailabilityValidationMessages
-                  )
-                  setAvailableUntil(newAvailableUntil)
-                }}
-                datePlaceholder={I18n.t('Select Date')}
-                invalidDateTimeMessage={I18n.t('Invalid date and time')}
-                messages={availabilityValidationMessages}
-                layout="columns"
-                dateInputRef={ref => {
-                  dateInputRef.current = ref
-                }}
-              />
-            </FormFieldGroup>
+            <NonGradedDateOptions
+              availableFrom={availableFrom}
+              setAvailableFrom={setAvailableFrom}
+              availableUntil={availableUntil}
+              setAvailableUntil={setAvailableUntil}
+              isGraded={isGraded}
+              setAvailabilityValidationMessages={setAvailabilityValidationMessages}
+              availabilityValidationMessages={availabilityValidationMessages}
+              inputWidth={inputWidth}
+              setDateInputRef={ref => {
+                dateInputRef.current = ref
+              }}
+            />
           ))}
         <View
           display="block"
