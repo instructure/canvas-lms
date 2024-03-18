@@ -18227,13 +18227,6 @@ jest@^29.7.0:
     import-local "^3.0.2"
     jest-cli "^29.7.0"
 
-jquery-getscrollbarwidth@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/jquery-getscrollbarwidth/-/jquery-getscrollbarwidth-1.0.0.tgz#3d95591a71141444b505b4a21c20569142b5b63b"
-  integrity sha1-PZVZGnEUFES1BbSiHCBWkUK1tjs=
-  dependencies:
-    jquery ">=1.5"
-
 jquery-migrate@1.4.1:
   version "1.4.1"
   resolved "https://registry.yarnpkg.com/jquery-migrate/-/jquery-migrate-1.4.1.tgz#85152f3ec99a95625f4f7d0bcf62e9b8638f5a76"

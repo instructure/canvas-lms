@@ -144,7 +144,6 @@ import '@canvas/util/templateData'
 import '@canvas/media-comments'
 import '@canvas/media-comments/jquery/mediaCommentThumbnail'
 import '@canvas/rails-flash-notifications'
-import 'jquery-getscrollbarwidth'
 import 'jquery-scroll-to-visible/jquery.scrollTo'
 import 'jquery-selectmenu'
 import '@canvas/jquery/jquery.disableWhileLoading'
@@ -622,8 +621,7 @@ function initDropdown() {
         $menu.show().css({
           left: $selectmenu_list.css('left'),
           top: $selectmenu_list.css('top'),
-          width:
-            $selectmenu_list.width() - ($selectmenu_list.hasScrollbar() && $.getScrollbarWidth()),
+          width: $selectmenu_list.width(),
           'z-index': Number($selectmenu_list.css('z-index')) + 1,
         })
       })
