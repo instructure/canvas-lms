@@ -74,7 +74,8 @@ class Lti::LineItem < ApplicationRecord
         name: params[:label],
         points_possible: params[:score_maximum],
         submission_types: "none",
-        due_at: params[:end_date_time]
+        due_at: params[:end_date_time],
+        unlock_at: params[:start_date_time]
       }
 
       submission_type = params[AGS_EXT_SUBMISSION_TYPE]
