@@ -61,12 +61,17 @@ export function PostMessage({...props}) {
           titleTextSize: 'small',
           titleTextWeight: 'bold',
           messageTextSize: 'fontSizeXSmall',
+          messageLeftPadding: undefined,
         },
         desktop: {
           titleMargin: props.threadMode ? '0' : '0 0 small 0',
           titleTextSize: props.threadMode ? 'medium' : 'x-large',
           titleTextWeight: props.threadMode ? 'bold' : 'normal',
           messageTextSize: props.threadMode ? 'fontSizeSmall' : 'fontSizeMedium',
+          messageLeftPadding:
+            props.discussionEntry && props.discussionEntry.depth === 1 && !props.threadMode
+              ? theme.variables.spacing.xxSmall
+              : undefined,
         },
       }}
       render={responsiveProps => (
@@ -109,8 +114,9 @@ export function PostMessage({...props}) {
             </View>
           ) : (
             <>
-              <span
+              <div
                 style={{
+                  marginLeft: responsiveProps.messageLeftPadding,
                   fontSize: theme.variables.typography[responsiveProps.messageTextSize],
                 }}
               >
@@ -119,7 +125,7 @@ export function PostMessage({...props}) {
                   searchTerm={searchTerm}
                   text={props.message}
                 />
-              </span>
+              </div>
               <View display="block">{props.children}</View>
             </>
           )}

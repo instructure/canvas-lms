@@ -734,7 +734,7 @@ class DiscussionTopicsController < ApplicationController
       add_rss_links_to_content
     end
 
-    if @context.is_a?(Course) && @context.grants_right?(@current_user, session, :manage)
+    if (@context.is_a?(Course) || @context.is_a?(Group)) && @context.grants_right?(@current_user, session, :manage)
       set_student_context_cards_js_env
     end
 
