@@ -77,5 +77,22 @@ describe "Smart Search API", type: :request do
       distances = response["results"].pluck("distance")
       expect(distances).to eq(distances.sort)
     end
+
+    it "filters by type" do
+      stub_smart_search
+      SmartSearch.index_course(@course)
+
+      response = api_call(:get, @path + "?q=foo&filter[]=announcements", @params.merge(q: "foo", filter: ["announcements"]))
+      expect(response["results"].pluck("content_type")).to match_array %w[Announcement]
+
+      response = api_call(:get, @path + "?q=foo&filter[]=discussion_topics&filter[]=pages", @params.merge(q: "foo", filter: ["discussion_topics", "pages"]))
+      expect(response["results"].pluck("content_type")).to match_array %w[DiscussionTopic DiscussionTopic WikiPage WikiPage]
+
+      response = api_call(:get, @path + "?q=foo&filter[]=discussion_topics&filter[]=announcements", @params.merge(q: "foo", filter: ["discussion_topics", "announcements"]))
+      expect(response["results"].pluck("content_type")).to match_array %w[DiscussionTopic DiscussionTopic Announcement]
+
+      response = api_call(:get, @path + "?q=foo&filter[]=assignments", @params.merge(q: "foo", filter: ["assignments"]))
+      expect(response["results"].pluck("content_type")).to match_array %w[Assignment]
+    end
   end
 end
