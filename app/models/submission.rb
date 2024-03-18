@@ -2614,9 +2614,7 @@ class Submission < ActiveRecord::Base
     # This should always be called in the context of a delayed job
     return unless CutyCapt.enabled?
 
-    if (attachment = CutyCapt.snapshot_attachment_for_url(url))
-      attachment.context = self
-      attachment.save!
+    if (attachment = CutyCapt.snapshot_attachment_for_url(url, context: self))
       attach_screenshot(attachment)
     else
       logger.error("Error capturing web snapshot for submission #{global_id}")
