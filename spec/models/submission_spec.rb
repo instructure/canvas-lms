@@ -5243,7 +5243,7 @@ describe Submission do
     it "does not blow up if web snapshotting fails" do
       sub = submission_spec_model
       expect(CutyCapt).to receive(:enabled?).and_return(true)
-      expect(CutyCapt).to receive(:snapshot_attachment_for_url).with(sub.url).and_return(nil)
+      expect(CutyCapt).to receive(:snapshot_attachment_for_url).with(sub.url, context: sub).and_return(nil)
       sub.get_web_snapshot
     end
   end

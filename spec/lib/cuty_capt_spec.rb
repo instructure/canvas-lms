@@ -85,7 +85,8 @@ describe CutyCapt do
     it "returns an attachment" do
       path = file_fixture("instructure.png")
       expect(CutyCapt).to receive(:snapshot_url).and_yield(path)
-      attachment = CutyCapt.snapshot_attachment_for_url("blah")
+      user = User.create!
+      attachment = CutyCapt.snapshot_attachment_for_url("blah", context: user)
       expect(attachment).not_to be_nil
     end
   end
