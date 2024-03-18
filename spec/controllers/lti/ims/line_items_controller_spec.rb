@@ -89,11 +89,13 @@ module Lti
       end
 
       describe "#create" do
+        let(:start_date_time) { 1.day.ago }
         let(:end_date_time) { Time.zone.now }
         let(:params_overrides) do
           {
             scoreMaximum: score_max,
             label:,
+            startDateTime: start_date_time.iso8601,
             endDateTime: end_date_time.iso8601,
             resourceId: resource_id,
             tag:,
@@ -148,6 +150,7 @@ module Lti
               label:,
               resourceId: resource_id,
               tag:,
+              startDateTime: start_date_time.iso8601,
               endDateTime: end_date_time.iso8601,
               resourceLinkId: item.resource_link.resource_link_uuid
             }.with_indifferent_access
@@ -215,6 +218,7 @@ module Lti
               label:,
               resourceId: resource_id,
               tag:,
+              startDateTime: start_date_time.iso8601,
               endDateTime: end_date_time.iso8601
             }.with_indifferent_access
 
@@ -257,6 +261,10 @@ module Lti
 
             it "sets the context of the new assignment" do
               expect(item.assignment.context).to eq course
+            end
+
+            it "sets the unlock_at for the assignment" do
+              expect(item.assignment.unlock_at).to be_within(1.second).of start_date_time
             end
 
             it "sets the due_at for the assignment" do
@@ -339,6 +347,7 @@ module Lti
                 :label => label,
                 :resourceId => resource_id,
                 :tag => tag,
+                :startDateTime => start_date_time.iso8601,
                 :endDateTime => end_date_time.iso8601,
                 :resourceLinkId => item.resource_link.resource_link_uuid
               }.with_indifferent_access
@@ -456,8 +465,20 @@ module Lti
           end
         end
 
+        context "with startDateTime" do
+          let(:line_item) { assignment.line_items.find(&:assignment_line_item?) }
+          let(:start_date_time) { 1.day.ago }
+          let(:params_overrides) { super().merge(startDateTime: start_date_time.iso8601) }
+
+          it "updates the assignment unlock_at" do
+            send_request
+            expect(line_item.reload.assignment.unlock_at).to be_within(1.second).of start_date_time
+          end
+        end
+
         context "with endDateTime" do
-          let(:end_date_time) { Time.zone.now }
+          let(:line_item) { assignment.line_items.find(&:assignment_line_item?) }
+          let(:end_date_time) { 1.day.from_now }
           let(:params_overrides) { super().merge(endDateTime: end_date_time.iso8601) }
 
           it "updates the assignment due_at" do
