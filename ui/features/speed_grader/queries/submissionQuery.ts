@@ -51,6 +51,7 @@ const SUBMISSION_QUERY = gql`
               id
               comment
               attempt
+              createdAt
               author {
                 name
                 updatedAt
