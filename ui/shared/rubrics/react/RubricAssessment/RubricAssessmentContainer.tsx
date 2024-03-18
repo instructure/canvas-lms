@@ -16,19 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect} from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {SimpleSelect} from '@instructure/ui-simple-select'
-import {CloseButton, IconButton} from '@instructure/ui-buttons'
+import {Button, CloseButton, IconButton} from '@instructure/ui-buttons'
 import {IconDownloadLine, IconPrinterLine} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
-import type {RubricAssessmentData, RubricCriterion} from '../types/rubric'
+import type {RubricAssessmentData, RubricCriterion, UpdateAssessmentData} from '../types/rubric'
 import {ModernView} from './ModernView'
 import {TraditionalView} from './TraditionalView'
 import {possibleString} from '../Points'
+import {Checkbox} from '@instructure/ui-checkbox'
 
 const I18n = useI18nScope('rubrics-assessment-tray')
 
@@ -45,7 +46,8 @@ type RubricAssessmentContainerProps = {
   selectedViewMode: ViewMode
   onViewModeChange: (viewMode: ViewMode) => void
   onDismiss: () => void
-  onUpdateAssessmentData: (criteriaId: string, points?: number) => void
+  onSubmit?: () => void
+  onUpdateAssessmentData: (params: UpdateAssessmentData) => void
 }
 export const RubricAssessmentContainer = ({
   criteria,
@@ -55,14 +57,30 @@ export const RubricAssessmentContainer = ({
   rubricAssessmentData,
   selectedViewMode,
   onDismiss,
+  onSubmit,
   onViewModeChange,
   onUpdateAssessmentData,
 }: RubricAssessmentContainerProps) => {
   const isTraditionalView = selectedViewMode === 'traditional'
-  const instructorPoints = rubricAssessmentData.reduce((prev, curr) => prev + curr.points, 0)
+  const instructorPoints = rubricAssessmentData.reduce((prev, curr) => prev + (curr.points ?? 0), 0)
   const disableTraditionalView = criteria.some(
     c => c.ratings.length > MAX_TRADITIONAL_CRITERIA_RATINGS
   )
+
+  const [distanceToBottom, setDistanceToBottom] = useState<number>(0)
+  const containerRef = useRef<HTMLElement>()
+
+  useEffect(() => {
+    const calculateDistance = () => {
+      if (containerRef.current) {
+        const rect = (containerRef.current as HTMLElement).getBoundingClientRect()
+        const distance = window.innerHeight - rect.bottom
+        setDistanceToBottom(distance)
+      }
+    }
+
+    calculateDistance()
+  }, [containerRef])
 
   const renderViewContainer = () => {
     if (isTraditionalView) {
@@ -95,71 +113,40 @@ export const RubricAssessmentContainer = ({
   }, [criteria, disableTraditionalView, onViewModeChange, selectedViewMode])
 
   return (
-    <View as="div" padding="medium" themeOverride={{paddingMedium: '1rem'}}>
-      <View
+    <View as="div" padding="medium medium 0 medium" themeOverride={{paddingMedium: '1rem'}}>
+      <Flex
         as="div"
-        position="sticky"
-        background="primary"
-        stacking="above"
-        style={{top: 0}}
-        padding={isTraditionalView ? '0 0 medium 0' : '0'}
+        direction="column"
+        height={`${distanceToBottom}px`}
+        elementRef={elRef => {
+          if (elRef instanceof HTMLElement) {
+            containerRef.current = elRef
+          }
+        }}
       >
-        <Flex>
-          <Flex.Item align="end">
-            <Text weight="bold" size="large">
-              {rubricTitle}
-            </Text>
+        <Flex.Item as="header">
+          <AssessmentHeader
+            disableTraditionalView={disableTraditionalView}
+            instructorPoints={instructorPoints}
+            isPreviewMode={isPreviewMode}
+            isTraditionalView={isTraditionalView}
+            onDismiss={onDismiss}
+            onViewModeChange={onViewModeChange}
+            rubricTitle={rubricTitle}
+            selectedViewMode={selectedViewMode}
+          />
+        </Flex.Item>
+        <Flex.Item shouldGrow={true} shouldShrink={true} as="main">
+          <View as="div" overflowY="auto">
+            {renderViewContainer()}
+          </View>
+        </Flex.Item>
+        {!isPreviewMode && (
+          <Flex.Item as="footer">
+            <AssessmentFooter onSubmit={onSubmit} />
           </Flex.Item>
-          <Flex.Item align="end">
-            <CloseButton
-              placement="end"
-              offset="x-small"
-              screenReaderLabel="Close"
-              onClick={onDismiss}
-            />
-          </Flex.Item>
-        </Flex>
-
-        <View as="hr" margin="x-small 0 small" />
-        <Flex>
-          <Flex.Item shouldGrow={true} shouldShrink={true}>
-            <ViewModeSelect
-              disableTraditionalView={disableTraditionalView}
-              selectedViewMode={selectedViewMode}
-              onViewModeChange={onViewModeChange}
-            />
-          </Flex.Item>
-          {isTraditionalView && (
-            <Flex.Item>
-              <View as="div" margin="0 large 0 0" themeOverride={{marginLarge: '2.938rem'}}>
-                <InstructorScore instructorPoints={instructorPoints} />
-              </View>
-            </Flex.Item>
-          )}
-          <Flex.Item margin="0 0 0 small">
-            <IconButton disabled={isPreviewMode} screenReaderLabel="Print">
-              <IconPrinterLine />
-            </IconButton>
-          </Flex.Item>
-          <Flex.Item margin="0 0 0 small">
-            <IconButton disabled={isPreviewMode} screenReaderLabel="Download">
-              <IconDownloadLine />
-            </IconButton>
-          </Flex.Item>
-        </Flex>
-
-        {!isTraditionalView && (
-          <>
-            <Flex.Item margin="0 0 0 small">
-              <InstructorScore instructorPoints={instructorPoints} />
-            </Flex.Item>
-
-            <View as="hr" margin="medium 0 medium 0" />
-          </>
         )}
-      </View>
-
-      <View>{renderViewContainer()}</View>
+      </Flex>
     </View>
   )
 }
@@ -247,5 +234,109 @@ const InstructorScore = ({instructorPoints = 0}: InstructorScoreProps) => {
         </div>
       </Flex.Item>
     </Flex>
+  )
+}
+
+type AssessmentHeaderProps = {
+  disableTraditionalView: boolean
+  instructorPoints: number
+  isPreviewMode: boolean
+  isTraditionalView: boolean
+  onDismiss: () => void
+  onViewModeChange: (viewMode: ViewMode) => void
+  rubricTitle: string
+  selectedViewMode: ViewMode
+}
+const AssessmentHeader = ({
+  disableTraditionalView,
+  instructorPoints,
+  isPreviewMode,
+  isTraditionalView,
+  onDismiss,
+  onViewModeChange,
+  rubricTitle,
+  selectedViewMode,
+}: AssessmentHeaderProps) => {
+  return (
+    <View as="div" padding={isTraditionalView ? '0 0 medium 0' : '0'}>
+      <Flex>
+        <Flex.Item align="end">
+          <Text weight="bold" size="large">
+            {rubricTitle}
+          </Text>
+        </Flex.Item>
+        <Flex.Item align="end">
+          <CloseButton
+            placement="end"
+            offset="x-small"
+            screenReaderLabel="Close"
+            onClick={onDismiss}
+          />
+        </Flex.Item>
+      </Flex>
+
+      <View as="hr" margin="x-small 0 small" />
+      <Flex>
+        <Flex.Item shouldGrow={true} shouldShrink={true}>
+          <ViewModeSelect
+            disableTraditionalView={disableTraditionalView}
+            selectedViewMode={selectedViewMode}
+            onViewModeChange={onViewModeChange}
+          />
+        </Flex.Item>
+        {isTraditionalView && (
+          <Flex.Item>
+            <View as="div" margin="0 large 0 0" themeOverride={{marginLarge: '2.938rem'}}>
+              <InstructorScore instructorPoints={instructorPoints} />
+            </View>
+          </Flex.Item>
+        )}
+        <Flex.Item margin="0 0 0 small">
+          <IconButton disabled={isPreviewMode} screenReaderLabel="Print">
+            <IconPrinterLine />
+          </IconButton>
+        </Flex.Item>
+        <Flex.Item margin="0 0 0 small">
+          <IconButton disabled={isPreviewMode} screenReaderLabel="Download">
+            <IconDownloadLine />
+          </IconButton>
+        </Flex.Item>
+      </Flex>
+
+      {!isTraditionalView && (
+        <>
+          <Flex.Item margin="0 0 0 small">
+            <InstructorScore instructorPoints={instructorPoints} />
+          </Flex.Item>
+
+          <View as="hr" margin="medium 0 medium 0" />
+        </>
+      )}
+    </View>
+  )
+}
+
+type AssessmentFooterProps = {
+  onSubmit?: () => void
+}
+const AssessmentFooter = ({onSubmit}: AssessmentFooterProps) => {
+  return (
+    <View as="div">
+      <View as="hr" margin="0" />
+      <Flex justifyItems="space-between" margin="small 0">
+        <Flex.Item>
+          <Checkbox label={I18n.t('Reassign')} value="medium" />
+        </Flex.Item>
+        <Flex.Item>
+          <Button
+            color="primary"
+            onClick={() => onSubmit?.()}
+            data-testid="save-rubric-assessment-button"
+          >
+            {I18n.t('Submit Assessment')}
+          </Button>
+        </Flex.Item>
+      </Flex>
+    </View>
   )
 }

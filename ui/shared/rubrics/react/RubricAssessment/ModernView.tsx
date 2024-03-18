@@ -26,7 +26,7 @@ import {TextInput} from '@instructure/ui-text-input'
 import {IconChatLine} from '@instructure/ui-icons'
 import {HorizontalButtonDisplay} from './HorizontalButtonDisplay'
 import {VerticalButtonDisplay} from './VerticalButtonDisplay'
-import type {RubricAssessmentData, RubricCriterion} from '../types/rubric'
+import type {RubricAssessmentData, RubricCriterion, UpdateAssessmentData} from '../types/rubric'
 
 const I18n = useI18nScope('rubrics-assessment-tray')
 
@@ -38,7 +38,7 @@ type ModernViewProps = {
   ratingOrder: string
   rubricAssessmentData: RubricAssessmentData[]
   selectedViewMode: ModernViewModes
-  onUpdateAssessmentData: (criteriaId: string, points?: number) => void
+  onUpdateAssessmentData: (params: UpdateAssessmentData) => void
 }
 export const ModernView = ({
   criteria,
@@ -79,7 +79,7 @@ type CriterionRowProps = {
   ratingOrder: string
   criterionAssessment?: RubricAssessmentData
   selectedViewMode: ModernViewModes
-  onUpdateAssessmentData: (criteriaId: string, points?: number) => void
+  onUpdateAssessmentData: (params: UpdateAssessmentData) => void
 }
 export const CriterionRow = ({
   criterion,
@@ -98,27 +98,34 @@ export const CriterionRow = ({
   const defaultPoints = criterionAssessment?.points ?? ''
 
   const [pointsInput, setPointsInput] = useState<string>(defaultPoints.toString())
+  const [selectedRatingDescription, setSelectedRatingDescription] = useState<string>()
 
   const selectRating = (index: number) => {
     if (selectedRatingIndex === index) {
-      onUpdateAssessmentData(criterion.id, undefined)
+      onUpdateAssessmentData({criterionId: criterion.id, points: undefined})
       setPoints('')
       return
     }
 
-    setPoints(ratings[index]?.points.toString() ?? '')
+    const selectedRating = ratings[index]
+    setPoints(selectedRating?.points.toString() ?? '')
+    setSelectedRatingDescription(selectedRating?.description)
   }
 
   const setPoints = (value: string) => {
     const points = Number(value)
 
     if (!value.trim().length || Number.isNaN(points)) {
-      onUpdateAssessmentData(criterion.id, undefined)
+      onUpdateAssessmentData({criterionId: criterion.id, points: undefined})
       setPointsInput('')
       return
     }
 
-    onUpdateAssessmentData(criterion.id, points)
+    onUpdateAssessmentData({
+      criterionId: criterion.id,
+      points,
+      description: selectedRatingDescription,
+    })
     setPointsInput(points.toString())
   }
 
