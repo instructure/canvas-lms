@@ -255,6 +255,7 @@ class ContextModule < ActiveRecord::Base
   end
 
   def available_for?(user, opts={})
+    return false if user.nil?
     enrollment = Enrollment.active.where(user_id: user.id, course_id: context.id).first
 
     if enrollment
