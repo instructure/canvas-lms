@@ -414,8 +414,8 @@ module AttachmentFu # :nodoc:
       shard.activate do
         GuardRail.activate(:secondary) do
           if md5.present? && (ns = infer_namespace)
-            scope = Attachment.where(md5:, namespace: ns, root_attachment_id: nil, content_type:)
-            scope = scope.where.not(filename: nil)
+            scope = Attachment.where(md5:, namespace: ns, root_attachment_id: nil, content_type:, instfs_uuid: nil)
+            scope = scope.where.not(filename: nil).where.not(workflow_state: "pending_upload")
             scope = scope.where.not(id: self) unless new_record?
             scope.detect { |a| a.store.exists? }
           end
