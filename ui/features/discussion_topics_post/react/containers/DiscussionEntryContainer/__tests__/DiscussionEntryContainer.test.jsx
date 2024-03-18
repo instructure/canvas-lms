@@ -136,7 +136,8 @@ describe('DiscussionEntryContainer', () => {
 
     it('should render the edited timestamp', () => {
       const container = setup(defaultProps())
-      expect(container.getByText('Edited by George Weasley Feb 2 2:00pm')).toBeInTheDocument()
+      const editedByTextElement = container.getByTestId('editedByText')
+      expect(editedByTextElement.textContent).toEqual('Edited by George Weasley Feb 2 2:00pm')
     })
 
     it('should render the reply preview', () => {

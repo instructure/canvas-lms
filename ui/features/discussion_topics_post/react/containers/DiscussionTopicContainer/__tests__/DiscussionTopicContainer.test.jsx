@@ -653,7 +653,8 @@ describe('DiscussionTopicContainer', () => {
       }),
     }
     const container = setup(props)
-    expect(container.getByText(`Edited by Eddy Tor Apr 22, 2021 6:41pm`)).toBeInTheDocument()
+    const editedByTextElement = container.getByTestId('editedByText')
+    expect(editedByTextElement.textContent).toEqual('Edited by Eddy Tor Apr 22, 2021 6:41pm')
     expect(container.queryByTestId('created-tooltip')).toBeFalsy()
   })
 
