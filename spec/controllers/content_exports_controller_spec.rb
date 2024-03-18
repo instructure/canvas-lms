@@ -38,6 +38,7 @@ describe ContentExportsController do
 
     context "new_quizzes_common_cartridge FF is disabled" do
       before do
+        allow(@course).to receive(:feature_enabled?).and_call_original
         Account.site_admin.disable_feature!(:new_quizzes_common_cartridge)
       end
 
@@ -75,6 +76,7 @@ describe ContentExportsController do
 
     context "new_quizzes_common_cartridge FF is enabled" do
       before do
+        allow(@course).to receive(:feature_enabled?).and_call_original
         Account.site_admin.enable_feature!(:new_quizzes_common_cartridge)
       end
 
