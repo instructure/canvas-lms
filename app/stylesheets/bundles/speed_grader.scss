@@ -993,3 +993,11 @@ body.no-headers {
     display: flex !important
   }
 }
+
+#enhanced-rubric-assessment-tray {
+  margin-top: 50px;
+}
+
+#enhanced-rubric-assessment-tray div[class*="-tray__content"] {
+  min-height: calc(100vh - 50px) !important;
+}
