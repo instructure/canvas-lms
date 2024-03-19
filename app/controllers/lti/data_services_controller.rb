@@ -99,6 +99,10 @@ module Lti
 
     before_action :verify_service_configured
 
+    # Do not require an installed tool for this API,
+    # for better access by internal services
+    skip_before_action :verify_tool
+
     # @API Create a Data Services Event Subscription
     # Creates a Data Service Event subscription for the specified event type and
     # context.
@@ -247,8 +251,13 @@ module Lti
       }
     end
 
+    # For whatever reason this API originally only accepted the account's lti_context_id
+    # as the account_id parameter, and not prefixed with `lti_context_id:` like other API
+    # endpoints. This now accepts the standard API id format, and falls back to the original
+    # strange choice.
     def context
-      @context ||= Account.active.find_by(lti_context_id: params[:account_id])
+      @context ||= api_find_all(Account.root_accounts.active, [params[:account_id]]).first ||
+                   Account.root_accounts.active.find_by(lti_context_id: params[:account_id])
     end
 
     def message_type
@@ -261,8 +270,10 @@ module Lti
         raise ActiveRecord::RecordInvalid unless context.grants_right?(u, nil, :manage_data_services)
 
         sub.merge(UpdatedByType: "person")
-      else
+      elsif tool
         sub.merge(UpdatedBy: tool.global_id.to_s, UpdatedByType: "external_tool")
+      else
+        sub.merge(UpdatedBy: developer_key.global_id.to_s, UpdatedByType: "internal_service")
       end
     end
 
@@ -272,8 +283,10 @@ module Lti
         raise ActiveRecord::RecordInvalid unless context.grants_right?(u, nil, :manage_data_services)
 
         sub.merge(OwnerType: "person")
-      else
+      elsif tool
         sub.merge(OwnerId: tool.global_id.to_s, OwnerType: "external_tool")
+      else
+        sub.merge(OwnerId: developer_key.global_id.to_s, OwnerType: "internal_service")
       end
     end
   end
