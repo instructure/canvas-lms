@@ -74,7 +74,7 @@ describe "conversations new" do
         wait_for_ajaximations
         f("button[data-testid='message-reply']").click
 
-        ff("input[aria-label='Search']")[1].click
+        f("input[aria-label='To']").click
         expect(f("body")).not_to contain_jqcss("div[data-testid='address-book-item']:contains('Users')")
         fj("div[data-testid='address-book-item']:contains('Students')").click
         expect(fj("div[data-testid='address-book-item']:contains('first student')")).to be_present
@@ -88,11 +88,11 @@ describe "conversations new" do
         wait_for_ajaximations
         f("button[data-testid='message-reply']").click
 
-        # The second compose modal addressbook should appear
-        expect(ff("input[aria-label='Search']").count).to eq(2)
+        # The compose modal "To" addressbook should appear
+        expect(ff("input[aria-label='To']").count).to eq(1)
 
         f("textarea[data-testid='message-body']").send_keys("new recipient")
-        ff("input[aria-label='Search']")[1].click
+        f("input[aria-label='To']").click
         fj("div[data-testid='address-book-item']:contains('first student')").click
         f("button[data-testid='send-button']").click
         wait_for_ajaximations
