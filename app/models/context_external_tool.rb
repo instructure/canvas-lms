@@ -1617,7 +1617,7 @@ class ContextExternalTool < ActiveRecord::Base
 
     allowed_domains = Setting.get("submission_type_selection_allowed_launch_domains", "").split(",")
     allowed_dev_keys = Setting.get("submission_type_selection_allowed_dev_keys", "").split(",")
-    allowed_domains.include?(domain) || allowed_dev_keys.include?(developer_key&.id.to_s)
+    allowed_domains.include?(domain) || allowed_dev_keys.include?(Shard.global_id_for(developer_key&.id).to_s)
   end
 
   private
