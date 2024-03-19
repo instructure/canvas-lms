@@ -425,7 +425,8 @@ describe "selective_release module set up" do
       go_to_modules
       click_new_module_link
       click_add_tray_add_module_button
-      expect(add_module_tray.text).to include("Module Name is required.")
+      expect(add_module_tray.text).to include("Module name can’t be blank")
+      check_element_has_focus(module_name_input)
     end
 
     it_behaves_like "selective_release add module tray", :context_modules
