@@ -1659,7 +1659,7 @@ nn:
         update_button: Oppdatering
       report_last_run_never: Aldri
       report_running: "Rapporten køyrer.*Du får ein e-post når køyringa er fullført.*"
-      rqd_help_message: "Når valgt vil denne innstillingen begrense visningen av kvantitativ (numerisk) vurderingsdata for nye emner. Studenter og observatører vil kun se kvalitative data, som inkluderar bokstavkarakterar og kommentarar."
+      rqd_help_message: "Når valgt vil denne innstillinga begrense visninga av kvantitativ (numerisk) vurderingsdata for nye emner. Studentar og observatørar vil kun sjå kvalitative data, som inkluderar bokstavkarakterar og kommentarar."
       rqd_screenreader: "Om å avgrense kvantitative data"
       select: 
         mfa: 
@@ -1842,7 +1842,7 @@ nn:
           account_reports: 
             default: 
               description: 
-                text: "Rapporten viser alle studentane sine sluttvurderingar i eit bestemt semester. CSV-fila inneheld ei rad per påmelding og viser gjeldande og endelege vurderingar som er lagt ut vurderingsoversikta for emnet."
+                text: "Denne rapporten viser alle studentane sine sluttvurderingar i eit bestemt semester. CSV-fila inneheld ei rad per påmelding og viser gjeldande og endelege vurderingar som er lagt ut i vurderingsoversikta for emnet."
       provisioning: 
         parameters: 
           account_reports: 
@@ -2142,7 +2142,7 @@ nn:
   add_a_build_button_on_the_assignment_edit_page_for_6b895561: "Legg til ein Bygg-knapp på oppgåva si redigeringsside for Nye quizar-oppgåver"
   add_a_comment_48994930: "Legg til ein kommentar"
   add_a_comment_872470ac: "Legg til ein kommentar"
-  add_a_comment_to_complete_your_peer_review_you_wil_65fbaabb: "Legg til ein kommentar for å fullføre din fagfellevurdering. Du vil berre sjå kommentarar skrive av deg."
+  add_a_comment_to_complete_your_peer_review_you_wil_65fbaabb: "Legg til ein kommentar for å fullføre din fagfellevurdering. Du vil berre sjå kommentarar du sjølv har skrive."
   add_a_course_b72b18d7: "Legg til eit emne"
   add_a_custom_help_link_4328252f: "Legg til eigendefinert Hjelp-kopling"
   add_a_letter_grade_c7b34199: "legg til ein bokstavkarakter"
@@ -2291,7 +2291,7 @@ nn:
   add_theme_32fa3d50: "Legg til tema"
   add_to_calendar_1d4a0e81: "Legg til i kalenderen"
   add_to_course_481a51c4: "Legg til emnet..."
-  add_to_course_pacing_blackout_dates_2459cfd2: "Legg til kursplanlegging for blackout-datoar"
+  add_to_course_pacing_blackout_dates_2459cfd2: "Legg til kursplanlegging for blokkerte datoar"
   add_to_do_7537af64: "Legg til gjeremål"
   add_to_do_7def3c37: "Legg til gjeremål"
   add_to_import_queue_1bf7013b: "Legg til i importkøen"
@@ -2344,7 +2344,7 @@ nn:
   adds_analytics_link_on_the_user_settings_menu_3a048816: "Legg til analyselenke i meny for brukarinnstillingar."
   adds_analytics_to_a_student_s_context_card_d4c1e3a3: "Legg til analyse til eit studentkontekstkort"
   adds_granular_permissions_for_adding_and_removing__e1e484a3: "Legg til detaljerte løyve for å legge til og fjerne kvar rolle, og eit separat løyve for andre emneadministrasjonshandlingar"
-  adds_menu_option_for_accessing_alignments_at_the_o_6d3bce6: "Legge til menyvalg for å vurdera justeringar på læringsmålnivå,  med forbetra læringsmål"
+  adds_menu_option_for_accessing_alignments_at_the_o_6d3bce6: "Legg til menyvalg for å vurdere justeringar på læringsmålnivå,  med forbetra læringsmål"
   adds_the_option_to_grade_by_question_in_speedgrade_5eac06f3: "Legg til moglegheita for å vurdere etter spørsmål i SpeedGrader for Quizzes.Next Quizzes"
   adds_visual_indicators_to_the_submission_details_p_c7b9d191: |-
       Legg til visuelle indikatorar på innleveringsdetaljer-sida for å fortelje studentar at det finst uleste
@@ -2537,7 +2537,7 @@ nn:
   allow_conference_selection_lti_placement_c020ad8d: "Tillat konferanseval for LTI plassering"
   allow_course_content_to_be_downloaded_and_viewed_o_48a0d252: "Tillat at emneinnhaldet kan bli lasta ned og lest når du ikkje er på nett"
   allow_course_images_to_be_assigned_to_a_course_and_82fb7bdd: "Tillat at emnebilde blir tilordna til eit emne og brukt på dashbordkorta. "
-  allow_course_pacing_blackout_dates_to_be_set_for_a_d4d597d5: "Tillat at kursplasseringens svarteliste kan settes for kontoer i stedet for bare kurs."
+  allow_course_pacing_blackout_dates_to_be_set_for_a_d4d597d5: "Tillat at emnegjennomføring for blokkerte datoar vert satt for kontoar i staden for berre kurs."
   allow_creation_anywhere_the_user_has_active_enroll_13c84fc2: "Tillat oppretting kvar som helst der brukaren har aktive påmeldingar"
   allow_creation_only_in_the_manually_created_course_69f37f2e: "Tillat oppretting kun i underkontoen for manuelt opprettede kurs"
   allow_dashboard_cards_to_be_reordered_for_each_use_81f989d7: "Tillat at kvar brukar kan reorganisere dashbordkorta sine. "
@@ -2768,7 +2768,7 @@ nn:
   allows_user_to_create_and_manage_appointments_on_t_393e9e84: "Gir ein brukar løyve til å opprette og administrere kalenderavtalar ved å bruke planleggaren. "
   allows_user_to_create_and_manage_groups_allows_use_562e0013: "Lar brukaren opprette og administrere grupper. Lar brukeren administrere delte ressursar i kontoen."
   allows_user_to_create_and_modify_grading_schemes_e4433a19: "Gir ein brukar løyve til å opprette og modifisere oppsett for karaktersetjing."
-  allows_user_to_create_blackout_dates_f6970f37: "Tillet brukaren å opprette svarte datoer."
+  allows_user_to_create_blackout_dates_f6970f37: "Tillet brukaren å opprette blokkerte datoar."
   allows_user_to_create_collaborations_allows_user_t_96f8c3be: "Gir ein brukar løyve til å opprette samarbeid. Gir ein bruker løyve til å sjå, endre og slette konferansar som dei har oppretta sjølve."
   allows_user_to_create_collaborations_allows_user_t_eff2a175: "Gir ein brukar løyve til å opprette samarbeid. Gir ein brukar løyve til å sjå, endre og slette samarbeid dei har oppretta sjølve."
   allows_user_to_create_collaborations_b4f214bf: "Lar brukaren opprette samarbeid."
@@ -2821,7 +2821,7 @@ nn:
   allows_user_to_download_all_comments_in_a_student__33b36d0a: "Gi ein brukar løyve til å laste ned alle kommentarar knytta til ein innlevering frå ein student."
   allows_user_to_duplicate_assignments_in_a_course_a3bf4f54: "Lar brukaren duplisere oppgåver i eit emne."
   allows_user_to_duplicate_quizzes_in_a_course_1d3437f2: "Lar brukaren duplisere quizar i eit emne."
-  allows_user_to_edit_a_list_of_assignment_blackout__9c734bf0: "Tillet brukar å redigere ei liste over periodar med utestenging for oppgaver."
+  allows_user_to_edit_a_list_of_assignment_blackout__9c734bf0: "Tillet brukaren å redigere ei liste over periodar med blokkerte datoar for oppgåver."
   allows_user_to_edit_a_user_s_section_or_role_if_no_cf272262: "Lar brukar endre på ein brukar sin seksjon eller rolle (dersom den ikkje kjem frå SIS)"
   allows_user_to_edit_account_and_course_groups_259139c0: "Lar brukaren redigere konto- og emnegrupper."
   allows_user_to_edit_and_publish_a_course_pace_via__1ccb27ef: "Tillet brukar å redigere og publisere ei emneframdrift via Emneframdrift."
@@ -2892,7 +2892,7 @@ nn:
   allows_user_to_import_resources_from_commons_into__79e8255e: "Lar brukaren importere ressursar frå Commons til eit emne."
   allows_user_to_import_sis_data_583b20a5: "Gir ein brukar løyve til å importere SIS-data."
   allows_user_to_like_discussion_posts_when_the_only_7390d91c: "Gir ein brukar løyve til å like diskusjonsinnlegg når valet \"Berre vurderarar kan like\" er slått på. "
-  allows_user_to_lock_unlock_selected_announcements__fbe4df6a: "Lar brukar låse / opne valgte kunngjeringar enkeltvis eller fleire samtidig."
+  allows_user_to_lock_unlock_selected_announcements__fbe4df6a: "Tillet brukaren å låse / opne valgte kunngjeringar enkeltvis eller fleire samtidig."
   allows_user_to_manage_assignment_settings_35d94690: "Lar brukaren administrere oppgåveinnstillingar."
   allows_user_to_manage_blueprint_course_settings_in_697362c5: "Lar brukaren administrere innstillingar for blåkopi i Emne Innstillingar"
   allows_user_to_manage_feature_options_in_account_s_c3c8ee03: "Gir ein brukar løyve til å administrere funksjonsval i kontoinnstillingar."
@@ -2920,7 +2920,7 @@ nn:
   allows_user_to_remove_a_course_as_a_course_templat_15e653d3: "Lar brukaren fjerne valet av eit emne som mal-emne i Emne Innstillingar"
   allows_user_to_remove_a_student_s_section_enrollme_78d1916e: "Lar brukaren fjerne ein student sitt seksjonsmedlemskap eller rolle"
   allows_user_to_remove_and_merge_users_in_an_accoun_b7e1aec7: "Lar brukaren fjerne og slå saman brukarar i ein konto."
-  allows_user_to_remove_assignment_blackout_dates_804b1d6d: "Lar brukar fjerne utestengelsesdatoar for oppgåver."
+  allows_user_to_remove_assignment_blackout_dates_804b1d6d: "Tillet brukaren å fjerne blokkerte datoar for oppgåver."
   allows_user_to_remove_collaborators_on_all_collabo_b9ce6f29: "Lar brukar fjerne medarbeidarar på alle samarbeid."
   allows_user_to_remove_designers_from_a_course_fa9e887e: "Lar brukaren fjerne designarar frå eit emne."
   allows_user_to_remove_group_members_from_course_gr_4f745b58: "Lar brukaren fjerne gruppemedlemmar frå emnegrupper."
@@ -3031,7 +3031,7 @@ nn:
   allows_user_to_view_course_and_student_analytics_f_5e3dca12: "Gir ein brukar løyve til å sjå analysedata for emne og studentar frå forsida til eit emne eller frå Personoversikta."
   allows_user_to_view_course_announcements_e71afc2: "Lar brukaren sjå emnekunngjeringar."
   allows_user_to_view_course_conferences_c40f8fd2: "Lar brukaren sjå emnekonferansar."
-  allows_user_to_view_course_copy_status_ca182555: "Tillater brukeren å se status for kurskopiering."
+  allows_user_to_view_course_copy_status_ca182555: "Lar brukaren sjå status for kurskopiering."
   allows_user_to_view_course_discussions_23346fa1: "Lar brukaren se emnediskusjonar."
   allows_user_to_view_course_sis_id_3a1818a5: "Gir ein brukar løyve til å sjå SIS-ID for emne."
   allows_user_to_view_course_status_choose_home_page_21bf32a8: "Gir brukar løyve til å sjå emnestatus, velje heimeside, og sjekkliste for enmeoppsett-knappar på heimesida."
@@ -3141,8 +3141,8 @@ nn:
   allows_users_to_add_a_friendly_description_to_outc_7acf6286: "Tillet brukarar å legge til ei venleg skildring til læringsmål for student- og foreldrevisning i vurderingsoversikt for meistringsbasert læring"
   allows_users_to_add_conferences_from_the_calendar_f36c5008: "Tillat brukarar å legge til konferansar frå kalenderen"
   allows_users_to_add_lti_tools_with_conference_sele_c38545ab: "Tillat brukarar å legge til LTI verktøy med conference_selection plasseringstype"
-  allows_users_to_delete_a_temporary_enrollment_7fd33cdd: "Tillater brukere å slette en midlertidig registrering"
-  allows_users_to_edit_an_existing_temporary_enrollm_b3543354: "Tillater brukere å redigere en eksisterende midlertidig registrering"
+  allows_users_to_delete_a_temporary_enrollment_7fd33cdd: "Lar brukarar slette ei midlertidig registrering"
+  allows_users_to_edit_an_existing_temporary_enrollm_b3543354: "Lar brukarar redigere ei eksisterende midlertidig registrering"
   allows_users_to_edit_conferences_2d3c960c: "Gir brukarar løyve til å endre konferansar."
   allows_users_to_enable_the_launch_speedgrader_filt_7e1b442: "Gir brukarar løyve til å slå på \"Start SpeedGrader filtrert etter studentgrupper\"-valet for emne i emneinnstillingar. Når det er aktivt og ei studentgruppe er vald i ny vurderingsoversikt, vil SpeedGrader kun laste studentar knytta til den valde gruppa. "
   allows_users_to_import_groups_in_a_course_a8b5c73e: "Lar brukarar importere grupper i eit emne."
@@ -3157,7 +3157,7 @@ nn:
   always_include_dates_1ae2935e: "Inkluder alltid datoar"
   always_include_dates_74b3721d: "Inkluder alltid datoar;"
   always_load_the_rce_and_sidebar_from_a_canvas_rich_1495e3fd: "Last alltid RCE og sidestolpe fra Canvas sin rikt innhald-teneste"
-  an_active_role_already_exists_with_that_name_205864bf: "Ein aktiv rolle med det namnet finst allereie."
+  an_active_role_already_exists_with_that_name_205864bf: "Ei aktiv rolle med det namnet finst allereie."
   an_amazing_discussion_assignment_e5c8bd6b: "Ei super diskusjonsoppgåve"
   an_api_key_is_required_to_use_academic_benchmarks_26011dd6: "Ein API-nøkkel er nødvendig for å bruke Academic Benchmarks"
   an_assignment_name_dc624e70: "Eit oppgåvenamn"
@@ -3383,7 +3383,7 @@ nn:
   anonymous_grading_cannot_be_enabled_for_group_assi_faa33494: "Anonym vurdering kan ikkje aktiverast for gruppeoppgåver"
   anonymous_grading_ccb5045c: "Anonym karaktersetjing"
   anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "Anonym karaktersetjing tvingar studentnamn til å vere skjulte i SpeedGrader™"
-  anonymous_grading_with_new_quizzes_ba0391f3: "Anonym vurdering med nye quizer"
+  anonymous_grading_with_new_quizzes_ba0391f3: "Anonym vurdering med nye quizar"
   anonymous_id_2ef1c6d2: "Anonym %{id}"
   anonymous_id_you_cf43ab76: "Anonym %{id} (du)"
   anonymous_instructor_annotations_2b6c822: "Anomyme merknader frå faglærar"
@@ -3542,7 +3542,7 @@ nn:
   archive_outcomes_20b869b6: "Arkiv Læringsmål"
   archive_selected_d64506ca: "Arkiv er valt"
   archived_de543437: Arkivert
-  archived_grading_schemes_6d698d0: "Arkiverte vurderingsskjemaer"
+  archived_grading_schemes_6d698d0: "Arkiverte vurderingsskjema"
   are_you_sure_26795d3c: "Er du sikker?"
   are_you_sure_that_you_want_to_remove_these_count_o_67ef2d6c: 
     one: "Er du sikker på at du vil fjerne dette læringsmålet frå denne kontoen?"
@@ -3645,7 +3645,7 @@ nn:
   ask_your_instructor_a_question_a61ca5e9: "Spør faglærar eit spørsmål"
   assess_and_survey_your_students_ce8172a9: "Vurder og kartlegg studentane dine"
   assess_student_understanding_1e0b8d7f: "Vurder studentane si forståing"
-  assessable_artifacts_include_assignments_quizzes_a_62b9698b: "Vurderbare element inkluderar oppgåver, quiz og vurderte diskusjonar."
+  assessable_artifacts_include_assignments_quizzes_a_62b9698b: "Vurderbare element inkluderer oppgåver, quiz og vurderte diskusjonar."
   assessment_audit_d4a76709: Vurderingslogg
   assessment_audit_events_for_creatorname_56e84e8: "Vurderingslogghendingar for %{creatorName}"
   assessment_audit_tray_5dd11721: "Meny for vurderingslogg"
