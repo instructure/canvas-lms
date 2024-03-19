@@ -478,6 +478,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                                     ?.focus()
                                 }, 0)
                               }}
+                              isAnnouncement={props.discussionTopic.isAnnouncement}
                             />
                           )}
                         </Flex.Item>

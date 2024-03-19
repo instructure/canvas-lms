@@ -36,6 +36,7 @@ const defaultProps = ({
   isEdit = false,
   canReplyAnonymously = false,
   discussionAnonymousState = null,
+  isAnnouncement = false,
 } = {}) => ({
   show,
   value,
@@ -44,6 +45,7 @@ const defaultProps = ({
   onSubmit,
   canReplyAnonymously,
   discussionAnonymousState,
+  isAnnouncement,
 })
 
 describe('DiscussionEdit', () => {

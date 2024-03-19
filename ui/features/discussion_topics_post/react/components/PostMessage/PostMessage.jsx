@@ -110,6 +110,7 @@ export function PostMessage({...props}) {
                 attachment={props.attachment}
                 onSubmit={props.onSave}
                 isEdit={true}
+                isAnnouncement={props.isAnnouncement}
               />
             </View>
           ) : (
@@ -173,10 +174,12 @@ PostMessage.propTypes = {
   canReplyAnonymously: PropTypes.bool,
   threadMode: PropTypes.bool,
   isTopic: PropTypes.bool,
+  isAnnouncement: PropTypes.bool,
 }
 
 PostMessage.defaultProps = {
   isSplitView: false,
+  isAnnouncement: false,
 }
 
 export default PostMessage

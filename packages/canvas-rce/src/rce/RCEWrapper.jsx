@@ -271,6 +271,9 @@ class RCEWrapper extends React.Component {
 
     this.pluginsToExclude = parsePluginsToExclude(props.editorOptions?.plugins || [])
 
+    this.resourceType = props.resourceType
+    this.resourceId = props.resourceId
+
     this.tinymceInitOptions = this.wrapOptions(props.editorOptions)
 
     alertHandler.alertFunc = this.addAlert
@@ -331,6 +334,13 @@ class RCEWrapper extends React.Component {
 
   getCanvasUrl() {
     return this.props.canvasOrigin
+  }
+
+  getResourceIdentifiers() {
+    return {
+      resourceType: this.resourceType,
+      resourceId: this.resourceId,
+    }
   }
 
   // getCode and setCode naming comes from tinyMCE
