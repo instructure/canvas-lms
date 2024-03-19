@@ -100,7 +100,7 @@
     <tr>
         <td>
             <label class="checkbox">
-                <%= check_box_tag "parameters[created_by_sis]"   %>
+                <%= check_box_tag "parameters[created_by_sis]", 1, false, :disabled => true %>
                 <%= t('Created by SIS') %>
             </label>
         </td>
@@ -112,5 +112,12 @@
             </label>
         </td>
     </tr>
-    <%=  render :partial => 'include_deleted_parameter' %>
+    <tr>
+      <td>
+        <label class="checkbox">
+          <%= check_box_tag "parameters[include_deleted]", 1, false, :disabled => true %>
+          <%= t('account_reports.default.include_deleted.check_box','Include Deleted Objects') %>
+        </label>
+      </td>
+    </tr>
 </table>
