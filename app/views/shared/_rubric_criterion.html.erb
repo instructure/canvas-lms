@@ -43,7 +43,7 @@
         <% if !learning_outcome_criterion %>
           <a href="#" class="edit_criterion_link" role="button"><i class="icon-edit standalone-icon"></i><span class="screenreader-only"><%= t 'Edit criterion description' %></span></a>
         <% end %>
-        <% if should_show_delete %>
+        <% if should_show_delete || rubric == nil %>
           <a href="#" class="delete_criterion_link" role="button"><i class="icon-trash standalone-icon"></i><span class="screenreader-only"><%= t 'Delete criterion row' %></span></a>
         <% end %>
       </div>
