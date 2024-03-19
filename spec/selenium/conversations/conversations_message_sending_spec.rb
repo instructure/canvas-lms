@@ -676,7 +676,10 @@ describe "conversations new" do
         end
 
         it "automatically sets individual message sending when max group conversation count is surpassed" do
-          Setting.set("max_group_conversation_size", 2)
+          Setting.set("max_group_conversation_size", 3)
+          @observer = user_factory(active_all: true, active_state: "active", name: "an observer")
+          observer_enrollment = @course.enroll_user(@observer, "ObserverEnrollment", enrollment_state: "active")
+          observer_enrollment.update_attribute(:associated_user_id, @s1.id)
 
           user_session(@teacher)
           get "/conversations"
@@ -690,6 +693,11 @@ describe "conversations new" do
 
           fj("div[data-testid='address-book-item']:contains('All in Students')").click
           expect(fj("span[data-testid='address-book-tag']:contains('All in Students')")).to be_present
+          expect(f("input[data-testid='individual-message-checkbox']")).not_to be_disabled
+          wait_for_ajaximations
+
+          f("button[data-testid='include-observer-button']").click
+          wait_for_ajaximations
           expect(f("input[data-testid='individual-message-checkbox']")).to be_disabled
 
           f("textarea[data-testid='message-body']").send_keys "sent to everyone in the account level group"
@@ -700,8 +708,8 @@ describe "conversations new" do
           expect(Conversation.count).to eq 0
           run_jobs
 
-          # once jobs complete, 3 new Convos are created
-          expect(Conversation.count).to eq 3
+          # once jobs complete, 4 new Convos are created
+          expect(Conversation.count).to eq 4
         end
 
         it "respects checkbox if it is checked, then unchecked" do
