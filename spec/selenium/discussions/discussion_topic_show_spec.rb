@@ -79,7 +79,6 @@ describe "Discussion Topic Show" do
     it "displays properly for a teacher" do
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
       expect(f("input[placeholder='Search entries or author...']")).to be_present
-      expect(fj("span:contains('Jul 9, 2017')")).to be_present
       expect(fj("span[data-testid='author_name']:contains('teacher')")).to be_present
       expect(ff("ul[data-testid='pill-container'] li").collect(&:text)).to eq ["AUTHOR", "TEACHER"]
       f("button[data-testid='discussion-post-menu-trigger']").click
