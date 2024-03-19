@@ -680,22 +680,6 @@ module Lti
           expect(subject).to be_nil
         end
 
-        context "when the tool is allowed to use the submission_type_selection placement through it's dev key" do
-          before do
-            Setting.set("submission_type_selection_allowed_dev_keys", tool_configuration.developer_key.global_id.to_s)
-          end
-
-          it { is_expected.to be_nil }
-        end
-
-        context "when the tool is allowed to use the submission_type_selection placement through it's domain" do
-          before do
-            Setting.set("submission_type_selection_allowed_launch_domains", tool_configuration.domain)
-          end
-
-          it { is_expected.to be_nil }
-        end
-
         context "when the configuration has a submission_type_selection placement" do
           let(:tool_configuration) do
             tc = super()
@@ -710,6 +694,32 @@ module Lti
           end
 
           it { is_expected.to include("Warning").and include("submission_type_selection") }
+
+          context "when the tool is allowed to use the submission_type_selection placement through it's dev key" do
+            before do
+              Setting.set("submission_type_selection_allowed_dev_keys", tool_configuration.developer_key.global_id.to_s)
+            end
+
+            it { is_expected.to be_nil }
+          end
+
+          context "when the tool is allowed to use the submission_type_selection placement through it's domain" do
+            before do
+              Setting.set("submission_type_selection_allowed_launch_domains", tool_configuration.domain)
+            end
+
+            it { is_expected.to be_nil }
+          end
+
+          context "when the tool has no domain and domain list is containing an empty space" do
+            before do
+              allow(tool_configuration).to receive_messages(domain: "", developer_key_id: nil)
+              Setting.set("submission_type_selection_allowed_launch_domains", ", ,,")
+              Setting.set("submission_type_selection_allowed_dev_keys", ", ,,")
+            end
+
+            it { is_expected.to include("Warning").and include("submission_type_selection") }
+          end
         end
       end
     end

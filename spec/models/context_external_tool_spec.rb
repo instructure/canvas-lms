@@ -4096,6 +4096,17 @@ describe ContextExternalTool do
 
         it { is_expected.to be true }
       end
+
+      context "when the tool has no domain and domain list is containing an empty space" do
+        before do
+          tool.update!(domain: "")
+          tool.update!(developer_key: nil)
+          Setting.set("submission_type_selection_allowed_launch_domains", ", ,,")
+          Setting.set("submission_type_selection_allowed_dev_keys", ", ,,")
+        end
+
+        it { is_expected.to be false }
+      end
     end
 
     it "return true for all placements other than submission_type_selection" do
