@@ -37,6 +37,10 @@ describe Lti::DataServicesController do
     }
   end
 
+  def service_response(sub)
+    double(body: sub.merge(Id: "testid"), code: 200)
+  end
+
   before do
     allow(CanvasSecurity::ServicesJwt).to receive_messages(encryption_secret: "setecastronomy92" * 2, signing_secret: "donttell" * 10)
     allow(HTTParty).to receive(:send).and_return(double(body: subscription, code: 200))
@@ -61,6 +65,10 @@ describe Lti::DataServicesController do
 
     let(:action) { :create }
 
+    before do
+      allow(Services::LiveEventsSubscriptionService).to receive(:create) { |_, sub| service_response(sub) }
+    end
+
     context do
       let(:params_overrides) do
         { subscription:, account_id: root_account.lti_context_id }
@@ -70,6 +78,19 @@ describe Lti::DataServicesController do
         expect(Services::LiveEventsSubscriptionService).to receive(:create).with(any_args,
                                                                                  hash_including(subscription.merge(OwnerId: tool.global_id.to_s, OwnerType: "external_tool")))
         send_request
+      end
+
+      context "without an installed tool" do
+        before do
+          tool.destroy
+        end
+
+        it "uses developer key for OwnerId" do
+          send_request
+          expect(response).to have_http_status(:success)
+          expect(Services::LiveEventsSubscriptionService).to have_received(:create).with(any_args,
+                                                                                         hash_including(OwnerId: developer_key.global_id.to_s, OwnerType: "internal_service"))
+        end
       end
     end
 
@@ -129,6 +150,10 @@ describe Lti::DataServicesController do
     let(:action) { :update }
     let(:subId) { "myid" }
 
+    before do
+      allow(Services::LiveEventsSubscriptionService).to receive(:update) { |_, sub| service_response(sub) }
+    end
+
     context do
       let(:params_overrides) do
         { subscription:, account_id: root_account.lti_context_id, id: subId }
@@ -138,6 +163,19 @@ describe Lti::DataServicesController do
         expect(Services::LiveEventsSubscriptionService).to receive(:update).with(any_args,
                                                                                  hash_including(UpdatedBy: tool.global_id.to_s, UpdatedByType: "external_tool", Id: subId))
         send_request
+      end
+
+      context "without an installed tool" do
+        before do
+          tool.destroy
+        end
+
+        it "uses developer key for UpdatedBy" do
+          send_request
+          expect(response).to have_http_status(:success)
+          expect(Services::LiveEventsSubscriptionService).to have_received(:update).with(any_args,
+                                                                                         hash_including(UpdatedBy: developer_key.global_id.to_s, UpdatedByType: "internal_service", Id: subId))
+        end
       end
     end
 
