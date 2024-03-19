@@ -1615,8 +1615,8 @@ class ContextExternalTool < ActiveRecord::Base
   def placement_allowed?(placement)
     return true if placement != :submission_type_selection
 
-    allowed_domains = Setting.get("submission_type_selection_allowed_launch_domains", "").split(",")
-    allowed_dev_keys = Setting.get("submission_type_selection_allowed_dev_keys", "").split(",")
+    allowed_domains = Setting.get("submission_type_selection_allowed_launch_domains", "").split(",").map(&:strip).reject(&:empty?)
+    allowed_dev_keys = Setting.get("submission_type_selection_allowed_dev_keys", "").split(",").map(&:strip).reject(&:empty?)
     allowed_domains.include?(domain) || allowed_dev_keys.include?(Shard.global_id_for(developer_key&.id).to_s)
   end
 
