@@ -149,7 +149,7 @@ class VideoCaptionService < ApplicationService
   end
 
   def auth_token
-    Rails.application.credentials.send(:"notorious-admin")&.[](:client_authtication_key)
+    Rails.application.credentials.send(:"notorious-admin")&.[](:client_authentication_key)
   end
 
   def request_headers
