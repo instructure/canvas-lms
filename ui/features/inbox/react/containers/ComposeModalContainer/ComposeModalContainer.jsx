@@ -95,6 +95,7 @@ const ComposeModalContainer = props => {
             id: u.id,
             name: u.name,
             itemType: 'user',
+            totalRecipients: 1,
           }
         })
 
