@@ -93,10 +93,10 @@ export const GradingSchemeView: React.FC<ComponentProps> = ({
         </Flex>
       )}
       <View>
-        <View as="div" padding="none none small none" withVisualDebug={false}>
+        <View as="div" padding="none none medium none" withVisualDebug={false}>
           <Flex justifyItems="space-between" alignItems="start">
             <Flex.Item>
-              <Heading level="h4" margin="0 0 x-small">
+              <Heading level="h4" style={{margin: '0px 0px 4px', lineHeight: '24px'}}>
                 {I18n.t('Grade By')}
               </Heading>
               {gradingScheme.points_based ? I18n.t('Points') : I18n.t('Percentage')}
@@ -127,15 +127,10 @@ export const GradingSchemeView: React.FC<ComponentProps> = ({
           >
             <Table.Head>
               <Table.Row themeOverride={{borderColor: 'transparent'}}>
-                <Table.ColHeader themeOverride={{padding: '0.5rem 0'}} id="1" width="30%">
+                <Table.ColHeader themeOverride={{padding: '0'}} id="1" width="30%">
                   {I18n.t('Letter Grade')}
                 </Table.ColHeader>
-                <Table.ColHeader
-                  themeOverride={{padding: '0.5rem 0'}}
-                  id="2"
-                  width="70%"
-                  colSpan={2}
-                >
+                <Table.ColHeader themeOverride={{padding: '0'}} id="2" width="70%" colSpan={2}>
                   {I18n.t('Range')}
                 </Table.ColHeader>
               </Table.Row>

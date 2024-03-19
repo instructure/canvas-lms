@@ -25,7 +25,8 @@ module GradingSchemeSerializer
     def to_grading_scheme_summary_json(grading_standard)
       {
         title: grading_standard.title,
-        id: grading_standard.id.to_s
+        id: grading_standard.id.to_s,
+        context_type: grading_standard.context_type
       }.as_json
     end
 
