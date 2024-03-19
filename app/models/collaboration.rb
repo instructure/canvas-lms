@@ -65,7 +65,7 @@ class Collaboration < ActiveRecord::Base
         (user_id == user.id ||
          users.include?(user) ||
          Collaborator
-             .joins("INNER JOIN #{GroupMembership.quoted_table_name} ON collaborators.group_id = group_memberships.group_id")
+             .joins("INNER JOIN #{GroupMembership.quoted_table_name} ON collaborators.group_id = group_memberships.group_id AND group_memberships.workflow_state <> 'deleted'")
              .where('collaborators.group_id IS NOT NULL AND
                             group_memberships.user_id = ? AND
                             collaborators.collaboration_id = ?',
