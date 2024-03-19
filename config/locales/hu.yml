@@ -19288,6 +19288,7 @@ hu:
   starred_no_subject_click_to_unstar_bff04bce: "Csillagozva \"(Nincs tárgy)\", Kattintson a csillag eltávolításához."
   starred_subject_click_to_unstar_6aafcddc: "Csillagozva \"%{subject}\", Kattintson a csillag eltávolításához."
   start_5a4cfcd6: Kezdés
+  start_a_new_course_57ae2480: "Új kurzus létrehozása"
   start_assignment_d56256d3: "Feladat kezdése"
   start_date_e937be8a: Kezdődátum
   start_date_end_date_d809dd93: "%{start_date} - %{end_date}"
