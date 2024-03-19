@@ -362,7 +362,7 @@ describe "conversations new" do
             f("button[data-testid='compose']").click
             f("input[placeholder='Select Course']").click
             fj("li:contains('#{@course.name}')").click
-            ff("input[aria-label='Search']")[1].click
+            f("input[aria-label='To']").click
             wait_for_ajaximations
             fj("li:contains('Students')").click
             wait_for_ajaximations
@@ -548,7 +548,7 @@ describe "conversations new" do
           f("button[data-testid='compose']").click
           f("input[placeholder='Select Course']").click
           fj("li:contains('#{@course.name}')").click
-          ff("input[aria-label='Search']")[1].click
+          f("input[aria-label='To']").click
         end
 
         it "correctly sends message to the entire course", priority: "1" do
@@ -625,11 +625,11 @@ describe "conversations new" do
         admin_logged_in
         get "/conversations"
         f("button[data-testid='compose']").click
-        ff("input[aria-label='Search']")[1].click
+        f("input[aria-label='To']").click
         wait_for_ajaximations
         fj("li:contains('Users')").click
         fj("li:contains('#{@s1.name}')").click
-        ff("input[aria-label='Search']")[1].click
+        f("input[aria-label='To']").click
         wait_for_ajaximations
         fj("li:contains('#{@s2.name}')").click
         f("textarea[data-testid='message-body']").send_keys "sent to both of you"
@@ -649,7 +649,7 @@ describe "conversations new" do
 
         expect(f("input[data-testid = 'course-select']").property("value")).to eq(@course.name)
 
-        ff("input[aria-label='Search']")[1].click
+        f("input[aria-label='To']").click
         expect(fj("li:contains('All in #{@course.name}')")).to be_displayed
       end
 
@@ -667,7 +667,7 @@ describe "conversations new" do
           wait_for_ajaximations
           fj("li:contains('#{account_level_group.name}')").click
           force_click("input[data-testid='individual-message-checkbox']")
-          ff("input[aria-label='Search']")[1].click
+          f("input[aria-label='To']").click
           fj("li:contains('second student')").click
           f("textarea[data-testid='message-body']").send_keys "sent to everyone in the account level group"
           fj("button:contains('Send')").click
@@ -683,7 +683,7 @@ describe "conversations new" do
           f("button[data-testid='compose']").click
           f("input[placeholder='Select Course']").click
           fj("li:contains('#{@course.name}')").click
-          ff("input[aria-label='Search']")[1].click
+          f("input[aria-label='To']").click
           expect(f("input[data-testid='individual-message-checkbox']")).not_to be_disabled
           fj("div[data-testid='address-book-item']:contains('Students')").click
           wait_for_ajaximations
@@ -712,7 +712,7 @@ describe "conversations new" do
           f("button[data-testid='compose']").click
           f("input[placeholder='Select Course']").click
           fj("li:contains('#{@course.name}')").click
-          ff("input[aria-label='Search']")[1].click
+          f("input[aria-label='To']").click
           expect(f("input[data-testid='individual-message-checkbox']")).not_to be_disabled
           fj("div[data-testid='address-book-item']:contains('Students')").click
           wait_for_ajaximations
@@ -748,7 +748,7 @@ describe "conversations new" do
         end
 
         it "includes correct observers when clicked" do
-          ff("input[aria-label='Search']")[1].click
+          f("input[aria-label='To']").click
           fj("div[data-testid='address-book-item']:contains('All in #{@course.name}')").click
           f("button[data-testid='include-observer-button']").click
           wait_for_ajaximations
@@ -758,7 +758,7 @@ describe "conversations new" do
         end
 
         it "does not include duplicate observers when clicked" do
-          ff("input[aria-label='Search']")[1].click
+          f("input[aria-label='To']").click
           fj("div[data-testid='address-book-item']:contains('All in #{@course.name}')").click
           f("button[data-testid='include-observer-button']").click
           wait_for_ajaximations
@@ -773,7 +773,7 @@ describe "conversations new" do
         end
 
         it "renders an alert when no observers are added" do
-          ff("input[aria-label='Search']")[1].click
+          f("input[aria-label='To']").click
           fj("div[data-testid='address-book-item']:contains('Students')").click
           wait_for_ajaximations
           fj("div[data-testid='address-book-item']:contains('#{@s2.name}')").click
@@ -815,7 +815,7 @@ describe "conversations new" do
         wait_for_ajaximations
 
         # Select student, verify that the recipient role pill is displayed
-        ff("input[aria-label='Search']")[1].click
+        f("input[aria-label='To']").click
         fj("div[data-testid='address-book-item']:contains('Students')").click
         wait_for_ajaximations
         fj("div[data-testid='address-book-item']:contains('#{@s1.name}')").click
@@ -866,6 +866,6 @@ describe "conversations new" do
     f("li[role='none']").click
 
     # Open address book
-    ff("input[aria-label='Search']")[1].click
+    f("input[aria-label='To']").click
   end
 end

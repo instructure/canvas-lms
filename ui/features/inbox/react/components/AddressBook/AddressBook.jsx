@@ -115,7 +115,7 @@ export const AddressBook = ({
     ...menuData.contextData,
     ...menuData.userData,
   ])
-  const ariaAddressBookLabel = I18n.t('Search')
+  const ariaAddressBookLabel = I18n.t('%{label}', {label: props.addressBookLabel})
   const [menuItemCurrent, setMenuItemCurrent] = useState(null)
   const [isSubMenuSelection, setIsSubMenuSelection] = useState(true)
   const {setOnSuccess} = useContext(AlertManagerContext)
@@ -580,7 +580,11 @@ export const AddressBook = ({
               renderTrigger={
                 <TextInput
                   placeholder={selectedMenuItems.length === 0 ? searchPlaceholder : null}
-                  renderLabel={<ScreenReaderContent>{I18n.t('Search Input')}</ScreenReaderContent>}
+                  renderLabel={
+                    <ScreenReaderContent>
+                      {I18n.t('%{label}', {label: props.addressBookLabel})}
+                    </ScreenReaderContent>
+                  }
                   renderBeforeInput={
                     selectedMenuItems.length === 0 ? (
                       <IconSearchLine inline={false} />
@@ -599,9 +603,9 @@ export const AddressBook = ({
                   type="search"
                   aria-owns={popoverInstanceId.current}
                   aria-label={ariaAddressBookLabel}
-                  aria-labelledby={selectedMenuItems
+                  aria-labelledby={`address-book-form ${selectedMenuItems
                     .map(u => `address-book-label-${u?.id}-${u?.itemType}`)
-                    .join(' ')}
+                    .join(' ')}`}
                   aria-autocomplete="list"
                   inputRef={ref => {
                     textInputRef.current = ref
@@ -630,7 +634,7 @@ export const AddressBook = ({
                 >
                   <ul
                     role="menu"
-                    aria-label={I18n.t('Search Menu')}
+                    aria-label={I18n.t('%{label} Menu', {label: props.addressBookLabel})}
                     id={popoverInstanceId.current}
                     style={{
                       paddingInlineStart: '0px',
@@ -651,7 +655,7 @@ export const AddressBook = ({
           <Flex.Item>
             <IconButton
               data-testid="address-button"
-              screenReaderLabel={I18n.t('Open Search Menu')}
+              screenReaderLabel={I18n.t('Open %{label} Menu', {label: props.addressBookLabel})}
               onClick={() => {
                 if (isMenuOpen) {
                   setIsMenuOpen(false)
@@ -679,6 +683,7 @@ AddressBook.defaultProps = {
   onSelect: () => {},
   onSelectedIdsChange: () => {},
   selectedRecipients: [],
+  addressBookLabel: 'Search',
 }
 
 AddressBook.propTypes = {
@@ -762,6 +767,7 @@ AddressBook.propTypes = {
    * placeholder text for search text input
    */
   placeholder: PropTypes.string,
+  addressBookLabel: PropTypes.string,
 }
 
 export default AddressBook
