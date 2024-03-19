@@ -181,6 +181,8 @@ const RCELoader = {
       timezone: ENV?.TIMEZONE,
       userCacheKey: ENV?.user_cache_key,
       canvasOrigin: ENV?.DEEP_LINKING_POST_MESSAGE_ORIGIN || window.location?.origin || '',
+      resourceType: tinyMCEInitOptions.resourceType,
+      resourceId: tinyMCEInitOptions.resourceId,
       externalToolsConfig: {
         ltiIframeAllowances: window.ENV?.LTI_LAUNCH_FRAME_ALLOWANCES,
         isA2StudentView: window.ENV?.a2_student_view,

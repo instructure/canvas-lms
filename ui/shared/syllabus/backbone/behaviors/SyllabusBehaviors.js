@@ -218,6 +218,7 @@ const bindToEditSyllabus = function (course_summary_enabled) {
     RichContentEditor.loadNewEditor($course_syllabus_body, {
       focus: true,
       manageParent: true,
+      resourceType: 'syllabus.body',
     })
 
     $('.jump_to_today_link').focus()

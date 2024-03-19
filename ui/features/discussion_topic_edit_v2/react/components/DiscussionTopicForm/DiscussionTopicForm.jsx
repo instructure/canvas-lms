@@ -569,6 +569,8 @@ export default function DiscussionTopicForm({
           height={300}
           defaultContent={isEditing ? currentDiscussionTopic?.message : ''}
           autosave={false}
+          resourceType={isAnnouncement ? 'announcement.body' : 'discussion_topic.body'}
+          resourceId={currentDiscussionTopic?._id}
         />
         {ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_ATTACH && (
           <AttachmentDisplay

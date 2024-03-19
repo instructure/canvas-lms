@@ -1223,6 +1223,8 @@ EditView.prototype._attachEditorToDescription = function () {
   return RichContentEditor.loadNewEditor(this.$description, {
     focus: true,
     manageParent: true,
+    resourceType: 'assignment.body',
+    resourceId: this.assignment.id,
   })
 }
 
