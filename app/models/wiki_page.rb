@@ -387,8 +387,14 @@ class WikiPage < ActiveRecord::Base
     # the page must be available for users of the following roles
     return false unless available_for?(user, session)
     return true if roles.include?("students") && context.respond_to?(:students) && context.includes_student?(user)
-    return true if roles.include?("members") && context.respond_to?(:users) && context.users.include?(user)
-    return true if roles.include?("public")
+
+    if roles.include?("members") || roles.include?("public")
+      if context.is_a?(Course)
+        return true if context.active_users.include?(user)
+      elsif context.respond_to?(:users) && context.users.include?(user)
+        return true
+      end
+    end
 
     false
   end
