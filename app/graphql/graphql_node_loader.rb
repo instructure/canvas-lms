@@ -165,6 +165,9 @@ module GraphQLNodeLoader
       Loaders::IDLoader.for(Quizzes::Quiz).load(id).then(check_read_permission)
     when "Submission"
       Loaders::IDLoader.for(Submission).load(id).then(check_read_permission)
+    when "SubmissionByAssignmentAndUser"
+      submission = Submission.active.find_by(assignment_id: id.fetch(:assignment_id), user_id: id.fetch(:user_id))
+      check_read_permission.call(submission)
     when "Progress"
       Loaders::IDLoader.for(Progress).load(id).then do |progress|
         Loaders::AssociationLoader.for(Progress, :context).load(progress).then do

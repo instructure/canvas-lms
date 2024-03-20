@@ -97,11 +97,29 @@ module Types
       argument :id,
                ID,
                "a graphql or legacy id",
-               required: true,
+               required: false,
                prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Submission")
+
+      argument :assignment_id,
+               ID,
+               "a graphql or legacy assignment id",
+               required: false,
+               prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Assignment")
+
+      argument :user_id,
+               ID,
+               "a graphql or legacy user id",
+               required: false,
+               prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("User")
     end
-    def submission(id:)
-      GraphQLNodeLoader.load("Submission", id, context)
+    def submission(id: nil, assignment_id: nil, user_id: nil)
+      if id && !assignment_id && !user_id
+        GraphQLNodeLoader.load("Submission", id, context)
+      elsif !id && assignment_id && user_id
+        GraphQLNodeLoader.load("SubmissionByAssignmentAndUser", { assignment_id:, user_id: }, context)
+      else
+        raise GraphQL::ExecutionError, "Must specify an id or an assignment_id and user_id"
+      end
     end
 
     field :term, Types::TermType, null: true do
