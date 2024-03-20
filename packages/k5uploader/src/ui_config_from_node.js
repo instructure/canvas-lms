@@ -28,7 +28,7 @@ export default function (xml) {
     maxTotalSize: limits.attr('maxTotalSize'),
   })
 
-  const filters = xml.find('fileFilters').children()
+  const filters = xml.find('fileFilter').children()
 
   for (let i = 0, l = filters.length; i < l; i++) {
     const filter = filterFromNode(filters[i])
