@@ -91,6 +91,7 @@ describe "Discussion Topic Show" do
       expect(fj("span:contains('Close for Comments')")).to be_present
       expect(fj("span:contains('Send To...')")).to be_present
       expect(fj("span:contains('Copy To...')")).to be_present
+      expect(f("body")).not_to contain_css(Discussion.summarize_button_selector)
     end
 
     context "group discussions in a group context" do
@@ -367,6 +368,77 @@ describe "Discussion Topic Show" do
         Discussion.click_assign_to_button
         wait_for_assign_to_tray_spinner
         expect(module_item_assign_to_card.last).to contain_css(due_date_input_selector)
+      end
+    end
+
+    context "when Discussion Summary feature flag is ON" do
+      before do
+        Account.default.enable_feature!(:discussion_summary)
+
+        @inst_llm = double("InstLLM::Client")
+        allow(InstLLMHelper).to receive(:client).and_return(@inst_llm)
+
+        get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+      end
+
+      it "allows a teacher to summarize a discussion" do
+        expect(@inst_llm).to receive(:chat).and_return(
+          InstLLM::Response::ChatResponse.new(
+            model: "model",
+            message: { role: :assistant, content: "summary_1" },
+            stop_reason: "stop_reason",
+            usage: {
+              input_tokens: 10,
+              output_tokens: 20,
+            }
+          )
+        )
+
+        Discussion.click_summarize_button
+
+        expect(Discussion.summary_text).to include_text("summary_1")
+        expect(Discussion.summary_like_button).to be_present
+        expect(Discussion.summary_dislike_button).to be_present
+        expect(Discussion.summary_regenerate_button).to be_present
+        expect(Discussion.summary_disable_button).to be_present
+        expect(f("body")).not_to contain_css(Discussion.summarize_button_selector)
+
+        Discussion.click_summary_like_button
+        Discussion.click_summary_dislike_button
+
+        expect(@inst_llm).to receive(:chat).and_return(
+          InstLLM::Response::ChatResponse.new(
+            model: "model",
+            message: { role: :assistant, content: "summary_2" },
+            stop_reason: "stop_reason",
+            usage: {
+              input_tokens: 10,
+              output_tokens: 20,
+            }
+          )
+        )
+
+        Discussion.click_summary_regenerate_button
+
+        expect(Discussion.summary_text).to include_text("summary_2")
+        expect(Discussion.summary_like_button).to be_present
+        expect(Discussion.summary_dislike_button).to be_present
+        expect(Discussion.summary_regenerate_button).to be_present
+        expect(Discussion.summary_disable_button).to be_present
+        expect(f("body")).not_to contain_css(Discussion.summarize_button_selector)
+
+        Discussion.click_summary_disable_button
+
+        expect(f("body")).not_to contain_css(Discussion.summary_text_selector)
+        expect(Discussion.summarize_button).to be_present
+      end
+
+      it "shows an error message when summarization fails" do
+        expect(@inst_llm).to receive(:chat).and_raise(InstLLM::ThrottlingError)
+
+        Discussion.click_summarize_button
+
+        expect(Discussion.summary_error).to include_text("Sorry, the service is currently busy. Please try again later.")
       end
     end
   end

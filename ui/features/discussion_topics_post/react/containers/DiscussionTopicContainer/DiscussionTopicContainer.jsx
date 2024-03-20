@@ -22,6 +22,7 @@ import DirectShareUserModal from '@canvas/direct-sharing/react/components/Direct
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
 import {Discussion} from '../../../graphql/Discussion'
 import {DiscussionEdit} from '../../components/DiscussionEdit/DiscussionEdit'
+import {DiscussionSummary} from '../../components/DiscussionSummary/DiscussionSummary'
 import {getSpeedGraderUrl, getReviewLinkUrl, responsiveQuerySizes} from '../../utils'
 import {Highlight} from '../../components/Highlight/Highlight'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -257,7 +258,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
           },
         },
       }}
-      render={responsiveProps => (
+      render={(responsiveProps, matches) => (
         <>
           <DiscussionTopicAlertManager discussionTopic={props.discussionTopic} />
           {!isSearch && (
@@ -498,6 +499,26 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                     )}
                   </View>
                 </Flex.Item>
+                {props.isSummaryEnabled && (
+                <Flex.Item>
+                  <View
+                    as="div"
+                    borderWidth={responsiveProps?.border?.width}
+                    borderRadius={responsiveProps?.border?.radius}
+                    borderStyle="solid"
+                    borderColor="primary"
+                    padding="small"
+                    margin="0 0 small 0"
+                  >
+                    <Flex direction="column" padding={responsiveProps?.container?.padding}>
+                      <DiscussionSummary
+                        onDisableSummaryClick={() => props.setIsSummaryEnabled(false)}
+                        showButtonText={!matches.includes('mobile')}
+                      />
+                    </Flex>
+                  </View>
+                </Flex.Item>
+                )}
               </Flex>
             </Highlight>
           )}
@@ -559,6 +580,14 @@ DiscussionTopicContainer.propTypes = {
    * useState object to set the REPLY_TO_ENTRY submission status
    */
   replyToEntrySubmission: PropTypes.object,
+  /**
+   * useState Boolean to toggle the Discussion Summary
+   */
+  isSummaryEnabled: PropTypes.bool,
+  /**
+   * useState function to set the Discussion Summary
+   */
+  setIsSummaryEnabled: PropTypes.func,
 }
 
 export default DiscussionTopicContainer

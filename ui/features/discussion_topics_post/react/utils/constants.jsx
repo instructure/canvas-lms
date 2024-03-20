@@ -58,6 +58,7 @@ const discussionManagerUtilityContext = {
   isGradedDiscussion: false,
   setIsGradedDiscussion: () => {},
   usedThreadingToolbarChildRef: null,
+  isSummaryEnabled: false,
 }
 
 export const DiscussionManagerUtilityContext = React.createContext(discussionManagerUtilityContext)

@@ -57,6 +57,8 @@ describe('DiscussionTopicContainer', () => {
       PEER_REVIEWS_URL: 'this_is_the_peer_reviews_url',
       context_asset_string: 'course_1',
       course_id: '1',
+      context_type: 'Course',
+      context_id: '1',
       discussion_topic_menu_tools: [
         {
           base_url: 'example.com',
@@ -811,6 +813,24 @@ describe('DiscussionTopicContainer', () => {
         })
         expect(queryByTestId('add_rubric_url')).toBeNull()
       })
+    })
+  })
+
+  describe('Discussion Summary', () => {
+    it('renders a summary', () => {
+      const { queryByTestId } = setup({
+        discussionTopic: Discussion.mock(),
+        isSummaryEnabled: true,
+      })
+      expect(queryByTestId('summary-loading')).toBeTruthy()
+    })
+
+    it('does not render a summary', () => {
+      const { queryAllByTestId } = setup({
+        discussionTopic: Discussion.mock(),
+        isSummaryEnabled: false,
+      })
+      expect( queryAllByTestId(/summary-.*/) ).toEqual([])
     })
   })
 })
