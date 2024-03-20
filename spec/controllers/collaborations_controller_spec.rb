@@ -108,9 +108,31 @@ describe CollaborationsController do
         user: @student
       ).tap { |c| c.update_attribute :url, "http://www.example.com" }
 
-      get "index", params: { course_id: @course.id }
+      gc = group_category
 
-      expect(assigns[:collaborations]).to eq [collab2]
+      valid_group = gc.groups.create!(context: @course, name: "valid")
+      valid_group.add_user(@student, "accepted")
+      valid_collab = @course.collaborations.create!(
+        title: "valid",
+        user: @teacher
+      ).tap do |c|
+        c.update_attribute :url, "http://www.example.com"
+        c.update_members([], [valid_group.id])
+      end
+
+      invalid_group = gc.groups.create!(context: @course, name: "invalid")
+      invalid_group.add_user(@student, "deleted")
+      invalid_collab = @course.collaborations.create!(
+        title: "invalid",
+        user: @teacher
+      ).tap do |c|
+        c.update_attribute :url, "http://www.example.com"
+        c.update_members([], [invalid_group.id])
+      end
+
+      get "index", params: { course_id: @course.id }
+      expect(assigns[:collaborations]).to match_array [collab2, valid_collab]
+      expect(assigns[:collaborations]).not_to include invalid_collab
     end
   end
 
