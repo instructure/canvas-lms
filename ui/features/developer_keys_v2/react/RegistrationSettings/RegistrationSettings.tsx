@@ -174,6 +174,7 @@ const RegistrationOverlayFormWrapper = (props: RegistrationOverlayFormWrapperPro
             onClick={() => {
               setSaving(true)
               updateRegistrationOverlay(
+                props.contextId,
                 props.ltiRegistration.id,
                 store.getState().state.registration
               )
