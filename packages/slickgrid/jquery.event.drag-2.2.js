@@ -1,7 +1,7 @@
 /* eslint-disable eslint-comments/no-unlimited-disable */
 /* eslint-disable */
 import $ from 'jquery'
-import 'jquery-migrate'
+import {isFunction} from 'lodash'
 
 /*!
  * jquery.event.drag - v 2.2
@@ -11,19 +11,19 @@ import 'jquery-migrate'
 // Created: 2008-06-04
 // Updated: 2012-05-21
 // REQUIRES: jquery 1.7.x
-;(function($) {
+;(function ($) {
   // add the jquery instance method
-  $.fn.drag = function(str, arg, opts) {
+  $.fn.drag = function (str, arg, opts) {
     // figure out the event type
     var type = typeof str == 'string' ? str : '',
       // figure out the event handler...
-      fn = $.isFunction(str) ? str : $.isFunction(arg) ? arg : null
+      fn = isFunction(str) ? str : isFunction(arg) ? arg : null
     // fix the event type
     if (type.indexOf('drag') !== 0) type = 'drag' + type
     // were options passed
     opts = (str == fn ? arg : opts) || {}
     // trigger or bind event handler
-    return fn ? this.bind(type, opts, fn) : this.trigger(type)
+    return fn ? this.on(type, opts, fn) : this.trigger(type)
   }
 
   // local refs (increase compression)
@@ -39,7 +39,7 @@ import 'jquery-migrate'
         handle: null, // selector to match handle target elements
         relative: false, // true to use "position", false to use "offset"
         drop: true, // false to suppress drop events, true or selector to allow
-        click: false // false to suppress click events after dragend (no proxy)
+        click: false, // false to suppress click events after dragend (no proxy)
       },
 
       // the key name for stored drag data
@@ -49,7 +49,7 @@ import 'jquery-migrate'
       noBubble: true,
 
       // count bound related events
-      add: function(obj) {
+      add: function (obj) {
         // read the interaction data
         var data = $.data(this, drag.datakey),
           // read any passed options
@@ -58,18 +58,18 @@ import 'jquery-migrate'
         data.related += 1
         // extend data options bound with this event
         // don't iterate "opts" in case it is a node
-        $.each(drag.defaults, function(key, def) {
+        $.each(drag.defaults, function (key, def) {
           if (opts[key] !== undefined) data[key] = opts[key]
         })
       },
 
       // forget unbound related events
-      remove: function() {
+      remove: function () {
         $.data(this, drag.datakey).related -= 1
       },
 
       // configure interaction, capture settings
-      setup: function() {
+      setup: function () {
         // check for related events
         if ($.data(this, drag.datakey)) return
         // initialize the drag data with copied defaults
@@ -83,7 +83,7 @@ import 'jquery-migrate'
       },
 
       // destroy configured interaction
-      teardown: function() {
+      teardown: function () {
         var data = $.data(this, drag.datakey) || {}
         // check for related events
         if (data.related) return
@@ -98,7 +98,7 @@ import 'jquery-migrate'
       },
 
       // initialize the interaction
-      init: function(event) {
+      init: function (event) {
         // sorry, only one touch at a time
         if (drag.touched) return
         // the drag/drop interaction data
@@ -128,7 +128,7 @@ import 'jquery-migrate'
         // insert new interaction elements
         if (results && results.length) {
           dd.interactions = []
-          $.each(results, function() {
+          $.each(results, function () {
             dd.interactions.push(drag.interaction(this, dd))
           })
         }
@@ -146,18 +146,18 @@ import 'jquery-migrate'
       },
 
       // returns an interaction object
-      interaction: function(elem, dd) {
+      interaction: function (elem, dd) {
         var offset = $(elem)[dd.relative ? 'position' : 'offset']() || {top: 0, left: 0}
         return {
           drag: elem,
           callback: new drag.callback(),
           droppable: [],
-          offset: offset
+          offset: offset,
         }
       },
 
       // handle drag-releatd DOM events
-      handler: function(event) {
+      handler: function (event) {
         // read the data before hijacking anything
         var dd = event.data
         // handle various events
@@ -212,7 +212,7 @@ import 'jquery-migrate'
       },
 
       // re-use event object for custom events
-      hijack: function(event, type, dd, x, elem) {
+      hijack: function (event, type, dd, x, elem) {
         // not configured
         if (!dd) return
         // remember the original event and type
@@ -242,11 +242,11 @@ import 'jquery-migrate'
             // prepare for more results
             ia.results = []
             // handle each element
-            $(elem || ia[mode] || dd.droppable).each(function(p, subject) {
+            $(elem || ia[mode] || dd.droppable).each(function (p, subject) {
               // identify drag or drop targets individually
               callback.target = subject
               // force propagtion of the custom event
-              event.isPropagationStopped = function() {
+              event.isPropagationStopped = function () {
                 return false
               }
               // handle the event
@@ -288,7 +288,7 @@ import 'jquery-migrate'
       },
 
       // extend the callback object with drag/drop properties...
-      properties: function(event, dd, ia) {
+      properties: function (event, dd, ia) {
         var obj = ia.callback
         // elements
         obj.drag = ia.drag
@@ -312,13 +312,13 @@ import 'jquery-migrate'
       },
 
       // determine is the argument is an element or jquery instance
-      element: function(arg) {
+      element: function (arg) {
         if (arg && (arg.jquery || arg.nodeType == 1)) return arg
       },
 
       // flatten nested jquery objects and arrays into a single dimension array
-      flatten: function(arr) {
-        return $.map(arr, function(member) {
+      flatten: function (arr) {
+        return $.map(arr, function (member) {
           return member && member.jquery
             ? $.makeArray(member)
             : member && member.length
@@ -328,7 +328,7 @@ import 'jquery-migrate'
       },
 
       // toggles text selection attributes ON (true) or OFF (false)
-      textselect: function(bool) {
+      textselect: function (bool) {
         $(document)
           [bool ? 'unbind' : 'bind']('selectstart', drag.dontstart)
           .css('MozUserSelect', bool ? '' : 'none')
@@ -337,27 +337,27 @@ import 'jquery-migrate'
       },
 
       // suppress "selectstart" and "ondragstart" events
-      dontstart: function() {
+      dontstart: function () {
         return false
       },
 
       // a callback instance contructor
-      callback: function() {}
+      callback: function () {},
     })
 
   // callback methods
   drag.callback.prototype = {
-    update: function() {
+    update: function () {
       if ($special.drop && this.available.length)
-        $.each(this.available, function(i) {
+        $.each(this.available, function (i) {
           $special.drop.locate(this, i)
         })
-    }
+    },
   }
 
   // patch $.event.$dispatch to allow suppressing clicks
   var $dispatch = $event.dispatch
-  $event.dispatch = function(event) {
+  $event.dispatch = function (event) {
     if ($.data(this, 'suppress.' + event.type) - new Date().getTime() > 0) {
       $.removeData(this, 'suppress.' + event.type)
       return
@@ -366,23 +366,29 @@ import 'jquery-migrate'
   }
 
   // event fix hooks for touch events...
-  var touchHooks = ($event.fixHooks.touchstart = $event.fixHooks.touchmove = $event.fixHooks.touchend = $event.fixHooks.touchcancel = {
-    props: 'clientX clientY pageX pageY screenX screenY'.split(' '),
-    filter: function(event, orig) {
-      if (orig) {
-        var touched =
-          (orig.touches && orig.touches[0]) ||
-          (orig.changedTouches && orig.changedTouches[0]) ||
-          null
-        // iOS webkit: touchstart, touchmove, touchend
-        if (touched)
-          $.each(touchHooks.props, function(i, prop) {
-            event[prop] = touched[prop]
-          })
-      }
-      return event
-    }
-  })
+  $event.fixHooks = $event.fixHooks || {}
+  var touchHooks =
+    ($event.fixHooks.touchstart =
+    $event.fixHooks.touchmove =
+    $event.fixHooks.touchend =
+    $event.fixHooks.touchcancel =
+      {
+        props: 'clientX clientY pageX pageY screenX screenY'.split(' '),
+        filter: function (event, orig) {
+          if (orig) {
+            var touched =
+              (orig.touches && orig.touches[0]) ||
+              (orig.changedTouches && orig.changedTouches[0]) ||
+              null
+            // iOS webkit: touchstart, touchmove, touchend
+            if (touched)
+              $.each(touchHooks.props, function (i, prop) {
+                event[prop] = touched[prop]
+              })
+          }
+          return event
+        },
+      })
 
   // share the same special event configuration with related events...
   $special.draginit = $special.dragstart = $special.dragend = drag

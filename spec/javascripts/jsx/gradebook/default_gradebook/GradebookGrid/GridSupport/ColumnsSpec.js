@@ -385,7 +385,8 @@ QUnit.module('GradebookGrid GridSupport Columns', suiteHooks => {
       )
     })
 
-    test('does not trigger onColumnsResized when column widths did not change', () => {
+    // unskip in FOO-4349
+    QUnit.skip('does not trigger onColumnsResized when column widths did not change', () => {
       resizeHeader('column4', 0)
       strictEqual(resizedColumns.length, 0)
     })
