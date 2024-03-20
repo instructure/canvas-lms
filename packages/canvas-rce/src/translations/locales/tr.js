@@ -145,6 +145,7 @@ const locale = {
   "file_url_c12b64be": { "message": "Dosya URL" },
   "files_c300e900": { "message": "Dosyalar" },
   "files_index_af7c662b": { "message": "Dosya Başlıkları" },
+  "find_8d605019": { "message": "Ara" },
   "finish_bc343002": { "message": "Tamamla" },
   "format_4247a9c5": { "message": "Format" },
   "generating_preview_45b53be0": { "message": "Oluşturma önizlemesi..." },
@@ -207,6 +208,7 @@ const locale = {
     "message": "Bu dosya için ön izleme bulunmamaktadır."
   },
   "no_results_940393cf": { "message": "Sonuç yok." },
+  "no_results_found_58717065": { "message": "Sonuç bulunamadı" },
   "none_3b5e34d2": { "message": "Yok" },
   "operators_a2ef9a93": { "message": "Operatörler" },
   "orange_81386a62": { "message": "Turuncu" },
@@ -217,6 +219,7 @@ const locale = {
   "pink_68ad45cb": { "message": "Pembe" },
   "prev_f82cbc48": { "message": "Önceki" },
   "preview_53003fd2": { "message": "Önizleme" },
+  "previous_bd2ac015": { "message": "Önceki" },
   "published_c944a23d": { "message": "yayınlandı" },
   "purple_7678a9fc": { "message": "Mor" },
   "quiz_e0dcce8f": { "message": "Kısa Sınav" },
