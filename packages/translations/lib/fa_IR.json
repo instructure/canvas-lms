@@ -263,6 +263,9 @@
     "filipino_33339264": {
         "message": "فیلیپینی"
     },
+    "find_8d605019": {
+        "message": "یافتن"
+    },
     "finish_bc343002": {
         "message": "پایان"
     },
@@ -485,6 +488,9 @@
     "no_results_940393cf": {
         "message": "No results."
     },
+    "no_results_found_58717065": {
+        "message": "نتیجه ای یافت نشد"
+    },
     "no_video_1ed00b26": {
         "message": "بدون تصویر"
     },
@@ -559,6 +565,9 @@
     },
     "preview_a3f8f854": {
         "message": "پیش نمایش"
+    },
+    "previous_bd2ac015": {
+        "message": "Previous"
     },
     "published_c944a23d": {
         "message": "منتشر شده"

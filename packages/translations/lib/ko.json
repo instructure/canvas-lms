@@ -119,6 +119,9 @@
     "files_index_af7c662b": {
         "message": "파일 색인"
     },
+    "find_8d605019": {
+        "message": "찾기"
+    },
     "format_4247a9c5": {
         "message": "형식"
     },
@@ -227,6 +230,9 @@
     "no_results_940393cf": {
         "message": "No results."
     },
+    "no_results_found_58717065": {
+        "message": "결과가 없음"
+    },
     "none_3b5e34d2": {
         "message": "없음"
     },
@@ -247,6 +253,9 @@
     },
     "preview_53003fd2": {
         "message": "미리 보기"
+    },
+    "previous_bd2ac015": {
+        "message": "이전"
     },
     "quiz_e0dcce8f": {
         "message": "퀴즈"

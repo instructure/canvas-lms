@@ -326,6 +326,7 @@
   },
   "files_c300e900": { "message": "Filer" },
   "files_index_af7c662b": { "message": "Filoversikt" },
+  "find_8d605019": { "message": "Finn" },
   "finish_bc343002": { "message": "Fullfør" },
   "fix_heading_hierarchy_f60884c4": { "message": "Fiks overskriftshierarkiet" },
   "focus_element_options_toolbar_18d993e": {
@@ -600,6 +601,7 @@
     "message": "Førehandsvising er ikkje tilgjengeleg for denne fila."
   },
   "no_results_940393cf": { "message": "Utan resultat. " },
+  "no_results_found_58717065": { "message": "Finn ikkje resultat" },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Ingen resultat funne for { filterTerm }"
   },
@@ -685,6 +687,7 @@
   "preview_a3f8f854": { "message": "Førehandsvisning" },
   "preview_in_overlay_ed772c46": { "message": "Førehandsvisning i nytt lag" },
   "preview_inline_9787330": { "message": "Førehandsvising i teksten" },
+  "previous_bd2ac015": { "message": "Førre" },
   "prime_917ea60e": { "message": "Primtal" },
   "prime_numbers_13464f61": { "message": "Primtal" },
   "product_39cf144f": { "message": "Produkt" },
