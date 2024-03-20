@@ -81,6 +81,30 @@ module Lti
           validate_launch_eligibility!
           set_extra_csp_frame_ancestor! unless @oidc_error
 
+          # This was added as a resolution to the INTEROP-8200 saga. Essentially, for a reason that no one was able to
+          # determine, during the second step of the LTI 1.3 launch, the browser would not send cookies. This meant that
+          # we had no user information and the launch would fail. Previously, we were forwarding this error along
+          # to tools. However, there wasn't really anything the tool was able to do. Luckily, the issue is easily fixed
+          # by just relaunching the tool. We *believe* that the issue was only present in Safari and that it was caused
+          # by ITP (Intelligent Tracking Prevention). We added this error screen to give the user and the tool a better
+          # overall experience, rather than just getting an obscure "login_required" error message.
+          # Unless you have tracked down the root cause of the issue and are sure that it is fixed,
+          # do not remove this error screen.
+          if @current_user.blank? && !public_course? && decoded_jwt.present? && Account.site_admin.feature_enabled?(:lti_login_required_error_page)
+            if context.is_a?(Account)
+              account = context
+            elsif context.respond_to?(:account)
+              account = context.account
+            end
+
+            InstStatsd::Statsd.increment("lti.oidc_login_required_error", tags: {
+                                           account: account&.global_id,
+                                           client_id: oidc_params[:client_id],
+                                         })
+            render("lti/ims/authentication/login_required_error_screen", status: :unauthorized, layout: "borderless_lti", formats: :html)
+            return
+          end
+
           render(
             "lti/ims/authentication/authorize",
             formats: :html,
