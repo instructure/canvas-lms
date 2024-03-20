@@ -284,13 +284,46 @@ describe Lti::IMS::AuthenticationController do
       context "when there there is no current user" do
         before { remove_user_session }
 
-        it_behaves_like "non redirect_uri errors" do
-          def authorize
-            get :authorize, params:
+        context "when the lti_login_required_error_page feature flag is enabled" do
+          before(:once) do
+            Account.site_admin.enable_feature!(:lti_login_required_error_page)
           end
 
-          let(:expected_message) { "Must have an active user session" }
-          let(:expected_error) { "login_required" }
+          it "renders a friendly error message" do
+            authorize
+            expect(response).to have_http_status :unauthorized
+            expect(response).to render_template("lti/ims/authentication/login_required_error_screen")
+          end
+
+          it "increments the lti.oidc_login_required_error metric" do
+            allow(InstStatsd::Statsd).to receive(:increment)
+            authorize
+            expect(InstStatsd::Statsd).to have_received(:increment).with("lti.oidc_login_required_error", tags: {
+                                                                           account: context.global_id,
+                                                                           client_id: client_id.to_s
+                                                                         })
+          end
+        end
+
+        context "when the lti_login_required_error_page feature flag is disabled" do
+          before(:once) do
+            Account.site_admin.disable_feature!(:lti_login_required_error_page)
+          end
+
+          it_behaves_like "non redirect_uri errors" do
+            def authorize
+              get :authorize, params:
+            end
+
+            let(:expected_message) { "Must have an active user session" }
+            let(:expected_error) { "login_required" }
+          end
+
+          it "does not render a friendly error message" do
+            authorize
+            expect(response).to have_http_status :ok
+            expect(response).not_to render_template("lti/ims/authentication/login_required_error_screen")
+          end
         end
 
         context "and the context is public" do
@@ -370,7 +403,7 @@ describe Lti::IMS::AuthenticationController do
         end
       end
 
-      context "when the devloper key is not active" do
+      context "when the developer key is not active" do
         before { developer_key.update!(workflow_state: "inactive") }
 
         it_behaves_like "non redirect_uri errors" do
