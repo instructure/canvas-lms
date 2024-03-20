@@ -121,6 +121,8 @@ const DiscussionTopicManager = props => {
 
   const usedThreadingToolbarChildRef = useRef(null)
 
+  const [isSummaryEnabled, setIsSummaryEnabled] = useState(ENV.discussion_summary_enabled || false)
+
   const discussionManagerUtilities = {
     replyFromId,
     setReplyFromId,
@@ -137,6 +139,8 @@ const DiscussionTopicManager = props => {
     setShowTranslationControl,
     translateTargetLanguage,
     setTranslateTargetLanguage,
+    isSummaryEnabled,
+    setIsSummaryEnabled,
   }
 
   const isModuleItem = ENV.SEQUENCE != null
@@ -372,6 +376,8 @@ const DiscussionTopicManager = props => {
                       discussionTopic={discussionTopicQuery.data.legacyNode}
                       setUserSplitScreenPreference={setUserSplitScreenPreference}
                       userSplitScreenPreference={userSplitScreenPreference}
+                      setIsSummaryEnabled={setIsSummaryEnabled}
+                      isSummaryEnabled={isSummaryEnabled}
                       closeView={closeView}
                     />
                     <DiscussionTopicContainer
@@ -398,6 +404,8 @@ const DiscussionTopicManager = props => {
                       isHighlighted={isTopicHighlighted}
                       replyToTopicSubmission={replyToTopicSubmission}
                       replyToEntrySubmission={replyToEntrySubmission}
+                      isSummaryEnabled={ENV.user_can_summarize && isSummaryEnabled}
+                      setIsSummaryEnabled={setIsSummaryEnabled}
                     />
 
                     {discussionTopicQuery.data.legacyNode.discussionEntriesConnection.nodes
