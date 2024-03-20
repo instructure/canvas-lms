@@ -170,6 +170,9 @@
     "files_index_af7c662b": {
         "message": "אינדקס קבצים"
     },
+    "find_8d605019": {
+        "message": "חיפוש"
+    },
     "format_4247a9c5": {
         "message": "פורמט"
     },
@@ -308,6 +311,9 @@
     "no_results_940393cf": {
         "message": "אין תוצאות"
     },
+    "no_results_found_58717065": {
+        "message": "לא נמצאו תוצאות"
+    },
     "none_3b5e34d2": {
         "message": "אף אחד"
     },
@@ -340,6 +346,9 @@
     },
     "preview_53003fd2": {
         "message": "תצוגה מקדימה"
+    },
+    "previous_bd2ac015": {
+        "message": "קודם"
     },
     "published_c944a23d": {
         "message": "פורסם"
