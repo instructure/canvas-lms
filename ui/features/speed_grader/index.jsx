@@ -38,6 +38,8 @@ ready(() => {
   if (window.ENV.FEATURES.platform_service_speedgrader && window.REMOTES?.speedgrader) {
     const theme = getCurrentTheme()
     const mountPoint = document.querySelector('#react-router-portals')
+    const params = new URLSearchParams(window.location.search)
+
     import('speedgrader/appInjector')
       .then(module => {
         module.render(mountPoint, {
@@ -51,6 +53,12 @@ ready(() => {
           mutations: {
             updateSubmissionGrade,
             createSubmissionComment,
+          },
+          context: {
+            courseId: window.ENV.course_id,
+            assignmentId: params.get('assignment_id'),
+            studentId: params.get('student_id'),
+            gradeBookIconHref: `/courses/${window.ENV.course_id}/gradebook`,
           },
         })
       })
