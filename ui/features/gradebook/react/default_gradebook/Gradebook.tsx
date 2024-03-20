@@ -2615,16 +2615,20 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
   // Assignment Column
   buildAssignmentColumn = (assignment: Assignment): GridColumn => {
+    let assignmentWidth
     const shrinkForOutOfText =
       assignment && assignment.grading_type === 'points' && assignment.points_possible != null
     const minWidth = shrinkForOutOfText ? 140 : 90
     const columnId = getAssignmentColumnId(assignment.id)
     const fieldName = `assignment_${assignment.id}`
-    const assignmentWidth = testWidth(
-      assignment.name,
-      minWidth,
-      columnWidths.assignment.default_max
-    )
+    if (this.gradebookColumnSizeSettings && this.gradebookColumnSizeSettings[fieldName]) {
+      assignmentWidth = parseInt(this.gradebookColumnSizeSettings[fieldName], 10)
+      if (Number.isNaN(assignmentWidth)) {
+        assignmentWidth = testWidth(assignment.name, minWidth, columnWidths.assignment.default_max)
+      }
+    } else {
+      assignmentWidth = testWidth(assignment.name, minWidth, columnWidths.assignment.default_max)
+    }
     const columnDef = {
       id: columnId,
       field: fieldName,
