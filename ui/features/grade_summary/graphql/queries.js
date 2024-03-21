@@ -38,6 +38,7 @@ export const ASSIGNMENTS = gql`
             submissionsConnection(filter: {userId: $studentId, includeUnsubmitted: true}) {
               nodes {
                 ...Submission
+                submittedAt
               }
             }
           }

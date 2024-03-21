@@ -95,6 +95,7 @@ export const Submission = {
     excused = false,
     studentEnteredScore = '8',
     state = 'graded',
+    submittedAt = null,
     commentsConnection = {
       nodes: [
         {
@@ -125,6 +126,7 @@ export const Submission = {
     excused,
     studentEnteredScore,
     state,
+    submittedAt,
     commentsConnection,
     rubricAssessmentsConnection,
   }),
