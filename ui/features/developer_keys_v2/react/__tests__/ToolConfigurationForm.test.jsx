@@ -18,11 +18,17 @@
 
 import React from 'react'
 import {mount} from 'enzyme'
+import {render} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import ToolConfigurationForm from '../ToolConfigurationForm'
 
 function newProps(overrides = {}) {
   return {
-    toolConfiguration: {name: 'Test Tool', url: 'https://www.test.com/launch'},
+    toolConfiguration: {
+      name: 'Test Tool',
+      url: 'https://www.test.com/launch',
+      target_link_uri: 'https://example.com/target_link_uri',
+    },
     toolConfigurationUrl: 'https://www.test.com/config.json',
     validScopes: {},
     validPlacements: [],
@@ -41,8 +47,14 @@ function newProps(overrides = {}) {
 
 let wrapper = 'empty wrapper'
 
+beforeEach(() => {
+  wrapper = null
+})
+
 afterEach(() => {
-  wrapper.unmount()
+  if (wrapper) {
+    wrapper.unmount()
+  }
 })
 
 describe('when configuration method is by JSON', () => {
@@ -82,6 +94,20 @@ describe('when configuration method is by JSON', () => {
     button.simulate('click')
     expect(wrapper.instance().props.prettifyPastedJson).toHaveBeenCalled()
   })
+
+  it('does not render a visible manual configuration', async () => {
+    const rendered = render(
+      <ToolConfigurationForm {...newProps()} />
+    )
+    const elem1 = rendered.queryByText(/Target Link URI/)
+    if (elem1) {
+      expect(elem1).not.toBeVisible()
+    }
+    const elem2 = rendered.queryByText(/OpenID Connect Initiation Url/)
+    if (elem2) {
+      expect(elem2).not.toBeVisible()
+    }
+  })
 })
 
 describe('when configuration method is by URL', () => {
@@ -109,5 +135,32 @@ describe('when configuration method is manual', () => {
 
   it('renders the manual configuration form', () => {
     expect(wrapper.find('ManualConfigurationForm').exists()).toEqual(true)
+  })
+
+  it('renders a visible manual configuration', async () => {
+    const rendered = render(
+      <ToolConfigurationForm {...newProps({configurationMethod: 'manual'})} />
+    )
+    const elem1 = rendered.queryByText('* Target Link URI')
+    expect(elem1).toBeVisible()
+    const elem2 = rendered.queryByText('* OpenID Connect Initiation Url')
+    expect(elem2).toBeVisible()
+  })
+
+  it('preserves state when changing to Pasted JSON mode and back again', async () => {
+    const user = userEvent.setup()
+
+    const props = newProps({configurationMethod: 'manual'})
+    const rendered = render(<ToolConfigurationForm {...props} />)
+
+    const oldUrl = props.toolConfiguration.target_link_uri
+    const newUrl = oldUrl + 'abc'
+    const input = rendered.queryByDisplayValue(oldUrl)
+    await user.type(input, 'abc')
+
+    expect(rendered.queryByDisplayValue(newUrl)).toBeTruthy()
+    rendered.rerender(<ToolConfigurationForm {...newProps({configurationMethod: 'json'})} />)
+    rendered.rerender(<ToolConfigurationForm {...newProps({configurationMethod: 'manual'})} />)
+    expect(rendered.queryByDisplayValue(newUrl)).toBeTruthy()
   })
 })
