@@ -80,7 +80,8 @@ module Api::V1::DiscussionTopics
     if opts[:root_topic_fields]&.length
       root_topics = get_root_topic_data(topics, opts[:root_topic_fields])
     end
-    if opts[:include_sections_user_count] && context
+    # ignore :include_sections_user_count for non-course contexts like groups
+    if opts[:include_sections_user_count] && context && context.is_a?(Course)
       opts[:context_user_count] = GuardRail.activate(:secondary) { context.enrollments.not_fake.active_or_pending_by_date_ignoring_access.distinct.count(:user_id) }
     end
 
@@ -154,7 +155,8 @@ module Api::V1::DiscussionTopics
                                             include_overrides: opts[:include_overrides] }.merge(opts[:assignment_opts]))
     end
 
-    if opts[:include_sections_user_count] && !topic.is_section_specific
+    # ignore :include_sections_user_count for non-course contexts like groups
+    if opts[:include_sections_user_count] && !topic.is_section_specific && context.is_a?(Course)
       json[:user_count] = opts[:context_user_count] || GuardRail.activate(:secondary) { context.enrollments.not_fake.active_or_pending_by_date_ignoring_access.count }
     end
 
