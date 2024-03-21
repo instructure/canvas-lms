@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 - present Instructure, Inc.
+ * Copyright (C) 2024 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,23 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import UiConfig from './ui_config'
-import filterFromNode from './filter_from_node'
+import KalturaRequestBuilder from '../kaltura_request_builder'
 
-export default function (xml) {
-  const limits = xml.querySelector('limits')
-
-  const config = new UiConfig({
-    maxUploads: limits.getAttribute('maxUploads'),
-    maxFileSize: limits.getAttribute('maxFileSize'),
-    maxTotalSize: limits.getAttribute('maxTotalSize'),
+describe('KalturaRequestBuilder', () => {
+  it('holds settings, url, and file', () => {
+    const session = {
+      getSession() {
+        return {ks: '5678909876'}
+      },
+    }
+    const file = {}
+    const requestBuilder = new KalturaRequestBuilder()
+    const xhr = requestBuilder.buildRequest(session, file)
+    expect(requestBuilder.getFile()).toEqual(file)
+    expect(requestBuilder.getSettings()).toEqual(session)
+    expect(xhr instanceof XMLHttpRequest).toBeTruthy()
   })
-
-  const filters = xml.querySelectorAll('fileFilter')
-
-  for (let i = 0, l = filters.length; i < l; i++) {
-    const filter = filterFromNode(filters[i])
-    config.addFileFilter(filter)
-  }
-  return config
-}
+})
