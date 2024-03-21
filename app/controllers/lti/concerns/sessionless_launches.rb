@@ -115,7 +115,6 @@ module Lti::Concerns
         course_id: module_item.context.id,
         id: module_item.id,
         display: :borderless,
-        sessionless_source:,
         session_token:
       )
     end
@@ -125,7 +124,6 @@ module Lti::Concerns
         course_id: assignment.course.id,
         id: assignment.id,
         display: :borderless,
-        sessionless_source:,
         session_token:
       )
     end
@@ -139,7 +137,6 @@ module Lti::Concerns
         url: launch_url,
         display: :borderless,
         session_token:,
-        sessionless_source:,
         resource_link_lookup_uuid: lookup_id
       )
     end
@@ -152,17 +149,9 @@ module Lti::Concerns
         id: tool.id,
         display: :borderless,
         session_token:,
-        sessionless_source:,
         launch_url:,
         launch_type:
       )
-    end
-
-    def sessionless_source
-      if respond_to?(:make_lti_launch_debug_logger)
-        # Tool info not used in this debug trace, so nil is fine
-        make_lti_launch_debug_logger(nil)&.generate_sessionless_launch_debug_trace
-      end
     end
   end
 end

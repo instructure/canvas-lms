@@ -101,12 +101,7 @@ module Lti
               parameters: @oidc_error || launch_parameters
             }
           )
-
-          report_lti_launch_debug_logger_metrics!
         end
-      rescue RequestError, ActiveRecord::RecordNotFound => e
-        report_lti_launch_debug_logger_metrics!(e)
-        raise
       end
 
       private
@@ -126,77 +121,6 @@ module Lti
           report_oidc_invalid_user_metric(@current_user)
           set_oidc_error!("login_required", "Must have an active user session")
         end
-      end
-
-      def report_lti_launch_debug_logger_metrics?(error)
-        log_level = Lti::LaunchDebugLogger.log_level(@domain_root_account)
-        if log_level <= 0
-          # Log nothing
-          false
-        elsif log_level == 1
-          # Log only "login_required" errors
-          @launch_debug_logger_oidc_errors&.include?("login_required")
-        elsif log_level == 2
-          # Log all errors except "really bogus" requests like an invalid message hint
-          @launch_debug_logger_oidc_errors && !error
-        elsif log_level == 3
-          # Log all non-"really bogus" requests
-          !error
-        else
-          # Log everything
-          true
-        end
-      end
-
-      # extract debug info added in concerns/sessionless_launches.rb
-      def lti_launch_debug_logger_sessionless_source_metrics(launch_kickoff_path)
-        launch_kickoff_path
-          &.then { URI.parse _1 }
-          &.query
-          &.then { CGI.parse _1 }
-          &.dig("sessionless_source")
-          &.first
-          &.then { Lti::LaunchDebugLogger.decode_debug_trace _1 }
-          &.transform_keys { "sessionless_#{_1}" }
-      rescue => e
-        Rails.logger.error("Error finding sessionless source debug_trace_metrics: #{e}")
-      end
-
-      def report_lti_launch_debug_logger_metrics!(error = nil)
-        return unless report_lti_launch_debug_logger_metrics?(error)
-
-        metrics_endpoint = DynamicSettings.find(tree: :private)["frontend_data_collection_endpoint"]
-        return unless metrics_endpoint
-
-        #  Metrics added when constructing the launch (see AdvantageAdapter#cache_payload:
-        debug_trace_metrics = (@decoded_jwt && Lti::LaunchDebugLogger.decode_debug_trace(@decoded_jwt["debug_trace"])) || {}
-        orig_timestamp = debug_trace_metrics&.dig("time")&.then { Time.parse _1 }
-
-        metrics = [{
-          id: SecureRandom.uuid,
-          type: "lti_launch_debug_logger",
-
-          error: error && "#{error.class}: #{error.message}",
-
-          state: oidc_params[:state],
-          oidc_errors: @launch_debug_logger_oidc_errors&.then { _1.sort.join(",") },
-          user: @current_user&.global_id,
-          pseudonym: @current_pseudonym&.global_id,
-          host: request.host,
-          pseudonym_session_login_error: @pseudonym_session.try(:login_error)&.inspect,
-          pseudonym_session_errors: @pseudonym_session.try(:errors)&.inspect,
-          pseudonym_session_class: @pseudonym_session.class.name,
-          time_since_launch_kickoff: orig_timestamp && (Time.now - orig_timestamp).round(3),
-
-          **Lti::LaunchDebugLogger.request_related_fields(request:, session:, cookies:) || {},
-
-          **debug_trace_metrics.transform_keys { |orig_key| "init_#{orig_key}" } || {},
-          **lti_launch_debug_logger_sessionless_source_metrics(debug_trace_metrics["path"]) || {}
-        }.compact]
-
-        CanvasHttp.put(metrics_endpoint, {}, body: metrics.to_json, content_type: "application/json")
-      rescue => e
-        Rails.logger.warn("Couldn't send OIDC invalid user metric: #{e.inspect}")
       end
 
       def report_oidc_invalid_user_metric(user)
@@ -239,8 +163,6 @@ module Lti
       end
 
       def set_oidc_error!(error, error_description)
-        (@launch_debug_logger_oidc_errors ||= []) << error
-
         @oidc_error = {
           error:,
           error_description:,
@@ -304,9 +226,6 @@ module Lti
         parts = canvas_domain.split(":")
         url.host = parts.first
         url.port = parts.last if parts.size > 1
-        if Lti::LaunchDebugLogger.log_level(@domain_root_account) > 0
-          url.query = url.query.present? ? "#{url.query}&authredir=1" : "authredir=1"
-        end
         url.to_s
       end
 
