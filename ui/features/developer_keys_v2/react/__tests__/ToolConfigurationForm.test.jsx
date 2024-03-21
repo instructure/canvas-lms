@@ -33,6 +33,8 @@ function newProps(overrides = {}) {
     configurationMethod: 'json',
     updateToolConfiguration: Function.prototype,
     updateToolConfigurationUrl: Function.prototype,
+    prettifyPastedJson: jest.fn(),
+    canPrettify: false,
     ...overrides,
   }
 }
@@ -44,20 +46,41 @@ afterEach(() => {
 })
 
 describe('when configuration method is by JSON', () => {
-  beforeEach(() => {
-    wrapper = mount(<ToolConfigurationForm {...newProps()} />)
+  function mountForm(propOverrides = {}) {
+    wrapper = mount(<ToolConfigurationForm {...newProps(propOverrides)} />)
     wrapper.setState({configurationType: 'json'})
-  })
+  }
 
   it('renders the tool configuration JSON in a text area', () => {
+    mountForm()
     const textArea = wrapper.find('TextArea').at(0)
     expect(textArea.text()).toEqual(expect.stringContaining(newProps().toolConfiguration.url))
   })
 
   it('transitions to configuring by URL when the url option is selected', () => {
+    mountForm()
     const select = wrapper.find('SimpleSelect').at(1)
     select.instance().props.onChange({}, {value: 'url'})
     expect(wrapper.instance().props.updateConfigurationMethod).toHaveBeenCalled()
+  })
+
+  it('renders the text in the jsonString prop', () => {
+    mountForm({jsonString: '{"test": "test"}'})
+    const textArea = wrapper.find('TextArea').at(0)
+    expect(textArea.text()).toEqual(expect.stringContaining('{"test": "test"}'))
+  })
+
+  it('prefers the text in the invalidJson prop even if it is an empty string', () => {
+    mountForm({jsonString: '{"test": "test"}', invalidJson: ''})
+    const textArea = wrapper.find('TextArea').at(0)
+    expect(textArea.text()).not.toEqual(expect.stringContaining('test'))
+  })
+
+  it('renders a button that fires the prettifyPastedJson prop', () => {
+    mountForm({canPrettify: true})
+    const button = wrapper.find('Button').at(0)
+    button.simulate('click')
+    expect(wrapper.instance().props.prettifyPastedJson).toHaveBeenCalled()
   })
 })
 

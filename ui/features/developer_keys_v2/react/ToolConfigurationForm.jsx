@@ -25,6 +25,7 @@ import {TextArea} from '@instructure/ui-text-area'
 import {TextInput} from '@instructure/ui-text-input'
 import {Grid} from '@instructure/ui-grid'
 import {View} from '@instructure/ui-view'
+import {Button} from '@instructure/ui-buttons'
 
 import ManualConfigurationForm from './ManualConfigurationForm/index'
 
@@ -37,11 +38,11 @@ const validationMessageRequiredField = [{text: I18n.t('Field cannot be blank.'),
 
 export default class ToolConfigurationForm extends React.Component {
   get toolConfiguration() {
-    if (this.props.invalidJson) {
+    if (this.props.invalidJson !== null && this.props.invalidJson !== undefined) {
       return this.props.invalidJson
     }
-    if (this.props.parsedJson) {
-      return JSON.stringify(this.props.parsedJson, null, 4)
+    if (this.props.jsonString) {
+      return this.props.jsonString
     }
     const {toolConfiguration} = this.props
     return toolConfiguration ? JSON.stringify(toolConfiguration, null, 4) : ''
@@ -56,7 +57,7 @@ export default class ToolConfigurationForm extends React.Component {
   }
 
   updatePastedJson = e => {
-    this.props.updatePastedJson(e.target.value)
+    this.props.updatePastedJson(e.target.value, e.target.selectionEnd === e.target.value.length)
   }
 
   updateToolConfigurationUrl = e => {
@@ -73,18 +74,34 @@ export default class ToolConfigurationForm extends React.Component {
     const {configurationMethod} = this.props
     if (configurationMethod === 'json') {
       return (
-        <TextArea
-          name="tool_configuration"
-          value={this.toolConfiguration}
-          onChange={this.updatePastedJson}
-          label={I18n.t('LTI 1.3 Configuration')}
-          maxHeight="20rem"
-          messages={
-            this.props.showRequiredMessages && this.props.invalidJson
-              ? validationMessageInvalidJson
-              : []
-          }
-        />
+        <Grid>
+          <Grid.Row>
+            <Grid.Col>
+              <TextArea
+                name="tool_configuration"
+                value={this.toolConfiguration}
+                onChange={this.updatePastedJson}
+                label={I18n.t('LTI 1.3 Configuration')}
+                maxHeight="20rem"
+                messages={
+                  this.props.showRequiredMessages && this.props.invalidJson
+                    ? validationMessageInvalidJson
+                    : []
+                }
+              />
+            </Grid.Col>
+          </Grid.Row>
+          <Grid.Row>
+            <Grid.Col>
+              <Button
+                onClick={this.props.prettifyPastedJson}
+                interaction={this.props.canPrettify ? 'enabled' : 'disabled'}
+              >
+                {I18n.t('Prettify JSON')}
+              </Button>
+            </Grid.Col>
+          </Grid.Row>
+        </Grid>
       )
     } else if (configurationMethod === 'manual') {
       return (
@@ -161,7 +178,9 @@ ToolConfigurationForm.propTypes = {
   updateToolConfigurationUrl: PropTypes.func.isRequired,
   configurationMethod: PropTypes.string.isRequired,
   updateConfigurationMethod: PropTypes.func.isRequired,
+  prettifyPastedJson: PropTypes.func.isRequired,
   invalidJson: PropTypes.string,
-  parsedJson: PropTypes.object,
+  jsonString: PropTypes.string,
   updatePastedJson: PropTypes.func,
+  canPrettify: PropTypes.bool,
 }
