@@ -8,21 +8,14 @@ We have lots of improvements planned for `inst` CLI. Please share your feedback 
 
 ## Prerequisites
 
-* Ruby
-* Okta access to JFrog Artifactory
-* [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+Follow the prerequisites listed [here](https://instructure.atlassian.net/wiki/spaces/CE/pages/85912256716/INST-CLI+local+docker+dev+canvas+quizzes#Prerequisites).
 
-Now do the following:
-
-1. Configure your `~/.gemrc` to talk to the [Artifactory](https://instructure.atlassian.net/wiki/spaces/SD/pages/32145722/Artifactory) internal-gems repo.
-2. In your terminal, run:
+Then in your terminal:
 
 ```bash
 gem install inst inst-private
 inst config-file
 ```
-
-See the `inst-cli-private` and `inst-cli` repos for more details if you like.
 
 ## Automated setup script
 
@@ -109,7 +102,7 @@ docker-compose run --rm js-tests ./script/nuke_node.sh
 docker-compose run --rm js-tests yarn install
 ```
 
-### QUnit Karma Tests in Headless Chrome
+#### QUnit Karma Tests in Headless Chrome
 
 Run all QUnit tests in watch mode with:
 
@@ -130,7 +123,7 @@ To run a targeted test without watch mode:
 docker-compose run --rm -e JSPEC_PATH=spec/coffeescripts/util/deparamSpec.js js-tests yarn test:karma:headless
 ```
 
-### Jest Tests
+#### Jest Tests
 
 Run all Jest tests with:
 
@@ -150,7 +143,7 @@ To run a targeted subset of tests in watch mode, use `test:jest:watch` and speci
 docker-compose run --rm js-tests yarn test:jest:watch ui/features/speed_grader/react/__tests__/CommentArea.test.js
 ```
 
-## Selenium
+### Selenium
 
 To enable Selenium: Add `docker-compose/selenium.override.yml` to your `COMPOSE_FILE` var in `.env`.
 

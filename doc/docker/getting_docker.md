@@ -1,5 +1,7 @@
 # Getting Docker Setup
 
+_*Instructure employees should use the `inst` CLI. Go [here](./../../inst-cli/doc/docker/developing_with_docker.md) for more info.*_
+
 **Note:** this works through the details of how to set docker up manually. If
 you just want to set up a Canvas development environment with a minimum of
 effort, run:

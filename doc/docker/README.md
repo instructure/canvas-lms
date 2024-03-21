@@ -1,4 +1,7 @@
 # Using Docker to run Canvas
+
+_*Instructure employees should use the `inst` CLI. Go [here](./../../inst-cli/doc/docker/developing_with_docker.md) for more info.*_
+
 ## Prerequisites
 
 You need Docker. Don't have Docker yet? Go [here](getting_docker.md) for details on getting it setup.
