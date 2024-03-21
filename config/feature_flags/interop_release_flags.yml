@@ -229,6 +229,7 @@ lti_log_launches:
   state: hidden
   applies_to: RootAccount
   display_name: Log LTI launches
+  shadow: true
   description: |-
     When enabled, sends data for all LTI launches to the PandataEvents system
     for querying and visualization.
