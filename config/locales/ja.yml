@@ -190,7 +190,7 @@ ja:
     nobody: なし
     observing_user: "観察中:%{user_name}"
   RosterView: 
-    greater_than_three: "検索語を 3 文字以上で入力してください"
+    greater_than_three: 検索ワードは３文字以上で入力してください
     unknown_error: 検索中に問題が発生しました。後でもう一度、試してください。
   SwitchEditorControl: 
     switch_editor_html: "HTML エディタ"
@@ -5116,7 +5116,7 @@ ja:
   attempt_3dd42b18: 試行
   attempt_attempt_d3911720: "%{attempt} 試行"
   attempt_attempt_feedback_1b042ff5: "%{attempt}フィードバックを試みる"
-  attempt_attempt_feedback_549683ba: "%{attempt}フィードバックの試み："
+  attempt_attempt_feedback_549683ba: "%{attempt}回目の試行のフィードバック："
   attempt_attempt_grade_c01f45df: "試行 %{attempt}:%{grade}"
   attempt_attempt_score_2a973edc: "試行 %{attempt} スコア:"
   attempt_count_267a4fc5: "%{count} 試行"
@@ -5445,7 +5445,7 @@ ja:
   big_blue_button_conference: 
     create_time: 時間を作成する
     recording_setting: 記録
-    recording_setting_enabled_description: この会議は録音可能です
+    recording_setting_enabled_description: この会議は録画可能です
   billing_country_code_as_reported_by_salesforce_625bbb4e: Salesforceにより報告された請求国コード
   blackboard: 
     no_manifest: "この Blackboard .zip のルート ディレクトリには imsmanifest.xml ファイルがありません。"
@@ -6717,7 +6717,7 @@ ja:
   client_credentials_audience_218f2d93: クライアント資格情報の対象者
   client_id_cb2502af: "依頼者:ID"
   client_id_is_required_1afd54d1: "依頼者 ID が必要です"
-  clone_group_set_c2a40e15: "クローン グループ セット"
+  clone_group_set_c2a40e15: "グループ セットのクローンを作成する"
   clone_groupcategoryname_ef85ddb8: "(クローン) %{groupCategoryName}"
   cloning_alignments_of_original_assignment_name_2fc7dae2: "\"%{original_assignment_name}\"のアラインメントの複製"
   cloning_alignments_of_originalassignmentname_deafb852: "\"%{originalAssignmentName}\"のアラインメントの複製"
@@ -11182,7 +11182,7 @@ ja:
   download_canvas_android_app_60b5595f: "Canvas Android アプリをダウンロードする"
   download_canvas_ios_app_11c8651b: "Canvas iOS アプリをダウンロードする"
   download_course_content_7f66edc9: コースのコンテンツをダウンロード
-  download_course_roster_csv_86b3d192: コース名簿CSVをダウンロードする
+  download_course_roster_csv_86b3d192: コース名CSVをダウンロードする
   download_current_scores_csv_8ae3f590: "現在のスコア (.csv) のダウンロード"
   download_epub_757cf0af: ePubをダウンロード
   download_errors_attchment_82ffea3f: ダウンロードerrors_attchment
@@ -11627,7 +11627,7 @@ ja:
   enable_or_condition_for_modules_a16f02d8: モジュールを有効"または"調整する
   enable_podcast_feed_e67c49ac: "ポッドキャスト フィードを使用可能にする"
   enable_recaptcha_by_default_for_self_registration_af9d50bd: 自己登録のためにデフォルトでRecaptchaを有効にする
-  enable_recording_for_this_conference_b8adff6: この会議は録音可能です
+  enable_recording_for_this_conference_b8adff6: この会議は録画可能です
   enable_reregistration_for_lti_2_b2a10444: LTI2の登録を有効にする
   enable_scope_ac28b832: スコープを有効にする
   enable_sending_oauth_consumer_key_5bb4bc5d: OAuthコンシューマーキーの送信を有効にする
@@ -14667,7 +14667,7 @@ ja:
         add_user_to_group: "ユーザ %{name} をこのグループに追加"
       add_unassigned_users: 
         no_users_found: ユーザが見つかりません
-        too_short: "検索語を 3 文字以上で入力してください"
+        too_short: 検索ワードは３文字以上で入力してください
       assign_to_group_menu: 
         add_to_group: グループに追加
         all_groups_full: "すべてのグループが満員です。%{br}"
@@ -14780,10 +14780,10 @@ ja:
       group_users: 
         add_student: 未割り当ての受講者はいません。
         add_user: 最初に、ユーザを追加します。
-        greater_than_three: "検索語を 3 文字以上で入力してください"
+        greater_than_three: 検索ワードは３文字以上で入力してください
         no_matching_students: 一致する受講者はいません。
         no_matching_users: 一致するユーザはいません。
-        no_students: 現在このグループには受講者がいません。
+        no_students: 現在このグループには未割当の受講者がいません。
         no_users: 現在このグループにはユーザがいません。
       groups: 
         no_groups: "現在、このグループ セットにはグループがありません。最初にグループを追加してください。"
@@ -15633,9 +15633,9 @@ ja:
   if_your_school_uses_microsoft_teams_you_can_use_th_992dff59: "学校で Microsoft Teams が使用されている場合は、Enhanced Rich Content Editor (RCE) を使って、カレンダーイベント、お知らせ、および考察記事などの作成時にチームルームを簡単に追加できます。"
   ignore_91750df8: 無視する
   ignore_assignment_738b3c99: 課題を無視
-  ignore_assignment_a4837cb3: "無視する%{assignment}"
+  ignore_assignment_a4837cb3: "%{assignment}を非表示にする"
   ignore_assignment_until_new_submission_424f8f01: "新しい提出まで %{assignment} を無視する"
-  ignore_item_46c066f3: "無視する%{item}"
+  ignore_item_46c066f3: "%{item}を非表示にする"
   ignore_item_until_new_mark_68518bf0: "新しいマークまで %{item} を無視する"
   ignore_item_until_new_submission_58246b15: "新しい提出まで %{item} を無視する"
   ignore_name_55edc6fe: "%{name} を無視"
@@ -15808,8 +15808,8 @@ ja:
   include_scores_when_alerting_about_grade_changes_623ec201: 成績変更に関するアラートには、スコアを記載してください。
   include_scores_when_alerting_about_grades_89728ae1: 成績に関する通知をする場合は、スコアを含むようにしてください。
   include_scores_when_alerting_about_grades_if_your__b221c2c8: |-
-      評定についてアラートするときにスコアを含めます。
-      あなたのメールが教育機関のメールでない場合、機密性の高いコンテンツが教育機関外に送信されることになります。
+      採点済みの通知メールにスコアが記載されます。
+      教育機関以外のメールを使用している場合には、スコアや情報が教育機関外へ送信されることになります。
   include_sis_batch_info_f79dd131: SISバッチ情報を含める
   include_sis_batch_information_75bf66c4: SISバッチ情報含をめる
   include_speedgrader_in_assignment_header_menu_69cd8656: 課題ヘッダメニューにSpeedGraderを含める
@@ -20214,7 +20214,7 @@ ja:
   new_ui_487a624e: 新しいUI
   new_user_s_name_909b6267: 新規ユーザー名
   new_user_tutorial_cdd3a446: 新貴ユーザーチュートリアル
-  new_video_conference_17817456: 新規ビデオ会議
+  new_video_conference_17817456: ビデオ会議を作成する
   new_zealand_64_f126cf2e: "ニュージーランド (+64)"
   new_zealand_ef5d7b74: ニュージーランド
   newest_first_87672763: 新しい順
@@ -21738,7 +21738,7 @@ ja:
   please_enter_a_due_date_on_or_after_earliestdate_b3fe6d29: "締め切り日または締め切り後日を入力してください%{earliestDate}"
   please_enter_a_name_for_this_link_318f01a4: このリンクの名前を入力してください。
   please_enter_a_number_between_0_and_100_for_the_mi_c6527eec: 移行率には0〜100の数値を入力してください
-  please_enter_a_search_term_with_three_or_more_char_53fd5ed8: "検索語を 3 文字以上で入力してください"
+  please_enter_a_search_term_with_three_or_more_char_53fd5ed8: 検索ワードは３文字以上で入力してください
   please_enter_a_valid_search_term_5c69b0b0: 有効な検索語句を入力してください
   please_enter_a_valid_url_e_g_http_example_com_b97051b4: "有効な URLを入力してください (例： http://example.com)"
   please_enter_a_valid_url_e_g_https_example_com_87675bca: "有効なURLを入力してください（例：https://example.com）"
@@ -24697,7 +24697,7 @@ ja:
   recipient_of_temporary_enrollment_click_to_edit_88614233: 仮登録の受信者、クリックして編集します
   recipients_a69b5e55: "受信者:"
   recipients_restricted_by_role_22c4c843: ロールによって制限された受信者
-  recipients_students_who_have_not_joined_a_group_a0c6a3c: "受信者:グループに未参加の受講者"
+  recipients_students_who_have_not_joined_a_group_a0c6a3c: 宛先グループに未参加の受講者
   record_7c9448b: 記録
   record_an_audio_or_video_comment_88425add: "オーディオまたはビデオ コメントを記録する"
   record_audio_14666880: オーディオを録音する
