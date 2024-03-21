@@ -1561,20 +1561,8 @@ class ApplicationController < ActionController::Base
           return redirect_to Canvas::OAuth::Provider.confirmation_redirect(self, provider, pseudonym.user)
         end
 
-        redirect_url = remove_query_params(request.original_url, "session_token")
         # do one final redirect to get the token out of the URL
-        canvas_domain = HostUrl.context_host(@domain_root_account, request.host)
-        if Setting.get("interop_8200_session_token_redirect", nil) == "true" ||
-           Setting.get("interop_8200_session_token_redirect/#{canvas_domain}", nil) == "true"
-          # html redirect?
-          render template: "shared/html_redirect",
-                 layout: false,
-                 locals: {
-                   url: redirect_url
-                 }
-        else
-          redirect_to redirect_url
-        end
+        redirect_to remove_query_params(request.original_url, "session_token")
       end
     end
   end

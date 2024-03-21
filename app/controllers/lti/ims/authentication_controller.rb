@@ -52,18 +52,7 @@ module Lti
       # track of institution-specific domain.
       def authorize_redirect
         Utils::InstStatsdUtils::Timing.track "lti.authorize_redirect" do
-          if Setting.get("interop_8200_session_token_redirect", nil) == "true" ||
-             Setting.get("interop_8200_session_token_redirect/#{canvas_domain}", nil) == "true"
-            csp_frame_ancestors << canvas_domain
-            render template: "shared/html_redirect",
-                   layout: false,
-                   formats: :html,
-                   locals: {
-                     url: authorize_redirect_url
-                   }
-          else
-            redirect_to authorize_redirect_url
-          end
+          redirect_to authorize_redirect_url
         end
       end
 
