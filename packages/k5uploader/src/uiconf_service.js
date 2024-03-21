@@ -18,14 +18,11 @@
 
 import urlParams from './url_params'
 import signatureBuilder from './signature_builder'
-import XmlParser from './xml_parser'
 import uiConfigFromNode from './ui_config_from_node'
 import mBus from './message_bus'
 import k5Options from './k5_options'
 
-function UiconfService() {
-  this.xmlParser = new XmlParser()
-}
+function UiconfService() {}
 
 UiconfService.prototype.load = function (sessionSettings) {
   const data = sessionSettings.getSession()
@@ -41,12 +38,11 @@ UiconfService.prototype.createUiConfig = function (xml) {
 }
 
 UiconfService.prototype.onXhrLoad = function (event) {
-  this.xmlParser.parseXML(this.xhr.response)
-  const conf = this.xmlParser.find('result').find('ui_conf').find('confFile').first().text()
+  const parser = new DOMParser()
+  const conf = parser.parseFromString(this.xhr.response, "application/xml").querySelector("result > ui_conf > confFile").textContent
   if (conf) {
-    this.xmlParser = new XmlParser()
-    this.xmlParser.parseXML(conf)
-    this.config = uiConfigFromNode(this.xmlParser)
+    const configXML = parser.parseFromString(conf, "application/xml")
+    this.config = uiConfigFromNode(configXML)
     mBus.dispatchEvent('UiConf.complete', this.config, this)
   } else {
     mBus.dispatchEvent('UiConf.error', this.xhr.response, this)

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 - present Instructure, Inc.
+ * Copyright (C) 2024 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,23 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import UiConfig from './ui_config'
-import filterFromNode from './filter_from_node'
+/// <reference types="vitest" />
 
-export default function (xml) {
-  const limits = xml.querySelector('limits')
+import {defineConfig} from 'vitest/config'
 
-  const config = new UiConfig({
-    maxUploads: limits.getAttribute('maxUploads'),
-    maxFileSize: limits.getAttribute('maxFileSize'),
-    maxTotalSize: limits.getAttribute('maxTotalSize'),
-  })
-
-  const filters = xml.querySelectorAll('fileFilter')
-
-  for (let i = 0, l = filters.length; i < l; i++) {
-    const filter = filterFromNode(filters[i])
-    config.addFileFilter(filter)
-  }
-  return config
-}
+export default defineConfig({
+  test: {
+    environment: 'happy-dom',
+    globals: true,
+    include: ['**/__tests__/**/*.test.?(c|m)[jt]s?(x)'],
+  },
+})
