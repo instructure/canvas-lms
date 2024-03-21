@@ -934,6 +934,23 @@ describe DiscussionTopicsController, type: :request do
         )
       end
 
+      it "ignores sections_user_count when context is Group" do
+        group_category = @course.group_categories.create(name: "watup")
+        group = group_category.groups.create!(name: "group1", context: @course)
+        gtopic = create_topic(group, title: "topic")
+
+        json = api_call(:get,
+                        "/api/v1/groups/#{group.id}/discussion_topics",
+                        { controller: "discussion_topics",
+                          action: "index",
+                          format: "json",
+                          group_id: group.to_param,
+                          include: ["sections", "sections_user_count"] })
+        expect(json[0]["user_count"]).to be_nil
+        expect(json[0]["sections"]).to be_nil
+        expect(json[0]["id"]).to eq gtopic.id
+      end
+
       context "when a course has users enrolled in multiple sections" do
         before(:once) do
           course_with_teacher(active_course: true)
