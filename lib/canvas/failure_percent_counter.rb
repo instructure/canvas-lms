@@ -21,8 +21,8 @@ module Canvas
   class FailurePercentCounter
     def initialize(redis, redis_key, period = 60.seconds, min_samples = 100)
       @redis = redis
-      @count_key = "#{redis_key}:total_count"
-      @fail_key = "#{redis_key}:fail"
+      @count_key = "{#{redis_key}}:total_count"
+      @fail_key = "{#{redis_key}}:fail"
       @period = period
       @min_samples = min_samples
     end
