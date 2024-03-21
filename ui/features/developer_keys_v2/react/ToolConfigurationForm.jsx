@@ -70,59 +70,57 @@ export default class ToolConfigurationForm extends React.Component {
 
   setManualConfigRef = node => (this.manualConfigRef = node)
 
-  configurationInput() {
-    const {configurationMethod} = this.props
-    if (configurationMethod === 'json') {
-      return (
-        <Grid>
-          <Grid.Row>
-            <Grid.Col>
-              <TextArea
-                name="tool_configuration"
-                value={this.toolConfiguration}
-                onChange={this.updatePastedJson}
-                label={I18n.t('LTI 1.3 Configuration')}
-                maxHeight="20rem"
-                messages={
-                  this.props.showRequiredMessages && this.props.invalidJson
-                    ? validationMessageInvalidJson
-                    : []
-                }
-              />
-            </Grid.Col>
-          </Grid.Row>
-          <Grid.Row>
-            <Grid.Col>
-              <Button
-                onClick={this.props.prettifyPastedJson}
-                interaction={this.props.canPrettify ? 'enabled' : 'disabled'}
-              >
-                {I18n.t('Prettify JSON')}
-              </Button>
-            </Grid.Col>
-          </Grid.Row>
-        </Grid>
-      )
-    } else if (configurationMethod === 'manual') {
-      return (
-        <ManualConfigurationForm
-          ref={this.setManualConfigRef}
-          toolConfiguration={this.props.toolConfiguration}
-          validScopes={this.props.validScopes}
-          validPlacements={this.props.validPlacements}
-        />
-      )
-    }
-    return (
-      <TextInput
-        name="tool_configuration_url"
-        value={this.props.toolConfigurationUrl || ''}
-        onChange={this.updateToolConfigurationUrl}
-        renderLabel={I18n.t('JSON URL')}
-        messages={this.props.showRequiredMessages ? validationMessageRequiredField : []}
+  jsonConfigurationInput = () => (
+    <Grid>
+      <Grid.Row>
+        <Grid.Col>
+          <TextArea
+            name="tool_configuration"
+            value={this.toolConfiguration}
+            onChange={this.updatePastedJson}
+            label={I18n.t('LTI 1.3 Configuration')}
+            maxHeight="20rem"
+            messages={
+              this.props.showRequiredMessages && this.props.invalidJson
+                ? validationMessageInvalidJson
+                : []
+            }
+          />
+        </Grid.Col>
+      </Grid.Row>
+      <Grid.Row>
+        <Grid.Col>
+          <Button
+            onClick={this.props.prettifyPastedJson}
+            interaction={this.props.canPrettify ? 'enabled' : 'disabled'}
+          >
+            {I18n.t('Prettify JSON')}
+          </Button>
+        </Grid.Col>
+      </Grid.Row>
+    </Grid>
+  )
+
+  urlConfigurationInput = () => (
+    <TextInput
+      name="tool_configuration_url"
+      value={this.props.toolConfigurationUrl || ''}
+      onChange={this.updateToolConfigurationUrl}
+      renderLabel={I18n.t('JSON URL')}
+      messages={this.props.showRequiredMessages ? validationMessageRequiredField : []}
+    />
+  )
+
+  manualConfigurationInput = visible => (
+    <div style={{display: visible ? undefined : 'none'}}>
+      <ManualConfigurationForm
+        ref={this.setManualConfigRef}
+        toolConfiguration={this.props.toolConfiguration}
+        validScopes={this.props.validScopes}
+        validPlacements={this.props.validPlacements}
       />
-    )
-  }
+    </div>
+  )
 
   renderOptions() {
     return [
@@ -141,6 +139,8 @@ export default class ToolConfigurationForm extends React.Component {
   }
 
   renderBody() {
+    const {configurationMethod} = this.props
+
     return (
       <View>
         <Heading level="h2" as="h2" margin="0 0 x-small">
@@ -154,7 +154,13 @@ export default class ToolConfigurationForm extends React.Component {
           {this.renderOptions()}
         </SimpleSelect>
         <br />
-        {this.configurationInput()}
+        {configurationMethod === 'json' && this.jsonConfigurationInput()}
+        {configurationMethod === 'url' && this.urlConfigurationInput()}
+        {
+          this.manualConfigurationInput(
+            configurationMethod === 'manual'
+          ) /* show invisible to preserve state */
+        }
       </View>
     )
   }
