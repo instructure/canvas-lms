@@ -29,6 +29,7 @@ describe Announcement do
   describe "locking" do
     it "locks if its course has the lock_all_announcements setting" do
       course_with_student(active_all: true)
+      teacher_in_course(active_all: true)
 
       @course.lock_all_announcements = true
       @course.save!
@@ -39,6 +40,7 @@ describe Announcement do
 
       expect(announcement).to be_locked
       expect(announcement.grants_right?(@student, :reply)).to be_falsey
+      expect(announcement.grants_right?(@teacher, :reply)).to be_falsey
     end
 
     it "does not lock if its course does not have the lock_all_announcements setting" do

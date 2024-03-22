@@ -324,7 +324,7 @@ class DiscussionEntry < ActiveRecord::Base
     given { |user| self.user && self.user == user }
     can :read
 
-    given { |user| self.user && self.user == user && discussion_topic.available_for?(user) && discussion_topic.can_participate_in_course?(user) }
+    given { |user| self.user && self.user == user && discussion_topic.available_for?(user) && discussion_topic.can_participate_in_course?(user) && !discussion_topic.comments_disabled? }
     can :reply
 
     given { |user| self.user && self.user == user && discussion_topic.available_for?(user) && context.user_can_manage_own_discussion_posts?(user) && discussion_topic.can_participate_in_course?(user) }
@@ -336,11 +336,14 @@ class DiscussionEntry < ActiveRecord::Base
     given { |user, session| !discussion_topic.is_announcement && context.grants_right?(user, session, :read_forum) && discussion_topic.visible_for?(user) }
     can :read
 
-    given { |user, session| discussion_topic.is_announcement && context.grants_right?(user, session, :participate_as_student) && discussion_topic.visible_for?(user) && !discussion_topic.locked_for?(user, check_policies: true) }
+    given { |user, session| discussion_topic.is_announcement && context.grants_right?(user, session, :participate_as_student) && discussion_topic.visible_for?(user) && !discussion_topic.locked_for?(user, check_policies: true) && !discussion_topic.comments_disabled? }
     can :create
 
     given { |user, session| context.grants_right?(user, session, :post_to_forum) && !discussion_topic.locked_for?(user) && discussion_topic.visible_for?(user) }
-    can :reply and can :create and can :read
+    can :read
+
+    given { |user, session| context.grants_right?(user, session, :post_to_forum) && !discussion_topic.locked_for?(user) && discussion_topic.visible_for?(user) && !discussion_topic.comments_disabled? }
+    can :reply and can :create
 
     given { |user, session| context.grants_right?(user, session, :post_to_forum) && discussion_topic.visible_for?(user) }
     can :read
@@ -349,13 +352,19 @@ class DiscussionEntry < ActiveRecord::Base
     can :attach
 
     given { |user, session| !discussion_topic.root_topic_id && context.grants_right?(user, session, :moderate_forum) && !discussion_topic.locked_for?(user, check_policies: true) }
-    can :update and can :delete and can :reply and can :create and can :read and can :attach
+    can :update and can :delete and can :read and can :attach
+
+    given { |user, session| !discussion_topic.root_topic_id && context.grants_right?(user, session, :moderate_forum) && !discussion_topic.locked_for?(user, check_policies: true) && !discussion_topic.comments_disabled? }
+    can :reply and can :create
 
     given { |user, session| !discussion_topic.root_topic_id && context.grants_right?(user, session, :moderate_forum) }
     can :update and can :delete and can :read
 
     given { |user, session| discussion_topic.root_topic&.context&.grants_right?(user, session, :moderate_forum) && !discussion_topic.locked_for?(user, check_policies: true) }
-    can :update and can :delete and can :reply and can :create and can :read and can :attach
+    can :update and can :delete and can :read and can :attach
+
+    given { |user, session| discussion_topic.root_topic&.context&.grants_right?(user, session, :moderate_forum) && !discussion_topic.locked_for?(user, check_policies: true) && !discussion_topic.comments_disabled? }
+    can :reply and can :create
 
     given { |user, session| discussion_topic.root_topic&.context&.grants_right?(user, session, :moderate_forum) }
     can :update and can :delete and can :read
