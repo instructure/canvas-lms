@@ -97,7 +97,10 @@ class Announcement < DiscussionTopic
 
   set_policy do
     given { |user| self.user.present? && self.user == user }
-    can :update and can :reply and can :read
+    can :update and can :read
+
+    given { |user| self.user.present? && self.user == user && !comments_disabled? }
+    can :reply
 
     given { |user| self.user.present? && self.user == user && discussion_entries.active.empty? }
     can :delete
@@ -115,14 +118,17 @@ class Announcement < DiscussionTopic
     given { |user, session| context.grants_right?(user, session, :read_announcements) && visible_for?(user) }
     can :read
 
-    given { |user, session| context.grants_right?(user, session, :post_to_forum) && !locked? }
+    given { |user, session| context.grants_right?(user, session, :post_to_forum) && !locked? && !comments_disabled? }
     can :reply
 
     given { |user, session| context.is_a?(Group) && context.grants_right?(user, session, :create_forum) }
     can :create
 
-    given { |user, session| context.grants_all_rights?(user, session, :read_announcements, :moderate_forum) } # admins.include?(user) }
-    can :update and can :read_as_admin and can :delete and can :reply and can :create and can :read and can :attach
+    given { |user, session| context.grants_all_rights?(user, session, :read_announcements, :moderate_forum) }
+    can :update and can :read_as_admin and can :delete and can :create and can :read and can :attach
+
+    given { |user, session| context.grants_all_rights?(user, session, :read_announcements, :moderate_forum) && !comments_disabled? }
+    can :reply
 
     given do |user, session|
       allow_rating && (!only_graders_can_rate ||
