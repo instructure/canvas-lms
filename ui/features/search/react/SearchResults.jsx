@@ -20,20 +20,19 @@ import React from 'react'
 import {Flex} from '@instructure/ui-flex'
 import SearchResult from './SearchResult'
 
-export default function SearchResults(props) {
-  function searchItemKey(searchItem) {
-    if (searchItem.wiki_page) {
-      return 'wiki_page-' + searchItem.wiki_page.id
-    } // TODO: add other search item types
-    return 'unknown'
-  }
+export default function SearchResults({onDislike, onExplain, onLike, searchResults}) {
+  const searchItemKey = ({content_id, content_type}) => `${content_type}_${content_id}`
 
   return (
-    <Flex as="div" direction="column">
-      {props.searchResults.map(s => (
-        <Flex.Item key={searchItemKey(s)} as="div">
-          <SearchResult searchResult={s} />
-        </Flex.Item>
+    <Flex as="ul" className="searchResults" direction="column">
+      {searchResults.map(result => (
+        <SearchResult
+          key={searchItemKey(result)}
+          result={result}
+          onDislike={onDislike}
+          onExplain={onExplain}
+          onLike={onLike}
+        />
       ))}
     </Flex>
   )

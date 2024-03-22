@@ -119,6 +119,18 @@ class SmartSearchController < ApplicationController
     end
   end
 
+  def log
+    # TODO: do something more with these params than logging them in the request logs
+    # params[:a]
+    # params[:c]
+    # params[:course_id]
+    # params[:oid]
+    # params[:ot]
+    # params[:q]
+
+    head :no_content
+  end
+
   def show
     @context = Course.find(params[:course_id])
 
