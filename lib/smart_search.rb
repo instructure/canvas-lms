@@ -61,6 +61,46 @@ module SmartSearch
       response["data"].pluck("embedding")[0]
     end
 
+    def perform_search(context, user, query, type_filter = [])
+      embedding = SmartSearch.generate_embedding(query)
+      collections = []
+      ActiveRecord::Base.with_pgvector do
+        SmartSearch.search_scopes(context, user) do |klass, item_scope|
+          item_scope = apply_filter(klass, item_scope, type_filter)
+          next unless item_scope
+
+          item_scope = item_scope.select(
+            ActiveRecord::Base.send(:sanitize_sql, ["#{klass.table_name}.*, MIN(embedding <=> ?) AS distance", embedding.to_s])
+          )
+                                 .joins(:embeddings)
+                                 .group("#{klass.table_name}.id")
+                                 .reorder("distance ASC")
+          collections << [klass.name,
+                          BookmarkedCollection.wrap(
+                            BookmarkedCollection::SimpleBookmarker.new(klass, { distance: { type: :float, null: false } }, :id),
+                            item_scope
+                          )]
+        end
+      end
+      BookmarkedCollection.merge(*collections)
+    end
+
+    def apply_filter(klass, scope, filter)
+      return scope if filter.empty?
+
+      if klass == DiscussionTopic
+        if filter.include?("discussion_topics") && filter.include?("announcements")
+          scope
+        elsif filter.include?("discussion_topics")
+          scope.where(type: nil)
+        elsif filter.include?("announcements")
+          scope.where(type: "Announcement")
+        end
+      elsif filter.include?(Context.api_type_name(klass))
+        scope
+      end
+    end
+
     def generate_completion(prompt)
       url = "https://api.openai.com/v1/completions"
 

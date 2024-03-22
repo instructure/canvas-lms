@@ -85,38 +85,17 @@ class SmartSearchController < ApplicationController
     return render_unauthorized_action unless SmartSearch.smart_search_available?(@context)
     return render json: { error: "missing 'q' param" }, status: :bad_request unless params.key?(:q)
 
-    ActiveRecord::Base.with_pgvector do
-      response = {
-        results: []
-      }
+    response = {
+      results: []
+    }
 
-      if params[:q].present?
-        embedding = SmartSearch.generate_embedding(params[:q])
-
-        collections = []
-        SmartSearch.search_scopes(@context, @current_user) do |klass, item_scope|
-          item_scope = apply_filter(klass, item_scope, Array(params[:filter]))
-          next unless item_scope
-
-          item_scope = item_scope.select(
-            ActiveRecord::Base.send(:sanitize_sql, ["#{klass.table_name}.*, MIN(embedding <=> ?) AS distance", embedding.to_s])
-          )
-                                 .joins(:embeddings)
-                                 .group("#{klass.table_name}.id")
-                                 .reorder("distance ASC")
-          collections << [klass.name,
-                          BookmarkedCollection.wrap(
-                            BookmarkedCollection::SimpleBookmarker.new(klass, { distance: { type: :float, null: false } }, :id),
-                            item_scope
-                          )]
-        end
-        scope = BookmarkedCollection.merge(*collections)
-        items = Api.paginate(scope, self, api_v1_course_smart_search_query_url(@context))
-        response[:results].concat(search_results_json(items))
-      end
-
-      render json: response
+    if params[:q].present?
+      scope = SmartSearch.perform_search(@context, @current_user, params[:q], Array(params[:filter]))
+      items = Api.paginate(scope, self, api_v1_course_smart_search_query_url(@context))
+      response[:results].concat(search_results_json(items))
     end
+
+    render json: response
   end
 
   def log
@@ -142,23 +121,5 @@ class SmartSearchController < ApplicationController
     js_env({
              COURSE_ID: @context.id.to_s
            })
-  end
-
-  private
-
-  def apply_filter(klass, scope, filter)
-    return scope if filter.empty?
-
-    if klass == DiscussionTopic
-      if filter.include?("discussion_topics") && filter.include?("announcements")
-        scope
-      elsif filter.include?("discussion_topics")
-        scope.where(type: nil)
-      elsif filter.include?("announcements")
-        scope.where(type: "Announcement")
-      end
-    elsif filter.include?(Context.api_type_name(klass))
-      scope
-    end
   end
 end
