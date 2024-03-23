@@ -19,7 +19,8 @@
 import React from 'react'
 
 import {View} from '@instructure/ui-view'
-
+import {Text} from '@instructure/ui-text'
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {AssignmentGroupSelect} from './AssignmentGroupSelect'
 import {DisplayGradeAs} from './DisplayGradeAs'
 import {PointsPossible} from './PointsPossible'
@@ -48,7 +49,10 @@ type Props = {
   setGradingSchemeId: (gradingSchemeId: string) => void
   intraGroupPeerReviews: boolean
   setIntraGroupPeerReviews: (intraGroupPeerReviews: boolean) => void
+  isCheckPoints: boolean
 }
+
+const I18n = useI18nScope('discussion_create')
 
 export const GradedDiscussionOptions = ({
   assignmentGroups,
@@ -70,6 +74,7 @@ export const GradedDiscussionOptions = ({
   setGradingSchemeId,
   intraGroupPeerReviews,
   setIntraGroupPeerReviews,
+  isCheckPoints,
 }: Props) => {
   return (
     <View as="div">
@@ -116,6 +121,11 @@ export const GradedDiscussionOptions = ({
           setIntraGroupPeerReviews={setIntraGroupPeerReviews}
         />
       </View>
+      {isCheckPoints && (
+        <View as="div" margin="medium 0">
+          <Text size="large">{I18n.t('Checkpoint Settings')}</Text>
+        </View>
+      )}
       <View as="div" margin="medium 0">
         <AssignmentDueDatesManager />
       </View>

@@ -25,14 +25,21 @@ import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {TextInput} from '@instructure/ui-text-input'
 import {FormFieldGroup} from '@instructure/ui-form-field'
-import {IconAddLine, IconPublishSolid, IconUnpublishedLine} from '@instructure/ui-icons'
+import {
+  IconAddLine,
+  IconPublishSolid,
+  IconUnpublishedLine,
+  IconInfoLine,
+} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {Checkbox} from '@instructure/ui-checkbox'
+import {Tooltip} from '@instructure/ui-tooltip'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {DateTimeInput} from '@instructure/ui-date-time-input'
 import CanvasMultiSelect from '@canvas/multi-select'
 import CanvasRce from '@canvas/rce/react/CanvasRce'
 import {Alert} from '@instructure/ui-alerts'
+import theme from '@instructure/canvas-theme'
 
 import {FormControlButtons} from './FormControlButtons'
 import {GradedDiscussionOptions} from '../DiscussionOptions/GradedDiscussionOptions'
@@ -120,6 +127,10 @@ export default function DiscussionTopicForm({
 
   const allSectionsOption = {id: 'all', name: 'All Sections'}
 
+  const checkPointsToolTipText = I18n.t(
+    'Checkpoints can be set to have different due dates and point values for the initial response and the subsequent replies.'
+  )
+
   const inputWidth = '100%'
 
   const [title, setTitle] = useState(currentDiscussionTopic?.title || '')
@@ -154,6 +165,9 @@ export default function DiscussionTopicForm({
     currentDiscussionTopic?.podcastHasStudentPosts || false
   )
   const [isGraded, setIsGraded] = useState(!!currentDiscussionTopic?.assignment || false)
+  const [isCheckPoints, setIsCheckPoints] = useState(
+    !!currentDiscussionTopic?.assignment?.checkpoints || false
+  )
   const [allowLiking, setAllowLiking] = useState(currentDiscussionTopic?.allowRating || false)
   const [onlyGradersCanLike, setOnlyGradersCanLike] = useState(
     currentDiscussionTopic?.onlyGradersCanRate || false
@@ -676,6 +690,29 @@ export default function DiscussionTopicForm({
               // disabled={sectionIdsToPostTo === [allSectionsOption._id]}
             />
           )}
+          {isGraded && ENV.DISCUSSION_CHECKPOINTS_ENABLED && (
+            <>
+              <View display="inline-block">
+                <Checkbox
+                  data-testid="checkpoints-checkbox"
+                  label={I18n.t('Assign graded checkpoints')}
+                  value="checkpoints"
+                  checked={isCheckPoints}
+                  onChange={() => setIsCheckPoints(!isCheckPoints)}
+                />
+              </View>
+              <Tooltip renderTip={checkPointsToolTipText} on={['hover', 'focus']} color="primary">
+                <div
+                  style={{display: "inline-block", marginLeft: theme.spacing.xxSmall}}
+                  // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+                  tabIndex="0"
+                >
+                  <IconInfoLine />
+                  <ScreenReaderContent>{checkPointsToolTipText}</ScreenReaderContent>
+                </div>
+              </Tooltip>
+            </>
+          )}
           {shouldShowLikingOption && (
             <>
               <Checkbox
@@ -851,6 +888,7 @@ export default function DiscussionTopicForm({
                   setGradingSchemeId={setGradingSchemeId}
                   intraGroupPeerReviews={intraGroupPeerReviews}
                   setIntraGroupPeerReviews={setIntraGroupPeerReviews}
+                  isCheckPoints={isCheckPoints && ENV.DISCUSSION_CHECKPOINTS_ENABLED}
                 />
               </GradedDiscussionDueDatesContext.Provider>
             </View>

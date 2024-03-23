@@ -1404,6 +1404,13 @@ describe DiscussionTopicsController do
       get :new, params: { course_id: @course.id }
       expect(assigns[:js_bundles].first).to include(:discussion_topic_edit_v2)
     end
+
+    it "js_env DISCUSSION_CHECKPOINTS_ENABLED is set to true when creating a discussion and discussion checkpoints ff is on" do
+      user_session(@teacher)
+      @course.root_account.enable_feature!(:discussion_checkpoints)
+      get :new, params: { course_id: @course.id }
+      expect(assigns[:js_env][:DISCUSSION_CHECKPOINTS_ENABLED]).to be_truthy
+    end
   end
 
   describe "GET 'edit'" do
@@ -1534,6 +1541,13 @@ describe DiscussionTopicsController do
       @course.save!
       get :edit, params: { course_id: @course.id, id: @topic.id }
       expect(assigns[:js_env][:allow_student_anonymous_discussion_topics]).to be true
+    end
+
+    it "js_env DISCUSSION_CHECKPOINTS_ENABLED is set to true when editing a discussion and discussion checkpoints ff is on" do
+      user_session(@teacher)
+      @course.root_account.enable_feature!(:discussion_checkpoints)
+      get :edit, params: { course_id: @course.id, id: @topic.id }
+      expect(assigns[:js_env][:DISCUSSION_CHECKPOINTS_ENABLED]).to be_truthy
     end
 
     context "conditional-release" do

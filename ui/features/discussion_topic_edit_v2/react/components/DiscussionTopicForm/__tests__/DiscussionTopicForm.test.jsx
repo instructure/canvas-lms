@@ -410,5 +410,43 @@ describe('DiscussionTopicForm', () => {
 
       expect(document.queryByTestId('group-category-not-editable')).toBeFalsy()
     })
+
+    it('displays the checkpoints checkbox when the Graded option is selected and discussion checkpoints flag is on', () => {
+      ENV.DISCUSSION_CHECKPOINTS_ENABLED = true
+
+      const {queryByTestId, getByLabelText} = setup()
+      expect(queryByTestId('checkpoints-checkbox')).not.toBeInTheDocument()
+      getByLabelText('Graded').click()
+      expect(queryByTestId('checkpoints-checkbox')).toBeInTheDocument()
+    })
+
+    it('does not display the checkpoints checkbox when the Graded option is not selected and discussion checkpoints flag is on', () => {
+      ENV.DISCUSSION_CHECKPOINTS_ENABLED = true
+
+      const {queryByTestId} = setup()
+      expect(queryByTestId('checkpoints-checkbox')).not.toBeInTheDocument()
+    })
+
+    it('does not display the checkpoints checkbox when the discussion checkpoints flag is off', () => {
+      ENV.DISCUSSION_CHECKPOINTS_ENABLED = false
+
+      const {queryByTestId, getByLabelText} = setup()
+      getByLabelText('Graded').click()
+      expect(queryByTestId('checkpoints-checkbox')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('Checkpoints', () => {
+    it('toggles the checkpoints checkbox when clicked', () => {
+      ENV.DISCUSSION_CHECKPOINTS_ENABLED = true
+
+      const {queryByTestId, getByLabelText} = setup()
+      getByLabelText('Graded').click()
+      const checkbox = queryByTestId('checkpoints-checkbox')
+      checkbox.click()
+      expect(checkbox.checked).toBe(true)
+      checkbox.click()
+      expect(checkbox.checked).toBe(false)
+    })
   })
 })
