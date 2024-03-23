@@ -37,6 +37,7 @@ const defaultProps = {
   setPeerReviewDueDate: () => {},
   assignedInfoList: [],
   setAssignedInfoList: () => {},
+  isCheckPoints: false,
 }
 
 const renderGradedDiscussionOptions = (props = {}) => {
@@ -59,5 +60,12 @@ describe('GradedDiscussionOptions', () => {
     expect(getByText('Assignment Group')).toBeInTheDocument()
     expect(getByText('Peer Reviews')).toBeInTheDocument()
     expect(getByText('Assignment Settings')).toBeInTheDocument()
+  })
+
+  describe('Checkpoints', () => {
+    it('renders the section Checkpoint Settings when the checkpoints checkbox is selected', () => {
+      const {getByText} = renderGradedDiscussionOptions({isCheckPoints: true})
+      expect(getByText('Checkpoint Settings')).toBeInTheDocument()
+    })
   })
 })
