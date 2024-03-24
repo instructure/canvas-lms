@@ -420,6 +420,7 @@ sv:
     tab_brand_configs: Teman
     tab_courses: Kurser
     tab_developer_keys: Utvecklarnycklar
+    tab_extensions: Tillägg
     tab_faculty_journal: Lärarjournal
     tab_grading_standards: Bedömning
     tab_jobs: Jobb
@@ -2432,7 +2433,7 @@ sv:
   added_new_proficiency_rating_e30cab8a: "Ny färdighetsbedömning har lagts till"
   added_outcome_title_3c258a9: "Lade till lärandemål %{title}"
   adding_59cf55e2: "Lägger till"
-  adding_efca307a: "Lägger till ..."
+  adding_efca307a: "Lägger till ..."
   adding_rss_feed_f1202567: "Lägger till RSS-flöde"
   adding_to_library_b552868: "Lägga till i biblioteket"
   additional_comments_9aed10bb: "Ytterligare kommentarer"
@@ -2603,6 +2604,7 @@ sv:
   all_4321c3a1: Alla
   all_account_types_e83c1516: "Ala kontotyper"
   all_accounts_3bafc860: "Alla konton"
+  all_assignees_removed_14639499: "Alla tilldelade har tagits bort"
   all_assignment_groups_a65e9e46: "Alla uppgiftsgrupper"
   all_assignments_b79a4d6a: "Alla uppgifter"
   all_changes_published_27a53ffd: "Alla ändringar har publicerats"
@@ -6460,11 +6462,14 @@ sv:
   cas_server_rejected_ticket_message_code_a6ef4093: "CAS-servern avvisade denna ticket: %{message} (%{code})"
   cas_url_4ba2843e: "CAS URL"
   catalan_16f6b78f: Katalanska
+  catalog_account_not_found_c786ce35: "Katalogkontot hittades inte"
+  catalog_account_to_copy_fa180ff4: "Katalogkonto att kopiera"
   catalog_already_enabled_56478a3c: "Catalog är redan aktiverat"
   catalog_manage_f57e50f3: "Katalog – hantera"
   catalog_name_46d37909: "Katalogens namn"
   catalog_url_a01655dd: Katalog-URL
   catalog_users_already_exist_2894b8c4: "Catalog-användarna finns redan"
+  catalog_was_copied_over_successfully_but_there_was_73889dd1: "Katalogen kopierades men ett problem uppstod under synkroniseringen med Canvas-registreringarna."
   catalog_was_provisioned_9851448f: "Catalog etablerades."
   catalog_was_unprovisioned_9524cb58: "Catalog avetablerades."
   catalog_was_updated_743a58eb: "Catalog uppdaterades."
@@ -7333,6 +7338,7 @@ sv:
   confirmation_failed_please_try_again_ae566d37: "Bekräftelse misslyckades.  Försök igen."
   confused_panda_questioning_what_to_do_next_42941484: "Förvirrad panda undrar vad hen ska göra nu"
   consider_selecting_multiple_submission_types_to_ac_f7e624d5: "För att underlätta för studenter som inte kan göra noteringar bör du överväga att välja flera inlämningstyper."
+  consistent_inheritance_logic_for_developer_keys_in_167f9061: "Konsekvent arvslogik för utvecklarnycklar i konsortier utanför CMC"
   consistent_lti_ags_ids_based_on_account_s_principa_b93fa45: "Konsekventa LTI AGS-ID:er baserade på kontots huvuddomän"
   consortium_parent_keys_803547b: "Överordnade konsortiumnycklar"
   consumer_key_57d9fcf1: Konsumentnyckel
@@ -8224,6 +8230,7 @@ sv:
   copy_9748f9f: Kopiera
   copy_assignment_name_to_another_course_b62d0a54: "Kopiera uppgiften %{name} till en annan kurs"
   copy_blueprint_course_settings_31a97e96: "Kopiera inställningar för Blueprint-kurs"
+  copy_content_615608a7: "Kopiera innehåll"
   copy_list_of_shard_ids_d51cd846: "Kopiera listan över skärv-ID:n"
   copy_operation_started_successfully_b2f236a1: "Kopieringen startades"
   copy_page_to_another_course_405cc07c: "Kopiera sidan till en annan kurs"
@@ -8238,6 +8245,7 @@ sv:
   copy_to_clipboard_493be1b: "Kopierad till Urklipp"
   copy_to_folder_32ecc3c3: "Kopiera till mapp"
   copying_628a9607: "Kopierar ..."
+  copying_the_content_of_a_template_catalog_5bd6f3b0: "Kopierar innehållet i en mallkatalog"
   copyright_and_license_information_must_be_provided_5feffaf: "Copyright- och licensinformation måste tillhandahållas för filer innan de publiceras."
   copyright_holder_386cc8b8: Upphovsrättsinnehavare
   copyright_holder_66ee111: "Upphovsrättsinnehavare:"
@@ -9812,6 +9820,7 @@ sv:
   crumbs: 
     access_report: Åtkomstrapport
     announcements: Anslag
+    apps: Tillägg
     assignments: Uppgifter
     calendar_events: Kalenderhändelser
     collaborations: Samarbeten
@@ -10490,6 +10499,9 @@ sv:
   designers_add_fe7e1ea9: "Designers – lägg till"
   designers_remove_39f50ec9: "Designers – ta bort"
   designers_remove_3e590bff: "Designers – ta bort"
+  destination_account_is_not_a_root_account_2f890dff: "Målkontot är inte ett rotkonto"
+  destination_account_is_not_empty_561f7e55: "Målkontot är inte tomt"
+  destination_account_not_found_274f33d4: "Målkontot hittades inte"
   details_98a31b68: Information
   details_a6f427c3: "Detaljer:"
   determined_by_course_end_date_5e3ffb4f: "Fastställs efter kursens slutdatum"
@@ -10676,6 +10688,8 @@ sv:
   discard_changes_e04b15f9: "Ignorera ändringar"
   discarded_20a4e7e8: Avvisad
   disccussions_515a3a99: Diskussioner
+  discover_56d42b60: Upptäck
+  discover_something_new_or_manage_existing_lti_exte_793093cb: "Upptäck något nytt eller hantera befintliga LTI-tillägg"
   discovery_service_url_ca13d3f4: "URL för identifieringstjänst"
   discovery_url_3dce06d9: Identifierings-URL
   discussion_6719c51d: Diskussion
@@ -11207,6 +11221,7 @@ sv:
   download_these_results_as_csv_9a890883: "Ladda ner dessa resultat i en CSV-fil"
   download_this_file_669f9174: "Ladda ner den här filen"
   downloading_course_content_allows_access_to_conten_164d9336: "Nedladdning av kursinnehåll ger tillgång till innehållet offline. Innehållet kan vara filer, sidor, uppgifter, diskussionsämnen eller quiz. Klicka på ”Generera ePub” för varje kurs och öppna med en e-läsare för att visa."
+  draft_83493fcd: Utkast
   draft_92507c72: (utkast)
   draft_comment_b2376ea4: "Skapa utkast till kommentar"
   draft_comment_warning_modal_in_speedgrader_ded232c1: "Varningsmodal för utkastkommentar i SpeedGrader"
@@ -11620,6 +11635,7 @@ sv:
   enable_gravatar_8a865b41: "Aktivera Gravatar"
   enable_i18n_features_in_outcomes_exports_64bcf82b: "Aktivera i18n-funktioner i lärandemålexporter"
   enable_individual_learning_paths_for_students_base_5236d3bb: "Aktivera individuella lärandevägar för studenter baserat på uppgift"
+  enable_irish_language_support_in_canvas_fe7abaf8: "Aktivera stöd för iriska i Canvas"
   enable_labels_on_the_new_inbox_page_485ce65a: "Aktivera etiketter på den nya Inkorgssidan"
   enable_migrating_item_banks_to_new_quizzes_during__af6ca020: "Aktivera migrering av frågebanker till New Quizzes under import/kopiering av kurs"
   enable_moderated_grading_bacd20d8: "Aktivera modererad bedömning."
@@ -12507,6 +12523,7 @@ sv:
   extend_due_date_20651e76: "Förläng inlämningsdatum"
   extended_632ebee0: utökad
   extended_9a58dcb6: Utökad
+  extensions_7250a0bb: Tillägg
   external_apps_account_course_settings_78de2b2f: "Externa appar (konto, kursinställningar)"
   external_apps_account_course_settings_c44af5ef: "Externa appar (konto-/kursinställningar)"
   external_apps_course_settings_1f045644: "Externa appar (kursinställningar)"
@@ -15940,6 +15957,8 @@ sv:
   instructor_is_working_on_grades_135388d2: "En lärare håller på med bedömningarna"
   instructor_messages_a4c28674: "Meddelanden till läraren"
   instructor_name_36bc0f39: "Lärarens namn"
+  instructor_points_2cd28bd1: Lärarpoäng
+  instructor_score_6e11587f: Lärarresultat
   instructor_sis_id_899dd697: "Lärarens SIS-ID"
   instructors_4b491a07: lärare
   instructors_are_not_bound_by_attempt_limits_but_an_20b78fea: "Lärare är inte bundna vid gränser för antal försök, men en lärares inlämning KOMMER ATT räknas som ett studentförsök."
@@ -16114,6 +16133,7 @@ sv:
   invalid_fields_for_a_group_invalid_f440b733: "Ogiltiga fält för en grupp: %{invalid}"
   invalid_fields_for_an_outcome_invalid_fafdf0df: "Ogiltiga fält för ett lärandemål: %{invalid}"
   invalid_file_type_881cc9b2: "Ogiltig filtyp"
+  invalid_filter_d6ec4d0b: "Ogiltigt filter"
   invalid_freq_freq_84b0427d: "Ogiltigt FREQ '%{freq}'"
   invalid_grade_9726cbc6: "Ogiltigt betyg"
   invalid_grade_passback_setting_a1d209d1: "Ogiltig grade_passback_setting"
@@ -16179,6 +16199,7 @@ sv:
   ireland_353_3cd32cc0: "Irland (+353)"
   ireland_f7bb9899: Irland
   irish_567e109f: Irländska
+  irish_language_support_e09996c4: "Stöd för iriska"
   is_blueprint_8f793ba8: is_blueprint
   is_invalid_702840b6: "är ogiltig"
   is_public_ca8561e8: is_public
@@ -16601,6 +16622,7 @@ sv:
   leave_5e852989: Lämna
   leave_a_comment_7991725b: "Lämna en kommentar"
   leave_blank_for_no_limit_e8f80808: "Lämna tomt för obegränsat"
+  leave_criterion_comment_707a4f18: "Lämna kommentar om villkor"
   leave_group_group_name_6847c632: "Lämna gruppen %{group_name}"
   left_group_group_name_aac4e813: "Lämnade gruppen %{group_name}"
   len_maxlen_97f1c88d: "%{len}/%{maxLen}"
@@ -16721,6 +16743,7 @@ sv:
   like_post_from_author_79b874f1: "Gilla inlägg från %{author}"
   like_this_entry_60da41a5: "Gilla det här inlägget"
   limit_assignment_names_lengths_max_255_5ee9ebb5: "Begränsa längden på uppgiftens namn (max 255)"
+  limit_certain_lti_placements_to_authorized_tools_f4384cb6: "Begränsa vissa LTI-placeringar till behöriga verktyg"
   limit_course_participation_to_term_or_custom_cours_67797a86: "Begränsa kursdeltagande till terminer eller anpassa kursdatum?"
   limit_each_time_slot_to_input_value_user_s_47461538: "Begränsa varje tid till %{input_value} användare. "
   limit_each_time_slot_to_num_participants_groups_us_14ec4d65: "Begränsa varje tid till %{num_participants} *grupper.* **användare.**"
@@ -16959,6 +16982,7 @@ sv:
   lock_selected_announcements_33740f80: "Lås markerade anslag"
   lock_this_setting_for_sub_accounts_2ae5af17: "Lås denna inställningen för underkonton"
   lock_until_549bb904: "Lås tills"
+  locked_1d1eaa8c: "Låst: "
   locked_762f138b: Låst
   locked_796957c7: "Låst:"
   locked_at_cda02889: "Låst kl."
@@ -17169,6 +17193,8 @@ sv:
   lti_delete_ee5f1bef: "LTI – radera"
   lti_dynamic_registration_8592edb0: "Dynamisk LTI-registrering"
   lti_edit_83a27850: "LTI – redigera"
+  lti_extensions_discover_page_93e4d9e0: "Sidan Upptäck för LTI-tillägg"
+  lti_extensions_page_4269b418: "Sidan LTI-tillägg"
   lti_key_14ad02b1: LTI-nyckel
   lti_keys_5677ba9e: LTI-nycklar
   lti_launch_af082dc3: "LTI-lansering:"
@@ -17176,6 +17202,9 @@ sv:
   lti_multiple_assignment_deep_linking_b7d641d7: "Djuplänkning för flera LTI-uppgifter"
   lti_platform_storage_9d11dc60: LTI-plattformslagring
   lti_registration_9e0f754d: LTI-registrering
+  lti_registrations: 
+    index: 
+      title: Tillägg
   lti_report_2b6193ab: LTI-rapport
   lti_submissions_require_a_url_to_submit_85ca9988: "LTI-inlämningar kräver en URL för inlämning"
   lti_tool_report_f13213b3: LTI-verktygsrapport
@@ -20034,6 +20063,7 @@ sv:
   name_is_locked_click_to_unlock_7aad9928: "%{name} är låst. Klicka för att låsa upp"
   name_is_locked_click_to_unlock_bbebf03e: "%{name} är låst. Klicka för att låsa upp."
   name_is_ready_to_be_assigned_temporary_enrollments_f39a6cf6: "%{name} är klar att tilldelas tillfälliga registreringar."
+  name_is_required_4341f774: "Namn är obligatoriskt"
   name_is_required_ba379522: "Ett namn krävs"
   name_is_too_long_48daa8db: "Namnet är för långt"
   name_is_too_long_must_be_under_length_characters_b8dad44c: "Namnet är för långt, det måste vara under %{length} tecken"
@@ -20397,6 +20427,7 @@ sv:
   no_such_source_context_80a659ba: "ingen sådan källkontext"
   no_such_target_context_21158b9: "ingen sådan målkontext"
   no_such_target_group_7e183d46: "ingen sådan målgrupp"
+  no_template_accounts_in_this_region_5e84955d: "Inga mallkonton i den här regionen"
   no_template_selected_f59e797: "Ingen mall har valts"
   no_temporary_enrollment_click_to_create_one_a6bafdf4: "Ingen temporär registrering, klicka för att skapa en"
   no_terms_eab5ee7b: "Inga villkor"
@@ -22419,6 +22450,7 @@ sv:
   prev_f82cbc48: Föregående
   prev_month_34bd934c: "Föregående månad"
   prevent_deletion_of_outcomes_with_alignments_in_os_65020476: "Förhindra att lärandemål raderas under OS-justeringar."
+  prevent_non_cmc_consortium_parent_dev_key_from_aff_418efa1c: "Förhindra att överordnade utvecklarnycklar från konsortier utanför CMC påverkar verktyg i underordnade"
   prevents_students_from_leaving_annotations_in_assi_cb188d2: "Gör att studenter inte kan göra noteringar i uppgifter. Gäller inte för kamratgranskning av uppgifter."
   preview_53003fd2: Förhandsgranska
   preview_a3f8f854: FÖRHANDSGRANSKA
@@ -22787,8 +22819,10 @@ sv:
       yo: Yo
     you_have_no_services: "Inga registrerade tjänster, du kan lägga till några på sidan för *inställningar*."
   profile_6bd2baed: Profil
+  profile_has_been_saved_successfully_12ffc6ea: "Profilen har sparats"
   profile_photo_save_failed_too_many_times_e1ebda5: "Försök att spara profilbilden misslyckades för många gånger"
   profile_pictures_15953851: Profilbilder
+  profile_save_was_unsuccessful_6e27fb5e: "Profilen sparades inte"
   profile_tray_bcec5044: Profilfack
   profiles: 
     avatar_dialog: 
@@ -24535,6 +24569,7 @@ sv:
       Manuellt skapade konton, tillåter den här funktionen, om den aktiveras,
       människor som kan skapa kurser manuellt att placera dessa i valfritt underkonto
       där de har registreringar.
+  rating_button_buttondisplay_8fb69a4e: "Bedömningsknapp %{buttonDisplay}"
   rating_description_db6adf39: "Ranking beskrivning"
   rating_display_b0b574be: Bedömningsdisplay
   rating_max_score_eade1523: "Maxresultat för gradering"
@@ -25386,6 +25421,7 @@ sv:
       criterion_long_description: "Kriterium lång beskrivning"
     unknown_user: "Okänd användare"
   rubric_assessment_5f0e8a83: Matrisbedömning
+  rubric_assessment_view_mode_1038db: "Visningsläge för matrisbedömning"
   rubric_association: 
     no_details: "Inga detaljer"
   rubric_button_display_4e4a26fe: "Knappvisning för matris"
@@ -25491,6 +25527,7 @@ sv:
   save_11a80ec3: Spara
   save_and_customize_19eb7a7b: "Spara och anpassa"
   save_and_publish_1b765e7: "Spara och publicera"
+  save_as_draft_341d4577: "Spara som utkast"
   save_changes_698abe77: "Spara ändringar"
   save_criterion_cce60085: "Spara kriterium"
   save_customizations_dde779d8: "Spara anpassningar"
@@ -25951,6 +25988,7 @@ sv:
   select_a_student_to_view_281d17b9: "Välj en student att visa"
   select_a_student_to_view_additional_information_he_c371e40c: "Välj en student att visa ytterligare information för här."
   select_a_student_to_view_the_page_will_refresh_aut_eaa5d00c: "Välj en student att visa. Den här sidan uppdateras automatiskt."
+  select_a_template_account_e0c03ee8: "Välj ett mallkonto"
   select_a_type_to_restore_de2c0d04: "Välj typ som ska återställas"
   select_access_type_e5955544: "Välj tillgångstyp"
   select_all_assignments_bd07b919: "Välj alla uppgifter"
@@ -27375,6 +27413,7 @@ sv:
   snapshots_6e1806b4: Ögonblicksbilder
   snapshots_are_backups_of_your_canvas_trial_taking__f18bd571: "Ögonblicksbilder är säkerhetskopior av din Canvas-provperiod. När du tar en ögonblicksbild skapas en unik version med en perfekt avbild av din provperiods status vid tidpunkten för ögonblicksbilden."
   social_studies_13fa30c7: Samhällsvetenskap
+  some_assignments_are_associated_with_an_archived_o_e1856b65: "Vissa uppgifter är kopplade till ett arkiverat eller raderat omdömesschema och omdömesschemat kanske inte kan exporteras."
   some_assignments_could_not_be_created_because_they_d91f2f21: "Vissa uppgifter kan inte skapas eftersom de skulle infalla under en stängd bedömningsperiod."
   some_conferences_on_this_page_are_hidden_because_o_789684fd: "Vissa konferenser på den här sidan är dolda på grund av fel som uppstod när deras status hämtades"
   some_custom_columns_could_not_be_changed_because_t_88abc9be: "Det gick inte att ändra några anpassade kolumner eftersom de var skrivskyddade. Ändringarna i dessa kolumner har ignorerats."
@@ -28448,6 +28487,9 @@ sv:
   tell_us_how_and_when_you_would_like_to_be_notified_de3ed2bc: "Berätta för oss hur och när du vill bli meddelad om händelser i Canvas."
   tempe_grade_export_c611da01: "Omdömesexport för Tempe"
   template_account_21ac8f4f: Mallkonto
+  template_account_is_not_a_root_account_83ae89bc: "Mallkontot är inte ett rotkonto"
+  template_account_is_not_a_template_account_d80200ae: "Mallkontot är inte ett mallkonto"
+  template_account_not_found_7144542c: "Mallkontot hittades inte"
   templates_4ca13d07: Mallar
   temporarily_enroll_a_user_into_a_course_this_tempo_990488f8: "Registrera en användare tillfälligt för en kurs. Den här tillfälliga registreringen paras samman med en annan registrering i kursen."
   temporarily_enroll_name_8acb66ce: "Registrera %{name} tillfälligt"
@@ -28690,6 +28732,7 @@ sv:
   the_course_id_for_the_export_data_a99f37d: "Kurs-ID för exportdata"
   the_course_id_for_the_grade_export_data_d20f4ed: "Kurs-ID för exportdata för omdömen"
   the_course_id_to_report_on_eb4ad5d2: "Kurs-ID som ska rapporteras"
+  the_course_is_associated_with_an_archived_or_delet_43b836a9: "Kursen är kopplad till ett arkiverat eller raderat omdömesschema och omdömesschemat kanske inte kan exporteras."
   the_course_link_validator_searches_course_content__563fa215: "Kursens länkvaliderare söker igenom kursinnehållet efter ogiltiga eller onåbara länkar eller bilder."
   the_course_link_validator_searches_through_course__76f0bc63: "Kursens länkbekräftare söker igenom kursens innehåll och visar alla ogiltiga eller ej fungerade länkar den hittar. Observera att vissa länkar som är flaggade som ej fungerande kan vara otillgängliga från våra servrar och kommer fortfarande att fungera för studenterna."
   the_course_state_manage_permission_allows_the_user_1d9da094: "Med behörigheten Kursstatus – hantera kan användare publicera kurser som inte innehåller moduler. För att publicera och avpublicera modulinnehåll måste även Kursinnehåll – lägg till/redigera/ta bort aktiveras."
@@ -28813,6 +28856,7 @@ sv:
   the_list_below_is_content_that_has_been_shared_wit_2b2648bc: "I listan nedan visas innehåll som delats med dig. Du kan förhandsgranska innehållet, importera det till din kurs eller ta bort det från listan."
   the_list_of_results_has_been_updated_46e3c733: "Listan av uppdaterade resultat."
   the_login_login_is_currently_suspended_and_will_no_472b19e9: "Inloggningen %{login} är för närvarande avstängd och kommer inte att ha åtkomst till Canvas"
+  the_lti_extensions_discover_page_won_t_be_accessib_1451172e: "Sidan Upptäck för LTI-tillägg kan inte nås om inte sidan LTI-registreringar är aktiverad."
   the_lti_tool_was_deleted_on_3727da23: "LTI-verktyget raderades"
   the_lti_user_was_deleted_2a3b796f: "LTI-användaren raderades"
   the_material_is_in_the_public_domain_279c39a3: "Materialet finns i den offentliga domänen"
@@ -28835,10 +28879,15 @@ sv:
                 Tack!
                 Canvas Support
   the_message_you_sent_with_the_subject_line_subject_8157a1ff: |-
-      Meddelandet du skickade med ämnesraden "%{subject}" levererades inte eftersom ditt konto har stängts av.
-      
-      Tack,
-      Canvas Support
+      Meddelandet du skickade med ämnesraden ”%{subject}” levererades inte eftersom ditt konto är avstängt.
+                
+                Tack!
+                Canvas Support
+  the_message_you_sent_with_the_subject_line_subject_8511b0dd: |-
+      Meddelandet du skickade med ämnesraden ”%{subject}” levererades inte eftersom du inte är en giltig deltagare i konversationen.
+                
+                Tack!
+                Canvas Support
   the_message_you_sent_with_the_subject_line_subject_c73f92e4: |-
       Meddelandet med ämnet ”%{subject}” levererades inte. För att svara på Canvas-meddelanden från den här e-postadressen måste den först vara en bekräftad kommunikationskanal i din Canvas-profil. Gå till din användarprofil och skicka bekräftelsemeddelandet för den här e-postadressen igen [Se https://community.canvaslms.com/docs/DOC-2281]. Du kan också kontakta den här personen via inkorgen i Canvas [Se https://community.canvaslms.com/docs/DOC-2670].
                 
@@ -29127,6 +29176,7 @@ sv:
   there_was_an_unexpected_error_deleting_the_convers_412fd621: "Ett oväntat fel inträffade när konversationsmeddelandet raderades"
   there_was_an_unexpected_error_deleting_the_discuss_fe1022cb: "Ett oväntat fel uppstod när diskussionsämnet togs bort."
   there_was_an_unexpected_error_deleting_the_topic_b53db7a7: "Ett oväntat fel uppstod när ämnet togs bort."
+  there_was_an_unexpected_error_error_ca0fc77e: "Ett oväntat fel uppstod: %{error}"
   there_was_an_unexpected_error_loading_the_discussi_cc4ee42: "Ett oväntat fel inträffade när diskussionsinlägget lästes in."
   there_was_an_unexpected_error_loading_the_replies_578d9738: "Ett oväntat fel uppstod när svaren lästes in."
   there_was_an_unexpected_error_marking_all_as_read_117fe739: "Ett oväntat fel inträffade när alla skulle markeras som lästa."
@@ -29213,6 +29263,7 @@ sv:
   this_canvas_installation_is_only_for_testing_and_w_17ce8bc2: 
     one: "Den här Canvas-installationen är endast avsedd för testning och *återställs varje vecka.*"
     other: "Den här Canvas-installationen är endast avsedd för testning och *återställs var %{count} vecka.*"
+  this_catalog_will_be_a_template_account_and_its_da_8b6277cb: "Den här katalogen kommer att vara ett mallkonto, och dess data kan kopieras till nyligen etablerade kataloger."
   this_code_expires_in_timefromnow_ec7ccef4: "Den här koden går ut %{timeFromNow}."
   this_code_expires_timefromnow_877a5225: "Den här koden upphör att gälla %{timeFromNow}."
   this_code_has_expired_41f76642: "Koden har gått ut."
@@ -29376,8 +29427,10 @@ sv:
   this_is_an_account_setting_that_must_be_enabled_by_8ced660: "Detta är en kontoinställning som måste aktiveras av en Kundframgångschef (Customer Success Manager). Notiser är en sällan använd funktion som designats för att skicka en notis till studenter, lärare eller administratörer vid vissa tillfällen (t.ex. ingen interaktion mellan student och lärare under 7 dagar). De kontrolleras varje dag och aviseringar skickas till studenten och/eller läraren tills problemet som utlöste aviseringen har åtgärdats."
   this_is_an_account_setting_that_must_be_turned_on__4c939dea: "Detta är en kontoinställning som måste aktiveras av din Customer Success Manager."
   this_is_an_anonymous_discussion_student_names_and__bc19b64d: "Detta är en anonym diskussion. Studentnamn och profilbilder är dolda."
+  this_is_an_anonymous_discussion_though_student_nam_c45b563e: "Detta är en anonym diskussion. Även om studenters namn och profilbilder är dolda kommer ditt namn och din profilbild att vara synliga för alla kursmedlemmar. Även omnämnanden har inaktiverats."
   this_is_an_anonymous_discussion_though_student_nam_f98abe71: "Detta är en anonym diskussion. Även om studenters namn och profilbilder är dolda kommer ditt namn och din profilbild att vara synliga för alla kursmedlemmar."
   this_is_an_anonymous_discussion_your_name_and_prof_72c49b77: "Detta är en anonym diskussion. Ditt namn och profilbild döljs för andra kursmedlemmar."
+  this_is_an_anonymous_discussion_your_name_and_prof_c88f50e2: "Detta är en anonym diskussion. Ditt namn och din profilbild kommer att vara dolda för övriga kursmedlemmar. Även omnämnanden har inaktiverats."
   this_is_enabled_by_default_as_assignments_can_not__767e9b16: "Detta är aktiverat som standard eftersom uppgifter inte kan undanhållas från betygsboken och fortfarande räknas in i den."
   this_is_just_a_dev_only_feature_you_can_turn_on_to_7f88c58f: "Det här är bara en funktion för utvecklingsändamål som kan aktiveras för att förhandsvisa hur sidorna skulle se ut i en RTL-miljö, utan att behöva ändra språk till ett som vanligtvis är ett RTL-språk"
   this_is_not_a_breaking_change_all_lti_1_3_tool_beh_16df3ac0: "Detta är *inte* en icke-bakåtkompatibel ändring. Alla beteenden för LTI 1.3-verktyg förblir desamma oavsett vilken slutpunkt som används, med undantag av de Platform Storage-specifikationer som nyligen fått stöd. En utökning av den här ändringen kommer att ske på ett senare ospecificerat datum."
@@ -30954,6 +31007,10 @@ sv:
   update_public_jwk_9f25f520: "Uppdatera offentlig JWK"
   update_rating_6d29c2ef: "Uppdatera ranking"
   update_settings_9b422d0f: "Uppdatera inställningar"
+  update_the_assignment_submission_type_launch_butto_bf130d86: "Uppdatera startknappen för uppgiftens inlämningstyp"
+  update_the_look_of_all_tools_using_the_submission__368b06c: |-
+      Uppdatera utseendet för alla verktyg som använder placeringen submission_type_selection
+      till en mer modern design i linje med det övriga gränssnittet i Canvas
   update_tool_7d48ef2a: "Uppdatera %{tool}"
   update_your_notification_settings_ed9564f3: "Uppdatera aviseringsinställningar"
   updated_2c1e8615: Uppdaterad
@@ -31871,6 +31928,7 @@ sv:
   warning_if_there_are_any_users_with_this_role_they_1a7c1fef: "Varning! Om det finns användare med den här rollen kommer de att behålla sina nuvarande behörigheter men du kommer inte att kunna skapa nya användare med den här rollen."
   warning_step_has_children_that_aren_t_stepitem_com_32a3f351: "Varning. Steget har underordnade som inte är StepItem-komponenter"
   warning_step_has_two_stepitems_with_a_status_of_in_77138e9e: "Varning! Steget har två StepItems med statusen Pågår"
+  warning_the_submission_type_selection_placement_is_d327c8d: "Varning: Placeringen submission_type_selection tillåts endast för Instructure-godkända LTI-verktyg. Kontakta ditt supportteam om du anser att det här meddelandet har skickats till dig felaktigt."
   warning_you_are_about_to_adjust_this_group_s_membe_a04281b6: "Varning! Du kommer att justera den här gruppens medlemmar. *Den här ändringen påverkar befintliga gruppinlämningar, noteringar och kommentarer, och resulterar i dataförluster för BÅDE den här gruppen och studentens tidigare grupp.*** Om du vill förhindra oavsiktliga konsekvenser för befintliga gruppinlämningar skapar du en ny gruppuppsättning för framtida uppgifter. **"
   warnings: 
     test_install: 
@@ -31880,6 +31938,7 @@ sv:
         one: "Denna Canvas-installation är endast för testning och återställs varje vecka."
         other: "Denna Canvas-installation är endast för testning och kommer att återställas varje %{count} vecka."
   was_locked_at_date_acf1c576: "Låstes kl. %{date}"
+  was_not_selected_30d63a10: "valdes inte"
   watermark_c93fae0d: Vattenstämpel
   watermark_opacity_ce3d3097: "Vattenstämpelns genomskinlighet"
   watermarks_other_images_e970fc6a: "Vattenstämpel och andra bilder"
@@ -31995,7 +32054,9 @@ sv:
       i en ny flik. När den här flaggan är aktiverad markeras kryssrutan som standard
       om användaren markerade den när hen senast lade till en extern länk.
   when_adding_multiple_users_use_a_comma_or_line_bre_67f9c87d: "När du lägger till flera användare, använd ett kommatecken eller en radbrytning för att separera användare."
+  when_creating_a_reply_students_will_have_the_optio_34556e85: "När studenter skapar ett svar kan de visa sitt namn och sin profilbild eller förbli anonyma. Ditt namn och din bild kommer att vara synliga för alla kursmedlemmar. Även omnämnanden har inaktiverats."
   when_creating_a_reply_students_will_have_the_optio_716eb2f4: "När studenter skapar ett svar kan de visa sitt namn och sin profilbild eller förbli anonyma. Ditt namn och din bild kommer att vara synliga för alla kursmedlemmar."
+  when_creating_a_reply_you_will_have_the_option_to__3fb91c13: "När du skapar ett svar kan du visa ditt namn och din profilbild eller förbli anonym för andra kursmedlemmar. Även omnämnanden har inaktiverats."
   when_creating_a_reply_you_will_have_the_option_to__8607ac10: "När du skapar ett svar kan du visa ditt namn och din profilbild eller förbli anonym för andra kursmedlemmar."
   when_disabled_new_or_updated_contextexternaltool_i_27e19300: |-
       Om inaktiverad, kommer nya eller uppdaterade ContextExternalTool-installationer (däribland
@@ -32012,6 +32073,21 @@ sv:
       sorteras och filtreras.
   when_enabled_an_lti_tool_with_the_assignment_edit__cd60b1a0: "Om aktiverad, lanseras ett LTI-verktyg med assignment_edit-placeringen på sidan Meddelanden."
   when_enabled_collect_internal_analytics_metrics_us_88e81ee5: "Om aktiverat, samla mätvärden för intern analys med hjälp av ett distribuerat system."
+  when_enabled_for_a_child_account_of_a_non_centrall_8b126bc0: |-
+      Om funktionen är aktiverad för ett underordnat konto i ett konsortium som inte är centralt hanterat,
+      ärvs inte tillstånd och token för utvecklarnycklar från det överordnade konsortiet
+      till underkonton i ett underordnat konsortium. Om funktionen är inaktiverad uppvisas äldre
+      (inkonsekvent) beteende. Den här flaggan gäller endast konton i
+      _child_ konsortier. Den här flaggan påverkar inte centralt hanterade konsortier på
+      något sätt.
+  when_enabled_for_the_parent_account_of_a_non_centr_4d7adbaa: |-
+      Om funktionen är aktiverad för det överordnade kontot i ett konsortium som inte är centralt hanterat,
+      påverkar inaktivering/aktivering av utvecklarnycklar i det överordnade inte verktygsinstallationer
+      i underordnade konton. Om funktionen är inaktiverad, påverkar (raderar/återställer) inaktivering/aktivering
+      av SiteAdmin-ärvda utvecklarnycklar i det överordnade kontot i ett konsortium som inte är centralt hanterat
+      verktyg i de underordnade
+      kontona (äldre beteende). Den här flaggan gäller endast för konton i_parent_
+      konsortier. Den här flaggan påverkar inte centralt hanterade konsortier på något sätt.
   when_enabled_global_javascript_and_css_files_can_b_ea21d216: "När den är aktiverad kan javascript och CSS-filer laddas upp i *%{t_theme_editor}*"
   when_enabled_it_deprecates_the_short_message_servi_18c6ee3f: "När aktiverad fasar den ut SMS-tjänsten (Short Message Service)."
   when_enabled_lti_1_1_speedgrader_launches_will_set_47dcded1: |-
@@ -32035,6 +32111,9 @@ sv:
       Om aktiverad skickas data för alla LTI-lanseringar till PandataEvents-systemet
       för frågor och visualisering.
   when_enabled_site_admin_account_ui_will_allow_asso_9d04a1d8: "Om aktiverad kommer webbplatsadministratörer att tillåta koppling mellan tjänstens användare till en DeveloperKey och sedan använda den nyckeln/användaren med tillåtelsetypen client_credentials"
+  when_enabled_submission_type_selection_placement_u_412d226e: |-
+      Om funktionen är aktiverad begränsas Submission_type_selection användningen av placeringen
+      med en lista över tillåtna.
   when_enabled_teachers_can_choose_to_allow_observer_320b555e: |-
       Om aktiverad kan lärare välja att låta observatörer schemalägga möten
       när de skapar mötesgrupper i kalendern.
@@ -32043,6 +32122,8 @@ sv:
       ett slumpmässigt nummer tillagt i sitt ID. Om funktionen är inaktiverad har vart
       och ett samma ID för tool_form.
   when_enabled_the_internal_access_manager_will_be_u_bc470109: "Om aktiverad kan den interna åtkomsthanteraren användas för att ge åtkomst till visa begäranden"
+  when_enabled_the_lti_extensions_discover_page_will_8bb57ff6: "Om funktionen är aktiverad blir sidan Upptäck för LTI-tillägg tillgänglig i vyn Tillägg."
+  when_enabled_the_lti_extensions_page_will_be_avail_ac8ed3fa: "Om funktionen är aktiverad blir sidan LTI-tillägg tillgänglig i vyn Konto."
   when_enabled_this_flag_displays_a_word_count_in_th_a75163d6: |-
       När den här flaggan är aktiverad visas en ordräkning i SpeedGrader för textbaserade
       inlämningar.
@@ -32067,6 +32148,7 @@ sv:
       utvecklarnyckel som det ursprungliga verktyget. Detta förhindrar scenarier där flera utvecklarnycklar
       delar samma domän och ett verktyg från fel utvecklarnyckel skulle matchas först.
   when_posting_grades_for_anonymous_assignments_grad_b13f3ae6: "När du publicerar omdömen för anonyma uppgifter visas omdömena för alla i kursen. Anonymitet kommer att tas bort"
+  when_posting_grades_for_this_anonymous_assignment__1c64fadf: "Publicerade omdömen för den här anonyma uppgiften publiceras för alla som tilldelats objektet. Anonymitet kommer att tas bort"
   when_scope_enforcement_is_disabled_tokens_have_acc_6939182f: "Om tvingande av omfattning har inaktiverats har token åtkomst till alla tillgängliga slutpunkter för användaren som auktoriserar."
   when_selected_the_course_is_in_a_read_only_state_o_5aaeb0d: "Om markerat är kursen skrivskyddad utanför dessa datum."
   when_selected_the_course_is_inaccessible_outside_c_af595406: "Om markerad är kursen onåbar utanför kursdatumen. Om kursdatumen är tomma gäller dessa start- och slutdatum som terminsdatum."
