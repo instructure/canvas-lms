@@ -375,6 +375,10 @@ class BigBlueButtonConference < WebConference
       additional_params[:avatarUrl] = user.avatar_url
     end
 
+    unless user.pronouns.nil?
+      additional_params[:userdataPronouns] = user.pronouns
+    end
+
     generate_request :join,
                      fullName: user.short_name,
                      meetingID: conference_key,
