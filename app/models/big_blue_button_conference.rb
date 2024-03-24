@@ -369,12 +369,19 @@ class BigBlueButtonConference < WebConference
   end
 
   def join_url(user, type = :user)
+    additional_params = {}
+
+    if config[:send_avatar]
+      additional_params[:avatarUrl] = user.avatar_url
+    end
+
     generate_request :join,
                      fullName: user.short_name,
                      meetingID: conference_key,
                      password: settings[((type == :user) ? :user_key : :admin_key)],
                      userID: user.id,
-                     createTime: settings[:create_time]
+                     createTime: settings[:create_time],
+                     **additional_params
   end
 
   def end_meeting

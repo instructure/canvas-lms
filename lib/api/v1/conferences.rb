@@ -97,6 +97,7 @@ module Api::V1::Conferences
         type: conference_type[:conference_type],
         settings: conference_user_setting_fields_json(conference_type[:user_setting_fields]),
         free_trial: !!conference_type[:free_trial],
+        send_avatar: !!conference_type[:send_avatar],
         lti_settings: conference_type[:lti_settings].as_json,
         contexts: conference_type[:contexts]&.map(&:asset_string)
       }

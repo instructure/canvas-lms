@@ -17,6 +17,14 @@ confetti_for_valid_links:
     a course and no issues are found.
   applies_to: RootAccount
 
+bbb_avatar:
+  state: 'hidden'
+  display_name: 'Send user avatar to BigBlueButton'
+  description: |-
+    Adds a new admin setting to the BigBlueButton plugin to allow
+    sending of user avatars upon joining conference.
+  applies_to: RootAccount
+
 react_discussions_post:
   state: hidden
   beta: true
