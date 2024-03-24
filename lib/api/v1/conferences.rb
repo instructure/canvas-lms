@@ -29,10 +29,7 @@ module Api::V1::Conferences
       ended_at
       started_at
       user_ids
-      long_running
-      recordings
       join_url
-      has_advanced_settings
       conference_key
       context_type
       context_id
@@ -53,6 +50,8 @@ module Api::V1::Conferences
       j["long_running"] = value_to_boolean(j["long_running"])
       j["duration"] = j["duration"].to_i if j["duration"]
       j["users"] = Array(j.delete("user_ids"))
+      j["invitees"] = Array(j.delete("invitees_ids"))
+      j["attendees"] = Array(j.delete("attendees_ids"))
       j["url"] = named_context_url(conference.context, :context_conference_url, conference)
     end
   end

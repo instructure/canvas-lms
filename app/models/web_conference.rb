@@ -543,7 +543,7 @@ class WebConference < ActiveRecord::Base
     url = options.delete(:url)
     join_url = options.delete(:join_url)
     options.reverse_merge!(only: %w[id title description conference_type duration started_at ended_at user_ids context_id context_type context_code start_at end_at])
-    result = super(options.merge(include_root: false, methods: %i[has_advanced_settings has_calendar_event long_running user_settings recordings]))
+    result = super(options.merge(include_root: false, methods: %i[has_advanced_settings invitees_ids attendees_ids has_calendar_event long_running user_settings recordings]))
     result["url"] = url
     result["join_url"] = join_url
     result
@@ -551,6 +551,14 @@ class WebConference < ActiveRecord::Base
 
   def user_ids
     web_conference_participants.pluck(:user_id)
+  end
+
+  def invitees_ids
+    invitees.pluck(:id)
+  end
+
+  def attendees_ids
+    attendees.pluck(:id)
   end
 
   def self.conference_types(context)
