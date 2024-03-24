@@ -420,6 +420,7 @@ zh-Hant:
     tab_brand_configs: 主題
     tab_courses: 課程
     tab_developer_keys: 開發人員密鑰
+    tab_extensions: 副檔名
     tab_faculty_journal: 教職員日誌
     tab_grading_standards: 評分
     tab_jobs: 工作
@@ -2606,6 +2607,7 @@ zh-Hant:
   all_4321c3a1: 全部
   all_account_types_e83c1516: 所有的帳戶類型
   all_accounts_3bafc860: 所有帳戶
+  all_assignees_removed_14639499: 所有獲配人均已移除
   all_assignment_groups_a65e9e46: 所有作業小組
   all_assignments_b79a4d6a: 所有作業列表
   all_changes_published_27a53ffd: 所有變更已發佈
@@ -6460,11 +6462,14 @@ zh-Hant:
   cas_server_rejected_ticket_message_code_a6ef4093: "CAS 伺服器拒絕的票證：%{message}(%{code})"
   cas_url_4ba2843e: "CAS URL"
   catalan_16f6b78f: 加泰隆尼亞語
+  catalog_account_not_found_c786ce35: 找不到目錄帳戶
+  catalog_account_to_copy_fa180ff4: 要複製的目錄帳戶
   catalog_already_enabled_56478a3c: "Catalog 目錄已採用"
   catalog_manage_f57e50f3: "目錄 - 管理"
   catalog_name_46d37909: "Catalog 名稱"
   catalog_url_a01655dd: "Catalog 目錄 URL"
   catalog_users_already_exist_2894b8c4: "Catalog 使用者已存在"
+  catalog_was_copied_over_successfully_but_there_was_73889dd1: "成功複製目錄，但從 Canvas 同步註冊學生時出現問題"
   catalog_was_provisioned_9851448f: "Catalog 已佈建。"
   catalog_was_unprovisioned_9524cb58: "Catalog 未佈建。"
   catalog_was_updated_743a58eb: "Catalog 已更新。"
@@ -7333,6 +7338,7 @@ zh-Hant:
   confirmation_failed_please_try_again_ae566d37: 確認失敗。請再試一次。
   confused_panda_questioning_what_to_do_next_42941484: "感到疑惑的 Panda 詢問接下來要做什麼"
   consider_selecting_multiple_submission_types_to_ac_f7e624d5: 考慮選擇多個提交類型以容納可能無法建立註釋的學生。
+  consistent_inheritance_logic_for_developer_keys_in_167f9061: "在非 CMC 協作組中開發人員金鑰的一致繼承邏輯"
   consistent_lti_ags_ids_based_on_account_s_principa_b93fa45: "一致的 LTI AGS ID，以帳戶的主要網域為依據"
   consortium_parent_keys_803547b: 聯盟上級金鑰
   consumer_key_57d9fcf1: 消費者密鑰
@@ -8224,6 +8230,7 @@ zh-Hant:
   copy_9748f9f: 複製
   copy_assignment_name_to_another_course_b62d0a54: "將作業 %{name} 複製到其他課程中"
   copy_blueprint_course_settings_31a97e96: 複製「藍圖課程」設定
+  copy_content_615608a7: 複製內容
   copy_list_of_shard_ids_d51cd846: "複製碎片 ID 清單"
   copy_operation_started_successfully_b2f236a1: 拷貝操作已成功開始
   copy_page_to_another_course_405cc07c: 將頁面複製到其他課程中
@@ -8237,6 +8244,7 @@ zh-Hant:
   copy_to_clipboard_493be1b: 複製到剪貼簿
   copy_to_folder_32ecc3c3: 拷貝到文件夾
   copying_628a9607: 拷貝中……
+  copying_the_content_of_a_template_catalog_5bd6f3b0: 複製範本目錄的內容
   copyright_and_license_information_must_be_provided_5feffaf: 必須提供檔案的版權與許可資訊，才能將其發佈。
   copyright_holder_386cc8b8: 版權持有人
   copyright_holder_66ee111: 版權持有人：
@@ -9811,6 +9819,7 @@ zh-Hant:
   crumbs: 
     access_report: 存取報告
     announcements: 通告
+    apps: 副檔名
     assignments: 作業列表
     calendar_events: 月曆事件
     collaborations: 協作
@@ -10489,6 +10498,9 @@ zh-Hant:
   designers_add_fe7e1ea9: "設計者 - 添加"
   designers_remove_39f50ec9: "設計者 - 移除"
   designers_remove_3e590bff: "設計者 - 移除"
+  destination_account_is_not_a_root_account_2f890dff: 目的地帳戶不是根帳戶
+  destination_account_is_not_empty_561f7e55: 目的地帳戶不是空白
+  destination_account_not_found_274f33d4: 找不到目的地帳戶
   details_98a31b68: 詳細資料
   details_a6f427c3: 詳細資料：
   determined_by_course_end_date_5e3ffb4f: 以課程結束日期決定
@@ -10675,6 +10687,8 @@ zh-Hant:
   discard_changes_e04b15f9: 捨棄變更
   discarded_20a4e7e8: 放棄
   disccussions_515a3a99: 討論區
+  discover_56d42b60: 發現
+  discover_something_new_or_manage_existing_lti_exte_793093cb: "發現新事物或管理現有的 LTI 副檔名"
   discovery_service_url_ca13d3f4: "探索服務 URL"
   discovery_url_3dce06d9: "探索 URL"
   discussion_6719c51d: 討論
@@ -11204,6 +11218,7 @@ zh-Hant:
   download_these_results_as_csv_9a890883: "以 CSV 格式下載結果"
   download_this_file_669f9174: 下載此文檔
   downloading_course_content_allows_access_to_conten_164d9336: 下載課程内容可以允許離綫瀏覽課程内容。内容包括文檔、頁面、作業、討論話題或測試。按一下『生成ePub』按鈕，生成個課程文檔，並用任何電子書軟件瀏覽。
+  draft_83493fcd: 草稿
   draft_92507c72: （草稿）
   draft_comment_b2376ea4: 草擬評論
   draft_comment_warning_modal_in_speedgrader_ded232c1: "SpeedGrader 中的草稿評論警告模態"
@@ -11617,6 +11632,7 @@ zh-Hant:
   enable_gravatar_8a865b41: "啟用 Gravatar"
   enable_i18n_features_in_outcomes_exports_64bcf82b: "在學習成果匯出中啟用 i18n 功能"
   enable_individual_learning_paths_for_students_base_5236d3bb: 根據評估結果啟用學生的個別學習歷程
+  enable_irish_language_support_in_canvas_fe7abaf8: "在 Canvas 中啟用愛爾蘭語支援"
   enable_labels_on_the_new_inbox_page_485ce65a: 在新的收件匣頁面啟用標籤
   enable_migrating_item_banks_to_new_quizzes_during__af6ca020: 在課程匯入/複製期間，啟用遷移項目題庫到新測驗
   enable_moderated_grading_bacd20d8: 啟用綜合評分。
@@ -12502,6 +12518,7 @@ zh-Hant:
   extend_due_date_20651e76: 延長截止日期
   extended_632ebee0: 延伸
   extended_9a58dcb6: 延伸
+  extensions_7250a0bb: 副檔名
   external_apps_account_course_settings_78de2b2f: 外部應用程式（帳戶、課程設定）
   external_apps_account_course_settings_c44af5ef: 外部應用程式（帳戶/課程設定）
   external_apps_course_settings_1f045644: 外部應用程式（課程設定）
@@ -15924,6 +15941,8 @@ zh-Hant:
   instructor_is_working_on_grades_135388d2: 導師正在進行評分
   instructor_messages_a4c28674: 導師訊息
   instructor_name_36bc0f39: 導師姓名
+  instructor_points_2cd28bd1: 導師分數
+  instructor_score_6e11587f: 導師得分
   instructor_sis_id_899dd697: "導師 SIS ID"
   instructors_4b491a07: 導師
   instructors_are_not_bound_by_attempt_limits_but_an_20b78fea: 導師不受嘗試限制約束，但導師的提交項目「將」計入學生的嘗試次數。
@@ -16098,6 +16117,7 @@ zh-Hant:
   invalid_fields_for_a_group_invalid_f440b733: "群組的無效欄位：%{invalid}"
   invalid_fields_for_an_outcome_invalid_fafdf0df: "成果的無效欄位：%{invalid}"
   invalid_file_type_881cc9b2: 無效的檔案類型
+  invalid_filter_d6ec4d0b: 無效的篩選器
   invalid_freq_freq_84b0427d: "無效的 FREQ '%{freq}'"
   invalid_grade_9726cbc6: 無效的評分
   invalid_grade_passback_setting_a1d209d1: "無效的 grade_passback_setting"
@@ -16163,6 +16183,7 @@ zh-Hant:
   ireland_353_3cd32cc0: "愛爾蘭 (+353)"
   ireland_f7bb9899: 愛爾蘭
   irish_567e109f: 愛爾蘭語
+  irish_language_support_e09996c4: 愛爾蘭語支援
   is_blueprint_8f793ba8: is_blueprint
   is_invalid_702840b6: 無效
   is_public_ca8561e8: is_public
@@ -16585,6 +16606,7 @@ zh-Hant:
   leave_5e852989: 離開
   leave_a_comment_7991725b: 留下評論
   leave_blank_for_no_limit_e8f80808: 留空則設置為無限制
+  leave_criterion_comment_707a4f18: 留下標準評論
   leave_group_group_name_6847c632: "離開群組 %{group_name}"
   left_group_group_name_aac4e813: "已離開群組%{group_name}"
   len_maxlen_97f1c88d: "%{len}/%{maxLen}"
@@ -16705,6 +16727,7 @@ zh-Hant:
   like_post_from_author_79b874f1: "讚好 %{author} 中的貼文"
   like_this_entry_60da41a5: 讚好此條目
   limit_assignment_names_lengths_max_255_5ee9ebb5: "限制作業名稱長度 ( 最長 255 )"
+  limit_certain_lti_placements_to_authorized_tools_f4384cb6: "將特定 LTI 配置限制在授權工具上"
   limit_course_participation_to_term_or_custom_cours_67797a86: 是否限制課程參與情況至學期或自訂課程日期？
   limit_each_time_slot_to_input_value_user_s_47461538: "限制每個時段有 %{input_value} 位用戶。"
   limit_each_time_slot_to_num_participants_groups_us_14ec4d65: "將每個時閒段限定給 %{num_participants} *群組* **使用者**使用"
@@ -16943,6 +16966,7 @@ zh-Hant:
   lock_selected_announcements_33740f80: 鎖定所選通告
   lock_this_setting_for_sub_accounts_2ae5af17: 為子帳戶鎖定此設置
   lock_until_549bb904: 鎖定直至
+  locked_1d1eaa8c: "已鎖定： "
   locked_762f138b: 已鎖定
   locked_796957c7: 已鎖定：
   locked_at_cda02889: 鎖定時間
@@ -17153,6 +17177,8 @@ zh-Hant:
   lti_delete_ee5f1bef: "LTI - 刪除"
   lti_dynamic_registration_8592edb0: "LTI 動態註冊"
   lti_edit_83a27850: "LTI - 編輯"
+  lti_extensions_discover_page_93e4d9e0: "LTI 副檔名發現頁面"
+  lti_extensions_page_4269b418: "LTI 副檔名頁面"
   lti_key_14ad02b1: "LTI 金鑰"
   lti_keys_5677ba9e: "LTI 金鑰"
   lti_launch_af082dc3: "LTI 啟動："
@@ -17160,6 +17186,9 @@ zh-Hant:
   lti_multiple_assignment_deep_linking_b7d641d7: "LTI 多個作業深入連結"
   lti_platform_storage_9d11dc60: "LTI 平台儲存"
   lti_registration_9e0f754d: "LTI 註冊"
+  lti_registrations: 
+    index: 
+      title: 副檔名
   lti_report_2b6193ab: "LTI 報告"
   lti_submissions_require_a_url_to_submit_85ca9988: "LTI 提交項目需要 URL 以提交"
   lti_tool_report_f13213b3: "LTI 工具報告"
@@ -20018,6 +20047,7 @@ zh-Hant:
   name_is_locked_click_to_unlock_7aad9928: "%{name} 被鎖定。點擊解鎖"
   name_is_locked_click_to_unlock_bbebf03e: "%{name} 被鎖定。點擊解鎖。"
   name_is_ready_to_be_assigned_temporary_enrollments_f39a6cf6: "%{name} 準備好指派給暫時的註冊學生。"
+  name_is_required_4341f774: 名稱必填
   name_is_required_ba379522: 名稱必填
   name_is_too_long_48daa8db: 名稱太長
   name_is_too_long_must_be_under_length_characters_b8dad44c: "名稱太長，不可超過 %{length} 個字符"
@@ -20381,6 +20411,7 @@ zh-Hant:
   no_such_source_context_80a659ba: 沒有此類來源內容
   no_such_target_context_21158b9: 沒有此類目標內容
   no_such_target_group_7e183d46: 沒有此類目標群組
+  no_template_accounts_in_this_region_5e84955d: 此地區沒有範本帳戶
   no_template_selected_f59e797: 未選擇範本
   no_temporary_enrollment_click_to_create_one_a6bafdf4: 沒有暫時的註冊學生，按一下以建立一個
   no_terms_eab5ee7b: 無條款
@@ -22403,6 +22434,7 @@ zh-Hant:
   prev_f82cbc48: 預覽
   prev_month_34bd934c: 上個月
   prevent_deletion_of_outcomes_with_alignments_in_os_65020476: 防止刪除作業系統中的學習成果
+  prevent_non_cmc_consortium_parent_dev_key_from_aff_418efa1c: "防止非 CMC 協作組父項開發金鑰影響子項中的工具"
   prevents_students_from_leaving_annotations_in_assi_cb188d2: 防止學生在作業中添加註釋。不適用於同儕互評作業。
   preview_53003fd2: 預覽
   preview_a3f8f854: 預覽
@@ -22777,8 +22809,10 @@ zh-Hant:
       yo: Yo
     you_have_no_services: 您還沒有註冊任何服務，您可以在*設置*頁面添加一些服務。
   profile_6bd2baed: 個人檔案
+  profile_has_been_saved_successfully_12ffc6ea: 個人檔案儲存成功
   profile_photo_save_failed_too_many_times_e1ebda5: 個人檔案照片儲存失敗次數太多
   profile_pictures_15953851: 個人檔案圖片
+  profile_save_was_unsuccessful_6e27fb5e: 個人資料儲存失敗
   profile_tray_bcec5044: 個人檔案收集箱
   profiles: 
     avatar_dialog: 
@@ -24524,6 +24558,7 @@ zh-Hant:
       「手動建立課程」子帳戶，啟用後，允許
       可以手動建立課程的人員將課程放入任何
       他們有註冊學生的子帳戶中。
+  rating_button_buttondisplay_8fb69a4e: "評級按鈕 %{buttonDisplay}"
   rating_description_db6adf39: 評級描述
   rating_display_b0b574be: 評價顯示
   rating_max_score_eade1523: 評級最大分數
@@ -25375,6 +25410,7 @@ zh-Hant:
       criterion_long_description: 標準完整描述
     unknown_user: 未知使用者
   rubric_assessment_5f0e8a83: 評分標準評估
+  rubric_assessment_view_mode_1038db: 評分標準評估檢視模式
   rubric_association: 
     no_details: 沒有詳細資料
   rubric_button_display_4e4a26fe: 評分標準按鈕顯示
@@ -25480,6 +25516,7 @@ zh-Hant:
   save_11a80ec3: 保存
   save_and_customize_19eb7a7b: 儲存並自定義
   save_and_publish_1b765e7: 儲存並發佈
+  save_as_draft_341d4577: 保存草稿
   save_changes_698abe77: 保存更改
   save_criterion_cce60085: 儲存標準
   save_customizations_dde779d8: 儲存自定義設定
@@ -25939,6 +25976,7 @@ zh-Hant:
   select_a_student_to_view_281d17b9: 選擇要檢視的學生
   select_a_student_to_view_additional_information_he_c371e40c: 選擇一名學生，檢視更多資訊。
   select_a_student_to_view_the_page_will_refresh_aut_eaa5d00c: 選擇要檢視的學生。此頁面將自動重新整理。
+  select_a_template_account_e0c03ee8: 選取範本帳戶
   select_a_type_to_restore_de2c0d04: 選取要還原的類型
   select_access_type_e5955544: 選取存取類型
   select_all_assignments_bd07b919: 選擇所有作業
@@ -27363,6 +27401,7 @@ zh-Hant:
   snapshots_6e1806b4: 快照
   snapshots_are_backups_of_your_canvas_trial_taking__f18bd571: "快照是您的 Canvas 試用版備份。拍攝快照將建立一個唯一的「版本」，在快照時刻完成您的試用狀態的完整記錄。"
   social_studies_13fa30c7: 社會研究
+  some_assignments_are_associated_with_an_archived_o_e1856b65: 有些作業列表與已存檔或刪除的等級評分方式關聯，且可能無法匯出等級評分方式。
   some_assignments_could_not_be_created_because_they_d91f2f21: 由於某些作業將進入評分階段，因此無法創建。
   some_conferences_on_this_page_are_hidden_because_o_789684fd: 由於在讀取狀態時出現錯誤，本頁一些會議被隱藏
   some_custom_columns_could_not_be_changed_because_t_88abc9be: 部分自定義欄不能變更，因為其標示為唯讀；有關該欄的變更已被忽略。
@@ -28434,6 +28473,9 @@ zh-Hant:
   tell_us_how_and_when_you_would_like_to_be_notified_de3ed2bc: "告訴我們，您希望在何時以何方式收到 Canvas 事件通知。"
   tempe_grade_export_c611da01: "Tempe 評分報告"
   template_account_21ac8f4f: 範本帳戶
+  template_account_is_not_a_root_account_83ae89bc: 範本帳戶不是根帳戶
+  template_account_is_not_a_template_account_d80200ae: 範本帳戶不是範本帳戶
+  template_account_not_found_7144542c: 找不到範本帳戶
   templates_4ca13d07: 範本
   temporarily_enroll_a_user_into_a_course_this_tempo_990488f8: 將使用者暫時註冊到課程中。此暫時的註冊學生與課程中的另一個註冊學生配對。
   temporarily_enroll_name_8acb66ce: "暫時註冊 %{name}"
@@ -28676,6 +28718,7 @@ zh-Hant:
   the_course_id_for_the_export_data_a99f37d: "匯出資料的課程 ID"
   the_course_id_for_the_grade_export_data_d20f4ed: "評分匯出資料的課程 ID"
   the_course_id_to_report_on_eb4ad5d2: "要報告的課程 ID"
+  the_course_is_associated_with_an_archived_or_delet_43b836a9: 該課程與已存檔或刪除的等級評分方式關聯，且可能無法匯出等級評分方式。
   the_course_link_validator_searches_course_content__563fa215: 課程連結驗證工具會搜尋課程內容中的無效或無法取得的連結及影像。
   the_course_link_validator_searches_through_course__76f0bc63: 課程連結驗證器負責檢索課程內容，報告發現的任何無效或無響應鏈接。請注意，某些被標記為無響應的連接有可能只是無法透過我們的伺服器訪問，但依然可以供學生們使用。
   the_course_state_manage_permission_allows_the_user_1d9da094: "「課程狀態 - 管理」權限允許使用者發佈不包含單元的課程。要發佈和取消發佈單元內容，必須啟用「課程內容 - 添加/編輯/刪除」。"
@@ -28799,6 +28842,7 @@ zh-Hant:
   the_list_below_is_content_that_has_been_shared_wit_2b2648bc: 以下列表為已與您共用的內容列表。您可以預覽該內容，將其導入您的課程，或將其從列表中刪除。
   the_list_of_results_has_been_updated_46e3c733: 搜索結果已更新。
   the_login_login_is_currently_suspended_and_will_no_472b19e9: "登入 %{login} 目前暫停，而且將無法存取 Canvas"
+  the_lti_extensions_discover_page_won_t_be_accessib_1451172e: "除非啟用 LTI 註冊頁面，否則無法存取 LTI 副檔名發現頁面"
   the_lti_tool_was_deleted_on_3727da23: "刪除 LTI 工具的日期"
   the_lti_user_was_deleted_2a3b796f: "LTI 使用者已刪除"
   the_material_is_in_the_public_domain_279c39a3: 該材料位於公用網域中。
@@ -28821,10 +28865,15 @@ zh-Hant:
       謝謝！
       Canvas支援團隊
   the_message_you_sent_with_the_subject_line_subject_8157a1ff: |-
-      您傳送的主旨行為 "%{subject}” 的訊息未送出，因為您的帳戶已暫停。
-      
-      謝謝。
-      Canvas 支援
+      您傳送的主旨行為 "%{subject}” 的訊息未送達，因為您的帳戶已暫停。
+        
+        謝謝！
+        Canvas支援團隊
+  the_message_you_sent_with_the_subject_line_subject_8511b0dd: |-
+      您傳送的主旨行 "%{subject}” 的訊息未送達，因為您不是對話的有效參與者。
+        
+        謝謝！
+        Canvas支援團隊
   the_message_you_sent_with_the_subject_line_subject_c73f92e4: |-
       您發送的主題為『%{subject}』的郵件未能投遞。 如希望透過本郵件向 Canvas 回复郵件，您的 Canvas 個人檔案中必須有經確認的通訊渠道。請訪問您的檔案，並向下列地址再次發送確認郵件 [參考 https://community.canvaslms.com/docs/DOC-2281]。您還可以透過 Canvas 收件箱聯繫相關個人 [參考 https://community.canvaslms.com/docs/DOC-2670]。
       
@@ -29113,6 +29162,7 @@ zh-Hant:
   there_was_an_unexpected_error_deleting_the_convers_412fd621: 刪除交談訊息時發生意外錯誤
   there_was_an_unexpected_error_deleting_the_discuss_fe1022cb: 刪除討論主題時發生意外錯誤。
   there_was_an_unexpected_error_deleting_the_topic_b53db7a7: 刪除主題時發生意外錯誤。
+  there_was_an_unexpected_error_error_ca0fc77e: "發生意外錯誤：%{error}"
   there_was_an_unexpected_error_loading_the_discussi_cc4ee42: 載入討論條目時發生意外錯誤。
   there_was_an_unexpected_error_loading_the_replies_578d9738: 載入回覆時發生意外錯誤。
   there_was_an_unexpected_error_marking_all_as_read_117fe739: 全部標示為已讀時發生意外錯誤。
@@ -29199,6 +29249,7 @@ zh-Hant:
   this_canvas_installation_is_only_for_testing_and_w_17ce8bc2: 
     one: "此 Canvas 安裝僅用於測試，*並會每 %{count} 週重設。*"
     other: "此 Canvas 安裝僅用於測試，*並會每 %{count} 週重設。*"
+  this_catalog_will_be_a_template_account_and_its_da_8b6277cb: 此目錄是一個範本帳戶，而且它的資料可以複製到新佈建的目錄中
   this_code_expires_in_timefromnow_ec7ccef4: "此條碼將於 %{timeFromNow} 後過期。"
   this_code_expires_timefromnow_877a5225: "此編碼%{timeFromNow}過期。"
   this_code_has_expired_41f76642: 此條碼已過期。
@@ -29363,8 +29414,10 @@ zh-Hant:
   this_is_an_account_setting_that_must_be_enabled_by_8ced660: "這是必須由客戶服務經理啟用的帳戶設定。提醒是個比較少用的功能，用於向學生、教師或管理員就特定觸發事件（如：過去 7 天沒有師生互動）傳送提醒。每天都會進行檢查，並將通知傳送給學生和/或教師，直到觸發問題得到解決。"
   this_is_an_account_setting_that_must_be_turned_on__4c939dea: 此帳戶設定必須由您的客戶服務經理啟用。
   this_is_an_anonymous_discussion_student_names_and__bc19b64d: 這是匿名的討論區。學生姓名和個人檔案圖片隱藏。
+  this_is_an_anonymous_discussion_though_student_nam_c45b563e: 這是匿名的討論區。雖然學生姓名和個人檔案圖片會隱藏，但所有課程成員都可以看到您的姓名和個人檔案圖片。提及也已停用。
   this_is_an_anonymous_discussion_though_student_nam_f98abe71: 這是匿名的討論區。雖然學生姓名和個人檔案圖片會隱藏，但所有課程成員都可以看到您的姓名和個人檔案圖片。
   this_is_an_anonymous_discussion_your_name_and_prof_72c49b77: 這是匿名的「討論區」，您的姓名和個人檔案圖片將對其他課程成員隱藏。
+  this_is_an_anonymous_discussion_your_name_and_prof_c88f50e2: 這是匿名的討論區。您的姓名和個人檔案圖片會對其他課程成員隱藏。提及也已停用。
   this_is_enabled_by_default_as_assignments_can_not__767e9b16: 這預設為啟用，因為不能從成績單中扣除作業並仍然將其計入。
   this_is_just_a_dev_only_feature_you_can_turn_on_to_7f88c58f: "這只是一個僅限於開發人員的功能，您可以開啟它來預覽頁面在 RTL 環境中的外觀，而不必將語言變更為通常為 RTL 的語言"
   this_is_not_a_breaking_change_all_lti_1_3_tool_beh_16df3ac0: "這*不*是最新變更。所有 LTI 1.3 工具行為將保持不變，無論使用哪一個端點，但新支援的 Platform Storage 規格除外。執行此變更將發生在稍後未指定的日期中。"
@@ -30942,6 +30995,10 @@ zh-Hant:
   update_public_jwk_9f25f520: "更新公開的 JWK"
   update_rating_6d29c2ef: 更新評級
   update_settings_9b422d0f: 更新設定
+  update_the_assignment_submission_type_launch_butto_bf130d86: 更新作業提交類型啟動按鈕
+  update_the_look_of_all_tools_using_the_submission__368b06c: |-
+      使用 submission_type_selection
+       配置更新所有工具的外觀，使其成為與 Canvas UI 的其餘部分一致的更現代設計
   update_tool_7d48ef2a: "更新 %{tool}"
   update_your_notification_settings_ed9564f3: 更新您的通知設定
   updated_2c1e8615: 已更新
@@ -31855,6 +31912,7 @@ zh-Hant:
   warning_if_there_are_any_users_with_this_role_they_1a7c1fef: 警告：如果任何使用者有此角色，他們將保持當前權限，但是您將無法創建有此角色的新使用者。
   warning_step_has_children_that_aren_t_stepitem_com_32a3f351: "警告 步驟包含並非 StepItem 組件的兒童"
   warning_step_has_two_stepitems_with_a_status_of_in_77138e9e: "警告：步驟包含兩個狀態為進行中的 StepItems"
+  warning_the_submission_type_selection_placement_is_d327c8d: "警告：submission_type_selection 配置僅適用於 Instructure 核准的 LTI 工具。如果您認為您誤收到此訊息，請聯絡您的支援團隊。"
   warning_you_are_about_to_adjust_this_group_s_membe_a04281b6: "警告！您將要調整此群組的成員。*此變更將影響現有的小組遞交作業、註釋，並導致此群組和學生之前的群組的評論及成績都會丟失數據。*** 為防止現有的小組遞交作業產生意外後果，會為以后的作業創建一個新的小組。**"
   warnings: 
     test_install: 
@@ -31864,6 +31922,7 @@ zh-Hant:
         one: "此 Canvas 安裝僅用於測試，並會每 %{count} 週重設。"
         other: "此 Canvas 安裝僅用於測試，並會每 %{count} 週重設。"
   was_locked_at_date_acf1c576: "被鎖定在%{date}"
+  was_not_selected_30d63a10: 未被選取
   watermark_c93fae0d: 水印
   watermark_opacity_ce3d3097: 水印透光度
   watermarks_other_images_e970fc6a: 水印和其他影像
@@ -31979,7 +32038,9 @@ zh-Hant:
       在新標籤中載入。啟用此標記時，如果使用者勾選上次他們添加外部連結的勾選框，
       根據預設值將選擇該勾選框。
   when_adding_multiple_users_use_a_comma_or_line_bre_67f9c87d: 當添加多個使用者時，以逗號或間線分隔使用者。
+  when_creating_a_reply_students_will_have_the_optio_34556e85: 建立回覆時，學生將可以選擇顯示他們的姓名和個人檔案圖片或保持匿名。所有學生都可以看到您的姓名和個人檔案圖片。提及也已停用。
   when_creating_a_reply_students_will_have_the_optio_716eb2f4: 建立回覆時，學生將可以選擇顯示他們的姓名和個人檔案圖片或保持匿名。所有學生都可以看到您的姓名和個人檔案圖片。
+  when_creating_a_reply_you_will_have_the_option_to__3fb91c13: 建立回覆時，您將可以選擇對其他學生顯示您的姓名和個人檔案圖片或保持匿名。提及也已停用。
   when_creating_a_reply_you_will_have_the_option_to__8607ac10: 建立回覆時，您將可以選擇對其他學生顯示您的姓名和個人檔案圖片或保持匿名。
   when_disabled_new_or_updated_contextexternaltool_i_27e19300: |-
       停用後，如果設定中沒有提供 icon_url 或
@@ -31996,6 +32057,21 @@ zh-Hant:
       進行排序和篩選。
   when_enabled_an_lti_tool_with_the_assignment_edit__cd60b1a0: "啟用後，將在「通告」頁面上啟動有 assignment_edit 放置位置的 LTI 工具。"
   when_enabled_collect_internal_analytics_metrics_us_88e81ee5: 啟用時，使用分配的系統收集內部分析工具指標。
+  when_enabled_for_a_child_account_of_a_non_centrall_8b126bc0: |-
+      啟用於非集中管理的協作組時，
+      來自協作組父項的開發人員金鑰狀態和權杖將不會
+      由協作組子項的子帳戶繼承。停用後，將遵照舊版的
+      （不一致）行為。此標記僅適用於協作組
+      _child_帳戶。此標記不會以
+      任何方式影響集中管理的協作組。
+  when_enabled_for_the_parent_account_of_a_non_centr_4d7adbaa: |-
+      啟用於非集中管理協作組的父帳戶時，
+      開啟/關閉父帳戶中的開發人員金鑰不會影響
+      子帳戶的工具安裝。停用後，開啟/關閉
+      非集中管理協作組的父帳戶中的 SiteAdmin 繼承的開發人員金鑰
+      將影響（刪除/還原）子
+      帳戶中的工具（舊行為）。此標記僅適用於協作組_parent_
+      帳戶。此標記不會以任何方式影響集中管理的協作組。
   when_enabled_global_javascript_and_css_files_can_b_ea21d216: "經許可后, 全局JavaScript 和CSS文檔可以上傳到 *%{t_theme_editor}*。"
   when_enabled_it_deprecates_the_short_message_servi_18c6ee3f: "啟用後，其棄用簡訊服務 (SMS)。"
   when_enabled_lti_1_1_speedgrader_launches_will_set_47dcded1: |-
@@ -32019,6 +32095,9 @@ zh-Hant:
       啟用後，將所有 LTI 啟動的資料傳送到PandataEvents系統
       以進行查詢和視覺化。
   when_enabled_site_admin_account_ui_will_allow_asso_9d04a1d8: "啟用後，網站管理員帳戶 UI 將允許關聯使用者和 DeveloperKey，以及使用有 client_credentials 授予類型的金鑰/使用者"
+  when_enabled_submission_type_selection_placement_u_412d226e: |-
+      啟用後，Submission_type_selection 配置使用將
+      受到允許清單的限制。
   when_enabled_teachers_can_choose_to_allow_observer_320b555e: |-
       啟用後，在行事曆中建立預約見面群組時，
       教師可以選擇允許觀察者安排預約見面。
@@ -32027,6 +32106,8 @@ zh-Hant:
       都會在其 ID 後面附加一個隨機數字。停用後，每
       一個都有相同的 tool_form 的 ID。
   when_enabled_the_internal_access_manager_will_be_u_bc470109: 啟用後，內部存取管理員將使用於存取特定請求
+  when_enabled_the_lti_extensions_discover_page_will_8bb57ff6: "啟用後，「LTI 副檔名發現」頁面將可在「副檔名」視圖中使用。"
+  when_enabled_the_lti_extensions_page_will_be_avail_ac8ed3fa: "啟用後，「LTI 副檔名」頁面將可在「帳戶導覽」中使用。"
   when_enabled_this_flag_displays_a_word_count_in_th_a75163d6: |-
       啟用時，此標記在基於
       文字的 SpeedGrader 中顯示字數。
@@ -32051,6 +32132,7 @@ zh-Hant:
       開發人員金鑰安裝的工具。這可以防止出現多個開發人員
       金鑰共用同一個網域的邊緣情況，並且將首先比對來自錯誤開發人員金鑰的工具。
   when_posting_grades_for_anonymous_assignments_grad_b13f3ae6: 公佈匿名作業的成績時，成績將對課程中的每個人公佈。匿名將會移除。
+  when_posting_grades_for_this_anonymous_assignment__1c64fadf: 公佈匿名作業的成績時，將對被分配到此項目的每個人公佈成績。匿名將會移除。
   when_scope_enforcement_is_disabled_tokens_have_acc_6939182f: 當禁用範圍執行時，許可證可以訪問授權使用者可用的所有端點。
   when_selected_the_course_is_in_a_read_only_state_o_5aaeb0d: 選取後，課程在這些日期以外的時間會變為唯讀狀態。
   when_selected_the_course_is_inaccessible_outside_c_af595406: 選取後，課程在這些日期以外的時間會變為不可訪問。如果課程日期為空白，將套用這些開始及結束日期至學期日期。
