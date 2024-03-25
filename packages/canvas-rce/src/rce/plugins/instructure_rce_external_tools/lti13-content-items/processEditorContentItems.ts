@@ -28,6 +28,7 @@ export default function processEditorContentItems(
     data?: {
       content_items?: Lti13ContentItemJson[] | null
       ltiEndpoint?: string | null
+      replaceEditorContents?: boolean | null
     }
   },
   env: ExternalToolsEnv,
@@ -52,7 +53,11 @@ export default function processEditorContentItems(
       })
 
       if (parsedItem != null) {
-        env.insertCode(parsedItem.toHtmlString())
+        if (event.data?.replaceEditorContents) {
+          env.replaceCode(parsedItem.toHtmlString())
+        } else {
+          env.insertCode(parsedItem.toHtmlString())
+        }
       } else if (!unsupportedItemWarningShown) {
         showFlashAlert({
           message: formatMessage(

@@ -444,6 +444,12 @@ class RCEWrapper extends React.Component {
     this.contentInserted(element)
   }
 
+  replaceCode(code) {
+    if (code !== "" && window.confirm(formatMessage('Content in the editor will be changed. Press Cancel to keep the original content.'))) {
+      this.mceInstance().setContent(code);
+    }
+  }
+
   insertEmbedCode(code) {
     const editor = this.mceInstance()
 
