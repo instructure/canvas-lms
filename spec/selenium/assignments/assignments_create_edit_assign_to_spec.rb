@@ -191,6 +191,45 @@ shared_examples_for "item assign to tray during assignment creation/update" do
 
     expect(AssignmentCreateEditPage.pending_changes_pill_exists?).to be_truthy
   end
+
+  context "Module overrides" do
+    before do
+      @context_module = @course.context_modules.create! name: "Mod"
+      new_override = @context_module.assignment_overrides.build
+      new_override.course_section = @course.course_sections.first
+      new_override.save!
+      assignment = Assignment.create!(context: @course, title: "Assignment")
+      @context_module.add_item(type: "assignment", id: assignment.id)
+      AssignmentCreateEditPage.visit_assignment_edit_page(@course.id, assignment.id)
+    end
+
+    it "shows module cards if they are not overridden" do
+      AssignmentCreateEditPage.click_manage_assign_to_button
+
+      wait_for_assign_to_tray_spinner
+      keep_trying_until { expect(item_tray_exists?).to be_truthy }
+      expect(inherited_from.last.text).to eq("Inherited from #{@context_module.name}")
+    end
+
+    it "does not show the inherited module override if there is an assignment override" do
+      AssignmentCreateEditPage.click_manage_assign_to_button
+
+      wait_for_assign_to_tray_spinner
+      keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+      update_due_date(0, "12/31/2022")
+      update_due_time(0, "5:00 PM")
+
+      click_save_button("Apply")
+
+      keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
+      AssignmentCreateEditPage.click_manage_assign_to_button
+
+      wait_for_assign_to_tray_spinner
+      keep_trying_until { expect(item_tray_exists?).to be_truthy }
+      expect(module_item_assign_to_card.last).not_to contain_css(inherited_from_selector)
+    end
+  end
 end
 
 describe "assignments show page assign to", :ignore_js_errors do

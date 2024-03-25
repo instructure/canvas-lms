@@ -411,6 +411,7 @@ export default function ItemAssignToTray({
             ...card,
             selectedAssigneeIds,
             highlightCard: !areEquals,
+            isEdited: !areEquals,
             hasAssignees: assignees.length > 0,
           }
         : card
@@ -487,7 +488,7 @@ export default function ItemAssignToTray({
       const currentCard = {...currentCardProps, [dateAttribute]: newDate}
       const areEquals = JSON.stringify(initialCard) === JSON.stringify(currentCard)
 
-      const newCard = {...currentCard, highlightCard: !areEquals, isEdited: true}
+      const newCard = {...currentCard, highlightCard: !areEquals, isEdited: !areEquals}
       const cards = assignToCards.map(card => (card.key === cardId ? newCard : card))
       setAssignToCards(cards)
       onDatesChange?.(cardId, dateAttribute, newDate ?? '')
