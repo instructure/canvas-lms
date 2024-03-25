@@ -22,7 +22,7 @@
 @import "components/rubric";
 @import "components/emoji";
 
-body {
+body.is-inside-submission-frame {
   background-color: #f5f5f5;
 }
 
