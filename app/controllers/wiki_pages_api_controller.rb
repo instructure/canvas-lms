@@ -477,7 +477,14 @@ class WikiPagesApiController < ApplicationController
                         else
                           true
                         end
-      render :json => wiki_page_revision_json(revision, @current_user, session, include_content, @page.current_version)
+
+      begin
+        current_version = @page.current_version
+      rescue NoMethodError
+        current_version = nil
+      end
+
+      render :json => wiki_page_revision_json(revision, @current_user, session, include_content, current_version)
     end
   end
 
