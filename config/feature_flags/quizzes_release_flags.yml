@@ -75,3 +75,8 @@ new_quizzes_subaccount_sharing_permission:
   display_name: New Quizzes Subaccount Sharing Permission
   description: Allow the "Item Banks - share with subaccounts" permission
   applies_to: SiteAdmin
+common_cartridge_qti_new_quizzes_import:
+  state: hidden
+  display_name: Common Cartridge QTI New Quizzes Import
+  description: If enabled, users will be able to import a Common Cartridge with New Quizzes in QTI format, users will be able to select the option to import existing quizzes as New Quizzes or import as the current quiz type.
+  applies_to: SiteAdmin
