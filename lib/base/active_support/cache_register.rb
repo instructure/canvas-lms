@@ -63,14 +63,15 @@ module ActiveSupport
         private
 
         def fetch_with_cache_register(name, batch_object, batched_keys, **options, &)
+          base_obj_key = batch_object.class.base_cache_register_key_for(batch_object)
+
+          return yield unless base_obj_key
+
           options = merged_options(options)
-          key = normalize_key(name, options)
-          key += "/#{batch_object.model_name.cache_key}/#{batch_object.id}"
+          key = "#{normalize_key(name, options)}/{#{base_obj_key}}"
 
           entry = nil
           frd_key = nil
-          base_obj_key = batch_object.class.base_cache_register_key_for(batch_object)
-          return yield unless base_obj_key
 
           redis = Canvas::CacheRegister.redis(base_obj_key, batch_object.shard)
 
