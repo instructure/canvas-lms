@@ -483,7 +483,7 @@ class WikiPagesApiController < ApplicationController
         return and render :json => { :message => 'No revisions found' }, :status => :not_found
       end
 
-      render :json => wiki_page_revision_json(revision, @current_user, session, include_content, current_version)
+      render :json => wiki_page_revision_json(revision, @current_user, session, include_content, @page.current_version)
     end
   end
 
