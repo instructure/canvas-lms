@@ -28,10 +28,21 @@ import {IconEditLine} from '@instructure/ui-icons'
 import _ from 'underscore'
 import {forEach, map} from 'lodash'
 import TokenActions from './TokenActions'
-import { sortedRowKeys, getAllOverrides, datesFromOverride, areCardsEqual, resetOverrides, cloneObject, getParsedOverrides, resetStagedCards } from '../util/overridesUtils'
 import { string, func, array, number, oneOfType, bool } from 'prop-types'
 import {uid} from '@instructure/uid'
 import {Pill} from '@instructure/ui-pill'
+import {
+  sortedRowKeys,
+  getAllOverrides,
+  datesFromOverride,
+  areCardsEqual,
+  resetOverrides,
+  cloneObject,
+  getParsedOverrides,
+  resetStagedCards,
+  removeOverriddenAssignees,
+  processModuleOverrides,
+} from "../util/overridesUtils";
 
 const I18n = useI18nScope('DueDateOverrideView')
 
@@ -68,11 +79,11 @@ const DifferentiatedModulesSection = ({
     if(stagedOverrides === null) return
 
     const parsedOverrides = getParsedOverrides(stagedOverrides, stagedCards)
-
-    setStagedCards(parsedOverrides)
+    const uniqueOverrides = removeOverriddenAssignees(overrides, parsedOverrides)
+    setStagedCards(uniqueOverrides)
     if(initialState === null){
-      const state = cloneObject(parsedOverrides);
-      // initialState is set only 1 time to check if the overrides have pending changes
+      const state = cloneObject(uniqueOverrides);
+      // initialState is set only 1 time to check if the overrides have pending changes 
       setInitialState(state)
       // checkPoint is set every time the user applies changes to the overrides
       setCheckPoint(state)
@@ -247,7 +258,7 @@ const DifferentiatedModulesSection = ({
 
   const handleAssigneeDeletion = (cardId, tokenToRemove) => {
     const row = stagedCards[cardId]
-    const tmpOverrides = stagedOverrides.filter(({attributes}) => attributes.rowKey !== cardId)
+    const tmpOverrides = getAllOverrides(stagedCards).filter(({attributes}) => attributes.rowKey !== cardId)
     let newCardOverrides = TokenActions.handleTokenRemove(tokenToRemove, row?.overrides ?? {})
     if (newCardOverrides.length === 0) {
       const emptyRow = TokenActions.handleTokenAdd({}, newCardOverrides, cardId, row.dates)[0]
@@ -263,6 +274,9 @@ const DifferentiatedModulesSection = ({
     const newOverrides = getAllOverrides(stagedCards).filter(
       row => row.attributes.course_section_id || row.attributes.student_ids || row.attributes.noop_id
     )
+    const withoutModuleOverrides = processModuleOverrides(newOverrides, checkPoint)
+    resetOverrides(newOverrides, withoutModuleOverrides)
+
     setStagedOverrides(newOverrides)
     setPreSavedOverrides(cloneObject(newOverrides))
     setCheckPoint(cloneObject(stagedCards))

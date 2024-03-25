@@ -18,6 +18,7 @@
 
 import _ from 'underscore'
 import {map} from 'lodash'
+import {getOverriddenAssignees} from '@canvas/context-modules/differentiated-modules/utils/assignToHelper'
 
 export const cloneObject = object => JSON.parse(JSON.stringify(object))
 
@@ -113,7 +114,7 @@ export const areCardsEqual = (preSavedCard, currentCard) => {
 export const resetOverrides = (overrides, newState) => {
   newState.forEach(({assignment_override}) => {
     const override = overrides.find(
-      ({attributes}) => attributes.rowKey === assignment_override.rowKey
+      ({attributes}) => attributes.stagedOverrideId === assignment_override.stagedOverrideId
     )
     if (override) {
       for (const [key, value] of Object.entries(assignment_override)) {
@@ -158,4 +159,65 @@ export const getParsedOverrides = (stagedOverrides, cards) => {
     .object()
     .value()
   return parsedOverrides
+}
+
+export const removeOverriddenAssignees = (overrides, parsedOverrides) => {
+  const parsed = overrides.map(o => o.attributes)
+  const overriddenTargets = getOverriddenAssignees(parsed)
+  for (const [key, value] of Object.entries(parsedOverrides)) {
+    value.overrides.forEach(({attributes}) => {
+      if (attributes?.context_module_id && attributes?.student_ids) {
+        let filteredStudents = attributes?.student_ids
+        filteredStudents = filteredStudents?.filter(
+          id => !overriddenTargets?.students?.includes(id)
+        )
+        if (attributes?.student_ids?.length > 0 && filteredStudents?.length === 0) {
+          delete parsedOverrides[key]
+        }
+      }
+      if (
+        attributes?.context_module_id &&
+        attributes?.course_section_id &&
+        overriddenTargets?.sections?.includes(attributes?.course_section_id)
+      ) {
+        delete parsedOverrides[key]
+      }
+    })
+  }
+  return parsedOverrides
+}
+
+export const processModuleOverrides = (overrides, lastCheckpoint) => {
+  const withoutModuleOverrides = overrides.map(o => {
+    if (o.attributes.context_module_id) {
+      const checkpointOverrides = lastCheckpoint[o.attributes.rowKey]?.overrides
+      const lastOverrideState = checkpointOverrides?.find(
+        ({assignment_override}) =>
+          assignment_override.stagedOverrideId === o.attributes.stagedOverrideId
+      )?.assignment_override
+      const {persisted, id, context_module_id, context_module_name, ...previousAttributes} =
+        lastOverrideState
+      const {
+        persisted: _p,
+        id: id_,
+        context_module_id: cId,
+        context_module_name: cName,
+        ...currentAttributes
+      } = o.attributes
+      const hasChanges = JSON.stringify(previousAttributes) !== JSON.stringify(currentAttributes)
+      return {
+        assignment_override: hasChanges
+          ? {
+              ...o.attributes,
+              context_module_id: undefined,
+              context_module_name: undefined,
+              id: undefined,
+            }
+          : o.attributes,
+      }
+    }
+    return {assignment_override: o.attributes}
+  })
+
+  return withoutModuleOverrides
 }
