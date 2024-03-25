@@ -46,6 +46,8 @@ const SUBMISSION_QUERY = gql`
           wordCount
           late
           submissionStatus
+          customGradeStatus
+          excused
           commentsConnection {
             nodes {
               id
