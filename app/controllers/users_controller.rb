@@ -279,6 +279,7 @@ class UsersController < ApplicationController
     end
     grade_data[:restrict_quantitative_data] = enrollment.course.restrict_quantitative_data?(@current_user)
     grade_data[:grading_scheme] = enrollment.course.grading_standard_or_default.data
+    grade_data[:points_based_grading_scheme] = enrollment.course.grading_standard_or_default.points_based?
 
     render json: grade_data
   end

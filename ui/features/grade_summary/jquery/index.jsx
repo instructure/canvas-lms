@@ -474,7 +474,12 @@ function calculateTotals(calculatedGrades, currentOrFinal, groupWeightingScheme)
       : calculatePercentGrade(finalScore, finalPossible)
 
     const grading_scheme = ENV.course_active_grading_scheme?.data
-    const letterGrade = scoreToLetterGrade(scoreToUse, grading_scheme) || I18n.t('N/A')
+    const letterGrade =
+      scoreToLetterGrade(
+        scoreToUse,
+        grading_scheme,
+        ENV.course_active_grading_scheme?.points_based
+      ) || I18n.t('N/A')
 
     $('.final_grade .letter_grade').text(GradeFormatHelper.replaceDashWithMinus(letterGrade))
   }

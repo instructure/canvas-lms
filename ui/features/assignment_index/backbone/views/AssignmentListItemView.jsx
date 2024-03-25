@@ -797,13 +797,14 @@ export default AssignmentListItemView = (function () {
           if (json.pointsPossible === 0 && json.submission.score < 0) {
             grade = json.submission.score
           } else if (json.pointsPossible === 0 && json.submission.score > 0) {
-            grade = scoreToGrade(100, ENV.grading_scheme)
+            grade = scoreToGrade(100, ENV.grading_scheme, ENV.points_based)
           } else if (json.pointsPossible === 0 && json.submission.score === 0) {
             grade = 'complete'
           } else {
             grade = scoreToGrade(
               scoreToPercentage(json.submission.score, json.pointsPossible),
-              ENV.grading_scheme
+              ENV.grading_scheme,
+              ENV.points_based
             )
           }
         }

@@ -45,6 +45,7 @@ export const GradesPage = ({
   outcomeProficiency,
   observedUserId,
   gradingScheme,
+  pointsBasedGradingScheme,
   restrictQuantitativeData,
 }) => {
   const [loadingGradingPeriods, setLoadingGradingPeriods] = useState(true)
@@ -119,6 +120,7 @@ export const GradesPage = ({
         userIsCourseAdmin={userIsCourseAdmin}
         observedUserId={observedUserId}
         gradingScheme={gradingScheme}
+        pointsBasedGradingScheme={pointsBasedGradingScheme}
         restrictQuantitativeData={restrictQuantitativeData}
       />
     </>
@@ -188,6 +190,7 @@ GradesPage.propTypes = {
   outcomeProficiency: outcomeProficiencyShape,
   observedUserId: PropTypes.string,
   gradingScheme: PropTypes.array,
+  pointsBasedGradingScheme: PropTypes.bool,
   restrictQuantitativeData: PropTypes.bool,
 }
 

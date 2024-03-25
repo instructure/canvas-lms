@@ -109,6 +109,7 @@ export default ({
       score: ENV.restrict_quantitative_data && submission.score != null ? submission.score : null,
       restrict_quantitative_data: ENV.restrict_quantitative_data,
       grading_scheme: ENV.grading_scheme,
+      points_based_grading_scheme: ENV.points_based,
     })
 
     return (

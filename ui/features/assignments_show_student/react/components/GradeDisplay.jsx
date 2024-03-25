@@ -96,6 +96,7 @@ export default function PointsDisplay(props) {
       formatType: 'points_out_of_fraction',
       restrict_quantitative_data: ENV.restrict_quantitative_data,
       grading_scheme: ENV.grading_scheme,
+      points_based_grading_scheme: ENV.points_based,
     })
 
     if (

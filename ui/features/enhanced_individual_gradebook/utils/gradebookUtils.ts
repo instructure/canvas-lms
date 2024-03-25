@@ -406,14 +406,15 @@ export function scoreToScaledPoints(score: number, pointsPossible: number, scali
 export function getLetterGrade(
   possible?: number,
   score?: number,
-  gradingStadards?: GradingStandard[] | null
+  gradingStandards?: GradingStandard[] | null,
+  pointsBased?: boolean
 ) {
-  if (!gradingStadards || !gradingStadards.length || !possible || !score) {
+  if (!gradingStandards || !gradingStandards.length || !possible || !score) {
     return '-'
   }
   const rawPercentage = scoreToPercentage(score, possible)
   const percentage = parseFloat(Number(rawPercentage).toPrecision(4))
-  return scoreToGrade(percentage, gradingStadards)
+  return scoreToGrade(percentage, gradingStandards, pointsBased)
 }
 
 type CalculateGradesForUserProps = {
