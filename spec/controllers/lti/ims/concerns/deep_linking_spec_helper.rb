@@ -33,8 +33,8 @@ RSpec.shared_context "deep_linking_spec_helper" do
   let(:jti) { SecureRandom.uuid }
   let(:log) { "log" }
   let(:errorlog) { "error log" }
-  let(:deep_linking_jwt) do
-    body = {
+  let(:deep_linking_jwt_body) do
+    {
       "iss" => iss,
       "aud" => aud,
       "iat" => iat,
@@ -48,12 +48,17 @@ RSpec.shared_context "deep_linking_spec_helper" do
       "https://purl.imsglobal.org/spec/lti-dl/claim/msg" => msg,
       "https://purl.imsglobal.org/spec/lti-dl/claim/errormsg" => errormsg,
       "https://purl.imsglobal.org/spec/lti-dl/claim/log" => log,
-      "https://purl.imsglobal.org/spec/lti-dl/claim/errorlog" => errorlog
-    }
+      "https://purl.imsglobal.org/spec/lti-dl/claim/errorlog" => errorlog,
+      "https://canvas.instructure.com/lti/replace_editor_contents" => replace_editor_contents
+    }.compact
+  end
+  let(:deep_linking_jwt) do
+    body = deep_linking_jwt_body
     JSON::JWT.new(body).sign(private_jwk, alg).to_s
   end
+  let(:developer_key_scopes) { [] }
   let(:developer_key) do
-    key = DeveloperKey.new(account:)
+    key = DeveloperKey.new(account:, scopes: developer_key_scopes)
     key.generate_rsa_keypair!
     key.save!
     key.developer_key_account_bindings.first.update!(
@@ -63,4 +68,5 @@ RSpec.shared_context "deep_linking_spec_helper" do
   end
   let(:public_jwk) { JSON::JWK.new(developer_key.public_jwk) }
   let(:private_jwk) { JSON::JWK.new(developer_key.private_jwk) }
+  let(:replace_editor_contents) { nil }
 end
