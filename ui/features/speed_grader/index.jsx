@@ -30,6 +30,8 @@ import {getSubmission} from './queries/submissionQuery'
 import {getSubmissionsByAssignment} from './queries/submissionsByAssignmentQuery'
 import {updateSubmissionGrade} from './mutations/updateSubmissionGradeMutation'
 import {createSubmissionComment} from './mutations/createSubmissionCommentMutation'
+import GenericErrorPage from '@canvas/generic-error-page'
+import errorShipUrl from '@canvas/images/ErrorShip.svg'
 
 const I18n = useI18nScope('speed_grader')
 
@@ -64,8 +66,16 @@ ready(() => {
       })
       .catch(error => {
         // eslint-disable-next-line no-console
-        console.error('Failed to load speedgrader', error)
+        console.error('Failed to load SpeedGrader', error)
         captureException(error)
+        ReactDOM.render(
+          <GenericErrorPage
+            imageUrl={errorShipUrl}
+            errorSubject={I18n.t('SpeedGrader loading error')}
+            errorCategory={I18n.t('SpeedGrader Error Page')}
+          />,
+          mountPoint
+        )
       })
   } else {
     const mountPoint = document.getElementById('speed_grader_loading')
