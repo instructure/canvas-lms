@@ -3672,7 +3672,7 @@ nn:
   assign_access_ecd4227b: "Tildel tilgang"
   assign_eedf72bb: Tilordne
   assign_manually_1785dcfc: "Tildel manuelt"
-  assign_module_to_individuals_or_sections_bd638c03: "Tildel modul til enkeltpersoner eller seksjoner."
+  assign_module_to_individuals_or_sections_bd638c03: "Tildel modul til enkeltpersonar eller seksjonar."
   assign_reviews_on_date_7e48ec50: "Tilordne gjennomgangar etter dato"
   assign_temporary_enrollments_bdaaa58a: "Tildel midlertidige påmeldingar"
   assign_temporary_enrollments_to_recipient_b25cb6be: "Tildel midlertidige påmeldingar til %{recipient}"
@@ -3686,7 +3686,7 @@ nn:
   assigned_pace_e954962a: "Tildelt Emneframdrift"
   assigned_permissions_6f6fecb6: "Tilordna løyve"
   assigned_roles_ace6c950: "Tilordna roller"
-  assigning_members_to_the_new_groups_2f731e80: "å tildele medlemmer til de nye gruppene"
+  assigning_members_to_the_new_groups_2f731e80: "å tildele medlemmer til dei nye gruppene"
   assigning_students_to_groups_35b1532a: "Å tildele studentar til grupper"
   assignment: 
     assignment_group_must_have_group: "Vel ei oppgåvegruppe for denne oppgåva"
@@ -4699,13 +4699,13 @@ nn:
   authorize_url_f28167a3: "Godkjenn URL"
   auto_leader_7791c30a: auto_leader
   auto_show_closed_captions_e4cd7aff: "Vis undertekstar automatisk"
-  auto_subscribe_a7da0dff: "Auto abonner"
+  auto_subscribe_a7da0dff: "Abonner automatisk"
   autodetect_field_separators_in_compatible_spreadsh_768067e1: "Autogjenkjenn feltskilje i kompatible reknearkeksportar"
   autodetect_field_separators_in_gradebook_exports_ed9a9d77: "Autogjenkjenn feltskilje ved eksport av vurderingsoversikt"
   automatic_mobile_app_login_3724af59: "Automatisk innlogging for Mobil App"
   automatically_apply_deduction_to_late_submissions_2b68166e: "Bruk automatisk resultatutrekning på for seine innleveringar"
   automatically_apply_grade_for_missing_submissions_2b5c1a72: "Bruk automatisk vurdering for manglande innleveringar"
-  automatically_assign_709c6ddb: "Automatisk tildele"
+  automatically_assign_709c6ddb: "Tildel automatisk"
   automatically_assign_a_student_group_leader_29448649: "Oppgi ein student automatisk som gruppeleiar"
   automatically_dff02416: Automatisk
   automatically_disable_post_to_sis_on_assignments_w_dd7e873a: "Automatisk slå av \"Post til SIS\" på oppgåver når vurderingsperioden stenger"
@@ -4826,7 +4826,7 @@ nn:
   bigeasy_locale: nn_NO
   blackboard: 
     no_manifest: "ZIP-fil for Blackboard har inga imsmanifest.xml-fil i rotkatalogen."
-  blackout_date_5fc44c2b: Blackout-datoar
+  blackout_date_5fc44c2b: "Blokkerte datoar"
   blackout_dates_4a140a72: Blackout-datoar
   blank_38df4238: tom
   blocked_30d0fb62: Blokkert
@@ -4889,7 +4889,7 @@ nn:
   blueprint_courses_must_be_enabled_for_an_account_b_edd8f7d3: "Blåkopiemner må være aktivert for ein konto av ein administrator."
   blueprint_courses_must_be_enabled_for_an_account_b_ffb3ac4b: "Blueprint-emne må aktiverast på kontonivå av ein administrator. Emneroller kan kun administrere innhald i Blueprint-emne dersom dei er lagde til eit Blueprint-emne som faglærar, undervisingsassistent eller designar."
   blueprint_information_95dcef55: Blueprint-informasjon
-  blueprint_locking_is_only_available_for_published__c8c97e3f: "Låsing for Blåkopi er berre tilgjengeleg for publiserte Emneframdrift."
+  blueprint_locking_is_only_available_for_published__c8c97e3f: "Låsing for Blåkopi er berre tilgjengeleg for publiserte Emneframdrifter."
   blueprint_locking_is_only_available_for_the_course_68ec4266: "Låsing for Blåkopi er berre tilgjengeleg for framdriftsplanar på emnenivå."
   blueprint_settings_233e909a: Blueprint-innstillingar
   blueprint_sync_90d0dfd5: "Synkronisering av Blueprint"
@@ -5460,14 +5460,14 @@ nn:
     ics_title: "%{course_or_group_name}-kalender i Canvas"
     invalid_date_or_time: "Ugyldig dato eller ugyldig dato/klokkeslett for %{attr}"
   calendar_frequency_picker: 
-    custom: Tilpasset...
+    custom: Tilpassa...
     daily: Dagleg
     first: Først
     fourth: fjerde
     frequency: Frekvens
     last: siste
     not_repeat: "Gjentek ikkje"
-    second: sekund
+    second: andre
     third: tredje
   calendar_removed_1c841af4: "Kalender fjerna"
   calendar_series_e1b7a4bc: Kalenderserie
@@ -5848,8 +5848,8 @@ nn:
   clear_all_da755751: "Fjern alt"
   clear_all_e23811b1: "Fjern alle"
   clear_all_filters_9c7e870: "Fjern alle filtre"
-  clear_assign_to_d5fc178f: "Tildel tilbake"
-  clear_search_900e9c97: "Fjern søk"
+  clear_assign_to_d5fc178f: "Fjern tilordne til"
+  clear_search_900e9c97: "Tøm søk"
   clear_search_field_75f595c7: "Tøm søkefeltet"
   clear_selected_file_82388e50: "Fjern vald fil"
   clear_user_cache_ef079f7f: "Tøm brukarcache"
@@ -8977,7 +8977,7 @@ nn:
   define_general_settings_for_locked_objects_in_this_20da2981: "Definer generelle innstillingar for låste element i dette emnet. "
   define_settings_by_type_for_locked_objects_in_this_676197bf: "Definer innstillingar etter type for låste element i dette emnet."
   define_text_to_go_before_and_after_the_dropdown_an_be8d16e2: "Skriv inn teksta som skal stå før og etter rullegardinmenyen og set saman ei samling moglege svar."
-  delay_posting_f45eed7d: "Publiser seinare"
+  delay_posting_f45eed7d: "Utset publisering"
   delay_posting_this_topic_until_aa483eec: "Utsett å poste dette emnet til"
   delayed_until_58b7af4b: "Utsett til:"
   delete_8d6d2222: "Slett:"
@@ -9187,7 +9187,7 @@ nn:
   description_436c48d7: Skildring
   description_61f4296: "* Skildring"
   description_for_mastery_level_position_description_cc17114b: "Skildring av ekspertisenivå %{position}: %{description}"
-  description_must_be_less_than_2500_characters_1ee7c522: "Beskrivelsa må vere mindre enn 2500 teikn."
+  description_must_be_less_than_2500_characters_1ee7c522: "Beskrivinga må vere mindre enn 2500 teikn."
   descriptivename_was_changed_from_formattedoldvalue_47623537: "%{descriptiveName} vart endra frå %{formattedOldValue} til %{formattedNewValue}."
   descriptivename_was_set_to_formattednewvalue_cd78b357: "%{descriptiveName} vart satt til %{formattedNewValue}."
   descriptivename_was_turned_off_38771a19: "%{descriptiveName} vart skrudd av."
@@ -24841,7 +24841,7 @@ nn:
   there_was_an_error_saving_the_custom_grade_status_f184a28c: "Det oppstod ein feil ved lagring av den tilpassa vurderingsstatusen."
   there_was_an_error_saving_the_note_please_try_agai_f2f2cd38: "Det oppstod ein feil under lagring av merknaden. Prøv på nytt seinare."
   there_was_an_error_saving_the_rubric_4d62fe89: "Det oppstod ein feil ved lagring av vurderingsskjemaet."
-  there_was_an_error_saving_your_blackout_dates_1efee334: "Det oppstod ein feil ved lagring av dine utelukka datoar."
+  there_was_an_error_saving_your_blackout_dates_1efee334: "Det oppstod ein feil ved lagring av dine blokkerte datoar."
   there_was_an_error_saving_your_changes_bfaf3d79: "Det opptstod ein feil då endringane dine skulle lagrast."
   there_was_an_error_sending_the_message_791127d9: "Det oppstod ein feil ved sending av meldingen."
   there_was_an_error_setting_usage_rights_53739e1d: "Det oppstod ein feil under fastsetjinga av bruksrettar."
@@ -24946,7 +24946,7 @@ nn:
   this_date_is_invalid_ae413346: "Denne datoen er ugyldig."
   this_due_date_is_managed_by_cfbb698c: "Denne forfallsdatoen blir administrert av"
   this_due_date_is_managed_by_course_pacing_d9f9ce1d: "Denne forfallsdatoen blir administrert av Emnegjennomføring."
-  this_duration_does_not_take_into_account_weekends__19209a71: "Denne varigheita tar ikkje hensyn til helgar og svartelista dagar."
+  this_duration_does_not_take_into_account_weekends__19209a71: "Denne varigheita tar ikkje hensyn til helger og blokkerte dagar."
   this_element_is_a_more_accessible_alternative_to_d_e17b4e51: "Dette elementet er ei meir tilgjengeleg løysing for omorganisering enn å dra og sleppe. Trykk Enter eller Mellomromtasten for å flytte dette spørsmålet. "
   this_email_address_is_unconfirmed_f0fc8c6e: "E-postadressa er ikkje stadfesta"
   this_enables_an_updated_navigation_new_dashboard_a_8bd4cae: "Dette mogleggjer ein oppdatert navigasjon, nytt dashbord og eit enklare, meir moderne uttrykk."

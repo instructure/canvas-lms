@@ -420,6 +420,7 @@ nl:
     tab_brand_configs: Thema's
     tab_courses: Cursussen
     tab_developer_keys: Ontwikkelaarssleutels
+    tab_extensions: Extensies
     tab_faculty_journal: Faculteitsnieuws
     tab_grading_standards: Beoordeling
     tab_jobs: Taken
@@ -2606,6 +2607,7 @@ nl:
   all_4321c3a1: Alle(n)
   all_account_types_e83c1516: "Alle account types"
   all_accounts_3bafc860: "Alle accounts"
+  all_assignees_removed_14639499: "Alle ontvangers zijn verwijderd"
   all_assignment_groups_a65e9e46: "Alle opdrachtgroepen"
   all_assignments_b79a4d6a: "Alle opdrachten"
   all_changes_published_27a53ffd: "Alle gepubliceerde wijzigingen"
@@ -6457,11 +6459,14 @@ nl:
   cas_server_rejected_ticket_message_code_a6ef4093: "Geweigerde ticket voor CAS-server: %{message} (%{code})"
   cas_url_4ba2843e: CAS-URL
   catalan_16f6b78f: Catalaans
+  catalog_account_not_found_c786ce35: "Catalogus-account niet gevonden"
+  catalog_account_to_copy_fa180ff4: "Te kopiëren Catalogus-account"
   catalog_already_enabled_56478a3c: "Catalogus al in gebruik"
   catalog_manage_f57e50f3: "Catalogus - beheren"
   catalog_name_46d37909: Catalogusnaam
   catalog_url_a01655dd: "Catalogus URL"
   catalog_users_already_exist_2894b8c4: "Catalogusgebruikers bestaan al"
+  catalog_was_copied_over_successfully_but_there_was_73889dd1: "Catalogus is gekopieerd, maar er is een probleem met het synchroniseren van de inschrijvingen vanuit Canvas"
   catalog_was_provisioned_9851448f: "Catalogus was ingericht."
   catalog_was_unprovisioned_9524cb58: "Inrichting catalogus was ongedaan gemaakt."
   catalog_was_updated_743a58eb: "Catalogus was bijgewerkt."
@@ -7324,6 +7329,7 @@ nl:
   confirmation_failed_please_try_again_ae566d37: "Bevestiging is mislukt, probeer het opnieuw."
   confused_panda_questioning_what_to_do_next_42941484: "Verwarde Panda die zich afvraagt wat er nu moet worden gedaan"
   consider_selecting_multiple_submission_types_to_ac_f7e624d5: "Overweeg selecteren van meerdere inleveringstypen voor opnemen van cursisten die mogelijk geen aantekeningen kunnen maken."
+  consistent_inheritance_logic_for_developer_keys_in_167f9061: "Consistente overnamelogica voor ontwikkelaarssleutels in niet-CMC-consortia"
   consistent_lti_ags_ids_based_on_account_s_principa_b93fa45: "Consistente LTI AGS-ID's gebaseerd op het hoofddomein van het account"
   consortium_parent_keys_803547b: "Consortium bovenliggende sleutels"
   consumer_key_57d9fcf1: "Sleutel voor klant"
@@ -8218,6 +8224,7 @@ nl:
   copy_9748f9f: Kopie
   copy_assignment_name_to_another_course_b62d0a54: "Kopieer opdracht %{name} naar een andere cursus"
   copy_blueprint_course_settings_31a97e96: "Instellingen voor blauwdrukcursus kopiëren"
+  copy_content_615608a7: "Inhoud kopiëren"
   copy_list_of_shard_ids_d51cd846: "Lijst met shard-ID's kopiëren"
   copy_operation_started_successfully_b2f236a1: "Het kopiëren is gestart"
   copy_page_to_another_course_405cc07c: "Kopieer pagina naar een andere cursus"
@@ -8232,6 +8239,7 @@ nl:
   copy_to_clipboard_493be1b: "Kopiëren naar klembord"
   copy_to_folder_32ecc3c3: "Kopiëren naar Map"
   copying_628a9607: "Bezig met kopiëren..."
+  copying_the_content_of_a_template_catalog_5bd6f3b0: "De inhoud van een sjabloon-Catalogus kopiëren"
   copyright_and_license_information_must_be_provided_5feffaf: "Auteursrecht- en licentie-informatie moet worden verstrekt voor bestanden voordat ze worden gepubliceerd."
   copyright_holder_386cc8b8: "Houder van auteursrecht"
   copyright_holder_66ee111: "Houder van auteursrecht:"
@@ -9802,6 +9810,7 @@ nl:
   crumbs: 
     access_report: Toegangsrapport
     announcements: Aankondigingen
+    apps: Extensies
     assignments: Opdrachten
     calendar_events: Kalendergebeurtenissen
     collaborations: Samenwerkingen
@@ -10480,6 +10489,9 @@ nl:
   designers_add_fe7e1ea9: "Ontwerpers - Toevoegen"
   designers_remove_39f50ec9: "Ontwerpers - verwijderen"
   designers_remove_3e590bff: "Ontwerpers - Verwijderen"
+  destination_account_is_not_a_root_account_2f890dff: "Bestemmingsaccount is geen hoofdaccount"
+  destination_account_is_not_empty_561f7e55: "Bestemmingsaccount is niet leeg"
+  destination_account_not_found_274f33d4: "Bestemmingsaccount is niet gevonden"
   details_98a31b68: Details
   details_a6f427c3: Details...
   determined_by_course_end_date_5e3ffb4f: "Bepaald door einddatum van cursus"
@@ -10667,6 +10679,8 @@ nl:
   discard_changes_e04b15f9: "Wijzigingen verwijderen"
   discarded_20a4e7e8: Verwijderd
   disccussions_515a3a99: Disccussies
+  discover_56d42b60: Ontdekken
+  discover_something_new_or_manage_existing_lti_exte_793093cb: "Ontdek iets nieuws of beheer bestaande LTI-extensies"
   discovery_service_url_ca13d3f4: "URL detectieservice"
   discovery_url_3dce06d9: Detectie-URL
   discussion_6719c51d: Discussie
@@ -11198,6 +11212,7 @@ nl:
   download_these_results_as_csv_9a890883: "Deze resultaten als CSV downloaden"
   download_this_file_669f9174: "Dit bestand downloaden"
   downloading_course_content_allows_access_to_conten_164d9336: "Het downloaden van cursuscontent maakt offline toegang tot de content mogelijk. Content kan bestanden, pagina's, beoordelingen, gespreksonderwerpen of toetsen inhouden. Klik op 'ePub genereren\" voor elke cursus en open met een eReader software om weer te geven."
+  draft_83493fcd: Concept
   draft_92507c72: (concept)
   draft_comment_b2376ea4: "Concept opmerking"
   draft_comment_warning_modal_in_speedgrader_ded232c1: "Waarschuwingsmodaal voor conceptopmerking in SpeedGrader"
@@ -11613,6 +11628,7 @@ nl:
   enable_gravatar_8a865b41: "Gravatar inschakelen"
   enable_i18n_features_in_outcomes_exports_64bcf82b: "Schakel i18-functies in bij het exporteren van leerdoelen"
   enable_individual_learning_paths_for_students_base_5236d3bb: "Afzonderlijke leertrajecten voor cursisten inschakelen op basis van beoordelingen"
+  enable_irish_language_support_in_canvas_fe7abaf8: "Ondersteuning voor Ierse taal inschakelen in Canvas"
   enable_labels_on_the_new_inbox_page_485ce65a: "Labels inschakelen op de nieuwe Inbox-pagina"
   enable_migrating_item_banks_to_new_quizzes_during__af6ca020: "Inschakelen van migratie van itembanken naar Nieuwe toetsen tijdens importeren/kopiëren van cursussen"
   enable_moderated_grading_bacd20d8: "Schakel gemodereerde beoordeling in."
@@ -12498,6 +12514,7 @@ nl:
   extend_due_date_20651e76: "Vervaldatum verlengen"
   extended_632ebee0: uitgebreid
   extended_9a58dcb6: Uitgebreid
+  extensions_7250a0bb: Extensies
   external_apps_account_course_settings_78de2b2f: "Externe apps (account-, cursusinstellingen)"
   external_apps_account_course_settings_c44af5ef: "Externe apps (Account-/Cursusinstellingen)"
   external_apps_course_settings_1f045644: "Externe apps (Cursusinstellingen)"
@@ -15924,6 +15941,8 @@ nl:
   instructor_is_working_on_grades_135388d2: "Cursusleider werkt aan de cijfers"
   instructor_messages_a4c28674: "Berichten van cursusleider"
   instructor_name_36bc0f39: "Naam van cursusleider"
+  instructor_points_2cd28bd1: Docentpunten
+  instructor_score_6e11587f: Docentscore
   instructor_sis_id_899dd697: "SIS-ID cursusleider"
   instructors_4b491a07: cursusleiders
   instructors_are_not_bound_by_attempt_limits_but_an_20b78fea: "Voor cursusleiders geldt geen maximumaantal pogingen, maar de inlevering van een cursusleider telt WEL als de poging van een cursist."
@@ -16098,6 +16117,7 @@ nl:
   invalid_fields_for_a_group_invalid_f440b733: "Ongeldige velden voor een groep: %{invalid}"
   invalid_fields_for_an_outcome_invalid_fafdf0df: "Ongeldige velden voor een leerdoel: %{invalid}"
   invalid_file_type_881cc9b2: "Ongeldig bestandstype"
+  invalid_filter_d6ec4d0b: "Ongeldig filter"
   invalid_freq_freq_84b0427d: "Ongeldige FREQ '%{freq}'"
   invalid_grade_9726cbc6: "Ongeldig cijfer"
   invalid_grade_passback_setting_a1d209d1: "Ongeldige grade_passback_setting"
@@ -16163,6 +16183,7 @@ nl:
   ireland_353_3cd32cc0: "Ierland (+353)"
   ireland_f7bb9899: Ierland
   irish_567e109f: Iers
+  irish_language_support_e09996c4: "Ondersteuning voor Ierse taal"
   is_blueprint_8f793ba8: is_blueprint
   is_invalid_702840b6: "is ongeldig"
   is_public_ca8561e8: is_public
@@ -16586,6 +16607,7 @@ nl:
   leave_5e852989: Verlaten
   leave_a_comment_7991725b: "Laat een opmerking achter"
   leave_blank_for_no_limit_e8f80808: "Laat leeg voor geen limiet"
+  leave_criterion_comment_707a4f18: "Opmerking bij criterium achterlaten"
   leave_group_group_name_6847c632: "%{group_name} groep verlaten"
   left_group_group_name_aac4e813: "Heeft groep %{group_name} verlaten"
   len_maxlen_97f1c88d: "%{len}/%{maxLen}"
@@ -16706,6 +16728,7 @@ nl:
   like_post_from_author_79b874f1: "Post liken van %{author}"
   like_this_entry_60da41a5: "Deze invoer liken"
   limit_assignment_names_lengths_max_255_5ee9ebb5: "Beperk de lengte van opdrachtnamen (max. 255)"
+  limit_certain_lti_placements_to_authorized_tools_f4384cb6: "Beperk bepaalde LTI-plaatsingen tot gemachtigde tools"
   limit_course_participation_to_term_or_custom_cours_67797a86: "Cursusdeelname beperken tot periodedatums of aangepaste cursusdatums?"
   limit_each_time_slot_to_input_value_user_s_47461538: "Beperk elk tijdblok tot %{input_value} gebruiker(s). "
   limit_each_time_slot_to_num_participants_groups_us_14ec4d65: "Beperk elke tijdsperiode tot %{num_participants} *groepen.* **gebruikers.**"
@@ -16944,6 +16967,7 @@ nl:
   lock_selected_announcements_33740f80: "Geselecteerde aankondigingen vergrendelen"
   lock_this_setting_for_sub_accounts_2ae5af17: "Vergrendel deze instelling voor subaccounts"
   lock_until_549bb904: "Vergrendelen tot"
+  locked_1d1eaa8c: "Vergrendeld: "
   locked_762f138b: Vergrendeld
   locked_796957c7: "Vergrendeld:"
   locked_at_cda02889: "Vergrendeld op"
@@ -17154,6 +17178,8 @@ nl:
   lti_delete_ee5f1bef: "LTI - verwijderen"
   lti_dynamic_registration_8592edb0: "Dynamische LTI-registratie"
   lti_edit_83a27850: "LTI - bewerken"
+  lti_extensions_discover_page_93e4d9e0: "Pagina LTI-extensies ontdekken"
+  lti_extensions_page_4269b418: "Pagina LTI-extensies"
   lti_key_14ad02b1: LTI-sleutel
   lti_keys_5677ba9e: LTI-sleutels
   lti_launch_af082dc3: "LTI starten:"
@@ -17161,6 +17187,9 @@ nl:
   lti_multiple_assignment_deep_linking_b7d641d7: "Diepe links voor LTI meervoudige opdrachten"
   lti_platform_storage_9d11dc60: LTI-platformopslag
   lti_registration_9e0f754d: LTI-registratie
+  lti_registrations: 
+    index: 
+      title: Extensies
   lti_report_2b6193ab: LTI-rapport
   lti_submissions_require_a_url_to_submit_85ca9988: "Voor LTI-inleveringen is een URL vereist om in te leveren"
   lti_tool_report_f13213b3: LTI-toolrapport
@@ -20019,6 +20048,7 @@ nl:
   name_is_locked_click_to_unlock_7aad9928: "%{name} is vergrendeld. Klik om te ontgrendelen"
   name_is_locked_click_to_unlock_bbebf03e: "%{name} is vergrendeld. Klik om te ontgrendelen."
   name_is_ready_to_be_assigned_temporary_enrollments_f39a6cf6: "Aan %{name} kunnen nu tijdelijke inschrijvingen worden toegewezen."
+  name_is_required_4341f774: "Naam is vereist."
   name_is_required_ba379522: "Naam is vereist"
   name_is_too_long_48daa8db: "Naam is te lang"
   name_is_too_long_must_be_under_length_characters_b8dad44c: "Naam is te lang, deze moet minder dan %{length} tekens zijn"
@@ -20382,6 +20412,7 @@ nl:
   no_such_source_context_80a659ba: "geen dergelijke broncontext"
   no_such_target_context_21158b9: "geen dergelijke doelcontext"
   no_such_target_group_7e183d46: "geen dergelijke doelgroep"
+  no_template_accounts_in_this_region_5e84955d: "Geen sjabloonaccounts in deze regio"
   no_template_selected_f59e797: "Geen sjabloon geselecteerd"
   no_temporary_enrollment_click_to_create_one_a6bafdf4: "Geen tijdelijke inschrijving, klik om er een te maken"
   no_terms_eab5ee7b: "Geen voorwaarden"
@@ -22403,6 +22434,7 @@ nl:
   prev_f82cbc48: Vorige
   prev_month_34bd934c: "Vorige maand"
   prevent_deletion_of_outcomes_with_alignments_in_os_65020476: "Voorkom het verwijderen van leerdoelen met afstemmingen in OS"
+  prevent_non_cmc_consortium_parent_dev_key_from_aff_418efa1c: "Voorkomen dat bovenliggende ontwikkelaarssleutel niet-CMC-consortium tools in onderliggende accounts beïnvloedt"
   prevents_students_from_leaving_annotations_in_assi_cb188d2: "Hiermee wordt voorkomen dat cursisten aantekeningen in opdrachten achterlaten. Heeft geen betrekking op door medecursisten beoordeelde opdrachten."
   preview_53003fd2: Voorbeeld
   preview_a3f8f854: VOORBEELD
@@ -22777,8 +22809,10 @@ nl:
       yo: Yo
     you_have_no_services: "Geen geregistreerde diensten, je kunt er enkele toevoegen op de pagina *instellingen*"
   profile_6bd2baed: Profiel
+  profile_has_been_saved_successfully_12ffc6ea: "Profiel is opgeslagen"
   profile_photo_save_failed_too_many_times_e1ebda5: "Opslaan van profielfoto te vaak mislukt"
   profile_pictures_15953851: Profielfoto's
+  profile_save_was_unsuccessful_6e27fb5e: "Profiel kan niet worden opgeslagen"
   profile_tray_bcec5044: Profiel
   profiles: 
     avatar_dialog: 
@@ -24523,6 +24557,7 @@ nl:
       "Handmatig gemaakte cursussen" subaccount te plaatsen, kan deze functie, indien ingeschakeld,
       personen die handmatig cursussen kunnen maken, deze cursussen in elk subaccount
       waar ze inschrijvingen hebben laten plaatsen.
+  rating_button_buttondisplay_8fb69a4e: "Knop Beoordeling %{buttonDisplay}"
   rating_description_db6adf39: "Beschrijving beoordeling"
   rating_display_b0b574be: "Weergave van beoordelingen"
   rating_max_score_eade1523: "Max. score beoordeling"
@@ -25374,6 +25409,7 @@ nl:
       criterion_long_description: "Criterium voor uitgebreide beschrijving"
     unknown_user: "Onbekende gebruiker"
   rubric_assessment_5f0e8a83: Rubriekbeoordeling
+  rubric_assessment_view_mode_1038db: "Modus Rubriekbeoordeling bekijken"
   rubric_association: 
     no_details: "Geen details"
   rubric_button_display_4e4a26fe: "Weergave knop Rubriek"
@@ -25479,6 +25515,7 @@ nl:
   save_11a80ec3: Opslaan
   save_and_customize_19eb7a7b: "Opslaan en aanpassen"
   save_and_publish_1b765e7: "Opslaan en publiceren"
+  save_as_draft_341d4577: "Opslaan als concept"
   save_changes_698abe77: "Wijzigingen opslaan"
   save_criterion_cce60085: "Criterium opslaan"
   save_customizations_dde779d8: "Aanpassingen opslaan"
@@ -25939,6 +25976,7 @@ nl:
   select_a_student_to_view_281d17b9: "Selecteer een cursist om te bekijken"
   select_a_student_to_view_additional_information_he_c371e40c: "Een student selecteren om hier extra informatie weer te geven."
   select_a_student_to_view_the_page_will_refresh_aut_eaa5d00c: "Selecteer een cursist om te bekijken. Deze pagina wordt automatisch vernieuwd."
+  select_a_template_account_e0c03ee8: "Selecteer een sjabloonaccount"
   select_a_type_to_restore_de2c0d04: "Selecteer een type om te herstellen"
   select_access_type_e5955544: "Toegangstype selecteren"
   select_all_assignments_bd07b919: "Alle opdrachten selecteren"
@@ -27370,6 +27408,7 @@ nl:
   snapshots_6e1806b4: Snapshots
   snapshots_are_backups_of_your_canvas_trial_taking__f18bd571: "Snapshots zijn back-ups van je Canvas-proefversie. Door een snapshot te maken, ontstaat een unieke “versie”, ofwel een perfect beeld van de status van je proefversie op het moment dat de snapshot wordt gemaakt."
   social_studies_13fa30c7: "Sociale wetenschappen"
+  some_assignments_are_associated_with_an_archived_o_e1856b65: "Sommige opdrachten zijn gekoppeld aan een gearchiveerd of verwijderd beoordelingsschema en het beoordelingsschema kan niet worden geëxporteerd."
   some_assignments_could_not_be_created_because_they_d91f2f21: "Sommige opdrachten kunnen niet worden gemaakt omdat deze bij een reeds afgesloten beoordelingsperiode horen."
   some_conferences_on_this_page_are_hidden_because_o_789684fd: "Sommige conferenties op deze pagina zijn verborgen wegens fouten bij het ophalen van hun status"
   some_custom_columns_could_not_be_changed_because_t_88abc9be: "Sommige aangepaste kolommen kunnen niet worden gewijzigd omdat ze alleen-lezen zijn. Wijzigingen aan die kolommen worden genegeerd."
@@ -28441,6 +28480,9 @@ nl:
   tell_us_how_and_when_you_would_like_to_be_notified_de3ed2bc: "Vertel ons hoe en wanneer je op de hoogte gesteld wilt worden van gebeurtenissen in Canvas."
   tempe_grade_export_c611da01: Tempe-cijferexport
   template_account_21ac8f4f: Sjabloonaccount
+  template_account_is_not_a_root_account_83ae89bc: "Sjabloonaccount is geen hoofdaccount"
+  template_account_is_not_a_template_account_d80200ae: "Dit is geen sjaboonaccount"
+  template_account_not_found_7144542c: "Sjabloonaccount is niet gevonden"
   templates_4ca13d07: Sjablonen
   temporarily_enroll_a_user_into_a_course_this_tempo_990488f8: "Schrijf een gebruiker tijdelijk in voor een cursus. Deze tijdelijke inschrijving wordt binnen de cursus gekoppeld aan een andere inschrijving."
   temporarily_enroll_name_8acb66ce: "Schrijf %{name} tijdelijk in"
@@ -28683,6 +28725,7 @@ nl:
   the_course_id_for_the_export_data_a99f37d: "De cursus-ID voor de exportgegevens"
   the_course_id_for_the_grade_export_data_d20f4ed: "De cursus-ID voor de cijferexportgegevens"
   the_course_id_to_report_on_eb4ad5d2: "De cursus-ID voor rapportage"
+  the_course_is_associated_with_an_archived_or_delet_43b836a9: "De cursus is gekoppeld aan een gearchiveerd of verwijderd beoordelingsschema en het beoordelingsschema kan niet worden geëxporteerd."
   the_course_link_validator_searches_course_content__563fa215: "De cursuskoppelingsvalidator doorzoekt cursusinhoud op ongeldige of onbereikbare links en afbeeldingen."
   the_course_link_validator_searches_through_course__76f0bc63: "De cursus linkvalidator zoekt door de cursusinhoud en retourneert elke ongeldige of niet reagerende link die hij tegenkomt. Let wel dat sommige links die als niet reagerend gevlagd worden gewoon ontoegankelijk zijn van onze servers en wel voor de cursisten zullen functioneren."
   the_course_state_manage_permission_allows_the_user_1d9da094: "Met de machtiging Cursusstatus - beheren kan de gebruiker cursussen publiceren die geen modules bevatten. Om module-inhoud te publiceren of de publicatie ervan ongedaan te maken, moet Cursusinhoud - toevoegen/bewerken/verwijderen​ zijn ingeschakeld."
@@ -28806,6 +28849,7 @@ nl:
   the_list_below_is_content_that_has_been_shared_wit_2b2648bc: "De lijst hieronder bestaat uit content die met jou is gedeeld. Je kunt een voorbeeld van de content bekijken, de content importeren in je cursus of de content uit de lijst verwijderen."
   the_list_of_results_has_been_updated_46e3c733: "De lijst resultaten is bijgewerkt"
   the_login_login_is_currently_suspended_and_will_no_472b19e9: "De login %{login} is momenteel geblokkeerd en kan geen toegang verkrijgen tot Canvas"
+  the_lti_extensions_discover_page_won_t_be_accessib_1451172e: "De pagina LTI-extensies ontdekken kan alleen worden geopend als de pagina LTI-registraties is ingeschakeld"
   the_lti_tool_was_deleted_on_3727da23: "De LTI-tool is verwijderd op"
   the_lti_user_was_deleted_2a3b796f: "De LTI-gebruiker is verwijderd"
   the_material_is_in_the_public_domain_279c39a3: "Het materiaal bevindt zich in het openbaar domein"
@@ -28828,10 +28872,15 @@ nl:
                 Bedankt!
                 Canvas Ondersteuning
   the_message_you_sent_with_the_subject_line_subject_8157a1ff: |-
-      Het bericht dat je stuurde met onderwerpregel "%{subject}" is niet afgeleverd omdat je account is onderbroken.
-      
-      Bedankt,
-      Canvas Support
+      Het bericht dat je stuurde met onderwerpregel "%{subject}" is niet afgeleverd omdat je account is geblokkeerd.
+                  
+                  Bedankt!
+                  Canvas Ondersteuning
+  the_message_you_sent_with_the_subject_line_subject_8511b0dd: |-
+      Het bericht dat je stuurde met onderwerpregel "%{subject}" is niet afgeleverd omdat je geen geldige deelnemer aan het gesprek bent.
+                  
+                  Bedankt!
+                  Canvas Ondersteuning
   the_message_you_sent_with_the_subject_line_subject_c73f92e4: |-
       Het bericht dat je stuurde met onderwerpregel "%{subject}" is niet afgeleverd. Om de Canvas berichten vanaf deze e-mail te beantwoorden, moet het eerst een bevestigd communcatiekanaal in je Canvas profiel zijn. Ga naar je profiel en stuur de bevestigingsmail voor dit e-mailadres [Zie https://community.canvaslms.com/docs/DOC-2281]. Je kunt ook contact opnemen met deze persoon via de Canvas postbus [See https://community.canvaslms.com/docs/DOC-2670].
       
@@ -29120,6 +29169,7 @@ nl:
   there_was_an_unexpected_error_deleting_the_convers_412fd621: "Er is een onverwachte fout opgetreden bij het verwijderen van het gespreksbericht"
   there_was_an_unexpected_error_deleting_the_discuss_fe1022cb: "Er is een onverwachte fout opgetreden bij het verwijderen van het discussieonderwerp."
   there_was_an_unexpected_error_deleting_the_topic_b53db7a7: "Er is een onverwachte fout opgetreden bij het verwijderen van het onderwerp."
+  there_was_an_unexpected_error_error_ca0fc77e: "Er is een onverwachte fout opgetreden. %{error}"
   there_was_an_unexpected_error_loading_the_discussi_cc4ee42: "Er is een onverwachte fout opgetreden bij het laden van de discussie-invoer."
   there_was_an_unexpected_error_loading_the_replies_578d9738: "Er is een onverwachte fout opgetreden bij het laden van de antwoorden."
   there_was_an_unexpected_error_marking_all_as_read_117fe739: "Er is een onverwachte fout opgetreden bij het markeren van alles als gelezen."
@@ -29206,6 +29256,7 @@ nl:
   this_canvas_installation_is_only_for_testing_and_w_17ce8bc2: 
     one: "Deze Canvas-installatie is alleen bedoeld voor tests en *wordt elke week opnieuw ingesteld.*"
     other: "Deze Canvas-installatie is alleen bedoeld voor tests en *wordt elke %{count} weken opnieuw ingesteld.*"
+  this_catalog_will_be_a_template_account_and_its_da_8b6277cb: "Deze catalogus wordt gebruikt als sjabloonaccount en de gegevens erin kunnen worden gekopieerd naar nieuw gemaakte catalogi"
   this_code_expires_in_timefromnow_ec7ccef4: "Deze code vervalt over %{timeFromNow}."
   this_code_expires_timefromnow_877a5225: "Deze code vervalt %{timeFromNow}."
   this_code_has_expired_41f76642: "Deze code is vervallen."
@@ -29370,8 +29421,10 @@ nl:
   this_is_an_account_setting_that_must_be_enabled_by_8ced660: "Dit is een accountinstelling die door een Customer Success Manager moet worden ingeschakeld. De zelden gebruikte waarschuwingsfunctie is bedoeld om cursisten, docenten of beheerders een waarschuwing te sturen voor specifieke triggers (bijvoorbeeld geen interactie van cursist en docent gedurende 7 dagen). De criteria worden elke dag gecontroleerd en er worden meldingen verstuurd naar de cursist en/of de docent totdat het triggerprobleem is opgelost."
   this_is_an_account_setting_that_must_be_turned_on__4c939dea: "Dit is een accountinstelling die door je Customer Success Manager moet worden ingeschakeld."
   this_is_an_anonymous_discussion_student_names_and__bc19b64d: "Dit is een anonieme discussie. Cursistnamen en profielafbeeldingen zijn verborgen."
+  this_is_an_anonymous_discussion_though_student_nam_c45b563e: "Dit is een anonieme discussie. Hoewel studentnamen en profielafbeeldingen verborgen worden, is je naam en profielafbeelding wel zichtbaar voor alle studenten. Vermeldingen zijn ook uitgeschakeld."
   this_is_an_anonymous_discussion_though_student_nam_f98abe71: "Dit is een anonieme discussie. Hoewel cursistnamen en profielafbeeldingen verborgen zullen zijn, zal je naam en profielafbeelding wel zichtbaar zijn voor alle cursisten."
   this_is_an_anonymous_discussion_your_name_and_prof_72c49b77: "Dit is een anonieme discussie, je naam en profielafbeelding zijn verborgen voor andere cursisten."
+  this_is_an_anonymous_discussion_your_name_and_prof_c88f50e2: "Dit is een anonieme discussie. Je naam en profielafbeelding zijn niet zichtbaar voor andere studenten. Vermeldingen zijn ook uitgeschakeld."
   this_is_enabled_by_default_as_assignments_can_not__767e9b16: "Dit is standaard ingeschakeld omdat opdrachten niet uit de Cijferlijst kunnen worden gehouden en er dan toch voor meetellen."
   this_is_just_a_dev_only_feature_you_can_turn_on_to_7f88c58f: "Dit is een apparaatspecifieke functie die je kunt inschakelen om te bekijken hoe pagina's eruitzien op een RNL-omgeving, zonder dat je de taal hoeft te veranderen in een RNL-taal."
   this_is_not_a_breaking_change_all_lti_1_3_tool_beh_16df3ac0: "Dit is *geen* diepgaande wijziging. Al het gedrag van LTI 1.3-tools blijft hetzelfde ongeacht het gebruikte eindpunt, met uitzondering van de onlangs ondersteunde Platform Storage-specificatie. Deze wijziging wordt later, op een nog nader te bepalen datum, doorgevoerd."
@@ -30947,6 +31000,10 @@ nl:
   update_public_jwk_9f25f520: "Openbare JWK bijwerken"
   update_rating_6d29c2ef: "Beoordeling bijwerken"
   update_settings_9b422d0f: "Instellingen bijwerken"
+  update_the_assignment_submission_type_launch_butto_bf130d86: "Werk de knop Type opdrachtinlevering bij"
+  update_the_look_of_all_tools_using_the_submission__368b06c: |-
+      Werk het uiterlijk van alle tools bij met behulp van de submission_type_selection
+      -plaatsing om te zorgen voor een moderner ontwerp dat aansluit op de rest van de UI van Canvas
   update_tool_7d48ef2a: "%{tool} bijwerken"
   update_your_notification_settings_ed9564f3: "Hier klikken om jouw meldingsinstellingen bij te werken"
   updated_2c1e8615: Bijgewerkt
@@ -31864,6 +31921,7 @@ nl:
   warning_if_there_are_any_users_with_this_role_they_1a7c1fef: "Waarschuwing: Als er gebruikers met deze functie zijn, behouden ze de huidige machtigingen voor deze functie, maar je kunt dan geen nieuwe gebruikers met deze functie meer maken."
   warning_step_has_children_that_aren_t_stepitem_com_32a3f351: "Waarschuwingsstap heeft onderliggende items die geen StepItem-componenten zijn"
   warning_step_has_two_stepitems_with_a_status_of_in_77138e9e: "Waarschuwing: Stap heeft twee StepItems met de status In voortgang"
+  warning_the_submission_type_selection_placement_is_d327c8d: "Waarschuwing: de submission_type_selection-plaatsing is alleen toegestaan voor LTI-tools die zijn goedgekeurd door Instructure. Als je denkt dat je dit bericht onterecht hebt ontvangen, neem dan contact op met het supportteam."
   warning_you_are_about_to_adjust_this_group_s_membe_a04281b6: "Waarschuwing! Je staat op het punt het lidmaatschap van deze groep aan te passen. *Deze wijziging is van invloed op bestaande groepsinleveringen, annotaties en opmerkingen en resulteert in gegevensverlies voor zowel deze groep als de vorige groep van de cursist.*** Om onopzettelijke gevolgen voor bestaande groepsinleveringen te voorkomen, moet je voor toekomstige opdrachten een nieuwe groepsset maken. **"
   warnings: 
     test_install: 
@@ -31873,6 +31931,7 @@ nl:
         one: "Deze Canvas-installatie is alleen bedoeld voor tests en wordt elke week opnieuw ingesteld."
         other: "Deze Canvas-installatie is alleen bedoeld voor tests en wordt elke %{count} weken opnieuw ingesteld."
   was_locked_at_date_acf1c576: "Werd vergrendeld op %{date}"
+  was_not_selected_30d63a10: "is niet geselecteerd"
   watermark_c93fae0d: Watermerk
   watermark_opacity_ce3d3097: "Opaciteit watermerk"
   watermarks_other_images_e970fc6a: "Watermerken & andere afbeeldingen"
@@ -31988,7 +32047,9 @@ nl:
       in een nieuw tabblad moeten worden geladen. Wanneer deze vlag is ingeschakeld, zal dat selectievakje standaard
       zijn ingeschakeld als de gebruiker het de laatste keer dat een externe link werd toegevoegd heeft ingeschakeld.
   when_adding_multiple_users_use_a_comma_or_line_bre_67f9c87d: "Wanneer je meerdere gebruikers toevoegt, gebruik je een komma of regeleinde als scheidingsteken."
+  when_creating_a_reply_students_will_have_the_optio_34556e85: "Bij het maken van een antwoord hebben studenten de optie om hun naam en profielafbeelding te tonen of anoniem te blijven. Je naam en profielafbeelding zijn voor alle studenten zichtbaar. Vermeldingen zijn ook uitgeschakeld."
   when_creating_a_reply_students_will_have_the_optio_716eb2f4: "Bij het maken van een antwoord hebben cursisten de optie om hun naam en profielafbeelding te tonen of anoniem te blijven. Je naam en profielafbeelding zullen voor alle cursisten zichtbaar zijn."
+  when_creating_a_reply_you_will_have_the_option_to__3fb91c13: "Bij het maken van een antwoord heb je de optie om je naam en profielafbeelding aan andere studenten te tonen of anoniem te blijven. Vermeldingen zijn ook uitgeschakeld."
   when_creating_a_reply_you_will_have_the_option_to__8607ac10: "Bij het maken van een antwoord heb je de optie om je naam en profielafbeelding aan andere cursisten te tonen of anoniem te blijven."
   when_disabled_new_or_updated_contextexternaltool_i_27e19300: |-
       Indien uitgeschakeld wordt voor nieuwe of bijgewerkte ContextExternalTool-installaties (waaronder
@@ -32005,6 +32066,21 @@ nl:
       gesorteerd en gefilterd worden.
   when_enabled_an_lti_tool_with_the_assignment_edit__cd60b1a0: "Indien ingeschakeld wordt een LTI-tool met de assignment_edit-plaatsing gestart op de pagina Aankondigingen."
   when_enabled_collect_internal_analytics_metrics_us_88e81ee5: "Indien ingeschakeld, verzamel statistieken van Internal Analytics met behulp van een gedistribueerd systeem."
+  when_enabled_for_a_child_account_of_a_non_centrall_8b126bc0: |-
+      Indien ingeschakeld voor een onderliggend account van een niet-centraal beheerd consortium,
+      worden de status en tokens van ontwikkelaarssleutels uit het bovenliggend consortiumaccount niet
+      overgenomen in subaccounts van een onderliggend consortiumaccount. Indien uitgeschakeld, wordt het verouderde
+      (inconsistente) gedrag gevolgd. Deze vlag geldt alleen voor
+      _child_-accounts. Deze vlag heeft op geen enkele manier invloed op
+      centraal beheerde consortia.
+  when_enabled_for_the_parent_account_of_a_non_centr_4d7adbaa: |-
+      Indien ingeschakeld voor het bovenliggend account van een niet centraal beheerd consortium,
+      heeft het in- en uitschakelen van ontwikkelaarssleutels in het bovenliggend account geen invloed op de toolinstallaties
+      in de onderliggende accounts. Indien uitgeschakeld, is het in- en
+      uitschakelen van door sitebeheerders overgenomen ontwikkelaarssleutels in het bovenliggend account
+      van een niet centraal beheerd consortium van invloed op (het verwijderen/herstellen) van tools in de onderliggende
+      accounts (verouderd gedrag). Deze vlag geldt alleen voor _parent_
+      -accounts. Deze vlag heeft op geen enkele manier invloed op centraal beheerde consortia.
   when_enabled_global_javascript_and_css_files_can_b_ea21d216: "Indien geactiveerd, kunnen global Javascript en CSS bestanden geüpload worden in de  *%{t_theme_editor}*."
   when_enabled_it_deprecates_the_short_message_servi_18c6ee3f: "Indien ingeschakeld, zal hierdoor de SMS-service vervallen."
   when_enabled_lti_1_1_speedgrader_launches_will_set_47dcded1: |-
@@ -32028,6 +32104,9 @@ nl:
       Wanneer ingeschakeld, worden er gegevens voor alle LTI-lanceringen naar het PandataEvents systeem
       gestuurd om daar te worden gevisualiseerd en gebruikt te worden voor queries.
   when_enabled_site_admin_account_ui_will_allow_asso_9d04a1d8: "Indien ingeschakeld, kan in de UI van het account van de sitebeheerder een servicegebruiker worden gekoppeld aan een DeveloperKey en die sleutel/gebruiker gebruiken met het toestemmingstype client_credentials"
+  when_enabled_submission_type_selection_placement_u_412d226e: |-
+      Indien ingeschakeld, is het gebruik van Submission_type_selection-plaatsingen
+      beperkt tot een toelatingslijst.
   when_enabled_teachers_can_choose_to_allow_observer_320b555e: |-
       Wanneer ingeschakeld, kunnen docenten kiezen of ze waarnemers toestaan afspraken te plannen
       wanneer ze afspraakgroepen maken in de kalender.
@@ -32036,6 +32115,8 @@ nl:
       van een LTI-start een willekeurig nummer aan de ID toegevoegd gekregen.
       Indien uitgeschakeld, heeft elk formulier dezelfde ID van tool_form.
   when_enabled_the_internal_access_manager_will_be_u_bc470109: "Indien ingeschakeld, wordt intern toegangsbeheer gebruikt om toegang te verlenen aan bepaalde verzoeken"
+  when_enabled_the_lti_extensions_discover_page_will_8bb57ff6: "Indien ingeschakeld, is de pagina LTI-extensies ontdekken beschikbaar in de weergave Extensies."
+  when_enabled_the_lti_extensions_page_will_be_avail_ac8ed3fa: "Indien ingeschakeld, is de pagina LTI-extensies beschikbaar in de accountnavigatie."
   when_enabled_this_flag_displays_a_word_count_in_th_a75163d6: |-
       Indien ingeschakeld, toont deze vlag een woordtelling in SpeedGrader voor op tekst
       gebaseerde inleveringen.
@@ -32060,6 +32141,7 @@ nl:
       ontwikkelaarssleutel als de oorspronkelijke tool. Hierdoor wordt het randgeval voorkomen waarin meerdere ontwikkelaars-
       sleutels hetzelfde domein delen en er eerst een tool uit de verkeerde ontwikkelaarssleutel zou worden gekoppeld.
   when_posting_grades_for_anonymous_assignments_grad_b13f3ae6: "Wanneer cijfers voor anonieme opdrachten worden gepost, worden de cijfers gepost voor iedereen in de cursus. Anonimiteit wordt uitgeschakeld."
+  when_posting_grades_for_this_anonymous_assignment__1c64fadf: "Wanneer cijfers voor deze anonieme opdracht worden gepost, worden de cijfers gepost voor iedereen aan wie dit item is toegewezen. Anonimiteit wordt uitgeschakeld."
   when_scope_enforcement_is_disabled_tokens_have_acc_6939182f: "Wanneer het afdwingen van bereiken is uitgeschakeld, hebben tokens toegang tot alle eindpunten die beschikbaar zijn voor de gemachtigde gebruiker."
   when_selected_the_course_is_in_a_read_only_state_o_5aaeb0d: "Wanneer dit is geselecteerd, heeft de cursus de status alleen-lezen buiten deze datums."
   when_selected_the_course_is_inaccessible_outside_c_af595406: "Wanneer dit is geselecteerd, kan de cursus niet buiten de cursusdatums worden geopend. Als de cursusdatums niet zijn ingevuld, hebben deze start- en einddatum betrekking op periodedatums."
