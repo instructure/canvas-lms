@@ -51,6 +51,7 @@ class TokenScopes
   LTI_SHOW_ACCOUNT_EXTERNAL_TOOLS_SCOPE = "https://canvas.instructure.com/lti/account_external_tools/scope/show"
   LTI_UPDATE_ACCOUNT_EXTERNAL_TOOLS_SCOPE = "https://canvas.instructure.com/lti/account_external_tools/scope/update"
   LTI_PAGE_CONTENT_SHOW_SCOPE = "http://canvas.instructure.com/lti/page_content/show"
+  LTI_REPLACE_EDITOR_CONTENT_SCOPE = "https://canvas.instructure.com/lti/replace_editor_contents"
   LTI_SCOPES = {
     LTI_AGS_LINE_ITEM_SCOPE => I18n.t("Can create and view assignment data in the gradebook associated with the tool."),
     LTI_AGS_LINE_ITEM_READ_ONLY_SCOPE => I18n.t("Can view assignment data in the gradebook associated with the tool."),
@@ -87,6 +88,7 @@ class TokenScopes
     LTI_LIST_EVENT_TYPES_DATA_SERVICE_SUBSCRIPTION_SCOPE => I18n.t("Can list categorized event types."),
     LTI_SHOW_FEATURE_FLAG_SCOPE => I18n.t("Can view feature flags"),
     LTI_PAGE_CONTENT_SHOW_SCOPE => I18n.t("Can request page content using postMessage API."),
+    LTI_REPLACE_EDITOR_CONTENT_SCOPE => I18n.t("Can replace the entire contents of the RCE.")
   }.freeze
 
   def self.named_scopes

@@ -155,6 +155,7 @@ module Lti
                    ltiEndpoint: polymorphic_url([:retrieve, @context, :external_tools]),
                    reloadpage: reload_page,
                    moduleCreated: module_created,
+                   replaceEditorContents: replace_editor_contents?,
                    **extra
                  }.compact
                })

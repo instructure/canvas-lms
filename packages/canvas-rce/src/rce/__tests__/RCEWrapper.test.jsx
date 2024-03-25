@@ -240,8 +240,8 @@ describe('RCEWrapper', () => {
       expect(rce.mceInstance().getContent()).toEqual(rce.getCode())
     })
 
-    it('inserts code properly', () => {
-      const code = '<div>i am new content</div>'
+    it('inserts code properly with embedded content title', () => {
+      const code = '<div title="embedded content">i am new content</div>'
       jest.spyOn(contentInsertion, 'insertContent').mockImplementation(() => {})
       rce.insertCode(code)
       expect(contentInsertion.insertContent).toHaveBeenCalledWith(rce.mceInstance(), code)

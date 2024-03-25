@@ -68,7 +68,8 @@ module Lti
                                                             host: "test.host"
                                                           ),
                                                           reloadpage: false,
-                                                          moduleCreated: false
+                                                          moduleCreated: false,
+                                                          replaceEditorContents: false
                                                         }
                                                       })
 
@@ -1049,6 +1050,107 @@ module Lti
               expected_js_env_attributes = {
                 tool_id: context_external_tool.id,
                 content_items:
+              }
+
+              expect(controller).to have_received(:js_env).with(deep_link_response: hash_including(expected_js_env_attributes))
+            end
+          end
+        end
+
+        context "LTI tools replace content functionality with missing scope" do
+          before do
+            context_external_tool
+          end
+
+          let(:developer_key_scopes) { [] }
+
+          context "when LTI tool sets replace_editor_contents flag to true" do
+            let(:replace_editor_contents) { true }
+
+            it "then replace content shall be enabled on the UI" do
+              allow(controller).to receive(:js_env)
+              subject
+              expected_js_env_attributes = {
+                replaceEditorContents: false
+              }
+
+              expect(controller).to have_received(:js_env).with(deep_link_response: hash_including(expected_js_env_attributes))
+            end
+          end
+
+          context "when LTI tool sets replace_editor_contents flag to false" do
+            let(:replace_editor_contents) { false }
+
+            it "then replace contents shall be disabled on the UI" do
+              allow(controller).to receive(:js_env)
+              subject
+              expected_js_env_attributes = {
+                replaceEditorContents: false
+              }
+
+              expect(controller).to have_received(:js_env).with(deep_link_response: hash_including(expected_js_env_attributes))
+            end
+          end
+
+          context "when LTI tool omit sending replace_editor_contents flag" do
+            let(:replace_editor_contents) { nil } # so that compact will filter this value out
+
+            it "then replace contents shall be disabled on the UI" do
+              allow(controller).to receive(:js_env)
+              subject
+              expected_js_env_attributes = {
+                replaceEditorContents: false
+              }
+
+              expect(controller).to have_received(:js_env).with(deep_link_response: hash_including(expected_js_env_attributes))
+            end
+          end
+        end
+
+        context "LTI tools replace content functionality with correct scope" do
+          before do
+            context_external_tool
+          end
+
+          context "when LTI tool sets replace_editor_contents flag to true" do
+            let(:replace_editor_contents) { true }
+            let(:developer_key_scopes) { ["https://canvas.instructure.com/lti/replace_editor_contents"] }
+
+            it "then replace content shall be enabled on the UI" do
+              allow(controller).to receive(:js_env)
+              subject
+              expected_js_env_attributes = {
+                replaceEditorContents: true
+              }
+
+              expect(controller).to have_received(:js_env).with(deep_link_response: hash_including(expected_js_env_attributes))
+            end
+          end
+
+          context "when LTI tool sets replace_editor_contents flag to false" do
+            let(:replace_editor_contents) { false }
+            let(:developer_key_scopes) { ["https://canvas.instructure.com/lti/replace_editor_contents"] }
+
+            it "then replace contents shall be disabled on the UI" do
+              allow(controller).to receive(:js_env)
+              subject
+              expected_js_env_attributes = {
+                replaceEditorContents: false
+              }
+
+              expect(controller).to have_received(:js_env).with(deep_link_response: hash_including(expected_js_env_attributes))
+            end
+          end
+
+          context "when LTI tool omit sending replace_editor_contents flag" do
+            let(:replace_editor_contents) { nil } # so that compact will filter this value out
+            let(:developer_key_scopes) { ["https://canvas.instructure.com/lti/replace_editor_contents"] }
+
+            it "then replace contents shall be disabled on the UI" do
+              allow(controller).to receive(:js_env)
+              subject
+              expected_js_env_attributes = {
+                replaceEditorContents: false
               }
 
               expect(controller).to have_received(:js_env).with(deep_link_response: hash_including(expected_js_env_attributes))
