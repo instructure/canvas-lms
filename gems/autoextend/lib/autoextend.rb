@@ -22,7 +22,7 @@ require_relative "autoextend/railtie" if defined?(Rails::Railtie)
 
 module Autoextend
   class << self
-    def const_added(const, source:, recursive: false)
+    def ae_const_added(const, source:, recursive: false)
       const_name = const.is_a?(String) ? const : const.name
       return [] unless const_name
 
@@ -44,7 +44,7 @@ module Autoextend
           child_const = const.const_get(child, false)
           next unless child_const.is_a?(Module)
 
-          const_added(child_const, source:, recursive: true)
+          ae_const_added(child_const, source:, recursive: true)
         end
       end
 
@@ -144,7 +144,7 @@ module Autoextend
         loader.on_load do |_cpath, value, _abspath|
           next unless value.is_a?(Module)
 
-          Autoextend.const_added(value, source: :Zeitwerk, recursive: true)
+          Autoextend.ae_const_added(value, source: :Zeitwerk, recursive: true)
         end
       end
     end
@@ -184,7 +184,7 @@ end
 
 module Autoextend::ClassMethods
   def inherited(klass)
-    Autoextend.const_added(klass, source: :inherited)
+    Autoextend.ae_const_added(klass, source: :inherited)
     super
   end
 end
@@ -193,14 +193,14 @@ end
 # only when it gets included into a class.
 module Autoextend::ModuleMethods
   def prepended(klass)
-    Autoextend.const_added(self, source: :prepended).each do |extension|
+    Autoextend.ae_const_added(self, source: :prepended).each do |extension|
       extension.extend(klass, source: :prepended)
     end
     super
   end
 
   def included(klass)
-    Autoextend.const_added(self, source: :included).each do |extension|
+    Autoextend.ae_const_added(self, source: :included).each do |extension|
       extension.extend(klass, source: :included)
     end
     super
