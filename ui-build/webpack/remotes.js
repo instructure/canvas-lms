@@ -17,7 +17,7 @@
  */
 
 // based on https://module-federation.io/docs/en/mf-docs/0.2/dynamic-remotes/
-function fetchSpeedGraderLibrary(resolve) {
+function fetchSpeedGraderLibrary(resolve, reject) {
   const script = document.createElement('script')
   script.src = window.REMOTES?.speedgrader || 'http://localhost:3002/remoteEntry.js'
   script.onload = () => {
@@ -34,6 +34,16 @@ function fetchSpeedGraderLibrary(resolve) {
     }
     resolve(module)
   }
+
+  script.onerror = errorEvent => {
+    const errorMessage = `Failed to load the script: ${script.src}`
+    // eslint-disable-next-line no-console
+    console.error(errorMessage, errorEvent)
+    if (typeof reject === 'function') {
+      reject(new Error(errorMessage, errorEvent))
+    }
+  }
+
   document.head.appendChild(script)
 }
 
