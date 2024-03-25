@@ -2391,6 +2391,7 @@ class CoursesController < ApplicationController
             TAB_CONTENT_ONLY: embed_mode,
             SHOW_IMMERSIVE_READER: show_immersive_reader?,
             GRADING_SCHEME: @context.grading_standard_or_default.data,
+            POINTS_BASED: @context.grading_standard_or_default.points_based?,
             RESTRICT_QUANTITATIVE_DATA: @context.restrict_quantitative_data?(@current_user)
           )
 

@@ -86,6 +86,8 @@ export default class AssignmentRowCellPropFactory {
       gradeIsEditable: this.gradebook.isGradeEditable(student.id, assignment.id),
       gradeIsVisible: this.gradebook.isGradeVisible(student.id, assignment.id),
       gradingScheme: this.gradebook.getAssignmentGradingScheme(assignment.id)?.data,
+      pointsBasedGradingScheme: this.gradebook.getAssignmentGradingScheme(assignment.id)
+        ?.pointsBased,
       isSubmissionTrayOpen: isTrayOpen(this.gradebook, student, assignment),
 
       onToggleSubmissionTrayOpen: () => {

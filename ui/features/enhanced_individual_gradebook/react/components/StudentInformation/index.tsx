@@ -211,7 +211,7 @@ export default function StudentInformation({
 
     const letterGradeText = gradingStandard
       ? ` - ${GradeFormatHelper.replaceDashWithMinus(
-          getLetterGrade(possible, score, gradingStandard)
+          getLetterGrade(possible, score, gradingStandard, gradingStandardPointsBased)
         )}`
       : ''
 

@@ -341,6 +341,7 @@ export type FormatGradeOptions = {
   score?: number | null
   restrict_quantitative_data?: boolean
   grading_scheme?: DeprecatedGradingScheme[]
+  points_based_grading_scheme?: boolean
 }
 
 /**

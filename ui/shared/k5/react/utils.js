@@ -52,6 +52,7 @@ export const transformGrades = courses =>
       isHomeroom: course.homeroom_course,
       enrollments: course.enrollments,
       gradingScheme: course.grading_scheme,
+      pointsBasedGradingScheme: course.points_based_grading_scheme,
       restrictQuantitativeData: course.restrict_quantitative_data,
     }
     return getCourseGrades(basicCourseInfo)
@@ -173,7 +174,8 @@ export const getAssignmentGroupTotals = (
   gradingPeriodId,
   observedUserId,
   restrictQuantitativeData = false,
-  gradingScheme = []
+  gradingScheme = [],
+  pointsBasedGradingScheme = false
 ) => {
   if (gradingPeriodId) {
     data = data.filter(group =>
@@ -207,7 +209,7 @@ export const getAssignmentGroupTotals = (
     } else {
       const tempScore = (groupScores.current.score / groupScores.current.possible) * 100
       score = restrictQuantitativeData
-        ? scoreToGrade(tempScore, gradingScheme)
+        ? scoreToGrade(tempScore, gradingScheme, pointsBasedGradingScheme)
         : I18n.n(tempScore, {percentage: true, precision: 2})
     }
 
@@ -232,6 +234,7 @@ const formatGradeToRQD = (assignment, submission) => {
       score: submission?.score,
       restrict_quantitative_data: ENV.RESTRICT_QUANTITATIVE_DATA,
       grading_scheme: ENV.GRADING_SCHEME,
+      points_based_grading_scheme: ENV.POINTS_BASED,
     })
   }
 
@@ -285,7 +288,8 @@ export const getTotalGradeStringFromEnrollments = (
   userId,
   observedUserId,
   restrictQuantitativeData = false,
-  gradingScheme = []
+  gradingScheme = [],
+  pointsBasedGradingScheme
 ) => {
   let grades
   if (observedUserId) {
@@ -300,7 +304,7 @@ export const getTotalGradeStringFromEnrollments = (
     return I18n.t('n/a')
   }
   if (restrictQuantitativeData) {
-    return scoreToGrade(grades.current_score, gradingScheme)
+    return scoreToGrade(grades.current_score, gradingScheme, pointsBasedGradingScheme)
   }
   const score = I18n.n(grades.current_score, {percentage: true, precision: 2})
   return grades.current_grade == null

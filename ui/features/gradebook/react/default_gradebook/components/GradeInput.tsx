@@ -42,7 +42,13 @@ type Message = {
 }
 
 function normalizeSubmissionGrade(props: Props) {
-  const {submission, assignment, enterGradesAs: formatType, gradingScheme} = props
+  const {
+    submission,
+    assignment,
+    enterGradesAs: formatType,
+    gradingScheme,
+    pointsBasedGradingScheme,
+  } = props
   const gradeToNormalize = submission.enteredGrade
 
   if (props.pendingGradeInfo && props.pendingGradeInfo.excused) {
@@ -59,6 +65,7 @@ function normalizeSubmissionGrade(props: Props) {
     defaultValue: '',
     formatType,
     gradingScheme,
+    pointsBasedGradingScheme,
     pointsPossible: assignment.pointsPossible,
     version: 'entered',
   }
@@ -132,6 +139,7 @@ type Props = {
   disabled: boolean
   enterGradesAs: GradeEntryMode
   gradingScheme: GradingStandard[] | null
+  pointsBasedGradingScheme: boolean
   onSubmissionUpdate: (submission: SubmissionData, gradeInfo: GradeResult) => void
   pendingGradeInfo: PendingGradeInfo
   submission: SubmissionData
@@ -147,6 +155,7 @@ export default class GradeInput extends Component<Props, State> {
   static defaultProps = {
     disabled: false,
     gradingScheme: null,
+    pointsBasedGradingScheme: false,
     onSubmissionUpdate() {},
     pendingGradeInfo: null,
     submissionUpdating: false,
@@ -208,6 +217,7 @@ export default class GradeInput extends Component<Props, State> {
     const gradeInfo = parseTextValue(this.state.grade, {
       enterGradesAs: this.props.enterGradesAs,
       gradingScheme: this.props.gradingScheme,
+      pointsBasedGradingScheme: this.props.pointsBasedGradingScheme,
       pointsPossible: this.props.assignment.pointsPossible,
     })
 
@@ -241,6 +251,7 @@ export default class GradeInput extends Component<Props, State> {
       currentGradeInfo = parseTextValue(this.state.grade, {
         enterGradesAs: this.props.enterGradesAs,
         gradingScheme: this.props.gradingScheme,
+        pointsBasedGradingScheme: this.props.pointsBasedGradingScheme,
         pointsPossible: this.props.assignment.pointsPossible,
       })
     }

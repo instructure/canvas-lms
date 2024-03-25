@@ -50,7 +50,7 @@ $(document).ready(function () {
           gradeToShow = '--'
         } else if (totals.grade || totals.grade === 0) {
           gradeToShow = totals.restrict_quantitative_data
-            ? scoreToGrade(totals.grade, totals.grading_scheme)
+            ? scoreToGrade(totals.grade, totals.grading_scheme, totals.points_based_grading_scheme)
             : totals.grade + '%'
         } else {
           gradeToShow = I18n.t('no grade')

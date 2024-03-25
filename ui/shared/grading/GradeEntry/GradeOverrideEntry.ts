@@ -31,7 +31,7 @@ import type {GradeType, DeprecatedGradingScheme, GradeEntryMode} from '../gradin
 
 function schemeKeyForPercentage(percentage, gradingScheme: DeprecatedGradingScheme) {
   if (gradingScheme) {
-    const grade = scoreToGrade(percentage, gradingScheme.data)
+    const grade = scoreToGrade(percentage, gradingScheme.data, gradingScheme.pointsBased)
     return GradeFormatHelper.replaceDashWithMinus(grade)
   }
   return null
