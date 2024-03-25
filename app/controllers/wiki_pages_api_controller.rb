@@ -477,12 +477,9 @@ class WikiPagesApiController < ApplicationController
                         else
                           true
                         end
-
-
       if @page.versions.empty?
-        return and render :json => { :message => 'No revisions found' }, :status => :not_found
+        render :json => { :message => 'No revisions found' }, :status => :not_found and return
       end
-
       render :json => wiki_page_revision_json(revision, @current_user, session, include_content, @page.current_version)
     end
   end
