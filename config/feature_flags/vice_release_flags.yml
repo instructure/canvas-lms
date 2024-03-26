@@ -136,3 +136,9 @@ discussion_checkpoints:
     response and replies are then graded separately, and those grades are
     combined to form a final discussion grade.
   applies_to: RootAccount
+
+inbox_signature:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Inbox Setting - Signature
+  description: Users can optionally set a default signature that will be added at the end of outgoing messages.
