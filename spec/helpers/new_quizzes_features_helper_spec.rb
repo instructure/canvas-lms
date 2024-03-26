@@ -275,4 +275,52 @@ describe NewQuizzesFeaturesHelper do
       end
     end
   end
+
+  describe "#common_cartridge_qti_new_quizzes_import_enabled?" do
+    def flag_state(value)
+      Account.site_admin.set_feature_flag!(:common_cartridge_qti_new_quizzes_import, value)
+    end
+
+    context "new_quizzes_migration_enabled is true" do
+      before do
+        allow(@context).to receive(:feature_enabled?).with(:quizzes_next).and_return(true)
+        @context.root_account.enable_feature!(:new_quizzes_migration)
+      end
+
+      context "flag is off" do
+        it "returns false" do
+          flag_state Feature::STATE_OFF
+          expect(NewQuizzesFeaturesHelper.common_cartridge_qti_new_quizzes_import_enabled?(@context)).to be false
+        end
+      end
+
+      context "flag is on" do
+        it "returns true" do
+          flag_state Feature::STATE_ON
+          expect(NewQuizzesFeaturesHelper.common_cartridge_qti_new_quizzes_import_enabled?(@context)).to be true
+        end
+      end
+    end
+
+    context "new_quizzes_migration_enabled is false" do
+      before do
+        allow(@context).to receive(:feature_enabled?).with(:quizzes_next).and_return(false)
+        @context.root_account.disable_feature!(:new_quizzes_migration)
+      end
+
+      context "flag is off" do
+        it "returns false" do
+          flag_state Feature::STATE_OFF
+          expect(NewQuizzesFeaturesHelper.common_cartridge_qti_new_quizzes_import_enabled?(@context)).to be false
+        end
+      end
+
+      context "flag is on" do
+        it "returns false" do
+          flag_state Feature::STATE_ON
+          expect(NewQuizzesFeaturesHelper.common_cartridge_qti_new_quizzes_import_enabled?(@context)).to be false
+        end
+      end
+    end
+  end
 end
