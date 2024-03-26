@@ -59,7 +59,8 @@ module CC
       begin
         if for_external_migration? && !@content_export.selective_export?
           # we already know we're exporting all the data so we can begin the external exports now
-          @pending_exports = Canvas::Migration::ExternalContent::Migrator.begin_exports(@course)
+          @pending_exports = Canvas::Migration::ExternalContent::Migrator.begin_exports(@course,
+                                                                                        @content_export)
         end
 
         create_export_dir
@@ -77,6 +78,7 @@ module CC
             # if it's selective, we have to wait until we've completed the rest of the export
             # before we really know what we exported. because magic
             @pending_exports = Canvas::Migration::ExternalContent::Migrator.begin_exports(@course,
+                                                                                          @content_export,
                                                                                           selective: true,
                                                                                           exported_assets: @content_export.exported_assets.to_a)
           end
