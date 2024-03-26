@@ -1194,7 +1194,7 @@ ja:
     - 11月
     - 12月
     formats:
-      date_at_time: "%b %-d %l:%M%P"
+      date_at_time: "%b %-d %k:%M"
       default: "%Y年%m月%d日"
       full: "%Y年%b%-d日 %k:%M"
       full_with_weekday: "%a %Y年%b%-d日 %k:%M"
