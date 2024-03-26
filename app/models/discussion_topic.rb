@@ -77,6 +77,7 @@ class DiscussionTopic < ActiveRecord::Base
            },
            class_name: "DiscussionEntry"
   has_many :root_discussion_entries, -> { preload(:user).where("discussion_entries.parent_id IS NULL AND discussion_entries.workflow_state<>'deleted'") }, class_name: "DiscussionEntry"
+  has_many :ungraded_discussion_student_visibilities
   has_one :external_feed_entry, as: :asset
   belongs_to :root_account, class_name: "Account"
   belongs_to :external_feed
