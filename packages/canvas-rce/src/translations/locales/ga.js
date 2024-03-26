@@ -54,10 +54,10 @@ const locale = {
     "message": "Tharla earráid agus an comhad á léamh"
   },
   "an_error_occurred_making_a_network_request_d1bda348": {
-    "message": "Tharla earráid agus iarratas líonra á dhéanamh"
+    "message": "Tharla earráid agus iarratas gréasáin á dhéanamh"
   },
   "an_error_occurred_uploading_your_media_71f1444d": {
-    "message": "Tharla earráid agus do mheán á uaslódáil."
+    "message": "Tharla earráid agus do mheáin á uaslódáil."
   },
   "and_7fcc2911": { "message": "Agus" },
   "angle_c5b4ec50": { "message": "Uillinn" },
@@ -637,7 +637,7 @@ const locale = {
   "math_icon_ad4e9d03": { "message": "Deilbhín Mata" },
   "media_af190855": { "message": "Meáin" },
   "media_file_is_processing_please_try_again_later_58a6d49": {
-    "message": "Tá comhad meán á phróiseáil. Bain triail eile as ar ball."
+    "message": "Tá comhad meáin á phróiseáil. Bain triail eile as ar ball."
   },
   "media_title_2112243b": { "message": "Teideal Meán" },
   "medium_5a8e9ead": { "message": "Meán" },
@@ -835,7 +835,7 @@ const locale = {
   },
   "record_7c9448b": { "message": "Taifead" },
   "record_upload_media_5fdce166": { "message": "Taifead/Uaslódáil Meáin" },
-  "recording_98da6bda": { "message": "Taifeadadh" },
+  "recording_98da6bda": { "message": "Ag Taifeadadh" },
   "red_8258edf3": { "message": "Dearg" },
   "relationships_6602af70": { "message": "Caidrimh" },
   "religion_icon_246e0be1": { "message": "Deilbhín Creideamh" },
@@ -1140,7 +1140,7 @@ const locale = {
   "upload_document_253f0478": { "message": "Uaslódáil Doiciméad" },
   "upload_file_fd2361b8": { "message": "Uaslódáil Comhad" },
   "upload_image_6120b609": { "message": "Uaslódáil Íomhá" },
-  "upload_media_ce31135a": { "message": "Uaslódáil Meán" },
+  "upload_media_ce31135a": { "message": "Uaslódáil Meáin" },
   "upload_record_media_e4207d72": { "message": "Uaslódáil/Taifead Meáin" },
   "uploading_19e8a4e7": { "message": "Ag uaslódáil" },
   "uppercase_alphabetic_ordered_list_3f5aa6b2": {
