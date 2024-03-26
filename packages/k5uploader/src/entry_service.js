@@ -49,12 +49,12 @@ EntryService.prototype.parseRequest = function (xml) {
   const ent = parsedXml.querySelector("result > entries > entry1_")
   if (ent) {
     var entry = {
-      id: ent.querySelector('id')?.textContent,
-      type: ent.querySelector('type')?.textContent,
-      title: ent.querySelector('name')?.textContent,
-      context_code: ent.querySelector('partnerData')?.textContent,
-      mediaType: ent.querySelector('mediatype')?.textContent,
-      entryId: ent.querySelector('id')?.textContent,
+      id: ent.querySelector('id') && ent.querySelector('id').textContent,
+      type: ent.querySelector('type') && ent.querySelector('type').textContent,
+      title: ent.querySelector('name') && ent.querySelector('name').textContent,
+      context_code: ent.querySelector('partnerData') && ent.querySelector('partnerData').textContent,
+      mediaType: ent.querySelector('mediatype') && ent.querySelector('mediatype').textContent,
+      entryId: ent.querySelector('id') && ent.querySelector('id').textContent,
       userTitle: undefined,
     }
     return entry

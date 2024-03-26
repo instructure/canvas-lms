@@ -84,7 +84,7 @@ describe('UploadResult', () => {
   it('handles no token', () => {
     const xml = '<xml><result><result_ok></result_ok></result></xml>'
     this.result.parseXML(xml)
-    expect(this.result.token).toBeUndefined()
+    expect(this.result.token).toBeNull()
   })
 
   it('asEntryParams serializes all needed keys', () => {
