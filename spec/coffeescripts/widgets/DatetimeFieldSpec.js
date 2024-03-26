@@ -609,7 +609,7 @@ test('returns time only if @showDate false', function () {
 
 test('localizes formatting of dates and times', function () {
   ENV.LOCALE = 'pt-BR'
-  equal(this.field.formatSuggest(), 'dom., 20 de jul. de 1969 21:56')
+  equal(this.field.formatSuggest(), 'dom., 20 de jul. de 1969, 21:56')
 })
 
 QUnit.module('formatSuggestContext', {
