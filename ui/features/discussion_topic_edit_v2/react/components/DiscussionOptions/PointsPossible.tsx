@@ -17,29 +17,34 @@
  */
 
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
-
 import {NumberInput} from '@instructure/ui-number-input'
-
-const I18n = useI18nScope('discussion_create')
 
 type Props = {
   pointsPossible: number
   setPointsPossible: (points: number) => void
+  pointsPossibleLabel: string
+  pointsPossibleDataTestId: string
 }
 
-export const PointsPossible = ({pointsPossible, setPointsPossible}: Props) => {
+export const PointsPossible = ({
+  pointsPossible,
+  setPointsPossible,
+  pointsPossibleLabel,
+  pointsPossibleDataTestId,
+}: Props) => {
   return (
     <NumberInput
-      data-testid="points-possible-input"
-      renderLabel={I18n.t('Points Possible')}
+      data-testid={pointsPossibleDataTestId}
+      renderLabel={pointsPossibleLabel}
       onIncrement={() => setPointsPossible(Math.max(0, pointsPossible + 1))}
       onDecrement={() => setPointsPossible(Math.max(0, pointsPossible - 1))}
       value={pointsPossible.toString()}
       onChange={event => {
         // don't allow non-numeric values
         if (!/^\d*\.?\d*$/.test(event.target.value)) return
-        setPointsPossible(Number.parseInt(event.target.value, 10))
+        const value = Number.parseInt(event.target.value, 10)
+        const points = Number.isNaN(value) ? 0 : value
+        setPointsPossible(points)
       }}
     />
   )

@@ -127,7 +127,7 @@ export default function DiscussionTopicForm({
 
   const allSectionsOption = {id: 'all', name: 'All Sections'}
 
-  const checkPointsToolTipText = I18n.t(
+  const checkpointsToolTipText = I18n.t(
     'Checkpoints can be set to have different due dates and point values for the initial response and the subsequent replies.'
   )
 
@@ -165,7 +165,7 @@ export default function DiscussionTopicForm({
     currentDiscussionTopic?.podcastHasStudentPosts || false
   )
   const [isGraded, setIsGraded] = useState(!!currentDiscussionTopic?.assignment || false)
-  const [isCheckPoints, setIsCheckPoints] = useState(
+  const [isCheckpoints, setIsCheckpoints] = useState(
     !!currentDiscussionTopic?.assignment?.checkpoints || false
   )
   const [allowLiking, setAllowLiking] = useState(currentDiscussionTopic?.allowRating || false)
@@ -196,6 +196,10 @@ export default function DiscussionTopicForm({
   const [pointsPossible, setPointsPossible] = useState(
     currentDiscussionTopic?.assignment?.pointsPossible || 0
   )
+  // add initial states once checkpoint mutation has been edited
+  const [pointsPossibleReplyToTopic, setPointsPossibleReplyToTopic] = useState(0)
+  // add initial states once checkpoint mutation has been edited
+  const [pointsPossibleReplyToEntry, setPointsPossibleReplyToEntry] = useState(0)
   const [displayGradeAs, setDisplayGradeAs] = useState(
     currentDiscussionTopic?.assignment?.gradingType || 'points'
   )
@@ -236,6 +240,10 @@ export default function DiscussionTopicForm({
     groupCategoryId,
     gradedDiscussionRefMap,
     setGradedDiscussionRefMap,
+    pointsPossibleReplyToTopic,
+    setPointsPossibleReplyToTopic,
+    pointsPossibleReplyToEntry,
+    setPointsPossibleReplyToEntry,
   }
   const [showGroupCategoryModal, setShowGroupCategoryModal] = useState(false)
 
@@ -297,6 +305,7 @@ export default function DiscussionTopicForm({
     shouldShowAvailabilityOptions,
     shouldShowSaveAndPublishButton,
     shouldShowPodcastFeedOption,
+    shouldShowCheckpointsOptions,
   } = useShouldShowContent(
     isGraded,
     isAnnouncement,
@@ -690,25 +699,25 @@ export default function DiscussionTopicForm({
               // disabled={sectionIdsToPostTo === [allSectionsOption._id]}
             />
           )}
-          {isGraded && ENV.DISCUSSION_CHECKPOINTS_ENABLED && (
+          {shouldShowCheckpointsOptions && (
             <>
               <View display="inline-block">
                 <Checkbox
                   data-testid="checkpoints-checkbox"
                   label={I18n.t('Assign graded checkpoints')}
                   value="checkpoints"
-                  checked={isCheckPoints}
-                  onChange={() => setIsCheckPoints(!isCheckPoints)}
+                  checked={isCheckpoints}
+                  onChange={() => setIsCheckpoints(!isCheckpoints)}
                 />
               </View>
-              <Tooltip renderTip={checkPointsToolTipText} on={['hover', 'focus']} color="primary">
+              <Tooltip renderTip={checkpointsToolTipText} on={['hover', 'focus']} color="primary">
                 <div
                   style={{display: "inline-block", marginLeft: theme.spacing.xxSmall}}
                   // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
                   tabIndex="0"
                 >
                   <IconInfoLine />
-                  <ScreenReaderContent>{checkPointsToolTipText}</ScreenReaderContent>
+                  <ScreenReaderContent>{checkpointsToolTipText}</ScreenReaderContent>
                 </div>
               </Tooltip>
             </>
@@ -888,7 +897,7 @@ export default function DiscussionTopicForm({
                   setGradingSchemeId={setGradingSchemeId}
                   intraGroupPeerReviews={intraGroupPeerReviews}
                   setIntraGroupPeerReviews={setIntraGroupPeerReviews}
-                  isCheckPoints={isCheckPoints && ENV.DISCUSSION_CHECKPOINTS_ENABLED}
+                  isCheckpoints={isCheckpoints && ENV.DISCUSSION_CHECKPOINTS_ENABLED}
                 />
               </GradedDiscussionDueDatesContext.Provider>
             </View>

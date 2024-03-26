@@ -19,7 +19,6 @@
 import React from 'react'
 
 import {View} from '@instructure/ui-view'
-import {Text} from '@instructure/ui-text'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {AssignmentGroupSelect} from './AssignmentGroupSelect'
 import {DisplayGradeAs} from './DisplayGradeAs'
@@ -28,6 +27,7 @@ import {PeerReviewOptions} from './PeerReviewOptions'
 import {AssignmentDueDatesManager} from './AssignmentDueDatesManager'
 import {SyncToSisCheckbox} from './SyncToSisCheckbox'
 import {GradingSchemesSelector} from '@canvas/grading-scheme'
+import {CheckpointsSettings} from './CheckpointsSettings'
 
 type Props = {
   assignmentGroups: [{_id: string; name: string}]
@@ -49,7 +49,7 @@ type Props = {
   setGradingSchemeId: (gradingSchemeId: string) => void
   intraGroupPeerReviews: boolean
   setIntraGroupPeerReviews: (intraGroupPeerReviews: boolean) => void
-  isCheckPoints: boolean
+  isCheckpoints: boolean
 }
 
 const I18n = useI18nScope('discussion_create')
@@ -74,16 +74,20 @@ export const GradedDiscussionOptions = ({
   setGradingSchemeId,
   intraGroupPeerReviews,
   setIntraGroupPeerReviews,
-  isCheckPoints,
+  isCheckpoints,
 }: Props) => {
   return (
     <View as="div">
-      <View as="div" margin="medium 0">
-        <PointsPossible
-          pointsPossible={pointsPossible || 0}
-          setPointsPossible={setPointsPossible}
-        />
-      </View>
+      {!isCheckpoints && (
+        <View as="div" margin="medium 0">
+          <PointsPossible
+            pointsPossible={pointsPossible || 0}
+            setPointsPossible={setPointsPossible}
+            pointsPossibleLabel={I18n.t('Points Possible')}
+            pointsPossibleDataTestId="points-possible-input"
+          />
+        </View>
+      )}
       <View as="div" margin="medium 0">
         <DisplayGradeAs displayGradeAs={displayGradeAs} setDisplayGradeAs={setDisplayGradeAs} />
       </View>
@@ -121,11 +125,7 @@ export const GradedDiscussionOptions = ({
           setIntraGroupPeerReviews={setIntraGroupPeerReviews}
         />
       </View>
-      {isCheckPoints && (
-        <View as="div" margin="medium 0">
-          <Text size="large">{I18n.t('Checkpoint Settings')}</Text>
-        </View>
-      )}
+      {isCheckpoints && <CheckpointsSettings />}
       <View as="div" margin="medium 0">
         <AssignmentDueDatesManager />
       </View>
