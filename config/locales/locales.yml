@@ -1196,8 +1196,8 @@ ja:
     formats:
       date_at_time: "%b %-d %l:%M%P"
       default: "%Y年%m月%d日"
-      full: "%Y年%b%-d日 %k,%M"
-      full_with_weekday: "%a %Y年%b%-d日 %k.%M"
+      full: "%Y年%b%-d日 %k:%M"
+      full_with_weekday: "%a %Y年%b%-d日 %k:%M"
       long: "%Y %B %-d"
       long_with_weekday: "%A %B %-d"
       medium: "%Y年%b%-d日"
@@ -1213,8 +1213,8 @@ ja:
   time:
     event: "%{date} %{time}"
     formats:
-      tiny: "%k.%M"
-      tiny_on_the_hour: "%k.%M"
+      tiny: "%k:%M"
+      tiny_on_the_hour: "%k:%M"
   proper_noun_singular_genitive: "%{noun}"
   number:
     format:
