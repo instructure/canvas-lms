@@ -42,6 +42,10 @@ const GradedDiscussionDueDateDefaultValues = {
   groups: [],
   gradedDiscussionRefMap: new Map(),
   setGradedDiscussionRefMap: () => {},
+  pointsPossibleReplyToTopic: 0,
+  setPointsPossibleReplyToTopic: () => {},
+  pointsPossibleReplyToEntry: 0,
+  setPointsPossibleReplyToEntry: () => {},
 }
 
 export const GradedDiscussionDueDatesContext = React.createContext(
@@ -112,6 +116,8 @@ export const useShouldShowContent = (
   const shouldShowPodcastFeedOption =
     ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MODERATE && !ENV.K5_HOMEROOM_COURSE
 
+  const shouldShowCheckpointsOptions = isGraded && ENV.DISCUSSION_CHECKPOINTS_ENABLED
+
   return {
     shouldShowTodoSettings,
     shouldShowPostToSectionOption,
@@ -125,5 +131,6 @@ export const useShouldShowContent = (
     shouldShowAvailabilityOptions,
     shouldShowSaveAndPublishButton,
     shouldShowPodcastFeedOption,
+    shouldShowCheckpointsOptions,
   }
 }

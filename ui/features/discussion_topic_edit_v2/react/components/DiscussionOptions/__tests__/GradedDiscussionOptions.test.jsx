@@ -37,7 +37,7 @@ const defaultProps = {
   setPeerReviewDueDate: () => {},
   assignedInfoList: [],
   setAssignedInfoList: () => {},
-  isCheckPoints: false,
+  isCheckpoints: false,
 }
 
 const renderGradedDiscussionOptions = (props = {}) => {
@@ -64,7 +64,7 @@ describe('GradedDiscussionOptions', () => {
 
   describe('Checkpoints', () => {
     it('renders the section Checkpoint Settings when the checkpoints checkbox is selected', () => {
-      const {getByText} = renderGradedDiscussionOptions({isCheckPoints: true})
+      const {getByText} = renderGradedDiscussionOptions({isCheckpoints: true})
       expect(getByText('Checkpoint Settings')).toBeInTheDocument()
     })
   })
