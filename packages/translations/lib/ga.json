@@ -75,10 +75,10 @@
         "message": "Tharla earráid agus an comhad á léamh"
     },
     "an_error_occurred_making_a_network_request_d1bda348": {
-        "message": "Tharla earráid agus iarratas líonra á dhéanamh"
+        "message": "Tharla earráid agus iarratas gréasáin á dhéanamh"
     },
     "an_error_occurred_uploading_your_media_71f1444d": {
-        "message": "Tharla earráid agus do mheán á uaslódáil."
+        "message": "Tharla earráid agus do mheáin á uaslódáil."
     },
     "and_7fcc2911": {
         "message": "Agus"
@@ -1326,7 +1326,7 @@
         "message": "Meáin"
     },
     "media_file_is_processing_please_try_again_later_58a6d49": {
-        "message": "Tá comhad meán á phróiseáil. Bain triail eile as ar ball."
+        "message": "Tá comhad meáin á phróiseáil. Bain triail eile as ar ball."
     },
     "media_title_2112243b": {
         "message": "Teideal Meán"
@@ -1755,7 +1755,7 @@
         "message": "Taifead/Uaslódáil Meáin"
     },
     "recording_98da6bda": {
-        "message": "Taifeadadh"
+        "message": "Ag Taifeadadh"
     },
     "red_8258edf3": {
         "message": "Dearg"
@@ -2343,7 +2343,7 @@
         "message": "Uaslódáil Íomhá"
     },
     "upload_media_ce31135a": {
-        "message": "Uaslódáil Meán"
+        "message": "Uaslódáil Meáin"
     },
     "upload_record_media_e4207d72": {
         "message": "Uaslódáil/Taifead Meáin"
