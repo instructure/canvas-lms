@@ -302,6 +302,8 @@ class ConversationsController < ApplicationController
           MAX_GROUP_CONVERSATION_SIZE: Conversation.max_group_conversation_size
         }
 
+        hash[:INBOX_SIGNATURE_ENABLED] = Account.site_admin.feature_enabled?(:inbox_signature)
+
         notes_enabled_accounts = @current_user.associated_accounts.having_user_notes_enabled
 
         hash[:NOTES_ENABLED] = notes_enabled_accounts.any?
