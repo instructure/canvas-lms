@@ -26,6 +26,7 @@ const ASSIGNMENT_QUERY = gql`
       dueAt
       gradingType
       id
+      _id
       name
       pointsPossible
       rubric {
