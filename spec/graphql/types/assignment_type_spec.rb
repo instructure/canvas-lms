@@ -61,6 +61,7 @@ describe Types::AssignmentType do
     expect(assignment_type.resolve("moderatedGradingEnabled")).to eq assignment.moderated_grading?
     expect(assignment_type.resolve("postManually")).to eq assignment.post_manually?
     expect(assignment_type.resolve("published")).to eq assignment.published?
+    expect(assignment_type.resolve("importantDates")).to eq assignment.important_dates
   end
 
   it_behaves_like "types with enumerable workflow states" do
