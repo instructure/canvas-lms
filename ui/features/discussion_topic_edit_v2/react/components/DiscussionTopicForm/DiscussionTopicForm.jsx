@@ -353,7 +353,9 @@ export default function DiscussionTopicForm({
       groupCategoryId: isGroupDiscussion ? groupCategoryId : null,
       specificSections: shouldShowPostToSectionOption ? sectionIdsToPostTo.join() : 'all',
       locked: shouldShowAnnouncementOnlyOptions ? locked : false,
-      requireInitialPost: !isGroupDiscussion ? requireInitialPost : false,
+      // we allow requireInitial posts for group discussions created from the course,
+      // just not from discussions created from within the group context directly
+      requireInitialPost: ENV.context_is_not_group ? requireInitialPost : false,
       todoDate: addToTodo ? todoDate : null,
       allowRating: shouldShowLikingOption ? allowLiking : false,
       onlyGradersCanRate: shouldShowLikingOption ? onlyGradersCanLike : false,
