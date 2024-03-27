@@ -203,13 +203,5 @@ describe LocaleSelection do
       allow(Canvas::Plugin).to receive(:find).with(:i18n).and_return(ps)
       expect(ls.available_locales).to eq("en" => "English", "ja" => "Japanese")
     end
-
-    it "does not include irish unless enabled" do
-      allow(I18n).to receive(:available_locales).and_return([:en, :ga])
-      expect(ls.available_locales).to eq("en" => "English (United States)")
-
-      Account.default.enable_feature!(:irish_language_pack)
-      expect(ls.available_locales).to eq("en" => "English (United States)", "ga" => "Irish (Gaeilge)")
-    end
   end
 end

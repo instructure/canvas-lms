@@ -120,7 +120,6 @@ module LocaleSelection
       name = I18n.send(:t, :locales, locale:)[locale]
       custom = I18n.send(:t, :custom, locale:) == true
       next if custom && !enabled_custom_locales.include?(locale)
-      next if locale.match?(/^ga$/) && !Account.default.feature_enabled?(:irish_language_pack)
 
       result[locale.to_s] = name if name
     end
