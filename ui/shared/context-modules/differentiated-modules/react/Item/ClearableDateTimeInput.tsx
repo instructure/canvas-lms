@@ -49,7 +49,7 @@ function useElementResize(
 }
 
 export interface ClearableDateTimeInputProps {
-  disabledByBPLock: boolean
+  disabled?: boolean
   description: string
   dateRenderLabel: string
   value: string | null
@@ -65,7 +65,7 @@ export interface ClearableDateTimeInputProps {
 }
 
 function ClearableDateTimeInput({
-  disabledByBPLock,
+  disabled = false,
   description,
   dateRenderLabel,
   value,
@@ -131,7 +131,7 @@ function ClearableDateTimeInput({
           onChange={onChange}
           onBlur={onBlur}
           dateInputRef={dateInputRef}
-          interaction={disabledByBPLock ? 'disabled' : 'enabled'}
+          interaction={disabled ? 'disabled' : 'enabled'}
         />
       </Flex.Item>
 
@@ -139,7 +139,7 @@ function ClearableDateTimeInput({
         margin="0 0 0 small"
         elementRef={e => (clearButtonContainer.current = e as HTMLElement)}
       >
-        <CondensedButton interaction={disabledByBPLock ? 'disabled' : 'enabled'} onClick={onClear}>
+        <CondensedButton interaction={disabled ? 'disabled' : 'enabled'} onClick={onClear}>
           {I18n.t('Clear')}
         </CondensedButton>
       </Flex.Item>

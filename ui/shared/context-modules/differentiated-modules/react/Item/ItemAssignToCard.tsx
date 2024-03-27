@@ -16,28 +16,33 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useEffect, useRef, useState, type SyntheticEvent} from 'react'
+import React, {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+  type ForwardedRef,
+  type SyntheticEvent,
+} from 'react'
 import {View} from '@instructure/ui-view'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconTrashLine} from '@instructure/ui-icons'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import DateValidator from '@canvas/grading/DateValidator'
-import ClearableDateTimeInput from './ClearableDateTimeInput'
 import moment from 'moment'
 import AssigneeSelector, {type AssigneeOption} from '../AssigneeSelector'
 import type {FormMessage} from '@instructure/ui-form-field'
 import ContextModuleLink from './ContextModuleLink'
-import {DateLockTypes} from './types'
+import type {DateLockTypes} from './types'
+import {arrayEquals, generateWrapperStyleProps, setEquals, useDates} from './utils'
+import {DueDateTimeInput} from './DueDateTimeInput'
+import {AvailableFromDateTimeInput} from './AvailableFromDateTimeInput'
+import {AvailableToDateTimeInput} from './AvailableToDateTimeInput'
 
 const I18n = useI18nScope('differentiated_modules')
-
-function arrayEquals(a: any[], b: any[]) {
-  return a.length === b.length && a.every((v, i) => v === b[i])
-}
-
-function setEquals(a: Set<any>, b: Set<any>) {
-  return a.size === b.size && Array.from(a).every(x => b.has(x))
-}
 
 export interface DateValidatorInputArgs {
   lock_at: string | null
@@ -72,81 +77,55 @@ export type ItemAssignToCardProps = {
   customIsLoading?: boolean
   customSetSearchTerm?: (term: string) => void
   highlightCard?: boolean
-  focus?: boolean
   blueprintDateLocks?: DateLockTypes[]
-  shouldFocusDeleteButton?: boolean
 }
 
-function setTimeToStringDate(time: string, date: string | undefined): string | undefined {
-  const [hour, minute, second] = time.split(':').map(Number)
-  const chosenDate = moment.tz(date, ENV.TIMEZONE)
-  chosenDate.set({hour, minute, second})
-  return chosenDate.isValid() ? chosenDate.utc().toISOString() : date
+export type ItemAssignToCardRef = {
+  showValidations: () => void
+  focusDeleteButton: () => void
+  focusInputs: () => void
 }
 
-function generateMessages(
-  value: string | null,
-  error: string | null,
-  unparsed: boolean
-): FormMessage[] {
-  if (unparsed) return [{type: 'error', text: I18n.t('Invalid date')}]
-  if (error) return [{type: 'error', text: error}]
-  if (
-    ENV.CONTEXT_TIMEZONE &&
-    ENV.TIMEZONE !== ENV.CONTEXT_TIMEZONE &&
-    ENV.context_asset_string.startsWith('course') &&
-    moment(value).isValid()
-  ) {
-    return [
-      {
-        type: 'hint',
-        text: I18n.t('Local: %{datetime}', {
-          datetime: moment.tz(value, ENV.TIMEZONE).format('ddd, MMM D, YYYY, h:mm A'),
-        }),
-      },
-      {
-        type: 'hint',
-        text: I18n.t('Course: %{datetime}', {
-          datetime: moment.tz(value, ENV.CONTEXT_TIMEZONE).format('ddd, MMM D, YYYY, h:mm A'),
-        }),
-      },
-    ]
-  }
-  return []
-}
+export default forwardRef(function ItemAssignToCard(
+  props: ItemAssignToCardProps,
+  ref: ForwardedRef<ItemAssignToCardRef>
+) {
+  const {
+    courseId,
+    contextModuleId,
+    contextModuleName,
+    cardId,
+    onDelete,
+    onValidityChange,
+    onCardAssignmentChange,
+    disabledOptionIds,
+    selectedAssigneeIds,
+    isOpen,
+    everyoneOption,
+    customAllOptions,
+    customIsLoading,
+    customSetSearchTerm,
+    highlightCard,
+    blueprintDateLocks,
+  } = props
+  const [
+    dueDate,
+    setDueDate,
+    handleDueDateChange,
+    availableFromDate,
+    setAvailableFromDate,
+    handleAvailableFromDateChange,
+    availableToDate,
+    setAvailableToDate,
+    handleAvailableToDateChange,
+  ] = useDates(props)
 
-export default function ItemAssignToCard({
-  courseId,
-  contextModuleId,
-  contextModuleName,
-  cardId,
-  due_at = null,
-  unlock_at = null,
-  lock_at = null,
-  onDelete,
-  onValidityChange,
-  onCardAssignmentChange,
-  onCardDatesChange,
-  disabledOptionIds,
-  selectedAssigneeIds,
-  isOpen,
-  everyoneOption,
-  customAllOptions,
-  customIsLoading,
-  customSetSearchTerm,
-  highlightCard,
-  focus,
-  blueprintDateLocks,
-  shouldFocusDeleteButton,
-}: ItemAssignToCardProps) {
-  const [dueDate, setDueDate] = useState<string | null>(due_at)
-  const [availableFromDate, setAvailableFromDate] = useState<string | null>(unlock_at)
-  const [availableToDate, setAvailableToDate] = useState<string | null>(lock_at)
+  const [showValidations, setShowValidations] = useState<boolean>(false)
+  const [error, setError] = useState<FormMessage[]>([])
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({})
   const [unparsedFieldKeys, setUnparsedFieldKeys] = useState<Set<string>>(new Set())
-  const [error, setError] = useState<FormMessage[]>([])
-  const deleteCardButtonRef = useRef<Element | null>(null)
 
+  const deleteCardButtonRef = useRef<Element | null>(null)
   const assigneeSelectorRef = useRef<HTMLInputElement | null>(null)
   const dateInputRefs = useRef<Record<string, HTMLInputElement | null>>({})
   const dateValidator = useRef<DateValidator>(
@@ -168,41 +147,6 @@ export default function ItemAssignToCard({
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [error.length, Object.keys(validationErrors).length, unparsedFieldKeys.size])
-
-  useEffect(() => {
-    if (!focus) {
-      return
-    }
-    if (error.length > 0) {
-      assigneeSelectorRef.current?.focus()
-      return
-    }
-
-    const dateInputKeys = ['due_at', 'unlock_at', 'lock_at']
-    let key
-    if (Object.keys(validationErrors).length > 0) {
-      key = dateInputKeys.find(k => validationErrors[k] !== undefined)
-    } else if (unparsedFieldKeys.size > 0) {
-      key = dateInputKeys.find(k => unparsedFieldKeys.has(k))
-    }
-    if (key) dateInputRefs.current[key]?.focus()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [focus])
-
-  useEffect(() => {
-    onCardDatesChange?.(cardId, 'due_at', dueDate)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dueDate])
-
-  useEffect(() => {
-    onCardDatesChange?.(cardId, 'unlock_at', availableFromDate)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [availableFromDate])
-
-  useEffect(() => {
-    onCardDatesChange?.(cardId, 'lock_at', availableToDate)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [availableToDate])
 
   useEffect(() => {
     const data: DateValidatorInputArgs = {
@@ -229,20 +173,41 @@ export default function ItemAssignToCard({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedAssigneeIds.length])
 
-  useEffect(() => {
-    if (shouldFocusDeleteButton && deleteCardButtonRef?.current instanceof HTMLButtonElement) {
-      deleteCardButtonRef.current.focus()
-    }
-    // we only want to focus the delete button on the initial render
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  useImperativeHandle(ref, () => ({
+    showValidations() {
+      setShowValidations(true)
+    },
+    focusDeleteButton() {
+      if (deleteCardButtonRef?.current instanceof HTMLButtonElement) {
+        deleteCardButtonRef.current.focus()
+      }
+    },
+    focusInputs() {
+      if (error.length > 0) {
+        assigneeSelectorRef.current?.focus()
+        return
+      }
 
-  const handleSelect = (newSelectedAssignees: AssigneeOption[]) => {
-    const deletedAssigneeIds = selectedAssigneeIds.filter(
-      assigneeId => newSelectedAssignees.find(({id}) => id === assigneeId) === undefined
-    )
-    onCardAssignmentChange?.(cardId, newSelectedAssignees, deletedAssigneeIds)
-  }
+      const dateInputKeys = ['due_at', 'unlock_at', 'lock_at']
+      let key
+      if (Object.keys(validationErrors).length > 0) {
+        key = dateInputKeys.find(k => validationErrors[k] !== undefined)
+      } else if (unparsedFieldKeys.size > 0) {
+        key = dateInputKeys.find(k => unparsedFieldKeys.has(k))
+      }
+      if (key) dateInputRefs.current[key]?.focus()
+    },
+  }))
+
+  const handleSelect = useCallback(
+    (newSelectedAssignees: AssigneeOption[]) => {
+      const deletedAssigneeIds = selectedAssigneeIds.filter(
+        assigneeId => newSelectedAssignees.find(({id}) => id === assigneeId) === undefined
+      )
+      onCardAssignmentChange?.(cardId, newSelectedAssignees, deletedAssigneeIds)
+    },
+    [cardId, selectedAssigneeIds, onCardAssignmentChange]
+  )
 
   const handleBlur = useCallback(
     (unparsedFieldKey: string) => (e: SyntheticEvent) => {
@@ -265,115 +230,15 @@ export default function ItemAssignToCard({
 
   const handleDelete = useCallback(() => onDelete?.(cardId), [cardId, onDelete])
 
-  const handleDueDateChange = useCallback(
-    (_event: React.SyntheticEvent, value: string | undefined) => {
-      const defaultDueTime = ENV.DEFAULT_DUE_TIME ?? '23:59:00'
-      const newDueDate = dueDate ? value : setTimeToStringDate(defaultDueTime, value)
-      // When user uses calendar pop-up type is "click", but for KB is "blur"
-      if (_event.type !== 'blur') {
-        setDueDate(newDueDate || null)
-      } else {
-        setTimeout(() => setDueDate(newDueDate || null), 0)
-      }
-    },
-    [dueDate]
-  )
+  const wrapperProps = useMemo(() => generateWrapperStyleProps(highlightCard), [highlightCard])
 
-  const handleAvailableFromDateChange = useCallback(
-    (_event: React.SyntheticEvent, value: string | undefined) => {
-      const newAvailableFromDate = availableFromDate
-        ? value
-        : setTimeToStringDate('00:00:00', value)
-      // When user uses calendar pop-up type is "click", but for KB is "blur"
-      if (_event.type !== 'blur') {
-        setAvailableFromDate(newAvailableFromDate || null)
-      } else {
-        setTimeout(() => setAvailableFromDate(newAvailableFromDate || null), 0)
-      }
-    },
-    [availableFromDate]
-  )
-
-  const handleAvailableToDateChange = useCallback(
-    (_event: React.SyntheticEvent, value: string | undefined) => {
-      const newAvailableToDate = availableToDate ? value : setTimeToStringDate('23:59:00', value)
-      // When user uses calendar pop-up type is "click", but for KB is "blur"
-      if (_event.type !== 'blur') {
-        setAvailableToDate(newAvailableToDate || null)
-      } else {
-        setTimeout(() => setAvailableToDate(newAvailableToDate || null), 0)
-      }
-    },
-    [availableToDate]
-  )
-
-  type DateTimeInput = {
-    key: string
-    description: string
-    dateRenderLabel: string
-    value: string | null
-    onChange: (event: React.SyntheticEvent, value: string | undefined) => void
-    onClear: () => void
-    messages: FormMessage[]
+  const commonDateTimeInputProps = {
+    breakpoints: {},
+    showMessages: false,
+    locale: ENV.LOCALE || 'en',
+    timezone: ENV.TIMEZONE || 'UTC',
   }
 
-  const dateTimeInputs: DateTimeInput[] = [
-    {
-      key: 'due_at',
-      disabledByBPLock: blueprintDateLocks && blueprintDateLocks.includes('due_dates'),
-      description: I18n.t('Choose a due date and time'),
-      dateRenderLabel: I18n.t('Due Date'),
-      value: dueDate,
-      onChange: handleDueDateChange,
-      onClear: () => setDueDate(null),
-      messages: generateMessages(
-        dueDate,
-        validationErrors.due_at ?? null,
-        unparsedFieldKeys.has('due_at')
-      ),
-    },
-    {
-      key: 'unlock_at',
-      disabledByBPLock: blueprintDateLocks && blueprintDateLocks.includes('availability_dates'),
-      description: I18n.t('Choose an available from date and time'),
-      dateRenderLabel: I18n.t('Available from'),
-      value: availableFromDate,
-      onChange: handleAvailableFromDateChange,
-      onClear: () => setAvailableFromDate(null),
-      messages: generateMessages(
-        availableFromDate,
-        validationErrors.unlock_at ?? null,
-        unparsedFieldKeys.has('unlock_at')
-      ),
-    },
-    {
-      key: 'lock_at',
-      disabledByBPLock: blueprintDateLocks && blueprintDateLocks.includes('availability_dates'),
-      description: I18n.t('Choose an available to date and time'),
-      dateRenderLabel: I18n.t('Until'),
-      value: availableToDate,
-      onChange: handleAvailableToDateChange,
-      onClear: () => setAvailableToDate(null),
-      messages: generateMessages(
-        availableToDate,
-        validationErrors.lock_at ?? null,
-        unparsedFieldKeys.has('lock_at')
-      ),
-    },
-  ]
-
-  const wrapperProps = highlightCard
-    ? {
-        borderWidth: 'none none none large' as const,
-        'data-testid': 'highlighted_card',
-        borderColor: 'brand' as const,
-        borderRadius: 'medium' as const,
-      }
-    : {
-        borderWidth: 'none' as const,
-        borderColor: 'primary' as const,
-        borderRadius: 'medium' as const,
-      }
   return (
     <View as="div" {...wrapperProps}>
       <View
@@ -416,25 +281,54 @@ export default function ItemAssignToCard({
           defaultValues={[]}
           clearAllDisabled={true}
           size="medium"
-          messages={error}
+          messages={showValidations ? error : []}
           disabledOptionIds={disabledOptionIds}
           disableFetch={!isOpen}
           customAllOptions={customAllOptions}
           customIsLoading={customIsLoading}
           customSetSearchTerm={customSetSearchTerm}
           inputRef={el => (assigneeSelectorRef.current = el)}
+          onBlur={() => setShowValidations(true)}
         />
-        {dateTimeInputs.map((props: DateTimeInput) => (
-          <ClearableDateTimeInput
-            breakpoints={{}}
-            {...props}
-            showMessages={false}
-            locale={ENV.LOCALE || 'en'}
-            timezone={ENV.TIMEZONE || 'UTC'}
-            onBlur={handleBlur(props.key)}
-            dateInputRef={el => (dateInputRefs.current[props.key] = el)}
-          />
-        ))}
+        <DueDateTimeInput
+          {...{
+            dueDate,
+            setDueDate,
+            handleDueDateChange,
+            validationErrors,
+            unparsedFieldKeys,
+            blueprintDateLocks,
+            dateInputRefs: dateInputRefs.current,
+            handleBlur,
+          }}
+          {...commonDateTimeInputProps}
+        />
+        <AvailableFromDateTimeInput
+          {...{
+            availableFromDate,
+            setAvailableFromDate,
+            handleAvailableFromDateChange,
+            validationErrors,
+            unparsedFieldKeys,
+            blueprintDateLocks,
+            dateInputRefs: dateInputRefs.current,
+            handleBlur,
+          }}
+          {...commonDateTimeInputProps}
+        />
+        <AvailableToDateTimeInput
+          {...{
+            availableToDate,
+            setAvailableToDate,
+            handleAvailableToDateChange,
+            validationErrors,
+            unparsedFieldKeys,
+            blueprintDateLocks,
+            dateInputRefs: dateInputRefs.current,
+            handleBlur,
+          }}
+          {...commonDateTimeInputProps}
+        />
         <ContextModuleLink
           courseId={courseId}
           contextModuleId={contextModuleId}
@@ -443,4 +337,4 @@ export default function ItemAssignToCard({
       </View>
     </View>
   )
-}
+})

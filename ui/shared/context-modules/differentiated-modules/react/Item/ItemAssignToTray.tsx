@@ -46,7 +46,7 @@ import type {
   FetchDueDatesResponse,
   ItemAssignToCardSpec,
 } from './types'
-import ItemAssignToCard from './ItemAssignToCard'
+import ItemAssignToCard, {type ItemAssignToCardRef} from './ItemAssignToCard'
 import TrayFooter from '../Footer'
 import type {AssigneeOption} from '../AssigneeSelector'
 import useFetchAssignees from '../../utils/hooks/useFetchAssignees'
@@ -185,7 +185,7 @@ export default function ItemAssignToTray({
   const [blueprintDateLocks, setBlueprintDateLocks] = useState<DateLockTypes[] | undefined>(
     undefined
   )
-  const [shouldFocusDeleteButton, setShouldFocusDeleteButton] = useState<boolean>(false)
+  const cardsRefs = useRef<{[cardId: string]: ItemAssignToCardRef}>({})
   const addCardButtonRef = useRef<Element | null>(null)
   const everyoneOption = useMemo(() => {
     const hasOverrides =
@@ -211,8 +211,13 @@ export default function ItemAssignToTray({
   })
 
   useEffect(() => {
-    if (shouldFocusCard) setShouldFocusCard(false)
-  }, [shouldFocusCard])
+    if (assignToCards.length === 0) return
+    const lastCard = assignToCards.at(assignToCards.length - 1)
+    if (!lastCard) return
+    const lastCardRef = cardsRefs.current[lastCard.key]
+    lastCardRef?.focusDeleteButton()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [assignToCards.length])
 
   useEffect(() => {
     if (defaultCards !== undefined) {
@@ -320,7 +325,6 @@ export default function ItemAssignToTray({
   }, [courseId, itemContentId, itemType, JSON.stringify(defaultCards)])
 
   const handleAddCard = () => {
-    setShouldFocusDeleteButton(true)
     if (onAddCard) {
       onAddCard()
       return
@@ -347,7 +351,12 @@ export default function ItemAssignToTray({
     const hasErrors = assignToCards.some(card => !card.isValid)
     // If a card has errors it should not save and the respective card should be focused
     if (hasErrors) {
-      setShouldFocusCard(true)
+      const firstCardWithError = assignToCards.find(card => !card.isValid)
+      if (!firstCardWithError) return
+      const firstCardWithErrorRef = cardsRefs.current[firstCardWithError.key]
+
+      Object.values(cardsRefs.current).forEach(c => c.showValidations())
+      firstCardWithErrorRef?.focusInputs()
       return
     }
 
@@ -550,11 +559,13 @@ export default function ItemAssignToTray({
 
   function renderCards(isOpen?: boolean) {
     const cardCount = assignToCards.length
-    const firstCardWithError = assignToCards.find(card => !card.isValid)
     return assignToCards.map((card, i) => {
       return (
         <View key={card.key} as="div" margin="small 0 0 0">
           <ItemAssignToCard
+            ref={cardRef => {
+              if (cardRef) cardsRefs.current[card.key] = cardRef
+            }}
             courseId={courseId}
             contextModuleId={card.contextModuleId}
             contextModuleName={card.contextModuleName}
@@ -574,9 +585,7 @@ export default function ItemAssignToTray({
             customIsLoading={isLoading}
             customSetSearchTerm={setSearchTerm}
             highlightCard={card.highlightCard}
-            focus={shouldFocusCard && firstCardWithError?.key === card.key}
             blueprintDateLocks={blueprintDateLocks}
-            shouldFocusDeleteButton={shouldFocusDeleteButton && i === assignToCards.length - 1}
           />
         </View>
       )
