@@ -23770,7 +23770,7 @@ ga:
       in Ardsocruithe.  Ba cheart duit a chumrú %{callback_url} mar an URI atreoraithe OAuth bailí.
       Tar éis duit d’aip a shábháil, déan nóta de ID na haipe agus Rún Aip, agus cuir isteach anseo iad.
   you_will_need_to_create_a_service_id_apple_develop_4e684a7a: |-
-      Beidh ort aitheantas Seirbhíse a chruthú [Apple Developer Console](%{apple_url}).
+      Beidh ort ID Seirbhíse a chruthú [Apple Developer Console](%{apple_url}).
       Cumasaigh Sínigh isteach le Apple, agus cuir %{callback_url} leis mar URL tuairisceáin. Cuir isteach an tAitheantóir anseo.
   you_will_need_to_create_a_web_application_in_the_g_43f753ec: |-
       Beidh ort aip gréasáin a chruthú sa [Google Developer Console](%{google_url}).
