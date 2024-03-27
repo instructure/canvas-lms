@@ -984,6 +984,17 @@ function handleSelectedRubricAssessmentChanged({validateEnteredData = true} = {}
     showEditButton = !selectedAssessment || assessmentBelongsToCurrentUser(selectedAssessment)
   }
   $('#rubric_assessments_list_and_edit_button_holder .edit').showIf(showEditButton)
+
+  if (enhanced_rubrics) {
+    if (
+      !selectedAssessment?.assessor_id ||
+      ENV.RUBRIC_ASSESSMENT.assessor_id === selectedAssessment?.assessor_id
+    ) {
+      $('button.toggle_full_rubric').show()
+    } else {
+      $('button.toggle_full_rubric').hide()
+    }
+  }
 }
 
 function initRubricStuff() {

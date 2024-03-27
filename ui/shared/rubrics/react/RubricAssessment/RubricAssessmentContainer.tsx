@@ -323,10 +323,7 @@ const AssessmentFooter = ({onSubmit}: AssessmentFooterProps) => {
   return (
     <View as="div">
       <View as="hr" margin="0" />
-      <Flex justifyItems="space-between" margin="small 0">
-        <Flex.Item>
-          <Checkbox label={I18n.t('Reassign')} value="medium" />
-        </Flex.Item>
+      <Flex justifyItems="end" margin="small 0">
         <Flex.Item>
           <Button
             color="primary"
