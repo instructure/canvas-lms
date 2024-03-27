@@ -331,6 +331,7 @@ class EnrollmentsApiController < ApplicationController
   @@errors = {
     missing_parameters: "No parameters given",
     missing_user_id: "Can't create an enrollment without a user. Include enrollment[user_id] to create an enrollment",
+    missing_sis_or_integration_id: "Can't create an enrollment without a sis_user_id or integration_id when root_account is provided",
     bad_type: "Invalid type",
     bad_role: "Invalid role",
     inactive_role: "Cannot create an enrollment with this role because it is inactive.",
@@ -621,6 +622,20 @@ class EnrollmentsApiController < ApplicationController
   #   student's enrollments (for example, as a parent), please use
   #   the {api:UserObserveesController#create User Observees API}.
   #
+  # @argument enrollment[sis_user_id] [String]
+  #   Required if the user is being enrolled from another trusted account.
+  #   The unique identifier for the user (sis_user_id) must also be
+  #   accompanied by the root_account parameter. The user_id will be ignored.
+  #
+  # @argument enrollment[integration_id] [String]
+  #   Required if the user is being enrolled from another trusted account.
+  #   The unique identifier for the user (integration_id) must also be
+  #   accompanied by the root_account parameter. The user_id will be ignored.
+  #
+  # @argument root_account [String]
+  #   The domain of the account to search for the user. Will be a no-op
+  #   unless the sis_user_id or integration_id parameter is also included.
+  #
   # @example_request
   #   curl https://<canvas>/api/v1/courses/:course_id/enrollments \
   #     -X POST \
@@ -674,7 +689,11 @@ class EnrollmentsApiController < ApplicationController
         errors << @@errors[:bad_role]
       end
 
-      errors << @@errors[:missing_user_id] unless params[:enrollment][:user_id].present?
+      if params[:root_account].present? && %i[sis_user_id integration_id].all? { |k| params[:enrollment][k].blank? }
+        errors << @@errors[:missing_sis_or_integration_id]
+      elsif params[:enrollment][:user_id].blank? && params[:root_account].blank?
+        errors << @@errors[:missing_user_id]
+      end
     end
     return render_create_errors(errors) if errors.present?
 
@@ -690,9 +709,22 @@ class EnrollmentsApiController < ApplicationController
       @section = api_find(@context.course_sections.active, params[:enrollment].delete(:course_section_id))
       params[:enrollment][:section] = @section
     end
-    api_user_id = params[:enrollment].delete(:user_id)
-    user = api_find(User, api_user_id)
-    raise(ActiveRecord::RecordNotFound, "Couldn't find User with API id '#{api_user_id}'") unless user.can_be_enrolled_in_course?(@context)
+
+    user = if @trusted_account.present? && params.delete(:root_account)
+             sis_user_id = params[:enrollment].delete(:sis_user_id)
+             integration_id = params[:enrollment].delete(:integration_id)
+             scope = @trusted_account.pseudonyms.active_only
+             pseudo = sis_user_id.present? ? scope.find_by(sis_user_id:) : scope.find_by(integration_id:)
+             pseudo&.user
+           else
+             api_user_id = params[:enrollment].delete(:user_id)
+             api_find(User, api_user_id)
+           end
+
+    unless user.can_be_enrolled_in_course?(@context)
+      unique_id = api_user_id || sis_user_id || integration_id
+      raise(ActiveRecord::RecordNotFound, "Couldn't find User with API id '#{unique_id}'")
+    end
 
     # allow moving users already in the course to open sections
     if @context.concluded? &&
