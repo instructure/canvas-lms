@@ -318,7 +318,7 @@ $icon-size: 1.4rem;
   bottom: 0;
   #{direction(left)}: 0;
   background: #bbb url("/images/splitpane_handle-ew.gif") no-repeat scroll 50% 50%;
-  cursor: pointer;
+  cursor: ew-resize;
   width: 7px;
   border-#{direction(right)}: 1px solid #838383;
   z-index: 2;
