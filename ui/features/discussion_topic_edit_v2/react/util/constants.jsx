@@ -46,6 +46,9 @@ const GradedDiscussionDueDateDefaultValues = {
   setPointsPossibleReplyToTopic: () => {},
   pointsPossibleReplyToEntry: 0,
   setPointsPossibleReplyToEntry: () => {},
+  replyToEntryRequiredCount: 1,
+  setReplyToEntryRequiredCount: () => {},
+  setReplyToEntryRequiredRef: () => {},
 }
 
 export const GradedDiscussionDueDatesContext = React.createContext(
@@ -57,6 +60,9 @@ export const ASSIGNMENT_OVERRIDE_GRAPHQL_TYPENAMES = {
   SECTION: 'Section',
   GROUP: 'Group',
 }
+
+export const minimumReplyToEntryRequiredCount = 1
+export const maximumReplyToEntryRequiredCount = 10
 
 export const useShouldShowContent = (
   isGraded,

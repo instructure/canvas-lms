@@ -414,13 +414,17 @@ describe('DiscussionTopicForm', () => {
 
     it('displays the checkpoints checkbox when the Graded option is selected and discussion checkpoints flag is on', () => {
       const {queryByTestId, getByLabelText} = setup()
+
       expect(queryByTestId('checkpoints-checkbox')).not.toBeInTheDocument()
+
       getByLabelText('Graded').click()
+
       expect(queryByTestId('checkpoints-checkbox')).toBeInTheDocument()
     })
 
     it('does not display the checkpoints checkbox when the Graded option is not selected and discussion checkpoints flag is on', () => {
       const {queryByTestId} = setup()
+
       expect(queryByTestId('checkpoints-checkbox')).not.toBeInTheDocument()
     })
 
@@ -428,7 +432,9 @@ describe('DiscussionTopicForm', () => {
       window.ENV.DISCUSSION_CHECKPOINTS_ENABLED = false
 
       const {queryByTestId, getByLabelText} = setup()
+
       getByLabelText('Graded').click()
+
       expect(queryByTestId('checkpoints-checkbox')).not.toBeInTheDocument()
     })
   })
@@ -436,39 +442,113 @@ describe('DiscussionTopicForm', () => {
   describe('Checkpoints', () => {
     it('toggles the checkpoints checkbox when clicked', () => {
       const {getByTestId, getByLabelText} = setup()
+
       getByLabelText('Graded').click()
+
       const checkbox = getByTestId('checkpoints-checkbox')
       checkbox.click()
       expect(checkbox.checked).toBe(true)
+
       checkbox.click()
       expect(checkbox.checked).toBe(false)
     })
     describe('Checkpoints Settings', () => {
       it('increments and decrements the checkpoints settings points possible reply to topic fields', () => {
         const {getByTestId, getByLabelText} = setup()
+
         getByLabelText('Graded').click()
+
         const checkbox = getByTestId('checkpoints-checkbox')
         checkbox.click()
+
         const numberInputReplyToTopic = getByTestId('points-possible-input-reply-to-topic')
         expect(numberInputReplyToTopic.value).toBe('0')
+
         fireEvent.click(numberInputReplyToTopic)
+
         fireEvent.keyDown(numberInputReplyToTopic, {keyCode: 38})
         expect(numberInputReplyToTopic.value).toBe('1')
+
         fireEvent.keyDown(numberInputReplyToTopic, {keyCode: 40})
         expect(numberInputReplyToTopic.value).toBe('0')
       })
       it('increments and decrements the checkpoints settings points possible reply to entry fields', () => {
         const {getByTestId, getByLabelText} = setup()
+
         getByLabelText('Graded').click()
+
         const checkbox = getByTestId('checkpoints-checkbox')
         checkbox.click()
+
         const numberInputReplyToEntry = getByTestId('points-possible-input-reply-to-entry')
         expect(numberInputReplyToEntry.value).toBe('0')
+
         fireEvent.click(numberInputReplyToEntry)
+
         fireEvent.keyDown(numberInputReplyToEntry, {keyCode: 38})
         expect(numberInputReplyToEntry.value).toBe('1')
+
         fireEvent.keyDown(numberInputReplyToEntry, {keyCode: 40})
         expect(numberInputReplyToEntry.value).toBe('0')
+      })
+      it('increments and decrements the checkpoints settings additional replies required entry field', () => {
+        const {getByTestId, getByLabelText} = setup()
+
+        getByLabelText('Graded').click()
+
+        const checkbox = getByTestId('checkpoints-checkbox')
+        checkbox.click()
+
+        const numberInputReplyToEntryRequiredCount = getByTestId('reply-to-entry-required-count')
+        expect(numberInputReplyToEntryRequiredCount.value).toBe('1')
+
+        fireEvent.click(numberInputReplyToEntryRequiredCount)
+
+        fireEvent.keyDown(numberInputReplyToEntryRequiredCount, {keyCode: 38})
+        expect(numberInputReplyToEntryRequiredCount.value).toBe('2')
+
+        fireEvent.keyDown(numberInputReplyToEntryRequiredCount, {keyCode: 40})
+        expect(numberInputReplyToEntryRequiredCount.value).toBe('1')
+      })
+      it('does not submit when the required replies count is greater than maximum allowed count', () => {
+        const onSubmit = jest.fn()
+        const {container, getByText, getByLabelText, getByTestId, getByPlaceholderText} = setup({onSubmit})
+
+        fireEvent.input(getByPlaceholderText('Topic Title'), {target: {value: 'a title'}})
+
+        getByLabelText('Graded').click()
+
+        const checkbox = getByTestId('checkpoints-checkbox')
+        checkbox.click()
+
+        const numberInputReplyToEntryRequiredCount = getByTestId('reply-to-entry-required-count')
+        fireEvent.change(numberInputReplyToEntryRequiredCount, {target: {value: '11'}})
+
+        expect(container).toHaveTextContent("This number must be between 1 and 10")
+
+        const saveButton = getByText('Save')
+        saveButton.click()
+
+        expect(onSubmit).not.toHaveBeenCalled()
+      })
+      it('submits when the required replies count is between the minimum and maximum allowed count, inclusive', () => {
+        const onSubmit = jest.fn()
+        const {getByText, getByLabelText, getByTestId, getByPlaceholderText} = setup({onSubmit})
+
+        fireEvent.input(getByPlaceholderText('Topic Title'), {target: {value: 'a title'}})
+
+        getByLabelText('Graded').click()
+
+        const checkbox = getByTestId('checkpoints-checkbox')
+        checkbox.click()
+
+        const numberInputReplyToEntryRequiredCount = getByTestId('reply-to-entry-required-count')
+        fireEvent.change(numberInputReplyToEntryRequiredCount, {target: {value: '10'}})
+
+        const saveButton = getByText('Save')
+        saveButton.click()
+
+        expect(onSubmit).toHaveBeenCalled()
       })
     })
   })

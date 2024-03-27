@@ -93,6 +93,7 @@ export default function DiscussionTopicForm({
   const dateInputRef = useRef()
   const groupOptionsRef = useRef()
   const gradedDiscussionRef = useRef()
+  const replyToEntryRequiredRef = useRef()
   const {setOnFailure} = useContext(AlertManagerContext)
 
   const isAnnouncement = ENV?.DISCUSSION_TOPIC?.ATTRIBUTES?.is_announcement ?? false
@@ -165,9 +166,7 @@ export default function DiscussionTopicForm({
     currentDiscussionTopic?.podcastHasStudentPosts || false
   )
   const [isGraded, setIsGraded] = useState(!!currentDiscussionTopic?.assignment || false)
-  const [isCheckpoints, setIsCheckpoints] = useState(
-    !!currentDiscussionTopic?.assignment?.checkpoints || false
-  )
+
   const [allowLiking, setAllowLiking] = useState(currentDiscussionTopic?.allowRating || false)
   const [onlyGradersCanLike, setOnlyGradersCanLike] = useState(
     currentDiscussionTopic?.onlyGradersCanRate || false
@@ -196,10 +195,6 @@ export default function DiscussionTopicForm({
   const [pointsPossible, setPointsPossible] = useState(
     currentDiscussionTopic?.assignment?.pointsPossible || 0
   )
-  // add initial states once checkpoint mutation has been edited
-  const [pointsPossibleReplyToTopic, setPointsPossibleReplyToTopic] = useState(0)
-  // add initial states once checkpoint mutation has been edited
-  const [pointsPossibleReplyToEntry, setPointsPossibleReplyToEntry] = useState(0)
   const [displayGradeAs, setDisplayGradeAs] = useState(
     currentDiscussionTopic?.assignment?.gradingType || 'points'
   )
@@ -229,6 +224,18 @@ export default function DiscussionTopicForm({
 
   const [gradedDiscussionRefMap, setGradedDiscussionRefMap] = useState(new Map())
 
+  // Checkpoints - add initial states once checkpoint mutation has been edited
+  const [isCheckpoints, setIsCheckpoints] = useState(
+    !!currentDiscussionTopic?.assignment?.checkpoints || false
+  )
+  const [pointsPossibleReplyToTopic, setPointsPossibleReplyToTopic] = useState(0)
+  const [pointsPossibleReplyToEntry, setPointsPossibleReplyToEntry] = useState(0)
+  const [replyToEntryRequiredCount, setReplyToEntryRequiredCount] = useState(1)
+
+  const setReplyToEntryRequiredRef = (ref) => {
+    replyToEntryRequiredRef.current = ref
+  }
+
   const assignmentDueDateContext = {
     assignedInfoList,
     setAssignedInfoList,
@@ -244,6 +251,9 @@ export default function DiscussionTopicForm({
     setPointsPossibleReplyToTopic,
     pointsPossibleReplyToEntry,
     setPointsPossibleReplyToEntry,
+    replyToEntryRequiredCount,
+    setReplyToEntryRequiredCount,
+    setReplyToEntryRequiredRef,
   }
   const [showGroupCategoryModal, setShowGroupCategoryModal] = useState(false)
 
@@ -413,7 +423,10 @@ export default function DiscussionTopicForm({
         setTitleValidationMessages,
         setAvailabilityValidationMessages,
         shouldShowPostToSectionOption,
-        sectionIdsToPostTo
+        sectionIdsToPostTo,
+        isCheckpoints,
+        replyToEntryRequiredCount,
+        replyToEntryRequiredRef,
       )
     ) {
       const payload = createSubmitPayload(shouldPublish)

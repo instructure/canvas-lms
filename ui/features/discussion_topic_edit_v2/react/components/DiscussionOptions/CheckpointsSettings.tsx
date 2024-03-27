@@ -15,12 +15,17 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React, {useContext} from 'react'
+import React, {useContext, useRef} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import {PointsPossible} from './PointsPossible'
-import {GradedDiscussionDueDatesContext} from '../../util/constants'
+import {DiscussionTopicNumberInput} from './DiscussionTopicNumberInput'
+import {
+  GradedDiscussionDueDatesContext,
+  minimumReplyToEntryRequiredCount,
+  maximumReplyToEntryRequiredCount,
+} from '../../util/constants'
+import type {FormMessage} from '@instructure/ui-form-field'
 
 const I18n = useI18nScope('discussion_create')
 
@@ -30,7 +35,25 @@ export const CheckpointsSettings = () => {
     setPointsPossibleReplyToTopic,
     pointsPossibleReplyToEntry,
     setPointsPossibleReplyToEntry,
+    replyToEntryRequiredCount,
+    setReplyToEntryRequiredCount,
+    setReplyToEntryRequiredRef,
   } = useContext(GradedDiscussionDueDatesContext)
+
+  const validateReplyToEntryRequiredCountMessage = () => {
+    if (
+      replyToEntryRequiredCount >= minimumReplyToEntryRequiredCount &&
+      replyToEntryRequiredCount <= maximumReplyToEntryRequiredCount
+    ) {
+      return []
+    }
+    return [
+      {
+        text: I18n.t('This number must be between 1 and 10'),
+        type: 'error',
+      },
+    ] as FormMessage[]
+  }
 
   return (
     <>
@@ -38,19 +61,29 @@ export const CheckpointsSettings = () => {
         <Text size="large">{I18n.t('Checkpoint Settings')}</Text>
       </View>
       <View as="div" margin="0 0 medium 0">
-        <PointsPossible
-          pointsPossible={pointsPossibleReplyToTopic || 0}
-          setPointsPossible={setPointsPossibleReplyToTopic}
-          pointsPossibleLabel={I18n.t('Points Possible: Reply to Topic')}
-          pointsPossibleDataTestId="points-possible-input-reply-to-topic"
+        <DiscussionTopicNumberInput
+          numberInput={pointsPossibleReplyToTopic}
+          setNumberInput={setPointsPossibleReplyToTopic}
+          numberInputLabel={I18n.t('Points Possible: Reply to Topic')}
+          numberInputDataTestId="points-possible-input-reply-to-topic"
         />
       </View>
       <View as="div" margin="0 0 medium 0">
-        <PointsPossible
-          pointsPossible={pointsPossibleReplyToEntry || 0}
-          setPointsPossible={setPointsPossibleReplyToEntry}
-          pointsPossibleLabel={I18n.t('Points Possible: Additional Replies')}
-          pointsPossibleDataTestId="points-possible-input-reply-to-entry"
+        <DiscussionTopicNumberInput
+          numberInput={replyToEntryRequiredCount}
+          setNumberInput={setReplyToEntryRequiredCount}
+          numberInputLabel={I18n.t('Additional Replies Required')}
+          numberInputDataTestId="reply-to-entry-required-count"
+          messages={validateReplyToEntryRequiredCountMessage()}
+          setRef={setReplyToEntryRequiredRef}
+        />
+      </View>
+      <View as="div" margin="0 0 medium 0">
+        <DiscussionTopicNumberInput
+          numberInput={pointsPossibleReplyToEntry}
+          setNumberInput={setPointsPossibleReplyToEntry}
+          numberInputLabel={I18n.t('Points Possible: Additional Replies')}
+          numberInputDataTestId="points-possible-input-reply-to-entry"
         />
       </View>
       <View as="div" margin="0 0 medium 0">

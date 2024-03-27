@@ -28,6 +28,8 @@ const setup = ({
   setPointsPossibleReplyToTopic = () => {},
   pointsPossibleReplyToEntry = 0,
   setPointsPossibleReplyToEntry = () => {},
+  replyToEntryRequiredCount = 0,
+  setReplyToEntryRequiredCount = () => {},
 } = {}) => {
   return render(
     <GradedDiscussionDueDatesContext.Provider
@@ -36,6 +38,8 @@ const setup = ({
         setPointsPossibleReplyToTopic,
         pointsPossibleReplyToEntry,
         setPointsPossibleReplyToEntry,
+        replyToEntryRequiredCount,
+        setReplyToEntryRequiredCount,
       }}
     >
       <CheckpointsSettings />
@@ -66,6 +70,14 @@ describe('CheckpointsSettings', () => {
         pointsPossibleReplyToTopic: 9,
       })
       expect(getByText('Total Points Possible: 17')).toBeInTheDocument()
+    })
+  })
+  describe('Additional Replies Required', () => {
+    it('displays the correct additional replies required passed from the useContext', () => {
+      const {getByTestId} = setup({
+        replyToEntryRequiredCount: 5
+      })
+      expect(getByTestId('reply-to-entry-required-count')).toHaveValue('5')
     })
   })
 })
