@@ -132,6 +132,18 @@ enhanced_developer_keys_tables:
       state: allowed_on
     ci:
       state: on
+external_tool_drawer:
+  state: hidden
+  applies_to: RootAccount
+  display_name: External Tool Drawer
+  description: Enables experimental external tool drawer layout.
+  environments:
+    development:
+      state: allowed_on
+    test:
+      state: allowed_on
+    ci:
+      state: allowed_on
 include_oauth_consumer_key_in_lti_launch:
   state: hidden
   applies_to: SiteAdmin
