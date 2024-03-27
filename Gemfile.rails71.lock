@@ -90,7 +90,7 @@ PATH
     respondus_soap_endpoint (1.1.0)
       rails (>= 3.2)
       soap4r-middleware (= 0.8.7)
-      soap4r-ruby1.9 (= 2.0.5)
+      soap4r-ng (= 2.0.4)
 
 PATH
   remote: gems/plugins/simply_versioned
@@ -1072,6 +1072,7 @@ GEM
       version_gem (~> 1.1, >= 1.1.1)
     soap4r-middleware (0.8.7)
       soap4r-ruby1.9 (= 2.0.5)
+    soap4r-ng (2.0.4)
     soap4r-ruby1.9 (2.0.5)
     sorbet-runtime (0.5.11262)
     spring (4.1.3)
