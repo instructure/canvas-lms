@@ -25,14 +25,14 @@ module ConditionalRelease
     it_behaves_like "a soft-deletable model"
 
     it "must have an assignment_id" do
-      assignment = build :assignment_set_association
+      assignment = build(:assignment_set_association)
       assignment.assignment_id = nil
       expect(assignment.valid?).to be false
     end
 
     it "enforces unique assignment_id in assignment_set" do
-      asg = create :assignment_set_association
-      dup = build :assignment_set_association, assignment_id: asg.assignment_id
+      asg = create(:assignment_set_association)
+      dup = build(:assignment_set_association, assignment_id: asg.assignment_id)
       asg.assignment_set.assignment_set_associations << dup
       expect(dup.valid?).to be false
       expect(dup.errors["assignment_id"].to_s).to match(/taken/)
@@ -41,7 +41,7 @@ module ConditionalRelease
     end
 
     it "enforces not having the same assigment_id as the trigger_assignment of its rule" do
-      asg = create :assignment_set_association
+      asg = create(:assignment_set_association)
       asg.assignment_id = asg.rule.trigger_assignment_id
       expect(asg.valid?).to be false
       expect(asg.errors["assignment_id"].to_s).to match(/trigger/)

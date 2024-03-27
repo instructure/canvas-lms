@@ -29,6 +29,7 @@ class Course < ActiveRecord::Base
   include ContentLicenses
   include TurnitinID
   include Courses::ItemVisibilityHelper
+  include Courses::ExportWarnings
   include OutcomeImportContext
   include MaterialChanges
 
@@ -371,6 +372,12 @@ class Course < ActiveRecord::Base
 
   def [](attr)
     (attr.to_s == "asset_string") ? asset_string : super
+  end
+
+  def grade_statuses
+    statuses = %w[late missing none excused]
+    statuses << "extended" if root_account.feature_enabled?(:extended_submission_state)
+    statuses
   end
 
   def events_for(user)
@@ -3361,7 +3368,7 @@ class Course < ActiveRecord::Base
                      Course.default_tabs
                    end
 
-    if OpenAi.smart_search_available?(self)
+    if SmartSearch.smart_search_available?(self)
       default_tabs.insert(1,
                           {
                             id: TAB_SEARCH,

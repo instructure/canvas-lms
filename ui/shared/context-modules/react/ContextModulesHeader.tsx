@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect} from 'react'
+import React, {useEffect, useState} from 'react'
 import {Heading} from '@instructure/ui-heading'
 import {Flex} from '@instructure/ui-flex'
 import {Link} from '@instructure/ui-link'
@@ -59,14 +59,16 @@ type ExportCourseContentProps = {
   visible: boolean
 }
 
+type PublishMenuProps = {
+  courseId: string
+  runningProgressId: string
+  disabled: boolean
+  visible: boolean
+}
+
 type Props = {
   title: string
-  publishMenu: {
-    courseId: string
-    runningProgressId: string
-    disabled: boolean
-    visible: boolean
-  }
+  publishMenu: PublishMenuProps
   viewProgress: {
     label: string
     url: string
@@ -144,10 +146,22 @@ const ContextModulesHeaderMoreMenu = ({component, items}: MoreMenuProps) => {
 }
 
 const ContextModulesHeaderContent = ({responsive, ...props}: ContentProps) => {
+  const [publishMenu, setPublishMenu] = useState<PublishMenuProps>(props.publishMenu)
+
   useEffect(() => {
     setExpandAllButton()
     setExpandAllButtonHandler()
   })
+
+  useEffect(() => {
+    window.addEventListener('update-publish-menu-disabled-state', ((e: CustomEvent) => {
+      setPublishMenu((prev: PublishMenuProps) => ({
+        ...prev,
+        disabled: e.detail.disabled,
+      }))
+      // eslint-disable-next-line no-undef
+    }) as EventListener)
+  }, [])
 
   resetExpandAllButtonBindings()
   return (
@@ -183,7 +197,7 @@ const ContextModulesHeaderContent = ({responsive, ...props}: ContentProps) => {
             withVisualDebug={false}
             direction={responsive.matches.includes('small') ? 'column-reverse' : 'row'}
           >
-            {(props.moreMenu.menuTools.visible || props.moreMenu.exportCourseContent.visible) && (
+            {props.moreMenu.menuTools.visible && (
               <Flex.Item overflowY="visible">
                 <View
                   as="div"
@@ -241,9 +255,23 @@ const ContextModulesHeaderContent = ({responsive, ...props}: ContentProps) => {
               </Flex.Item>
             )}
 
-            {props.publishMenu.visible && (
+            {!props.moreMenu.menuTools.visible && props.moreMenu.exportCourseContent.visible && (
+              <Flex.Item overflowY="visible">
+                <Button
+                  renderIcon={IconExportLine}
+                  href={props.moreMenu.exportCourseContent.url}
+                  id="context-modules-header-export-course-button"
+                  display={responsive.props.display}
+                >
+                  {props.moreMenu.exportCourseContent.label}
+                </Button>
+              </Flex.Item>
+            )}
+
+            {publishMenu.visible && (
               <Flex.Item overflowY="visible">
                 <View
+                  id="context-modules-publish-menu"
                   as="div"
                   display={responsive.props.display}
                   maxHeight="2.375rem"
@@ -252,8 +280,9 @@ const ContextModulesHeaderContent = ({responsive, ...props}: ContentProps) => {
                       ? 'context-modules-header-publish-menu-responsive'
                       : null
                   }
+                  data-progress-id={publishMenu.runningProgressId}
                 >
-                  <ContextModulesPublishMenu {...props.publishMenu} />
+                  <ContextModulesPublishMenu {...publishMenu} />
                 </View>
               </Flex.Item>
             )}

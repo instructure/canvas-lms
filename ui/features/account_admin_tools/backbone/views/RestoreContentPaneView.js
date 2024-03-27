@@ -50,7 +50,7 @@ export default class RestoreContentPaneView extends Backbone.View {
   }
 
   toJSON() {
-    return {...this.permissions, deleted_user_tools: ENV.FEATURES.deleted_user_tools}
+    return {...this.permissions}
   }
 
   onTypeChange(e) {

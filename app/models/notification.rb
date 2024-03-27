@@ -21,8 +21,6 @@
 class Notification < Switchman::UnshardedRecord
   include TextHelper
 
-  self.ignored_columns += %i[workflow_state]
-
   TYPES_TO_SHOW_IN_FEED = [
     # Assignment
     "Assignment Created",

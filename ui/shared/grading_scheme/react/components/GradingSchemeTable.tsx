@@ -33,12 +33,14 @@ import type {GradingScheme, GradingSchemeCardData} from '../../gradingSchemeApiM
 import {Link} from '@instructure/ui-link'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {Tooltip} from '@instructure/ui-tooltip'
+import {Pagination} from '@instructure/ui-pagination'
 
 const I18n = useI18nScope('GradingSchemeManagement')
 
 type Props = {
   caption: string
   gradingSchemeCards: GradingSchemeCardData[]
+  showUsedLocations: boolean
   editGradingScheme: (gradingSchemeId: string) => void
   openGradingScheme: (gradingScheme: GradingScheme) => void
   viewUsedLocations: (gradingScheme: GradingScheme) => void
@@ -51,6 +53,7 @@ type Props = {
 export const GradingSchemeTable = ({
   caption,
   gradingSchemeCards,
+  showUsedLocations,
   editGradingScheme,
   openGradingScheme,
   viewUsedLocations,
@@ -61,6 +64,7 @@ export const GradingSchemeTable = ({
   archivedSchemes = false,
 }: Props) => {
   const [ascending, setAscending] = useState(true)
+  const [currentPage, setCurrentPage] = useState<number>(0)
   const direction = ascending ? 'ascending' : 'descending'
   const sortedSchemes = gradingSchemeCards.sort((a, b) =>
     a.gradingScheme.title.localeCompare(b.gradingScheme.title)
@@ -68,10 +72,15 @@ export const GradingSchemeTable = ({
   if (!ascending) {
     sortedSchemes.reverse()
   }
-
   const handleSort = (_event: React.SyntheticEvent<Element, Event>, _param: {id: string}) => {
     setAscending(!ascending)
   }
+  const currentPageSchemes = sortedSchemes.slice(currentPage * 10, currentPage * 10 + 10)
+  const pages = [...Array(Math.ceil(sortedSchemes.length / 10)).keys()].map((v, index) => (
+    <Pagination.Page key={v} onClick={() => setCurrentPage(index)} current={index === currentPage}>
+      {index + 1}{' '}
+    </Pagination.Page>
+  ))
   const header = (
     <Table.Row>
       <Table.ColHeader
@@ -84,14 +93,16 @@ export const GradingSchemeTable = ({
       >
         {I18n.t('Grading Scheme Name')}
       </Table.ColHeader>
-      <Table.ColHeader
-        id="locationsUsed"
-        key="locationsUsed"
-        width="45%"
-        stackedSortByLabel="Locations Used"
-      >
-        {I18n.t('Locations Used')}
-      </Table.ColHeader>
+      {showUsedLocations && (
+        <Table.ColHeader
+          id="locationsUsed"
+          key="locationsUsed"
+          width="45%"
+          stackedSortByLabel="Locations Used"
+        >
+          {I18n.t('Locations Used')}
+        </Table.ColHeader>
+      )}
       <Table.ColHeader id="actions" key="actions" width="20%" />
     </Table.Row>
   )
@@ -105,131 +116,132 @@ export const GradingSchemeTable = ({
     )
   }
   return (
-    <Responsive
-      query={{
-        small: {maxWidth: '40rem'},
-        large: {minWidth: '41rem'},
-      }}
-      props={{
-        small: {layout: 'stacked'},
-        large: {layout: 'auto'},
-      }}
-    >
-      {props => (
-        <div>
-          <Table
-            caption={`${caption}: sorted by grading scheme name in ${direction} order`}
-            {...props}
-          >
-            <Table.Head renderSortLabel="Sort by">{header}</Table.Head>
-            <Table.Body>
-              {sortedSchemes.map(gradingSchemeCard => (
-                <Table.Row key={gradingSchemeCard.gradingScheme.id}>
-                  <Table.Cell key="gradingSchemeName">
-                    <Link
-                      onClick={() => openGradingScheme(gradingSchemeCard.gradingScheme)}
-                      isWithinText={false}
-                    >
-                      <TruncateText>{gradingSchemeCard.gradingScheme.title}</TruncateText>
-                    </Link>
-                  </Table.Cell>
-                  <Table.Cell key="locationsUsed">
-                    {(gradingSchemeCard.gradingScheme.used_locations || []).length > 0 ? (
+    <>
+      <Responsive
+        query={{
+          small: {maxWidth: '40rem'},
+          large: {minWidth: '41rem'},
+        }}
+        props={{
+          small: {layout: 'stacked'},
+          large: {layout: 'auto'},
+        }}
+      >
+        {props => (
+          <div>
+            <Table
+              caption={`${caption}: sorted by grading scheme name in ${direction} order`}
+              {...props}
+            >
+              <Table.Head renderSortLabel="Sort by">{header}</Table.Head>
+              <Table.Body>
+                {currentPageSchemes.map(gradingSchemeCard => (
+                  <Table.Row key={gradingSchemeCard.gradingScheme.id}>
+                    <Table.Cell>
                       <Link
+                        onClick={() => openGradingScheme(gradingSchemeCard.gradingScheme)}
                         isWithinText={false}
-                        onClick={() => viewUsedLocations(gradingSchemeCard.gradingScheme)}
                       >
-                        {' '}
-                        {I18n.t('Show courses and assignments')}
+                        <TruncateText>{gradingSchemeCard.gradingScheme.title}</TruncateText>
                       </Link>
-                    ) : (
-                      ''
+                    </Table.Cell>
+                    {showUsedLocations && (
+                      <Table.Cell>
+                        {gradingSchemeCard.gradingScheme.assessed_assignment ? (
+                          <Link
+                            isWithinText={false}
+                            onClick={() => viewUsedLocations(gradingSchemeCard.gradingScheme)}
+                          >
+                            {I18n.t('Show courses and assignments')}
+                          </Link>
+                        ) : (
+                          ''
+                        )}
+                      </Table.Cell>
                     )}
-                  </Table.Cell>
-                  <Table.Cell key="actions" textAlign="end">
-                    <IconButton
-                      withBorder={false}
-                      withBackground={false}
-                      screenReaderLabel={I18n.t('Duplicate Grading Scheme')}
-                      onClick={() => openDuplicateModal(gradingSchemeCard.gradingScheme)}
-                    >
-                      <IconDuplicateLine />
-                    </IconButton>
-                    {!defaultScheme ? (
-                      <>
-                        <IconButton
-                          withBorder={false}
-                          withBackground={false}
-                          onClick={() => editGradingScheme(gradingSchemeCard.gradingScheme.id)}
-                          screenReaderLabel={I18n.t('Edit Grading Scheme')}
-                          disabled={
-                            (gradingSchemeCard.gradingScheme.used_locations || []).length > 0
-                          }
-                        >
-                          {(gradingSchemeCard.gradingScheme.used_locations || []).length > 0 ? (
-                            <Tooltip
-                              renderTip={I18n.t(
-                                "You can't edit this grading scheme because it has been used for grading."
-                              )}
-                            >
-                              <IconEditLine />
-                            </Tooltip>
-                          ) : (
+                    <Table.Cell textAlign="end">
+                      <IconButton
+                        withBorder={false}
+                        withBackground={false}
+                        screenReaderLabel={I18n.t('Duplicate Grading Scheme')}
+                        onClick={() => openDuplicateModal(gradingSchemeCard.gradingScheme)}
+                      >
+                        <IconDuplicateLine />
+                      </IconButton>
+                      {!defaultScheme ? (
+                        <>
+                          <IconButton
+                            withBorder={false}
+                            withBackground={false}
+                            onClick={() => editGradingScheme(gradingSchemeCard.gradingScheme.id)}
+                            screenReaderLabel={I18n.t('Edit Grading Scheme')}
+                          >
                             <IconEditLine />
-                          )}
-                        </IconButton>
-                        <IconButton
-                          withBorder={false}
-                          withBackground={false}
-                          screenReaderLabel={
-                            archivedSchemes
-                              ? I18n.t('Unarchive Grading Scheme')
-                              : I18n.t('Archive Grading Scheme')
-                          }
-                          onClick={() => archiveOrUnarchiveScheme(gradingSchemeCard.gradingScheme)}
-                        >
-                          {archivedSchemes ? <IconUnarchiveLine /> : <IconArchiveLine />}
-                        </IconButton>
+                          </IconButton>
+                          <IconButton
+                            withBorder={false}
+                            withBackground={false}
+                            screenReaderLabel={
+                              archivedSchemes
+                                ? I18n.t('Unarchive Grading Scheme')
+                                : I18n.t('Archive Grading Scheme')
+                            }
+                            onClick={() =>
+                              archiveOrUnarchiveScheme(gradingSchemeCard.gradingScheme)
+                            }
+                          >
+                            {archivedSchemes ? <IconUnarchiveLine /> : <IconArchiveLine />}
+                          </IconButton>
 
-                        <IconButton
-                          withBorder={false}
-                          withBackground={false}
-                          screenReaderLabel={I18n.t('Delete Grading Scheme')}
-                          onClick={() => openDeleteModal(gradingSchemeCard.gradingScheme)}
-                          disabled={
-                            (gradingSchemeCard.gradingScheme.used_locations || []).length > 0
-                          }
-                        >
-                          {(gradingSchemeCard.gradingScheme.used_locations || []).length > 0 ? (
-                            <Tooltip
-                              renderTip={I18n.t(
-                                "You can't delete this grading scheme because it is in use."
-                              )}
-                            >
+                          <IconButton
+                            withBorder={false}
+                            withBackground={false}
+                            screenReaderLabel={I18n.t('Delete Grading Scheme')}
+                            onClick={() => openDeleteModal(gradingSchemeCard.gradingScheme)}
+                            disabled={gradingSchemeCard.gradingScheme.assessed_assignment}
+                          >
+                            {gradingSchemeCard.gradingScheme.assessed_assignment ? (
+                              <Tooltip
+                                renderTip={I18n.t(
+                                  "You can't delete this grading scheme because it is in use."
+                                )}
+                              >
+                                <IconTrashLine />
+                              </Tooltip>
+                            ) : (
                               <IconTrashLine />
-                            </Tooltip>
-                          ) : (
-                            <IconTrashLine />
-                          )}
-                        </IconButton>
-                      </>
-                    ) : (
-                      <></>
-                    )}
-                  </Table.Cell>
-                </Table.Row>
-              ))}
-            </Table.Body>
-          </Table>
-          <Alert
-            liveRegion={() => document.getElementById('flash-messages') || document.body}
-            liveRegionPoliteness="polite"
-            screenReaderOnly={true}
-          >
-            {`Sorted by grading scheme name in ${direction} order`}
-          </Alert>
-        </div>
+                            )}
+                          </IconButton>
+                        </>
+                      ) : (
+                        <></>
+                      )}
+                    </Table.Cell>
+                  </Table.Row>
+                ))}
+              </Table.Body>
+            </Table>
+            <Alert
+              liveRegion={() => document.getElementById('flash-messages') || document.body}
+              liveRegionPoliteness="polite"
+              screenReaderOnly={true}
+            >
+              {`Sorted by grading scheme name in ${direction} order`}
+            </Alert>
+          </div>
+        )}
+      </Responsive>
+      {pages.length > 1 && (
+        <Pagination
+          as="nav"
+          margin="small"
+          variant="compact"
+          labelNext={I18n.t('Next Page')}
+          labelPrev={I18n.t('Previous Page')}
+        >
+          {pages}
+        </Pagination>
       )}
-    </Responsive>
+    </>
   )
 }

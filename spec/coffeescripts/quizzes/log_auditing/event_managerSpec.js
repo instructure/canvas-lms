@@ -21,6 +21,7 @@ import QuizEvent from '@canvas/quiz-log-auditing/jquery/event'
 import EventManager from '@canvas/quiz-log-auditing/jquery/event_manager'
 import EventTracker from '@canvas/quiz-log-auditing/jquery/event_tracker'
 import Backbone from 'node_modules-version-of-backbone'
+import sinon from 'sinon'
 
 QUnit.module('Quizzes::LogAuditing::EventManager', {
   teardown() {

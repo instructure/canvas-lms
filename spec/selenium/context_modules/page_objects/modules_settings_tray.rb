@@ -134,7 +134,7 @@ module ModulesSettingsTray
   end
 
   def remove_prerequisite_button_selector
-    "//button[.//*[starts-with(text(), 'Remove') and ends-with(text(), 'Prerequisite')]]"
+    "//button[.//*[contains(text(),'Remove')]]"
   end
 
   def remove_requirement_button_selector

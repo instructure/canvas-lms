@@ -21,6 +21,7 @@ import type {RubricCriterion} from '@canvas/rubrics/react/types/rubric'
 export type RubricFormProps = {
   id?: string
   title: string
+  hasRubricAssociations: boolean
   hidePoints: boolean
   accountId?: string
   courseId?: string
@@ -29,4 +30,5 @@ export type RubricFormProps = {
   buttonDisplay: string
   ratingOrder: string
   unassessed: boolean
+  workflowState: string
 }

@@ -27,6 +27,10 @@ module QuizzesIndexPage
     "#{quiz_settings_menu_selector(quiz_id)} .assign-to-link"
   end
 
+  def quiz_row_selector(quiz_id)
+    "#summary_quiz_#{quiz_id}"
+  end
+
   def quiz_settings_menu_selector(quiz_id)
     "ul[role='menu']#ui-id-#{quiz_id}-1"
   end
@@ -49,7 +53,7 @@ module QuizzesIndexPage
   end
 
   def quiz_row(quiz_id)
-    f("#summary_quiz_#{quiz_id}")
+    f(quiz_row_selector(quiz_id))
   end
 
   def manage_quiz_menu(quiz_id)

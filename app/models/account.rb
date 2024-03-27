@@ -481,6 +481,7 @@ class Account < ActiveRecord::Base
 
   def enable_canvas_authentication
     return unless root_account?
+    return if dummy?
     # for migrations creating a new db
     return unless Account.connection.data_source_exists?("authentication_providers")
     return if authentication_providers.active.where(auth_type: "canvas").exists?
@@ -1094,14 +1095,17 @@ class Account < ActiveRecord::Base
   end
 
   def account_chain_ids(include_federated_parent_id: false)
-    @cached_account_chain_ids ||= Account.account_chain_ids(self).freeze
+    @cached_account_chain_ids ||= {}
+
+    result = (@cached_account_chain_ids[Shard.current.id] ||= Account.account_chain_ids(self).freeze)
 
     if include_federated_parent_id
-      return @cached_account_chain_ids_with_federated_parent ||=
-               Account.add_federated_parent_id_to_chain!(@cached_account_chain_ids.dup).freeze
+      @cached_account_chain_ids_with_federated_parent ||= {}
+      result = (@cached_account_chain_ids_with_federated_parent[Shard.current.id] ||=
+                  Account.add_federated_parent_id_to_chain!(result.dup).freeze)
     end
 
-    @cached_account_chain_ids
+    result
   end
 
   def account_chain_loop
@@ -1522,6 +1526,7 @@ class Account < ActiveRecord::Base
 
   def default_enrollment_term
     return @default_enrollment_term if @default_enrollment_term
+    return if dummy?
 
     if root_account?
       @default_enrollment_term = GuardRail.activate(:primary) { enrollment_terms.active.where(name: EnrollmentTerm::DEFAULT_TERM_NAME).first_or_create }
@@ -1893,6 +1898,7 @@ class Account < ActiveRecord::Base
   TAB_JOBS = 15
   TAB_DEVELOPER_KEYS = 16
   TAB_RELEASE_NOTES = 17
+  TAB_EXTENSIONS = 18
 
   def external_tool_tabs(opts, user)
     tools = Lti::ContextToolFinder
@@ -1954,6 +1960,11 @@ class Account < ActiveRecord::Base
 
     if root_account? && grants_right?(user, :manage_developer_keys)
       tabs << { id: TAB_DEVELOPER_KEYS, label: t("#account.tab_developer_keys", "Developer Keys"), css_class: "developer_keys", href: :account_developer_keys_path, account_id: root_account.id }
+    end
+
+    if root_account? && grants_right?(user, :manage_developer_keys) && root_account.feature_enabled?(:lti_registrations_page)
+      registrations_path = root_account.feature_enabled?(:lti_registrations_discover_page) ? :account_lti_registrations_path : :account_lti_manage_registrations_path
+      tabs << { id: TAB_EXTENSIONS, label: t("#account.tab_extensions", "Extensions"), css_class: "extensions", href: registrations_path, account_id: root_account.id }
     end
 
     tabs += external_tool_tabs(opts, user)
@@ -2232,6 +2243,8 @@ class Account < ActiveRecord::Base
   end
 
   def create_default_objects
+    return if dummy?
+
     work = lambda do
       default_enrollment_term
       enable_canvas_authentication
@@ -2244,6 +2257,8 @@ class Account < ActiveRecord::Base
   end
 
   def create_built_in_roles
+    return if dummy?
+
     shard.activate do
       Role::BASE_TYPES.each do |base_type|
         role = Role.new

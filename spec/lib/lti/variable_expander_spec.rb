@@ -65,6 +65,7 @@ module Lti
       allow(request_mock).to receive_messages(url: "https://localhost", host_with_port: "https://localhost", host: "/my/url", scheme: "https", parameters: {
         com_instructure_course_accept_canvas_resource_types: ["page", "module"],
         com_instructure_course_canvas_resource_type: "page",
+        com_instructure_course_canvas_resource_id: "112233",
         com_instructure_course_allow_canvas_resource_selection: "true",
         com_instructure_course_available_canvas_resources: available_canvas_resources
       }.with_indifferent_access)
@@ -895,6 +896,10 @@ module Lti
 
       it "has substitution for $com.instructure.Course.canvas_resource_type" do
         expect(expand!("$com.instructure.Course.canvas_resource_type")).to eq "page"
+      end
+
+      it "has substitution for $com.instructure.Course.canvas_resource_id" do
+        expect(expand!("$com.instructure.Course.canvas_resource_id")).to eq "112233"
       end
 
       it "has substitution for $com.instructure.Course.allow_canvas_resource_selection" do

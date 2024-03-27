@@ -1356,7 +1356,7 @@ class UsersController < ApplicationController
 
       @context_account = @context.is_a?(Account) ? @context : @domain_root_account
       @user = api_find_all(@context&.all_users || User, [params[:id]]).first
-      if !@user && @context.is_a?(Account) && Account.site_admin.feature_enabled?(:deleted_user_tools)
+      if !@user && @context.is_a?(Account)
         @user = api_find_all(@context&.deleted_users, [params[:id]]).first
       end
       allowed = @user&.grants_right?(@current_user, session, :read_full_profile)
@@ -1492,10 +1492,8 @@ class UsersController < ApplicationController
       domain: HostUrl.context_host(@domain_root_account, request.host)
     }
 
-    if @tool.root_account.feature_enabled?(:lti_unique_tool_form_ids)
-      @tool_form_id = random_lti_tool_form_id
-      js_env(LTI_TOOL_FORM_ID: @tool_form_id)
-    end
+    @tool_form_id = random_lti_tool_form_id
+    js_env(LTI_TOOL_FORM_ID: @tool_form_id)
 
     variable_expander = Lti::VariableExpander.new(@domain_root_account, @context, self, {
                                                     current_user: @current_user,

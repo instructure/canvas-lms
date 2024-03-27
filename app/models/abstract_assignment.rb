@@ -39,8 +39,6 @@ class AbstractAssignment < ActiveRecord::Base
   include LockedFor
   include Lti::Migratable
 
-  self.ignored_columns += %i[context_code checkpointed checkpoint_label]
-
   GRADING_TYPES = OpenStruct.new(
     {
       points: "points",
@@ -140,6 +138,8 @@ class AbstractAssignment < ActiveRecord::Base
   belongs_to :final_grader, class_name: "User", optional: true
   has_many :active_groups, -> { merge(GroupCategory.active).merge(Group.active) }, through: :group_category, source: :groups
   has_many :assigned_students, through: :submissions, source: :user
+  has_many :enrollments_for_assigned_students, -> { active.not_fake.where("enrollments.course_id = submissions.course_id") }, through: :assigned_students, source: :enrollments
+  has_many :sections_for_assigned_students, -> { active.distinct }, through: :enrollments_for_assigned_students, source: :course_section
 
   belongs_to :duplicate_of, class_name: "Assignment", optional: true, inverse_of: :duplicates
   has_many :duplicates, class_name: "Assignment", inverse_of: :duplicate_of, foreign_key: "duplicate_of_id"
@@ -3162,7 +3162,7 @@ class AbstractAssignment < ActiveRecord::Base
     from("(SELECT s.cached_due_date AS user_due_date, a.*
           FROM #{Assignment.quoted_table_name} a
           INNER JOIN #{Submission.quoted_table_name} AS s ON s.assignment_id = a.id
-          WHERE s.user_id = #{User.connection.quote(user.id_for_database)} AND s.workflow_state <> 'deleted') AS assignments")
+          WHERE s.user_id = #{User.connection.quote(user.id_for_database)} AND s.workflow_state <> 'deleted') AS assignments").select(arel.projections, "user_due_date")
   }
 
   scope :with_latest_due_date, lambda {
@@ -3171,7 +3171,7 @@ class AbstractAssignment < ActiveRecord::Base
           LEFT JOIN #{AssignmentOverride.quoted_table_name} ao
           ON ao.assignment_id = a.id
           AND ao.due_at_overridden
-          GROUP BY a.id) AS assignments")
+          GROUP BY a.id) AS assignments").select(arel.projections, "latest_due_date")
   }
 
   scope :updated_after, lambda { |*args|

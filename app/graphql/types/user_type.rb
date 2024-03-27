@@ -435,8 +435,8 @@ module Types
         submissions += Submission.where(id: submission_ids)
       end
       InstStatsd::Statsd.increment("inbox.visit.scope.submission_comments.pages_loaded.react")
-      # if .last_comment_at is nil check the last created submission comment
-      submissions.sort_by { |t| t.last_comment_at || t.submission_comments.last.created_at }.reverse
+      # on FE we use newest submission comment to render date so use that first.
+      submissions.sort_by { |t| t.submission_comments.last.created_at || t.last_comment_at }.reverse
     rescue
       []
     end

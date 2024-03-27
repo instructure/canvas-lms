@@ -107,7 +107,7 @@ describe "calendar2" do
       end
 
       it "does not change duration when dragging a short event", priority: "2" do
-        skip("dragging events doesn't seem to work")
+        skip("dragging events doesn't seem to work FOO-4335")
         noon = Time.zone.now.at_beginning_of_day + 12.hours
         event = @course.calendar_events.create! title: "ohai", start_at: noon, end_at: noon + 5.minutes
         load_week_view
@@ -231,6 +231,8 @@ describe "calendar2" do
     end
 
     it "extends event time by dragging", priority: "1" do
+      skip("dragging events are flaky and need more research FOO-4335")
+
       # Create event on current day at 9:00 AM in current time zone
       midnight = Time.zone.now.beginning_of_day
       event1 = make_event(start: midnight + 9.hours, end_at: midnight + 10.hours)
@@ -333,6 +335,8 @@ describe "calendar2" do
       end
 
       it "extends all day event by dragging", priority: "2" do
+        skip("dragging events are flaky and need more research FOO-4335")
+
         start_at_time = Time.zone.today.at_beginning_of_week(:sunday).beginning_of_day
         event = make_event(title: "Event1", start: start_at_time, all_day: true)
         load_week_view

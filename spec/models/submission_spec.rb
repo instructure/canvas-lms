@@ -1930,7 +1930,7 @@ describe Submission do
   context "broadcast policy" do
     context "Submission Notifications" do
       before :once do
-        Notification.create(name: "Assignment Submitted")
+        Notification.create(name: "Assignment Submitted", category: "TestImmediately")
         Notification.create(name: "Assignment Resubmitted")
         Notification.create(name: "Assignment Submitted Late")
         Notification.create(name: "Group Assignment Submitted Late")
@@ -1957,16 +1957,15 @@ describe Submission do
         normal_ta = user_factory(active_all: true, active_cc: true)
         @course.enroll_user(normal_ta, "TaEnrollment", enrollment_state: "active")
 
-        n = Notification.where(name: "Assignment Submitted").first
-        n.update(category: "TestImmediately")
-        [limited_ta, normal_ta].each do |ta|
-          NotificationPolicy.create(notification: n, communication_channel: ta.communication_channel, frequency: "immediately")
-        end
+        Notification.where(name: "Assignment Submitted").first
+
         @assignment.workflow_state = "published"
         @assignment.update(due_at: Time.now + 1000)
 
         submission_spec_model(user: @student, submit_homework: true)
-        expect(@submission.messages_sent["Assignment Submitted"].map(&:user)).to eq [normal_ta]
+
+        expect(@submission.messages_sent["Assignment Submitted"].map(&:user)).not_to include(limited_ta)
+        expect(@submission.messages_sent["Assignment Submitted"].map(&:user)).to include(normal_ta)
       end
 
       it "sends the correct message when an assignment is turned in late" do

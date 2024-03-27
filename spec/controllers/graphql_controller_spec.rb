@@ -276,9 +276,7 @@ describe GraphQLController do
   describe "subgraph_execute" do
     context "with authentication" do
       around do |example|
-        InstAccess.with_config(signing_key: signing_priv_key) do
-          example.run
-        end
+        InstAccess.with_config(signing_key: signing_priv_key, &example)
       end
 
       let(:token_signing_keypair) { OpenSSL::PKey::RSA.new(2048) }

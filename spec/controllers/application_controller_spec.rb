@@ -1070,16 +1070,9 @@ RSpec.describe ApplicationController do
             end
 
             context "ENV.LTI_TOOL_FORM_ID" do
-              it "with the lti_unique_tool_form_ids flag on, sets a random id" do
-                course.account.enable_feature!(:lti_unique_tool_form_ids)
+              it "sets a random id" do
                 expect(controller).to receive(:random_lti_tool_form_id).and_return("1")
                 expect(controller).to receive(:js_env).with(LTI_TOOL_FORM_ID: "1")
-                controller.send(:content_tag_redirect, course, content_tag, nil)
-              end
-
-              it "with the lti_unique_tool_form_ids flag off, does not set a random it" do
-                course.account.disable_feature!(:lti_unique_tool_form_ids)
-                expect(controller).not_to receive(:js_env).with(LTI_TOOL_FORM_ID: anything)
                 controller.send(:content_tag_redirect, course, content_tag, nil)
               end
             end
@@ -1735,6 +1728,46 @@ RSpec.describe ApplicationController do
         @account.enable_feature!(:admin_analytics)
         external_tools = controller.external_tools_display_hashes(:account_navigation, @account)
         expect(external_tools).to include({ id: tool.id, title: "Admin Analytics", base_url: "http://admin_analytics.example.com/", icon_url: nil, canvas_icon_class: "icon-analytics", tool_id: ContextExternalTool::ADMIN_ANALYTICS })
+      end
+
+      context "LTI tool has a submission_type_selection placement" do
+        let(:developer_key) { DeveloperKey.create! }
+        let(:domain) { "http://example.com" }
+        let(:tool1) { external_tool_1_3_model(developer_key:, opts: { domain:, settings: { submission_type_selection: {} } }) }
+        let(:tool2) { external_tool_1_3_model(developer_key:, opts: { domain:, settings: { submission_type_selection: {} } }) }
+
+        def setup_tools
+          allow(Lti::ContextToolFinder).to receive(:all_tools_for).and_return([tool1, tool2])
+          allow(controller).to receive(:polymorphic_url).and_return(domain)
+        end
+
+        context "lti_placement_restrictions FF on" do
+          before do
+            expect(Account.site_admin).to receive(:feature_enabled?).with(:lti_placement_restrictions).and_return(true)
+          end
+
+          it "is filtering out not allowed placements" do
+            setup_tools
+            expect(tool1).to receive(:placement_allowed?).and_return(true)
+            expect(tool2).to receive(:placement_allowed?).and_return(false)
+            external_tools = controller.send(:external_tools_display_hashes, :submission_type_selection)
+            expect(external_tools).to include({ id: tool1.id, title: "a", base_url: domain, icon_url: nil, canvas_icon_class: nil })
+            expect(external_tools).to_not include({ id: tool2.id, title: "a", base_url: domain, icon_url: nil, canvas_icon_class: nil })
+          end
+        end
+
+        context "lti_placement_restrictions FF off" do
+          before do
+            expect(Account.site_admin).to receive(:feature_enabled?).with(:lti_placement_restrictions).and_return(false)
+          end
+
+          it "is not filtering out not allowed placements" do
+            setup_tools
+            external_tools = controller.send(:external_tools_display_hashes, :submission_type_selection)
+            expect(external_tools).to include({ id: tool1.id, title: "a", base_url: domain, icon_url: nil, canvas_icon_class: nil })
+            expect(external_tools).to include({ id: tool2.id, title: "a", base_url: domain, icon_url: nil, canvas_icon_class: nil })
+          end
+        end
       end
     end
 

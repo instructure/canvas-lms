@@ -1,6 +1,6 @@
 {
   "name": "course_completed",
-  "definition": "The event is emitted anytime a course module's completion requirements are met.",
+  "definition": "The event is emitted when all of the module requirements in a course are met.",
   "trigger": "Triggered when all the module requirements of a course have been met. Also gets triggered when a module has a set completion time or when the completion time gets updated.",
   "schema": {
     "course": {

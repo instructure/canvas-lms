@@ -77,6 +77,7 @@ test('opening and closing the dialog with the trigger', () => {
 })
 
 test('submitting the form', () => {
+  const clock = sinon.useFakeTimers()
   openDialog()
   equal(view.model.get('is_awesome'), true, 'is_awesome starts true')
   view.$('label').simulate('click')
@@ -85,7 +86,9 @@ test('submitting the form', () => {
     id: 1,
     is_awesome: false,
   })
+  clock.tick(1)
   equal(view.model.get('is_awesome'), false, 'is_awesome is updated to false')
+  clock.restore()
   return assert.isHidden(view.$el, 'when form submission is complete')
 })
 const assertDialogTitle = function (expected, message) {

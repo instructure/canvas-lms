@@ -532,8 +532,11 @@ describe('CreateOutcomeModal', () => {
             expect(getByTestId('outcome-management-ratings')).toBeInTheDocument()
           })
 
-          // OUT-6152 - fix flaky spec
-          it.skip('creates outcome with calculation method and proficiency ratings (flaky)', async () => {
+          /*
+            Since the InstUI 8 upgrade, this test takes an average of 5.6 seconds to complete.
+            For now, the timeout interval is increased to 7.5 seconds.
+          */
+          it('creates outcome with calculation method and proficiency ratings (flaky)', async () => {
             const user = userEvent.setup(USER_EVENT_OPTIONS)
             const {getByText, getByLabelText, getByDisplayValue} = render(
               <CreateOutcomeModal {...defaultProps()} />,
@@ -569,7 +572,7 @@ describe('CreateOutcomeModal', () => {
                 type: 'success',
               })
             })
-          })
+          }, 7500) // Allow test to run for 7.5 seconds
 
           it('displays horizontal divider between ratings and calculation method which is hidden from screen readers', async () => {
             const {getByTestId} = render(<CreateOutcomeModal {...defaultProps()} />, {

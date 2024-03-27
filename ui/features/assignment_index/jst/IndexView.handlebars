@@ -58,11 +58,7 @@
           <div id="settingsMountPoint"></div>
         {{/if}}
         <div id="indexCreateMountPoint"></div>
-        <a
-          style="display:none"
-          data-view="addGroup"
-          id="addGroup"
-        />
+        <a style="display:none" data-view="addGroup" id="addGroup"></a>
       {{else}}
         {{#if ENV.PERMISSIONS.manage_assignments_add}}
           {{#if ENV.QUIZ_LTI_ENABLED}}
@@ -133,9 +129,9 @@
 {{/if}}
 
 <div data-view="assignmentGroups" class="item-group-container" id="ag-list"></div>
-<div id="copy-to-mount-point" />
-<div id="send-to-mount-point" />
-<div id="external-tool-mount-point" />
+<div id="copy-to-mount-point"></div>
+<div id="send-to-mount-point"></div>
+<div id="external-tool-mount-point"></div>
 
 {{#if ENV.PERMISSIONS.manage_assignments_add}}
   <form data-view="createGroup" class="form-dialog"></form>

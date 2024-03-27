@@ -62,7 +62,7 @@ module Canvas::OAuth
       return nil unless client_id_is_valid?
 
       @key ||= DeveloperKey.find_cached(@client_id)
-    rescue ActiveRecord::RecordNotFound
+    rescue ::ActiveRecord::RecordNotFound
       nil
     end
 

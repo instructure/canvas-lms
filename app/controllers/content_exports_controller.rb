@@ -34,6 +34,7 @@ class ContentExportsController < ApplicationController
     scope = @context.content_exports_visible_to(@current_user).without_epub
     @exports = scope.active.not_for_copy.order("content_exports.created_at DESC")
     @current_export_id = scope.running.first.try(:id)
+    @warning_messages = @context.export_warnings if @context.is_a?(Course)
   end
 
   def show

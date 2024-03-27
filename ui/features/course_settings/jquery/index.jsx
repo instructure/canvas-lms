@@ -185,11 +185,12 @@ $(document).ready(function () {
   $tabBar
     .on('tabsactivate', (event, ui) => {
       try {
-        const hash = new URL(ui.newTab.context.href).hash
+        const $tabLink = ui.newTab.children('a:first-child')
+        const hash = new URL($tabLink.prop('href')).hash
         if (window.location.hash !== hash) {
           window.history.pushState(null, null, hash)
         }
-        ui.newTab.focus(0)
+        $tabLink.focus()
       } catch (_ignore) {
         // if the URL can't be parsed, so be it.
       }
@@ -395,6 +396,8 @@ $(document).ready(function () {
           contextType="Course"
           initiallySelectedGradingSchemeId={selectedGradingSchemeId}
           onChange={gradingSchemeId => handleSelectedGradingSchemeIdChanged(gradingSchemeId)}
+          archivedGradingSchemesEnabled={ENV.ARCHIVED_GRADING_SCHEMES_ENABLED}
+          shrinkSearchBar
         />,
         grading_scheme_selector
       )

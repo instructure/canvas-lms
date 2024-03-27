@@ -21,6 +21,6 @@ class AddEndingEnrollmentStateToTemporaryEnrollmentPairings < ActiveRecord::Migr
   tag :predeploy
 
   def change
-    add_column :temporary_enrollment_pairings, :ending_enrollment_state, :text, default: nil, null: true
+    add_column :temporary_enrollment_pairings, :ending_enrollment_state, :text
   end
 end

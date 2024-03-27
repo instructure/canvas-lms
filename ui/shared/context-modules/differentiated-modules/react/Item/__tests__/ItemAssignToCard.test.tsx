@@ -63,6 +63,15 @@ describe('ItemAssignToCard', () => {
     expect(getByRole('button', {name: 'Delete'})).toBeInTheDocument()
   })
 
+  it('disables blueprint-locked date inputs', () => {
+    const {getByLabelText, getAllByLabelText} = renderComponent({
+      blueprintDateLocks: ['availability_dates', 'due_dates'],
+    })
+    expect(getByLabelText('Due Date')).toBeDisabled()
+    expect(getByLabelText('Available from')).toBeDisabled()
+    getAllByLabelText('Time').forEach(t => expect(t).toBeDisabled())
+  })
+
   it('calls onDelete when delete button is clicked', () => {
     const onDelete = jest.fn()
     const {getByRole} = renderComponent({onDelete})

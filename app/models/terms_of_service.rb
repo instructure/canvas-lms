@@ -46,6 +46,7 @@ class TermsOfService < ActiveRecord::Base
 
   def self.ensure_terms_for_account(account, is_new_account = false)
     return unless table_exists?
+    return if account.dummy?
 
     passive = is_new_account || !(Setting.get("terms_required", "true") == "true" && account.account_terms_required?)
     unique_constraint_retry do |retry_count|

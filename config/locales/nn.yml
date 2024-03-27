@@ -186,7 +186,7 @@ nn:
   a_comma_delimited_list_of_user_ids_to_report_on_49e05a7: "Ei kommaseparert liste med user_id-ar til å lage rapport for"
   a_comma_delimited_string_containing_account_wide_a_b23cd19a: "Ein kommaseparert streng som inneheld konto-omfattande assignment_name verdiar vil eksludere"
   a_comma_delimited_string_containing_course_code_an_18261012: "Ein kommaseparert streng som inneheld course_code og assignment_name vil saman ekskludere"
-  a_deleted_user_with_that_id_could_not_be_found_for_57503c7b: "Ein sletta brukar med den ID-en kunne ikkje finnast for denne kontoen."
+  a_deleted_user_with_that_id_could_not_be_found_for_57503c7b: "Ein sletta brukar med den ID-en vart ikkje funne for denne kontoen."
   a_few_seconds_ago_e43118d: "for ei kort stund sidan"
   a_file_named_itemname_already_exists_in_this_folde_b0dc7185: "Ei fil med namnet %{itemName} finst allereie i denne mappa."
   a_file_named_name_already_exists_do_you_want_to_re_6536980: "Ei fil med namnet \"%{name}\" finst allereie. Vil du erstatte den eksisterande fila? "
@@ -223,28 +223,28 @@ nn:
   a_single_certificate_file_e7f347f1: "Ei enkel sertifikatfil"
   a_sis_integration_is_not_configured_and_the_enable_3c560d89: "SIS-integrasjon er ikkje satt opp og dei nye integrasjonsinnstillingane for Enable er ikkje aktivert"
   a_sticker_with_a_picture_of_a_basketball_9660b3b8: "Eit klistremerke med eit bilete av ein basketball."
-  a_sticker_with_a_picture_of_a_bell_2ff0210: "Eit klistremerke med eit bilete av ei klokke."
+  a_sticker_with_a_picture_of_a_bell_2ff0210: "Eit klistremerke med eit bilete av ei bjølle."
   a_sticker_with_a_picture_of_a_book_2045caea: "Eit klistremerke med eit bilete av ei bok."
   a_sticker_with_a_picture_of_a_bookbag_79ce0c5: "Eit klistremerke med eit bilete av ein boksekk."
-  a_sticker_with_a_picture_of_a_briefcase_ff12909f: "Eit klistremerke med eit bilete av ein dokumentmappe."
+  a_sticker_with_a_picture_of_a_briefcase_ff12909f: "Eit klistremerke med eit bilete av ei dokumentmappe."
   a_sticker_with_a_picture_of_a_calculator_8949baae: "Eit klistremerke med eit bilete av ein kalkulator."
   a_sticker_with_a_picture_of_a_calendar_e474d679: "Eit klistremerke med eit bilete av ein kalender."
-  a_sticker_with_a_picture_of_a_circular_lab_beaker__d9cecd1b: "Eit klistremerke med eit bilete av ein sirkulær laboratorieflaske med ein smal hals."
-  a_sticker_with_a_picture_of_a_clip_on_identificati_7ec36b79: "Eit klistremerke med eit bilete av eit id-kort som kan festas på."
+  a_sticker_with_a_picture_of_a_circular_lab_beaker__d9cecd1b: "Eit klistremerke med eit bilete av ei sirkulær laboratorieflaske med ein smal hals."
+  a_sticker_with_a_picture_of_a_clip_on_identificati_7ec36b79: "Eit klistremerke med eit bilete av eit id-kort som kan festast på."
   a_sticker_with_a_picture_of_a_closed_mouth_panda_s_cbf1152e: "Eit klistremerke med eit bilete av ein panda med lukka munn som smiler."
   a_sticker_with_a_picture_of_a_composite_notebook_64c5ff5d: "Eit klistremerke med eit bilete av ei kladdebok."
-  a_sticker_with_a_picture_of_a_computer_44b20507: "Eit klistremerke med eit bilete av ein datamaskin."
+  a_sticker_with_a_picture_of_a_computer_44b20507: "Eit klistremerke med eit bilete av ei datamaskin."
   a_sticker_with_a_picture_of_a_computer_mouse_a658d4c2: "Eit klistremerke med eit bilete av ei datamus."
   a_sticker_with_a_picture_of_a_fountain_pen_nib_2c060df8: "Eit klistremerke med eit bilete av ein fyllepennspiss."
   a_sticker_with_a_picture_of_a_globe_8f2eaab: "Eit klistremerke med eit bilete av ein globus."
   a_sticker_with_a_picture_of_a_golden_trophy_28087753: "Eit klistremerke med eit bilete av eit gulltrofé."
-  a_sticker_with_a_picture_of_a_graduation_cap_803482e2: "Eit klistremerke med eit bilete av ein eksamenslue."
+  a_sticker_with_a_picture_of_a_graduation_cap_803482e2: "Eit klistremerke med eit bilete av ei eksamenslue."
   a_sticker_with_a_picture_of_a_jumping_rope_274bbbff: "Eit klistremerke med eit bilete av eit hoppetau"
   a_sticker_with_a_picture_of_a_microscope_794fbfd3: "Eit klistremerke med eit bilete av eit mikroskop."
   a_sticker_with_a_picture_of_a_molecule_2452fc57: "Eit klistremerke med eit bilete av eit molekyl."
-  a_sticker_with_a_picture_of_a_musical_note_9113e6df: "Eit klistremerke med eit bilete av ei musikknote."
+  a_sticker_with_a_picture_of_a_musical_note_9113e6df: "Eit klistremerke med eit bilete av ein musikknote."
   a_sticker_with_a_picture_of_a_paint_brush_f33bd37c: "Eit klistremerke med eit bilete av ein malepensel."
-  a_sticker_with_a_picture_of_a_panda_grinning_5c4ea6f6: "Eit klistremerke med eit bilete av ein smilande panda."
+  a_sticker_with_a_picture_of_a_panda_grinning_5c4ea6f6: "Eit klistremerke med eit bilete av ein glisande panda."
   a_sticker_with_a_picture_of_a_panda_smiling_d892f5f7: "Eit klistremerke med eit bilete av ein smilande panda."
   a_sticker_with_a_picture_of_a_panda_with_a_half_op_10da8ed0: "Eit klistremerke med eit bilete av ein panda med ein halvopen munn, smilande."
   a_sticker_with_a_picture_of_a_paperclip_66d9cd1c: "Eit klistremerke med eit bilete av ein binders."
@@ -260,17 +260,17 @@ nn:
   a_sticker_with_a_picture_of_a_tablet_computer_f59a64e3: "Eit klistremerke med eit bilete av eit nettbrett."
   a_sticker_with_a_picture_of_a_tape_roll_dispenser_b0d28486: "Eit klistremerke med eit bilete av ein teiprulle-dispenser."
   a_sticker_with_a_picture_of_a_telescope_e4611aae: "Eit klistremerke med eit bilete av eit teleskop."
-  a_sticker_with_a_picture_of_a_triangular_lab_beake_bd4c2189: "Eit klistremerke med eit bilete av ein trekanta laboratorieflaske med ein smal hals."
-  a_sticker_with_a_picture_of_a_wall_clock_236f2fdd: "Eit klistremerke med eit bilete av et veggur."
+  a_sticker_with_a_picture_of_a_triangular_lab_beake_bd4c2189: "Eit klistremerke med eit bilete av ei trekanta laboratorieflaske med ein smal hals."
+  a_sticker_with_a_picture_of_a_wall_clock_236f2fdd: "Eit klistremerke med eit bilete av eit veggur."
   a_sticker_with_a_picture_of_an_apple_488db91: "Eit klistremerke med eit bilete av eit eple."
   a_sticker_with_a_picture_of_an_archery_target_with_d0348cc: "Eit klistremerke med eit bilete av ei skyteskive med ein pil i midten."
   a_sticker_with_a_picture_of_an_atom_b112d32f: "Eit klistremerke med eit bilete av eit atom."
   a_sticker_with_a_picture_of_an_envelope_936cf90c: "Eit klistremerke med eit bilete av ein konvolutt."
-  a_sticker_with_a_picture_of_an_open_mouth_panda_ma_726778e7: "Eit klistremerke med eit bilete av ein panda med open munn som gjer eit overraska ansikt."
+  a_sticker_with_a_picture_of_an_open_mouth_panda_ma_726778e7: "Eit klistremerke med eit bilete av ein panda med open munn og overraska uttrykk i ansiktet."
   a_sticker_with_a_picture_of_an_open_mouth_panda_sm_a89776d2: "Eit klistremerke med eit bilete av ein panda med open munn som smiler."
-  a_sticker_with_a_picture_of_an_open_mouth_smiling__777edfce: "Ein klistremerke med eit bilete av ein smilande panda med open munn og som gret gledestårar."
-  a_sticker_with_a_picture_of_an_open_mouth_smiling__ef6bff29: "Eit klistremerke med eit bilete av ein smilande panda med open munn og hjarte i auga."
-  a_sticker_with_a_picture_of_scissors_c7cc3139: "Eit klistremerke med eit bilete av saksar."
+  a_sticker_with_a_picture_of_an_open_mouth_smiling__777edfce: "Ein klistremerke med eit bilete av ein smilande panda med open munn som gret gledestårar."
+  a_sticker_with_a_picture_of_an_open_mouth_smiling__ef6bff29: "Eit klistremerke med eit bilete av ein smilande panda med open munn og hjarter i augene."
+  a_sticker_with_a_picture_of_scissors_c7cc3139: "Eit klistremerke med eit bilete av ei saks."
   a_student_has_just_turned_in_a_late_submission_for_23f0ba9e: "Ein student har akkurat levert inn ein oppgåve for seint til %{assignment_name} i emnet %{course_name}"
   a_student_has_just_turned_in_a_re_submission_for_a_9e9a17: "Ein student har akkurat levert inn ei oppgåve på nytt for %{assignment_title}i emnet %{course_name}"
   a_student_has_just_turned_in_a_submission_for_assi_d5ba674d: "Ein student har akkurat levert inn ei oppgåve for %{assignment_title}i emnet %{course_name}"
@@ -492,7 +492,7 @@ nn:
       login_handle_name_description: "Etiketten som blir brukt for unike påloggings-ID-ar. Eksempel: Pålogging, brukarnamn, student-ID osv."
       unknown_user_url_description: "URL-en for omdirigering av godkjend brukar finst ikkje i Canvas."
   account_branding_for_confetti_db2012a8: "Kontomerking for konfetti"
-  account_calendar_visibility_350b0475: "Kontokalender Synlighet"
+  account_calendar_visibility_350b0475: "Kontokalender Synlegheit"
   account_calendars_4a4a79b2: Kontokalendrar
   account_calendars_add_edit_delete_events_1ef2b8bd: "Kontokalendrar - legg til / endre / slett hendingar"
   account_calendars_change_visibility_c795702a: "Kontokalendrar - endre synlegheit"
@@ -1243,7 +1243,7 @@ nn:
           account_reports: 
             default: 
               parameters: 
-                header: "Vilkår (Begrensning 5)"
+                header: "Vilkår (Grense 5)"
     last_enrollment_activity_csv_description: 
       account_reports: 
         default: 
@@ -1599,7 +1599,7 @@ nn:
         turnitin_shared_secret: "Turnitin delt hemmelegheit"
         users_can_edit_comm_channels: "Brukarar kan redigere kommunikasjonskanalane sine."
         users_can_edit_name: "Brukarar kan redigere namnet sitt"
-        users_can_edit_profile: "Brukarar kan redigera profilen sin."
+        users_can_edit_profile: "Brukarar kan redigere profilen sin."
         value: "Slå av kommentering av kunngjeringar"
       links: 
         add_admins: Kontoadministratorar
@@ -1659,7 +1659,7 @@ nn:
         update_button: Oppdatering
       report_last_run_never: Aldri
       report_running: "Rapporten køyrer.*Du får ein e-post når køyringa er fullført.*"
-      rqd_help_message: "Når valgt vil denne innstillingen begrense visningen av kvantitativ (numerisk) vurderingsdata for nye emner. Studenter og observatører vil kun se kvalitative data, som inkluderar bokstavkarakterar og kommentarar."
+      rqd_help_message: "Når valgt vil denne innstillinga begrense visninga av kvantitativ (numerisk) vurderingsdata for nye emner. Studentar og observatørar vil kun sjå kvalitative data, som inkluderar bokstavkarakterar og kommentarar."
       rqd_screenreader: "Om å avgrense kvantitative data"
       select: 
         mfa: 
@@ -1842,7 +1842,7 @@ nn:
           account_reports: 
             default: 
               description: 
-                text: "Rapporten viser alle studentane sine sluttvurderingar i eit bestemt semester. CSV-fila inneheld ei rad per påmelding og viser gjeldande og endelege vurderingar som er lagt ut vurderingsoversikta for emnet."
+                text: "Denne rapporten viser alle studentane sine sluttvurderingar i eit bestemt semester. CSV-fila inneheld ei rad per påmelding og viser gjeldande og endelege vurderingar som er lagt ut i vurderingsoversikta for emnet."
       provisioning: 
         parameters: 
           account_reports: 
@@ -2142,7 +2142,7 @@ nn:
   add_a_build_button_on_the_assignment_edit_page_for_6b895561: "Legg til ein Bygg-knapp på oppgåva si redigeringsside for Nye quizar-oppgåver"
   add_a_comment_48994930: "Legg til ein kommentar"
   add_a_comment_872470ac: "Legg til ein kommentar"
-  add_a_comment_to_complete_your_peer_review_you_wil_65fbaabb: "Legg til ein kommentar for å fullføre din fagfellevurdering. Du vil berre sjå kommentarar skrive av deg."
+  add_a_comment_to_complete_your_peer_review_you_wil_65fbaabb: "Legg til ein kommentar for å fullføre din fagfellevurdering. Du vil berre sjå kommentarar du sjølv har skrive."
   add_a_course_b72b18d7: "Legg til eit emne"
   add_a_custom_help_link_4328252f: "Legg til eigendefinert Hjelp-kopling"
   add_a_letter_grade_c7b34199: "legg til ein bokstavkarakter"
@@ -2202,7 +2202,7 @@ nn:
   add_discussion_653dab4c: "Legg til diskusjon"
   add_domain_f15bc6c1: "Legg til domene"
   add_domain_lookup_825f9eb7: "Legg til domeneoppslag"
-  add_edit_and_delete_events_on_account_calendars_71bea006: "Legg til, rediger og slett hendelsar på kontokalendarar"
+  add_edit_and_delete_events_on_account_calendars_71bea006: "Legg til, rediger og slett hendingar på kontokalendarar"
   add_edit_delete_sections_d32c5b4d: "legg til / rediger / slett seksjonar"
   add_email_address_aef3b61: "Legg til e-postadresse"
   add_existing_content_7e36da66: "Legg til eksisterande innhald"
@@ -2212,7 +2212,7 @@ nn:
   add_folder_ba50d107: "Legg til mappe"
   add_grading_period_6f774dc3: "Legg til periode for karaktersetjing"
   add_grading_scheme_81e23c05: " Legg til skjema for karaktersetjing"
-  add_granularity_to_permissions_around_managing_all_129149da: "Legg til løyve på detaljnivå i tillatelsene rundt administrering av alt anna kursinnhald"
+  add_granularity_to_permissions_around_managing_all_129149da: "Legg til løyve på detaljnivå i løyvene rundt administrering av alt anna kursinnhald"
   add_granularity_to_permissions_around_managing_cou_4a5bc486: "Legg til detaljer til løyve for administrering av emneseksjonar"
   add_granularity_to_permissions_around_managing_cou_e18d7f97: "Legg til detaljnivå for løyve rundt administrering av emne, dvs. legge til / publisere / avslutte / slette"
   add_granularity_to_permissions_around_managing_gro_ef410a72: "Legg til løyve på detaljnivå rundt administrering av grupper i Konto- eller Emnesamanhengar"
@@ -2291,10 +2291,10 @@ nn:
   add_theme_32fa3d50: "Legg til tema"
   add_to_calendar_1d4a0e81: "Legg til i kalenderen"
   add_to_course_481a51c4: "Legg til emnet..."
-  add_to_course_pacing_blackout_dates_2459cfd2: "Legg til kursplanlegging for svarteliste datoer"
+  add_to_course_pacing_blackout_dates_2459cfd2: "Legg til kursplanlegging for blokkerte datoar"
   add_to_do_7537af64: "Legg til gjeremål"
   add_to_do_7def3c37: "Legg til gjeremål"
-  add_to_import_queue_1bf7013b: "Legg til i importkøa"
+  add_to_import_queue_1bf7013b: "Legg til i importkøen"
   add_to_library_30514daa: "Legg til i Bibliotek"
   add_to_rce_toolbar_e5b3e3b4: "Legg til verktøyline i teksteditor"
   add_to_student_to_do_58e66b4b: "Legg til studentens gjeremål"
@@ -2344,7 +2344,7 @@ nn:
   adds_analytics_link_on_the_user_settings_menu_3a048816: "Legg til analyselenke i meny for brukarinnstillingar."
   adds_analytics_to_a_student_s_context_card_d4c1e3a3: "Legg til analyse til eit studentkontekstkort"
   adds_granular_permissions_for_adding_and_removing__e1e484a3: "Legg til detaljerte løyve for å legge til og fjerne kvar rolle, og eit separat løyve for andre emneadministrasjonshandlingar"
-  adds_menu_option_for_accessing_alignments_at_the_o_6d3bce6: "Legge til menyvalg for å vurdera justeringar på læringsmålnivå,  med forbetra læringsmål"
+  adds_menu_option_for_accessing_alignments_at_the_o_6d3bce6: "Legg til menyvalg for å vurdere justeringar på læringsmålnivå,  med forbetra læringsmål"
   adds_the_option_to_grade_by_question_in_speedgrade_5eac06f3: "Legg til moglegheita for å vurdere etter spørsmål i SpeedGrader for Quizzes.Next Quizzes"
   adds_visual_indicators_to_the_submission_details_p_c7b9d191: |-
       Legg til visuelle indikatorar på innleveringsdetaljer-sida for å fortelje studentar at det finst uleste
@@ -2354,7 +2354,7 @@ nn:
   admin_4d3ba42f: Admin
   admin_analytics_description: "Gjer det mogleg å bruke analyseverktøy på kontonivå. Admin Analytics dashboardet gir detaljar om bruken av Canvas, suksess i Canvasemne og engasjement frå studentar. Les meir i *Admin Analytics Hub* i Canvas-fellesskapet."
   admin_analytics_eacba735: "Admin Analyse"
-  admin_analytics_view_admin_analytics_permission_cc7d46db: "Administrasjons analyse - Vis admin analyse tilgang"
+  admin_analytics_view_admin_analytics_permission_cc7d46db: "Administrasjons analyse - Vis løyve for admin analyse"
   admin_csv_f8d1b3eb: "CSV-fil over administratorar"
   admin_export_for_multiple_grading_periods_8a0c5ac1: "Administratoreksport for fleire vurderingsperiodar"
   admin_navigation_menu_77b801a2: Admin-navigeringsmeny
@@ -2392,7 +2392,7 @@ nn:
   after_the_due_date_eee89c9c: "Etter innleveringsfristen"
   after_the_first_attempt_you_cannot_leave_comments__3922325f: "Etter fyrste forsøk kan du ikkje legge att kommentarar før du har levert oppgåva."
   ahead_21f22939: Komande
-  ai_driven_smart_search_feature_597dbd4f: "AI-dreve smart søkefunksjon."
+  ai_driven_smart_search_feature_597dbd4f: "AI-driven smart søkefunksjon."
   ajax_errors: 
     error_heading: "AJAX-feil: %{status_code}"
     errors: 
@@ -2451,7 +2451,7 @@ nn:
   alerts_course_settings_53551794: "Varsel (Emneinnstillingar)"
   alerts_must_be_configured_for_the_institution_aler_43bbacb1: "Varslingar må konfigureras for institusjonen. Varslingar er ein lite brukt funksjon designa for å sende eit varsel til studentar, lærarar eller administratorar for spesifikke utløysarar (f.eks. ingen lærar-student-interaksjon i løpet av 7 dagar). Dei sjekkast kvar dag og varslingar vil sendast ut til studenten og/eller læraren fram til det utløysande problemet er løyst."
   align_outcomes_to_this_page_7d055196: "Samle læringsmål på denne sida"
-  aligned_questions_125fd2ce: "Allignerte spørsmål"
+  aligned_questions_125fd2ce: "Justerte spørsmål"
   alignments_de5f20d8: Justeringar
   all_4321c3a1: Alle
   all_account_types_e83c1516: "Alle kontoar"
@@ -2474,7 +2474,7 @@ nn:
   all_day_fb42c4fc: "Heile dagen"
   all_discussion_entries_report_c1e02906: "Rapport over alle diskusjonsoppføringar"
   all_events_6ae4331b: "Alle arrangement"
-  all_filters_have_been_cleared_7f38f765: "Alle filtere er fjerna."
+  all_filters_have_been_cleared_7f38f765: "Alle filter er fjerna."
   all_finished_time_to_publish_your_course_click_the_b6f07217: "Er du ferdig?  Du kan publisere emnet ditt. Klikk på knappen nedanfor. Publisering inneber at brukarane kan ta del på emnet."
   all_gradeable_student_submissions_report_d11ee705: "Rapport over alle studentinnleveringar som kan vurderast"
   all_grades_hidden_3092d5b5: "Alle vurderingar er skjulte"
@@ -2495,8 +2495,8 @@ nn:
   all_modules_20c9a1c8: "Alle modular"
   all_my_files_a0213441: "Alle filene mine"
   all_my_sections_375248b3: "Alle mine seksjonar"
-  all_new_and_existing_users_in_the_sub_account_will_7ec9ca8d: "Alle nye og eksisterende brukarar i underkontoen vil automatisk bli abonnert på valde kalendrar."
-  all_outcomes_9f338636: "Legg til læringsmål"
+  all_new_and_existing_users_in_the_sub_account_will_7ec9ca8d: "Alle nye og eksisterande brukarar i underkontoen vil automatisk bli satt opp med abonnement på valde kalendarar."
+  all_outcomes_9f338636: "Alle læringsmål"
   all_outcomes_from_grouptitle_have_been_successfull_38e3c33c: "Alle utfall frå %{groupTitle} har blitt vellukka lagt til dette kurset."
   all_outcomes_from_grouptitle_have_been_successfull_6267efe4: "Alle utfall frå %{groupTitle} har blitt vellukka lagt til %{targetGroupTitle}."
   all_outcomes_from_grouptitle_have_been_successfull_cb6ad008: "Alle utfall frå %{groupTitle}har blitt lagt til denne kontoen."
@@ -2537,7 +2537,7 @@ nn:
   allow_conference_selection_lti_placement_c020ad8d: "Tillat konferanseval for LTI plassering"
   allow_course_content_to_be_downloaded_and_viewed_o_48a0d252: "Tillat at emneinnhaldet kan bli lasta ned og lest når du ikkje er på nett"
   allow_course_images_to_be_assigned_to_a_course_and_82fb7bdd: "Tillat at emnebilde blir tilordna til eit emne og brukt på dashbordkorta. "
-  allow_course_pacing_blackout_dates_to_be_set_for_a_d4d597d5: "Tillat at kursplasseringens svarteliste kan settes for kontoer i stedet for bare kurs."
+  allow_course_pacing_blackout_dates_to_be_set_for_a_d4d597d5: "Tillat at emnegjennomføring for blokkerte datoar vert satt for kontoar i staden for berre kurs."
   allow_creation_anywhere_the_user_has_active_enroll_13c84fc2: "Tillat oppretting kvar som helst der brukaren har aktive påmeldingar"
   allow_creation_only_in_the_manually_created_course_69f37f2e: "Tillat oppretting kun i underkontoen for manuelt opprettede kurs"
   allow_dashboard_cards_to_be_reordered_for_each_use_81f989d7: "Tillat at kvar brukar kan reorganisere dashbordkorta sine. "
@@ -2560,8 +2560,8 @@ nn:
   allow_migration_of_quizzes_during_course_copy_and__35d80756: "Tillat migrering av quizar gjennom emnekopiering og -import"
   allow_moderator_to_review_multiple_independent_gra_c59d64f6: "La ein vurderingsmoderator gå gjennom fleire uavhengige vurderingar for utvalde innleveringar"
   allow_multiple_attempts_e67a0a37: "Tillat fleire forsøk"
-  allow_observers_to_schedule_appointments_in_the_ca_7f4d0052: "La observatørar planlegg avtalar i kalenderen."
-  allow_observers_to_sign_up_9afddf76: "La observatørar melde seg på"
+  allow_observers_to_schedule_appointments_in_the_ca_7f4d0052: "Tillat observatørar å legge til avtaler i kalenderen."
+  allow_observers_to_sign_up_9afddf76: "Tillat observatørar å melde seg på"
   allow_opt_out_of_inbox: "Tillat brukarar å trekkje seg frå samtaleinnboksen. Dette vil medføre at alle samtalemeldingar og -varsel blir sende direkte til den primære e-postadressa til brukaren, at meldingsindikatoren for ulesne meldingar blir skjult, og at varslingsinnstillingar for samtalar blir skjulte."
   allow_outcome_extra_credit_57c1e84e: "Tillat ekstra utbytte for læringsmålet "
   allow_pages_to_be_deleted_in_bulk_199d3d3b: "Tillat massesletting av sider "
@@ -2600,13 +2600,13 @@ nn:
       GraphQL-mutasjonar.
   allows_aligning_outcomes_to_non_scoring_content_537ce399: "Tillet resultatjustering på innhald utan poeng"
   allows_assessors_to_view_the_assessment_audit_tray_84c0c4c2: "Tillat å sjå vurderingsloggen i SpeedGrader for anonyme oppgåver eller oppgåver med fleire rettarar eller retteperiodar. "
-  allows_blueprint_courses_to_keep_track_of_assignme_3faaa416: "Tillater blåkopikurs å halde oversikt over endringar i ressurs-id for oppgåver."
-  allows_course_pages_to_be_published_on_a_schedule_7e12fd52: "Tillater at kursider kan publiseres etter en plan"
+  allows_blueprint_courses_to_keep_track_of_assignme_3faaa416: "Tillet blåkopikurs å halde oversikt over endringar i ressurs-id for oppgåver."
+  allows_course_pages_to_be_published_on_a_schedule_7e12fd52: "Tillet at kurssider kan publiseres etter ein plan"
   allows_creating_announcements_for_a_specific_secti_14e0a63d: "Tillet oppretting av kunngjeringar for ein spesifikk seksjon"
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: "Gjer at hjelpelenker merkast som Framheva eller Ny og at dei får ei utheva vising i hjelpemenyen."
   allows_instructors_to_apply_scores_to_ungraded_sub_999e34dd: "Lar faglærar sette resultat på fleire uvurderte innleveringar frå menyane oppgåvegruppe og total kollonna i vurderingsoversikta."
-  allows_instructors_to_enable_anonymous_grading_for_b852c884: "Tillater instruktørar å aktivere anonym vurdering for New Quizzes."
-  allows_instructors_to_submit_file_attachments_on_b_e39f2ca8: "Tillater instruktørar å sende inn filvedlegg på vegner av ein student."
+  allows_instructors_to_enable_anonymous_grading_for_b852c884: "Tillet instruktørar å aktivere anonym vurdering for New Quizzes."
+  allows_instructors_to_submit_file_attachments_on_b_e39f2ca8: "Tillet instruktørar å sende inn filvedlegg på vegne av ein student."
   allows_learning_outcomes_to_be_selectable_when_mig_acf15555: "Lar deg velje læringsmål når emnet vert eksportert"
   allows_result_data_stored_in_the_outcomes_service__69c12c18: "Lar resultatdata lagra i læringsmåltenesten bli vist i Canvas-rapportering (LMGB, sLMGB og læringsmålrelatert admin-rapportering)"
   allows_setting_account_course_level_mastery_scales_1939e0fd: "Tillet å setje meistringsskalaar og utrekningsmetodar på konto- og emnenivå, som erstattar per-resultat kriteriumsvurderingane og utrekningsmetodane."
@@ -2615,7 +2615,7 @@ nn:
   allows_syncing_of_canvas_course_members_to_a_micro_785119b4: "Tillet synkronisering av Canvas-kursmedlemmer til eit Microsoft-team"
   allows_teacher_designer_ta_based_roles_to_access_t_d480279: "Gir rollene faglærar/designar/undervisingsassistent tilgang til chatverktøyet."
   allows_teacher_ta_based_roles_to_access_the_attend_bf5b2a17: "Gir rollene faglærar/designar/undervisingsassistent tilgang til frammøteverktøyet."
-  allows_teachers_to_attach_stickers_to_student_subm_efb006c4: "La lærarar feste klistremerke til elevinnleveringar."
+  allows_teachers_to_attach_stickers_to_student_subm_efb006c4: "Tillet lærarar å feste klistremerke til elevinnleveringar."
   allows_teachers_to_hide_course_sections_from_stude_eb69d87b: "Tillet lærarar å gøyme emneseksjonar på sida \"Personar\" frå studentar når det er meir enn ein seksjon i emnet."
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "Gir faglærarar løyve til å markere vurderingsdata for masseeksport til SIS-integrasjonar."
   allows_teachers_to_specify_post_policies_for_this__9b9433ef: |-
@@ -2679,7 +2679,7 @@ nn:
       Gir ein brukar løyve til å legge til, endre og slette emneseksjonar.
       Gir ein brukar løyve til å kryssliste seksjonar.
   allows_user_to_add_edit_and_delete_course_sections_92715d3: "Gir ein brukar løyve til å legge til, endre og slette emneseksjonar. Gir brukar løyve til å kryssliste seksjonar."
-  allows_user_to_add_edit_and_delete_events_in_accou_80a5588e: "La brukarar legge til, endre og slette hendingar i konto-kalendrar."
+  allows_user_to_add_edit_and_delete_events_in_accou_80a5588e: "Tillet brukarar å legge til, endre og slette hendingar i konto-kalendarar."
   allows_user_to_add_edit_and_delete_events_in_the_c_14413268: "Gir ein brukar løyve til å legge til, endre og slette hendingar i emnekalenderen."
   allows_user_to_add_edit_and_delete_global_announce_8463e383: "Gir ein brukar løyve til å legge til, endre og slette globale kunngjeringar."
   allows_user_to_add_edit_and_update_grades_in_the_g_29a4068e: |-
@@ -2748,7 +2748,7 @@ nn:
   allows_user_to_assign_a_student_group_leader_in_an_73e12cb6: "Lar brukaren tilordne ein studentgruppeleiar i ein konto eller eit emne."
   allows_user_to_change_start_and_end_dates_for_cour_f437cee1: "Lar brukaren endre start- og sluttdatoar for emneseksjonane."
   allows_user_to_change_the_template_being_used_by_a_eab509a3: "Tillet brukar å endre malen som blir brukt av ein konto. "
-  allows_user_to_change_visibility_of_account_calend_c8cda753: "Tillater brukeren å endre synligheten til kontoens kalendere."
+  allows_user_to_change_visibility_of_account_calend_c8cda753: "Tillet brukaren å endre synlegheita til kontoen sine kalendarar."
   allows_user_to_close_for_comments_move_pin_unpin_e_bf17f03c: "Tillet brukar å stenge for kommentarar, flytte, feste/løyse, redigere, og slette diskusjonstrådar frå diskusjonssida."
   allows_user_to_configure_alerts_in_course_settings_38675b12: "Lar ein brukar konfigurere varslingar i emneinnstillinger. Varslingar er ein lite brukt funksjon designa for å sende eit varsel til studentar, lærarar eller administratorar for spesifikke utløysarar (f.eks. ingen lærar-student-interaksjon i løpet av 7 dagar). Dei sjekkast kvar dag og varslingar vil sendast ut til studenten og/eller læraren fram til det utløysande problemet er løyst."
   allows_user_to_configure_alerts_in_course_settings_40a81b1d: "Gi ein brukar løyve til å konfigurere varsel i emneinnstillingar. Varsel er ein sjeldan brukt funksjon som er laga for å sende eit varsel til studentar, faglærarar eller administratorar på grunnlag av spesifikke triggarar (t.d. ingen student/faglærar-interaksjon på ei veke/7 dagar). Dei sjekkast kvar dag, og varsel sendast til studenten og/eller faglæraren fram til det ikkje lenger er grunnlag for varsel."
@@ -2756,7 +2756,7 @@ nn:
   allows_user_to_configure_alerts_in_course_settings_c6b938ab: "Lar brukaren konfigurere varsler i emneinnstillingane."
   allows_user_to_configure_alerts_in_course_settings_f8acd7ba: "Lar ein brukar konfigurere varslingar i emneinnstillinger. Varslingar er ein lite brukt funksjon designa for å sende eit varsel til studentar, lærarar eller administratorar for spesifikke utløysarar (f.eks. ingen lærar-student-interaksjon i løpet av 7 dagar). Dei sjekkast kvar dag og varslingar vil sendast ut til studenten og/eller læraren fram til det utløysande problemet er løyst."
   allows_user_to_copy_individual_course_items_to_ano_46ba40d6: "Lar brukaren kopiere individuelle emneelement til eit anna emne."
-  allows_user_to_create_a_course_pace_via_course_pac_2ec549c: "Lar brukar opprette ein emneframdrift via Emneframdrift."
+  allows_user_to_create_a_course_pace_via_course_pac_2ec549c: "Tillet brukar å opprette ei emneframdrift via Emneframdrift."
   allows_user_to_create_account_or_course_groups_1d5c4aaf: "Lar brukaren opprette konto- eller emnegrupper."
   allows_user_to_create_accounts_for_new_users_e4ec27c3: "Lar brukaren opprette kontoar for nye brukarar."
   allows_user_to_create_accounts_for_new_users_with__30b55094: "Lar ein brukaren legge til nye brukarar i denne kontoen. Lar brukaren slette eller slå saman brukarar i denne kontoen. Lar brukaren endre opplysingar om andre brukarar, som namn og e-post. Lar brukaren sjå og endre påloggingsinformasjon for andre brukarar."
@@ -2764,15 +2764,15 @@ nn:
       Gir ein brukar løyve til å opprette kontoar for nye brukarar med knappen Legg til personar på kontonivå.
       Gir ein brukar løyve til å fjerne og slå saman brukarar innafor ein konto.
       Gir ein brukar løyve til å modifisere brukarkontodetaljar, som for eksempel namn, e-post og tidssone. Gir ein brukar løyve til å sjå og modifisere påloggingsinformasjon for ein annan brukar.
-  allows_user_to_create_add_items_and_duplicate_modu_bf3be878: "Lar brukaren opprette, legge til element og duplisere modular."
+  allows_user_to_create_add_items_and_duplicate_modu_bf3be878: "Tillet brukaren å opprette, legge til element og duplisere modular."
   allows_user_to_create_and_manage_appointments_on_t_393e9e84: "Gir ein brukar løyve til å opprette og administrere kalenderavtalar ved å bruke planleggaren. "
   allows_user_to_create_and_manage_groups_allows_use_562e0013: "Lar brukaren opprette og administrere grupper. Lar brukeren administrere delte ressursar i kontoen."
   allows_user_to_create_and_modify_grading_schemes_e4433a19: "Gir ein brukar løyve til å opprette og modifisere oppsett for karaktersetjing."
-  allows_user_to_create_blackout_dates_f6970f37: "Lar brukeren opprette svarte datoer."
+  allows_user_to_create_blackout_dates_f6970f37: "Tillet brukaren å opprette blokkerte datoar."
   allows_user_to_create_collaborations_allows_user_t_96f8c3be: "Gir ein brukar løyve til å opprette samarbeid. Gir ein bruker løyve til å sjå, endre og slette konferansar som dei har oppretta sjølve."
   allows_user_to_create_collaborations_allows_user_t_eff2a175: "Gir ein brukar løyve til å opprette samarbeid. Gir ein brukar løyve til å sjå, endre og slette samarbeid dei har oppretta sjølve."
   allows_user_to_create_collaborations_b4f214bf: "Lar brukaren opprette samarbeid."
-  allows_user_to_create_content_migrations_67527a6b: "Lar brukaren opprette innhaldsmigrasjonar."
+  allows_user_to_create_content_migrations_67527a6b: "Tillet brukaren å opprette innhaldsmigrasjonar."
   allows_user_to_create_course_groups_created_by_stu_2be56e8f: "Lar brukaren opprette emnegrupper oppretta av studentar."
   allows_user_to_create_course_groups_e169f91b: "Lar brukaren opprette emnegrupper."
   allows_user_to_create_course_pages_ec9c6647: "Lar brukaren opprette emnesider."
@@ -2821,10 +2821,10 @@ nn:
   allows_user_to_download_all_comments_in_a_student__33b36d0a: "Gi ein brukar løyve til å laste ned alle kommentarar knytta til ein innlevering frå ein student."
   allows_user_to_duplicate_assignments_in_a_course_a3bf4f54: "Lar brukaren duplisere oppgåver i eit emne."
   allows_user_to_duplicate_quizzes_in_a_course_1d3437f2: "Lar brukaren duplisere quizar i eit emne."
-  allows_user_to_edit_a_list_of_assignment_blackout__9c734bf0: "Tillater bruker å redigere en liste over perioder med utestengelse for oppgaver."
+  allows_user_to_edit_a_list_of_assignment_blackout__9c734bf0: "Tillet brukaren å redigere ei liste over periodar med blokkerte datoar for oppgåver."
   allows_user_to_edit_a_user_s_section_or_role_if_no_cf272262: "Lar brukar endre på ein brukar sin seksjon eller rolle (dersom den ikkje kjem frå SIS)"
   allows_user_to_edit_account_and_course_groups_259139c0: "Lar brukaren redigere konto- og emnegrupper."
-  allows_user_to_edit_and_publish_a_course_pace_via__1ccb27ef: "Lar brukar redigere og publisere ein emneframdrift via Emneframdrift."
+  allows_user_to_edit_and_publish_a_course_pace_via__1ccb27ef: "Tillet brukar å redigere og publisere ei emneframdrift via Emneframdrift."
   allows_user_to_edit_and_publish_unpublish_assignme_54d13630: "Lar brukaren redigere og publisere/oppheve publisering av oppgåver."
   allows_user_to_edit_and_publish_unpublish_quizzes_bdc5b306: "Lar brukaren redigere og publisere/oppheve publisering av quiz'ar."
   allows_user_to_edit_assignment_details_on_individu_3e50993a: "Gir ein brukar løyve til å endre oppgåvedetaljar for individuelle diskusjonar. Modular: Gir ein brukar løyve til å legge til nye oppgåver til ein modul."
@@ -2845,12 +2845,12 @@ nn:
   allows_user_to_edit_blueprint_lock_settings_on_the_a2534937: "Gir ein brukar løyve til å endre låseinnstillingane på oversiktssidene til oppgåver og quizer i eit  Blueprint-masteremne. "
   allows_user_to_edit_conferences_61eb62e0: "Gir brukar løyve til å redigere konferansar."
   allows_user_to_edit_configurations_for_manually_ad_7e0f496c: "Gir ein brukar løyve til å endre konfigurasjonar for eksterne appar som er lagt til manuelt. "
-  allows_user_to_edit_content_migrations_19af4464: "Lar brukar redigere innhaldsmigrasjonar."
+  allows_user_to_edit_content_migrations_19af4464: "Tillet brukar å redigere innhaldsmigrasjonar."
   allows_user_to_edit_course_files_and_folders_7a3fc8c7: "Lar brukaren redigere emnefiler og mapper."
   allows_user_to_edit_course_groups_d459145d: "Lar brukaren redigere emnegrupper."
   allows_user_to_edit_course_image_name_course_code__8a4681c8: "Lar brukaren redigere emnebilde, namn, emnekode, tidssone, underkonto, semester og andre alternativ i emnedetaljer-fana."
   allows_user_to_edit_course_pages_30f188b4: "Lar brukaren redigere emnesider."
-  allows_user_to_edit_course_tabs_95968064: "Lar brukaren redigere emnetabbar."
+  allows_user_to_edit_course_tabs_95968064: "Tillet brukaren å redigere emnefaner."
   allows_user_to_edit_discussion_topics_5576aeb1: "Lar brukaren redigere diskusjonsemner."
   allows_user_to_edit_grades_and_add_comments_in_spe_dc18e3c0: "Gir ein brukar løyve til å endre vurderingar og legge til kommentarar i SpeedGrader."
   allows_user_to_edit_grades_in_the_gradebook_83fa5c4f: "Lar brukaren redigere karakterar i karakterboka."
@@ -2865,9 +2865,9 @@ nn:
   allows_user_to_edit_question_banks_in_a_course_or__f72a39cf: "Lar brukaren redigere spørsmålsbankar i eit emne eller ein konto."
   allows_user_to_edit_the_course_sis_id_e1eccee3: "Gir ein brukar løyve til å endre SIS-ID for eit emne."
   allows_user_to_edit_the_course_syllabus_a28ff262: "Gir ein brukar løyve til å endre emneoversikta."
-  allows_user_to_edit_title_and_description_on_all_c_dd51db74: "Tillater bruker å redigere tittel og beskrivelse på alle samarbeid."
+  allows_user_to_edit_title_and_description_on_all_c_dd51db74: "Tillet brukar å redigere tittel og skildring på alle samarbeid."
   allows_user_to_edit_title_description_or_remove_co_483daae5: "Lar brukaren redigere tittel, skildring, eller fjerne samarbeidspartnarar for alle samarbeid."
-  allows_user_to_edit_to_do_date_on_a_course_page_th_10b5c738: "Lar brukaren redigere dato for gjøremål på ein kurside som støttar det."
+  allows_user_to_edit_to_do_date_on_a_course_page_th_10b5c738: "Tillet brukaren å redigere dato for gjeremål på ei kursside som støttar det."
   allows_user_to_enable_and_edit_assignment_group_we_87c09b9f: "Lar brukaren aktivere og endre vekting av oppgåvegrupper i eit emne."
   allows_user_to_export_the_gradebook_to_a_comma_sep_e52259a3: "Lar brukaren eksportere vurderingsoversikta til ei fil (csv)."
   allows_user_to_filter_for_blueprint_courses_as_the_2b3d864e: "Lar brukaren filtrere etter blueprint-emne som kontonivå. Lar brukaren fjerne tilknytta emne."
@@ -2878,7 +2878,7 @@ nn:
   allows_user_to_generate_a_pairing_code_on_behalf_o_9ea9bb0a: "Gir ein brukar løyve til å generere ein paringskode på vegner av ein student som kan delast med ein observatør. "
   allows_user_to_generate_login_logout_activity_repo_bba62f2: "Gir ein brukar løyve til å generere ein rapport i administrasjonsverktøy om inn-/utloggingsaktivitet."
   allows_user_to_generate_login_logout_activity_repo_e03fb94f: "Lar ein brukar generere aktivitetsrapport for inn-/utlogging i administratorverktøy. (Ikkje tilgjengeleg på underkontonivå.)"
-  allows_user_to_have_full_section_visibility_when_v_d087d8b7: "Tillater brukeren å ha full seksjonsvisning når du ser kunngjøringer."
+  allows_user_to_have_full_section_visibility_when_v_d087d8b7: "Tillet brukaren å ha full seksjonsvisning ved visning av kunngjeringar."
   allows_user_to_import_a_zip_file_97bd7db2: "Lar brukaren importere ei zip-fil."
   allows_user_to_import_account_learning_outcomes_f6f6d0b9: "Gir ein brukar løyve til å importere ein konto sine læringsmål"
   allows_user_to_import_content_using_the_course_imp_4a4ec4c7: "Gir ein brukar løyve til å importere innhald ved å bruke emneimportverktøyet."
@@ -2892,7 +2892,7 @@ nn:
   allows_user_to_import_resources_from_commons_into__79e8255e: "Lar brukaren importere ressursar frå Commons til eit emne."
   allows_user_to_import_sis_data_583b20a5: "Gir ein brukar løyve til å importere SIS-data."
   allows_user_to_like_discussion_posts_when_the_only_7390d91c: "Gir ein brukar løyve til å like diskusjonsinnlegg når valet \"Berre vurderarar kan like\" er slått på. "
-  allows_user_to_lock_unlock_selected_announcements__fbe4df6a: "Lar brukar låse / opne valgte kunngjeringar enkeltvis eller fleire samtidig."
+  allows_user_to_lock_unlock_selected_announcements__fbe4df6a: "Tillet brukaren å låse / opne valgte kunngjeringar enkeltvis eller fleire samtidig."
   allows_user_to_manage_assignment_settings_35d94690: "Lar brukaren administrere oppgåveinnstillingar."
   allows_user_to_manage_blueprint_course_settings_in_697362c5: "Lar brukaren administrere innstillingar for blåkopi i Emne Innstillingar"
   allows_user_to_manage_feature_options_in_account_s_c3c8ee03: "Gir ein brukar løyve til å administrere funksjonsval i kontoinnstillingar."
@@ -2920,7 +2920,7 @@ nn:
   allows_user_to_remove_a_course_as_a_course_templat_15e653d3: "Lar brukaren fjerne valet av eit emne som mal-emne i Emne Innstillingar"
   allows_user_to_remove_a_student_s_section_enrollme_78d1916e: "Lar brukaren fjerne ein student sitt seksjonsmedlemskap eller rolle"
   allows_user_to_remove_and_merge_users_in_an_accoun_b7e1aec7: "Lar brukaren fjerne og slå saman brukarar i ein konto."
-  allows_user_to_remove_assignment_blackout_dates_804b1d6d: "Lar brukar fjerne utestengelsesdatoar for oppgåver."
+  allows_user_to_remove_assignment_blackout_dates_804b1d6d: "Tillet brukaren å fjerne blokkerte datoar for oppgåver."
   allows_user_to_remove_collaborators_on_all_collabo_b9ce6f29: "Lar brukar fjerne medarbeidarar på alle samarbeid."
   allows_user_to_remove_designers_from_a_course_fa9e887e: "Lar brukaren fjerne designarar frå eit emne."
   allows_user_to_remove_group_members_from_course_gr_4f745b58: "Lar brukaren fjerne gruppemedlemmar frå emnegrupper."
@@ -3031,7 +3031,7 @@ nn:
   allows_user_to_view_course_and_student_analytics_f_5e3dca12: "Gir ein brukar løyve til å sjå analysedata for emne og studentar frå forsida til eit emne eller frå Personoversikta."
   allows_user_to_view_course_announcements_e71afc2: "Lar brukaren sjå emnekunngjeringar."
   allows_user_to_view_course_conferences_c40f8fd2: "Lar brukaren sjå emnekonferansar."
-  allows_user_to_view_course_copy_status_ca182555: "Tillater brukeren å se status for kurskopiering."
+  allows_user_to_view_course_copy_status_ca182555: "Lar brukaren sjå status for kurskopiering."
   allows_user_to_view_course_discussions_23346fa1: "Lar brukaren se emnediskusjonar."
   allows_user_to_view_course_sis_id_3a1818a5: "Gir ein brukar løyve til å sjå SIS-ID for emne."
   allows_user_to_view_course_status_choose_home_page_21bf32a8: "Gir brukar løyve til å sjå emnestatus, velje heimeside, og sjekkliste for enmeoppsett-knappar på heimesida."
@@ -3141,8 +3141,8 @@ nn:
   allows_users_to_add_a_friendly_description_to_outc_7acf6286: "Tillet brukarar å legge til ei venleg skildring til læringsmål for student- og foreldrevisning i vurderingsoversikt for meistringsbasert læring"
   allows_users_to_add_conferences_from_the_calendar_f36c5008: "Tillat brukarar å legge til konferansar frå kalenderen"
   allows_users_to_add_lti_tools_with_conference_sele_c38545ab: "Tillat brukarar å legge til LTI verktøy med conference_selection plasseringstype"
-  allows_users_to_delete_a_temporary_enrollment_7fd33cdd: "Tillater brukere å slette en midlertidig registrering"
-  allows_users_to_edit_an_existing_temporary_enrollm_b3543354: "Tillater brukere å redigere en eksisterende midlertidig registrering"
+  allows_users_to_delete_a_temporary_enrollment_7fd33cdd: "Lar brukarar slette ei midlertidig registrering"
+  allows_users_to_edit_an_existing_temporary_enrollm_b3543354: "Lar brukarar redigere ei eksisterende midlertidig registrering"
   allows_users_to_edit_conferences_2d3c960c: "Gir brukarar løyve til å endre konferansar."
   allows_users_to_enable_the_launch_speedgrader_filt_7e1b442: "Gir brukarar løyve til å slå på \"Start SpeedGrader filtrert etter studentgrupper\"-valet for emne i emneinnstillingar. Når det er aktivt og ei studentgruppe er vald i ny vurderingsoversikt, vil SpeedGrader kun laste studentar knytta til den valde gruppa. "
   allows_users_to_import_groups_in_a_course_a8b5c73e: "Lar brukarar importere grupper i eit emne."
@@ -3157,7 +3157,7 @@ nn:
   always_include_dates_1ae2935e: "Inkluder alltid datoar"
   always_include_dates_74b3721d: "Inkluder alltid datoar;"
   always_load_the_rce_and_sidebar_from_a_canvas_rich_1495e3fd: "Last alltid RCE og sidestolpe fra Canvas sin rikt innhald-teneste"
-  an_active_role_already_exists_with_that_name_205864bf: "Ein aktiv rolle med det namnet finst allereie."
+  an_active_role_already_exists_with_that_name_205864bf: "Ei aktiv rolle med det namnet finst allereie."
   an_amazing_discussion_assignment_e5c8bd6b: "Ei super diskusjonsoppgåve"
   an_api_key_is_required_to_use_academic_benchmarks_26011dd6: "Ein API-nøkkel er nødvendig for å bruke Academic Benchmarks"
   an_assignment_name_dc624e70: "Eit oppgåvenamn"
@@ -3383,7 +3383,7 @@ nn:
   anonymous_grading_cannot_be_enabled_for_group_assi_faa33494: "Anonym vurdering kan ikkje aktiverast for gruppeoppgåver"
   anonymous_grading_ccb5045c: "Anonym karaktersetjing"
   anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "Anonym karaktersetjing tvingar studentnamn til å vere skjulte i SpeedGrader™"
-  anonymous_grading_with_new_quizzes_ba0391f3: "Anonym vurdering med nye quizer"
+  anonymous_grading_with_new_quizzes_ba0391f3: "Anonym vurdering med nye quizar"
   anonymous_id_2ef1c6d2: "Anonym %{id}"
   anonymous_id_you_cf43ab76: "Anonym %{id} (du)"
   anonymous_instructor_annotations_2b6c822: "Anomyme merknader frå faglærar"
@@ -3497,11 +3497,11 @@ nn:
   applied_cc7be774: Brukt
   applied_filters_63a90ccd: "Anvendte filter"
   apply_781a2546: Bruk
-  apply_changes_b1dffc70: "Bruk endringar"
+  apply_changes_b1dffc70: "Anvend endringar"
   apply_conditions_9e941010: "Anvend vilkår"
   apply_date_range_selection_cc4351ed: "Bruk vald datointervall"
   apply_filter_7e4f6113: "Anvend filter"
-  apply_filters_e98823c0: "Bruk filter"
+  apply_filters_e98823c0: "Anvend filter"
   apply_filters_note_clicking_this_button_will_cause_753f04: "Legg til filter. Merk: ved å klikke på knappen vil sida laste på nytt."
   apply_missing_status_cd98e1d3: "Bruk manglande status"
   apply_score_1edd7cda: "Anvend poengsum"
@@ -3509,7 +3509,7 @@ nn:
   apply_settings_10409ad9: "Bruk innstillingar"
   apply_theme_7af08387: "Bruk tema"
   apply_to_92f70c8c: "Skal gjelde for: "
-  applying_changes_976b8b1e: "Å søke endringer"
+  applying_changes_976b8b1e: "Anvender endringer"
   applying_new_styles_to_subaccounts_e8aeeef2: "Legg til nye stilar til underkontoar"
   applying_please_be_patient_f7b5f244: "Arbeider, ver tolmodig"
   applying_score_to_ungraded_7311df9a: "Legger til resultat for ikkje-vurdert"
@@ -3542,7 +3542,7 @@ nn:
   archive_outcomes_20b869b6: "Arkiv Læringsmål"
   archive_selected_d64506ca: "Arkiv er valt"
   archived_de543437: Arkivert
-  archived_grading_schemes_6d698d0: "Arkiverte vurderingsskjemaer"
+  archived_grading_schemes_6d698d0: "Arkiverte vurderingsskjema"
   are_you_sure_26795d3c: "Er du sikker?"
   are_you_sure_that_you_want_to_remove_these_count_o_67ef2d6c: 
     one: "Er du sikker på at du vil fjerne dette læringsmålet frå denne kontoen?"
@@ -3645,7 +3645,7 @@ nn:
   ask_your_instructor_a_question_a61ca5e9: "Spør faglærar eit spørsmål"
   assess_and_survey_your_students_ce8172a9: "Vurder og kartlegg studentane dine"
   assess_student_understanding_1e0b8d7f: "Vurder studentane si forståing"
-  assessable_artifacts_include_assignments_quizzes_a_62b9698b: "Vurderbare element inkluderar oppgåver, quiz og vurderte diskusjonar."
+  assessable_artifacts_include_assignments_quizzes_a_62b9698b: "Vurderbare element inkluderer oppgåver, quiz og vurderte diskusjonar."
   assessment_audit_d4a76709: Vurderingslogg
   assessment_audit_events_for_creatorname_56e84e8: "Vurderingslogghendingar for %{creatorName}"
   assessment_audit_tray_5dd11721: "Meny for vurderingslogg"
@@ -3672,7 +3672,7 @@ nn:
   assign_access_ecd4227b: "Tildel tilgang"
   assign_eedf72bb: Tilordne
   assign_manually_1785dcfc: "Tildel manuelt"
-  assign_module_to_individuals_or_sections_bd638c03: "Tildel modul til enkeltpersoner eller seksjoner."
+  assign_module_to_individuals_or_sections_bd638c03: "Tildel modul til enkeltpersonar eller seksjonar."
   assign_reviews_on_date_7e48ec50: "Tilordne gjennomgangar etter dato"
   assign_temporary_enrollments_bdaaa58a: "Tildel midlertidige påmeldingar"
   assign_temporary_enrollments_to_recipient_b25cb6be: "Tildel midlertidige påmeldingar til %{recipient}"
@@ -3686,7 +3686,7 @@ nn:
   assigned_pace_e954962a: "Tildelt Emneframdrift"
   assigned_permissions_6f6fecb6: "Tilordna løyve"
   assigned_roles_ace6c950: "Tilordna roller"
-  assigning_members_to_the_new_groups_2f731e80: "å tildele medlemmer til de nye gruppene"
+  assigning_members_to_the_new_groups_2f731e80: "å tildele medlemmer til dei nye gruppene"
   assigning_students_to_groups_35b1532a: "Å tildele studentar til grupper"
   assignment: 
     assignment_group_must_have_group: "Vel ei oppgåvegruppe for denne oppgåva"
@@ -4699,13 +4699,13 @@ nn:
   authorize_url_f28167a3: "Godkjenn URL"
   auto_leader_7791c30a: auto_leader
   auto_show_closed_captions_e4cd7aff: "Vis undertekstar automatisk"
-  auto_subscribe_a7da0dff: "Auto abonner"
+  auto_subscribe_a7da0dff: "Abonner automatisk"
   autodetect_field_separators_in_compatible_spreadsh_768067e1: "Autogjenkjenn feltskilje i kompatible reknearkeksportar"
   autodetect_field_separators_in_gradebook_exports_ed9a9d77: "Autogjenkjenn feltskilje ved eksport av vurderingsoversikt"
   automatic_mobile_app_login_3724af59: "Automatisk innlogging for Mobil App"
   automatically_apply_deduction_to_late_submissions_2b68166e: "Bruk automatisk resultatutrekning på for seine innleveringar"
   automatically_apply_grade_for_missing_submissions_2b5c1a72: "Bruk automatisk vurdering for manglande innleveringar"
-  automatically_assign_709c6ddb: "Automatisk tildele"
+  automatically_assign_709c6ddb: "Tildel automatisk"
   automatically_assign_a_student_group_leader_29448649: "Oppgi ein student automatisk som gruppeleiar"
   automatically_dff02416: Automatisk
   automatically_disable_post_to_sis_on_assignments_w_dd7e873a: "Automatisk slå av \"Post til SIS\" på oppgåver når vurderingsperioden stenger"
@@ -4826,7 +4826,7 @@ nn:
   bigeasy_locale: nn_NO
   blackboard: 
     no_manifest: "ZIP-fil for Blackboard har inga imsmanifest.xml-fil i rotkatalogen."
-  blackout_date_5fc44c2b: Blackout-datoar
+  blackout_date_5fc44c2b: "Blokkerte datoar"
   blackout_dates_4a140a72: Blackout-datoar
   blank_38df4238: tom
   blocked_30d0fb62: Blokkert
@@ -4889,7 +4889,7 @@ nn:
   blueprint_courses_must_be_enabled_for_an_account_b_edd8f7d3: "Blåkopiemner må være aktivert for ein konto av ein administrator."
   blueprint_courses_must_be_enabled_for_an_account_b_ffb3ac4b: "Blueprint-emne må aktiverast på kontonivå av ein administrator. Emneroller kan kun administrere innhald i Blueprint-emne dersom dei er lagde til eit Blueprint-emne som faglærar, undervisingsassistent eller designar."
   blueprint_information_95dcef55: Blueprint-informasjon
-  blueprint_locking_is_only_available_for_published__c8c97e3f: "Låsing for Blåkopi er berre tilgjengeleg for publiserte Emneframdrift."
+  blueprint_locking_is_only_available_for_published__c8c97e3f: "Låsing for Blåkopi er berre tilgjengeleg for publiserte Emneframdrifter."
   blueprint_locking_is_only_available_for_the_course_68ec4266: "Låsing for Blåkopi er berre tilgjengeleg for framdriftsplanar på emnenivå."
   blueprint_settings_233e909a: Blueprint-innstillingar
   blueprint_sync_90d0dfd5: "Synkronisering av Blueprint"
@@ -5460,14 +5460,14 @@ nn:
     ics_title: "%{course_or_group_name}-kalender i Canvas"
     invalid_date_or_time: "Ugyldig dato eller ugyldig dato/klokkeslett for %{attr}"
   calendar_frequency_picker: 
-    custom: Tilpasset...
+    custom: Tilpassa...
     daily: Dagleg
     first: Først
     fourth: fjerde
     frequency: Frekvens
     last: siste
     not_repeat: "Gjentek ikkje"
-    second: sekund
+    second: andre
     third: tredje
   calendar_removed_1c841af4: "Kalender fjerna"
   calendar_series_e1b7a4bc: Kalenderserie
@@ -5848,8 +5848,8 @@ nn:
   clear_all_da755751: "Fjern alt"
   clear_all_e23811b1: "Fjern alle"
   clear_all_filters_9c7e870: "Fjern alle filtre"
-  clear_assign_to_d5fc178f: "Tildel tilbake"
-  clear_search_900e9c97: "Fjern søk"
+  clear_assign_to_d5fc178f: "Fjern tilordne til"
+  clear_search_900e9c97: "Tøm søk"
   clear_search_field_75f595c7: "Tøm søkefeltet"
   clear_selected_file_82388e50: "Fjern vald fil"
   clear_user_cache_ef079f7f: "Tøm brukarcache"
@@ -8977,7 +8977,7 @@ nn:
   define_general_settings_for_locked_objects_in_this_20da2981: "Definer generelle innstillingar for låste element i dette emnet. "
   define_settings_by_type_for_locked_objects_in_this_676197bf: "Definer innstillingar etter type for låste element i dette emnet."
   define_text_to_go_before_and_after_the_dropdown_an_be8d16e2: "Skriv inn teksta som skal stå før og etter rullegardinmenyen og set saman ei samling moglege svar."
-  delay_posting_f45eed7d: "Publiser seinare"
+  delay_posting_f45eed7d: "Utset publisering"
   delay_posting_this_topic_until_aa483eec: "Utsett å poste dette emnet til"
   delayed_until_58b7af4b: "Utsett til:"
   delete_8d6d2222: "Slett:"
@@ -9187,7 +9187,7 @@ nn:
   description_436c48d7: Skildring
   description_61f4296: "* Skildring"
   description_for_mastery_level_position_description_cc17114b: "Skildring av ekspertisenivå %{position}: %{description}"
-  description_must_be_less_than_2500_characters_1ee7c522: "Beskrivelsa må vere mindre enn 2500 teikn."
+  description_must_be_less_than_2500_characters_1ee7c522: "Beskrivinga må vere mindre enn 2500 teikn."
   descriptivename_was_changed_from_formattedoldvalue_47623537: "%{descriptiveName} vart endra frå %{formattedOldValue} til %{formattedNewValue}."
   descriptivename_was_set_to_formattednewvalue_cd78b357: "%{descriptiveName} vart satt til %{formattedNewValue}."
   descriptivename_was_turned_off_38771a19: "%{descriptiveName} vart skrudd av."
@@ -23907,7 +23907,7 @@ nn:
     a_file_upload: "ei filopplasting"
     a_media_recording: "ei mediainnspeling"
     a_quiz: "ein quiz"
-    a_text_entry_box: teksteditoren
+    a_text_entry_box: "ein teksteditor"
     a_website_url: "ei URL-adresse til ein nettstad"
     external_tool: "eit eksternt verktøy"
     on_paper: "på papir"
@@ -24841,7 +24841,7 @@ nn:
   there_was_an_error_saving_the_custom_grade_status_f184a28c: "Det oppstod ein feil ved lagring av den tilpassa vurderingsstatusen."
   there_was_an_error_saving_the_note_please_try_agai_f2f2cd38: "Det oppstod ein feil under lagring av merknaden. Prøv på nytt seinare."
   there_was_an_error_saving_the_rubric_4d62fe89: "Det oppstod ein feil ved lagring av vurderingsskjemaet."
-  there_was_an_error_saving_your_blackout_dates_1efee334: "Det oppstod ein feil ved lagring av dine utelukka datoar."
+  there_was_an_error_saving_your_blackout_dates_1efee334: "Det oppstod ein feil ved lagring av dine blokkerte datoar."
   there_was_an_error_saving_your_changes_bfaf3d79: "Det opptstod ein feil då endringane dine skulle lagrast."
   there_was_an_error_sending_the_message_791127d9: "Det oppstod ein feil ved sending av meldingen."
   there_was_an_error_setting_usage_rights_53739e1d: "Det oppstod ein feil under fastsetjinga av bruksrettar."
@@ -24946,7 +24946,7 @@ nn:
   this_date_is_invalid_ae413346: "Denne datoen er ugyldig."
   this_due_date_is_managed_by_cfbb698c: "Denne forfallsdatoen blir administrert av"
   this_due_date_is_managed_by_course_pacing_d9f9ce1d: "Denne forfallsdatoen blir administrert av Emnegjennomføring."
-  this_duration_does_not_take_into_account_weekends__19209a71: "Denne varigheita tar ikkje hensyn til helgar og svartelista dagar."
+  this_duration_does_not_take_into_account_weekends__19209a71: "Denne varigheita tar ikkje hensyn til helger og blokkerte dagar."
   this_element_is_a_more_accessible_alternative_to_d_e17b4e51: "Dette elementet er ei meir tilgjengeleg løysing for omorganisering enn å dra og sleppe. Trykk Enter eller Mellomromtasten for å flytte dette spørsmålet. "
   this_email_address_is_unconfirmed_f0fc8c6e: "E-postadressa er ikkje stadfesta"
   this_enables_an_updated_navigation_new_dashboard_a_8bd4cae: "Dette mogleggjer ein oppdatert navigasjon, nytt dashbord og eit enklare, meir moderne uttrykk."

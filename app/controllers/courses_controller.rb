@@ -1560,6 +1560,7 @@ class CoursesController < ApplicationController
                MSFT_SYNC_MAX_ENROLLMENT_MEMBERS: MicrosoftSync::MembershipDiff::MAX_ENROLLMENT_MEMBERS,
                MSFT_SYNC_MAX_ENROLLMENT_OWNERS: MicrosoftSync::MembershipDiff::MAX_ENROLLMENT_OWNERS,
                COURSE_PACES_ENABLED: @context.enable_course_paces?,
+               ARCHIVED_GRADING_SCHEMES_ENABLED: Account.site_admin.feature_enabled?(:archived_grading_schemes),
              })
 
       set_tutorial_js_env
@@ -2664,7 +2665,12 @@ class CoursesController < ApplicationController
     unless account.grants_any_right?(@current_user, session, :create_courses, :manage_courses, :manage_courses_admin)
       account = @domain_root_account.manually_created_courses_account
     end
+
     return unless authorized_action(account, @current_user, [:manage_courses, :create_courses])
+
+    # For warnings messages previous to export
+    warnings = @context.export_warnings
+    js_env(EXPORT_WARNINGS: warnings) unless warnings.empty?
 
     # For prepopulating the date fields
     js_env(OLD_START_DATE: datetime_string(@context.start_at, :verbose))

@@ -62,17 +62,10 @@ describe UsersController do
     end
 
     context "ENV.LTI_TOOL_FORM_ID" do
-      it "with the lti_unique_tool_form_ids flag on, sets a random id" do
-        account.enable_feature!(:lti_unique_tool_form_ids)
+      it "sets a random id" do
         expect(controller).to receive(:random_lti_tool_form_id).and_return("1")
         allow(controller).to receive(:js_env).with(anything).and_call_original
         expect(controller).to receive(:js_env).with(LTI_TOOL_FORM_ID: "1")
-        get :external_tool, params: { id: tool.id, user_id: user.id }
-      end
-
-      it "with the lti_unique_tool_form_ids flag off, does not set a random it" do
-        account.disable_feature!(:lti_unique_tool_form_ids)
-        expect(controller).not_to receive(:js_env).with(LTI_TOOL_FORM_ID: anything)
         get :external_tool, params: { id: tool.id, user_id: user.id }
       end
     end
@@ -2309,8 +2302,6 @@ describe UsersController do
     end
 
     it "404s, but still shows, on a deleted user for admins" do
-      Account.site_admin.enable_feature!(:deleted_user_tools)
-
       course_with_teacher(active_all: 1, user: user_with_pseudonym)
 
       account_admin_user
@@ -2363,8 +2354,6 @@ describe UsersController do
     end
 
     it "shows a deleted user from the account context if they have a deleted pseudonym for that account" do
-      Account.site_admin.enable_feature!(:deleted_user_tools)
-
       course_with_teacher(active_all: 1, user: user_with_pseudonym)
       account_admin_user(active_all: true)
       user_session(@admin)
@@ -2378,7 +2367,6 @@ describe UsersController do
       specs_require_sharding
 
       before do
-        Account.site_admin.enable_feature!(:deleted_user_tools)
         @shard1.activate do
           course_with_teacher(active_all: 1, user: user_with_pseudonym)
         end

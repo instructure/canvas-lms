@@ -25,8 +25,11 @@ import speedGrader from './jquery/speed_grader'
 import {getCurrentTheme} from '@instructure/theme-registry'
 import {captureException} from '@sentry/browser'
 import {getAssignment} from './queries/assignmentQuery'
+import {getSectionsByAssignment} from './queries/sectionsByAssignmentQuery'
 import {getSubmission} from './queries/submissionQuery'
 import {getSubmissionsByAssignment} from './queries/submissionsByAssignmentQuery'
+import {updateSubmissionGrade} from './mutations/updateSubmissionGradeMutation'
+import {createSubmissionComment} from './mutations/createSubmissionCommentMutation'
 
 const I18n = useI18nScope('speed_grader')
 
@@ -39,7 +42,16 @@ ready(() => {
       .then(module => {
         module.render(mountPoint, {
           theme,
-          queries: {getAssignment, getSubmission, getSubmissionsByAssignment},
+          queries: {
+            getAssignment,
+            getSubmission,
+            getSubmissionsByAssignment,
+            getSectionsByAssignment,
+          },
+          mutations: {
+            updateSubmissionGrade,
+            createSubmissionComment,
+          },
         })
       })
       .catch(error => {

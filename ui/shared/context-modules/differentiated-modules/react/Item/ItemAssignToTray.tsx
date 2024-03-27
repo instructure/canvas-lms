@@ -34,11 +34,14 @@ import {
   IconQuestionLine,
 } from '@instructure/ui-icons'
 import {showFlashAlert, showFlashError} from '@canvas/alerts/react/FlashAlert'
+import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
+import {lockLabels} from '@canvas/blueprint-courses/react/labels'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import type {
   BaseDateDetails,
   DateDetails,
+  DateLockTypes,
   exportedOverride,
   FetchDueDatesResponse,
   ItemAssignToCardSpec,
@@ -48,6 +51,8 @@ import TrayFooter from '../Footer'
 import type {AssigneeOption} from '../AssigneeSelector'
 import useFetchAssignees from '../../utils/hooks/useFetchAssignees'
 import {generateDateDetailsPayload, getOverriddenAssignees} from '../../utils/assignToHelper'
+import {Text} from '@instructure/ui-text'
+import {Alert} from '@instructure/ui-alerts'
 
 const I18n = useI18nScope('differentiated_modules')
 
@@ -139,7 +144,7 @@ export interface ItemAssignToTrayProps {
   defaultCards?: ItemAssignToCardSpec[]
   defaultDisabledOptionIds?: string[]
   defaultSectionId?: string
-  useApplyButton: boolean
+  useApplyButton?: boolean
   onAddCard?: () => void
   onAssigneesChange?: (
     cardId: string,
@@ -177,6 +182,11 @@ export default function ItemAssignToTray({
   const [fetchInFlight, setFetchInFlight] = useState(false)
   const [disabledOptionIds, setDisabledOptionIds] = useState<string[]>(defaultDisabledOptionIds)
   const [shouldFocusCard, setShouldFocusCard] = useState<boolean>(false)
+  const [blueprintDateLocks, setBlueprintDateLocks] = useState<DateLockTypes[] | undefined>(
+    undefined
+  )
+  const [shouldFocusDeleteButton, setShouldFocusDeleteButton] = useState<boolean>(false)
+  const addCardButtonRef = useRef<Element | null>(null)
   const everyoneOption = useMemo(() => {
     const hasOverrides =
       (disabledOptionIds.length === 1 && !disabledOptionIds.includes('everyone')) ||
@@ -230,7 +240,7 @@ export default function ItemAssignToTray({
         const overriddenTargets = getOverriddenAssignees(overrides)
         delete dateDetailsApiResponse.overrides
         const baseDates: BaseDateDetails = dateDetailsApiResponse
-        const onlyOverrides = dateDetailsApiResponse.only_visible_to_overrides
+        const onlyOverrides = !dateDetailsApiResponse.visible_to_everyone
 
         const cards: ItemAssignToCardSpec[] = []
         const selectedOptionIds: string[] = []
@@ -290,6 +300,7 @@ export default function ItemAssignToTray({
             selectedOptionIds.push(...defaultOptions)
           })
         }
+        setBlueprintDateLocks(dateDetailsApiResponse.blueprint_date_locks)
         setDisabledOptionIds(selectedOptionIds)
         setInitialCards(cards)
         setAssignToCards(cards)
@@ -305,6 +316,7 @@ export default function ItemAssignToTray({
   }, [courseId, itemContentId, itemType, JSON.stringify(defaultCards)])
 
   const handleAddCard = () => {
+    setShouldFocusDeleteButton(true)
     if (onAddCard) {
       onAddCard()
       return
@@ -364,6 +376,10 @@ export default function ItemAssignToTray({
       setAssignToCards(cards)
       setDisabledOptionIds(newDisabled)
       onCardRemove?.(cardId)
+      if (addCardButtonRef?.current instanceof HTMLButtonElement) {
+        addCardButtonRef.current.disabled = false // so it can be focused
+        addCardButtonRef.current.focus()
+      }
     },
     [assignToCards, disabledOptionIds, onCardRemove]
   )
@@ -483,7 +499,7 @@ export default function ItemAssignToTray({
   function Header() {
     const icon = itemTypeToIcon(iconType)
     return (
-      <Flex.Item margin="medium 0" padding="0 medium" width="100%">
+      <Flex.Item margin="medium 0 small" padding="0 medium" width="100%">
         <CloseButton
           onClick={onClose}
           screenReaderLabel={I18n.t('Close')}
@@ -496,6 +512,14 @@ export default function ItemAssignToTray({
         <View data-testid="item-type-text" as="div" margin="medium 0 0 0">
           {renderItemType()} {pointsPossible != null && `| ${renderPointsPossible()}`}
         </View>
+        {blueprintDateLocks?.length > 0 ? (
+          <Alert liveRegion={getLiveRegion} variant="info" margin="small 0 0">
+            <Text weight="bold" size="small">
+              {I18n.t('Locked: ')}
+            </Text>
+            <Text size="small">{blueprintDateLocks.map(i => lockLabels[i]).join(' & ')}</Text>
+          </Alert>
+        ) : null}
       </Flex.Item>
     )
   }
@@ -516,7 +540,7 @@ export default function ItemAssignToTray({
   function renderCards(isOpen?: boolean) {
     const cardCount = assignToCards.length
     const firstCardWithError = assignToCards.find(card => !card.isValid)
-    return assignToCards.map(card => {
+    return assignToCards.map((card, i) => {
       return (
         <View key={card.key} as="div" margin="small 0 0 0">
           <ItemAssignToCard
@@ -540,6 +564,8 @@ export default function ItemAssignToTray({
             customSetSearchTerm={setSearchTerm}
             highlightCard={card.highlightCard}
             focus={shouldFocusCard && firstCardWithError?.key === card.key}
+            blueprintDateLocks={blueprintDateLocks}
+            shouldFocusDeleteButton={shouldFocusDeleteButton && i === assignToCards.length - 1}
           />
         </View>
       )
@@ -563,7 +589,8 @@ export default function ItemAssignToTray({
           data-testid="add-card"
           margin="small 0 0 0"
           renderIcon={IconAddLine}
-          disabled={!allCardsAssigned()}
+          interaction={!allCardsAssigned() || !!blueprintDateLocks?.length ? 'disabled' : 'enabled'}
+          elementRef={el => (addCardButtonRef.current = el)}
         >
           {I18n.t('Add')}
         </Button>

@@ -189,6 +189,23 @@ describe ProfileController do
       user_session(@user, @pseudonym.reload)
     end
 
+    it "alert is set to success when profile update is successful" do
+      put "update_profile",
+          params: { user: { short_name: "Monsturd", name: "Jenkins" },
+                    user_profile: { bio: "...", title: "!!!" } },
+          format: "json"
+      expect(flash[:success]).to be_truthy
+    end
+
+    it "alert is set to failed when user validation fails" do
+      name = "a" * 1000
+      put "update_profile",
+          params: { user: { short_name: name, name: "Jenkins" },
+                    user_profile: { bio: "...", title: "!!!" } },
+          format: "json"
+      expect(flash[:success]).to be_falsey
+    end
+
     it "lets you change your short_name and profile information" do
       put "update_profile",
           params: { user: { short_name: "Monsturd", name: "Jenkins" },

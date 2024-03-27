@@ -63,6 +63,7 @@ import {
   scrollTo,
   setExpandAllButton,
   setExpandAllButtonHandler,
+  setExpandAllButtonVisible,
   updateProgressionState,
   openExternalTool,
 } from './utils'
@@ -74,6 +75,7 @@ import DifferentiatedModulesTray from '../differentiated-modules'
 import ItemAssignToTray from '../differentiated-modules/react/Item/ItemAssignToTray'
 import {parseModule, parseModuleList} from '../differentiated-modules/utils/moduleHelpers'
 import {addModuleElement} from '../utils/moduleHelpers'
+import ContextModulesHeader from '../react/ContextModulesHeader'
 
 if (!('INST' in window)) window.INST = {}
 
@@ -948,19 +950,24 @@ const newPillMessage = function ($module, requirement_count) {
 }
 
 const updatePublishMenuDisabledState = function (disabled) {
-  // Update the top level publish menu to reflect the new module
-  const publishMenu = document.getElementById('context-modules-publish-menu')
-  if (publishMenu) {
-    const $publishMenu = $(publishMenu)
-    $publishMenu.data('disabled', disabled)
-    ReactDOM.render(
-      <ContextModulesPublishMenu
-        courseId={$publishMenu.data('courseId')}
-        runningProgressId={$publishMenu.data('progressId')}
-        disabled={disabled}
-      />,
-      publishMenu
-    )
+  if (ENV.FEATURES.instui_header) {
+    // Send event to ContextModulesHeader component to update the publish menu
+    window.dispatchEvent(new CustomEvent('update-publish-menu-disabled-state', {detail: {disabled}}))
+  } else {
+    // Update the top level publish menu to reflect the new module
+    const publishMenu = document.getElementById('context-modules-publish-menu')
+    if (publishMenu) {
+      const $publishMenu = $(publishMenu)
+      $publishMenu.data('disabled', disabled)
+      ReactDOM.render(
+        <ContextModulesPublishMenu
+          courseId={$publishMenu.data('courseId')}
+          runningProgressId={$publishMenu.data('progressId')}
+          disabled={disabled}
+        />,
+        publishMenu
+      )
+    } 
   }
 }
 
@@ -1188,16 +1195,16 @@ modules.initModuleManagement = function (duplicate) {
       })
     $pre.find('.option').empty().append($option)
     $option.find('.id').change()
-    $option.slideDown(function () {
-      if (event.originalEvent) {
-        // don't do this when populating the dialog :P
-        $('select:first', $(this)).focus()
-      }
-    })
     $form.find('.completion_entry .criteria_list').append($pre).show()
     $pre.slideDown()
     $('.requirement-count-radio').show()
     $('#context_module_requirement_count_').change()
+    $option.slideDown(function () {
+      if (event.originalEvent) {
+        // don't do this when populating the dialog :P
+        $('select:first', $(this)).trigger('focus')
+      }
+    })
   })
 
   $('#completion_criterion_option .id').change(function () {
@@ -1330,6 +1337,7 @@ modules.initModuleManagement = function (duplicate) {
           $('.duplicate_module_link').die()
           $('.duplicate_item_link').die()
           if (!ENV.FEATURES.instui_header) {
+            // not using with instui header, clicks are handled differently
             $('.add_module_link').die()
           }
           $('.edit_module_link').die()
@@ -1386,7 +1394,7 @@ modules.initModuleManagement = function (duplicate) {
             $toFocus.focus()
             const $contextModules = $('#context_modules .context_module')
             if (!$contextModules.length) {
-              $('#expand_collapse_all').hide()
+              setExpandAllButtonVisible(false)
               updatePublishMenuDisabledState(true)
             }
           })
@@ -1717,10 +1725,10 @@ modules.initModuleManagement = function (duplicate) {
   }
 
   if (ENV.FEATURES.instui_header) {
-    setTimeout(() => { // export for react, use timer to avoid race conditions.
-      document.add_module_link_handler = add_module_link_handler
-    }, 300)
+    // export "new module" handler for react
+    document.add_module_link_handler = add_module_link_handler
   } else {
+    // adds the "new module" button click handler
     $(document).on('click', '.add_module_link', add_module_link_handler)
   }
 
@@ -2182,6 +2190,11 @@ $(document).ready(function () {
     modules.evaluateItemCyoe($item)
   })
 
+  if (ENV.FEATURES.instui_header) {
+    // render the new INSTUI header component
+    renderHeaderComponent()
+  }
+
   let $currentElem = null
   const hover = function ($elem) {
     if ($elem.hasClass('context_module')) {
@@ -2301,6 +2314,7 @@ $(document).ready(function () {
     // "n" opens up the Add Module form
     $document.keycodes('n', event => {
       if (ENV.FEATURES.instui_header) {
+        // handles the "new module" button action on keypress
         $('#context-modules-header-add-module-button:visible').click()
       } else {
         $('.add_module_link:visible:first').click()
@@ -2362,26 +2376,26 @@ $(document).ready(function () {
   const $contextModules = $('#context_modules .context_module')
   if (!$contextModules.length) {
     $('#no_context_modules_message').show()
-    $('#expand_collapse_all').hide()
+    setExpandAllButtonVisible(false)
     $('#context_modules_sortable_container').addClass('item-group-container--is-empty')
   }
   $contextModules.each(function () {
     updateProgressionState($(this))
   })
 
-  if (ENV.FEATURES.instui_header) {
-    setTimeout(() => {
-      setExpandAllButton()
-    }, 300)
-  }
-  else {
-    setExpandAllButton()
+  setExpandAllButton()
+
+  if (!ENV.FEATURES.instui_header) {
+    // set the click handler for the expand/collapse all button 
+    // if the instui header is not enabled
     setExpandAllButtonHandler()
   }
 
   if (!ENV.FEATURES.instui_header) {
+    // menu tools click handler for the old UI
     $('.menu_tray_tool_link').click(openExternalTool)
   }
+
   monitorLtiMessages()
 
   function renderCopyToTray(open, contentSelection, returnFocusTo) {
@@ -2412,6 +2426,13 @@ $(document).ready(function () {
       />,
       document.getElementById('direct-share-mount-point')
     )
+  }
+
+  function renderHeaderComponent() {
+    const root = $('#context-modules-header-root')
+    if (root[0]) {
+      ReactDOM.render(<ContextModulesHeader {...root.data('props')} />, root[0])
+    }
   }
 
   $(document).on('click', '.module_copy_to', event => {

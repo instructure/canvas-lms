@@ -20,10 +20,10 @@ class AddReplicaIdentityToRubricCriteria < ActiveRecord::Migration[7.0]
   tag :predeploy
 
   def up
-    add_replica_identity "RubricCriterion", :root_account_id
+    set_replica_identity :rubric_criteria
   end
 
   def down
-    remove_replica_identity "RubricCriterion"
+    set_replica_identity :rubric_criteria, :default
   end
 end

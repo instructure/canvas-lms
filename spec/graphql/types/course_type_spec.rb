@@ -290,6 +290,65 @@ describe Types::CourseType do
     end
   end
 
+  describe "customGradeStatusesConnection" do
+    before do
+      account_admin_user
+      course.root_account.custom_grade_statuses.create!(
+        color: "#BBB",
+        created_by: @admin,
+        name: "My Status"
+      )
+    end
+
+    it "returns nil when the feature flag is disabled" do
+      Account.site_admin.disable_feature!(:custom_gradebook_statuses)
+      expect(
+        course_type.resolve("customGradeStatusesConnection { edges { node { name } } }", current_user: @teacher)
+      ).to be_nil
+    end
+
+    it "returns nil when the requesting user lacks needed permissions" do
+      expect(
+        course_type.resolve("customGradeStatusesConnection { edges { node { name } } }", current_user: @student)
+      ).to be_nil
+    end
+
+    it "returns the custom grade statuses used by the course" do
+      expect(
+        course_type.resolve("customGradeStatusesConnection { edges { node { name } } }", current_user: @teacher)
+      ).to match_array ["My Status"]
+    end
+
+    it "excludes custom statuses not used by the course" do
+      new_account = Account.create!
+      new_admin = account_admin_user(account: new_account)
+      new_account.custom_grade_statuses.create!(color: "#AAA", created_by: new_admin, name: "Another Status")
+      expect(
+        course_type.resolve("customGradeStatusesConnection { edges { node { name } } }", current_user: @teacher)
+      ).not_to include "Another Status"
+    end
+  end
+
+  describe "gradeStatuses" do
+    before do
+      account_admin_user
+    end
+
+    it "always includes 'late', 'missing', 'none', and 'excused'" do
+      expect(
+        course_type.resolve("gradeStatuses", current_user: @teacher)
+      ).to include("late", "missing", "none", "excused")
+    end
+
+    it "returns 'extended' only when the 'Extended Submission State' feature flag is enabled" do
+      expect do
+        course.root_account.disable_feature!(:extended_submission_state)
+      end.to change {
+        course_type.resolve("gradeStatuses", current_user: @teacher).include?("extended")
+      }.from(true).to(false)
+    end
+  end
+
   describe "outcomeProficiency" do
     it "resolves to the account proficiency" do
       outcome_proficiency_model(course.account)
@@ -351,6 +410,25 @@ describe Types::CourseType do
       expect(
         course_type.resolve("sectionsConnection { edges { node { _id } } }")
       ).to match_array course.course_sections.active.map(&:to_param)
+    end
+
+    describe "assignmentId filter" do
+      before do
+        other_section_student = course_with_student(active_all: true, course:, section: other_section).user
+        @assignment = course.assignments.create!(only_visible_to_overrides: true)
+        create_adhoc_override_for_assignment(@assignment, other_section_student)
+      end
+
+      let(:query) { "sectionsConnection(filter: { assignmentId: #{@assignment.id} }) { edges { node { _id } } }" }
+
+      it "returns course sections associated with the assignment's assigned students" do
+        expect(course_type.resolve(query)).to match_array [other_section.to_param]
+      end
+
+      it "raises an error if the provided assignment is soft-deleted" do
+        @assignment.destroy
+        expect { course_type.resolve(query) }.to raise_error(/assignment not found/)
+      end
     end
   end
 

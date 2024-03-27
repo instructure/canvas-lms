@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 - present Instructure, Inc.
+ * Copyright (C) 2024 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useState} from 'react'
 import {useNavigate, useParams} from 'react-router-dom'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import type {Rubric} from '@canvas/rubrics/react/types/rubric'
@@ -25,6 +25,7 @@ import {TruncateText} from '@instructure/ui-truncate-text'
 import {Link} from '@instructure/ui-link'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {RubricPopover} from './RubricPopover'
+import {Pill} from '@instructure/ui-pill'
 
 const I18n = useI18nScope('rubrics-list-table')
 
@@ -37,40 +38,77 @@ export type RubricTableProps = {
 export const RubricTable = ({rubrics}: RubricTableProps) => {
   const navigate = useNavigate()
   const {accountId, courseId} = useParams()
+  const [sortDirection, setSortDirection] = useState<'ascending' | 'descending' | 'none'>('none')
+  const [sortedColumn, setSortedColumn] = useState<string>() // Track the column being sorted
+
+  const handleSort = (columnId: string) => {
+    if (sortedColumn === columnId) {
+      setSortDirection(sortDirection === 'ascending' ? 'descending' : 'ascending')
+    } else {
+      setSortedColumn(columnId)
+      setSortDirection('ascending')
+    }
+  }
+
+  const sortedRubrics = [...rubrics].sort((a, b) => {
+    if (sortedColumn === 'Title') {
+      return sortDirection === 'ascending'
+        ? a.title.localeCompare(b.title)
+        : b.title.localeCompare(a.title)
+    } else if (sortedColumn === 'TotalPoints') {
+      return sortDirection === 'ascending'
+        ? a.pointsPossible - b.pointsPossible
+        : b.pointsPossible - a.pointsPossible
+    } else if (sortedColumn === 'Criterion') {
+      return sortDirection === 'ascending'
+        ? a.criteriaCount - b.criteriaCount
+        : b.criteriaCount - a.criteriaCount
+    }
+    // TODO - EVAL-3966 - Add sorting for LocationUsed by using hasRubricAssociations
+    // else if (sortedColumn === 'LocationUsed') {
+    // return sortDirection === 'ascending'
+    //   ? a.locations.join(', ').localeCompare(b.locations.join(', '))
+    //   : b.locations.join(', ').localeCompare(a.locations.join(', '))
+    // }
+    else {
+      // Default sorting by ID if no specific column is selected
+      return a.id.localeCompare(b.id)
+    }
+  })
 
   return (
     <Table caption="Set text-align for columns">
       <Head renderSortLabel={<ScreenReaderContent>{I18n.t('Sort by')}</ScreenReaderContent>}>
         <Row>
           <ColHeader
-            id="Rank"
+            id="Title"
             stackedSortByLabel={I18n.t('Rubric Name')}
-            onRequestSort={() => {}}
-            sortDirection="none"
+            onRequestSort={() => handleSort('Title')}
+            sortDirection={sortedColumn === 'Title' ? sortDirection : undefined}
           >
             {I18n.t('Rubric Name')}
           </ColHeader>
           <ColHeader
-            id="Title"
+            id="TotalPoints"
             stackedSortByLabel={I18n.t('Total Points')}
-            onRequestSort={() => {}}
-            sortDirection="none"
+            onRequestSort={() => handleSort('TotalPoints')}
+            sortDirection={sortedColumn === 'TotalPoints' ? sortDirection : undefined}
           >
             {I18n.t('Total Points')}
           </ColHeader>
           <ColHeader
-            id="Year"
+            id="Criterion"
             stackedSortByLabel={I18n.t('Criterion')}
-            onRequestSort={() => {}}
-            sortDirection="none"
+            onRequestSort={() => handleSort('Criterion')}
+            sortDirection={sortedColumn === 'Criterion' ? sortDirection : undefined}
           >
             {I18n.t('Criterion')}
           </ColHeader>
           <ColHeader
-            id="Rating"
+            id="LocationUsed"
             stackedSortByLabel={I18n.t('Location Used')}
-            onRequestSort={() => {}}
-            sortDirection="none"
+            onRequestSort={() => handleSort('LocationUsed')}
+            sortDirection={sortedColumn === 'LocationUsed' ? sortDirection : undefined}
           >
             {I18n.t('Location Used')}
           </ColHeader>
@@ -78,9 +116,9 @@ export const RubricTable = ({rubrics}: RubricTableProps) => {
         </Row>
       </Head>
       <Body>
-        {rubrics.map(rubric => (
+        {sortedRubrics.map((rubric, index) => (
           <Row key={rubric.id}>
-            <Cell data-testid={`rubric-title-${rubric.id}`}>
+            <Cell data-testid={`rubric-title-${index}`}>
               <Link
                 forceButtonRole={true}
                 isWithinText={false}
@@ -88,10 +126,11 @@ export const RubricTable = ({rubrics}: RubricTableProps) => {
               >
                 {rubric.title}
               </Link>
+              {rubric.workflowState === 'draft' && <Pill margin="x-small">{I18n.t('Draft')}</Pill>}
             </Cell>
-            <Cell data-testid={`rubric-points-${rubric.id}`}>{rubric.pointsPossible}</Cell>
-            <Cell data-testid={`rubric-criterion-count-${rubric.id}`}>{rubric.criteriaCount}</Cell>
-            <Cell data-testid={`rubric-locations-${rubric.id}`}>
+            <Cell data-testid={`rubric-points-${index}`}>{rubric.pointsPossible}</Cell>
+            <Cell data-testid={`rubric-criterion-count-${index}`}>{rubric.criteriaCount}</Cell>
+            <Cell data-testid={`rubric-locations-${index}`}>
               {rubric.locations.length > 0 ? (
                 <Link forceButtonRole={true} isWithinText={false} onClick={() => {}}>
                   <TruncateText>{rubric.locations.join(', ')}...</TruncateText>
@@ -111,6 +150,7 @@ export const RubricTable = ({rubrics}: RubricTableProps) => {
                 pointsPossible={rubric.pointsPossible}
                 buttonDisplay={rubric.buttonDisplay}
                 ratingOrder={rubric.ratingOrder}
+                hasRubricAssociations={rubric.hasRubricAssociations}
               />
             </Cell>
           </Row>

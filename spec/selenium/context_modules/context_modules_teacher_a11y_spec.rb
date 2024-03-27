@@ -122,7 +122,6 @@ describe "context modules" do
     end
 
     it "retains focus when deleting prerequisites with different modules" do
-      skip("LF-960 Waiting for updates to a11y issues found for new tray")
       differentiated_modules_on
       modules = create_modules(3)
       go_to_modules
@@ -139,7 +138,7 @@ describe "context modules" do
       check_element_has_focus(remove_prerequisite_button[0])
       click_remove_prerequisite_button(0)
 
-      check_element_has_focus(add_prerequisite_button)
+      check_element_has_focus(add_prerequisites_button)
     end
 
     it "adds a title attribute to the text header" do

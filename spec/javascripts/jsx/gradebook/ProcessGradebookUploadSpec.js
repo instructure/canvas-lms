@@ -541,6 +541,7 @@ test('handles a grade change to a single existing assignment', () => {
   const student = {previous_id: 1, submissions: [submissionOld1Change]}
   const gradebook = {students: [student], assignments: [oldAssignment1]}
   ProcessGradebookUpload.upload(gradebook)
+  clock.tick(1)
 
   equal(requests.length, 1)
   equal(requests[0].url, '/bulk_update_path/url')
@@ -553,6 +554,7 @@ test('handles a grade change to a single existing assignment', () => {
   )
 
   requests[0].respond(200, {}, JSON.stringify(progressCompleted))
+  clock.tick(3)
 
   ok(goToGradebookStub.called)
 })
@@ -561,6 +563,7 @@ test('handles a change to excused to a single existing assignment', () => {
   const student = {previous_id: 1, submissions: [submissionOld1Excused]}
   const gradebook = {students: [student], assignments: [oldAssignment1]}
   ProcessGradebookUpload.upload(gradebook)
+  clock.tick(1)
 
   equal(requests.length, 1)
   equal(requests[0].url, '/bulk_update_path/url')
@@ -570,6 +573,7 @@ test('handles a change to excused to a single existing assignment', () => {
   equal(bulkUpdateRequest.grade_data[oldAssignment1.id][student.previous_id].excuse, true)
 
   requests[0].respond(200, {}, JSON.stringify(progressCompleted))
+  clock.tick(3)
 
   ok(goToGradebookStub.called)
 })
@@ -579,6 +583,7 @@ test('handles multiple students changing a single existing assignment', () => {
   const student2 = {previous_id: 2, submissions: [submissionOld1Excused]}
   const gradebook = {students: [student1, student2], assignments: [oldAssignment1]}
   ProcessGradebookUpload.upload(gradebook)
+  clock.tick(1)
 
   equal(requests.length, 1)
   equal(requests[0].url, '/bulk_update_path/url')
@@ -592,6 +597,7 @@ test('handles multiple students changing a single existing assignment', () => {
   equal(bulkUpdateRequest.grade_data[oldAssignment1.id][student2.previous_id].excuse, true)
 
   requests[0].respond(200, {}, JSON.stringify(progressCompleted))
+  clock.tick(3)
 
   ok(goToGradebookStub.called)
 })
@@ -601,6 +607,7 @@ test('handles multiple students changing multiple existing assignments', () => {
   const student2 = {previous_id: 2, submissions: [submissionOld1Excused, submissionOld2Change]}
   const gradebook = {students: [student1, student2], assignments: [oldAssignment1, oldAssignment2]}
   ProcessGradebookUpload.upload(gradebook)
+  clock.tick(1)
 
   equal(requests.length, 1)
   equal(requests[0].url, '/bulk_update_path/url')
@@ -619,6 +626,7 @@ test('handles multiple students changing multiple existing assignments', () => {
   )
 
   requests[0].respond(200, {}, JSON.stringify(progressCompleted))
+  clock.tick(3)
 
   ok(goToGradebookStub.called)
 })
@@ -627,6 +635,7 @@ test('handles a creation of a new assignment with no submissions', () => {
   const student = {previous_id: 1, submissions: []}
   const gradebook = {students: [student], assignments: [newAssignment1]}
   ProcessGradebookUpload.upload(gradebook)
+  clock.tick(1)
 
   equal(requests.length, 1)
   equal(requests[0].url, '/create_assignment_path/url')
@@ -636,6 +645,7 @@ test('handles a creation of a new assignment with no submissions', () => {
   equalAssignment(createAssignmentRequest.assignment, newAssignment1)
 
   requests[0].respond(200, {}, JSON.stringify(createAssignmentResponse1))
+  clock.tick(3)
 
   ok(goToGradebookStub.called)
 })
@@ -644,6 +654,7 @@ test('handles the creation of several new assignments with no submissions', () =
   const student = {previous_id: 1, submissions: []}
   const gradebook = {students: [student], assignments: [newAssignment1, newAssignment2]}
   ProcessGradebookUpload.upload(gradebook)
+  clock.tick(1)
 
   equal(requests.length, 2)
 
@@ -654,6 +665,7 @@ test('handles the creation of several new assignments with no submissions', () =
   equalAssignment(createAssignmentRequest1.assignment, newAssignment1)
 
   requests[0].respond(200, {}, JSON.stringify(createAssignmentResponse1))
+  clock.tick(3)
 
   equal(requests[1].url, '/create_assignment_path/url')
   equal(requests[1].method, 'POST')
@@ -662,6 +674,7 @@ test('handles the creation of several new assignments with no submissions', () =
   equalAssignment(createAssignmentRequest2.assignment, newAssignment2)
 
   requests[1].respond(200, {}, JSON.stringify(createAssignmentResponse2))
+  clock.tick(3)
 
   ok(goToGradebookStub.called)
 })
@@ -670,6 +683,7 @@ test('handles a creation of a new assignment with no grade change', () => {
   const student = {previous_id: 1, submissions: [submissionNew1NoChange]}
   const gradebook = {students: [student], assignments: [newAssignment1]}
   ProcessGradebookUpload.upload(gradebook)
+  clock.tick(1)
 
   equal(requests.length, 1)
   equal(requests[0].url, '/create_assignment_path/url')
@@ -679,6 +693,7 @@ test('handles a creation of a new assignment with no grade change', () => {
   equalAssignment(createAssignmentRequest.assignment, newAssignment1)
 
   requests[0].respond(200, {}, JSON.stringify(createAssignmentResponse1))
+  clock.tick(3)
 
   ok(goToGradebookStub.called)
 })
@@ -687,6 +702,7 @@ test('handles creation of a new assignment with a grade change', () => {
   const student = {previous_id: 1, submissions: [submissionNew1Change]}
   const gradebook = {students: [student], assignments: [newAssignment1]}
   ProcessGradebookUpload.upload(gradebook)
+  clock.tick(1)
 
   equal(requests.length, 1)
   equal(requests[0].url, '/create_assignment_path/url')
@@ -696,6 +712,7 @@ test('handles creation of a new assignment with a grade change', () => {
   equalAssignment(createAssignmentRequest.assignment, newAssignment1)
 
   requests[0].respond(200, {}, JSON.stringify(createAssignmentResponse1))
+  clock.tick(3)
 
   equal(requests.length, 2)
   equal(requests[1].url, '/bulk_update_path/url')
@@ -708,6 +725,7 @@ test('handles creation of a new assignment with a grade change', () => {
   )
 
   requests[1].respond(200, {}, JSON.stringify(progressCompleted))
+  clock.tick(3)
 
   ok(goToGradebookStub.called)
 })
@@ -716,6 +734,7 @@ test('handles creation of a new assignment with a change to excused', () => {
   const student = {previous_id: 1, submissions: [submissionNew1Excused]}
   const gradebook = {students: [student], assignments: [newAssignment1]}
   ProcessGradebookUpload.upload(gradebook)
+  clock.tick(1)
 
   equal(requests.length, 1)
   equal(requests[0].url, '/create_assignment_path/url')
@@ -725,6 +744,7 @@ test('handles creation of a new assignment with a change to excused', () => {
   equalAssignment(createAssignmentRequest.assignment, newAssignment1)
 
   requests[0].respond(200, {}, JSON.stringify(createAssignmentResponse1))
+  clock.tick(3)
 
   equal(requests.length, 2)
   equal(requests[1].url, '/bulk_update_path/url')
@@ -737,6 +757,7 @@ test('handles creation of a new assignment with a change to excused', () => {
   )
 
   requests[1].respond(200, {}, JSON.stringify(progressCompleted))
+  clock.tick(3)
 
   ok(goToGradebookStub.called)
 })
@@ -746,6 +767,7 @@ test('handles multiple students changing a single new assignment', () => {
   const student2 = {previous_id: 2, submissions: [submissionNew1Excused]}
   const gradebook = {students: [student1, student2], assignments: [newAssignment1]}
   ProcessGradebookUpload.upload(gradebook)
+  clock.tick(1)
 
   equal(requests.length, 1)
   equal(requests[0].url, '/create_assignment_path/url')
@@ -755,6 +777,7 @@ test('handles multiple students changing a single new assignment', () => {
   equalAssignment(createAssignmentRequest.assignment, newAssignment1)
 
   requests[0].respond(200, {}, JSON.stringify(createAssignmentResponse1))
+  clock.tick(3)
 
   equal(requests.length, 2)
   equal(requests[1].url, '/bulk_update_path/url')
@@ -771,6 +794,7 @@ test('handles multiple students changing a single new assignment', () => {
   )
 
   requests[1].respond(200, {}, JSON.stringify(progressCompleted))
+  clock.tick(3)
 
   ok(goToGradebookStub.called)
 })
@@ -780,6 +804,7 @@ test('handles multiple students changing multiple new assignments', () => {
   const student2 = {previous_id: 2, submissions: [submissionNew1Excused, submissionNew2Change]}
   const gradebook = {students: [student1, student2], assignments: [newAssignment1, newAssignment2]}
   ProcessGradebookUpload.upload(gradebook)
+  clock.tick(1)
 
   equal(requests.length, 2)
 
@@ -790,6 +815,7 @@ test('handles multiple students changing multiple new assignments', () => {
   equalAssignment(createAssignmentRequest1.assignment, newAssignment1)
 
   requests[0].respond(200, {}, JSON.stringify(createAssignmentResponse1))
+  clock.tick(3)
 
   equal(requests[1].url, '/create_assignment_path/url')
   equal(requests[1].method, 'POST')
@@ -798,6 +824,7 @@ test('handles multiple students changing multiple new assignments', () => {
   equalAssignment(createAssignmentRequest2.assignment, newAssignment2)
 
   requests[1].respond(200, {}, JSON.stringify(createAssignmentResponse2))
+  clock.tick(3)
 
   equal(requests.length, 3)
   equal(requests[2].url, '/bulk_update_path/url')
@@ -822,6 +849,7 @@ test('handles multiple students changing multiple new assignments', () => {
   )
 
   requests[2].respond(200, {}, JSON.stringify(progressCompleted))
+  clock.tick(3)
 
   ok(goToGradebookStub.called)
 })
@@ -844,6 +872,7 @@ test('handles multiple students changing multiple new and existing assignments',
     assignments: [oldAssignment1, oldAssignment2, newAssignment1, newAssignment2],
   }
   ProcessGradebookUpload.upload(gradebook)
+  clock.tick(1)
 
   equal(requests.length, 2)
 
@@ -854,6 +883,7 @@ test('handles multiple students changing multiple new and existing assignments',
   equalAssignment(createAssignmentRequest1.assignment, newAssignment1)
 
   requests[0].respond(200, {}, JSON.stringify(createAssignmentResponse1))
+  clock.tick(3)
 
   equal(requests[1].url, '/create_assignment_path/url')
   equal(requests[1].method, 'POST')
@@ -862,6 +892,7 @@ test('handles multiple students changing multiple new and existing assignments',
   equalAssignment(createAssignmentRequest2.assignment, newAssignment2)
 
   requests[1].respond(200, {}, JSON.stringify(createAssignmentResponse2))
+  clock.tick(3)
 
   equal(requests.length, 3)
   equal(requests[2].url, '/bulk_update_path/url')
@@ -900,6 +931,7 @@ test('handles multiple students changing multiple new and existing assignments',
   )
 
   requests[2].respond(200, {}, JSON.stringify(progressCompleted))
+  clock.tick(3)
 
   ok(goToGradebookStub.called)
 })
@@ -1124,11 +1156,13 @@ test('shows an alert if any bulk data is being uploaded', () => {
   }
 
   ProcessGradebookUpload.upload(gradebook)
+  clock.tick(1)
 
   // Respond to assignment creation requests
   requests.forEach((request, idx) => {
     request.respond(200, {}, JSON.stringify({id: idx + 1000}))
   })
+  clock.tick(3)
 
   // Respond to grade upload requests
   requests
@@ -1136,6 +1170,7 @@ test('shows an alert if any bulk data is being uploaded', () => {
     .forEach(request => {
       request.respond(200, {}, JSON.stringify(progressQueued))
     })
+  clock.tick(3)
 
   strictEqual(window.alert.callCount, 1)
 })
@@ -1178,6 +1213,7 @@ test('does not redirect to gradebook until all requests have completed', () => {
     ],
   }
   ProcessGradebookUpload.upload(gradebook)
+  clock.tick(1)
 
   const createAssignmentRequests = requests.filter(
     request => request.url === '/create_assignment_path/url'
@@ -1185,6 +1221,7 @@ test('does not redirect to gradebook until all requests have completed', () => {
   createAssignmentRequests.forEach((request, idx) => {
     request.respond(200, {}, JSON.stringify({id: idx + 1000}))
   })
+  clock.tick(3)
 
   const overrideScoreRequests = requests.filter(
     request => request.url === '/bulk_update_override_scores_path/url'
@@ -1192,6 +1229,7 @@ test('does not redirect to gradebook until all requests have completed', () => {
   overrideScoreRequests.forEach(request => {
     request.respond(200, {}, JSON.stringify(progressQueued))
   })
+  clock.tick(3)
 
   strictEqual(
     ProcessGradebookUpload.goToGradebook.callCount,
@@ -1205,6 +1243,7 @@ test('does not redirect to gradebook until all requests have completed', () => {
   uploadSubmissionsRequests.forEach(request => {
     request.respond(200, {}, JSON.stringify(progressQueued))
   })
+  clock.tick(3)
 
   strictEqual(ProcessGradebookUpload.goToGradebook.callCount, 1)
 })

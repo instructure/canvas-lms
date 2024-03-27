@@ -352,7 +352,6 @@ class ApplicationController < ActionController::Base
   JS_ENV_SITE_ADMIN_FEATURES = %i[
     featured_help_links
     account_level_blackout_dates
-    deleted_user_tools
     render_both_to_do_lists
     course_paces_redesign
     course_paces_for_students
@@ -377,7 +376,6 @@ class ApplicationController < ActionController::Base
     lti_dynamic_registration
     lti_multiple_assignment_deep_linking
     lti_overwrite_user_url_input_select_content_dialog
-    lti_unique_tool_form_ids
     buttons_and_icons_root_account
     extended_submission_state
     scheduled_page_publication
@@ -388,6 +386,7 @@ class ApplicationController < ActionController::Base
     react_discussions_post
     instui_nav
     enhanced_developer_keys_tables
+    lti_registrations_discover_page
   ].freeze
   JS_ENV_BRAND_ACCOUNT_FEATURES = [
     :embedded_release_notes
@@ -504,6 +503,10 @@ class ApplicationController < ActionController::Base
     tools.select! do |tool|
       tool.visible_with_permission_check?(type, @current_user, context, session) &&
         tool.feature_flag_enabled?(context)
+    end
+
+    if Account.site_admin.feature_enabled?(:lti_placement_restrictions)
+      tools.select! { |tool| tool.placement_allowed?(type) }
     end
 
     tools.map do |tool|
@@ -2123,10 +2126,8 @@ class ApplicationController < ActionController::Base
           include_module_context: true
         }
 
-        if @tool.root_account.feature_enabled?(:lti_unique_tool_form_ids)
-          @tool_form_id = random_lti_tool_form_id
-          js_env(LTI_TOOL_FORM_ID: @tool_form_id)
-        end
+        @tool_form_id = random_lti_tool_form_id
+        js_env(LTI_TOOL_FORM_ID: @tool_form_id)
 
         variable_expander = Lti::VariableExpander.new(@domain_root_account, @context, self, {
                                                         current_user: @current_user,

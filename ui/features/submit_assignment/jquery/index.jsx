@@ -359,8 +359,9 @@ ready(function () {
     $('#submit_assignment_tabs').tabs({
       beforeActivate(event, ui) {
         // determine if this is an external tool
-        if (ui.newTab.context.classList.contains('external-tool')) {
-          const externalToolId = $(ui.newTab.context).data('id')
+        const $tabLink = ui.newTab.children('a:first-child')
+        if ($tabLink.hasClass('external-tool')) {
+          const externalToolId = $tabLink.data('id')
           homeworkSubmissionLtiContainer.embedLtiLaunch(externalToolId)
         }
       },
@@ -372,8 +373,9 @@ ready(function () {
           }
         }
 
-        if (ui.newTab.context.classList[0] === 'external-tool') {
-          ui.newTab.find('a').click()
+        const $tabLink = ui.newTab.children('a:first-child')
+        if ($tabLink.hasClass('external-tool')) {
+          $tabLink.trigger('click')
         }
       },
       create(event, ui) {

@@ -49,6 +49,7 @@ class CommunicationChannel < ActiveRecord::Base
   after_commit :check_if_bouncing_changed
   after_save :clear_user_email_cache, if: -> { workflow_state_before_last_save != workflow_state }
   after_save :after_save_flag_old_microsoft_sync_user_mappings
+  after_save :consider_building_notification_policies, if: -> { workflow_state_before_last_save != "active" && workflow_state == "active" }
 
   acts_as_list scope: :user
 
@@ -74,6 +75,14 @@ class CommunicationChannel < ActiveRecord::Base
   RESEND_PASSWORD_RESET_TIME = 30.minutes
   MAX_SHARDS_FOR_BOUNCES = 50
   MERGE_CANDIDATE_SEARCH_LIMIT = 10
+
+  # Notification polcies are required for a user to start recieving notifications from an
+  # active communication channel. This code will create these policies if they don't already exist.
+  def consider_building_notification_policies
+    if notification_policies.empty?
+      NotificationPolicy.build_policies_for_channel(self)
+    end
+  end
 
   # Generally, "TYPE_PERSONAL_EMAIL" should be treated exactly the same
   # as TYPE_EMAIL.  It is just kept distinct for the purposes of customers

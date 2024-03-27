@@ -466,6 +466,7 @@ class ProfileController < ApplicationController
     if @user.valid? && @profile.valid?
       @user.save!
       @profile.save!
+      flash[:success] = true
 
       if params[:user_services]
         visible, invisible = params[:user_services].to_unsafe_h.partition do |_service, bool|
@@ -474,12 +475,12 @@ class ProfileController < ApplicationController
         @user.user_services.where(service: visible.map(&:first)).update_all(visible: true)
         @user.user_services.where(service: invisible.map(&:first)).update_all(visible: false)
       end
-
       respond_to do |format|
         format.html { redirect_to user_profile_path(@user) }
         format.json { render json: user_profile_json(@user.profile, @current_user, session, params[:includes]) }
       end
     else
+      flash[:success] = false
       respond_to do |format|
         format.html { redirect_to user_profile_path(@user) } # FIXME: need to go to edit path
         format.json { render json: @profile.errors, status: :bad_request } # NOTE: won't send back @user validation errors (i.e. short_name)

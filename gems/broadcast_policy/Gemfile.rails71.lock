@@ -35,8 +35,7 @@ GEM
       irb (~> 1.10)
       reline (>= 0.3.8)
     diff-lcs (1.5.1)
-    drb (2.2.0)
-      ruby2_keywords
+    drb (2.2.1)
     i18n (1.14.1)
       concurrent-ruby (~> 1.0)
     io-console (0.7.2)
@@ -53,7 +52,7 @@ GEM
       stringio
     rdoc (6.6.2)
       psych (>= 4.0.0)
-    reline (0.4.2)
+    reline (0.4.3)
       io-console (~> 0.5)
     rspec (3.13.0)
       rspec-core (~> 3.13.0)
@@ -67,8 +66,7 @@ GEM
     rspec-mocks (3.13.0)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.13.0)
-    rspec-support (3.13.0)
-    ruby2_keywords (0.0.5)
+    rspec-support (3.13.1)
     stringio (3.1.0)
     timeout (0.4.1)
     tzinfo (2.0.6)

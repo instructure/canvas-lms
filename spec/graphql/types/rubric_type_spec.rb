@@ -26,8 +26,6 @@ describe Types::RubricType do
   let(:rubric) { rubric_for_course }
   let(:rubric_type) { GraphQLTypeTester.new(rubric, current_user: student) }
   let(:assignment) { assignment_model(course: @course) }
-  let(:association) { rubric_association_model(rubric:, association_object: assignment, purpose: "grading") }
-  let(:assessment) { rubric_assessment_model(rubric:, rubric_association: association) }
 
   it "works" do
     expect(rubric_type.resolve("_id")).to eq rubric.id.to_s
@@ -85,6 +83,17 @@ describe Types::RubricType do
 
     it "unassessed" do
       expect(rubric_type.resolve("unassessed")).to be true
+
+      association = rubric_association_model(rubric:, association_object: assignment, purpose: "grading")
+      rubric_assessment_model(rubric:, rubric_association: association, user: student)
+      expect(rubric_type.resolve("unassessed")).to be false
+    end
+
+    it "has_rubric_associations" do
+      expect(rubric_type.resolve("hasRubricAssociations")).to be false
+
+      rubric_association_model(rubric:, association_object: assignment, purpose: "grading")
+      expect(rubric_type.resolve("hasRubricAssociations")).to be true
     end
   end
 end

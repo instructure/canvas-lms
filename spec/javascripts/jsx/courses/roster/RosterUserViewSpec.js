@@ -26,11 +26,15 @@ let rosterViewOne
 let rosterViewTwo
 let existingENV
 let server
+let clock
 
 QUnit.module('RosterUserViewSpec', {
   setup() {
     window.ENV = window.ENV || {}
     existingENV = window.ENV
+    window.ENV.FEATURES = {
+      granular_permissions_manage_users: false,
+    }
     window.ENV.permissions = {
       can_allow_course_admin_actions: true,
       manage_students: true,
@@ -60,6 +64,7 @@ QUnit.module('RosterUserViewSpec', {
     })
 
     server = sinon.fakeServer.create()
+    clock = sinon.useFakeTimers()
 
     server.respondWith('POST', /unenroll/, [200, {'Content-Type': 'application/json'}, '{}'])
 
@@ -73,6 +78,7 @@ QUnit.module('RosterUserViewSpec', {
     window.confirm.restore()
     window.ENV = existingENV
     server.restore()
+    clock.restore()
     $('#fixtures').empty()
   },
 })
@@ -84,6 +90,7 @@ test('moves focus to previous user when deleting a user in the middle', () => {
   $('#fixtures').append($listContainer)
   rosterViewTwo.removeFromCourse()
   server.respond()
+  clock.tick(1)
   equal(document.activeElement, $('.al-trigger')[0], 'focus is set to the previous cog.')
 })
 
@@ -94,6 +101,7 @@ test('moves focus to "+ People" button when deleting the top user', () => {
   $('#fixtures').append($listContainer)
   rosterViewOne.removeFromCourse()
   server.respond()
+  clock.tick(1)
   equal(document.activeElement, $('#addUsers')[0], 'focus is set to + People button')
 })
 

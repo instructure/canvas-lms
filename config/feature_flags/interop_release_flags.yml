@@ -136,6 +136,38 @@ include_oauth_consumer_key_in_lti_launch:
     When enabled, LTI 1.3 launches that would be associated with LTI 1.1 tool
     if the LTI 1.3 tool wasn't present will include the oauth_consumer_key and
     oauth_consumer_key_sign properties as part of the LTI 1.1 claims section.
+developer_key_consortia_fix_inheritance_logic:
+  state: hidden
+  applies_to: RootAccount
+  shadow: true
+  display_name: Consistent inheritance logic for Developer Keys in non-CMC consortia
+  description: |-
+    When enabled for a child account of a non-centrally managed consortium,
+    developer key state and tokens from the consortium parent will not be
+    inherited to subaccounts of a consortium child. When disabled, the legacy
+    (inconsistent) behavior is followed. This flag applies only to consortium
+    _child_ accounts. This flag does not affect centrally-managed consortia in
+    any way.
+  environments:
+    development:
+      state: allowed_on
+    test:
+      state: allowed_on
+    ci:
+      state: allowed_on
+developer_key_consortia_stop_tool_management_from_parent:
+  state: allowed_on
+  applies_to: RootAccount
+  shadow: true
+  display_name: Prevent non-CMC consortium parent dev key from affecting tools in children
+  description: |-
+    When enabled for the parent account of a non-centrally managed consortium,
+    turning on/off developer keys in the parent will not affect the tool
+    installs of the child accounts. When disabled, turning on/off
+    SiteAdmin-inherited developer keys in the parent account of a non-centrally
+    managed consortium will affect (delete/restore) tools in the children
+    accounts (legacy behavior). This flag applies only to consortium _parent_
+    accounts. This flag does not affect centrally-managed consortia in any way.
 resource_link_uuid_in_custom_substitution:
   state: hidden
   display_name: Use a Resource link's resource_link_uuid in the $ResourceLink.id substitution parameter
@@ -193,18 +225,11 @@ lti_resource_link_id_speedgrader_launches_reference_assignment:
     title. With the feature flag off, in SpeedGrader launches, resource_link_id
     and resource_link_title reference the tool (not the assignment) for
     non-NewQuizzes LTI 1.1 tools.
-lti_unique_tool_form_ids:
-  state: hidden
-  applies_to: RootAccount
-  display_name: Use a unique HTML ID for each tool launch form
-  description: |-
-    When enabled, the hidden HTML forms that are used to trigger an LTI launch
-    will each have a random number appended to their id. When disabled, each
-    one has the same id of tool_form.
 lti_log_launches:
   state: hidden
   applies_to: RootAccount
   display_name: Log LTI launches
+  shadow: true
   description: |-
     When enabled, sends data for all LTI launches to the PandataEvents system
     for querying and visualization.
@@ -231,6 +256,13 @@ assignment_edit_placement_not_on_announcements:
   display_name: Allows LTI tools with assignment_edit placement to be launched on Announcements page
   description: |-
     When enabled, an LTI tool with the assignment_edit placement will be launched on the Announcement page.
+update_assignment_submission_type_launch_button:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Update the assignment submission type launch button
+  description: |-
+    Update the look of all tools using the submission_type_selection
+    placement to be a more modern design in line with the rest of Canvas' UI
   environments:
     development:
       state: allowed_on
@@ -254,3 +286,37 @@ allow_lti_tools_editor_button_placement_without_icon:
       state: allowed_on
     ci:
       state: allowed_on
+lti_placement_restrictions:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Limit certain LTI placements to authorized tools
+  description: |-
+    When enabled, Submission_type_selection placement usage will be
+    limited with an allow list.
+  shadow: true
+  environments:
+    development:
+      state: allowed_on
+    test:
+      state: allowed_on
+    ci:
+      state: allowed_on
+lti_registrations_page:
+  state: hidden
+  applies_to: RootAccount
+  display_name: LTI Extensions Page
+  description: |-
+    When enabled, the LTI Extensions page will be available in the Account navigation.
+  environments:
+    development:
+      state: hidden
+lti_registrations_discover_page:
+  state: hidden
+  applies_to: RootAccount
+  display_name: LTI Extensions Discover Page
+  description: |-
+    When enabled, the LTI Extensions Discover page will be available in the Extensions view.
+  environments:
+    development:
+      state: hidden
+  custom_transition_proc: lti_registrations_discover_page_hook

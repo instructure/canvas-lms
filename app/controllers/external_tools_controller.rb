@@ -586,10 +586,8 @@ class ExternalToolsController < ApplicationController
     message_type = tool.extension_setting(selection_type, "message_type") if selection_type
     log_asset_access(@tool, "external_tools", "external_tools") if post_live_event
 
-    if tool.root_account.feature_enabled?(:lti_unique_tool_form_ids)
-      @tool_form_id = random_lti_tool_form_id
-      js_env(LTI_TOOL_FORM_ID: @tool_form_id)
-    end
+    @tool_form_id = random_lti_tool_form_id
+    js_env(LTI_TOOL_FORM_ID: @tool_form_id)
 
     case message_type
     when "ContentItemSelectionResponse", "ContentItemSelection"

@@ -397,6 +397,8 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                             message={props.discussionTopic.message}
                             isSplitView={false}
                             editor={props.discussionTopic.editor}
+                            createdAt={props.discussionTopic.postedAt}
+                            updatedAt={props.discussionTopic.updatedAt}
                             timingDisplay={DateHelper.formatDatetimeForDiscussions(
                               props.discussionTopic.postedAt
                             )}

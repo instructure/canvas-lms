@@ -983,8 +983,6 @@ describe "Users API", type: :request do
       end
 
       it "404s on a deleted user" do
-        Account.site_admin.enable_feature!(:deleted_user_tools)
-
         @other_user.destroy
         account_admin_user
         json = api_call(:get,
@@ -993,19 +991,6 @@ describe "Users API", type: :request do
                         {},
                         expected_status: 404)
         expect(json.keys).to include("id")
-      end
-
-      it "doesn't error on a user when the feature flag is off" do
-        Account.site_admin.disable_feature!(:deleted_user_tools)
-
-        @other_user.destroy
-        account_admin_user
-        json = api_call(:get,
-                        "/api/v1/users/#{@other_user.id}",
-                        { controller: "users", action: "api_show", id: @other_user.id.to_param, format: "json" },
-                        {},
-                        expected_status: 404)
-        expect(json.keys).not_to include("error_report_id")
       end
 
       it "404s but still returns the user on a deleted user for a site admin" do
@@ -2649,6 +2634,25 @@ describe "Users API", type: :request do
         path = "/api/v1/accounts/#{Account.default.to_param}/users/#{@student.id}"
         api_call_as_user(@student, :delete, path, @path_options.merge(user_id: @student.to_param), {}, {}, expected_status: 401)
       end
+    end
+  end
+
+  describe "DELETE expire_mobile_sessions" do
+    let_once(:user) { user_with_pseudonym(active_all: true)  }
+    let_once(:admin) { account_admin_user(active_all: true)  }
+    let_once(:path) { "/api/v1/users/mobile_sessions" }
+    let_once(:path_options) { { controller: "users", action: "expire_mobile_sessions", format: "json" } }
+
+    before do
+      user.access_tokens.create!
+    end
+
+    it "allows admin to expire mobile sessions" do
+      user_session(admin)
+      raw_api_call(:delete, path, path_options)
+
+      expect(response).to have_http_status :ok
+      expect(user.reload.access_tokens.take.permanent_expires_at).to be <= Time.zone.now
     end
   end
 

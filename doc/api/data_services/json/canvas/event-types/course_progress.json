@@ -1,7 +1,7 @@
 {
   "name": "course_progress",
-  "definition": "The event is emitted anytime a course module progression requirements are met.",
-  "trigger": "Triggered when a user makes progress in a course by completing a module requirement. The following setup should be enabled in Canvas in order for this event to get triggered:\n1. Module is set to be published\n2. Module has at least one requirement enabled\n3. Student completed at least one requirement in Module",
+  "definition": "The event is emitted when a course module requirement is met.",
+  "trigger": "Triggered when a user makes progress in a course by completing a module requirement, unless the completed requirement is the last remaining requirement in the course (in this case, a `course_completed` event is emitted). The following setup should be enabled in Canvas in order for this event to get triggered:\n1. Module is set to be published\n2. Module has at least one requirement enabled\n3. Student completed at least one requirement in Module\n\nNote that these events have a 2-minute debounce, meaning that a single `course_progress` event will be emitted per student per course 2 minutes after the student has finished completing requirements.",
   "schema": {
     "course": {
       "account_id": "The local Canvas id of the course's account.",

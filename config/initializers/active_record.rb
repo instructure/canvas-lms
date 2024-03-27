@@ -786,6 +786,11 @@ class ActiveRecord::Base
     # Just return something that isn't an ar connection object so consoles don't explode
     override
   end
+
+  def self.with_pgvector(&)
+    vector_schema = connection.extension("vector").schema
+    connection.add_schema_to_search_path(vector_schema, &)
+  end
 end
 
 module UsefulFindInBatches
@@ -1074,6 +1079,11 @@ module UsefulFindInBatches
 
         base_class = klass.base_class
         base_class.unscoped do
+          # Ensure we don't enumerate columns on the temp table, because the temp table may not have the same columns as the base class
+          ignored_columns_was = base_class.ignored_columns
+          enumerate_columns_was = base_class.enumerate_columns_in_select_statements
+          base_class.enumerate_columns_in_select_statements = false
+          base_class.ignored_columns = [] # rubocop:disable Rails/IgnoredColumnsAssignment
           batch_relation = base_class.from("#{connection.quote_column_name(table)} as #{connection.quote_column_name(base_class.table_name)}").limit(of).preload(includes_values + preload_values)
           batch_relation = batch_relation.order(Arel.sql(connection.quote_column_name(index))) if index
           yielded_relation = batch_relation
@@ -1086,12 +1096,15 @@ module UsefulFindInBatches
             last_value = if yielded_relation.loaded?
                            yielded_relation.last[index]
                          else
-                           yielded_relation.offset(of - 1).limit(1).pluck(index).first
+                           yielded_relation.offset(of - 1).limit(1).pick(index)
                          end
             break if last_value.nil?
 
             yielded_relation = batch_relation.where("#{connection.quote_column_name(index)} > ?", last_value)
           end
+        ensure
+          base_class.ignored_columns = ignored_columns_was # rubocop:disable Rails/IgnoredColumnsAssignment
+          base_class.enumerate_columns_in_select_statements = enumerate_columns_was
         end
       ensure
         if !$!.is_a?(ActiveRecord::StatementInvalid) || connection.open_transactions == 0
@@ -1765,27 +1778,6 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
 
     execute schema_creation.accept(at)
   end
-
-  def add_replica_identity(model_name, column_name, default_value = 0)
-    klass = model_name.constantize
-    if columns(klass.table_name).find { |c| c.name == column_name.to_s }.null
-      DataFixup::BackfillNulls.run(klass, column_name, default_value:)
-    end
-    change_column_null klass.table_name, column_name, false
-    primary_column = klass.primary_key
-    index_name = "index_#{klass.table_name}_replica_identity"
-    options = { name: index_name, unique: true, if_not_exists: true }.tap do |hash|
-      hash[:algorithm] = :concurrently if klass.exists?
-    end
-    add_index klass.table_name, [column_name, primary_column], **options
-    set_replica_identity klass.table_name, index_name
-  end
-
-  def remove_replica_identity(model_name)
-    klass = model_name.constantize
-    set_replica_identity klass.table_name, :default
-    remove_index klass.table_name, name: "index_#{klass.table_name}_replica_identity", if_exists: true
-  end
 end
 
 # yes, various versions of rails supports various if_exists/if_not_exists options,
@@ -2024,20 +2016,6 @@ ActiveRecord::Base.prepend(DefeatInspectionFilterMarshalling)
 ActiveRecord::Base.prepend(ActiveRecord::CacheRegister::Base)
 ActiveRecord::Base.singleton_class.prepend(ActiveRecord::CacheRegister::Base::ClassMethods)
 ActiveRecord::Relation.prepend(ActiveRecord::CacheRegister::Relation)
-
-# see https://github.com/rails/rails/issues/37745
-module DontExplicitlyNameColumnsBecauseOfIgnores
-  def build_select(arel)
-    if select_values.any?
-      arel.project(*arel_columns(select_values.uniq))
-    elsif !from_clause.value && klass.ignored_columns.any? && !!klass.ignored_columns.intersect?(klass.column_names)
-      arel.project(*klass.column_names.map { |field| arel_attribute(field) })
-    else
-      arel.project(table[Arel.star])
-    end
-  end
-end
-ActiveRecord::Relation.prepend(DontExplicitlyNameColumnsBecauseOfIgnores)
 
 module PreserveShardAfterTransaction
   def after_transaction_commit(&)
@@ -2295,3 +2273,46 @@ if $canvas_rails == "7.0"
 
   ActiveRecord::Relation.send(:public, :null_relation?)
 end
+
+module CreateIcuCollationsBeforeMigrations
+  def migrate_without_lock(*)
+    c = ($canvas_rails == "7.1") ? connection : ActiveRecord::Base.connection
+    c.create_icu_collations if up?
+
+    super
+  end
+end
+ActiveRecord::Migrator.prepend(CreateIcuCollationsBeforeMigrations)
+
+module RollbackIgnoreNonDatedMigrations
+  def move(direction, steps)
+    if direction == :down
+      # we need to back up over any migrations that are not dated
+      steps += migrations.count { |migration| migration.version.to_s.length > 14 && migration.runnable? }
+      args = [direction, migrations, schema_migration]
+      args << internal_metadata if $canvas_rails == "7.1"
+      migrator = ActiveRecord::Migrator.new(*args)
+
+      if current_version != 0 && !migrator.current_migration
+        raise ActiveRecord::UnknownMigrationVersionError, current_version
+      end
+
+      start_index =
+        if current_version == 0
+          0
+        else
+          migrator.migrations.index(migrator.current_migration) || 0
+        end
+
+      finish = migrator.migrations[start_index + steps]
+      version = finish ? finish.version : 0
+      return public_send(direction, version) do |migration|
+        # but don't actually run the non-dated migrations
+        migration.version.to_s.length <= 14
+      end
+    end
+
+    super
+  end
+end
+ActiveRecord::MigrationContext.prepend(RollbackIgnoreNonDatedMigrations)

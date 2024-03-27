@@ -30,7 +30,7 @@ import type {AvailableScope} from './reducers/listScopesReducer'
 import type {DeveloperKeyCreateOrEditState} from './reducers/createOrEditReducer'
 import actions from './actions/developerKeysActions'
 import type {AnyAction, Dispatch} from 'redux'
-import type {DeveloperKey} from '../model/DeveloperKey'
+import type {DeveloperKey} from '../model/api/DeveloperKey'
 
 const I18n = useI18nScope('react_developer_keys')
 
@@ -48,7 +48,7 @@ type Props = {
   }
   actions: typeof actions
   selectedScopes: Array<string>
-  handleSuccessfulSave: () => void
+  handleSuccessfulSave: (warningMessage?: string) => void
 }
 
 type ConfigurationMethod = 'manual' | 'json' | 'url'
@@ -216,10 +216,10 @@ export default class DeveloperKeyModal extends React.Component<Props, State> {
       .updateLtiKey(developerKey, [], this.developerKey.id, settings, settings.custom_fields)
       .then(data => {
         this.setState({isSaving: false})
-        const {developer_key, tool_configuration} = data
+        const {developer_key, tool_configuration, warning_message} = data
         developer_key.tool_configuration = tool_configuration.settings
         dispatch(actions.listDeveloperKeysReplace(developer_key))
-        this.props.handleSuccessfulSave()
+        this.props.handleSuccessfulSave(warning_message)
         this.closeModal()
       })
       .catch(() => {
@@ -286,9 +286,9 @@ export default class DeveloperKeyModal extends React.Component<Props, State> {
       return actions
         .saveLtiToolConfiguration(toSave)(dispatch)
         .then(
-          () => {
+          data => {
             this.setState({isSaving: false})
-            this.props.handleSuccessfulSave()
+            this.props.handleSuccessfulSave(data.warning_message)
             this.closeModal()
           },
           () => this.setState({isSaving: false})

@@ -53,6 +53,10 @@ ca:
   date:
     formats:
       default: '%d/%m/%Y'
+  time:
+    formats:
+      tiny: "%k:%M"
+      tiny_on_the_hour: "%k:%M"
   number:
     currency:
       format:
@@ -1199,7 +1203,7 @@ ja:
       medium: "%Y年%b%-d日"
       medium_month: "%Y %b"
       medium_with_weekday: "%a %Y年%b%-d日"
-      short: "%b%-d日"
+      short: "%b %-d日"
       short_month: "%b"
       short_weekday: "%a"
       short_with_weekday: "%a %b %-d"

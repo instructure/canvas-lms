@@ -27,6 +27,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {setContainScrollBehavior} from '../utils/assignToHelper'
 import useFetchAssignees from '../utils/hooks/useFetchAssignees'
 import type {FormMessage} from '@instructure/ui-form-field'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
 const {Option: CanvasMultiSelectOption} = CanvasMultiSelect as any
 
@@ -125,6 +126,11 @@ const AssigneeSelector = ({
     }, 500)
   }
 
+  const handleClear = () => {
+    onSelect([])
+    showFlashAlert({message: I18n.t('All assignees removed'), srOnly: true})
+  }
+
   const label = I18n.t('Assign To')
 
   const optionMatcher = (
@@ -154,7 +160,7 @@ const AssigneeSelector = ({
         customOnInputChange={handleInputChange}
         visibleOptionsCount={10}
         isLoading={isLoading}
-        inputRef={inputRef}
+        setInputRef={inputRef}
         listRef={e => (listElementRef.current = e)}
         isShowingOptions={isShowingOptions}
         customOnRequestShowOptions={handleShowOptions}
@@ -201,11 +207,7 @@ const AssigneeSelector = ({
       </CanvasMultiSelect>
       {!clearAllDisabled && (
         <View as="div" textAlign="end" margin="small none">
-          <Link
-            data-testid="clear_selection_button"
-            onClick={() => onSelect([])}
-            isWithinText={false}
-          >
+          <Link data-testid="clear_selection_button" onClick={handleClear} isWithinText={false}>
             <span aria-hidden={true}>{I18n.t('Clear All')}</span>
             <ScreenReaderContent>{I18n.t('Clear Assign To')}</ScreenReaderContent>
           </Link>

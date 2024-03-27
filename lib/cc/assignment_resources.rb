@@ -198,7 +198,7 @@ module CC
       node.all_day_date CCHelper.ims_date(assignment.all_day_date) if assignment.all_day_date
       node.peer_reviews_due_at CCHelper.ims_datetime(assignment.peer_reviews_due_at) if assignment.peer_reviews_due_at
       node.assignment_group_identifierref key_generator.create_key(assignment.assignment_group) if assignment.assignment_group && (!manifest || manifest.export_object?(assignment.assignment_group))
-      if assignment.grading_standard
+      if assignment.grading_standard && !(Account.site_admin.feature_enabled?(:archived_grading_schemes) && !assignment.grading_standard.active?)
         if assignment.grading_standard.context == assignment.context
           node.grading_standard_identifierref key_generator.create_key(assignment.grading_standard) if !manifest || manifest.export_object?(assignment.grading_standard)
         else

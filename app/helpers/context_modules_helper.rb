@@ -19,8 +19,8 @@
 #
 
 module ContextModulesHelper
-  include Api::V1::ContextModule
   include CyoeHelper
+  include ApplicationHelper
 
   def translated_content_type(content_type)
     case content_type

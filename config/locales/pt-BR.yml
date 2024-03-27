@@ -420,6 +420,7 @@ pt-BR:
     tab_brand_configs: Temas
     tab_courses: Cursos
     tab_developer_keys: "Chaves do desenvolvedor"
+    tab_extensions: Extensões
     tab_faculty_journal: "Diário de classe"
     tab_grading_standards: Avaliação
     tab_jobs: Trabalhos
@@ -2606,6 +2607,7 @@ pt-BR:
   all_4321c3a1: Todos
   all_account_types_e83c1516: "Todos os Tipos de Conta"
   all_accounts_3bafc860: "Todas as contas"
+  all_assignees_removed_14639499: "Todos os cessionários removidos"
   all_assignment_groups_a65e9e46: "Todos os grupos de tarefas"
   all_assignments_b79a4d6a: "Todas as tarefas"
   all_changes_published_27a53ffd: "Todas as alterações foram publicadas"
@@ -6457,11 +6459,14 @@ pt-BR:
   cas_server_rejected_ticket_message_code_a6ef4093: "Servidor CAS rejeitou o tíquete: %{message} (%{code})"
   cas_url_4ba2843e: "URL CAS"
   catalan_16f6b78f: Catalão
+  catalog_account_not_found_c786ce35: "Conta do Catalog não encontrada"
+  catalog_account_to_copy_fa180ff4: "Conta do Catalog a ser copiada"
   catalog_already_enabled_56478a3c: "Catalog já ativado"
   catalog_manage_f57e50f3: "Catálogo - gerenciar"
   catalog_name_46d37909: "Nome do Catalog"
   catalog_url_a01655dd: "URL do Catalog"
   catalog_users_already_exist_2894b8c4: "Usuários de Catalog já existem"
+  catalog_was_copied_over_successfully_but_there_was_73889dd1: "O Catalog foi copiado com sucesso, mas houve um problema ao sincronizar as matrículas do Canvas"
   catalog_was_provisioned_9851448f: "O Catalog estava provisionado."
   catalog_was_unprovisioned_9524cb58: "O Catalog não estava provisionado."
   catalog_was_updated_743a58eb: "O Catalog foi atualizado."
@@ -7324,6 +7329,7 @@ pt-BR:
   confirmation_failed_please_try_again_ae566d37: "Falha na confirmação.  Por favor, tente novamente."
   confused_panda_questioning_what_to_do_next_42941484: "Panda confuso questionando o que fazer a seguir"
   consider_selecting_multiple_submission_types_to_ac_f7e624d5: "Considere selecionar vários tipos de envio para acomodar os alunos que podem não ser capazes de criar observações."
+  consistent_inheritance_logic_for_developer_keys_in_167f9061: "Lógica de herança consistente para Chaves de Desenvolvedor em consórcios não CMC"
   consistent_lti_ags_ids_based_on_account_s_principa_b93fa45: "IDs LTI AGS consistentes com base no domínio principal da conta"
   consortium_parent_keys_803547b: "Chaves primárias do consórcio"
   consumer_key_57d9fcf1: "Chave do cliente"
@@ -8215,6 +8221,7 @@ pt-BR:
   copy_9748f9f: Copiar
   copy_assignment_name_to_another_course_b62d0a54: "Copiar tarefa %{name} para outro curso"
   copy_blueprint_course_settings_31a97e96: "Copiar configurações do Curso do Modelo"
+  copy_content_615608a7: "Copiar conteúdo"
   copy_list_of_shard_ids_d51cd846: "Copiar lista de IDs de fragmentos"
   copy_operation_started_successfully_b2f236a1: "Operação de cópia iniciada com sucesso"
   copy_page_to_another_course_405cc07c: "Copiar página para outro curso"
@@ -8229,6 +8236,7 @@ pt-BR:
   copy_to_clipboard_493be1b: "Copiar para área de transferência"
   copy_to_folder_32ecc3c3: "Copiar à Pasta"
   copying_628a9607: Copiando...
+  copying_the_content_of_a_template_catalog_5bd6f3b0: "Cópia do conteúdo de um Catalog de modelos"
   copyright_and_license_information_must_be_provided_5feffaf: "Informações de licença e direitos autorais devem ser fornecidas para arquivos antes que eles sejam publicados."
   copyright_holder_386cc8b8: "Titular do Copyright"
   copyright_holder_66ee111: "Titular do Copyright:"
@@ -9798,6 +9806,7 @@ pt-BR:
   crumbs: 
     access_report: "Relatório de acesso"
     announcements: Avisos
+    apps: Extensões
     assignments: Tarefas
     calendar_events: "Eventos do calendário"
     collaborations: Colaborações
@@ -10476,6 +10485,9 @@ pt-BR:
   designers_add_fe7e1ea9: "Designers - Adicionar"
   designers_remove_39f50ec9: "Designers - remover"
   designers_remove_3e590bff: "Designers - Remover"
+  destination_account_is_not_a_root_account_2f890dff: "A conta de destino não é uma conta raiz"
+  destination_account_is_not_empty_561f7e55: "A conta de destino não está vazia"
+  destination_account_not_found_274f33d4: "Conta de destino não encontrada"
   details_98a31b68: Detalhes
   details_a6f427c3: "Detalhes:"
   determined_by_course_end_date_5e3ffb4f: "Determinado pela data de término do curso"
@@ -10662,6 +10674,8 @@ pt-BR:
   discard_changes_e04b15f9: "Descartar alterações"
   discarded_20a4e7e8: Descartado
   disccussions_515a3a99: Discussões
+  discover_56d42b60: Descobrir
+  discover_something_new_or_manage_existing_lti_exte_793093cb: "Descubra algo novo ou gerencie as extensões de LTI existentes"
   discovery_service_url_ca13d3f4: "URL do serviço de descoberta"
   discovery_url_3dce06d9: "URL de Descoberta"
   discussion_6719c51d: Fórum
@@ -11191,6 +11205,7 @@ pt-BR:
   download_these_results_as_csv_9a890883: "Baixe esses resultados como CSV"
   download_this_file_669f9174: "Baixar este arquivo"
   downloading_course_content_allows_access_to_conten_164d9336: "Baixar conteúdo do curso permite acesso ao conteúdo enquanto esteja offline. O conteúdo pode incluir arquivos, páginas, tarefas, assuntos do fórum ou testes. Clique em \"Gerar ePub\" para cada curso e abra com qualquer software de eReader para ler."
+  draft_83493fcd: Rascunho
   draft_92507c72: (rascunho)
   draft_comment_b2376ea4: "Rascunhar comentário"
   draft_comment_warning_modal_in_speedgrader_ded232c1: "Modal de aviso de comentário de rascunho no SpeedGrader"
@@ -11604,6 +11619,7 @@ pt-BR:
   enable_gravatar_8a865b41: "Habilitar Gravatar"
   enable_i18n_features_in_outcomes_exports_64bcf82b: "Habilitar funcionalidades do i18n em exportações de objetivos"
   enable_individual_learning_paths_for_students_base_5236d3bb: "Ative caminhos individuais de aprendizado para alunos baseado em avaliações."
+  enable_irish_language_support_in_canvas_fe7abaf8: "Habilitar o suporte ao idioma irlandês no Canvas"
   enable_labels_on_the_new_inbox_page_485ce65a: "Habilitar marcadores na nova página Caixa de entrada"
   enable_migrating_item_banks_to_new_quizzes_during__af6ca020: "Permitir a migração de bancos de itens para novos questionários durante a importação/cópia do curso"
   enable_moderated_grading_bacd20d8: "Permitir avaliação com moderação."
@@ -12491,6 +12507,7 @@ pt-BR:
   extend_due_date_20651e76: "Prorrogar prazo de entrega"
   extended_632ebee0: estendido
   extended_9a58dcb6: Estendido
+  extensions_7250a0bb: Extensões
   external_apps_account_course_settings_78de2b2f: "Apps externos (Conta, Configurações do curso)"
   external_apps_account_course_settings_c44af5ef: "Aplicativos externos (Configurações da conta/curso)"
   external_apps_course_settings_1f045644: "Aplicativos externos (Configurações do curso)"
@@ -15924,6 +15941,8 @@ pt-BR:
   instructor_is_working_on_grades_135388d2: "O instrutor está trabalhando na avaliação"
   instructor_messages_a4c28674: "Mensagens de Instrutor"
   instructor_name_36bc0f39: "Nome do instrutor"
+  instructor_points_2cd28bd1: "Pontos do instrutor"
+  instructor_score_6e11587f: "Pontuação do instrutor"
   instructor_sis_id_899dd697: "Id do sis do instrutor"
   instructors_4b491a07: instrutores
   instructors_are_not_bound_by_attempt_limits_but_an_20b78fea: "Os instrutores não estão sujeitos a limites de tentativa, mas o envio de um instrutor CONTARÁ como uma tentativa do aluno."
@@ -16098,6 +16117,7 @@ pt-BR:
   invalid_fields_for_a_group_invalid_f440b733: "Campos inválidos para um grupo: %{invalid}"
   invalid_fields_for_an_outcome_invalid_fafdf0df: "Campos inválidos para um resultado: %{invalid}"
   invalid_file_type_881cc9b2: "Tipo de arquivo inválido"
+  invalid_filter_d6ec4d0b: "Filtro inválido"
   invalid_freq_freq_84b0427d: "FREQ '%{freq}' inválido"
   invalid_grade_9726cbc6: "Nota inválida"
   invalid_grade_passback_setting_a1d209d1: "grade_passback_setting inválido"
@@ -16163,6 +16183,7 @@ pt-BR:
   ireland_353_3cd32cc0: "Irlanda (+353)"
   ireland_f7bb9899: Irlanda
   irish_567e109f: Irlandês
+  irish_language_support_e09996c4: "Suporte ao idioma irlandês"
   is_blueprint_8f793ba8: is_blueprint
   is_invalid_702840b6: "é inválido"
   is_public_ca8561e8: is_public
@@ -16585,6 +16606,7 @@ pt-BR:
   leave_5e852989: Sair
   leave_a_comment_7991725b: "Deixar um comentário"
   leave_blank_for_no_limit_e8f80808: "Deixar em branco para sem limite"
+  leave_criterion_comment_707a4f18: "Deixar comentário de critério"
   leave_group_group_name_6847c632: "Sair do grupo %{group_name}"
   left_group_group_name_aac4e813: "Grupo retirado %{group_name}"
   len_maxlen_97f1c88d: "%{len}/%{maxLen}"
@@ -16705,6 +16727,7 @@ pt-BR:
   like_post_from_author_79b874f1: "Curtir postagem de %{author}"
   like_this_entry_60da41a5: "Curtir esta entrada"
   limit_assignment_names_lengths_max_255_5ee9ebb5: "Limitar comprimentos dos nomes das tarefas (máx.. 255)"
+  limit_certain_lti_placements_to_authorized_tools_f4384cb6: "Limitar determinadas inclusões de LTI a ferramentas autorizadas"
   limit_course_participation_to_term_or_custom_cours_67797a86: "Limitar a participação no curso ao período letivo ou datas personalizadas do curso?"
   limit_each_time_slot_to_input_value_user_s_47461538: "Limitar cada horário para %{input_value} usuário(s). "
   limit_each_time_slot_to_num_participants_groups_us_14ec4d65: "Limitar cada horário a %{num_participants} *grupos.* **usuários.**"
@@ -16943,6 +16966,7 @@ pt-BR:
   lock_selected_announcements_33740f80: "Bloquear avisos selecionados"
   lock_this_setting_for_sub_accounts_2ae5af17: "Bloquear essa configuração para subcontas"
   lock_until_549bb904: "Bloquear até"
+  locked_1d1eaa8c: "Bloqueado(a): "
   locked_762f138b: Bloqueado(a)
   locked_796957c7: "Bloqueado(a):"
   locked_at_cda02889: "Bloqueado em"
@@ -17153,6 +17177,8 @@ pt-BR:
   lti_delete_ee5f1bef: "LTI - excluir"
   lti_dynamic_registration_8592edb0: "Registro dinâmico LTI"
   lti_edit_83a27850: "LTI - editar"
+  lti_extensions_discover_page_93e4d9e0: "Página de descoberta das extensões de LTI"
+  lti_extensions_page_4269b418: "Página de extensões de LTI"
   lti_key_14ad02b1: "Chave LTI"
   lti_keys_5677ba9e: "Chaves LTI"
   lti_launch_af082dc3: "Lançamento LTI:"
@@ -17160,6 +17186,9 @@ pt-BR:
   lti_multiple_assignment_deep_linking_b7d641d7: "Vínculo profundo de tarefa múltipla LTI"
   lti_platform_storage_9d11dc60: "Armazenamento de plataforma LTI"
   lti_registration_9e0f754d: "Registro LTI"
+  lti_registrations: 
+    index: 
+      title: Extensões
   lti_report_2b6193ab: "Relatório LTI"
   lti_submissions_require_a_url_to_submit_85ca9988: "Os envios de LTI exigem um URL para enviar"
   lti_tool_report_f13213b3: "Relatório de ferramenta LTI"
@@ -20018,6 +20047,7 @@ pt-BR:
   name_is_locked_click_to_unlock_7aad9928: "%{name} está bloqueado. Clique para desbloquear"
   name_is_locked_click_to_unlock_bbebf03e: "%{name} está bloqueado. Clique para desbloquear."
   name_is_ready_to_be_assigned_temporary_enrollments_f39a6cf6: "%{name} está pronto para receber matrículas temporárias."
+  name_is_required_4341f774: "O nome é obrigatório"
   name_is_required_ba379522: "Nome é necessário"
   name_is_too_long_48daa8db: "O nome é longo demais"
   name_is_too_long_must_be_under_length_characters_b8dad44c: "O nome é longo demais, deve estar abaixo de %{length} caracteres"
@@ -20381,6 +20411,7 @@ pt-BR:
   no_such_source_context_80a659ba: "nenhum contexto de origem"
   no_such_target_context_21158b9: "não existe tal contexto de destino"
   no_such_target_group_7e183d46: "esse grupo-alvo não existe"
+  no_template_accounts_in_this_region_5e84955d: "Não há contas modelo nessa região"
   no_template_selected_f59e797: "Nenhum modelo selecionado"
   no_temporary_enrollment_click_to_create_one_a6bafdf4: "Nenhuma matrícula temporária, clique para criar uma"
   no_terms_eab5ee7b: "Sem prazos"
@@ -22400,6 +22431,7 @@ pt-BR:
   prev_f82cbc48: Ant
   prev_month_34bd934c: "Mês anterior"
   prevent_deletion_of_outcomes_with_alignments_in_os_65020476: "Impedir a exclusão de resultados com alinhamentos no sistema operacional"
+  prevent_non_cmc_consortium_parent_dev_key_from_aff_418efa1c: "Impedir que a chave de desenvolvimento dos pais do consórcio não CMC afete as ferramentas em crianças"
   prevents_students_from_leaving_annotations_in_assi_cb188d2: "Impede que os alunos deixem observações nas tarefas. Não é aplicável a tarefas revisadas por pares."
   preview_53003fd2: Pré-visualização
   preview_a3f8f854: PRÉ-VISUALIZAÇÃO
@@ -22773,8 +22805,10 @@ pt-BR:
       yo: Yo
     you_have_no_services: "Nenhum serviço registrado, você pode adicionar algum na página de *configurações*."
   profile_6bd2baed: Perfil
+  profile_has_been_saved_successfully_12ffc6ea: "O perfil foi salvo com sucesso"
   profile_photo_save_failed_too_many_times_e1ebda5: "Salvar a foto do perfil falhou muitas vezes"
   profile_pictures_15953851: "Imagens do perfil"
+  profile_save_was_unsuccessful_6e27fb5e: "O salvamento do perfil não foi bem-sucedido"
   profile_tray_bcec5044: "Bandeja do perfil"
   profiles: 
     avatar_dialog: 
@@ -24518,6 +24552,7 @@ pt-BR:
       "Cursos criados manualmente", quando ativado, este recurso permite
       pessoas que podem criar cursos manualmente para colocá-los em qualquer subconta
       onde tenham matrículas.
+  rating_button_buttondisplay_8fb69a4e: "Botão de classificação %{buttonDisplay}"
   rating_description_db6adf39: "Descrição da avaliação"
   rating_display_b0b574be: "Exibição de classificação"
   rating_max_score_eade1523: "Pontuação máxima da avaliação"
@@ -25369,6 +25404,7 @@ pt-BR:
       criterion_long_description: "Descrição longa do critério"
     unknown_user: "Usuário desconhecido"
   rubric_assessment_5f0e8a83: "Avaliação da rubrica"
+  rubric_assessment_view_mode_1038db: "Modo de exibição da avaliação da rubrica"
   rubric_association: 
     no_details: "Nenhum detalhe"
   rubric_button_display_4e4a26fe: "Exibição do botão de rubrica"
@@ -25474,6 +25510,7 @@ pt-BR:
   save_11a80ec3: Salvar
   save_and_customize_19eb7a7b: "Salvar e personalizar"
   save_and_publish_1b765e7: "Salvar e publicar"
+  save_as_draft_341d4577: "Salvar como rascunho"
   save_changes_698abe77: "Salvar alterações"
   save_criterion_cce60085: "Salvar critério"
   save_customizations_dde779d8: "Salvar personalizações"
@@ -25934,6 +25971,7 @@ pt-BR:
   select_a_student_to_view_281d17b9: "Selecione um aluno para ver"
   select_a_student_to_view_additional_information_he_c371e40c: "Escolha um aluno para visualizar as informações adicionais aqui."
   select_a_student_to_view_the_page_will_refresh_aut_eaa5d00c: "Selecione um aluno para visualizar. A página será atualizada automaticamente."
+  select_a_template_account_e0c03ee8: "Selecione uma conta modelo"
   select_a_type_to_restore_de2c0d04: "Selecionar um tipo para restaurar"
   select_access_type_e5955544: "Selecionar tipo de acesso"
   select_all_assignments_bd07b919: "Selecionar todas as tarefas"
@@ -27368,6 +27406,7 @@ pt-BR:
   snapshots_6e1806b4: Instantâneos
   snapshots_are_backups_of_your_canvas_trial_taking__f18bd571: "Instantâneos são backups da sua avaliação do Canvas. Tirar um instantâneo criará uma versão “única”, fazendo um registro perfeito do estado da sua avaliação no momento do instantâneo."
   social_studies_13fa30c7: "Estudos sociais"
+  some_assignments_are_associated_with_an_archived_o_e1856b65: "Alguns exercícios estão associados a um esquema de classificação arquivado ou excluído e o esquema de classificação pode não ser exportado."
   some_assignments_could_not_be_created_because_they_d91f2f21: "Algumas tarefas não puderam ser criadas porque cairiam em um período de pontuação fechado."
   some_conferences_on_this_page_are_hidden_because_o_789684fd: "Algumas conferências nesta página são ocultos por causa de erros ao retirar o seu status"
   some_custom_columns_could_not_be_changed_because_t_88abc9be: "Algumas colunas personalizadas não puderam ser alteradas porque eram apenas leitura; alterações para essas colunas foram ignoradas."
@@ -28439,6 +28478,9 @@ pt-BR:
   tell_us_how_and_when_you_would_like_to_be_notified_de3ed2bc: "Diga-nos como e quando você gostaria de ser notificado de eventos no Canvas."
   tempe_grade_export_c611da01: "Exportação da nota Tempe"
   template_account_21ac8f4f: "Conta modelo"
+  template_account_is_not_a_root_account_83ae89bc: "A conta do modelo não é uma conta raiz"
+  template_account_is_not_a_template_account_d80200ae: "A conta de modelo não é uma conta de modelo"
+  template_account_not_found_7144542c: "Conta de modelo não encontrada"
   templates_4ca13d07: Modelos
   temporarily_enroll_a_user_into_a_course_this_tempo_990488f8: "Matricular temporariamente um usuário em um curso. Esta matrícula temporária é emparelhada com outra matrícula dentro do curso."
   temporarily_enroll_name_8acb66ce: "Matricular temporariamente %{name}"
@@ -28681,6 +28723,7 @@ pt-BR:
   the_course_id_for_the_export_data_a99f37d: "O id do curso para os dados de exportação"
   the_course_id_for_the_grade_export_data_d20f4ed: "O id do curso para os dados de exportação de notas"
   the_course_id_to_report_on_eb4ad5d2: "O id do curso para relatar"
+  the_course_is_associated_with_an_archived_or_delet_43b836a9: "O curso está associado a um esquema de classificação arquivado ou excluído e o esquema de classificação não pode ser exportado."
   the_course_link_validator_searches_course_content__563fa215: "O validador do link do curso pesquisa conteúdo do curso por links inválidos ou inalcançáveis e imagens."
   the_course_link_validator_searches_through_course__76f0bc63: "O validador de links do curso procura pelo conteúdo do curso e retorna cada link inválido ou sem resposta que se depara. Por favor perceba que alguns links sinalizados como sem resposta estão apenas inacessíveis de nossos servidores e ainda continuarão a funcionar para os estudantes."
   the_course_state_manage_permission_allows_the_user_1d9da094: "A permissão Estado do curso - gerenciar permite que o usuário publique cursos que não tenham módulos. Para publicar e cancelar a publicação do conteúdo do módulo, Conteúdo do curso - adicionar/editar/excluir deve ser habilitada."
@@ -28804,6 +28847,7 @@ pt-BR:
   the_list_below_is_content_that_has_been_shared_wit_2b2648bc: "A lista abaixo é conteúdo que foi compartilhado com você. É possível pré-visualizar o conteúdo, importá-lo ao seu curso ou removê-lo da lista."
   the_list_of_results_has_been_updated_46e3c733: "A lista de resultados já foi atualizada"
   the_login_login_is_currently_suspended_and_will_no_472b19e9: "O login %{login} está atualmente suspenso e não poderá acessar o Canvas"
+  the_lti_extensions_discover_page_won_t_be_accessib_1451172e: "A página Descoberta de extensões de LTI não estará acessível a menos que a página Registros de LTI esteja ativada"
   the_lti_tool_was_deleted_on_3727da23: "A ferramenta LTI foi excluída em"
   the_lti_user_was_deleted_2a3b796f: "O usuário LTI foi excluído"
   the_material_is_in_the_public_domain_279c39a3: "O material está no domínio público"
@@ -28826,10 +28870,15 @@ pt-BR:
                 Obrigado,
                 Suporte do Canvas
   the_message_you_sent_with_the_subject_line_subject_8157a1ff: |-
-      A mensagem que você enviou com a linha de assunto "%{subject}" não foi entregue porque sua conta foi suspensa
-      
-      Obrigado,
-      Suporte do Canvas
+      A mensagem que você enviou com a linha de assunto “%{subject}" não foi entregue porque sua conta foi suspensa.
+                
+                Obrigado,
+                Suporte do Canvas
+  the_message_you_sent_with_the_subject_line_subject_8511b0dd: |-
+      A mensagem que você enviou com a linha de assunto “%{subject}" não foi entregue porque você não é um participante válido na conversa.
+                
+                Obrigado,
+                Suporte do Canvas
   the_message_you_sent_with_the_subject_line_subject_c73f92e4: |-
       A mensagem que você enviou com a linha de assunto "%{subject}" não foi entregue. Para responder mensagens do Canvas deste e-mail, primeiro deve ser um canal de comunicação confirmado em seu perfil do Canvas. Por favor, visite seu perfil e reenvie o e-mail de confirmação para este endereço de e-mail [Ver https://community.canvaslms.com/docs/DOC-2281]. Você também pode contatar essa pessoa através da Caixa de Entrada do Canvas [Ver https://community.canvaslms.com/docs/DOC-2670].
                 
@@ -29118,6 +29167,7 @@ pt-BR:
   there_was_an_unexpected_error_deleting_the_convers_412fd621: "Ocorreu um erro inesperado ao excluir a mensagem da conversa"
   there_was_an_unexpected_error_deleting_the_discuss_fe1022cb: "Ocorreu um erro inesperado ao excluir o tópico de fórum."
   there_was_an_unexpected_error_deleting_the_topic_b53db7a7: "Ocorreu um erro inesperado ao excluir o tópico."
+  there_was_an_unexpected_error_error_ca0fc77e: "Ocorreu um erro inesperado: %{error}"
   there_was_an_unexpected_error_loading_the_discussi_cc4ee42: "Ocorreu um erro inesperado ao carregar a entrada da discussão."
   there_was_an_unexpected_error_loading_the_replies_578d9738: "Ocorreu um erro inesperado ao carregar as respostas."
   there_was_an_unexpected_error_marking_all_as_read_117fe739: "Ocorreu um erro inesperado ao marcar tudo como lido."
@@ -29203,6 +29253,7 @@ pt-BR:
   this_canvas_installation_is_only_for_testing_and_w_17ce8bc2: 
     one: "Esta instalação do Canvas é apenas para teste e *será redefinido a cada semana.*"
     other: "Esta instalação do Canvas é apenas para teste e *será redefinido a cada %{count} semanas.*"
+  this_catalog_will_be_a_template_account_and_its_da_8b6277cb: "Esse Catalog será uma conta modelo, e seus dados poderão ser copiados para Catalogs recém-provisionados"
   this_code_expires_in_timefromnow_ec7ccef4: "Este código expira em %{timeFromNow}."
   this_code_expires_timefromnow_877a5225: "Este código expira %{timeFromNow}."
   this_code_has_expired_41f76642: "Este código expirou."
@@ -29367,8 +29418,10 @@ pt-BR:
   this_is_an_account_setting_that_must_be_enabled_by_8ced660: "Essa é uma configuração da conta que deve ser ativada pelo seu Gerente de Sucesso do Cliente. Alertas são um recurso raramente utilizados projetados para enviar um alerta a alunos, professores ou administradores para disparadores específicos (por ex., nenhuma interação do aluno/professor por 7 dias). Eles são verificados todos os dias, e notificações serão enviadas ao aluno e/ou professor até que o problema que esteja disparando o alerta seja resolvido."
   this_is_an_account_setting_that_must_be_turned_on__4c939dea: "Essa é uma configuração da conta que deve ser ativada pelo seu Gerente de sucesso do cliente."
   this_is_an_anonymous_discussion_student_names_and__bc19b64d: "Esta é uma discussão anônima. Os nomes dos alunos e as fotos do perfil ficam ocultos."
+  this_is_an_anonymous_discussion_though_student_nam_c45b563e: "Esta é uma discussão anônima. Embora os nomes dos alunos e as fotos do perfil fiquem ocultos, seu nome e foto do perfil ficarão visíveis para todos os membros do curso. As menções também foram desativadas."
   this_is_an_anonymous_discussion_though_student_nam_f98abe71: "Esta é uma discussão anônima. Embora os nomes dos alunos e as fotos do perfil fiquem ocultos, seu nome e foto do perfil ficarão visíveis para todos os membros do curso."
   this_is_an_anonymous_discussion_your_name_and_prof_72c49b77: "Esta é uma discussão anônima. Seu nome e foto de perfil serão ocultados de outros membros do curso."
+  this_is_an_anonymous_discussion_your_name_and_prof_c88f50e2: "Esta é uma discussão anônima. Seu nome e foto do perfil ficarão ocultos para os outros membros do curso. As menções também foram desativadas."
   this_is_enabled_by_default_as_assignments_can_not__767e9b16: "Isso é ativado por padrão, pois as tarefas não podem ser retidas do boletim de notas e ainda contam para ele."
   this_is_just_a_dev_only_feature_you_can_turn_on_to_7f88c58f: "Esta é uma funcionalidade apenas para desenvolvedores que você pode ativar para obter uma pré-visualização de como as páginas aparentam em um ambiente RTL, sem ter que alterar o seu idioma para aquele que é normalmente RTL"
   this_is_not_a_breaking_change_all_lti_1_3_tool_beh_16df3ac0: "Isso *não* é uma alteração significativa. Todo o comportamento da ferramenta LTI 1.3 permanecerá o mesmo, independentemente do terminal usado, com exceção da especificação Platform Storage recém-suportada. A aplicação dessa mudança ocorrerá em uma data posterior não especificada."
@@ -30942,6 +30995,10 @@ pt-BR:
   update_public_jwk_9f25f520: "Atualizar JWK público"
   update_rating_6d29c2ef: "Atualizar avaliação"
   update_settings_9b422d0f: "Atualizar configurações"
+  update_the_assignment_submission_type_launch_butto_bf130d86: "Atualizar o botão de lançamento do tipo de envio de tarefa"
+  update_the_look_of_all_tools_using_the_submission__368b06c: |-
+      Atualizar a aparência de todas as ferramentas que usam a inclusãosubmission_type_selection
+       para um design mais moderno, alinhado com o restante da interface do usuário do Canvas.
   update_tool_7d48ef2a: "Atualizar %{tool}"
   update_your_notification_settings_ed9564f3: "Atualizar suas configurações de notificação"
   updated_2c1e8615: Atualizado
@@ -31859,6 +31916,7 @@ pt-BR:
   warning_if_there_are_any_users_with_this_role_they_1a7c1fef: "Aviso: Se houver algum usuário com este papel, ele permanecerá com as permissões atuais, mas você não poderá criar novos usuários com este papel."
   warning_step_has_children_that_aren_t_stepitem_com_32a3f351: "Etapa de aviso tem crianças que não componentes de StepItem"
   warning_step_has_two_stepitems_with_a_status_of_in_77138e9e: "Aviso: Etapa tem dois StepItems com um status de em andamento"
+  warning_the_submission_type_selection_placement_is_d327c8d: "Aviso: a inclusão submission_type_selection só é permitida para ferramentas de LTI aprovadas pela Instructure. Se achar que recebeu essa mensagem por engano, entre em contato com a equipe de suporte."
   warning_you_are_about_to_adjust_this_group_s_membe_a04281b6: "Aviso! Você está prestes a ajustar a adesão deste grupo. *Esta alteração afetará envios, observações e comentários existentes do grupo e resultará em perda de dados para este grupo e o grupo anterior do aluno.*** Para impedir que consequências indesejadas com envios existentes do grupo, crie um novo conjunto de grupos para tarefas futuras. **"
   warnings: 
     test_install: 
@@ -31868,6 +31926,7 @@ pt-BR:
         one: "Esta instalação Canvas é apenas para teste e será redefinida toda semana."
         other: "Esta instalação Canvas é apenas para teste e será redefinida a cada %{count} semanas."
   was_locked_at_date_acf1c576: "Foi bloqueado em %{date}"
+  was_not_selected_30d63a10: "não foi selecionado"
   watermark_c93fae0d: "Marca d´água"
   watermark_opacity_ce3d3097: "Opacidade da Marca d´água"
   watermarks_other_images_e970fc6a: "Marcas d´água & Outras Imagens"
@@ -31983,7 +32042,9 @@ pt-BR:
       carregar em uma nova guia. Quando esse sinalizador estiver ativado, essa caixa de seleção será marcada por padrão
       se o usuário a marcou na última vez que adicionou um link externo.
   when_adding_multiple_users_use_a_comma_or_line_bre_67f9c87d: "Ao adicionar diversos usuários, use uma vírgula ou quebra de linha para separar usuários."
+  when_creating_a_reply_students_will_have_the_optio_34556e85: "Ao criar uma resposta, os alunos terão a opção de mostrar seu nome e foto de perfil ou permanecer anônimos. Seu nome e foto de perfil ficarão visíveis para todos os membros do curso. As menções também foram desativadas."
   when_creating_a_reply_students_will_have_the_optio_716eb2f4: "Ao criar uma resposta, os alunos terão a opção de mostrar seu nome e foto de perfil ou permanecer anônimos. Seu nome e foto de perfil ficarão visíveis para todos os membros do curso."
+  when_creating_a_reply_you_will_have_the_option_to__3fb91c13: "Ao criar uma resposta, você terá a opção de mostrar seu nome e foto de perfil para outros membros do curso ou permanecer anônimo. As menções também foram desativadas."
   when_creating_a_reply_you_will_have_the_option_to__8607ac10: "Ao criar uma resposta, você terá a opção de mostrar seu nome e foto de perfil para outros membros do curso ou permanecer anônimo."
   when_disabled_new_or_updated_contextexternaltool_i_27e19300: |-
       Quando desabilitadas, instalações novas ou atualizadas do ContextExternalTool (incluindo
@@ -32000,6 +32061,21 @@ pt-BR:
       classificadas e filtradas.
   when_enabled_an_lti_tool_with_the_assignment_edit__cd60b1a0: "Quando ativado, uma ferramenta LTI com o assignment_edit posicionamento será lançada na página Anúncio."
   when_enabled_collect_internal_analytics_metrics_us_88e81ee5: "Quando ativado, colete métricas internas de análise usando um sistema distribuído."
+  when_enabled_for_a_child_account_of_a_non_centrall_8b126bc0: |-
+      Quando ativado para uma conta secundária de um consórcio gerenciado de forma não centralizada,
+      o estado e os tokens da chave do desenvolvedor do consórcio primário não serão herdados
+      para as subcontas de um consórcio secundário. Quando desativado, o comportamento legado
+      (inconsistente) é seguido. Esse sinalizador se aplica somente a contas
+      _child_ de consórcio. Esse sinalizador não afeta de forma alguma os consórcios gerenciados
+      centralmente.
+  when_enabled_for_the_parent_account_of_a_non_centr_4d7adbaa: |-
+      Quando ativada para a conta principal de um consórcio gerenciado de forma não centralizada,
+      a ativação/desativação das chaves de desenvolvedor na conta primária não afetará as instalações de ferramentas
+      das contas secundárias. Quando desativado, ativar/desativar
+      as chaves de desenvolvedor herdadas do SiteAdmin na conta primária de um consórcio
+      não gerenciado centralmente afetará (excluir/restaurar) as ferramentas nas
+      contas secundárias (comportamento herdado). Esse sinalizador se aplica somente a contas de _parent_
+      consórcio. Esse sinalizador não afeta de forma alguma os consórcios gerenciados centralmente.
   when_enabled_global_javascript_and_css_files_can_b_ea21d216: "Quando ativados, o upload de arquivos globais de JavaScript e CSS pode ser feito no *%{t_theme_editor}*."
   when_enabled_it_deprecates_the_short_message_servi_18c6ee3f: "Quando ativado, torna obsoleto o Short Message Service (SMS)."
   when_enabled_lti_1_1_speedgrader_launches_will_set_47dcded1: |-
@@ -32023,6 +32099,9 @@ pt-BR:
       Quando ativado, envia dados de todos os lançamentos de LTI para o PandataEvents sistema
       para consulta e visualização.
   when_enabled_site_admin_account_ui_will_allow_asso_9d04a1d8: "Quando habilitada, a interface do usuário da conta do administrador do site permitirá associar um usuário de serviço a um DeveloperKey e usar essa chave/usuário com o tipo de concessão client_credentials"
+  when_enabled_submission_type_selection_placement_u_412d226e: |-
+      Quando ativado, o uso da inclusão Submission_type_selection será limitado por
+      uma lista de permissões.
   when_enabled_teachers_can_choose_to_allow_observer_320b555e: |-
       Quando ativado, os professores podem optar por permitir que os observadores agendem compromissos
       ao criar grupos de compromissos no calendário.
@@ -32031,6 +32110,8 @@ pt-BR:
       LTI terão, cada um, um número aleatório anexado ao seu ID. Quando desabilitado,
       cada um tem o mesmo id de tool_form.
   when_enabled_the_internal_access_manager_will_be_u_bc470109: "Quando ativado, o gerenciador de acesso interno será usado para bloquear o acesso a determinadas solicitações"
+  when_enabled_the_lti_extensions_discover_page_will_8bb57ff6: "Quando ativada, a página Descobrir Extensões de LTI estará disponível na visualização Extensões."
+  when_enabled_the_lti_extensions_page_will_be_avail_ac8ed3fa: "Quando ativada, a página Extensões de LTI estará disponível na navegação da conta."
   when_enabled_this_flag_displays_a_word_count_in_th_a75163d6: |-
       Quando ativado, este sinalizador exibe uma contagem de palavras na motoniveladora para
       envios baseados em texto.
@@ -32055,6 +32136,7 @@ pt-BR:
       da ferramenta original. Isso evita o caso extremo em que várias chaves de desenvolvedor
       compartilham o mesmo domínio e uma ferramenta da chave de desenvolvedor errada seria correspondida primeiro.
   when_posting_grades_for_anonymous_assignments_grad_b13f3ae6: "Ao postar notas para tarefas anônimas, notas serão postadas para todos no curso. Anonimato será removido."
+  when_posting_grades_for_this_anonymous_assignment__1c64fadf: "Ao publicar notas para esse exercício anônimo, as notas serão publicadas para todos os que receberam esse item. Anonimato será removido."
   when_scope_enforcement_is_disabled_tokens_have_acc_6939182f: "Quando a aplicação do escopo estiver desabilitada, os tokens têm acesso a todos os endpoints disponíveis ao usuário realizando a autorização."
   when_selected_the_course_is_in_a_read_only_state_o_5aaeb0d: "Quando selecionado, o curso está em um estado somente leitura fora dessas datas."
   when_selected_the_course_is_inaccessible_outside_c_af595406: "Quando selecionado, o curso é inacessível fora das datas do curso. Se as datas do curso estiverem em branco, essas datas iniciais e de término são aplicáveis às datas do período."

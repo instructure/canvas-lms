@@ -61,6 +61,7 @@ describe('.load', () => {
   })
 
   it('emits change', () => {
+    const clock = sinon.useFakeTimers()
     const onChange = jest.fn()
 
     fakeServer.respondWith('GET', /^\/reports/, jsonResponse(200, quizReportsFixture))
@@ -69,10 +70,14 @@ describe('.load', () => {
     subject.load()
 
     assertChange({
-      fn: () => fakeServer.respond(),
+      fn: () => {
+        fakeServer.respond()
+        clock.tick(1)
+      },
       of: () => onChange.mock.calls.length,
       by: 1,
     })
+    clock.restore()
   })
 
   it('should request both "file" and "progress" to be included with quiz reports', function () {

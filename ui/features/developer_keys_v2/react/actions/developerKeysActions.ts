@@ -23,10 +23,16 @@ import {LtiScope} from 'features/developer_keys_v2/model/LtiScopes'
 import $ from 'jquery'
 import parseLinkHeader from 'link-header-parsing/parseLinkHeader'
 import {AnyAction, Dispatch} from 'redux'
-import {DeveloperKey, DeveloperKeyAccountBinding} from '../../model/DeveloperKey'
+import {DeveloperKey, DeveloperKeyAccountBinding} from '../../model/api/DeveloperKey'
+import type {LtiToolConfiguration} from 'features/developer_keys_v2/model/api/LtiToolConfiguration'
 
 const I18n = useI18nScope('react_developer_keys')
 
+export type LtiDeveloperKeyApiResponse = {
+  developer_key: DeveloperKey
+  tool_configuration: LtiToolConfiguration
+  warning_message?: string
+}
 /**
  * Type function that takes a action type name in all caps and snake case
  * and converts it to a camel case action creator name.
@@ -598,7 +604,7 @@ export const actions = {
           newKey.tool_configuration = response.data.tool_configuration.settings
           dispatch(actions.setEditingDeveloperKey(newKey))
           dispatch(actions.listDeveloperKeysPrepend(newKey))
-          return response.data
+          return response.data as LtiDeveloperKeyApiResponse
         })
         .catch(err => {
           const errors = err.response.data.errors
@@ -640,7 +646,7 @@ export const actions = {
         },
       })
       .then(data => {
-        return data.data
+        return data.data as LtiDeveloperKeyApiResponse
       })
       .catch(err => {
         const errors = err.response.data.errors

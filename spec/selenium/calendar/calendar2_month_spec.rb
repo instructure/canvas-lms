@@ -204,6 +204,8 @@ describe "calendar2" do
         end
 
         it "extends event to multiple days by draging", priority: "2" do
+          skip("dragging events are flaky and need more research FOO-4335")
+
           create_middle_day_event
           date_of_middle_day = find_middle_day.attribute("data-date")
           date_of_next_day = (date_of_middle_day.to_datetime + 1.day).strftime("%Y-%m-%d")

@@ -359,6 +359,15 @@ describe Lti::Messages::ResourceLinkRequest do
           it "includes the resource_link_id property with the different lti_context_id" do
             expect(message_resource_link_id).to eq assignment.lti_resource_link_id
           end
+
+          context "when user is not present" do
+            let(:user) { nil }
+
+            it "does not crash and returns a sane empty value for lti1p1 user_id" do
+              expect(message_lti1p1).to include "user_id"
+              expect(message_lti1p1["user_id"]).to be_nil
+            end
+          end
         end
       end
     end

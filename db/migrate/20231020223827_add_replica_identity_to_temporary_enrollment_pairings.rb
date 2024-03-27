@@ -20,10 +20,10 @@ class AddReplicaIdentityToTemporaryEnrollmentPairings < ActiveRecord::Migration[
   tag :predeploy
 
   def up
-    add_replica_identity "TemporaryEnrollmentPairing", :root_account_id
+    set_replica_identity :temporary_enrollment_pairings
   end
 
   def down
-    remove_replica_identity "TemporaryEnrollmentPairing"
+    set_replica_identity :temporary_enrollment_pairings, :default
   end
 end

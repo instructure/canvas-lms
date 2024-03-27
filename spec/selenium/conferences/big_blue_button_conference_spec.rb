@@ -255,7 +255,7 @@ describe "BigBlueButton conferences" do
       get conferences_index_page
       f("button[title='New Conference']").click
 
-      force_click("input[value='add_to_calendar']")
+      f("input[value='add_to_calendar'] + label").click
       driver.switch_to.alert.accept
       wait_for_ajaximations
 
@@ -296,7 +296,7 @@ describe "BigBlueButton conferences" do
 
       # click, then cancel add to calendar
       f("div#tab-settings").click
-      force_click("input[value='add_to_calendar']")
+      f("input[value='add_to_calendar'] + label").click
       driver.switch_to.alert.dismiss
       wait_for_ajaximations
 
