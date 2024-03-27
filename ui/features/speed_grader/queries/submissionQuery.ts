@@ -33,6 +33,7 @@ const SUBMISSION_QUERY = gql`
           cachedDueDate
           gradingStatus
           user {
+            _id
             avatarUrl
             name
           }

@@ -17,43 +17,58 @@
  */
 
 import {z} from 'zod'
-import {executeQuery} from '@canvas/query/graphql'
-import gql from 'graphql-tag'
+import getCookie from '@instructure/get-cookie'
 
-export const UPDATE_SUBMISSION_GRADE = gql`
-  mutation UpdateSubmissionGrade($submissionId: ID!, $score: Int!) {
-    __typename
-    updateSubmissionGrade(input: {submissionId: $submissionId, score: $score}) {
-      submission {
-        _id
-        id
-        grade
-        score
-        user {
-          _id
-          id
-          name
-        }
-      }
-    }
+function transform(result: any) {
+  if (result.errors?.length > 0) {
+    throw new Error(result.errors[0].message)
   }
-`
+
+  const {submission} = result[0]
+  return {
+    submission: {
+      _id: submission.id,
+      grade: submission.grade,
+      score: submission.score,
+    },
+  }
+}
 
 export const ZUpdateSubmissionGradeParams = z.object({
-  submissionId: z.string(),
-  score: z.number(),
+  assignmentId: z.string(),
+  userId: z.string(),
+  gradedAnonymously: z.boolean(),
+  grade: z.string(),
 })
 
 type UpdateSubmissionGradeParams = z.infer<typeof ZUpdateSubmissionGradeParams>
 
 export async function updateSubmissionGrade({
-  submissionId,
-  score,
+  assignmentId,
+  userId,
+  gradedAnonymously,
+  grade,
 }: UpdateSubmissionGradeParams): Promise<any> {
-  const result = executeQuery<any>(UPDATE_SUBMISSION_GRADE, {
-    submissionId,
-    score,
+  const data = {
+    submission: {
+      assignment_id: assignmentId,
+      user_id: userId,
+      graded_anonymously: gradedAnonymously,
+      originator: 'speed_grader',
+      grade,
+    },
+  }
+
+  const response = await fetch('/courses/1/gradebook/update_submission', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRF-Token': getCookie('_csrf_token'),
+      Accept: 'application/json',
+    },
+    body: JSON.stringify(data),
   })
 
-  return result
+  const json = await response.json()
+  return transform(json)
 }
