@@ -30,6 +30,8 @@ const SUBMISSIONS_BY_ASSIGNMENT_QUERY = gql`
           _id
           id
           cachedDueDate
+          customGradeStatus
+          excused
           excused
           gradeMatchesCurrentSubmission
           gradingPeriodId
@@ -37,8 +39,7 @@ const SUBMISSIONS_BY_ASSIGNMENT_QUERY = gql`
           postedAt
           score
           submissionStatus
-          customGradeStatus
-          excused
+          submittedAt
           user {
             _id
             id
