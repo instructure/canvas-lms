@@ -33,6 +33,10 @@ const preview = (body, maxLength = 512) => {
   const preview = []
   const words = body.match(/\w+/g)
 
+  if(words == null) {
+    return ''
+  }
+
   while (preview.join(' ').length < maxLength) {
     preview.push(words.shift())
   }
