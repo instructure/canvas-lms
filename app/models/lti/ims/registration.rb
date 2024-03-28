@@ -25,6 +25,7 @@ class Lti::IMS::Registration < ApplicationRecord
   REQUIRED_RESPONSE_TYPES = ["id_token"].freeze
   REQUIRED_APPLICATION_TYPE = "web"
   REQUIRED_TOKEN_ENDPOINT_AUTH_METHOD = "private_key_jwt"
+  COURSE_NAV_DEFAULT_ENABLED_EXTENSION = "https://canvas.instructure.com/lti/course_navigation/default_enabled"
 
   validates :application_type,
             :grant_types,
@@ -165,6 +166,10 @@ class Lti::IMS::Registration < ApplicationRecord
         custom_fields: message["custom_parameters"],
         display_type:,
         windowTarget: window_target,
+        # This supports a very old parameter (hence the obtuse name) that only applies to the course navigation placement. It hides the
+        # tool from the course navigation by default. Teachers can still add the tool to the course navigation using the course
+        # settings page if they'd like.
+        default: (message[COURSE_NAV_DEFAULT_ENABLED_EXTENSION] == false && placement_name == "course_navigation") ? "disabled" : nil
       }.merge(width_and_height_settings(message, placement_name)).compact
     ]
   end
