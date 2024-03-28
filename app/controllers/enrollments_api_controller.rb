@@ -1052,7 +1052,9 @@ class EnrollmentsApiController < ApplicationController
 
         # if there aren't any ids in approved_accounts, then the user doesn't have
         # permissions.
-        render_unauthorized_action and return false if approved_accounts.empty?
+        unless @domain_root_account.grants_right?(@current_user, session, :read_roster)
+          render_unauthorized_action and return false if approved_accounts.empty?
+        end
 
         enrollments = user.enrollments.where(enrollment_index_conditions)
                           .where(root_account_id: approved_accounts)
