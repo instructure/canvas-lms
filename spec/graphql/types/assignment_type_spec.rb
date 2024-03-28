@@ -888,6 +888,32 @@ describe Types::AssignmentType do
           expect(assignment_type.resolve("checkpoints {onlyVisibleToOverrides}")).to match_array [@c1.only_visible_to_overrides, @c2.only_visible_to_overrides]
         end
       end
+
+      describe "when assignment has checkpoints with overrides" do
+        before do
+          @everyone_due_at = 2.days.from_now
+          @section_due_at = 3.days.from_now
+
+          @topic = DiscussionTopic.create_graded_topic!(course:, title: "Checkpointed Discussion")
+          @c1 = Checkpoints::DiscussionCheckpointCreatorService.call(
+            discussion_topic: @topic,
+            checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+            dates: [
+              { type: "everyone", due_at: @everyone_due_at },
+              { type: "override", set_type: "CourseSection", set_id: @topic.course.default_section.id, due_at: @section_due_at }
+            ],
+            points_possible: 10
+          )
+        end
+
+        it "returns assignment overrides for checkpoints" do
+          query = GraphQLTypeTester.new(@topic.assignment, current_user: student)
+
+          expect(query.resolve("checkpoints {pointsPossible}")).to eq [10]
+          expect(query.resolve("checkpoints {dueAt}")).to eq [@everyone_due_at.iso8601]
+          expect(query.resolve("checkpoints {assignmentOverrides {nodes {dueAt}}}")).to eq [[@section_due_at.iso8601]]
+        end
+      end
     end
   end
 end
