@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import type {RouteObject} from 'react-router-dom'
-import {Discover} from './Discover'
-
-export const DiscoverRoute: RouteObject = {
-  path: '/',
-  element: <Discover />,
+export type Product = {
+  id: string
+  name: string
+  company: string
+  companyUrl: string
+  logoUrl: string
+  tagline: string
 }

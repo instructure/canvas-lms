@@ -19,10 +19,10 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {createBrowserRouter, RouterProvider, Link} from 'react-router-dom'
-import {Discover} from './discover/Discover'
+import {Discover} from './discover/components/Discover'
 import {Manage} from './manage/Manage'
 import {LtiAppsLayout} from './layout/LtiAppsLayout'
-import {DiscoverRoute} from './discover'
+import {DiscoverRoute} from './discover/components'
 import {ManageRoute} from './manage'
 
 const getBasename = () => {
