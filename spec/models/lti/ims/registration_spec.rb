@@ -389,8 +389,8 @@ module Lti::IMS
         subject { registration.placements }
 
         context "convert messages to placements" do
-          it "accepts valid placements" do
-            canvas_placement_hash = {
+          let(:canvas_placement_hash) do
+            {
               custom_fields: { "foo" => "bar" },
               enabled: true,
               icon_url: "http://example.com/icon.png",
@@ -398,6 +398,9 @@ module Lti::IMS
               target_link_uri: "http://example.com/launch",
               display_type: "full_width",
             }
+          end
+
+          it "accepts valid placements" do
             expect(subject).to eq [
               canvas_placement_hash.merge(placement: "assignment_edit", launch_width: 200, launch_height: 300),
               canvas_placement_hash.merge(placement: "global_navigation", selection_width: 200, selection_height: 300),
@@ -417,6 +420,21 @@ module Lti::IMS
             bad_placement_name = "course_navigationhttps://canvas.instructure.com/lti/"
             registration.lti_tool_configuration["messages"].first["placements"] << bad_placement_name
             expect { registration.save! }.to raise_error(ActiveRecord::RecordInvalid)
+          end
+
+          it "doesn't include the default_enabled param if it's not present" do
+            expect(subject.count { |p| p[:default].present? }).to be(0)
+          end
+
+          it "doesn't include the default_enabled param if it's set to true" do
+            lti_tool_configuration[:messages].first[Registration::COURSE_NAV_DEFAULT_ENABLED_EXTENSION] = true
+            expect(subject.count { |p| p[:default].present? }).to be(0)
+          end
+
+          it "includes the default_enabled param only for the course_navigation placement" do
+            lti_tool_configuration[:messages].first[Registration::COURSE_NAV_DEFAULT_ENABLED_EXTENSION] = false
+            expect(subject.find { |p| p[:placement] == "course_navigation" }).to eq(canvas_placement_hash.merge(placement: "course_navigation", default: "disabled", selection_width: 200, selection_height: 300))
+            expect(subject.count { |p| p[:default] == "disabled" }).to be(1)
           end
         end
       end
