@@ -51,6 +51,32 @@ describe CC::AssignmentResources do
       end
     end
 
+    context "with time_zone_edited" do
+      context "when time_zone_edited is given" do
+        let(:expected_time_zone_edited) { "Mountain Time (US & Canada)" }
+
+        before do
+          assignment.time_zone_edited = expected_time_zone_edited
+          assignment.save!
+        end
+
+        it "sets the time_zone_edited" do
+          expect(subject.at("time_zone_edited").text).to eq(expected_time_zone_edited)
+        end
+      end
+
+      context "when time_zone_edited is missing" do
+        before do
+          assignment.time_zone_edited = nil
+          assignment.save!
+        end
+
+        it "does not set the time_zone_edited" do
+          expect(subject.at("time_zone_edited")).to be_nil
+        end
+      end
+    end
+
     context "with an associated LTI 1.3 tool" do
       let(:assignment) do
         course.assignments.new(
