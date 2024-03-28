@@ -1018,6 +1018,51 @@ describe "threaded discussions" do
         expect(authors).not_to include("student")
         expect(authors).not_to include("Mr Nil")
       end
+
+      it "allows liking" do
+        @teacher.preferences[:discussions_splitscreen_view] = false
+        @teacher.save!
+
+        anon_topic = @course.discussion_topics.create!(
+          user: @teacher,
+          title: "Fully Anonymous Topic",
+          message: "Teachers, TAs and Designers are anonymized",
+          workflow_state: "published",
+          anonymous_state: "full_anonymity",
+          allow_rating: true
+        )
+
+        @first_reply = anon_topic.discussion_entries.create!(
+          user: @teacher,
+          message: "1st level reply"
+        )
+
+        @second_reply = DiscussionEntry.create!(
+          message: "2nd level reply",
+          discussion_topic_id: @first_reply.discussion_topic_id,
+          user_id: @student.id,
+          root_entry_id: @first_reply.id,
+          parent_id: @first_reply.id
+        )
+
+        expect(@second_reply.rating_sum).to be_nil
+        user_session(@teacher)
+        get "/courses/#{@course.id}/discussion_topics/#{anon_topic.id}"
+        wait_for_ajaximations
+
+        f(".discussion-expand-btn").click
+        wait_for_ajaximations
+        expect(fj("div:contains('2nd level reply')")).to be_truthy
+
+        ff("[data-testid='like-button']")[1].click
+        wait_for_ajaximations
+        expect(@second_reply.reload.rating_sum).to eq(1)
+
+        ff("[data-testid='like-button']")[1].click
+        wait_for_ajaximations
+        expect(fj("div:contains('2nd level reply')")).to be_truthy
+        expect(@second_reply.reload.rating_sum).to eq(0)
+      end
     end
 
     context "partially anonymous discussions" do
