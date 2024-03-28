@@ -23,6 +23,10 @@ import template from '../../jst/calendarHeader.handlebars'
 import CalendarNavigator from './CalendarNavigator'
 import {publish, subscribe} from 'jquery-tinypubsub'
 
+import React from 'react'
+import ReactDOM from 'react-dom'
+import CalendarHeaderComponent from '../../react/CalendarHeaderComponent'
+
 extend(CalendarHeader, Backbone.View)
 
 function CalendarHeader() {
@@ -33,12 +37,14 @@ function CalendarHeader() {
 
 CalendarHeader.prototype.template = template
 
-CalendarHeader.prototype.els = {
-  '.calendar_view_buttons': '$calendarViewButtons',
-  '.recommend_agenda': '$recommendAgenda',
-  '.calendar_navigator': '$navigator',
-  '#create_new_event_link': '$createNewEventLink',
-  '#refresh_calendar_link': '$refreshCalendarLink',
+if (!ENV.FEATURES?.instui_header) {
+  CalendarHeader.prototype.els = {
+    '.calendar_view_buttons': '$calendarViewButtons',
+    '.recommend_agenda': '$recommendAgenda',
+    '.calendar_navigator': '$navigator',
+    '#create_new_event_link': '$createNewEventLink',
+    '#refresh_calendar_link': '$refreshCalendarLink',
+  }
 }
 
 CalendarHeader.prototype.events = {
@@ -55,15 +61,7 @@ CalendarHeader.prototype.events = {
 
 CalendarHeader.prototype.initialize = function () {
   CalendarHeader.__super__.initialize.apply(this, arguments)
-  this.render()
-  this.navigator = new CalendarNavigator({
-    el: this.$navigator,
-  })
-  this.showNavigator()
-  // The badge is part of the buttonset, so we can't find it beforehand with els
-  this.$badge = this.$el.find('.counter-badge')
-  this.setSchedulerBadgeCount(0)
-  return this.connectEvents()
+  return this.render()
 }
 
 CalendarHeader.prototype.connectEvents = function () {
@@ -154,14 +152,26 @@ CalendarHeader.prototype._selectAgenda = function (_event) {
 }
 
 CalendarHeader.prototype._triggerWeek = function (_event) {
+  if (ENV.FEATURES?.instui_header) {
+    document.dispatchEvent(new CustomEvent('calendar:header:select_view', {detail: {viewName: 'week'}}))
+  }
+
   return this.trigger('week')
 }
 
 CalendarHeader.prototype._triggerMonth = function (_event) {
+  if (ENV.FEATURES?.instui_header) {
+    document.dispatchEvent(new CustomEvent('calendar:header:select_view', {detail: {viewName: 'month'}}))
+  }
+
   return this.trigger('month')
 }
 
 CalendarHeader.prototype._triggerAgenda = function (_event) {
+  if (ENV.FEATURES?.instui_header) {
+    document.dispatchEvent(new CustomEvent('calendar:header:select_view', {detail: {viewName: 'agenda'}}))
+  }
+  
   return this.trigger('agenda')
 }
 
@@ -187,6 +197,43 @@ CalendarHeader.prototype._handleKeyDownEvent = function (event) {
       event.preventDefault()
       return this.moveToCalendarViewButton('next')
   }
+}
+
+CalendarHeader.prototype._loadObjects = function(options = null) {
+  this.navigator = new CalendarNavigator({
+    el: this.$navigator,
+    size: options?.size,
+  })
+  this.showNavigator()
+  // The badge is part of the buttonset, so we can't find it beforehand with els
+  this.$badge = this.$el.find('.counter-badge')
+  this.setSchedulerBadgeCount(0)
+  this.connectEvents()
+}
+
+CalendarHeader.prototype.afterRender = function() {
+  if (!ENV.FEATURES?.instui_header) {
+    return this._loadObjects()
+  }
+
+  ReactDOM.render(
+    <CalendarHeaderComponent 
+      bridge={{
+        onLoadReady: (options) => {
+          if (this.navigator) return
+
+          this.$calendarViewButtons = this.$el.find('.calendar_view_buttons')
+          this.$recommendAgenda = this.$el.find('.recommend_agenda')
+          this.$navigator = this.$el.find('.calendar_navigator')
+          this.$createNewEventLink = this.$el.find('#create_new_event_link')
+          this.$refreshCalendarLink = this.$el.find('#refresh_calendar_link')
+
+          this._loadObjects(options)
+        },
+        onChangeSelectViewMode: (viewName) => this.selectView(viewName),
+      }} />, 
+    this.$el.find('#calendar_header_component')[0]
+  )
 }
 
 export default CalendarHeader
