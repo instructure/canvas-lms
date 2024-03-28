@@ -246,6 +246,11 @@ export default class DeveloperKeyModal extends React.Component<Props, State> {
     } = {}
     if (this.isJsonConfig) {
       if (!this.state.toolConfiguration) {
+        // TODO: I don't think this code is called as we initialize
+        // toolConfiguration to an empty object, which is truthy. Fixing this
+        // correctly with regards to invalid JSON is a bit more involved,
+        // though, and simply enabling this has the effect of doing nothing
+        // when the JSON is unchanged
         this.setState({submitted: true})
         return
       }

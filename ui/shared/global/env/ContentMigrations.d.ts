@@ -32,4 +32,5 @@ export interface EnvContentMigrations {
   NEW_QUIZZES_MIGRATION?: boolean
   QUIZZES_NEXT_ENABLED?: boolean
   NEW_QUIZZES_MIGRATION_DEFAULT?: boolean
+  EXPORT_WARNINGS?: string[]
 }

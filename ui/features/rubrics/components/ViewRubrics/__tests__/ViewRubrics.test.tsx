@@ -19,10 +19,10 @@
 import React from 'react'
 import Router from 'react-router'
 import {BrowserRouter} from 'react-router-dom'
-import {fireEvent, render} from '@testing-library/react'
+import {fireEvent, render, waitFor} from '@testing-library/react'
 import {QueryProvider, queryClient} from '@canvas/query'
 import {ViewRubrics} from '../index'
-import {RUBRICS_QUERY_RESPONSE} from './fixtures'
+import {RUBRICS_QUERY_RESPONSE, RUBRIC_PREVIEW_QUERY_RESPONSE} from './fixtures'
 
 jest.mock('react-router', () => ({
   ...jest.requireActual('react-router'),
@@ -60,12 +60,12 @@ describe('ViewRubrics Tests', () => {
       expect(getByTestId('rubric-title-1')).toHaveTextContent('Rubric 3')
       expect(getByTestId('rubric-points-1')).toHaveTextContent('15')
       expect(getByTestId('rubric-criterion-count-1')).toHaveTextContent('3')
-      expect(getByTestId('rubric-locations-1')).toHaveTextContent('-')
+      expect(getByTestId('rubric-locations-1')).toHaveTextContent('courses and assignments')
 
       expect(getByTestId('rubric-title-1')).toHaveTextContent('Rubric 3')
       expect(getByTestId('rubric-points-1')).toHaveTextContent('15')
       expect(getByTestId('rubric-criterion-count-1')).toHaveTextContent('3')
-      expect(getByTestId('rubric-locations-1')).toHaveTextContent('-')
+      expect(getByTestId('rubric-locations-1')).toHaveTextContent('courses and assignments')
 
       const archivedRubricsTab = getByText('Archived')
       archivedRubricsTab.click()
@@ -206,6 +206,46 @@ describe('ViewRubrics Tests', () => {
         const sortedCriterion = ['3', '1']
         expect(getByTestId('rubric-criterion-count-0')).toHaveTextContent(sortedCriterion[1])
         expect(getByTestId('rubric-criterion-count-1')).toHaveTextContent(sortedCriterion[0])
+      })
+
+      it('sorts rubrics by Location Used in ascending order', () => {
+        queryClient.setQueryData(['accountRubrics-1'], RUBRICS_QUERY_RESPONSE)
+        const {getByTestId, getByText} = renderComponent()
+
+        const locationUsedHeader = getByText('Location Used')
+        fireEvent.click(locationUsedHeader)
+
+        const sortedLocations = ['courses and assignments', '-']
+        expect(getByTestId('rubric-locations-0')).toHaveTextContent(sortedLocations[0])
+        expect(getByTestId('rubric-locations-1')).toHaveTextContent(sortedLocations[1])
+      })
+
+      it('sorts rubrics by Location Used in descending order', () => {
+        queryClient.setQueryData(['accountRubrics-1'], RUBRICS_QUERY_RESPONSE)
+        const {getByTestId, getByText} = renderComponent()
+
+        const locationUsedHeader = getByText('Location Used')
+        fireEvent.click(locationUsedHeader)
+        fireEvent.click(locationUsedHeader)
+
+        const sortedLocations = ['-', 'courses and assignments']
+        expect(getByTestId('rubric-locations-0')).toHaveTextContent(sortedLocations[0])
+        expect(getByTestId('rubric-locations-1')).toHaveTextContent(sortedLocations[1])
+      })
+
+      it('filters rubrics based on search query at account level', () => {
+        queryClient.setQueryData(['accountRubrics-1'], RUBRICS_QUERY_RESPONSE)
+        const {getByTestId, queryByText} = renderComponent()
+
+        expect(getByTestId('saved-rubrics-panel').querySelectorAll('tr').length).toBe(3)
+
+        const searchInput = getByTestId('rubric-search-bar')
+        fireEvent.change(searchInput, {target: {value: '1'}})
+
+        expect(getByTestId('saved-rubrics-panel').querySelectorAll('tr').length).toBe(2)
+        expect(queryByText('Rubric 1')).not.toBeNull()
+        expect(queryByText('Rubric 2')).toBeNull()
+        expect(queryByText('Rubric 3')).toBeNull()
       })
     })
   })
@@ -229,12 +269,12 @@ describe('ViewRubrics Tests', () => {
       expect(getByTestId('rubric-title-1')).toHaveTextContent('Rubric 3')
       expect(getByTestId('rubric-points-1')).toHaveTextContent('15')
       expect(getByTestId('rubric-criterion-count-1')).toHaveTextContent('3')
-      expect(getByTestId('rubric-locations-1')).toHaveTextContent('-')
+      expect(getByTestId('rubric-locations-1')).toHaveTextContent('courses and assignments')
 
       expect(getByTestId('rubric-title-1')).toHaveTextContent('Rubric 3')
       expect(getByTestId('rubric-points-1')).toHaveTextContent('15')
       expect(getByTestId('rubric-criterion-count-1')).toHaveTextContent('3')
-      expect(getByTestId('rubric-locations-1')).toHaveTextContent('-')
+      expect(getByTestId('rubric-locations-1')).toHaveTextContent('courses and assignments')
 
       const archivedRubricsTab = getByText('Archived')
       archivedRubricsTab.click()
@@ -376,6 +416,80 @@ describe('ViewRubrics Tests', () => {
         expect(getByTestId('rubric-criterion-count-0')).toHaveTextContent(sortedCriterion[1])
         expect(getByTestId('rubric-criterion-count-1')).toHaveTextContent(sortedCriterion[0])
       })
+
+      it('sorts rubrics by Location Used in ascending order', () => {
+        queryClient.setQueryData(['courseRubrics-1'], RUBRICS_QUERY_RESPONSE)
+        const {getByTestId, getByText} = renderComponent()
+
+        const locationUsedHeader = getByText('Location Used')
+        fireEvent.click(locationUsedHeader)
+
+        const sortedLocations = ['courses and assignments', '-']
+        expect(getByTestId('rubric-locations-0')).toHaveTextContent(sortedLocations[0])
+        expect(getByTestId('rubric-locations-1')).toHaveTextContent(sortedLocations[1])
+      })
+
+      it('sorts rubrics by Location Used in descending order', () => {
+        queryClient.setQueryData(['courseRubrics-1'], RUBRICS_QUERY_RESPONSE)
+        const {getByTestId, getByText} = renderComponent()
+
+        const locationUsedHeader = getByText('Location Used')
+        fireEvent.click(locationUsedHeader)
+        fireEvent.click(locationUsedHeader)
+
+        const sortedLocations = ['-', 'courses and assignments']
+        expect(getByTestId('rubric-locations-0')).toHaveTextContent(sortedLocations[0])
+        expect(getByTestId('rubric-locations-1')).toHaveTextContent(sortedLocations[1])
+      })
+    })
+  })
+
+  describe('preview tray', () => {
+    beforeAll(() => {
+      jest.spyOn(Router, 'useParams').mockReturnValue({accountId: '1'})
+    })
+
+    const getPreviewTray = () => {
+      return document.querySelector('[role="dialog"][aria-label="Rubric Assessment Tray"]')
+    }
+
+    queryClient.setQueryData(['accountRubrics-1'], RUBRICS_QUERY_RESPONSE)
+    queryClient.setQueryData(['rubric-preview-1'], RUBRIC_PREVIEW_QUERY_RESPONSE)
+
+    it('opens the preview tray when a rubric is clicked', () => {
+      const {getByTestId} = renderComponent()
+
+      const previewCell = getByTestId('rubric-title-preview-1')
+      previewCell.click()
+
+      expect(getPreviewTray()).toBeInTheDocument()
+      expect(getByTestId('traditional-criterion-1-ratings-0')).toBeInTheDocument()
+    })
+
+    it('closes the preview tray when the same rubric is clicked again', async () => {
+      const {getByTestId} = renderComponent()
+
+      const previewCell = getByTestId('rubric-title-preview-1')
+      previewCell.click()
+      expect(getByTestId('traditional-criterion-1-ratings-0')).toBeInTheDocument()
+
+      previewCell.click()
+      await waitFor(() => expect(getPreviewTray()).not.toBeInTheDocument())
+    })
+
+    it('filters rubrics based on search query at course level', () => {
+      queryClient.setQueryData(['courseRubrics-1'], RUBRICS_QUERY_RESPONSE)
+      const {getByTestId, queryByText} = renderComponent()
+
+      expect(getByTestId('saved-rubrics-panel').querySelectorAll('tr').length).toBe(3)
+
+      const searchInput = getByTestId('rubric-search-bar')
+      fireEvent.change(searchInput, {target: {value: '1'}})
+
+      expect(getByTestId('saved-rubrics-panel').querySelectorAll('tr').length).toBe(2)
+      expect(queryByText('Rubric 1')).not.toBeNull()
+      expect(queryByText('Rubric 2')).toBeNull()
+      expect(queryByText('Rubric 3')).toBeNull()
     })
   })
 })

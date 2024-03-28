@@ -621,6 +621,7 @@ class DiscussionTopicsController < ApplicationController
       allow_student_anonymous_discussion_topics: @context.allow_student_anonymous_discussion_topics,
       context_is_not_group: !@context.is_a?(Group),
       GRADING_SCHEME_UPDATES_ENABLED: Account.site_admin.feature_enabled?(:grading_scheme_updates),
+      DISCUSSION_CHECKPOINTS_ENABLED: @context.root_account.feature_enabled?(:discussion_checkpoints)
     }
 
     post_to_sis = Assignment.sis_grade_export_enabled?(@context)
@@ -734,7 +735,7 @@ class DiscussionTopicsController < ApplicationController
       add_rss_links_to_content
     end
 
-    if @context.is_a?(Course) && @context.grants_right?(@current_user, session, :manage)
+    if (@context.is_a?(Course) || @context.is_a?(Group)) && @context.grants_right?(@current_user, session, :manage)
       set_student_context_cards_js_env
     end
 

@@ -16,77 +16,113 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React from 'react'
 import {Text} from '@instructure/ui-text'
-import {TextArea} from '@instructure/ui-text-area'
-import {View} from '@instructure/ui-view'
-import {Rating} from '@instructure/ui-rating'
-import {Tooltip} from '@instructure/ui-tooltip'
+import {IconButton} from '@instructure/ui-buttons'
+import {Link} from '@instructure/ui-link'
+import {ProgressBar} from '@instructure/ui-progress'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import {Heading} from '@instructure/ui-heading'
+import {Flex} from '@instructure/ui-flex'
+import {IconLikeLine, IconAssignmentLine, IconDocumentLine, IconAnnouncementLine, IconDiscussionLine} from '@instructure/ui-icons'
+import {View} from '@instructure/ui-view'
 
 const I18n = useI18nScope('SmartSearch')
 
-export default function SearchResult(props) {
-  function ellipsize(str, max) {
-    if (str.length > max) {
-      return str.substring(0, max - 3) + '...'
-    }
-    return str
+const preview = (body, maxLength = 512) => {
+  const preview = []
+  const words = body.match(/\w+/g)
+
+  while (preview.join(' ').length < maxLength) {
+    preview.push(words.shift())
   }
 
-  // Cosine distance = 1 — cosine similarity.
-  // Range of cosine distance is from 0 to 2,
-  // 0 — identical vectors, 1 — no correlation,
-  // 2 — absolutely different.
-  // We are interested in range of 0 to 1, so we
-  // subtract the distance from 1 and multiply by 100.
+  return preview.join(' ') + '...'
+}
 
-  function getRelevance(record) {
-    let relevance = 100.0 * (1.0 - record.distance)
-    let tooltipText = `
-      ${I18n.t('Relevance')}: ${Math.round(relevance)}%
-      ${I18n.t('Distance')}: ${record.distance.toFixed(3)}
-    `
-    return (
-      <Tooltip renderTip={tooltipText} as="span">
-        <Rating label={I18n.t('Relevance')} valueNow={relevance} iconCount={5} valueMax={100} />
-      </Tooltip>
-    )
-  }
+const relevance = distance => {
+  return Math.round(100.0 * (1.0 - distance))
+}
 
-  if (props.searchResult.content_type === 'WikiPage') {
-    // id, wiki_id, title, body, etc.
-    const wiki_page = props.searchResult
-    return (
-      <View
-        as="div"
-        margin="small"
-        padding="small"
-        borderWidth="small"
-        borderRadius="medium"
-        shadow="resting"
-      >
-        <h3>{wiki_page.title}</h3>
-        <h4>{I18n.t('Course Page')}</h4>
-        <Text as="div" size="medium" color="secondary">
-          {ellipsize(wiki_page.body, 1000)}
-        </Text>
-        <View as="div">{getRelevance(wiki_page)}</View>
-        <View as="div">
-          <a href={wiki_page.html_url} target="_blank">
-            {I18n.t('View Full Page')}
-          </a>
-        </View>
-      </View>
-    )
-  } else if (props.searchResult.discussion_topic) {
-    // TODO: implement discussion_topic or other record type
-  } else {
-    // Unknown type, just dump json
-    return (
-      <View as="div" margin="small" padding="small">
-        <TextArea value={JSON.stringify(props.searchResult)} />
-      </View>
-    )
+const icon_class = content_type => {
+  switch (content_type) {
+    case 'Assignment':
+      return IconAssignmentLine
+    case 'Announcement':
+      return IconAnnouncementLine
+    case 'DiscussionTopic':
+      return IconDiscussionLine
+    default:
+      return IconDocumentLine
   }
+}
+
+export default function SearchResult({onExplain, onLike, onDislike, result}) {
+  const {body, content_id, content_type, distance, html_url, readable_type, title} = result
+
+  return (
+    <View as="li" borderColor="primary" borderWidth="small 0 0 0" padding="medium 0">
+      <Flex alignItems={'start'} as="div" gap="large" justifyItems={'space-between'}>
+        <Flex.Item shouldShrink={true} size="60%">
+          <Heading as={'h2'} level={'h3'}>
+            {title}
+          </Heading>
+
+          <Link href={html_url} isWithinText={false} renderIcon={React.createElement(icon_class(content_type), {color: 'brand', size: 'x-small'})}>
+            {readable_type}
+          </Link>
+
+          <Text as="p" size="small">
+            {preview(body)}
+          </Text>
+        </Flex.Item>
+        <Flex.Item shouldShrink={true}>
+          <Flex gap="small">
+            <Flex.Item as="div">
+              <Text size={'small'} weight="bold">
+                {I18n.t('%{percent}% Relevance', {percent: relevance(distance)})}
+              </Text>
+              <ProgressBar
+                meterColor="success"
+                size={'x-small'}
+                screenReaderLabel={I18n.t('Relevance')}
+                valueNow={relevance(distance)}
+                valueMax={100}
+                width={'150px'}
+              />
+              <span className="hidden">
+                <Text size="small">
+                  <Link
+                    as="button"
+                    onClick={_ => onExplain({id: content_id, type: content_type})}
+                    margin="small 0 0 0"
+                  >
+                    {I18n.t('Why was this result received?')}
+                  </Link>
+                </Text>
+              </span>
+            </Flex.Item>
+            <Flex.Item>
+              <IconButton
+                onClick={_ => onLike({id: content_id, type: content_type})}
+                screenReaderLabel={I18n.t('I like this result')}
+                renderIcon={<IconLikeLine />}
+                withBackground={false}
+                withBorder={false}
+              />
+              <span style={{display: 'inline-block', transform: 'rotate(180deg)'}}>
+                <IconButton
+                  onClick={_ => onDislike({id: content_id, type: content_type})}
+                  screenReaderLabel={I18n.t('I do not like this result')}
+                  renderIcon={<IconLikeLine />}
+                  withBackground={false}
+                  withBorder={false}
+                />
+              </span>
+            </Flex.Item>
+          </Flex>
+        </Flex.Item>
+      </Flex>
+    </View>
+  )
 }

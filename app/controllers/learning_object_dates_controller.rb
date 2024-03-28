@@ -52,6 +52,11 @@
 #           "example": false,
 #           "type": "boolean"
 #         },
+#         "graded": {
+#           "description": "whether the learning object is graded (and thus has a due date)",
+#           "example": true,
+#           "type": "boolean"
+#         },
 #         "blueprint_date_locks": {
 #           "description": "[exclusive to blueprint child content only] list of lock types",
 #           "example": ["due_dates", "availability_dates"],

@@ -399,6 +399,7 @@ da-x-k12:
     tab_brand_configs: Temaer
     tab_courses: Fag
     tab_developer_keys: "Udvikler nøgler"
+    tab_extensions: Udvidelser
     tab_faculty_journal: Undervisernotater
     tab_grading_standards: Vurdering
     tab_jobs: Jobs
@@ -2435,6 +2436,7 @@ da-x-k12:
   all_4321c3a1: Alle
   all_account_types_e83c1516: "Alle kontotyper"
   all_accounts_3bafc860: "Alle konti"
+  all_assignees_removed_14639499: "Alle tildelte er fjernet"
   all_assignment_groups_a65e9e46: "Alle opgavegrupper"
   all_assignments_b79a4d6a: "Alle opgaver"
   all_changes_published_27a53ffd: "Alle ændringer offentliggjort"
@@ -5984,11 +5986,14 @@ da-x-k12:
   cas_server_rejected_ticket_message_code_a6ef4093: "CAS-server afviste billet: %{message} (%{code})"
   cas_url_4ba2843e: "CAS URL"
   catalan_16f6b78f: Katalansk
+  catalog_account_not_found_c786ce35: "Katalogkonto ikke fundet"
+  catalog_account_to_copy_fa180ff4: "Katalogkonto til at kopiere"
   catalog_already_enabled_56478a3c: "Catalog allerede aktiveret"
   catalog_manage_f57e50f3: "Katalog - administrer"
   catalog_name_46d37909: Catalog-navn
   catalog_url_a01655dd: Catalog-URL
   catalog_users_already_exist_2894b8c4: "Catalog-brugere eksisterer allerede"
+  catalog_was_copied_over_successfully_but_there_was_73889dd1: "Katalog blev kopieret, men der opstod et problem med at synkronisere tilmeldingerne fra Canvas"
   catalog_was_provisioned_9851448f: "Katalog var klargjort."
   catalog_was_unprovisioned_9524cb58: "Kataloget var ikke-klargjort."
   catalog_was_updated_743a58eb: "Katalog blev opdateret."
@@ -6789,6 +6794,7 @@ da-x-k12:
   confirmation_failed_please_try_again_ae566d37: "Bekræftelse mislykkedes. Prøv igen."
   confused_panda_questioning_what_to_do_next_42941484: "Forvirret Panda spørger, hvad hun skal gøre"
   consider_selecting_multiple_submission_types_to_ac_f7e624d5: "Overvej at vælge flere afleveringsformer for at gøre det muligt for elever, der ikke nødvendigvis kan oprette kommentarer."
+  consistent_inheritance_logic_for_developer_keys_in_167f9061: "Konsistent nedarvningslogik for udvikler-nøgler i ikke-CMC-konsortier"
   consistent_lti_ags_ids_based_on_account_s_principa_b93fa45: "Konsistente LTI AGS-ID'er baseret på kontoens hoveddomæne"
   consortium_parent_keys_803547b: "Consortium overordnede nøgler"
   consumer_key_6f94ba11: Forbrugernøgle
@@ -7560,6 +7566,7 @@ da-x-k12:
   copy_9748f9f: Kopi
   copy_assignment_name_to_another_course_b62d0a54: "Kopiér opgave %{name} til et andet fag"
   copy_blueprint_course_settings_31a97e96: "Kopiér indstillinger til Blueprint-fag"
+  copy_content_615608a7: "Kopier indhold"
   copy_list_of_shard_ids_d51cd846: "Kopier liste over shard-ID'er"
   copy_operation_started_successfully_b2f236a1: "Kopiering blev påbegyndt"
   copy_page_to_another_course_405cc07c: "Kopiér side til et andet fag"
@@ -7573,6 +7580,7 @@ da-x-k12:
   copy_to_clipboard_493be1b: "Kopier til udklipsholder"
   copy_to_folder_32ecc3c3: "Kopiér til mappe"
   copying_628a9607: "Kopierer ..."
+  copying_the_content_of_a_template_catalog_5bd6f3b0: "Kopiering af indholdet af et skabelonkatalog"
   copyright_and_license_information_must_be_provided_5feffaf: "Der skal gives ophavsrets- og licensoplysninger for filer, før de offentliggøres."
   copyright_holder_386cc8b8: "Indehaver af ophavsret"
   copyright_holder_66ee111: "Rettighedshaver:"
@@ -8932,6 +8940,7 @@ da-x-k12:
   crumbs: 
     access_report: Adgangsrapport
     announcements: Beskeder
+    apps: Udvidelser
     assignments: Opgaver
     calendar_events: Kalenderbegivenheder
     collaborations: Samarbejde
@@ -9581,6 +9590,9 @@ da-x-k12:
   designers_add_fe7e1ea9: "Designere - Tilføj"
   designers_remove_39f50ec9: "Designere - fjern"
   designers_remove_3e590bff: "Designere - Fjern"
+  destination_account_is_not_a_root_account_2f890dff: "Destinationskontoen er ikke en rodkonto"
+  destination_account_is_not_empty_561f7e55: "Destinationskontoen er ikke tom"
+  destination_account_not_found_274f33d4: "Destinationskontoen blev ikke fundet"
   details_98a31b68: "Nærmere oplysninger"
   details_a6f427c3: "Detaljer:"
   determined_by_course_end_date_5e3ffb4f: "Bestemt af fagets slutdato"
@@ -9751,6 +9763,8 @@ da-x-k12:
   discard_changes_e04b15f9: "Annuller ændringer"
   discarded_20a4e7e8: Kasseret
   disccussions_515a3a99: Diskussioner
+  discover_56d42b60: Opdag
+  discover_something_new_or_manage_existing_lti_exte_793093cb: "Opdag noget nyt, eller administrer eksisterende LTI-udvidelser"
   discovery_service_url_ca13d3f4: "Opdagelsesservice URL"
   discovery_url_3dce06d9: "Discovery URL"
   discussion_6719c51d: Diskussion
@@ -10222,6 +10236,7 @@ da-x-k12:
   download_these_results_as_csv_9a890883: "Download disse resultater som CSV"
   download_this_file_669f9174: "Download denne fil"
   downloading_course_content_allows_access_to_conten_164d9336: "Download af fagindhold giver adgang til indhold, når du er offline. Indholdet kan omfatte filer, sider, opgaver, diskussionsemner eller quizzer. Klik på \"Generer ePub\" for hvert fag og åbn med en vilkårlig software til E-læser for at vise."
+  draft_83493fcd: Kladde
   draft_92507c72: (udkast)
   draft_comment_b2376ea4: "Kladde kommentar"
   draft_comment_warning_modal_in_speedgrader_ded232c1: "Kommentarudkast-advarsel i SpeedGrader"
@@ -10597,6 +10612,7 @@ da-x-k12:
   enable_gravatar_8a865b41: "Aktiver Gravatar"
   enable_i18n_features_in_outcomes_exports_64bcf82b: "Aktivér i18n-funktioner i eksport af læringsudbytte"
   enable_individual_learning_paths_for_students_base_5236d3bb: "Aktiver individuelle læringsstier for elever ud fra bedømmelse."
+  enable_irish_language_support_in_canvas_fe7abaf8: "Aktiver understøttelse af irsk sprog i Canvas"
   enable_labels_on_the_new_inbox_page_485ce65a: "Aktivér mærkater på den nye indbakke-side"
   enable_migrating_item_banks_to_new_quizzes_during__af6ca020: "Aktivér overførsel af elementbanker til New Quizzes under fagimport / -kopiering"
   enable_moderated_grading_bacd20d8: "Aktiver samlet vurdering."
@@ -11440,6 +11456,7 @@ da-x-k12:
   extend_due_date_20651e76: "Forlæng afleveringsdato"
   extended_632ebee0: udvidet
   extended_9a58dcb6: Udvidet
+  extensions_7250a0bb: Udvidelser
   external_apps_account_course_settings_78de2b2f: "Eksterne apps (konto, fagindstillinger)"
   external_apps_account_course_settings_c44af5ef: "Eksterne apps (konto-/fagindstillinger)"
   external_apps_course_settings_1f045644: "Eksterne apps (fagindstillinger)"
@@ -14124,6 +14141,8 @@ da-x-k12:
   instructor_is_working_on_grades_135388d2: "Instruktøren arbejder på vurderinger"
   instructor_messages_a4c28674: Instruktørbeskeder
   instructor_name_36bc0f39: "Instruktørens navn"
+  instructor_points_2cd28bd1: Instruktørpoint
+  instructor_score_6e11587f: Instruktørresultat
   instructor_sis_id_899dd697: "Instruktør SIS-ID"
   instructors_4b491a07: instruktører
   instructors_are_not_bound_by_attempt_limits_but_an_20b78fea: "Instruktører er ikke bundet af forsøgsgrænser, men en instruktørs aflevering VIL tælle som en elevs forsøg."
@@ -14294,6 +14313,7 @@ da-x-k12:
   invalid_fields_for_a_group_invalid_f440b733: "Ugyldige felter for en gruppe: %{invalid}"
   invalid_fields_for_an_outcome_invalid_fafdf0df: "Ugyldige felter for et læringsudbytte: %{invalid}"
   invalid_file_type_881cc9b2: "Ugyldig filtype"
+  invalid_filter_d6ec4d0b: "Ugyldigt filter"
   invalid_freq_freq_84b0427d: "Ugyldig FREQ '%{freq}'"
   invalid_grade_9726cbc6: "Ugyldig vurdering"
   invalid_grade_passback_setting_a1d209d1: "Ugyldig grade_passback_setting"
@@ -14356,6 +14376,7 @@ da-x-k12:
   ip_filter_is_not_valid_152a46d8: "IP-filter ikke gyldigt."
   ireland_353_3cd32cc0: "Irland (+353)"
   irish_567e109f: Irsk
+  irish_language_support_e09996c4: "Støtte til irsk sprog"
   is_blueprint_8f793ba8: is_blueprint
   is_invalid_702840b6: "er ugyldig"
   is_public_ca8561e8: is_public
@@ -14755,6 +14776,7 @@ da-x-k12:
   leave_5e852989: Forlad
   leave_a_comment_7991725b: "Skriv en kommentar"
   leave_blank_for_no_limit_e8f80808: "Efterlad tom for ingen grænse"
+  leave_criterion_comment_707a4f18: "Skriv kriteriekommentar"
   leave_group_group_name_6847c632: "Forlad gruppen %{group_name}"
   left_group_group_name_aac4e813: "Forladt gruppen %{group_name}"
   len_maxlen_97f1c88d: "%{len}/%{maxLen}"
@@ -14869,6 +14891,7 @@ da-x-k12:
   like_post_from_author_79b874f1: "Synes godt om et indlæg fra %{author}"
   like_this_entry_60da41a5: "Synes godt om dette indlæg"
   limit_assignment_names_lengths_max_255_5ee9ebb5: "Begræns indsendelsers navnelængde (maks. 255)"
+  limit_certain_lti_placements_to_authorized_tools_f4384cb6: "Begræns visse LTI-placeringer til autoriserede værktøjer"
   limit_course_participation_to_term_or_custom_cours_67797a86: "Begræns fagdeltagelse til skoleår eller tilpassede fagdatoer?"
   limit_each_time_slot_to_input_value_user_s_47461538: "Begræns hvert tidsrum til %{input_value} bruger(e). "
   limit_each_time_slot_to_num_participants_groups_us_14ec4d65: "Begræns hver tidsrum til %{num_participants} *grupper.* **brugere.**"
@@ -15094,6 +15117,7 @@ da-x-k12:
   lock_selected_announcements_33740f80: "Lås valgte beskeder"
   lock_this_setting_for_sub_accounts_2ae5af17: "Lås denne indstilling for underkonti"
   lock_until_549bb904: "Lås indtil"
+  locked_1d1eaa8c: "Låst: "
   locked_762f138b: Låst
   locked_796957c7: "Låst:"
   locked_at_cda02889: Låst
@@ -15275,6 +15299,8 @@ da-x-k12:
   lti_delete_ee5f1bef: "LTI - slet"
   lti_dynamic_registration_8592edb0: "LTI dynamisk registrering"
   lti_edit_83a27850: "LTI - rediger"
+  lti_extensions_discover_page_93e4d9e0: "Side til at finde LTI-udvidelser"
+  lti_extensions_page_4269b418: LTI-udvidelsesside
   lti_key_14ad02b1: LTI-nøgle
   lti_keys_5677ba9e: LTI-nøgler
   lti_launch_af082dc3: "LTI-lancering:"
@@ -15282,6 +15308,9 @@ da-x-k12:
   lti_multiple_assignment_deep_linking_b7d641d7: "LTI flere dybe links til opgaver"
   lti_platform_storage_9d11dc60: LTI-platformslager
   lti_registration_9e0f754d: LTI-registrering
+  lti_registrations: 
+    index: 
+      title: Udvidelser
   lti_report_2b6193ab: LTI-rapport
   lti_submissions_require_a_url_to_submit_85ca9988: "LTI-afleveringer kræver en URL for at blive afleveret"
   lti_tool_report_f13213b3: LTI-værktøjsrapport
@@ -17798,6 +17827,7 @@ da-x-k12:
   name_is_locked_click_to_unlock_7aad9928: "%{name} er låst. Klik for at låse op"
   name_is_locked_click_to_unlock_bbebf03e: "%{name} er låst. Klik for at låse op."
   name_is_ready_to_be_assigned_temporary_enrollments_f39a6cf6: "%{name} er klar til at blive tildelt midlertidige tilmeldinger."
+  name_is_required_4341f774: "Navn er påkrævet"
   name_is_required_ba379522: "Navn er påkrævet"
   name_is_too_long_48daa8db: "Navn er for langt"
   name_is_too_long_must_be_under_length_characters_b8dad44c: "Navn er for lang, skal være under %{length} tegn"
@@ -18141,6 +18171,7 @@ da-x-k12:
   no_such_source_context_80a659ba: "ingen sådan kildekontekst"
   no_such_target_context_21158b9: "ingen sådan målkontekst"
   no_such_target_group_7e183d46: "ingen sådan målgruppe"
+  no_template_accounts_in_this_region_5e84955d: "Ingen skabelonkonti i denne region"
   no_template_selected_f59e797: "Ingen skabelon valgt"
   no_temporary_enrollment_click_to_create_one_a6bafdf4: "Ingen midlertidig tilmelding, klik for at oprette en"
   no_terms_eab5ee7b: "Ingen skoleår"
@@ -20031,6 +20062,7 @@ da-x-k12:
   prev_f82cbc48: Forrige
   prev_month_34bd934c: "Forrige måned"
   prevent_deletion_of_outcomes_with_alignments_in_os_65020476: "Forhindr sletning af læringsudbytter med justeringer i OS"
+  prevent_non_cmc_consortium_parent_dev_key_from_aff_418efa1c: "Forhindr ikke-CMC-konsortiets overordnede udvikler-nøgle i at påvirke værktøjer hos underordnede"
   prevents_students_from_leaving_annotations_in_assi_cb188d2: "Forhindrer elever i at skrive anmærkninger i opgaver. Gælder ikke for opgaver med elev-elev vurdering."
   preview_53003fd2: Eksempel
   preview_a3f8f854: FORHÅNDSVISNING
@@ -20367,8 +20399,10 @@ da-x-k12:
       yo: Yo
     you_have_no_services: "Ingen registrerede tjenester. Du kan tilføje dem på siden med *indstillinger*."
   profile_6bd2baed: Profil
+  profile_has_been_saved_successfully_12ffc6ea: "Profilen blev gemt"
   profile_photo_save_failed_too_many_times_e1ebda5: "Profilbilledet kunne ikke gemmes for mange gange"
   profile_pictures_15953851: Profilbilleder
+  profile_save_was_unsuccessful_6e27fb5e: "Profilen blev ikke gemt"
   profile_tray_bcec5044: Profilbakke
   profiles: 
     gravatar_view: 
@@ -21847,6 +21881,7 @@ da-x-k12:
       underkontoen "Manuelt oprettede fag", når denne funktion er aktiveret, tillader den
       deltagere, der manuelt kan oprette fag, at sætte disse fag på en hvilken som helst underkonto,
       hvor de har tilmeldinger.
+  rating_button_buttondisplay_8fb69a4e: "Vurderingsknap %{buttonDisplay}"
   rating_description_db6adf39: "Beskrivelse af bedømmelse"
   rating_display_b0b574be: Bedømmelsesvisning
   rating_max_score_eade1523: "Bedømmelse maks. resultat"
@@ -22637,6 +22672,7 @@ da-x-k12:
   rubric_assessment: 
     unknown_user: "Ukendt bruger"
   rubric_assessment_5f0e8a83: "Bedømmelse med vurderingskriterier"
+  rubric_assessment_view_mode_1038db: "Visningstilstand for vurderingskriterie"
   rubric_association: 
     no_details: "Inge detaljer"
   rubric_button_display_4e4a26fe: "Visning af vurderingskriterier-knap"
@@ -22734,6 +22770,7 @@ da-x-k12:
   save_11a80ec3: Gem
   save_and_customize_19eb7a7b: "Gem og tilpas"
   save_and_publish_1b765e7: "Gem og offentliggør"
+  save_as_draft_341d4577: "Gem som udkast"
   save_changes_698abe77: "Gem ændringer"
   save_criterion_cce60085: "Gem kriterie"
   save_customizations_dde779d8: "Gem tilpasninger"
@@ -23169,6 +23206,7 @@ da-x-k12:
   select_a_student_to_view_281d17b9: "Vælg en elev at få vist"
   select_a_student_to_view_additional_information_he_c371e40c: "Vælg en elev for at vise yderligere oplysninger her."
   select_a_student_to_view_the_page_will_refresh_aut_eaa5d00c: "Vælg en elev at få vist. Siden opdateres automatisk."
+  select_a_template_account_e0c03ee8: "Vælg en skabelonkonto"
   select_a_type_to_restore_de2c0d04: "Vælg en type, der skal gendannes"
   select_access_type_e5955544: "Vælg adgangstype"
   select_all_assignments_bd07b919: "Vælg alle opgaver"
@@ -24370,6 +24408,7 @@ da-x-k12:
   snapshots_6e1806b4: Øjebliksbilleder
   snapshots_are_backups_of_your_canvas_trial_taking__f18bd571: "Øjebliksbilleder er sikkerhedskopier af din Canvas-prøveversion. Når du tager et øjebliksbillede skaber du en unik \"version\", hvilket er en perfekt registrering af tilstanden af ​​din prøveperiode på tidspunktet for øjebliksbilledet."
   social_studies_13fa30c7: "Sociale studier"
+  some_assignments_are_associated_with_an_archived_o_e1856b65: "Nogle opgaver er knyttet til et arkiveret eller slettet vurderingssystem, og vurderingssystemet kan ikke eksporteres."
   some_assignments_could_not_be_created_because_they_d91f2f21: "Nogle opgaver kunne ikke oprettes, fordi de ville falde i en lukket vurderingsperiode."
   some_conferences_on_this_page_are_hidden_because_o_789684fd: "Nogle konferencer på denne side er skjulte grundet fejl under indhentning af deres status"
   some_custom_columns_could_not_be_changed_because_t_88abc9be: "Nogle brugerdefinerede kolonner kunne ikke ændres, fordi de var skrivebeskyttede. Ændringer for disse kolonner blev ignoreret."
@@ -25373,6 +25412,9 @@ da-x-k12:
   tell_us_how_and_when_you_would_like_to_be_notified_de3ed2bc: "Fortæl os, hvordan og hvornår du gerne vil informeres om begivenheder i Canvas."
   tempe_grade_export_c611da01: "Tempe vurderingseksport"
   template_account_21ac8f4f: Skabelonkonto
+  template_account_is_not_a_root_account_83ae89bc: "Skabelonkonto er ikke en rodkonto"
+  template_account_is_not_a_template_account_d80200ae: "Skabelonkonto er ikke en skabelonkonto"
+  template_account_not_found_7144542c: "Skabelonkonto blev ikke fundet"
   templates_4ca13d07: Skabeloner
   temporarily_enroll_a_user_into_a_course_this_tempo_990488f8: "Tilmeld midlertidigt en bruger til et fag. Denne midlertidige tilmelding er parret med en anden tilmelding i faget."
   temporarily_enroll_name_8acb66ce: "Tilmeld %{name} midlertidigt"
@@ -25606,6 +25648,7 @@ da-x-k12:
   the_course_id_for_the_export_data_a99f37d: "Fag-id'et for eksportdata"
   the_course_id_for_the_grade_export_data_d20f4ed: "Fag-id'et for vurderingseksportdata"
   the_course_id_to_report_on_eb4ad5d2: "Fag-id at oprette rapport om"
+  the_course_is_associated_with_an_archived_or_delet_43b836a9: "Faget er knyttet til et arkiveret eller slettet vurderingssystem og vurderingssystemet kan ikke eksporteres."
   the_course_link_validator_searches_course_content__563fa215: "Faglink-validatoren søger gennem fagindhold for ugyldige eller uopnåelige links og billeder."
   the_course_link_validator_searches_through_course__76f0bc63: "Valider links i fagrum søger gennem fagets indhold og returnerer ethvert ugyldigt eller ikke-reagerende link, der findes. Vær venligst opmærksom på, at nogle links, markeret som brudt, blot er utilgængelige fra vores servere og vil stadig virke for eleverne."
   the_course_state_manage_permission_allows_the_user_1d9da094: "Tilladelsen Fagstatus - administrér gør det muligt for brugeren at offentliggøre fag, der ikke indeholder forløb. For at offentliggøre og fjerne offentliggørelse af forløbindhold skal Fagindhold - tilføj/rediger/slet være aktiveret."
@@ -25726,6 +25769,7 @@ da-x-k12:
   the_link_you_used_has_expired_click_forgot_passwor_80569899: "Det link, du brugte, er udløbet. Klik på \"Glemt adgangskode?\" for at få et nyt nulstil-adgangskode-link."
   the_list_below_is_content_that_has_been_shared_wit_2b2648bc: "Listen herunder er indhold, der er blevet delt med dig. Du kan få vist indholdet, importere det til dit fag eller fjerne det fra listen."
   the_login_login_is_currently_suspended_and_will_no_472b19e9: "Login %{login} er i øjeblikket suspenderet og kan ikke få adgang til Canvas"
+  the_lti_extensions_discover_page_won_t_be_accessib_1451172e: "Siden til at finde LTI-udvidelser vil ikke være tilgængelig, medmindre siden LTI-tilmeldinger er aktiveret"
   the_lti_tool_was_deleted_on_3727da23: "LTI-værktøjet blev slettet den"
   the_lti_user_was_deleted_2a3b796f: "LTI-brugeren blev slettet"
   the_material_is_in_the_public_domain_279c39a3: "Materialer er på det offentlige domæne"
@@ -25743,10 +25787,15 @@ da-x-k12:
                 Tak,
                 Canvas Support
   the_message_you_sent_with_the_subject_line_subject_8157a1ff: |-
-      Den besked du sendte med emnelinjen "%{subject}" blev ikke leveret, fordi din konto er blevet suspenderet.
-      
-      Med venlig hilsen
-      Canvas Support
+      Den besked, du sendte med emnelinjen "%{subject}", blev ikke leveret, fordi din konto er blevet suspenderet.
+                  
+                  Tak,
+                  Canvas Support
+  the_message_you_sent_with_the_subject_line_subject_8511b0dd: |-
+      Den besked, du sendte med emnelinjen "%{subject}", blev ikke leveret, fordi du ikke er en gyldig deltager i samtalen.
+                  
+                  Tak,
+                  Canvas Support
   the_message_you_sent_with_the_subject_line_subject_c73f92e4: |-
       Beskeden du sendte med emnelinjen "%{subject}" blev ikke afleveret. For at svare på Canvas-beskeder fra denne e-mail, skal den først være en bekræftet kommunikationskanal i din Canvas-profil. Gå ind på din profil og send bekræftelsen for denne e-mailadresse igen [Læs https://community.canvaslms.com/docs/DOC-2281]. Du kan eventuelt også kontakte personen via Canvas-indbakken [Læs https://community.canvaslms.com/docs/DOC-2670].
       
@@ -26026,6 +26075,7 @@ da-x-k12:
   there_was_an_unexpected_error_deleting_the_convers_412fd621: "Der opstod en uventet fejl ved sletning af diskussionsbeskeden."
   there_was_an_unexpected_error_deleting_the_discuss_fe1022cb: "Der opstod en uventet fejl under sletning af dette diskussionsemne."
   there_was_an_unexpected_error_deleting_the_topic_b53db7a7: "Der opstod en uventet fejl ved sletning af emnet."
+  there_was_an_unexpected_error_error_ca0fc77e: "Der opstod en uventet fejl: %{error}"
   there_was_an_unexpected_error_loading_the_discussi_cc4ee42: "Der opstod en uventet fejl under indlæsning af dette diskussionsindlæg."
   there_was_an_unexpected_error_loading_the_replies_578d9738: "Der opstod en uventet fejl under indlæsning af svarene."
   there_was_an_unexpected_error_marking_all_as_read_117fe739: "Der opstod en uventet fejl, der markerede alle som læst."
@@ -26093,6 +26143,7 @@ da-x-k12:
   this_canvas_installation_is_only_for_testing_and_w_17ce8bc2: 
     one: "Denne Canvas-installation er kun til test og *nulstilles hver uge*."
     other: "Denne Canvas-installation er kun til test og *nulstilles hver %{count} uge.*"
+  this_catalog_will_be_a_template_account_and_its_da_8b6277cb: "Dette katalog vil være en skabelonkonto, og dens data kan kopieres over til nyligt klargjorte kataloger"
   this_code_expires_in_timefromnow_ec7ccef4: "Denne kode udløber om %{timeFromNow}."
   this_code_expires_timefromnow_877a5225: "Denne kode udløber %{timeFromNow}."
   this_code_has_expired_41f76642: "Denne kode er udløbet."
@@ -26249,8 +26300,10 @@ da-x-k12:
   this_is_an_account_setting_that_must_be_enabled_by_8ced660: "Det her er en kontoindstilling, som din kundesuccesmanager skal aktivere. Varslinger er en sjældent brugt funktion, der er beregnet til at sende en varsling til elever, lærere eller admins om bestemte udløsere (fx ingen interaktion mellem elev-lærer i 7 dage). De tjekkes hver dag, og der sendes meddelelser til eleven og/eller læreren, indtil det udløsende problem udbedres."
   this_is_an_account_setting_that_must_be_turned_on__4c939dea: "Denne er en kontoindstilling, som din kundesuccesmanager skal slå til."
   this_is_an_anonymous_discussion_student_names_and__bc19b64d: "Dette er en anonym diskussion. Elevernes navne og profilbilleder er skjult."
+  this_is_an_anonymous_discussion_though_student_nam_c45b563e: "Dette er en anonym diskussion. Selvom elevens navne og profilbilleder vil være skjult, vil dit navn og profilbillede være synligt for alle fagets medlemmer. Omtaler er også blevet deaktiveret."
   this_is_an_anonymous_discussion_though_student_nam_f98abe71: "Dette er en anonym diskussion. Selvom elevens navne og profilbilleder vil være skjult, vil dit navn og profilbillede være synligt for alle fagets medlemmer."
   this_is_an_anonymous_discussion_your_name_and_prof_72c49b77: "Dette er en anonym diskussion, dit navn og profilbillede vil blive skjult for andre fagdeltagere."
+  this_is_an_anonymous_discussion_your_name_and_prof_c88f50e2: "Dette er en anonym diskussion. Dit navn og profilbillede vil blive skjult for andre fagdeltagere. Omtaler er også blevet deaktiveret."
   this_is_enabled_by_default_as_assignments_can_not__767e9b16: "Dette er aktiveret som standard, da opgaver ikke kan tilbageholdes fra vurderingsoversigten og stadig tæller med i den."
   this_is_just_a_dev_only_feature_you_can_turn_on_to_7f88c58f: "Dette er bare en funktion kun for udviklere, som du kan tænde for at få et eksempel på, hvordan siderne vil se ud i et højre-til-venstre-miljø uden at skulle skifte sprog til et, der normalt er højre-til-venstre"
   this_is_not_a_breaking_change_all_lti_1_3_tool_beh_16df3ac0: "Dette er *ikke* en breaking change. Al LTI 1.3-værktøjsadfærd forbliver den samme uanset det anvendte slutpunkt, med undtagelse af den nyligt understøttede Platform Storage-specifikation. Håndhævelse af denne ændring vil ske på en senere, uspecificeret dato."
@@ -27775,6 +27828,10 @@ da-x-k12:
   update_public_jwk_9f25f520: "Opdater Offentlig JWK"
   update_rating_6d29c2ef: "Opdater bedømmelse"
   update_settings_9b422d0f: "Opdater indstillinger"
+  update_the_assignment_submission_type_launch_butto_bf130d86: "Opdater startknappen for opgaveafsendelsestype"
+  update_the_look_of_all_tools_using_the_submission__368b06c: |-
+      Opdater alle værktøjernes udseende ved hjælp af submission_type_selection
+      placering for at give et mere moderne design på linje med resten af Canvas' UI
   update_tool_7d48ef2a: "Opdater %{tool}"
   update_your_notification_settings_ed9564f3: "Opdater dine notifikationsindstillinger"
   updated_2c1e8615: Opdateret
@@ -28596,6 +28653,7 @@ da-x-k12:
   warning_if_there_are_any_users_with_this_role_they_1a7c1fef: "Advarsel: Hvis der findes brugere med denne rolle, beholder de deres aktuelle tilladelser, men du vil ikke være i stand til at oprette nye brugere med denne rolle."
   warning_step_has_children_that_aren_t_stepitem_com_32a3f351: "Advarsel Dette trin har børn, der ikke er StepItem-komponenter"
   warning_step_has_two_stepitems_with_a_status_of_in_77138e9e: "Advarsel: Dette trin har to StepItems med statussen Igangværende"
+  warning_the_submission_type_selection_placement_is_d327c8d: "Advarsel: submission_type_selection placeringen er kun tilladt for Instructure-godkendte LTI-værktøjer. Hvis du mener, at du har modtaget denne meddelelse ved en fejl, bedes du kontakte dit supportteam."
   warning_you_are_about_to_adjust_this_group_s_membe_a04281b6: "Advarsel! Du er ved at tilpasse denne gruppes medlemskab. *Denne ændring påvirker eksisterende gruppeafleveringer, anmærkninger og kommentarer og resulterer i tab af data for både denne gruppe og den elevs tidligere gruppe.*** For at forhindre utilsigtede konsekvenser med eksisterende gruppeafleveringer, skal du oprette et nyt gruppesæt til fremtidige opgaver. **"
   warnings: 
     test_install: 
@@ -28605,6 +28663,7 @@ da-x-k12:
         one: "Denne Canvas-installation er kun til test og nulstilles hver uge."
         other: "Denne Canvas-installation er kun til test og nulstilles hver %{count}. uge."
   was_locked_at_date_acf1c576: "Blev låst kl. %{date}"
+  was_not_selected_30d63a10: "blev ikke valgt"
   watermark_c93fae0d: Vandmærke
   watermark_opacity_ce3d3097: "Vandmærke uigennemsigtighed"
   watermarks_other_images_e970fc6a: "Vandmærker & andre billeder"
@@ -28714,7 +28773,9 @@ da-x-k12:
       indlæses i en ny fane. Når dette flag er aktiveret, markeres dette afkrydsningsfelt som standard,
       hvis brugerene markerede det sidste gang, de tilføjede et eksternt link.
   when_adding_multiple_users_use_a_comma_or_line_bre_67f9c87d: "Når du tilføjer flere brugere, skal du bruge et komma eller linjeskift til at adskille brugere."
+  when_creating_a_reply_students_will_have_the_optio_34556e85: "Når de opretter et svar, vil eleverne have mulighed for at vise deres navn og profilbillede eller forblive anonyme. Dit navn og profilbillede vil være synligt for alle fagets deltagere. Omtaler er også blevet deaktiveret."
   when_creating_a_reply_students_will_have_the_optio_716eb2f4: "Når de opretter et svar, vil eleverne have mulighed for at vise deres navn og profilbillede eller forblive anonyme. Dit navn og profilbillede vil være synligt for alle fagets deltagere."
+  when_creating_a_reply_you_will_have_the_option_to__3fb91c13: "Når du opretter et svar, vil du have mulighed for at vise dit navn og profilbillede til andre fagmedlemmer eller forblive anonym. Omtaler er også blevet deaktiveret."
   when_creating_a_reply_you_will_have_the_option_to__8607ac10: "Når du opretter et svar, vil du have mulighed for at vise dit navn og profilbillede til andre fagmedlemmer eller forblive anonym."
   when_disabled_new_or_updated_contextexternaltool_i_27e19300: |-
       Når deaktiveret, får nye eller opdaterede ContextExternalTool-installationer (herunder
@@ -28731,6 +28792,21 @@ da-x-k12:
       sorteres og filtreres.
   when_enabled_an_lti_tool_with_the_assignment_edit__cd60b1a0: "Når aktiveret, vil et LTI-værktøj med assignment_edit placering blive lanceret på beskedsiden."
   when_enabled_collect_internal_analytics_metrics_us_88e81ee5: "Når aktiveret, skal du indsamle interne analytiske målinger ved hjælp af et distribueret system."
+  when_enabled_for_a_child_account_of_a_non_centrall_8b126bc0: |-
+      Når aktiveret for en underordnet konto for et ikke-centralt administreret konsortium,
+      vil udvikler-nøgletilstand og tokens fra konsortiets overordnede konto ikke
+      nedarves til underkonti af et underordnet konsortium. Når deaktiveret, følges arvelig
+      (inkonsekvent) adfærd. Dette flag gælder kun for konsortiumkonti
+      _child_. Dette flag påvirker ikke centralt styrede konsortier på
+      nogen måde.
+  when_enabled_for_the_parent_account_of_a_non_centr_4d7adbaa: |-
+      Når aktiveret for den overordnede konto for et ikke-centralt styret konsortium,
+      påvirker tænd/sluk for udvikler-nøgler i den overordnede konto ikke værktøjsinstallationer
+       af de underordnede konti. Når deaktiveret, påvirker tænd/sluk af
+      SiteAdmin-nedarvede udvikler-nøgler i den overordnede konto for et ikke-centralt
+      styret konsortium (slet/gendan) værktøjer i underordnede
+      konti (nedarvet adfærd). Dette flag gælder kun for konsortiumkonti_parent_
+      . Dette flag påvirker ikke centralt administrerede konsortier på nogen måde.
   when_enabled_it_deprecates_the_short_message_servi_18c6ee3f: "Når aktiveret, udfases SMS (Short Message Service)."
   when_enabled_lti_1_1_speedgrader_launches_will_set_47dcded1: |-
       Når aktiveret, vil LTI 1.1 SpeedGrader-opstarter indstille resource_link_id og
@@ -28753,6 +28829,9 @@ da-x-k12:
       Når aktiveret, sender data for alle LTI-lanceringer til PandataEvents-systemet
       til forespørgsel og visualisering.
   when_enabled_site_admin_account_ui_will_allow_asso_9d04a1d8: "Når funktionen er aktiveret, giver websideadministratorens konto-UI mulighed for at associere  en servicebruger med en DeveloperKey og bruge den nøgle/bruger med client_credentials bevillingstypen"
+  when_enabled_submission_type_selection_placement_u_412d226e: |-
+      Når aktiveret, vil Submission_type_selection placeringsbrug være
+      begrænset med en tilladelsesliste.
   when_enabled_teachers_can_choose_to_allow_observer_320b555e: |-
       Når aktiveret, kan lærere vælge at lade observatører planlægge aftaler
       ved oprettelse af aftalegrupper i kalenderen.
@@ -28761,6 +28840,8 @@ da-x-k12:
       hver have et tilfældigt tal tilføjet til deres ID. Når deaktiveret, har hver
       samme ID af tool_form.
   when_enabled_the_internal_access_manager_will_be_u_bc470109: "Når funktionen er aktiveret, bruges manageren af intern adgang til at begrænse adgang til bestemte anmodninger."
+  when_enabled_the_lti_extensions_discover_page_will_8bb57ff6: "Når aktiveret, vil siden til at finde LTI-udvidelser være tilgængelig i udvidelsesvisningen."
+  when_enabled_the_lti_extensions_page_will_be_avail_ac8ed3fa: "Når aktiveret, vil siden LTI-udvidelser være tilgængelig i kontonavigationen."
   when_enabled_this_flag_displays_a_word_count_in_th_a75163d6: |-
       Når aktiveret, viser dette flag ordtælling i SpeedGrader for
       tekstbaserede indlæg.
@@ -28784,6 +28865,7 @@ da-x-k12:
       udvikler-nøgle som det originale værktøj. Dette forhindrer sjældne tilfælde, hvor flere udvikler-
       nøgler deler det samme domæne, og et værktøj fra den forkerte udvikler-nøgle vil blive matchet først.
   when_posting_grades_for_anonymous_assignments_grad_b13f3ae6: "Når man slår vurderinger op for anonyme opgaver, slås vurderinger op for alle i faget. Anonymitet bliver fjernet."
+  when_posting_grades_for_this_anonymous_assignment__1c64fadf: "Når du slår vurderinger op for denne anonyme opgave, vil vurderinger blive slået op for alle, der har fået tildelt dette element. Anonymitet bliver fjernet."
   when_scope_enforcement_is_disabled_tokens_have_acc_6939182f: "Når områdehåndhævelse er deaktiveret, har tokens adgang til alle slutpunkter, der er tilgængelige for den autoriserende bruger."
   when_selected_the_course_is_in_a_read_only_state_o_5aaeb0d: "Når valgt, er faget i skrivebeskyttet tilstand uden for disse datoer."
   when_selected_the_course_is_inaccessible_outside_c_af595406: "Når valgt, er faget utilgængeligt uden for fagdatoer. Hvis fagdatoer er tomme, gælder disse start- og slutdatoer for skoleårsdatoerne."

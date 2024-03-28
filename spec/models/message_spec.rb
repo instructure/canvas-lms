@@ -243,6 +243,31 @@ describe Message do
         expect(@topic).to be_anonymous
         expect(@message.from_name).to eq(@discussion_entry.author_name)
       end
+
+      it "returns root account outgoing_email_default_name if message is inside a summary notification" do
+        account = Account.default
+        account.settings[:outgoing_email_default_name] = "The Root Account Default Name"
+        account.save!
+        expect(account.reload.settings[:outgoing_email_default_name]).to eq "The Root Account Default Name"
+        discussion_topic_model
+        @topic.update(anonymous_state: "full_anonymity")
+        @discussion_entry = @topic.discussion_entries.create!(user: user_model)
+        notification_model(name: "Summaries", category: "Summaries")
+        message_model(context: @discussion_entry, notification_id: @notification.id, notification_name: "Summaries")
+        expect(@topic).to be_anonymous
+        expect(@message.from_name).to eq "The Root Account Default Name"
+      end
+
+      it "returns HostUrl outgoing_email_default_name if message is inside a summary notification" do
+        HostUrl.outgoing_email_default_name = "The Host Url Default Name"
+        discussion_topic_model
+        @topic.update(anonymous_state: "full_anonymity")
+        @discussion_entry = @topic.discussion_entries.create!(user: user_model)
+        notification_model(name: "Summaries", category: "Summaries")
+        message_model(context: @discussion_entry, notification_id: @notification.id, notification_name: "Summaries")
+        expect(@topic).to be_anonymous
+        expect(@message.from_name).to eq "The Host Url Default Name"
+      end
     end
   end
 

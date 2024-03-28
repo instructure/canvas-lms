@@ -143,5 +143,6 @@ export interface EnvGradebookSpeedGrader {
      * This is assigned on the client, in ui/features/speed_grader/jquery/speed_grader.tsx:EG.showRubric
      */
     assessment_user_id?: string
+    anonymous_id?: string
   }
 }

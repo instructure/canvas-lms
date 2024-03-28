@@ -33,7 +33,7 @@ KalturaRequestBuilder.id = 1
 KalturaRequestBuilder.prototype.createRequest = function () {
   const xhr = new XMLHttpRequest()
   xhr.open('POST', this.createUrl())
-  xhr.responseType = 'xml'
+  xhr.responseType = 'text'
   return xhr
 }
 

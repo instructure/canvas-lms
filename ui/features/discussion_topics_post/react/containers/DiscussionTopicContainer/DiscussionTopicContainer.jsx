@@ -48,6 +48,7 @@ import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {Responsive} from '@instructure/ui-responsive/lib/Responsive'
+import '@canvas/context-cards/react/StudentContextCardTrigger'
 
 import assignmentRubricDialog from '../../../../discussion_topic/jquery/assignmentRubricDialog'
 import rubricEditing from '../../../../../shared/rubrics/jquery/edit_rubric'
@@ -397,10 +398,10 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                             message={props.discussionTopic.message}
                             isSplitView={false}
                             editor={props.discussionTopic.editor}
-                            createdAt={props.discussionTopic.postedAt}
+                            createdAt={props.discussionTopic.createdAt}
                             updatedAt={props.discussionTopic.updatedAt}
                             timingDisplay={DateHelper.formatDatetimeForDiscussions(
-                              props.discussionTopic.postedAt
+                              props.discussionTopic.createdAt
                             )}
                             editedTimingDisplay={DateHelper.formatDatetimeForDiscussions(
                               props.discussionTopic.updatedAt

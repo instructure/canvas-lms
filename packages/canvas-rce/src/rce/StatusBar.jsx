@@ -180,17 +180,18 @@ export default function StatusBar(props) {
 
   function renderA11yButton() {
     const a11y = formatMessage('Accessibility Checker')
+    const a11yButtonId = 'rce-a11y-btn'
     const button = (
       <IconButton
-        data-btn-id="rce-a11y-btn"
+        data-btn-id={a11yButtonId}
         color="primary"
         title={a11y}
-        tabIndex={tabIndexForBtn('rce-a11y-btn')}
+        tabIndex={tabIndexForBtn(a11yButtonId)}
         onClick={event => {
           event.target.focus()
-          props.onA11yChecker()
+          props.onA11yChecker(a11yButtonId)
         }}
-        onFocus={() => setFocusedBtnId('rce-a11y-btn')}
+        onFocus={() => setFocusedBtnId(a11yButtonId)}
         screenReaderLabel={a11y}
         withBackground={false}
         withBorder={false}

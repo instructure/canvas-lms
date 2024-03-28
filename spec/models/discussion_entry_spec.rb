@@ -866,6 +866,24 @@ describe DiscussionEntry do
           expect(entry.grants_right?(user, :reply)).to be false
         end
       end
+
+      context "when course has announcement comments disabled" do
+        before do
+          create_enrollment(topic.course, user, { enrollment_state: "active" })
+          topic.course.lock_all_announcements = true
+          topic.course.save!
+        end
+
+        it "returns false when comments is locked for announcements" do
+          announcement = topic.course.announcements.create!(title: "announcement", message: "message")
+          announcement_entry = announcement.discussion_entries.create!(message: "Hello!", user:)
+          expect(announcement_entry.grants_right?(user, :reply)).to be false
+        end
+
+        it "returns true for non-announcement discussions" do
+          expect(entry.grants_right?(user, :reply)).to be true
+        end
+      end
     end
 
     describe "update" do
@@ -921,6 +939,23 @@ describe DiscussionEntry do
           announcement.lock!
           entry = announcement.discussion_entries.build(user: @student, message: "message")
           expect(entry.grants_right?(@student, :create)).to be false
+        end
+
+        context "when context.lock_all_announcements is true" do
+          before do
+            @course.lock_all_announcements = true
+            @course.save!
+          end
+
+          it "does not allow replies from students on announcements" do
+            entry = announcement.discussion_entries.build(user: @student, message: "message")
+            expect(entry.grants_right?(@student, :create)).to be false
+          end
+
+          it "allows replies for non-announcement topics" do
+            entry = topic.discussion_entries.build(user: @student, message: "message")
+            expect(entry.grants_right?(@student, :create)).to be true
+          end
         end
       end
     end

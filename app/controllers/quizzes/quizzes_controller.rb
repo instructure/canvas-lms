@@ -344,7 +344,8 @@ class Quizzes::QuizzesController < ApplicationController
         ASSIGNMENT_ID: @assignment.present? ? @assignment.id : nil,
         ASSIGNMENT_OVERRIDES: assignment_overrides_json(@quiz.overrides_for(@current_user,
                                                                             ensure_set_not_empty: true),
-                                                        @current_user),
+                                                        @current_user,
+                                                        include_names: true),
         DUE_DATE_REQUIRED_FOR_ACCOUNT: AssignmentUtil.due_date_required_for_account?(@context),
         QUIZ: quiz_json(@quiz, @context, @current_user, session),
         SECTION_LIST: sections.map do |section|
@@ -1111,8 +1112,8 @@ class Quizzes::QuizzesController < ApplicationController
                quiz_version: quiz.version_number,
                assignment_id: quiz.assignment_id,
                assignment_version: quiz.assignment&.version_number }
-    prepared_batch[:overrides_to_create].each { |override| override.assign_attributes(params) }
-    prepared_batch[:overrides_to_update].each { |override| override.assign_attributes(params) }
+    prepared_batch[:overrides_to_create].each { |override| override.assign_attributes(params) unless override.context_module_id }
+    prepared_batch[:overrides_to_update].each { |override| override.assign_attributes(params) unless override.context_module_id }
   end
 
   def hide_quiz?

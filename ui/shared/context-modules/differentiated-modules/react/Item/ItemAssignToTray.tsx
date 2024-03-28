@@ -205,6 +205,7 @@ export default function ItemAssignToTray({
   const {allOptions, isLoading, setSearchTerm} = useFetchAssignees({
     courseId,
     everyoneOption,
+    checkMasteryPaths: true,
     defaultValues: [],
     onError: handleDismiss,
   })
@@ -272,6 +273,9 @@ export default function ItemAssignToTray({
             const studentOverrides =
               filteredStudents?.map(studentId => `student-${studentId}`) ?? []
             const defaultOptions = studentOverrides
+            if (override.noop_id) {
+              defaultOptions.push('mastery_paths')
+            }
             if (override.course_section_id) {
               defaultOptions.push(`section-${override.course_section_id}`)
             }
@@ -442,18 +446,22 @@ export default function ItemAssignToTray({
             id: isEveryoneOption ? defaultSectionId : idData[1],
             name: newSelectedOption.value,
           } as exportedOverride)
+
     if (newSelectedOption?.id === everyoneOption.id) {
       parsedCard.course_section_id = defaultSectionId
     } else if (parsedCard.id && idData[0] === 'section') {
       parsedCard.course_section_id = idData[1]
     } else if (parsedCard.id && idData[0] === 'student') {
       parsedCard.short_name = newSelectedOption.value
+    } else if (idData && idData[0] === 'mastery_paths') {
+      parsedCard.noop_id = '1'
     }
 
     const parsedDeletedCard = deletedAssignees.map(id => {
       const card = allOptions.find(a => a.id === id)
       const data = card?.id?.split('-')
       const deleted = {name: card?.value, type: data?.[0]} as exportedOverride
+
       if (id === everyoneOption.id) {
         deleted.course_section_id = defaultSectionId
       } else if (data?.[0] === 'section') {
@@ -461,6 +469,8 @@ export default function ItemAssignToTray({
       } else if (data?.[0] === 'student') {
         deleted.short_name = card?.value
         deleted.student_id = data[1]
+      } else if (data?.[0] === 'mastery_paths') {
+        deleted.noop_id = '1'
       }
       return deleted
     })

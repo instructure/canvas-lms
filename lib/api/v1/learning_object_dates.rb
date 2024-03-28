@@ -29,6 +29,7 @@ module Api::V1::LearningObjectDates
     only_visible_to_overrides
     visible_to_everyone
   ].freeze
+  GRADED_MODELS = [Assignment, Quizzes::Quiz].freeze
   LOCKABLE_PSEUDO_COLUMNS = %i[due_dates availability_dates].freeze
 
   def learning_object_dates_json(learning_object, overridable)
@@ -36,6 +37,7 @@ module Api::V1::LearningObjectDates
     LEARNING_OBJECT_DATES_FIELDS.each do |field|
       hash[field] = overridable.send(field) if overridable.respond_to?(field)
     end
+    hash[:graded] = graded?(learning_object)
     hash
   end
 
@@ -43,5 +45,11 @@ module Api::V1::LearningObjectDates
     return {} unless learning_object.try(:is_child_content?)
 
     { blueprint_date_locks: learning_object.child_content_restrictions.filter_map { |k, v| k if LOCKABLE_PSEUDO_COLUMNS.include?(k) && v } }
+  end
+
+  def graded?(learning_object)
+    return learning_object.assignment_id.present? if learning_object.is_a?(DiscussionTopic)
+
+    GRADED_MODELS.include?(learning_object.class)
   end
 end

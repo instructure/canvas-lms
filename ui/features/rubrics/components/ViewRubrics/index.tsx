@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 - present Instructure, Inc.
+ * Copyright (C) 2024 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -36,7 +36,9 @@ import {
   type FetchRubricVariables,
   fetchAccountRubrics,
   fetchCourseRubrics,
+  fetchRubricCriterion,
 } from '../../queries/ViewRubricQueries'
+import {RubricAssessmentTray} from '@canvas/rubrics/react/RubricAssessment'
 
 const {Item: FlexItem} = Flex
 
@@ -53,6 +55,9 @@ export const ViewRubrics = () => {
   const isAccount = !!accountId
   const isCourse = !!courseId
   const [selectedTab, setSelectedTab] = useState<string | undefined>(TABS.saved)
+  const [isPreviewTrayOpen, setIsPreviewTrayOpen] = useState(false)
+  const [rubricIdForPreview, setRubricIdForPreview] = useState<string | undefined>(undefined)
+  const [searchQuery, setSearchQuery] = useState('')
 
   let queryVariables: FetchRubricVariables
   let fetchQuery: (queryVariables: FetchRubricVariables) => Promise<RubricQueryResponse>
@@ -71,6 +76,12 @@ export const ViewRubrics = () => {
   const {data, isLoading} = useQuery({
     queryKey: [queryKey],
     queryFn: async () => fetchQuery(queryVariables),
+  })
+
+  const {data: rubricPreview, isLoading: isLoadingPreview} = useQuery({
+    queryKey: [`rubric-preview-${rubricIdForPreview}`],
+    queryFn: async () => fetchRubricCriterion(rubricIdForPreview),
+    enabled: !!rubricIdForPreview,
   })
 
   if (isLoading) {
@@ -106,6 +117,30 @@ export const ViewRubrics = () => {
     {activeRubrics: [] as Rubric[], archivedRubrics: [] as Rubric[]}
   )
 
+  const handlePreviewClick = (rubricId: string) => {
+    if (rubricIdForPreview === rubricId) {
+      setRubricIdForPreview(undefined)
+      setIsPreviewTrayOpen(false)
+      return
+    }
+
+    setRubricIdForPreview(rubricId)
+    setIsPreviewTrayOpen(true)
+  }
+  const filteredActiveRubrics =
+    searchQuery.trim() !== ''
+      ? activeRubrics.filter(rubric =>
+          rubric.title.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+      : activeRubrics
+
+  const filteredArchivedRubrics =
+    searchQuery.trim() !== ''
+      ? archivedRubrics.filter(rubric =>
+          rubric.title.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+      : archivedRubrics
+
   return (
     <View as="div">
       <Flex>
@@ -118,9 +153,11 @@ export const ViewRubrics = () => {
           <TextInput
             renderLabel={<ScreenReaderContent>{I18n.t('Search Rubrics')}</ScreenReaderContent>}
             placeholder={I18n.t('Search...')}
-            value=""
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
             width="17"
             renderBeforeInput={<IconSearchLine inline={false} />}
+            data-testid="rubric-search-bar"
           />
         </FlexItem>
         <FlexItem>
@@ -148,7 +185,10 @@ export const ViewRubrics = () => {
           padding="none"
         >
           <View as="div" margin="medium 0" data-testid="saved-rubrics-table">
-            <RubricTable rubrics={activeRubrics} />
+            <RubricTable
+              rubrics={filteredActiveRubrics}
+              onPreviewClick={rubricId => handlePreviewClick(rubricId)}
+            />
           </View>
         </Tabs.Panel>
         <Tabs.Panel
@@ -159,10 +199,22 @@ export const ViewRubrics = () => {
           padding="none"
         >
           <View as="div" margin="medium 0" data-testid="archived-rubrics-table">
-            <RubricTable rubrics={archivedRubrics} />
+            <RubricTable
+              rubrics={filteredArchivedRubrics}
+              onPreviewClick={rubricId => handlePreviewClick(rubricId)}
+            />
           </View>
         </Tabs.Panel>
       </Tabs>
+
+      <RubricAssessmentTray
+        isLoading={isLoadingPreview}
+        isOpen={isPreviewTrayOpen}
+        isPreviewMode={true}
+        rubric={rubricPreview}
+        rubricAssessmentData={[]}
+        onDismiss={() => setIsPreviewTrayOpen(false)}
+      />
     </View>
   )
 }

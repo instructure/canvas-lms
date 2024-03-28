@@ -1173,7 +1173,19 @@ self.user,
 
   private
 
+  def outgoing_email_default_name_for_messages
+    if root_account && root_account.settings[:outgoing_email_default_name]
+      root_account.settings[:outgoing_email_default_name]
+    else
+      HostUrl.outgoing_email_default_name
+    end
+  end
+
   def infer_from_name
+    if notification_category == "Summaries"
+      return outgoing_email_default_name_for_messages
+    end
+
     if context.is_a?(DiscussionEntry) && context.discussion_topic.anonymous?
       return context.author_name
     end
@@ -1190,11 +1202,7 @@ self.user,
     end
     return context_context.nickname_for(user) if can_use_name_for_from?(context_context)
 
-    if root_account && root_account.settings[:outgoing_email_default_name]
-      return root_account.settings[:outgoing_email_default_name]
-    end
-
-    HostUrl.outgoing_email_default_name
+    outgoing_email_default_name_for_messages
   end
 
   def can_use_name_for_from?(c)

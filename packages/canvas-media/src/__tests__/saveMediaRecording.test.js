@@ -15,9 +15,10 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import K5Uploader from '@instructure/k5uploader'
+
 import moxios from 'moxios'
 import sinon from 'sinon'
+import K5Uploader from '@instructure/k5uploader'
 import saveMediaRecording, {
   saveClosedCaptions,
   saveClosedCaptionsForAttachment,
@@ -59,9 +60,11 @@ describe('saveMediaRecording', () => {
       headers: {Authorization: 'Bearer doesnotmatter'},
     }
   })
+
   afterEach(() => {
     moxios.uninstall()
   })
+
   it('fails if request for kaltura session fails', async () => {
     moxios.stubRequest('http://host:port/api/v1/services/kaltura_session?include_upload_config=1', {
       status: 500,

@@ -24,6 +24,7 @@ import {EnvCourse} from './EnvCourse'
 import {EnvCoursePaces} from './EnvCoursePaces'
 import {EnvGradebook} from './EnvGradebook'
 import {EnvGradingStandards} from './EnvGradingStandards'
+import {EnvDeveloperKeys} from './EnvDeveloperKeys'
 import {EnvPlatformStorage} from './EnvPlatformStorage'
 import {EnvAccounts} from './EnvAccounts'
 import {EnvContextModules} from './EnvContextModules'
@@ -54,6 +55,7 @@ export type GlobalEnv =
         EnvGradingStandards &
         EnvPlatformStorage &
         EnvRce &
+        EnvDeveloperKeys &
         EnvContextModules &
         EnvWikiPages &
         EnvContentMigrations

@@ -124,9 +124,9 @@ module Lti
       return unless placements.any? { |p| p["placement"] == "submission_type_selection" }
       return unless Account.site_admin.feature_enabled?(:lti_placement_restrictions)
 
-      allowed_domains = Setting.get("submission_type_selection_allowed_launch_domains", "").split(",")
-
-      allowed_dev_keys = Setting.get("submission_type_selection_allowed_dev_keys", "").split(",")
+      # This is a candidate for a deduplication with the same logic in app/models/context_external_tool.rb#placement_allowed?
+      allowed_domains = Setting.get("submission_type_selection_allowed_launch_domains", "").split(",").map(&:strip).reject(&:empty?)
+      allowed_dev_keys = Setting.get("submission_type_selection_allowed_dev_keys", "").split(",").map(&:strip).reject(&:empty?)
       return if allowed_domains.include?(domain) || allowed_dev_keys.include?(Shard.global_id_for(developer_key_id).to_s)
 
       t("Warning: the submission_type_selection placement is only allowed for Instructure approved LTI tools. If you believe you have received this message in error, please contact your support team.")

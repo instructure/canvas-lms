@@ -75,42 +75,46 @@ class SmartSearchController < ApplicationController
   # @argument q [String, required]
   #   The search query
   #
+  # @argument filter[] [String, optional]
+  #   Types of objects to search. By default, all supported types are searched. Supported types
+  #   include +pages+, +assignments+, +announcements+, and +discussion_topics+.
+  #
   # @returns [SearchResult]
   def search
     return render_unauthorized_action unless @context.grants_right?(@current_user, session, :read)
     return render_unauthorized_action unless SmartSearch.smart_search_available?(@context)
     return render json: { error: "missing 'q' param" }, status: :bad_request unless params.key?(:q)
 
-    WikiPageEmbedding.with_pgvector do
-      response = {
-        results: []
-      }
+    response = {
+      results: []
+    }
 
-      if params[:q].present?
-        embedding = SmartSearch.generate_embedding(params[:q])
-
-        # Prototype query using "neighbor". Embedding is now on join table so manual SQL for now
-        # wiki_pages = WikiPage.nearest_neighbors(:embedding, embedding, distance: "inner_product")
-        # response[:results].concat( wiki_pages.select { |x| x.neighbor_distance >= MIN_DISTANCE }.first(MAX_RESULT))
-        # Wiki Pages
-        scope = @context.wiki_pages.not_deleted
-        scope = WikiPages::ScopedToUser.new(@context, @current_user, scope).scope
-                                       .select(WikiPage.send(:sanitize_sql, ["wiki_pages.*, MIN(wpe.embedding <=> ?) AS distance", embedding.to_s]))
-                                       .joins("INNER JOIN #{WikiPageEmbedding.quoted_table_name} wpe ON wiki_pages.id = wpe.wiki_page_id")
-                                       .group("wiki_pages.id")
-                                       .order("distance ASC")
-        wiki_pages = Api.paginate(scope, self, api_v1_course_smart_search_query_url(@context))
-        response[:results].concat(search_results_json(wiki_pages))
-      end
-
-      render json: response
+    if params[:q].present?
+      scope = SmartSearch.perform_search(@context, @current_user, params[:q], Array(params[:filter]))
+      items = Api.paginate(scope, self, api_v1_course_smart_search_query_url(@context))
+      response[:results].concat(search_results_json(items))
     end
+
+    render json: response
+  end
+
+  def log
+    # TODO: do something more with these params than logging them in the request logs
+    # params[:a]
+    # params[:c]
+    # params[:course_id]
+    # params[:oid]
+    # params[:ot]
+    # params[:q]
+
+    head :no_content
   end
 
   def show
     @context = Course.find(params[:course_id])
 
-    render_unauthorized_action unless SmartSearch.smart_search_available?(@context)
+    return render_unauthorized_action unless SmartSearch.smart_search_available?(@context)
+
     set_active_tab("search")
     @show_left_side = true
     add_crumb(t("#crumbs.search", "Search"), named_context_url(@context, :course_search_url)) unless @skip_crumb

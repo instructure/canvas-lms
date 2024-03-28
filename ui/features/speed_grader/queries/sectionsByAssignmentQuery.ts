@@ -28,6 +28,11 @@ const SECTIONS_BY_ASSIGNMENT_QUERY = gql`
           id
           _id
           name
+          students {
+            nodes {
+              _id
+            }
+          }
         }
       }
     }
@@ -36,7 +41,15 @@ const SECTIONS_BY_ASSIGNMENT_QUERY = gql`
 
 function transform(result: any) {
   if (result.course?.sectionsConnection?.nodes) {
-    return result.course.sectionsConnection.nodes
+    const sections = result.course.sectionsConnection.nodes
+    return sections.map((section: any) => {
+      return {
+        ...section,
+        students: section.students.nodes.map((student: any) => {
+          return student._id
+        }),
+      }
+    })
   }
   return null
 }

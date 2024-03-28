@@ -33,7 +33,6 @@ class ApplicationController < ActionController::Base
   include Api::V1::WikiPage
   include LegalInformationHelper
   include ObserverEnrollmentsHelper
-  include LtiLaunchDebugLoggerHelper
 
   helper :all
 
@@ -366,6 +365,7 @@ class ApplicationController < ActionController::Base
     assignment_edit_placement_not_on_announcements
     platform_service_speedgrader
     instui_header
+    rce_find_replace
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     product_tours
@@ -1561,20 +1561,8 @@ class ApplicationController < ActionController::Base
           return redirect_to Canvas::OAuth::Provider.confirmation_redirect(self, provider, pseudonym.user)
         end
 
-        redirect_url = remove_query_params(request.original_url, "session_token")
         # do one final redirect to get the token out of the URL
-        canvas_domain = HostUrl.context_host(@domain_root_account, request.host)
-        if Setting.get("interop_8200_session_token_redirect", nil) == "true" ||
-           Setting.get("interop_8200_session_token_redirect/#{canvas_domain}", nil) == "true"
-          # html redirect?
-          render template: "shared/html_redirect",
-                 layout: false,
-                 locals: {
-                   url: redirect_url
-                 }
-        else
-          redirect_to redirect_url
-        end
+        redirect_to remove_query_params(request.original_url, "session_token")
       end
     end
   end
@@ -2151,8 +2139,7 @@ class ApplicationController < ActionController::Base
                       expander: variable_expander,
                       include_storage_target: !in_lti_mobile_webview?,
                       opts: opts.merge(
-                        resource_link: @tag.associated_asset_lti_resource_link,
-                        lti_launch_debug_logger: make_lti_launch_debug_logger(@tool)
+                        resource_link: @tag.associated_asset_lti_resource_link
                       )
                     )
                   else

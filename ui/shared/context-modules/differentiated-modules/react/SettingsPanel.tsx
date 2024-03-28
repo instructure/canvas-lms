@@ -157,26 +157,58 @@ export default function SettingsPanel({
     publishFinalGrade: publishFinalGrade ?? false,
   })
   const initialState = useRef(_.cloneDeep(state))
+  const nameInputRef = useRef<HTMLInputElement | null>(null)
+  const dateInputRef = useRef<HTMLInputElement | null>(null)
 
   const [loading, setLoading] = useState(false)
+  const [validDate, setValidDate] = useState(true)
 
+  const hasErrors = () => {
+    return (
+      state.nameInputMessages.length > 0 ||
+      (state.lockUntilChecked && (state.lockUntilInputMessages.length > 0 || !validDate))
+    )
+  }
   const availableModules = useMemo(() => {
     const cutoffIndex = moduleList.findIndex(module => module.name === moduleName)
     return cutoffIndex === -1 ? moduleList : moduleList.slice(0, cutoffIndex)
   }, [moduleList, moduleName])
 
-  const handleSave = useCallback(() => {
+  const handleLockUntilError = useCallback(() => {
+    if (state.lockUntilInputMessages.length > 0) return
+    dispatch({
+      type: actions.SET_LOCK_UNTIL_INPUT_MESSAGES,
+      payload: [
+        {
+          type: 'error',
+          text: I18n.t('Unlock date can’t be blank'),
+        },
+      ],
+    })
+  }, [state.lockUntilInputMessages])
+
+  const handleNameError = useCallback(() => {
     if (state.nameInputMessages.length > 0) return
-    if (state.moduleName.length === 0) {
-      dispatch({
-        type: actions.SET_NAME_INPUT_MESSAGES,
-        payload: [
-          {
-            type: 'error',
-            text: I18n.t('Module Name is required.'),
-          },
-        ],
-      })
+    dispatch({
+      type: actions.SET_NAME_INPUT_MESSAGES,
+      payload: [
+        {
+          type: 'error',
+          text: I18n.t('Module name can’t be blank'),
+        },
+      ],
+    })
+  }, [state.nameInputMessages])
+
+  const handleSave = useCallback(() => {
+    // check for errors
+    if (state.moduleName.trim().length === 0) {
+      handleNameError()
+      nameInputRef.current?.focus()
+      return
+    }
+    if (state.lockUntilChecked && state.unlockAt === undefined) {
+      dateInputRef.current?.focus()
       return
     }
 
@@ -187,7 +219,7 @@ export default function SettingsPanel({
     handleRequest({moduleId, moduleElement, addModuleUI, data: state})
       .finally(() => setLoading(false))
       .then(() => (onDidSubmit ? onDidSubmit() : onDismiss()))
-  }, [onDidSubmit, onDismiss, addModuleUI, moduleId, moduleElement, state])
+  }, [state, moduleId, moduleElement, addModuleUI, handleNameError, onDidSubmit, onDismiss])
 
   function customOnDismiss() {
     if (!moduleId) {
@@ -211,6 +243,7 @@ export default function SettingsPanel({
           <TextInput
             data-testid="module-name-input"
             renderLabel={I18n.t('Module Name')}
+            inputRef={el => (nameInputRef.current = el)}
             value={state.moduleName}
             messages={state.nameInputMessages}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
@@ -218,6 +251,11 @@ export default function SettingsPanel({
               dispatch({type: actions.SET_MODULE_NAME, payload: value})
               if (value.trim().length > 0) {
                 dispatch({type: actions.SET_NAME_INPUT_MESSAGES, payload: []})
+              }
+            }}
+            onBlur={() => {
+              if (state.moduleName.trim().length === 0) {
+                handleNameError()
               }
             }}
           />
@@ -240,15 +278,34 @@ export default function SettingsPanel({
               timezone={ENV.TIMEZONE || 'UTC'}
               dateRenderLabel={I18n.t('Date')}
               timeRenderLabel={I18n.t('Time')}
-              invalidDateTimeMessage={I18n.t('Invalid date!')}
+              invalidDateTimeMessage={I18n.t('Invalid date')}
+              messages={state.lockUntilInputMessages}
+              dateInputRef={el => (dateInputRef.current = el)}
               layout="columns"
               colSpacing="small"
               prevMonthLabel={I18n.t('Previous month')}
               nextMonthLabel={I18n.t('Next month')}
               allowNonStepInput={true}
-              onChange={(e, dateTimeString) =>
+              onChange={(e, dateTimeString) => {
                 dispatch({type: actions.SET_UNLOCK_AT, payload: dateTimeString})
-              }
+                if (dateTimeString) {
+                  setValidDate(true)
+                  dispatch({type: actions.SET_LOCK_UNTIL_INPUT_MESSAGES, payload: []})
+                } else {
+                  setValidDate(false)
+                }
+              }}
+              onBlur={e => {
+                const target = e.target as HTMLInputElement
+                if (!target) return
+                if (target.value.length > 0) {
+                  setTimeout(() => {
+                    dispatch({type: actions.SET_LOCK_UNTIL_INPUT_MESSAGES, payload: []})
+                  }, 1)
+                } else {
+                  handleLockUntilError()
+                }
+              }}
               description={
                 <ScreenReaderContent>
                   {I18n.t('Unlock Date for %{moduleName}', {moduleName: state.moduleName})}
@@ -355,7 +412,7 @@ export default function SettingsPanel({
           saveButtonLabel={moduleId ? I18n.t('Save') : I18n.t('Add Module')}
           onDismiss={customOnDismiss}
           onUpdate={handleSave}
-          hasErrors={state.nameInputMessages.length > 0}
+          hasErrors={hasErrors()}
         />
       </Flex.Item>
     </Flex>

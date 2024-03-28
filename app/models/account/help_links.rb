@@ -66,7 +66,7 @@ class Account::HelpLinks
         url: I18n.t(:"community.contingency_covid"),
         type: "default",
         id: :covid,
-        is_new: true,
+        is_new: false,
         is_featured: false,
         feature_headline: -> { "" }
       }.freeze

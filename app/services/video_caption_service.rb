@@ -91,13 +91,17 @@ class VideoCaptionService < ApplicationService
 
   def poll_for_captions_ready
     if @skip_polling
-      return get_media
+      response = media
+      return response.dig("media", "captions", 0, "language")
     end
 
     10.times do |i|
       response = media
       if response.dig("media", "captions", 0, "language") && response.dig("media", "captions", 0, "status") == "succeeded"
-        return response.dig("media", "captions", 0, "language")
+        src_lang = response.dig("media", "captions", 0, "language")
+        # dont' proceed if the language is not detected as English
+        src_lang = nil unless src_lang.start_with?("en")
+        return src_lang
       end
 
       sleep(1.minute * (i + 1))
@@ -145,7 +149,7 @@ class VideoCaptionService < ApplicationService
   end
 
   def auth_token
-    Rails.application.credentials.send(:"notorious-admin")&.[](:client_authtication_key)
+    Rails.application.credentials.send(:"notorious-admin")&.[](:client_authentication_key)
   end
 
   def request_headers

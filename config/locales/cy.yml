@@ -418,6 +418,7 @@ cy:
     tab_brand_configs: Themâu
     tab_courses: Cyrsiau
     tab_developer_keys: "Allweddi Datblygwyr"
+    tab_extensions: Estyniadau
     tab_faculty_journal: "Nodiadau Cyfadran"
     tab_grading_standards: Graddio
     tab_jobs: Tasgau
@@ -2370,6 +2371,7 @@ cy:
   all_4321c3a1: "Y cyfan"
   all_account_types_e83c1516: "Pob Math o Gyfrif"
   all_accounts_3bafc860: "Pob Cyfrif"
+  all_assignees_removed_14639499: "Pob aseinî wedi’i dynnu"
   all_assignment_groups_a65e9e46: "Pob Grŵp Aseiniadau"
   all_assignments_b79a4d6a: "Pob Aseiniad"
   all_changes_published_27a53ffd: "Pob newid wedi’i gyhoeddi"
@@ -5971,11 +5973,14 @@ cy:
   cas_server_rejected_ticket_message_code_a6ef4093: "Gweinydd CAS wedi gwrthod tocyn: %{message} (%{code})"
   cas_url_4ba2843e: "URL CAS"
   catalan_16f6b78f: Catalaneg
+  catalog_account_not_found_c786ce35: "Heb ddod o hyd i gyfrif catalog"
+  catalog_account_to_copy_fa180ff4: "Cyfrif catalog i'w gopïo"
   catalog_already_enabled_56478a3c: "Catalog wedi’i alluogi’n barod"
   catalog_manage_f57e50f3: "Catalog - rheoli"
   catalog_name_46d37909: "Enw’r Catalog"
   catalog_url_a01655dd: "URL y Catalog"
   catalog_users_already_exist_2894b8c4: "Defnyddwyr catalog yn bodoli’n barod"
+  catalog_was_copied_over_successfully_but_there_was_73889dd1: "Wedi llwyddo i gopïo’r catalog, ond roedd problem yn cysoni’r ymrestriadau o Canvas."
   catalog_was_provisioned_9851448f: "Catalog wedi’i ddarparu."
   catalog_was_unprovisioned_9524cb58: "Catalog heb ei ddarparu."
   catalog_was_updated_743a58eb: "Catalog wedi’i ddiweddaru."
@@ -6780,6 +6785,7 @@ cy:
   confirmation_failed_please_try_again_ae566d37: "Mae’r broses gadarnhau wedi methu.  Rhowch gynnig arall arni."
   confused_panda_questioning_what_to_do_next_42941484: "Panda Dryslyd yn cwestiynu beth i’w wneud nesaf"
   consider_selecting_multiple_submission_types_to_ac_f7e624d5: "Ystyriwch ddewis mwy nag un math o gyflwyniad ar gyfer myfyrwyr sydd ddim yn gallu creu anodiadau."
+  consistent_inheritance_logic_for_developer_keys_in_167f9061: "Rhesymeg etifeddu gyson ar gyfer Allweddi Datblygwyr mewn consortia sydd ddim yn CMC"
   consistent_lti_ags_ids_based_on_account_s_principa_b93fa45: "IDs LTI AGS Cyson yn seiliedig ar brif barth y Cyfrif"
   consortium_parent_keys_803547b: "Allweddi rhiant ar gyfer consortiwm"
   consumer_key_6f94ba11: "Allwedd Defnyddiwr"
@@ -7549,6 +7555,7 @@ cy:
   copy_9748f9f: Copïo
   copy_assignment_name_to_another_course_b62d0a54: "Copïo Aseiniad %{name} i gwrs arall"
   copy_blueprint_course_settings_31a97e96: "Copïo gosodiadau Cwrs Glasbrint"
+  copy_content_615608a7: "Copïo cynnwys"
   copy_list_of_shard_ids_d51cd846: "Copïo rhestr o ids darnau"
   copy_operation_started_successfully_b2f236a1: "Y gwaith copïo wedi dechrau'n llwyddiannus"
   copy_page_to_another_course_405cc07c: "Copïo tudalen i gwrs arall"
@@ -7563,6 +7570,7 @@ cy:
   copy_to_clipboard_493be1b: "Copïo i’r clipfwrdd"
   copy_to_folder_32ecc3c3: "Copïo i Ffolder"
   copying_628a9607: "Wrthi’n copïo..."
+  copying_the_content_of_a_template_catalog_5bd6f3b0: "Copïo cynnwys Catalog templed"
   copyright_and_license_information_must_be_provided_5feffaf: "Rhaid darparu gwybodaeth am hawlfraint a thrwydded ar gyfer ffeiliau cyn eu cyhoeddi."
   copyright_holder_386cc8b8: "Perchennog yr Hawlfraint"
   copyright_holder_66ee111: "Perchennog yr Hawlfraint:"
@@ -9065,6 +9073,7 @@ cy:
   crumbs: 
     access_report: "Adroddiad Mynediad"
     announcements: Cyhoeddiadau
+    apps: Estyniadau
     assignments: Aseiniadau
     calendar_events: "Digwyddiadau Calendr"
     collaborations: Cydweithrediadau
@@ -9753,6 +9762,9 @@ cy:
   designers_add_fe7e1ea9: "Dylunwyr - Ychwanegu"
   designers_remove_39f50ec9: "Dylunwyr - tynnu"
   designers_remove_3e590bff: "Dylunwyr - Tynnu"
+  destination_account_is_not_a_root_account_2f890dff: "Nid yw’r cyfrif cyrchfan yn gyfrif gwraidd"
+  destination_account_is_not_empty_561f7e55: "Nid yw’r cyfrif cyrchfan yn wag"
+  destination_account_not_found_274f33d4: "Heb ddod o hyd i’r cyfrif cyrchfan"
   details_98a31b68: Manylion
   details_a6f427c3: "Manylion:"
   determined_by_course_end_date_5e3ffb4f: "Wedi’i bennu gan ddyddiad gorffen y cwrs"
@@ -9926,6 +9938,8 @@ cy:
   disallow_replies_for_title_ca3806b2: "Gwrthod ymatebion ar gyfer %{title}"
   discard_changes_e04b15f9: "Hepgor y Newidiadau"
   discarded_20a4e7e8: "Wedi’i Hepgor"
+  discover_56d42b60: Darganfod
+  discover_something_new_or_manage_existing_lti_exte_793093cb: "Darganfod rhywbeth newydd neu reoli estyniadau LTI cyfredol"
   discovery_service_url_ca13d3f4: "URL Gwasanaeth Darganfod"
   discovery_url_3dce06d9: "URL Darganfod"
   discussion_6719c51d: Trafodaeth
@@ -10407,6 +10421,7 @@ cy:
   download_these_results_as_csv_9a890883: "Llwytho’r canlyniadau hyn i lawr fel CSV"
   download_this_file_669f9174: "Llwytho’r ffeil hon i lawr"
   downloading_course_content_allows_access_to_conten_164d9336: "Drwy lwytho cynnwys cwrs i lawr, bydd modd cael mynediad at gynnwys heb gysylltiad. Gall cynnwys olygu ffeiliau, tudalennau, aseiniadau, pynciau trafod neu gwisiau. Cliciwch \"Creu ePub\" ar gyfer pob cwrs, a defnyddio unrhyw feddalwedd eDdarllenydd i’w agor."
+  draft_83493fcd: Drafft
   draft_92507c72: (drafft)
   draft_comment_b2376ea4: "Sylw drafft"
   draft_comment_warning_modal_in_speedgrader_ded232c1: "Is-ffenestr Rhybudd Sylw Drafft yn SpeedGrader"
@@ -10786,6 +10801,7 @@ cy:
   enable_gravatar_8a865b41: "Galluogi Gravatar"
   enable_i18n_features_in_outcomes_exports_64bcf82b: "Galluogi nodweddion i18n mewn ffeiliau allgludo deilliannau"
   enable_individual_learning_paths_for_students_base_5236d3bb: "Galluogi llwybrau dysgu unigol ar gyfer myfyrwyr ar sail asesiad."
+  enable_irish_language_support_in_canvas_fe7abaf8: "Galluogi cymorth Gwyddeleg yn Canvas"
   enable_labels_on_the_new_inbox_page_485ce65a: "Galluogi Labeli ar y dudalen Blwch Derbyn newydd"
   enable_migrating_item_banks_to_new_quizzes_during__af6ca020: "Galluogi mudo banciau eitemau i New Quizzes wrth fewngludo/copio cwrs"
   enable_moderated_grading_bacd20d8: "Galluogi graddau wedi'u safoni."
@@ -11689,6 +11705,7 @@ cy:
   extend_due_date_20651e76: "Ymestyn Dyddiad Erbyn"
   extended_632ebee0: estynedig
   extended_9a58dcb6: Estynedig
+  extensions_7250a0bb: Estyniadau
   external_apps_account_course_settings_78de2b2f: "Apiau Allannol (Cyfrif, Gosodiadau Cwrs)"
   external_apps_account_course_settings_c44af5ef: "Apiau Allanol (Gosodiadau Cyfrif/Cwrs)"
   external_apps_course_settings_1f045644: "Apiau Allanol (Gosodiadau Cwrs)"
@@ -14417,6 +14434,8 @@ cy:
   instructor_is_working_on_grades_135388d2: "Mae'r addysgwr yn gweithio ar y graddau"
   instructor_messages_a4c28674: "Negeseuon Addysgwr"
   instructor_name_36bc0f39: "Enw’r Addysgwr"
+  instructor_points_2cd28bd1: "Pwyntiau Addysgwr"
+  instructor_score_6e11587f: "Sgôr Addysgwr"
   instructor_sis_id_899dd697: "Id Sis yr Addysgwr"
   instructors_4b491a07: addysgwyr
   instructors_are_not_bound_by_attempt_limits_but_an_20b78fea: "Dydy addysgwyr ddim wedi’u cyfyngu gan nifer y ceisiadau, ond bydd cyflwyniad addysgwr YN CYFRIF fel ymgais myfyriwr."
@@ -14585,6 +14604,7 @@ cy:
   invalid_fields_for_a_group_invalid_f440b733: "Meysydd annilys ar gyfer grŵp: %{invalid}"
   invalid_fields_for_an_outcome_invalid_fafdf0df: "Meysydd annilys ar gyfer deilliant: %{invalid}"
   invalid_file_type_881cc9b2: "Math o ffeil annilys"
+  invalid_filter_d6ec4d0b: "Hidlydd annilys"
   invalid_freq_freq_84b0427d: "FREQ annilys '%{freq}'"
   invalid_grade_9726cbc6: "Gradd Annilys"
   invalid_grade_passback_setting_a1d209d1: "grade_passback_setting annilys"
@@ -14648,6 +14668,7 @@ cy:
   ip_filter_is_not_valid_152a46d8: "Dydy’r hidlydd IP ddim yn ddilys."
   ireland_353_3cd32cc0: "Iwerddon (+353)"
   irish_567e109f: Gwyddeleg
+  irish_language_support_e09996c4: "Cymorth Gwyddeleg"
   is_an_lti_1_3_tool_770480a1: "Adnodd  LTI 1.3"
   is_blueprint_8f793ba8: is_blueprint
   is_invalid_702840b6: "yn annilys"
@@ -15056,6 +15077,7 @@ cy:
   leave_5e852989: Gadael
   leave_a_comment_7991725b: "Gadael sylw"
   leave_blank_for_no_limit_e8f80808: "Gadael yn wag i beidio â rhoi terfyn"
+  leave_criterion_comment_707a4f18: "Gadael sylw maen prawf"
   leave_group_group_name_6847c632: "Gadael y grŵp %{group_name}"
   left_group_group_name_aac4e813: "Wedi gadael y grŵp %{group_name}"
   len_maxlen_97f1c88d: "%{len}/%{maxLen}"
@@ -15172,6 +15194,7 @@ cy:
   like_post_from_author_79b874f1: "Hoffi post o %{author}"
   like_this_entry_60da41a5: "Hoffi’r Cofnod hwn"
   limit_assignment_names_lengths_max_255_5ee9ebb5: "Cyfyngu hyd enwau aseiniad (hyd at 255)"
+  limit_certain_lti_placements_to_authorized_tools_f4384cb6: "Cyfyngu gosodiadau LTI penodol i adnoddau wedi’u hawdurdodi"
   limit_course_participation_to_term_or_custom_cours_67797a86: "Cyfyngu cymryd rhan mewn cwrs i dymor neu ddyddiadau cwrs penodol?"
   limit_each_time_slot_to_input_value_user_s_47461538: "Cyfyngu pob slot amser i %{input_value} defnyddiwr. "
   limit_each_time_slot_to_num_participants_groups_us_14ec4d65: "Cyfyngu pob slot amser i %{num_participants} *grŵp.* **defnyddiwr.**"
@@ -15399,6 +15422,7 @@ cy:
   lock_selected_announcements_33740f80: "Cloi’r cyhoeddiadau sydd wedi’u dewis"
   lock_this_setting_for_sub_accounts_2ae5af17: "Cloi’r gosodiad hwn ar gyfer isgyfrifon"
   lock_until_549bb904: "Wedi cloi tan"
+  locked_1d1eaa8c: "Wedi Cloi: "
   locked_762f138b: "Wedi Cloi"
   locked_796957c7: "Wedi Cloi:"
   locked_at_cda02889: "Wedi cloi"
@@ -15583,6 +15607,8 @@ cy:
   lti_delete_ee5f1bef: "LTI - dileu"
   lti_dynamic_registration_8592edb0: "Cofrestru Dynamig LTI"
   lti_edit_83a27850: "LTI - golygu"
+  lti_extensions_discover_page_93e4d9e0: "Tudalen Darganfod Estyniadau LTI"
+  lti_extensions_page_4269b418: "Tudalen Estyniadau LTI"
   lti_key_14ad02b1: "Allwedd LTI"
   lti_keys_5677ba9e: "Allweddi LTI"
   lti_launch_af082dc3: "Lansiad LTI:"
@@ -15590,6 +15616,9 @@ cy:
   lti_multiple_assignment_deep_linking_b7d641d7: "LTI Multiple Assignment Deep Linking"
   lti_platform_storage_9d11dc60: "Storfa Llwyfan LTI"
   lti_registration_9e0f754d: "Cofrestru LTI"
+  lti_registrations: 
+    index: 
+      title: Estyniadau
   lti_report_2b6193ab: "Adroddiad LTI"
   lti_submissions_require_a_url_to_submit_85ca9988: "Mae cyflwyniadau LTI angen URL i'w cyflwyno"
   lti_tool_report_f13213b3: "Adroddiad Adnodd LTI"
@@ -18149,6 +18178,7 @@ cy:
   name_is_locked_click_to_unlock_7aad9928: "%{name} wedi’i gloi. Cliciwch i'w ddatgloi"
   name_is_locked_click_to_unlock_bbebf03e: "%{name} wedi’i gloi. Cliciwch i'w ddatgloi."
   name_is_ready_to_be_assigned_temporary_enrollments_f39a6cf6: "Mae %{name} yn barod i gael ymrestriadau dros dro wedi’u neilltuo iddo."
+  name_is_required_4341f774: "Mae’n rhaid rhoi enw"
   name_is_required_ba379522: "Mae’n rhaid rhoi enw"
   name_is_too_long_48daa8db: "Mae’r enw yn rhy hir"
   name_is_too_long_must_be_under_length_characters_b8dad44c: "Mae'r enw yn rhy hir, rhaid iddo fod yn llai na %{length} nod"
@@ -18493,6 +18523,7 @@ cy:
   no_such_source_context_80a659ba: "Dim y fath gyd-destun ffynhonnell"
   no_such_target_context_21158b9: "Dim y fath gyd-destun targed"
   no_such_target_group_7e183d46: "Dim y fath grŵp targed"
+  no_template_accounts_in_this_region_5e84955d: "Dim cyfrifon templed yn y rhanbarth hwn"
   no_template_selected_f59e797: "Dim Templed wedi’i ddewis"
   no_temporary_enrollment_click_to_create_one_a6bafdf4: "Dim ymrestriadau Dros Dro, cliciwch i greu un"
   no_terms_eab5ee7b: "Dim Tymhorau"
@@ -20393,6 +20424,7 @@ cy:
   prev_f82cbc48: Blaenorol
   prev_month_34bd934c: "Mis blaenorol"
   prevent_deletion_of_outcomes_with_alignments_in_os_65020476: "Atal dileu deilliannau gydag aliniadau yn OS"
+  prevent_non_cmc_consortium_parent_dev_key_from_aff_418efa1c: "Atal allwedd datblygwr rhiant consortiwm sydd ddim yn CMC rhag effeithio ar adnoddau mewn plant"
   prevents_students_from_leaving_annotations_in_assi_cb188d2: "Rhwystro myfyrwyr rhag anodi aseiniadau. Ddim yn berthnasol i aseiniadau sy’n cael eu hadolygu gan gyd-fyfyrwyr."
   preview_53003fd2: Rhagolwg
   preview_a3f8f854: RHAGOLWG
@@ -20718,8 +20750,10 @@ cy:
     ways_to_contact_me: Cyswllt
     you_have_no_services: "Dim gwasanaethau wedi'u cofrestru, gallwch chi ychwanegu rhai ar y dudalen *gosodiadau*."
   profile_6bd2baed: Proffil
+  profile_has_been_saved_successfully_12ffc6ea: "Wedi llwyddo i gadw proffil"
   profile_photo_save_failed_too_many_times_e1ebda5: "Mae’r broses o gadw llun proffil wedi methu ormod o weithiau"
   profile_pictures_15953851: "Lluniau Proffil"
+  profile_save_was_unsuccessful_6e27fb5e: "Heb lwyddo i gadw proffil"
   profile_tray_bcec5044: "Ardal proffiliau"
   profiles: 
     gravatar_view: 
@@ -22263,6 +22297,7 @@ cy:
       is-gyfrif "Cyrsiau sydd heb gael eu creu’n awtomatig" yn awtomatig, pan fo wedi’i galluogi, mae’r noddwedd hon yn gadael i
       bobl sy’n gallu creu cyrsiau eu hunain i mewn i unrhyw is-gyfrif
       lle mae ganddyn nhw ymrestriadau.
+  rating_button_buttondisplay_8fb69a4e: "Botwm Sgôr %{buttonDisplay}"
   rating_description_db6adf39: "Disgrifiad o lefel sgôr"
   rating_display_b0b574be: "Dangos Sgôr"
   rating_max_score_eade1523: "Lefel sgôr fwyaf"
@@ -23090,6 +23125,7 @@ cy:
   rubric_assessment: 
     unknown_user: "Defnyddiwr Dieithr"
   rubric_assessment_5f0e8a83: "Asesiad Cyfarwyddyd Sgorio"
+  rubric_assessment_view_mode_1038db: "Modd Gwedd Asesiad Cyfarwyddyd Sgorio"
   rubric_association: 
     no_details: "Dim manylion"
   rubric_button_display_4e4a26fe: "Dangos Botwm Cyfarwyddyd Sgorio"
@@ -23194,6 +23230,7 @@ cy:
   save_11a80ec3: Cadw
   save_and_customize_19eb7a7b: "Cadw ac Addasu"
   save_and_publish_1b765e7: "Cadw a Chyhoeddi"
+  save_as_draft_341d4577: "Cadw fel Drafft"
   save_changes_698abe77: "Cadw Newidiadau"
   save_criterion_cce60085: "Cadw Maen Prawf"
   save_customizations_dde779d8: "Cadw Addasiadau"
@@ -23637,6 +23674,7 @@ cy:
   select_a_student_to_view_281d17b9: "Dewiswch fyfyriwr i’w weld"
   select_a_student_to_view_additional_information_he_c371e40c: "Dewiswch fyfyriwr i weld gwybodaeth ychwanegol yma."
   select_a_student_to_view_the_page_will_refresh_aut_eaa5d00c: "Dewiswch fyfyriwr i’w weld. Bydd y dudalen yn adnewyddu’n awtomatig."
+  select_a_template_account_e0c03ee8: "Dewis cyfrif templed"
   select_a_type_to_restore_de2c0d04: "Chwilio am fath i’w adnewyddu"
   select_access_type_e5955544: "Dewis Math o Fynediad"
   select_all_assignments_bd07b919: "Dewis pob aseiniad"
@@ -24865,6 +24903,7 @@ cy:
   snapshots_6e1806b4: Cipluniau
   snapshots_are_backups_of_your_canvas_trial_taking__f18bd571: "Ffeiliau wrth gefn o’ch treial gyda Canvas yw cipluniau. Wrth dynnu ciplun bydd hyn yn creu \"fersiwn\" unigryw a chofnod perffaith o gyflwr eich treial wrth i chi dynnu’r ciplun."
   social_studies_13fa30c7: "Astudiaethau Cymdeithasol"
+  some_assignments_are_associated_with_an_archived_o_e1856b65: "Mae rhai aseiniadau’n gysylltiedig â chynllun graddau wedi’i archifo neu ei ddileu a does dim modd allgludo’r cynllun graddau."
   some_assignments_could_not_be_created_because_they_d91f2f21: "Doedd dim modd creu rhai aseiniadau oherwydd bydden nhw’n digwydd yn ystod cyfnod graddio sydd wedi dod i ben."
   some_conferences_on_this_page_are_hidden_because_o_789684fd: "Mae rhai cynadleddau ar y dudalen hon yn gudd oherwydd gwallau wrth adfer eu statws"
   some_custom_columns_could_not_be_changed_because_t_88abc9be: "Doedd dim modd newid rhai colofnau personol gan eu bod yn ddarllen yn unig, mae newidiadau ar gyfer y colofnau hynny wedi cael eu hanwybyddu."
@@ -25900,6 +25939,9 @@ cy:
   tell_us_how_and_when_you_would_like_to_be_notified_de3ed2bc: "Dywedwch wrthym sut a phryd hoffech chi gael gwybod am ddigwyddiadau yn Canvas."
   tempe_grade_export_c611da01: "Allgludo Gradd Tempe"
   template_account_21ac8f4f: "Cyfrif Templed"
+  template_account_is_not_a_root_account_83ae89bc: "Nid yw’r cyfrif templed yn gyfrif gwraidd"
+  template_account_is_not_a_template_account_d80200ae: "Nid yw’r cyfrif templed yn gyfrif templed"
+  template_account_not_found_7144542c: "Heb ddod o hyd i’r cyfrif cyrchfan"
   templates_4ca13d07: Templedi
   temporarily_enroll_a_user_into_a_course_this_tempo_990488f8: "Ymrestru defnyddiwr i gwrs dros dro. Mae’r ymrestriad dros dro hwn yn cael ei baru ag ymrestriad arall yn y cwrs."
   temporarily_enroll_name_8acb66ce: "Ymrestru %{name} dros dro"
@@ -26140,6 +26182,7 @@ cy:
   the_course_id_for_the_export_data_a99f37d: "Id cwrs y data allgludo"
   the_course_id_for_the_grade_export_data_d20f4ed: "Id cwrs y data allgludo graddau"
   the_course_id_to_report_on_eb4ad5d2: "Yr id cwrs i adrodd arno"
+  the_course_is_associated_with_an_archived_or_delet_43b836a9: "Mae’r cwrs yn gysylltiedig â chynllun graddau wedi’i archifo neu ei ddileu a does dim modd allgludo’r cynllun graddau."
   the_course_link_validator_searches_course_content__563fa215: "Mae dilysydd dolen cwrs yn chwilio drwy gynnwys y cwrs am ddolenni a delweddau annilys neu nad oes modd eu cyrraedd."
   the_course_link_validator_searches_through_course__76f0bc63: "Mae dilysydd dolen cwrs yn chwilio drwy gynnwys y cwrs ac yn dychwelyd pob dolen annilys neu sydd ddim yn ymateb y daw ar ei thraws. Cofiwch nad ydy rhai dolenni sydd wedi'u fflagio fel rhai sydd ddim yn ymateb ar gael ar ein gweinyddion ni ac y byddant yn dal i weithio i fyfyrwyr."
   the_course_state_manage_permission_allows_the_user_1d9da094: "Cyflwr y Cwrs - mae rheoli hawliau yn gadael i'r defnyddiwr gyhoeddi cyrsiau sydd ddim yn cynnwys modiwlau. I gyhoeddi a dad-gyhoeddi cynnwys modiwl, rhaid i'r adran Cynnwys Cwrs - ychwanegu / golygu / dileu fod wedi cael ei galluogi."
@@ -26262,6 +26305,7 @@ cy:
   the_link_you_used_has_expired_click_forgot_passwor_80569899: "Mae’r ddolen y gwnaethoch chi ei defnyddio wedi dod i ben. Gallwch glicio \"Wedi anghofio’r cyfrinair?\" i gael dolen newydd i ailosod y cyfrinair."
   the_list_below_is_content_that_has_been_shared_wit_2b2648bc: "Mae rhestr isod yn cynnwys ffeiliau sydd wedi cael eu rhannu gyda chi. Gallwch weld rhagolwg o'r cynnwys, ei fewngludo i'ch cwrs, neu ei dynnu o'r rhestr."
   the_login_login_is_currently_suspended_and_will_no_472b19e9: "Mae’r %{login} mewngofnodi wedi’i atal ar hyn p bryd ac ni fydd yn gallu cael mynediad at Canvas"
+  the_lti_extensions_discover_page_won_t_be_accessib_1451172e: "Ni fydd y dudalen Darganfod Estyniadau LTI ar gael oni bai fod y dudalen Cofrestriadau LTI wedi’i galluogi."
   the_lti_tool_was_deleted_on_3727da23: "Cafodd yr Adnodd LTI ei ddileu ar"
   the_lti_user_was_deleted_2a3b796f: "Cafodd y Defnyddiwr LTI ei ddileu"
   the_material_is_in_the_public_domain_279c39a3: "Mae’r deunydd yn y parth cyhoeddus"
@@ -26280,9 +26324,14 @@ cy:
                 Tîm Cymorth Canvas
   the_message_you_sent_with_the_subject_line_subject_8157a1ff: |-
       Dydy’r neges y gwnaethoch chi ei hanfon gyda’r llinell pwnc "%{subject}" ddim wedi cael ei danfon oherwydd bod eich cyfrif wedi cael ei atal.
-      
-      Diolch,
-      Canvas Support
+                  
+                  Diolch yn fawr,
+                  Tîm Cymorth Canvas
+  the_message_you_sent_with_the_subject_line_subject_8511b0dd: |-
+      Dydy’r neges y gwnaethoch chi ei hanfon gyda’r llinell pwnc  "%{subject}" ddim wedi cael ei danfon gan nad ydych chi’n gyfranogwr dilys yn y sgwrs.
+                  
+                  Diolch yn fawr,
+                  Tîm Cymorth Canvas
   the_message_you_sent_with_the_subject_line_subject_c73f92e4: |-
       Dydy’r neges y gwnaethoch chi ei hanfon gyda’r llinell pwnc "%{subject}" ddim wedi cael ei danfon. I ateb i neges Canvas o’r e-bost hwn, mae’n rhaid ei gadarnhau fel ffordd o gyfathrebu yn eich proffil Canvas. Ewch i’ch proffil ac ailanfon yr e-bost cadarnhau ar gyfer y cyfeiriad e-bost hwn [https://community.canvaslms.com/docs/DOC-2281]. Gallwch hefyd gysylltu â’r person hwn drwy Flwch Derbyn Canvas [https://community.canvaslms.com/docs/DOC-2670].
       
@@ -26574,6 +26623,7 @@ cy:
   there_was_an_unexpected_error_deleting_the_convers_412fd621: "Gwall annisgwyl wrth ddileu neges mewn sgwrs."
   there_was_an_unexpected_error_deleting_the_discuss_fe1022cb: "Gwall annisgwyl wrth greu’r pwnc trafodaeth."
   there_was_an_unexpected_error_deleting_the_topic_b53db7a7: "Gwall annisgwyl wrth ddileu'r pwnc.."
+  there_was_an_unexpected_error_error_ca0fc77e: "Gwall annisgwyl: %{error}"
   there_was_an_unexpected_error_loading_the_discussi_cc4ee42: "Gwall annisgwyl wrth lwytho’r cofnod trafodaeth."
   there_was_an_unexpected_error_loading_the_replies_578d9738: "Gwall annisgwyl wrth lwytho’r ymatebion."
   there_was_an_unexpected_error_marking_all_as_read_117fe739: "Gwall annisgwyl wrth farcio pob un fel wedi’u darllen."
@@ -26657,6 +26707,7 @@ cy:
     one: "Dim ond er mwyn profi Canvas y mae’r rhaglen hon yn cael ei defnyddio, a *bydd yn cael ei hailosod bob wythnos.*"
     other: "Dim ond er mwyn profi Canvas y mae’r rhaglen hon yn cael ei defnyddio, a *bydd yn cael ei hailosod bob %{count} wythnos.*"
     two: "Dim ond er mwyn profi Canvas y mae’r rhaglen hon yn cael ei defnyddio, a *bydd yn cael ei hailosod bob %{count} wythnos.*"
+  this_catalog_will_be_a_template_account_and_its_da_8b6277cb: "Bydd y Catalog hwn yn gyfrif templed, ac mae modd copïo ei ddata i Gatalogau sydd newydd eu darparu."
   this_code_expires_in_timefromnow_ec7ccef4: "Bydd y cod hwn yn dod i ben mewn %{timeFromNow}."
   this_code_expires_timefromnow_877a5225: "Bydd y cod hwn dod i ben %{timeFromNow}."
   this_code_has_expired_41f76642: "Mae’r cod hwn wedi dod i ben."
@@ -26817,8 +26868,10 @@ cy:
   this_is_an_account_setting_that_must_be_enabled_by_8ced660: "Rhaid i’r gosodiad cyfrif hwn gael ei roi ar waith gan Reolwr Llwyddiant Cwsmeriaid. Mae rhybuddion yn nodweddion sy'n cael eu defnyddio'n anaml er mwyn anfon rhybudd at fyfyrwyr, athrawon a gweinyddwr ar gyfer pethau penodol (e.e. dim rhyngweithio rhwng myfyrwyr ac athrawon am 7 diwrnod). Maen nhw’n cael eu gwirio bob dydd a bydd hysbysiadau’n cael eu hanfon at y myfyriwr a/neu’r athro nes bydd y broblem sy’n sbarduno hynny wedi cael ei datrys."
   this_is_an_account_setting_that_must_be_turned_on__4c939dea: "Rhaid i’r gosodiad cyfrif hwn gael ei roi ar waith gan eich Rheolwr Llwyddiant Cwsmeriaid."
   this_is_an_anonymous_discussion_student_names_and__bc19b64d: "Mae hon yn Drafodaeth ddienw. Mae enwau a lluniau proffil myfyrwyr wedi'u cuddio."
+  this_is_an_anonymous_discussion_though_student_nam_c45b563e: "Mae hon yn Drafodaeth ddienw. Er y bydd enw a llun proffil y myfyriwr wedi’u cuddio, bydd eich enw a’ch llun proffil i’w gweld gan bob aelod o’r cwrs. Mae sylwadau hefyd wedi cael eu hanalluogi."
   this_is_an_anonymous_discussion_though_student_nam_f98abe71: "Mae hon yn Drafodaeth ddienw. Er y bydd enw a llun proffil y myfyriwr wedi’u cuddio, bydd eich enw a’ch llun proffil i’w gweld gan bob aelod o’r cwrs."
   this_is_an_anonymous_discussion_your_name_and_prof_72c49b77: "Mae’r Drafodaeth hon yn ddienw, bydd eich enw a’ch llun proffil yn cael eu cuddio oddi wrth aelodau eraill y cwrs."
+  this_is_an_anonymous_discussion_your_name_and_prof_c88f50e2: "Mae hon yn Drafodaeth ddienw. Bydd eich enw a’ch llun proffil yn cael eu cuddio oddi wrth aelodau eraill o’r cwrs. Mae sylwadau hefyd wedi cael eu hanalluogi."
   this_is_enabled_by_default_as_assignments_can_not__767e9b16: "Mae hyn yn cael ei alluogi’n ddiofyn gan nad oes modd i aseiniadau gael eu dal yn ôl o’r llyfr graddau a chyfrif tuag ato."
   this_is_just_a_dev_only_feature_you_can_turn_on_to_7f88c58f: "Mae hon yn nodwedd ar gyfer y datblygwr yn unig, a gallwch ei rhoi ar waith i gael rhagolwg o sut byddai tudalennau’n edrych mewn amgylchedd RTL, heb orfod newid eich iaith i un sy’n arfer dilyn y drefn o’r dde i’r chwith"
   this_is_not_a_breaking_change_all_lti_1_3_tool_beh_16df3ac0: "Dydy hwn *ddim* yn newid torri. Bydd holl ymddygiad adnoddau LTI 1.3 yn aros yr un fath beth bynnag fo’r pwynt gorffen sy’n cael ei ddefnyddio, ac eithrio’r fanyleb Storfa Llwyfan y mae modd delio â hi o’r newydd. Bydd gorfodi’r newid hwn y digwydd yn nes ymlaen ar ddyddiad sydd heb ei bennu."
@@ -28366,6 +28419,10 @@ cy:
   update_public_jwk_9f25f520: "Diweddaru JWK Cyhoeddus"
   update_rating_6d29c2ef: "Diweddaru Sgôr"
   update_settings_9b422d0f: "Diweddaru Gosodiadau"
+  update_the_assignment_submission_type_launch_butto_bf130d86: "Diweddaru’r botwm lansio math o gyflwyniad aseiniad"
+  update_the_look_of_all_tools_using_the_submission__368b06c: |-
+      Diweddarwch olwg yr holl adnoddau gan ddefnyddio’r gosodiad submission_type_selection
+      i fod yn ddyluniad mwy modern i gyd-fynd â gweddill UI Canvas
   update_tool_7d48ef2a: "Diweddaru %{tool}"
   update_your_notification_settings_ed9564f3: "Diweddaru gosodiadau eich hysbysiadau"
   updated_2c1e8615: "Wedi diweddaru"
@@ -29211,6 +29268,7 @@ cy:
   warning_if_there_are_any_users_with_this_role_they_1a7c1fef: "Rhybudd: Os oes unrhyw ddefnyddwyr â’r rôl hon, byddant yn cadw’r hawliau presennol ond ni fydd modd i chi greu defnyddwyr newydd gyda’r rôl hon."
   warning_step_has_children_that_aren_t_stepitem_com_32a3f351: "Rhybudd mae gan Step blant sydd ddim yn gydrannau StepItem"
   warning_step_has_two_stepitems_with_a_status_of_in_77138e9e: "Rhybudd: Mae gan Step ddau StepItems gyda'r statws ar y gweill"
+  warning_the_submission_type_selection_placement_is_d327c8d: "Rhybudd: dim ond ar gyfer adnoddau LTI wedi’u cymeradwyo gan Insructure y mae'r gosodiad submission_type_selection wedi’i ganiatáu. Os ydych chi’n meddwl eich bod chi wedi derbyn y neges hon drwy gamgymeriad, cysylltwch â’ch tîm cymorth."
   warning_you_are_about_to_adjust_this_group_s_membe_a04281b6: "Rhybudd! Rydych chi ar fin addasu aelodaeth y grŵp hwn. *Bydd hyn yn effeithio ar gyflwyniadau, nodiadau, a sylwadau cyfredol y grŵp ac yn arwain at golli data yn y grŵp hwn A grŵp blaenorol y myfyriwr.*** I osgoi canlyniadau anfwriadol gyda chyflwyniadau grŵp cyfredol, dylech greu set newydd o grwpiau ar gyfer aseiniadau yn y dyfodol. **"
   warnings: 
     test_install: 
@@ -29222,6 +29280,7 @@ cy:
         other: "Dim ond er mwyn profi Canvas y mae’r rhaglen hon yn cael ei defnyddio, a bydd yn cael ei hailosod bob %{count} wythnos."
         two: "Dim ond er mwyn profi Canvas y mae’r rhaglen hon yn cael ei defnyddio, a bydd yn cael ei hailosod bob %{count} wythnos."
   was_locked_at_date_acf1c576: "Wedi cloi %{date}"
+  was_not_selected_30d63a10: "heb ei ddewis"
   watermark_c93fae0d: "Marc dŵr"
   watermark_opacity_ce3d3097: "Anrhyloywedd marc dŵr"
   watermarks_other_images_e970fc6a: "Marciau Dŵr a Delweddau Eraill"
@@ -29331,7 +29390,9 @@ cy:
       lwytho mewn tab newydd. Pan fo’r fflag hon wedi’i galluogi, bydd y blwch ticio hwnnw wedi’i ddewis yn ddiofyn
       os gwnaeth y defnyddiwr ei dicio y tro diwethaf iddyn nhw ychwanegu dolen allanol.
   when_adding_multiple_users_use_a_comma_or_line_bre_67f9c87d: "Wrth ychwanegu mwy nag un defnyddiwr, mae angen i chi ddefnyddio coma neu doriad linell i wahanu’r defnyddwyr."
+  when_creating_a_reply_students_will_have_the_optio_34556e85: "Wrth greu ateb, bydd gan fyfyrwyr yr opsiwn o ddangos eu henwau a’u llun proffil neu aros yn anhysbys. Bydd eich enw a’ch llun Proffil yn gallu cael eu gweld gan bob aelod o’r cwrs. Mae sylwadau hefyd wedi cael eu hanalluogi."
   when_creating_a_reply_students_will_have_the_optio_716eb2f4: "Wrth greu ateb, bydd gan fyfyrwyr yr opsiwn o ddangos eu henwau a’u llun proffil neu aros yn anhysbys. Bydd eich enw a’ch llun Proffil yn gallu cael eu gweld gan bob aelod o’r cwrs."
+  when_creating_a_reply_you_will_have_the_option_to__3fb91c13: "Wrth greu ateb, bydd gennych chi’r opsiwn o ddangos eich enw a’ch llun proffil i aelodau eraill y cwrs neu aros yn anhysbys. Mae sylwadau hefyd wedi cael eu hanalluogi."
   when_creating_a_reply_you_will_have_the_option_to__8607ac10: "Wrth greu ateb, bydd gennych chi’r opsiwn o ddangos eich enw a’ch llun proffil i aelodau eraill y cwrs neu aros yn anhysbys."
   when_disabled_new_or_updated_contextexternaltool_i_27e19300: |-
       Pan wedi’u hanalluogi, bydd lleoliad gosodiadau ContextExternalTool newydd neu wedi’u diweddaru (gan gynnwys
@@ -29348,6 +29409,21 @@ cy:
       trefnu a’u hidlo.
   when_enabled_an_lti_tool_with_the_assignment_edit__cd60b1a0: "Pan wedi’i alluogi, bydd adnodd LTI gyda’r lleoliad assignment_edit yn cael ei lansio ar y dudalen Cyhoeddiadau."
   when_enabled_collect_internal_analytics_metrics_us_88e81ee5: "Pan fo wedi’i alluogi, casglwch fetrigau dadansoddi mewnol gan ddefnyddio system ddosbarthedig."
+  when_enabled_for_a_child_account_of_a_non_centrall_8b126bc0: |-
+      Pan mae wedi’i alluogi ar gyfer cyfrif plentyn consortiwm sydd ddim yn cael ei reoli’n ganolog,
+      ni fydd cyflwr allwedd datblygwr a thocynnau o riant y consortiwm yn cael eu
+      hetifeddu i is-gyfrifon plentyn y consortiwm. Pan mae wedi’i analluogi, mae’r hen
+      ymddygiad (anghyson) yn cael ei ddilyn. Dim ond i gyfrifon
+      _child_ consortiwm y mae’r fflag hon yn berthnasol. Dydy’r fflag hon ddim yn effeithio ar gonsortia sy’n cael eu rheoli’n ganolog mewn
+      unrhyw ffordd.
+  when_enabled_for_the_parent_account_of_a_non_centr_4d7adbaa: |-
+      Pan mae wedi’i alluogi ar gyfer cyfrif rhiant consortiwm sydd ddim yn cael ei reoli’n ganolog,
+      ni fydd galluogi/analluogi allweddi datblygwyr yn y rhiant yn effeithio ar osodiadau
+      adnoddau’r cyfrifon plentyn. Pan mae wedi’i analluogi, mae galluogi/analluogi
+      allweddi datblygwyr wedi’u hetifeddu o Weinyddwr Safle mewn cyfrif rhiant consortiwm sydd ddim yn cael ei
+      reoli’n ganolog yn effeithio ar (dileu/adfer) adnoddau yn y cyfrifon
+      plentyn (hen ymddygiad). Dim ond i gyfrifon _parent_
+      consortiwm y mae’r fflag hon yn berthnasol. Dydy’r fflag hon ddim yn effeithio ar gonsortia sy’n cael eu rheoli’n ganolog mewnunrhyw ffordd.
   when_enabled_it_deprecates_the_short_message_servi_18c6ee3f: "Pan fo wedi’i alluogi mae’n dibrisio’r Gwasanaeth Negeseuon Byr (SMS)"
   when_enabled_lti_1_1_speedgrader_launches_will_set_47dcded1: |-
       Pan mae wedi’i alluogi, bydd lansiadau LTI 1.1 SpeedGrader yn gosod y resource_link_id a’r
@@ -29370,6 +29446,9 @@ cy:
       Pan fydd wedi'i alluogi, mae'n anfon data ar gyfer pob lansiad LTI i'r PandataEvents system
       ar gyfer ymholi a delweddu.
   when_enabled_site_admin_account_ui_will_allow_asso_9d04a1d8: "Pan fo wedi’i alluogi, bydd yr UI cyfrif gweinyddu safle yn caniatáu cysylltu defnyddiwr gwasanaeth gyda DeveloperKey a defnyddio allwedd/defnyddiwr gyda’r math o grant client_credentials"
+  when_enabled_submission_type_selection_placement_u_412d226e: |-
+      Pan mae wedi’i alluogi, Submission_type_selection bydd y defnydd o’r gosodiad wedi’i
+      gyfyngu gyda rhestr ganiatáu.
   when_enabled_teachers_can_choose_to_allow_observer_320b555e: |-
       Pan fydd wedi'i alluogi, gall athrawon ddewis caniatáu i arsylwyr drefnu apwyntiadau
       wrth greu grwpiau apwyntiadau yn y calendr.
@@ -29378,6 +29457,8 @@ cy:
       a bydd gan bob un rif ar hap wedi’i atodi at eu id. Pan mae wedi’i analluogi, mae gan bob
       un yr un id o tool_form.
   when_enabled_the_internal_access_manager_will_be_u_bc470109: "Pan fo wedi’i alluogi, bydd y rheolwr mynediad mewnol yn cael ei ddefnyddio i rwystro mynediad at rai ceisiadau."
+  when_enabled_the_lti_extensions_discover_page_will_8bb57ff6: "Pan mae wedi’i galluogi, bydd y dudalen Darganfod Estyniadau LTI ar gael yn y wedd Estyniadau."
+  when_enabled_the_lti_extensions_page_will_be_avail_ac8ed3fa: "Pan mae wedi’i galluogi, bydd y dudalen Estyniadau LTI ar gaen yn yr adran crwydro’r Cyfrif."
   when_enabled_this_flag_displays_a_word_count_in_th_a75163d6: |-
       Pan fo wedi’i alluogi, mae’r fflag hon yn dangos nifer y geiriau yn speed grader ar
       gyfer cyflwyniadau testun.
@@ -29401,6 +29482,7 @@ cy:
       allwedd datblygwr a’r adnodd gwreiddiol Mae hyn yn atal yr achos ymylol lle mae mwy nag un allwedd
       datblygwr yn rhannu’r un parth, a byddai adnodd o’r allwedd datblygwr anghywir yn cael ei chyfateb yn gyntaf.
   when_posting_grades_for_anonymous_assignments_grad_b13f3ae6: "Wrth bostio graddau ar gyfer aseiniad dienw, bydd y graddau'n cael eu postio i bawb ar y cwrs. Bydd anhysbysrwydd yn cael ei dynnu"
+  when_posting_grades_for_this_anonymous_assignment__1c64fadf: "Wrth bostio graddau ar gyfer yr aseiniad dienw hwn, bydd y graddau'n cael eu postio i bawb y mae’r eitem hwn wedi’i neilltuo iddynt. Bydd anhysbysrwydd yn cael ei dynnu"
   when_scope_enforcement_is_disabled_tokens_have_acc_6939182f: "Pan fydd gorfodi cwmpas wedi’i analluogi, bydd gan y tocynnau fynediad at bob pwynt gorffen sydd ar gael i’r defnyddiwr sy'n awdurdodi."
   when_selected_the_course_is_in_a_read_only_state_o_5aaeb0d: "Pan fydd y cwrs wedi’i ddewis bydd mewn cyflwr darllen yn unig y tu all i’r dyddiau hyn."
   when_selected_the_course_is_inaccessible_outside_c_af595406: "Pan fydd y cwrs wedi’i ddewis ni fydd ar gael y tu allan i ddyddiadau’r cwrs. Os yw dyddiadau’r cwrs yn wag, mae’r dyddiadau dechrau a gorffen yn cyfateb i ddyddiadau’r tymor."

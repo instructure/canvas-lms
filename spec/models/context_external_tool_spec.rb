@@ -4083,7 +4083,7 @@ describe ContextExternalTool do
 
       context "when the placement is allowed by developer_key_id" do
         before do
-          Setting.set("submission_type_selection_allowed_dev_keys", developer_key.id.to_s)
+          Setting.set("submission_type_selection_allowed_dev_keys", Shard.global_id_for(developer_key.id).to_s)
         end
 
         it { is_expected.to be true }
@@ -4095,6 +4095,17 @@ describe ContextExternalTool do
         end
 
         it { is_expected.to be true }
+      end
+
+      context "when the tool has no domain and domain list is containing an empty space" do
+        before do
+          tool.update!(domain: "")
+          tool.update!(developer_key: nil)
+          Setting.set("submission_type_selection_allowed_launch_domains", ", ,,")
+          Setting.set("submission_type_selection_allowed_dev_keys", ", ,,")
+        end
+
+        it { is_expected.to be false }
       end
     end
 

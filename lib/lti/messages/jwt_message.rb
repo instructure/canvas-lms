@@ -205,13 +205,9 @@ module Lti::Messages
       @message.assignment_and_grade_service.scope = @tool.developer_key.scopes & TokenScopes::LTI_AGS_SCOPES
 
       @message.assignment_and_grade_service.lineitems =
-        if @context.root_account.feature_enabled?(:consistent_ags_ids_based_on_account_principal_domain)
-          @expander.controller.lti_line_item_index_url(
-            host: @context.root_account.environment_specific_domain, course_id: course_id_for_ags_url
-          )
-        else
-          @expander.controller.lti_line_item_index_url(course_id: course_id_for_ags_url)
-        end
+        @expander.controller.lti_line_item_index_url(
+          host: @context.root_account.environment_specific_domain, course_id: course_id_for_ags_url
+        )
     end
 
     def associated_1_1_tool
@@ -234,14 +230,10 @@ module Lti::Messages
 
     def add_names_and_roles_service_claims!
       @message.names_and_roles_service.context_memberships_url =
-        if @context.root_account.feature_enabled?(:consistent_ags_ids_based_on_account_principal_domain)
-          @expander.controller.polymorphic_url(
-            [@context, :names_and_roles],
-            host: @context.root_account.environment_specific_domain
-          )
-        else
-          @expander.controller.polymorphic_url([@context, :names_and_roles])
-        end
+        @expander.controller.polymorphic_url(
+          [@context, :names_and_roles],
+          host: @context.root_account.environment_specific_domain
+        )
       @message.names_and_roles_service.service_versions = ["2.0"]
     end
 

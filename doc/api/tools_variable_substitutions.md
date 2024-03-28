@@ -234,7 +234,8 @@ Returns an empty string otherwise.
 ```
 ## com.instructure.User.sectionNames
 Returns an array of the section names in a JSON-escaped format that the user is enrolled in, if the
-context of the tool launch is within a course.
+context of the tool launch is within a course. The names are sorted by the course_section_id, so that
+they are useful in conjunction with the Canvas.course.sectionIds substitution.
 
 **Availability**: *when launched from a course*  
 **Launch Parameter**: *com_instructure_user_section_names*  

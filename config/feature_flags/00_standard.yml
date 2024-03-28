@@ -162,12 +162,6 @@ international_sms:
     from Canvas.
   applies_to: RootAccount
   root_opt_in: true
-irish_language_pack:
-    state: hidden
-    display_name: Irish language support
-    description: Enable Irish language support in Canvas
-    applies_to: RootAccount
-    shadow: true
 javascript_csp:
   type: setting
   state: allowed

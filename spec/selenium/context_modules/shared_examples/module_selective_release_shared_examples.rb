@@ -416,6 +416,21 @@ shared_examples_for "selective_release edit module lock until" do |context|
     ignore_relock
     expect(unlock_details(@module.id).text).to eq("")
   end
+
+  it "shows error if lock until date and time are empty on edit module tray" do
+    get @mod_url
+    lock_until_date_input = ""
+    scroll_to_the_top_of_modules_page
+    manage_module_button(@module).click
+    module_index_menu_tool_link("Edit").click
+    click_lock_until_checkbox
+
+    update_lock_until_date(lock_until_date_input)
+    update_lock_until_time("")
+    click_settings_tray_update_module_button
+    expect(lock_until_input.text).to include("Unlock date can’t be blank")
+    check_element_has_focus(lock_until_date)
+  end
 end
 
 shared_examples_for "selective_release add module lock until" do |context|

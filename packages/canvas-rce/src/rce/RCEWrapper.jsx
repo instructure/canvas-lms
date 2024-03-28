@@ -309,6 +309,7 @@ class RCEWrapper extends React.Component {
       explicit_latex_typesetting = false,
       rce_transform_loaded_content = false,
       media_links_use_attachment_id = false,
+      rce_find_replace = false
     } = this.props.features
 
     return {
@@ -316,6 +317,7 @@ class RCEWrapper extends React.Component {
       explicit_latex_typesetting,
       rce_transform_loaded_content,
       media_links_use_attachment_id,
+      rce_find_replace,
     }
   }
 
@@ -997,8 +999,16 @@ class RCEWrapper extends React.Component {
     this.fixToolbarKeyboardNavigation()
 
     this.props.onInitted?.(editor)
-  }
 
+    // cleans up highlight artifacts from findreplace plugin
+    if (this.getRequiredFeatureStatuses().rce_find_replace) {
+      editor.on('undo redo', (e) => {
+        if (editor?.dom?.doc?.getElementsByClassName?.('mce-match-marker')?.length > 0) {
+          editor.plugins?.searchreplace?.done()
+        }
+      })
+    }
+  }
   /**
    * Fix keyboard navigation in the expanded toolbar
    *
@@ -1324,13 +1334,14 @@ class RCEWrapper extends React.Component {
     }
   }
 
-  onA11yChecker = () => {
+  onA11yChecker = (triggerElementId) => {
     const editor = this.mceInstance()
     editor.execCommand(
       'openAccessibilityChecker',
       false,
       {
         mountNode: instuiPopupMountNode,
+        triggerElementId,
         onFixError: errors => {
           this.setState({a11yErrorsCount: errors.length})
         },
@@ -1431,6 +1442,11 @@ class RCEWrapper extends React.Component {
       canvasPlugins.push('instructure_fullscreen')
     }
 
+    if(this.getRequiredFeatureStatuses().rce_find_replace) {
+      canvasPlugins.push('searchreplace')
+      canvasPlugins.push('instructure_search_and_replace')
+    }
+
     const possibleNewMenubarItems = this.props.editorOptions.menu
       ? Object.keys(this.props.editorOptions.menu).join(' ')
       : undefined
@@ -1505,7 +1521,7 @@ class RCEWrapper extends React.Component {
             items:
               'instructure_links instructure_image instructure_media instructure_document instructure_icon_maker | instructure_equation inserttable instructure_media_embed | hr',
           },
-          tools: {title: formatMessage('Tools'), items: 'instructure_wordcount lti_tools_menuitem'},
+          tools: {title: formatMessage('Tools'), items: 'instructure_wordcount lti_tools_menuitem instructure_search_and_replace'},
           view: {
             title: formatMessage('View'),
             items: 'instructure_fullscreen instructure_exit_fullscreen instructure_html_view',

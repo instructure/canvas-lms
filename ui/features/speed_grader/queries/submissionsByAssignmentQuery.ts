@@ -36,6 +36,9 @@ const SUBMISSIONS_BY_ASSIGNMENT_QUERY = gql`
           gradingStatus
           postedAt
           score
+          submissionStatus
+          customGradeStatus
+          excused
           user {
             _id
             id

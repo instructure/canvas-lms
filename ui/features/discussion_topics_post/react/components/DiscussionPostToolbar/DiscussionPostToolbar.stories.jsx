@@ -58,7 +58,17 @@ export const WithChildTopics = Template.bind({})
 WithChildTopics.args = {
   childTopics: [
     ChildTopic.mock(),
-    ChildTopic.mock({_id: '2', contextName: 'Group 2', contextId: '2'}),
-    ChildTopic.mock({_id: '3', contextName: 'Group 3', contextId: '3'}),
+    ChildTopic.mock({
+      _id: '2',
+      contextName: 'Group 2',
+      contextId: '2',
+      entryCounts: {unreadCount: 0},
+    }),
+    ChildTopic.mock({
+      _id: '3',
+      contextName: 'Group 3',
+      contextId: '3',
+      entryCounts: {unreadCount: 0},
+    }),
   ],
 }

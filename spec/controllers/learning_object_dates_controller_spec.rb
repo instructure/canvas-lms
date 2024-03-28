@@ -51,6 +51,7 @@ describe LearningObjectDatesController do
                                  "unlock_at" => "2022-01-01T00:00:00Z",
                                  "lock_at" => "2022-01-03T01:00:00Z",
                                  "only_visible_to_overrides" => true,
+                                 "graded" => true,
                                  "visible_to_everyone" => false,
                                  "overrides" => [{
                                    "id" => @override.id,
@@ -78,6 +79,7 @@ describe LearningObjectDatesController do
                                  "unlock_at" => nil,
                                  "lock_at" => nil,
                                  "only_visible_to_overrides" => false,
+                                 "graded" => true,
                                  "visible_to_everyone" => true,
                                  "overrides" => [{
                                    "id" => @override.id,
@@ -103,6 +105,7 @@ describe LearningObjectDatesController do
                                  "id" => context_module.id,
                                  "unlock_at" => nil,
                                  "only_visible_to_overrides" => true,
+                                 "graded" => false,
                                  "overrides" => [{
                                    "id" => @override.id,
                                    "context_module_id" => context_module.id,
@@ -137,6 +140,7 @@ describe LearningObjectDatesController do
                                  "unlock_at" => "2022-05-05T12:00:00Z",
                                  "lock_at" => "2022-05-07T12:00:00Z",
                                  "only_visible_to_overrides" => false,
+                                 "graded" => true,
                                  "visible_to_everyone" => true,
                                  "overrides" => [{
                                    "id" => override.id,
@@ -166,6 +170,7 @@ describe LearningObjectDatesController do
                                  "unlock_at" => "2022-01-05T12:00:00Z",
                                  "lock_at" => "2022-03-05T12:00:00Z",
                                  "only_visible_to_overrides" => false,
+                                 "graded" => false,
                                  "visible_to_everyone" => true,
                                  "overrides" => [{
                                    "id" => override.id,
@@ -191,6 +196,7 @@ describe LearningObjectDatesController do
                                  "unlock_at" => "2022-01-05T00:00:00Z",
                                  "lock_at" => "2022-03-05T00:00:00Z",
                                  "only_visible_to_overrides" => false,
+                                 "graded" => false,
                                  "visible_to_everyone" => true,
                                  "overrides" => [{
                                    "id" => override.id,
@@ -217,6 +223,7 @@ describe LearningObjectDatesController do
                                  "unlock_at" => "2022-01-05T00:00:00Z",
                                  "lock_at" => "2022-03-05T00:00:00Z",
                                  "only_visible_to_overrides" => false,
+                                 "graded" => false,
                                  "visible_to_everyone" => true,
                                  "overrides" => [{
                                    "id" => override.id,
@@ -434,6 +441,30 @@ describe LearningObjectDatesController do
         new_override = differentiable.assignment_overrides.active.last
         expect(new_override.course_section.id).to eq section2.id
         expect(new_override.unlock_at.iso8601).to eq "2024-01-01T01:00:00Z"
+      end
+
+      it "doesn't duplicate module overrides on a learning object" do
+        context_module = @course.context_modules.create!(name: "module")
+        module1_override = context_module.assignment_overrides.create!
+        context_module.content_tags.create!(content: differentiable, context: @course, tag_type: "context_module")
+
+        override2 = differentiable.assignment_overrides.create!(unlock_at: "2022-02-01T01:00:00Z",
+                                                                unlock_at_overridden: true,
+                                                                lock_at: "2022-02-02T01:00:00Z",
+                                                                lock_at_overridden: true)
+        override2.assignment_override_students.create!(user: student_in_course.user)
+        override_params = [{ id: module1_override.id },
+                           { id: override2.id, unlock_at: "2022-03-01T01:00:00Z" }]
+        override_params[1][:due_at] = "2024-02-01T01:00:00Z" if support_due_at
+        put :update, params: { **default_params, assignment_overrides: override_params }
+        expect(response).to be_no_content
+        expect(differentiable.assignment_overrides.active.count).to eq 1
+        expect(differentiable.all_assignment_overrides.active.count).to eq 2
+        override2.reload
+        expect(override2.unlock_at.iso8601).to eq "2022-03-01T01:00:00Z"
+        expect(override2.unlock_at_overridden).to be true
+        expect(override2.lock_at).to be_nil
+        expect(override2.lock_at_overridden).to be false
       end
 
       it "returns bad_request if trying to create duplicate overrides" do

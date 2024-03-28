@@ -33,7 +33,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
         title = "test_page"
         unpublished = false
         edit_roles = "public"
-        validations = ["teachers", "teachers,students", "teachers,students,public"]
+        validations = ["teachers", "teachers,students", "teachers,students,members"]
 
         p = create_wiki_page(title, unpublished, edit_roles)
         get "/courses/#{@course.id}/pages/#{p.title}/edit"

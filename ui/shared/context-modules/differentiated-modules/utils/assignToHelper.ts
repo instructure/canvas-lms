@@ -72,9 +72,9 @@ export const generateDateDetailsPayload = (cards: ItemAssignToCardSpec[]) => {
   const everyoneCard = cards.find(card => card.selectedAssigneeIds.includes('everyone'))
   const overrideCards = cards.filter(card => card.key !== 'everyone')
   if (everyoneCard !== undefined) {
-    payload.due_at = everyoneCard.due_at
-    payload.unlock_at = everyoneCard.unlock_at
-    payload.lock_at = everyoneCard.lock_at
+    payload.due_at = everyoneCard.due_at || null
+    payload.unlock_at = everyoneCard.unlock_at || null
+    payload.lock_at = everyoneCard.lock_at || null
     payload.only_visible_to_overrides = false
   } else {
     payload.only_visible_to_overrides = true
@@ -111,6 +111,19 @@ export const generateDateDetailsPayload = (cards: ItemAssignToCardSpec[]) => {
       return overrides
     })
     .flat()
+
+  const masteryPathsCard = cards.find(card => card.selectedAssigneeIds.includes('mastery_paths'))
+  if (masteryPathsCard !== undefined) {
+    payload.assignment_overrides.push({
+      id: masteryPathsCard.overrideId,
+      title: 'Mastery Paths',
+      due_at: masteryPathsCard.due_at || null,
+      unlock_at: masteryPathsCard.unlock_at || null,
+      lock_at: masteryPathsCard.lock_at || null,
+      noop_id: 1,
+    })
+  }
+
   return payload
 }
 

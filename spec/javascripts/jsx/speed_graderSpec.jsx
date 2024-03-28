@@ -44,6 +44,7 @@ const requiredDOMFixtures = `
   <div id="speed_grader_assessment_audit_tray_mount_point"></div>
   <span id="speed_grader_post_grades_menu_mount_point"></span>
   <span id="speed_grader_settings_mount_point"></span>
+  <div id="speed_grader_rubric_assessment_tray_wrapper"><div>
   <div id="speed_grader_assessment_audit_button_mount_point"></div>
   <div id="speed_grader_submission_comments_download_mount_point"></div>
   <div id="speed_grader_hidden_submission_pill_mount_point"></div>
@@ -127,6 +128,7 @@ QUnit.module('SpeedGrader', rootHooks => {
         show_help_menu_item: false,
         force_anonymous_grading: false,
         GRADE_BY_QUESTION: false,
+        FEATURES: {},
       }
       sandbox.stub(userSettings, 'get')
       userSettings.get.withArgs('eg_hide_student_names').returns(false)

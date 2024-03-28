@@ -29,6 +29,7 @@ const I18n = useI18nScope('differentiated_modules')
 interface Props {
   courseId: string
   everyoneOption?: AssigneeOption
+  checkMasteryPaths?: boolean
   disableFetch?: boolean // avoid mutating the state when closing the tray
   defaultValues: AssigneeOption[]
   customAllOptions?: AssigneeOption[]
@@ -42,6 +43,7 @@ const useFetchAssignees = ({
   defaultValues,
   disableFetch = false,
   everyoneOption,
+  checkMasteryPaths = false,
   customAllOptions,
   customIsLoading,
   customSetSearchTerm,
@@ -74,12 +76,20 @@ const useFetchAssignees = ({
         params: {...params, enrollment_type: 'student'},
       })
 
-      Promise.allSettled([fetchSections, fetchStudents])
+      const fetchCourseSettings =
+        checkMasteryPaths &&
+        doFetchApi({
+          path: `/api/v1/courses/${courseId}/settings`,
+        })
+
+      Promise.allSettled([fetchSections, fetchStudents, fetchCourseSettings].filter(Boolean))
         .then(results => {
           const sectionsResult = results[0]
           const studentsResult = results[1]
+          const courseSettingsResult = results[2]
           let sectionsParsedResult: AssigneeOption[] = []
           let studentsParsedResult: AssigneeOption[] = []
+          let masteryPathsOption
           if (sectionsResult.status === 'fulfilled') {
             const sectionsJSON = sectionsResult.value.json as Record<string, string>[]
             sectionsParsedResult =
@@ -126,8 +136,16 @@ const useFetchAssignees = ({
             setHasErrors(true)
           }
 
-          const defaultOptions =
-            everyoneOption !== undefined ? [everyoneOption, ...allOptions] : allOptions
+          if (courseSettingsResult && courseSettingsResult.status === 'fulfilled') {
+            if (courseSettingsResult.value.json.conditional_release) {
+              masteryPathsOption = {id: 'mastery_paths', value: I18n.t('Mastery Paths')}
+            }
+          } else if (courseSettingsResult) {
+            showFlashError(I18n.t('Failed to load course settings'))(courseSettingsResult.reason)
+            setHasErrors(true)
+          }
+
+          const defaultOptions = [everyoneOption, masteryPathsOption, ...allOptions].filter(Boolean)
           const newOptions = uniqBy(
             [
               ...defaultOptions.map(option => {

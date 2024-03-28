@@ -16,14 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useEffect, useState, useRef} from 'react'
+import React, {useCallback, useEffect, useState} from 'react'
 import AssigneeSelector, {type AssigneeOption} from './AssigneeSelector'
+import type {FormMessage} from '@instructure/ui-form-field'
 
 export interface ModuleAssignmentsProps {
   courseId: string
   onSelect: (options: AssigneeOption[]) => void
   defaultValues: AssigneeOption[]
   onDismiss?: () => void
+  onBlur?: () => void
+  messages?: FormMessage[]
+  inputRef?: (inputElement: HTMLInputElement | null) => void
 }
 
 export type {AssigneeOption} from './AssigneeSelector'
@@ -33,9 +37,11 @@ export default function ModuleAssignments({
   onSelect,
   defaultValues,
   onDismiss,
+  onBlur,
+  messages,
+  inputRef,
 }: ModuleAssignmentsProps) {
   const [selectedOptions, setSelectedOptions] = useState<AssigneeOption[]>(defaultValues)
-  const assigneeSelectorRef = useRef<HTMLInputElement | null>(null)
 
   const handleSelect = useCallback(
     (assignees: AssigneeOption[]) => {
@@ -57,7 +63,9 @@ export default function ModuleAssignments({
       selectedOptionIds={selectedOptions.map(({id}) => id)}
       onError={onDismiss}
       showVisualLabel={false}
-      inputRef={el => (assigneeSelectorRef.current = el)}
+      inputRef={inputRef}
+      onBlur={onBlur}
+      messages={messages}
     />
   )
 }

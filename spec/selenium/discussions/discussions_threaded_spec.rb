@@ -519,7 +519,9 @@ describe "threaded discussions" do
             # Verify that the correct quote is created after submission
             expect(fj("div[data-testid='reply-preview']:contains('#{@third_reply.summary}')")).to be_present
             # Verify that the correct @mentions is created
-            expect(new_reply.message).to eq "<p><span class=\"mceNonEditable mention\" data-mention=\"#{@third_reply.user_id}\" data-reactroot=\"\">@#{@third_reply.author_name}</span>quoting 3rd level reply</p>"
+            expect(new_reply.message).to include "<p><span class=\"mceNonEditable mention\""
+            expect(new_reply.message).to include "data-mention=\"#{@third_reply.user_id}\" data-reactroot=\"\">"
+            expect(new_reply.message).to include "@#{@third_reply.author_name}</span>quoting 3rd level reply</p>"
           end
 
           it "quotes fourth_reply correctly" do

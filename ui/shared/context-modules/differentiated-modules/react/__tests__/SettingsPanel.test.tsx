@@ -169,6 +169,7 @@ describe('SettingsPanel', () => {
         lockUntilChecked: false,
         moduleName: 'Week 12',
         nameInputMessages: [],
+        lockUntilInputMessages: [],
         prerequisites: [],
         publishFinalGrade: false,
         requireSequentialProgress: false,
@@ -189,6 +190,7 @@ describe('SettingsPanel', () => {
         lockUntilChecked: false,
         moduleName: 'Week 1',
         nameInputMessages: [],
+        lockUntilInputMessages: [],
         prerequisites: [],
         publishFinalGrade: false,
         requireSequentialProgress: false,
@@ -211,13 +213,14 @@ describe('SettingsPanel', () => {
     })
 
     it('validates the module name', () => {
-      const {getByRole, getByText} = renderComponent({moduleName: ''})
+      const {getByRole, getByText, getByTestId} = renderComponent({moduleName: ''})
       const updateButton = getByRole('button', {name: 'Save'})
+      const nameInput = getByTestId('module-name-input')
 
       updateButton.click()
-      updateButton.focus()
       expect(getByText('Please fix errors before continuing')).toBeInTheDocument()
-      expect(getByText('Module Name is required.')).toBeInTheDocument()
+      expect(getByText('Module name can’t be blank')).toBeInTheDocument()
+      expect(nameInput).toHaveFocus()
     })
 
     it('makes a request to the modules update endpoint', async () => {

@@ -63,6 +63,7 @@ class ContentExportsController < ApplicationController
         else
           export.export_type = ContentExport::COMMON_CARTRIDGE
           export.set_contains_new_quizzes_settings
+          export.mark_waiting_for_external_tool if export.contains_new_quizzes?
           export.selected_content = { everything: true }
         end
       when User
@@ -71,7 +72,7 @@ class ContentExportsController < ApplicationController
 
       export.progress = 0
       if export.save
-        export.export
+        export.export unless export.waiting_for_external_tool?
         render_export(export)
       else
         render json: { error_message: t("errors.couldnt_create", "Couldn't create content export.") }

@@ -30,7 +30,7 @@ import {Table} from '@instructure/ui-table'
 import {Flex} from '@instructure/ui-flex'
 import {createAnalyticPropsGenerator} from './util/analytics'
 import {TempEnrollAvatar} from './TempEnrollAvatar'
-import type {User} from './types'
+import type {User, DuplicateUser} from './types'
 import {EMPTY_USER, MODULE_NAME} from './types'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 
@@ -48,6 +48,7 @@ interface Props {
   searchSuccess: Function
   canReadSIS?: boolean
   foundUser?: User | null
+  wasReset?: boolean
 }
 
 export function TempEnrollSearch(props: Props) {
@@ -57,6 +58,11 @@ export function TempEnrollSearch(props: Props) {
   const [loading, setLoading] = useState(false)
   const [search, setSearch] = useState('')
   const [userDetails, setUserDetails] = useState<User>(EMPTY_USER)
+  const [duplicateUsers, setDuplicateUsers] = useState<DuplicateUser[]>([])
+  const [selectedDuplicateUser, setSelectedDuplicateUser] = useState<DuplicateUser>({
+    user_id: '',
+    user_name: '',
+  })
 
   const handleSearchTypeChange = (_event: ChangeEvent<HTMLInputElement>, value: string) => {
     setSearchType(value)
@@ -65,6 +71,27 @@ export function TempEnrollSearch(props: Props) {
   const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target !== null) {
       setSearch(event.target.value)
+    }
+  }
+
+  const handleDuplicateUserSelection = (event: ChangeEvent<HTMLElement>) => {
+    const target = event.target as HTMLTextAreaElement
+    const selection = duplicateUsers.find((dupeUser: DuplicateUser) => {
+      if (dupeUser.user_id === target.value) {
+        return dupeUser
+      }
+      return null
+    })
+    if (selection) {
+      const attrs = {
+        id: selection.user_id,
+        name: selection.user_name,
+        primary_email: selection.email,
+        login_id: selection.login_id,
+        sis_user_id: selection.sis_user_id,
+      }
+      setSelectedDuplicateUser({user_id: selection.user_id, user_name: selection.user_name})
+      props.searchSuccess(attrs)
     }
   }
 
@@ -88,26 +115,35 @@ export function TempEnrollSearch(props: Props) {
   }
 
   const processSearchApiResponse = (response: any) => {
-    const foundUser = response.users[0]
-    if (typeof foundUser === 'undefined') {
-      setMessage(I18n.t('User could not be found.'))
-      setUserDetails(EMPTY_USER)
-      props.searchFail()
-      setLoading(false)
-    } else if (response.users.length === 1 && foundUser.user_id !== props.user.id) {
-      // api could return more than 1, which we don't want
-      fetchUserDetails(foundUser)
-    } else {
-      setMessage(
-        I18n.t('The user found matches the provider. Please search for a new recipient user.')
-      )
-      setUserDetails(EMPTY_USER)
-      props.searchFail()
+    if (response.users.length > 0) {
+      const foundUser = response.users[0]
+      if (typeof foundUser === 'undefined') {
+        setMessage(I18n.t('User could not be found.'))
+        setUserDetails(EMPTY_USER)
+        props.searchFail()
+        setLoading(false)
+      } else if (response.users.length === 1 && foundUser.user_id !== props.user.id) {
+        fetchUserDetails(foundUser)
+      } else {
+        setMessage(
+          I18n.t('The user found matches the provider. Please search for a new recipient user.')
+        )
+        setUserDetails(EMPTY_USER)
+        props.searchFail()
+        setLoading(false)
+      }
+    } else if (response.duplicates.length > 0) {
+      setDuplicateUsers(response.duplicates[0])
       setLoading(false)
     }
   }
 
   useEffect(() => {
+    if (props.wasReset) {
+      setMessage('')
+      setSelectedDuplicateUser({user_id: '', user_name: ''})
+      setUserDetails(EMPTY_USER)
+    }
     if (props.page === 1 && !props.foundUser) {
       setLoading(true)
 
@@ -118,7 +154,6 @@ export function TempEnrollSearch(props: Props) {
             method: 'POST',
             params: {user_list: search, v2: true, search_type: searchType},
           })
-
           processSearchApiResponse(json)
         } catch (error: any) {
           setMessage(error.message)
@@ -168,24 +203,92 @@ export function TempEnrollSearch(props: Props) {
     )
   }
 
-  if (props.page === 1 && userDetails.name !== '') {
+  const renderSubHeader = () => {
+    return (
+      <Flex.Item>
+        <Flex gap="x-small" direction="column">
+          <Flex.Item>
+            <TempEnrollAvatar user={props.user} />
+          </Flex.Item>
+          <Flex.Item shouldGrow={true}>
+            <Text weight="bold">
+              {I18n.t('Find a recipient of temporary enrollments from %{name}', {
+                name: props.user.name,
+              })}
+            </Text>
+          </Flex.Item>
+        </Flex>
+      </Flex.Item>
+    )
+  }
+
+  const renderDupeList = () => {
+    const list = duplicateUsers.map((dupeUser: DuplicateUser, i: number) => {
+      const k = `dupeuser_${i}`
+      const checked = selectedDuplicateUser.user_id === dupeUser.user_id
+      return (
+        <Table.Row key={k}>
+          <Table.RowHeader>
+            <RadioInput
+              value={dupeUser.user_id}
+              name={dupeUser.user_name}
+              onChange={handleDuplicateUserSelection}
+              checked={checked}
+              label={
+                <ScreenReaderContent>
+                  {I18n.t('Click to select user %{name}', {name: dupeUser.user_name})}
+                </ScreenReaderContent>
+              }
+            />
+          </Table.RowHeader>
+          <Table.Cell>{dupeUser.user_name}</Table.Cell>
+          <Table.Cell>{dupeUser.email}</Table.Cell>
+          <Table.Cell>{dupeUser.login_id}</Table.Cell>
+          {props.canReadSIS ? <Table.Cell>{dupeUser.sis_user_id || ''}</Table.Cell> : null}
+          <Table.Cell>{dupeUser.account_name || ''}</Table.Cell>
+        </Table.Row>
+      )
+    })
+    return list
+  }
+
+  const renderDuplicates = () => {
+    return (
+      <div>
+        <Table
+          caption={
+            <Text>
+              {I18n.t('Possible matches for "%{searchType}". Select the desired one below.', {
+                searchType: labelText,
+              })}
+            </Text>
+          }
+        >
+          <Table.Head>
+            <Table.Row>
+              <Table.ColHeader id="dupesection-select">
+                <ScreenReaderContent>{I18n.t('User Selection')}</ScreenReaderContent>
+              </Table.ColHeader>
+              <Table.ColHeader id="dupesection-name">{I18n.t('Name')}</Table.ColHeader>
+              <Table.ColHeader id="dupesection-email">{I18n.t('Email Address')}</Table.ColHeader>
+              <Table.ColHeader id="dupesection-loginid">{I18n.t('Login ID')}</Table.ColHeader>
+              {props.canReadSIS ? (
+                <Table.ColHeader id="dupesection-sisid">{I18n.t('SIS ID')}</Table.ColHeader>
+              ) : null}
+              <Table.ColHeader id="dupesection-inst">{I18n.t('Institution')}</Table.ColHeader>
+            </Table.Row>
+          </Table.Head>
+          <Table.Body>{renderDupeList()}</Table.Body>
+        </Table>
+      </div>
+    )
+  }
+
+  if (props.page === 1 && userDetails?.name !== '') {
     // user confirmation page
     return (
       <Flex gap="medium" direction="column">
-        <Flex.Item>
-          <Flex gap="x-small" direction="column">
-            <Flex.Item>
-              <TempEnrollAvatar user={props.user} />
-            </Flex.Item>
-            <Flex.Item shouldGrow={true}>
-              <Text weight="bold">
-                {I18n.t('Find a recipient of temporary enrollments from %{name}', {
-                  name: props.user.name,
-                })}
-              </Text>
-            </Flex.Item>
-          </Flex>
-        </Flex.Item>
+        {renderSubHeader()}
         <Flex.Item shouldGrow={true}>
           <Alert variant="success" margin="0">
             {I18n.t('%{name} is ready to be assigned temporary enrollments.', {
@@ -217,23 +320,27 @@ export function TempEnrollSearch(props: Props) {
         </Flex.Item>
       </Flex>
     )
+  } else if (props.page === 1 && duplicateUsers?.length > 0) {
+    return (
+      <Flex gap="medium" direction="column">
+        {renderSubHeader()}
+        <Flex.Item shouldGrow={true}>
+          <Alert variant="warning" margin="0">
+            {I18n.t(
+              'Multiple users with the same %{search_type} were found. Please select desired user from the list below.',
+              {
+                search_type: labelText,
+              }
+            )}
+          </Alert>
+        </Flex.Item>
+        {renderDuplicates()}
+      </Flex>
+    )
   } else {
     return (
       <Flex gap="medium" direction="column">
-        <Flex.Item>
-          <Flex gap="x-small" direction="column">
-            <Flex.Item>
-              <TempEnrollAvatar user={props.user} />
-            </Flex.Item>
-            <Flex.Item shouldGrow={true}>
-              <Text weight="bold">
-                {I18n.t('Find a recipient of temporary enrollments from %{name}', {
-                  name: props.user.name,
-                })}
-              </Text>
-            </Flex.Item>
-          </Flex>
-        </Flex.Item>
+        {renderSubHeader()}
         {message && (
           <Flex.Item shouldGrow={true}>
             <Alert variant="error" margin="0">

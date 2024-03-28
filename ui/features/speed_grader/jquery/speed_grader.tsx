@@ -55,6 +55,7 @@ import AssessmentAuditButton from '../react/AssessmentAuditTray/components/Asses
 import AssessmentAuditTray from '../react/AssessmentAuditTray/index'
 import CommentArea from '../react/CommentArea'
 import GradeLoadingSpinner from '../react/GradeLoadingSpinner'
+import RubricAssessmentTrayWrapper from '../react/RubricAssessmentTrayWrapper'
 import {originalityReportSubmissionKey} from '@canvas/grading/originalityReportHelper'
 import PostPolicies from '../react/PostPolicies/index'
 import SpeedGraderProvisionalGradeSelector from '../react/SpeedGraderProvisionalGradeSelector'
@@ -144,7 +145,6 @@ import '@canvas/util/templateData'
 import '@canvas/media-comments'
 import '@canvas/media-comments/jquery/mediaCommentThumbnail'
 import '@canvas/rails-flash-notifications'
-import 'jquery-getscrollbarwidth'
 import 'jquery-scroll-to-visible/jquery.scrollTo'
 import 'jquery-selectmenu'
 import '@canvas/jquery/jquery.disableWhileLoading'
@@ -154,6 +154,7 @@ import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 import type {EnvGradebookSpeedGrader} from '@canvas/global/env/EnvGradebook'
 import replaceTags from '@canvas/util/replaceTags'
 import type {GradeStatusUnderscore} from '@canvas/grading/accountGradingStatus'
+import type {RubricUnderscoreType} from '../react/RubricAssessmentTrayWrapper/utils'
 
 declare global {
   interface Window {
@@ -280,6 +281,8 @@ const anonymousAssignmentDetailedReportTooltip = I18n.t(
 
 const HISTORY_PUSH = 'push'
 const HISTORY_REPLACE = 'replace'
+
+const {enhanced_rubrics} = ENV.FEATURES ?? {}
 
 function setGradeLoading(studentId: string, loading: boolean) {
   useStore.setState(state => {
@@ -622,8 +625,7 @@ function initDropdown() {
         $menu.show().css({
           left: $selectmenu_list.css('left'),
           top: $selectmenu_list.css('top'),
-          width:
-            $selectmenu_list.width() - ($selectmenu_list.hasScrollbar() && $.getScrollbarWidth()),
+          width: $selectmenu_list.width(),
           'z-index': Number($selectmenu_list.css('z-index')) + 1,
         })
       })
@@ -1002,87 +1004,7 @@ function initRubricStuff() {
   $('.save_rubric_button').click(function () {
     const $rubric = $(this).parents('#rubric_holder').find('.rubric')
     const data = rubricAssessment.assessmentData($rubric)
-    if (ENV.grading_role === 'moderator' || ENV.grading_role === 'provisional_grader') {
-      data.provisional = '1'
-      if (ENV.grading_role === 'moderator' && EG.current_prov_grade_index === 'final') {
-        data.final = '1'
-      }
-    }
-    if (isAnonymous) {
-      // FIXME: data['rubric_assessment[user_id]'] should not contain anonymous_id,
-      // figure out how to fix the keys elsewhere
-      data[`rubric_assessment[${anonymizableUserId}]`] = data['rubric_assessment[user_id]']
-      delete data['rubric_assessment[user_id]']
-      data.graded_anonymously = true
-    } else {
-      data.graded_anonymously = utils.shouldHideStudentNames()
-    }
-    const url = ENV.update_rubric_assessment_url!
-    const method = 'POST'
-    EG.toggleFullRubric('close')
-
-    const promise = $.ajaxJSON(
-      url,
-      method,
-      data,
-      ///
-      (response: {
-        id: string
-        rubric_association: unknown
-        artifact: unknown
-        related_group_submissions_and_assessments: {
-          rubric_assessments: {
-            rubric_assessment: {id: string}
-          }[]
-        }[]
-      }) => {
-        let found = false
-        if (response && response.rubric_association) {
-          rubricAssessment.updateRubricAssociation($rubric, response.rubric_association)
-          delete response.rubric_association
-        }
-
-        // If the student has a submission, update it with the data returned,
-        // otherwise we need to create a submission for them.
-        const assessedStudent = EG.setOrUpdateSubmission(response.artifact)
-
-        for (let i = 0; i < assessedStudent.rubric_assessments.length; i++) {
-          if (response.id === assessedStudent.rubric_assessments[i].id) {
-            $.extend(true, assessedStudent.rubric_assessments[i], response)
-            found = true
-          }
-        }
-        if (!found) {
-          assessedStudent.rubric_assessments.push(response)
-        }
-
-        // this next part will take care of group submissions, so that when one member of the group gets assessesed then everyone in the group will get that same assessment.
-        $.each(
-          response.related_group_submissions_and_assessments,
-          (_i, submissionAndAssessment) => {
-            // setOrUpdateSubmission returns the student. so we can set student.rubric_assesments
-            // submissionAndAssessment comes back with :include_root => true, so we have to get rid of the root
-            const student = EG.setOrUpdateSubmission(response.artifact)
-            student.rubric_assessments = $.map(
-              submissionAndAssessment.rubric_assessments,
-              ra => ra.rubric_assessment
-            )
-            EG.updateSelectMenuStatus(student)
-          }
-        )
-
-        EG.showGrade()
-        EG.showDiscussion()
-        EG.showRubric()
-        EG.updateStatsInHeader()
-      }
-    )
-
-    $rubric_holder.disableWhileLoading(promise, {
-      buttons: {
-        '.save_rubric_button': 'Saving...',
-      },
-    })
+    EG.saveRubricAssessment(data, $rubric)
   })
 }
 
@@ -1558,7 +1480,6 @@ EG = {
   },
 
   toggleFullRubric(force) {
-    const rubricFull = selectors.get('#rubric_full')
     // if there is no rubric associated with this assignment, then the edit
     // rubric thing should never be shown.  the view should make sure that
     // the edit rubric html is not even there but we also want to make sure
@@ -1567,7 +1488,18 @@ EG = {
       return false
     }
 
-    if (rubricFull.filter(':visible').length || force === 'close') {
+    const isClosed = force === 'close'
+
+    if (enhanced_rubrics) {
+      const isOpen = isClosed ? false : !useStore.getState().rubricAssessmentTrayOpen
+      useStore.setState({rubricAssessmentTrayOpen: isOpen})
+      this.refreshFullRubric()
+      return
+    }
+
+    const rubricFull = selectors.get('#rubric_full')
+
+    if (rubricFull.filter(':visible').length || isClosed) {
       toggleGradeVisibility(true)
       rubricFull.fadeOut()
       $('.toggle_full_rubric').focus()
@@ -1581,6 +1513,12 @@ EG = {
   },
 
   refreshFullRubric() {
+    if (enhanced_rubrics) {
+      const assessment = rubricAssessmentToPopulate(EG) as any
+      useStore.setState({studentAssessmentData: assessment?.data})
+      return
+    }
+
     const rubricFull = selectors.get('#rubric_full')
     if (!window.jsonData.rubric_association) {
       return
@@ -1939,6 +1877,108 @@ EG = {
 
     const button = <AssessmentAuditButton onClick={onClick} />
     ReactDOM.render(button, document.getElementById(ASSESSMENT_AUDIT_BUTTON_MOUNT_POINT))
+  },
+
+  setUpRubricAssessmentTrayWrapper() {
+    ReactDOM.render(
+      <RubricAssessmentTrayWrapper
+        rubric={ENV.rubric as RubricUnderscoreType}
+        onSave={data => {
+          useStore.setState({rubricAssessmentTrayOpen: false})
+          this.saveRubricAssessment(data)
+        }}
+      />,
+      document.getElementById('speed_grader_rubric_assessment_tray_wrapper')
+    )
+  },
+
+  saveRubricAssessment(
+    data: {[key: string]: string | boolean | number},
+    rubricElement?: JQuery<HTMLElement>
+  ) {
+    if (ENV.grading_role === 'moderator' || ENV.grading_role === 'provisional_grader') {
+      data.provisional = '1'
+      if (ENV.grading_role === 'moderator' && EG.current_prov_grade_index === 'final') {
+        data.final = '1'
+      }
+    }
+    if (isAnonymous) {
+      // FIXME: data['rubric_assessment[user_id]'] should not contain anonymous_id,
+      // figure out how to fix the keys elsewhere
+      data[`rubric_assessment[${anonymizableUserId}]`] = data['rubric_assessment[user_id]']
+      delete data['rubric_assessment[user_id]']
+      data.graded_anonymously = true
+    } else {
+      data.graded_anonymously = utils.shouldHideStudentNames()
+    }
+    const url = ENV.update_rubric_assessment_url!
+    const method = 'POST'
+    EG.toggleFullRubric('close')
+
+    const promise = $.ajaxJSON(
+      url,
+      method,
+      data,
+      ///
+      (response: {
+        id: string
+        rubric_association: unknown
+        artifact: unknown
+        related_group_submissions_and_assessments: {
+          rubric_assessments: {
+            rubric_assessment: {id: string}
+          }[]
+        }[]
+      }) => {
+        let found = false
+        if (response && response.rubric_association) {
+          if (!enhanced_rubrics) {
+            rubricAssessment.updateRubricAssociation(rubricElement, response.rubric_association)
+          }
+          delete response.rubric_association
+        }
+
+        // If the student has a submission, update it with the data returned,
+        // otherwise we need to create a submission for them.
+        const assessedStudent = EG.setOrUpdateSubmission(response.artifact)
+
+        for (let i = 0; i < assessedStudent.rubric_assessments.length; i++) {
+          if (response.id === assessedStudent.rubric_assessments[i].id) {
+            $.extend(true, assessedStudent.rubric_assessments[i], response)
+            found = true
+          }
+        }
+        if (!found) {
+          assessedStudent.rubric_assessments.push(response)
+        }
+
+        // this next part will take care of group submissions, so that when one member of the group gets assessesed then everyone in the group will get that same assessment.
+        $.each(
+          response.related_group_submissions_and_assessments,
+          (_i, submissionAndAssessment) => {
+            // setOrUpdateSubmission returns the student. so we can set student.rubric_assesments
+            // submissionAndAssessment comes back with :include_root => true, so we have to get rid of the root
+            const student = EG.setOrUpdateSubmission(response.artifact)
+            student.rubric_assessments = $.map(
+              submissionAndAssessment.rubric_assessments,
+              ra => ra.rubric_assessment
+            )
+            EG.updateSelectMenuStatus(student)
+          }
+        )
+
+        EG.showGrade()
+        EG.showDiscussion()
+        EG.showRubric()
+        EG.updateStatsInHeader()
+      }
+    )
+
+    $rubric_holder.disableWhileLoading(promise, {
+      buttons: {
+        '.save_rubric_button': 'Saving...',
+      },
+    })
   },
 
   setReadOnly(readonly) {
@@ -4226,6 +4266,10 @@ export default {
 
     if (ENV.can_view_audit_trail) {
       EG.setUpAssessmentAuditTray()
+    }
+
+    if (enhanced_rubrics && ENV.rubric) {
+      EG.setUpRubricAssessmentTrayWrapper()
     }
 
     function registerQuizzesNext(

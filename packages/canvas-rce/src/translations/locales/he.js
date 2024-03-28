@@ -91,6 +91,7 @@ const locale = {
   "external_tools_6e77821": { "message": "כלים חיצוניים" },
   "files_c300e900": { "message": "קבצים " },
   "files_index_af7c662b": { "message": "אינדקס קבצים" },
+  "find_8d605019": { "message": "חיפוש" },
   "format_4247a9c5": { "message": "פורמט" },
   "generating_preview_45b53be0": { "message": "מכין תצוגה מקדימה..." },
   "grades_a61eba0a": { "message": "הערכות" },
@@ -145,6 +146,7 @@ const locale = {
     "message": "אין תצוגה מקדימה לקובץ זה"
   },
   "no_results_940393cf": { "message": "אין תוצאות" },
+  "no_results_found_58717065": { "message": "לא נמצאו תוצאות" },
   "none_3b5e34d2": { "message": "אף אחד" },
   "open_this_keyboard_shortcuts_dialog_9658b83a": {
     "message": "פתיחת חלון דיאלוג של מקשי קיצור"
@@ -158,6 +160,7 @@ const locale = {
   "pink_68ad45cb": { "message": "ורוד" },
   "prev_f82cbc48": { "message": "הקודם" },
   "preview_53003fd2": { "message": "תצוגה מקדימה" },
+  "previous_bd2ac015": { "message": "קודם" },
   "published_c944a23d": { "message": "פורסם" },
   "purple_7678a9fc": { "message": "סגול" },
   "quiz_e0dcce8f": { "message": "בוחן" },

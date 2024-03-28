@@ -67,11 +67,14 @@ module Types
     end
 
     field :html_url, UrlType, null: true do
-      argument :course_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Course")
+      argument :course_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Course")
     end
-    def html_url(course_id:)
+    def html_url(course_id: nil)
+      resolved_course_id = course_id.nil? ? context[:course_id] : course_id
+      return if resolved_course_id.nil?
+
       GraphQLHelpers::UrlHelpers.course_user_url(
-        course_id:,
+        course_id: resolved_course_id,
         id: object.id,
         host: context[:request].host_with_port
       )

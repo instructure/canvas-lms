@@ -193,6 +193,12 @@ class BigBlueButtonConference < WebConference
       "meta_canvas-recording-ready-user" => recording_ready_user,
       "meta_canvas-recording-ready-url" => recording_ready_url(current_host)
     }
+
+    if context.is_a?(Course)
+      req_params[:bbbCanvasCourseName] = context.name
+      req_params[:bbbCanvasCourseCode] = context.course_code
+    end
+
     if Account.site_admin.feature_enabled? :bbb_modal_update
       req_params.merge!({
                           lockSettingsDisableCam: settings[:share_webcam] ? false : true,

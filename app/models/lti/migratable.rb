@@ -27,15 +27,39 @@ module Lti::Migratable
 
   def self.included(base)
     base.class_eval do
-      def self.directly_associated_items(_tool_id, _context)
+      # @param [ActiveRecord::Relation<self>] base_scope The base scope to filter
+      # @param [Account|Course] context The context to filter the base scope by
+      # @return [ActiveRecord::Relation<self>] The scope that now includes all items within the context.
+      # handles contexts of Course, root Account, and sub Account properly.
+      def self.scope_to_context(base_scope, context)
+        case context
+        when Course
+          base_scope.where(context:)
+        when Account
+          if context.root_account? && has_attribute?(:root_account_id)
+            base_scope.where(root_account_id: context.id)
+          else
+            base_scope.where(context: context.associated_courses.active)
+          end
+        end
+      end
+
+      # @param [Integer] tool_id The ID of the LTI 1.1 tool that the resource is indirectly
+      # associated with
+      # @return [ActiveRecord::Relation<self>] The associated items
+      # Should return all items that have a foreign key reference to the tool, or are
+      # otherwise directly linked by id.
+      # Scope will be filtered by context later
+      def self.directly_associated_items(_tool_id)
         raise NotImplemented
       end
 
       # @param [Integer] tool_id The ID of the LTI 1.1 tool that the resource is indirectly
       # associated with
-      # @param [Account|Course] context The context to search for the associated items in
       # @return [ActiveRecord::Relation<self>] The associated items
-      def self.indirectly_associated_items(_tool_id, _context)
+      # Should return all items that could be related to the tool, mostly via url.
+      # Scope will be filtered by context later
+      def self.indirectly_associated_items(_tool_id)
         raise NotImplemented
       end
 
@@ -48,7 +72,7 @@ module Lti::Migratable
       # @param [Integer] tool_id The ID of the LTI 1.1 tool that the resource is indirectly
       # associated with
       # @param [Array<Integer>] ids The IDs of the resources to fetch for this batch
-      # @return [self] item
+      # @yieldparam [self] item
       def self.fetch_indirect_batch(_tool_id, _new_tool_id, _ids, &)
         raise NotImplemented
       end

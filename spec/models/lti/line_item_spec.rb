@@ -123,11 +123,10 @@ RSpec.describe Lti::LineItem do
   end
 
   context "when updating the associated assignment" do
-    it "updates the line item's end_date_time to match assignment's due date" do
-      current_time = Time.now
-      next_week = current_time + 7.days
+    let(:line_item) do
+      Time.now
       tool = AccessToken.create!
-      line_item_params = { end_date_time: Time.now, score_maximum: 10.0, label: "a line item" }
+      line_item_params = { start_date_time: Time.now - 1.day, end_date_time: Time.now, score_maximum: 10.0, label: "a line item" }
       line_item = Lti::LineItem.create_line_item!(nil, course_model, tool, line_item_params)
       # This is necessary because the line item only gets associated to the assignment after
       # the assignment is created. This line_item variable is up-to-date with "knowing" its
@@ -138,9 +137,21 @@ RSpec.describe Lti::LineItem do
       # is only ever called in an API request, this "need to reload" scenario should not
       # happen in real life.
       line_item.assignment.reload
+      line_item
+    end
+
+    it "updates the line item's end_date_time to match assignment's due date" do
+      next_week = 1.week.from_now
       line_item.assignment.due_at = next_week
       line_item.assignment.save!
       expect(line_item.reload.end_date_time).to eq(next_week)
+    end
+
+    it "updates the line item's start_date_time to match assignment's due date" do
+      last_week = 1.week.ago
+      line_item.assignment.unlock_at = last_week
+      line_item.assignment.save!
+      expect(line_item.reload.start_date_time).to eq(last_week)
     end
   end
 end

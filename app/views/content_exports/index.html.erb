@@ -32,7 +32,7 @@
     <p><%= friendly_message %></p>
   <% end %>
 
-  <% unless @warning_messages.empty? %>
+  <% if @warning_messages.present? %>
     <div class="export_messages">
       <div class="alert">
         <% @warning_messages.each do |warning| %>

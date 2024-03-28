@@ -17,7 +17,7 @@
  */
 
 import gql from 'graphql-tag'
-import {shape, string} from 'prop-types'
+import {number, shape, string} from 'prop-types'
 
 export const ChildTopic = {
   fragment: gql`
@@ -26,6 +26,9 @@ export const ChildTopic = {
       _id
       contextName
       contextId
+      entryCounts {
+        unreadCount
+      }
     }
   `,
 
@@ -34,6 +37,9 @@ export const ChildTopic = {
     _id: string,
     contextName: string,
     contextId: string,
+    entryCounts: shape({
+      unreadCount: number,
+    }),
   }),
 
   mock: ({
@@ -41,11 +47,16 @@ export const ChildTopic = {
     _id = '1',
     contextName = 'Super Group',
     contextId = '5',
+    entryCounts = {
+      unreadCount: 1,
+      __typename: 'DiscussionEntryCounts',
+    },
   } = {}) => ({
     id,
     _id,
     contextId,
     contextName,
+    entryCounts,
     __typename: 'Discussion',
   }),
 }

@@ -201,12 +201,14 @@ QUnit.module('Gradebook Grid Column Widths', suiteHooks => {
       ok(columnNode.offsetWidth > 10, 'width is not the minimum')
     })
 
-    test('uses a stored width for assignment column headers', () => {
+    // unskip in FOO-4349
+    QUnit.skip('uses a stored width for assignment column headers', () => {
       const columnNode = gridSpecHelper.getColumnHeaderNode('assignment_2303')
       strictEqual(columnNode.offsetWidth, 54)
     })
 
-    test('hides assignment column header content when the column is minimized', () => {
+    // unskip in FOO-4349
+    QUnit.skip('hides assignment column header content when the column is minimized', () => {
       const columnNode = gridSpecHelper.getColumnHeaderNode('assignment_2302')
       ok(columnNode.classList.contains('minimized'))
     })

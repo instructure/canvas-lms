@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, fireEvent, screen} from '@testing-library/react'
+import {render, fireEvent, screen, waitFor} from '@testing-library/react'
 import ItemAssignToCard, {type ItemAssignToCardProps} from '../ItemAssignToCard'
 
 const props: ItemAssignToCardProps = {
@@ -79,13 +79,33 @@ describe('ItemAssignToCard', () => {
     expect(onDelete).toHaveBeenCalledWith('assign-to-card-001')
   })
 
-  it('defaults to 11:59pm for due dates if has null due time', () => {
+  it('defaults to 11:59pm for due dates if has null due time on click', () => {
     window.ENV.DEFAULT_DUE_TIME = undefined
     const {getByLabelText, getByRole, getAllByLabelText} = renderComponent()
     const dateInput = getByLabelText('Due Date')
     fireEvent.change(dateInput, {target: {value: 'Nov 9, 2020'}})
     getByRole('option', {name: /10 november 2020/i}).click()
     expect(getAllByLabelText('Time')[0]).toHaveValue('11:59 PM')
+  })
+
+  it('defaults to 11:59pm for due dates if has null due time on blur', async () => {
+    window.ENV.DEFAULT_DUE_TIME = undefined
+    const onCardDatesChangeMock = jest.fn()
+    const {getByLabelText, findAllByLabelText} = renderComponent({
+      onCardDatesChange: onCardDatesChangeMock,
+    })
+    const dateInput = getByLabelText('Due Date')
+    fireEvent.change(dateInput, {target: {value: 'Nov 9, 2020'}})
+    // userEvent causes Event Pooling issues, so I used fireEvent instead
+    fireEvent.blur(dateInput, {target: {value: 'Nov 9, 2020'}})
+    await waitFor(async () => {
+      expect(onCardDatesChangeMock).toHaveBeenCalledWith(
+        expect.any(String),
+        'due_at',
+        '2020-11-09T23:59:00.000Z'
+      )
+      expect((await findAllByLabelText('Time'))[0]).toHaveValue('11:59 PM')
+    })
   })
 
   it('defaults to 11:59pm for due dates if has undefined due time', () => {
@@ -115,12 +135,31 @@ describe('ItemAssignToCard', () => {
     expect(getAllByLabelText('Time')[0]).toHaveValue('8:00 AM')
   })
 
-  it('defaults to midnight for available from dates if it is null', () => {
+  it('defaults to midnight for available from dates if it is null on click', () => {
     const {getByLabelText, getByRole, getAllByLabelText} = renderComponent()
     const dateInput = getByLabelText('Available from')
     fireEvent.change(dateInput, {target: {value: 'Nov 9, 2020'}})
     getByRole('option', {name: /10 november 2020/i}).click()
     expect(getAllByLabelText('Time')[1]).toHaveValue('12:00 AM')
+  })
+
+  it('defaults to midnight for available from dates if it is null on blur', async () => {
+    const onCardDatesChangeMock = jest.fn()
+    const {getByLabelText, findAllByLabelText} = renderComponent({
+      onCardDatesChange: onCardDatesChangeMock,
+    })
+    const dateInput = getByLabelText('Available from')
+    fireEvent.change(dateInput, {target: {value: 'Nov 9, 2020'}})
+    // userEvent causes Event Pooling issues, so I used fireEvent instead
+    fireEvent.blur(dateInput, {target: {value: 'Nov 9, 2020'}})
+    await waitFor(async () => {
+      expect(onCardDatesChangeMock).toHaveBeenCalledWith(
+        expect.any(String),
+        'unlock_at',
+        '2020-11-09T00:00:00.000Z'
+      )
+      expect((await findAllByLabelText('Time'))[1]).toHaveValue('12:00 AM')
+    })
   })
 
   it('defaults to midnight for available from dates if it is undefined', () => {
@@ -131,12 +170,31 @@ describe('ItemAssignToCard', () => {
     expect(getAllByLabelText('Time')[1]).toHaveValue('12:00 AM')
   })
 
-  it('defaults to 11:59 PM for available until dates if it is null', () => {
+  it('defaults to 11:59 PM for available until dates if it is null on click', () => {
     const {getByLabelText, getByRole, getAllByLabelText} = renderComponent()
     const dateInput = getByLabelText('Until')
     fireEvent.change(dateInput, {target: {value: 'Nov 9, 2020'}})
     getByRole('option', {name: /10 november 2020/i}).click()
     expect(getAllByLabelText('Time')[2]).toHaveValue('11:59 PM')
+  })
+
+  it('defaults to 11:59 PM for available until dates if it is null on blur', async () => {
+    const onCardDatesChangeMock = jest.fn()
+    const {getByLabelText, findAllByLabelText} = renderComponent({
+      onCardDatesChange: onCardDatesChangeMock,
+    })
+    const dateInput = getByLabelText('Until')
+    fireEvent.change(dateInput, {target: {value: 'Nov 9, 2020'}})
+    // userEvent causes Event Pooling issues, so I used fireEvent instead
+    fireEvent.blur(dateInput, {target: {value: 'Nov 9, 2020'}})
+    await waitFor(async () => {
+      expect(onCardDatesChangeMock).toHaveBeenCalledWith(
+        expect.any(String),
+        'lock_at',
+        '2020-11-09T23:59:00.000Z'
+      )
+      expect((await findAllByLabelText('Time'))[2]).toHaveValue('11:59 PM')
+    })
   })
 
   it('defaults to 11:59 PM for available until dates if it is undefined', () => {

@@ -18,6 +18,27 @@
 
 import create from 'zustand'
 import {subscribeWithSelector} from 'zustand/middleware'
+import type {RubricAssessmentDataUnderscore} from '../react/RubricAssessmentTrayWrapper/utils'
 
-const useStore = create(subscribeWithSelector(() => ({currentStudentId: '', gradesLoading: {}})))
+type SpeedGraderStore = {
+  currentStudentId: string
+  gradesLoading: Record<string, boolean>
+  rubricAssessmentTrayOpen: boolean
+  studentAssessmentData: RubricAssessmentDataUnderscore[]
+}
+
+const useStore = create(
+  subscribeWithSelector(() => ({
+    currentStudentId: '',
+    gradesLoading: {},
+    rubricAssessmentTrayOpen: false,
+    studentAssessmentData: [],
+  }))
+)
+
+export const updateState = (newState: Partial<SpeedGraderStore>) => {
+  useStore.setState(state => {
+    return {...state, newState}
+  })
+}
 export default useStore

@@ -161,8 +161,8 @@ describe "calendar2" do
       change_calendar(:next)
 
       # Verify Week and Day labels are correct
-      expect(header_text).to include("Jan 8 — 14, 2012")
-      expect(f(".fc-sun")).to include_text("8\nSUN")
+      expect(header_text).to include("Jan 8 – 14, 2012")
+      expect(f(".fc-sun")).to include_text("SUN 1/8")
     end
 
     it "creates event by clicking on week calendar", priority: "1" do
@@ -192,7 +192,7 @@ describe "calendar2" do
       #   when checking for "today", we need to look for the second instance of the class
 
       # Check for highlight to be present on this week
-      expect(ff(".fc-agendaWeek-view .fc-today").size).to eq 2
+      expect(ff(".fc-agendaWeek-view .fc-today").size).to eq 3
 
       # Change calendar week until the highlight is not there (it should eventually)
       2.times { change_calendar }
@@ -200,7 +200,7 @@ describe "calendar2" do
 
       # Back to today. Make sure that the highlight is present again
       change_calendar(:today)
-      expect(ff(".fc-agendaWeek-view .fc-today").size).to eq 2
+      expect(ff(".fc-agendaWeek-view .fc-today").size).to eq 3
     end
 
     it "shows the location when clicking on a calendar event", priority: "2" do

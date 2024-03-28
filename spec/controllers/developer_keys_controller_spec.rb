@@ -89,7 +89,7 @@ describe DeveloperKeysController do
           # enable conference placement
           Account.site_admin.enable_feature! :conference_selection_lti_placement
           get "index", params: { account_id: Account.site_admin.id }
-          expect(assigns.dig(:js_env, :validLtiPlacements)).to match_array Lti::ResourcePlacement::PLACEMENTS
+          expect(assigns.dig(:js_env, :validLtiPlacements)).to match_array Lti::ResourcePlacement.public_placements(Account.site_admin)
         end
 
         it 'includes the "includes parameter" release flag' do

@@ -106,6 +106,7 @@ const locale = {
   "file_name_8fd421ff": { "message": "نام فایل" },
   "files_c300e900": { "message": "فایل ها" },
   "files_index_af7c662b": { "message": "فهرست فایل ها" },
+  "find_8d605019": { "message": "یافتن" },
   "finish_bc343002": { "message": "پایان" },
   "folder_tree_fbab0726": { "message": "درخت پوشه" },
   "format_4247a9c5": { "message": "قالب" },
@@ -168,6 +169,7 @@ const locale = {
     "message": "هیچ پیش نمایشی برای این فایل موجود نیست."
   },
   "no_results_940393cf": { "message": "No results." },
+  "no_results_found_58717065": { "message": "نتیجه ای یافت نشد" },
   "no_video_1ed00b26": { "message": "بدون تصویر" },
   "none_3b5e34d2": { "message": "هیچ کدام" },
   "olive_6a3e4d6b": { "message": "زیتون" },
@@ -191,6 +193,7 @@ const locale = {
   "prev_f82cbc48": { "message": "قبلی" },
   "preview_53003fd2": { "message": "پیش‌نمایش" },
   "preview_a3f8f854": { "message": "پیش نمایش" },
+  "previous_bd2ac015": { "message": "Previous" },
   "published_c944a23d": { "message": "منتشر شده" },
   "pumpkin_904428d5": { "message": "کدوتنبل" },
   "purple_7678a9fc": { "message": "ارغوانی" },

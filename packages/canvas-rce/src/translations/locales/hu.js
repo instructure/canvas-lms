@@ -326,6 +326,7 @@ const locale = {
   },
   "files_c300e900": { "message": "Fájlok" },
   "files_index_af7c662b": { "message": "Fájlok indexe" },
+  "find_8d605019": { "message": "Keresés" },
   "finish_bc343002": { "message": "Befejezés" },
   "flat_music_76d5a5c3": { "message": "Lapos (zene)" },
   "focus_element_options_toolbar_18d993e": {
@@ -538,6 +539,7 @@ const locale = {
     "message": "Ehhez a fájlhoz nincs előnézet."
   },
   "no_results_940393cf": { "message": "Nincs eredmény." },
+  "no_results_found_58717065": { "message": "Nincs találat" },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Nincs találat a követezőre: { filterTerm }"
   },
@@ -620,6 +622,7 @@ const locale = {
   "preview_a3f8f854": { "message": "ELŐNÉZET" },
   "preview_in_overlay_ed772c46": { "message": "Előnézet a fedvényben" },
   "preview_inline_9787330": { "message": "Soron belüli előnézet" },
+  "previous_bd2ac015": { "message": "Előző" },
   "prime_917ea60e": { "message": "Prím" },
   "prime_numbers_13464f61": { "message": "Prímszámok" },
   "product_39cf144f": { "message": "Szorzat" },
