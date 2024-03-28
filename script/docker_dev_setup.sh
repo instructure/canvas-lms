@@ -1,4 +1,4 @@
-#!/bin/bash
+do#!/bin/bash
 set -e
 source script/common/utils/common.sh
 source script/common/canvas/build_helpers.sh
