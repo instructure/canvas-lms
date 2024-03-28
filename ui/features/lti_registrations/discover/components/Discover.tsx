@@ -19,7 +19,7 @@
 import React from 'react'
 import {Flex} from '@instructure/ui-flex'
 
-import ProductCard from './components/ProductCard'
+import ProductCard from './ProductCard'
 
 const product = {
   name: 'Product Name',
@@ -39,7 +39,6 @@ export const Discover = () => {
   }
   return (
     <div>
-      <h1>This is the Discover page</h1>
       <Flex gap="medium" wrap="wrap">
         {renderProducts()}
       </Flex>
