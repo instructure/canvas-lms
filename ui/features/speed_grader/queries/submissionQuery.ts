@@ -48,6 +48,7 @@ const SUBMISSION_QUERY = gql`
           submissionStatus
           customGradeStatus
           excused
+          submittedAt
           commentsConnection {
             nodes {
               id
