@@ -975,36 +975,20 @@ export default class Calendar {
       }
       return false
     })
-
-    // events got created
-    if (candidateEventsInCalendar.length < updatedEvents.length) {
-      this.dataSource.clearCache()
-    }
-
-    // if you change the start time of an event+following, it will create a new
-    // series for those events plus update those to the left with a new rrule
-    const updatedEventIds = candidateEventsInCalendar.map(e => e.calendarEvent.id)
-    const otherEventsInSeries = this.calendar.fullCalendar('clientEvents').filter(c => {
-      return (
-        c.calendarEvent?.series_uuid === updatedEvents[0].series_uuid &&
-        !updatedEventIds.includes(c.calendarEvent.id)
-      )
-    })
-
-    if (otherEventsInSeries.length !== 0) {
-      this.dataSource.clearCache()
-    }
+    // with the jquery and fullcalendar version update, editing events in a series
+    // would not update the contextInfo of the event the user initiated the change in
+    // resulting in the wrong info being shown in the detail dialog when clicking on an event.
+    // I cannot figure out where the contextInfo is failing to get updated. This fixes it.
+    // This change also means we don't need to look for special cases where we need to clear
+    // the cache, since it's always happening now.
+    this.dataSource.resetContexts()
 
     candidateEventsInCalendar.forEach(e => {
       this.updateEvent(e)
     })
     $.publish('CommonEvent/eventsSavedFromSeries', {seriesEvents: candidateEventsInCalendar})
 
-    // I don't understand why, but it we don't take a beat the
-    // events' coloring doesn't get updated.
-    window.setTimeout(() => {
-      this.calendar.fullCalendar('refetchEvents')
-    }, 0)
+    this.calendar.fullCalendar('refetchEvents')
   }
 
   // When an assignment event is updated, update its related overrides.
