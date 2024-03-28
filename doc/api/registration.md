@@ -140,43 +140,44 @@ curl \
 
 #### LTI Registration schema
 
-|Name|Type|Required|Description|
-|---|---|---|---|---|
-|application_type|"web"|yes||
-|grant_types|["client_credentials", "implicit"]|yes||
-|initiate_login_uri|string|yes|The url that Canvas should use to initiate an LTI launch request|
-|redirect_uris|string|yes|Any urls that the tool can launch to.|
-|response_types|"id_token"|yes||
-|client_name|string|yes|The name of the tool as it will appear to Administrators maintaining the integration|
-|jwks_uri|string|yes|The url of the tool's JSON Web Key Set|
-|token_endpoint_auth_method|"private_key_jwt"|yes||
-|scope|string|yes|A space-separated list of scopes the tool requests access to.|
-|ht<span>tps://</span>purl.imsglobal.org/spec/lti-tool-configuration|[Lti Tool Configuration](#lti-tool-configuration-schema)|yes|none|
+| Name                                                                | Type                                                     | Required | Description                                                                          |
+|---------------------------------------------------------------------|----------------------------------------------------------|----------|--------------------------------------------------------------------------------------|
+| application_type                                                    | "web"                                                    | yes      |                                                                                      |
+| grant_types                                                         | ["client_credentials", "implicit"]                       | yes      |                                                                                      |
+| initiate_login_uri                                                  | string                                                   | yes      | The url that Canvas should use to initiate an LTI launch request                     |
+| redirect_uris                                                       | string                                                   | yes      | Any urls that the tool can launch to.                                                |
+| response_types                                                      | "id_token"                                               | yes      |                                                                                      |
+| client_name                                                         | string                                                   | yes      | The name of the tool as it will appear to Administrators maintaining the integration |
+| jwks_uri                                                            | string                                                   | yes      | The url of the tool's JSON Web Key Set                                               |
+| token_endpoint_auth_method                                          | "private_key_jwt"                                        | yes      |                                                                                      |
+| scope                                                               | string                                                   | yes      | A space-separated list of scopes the tool requests access to.                        |
+| ht<span>tps://</span>purl.imsglobal.org/spec/lti-tool-configuration | [Lti Tool Configuration](#lti-tool-configuration-schema) | yes      | none                                                                                 |
 
 #### LTI Tool Configuration schema
 
-|Name|Type|Required|Description|
-|---|---|---|---|---|
-|domain|string|yes|The primary domain used by this tool.|
-|secondary_domains|Array<string>|no|Additional domains used by this tool.|
-|target_link_uri|string|yes|The default launch url if not defined in a message|
-|custom_parameters|JSON object|no|Custom parameters to be included in each launch. Values must be a string|
-|description|string|no|A short description of the tool.|
-|messages|Array<[message](#lti-message-schema)>|yes|Messages supported by the tool.|
-|claims|Array<string>|yes|An array of claims to be included in each launch token.|
-|ht<span>tps://</span>canvas.instructure.com/lti/privacy_level|"public" &#124; "name_only" &#124; "email_only" &#124; "anonymous"|no|The tool's default privacy level, (determines the PII fields the tool is sent.) defaults to "anonymous"|
+| Name                                                          | Type                                                               | Required | Description                                                                                             |
+|---------------------------------------------------------------|--------------------------------------------------------------------|----------|---------------------------------------------------------------------------------------------------------|
+| domain                                                        | string                                                             | yes      | The primary domain used by this tool.                                                                   |
+| secondary_domains                                             | Array<string>                                                      | no       | Additional domains used by this tool.                                                                   |
+| target_link_uri                                               | string                                                             | yes      | The default launch url if not defined in a message                                                      |
+| custom_parameters                                             | JSON object                                                        | no       | Custom parameters to be included in each launch. Values must be a string                                |
+| description                                                   | string                                                             | no       | A short description of the tool.                                                                        |
+| messages                                                      | Array<[message](#lti-message-schema)>                              | yes      | Messages supported by the tool.                                                                         |
+| claims                                                        | Array<string>                                                      | yes      | An array of claims to be included in each launch token.                                                 |
+| ht<span>tps://</span>canvas.instructure.com/lti/privacy_level | "public" &#124; "name_only" &#124; "email_only" &#124; "anonymous" | no       | The tool's default privacy level, (determines the PII fields the tool is sent.) defaults to "anonymous" |
 
 #### LTI Message schema
 
-|Name|Type|Required|Description|
-|---|---|---|---|---|
-|type|"LtiResourceLinkRequest" &#124; "LtiDeepLinkingRequest"|yes|The message type.|
-|target_link_uri|string|no|The url to launch to.|
-|label|string|no|The user-facing label to show when launching a tool.|
-|icon_uri|string|no|Url to an icon that will be added to the link (only applicable placements)|
-|custom_parameters|JSON object|no|Custom parameters to be included in each launch. Values must be a string|
-|placements|Array<string>|yes|An array of placements to apply to this launch|
-|roles (optional)|string|yes|An array of roles to apply the launch. If not included, the placement will be available for all roles.|
+| Name                                                                              | Type                                                    | Required | Description                                                                                                                                                                                                                                                                                                |
+|-----------------------------------------------------------------------------------|---------------------------------------------------------|----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| type                                                                              | "LtiResourceLinkRequest" &#124; "LtiDeepLinkingRequest" | yes      | The message type.                                                                                                                                                                                                                                                                                          |
+| target_link_uri                                                                   | string                                                  | no       | The URL to launch to.                                                                                                                                                                                                                                                                                      |
+| label                                                                             | string                                                  | no       | The user-facing label to show when launching a tool.                                                                                                                                                                                                                                                       |
+| icon_uri                                                                          | string                                                  | no       | URL to an icon that will be added to the link (only for applicable placements)                                                                                                                                                                                                                             |
+| custom_parameters                                                                 | JSON object                                             | no       | Custom parameters to be included in each launch. Values must be a string                                                                                                                                                                                                                                   |
+| placements                                                                        | Array<string>                                           | no       | An array of placements to apply to this launch                                                                                                                                                                                                                                                             |
+| roles                                                                             | string                                                  | no       | An array of roles to apply the launch. If not included, the placement will be available for all roles.                                                                                                                                                                                                     |
+| ht<span>tps://</span>canvas.instructure.com/lti/course_navigation/default_enabled | boolean                                                 | no       | Only applies if the placement is "course_navigation". If false, the tool will not appear in the course navigation bar, but can still be re-enabled by admins and teachers. Defaults to 'true'. See the "default" setting as discussed in the [Navigation Tools](file.navigation_tools.html#settings) docs. |
 
 example LTI Registration body:
 ```json
