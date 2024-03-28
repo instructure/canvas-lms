@@ -36,7 +36,6 @@ import calendarAppTemplate from '../jst/calendarApp.handlebars'
 import commonEventFactory from '@canvas/calendar/jquery/CommonEvent/index'
 import ShowEventDetailsDialog from './ShowEventDetailsDialog'
 import EditEventDetailsDialog from './EditEventDetailsDialog'
-import CalendarNavigator from '../backbone/views/CalendarNavigator'
 import AgendaView from '../backbone/views/AgendaView'
 import calendarDefaults from '../CalendarDefaults'
 import ContextColorer from '@canvas/util/contextColorer'
@@ -91,13 +90,6 @@ export default class Calendar {
     }
 
     this.el = $(selector).html(calendarAppTemplate())
-
-    // In theory this is no longer necessary, but it performs some function that
-    // another file depends on or perhaps even this one. Whatever the dependency
-    // is it is not clear, without more research, what effect this has on the
-    // calendar system
-    this.schedulerNavigator = new CalendarNavigator({el: $('.scheduler_navigator')})
-    this.schedulerNavigator.hide()
 
     this.agenda = new AgendaView({
       el: $('.agenda-wrapper'),
@@ -158,7 +150,6 @@ export default class Calendar {
     }
 
     this.connectHeaderEvents()
-    this.connectSchedulerNavigatorEvents()
     this.connectAgendaEvents()
     $('#flash_message_holder').on('click', '.gotoDate_link', event =>
       this.gotoDate(fcUtil.wrap($(event.target).data('date')))
@@ -212,13 +203,6 @@ export default class Calendar {
     this.header.on('agenda', () => this.loadView('agenda'))
     this.header.on('createNewEvent', this.addEventClick)
     this.header.on('refreshCalendar', this.reloadClick)
-  }
-
-  connectSchedulerNavigatorEvents() {
-    this.schedulerNavigator.on('navigatePrev', () => this.handleArrow('prev'))
-    this.schedulerNavigator.on('navigateToday', this.today)
-    this.schedulerNavigator.on('navigateNext', () => this.handleArrow('next'))
-    this.schedulerNavigator.on('navigateDate', this.navigateDate)
   }
 
   connectAgendaEvents() {
@@ -707,8 +691,7 @@ export default class Calendar {
   }
 
   setDateTitle = title => {
-    this.header.setHeaderText(title)
-    return this.schedulerNavigator.setTitle(title)
+    return this.header.setHeaderText(title)
   }
 
   // event triggered by items being dropped from outside the calendar
@@ -1133,7 +1116,6 @@ export default class Calendar {
       this.displayAppointmentEvents = null
       this.header.showAgendaRecommendation()
       this.calendar.show()
-      this.schedulerNavigator.hide()
       this.calendar.fullCalendar('refetchEvents')
       this.calendar.fullCalendar('changeView', view === 'week' ? 'agendaWeek' : 'month')
       this.calendar.fullCalendar('render')

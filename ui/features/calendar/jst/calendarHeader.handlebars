@@ -1,3 +1,6 @@
+{{#if ENV.FEATURES.instui_header}}
+<span id="calendar_header_component"></span>
+{{else}}
 <div class="header-bar-outer-container calendar_header">
     <div class="sticky-toolbar" data-sticky>
         <div class="header-bar flex-container">
@@ -31,3 +34,4 @@
         </div>
     </div>
 </div>
+{{/if}}
