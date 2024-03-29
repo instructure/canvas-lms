@@ -1211,6 +1211,8 @@ hu:
               check_box: "Csoporttagság CSV"
           groups: 
             check_box: "Csoportok CSV"
+          include_deleted: 
+            check_box: "Beleértve a törölt elemeket is"
           sections: 
             check_box: "Szekciók CSV"
           terms: 

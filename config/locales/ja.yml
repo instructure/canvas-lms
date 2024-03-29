@@ -8534,7 +8534,7 @@ ja:
   count_rows_removed_c6ff7bc: "%{count}列の削除"
   count_sections_466dcd5c: 
     one: "%{count}セクション"
-    other: "%{count}セクション"
+    other: "%{count}つのセクション"
   count_sets_of_grading_periods_found_c8857ae9: 
     one: 採点期間が1セット見つかりました。
     other: "採点期間が%{count} セット見つかりました。"
@@ -9116,7 +9116,7 @@ ja:
         join_course: このコースに参加
         new_announcement: 新規アナウンスメント
         view_course_calendar: コースカレンダーを表示
-        view_course_notification_settings: コース通知を表示する
+        view_course_notification_settings: コースの通知設定を表示する
         view_course_stream: コースの最近のアクティビティを表示
     description: 
       links: 
@@ -10142,7 +10142,7 @@ ja:
   date_is_required_8660ec22: 日付は必須です
   date_is_required_9c6f5e83: 日付は必須です！
   date_modified_4d065406: "、修正日： "
-  date_modified_e1c8ac8f: 変更日
+  date_modified_e1c8ac8f: 編集日
   date_modified_modifiedat_b839cc8b: "修正日：%{modifiedAt}"
   date_must_be_after_date_available_55bdfee0: 日付は利用可能日以降でなければならない
   date_must_be_after_date_available_b4fbd204: 日付は利用可能な日付以降でなければなりません
@@ -11316,7 +11316,7 @@ ja:
   duplicate_discussion_title_6537ef4d: "ディスカッションを複製する%{title}"
   duplicate_grading_scheme_d0e57758: 評定スキームを複製
   duplicate_ids_23b0a29e: 重複ID
-  duplicate_item_339f54bb: 項目重複
+  duplicate_item_339f54bb: アイテムのコピー
   duplicate_module_module_name_be40ad50: "モジュールを複製%{module_name}"
   duplicate_module_name_ab26e5c3: "重複%{module_name}"
   duplicate_modules_8ea35557: モジュールを複製
@@ -11879,7 +11879,7 @@ ja:
   enter_account_domain_to_substitute_the_user_s_root_1b79eac2: "ユーザのルート アカウント ドメインを置き換えるには、\"{{ACCOUNT_DOMAIN}}\" を入力します"
   enter_an_id_or_an_original_job_id_d81ad1c7: IDまたはoriginal_job_idを入力する
   enter_and_distribute_grades_c1216df: 評定を入力して配布する
-  enter_at_least_count_characters_1c7a0b36: "%{count} 文字以上記入してください"
+  enter_at_least_count_characters_1c7a0b36: "%{count} 文字以上入力してください"
   enter_canvas_user_id_to_substitute_the_user_s_uniq_b2a75735: "ユーザの一意の Canvas ID を置き換えるには、\"{{CANVAS_USER_ID}}\" を入力します"
   enter_grades_as_e113e606: グレードを～として入力する
   enter_group_set_name_70f51d2: グループセット名を入力
@@ -13289,7 +13289,7 @@ ja:
   from_gravatar_58372d5a: "Gravatar から"
   from_grouptitle_860dff95: "%{groupTitle}から"
   from_the_provider_of_the_enrollments_834d5ae4: 登録のプロバイダーから
-  front_page_50cae87e: フロントページ
+  front_page_50cae87e: トップページ
   front_page_must_be_set_first_4dbbfdbe: "トップ ページを最初に設定する必要があります"
   front_page_must_be_set_first_c5246f7d: 表紙を先に設定してください
   full_article_9296bb6f: 記事全文
@@ -15748,7 +15748,7 @@ ja:
   importing_course_content_into_the_same_course_will_b09c69e: 同じコースにコースのコンテンツをインポートすると、コンテンツを最初に複製し、繰り返した場合、その重複を上書きします。
   importing_name_8f2b131d: "\"%{name}\"をインポート中"
   importing_outcomes_e62a0375: アウトカムをインポートする
-  importing_the_same_course_content_more_than_once_w_8b28b2c6: 同じコースのコンテンツを複数回インポートすると、コース内の既存のコンテンツが上書きされます。
+  importing_the_same_course_content_more_than_once_w_8b28b2c6: 同じコースのコンテンツを複数回コピーすると、コース内の既存のコンテンツが上書きされます。
   improve_accessibility_of_left_hand_menu_through_be_908fb002: 無効になっているメニュー項目の色と視覚およびスクリーンリーダーインジケータを適切に利用することで、左メニューのアクセシビリティを改善します。
   improve_and_streamline_the_rce_button_and_tray_ux_89d5a47e: RCEボタンとトレイのUXを改善・効率化する
   improve_discoverability_of_drag_and_drop_in_files_421e9e25: "ファイル内におけるドラッグ & ドロップの見つけやすさを改善"
@@ -16464,7 +16464,7 @@ ja:
   last_login_54565109: 前回のログイン
   last_login_b7bc0479: 最終ログイン：
   last_modified_5a9c80b7: 最終修正日
-  last_modified_by_ca4bb5e1: 最終変更者
+  last_modified_by_ca4bb5e1: 最終編集者
   last_name_303122f3: 姓
   last_post_at_date_bf77652f: "最後の投稿%{date}"
   last_post_display_last_reply_at_b9896355: "最後のポスト%{display_last_reply_at}"
@@ -17239,7 +17239,7 @@ ja:
   maltese_916925e8: マルタ語
   manage_a_library_of_custom_buttons_and_icons_from__e3137049: RCEからカスタムボタンとアイコンのライブラリを管理します。
   manage_a_library_of_custom_icons_from_the_rce_fff6fe2e: RCEのカスタムアイコンライブラリを管理します。
-  manage_access_bd923d8d: アクセスの管理
+  manage_access_bd923d8d: 公開設定
   manage_account_calendars_89dce020: アカウントカレンダーを管理する
   manage_account_level_course_actions_1a9d2385: アカウントレベルのコースアクションを管理する
   manage_add_edit_delete_18963dbc: "管理（追加/編集/削除） "
@@ -19609,7 +19609,7 @@ ja:
   moderator_49b9f2e1: 管理者
   moderator_sortorder_18063692: "管理者%{sortOrder}"
   modified_by_52d699e9: "、修正者： "
-  modified_by_c1584b3c: 変更者
+  modified_by_c1584b3c: 編集者
   modified_by_user_e6c8ade3: "修正者：%{user}"
   modify_permissions_for_account_rubrics_6c3aee59: アカウント規定の許可を変更
   modify_settings_ed8b9ccf: 設定を変更
@@ -20010,7 +20010,7 @@ ja:
   my_drafts_4e4ac1a6: 私の下書き
   my_files_2f621040: "マイ ファイル"
   my_grades_98834476: 私の評定
-  my_settings_2ff35329: マイ設定
+  my_settings_2ff35329: 個人設定
   my_subjects_61936afb: マイ教科
   my_themes_b72217b8: マイテーマ
   n_554bc493: "n"
@@ -21183,7 +21183,7 @@ ja:
   orbis_report_header_student_sis_id: "ユーザ SIS"
   orbis_report_header_submission_score: 提出物のスコア
   order_301c3ac1: 並べ替え
-  ordered_by_recent_activity_112d33d5: 最近のアクティビティで並べ替え
+  ordered_by_recent_activity_112d33d5: 最近のアクティビティ順で表示
   org_type_as_reported_by_salesforce_c10f4000: "Salesforce で報告されている組織タイプ"
   organize_and_segment_your_course_by_topic_unit_cha_4c38a6b9: |-
       あなたのコースをトピック、ユニット、章、または週ごとに整理・
@@ -24640,7 +24640,7 @@ ja:
     folder_browsing_tree: フォルダ参照ツリー
     folder_name: フォルダ名
     loading_more_results: より多くの結果を読み込んでいます...
-    modified_by: 変更者
+    modified_by: 編集者
     move: 移動
     move_question: 
       one: "これら %{count} 個のアイテムをどこに移動しますか?"
@@ -24660,8 +24660,8 @@ ja:
     sorted_ascending: 昇順に並べ替え
     sorted_desending: 降順に並べ替え
     this_folder_is_empty: このフォルダは空です
-    updated_at: 変更日
-    updated_at_short: 変更日
+    updated_at: 編集日
+    updated_at_short: 編集日
     view: 表示
   react_ui_rewrite_developer_key_management_aa1df236: 反応UIリライト開発者キー管理
   reactivate_user_e058db8b: ユーザーを再有効化する
@@ -32219,7 +32219,7 @@ ja:
     wiki_page: 
       buttons: 
         edit: 編集
-        view_all_pages: すべてのページを表示
+        view_all_pages: ページ一覧を表示
       delete_wiki: 削除
       labels: 
         front_page: "%{frontPageText}"
@@ -32400,7 +32400,7 @@ ja:
     one: "これら%{count}の成果を削除しますか？"
     other: "これら%{count}の成果を削除しますか？"
   wrap_event_titles_in_calendar_month_view_cbb29fd8: カレンダーの月表示でイベントのタイトルを終了します
-  write_something_430e346c: 何か書く...
+  write_something_430e346c: コメントを追加...
   wrong_answer_comments_14963a24: 不正解時のコメント
   x_y_4a86b3ab: "%{x}/%{y}"
   xls_733452c1: XLS

@@ -1175,6 +1175,8 @@ he:
               check_box: "קובץ CSV של קבוצות חבריויות"
           groups: 
             check_box: "קובץ CSV של קבוצות"
+          include_deleted: 
+            check_box: "יש לכלול רכיבים שבוטלו"
           sections: 
             check_box: "קובץ CSV של הקבצות"
           terms: 
@@ -8711,7 +8713,7 @@ he:
           
           %{users}
           להמשיך בכל זאת?
-    course_average: "ממוצע קורס"
+    course_average: "ממוצע קורס "
     course_median: "חציון של הקורס"
     course_mode: "שכיח הקורס "
     crocodoc_expiring: "חלון הזמן לפעילות ה Crocodoc שלך עומד לפוג. יש לטעון את החלון מחדש כדי לא לאבד שינויים"

@@ -1097,6 +1097,8 @@ uk:
               check_box: "CSV членства у групах"
           groups: 
             check_box: "CSV груп"
+          include_deleted: 
+            check_box: "Включно з видаленими обєктами"
           sections: 
             check_box: "CSV розділів"
           terms: 
