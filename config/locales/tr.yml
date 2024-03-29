@@ -1237,6 +1237,8 @@ tr:
               check_box: "Grup Üyeliği CSV"
           groups: 
             check_box: "Gruplar CSV"
+          include_deleted: 
+            check_box: "Silinen Nesneleri İçer"
           sections: 
             check_box: "Bölümler CSV"
           terms: 
