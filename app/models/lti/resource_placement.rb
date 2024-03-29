@@ -20,6 +20,8 @@
 require "lti_advantage"
 
 module Lti
+  class InvalidMessageTypeForPlacementError < StandardError; end
+
   class ResourcePlacement < ActiveRecord::Base
     ACCOUNT_NAVIGATION = "account_navigation"
     ASSIGNMENT_EDIT = "assignment_edit"
@@ -135,6 +137,13 @@ module Lti
         item_banks_tab[:label] = new_label || t("#tabs.item_banks", "Item Banks")
       end
       item_banks_tab
+    end
+
+    def self.supported_message_type?(placement, message_type)
+      return true if message_type.blank?
+      return false if placement.blank? || PLACEMENTS.exclude?(placement.to_sym)
+
+      PLACEMENTS_BY_MESSAGE_TYPE[message_type.to_s]&.include?(placement.to_sym)
     end
   end
 end

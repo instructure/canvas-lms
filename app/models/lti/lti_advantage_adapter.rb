@@ -179,6 +179,12 @@ module Lti
       end
 
       message_type = @tool.extension_setting(resource_type, :message_type)
+      unless Lti::ResourcePlacement.supported_message_type?(resource_type, message_type)
+        e = Lti::InvalidMessageTypeForPlacementError.new
+        CanvasErrors.capture(e, { tags: { developer_key_id: @tool.global_developer_key_id } }, :error)
+        # We explicitly want to stop the launch at this point.
+        raise e
+      end
       if message_type == LtiAdvantage::Messages::DeepLinkingRequest::MESSAGE_TYPE
         deep_linking_request.generate_post_payload
       else

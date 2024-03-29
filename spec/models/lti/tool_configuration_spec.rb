@@ -162,6 +162,25 @@ module Lti
         it { is_expected.to be false }
       end
 
+      context "when one of the configured placements has an unsupported message_type" do
+        before do
+          tool_configuration.developer_key = developer_key
+          tool_configuration.settings["extensions"].first["settings"]["placements"] = [
+            {
+              "placement" => "account_navigation",
+              "message_type" => "LtiDeepLinkingRequest",
+            }
+          ]
+        end
+
+        it { is_expected.to be false }
+
+        it "includes a friendly error message" do
+          subject
+          expect(tool_configuration.errors[:placements].first.message).to include("does not support message type")
+        end
+      end
+
       context "when extensions have non-Canvas platform" do
         let(:settings) do
           sets = super()

@@ -1944,9 +1944,11 @@ describe ExternalToolsController do
         context "during a basic launch" do
           let(:message_type) { "LtiResourceLinkRequest" }
 
-          it_behaves_like "includes editor variables" do
-            let(:selection_launch_param) { launch_params.dig("https://purl.imsglobal.org/spec/lti/claim/custom", "selection") }
-            let(:contents_launch_param) { launch_params.dig("https://purl.imsglobal.org/spec/lti/claim/custom", "contents") }
+          it "doesn't launch, as LtiResourceLinkRequest is not supported in the RCE" do
+            allow(CanvasErrors).to receive(:capture)
+            subject
+            expect(response).not_to be_successful
+            expect(CanvasErrors).to have_received(:capture).with(an_instance_of(Lti::InvalidMessageTypeForPlacementError), hash_including({ tags: { developer_key_id: tool.global_developer_key_id } }), :error)
           end
         end
 
