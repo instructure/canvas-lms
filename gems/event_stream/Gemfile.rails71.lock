@@ -102,7 +102,7 @@ GEM
       activerecord (>= 5.2)
       activesupport (>= 5.2)
     base64 (0.2.0)
-    bigdecimal (3.1.6)
+    bigdecimal (3.1.7)
     builder (3.2.4)
     concurrent-ruby (1.2.3)
     connection_pool (2.4.1)

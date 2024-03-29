@@ -22,7 +22,7 @@ GEM
       tzinfo (~> 2.0)
     aes_key_wrap (1.1.0)
     base64 (0.2.0)
-    bigdecimal (3.1.6)
+    bigdecimal (3.1.7)
     bindata (2.5.0)
     concurrent-ruby (1.2.3)
     connection_pool (2.4.1)
