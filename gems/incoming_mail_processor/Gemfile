@@ -13,4 +13,4 @@ gem "utf8_cleaner", path: "../utf8_cleaner"
 gem "canvas_errors", path: "../canvas_errors"
 gem "canvas_text_helper", path: "../canvas_text_helper"
 
-eval_gemfile(gemfile.dirname.join("../gemfile_prefix.rb"))
+eval_gemfile("../gemfile_prefix.rb")

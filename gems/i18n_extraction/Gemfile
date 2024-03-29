@@ -6,4 +6,4 @@ gemspec
 
 gem "i18nliner", "~> 0.2.4"
 
-eval_gemfile(gemfile.dirname.join("../gemfile_prefix.rb"))
+eval_gemfile("../gemfile_prefix.rb")
