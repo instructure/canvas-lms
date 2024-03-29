@@ -230,5 +230,8 @@ DEPENDENCIES
   sqlite3
   thrift_client (= 0.9.3)!
 
+RUBY VERSION
+   ruby 3.1.2p20
+
 BUNDLED WITH
    2.5.7
