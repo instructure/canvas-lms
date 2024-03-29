@@ -20,16 +20,16 @@
 class Attachments::Storage
   def self.store_for_attachment(attachment, data)
     if InstFS.enabled?
+      attachment.filename ||= detect_filename(data)
       instfs_uuid = InstFS.direct_upload(
         file_object: data,
-        file_name: attachment.display_name
+        file_name: attachment.display_name.presence || attachment.filename || "attachment"
       )
       attachment.instfs_uuid = instfs_uuid
       attachment.md5 = Digest::SHA2.new(512).file(data).hexdigest if digest_file? data
 
       # populate attachment fields if they were not already set
       attachment.size ||= data.size
-      attachment.filename ||= detect_filename(data)
       attachment.content_type ||= attachment.detect_mimetype(data)
       attachment.workflow_state = "processed"
     else

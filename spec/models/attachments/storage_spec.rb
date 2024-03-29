@@ -33,6 +33,12 @@ describe Attachments::Storage do
       expect(@attachment.instfs_uuid).to eq(@uuid)
     end
 
+    it "infers a filename for direct_upload" do
+      att = Attachment.new
+      expect(InstFS).to receive(:direct_upload).with(file_object: @file, file_name: "a.png")
+      Attachments::Storage.store_for_attachment(att, @file)
+    end
+
     it "calls attachment_fu methods if inst-fs is not enabled" do
       allow(InstFS).to receive(:enabled?).and_return(false)
       expect(@attachment).to receive(:uploaded_data=)
