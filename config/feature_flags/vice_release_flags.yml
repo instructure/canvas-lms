@@ -137,8 +137,8 @@ discussion_checkpoints:
     combined to form a final discussion grade.
   applies_to: RootAccount
 
-inbox_signature:
+inbox_settings:
   state: hidden
   applies_to: SiteAdmin
-  display_name: Inbox Setting - Signature
-  description: Users can optionally set a default signature that will be added at the end of outgoing messages.
+  display_name: Inbox Settings - QW Updates
+  description: Gives users access to new optional features like setting a default signature that will be added at the end of outgoing messages and setting an autoresponder.
