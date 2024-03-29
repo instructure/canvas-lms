@@ -979,6 +979,11 @@ hy:
         sis_export: 
           description: 
             text: "Այս հաշվետվությունը արտահանում է բոլոր անհրաժեշտ տեղեկությունները, որոնք վերաբերում են Canvas-ի համապատասխան կատեգորիաների ինիցիալիզացիային:"
+    provisioning_csv_parameters: 
+      account_reports: 
+        default: 
+          include_deleted: 
+            check_box: "Ներառել Ջնջված Օբյեկտները "
     public_courses_csv_description: 
       account_reports: 
         default: 
@@ -7223,6 +7228,8 @@ hy:
           
           %{users}:
           Այնուամենայնիվ, շարունակե՞լ:
+    course_average: "Դասընթացի միջին գնահատական "
+    course_median: "Դասընթացի մեդիան"
     crocodoc_expiring: "Ձեր Crocodoc սեսիայի ժամանակը շուտող կլրանա: Կրկին բեռնեք պատուհանը աշխատանքը չկորցնելու համար: "
     dialog_button: 
       aria_record: "Սեղմեք գրանցելու համար"
