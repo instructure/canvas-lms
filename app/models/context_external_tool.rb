@@ -800,7 +800,11 @@ class ContextExternalTool < ActiveRecord::Base
     when :selection_height
       400
     when :message_type
-      if type == :resource_selection
+      if use_1_3? && type == :editor_button
+        LtiAdvantage::Messages::DeepLinkingRequest::MESSAGE_TYPE
+      elsif use_1_3?
+        LtiAdvantage::Messages::ResourceLinkRequest::MESSAGE_TYPE
+      elsif type == :resource_selection
         "resource_selection"
       else
         "basic-lti-launch-request"

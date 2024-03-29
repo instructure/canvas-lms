@@ -180,6 +180,12 @@ module Lti
     end
 
     def validate_placements
+      placements.each do |p|
+        unless Lti::ResourcePlacement.supported_message_type?(p["placement"], p["message_type"])
+          errors.add(:placements, "Placement #{p["placement"]} does not support message type #{p["message_type"]}")
+        end
+      end
+
       return if disabled_placements.blank?
 
       invalid = disabled_placements.reject { |p| Lti::ResourcePlacement::PLACEMENTS.include?(p.to_sym) }
