@@ -4,4 +4,4 @@ source "https://rubygems.org"
 gem "canvas_mimetype_fu", path: "../canvas_mimetype_fu"
 gemspec
 
-eval_gemfile(gemfile.dirname.join("../gemfile_prefix.rb"))
+eval_gemfile("../gemfile_prefix.rb")

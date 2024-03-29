@@ -14,4 +14,4 @@ gem "cassandra-cql", "1.2.3", github: "kreynolds/cassandra-cql", ref: "02b5abbe4
 gem "config_file", path: "../config_file"
 # rubocop:enable Bundler/OrderedGems
 
-eval_gemfile(gemfile.dirname.join("../gemfile_prefix.rb"))
+eval_gemfile("../gemfile_prefix.rb")

@@ -9,4 +9,4 @@ gem "canvas_slug", path: "../canvas_slug"
 gem "config_file", path: "../config_file"
 gem "legacy_multipart", path: "../legacy_multipart"
 
-eval_gemfile(gemfile.dirname.join("../gemfile_prefix.rb"))
+eval_gemfile("../gemfile_prefix.rb")

@@ -7,4 +7,4 @@ gemspec
 gem "canvas_text_helper", path: "../canvas_text_helper"
 gem "html_text_helper", path: "../html_text_helper"
 
-eval_gemfile(gemfile.dirname.join("../gemfile_prefix.rb"))
+eval_gemfile("../gemfile_prefix.rb")

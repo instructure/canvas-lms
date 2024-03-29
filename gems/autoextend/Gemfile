@@ -4,4 +4,4 @@ source "https://rubygems.org"
 
 gemspec
 
-eval_gemfile(gemfile.dirname.join("../gemfile_prefix.rb"))
+eval_gemfile("../gemfile_prefix.rb")
