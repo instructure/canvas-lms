@@ -169,5 +169,8 @@ DEPENDENCIES
   rubocop-rake (~> 0.6)
   rubocop-rspec (~> 2.22)
 
+RUBY VERSION
+   ruby 3.1.2p20
+
 BUNDLED WITH
    2.5.7
