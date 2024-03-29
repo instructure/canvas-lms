@@ -20,52 +20,56 @@
 describe Inbox::InboxService do
   let(:user) { user_model }
   let(:user_id) { user.id.to_s }
+  let(:different_user_id) { "99999" }
   let(:account) { account_model }
   let(:root_account_id) { account.id }
   let(:inbox_settings_entity) { Inbox::Entities::InboxSettings }
   let(:inbox_settings_record) { Inbox::Repositories::InboxSettingsRepository::InboxSettingsRecord }
 
-  def expect_objects_equal(obj_a, obj_b)
-    # compare objects by serializing to json
-    expect(obj_a.to_json).to eq(obj_b.to_json)
+  # exclude record timestamps from comparison
+  def expect_entities_equal(ent_a, ent_b)
+    expect(ent_a.id).to eq ent_b.id
+    expect(ent_a.user_id).to eq ent_b.user_id
+    expect(ent_a.root_account_id).to eq ent_b.root_account_id
+    expect(ent_a.use_signature).to eq ent_b.use_signature
+    expect(ent_a.signature).to eq ent_b.signature
+    expect(ent_a.use_out_of_office).to eq ent_b.use_out_of_office
+    expect(ent_a.out_of_office_first_date).to eq ent_b.out_of_office_first_date
+    expect(ent_a.out_of_office_last_date).to eq ent_b.out_of_office_last_date
+    expect(ent_a.out_of_office_subject).to eq ent_b.out_of_office_subject
+    expect(ent_a.out_of_office_message).to eq ent_b.out_of_office_message
   end
 
-  describe ".user_settings" do
+  describe ".get_inbox_settings_for_user" do
     context "when there are inbox settings for user" do
-      let(:inbox_settings_entity_for_user) { inbox_settings_entity.new(user_id:) }
-
       before do
-        record = inbox_settings_record.new(user_id:, root_account_id:)
-        record.save!
+        inbox_settings_record.new(user_id:, root_account_id:).save!
       end
 
       it "returns inbox settings for user" do
-        inbox_service = Inbox::InboxService.new(user_id:, root_account_id:)
-        user_inbox_settings = inbox_service.user_settings
-        expect_objects_equal(user_inbox_settings, inbox_settings_entity_for_user)
+        record_id = inbox_settings_record.find_by(user_id:, root_account_id:).id
+        inbox_settings_entity_for_user = inbox_settings_entity.new(id: record_id, user_id:, root_account_id:)
+        user_inbox_settings = Inbox::InboxService.inbox_settings_for_user(user_id:, root_account_id:)
+        expect_entities_equal(user_inbox_settings, inbox_settings_entity_for_user)
       end
     end
 
     context "when there are no inbox settings for user" do
-      let(:inbox_settings_entity_for_user) { inbox_settings_entity.new(user_id: "99999") }
-
-      it "returns default inbox settings" do
-        inbox_service = Inbox::InboxService.new(user_id: "99999", root_account_id:)
-        inbox_settings = inbox_service.user_settings
-        expect_objects_equal(inbox_settings, inbox_settings_entity_for_user)
+      it "creates and returns default inbox settings for user" do
+        inbox_settings_new_user = Inbox::InboxService.inbox_settings_for_user(user_id: different_user_id, root_account_id:)
+        record_id = inbox_settings_record.find_by(user_id: different_user_id, root_account_id:).id
+        inbox_settings_entity_for_user = inbox_settings_entity.new(id: record_id, user_id: different_user_id, root_account_id:)
+        expect_entities_equal(inbox_settings_new_user, inbox_settings_entity_for_user)
       end
     end
   end
 
-  describe ".update_user_settings" do
+  describe ".update_inbox_settings_for_user" do
     context "when there are no inbox settings for user" do
-      let(:new_inbox_settings_entity) do
-        inbox_settings_entity.new(user_id: "99999")
-      end
-
       it "creates new inbox settings record" do
-        inbox_service = Inbox::InboxService.new(user_id: "99999", root_account_id:)
-        user_inbox_settings = inbox_service.update_user_settings(
+        user_inbox_settings = Inbox::InboxService.update_inbox_settings_for_user(
+          user_id: different_user_id,
+          root_account_id:,
           use_signature: false,
           signature: nil,
           use_out_of_office: false,
@@ -74,23 +78,20 @@ describe Inbox::InboxService do
           out_of_office_subject: nil,
           out_of_office_message: nil
         )
-        expect_objects_equal(user_inbox_settings, new_inbox_settings_entity)
+        new_inbox_settings_entity = inbox_settings_entity.new(id: user_inbox_settings.id, user_id: different_user_id, root_account_id:)
+        expect_entities_equal(user_inbox_settings, new_inbox_settings_entity)
       end
     end
 
     context "when there are inbox settings for user" do
-      let(:updated_inbox_settings_entity) do
-        inbox_settings_entity.new(user_id:, use_signature: true, signature: "John Doe")
-      end
-
       before do
-        record = inbox_settings_record.new(user_id:, root_account_id:)
-        record.save!
+        inbox_settings_record.new(user_id:, root_account_id:).save!
       end
 
       it "updates inbox settings record" do
-        inbox_service = Inbox::InboxService.new(user_id:, root_account_id:)
-        updated_user_inbox_settings = inbox_service.update_user_settings(
+        updated_user_inbox_settings = Inbox::InboxService.update_inbox_settings_for_user(
+          user_id:,
+          root_account_id:,
           use_signature: true,
           signature: "John Doe",
           use_out_of_office: false,
@@ -99,7 +100,13 @@ describe Inbox::InboxService do
           out_of_office_subject: nil,
           out_of_office_message: nil
         )
-        expect_objects_equal(updated_user_inbox_settings, updated_inbox_settings_entity)
+        expect_entities_equal(updated_user_inbox_settings, inbox_settings_entity.new(
+                                                             id: updated_user_inbox_settings.id,
+                                                             user_id:,
+                                                             root_account_id:,
+                                                             use_signature: true,
+                                                             signature: "John Doe"
+                                                           ))
       end
     end
   end

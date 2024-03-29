@@ -106,6 +106,11 @@ module GraphQLNodeLoader
       return nil unless Account.site_admin.grants_right?(ctx[:current_user], ctx[:session], :manage_internal_settings)
 
       Setting.where(name: id).take
+    when "MyInboxSettings"
+      return nil unless Account.site_admin.feature_enabled?(:inbox_settings)
+      return nil unless !id.nil? && !ctx[:domain_root_account].nil?
+
+      Inbox::InboxService.inbox_settings_for_user(user_id: id, root_account_id: ctx[:domain_root_account].id)
     when "MediaObject"
       Loaders::MediaObjectLoader.load(id)
     when "Module"

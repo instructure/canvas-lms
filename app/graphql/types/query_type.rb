@@ -254,5 +254,10 @@ module Types
     def rubric(id:)
       GraphQLNodeLoader.load("Rubric", id, context)
     end
+
+    field :my_inbox_settings, Types::InboxSettingsType, null: true
+    def my_inbox_settings
+      GraphQLNodeLoader.load("MyInboxSettings", context[:current_user].id.to_s, context) if context[:current_user]
+    end
   end
 end

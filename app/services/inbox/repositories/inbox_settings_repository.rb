@@ -24,49 +24,53 @@ module Inbox
         self.table_name = "inbox_settings"
       end
 
-      def initialize(user_id:, root_account_id:)
-        @user_id = user_id
-        @root_account_id = root_account_id
-      end
+      class << self
+        def get_inbox_settings(user_id:, root_account_id:)
+          settings = InboxSettingsRecord.find_by(user_id:, root_account_id:)
+          as_entity settings unless settings.nil?
+        end
 
-      def inbox_settings
-        settings = existing_inbox_settings
-        as_entity settings unless settings.nil?
-      end
+        def save_inbox_settings(
+          user_id:,
+          root_account_id:,
+          use_signature:,
+          signature:,
+          use_out_of_office:,
+          out_of_office_first_date:,
+          out_of_office_last_date:,
+          out_of_office_subject:,
+          out_of_office_message:
+        )
+          settings = InboxSettingsRecord.find_by(user_id:, root_account_id:) ||
+                     InboxSettingsRecord.new(user_id:, root_account_id:)
+          settings.use_signature = use_signature
+          settings.signature = signature
+          settings.use_out_of_office = use_out_of_office
+          settings.out_of_office_first_date = out_of_office_first_date
+          settings.out_of_office_last_date = out_of_office_last_date
+          settings.out_of_office_subject = out_of_office_subject
+          settings.out_of_office_message = out_of_office_message
+          settings.save!
 
-      def save_inbox_settings(use_signature:, signature:, use_out_of_office:, out_of_office_first_date:, out_of_office_last_date:, out_of_office_subject:, out_of_office_message:)
-        settings = existing_inbox_settings || new_inbox_settings
-        settings.use_signature = use_signature
-        settings.signature = signature
-        settings.use_out_of_office = use_out_of_office
-        settings.out_of_office_first_date = out_of_office_first_date
-        settings.out_of_office_last_date = out_of_office_last_date
-        settings.out_of_office_subject = out_of_office_subject
-        settings.out_of_office_message = out_of_office_message
-        settings.save!
+          as_entity settings
+        end
 
-        as_entity settings
-      end
+        private
 
-      private
-
-      def existing_inbox_settings
-        InboxSettingsRecord.find_by(user_id: @user_id, root_account_id: @root_account_id)
-      end
-
-      def new_inbox_settings
-        InboxSettingsRecord.new(user_id: @user_id, root_account_id: @root_account_id)
-      end
-
-      def as_entity(settings)
-        Entities::InboxSettings.new(user_id: settings.user_id,
-                                    use_signature: settings.use_signature,
-                                    signature: settings.signature,
-                                    use_out_of_office: settings.use_out_of_office,
-                                    out_of_office_first_date: settings.out_of_office_first_date,
-                                    out_of_office_last_date: settings.out_of_office_last_date,
-                                    out_of_office_subject: settings.out_of_office_subject,
-                                    out_of_office_message: settings.out_of_office_message)
+        def as_entity(settings)
+          Entities::InboxSettings.new(id: settings.id,
+                                      user_id: settings.user_id,
+                                      root_account_id: settings.root_account_id,
+                                      use_signature: settings.use_signature,
+                                      signature: settings.signature,
+                                      use_out_of_office: settings.use_out_of_office,
+                                      out_of_office_first_date: settings.out_of_office_first_date,
+                                      out_of_office_last_date: settings.out_of_office_last_date,
+                                      out_of_office_subject: settings.out_of_office_subject,
+                                      out_of_office_message: settings.out_of_office_message,
+                                      created_at: settings.created_at,
+                                      updated_at: settings.updated_at)
+        end
       end
     end
   end

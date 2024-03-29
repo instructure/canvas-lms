@@ -522,6 +522,9 @@
             "name": "GroupMembership"
           },
           {
+            "name": "InboxSettings"
+          },
+          {
             "name": "InternalSetting"
           },
           {
