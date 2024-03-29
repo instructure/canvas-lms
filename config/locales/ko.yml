@@ -815,6 +815,11 @@ ko:
         sis_export: 
           description: 
             text: "이 보고서는 관련 범주에 Canvas를 구축하는 데 필요한 모든 정보를 내보냅니다."
+    provisioning_csv_parameters: 
+      account_reports: 
+        default: 
+          include_deleted: 
+            check_box: "삭제된 개체 포함"
     quota_integer_required: "정수 값이 필요함"
     quota_must_be_positive: "값이 양수이어야 함"
     quota_not_updated: "할당량을 업데이트하지 않았음"
