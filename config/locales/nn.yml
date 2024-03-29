@@ -1390,6 +1390,8 @@ nn:
               check_box: "CSV-fil for gruppemedlemskap"
           groups: 
             check_box: "CSV-fil for grupper"
+          include_deleted: 
+            check_box: "Inkluder sletta objekt"
           sections: 
             check_box: "CSV-fil over seksjonar"
           terms: 
