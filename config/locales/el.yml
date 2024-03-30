@@ -960,6 +960,8 @@ el:
             check_box: "CSV Εγγραφών"
           groups: 
             check_box: "CSV Ομάδων"
+          include_deleted: 
+            check_box: "Να συμπεριληφθούν τα Αντικείμενα που έχουν αφαιρεθεί"
           sections: 
             check_box: "CSV Τμημάτων"
           terms: 
