@@ -569,7 +569,7 @@ GEM
       representable (~> 3.0)
       retriable (>= 2.0, < 4.a)
       rexml
-    google-apis-drive_v3 (0.49.0)
+    google-apis-drive_v3 (0.50.0)
       google-apis-core (>= 0.14.0, < 2.a)
     google-cloud-env (2.1.1)
       faraday (>= 1.0, < 3.a)
