@@ -14,7 +14,11 @@
     "percent": "Percent of maximum points possible for an outcome, scaled to reflect any custom mastery levels that differ from the learning outcome.",
     "possible": "Total number of points possible.",
     "score": "The student's score.",
-    "title": "Title of the learning outcome."
+    "user_uuid": "The unique identifier for the user that the outcome was assessed.",
+    "artifact_id": "The id of the artifact that contains the outcome assessment. Value will be an string representation of an integer or nil.",
+    "artifact_type": "The type of artifact that contains the outcome assessment.  Value will be one of the following: RubricAssessment, Submission, Quizzes::QuizSubmission, or LiveAssessments::Submission.",
+    "associated_asset_id": "The id of the asset that the outcome is aligned to. Value will be an string representation of an integer or nil.",
+    "associated_asset_type": "The type of the asset that the outcome is aligned to. Value will be one of the following: AssessmentQuestion, Assignment, Quizzes::Quiz, LiveAssessments::Assessment or nil."
   },
   "examples": [
     {
@@ -41,7 +45,11 @@
           "percent": 1,
           "possible": 5,
           "score": 5,
-          "title": "oxana Student 2, Test Outcome"
+          "user_uuid": "elXwFPr6uKGaiVxchQSsqV6YZy5HBtlq8O2vqMXM",
+          "artifact_id": "22",
+          "artifact_type": "RubricAssessment",
+          "associated_asset_id": "56",
+          "associated_asset_type": "Assignment"
         }
       }
     }
