@@ -53,4 +53,10 @@ describe Auditors::FeatureFlag do
     allow(Auditors::ActiveRecord::FeatureFlagRecord).to receive(:create_from_event_stream!).and_raise(test_err_class.new("DB Error"))
     expect { Auditors::FeatureFlag.record(@flag, @user, "on") }.to raise_error(test_err_class)
   end
+
+  context "root account" do
+    it "sets root_account_id attribute to the global id of the account" do
+      expect(@event.root_account_id).to eq(Account.site_admin.global_id)
+    end
+  end
 end
