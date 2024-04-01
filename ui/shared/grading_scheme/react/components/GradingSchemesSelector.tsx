@@ -33,11 +33,7 @@ import {useDefaultGradingScheme} from '../hooks/useDefaultGradingScheme'
 import {GradingSchemesManagement} from './GradingSchemesManagement'
 import {defaultPointsGradingScheme} from '../../defaultPointsGradingScheme'
 
-import type {
-  GradingSchemeTemplate,
-  GradingSchemeSummary,
-  GradingScheme,
-} from '../../gradingSchemeApiModel'
+import type {GradingSchemeSummary, GradingScheme} from '../../gradingSchemeApiModel'
 import {GradingSchemeViewEditModal} from './GradingSchemeViewEditModal'
 import {GradingSchemeViewCopyTemplateModal} from './GradingSchemeViewCopyTemplateModal'
 import {IconAddLine, IconCheckSolid} from '@instructure/ui-icons'
@@ -58,7 +54,7 @@ import {useGradingScheme} from '../hooks/useGradingScheme'
 
 const I18n = useI18nScope('assignments.grading_type_selector')
 
-interface ComponentProps {
+export type GradingSchemesSelectorProps = {
   canManage: boolean
   contextType: 'Course' | 'Account'
   contextId: string
@@ -77,7 +73,7 @@ export const GradingSchemesSelector = ({
   courseDefaultSchemeId,
   shrinkSearchBar = false,
   archivedGradingSchemesEnabled,
-}: ComponentProps) => {
+}: GradingSchemesSelectorProps) => {
   if (initiallySelectedGradingSchemeId === '0' || initiallySelectedGradingSchemeId === '') {
     initiallySelectedGradingSchemeId = undefined
   }
@@ -96,7 +92,7 @@ export const GradingSchemesSelector = ({
     undefined
   )
   const [defaultCanvasGradingScheme, setDefaultCanvasGradingScheme] = useState<
-    GradingSchemeTemplate | undefined
+    GradingScheme | undefined
   >(undefined)
   const [selectedGradingSchemeId, setSelectedGradingSchemeId] = useState<string | undefined>(
     initiallySelectedGradingSchemeId
@@ -221,12 +217,11 @@ export const GradingSchemesSelector = ({
     setShowManageGradingSchemesModal(false)
   }
   async function openGradingSchemeViewModal() {
-    if (!selectedGradingSchemeId) {
-      return
-    }
     setSelectedGradingScheme(undefined)
     try {
-      const scheme = await loadGradingScheme(contextType, contextId, selectedGradingSchemeId)
+      const scheme = selectedGradingSchemeId
+        ? await loadGradingScheme(contextType, contextId, selectedGradingSchemeId)
+        : defaultCanvasGradingScheme
       setSelectedGradingScheme(scheme)
       setShowViewGradingSchemeModal(true)
     } catch (error: any) {
@@ -234,12 +229,11 @@ export const GradingSchemesSelector = ({
     }
   }
   async function openGradingSchemeDuplicateModal() {
-    if (!selectedGradingSchemeId) {
-      return
-    }
     setSelectedGradingScheme(undefined)
     try {
-      const scheme = await loadGradingScheme(contextType, contextId, selectedGradingSchemeId)
+      const scheme = selectedGradingSchemeId
+        ? await loadGradingScheme(contextType, contextId, selectedGradingSchemeId)
+        : defaultCanvasGradingScheme
       setSelectedGradingScheme(scheme)
       setShowDuplicateGradingSchemeModal(true)
     } catch (error: any) {
@@ -379,11 +373,13 @@ export const GradingSchemesSelector = ({
                     renderLabel={
                       <ScreenReaderContent>{I18n.t('Select a grading scheme')}</ScreenReaderContent>
                     }
+                    data-testid="grading-schemes-selector-dropdown"
                   >
                     <SimpleSelect.Option
                       value=""
                       id="0"
                       key="0"
+                      data-testid="grading-schemes-selector-default-option"
                       renderBeforeLabel={() => {
                         if (
                           selectedGradingSchemeId === '' ||
@@ -410,6 +406,7 @@ export const GradingSchemesSelector = ({
                                 return <IconCheckSolid />
                               }
                             }}
+                            data-testid={`grading-schemes-selector-option-${gradingScheme.id}`}
                           >
                             {gradingScheme.title}
                           </SimpleSelect.Option>
@@ -428,6 +425,7 @@ export const GradingSchemesSelector = ({
                                 return <IconCheckSolid />
                               }
                             }}
+                            data-testid={`grading-schemes-selector-option-${gradingScheme.id}`}
                           >
                             {`${gradingScheme.title} ${
                               courseDefaultSchemeId === gradingScheme.id
@@ -480,24 +478,31 @@ export const GradingSchemesSelector = ({
             >
               <Flex.Item>
                 <View as="div" withVisualDebug={false}>
-                  {/* {selectedGradingScheme?.id === '' ||
-                  selectedGradingScheme?.assessed_assignment ||
-                  selectedGradingScheme?.context_type === 'Account' ||
-                  selectedGradingScheme?.id === courseDefaultSchemeId ? ( */}
-                  <Button onClick={openGradingSchemeViewModal}>{I18n.t('View')}</Button>
-                  {/* // ) : ( */}
-                  {/* <Button onClick={openGradingSchemeEditModal}>{I18n.t('Edit')}</Button> */}
-                  {/* )} */}
+                  <Button
+                    onClick={openGradingSchemeViewModal}
+                    data-testid="grading-schemes-selector-view-button"
+                  >
+                    {I18n.t('View')}
+                  </Button>
                 </View>
               </Flex.Item>
               <Flex.Item>
                 <View as="div" margin="none none none small" withVisualDebug={false}>
-                  <Button onClick={openGradingSchemeDuplicateModal}>{I18n.t('Copy')}</Button>
+                  <Button
+                    onClick={openGradingSchemeDuplicateModal}
+                    data-testid="grading-schemes-selector-copy-button"
+                  >
+                    {I18n.t('Copy')}
+                  </Button>
                 </View>
               </Flex.Item>
               <Flex.Item>
                 <View as="div" margin="none none none small" withVisualDebug={false}>
-                  <Button onClick={openGradingSchemeCreateModal} renderIcon={IconAddLine}>
+                  <Button
+                    onClick={openGradingSchemeCreateModal}
+                    renderIcon={IconAddLine}
+                    data-testid="grading-schemes-selector-new-grading-scheme-button"
+                  >
                     {I18n.t('New Grading Scheme')}
                   </Button>
                 </View>
@@ -530,7 +535,6 @@ export const GradingSchemesSelector = ({
               handleUpdateScheme={handleUpdateScheme}
               defaultGradingSchemeTemplate={defaultCanvasGradingScheme as GradingScheme}
               defaultPointsGradingScheme={defaultPointsGradingScheme}
-              archivedGradingSchemesEnabled={archivedGradingSchemesEnabled}
               openDeleteModal={openGradingSchemeDeleteModal}
               isCourseDefault={selectedGradingScheme?.id === courseDefaultSchemeId}
             />

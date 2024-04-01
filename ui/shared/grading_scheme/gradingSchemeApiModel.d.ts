@@ -26,11 +26,11 @@ export interface GradingSchemeTemplate {
 }
 
 export type UsedLocation = {
-  id: number
+  id: string
   name: string
   'concluded?': boolean
   assignments: {
-    id: number
+    id: string
     title: string
   }[]
 }

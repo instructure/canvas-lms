@@ -26,7 +26,7 @@ import {Flex} from '@instructure/ui-flex'
 
 const I18n = useI18nScope('GradingSchemeViewModal')
 
-type Props = {
+export type GradingSchemeViewModalProps = {
   open: boolean
   gradingScheme?: GradingScheme
   isCourseDefault?: boolean
@@ -45,7 +45,7 @@ const GradingSchemeViewModal = ({
   openDeleteModal,
   editGradingScheme,
   canManageScheme,
-}: Props) => {
+}: GradingSchemeViewModalProps) => {
   if (!gradingScheme) {
     return <></>
   }
@@ -54,15 +54,23 @@ const GradingSchemeViewModal = ({
     gradingScheme.assessed_assignment ||
     isCourseDefault
   return (
-    <Modal as="form" open={open} onDismiss={handleClose} label={gradingScheme.title} size="small">
+    <Modal
+      as="form"
+      open={open}
+      onDismiss={handleClose}
+      label={gradingScheme.title}
+      size="small"
+      data-testid="grading-scheme-view-modal"
+    >
       <Modal.Header>
         <CloseButton
           screenReaderLabel={I18n.t('Close')}
           placement="end"
           offset="small"
           onClick={handleClose}
+          data-testid="grading-scheme-view-modal-close-button"
         />
-        <Heading>{gradingScheme.title}</Heading>
+        <Heading data-testid="grading-scheme-view-modal-title">{gradingScheme.title}</Heading>
       </Modal.Header>
       <Modal.Body>
         <GradingSchemeView

@@ -59,6 +59,7 @@ import GradingSchemeDeleteModal from './GradingSchemeDeleteModal'
 import {useGradingSchemeArchive} from '../hooks/useGradingSchemeArchive'
 import {useGradingSchemeUnarchive} from '../hooks/useGradingSchemeUnarchive'
 import {Tooltip} from '@instructure/ui-tooltip'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 const I18n = useI18nScope('GradingSchemeManagement')
 
@@ -447,6 +448,8 @@ export const GradingSchemesManagement = ({
                 onChange={e => setGradingSchemeSearch(e.target.value)}
                 renderBeforeInput={() => <IconSearchLine inline={false} />}
                 width="22.5rem"
+                renderLabel={<ScreenReaderContent>{I18n.t('Search')}</ScreenReaderContent>}
+                data-testid="grading-scheme-search"
               />
             </Flex.Item>
           )}
@@ -497,7 +500,6 @@ export const GradingSchemesManagement = ({
                       },
                     }}
                     onSave={handleCreateScheme}
-                    archivedGradingSchemesEnabled={archivedGradingSchemesEnabled}
                   />
                   <hr />
                   <Flex justifyItems="end">
@@ -624,7 +626,6 @@ export const GradingSchemesManagement = ({
                 handleUpdateScheme={handleUpdateScheme}
                 defaultGradingSchemeTemplate={defaultGradingScheme}
                 defaultPointsGradingScheme={defaultPointsGradingScheme}
-                archivedGradingSchemesEnabled={archivedGradingSchemesEnabled}
                 openDeleteModal={openDeleteModal}
                 viewingFromAccountManagementPage={true}
               />
@@ -699,7 +700,6 @@ export const GradingSchemesManagement = ({
                           },
                         }}
                         ref={gradingSchemeUpdateRef}
-                        archivedGradingSchemesEnabled={archivedGradingSchemesEnabled}
                         onSave={modifiedGradingScheme =>
                           handleUpdateScheme(
                             modifiedGradingScheme,
