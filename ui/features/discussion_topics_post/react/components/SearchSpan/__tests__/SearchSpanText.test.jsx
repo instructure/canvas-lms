@@ -90,4 +90,12 @@ describe('SearchSpan', () => {
     // The iframe html tag wasn't removed
     expect(container.container.innerHTML).toContain('<iframe')
   })
+
+  it('should handle special characters in searchTerm', () => {
+    const {queryAllByTestId} = setup({
+      searchTerm: '(',
+      text: 'This is a (here) test with (here) special characters',
+    })
+    expect(queryAllByTestId('highlighted-search-item').length).toBe(2)
+  })
 })
