@@ -19,6 +19,8 @@
 #
 
 class ExternalFeed < ActiveRecord::Base
+  self.ignored_columns += %w[author_email author_name author_url]
+
   belongs_to :user
   belongs_to :context, polymorphic: [:course, :group]
 
@@ -142,7 +144,6 @@ class ExternalFeed < ActiveRecord::Base
       uuid = item.id || Digest::SHA256.hexdigest("#{item.title}#{item.published.utc.strftime("%Y-%m-%d")}")
       entry = external_feed_entries.where(uuid:).first
       entry ||= external_feed_entries.where(url: item.links.alternate.to_s).first
-      author = item.authors.first || OpenObject.new
       description = entry&.message
       if description.blank?
         description = "<a href='#{ERB::Util.h(item.links.alternate.to_s)}'>#{ERB::Util.h(t(:original_article, "Original article"))}</a><br/><br/>"
@@ -152,10 +153,7 @@ class ExternalFeed < ActiveRecord::Base
         entry.update_feed_attributes(
           title: item.title.to_s,
           message: description,
-          url: item.links.alternate.to_s,
-          author_name: author.name,
-          author_url: author.uri,
-          author_email: author.email
+          url: item.links.alternate.to_s
         )
         return entry
       end
@@ -172,9 +170,6 @@ class ExternalFeed < ActiveRecord::Base
         posted_at: item.published,
         url: item.links.alternate.to_s,
         user:,
-        author_name: author.name,
-        author_url: author.uri,
-        author_email: author.email,
         uuid:
       )
       entry if entry.save
