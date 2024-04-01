@@ -26,7 +26,7 @@ import {Button, CloseButton} from '@instructure/ui-buttons'
 
 const I18n = useI18nScope('GradingSchemeViewModal')
 
-type Props = {
+export type GradingSchemeDuplicateModalProps = {
   open: boolean
   creatingGradingScheme: boolean
   selectedGradingScheme?: GradingScheme
@@ -39,7 +39,7 @@ const GradingSchemeDuplicateModal = ({
   creatingGradingScheme,
   handleDuplicateScheme,
   handleCloseDuplicateModal,
-}: Props) => {
+}: GradingSchemeDuplicateModalProps) => {
   if (!selectedGradingScheme) {
     return <></>
   }
@@ -50,6 +50,7 @@ const GradingSchemeDuplicateModal = ({
       onDismiss={handleCloseDuplicateModal}
       label={I18n.t('Duplicate ') + selectedGradingScheme.title}
       size="small"
+      data-testid="grading-scheme-duplicate-modal"
     >
       <Modal.Header>
         <CloseButton
@@ -57,8 +58,9 @@ const GradingSchemeDuplicateModal = ({
           placement="end"
           offset="small"
           onClick={handleCloseDuplicateModal}
+          data-testid="grading-scheme-duplicate-modal-close-button"
         />
-        <Heading>
+        <Heading data-testid="grading-scheme-duplicate-modal-title">
           <TruncateText>{I18n.t('Duplicate ') + selectedGradingScheme.title}</TruncateText>
         </Heading>
       </Modal.Header>
@@ -73,6 +75,7 @@ const GradingSchemeDuplicateModal = ({
               onClick={() => handleDuplicateScheme(selectedGradingScheme)}
               color="primary"
               disabled={creatingGradingScheme}
+              data-testid="grading-scheme-duplicate-modal-duplicate-button"
             >
               {I18n.t('Duplicate')}
             </Button>

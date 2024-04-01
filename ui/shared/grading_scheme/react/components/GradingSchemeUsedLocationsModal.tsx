@@ -32,15 +32,20 @@ import {useGradingSchemeUsedLocations} from '../hooks/useGradingSchemeUsedLocati
 import {ApiCallStatus} from '../hooks/ApiCallStatus'
 import {Spinner} from '@instructure/ui-spinner'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 const I18n = useI18nScope('GradingSchemeViewModal')
 
-type Props = {
+export type GradingSchemeUsedLocationsModalProps = {
   open: boolean
   gradingScheme?: GradingScheme
   handleClose: () => void
 }
-const GradingSchemeUsedLocationsModal = ({open, gradingScheme, handleClose}: Props) => {
+const GradingSchemeUsedLocationsModal = ({
+  open,
+  gradingScheme,
+  handleClose,
+}: GradingSchemeUsedLocationsModalProps) => {
   const [filter, setFilter] = useState<string>('')
   const [usedLocations, setUsedLocations] = useState<UsedLocation[]>([])
   const path = useRef<string | undefined>(undefined)
@@ -62,7 +67,6 @@ const GradingSchemeUsedLocationsModal = ({open, gradingScheme, handleClose}: Pro
         gradingScheme.id,
         path.current
       )
-
       setUsedLocations(prevLocations => {
         if (newLocations.usedLocations[0]?.id === prevLocations[prevLocations.length - 1]?.id) {
           prevLocations[prevLocations.length - 1].assignments.push(
@@ -118,7 +122,6 @@ const GradingSchemeUsedLocationsModal = ({open, gradingScheme, handleClose}: Pro
     }, 0)
     return () => clearTimeout(timer)
   }, [gradingSchemeUsedLocationsStatus, loadMoreItems, moreLocationsLeft, open])
-
   return (
     <Modal
       as="form"
@@ -127,6 +130,7 @@ const GradingSchemeUsedLocationsModal = ({open, gradingScheme, handleClose}: Pro
       onDismiss={handleClose}
       label={I18n.t('Locations Used')}
       size="small"
+      data-testid="used-locations-modal"
     >
       <Modal.Header>
         <CloseButton
@@ -134,6 +138,7 @@ const GradingSchemeUsedLocationsModal = ({open, gradingScheme, handleClose}: Pro
           placement="end"
           offset="small"
           onClick={handleClose}
+          data-testid="used-locations-modal-close-button"
         />
         <Heading>{I18n.t('Locations Used')}</Heading>
       </Modal.Header>
@@ -146,6 +151,8 @@ const GradingSchemeUsedLocationsModal = ({open, gradingScheme, handleClose}: Pro
             width="22.5rem"
             value={filter}
             onChange={e => setFilter(e.target.value)}
+            renderLabel={<ScreenReaderContent>{I18n.t('Search')}</ScreenReaderContent>}
+            data-testid="used-locations-modal-search-input"
           />
         </View>
         <List isUnstyled={true} margin="0 0 0 0">
@@ -162,28 +169,41 @@ const GradingSchemeUsedLocationsModal = ({open, gradingScheme, handleClose}: Pro
               // if no assignments match the filter nor the course name,
               // don't render the course in the list
               if (filteredAssignments.length === 0) {
-                return <></>
+                return
               }
             }
             return (
-              <>
-                <List.Item margin="x-small 0 0" key={course.id}>
-                  <Flex alignItems="center">
-                    <Flex.Item margin="0 x-small 0 0">
-                      <Link isWithinText={false} href={`/courses/${course.id}`}>
-                        {course.name}
-                      </Link>
-                    </Flex.Item>
-                    <Flex.Item>
-                      {course['concluded?'] ? <Pill>{I18n.t('Concluded')}</Pill> : <></>}
-                    </Flex.Item>
-                  </Flex>
-                </List.Item>
-
+              <List.Item
+                margin="x-small 0 0"
+                key={`course-${course.id}`}
+                data-testid={`used-locations-modal-course-${course.id}`}
+              >
+                <Flex alignItems="center">
+                  <Flex.Item margin="0 x-small 0 0">
+                    <Link isWithinText={false} href={`/courses/${course.id}`}>
+                      {course.name}
+                    </Link>
+                  </Flex.Item>
+                  <Flex.Item>
+                    {course['concluded?'] ? (
+                      <Pill>
+                        <View as="span" data-testid={`concluded-course-${course.id}-pill`}>
+                          {I18n.t('Concluded')}
+                        </View>
+                      </Pill>
+                    ) : (
+                      <></>
+                    )}
+                  </Flex.Item>
+                </Flex>
                 {filteredAssignments.length > 0 ? (
-                  <List isUnstyled={true}>
+                  <List isUnstyled={true} key={`assignments-list-${course.id}`}>
                     {filteredAssignments.map(assignment => (
-                      <List.Item margin="x-small 0 0" key={assignment.id}>
+                      <List.Item
+                        margin="x-small 0 0"
+                        key={`assignment-${assignment.id}`}
+                        data-testid={`used-locations-modal-assignment-${assignment.id}`}
+                      >
                         <Link
                           isWithinText={false}
                           href={`/courses/${course.id}/assignments/${assignment.id}`}
@@ -196,7 +216,7 @@ const GradingSchemeUsedLocationsModal = ({open, gradingScheme, handleClose}: Pro
                 ) : (
                   <></>
                 )}
-              </>
+              </List.Item>
             )
           })}
         </List>

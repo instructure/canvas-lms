@@ -42,7 +42,6 @@ export interface ComponentProps {
   }
   onSave: (updatedGradingSchemeData: GradingSchemeEditableData) => any
   schemeInputType: 'percentage' | 'points'
-  archivedGradingSchemesEnabled?: boolean
   editSchemeDataDisabled?: boolean
 }
 export interface GradingSchemeEditableData {
@@ -69,16 +68,7 @@ export type GradingSchemeInputHandle = {
  */
 
 export const GradingSchemeInput = React.forwardRef<GradingSchemeInputHandle, ComponentProps>(
-  (
-    {
-      initialFormDataByInputType,
-      schemeInputType,
-      onSave,
-      archivedGradingSchemesEnabled = false,
-      editSchemeDataDisabled = false,
-    },
-    ref
-  ) => {
+  ({initialFormDataByInputType, schemeInputType, onSave, editSchemeDataDisabled = false}, ref) => {
     interface GradingSchemeInputState {
       title: string
       rows: GradingSchemeRowState[]
@@ -358,6 +348,7 @@ export const GradingSchemeInput = React.forwardRef<GradingSchemeInputHandle, Com
                       ? [{text: I18n.t('Enter a grading scheme name'), type: 'error'}]
                       : []
                   }
+                  data-testid="grading-scheme-name-input"
                 />
               </Flex.Item>
               <Flex.Item margin="medium none none none">
