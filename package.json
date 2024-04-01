@@ -208,7 +208,7 @@
     "swc-plugin-coverage-instrument": "^0.0.20",
     "swfobject": "^2.2.1",
     "tablesorter": "^2.28.5",
-    "timezone": "npm:@instructure/timezone@1.0.28",
+    "timezone": "npm:@instructure/timezone@1.0.29",
     "tinycolor2": "1.4.1",
     "twitter-text": "^3.1.0",
     "underscore": "^1.13.6",
