@@ -24877,10 +24877,10 @@ timezone-mock@^1.3.1:
   resolved "https://registry.yarnpkg.com/timezone-mock/-/timezone-mock-1.3.1.tgz#750ca001831007be5af7456c78f350812398d947"
   integrity sha512-kWK2liWUaYSLW/B2yJ6/oUbLc26cEbtIjM7BPrRxaX/3TSeqOOQfXQ6N4pNhy05ZBnUs9vywWAthiE9QYGZFwA==
 
-"timezone@npm:@instructure/timezone@1.0.28":
-  version "1.0.28"
-  resolved "https://registry.yarnpkg.com/@instructure/timezone/-/timezone-1.0.28.tgz#9e91b4919d77facb851ad2d70bb93e1e792cee41"
-  integrity sha512-GNRJ6lYi3yDJaYv1b+oUcM3vWMkH+qLL5y/qnOHHtEApl2R/F1BSPP019lWnEeJRbNPLch9/XZpMdMYdFAJvOg==
+"timezone@npm:@instructure/timezone@1.0.29":
+  version "1.0.29"
+  resolved "https://registry.yarnpkg.com/@instructure/timezone/-/timezone-1.0.29.tgz#8e4d205cbe21c19d301511e39526dddd6459d7ae"
+  integrity sha512-xG3sXJTqbxOP6uOsf4cw09u31B+4tlpU9hDj6soXbz3GqrgiTgYmYpw/qW1oTJcifsTe7g6gT27Ncv7dozI5xg==
 
 tinybench@^2.5.1:
   version "2.5.1"
