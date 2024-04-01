@@ -52,9 +52,11 @@ const addSearchHighlighting = (searchTerm, searchArea, isSplitView) => {
 
 // Highlight the search term and remove HTML
 const highlightText = (text, searchTerm) => {
-  const searchExpression = new RegExp(`(${searchTerm})`, 'gi')
+  const escapedSearchTerm = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  const searchExpression = new RegExp(`(${escapedSearchTerm})`, 'gi')
+
   return text
-    .replace(/<[^>]*>?/gm, '')
+    .replace(/<[^>]*>/gm, '')
     .replace(
       searchExpression,
       '<span data-testid="highlighted-search-item" style="background-color: rgba(0,142,226,0.2); border-radius: .25rem; padding-bottom: 3px; padding-top: 1px;">$1</span>'
