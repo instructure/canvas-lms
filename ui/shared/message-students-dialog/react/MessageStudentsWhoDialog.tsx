@@ -22,6 +22,7 @@ import React, {useState, useContext, useEffect} from 'react'
 import {Button, CloseButton, IconButton} from '@instructure/ui-buttons'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Flex} from '@instructure/ui-flex'
+import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
 import {Heading} from '@instructure/ui-heading'
 import {
   IconArrowOpenDownLine,
@@ -134,12 +135,34 @@ const isReassignable = (assignment: CamelizedAssignment) =>
     'on_paper' || 'external_tool' || 'none' || 'discussion_topic' || 'online_quiz'
   )
 
+const isSubmittableAssignment = (assignment: CamelizedAssignment) =>
+  !!assignment &&
+  !assignment.submissionTypes.some(submissionType =>
+    ['on_paper', 'none', 'not_graded', ''].includes(submissionType)
+  )
+
 const filterCriteria: FilterCriterion[] = [
   {
     requiresCutoff: false,
-    shouldShow: assignment =>
-      assignment !== null &&
-      !['on_paper', 'none', 'not_graded', ''].includes(assignment.submissionTypes[0]),
+    shouldShow: isSubmittableAssignment,
+    title: I18n.t('Have submitted'),
+    value: 'submitted',
+  },
+  {
+    requiresCutoff: false,
+    shouldShow: () => false, // Will never show in dropdown, but is used with radio button group on "Have submitted" option
+    title: I18n.t('Have submitted and been graded'),
+    value: 'submitted_and_graded',
+  },
+  {
+    requiresCutoff: false,
+    shouldShow: () => false, // Will never show in dropdown, but is used with radio button group on "Have submitted" option
+    title: I18n.t('Have submitted and not been graded'),
+    value: 'submitted_and_not_graded',
+  },
+  {
+    requiresCutoff: false,
+    shouldShow: isSubmittableAssignment,
     title: I18n.t('Have not yet submitted'),
     value: 'unsubmitted',
   },
@@ -195,6 +218,21 @@ function filterStudents(criterion, students, cutoff) {
   const newfilteredStudents: Student[] = []
   for (const student of students) {
     switch (criterion?.value) {
+      case 'submitted':
+        if (student.submittedAt) {
+          newfilteredStudents.push(student)
+        }
+        break
+      case 'submitted_and_graded':
+        if (student.submittedAt && student.grade) {
+          newfilteredStudents.push(student)
+        }
+        break
+      case 'submitted_and_not_graded':
+        if (student.submittedAt && !student.grade) {
+          newfilteredStudents.push(student)
+        }
+        break
       case 'unsubmitted':
         if (!student.submittedAt && !student.excused) {
           newfilteredStudents.push(student)
@@ -245,10 +283,18 @@ function defaultSubject(criterion, assignment, cutoff, pointsBasedGradingScheme)
     cutoff = 0
   }
 
-  if (assignment !== null) {
+  if (assignment) {
     switch (criterion) {
+      case 'submitted':
+        return I18n.t('Submission for %{assignment}', {assignment: assignment.name})
+      case 'submitted_and_graded':
+        return I18n.t('Submission and grade for %{assignment}', {assignment: assignment.name})
+      case 'submitted_and_not_graded':
+        return I18n.t('Submission and no grade for %{assignment}', {assignment: assignment.name})
       case 'unsubmitted':
         return I18n.t('No submission for %{assignment}', {assignment: assignment.name})
+      case 'graded':
+        return I18n.t('Grade for %{assignment}', {assignment: assignment.name})
       case 'ungraded':
         return I18n.t('No grade for %{assignment}', {assignment: assignment.name})
       case 'scored_more_than':
@@ -470,6 +516,17 @@ const MessageStudentsWhoDialog = ({
     }
   }
 
+  const onSubmissionRadioSelect = (value: string) => {
+    const criterion = filterCriteria.find(c => c.value === value)
+    if (criterion) {
+      setFilteredStudents(filterStudents(criterion, sortedStudents, cutoff))
+      setObserversDisplayed(
+        observerCount(filterStudents(criterion, sortedStudents, cutoff), observersByStudentID)
+      )
+      setSubject(defaultSubject(criterion.value, assignment, cutoff))
+    }
+  }
+
   const onAddAttachment = addAttachmentsFn(
     setAttachments,
     setPendingUploads,
@@ -578,12 +635,14 @@ const MessageStudentsWhoDialog = ({
                 renderLabel={I18n.t('For students who…')}
                 onChange={handleCriterionSelected}
                 value={selectedCriterion.value}
+                data-testid="criterion-dropdown"
               >
                 {availableCriteria.map(criterion => (
                   <SimpleSelect.Option
                     id={`criteria_${criterion.value}`}
                     key={criterion.value}
                     value={criterion.value}
+                    data-testid="criterion-dropdown-item"
                   >
                     {criterion.title}
                   </SimpleSelect.Option>
@@ -618,6 +677,38 @@ const MessageStudentsWhoDialog = ({
             )}
           </Flex>
           <br />
+          {selectedCriterion.value === 'submitted' && (
+            <>
+              <Flex>
+                <RadioInputGroup
+                  description=""
+                  defaultValue="all"
+                  name="include-students"
+                  data-testid="include-student-radio-group"
+                >
+                  <RadioInput
+                    label={I18n.t('All')}
+                    value="all"
+                    onClick={() => onSubmissionRadioSelect('submitted')}
+                    data-testid="all-students-radio-button"
+                  />
+                  <RadioInput
+                    label={I18n.t('Graded')}
+                    value="graded"
+                    onClick={() => onSubmissionRadioSelect('submitted_and_graded')}
+                    data-testid="graded-students-radio-button"
+                  />
+                  <RadioInput
+                    label={I18n.t('Not Graded')}
+                    value="not_graded"
+                    onClick={() => onSubmissionRadioSelect('submitted_and_not_graded')}
+                    data-testid="not-graded-students-radio-button"
+                  />
+                </RadioInputGroup>
+              </Flex>
+              <br />
+            </>
+          )}
           <Flex>
             <Flex.Item>
               <Text weight="bold">{I18n.t('Send Message To:')}</Text>
