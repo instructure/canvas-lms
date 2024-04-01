@@ -30,7 +30,7 @@ import {
 
 const I18n = useI18nScope('GradingSchemeViewModal')
 
-type Props = {
+export type GradingSchemeCreateModalProps = {
   open: boolean
   handleCreateScheme: (gradingSchemeFormInput: GradingSchemeEditableData) => Promise<void>
   defaultGradingSchemeTemplate: GradingScheme
@@ -45,7 +45,7 @@ const GradingSchemeCreateModal = ({
   defaultGradingSchemeTemplate,
   defaultPointsGradingScheme,
   handleCancelCreate,
-}: Props) => {
+}: GradingSchemeCreateModalProps) => {
   const gradingSchemeCreateRef = useRef<GradingSchemeInputHandle>(null)
   if (!defaultGradingSchemeTemplate) {
     return <></>
@@ -58,6 +58,7 @@ const GradingSchemeCreateModal = ({
       onDismiss={handleCancelCreate}
       label={I18n.t('New Grading Scheme')}
       size="small"
+      data-testid="grading-scheme-create-modal"
     >
       <Modal.Header>
         <CloseButton
@@ -65,6 +66,7 @@ const GradingSchemeCreateModal = ({
           placement="end"
           offset="small"
           onClick={handleCancelCreate}
+          data-testid="grading-scheme-create-modal-close-button"
         />
         <Heading>{I18n.t('New Grading Scheme')}</Heading>
       </Modal.Header>
@@ -86,17 +88,24 @@ const GradingSchemeCreateModal = ({
             },
           }}
           ref={gradingSchemeCreateRef}
-          archivedGradingSchemesEnabled={archivedGradingSchemesEnabled}
           onSave={handleCreateScheme}
         />
       </Modal.Body>
       <Modal.Footer>
         <Flex justifyItems="end">
           <Flex.Item>
-            <Button onClick={handleCancelCreate} margin="0 x-small">
+            <Button
+              onClick={handleCancelCreate}
+              margin="0 x-small"
+              data-testid="grading-scheme-create-modal-cancel-button"
+            >
               {I18n.t('Cancel')}
             </Button>
-            <Button onClick={() => gradingSchemeCreateRef.current?.savePressed()} color="primary">
+            <Button
+              onClick={() => gradingSchemeCreateRef.current?.savePressed()}
+              color="primary"
+              data-testid="grading-scheme-create-modal-save-button"
+            >
               {I18n.t('Save')}
             </Button>
           </Flex.Item>

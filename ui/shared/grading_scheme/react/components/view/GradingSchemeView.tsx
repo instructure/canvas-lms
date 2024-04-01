@@ -106,6 +106,7 @@ export const GradingSchemeView: React.FC<ComponentProps> = ({
                 <IconButton
                   screenReaderLabel={I18n.t('Edit Grading Scheme')}
                   onClick={onEditRequested}
+                  data-testid={`grading-scheme-${gradingScheme.id}-edit-button`}
                 >
                   <IconEditLine />
                 </IconButton>
