@@ -298,6 +298,36 @@ describe "Groups API", type: :request do
     expect(json.first["id"]).to eq @group_1.id
   end
 
+  context "sharding" do
+    specs_require_sharding
+
+    it "shows cross-shard all groups" do
+      @shard1.activate do
+        @account_1 = Account.create
+        @student = user_with_pseudonym(active_all: true, account: @account_1)
+      end
+
+      @shard2.activate do
+        @account_2 = Account.create
+        course_with_teacher(active_all: true)
+        @teacher_1 = @teacher
+        @course_1 = @course
+        @course_1.enroll_student(@student).accept!
+        @group_1 = @course.groups.create!(name: "Group on shard2")
+        @group_1.add_user(@student, "accepted", false)
+      end
+
+      json = api_call_as_user(@student,
+                              :get,
+                              "/api/v1/courses/#{@course_1.to_param}/groups.json",
+                              @category_path_options.merge(action: "context_index",
+                                                           course_id: @course_1.to_param,
+                                                           only_own_groups: true))
+      expect(json.count).to eq 1
+      expect(json.first["id"]).to eq @group_1.id
+    end
+  end
+
   describe "filters groups" do
     before(:once) do
       course_with_student(active_all: true)
