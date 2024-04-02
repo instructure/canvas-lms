@@ -1096,13 +1096,11 @@ class ConversationsController < ApplicationController
 
     @current_user = @context
     load_all_contexts
-    feed = Atom::Feed.new do |f|
-      f.title = t("titles.rss_feed", "Conversations Feed")
-      f.links << Atom::Link.new(href: conversations_url, rel: "self")
-      f.updated = Time.now
-      f.id = conversations_url
-    end
-    GuardRail.activate(:secondary) do
+
+    title = t("titles.rss_feed", "Conversations Feed")
+    link = conversations_url
+
+    feed_xml = GuardRail.activate(:secondary) do
       @entries = []
       @conversation_contexts = {}
       @current_user.conversations.each do |conversation|
@@ -1112,12 +1110,13 @@ class ConversationsController < ApplicationController
         end
       end
       @entries = @entries.sort_by { |e| [e.created_at, e.id] }.reverse
-      @entries.each do |entry|
-        feed.entries << entry.to_atom(additional_content: @conversation_contexts[entry.conversation.id])
+
+      AtomFeedHelper.render_xml(title:, link:, entries: @entries) do |entry|
+        { additional_content: @conversation_contexts[entry.conversation.id] }
       end
     end
     respond_to do |format|
-      format.atom { render plain: feed.to_xml }
+      format.atom { render plain: feed_xml }
     end
   end
 

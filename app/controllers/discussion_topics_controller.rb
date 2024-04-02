@@ -1234,22 +1234,17 @@ class DiscussionTopicsController < ApplicationController
   def public_feed
     return unless get_feed_context
 
-    feed = Atom::Feed.new do |f|
-      f.title = t :discussion_feed_title, "%{title} Discussion Feed", title: @context.name
-      f.links << Atom::Link.new(href: polymorphic_url([@context, :discussion_topics]), rel: "self")
-      f.updated = Time.now
-      f.id = polymorphic_url([@context, :discussion_topics])
-    end
+    title = t :discussion_feed_title, "%{title} Discussion Feed", title: @context.name
+    link = polymorphic_url([@context, :discussion_topics])
+
     @entries = []
     @entries.concat(@context.discussion_topics
                             .select { |dt| dt.visible_for?(@current_user) })
     @entries.concat @context.discussion_entries.active
     @entries = @entries.sort_by(&:updated_at)
-    @entries.each do |entry|
-      feed.entries << entry.to_atom
-    end
+
     respond_to do |format|
-      format.atom { render plain: feed.to_xml }
+      format.atom { render plain: AtomFeedHelper.render_xml(title:, link:, entries: @entries) }
     end
   end
 

@@ -106,16 +106,10 @@ class AnnouncementsController < ApplicationController
 
     respond_to do |format|
       format.atom do
-        feed = Atom::Feed.new do |f|
-          f.title = t(:feed_name, "%{course} Announcements Feed", course: @context.name)
-          f.links << Atom::Link.new(href: polymorphic_url([@context, :announcements]), rel: "self")
-          f.updated = Time.now
-          f.id = polymorphic_url([@context, :announcements])
-        end
-        announcements.each do |e|
-          feed.entries << e.to_atom
-        end
-        render plain: feed.to_xml
+        title = t(:feed_name, "%{course} Announcements Feed", course: @context.name)
+        link = polymorphic_url([@context, :announcements])
+
+        render plain: AtomFeedHelper.render_xml(title:, link:, entries: announcements)
       end
 
       format.rss do

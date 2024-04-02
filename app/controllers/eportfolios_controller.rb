@@ -220,17 +220,15 @@ class EportfoliosController < ApplicationController
   def public_feed
     if @portfolio.public || params[:verifier] == @portfolio.uuid
       @entries = @portfolio.eportfolio_entries.order("eportfolio_entries.created_at DESC").to_a
-      feed = Atom::Feed.new do |f|
-        f.title = t(:title, "%{portfolio_name} Feed", portfolio_name: @portfolio.name)
-        f.links << Atom::Link.new(href: eportfolio_url(@portfolio.id), rel: "self")
-        f.updated = @entries.first.updated_at rescue Time.now
-        f.id = eportfolio_url(@portfolio.id)
-      end
-      @entries.each do |e|
-        feed.entries << e.to_atom(private: params[:verifier] == @portfolio.uuid)
-      end
+
+      title = t(:title, "%{portfolio_name} Feed", portfolio_name: @portfolio.name)
+      updated = @entries.first.updated_at rescue Time.now
+      link = eportfolio_url(@portfolio.id)
+
+      private_value = params[:verifier] == @portfolio.uuid
+
       respond_to do |format|
-        format.atom { render plain: feed.to_xml }
+        format.atom { render plain: AtomFeedHelper.render_xml(title:, link:, updated:, entries: @entries, private: private_value) }
       end
     else
       authorized_action(nil, nil, :bad_permission)
