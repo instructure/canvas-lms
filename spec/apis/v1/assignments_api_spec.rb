@@ -88,12 +88,20 @@ describe AssignmentsApiController, type: :request do
         assignment = @course.assignments.create!(title: "Assignment 1", has_sub_assignments: true)
         @c1 = assignment.sub_assignments.create!(context: assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC, points_possible: 5, due_at: 3.days.from_now)
         @c2 = assignment.sub_assignments.create!(context: assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY, points_possible: 10, due_at: 5.days.from_now)
+
+        user = user_factory(active_all: true)
+        @course.enroll_student(user).accept!
+        @students = [user]
+
+        create_adhoc_override_for_assignment(@c2, @students, due_at: 2.days.from_now)
       end
 
       it "returns the assignments list with API-formatted Checkpoint data" do
         json = api_get_assignments_index_from_course(@course, include: ["checkpoints"])
         assignment = json.first
         checkpoints = assignment["checkpoints"]
+        first_checkpoint = checkpoints.find { |c| c["tag"] == CheckpointLabels::REPLY_TO_TOPIC }
+        second_checkpoint = checkpoints.find { |c| c["tag"] == CheckpointLabels::REPLY_TO_ENTRY }
 
         expect(assignment["has_sub_assignments"]).to be_truthy
 
@@ -103,6 +111,10 @@ describe AssignmentsApiController, type: :request do
         expect(checkpoints.pluck("points_possible")).to match_array [@c1.points_possible, @c2.points_possible]
         expect(checkpoints.pluck("due_at")).to match_array [@c1.due_at.iso8601, @c2.due_at.iso8601]
         expect(checkpoints.pluck("only_visible_to_overrides")).to match_array [@c1.only_visible_to_overrides, @c2.only_visible_to_overrides]
+        expect(first_checkpoint["overrides"].length).to eq 0
+        expect(second_checkpoint["overrides"].length).to eq 1
+        expect(second_checkpoint["overrides"].first["assignment_id"]).to eq @c2.id
+        expect(second_checkpoint["overrides"].first["student_ids"]).to match_array @students.map(&:id)
       end
     end
 

@@ -20,22 +20,39 @@
 describe Checkpoint do
   describe "#as_json" do
     it "returns a hash with the correct keys" do
-      assignment = Assignment.new(
+      course_with_teacher(active_all: true)
+
+      parent_assignment = @course.assignments.create!
+
+      sub_assignment = SubAssignment.new(
         name: "Assignment Name",
         sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC,
         points_possible: 10,
         due_at: 3.days.from_now,
-        only_visible_to_overrides: false
+        only_visible_to_overrides: false,
+        context: @course,
+        parent_assignment:
       )
 
-      checkpoint = Checkpoint.new(assignment)
-      expect(checkpoint.as_json).to eq({
-                                         name: assignment.name,
-                                         tag: assignment.sub_assignment_tag,
-                                         points_possible: assignment.points_possible,
-                                         due_at: assignment.due_at,
-                                         only_visible_to_overrides: assignment.only_visible_to_overrides
-                                       })
+      sub_assignment.save!
+
+      user = user_factory(active_all: true)
+      @course.enroll_student(user).accept!
+      students = [user]
+
+      create_adhoc_override_for_assignment(sub_assignment, students, due_at: 2.days.from_now)
+
+      checkpoint = Checkpoint.new(sub_assignment, @teacher)
+      json = checkpoint.as_json
+
+      expect(json[:name]).to eq(sub_assignment.name)
+      expect(json[:tag]).to eq(sub_assignment.sub_assignment_tag)
+      expect(json[:points_possible]).to eq(sub_assignment.points_possible)
+      expect(json[:due_at]).to eq(sub_assignment.due_at)
+      expect(json[:only_visible_to_overrides]).to eq(sub_assignment.only_visible_to_overrides)
+      expect(json[:overrides].length).to eq(1)
+      expect(json[:overrides].first[:assignment_id]).to eq(sub_assignment.id)
+      expect(json[:overrides].first[:student_ids]).to match_array(students.map(&:id))
     end
   end
 end
