@@ -20,8 +20,9 @@
 module CC
   module Qti
     class NewQuizzesGenerator
-      def initialize(manifest)
+      def initialize(manifest, resources_node)
         @manifest = manifest
+        @resources_node = resources_node
       end
 
       def write_new_quizzes_content
@@ -43,6 +44,7 @@ module CC
             FileUtils.mkdir_p(dest_dir)
 
             File.binwrite(File.join(dest_dir, file_name), File.read(f))
+            file_path
           end
         end
       end
@@ -57,6 +59,82 @@ module CC
 
       def new_quizzes_export_file_url
         @manifest.exporter.new_quizzes_export_url
+      end
+
+      def generate_qti
+        file_paths = write_new_quizzes_content
+        return unless file_paths
+
+        classified_files_hash = classified_files(file_paths)
+        classified_files_hash.each_key do |k|
+          file_paths = classified_files_hash[k]
+
+          next uploaded_media_resources(file_paths) if k == "uploaded_media"
+
+          file_paths.include?("#{k}/assessment_meta.xml") ? quiz_resources(k) : bank_resources(k)
+        end
+      end
+
+      def classified_files(file_paths)
+        classified_files_hash = {}
+        file_paths.each do |file_path|
+          ident = nil
+          if file_path.start_with?("non_cc_assessments/")
+            ident = file_path.sub("non_cc_assessments/", "").split(".").first
+          elsif file_path.end_with?("assessment_meta.xml")
+            ident = file_path.split("/").first
+          elsif file_path.start_with?("Uploaded Media")
+            ident = "uploaded_media"
+          end
+
+          next unless ident
+
+          classified_files_hash[ident] = [] if classified_files_hash[ident].nil?
+          classified_files_hash[ident] << file_path
+        end
+
+        classified_files_hash
+      end
+
+      private
+
+      def uploaded_media_resources(file_paths)
+        file_paths.each do |file_path|
+          file_uuid = file_path.split("/").last
+          identifier = CC::CCHelper.create_key(file_uuid)
+          @resources_node.resource({ identifier:, type: "webcontent", href: file_path }) do |resource|
+            resource.file({ href: file_path })
+          end
+        end
+      end
+
+      def quiz_resources(mig_id)
+        identifier = CC::CCHelper.create_key(mig_id)
+        @resources_node.resource(
+          identifier: mig_id,
+          type: "imsqti_xmlv1p2/imscc_xmlv1p1/assessment"
+        ) do |resource|
+          resource.file(href: "#{mig_id}/assessment_qti.xml")
+          resource.dependency(identifierref: identifier)
+        end
+        @resources_node.resource(
+          identifier:,
+          type: "associatedcontent/imscc_xmlv1p1/learning-application-resource",
+          href: "#{mig_id}/assessment_meta.xml"
+        ) do |resource|
+          resource.file(href: "#{mig_id}/assessment_meta.xml")
+          resource.file(href: "non_cc_assessments/#{mig_id}.xml.qti")
+        end
+      end
+
+      def bank_resources(mig_id)
+        @resources_node.resource(
+          identifier: mig_id,
+          type: "associatedcontent/imscc_xmlv1p1/learning-application-resource",
+          href: "non_cc_assessments/#{mig_id}.xml.qti"
+        ) do |resource|
+          resource.file(href: "non_cc_assessments/#{mig_id}.xml.qti")
+        end
       end
     end
   end

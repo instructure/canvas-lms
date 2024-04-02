@@ -200,8 +200,8 @@ module CC
       end
 
       def generate_new_quizzes
-        new_quizzes_generator = NewQuizzesGenerator.new(@manifest)
-        new_quizzes_generator.write_new_quizzes_content
+        new_quizzes_generator = NewQuizzesGenerator.new(@manifest, @resources_node)
+        new_quizzes_generator.generate_qti
       end
 
       def include_new_quizzes_in_export?
