@@ -120,8 +120,8 @@ describe ExternalFeed do
 
   it "adds atom entries" do
     @feed = external_feed_model
-    require "atom"
-    atom = Atom::Feed.load_feed atom_example
+    require "feedjira"
+    atom = Feedjira.parse atom_example
     res = @feed.add_atom_entries(atom)
     expect(res).not_to be_nil
     expect(res.length).to be(1)
@@ -132,8 +132,8 @@ describe ExternalFeed do
   it "adds atom entries as course announcements" do
     @course = course_model
     @feed = external_feed_model(context: @course)
-    require "atom"
-    atom = Atom::Feed.load_feed atom_example
+    require "feedjira"
+    atom = Feedjira.parse atom_example
     res = @feed.add_atom_entries(atom)
     expect(res).not_to be_nil
     expect(res.length).to be(1)

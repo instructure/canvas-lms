@@ -94,8 +94,8 @@ else
   gem "rack-brotli", "~> 1.2"
 end
 gem "rails-observers", "0.1.5"
+gem "feedjira", "~> 3.2.3", require: false
 gem "ratom-nokogiri", "0.10.11", require: false
-  gem "nokogiri", "1.15.5" # see https://github.com/sparklemotion/nokogiri/issues/3102
 gem "redcarpet", "~> 3.6", require: false
 gem "retriable", "~> 3.1"
 gem "ritex", "1.0.1", require: false

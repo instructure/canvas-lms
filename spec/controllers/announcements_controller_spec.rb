@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require "feedjira"
+
 describe AnnouncementsController do
   before :once do
     course_with_student(active_all: true)
@@ -81,18 +83,17 @@ describe AnnouncementsController do
 
     it "includes absolute path for rel='self' link" do
       get "public_feed", format: "atom", params: { feed_code: @enrollment.feed_code }
-      feed = Atom::Feed.load_feed(response.body) rescue nil
+      feed = Feedjira.parse(response.body) rescue nil
       expect(feed).not_to be_nil
-      expect(feed.links.first.rel).to match(/self/)
-      expect(feed.links.first.href).to match(%r{http://})
+      expect(feed.feed_url).to match(%r{http://})
     end
 
     it "includes an author for each entry" do
       get "public_feed", format: "atom", params: { feed_code: @enrollment.feed_code }
-      feed = Atom::Feed.load_feed(response.body) rescue nil
+      feed = Feedjira.parse(response.body) rescue nil
       expect(feed).not_to be_nil
       expect(feed.entries).not_to be_empty
-      expect(feed.entries.all? { |e| e.authors.present? }).to be_truthy
+      expect(feed.entries.all? { |e| e.author.present? }).to be_truthy
     end
 
     it "shows the 15 most recent announcements" do
@@ -102,7 +103,7 @@ describe AnnouncementsController do
 
       get "public_feed", format: "atom", params: { feed_code: @enrollment.feed_code }
 
-      feed_entries = Atom::Feed.load_feed(response.body).entries
+      feed_entries = Feedjira.parse(response.body).entries
       feed_entry_ids = feed_entries.map { |e| e.id.gsub(/.*topic_/, "").to_i }
       expect(feed_entry_ids).to match_array(announcement_ids)
     end
@@ -114,7 +115,7 @@ describe AnnouncementsController do
       announcement_ids.shift # Drop first announcement so we have the 15 most recent
       get "public_feed", format: "atom", params: { feed_code: @enrollment.feed_code }
 
-      feed_entries = Atom::Feed.load_feed(response.body).entries
+      feed_entries = Feedjira.parse(response.body).entries
       feed_entry_ids = feed_entries.map { |e| e.id.gsub(/.*topic_/, "").to_i }
       expect(feed_entry_ids).to match_array(announcement_ids)
     end
@@ -139,7 +140,7 @@ describe AnnouncementsController do
 
       get "public_feed", format: "atom", params: { feed_code: @enrollment.feed_code }
 
-      feed_entries = Atom::Feed.load_feed(response.body).entries
+      feed_entries = Feedjira.parse(response.body).entries
       feed_entry_ids = feed_entries.map { |e| e.id.gsub(/.*topic_/, "").to_i }
       expect(feed_entry_ids).to match_array(visible_announcements.map(&:id))
     end
