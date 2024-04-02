@@ -2423,7 +2423,7 @@ ja:
   add_trigger_bc1a0fae: トリガーの追加
   add_user_by_email_address_login_id_or_sis_id_7dd370dd: "メールアドレス、ログイン ID、または SIS ID でユーザーを追加します。"
   add_user_e73e8e50: ユーザーの追加
-  add_user_s_by_b2549f89: ～でユーザーを追加する
+  add_user_s_by_b2549f89: ユーザーを追加する
   add_users_b10c7fb1: ユーザの追加
   add_users_to_name_b8109bbb: "ユーザーを %{name}に追加"
   add_word_count_to_speedgrader_d04dd417: "SpeedGrader に単語数を追加"
@@ -4704,7 +4704,7 @@ ja:
         automatically_assign_reviews: "下のボタンをクリックすると、課題を提出済みであるが、まだレビューが割り当てられていないユーザに、ピア レビューを割り当てることができます。"
       details: 左側に、この課題に対する受講者のリストが表示されます。既にレビューが割り当てられている受講者には、どの受講者の提出物に対するレビューであるかも表示されます。
       links: 
-        assign_peer_review: "%{student} に、査定すべき別の提出物を与える"
+        assign_peer_review: "%{student} に、ピアレビューする受講者を選択する"
         back_to_assignment: 課題に戻る
       messages: 
         cancel_peer_review: "このピア レビューを取り消しますか?"
@@ -5391,8 +5391,8 @@ ja:
   base_url_for_mathman_service_bdd4b10b: "MathMan サービスのための基本 url"
   based_on_basedon_d6e4f4d7: "基準：%{basedOn}"
   based_on_what_if_scores_the_new_total_is_now_grade_d223be10: "What-If スコアに基づいた、新しい合計は現在%{grade}"
-  batch_edit_6d41d0d7: バッチ編集
-  batch_edit_dates_f1ec3df2: バッチ編集日
+  batch_edit_6d41d0d7: 一括編集
+  batch_edit_dates_f1ec3df2: 一括編集日
   bb_display: "Blackboard Learn"
   bb_file_description: "Blackboard 6/7/8/9/Ultraエクスポート.zipファイル"
   bb_name: "Blackboard コンバータ"
@@ -13291,7 +13291,7 @@ ja:
   from_the_provider_of_the_enrollments_834d5ae4: 登録のプロバイダーから
   front_page_50cae87e: トップページ
   front_page_must_be_set_first_4dbbfdbe: "トップ ページを最初に設定する必要があります"
-  front_page_must_be_set_first_c5246f7d: 表紙を先に設定してください
+  front_page_must_be_set_first_c5246f7d: トップページを先に設定してください
   full_article_9296bb6f: 記事全文
   full_letter_grade_3f2ed2e4: 正式なレター形式の評定
   full_name_14c958f7: フルネーム：
@@ -13438,12 +13438,12 @@ ja:
   grade_for_ungraded_artifacts_d0b6fb57: 未採点の成果物の評定
   grade_for_ungraded_submissions_59f72299: 未採点の投稿の評定
   grade_grade_7e52dd1c: "評定：%{grade}"
-  grade_high_to_low_1cea0381: "グレード - 高〜低"
+  grade_high_to_low_1cea0381: "グレード - 高い順"
   grade_history_9c51ad49: 採点履歴...
   grade_history_ccc09fde: 採点履歴
   grade_info_19fb9875: 評定についての情報
   grade_loading_bc1ad721: 評価の読み込み
-  grade_low_to_high_1678b713: "グレード - 低から高"
+  grade_low_to_high_1678b713: "グレード - 低い順"
   grade_out_of_percentage_1972bf52: "配点%{percentage}"
   grade_out_of_points_d401b79d: "配点%{points}"
   grade_percentage_for_missing_submissions_dc7ccac: 不足している提出物の成績割合
@@ -17477,7 +17477,7 @@ ja:
       flash_required_upload_video: "ビデオをアップロードするには Flash が必要です。"
       loading: 読み込み中・・・
       submitted: "メディア ファイルが提出されました!"
-      submitting: "メディア ファイルを提出しています..."
+      submitting: "メディア ファイルを読み込んでいます"
     titles: 
       media_contribution: メディア投稿
       record_upload_media_comment: "メディア コメントの記録/アップロード"
@@ -17487,7 +17487,7 @@ ja:
     file_size_error: "%{file} のサイズが、最大許容ファイルサイズ %{max} MB を超えています。"
     file_type_error: "%{file} は、許可された %{type} ファイルではありません。"
     messages: 
-      submitting: "メディア ファイルを提出しています..."
+      submitting: "メディア ファイルを読み込んでいます"
   media_has_been_queued_for_conversion_please_try_ag_74343bbd: メディアは変換のため、待ち列に入れられています。しばらくしてからやり直してください。
   media_objects: 
     media_objects_not_configured: "メディア オブジェクトが構成されていません"
@@ -26733,7 +26733,7 @@ ja:
       message_title: メッセージ
       message_user_canvas: "Canvas で %{user} にメッセージを送信"
       name: 名前
-      no_links: "%{name} はリンクを追加していません"
+      no_links: "%{name} はリンクを登録していません"
       nothing_in_common: 共通のものは何もありません
       save_profile: プロフィールの保存
       service_contact: "%{service} で %{user} と連絡をとる"
@@ -26742,7 +26742,7 @@ ja:
       titles: 
         click_to_change_profile_pic: クリックして、プロフィール画像を変更
       user_enrolled: 登録
-      user_has_no_bio: "%{user} は略歴を追加していません"
+      user_has_no_bio: "%{user} は経歴を登録していません"
       ways_to_contact_user: 連絡先
     recent_activity: 
       date_column: 日付
@@ -27508,7 +27508,7 @@ ja:
       no_students_in_groups_close: "申し訳ありません。この割当への提出は、割り当てられたユーザーがいないため、Speedgrader で採点することはできません。このグループにユーザーを割り当ててから、もう一度やり直してください。このウインドウを閉じるには、「OK」をクリックします。"
       no_students_in_section: そのセクションには受講者が見つかりませんでした。全セクション表示に戻ります。
     allow_message: "録音を開始するには、[許可] ボタンをクリックします。"
-    begin_record_prompt: "開始するには、[記録] ボタンをクリックします。"
+    begin_record_prompt: 開始するには、「●」ボタンをクリックします。
     buttons: 
       dialog_buttons: キャンセル
       saving_settings: 設定を変更しています...
@@ -32590,7 +32590,7 @@ ja:
     other: "まだ%{count}の完了すべきピアレビューが残っています。"
   you_have_count_peer_reviews_to_complete_52e065e: "%{count}つのピアレビューを完了する必要があります。"
   you_have_count_submissions_to_grade_6c5b511a: "採点する提出が %{count} あります"
-  you_have_created_a_comment_that_has_not_been_poste_cd1d3a06: まだ投稿されていないコメントを作成しました。このコメントを下書きとして保存しますか？(下書きコメントはいつでも投稿できます)。
+  you_have_created_a_comment_that_has_not_been_poste_cd1d3a06: 入力したコメントは投稿されていません。このコメントを下書きとして保存しますか？(下書きコメントはいつでも投稿できます)。
   you_have_entered_an_invalid_grade_for_this_student_7c41e9bc: この受講者に無効な評定を入力しました。値と採点タイプを確認して、もう一度やり直してください。
   you_have_made_changes_to_the_questions_in_this_qui_1658361a: "*この小テストの問題は変更されています。*これらの変更内容は、小テストを保存するまで、受講者には表示されません。"
   you_have_media_feedback_f5f9aba8: メディアフィードバックがあります。
