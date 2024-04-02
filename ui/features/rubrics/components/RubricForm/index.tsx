@@ -23,7 +23,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
 import LoadingIndicator from '@canvas/loading-indicator/react'
 import {useQuery, useMutation, queryClient} from '@canvas/query'
-import type {RubricAssessmentData, RubricCriterion} from '@canvas/rubrics/react/types/rubric'
+import type {RubricCriterion} from '@canvas/rubrics/react/types/rubric'
 import {Alert} from '@instructure/ui-alerts'
 import {View} from '@instructure/ui-view'
 import {TextInput} from '@instructure/ui-text-input'
@@ -42,6 +42,9 @@ import {CriterionModal} from './CriterionModal'
 import {DragDropContext as DragAndDrop, Droppable} from 'react-beautiful-dnd'
 import type {DropResult} from 'react-beautiful-dnd'
 import {RubricAssessmentTray} from '@canvas/rubrics/react/RubricAssessment'
+import FindDialog from '@canvas/outcomes/backbone/views/FindDialog'
+import OutcomeGroup from '@canvas/outcomes/backbone/models/OutcomeGroup'
+import type {GroupOutcome} from '@canvas/global/env/EnvCommon'
 
 const I18n = useI18nScope('rubrics-form')
 
@@ -88,7 +91,11 @@ export const reorder = ({list, startIndex, endIndex}: ReorderProps) => {
   return result
 }
 
-export const RubricForm = () => {
+type RubricFormComponentProp = {
+  rootOutcomeGroup: GroupOutcome
+}
+
+export const RubricForm = ({rootOutcomeGroup}: RubricFormComponentProp) => {
   const {rubricId, accountId, courseId} = useParams()
   const navigate = useNavigate()
   const navigateUrl = accountId ? `/accounts/${accountId}/rubrics` : `/courses/${courseId}/rubrics`
@@ -101,6 +108,8 @@ export const RubricForm = () => {
   const [selectedCriterion, setSelectedCriterion] = useState<RubricCriterion>()
   const [isCriterionModalOpen, setIsCriterionModalOpen] = useState(false)
   const [isPreviewTrayOpen, setIsPreviewTrayOpen] = useState(false)
+  const [outcomeDialog, setOutcomeDialog] = useState<FindDialog | null>(null)
+  const [outcomeDialogOpen, setOutcomeDialogOpen] = useState(false)
 
   const header = rubricId ? I18n.t('Edit Rubric') : I18n.t('Create New Rubric')
 
@@ -203,6 +212,30 @@ export const RubricForm = () => {
 
     setRubricForm(newRubricFormProps)
   }
+
+  const handleAddOutcome = () => {
+    setOutcomeDialogOpen(true)
+    outcomeDialog?.show()
+  }
+
+  useEffect(() => {
+    if (outcomeDialogOpen) {
+      const dialog = new FindDialog({
+        title: I18n.t('Find Outcome'),
+        selectedGroup: new OutcomeGroup(rootOutcomeGroup),
+        useForScoring: true,
+        shouldImport: false,
+        disableGroupImport: true,
+        rootOutcomeGroup: new OutcomeGroup(rootOutcomeGroup),
+        url: '/outcomes/find_dialog',
+      })
+      ;(dialog as any).on('import', (data: any) => {
+        dialog.cleanup()
+      })
+      setOutcomeDialog(dialog)
+      setOutcomeDialogOpen(false)
+    }
+  }, [outcomeDialogOpen, rootOutcomeGroup])
 
   useEffect(() => {
     if (data) {
@@ -361,6 +394,7 @@ export const RubricForm = () => {
               <NewCriteriaRow
                 rowIndex={rubricForm.criteria.length + 1}
                 onEditCriterion={() => openCriterionModal()}
+                onAddOutcome={handleAddOutcome}
               />
             )}
           </View>
