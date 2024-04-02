@@ -36,9 +36,28 @@ jest.mock('../../../queries/RubricFormQueries', () => ({
   saveRubric: () => saveRubricMock,
 }))
 
+const ROOT_OUTCOME_GROUP = {
+  id: '1',
+  title: 'Root Outcome Group',
+  vendor_guid: '12345',
+  subgroups_url: 'https://example.com/subgroups',
+  outcomes_url: 'https://example.com/outcomes',
+  can_edit: true,
+  import_url: 'https://example.com/import',
+  context_id: '1',
+  context_type: 'Account',
+  description: 'Root Outcome Group Description',
+  url: 'https://example.com/root',
+}
+
 describe('RubricForm Tests', () => {
   beforeEach(() => {
     jest.spyOn(Router, 'useParams').mockReturnValue({accountId: '1'})
+
+    window.ENV = {
+      ...window.ENV,
+      context_asset_string: 'user_1',
+    }
   })
 
   afterEach(() => {
@@ -49,7 +68,7 @@ describe('RubricForm Tests', () => {
     return render(
       <QueryProvider>
         <BrowserRouter>
-          <RubricForm />
+          <RubricForm rootOutcomeGroup={ROOT_OUTCOME_GROUP} />
         </BrowserRouter>
       </QueryProvider>
     )
@@ -297,6 +316,17 @@ describe('RubricForm Tests', () => {
       expect(reorderedCriteria[0]).toEqual(criteria[1])
       expect(reorderedCriteria[1]).toEqual(criteria[2])
       expect(reorderedCriteria[2]).toEqual(criteria[0])
+    })
+
+    it('opens the find outcomes modal when the add outcome button is clicked', async () => {
+      queryClient.setQueryData(['fetch-rubric-1'], RUBRICS_QUERY_RESPONSE)
+
+      const {getByTestId, queryByTestId, getByText} = renderComponent()
+      expect(queryByTestId('Find Outcome')).not.toBeInTheDocument()
+      fireEvent.click(getByTestId('create-from-outcome-button'))
+
+      await new Promise(resolve => setTimeout(resolve, 0))
+      expect(getByText('Find Outcome')).toBeInTheDocument()
     })
 
     describe('criterion modal', () => {

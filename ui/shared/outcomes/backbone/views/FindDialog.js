@@ -182,6 +182,10 @@ export default class FindDialog extends DialogBaseView {
     $('.ui-dialog-buttonpane .btn-primary').toggle(canShow)
   }
 
+  cleanup() {
+    this.$el.remove()
+  }
+
   confirmText(model) {
     const target =
       this.selectedGroup.get('title') ||

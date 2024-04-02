@@ -41,6 +41,20 @@ type Role = {
   plural_label: string
 }
 
+export type GroupOutcome = {
+  id: string
+  title: string
+  vendor_guid: string
+  url: string
+  subgroups_url: string
+  outcomes_url: string
+  can_edit: boolean
+  import_url: string
+  context_id: string
+  context_type: string
+  description: string
+}
+
 export interface EnvCommon {
   ASSET_HOST: string
   active_brand_config_json_url: string
@@ -79,6 +93,7 @@ export interface EnvCommon {
   ACCOUNT_ID: string
   DOMAIN_ROOT_ACCOUNT_ID: string
   ROOT_ACCOUNT_ID: string
+  ROOT_OUTCOME_GROUP: GroupOutcome
   k12: false
   help_link_name: string
   help_link_icon: string

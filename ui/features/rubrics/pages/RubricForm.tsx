@@ -28,7 +28,7 @@ export const Component = () => {
 
   return (
     <Portal open={true} mountNode={mountPoint}>
-      <RubricForm />
+      <RubricForm rootOutcomeGroup={ENV.ROOT_OUTCOME_GROUP} />
     </Portal>
   )
 }
