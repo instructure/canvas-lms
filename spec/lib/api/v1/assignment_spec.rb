@@ -239,11 +239,18 @@ describe "Api::V1::Assignment" do
 
           @c1 = assignment.sub_assignments.create!(context: assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC, points_possible: 5, due_at: 2.days.from_now)
           @c2 = assignment.sub_assignments.create!(context: assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY, points_possible: 5, due_at: 5.days.from_now)
+
+          @student = @assignment.course.enroll_student(User.create!, enrollment_state: "active").user
+          @students = [@student]
+
+          create_adhoc_override_for_assignment(@c2, @students, due_at: 2.days.from_now)
         end
 
         it "returns the checkpoints attribute with the correct values" do
-          json = api.assignment_json(assignment, user, session, { include_checkpoints: true })
+          json = api.assignment_json(assignment, @student, session, { include_checkpoints: true })
           checkpoints = json["checkpoints"]
+          first_checkpoint = checkpoints.find { |c| c[:tag] == CheckpointLabels::REPLY_TO_TOPIC }
+          second_checkpoint = checkpoints.find { |c| c[:tag] == CheckpointLabels::REPLY_TO_ENTRY }
 
           expect(json["has_sub_assignments"]).to be_truthy
 
@@ -252,6 +259,10 @@ describe "Api::V1::Assignment" do
           expect(checkpoints.pluck(:points_possible)).to match_array [@c1.points_possible, @c2.points_possible]
           expect(checkpoints.pluck(:due_at)).to match_array [@c1.due_at, @c2.due_at]
           expect(checkpoints.pluck(:only_visible_to_overrides)).to match_array [@c1.only_visible_to_overrides, @c2.only_visible_to_overrides]
+          expect(first_checkpoint[:overrides].length).to eq 0
+          expect(second_checkpoint[:overrides].length).to eq 1
+          expect(second_checkpoint[:overrides].first[:assignment_id]).to eq @c2.id
+          expect(second_checkpoint[:overrides].first[:student_ids]).to match_array @students.map(&:id)
         end
       end
     end
