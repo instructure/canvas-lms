@@ -40,14 +40,23 @@ const DATE_FORMAT_OPTIONS = {
   year: 'numeric',
 }
 
+const EARLIEST_YEAR = 1980 // do not allow any manually entered year before this
+
+const PARSE_RESULTS = {
+  VALID: 0,
+  ERROR: 1,
+  BAD_YEAR: 2,
+}
+
 const DATETIME_FORMAT_OPTIONS = {...DATE_FORMAT_OPTIONS, ...TIME_FORMAT_OPTIONS}
 
 Object.freeze(TIME_FORMAT_OPTIONS)
 Object.freeze(DATE_FORMAT_OPTIONS)
 Object.freeze(DATETIME_FORMAT_OPTIONS)
+Object.freeze(PARSE_RESULTS)
 
 // for tests only
-export {TIME_FORMAT_OPTIONS, DATE_FORMAT_OPTIONS, DATETIME_FORMAT_OPTIONS}
+export {TIME_FORMAT_OPTIONS, DATE_FORMAT_OPTIONS, DATETIME_FORMAT_OPTIONS, PARSE_RESULTS}
 
 function formatter(zone, formatOptions = DATETIME_FORMAT_OPTIONS) {
   const options = {...formatOptions}
@@ -147,6 +156,10 @@ export default class DatetimeField {
     } else {
       this.setFromValue()
     }
+  }
+
+  invalid() {
+    return this.valid !== PARSE_RESULTS.VALID
   }
 
   processTimeOptions(options) {
@@ -285,26 +298,29 @@ export default class DatetimeField {
   }
 
   parseValue(val) {
+    const previousDate = this.datetime
     if (typeof val === 'undefined' && this.$field.data('inputdate')) {
       const inputdate = this.$field.data('inputdate')
       this.datetime = inputdate instanceof Date ? inputdate : new Date(inputdate)
       this.blank = false
-      this.invalid = this.datetime === null
+      this.valid = PARSE_RESULTS.VALID
+      if (this.datetime === null) this.valid = PARSE_RESULTS.ERROR
+      if (this.datetime && this.datetime.getFullYear() < EARLIEST_YEAR)
+        this.valid = PARSE_RESULTS.BAD_YEAR
       this.$field.data('inputdate', null)
     } else {
-      const previousDate = this.datetime
-      if (val) {
-        this.setFormattedDatetime(val, TIME_FORMAT_OPTIONS)
-      }
+      if (val) this.setFormattedDatetime(val, this.intlFormatType())
       const value = this.normalizeValue(this.$field.val())
       this.datetime = tz.parse(value)
       this.blank = !value
-      this.invalid = !this.blank && this.datetime === null
-      // If the date is invalid, revert to the previous date
-      if (this.invalid) {
-        this.datetime = previousDate
-      }
+      this.valid = PARSE_RESULTS.VALID
+      if (!this.blank && this.datetime === null) this.valid = PARSE_RESULTS.ERROR
+      if (this.datetime && this.datetime.getFullYear() < EARLIEST_YEAR)
+        this.valid = PARSE_RESULTS.BAD_YEAR
     }
+    // If the date is invalid, revert to the previous date
+    if (this.invalid()) this.datetime = previousDate
+
     if (this.datetime && !this.showDate && this.implicitDate) {
       this.datetime = tz.mergeTimeAndDate(this.datetime, this.implicitDate)
     }
@@ -326,7 +342,7 @@ export default class DatetimeField {
       this.fudged = null
       this.$field.val('')
     }
-    this.invalid = false
+    this.valid = PARSE_RESULTS.VALID
     this.showTime = this.alwaysShowTime || (this.allowTime && !tz.isMidnight(this.datetime))
     this.update()
     this.updateSuggest(false)
@@ -344,7 +360,7 @@ export default class DatetimeField {
       date: this.fudged,
       iso8601,
       blank: this.blank,
-      invalid: this.invalid,
+      invalid: this.invalid(),
     })
 
     if (this.$hiddenInput) {
@@ -354,7 +370,7 @@ export default class DatetimeField {
     // date_fields and time_fields don't have timepicker data fields
     if (!(this.showDate && this.allowTime)) return
 
-    if (this.invalid || this.blank || !this.showTime) {
+    if (this.invalid() || this.blank || !this.showTime) {
       this.$field.data({
         'time-hour': null,
         'time-minute': null,
@@ -384,8 +400,8 @@ export default class DatetimeField {
       }
       this.$contextSuggest.text(contextText).show()
     }
-    this.$suggest.toggleClass('invalid_datetime', this.invalid).text(localText)
-    if (show || this.$contextSuggest || this.invalid) {
+    this.$suggest.toggleClass('invalid_datetime', this.invalid()).text(localText)
+    if (show || this.$contextSuggest || this.invalid()) {
       this.$suggest.show()
       return
     }
@@ -407,7 +423,7 @@ export default class DatetimeField {
   }
 
   updateAria() {
-    this.$field.attr('aria-invalid', !!this.invalid)
+    this.$field.attr('aria-invalid', this.invalid())
   }
 
   intlFormatType() {
@@ -417,13 +433,13 @@ export default class DatetimeField {
   }
 
   formatSuggest() {
-    if (this.invalid) return this.parseError
+    if (this.invalid()) return this.parseError
     if (this.blank) return ''
     return formatter(ENV.TIMEZONE, this.intlFormatType()).format(this.datetime)
   }
 
   formatSuggestContext() {
-    if (this.invalid || !this.showTime || this.blank) return ''
+    if (this.invalid() || !this.showTime || this.blank) return ''
     return formatter(this.contextTimezone, this.intlFormatType()).format(this.datetime)
   }
 
@@ -438,6 +454,7 @@ export default class DatetimeField {
   }
 
   get parseError() {
+    if (this.valid === PARSE_RESULTS.BAD_YEAR) return I18n.t('Year is too far in the past.')
     return I18n.t('errors.not_a_date', "That's not a date!")
   }
 }

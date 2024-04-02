@@ -49,6 +49,8 @@ type BlurReturn = SyntheticEvent<Element, Event> | KeyboardEvent<DateInputProps>
 
 const I18n = useI18nScope('app_shared_components_canvas_date_time')
 
+const EARLIEST_YEAR = 1980 // do not allow any manually entered year before this
+
 export type CanvasDateInputProps = {
   /**
    * Represents the initial date to be selected. May be `undefined` for no selected date.
@@ -288,10 +290,22 @@ export default function CanvasDateInput({
     if (isShowingCalendar && withRunningValue) handleHideCalendar()
     const newDate = tz.parse(value, timezone)
     if (newDate) {
+      const year = newDate.getFullYear()
+      if (year < EARLIEST_YEAR) {
+        setInternalMessages([
+          {
+            type: 'error',
+            text: I18n.t('Year %{year} is too far in the past', {year: String(year)}),
+          },
+        ])
+        return
+      }
       const msgs: Messages = withRunningValue ? [{type: 'success', text: formatDate(newDate)}] : []
       setRenderedMoment(moment.tz(newDate, timezone))
       setInternalMessages(msgs)
-    } else if (value === '') {
+      return
+    }
+    if (value === '') {
       setInternalMessages([])
     } else {
       const text = invalidText(value)

@@ -19,7 +19,7 @@
 import london from 'timezone/Europe/London'
 import * as tz from '@canvas/datetime'
 import coupleTimeFields from '@canvas/calendar/jquery/coupleTimeFields'
-import DatetimeField from '@canvas/datetime/jquery/DatetimeField'
+import DatetimeField, {PARSE_RESULTS} from '@canvas/datetime/jquery/DatetimeField'
 import $ from 'jquery'
 import 'jquery-migrate'
 import fakeENV from 'helpers/fakeENV'
@@ -80,7 +80,7 @@ test('leaves invalid start alone', function () {
   this.end.setTime(fixed)
   coupleTimeFields(this.$start, this.$end)
   equal(this.$start.val(), 'invalid')
-  equal(this.start.invalid, true)
+  equal(this.start.valid, PARSE_RESULTS.ERROR)
 })
 
 test('leaves invalid end alone', function () {
@@ -89,7 +89,7 @@ test('leaves invalid end alone', function () {
   this.end.setFromValue()
   coupleTimeFields(this.$start, this.$end)
   equal(this.$end.val(), 'invalid')
-  equal(this.end.invalid, true)
+  equal(this.end.valid, PARSE_RESULTS.ERROR)
 })
 
 test('interprets time as occurring on date', function () {
@@ -156,7 +156,7 @@ test('leaves invalid start alone', function () {
   this.end.setTime(fixed)
   this.$end.trigger('blur')
   equal(this.$start.val(), 'invalid')
-  equal(this.start.invalid, true)
+  equal(this.start.valid, PARSE_RESULTS.ERROR)
 })
 
 test('leaves invalid end alone', function () {
@@ -165,7 +165,7 @@ test('leaves invalid end alone', function () {
   this.end.setFromValue()
   this.$start.trigger('blur')
   equal(this.$end.val(), 'invalid')
-  equal(this.end.invalid, true)
+  equal(this.end.valid, PARSE_RESULTS.ERROR)
 })
 
 test('does not rewrite blurred input', function () {
