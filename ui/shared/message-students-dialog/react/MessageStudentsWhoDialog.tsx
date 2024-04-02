@@ -168,6 +168,12 @@ const filterCriteria: FilterCriterion[] = [
   },
   {
     requiresCutoff: false,
+    shouldShow: () => false, // Will never show in dropdown, but is used with checkbox on "Have not yet submitted" option
+    title: I18n.t('Have not yet submitted and excused'),
+    value: 'unsubmitted_skip_excused',
+  },
+  {
+    requiresCutoff: false,
     shouldShow: assignment => assignment !== null,
     title: I18n.t('Have not been graded'),
     value: 'ungraded',
@@ -234,6 +240,11 @@ function filterStudents(criterion, students, cutoff) {
         }
         break
       case 'unsubmitted':
+        if (!student.submittedAt) {
+          newfilteredStudents.push(student)
+        }
+        break
+      case 'unsubmitted_skip_excused':
         if (!student.submittedAt && !student.excused) {
           newfilteredStudents.push(student)
         }
@@ -527,6 +538,17 @@ const MessageStudentsWhoDialog = ({
     }
   }
 
+  const onExcusedCheckBoxChange = event => {
+    const criteriaValue = event.target.checked ? 'unsubmitted_skip_excused' : 'unsubmitted'
+    const criterion = filterCriteria.find(c => c.value === criteriaValue)
+    if (criterion) {
+      setFilteredStudents(filterStudents(criterion, sortedStudents, cutoff))
+      setObserversDisplayed(
+        observerCount(filterStudents(criterion, sortedStudents, cutoff), observersByStudentID)
+      )
+    }
+  }
+
   const onAddAttachment = addAttachmentsFn(
     setAttachments,
     setPendingUploads,
@@ -706,6 +728,16 @@ const MessageStudentsWhoDialog = ({
                   />
                 </RadioInputGroup>
               </Flex>
+              <br />
+            </>
+          )}
+          {selectedCriterion.value === 'unsubmitted' && (
+            <>
+              <Checkbox
+                onChange={onExcusedCheckBoxChange}
+                data-testid="skip-excused-checkbox"
+                label={<Text>{I18n.t('Skip excused students when messaging')}</Text>}
+              />
               <br />
             </>
           )}
