@@ -601,7 +601,34 @@ describe.skip('MessageStudentsWhoDialog', () => {
       })
     })
 
-    it('"Have not yet submitted" does not display students who are excused', async () => {
+    it('"Have not yet submitted" does not display students who are excused when selecting "skip excused" checkbox', async () => {
+      const mocks = await makeMocks()
+      students[2].excused = true
+      const {getAllByRole, getByRole, findByLabelText, getByText, getByTestId} = render(
+        <MockedProvider mocks={mocks} cache={createCache()}>
+          <MessageStudentsWhoDialog {...makeProps()} />
+        </MockedProvider>
+      )
+
+      const button = await findByLabelText(/For students who/)
+      fireEvent.click(button)
+      fireEvent.click(getByText(/Have not yet submitted/))
+
+      fireEvent.click(getByTestId('skip-excused-checkbox'))
+
+      fireEvent.click(getByRole('button', {name: 'Show all recipients'}))
+      expect(getByRole('table')).toBeInTheDocument()
+
+      const tableRows = getAllByRole('row') as HTMLTableRowElement[]
+      const studentCells = tableRows.map(row => row.cells[0])
+      expect(studentCells).toHaveLength(4)
+      expect(studentCells[0]).toHaveTextContent('Students')
+      expect(studentCells[1]).toHaveTextContent('Betty Ford')
+      expect(studentCells[2]).toHaveTextContent('Adam Jones')
+      expect(studentCells[3]).toHaveTextContent('Dana Smith')
+    })
+
+    it('"Have not yet submitted" does display students who are excused when "skip excused" checkbox is not selected', async () => {
       const mocks = await makeMocks()
       students[2].excused = true
       const {getAllByRole, getByRole, findByLabelText, getByText} = render(
@@ -619,11 +646,12 @@ describe.skip('MessageStudentsWhoDialog', () => {
 
       const tableRows = getAllByRole('row') as HTMLTableRowElement[]
       const studentCells = tableRows.map(row => row.cells[0])
-      expect(studentCells).toHaveLength(4)
+      expect(studentCells).toHaveLength(5)
       expect(studentCells[0]).toHaveTextContent('Students')
       expect(studentCells[1]).toHaveTextContent('Betty Ford')
       expect(studentCells[2]).toHaveTextContent('Adam Jones')
       expect(studentCells[3]).toHaveTextContent('Dana Smith')
+      expect(studentCells[4]).toHaveTextContent('Charlie Xi')
     })
 
     it('"Have not yet submitted" displays students who have no submitted next to their observers', async () => {
