@@ -835,12 +835,9 @@ class GroupsController < ApplicationController
   def public_feed
     return unless get_feed_context(only: [:group])
 
-    feed = Atom::Feed.new do |f|
-      f.title = t(:feed_title, "%{course_or_account_name} Feed", course_or_account_name: @context.full_name)
-      f.links << Atom::Link.new(href: group_url(@context), rel: "self")
-      f.updated = Time.now
-      f.id = group_url(@context)
-    end
+    title = t(:feed_title, "%{course_or_account_name} Feed", course_or_account_name: @context.full_name)
+    link = group_url(@context)
+
     @entries = []
     @entries.concat @context.calendar_events.active
     @entries.concat(DiscussionTopic::ScopedToUser.new(@context, @current_user, @context.discussion_topics.published).scope.reject do |dt|
@@ -848,11 +845,9 @@ class GroupsController < ApplicationController
     end)
     @entries.concat WikiPages::ScopedToUser.new(@context, @current_user, @context.wiki_pages.published).scope
     @entries = @entries.sort_by(&:updated_at)
-    @entries.each do |entry|
-      feed.entries << entry.to_atom(context: @context)
-    end
+
     respond_to do |format|
-      format.atom { render plain: feed.to_xml }
+      format.atom { render plain: AtomFeedHelper.render_xml(title:, link:, entries: @entries, context: @context) }
     end
   end
 

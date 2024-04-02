@@ -1289,16 +1289,14 @@ class CalendarEventsApiController < ApplicationController
         render plain: calendar.to_ical
       end
       format.atom do
-        feed = Atom::Feed.new do |f|
-          f.title = t :feed_title, "%{course_or_group_name} Calendar Feed", course_or_group_name: @context.name
-          f.links << Atom::Link.new(href: calendar_url_for(@context), rel: "self")
-          f.updated = Time.now
-          f.id = calendar_url_for(@context)
+        title = t :feed_title, "%{course_or_group_name} Calendar Feed", course_or_group_name: @context.name
+        link = calendar_url_for(@context)
+
+        feed_xml = AtomFeedHelper.render_xml(title:, link:, entries: @events) do |e|
+          { exclude_description: !!e.try(:locked_for?, @current_user) }
         end
-        @events.each do |e|
-          feed.entries << e.to_atom(exclude_description: !!e.try(:locked_for?, @current_user))
-        end
-        render plain: feed.to_xml
+
+        render plain: feed_xml
       end
     end
   end
