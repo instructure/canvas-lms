@@ -80,7 +80,7 @@ class ExternalFeed < ActiveRecord::Base
 
   def add_atom_entries(atom)
     items = []
-    atom.each_entry { |item| items << add_entry(item, atom, :atom) }
+    atom.entries.each { |item| items << add_entry(item, atom, :atom) }
     items.compact!
     context.add_aggregate_entries(items, self) if context.respond_to?(:add_aggregate_entries)
     items
@@ -143,32 +143,32 @@ class ExternalFeed < ActiveRecord::Base
     when :atom
       uuid = item.id || Digest::SHA256.hexdigest("#{item.title}#{item.published.utc.strftime("%Y-%m-%d")}")
       entry = external_feed_entries.where(uuid:).first
-      entry ||= external_feed_entries.where(url: item.links.alternate.to_s).first
+      entry ||= external_feed_entries.where(url: item.url).first
       description = entry&.message
       if description.blank?
-        description = "<a href='#{ERB::Util.h(item.links.alternate.to_s)}'>#{ERB::Util.h(t(:original_article, "Original article"))}</a><br/><br/>"
+        description = "<a href='#{ERB::Util.h(item.url)}'>#{ERB::Util.h(t(:original_article, "Original article"))}</a><br/><br/>"
         description += format_description(item.content || item.title)
       end
       if entry
         entry.update_feed_attributes(
           title: item.title.to_s,
           message: description,
-          url: item.links.alternate.to_s
+          url: item.url
         )
         return entry
       end
       return nil if header_match && !item.title.downcase.include?(header_match.downcase)
       return nil if (item.published && created_at > item.published rescue false)
 
-      description = "<a href='#{ERB::Util.h(item.links.alternate.to_s)}'>#{ERB::Util.h(t(:original_article, "Original article"))}</a><br/><br/>"
+      description = "<a href='#{ERB::Util.h(item.url)}'>#{ERB::Util.h(t(:original_article, "Original article"))}</a><br/><br/>"
       description += format_description(item.content || item.title)
       entry = external_feed_entries.new(
         title: item.title,
         message: description,
         source_name: feed.title.to_s,
-        source_url: feed.links.alternate.to_s,
+        source_url: feed.url,
         posted_at: item.published,
-        url: item.links.alternate.to_s,
+        url: item.url,
         user:,
         uuid:
       )
