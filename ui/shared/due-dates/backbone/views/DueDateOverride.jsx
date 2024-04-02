@@ -83,7 +83,7 @@ DueDateOverrideView.prototype.render = function () {
     ? React.createElement(DifferentiatedModulesSection, {
         onSync: this.setNewOverridesCollection,
         defaultSectionId: this.model.defaultDueDateSectionId,
-        overrides: this.model.overrides.models,
+        overrides: this.model.overrides.models.map(model => model.toJSON().assignment_override),
         assignmentId: this.model.assignment.get('id'),
         assignmentName: this.model.assignment.get('name') || this.model.assignment.get('title'),
         isOnlyVisibleToOverrides: this.model.assignment.isOnlyVisibleToOverrides(),
