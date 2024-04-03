@@ -17,15 +17,18 @@
  */
 
 import React from 'react'
-import {shallow, mount} from 'enzyme'
-import IndexHeader from 'ui/features/announcements/react/components/IndexHeader'
+import {render} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import {shallow} from 'enzyme'
+import IndexHeader from '../IndexHeader'
+import sinon from 'sinon'
 
 function makeProps() {
   return {
     applicationElement: () => document.getElementById('fixtures'),
     contextId: '1',
     contextType: 'course',
-    deleteSelectedAnnouncements() {},
+    deleteSelectedAnnouncements: jest.fn(),
     isBusy: false,
     permissions: {
       create: true,
@@ -33,9 +36,11 @@ function makeProps() {
       manage_course_content_delete: true,
       moderate: true,
     },
-    searchAnnouncements: () => {},
+    searchAnnouncements: jest.fn(),
     selectedCount: 0,
-    toggleSelectedAnnouncementsLock: () => {},
+    toggleSelectedAnnouncementsLock: jest.fn(),
+    announcementsLocked: false,
+    isToggleLocking: false,
   }
 }
 
@@ -50,12 +55,12 @@ function waitForSpyToBeCalled(spy) {
   })
 }
 
-QUnit.module('"Add Announcement" button', () => {
+describe('"Add Announcement" button', () => {
   test('is present when the user has permission to create an announcement', () => {
     const props = makeProps()
     const wrapper = shallow(<IndexHeader {...props} />)
     const node = wrapper.find('#add_announcement')
-    ok(node.exists())
+    expect(node.exists()).toBeTruthy()
   })
 
   test('is absent when the user does not have permission to create an announcement', () => {
@@ -63,31 +68,31 @@ QUnit.module('"Add Announcement" button', () => {
     props.permissions.create = false
     const wrapper = shallow(<IndexHeader {...props} />)
     const node = wrapper.find('#add_announcement')
-    notOk(node.exists())
+    expect(node.exists()).toBeFalsy()
   })
 })
 
-QUnit.module('searching announcements', () => {
+describe('searching announcements', () => {
   test('calls the searchAnnouncements prop with searchInput value after debounce timeout', async () => {
     const spy = sinon.spy()
     const props = makeProps()
     props.searchAnnouncements = spy
-    const wrapper = mount(<IndexHeader {...props} />)
-    const input = wrapper.find('TextInput').find('input')
-    input.instance().value = 'foo'
-    input.simulate('change', {target: {value: 'foo'}})
+    const wrapper = render(<IndexHeader {...props} />)
+    const input = wrapper.container.querySelector('input')
+    const user = userEvent.setup({delay: null})
+    await user.type(input, 'foo')
     const searchOptions = await waitForSpyToBeCalled(spy)
-    deepEqual(searchOptions[0], {term: 'foo'})
+    expect(searchOptions[0]).toEqual({term: 'foo'})
     wrapper.unmount()
   })
 })
 
-QUnit.module('"Announcement Filter" select', () => {
+describe('"Announcement Filter" select', () => {
   test('includes two options in the filter select component', () => {
     const props = makeProps()
     const wrapper = shallow(<IndexHeader {...props} />)
     const filtersText = wrapper.find('option').map(option => option.text())
-    deepEqual(filtersText, ['All', 'Unread'])
+    expect(filtersText).toEqual(['All', 'Unread'])
   })
 
   test('calls the searchAnnouncements prop when selecting a filter option', () => {
@@ -97,7 +102,7 @@ QUnit.module('"Announcement Filter" select', () => {
     const wrapper = shallow(<IndexHeader {...props} />)
     const onChange = wrapper.find('select').prop('onChange')
     onChange({target: {value: 'unread'}})
-    strictEqual(spy.callCount, 1)
+    expect(spy.callCount).toEqual(1)
   })
 
   test('includes the filter value when calling the searchAnnouncements prop', () => {
@@ -108,43 +113,43 @@ QUnit.module('"Announcement Filter" select', () => {
     const onChange = wrapper.find('select').prop('onChange')
     onChange({target: {value: 'unread'}})
     const searchOptions = spy.lastCall.args[0]
-    deepEqual(searchOptions, {filter: 'unread'})
+    expect(searchOptions).toEqual({filter: 'unread'})
   })
 })
 
-QUnit.module('"Lock Selected Announcements" button', () => {
+describe('"Lock Selected Announcements" button', () => {
   test('is present when the user has permission to lock announcements', () => {
     const props = makeProps()
     const wrapper = shallow(<IndexHeader {...props} />)
-    strictEqual(wrapper.find('#lock_announcements').length, 1)
+    expect(wrapper.find('#lock_announcements').length).toEqual(1)
   })
 
   test('is absent when the user does not have permission to lock announcements', () => {
     const props = makeProps()
     props.permissions.manage_course_content_edit = false
     const wrapper = shallow(<IndexHeader {...props} />)
-    strictEqual(wrapper.find('#lock_announcements').length, 0)
+    expect(wrapper.find('#lock_announcements').length).toEqual(0)
   })
 
   test('is absent when announcements are globally locked', () => {
     const props = makeProps()
     props.announcementsLocked = true
     const wrapper = shallow(<IndexHeader {...props} />)
-    strictEqual(wrapper.find('#lock_announcements').length, 0)
+    expect(wrapper.find('#lock_announcements').length).toEqual(0)
   })
 
   test('is disabled when "isBusy" is true', () => {
     const props = makeProps()
     props.isBusy = true
     const wrapper = shallow(<IndexHeader {...props} />)
-    strictEqual(wrapper.find('#lock_announcements').is('[disabled]'), true)
+    expect(wrapper.find('#lock_announcements').is('[disabled]')).toBeTruthy()
   })
 
   test('is disabled when "selectedCount" is 0', () => {
     const props = makeProps()
     props.selectedCount = 0
     const wrapper = shallow(<IndexHeader {...props} />)
-    strictEqual(wrapper.find('#lock_announcements').is('[disabled]'), true)
+    expect(wrapper.find('#lock_announcements').is('[disabled]')).toBeTruthy()
   })
 
   test('calls the toggleSelectedAnnouncementsLock prop when clicked', () => {
@@ -154,43 +159,45 @@ QUnit.module('"Lock Selected Announcements" button', () => {
     props.selectedCount = 1
     const wrapper = shallow(<IndexHeader {...props} />)
     wrapper.find('#lock_announcements').simulate('click')
-    strictEqual(spy.callCount, 1)
+    expect(spy.callCount).toEqual(1)
   })
 })
 
-QUnit.module('"Delete Selected Announcements" button', () => {
+describe('"Delete Selected Announcements" button', () => {
   test('is present when the user has permission to delete announcements', () => {
     const props = makeProps()
     const wrapper = shallow(<IndexHeader {...props} />)
-    strictEqual(wrapper.find('#delete_announcements').length, 1)
+    expect(wrapper.find('#delete_announcements').length).toEqual(1)
   })
 
   test('is absent when the user does not have permission to delete announcements', () => {
     const props = makeProps()
     props.permissions.manage_course_content_delete = false
     const wrapper = shallow(<IndexHeader {...props} />)
-    strictEqual(wrapper.find('#delete_announcements').length, 0)
+    expect(wrapper.find('#delete_announcements').length).toEqual(0)
   })
 
   test('is disabled when "isBusy" is true', () => {
     const props = makeProps()
     props.isBusy = true
     const wrapper = shallow(<IndexHeader {...props} />)
-    strictEqual(wrapper.find('#delete_announcements').is('[disabled]'), true)
+    expect(wrapper.find('#delete_announcements').is('[disabled]')).toBeTruthy()
   })
 
   test('is disabled when "selectedCount" is 0', () => {
     const props = makeProps()
     props.selectedCount = 0
     const wrapper = shallow(<IndexHeader {...props} />)
-    strictEqual(wrapper.find('#delete_announcements').is('[disabled]'), true)
+    expect(wrapper.find('#delete_announcements').is('[disabled]')).toBeTruthy()
   })
 
-  test('shows the "Confirm Delete" modal when clicked', () => {
+  test('shows the "Confirm Delete" modal when clicked', async () => {
     const props = makeProps()
     props.selectedCount = 1
-    const wrapper = shallow(<IndexHeader {...props} />)
-    wrapper.find('#delete_announcements').simulate('click')
-    ok(wrapper.instance().deleteModal)
+    const ref = React.createRef()
+    const wrapper = render(<IndexHeader {...props} ref={ref} />)
+    const delButton = wrapper.container.querySelector('#delete_announcements')
+    await userEvent.click(delButton)
+    expect(ref.current.deleteModal).toBeTruthy()
   })
 })
