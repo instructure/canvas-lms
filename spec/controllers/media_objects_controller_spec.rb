@@ -1172,6 +1172,16 @@ describe MediaObjectsController do
         media_attachment_api_json = controller.media_attachment_api_json(@attachment, @media_object, @teacher, session)
         expect(media_attachment_api_json["can_add_captions"]).to be(false)
       end
+
+      it "returns true if media object points to different attachment" do
+        user_session(@teacher)
+        other_course = course_factory
+        other_attachment = other_course.attachments.create! media_entry_id: "0_deadbeef", filename: "blah.flv", uploaded_data: StringIO.new("data"), media_object: @media_object
+        @media_object.attachment = other_attachment
+        @media_object.save!
+        media_attachment_api_json = controller.media_attachment_api_json(@attachment, @media_object, @teacher, session)
+        expect(media_attachment_api_json["can_add_captions"]).to be(true)
+      end
     end
   end
 
