@@ -34,14 +34,12 @@ class Course < ActiveRecord::Base
   attr_accessor :teacher_names, :master_course, :primary_enrollment_role, :saved_by
   attr_writer :student_count, :teacher_count, :primary_enrollment_type, :primary_enrollment_role_id, :primary_enrollment_rank, :primary_enrollment_state, :primary_enrollment_date, :invitation, :master_migration
 
+  alias_attribute :short_name, :course_code
+
   time_zone_attribute :time_zone
   def time_zone
-    if read_attribute(:time_zone)
-      super
-    else
-      RequestCache.cache("account_time_zone", root_account_id) do
-        root_account.default_time_zone
-      end
+    super || RequestCache.cache("account_time_zone", root_account_id) do
+      root_account.default_time_zone
     end
   end
 
@@ -1047,7 +1045,7 @@ class Course < ActiveRecord::Base
     scope = User.joins(:not_ended_enrollments)
                 .where(enrollments: { course_id: self, type: "StudentEnrollment" })
                 .where(Group.not_in_group_sql_fragment(groups.map(&:id)))
-                .select("users.id, users.name, users.updated_at").distinct
+                .select("users.id, users.name, users.short_name, users.updated_at").distinct
     scope = scope.select(opts[:order]).order(opts[:order]) if opts[:order]
     scope
   end
@@ -1346,11 +1344,11 @@ class Course < ActiveRecord::Base
   end
 
   def self_enrollment_code
-    read_attribute(:self_enrollment_code) || set_self_enrollment_code
+    super || set_self_enrollment_code
   end
 
   def set_self_enrollment_code
-    return if !self_enrollment_enabled? || read_attribute(:self_enrollment_code)
+    return if !self_enrollment_enabled? || self["self_enrollment_code"]
 
     # subset of letters and numbers that are unambiguous
     alphanums = "ABCDEFGHJKLMNPRTWXY346789".chars
@@ -1500,14 +1498,6 @@ class Course < ActiveRecord::Base
 
   def allow_media_comments?
     true
-  end
-
-  def short_name
-    course_code
-  end
-
-  def short_name=(val)
-    write_attribute(:course_code, val)
   end
 
   def short_name_slug
@@ -1696,7 +1686,7 @@ class Course < ActiveRecord::Base
   end
 
   def storage_quota
-    read_attribute(:storage_quota) ||
+    super ||
       (account.default_storage_quota rescue nil) ||
       Setting.get("course_default_quota", 500.decimal_megabytes.to_s).to_i
   end
@@ -1707,7 +1697,7 @@ class Course < ActiveRecord::Base
     if account && account.default_storage_quota == val
       val = nil
     end
-    write_attribute(:storage_quota, val)
+    super
   end
 
   def assign_uuid
@@ -3570,7 +3560,7 @@ class Course < ActiveRecord::Base
   end
 
   def allow_wiki_comments
-    read_attribute(:allow_wiki_comments)
+    self["allow_wiki_comments"]
   end
 
   def account_name
@@ -3822,18 +3812,13 @@ class Course < ActiveRecord::Base
     hash
   end
 
-  # DEPRECATED, use setting accessors instead
-  def settings=(hash)
-    write_attribute(:settings, hash)
-  end
-
   # frozen, because you should use setters
   def settings
     settings_frd.dup.freeze
   end
 
   def settings_frd
-    read_or_initialize_attribute(:settings, {})
+    self["settings"] ||= {}
   end
 
   def disable_setting_defaults
@@ -3861,7 +3846,7 @@ class Course < ActiveRecord::Base
           grading_standard_id
         ].map(&:to_s)
         attributes.each do |key, val|
-          new_course.write_attribute(key, val) if keys_to_copy.include?(key)
+          new_course[key] = val if keys_to_copy.include?(key)
         end
         new_course.workflow_state = (admins.any? ? "claimed" : "created")
         # there's a unique constraint on this, so we need to clear it out
@@ -4085,9 +4070,9 @@ class Course < ActiveRecord::Base
 
   %w[student_count teacher_count primary_enrollment_type primary_enrollment_role_id primary_enrollment_rank primary_enrollment_state primary_enrollment_date invitation].each do |method|
     class_eval <<~RUBY, __FILE__, __LINE__ + 1
-      def #{method}
-        read_attribute(:#{method}) || @#{method}
-      end
+      def #{method}                            # def student_count
+        self[#{method.inspect}] || @#{method}  #   self["student_count"] || @student_count
+      end                                      # end
     RUBY
   end
 
@@ -4164,7 +4149,7 @@ class Course < ActiveRecord::Base
   def name
     return @nickname if @nickname
 
-    read_attribute(:name)
+    super
   end
 
   def apply_nickname_for!(user)

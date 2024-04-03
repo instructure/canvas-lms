@@ -64,7 +64,7 @@ class User < ActiveRecord::Base
   before_save :infer_defaults
   before_validation :ensure_lti_id, on: :update
   after_create :set_default_feature_flags
-  after_update :clear_cached_short_name, if: ->(user) { user.saved_change_to_short_name? || (user.read_attribute(:short_name).nil? && user.saved_change_to_name?) }
+  after_update :clear_cached_short_name, if: ->(user) { user.saved_change_to_short_name? || (user["short_name"].nil? && user.saved_change_to_name?) }
   validate :preserve_lti_id, on: :update
 
   serialize :preferences
@@ -856,7 +856,7 @@ class User < ActiveRecord::Base
   def assign_uuid
     # DON'T use ||=, because that will cause an immediate save to the db if it
     # doesn't already exist
-    self.uuid = CanvasSlug.generate_securish_uuid unless read_attribute(:uuid)
+    self.uuid = CanvasSlug.generate_securish_uuid unless self["uuid"]
   end
   protected :assign_uuid
 
@@ -979,7 +979,7 @@ class User < ActiveRecord::Base
                                 !sortable_name_explicitly_set &&
                                 name_changed? &&
                                 User.name_parts(sortable_name, likely_already_surname_first: true).compact.join(" ") == name_was
-    unless read_attribute(:sortable_name)
+    unless self["sortable_name"]
       self.sortable_name = User.last_name_first(self.name, sortable_name_was, likely_already_surname_first: true)
     end
     self.reminder_time_for_due_dates ||= 48.hours.to_i
@@ -1011,7 +1011,7 @@ class User < ActiveRecord::Base
   end
 
   def sortable_name
-    self.sortable_name = read_attribute(:sortable_name) ||
+    self.sortable_name = super ||
                          User.last_name_first(self.name, likely_already_surname_first: false)
   end
 
@@ -1124,7 +1124,7 @@ class User < ActiveRecord::Base
   end
 
   def short_name
-    read_attribute(:short_name) || name
+    super || name
   end
 
   workflow do
@@ -1631,8 +1631,8 @@ class User < ActiveRecord::Base
   end
 
   def avatar_state
-    if %w[none submitted approved locked reported re_reported].include?(read_attribute(:avatar_state))
-      read_attribute(:avatar_state).to_sym
+    if %w[none submitted approved locked reported re_reported].include?(super)
+      super.to_sym
     else
       :none
     end
@@ -1645,7 +1645,7 @@ class User < ActiveRecord::Base
         self.avatar_image_source = "no_pic"
         self.avatar_image_updated_at = Time.now
       end
-      write_attribute(:avatar_state, val.to_s)
+      super(val.to_s)
     end
   end
 
@@ -1764,7 +1764,7 @@ class User < ActiveRecord::Base
   end
 
   def preferences
-    read_or_initialize_attribute(:preferences, {})
+    self["preferences"] ||= {}
   end
 
   def speed_grader_settings
@@ -1998,16 +1998,16 @@ class User < ActiveRecord::Base
   # it will store the data in a separate table on the db and lighten the load on poor `users`
 
   def uuid
-    unless read_attribute(:uuid)
+    unless super
       update_attribute(:uuid, CanvasSlug.generate_securish_uuid)
     end
-    read_attribute(:uuid)
+    super
   end
 
   def heap_id(root_account: nil)
     # this is called in read-only contexts where we can't create a missing uuid
     # (uuid-less users should be rare in real life but they exist in specs and maybe unauthenticated requests)
-    return nil unless read_attribute(:uuid)
+    return nil unless self["uuid"]
 
     # for an explanation of these, see
     # https://instructure.atlassian.net/wiki/spaces/HEAP/pages/85854749165/RFC+Advanced+HEAP+installation
@@ -2836,7 +2836,7 @@ class User < ActiveRecord::Base
   end
 
   def quota
-    return read_attribute(:storage_quota) if read_attribute(:storage_quota)
+    return storage_quota if storage_quota
 
     accounts = associated_root_accounts.reject(&:site_admin?)
     if accounts.empty?
@@ -3134,7 +3134,7 @@ class User < ActiveRecord::Base
   end
 
   def crocodoc_id!
-    cid = read_attribute(:crocodoc_id)
+    cid = crocodoc_id
     return cid if cid
 
     Setting.transaction do
@@ -3480,11 +3480,11 @@ class User < ActiveRecord::Base
   end
 
   def pronouns
-    translate_pronouns(read_attribute(:pronouns))
+    translate_pronouns(super)
   end
 
   def pronouns=(pronouns)
-    write_attribute(:pronouns, untranslate_pronouns(pronouns))
+    super(untranslate_pronouns(pronouns))
   end
 
   def create_courses_right(account)

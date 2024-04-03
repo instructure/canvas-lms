@@ -210,7 +210,7 @@ class ContentTag < ActiveRecord::Base
   protected :default_values
 
   def context_code
-    read_attribute(:context_code) || "#{context_type.to_s.underscore}_#{context_id}" rescue nil
+    super || "#{context_type.to_s.underscore}_#{context_id}" rescue nil
   end
 
   def context_name

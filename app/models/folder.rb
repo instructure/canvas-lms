@@ -161,7 +161,7 @@ class Folder < ActiveRecord::Base
   end
 
   def full_name(reload = false)
-    return read_attribute(:full_name) if !reload && read_attribute(:full_name)
+    return super() if !reload && super()
 
     folder = self
     names = [name]

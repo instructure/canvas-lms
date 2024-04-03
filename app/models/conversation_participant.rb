@@ -399,7 +399,7 @@ class ConversationParticipant < ActiveRecord::Base
   end
 
   def starred
-    read_attribute(:label) == "starred"
+    label == "starred"
   end
   alias_method :starred?, :starred
 
@@ -407,8 +407,7 @@ class ConversationParticipant < ActiveRecord::Base
     # if starred were an actual boolean column, this is the method that would
     # be used to convert strings to appropriate boolean values (e.g. 'true' =>
     # true and 'false' => false)
-    val = Canvas::Plugin.value_to_boolean(val)
-    write_attribute(:label, val ? "starred" : nil)
+    self.label = Canvas::Plugin.value_to_boolean(val) ? "starred" : nil
   end
 
   def one_on_one?
@@ -484,7 +483,7 @@ class ConversationParticipant < ActiveRecord::Base
   end
 
   def context_tags
-    read_attribute(:tags) ? tags.grep(/\A(course|group)_\d+\z/) : infer_tags
+    self["tags"] ? tags.grep(/\A(course|group)_\d+\z/) : infer_tags
   end
 
   def infer_tags

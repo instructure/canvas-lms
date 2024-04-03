@@ -86,7 +86,7 @@ module SimpleTags
 
     def serialize_tags
       if @tag_array
-        write_attribute(:tags, serialized_tags)
+        self["tags"] = serialized_tags
         remove_instance_variable :@tag_array
       end
     end

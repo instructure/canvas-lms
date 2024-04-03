@@ -29,7 +29,7 @@ module StickySisFields
                                      calculate_currently_stuck_sis_fields
                                    end
       if load_stuck_sis_fields_cache != currently_stuck_sis_fields
-        write_attribute(:stuck_sis_fields, currently_stuck_sis_fields.map(&:to_s).sort.join(","))
+        self["stuck_sis_fields"] = currently_stuck_sis_fields.map(&:to_s).sort.join(",")
       end
       @stuck_sis_fields_cache = currently_stuck_sis_fields
       @sis_fields_to_stick = [].to_set
@@ -80,7 +80,7 @@ module StickySisFields
     private
 
     def load_stuck_sis_fields_cache
-      @stuck_sis_fields_cache ||= (read_attribute(:stuck_sis_fields) || "").split(",").to_set(&:to_sym)
+      @stuck_sis_fields_cache ||= (self["stuck_sis_fields"] || "").split(",").to_set(&:to_sym)
     end
 
     def calculate_currently_stuck_sis_fields

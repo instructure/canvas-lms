@@ -359,7 +359,7 @@ ActiveRecord::Base.class_eval do
       if options[:allow_nil] && !options[:allow_empty]
         before_validation do |record|
           args.each do |field|
-            record.write_attribute(field, nil) if record.read_attribute(field) == ""
+            record[field] = nil if record[field] == ""
           end
         end
       end

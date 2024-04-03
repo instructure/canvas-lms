@@ -321,12 +321,7 @@ class AssignmentOverride < ActiveRecord::Base
   end
 
   # override set read accessor and set_id read/write accessors so that reading
-  # set/set_id or setting set_id while set_type=ADHOC doesn't try and find the
-  # ADHOC model
-  def set_id
-    read_attribute(:set_id)
-  end
-
+  # set while set_type=ADHOC doesn't try and find the # ADHOC model
   def set
     case self.set_type
     when "ADHOC"
@@ -335,14 +330,6 @@ class AssignmentOverride < ActiveRecord::Base
       super
     else
       nil
-    end
-  end
-
-  def set_id=(id)
-    if ["ADHOC", SET_TYPE_NOOP].include? self.set_type
-      write_attribute(:set_id, id)
-    else
-      super
     end
   end
 
@@ -429,19 +416,19 @@ class AssignmentOverride < ActiveRecord::Base
     new_due_at = CanvasTime.fancy_midnight(new_due_at)
     new_all_day, new_all_day_date = Assignment.all_day_interpretation(
       due_at: new_due_at,
-      due_at_was: read_attribute(:due_at),
-      all_day_was: read_attribute(:all_day),
-      all_day_date_was: read_attribute(:all_day_date)
+      due_at_was: due_at,
+      all_day_was: all_day,
+      all_day_date_was: all_day_date
     )
 
-    write_attribute(:due_at, new_due_at)
-    write_attribute(:all_day, new_all_day)
-    write_attribute(:all_day_date, new_all_day_date)
+    super
+    self.all_day = new_all_day
+    self.all_day_date = new_all_day_date
   end
 
   def lock_at=(new_lock_at)
     new_lock_at = self.class.type_for_attribute(:lock_at).cast(new_lock_at) if new_lock_at.is_a?(String)
-    write_attribute(:lock_at, CanvasTime.fancy_midnight(new_lock_at))
+    super(CanvasTime.fancy_midnight(new_lock_at))
   end
 
   def availability_expired?
@@ -555,7 +542,7 @@ class AssignmentOverride < ActiveRecord::Base
   end
 
   def set_root_account_id
-    write_attribute(:root_account_id, root_account_id) unless read_attribute(:root_account_id)
+    self.root_account_id = root_account_id unless self[:root_account_id]
   end
 
   def sub_assignment_due_dates

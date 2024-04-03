@@ -106,7 +106,7 @@ class PluginSetting < ActiveRecord::Base
   end
 
   def enabled?
-    read_attribute(:disabled) != true
+    !disabled
   end
 
   def self.cached_plugin_setting(name)

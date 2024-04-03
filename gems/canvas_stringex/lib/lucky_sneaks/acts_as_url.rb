@@ -103,13 +103,13 @@ module LuckySneaks
       end
       url_owners = self.class.where(conditions).to_a
       if url_owners.empty?
-        write_attribute url_attribute, base_url
+        self[url_attribute] = base_url
       else
         n = 1
         while url_owners.detect { |u| u.send(url_attribute) == "#{base_url}-#{n}" }
           n = n.succ
         end
-        write_attribute url_attribute, "#{base_url}-#{n}"
+        self[url_attribute] = "#{base_url}-#{n}"
       end
     end
   end

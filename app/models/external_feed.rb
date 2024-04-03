@@ -56,7 +56,7 @@ class ExternalFeed < ActiveRecord::Base
   end
 
   def header_match=(str)
-    write_attribute(:header_match, str.to_s.strip.presence)
+    super(str.to_s.strip.presence)
   end
 
   scope :to_be_polled, lambda { |start|

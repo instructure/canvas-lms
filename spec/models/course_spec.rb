@@ -5953,7 +5953,7 @@ describe Course do
     it "generates a code on demand for existing self enrollment courses" do
       Course.where(id: @course).update_all(self_enrollment: true)
       c1.reload
-      expect(c1.read_attribute(:self_enrollment_code)).to be_nil
+      expect(c1["self_enrollment_code"]).to be_nil
       expect(c1.self_enrollment_code).not_to be_nil
       expect(c1.self_enrollment_code).to match(/\A[A-Z0-9]{6}\z/)
     end
@@ -5965,8 +5965,8 @@ describe Course do
     end
 
     before do
-      @course.write_attribute(:workflow_state, "available")
-      @course.write_attribute(:is_public, true)
+      @course.workflow_state = "available"
+      @course.is_public = true
     end
 
     it "can be read by a nil user if public and available" do
@@ -5974,14 +5974,14 @@ describe Course do
     end
 
     it "cannot be read by a nil user if public but not available" do
-      @course.write_attribute(:workflow_state, "created")
+      @course.workflow_state = "created"
       expect(@course.check_policy(nil)).to eq []
     end
 
     describe "when course is unpublished" do
       before do
-        @course.write_attribute(:workflow_state, "claimed")
-        @course.write_attribute(:is_public, false)
+        @course.workflow_state = "claimed"
+        @course.is_public = false
       end
 
       let_once(:user) { user_model }
@@ -5999,7 +5999,7 @@ describe Course do
 
     describe "when course is not public" do
       before do
-        @course.write_attribute(:is_public, false)
+        @course.is_public = false
       end
 
       let_once(:user) { user_model }

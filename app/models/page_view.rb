@@ -81,7 +81,7 @@ class PageView < ActiveRecord::Base
   end
 
   def url
-    url = read_attribute(:url)
+    url = super
     url && LoggingFilter.filter_uri(url)
   end
 

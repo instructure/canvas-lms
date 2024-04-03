@@ -293,9 +293,6 @@ Rails/OutputSafety:
 Rails/RakeEnvironment:
   Severity: convention
   AutoCorrect: false
-Rails/ReadWriteAttribute:
-  Enabled: false # accessors are often defined in terms of read_attribute
-  AutoCorrect: false
 Rails/TimeZone:
   Enabled: false
   AutoCorrect: false

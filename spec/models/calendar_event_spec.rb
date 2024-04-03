@@ -696,7 +696,6 @@ describe CalendarEvent do
 
       appointment.participants_per_appointment = 2
       appointment.save!
-      expect(appointment.read_attribute(:participants_per_limit)).to be_nil
       expect(appointment.override_participants_per_appointment?).to be_falsey
       expect(appointment.participants_per_appointment).to be 2
     end

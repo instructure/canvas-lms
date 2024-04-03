@@ -2055,7 +2055,7 @@ describe "Users API", type: :request do
             json = api_call(:put, @path, @path_options, { user: { pronouns: approved_pronoun } })
             expect(json["pronouns"]).to eq approved_pronoun
             expect(@student.reload.pronouns).to eq approved_pronoun
-            expect(@student.read_attribute(:pronouns)).to eq "he_him"
+            expect(@student["pronouns"]).to eq "he_him"
           end
 
           it "fixes the case when pronoun does not match default pronoun case" do
@@ -2064,7 +2064,7 @@ describe "Users API", type: :request do
             json = api_call(:put, @path, @path_options, { user: { pronouns: wrong_case_pronoun } })
             expect(json["pronouns"]).to eq expected_pronoun
             expect(@student.reload.pronouns).to eq expected_pronoun
-            expect(@student.read_attribute(:pronouns)).to eq "he_him"
+            expect(@student["pronouns"]).to eq "he_him"
           end
 
           it "fixes the case when pronoun does not match custom pronoun case" do
@@ -2077,7 +2077,7 @@ describe "Users API", type: :request do
             json = api_call(:put, @path, @path_options, { user: { pronouns: wrong_case_pronoun } })
             expect(json["pronouns"]).to eq expected_pronoun
             expect(@student.reload.pronouns).to eq expected_pronoun
-            expect(@student.read_attribute(:pronouns)).to eq expected_pronoun
+            expect(@student["pronouns"]).to eq expected_pronoun
           end
 
           it "does not update when pronoun is not approved" do

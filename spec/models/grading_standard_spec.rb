@@ -152,16 +152,16 @@ describe GradingStandard do
 
   it "upgrades in memory when accessing data" do
     standard = GradingStandard.new
-    standard.write_attribute(:data, @default_standard_v1)
-    standard.write_attribute(:version, 1)
+    standard["data"] = @default_standard_v1
+    standard.version = 1
     compare_schemes(standard.data, GradingStandard.default_grading_standard)
     expect(standard.version).to eq GradingStandard::VERSION
   end
 
   it "does not upgrade repeatedly when accessing data repeatedly" do
     standard = GradingStandard.new
-    standard.write_attribute(:data, @default_standard_v1)
-    standard.write_attribute(:version, 1)
+    standard["data"] = @default_standard_v1
+    standard.version = 1
     compare_schemes(standard.data, GradingStandard.default_grading_standard)
     compare_schemes(standard.data, GradingStandard.default_grading_standard)
     compare_schemes(standard.data, GradingStandard.default_grading_standard)

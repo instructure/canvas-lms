@@ -233,7 +233,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def discussion_type
-    read_attribute(:discussion_type) || DiscussionTypes::NOT_THREADED
+    super || DiscussionTypes::NOT_THREADED
   end
 
   def validate_draft_state_change
@@ -253,7 +253,7 @@ class DiscussionTopic < ActiveRecord::Base
       self.title = t("#discussion_topic.default_title", "No Title")
     end
 
-    d_type = read_attribute(:discussion_type)
+    d_type = self["discussion_type"]
     d_type ||= context.feature_enabled?("react_discussions_post") ? DiscussionTypes::THREADED : DiscussionTypes::NOT_THREADED
     self.discussion_type = d_type
 

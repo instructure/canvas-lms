@@ -110,7 +110,7 @@ describe ProfileController do
         put "update", params: { user: { pronouns: "  He/Him " } }, format: "json"
         expect(response).to be_successful
         @user.reload
-        expect(@user.read_attribute(:pronouns)).to eq "he_him"
+        expect(@user["pronouns"]).to eq "he_him"
         expect(@user.pronouns).to eq "He/Him"
       end
 

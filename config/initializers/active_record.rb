@@ -22,8 +22,6 @@ require "active_support/callbacks/suspension"
 class ActiveRecord::Base
   self.cache_timestamp_format = :usec
 
-  public :write_attribute
-
   class << self
     delegate :distinct_on, :find_ids_in_batches, :explain, to: :all
 
@@ -73,11 +71,6 @@ class ActiveRecord::Base
         connection.vacuum(table_name, analyze: true)
       end
     end
-  end
-
-  def read_or_initialize_attribute(attr_name, default_value)
-    # have to read the attribute again because serialized attributes in Rails 4.2 get duped
-    read_attribute(attr_name) || (write_attribute(attr_name, default_value) && read_attribute(attr_name))
   end
 
   alias_method :clone, :dup
@@ -206,8 +199,8 @@ class ActiveRecord::Base
         res = super
         if !res && #{string_version_name}.present?
           type, id = ActiveRecord::Base.parse_asset_string(#{string_version_name})
-          write_attribute(:#{association_version_name}_type, type)
-          write_attribute(:#{association_version_name}_id, id)
+          self["#{association_version_name}_type"] = type
+          self["#{association_version_name}_id"] = id
           res = super
         end
         res

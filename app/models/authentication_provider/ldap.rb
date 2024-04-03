@@ -86,7 +86,7 @@ class AuthenticationProvider::LDAP < AuthenticationProvider
   end
 
   def auth_over_tls
-    self.class.auth_over_tls_setting(read_attribute(:auth_over_tls), tls_required: account.feature_enabled?(:verify_ldap_certs))
+    self.class.auth_over_tls_setting(super, tls_required: account.feature_enabled?(:verify_ldap_certs))
   end
 
   def ldap_connection(verify_tls_certs: nil)

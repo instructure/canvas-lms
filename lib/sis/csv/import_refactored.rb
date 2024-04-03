@@ -249,11 +249,11 @@ module SIS
       rescue => e
         if !in_retry
           ensure_later = true
-          parallel_importer.write_attribute(:workflow_state, "retry")
+          parallel_importer.workflow_state = "retry"
           run_parallel_importer(parallel_importer, attempt:)
         elsif attempt < MAX_TRIES
           ensure_later = true
-          parallel_importer.write_attribute(:workflow_state, "queued")
+          parallel_importer.workflow_state = "queued"
           attempt += 1
           args = job_args(importer_type, attempt:)
           delay_if_production(**args).run_parallel_importer(parallel_importer, attempt:)

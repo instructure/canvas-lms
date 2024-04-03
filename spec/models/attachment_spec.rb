@@ -1075,7 +1075,7 @@ describe Attachment do
       new_a = a.clone_for(@course)
       expect(new_a.context).not_to eql(a.context)
       expect(new_a.filename).to eql(a.filename)
-      expect(new_a.read_attribute(:filename)).to be_nil
+      expect(new_a["filename"]).to be_nil
       expect(new_a.root_attachment_id).to eql(a.id)
     end
 
@@ -1869,10 +1869,10 @@ describe Attachment do
       Attachment.current_root_account = nil
       @a = Attachment.new(context: @course)
       expect(@a).to be_new_record
-      expect(@a.read_attribute(:namespace)).to be_nil
+      expect(@a["namespace"]).to be_nil
       expect(@a.namespace).not_to be_nil
       @a.set_root_account_id
-      expect(@a.read_attribute(:namespace)).not_to be_nil
+      expect(@a["namespace"]).not_to be_nil
       expect(@a.root_account_id).to eq @account.id
     end
 
@@ -1883,9 +1883,9 @@ describe Attachment do
       @attachment.context = @course
       @attachment.save!
       expect(@attachment).not_to be_new_record
-      expect(@attachment.read_attribute(:namespace)).to eq original_namespace
+      expect(@attachment["namespace"]).to eq original_namespace
       expect(@attachment.namespace).to eq original_namespace
-      expect(@attachment.read_attribute(:namespace)).to eq original_namespace
+      expect(@attachment["namespace"]).to eq original_namespace
     end
 
     context "sharding" do
@@ -2082,7 +2082,7 @@ describe Attachment do
       @root.make_childless(@child)
       expect(@root.reload.children).to eq []
       expect(@child.reload.root_attachment_id).to be_nil
-      expect(@child.read_attribute(:filename)).to eq @root.filename
+      expect(@child["filename"]).to eq @root.filename
     end
   end
 
@@ -2750,7 +2750,7 @@ describe Attachment do
 
         it "retires the existing attachment's filename" do
           @attachment.process_s3_details!({})
-          expect(@existing_attachment.reload.read_attribute(:filename)).to be_nil
+          expect(@existing_attachment.reload["filename"]).to be_nil
           expect(@existing_attachment.filename).to eq @attachment.filename
         end
 
