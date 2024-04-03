@@ -38,6 +38,9 @@
     annotation_context = @submission.annotation_context(attempt: @submission.attempt)
     preview_url_opts[:annotation_context] = annotation_context.launch_id
   end
+
+  react_discussions_post = @context.is_a?(Course) ? @context.feature_enabled?(:react_discussions_post) : @context.context.feature_enabled?(:react_discussions_post)
+  discussion_preview_div_style = react_discussions_post ? 'width: 100%' : 'width: 600px; margin: 10px auto;'
 %>
 
 <% css_bundle :submission %>
@@ -47,7 +50,7 @@
 
 <% provide :page_title do %><%= join_title @assignment.title, t("Submission Preview") %><% end %>
 <% if @assignment.submission_types == 'discussion_topic' && @assignment.discussion_topic %>
-  <div style="width: 600px; margin: 10px auto;">
+  <div style="<%= discussion_preview_div_style %>"
     <p>
       <% if assignment_visible_to_user = @assignment.visible_to_user?(@current_user)%>
         <% if @assignment.discussion_topic.for_group_discussion? && (group = @assignment.discussion_topic.group_category.group_for(@user)) %>
@@ -73,16 +76,30 @@
         <% end %>
       <% end %>
     </p>
-    <% @entries = @assignment.discussion_topic.discussion_entries.active.for_user(@user) %>
-    <% if @assignment.discussion_topic.for_group_discussion? %>
-      <% @entries = @assignment.discussion_topic.child_topics.map{|t| t.discussion_entries.active.for_user(@user) }.flatten.sort_by{|e| e.created_at} %>
+    <% is_group_discussion = @assignment.discussion_topic.for_group_discussion? 
+      @entries = is_group_discussion ? 
+        @assignment.discussion_topic.child_topics.map{ |t|t.discussion_entries.active.for_user(@user) }.flatten.sort_by{|e| e.created_at}  :
+        @assignment.discussion_topic.discussion_entries.active.for_user(@user)
+      discussion_iframe_src = is_group_discussion ?
+        context_url(@entries.first.discussion_topic.context, :context_discussion_topic_url, @entries.first.discussion_topic.id, :embed => true, :entry_id => @entries.first.id) :
+        context_url(@assignment.context, :context_discussion_topic_url, @assignment.discussion_topic.id, :embed => true, :entry_id => @entries.first.id) %>
+    <% if @assignment.context.feature_enabled?(:react_discussions_post) %>
+      <div class="ef-file-preview-stretch">
+        <iframe
+          id="discussion_preview_iframe"
+          title="<%= t "Graded discussion submission" %>"
+          src="<%= discussion_iframe_src %>"
+          class="ef-file-preview-frame">
+        </iframe>
+      </div>
+    <% else %>
+      <% @entries.each do |entry| %>
+        <%= render :partial => 'discussion_topics/entry', :object => entry, :locals => {:out_of_context => true, :skip_sub_entries => true, :link_to_headless => true, :hide_student_names => params[:hide_student_name], :assignment_visible_to_user => assignment_visible_to_user} %>
+      <% end %>
+      <div style="text-align: center; font-size: 1.2em; margin-top: 10px; display: none;">
+        <a href="<%= context_url(@assignment.context, :context_discussion_topic_url, @assignment.discussion_topic.id, :headless => 1, :combined => 1) %>" class="forward"><%= t('show_entire_discussion', 'Show the Entire Discussion') %></a>
+      </div>
     <% end %>
-    <% @entries.each do |entry| %>
-      <%= render :partial => 'discussion_topics/entry', :object => entry, :locals => {:out_of_context => true, :skip_sub_entries => true, :link_to_headless => true, :hide_student_names => params[:hide_student_name], :assignment_visible_to_user => assignment_visible_to_user} %>
-    <% end %>
-    <div style="text-align: center; font-size: 1.2em; margin-top: 10px; display: none;">
-      <a href="<%= context_url(@assignment.context, :context_discussion_topic_url, @assignment.discussion_topic.id, :headless => 1, :combined => 1) %>" class="forward"><%= t('show_entire_discussion', 'Show the Entire Discussion') %></a>
-    </div>
   </div>
 <% elsif @submission.submission_type == "online_url" %>
   <div style="text-align: center; width: 500px; margin: 10px auto; font-size: 0.8em;">
