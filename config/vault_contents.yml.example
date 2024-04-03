@@ -24,6 +24,7 @@ development:
 #     pandata_creds:
 #       canvas_key: 'INTERNAL_TEST'
 #       canvas_secret: 'internaltest'
+#       canvas_secret_alg: 'HS256'
 #      canvas_cdn_creds:
 #        aws_access_key_id: <access_key_id>
 #        aws_secret_access_key: <secret_access_key>
