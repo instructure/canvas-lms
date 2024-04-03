@@ -127,6 +127,9 @@ Rails/I18nLocaleTexts:
     - "**/spec_canvas/**/*.rb"
 Rails/NegateInclude:
   Enabled: false # exclude? isn't as intuitive as !include?
+Rails/NotNullColumn:
+  Enabled: false # it's perfectly reasonable to have a non-nullable column without a default.
+                 # _especially_ on references
 Rails/Present:
   UnlessBlank: false # allow `unless foo.blank?`
 Rails/RedundantPresenceValidationOnBelongsTo:
@@ -283,10 +286,6 @@ Rails/ApplicationMailer:
 Rails/BelongsTo:
   Severity: convention
   AutoCorrect: false
-Rails/BulkChangeTable:
-  Severity: convention
-Rails/CreateTableWithTimestamps:
-  Severity: convention
 Rails/Date:
   Enabled: false
   AutoCorrect: false
@@ -313,8 +312,6 @@ Rails/InverseOf:
   Severity: convention
 Rails/LexicallyScopedActionFilter:
   Severity: convention
-Rails/NotNullColumn:
-  Severity: convention
 Rails/Output:
   Severity: convention
   AutoCorrect: false
@@ -332,8 +329,6 @@ Rails/RakeEnvironment:
 Rails/ReadWriteAttribute:
   Enabled: false # accessors are often defined in terms of read_attribute
   AutoCorrect: false
-Rails/ReversibleMigration:
-  Severity: convention
 Rails/TimeZone:
   Enabled: false
   AutoCorrect: false
