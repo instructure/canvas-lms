@@ -1314,17 +1314,18 @@ class Attachment < ActiveRecord::Base
   end
 
   def to_atom(opts = {})
-    Atom::Entry.new do |entry|
-      entry.title     = t(:feed_title, "File: %{title}", title: context.name) unless opts[:include_context]
-      entry.title     = t(:feed_title_with_context, "File, %{course_or_group}: %{title}", course_or_group: context.name, title: context.name) if opts[:include_context]
-      entry.authors << Atom::Person.new(name: context.name)
-      entry.updated   = updated_at
-      entry.published = created_at
-      entry.id        = "tag:#{HostUrl.default_host},#{created_at.strftime("%Y-%m-%d")}:/files/#{feed_code}"
-      entry.links << Atom::Link.new(rel: "alternate",
-                                    href: "http://#{HostUrl.context_host(context)}/#{context_url_prefix}/files/#{id}")
-      entry.content = Atom::Content::Html.new(self.display_name.to_s)
-    end
+    title = t(:feed_title, "File: %{title}", title: context.name) unless opts[:include_context]
+    title = t(:feed_title_with_context, "File, %{course_or_group}: %{title}", course_or_group: context.name, title: context.name) if opts[:include_context]
+
+    {
+      title:,
+      author: context.name,
+      updated: updated_at,
+      published: created_at,
+      id: "tag:#{HostUrl.default_host},#{created_at.strftime("%Y-%m-%d")}:/files/#{feed_code}",
+      link: "http://#{HostUrl.context_host(context)}/#{context_url_prefix}/files/#{id}",
+      content: self.display_name.to_s,
+    }
   end
 
   def name

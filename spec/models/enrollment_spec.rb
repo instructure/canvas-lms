@@ -1563,11 +1563,11 @@ describe Enrollment do
 
   context "atom" do
     it "uses the course and user name to derive a title" do
-      expect(@enrollment.to_atom.title).to eql("#{@enrollment.user.name} in #{@enrollment.course.name}")
+      expect(@enrollment.to_atom[:title]).to eql("#{@enrollment.user.name} in #{@enrollment.course.name}")
     end
 
     it "links to the enrollment" do
-      link_path = @enrollment.to_atom.links.first.to_s
+      link_path = @enrollment.to_atom[:link]
       expect(link_path).to eql("/courses/#{@enrollment.course.id}/enrollments/#{@enrollment.id}")
     end
   end

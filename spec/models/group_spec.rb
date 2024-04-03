@@ -158,11 +158,11 @@ describe Group do
   context "atom" do
     it "has an atom name as it's own name" do
       group_model(name: "some unique name")
-      expect(@group.to_atom.title).to eql("some unique name")
+      expect(@group.to_atom[:title]).to eql("some unique name")
     end
 
     it "has a link to itself" do
-      link = @group.to_atom.links.first.to_s
+      link = @group.to_atom[:link]
       expect(link).to eql("/groups/#{@group.id}")
     end
   end

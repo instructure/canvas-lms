@@ -1290,13 +1290,12 @@ class Enrollment < ActiveRecord::Base
   end
 
   def to_atom
-    Atom::Entry.new do |entry|
-      entry.title     = t("#enrollment.title", "%{user_name} in %{course_name}", user_name:, course_name:)
-      entry.updated   = updated_at
-      entry.published = created_at
-      entry.links << Atom::Link.new(rel: "alternate",
-                                    href: "/courses/#{course.id}/enrollments/#{id}")
-    end
+    {
+      title: t("#enrollment.title", "%{user_name} in %{course_name}", user_name:, course_name:),
+      updated: updated_at,
+      published: created_at,
+      link: "/courses/#{course.id}/enrollments/#{id}"
+    }
   end
 
   set_policy do

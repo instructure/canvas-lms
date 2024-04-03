@@ -396,22 +396,23 @@ class DiscussionEntry < ActiveRecord::Base
 
   def to_atom(opts = {})
     author_name = user.present? ? user.name : t("atom_no_author", "No Author")
-    Atom::Entry.new do |entry|
-      subject = [discussion_topic.title]
-      subject << discussion_topic.context.name if opts[:include_context]
-      entry.title = if parent_id
-                      t "#subject_reply_to", "Re: %{subject}", subject: subject.to_sentence
-                    else
-                      subject.to_sentence
-                    end
-      entry.authors << Atom::Person.new(name: author_name)
-      entry.updated   = updated_at
-      entry.published = created_at
-      entry.id        = "tag:#{HostUrl.default_host},#{created_at.strftime("%Y-%m-%d")}:/discussion_entries/#{feed_code}"
-      entry.links << Atom::Link.new(rel: "alternate",
-                                    href: "http://#{HostUrl.context_host(discussion_topic.context)}/#{discussion_topic.context_prefix}/discussion_topics/#{discussion_topic_id}")
-      entry.content = Atom::Content::Html.new(message)
-    end
+    subject = [discussion_topic.title]
+    subject << discussion_topic.context.name if opts[:include_context]
+    title = if parent_id
+              t "#subject_reply_to", "Re: %{subject}", subject: subject.to_sentence
+            else
+              subject.to_sentence
+            end
+
+    {
+      title:,
+      author: author_name,
+      updated: updated_at,
+      published: created_at,
+      id: "tag:#{HostUrl.default_host},#{created_at.strftime("%Y-%m-%d")}:/discussion_entries/#{feed_code}",
+      link: "http://#{HostUrl.context_host(discussion_topic.context)}/#{discussion_topic.context_prefix}/discussion_topics/#{discussion_topic_id}",
+      content: message
+    }
   end
 
   delegate :context, to: :discussion_topic
