@@ -19,11 +19,15 @@
 import {z} from 'zod'
 import {executeQuery} from '@canvas/query/graphql'
 import gql from 'graphql-tag'
+import {omit} from 'lodash'
 
 const SUBMISSION_QUERY = gql`
   query SubmissionQuery($assignmentId: ID!, $userId: ID!) {
     assignment(id: $assignmentId) {
       id
+      name
+      gradingType
+      pointsPossible
       submissionsConnection(
         filter: {includeUnsubmitted: true, userId: $userId, applyGradebookEnrollmentFilters: true}
       ) {
@@ -63,23 +67,32 @@ const SUBMISSION_QUERY = gql`
               }
             }
           }
+          rubricAssessmentsConnection {
+            nodes {
+              _id
+              assessmentType
+              artifactAttempt
+              score
+              assessmentRatings {
+                ratingTag: _id
+                comments
+                points
+              }
+            }
+          }
         }
       }
-      name
-      gradingType
-      pointsPossible
     }
   }
 `
 
 function transform(result: any) {
-  if (result.assignment?.submissionsConnection?.nodes?.[0]) {
-    const submission = result.assignment?.submissionsConnection?.nodes?.[0]
-    const comments = submission?.commentsConnection?.nodes
-    delete submission?.commentsConnection
+  const submission = result.assignment?.submissionsConnection?.nodes?.[0]
+  if (submission) {
     return {
-      ...submission,
-      comments,
+      ...omit(submission, ['commentsConnection', 'rubricAssessmentsConnection']),
+      comments: submission?.commentsConnection?.nodes,
+      rubricAssessments: submission?.rubricAssessmentsConnection?.nodes,
     }
   }
   return null
