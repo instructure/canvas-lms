@@ -91,7 +91,11 @@ export const GradingSchemeViewCopyTemplateModal = ({
       showFlashSuccess(I18n.t('Grading scheme was successfully created.'))()
       if (onCreate) {
         // if parent supplied a callback method, inform parent that grading scheme was created
-        onCreate({title: createdGradingScheme.title, id: createdGradingScheme.id})
+        onCreate({
+          title: createdGradingScheme.title,
+          id: createdGradingScheme.id,
+          context_type: createdGradingScheme.context_type,
+        })
       }
     } catch (error) {
       showFlashError(I18n.t('There was an error while creating the grading scheme'))(error as Error)
