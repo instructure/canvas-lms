@@ -27,8 +27,6 @@ class Account < ActiveRecord::Base
   include SearchTermHelper
 
   INSTANCE_GUID_SUFFIX = "canvas-lms"
-  # a list of columns necessary for validation and save callbacks to work on a slim object
-  BASIC_COLUMNS_FOR_CALLBACKS = %i[id parent_account_id root_account_id name workflow_state settings account_calendar_subscription_type].freeze
   CALENDAR_SUBSCRIPTION_TYPES = %w[manual auto].freeze
 
   include Workflow
