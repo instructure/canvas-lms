@@ -64,13 +64,12 @@ class Wiki < ActiveRecord::Base
   end
 
   def to_atom
-    Atom::Entry.new do |entry|
-      entry.title     = title
-      entry.updated   = updated_at
-      entry.published = created_at
-      entry.links << Atom::Link.new(rel: "alternate",
-                                    href: "/wikis/#{id}")
-    end
+    {
+      title:,
+      updated: updated_at,
+      published: created_at,
+      link: "/wikis/#{id}"
+    }
   end
 
   def update_default_wiki_page_roles(new_roles, old_roles)

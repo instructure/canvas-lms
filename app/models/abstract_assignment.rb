@@ -1710,16 +1710,19 @@ class AbstractAssignment < ActiveRecord::Base
         </div>
       "
     end
-    Atom::Entry.new do |entry|
-      entry.title     = t(:feed_entry_title, "Assignment: %{assignment}", assignment: self.title) unless opts[:include_context]
-      entry.title     = t(:feed_entry_title_with_course, "Assignment, %{course}: %{assignment}", assignment: self.title, course: context.name) if opts[:include_context]
-      entry.updated   = updated_at.utc
-      entry.published = created_at.utc
-      entry.id        = "tag:#{HostUrl.default_host},#{created_at.strftime("%Y-%m-%d")}:/assignments/#{feed_code}_#{due_at.strftime("%Y-%m-%d-%H-%M") rescue "none"}"
-      entry.content   = Atom::Content::Html.new(content)
-      entry.links << Atom::Link.new(rel: "alternate", href: direct_link)
-      entry.authors << Atom::Person.new(name: author_name)
-    end
+
+    title = t(:feed_entry_title, "Assignment: %{assignment}", assignment: self.title) unless opts[:include_context]
+    title = t(:feed_entry_title_with_course, "Assignment, %{course}: %{assignment}", assignment: self.title, course: context.name) if opts[:include_context]
+
+    {
+      title:,
+      updated: updated_at.utc,
+      published: created_at.utc,
+      id: "tag:#{HostUrl.default_host},#{created_at.strftime("%Y-%m-%d")}:/assignments/#{feed_code}_#{due_at.strftime("%Y-%m-%d-%H-%M") rescue "none"}",
+      content:,
+      link: direct_link,
+      author: author_name
+    }
   end
 
   def start_at

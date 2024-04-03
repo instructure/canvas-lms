@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module AtomFeedHelper
+  ALLOWED_ENTRY_KEYS = %i[title author updated published id link content attachment_links].freeze
+
   def self.render_xml(title:, link:, entries:, updated: nil, id: nil, **kwargs)
     feed = Atom::Feed.new do |f|
       f.title = title
@@ -27,11 +29,29 @@ module AtomFeedHelper
     end
 
     entries.each do |e|
-      feed.entries << if block_given?
-                        e.to_atom(**yield(e))
-                      else
-                        e.to_atom(**kwargs)
-                      end
+      hash = if block_given?
+               e.to_atom(**yield(e))
+             else
+               e.to_atom(**kwargs)
+             end
+
+      raise "unknown key(s) found" unless (hash.keys - ALLOWED_ENTRY_KEYS).empty?
+
+      feed.entries << Atom::Entry.new do |entry|
+        entry.title = hash[:title] if hash.key?(:title)
+        entry.authors << Atom::Person.new(name: hash[:author]) if hash.key?(:author)
+        entry.updated = hash[:updated] if hash.key?(:updated)
+        entry.published = hash[:published] if hash.key?(:published)
+        entry.id = hash[:id] if hash.key?(:id)
+        entry.links << Atom::Link.new(rel: "alternate", href: hash[:link]) if hash.key?(:link)
+        entry.content = Atom::Content::Html.new(hash[:content]) if hash.key?(:content)
+
+        if hash.key?(:attachment_links)
+          hash[:attachment_links].each do |href|
+            entry.links << Atom::Link.new(rel: "enclosure", href:)
+          end
+        end
+      end
     end
 
     feed.to_xml
