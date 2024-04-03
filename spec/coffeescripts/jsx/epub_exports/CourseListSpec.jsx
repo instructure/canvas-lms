@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {mount} from 'enzyme'
+import {render} from '@testing-library/react'
 import CourseList from 'ui/features/epub_exports/react/CourseList'
 
 QUnit.module('CourseListSpec', {
@@ -36,13 +36,13 @@ QUnit.module('CourseListSpec', {
 })
 
 test('render', function () {
-  let component = mount(<CourseList courses={{}} />)
-  equal(component.find('li').length, 0, 'should not render list items')
+  let component = render(<CourseList courses={{}} />)
+  equal(component.container.querySelectorAll('li').length, 0, 'should not render list items')
   component.unmount()
 
-  component = mount(<CourseList courses={this.props} />)
+  component = render(<CourseList courses={this.props} />)
   equal(
-    component.find('li').length,
+    component.container.querySelectorAll('li').length,
     Object.keys(this.props).length,
     'should have an li element per course in @props'
   )
