@@ -34,6 +34,17 @@ admin_analytics:
   after_state_change_proc: analytics_2_after_state_change_hook
   root_opt_in: true
   beta: false
+admin_analytics_dap_model:
+  state: hidden
+  applies_to: Account
+  display_name: Admin Analytics DAP
+  description:
+    wrapper: <a href="https://community.canvaslms.com/t5/Admin-Analytics-Hub/gh-p/admin_analytics">\1</a>
+    admin_analytics_dap_model_description: Enables the use of DAP for Analytics at the account-level.
+  after_state_change_proc: analytics_2_after_state_change_hook
+  root_opt_in: true
+  beta: true
+  shadow: true
 
 # Advanced Analytics - Provided through K20 LTI App
 k20_course_readiness_alpha_testing:
