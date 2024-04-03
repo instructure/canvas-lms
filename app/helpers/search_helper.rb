@@ -99,7 +99,7 @@ module SearchHelper
             state: group.active? ? :active : :inactive,
             parent: (group.context_type == "Course") ? { course: group.context_id } : nil,
             context_name: (group_context || group.context).name,
-            category: group.category
+            category: group.group_category&.name
           }.tap do |hash|
             hash[:permissions] =
               if include_all_permissions

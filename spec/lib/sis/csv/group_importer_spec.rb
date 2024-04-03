@@ -201,7 +201,7 @@ describe SIS::CSV::GroupImporter do
       expect(course.groups.count do |g|
         # when a group_category is not defined, the group is
         # automatically assigned to "Student Groups"
-        g.category == "Student Groups"
+        g.group_category.name == "Student Groups"
       end).to eq 3
 
       group_categories = GroupCategory.where(context_id: course_sis_id)
@@ -228,7 +228,7 @@ describe SIS::CSV::GroupImporter do
       expect(course.group_categories.count).to eq 1
       expect(course.groups.count).to eq 3
       expect(course.groups.count do |g|
-        g.category == "Student Groups"
+        g.group_category.name == "Student Groups"
       end).to eq 3
 
       group_categories.each do |gc|
@@ -253,7 +253,7 @@ describe SIS::CSV::GroupImporter do
       expect(new_course.group_categories.count).to eq 1
       expect(new_course.groups.count).to eq 3
       expect(new_course.groups.count do |g|
-        g.category == "Student Groups"
+        g.group_category.name == "Student Groups"
       end).to eq 3
 
       group_categories.each do |gc|

@@ -6768,19 +6768,6 @@ describe Assignment do
     end
   end
 
-  it "maintains the deprecated group_category attribute" do
-    assignment = assignment_model(course: @course)
-    expect(assignment.read_attribute(:group_category)).to be_nil
-    assignment.group_category = assignment.context.group_categories.create(name: "my category")
-    assignment.save
-    assignment.reload
-    expect(assignment.read_attribute(:group_category)).to eql("my category")
-    assignment.group_category = nil
-    assignment.save
-    assignment.reload
-    expect(assignment.read_attribute(:group_category)).to be_nil
-  end
-
   it "provides has_group_category?" do
     assignment = assignment_model(course: @course)
     expect(assignment.has_group_category?).to be_falsey
