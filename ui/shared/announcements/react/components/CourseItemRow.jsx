@@ -185,7 +185,7 @@ export default class CourseItemRow extends Component {
       <a className="ic-item-row__content-link" ref={refFn} href={this.props.itemUrl}>
         <div
           className="ic-item-row__content-link-container"
-          data-testId="single-announcement-test-id"
+          data-testid="single-announcement-test-id"
         >
           {component}
         </div>

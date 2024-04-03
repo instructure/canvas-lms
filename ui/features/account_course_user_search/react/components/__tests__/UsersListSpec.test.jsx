@@ -17,14 +17,16 @@
  */
 
 import React from 'react'
-import {mount, shallow} from 'enzyme'
-import UsersList from 'ui/features/account_course_user_search/react/components/UsersList'
-import UsersListRow from 'ui/features/account_course_user_search/react/components/UsersListRow'
+import {render} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import {shallow} from 'enzyme'
+import UsersList from '../UsersList'
+import UsersListRow from '../UsersListRow'
 import fetchMock from 'fetch-mock'
 import sinon from 'sinon'
 
-QUnit.module('Account Course User Search UsersList View', function (hooks) {
-  hooks.beforeEach(() => {
+describe('Account Course User Search UsersList View', function (hooks) {
+  beforeEach(() => {
     fetchMock.mock(
       '/api/v1/users/1/enrollments?state%5B%5D=active&state%5B%5D=invited&temporary_enrollment_providers=true',
       {
@@ -34,7 +36,7 @@ QUnit.module('Account Course User Search UsersList View', function (hooks) {
     )
   })
 
-  hooks.afterEach(() => {
+  afterEach(() => {
     fetchMock.restore()
   })
 
@@ -44,24 +46,26 @@ QUnit.module('Account Course User Search UsersList View', function (hooks) {
       {
         id: '1',
         name: 'UserA',
+        short_name: 'UserA',
+        sortable_name: 'UserA',
         avatar_url: 'http://someurl',
       },
       {
         id: '2',
         name: 'UserB',
+        short_name: 'UserB',
+        sortable_name: 'UserB',
         avatar_url: 'http://someurl',
       },
       {
         id: '3',
         name: 'UserC',
+        short_name: 'UserC',
+        sortable_name: 'UserC',
         avatar_url: 'http://someurl',
       },
     ],
-    handlers: {
-      handleOpenEditUserDialog() {},
-      handleSubmitEditUserForm() {},
-      handleCloseEditUserDialog() {},
-    },
+    handleSubmitEditUserForm: jest.fn(),
     permissions: {
       can_masquerade: true,
       can_message_users: true,
@@ -75,16 +79,16 @@ QUnit.module('Account Course User Search UsersList View', function (hooks) {
     onUpdateFilters: sinon.spy(),
     onApplyFilters: sinon.spy(),
     sortColumnHeaderRef: sinon.spy(),
-    roles: {},
+    roles: [],
   }
 
-  test('displays users that are passed in as props', () => {
+  it('displays users that are passed in as props', () => {
     const wrapper = shallow(<UsersList {...usersProps} />)
     const nodes = wrapper.find(UsersListRow).getElements()
 
-    equal(nodes[0].props.user.name, 'UserA')
-    equal(nodes[1].props.user.name, 'UserB')
-    equal(nodes[2].props.user.name, 'UserC')
+    expect(nodes[0].props.user.name).toEqual('UserA')
+    expect(nodes[1].props.user.name).toEqual('UserB')
+    expect(nodes[2].props.user.name).toEqual('UserC')
   })
 
   Object.entries({
@@ -114,26 +118,20 @@ QUnit.module('Account Course User Search UsersList View', function (hooks) {
         },
       }
 
-      test(`sorting by ${columnID} ${sortOrder} puts ${expectedArrow}-arrow on ${label} only`, () => {
-        const wrapper = mount(<UsersList {...props} />)
-        equal(
-          wrapper.find(`IconMiniArrow${unexpectedArrow}Solid`).length,
-          0,
-          `no columns have an ${unexpectedArrow} arrow`
-        )
-        const icons = wrapper.find(`IconMiniArrow${expectedArrow}Solid`)
-        equal(icons.length, 1, `only one ${expectedArrow} arrow`)
-        const header = icons.closest('[data-testid="UsersListHeader"]')
-        ok(
-          header.find('Tooltip').first().prop('renderTip').match(RegExp(expectedTip, 'i')),
-          'has right tooltip'
-        )
-        ok(header.text().includes(label), `${label} is the one that has the ${expectedArrow} arrow`)
+      it(`sorting by ${columnID} ${sortOrder} puts ${expectedArrow}-arrow on ${label} only`, () => {
+        const wrapper = render(<UsersList {...props} />)
+        expect(wrapper.container.querySelectorAll(`[name="IconMiniArrow${unexpectedArrow}"]`).length).toEqual(0)
+        const icons = wrapper.container.querySelectorAll(`[name="IconMiniArrow${expectedArrow}"]`)
+        expect(icons.length).toEqual(1)
+        const header = icons[0].closest('[data-testid="UsersListHeader"]')
+        header.focus()
+        expect(wrapper.queryAllByText(expectedTip)).toBeTruthy()
+        expect(header.textContent.includes(label)).toBeTruthy()
       })
 
-      test(`clicking the ${label} column header calls onChangeSort with ${columnID}`, () => {
+      it(`clicking the ${label} column header calls onChangeSort with ${columnID}`, async () => {
         const sortSpy = sinon.spy()
-        const wrapper = mount(
+        const wrapper = render(
           <UsersList
             {...{
               ...props,
@@ -141,41 +139,41 @@ QUnit.module('Account Course User Search UsersList View', function (hooks) {
             }}
           />
         )
-        const header = wrapper
-          .find('[data-testid="UsersListHeader"]')
-          .filterWhere(n => n.text().includes(label))
-          .find('button')
-        header.simulate('click')
-        ok(sortSpy.calledOnce)
-        ok(
+        const header = Array.from(wrapper
+          .container.querySelectorAll('[data-testid="UsersListHeader"]'))
+          .filter(n => n.textContent.includes(label))[0].querySelector('button')
+        const user = userEvent.setup({delay: null})
+        await user.click(header)
+        expect(sortSpy.calledOnce).toBeTruthy()
+        expect(
           sortSpy.calledWith({
             search_term: 'User',
             sort: columnID,
             order: sortOrder === 'asc' ? 'desc' : 'asc',
             role_filter_id: undefined,
           })
-        )
+        ).toBeTruthy()
       })
     })
   })
 
-  test('component should not update if props do not change', () => {
+  it('component should not update if props do not change', () => {
     const instance = new UsersList(usersProps)
-    notOk(instance.shouldComponentUpdate({...usersProps}))
+    expect(instance.shouldComponentUpdate({...usersProps})).toBeFalsy()
   })
 
-  test('component should update if a prop is added', () => {
+  it('component should update if a prop is added', () => {
     const instance = new UsersList(usersProps)
-    ok(instance.shouldComponentUpdate({...usersProps, newProp: true}))
+    expect(instance.shouldComponentUpdate({...usersProps, newProp: true})).toBeTruthy()
   })
 
-  test('component should update if a prop is changed', () => {
+  it('component should update if a prop is changed', () => {
     const instance = new UsersList(usersProps)
-    ok(instance.shouldComponentUpdate({...usersProps, users: {}}))
+    expect(instance.shouldComponentUpdate({...usersProps, users: {}})).toBeTruthy()
   })
 
-  test('component should not update if only the searchFilter prop is changed', () => {
+  it('component should not update if only the searchFilter prop is changed', () => {
     const instance = new UsersList(usersProps)
-    notOk(instance.shouldComponentUpdate({...usersProps, searchFilter: {}}))
+    expect(instance.shouldComponentUpdate({...usersProps, searchFilter: {}})).toBeFalsy()
   })
 })
