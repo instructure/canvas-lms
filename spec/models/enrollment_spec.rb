@@ -994,19 +994,15 @@ describe Enrollment do
           expect(@enrollment.graded_at).to eq score.updated_at
         end
 
-        it "uses the graded_at attribute if no associated score object exists" do
-          expect(@enrollment.graded_at).to eq @enrollment.read_attribute(:graded_at)
-        end
-
         it "ignores grading period scores" do
           @enrollment.scores.create!(current_score: 80.3, grading_period: period)
-          expect(@enrollment.graded_at).to eq @enrollment.read_attribute(:graded_at)
+          expect(@enrollment.graded_at).to be_nil
         end
 
         it "ignores soft-deleted scores" do
           score = @enrollment.scores.create!(current_score: 80.3)
           score.destroy
-          expect(@enrollment.graded_at).to eq @enrollment.read_attribute(:graded_at)
+          expect(@enrollment.graded_at).to be_nil
         end
       end
 

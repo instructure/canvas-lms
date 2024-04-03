@@ -27,6 +27,8 @@ class Enrollment < ActiveRecord::Base
     "ObserverEnrollment" => "observer"
   }.freeze
 
+  self.ignored_columns += ["graded_at"]
+
   include Workflow
 
   belongs_to :course, inverse_of: :enrollments
@@ -1209,14 +1211,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def graded_at
-    score = find_score
-    if score.present?
-      score.updated_at
-    else
-      # TODO: drop the graded_at column after the data fixup to populate
-      # the scores table completes
-      read_attribute(:graded_at)
-    end
+    find_score&.updated_at
   end
 
   def self.typed_enrollment(type)
