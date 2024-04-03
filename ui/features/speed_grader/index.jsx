@@ -25,6 +25,7 @@ import speedGrader from './jquery/speed_grader'
 import {getCurrentTheme} from '@instructure/theme-registry'
 import {captureException} from '@sentry/browser'
 import {getAssignment} from './queries/assignmentQuery'
+import {getCourse} from './queries/courseQuery'
 import {getSectionsByAssignment} from './queries/sectionsByAssignmentQuery'
 import {getSubmission} from './queries/submissionQuery'
 import {getSubmissionsByAssignment} from './queries/submissionsByAssignmentQuery'
@@ -47,6 +48,7 @@ ready(() => {
         module.render(mountPoint, {
           theme,
           queries: {
+            getCourse,
             getAssignment,
             getSubmission,
             getSubmissionsByAssignment,
