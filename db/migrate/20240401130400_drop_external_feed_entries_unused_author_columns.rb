@@ -21,8 +21,10 @@ class DropExternalFeedEntriesUnusedAuthorColumns < ActiveRecord::Migration[7.0]
   tag :postdeploy
 
   def change
-    remove_column :external_feed_entries, :author_email, :string, limit: 255, if_exists: true
-    remove_column :external_feed_entries, :author_name, :string, limit: 255, if_exists: true
-    remove_column :external_feed_entries, :author_url, :text, if_exists: true
+    change_table :external_feed_entries, bulk: true do |t|
+      t.remove :author_email, type: :string, limit: 255
+      t.remove :author_name, type: :string, limit: 255
+      t.remove :author_url, type: :text
+    end
   end
 end
