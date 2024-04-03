@@ -587,21 +587,6 @@ describe Group do
     expect(hash["group"]["group_category"]).to eq "Something"
   end
 
-  it "maintains the deprecated category attribute" do
-    course = course_model
-    group = course.groups.create
-    default_category = GroupCategory.student_organized_for(course)
-    expect(group.read_attribute(:category)).to eql(default_category.name)
-    group.group_category = group.context.group_categories.create(name: "my category")
-    group.save
-    group.reload
-    expect(group.read_attribute(:category)).to eql("my category")
-    group.group_category = nil
-    group.save
-    group.reload
-    expect(group.read_attribute(:category)).to eql(default_category.name)
-  end
-
   context "has_common_section?" do
     it "is false for accounts" do
       account = Account.default

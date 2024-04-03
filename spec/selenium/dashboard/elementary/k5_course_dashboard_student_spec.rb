@@ -191,7 +191,7 @@ describe "student k5 course dashboard" do
       titles_list = group_titles_text_list
       expect(titles_list.count).to eq(2)
       expect(titles_list.first).to match(@group1.name)
-      expect(titles_list.first).to match(@group1.category)
+      expect(titles_list.first).to match(@group1.group_category.name)
     end
 
     it "allows student to join group" do
