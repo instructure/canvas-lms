@@ -19,102 +19,110 @@
 import $ from 'jquery'
 import 'jquery-migrate'
 import React from 'react'
-import {mount} from 'enzyme'
-import AddExternalToolButton from 'ui/features/external_apps/react/components/AddExternalToolButton'
+import {render, screen} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import AddExternalToolButton from '../AddExternalToolButton'
 
-QUnit.module('AddExternalToolButton', suiteHooks => {
-  let server
-  let wrapper
-
-  suiteHooks.beforeEach(() => {
-    server = sinon.fakeServer.create()
-    sinon.spy($, 'flashErrorSafe')
+describe('AddExternalToolButton', () => {
+  beforeEach(() => {
+    jest.spyOn($, 'flashErrorSafe')
+    userEvent.setup()
   })
 
-  suiteHooks.afterEach(() => {
-    wrapper.setState({modalIsOpen: false}) // close the modal, if open
-    $.flashErrorSafe.restore()
-    server.restore()
-    wrapper.unmount()
+  afterEach(() => {
+    $.flashErrorSafe.mockRestore()
   })
-
-  function mountComponent(props) {
-    wrapper = mount(<AddExternalToolButton {...props} />)
-  }
 
   test('renders the duplicate confirmation form when "duplicateTool" is true', () => {
-    mountComponent({duplicateTool: true, modalIsOpen: true})
-    strictEqual(document.querySelectorAll('#duplicate-confirmation-form').length, 1)
+    render(<AddExternalToolButton duplicateTool={true} modalIsOpen={true} />)
+    expect(screen.getByText(/This tool has already been installed/)).toBeInTheDocument()
   })
 
-  QUnit.module('#handleLti2ToolInstalled()', () => {
+  describe('handleLti2ToolInstalled()', () => {
     test('displays a flash message from the tool when there is an error', () => {
-      mountComponent()
+      const ref = React.createRef()
+      render(<AddExternalToolButton ref={ref} />)
       const toolData = {
         message: {html: 'Something bad happened'},
         status: 'failure',
       }
-      wrapper.instance().handleLti2ToolInstalled(toolData)
-      strictEqual($.flashErrorSafe.callCount, 1)
+      ref.current.handleLti2ToolInstalled(toolData)
+      expect($.flashErrorSafe).toHaveBeenCalledTimes(1)
     })
 
     test('displays the message included with the error', () => {
-      mountComponent()
+      const ref = React.createRef()
+      render(<AddExternalToolButton ref={ref} />)
       const toolData = {
         message: 'Something bad happened',
         status: 'failure',
       }
-      wrapper.instance().handleLti2ToolInstalled(toolData)
-      const [message] = $.flashErrorSafe.lastCall.args
-      equal(message, 'Something bad happened')
+      ref.current.handleLti2ToolInstalled(toolData)
+      const [message] = $.flashErrorSafe.mock.lastCall
+      expect(message).toBe('Something bad happened')
     })
 
     test('displays a default flash message when the error does not include a message', () => {
-      mountComponent()
+      const ref = React.createRef()
+      render(<AddExternalToolButton ref={ref} />)
       const toolData = {
         status: 'failure',
       }
-      wrapper.instance().handleLti2ToolInstalled(toolData)
-      const [message] = $.flashErrorSafe.lastCall.args
-      equal(message, 'There was an unknown error registering the tool')
+      ref.current.handleLti2ToolInstalled(toolData)
+      const [message] = $.flashErrorSafe.mock.lastCall
+      expect(message).toBe('There was an unknown error registering the tool')
     })
   })
 
-  QUnit.module('when not using LTI2 registration', () => {
+  describe('when not using LTI2 registration', () => {
     test('hides the configuration form once registration begins', () => {
-      mountComponent({isLti2: false, modalIsOpen: true})
-      const element = document.querySelector('#lti2-iframe-container')
-      const style = window.getComputedStyle(element)
-      equal(style.getPropertyValue('display'), 'none')
+      render(<AddExternalToolButton isLti2={false} modalIsOpen={true} />)
+      const element = screen.getByTestId('lti2-iframe-container')
+      expect(element).toHaveStyle({display: 'none'})
     })
 
-    test('submits the configuration form to the launch iframe for LTI2', () => {
-      mountComponent({isLti2: false, modalIsOpen: true})
+    test('submits the configuration form to the launch iframe for LTI2', async () => {
+      const ref = React.createRef()
+      render(
+        <AddExternalToolButton
+          isLti2={false}
+          modalIsOpen={true}
+          ref={ref}
+          configurationType="lti2"
+        />
+      )
+      await userEvent.selectOptions(
+        screen.getByRole('combobox', {name: /Configuration Type/i}),
+        'By LTI 2 Registration URL'
+      )
       const registrationUrl = 'http://www.instructure.com/register'
-      const iframeDouble = {submit: sinon.spy()}
-      const launchButton = document.querySelector('#submitExternalAppBtn')
-      launchButton.closest = sinon.stub()
-      launchButton.closest.withArgs('form').returns(iframeDouble)
-      wrapper.instance().createTool('lti2', {registrationUrl}, {currentTarget: launchButton})
-      strictEqual(iframeDouble.submit.callCount, 1)
+      const iframeDouble = {submit: jest.fn()}
+      const launchButton = screen.getByText(/Launch Registration Tool/i)
+      // This is a disgrace and should be fixed but would require a huge rewrite of the components,
+      // so here we are.
+      launchButton.closest = jest.fn()
+      launchButton.closest.mockReturnValue(iframeDouble)
+      ref.current.createTool('lti2', {registrationUrl}, {currentTarget: launchButton})
+      expect(iframeDouble.submit).toHaveBeenCalledTimes(1)
     })
   })
 
-  QUnit.module('when using LTI2 registration', () => {
+  describe('when using LTI2 registration', () => {
     test('includes close button in footer', () => {
-      mountComponent({isLti2: true, modalIsOpen: true})
-      strictEqual(document.querySelectorAll('#footer-close-button').length, 1)
+      render(<AddExternalToolButton isLti2={true} modalIsOpen={true} />)
+      expect(screen.getByTestId('lti2-close-button')).toBeInTheDocument()
     })
 
     test('renders a tool launch iframe for LTI2', () => {
-      mountComponent({isLti2: true, modalIsOpen: true})
-      strictEqual(document.querySelectorAll('#lti2-iframe-container').length, 1)
+      render(<AddExternalToolButton isLti2={true} modalIsOpen={true} />)
+      expect(screen.getByTestId('lti2-iframe-container')).toBeInTheDocument()
     })
   })
 
-  QUnit.module('#_errorHandler()', () => {
+  describe('_errorHandler()', () => {
     test('returns a message for invalid configuration url', () => {
-      mountComponent({configurationType: 'url'})
+      const ref = React.createRef()
+      render(<AddExternalToolButton configurationType="url" ref={ref} />)
       const xhr = {
         responseText: JSON.stringify({
           errors: {
@@ -142,11 +150,12 @@ QUnit.module('AddExternalToolButton', suiteHooks => {
           },
         }),
       }
-      equal(wrapper.instance()._errorHandler(xhr), 'Invalid Config URL')
+      expect(ref.current._errorHandler(xhr)).toBe('Invalid Config URL')
     })
 
     test('returns a message for invalid XML configuration', () => {
-      mountComponent({configurationType: 'xml'})
+      const ref = React.createRef()
+      render(<AddExternalToolButton configurationType="xml" ref={ref} />)
       const xhr = {
         responseText: JSON.stringify({
           errors: {
@@ -167,11 +176,12 @@ QUnit.module('AddExternalToolButton', suiteHooks => {
           },
         }),
       }
-      equal(wrapper.instance()._errorHandler(xhr), 'Invalid XML Configuration')
+      expect(ref.current._errorHandler(xhr)).toBe('Invalid XML Configuration')
     })
 
     test('returns a message for url or domain not being set', () => {
-      mountComponent()
+      const ref = React.createRef()
+      render(<AddExternalToolButton ref={ref} />)
       const xhr = {
         responseText: JSON.stringify({
           errors: {
@@ -192,22 +202,31 @@ QUnit.module('AddExternalToolButton', suiteHooks => {
           },
         }),
       }
-      equal(wrapper.instance()._errorHandler(xhr), 'Either the url or domain should be set.')
+      expect(ref.current._errorHandler(xhr)).toBe('Either the url or domain should be set.')
     })
 
     test('returns a default error message when handling an unspecified error', () => {
-      mountComponent()
+      const ref = React.createRef()
+      render(<AddExternalToolButton ref={ref} />)
       const xhr = {
         responseText: JSON.stringify({
           errors: [{message: 'An error occurred.', error_code: 'internal_server_error'}],
           error_report_id: 8,
         }),
       }
-      equal(wrapper.instance()._errorHandler(xhr), 'We were unable to add the app.')
+      expect(ref.current._errorHandler(xhr)).toBe('We were unable to add the app.')
     })
 
     test('renders the duplicate confirmation form when duplicate tool response is received', () => {
-      mountComponent({modalIsOpen: true, duplicateTool: true, configurationType: 'xml'})
+      const ref = React.createRef()
+      render(
+        <AddExternalToolButton
+          modalIsOpen={true}
+          duplicateTool={true}
+          configurationType="xml"
+          ref={ref}
+        />
+      )
       const xhr = {
         responseText: JSON.stringify({
           errors: {
@@ -220,8 +239,8 @@ QUnit.module('AddExternalToolButton', suiteHooks => {
           },
         }),
       }
-      wrapper.instance()._errorHandler(xhr)
-      strictEqual(document.querySelectorAll('#duplicate-confirmation-form').length, 1)
+      ref.current._errorHandler(xhr)
+      expect(screen.getByText(/This tool has already been installed/)).toBeInTheDocument()
     })
   })
 })

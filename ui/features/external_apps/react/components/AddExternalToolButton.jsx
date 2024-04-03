@@ -288,7 +288,12 @@ export default class AddExternalToolButton extends React.Component {
           >
             <div className="ReactModal__Footer">
               <div id="footer-close-button" className="ReactModal__Footer-Actions">
-                <button type="button" className="Button" onClick={this.closeModal}>
+                <button
+                  type="button"
+                  className="Button"
+                  onClick={this.closeModal}
+                  data-testid="lti2-close-button"
+                >
                   {I18n.t('Close')}
                 </button>
               </div>

@@ -164,7 +164,9 @@ export default class ConfigureExternalToolButton extends React.Component {
         >
           <Modal.Body>{this.renderIframe()}</Modal.Body>
           <Modal.Footer>
-            <Button onClick={this.closeModal}>{I18n.t('Close')}</Button>
+            <Button onClick={this.closeModal} data-testid="close-modal-button">
+              {I18n.t('Close')}
+            </Button>
           </Modal.Footer>
         </Modal>
       </li>

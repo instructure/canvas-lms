@@ -105,7 +105,11 @@ export default class Lti2Iframe extends React.Component {
     const afterAlertStyles = `after_external_content_info_alert ${this.state.afterExternalContentAlertClass}`
 
     return (
-      <div id="lti2-iframe-container" style={this.props.hideComponent ? {display: 'none'} : {}}>
+      <div
+        id="lti2-iframe-container"
+        style={this.props.hideComponent ? {display: 'none'} : {}}
+        data-testid="lti2-iframe-container"
+      >
         <div className="ReactModal__Body" style={{padding: '0px !important', overflow: 'auto'}}>
           <div
             onFocus={this.handleAlertFocus}
