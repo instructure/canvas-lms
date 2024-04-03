@@ -17,26 +17,23 @@
  */
 
 import React from 'react'
-import {mount} from 'enzyme'
-import Lti2Permissions from 'ui/features/external_apps/react/components/Lti2Permissions'
+import Lti2Permissions from '../Lti2Permissions'
+import {render, screen} from '@testing-library/react'
 
-QUnit.module('ExternalApps.Lti2Permissions')
+describe('Lti2Permissions', () => {
+  test('renders', () => {
+    const tool = {
+      app_id: 3,
+      app_type: 'Lti::ToolProxy',
+      description: null,
+      enabled: false,
+      installed_locally: true,
+      name: 'Twitter',
+    }
+    render(
+      <Lti2Permissions tool={tool} handleCancelLti2={jest.fn()} handleActivateLti2={jest.fn()} />
+    )
 
-test('renders', () => {
-  ok(
-    mount(
-      <Lti2Permissions
-        tool={{
-          app_id: 3,
-          app_type: 'Lti::ToolProxy',
-          description: null,
-          enabled: false,
-          installed_locally: true,
-          name: 'Twitter',
-        }}
-        handleCancelLti2={() => {}}
-        handleActivateLti2={() => {}}
-      />
-    ).exists()
-  )
+    expect(screen.getByText(/Would you like to enable this app\?/i)).toBeInTheDocument()
+  })
 })

@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {func, object, string} from 'prop-types'
+import {func, object, string, oneOfType, bool} from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
@@ -64,7 +64,7 @@ DuplicateConfirmationForm.propTypes = {
   onCancel: func.isRequired,
   onSuccess: func.isRequired,
   onError: func.isRequired,
-  forceSaveTool: func,
+  forceSaveTool: oneOfType([func, bool]),
   toolData: object.isRequired,
   configurationType: string.isRequired,
   store: object.isRequired,
