@@ -158,7 +158,7 @@ describe PandataEvents do
     context "when PandataEvents is enabled" do
       let(:enabled) { true }
 
-      it "enqueues post_event in a job" do
+      it "calls post_event in a thread" do
         subject
         expect(PandataEvents).to have_received(:post_event).with(event_type, data, sub)
       end
@@ -170,6 +170,24 @@ describe PandataEvents do
       it "does nothing" do
         subject
         expect(PandataEvents).not_to have_received(:post_event)
+      end
+    end
+
+    context "when thread fails" do
+      let(:enabled) { true }
+
+      before do
+        allow(Thread).to receive(:new).and_raise(ThreadError)
+        allow(InstStatsd::Statsd).to receive(:increment).and_return(nil)
+      end
+
+      it "logs to statsd" do
+        subject
+        expect(InstStatsd::Statsd).to have_received(:increment).with("pandata_events.error.queue_failure", tags: { event_type: })
+      end
+
+      it "swallows the error" do
+        expect { subject }.not_to raise_error
       end
     end
   end
