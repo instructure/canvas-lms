@@ -127,9 +127,6 @@ Rails/I18nLocaleTexts:
     - "**/spec_canvas/**/*.rb"
 Rails/NegateInclude:
   Enabled: false # exclude? isn't as intuitive as !include?
-Rails/NotNullColumn:
-  Enabled: false # it's perfectly reasonable to have a non-nullable column without a default.
-                 # _especially_ on references
 Rails/Present:
   UnlessBlank: false # allow `unless foo.blank?`
 Rails/RedundantPresenceValidationOnBelongsTo:
