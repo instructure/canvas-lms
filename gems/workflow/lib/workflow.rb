@@ -271,7 +271,7 @@ module Workflow
 
   module ActiveRecordInstanceMethods
     def load_workflow_state
-      read_attribute(:workflow_state)
+      self["workflow_state"]
     end
 
     # On transition the new workflow state is immediately saved in the
@@ -288,7 +288,7 @@ module Workflow
     # state. That's why it is important to save the string with the name of the
     # initial state in all the new records.
     def write_initial_state
-      write_attribute :workflow_state, current_state.to_s unless frozen?
+      self.workflow_state = current_state.to_s unless frozen?
     end
   end
 

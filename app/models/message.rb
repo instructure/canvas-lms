@@ -440,7 +440,7 @@ class Message < ActiveRecord::Base
   #
   # Returns nothing.
   def transmission_errors=(val)
-    write_attribute(:transmission_errors, val[0, self.class.maximum_text_length])
+    super(val[0, self.class.maximum_text_length])
   end
 
   # Public: Custom getter that delegates and caches notification category to

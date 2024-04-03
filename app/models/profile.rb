@@ -33,8 +33,8 @@ class Profile < ActiveRecord::Base
   validates :visibility, inclusion: { in: %w[public unlisted private] }
 
   def title=(title)
-    write_attribute(:title, title)
-    write_attribute(:path, infer_path) if path.nil?
+    super
+    self.path ||= infer_path
   end
 
   def infer_path
@@ -51,7 +51,7 @@ class Profile < ActiveRecord::Base
   end
 
   def data
-    read_or_initialize_attribute(:data, {})
+    self["data"] ||= {}
   end
 
   def data_before_type_cast # for validations and such

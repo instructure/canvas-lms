@@ -653,7 +653,7 @@ class AbstractAssignment < ActiveRecord::Base
     # remove the . if they put it on, and extra whitespace
     new_value.map! { |v| v.strip.delete_prefix(".").downcase } if new_value.is_a?(Array)
 
-    write_attribute(:allowed_extensions, new_value)
+    super
   end
 
   # ensure a root_account_id is set before validation so that we can
@@ -981,7 +981,7 @@ class AbstractAssignment < ActiveRecord::Base
         settings[key] = turnitin_settings[key] if turnitin_settings[key]
       end
     end
-    write_attribute :turnitin_settings, settings
+    self[:turnitin_settings] = settings
   end
 
   def create_in_vericite
@@ -1017,7 +1017,7 @@ class AbstractAssignment < ActiveRecord::Base
         settings[key] = turnitin_settings[key] if turnitin_settings[key]
       end
     end
-    write_attribute :turnitin_settings, settings
+    self[:turnitin_settings] = settings
   end
 
   def self.all_day_interpretation(opts = {})
@@ -1518,7 +1518,7 @@ class AbstractAssignment < ActiveRecord::Base
   end
 
   def time_zone_edited
-    CGI.unescapeHTML(read_attribute(:time_zone_edited) || "")
+    CGI.unescapeHTML(super || "")
   end
 
   def restore(from = nil)
@@ -1767,7 +1767,7 @@ class AbstractAssignment < ActiveRecord::Base
   end
 
   def all_day
-    read_attribute(:all_day) || (new_record? && !!due_at && (due_at.strftime("%H:%M") == "23:59" || due_at.strftime("%H:%M") == "00:00"))
+    super || (new_record? && !!due_at && (due_at.strftime("%H:%M") == "23:59" || due_at.strftime("%H:%M") == "00:00"))
   end
 
   def self.preload_context_module_tags(assignments, include_context_modules: false)
@@ -1913,7 +1913,7 @@ class AbstractAssignment < ActiveRecord::Base
   end
 
   def graded_count
-    return read_attribute(:graded_count).to_i if read_attribute(:graded_count)
+    return self["graded_count"].to_i if has_attribute?("graded_count")
 
     Rails.cache.fetch(["graded_count", self].cache_key) do
       submissions.graded.in_workflow_state("graded").count
@@ -1933,7 +1933,7 @@ class AbstractAssignment < ActiveRecord::Base
   attr_writer :has_submitted_submissions
 
   def submitted_count
-    return read_attribute(:submitted_count).to_i if read_attribute(:submitted_count)
+    return self["submitted_count"].to_i if has_attribute?("submitted_count")
 
     Rails.cache.fetch(["submitted_count", self].cache_key) do
       submissions.having_submission.count
@@ -3043,7 +3043,7 @@ class AbstractAssignment < ActiveRecord::Base
   end
 
   def peer_reviews_assign_at=(val)
-    write_attribute(:peer_reviews_due_at, val)
+    self.peer_reviews_due_at = val
   end
 
   def has_peer_reviews?

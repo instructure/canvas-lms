@@ -43,7 +43,7 @@ class Role < ActiveRecord::Base
 
       self.role = shard.activate do
         # Use `default_canvas_role` even though `default_role` sounds better since default_role is a rails method in rails >= 6.1
-        Role.get_role_by_id(read_attribute(:role_id)) || (respond_to?(:default_canvas_role) ? default_canvas_role : nil)
+        Role.get_role_by_id(role_id) || (respond_to?(:default_canvas_role) ? default_canvas_role : nil)
       end
     end
 

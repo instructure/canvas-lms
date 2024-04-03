@@ -579,7 +579,7 @@ class ContentExport < ActiveRecord::Base
   end
 
   def settings
-    read_or_initialize_attribute(:settings, {}.with_indifferent_access)
+    self["settings"] ||= {}.with_indifferent_access
   end
 
   def fast_update_progress(val)

@@ -267,7 +267,7 @@ describe StickySisFields do
   it "doesn't write to the database when there's not a change" do
     ac = create_abstract_course
     expect(ac.stuck_sis_fields).to eq [].to_set
-    expect(ac).not_to receive(:write_attribute).with(:stuck_sis_fields, anything)
+    expect(ac).not_to receive(:[]=).with(:stuck_sis_fields, anything)
     ac.save!
     ac.add_sis_stickiness(:name)
     ac.clear_sis_stickiness(:name)
@@ -277,11 +277,10 @@ describe StickySisFields do
   it "writes to the database when there's a change" do
     ac = create_abstract_course
     ac.add_sis_stickiness(:name)
-    expect(ac).to receive(:write_attribute).with(:workflow_state, "active")
-    allow(ac).to receive(:write_attribute).with("root_account_id", Account.default.id)
-    allow(ac).to receive(:write_attribute).with("account_id", Account.default.id)
-    allow(ac).to receive(:write_attribute).with("enrollment_term_id", Account.default.default_enrollment_term.id)
-    expect(ac).to receive(:write_attribute).with(:stuck_sis_fields, "name")
+    allow(ac).to receive(:[]=).with("root_account_id", Account.default.id)
+    allow(ac).to receive(:[]=).with("account_id", Account.default.id)
+    allow(ac).to receive(:[]=).with("enrollment_term_id", Account.default.default_enrollment_term.id)
+    expect(ac).to receive(:[]=).with("stuck_sis_fields", "name")
     ac.save!
   end
 

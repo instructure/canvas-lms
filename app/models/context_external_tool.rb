@@ -499,7 +499,7 @@ class ContextExternalTool < ActiveRecord::Base
   private :validate_url
 
   def settings
-    read_or_initialize_attribute(:settings, {}.with_indifferent_access)
+    self["settings"] ||= {}.with_indifferent_access
   end
 
   def label_for(key, lang = nil)
@@ -691,7 +691,7 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def not_selectable=(bool)
-    write_attribute(:not_selectable, Canvas::Plugin.value_to_boolean(bool))
+    super(Canvas::Plugin.value_to_boolean(bool))
   end
 
   def selectable
@@ -699,7 +699,7 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def shared_secret=(val)
-    write_attribute(:shared_secret, val) unless val.blank?
+    super unless val.blank?
   end
 
   def display_type(extension_type)

@@ -115,7 +115,7 @@ class AuthenticationProvider
     end
 
     def raw_login_attribute
-      read_attribute(:login_attribute).presence
+      self["login_attribute"].presence
     end
 
     def login_attribute

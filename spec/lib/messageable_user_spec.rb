@@ -40,7 +40,7 @@ describe "MessageableUser" do
                          .where(id: @student)
                          .group(MessageableUser.connection.group_by(*MessageableUser::COLUMNS))
                          .first
-      expect(messageable_user.send(:read_attribute, :common_courses))
+      expect(messageable_user.read_attribute(:common_courses))
         .to eq "course_column:role_column"
     end
 
@@ -56,7 +56,7 @@ describe "MessageableUser" do
                          .where(id: @ta.id)
                          .group(MessageableUser.connection.group_by(*MessageableUser::COLUMNS))
                          .first
-      expect(messageable_user.send(:read_attribute, :common_courses).split(",").sort)
+      expect(messageable_user.read_attribute(:common_courses).split(",").sort)
         .to eq ["course:StudentEnrollment", "course:TaEnrollment"]
     end
 
@@ -69,7 +69,7 @@ describe "MessageableUser" do
                          .where(id: @user)
                          .group(MessageableUser.connection.group_by(*MessageableUser::COLUMNS))
                          .first
-      expect(messageable_user.send(:read_attribute, :common_groups).split(",").map(&:to_i).sort)
+      expect(messageable_user.read_attribute(:common_groups).split(",").map(&:to_i).sort)
         .to eq [group1.id, group2.id].sort
     end
   end

@@ -75,7 +75,7 @@ class Conversation < ActiveRecord::Base
       workflow_state: "read",
       has_attachments: has_attachments?,
       has_media_objects: has_media_objects?,
-      root_account_ids: read_attribute(:root_account_ids)
+      root_account_ids: self["root_account_ids"]
     }.merge(options)
     ConversationParticipant.bulk_insert(user_ids.map do |user_id|
       options.merge({ user_id: })
@@ -189,7 +189,7 @@ class Conversation < ActiveRecord::Base
           # NOTE: individual messages in group conversations don't have tags
           self.class.connection.execute(sanitize_sql([<<~SQL.squish, id, current_user.id, user_ids]))
             INSERT INTO #{ConversationMessageParticipant.quoted_table_name}(conversation_message_id, conversation_participant_id, user_id, workflow_state, root_account_ids)
-            SELECT conversation_messages.id, conversation_participants.id, conversation_participants.user_id, 'active', '#{read_attribute(:root_account_ids)}'
+            SELECT conversation_messages.id, conversation_participants.id, conversation_participants.user_id, 'active', '#{self["root_account_ids"]}'
             FROM #{ConversationMessage.quoted_table_name}, #{ConversationParticipant.quoted_table_name}, #{ConversationMessageParticipant.quoted_table_name}
             WHERE conversation_messages.conversation_id = ?
               AND conversation_messages.conversation_id = conversation_participants.conversation_id
@@ -271,7 +271,7 @@ class Conversation < ActiveRecord::Base
       # ids have changed, but the participants' root_account_ids were not being set for
       # a long time so we set them all the time for fixing up purposes
       # add this check back in when the data is fixed or we decide to run a fixup.
-      options[:root_account_ids] = read_attribute(:root_account_ids) # if self.root_account_ids_changed?
+      options[:root_account_ids] = self["root_account_ids"] # if self.root_account_ids_changed?
       save! if new_tags.present? || root_account_ids_changed?
 
       # so we can take advantage of other preloaded associations
@@ -413,7 +413,7 @@ class Conversation < ActiveRecord::Base
             user_id: cp.user_id,
             tags: message_tags ? serialized_tags(message_tags) : nil,
             workflow_state: "active",
-            root_account_ids: read_attribute(:root_account_ids)
+            root_account_ids: self["root_account_ids"]
           }
         end
         # some of the participants we're about to insert may have been soft-deleted,
@@ -682,7 +682,7 @@ class Conversation < ActiveRecord::Base
   def update_root_account_ids
     if root_account_ids_changed?
       # ids must be sorted for the scope to work
-      latest_ids = read_attribute(:root_account_ids)
+      latest_ids = self["root_account_ids"]
       %w[conversation_participants conversation_messages conversation_message_participants].each do |assoc|
         scope = send(assoc).where("#{assoc}.root_account_ids IS DISTINCT FROM ?", latest_ids).limit(1_000)
         until scope.update_all(root_account_ids: latest_ids) < 1_000; end

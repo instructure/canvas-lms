@@ -88,7 +88,7 @@ class CommunicationChannel < ActiveRecord::Base
   # as TYPE_EMAIL.  It is just kept distinct for the purposes of customers
   # querying records in Canvas Data.
   def path_type
-    raw_value = read_attribute(:path_type)
+    raw_value = super
     return TYPE_EMAIL if raw_value == TYPE_PERSONAL_EMAIL
 
     raw_value

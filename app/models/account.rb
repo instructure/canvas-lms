@@ -181,7 +181,7 @@ class Account < ActiveRecord::Base
 
   time_zone_attribute :default_time_zone, default: "America/Denver"
   def default_time_zone
-    if read_attribute(:default_time_zone) || root_account?
+    if self["default_time_zone"] || root_account?
       super
     else
       root_account.default_time_zone
@@ -221,7 +221,7 @@ class Account < ActiveRecord::Base
   end
 
   def default_locale
-    result = read_attribute(:default_locale)
+    result = super
     result = nil unless I18n.locale_available?(result)
     result
   end
@@ -924,7 +924,7 @@ class Account < ActiveRecord::Base
   DEFAULT_STORAGE_QUOTA = 500.decimal_megabytes
 
   def quota
-    return storage_quota if read_attribute(:storage_quote)
+    return storage_quota if storage_quota
     return DEFAULT_STORAGE_QUOTA if root_account?
 
     shard.activate do
@@ -935,7 +935,7 @@ class Account < ActiveRecord::Base
   end
 
   def default_storage_quota
-    return super if read_attribute(:default_storage_quota)
+    return super if super
     return DEFAULT_STORAGE_QUOTA if root_account?
 
     shard.activate do
@@ -961,18 +961,17 @@ class Account < ActiveRecord::Base
     if parent_account && parent_account.default_storage_quota == val
       val = nil
     end
-    write_attribute(:default_storage_quota, val)
+    super
   end
 
   def default_user_storage_quota
-    read_attribute(:default_user_storage_quota) ||
-      User.default_storage_quota
+    super || User.default_storage_quota
   end
 
   def default_user_storage_quota=(val)
     val = val.to_i
     val = nil if val == User.default_storage_quota || val <= 0
-    write_attribute(:default_user_storage_quota, val)
+    super
   end
 
   def default_user_storage_quota_mb
@@ -984,7 +983,7 @@ class Account < ActiveRecord::Base
   end
 
   def default_group_storage_quota
-    return super if read_attribute(:default_group_storage_quota)
+    return super if super
     return Group.default_storage_quota if root_account?
 
     shard.activate do
@@ -1000,7 +999,7 @@ class Account < ActiveRecord::Base
        (parent_account && parent_account.default_group_storage_quota == val)
       val = nil
     end
-    write_attribute(:default_group_storage_quota, val)
+    super
   end
 
   def default_group_storage_quota_mb
@@ -1874,7 +1873,7 @@ class Account < ActiveRecord::Base
   end
 
   def current_sis_batch
-    if (current_sis_batch_id = read_attribute(:current_sis_batch_id)) && current_sis_batch_id.present?
+    if current_sis_batch_id.present?
       sis_batches.where(id: current_sis_batch_id).first
     end
   end

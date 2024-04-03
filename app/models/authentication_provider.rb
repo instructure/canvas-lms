@@ -197,7 +197,7 @@ class AuthenticationProvider < ActiveRecord::Base
   end
 
   def settings
-    read_attribute(:settings) || {}
+    super || {}
   end
 
   def federated_attributes=(value)

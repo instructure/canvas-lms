@@ -406,7 +406,7 @@ class Attachment < ActiveRecord::Base
         copy_attachment_content(dup)
       end
     end
-    dup.write_attribute(:filename, filename) unless dup.read_attribute(:filename) || dup.root_attachment_id?
+    dup["filename"] ||= filename unless dup.root_attachment_id?
     dup.migration_id = options[:migration_id]
     dup.mark_as_importing!(options[:migration]) if options[:migration]
     dup.shard.activate do
@@ -547,7 +547,7 @@ class Attachment < ActiveRecord::Base
       # are docx files than assuming they're zip files
       self.content_type = "application/vnd.openxmlformats-officedocument.wordprocessingml.document" if content_type&.include?("zip")
       ext = extension
-      write_attribute(:filename, filename + ext) unless ext == ".unknown"
+      self["filename"] = filename + ext unless ext == ".unknown"
     end
   end
 
@@ -577,7 +577,7 @@ class Attachment < ActiveRecord::Base
         send(:"#{key}=", root_attachment.send(key))
       end
       self.workflow_state = "processed"
-      write_attribute(:filename, root_attachment.filename)
+      self.filename = root_attachment.filename
     end
     self.context = folder.context if folder && (!context || (context.respond_to?(:is_a_context?) && context.is_a_context?))
 
@@ -626,7 +626,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def namespace
-    read_attribute(:namespace) || (new_record? ? write_attribute(:namespace, infer_namespace) : nil)
+    super || (new_record? ? self.namespace = infer_namespace : nil)
   end
 
   def infer_namespace
@@ -656,7 +656,7 @@ class Attachment < ActiveRecord::Base
     return if new_namespace == namespace
 
     old_full_filename = full_filename
-    write_attribute(:namespace, new_namespace)
+    self.namespace = new_namespace
 
     store.change_namespace(old_full_filename)
     shard.activate do
@@ -681,13 +681,13 @@ class Attachment < ActiveRecord::Base
           # have this attachment inherit from the existing attachment.
           s3object.delete rescue nil
           self.root_attachment = existing_attachment
-          write_attribute(:filename, nil)
+          self["filename"] = nil
         else
           # it looks like we had a duplicate, but the existing attachment doesn't
           # actually have an s3object (probably from an earlier bug). update it
           # and all its inheritors to inherit instead from this attachment.
           existing_attachment.root_attachment = self
-          existing_attachment.write_attribute(:filename, nil)
+          existing_attachment["filename"] = nil
           existing_attachment.save!
           Attachment.where(root_attachment_id: existing_attachment).update_all(
             root_attachment_id: id,
@@ -1169,6 +1169,8 @@ class Attachment < ActiveRecord::Base
   end
 
   def self.truncate_filename(filename, max_len, &block)
+    return nil unless filename
+
     block ||= ->(str, len) { str[0...len] }
     ext_index = filename.rindex(".")
     if ext_index
@@ -1292,13 +1294,13 @@ class Attachment < ActiveRecord::Base
   end
 
   def filename
-    read_attribute(:filename) || root_attachment&.filename
+    super || root_attachment&.filename
   end
 
   def filename=(name)
     # infer a display name without round-tripping through truncated CGI-escaped filename
     # (which reduces the length of unicode filenames to as few as 28 characters)
-    self.display_name ||= Attachment.truncate_filename(name, 255)
+    self.display_name ||= Attachment.truncate_filename(name, 255) if name
     super
   end
 
@@ -1926,16 +1928,16 @@ class Attachment < ActiveRecord::Base
     raise "must have been sent to purgatory first" unless p
     raise "purgatory record has expired" if p.workflow_state == "expired"
 
-    write_attribute(:filename, p.old_filename)
-    write_attribute(:display_name, p.old_display_name)
-    write_attribute(:content_type, p.old_content_type)
-    write_attribute(:root_attachment_id, nil)
-    write_attribute(:file_state, p.old_file_state) if p.old_file_state
-    write_attribute(:workflow_state, p.old_workflow_state) if p.old_workflow_state
+    self["filename"] = p.old_filename
+    self.display_name = p.old_display_name
+    self["content_type"] = p.old_content_type
+    self.root_attachment_id = nil
+    self.file_state = p.old_file_state if p.old_file_state
+    self.workflow_state = p.old_workflow_state if p.old_workflow_state
 
     if InstFS.enabled? && p.new_instfs_uuid
       # just set it to the copied uuid, shouldn't get deleted when expired since we'll set p to 'restored'
-      write_attribute(:instfs_uuid, p.new_instfs_uuid)
+      self.instfs_uuid = p.new_instfs_uuid
     elsif Attachment.s3_storage?
       old_s3object = bucket.object(purgatory_filename)
       raise Attachment::FileDoesNotExist unless old_s3object.exists?
@@ -2027,7 +2029,7 @@ class Attachment < ActiveRecord::Base
       Attachment.where(id: destination).update_all(file_state: "broken")
       return
     end
-    destination.write_attribute(:filename, filename) if filename
+    destination["filename"] = filename if filename
     if service_side_clone(destination)
       destination.content_type ||= content_type
       destination.size = size

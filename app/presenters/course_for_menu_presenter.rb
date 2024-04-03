@@ -47,7 +47,7 @@ class CourseForMenuPresenter
       originalName: course.name,
       courseCode: course.course_code,
       assetString: course.asset_string,
-      href: course_path(course, invitation: course.read_attribute(:invitation)),
+      href: course_path(course, invitation: course["invitation"]),
       term: term || nil,
       subtitle:,
       enrollmentState: course.primary_enrollment_state,

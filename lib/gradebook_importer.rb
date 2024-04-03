@@ -34,6 +34,7 @@ class GradebookImporter
     moderated_grading
     grades_published_at
     final_grader_id
+    workflow_state
   ].freeze
 
   class NegativeId
@@ -199,7 +200,7 @@ class GradebookImporter
 
     @original_submissions = @context.submissions
                                     .preload(:grading_period, assignment: { context: :account })
-                                    .select(["submissions.id", :assignment_id, :user_id, :grading_period_id, :score, :excused, :cached_due_date, :course_id, "submissions.updated_at"])
+                                    .select(:id, :assignment_id, :user_id, :grading_period_id, :score, :excused, :cached_due_date, :course_id, :updated_at, :workflow_state)
                                     .where(assignment_id: assignment_ids, user_id: user_ids)
                                     .map do |submission|
       is_gradeable = gradeable?(submission:, is_admin:)

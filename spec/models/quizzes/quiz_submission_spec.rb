@@ -347,7 +347,7 @@ describe Quizzes::QuizSubmission do
 
       expect(q.workflow_state).to eql("complete")
       expect(q.state).to be(:complete)
-      q.write_attribute(:submission_data, [])
+      q.submission_data = []
       res = false
       begin
         res = Quizzes::SubmissionGrader.new(q).grade_submission
