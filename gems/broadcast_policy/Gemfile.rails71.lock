@@ -28,7 +28,6 @@ GEM
       activerecord (>= 5.2)
     base64 (0.2.0)
     bigdecimal (3.1.7)
-    coderay (1.1.3)
     concurrent-ruby (1.2.3)
     connection_pool (2.4.1)
     debug (1.9.2)
@@ -42,12 +41,8 @@ GEM
     irb (1.12.0)
       rdoc
       reline (>= 0.4.2)
-    method_source (1.0.0)
     minitest (5.22.3)
     mutex_m (0.2.0)
-    pry (0.14.2)
-      coderay (~> 1.1)
-      method_source (~> 1.0)
     psych (5.1.2)
       stringio
     rdoc (6.6.3.1)
@@ -82,7 +77,6 @@ PLATFORMS
 DEPENDENCIES
   broadcast_policy!
   debug
-  pry
   rspec (~> 3.12)
 
 RUBY VERSION
