@@ -25,6 +25,12 @@ import {SECTIONS_DATA, STUDENTS_DATA} from '../../__tests__/mocks'
 
 const USER_EVENT_OPTIONS = {pointerEventsCheck: PointerEventsCheckLevel.Never, delay: null}
 
+// Mock the showFlashError that occurs when an itemType is not supported.
+jest.mock('@canvas/alerts/react/FlashAlert', () => ({
+  ...jest.requireActual('@canvas/alerts/react/FlashAlert'),
+  showFlashError: jest.fn(() => jest.fn()),
+}))
+
 describe('ItemAssignToTray', () => {
   const props: ItemAssignToTrayProps = {
     open: true,
@@ -123,23 +129,44 @@ describe('ItemAssignToTray', () => {
     render(<ItemAssignToTray {...props} {...overrides} />)
 
   it('renders', async () => {
-    const {getByText, getByLabelText, findAllByTestId} = renderComponent()
+    const {getByTestId, getByText, getByLabelText, findAllByTestId} = renderComponent()
     expect(getByText('Item Name')).toBeInTheDocument()
     expect(getByText('Assignment | 10 pts')).toBeInTheDocument()
     expect(getByLabelText('Edit assignment Item Name')).toBeInTheDocument()
     // the tray is mocking an api response that makes 2 cards
     const cards = await findAllByTestId('item-assign-to-card')
     expect(cards).toHaveLength(2)
+    const icon = getByTestId('icon-assignment')
+    expect(icon).toBeInTheDocument()
   })
 
   it('renders a quiz', () => {
-    const {getByText} = renderComponent({itemType: 'quiz', iconType: 'quiz'})
+    const {getByTestId, getByText} = renderComponent({itemType: 'quiz', iconType: 'quiz'})
     expect(getByText('Quiz | 10 pts')).toBeInTheDocument()
+    const icon = getByTestId('icon-quiz')
+    expect(icon).toBeInTheDocument()
   })
 
   it('renders a new quiz', () => {
-    const {getByText} = renderComponent({itemType: 'lti-quiz', iconType: 'lti-quiz'})
+    const {getByTestId, getByText} = renderComponent({itemType: 'lti-quiz', iconType: 'lti-quiz'})
     expect(getByText('Quiz | 10 pts')).toBeInTheDocument()
+    const icon = getByTestId('icon-lti-quiz')
+    expect(icon).toBeInTheDocument()
+  })
+
+  it('renders a discussion', () => {
+    // When discussions API are supported, this test should fail and this section should be removed
+    fetchMock.get('/', {
+      status: 404,
+      body: {error: 'UnSupported item type'},
+    })
+    const {getByTestId, getByText} = renderComponent({
+      itemType: 'discussion',
+      iconType: 'discussion',
+    })
+    expect(getByText('Discussion | 10 pts')).toBeInTheDocument()
+    const icon = getByTestId('icon-discussion')
+    expect(icon).toBeInTheDocument()
   })
 
   it('renders Save button', () => {
