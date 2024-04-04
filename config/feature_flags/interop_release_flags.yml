@@ -194,8 +194,21 @@ lti_log_launches:
   display_name: Log LTI launches
   shadow: true
   description: |-
-    When enabled, sends data for all LTI launches to the PandataEvents system
-    for querying and visualization.
+    When enabled for an account, sends data for all LTI launches to the PandataEvents system
+    for querying and visualization. Requires Log LTI launches (Site Admin) to also be enabled.
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
+lti_log_launches_site_admin:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Log LTI launches (Site Admin)
+  shadow: true
+  description: |-
+    Allows for quickly enabling or disabling LTI launch logging while rolling out
+    at the account level.
   environments:
     development:
       state: allowed_on

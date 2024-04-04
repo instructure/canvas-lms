@@ -56,7 +56,7 @@ describe Lti::LogService do
       allow(service).to receive(:log_data).and_return(data)
     end
 
-    context "when flag is disabled" do
+    context "when account-level flag is disabled" do
       before do
         account.disable_feature!(:lti_log_launches)
       end
@@ -67,9 +67,21 @@ describe Lti::LogService do
       end
     end
 
-    context "when flag is enabled" do
+    context "when site-admin-level flag is disabled" do
+      before do
+        Account.site_admin.disable_feature!(:lti_log_launches_site_admin)
+      end
+
+      it "does not send an event to PandataEvents" do
+        subject
+        expect(PandataEvents).not_to have_received(:send_event)
+      end
+    end
+
+    context "when both flags are enabled" do
       before do
         account.enable_feature!(:lti_log_launches)
+        Account.site_admin.enable_feature!(:lti_log_launches_site_admin)
       end
 
       it "sends an event to PandataEvents" do

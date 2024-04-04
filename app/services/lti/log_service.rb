@@ -40,6 +40,7 @@ module Lti
 
     def call
       return unless @context.root_account.feature_enabled?(:lti_log_launches)
+      return unless Account.site_admin.feature_enabled?(:lti_log_launches_site_admin)
 
       PandataEvents.send_event(:lti_launch, log_data, for_user_id: @user&.global_id)
     end
