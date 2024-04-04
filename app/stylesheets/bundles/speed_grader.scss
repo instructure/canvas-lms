@@ -983,6 +983,52 @@ figure {
   margin: 0;
 }
 
+.transparent-bg {
+  background: transparent;
+}
+
+.borderless {
+  border: none;
+}
+
+#new-studio-media-indicator {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 2px 8px;
+  gap: 6px;
+  background: #DDECF5;
+  border-radius: 4px;
+  flex: 0 0;
+  margin-right: 4px;
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
+.speech-recognition {
+  display: flex;
+  align-items: center;
+}
+
+#new-studio-media-indicator-wrapper {
+  display: flex;
+  align-items: center;
+  button {
+    flex: 1 0;
+    width: 37px;
+  }
+}
+
+.m-left-auto {
+  margin-#{direction(left)}: auto;
+}
+
+.r-margin-0 {
+  margin-#{direction(right)}: 0 !important;
+}
+
 // even though we show no headers in speed grader, we want the
 // masquerade bar to always show if someone is masquerading
 // (#masquerade_bar is set to 'display: none !important' for
