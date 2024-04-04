@@ -21,39 +21,49 @@ module AtomFeedHelper
   ALLOWED_ENTRY_KEYS = %i[title author updated published id link content attachment_links].freeze
 
   def self.render_xml(title:, link:, entries:, updated: nil, id: nil, **kwargs)
-    feed = Atom::Feed.new do |f|
-      f.title = title
-      f.links << Atom::Link.new(href: link, rel: "self")
-      f.updated = updated || Time.now
-      f.id = id || link
-    end
+    require "rss/maker"
 
-    entries.each do |e|
-      hash = if block_given?
-               e.to_atom(**yield(e))
-             else
-               e.to_atom(**kwargs)
-             end
+    content = RSS::Maker.make("atom") do |maker|
+      maker.channel.author = "author"
+      maker.channel.updated = updated ? updated.to_s : Time.now.to_s
+      maker.channel.about = id || link
+      maker.channel.title = title
+      maker.channel.links.new_link do |rss_link|
+        rss_link.href = link
+        rss_link.rel = "self"
+      end
 
-      raise "unknown key(s) found" unless (hash.keys - ALLOWED_ENTRY_KEYS).empty?
+      entries.each do |e|
+        hash = if block_given?
+                 e.to_atom(**yield(e))
+               else
+                 e.to_atom(**kwargs)
+               end
 
-      feed.entries << Atom::Entry.new do |entry|
-        entry.title = hash[:title] if hash.key?(:title)
-        entry.authors << Atom::Person.new(name: hash[:author]) if hash.key?(:author)
-        entry.updated = hash[:updated] if hash.key?(:updated)
-        entry.published = hash[:published] if hash.key?(:published)
-        entry.id = hash[:id] if hash.key?(:id)
-        entry.links << Atom::Link.new(rel: "alternate", href: hash[:link]) if hash.key?(:link)
-        entry.content = Atom::Content::Html.new(hash[:content]) if hash.key?(:content)
+        raise "unknown key(s) found" unless (hash.keys - ALLOWED_ENTRY_KEYS).empty?
 
-        if hash.key?(:attachment_links)
-          hash[:attachment_links].each do |href|
-            entry.links << Atom::Link.new(rel: "enclosure", href:)
+        maker.items.new_item do |item|
+          item.author = hash[:author] if hash.key?(:author)
+          item.link = hash[:link] if hash.key?(:link)
+          item.title = hash[:title] if hash.key?(:title)
+          item.updated = hash[:updated].to_s if hash.key?(:updated)
+          item.published = hash[:published].rfc3339.to_s if hash.key?(:published)
+          item.content.content = hash[:content] if hash.key?(:content)
+          item.content.type = "html" if hash.key?(:content)
+          item.id = hash[:id] if hash.key?(:id)
+
+          if hash.key?(:attachment_links)
+            hash[:attachment_links].each do |href|
+              item.links.new_link do |rss_link|
+                rss_link.href = href
+                rss_link.rel = "enclosure"
+              end
+            end
           end
         end
       end
     end
 
-    feed.to_xml
+    Nokogiri::XML(content.to_s)
   end
 end

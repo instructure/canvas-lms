@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "atom"
 require "crocodoc"
 
 # See the uploads controller and views for examples on how to use this model.

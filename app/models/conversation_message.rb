@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "atom"
-
 class ConversationMessage < ActiveRecord::Base
   include HtmlTextHelper
   include ConversationHelper

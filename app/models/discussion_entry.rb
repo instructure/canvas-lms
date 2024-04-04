@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "atom"
-
 class DiscussionEntry < ActiveRecord::Base
   # The maximum discussion entry threading depth that is allowed
   MAX_DEPTH = 50
