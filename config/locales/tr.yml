@@ -4645,6 +4645,7 @@ tr:
   comm_messages: 
     from_beginning: başlangıç
     to_now: şimdi
+  comment_7ef1428e: Yorum
   comment_by_replying_to_this_message_or_join_the_co_26d42fde: "Bu mesaja cevap yazarak yorum yapın veya %{link} bağlantısına tıklayarak karşılıklı konuşmaya katılın."
   comment_from_files: 
     one: "Ekli dosyaya bakın"
