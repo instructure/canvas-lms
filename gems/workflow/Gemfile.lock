@@ -22,7 +22,7 @@ GEM
     i18n (1.14.4)
       concurrent-ruby (~> 1.0)
     minitest (5.22.3)
-    rake (13.1.0)
+    rake (13.2.1)
     rspec (3.13.0)
       rspec-core (~> 3.13.0)
       rspec-expectations (~> 3.13.0)
