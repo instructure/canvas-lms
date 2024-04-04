@@ -133,7 +133,7 @@ GEM
       racc (~> 1.4)
     psych (5.1.2)
       stringio
-    public_suffix (5.0.4)
+    public_suffix (5.0.5)
     racc (1.7.3)
     rack (3.0.10)
     rack-session (2.0.0)

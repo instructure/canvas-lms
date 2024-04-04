@@ -53,7 +53,7 @@ GEM
     multipart-post (2.4.0)
     net-http (0.4.1)
       uri
-    public_suffix (5.0.4)
+    public_suffix (5.0.5)
     rake (13.1.0)
     rexml (3.2.6)
     rspec (3.13.0)
