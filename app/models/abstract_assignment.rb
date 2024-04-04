@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "atom"
 require "canvas/draft_state_validations"
 
 class AbstractAssignment < ActiveRecord::Base

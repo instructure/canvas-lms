@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "atom"
-
 # @API Groups
 #
 # Groups serve as the data for a few different ideas in Canvas.  The first is

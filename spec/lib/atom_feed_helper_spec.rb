@@ -27,7 +27,7 @@ end
 
 class SimpleModel
   def to_atom(entry_title:)
-    { title: entry_title }
+    { title: entry_title, link: "link", updated: Time.now }
   end
 end
 

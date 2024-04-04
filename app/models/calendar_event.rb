@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "atom"
 require "icalendar"
 
 Icalendar::Event.optional_property :x_alt_desc
