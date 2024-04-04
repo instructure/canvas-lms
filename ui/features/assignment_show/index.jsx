@@ -41,6 +41,7 @@ import ready from '@instructure/ready'
 import {monitorLtiMessages} from '@canvas/lti/jquery/messages'
 import ItemAssignToTray from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToTray'
 import {captureException} from '@sentry/browser'
+import ContentTypeExternalToolDrawer from '@canvas/trays/react/ContentTypeExternalToolDrawer'
 
 if (!('INST' in window)) window.INST = {}
 
@@ -223,6 +224,56 @@ function renderItemAssignToTray(open, returnFocusTo, itemProps) {
     document.getElementById('assign-to-mount-point')
   )
 }
+
+function renderDrawerLayout (tool, onDismiss) {
+  const mountPoint = document.getElementById('drawer-layout-mount-point')
+  const pageContent = document.getElementById('application')
+
+  if (!!mountPoint && !!pageContent) {
+    ReactDOM.render(
+      <ContentTypeExternalToolDrawer
+        tool={tool || null}
+        trayPlacement="end"
+        pageContent={pageContent}
+        pageContentTitle=""
+        pageContentMinWidth="40rem"
+        pageContentHeight={window.innerHeight}
+        acceptedResourceTypes={["assignment"]}
+        targetResourceType="assignment"
+        allowItemSelection={false}
+        selectableItems={[]}
+        onDismiss={onDismiss}
+        open={!!tool ? true : false}
+        placement="assignment_menu"
+        extraQueryParams=""
+      />,
+      mountPoint
+    )
+  }
+}
+
+ready(() => {
+  if (!document.getElementById('drawer-layout-mount-point')) { return }
+
+  let tool = null
+  const onDismiss = () => {
+    tool = null
+    renderDrawerLayout()
+  }
+
+  $('.menu_tool_link').on('click keyclick', function (event) {
+    event.preventDefault()
+    if (event != null && event.target.dataset.toolLaunchMethod === 'tray') {
+      tool = ENV.assignment_menu_tools.find(t => t.id === event.target.dataset.toolId)
+      if (tool) {
+        event.preventDefault()
+        renderDrawerLayout(tool, onDismiss)
+      }
+    }
+  })
+  window.addEventListener('resize', () => renderDrawerLayout(tool, onDismiss))
+  renderDrawerLayout(tool, onDismiss)
+})
 
 $('.assign-to-link').on('click keyclick', function (event) {
   event.preventDefault()
