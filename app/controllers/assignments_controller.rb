@@ -268,6 +268,9 @@ class AssignmentsController < ApplicationController
           return
         end
 
+        menu_tools = filtered_assignment_menu_tools
+        js_env(assignment_menu_tools: menu_tools) if menu_tools.present?
+
         # override media comment context: in the show action, these will be submissions
         js_env media_comment_asset_string: @current_user.asset_string if @current_user
 
@@ -456,7 +459,7 @@ class AssignmentsController < ApplicationController
         @can_direct_share = @context.grants_right?(@current_user, session, :direct_share)
         @can_link_to_speed_grader = Account.site_admin.feature_enabled?(:additional_speedgrader_links) && @assignment.can_view_speed_grader?(@current_user)
 
-        @assignment_menu_tools = external_tools_display_hashes(:assignment_menu)
+        @assignment_menu_tools = filtered_assignment_menu_tools
 
         @mark_done = MarkDonePresenter.new(self, @context, params["module_item_id"], @current_user, @assignment)
 
@@ -1184,5 +1187,22 @@ class AssignmentsController < ApplicationController
         override_course_and_term_dates: section.restrict_enrollments_to_section_dates
       }
     }
+  end
+
+  def filtered_assignment_menu_tools
+    tools = external_tools_display_hashes(:assignment_menu)
+    return tools unless tools.present? && @context.is_a?(Course)
+
+    # we do not support tray launch method on this page without the drawer
+    unless @domain_root_account&.feature_enabled?(:external_tool_drawer)
+      tools.reject! { |tool| tool[:launch_method] == "tray" }
+    end
+
+    # students should only see menu tools that launch in the tray
+    if context.user_is_student?(@current_user, include_fake_student: true, include_all: true)
+      tools.select! { |tool| tool[:launch_method] == "tray" }
+    end
+
+    tools.presence || []
   end
 end
