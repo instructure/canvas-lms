@@ -5180,6 +5180,7 @@ hu:
     from_beginning: "a kezdet"
     to_now: most
   comma_separated_list_of_users_sis_id_332c98f1: "A felhasználók SIS-azonosítóinak vesszővel tagolt listája"
+  comment_7ef1428e: Megjegyzés
   comment_added_33ab70d9: "Megjegyzés hozzáadva"
   comment_by_replying_to_this_message_or_join_the_co_52b5ac1c: "Adjon hozzá megjegyzéseket erre az üzenetre válaszolva, vagy csatlakozzon a beszélgetéshez ezt a linket követve: %{link}! Amikor engedélyezett, ha mellékletet kell csatolnia, kérjük, lépjen be a Canvas-ba, és válaszoljon a beszélgetésre!"
   comment_by_replying_to_this_message_or_join_the_co_886bc612: "Adjon hozzá megjegyzéseket erre az üzenetre válaszolva, vagy csatlakozzon a beszélgetéshez ezt a linket követve: %{link}! Amikor engedélyezett, ha mellékletet kell csatolnia, kérjük, lépjen be a Canvas-ba, és válaszoljon a közleményre!"
