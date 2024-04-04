@@ -32,6 +32,7 @@ import {
   IconQuizLine,
   IconQuizSolid,
   IconQuestionLine,
+  IconDiscussionLine,
 } from '@instructure/ui-icons'
 import {showFlashAlert, showFlashError} from '@canvas/alerts/react/FlashAlert'
 import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
@@ -59,13 +60,15 @@ const I18n = useI18nScope('differentiated_modules')
 function itemTypeToIcon(iconType: string) {
   switch (iconType) {
     case 'assignment':
-      return <IconAssignmentLine />
+      return <IconAssignmentLine data-testid="icon-assignment" />
     case 'quiz':
-      return <IconQuizLine />
+      return <IconQuizLine data-testid="icon-quiz" />
     case 'lti-quiz':
-      return <IconQuizSolid />
+      return <IconQuizSolid data-testid="icon-lti-quiz" />
+    case 'discussion':
+      return <IconDiscussionLine data-testid="icon-discussion" />
     default:
-      return <IconQuestionLine />
+      return <IconQuestionLine data-testid="icon-unknown" />
   }
 }
 
@@ -552,6 +555,8 @@ export default function ItemAssignToTray({
         return I18n.t('Quiz')
       case 'lti-quiz':
         return I18n.t('Quiz')
+      case 'discussion':
+        return I18n.t('Discussion')
       default:
         return ''
     }
