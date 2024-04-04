@@ -3455,6 +3455,7 @@ el:
   comm_messages: 
     from_beginning: "η αρχή"
     to_now: τώρα
+  comment_7ef1428e: Σχολιάστε
   comment_from_files: 
     one: "Δείτε το επισυναπτόμενο αρχείο"
     other: "Δείτε τα επισυναπτόμενα αρχεία"
