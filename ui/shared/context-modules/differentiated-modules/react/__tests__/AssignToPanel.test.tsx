@@ -35,6 +35,7 @@ jest.mock('../../utils/assignToHelper', () => {
 })
 
 const errorText = 'A student or section must be selected'
+const errorTooltipText = 'Please fix errors before continuing'
 
 describe('AssignToPanel', () => {
   const props: AssignToPanelProps = {
@@ -49,7 +50,7 @@ describe('AssignToPanel', () => {
 
   const ASSIGNMENT_OVERRIDES_URL = `/api/v1/courses/${props.courseId}/modules/${props.moduleId}/assignment_overrides`
   const SECTIONS_URL = `/api/v1/courses/${props.courseId}/sections`
-  const STUDENTS_URL = `api/v1/courses/${props.courseId}/users?enrollment_type=student`
+  const STUDENTS_URL = `/api/v1/courses/${props.courseId}/users?enrollment_type=student`
 
   beforeAll(() => {
     if (!document.getElementById('flash_screenreader_holder')) {
@@ -202,77 +203,121 @@ describe('AssignToPanel', () => {
     })
   })
 
-  it('does not display empty assignee error on open', async () => {
-    renderComponent()
-    const customOption = await screen.findByTestId('custom-option')
-    await userEvent.click(customOption)
-    await waitFor(() => expect(screen.queryByText(errorText)).toBeNull())
-  })
+  describe('error messages', () => {
+    it('does not display empty assignee error on open', async () => {
+      renderComponent()
+      const customOption = await screen.findByTestId('custom-option')
+      await userEvent.click(customOption)
+      await waitFor(() => expect(screen.queryByText(errorText)).toBeNull())
+    })
 
-  it('does display empty assignee error on blur', async () => {
-    renderComponent()
-    const customOption = await screen.findByTestId('custom-option')
-    await userEvent.click(customOption)
-    const assigneeSelector = await screen.findByTestId('assignee_selector')
-    await userEvent.click(assigneeSelector)
-    await userEvent.click(customOption)
-    expect(await screen.findByText(errorText)).toBeInTheDocument()
-  })
+    it('does display empty assignee error on blur', async () => {
+      renderComponent()
+      const customOption = await screen.findByTestId('custom-option')
+      await userEvent.click(customOption)
+      const assigneeSelector = await screen.findByTestId('assignee_selector')
+      await userEvent.click(assigneeSelector)
+      await userEvent.click(customOption)
+      expect(await screen.findByText(errorText)).toBeInTheDocument()
+    })
 
-  it('clears empty assignee error on selection', async () => {
-    renderComponent()
-    const customOption = await screen.findByTestId('custom-option')
-    await userEvent.click(customOption)
-    const assigneeSelector = await screen.findByTestId('assignee_selector')
-    await userEvent.click(assigneeSelector)
-    await userEvent.click(customOption)
-    expect(await screen.findByText(errorText)).toBeInTheDocument()
+    it('clears empty assignee error on selection', async () => {
+      renderComponent()
+      const customOption = await screen.findByTestId('custom-option')
+      await userEvent.click(customOption)
+      const assigneeSelector = await screen.findByTestId('assignee_selector')
+      await userEvent.click(assigneeSelector)
+      await userEvent.click(customOption)
+      expect(await screen.findByText(errorText)).toBeInTheDocument()
 
-    await userEvent.click(assigneeSelector)
-    const option = await screen.findByText(STUDENTS_DATA[0].name)
-    await userEvent.click(option)
-    await waitFor(() => expect(screen.queryByText(errorText)).toBeNull())
-  })
+      await userEvent.click(assigneeSelector)
+      const option = await screen.findByText(STUDENTS_DATA[0].name)
+      await userEvent.click(option)
+      await waitFor(() => expect(screen.queryByText(errorText)).toBeNull())
+    })
 
-  it('does not save when empty assignee error is displayed', async () => {
-    renderComponent()
-    const customOption = await screen.findByTestId('custom-option')
-    await userEvent.click(customOption)
-    const assigneeSelector = await screen.findByTestId('assignee_selector')
-    await userEvent.click(assigneeSelector)
-    await userEvent.click(customOption)
-    expect(await screen.findByText(errorText)).toBeInTheDocument()
-    const saveButton = screen.getByRole('button', {name: 'Save'})
-    await userEvent.click(saveButton)
-    expect(assigneeSelector).toHaveFocus()
-  })
+    it('clears empty assignee error when Everyone is selected', async () => {
+      renderComponent()
+      const customOption = await screen.findByTestId('custom-option')
+      await userEvent.click(customOption)
+      const assigneeSelector = await screen.findByTestId('assignee_selector')
+      await userEvent.click(assigneeSelector)
+      await userEvent.click(customOption)
+      expect(await screen.findByText(errorText)).toBeInTheDocument()
+      const saveButton = screen.getByRole('button', {name: 'Save'})
+      await userEvent.hover(saveButton)
+      expect(screen.getByText(errorTooltipText)).toBeInTheDocument()
 
-  it('displays empty assignee error on clearAll', async () => {
-    renderComponent()
-    const customOption = await screen.findByTestId('custom-option')
-    await userEvent.click(customOption)
-    const assigneeSelector = await screen.findByTestId('assignee_selector')
-    await userEvent.click(assigneeSelector)
+      const everyoneOption = await screen.findByTestId('everyone-option')
+      await userEvent.click(everyoneOption)
+      expect(screen.queryByText(errorText)).toBeNull()
+      await userEvent.hover(saveButton)
+      expect(screen.queryByText(errorTooltipText)).not.toBeInTheDocument()
+    })
 
-    const clearAllButton = screen.getByTestId('clear_selection_button')
-    await userEvent.click(clearAllButton)
-    expect(await screen.findByText(errorText)).toBeInTheDocument()
-  })
+    it('does not save when empty assignee error is displayed', async () => {
+      renderComponent()
+      const customOption = await screen.findByTestId('custom-option')
+      await userEvent.click(customOption)
+      const assigneeSelector = await screen.findByTestId('assignee_selector')
+      await userEvent.click(assigneeSelector)
+      await userEvent.click(customOption)
+      expect(await screen.findByText(errorText)).toBeInTheDocument()
+      const saveButton = screen.getByRole('button', {name: 'Save'})
+      await userEvent.click(saveButton)
+      expect(assigneeSelector).toHaveFocus()
+    })
 
-  it('displays empty assignee error after switching options', async () => {
-    renderComponent()
-    const customOption = await screen.findByTestId('custom-option')
-    await userEvent.click(customOption)
-    const assigneeSelector = await screen.findByTestId('assignee_selector')
-    await userEvent.click(assigneeSelector)
-    await userEvent.click(customOption)
-    expect(await screen.findByText(errorText)).toBeInTheDocument()
+    it('displays empty assignee error on clearAll', async () => {
+      renderComponent()
+      const customOption = await screen.findByTestId('custom-option')
+      await userEvent.click(customOption)
+      const assigneeSelector = await screen.findByTestId('assignee_selector')
+      await userEvent.click(assigneeSelector)
 
-    const everyoneOption = await screen.findByTestId('everyone-option')
-    await userEvent.click(everyoneOption)
-    expect(screen.queryByText(errorText)).toBeNull()
-    await userEvent.click(customOption)
-    expect(await screen.findByText(errorText)).toBeInTheDocument()
+      const clearAllButton = screen.getByTestId('clear_selection_button')
+      await userEvent.click(clearAllButton)
+      expect(await screen.findByText(errorText)).toBeInTheDocument()
+    })
+
+    it('displays empty assignee error on clearAll after component is rendered with pills', async () => {
+      fetchMock.getOnce(ASSIGNMENT_OVERRIDES_URL, ASSIGNMENT_OVERRIDES_DATA, {
+        overwriteRoutes: true,
+      })
+      renderComponent()
+      expect(await screen.findByTestId('custom-option')).toBeChecked()
+      const clearAllButton = screen.getByTestId('clear_selection_button')
+      await userEvent.click(clearAllButton)
+      expect(await screen.findByText(errorText)).toBeInTheDocument()
+    })
+
+    it('displays empty assignee error after switching options', async () => {
+      renderComponent()
+      const customOption = await screen.findByTestId('custom-option')
+      await userEvent.click(customOption)
+      const assigneeSelector = await screen.findByTestId('assignee_selector')
+      await userEvent.click(assigneeSelector)
+      await userEvent.click(customOption)
+      expect(await screen.findByText(errorText)).toBeInTheDocument()
+
+      const everyoneOption = await screen.findByTestId('everyone-option')
+      await userEvent.click(everyoneOption)
+      expect(screen.queryByText(errorText)).toBeNull()
+      await userEvent.click(customOption)
+      expect(await screen.findByText(errorText)).toBeInTheDocument()
+    })
+
+    it('displays empty assignee error if the user switches to custom and clicks save without adding any assignees', async () => {
+      renderComponent()
+      const customOption = await screen.findByTestId('custom-option')
+      await userEvent.click(customOption)
+      expect(screen.queryByText(errorText)).not.toBeInTheDocument()
+      const saveButton = screen.getByRole('button', {name: 'Save'})
+      await userEvent.click(saveButton)
+      const assigneeSelector = await screen.findByTestId('assignee_selector')
+      expect(screen.getByText(errorText)).toBeInTheDocument()
+      expect(assigneeSelector).toHaveFocus()
+    })
   })
 
   describe('on update', () => {

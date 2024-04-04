@@ -129,8 +129,8 @@ export default function AssignToPanel({
   )
   const [isLoading, setIsLoading] = useState(false)
   const changed = useRef(false)
-  const [isInitialLoad, setIsInitialLoad] = useState(true)
-  const [error, setError] = useState<FormMessage[]>([])
+  const [suppressEmptyAssigneeError, setSuppressEmptyAssigneeError] = useState(true)
+  const [errors, setErrors] = useState<FormMessage[]>([])
   const assigneeSelectorRef = useRef<HTMLInputElement | null>(null)
 
   useEffect(() => {
@@ -179,9 +179,19 @@ export default function AssignToPanel({
       })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-  const hasErrors = error.length > 0
+
+  const visibleErrors = errors.filter(error => {
+    // hide empty assignee error on initial load
+    if (error === EMPTY_ASSIGNEE_ERROR_MESSAGE) {
+      return !suppressEmptyAssigneeError
+    }
+    return true
+  })
+  const hasErrors = errors.length > 0
+  const hasVisibleErrors = visibleErrors.length > 0
 
   const handleSave = useCallback(() => {
+    setSuppressEmptyAssigneeError(false)
     if (hasErrors) {
       assigneeSelectorRef.current?.focus()
       return
@@ -210,16 +220,15 @@ export default function AssignToPanel({
 
   // cannot handle in onSelect because of infinite rerenders due to messages prop
   useEffect(() => {
-    if (selectedAssignees.length > 0) setError([])
-    else if (selectedAssignees.length === 0 && !isInitialLoad)
-      setError([EMPTY_ASSIGNEE_ERROR_MESSAGE])
-  }, [selectedAssignees, isInitialLoad])
+    const newErrors = []
+    if (selectedOption === CUSTOM_OPTION.value && selectedAssignees.length === 0) {
+      newErrors.push(EMPTY_ASSIGNEE_ERROR_MESSAGE)
+    }
+    setErrors(newErrors)
+  }, [selectedAssignees, selectedOption])
 
   const handleBlur = () => {
-    setIsInitialLoad(false)
-    if (selectedAssignees.length === 0) {
-      setError([EMPTY_ASSIGNEE_ERROR_MESSAGE])
-    }
+    setSuppressEmptyAssigneeError(false)
   }
 
   return (
@@ -259,10 +268,13 @@ export default function AssignToPanel({
                         <View as="div" margin="small 0 0">
                           <ModuleAssignments
                             inputRef={el => (assigneeSelectorRef.current = el)}
-                            messages={error}
+                            messages={visibleErrors}
                             courseId={courseId}
                             onSelect={assignees => {
-                              if (selectedAssignees && !assignees) setIsInitialLoad(false)
+                              // i.e., if there's existing assignees and the user is removing all of them
+                              if (selectedAssignees.length > 0 && assignees.length === 0) {
+                                setSuppressEmptyAssigneeError(false)
+                              }
                               setSelectedAssignees(assignees)
                               changed.current = true
                             }}
@@ -281,7 +293,7 @@ export default function AssignToPanel({
       </Flex.Item>
       <Flex.Item margin="auto none none none" size={footerHeight}>
         <Footer
-          hasErrors={hasErrors}
+          hasErrors={hasVisibleErrors}
           saveButtonLabel={moduleId ? I18n.t('Save') : I18n.t('Add Module')}
           onDismiss={onDismiss}
           onUpdate={handleSave}
