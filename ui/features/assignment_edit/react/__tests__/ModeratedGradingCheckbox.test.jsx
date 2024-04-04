@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 - present Instructure, Inc.
+ * Copyright (C) 2024 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -17,14 +17,15 @@
  */
 
 import React from 'react'
-import {mount} from 'enzyme'
-import ModeratedGradingCheckbox from 'ui/features/assignment_edit/react/ModeratedGradingCheckbox'
+import {render} from '@testing-library/react'
+import ModeratedGradingCheckbox from '../ModeratedGradingCheckbox'
+import userEvent from '@testing-library/user-event'
 
-QUnit.module('ModeratedGradingCheckbox', hooks => {
+describe('ModeratedGradingCheckbox', () => {
   let props
   let wrapper
 
-  hooks.beforeEach(() => {
+  beforeEach(() => {
     props = {
       checked: false,
       gradedSubmissionsExist: false,
@@ -35,27 +36,27 @@ QUnit.module('ModeratedGradingCheckbox', hooks => {
   })
 
   function mountComponent() {
-    wrapper = mount(<ModeratedGradingCheckbox {...props} />)
+    wrapper = render(<ModeratedGradingCheckbox {...props} />)
   }
 
   function checkbox() {
-    return wrapper.find('input#assignment_moderated_grading[type="checkbox"]')
+    return wrapper.container.querySelector('input#assignment_moderated_grading[type="checkbox"]')
   }
 
   test('renders a Moderated Grading checkbox', () => {
     mountComponent()
-    strictEqual(checkbox().length, 1)
+    expect(checkbox()).toBeInTheDocument()
   })
 
   test('renders an unchecked checkbox when passed checked: false', () => {
     mountComponent()
-    strictEqual(checkbox().instance().checked, false)
+    expect(checkbox().checked).toBe(false)
   })
 
   test('renders a checked checkbox when passed checked: true', () => {
     props.checked = true
     mountComponent()
-    strictEqual(checkbox().instance().checked, true)
+    expect(checkbox().checked).toBe(true)
   })
 
   test(
@@ -63,47 +64,50 @@ QUnit.module('ModeratedGradingCheckbox', hooks => {
       'review assignment, and it is not a group assignment',
     () => {
       mountComponent()
-      strictEqual(checkbox().instance().disabled, false)
+      expect(checkbox().disabled).toBe(false)
     }
   )
 
   test('disables the checkbox if graded submissions exist', () => {
     props.gradedSubmissionsExist = true
     mountComponent()
-    strictEqual(checkbox().instance().disabled, true)
+    expect(checkbox().disabled).toBe(true)
   })
 
   test('disables the checkbox if it is a peer review assignment', () => {
     props.isPeerReviewAssignment = true
     mountComponent()
-    strictEqual(checkbox().instance().disabled, true)
+    expect(checkbox().disabled).toBe(true)
   })
 
   test('disables the checkbox if it is a group assignment', () => {
     props.isGroupAssignment = true
     mountComponent()
-    strictEqual(checkbox().instance().disabled, true)
+    expect(checkbox().disabled).toBe(true)
   })
 
-  test('calls onChange when checked', () => {
-    props.onChange = sinon.stub()
+  test('calls onChange when checked', async () => {
+    const user = userEvent.setup()
+    props.onChange = jest.fn()
     mountComponent()
-    checkbox().simulate('change')
-    strictEqual(props.onChange.callCount, 1)
+    await user.click(checkbox())
+    expect(props.onChange).toHaveBeenCalledTimes(1)
   })
 
-  test('calls onChange with `true` when being checked', () => {
-    props.onChange = sinon.stub()
+  test('calls onChange with `true` when being checked', async () => {
+    const user = userEvent.setup()
+    props.onChange = jest.fn()
     mountComponent()
-    checkbox().simulate('change')
-    strictEqual(props.onChange.getCall(0).args[0], true)
+    await user.click(checkbox())
+    expect(props.onChange).toHaveBeenCalledWith(true)
   })
 
-  test('calls onChange with `false` when being unchecked', () => {
+  test('calls onChange with `false` when being unchecked', async () => {
+    const user = userEvent.setup()
     props.checked = true
-    props.onChange = sinon.stub()
+    props.onChange = jest.fn()
     mountComponent()
-    checkbox().simulate('change')
-    strictEqual(props.onChange.getCall(0).args[0], false)
+    await user.click(checkbox())
+    expect(props.onChange).toHaveBeenCalledWith(false)
   })
 })

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 - present Instructure, Inc.
+ * Copyright (C) 2024 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -17,69 +17,69 @@
  */
 
 import React from 'react'
-import {mount} from 'enzyme'
-import GraderNamesVisibleToFinalGraderCheckbox from 'ui/features/assignment_edit/react/GraderNamesVisibleToFinalGraderCheckbox'
+import {render} from '@testing-library/react'
+import GraderNamesVisibleToFinalGraderCheckbox from '../GraderNamesVisibleToFinalGraderCheckbox'
+import userEvent from '@testing-library/user-event'
 
-QUnit.module('GraderNamesVisibleToFinalGraderCheckbox', hooks => {
+describe('GraderNamesVisibleToFinalGraderCheckbox', () => {
   let props
   let wrapper
 
-  hooks.beforeEach(() => {
+  beforeEach(() => {
     props = {checked: false}
   })
 
   function mountComponent() {
-    wrapper = mount(<GraderNamesVisibleToFinalGraderCheckbox {...props} />)
+    wrapper = render(<GraderNamesVisibleToFinalGraderCheckbox {...props} />)
   }
 
   function checkbox() {
-    return wrapper.find('input#assignment_grader_names_visible_to_final_grader')
+    return wrapper.container.querySelector('input#assignment_grader_names_visible_to_final_grader')
   }
 
   function formField() {
-    return wrapper
-      .find('input[name="grader_names_visible_to_final_grader"][type="hidden"]')
-      .at(0)
-      .instance()
+    return wrapper.container.querySelector('input[name="grader_names_visible_to_final_grader"]')
   }
 
   test('renders a checkbox', () => {
     mountComponent()
-    strictEqual(checkbox().length, 1)
+    expect(checkbox()).toBeInTheDocument()
   })
 
   test('renders an unchecked checkbox when passed checked: false', () => {
     mountComponent()
-    strictEqual(checkbox().at(0).instance().checked, false)
+    expect(checkbox().checked).toBe(false)
   })
 
   test('renders a checked checkbox when passed checked: true', () => {
     props.checked = true
     mountComponent()
-    strictEqual(checkbox().at(0).instance().checked, true)
+    expect(checkbox().checked).toBe(true)
   })
 
   test('sets the value of the form input to "false" when passed checked: false', () => {
     mountComponent()
-    strictEqual(formField().value, 'false')
+    expect(formField().value).toBe('false')
   })
 
   test('sets the value of the form input to "true" when passed checked: true', () => {
     props.checked = true
     mountComponent()
-    strictEqual(formField().value, 'true')
+    expect(formField().value).toBe('true')
   })
 
-  test('checking the checkbox updates the value of the form input', () => {
+  test('checking the checkbox updates the value of the form input', async () => {
+    const user = userEvent.setup()
     mountComponent()
-    checkbox().simulate('change', {target: {checked: true}})
-    strictEqual(formField().value, 'true')
+    await user.click(checkbox())
+    expect(formField().value).toBe('true')
   })
 
-  test('unchecking the checkbox updates the value of the form input', () => {
+  test('unchecking the checkbox updates the value of the form input', async () => {
+    const user = userEvent.setup()
     props.checked = true
     mountComponent()
-    checkbox().simulate('change', {target: {checked: false}})
-    strictEqual(formField().value, 'false')
+    await user.click(checkbox())
+    expect(formField().value).toBe('false')
   })
 })
