@@ -549,7 +549,7 @@ module CustomSeleniumActions
              else
                f("#{form} #{submit_button_css}")
              end
-    scroll_to(button)
+    scroll_into_view(button)
     driver.action.move_to(button).click.perform
   end
 
@@ -685,8 +685,12 @@ module CustomSeleniumActions
     wait_for_ajaximations
   end
 
-  def scroll_into_view(selector)
-    driver.execute_script("$(#{selector.to_json})[0].scrollIntoView()")
+  def scroll_into_view(target)
+    if target.is_a?(Selenium::WebDriver::Element)
+      driver.execute_script("arguments[0].scrollIntoView(true);", target)
+    else
+      driver.execute_script("$(#{target.to_json})[0].scrollIntoView()")
+    end
   end
 
   # see packages/jquery-scroll-to-visible
