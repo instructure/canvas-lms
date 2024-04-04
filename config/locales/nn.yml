@@ -6098,6 +6098,7 @@ nn:
     from_beginning: starten
     to_now: "no"
   comma_separated_list_of_users_sis_id_332c98f1: "Kommaseparert liste over brukarar sine SIS-ID-ar"
+  comment_7ef1428e: Kommentar
   comment_added_33ab70d9: "Kommentar lagt til"
   comment_by_replying_to_this_message_or_join_the_co_26d42fde: "Kommentér ved å svare på denne meldinga, eller delta i samtalen ved å bruke linken: %{link}."
   comment_by_replying_to_this_message_or_join_the_co_52b5ac1c: "Kommentér ved å svare på denne meldinga, eller delta i samtalen ved å bruke linken: %{link}. Om du vil sende med eit vedlegg, må du logge inn i Canvas og svare på diskusjonen der. "
