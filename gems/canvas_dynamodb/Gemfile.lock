@@ -26,7 +26,7 @@ GEM
     diff-lcs (1.5.1)
     docile (1.4.0)
     jmespath (1.6.2)
-    rake (13.1.0)
+    rake (13.2.1)
     rspec (3.13.0)
       rspec-core (~> 3.13.0)
       rspec-expectations (~> 3.13.0)
