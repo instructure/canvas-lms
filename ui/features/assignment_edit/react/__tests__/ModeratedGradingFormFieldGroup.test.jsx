@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 - present Instructure, Inc.
+ * Copyright (C) 2024 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -17,14 +17,15 @@
  */
 
 import React from 'react'
-import {mount} from 'enzyme'
-import ModeratedGradingFormFieldGroup from 'ui/features/assignment_edit/react/ModeratedGradingFormFieldGroup'
+import {render} from '@testing-library/react'
+import ModeratedGradingFormFieldGroup from '../ModeratedGradingFormFieldGroup'
+import userEvent from '@testing-library/user-event'
 
-QUnit.module('ModeratedGradingFormFieldGroup', hooks => {
+describe('ModeratedGradingFormFieldGroup', () => {
   let props
   let wrapper
 
-  hooks.beforeEach(() => {
+  beforeEach(() => {
     props = {
       availableModerators: [
         {name: 'John Doe', id: '923'},
@@ -45,129 +46,135 @@ QUnit.module('ModeratedGradingFormFieldGroup', hooks => {
   })
 
   function mountComponent() {
-    wrapper = mount(<ModeratedGradingFormFieldGroup {...props} />)
+    wrapper = render(<ModeratedGradingFormFieldGroup {...props} />)
   }
 
   function content() {
-    return wrapper.find('.ModeratedGrading__Content')
+    return wrapper.container.querySelector('.ModeratedGrading__Content')
   }
 
   test('hides the moderated grading content when passed moderatedGradingEnabled: false', () => {
     props.moderatedGradingEnabled = false
     mountComponent()
-    strictEqual(content().length, 0)
+    expect(content()).not.toBeInTheDocument()
   })
 
   test('shows the moderated grading content when passed moderatedGradingEnabled: true', () => {
     mountComponent()
-    strictEqual(content().length, 1)
+    expect(content()).toBeInTheDocument()
   })
 
   test('includes a final grader select menu in the moderated grading content', () => {
     mountComponent()
-    const selectMenu = content().find('select[name="final_grader_id"]')
-    strictEqual(selectMenu.length, 1)
+    const selectMenu = content().querySelector('select[name="final_grader_id"]')
+    expect(selectMenu).toBeInTheDocument()
   })
 
   test('includes a grader count input in the moderated grading content', () => {
     mountComponent()
-    const graderCountInput = content().find('.ModeratedGrading__GraderCountInputContainer input')
-    strictEqual(graderCountInput.length, 1)
+    const graderCountInput = content().querySelector(
+      '.ModeratedGrading__GraderCountInputContainer input'
+    )
+    expect(graderCountInput).toBeInTheDocument()
   })
 
-  QUnit.module('Moderated Grading Checkbox', () => {
+  describe('Moderated Grading Checkbox', () => {
     function moderatedGradingCheckbox() {
-      return wrapper.find('input#assignment_moderated_grading[type="checkbox"]')
+      return wrapper.container.querySelector('input#assignment_moderated_grading[type="checkbox"]')
     }
 
     test('renders the checkbox', () => {
       mountComponent()
-      strictEqual(moderatedGradingCheckbox().length, 1)
+      expect(moderatedGradingCheckbox()).toBeInTheDocument()
     })
 
     test('renders an unchecked checkbox when passed moderatedGradingEnabled: false', () => {
       props.moderatedGradingEnabled = false
       mountComponent()
-      strictEqual(moderatedGradingCheckbox().at(0).instance().checked, false)
+      expect(moderatedGradingCheckbox().checked).toBe(false)
     })
 
     test('renders a checked checkbox when passed moderatedGradingEnabled: true', () => {
       mountComponent()
-      strictEqual(moderatedGradingCheckbox().at(0).instance().checked, true)
+      expect(moderatedGradingCheckbox().checked).toBe(true)
     })
 
-    test('hides the moderated grading content when the checkbox is unchecked', () => {
+    test('hides the moderated grading content when the checkbox is unchecked', async () => {
+      const user = userEvent.setup()
       mountComponent()
-      moderatedGradingCheckbox().simulate('change')
-      strictEqual(content().length, 0)
+      await user.click(moderatedGradingCheckbox())
+      expect(content()).not.toBeInTheDocument()
     })
 
-    test('shows the moderated grading content when the checkbox is checked', () => {
+    test('shows the moderated grading content when the checkbox is checked', async () => {
+      const user = userEvent.setup()
       props.moderatedGradingEnabled = false
       mountComponent()
-      moderatedGradingCheckbox().simulate('change')
-      strictEqual(content().length, 1)
+      await user.click(moderatedGradingCheckbox())
+      expect(content()).toBeInTheDocument()
     })
 
-    test('calls onModeratedGradingChange when the checkbox is checked', () => {
+    test('calls onModeratedGradingChange when the checkbox is checked', async () => {
+      const user = userEvent.setup()
       props.moderatedGradingEnabled = false
-      sinon.stub(props, 'onModeratedGradingChange')
+      props.onModeratedGradingChange = jest.fn()
       mountComponent()
-      moderatedGradingCheckbox().simulate('change')
-      strictEqual(props.onModeratedGradingChange.callCount, 1)
-      props.onModeratedGradingChange.restore()
+      await user.click(moderatedGradingCheckbox())
+      expect(props.onModeratedGradingChange).toHaveBeenCalledTimes(1)
     })
 
-    test('calls onModeratedGradingChange when the checkbox is unchecked', () => {
-      sinon.stub(props, 'onModeratedGradingChange')
+    test('calls onModeratedGradingChange when the checkbox is unchecked', async () => {
+      const user = userEvent.setup()
+      props.onModeratedGradingChange = jest.fn()
       mountComponent()
-      moderatedGradingCheckbox().simulate('change')
-      strictEqual(props.onModeratedGradingChange.callCount, 1)
-      props.onModeratedGradingChange.restore()
+      await user.click(moderatedGradingCheckbox())
+      expect(props.onModeratedGradingChange).toHaveBeenCalledTimes(1)
     })
   })
 
-  QUnit.module('Grader Comment Visibility Checkbox', () => {
+  describe('Grader Comment Visibility Checkbox', () => {
     function graderCommentsVisibleToGradersCheckbox() {
-      return wrapper.find('input#assignment_grader_comment_visibility')
+      return wrapper.container.querySelector('input#assignment_grader_comment_visibility')
     }
 
     test('renders the checkbox', () => {
       mountComponent()
-      strictEqual(graderCommentsVisibleToGradersCheckbox().length, 1)
+      expect(graderCommentsVisibleToGradersCheckbox()).toBeInTheDocument()
     })
 
     test('renders an unchecked checkbox when passed graderCommentsVisibleToGraders: false', () => {
       props.graderCommentsVisibleToGraders = false
       mountComponent()
-      strictEqual(graderCommentsVisibleToGradersCheckbox().at(0).instance().checked, false)
+      expect(graderCommentsVisibleToGradersCheckbox().checked).toBe(false)
     })
 
     test('renders a checked checkbox when passed graderCommentsVisibleToGraders: true', () => {
       mountComponent()
-      strictEqual(graderCommentsVisibleToGradersCheckbox().at(0).instance().checked, true)
+      expect(graderCommentsVisibleToGradersCheckbox().checked).toBe(true)
     })
   })
 
-  QUnit.module('Grader Names Visible to Final Grader Checkbox', () => {
+  describe('Grader Names Visible to Final Grader Checkbox', () => {
     function graderNamesVisibleToFinalGraderCheckbox() {
-      return wrapper.find('input#assignment_grader_names_visible_to_final_grader')
+      return wrapper.container.querySelector(
+        'input#assignment_grader_names_visible_to_final_grader'
+      )
     }
 
     test('renders a grader names visible to final grader checkbox in the moderated grading content', () => {
       mountComponent()
-      strictEqual(graderNamesVisibleToFinalGraderCheckbox().length, 1)
+      expect(graderNamesVisibleToFinalGraderCheckbox()).toBeInTheDocument()
     })
 
     test('renders an unchecked checkbox when passed graderNamesVisibleToFinalGrader: false', () => {
       props.graderNamesVisibleToFinalGrader = false
       mountComponent()
-      strictEqual(graderNamesVisibleToFinalGraderCheckbox().at(0).instance().checked, false)
+      expect(graderNamesVisibleToFinalGraderCheckbox().checked).toBe(false)
     })
 
     test('renders a checked checkbox for Moderated Grading when passed graderNamesVisibleToFinalGrader: true', () => {
       mountComponent()
-      strictEqual(graderNamesVisibleToFinalGraderCheckbox().at(0).instance().checked, true)
+      expect(graderNamesVisibleToFinalGraderCheckbox().checked).toBe(true)
     })
   })
 })

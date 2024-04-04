@@ -52,6 +52,7 @@ const ignoredErrors = [
   /Prop `children` should be supplied unless/, // https://instructure.atlassian.net/browse/FOO-3407
   /The above error occurred in the <.*> component/,
   /You seem to have overlapping act\(\) calls/,
+  /Warning: `value` prop on `%s` should not be null. Consider using an empty string to clear the component or `undefined` for uncontrolled components.%s/,
 ]
 const globalWarn = global.console.warn
 const ignoredWarnings = [/JQMIGRATE:/] // ignore warnings about jquery migrate; these are muted globally when not in a jest test
