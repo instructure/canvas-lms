@@ -18,11 +18,11 @@
 
 import React from 'react'
 import {Portal} from '@instructure/ui-portal'
-import TopNav from './TopNav'
+import TopNav, {type ITopNavProps} from './TopNav'
 import {QueryProvider} from '@canvas/query'
 import ReactDOM from 'react-dom'
 
-const TopNavPortal = () => {
+const TopNavPortal: React.FC<ITopNavProps> = props => {
   const mountPoint: HTMLElement | null = document.getElementById('react-instui-topnav')
   if (!mountPoint) {
     return null
@@ -31,14 +31,17 @@ const TopNavPortal = () => {
   return (
     <Portal open={true} mountNode={mountPoint}>
       <QueryProvider>
-        <TopNav />
+        <TopNav {...props} />
       </QueryProvider>
     </Portal>
   )
 }
-export const initializeTopNavPortal = (mountPoint: ReactDOM.Container): void => {
+export const initializeTopNavPortal = (
+  mountPoint: ReactDOM.Container,
+  props?: ITopNavProps
+): void => {
   if (mountPoint) {
-    ReactDOM.render(<TopNavPortal />, mountPoint)
+    ReactDOM.render(<TopNavPortal {...props} />, mountPoint)
   }
 }
 
