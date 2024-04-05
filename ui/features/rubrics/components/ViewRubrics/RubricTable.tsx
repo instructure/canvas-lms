@@ -17,7 +17,7 @@
  */
 
 import React, {useState} from 'react'
-import {useNavigate, useParams} from 'react-router-dom'
+import {useParams} from 'react-router-dom'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import type {Rubric} from '@canvas/rubrics/react/types/rubric'
 import {Table} from '@instructure/ui-table'
@@ -45,7 +45,6 @@ export const RubricTable = ({
   onLocationsClick,
   onPreviewClick,
 }: RubricTableProps) => {
-  const navigate = useNavigate()
   const {accountId, courseId} = useParams()
   const [sortDirection, setSortDirection] = useState<'ascending' | 'descending' | 'none'>('none')
   const [sortedColumn, setSortedColumn] = useState<string>() // Track the column being sorted
