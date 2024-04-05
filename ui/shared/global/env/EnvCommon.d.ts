@@ -133,7 +133,6 @@ export interface EnvCommon {
     revision: string
   }
 
-  API_GATEWAY_URI?: string
   DATA_COLLECTION_ENDPOINT?: string
 
   /**

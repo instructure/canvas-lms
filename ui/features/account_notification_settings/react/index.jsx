@@ -23,9 +23,6 @@ import AccountNotificationSettingsView from './AccountNotificationSettingsView'
 export default function NotificationSettings(options = {}) {
   const apolloClientOpts = {}
   const envDict = options.envDict || ENV
-  if (envDict.API_GATEWAY_URI) {
-    apolloClientOpts.apiGatewayUri = envDict.API_GATEWAY_URI
-  }
   const client = createClient(apolloClientOpts)
   return (
     <ApolloProvider client={client}>

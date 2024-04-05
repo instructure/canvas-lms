@@ -18,7 +18,6 @@
 
 import getCookie from '@instructure/get-cookie'
 import introspectionQueryResultData from '@canvas/apollo/fragmentTypes.json'
-import InstAccess from '@canvas/apollo/InstAccess'
 import {ApolloClient, InMemoryCache, HttpLink, ApolloLink} from '@apollo/client'
 import {IntrospectionFragmentMatcher} from 'apollo-cache-inmemory'
 import {persistCache} from 'apollo-cache-persist'
@@ -105,22 +104,6 @@ async function createPersistentCache(passphrase = null) {
 function createClient(opts = {}) {
   const cache = opts.cache || new InMemoryCache()
 
-  // if this option exists, we want this client
-  // to talk through the API gateway instead of
-  // directly to canvas, so we'll need to update the http
-  // link to have both our target URL, and also
-  // an enhanced "fetch" implementation that uses
-  // InstAccess tokens
-  const gatewayUri = opts.apiGatewayUri || false
-  const defaultHttpLinkOptions = {}
-  if (gatewayUri) {
-    defaultHttpLinkOptions.uri = gatewayUri
-    const instAccess = new InstAccess()
-    defaultHttpLinkOptions.fetch = (uri, fetchOpts) => {
-      return instAccess.gatewayAuthenticatedFetch(uri, fetchOpts)
-    }
-  }
-
   // there are some cases where we need to override these options.
   //  If we're using an API gateway instead of talking to canvas directly,
   // we need to be able to inject that config.
@@ -129,10 +112,7 @@ function createClient(opts = {}) {
   // A design goal here is not to do anything "special", but just
   // use the options that are already built into ApolloLink:
   // https://github.com/apollographql/apollo-client/blob/main/src/link/core/ApolloLink.ts
-  const httpLinkOptions = {
-    ...defaultHttpLinkOptions,
-    ...(opts.httpLinkOptions || {}),
-  }
+  const httpLinkOptions = opts.httpLinkOptions || {}
 
   const links = [createConsoleErrorReportLink(), setHeadersLink(), createHttpLink(httpLinkOptions)]
 
