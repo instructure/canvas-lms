@@ -57,7 +57,7 @@ export const RubricCriteriaRow = ({
   onDuplicateCriterion,
   onEditCriterion,
 }: RubricCriteriaRowProps) => {
-  const {description, longDescription, points} = criterion
+  const {description, longDescription, outcome, learningOutcomeId, points} = criterion
 
   return (
     <Draggable draggableId={criterion.id} index={rowIndex - 1}>
@@ -82,29 +82,50 @@ export const RubricCriteriaRow = ({
                 </View>
               </Flex.Item>
               <Flex.Item margin="0 small" align="start" shouldGrow={true} shouldShrink={true}>
-                <View as="div">
-                  <Tag
-                    text={
-                      <AccessibleContent alt="Remove outcome">
-                        <Text>FA.V.CR.1</Text>
-                      </AccessibleContent>
-                    }
-                    size="small"
-                    dismissible={true}
-                    onClick={() => {}}
-                    themeOverride={{
-                      defaultBackground: 'white',
-                      defaultBorderColor: 'rgb(3, 116, 181)',
-                      defaultColor: 'rgb(3, 116, 181)',
-                    }}
-                  />
-                </View>
-                <View as="div" margin="small 0 0 0" data-testid="rubric-criteria-row-description">
-                  <Text weight="bold">{description}</Text>
-                </View>
-                <View as="div" data-testid="rubric-criteria-row-long-description">
-                  <Text>{longDescription}</Text>
-                </View>
+                {learningOutcomeId ? (
+                  <>
+                    <View as="div">
+                      <Tag
+                        text={
+                          <AccessibleContent alt="Remove outcome">
+                            <Text>{outcome?.displayName}</Text>
+                          </AccessibleContent>
+                        }
+                        size="small"
+                        onClick={() => {}}
+                        themeOverride={{
+                          defaultBackground: 'white',
+                          defaultBorderColor: 'rgb(3, 116, 181)',
+                          defaultColor: 'rgb(3, 116, 181)',
+                        }}
+                        data-testid="rubric-criteria-row-outcome-tag"
+                      />
+                    </View>
+                    <View as="div" margin="small 0 0 0" data-testid="rubric-criteria-outcome-title">
+                      <Text weight="bold">{outcome?.title}</Text>
+                    </View>
+                    <View
+                      as="div"
+                      margin="small 0 0 0"
+                      data-testid="rubric-criteria-row-description"
+                    >
+                      <Text>{description}</Text>
+                    </View>
+                  </>
+                ) : (
+                  <>
+                    <View
+                      as="div"
+                      margin="xxx-small 0 0 0"
+                      data-testid="rubric-criteria-row-description"
+                    >
+                      <Text weight="bold">{description}</Text>
+                    </View>
+                    <View as="div" data-testid="rubric-criteria-row-long-description">
+                      <Text>{longDescription}</Text>
+                    </View>
+                  </>
+                )}
               </Flex.Item>
               <Flex.Item align="start">
                 <Pill
@@ -125,6 +146,7 @@ export const RubricCriteriaRow = ({
                     withBorder={false}
                     screenReaderLabel={I18n.t('Edit Criterion')}
                     onClick={onEditCriterion}
+                    disabled={!unassessed && !!learningOutcomeId}
                     size="small"
                     themeOverride={{smallHeight: '18px'}}
                     data-testid="rubric-criteria-row-edit-button"

@@ -54,22 +54,27 @@ export const RUBRICS_QUERY_RESPONSE: Rubric = {
     {
       id: '2',
       points: 5,
-      description: 'Criterion 2',
-      longDescription: 'Long description for criterion 2',
+      description: 'Outcome Criterion 2',
+      longDescription: '',
       ignoreForScoring: false,
       masteryPoints: 3,
       criterionUseRange: false,
+      outcome: {
+        displayName: 'Sample Outcome Display Name',
+        title: 'Sample Outcome Title',
+      },
+      learningOutcomeId: '12345',
       ratings: [
         {
           id: '1',
-          description: 'Rating 1',
-          longDescription: 'Long description for rating 1',
+          description: 'Outcome Rating 1',
+          longDescription: '',
           points: 5,
         },
         {
           id: '2',
-          description: 'Rating 2',
-          longDescription: 'Long description for rating 2',
+          description: 'Outcome Rating 2',
+          longDescription: '',
           points: 0,
         },
       ],

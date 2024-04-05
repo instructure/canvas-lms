@@ -18,7 +18,7 @@
 
 import React, {useEffect, useRef, useState} from 'react'
 import {useNavigate, useParams} from 'react-router-dom'
-import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import {showFlashSuccess, showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
 import LoadingIndicator from '@canvas/loading-indicator/react'
@@ -41,6 +41,7 @@ import type {RubricFormProps} from '../../types/RubricForm'
 import {CriterionModal} from './CriterionModal'
 import {DragDropContext as DragAndDrop, Droppable} from 'react-beautiful-dnd'
 import type {DropResult} from 'react-beautiful-dnd'
+import {OutcomeCriterionModal} from './OutcomeCriterionModal'
 import {RubricAssessmentTray} from '@canvas/rubrics/react/RubricAssessment'
 import FindDialog from '@canvas/outcomes/backbone/views/FindDialog'
 import OutcomeGroup from '@canvas/outcomes/backbone/models/OutcomeGroup'
@@ -91,6 +92,10 @@ export const reorder = ({list, startIndex, endIndex}: ReorderProps) => {
   return result
 }
 
+const stripPTags = (htmlString: string) => {
+  return htmlString.replace(/^<p>(.*)<\/p>$/, '$1')
+}
+
 type RubricFormComponentProp = {
   rootOutcomeGroup: GroupOutcome
 }
@@ -107,6 +112,7 @@ export const RubricForm = ({rootOutcomeGroup}: RubricFormComponentProp) => {
 
   const [selectedCriterion, setSelectedCriterion] = useState<RubricCriterion>()
   const [isCriterionModalOpen, setIsCriterionModalOpen] = useState(false)
+  const [isOutcomeCriterionModalOpen, setIsOutcomeCriterionModalOpen] = useState(false)
   const [isPreviewTrayOpen, setIsPreviewTrayOpen] = useState(false)
   const [outcomeDialog, setOutcomeDialog] = useState<FindDialog | null>(null)
   const [outcomeDialogOpen, setOutcomeDialogOpen] = useState(false)
@@ -150,7 +156,11 @@ export const RubricForm = ({rootOutcomeGroup}: RubricFormComponentProp) => {
 
   const openCriterionModal = (criterion?: RubricCriterion) => {
     setSelectedCriterion(criterion)
-    setIsCriterionModalOpen(true)
+    if (criterion?.learningOutcomeId) {
+      setIsOutcomeCriterionModalOpen(true)
+    } else {
+      setIsCriterionModalOpen(true)
+    }
   }
 
   const duplicateCriterion = (criterion: RubricCriterion) => {
@@ -181,6 +191,7 @@ export const RubricForm = ({rootOutcomeGroup}: RubricFormComponentProp) => {
     setRubricFormField('pointsPossible', newPointsPossible)
     setRubricFormField('criteria', criteria)
     setIsCriterionModalOpen(false)
+    setIsOutcomeCriterionModalOpen(false)
   }
 
   const handleSaveAsDraft = () => {
@@ -215,7 +226,6 @@ export const RubricForm = ({rootOutcomeGroup}: RubricFormComponentProp) => {
 
   const handleAddOutcome = () => {
     setOutcomeDialogOpen(true)
-    outcomeDialog?.show()
   }
 
   useEffect(() => {
@@ -229,13 +239,47 @@ export const RubricForm = ({rootOutcomeGroup}: RubricFormComponentProp) => {
         rootOutcomeGroup: new OutcomeGroup(rootOutcomeGroup),
         url: '/outcomes/find_dialog',
       })
-      ;(dialog as any).on('import', (data: any) => {
+      setOutcomeDialog(dialog)
+      outcomeDialog?.show()
+      ;(dialog as any).on('import', (outcomeData: any) => {
+        const newOutcomeCriteria = {
+          id: Date.now().toString(),
+          points: outcomeData.attributes.points_possible,
+          description: stripPTags(outcomeData.attributes.description),
+          longDescription: '',
+          outcome: {
+            displayName: outcomeData.attributes.display_name,
+            title: outcomeData.outcomeLink.outcome.title,
+          },
+          ignoreForScoring: false,
+          masteryPoints: outcomeData.attributes.mastery_points,
+          criterionUseRange: false,
+          ratings: outcomeData.attributes.ratings,
+          learningOutcomeId: outcomeData.outcomeLink.outcome.id,
+        }
+        const criteria = [...rubricForm.criteria]
+        // Check if the outcome has already been added to this rubric
+        const hasDuplicateLearningOutcomeId = criteria.some(
+          criterion => criterion.learningOutcomeId === newOutcomeCriteria.learningOutcomeId
+        )
+
+        if (hasDuplicateLearningOutcomeId) {
+          showFlashError(
+            I18n.t('This Outcome has not been added as it already exists in this rubric.')
+          )()
+
+          return
+        }
+        criteria.push(newOutcomeCriteria)
+
+        const newPointsPossible = criteria.reduce((acc, c) => acc + c.points, 0)
+        setRubricFormField('pointsPossible', newPointsPossible)
+        setRubricFormField('criteria', criteria)
         dialog.cleanup()
       })
-      setOutcomeDialog(dialog)
       setOutcomeDialogOpen(false)
     }
-  }, [outcomeDialogOpen, rootOutcomeGroup])
+  }, [outcomeDialog, outcomeDialogOpen, rootOutcomeGroup, rubricForm.criteria])
 
   useEffect(() => {
     if (data) {
@@ -454,6 +498,12 @@ export const RubricForm = ({rootOutcomeGroup}: RubricFormComponentProp) => {
         isOpen={isCriterionModalOpen}
         unassessed={rubricForm.unassessed}
         onDismiss={() => setIsCriterionModalOpen(false)}
+        onSave={(updatedCriteria: RubricCriterion) => handleSaveCriterion(updatedCriteria)}
+      />
+      <OutcomeCriterionModal
+        criterion={selectedCriterion}
+        isOpen={isOutcomeCriterionModalOpen}
+        onDismiss={() => setIsOutcomeCriterionModalOpen(false)}
         onSave={(updatedCriteria: RubricCriterion) => handleSaveCriterion(updatedCriteria)}
       />
       <RubricAssessmentTray
