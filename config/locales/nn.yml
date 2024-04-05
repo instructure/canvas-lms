@@ -10916,7 +10916,7 @@ nn:
   failed_getting_course_list_49846a93: "Henting av emnelista mislukkast"
   failed_getting_file_to_preview_89fe2bf4: "Henting av førehandsvisning mislukkast"
   failed_getting_next_batch_of_announcements_1f1165a5: "Henting av neste sett kunngjeringar mislukkast"
-  failed_getting_to_do_list_10ce2833: "Henting av gjerelista mislukkast"
+  failed_getting_to_do_list_10ce2833: "Henting av gjeremålslista mislukkast"
   failed_initializing_dashboard_3d967143: "Initialisering av dashbord mislukkast"
   failed_jobs_b632bbf0: "Mislukka jobbar"
   failed_loading_associations_component_is_your_netw_fa49fb32: "Kan ikkje laste Associations-komponenten. Er internettkoplinga OK?"
@@ -10998,7 +10998,7 @@ nn:
   failed_to_update_permission_33c493f: "Kan ikkje oppdatere løyve"
   failed_to_update_role_name_8c7b0119: "Kan ikkje oppdatere rollenamn"
   failed_to_validate_cas_ticket_error_31aa4c63: "Validering av CAS-informasjon mislukkast: %{error}"
-  failure_loading_the_to_do_list_c61895c8: "Lasting av gjerelista mislukkast"
+  failure_loading_the_to_do_list_c61895c8: "Lasting av gjeremålslista mislukkast"
   fair_38e62237: "Nokså godt"
   fair_score_554e2558: "Nokså godt resultat"
   fair_use_bee47d77: "Fair use"
@@ -11436,7 +11436,7 @@ nn:
   grade_a91e433e: "Vurdering:"
   grade_assignment_7c1abc11: "Gi vurdering av %{assignment}"
   grade_change_activity_75fb525: Vurderingsendringsaktivitet
-  grade_change_log_231f90e4: Vurderingslogg
+  grade_change_log_231f90e4: Vurderingsendringslogg
   grade_change_notifications_98461261: Vurderingsendringsvarsel
   grade_changes_and_comments_have_been_released_for__3978b741: "Vurderingsendringar og kommentarar er publisert for alle."
   grade_changes_and_comments_have_been_released_for__5d6a01a0: "Endringar i vurdering og kommentarar er publisert for alle i seksjonane: %{section_names}"
@@ -12294,7 +12294,7 @@ nn:
       saving: Lagrar...
     titles: 
       grading_scheme_info: "Vis/rediger karakterskjema"
-  grading_standards_b73bfa72: "Standard karaktersetjing"
+  grading_standards_b73bfa72: "Standardar for karaktersetjing"
   grading_type_type_7d8b42d7: "Type karaktersetjing: %{type}"
   grant_tenant_access_9afafd: "Gi tenant tilgang"
   granular_permissions_for_add_remove_admin_roles_fr_9a06a75d: "Detaljerte løyve for å legge til/fjerne administratorroller frå emne"
@@ -12994,7 +12994,7 @@ nn:
   high_contrast_description: |-
       Høgkontrast forsterkar fargekontrasten i brukargrensesnittet (tekst, knappar osb.), og gjer desse elementa
       tydelegare og enklare å finne. Merk: Institusjonsutsjånaden blir deaktivert.
-  high_score_267b6641: "Høg skår"
+  high_score_267b6641: "Høg poengsum"
   high_score_47924c1a: "Høgt: %{score}"
   highest_28ad71e6: Høgast
   highest_score_e080551e: "Høgaste resultat"
