@@ -585,7 +585,8 @@ GEM
       multi_json (~> 1.11)
       os (>= 0.9, < 2.0)
       signet (>= 0.16, < 2.a)
-    graphql (1.12.24)
+    graphql (1.13.23)
+      base64
     graphql-batch (0.6.0)
       graphql (>= 1.12.18, < 3)
       promise.rb (~> 0.7.2)
@@ -1249,7 +1250,7 @@ DEPENDENCIES
   gepub (= 1.0.15)
   gergich (~> 2.1)
   google_drive!
-  graphql (~> 1.12.7)
+  graphql (~> 1.13.23)
   graphql-batch (~> 0.5)
   guardrail (~> 3.0)
   headless (= 2.3.1)
