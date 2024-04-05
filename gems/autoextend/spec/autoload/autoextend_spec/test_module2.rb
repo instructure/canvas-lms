@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2021 - present Instructure, Inc.
+# Copyright (C) 2024 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -17,10 +17,5 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-module Autoextend
-  class Railtie < Rails::Railtie
-    initializer "inject autoextend hooks", before: :setup_once_autoloader do
-      ::Autoextend.inject_into_zetwerk
-    end
-  end
+module AutoextendSpec::TestModule2
 end
