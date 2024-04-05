@@ -31,7 +31,11 @@ import type {StoreApi} from 'zustand'
 import {type LtiPlacement, i18nLtiPlacement} from '../../model/LtiPlacements'
 import type {LtiRegistration} from '../../model/LtiRegistration'
 import {i18nLtiScope} from '../../model/LtiScopes'
-import type {PlacementOverlay, RegistrationOverlayStore} from './RegistrationOverlayState'
+import {
+  canvasPlatformSettings,
+  type PlacementOverlay,
+  type RegistrationOverlayStore,
+} from './RegistrationOverlayState'
 import {RegistrationPrivacyField} from './RegistrationPrivacyField'
 
 const I18n = useI18nScope('react_developer_keys')
@@ -40,6 +44,8 @@ export const RegistrationOverlayForm = (props: {
   ltiRegistration: LtiRegistration
   store: StoreApi<RegistrationOverlayStore>
 }) => {
+  const configuration = props.ltiRegistration.default_configuration
+
   const [{state, ...actions}, setState] = React.useState(props.store.getState())
 
   const {
@@ -59,6 +65,10 @@ export const RegistrationOverlayForm = (props: {
     }
   }, [props.store])
 
+  const placements = canvasPlatformSettings(configuration)?.settings.placements || []
+
+  const scopes = configuration.scopes || []
+
   return (
     <>
       <Flex justifyItems="space-between" alignItems="center">
@@ -72,7 +82,7 @@ export const RegistrationOverlayForm = (props: {
             renderIcon={IconResetLine}
             margin="0 0 0 small"
             onClick={() => {
-              resetOverlays(props.ltiRegistration)
+              resetOverlays(configuration)
             }}
           >
             {I18n.t('Restore Defaults')}
@@ -81,16 +91,18 @@ export const RegistrationOverlayForm = (props: {
       </Flex>
       <View margin="medium 0" as="div">
         <FormFieldGroup description={I18n.t('Permissions')}>
-          {props.ltiRegistration.scopes.map(scope => {
-            return (
+          {scopes.length > 0 ? (
+            scopes.map(scope => (
               <Checkbox
                 key={scope}
                 checked={!state.registration.disabledScopes.includes(scope)}
                 label={i18nLtiScope(scope)}
                 onChange={() => toggleDisabledScope(scope)}
               />
-            )
-          })}
+            ))
+          ) : (
+            <Text fontStyle="italic">{I18n.t('This tool requires no permissions')}</Text>
+          )}
         </FormFieldGroup>
       </View>
       <View margin="medium 0" as="div">
@@ -101,21 +113,33 @@ export const RegistrationOverlayForm = (props: {
       </View>
       <View margin="medium 0" as="div">
         <FormFieldGroup description={I18n.t('Placements')} size={10}>
-          {state.registration.placements
-            .filter(p => (p.type as unknown) !== 'resource_selection')
-            .map(placementOverlay => {
-              const placementDisabled = state.registration.disabledPlacements.includes(
-                placementOverlay.type
+          {placements.length === 0 ? (
+            <Text fontStyle="italic">{I18n.t('This tool has no placements')}</Text>
+          ) : null}
+          {placements
+            .map(placement => {
+              const placementOverlay = state.registration.placements.find(
+                p => p.type === placement.placement
               )
+              if (!placementOverlay) {
+                return [placement, {type: placement.placement}] as const
+              } else {
+                return [placement, placementOverlay] as const
+              }
+            })
+            .map(([placement, placementOverlay]) => {
+              const disabled = state.registration.disabledPlacements.includes(placementOverlay.type)
               return (
-                <PlacementOverlayForm
-                  key={placementOverlay.type}
-                  updatePlacement={updatePlacement}
-                  placementOverlay={placementOverlay}
-                  placementDisabled={placementDisabled}
-                  toggleDisabledPlacement={toggleDisabledPlacement}
-                  borders={true}
-                />
+                <div>
+                  <PlacementOverlayForm
+                    key={placementOverlay.type}
+                    updatePlacement={updatePlacement}
+                    placementOverlay={placementOverlay}
+                    placementDisabled={disabled}
+                    toggleDisabledPlacement={toggleDisabledPlacement}
+                    borders={true}
+                  />
+                </div>
               )
             })}
         </FormFieldGroup>

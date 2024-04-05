@@ -16,21 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import GenericErrorPage from '@canvas/generic-error-page/react'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
 import page from 'page'
 import * as React from 'react'
-import type {DeveloperKey} from '../../model/api/DeveloperKey'
 import type {LtiRegistration} from '../../model/LtiRegistration'
+import type {DeveloperKey} from '../../model/api/DeveloperKey'
 import {updateRegistrationOverlay} from '../dynamic_registration/registrationApi'
 import {RegistrationOverlayForm} from './RegistrationOverlayForm'
 import {createRegistrationOverlayStore} from './RegistrationOverlayState'
-import GenericErrorPage from '@canvas/generic-error-page/react'
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = useI18nScope('react_developer_keys')
 
