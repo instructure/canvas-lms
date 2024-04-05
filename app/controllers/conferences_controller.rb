@@ -101,6 +101,18 @@
 #           "type": "array",
 #           "items": { "type": "integer"}
 #         },
+#         "invitees": {
+#           "description": "Array of user ids that are invitees in the conference",
+#           "example": [1, 7, 8, 9, 10],
+#           "type": "array",
+#           "items": { "type": "integer"}
+#         },
+#         "attendees": {
+#           "description": "Array of user ids that are attendees in the conference",
+#           "example": [1, 7, 8, 9, 10],
+#           "type": "array",
+#           "items": { "type": "integer"}
+#         },
 #         "has_advanced_settings": {
 #           "description": "True if the conference type has advanced settings.",
 #           "example": false,
