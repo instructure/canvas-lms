@@ -59,7 +59,7 @@ const not =
 
 const PrivacyFieldsIncluded: Record<LtiPrivacyLevel, ReadonlyArray<LtiPiiField>> = {
   public: allLtiPiiFields,
-  name_only: allLtiPiiFields.filter(not('email')),
+  name_only: allLtiPiiFields.filter(not('email', 'picture')),
   email_only: ['id', 'email'],
   anonymous: ['id'],
 }
