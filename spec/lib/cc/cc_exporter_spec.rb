@@ -1263,6 +1263,75 @@ describe "Common Cartridge exporting" do
         check_resource_node(@locked, CC::CCHelper::WEBCONTENT, false)
       end
     end
+
+    describe "New Quizzes Common Cartridge" do
+      context "with new_quizzes_common_cartridge feature flag enabled" do
+        it "should include the assignments settings and description html" do
+          @course.enable_feature!(:quizzes_next)
+          assignment_model(submission_types: "external_tool", course: @course)
+          tool = @c.context_external_tools.create!(
+            name: "Quizzes.Next",
+            consumer_key: "test_key",
+            shared_secret: "test_secret",
+            tool_id: "Quizzes 2",
+            url: "http://example.com/launch"
+          )
+          @a.external_tool_tag_attributes = { content: tool }
+          @a.save!
+
+          @course.root_account.settings[:provision] = { "lti" => "lti url" }
+          @course.root_account.save!
+          assignment = @course.assignments.last
+          assignment.title = "NewQuizzes"
+          assignment.save!
+
+          @ce.export_type = ContentExport::COMMON_CARTRIDGE
+          @ce.save!
+
+          run_export
+
+          assignment_id = @manifest_doc.at_css("resource[href*='newquizzes.html']").attr("href").chomp("/newquizzes.html")
+
+          doc = Nokogiri::XML.parse(@zip_file.read("#{assignment_id}/assignment_settings.xml"))
+          expect(doc).to_not be_nil
+        end
+      end
+
+      context "with new_quizzes_common_cartridge feature flag disabled" do
+        before do
+          Account.site_admin.enable_feature!(:new_quizzes_common_cartridge)
+        end
+
+        it "should not include the assignments settings and description html" do
+          @course.enable_feature!(:quizzes_next)
+          assignment_model(submission_types: "external_tool", course: @course)
+          tool = @c.context_external_tools.create!(
+            name: "Quizzes.Next",
+            consumer_key: "test_key",
+            shared_secret: "test_secret",
+            tool_id: "Quizzes 2",
+            url: "http://example.com/launch"
+          )
+          @a.external_tool_tag_attributes = { content: tool }
+          @a.save!
+
+          @course.root_account.settings[:provision] = { "lti" => "lti url" }
+          @course.root_account.save!
+          assignment = @course.assignments.last
+          assignment.title = "NewQuizzes"
+          assignment.save!
+
+          @ce.export_type = ContentExport::COMMON_CARTRIDGE
+          @ce.save!
+
+          run_export
+
+          assignment_id = @manifest_doc.at_css("resource[href*='newquizzes.html']")&.attr("href")&.chomp("/newquizzes.html")
+
+          expect(assignment_id).to be_nil
+        end
+      end
+    end
   end
 
   describe "#disable_content_rewriting" do
