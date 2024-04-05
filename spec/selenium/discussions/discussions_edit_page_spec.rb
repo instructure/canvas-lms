@@ -639,6 +639,7 @@ describe "discussions" do
             grading_type: "letter_grade",
             assignment_group: course.assignment_groups.create!(name: "assignment group"),
             grading_standard_id: grading_standard.id,
+            only_visible_to_overrides: true,
           }
 
           discussion_assignment_peer_review_options = {
@@ -691,6 +692,10 @@ describe "discussions" do
 
           expect(f("span[data-testid='assign-to-select-span']").present?).to be_truthy
           expect(fj("span:contains('#{course_section.name}')").present?).to be_truthy
+
+          # Verify that the only_visible_to_overrides field is being respected
+          expect(f("body")).not_to contain_jqcss("span:contains('Everyone')")
+
           # Just checking for a value. Formatting and TZ differences between front-end and back-end
           # makes an exact comparison too fragile.
           expect(f("input[placeholder='Select Assignment Due Date']").attribute("value")).not_to be_empty
