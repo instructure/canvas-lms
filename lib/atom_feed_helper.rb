@@ -24,7 +24,7 @@ module AtomFeedHelper
     require "rss/maker"
 
     content = RSS::Maker.make("atom") do |maker|
-      maker.channel.author = "author"
+      maker.channel.author = "canvas-lms"
       maker.channel.updated = updated ? updated.to_s : Time.now.to_s
       maker.channel.about = id || link
       maker.channel.title = title
