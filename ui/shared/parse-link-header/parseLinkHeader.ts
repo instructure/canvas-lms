@@ -75,7 +75,7 @@ function intoRels(acc: {[rel: string]: LinkInfo}, x: LinkInfo): {[rel: string]: 
 
 const PARSE_LINK_HEADER_MAXLEN = 2000
 const PARSE_LINK_HEADER_THROW_ON_MAXLEN_EXCEEDED =
-  ENV?.PARSE_LINK_HEADER_THROW_ON_MAXLEN_EXCEEDED != null
+  process.env.PARSE_LINK_HEADER_THROW_ON_MAXLEN_EXCEEDED != null
 
 function checkHeader(linkHeader: string | undefined): boolean {
   if (!linkHeader) return false
