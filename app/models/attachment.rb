@@ -1800,6 +1800,15 @@ class Attachment < ActiveRecord::Base
     end
   end
 
+  # after replacing this file's instfs_uuid, delete the old file if it's not being used by any other Attachments
+  def safe_delete_overwritten_instfs_uuid(instfs_uuid)
+    raise ArgumentError, "instfs_uuid not overwritten" if self.instfs_uuid == instfs_uuid
+
+    shard.activate do
+      InstFS.delete_file(instfs_uuid) unless Attachment.where(instfs_uuid:).exists?
+    end
+  end
+
   # this method does not destroy anything. It copies the content to a new s3object
   def send_to_purgatory(deleted_by_user = nil)
     make_rootless
