@@ -20,7 +20,7 @@ import React from 'react'
 import {ApolloProvider, createClient} from '@canvas/apollo'
 import {InternalSettingsView} from './InternalSettingsView'
 
-const client = createClient({apiGatewayUri: ENV.API_GATEWAY_URI})
+const client = createClient()
 
 export const InternalSettings = () => {
   return (

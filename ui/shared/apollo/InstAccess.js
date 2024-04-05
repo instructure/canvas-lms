@@ -38,46 +38,6 @@ class InstAccess {
       })
   }
 
-  async gatewayAuthenticatedFetch(uri, options) {
-    if (this.instAccessToken === null) {
-      this.instAccessToken = await this._fetchFreshAccessToken()
-    }
-    options.headers = options.headers || {}
-    options.headers.authorization = `Bearer ${this.instAccessToken}`
-    const firstTryResponse = await this.fetchImpl(uri, options)
-    const {status} = firstTryResponse
-    if (status >= 400 && status < 500) {
-      // we might have an expired token, let's try to refresh it
-      this.instAccessToken = await this._fetchFreshAccessToken()
-      options.headers.authorization = `Bearer ${this.instAccessToken}`
-      return this.fetchImpl(uri, options)
-    }
-    return firstTryResponse
-  }
-
-  // Internal only.
-  //
-  // InstAccess tokens are JWTs that are encrypted
-  // in a way only the API Gateway can read.  They have a
-  // relatively short expiration window, so go invalid quickly.
-  // This function is purposely stateless so that any time we hit
-  // an expiration issue in talking to the gateway, it's easy to just get another token
-  // with the user's cookie.
-  async _fetchFreshAccessToken() {
-    const fetchOptions = {
-      method: 'POST',
-      credentials: 'same-origin',
-      mode: 'same-origin',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-        'X-CSRF-Token': getCookie('_csrf_token'),
-      },
-    }
-    const tokenResponse = await this.fetchImpl('/api/v1/inst_access_tokens', fetchOptions)
-    const tokenBody = await tokenResponse.json()
-    return tokenBody.token
-  }
 }
 
 export default InstAccess
