@@ -607,6 +607,63 @@ describe AssignmentOverrideApplicator do
           expect(overrides).to eq [@override, @module_override]
         end
       end
+
+      describe "for other types of learning objects" do
+        before do
+          teacher_in_course(active_all: true)
+          account_admin_user
+          course_with_observer({ course: @course, active_all: true })
+          @course.enroll_user(@observer, "ObserverEnrollment", { associated_user_id: @student.id })
+        end
+
+        it "works for ungraded discussions" do
+          discussion = @course.discussion_topics.create!
+          discussion_override = discussion.assignment_overrides.create!
+          discussion_override_student = discussion_override.assignment_override_students.build
+          discussion_override_student.user = @student
+          discussion_override_student.save!
+
+          # students
+          overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(discussion, @student)
+          expect(overrides).to eq [discussion_override]
+
+          # teachers
+          overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(discussion, @teacher)
+          expect(overrides).to eq [discussion_override]
+
+          # admins
+          overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(discussion, @admin)
+          expect(overrides).to eq [discussion_override]
+
+          # observers
+          overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(discussion, @observer)
+          expect(overrides).to eq [discussion_override]
+        end
+
+        it "works for wiki pages" do
+          wiki_page = @course.wiki_pages.create!(title: "Wiki Page")
+          wiki_page_override = wiki_page.assignment_overrides.create!
+          wiki_page_override_student = wiki_page_override.assignment_override_students.build
+          wiki_page_override_student.user = @student
+          wiki_page_override_student.save!
+
+          # students
+          overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(wiki_page, @student)
+          expect(overrides).to eq [wiki_page_override]
+
+          # teachers
+          overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(wiki_page, @teacher)
+          expect(overrides).to eq [wiki_page_override]
+
+          # admins
+          overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(wiki_page, @admin)
+          expect(overrides).to eq [wiki_page_override]
+
+          # observers
+          overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(wiki_page, @observer)
+          expect(overrides).to eq [wiki_page_override]
+        end
+      end
     end
 
     context "group overrides" do
@@ -860,6 +917,61 @@ describe AssignmentOverrideApplicator do
           expect(result).to include(@module_override)
         end
       end
+
+      describe "for other types of learning objects" do
+        before do
+          teacher_in_course(active_all: true)
+          account_admin_user
+          course_with_observer({ course: @course, active_all: true })
+          @course.enroll_user(@observer, "ObserverEnrollment", { associated_user_id: @student.id })
+        end
+
+        it "works for ungraded discussions" do
+          discussion = @course.discussion_topics.create!
+          discussion_override = discussion.assignment_overrides.create!
+          discussion_override.set = @course.default_section
+          discussion_override.save!
+
+          # students
+          overrides = AssignmentOverrideApplicator.section_overrides(discussion, @student)
+          expect(overrides).to eq [discussion_override]
+
+          # teachers
+          overrides = AssignmentOverrideApplicator.section_overrides(discussion, @teacher)
+          expect(overrides).to eq [discussion_override]
+
+          # admins
+          overrides = AssignmentOverrideApplicator.section_overrides(discussion, @admin)
+          expect(overrides).to eq [discussion_override]
+
+          # observers
+          overrides = AssignmentOverrideApplicator.section_overrides(discussion, @observer)
+          expect(overrides).to eq [discussion_override]
+        end
+
+        it "works for wiki pages" do
+          wiki_page = @course.wiki_pages.create!(title: "Wiki Page")
+          wiki_page_override = wiki_page.assignment_overrides.create!
+          wiki_page_override.set = @course.default_section
+          wiki_page_override.save!
+
+          # students
+          overrides = AssignmentOverrideApplicator.section_overrides(wiki_page, @student)
+          expect(overrides).to eq [wiki_page_override]
+
+          # teachers
+          overrides = AssignmentOverrideApplicator.section_overrides(wiki_page, @teacher)
+          expect(overrides).to eq [wiki_page_override]
+
+          # admins
+          overrides = AssignmentOverrideApplicator.section_overrides(wiki_page, @admin)
+          expect(overrides).to eq [wiki_page_override]
+
+          # observers
+          overrides = AssignmentOverrideApplicator.section_overrides(wiki_page, @observer)
+          expect(overrides).to eq [wiki_page_override]
+        end
+      end
     end
 
     context "course overrides" do
@@ -938,6 +1050,62 @@ describe AssignmentOverrideApplicator do
           account_admin_user
           overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @admin)
           expect(overrides).to eq []
+        end
+      end
+
+      describe "for other types of learning objects" do
+        before do
+          Account.site_admin.enable_feature!(:differentiated_modules)
+          teacher_in_course(active_all: true)
+          account_admin_user
+          course_with_observer({ course: @course, active_all: true })
+          @course.enroll_user(@observer, "ObserverEnrollment", { associated_user_id: @student.id })
+        end
+
+        it "works for ungraded discussions" do
+          discussion = @course.discussion_topics.create!
+          discussion_override = discussion.assignment_overrides.create!
+          discussion_override.set = @course
+          discussion_override.save!
+
+          # students
+          overrides = AssignmentOverrideApplicator.course_overrides(discussion, @student)
+          expect(overrides).to eq [discussion_override]
+
+          # teachers
+          overrides = AssignmentOverrideApplicator.course_overrides(discussion, @teacher)
+          expect(overrides).to eq [discussion_override]
+
+          # admins
+          overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(discussion, @admin)
+          expect(overrides).to eq [discussion_override]
+
+          # observers
+          overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(discussion, @observer)
+          expect(overrides).to eq [discussion_override]
+        end
+
+        it "works for wiki pages" do
+          wiki_page = @course.wiki_pages.create!(title: "Wiki Page")
+          wiki_page_override = wiki_page.assignment_overrides.create!
+          wiki_page_override.set = @course
+          wiki_page_override.save!
+
+          # students
+          overrides = AssignmentOverrideApplicator.course_overrides(wiki_page, @student)
+          expect(overrides).to eq [wiki_page_override]
+
+          # teachers
+          overrides = AssignmentOverrideApplicator.course_overrides(wiki_page, @teacher)
+          expect(overrides).to eq [wiki_page_override]
+
+          # admins
+          overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(wiki_page, @admin)
+          expect(overrides).to eq [wiki_page_override]
+
+          # observers
+          overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(wiki_page, @observer)
+          expect(overrides).to eq [wiki_page_override]
         end
       end
     end
@@ -1180,6 +1348,22 @@ describe AssignmentOverrideApplicator do
     it "returns a new assignment object" do
       expect(@overridden.class).to eq @assignment.class
       expect(@overridden.object_id).not_to eq @assignment.object_id
+    end
+
+    it "returns a new discussion topic object for discussion topics" do
+      discussion = @course.discussion_topics.create!
+      discussion_override = discussion.assignment_overrides.create!
+      overridden_discussion = AssignmentOverrideApplicator.assignment_with_overrides(discussion, [discussion_override])
+      expect(overridden_discussion.class).to eq discussion.class
+      expect(overridden_discussion.object_id).not_to eq discussion.object_id
+    end
+
+    it "returns a new wiki page object for wiki pages" do
+      wiki_page = @course.wiki_pages.create!(title: "Wiki Page")
+      wiki_page_override = wiki_page.assignment_overrides.create!
+      overridden_wiki_page = AssignmentOverrideApplicator.assignment_with_overrides(wiki_page, [wiki_page_override])
+      expect(overridden_wiki_page.class).to eq wiki_page.class
+      expect(overridden_wiki_page.object_id).not_to eq wiki_page.object_id
     end
 
     it "preserves assignment id" do
@@ -1560,6 +1744,22 @@ describe AssignmentOverrideApplicator do
       unlock_at = AssignmentOverrideApplicator.overridden_unlock_at(@assignment, [@override])
       expect(unlock_at).to eq @assignment.unlock_at
     end
+
+    it "uses discussion overrides that override unlock_at" do
+      @discussion = discussion_topic_model
+      @override = @discussion.assignment_overrides.create!
+      @override.override_unlock_at(7.days.from_now)
+      unlock_at = AssignmentOverrideApplicator.overridden_unlock_at(@discussion, [@override])
+      expect(unlock_at).to eq @override.unlock_at
+    end
+
+    it "uses wiki page overrides that override unlock_at" do
+      @wiki_page = discussion_topic_model
+      @override = @wiki_page.assignment_overrides.create!
+      @override.override_unlock_at(7.days.from_now)
+      unlock_at = AssignmentOverrideApplicator.overridden_unlock_at(@wiki_page, [@override])
+      expect(unlock_at).to eq @override.unlock_at
+    end
   end
 
   describe "overridden_lock_at" do
@@ -1641,6 +1841,22 @@ describe AssignmentOverrideApplicator do
     it "recognizes overrides with overridden-but-nil lock_at" do
       @override.override_lock_at(nil)
       lock_at = AssignmentOverrideApplicator.overridden_lock_at(@assignment, [@override])
+      expect(lock_at).to eq @override.lock_at
+    end
+
+    it "uses discussion overrides that override lock_at" do
+      @discussion = discussion_topic_model
+      @override = @discussion.assignment_overrides.create!
+      @override.override_lock_at(7.days.from_now)
+      lock_at = AssignmentOverrideApplicator.overridden_lock_at(@discussion, [@override])
+      expect(lock_at).to eq @override.lock_at
+    end
+
+    it "uses wiki page overrides that override lock_at" do
+      @wiki_page = wiki_page_model
+      @override = @wiki_page.assignment_overrides.create!
+      @override.override_lock_at(7.days.from_now)
+      lock_at = AssignmentOverrideApplicator.overridden_lock_at(@wiki_page, [@override])
       expect(lock_at).to eq @override.lock_at
     end
   end

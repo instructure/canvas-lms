@@ -446,7 +446,7 @@ describe LearningObjectDatesController do
       it "doesn't duplicate module overrides on a learning object" do
         context_module = @course.context_modules.create!(name: "module")
         module1_override = context_module.assignment_overrides.create!
-        context_module.content_tags.create!(content: differentiable, context: @course, tag_type: "context_module")
+        context_module.content_tags.create!(content: learning_object, context: @course, tag_type: "context_module")
 
         override2 = differentiable.assignment_overrides.create!(unlock_at: "2022-02-01T01:00:00Z",
                                                                 unlock_at_overridden: true,
