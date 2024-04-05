@@ -250,7 +250,7 @@ module Lti::IMS
             "extensions" => [{
               "domain" => "example.com",
               "platform" => "canvas.instructure.com",
-              "privacy_level" => "public",
+              "privacy_level" => "anonymous",
               "settings" => {
                 "icon_url" => nil,
                 "placements" => [],
@@ -356,6 +356,70 @@ module Lti::IMS
                 }
               ]
             )
+          end
+        end
+      end
+
+      context "privacy level isn't defined" do
+        let(:lti_tool_configuration) do
+          {
+            domain: "example.com",
+            messages: [],
+            claims: []
+          }
+        end
+
+        it "privacy level defaults to anonymous" do
+          expect(subject[:privacy_level]).to eq("anonymous")
+        end
+
+        context "when claims is an Email Address" do
+          before do
+            lti_tool_configuration[:claims] = %w[email]
+          end
+
+          it "privacy level is User's email Only" do
+            expect(subject[:privacy_level]).to eq("email_only")
+          end
+        end
+
+        context "when claims are Name, First Name, Last Name, Avatar" do
+          before do
+            lti_tool_configuration[:claims] = %w[name given_name family_name]
+          end
+
+          it "privacy level is User's Name Only" do
+            expect(subject[:privacy_level]).to eq("name_only")
+          end
+        end
+
+        context "when claims are Name, First Name, Last Name, SIS ID, Avatar, Email Address" do
+          before do
+            lti_tool_configuration[:claims] = %w[name given_name family_name picture email https://purl.imsglobal.org/spec/lti/claim/lis]
+          end
+
+          it "privacy level is public" do
+            expect(subject[:privacy_level]).to eq("public")
+          end
+        end
+
+        context "when claims are Email and Avatar" do
+          before do
+            lti_tool_configuration[:claims] = %w[email picture]
+          end
+
+          it "privacy level is public" do
+            expect(subject[:privacy_level]).to eq("public")
+          end
+        end
+
+        context "when claims are Email and Name" do
+          before do
+            lti_tool_configuration[:claims] = %w[email name]
+          end
+
+          it "privacy level is public" do
+            expect(subject[:privacy_level]).to eq("public")
           end
         end
       end
@@ -511,7 +575,7 @@ module Lti::IMS
               "extensions" => [{
                 "domain" => "example.com",
                 "platform" => "canvas.instructure.com",
-                "privacy_level" => "public",
+                "privacy_level" => "anonymous",
                 "settings" => {
                   "icon_url" => nil,
                   "placements" => [
@@ -540,7 +604,7 @@ module Lti::IMS
               "lti_version" => "1.3",
               "oidc_initiation_url" => "http://example.com/login",
               "platform" => "canvas.instructure.com",
-              "privacy_level" => "public",
+              "privacy_level" => "anonymous",
               "public_jwk_url" => "http://example.com/jwks",
               "scopes" => [],
               "target_link_uri" => nil,
