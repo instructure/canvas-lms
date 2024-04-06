@@ -279,9 +279,9 @@ module CanvasSanitize # :nodoc:
                     allowscriptaccess
                     width
                     height].freeze,
-      "video" => %w[name src allowfullscreen muted poster width height controls playsinline].freeze,
+      "video" => %w[name src allowfullscreen allow muted poster width height controls playsinline].freeze,
       "track" => %w[default kind label src srclang].freeze,
-      "audio" => %w[name src muted controls].freeze,
+      "audio" => %w[name src allowfullscreen allow muted poster width height controls playsinline].freeze,
       "font" => %w[face color size].freeze,
       # MathML
       "annotation" => %w[href xref definitionURL encoding cd name src].freeze,

@@ -404,11 +404,6 @@ module CC
         return html if html.blank?
 
         doc = Nokogiri::HTML5.fragment(html)
-        doc.css("iframe[src*=media_attachment]").each do |iframe|
-          replace_media_iframe(iframe)
-        end
-        return doc.to_s if @for_course_copy
-
         # keep track of found media comments, and translate them into links into the files tree
         # if imported back into canvas, they'll get uploaded to the media server
         # and translated back into media comments
@@ -427,7 +422,7 @@ module CC
 
         # process new RCE media iframes too
         doc.css("iframe[data-media-id]").each do |iframe|
-          next if iframe["src"].include?("/media_attachments_iframe/")
+          next if iframe["src"].include?("/media_attachments_iframe/") || iframe["src"].include?(WEB_CONTENT_TOKEN)
 
           media_id = iframe["data-media-id"]
           obj = MediaObject.active.by_media_id(media_id).take
@@ -443,6 +438,8 @@ module CC
         doc.css("iframe[data-media-type]").each do |iframe|
           replace_media_iframe(iframe)
         end
+
+        return doc.to_html if @for_course_copy
 
         # prepend the Canvas domain to remaining absolute paths that are missing the host
         # (those in the course are already "$CANVAS_COURSE_REFERENCE$/...", but links

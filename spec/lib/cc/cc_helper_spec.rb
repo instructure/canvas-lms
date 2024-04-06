@@ -139,15 +139,7 @@ describe CC::CCHelper do
       expect(@exporter.media_object_infos[@obj.id][:asset][:id]).to eq "one"
     end
 
-    it "does not touch media links on course copy" do
-      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, for_course_copy: true)
-      orig = <<~HTML
-        <p><a id="media_comment_abcde" class="instructure_inline_media_comment">this is a media comment</a></p>
-      HTML
-      translated = @exporter.html_content(orig)
-      expect(translated).to eq orig
-    end
-
+    # TODO: tests for media_comment_ links can be removed after the datafix up for LF-1335 is complete
     it "does not touch links to deleted media objects" do
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
       @obj.destroy
