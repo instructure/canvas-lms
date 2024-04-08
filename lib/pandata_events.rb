@@ -52,13 +52,14 @@ module PandataEvents
   end
 
   # Send data to the PandataEvents service, partitioned by `event_type`.
+  # Uses light fire-and-forget threading to avoid blocking the
+  # main request cycle and to avoid overwhelming the jobs infrastructure.
   def self.send_event(event_type, data, for_user_id: nil)
     return unless enabled?
 
-    delay(
-      priority: Delayed::LOW_PRIORITY,
-      n_strand: ["pandata_events", event_type]
-    ).post_event(event_type, data, for_user_id)
+    Thread.new(event_type, data, for_user_id) { |et, d, fui| post_event(et, d, fui) }
+  rescue ThreadError
+    InstStatsd::Statsd.increment("pandata_events.error.queue_failure", tags: { event_type: })
   end
 
   def self.post_event(event_type, data, sub)
