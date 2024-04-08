@@ -1980,6 +1980,23 @@ describe Assignment do
   end
 
   describe "#representatives" do
+    it "optionally returns group members along with the reps" do
+      @first_student = @student
+      @second_student = student_in_course(active_all: true).user
+      group_category = @course.group_categories.create!(name: "My Category")
+      group = @course.groups.create!(name: "My Group", group_category:)
+      group.add_user(@first_student)
+      group.add_user(@second_student)
+      group.save!
+      assignment = @course.assignments.create!(assignment_valid_attributes.merge(group_category:))
+      rep, others = assignment.representatives(user: @teacher, include_others: true).first
+      aggregate_failures do
+        expect(rep.id).to eq @first_student.id
+        expect(others.count).to eq 1
+        expect(others.first.id).to eq @second_student.id
+      end
+    end
+
     context "when filtering by section" do
       before(:once) do
         @student_enrollment = @enrollment

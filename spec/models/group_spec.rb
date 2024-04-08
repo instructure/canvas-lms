@@ -910,4 +910,30 @@ describe Group do
       expect(group.usage_rights_required?).to be true
     end
   end
+
+  describe ".ids_by_student_by_assignment" do
+    it "returns a hash of assignment_id => user_id => group_id" do
+      first_student = @course.enroll_student(user_model, enrollment_state: "active").user
+      second_student = @course.enroll_student(user_model, enrollment_state: "active").user
+
+      first_group = @group
+      group_category = first_group.group_category
+      first_group.add_user(first_student)
+      second_group = @course.groups.create!(group_category:)
+      second_group.add_user(second_student)
+      assignment = @course.assignments.create!(group_category:)
+
+      aggregate_failures do
+        map = Group.ids_by_student_by_assignment([first_student.id], [assignment.id])
+        expect(map.dig(assignment.id, first_student.id)).to eq first_group.id
+        expect(map.fetch(assignment.id)).not_to have_key(second_student.id)
+
+        map = Group.ids_by_student_by_assignment([first_student.id, second_student.id], [assignment.id])
+        expect(map.dig(assignment.id, first_student.id)).to eq first_group.id
+        expect(map.dig(assignment.id, second_student.id)).to eq second_group.id
+
+        expect(Group.ids_by_student_by_assignment([first_student.id], [])).to be_empty
+      end
+    end
+  end
 end

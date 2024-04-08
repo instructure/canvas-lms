@@ -69,6 +69,36 @@ describe Types::AssignmentType do
     let(:model_class) { Assignment }
   end
 
+  describe "hasGroupCategory" do
+    it "returns true for group assignments" do
+      assignment.update!(group_category: course.group_categories.create!(name: "My Category"))
+      expect(assignment_type.resolve("hasGroupCategory")).to be true
+    end
+
+    it "returns false for non-group assignments" do
+      expect(assignment_type.resolve("hasGroupCategory")).to be false
+    end
+  end
+
+  describe "gradeAsGroup" do
+    it "returns true for group assignments being graded as group" do
+      assignment.update!(group_category: course.group_categories.create!(name: "My Category"))
+      expect(assignment_type.resolve("gradeAsGroup")).to be true
+    end
+
+    it "returns false for group assignments being graded individually" do
+      assignment.update!(
+        group_category: course.group_categories.create!(name: "My Category"),
+        grade_group_students_individually: true
+      )
+      expect(assignment_type.resolve("gradeAsGroup")).to be false
+    end
+
+    it "returns false for non-group assignments" do
+      expect(assignment_type.resolve("gradeAsGroup")).to be false
+    end
+  end
+
   context "top-level permissions" do
     it "requires read permission" do
       assignment.unpublish

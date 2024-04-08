@@ -454,6 +454,18 @@ module Types
       AssignmentOverrideApplicator.overrides_for_assignment_and_user(assignment, current_user)
     end
 
+    field :has_group_category,
+          Boolean,
+          "specifies that this assignment is a group assignment",
+          method: :has_group_category?,
+          null: false
+
+    field :grade_as_group,
+          Boolean,
+          "specifies that students are being graded as a group (as opposed to being graded individually).",
+          method: :grade_as_group?,
+          null: false
+
     field :group_set, GroupSetType, null: true
     def group_set
       load_association(:group_category)
@@ -495,13 +507,9 @@ module Types
       argument :order_by, [SubmissionSearchOrderInputType], required: false
     end
     def group_submissions_connection(filter: nil, order_by: nil)
-      return nil if current_user.nil? || assignment.group_category_id.nil?
+      return nil if assignment.group_category_id.nil?
 
-      filter = filter.to_h
-      order_by ||= []
-      filter[:states] ||= DEFAULT_SUBMISSION_STATES
-      filter[:order_by] = order_by.map(&:to_h)
-      scope = SubmissionSearch.new(assignment, current_user, session, filter).search
+      scope = submissions_connection(filter:, order_by:)
       Promise.all([
                     Loaders::AssociationLoader.for(Assignment, :submissions).load(assignment),
                     Loaders::AssociationLoader.for(Assignment, :context).load(assignment)

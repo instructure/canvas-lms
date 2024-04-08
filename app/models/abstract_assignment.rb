@@ -118,10 +118,11 @@ class AbstractAssignment < ActiveRecord::Base
   belongs_to :context, polymorphic: [:course]
   delegate :moderated_grading_max_grader_count, to: :course
   belongs_to :grading_standard
-  belongs_to :group_category
+  belongs_to :group_category, inverse_of: :assignments
   belongs_to :grader_section, class_name: "CourseSection", optional: true
   belongs_to :final_grader, class_name: "User", optional: true
   has_many :active_groups, -> { merge(GroupCategory.active).merge(Group.active) }, through: :group_category, source: :groups
+  has_many :group_memberships, through: :active_groups
   has_many :assigned_students, through: :submissions, source: :user
   has_many :enrollments_for_assigned_students, -> { active.not_fake.where("enrollments.course_id = submissions.course_id") }, through: :assigned_students, source: :enrollments
   has_many :sections_for_assigned_students, -> { active.distinct }, through: :enrollments_for_assigned_students, source: :course_section
@@ -2629,7 +2630,7 @@ class AbstractAssignment < ActiveRecord::Base
   # for group assignments, returns a single "student" for each
   # group's submission.  the students name will be changed to the group's
   # name.  for non-group assignments this just returns all visible users
-  def representatives(user:, includes: [:inactive], group_id: nil, section_id: nil, ignore_student_visibility: false, &block)
+  def representatives(user:, includes: [:inactive], group_id: nil, section_id: nil, ignore_student_visibility: false, include_others: false, &block)
     return visible_students_for_speed_grader(user:, includes:, group_id:, section_id:, ignore_student_visibility:) unless grade_as_group?
 
     submissions = self.submissions.to_a
@@ -2685,7 +2686,12 @@ class AbstractAssignment < ActiveRecord::Base
     if block
       sorted_reps_with_others.each(&block)
     end
-    sorted_reps_with_others.map(&:first)
+
+    if include_others
+      sorted_reps_with_others
+    else
+      sorted_reps_with_others.map(&:first)
+    end
   end
 
   def groups_and_ungrouped(user, includes: [])

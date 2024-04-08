@@ -273,6 +273,16 @@ class Group < ActiveRecord::Base
     name
   end
 
+  def self.ids_by_student_by_assignment(student_ids, assignment_ids)
+    GroupMembership.for_assignments(assignment_ids)
+                   .for_students(student_ids)
+                   .pluck("assignments.id", "group_memberships.group_id", "group_memberships.user_id")
+                   .each_with_object({}) do |(assignment_id, group_id, user_id), acc|
+                     acc[assignment_id] ||= {}
+                     acc[assignment_id][user_id] = group_id
+                   end
+  end
+
   def self.find_all_by_context_code(codes)
     ids = codes.filter_map { |c| c.match(/\Agroup_(\d+)\z/)[1] rescue nil }
     Group.find(ids)

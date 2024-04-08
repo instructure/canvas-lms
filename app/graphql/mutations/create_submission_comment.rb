@@ -21,13 +21,18 @@
 class Mutations::CreateSubmissionComment < Mutations::BaseMutation
   graphql_name "CreateSubmissionComment"
 
-  argument :submission_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Submission")
   argument :attempt, Integer, required: false
   argument :comment, String, required: true
   argument :file_ids, [ID], required: false, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("Attachment")
+  argument :group_comment,
+           Boolean,
+           "Post comment to entire group (only relevant for group assignments grading students individually)",
+           required: false,
+           default_value: false
   argument :media_object_id, ID, required: false
   argument :media_object_type, String, required: false
   argument :reviewer_submission_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Submission")
+  argument :submission_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Submission")
 
   field :submission_comment, Types::SubmissionCommentType, null: true
 
@@ -77,7 +82,7 @@ class Mutations::CreateSubmissionComment < Mutations::BaseMutation
     end
 
     assignment = submission.assignment
-    opts[:group_comment] = assignment.grade_as_group?
+    opts[:group_comment] = group_comment?(assignment, input)
 
     comment = assignment.add_submission_comment(submission.user, opts).first
     comment.mark_read!(current_user)
@@ -86,5 +91,14 @@ class Mutations::CreateSubmissionComment < Mutations::BaseMutation
     errors_for(e.record)
   rescue ActiveRecord::RecordNotFound
     raise GraphQL::ExecutionError, "not found"
+  end
+
+  private
+
+  def group_comment?(assignment, input)
+    return false unless assignment.has_group_category?
+    return true unless assignment.grade_group_students_individually?
+
+    input[:group_comment]
   end
 end
