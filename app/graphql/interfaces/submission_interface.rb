@@ -420,6 +420,14 @@ module Interfaces::SubmissionInterface
 
   field :assignment_id, ID, null: false
 
+  field :group_id, ID, null: true
+  def group_id
+    # Unfortunately, we can't use submissions.group_id, since that value is
+    # only set once the group has submitted, but not before then. So we have
+    # to jump through some hoops to load the correct group ID for a submission.
+    Loaders::SubmissionGroupIdLoader.load(object).then { |group_id| group_id }
+  end
+
   field :preview_url, String, null: true
   def preview_url
     Loaders::SubmissionVersionNumberLoader.load(object).then do |version_number|

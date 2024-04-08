@@ -33,7 +33,12 @@ const SUBMISSION_QUERY = gql`
       pointsPossible
       courseId
       submissionsConnection(
-        filter: {includeUnsubmitted: true, userId: $userId, applyGradebookEnrollmentFilters: true}
+        filter: {
+          applyGradebookEnrollmentFilters: true
+          includeUnsubmitted: true
+          representativesOnly: true
+          userId: $userId
+        }
       ) {
         nodes {
           _id
