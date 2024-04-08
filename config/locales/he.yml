@@ -2035,6 +2035,7 @@ he:
   after_last_attempt_c9168da2: "בתום הנסיון האחרון"
   after_the_assignment_is_graded_53754607: "אחרי שהמטלה מוערכת"
   after_the_due_date_eee89c9c: "אחרי תאריך היעד"
+  agenda_b010136d: "סדר יים"
   ahead_21f22939: בהמשך
   ajax_errors: 
     error_heading: "שגיאת AJAX: (תוכנה)  %{status_code}"
@@ -6439,6 +6440,7 @@ he:
   create_failed_15d07ad4: "יצירה נכשלה"
   create_group_set_7fe1cd53: "יצירת אוסף קבוצות"
   create_new_e0946c49: "צור/י חדש"
+  create_new_event_e9fb2fb6: "יצירת אירוע חדש"
   create_slots_71dbb2f8: "יצירת חלונות"
   create_theme_based_on_40651ed3: "יצירת ערכת נושא המבוסס על"
   create_users_view: 
@@ -7752,6 +7754,7 @@ he:
   enter_grades_as_e113e606: "עיון בציונים בתור"
   enter_or_find_an_external_tool_url_6aebbd0d: "הקלדת או מציאת כתובת דף הכלי החיצוני"
   enter_the_access_token_for_your_organization_from__cc77493d: "יש לקליד את אסימון הגישה של ארגונך מ *eduappcenter.com*. לאחר מכן רק האפליקציות שארגונך אישר ב EduAppCenter יוצגו בדף האפליקציות החיצוניות. למד/י כיצד לבצע **ייצור אסימון גישה**"
+  enter_the_date_you_would_like_to_navigate_to_a712de47: "יש להקליד את התאריך אליו רוצים להתנתב."
   enter_the_email_addresses_of_the_users_you_would_l_f76448a6: "יש להקליד את כתובות הדוא\"ל של המשתמשים שברצונך להוסיף, מופרדות בפסיקים או כ\"א בשורה חדשה"
   enter_the_login_ids_of_the_users_you_would_like_to_502fcbc5: "יש להקליד את מזהה הלוג-אין של המשתמשים אשר ברצונך להוסיף, מופרדים ע\"י פסיקים או בשורות נפרדות"
   enter_the_sis_ids_of_the_users_you_would_like_to_a_25e441f1: "הקלדת מזהי המערכת הבית ספרית של המשתמשים שברצונך להוסיף, מופרדים בפסיקים או כ\"א בשורה נפרדת"
@@ -13009,6 +13012,7 @@ he:
   modules_c4325335: מודולים
   modules_home_page_568c6bb9: "דף הבית של המודולים"
   modules_tutorial_tray_d58ac3cb: "איזור מדריך המודולים"
+  month_4b83b95f: חודש
   month_s_5c17590e: חודש(ים)
   moodle_dropdown_many_warning_title: "ישנן %{count} שאלות מרובות רשימות נפתחות בבנק שאלות זה אשר יתכן ויובא שלא כהלכה"
   moodle_dropdown_warning_title: "שאלות מרובות רשימות נפתחות בבנק שאלות זה. יתכן ויובא שלא כהלכה"
@@ -20235,6 +20239,7 @@ he:
   warning_for_improved_accessibility_of_calendar_eve_da54b4e2: "אזהרה: לגישה משופרת לאירועי היומן, נא השתמשו בתצוגת סדר היום."
   warning_for_improved_accessibility_of_reordering_a_5d0206c7: "אזהרה: לגישה משופרת אל מיון מחדש של משימות וקבוצות, נא להשתמש בחלון מעבר אל אשר מופיע בתפריט. "
   warning_for_improved_accessibility_please_click_he_e6472c02: "אזהרה: לגישה משופרת, נא להקליק כאן כדי להשתמש בתצוגה הפרטנית של ספר הציונים"
+  warning_for_improved_accessibility_please_use_the__1075c150: "אזהרה: לגישה משופרת, נא להשתמש ב\"תצוגת סדר יום\""
   warnings: 
     test_install: 
       periodic_message: "התקנת קנבס הנה לצורך בדיקות בלבד, ותאופס מדי פעם."
@@ -20274,6 +20279,7 @@ he:
   webct_file_description: " קורס  +Blackboard Vista/CE, WebCT 6"
   webct_name: "Blackboard Vista/CE (WebCT) "
   website_url_177fc1dc: "כתובת אתר"
+  week_1f945ddd: שבוע
   week_s_cb1492ee: שבוע(ות)
   weight_ff579a8e: "משקל:"
   weight_final_grade_based_on_assignment_groups_3124161: "שיקלול הערכה סופית על בסיס קבוצות משימה"
