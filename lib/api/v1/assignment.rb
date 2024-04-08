@@ -1109,6 +1109,10 @@ module Api::V1::Assignment
       assignment.lti_resource_link_url = external_tool_tag_attributes[:url]
     end
 
+    if external_tool_tag_attributes&.include?(:title)
+      assignment.lti_resource_link_title = external_tool_tag_attributes[:title]
+    end
+
     if assignment.external_tool?
       assignment.peer_reviews = false
     end

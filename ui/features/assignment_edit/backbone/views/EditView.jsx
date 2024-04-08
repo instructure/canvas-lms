@@ -93,6 +93,7 @@ const ALLOWED_ATTEMPTS_CONTAINER = '#allowed_attempts_fields'
 const GROUP_CATEGORY_SELECTOR = '#group_category_selector'
 const PEER_REVIEWS_FIELDS = '#assignment_peer_reviews_fields'
 const EXTERNAL_TOOLS_URL = '#assignment_external_tool_tag_attributes_url'
+const EXTERNAL_TOOLS_TITLE = '#assignment_external_tool_tag_attributes_title'
 const EXTERNAL_TOOLS_CONTENT_TYPE = '#assignment_external_tool_tag_attributes_content_type'
 const EXTERNAL_TOOLS_CONTENT_ID = '#assignment_external_tool_tag_attributes_content_id'
 const EXTERNAL_TOOLS_NEW_TAB = '#assignment_external_tool_tag_attributes_new_tab'
@@ -231,6 +232,7 @@ EditView.prototype.els = {
     els['' + GROUP_CATEGORY_SELECTOR] = '$groupCategorySelector'
     els['' + PEER_REVIEWS_FIELDS] = '$peerReviewsFields'
     els['' + EXTERNAL_TOOLS_URL] = '$externalToolsUrl'
+    els['' + EXTERNAL_TOOLS_TITLE] = '$externalToolsTitle'
     els['' + EXTERNAL_TOOLS_NEW_TAB] = '$externalToolsNewTab'
     els['' + EXTERNAL_TOOLS_IFRAME_WIDTH] = '$externalToolsIframeWidth'
     els['' + EXTERNAL_TOOLS_IFRAME_HEIGHT] = '$externalToolsIframeHeight'
@@ -641,6 +643,7 @@ EditView.prototype.handleContentItem = function (item) {
   this.$externalToolsContentType.val(item.type)
   this.$externalToolsContentId.val(item.id || this.selectedTool?.id)
   this.$externalToolsUrl.val(item.url)
+  this.$externalToolsTitle.val(item.title)
   this.$externalToolsNewTab.prop('checked', item.window?.targetName === '_blank')
   this.$externalToolsIframeWidth.val(item.iframe?.width)
   this.$externalToolsIframeHeight.val(item.iframe?.height)
@@ -1078,6 +1081,7 @@ EditView.prototype.handleExternalContentReady = function (data) {
   let student_count_text
   const item = data.contentItems[0]
   this.$externalToolsUrl.val(item.url)
+  this.$externalToolsTitle.val(item.title)
   if (item.title) {
     this.$name.val(item.title)
   }
