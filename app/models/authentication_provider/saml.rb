@@ -434,6 +434,8 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
                          include_all_encryption_certificates:)
     prior_configs = Set.new
     aps.each do |ap|
+      entity.roles.last.authn_requests_signed = true if ap.sig_alg
+
       federated_attributes = ap.federated_attributes
       next if federated_attributes.empty?
       next if prior_configs.include?(federated_attributes)
