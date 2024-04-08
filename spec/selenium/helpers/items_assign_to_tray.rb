@@ -105,6 +105,10 @@ module ItemsAssignToTray
     "[data-testid='module-item-edit-tray'] h3"
   end
 
+  def close_button_selector
+    "//*[@data-testid = 'module-item-edit-tray']//button[. = 'Close']"
+  end
+
   #------------------------------ Elements ------------------------------
   def add_assign_to_card
     f(add_assign_to_card_selector)
@@ -192,6 +196,10 @@ module ItemsAssignToTray
 
   def tray_header
     f(tray_header_selector)
+  end
+
+  def close_button
+    fxpath(close_button_selector)
   end
 
   #------------------------------ Actions ------------------------------

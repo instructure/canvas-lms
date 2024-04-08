@@ -188,10 +188,10 @@ export default function ItemAssignToTray({
   const [initialCards, setInitialCards] = useState<ItemAssignToCardSpec[]>([])
   const [fetchInFlight, setFetchInFlight] = useState(false)
   const [disabledOptionIds, setDisabledOptionIds] = useState<string[]>(defaultDisabledOptionIds)
-  const [shouldFocusCard, setShouldFocusCard] = useState<boolean>(false)
   const [blueprintDateLocks, setBlueprintDateLocks] = useState<DateLockTypes[] | undefined>(
     undefined
   )
+  const lastPerformedAction = useRef<{action: 'add' | 'delete'; index?: number} | null>(null)
   const cardsRefs = useRef<{[cardId: string]: ItemAssignToCardRef}>({})
   const addCardButtonRef = useRef<Element | null>(null)
   const everyoneOption = useMemo(() => {
@@ -218,11 +218,30 @@ export default function ItemAssignToTray({
   })
 
   useEffect(() => {
-    if (assignToCards.length === 0) return
-    const lastCard = assignToCards.at(assignToCards.length - 1)
-    if (!lastCard) return
-    const lastCardRef = cardsRefs.current[lastCard.key]
-    lastCardRef?.focusDeleteButton()
+    if (assignToCards.length === 0 && !lastPerformedAction.current) return
+    const action = lastPerformedAction.current?.action
+    const index = lastPerformedAction.current?.index || 0
+    // If only a card remains, we should focus the add button
+    const shouldFocusAddButton = action === 'delete' && assignToCards.length <= 1
+    let focusIndex
+    if (shouldFocusAddButton && addCardButtonRef?.current instanceof HTMLButtonElement) {
+      addCardButtonRef.current.disabled = false // so it can be focused
+      addCardButtonRef.current.focus()
+    } else if (action === 'add') {
+      // Focus the last card
+      focusIndex = assignToCards.length - 1
+    } else if (action === 'delete') {
+      // Focus the previous card
+      focusIndex = index <= 0 ? 0 : index - 1
+    }
+    if (focusIndex !== undefined) {
+      const card = assignToCards.at(focusIndex)
+      if (card) {
+        const cardRef = cardsRefs.current[card.key]
+        cardRef?.focusDeleteButton()
+      }
+    }
+    lastPerformedAction.current = null
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [assignToCards.length])
 
@@ -351,6 +370,7 @@ export default function ItemAssignToTray({
         selectedAssigneeIds: [] as string[],
       } as ItemAssignToCardSpec,
     ]
+    lastPerformedAction.current = {action: 'add'}
     setAssignToCards(cards)
   }
 
@@ -389,17 +409,14 @@ export default function ItemAssignToTray({
 
   const handleDeleteCard = useCallback(
     (cardId: string) => {
-      const cardSelection =
-        assignToCards.find(card => card.key === cardId)?.selectedAssigneeIds ?? []
+      const cardIndex = assignToCards.findIndex(card => card.key === cardId)
+      const cardSelection = assignToCards.at(cardIndex)?.selectedAssigneeIds ?? []
       const newDisabled = disabledOptionIds.filter(id => !cardSelection.includes(id))
       const cards = assignToCards.filter(({key}) => key !== cardId)
+      lastPerformedAction.current = {action: 'delete', index: cardIndex}
       setAssignToCards(cards)
       setDisabledOptionIds(newDisabled)
       onCardRemove?.(cardId)
-      if (addCardButtonRef?.current instanceof HTMLButtonElement) {
-        addCardButtonRef.current.disabled = false // so it can be focused
-        addCardButtonRef.current.focus()
-      }
     },
     [assignToCards, disabledOptionIds, onCardRemove]
   )
@@ -539,7 +556,7 @@ export default function ItemAssignToTray({
         <View data-testid="item-type-text" as="div" margin="medium 0 0 0">
           {renderItemType()} {pointsPossible != null && `| ${renderPointsPossible()}`}
         </View>
-        {blueprintDateLocks?.length > 0 ? (
+        {blueprintDateLocks && blueprintDateLocks.length > 0 ? (
           <Alert liveRegion={getLiveRegion} variant="info" margin="small 0 0">
             <Text weight="bold" size="small">
               {I18n.t('Locked: ')}

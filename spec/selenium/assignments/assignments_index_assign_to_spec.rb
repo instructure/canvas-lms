@@ -162,6 +162,16 @@ shared_examples_for "selective_release assign to tray" do |context|
     expect(element_exists?(module_item_edit_tray_selector)).to be_falsey
     expect(@assignment1.assignment_overrides.first.assignment_override_students.count).to eq(1)
   end
+
+  it "focus close button on open" do
+    get @mod_url
+    click_manage_assignment_button(@assignment1.id)
+    click_assign_to_menu_link(@assignment1.id)
+
+    expect(item_tray_exists?).to be_truthy
+
+    check_element_has_focus close_button
+  end
 end
 
 describe "assignments index menu tool placement" do
