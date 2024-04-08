@@ -22,7 +22,7 @@ import {DeletedPostMessage} from '../../components/DeletedPostMessage/DeletedPos
 import {PostMessage} from '../../components/PostMessage/PostMessage'
 import PropTypes from 'prop-types'
 import React, {useContext} from 'react'
-import {responsiveQuerySizes} from '../../utils'
+import {responsiveQuerySizes, userNameToShow} from '../../utils'
 import {SearchContext} from '../../utils/constants'
 import {Attachment} from '../../../graphql/Attachment'
 import {User} from '../../../graphql/User'
@@ -35,11 +35,26 @@ import {ReplyPreview} from '../../components/ReplyPreview/ReplyPreview'
 
 export const DiscussionEntryContainer = props => {
   const {searchTerm} = useContext(SearchContext)
+  const getDeletedDisplayName = () => {
+    if (props.editor) {
+      return userNameToShow(
+        props.editor?.displayName,
+        props.author?._id,
+        props.editor.courseRoles || []
+      )
+    } else {
+      return userNameToShow(
+        props.author?.displayName,
+        props.author?._id,
+        props.author.courseRoles || []
+      )
+    }
+  }
 
   if (props.deleted) {
     return (
       <DeletedPostMessage
-        deleterName={props.editor ? props.editor?.displayName : props.author?.displayName}
+        deleterName={getDeletedDisplayName()}
         timingDisplay={props.timingDisplay}
         deletedTimingDisplay={props.editedTimingDisplay}
       >
