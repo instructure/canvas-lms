@@ -43,7 +43,13 @@ module CC
             dest_dir = File.join(export_dir, file_dir)
             FileUtils.mkdir_p(dest_dir)
 
-            File.binwrite(File.join(dest_dir, file_name), File.read(f))
+            file_content = File.read(f)
+
+            if file_name.end_with?(".xml", ".qti")
+              file_content = links_replacer.replace_links(file_content)
+            end
+
+            File.binwrite(File.join(dest_dir, file_name), file_content)
             file_path
           end
         end
@@ -97,6 +103,10 @@ module CC
       end
 
       private
+
+      def links_replacer
+        @links_replacer ||= CC::NewQuizzesLinksReplacer.new(@manifest)
+      end
 
       def uploaded_media_resources(file_paths)
         file_paths.each do |file_path|
