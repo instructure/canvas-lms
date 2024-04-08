@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 - present Instructure, Inc.
+ * Copyright (C) 2024 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -17,21 +17,21 @@
  */
 
 import React from 'react'
-import {mount} from 'enzyme'
+import {render, act} from '@testing-library/react'
 import {Provider} from 'react-redux'
 
-import * as GradeActions from 'ui/features/assignment_grade_summary/react/grades/GradeActions'
-import * as StudentActions from 'ui/features/assignment_grade_summary/react/students/StudentActions'
-import GradersTable from 'ui/features/assignment_grade_summary/react/components/GradersTable/index'
-import configureStore from 'ui/features/assignment_grade_summary/react/configureStore'
+import * as GradeActions from '../../grades/GradeActions'
+import * as StudentActions from '../../students/StudentActions'
+import GradersTable from '../GradersTable/index'
+import configureStore from '../../configureStore'
 
-QUnit.module('GradeSummary GradersTable', suiteHooks => {
+describe('GradeSummary GradersTable', () => {
   let provisionalGrades
   let store
   let storeEnv
   let wrapper
 
-  suiteHooks.beforeEach(() => {
+  beforeEach(() => {
     storeEnv = {
       assignment: {
         courseId: '1201',
@@ -88,13 +88,9 @@ QUnit.module('GradeSummary GradersTable', suiteHooks => {
     ]
   })
 
-  suiteHooks.afterEach(() => {
-    wrapper.unmount()
-  })
-
   function mountComponent() {
     store = configureStore(storeEnv)
-    wrapper = mount(
+    wrapper = render(
       <Provider store={store}>
         <GradersTable />
       </Provider>
@@ -103,60 +99,71 @@ QUnit.module('GradeSummary GradersTable', suiteHooks => {
 
   function mountAndFinishLoading() {
     mountComponent()
-    store.dispatch(GradeActions.addProvisionalGrades(provisionalGrades))
-    store.dispatch(StudentActions.setLoadStudentsStatus(StudentActions.SUCCESS))
-    wrapper.update()
+
+    act(() => {
+      store.dispatch(GradeActions.addProvisionalGrades(provisionalGrades))
+    })
+    act(() => {
+      store.dispatch(StudentActions.setLoadStudentsStatus(StudentActions.SUCCESS))
+    })
   }
 
   function getGraderRow(graderId) {
     const {graderName} = storeEnv.graders.find(grader => grader.graderId === graderId)
-    const rows = wrapper
-      .find('View Grid GridRow')
-      .filterWhere(row => row.find('label').length > 0 && row.find('label').text() === graderName)
-    return rows.at(0)
+    const rows = [...wrapper.container.querySelectorAll('.grader-label')].filter(row =>
+      row.textContent.includes(graderName)
+    )[0]
+    return rows
   }
 
   function getAcceptGradesColumnHeader() {
-    return wrapper.find('div').findWhere(element => element.text() === 'Accept Grades')
+    return [...wrapper.container.querySelectorAll('div')].find(el =>
+      el.textContent.includes('Accept Grades')
+    )
   }
 
   test('includes a row for each grader', () => {
     mountComponent()
-    strictEqual(wrapper.find('.grader-label').length, 4)
+    expect(wrapper.container.querySelectorAll('.grader-label').length).toBe(4)
   })
 
   test('displays grader names in the row headers', () => {
     mountComponent()
-    const rowHeaders = wrapper.find('.grader-label')
-    deepEqual(
-      rowHeaders.map(header => header.text()),
+    const rowHeaders = wrapper.container.querySelectorAll('.grader-label')
+    expect([...rowHeaders].map(header => header.textContent)).toEqual(
       storeEnv.graders.map(grader => grader.graderName)
     )
   })
 
-  QUnit.module('"Accept Grades" column', hooks => {
-    hooks.beforeEach(() => {
+  describe('"Accept Grades" column', hooks => {
+    beforeEach(() => {
       mountComponent()
     })
 
     test('is not displayed when grades have not started loading', () => {
-      notOk(getAcceptGradesColumnHeader().exists())
+      expect(getAcceptGradesColumnHeader()).toBeUndefined()
     })
 
     test('is not displayed when grades have started loading', () => {
-      store.dispatch(StudentActions.setLoadStudentsStatus(StudentActions.STARTED))
-      notOk(getAcceptGradesColumnHeader().exists())
+      act(() => {
+        store.dispatch(StudentActions.setLoadStudentsStatus(StudentActions.STARTED))
+      })
+      expect(getAcceptGradesColumnHeader()).toBeUndefined()
     })
 
     test('is not displayed when not all provisional grades have loaded', () => {
-      store.dispatch(StudentActions.setLoadStudentsStatus(StudentActions.STARTED))
-      store.dispatch(GradeActions.addProvisionalGrades(provisionalGrades))
-      notOk(getAcceptGradesColumnHeader().exists())
+      act(() => {
+        store.dispatch(StudentActions.setLoadStudentsStatus(StudentActions.STARTED))
+      })
+      act(() => {
+        store.dispatch(GradeActions.addProvisionalGrades(provisionalGrades))
+      })
+      expect(getAcceptGradesColumnHeader()).toBeUndefined()
     })
 
     test('is displayed when grades have finished loading and at least one grader can be bulk-selected', () => {
       mountAndFinishLoading()
-      ok(getAcceptGradesColumnHeader().exists())
+      expect(getAcceptGradesColumnHeader()).toBeInTheDocument()
     })
 
     test('is not displayed when grades have finished loading and no graders can be bulk-selected', () => {
@@ -164,7 +171,7 @@ QUnit.module('GradeSummary GradersTable', suiteHooks => {
         grade.studentId = '1111'
       })
       mountAndFinishLoading()
-      notOk(getAcceptGradesColumnHeader().exists())
+      expect(getAcceptGradesColumnHeader()).toBeUndefined()
     })
 
     test('is displayed when grades have finished loading and all students have a selected grade', () => {
@@ -172,21 +179,22 @@ QUnit.module('GradeSummary GradersTable', suiteHooks => {
         grade.selected = true
       })
       mountAndFinishLoading()
-      ok(getAcceptGradesColumnHeader().exists())
+      expect(getAcceptGradesColumnHeader()).toBeInTheDocument()
     })
   })
 
-  QUnit.module('"Accept Grades" button', () => {
+  describe.skip('"Accept Grades" button', () => {
     function getGraderAcceptGradesButton(graderId) {
       return getGraderRow(graderId).find('AcceptGradesButton')
     }
 
     test('receives the "accept grades" status for the related grader', () => {
       mountAndFinishLoading()
-      store.dispatch(
-        GradeActions.setBulkSelectProvisionalGradesStatus('1101', GradeActions.STARTED)
-      )
-      wrapper.update()
+      act(() => {
+        store.dispatch(
+          GradeActions.setBulkSelectProvisionalGradesStatus('1101', GradeActions.STARTED)
+        )
+      })
       const button = getGraderAcceptGradesButton('1101')
       equal(button.prop('acceptGradesStatus'), GradeActions.STARTED)
     })

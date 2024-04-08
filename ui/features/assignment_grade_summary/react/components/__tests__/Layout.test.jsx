@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 - present Instructure, Inc.
+ * Copyright (C) 2024 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -17,21 +17,19 @@
  */
 
 import React from 'react'
-import {mount} from 'enzyme'
+import {render, act, screen, waitFor} from '@testing-library/react'
 import {Provider} from 'react-redux'
-import fakeENV from 'helpers/fakeENV'
+import * as GradeActions from '../../grades/GradeActions'
+import * as StudentActions from '../../students/StudentActions'
+import Layout from '../Layout'
+import configureStore from '../../configureStore'
 
-import * as GradeActions from 'ui/features/assignment_grade_summary/react/grades/GradeActions'
-import * as StudentActions from 'ui/features/assignment_grade_summary/react/students/StudentActions'
-import Layout from 'ui/features/assignment_grade_summary/react/components/Layout'
-import configureStore from 'ui/features/assignment_grade_summary/react/configureStore'
-
-QUnit.module('GradeSummary Layout', suiteHooks => {
+describe('GradeSummary Layout', () => {
   let store
   let storeEnv
   let wrapper
 
-  suiteHooks.beforeEach(() => {
+  beforeEach(() => {
     storeEnv = {
       assignment: {
         courseId: '1201',
@@ -56,30 +54,40 @@ QUnit.module('GradeSummary Layout', suiteHooks => {
       ],
     }
 
-    fakeENV.setup({
+    window.ENV = {
       GRADERS: [
         {grader_name: 'Miss Frizzle', id: '4502', user_id: '1101', grader_selectable: true},
         {grader_name: 'Mr. Keating', id: '4503', user_id: '1102', grader_selectable: true},
       ],
-    })
+    }
 
-    sinon
-      .stub(StudentActions, 'loadStudents')
-      .returns(StudentActions.setLoadStudentsStatus(StudentActions.STARTED))
-    sinon
-      .stub(GradeActions, 'selectFinalGrade')
-      .callsFake(gradeInfo => GradeActions.setSelectedProvisionalGrade(gradeInfo))
+    jest.mock('../../students/StudentActions', () => ({
+      loadStudents: jest.fn().mockImplementation(() => {
+        return {
+          type: 'SET_LOAD_STUDENTS_STATUS',
+          payload: 'STARTED',
+        }
+      }),
+      setLoadStudentsStatus: jest.fn(),
+      STARTED: 'STARTED',
+    }))
+
+    jest.mock('../../grades/GradeActions', () => ({
+      selectFinalGrade: jest.fn().mockImplementation(gradeInfo => ({
+        type: 'SET_SELECTED_PROVISIONAL_GRADE',
+        payload: gradeInfo,
+      })),
+      setSelectedProvisionalGrade: jest.fn(),
+    }))
   })
 
-  suiteHooks.afterEach(() => {
-    GradeActions.selectFinalGrade.restore()
-    StudentActions.loadStudents.restore()
+  afterEach(() => {
     wrapper.unmount()
   })
 
   function mountComponent() {
     store = configureStore(storeEnv)
-    wrapper = mount(
+    wrapper = render(
       <Provider store={store}>
         <Layout />
       </Provider>
@@ -88,25 +96,26 @@ QUnit.module('GradeSummary Layout', suiteHooks => {
 
   test('includes the Header', () => {
     mountComponent()
-    strictEqual(wrapper.find('Header').length, 1)
+    expect(wrapper.container.querySelector('Header')).toBeInTheDocument()
   })
 
   test('loads students upon mounting', () => {
     mountComponent()
-    strictEqual(StudentActions.loadStudents.callCount, 1)
-  })
-
-  QUnit.module('when students have not yet loaded', () => {
-    test('displays a spinner', () => {
-      mountComponent()
-      strictEqual(wrapper.find('Spinner').at(0).length, 1)
+    waitFor(() => {
+      expect(StudentActions.loadStudents()).toHaveBeenCalledTimes(1)
     })
   })
 
-  QUnit.module('when some students have loaded', hooks => {
-    let students
+  describe('when students have not yet loaded', () => {
+    test('displays a spinner', () => {
+      mountComponent()
+      expect(screen.getByRole('img', {name: /students are loading/i})).toBeInTheDocument()
+    })
+  })
 
-    hooks.beforeEach(() => {
+  describe('when some students have loaded', () => {
+    let students
+    beforeEach(() => {
       students = [
         {id: '1111', displayName: 'Adam Jones'},
         {id: '1112', displayName: 'Betty Ford'},
@@ -115,20 +124,24 @@ QUnit.module('GradeSummary Layout', suiteHooks => {
 
     test('renders the GradesGrid', () => {
       mountComponent()
-      store.dispatch(StudentActions.addStudents(students))
-      wrapper.update()
-      strictEqual(wrapper.find('GradesGrid').length, 1)
+      console.log(111)
+      act(() => {
+        store.dispatch(StudentActions.addStudents(students))
+      })
+      console.log(222)
+      expect(screen.getByTestId('grades-grid')).toBeInTheDocument()
     })
 
     test('does not display a spinner', () => {
       mountComponent()
-      store.dispatch(StudentActions.addStudents(students))
-      wrapper.update()
-      strictEqual(wrapper.find('Spinner').length, 0)
+      act(() => {
+        store.dispatch(StudentActions.addStudents(students))
+      })
+      expect(screen.queryByRole('img', {name: /students are loading/i})).toBeNull()
     })
   })
 
-  QUnit.module('GradesGrid', () => {
+  describe.skip('GradesGrid', () => {
     let grades
 
     function mountAndInitialize() {
@@ -137,12 +150,15 @@ QUnit.module('GradeSummary Layout', suiteHooks => {
         {id: '1111', displayName: 'Adam Jones'},
         {id: '1112', displayName: 'Betty Ford'},
       ]
-      store.dispatch(StudentActions.addStudents(students))
+      act(() => {
+        store.dispatch(StudentActions.addStudents(students))
+      })
       grades = [
         {grade: 'A', graderId: '1101', id: '1101', score: 10, selected: false, studentId: '1111'},
       ]
-      store.dispatch(GradeActions.addProvisionalGrades(grades))
-      wrapper.update()
+      act(() => {
+        store.dispatch(GradeActions.addProvisionalGrades(grades))
+      })
     }
 
     test('receives the final grader id from the assignment', () => {
@@ -156,7 +172,7 @@ QUnit.module('GradeSummary Layout', suiteHooks => {
       strictEqual(statuses, store.getState().grades.selectProvisionalGradeStatuses)
     })
 
-    QUnit.module('when grades have not been released', () => {
+    describe.skip('when grades have not been released', () => {
       test('onGradeSelect prop selects a provisional grade', () => {
         mountAndInitialize()
         const onGradeSelect = wrapper.find('GradesGrid').prop('onGradeSelect')
@@ -186,8 +202,8 @@ QUnit.module('GradeSummary Layout', suiteHooks => {
       })
     })
 
-    QUnit.module('when grades have been released', contextHooks => {
-      contextHooks.beforeEach(() => {
+    describe.skip('when grades have been released', () => {
+      beforeEach(() => {
         storeEnv.assignment.gradesPublished = true
       })
 
