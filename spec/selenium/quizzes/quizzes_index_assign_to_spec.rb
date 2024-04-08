@@ -176,4 +176,14 @@ describe "quizzes selective_release assign to tray" do
     expect(element_exists?(module_item_edit_tray_selector)).to be_falsey
     expect(@classic_quiz.assignment_overrides.first.assignment_override_students.count).to eq(1)
   end
+
+  it "focus close button on open" do
+    visit_quizzes_index_page(@course.id)
+    click_manage_quiz_button(@classic_quiz.id)
+    click_assign_to_link(@classic_quiz.id)
+
+    expect(item_tray_exists?).to be_truthy
+
+    check_element_has_focus close_button
+  end
 end
