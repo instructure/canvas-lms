@@ -2102,6 +2102,7 @@ hu:
   after_the_assignment_is_graded_53754607: "Miután a feladat értékelve lett"
   after_the_due_date_eee89c9c: "Határidő után"
   after_the_first_attempt_you_cannot_leave_comments__3922325f: "Az első próbálkozás után nem írhat megjegyzést, amíg el nem küldi a feladatot."
+  agenda_b010136d: Napirend
   ahead_21f22939: Előre
   ajax_errors: 
     error_heading: "Ajax hiba: %{status_code}"
@@ -7383,6 +7384,7 @@ hu:
   create_new_course_e3ef9cd0: "Új kurzus létrehozása"
   create_new_discussions_6ab69da2: "Új fórumok létrehozása"
   create_new_e0946c49: "Új létrehozása"
+  create_new_event_e9fb2fb6: "Új esemény létrehozása"
   create_new_filter_c244aa92: "Új szűrő létrehozása"
   create_new_group_bf9561d4: "Új csoport létrehozása"
   create_new_group_fca5cc73: "Új csoport létrehozása"
@@ -8962,6 +8964,7 @@ hu:
   enter_specific_phrase_9b686755: "Adjon meg egy adott kifejezést"
   enter_the_access_token_for_your_organization_from__7b67e135: "Adja meg szervezete hozzáférési tokent a \\ *eduappcenter.com* webhelyről. Az alkalmazást követően csak azok az alkalmazások jelennek meg a Külső alkalmazások oldalon, amelyeket szervezete jóváhagyott az EduAppCenterben. \\ Ismerje meg, hogyan **hozhat létre hozzáférési tokent**."
   enter_the_access_token_for_your_organization_from__cc77493d: "Adja meg az intézményének hozzáférési kódját az *eduappcenter.com* oldalról. Ezután csak a szervezet által elfogadott alkalmazások lesznek listázva a Külső alkalmazások oldalon.  Nézze meg, hogyan **generálhat hozzáférési kódot**."
+  enter_the_date_you_would_like_to_navigate_to_a712de47: "Adja meg azt a dátumot, amire ugrani szeretne"
   enter_the_email_addresses_of_the_users_you_would_l_f76448a6: "Adja meg a hozzáadni kívánt felhasználók e-mail címét, vesszővel vagy sortöréssel elválasztva"
   enter_the_grade_41d5c97d: "Adja meg az osztályzatot"
   enter_the_login_ids_of_the_users_you_would_like_to_502fcbc5: "Adja meg a hozzáadni kívánt felhasználók bejelentkezési azonosítóit, vesszővel vagy sortöréssel elválasztva"
@@ -14145,6 +14148,7 @@ hu:
   modules_index_menu_modal_79123a19: "Modulok index menü (modal)"
   modules_index_menu_tray_3f9975d9: "Modulok index menü (tálca)"
   modules_settings_a7066f13: "Modulok beállításai"
+  month_4b83b95f: Hó
   month_s_5c17590e: Hónap(ok)
   moodle_dropdown_many_warning_title: "%{count} többválaszos lenyíló kérdés van a bankban, ami elképzelhető, hogy rosszul lett importálva"
   moodle_dropdown_warning_title: "Lehetséges, hogy a többválaszos lenyíló kérdés hibásan lett importálva"
@@ -21129,6 +21133,7 @@ hu:
   warning_for_improved_accessibility_of_calendar_eve_da54b4e2: "Figyelem! A naptári események jobb hozzáférhetőségének érdekében kérjük, használja a napirend nézetet."
   warning_for_improved_accessibility_of_reordering_a_5d0206c7: "Figyelem! A feladatok és csoportok rendezésének jobb hozzáférhetőségének érdekében, kérjük, használja a menü Mozgatás ide párbeszédablakát."
   warning_for_improved_accessibility_please_click_he_e6472c02: "Figyelem! A jobb hozzáférhetőség érdekében kérjük, kattintson ide az \"Egyedi nézetű osztálynapló\" használatához."
+  warning_for_improved_accessibility_please_use_the__1075c150: "Figyelmeztetés: A jobb hozzáférhetőség érdekében kérjük, használja a \"Napirend nézet\" naptárat."
   warnings: 
     test_install: 
       periodic_message: "Ez a Canvas telepítés csak tesztelésre való, és időnként alaphelyzetbe áll. "
@@ -21171,6 +21176,7 @@ hu:
   webct_name: "Blackboard Vista/CE (WebCT)"
   webhooks_subscriptions_ed524e73: "Webhooks Előfizetések"
   website_url_177fc1dc: Webcím
+  week_1f945ddd: Hét
   week_s_cb1492ee: Hét/(hetek)
   weekly_schedule_navigation_6b042645: "Heti menetrend navigáció"
   weight_9b308e5b: Súly
