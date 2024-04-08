@@ -409,6 +409,26 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  JS_ENV_ROOT_ACCOUNT_SETTINGS = %i[
+    calendar_contexts_limit
+    open_registration
+  ].freeze
+  JS_ENV_ROOT_ACCOUNT_SETTINGS_HASH = Digest::SHA256.hexdigest(JS_ENV_ROOT_ACCOUNT_SETTINGS.sort.join(",")).freeze
+
+  def cached_js_env_account_settings
+    # can be invalidated by a settings change on the domain root account
+    # or updating the JS_ENV_ROOT_ACCOUNT_SETTINGS array
+    MultiCache.fetch(["js_env_account_settings",
+                      JS_ENV_ROOT_ACCOUNT_SETTINGS_HASH,
+                      @domain_root_account[:settings]].cache_key) do
+      results = {}
+      JS_ENV_ROOT_ACCOUNT_SETTINGS.each do |s|
+        results[s] = @domain_root_account&.setting_enabled?(s)
+      end
+      results
+    end
+  end
+
   def add_to_js_env(hash, jsenv, overwrite)
     hash.each do |k, v|
       if jsenv[k] && jsenv[k] != v && !overwrite
