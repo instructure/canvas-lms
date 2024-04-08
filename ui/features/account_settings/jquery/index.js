@@ -238,35 +238,65 @@ $(document).ready(function () {
 
             $('.configure_report_link').click(function (_event) {
               const provisioning_container = document.getElementById('provisioning_csv_form')
-              const checkboxes = provisioning_container.querySelectorAll(
+              const sis_export_container = document.getElementById('sis_export_csv_form')
+              const provisioning_checkboxes = provisioning_container.querySelectorAll(
+                'input[type="checkbox"]:not(#parameters_created_by_sis):not(#parameters_include_deleted)'
+              )
+              const sis_export_checkboxes = sis_export_container.querySelectorAll(
                 'input[type="checkbox"]:not(#parameters_created_by_sis):not(#parameters_include_deleted)'
               )
 
               provisioning_container.onclick = function () {
                 let reportIsChecked = false
 
-                checkboxes.forEach(checkbox => {
+                provisioning_checkboxes.forEach(checkbox => {
                   if (checkbox.checked) {
                     reportIsChecked = true
                   }
                 })
 
+                const createdBySisChecbox = provisioning_container.querySelector(
+                  '#parameters_created_by_sis'
+                )
+                const includeDeletedCheckbox = provisioning_container.querySelector(
+                  '#parameters_include_deleted'
+                )
+
                 if (reportIsChecked) {
-                  provisioning_container.querySelector(
-                    '#parameters_created_by_sis'
-                  ).disabled = false
-                  provisioning_container.querySelector(
-                    '#parameters_include_deleted'
-                  ).disabled = false
+                  createdBySisChecbox.disabled = false
+                  includeDeletedCheckbox.disabled = false
                 } else {
-                  provisioning_container.querySelector('#parameters_created_by_sis').checked = false
-                  provisioning_container.querySelector('#parameters_created_by_sis').disabled = true
-                  provisioning_container.querySelector(
-                    '#parameters_include_deleted'
-                  ).checked = false
-                  provisioning_container.querySelector(
-                    '#parameters_include_deleted'
-                  ).disabled = true
+                  createdBySisChecbox.checked = false
+                  createdBySisChecbox.disabled = true
+                  includeDeletedCheckbox.checked = false
+                  includeDeletedCheckbox.disabled = true
+                }
+              }
+
+              sis_export_container.onclick = function () {
+                let reportIsChecked = false
+
+                sis_export_checkboxes.forEach(checkbox => {
+                  if (checkbox.checked) {
+                    reportIsChecked = true
+                  }
+                })
+
+                const createdBySisChecbox = sis_export_container.querySelector(
+                  '#parameters_created_by_sis'
+                )
+                const includeDeletedCheckbox = sis_export_container.querySelector(
+                  '#parameters_include_deleted'
+                )
+
+                if (reportIsChecked) {
+                  createdBySisChecbox.disabled = false
+                  includeDeletedCheckbox.disabled = false
+                } else {
+                  createdBySisChecbox.checked = false
+                  createdBySisChecbox.disabled = true
+                  includeDeletedCheckbox.checked = false
+                  includeDeletedCheckbox.disabled = true
                 }
               }
 
