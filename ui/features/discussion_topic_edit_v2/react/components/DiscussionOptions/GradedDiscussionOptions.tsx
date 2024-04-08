@@ -28,6 +28,9 @@ import {AssignmentDueDatesManager} from './AssignmentDueDatesManager'
 import {SyncToSisCheckbox} from './SyncToSisCheckbox'
 import {GradingSchemesSelector} from '@canvas/grading-scheme'
 import {CheckpointsSettings} from './CheckpointsSettings'
+import {Text} from '@instructure/ui-text'
+import {ItemAssignToTrayWrapper} from './ItemAssignToTrayWrapper'
+import CoursePacingNotice from '@canvas/due-dates/react/CoursePacingNotice'
 
 type Props = {
   assignmentGroups: [{_id: string; name: string}]
@@ -76,6 +79,9 @@ export const GradedDiscussionOptions = ({
   setIntraGroupPeerReviews,
   isCheckpoints,
 }: Props) => {
+  const differentiatedModulesEnabled = ENV.FEATURES?.differentiated_modules
+  const isPacedDiscussion = ENV?.DISCUSSION_TOPIC?.ATTRIBUTES?.in_paced_course
+
   return (
     <View as="div">
       {!isCheckpoints && (
@@ -127,7 +133,18 @@ export const GradedDiscussionOptions = ({
       </View>
       {isCheckpoints && <CheckpointsSettings />}
       <View as="div" margin="medium 0">
-        <AssignmentDueDatesManager />
+        {!differentiatedModulesEnabled ? (
+          <AssignmentDueDatesManager />
+        ) : (
+          <>
+            <Text size="large">{I18n.t('Assignment Settings')}</Text>
+            {isPacedDiscussion ? (
+              <CoursePacingNotice courseId={ENV.COURSE_ID} />
+            ) : (
+              <ItemAssignToTrayWrapper />
+            )}
+          </>
+        )}
       </View>
     </View>
   )

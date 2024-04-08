@@ -68,6 +68,10 @@ class Discussion
       f(course_pacing_notice_selector)
     end
 
+    def assign_to_button
+      f("button[data-testid='manage-assign-to']")
+    end
+
     # ---------------------- Actions ----------------------
     def visit(course, discussion)
       get("/courses/#{course.id}/discussion_topics/#{discussion.id}")

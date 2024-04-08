@@ -18,12 +18,37 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative "../helpers/discussions_common"
+require_relative "../helpers/items_assign_to_tray"
 require_relative "../common"
 require_relative "pages/discussion_page"
 
 describe "discussions" do
   include_context "in-process server selenium tests"
   include DiscussionsCommon
+  include ItemsAssignToTray
+
+  def generate_expected_overrides(assignment)
+    expected_overrides = []
+
+    if assignment.assignment_overrides.active.empty?
+      expected_overrides << ["Everyone"]
+    else
+      unless assignment.only_visible_to_overrides
+        expected_overrides << ["Everyone else"]
+      end
+
+      assignment.assignment_overrides.active.each do |override|
+        if override.set_type == "CourseSection"
+          expected_overrides << [override.title]
+        elsif override.set_type == "ADHOC"
+          student_names = override.assignment_override_students.map { |student| student.user.name }
+          expected_overrides << student_names
+        end
+      end
+    end
+
+    expected_overrides
+  end
 
   let(:course) { course_model.tap(&:offer!) }
   let(:teacher) { teacher_in_course(course:, name: "teacher", active_all: true).user }
@@ -629,6 +654,18 @@ describe "discussions" do
       end
 
       context "graded" do
+        def create_graded_discussion(assignment_options)
+          discussion_assignment = course.assignments.create!(assignment_options)
+          all_graded_discussion_options = {
+            user: teacher,
+            title: "assignment topic title",
+            message: "assignment topic message",
+            discussion_type: "threaded",
+            assignment: discussion_assignment,
+          }
+          course.discussion_topics.create!(all_graded_discussion_options)
+        end
+
         it "displays graded assignment options correctly when initially opening edit page" do
           grading_standard = course.grading_standards.create!(title: "Win/Lose", data: [["Winner", 0.94], ["Loser", 0]])
 
@@ -650,21 +687,12 @@ describe "discussions" do
           }
 
           discussion_assignment_options = discussion_assignment_options.merge(discussion_assignment_peer_review_options)
-          discussion_assignment = course.assignments.create!(discussion_assignment_options)
 
-          all_graded_discussion_options = {
-            user: teacher,
-            title: "assignment topic title",
-            message: "assignment topic message",
-            discussion_type: "threaded",
-            assignment: discussion_assignment,
-          }
+          graded_discussion = create_graded_discussion(discussion_assignment_options)
 
-          discussion_due_date = 5.days.from_now
-
+          course_override_due_date = 5.days.from_now
           course_section = course.course_sections.create!(name: "section alpha")
-          graded_discussion = course.discussion_topics.create!(all_graded_discussion_options)
-          graded_discussion.assignment.assignment_overrides.create!(set_type: "CourseSection", set_id: course_section.id, due_at: discussion_due_date)
+          graded_discussion.assignment.assignment_overrides.create!(set_type: "CourseSection", set_id: course_section.id, due_at: course_override_due_date)
 
           get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/edit"
           # Grading scheme sub menu is selected
@@ -746,6 +774,127 @@ describe "discussions" do
           f("input[data-testid='attachment-input']").send_keys(fullpath)
           fj("button:contains('Save')").click
           expect(assignment_topic.reload.attachment_id).to eq Attachment.last.id
+        end
+
+        context "differentiated modules Feature Flag" do
+          before do
+            Account.site_admin.enable_feature!(:differentiated_modules)
+            Setting.set("differentiated_modules_setting", "true")
+            AssignmentStudentVisibility.reset_table_name
+          end
+
+          let(:student1) { student_in_course(course:, active_all: true).user }
+          let(:student2) { student_in_course(course:, active_all: true).user }
+          let(:course_section) { course.course_sections.create!(name: "section alpha") }
+          let(:course_section_2) { course.course_sections.create!(name: "section Beta") }
+
+          it "displays Everyone correctly", custom_timeout: 30 do
+            discussion_assignment_options = {
+              name: "assignment",
+              points_possible: 10,
+              assignment_group: course.assignment_groups.create!(name: "assignment group"),
+              only_visible_to_overrides: false,
+            }
+            graded_discussion = create_graded_discussion(discussion_assignment_options)
+
+            due_date = "Sat, 06 Apr 2024 00:00:00.000000000 UTC +00:00"
+            unlock_at = "Fri, 05 Apr 2024 00:00:00.000000000 UTC +00:00"
+            lock_at = "Sun, 07 Apr 2024 00:00:00.000000000 UTC +00:00"
+            graded_discussion.assignment.update!(due_at: due_date, unlock_at:, lock_at:)
+
+            # Open page and assignTo tray
+            get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/edit"
+            Discussion.assign_to_button.click
+
+            # Expect check card and override count/content
+            expect(module_item_assign_to_card.count).to eq 1
+            expect(ff("div[data-testid='assignee_selector_selected_option']").count).to eq 1
+            expect(f("div[data-testid='assignee_selector_selected_option'] span").text).to eq "Everyone"
+
+            # Find the date inputs, extract their values, combine date and time values, and parse into DateTime objects
+            displayed_override_dates = ff("div[data-testid='clearable-date-time-input'] input")
+                                       .map { |input| input.attribute("value") }
+                                       .each_slice(2)
+                                       .map { |date, time| DateTime.parse("#{date} #{time}") }
+
+            # Check that the due dates are correctly displayed
+            expect(displayed_override_dates.include?(DateTime.parse(due_date))).to be_truthy
+            expect(displayed_override_dates.include?(DateTime.parse(unlock_at))).to be_truthy
+            expect(displayed_override_dates.include?(DateTime.parse(lock_at))).to be_truthy
+          end
+
+          it "displays everyone and section and student overrides correctly", custom_timeout: 30 do
+            discussion_assignment_options = {
+              name: "assignment",
+              points_possible: 10,
+              assignment_group: course.assignment_groups.create!(name: "assignment group"),
+              only_visible_to_overrides: false,
+            }
+            graded_discussion = create_graded_discussion(discussion_assignment_options)
+
+            # Create overrides
+            # Card 1 = ["Everyone else"], Set by: only_visible_to_overrides: false
+
+            # Card 2
+            graded_discussion.assignment.assignment_overrides.create!(set_type: "CourseSection", set_id: course_section.id)
+
+            # Card 3
+            graded_discussion.assignment.assignment_overrides.create!(set_type: "CourseSection", set_id: course_section_2.id)
+
+            # Card 4
+            graded_discussion.assignment.assignment_overrides.create!(set_type: "ADHOC")
+            graded_discussion.assignment.assignment_overrides.last.assignment_override_students.create!(user: student1)
+            graded_discussion.assignment.assignment_overrides.last.assignment_override_students.create!(user: student2)
+
+            # Open edit page and AssignTo Tray
+            get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/edit"
+            Discussion.assign_to_button.click
+
+            # Check that displayed cards and overrides are correct
+            expect(module_item_assign_to_card.count).to eq 4
+
+            displayed_overrides = module_item_assign_to_card.map do |card|
+              card.find_all("div[data-testid='assignee_selector_selected_option']").map(&:text)
+            end
+
+            expected_overrides = generate_expected_overrides(graded_discussion.assignment)
+            expect(displayed_overrides).to match_array(expected_overrides)
+          end
+
+          it "displays visible to overrides only correctly", custom_timeout: 30 do
+            # The main difference in this test is that only_visible_to_overrides is true
+            discussion_assignment_options = {
+              name: "assignment",
+              points_possible: 10,
+              assignment_group: course.assignment_groups.create!(name: "assignment group"),
+              only_visible_to_overrides: true,
+            }
+            graded_discussion = create_graded_discussion(discussion_assignment_options)
+
+            # Create overrides
+            # Card 1
+            graded_discussion.assignment.assignment_overrides.create!(set_type: "CourseSection", set_id: course_section.id)
+            # Card 2
+            graded_discussion.assignment.assignment_overrides.create!(set_type: "CourseSection", set_id: course_section_2.id)
+            # Card 3
+            graded_discussion.assignment.assignment_overrides.create!(set_type: "ADHOC")
+            graded_discussion.assignment.assignment_overrides.last.assignment_override_students.create!(user: student1)
+            graded_discussion.assignment.assignment_overrides.last.assignment_override_students.create!(user: student2)
+
+            # Open edit page and AssignTo Tray
+            get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/edit"
+            Discussion.assign_to_button.click
+
+            # Check that displayed cards and overrides are correct
+            expect(module_item_assign_to_card.count).to eq 3
+
+            displayed_overrides = module_item_assign_to_card.map do |card|
+              card.find_all("div[data-testid='assignee_selector_selected_option']").map(&:text)
+            end
+
+            expected_overrides = generate_expected_overrides(graded_discussion.assignment)
+            expect(displayed_overrides).to match_array(expected_overrides)
+          end
         end
       end
     end
