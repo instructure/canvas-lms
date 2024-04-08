@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 - present Instructure, Inc.
+ * Copyright (C) 2024 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -17,24 +17,28 @@
  */
 
 import React from 'react'
-import {mount} from 'enzyme'
+import {render} from '@testing-library/react'
 import {Provider} from 'react-redux'
 
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
-import * as AssignmentActions from 'ui/features/assignment_grade_summary/react/assignment/AssignmentActions'
-import * as GradeActions from 'ui/features/assignment_grade_summary/react/grades/GradeActions'
-import * as StudentActions from 'ui/features/assignment_grade_summary/react/students/StudentActions'
-import FlashMessageHolder from 'ui/features/assignment_grade_summary/react/components/FlashMessageHolder'
-import configureStore from 'ui/features/assignment_grade_summary/react/configureStore'
+import * as AssignmentActions from '../../assignment/AssignmentActions'
+import * as GradeActions from '../../grades/GradeActions'
+import * as StudentActions from '../../students/StudentActions'
+import FlashMessageHolder from '../FlashMessageHolder'
+import configureStore from '../../configureStore'
 
 /* eslint-disable qunit/no-identical-names */
 
-QUnit.module('GradeSummary FlashMessageHolder', suiteHooks => {
+jest.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashAlert: jest.fn(),
+}))
+
+describe('GradeSummary FlashMessageHolder', () => {
   let storeEnv
   let store
   let wrapper
 
-  suiteHooks.beforeEach(() => {
+  beforeEach(() => {
     storeEnv = {
       assignment: {
         courseId: '1201',
@@ -50,46 +54,44 @@ QUnit.module('GradeSummary FlashMessageHolder', suiteHooks => {
         {graderId: '1102', graderName: 'Mr. Keating'},
       ],
     }
-    sinon.stub(FlashAlert, 'showFlashAlert')
   })
 
-  suiteHooks.afterEach(() => {
-    FlashAlert.showFlashAlert.restore()
-    wrapper.unmount()
+  afterEach(() => {
+    jest.clearAllMocks()
   })
 
   function mountComponent() {
     store = configureStore(storeEnv)
-    wrapper = mount(
+    wrapper = render(
       <Provider store={store}>
         <FlashMessageHolder />
       </Provider>
     )
   }
 
-  QUnit.module('when students fail to load', hooks => {
-    hooks.beforeEach(() => {
+  describe('when students fail to load', () => {
+    beforeEach(() => {
       mountComponent()
       store.dispatch(StudentActions.setLoadStudentsStatus(StudentActions.FAILURE))
     })
 
     test('displays a flash alert', () => {
-      strictEqual(FlashAlert.showFlashAlert.callCount, 1)
+      expect(FlashAlert.showFlashAlert).toHaveBeenCalledTimes(1)
     })
 
     test('uses the error type', () => {
-      const {type} = FlashAlert.showFlashAlert.lastCall.args[0]
-      equal(type, 'error')
+      const {type} = FlashAlert.showFlashAlert.mock.lastCall[0]
+      expect(type).toBe('error')
     })
 
     test('includes a message about loading students', () => {
-      const {message} = FlashAlert.showFlashAlert.lastCall.args[0]
-      ok(message.includes('loading students'))
+      const {message} = FlashAlert.showFlashAlert.mock.lastCall[0]
+      expect(message).toContain('loading students')
     })
   })
 
-  QUnit.module('when a provisional grade selection succeeds', hooks => {
-    hooks.beforeEach(() => {
+  describe('when a provisional grade selection succeeds', () => {
+    beforeEach(() => {
       mountComponent()
       const gradeInfo = {
         grade: 'A',
@@ -103,22 +105,22 @@ QUnit.module('GradeSummary FlashMessageHolder', suiteHooks => {
     })
 
     test('displays a flash alert', () => {
-      strictEqual(FlashAlert.showFlashAlert.callCount, 1)
+      expect(FlashAlert.showFlashAlert).toHaveBeenCalledTimes(1)
     })
 
     test('uses the success type', () => {
-      const {type} = FlashAlert.showFlashAlert.lastCall.args[0]
-      equal(type, 'success')
+      const {type} = FlashAlert.showFlashAlert.mock.lastCall[0]
+      expect(type).toBe('success')
     })
 
     test('includes a "Grade saved" message', () => {
-      const {message} = FlashAlert.showFlashAlert.lastCall.args[0]
-      equal(message, 'Grade saved.')
+      const {message} = FlashAlert.showFlashAlert.mock.lastCall[0]
+      expect(message).toBe('Grade saved.')
     })
   })
 
-  QUnit.module('when a provisional grade selection fails', hooks => {
-    hooks.beforeEach(() => {
+  describe('when a provisional grade selection fails', () => {
+    beforeEach(() => {
       mountComponent()
       const gradeInfo = {
         grade: 'A',
@@ -132,28 +134,28 @@ QUnit.module('GradeSummary FlashMessageHolder', suiteHooks => {
     })
 
     test('displays a flash alert', () => {
-      strictEqual(FlashAlert.showFlashAlert.callCount, 1)
+      expect(FlashAlert.showFlashAlert).toHaveBeenCalledTimes(1)
     })
 
     test('uses the error type', () => {
-      const {type} = FlashAlert.showFlashAlert.lastCall.args[0]
-      equal(type, 'error')
+      const {type} = FlashAlert.showFlashAlert.mock.lastCall[0]
+      expect(type).toBe('error')
     })
 
     test('includes a message about saving the grade', () => {
-      const {message} = FlashAlert.showFlashAlert.lastCall.args[0]
-      equal(message, 'There was a problem saving the grade.')
+      const {message} = FlashAlert.showFlashAlert.mock.lastCall[0]
+      expect(message).toBe('There was a problem saving the grade.')
     })
   })
 
   test('does not display a flash alert when releasing grades starts', () => {
     mountComponent()
     store.dispatch(AssignmentActions.setReleaseGradesStatus(AssignmentActions.STARTED))
-    strictEqual(FlashAlert.showFlashAlert.callCount, 0)
+    expect(FlashAlert.showFlashAlert).toHaveBeenCalledTimes(0)
   })
 
-  QUnit.module('when a bulk provisional grade selection succeeds', hooks => {
-    hooks.beforeEach(() => {
+  describe('when a bulk provisional grade selection succeeds', () => {
+    beforeEach(() => {
       mountComponent()
       store.dispatch(
         GradeActions.setBulkSelectProvisionalGradesStatus('1101', GradeActions.SUCCESS)
@@ -161,22 +163,22 @@ QUnit.module('GradeSummary FlashMessageHolder', suiteHooks => {
     })
 
     test('displays a flash alert', () => {
-      strictEqual(FlashAlert.showFlashAlert.callCount, 1)
+      expect(FlashAlert.showFlashAlert).toHaveBeenCalledTimes(1)
     })
 
     test('uses the success type', () => {
-      const {type} = FlashAlert.showFlashAlert.lastCall.args[0]
-      equal(type, 'success')
+      const {type} = FlashAlert.showFlashAlert.mock.lastCall[0]
+      expect(type).toBe('success')
     })
 
     test('includes a "Grades saved" message', () => {
-      const {message} = FlashAlert.showFlashAlert.lastCall.args[0]
-      equal(message, 'Grades saved.')
+      const {message} = FlashAlert.showFlashAlert.mock.lastCall[0]
+      expect(message).toBe('Grades saved.')
     })
   })
 
-  QUnit.module('when a bulk provisional grade selection fails', hooks => {
-    hooks.beforeEach(() => {
+  describe('when a bulk provisional grade selection fails', () => {
+    beforeEach(() => {
       mountComponent()
       store.dispatch(
         GradeActions.setBulkSelectProvisionalGradesStatus('1101', GradeActions.FAILURE)
@@ -184,28 +186,28 @@ QUnit.module('GradeSummary FlashMessageHolder', suiteHooks => {
     })
 
     test('displays a flash alert', () => {
-      strictEqual(FlashAlert.showFlashAlert.callCount, 1)
+      expect(FlashAlert.showFlashAlert).toHaveBeenCalledTimes(1)
     })
 
     test('uses the error type', () => {
-      const {type} = FlashAlert.showFlashAlert.lastCall.args[0]
-      equal(type, 'error')
+      const {type} = FlashAlert.showFlashAlert.mock.lastCall[0]
+      expect(type).toBe('error')
     })
 
     test('includes a message about saving the grade', () => {
-      const {message} = FlashAlert.showFlashAlert.lastCall.args[0]
-      equal(message, 'There was a problem saving the grades.')
+      const {message} = FlashAlert.showFlashAlert.mock.lastCall[0]
+      expect(message).toBe('There was a problem saving the grades.')
     })
   })
 
   test('does not display a flash alert when releasing grades starts', () => {
     mountComponent()
     store.dispatch(AssignmentActions.setReleaseGradesStatus(AssignmentActions.STARTED))
-    strictEqual(FlashAlert.showFlashAlert.callCount, 0)
+    expect(FlashAlert.showFlashAlert).toHaveBeenCalledTimes(0)
   })
 
-  QUnit.module('when updating a selected grade succeeds', hooks => {
-    hooks.beforeEach(() => {
+  describe('when updating a selected grade succeeds', () => {
+    beforeEach(() => {
       mountComponent()
       const gradeInfo = {
         grade: 'A',
@@ -219,24 +221,24 @@ QUnit.module('GradeSummary FlashMessageHolder', suiteHooks => {
     })
 
     test('displays a flash alert', () => {
-      strictEqual(FlashAlert.showFlashAlert.callCount, 1)
+      expect(FlashAlert.showFlashAlert).toHaveBeenCalledTimes(1)
     })
 
     test('uses the success type', () => {
-      const {type} = FlashAlert.showFlashAlert.lastCall.args[0]
-      equal(type, 'success')
+      const {type} = FlashAlert.showFlashAlert.mock.lastCall[0]
+      expect(type).toBe('success')
     })
 
     test('includes a "Grade saved" message', () => {
-      const {message} = FlashAlert.showFlashAlert.lastCall.args[0]
-      equal(message, 'Grade saved.')
+      const {message} = FlashAlert.showFlashAlert.mock.lastCall[0]
+      expect(message).toBe('Grade saved.')
     })
   })
 
-  QUnit.module('when updating a selected grade', contextHooks => {
+  describe('when updating a selected grade', () => {
     let gradeInfo
 
-    contextHooks.beforeEach(() => {
+    beforeEach(() => {
       mountComponent()
       gradeInfo = {
         grade: 'A',
@@ -251,54 +253,54 @@ QUnit.module('GradeSummary FlashMessageHolder', suiteHooks => {
     test('does not display a flash alert when updating a selected grade starts', () => {
       mountComponent()
       store.dispatch(GradeActions.setUpdateGradeStatus(gradeInfo, GradeActions.STARTED))
-      strictEqual(FlashAlert.showFlashAlert.callCount, 0)
+      expect(FlashAlert.showFlashAlert).toHaveBeenCalledTimes(0)
     })
 
-    QUnit.module('when the update succeeds', hooks => {
-      hooks.beforeEach(() => {
+    describe('when the update succeeds', () => {
+      beforeEach(() => {
         store.dispatch(GradeActions.setUpdateGradeStatus(gradeInfo, GradeActions.SUCCESS))
       })
 
       test('displays a flash alert', () => {
-        strictEqual(FlashAlert.showFlashAlert.callCount, 1)
+        expect(FlashAlert.showFlashAlert).toHaveBeenCalledTimes(1)
       })
 
       test('uses the success type', () => {
-        const {type} = FlashAlert.showFlashAlert.lastCall.args[0]
-        equal(type, 'success')
+        const {type} = FlashAlert.showFlashAlert.mock.lastCall[0]
+        expect(type).toBe('success')
       })
 
       test('includes a "Grade saved" message', () => {
-        const {message} = FlashAlert.showFlashAlert.lastCall.args[0]
-        equal(message, 'Grade saved.')
+        const {message} = FlashAlert.showFlashAlert.mock.lastCall[0]
+        expect(message).toBe('Grade saved.')
       })
     })
 
-    QUnit.module('when the update fails', hooks => {
-      hooks.beforeEach(() => {
+    describe('when the update fails', () => {
+      beforeEach(() => {
         store.dispatch(GradeActions.setUpdateGradeStatus(gradeInfo, GradeActions.FAILURE))
       })
 
       test('displays a flash alert', () => {
-        strictEqual(FlashAlert.showFlashAlert.callCount, 1)
+        expect(FlashAlert.showFlashAlert).toHaveBeenCalledTimes(1)
       })
 
       test('uses the error type', () => {
-        const {type} = FlashAlert.showFlashAlert.lastCall.args[0]
-        equal(type, 'error')
+        const {type} = FlashAlert.showFlashAlert.mock.lastCall[0]
+        expect(type).toBe('error')
       })
 
       test('includes a message about updating the grade', () => {
-        const {message} = FlashAlert.showFlashAlert.lastCall.args[0]
-        equal(message, 'There was a problem updating the grade.')
+        const {message} = FlashAlert.showFlashAlert.mock.lastCall[0]
+        expect(message).toBe('There was a problem updating the grade.')
       })
     })
   })
 
-  QUnit.module('when updating a non-selected grade', contextHooks => {
+  describe('when updating a non-selected grade', () => {
     let gradeInfo
 
-    contextHooks.beforeEach(() => {
+    beforeEach(() => {
       mountComponent()
       gradeInfo = {
         grade: 'A',
@@ -312,60 +314,60 @@ QUnit.module('GradeSummary FlashMessageHolder', suiteHooks => {
 
     test('does not display a flash alert when the update starts', () => {
       store.dispatch(GradeActions.setUpdateGradeStatus(gradeInfo, GradeActions.STARTED))
-      strictEqual(FlashAlert.showFlashAlert.callCount, 0)
+      expect(FlashAlert.showFlashAlert).toHaveBeenCalledTimes(0)
     })
 
     test('does not display a flash alert when the update succeeds', () => {
       // The action of selecting this grade continues and will be announced upon
       // success or failure.
       store.dispatch(GradeActions.setUpdateGradeStatus(gradeInfo, GradeActions.SUCCESS))
-      strictEqual(FlashAlert.showFlashAlert.callCount, 0)
+      expect(FlashAlert.showFlashAlert).toHaveBeenCalledTimes(0)
     })
 
-    QUnit.module('when the update fails', hooks => {
-      hooks.beforeEach(() => {
+    describe('when the update fails', () => {
+      beforeEach(() => {
         store.dispatch(GradeActions.setUpdateGradeStatus(gradeInfo, GradeActions.FAILURE))
       })
 
       test('displays a flash alert', () => {
-        strictEqual(FlashAlert.showFlashAlert.callCount, 1)
+        expect(FlashAlert.showFlashAlert).toHaveBeenCalledTimes(1)
       })
 
       test('uses the error type', () => {
-        const {type} = FlashAlert.showFlashAlert.lastCall.args[0]
-        equal(type, 'error')
+        const {type} = FlashAlert.showFlashAlert.mock.lastCall[0]
+        expect(type).toBe('error')
       })
 
       test('includes a message about updating the grade', () => {
-        const {message} = FlashAlert.showFlashAlert.lastCall.args[0]
-        equal(message, 'There was a problem updating the grade.')
+        const {message} = FlashAlert.showFlashAlert.mock.lastCall[0]
+        expect(message).toBe('There was a problem updating the grade.')
       })
     })
   })
 
-  QUnit.module('when releasing grades succeeds', hooks => {
-    hooks.beforeEach(() => {
+  describe('when releasing grades succeeds', () => {
+    beforeEach(() => {
       mountComponent()
       store.dispatch(AssignmentActions.setReleaseGradesStatus(AssignmentActions.SUCCESS))
     })
 
     test('displays a flash alert', () => {
-      strictEqual(FlashAlert.showFlashAlert.callCount, 1)
+      expect(FlashAlert.showFlashAlert).toHaveBeenCalledTimes(1)
     })
 
     test('uses the success type', () => {
-      const {type} = FlashAlert.showFlashAlert.lastCall.args[0]
-      equal(type, 'success')
+      const {type} = FlashAlert.showFlashAlert.mock.lastCall[0]
+      expect(type).toBe('success')
     })
 
     test('includes a message about grades being released', () => {
-      const {message} = FlashAlert.showFlashAlert.lastCall.args[0]
-      equal(message, 'Grades were successfully released to the gradebook.')
+      const {message} = FlashAlert.showFlashAlert.mock.lastCall[0]
+      expect(message).toBe('Grades were successfully released to the gradebook.')
     })
   })
 
-  QUnit.module('when releasing grades fails for having already been released', hooks => {
-    hooks.beforeEach(() => {
+  describe('when releasing grades fails for having already been released', () => {
+    beforeEach(() => {
       mountComponent()
       store.dispatch(
         AssignmentActions.setReleaseGradesStatus(AssignmentActions.GRADES_ALREADY_RELEASED)
@@ -373,22 +375,22 @@ QUnit.module('GradeSummary FlashMessageHolder', suiteHooks => {
     })
 
     test('displays a flash alert', () => {
-      strictEqual(FlashAlert.showFlashAlert.callCount, 1)
+      expect(FlashAlert.showFlashAlert).toHaveBeenCalledTimes(1)
     })
 
     test('uses the error type', () => {
-      const {type} = FlashAlert.showFlashAlert.lastCall.args[0]
-      equal(type, 'error')
+      const {type} = FlashAlert.showFlashAlert.mock.lastCall[0]
+      expect(type).toBe('error')
     })
 
     test('includes a message about grades already being released', () => {
-      const {message} = FlashAlert.showFlashAlert.lastCall.args[0]
-      equal(message, 'Assignment grades have already been released.')
+      const {message} = FlashAlert.showFlashAlert.mock.lastCall[0]
+      expect(message).toBe('Assignment grades have already been released.')
     })
   })
 
-  QUnit.module('when releasing grades fails for not having all grade selections', hooks => {
-    hooks.beforeEach(() => {
+  describe('when releasing grades fails for not having all grade selections', () => {
+    beforeEach(() => {
       mountComponent()
       store.dispatch(
         AssignmentActions.setReleaseGradesStatus(
@@ -398,86 +400,86 @@ QUnit.module('GradeSummary FlashMessageHolder', suiteHooks => {
     })
 
     test('displays a flash alert', () => {
-      strictEqual(FlashAlert.showFlashAlert.callCount, 1)
+      expect(FlashAlert.showFlashAlert).toHaveBeenCalledTimes(1)
     })
 
     test('uses the error type', () => {
-      const {type} = FlashAlert.showFlashAlert.lastCall.args[0]
-      equal(type, 'error')
+      const {type} = FlashAlert.showFlashAlert.mock.lastCall[0]
+      expect(type).toBe('error')
     })
 
     test('includes a message about grades already being released', () => {
-      const {message} = FlashAlert.showFlashAlert.lastCall.args[0]
-      equal(message, 'All submissions must have a selected grade.')
+      const {message} = FlashAlert.showFlashAlert.mock.lastCall[0]
+      expect(message).toBe('All submissions must have a selected grade.')
     })
   })
 
-  QUnit.module('when releasing grades fails for some other reason', hooks => {
-    hooks.beforeEach(() => {
+  describe('when releasing grades fails for some other reason', () => {
+    beforeEach(() => {
       mountComponent()
       store.dispatch(AssignmentActions.setReleaseGradesStatus(AssignmentActions.FAILURE))
     })
 
     test('displays a flash alert', () => {
-      strictEqual(FlashAlert.showFlashAlert.callCount, 1)
+      expect(FlashAlert.showFlashAlert).toHaveBeenCalledTimes(1)
     })
 
     test('uses the error type', () => {
-      const {type} = FlashAlert.showFlashAlert.lastCall.args[0]
-      equal(type, 'error')
+      const {type} = FlashAlert.showFlashAlert.mock.lastCall[0]
+      expect(type).toBe('error')
     })
 
     test('includes a message about grades already being released', () => {
-      const {message} = FlashAlert.showFlashAlert.lastCall.args[0]
-      equal(message, 'There was a problem releasing grades.')
+      const {message} = FlashAlert.showFlashAlert.mock.lastCall[0]
+      expect(message).toBe('There was a problem releasing grades.')
     })
   })
 
   test('does not display a flash alert when unmuting the assignment starts', () => {
     mountComponent()
     store.dispatch(AssignmentActions.setUnmuteAssignmentStatus(AssignmentActions.STARTED))
-    strictEqual(FlashAlert.showFlashAlert.callCount, 0)
+    expect(FlashAlert.showFlashAlert).toHaveBeenCalledTimes(0)
   })
 
-  QUnit.module('when unmuting the assignment succeeds', hooks => {
-    hooks.beforeEach(() => {
+  describe('when unmuting the assignment succeeds', () => {
+    beforeEach(() => {
       mountComponent()
       store.dispatch(AssignmentActions.setUnmuteAssignmentStatus(AssignmentActions.SUCCESS))
     })
 
     test('displays a flash alert', () => {
-      strictEqual(FlashAlert.showFlashAlert.callCount, 1)
+      expect(FlashAlert.showFlashAlert).toHaveBeenCalledTimes(1)
     })
 
     test('uses the success type', () => {
-      const {type} = FlashAlert.showFlashAlert.lastCall.args[0]
-      equal(type, 'success')
+      const {type} = FlashAlert.showFlashAlert.mock.lastCall[0]
+      expect(type).toBe('success')
     })
 
     test('includes a message about grades being visible to students', () => {
-      const {message} = FlashAlert.showFlashAlert.lastCall.args[0]
-      equal(message, 'Grades for this assignment are now visible to students.')
+      const {message} = FlashAlert.showFlashAlert.mock.lastCall[0]
+      expect(message).toBe('Grades for this assignment are now visible to students.')
     })
   })
 
-  QUnit.module('when unmuting the assignment fails', hooks => {
-    hooks.beforeEach(() => {
+  describe('when unmuting the assignment fails', () => {
+    beforeEach(() => {
       mountComponent()
       store.dispatch(AssignmentActions.setUnmuteAssignmentStatus(AssignmentActions.FAILURE))
     })
 
     test('displays a flash alert', () => {
-      strictEqual(FlashAlert.showFlashAlert.callCount, 1)
+      expect(FlashAlert.showFlashAlert).toHaveBeenCalledTimes(1)
     })
 
     test('uses the error type', () => {
-      const {type} = FlashAlert.showFlashAlert.lastCall.args[0]
-      equal(type, 'error')
+      const {type} = FlashAlert.showFlashAlert.mock.lastCall[0]
+      expect(type).toBe('error')
     })
 
     test('includes a message about updating the assignment', () => {
-      const {message} = FlashAlert.showFlashAlert.lastCall.args[0]
-      equal(message, 'There was a problem updating the assignment.')
+      const {message} = FlashAlert.showFlashAlert.mock.lastCall[0]
+      expect(message).toBe('There was a problem updating the assignment.')
     })
   })
 })

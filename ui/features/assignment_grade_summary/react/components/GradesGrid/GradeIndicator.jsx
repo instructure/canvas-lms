@@ -53,7 +53,7 @@ export default class GradeIndicator extends Component {
 
     return (
       <View
-        background={selected ? 'primary-inverse' : 'default'}
+        background={selected ? 'primary-inverse' : 'primary'}
         borderRadius="small"
         borderWidth={selected ? 'small' : '0'}
         padding="xx-small small"
