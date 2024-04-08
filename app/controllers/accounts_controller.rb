@@ -291,7 +291,11 @@
 #     }
 
 class AccountsController < ApplicationController
-  before_action :require_user, only: %i[index help_links manually_created_courses_account account_calendar_settings]
+  before_action :require_user, only: %i[index
+                                        help_links
+                                        manually_created_courses_account
+                                        account_calendar_settings
+                                        environment]
   before_action :reject_student_view_student
   before_action :get_context
   before_action :rce_js_env, only: [:settings]
@@ -476,6 +480,24 @@ class AccountsController < ApplicationController
                       microsoft_sync_remote_attribute]
 
     render json: public_attrs.index_with { |key| @account.settings[key] }.compact
+  end
+
+  # @API List environment settings
+  #
+  # Return a hash of global settings for the root account
+  # This is the same information supplied to the web interface as +ENV.SETTINGS+.
+  #
+  # @example_request
+  #
+  #   curl 'http://<canvas>/api/v1/settings/environment' \
+  #     -H "Authorization: Bearer <token>"
+  #
+  # @example_response
+  #
+  #   { "calendar_contexts_limit": true, open_registration: false, ...}
+  #
+  def environment
+    render json: cached_js_env_account_settings
   end
 
   # @API Permissions
