@@ -49,8 +49,8 @@ describe "speed grader - discussion submissions" do
     @course.enroll_user(student_2, "StudentEnrollment", enrollment_state: "active")
 
     # create discussion entries
-    @first_message = "first student message"
-    @second_message = "second student message"
+    @first_message = "uno student message"
+    @second_message = "dos student message"
     @discussion_topic = DiscussionTopic.find_by(assignment_id: @assignment.id)
     @entry = @discussion_topic.discussion_entries
                               .create!(user: student, message: @first_message)
@@ -62,6 +62,7 @@ describe "speed grader - discussion submissions" do
     @entry_2.update_topic
     @entry_2.context_module_action
     @student = student
+    @student_2 = student_2
   end
 
   context "when react_discussions_post feature flag is OFF" do
@@ -165,7 +166,7 @@ describe "speed grader - discussion submissions" do
 
     it "displays the discussion view with the first student entry highlighted" do
       Speedgrader.visit(@course.id, @assignment.id)
-      in_frame "speedgrader_iframe", "#discussion_view_link" do
+      in_frame "speedgrader_iframe", "#application" do
         x = f("#discussion_preview_iframe")
         expect(x.attribute("src")).to include("/courses/#{@course.id}/discussion_topics/#{@discussion_topic.id}?embed=true&entry_id=#{@entry.id}")
         in_frame "discussion_preview_iframe" do
@@ -183,12 +184,56 @@ describe "speed grader - discussion submissions" do
       entry.update_topic
 
       Speedgrader.visit(@course.id, @assignment.id)
-      in_frame "speedgrader_iframe", "#discussion_view_link" do
+      in_frame "speedgrader_iframe", "#application" do
         x = f("#discussion_preview_iframe")
         expect(x.attribute("src")).to include("/groups/#{@group1.id}/discussion_topics/#{child_topic.id}?embed=true&entry_id=#{entry.id}")
         in_frame "discussion_preview_iframe" do
           wait_for(method: nil, timeout: 5) { f("div[data-testid='isHighlighted']") }
           expect(f("div[data-testid='isHighlighted']")).to include_text(@first_message)
+        end
+      end
+    end
+
+    it "hides student names (not teachers though) when hide student names is ON" do
+      teacher_message = "why did the taco cross the road?"
+      teacher_entry = @discussion_topic.discussion_entries
+                                       .create!(user: @teacher, message: teacher_message)
+      teacher_entry.update_topic
+
+      Speedgrader.visit(@course.id, @assignment.id)
+
+      Speedgrader.click_settings_link
+      Speedgrader.click_options_link
+      Speedgrader.select_hide_student_names
+      force_click_native(".submit_button")
+      wait_for_ajaximations
+
+      # this includes turning the name into this student or discussion participant
+      # also includes using anonymous avatars
+      in_frame "speedgrader_iframe", "#application" do
+        x = f("#discussion_preview_iframe")
+        expect(x.attribute("src")).to include("/courses/#{@course.id}/discussion_topics/#{@discussion_topic.id}?embed=true&entry_id=#{@entry.id}&hidden_user_id=#{@student.id}")
+        in_frame "discussion_preview_iframe" do
+          wait_for(method: nil, timeout: 5) { f("div[data-testid='isHighlighted']") }
+
+          highlighted_entry = f("div[data-testid='isHighlighted']")
+          expect(highlighted_entry).to include_text(@first_message)
+          expect(highlighted_entry).to include_text("This Student")
+          expect(highlighted_entry).to include_text("Manage Discussion by This Student")
+          expect(highlighted_entry).not_to include_text(@student.name)
+          expect(highlighted_entry).not_to include_text("Manage Discussion by #{@student.name}")
+
+          other_student_entry = fj("div[data-testid='notHighlighted']:contains('#{@second_message}')")
+          expect(other_student_entry).to include_text("Discussion Participant")
+          expect(other_student_entry).to include_text("Manage Discussion by Discussion Participant")
+          expect(other_student_entry).not_to include_text(@student_2.name)
+          expect(other_student_entry).not_to include_text("Manage Discussion by #{@student_2.name}")
+
+          teacher_ui_entry = fj("div[data-testid='notHighlighted']:contains('#{teacher_message}')")
+          expect(teacher_ui_entry).to include_text(@teacher.name)
+          expect(teacher_ui_entry).to include_text("Manage Discussion by #{@teacher.name}")
+          expect(teacher_ui_entry).not_to include_text("Discussion Participant")
+          expect(teacher_ui_entry).not_to include_text("Manage Discussion by Discussion Participant")
         end
       end
     end
