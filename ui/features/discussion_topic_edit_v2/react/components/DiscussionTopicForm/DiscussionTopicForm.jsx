@@ -254,6 +254,10 @@ export default function DiscussionTopicForm({
     replyToEntryRequiredCount,
     setReplyToEntryRequiredCount,
     setReplyToEntryRequiredRef,
+    title,
+    assignmentID: currentDiscussionTopic?.assignment?._id || null,
+    importantDates: currentDiscussionTopic?.assignment?.importantDates || false,
+    pointsPossible,
   }
   const [showGroupCategoryModal, setShowGroupCategoryModal] = useState(false)
 

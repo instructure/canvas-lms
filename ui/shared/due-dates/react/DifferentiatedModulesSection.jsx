@@ -415,7 +415,7 @@ const DifferentiatedModulesSection = ({
 DifferentiatedModulesSection.propTypes = {
   onSync: func.isRequired,
   assignmentName: string.isRequired,
-  assignmentId: string.isRequired,
+  assignmentId: string,
   type: string.isRequired,
   pointsPossible: oneOfType([number, string]),
   overrides: array.isRequired,
