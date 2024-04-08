@@ -2393,6 +2393,7 @@ nn:
   after_the_assignment_is_graded_53754607: "Etter at oppgåva er vurdert"
   after_the_due_date_eee89c9c: "Etter innleveringsfristen"
   after_the_first_attempt_you_cannot_leave_comments__3922325f: "Etter fyrste forsøk kan du ikkje legge att kommentarar før du har levert oppgåva."
+  agenda_b010136d: Listevising
   ahead_21f22939: Komande
   ai_driven_smart_search_feature_597dbd4f: "AI-driven smart søkefunksjon."
   ajax_errors: 
@@ -8542,6 +8543,7 @@ nn:
   create_new_course_e3ef9cd0: "Opprett nytt emne"
   create_new_discussions_6ab69da2: "Opprett nye diskusjonar"
   create_new_e0946c49: "Opprett ny"
+  create_new_event_e9fb2fb6: "Opprett ny hending"
   create_new_filter_c244aa92: "Opprett nytt filter"
   create_new_group_bf9561d4: "Opprett ny gruppe"
   create_new_group_fca5cc73: "Opprett ny gruppe"
@@ -10350,6 +10352,7 @@ nn:
   enter_the_access_token_for_your_organization_from__38b84fd1: "Registrer tilgangstoken for din organisasjon frå *eduappcenter.com*. Når det er lagt inn, vil kun appar som din institusjon har godkjent bli lista ut på den eksterne app-sida. Lær korleis du kan **generere eit tilgangstoken**."
   enter_the_access_token_for_your_organization_from__7b67e135: "Registrer tilgangstoken for din organisasjon frå *eduappcenter.com*. Når det er lagt inn, vil kun appar som din institusjon har godkjent bli lista ut på den eksterne app-sida. Lær korleis du kan **generere eit tilgangstoken**."
   enter_the_access_token_for_your_organization_from__cc77493d: "Registrer tilgangstoken for din organisasjon frå *eduappcenter.com*. Når det er lagt inn, vil kun appar som din institusjon har godkjent bli lista ut på den eksterne app-sida. Lær korleis du kan **generere eit tilgangstoken**."
+  enter_the_date_you_would_like_to_navigate_to_a712de47: "Skriv inn datoen du vil navigere til."
   enter_the_email_addresses_of_the_users_you_would_l_17cef6a0: "Oppgi e-postadressene til brukarane du vil legge til, berre delt av komma"
   enter_the_email_addresses_of_the_users_you_would_l_f76448a6: "Oppgi e-postadressene til brukarane du vil legge til, skilde med komma eller linjeskift"
   enter_the_grade_41d5c97d: "Skriv inn karakteren"
@@ -16772,6 +16775,7 @@ nn:
   modules_index_menu_tray_3f9975d9: "Modular indexmeny (Sidemeny)"
   modules_settings_a7066f13: Modulinnstillingar
   modules_tutorial_tray_d58ac3cb: "Modular opplæringsmeny"
+  month_4b83b95f: Månad
   month_s_5c17590e: Månad(er)
   monthandday_starting_at_time_769b12c8: "%{monthAndDay}startar %{time}"
   moodle_dropdown_many_warning_title: "Det er %{count} fleire spørsmål i rullegardinmenyar i denne banken som kan vere feil importert"
@@ -27040,6 +27044,7 @@ nn:
   warning_for_improved_accessibility_of_calendar_eve_da54b4e2: "Åtvaring: Dersom du vil ha betre tilgang til kalenderhendingar, kan du bruke listevisinga."
   warning_for_improved_accessibility_of_reordering_a_5d0206c7: "Åtvaring: Dersom du vil ha betre tilgang til å omorganisere oppgåver og grupper, må du velje alternativet Flytt til dialog, i menyen."
   warning_for_improved_accessibility_please_click_he_e6472c02: "Åtvaring: Dersom du vil ha betre tilgang, kan du klikke her og bruke vurderingsoversikt med individuell vising. "
+  warning_for_improved_accessibility_please_use_the__1075c150: "Åtvaring: Dersom du vil ha betre tilgang, kan du bruke \"Listevising\" i kalenderen."
   warning_for_improved_accessibility_with_annotated__43e3a5ea: "Åtvaring: for betre tilgjengeligheit med kommenterte oppgåver, vær vennleg og bruk Filopplasting eller Text Entry for å legge igjen kommentarar. "
   warning_if_there_are_any_users_with_this_role_they_1a7c1fef: "Merk: brukarar med denne rolla kan behalde gjeldande løyve, men du kan ikkje opprette nye brukarar med denne rolla. "
   warning_you_are_about_to_adjust_this_group_s_membe_a04281b6: "Åtvaring! Du er i ferd med å endre på medlemsamansettinga i gruppa. *Endringa vil påverke eksisterande gruppeinnleveringar, merknader, kommentarar og vurderingar og føre til tap av data frå BÅDE denne gruppa og frå gruppa du har flytta studenten frå.*** For å hindre uønska konsekvensar for eksisterande gruppeinnleveringar må du opprette eit nytt gruppesett for for framtidige innleveringar.**"
@@ -27102,6 +27107,7 @@ nn:
   website_url_b995c5b6: Nettstad-URL
   website_url_input_1a3eab25: "Innputt til nettstad-URL"
   website_url_url_bd07233d: "Nettside URL: %{url}"
+  week_1f945ddd: Veke
   week_s_cb1492ee: Veke(r)
   weekly_schedule_navigation_6b042645: "Navigasjon for vekestimeplan"
   weekly_summary_56cd0c95: Vekesamandrag
