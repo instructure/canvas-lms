@@ -4076,6 +4076,18 @@ class AbstractAssignment < ActiveRecord::Base
     %w[duplicating failed_to_duplicate outcome_alignment_cloning failed_to_clone_outcome_alignment].include?(workflow_state)
   end
 
+  def mark_as_ready_to_migrate_to_quiz_next
+    self.settings = (settings || {}).merge({ "common_cartridge_import" => { "migrate_to_quizzes_next" => true } })
+  end
+
+  def ready_to_migrate_to_quiz_next?
+    !!settings&.dig("common_cartridge_import", "migrate_to_quizzes_next")
+  end
+
+  def unmark_as_ready_to_migrate_to_quiz_next
+    (settings || {}).delete "common_cartridge_import"
+  end
+
   private
 
   def grading_type_requires_points?
