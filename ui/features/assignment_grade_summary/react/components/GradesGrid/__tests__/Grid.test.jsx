@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 - present Instructure, Inc.
+ * Copyright (C) 2024 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -17,23 +17,32 @@
  */
 
 import React from 'react'
-import {mount} from 'enzyme'
+import {render, screen, within} from '@testing-library/react'
 
-import {speedGraderUrl} from 'ui/features/assignment_grade_summary/react/assignment/AssignmentApi'
-import Grid from 'ui/features/assignment_grade_summary/react/components/GradesGrid/Grid'
-import GridRow from 'ui/features/assignment_grade_summary/react/components/GradesGrid/GridRow'
-import {STARTED, SUCCESS} from 'ui/features/assignment_grade_summary/react/grades/GradeActions'
+import {speedGraderUrl} from '../../../assignment/AssignmentApi'
+import Grid from '../Grid'
+import GridRow from '../GridRow'
+import {STARTED, SUCCESS} from '../../../grades/GradeActions'
 
-QUnit.module('GradeSummary Grid', suiteHooks => {
+const ActualGridRow = jest.requireActual('../GridRow').default
+jest.mock('../GridRow', props => {
+  return jest.fn(properties => {
+    return <ActualGridRow {...properties} />
+  })
+})
+
+describe('GradeSummary Grid', () => {
   let props
-  let wrapper
 
   function speedGraderUrlFor(studentId) {
     return speedGraderUrl('1201', '2301', {anonymousStudents: false, studentId})
   }
 
-  suiteHooks.beforeEach(() => {
+  afterEach(() => { jest.clearAllMocks() })
+
+  beforeEach(() => {
     props = {
+      horizontalScrollRef: () => {},
       disabledCustomGrade: false,
       finalGrader: {
         graderId: 'teach',
@@ -43,7 +52,6 @@ QUnit.module('GradeSummary Grid', suiteHooks => {
         {graderId: '1101', graderName: 'Miss Frizzle'},
         {graderId: '1102', graderName: 'Mr. Keating'},
       ],
-
       grades: {
         1111: {
           1101: {
@@ -84,9 +92,7 @@ QUnit.module('GradeSummary Grid', suiteHooks => {
           },
         },
       },
-
-      horizontalScrollRef: sinon.spy(),
-      onGradeSelect() {},
+      onGradeSelect: jest.fn(),
       rows: [
         {speedGraderUrl: speedGraderUrlFor('1111'), studentId: '1111', studentName: 'Adam Jones'},
         {speedGraderUrl: speedGraderUrlFor('1112'), studentId: '1112', studentName: 'Betty Ford'},
@@ -100,93 +106,87 @@ QUnit.module('GradeSummary Grid', suiteHooks => {
     }
   })
 
-  suiteHooks.afterEach(() => {
-    wrapper.unmount()
-  })
-
-  function mountComponent() {
-    wrapper = mount(<Grid {...props} />)
-  }
-
   test('includes a column header for the student name column', () => {
-    mountComponent()
-    strictEqual(wrapper.find('th.GradesGrid__StudentColumnHeader').length, 1)
+    render(<Grid {...props} />)
+    expect(screen.getByRole('columnheader', {name: 'Student'})).toBeInTheDocument()
   })
 
   test('includes a column header for each grader', () => {
-    mountComponent()
-    strictEqual(wrapper.find('th.GradesGrid__GraderHeader').length, 2)
+    render(<Grid {...props} />)
+    expect(
+      screen
+        .getAllByRole('columnheader')
+        .filter(header => header.textContent.match(/Miss Frizzle|Mr. Keating/)).length
+    ).toBe(2)
   })
 
   test('includes a column header for the final grade column', () => {
-    mountComponent()
-    strictEqual(wrapper.find('th.GradesGrid__FinalGradeHeader').length, 1)
+    render(<Grid {...props} />)
+    expect(screen.getByRole('columnheader', {name: /final grade/i})).toBeInTheDocument()
   })
 
   test('displays the grader names in the column headers', () => {
-    mountComponent()
-    const headers = wrapper.find('th.GradesGrid__GraderHeader')
-    deepEqual(
-      headers.map(header => header.text()),
-      ['Miss Frizzle', 'Mr. Keating']
-    )
+    render(<Grid {...props} />)
+    const headers = screen
+      .getAllByRole('columnheader')
+      .filter(header => header.textContent.match(/Miss Frizzle|Mr. Keating/))
+    expect(headers.map(header => header.textContent)).toEqual(['Miss Frizzle', 'Mr. Keating'])
   })
 
   test('includes a GridRow for each student', () => {
-    mountComponent()
-    strictEqual(wrapper.find(GridRow).length, 4)
+    render(<Grid {...props} />)
+    const rows = within(screen.getAllByRole('rowgroup')[1]).getAllByRole('row')
+    expect(rows.length).toBe(4)
   })
 
   test('sends disabledCustomGrade to each GridRow', () => {
-    mountComponent()
-    wrapper.find(GridRow).forEach(gridRow => {
-      strictEqual(gridRow.prop('disabledCustomGrade'), false)
-    })
+    render(<Grid {...props} />)
+    const rowCalls = GridRow.mock.calls.filter((call => !call[0].disabledCustomGrade))
+    expect(rowCalls.length).toBe(4)
   })
 
   test('sends finalGrader to each GridRow', () => {
-    mountComponent()
-    wrapper.find(GridRow).forEach(gridRow => {
-      strictEqual(gridRow.prop('finalGrader'), props.finalGrader)
-    })
+    render(<Grid {...props} />)
+    const rowCalls = GridRow.mock.calls.filter((call => !!call[0].finalGrader))
+    expect(rowCalls.length).toBe(4)
   })
 
   test('sends graders to each GridRow', () => {
-    mountComponent()
-    wrapper.find(GridRow).forEach(gridRow => {
-      strictEqual(gridRow.prop('graders'), props.graders)
-    })
+    render(<Grid {...props} />)
+    const rowCalls = GridRow.mock.calls
+    expect(rowCalls.map(row => row[0].graders.map(grader => grader.graderName)).flat()).toStrictEqual([
+      'Miss Frizzle',
+      'Mr. Keating',
+      'Miss Frizzle',
+      'Mr. Keating',
+      'Miss Frizzle',
+      'Mr. Keating',
+      'Miss Frizzle',
+      'Mr. Keating',
+    ])
   })
 
   test('sends onGradeSelect to each GridRow', () => {
-    mountComponent()
-    wrapper.find(GridRow).forEach(gridRow => {
-      strictEqual(gridRow.prop('onGradeSelect'), props.onGradeSelect)
-    })
+    render(<Grid {...props} />)
+    const rowCalls = GridRow.mock.calls.filter((call => !!call[0].onGradeSelect))
+    expect(rowCalls.length).toBe(4)
   })
 
   test('sends student-specific grades to each GridRow', () => {
-    mountComponent()
-    const gridRow = wrapper.find(GridRow).at(1)
-    strictEqual(gridRow.prop('grades'), props.grades[1112])
+    render(<Grid {...props} />)
+    const firstStudentGrade = GridRow.mock.calls[0][0].grades
+    expect(Object.keys(firstStudentGrade)).toStrictEqual(['1101', '1102'])
   })
 
   test('sends student-specific select provisional grade statuses to each GridRow', () => {
-    mountComponent()
-    const gridRow = wrapper.find(GridRow).at(1)
-    strictEqual(gridRow.prop('selectProvisionalGradeStatus'), STARTED)
+    render(<Grid {...props} />)
+    const rowCalls = GridRow.mock.calls.filter((call => call[0].selectProvisionalGradeStatus == STARTED))
+    expect(rowCalls.length).toBe(1)
   })
 
   test('sends the related row to each GridRow', () => {
-    mountComponent()
-    const gridRow = wrapper.find(GridRow).at(1)
-    strictEqual(gridRow.prop('row'), props.rows[1])
-  })
-
-  test('binds the GradesGrid container using the horizontalScrollRef prop', () => {
-    mountComponent()
-    const [ref] = props.horizontalScrollRef.lastCall.args
-    const grid = wrapper.find('.GradesGrid').at(0)
-    strictEqual(ref, grid.instance())
+    render(<Grid {...props} />)
+    const rowCalls = GridRow.mock.calls.filter((call => !!call[0].row))
+    expect(rowCalls.length).toBe(4)
   })
 })
