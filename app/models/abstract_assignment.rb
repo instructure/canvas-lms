@@ -95,6 +95,7 @@ class AbstractAssignment < ActiveRecord::Base
   serialize :lti_resource_link_custom_params, coder: JSON
   attribute :lti_resource_link_lookup_uuid, :string, default: nil
   attribute :lti_resource_link_url, :string, default: nil
+  attribute :lti_resource_link_title, :string, default: nil
   attribute :line_item_resource_id, :string, default: nil
   attribute :line_item_tag, :string, default: nil
 
@@ -1291,6 +1292,7 @@ class AbstractAssignment < ActiveRecord::Base
             resource_link_uuid: lti_context_id,
             context_external_tool: lti_1_3_tool || tool_from_external_tool_tag,
             url: lti_resource_link_url,
+            title: lti_resource_link_title,
             lti_1_1_id:
           )
 
