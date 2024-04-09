@@ -1672,13 +1672,12 @@ class Attachment < ActiveRecord::Base
   scope :is_media_object, -> { where.not(media_entry_id: nil) }
 
   def self.build_content_types_sql(types)
-    clauses = []
-    types.each do |type|
-      clauses << if type.include? "/"
-                   sanitize_sql_array(["(attachments.content_type=?)", type])
-                 else
-                   wildcard("attachments.content_type", type, type: :right)
-                 end
+    clauses = types.map do |type|
+      if type.include? "/"
+        sanitize_sql_array(["(attachments.content_type=?)", type])
+      else
+        wildcard("attachments.content_type", type, type: :right)
+      end
     end
     clauses.join(" OR ")
   end
@@ -2242,7 +2241,7 @@ class Attachment < ActiveRecord::Base
     random_backup_name = "#{dir}#{basename}-#{SecureRandom.uuid}#{extname}"
     return random_backup_name if attempts >= 8
 
-    until block.call(new_name = "#{dir}#{basename}-#{addition}#{extname}")
+    until block.call((new_name = "#{dir}#{basename}-#{addition}#{extname}"))
       addition += 1
       return random_backup_name if addition >= 8
     end

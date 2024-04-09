@@ -44,34 +44,32 @@ describe OutcomeResultsController do
   end
 
   def create_outcome_groups_with_one_outcome(context, num_groups)
-    outcome_groups = []
-    outcomes = []
     content_tags = []
     root_learning_outcome_group_id = context.root_outcome_group.id
     root_account_id = context.root_account_id
 
     # Make outcomes
-    (1..num_groups).each do |i|
-      outcomes.append({
-                        context_id: context.id,
-                        context_type: "Course",
-                        short_description: "Outcome #{i}",
-                        workflow_state: "active",
-                        root_account_ids: [root_account_id]
-                      })
+    outcomes = (1..num_groups).map do |i|
+      {
+        context_id: context.id,
+        context_type: "Course",
+        short_description: "Outcome #{i}",
+        workflow_state: "active",
+        root_account_ids: [root_account_id]
+      }
     end
     outcome_ids = LearningOutcome.upsert_all(outcomes).rows.flatten
 
     # Make outcome groups
-    (1..num_groups).each do |i|
-      outcome_groups.append({
-                              context_id: context.id,
-                              context_type: "Course",
-                              title: "Group #{i}",
-                              workflow_state: "active",
-                              root_learning_outcome_group_id:,
-                              root_account_id:
-                            })
+    outcome_groups = (1..num_groups).map do |i|
+      {
+        context_id: context.id,
+        context_type: "Course",
+        title: "Group #{i}",
+        workflow_state: "active",
+        root_learning_outcome_group_id:,
+        root_account_id:
+      }
     end
     group_ids = LearningOutcomeGroup.upsert_all(outcome_groups).rows.flatten
 
@@ -310,11 +308,7 @@ describe OutcomeResultsController do
   end
 
   def get_linked_users(rollups)
-    users = []
-    rollups.each do |r|
-      users.append(r["links"])
-    end
-    users
+    rollups.pluck("links")
   end
 
   describe "retrieving outcome results" do
@@ -512,11 +506,7 @@ describe OutcomeResultsController do
 
     context "user lmgb outcome orderings" do
       def get_response_ordering(outcomes)
-        order = []
-        outcomes.each do |o|
-          order.append(o["id"])
-        end
-        order
+        outcomes.pluck("id")
       end
 
       def set_lmgb_outcome_order(root_account_id, user_id, course_id, outcome_ids)

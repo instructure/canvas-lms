@@ -53,22 +53,19 @@ class OpenObject < OpenStruct
   def self.process(pre = {})
     pre = pre.dup
     if pre.is_a? Array
-      new_list = []
-      pre.each do |obj|
-        new_list << OpenObject.process(obj)
+      new_list = pre.map do |obj|
+        OpenObject.process(obj)
       end
-      new_list
     elsif pre
       pre.each do |name, value|
         case value
         when Array
-          new_list = []
-          value.each do |obj|
-            new_list << if obj.is_a? Hash
-                          OpenObject.process(obj)
-                        else
-                          obj
-                        end
+          new_list = value.map do |obj|
+            if obj.is_a? Hash
+              OpenObject.process(obj)
+            else
+              obj
+            end
           end
           pre[name] = new_list
         when Hash

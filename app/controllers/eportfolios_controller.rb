@@ -151,8 +151,7 @@ class EportfoliosController < ApplicationController
 
   def reorder_categories
     if authorized_action(@portfolio, @current_user, :update)
-      order = []
-      params[:order].split(",").each { |id| order << Shard.relative_id_for(id, Shard.current, @portfolio.shard) }
+      order = params[:order].split(",").map { |id| Shard.relative_id_for(id, Shard.current, @portfolio.shard) }
       @portfolio.eportfolio_categories.build.update_order(order)
       render json: @portfolio.eportfolio_categories.map { |c| [c.id, c.position] }, status: :ok
     end
@@ -160,8 +159,7 @@ class EportfoliosController < ApplicationController
 
   def reorder_entries
     if authorized_action(@portfolio, @current_user, :update)
-      order = []
-      params[:order].split(",").each { |id| order << Shard.relative_id_for(id, Shard.current, @portfolio.shard) }
+      order = params[:order].split(",").map { |id| Shard.relative_id_for(id, Shard.current, @portfolio.shard) }
       @category = @portfolio.eportfolio_categories.find(params[:eportfolio_category_id])
       @category.eportfolio_entries.build.update_order(order)
       render json: @portfolio.eportfolio_entries.map { |c| [c.id, c.position] }, status: :ok

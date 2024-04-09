@@ -601,8 +601,7 @@ describe AppointmentGroupsController, type: :request do
     ag = AppointmentGroup.create!(title: "something", new_appointments: appointment_times, contexts: [@course])
     ag.publish!
     student_in_course(course: @course, active_all: true)
-    child_events = []
-    ag.appointments.each { |appt| child_events << appt.reserve_for(@student, @me) }
+    child_events = ag.appointments.map { |appt| appt.reserve_for(@student, @me) }
 
     @user = @student
 
