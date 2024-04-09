@@ -433,6 +433,12 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
                          HostUrl.context_hosts(account, current_host),
                          include_all_encryption_certificates:)
     prior_configs = Set.new
+
+    sp = entity.roles.last
+    unless aps.empty?
+      sp.authn_requests_signed = true if aps.all?(&:sig_alg)
+      sp.authn_requests_signed = false if aps.none?(&:sig_alg)
+    end
     aps.each do |ap|
       federated_attributes = ap.federated_attributes
       next if federated_attributes.empty?
