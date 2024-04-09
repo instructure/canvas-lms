@@ -557,6 +557,7 @@ ht:
   account_id_2c3b4f15: "kont id"
   account_id_73966078: account_id
   account_id_f6e26867: "Kont Id"
+  account_level_3c2a42a5: "Nivo Kont"
   account_level_calendars_5b93794: "Kont-nivo kalandriye"
   account_level_course_pacing_blackout_dates_ce944dfb: "Dat entèdiksyon kadans kou onivo kont"
   account_level_mastery_scales_a5bdff29: "Echèl Metriz Nivo Kont"
@@ -4008,6 +4009,7 @@ ht:
   asset_string_ddeaf719: "Chèn Aktif"
   assign_access_ecd4227b: "Atribye Aksè"
   assign_eedf72bb: Bay
+  assign_graded_checkpoints_2a7e9694: "Atribye Pwen Kontwòl Gradye"
   assign_manually_1785dcfc: "Atribye manyèlman"
   assign_module_to_individuals_or_sections_bd638c03: "Atribye yon modil a moun yo oswa seksyon yo."
   assign_reviews_on_date_7e48ec50: "Atribye nan Dat"
@@ -4231,6 +4233,7 @@ ht:
     student_count: 
       one: "%{count} elèv"
       other: "%{count} elèv"
+  assignment_overrides_export_1c008ad2: "Priyorite Afektasyon Ekspòtasyon"
   assignment_path_selected_e80191d1: "Pakou Sesyon Seleksyone"
   assignment_preview_3833e819: "%{assignment} apèsi"
   assignment_scheduling_e2a3eaf6: "Planifikasyon Devwa"
@@ -4934,6 +4937,7 @@ ht:
   attendees_eb402bac: Patisipan
   attendees_failed_to_sync_725c8137: " Patisipan yo pa reyisi senkwonize."
   attendees_synced_ee5edd00: " Patisipan yo senkwonize!"
+  attention_2baa0104: Atansyon
   attention_aaca1f1d: Atansyon!
   attribute_d9f3af72: Atribi
   attributes_locked_1a1a0f46: "%{attributes} bloke"
@@ -6309,6 +6313,8 @@ ht:
   checkbox_examples_dc790142: "Egzanp kasye pou koche"
   checked_883b93fd: Tcheke
   checking_add_to_calendar_will_invite_all_course_me_6779c8df: "Si w koche kazye Ajoute nan Kalandriye a, tout manm fòmasyon an ap envite."
+  checkpoint_settings_30796b6b: "Paramèt Pwen Kontwòl"
+  checkpoints_can_be_set_to_have_different_due_dates_aefefd4f: "Pwen kontwòl yo ka defini ak delè e valè pwen diferan pou repons inisyal la e repons anvan yo."
   cheerful_panda_holding_a_map_17ba47ee: "Yon panda kontan ki gen yon kat"
   child_course_must_belong_to_the_same_root_account__66ed7b8e: "Kou timoun nan dwe nan menm kont root ak kou prensipal la"
   child_s_username_dde3aa9: "Non itilizatè Timoun nan"
@@ -6670,6 +6676,7 @@ ht:
   common_cartridge_file_description: "Pakè 1.x Common Cartridge"
   common_cartridge_html_file_to_page_conversion_7bf9678: "Fichye HTML Katouch Komen  a Konvèsyon Paj"
   common_cartridge_name: "Enpòtatè Common Cartridge"
+  common_cartridge_qti_new_quizzes_import_58b786ce: "Enpòtasyon Nouvo Quiz Common Cartridge QTI"
   common_timezones_2b00baba: "Fizo orè Common"
   commons_ed0252fb: Commons
   communicate_course_objectives_f457158c: "Kominike objektif kou a"
@@ -8429,6 +8436,7 @@ ht:
   course_is_already_associated_with_a_blueprint_4d9407cb: "Kou a gentan asosye ak yon blueprint"
   course_is_ineligible_to_be_set_as_a_blueprint_8e25ebcc: "Kou a ka petèt pa konsidere kòm yon blueprint"
   course_landing_page_49a53ade: "Paj prensipal kou"
+  course_level_fe0134b2: "Nivo Kou"
   course_level_notification_preferences_require_a_co_2f0a618: "Preferans notifikasyon nivo kou yo bezwen yon course_id pou li aktyalize"
   course_level_notifications_are_inherited_from_your_7ae3c0c2: "Notifikasyon onivo kou a yo eritye de paramèt notifikasyon ki onivo kont ou a. Ajisteman notifikasyon pou kou sa a ap gen priyorite sou notifikasyon ki gen onivo kont lan."
   course_level_overrides_for_notification_preference_e86d1725: "Priyorite nivo kou pou preferans notifikasyon"
@@ -9208,6 +9216,7 @@ ht:
   courses_account_settings_79e2f748: "Kou - Paramèt Kont"
   courses_add_20891f99: "Kou - ajoute"
   courses_add_edit_delete_aa2b55d3: "Kou - ajoute / chanje / efase"
+  courses_and_assignments_4e504b07: "kou yo ak travay pratik"
   courses_can_only_be_created_at_the_course_level_if_192bb838: "Kou yo kapab kreye onivo kou a sèlman si yon administratè Canvas otorize pou sa fèt. Si yo bay otorizasyon, kou yo ka kreye nan Tablo a."
   courses_cannot_be_created_on_the_site_admin_accoun_68053d94: "Kou pa kapab kreye sou site_admin kont lan."
   courses_change_visibility_9150ff1b: "Kou - chanje vizibilite"
@@ -10959,12 +10968,14 @@ ht:
   edit_video_conference_5ceec91c: "Edite Videyo konferans"
   edit_when_36c1c2c8: "Modifye %{when}"
   edit_your_catalog_account_cce59310: "Modifye Katalòg Kont ou a"
+  edited_by_aa816658: "Modifye pa"
   edited_by_editorname_editedtimingdisplay_1ff58a2e: ", chanje pa %{editorName} %{editedTimingDisplay}"
   edited_by_editorname_editedtimingdisplay_ae2f4692: "Chanje pa %{editorName} %{editedTimingDisplay}"
   edited_c4fcbdbf: "Chanje:"
   edited_date_b0455372: "(Modifye) %{date}"
   edited_editedtimingdisplay_85d8f1db: "Chanje %{editedTimingDisplay}"
   edited_editedtimingdisplay_8788890e: ", chanje %{editedTimingDisplay}"
+  editedtimingdisplay_6565897a: "%{editedTimingDisplay}"
   editing_an_announcement_will_create_a_notification_cbb5377a: "Modifikasyon yon anons kreye yon notifikasyon nan Tablodbò Itilizatè a ak Dewoulman Aktivite Kou yo. Si w vle pou itilizatè yo resevwa anons modifye a nan paramèt notifikasyon yo, ou dwe kreye yon nouvo anons."
   editing_is_limited_for_this_rubric_as_it_has_alrea_a3f4b6a0: "Edisyon an limite pou ribrik sa a paske yo te gentan itilize l pou evalyasyon."
   editing_permissions_for_name_3503e235: "Modifikasyon pèmisyon pou: %{name}"
@@ -11065,6 +11076,7 @@ ht:
   emojis_in_submission_comments_72720afc: "Emoji nan Soumisyon Kòmantè"
   empty_stub_for_testing_only_37aad38: "Souch vid (pou teste sèlman)"
   enable_6f5d1328: Aktive
+  enable_a_plugin_which_can_find_and_replace_content_59c15164: "Aktive yon plugin ki kapab jwenn kontni pandan edisyon nan yon RCE epi ranplase li"
   enable_ability_to_alter_the_final_grade_for_the_en_e120f72d: "Aktive posibilite pou chanje nòt final pou tout kou a san chanje nòt sesyon yo."
   enable_all_read_only_scopes_3ddc2bb5: "Aktive tout espas ki lekti sèlman yo."
   enable_an_account_setting_which_toggles_push_notif_f3ccc7a1: "Aktive yon paramèt kont ki pèmèt aktive notifikasyon push pou kont sa a"
@@ -11329,7 +11341,9 @@ ht:
   ensures_that_users_without_the_import_outcomes_per_42dfc56d: "Sa garanti itilizatè ki pa gen otorizasyon pou enpòte rezilta yo pa p ka wè bouton an nan onglè Rezilta a."
   enter_a_course_to_narrow_results_e992f93: "Antre yon kou pou w ka limite rezilta yo"
   enter_a_filename_for_the_photo_4f0fc10e: "Ekri yon non fichye pou foto a"
+  enter_a_grading_scheme_name_3b0e9113: "Antre non yon sistèm klasman"
   enter_a_hexcode_here_to_use_a_custom_color_51ecccce: "Antre yon kòd hexa la a pou ka itilize yon koulè pèsonalize."
+  enter_a_letter_grade_536a8cef: "Antre yon nòt an lèt"
   enter_a_score_to_test_c6f89f4a: "Ekri yon nòt pou teste"
   enter_a_student_pairing_code_below_to_add_a_studen_15789251: "Antre kòd kouplaj yon elèv pi ba a pou ka ajoute yon elèv pou obsève."
   enter_a_valid_date_46d77547: "Antre yon dat valid"
@@ -12124,6 +12138,7 @@ ht:
   failed_to_load_assignments_in_important_dates_ce3b4227: "Enposib pou chaje devwa yo nan dat enpòtan yo."
   failed_to_load_conversation_messages_9b4546fc: "Echèk chajman mesaj konvèsasyon yo."
   failed_to_load_course_navigation_for_name_aded3650: "Echèk chajman navigasyon kou pou %{name}."
+  failed_to_load_course_settings_74168426: "Echèk chajman paramèt kou a"
   failed_to_load_courses_refresh_the_page_to_try_aga_4248fa3f: "Chajman kou yo echwe Aktyalize paj la pou eseye ankò."
   failed_to_load_csp_information_try_refreshing_the__4a056997: "Echèk chajman enfòmasyon CSP, eseye aktyalize paj la."
   failed_to_load_events_in_important_dates_2195b227: "Enposib pou chaje aktivite yo nan dat enpòtan yo."
@@ -12145,6 +12160,7 @@ ht:
   failed_to_load_the_schedule_tab_fd7b0911: "Enposib pou chaje onglè orè a"
   failed_to_load_the_to_do_sidebar_b6169202: "Echèk chajman Tach yo sou Ba Lateral la"
   failed_to_load_todos_93cfc2d2: "Enposib pou chaje todos"
+  failed_to_load_used_locations_94fe4eae: "Echèk chajman anplasman yo itilize yo"
   failed_to_log_in_7ceec561: "Echèk Koneksyon"
   failed_to_move_items_e043da6: "Echèk Deplasman Eleman yo"
   failed_to_open_discussion_for_comments_87412434: "Pa kapab ouvri diskisyon pou kòmantè"
@@ -12435,6 +12451,7 @@ ht:
   find_an_assignee_of_temporary_enrollments_from_nam_ba08bb2b: "Jwenn yon sesyonè enskripsyon tanporè apati de %{name}"
   find_an_existing_grading_scheme_d836ea: "Jwenn yon Sistèm Notasyon ki Egziste"
   find_an_outcome_919328e6: "Jwenn yon Rezilta"
+  find_and_replace_rce_plugin_23b67e6c: "Jwenn Plugin RCE yo epi Ranplase  yo"
   find_appointment_85d6922e: "Jwenn Randevou"
   find_flickr_image_view: 
     find_cc_on_flickr: "Jwenn imajCreative Commons sou Flickr"
@@ -12507,6 +12524,7 @@ ht:
     no_deleting_root: "Pa kapab efase dosye root la"
     only_one_folder: "Pa kapab defini pakou dosye ak id dosye"
   food_drink_b0ea7e7b: "Manje ak Bwason"
+  food_that_a_panda_eats_2dfb996c: "Manje yon panda manje"
   for: pou
   for_974cbb84: Pou
   for_all_devices_1f603968: "Pou Tout Aparèy"
@@ -12568,6 +12586,7 @@ ht:
   friendly_description_57f7fdde: "Deskripsyon Amikal"
   friendly_description_for_parent_student_display_e608ecf3: "Deskripsyon senpatik (pou afichaj paran/elèv)"
   friendly_description_is_too_long_maximum_is_255_ch_c65d0a34: "Deskripsyon amikal la twò long (maksomòm nan se 255 karaktè)"
+  friendly_error_page_for_lti_login_required_113297ef: "Paj Erè Amikal pou koneksyon LTI a nesesè"
   friendly_name_601153fb: "Non Jwèt"
   friendly_panda_3a0df50e: "Panda amikal"
   from_8187f4fb: "De:"
@@ -13403,6 +13422,7 @@ ht:
   grading_scheme_was_successfully_removed_a2f98b4b: "Sistèm notasyon an te elimine avèk siksè."
   grading_scheme_was_successfully_saved_59607cb1: "Sistèm notasyon an te sovgade avèk siksè."
   grading_scheme_was_successfully_unarchived_9c081e4a: "Sistèm Notasyon an soti nan achiv avèk siksè."
+  grading_scheme_was_successfully_updated_afec1619: "Sistèm notasyon an aktyalize avèk siksè."
   grading_schemes_1c3c3252: "Sistèm Notasyon"
   grading_standard: 
     unknown_grading_details: "Detay Enkoni"
@@ -13936,6 +13956,7 @@ ht:
   help_for_unpublished_courses_512a08d7: "Èd pou Kou ki pa Pibliye"
   help_menu_links_51184b65: "Lyen meni èd"
   help_menu_options_7ecf7031: "Opsyon Lmeni èd"
+  help_us_improve_45f177f0: "Ede nou Amelyore!"
   help_us_improve_by_telling_us_what_happened_d6392f18: "Di nou sa ki pase a pou ka ede nou ranje sa"
   help_with_content_licensing_a146fb0e: "Èd avèk lisans kontni"
   help_with_course_visibilities_6b6e22a4: "Ede ak vizibilite kou a"
@@ -14163,6 +14184,7 @@ ht:
   how_do_i_view_assignments_or_students_individually_2b7211f8: "Kijan pou mwen afiche devwa yo oswa elèv yo nan Bilten an endividyèlman?"
   how_do_i_view_the_details_of_a_submission_for_a_st_3ba83fb3: "Kijan mwen ka wè detay yon soumisyon pou yon elèv nan SSpeedGrader?"
   how_do_i_view_user_details_for_an_enrollment_in_a__308e9ac0: "Kijan mwen ka afiche detay itilizatè yo pou yon enskripsyon nan yon kou?"
+  how_do_you_feel_about_this_search_result_e797abbf: "Kisa w panse de rezilta rechèh sa a?"
   how_is_the_grade_determined_bb75bf53: "Kijam yo Detèmine Nòt sa a"
   how_is_this_affecting_you_b3b6a639: "Nan ki sans sa afekte w?"
   how_many_minutes_ecca5ee7: "Konbyen minit?"
@@ -14192,8 +14214,10 @@ ht:
   i_agree_to_the_tool_s_end_user_license_agreement_c77fa44d: "Mwen dakò ak *Kontra Lisans pou Itilizatè Final*"
   i_cannot_get_things_done_until_i_hear_back_from_yo_83ba46b7: "Mwen paka fè bagay yo jiskaske mwen tounen tande w."
   i_cb2f5130: i
+  i_do_not_like_this_result_47aef004: "Mwen pa renmen rezilta sa a"
   i_have_obtained_permission_to_use_this_file_6386f087: "Mwen gen otorizasyon pou itilize fichye sa a."
   i_hold_the_copyright_71ee91b1: "Mwen gen dwa dotè a"
+  i_like_this_result_100bc747: "Mwen renmen rezilta sa a"
   i_ll_create_groups_later_673c78da: "M ap kreye gwoup yo pita"
   i_ll_write_free_form_comments_when_assessing_stude_5cf50d06: "M ap fè kòmantè libre pandan evalyasyon elèv yo"
   i_need_some_help_but_it_is_not_urgent_d967ea0a: "Mwen bezwen èd men se pa ijan."
@@ -14385,6 +14409,7 @@ ht:
   if_enabled_the_user_will_see_a_warning_alert_box_n_d85c7b1f: |-
       Si opsyon sa a aktive, l ap wè yon bwat avètisman ki parèt anlè paj Kle
       Developè yo ki enfòme de chanjman pwen tèminezon OIDC Auth k ap vini oswa ki konplè yo.
+  if_enabled_users_will_be_able_to_import_a_common_c_ed978620: "Si opsyon sa a aktive, itilizatè yo ap ka enpòte yon Common Cartridge ak de Nouvo Quiz  nan fòma QTI, itilizatè yo ap ka seleksyone opsyon pou enpòte quiz ki deja egziste yo an tan ke Nouvo Quiz  oswa enpòte tip Quiz aktyèl la."
   if_enabled_variable_substitutions_will_return_stri_26421822: "Si opsyon sa a aktive, ranplasman varyab yo ap voye valè tankou chèn karaktè olye li voye valè nimerik"
   if_enabled_when_an_lti_toolproxy_is_created_it_wil_9c2ea3ec: |-
       Si l aktive, lè yon Lti::ToolProxy kreye, il ap
@@ -15017,6 +15042,7 @@ ht:
   invalid_datetime_for_graded_since_884cce5: "Dat ak lè envalid pou graded_since"
   invalid_datetime_for_submitted_since_a238f3a6: "Dat ak lè envalid pou submitted_since"
   invalid_domain_e810c1d: "Domèn envalid"
+  invalid_entry_249cd786: "Antre envalid"
   invalid_field_type_61d31870: "Envalid %{field}: \"%{type}\""
   invalid_fields_after_ratings_fields_815ff223: "Espas envalid aprè evalyasyon: %{fields}"
   invalid_fields_fields_8698284: "Espas envalid: %{fields}"
@@ -15314,8 +15340,10 @@ ht:
   know_your_users_5c1323be: "Konnen itilizatè w yo"
   korean_da812d9: Koreyen
   label_3c9a991: "%{label}:"
+  label_9fe386a0: "%{label}"
   label_as_gradingtype_ae164bd9: "%{label}, tankou %{gradingType}"
   label_disabled_not_visible_to_students_da093eec: "%{label}. Dezaktive. Pa vizib a etidyan"
+  label_menu_a41426cb: "%{label} Meni"
   label_name_ee0b0ff8: "Non Etikèt"
   label_navigate_inside_to_interact_with_the_checkbo_cb21c990: "%{label}, Navige anndan pou w ka entèaji ak kazye pou koche a"
   label_no_content_not_visible_to_students_84345d2f: "%{label}. San kontni. Pa vizib a etidyan"
@@ -15412,6 +15440,7 @@ ht:
   latest_version_updatedat_510b6035: "Dènye vèsyon %{updatedAt}"
   latex_equations_are_currently_migrated_as_images_a_1206c659: "Ekwasyon LaTex yo deplase kounye a kòm imaj, epi kesyon an pa gen dwa modifye."
   latvian_2bbb6aab: Latvyen
+  launch_error_4e4c1129: "Erè Lansman"
   launch_external_tool_672c0409: "Lanse Zouti eksteryè"
   launch_height_2915768c: "Wotè Lansman"
   launch_registration_tool_38d4781: "Lanse Zouti Enskripsyon"
@@ -16155,6 +16184,7 @@ ht:
   manage_snapshots_1dc4b79d: "Jere Foto yo"
   manage_snapshots_modal_b0517bb6: "Jere Modal Foto yo"
   manage_strand_strand_21998a5d: "Jere fil la \"%{strand}\""
+  manage_student_group_8f9c36f2: "Jere Gwoup Elèv"
   manage_students_for_the_course_3b1bc4f0: "Jere elèv pou kou a"
   manage_subject_coursecontext_2328e1ff: "Jere Matyè: %{courseContext}"
   manage_subject_f9835769: "Jere Matyè"
@@ -18318,6 +18348,7 @@ ht:
   module_menu_modal_6b20c03: "Meni Modil (Modal)"
   module_module_name_was_successfully_deleted_fc9e9d47: "Modil %{module_name} te efase kòrèkteman."
   module_name_1127ebdb: "Non Modil"
+  module_name_can_t_be_blank_23e86fc7: "Non modil la paka vid"
   module_name_is_required_de75de0a: "Non modil la nesesè: "
   module_navigation_97043417: "NAvigasyon Modil"
   module_progress_for_name_fbff0ccb: "Pwogrè Modil pou *%{name}*"
@@ -18491,6 +18522,7 @@ ht:
   multiple_grading_periods_grade_export_512bcd7f: "Peryòd Evalyasyon Miltip Ekspòtasyon Nòt"
   multiple_microsoft_education_classes_already_exist_317ca726: "Plizyè klas edikasyon Microsoft egziste deja pou kou a."
   multiple_modules_930713d4: "Plizyè Modil"
+  multiple_users_with_the_same_search_type_were_foun_5573669e: "Yo jwenn plizyè itilizatè ak menm %{search_type} nan. Seleksyone itilizatè ou swete a nan lis anba a."
   must_achieve_mastery_at_least_count_times_scores_a_628db168: 
     one: "Dwe atenn metriz omwen yon fwa. Nòt ki siperyè a metriz ap an mwayèn pou kalkile nòt final la."
     other: "Dwe atenn metriz omwen %{count} times. Nòt ki siperyè a metriz ap an mwayèn pou kalkile nòt final la."
@@ -19639,6 +19671,7 @@ ht:
   open_in_speedgrader_506a4ad5: "Ouvri nan Speedgrader"
   open_in_speedgrader_57c64fe3: "Ouvri nan Speedgrader"
   open_in_theme_editor_156028e2: "Ouvri nan Editè Tèm"
+  open_label_menu_97538918: "Ouvri Meni %{label}"
   open_message_d7b12975: "Ouvri Mesaj"
   open_name_color_picker_a2646a33: "Ouvri %{name} Color Picker"
   open_new_course_modal_a8f8ad52: "Modalite ouvèti nouvo kou"
@@ -19656,6 +19689,7 @@ ht:
   open_total_grade_override_tray_d2187914: "Ouvri plato anilasyon rezilta total la"
   openid_connect_initiation_url_d9037d30: "* Url Inisyasyon Koneksyon OpenID"
   opens_in_new_window_b4b99243: "Ouvri nan yon nouvo fenèt"
+  opportunities_eb978a67: Opòtinite
   opportunities_popup_f6703842: "opòtinite afiche"
   option_1_dea39f90: "Opsyon 1"
   option_2_47aace2a: "Opsyon 2"
@@ -20189,8 +20223,12 @@ ht:
   percent_of_respondents_selecting_this_answer_4c2ce4ee: "Pousantaj patisipan ki chwazi repons sa a"
   percent_of_students_scored_score_53d2c4d5: "%{percent} elèv ki fè %{score}"
   percent_of_students_scoring_1239d948: "Pousantaj Elèv Ki Fè"
+  percent_relevance_b375fbdc: "%{percent}% Pètinans"
   percent_to_deduct_for_missing_submission_4ad01f41: "Pousantaj pou retire nan prestasyon ki manke yo"
   percentage_34ab7c2c: Pousantaj
+  percentages_and_points_can_t_be_edited_because_it__3639dd1b: "Pousataj yo ak pwen yo paka modifye paske se yon sistèm notasyon onivo kont lan."
+  percentages_and_points_can_t_be_edited_because_it__806d51e8: "Pousataj yo ak pwen yo paka modifye paske y ap itilize yo."
+  percentages_and_points_can_t_be_edited_because_it__fa156ee5: "Pousataj yo ak pwen yo paka modifye paske se sistèm notasyon pa defo a"
   percentdone_percent_edd66f1b: "%{percentDone} pousantaj"
   percentused_of_bytesavailable_used_894e2327: "%{percentUsed}% de %{bytesAvailable} itilize"
   percentused_of_bytesavailable_used_a859a40d: "%{percentUsed} sou %{bytesAvailable} itilize"
@@ -20821,10 +20859,12 @@ ht:
   points_possible_1c0b3445: "Pwen Posib"
   points_possible_44cb4190: "/ %{points_possible}"
   points_possible_720fc8fd: "%{points} / %{possible}"
+  points_possible_additional_replies_d84680b8: " Pwen Posib: Lòt Repons"
   points_possible_e57d5613: "Pwen posib"
   points_possible_must_be_0_or_more_for_selected_gra_f96a04e3: "Pwen Posib la dwe siperyè ou egal a 0 pou tip de klasman seleksyone a"
   points_possible_must_be_greater_than_0_for_selecte_5708da1b: "Pwen posib yo dwe siperyè a 0 pou tip klasman ki seleksyone a"
   points_possible_points_fda3b111: "%{points_possible} Pwen"
+  points_possible_reply_to_topic_6b19cfe3: "Pwen Posib: Reponn a Sijè"
   points_pts_e5596bf7: "%{points} pwen"
   points_range_rating_pts_ab9c8540: "%{points}%{range_rating} pts"
   points_should_be_strictly_decreasing_l_r_18f26f87: "Pwen yo dwe strikteman dekwasan: %{l} <= %{r}"
@@ -20861,6 +20901,7 @@ ht:
   position_select_c2dd3980: "Seleksyone Pozisyon"
   possible_combination_count_db651ca4: "Kantite konbinezon posib"
   possible_matches_for_address_select_the_correct_on_e206f972: "Korespondans posib pou \"%{address}\". Seleksyone sa ki bon pi ba a pou kreye yon nouvo itilizatè."
+  possible_matches_for_searchtype_select_the_desired_14af33f9: "Korespondans posib pou \"%{searchType}\". Seleksyone opsyon ou swete a anba a."
   possible_points_b1df0a5c: "Pwen Posib"
   possible_pts_b63dff4c: "%{possible} pwen"
   possible_pts_f4681c49: "/ %{possible} pwen"
@@ -20925,6 +20966,7 @@ ht:
   press_the_comma_key_or_shift_question_mark_to_see__930af9df: "Peze touch vigil la oswa shift + pwen enterogasyon pou wè yon lis rakousi klavye"
   press_the_comma_key_or_shift_to_see_a_list_of_keyb_155d8ca3: "Peze touch vigil la oswa shift + pwen enterogasyon pou wè yon lis rakousi klavye"
   press_the_esc_key_to_close_this_modal_14d10601: "Peze touch esc pou fèmen modal sa a"
+  prettify_json_139dc954: "JSON amelyore"
   prev_f82cbc48: Anvan
   prev_month_34bd934c: "Mwa pase"
   prevent_deletion_of_outcomes_with_alignments_in_os_65020476: "Anpeche eliminasyon rezilta yo ak aliman nan SE"
@@ -22896,6 +22938,7 @@ ht:
   ready_for_sync_16eaf713: "Pare pou senkwonizasyon"
   ready_to_enroll_panel_46f45abb: "Pano pre pou enskri"
   ready_to_review_8b2d96ac: "Pre pou Revizyon"
+  reassign_2edc7f0d: "Re atribye"
   reassign_assignment_e3a70bcb: "Reaafektasyon Devwa"
   reassign_assignments_cfd508c5: "Reaafektasyon Devwa yo"
   reassigned_cedad6d9: "Re afekte"
@@ -23144,6 +23187,7 @@ ht:
   remove_studentname_16ba8c3a: "Elimine %{studentName}"
   remove_students_from_courses_a8e024fd: "Retire Elèv nan kou yo"
   remove_submission_draft_f5c7f58b: "Elimine vèsyon preliminè prezantasyon"
+  remove_submission_type_selection_from_dev_keys_edi_f3c786b7: "Elimine submission_type_selection nan UI paj edisyon Kle Devlopè a"
   remove_tas_from_courses_13ade851: "Elimine AP nan kou yo"
   remove_teachers_from_courses_353d5217: "Retire Pwofesè nan kou"
   remove_text_8e485c41: "Elimine %{text}"
@@ -23152,6 +23196,7 @@ ht:
   remove_this_rubric_from_my_list_c7d80704: "Elimine Ribrik sa a nan lis mwen"
   remove_this_section_pace_ba87ad3c: "Elimine Ritm Seksyon sa a?"
   remove_this_student_pace_a5e7b3c5: "Elimine Ritm Elèv sa a?"
+  remove_top_level_submittedat_from_lti_ags_score_ap_4f969cc4: "Elimine nivo siperyè submittedAt API rezilta LTI AGS la"
   remove_user_from_section_5556f465: "Retire Itilizatè nan Seksyon"
   remove_webcam_image_count_efee4a11: "elimine imaj kamera %{count}"
   removed_assignment_assignment_name_835cc776: "Elimine devwa %{assignment_name}"
@@ -23592,6 +23637,7 @@ ht:
       criterion_long_description: "Kritè pou Deskripsyon Long"
     unknown_user: "Itilizatè Enkoni"
   rubric_assessment_5f0e8a83: "Evalyasyon Ribrik"
+  rubric_assessment_tray_df17d20b: "Ribrik Plato Evalyasyon"
   rubric_assessment_view_mode_1038db: "Mòd Afichaj Evalysyon Ribrik yo"
   rubric_association: 
     no_details: "Pa gen detay"
@@ -24130,6 +24176,7 @@ ht:
   select_a_date_optional_d60168d0: "Seleksyone yon dat (opsyonèl)"
   select_a_grading_period_5ea50f1: "Seleksyone yon Peryòd Klasman..."
   select_a_grading_period_aab25483: "Seleksyone yon Peryòd Klasman"
+  select_a_grading_scheme_1a21b2e8: "Seleksyone yon sistèm notasyon"
   select_a_group_category_295f7a34: "Seleksyone yon kategori gwoup"
   select_a_group_to_reveal_outcomes_here_91883028: "Seleksyone yon gwoup pou releve rezilta yo isit la."
   select_a_homeroom_bd9ec5d5: "Seleksyone yon klas akèy"
@@ -25585,6 +25632,8 @@ ht:
   speedgrader_2_steel_thread_ee5814b5: "SpeedGrader 2: Filè Asye"
   speedgrader_d9a6fa90: SpeedGrader
   speedgrader_de0affa6: SpeedGrader
+  speedgrader_error_page_d9c4a075: "SpeedGrader Paj Erè"
+  speedgrader_loading_error_235fd2e2: "SpeedGrader erè chajman"
   speedgrader_settings_4195099b: "SpeedGrader Paramèt"
   speedgrader_settings_c9503705: "Paramèt SpeedGrader"
   speedgrader_studio_media_capture_3fd8aa93: "SpeedGrader Kapti Medya Studio"
@@ -25651,6 +25700,7 @@ ht:
   start_5a4cfcd6: Kòmanse
   start_a_conversation_with_your_instructor_in_the_c_50c9b8d5: "Kòmanse yon konvèsasyon ak pwofesè w nan Bwat Resepsyon Canvas la."
   start_a_new_course_1f5f2266: "Kòmanse yon nouvo kou"
+  start_a_new_course_57ae2480: "Kòmanse yon Nouvo Kou"
   start_a_new_subject_7271b3ec: "Kòmanse yon nouvo sijè"
   start_and_end_date_filter_selections_55bcd8b8: "Seleksyon Filtè Dat Kòmansan ak Dat Finisman"
   start_assignment_d56256d3: "Kòmansman Devwa"
@@ -26177,6 +26227,7 @@ ht:
   submit_a3cc6859: Soumèt
   submit_a_comment_7edbf648: "Soumèt yon kòmantè"
   submit_a_feature_idea_2d4baa3d: "Soumèt yon Fonksyon Ide"
+  submit_assessment_900ecd29: "Soumèt Evalyasyon"
   submit_assignment: 
     buttons: 
       submit_assignment: "Soumèt Sesyon"
@@ -27119,6 +27170,7 @@ ht:
   there_was_an_error_while_loading_grading_schemes_2ad6176d: "Gen yon erè ki fèt pandan chajman sistèm notasyon yo"
   there_was_an_error_while_loading_the_default_canva_7782cecc: "Te gen yon erè pandan chajman sistèm notasyon pa defo canvas la"
   there_was_an_error_while_loading_the_default_gradi_bb879ed1: "Te gen yon erè pandan chajman sistèm notasyon pa defo a"
+  there_was_an_error_while_loading_the_grading_schem_6f80848d: "Te gen yon erè pandan chajman sistèm notasyon an"
   there_was_an_error_while_refreshing_grading_scheme_ab1136b9: "Gen yon erè pandan aktyalizasyon sistèm notasyon yo"
   there_was_an_error_while_removing_the_grading_sche_2a481e33: "Te gen yon erè pandan eliminasyon sistèm notasyon an"
   there_was_an_error_while_requesting_user_enrollmen_10634f3c: "Yon erè fèt pandan demann enskripsyon itilizatè yo, eseye ankò"
@@ -27543,6 +27595,8 @@ ht:
   this_submission_is_not_in_any_grading_period_cbbd2f8: "Soumisyon sa a pa nan okenn peryòd klasman"
   this_submission_is_not_in_any_grading_period_d4c728db: "Soumisyon sa a pa nan okenn peryòd klasman."
   this_tool_has_already_been_installed_in_this_conte_b73ea29c: "Zouti sa a enstale nan kontèks sa a deja. Èske w vle enstale li kanmenm?"
+  this_tool_has_no_placements_66b3d7d6: "Zouti sa a pa gen plasman"
+  this_tool_requires_no_permissions_cda22fff: "Zouti sa a pa bezwen pèmisyon"
   this_topic_is_closed_for_comments_3dd10c00: "Tèm sa a fèmen pou kòmantè."
   this_topic_is_closed_for_comments_5bacad6: "Tèm sa a fèmen pou kòmantè"
   this_topic_is_used_for_grading_efc6ca89: "Yo itilize tèm sa a pou klasman"
@@ -28497,6 +28551,7 @@ ht:
   total_messages_af025be6: "Total mesaj"
   total_options_351e2682: "Opsyon Total"
   total_points_44d76792: "Total Pwen"
+  total_points_possible_totalpoints_afe246a1: "Total Pwen Posib: %{totalPoints}"
   total_points_total_f41b2cff: "Pwen Total: %{total}"
   total_points_total_out_of_possible_9056fdb4: "Pwen Total: %{total} sou %{possible}"
   total_range_45c8549a: "Gam Total"
@@ -28807,6 +28862,7 @@ ht:
   unlock_562bc4cb: Debloke
   unlock_at_bb930b34: "Debloke A"
   unlock_at_time_a0bbfb9: "Debloke a: %{time}"
+  unlock_date_can_t_be_blank_43efb114: "Dat debloke a paka vid"
   unlock_date_cannot_be_after_due_date_8829d9ca: "Dat deblokaj la pa kapab aprè delè a"
   unlock_date_cannot_be_after_lock_date_591f7fda: "Dat deblokaj la pa kapab aprè dat blokaj la"
   unlock_date_cannot_be_before_course_start_9c7b8524: "Dat deblokaj la pa kapab anvan kou a kòmanse"
@@ -28876,6 +28932,7 @@ ht:
   unread_ee6db4aa: "poko li"
   unread_post_47a1a06b: "piblikasyon ki poko li"
   unread_rubric_assessment_2b2d5c47: "Evalyasyon ribrik ki pa li"
+  unreadcount_unread_9b2af1e7: "%{unreadCount} Poko li"
   unreadcount_unread_9c86f4d1: "%{unreadCount} poko li"
   unreadcount_unread_replies_509e167f: "%{unreadCount} repons ki poko li"
   unregister_service_985238e9: "Sèvis ki pa Anrejistre"
@@ -29835,6 +29892,7 @@ ht:
   watermark_opacity_ce3d3097: "Opasite Filigrán"
   watermarks_other_images_e970fc6a: "Filigrán e Lòt Imaj"
   we_apologize_for_the_inconvenience_and_thank_you_f_625d855d: "Nou eskize nou pou deranjman an epi n ap mande w tanpri pran ti pasyans pou nou pandan n ap kontinye amelyore eksperyans migrasyon an!"
+  we_apologize_for_the_inconvenience_but_an_error_oc_b5d7ff7b: "Nou eskize nou pou enkonvenyan an, men gen yon erè ki fèt pandan lansman zouti a. Tanpr eseye lanse zouti a anko. Si pwoblèm nan kontinye, kontakte sèvis sipò. Ou ka fè sa si w kontakte enstitisyon ou an oswa klike sou bouton 'Èd' ki sou ba lateral Canvas la pou w ka jwenn èd."
   we_are_currently_assigning_your_students_into_grou_923be472: "Kounye a n ap fè distribisyon elèv ou yo nan gwoup yo selon chwa ou. Sa kapab pran yon ti tan."
   we_are_currently_processing_your_files_this_may_ta_e67433a7: "N ap trete fichye w la kounye a. Sa kapab pran yon ti tan, sa depan de gwosè fichye w ap transfere a. Ou gendwa soti nan ekran s a epi retounen verifye aprè, pou w fè sa w ap klike sou lyen \"Afiche Estati Transfè\" ki nan paj devwa a , oswa aktyalize paj sa a pou w ka wè estati a."
   we_could_not_automatically_log_you_in_d836d1b5: "Nou pa kapab konekte w otomatikman"
@@ -29957,6 +30015,9 @@ ht:
       defo (ak o¡yon koulè/lèt ki baze sou non zouti a ak ID kle zouti/devlopè a).
   when_disabled_students_can_still_send_individual_m_3bf396f2: "Lè l dezaktive, elèv yo ka toujou voye mesaj endividyèl bay pwofesè kou yo, AP kou yo epi bay elèv ki nan menm gwoup nan nivo kont yo."
   when_disabled_students_can_still_send_individual_m_567a911c: "Lè li dezaktive, elèv yo ka toujou voye mesaj pèsonèl bay pwofesè ak AP kou yo, epi bay elèv ki nan menm gwoup onivo kont lan."
+  when_enabled_a_friendly_error_page_will_be_shown_t_c0fcd739: |-
+      Lè opsyon sa a aktive, gen yon paj erè amikal k ap parèt a itilizatè k ap tante lanse yon zouti LTI men ki
+      fè fas a Heisenbug tèrib cookie ki manke yo lakoz. Gade INTEROP-8200 pou plis enfòmasyon.
   when_enabled_accesstoken_reads_will_be_cached_usin_917f3375: "Lè opsyon sa a aktive, AccessToken lekti yo ap rete nan cache (avèk MultiCache) pandan otantifikasyon demann lan."
   when_enabled_allows_the_tables_on_the_developer_ke_530070d: |-
       Lè opsyon sa a aktive, li pèmèt
@@ -29992,6 +30053,9 @@ ht:
   when_enabled_new_quizzes_provisions_will_use_the_d_f18d3c15: |-
       Lè opsyon sa a aktive, dispozisyon ki gen rapò a Nouvo Quiz yo ap itilize zouti dedye Admin Sit la
       sèvis itilizatè a epi DeveloperKey pou jenere token aksè ak aktyalizasyon
+  when_enabled_removes_support_for_passing_submitted_ce61e9e9: |-
+      Lè opsyon sa a aktive,  l ap elimine posibilite pou pase submittedAt  kòm paramèt nivo siperyè nan yon
+      demann rezilta LTI AGS pou l ka pi byen konfòme l a nòm LTI AGS yo.
   when_enabled_root_accounts_with_a_ready_for_new_qu_b412daa: |-
       Lè l aktive, kont Rasin ki gen yon kle `:ready_for_new_quizzes_provision`
       nan paramèt yo ki pa t pwovizyone, y ap vin pwovizyone. Kontwòl
@@ -30013,6 +30077,12 @@ ht:
   when_enabled_the_internal_access_manager_will_be_u_bc470109: "Lè popsyon sa a aktive, yo itilize jesyonè aksè entèn nan pou otorize aksè a kèk demann."
   when_enabled_the_lti_extensions_discover_page_will_8bb57ff6: "Lè opsyon sa a aktive,  Paj Dekouvèt Ekstansyon LTI a ap disponib nan afichaj Ekstansyon yo."
   when_enabled_the_lti_extensions_page_will_be_avail_ac8ed3fa: "Lè opsyon sa a aktive,  Paj Ekstansyon LTI a ap disponib nan navigasyon Kont lan."
+  when_enabled_the_submission_type_selection_placeme_dc9226b2: |-
+      Lè opsyon sa a aktive, plasman an submission_type_selection pa p parèt nan
+      UI a pou Kle Devlopè ki poko genyen li yo. Zouti yo ka toujou gen
+      plasman si yo modifye JSON nan, epi l ap toujou parèt pou Kle Devlopè
+      ki deja genyen li yo. Yo dwe retire siyal sa a lè li fin aktive
+      konplètman, bò mwa avril-me 2024 yo.
   when_enabled_this_flag_displays_a_word_count_in_th_a75163d6: |-
       Lè li aktive, endikatè a afiche ki kantite mo ki nan evalyatè vitès pou
       soumisyon ki an mpod tèks yo.
@@ -30073,6 +30143,7 @@ ht:
   whitelisted_tool_domains_7df5e481: "Domèn Zouti nan Lis Blanch"
   who_can_create_new_courses_7a6c1338: "Kiyès Ki Kapab Kreye Nouvo Kou"
   whoops_looks_like_nothing_is_here_f5c7dd44: "Oups ! Sanble pa gen anyen la a!"
+  why_was_this_result_received_cfcd7cbd: "Poukisa yo jwenn rezilta sa a?"
   widget: 
     upload_media_track_form: 
       amara_instructions: "Lè yo envite w fè sa, kole URL videyo ou te kopye nan etap 1 an."
