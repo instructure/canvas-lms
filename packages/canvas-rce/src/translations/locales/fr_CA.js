@@ -340,6 +340,12 @@ const locale = {
   "enter_at_least_3_characters_to_search_4f037ee0": {
     "message": "Saisir au moins 3 caractères à rechercher"
   },
+  "enter_replacement_text_17631bbc": {
+    "message": "saisir le texte de remplacement"
+  },
+  "enter_search_text_26cb4459": {
+    "message": "Saisir le texte de la recherche"
+  },
   "epsilon_54bb8afa": { "message": "Epsilon" },
   "epsilon_variant_d31f1e77": { "message": "Epsilon (Variant)" },
   "equals_sign_c51bdc58": { "message": "Signe égal" },
@@ -384,6 +390,8 @@ const locale = {
   },
   "files_c300e900": { "message": "Fichiers" },
   "files_index_af7c662b": { "message": "Index des fichiers" },
+  "find_8d605019": { "message": "Rechercher" },
+  "find_and_replace_6e345933": { "message": "Rechercher et remplacer" },
   "finish_bc343002": { "message": "Terminer" },
   "fix_heading_hierarchy_f60884c4": {
     "message": "Corriger la hiérarchie d’entête"
@@ -512,6 +520,7 @@ const locale = {
   "in_element_of_19ca2f33": { "message": "Dans (élément de)" },
   "increase_indent_6af90f7c": { "message": "Augmenter le retrait" },
   "indefinite_integral_6623307e": { "message": "Intégrale indéfinie" },
+  "index_of_max_80dcf7a5": { "message": "{ index } sur { max }" },
   "indigo_2035fc55": { "message": "Indigo" },
   "inference_fed5c960": { "message": "Inférence" },
   "infinity_7a10f206": { "message": "Infinité" },
@@ -734,6 +743,7 @@ const locale = {
     "message": "Aucun questionnaire n’a été trouvé."
   },
   "no_results_940393cf": { "message": "Pas de résultats" },
+  "no_results_found_58717065": { "message": "Aucun résultat trouvé" },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Aucun résultat trouvé pour { filterTerm }"
   },
@@ -827,6 +837,7 @@ const locale = {
   "preview_a3f8f854": { "message": "PRÉVISUALISER" },
   "preview_in_overlay_ed772c46": { "message": "Aperçu en superposition" },
   "preview_inline_9787330": { "message": "Aperçu « inline »" },
+  "previous_bd2ac015": { "message": "Précédent" },
   "prime_917ea60e": { "message": "Premier" },
   "prime_numbers_13464f61": { "message": "Nombres premiers" },
   "product_39cf144f": { "message": "Produit" },
@@ -857,7 +868,9 @@ const locale = {
   "religion_icon_246e0be1": { "message": "Icône Religion" },
   "remove_heading_style_5fdc8855": { "message": "Retirer le style d’entête" },
   "remove_link_d1f2f4d0": { "message": "Retirer le lien" },
+  "replace_all_d3d68b3": { "message": "Remplacer tout" },
   "replace_e61834a7": { "message": "Remplacer" },
+  "replace_with_eeff01ad": { "message": "Remplacer par" },
   "reset_95a81614": { "message": "Réinitialiser" },
   "resize_ec83d538": { "message": "Redimensionner" },
   "restore_auto_save_deccd84b": {

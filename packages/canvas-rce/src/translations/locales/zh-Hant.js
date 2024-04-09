@@ -298,6 +298,8 @@ const locale = {
   "enter_at_least_3_characters_to_search_4f037ee0": {
     "message": "請輸入最少 3 個字元以開始搜尋"
   },
+  "enter_replacement_text_17631bbc": { "message": "輸入取代文字" },
+  "enter_search_text_26cb4459": { "message": "輸入搜尋文字" },
   "epsilon_54bb8afa": { "message": "ɛ" },
   "epsilon_variant_d31f1e77": { "message": "ɛ（變量）" },
   "equals_sign_c51bdc58": { "message": "等號" },
@@ -330,6 +332,8 @@ const locale = {
   "filename_text_preview_e41ca2d8": { "message": "{ filename } 文字預覽" },
   "files_c300e900": { "message": "檔案" },
   "files_index_af7c662b": { "message": "檔案索引" },
+  "find_8d605019": { "message": "尋找" },
+  "find_and_replace_6e345933": { "message": "尋找和取代" },
   "finish_bc343002": { "message": "完成" },
   "fix_heading_hierarchy_f60884c4": { "message": "固定標題階層" },
   "flat_music_76d5a5c3": { "message": "♭（音樂）" },
@@ -440,6 +444,7 @@ const locale = {
   "in_element_of_19ca2f33": { "message": "在（某個元素）" },
   "increase_indent_6af90f7c": { "message": "增加縮進" },
   "indefinite_integral_6623307e": { "message": "無限積分" },
+  "index_of_max_80dcf7a5": { "message": "{ max } 的 { index }" },
   "indigo_2035fc55": { "message": "靛藍色" },
   "inference_fed5c960": { "message": "推論" },
   "infinity_7a10f206": { "message": "無限" },
@@ -620,6 +625,7 @@ const locale = {
   "no_quizzes_created_yet_1a2370b9": { "message": "尚未建立測驗。" },
   "no_quizzes_found_c80c537a": { "message": "找不到測驗。" },
   "no_results_940393cf": { "message": "無結果。" },
+  "no_results_found_58717065": { "message": "找不到結果" },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "找不到 { filterTerm } 的結果"
   },
@@ -703,6 +709,7 @@ const locale = {
   "preview_a3f8f854": { "message": "預覽" },
   "preview_in_overlay_ed772c46": { "message": "覆蓋預覽" },
   "preview_inline_9787330": { "message": "預覽內嵌" },
+  "previous_bd2ac015": { "message": "上一個" },
   "prime_917ea60e": { "message": "質數" },
   "prime_numbers_13464f61": { "message": "質數" },
   "product_39cf144f": { "message": "產品" },
@@ -731,7 +738,9 @@ const locale = {
   "religion_icon_246e0be1": { "message": "宗教圖示" },
   "remove_heading_style_5fdc8855": { "message": "移除標題樣式" },
   "remove_link_d1f2f4d0": { "message": "移除連結" },
+  "replace_all_d3d68b3": { "message": "全部取代" },
   "replace_e61834a7": { "message": "替換" },
+  "replace_with_eeff01ad": { "message": "取代為" },
   "reset_95a81614": { "message": "重設" },
   "resize_ec83d538": { "message": "調校大小" },
   "restore_auto_save_deccd84b": { "message": "還原自動儲存？" },

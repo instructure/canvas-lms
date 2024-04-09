@@ -340,6 +340,8 @@ const locale = {
   "enter_at_least_3_characters_to_search_4f037ee0": {
     "message": "Kirjoita vähintään 3 merkkiä ja tee haku"
   },
+  "enter_replacement_text_17631bbc": { "message": "syötä korvaava teksti" },
+  "enter_search_text_26cb4459": { "message": "syötä hakuteksti." },
   "epsilon_54bb8afa": { "message": "Epsilon" },
   "epsilon_variant_d31f1e77": { "message": "Epsilon (muuttuja)" },
   "equals_sign_c51bdc58": { "message": "Yhtä kuin -merkki" },
@@ -386,6 +388,8 @@ const locale = {
   },
   "files_c300e900": { "message": "Tiedostot" },
   "files_index_af7c662b": { "message": "Tiedostojen indeksi" },
+  "find_8d605019": { "message": "Hae" },
+  "find_and_replace_6e345933": { "message": "Etsi ja korvaa" },
   "finish_bc343002": { "message": "Lopeta" },
   "fix_heading_hierarchy_f60884c4": { "message": "Korjaa otsikon hierarkia" },
   "flat_music_76d5a5c3": { "message": "Flat (musiikki)" },
@@ -508,6 +512,7 @@ const locale = {
   "in_element_of_19ca2f33": { "message": "(/elementti)" },
   "increase_indent_6af90f7c": { "message": "Suurenna sisennystä" },
   "indefinite_integral_6623307e": { "message": "Epämääräinen integraali" },
+  "index_of_max_80dcf7a5": { "message": "{ index }/{ max }" },
   "indigo_2035fc55": { "message": "Indigo" },
   "inference_fed5c960": { "message": "Päättely" },
   "infinity_7a10f206": { "message": "ÄÄRETÖN" },
@@ -714,6 +719,7 @@ const locale = {
   },
   "no_quizzes_found_c80c537a": { "message": "Testejä ei löytynyt." },
   "no_results_940393cf": { "message": "Ei tuloksia." },
+  "no_results_found_58717065": { "message": "Tuloksia ei löytynyt" },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Tuloksia ei löytynyt kohteelle { filterTerm }"
   },
@@ -805,6 +811,7 @@ const locale = {
   "preview_a3f8f854": { "message": "ESIKATSELU" },
   "preview_in_overlay_ed772c46": { "message": "Esikatselu asettelussa" },
   "preview_inline_9787330": { "message": "Esikatselu inline-tilassa" },
+  "previous_bd2ac015": { "message": "Edellinen" },
   "prime_917ea60e": { "message": "Alku" },
   "prime_numbers_13464f61": { "message": "Alkuluvut" },
   "product_39cf144f": { "message": "Tuote" },
@@ -833,7 +840,9 @@ const locale = {
   "religion_icon_246e0be1": { "message": "Uskonnon kuvake" },
   "remove_heading_style_5fdc8855": { "message": "Poista otsikkotyyli" },
   "remove_link_d1f2f4d0": { "message": "Poista linkki" },
+  "replace_all_d3d68b3": { "message": "Korvaa kaikki" },
   "replace_e61834a7": { "message": "Korvaa" },
+  "replace_with_eeff01ad": { "message": "Korvaa tällä" },
   "reset_95a81614": { "message": "Nollaa" },
   "resize_ec83d538": { "message": "Muuta kokoa" },
   "restore_auto_save_deccd84b": {
