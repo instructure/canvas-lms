@@ -85,6 +85,10 @@ module Lti::IMS
         ]
       end
 
+      before do
+        allow(CanvasHttp).to receive(:get).with("https://getsamplefiles.com/download/txt/sample-1.txt").and_return("sample data")
+      end
+
       def post_instfs_progress(url, params)
         jwt = CGI.parse(URI(url).query)["token"].first
         jwt_params = Canvas::Security.decode_jwt(jwt, ["jwt signing key"])
