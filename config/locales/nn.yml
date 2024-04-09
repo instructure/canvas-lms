@@ -3847,6 +3847,8 @@ nn:
   assignment_id_b040cee0: Oppgåve-ID
   assignment_information_e871d0e0: Oppgåveinformasjon
   assignment_is_reassigned_dd6b6ef2: "Oppgåva er tilordna på nytt."
+  assignment_is_reassigned_ebb31807: "%{assignment} er tilordna på nytt"
+  assignment_itemtitle_fee53607: "Oppgåve, %{itemTitle}"
   assignment_locked_a6233228: "Oppgåve låst"
   assignment_locked_until_future_date_80cd0df2: "Oppgåva er låst fram til framtidig dato"
   assignment_locked_with_prerequisite_5b8cb148: "Oppgåve er låst med førehandskrav"
