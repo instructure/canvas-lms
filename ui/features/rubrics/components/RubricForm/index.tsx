@@ -123,6 +123,7 @@ export const RubricForm = () => {
       const queryKey = accountId ? `accountRubrics-${accountId}` : `courseRubrics-${courseId}`
       await queryClient.invalidateQueries([`fetch-rubric-${rubricId}`], {}, {cancelRefetch: true})
       await queryClient.invalidateQueries([queryKey], undefined, {cancelRefetch: true})
+      await queryClient.invalidateQueries([`rubric-preview-${rubricId}`], {}, {cancelRefetch: true})
     },
   })
 

@@ -15,12 +15,11 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React, {useCallback, useEffect, useRef, useState} from 'react'
+import React, {useRef} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import type {GradingScheme, UsedLocation} from '@canvas/grading_scheme/gradingSchemeApiModel'
+import type {GradingScheme} from '@canvas/grading_scheme/gradingSchemeApiModel'
 import {useGradingSchemeUsedLocations} from '../hooks/useGradingSchemeUsedLocations'
 import {ApiCallStatus} from '../hooks/ApiCallStatus'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {UsedLocationsModal} from './UsedLocationsModal'
 
 const I18n = useI18nScope('GradingSchemeViewModal')
@@ -35,89 +34,41 @@ const GradingSchemeUsedLocationsModal = ({
   gradingScheme,
   handleClose,
 }: GradingSchemeUsedLocationsModalProps) => {
-  const [usedLocations, setUsedLocations] = useState<UsedLocation[]>([])
   const path = useRef<string | undefined>(undefined)
-  const moreLocationsLeft = useRef(true)
-  const sentinelRef = useRef(null)
-  const fetchingLocations = useRef(false)
 
   const {getGradingSchemeUsedLocations, gradingSchemeUsedLocationsStatus} =
     useGradingSchemeUsedLocations()
-  const loadMoreItems = useCallback(async () => {
-    if (!gradingScheme || fetchingLocations.current) {
-      return
-    }
-    fetchingLocations.current = true
-    try {
-      const newLocations = await getGradingSchemeUsedLocations(
-        gradingScheme.context_type,
-        gradingScheme.context_id,
-        gradingScheme.id,
-        path.current
-      )
-      setUsedLocations(prevLocations => {
-        if (newLocations.usedLocations[0]?.id === prevLocations[prevLocations.length - 1]?.id) {
-          prevLocations[prevLocations.length - 1].assignments.push(
-            ...newLocations.usedLocations[0].assignments
-          )
-          newLocations.usedLocations.shift()
-        }
-        return [...prevLocations, ...newLocations.usedLocations]
-      })
-      path.current = newLocations.nextPage
-      moreLocationsLeft.current = !newLocations.isLastPage
-      fetchingLocations.current = false
-    } catch (error: any) {
-      showFlashError(I18n.t('Failed to load used locations'))(error)
-    }
-  }, [getGradingSchemeUsedLocations, gradingScheme])
 
-  const reset = () => {
-    setUsedLocations([])
+  const onClose = () => {
     path.current = undefined
-    moreLocationsLeft.current = true
+    handleClose()
   }
 
-  useEffect(() => {
-    if (!open) {
-      return
-    }
-    const timer = setTimeout(() => {
-      if (!sentinelRef?.current) {
-        return
-      }
-      const observer = new IntersectionObserver(
-        entries => {
-          if (
-            entries[0].isIntersecting &&
-            moreLocationsLeft.current &&
-            !fetchingLocations.current
-          ) {
-            loadMoreItems()
-          }
-        },
-        {
-          root: null,
-          rootMargin: '0px',
-          threshold: 0.4,
-        }
-      )
-
-      observer.observe(sentinelRef.current)
-      return () => {
-        observer.disconnect()
-      }
-    }, 0)
-    return () => clearTimeout(timer)
-  }, [gradingSchemeUsedLocationsStatus, loadMoreItems, moreLocationsLeft, open])
   return (
     <UsedLocationsModal
       isLoading={gradingSchemeUsedLocationsStatus === ApiCallStatus.PENDING}
       isOpen={open}
-      onClose={handleClose}
-      onDismiss={reset}
-      sentinelRef={sentinelRef}
-      usedLocations={usedLocations}
+      itemId={gradingScheme?.id}
+      fetchUsedLocations={async () => {
+        if (!gradingScheme) {
+          return {
+            usedLocations: [],
+            isLastPage: true,
+            nextPage: '',
+          }
+        }
+
+        const usedLocations = await getGradingSchemeUsedLocations(
+          gradingScheme.context_type,
+          gradingScheme.context_id,
+          gradingScheme.id,
+          path.current
+        )
+
+        path.current = usedLocations.nextPage
+        return usedLocations
+      }}
+      onClose={onClose}
     />
   )
 }

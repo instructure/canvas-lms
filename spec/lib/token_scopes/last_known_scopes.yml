@@ -1826,9 +1826,13 @@
 - verb: GET
   path: "/api/v1/accounts/:account_id/rubrics/:id"
 - verb: GET
+  path: "/api/v1/accounts/:account_id/rubrics/:id/used_locations"
+- verb: GET
   path: "/api/v1/courses/:course_id/rubrics"
 - verb: GET
   path: "/api/v1/courses/:course_id/rubrics/:id"
+- verb: GET
+  path: "/api/v1/courses/:course_id/rubrics/:id/used_locations"
 - verb: POST
   path: "/api/v1/courses/:course_id/rubrics"
 - verb: PUT
