@@ -17,7 +17,8 @@
  */
 
 import React from 'react'
-import {mount} from 'enzyme'
+import {render, screen} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import {merge} from 'lodash'
 import FilesCollection from '@canvas/files/backbone/collections/FilesCollection'
 import Folder from '@canvas/files/backbone/models/Folder'
@@ -64,6 +65,7 @@ describe('SearchResults', () => {
   let oldEnv
 
   beforeEach(() => {
+    userEvent.setup()
     oldEnv = window.ENV
     window.ENV = {
       COURSE_ID: '101',
@@ -82,27 +84,23 @@ describe('SearchResults', () => {
       document.body.appendChild(document.createElement('div'))
     })
 
-    afterEach(() => {
-      wrapper.detach()
-    })
-
     it('renders if userCanEditFilesForContext is true', () => {
-      wrapper = mount(<SearchResults {...defaultProps()} />, {attachTo: document.body.firstChild})
+      render(<SearchResults {...defaultProps()} />, {attachTo: document.body.firstChild})
       const message = document.querySelector('.SearchResults__accessbilityMessage')
       expect(message).toBeInTheDocument()
     })
 
     it('does not render if userCanEditFilesForContext is false', () => {
-      wrapper = mount(<SearchResults {...defaultProps({userCanEditFilesForContext: false})} />, {
+      render(<SearchResults {...defaultProps({userCanEditFilesForContext: false})} />, {
         attachTo: document.body.firstChild,
       })
       const message = document.querySelector('.SearchResults__accessbilityMessage')
-      expect(message).toBeNull()
+      expect(message).not.toBeInTheDocument()
     })
   })
 
   describe('File Menu', () => {
-    let wrapper, menuItems
+    let ref, menuItems
 
     beforeEach(() => {
       document.body.appendChild(document.createElement('div'))
@@ -110,13 +108,11 @@ describe('SearchResults', () => {
       const collection = new FilesCollection([
         {id: '1', created_at: '2022-01-01T00:00:00', modified_at: '2022-01-01T00:00:00'},
       ])
-      wrapper = mount(<SearchResults {...props} />, {attachTo: document.body.firstChild})
-      wrapper.instance().setState({collection})
-      menuItems = Array.from(document.body.querySelectorAll('.al-options [role="menuitem"]'))
-    })
+      ref = React.createRef()
+      render(<SearchResults {...props} ref={ref} />, {attachTo: document.body.firstChild})
+      ref.current.setState({collection})
 
-    afterEach(() => {
-      wrapper.detach()
+      menuItems = Array.from(document.body.querySelectorAll('.al-options [role="menuitem"]'))
     })
 
     describe('Download item', () => {
@@ -131,7 +127,7 @@ describe('SearchResults', () => {
       })
 
       it('renders a modal for sending the file, when clicked', () => {
-        wrapper.instance().setState({sendFileId: '1'})
+        ref.current.setState({sendFileId: '1'})
         expect(document.body.querySelector('[role="dialog"][aria-label="Send To..."]')).toBeTruthy()
       })
     })
@@ -142,7 +138,7 @@ describe('SearchResults', () => {
       })
 
       it('renders a modal for sending the file, when clicked', () => {
-        wrapper.instance().setState({copyFileId: '1'})
+        ref.current.setState({copyFileId: '1'})
         expect(document.body.querySelector('[role="dialog"][aria-label="Copy To..."]')).toBeTruthy()
       })
     })
