@@ -214,6 +214,7 @@ RSpec.shared_examples "DiscussionType" do
     expect(discussion_type.resolve("delayedPostAt")).to eq discussion.delayed_post_at
     expect(discussion_type.resolve("lockAt")).to eq discussion.lock_at
     expect(discussion_type.resolve("userCount")).to eq discussion.course.users.count
+    expect(discussion_type.resolve("replyToEntryRequiredCount")).to eq discussion.reply_to_entry_required_count
   end
 
   it "orders root_entries by last_reply_at" do
