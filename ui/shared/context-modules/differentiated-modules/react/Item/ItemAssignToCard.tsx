@@ -77,6 +77,7 @@ export type ItemAssignToCardProps = {
   customIsLoading?: boolean
   customSetSearchTerm?: (term: string) => void
   highlightCard?: boolean
+  removeDueDateInput?: boolean
   blueprintDateLocks?: DateLockTypes[]
 }
 
@@ -107,6 +108,7 @@ export default forwardRef(function ItemAssignToCard(
     customSetSearchTerm,
     highlightCard,
     blueprintDateLocks,
+    removeDueDateInput,
   } = props
   const [
     dueDate,
@@ -290,19 +292,21 @@ export default forwardRef(function ItemAssignToCard(
           inputRef={el => (assigneeSelectorRef.current = el)}
           onBlur={() => setShowValidations(true)}
         />
-        <DueDateTimeInput
-          {...{
-            dueDate,
-            setDueDate,
-            handleDueDateChange,
-            validationErrors,
-            unparsedFieldKeys,
-            blueprintDateLocks,
-            dateInputRefs: dateInputRefs.current,
-            handleBlur,
-          }}
-          {...commonDateTimeInputProps}
-        />
+        {!removeDueDateInput && (
+          <DueDateTimeInput
+            {...{
+              dueDate,
+              setDueDate,
+              handleDueDateChange,
+              validationErrors,
+              unparsedFieldKeys,
+              blueprintDateLocks,
+              dateInputRefs: dateInputRefs.current,
+              handleBlur,
+            }}
+            {...commonDateTimeInputProps}
+          />
+        )}
         <AvailableFromDateTimeInput
           {...{
             availableFromDate,
