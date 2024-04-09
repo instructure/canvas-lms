@@ -686,6 +686,12 @@
     "enter_at_least_3_characters_to_search_4f037ee0": {
         "message": "输入至少 3 个字符以进行搜索"
     },
+    "enter_replacement_text_17631bbc": {
+        "message": "输入替换文本"
+    },
+    "enter_search_text_26cb4459": {
+        "message": "输入搜索文本"
+    },
     "epsilon_54bb8afa": {
         "message": "Epsilon"
     },
@@ -781,6 +787,12 @@
     },
     "filipino_33339264": {
         "message": "菲律宾语"
+    },
+    "find_8d605019": {
+        "message": "查找"
+    },
+    "find_and_replace_6e345933": {
+        "message": "查找并替换"
     },
     "finish_bc343002": {
         "message": "完成"
@@ -1057,6 +1069,9 @@
     },
     "indefinite_integral_6623307e": {
         "message": "不定积分"
+    },
+    "index_of_max_80dcf7a5": {
+        "message": "{ index }，共{ max }"
     },
     "indigo_2035fc55": {
         "message": "靛蓝色"
@@ -1487,6 +1502,9 @@
     "no_results_940393cf": {
         "message": "无结果。"
     },
+    "no_results_found_58717065": {
+        "message": "未发现结果"
+    },
     "no_results_found_for_filterterm_ad1b04c8": {
         "message": "未找到{ filterTerm }的结果"
     },
@@ -1700,6 +1718,9 @@
     "preview_inline_9787330": {
         "message": "嵌入式预览"
     },
+    "previous_bd2ac015": {
+        "message": "上一个"
+    },
     "prime_917ea60e": {
         "message": "质"
     },
@@ -1772,8 +1793,14 @@
     "remove_link_d1f2f4d0": {
         "message": "删除链接"
     },
+    "replace_all_d3d68b3": {
+        "message": "全部替换"
+    },
     "replace_e61834a7": {
         "message": "替换"
+    },
+    "replace_with_eeff01ad": {
+        "message": "替换为"
     },
     "reset_95a81614": {
         "message": "重置"

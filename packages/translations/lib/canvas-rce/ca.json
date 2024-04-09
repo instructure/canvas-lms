@@ -323,6 +323,10 @@
   "enter_at_least_3_characters_to_search_4f037ee0": {
     "message": "Introduïu com a mínim 3 caràcters per cercar"
   },
+  "enter_replacement_text_17631bbc": {
+    "message": "introdueix el text substitutiu"
+  },
+  "enter_search_text_26cb4459": { "message": "introdueix el text de cerca" },
   "epsilon_54bb8afa": { "message": "Èpsilon" },
   "epsilon_variant_d31f1e77": { "message": "Èpsilon (variant)" },
   "equals_sign_c51bdc58": { "message": "Signe igual" },
@@ -365,6 +369,8 @@
   },
   "files_c300e900": { "message": "Fitxers" },
   "files_index_af7c662b": { "message": "Índex de fitxers" },
+  "find_8d605019": { "message": "Cerca" },
+  "find_and_replace_6e345933": { "message": "Cerca i substitueix" },
   "finish_bc343002": { "message": "Finalitza" },
   "fix_heading_hierarchy_f60884c4": {
     "message": "Corregiu la jerarquia de capçaleres"
@@ -495,6 +501,7 @@
   "in_element_of_19ca2f33": { "message": "A (un element de)" },
   "increase_indent_6af90f7c": { "message": "Augmenta la sagnia" },
   "indefinite_integral_6623307e": { "message": "Integral indefinida" },
+  "index_of_max_80dcf7a5": { "message": "{ index } de { max }" },
   "indigo_2035fc55": { "message": "Indi" },
   "inference_fed5c960": { "message": "Inferència" },
   "infinity_7a10f206": { "message": "Infinitat" },
@@ -713,6 +720,7 @@
   },
   "no_quizzes_found_c80c537a": { "message": "No s''ha trobat cap prova." },
   "no_results_940393cf": { "message": "Sense resultats." },
+  "no_results_found_58717065": { "message": "No s''ha trobat cap resultat" },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "No s''ha trobat cap resultat per a { filterTerm }"
   },
@@ -812,6 +820,7 @@
     "message": "Visualització prèvia en superposició"
   },
   "preview_inline_9787330": { "message": "Visualització prèvia en línia" },
+  "previous_bd2ac015": { "message": "Anterior" },
   "prime_917ea60e": { "message": "Primer" },
   "prime_numbers_13464f61": { "message": "Números primers" },
   "product_39cf144f": { "message": "Producte" },
@@ -844,7 +853,9 @@
     "message": "Suprimeix l''estil de la capçalera"
   },
   "remove_link_d1f2f4d0": { "message": "Elimina l''enllaç" },
+  "replace_all_d3d68b3": { "message": "Substitueixo-ho tot" },
   "replace_e61834a7": { "message": "Substitueix" },
+  "replace_with_eeff01ad": { "message": "Substitueixo-ho per" },
   "reset_95a81614": { "message": "Restableix" },
   "resize_ec83d538": { "message": "Canvia la mida" },
   "restore_auto_save_deccd84b": {

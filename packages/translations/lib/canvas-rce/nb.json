@@ -303,6 +303,10 @@
   "enter_at_least_3_characters_to_search_4f037ee0": {
     "message": "Skriv inn minst tre tegn for å søke"
   },
+  "enter_replacement_text_17631bbc": {
+    "message": "skriv inn erstatningstekst"
+  },
+  "enter_search_text_26cb4459": { "message": "skriv inn søketekst" },
   "epsilon_54bb8afa": { "message": "Epsilon" },
   "epsilon_variant_d31f1e77": { "message": "Epsilon (variant)" },
   "equals_sign_c51bdc58": { "message": "Likhetstegn" },
@@ -345,6 +349,8 @@
   },
   "files_c300e900": { "message": "Filer" },
   "files_index_af7c662b": { "message": "Filindeks" },
+  "find_8d605019": { "message": "Finn" },
+  "find_and_replace_6e345933": { "message": "Finn og erstatt" },
   "finish_bc343002": { "message": "Ferdig" },
   "fix_heading_hierarchy_f60884c4": { "message": "Reparer tittelhierarki" },
   "flat_music_76d5a5c3": { "message": "Flat (musikk)" },
@@ -465,6 +471,7 @@
   "in_element_of_19ca2f33": { "message": "I (element av)" },
   "increase_indent_6af90f7c": { "message": "Øk innryk" },
   "indefinite_integral_6623307e": { "message": "Ubestemt heltall" },
+  "index_of_max_80dcf7a5": { "message": "{ index } av { max }" },
   "indigo_2035fc55": { "message": "Indigo" },
   "inference_fed5c960": { "message": "Inferens" },
   "infinity_7a10f206": { "message": "Uendelig" },
@@ -673,6 +680,7 @@
   },
   "no_quizzes_found_c80c537a": { "message": "Ingen quizer funnet." },
   "no_results_940393cf": { "message": "Ingen resultater." },
+  "no_results_found_58717065": { "message": "Ingen resultater ble funnet" },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Ingen resultat funnet for { filterTerm }"
   },
@@ -764,6 +772,7 @@
   "preview_a3f8f854": { "message": "FORHÅNDSVISNING" },
   "preview_in_overlay_ed772c46": { "message": "Forhåndsvis i utvidet vindu" },
   "preview_inline_9787330": { "message": "Forhåndsvis i vindu" },
+  "previous_bd2ac015": { "message": "Forrige" },
   "prime_917ea60e": { "message": "Prim" },
   "prime_numbers_13464f61": { "message": "Primtall" },
   "product_39cf144f": { "message": "Produkt" },
@@ -792,7 +801,9 @@
   "religion_icon_246e0be1": { "message": "Religion-ikon" },
   "remove_heading_style_5fdc8855": { "message": "Fjern tittelstil" },
   "remove_link_d1f2f4d0": { "message": "Fjerne lenke" },
+  "replace_all_d3d68b3": { "message": "Erstatt alle" },
   "replace_e61834a7": { "message": "Erstatt" },
+  "replace_with_eeff01ad": { "message": "Erstatt med" },
   "reset_95a81614": { "message": "Tilbakestill" },
   "resize_ec83d538": { "message": "Endre størrelse" },
   "restore_auto_save_deccd84b": {
