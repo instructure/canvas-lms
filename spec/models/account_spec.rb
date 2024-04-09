@@ -2393,13 +2393,9 @@ describe Account do
     end
 
     let_once(:level_two_sub_accounts) do
-      level_two_sub_accounts = []
-
-      root_account.sub_accounts.each do |sa|
-        level_two_sub_accounts << sa.sub_accounts.create!(name: "Level 2 - Sub account")
+      root_account.sub_accounts.map do |sa|
+        sa.sub_accounts.create!(name: "Level 2 - Sub account")
       end
-
-      level_two_sub_accounts
     end
 
     context "with empty parent account ids" do

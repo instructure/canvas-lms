@@ -652,10 +652,9 @@ class ActiveRecord::Base
   def self.bulk_insert_objects(objects, excluded_columns: ["primary_key"])
     return if objects.empty?
 
-    hashed_objects = []
     excluded_columns << objects.first.class.primary_key if excluded_columns.delete("primary_key")
-    objects.each do |object|
-      hashed_objects << object.attributes.except(excluded_columns.join(",")).to_h do |name, value|
+    hashed_objects = objects.map do |object|
+      object.attributes.except(excluded_columns.join(",")).to_h do |name, value|
         if (type = object.class.attribute_types[name]).is_a?(ActiveRecord::Type::Serialized)
           value = type.serialize(value)
         end

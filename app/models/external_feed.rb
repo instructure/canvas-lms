@@ -79,8 +79,7 @@ class ExternalFeed < ActiveRecord::Base
   end
 
   def add_atom_entries(atom)
-    items = []
-    atom.entries.each { |item| items << add_entry(item, atom, :atom) }
+    items = atom.entries.map { |item| add_entry(item, atom, :atom) }
     items.compact!
     context.add_aggregate_entries(items, self) if context.respond_to?(:add_aggregate_entries)
     items

@@ -77,7 +77,7 @@ describe Lti::ScopeUnion do
   describe "#each" do
     it "runs the block on each result of each scope" do
       results = []
-      subject.each { |obj| results << obj }
+      subject.each { |obj| results << obj } # rubocop:disable Style/MapIntoArray
       expect(results).to eq([course2, course, course2])
     end
   end

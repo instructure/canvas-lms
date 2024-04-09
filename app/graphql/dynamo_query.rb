@@ -76,10 +76,8 @@ class DynamoQuery
     query.items.each(&)
   end
 
-  def map
-    res = []
-    each { |item| res << yield(item) }
-    res
+  def map(&)
+    each.map(&)
   end
 
   def first
