@@ -59,4 +59,16 @@ module Api::V1::Rubric
       api_v1_account_rubrics_url(@context)
     end
   end
+
+  def rubric_used_locations_pagination_url(rubric)
+    if @context.is_a? Course
+      api_v1_rubrics_course_used_locations_path(
+        course_id: @context.id, id: rubric.id, include_host: true
+      )
+    else
+      api_v1_rubrics_account_used_locations_path(
+        account_id: @context.id, id: rubric.id, include_host: true
+      )
+    end
+  end
 end

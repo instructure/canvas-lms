@@ -27,6 +27,8 @@ import type {
 import getCookie from '@instructure/get-cookie'
 import qs from 'qs'
 import type {Rubric, RubricCriterion} from '@canvas/rubrics/react/types/rubric'
+import type {UsedLocation} from '@canvas/grading_scheme/gradingSchemeApiModel'
+import doFetchApi from '@canvas/do-fetch-api-effect'
 
 const COURSE_RUBRICS_QUERY = gql`
   query CourseRubricsQuery($courseId: ID!) {
@@ -201,6 +203,47 @@ export const fetchRubricCriterion = async (id?: string) => {
 
   const {rubric} = await executeQuery<RubricPreviewQueryResponse>(RUBRIC_PREVIEW_QUERY, {id})
   return rubric
+}
+
+type FetchRubricUsedLocationsParams = {
+  accountId?: string
+  courseId?: string
+  id?: string
+  nextPagePath?: string
+}
+export const fetchRubricUsedLocations = async ({
+  accountId,
+  courseId,
+  id,
+  nextPagePath,
+}: FetchRubricUsedLocationsParams) => {
+  if (!id) {
+    return {
+      usedLocations: [],
+      isLastPage: true,
+      nextPage: '',
+    }
+  }
+
+  const urlPrefix = accountId ? `accounts/${accountId}` : `courses/${courseId}`
+  const path = nextPagePath ?? `/api/v1/${urlPrefix}/rubrics/${id}/used_locations`
+
+  const result = await doFetchApi({
+    path,
+    method: 'GET',
+  })
+
+  if (!result.response.ok) {
+    throw new Error(`Failed to fetch rubric locations: ${result.response.statusText}`)
+  }
+
+  const usedLocations = (result.json as UsedLocation[]) ?? []
+
+  return {
+    usedLocations,
+    isLastPage: result.link?.next === undefined,
+    nextPage: result.link?.next?.url,
+  }
 }
 
 export const deleteRubric = async ({

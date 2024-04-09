@@ -32,6 +32,7 @@ const {Head, Row, Cell, ColHeader, Body} = Table
 
 export type RubricTableProps = {
   rubrics: Rubric[]
+  onLocationsClick: (rubricId: string) => void
   onPreviewClick: (rubricId: string) => void
   handleArchiveRubricChange: (rubricId: string) => void
   active: boolean
@@ -41,6 +42,7 @@ export const RubricTable = ({
   rubrics,
   handleArchiveRubricChange,
   active,
+  onLocationsClick,
   onPreviewClick,
 }: RubricTableProps) => {
   const navigate = useNavigate()
@@ -141,7 +143,11 @@ export const RubricTable = ({
             <Cell data-testid={`rubric-criterion-count-${index}`}>{rubric.criteriaCount}</Cell>
             <Cell data-testid={`rubric-locations-${index}`}>
               {rubric.hasRubricAssociations ? (
-                <Link forceButtonRole={true} isWithinText={false} onClick={() => {}}>
+                <Link
+                  forceButtonRole={true}
+                  isWithinText={false}
+                  onClick={() => onLocationsClick(rubric.id)}
+                >
                   {I18n.t('courses and assignments')}
                 </Link>
               ) : (

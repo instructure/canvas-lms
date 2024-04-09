@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React, {useCallback, useEffect, useRef, useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Modal} from '@instructure/ui-modal'
@@ -31,33 +31,109 @@ import {Flex} from '@instructure/ui-flex'
 import {Link} from '@instructure/ui-link'
 import {Pill} from '@instructure/ui-pill'
 import {Spinner} from '@instructure/ui-spinner'
+import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = useI18nScope('UsedLocationsModal')
+
+export type FetchUsedLocationResponse = {
+  usedLocations: UsedLocation[]
+  isLastPage: boolean
+  nextPage: string
+}
 
 type UsedLocationsModalProps = {
   isLoading: boolean
   isOpen: boolean
-  sentinelRef?: React.MutableRefObject<null>
-  usedLocations: UsedLocation[]
+  itemId?: string
+  fetchUsedLocations: () => Promise<FetchUsedLocationResponse>
   onClose: () => void
-  onDismiss: () => void
 }
 export const UsedLocationsModal = ({
   isLoading,
   isOpen,
-  sentinelRef,
-  usedLocations,
+  itemId,
+  fetchUsedLocations,
   onClose,
-  onDismiss,
 }: UsedLocationsModalProps) => {
+  const [usedLocations, setUsedLocations] = useState<UsedLocation[]>([])
   const [filter, setFilter] = useState<string>('')
+  const sentinelRef = useRef(null)
+
+  const moreLocationsLeft = useRef(true)
+  const fetchingLocations = useRef(false)
+
+  const loadMoreItems = useCallback(async () => {
+    if (itemId == null || fetchingLocations.current) {
+      return
+    }
+    fetchingLocations.current = true
+    try {
+      const newLocations = await fetchUsedLocations()
+
+      if (newLocations.usedLocations.length) {
+        setUsedLocations(prevLocations => {
+          if (newLocations.usedLocations[0]?.id === prevLocations[prevLocations.length - 1]?.id) {
+            prevLocations[prevLocations.length - 1].assignments.push(
+              ...newLocations.usedLocations[0].assignments
+            )
+            newLocations.usedLocations.shift()
+          }
+          return [...prevLocations, ...newLocations.usedLocations]
+        })
+      }
+
+      moreLocationsLeft.current = !newLocations.isLastPage
+      fetchingLocations.current = false
+    } catch (error: any) {
+      showFlashError(I18n.t('Failed to load used locations'))(error)
+    }
+  }, [fetchUsedLocations, itemId])
+
+  const reset = () => {
+    setUsedLocations([])
+    moreLocationsLeft.current = true
+    onClose()
+  }
+
+  useEffect(() => {
+    if (!isOpen) {
+      return
+    }
+    const timer = setTimeout(() => {
+      if (!sentinelRef?.current) {
+        return
+      }
+      const observer = new IntersectionObserver(
+        entries => {
+          if (
+            entries[0].isIntersecting &&
+            moreLocationsLeft.current &&
+            !fetchingLocations.current
+          ) {
+            loadMoreItems()
+          }
+        },
+        {
+          root: null,
+          rootMargin: '0px',
+          threshold: 0.4,
+        }
+      )
+
+      observer.observe(sentinelRef.current)
+      return () => {
+        observer.disconnect()
+      }
+    }, 0)
+    return () => clearTimeout(timer)
+  }, [isLoading, loadMoreItems, moreLocationsLeft, isOpen])
 
   return (
     <Modal
       as="form"
       open={isOpen}
-      onClose={onClose}
-      onDismiss={onDismiss}
+      onClose={reset}
+      onDismiss={reset}
       label={I18n.t('Locations Used')}
       size="small"
       data-testid="used-locations-modal"

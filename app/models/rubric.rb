@@ -564,4 +564,10 @@ class Rubric < ActiveRecord::Base
   def rubric_assignment_associations?
     rubric_associations.where(association_type: "Assignment", workflow_state: "active").any?
   end
+
+  def used_locations
+    associations = rubric_associations.active.where(association_type: "Assignment")
+
+    Assignment.where(id: associations.pluck(:association_id))
+  end
 end

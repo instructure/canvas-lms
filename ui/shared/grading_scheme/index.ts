@@ -26,3 +26,4 @@ export type {
 
 export {GradingSchemesManagement} from './react/components/GradingSchemesManagement'
 export {GradingSchemesSelector} from './react/components/GradingSchemesSelector'
+export {UsedLocationsModal, type FetchUsedLocationResponse} from './react/components/UsedLocationsModal'
