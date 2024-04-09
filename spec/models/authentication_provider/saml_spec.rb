@@ -213,5 +213,38 @@ describe AuthenticationProvider::SAML do
       expect(entity.roles.last.attribute_consuming_services.first.requested_attributes.length).to eq 1
       expect(entity.roles.last.attribute_consuming_services.first.requested_attributes.first.name).to eq "name"
     end
+
+    it "signals if requests will be signed" do
+      ap = @account.authentication_providers.new(auth_type: "saml")
+      ap.sig_alg = "rsa-sha1"
+      ap.save!
+      # ignore invalid saml key configuration in specs
+      allow(AuthenticationProvider::SAML).to receive(:private_keys).and_return({})
+      entity = AuthenticationProvider::SAML.sp_metadata_for_account(@account)
+      expect(entity.roles.last.authn_requests_signed?).to be true
+    end
+
+    it "signals if requests will not be signed" do
+      ap = @account.authentication_providers.new(auth_type: "saml")
+      ap.sig_alg = nil
+      ap.save!
+      # ignore invalid saml key configuration in specs
+      allow(AuthenticationProvider::SAML).to receive(:private_keys).and_return({})
+      entity = AuthenticationProvider::SAML.sp_metadata_for_account(@account)
+      expect(entity.roles.last.authn_requests_signed?).to be false
+    end
+
+    it "does not signals if requests will be signed with mixed providers" do
+      ap = @account.authentication_providers.new(auth_type: "saml")
+      ap.sig_alg = "rsa-sha1"
+      ap.save!
+      ap = @account.authentication_providers.new(auth_type: "saml")
+      ap.sig_alg = nil
+      ap.save!
+      # ignore invalid saml key configuration in specs
+      allow(AuthenticationProvider::SAML).to receive(:private_keys).and_return({})
+      entity = AuthenticationProvider::SAML.sp_metadata_for_account(@account)
+      expect(entity.roles.last.authn_requests_signed?).to be_nil
+    end
   end
 end
