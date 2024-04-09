@@ -61,6 +61,7 @@ export function AvailableFromDateTimeInput({
 
   const availableFromDateProps = {
     key,
+    id: key,
     disabled: Boolean(blueprintDateLocks?.includes('availability_dates')),
     description: I18n.t('Choose an available from date and time'),
     dateRenderLabel: I18n.t('Available from'),

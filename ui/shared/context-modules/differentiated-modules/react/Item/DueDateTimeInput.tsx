@@ -56,6 +56,7 @@ export function DueDateTimeInput({
 
   const dueDateProps = {
     key,
+    id: key,
     disabled: Boolean(blueprintDateLocks?.includes('due_dates')),
     description: I18n.t('Choose a due date and time'),
     dateRenderLabel: I18n.t('Due Date'),

@@ -49,6 +49,7 @@ function useElementResize(
 }
 
 export interface ClearableDateTimeInputProps {
+  id?: string
   disabled?: boolean
   description: string
   dateRenderLabel: string
@@ -65,6 +66,7 @@ export interface ClearableDateTimeInputProps {
 }
 
 function ClearableDateTimeInput({
+  id,
   disabled = false,
   description,
   dateRenderLabel,
@@ -109,6 +111,7 @@ function ClearableDateTimeInput({
     >
       <Flex.Item
         direction={breakpoints?.mobileOnly ? 'column' : 'row'}
+        data-testid={`${id}_input`}
         shouldShrink={true}
         shouldGrow={true}
       >

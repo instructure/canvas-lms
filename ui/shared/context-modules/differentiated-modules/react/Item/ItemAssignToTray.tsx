@@ -79,6 +79,8 @@ function itemTypeToApiURL(courseId: string, itemType: string, itemId: string) {
       return `/api/v1/courses/${courseId}/assignments/${itemId}/date_details`
     case 'quiz':
       return `/api/v1/courses/${courseId}/quizzes/${itemId}/date_details`
+    case 'discussion':
+      return `/api/v1/courses/${courseId}/discussion_topics/${itemId}/date_details`
     default:
       return ''
   }
@@ -148,6 +150,7 @@ export interface ItemAssignToTrayProps {
   defaultDisabledOptionIds?: string[]
   defaultSectionId?: string
   useApplyButton?: boolean
+  removeDueDateInput?: boolean
   onAddCard?: () => void
   onAssigneesChange?: (
     cardId: string,
@@ -179,6 +182,7 @@ export default function ItemAssignToTray({
   onCardRemove,
   defaultSectionId,
   useApplyButton = false,
+  removeDueDateInput = false,
 }: ItemAssignToTrayProps) {
   const [assignToCards, setAssignToCards] = useState<ItemAssignToCardSpec[]>(defaultCards ?? [])
   const [initialCards, setInitialCards] = useState<ItemAssignToCardSpec[]>([])
@@ -574,6 +578,7 @@ export default function ItemAssignToTray({
             courseId={courseId}
             contextModuleId={card.contextModuleId}
             contextModuleName={card.contextModuleName}
+            removeDueDateInput={removeDueDateInput}
             cardId={card.key}
             due_at={card.due_at}
             unlock_at={card.unlock_at}
