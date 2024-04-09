@@ -226,11 +226,15 @@ export default function DiscussionTopicForm({
 
   // Checkpoints - add initial states once checkpoint mutation has been edited
   const [isCheckpoints, setIsCheckpoints] = useState(
-    !!currentDiscussionTopic?.assignment?.checkpoints || false
+    currentDiscussionTopic?.assignment?.hasSubAssignments || false
   )
-  const [pointsPossibleReplyToTopic, setPointsPossibleReplyToTopic] = useState(0)
-  const [pointsPossibleReplyToEntry, setPointsPossibleReplyToEntry] = useState(0)
-  const [replyToEntryRequiredCount, setReplyToEntryRequiredCount] = useState(1)
+  const getCheckpointsPointsPossible = (checkpointLabel) => {
+    const checkpoint = currentDiscussionTopic?.assignment?.checkpoints?.find(c => c.tag === checkpointLabel)
+    return checkpoint ? checkpoint.pointsPossible : 0
+  }
+  const [pointsPossibleReplyToTopic, setPointsPossibleReplyToTopic] = useState(getCheckpointsPointsPossible('reply_to_topic'))
+  const [pointsPossibleReplyToEntry, setPointsPossibleReplyToEntry] = useState(getCheckpointsPointsPossible('reply_to_entry'))
+  const [replyToEntryRequiredCount, setReplyToEntryRequiredCount] = useState(currentDiscussionTopic?.replyToEntryRequiredCount || 1)
 
   const setReplyToEntryRequiredRef = (ref) => {
     replyToEntryRequiredRef.current = ref

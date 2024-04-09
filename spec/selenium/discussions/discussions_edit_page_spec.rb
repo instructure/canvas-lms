@@ -896,6 +896,33 @@ describe "discussions" do
             expect(displayed_overrides).to match_array(expected_overrides)
           end
         end
+
+        context "checkpoints" do
+          before do
+            course.root_account.enable_feature!(:discussion_checkpoints)
+          end
+
+          it "displays checkpoint settings values correctly when there are existing checkpoints" do
+            checkpointed_discussion = DiscussionTopic.create_graded_topic!(course:, title: "checkpointed discussion")
+            Checkpoints::DiscussionCheckpointCreatorService.call(
+              discussion_topic: checkpointed_discussion,
+              checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+              dates: [{ type: "everyone", due_at: 2.days.from_now }],
+              points_possible: 6
+            )
+            Checkpoints::DiscussionCheckpointCreatorService.call(
+              discussion_topic: checkpointed_discussion,
+              checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+              dates: [{ type: "everyone", due_at: 2.days.from_now }],
+              points_possible: 7,
+              replies_required: 5
+            )
+            get "/courses/#{course.id}/discussion_topics/#{checkpointed_discussion.id}/edit"
+            expect(f("input[data-testid='points-possible-input-reply-to-topic']").attribute("value")).to eq "6"
+            expect(f("input[data-testid='points-possible-input-reply-to-entry']").attribute("value")).to eq "7"
+            expect(f("input[data-testid='reply-to-entry-required-count']").attribute("value")).to eq "5"
+          end
+        end
       end
     end
   end

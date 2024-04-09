@@ -22,6 +22,7 @@ import userEvent from '@testing-library/user-event'
 import React from 'react'
 import DiscussionTopicForm from '../DiscussionTopicForm'
 import {DiscussionTopic} from '../../../../graphql/DiscussionTopic'
+import { Assignment } from '../../../../graphql/Assignment'
 import {GroupSet} from '../../../../graphql/GroupSet'
 
 jest.mock('@canvas/rce/react/CanvasRce')
@@ -452,6 +453,13 @@ describe('DiscussionTopicForm', () => {
       checkbox.click()
       expect(checkbox.checked).toBe(false)
     })
+    it('renders the checkpoints checkbox as selected when there are existing checkpoints', () => {
+      const {getByTestId} = setup({
+        currentDiscussionTopic: DiscussionTopic.mock({assignment: Assignment.mock({hasSubAssignments: true})}),
+      })
+      const checkbox = getByTestId('checkpoints-checkbox')
+      expect(checkbox.checked).toBe(true)
+    })
     describe('Checkpoints Settings', () => {
       it('increments and decrements the checkpoints settings points possible reply to topic fields', () => {
         const {getByTestId, getByLabelText} = setup()
@@ -549,6 +557,34 @@ describe('DiscussionTopicForm', () => {
         saveButton.click()
 
         expect(onSubmit).toHaveBeenCalled()
+      })
+      it('sets the correct checkpoint settings values when there are existing checkpoints', () => {
+        const {getByTestId} = setup({
+          currentDiscussionTopic: DiscussionTopic.mock({replyToEntryRequiredCount: 5, assignment: Assignment.mock({
+            hasSubAssignments: true,
+            checkpoints: [{
+              "dueAt": null,
+              "name": "checkpoint discussion",
+              "onlyVisibleToOverrides": false,
+              "pointsPossible": 6,
+              "tag": "reply_to_topic"
+            },
+            {
+              "dueAt": null,
+              "name": "checkpoint discussion",
+              "onlyVisibleToOverrides": false,
+              "pointsPossible": 7,
+              "tag": "reply_to_entry"
+            }
+            ]}
+          )}),
+        })
+        const numberInputReplyToTopic = getByTestId('points-possible-input-reply-to-topic')
+        expect(numberInputReplyToTopic.value).toBe('6')
+        const numberInputReplyToEntry = getByTestId('points-possible-input-reply-to-entry')
+        expect(numberInputReplyToEntry.value).toBe('7')
+        const numberInputAdditionalRepliesRequired = getByTestId('reply-to-entry-required-count')
+        expect(numberInputAdditionalRepliesRequired.value).toBe('5')
       })
     })
   })
