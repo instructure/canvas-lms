@@ -295,6 +295,8 @@
   "enter_at_least_3_characters_to_search_4f037ee0": {
     "message": "กรอกอย่างน้อย 3 ตัวอักษรเพื่อค้นหา"
   },
+  "enter_replacement_text_17631bbc": { "message": "กรอกข้อความแทนที่" },
+  "enter_search_text_26cb4459": { "message": "กรอกข้อความค้นหา" },
   "epsilon_54bb8afa": { "message": "เอปไซลอน" },
   "epsilon_variant_d31f1e77": { "message": "เอปไซลอน (ตัวแปร)" },
   "equals_sign_c51bdc58": { "message": "สัญลักษณ์เท่ากับ" },
@@ -337,6 +339,8 @@
   },
   "files_c300e900": { "message": "ไฟล์" },
   "files_index_af7c662b": { "message": "ดัชนีไฟล์" },
+  "find_8d605019": { "message": "ค้นหา" },
+  "find_and_replace_6e345933": { "message": "ค้นหาและแทนที่" },
   "finish_bc343002": { "message": "เสร็จสิ้น" },
   "fix_heading_hierarchy_f60884c4": { "message": "แก้ไขโครงสร้างหัวเรื่อง" },
   "flat_music_76d5a5c3": { "message": "แฟลท (ดนตรี)" },
@@ -455,6 +459,7 @@
   "in_element_of_19ca2f33": { "message": "ใน (องค์ประกอบของ)" },
   "increase_indent_6af90f7c": { "message": "เพิ่มการเยื้อง" },
   "indefinite_integral_6623307e": { "message": "อินทริกรัลไม่จำกัดเขต" },
+  "index_of_max_80dcf7a5": { "message": "{ index } จาก { max }" },
   "indigo_2035fc55": { "message": "คราม" },
   "inference_fed5c960": { "message": "การอนุมาน" },
   "infinity_7a10f206": { "message": "อนันต์" },
@@ -649,6 +654,7 @@
   "no_quizzes_created_yet_1a2370b9": { "message": "ยังไม่ได้จัดทำแบบทดสอบ" },
   "no_quizzes_found_c80c537a": { "message": "ไม่พบแบบทดสอบ" },
   "no_results_940393cf": { "message": "ไม่มีผลลัพธ์" },
+  "no_results_found_58717065": { "message": "ไม่พบผลลัพธ์" },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "ไม่พบผลลัพธ์สำหรับ { filterTerm }"
   },
@@ -740,6 +746,7 @@
   "preview_a3f8f854": { "message": "แสดงตัวอย่าง" },
   "preview_in_overlay_ed772c46": { "message": "แสดงตัวอย่างเป็นโอเวอร์เลย์" },
   "preview_inline_9787330": { "message": "แสดงตัวอย่างในแถว" },
+  "previous_bd2ac015": { "message": "ก่อนหน้า" },
   "prime_917ea60e": { "message": "เฉพาะ" },
   "prime_numbers_13464f61": { "message": "จำนวนเฉพาะ" },
   "product_39cf144f": { "message": "ผล" },
@@ -768,7 +775,9 @@
   "religion_icon_246e0be1": { "message": "ไอคอนศาสนา" },
   "remove_heading_style_5fdc8855": { "message": "ลบรูปแบบหัวเรื่อง" },
   "remove_link_d1f2f4d0": { "message": "ลบลิงค์" },
+  "replace_all_d3d68b3": { "message": "แทนที่ทั้งหมด" },
   "replace_e61834a7": { "message": "แทนที่" },
+  "replace_with_eeff01ad": { "message": "แทนที่ด้วย" },
   "reset_95a81614": { "message": "รีเซ็ต" },
   "resize_ec83d538": { "message": "ปรับขนาด" },
   "restore_auto_save_deccd84b": {

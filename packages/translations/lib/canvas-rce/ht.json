@@ -293,6 +293,8 @@
   "enter_at_least_3_characters_to_search_4f037ee0": {
     "message": "Antre omwen 3 karaktè pou ka chèche"
   },
+  "enter_replacement_text_17631bbc": { "message": "Antre tèks ranplasman an" },
+  "enter_search_text_26cb4459": { "message": "Antre tèks rechèch la" },
   "epsilon_54bb8afa": { "message": "Epsilon" },
   "epsilon_variant_d31f1e77": { "message": "Epsilon (Varyan)" },
   "equals_sign_c51bdc58": { "message": "Siy Egal" },
@@ -329,6 +331,8 @@
   "filename_text_preview_e41ca2d8": { "message": "{ filename } apèsi tèks" },
   "files_c300e900": { "message": "Fichye" },
   "files_index_af7c662b": { "message": "Endis Fichye" },
+  "find_8d605019": { "message": "Jwenn" },
+  "find_and_replace_6e345933": { "message": "Jwenn epi Ranplase" },
   "finish_bc343002": { "message": "Fini" },
   "fix_heading_hierarchy_f60884c4": { "message": "Fikse yerachi antèt" },
   "flat_music_76d5a5c3": { "message": "Plat (Mizik)" },
@@ -449,6 +453,7 @@
   "in_element_of_19ca2f33": { "message": "Nan (Eleman de)" },
   "increase_indent_6af90f7c": { "message": "Ogmante Endantasyon" },
   "indefinite_integral_6623307e": { "message": "Entegral Endefini" },
+  "index_of_max_80dcf7a5": { "message": "{ index } de { max }" },
   "indigo_2035fc55": { "message": "Indigo" },
   "inference_fed5c960": { "message": "Enferans" },
   "infinity_7a10f206": { "message": "Enfinite" },
@@ -641,6 +646,7 @@
   "no_quizzes_created_yet_1a2370b9": { "message": "Poko gen quiz ki kreye." },
   "no_quizzes_found_c80c537a": { "message": "Yo pa jwenn quiz." },
   "no_results_940393cf": { "message": "Okenn rezilta." },
+  "no_results_found_58717065": { "message": "Nou pa jwenn rezilta" },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Nou pa jwenn rezilta pou { filterTerm }"
   },
@@ -732,6 +738,7 @@
   "preview_a3f8f854": { "message": "APÈSI" },
   "preview_in_overlay_ed772c46": { "message": "Apèsi an sipèpozisyon" },
   "preview_inline_9787330": { "message": "Apèsi an liy" },
+  "previous_bd2ac015": { "message": "Anvan" },
   "prime_917ea60e": { "message": "Premye" },
   "prime_numbers_13464f61": { "message": "Nonm Premye" },
   "product_39cf144f": { "message": "Pwodwi" },
@@ -760,7 +767,9 @@
   "religion_icon_246e0be1": { "message": "Ikòn Relijyon" },
   "remove_heading_style_5fdc8855": { "message": "Elimine stil antèt" },
   "remove_link_d1f2f4d0": { "message": "Elimine Lyen" },
+  "replace_all_d3d68b3": { "message": "Ranplase Tout" },
   "replace_e61834a7": { "message": "Ranplase" },
+  "replace_with_eeff01ad": { "message": "Ranplase ak" },
   "reset_95a81614": { "message": "Reinisyalize" },
   "resize_ec83d538": { "message": "Redimansyone" },
   "restore_auto_save_deccd84b": {
