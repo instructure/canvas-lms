@@ -128,7 +128,8 @@ ready(() => {
   const is_full_screen = $('body').hasClass('ic-full-screen-lti-tool')
 
   if (!is_full_screen) {
-    canvas_chrome_height = $tool_content_wrapper.offset().top + $('#footer').outerHeight(true)
+    const footerHeight = $('#footer').outerHeight(true) || 0
+    canvas_chrome_height = $tool_content_wrapper.offset().top + footerHeight
   }
 
   if ($tool_content_wrapper.length) {
@@ -157,11 +158,12 @@ ready(() => {
 
             toolResizer.resize_tool_content_wrapper(tool_height, $tool_content_wrapper, true)
           } else {
+            // module item navigation from PLAT-1687
+            const sequenceFooterHeight = $('#sequence_footer').outerHeight(true) || 0
             toolResizer.resize_tool_content_wrapper(
               $window.height() -
                 canvas_chrome_height -
-                // module item navigation from PLAT-1687
-                $('#sequence_footer').outerHeight(true)
+                sequenceFooterHeight
             )
           }
         }
