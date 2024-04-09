@@ -26,6 +26,9 @@ class Lti::IMS::Registration < ApplicationRecord
   REQUIRED_APPLICATION_TYPE = "web"
   REQUIRED_TOKEN_ENDPOINT_AUTH_METHOD = "private_key_jwt"
   COURSE_NAV_DEFAULT_ENABLED_EXTENSION = "https://canvas.instructure.com/lti/course_navigation/default_enabled"
+  PLACEMENT_VISIBILITY_EXTENSION = "https://canvas.instructure.com/lti/visibility"
+
+  PLACEMENT_VISIBILITY_OPTIONS = %(admins members public)
 
   validates :application_type,
             :grant_types,
@@ -169,9 +172,19 @@ class Lti::IMS::Registration < ApplicationRecord
         # This supports a very old parameter (hence the obtuse name) that only applies to the course navigation placement. It hides the
         # tool from the course navigation by default. Teachers can still add the tool to the course navigation using the course
         # settings page if they'd like.
-        default: (message[COURSE_NAV_DEFAULT_ENABLED_EXTENSION] == false && placement_name == "course_navigation") ? "disabled" : nil
+        default: (message[COURSE_NAV_DEFAULT_ENABLED_EXTENSION] == false && placement_name == "course_navigation") ? "disabled" : nil,
+        visibility: placement_visibility(message),
       }.merge(width_and_height_settings(message, placement_name)).compact
     ]
+  end
+
+  def placement_visibility(message)
+    availability = message[PLACEMENT_VISIBILITY_EXTENSION]
+    if availability
+      PLACEMENT_VISIBILITY_OPTIONS.include?(availability) ? availability : nil
+    else
+      nil
+    end
   end
 
   def lookup_placement_overlay(placement_type)

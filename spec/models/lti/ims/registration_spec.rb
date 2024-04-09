@@ -439,6 +439,46 @@ module Lti::IMS
         end
       end
 
+      describe "when extension visibility is supplied" do
+        let(:lti_tool_configuration) do
+          {
+            domain: "example.com",
+            messages: [{
+              type: "LtiResourceLinkRequest",
+              target_link_uri: "http://example.com/launch",
+              placements: ["global_navigation"],
+              "https://canvas.instructure.com/lti/visibility": "admins",
+            }],
+          }
+        end
+
+        subject { registration.canvas_configuration["extensions"][0]["settings"]["placements"][0]["visibility"] }
+
+        it "set visibility in the canvas configuration" do
+          expect(subject).to eq("admins")
+        end
+      end
+
+      describe "when an invalid extension visibility is supplied" do
+        let(:lti_tool_configuration) do
+          {
+            domain: "example.com",
+            messages: [{
+              type: "LtiResourceLinkRequest",
+              target_link_uri: "http://example.com/launch",
+              placements: ["global_navigation"],
+              "https://canvas.instructure.com/lti/visibility": "foo",
+            }],
+          }
+        end
+
+        subject { registration.canvas_configuration["extensions"][0]["settings"]["placements"][0]["visibility"] }
+
+        it "ignores the invalid visibility value" do
+          expect(subject).to be_nil
+        end
+      end
+
       describe "importable_configuration" do
         subject { registration.importable_configuration }
         let(:lti_tool_configuration) do
