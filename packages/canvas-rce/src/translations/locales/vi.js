@@ -332,6 +332,8 @@ const locale = {
   "enter_at_least_3_characters_to_search_4f037ee0": {
     "message": "Nhập ít nhất 3 ký tự để tìm kiếm"
   },
+  "enter_replacement_text_17631bbc": { "message": "nhập văn bản thay thế" },
+  "enter_search_text_26cb4459": { "message": "nhập văn bản tìm kiếm" },
   "epsilon_54bb8afa": { "message": "Epsilon" },
   "epsilon_variant_d31f1e77": { "message": "Epsilon (Biến)" },
   "equals_sign_c51bdc58": { "message": "Dấu Bằng" },
@@ -376,6 +378,8 @@ const locale = {
   },
   "files_c300e900": { "message": "Các Tập Tin" },
   "files_index_af7c662b": { "message": "Chỉ Mục Tập Tin" },
+  "find_8d605019": { "message": "Tìm" },
+  "find_and_replace_6e345933": { "message": "Tìm Kiếm và Thay Thế" },
   "finish_bc343002": { "message": "Hoàn Thành" },
   "fix_heading_hierarchy_f60884c4": { "message": "Sửa hệ phân cấp đầu đề" },
   "flat_music_76d5a5c3": { "message": "Cao Độ Thấp (Âm Nhac)" },
@@ -496,6 +500,7 @@ const locale = {
   "in_element_of_19ca2f33": { "message": "Thuộc (Phần Tử Của)" },
   "increase_indent_6af90f7c": { "message": "Tăng Thụt Lề" },
   "indefinite_integral_6623307e": { "message": "Tích Phân Không Xác Định" },
+  "index_of_max_80dcf7a5": { "message": "{ index } / { max }" },
   "indigo_2035fc55": { "message": "Chàm" },
   "inference_fed5c960": { "message": "Kết Luận" },
   "infinity_7a10f206": { "message": "Vô Hạn" },
@@ -702,6 +707,7 @@ const locale = {
     "message": "Không tìm thấy câu hỏi kiểm tra nào."
   },
   "no_results_940393cf": { "message": "Không có kết quả." },
+  "no_results_found_58717065": { "message": "Không tìm thấy kết quả" },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Không tìm thấy kết quả cho { filterTerm }"
   },
@@ -793,6 +799,7 @@ const locale = {
   "preview_a3f8f854": { "message": "XEM TRƯỚC" },
   "preview_in_overlay_ed772c46": { "message": "Xem trước trong lớp phủ" },
   "preview_inline_9787330": { "message": "Xem trước trong dòng" },
+  "previous_bd2ac015": { "message": "Trước" },
   "prime_917ea60e": { "message": "Nguyên Tố" },
   "prime_numbers_13464f61": { "message": "Số Nguyên Tố" },
   "product_39cf144f": { "message": "Sản Phẩm" },
@@ -823,7 +830,9 @@ const locale = {
   "religion_icon_246e0be1": { "message": "Biểu Tượng Tôn Giáo" },
   "remove_heading_style_5fdc8855": { "message": "Gỡ kiểu đầu đề" },
   "remove_link_d1f2f4d0": { "message": "Gỡ Liên Kết" },
+  "replace_all_d3d68b3": { "message": "Thay Tất Cả" },
   "replace_e61834a7": { "message": "Thay Thế" },
+  "replace_with_eeff01ad": { "message": "Thay bằng" },
   "reset_95a81614": { "message": "Cài lại" },
   "resize_ec83d538": { "message": "Đổi Cỡ" },
   "restore_auto_save_deccd84b": { "message": "Khôi phục tự động lưu?" },

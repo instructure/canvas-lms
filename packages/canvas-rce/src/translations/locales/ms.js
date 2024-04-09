@@ -325,6 +325,8 @@ const locale = {
   "enter_at_least_3_characters_to_search_4f037ee0": {
     "message": "Masukkan sekurang-kurangnya 3 aksara untuk mencari"
   },
+  "enter_replacement_text_17631bbc": { "message": "Masukkan teks gantian" },
+  "enter_search_text_26cb4459": { "message": "masukkan teks carian" },
   "epsilon_54bb8afa": { "message": "Epsilon" },
   "epsilon_variant_d31f1e77": { "message": "Epsilon (Varian)" },
   "equals_sign_c51bdc58": { "message": "Tanda Sama Dengan" },
@@ -369,6 +371,8 @@ const locale = {
   },
   "files_c300e900": { "message": "Fail" },
   "files_index_af7c662b": { "message": "Indeks Fail" },
+  "find_8d605019": { "message": "Cari" },
+  "find_and_replace_6e345933": { "message": "Cari dan Gantikan" },
   "finish_bc343002": { "message": "Selesai" },
   "fix_heading_hierarchy_f60884c4": { "message": "Pulihkan hierarki tajuk" },
   "flat_music_76d5a5c3": { "message": "Flat (Muzik)" },
@@ -491,6 +495,7 @@ const locale = {
   "in_element_of_19ca2f33": { "message": "Dalam (Element untuk)" },
   "increase_indent_6af90f7c": { "message": "Tambah Engsot" },
   "indefinite_integral_6623307e": { "message": "Kamiran Tidak Tentu" },
+  "index_of_max_80dcf7a5": { "message": "{ index } daripada { max }" },
   "indigo_2035fc55": { "message": "Biru Nila" },
   "inference_fed5c960": { "message": "Inferens" },
   "infinity_7a10f206": { "message": "Infiniti" },
@@ -691,6 +696,7 @@ const locale = {
   "no_quizzes_created_yet_1a2370b9": { "message": "Belum ada kuiz dicipta." },
   "no_quizzes_found_c80c537a": { "message": "Tiada kuiz dicipta." },
   "no_results_940393cf": { "message": "Tiada hasil." },
+  "no_results_found_58717065": { "message": "Tiada hasil ditemui" },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Tiada hasil ditemui untuk { filterTerm }"
   },
@@ -780,6 +786,7 @@ const locale = {
   "preview_a3f8f854": { "message": "PRATONTON" },
   "preview_in_overlay_ed772c46": { "message": "Pratonton dalam tindihan" },
   "preview_inline_9787330": { "message": "Pratonton dalam sebaris" },
+  "previous_bd2ac015": { "message": "Sebelumnya" },
   "prime_917ea60e": { "message": "Perdana" },
   "prime_numbers_13464f61": { "message": "Nombor Perdana" },
   "product_39cf144f": { "message": "Produk" },
@@ -808,7 +815,9 @@ const locale = {
   "religion_icon_246e0be1": { "message": "Ikon Agama" },
   "remove_heading_style_5fdc8855": { "message": "Alih keluar gaya tajuk" },
   "remove_link_d1f2f4d0": { "message": "Alih Keluar Pautan" },
+  "replace_all_d3d68b3": { "message": "Gantikan Semua" },
   "replace_e61834a7": { "message": "Gantikan" },
+  "replace_with_eeff01ad": { "message": "Gantikan dengan" },
   "reset_95a81614": { "message": "Tetap Semula" },
   "resize_ec83d538": { "message": "Saiz Semula" },
   "restore_auto_save_deccd84b": {

@@ -326,6 +326,8 @@ const locale = {
   "enter_at_least_3_characters_to_search_4f037ee0": {
     "message": "検索する語を3文字以上入力してください"
   },
+  "enter_replacement_text_17631bbc": { "message": "代替テキストを入力する" },
+  "enter_search_text_26cb4459": { "message": "検索テキストを入力する" },
   "epsilon_54bb8afa": { "message": "エプシロン" },
   "epsilon_variant_d31f1e77": { "message": "イプシロン(変形)" },
   "equals_sign_c51bdc58": { "message": "等記号" },
@@ -368,6 +370,8 @@ const locale = {
   },
   "files_c300e900": { "message": "ファイル" },
   "files_index_af7c662b": { "message": "ファイルのインデックス" },
+  "find_8d605019": { "message": "検索" },
+  "find_and_replace_6e345933": { "message": "検索して置換" },
   "finish_bc343002": { "message": "完了" },
   "fix_heading_hierarchy_f60884c4": {
     "message": "見出しヒエアルキーを修正する"
@@ -490,6 +494,7 @@ const locale = {
   "in_element_of_19ca2f33": { "message": "（）内（の要素）" },
   "increase_indent_6af90f7c": { "message": "インデントを増やす" },
   "indefinite_integral_6623307e": { "message": "不定積分" },
+  "index_of_max_80dcf7a5": { "message": "{ index } / { max }" },
   "indigo_2035fc55": { "message": "インディゴ" },
   "inference_fed5c960": { "message": "推論" },
   "infinity_7a10f206": { "message": "無限" },
@@ -686,6 +691,7 @@ const locale = {
   },
   "no_quizzes_found_c80c537a": { "message": "小テストが見つかりません。" },
   "no_results_940393cf": { "message": "結果がありません。" },
+  "no_results_found_58717065": { "message": "結果が見つかりませんでした" },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "{ filterTerm }の結果が見つかりませんでした"
   },
@@ -779,6 +785,7 @@ const locale = {
   "preview_a3f8f854": { "message": "プレビュー" },
   "preview_in_overlay_ed772c46": { "message": "オーバーレイでのプレビュー" },
   "preview_inline_9787330": { "message": "インラインでのプレビュー" },
+  "previous_bd2ac015": { "message": "前" },
   "prime_917ea60e": { "message": "素数" },
   "prime_numbers_13464f61": { "message": "素数" },
   "product_39cf144f": { "message": "積" },
@@ -807,7 +814,9 @@ const locale = {
   "religion_icon_246e0be1": { "message": "宗教学のアイコン" },
   "remove_heading_style_5fdc8855": { "message": "見出しスタイルを削除する" },
   "remove_link_d1f2f4d0": { "message": "リンクの削除" },
+  "replace_all_d3d68b3": { "message": "すべて置換する" },
   "replace_e61834a7": { "message": "置換" },
+  "replace_with_eeff01ad": { "message": "（）と置換する" },
   "reset_95a81614": { "message": "リセット" },
   "resize_ec83d538": { "message": "サイズ変更" },
   "restore_auto_save_deccd84b": {
