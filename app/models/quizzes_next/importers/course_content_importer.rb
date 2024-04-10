@@ -43,6 +43,12 @@ module QuizzesNext::Importers
         assignment = quiz_assignment(quiz)
         next unless assignment
 
+        if @migration.cc_qti_migration?
+          next unless assignment.ready_to_migrate_to_quiz_next?
+
+          assignment.unmark_as_ready_to_migrate_to_quiz_next
+        end
+
         lti_assignment_quiz_set << [assignment.global_id, quiz.global_id]
         assignment.workflow_state = "importing"
         assignment.importing_started_at = Time.zone.now
