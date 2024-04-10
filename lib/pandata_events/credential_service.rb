@@ -61,7 +61,7 @@ module PandataEvents
 
     def auth_token(sub, expires_at: nil, cache: true)
       if cache
-        cache_key = "pandata_events:auth_token:#{app_key}:#{sub}"
+        cache_key = "pandata_events:auth_token:#{app_key}:#{sub}:1"
         cached_token = Canvas.redis.get(cache_key)
         return cached_token if cached_token
       end
@@ -77,7 +77,9 @@ module PandataEvents
       auth_token = token(auth_body, expires_at:)
 
       if cache
-        Canvas.redis.setex(cache_key, expires_at - 1.minute, auth_token)
+        # expire the cached token 5 minutes before it actually expires
+        ttl = expires_at.to_i - Time.now.to_i - 5.minutes
+        Canvas.redis.setex(cache_key, ttl, auth_token)
       end
 
       auth_token
