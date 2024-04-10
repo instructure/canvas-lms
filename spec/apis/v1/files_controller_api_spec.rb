@@ -517,7 +517,8 @@ describe "Files API", type: :request do
       end
 
       it "reuses the Attachment if a file is re-uploaded to the same folder" do
-        expect(InstFS).to receive(:delete_file).with("old-instfs-uuid")
+        # FIXME: reinstate when we have the proper check in place (and add a test)
+        # expect(InstFS).to receive(:delete_file).with("old-instfs-uuid")
         json = api_call(:post, "/api/v1/files/capture?#{@capture_params.to_query}", @capture_params)
         expect(json["id"]).to eq @existing.id
         expect(@existing.reload.instfs_uuid).to eq "new-instfs-uuid"

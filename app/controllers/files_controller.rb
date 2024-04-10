@@ -1117,7 +1117,9 @@ class FilesController < ApplicationController
 
     # apply duplicate handling
     if overwritten_instfs_uuid
-      InstFS.delay_if_production.delete_file(overwritten_instfs_uuid)
+      # FIXME: this instfs uuid may be in use by other files;
+      # add a check and reinstate when we know it's safe
+      # InstFS.delay_if_production.delete_file(overwritten_instfs_uuid)
     else
       @attachment.handle_duplicates(params[:on_duplicate])
     end
