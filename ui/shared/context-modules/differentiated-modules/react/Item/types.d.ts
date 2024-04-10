@@ -99,6 +99,7 @@ export type CustomDateTimeInputProps = {
   unparsedFieldKeys: Set<string>
   blueprintDateLocks?: DateLockTypes[]
   dateInputRefs: Record<string, HTMLInputElement | null>
+  timeInputRefs: Record<string, HTMLInputElement | null>
   handleBlur: (unparsedFieldKey: string) => (e: SyntheticEvent) => void
   breakpoints: Breakpoints
   showMessages?: boolean

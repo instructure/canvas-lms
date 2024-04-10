@@ -130,6 +130,7 @@ export default forwardRef(function ItemAssignToCard(
   const deleteCardButtonRef = useRef<Element | null>(null)
   const assigneeSelectorRef = useRef<HTMLInputElement | null>(null)
   const dateInputRefs = useRef<Record<string, HTMLInputElement | null>>({})
+  const timeInputRefs = useRef<Record<string, HTMLInputElement | null>>({})
   const dateValidator = useRef<DateValidator>(
     new DateValidator({
       date_range: {...ENV.VALID_DATE_RANGE},
@@ -214,16 +215,29 @@ export default forwardRef(function ItemAssignToCard(
   const handleBlur = useCallback(
     (unparsedFieldKey: string) => (e: SyntheticEvent) => {
       const target = e.target as HTMLInputElement
-      if (!target || target !== dateInputRefs.current[unparsedFieldKey]) return
+
+      const dateField = dateInputRefs.current[unparsedFieldKey]
+      const isEmpty = dateField.value.trim() === ''
+      const isValid = moment(dateField.value, 'll').isValid()
       const unparsedFieldExists = unparsedFieldKeys.has(unparsedFieldKey)
-      const isEmpty = target.value.trim() === ''
-      const isValid = moment(target.value, 'll').isValid()
       const newUnparsedFieldKeys = new Set(Array.from(unparsedFieldKeys))
-      if ((isEmpty || isValid) && unparsedFieldExists) {
-        newUnparsedFieldKeys.delete(unparsedFieldKey)
-      } else if (!isEmpty && !isValid && !unparsedFieldExists) {
-        newUnparsedFieldKeys.add(unparsedFieldKey)
+
+      // e.target is not working in the onBlur event from the DateTimeInput component.
+      // so if we get a null target, we asumme it's the time field
+      if (!target && timeInputRefs.current[unparsedFieldKey].value.length > 0) {
+        if (isEmpty && !unparsedFieldExists) {
+          newUnparsedFieldKeys.add(unparsedFieldKey)
+        }
       }
+
+      if (target && target === dateInputRefs.current[unparsedFieldKey]) {
+        if ((isEmpty || isValid) && unparsedFieldExists) {
+          newUnparsedFieldKeys.delete(unparsedFieldKey)
+        } else if (!isEmpty && !isValid && !unparsedFieldExists) {
+          newUnparsedFieldKeys.add(unparsedFieldKey)
+        }
+      }
+
       if (!setEquals(newUnparsedFieldKeys, unparsedFieldKeys))
         setUnparsedFieldKeys(newUnparsedFieldKeys)
     },
@@ -298,41 +312,48 @@ export default forwardRef(function ItemAssignToCard(
             {...{
               dueDate,
               setDueDate,
-              handleDueDateChange,
               validationErrors,
               unparsedFieldKeys,
               blueprintDateLocks,
               dateInputRefs: dateInputRefs.current,
+              timeInputRefs: timeInputRefs.current,
               handleBlur,
             }}
             {...commonDateTimeInputProps}
+            handleDueDateChange={handleDueDateChange(timeInputRefs.current.due_at?.value || '')}
           />
         )}
         <AvailableFromDateTimeInput
           {...{
             availableFromDate,
             setAvailableFromDate,
-            handleAvailableFromDateChange,
             validationErrors,
             unparsedFieldKeys,
             blueprintDateLocks,
             dateInputRefs: dateInputRefs.current,
+            timeInputRefs: timeInputRefs.current,
             handleBlur,
           }}
           {...commonDateTimeInputProps}
+          handleAvailableFromDateChange={handleAvailableFromDateChange(
+            timeInputRefs.current.unlock_at?.value || ''
+          )}
         />
         <AvailableToDateTimeInput
           {...{
             availableToDate,
             setAvailableToDate,
-            handleAvailableToDateChange,
             validationErrors,
             unparsedFieldKeys,
             blueprintDateLocks,
             dateInputRefs: dateInputRefs.current,
+            timeInputRefs: timeInputRefs.current,
             handleBlur,
           }}
           {...commonDateTimeInputProps}
+          handleAvailableToDateChange={handleAvailableToDateChange(
+            timeInputRefs.current.lock_at?.value || ''
+          )}
         />
         <ContextModuleLink
           courseId={courseId}

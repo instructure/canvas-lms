@@ -53,6 +53,7 @@ const ignoredErrors = [
   /The above error occurred in the <.*> component/,
   /You seem to have overlapping act\(\) calls/,
   /Warning: `value` prop on `%s` should not be null. Consider using an empty string to clear the component or `undefined` for uncontrolled components.%s/,
+  /Warning: This synthetic event is reused for performance reasons/,
 ]
 const globalWarn = global.console.warn
 const ignoredWarnings = [/JQMIGRATE:/] // ignore warnings about jquery migrate; these are muted globally when not in a jest test

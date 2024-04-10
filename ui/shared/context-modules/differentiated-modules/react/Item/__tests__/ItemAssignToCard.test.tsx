@@ -19,6 +19,7 @@
 import React from 'react'
 import {render, fireEvent, screen, waitFor} from '@testing-library/react'
 import ItemAssignToCard, {type ItemAssignToCardProps} from '../ItemAssignToCard'
+import userEvent from '@testing-library/user-event'
 
 const props: ItemAssignToCardProps = {
   courseId: '1',
@@ -217,6 +218,19 @@ describe('ItemAssignToCard', () => {
     const link = screen.getByRole('link', {name: 'My fabulous module'})
     expect(link).toHaveAttribute('href', '/courses/1/modules#2')
     expect(link).toHaveAttribute('target', '_blank')
+  })
+
+  it('show error when date field is blank and time field has value on blur', async () => {
+    const {getAllByLabelText, getAllByText} = renderComponent()
+    const timeInput = getAllByLabelText('Time')[0]
+
+    await userEvent.type(timeInput, '3:30 PM')
+    await userEvent.tab()
+
+    await waitFor(async () => {
+      expect(timeInput).toHaveValue('3:30 PM')
+      expect(await getAllByText('Invalid date')[0]).toBeInTheDocument()
+    })
   })
 
   describe('when course and user timezones differ', () => {

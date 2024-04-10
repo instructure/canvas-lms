@@ -126,9 +126,13 @@ export function useDates({
   }, [availableToDate])
 
   const handleDueDateChange = useCallback(
-    (_event: React.SyntheticEvent, value: string | undefined) => {
+    (timeValue: String) => (_event: React.SyntheticEvent, value: string | undefined) => {
       const defaultDueTime = ENV.DEFAULT_DUE_TIME ?? '23:59:00'
-      const newDueDate = dueDate ? value : setTimeToStringDate(defaultDueTime, value)
+      const newDueDate = dueDate
+        ? value
+        : timeValue === ''
+        ? setTimeToStringDate(defaultDueTime, value)
+        : value
       // When user uses calendar pop-up type is "click", but for KB is "blur"
       if (_event.type !== 'blur') {
         setDueDate(newDueDate || null)
@@ -140,10 +144,12 @@ export function useDates({
   )
 
   const handleAvailableFromDateChange = useCallback(
-    (_event: React.SyntheticEvent, value: string | undefined) => {
+    (timeValue: String) => (_event: React.SyntheticEvent, value: string | undefined) => {
       const newAvailableFromDate = availableFromDate
         ? value
-        : setTimeToStringDate('00:00:00', value)
+        : timeValue === ''
+        ? setTimeToStringDate('00:00:00', value)
+        : value
       // When user uses calendar pop-up type is "click", but for KB is "blur"
       if (_event.type !== 'blur') {
         setAvailableFromDate(newAvailableFromDate || null)
@@ -155,8 +161,12 @@ export function useDates({
   )
 
   const handleAvailableToDateChange = useCallback(
-    (_event: React.SyntheticEvent, value: string | undefined) => {
-      const newAvailableToDate = availableToDate ? value : setTimeToStringDate('23:59:00', value)
+    (timeValue: String) => (_event: React.SyntheticEvent, value: string | undefined) => {
+      const newAvailableToDate = availableToDate
+        ? value
+        : timeValue === ''
+        ? setTimeToStringDate('23:59:00', value)
+        : value
       // When user uses calendar pop-up type is "click", but for KB is "blur"
       if (_event.type !== 'blur') {
         setAvailableToDate(newAvailableToDate || null)
