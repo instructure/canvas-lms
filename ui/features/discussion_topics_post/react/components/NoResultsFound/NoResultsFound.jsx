@@ -32,14 +32,14 @@ export const NoResultsFound = () => {
   return (
     <Billboard
       size="medium"
-      heading="No Results Found"
+      heading={I18n.t('No Results Found')}
       message={I18n.t('No results match "%{searchTerm}"', {searchTerm})}
       hero={
         <Img
           data-testid="page-not-found-panda"
           display="block"
           src={pageNotFound}
-          alt="No results found"
+          alt={I18n.t('No Results Found')}
         />
       }
     />
