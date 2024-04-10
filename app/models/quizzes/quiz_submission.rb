@@ -300,6 +300,13 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
         submission_data[previously_read_marker]
       end
     end
+
+    params.each do |param, _|
+      question_being_answered = /\Aquestion_(?<question_id>\d+)/.match(param)
+      next unless question_being_answered
+
+      params[param] = params[param].gsub(/(position|z-index|left|right|top|bottom|width|height):\s*[^;]+;/, '')
+    end
     params
   end
 
