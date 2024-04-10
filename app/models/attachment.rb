@@ -43,6 +43,8 @@ class Attachment < ActiveRecord::Base
   end
 
   EXCLUDED_COPY_ATTRIBUTES = %w[id
+                                created_at
+                                updated_at
                                 root_attachment_id
                                 uuid
                                 folder_id
