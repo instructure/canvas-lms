@@ -17,7 +17,8 @@
  */
 
 import React from 'react'
-import {mount, shallow} from 'enzyme'
+import {shallow} from 'enzyme'
+import {render} from '@testing-library/react'
 
 import Actions from '../../actions'
 import CourseImageSelector from '../CourseImageSelector'
@@ -43,8 +44,8 @@ describe('CourseImageSelector', () => {
   })
 
   it('renders', () => {
-    const wrapper = mount(<CourseImageSelector {...defaultProps} store={fakeStore()} />)
-    expect(wrapper.text()).toContain('Loading')
+    const wrapper = render(<CourseImageSelector {...defaultProps} store={fakeStore()} />)
+    expect(wrapper.getByText('Loading')).toBeInTheDocument()
   })
 
   it('sets the background image style properly', () => {
