@@ -26,7 +26,7 @@ import ready from '@instructure/ready'
 const I18n = useI18nScope('course_list')
 
 function success(target) {
-  const courseName = target.context.dataset.courseName
+  const courseName = target[0].dataset.courseName
   const favorited_tooltip = I18n.t(
     'favorited_tooltip',
     'Click to remove %{course_name} from the courses menu.',

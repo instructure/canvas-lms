@@ -116,6 +116,27 @@ describe "course index" do
       expect(fj('.course-list-favoritable:contains("Classic Course (Past) cannot be added to the courses menu unless the course is active.")')).to be_displayed
       expect(fj('.course-list-favoritable:contains("Click to add Classic Course (Future) to the courses menu.")')).to be_displayed
     end
+
+    it "favorites a course" do
+      get "/courses"
+
+      course_name = "Classic Course (Current)"
+      expect(row_with_text(course_name)).not_to contain_css(".icon-star")
+      favorite_icon(course_name).click
+      wait_for_ajaximations
+      expect(row_with_text(course_name)).to contain_css(".icon-star")
+    end
+
+    it "unfavorites a course" do
+      @user.favorites.create!(context: @current_courses[0])
+      get "/courses"
+
+      course_name = "Classic Course (Current)"
+      expect(row_with_text(course_name)).to contain_css(".icon-star")
+      favorite_icon(course_name).click
+      wait_for_ajaximations
+      expect(row_with_text(course_name)).not_to contain_css(".icon-star")
+    end
   end
 
   context "start new course button" do
