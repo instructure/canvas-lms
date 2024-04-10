@@ -17,44 +17,46 @@
  */
 
 import React from 'react'
-import * as enzyme from 'enzyme'
-import BlueprintSidebar from 'ui/features/blueprint_course_master/react/components/BlueprintSidebar'
+import {render} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import {shallow} from 'enzyme'
+import BlueprintSidebar from '../BlueprintSidebar'
+import sinon from 'sinon'
 
-QUnit.module('BlueprintSidebar', hooks => {
+describe('BlueprintSidebar', (hooks) => {
   let clock
   let wrapper
 
-  hooks.beforeEach(() => {
+  beforeEach(() => {
     clock = sinon.useFakeTimers()
-    const appElement = document.createElement('div')
-    appElement.id = 'application'
-    document.getElementById('fixtures').appendChild(appElement)
   })
 
-  hooks.afterEach(() => {
-    wrapper.unmount()
-    document.getElementById('fixtures').innerHTML = ''
+  afterEach(() => {
     clock.restore()
   })
 
   test('renders the BlueprintSidebar component', () => {
-    wrapper = enzyme.shallow(<BlueprintSidebar />)
-    ok(wrapper.find('.bcs__wrapper').exists())
+    wrapper = shallow(<BlueprintSidebar />)
+    expect(wrapper.find('.bcs__wrapper').exists()).toBeTruthy()
   })
 
-  test('clicking open button sets isOpen to true', () => {
-    wrapper = enzyme.mount(<BlueprintSidebar />)
-    wrapper.find('.bcs__trigger button').at(0).simulate('click')
+  test('clicking open button sets isOpen to true', async () => {
+    const ref = React.createRef()
+    wrapper = render(<BlueprintSidebar ref={ref} />)
+    const button = wrapper.container.querySelectorAll('.bcs__trigger button')[0]
+    const user = userEvent.setup({delay: null})
+    await user.click(button)
     clock.tick(500)
-    strictEqual(wrapper.instance().state.isOpen, true)
+    expect(ref.current.state.isOpen).toEqual(true)
   })
 
   test('clicking close button sets isOpen to false', () => {
-    wrapper = enzyme.mount(<BlueprintSidebar />)
-    wrapper.instance().open()
+    const ref = React.createRef()
+    wrapper = render(<BlueprintSidebar ref={ref} />)
+    ref.current.open()
     clock.tick(500)
-    wrapper.instance().closeBtn.click()
+    ref.current.closeBtn.click()
     clock.tick(500)
-    strictEqual(wrapper.instance().state.isOpen, false)
+    expect(ref.current.state.isOpen).toEqual(false)
   })
 })
