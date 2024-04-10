@@ -17,7 +17,7 @@
  */
 import React from 'react'
 import {render} from '@testing-library/react'
-import {shallow, mount} from 'enzyme'
+import {shallow} from 'enzyme'
 import moment from 'moment-timezone'
 import MockDate from 'mockdate'
 import {PlannerItem_raw as PlannerItem} from '../index'
@@ -549,7 +549,8 @@ it('disables the checkbox when toggleAPIPending is true', () => {
 it('registers itself as animatable', () => {
   const fakeRegister = jest.fn()
   const fakeDeregister = jest.fn()
-  const wrapper = mount(
+  const ref = React.createRef()
+  const wrapper = render(
     <PlannerItem
       {...defaultProps()}
       id="1"
@@ -557,17 +558,24 @@ it('registers itself as animatable', () => {
       animatableIndex={42}
       registerAnimatable={fakeRegister}
       deregisterAnimatable={fakeDeregister}
+      ref={ref}
     />
   )
-  const instance = wrapper.instance()
-  expect(fakeRegister).toHaveBeenCalledWith('item', instance, 42, ['first'])
+  expect(fakeRegister).toHaveBeenCalledWith('item', ref.current, 42, ['first'])
 
-  wrapper.setProps({uniqueId: 'second'})
-  expect(fakeDeregister).toHaveBeenCalledWith('item', instance, ['first'])
-  expect(fakeRegister).toHaveBeenCalledWith('item', instance, 42, ['second'])
-
-  wrapper.unmount()
-  expect(fakeDeregister).toHaveBeenCalledWith('item', instance, ['second'])
+  wrapper.rerender(
+    <PlannerItem
+      {...defaultProps()}
+      id="1"
+      uniqueId="second"
+      animatableIndex={42}
+      registerAnimatable={fakeRegister}
+      deregisterAnimatable={fakeDeregister}
+      ref={ref}
+    />
+  )
+  expect(fakeDeregister).toHaveBeenCalledWith('item', ref.current, ['first'])
+  expect(fakeRegister).toHaveBeenCalledWith('item', ref.current, 42, ['second'])
 })
 
 it('renders a NewActivityIndicator when asked to', () => {
