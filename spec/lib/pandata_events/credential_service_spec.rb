@@ -212,7 +212,7 @@ describe PandataEvents::CredentialService do
     context "caching" do
       specs_require_cache(:redis_cache_store)
 
-      let(:cache_key) { "pandata_events:auth_token:CANVAS:#{sub}" }
+      let(:cache_key) { "pandata_events:auth_token:CANVAS:#{sub}:1" }
 
       before do
         allow(Canvas.redis).to receive(:setex).and_call_original
@@ -243,20 +243,16 @@ describe PandataEvents::CredentialService do
       end
 
       it "caches the token for roughly 1 day" do
-        Timecop.freeze(1.day.ago) do
-          service.auth_token(sub, expires_at:)
-        end
-        expect(Time.zone.at(Canvas.redis.ttl(cache_key))).to be_within(5.minutes).of(Time.zone.now)
+        service.auth_token(sub, expires_at:)
+        expect(Canvas.redis.ttl(cache_key)).to be_within(10.minutes).of(1.day)
       end
 
       context "with expires_at" do
         let(:expires_at) { 1.hour.from_now }
 
         it "caches the token until roughly expires_at" do
-          Timecop.freeze(1.hour.ago) do
-            service.auth_token(sub, expires_at:)
-          end
-          expect(Time.zone.at(Canvas.redis.ttl(cache_key))).to be_within(5.minutes).of(Time.zone.now)
+          service.auth_token(sub, expires_at:)
+          expect(Canvas.redis.ttl(cache_key)).to be_within(10.minutes).of(1.hour)
         end
       end
     end
