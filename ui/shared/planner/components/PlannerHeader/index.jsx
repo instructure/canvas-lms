@@ -379,7 +379,7 @@ export class PlannerHeader extends Component {
       return (
         <Button
           id="planner-today-btn"
-          color={ENV.FEATURES?.instui_header ? 'secondary' : "primary-inverse"}
+          color={ENV.FEATURES?.instui_header ? 'secondary' : 'primary-inverse'}
           margin={buttonMargin}
           onClick={this.handleTodayClick}
           display={isSmallSize ? 'block' : 'inline-block'}
@@ -391,8 +391,8 @@ export class PlannerHeader extends Component {
     return null
   }
 
-  renderOpportunitiesButton(margin, isSmallSize=false) {
-    const badgeProps = {margin, countUntil: 100, display:(isSmallSize ? 'block' : 'inline-block')}
+  renderOpportunitiesButton(margin, isSmallSize = false) {
+    const badgeProps = {margin, countUntil: 100, display: isSmallSize ? 'block' : 'inline-block'}
     if (this.props.loading.allOpportunitiesLoaded && this.state.newOpportunities.length) {
       badgeProps.count = this.state.newOpportunities.length
       badgeProps.formatOutput = formattedCount => {
@@ -406,22 +406,22 @@ export class PlannerHeader extends Component {
 
     return (
       <Badge {...badgeProps}>
-        {ENV.FEATURES?.instui_header ? 
+        {ENV.FEATURES?.instui_header ? (
           <Button
-          renderIcon={IconAlertsLine}
-          screenReaderLabel={I18n.t('opportunities popup')}
-          onClick={this.toggleOpportunitiesDropdown}
-          display={isSmallSize ? 'block' : 'inline-block'}
-          ref={b => {
-            this.opportunitiesButton = b
-          }}
-          elementRef={b => {
-            this.opportunitiesHtmlButton = b
-          }}
+            renderIcon={IconAlertsLine}
+            screenReaderLabel={I18n.t('opportunities popup')}
+            onClick={this.toggleOpportunitiesDropdown}
+            display={isSmallSize ? 'block' : 'inline-block'}
+            ref={b => {
+              this.opportunitiesButton = b
+            }}
+            elementRef={b => {
+              this.opportunitiesHtmlButton = b
+            }}
           >
             {I18n.t('Opportunities')}
           </Button>
-        : 
+        ) : (
           <IconButton
             renderIcon={IconAlertsLine}
             screenReaderLabel={I18n.t('opportunities popup')}
@@ -435,20 +435,14 @@ export class PlannerHeader extends Component {
               this.opportunitiesHtmlButton = b
             }}
           />
-        }
+        )}
       </Badge>
     )
   }
 
   renderLegacy() {
-    const {
-      verticalRoom,
-      buttonMargin,
-      withArrow,
-      positionTarget,
-      placement,
-      offsetY
-    } = this.getPopupVerticalProperties()
+    const {verticalRoom, buttonMargin, withArrow, positionTarget, placement, offsetY} =
+      this.getPopupVerticalProperties()
 
     return (
       <>
@@ -554,27 +548,16 @@ export class PlannerHeader extends Component {
       return this.renderLegacy()
     }
 
-    const {
-      verticalRoom,
-      withArrow,
-      positionTarget,
-      placement,
-      offsetY
-    } = this.getPopupVerticalProperties()
+    const {verticalRoom, withArrow, positionTarget, placement, offsetY} =
+      this.getPopupVerticalProperties()
 
     const isSmallSize = this.props.responsiveSize === 'small'
     const renderTodayButton = this.renderToday('none', isSmallSize)
-    
+
     return (
-      <Flex
-        gap="small"
-        withVisualDebug={false}
-        direction={isSmallSize ? 'column' : 'row'}
-      >
-        {renderTodayButton &&
-          <Flex.Item overflowY="visible">{renderTodayButton}</Flex.Item>
-        }
-        
+      <Flex gap="small" withVisualDebug={false} direction={isSmallSize ? 'column' : 'row'}>
+        {renderTodayButton && <Flex.Item overflowY="visible">{renderTodayButton}</Flex.Item>}
+
         {!this.props.isObserving && (
           <Flex.Item overflowY="visible">
             <Button
@@ -591,7 +574,7 @@ export class PlannerHeader extends Component {
             </Button>
           </Flex.Item>
         )}
-        
+
         <Flex.Item overflowY="visible">
           <Button
             data-testid="show-my-grades-button"
@@ -603,7 +586,7 @@ export class PlannerHeader extends Component {
             {I18n.t('My Grades')}
           </Button>
         </Flex.Item>
-        
+
         <Flex.Item overflowY="visible">
           <Popover
             onHideContent={this.closeOpportunitiesDropdown}
@@ -626,9 +609,9 @@ export class PlannerHeader extends Component {
               maxHeight={verticalRoom}
               isObserving={this.props.isObserving}
             />
-          </Popover>        
+          </Popover>
         </Flex.Item>
-          
+
         <Tray
           open={this.state.trayOpen}
           label={this.getTrayLabel()}

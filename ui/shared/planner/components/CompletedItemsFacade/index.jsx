@@ -154,6 +154,7 @@ export class CompletedItemsFacade extends Component {
         {this.renderNotificationBadge()}
         <div className={this.style.classNames.contentPrimary}>
           <ToggleDetails
+            data-testid="completed-items-toggle"
             ref={ref => (this.buttonRef = ref)}
             onToggle={this.props.onClick}
             summary={I18n.t(

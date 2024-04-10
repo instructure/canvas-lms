@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import {shallow, mount} from 'enzyme'
+import {shallow} from 'enzyme'
+import {render, fireEvent} from '@testing-library/react'
 import moment from 'moment-timezone'
 import {Grouping} from '../index'
 
@@ -91,9 +92,9 @@ it('renders to do items correctly', () => {
 it('does not render completed items by default', () => {
   const props = getDefaultProps()
   props.items[0].completed = true
-  const wrapper = mount(<Grouping {...props} />)
+  const wrapper = render(<Grouping {...props} />)
 
-  expect(wrapper.find('Animatable(PlannerItem_raw)')).toHaveLength(1)
+  expect(wrapper.getAllByTestId('planner-item-raw')).toHaveLength(1)
 })
 
 it('renders a CompletedItemsFacade when completed items are present by default', () => {
@@ -109,10 +110,11 @@ it('renders completed items when the facade is clicked', () => {
   const props = getDefaultProps()
   props.items[0].completed = true
 
-  const wrapper = mount(<Grouping {...props} />)
+  const wrapper = render(<Grouping {...props} />)
 
-  wrapper.find('ToggleDetails button').simulate('click')
-  expect(wrapper.find('Animatable(PlannerItem_raw)')).toHaveLength(2)
+  const detailBtn = wrapper.getByTestId('completed-items-toggle')
+  fireEvent.click(detailBtn)
+  expect(wrapper.getAllByTestId('planner-item-raw')).toHaveLength(2)
 })
 
 it('renders completed items when they have the show property', () => {
@@ -221,33 +223,41 @@ describe('handleFacadeClick', () => {
   })
 
   afterEach(() => {
-    if (wrapper) wrapper.unmount()
     document.body.removeChild(containerElement)
   })
 
   it('sets focus to the groupingLink when called', () => {
-    wrapper = mount(<Grouping {...getDefaultProps()} />, {attachTo: containerElement})
-    wrapper.instance().handleFacadeClick()
-    expect(document.activeElement).toBe(wrapper.instance().groupingLink)
+    const ref = React.createRef()
+    render(<Grouping {...getDefaultProps()} ref={ref} />, {attachTo: containerElement})
+    ref.current.handleFacadeClick()
+    expect(document.activeElement).toBe(ref.current.groupingLink)
   })
 
   it('calls preventDefault on an event if given one', () => {
-    wrapper = mount(<Grouping {...getDefaultProps()} />)
+    const props = getDefaultProps()
+    const ref = React.createRef()
+    render(<Grouping {...props} ref={ref} />)
+
     const fakeEvent = {
       preventDefault: jest.fn(),
     }
-    wrapper.instance().handleFacadeClick(fakeEvent)
+
+    ref.current.handleFacadeClick(fakeEvent)
+
     expect(fakeEvent.preventDefault).toHaveBeenCalled()
   })
 })
 
 describe('toggleCompletion', () => {
   it('binds the toggleCompletion method to item', () => {
-    const mock = jest.fn()
+    const mockToggleCompletion = jest.fn()
     const props = getDefaultProps()
-    const wrapper = mount(<Grouping {...props} toggleCompletion={mock} />)
-    wrapper.find('input').first().simulate('change')
-    expect(mock).toHaveBeenCalledWith(props.items[0])
+    const {getAllByTestId} = render(<Grouping {...props} toggleCompletion={mockToggleCompletion} />)
+
+    const input = getAllByTestId('planner-item-completed-checkbox')[0]
+    fireEvent.click(input)
+
+    expect(mockToggleCompletion).toHaveBeenCalledWith(props.items[0])
   })
 })
 
@@ -262,22 +272,29 @@ it('registers itself as animatable', () => {
     {title: 'qwer', context: {id: 128}, id: '3', uniqueId: 'third'},
     {title: 'uiop', context: {id: 256}, id: '4', uniqueId: 'fourth'},
   ]
-  const wrapper = mount(
+  const ref = React.createRef()
+  const {rerender} = render(
     <Grouping
       {...getDefaultProps()}
       items={firstItems}
       animatableIndex={42}
       registerAnimatable={fakeRegister}
       deregisterAnimatable={fakeDeregister}
+      ref={ref}
     />
   )
-  const instance = wrapper.instance()
-  expect(fakeRegister).toHaveBeenCalledWith('group', instance, 42, ['first', 'second'])
+  expect(fakeRegister).toHaveBeenCalledWith('group', ref.current, 42, ['first', 'second'])
 
-  wrapper.setProps({items: secondItems})
-  expect(fakeDeregister).toHaveBeenCalledWith('group', instance, ['first', 'second'])
-  expect(fakeRegister).toHaveBeenCalledWith('group', instance, 42, ['third', 'fourth'])
-
-  wrapper.unmount()
-  expect(fakeDeregister).toHaveBeenCalledWith('group', instance, ['third', 'fourth'])
+  rerender(
+    <Grouping
+      {...getDefaultProps()}
+      items={secondItems}
+      animatableIndex={42}
+      registerAnimatable={fakeRegister}
+      deregisterAnimatable={fakeDeregister}
+      ref={ref}
+    />
+  )
+  expect(fakeDeregister).toHaveBeenCalledWith('group', ref.current, ['first', 'second'])
+  expect(fakeRegister).toHaveBeenCalledWith('group', ref.current, 42, ['third', 'fourth'])
 })

@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import {shallow, mount} from 'enzyme'
+import {shallow} from 'enzyme'
+import {render} from '@testing-library/react'
 import {Opportunities_ as Opportunities, OPPORTUNITY_SPECIAL_FALLBACK_FOCUS_ID} from '../index'
 
 function defaultProps() {
@@ -97,19 +98,16 @@ it('calls toggle popover when escape is pressed', () => {
 it('registers itself as animatable', () => {
   const fakeRegister = jest.fn()
   const fakeDeregister = jest.fn()
-  const wrapper = mount(
+  const ref = React.createRef()
+  render(
     <Opportunities
       {...defaultProps()}
       registerAnimatable={fakeRegister}
       deregisterAnimatable={fakeDeregister}
+      ref={ref}
     />
   )
-  const instance = wrapper.instance()
-  expect(fakeRegister).toHaveBeenCalledWith('opportunity', instance, -1, [
-    OPPORTUNITY_SPECIAL_FALLBACK_FOCUS_ID,
-  ])
-  wrapper.unmount()
-  expect(fakeDeregister).toHaveBeenCalledWith('opportunity', instance, [
+  expect(fakeRegister).toHaveBeenCalledWith('opportunity', ref.current, -1, [
     OPPORTUNITY_SPECIAL_FALLBACK_FOCUS_ID,
   ])
 })

@@ -243,6 +243,7 @@ exports[`does not render end time if the same as start time 1`] = `
   </style>
   <div
     className="PlannerItem-styles__root planner-item"
+    data-testid="planner-item-raw"
   >
     <div
       className="PlannerItem-styles__completed"
@@ -263,6 +264,7 @@ exports[`does not render end time if the same as start time 1`] = `
       >
         <Checkbox
           checked={false}
+          data-testid="planner-item-completed-checkbox"
           disabled={false}
           indeterminate={false}
           inline={false}
@@ -645,6 +647,7 @@ exports[`prefers to render feedback if it and the location are available 1`] = `
   </style>
   <div
     className="PlannerItem-styles__root planner-item"
+    data-testid="planner-item-raw"
   >
     <div
       className="PlannerItem-styles__completed"
@@ -665,6 +668,7 @@ exports[`prefers to render feedback if it and the location are available 1`] = `
       >
         <Checkbox
           checked={false}
+          data-testid="planner-item-completed-checkbox"
           disabled={false}
           indeterminate={false}
           inline={false}
@@ -1052,6 +1056,7 @@ exports[`renders Announcement correctly with everything 1`] = `
   </style>
   <div
     className="PlannerItem-styles__root planner-item"
+    data-testid="planner-item-raw"
   >
     <div
       className="PlannerItem-styles__completed"
@@ -1072,6 +1077,7 @@ exports[`renders Announcement correctly with everything 1`] = `
       >
         <Checkbox
           checked={true}
+          data-testid="planner-item-completed-checkbox"
           disabled={false}
           indeterminate={false}
           inline={false}
@@ -1447,6 +1453,7 @@ exports[`renders Announcement correctly with just date 1`] = `
   </style>
   <div
     className="PlannerItem-styles__root planner-item"
+    data-testid="planner-item-raw"
   >
     <div
       className="PlannerItem-styles__completed"
@@ -1467,6 +1474,7 @@ exports[`renders Announcement correctly with just date 1`] = `
       >
         <Checkbox
           checked={false}
+          data-testid="planner-item-completed-checkbox"
           disabled={false}
           indeterminate={false}
           inline={false}
@@ -1821,6 +1829,7 @@ exports[`renders Announcement correctly with just points 1`] = `
   </style>
   <div
     className="PlannerItem-styles__root planner-item"
+    data-testid="planner-item-raw"
   >
     <div
       className="PlannerItem-styles__completed"
@@ -1841,6 +1850,7 @@ exports[`renders Announcement correctly with just points 1`] = `
       >
         <Checkbox
           checked={false}
+          data-testid="planner-item-completed-checkbox"
           disabled={false}
           indeterminate={false}
           inline={false}
@@ -2216,6 +2226,7 @@ exports[`renders Announcement correctly without right side content 1`] = `
   </style>
   <div
     className="PlannerItem-styles__root planner-item"
+    data-testid="planner-item-raw"
   >
     <div
       className="PlannerItem-styles__completed"
@@ -2236,6 +2247,7 @@ exports[`renders Announcement correctly without right side content 1`] = `
       >
         <Checkbox
           checked={false}
+          data-testid="planner-item-completed-checkbox"
           disabled={false}
           indeterminate={false}
           inline={false}
@@ -2590,6 +2602,7 @@ exports[`renders Assignment correctly with everything 1`] = `
   </style>
   <div
     className="PlannerItem-styles__root planner-item"
+    data-testid="planner-item-raw"
   >
     <div
       className="PlannerItem-styles__completed"
@@ -2610,6 +2623,7 @@ exports[`renders Assignment correctly with everything 1`] = `
       >
         <Checkbox
           checked={true}
+          data-testid="planner-item-completed-checkbox"
           disabled={false}
           indeterminate={false}
           inline={false}
@@ -2985,6 +2999,7 @@ exports[`renders Assignment correctly with just date 1`] = `
   </style>
   <div
     className="PlannerItem-styles__root planner-item"
+    data-testid="planner-item-raw"
   >
     <div
       className="PlannerItem-styles__completed"
@@ -3005,6 +3020,7 @@ exports[`renders Assignment correctly with just date 1`] = `
       >
         <Checkbox
           checked={false}
+          data-testid="planner-item-completed-checkbox"
           disabled={false}
           indeterminate={false}
           inline={false}
@@ -3359,6 +3375,7 @@ exports[`renders Assignment correctly with just points 1`] = `
   </style>
   <div
     className="PlannerItem-styles__root planner-item"
+    data-testid="planner-item-raw"
   >
     <div
       className="PlannerItem-styles__completed"
@@ -3379,6 +3396,7 @@ exports[`renders Assignment correctly with just points 1`] = `
       >
         <Checkbox
           checked={false}
+          data-testid="planner-item-completed-checkbox"
           disabled={false}
           indeterminate={false}
           inline={false}
@@ -3754,6 +3772,7 @@ exports[`renders Assignment correctly without right side content 1`] = `
   </style>
   <div
     className="PlannerItem-styles__root planner-item"
+    data-testid="planner-item-raw"
   >
     <div
       className="PlannerItem-styles__completed"
@@ -3774,6 +3793,7 @@ exports[`renders Assignment correctly without right side content 1`] = `
       >
         <Checkbox
           checked={false}
+          data-testid="planner-item-completed-checkbox"
           disabled={false}
           indeterminate={false}
           inline={false}
@@ -4128,6 +4148,7 @@ exports[`renders Calendar Event correctly with an all day date 1`] = `
   </style>
   <div
     className="PlannerItem-styles__root planner-item"
+    data-testid="planner-item-raw"
   >
     <div
       className="PlannerItem-styles__completed"
@@ -4148,6 +4169,7 @@ exports[`renders Calendar Event correctly with an all day date 1`] = `
       >
         <Checkbox
           checked={false}
+          data-testid="planner-item-completed-checkbox"
           disabled={false}
           indeterminate={false}
           inline={false}
@@ -4529,6 +4551,7 @@ exports[`renders Calendar Event correctly with everything 1`] = `
   </style>
   <div
     className="PlannerItem-styles__root planner-item"
+    data-testid="planner-item-raw"
   >
     <div
       className="PlannerItem-styles__completed"
@@ -4549,6 +4572,7 @@ exports[`renders Calendar Event correctly with everything 1`] = `
       >
         <Checkbox
           checked={true}
+          data-testid="planner-item-completed-checkbox"
           disabled={false}
           indeterminate={false}
           inline={false}
@@ -4951,6 +4975,7 @@ exports[`renders Calendar Event correctly with just date 1`] = `
   </style>
   <div
     className="PlannerItem-styles__root planner-item"
+    data-testid="planner-item-raw"
   >
     <div
       className="PlannerItem-styles__completed"
@@ -4971,6 +4996,7 @@ exports[`renders Calendar Event correctly with just date 1`] = `
       >
         <Checkbox
           checked={false}
+          data-testid="planner-item-completed-checkbox"
           disabled={false}
           indeterminate={false}
           inline={false}
@@ -5352,6 +5378,7 @@ exports[`renders Calendar Event correctly with start and end time 1`] = `
   </style>
   <div
     className="PlannerItem-styles__root planner-item"
+    data-testid="planner-item-raw"
   >
     <div
       className="PlannerItem-styles__completed"
@@ -5372,6 +5399,7 @@ exports[`renders Calendar Event correctly with start and end time 1`] = `
       >
         <Checkbox
           checked={false}
+          data-testid="planner-item-completed-checkbox"
           disabled={false}
           indeterminate={false}
           inline={false}
@@ -5754,6 +5782,7 @@ exports[`renders Calendar Event correctly without right side content 1`] = `
   </style>
   <div
     className="PlannerItem-styles__root planner-item"
+    data-testid="planner-item-raw"
   >
     <div
       className="PlannerItem-styles__completed"
@@ -5774,6 +5803,7 @@ exports[`renders Calendar Event correctly without right side content 1`] = `
       >
         <Checkbox
           checked={false}
+          data-testid="planner-item-completed-checkbox"
           disabled={false}
           indeterminate={false}
           inline={false}
@@ -6155,6 +6185,7 @@ exports[`renders Discussion correctly with everything 1`] = `
   </style>
   <div
     className="PlannerItem-styles__root planner-item"
+    data-testid="planner-item-raw"
   >
     <div
       className="PlannerItem-styles__completed"
@@ -6175,6 +6206,7 @@ exports[`renders Discussion correctly with everything 1`] = `
       >
         <Checkbox
           checked={true}
+          data-testid="planner-item-completed-checkbox"
           disabled={false}
           indeterminate={false}
           inline={false}
@@ -6550,6 +6582,7 @@ exports[`renders Discussion correctly with just date 1`] = `
   </style>
   <div
     className="PlannerItem-styles__root planner-item"
+    data-testid="planner-item-raw"
   >
     <div
       className="PlannerItem-styles__completed"
@@ -6570,6 +6603,7 @@ exports[`renders Discussion correctly with just date 1`] = `
       >
         <Checkbox
           checked={false}
+          data-testid="planner-item-completed-checkbox"
           disabled={false}
           indeterminate={false}
           inline={false}
@@ -6924,6 +6958,7 @@ exports[`renders Discussion correctly with just points 1`] = `
   </style>
   <div
     className="PlannerItem-styles__root planner-item"
+    data-testid="planner-item-raw"
   >
     <div
       className="PlannerItem-styles__completed"
@@ -6944,6 +6979,7 @@ exports[`renders Discussion correctly with just points 1`] = `
       >
         <Checkbox
           checked={false}
+          data-testid="planner-item-completed-checkbox"
           disabled={false}
           indeterminate={false}
           inline={false}
@@ -7319,6 +7355,7 @@ exports[`renders Discussion correctly without right side content 1`] = `
   </style>
   <div
     className="PlannerItem-styles__root planner-item"
+    data-testid="planner-item-raw"
   >
     <div
       className="PlannerItem-styles__completed"
@@ -7339,6 +7376,7 @@ exports[`renders Discussion correctly without right side content 1`] = `
       >
         <Checkbox
           checked={false}
+          data-testid="planner-item-completed-checkbox"
           disabled={false}
           indeterminate={false}
           inline={false}
@@ -7693,6 +7731,7 @@ exports[`renders Note correctly with Group 1`] = `
   </style>
   <div
     className="PlannerItem-styles__root planner-item"
+    data-testid="planner-item-raw"
   >
     <div
       className="PlannerItem-styles__completed"
@@ -7713,6 +7752,7 @@ exports[`renders Note correctly with Group 1`] = `
       >
         <Checkbox
           checked={false}
+          data-testid="planner-item-completed-checkbox"
           disabled={false}
           indeterminate={false}
           inline={false}
@@ -8067,6 +8107,7 @@ exports[`renders Note correctly with everything 1`] = `
   </style>
   <div
     className="PlannerItem-styles__root planner-item"
+    data-testid="planner-item-raw"
   >
     <div
       className="PlannerItem-styles__completed"
@@ -8087,6 +8128,7 @@ exports[`renders Note correctly with everything 1`] = `
       >
         <Checkbox
           checked={true}
+          data-testid="planner-item-completed-checkbox"
           disabled={false}
           indeterminate={false}
           inline={false}
@@ -8492,6 +8534,7 @@ exports[`renders Note correctly without Course 1`] = `
   </style>
   <div
     className="PlannerItem-styles__root planner-item"
+    data-testid="planner-item-raw"
   >
     <div
       className="PlannerItem-styles__completed"
@@ -8512,6 +8555,7 @@ exports[`renders Note correctly without Course 1`] = `
       >
         <Checkbox
           checked={false}
+          data-testid="planner-item-completed-checkbox"
           disabled={false}
           indeterminate={false}
           inline={false}
@@ -8917,6 +8961,7 @@ exports[`renders Page correctly with everything 1`] = `
   </style>
   <div
     className="PlannerItem-styles__root planner-item"
+    data-testid="planner-item-raw"
   >
     <div
       className="PlannerItem-styles__completed"
@@ -8937,6 +8982,7 @@ exports[`renders Page correctly with everything 1`] = `
       >
         <Checkbox
           checked={true}
+          data-testid="planner-item-completed-checkbox"
           disabled={false}
           indeterminate={false}
           inline={false}
@@ -9312,6 +9358,7 @@ exports[`renders Page correctly with just date 1`] = `
   </style>
   <div
     className="PlannerItem-styles__root planner-item"
+    data-testid="planner-item-raw"
   >
     <div
       className="PlannerItem-styles__completed"
@@ -9332,6 +9379,7 @@ exports[`renders Page correctly with just date 1`] = `
       >
         <Checkbox
           checked={false}
+          data-testid="planner-item-completed-checkbox"
           disabled={false}
           indeterminate={false}
           inline={false}
@@ -9686,6 +9734,7 @@ exports[`renders Page correctly with just points 1`] = `
   </style>
   <div
     className="PlannerItem-styles__root planner-item"
+    data-testid="planner-item-raw"
   >
     <div
       className="PlannerItem-styles__completed"
@@ -9706,6 +9755,7 @@ exports[`renders Page correctly with just points 1`] = `
       >
         <Checkbox
           checked={false}
+          data-testid="planner-item-completed-checkbox"
           disabled={false}
           indeterminate={false}
           inline={false}
@@ -10081,6 +10131,7 @@ exports[`renders Page correctly without right side content 1`] = `
   </style>
   <div
     className="PlannerItem-styles__root planner-item"
+    data-testid="planner-item-raw"
   >
     <div
       className="PlannerItem-styles__completed"
@@ -10101,6 +10152,7 @@ exports[`renders Page correctly without right side content 1`] = `
       >
         <Checkbox
           checked={false}
+          data-testid="planner-item-completed-checkbox"
           disabled={false}
           indeterminate={false}
           inline={false}
@@ -10455,6 +10507,7 @@ exports[`renders Quiz correctly with everything 1`] = `
   </style>
   <div
     className="PlannerItem-styles__root planner-item"
+    data-testid="planner-item-raw"
   >
     <div
       className="PlannerItem-styles__completed"
@@ -10475,6 +10528,7 @@ exports[`renders Quiz correctly with everything 1`] = `
       >
         <Checkbox
           checked={true}
+          data-testid="planner-item-completed-checkbox"
           disabled={false}
           indeterminate={false}
           inline={false}
@@ -10850,6 +10904,7 @@ exports[`renders Quiz correctly with just date 1`] = `
   </style>
   <div
     className="PlannerItem-styles__root planner-item"
+    data-testid="planner-item-raw"
   >
     <div
       className="PlannerItem-styles__completed"
@@ -10870,6 +10925,7 @@ exports[`renders Quiz correctly with just date 1`] = `
       >
         <Checkbox
           checked={false}
+          data-testid="planner-item-completed-checkbox"
           disabled={false}
           indeterminate={false}
           inline={false}
@@ -11224,6 +11280,7 @@ exports[`renders Quiz correctly with just points 1`] = `
   </style>
   <div
     className="PlannerItem-styles__root planner-item"
+    data-testid="planner-item-raw"
   >
     <div
       className="PlannerItem-styles__completed"
@@ -11244,6 +11301,7 @@ exports[`renders Quiz correctly with just points 1`] = `
       >
         <Checkbox
           checked={false}
+          data-testid="planner-item-completed-checkbox"
           disabled={false}
           indeterminate={false}
           inline={false}
@@ -11619,6 +11677,7 @@ exports[`renders Quiz correctly without right side content 1`] = `
   </style>
   <div
     className="PlannerItem-styles__root planner-item"
+    data-testid="planner-item-raw"
   >
     <div
       className="PlannerItem-styles__completed"
@@ -11639,6 +11698,7 @@ exports[`renders Quiz correctly without right side content 1`] = `
       >
         <Checkbox
           checked={false}
+          data-testid="planner-item-completed-checkbox"
           disabled={false}
           indeterminate={false}
           inline={false}
@@ -11993,6 +12053,7 @@ exports[`renders assignment peer reviews correctly 1`] = `
   </style>
   <div
     className="PlannerItem-styles__root planner-item"
+    data-testid="planner-item-raw"
   >
     <div
       className="PlannerItem-styles__completed"
@@ -12013,6 +12074,7 @@ exports[`renders assignment peer reviews correctly 1`] = `
       >
         <Checkbox
           checked={false}
+          data-testid="planner-item-completed-checkbox"
           disabled={false}
           indeterminate={false}
           inline={false}
@@ -12367,6 +12429,7 @@ exports[`renders correctly 1`] = `
   </style>
   <div
     className="PlannerItem-styles__root planner-item"
+    data-testid="planner-item-raw"
   >
     <div
       className="PlannerItem-styles__completed"
@@ -12387,6 +12450,7 @@ exports[`renders correctly 1`] = `
       >
         <Checkbox
           checked={false}
+          data-testid="planner-item-completed-checkbox"
           disabled={false}
           indeterminate={false}
           inline={false}
@@ -12762,6 +12826,7 @@ exports[`renders feedback anonymously according to the assignment settings 1`] =
   </style>
   <div
     className="PlannerItem-styles__root planner-item"
+    data-testid="planner-item-raw"
   >
     <div
       className="PlannerItem-styles__completed"
@@ -12782,6 +12847,7 @@ exports[`renders feedback anonymously according to the assignment settings 1`] =
       >
         <Checkbox
           checked={false}
+          data-testid="planner-item-completed-checkbox"
           disabled={false}
           indeterminate={false}
           inline={false}
@@ -13168,6 +13234,7 @@ exports[`renders feedback if available 1`] = `
   </style>
   <div
     className="PlannerItem-styles__root planner-item"
+    data-testid="planner-item-raw"
   >
     <div
       className="PlannerItem-styles__completed"
@@ -13188,6 +13255,7 @@ exports[`renders feedback if available 1`] = `
       >
         <Checkbox
           checked={false}
+          data-testid="planner-item-completed-checkbox"
           disabled={false}
           indeterminate={false}
           inline={false}
@@ -13575,6 +13643,7 @@ exports[`renders media feedback if available 1`] = `
   </style>
   <div
     className="PlannerItem-styles__root planner-item"
+    data-testid="planner-item-raw"
   >
     <div
       className="PlannerItem-styles__completed"
@@ -13595,6 +13664,7 @@ exports[`renders media feedback if available 1`] = `
       >
         <Checkbox
           checked={false}
+          data-testid="planner-item-completed-checkbox"
           disabled={false}
           indeterminate={false}
           inline={false}
@@ -13982,6 +14052,7 @@ exports[`renders the end time if available 1`] = `
   </style>
   <div
     className="PlannerItem-styles__root planner-item"
+    data-testid="planner-item-raw"
   >
     <div
       className="PlannerItem-styles__completed"
@@ -14002,6 +14073,7 @@ exports[`renders the end time if available 1`] = `
       >
         <Checkbox
           checked={false}
+          data-testid="planner-item-completed-checkbox"
           disabled={false}
           indeterminate={false}
           inline={false}
@@ -14384,6 +14456,7 @@ exports[`renders the location if available 1`] = `
   </style>
   <div
     className="PlannerItem-styles__root planner-item"
+    data-testid="planner-item-raw"
   >
     <div
       className="PlannerItem-styles__completed"
@@ -14404,6 +14477,7 @@ exports[`renders the location if available 1`] = `
       >
         <Checkbox
           checked={false}
+          data-testid="planner-item-completed-checkbox"
           disabled={false}
           indeterminate={false}
           inline={false}
@@ -14770,6 +14844,7 @@ exports[`renders user-created Todo correctly 1`] = `
   </style>
   <div
     className="PlannerItem-styles__root planner-item"
+    data-testid="planner-item-raw"
   >
     <div
       className="PlannerItem-styles__completed"
@@ -14790,6 +14865,7 @@ exports[`renders user-created Todo correctly 1`] = `
       >
         <Checkbox
           checked={false}
+          data-testid="planner-item-completed-checkbox"
           disabled={false}
           indeterminate={false}
           inline={false}

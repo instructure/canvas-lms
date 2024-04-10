@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import {mount, shallow} from 'enzyme'
+import {shallow} from 'enzyme'
+import {render} from '@testing-library/react'
 import moment from 'moment-timezone'
 import {Day} from '../index'
 
@@ -293,7 +294,9 @@ it('registers itself as animatable', () => {
       uniqueId: 'fourth',
     },
   ]
-  const wrapper = mount(
+
+  const ref = React.createRef()
+  const {rerender} = render(
     <Day
       day="2017-08-11"
       timeZone={TZ}
@@ -303,15 +306,26 @@ it('registers itself as animatable', () => {
       deregisterAnimatable={fakeDeregister}
       updateTodo={() => {}}
       currentUser={user}
+      ref={ref}
     />
   )
-  const instance = wrapper.instance()
-  expect(fakeRegister).toHaveBeenCalledWith('day', instance, 42, ['first', 'second'])
 
-  wrapper.setProps({itemsForDay: secondItems})
-  expect(fakeDeregister).toHaveBeenCalledWith('day', instance, ['first', 'second'])
-  expect(fakeRegister).toHaveBeenCalledWith('day', instance, 42, ['third', 'fourth'])
+  expect(fakeRegister).toHaveBeenCalledWith('day', ref.current, 42, ['first', 'second'])
 
-  wrapper.unmount()
-  expect(fakeDeregister).toHaveBeenCalledWith('day', instance, ['third', 'fourth'])
+  rerender(
+    <Day
+      day="2017-08-11"
+      timeZone={TZ}
+      animatableIndex={42}
+      itemsForDay={secondItems}
+      registerAnimatable={fakeRegister}
+      deregisterAnimatable={fakeDeregister}
+      updateTodo={() => {}}
+      currentUser={user}
+      ref={ref}
+    />
+  )
+
+  expect(fakeDeregister).toHaveBeenCalledWith('day', ref.current, ['first', 'second'])
+  expect(fakeRegister).toHaveBeenCalledWith('day', ref.current, 42, ['third', 'fourth'])
 })
