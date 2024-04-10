@@ -18,30 +18,28 @@
 
 import '@instructure/canvas-theme'
 import React from 'react'
-import {mount} from 'enzyme'
+import {render} from '@testing-library/react'
 import AnnouncementEmptyState from '../AnnouncementEmptyState'
 
-const defaultProps = () => ({
-  canCreate: true,
-})
+
+const renderComponent = (props = {}) => {
+  const defaultProps = {
+    canCreate: true,
+  }
+  return render(<AnnouncementEmptyState {...defaultProps} {...props} />)
+}
 
 test('renders the AnnouncementsEmptyState component', () => {
-  const tree = mount(<AnnouncementEmptyState {...defaultProps()} />)
-  expect(tree.exists()).toBe(true)
+  const tree = renderComponent()
+  expect(tree.getByText('No Announcements')).toBeInTheDocument()
 })
 
 test('renders the AnnouncementsEmptyState component when teacher', () => {
-  const props = defaultProps()
-  props.canCreate = true
-  const tree = mount(<AnnouncementEmptyState {...defaultProps()} />)
-  const node = tree.find('Text').at(0)
-  expect(node.text()).toBe('Create announcements above')
+  const tree = renderComponent()
+  expect(tree.getByText('Create announcements above')).toBeInTheDocument()
 })
 
 test('renders the AnnouncementsEmptyState component when student', () => {
-  const props = defaultProps()
-  props.canCreate = false
-  const tree = mount(<AnnouncementEmptyState {...props} />)
-  const node = tree.find('Text').at(0)
-  expect(node.text()).toBe('Check back later')
+  const tree = renderComponent({canCreate: false})
+  expect(tree.getByText('Check back later')).toBeInTheDocument()
 })
