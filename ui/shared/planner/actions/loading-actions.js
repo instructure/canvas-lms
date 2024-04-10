@@ -119,19 +119,21 @@ export function getFirstNewActivityDate(fromMoment) {
   return (dispatch, getState) => {
     fromMoment = fromMoment.clone().subtract(6, 'months')
     const observed_user_id = observedUserId(getState())
-    const context_codes = observedUserContextCodes(getState())
+    const params = {}
     let include
     if (observed_user_id && !getState().singleCourse) {
-      include = ['account_calendars']
+      include = ['account_calendars', 'all_courses']
+    } else if (getState().singleCourse) {
+      params.context_codes = observedUserContextCodes(getState())
     }
 
     const url = buildURL('/api/v1/planner/items', {
+      ...params,
       start_date: fromMoment.toISOString(),
       include,
       filter: 'new_activity',
       order: 'asc',
       observed_user_id,
-      context_codes,
     })
 
     const request = asAxios(getPrefetchedXHR(url)) || axios.get(url)
@@ -337,20 +339,21 @@ function getWayFutureItem(fromMoment) {
   return (dispatch, getState) => {
     const state = getState()
     const observed_user_id = observedUserId(state)
-    let context_codes
     let include
+    const params = {}
     if (observed_user_id) {
-      context_codes = getContextCodesFromState(state)
       if (!state.singleCourse) {
-        include = ['account_calendars']
+        include = ['account_calendars', 'all_courses']
+      } else {
+        params.context_codes = getContextCodesFromState(state)
       }
     } else {
-      context_codes = state.singleCourse ? getContextCodesFromState(state) : undefined
+      params.context_codes = state.singleCourse ? getContextCodesFromState(state) : undefined
     }
     const futureMoment = fromMoment.clone().tz('UTC').startOf('day').add(1, 'year')
     const url = buildURL('/api/v1/planner/items', {
+      ...params,
       observed_user_id,
-      context_codes,
       end_date: futureMoment.toISOString(),
       include,
       order: 'desc',
@@ -373,20 +376,22 @@ function getWayPastItem(fromMoment) {
   return (dispatch, getState) => {
     const state = getState()
     const observed_user_id = observedUserId(state)
-    let context_codes
     let include
+    const params = {}
     if (observed_user_id) {
-      context_codes = getContextCodesFromState(state)
       if (!getState().singleCourse) {
-        include = ['account_calendars']
+        include = ['account_calendars', 'all_courses']
+      } else {
+        params.context_codes = getContextCodesFromState(state)
       }
     } else {
-      context_codes = state.singleCourse ? getContextCodesFromState(state) : undefined
+      params.context_codes = state.singleCourse ? getContextCodesFromState(state) : undefined
     }
     const pastMoment = fromMoment.clone().tz('UTC').startOf('day').add(-1, 'year')
+
     const url = buildURL('/api/v1/planner/items', {
+      ...params,
       observed_user_id,
-      context_codes,
       start_date: pastMoment.toISOString(),
       include,
       order: 'asc',
@@ -449,10 +454,11 @@ function fetchParams(loadingOptions) {
     const observeeId = observedUserId(loadingOptions.getState())
     if (observeeId) {
       if (!loadingOptions.getState().singleCourse) {
-        params.include = ['account_calendars']
+        params.include = ['account_calendars', 'all_courses']
+      } else {
+        params.context_codes = observedUserContextCodes(loadingOptions.getState())
       }
       params.observed_user_id = observeeId
-      params.context_codes = observedUserContextCodes(loadingOptions.getState())
     }
 
     return ['/api/v1/planner/items', {params}]
