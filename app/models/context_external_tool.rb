@@ -1487,13 +1487,17 @@ class ContextExternalTool < ActiveRecord::Base
       VALID_MIGRATION_TYPES.each do |type|
         next unless type.include?(Lti::Migratable)
 
-        type.directly_associated_items(tool_id, context)&.find_ids_in_batches do |ids|
+        type.scope_to_context(
+          type.directly_associated_items(tool_id), context
+        ).find_ids_in_batches do |ids|
           delay_if_production(
             priority: Delayed::LOW_PRIORITY,
             n_strand: ["ContextExternalTool#migrate_content_to_1_3", tool_id]
           ).prepare_direct_batch_for_migration(ids, type)
         end
-        type.indirectly_associated_items(tool_id, context)&.find_ids_in_batches do |ids|
+        type.scope_to_context(
+          type.indirectly_associated_items(tool_id), context
+        ).find_ids_in_batches do |ids|
           delay_if_production(
             priority: Delayed::LOW_PRIORITY,
             n_strand: ["ContextExternalTool#migrate_content_to_1_3", tool_id]
@@ -1507,7 +1511,7 @@ class ContextExternalTool < ActiveRecord::Base
   # from 1.1 to 1.3 according to the types migration method.
   # @see Lti::Migratable
   def prepare_direct_batch_for_migration(ids, content_type)
-    content_type.fetch_direct_batch(ids).each do |item|
+    content_type.fetch_direct_batch(ids) do |item|
       prepare_content_for_migration(item)
     end
   end
@@ -1516,7 +1520,7 @@ class ContextExternalTool < ActiveRecord::Base
   # from 1.1 to 1.3 according to the types migration method.
   # @see Lti::Migratable
   def prepare_indirect_batch_for_migration(tool_id, ids, content_type)
-    content_type.fetch_indirect_batch(tool_id, id, ids).each do |item|
+    content_type.fetch_indirect_batch(tool_id, id, ids) do |item|
       prepare_content_for_migration(item)
     end
   end
@@ -1611,9 +1615,9 @@ class ContextExternalTool < ActiveRecord::Base
   def placement_allowed?(placement)
     return true if placement != :submission_type_selection
 
-    allowed_domains = Setting.get("submission_type_selection_allowed_launch_domains", "").split(",")
-    allowed_dev_keys = Setting.get("submission_type_selection_allowed_dev_keys", "").split(",")
-    allowed_domains.include?(domain) || allowed_dev_keys.include?(developer_key&.id.to_s)
+    allowed_domains = Setting.get("submission_type_selection_allowed_launch_domains", "").split(",").map(&:strip).reject(&:empty?)
+    allowed_dev_keys = Setting.get("submission_type_selection_allowed_dev_keys", "").split(",").map(&:strip).reject(&:empty?)
+    allowed_domains.include?(domain) || allowed_dev_keys.include?(Shard.global_id_for(developer_key&.id).to_s)
   end
 
   private

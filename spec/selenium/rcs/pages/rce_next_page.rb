@@ -60,6 +60,11 @@ module RCENextPage
     menu_item_by_name("Exit Fullscreen")
   end
 
+  def find_and_replace_menu_item
+    menubar_open_menu("Tools")
+    menu_item_by_name("Find and Replace")
+  end
+
   def keyboard_shortcut_modal
     f('[role="dialog"][aria-label="Keyboard Shortcuts"]')
   end
@@ -1237,5 +1242,23 @@ module RCENextPage
       "return document.querySelector('#wiki_page_body_ifr').contentDocument.getSelection().removeAllRanges()"
     )
     # rubocop:enable Specs/NoExecuteScript
+  end
+  #=====================================================================================================================
+  # Find and Replace Tray
+
+  def find_and_replace_tray_header
+    f('[role="dialog"][aria-label="Find and Replace"]')
+  end
+
+  def find_and_replace_tray_find_input
+    f('input[name="findtext"]')
+  end
+
+  def find_and_replace_tray_replace_input
+    f('input[name="replacetext"]')
+  end
+
+  def find_and_replace_tray_replace_button
+    f('button[data-testid="replace-button"]')
   end
 end

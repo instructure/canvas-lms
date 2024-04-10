@@ -18,7 +18,7 @@
 
 import React, {useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import type {RubricAssessmentData, RubricCriterion} from '../types/rubric'
+import type {RubricAssessmentData, RubricCriterion, UpdateAssessmentData} from '../types/rubric'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
@@ -30,7 +30,7 @@ type TraditionalViewProps = {
   criteria: RubricCriterion[]
   rubricAssessmentData: RubricAssessmentData[]
   rubricTitle: string
-  onUpdateAssessmentData: (criteriaId: string, points?: number) => void
+  onUpdateAssessmentData: (params: UpdateAssessmentData) => void
 }
 export const TraditionalView = ({
   criteria,
@@ -104,7 +104,7 @@ export const TraditionalView = ({
 type CriterionRowProps = {
   criterion: RubricCriterion
   criterionAssessment?: RubricAssessmentData
-  onUpdateAssessmentData: (criteriaId: string, points?: number) => void
+  onUpdateAssessmentData: (params: UpdateAssessmentData) => void
 }
 const CriterionRow = ({
   criterion,
@@ -155,11 +155,15 @@ const CriterionRow = ({
               const borderWith = isHovered || isSelected ? highlightedBorder : border
               const borderColor = isHovered || isSelected ? 'success' : 'primary'
 
-              const onClickRating = (ratingIndex: number, criterionId: string, points: number) => {
+              const onClickRating = (ratingIndex: number) => {
                 if (selectedRatingIndex === ratingIndex) {
-                  onUpdateAssessmentData(criterionId, undefined)
+                  onUpdateAssessmentData({criterionId: criterion.id, points: undefined})
                 } else {
-                  onUpdateAssessmentData(criterionId, points)
+                  onUpdateAssessmentData({
+                    criterionId: criterion.id,
+                    points: rating.points,
+                    description: rating.description,
+                  })
                 }
               }
 
@@ -180,7 +184,7 @@ const CriterionRow = ({
                     padding="xxx-small x-small 0 x-small"
                     onMouseOver={() => setHoveredRatingIndex(index)}
                     onMouseOut={() => setHoveredRatingIndex(undefined)}
-                    onClick={() => onClickRating(index, criterion.id, rating.points)}
+                    onClick={() => onClickRating(index)}
                     themeOverride={{borderWidthMedium: isSelected ? '0.188rem' : '0.125rem'}}
                     data-testid={`traditional-criterion-${criterion.id}-ratings-${index}`}
                   >

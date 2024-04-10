@@ -161,4 +161,56 @@ describe('TempEnrollSearch', () => {
     const {queryByText} = render(<TempEnrollSearch page={1} {...props} canReadSIS={false} />)
     await waitFor(() => expect(queryByText('SIS ID')).toBeFalsy())
   })
+
+  describe('duplicates', () => {
+    const mockDuplicates = {
+      users: [],
+      duplicates: [
+        [
+          {
+            user_id: '2',
+            user_name: 'user2',
+            email: 'duplicate_email',
+            login_id: 'duplicate_login',
+            sis_user_id: 'user2_sis',
+            account_name: 'abc_university',
+          },
+          {
+            user_id: '3',
+            user_name: 'user3',
+            email: 'duplicate_email',
+            login_id: 'duplicate_login',
+            sis_user_id: 'user3_sis',
+            account_name: 'abc_university',
+          },
+        ],
+      ],
+    }
+
+    it('displays possible matches page when duplicates are present', async () => {
+      fetchMock.post(
+        `/accounts/1/user_lists.json?user_list=&v2=true&search_type=cc_path`,
+        mockDuplicates
+      )
+      const {queryByText} = render(<TempEnrollSearch page={1} {...props} />)
+      await waitFor(() =>
+        expect(queryByText(/Please select desired user from the list below/)).toBeTruthy()
+      )
+      await waitFor(() => expect(queryByText('user2')).toBeInTheDocument())
+      await waitFor(() => expect(queryByText('user2_sis')).toBeInTheDocument())
+      await waitFor(() => expect(queryByText('user3')).toBeInTheDocument())
+      await waitFor(() => expect(queryByText('user3_sis')).toBeInTheDocument())
+    })
+
+    it('does not show sis id on possible matches page when canReadSIS is false', async () => {
+      fetchMock.post(
+        `/accounts/1/user_lists.json?user_list=&v2=true&search_type=cc_path`,
+        mockDuplicates
+      )
+      const {queryByText} = render(<TempEnrollSearch page={1} {...props} canReadSIS={false} />)
+      await waitFor(() => expect(queryByText('SIS ID')).not.toBeInTheDocument())
+      await waitFor(() => expect(queryByText('user2_sis')).not.toBeInTheDocument())
+      await waitFor(() => expect(queryByText('user3_sis')).not.toBeInTheDocument())
+    })
+  })
 })

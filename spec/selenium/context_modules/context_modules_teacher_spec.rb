@@ -756,6 +756,19 @@ describe "context modules" do
         end
         expect(ContentTag.last.content.is_a?(Assignment)).to be_truthy
       end
+
+      it "creates a new quiz by default when both new_quizzes_by_default and require_migration is enabled" do
+        @course.enable_feature! :new_quizzes_by_default
+        @course.root_account.enable_feature! :require_migration_to_new_quizzes
+        get "/courses/#{@course.id}/modules"
+
+        add_new_module_item_and_yield("#quizs_select", "Quiz", "[ Create Quiz ]", "A New Quiz") do
+          expect(f("#quizs_select")).not_to contain_css("input[name=quiz_engine_selection]")
+          expect(f("#quizs_select .new")).not_to include_text("New Quizzes")
+          expect(f("#quizs_select .new")).not_to include_text("Classic Quizzes")
+        end
+        expect(ContentTag.last.content.is_a?(Assignment)).to be_truthy
+      end
     end
   end
 end

@@ -102,6 +102,12 @@ $ic-tooltip-arrow-size: 0.375rem;
       }
     }
 
+    .ic-svg-external-tool>div:first-child {
+      svg>path {
+        transform: scale(0.4);
+      }
+    }
+
     .ic-sidenav-tray:active:hover,
     .ic-user-tray:active:hover {
       color: var(--ic-brand-primary);
@@ -127,7 +133,6 @@ $ic-tooltip-arrow-size: 0.375rem;
     .ic-user-avatar {
       width: 1.875rem;
       height: 1.875rem;
-      border: 2px solid var(--ic-brand-global-nav-avatar-border) !important;
     }
 
     .ic-collapse-div {
@@ -438,8 +443,6 @@ body.primary-nav-expanded {
         gap: 0.2rem !important;
         width: auto !important;
         height: 63.55px !important;
-        font-weight: 400;
-        transition: background-color 0.3s;
       }
 
       .ic-user-tray {
@@ -460,6 +463,12 @@ body.primary-nav-expanded {
         >svg {
           width: 1.625rem !important;
           height: 1.625rem !important;
+        }
+      }
+
+      .ic-svg-external-tool>div:first-child {
+        svg>path {
+          transform: scale(0.4);
         }
       }
 
@@ -488,7 +497,6 @@ body.primary-nav-expanded {
       .ic-user-avatar {
         width: 2.25rem;
         height: 2.25rem;
-        border: 2px solid var(--ic-brand-global-nav-avatar-border) !important;
       }
 
       /** New SideNav CSS */

@@ -112,6 +112,7 @@ const locale = {
   "external_tools_6e77821": { "message": "Зовнішні інструменти" },
   "files_c300e900": { "message": "Файли" },
   "files_index_af7c662b": { "message": "Індекс файлів" },
+  "find_8d605019": { "message": "Знайти" },
   "format_4247a9c5": { "message": "Формат" },
   "generating_preview_45b53be0": {
     "message": "Генерується попередній перегляд..."
@@ -172,6 +173,7 @@ const locale = {
     "message": "Попередній перегляд  для цього файлу недоступний."
   },
   "no_results_940393cf": { "message": "Результати відсутні." },
+  "no_results_found_58717065": { "message": "Результатів не знайдено" },
   "none_3b5e34d2": { "message": "Ніхто" },
   "open_this_keyboard_shortcuts_dialog_9658b83a": {
     "message": "Вікрити діалогове вікно гарячих клавіш"
@@ -185,6 +187,7 @@ const locale = {
   "pink_68ad45cb": { "message": "Рожевий" },
   "prev_f82cbc48": { "message": "Попередній" },
   "preview_53003fd2": { "message": "Попередній перегляд" },
+  "previous_bd2ac015": { "message": "Попередній" },
   "published_c944a23d": { "message": "опубліковано" },
   "purple_7678a9fc": { "message": "Фіолетовий" },
   "quiz_e0dcce8f": { "message": "Контрольна робота" },

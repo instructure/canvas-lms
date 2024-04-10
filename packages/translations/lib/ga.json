@@ -75,10 +75,10 @@
         "message": "Tharla earráid agus an comhad á léamh"
     },
     "an_error_occurred_making_a_network_request_d1bda348": {
-        "message": "Tharla earráid agus iarratas líonra á dhéanamh"
+        "message": "Tharla earráid agus iarratas gréasáin á dhéanamh"
     },
     "an_error_occurred_uploading_your_media_71f1444d": {
-        "message": "Tharla earráid agus do mheán á uaslódáil."
+        "message": "Tharla earráid agus do mheáin á uaslódáil."
     },
     "and_7fcc2911": {
         "message": "Agus"
@@ -330,7 +330,7 @@
         "message": "Comhoibrithe"
     },
     "collapse_to_hide_types_1ab46d2e": {
-        "message": "Laghdaigh chun { types } chur i bhfolach"
+        "message": "Leacaigh chun { types } chur i bhfolach"
     },
     "color_picker_6b359edf": {
         "message": "Roghnóir Dathanna"
@@ -408,7 +408,7 @@
         "message": "Meáin an Chúrsa"
     },
     "course_navigation_dd035109": {
-        "message": "Nascleanúint an Chúrsa"
+        "message": "Nascleanúint Cúrsa"
     },
     "create_icon_110d6463": {
         "message": "Cruthaigh Deilbhín"
@@ -537,13 +537,13 @@
         "message": "Díchumasaigh Réamhamharc"
     },
     "discussion_6719c51d": {
-        "message": "Plé"
+        "message": "Fóram"
     },
     "discussions_a5f96392": {
         "message": "Fóraim"
     },
     "discussions_index_6c36ced": {
-        "message": "Innéacs Pléanna"
+        "message": "Innéacs Fóraim"
     },
     "disjoint_union_e74351a8": {
         "message": "Aontas Scartha"
@@ -552,7 +552,7 @@
         "message": "Roghanna Taispeána"
     },
     "display_text_link_opens_in_a_new_tab_75e9afc9": {
-        "message": "Taispeáin Nasc Téacs (Osclaítear i gcluaisín nua é)"
+        "message": "Taispeáin Nasc Téacs (Osclaítear i táb nua é)"
     },
     "division_sign_72190870": {
         "message": "Comhartha Rannóige"
@@ -705,7 +705,7 @@
         "message": "Cothromaíocht"
     },
     "equivalence_class_7b0f11c0": {
-        "message": "Aicme Coibhéise"
+        "message": "Rang Coibhéise"
     },
     "equivalent_identity_654b3ce5": {
         "message": "Coibhéis (Aitheantas)"
@@ -732,10 +732,10 @@
         "message": "Nasc Seachtrach"
     },
     "external_tool_frame_70b32473": {
-        "message": "Fráma uirlisí seachtrach"
+        "message": "Fráma uirlis sheachtrach"
     },
     "external_tools_6e77821": {
-        "message": "Uirlisí Seachtracha"
+        "message": "Uirlisí Sheachtracha"
     },
     "extra_large_b6cdf1ff": {
         "message": "An-Mhór"
@@ -759,7 +759,7 @@
         "message": "Ainm comhaid"
     },
     "file_storage_quota_exceeded_b7846cd1": {
-        "message": "Sáraíodh an cuóta stórála comhaid"
+        "message": "Sáraíodh an cuóta stórais comhaid"
     },
     "file_url_c12b64be": {
         "message": "URL an chomhaid"
@@ -813,7 +813,7 @@
         "message": "Ag Formáidiú"
     },
     "forward_slash_3f90f35e": {
-        "message": "Slais Chun Tosaigh"
+        "message": "Slais Ar aghaidh"
     },
     "found_auto_saved_content_3f6e4ca5": {
         "message": "Aimsíodh ábhar uath-shábháilte"
@@ -846,7 +846,7 @@
         "message": "Gearmáinis"
     },
     "gif_png_format_images_larger_than_size_kb_are_not__7af3bdbd": {
-        "message": "Ní thacaítear le híomhánna formáid GIF/png níos mó ná { size } KB faoi láthair."
+        "message": "Ní thacaítear le híomhánna formáid GIF/GGI níos mó ná { size } KB faoi láthair."
     },
     "go_to_the_editor_s_menubar_e6674c81": {
         "message": "Téigh go barra roghchláir an eagarthóra"
@@ -1044,7 +1044,7 @@
         "message": "Íomhánna"
     },
     "images_should_include_an_alt_attribute_describing__b86d6a86": {
-        "message": "Ba chóir go mbeadh tréith alt ag cur síos ar ábhar na híomhá san áireamh sna híomhánna."
+        "message": "Ba chóir go gcuimseoidh tréith alt ag cur síos ar ábhar na híomhá sna híomhánna."
     },
     "imaginary_portion_of_complex_number_2c733ffa": {
         "message": "Cuid Shamhailteach (d''Uimhir Choimpléascach)"
@@ -1326,10 +1326,10 @@
         "message": "Meáin"
     },
     "media_file_is_processing_please_try_again_later_58a6d49": {
-        "message": "Tá comhad meán á phróiseáil. Bain triail eile as ar ball."
+        "message": "Tá comhad meáin á phróiseáil. Bain triail eile as ar ball."
     },
     "media_title_2112243b": {
-        "message": "Teideal Meán"
+        "message": "Teideal Meáin"
     },
     "medium_5a8e9ead": {
         "message": "Meán"
@@ -1425,7 +1425,7 @@
         "message": "Neadaithe Níos lú ná"
     },
     "new_quiz_34aacba6": {
-        "message": "Tráth na gCeist Nua"
+        "message": "Quiz Nua"
     },
     "next_40e12421": {
         "message": "Ar aghaidh"
@@ -1449,10 +1449,10 @@
         "message": "Níl aon athruithe le sábháil."
     },
     "no_discussions_created_yet_ff99abe3": {
-        "message": "Níor cruthaíodh aon phlé go fóill."
+        "message": "Níor cruthaíodh aon fhóram go fóill."
     },
     "no_discussions_found_9284063b": {
-        "message": "Níor aimsíodh aon phlé."
+        "message": "Níor aimsíodh aon fhóram."
     },
     "no_e16d9132": {
         "message": "Níl"
@@ -1479,10 +1479,10 @@
         "message": "Níl réamhamharc ar fáil don chomhad seo."
     },
     "no_quizzes_created_yet_1a2370b9": {
-        "message": "Níl aon tráth na gceist cruthaithe go fóill."
+        "message": "Níl aon quizeanna cruthaithe go fóill."
     },
     "no_quizzes_found_c80c537a": {
-        "message": "Níor aimsíodh aon tráth na gceist."
+        "message": "Níor aimsíodh aon quizeanna."
     },
     "no_results_940393cf": {
         "message": "Gan torthaí."
@@ -1650,10 +1650,10 @@
         "message": "Imir"
     },
     "play_media_comment_35257210": {
-        "message": "Seinn trácht meáin."
+        "message": "Seinn ráiteas meáin."
     },
     "play_media_comment_by_name_from_createdat_c230123d": {
-        "message": "Seinn tráchtaireacht meáin ag { name } ó { createdAt }."
+        "message": "Seinn ráiteas meáin ag { name } ó { createdAt }."
     },
     "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
         "message": "Tabhair cead do Canvas rochtain a fháil ar do mhicreafón agus ceamara gréasáin."
@@ -1692,7 +1692,7 @@
         "message": "Réamhamharc"
     },
     "preview_a3f8f854": {
-        "message": "Réamhamhairc"
+        "message": "RÉAMHAMHARC"
     },
     "preview_in_overlay_ed772c46": {
         "message": "Réamhamharc i bhforleagan"
@@ -1734,7 +1734,7 @@
         "message": "Ceathrún"
     },
     "quiz_e0dcce8f": {
-        "message": "Tráth na gCeist"
+        "message": "Quiz"
     },
     "quizzes_7e598f57": {
         "message": "Quizeanna"
@@ -1755,7 +1755,7 @@
         "message": "Taifead/Uaslódáil Meáin"
     },
     "recording_98da6bda": {
-        "message": "Taifeadadh"
+        "message": "Ag Taifeadadh"
     },
     "red_8258edf3": {
         "message": "Dearg"
@@ -1794,10 +1794,10 @@
         "message": "Rho (athraitheach)"
     },
     "rich_content_editor_2708ef21": {
-        "message": "Eagarthóir Ábhar Saibhir"
+        "message": "Eagarthóír Mórán Inneachar"
     },
     "rich_text_area_press_oskey_f8_for_rich_content_edi_c2f651d": {
-        "message": "Réimse Téacs Saibhir. Brúigh { OSKey }+F8 le haghaidh aicearraí Eagarthóir Ábhar Saibhir."
+        "message": "Réimse Téacs Saibhir. Brúigh { OSKey }+F8 le haghaidh aicearraí Eagarthóír Mórán Inneachar."
     },
     "right_71ffdc4d": {
         "message": "Ceart"
@@ -2052,7 +2052,7 @@
         "message": "cearnaigh liosta gan ordú"
     },
     "star_8d156e09": {
-        "message": "Réalt"
+        "message": "Cuir réiltín le"
     },
     "start_over_f7552aa9": {
         "message": "Tosaigh arís"
@@ -2208,7 +2208,7 @@
         "message": "Tá an t-ábhar ceadúnaithe faoi Creative Commons"
     },
     "the_material_is_subject_to_an_exception_e_g_fair_u_a39c8ca2": {
-        "message": "Tá an t-ábhar faoi réir eisceachta - m.sh. úsáid chóir, an ceart chun luachan, nó daoine eile faoi dhlíthe cóipchirt infheidhmithe"
+        "message": "Tá an t-ábhar faoi réir eisceachta - m.sh. Úsáid Chothromr, an ceart chun luachan, nó daoine eile faoi dhlíthe cóipchirt infheidhmithe"
     },
     "the_preceding_content_is_partner_provided_d753928c": {
         "message": "Cuirtear an t-ábhar roimhe seo ar fáil ó chomhpháirtí"
@@ -2250,7 +2250,7 @@
         "message": "Ní féidir an doiciméad seo a thaispeáint laistigh de Canvas."
     },
     "this_equation_cannot_be_rendered_in_basic_view_9b6c07ae": {
-        "message": "Ní féidir an chothromóid seo a sholáthar i Basic View."
+        "message": "Ní féidir an chothromóid seo a sholáthar i Bun-Amharc."
     },
     "this_image_is_currently_unavailable_25c68857": {
         "message": "Níl an íomhá seo ar fáil faoi láthair"
@@ -2343,7 +2343,7 @@
         "message": "Uaslódáil Íomhá"
     },
     "upload_media_ce31135a": {
-        "message": "Uaslódáil Meán"
+        "message": "Uaslódáil Meáin"
     },
     "upload_record_media_e4207d72": {
         "message": "Uaslódáil/Taifead Meáin"

@@ -67,40 +67,21 @@ CalendarHeader.prototype.initialize = function () {
 }
 
 CalendarHeader.prototype.connectEvents = function () {
-  this.navigator.on(
-    'navigatePrev',
-    (function (_this) {
-      return function () {
-        return _this.trigger('navigatePrev')
-      }
-    })(this)
-  )
-  this.navigator.on(
-    'navigateToday',
-    (function (_this) {
-      return function () {
-        return _this.trigger('navigateToday')
-      }
-    })(this)
-  )
-  this.navigator.on(
-    'navigateNext',
-    (function (_this) {
-      return function () {
-        return _this.trigger('navigateNext')
-      }
-    })(this)
-  )
-  this.navigator.on(
-    'navigateDate',
-    (function (_this) {
-      return function (selectedDate) {
-        return _this.trigger('navigateDate', selectedDate)
-      }
-    })(this)
-  )
-  this.$calendarViewButtons.on('click', 'button', this.toggleView)
-  return subscribe('Calendar/loadStatus', this.animateLoading)
+  const _this = this
+  this.navigator.on('navigatePrev', function () {
+    _this.trigger('navigatePrev')
+  })
+  this.navigator.on('navigateToday', function () {
+    _this.trigger('navigateToday')
+  })
+  this.navigator.on('navigateNext', function () {
+    _this.trigger('navigateNext')
+  })
+  this.navigator.on('navigateDate', function (selectedDate) {
+    _this.trigger('navigateDate', selectedDate)
+  })
+  this.$calendarViewButtons.on('click', 'button', this.toggleView.bind(this))
+  return subscribe('Calendar/loadStatus', this.animateLoading.bind(this))
 }
 
 CalendarHeader.prototype.toggleView = function (e) {

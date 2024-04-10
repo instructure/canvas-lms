@@ -507,6 +507,7 @@ nn:
   account_id_2c3b4f15: konto-ID
   account_id_73966078: konto_id
   account_id_f6e26867: Konto-ID
+  account_level_3c2a42a5: Kontonivå
   account_level_notification_preferences_require_an__66467cd7: "Innstillingar for kontovarsel krev ein konto_id for å oppdatere"
   account_level_notification_preferences_ui_update_f5e189a4: "Oppdatering av brukargrensesnitt til innstillingar for kontovarsel"
   account_level_notifications_apply_to_all_courses_n_8b99c5b0: "Innstillingar på konto-nivå vil gjelde for alle emne. Du kan stille inn varslingar på kvart enkelt emne, og då overstyre desse innstillingane."
@@ -1390,6 +1391,8 @@ nn:
               check_box: "CSV-fil for gruppemedlemskap"
           groups: 
             check_box: "CSV-fil for grupper"
+          include_deleted: 
+            check_box: "Inkluder sletta objekt"
           sections: 
             check_box: "CSV-fil over seksjonar"
           terms: 
@@ -2391,6 +2394,7 @@ nn:
   after_the_assignment_is_graded_53754607: "Etter at oppgåva er vurdert"
   after_the_due_date_eee89c9c: "Etter innleveringsfristen"
   after_the_first_attempt_you_cannot_leave_comments__3922325f: "Etter fyrste forsøk kan du ikkje legge att kommentarar før du har levert oppgåva."
+  agenda_b010136d: Listevising
   ahead_21f22939: Komande
   ai_driven_smart_search_feature_597dbd4f: "AI-driven smart søkefunksjon."
   ajax_errors: 
@@ -3844,6 +3848,8 @@ nn:
   assignment_id_b040cee0: Oppgåve-ID
   assignment_information_e871d0e0: Oppgåveinformasjon
   assignment_is_reassigned_dd6b6ef2: "Oppgåva er tilordna på nytt."
+  assignment_is_reassigned_ebb31807: "%{assignment} er tilordna på nytt"
+  assignment_itemtitle_fee53607: "Oppgåve, %{itemTitle}"
   assignment_locked_a6233228: "Oppgåve låst"
   assignment_locked_until_future_date_80cd0df2: "Oppgåva er låst fram til framtidig dato"
   assignment_locked_with_prerequisite_5b8cb148: "Oppgåve er låst med førehandskrav"
@@ -6096,6 +6102,7 @@ nn:
     from_beginning: starten
     to_now: "no"
   comma_separated_list_of_users_sis_id_332c98f1: "Kommaseparert liste over brukarar sine SIS-ID-ar"
+  comment_7ef1428e: Kommentar
   comment_added_33ab70d9: "Kommentar lagt til"
   comment_by_replying_to_this_message_or_join_the_co_26d42fde: "Kommentér ved å svare på denne meldinga, eller delta i samtalen ved å bruke linken: %{link}."
   comment_by_replying_to_this_message_or_join_the_co_52b5ac1c: "Kommentér ved å svare på denne meldinga, eller delta i samtalen ved å bruke linken: %{link}. Om du vil sende med eit vedlegg, må du logge inn i Canvas og svare på diskusjonen der. "
@@ -8539,6 +8546,7 @@ nn:
   create_new_course_e3ef9cd0: "Opprett nytt emne"
   create_new_discussions_6ab69da2: "Opprett nye diskusjonar"
   create_new_e0946c49: "Opprett ny"
+  create_new_event_e9fb2fb6: "Opprett ny hending"
   create_new_filter_c244aa92: "Opprett nytt filter"
   create_new_group_bf9561d4: "Opprett ny gruppe"
   create_new_group_fca5cc73: "Opprett ny gruppe"
@@ -10347,6 +10355,7 @@ nn:
   enter_the_access_token_for_your_organization_from__38b84fd1: "Registrer tilgangstoken for din organisasjon frå *eduappcenter.com*. Når det er lagt inn, vil kun appar som din institusjon har godkjent bli lista ut på den eksterne app-sida. Lær korleis du kan **generere eit tilgangstoken**."
   enter_the_access_token_for_your_organization_from__7b67e135: "Registrer tilgangstoken for din organisasjon frå *eduappcenter.com*. Når det er lagt inn, vil kun appar som din institusjon har godkjent bli lista ut på den eksterne app-sida. Lær korleis du kan **generere eit tilgangstoken**."
   enter_the_access_token_for_your_organization_from__cc77493d: "Registrer tilgangstoken for din organisasjon frå *eduappcenter.com*. Når det er lagt inn, vil kun appar som din institusjon har godkjent bli lista ut på den eksterne app-sida. Lær korleis du kan **generere eit tilgangstoken**."
+  enter_the_date_you_would_like_to_navigate_to_a712de47: "Skriv inn datoen du vil navigere til."
   enter_the_email_addresses_of_the_users_you_would_l_17cef6a0: "Oppgi e-postadressene til brukarane du vil legge til, berre delt av komma"
   enter_the_email_addresses_of_the_users_you_would_l_f76448a6: "Oppgi e-postadressene til brukarane du vil legge til, skilde med komma eller linjeskift"
   enter_the_grade_41d5c97d: "Skriv inn karakteren"
@@ -10913,7 +10922,7 @@ nn:
   failed_getting_course_list_49846a93: "Henting av emnelista mislukkast"
   failed_getting_file_to_preview_89fe2bf4: "Henting av førehandsvisning mislukkast"
   failed_getting_next_batch_of_announcements_1f1165a5: "Henting av neste sett kunngjeringar mislukkast"
-  failed_getting_to_do_list_10ce2833: "Henting av gjerelista mislukkast"
+  failed_getting_to_do_list_10ce2833: "Henting av gjeremålslista mislukkast"
   failed_initializing_dashboard_3d967143: "Initialisering av dashbord mislukkast"
   failed_jobs_b632bbf0: "Mislukka jobbar"
   failed_loading_associations_component_is_your_netw_fa49fb32: "Kan ikkje laste Associations-komponenten. Er internettkoplinga OK?"
@@ -10995,7 +11004,7 @@ nn:
   failed_to_update_permission_33c493f: "Kan ikkje oppdatere løyve"
   failed_to_update_role_name_8c7b0119: "Kan ikkje oppdatere rollenamn"
   failed_to_validate_cas_ticket_error_31aa4c63: "Validering av CAS-informasjon mislukkast: %{error}"
-  failure_loading_the_to_do_list_c61895c8: "Lasting av gjerelista mislukkast"
+  failure_loading_the_to_do_list_c61895c8: "Lasting av gjeremålslista mislukkast"
   fair_38e62237: "Nokså godt"
   fair_score_554e2558: "Nokså godt resultat"
   fair_use_bee47d77: "Fair use"
@@ -11433,7 +11442,7 @@ nn:
   grade_a91e433e: "Vurdering:"
   grade_assignment_7c1abc11: "Gi vurdering av %{assignment}"
   grade_change_activity_75fb525: Vurderingsendringsaktivitet
-  grade_change_log_231f90e4: Vurderingslogg
+  grade_change_log_231f90e4: Vurderingsendringslogg
   grade_change_notifications_98461261: Vurderingsendringsvarsel
   grade_changes_and_comments_have_been_released_for__3978b741: "Vurderingsendringar og kommentarar er publisert for alle."
   grade_changes_and_comments_have_been_released_for__5d6a01a0: "Endringar i vurdering og kommentarar er publisert for alle i seksjonane: %{section_names}"
@@ -12291,7 +12300,7 @@ nn:
       saving: Lagrar...
     titles: 
       grading_scheme_info: "Vis/rediger karakterskjema"
-  grading_standards_b73bfa72: "Standard karaktersetjing"
+  grading_standards_b73bfa72: "Standardar for karaktersetjing"
   grading_type_type_7d8b42d7: "Type karaktersetjing: %{type}"
   grant_tenant_access_9afafd: "Gi tenant tilgang"
   granular_permissions_for_add_remove_admin_roles_fr_9a06a75d: "Detaljerte løyve for å legge til/fjerne administratorroller frå emne"
@@ -12991,7 +13000,7 @@ nn:
   high_contrast_description: |-
       Høgkontrast forsterkar fargekontrasten i brukargrensesnittet (tekst, knappar osb.), og gjer desse elementa
       tydelegare og enklare å finne. Merk: Institusjonsutsjånaden blir deaktivert.
-  high_score_267b6641: "Høg skår"
+  high_score_267b6641: "Høg poengsum"
   high_score_47924c1a: "Høgt: %{score}"
   highest_28ad71e6: Høgast
   highest_score_e080551e: "Høgaste resultat"
@@ -16769,6 +16778,7 @@ nn:
   modules_index_menu_tray_3f9975d9: "Modular indexmeny (Sidemeny)"
   modules_settings_a7066f13: Modulinnstillingar
   modules_tutorial_tray_d58ac3cb: "Modular opplæringsmeny"
+  month_4b83b95f: Månad
   month_s_5c17590e: Månad(er)
   monthandday_starting_at_time_769b12c8: "%{monthAndDay}startar %{time}"
   moodle_dropdown_many_warning_title: "Det er %{count} fleire spørsmål i rullegardinmenyar i denne banken som kan vere feil importert"
@@ -27037,6 +27047,7 @@ nn:
   warning_for_improved_accessibility_of_calendar_eve_da54b4e2: "Åtvaring: Dersom du vil ha betre tilgang til kalenderhendingar, kan du bruke listevisinga."
   warning_for_improved_accessibility_of_reordering_a_5d0206c7: "Åtvaring: Dersom du vil ha betre tilgang til å omorganisere oppgåver og grupper, må du velje alternativet Flytt til dialog, i menyen."
   warning_for_improved_accessibility_please_click_he_e6472c02: "Åtvaring: Dersom du vil ha betre tilgang, kan du klikke her og bruke vurderingsoversikt med individuell vising. "
+  warning_for_improved_accessibility_please_use_the__1075c150: "Åtvaring: Dersom du vil ha betre tilgang, kan du bruke \"Listevising\" i kalenderen."
   warning_for_improved_accessibility_with_annotated__43e3a5ea: "Åtvaring: for betre tilgjengeligheit med kommenterte oppgåver, vær vennleg og bruk Filopplasting eller Text Entry for å legge igjen kommentarar. "
   warning_if_there_are_any_users_with_this_role_they_1a7c1fef: "Merk: brukarar med denne rolla kan behalde gjeldande løyve, men du kan ikkje opprette nye brukarar med denne rolla. "
   warning_you_are_about_to_adjust_this_group_s_membe_a04281b6: "Åtvaring! Du er i ferd med å endre på medlemsamansettinga i gruppa. *Endringa vil påverke eksisterande gruppeinnleveringar, merknader, kommentarar og vurderingar og føre til tap av data frå BÅDE denne gruppa og frå gruppa du har flytta studenten frå.*** For å hindre uønska konsekvensar for eksisterande gruppeinnleveringar må du opprette eit nytt gruppesett for for framtidige innleveringar.**"
@@ -27099,6 +27110,7 @@ nn:
   website_url_b995c5b6: Nettstad-URL
   website_url_input_1a3eab25: "Innputt til nettstad-URL"
   website_url_url_bd07233d: "Nettside URL: %{url}"
+  week_1f945ddd: Veke
   week_s_cb1492ee: Veke(r)
   weekly_schedule_navigation_6b042645: "Navigasjon for vekestimeplan"
   weekly_summary_56cd0c95: Vekesamandrag

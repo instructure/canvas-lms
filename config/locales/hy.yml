@@ -979,6 +979,11 @@ hy:
         sis_export: 
           description: 
             text: "Այս հաշվետվությունը արտահանում է բոլոր անհրաժեշտ տեղեկությունները, որոնք վերաբերում են Canvas-ի համապատասխան կատեգորիաների ինիցիալիզացիային:"
+    provisioning_csv_parameters: 
+      account_reports: 
+        default: 
+          include_deleted: 
+            check_box: "Ներառել Ջնջված Օբյեկտները "
     public_courses_csv_description: 
       account_reports: 
         default: 
@@ -1663,6 +1668,7 @@ hy:
   admin_4d3ba42f: Ադմինիստրատոր
   after_date_981cd41b: "%{date}-ից հետո"
   after_last_attempt_c9168da2: "Վերջին փորձից հետո"
+  agenda_b010136d: Օրակարգ
   ajax_errors: 
     error_heading: "Ajax սխալ՝ %{status_code}"
     errors: 
@@ -5401,6 +5407,7 @@ hy:
     quiz_name: "Ստուգողական աշխատանքի անվանում"
     ungrded_survey: "Չգնահատված հարցում"
     url: "URL հասցե"
+  create_new_event_e9fb2fb6: "Ստեղծել նոր միջոցառում"
   create_quiz_d08bb72a: "Ստեղծել ստուգողական աշխատանք"
   create_users_view: 
     required: "Մուտքագրեք որոշ էլ.փոստի հասցեներ"
@@ -6442,6 +6449,7 @@ hy:
   enrollments_teachers: Դասավանդողներ
   enter_a_hexcode_here_to_use_a_custom_color_51ecccce: "Մուտքագրել hexcode լրացուցիչ գույն օգտագործելու համար"
   enter_a_score_to_test_c6f89f4a: "Մուտքագրեք գնահատականը թեստի համար"
+  enter_the_date_you_would_like_to_navigate_to_a712de47: "Մուտքագրեք այն ամսաթիվը, որին կցանկանայիք անցնել"
   enter_your_question_and_multiple_answers_31370054: "Մուտքագրեք Ձեր հարցը եւ պատասխանների տարբերակները:"
   enter_your_question_text_4729b886: "Մուտքագրեք Ձեր հարցը"
   enter_your_question_text_students_will_see_the_que_f19af9e9: "Մուտքագրեք Ձեր հարցը: Ուսանողները կտեսնեն հարցը եւ դրան կից դաշտում կլրացնեն իրենց պատասխանը:"
@@ -7223,6 +7231,8 @@ hy:
           
           %{users}:
           Այնուամենայնիվ, շարունակե՞լ:
+    course_average: "Դասընթացի միջին գնահատական "
+    course_median: "Դասընթացի մեդիան"
     crocodoc_expiring: "Ձեր Crocodoc սեսիայի ժամանակը շուտող կլրանա: Կրկին բեռնեք պատուհանը աշխատանքը չկորցնելու համար: "
     dialog_button: 
       aria_record: "Սեղմեք գրանցելու համար"
@@ -11057,6 +11067,7 @@ hy:
     must_submit_incomplete: "պետք է ուղարկի հանձնարարությունը"
     must_view_complete: "դիտել է էջը"
     must_view_incomplete: "պետք է դիտի էջը"
+  month_4b83b95f: Ամիս
   month_s_5c17590e: Ամիս(ներ)
   moodle_dropdown_many_warning_title: "Այս շտեմարանում %{count} բացվող ցուցակների մի քանի հարցեր  ներմուծվել են սխալ ձևով"
   moodle_dropdown_warning_title: "Բացվող ցուցակների մի քանի հարցեր  կարող են սխալ ձևով ներմուծված լինել"
@@ -17240,6 +17251,7 @@ hy:
   waiting_for_attempted_login_6d00cb49: "Համակարգ մուտք գործելու սպասում "
   warning_crocodoc_has_limitations_when_used_in_fire_8ab414e6: "Նախազգուշացում. Crocodoc-ն ունի սահմանափակումներ Firefox-ի օգտագոծման ժամանակ: Մեկնաբանությունները երբեմն կարող են չպահպանվել:"
   warning_for_improved_accessibility_in_moving_files_71e1028b: "Նախազգուշացում. ֆայլերը տեղափոխելիս հասանելիության բարելավման համար օգտագործեք մենյուի Անցնել Երկխոսության օպցիան:"
+  warning_for_improved_accessibility_please_use_the__1075c150: "Ուշադրություն. հասանելիության բարելավման համար խնդրում ենք օգտվել \"Օրակարգի դիտում\" օրացույցից"
   warning_icon_f64936d7: "նախազգուշացման պատկերը"
   warnings: 
     test_install: 
@@ -17274,6 +17286,7 @@ hy:
   webct_file_description: "Blackboard Vista/CE, WebCT 6+ դասընթաց"
   webct_name: "Blackboard Vista/CE (WebCT)"
   website_url_177fc1dc: "Վեբ-կայքի url հասցեն"
+  week_1f945ddd: Շաբաթ
   week_s_cb1492ee: Շաբաթ(ներ)
   welcome_to_the_canvas_theme_editor_73091d1: "Ձեզ ողջունում է Canvas-"
   welcome_to_your_courses_to_customize_the_list_of_c_22de652e: "Բարի գալուստ ձեր դասընթացներին: Դասընթացների ցուցակը կարգաբերելու համար սեղմեք \"Բոլոր դասընթացները\" հղումը և աստղանիշով նշեք դասընթացները ցուցադրելու համար:"

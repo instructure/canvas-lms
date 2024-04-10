@@ -26,11 +26,18 @@ import {DiscussionEntryVersion} from '../../../../graphql/DiscussionEntryVersion
 
 const setup = ({
   author = User.mock({
+    _id: '2',
     displayName: 'Harry Potter',
     courseRoles: ['StudentEnrollment', 'TaEnrollment'],
+    htmlUrl: 'http://test.host/courses/1/users/2',
   }),
   anonymousAuthor = null,
-  editor = User.mock({_id: '1', displayName: 'Severus Snape'}),
+  editor = User.mock({
+    _id: '1',
+    displayName: 'Severus Snape',
+    courseRoles: ['StudentEnrollment'],
+    htmlUrl: 'http://test.host/courses/1/users/1',
+  }),
   isUnread = false,
   isForcedRead = false,
   isSplitView = false,
@@ -74,6 +81,64 @@ describe('AuthorInfo', () => {
   it('renders the author name when there is an author', () => {
     const container = setup()
     expect(container.getByText('Harry Potter')).toBeInTheDocument()
+  })
+
+  it('renders author name with link to the author profile page', () => {
+    const container = setup()
+    const link = container.getByRole('link', {name: 'Harry Potter'})
+    expect(link).toHaveAttribute('href', 'http://test.host/courses/1/users/2')
+  })
+
+  it('renders editor name with link to the author profile page', () => {
+    const container = setup()
+    const link = container.getByRole('link', {name: 'Severus Snape'})
+    expect(link).toHaveAttribute('href', 'http://test.host/courses/1/users/1')
+  })
+
+  it('has the necessary attributes for the StudentContextCardTrigger component when the author is a student', () => {
+    ENV.course_id = '1'
+    const container = setup()
+    const student_context_card_trigger_container = container.getByTestId(
+      'student_context_card_trigger_container_author'
+    )
+    expect(student_context_card_trigger_container).toHaveAttribute(
+      'class',
+      'student_context_card_trigger'
+    )
+    expect(student_context_card_trigger_container).toHaveAttribute('data-student_id', '2')
+    expect(student_context_card_trigger_container).toHaveAttribute('data-course_id', '1')
+  })
+
+  it('has the necessary attributes for the StudentContextCardTrigger component when the editor is a student', () => {
+    ENV.course_id = '1'
+    const container = setup()
+    const student_context_card_trigger_container = container.getByTestId(
+      'student_context_card_trigger_container_editor'
+    )
+    expect(student_context_card_trigger_container).toHaveAttribute(
+      'class',
+      'student_context_card_trigger'
+    )
+    expect(student_context_card_trigger_container).toHaveAttribute('data-student_id', '1')
+    expect(student_context_card_trigger_container).toHaveAttribute('data-course_id', '1')
+  })
+
+  it('does not have a class of student context card trigger when the author is not a student', () => {
+    ENV.course_id = '1'
+    const container = setup({author: User.mock({courseRoles: ['TeacherEnrollment']})})
+    const student_context_card_trigger_container = container.getByTestId(
+      'student_context_card_trigger_container_author'
+    )
+    expect(student_context_card_trigger_container).toHaveAttribute('class', '')
+  })
+
+  it('does not have a class of student context card trigger when the editor is not a student', () => {
+    ENV.course_id = '1'
+    const container = setup({editor: User.mock({_id: '1', courseRoles: ['TeacherEnrollment']})})
+    const student_context_card_trigger_container = container.getByTestId(
+      'student_context_card_trigger_container_editor'
+    )
+    expect(student_context_card_trigger_container).toHaveAttribute('class', '')
   })
 
   it('does not render the authors pronouns when it is not provided', () => {
@@ -151,7 +216,8 @@ describe('AuthorInfo', () => {
 
     it('renders the edited date', () => {
       const container = setup()
-      expect(container.getByText('Edited by Severus Snape Feb 2 2:00pm')).toBeInTheDocument()
+      const editedByTextElement = container.getByTestId('editedByText')
+      expect(editedByTextElement.textContent).toEqual('Edited by Severus Snape Feb 2 2:00pm')
     })
 
     it('renders the last reply at date', () => {

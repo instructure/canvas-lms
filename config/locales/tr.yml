@@ -1237,6 +1237,8 @@ tr:
               check_box: "Grup Üyeliği CSV"
           groups: 
             check_box: "Gruplar CSV"
+          include_deleted: 
+            check_box: "Silinen Nesneleri İçer"
           sections: 
             check_box: "Bölümler CSV"
           terms: 
@@ -2035,6 +2037,7 @@ tr:
   add_domain_f15bc6c1: "Alan Adı Ekle"
   add_domain_lookup_825f9eb7: "Alan Adı Araması"
   add_email_address_aef3b61: "Eposta Adresi Ekle"
+  add_event_9e21d0ff: "Olay Ekle"
   add_existing_content_7e36da66: "Varolan bir içeriği ekle"
   add_external_feed_6d437a28: "Dış Kaynak Ekle"
   add_feed_49ed1cb2: "Besleme Ekle"
@@ -2126,6 +2129,7 @@ tr:
   after_last_attempt_c9168da2: "Son Teşebbüsten Sonra"
   after_the_assignment_is_graded_53754607: "Ödev notlandırıldıktan sonra"
   after_the_due_date_eee89c9c: "Bitiş tarihinden sonra"
+  agenda_b010136d: Ajanda
   ahead_21f22939: İlerde
   ajax_errors: 
     error_heading: "Ajax Hatası: %{status_code}"
@@ -4643,6 +4647,7 @@ tr:
   comm_messages: 
     from_beginning: başlangıç
     to_now: şimdi
+  comment_7ef1428e: Yorum
   comment_by_replying_to_this_message_or_join_the_co_26d42fde: "Bu mesaja cevap yazarak yorum yapın veya %{link} bağlantısına tıklayarak karşılıklı konuşmaya katılın."
   comment_from_files: 
     one: "Ekli dosyaya bakın"
@@ -6720,6 +6725,7 @@ tr:
     url: URL
   create_new_discussions_6ab69da2: "Yeni tartışma oluştur"
   create_new_e0946c49: "Yeni oluştur"
+  create_new_event_e9fb2fb6: "Yeni Bir Olay Oluştur"
   create_quiz_d08bb72a: "Kısa Sınav Oluştur"
   create_slots_71dbb2f8: "Aralıklar Oluştur"
   create_theme_based_on_40651ed3: "Şunu baz alarak tema oluşturun"
@@ -8010,6 +8016,7 @@ tr:
   enter_canvas_user_id_to_substitute_the_user_s_uniq_b2a75735: "Kullanıcının özel Canvas Kimliğini değiştireceğiniz \"{{CANVAS_USER_ID}}\" i girin."
   enter_grades_as_e113e606: "Notları şu şekilde gir"
   enter_or_find_an_external_tool_url_6aebbd0d: "Harici Araç URL'sini girin ya da arayın"
+  enter_the_date_you_would_like_to_navigate_to_a712de47: "Gitmek istediğiniz tarihi girin."
   enter_your_question_and_multiple_answers_31370054: "Sorunuzu ve çoklu cevaplarınızı giriniz."
   enter_your_question_specifying_where_each_blank_sh_2c6e8035: "Her boşluğun nereye geleceğini belirterek sorunuzu girin. Öğrencilerin her boşluktaki metin kutularına doğru cevabı yazmaları gerekiyor."
   enter_your_question_specifying_where_each_dropdown_b428a9ff: "Her sarkık menünün nerede olacağını belirterek sorunuzu girin. Sonra her sarkık menü için olası cevapları belirleyin."
@@ -13126,6 +13133,7 @@ tr:
     must_submit_incomplete: "ödevi göndermeli"
     must_view_complete: "sayfayı görüntüledi"
     must_view_incomplete: "sayfayı görüntülemeli"
+  month_4b83b95f: Ay
   month_s_5c17590e: Ay(lar)
   moodle_dropdown_many_warning_title: "Bu soru bankasında  %{count} sayıda doğru aktarılamama ihtimali olan Çoklu Açılır Kutu şeklinde sorular bulunmaktadır."
   moodle_dropdown_warning_title: "Çoklu Açılır Kutular sorusu doğru içeri aktarılmamış olabilir"
@@ -19889,6 +19897,7 @@ tr:
   warning_6576b5b8: uyarı
   warning_aacb8c24: Uyarı
   warning_for_improved_accessibility_in_moving_files_71e1028b: "Uyarı: Dosyaları taşımada daha gelişmiş bir erişim için lütfen menüdeki Diyaloğa Taşı seçeneğini kullanın. "
+  warning_for_improved_accessibility_please_use_the__1075c150: "Uyarı: Daha gelişmiş erişilebilirllik için lütfen \"Gündem görünümü\" Takvimini kullanın."
   warnings: 
     test_install: 
       periodic_message: "Bu Canvas kurulumu sadece test işlemi içindir ve belirli aralıklarda sıfırlanacaktır."
@@ -19923,6 +19932,7 @@ tr:
   webct_file_description: "Blackboard Vista/CE, WebCT 6+ Dersi"
   webct_name: "Blackboard Vista/CE (WebCT)"
   website_url_177fc1dc: "Web Sayfası URL"
+  week_1f945ddd: Hafta
   week_s_cb1492ee: Hafta(lar)
   weight_of_final_abbbe82f: "Final'in %{weight}"
   welcome_to_the_canvas_theme_editor_73091d1: "Canvas Tema Editörüne Hoşgeldiniz"

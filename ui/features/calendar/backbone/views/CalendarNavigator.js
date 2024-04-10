@@ -139,7 +139,7 @@ CalendarNavigator.prototype._currentSelectedDate = function () {
 CalendarNavigator.prototype._dateFieldSelect = function () {
   const data = this._enterKeyData || this._currentSelectedDate()
   if (!(data.invalid || data.blank)) {
-    this._triggerDate(data['unfudged-date'])
+    this._triggerDate(data.unfudgedDate)
   }
   return this.hidePicker()
 }

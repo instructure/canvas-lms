@@ -18,7 +18,7 @@
 
 import React, {useState, useEffect, useContext} from 'react'
 import PropTypes from 'prop-types'
-import {UsageRights} from '../../components/GradedDiscussionOptions/UsageRights'
+import {UsageRights} from '../../components/DiscussionOptions/UsageRights'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {defaultUsageRights} from '../../util/usageRightsConstants'
 

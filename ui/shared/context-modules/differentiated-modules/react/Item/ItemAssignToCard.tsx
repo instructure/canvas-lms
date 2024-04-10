@@ -269,7 +269,12 @@ export default function ItemAssignToCard({
     (_event: React.SyntheticEvent, value: string | undefined) => {
       const defaultDueTime = ENV.DEFAULT_DUE_TIME ?? '23:59:00'
       const newDueDate = dueDate ? value : setTimeToStringDate(defaultDueTime, value)
-      setDueDate(newDueDate || null)
+      // When user uses calendar pop-up type is "click", but for KB is "blur"
+      if (_event.type !== 'blur') {
+        setDueDate(newDueDate || null)
+      } else {
+        setTimeout(() => setDueDate(newDueDate || null), 0)
+      }
     },
     [dueDate]
   )
@@ -279,7 +284,12 @@ export default function ItemAssignToCard({
       const newAvailableFromDate = availableFromDate
         ? value
         : setTimeToStringDate('00:00:00', value)
-      setAvailableFromDate(newAvailableFromDate || null)
+      // When user uses calendar pop-up type is "click", but for KB is "blur"
+      if (_event.type !== 'blur') {
+        setAvailableFromDate(newAvailableFromDate || null)
+      } else {
+        setTimeout(() => setAvailableFromDate(newAvailableFromDate || null), 0)
+      }
     },
     [availableFromDate]
   )
@@ -287,7 +297,12 @@ export default function ItemAssignToCard({
   const handleAvailableToDateChange = useCallback(
     (_event: React.SyntheticEvent, value: string | undefined) => {
       const newAvailableToDate = availableToDate ? value : setTimeToStringDate('23:59:00', value)
-      setAvailableToDate(newAvailableToDate || null)
+      // When user uses calendar pop-up type is "click", but for KB is "blur"
+      if (_event.type !== 'blur') {
+        setAvailableToDate(newAvailableToDate || null)
+      } else {
+        setTimeout(() => setAvailableToDate(newAvailableToDate || null), 0)
+      }
     },
     [availableToDate]
   )

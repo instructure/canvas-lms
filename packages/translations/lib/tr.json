@@ -287,6 +287,9 @@
     "files_index_af7c662b": {
         "message": "Dosya Başlıkları"
     },
+    "find_8d605019": {
+        "message": "Ara"
+    },
     "finish_bc343002": {
         "message": "Tamamla"
     },
@@ -455,6 +458,9 @@
     "no_results_940393cf": {
         "message": "Sonuç yok."
     },
+    "no_results_found_58717065": {
+        "message": "Sonuç bulunamadı"
+    },
     "none_3b5e34d2": {
         "message": "Yok"
     },
@@ -484,6 +490,9 @@
     },
     "preview_53003fd2": {
         "message": "Önizleme"
+    },
+    "previous_bd2ac015": {
+        "message": "Önceki"
     },
     "published_c944a23d": {
         "message": "yayınlandı"

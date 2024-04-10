@@ -188,7 +188,8 @@ class ConversationMessage < ActiveRecord::Base
   def recipients
     return [] unless conversation
 
-    subscribed = subscribed_participants.reject { |u| u.id == author_id }.map { |x| x.becomes(User) }
+    subscribed_ids = subscribed_participants.reject { |u| u.id == author_id }.map(&:id)
+    subscribed = User.where(id: subscribed_ids)
     ActiveRecord::Associations.preload(conversation_message_participants, :user)
     participants = conversation_message_participants.map(&:user)
     subscribed & participants

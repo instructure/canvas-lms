@@ -51,7 +51,7 @@ describe "international sms" do
           expect(find(".intl_rates_may_apply")).to have_attribute("style", "display: none;")
         else
           # display text messaging rate disclaimer
-          expect(find(".intl_rates_may_apply")).to have_attribute("style", "display: inline;")
+          expect(find(".intl_rates_may_apply")).to have_attribute("style", "")
         end
       end
     end

@@ -149,6 +149,9 @@
     "files_index_af7c662b": {
         "message": "Ֆայլերի ցուցիչ"
     },
+    "find_8d605019": {
+        "message": "Գտնել"
+    },
     "format_4247a9c5": {
         "message": "Ֆորմատ"
     },
@@ -284,6 +287,9 @@
     "no_results_940393cf": {
         "message": "No results."
     },
+    "no_results_found_58717065": {
+        "message": "Արդյունքներ չեն ստացվել"
+    },
     "none_3b5e34d2": {
         "message": "Ոչինչ չկա"
     },
@@ -313,6 +319,9 @@
     },
     "preview_53003fd2": {
         "message": "Նախնական դիտում"
+    },
+    "previous_bd2ac015": {
+        "message": "Նախորդը"
     },
     "published_c944a23d": {
         "message": "հրապարակված"

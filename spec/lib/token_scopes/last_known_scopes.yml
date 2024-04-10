@@ -1691,6 +1691,8 @@
   path: "/api/v1/users/:user_id/content_exports/:id"
 - verb: PUT
   path: "/api/v1/users/:user_id/content_exports/:id/fail"
+- verb: PUT
+  path: "/api/v1/courses/:course_id/content_exports/:id"
 - verb: GET
   path: "/api/v1/courses/:course_id/content_list"
 - verb: GET
@@ -2171,6 +2173,8 @@
   path: "/api/v1/accounts/:account_id/admins/self"
 - verb: GET
   path: "/api/v1/courses/:course_id/smartsearch"
+- verb: GET
+  path: "/api/v1/courses/:course_id/smartsearch/log"
 - verb: POST
   path: "/api/v1/courses/:course_id/assignments/:assignment_id/retry_alignment_clone"
 - verb: POST

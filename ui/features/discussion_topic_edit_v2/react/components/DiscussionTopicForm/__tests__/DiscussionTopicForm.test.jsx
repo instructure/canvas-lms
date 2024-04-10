@@ -71,6 +71,7 @@ describe('DiscussionTopicForm', () => {
       K5_HOMEROOM_COURSE: false,
       current_user: {},
       STUDENT_PLANNER_ENABLED: true,
+      DISCUSSION_CHECKPOINTS_ENABLED: true,
     }
   })
 
@@ -409,6 +410,66 @@ describe('DiscussionTopicForm', () => {
       })
 
       expect(document.queryByTestId('group-category-not-editable')).toBeFalsy()
+    })
+
+    it('displays the checkpoints checkbox when the Graded option is selected and discussion checkpoints flag is on', () => {
+      const {queryByTestId, getByLabelText} = setup()
+      expect(queryByTestId('checkpoints-checkbox')).not.toBeInTheDocument()
+      getByLabelText('Graded').click()
+      expect(queryByTestId('checkpoints-checkbox')).toBeInTheDocument()
+    })
+
+    it('does not display the checkpoints checkbox when the Graded option is not selected and discussion checkpoints flag is on', () => {
+      const {queryByTestId} = setup()
+      expect(queryByTestId('checkpoints-checkbox')).not.toBeInTheDocument()
+    })
+
+    it('does not display the checkpoints checkbox when the discussion checkpoints flag is off', () => {
+      window.ENV.DISCUSSION_CHECKPOINTS_ENABLED = false
+
+      const {queryByTestId, getByLabelText} = setup()
+      getByLabelText('Graded').click()
+      expect(queryByTestId('checkpoints-checkbox')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('Checkpoints', () => {
+    it('toggles the checkpoints checkbox when clicked', () => {
+      const {getByTestId, getByLabelText} = setup()
+      getByLabelText('Graded').click()
+      const checkbox = getByTestId('checkpoints-checkbox')
+      checkbox.click()
+      expect(checkbox.checked).toBe(true)
+      checkbox.click()
+      expect(checkbox.checked).toBe(false)
+    })
+    describe('Checkpoints Settings', () => {
+      it('increments and decrements the checkpoints settings points possible reply to topic fields', () => {
+        const {getByTestId, getByLabelText} = setup()
+        getByLabelText('Graded').click()
+        const checkbox = getByTestId('checkpoints-checkbox')
+        checkbox.click()
+        const numberInputReplyToTopic = getByTestId('points-possible-input-reply-to-topic')
+        expect(numberInputReplyToTopic.value).toBe('0')
+        fireEvent.click(numberInputReplyToTopic)
+        fireEvent.keyDown(numberInputReplyToTopic, {keyCode: 38})
+        expect(numberInputReplyToTopic.value).toBe('1')
+        fireEvent.keyDown(numberInputReplyToTopic, {keyCode: 40})
+        expect(numberInputReplyToTopic.value).toBe('0')
+      })
+      it('increments and decrements the checkpoints settings points possible reply to entry fields', () => {
+        const {getByTestId, getByLabelText} = setup()
+        getByLabelText('Graded').click()
+        const checkbox = getByTestId('checkpoints-checkbox')
+        checkbox.click()
+        const numberInputReplyToEntry = getByTestId('points-possible-input-reply-to-entry')
+        expect(numberInputReplyToEntry.value).toBe('0')
+        fireEvent.click(numberInputReplyToEntry)
+        fireEvent.keyDown(numberInputReplyToEntry, {keyCode: 38})
+        expect(numberInputReplyToEntry.value).toBe('1')
+        fireEvent.keyDown(numberInputReplyToEntry, {keyCode: 40})
+        expect(numberInputReplyToEntry.value).toBe('0')
+      })
     })
   })
 })

@@ -117,7 +117,8 @@ module BookmarkedCollection
     TYPE_MAP = {
       string: ->(val) { val.is_a?(String) },
       integer: ->(val) { val.is_a?(Integer) },
-      datetime: ->(val) { val.is_a?(DateTime) || val.is_a?(Time) || (val.is_a?(String) && !!(DateTime.parse(val) rescue false)) }
+      datetime: ->(val) { val.is_a?(DateTime) || val.is_a?(Time) || (val.is_a?(String) && !!(DateTime.parse(val) rescue false)) },
+      float: ->(val) { val.is_a?(Float) }
     }.freeze
 
     def existing_column_definition(col_name)

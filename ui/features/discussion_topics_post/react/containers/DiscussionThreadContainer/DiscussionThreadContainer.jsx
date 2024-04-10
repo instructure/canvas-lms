@@ -470,10 +470,12 @@ export const DiscussionThreadContainer = props => {
         mobile: {
           marginDepth: `calc(${theme.variables.spacing.medium} * ${props.depth})`,
           padding: 'small xx-small small',
+          toolbarLeftPadding: undefined,
         },
         desktop: {
           marginDepth: `calc(${theme.variables.spacing.xxLarge} * ${props.depth})`,
           padding: 'small medium small',
+          toolbarLeftPadding: props.depth === 0 ? '0 0 0 xx-small' : undefined,
         },
       }}
       render={responsiveProps => (
@@ -586,7 +588,7 @@ export const DiscussionThreadContainer = props => {
                     quotedEntry={props.discussionEntry.quotedEntry}
                   >
                     {threadActions.length > 0 && (
-                      <View as="div">
+                      <View as="div" padding={responsiveProps.toolbarLeftPadding}>
                         <ThreadingToolbar
                           searchTerm={searchTerm}
                           discussionEntry={props.discussionEntry}

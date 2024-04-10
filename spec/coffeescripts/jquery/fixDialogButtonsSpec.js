@@ -80,6 +80,8 @@ test('handles buttons', function () {
   this.clock.tick(14)
   equal($submitButton.text(), 'while loading', 'copies over text-while-loading on buttons')
   deferred.resolve()
+  // wait for the resolve to do its thing
+  this.clock.tick(14)
   equal($submitButton.text(), originalButtonText, 'restores text-while-loading')
   msg = 'make sure clicking on the .dialog_closer causes dialog to close'
   const $closer = $dialog

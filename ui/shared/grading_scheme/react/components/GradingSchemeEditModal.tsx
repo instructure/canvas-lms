@@ -31,7 +31,7 @@ import {Alert} from '@instructure/ui-alerts'
 
 const I18n = useI18nScope('GradingSchemeViewModal')
 
-type Props = {
+export type GradingSchemeEditModalProps = {
   open: boolean
   gradingScheme?: GradingScheme
   handleCancelEdit: (gradingSchemeId: string) => void
@@ -42,7 +42,6 @@ type Props = {
   ) => void
   defaultGradingSchemeTemplate: GradingScheme
   defaultPointsGradingScheme: GradingSchemeTemplate
-  archivedGradingSchemesEnabled: boolean
   viewingFromAccountManagementPage?: boolean
   isCourseDefault?: boolean
 }
@@ -52,12 +51,11 @@ const GradingSchemeEditModal = ({
   handleCancelEdit,
   openDeleteModal,
   handleUpdateScheme,
-  archivedGradingSchemesEnabled,
   defaultGradingSchemeTemplate,
   defaultPointsGradingScheme,
   viewingFromAccountManagementPage,
   isCourseDefault,
-}: Props) => {
+}: GradingSchemeEditModalProps) => {
   const gradingSchemeUpdateRef = useRef<GradingSchemeInputHandle>(null)
   if (!gradingScheme) {
     return <></>
@@ -74,6 +72,7 @@ const GradingSchemeEditModal = ({
       onDismiss={() => handleCancelEdit(gradingScheme.id)}
       label={I18n.t('Edit Grading Scheme')}
       size="small"
+      data-testid="grading-scheme-edit-modal"
     >
       <Modal.Header>
         <CloseButton
@@ -81,8 +80,9 @@ const GradingSchemeEditModal = ({
           placement="end"
           offset="small"
           onClick={() => handleCancelEdit(gradingScheme.id)}
+          data-testid="grading-scheme-edit-modal-close-button"
         />
-        <Heading>{gradingScheme.title}</Heading>
+        <Heading data-testid="grading-scheme-edit-modal-title">{gradingScheme.title}</Heading>
       </Modal.Header>
       <Modal.Body padding="medium medium x-small">
         {gradingScheme.id !== '' && editSchemeDataDisabled && (
@@ -128,10 +128,9 @@ const GradingSchemeEditModal = ({
             },
           }}
           ref={gradingSchemeUpdateRef}
-          archivedGradingSchemesEnabled={archivedGradingSchemesEnabled}
-          onSave={modifiedGradingScheme =>
+          onSave={modifiedGradingScheme => {
             handleUpdateScheme(modifiedGradingScheme, gradingScheme.id)
-          }
+          }}
           editSchemeDataDisabled={editSchemeDataDisabled}
         />
       </Modal.Body>
@@ -141,13 +140,20 @@ const GradingSchemeEditModal = ({
             <Button
               onClick={() => openDeleteModal(gradingScheme)}
               disabled={editSchemeDataDisabled}
+              data-testid="grading-scheme-edit-modal-delete-button"
             >
               {I18n.t('Delete')}
             </Button>
             <Button onClick={() => handleCancelEdit(gradingScheme.id)} margin="0 x-small 0 x-small">
               {I18n.t('Cancel')}
             </Button>
-            <Button onClick={() => gradingSchemeUpdateRef.current?.savePressed()} color="primary">
+            <Button
+              onClick={() => {
+                gradingSchemeUpdateRef.current?.savePressed()
+              }}
+              color="primary"
+              data-testid="grading-scheme-edit-modal-update-button"
+            >
               {I18n.t('Save')}
             </Button>
           </Flex.Item>

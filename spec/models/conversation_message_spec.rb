@@ -315,6 +315,30 @@ describe ConversationMessage do
           expect(m.conversation.reload.conversation_messages.first.media_comment).to eq(@mc)
         end
       end
+
+      it "returns correct recipients for cross-shard users" do
+        @shard1.activate do
+          @account_1 = Account.create
+          @student = user_with_pseudonym(active_all: true, account: @account_1)
+        end
+        @shard2.activate do
+          @account_2 = Account.create
+          course_with_teacher(active_all: true)
+          @teacher_1 = @teacher
+          @course_1 = @course
+          @course_1.enroll_student(@student).accept!
+
+          @cp = @teacher_1.initiate_conversation([@student])
+          @convo = @cp.conversation
+          @m1 = @cp.add_message("Hi from shard 2", root_account_id: @account_2)
+        end
+
+        @shard1.activate do
+          @m2 = @convo.add_message(@student, "replying from shard 1", only_users: [@teacher_1], root_account_id: @account_1)
+          @m2 = ConversationMessage.find(@m2.id)
+          expect(@m2.recipients).to include(@teacher_1)
+        end
+      end
     end
   end
 

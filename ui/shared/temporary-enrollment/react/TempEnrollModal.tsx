@@ -95,6 +95,7 @@ export function TempEnrollModal(props: Props) {
   const [isViewingAssignFromEdit, setIsViewingAssignFromEdit] = useState(false)
   const [buttonsDisabled, setButtonsDisabled] = useState(true)
   const [loading, setLoading] = useState(false)
+  const [wasReset, setWasReset] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isModalOpenAnimationComplete, setIsModalOpenAnimationComplete] = useState(false)
   const [tempEnrollmentsPairing, setTempEnrollmentsPairing] = useState<Enrollment[] | null>(null)
@@ -143,6 +144,7 @@ export function TempEnrollModal(props: Props) {
   const handleModalReset = () => {
     setPage(0)
     setEnrollment(null)
+    setWasReset(true)
     setTempEnrollmentsPairing(null)
     setIsViewingAssignFromEdit(false)
     setIsFetchEnrollmentDataComplete(false)
@@ -184,6 +186,7 @@ export function TempEnrollModal(props: Props) {
   const handleCloseModal = () => {
     if (open) {
       setOpen(false)
+      handleModalReset()
     }
   }
 
@@ -291,6 +294,7 @@ export function TempEnrollModal(props: Props) {
           searchFail={handleModalReset}
           searchSuccess={handleSetEnrollmentFromSearch}
           foundUser={enrollment}
+          wasReset={wasReset}
         />
       )
     }
@@ -332,7 +336,7 @@ export function TempEnrollModal(props: Props) {
         !props.isEditMode && (
           <Flex.Item key="nextOrSubmit">
             <Button
-              disabled={buttonsDisabled}
+              disabled={buttonsDisabled || (enrollment === null && page === 1)}
               color="primary"
               onClick={handleGoForward}
               {...analyticProps(page === 2 ? 'Submit' : 'Next')}
@@ -363,34 +367,36 @@ export function TempEnrollModal(props: Props) {
 
   return (
     <>
-      <Modal
-        overflow="scroll"
-        open={open}
-        size="large"
-        label={I18n.t('Create a Temporary Enrollment')}
-        shouldCloseOnDocumentClick={false}
-        themeOverride={{smallMaxWidth: '30em'}}
-        onEnter={handleModalEnter}
-        onEntered={handleModalEntered}
-        onExit={handleModalExit}
-        onDismiss={handleCloseModal}
-        onExited={handleModalReset}
-      >
-        <Modal.Header>
-          {renderCloseButton()}
-          <Heading tabIndex={-1} level="h2">
-            {title}
-          </Heading>
-        </Modal.Header>
+      {open && (
+        <Modal
+          overflow="scroll"
+          open={open}
+          size="large"
+          label={I18n.t('Create a Temporary Enrollment')}
+          shouldCloseOnDocumentClick={false}
+          themeOverride={{smallMaxWidth: '30em'}}
+          onEnter={handleModalEnter}
+          onEntered={handleModalEntered}
+          onExit={handleModalExit}
+          onDismiss={handleCloseModal}
+          onExited={handleModalReset}
+        >
+          <Modal.Header>
+            {renderCloseButton()}
+            <Heading tabIndex={-1} level="h2">
+              {title}
+            </Heading>
+          </Modal.Header>
 
-        <Modal.Body>
-          {errorMessage ? renderError() : loading ? renderLoader() : renderBody()}
-        </Modal.Body>
+          <Modal.Body>
+            {errorMessage ? renderError() : loading ? renderLoader() : renderBody()}
+          </Modal.Body>
 
-        <Modal.Footer>
-          <Flex gap="small">{renderButtons()}</Flex>
-        </Modal.Footer>
-      </Modal>
+          <Modal.Footer>
+            <Flex gap="small">{renderButtons()}</Flex>
+          </Modal.Footer>
+        </Modal>
+      )}
 
       {cloneElement(props.children, {
         onClick: handleChildClick(props.children.props.onClick),

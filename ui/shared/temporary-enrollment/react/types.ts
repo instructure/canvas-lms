@@ -86,6 +86,16 @@ export interface User {
   user_id?: string
 }
 
+export interface DuplicateUser {
+  address?: string
+  account_name?: string
+  email?: string
+  user_id: string
+  user_name: string
+  login_id?: string
+  sis_user_id?: string
+}
+
 export interface NodeStructure {
   children: NodeStructure[]
   enrollId?: string

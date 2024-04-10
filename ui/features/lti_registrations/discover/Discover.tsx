@@ -17,11 +17,32 @@
  */
 
 import React from 'react'
+import {Flex} from '@instructure/ui-flex'
+
+import ProductCard from './components/ProductCard'
+
+const product = {
+  name: 'Product Name',
+  company: 'Company',
+  companyUrl: 'https://google.com',
+  tagline: 'This product supports LTI 1.3',
+  logoUrl:
+    'https://media.istockphoto.com/id/1147544807/vector/thumbnail-image-vector-graphic.jpg?s=612x612&w=0&k=20&c=rnCKVbdxqkjlcs3xH87-9gocETqpspHFXu5dIGB4wuM=',
+}
 
 export const Discover = () => {
+  const renderProducts = () => {
+    return [...Array(10)].map((e, i) => {
+      const id = `test-id-${i}`
+      return <ProductCard product={{...product, id}} />
+    })
+  }
   return (
     <div>
       <h1>This is the Discover page</h1>
+      <Flex gap="medium" wrap="wrap">
+        {renderProducts()}
+      </Flex>
     </div>
   )
 }

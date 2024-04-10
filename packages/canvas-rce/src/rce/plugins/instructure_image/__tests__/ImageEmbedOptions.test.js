@@ -642,6 +642,12 @@ describe('RCE > Plugins > Instructure Image > ImageEmbedOptions', () => {
         expect(getVideoOptions().attachmentId).toEqual('17')
       })
 
+      it('is included with non relative src', () => {
+        $video.innerHTML =
+          '<iframe allow="fullscreen" allowfullscreen data-media-id="17" data-media-type="video" src="https://canvas.docker/media_attachments_iframe/17?type=video&embedded=true" style="width:400px;height:225px;display:inline-block;" title="Video player for filename.mov"></iframe>'
+        expect(getVideoOptions().attachmentId).toEqual('17')
+      })
+
       it('is not included', () => {
         RCEGlobals.getFeatures = jest.fn().mockReturnValue({media_links_use_attachment_id: false})
         expect(getVideoOptions().attachmentId).toBeUndefined()

@@ -50,10 +50,10 @@ GEM
       faraday-net_http (>= 2.0, < 3.2)
     faraday-net_http (3.1.0)
       net-http
-    i18n (1.14.1)
+    i18n (1.14.4)
       concurrent-ruby (~> 1.0)
     io-console (0.7.2)
-    irb (1.11.2)
+    irb (1.12.0)
       rdoc
       reline (>= 0.4.2)
     loofah (2.22.0)
@@ -61,7 +61,7 @@ GEM
       nokogiri (>= 1.12.0)
     method_source (1.0.0)
     mini_portile2 (2.8.5)
-    minitest (5.22.2)
+    minitest (5.22.3)
     net-http (0.4.1)
       uri
     nokogiri (1.15.5)

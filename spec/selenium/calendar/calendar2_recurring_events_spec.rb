@@ -419,8 +419,6 @@ describe "recurring events" do
     end
 
     it "deletes 'this event and all following' from a series" do
-      skip("editing of event series requires custom code that has been removed FOO-4336")
-
       get "/calendar"
 
       events = events_in_a_series("event in a series")
@@ -439,8 +437,6 @@ describe "recurring events" do
     end
 
     it "deletes 'all events' from a series" do
-      skip("editing of event series requires custom code that has been removed FOO-4336")
-
       get "/calendar"
 
       events = events_in_a_series("event in a series")
@@ -647,8 +643,6 @@ describe "recurring events" do
     end
 
     it "updates all events from series head" do
-      skip("editing of event series requires custom code that has been removed FOO-4336")
-
       get "/calendar"
 
       wait_for_ajaximations
@@ -697,8 +691,6 @@ describe "recurring events" do
     end
 
     it "updates this and following events in the series" do
-      skip("editing of event series requires custom code that has been removed FOO-4336")
-
       get "/calendar"
       wait_for_ajaximations
       events = events_in_a_series("event in a series")
@@ -747,8 +739,7 @@ describe "recurring events" do
     end
 
     it "updates the event calendar correctly" do
-      skip("editing of event series requires custom code that has been removed FOO-4336")
-
+      skip("editing the event calendar works in UI but not in selenium FOO-4336")
       get "/calendar"
 
       wait_for_ajaximations
@@ -873,8 +864,6 @@ describe "recurring events" do
     end
 
     it "shows all events in list after time change split" do
-      skip("editing of event series requires custom code that has been removed FOO-4336")
-
       get "/calendar2#view_name=month&view_start=2023-07-01"
       wait_for_ajaximations
 
@@ -909,8 +898,6 @@ describe "recurring events" do
     end
 
     it "shows all events in list after RRULE split" do
-      skip("editing of event series requires custom code that has been removed FOO-4336")
-
       get "/calendar2#view_name=month&view_start=2023-07-01"
       wait_for_ajaximations
 
@@ -946,8 +933,6 @@ describe "recurring events" do
     end
 
     it "shows title change doesn't split series" do
-      skip("editing of event series requires custom code that has been removed FOO-4336")
-
       get "/calendar2#view_name=month&view_start=2023-07-01"
       wait_for_ajaximations
 
@@ -995,8 +980,6 @@ describe "recurring events" do
     end
 
     it "shows events series that have been split with an edit in week view" do
-      skip("editing of event series requires custom code that has been removed FOO-4336")
-
       get "/calendar2#view_name=week&view_start=2023-07-16"
       wait_for_ajaximations
 
@@ -1030,8 +1013,6 @@ describe "recurring events" do
     end
 
     it "shows events series with RRULE change in week view" do
-      skip("editing of event series requires custom code that has been removed FOO-4336")
-
       target_day = Date.parse("2023-08-06")
       create_calendar_event_series(@course, "daily series for week", target_day, 1.hour, "FREQ=DAILY;INTERVAL=1;COUNT=6")
 
@@ -1080,8 +1061,6 @@ describe "recurring events" do
     end
 
     it "shows events series in agenda view after time change split" do
-      skip("editing of event series requires custom code that has been removed FOO-4336")
-
       get "/calendar2#view_name=agenda&view_start=2023-07-20"
       wait_for_ajaximations
 
@@ -1117,8 +1096,6 @@ describe "recurring events" do
     end
 
     it "shows events series in agenda view with RRULE change" do
-      skip("editing of event series requires custom code that has been removed FOO-4336")
-
       get "/calendar2#view_name=agenda&view_start=2023-07-20"
       wait_for_ajaximations
 

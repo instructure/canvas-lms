@@ -26,7 +26,7 @@ import {Button, CloseButton} from '@instructure/ui-buttons'
 
 const I18n = useI18nScope('GradingSchemeViewModal')
 
-type Props = {
+export type GradingSchemeDeleteModalProps = {
   open: boolean
   deletingGradingScheme: boolean
   selectedGradingScheme?: GradingScheme
@@ -38,8 +38,8 @@ const GradingSchemeDeleteModal = ({
   selectedGradingScheme,
   deletingGradingScheme,
   handleGradingSchemeDelete,
-  handleCloseDeleteModal: handleCloseDuplicateModal,
-}: Props) => {
+  handleCloseDeleteModal,
+}: GradingSchemeDeleteModalProps) => {
   if (!selectedGradingScheme) {
     return <></>
   }
@@ -47,18 +47,20 @@ const GradingSchemeDeleteModal = ({
     <Modal
       as="form"
       open={open}
-      onDismiss={handleCloseDuplicateModal}
+      onDismiss={handleCloseDeleteModal}
       label={I18n.t('Delete ') + selectedGradingScheme.title}
       size="small"
+      data-testid="grading-scheme-delete-modal"
     >
       <Modal.Header>
         <CloseButton
           screenReaderLabel={I18n.t('Close')}
           placement="end"
           offset="small"
-          onClick={handleCloseDuplicateModal}
+          onClick={handleCloseDeleteModal}
+          data-testid="grading-scheme-delete-modal-close-button"
         />
-        <Heading>
+        <Heading data-testid="grading-scheme-delete-modal-title">
           <TruncateText>{I18n.t('Delete ') + selectedGradingScheme.title}</TruncateText>
         </Heading>
       </Modal.Header>
@@ -66,13 +68,14 @@ const GradingSchemeDeleteModal = ({
       <Modal.Footer>
         <Flex justifyItems="end">
           <Flex.Item>
-            <Button onClick={handleCloseDuplicateModal} margin="0 x-small">
+            <Button onClick={handleCloseDeleteModal} margin="0 x-small">
               {I18n.t('Cancel')}
             </Button>
             <Button
               onClick={() => handleGradingSchemeDelete(selectedGradingScheme.id)}
               color="danger"
               disabled={deletingGradingScheme}
+              data-testid="grading-scheme-delete-modal-delete-button"
             >
               {I18n.t('Delete')}
             </Button>

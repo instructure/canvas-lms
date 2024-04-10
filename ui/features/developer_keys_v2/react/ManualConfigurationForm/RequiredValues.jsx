@@ -151,7 +151,7 @@ export default class RequiredValues extends React.Component {
         <TextArea
           name="public_jwk"
           label={I18n.t('Public JWK')}
-          value={toolConfiguration.public_jwk}
+          value={toolConfiguration.public_jwk || ''}
           maxHeight="10rem"
           resize="vertical"
           autoGrow={true}
@@ -168,7 +168,7 @@ export default class RequiredValues extends React.Component {
         <TextInput
           name="public_jwk_url"
           renderLabel={I18n.t('Public JWK URL')}
-          value={toolConfiguration.public_jwk_url}
+          value={toolConfiguration.public_jwk_url || ''}
           onChange={this.handlePublicJwkUrlChange}
           messages={
             showMessages && !toolConfiguration.public_jwk_url && !toolConfiguration.public_jwk
@@ -194,7 +194,7 @@ export default class RequiredValues extends React.Component {
             <Grid.Col>
               <TextInput
                 name="title"
-                value={toolConfiguration.title}
+                value={toolConfiguration.title || ''}
                 renderLabel={I18n.t('* Title')}
                 onChange={this.handleTitleChange}
                 messages={showMessages && !toolConfiguration.title ? validationMessage : []}
@@ -203,7 +203,7 @@ export default class RequiredValues extends React.Component {
             <Grid.Col>
               <TextArea
                 name="description"
-                value={toolConfiguration.description}
+                value={toolConfiguration.description || ''}
                 label={I18n.t('* Description')}
                 maxHeight="5rem"
                 onChange={this.handleDescriptionChange}
@@ -215,7 +215,7 @@ export default class RequiredValues extends React.Component {
             <Grid.Col>
               <TextInput
                 name="target_link_uri"
-                value={toolConfiguration.target_link_uri}
+                value={toolConfiguration.target_link_uri || ''}
                 renderLabel={I18n.t('* Target Link URI')}
                 onChange={this.handleTargetLinkUriChange}
                 messages={
@@ -226,7 +226,7 @@ export default class RequiredValues extends React.Component {
             <Grid.Col>
               <TextInput
                 name="oidc_initiation_url"
-                value={toolConfiguration.oidc_initiation_url}
+                value={toolConfiguration.oidc_initiation_url || ''}
                 renderLabel={I18n.t('* OpenID Connect Initiation Url')}
                 onChange={this.handleOidcInitiationUrlChange}
                 messages={

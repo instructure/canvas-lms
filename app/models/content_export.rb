@@ -34,12 +34,14 @@ class ContentExport < ActiveRecord::Base
   serialize :settings
 
   attr_writer :master_migration
+  attr_accessor :new_quizzes_export_url, :new_quizzes_export_state
 
   validates :context_id, :workflow_state, presence: true
 
   has_one :job_progress, class_name: "Progress", as: :context, inverse_of: :context
 
   before_save :assign_quiz_migration_limitation_alert
+  before_save :set_new_quizzes_export_settings
   before_create :set_global_identifiers
 
   # export types
@@ -639,6 +641,13 @@ class ContentExport < ActiveRecord::Base
       none
     end
   }
+
+  def set_new_quizzes_export_settings
+    return unless common_cartridge? && new_quizzes_export_state.present?
+
+    settings[:new_quizzes_export_url] = new_quizzes_export_url
+    settings[:new_quizzes_export_state] = new_quizzes_export_state
+  end
 
   private
 

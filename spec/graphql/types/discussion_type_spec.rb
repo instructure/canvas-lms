@@ -763,7 +763,7 @@ describe Types::DiscussionType do
                                                       context: @course,
                                                       user: @teacher,
                                                       editor: @teacher)
-        @discusion_teacher_author = GraphQLTypeTester.new(authored_discussion, current_user: @teacher)
+        @discusion_teacher_author = GraphQLTypeTester.new(authored_discussion, current_user: @teacher, request: ActionDispatch::TestRequest.create)
       end
 
       it "finds author course roles without extra variables" do
@@ -772,6 +772,16 @@ describe Types::DiscussionType do
 
       it "finds editor course roles without extra variables" do
         expect(@discusion_teacher_author.resolve("editor { courseRoles }")).to eq(["TeacherEnrollment"])
+      end
+
+      it "finds the author htmlUrl without extra variables" do
+        expected_url = "http://test.host/courses/#{@course.id}/users/#{@teacher.id}"
+        expect(@discusion_teacher_author.resolve("author { htmlUrl }")).to eq(expected_url)
+      end
+
+      it "finds the editor htmlUrl without extra variables" do
+        expected_url = "http://test.host/courses/#{@course.id}/users/#{@teacher.id}"
+        expect(@discusion_teacher_author.resolve("editor { htmlUrl }")).to eq(expected_url)
       end
     end
   end

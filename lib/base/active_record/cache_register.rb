@@ -73,7 +73,7 @@ module ActiveRecord
 
             if key_types.any?
               base_keys.group_by { |key| Canvas::CacheRegister.redis(key, ::Shard.current) }.each do |redis, node_base_keys|
-                node_base_keys.map { |k| key_types.map { |type| "{#{k}}/#{type}" } }.flatten.each_slice(1000) do |slice|
+                node_base_keys.map { |k| key_types.map { |type| "{#{k}}/#{type}" } }.each do |slice|
                   redis.del(*slice)
                 end
               rescue Redis::BaseConnectionError

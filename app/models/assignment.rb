@@ -85,6 +85,12 @@ class Assignment < AbstractAssignment
     sub_assignments.find_by(sub_assignment_tag:)
   end
 
+  include SmartSearchable
+  use_smart_search title_column: :title,
+                   body_column: :description,
+                   index_scope: ->(course) { course.assignments.active },
+                   search_scope: ->(course, user) { Assignments::ScopedToUser.new(course, user, course.assignments.active).scope }
+
   private
 
   def before_soft_delete

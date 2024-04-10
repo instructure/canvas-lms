@@ -23,7 +23,24 @@ module SmartSearch
     end
 
     def smart_search_available?(context)
-      api_key.present? && context&.feature_enabled?(:smart_search)
+      context&.feature_enabled?(:smart_search) && api_key.present?
+    end
+
+    def register_class(klass, index_scope_proc, search_scope_proc)
+      @search_info ||= []
+      @search_info << [klass, index_scope_proc, search_scope_proc]
+    end
+
+    def index_scopes(course)
+      @search_info.each do |_, proc, _|
+        yield proc.call(course)
+      end
+    end
+
+    def search_scopes(course, user)
+      @search_info.each do |klass, _, proc|
+        yield klass, proc.call(course, user)
+      end
     end
 
     def generate_embedding(input)
@@ -42,6 +59,46 @@ module SmartSearch
       raise response["error"]["message"] if response["error"]
 
       response["data"].pluck("embedding")[0]
+    end
+
+    def perform_search(context, user, query, type_filter = [])
+      embedding = SmartSearch.generate_embedding(query)
+      collections = []
+      ActiveRecord::Base.with_pgvector do
+        SmartSearch.search_scopes(context, user) do |klass, item_scope|
+          item_scope = apply_filter(klass, item_scope, type_filter)
+          next unless item_scope
+
+          item_scope = item_scope.select(
+            ActiveRecord::Base.send(:sanitize_sql, ["#{klass.table_name}.*, MIN(embedding <=> ?) AS distance", embedding.to_s])
+          )
+                                 .joins(:embeddings)
+                                 .group("#{klass.table_name}.id")
+                                 .reorder("distance ASC")
+          collections << [klass.name,
+                          BookmarkedCollection.wrap(
+                            BookmarkedCollection::SimpleBookmarker.new(klass, { distance: { type: :float, null: false } }, :id),
+                            item_scope
+                          )]
+        end
+      end
+      BookmarkedCollection.merge(*collections)
+    end
+
+    def apply_filter(klass, scope, filter)
+      return scope if filter.empty?
+
+      if klass == DiscussionTopic
+        if filter.include?("discussion_topics") && filter.include?("announcements")
+          scope
+        elsif filter.include?("discussion_topics")
+          scope.where(type: nil)
+        elsif filter.include?("announcements")
+          scope.where(type: "Announcement")
+        end
+      elsif filter.include?(Context.api_type_name(klass))
+        scope
+      end
     end
 
     def generate_completion(prompt)
@@ -70,15 +127,17 @@ module SmartSearch
               singleton: "smart_search_index_course:#{course.global_id}",
               n_strand: "smart_search_index_course").index_course(course)
       end
+      nil
     end
 
     def index_course(course)
-      # index non-deleted pages (that have not already been indexed)
-      course.wiki_pages.not_deleted
-            .where.missing(:embeddings)
-            .find_each do |page|
-        page.generate_embeddings(synchronous: true)
+      index_scopes(course) do |scope|
+        scope.where.missing(:embeddings)
+             .find_each(strategy: :pluck_ids) do |item|
+          item.generate_embeddings(synchronous: true)
+        end
       end
+      nil
     end
   end
 end

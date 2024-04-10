@@ -26,7 +26,7 @@ GEM
       faraday (>= 1, < 3)
     faraday-net_http (3.1.0)
       net-http
-    i18n (1.14.1)
+    i18n (1.14.4)
       concurrent-ruby (~> 1.0)
     json-jwt (1.16.6)
       activesupport (>= 4.2)
@@ -35,7 +35,7 @@ GEM
       bindata
       faraday (~> 2.0)
       faraday-follow_redirects
-    minitest (5.22.2)
+    minitest (5.22.3)
     net-http (0.4.1)
       uri
     rake (13.1.0)

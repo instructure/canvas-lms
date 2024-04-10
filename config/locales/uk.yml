@@ -1097,6 +1097,8 @@ uk:
               check_box: "CSV членства у групах"
           groups: 
             check_box: "CSV груп"
+          include_deleted: 
+            check_box: "Включно з видаленими обєктами"
           sections: 
             check_box: "CSV розділів"
           terms: 
@@ -1870,6 +1872,7 @@ uk:
   after_last_attempt_c9168da2: "Після останньої спроби"
   after_the_assignment_is_graded_53754607: "Після оцінювання завдання"
   after_the_due_date_eee89c9c: "Після призначеної дати"
+  agenda_b010136d: "Порядок денний"
   ahead_21f22939: Наперед
   ajax_errors: 
     error_heading: "Ajax Помилка: %{status_code}"
@@ -5849,6 +5852,7 @@ uk:
   create_failed_15d07ad4: "Створити не вдалося"
   create_group_set_7fe1cd53: "Створити набір груп"
   create_new_e0946c49: "Створити новий"
+  create_new_event_e9fb2fb6: "Створити нову подію"
   create_slots_71dbb2f8: "Створити слоти"
   create_theme_based_on_40651ed3: "Створити тему на основі"
   create_users_view: 
@@ -7076,6 +7080,7 @@ uk:
   enter_grades_as_e113e606: "Введіть Оцінки як"
   enter_or_find_an_external_tool_url_6aebbd0d: "Введіть або знайдіть URL-адресу зовнішнього інструменту"
   enter_the_access_token_for_your_organization_from__cc77493d: "Введіть маркер доступу для Вашої організації від *eduappcenter.com*.  Після застосування, лише застосунки, схалені Вашою організацією у                          EduAppCenter,  будуть відображатися на сторінці Зовнішніх Застосунків.                         Дізнайтеся як  **згенерувати маркер доступу**."
+  enter_the_date_you_would_like_to_navigate_to_a712de47: "Введіть дату, до якої б Ви хотіли перейти."
   enter_the_email_addresses_of_the_users_you_would_l_f76448a6: "Введіть електорнні адреси користувачів, яких Ви би хотіли додати, відокремлюючи їх комамами або розривами рядків"
   enter_the_login_ids_of_the_users_you_would_like_to_502fcbc5: "Введіть ID логіни користувачів, яких Ви би хотіли додати, відокремлюючи їх комами або розривами рядків"
   enter_the_sis_ids_of_the_users_you_would_like_to_a_25e441f1: "Введіть SIS ID користувачів, яких Ви би хотіли додати, відокремлюючи їх комами або розривами рядків"
@@ -11547,6 +11552,7 @@ uk:
     requirements_changed: "Вимоги змінено"
   modules_c4325335: Розділи
   modules_tutorial_tray_d58ac3cb: "Вказівки щодо модулів"
+  month_4b83b95f: Місяць
   month_s_5c17590e: "Місяць (-ці)"
   moodle_dropdown_many_warning_title: "У цьому наборі є  %{count} питань у вигляді випадаючих списків з декількома варіантами, які могли некоректно імпортуватися"
   moodle_dropdown_warning_title: "Питання з кількома варіантами у вигляді списку могли некоректно імпортуватися"
@@ -18360,6 +18366,7 @@ uk:
   warning_for_improved_accessibility_of_calendar_eve_da54b4e2: "Попередження: Для покращення доступності календарних подій скористайтеся переглядом порядку денного."
   warning_for_improved_accessibility_of_reordering_a_5d0206c7: "Попередження: для покращення доступу до впорядкування завдань та груп, скористайтеся пунктом меню Перейти до діалогу."
   warning_for_improved_accessibility_please_click_he_e6472c02: "Увага: Для підвищення доступності, будь ласка, натисніть тут, щоб використовувати індивідуальний перегляд Gradebook."
+  warning_for_improved_accessibility_please_use_the__1075c150: "Увага! Для поліпшення доступності будь ласка використовуйте  в Календарі \"Перегляд порядку денного\"."
   warnings: 
     test_install: 
       periodic_message: "Ця установка Canvas призначена лише для тестування та періодично оновлюється."
@@ -18402,6 +18409,7 @@ uk:
   webct_file_description: "Blackboard Vista/CE, WebCT 6+ Курс"
   webct_name: "Blackboard Vista/CE (WebCT)"
   website_url_177fc1dc: "URL вебсайту"
+  week_1f945ddd: Тиждень
   week_s_cb1492ee: Тиждень(нів)
   weight_9b308e5b: Вага
   weight_ff579a8e: Вага

@@ -22,6 +22,14 @@
 @import "components/rubric";
 @import "components/emoji";
 
+body.is-inside-submission-frame {
+  background-color: #f5f5f5;
+}
+
+.ic-Layout-wrapper {
+  margin: auto;
+}
+
 .submission_details {
   .bold { font-weight: bold; }
   .error { color: $ic-color-danger; }

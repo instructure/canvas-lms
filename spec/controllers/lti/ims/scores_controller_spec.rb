@@ -96,26 +96,12 @@ module Lti::IMS
           expect(json["resultUrl"]).to include "results"
         end
 
-        context "when the consistent_ags_ids_based_on_account_principal_domain feature flag is on" do
-          it "uses the Account#domain in the resultUrl" do
-            allow_any_instance_of(Account).to receive(:environment_specific_domain).and_return("canonical.host")
-            course.root_account.enable_feature!(:consistent_ags_ids_based_on_account_principal_domain)
-            send_request
-            expect(json["resultUrl"]).to start_with(
-              "http://canonical.host/api/lti/courses/#{course.id}/line_items/"
-            )
-          end
-        end
-
-        context "when the consistent_ags_ids_based_on_account_principal_domain feature flag is off" do
-          it "uses the host domain in the resultUrl" do
-            course.root_account.disable_feature!(:consistent_ags_ids_based_on_account_principal_domain)
-            allow_any_instance_of(Account).to receive(:environment_specific_domain).and_return("canonical.host")
-            send_request
-            expect(json["resultUrl"]).to start_with(
-              "http://test.host/api/lti/courses/#{course.id}/line_items/"
-            )
-          end
+        it "uses the Account#domain in the resultUrl" do
+          allow_any_instance_of(Account).to receive(:environment_specific_domain).and_return("canonical.host")
+          send_request
+          expect(json["resultUrl"]).to start_with(
+            "http://canonical.host/api/lti/courses/#{course.id}/line_items/"
+          )
         end
 
         context "with no existing result" do
@@ -500,7 +486,24 @@ module Lti::IMS
             let(:submitted_at) { 5.minutes.ago.iso8601(3) }
             let(:params_overrides) { super().merge(submittedAt: submitted_at) }
 
-            it_behaves_like "a request specifying when the submission occurred"
+            context "when FF is off" do
+              before do
+                Account.site_admin.disable_feature!(:lti_ags_remove_top_submitted_at)
+              end
+
+              it_behaves_like "a request specifying when the submission occurred"
+            end
+
+            context "when FF is on" do
+              before do
+                Account.site_admin.enable_feature!(:lti_ags_remove_top_submitted_at)
+              end
+
+              it "ignores submittedAt" do
+                send_request
+                expect(result.submission.reload.submitted_at).not_to eq submitted_at
+              end
+            end
           end
 
           context "with submission.submittedAt param present" do
@@ -530,7 +533,7 @@ module Lti::IMS
               super().merge(Lti::Result::AGS_EXT_SUBMISSION => { content_items:, new_submission: false, submitted_at: }, :scoreGiven => 10, :scoreMaximum => line_item.score_maximum)
             end
             let(:expected_progress_url) do
-              "http://test.host/api/lti/courses/#{context_id}/progress/"
+              "http://canonical.host/api/lti/courses/#{context_id}/progress/"
             end
 
             it "ignores content items that are not type file" do
@@ -605,24 +608,11 @@ module Lti::IMS
                 json[Lti::Result::AGS_EXT_SUBMISSION]["content_items"].first["progress"]
               end
 
-              context "when the consistent_ags_ids_based_on_account_principal_domain feature flag is on" do
-                it "returns a progress URL with the Account#domain" do
-                  course.root_account.enable_feature!(:consistent_ags_ids_based_on_account_principal_domain)
-                  allow_any_instance_of(Account).to receive(:environment_specific_domain).and_return("canonical.host")
-                  send_request
-                  expect(actual_progress_url)
-                    .to start_with("http://canonical.host/api/lti/courses/#{context_id}/progress/")
-                end
-              end
-
-              context "when the consistent_ags_ids_based_on_account_principal_domain feature flag is off" do
-                it "returns a progress URL with the Account#domain" do
-                  course.root_account.disable_feature!(:consistent_ags_ids_based_on_account_principal_domain)
-                  allow_any_instance_of(Account).to receive(:environment_specific_domain).and_return("canonical.host")
-                  send_request
-                  expect(actual_progress_url)
-                    .to start_with("http://test.host/api/lti/courses/#{context_id}/progress/")
-                end
+              it "returns a progress URL with the Account#domain" do
+                allow_any_instance_of(Account).to receive(:environment_specific_domain).and_return("canonical.host")
+                send_request
+                expect(actual_progress_url)
+                  .to start_with("http://canonical.host/api/lti/courses/#{context_id}/progress/")
               end
 
               it "calculates content_type from extension" do
@@ -732,6 +722,7 @@ module Lti::IMS
               # that doesn't work well in a controller spec for this controller
 
               it "returns a progress url" do
+                allow_any_instance_of(Account).to receive(:environment_specific_domain).and_return("canonical.host")
                 send_request
                 progress_url =
                   json[Lti::Result::AGS_EXT_SUBMISSION]["content_items"].first["progress"]

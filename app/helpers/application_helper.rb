@@ -26,6 +26,7 @@ module ApplicationHelper
   include Canvas::LockExplanation
   include DatadogRumHelper
   include NewQuizzesFeaturesHelper
+  include HeapHelper
 
   def context_user_name_display(user)
     name = user.try(:short_name) || user.try(:name)
@@ -1413,14 +1414,6 @@ module ApplicationHelper
 
   def append_default_due_time_js_env(context, hash)
     hash[:DEFAULT_DUE_TIME] = context.default_due_time if context&.default_due_time.present? && context.root_account.feature_enabled?(:default_due_time)
-  end
-
-  def find_heap_application_id
-    DynamicSettings.find(tree: :private)[:heap_app_id, failsafe: nil]
-  end
-
-  def load_heap?
-    find_heap_application_id && @domain_root_account&.feature_enabled?(:send_usage_metrics)
   end
 
   def load_hotjar?

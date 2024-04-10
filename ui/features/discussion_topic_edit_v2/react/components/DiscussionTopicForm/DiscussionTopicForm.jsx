@@ -18,37 +18,49 @@
 
 import React, {useState, useRef, useEffect, useContext} from 'react'
 import PropTypes from 'prop-types'
-import AnonymousResponseSelector from '@canvas/discussions/react/components/AnonymousResponseSelector/AnonymousResponseSelector'
 import {CreateOrEditSetModal} from '@canvas/groups/react/CreateOrEditSetModal'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
-
 import {TextInput} from '@instructure/ui-text-input'
 import {FormFieldGroup} from '@instructure/ui-form-field'
-import {Button} from '@instructure/ui-buttons'
-import {IconAddLine, IconPublishSolid, IconUnpublishedLine} from '@instructure/ui-icons'
-import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
+import {
+  IconAddLine,
+  IconPublishSolid,
+  IconUnpublishedLine,
+  IconInfoLine,
+} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {Checkbox} from '@instructure/ui-checkbox'
+import {Tooltip} from '@instructure/ui-tooltip'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {DateTimeInput} from '@instructure/ui-date-time-input'
 import CanvasMultiSelect from '@canvas/multi-select'
 import CanvasRce from '@canvas/rce/react/CanvasRce'
 import {Alert} from '@instructure/ui-alerts'
-import {GradedDiscussionOptions} from '../GradedDiscussionOptions/GradedDiscussionOptions'
+import theme from '@instructure/canvas-theme'
+
+import {FormControlButtons} from './FormControlButtons'
+import {GradedDiscussionOptions} from '../DiscussionOptions/GradedDiscussionOptions'
+import {NonGradedDateOptions} from '../DiscussionOptions/NonGradedDateOptions'
+import {AnonymousSelector} from '../DiscussionOptions/AnonymousSelector'
 import {
   GradedDiscussionDueDatesContext,
   defaultEveryoneOption,
   defaultEveryoneElseOption,
   masteryPathsOption,
+  useShouldShowContent,
 } from '../../util/constants'
+
 import {AttachmentDisplay} from '@canvas/discussions/react/components/AttachmentDisplay/AttachmentDisplay'
 import {responsiveQuerySizes} from '@canvas/discussions/react/utils'
 import {UsageRightsContainer} from '../../containers/usageRights/UsageRightsContainer'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+
+import {prepareAssignmentPayload} from '../../util/payloadPreparations'
+import {validateTitle, validateFormFields} from '../../util/formValidation'
 
 import {
   addNewGroupCategoryToCache,
@@ -115,6 +127,10 @@ export default function DiscussionTopicForm({
 
   const allSectionsOption = {id: 'all', name: 'All Sections'}
 
+  const checkpointsToolTipText = I18n.t(
+    'Checkpoints can be set to have different due dates and point values for the initial response and the subsequent replies.'
+  )
+
   const inputWidth = '100%'
 
   const [title, setTitle] = useState(currentDiscussionTopic?.title || '')
@@ -149,6 +165,9 @@ export default function DiscussionTopicForm({
     currentDiscussionTopic?.podcastHasStudentPosts || false
   )
   const [isGraded, setIsGraded] = useState(!!currentDiscussionTopic?.assignment || false)
+  const [isCheckpoints, setIsCheckpoints] = useState(
+    !!currentDiscussionTopic?.assignment?.checkpoints || false
+  )
   const [allowLiking, setAllowLiking] = useState(currentDiscussionTopic?.allowRating || false)
   const [onlyGradersCanLike, setOnlyGradersCanLike] = useState(
     currentDiscussionTopic?.onlyGradersCanRate || false
@@ -177,6 +196,10 @@ export default function DiscussionTopicForm({
   const [pointsPossible, setPointsPossible] = useState(
     currentDiscussionTopic?.assignment?.pointsPossible || 0
   )
+  // add initial states once checkpoint mutation has been edited
+  const [pointsPossibleReplyToTopic, setPointsPossibleReplyToTopic] = useState(0)
+  // add initial states once checkpoint mutation has been edited
+  const [pointsPossibleReplyToEntry, setPointsPossibleReplyToEntry] = useState(0)
   const [displayGradeAs, setDisplayGradeAs] = useState(
     currentDiscussionTopic?.assignment?.gradingType || 'points'
   )
@@ -217,6 +240,10 @@ export default function DiscussionTopicForm({
     groupCategoryId,
     gradedDiscussionRefMap,
     setGradedDiscussionRefMap,
+    pointsPossibleReplyToTopic,
+    setPointsPossibleReplyToTopic,
+    pointsPossibleReplyToEntry,
+    setPointsPossibleReplyToEntry,
   }
   const [showGroupCategoryModal, setShowGroupCategoryModal] = useState(false)
 
@@ -265,329 +292,32 @@ export default function DiscussionTopicForm({
     if (!isGroupDiscussion) setGroupCategoryId(null)
   }, [isGroupDiscussion])
 
-  const shouldShowTodoSettings =
-    !isGraded &&
-    !isAnnouncement &&
-    ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MANAGE_CONTENT &&
-    ENV.STUDENT_PLANNER_ENABLED
-
-  const shouldShowPostToSectionOption = !isGraded && !isGroupDiscussion && !isGroupContext
-
-  const shouldShowAnonymousOptions =
-    !isGroupContext &&
-    !isAnnouncement &&
-    (ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MODERATE ||
-      ENV.allow_student_anonymous_discussion_topics)
-
-  const shouldShowAnnouncementOnlyOptions = isAnnouncement && !isGroupContext
-
-  const shouldShowGroupOptions =
-    discussionAnonymousState === 'off' &&
-    !isAnnouncement &&
-    !isGroupContext &&
-    ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_SET_GROUP
-
-  const shouldShowGradedDiscussionOptions =
-    discussionAnonymousState === 'off' &&
-    !isAnnouncement &&
-    !isGroupContext &&
-    ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_CREATE_ASSIGNMENT
-
-  const shouldShowUsageRightsOption =
-    ENV?.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_ATTACH &&
-    ENV?.FEATURES?.usage_rights_discussion_topics &&
-    ENV?.USAGE_RIGHTS_REQUIRED &&
-    ENV?.PERMISSIONS?.manage_files
-
-  const shouldShowLikingOption = !ENV.K5_HOMEROOM_COURSE
-
-  const shouldShowPartialAnonymousSelector =
-    !isEditing && discussionAnonymousState === 'partial_anonymity' && isStudent
-
-  const shouldShowAvailabilityOptions = !isAnnouncement && !isGroupContext
-
-  /* discussion moderators viewing a new or still unpublished discussion */
-  const shouldShowSaveAndPublishButton =
-    !isAnnouncement && ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MODERATE && !published
-
-  const shouldShowPodcastFeedOption =
-    ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MODERATE && !ENV.K5_HOMEROOM_COURSE
+  const {
+    shouldShowTodoSettings,
+    shouldShowPostToSectionOption,
+    shouldShowAnonymousOptions,
+    shouldShowAnnouncementOnlyOptions,
+    shouldShowGroupOptions,
+    shouldShowGradedDiscussionOptions,
+    shouldShowUsageRightsOption,
+    shouldShowLikingOption,
+    shouldShowPartialAnonymousSelector,
+    shouldShowAvailabilityOptions,
+    shouldShowSaveAndPublishButton,
+    shouldShowPodcastFeedOption,
+    shouldShowCheckpointsOptions,
+  } = useShouldShowContent(
+    isGraded,
+    isAnnouncement,
+    isGroupDiscussion,
+    isGroupContext,
+    discussionAnonymousState,
+    isEditing,
+    isStudent,
+    published
+  )
 
   const canGroupDiscussion = !isEditing || currentDiscussionTopic?.canGroup || false
-
-  const validateTitle = newTitle => {
-    if (newTitle.length > 255) {
-      setTitleValidationMessages([
-        {text: I18n.t('Title must be less than 255 characters.'), type: 'error'},
-      ])
-      return false
-    } else if (newTitle.length === 0) {
-      setTitleValidationMessages([{text: I18n.t('Title must not be empty.'), type: 'error'}])
-      return false
-    } else {
-      setTitleValidationMessages([{text: '', type: 'success'}])
-      return true
-    }
-  }
-
-  const validateAvailability = (newAvailableFrom, newAvailableUntil) => {
-    if (isGraded) {
-      return true
-    }
-
-    if (newAvailableFrom === null || newAvailableUntil === null) {
-      setAvailabilityValidationMessages([{text: '', type: 'success'}])
-      return true
-    } else if (newAvailableUntil < newAvailableFrom) {
-      setAvailabilityValidationMessages([
-        {text: I18n.t('Date must be after date available.'), type: 'error'},
-      ])
-      return false
-    } else {
-      setAvailabilityValidationMessages([{text: '', type: 'success'}])
-      return true
-    }
-  }
-
-  const validateSelectGroup = () => {
-    if (!isGroupDiscussion) return true // if not a group discussion, no need to validate
-    if (groupCategoryId) return true // if a group category is selected, validated
-
-    // if not a group discussion and no group category is selected, show error
-    setGroupCategorySelectError([{text: I18n.t('Please select a group category.'), type: 'error'}])
-    return false
-  }
-
-  const validateUsageRights = () => {
-    // if usage rights is not enabled or there are no attachments, there is no need to validate
-    if (
-      !ENV?.FEATURES?.usage_rights_discussion_topics ||
-      !ENV?.USAGE_RIGHTS_REQUIRED ||
-      !attachment
-    ) {
-      return true
-    }
-
-    if (usageRightsData?.useJustification) return true
-    setOnFailure(I18n.t('You must set usage rights'))
-    setUsageRightsErrorState(true)
-    return false
-  }
-
-  const validatePostToSections = () => {
-    // If the PostTo section is not available, no need to validate
-    if (!shouldShowPostToSectionOption) {
-      return true
-    }
-
-    if (sectionIdsToPostTo.length === 0) {
-      return false
-    } else {
-      return true
-    }
-  }
-
-  const validateGradedDiscussionFields = () => {
-    if (!isGraded) {
-      return true
-    }
-
-    for (const refMap of gradedDiscussionRefMap.values()) {
-      for (const value of Object.values(refMap)) {
-        if (value !== null) {
-          gradedDiscussionRef.current = value.current
-          return false
-        }
-      }
-    }
-    gradedDiscussionRef.current = null
-    return true
-  }
-
-  const validateFormFields = () => {
-    let isValid = true
-
-    const validationRefs = [
-      {validationFunction: validateTitle(title), ref: textInputRef.current},
-      {validationFunction: validatePostToSections(), ref: sectionInputRef.current},
-      {validationFunction: validateSelectGroup(), ref: groupOptionsRef.current},
-      {
-        validationFunction: validateAvailability(availableFrom, availableUntil),
-        ref: dateInputRef.current,
-      },
-      {validationFunction: validateGradedDiscussionFields(), ref: gradedDiscussionRef.current},
-      {validationFunction: validateUsageRights(), ref: null},
-    ]
-
-    const inValidFields = []
-
-    validationRefs.forEach(({validationFunction, ref}) => {
-      if (!validationFunction) {
-        if (ref) inValidFields.push(ref)
-        isValid = false
-      }
-    })
-
-    inValidFields[0]?.focus()
-
-    return isValid
-  }
-
-  const prepareOverride = (
-    overrideDueDate,
-    overrideAvailableUntil,
-    overrideAvailableFrom,
-    overrideIds = {
-      groupId: null,
-      courseSectionId: null,
-      studentIds: null,
-      noopId: null,
-    },
-    overrideTitle = null
-  ) => {
-    return {
-      dueAt: overrideDueDate || null,
-      lockAt: overrideAvailableUntil || null,
-      unlockAt: overrideAvailableFrom || null,
-      groupId: overrideIds.groupIds || null,
-      courseSectionId: overrideIds.courseSectionId || null,
-      studentIds: overrideIds.studentIds || null,
-      noopId: overrideIds.noopId || null,
-      title: overrideTitle || null,
-    }
-  }
-
-  const prepareAssignmentOverridesPayload = () => {
-    const onlyVisibleToEveryone = assignedInfoList.every(
-      info =>
-        info.assignedList.length === 1 && info.assignedList[0] === defaultEveryoneOption.assetCode
-    )
-
-    if (onlyVisibleToEveryone) return null
-
-    const preparedOverrides = []
-    assignedInfoList.forEach(info => {
-      const {assignedList} = info
-      const studentIds = assignedList.filter(assetCode => assetCode.includes('user'))
-      const sectionIds = assignedList.filter(assetCode => assetCode.includes('section'))
-      const groupIds = assignedList.filter(assetCode => assetCode.includes('group'))
-
-      // override for student ids
-      if (studentIds.length > 0) {
-        preparedOverrides.push(
-          prepareOverride(
-            info.dueDate || null,
-            info.availableUntil || null,
-            info.availableFrom || null,
-            {
-              studentIds:
-                studentIds.length > 0 ? studentIds.map(id => id.split('_').reverse()[0]) : null,
-            }
-          )
-        )
-      }
-
-      // override for section ids
-      if (sectionIds.length > 0) {
-        sectionIds.forEach(sectionId => {
-          preparedOverrides.push(
-            prepareOverride(
-              info.dueDate || null,
-              info.availableUntil || null,
-              info.availableFrom || null,
-              {
-                courseSectionId: sectionId.split('_').reverse()[0] || null,
-              }
-            )
-          )
-        })
-      }
-
-      // override for group ids
-      if (groupIds.length > 0) {
-        groupIds.forEach(groupId => {
-          preparedOverrides.push(
-            prepareOverride(
-              info.dueDate || null,
-              info.availableUntil || null,
-              info.availableFrom || null,
-              {
-                groupIds: groupId.split('_').reverse()[0] || null,
-              }
-            )
-          )
-        })
-      }
-    })
-
-    const masteryPathOverride = assignedInfoList.find(info =>
-      info.assignedList.includes(masteryPathsOption.assetCode)
-    )
-
-    if (masteryPathOverride) {
-      preparedOverrides.push(
-        prepareOverride(
-          masteryPathOverride.dueDate || null,
-          masteryPathOverride.availableUntil || null,
-          masteryPathOverride.availableFrom || null,
-          {
-            noopId: '1',
-          },
-          masteryPathsOption.label
-        )
-      )
-    }
-
-    return preparedOverrides
-  }
-
-  const preparePeerReviewPayload = () => {
-    return peerReviewAssignment === 'off'
-      ? null
-      : {
-          automaticReviews: peerReviewAssignment === 'automatically',
-          count: !isEditing && peerReviewAssignment === 'manually' ? 0 : peerReviewsPerStudent,
-          enabled: true,
-          dueAt: peerReviewDueDate || null,
-          intraReviews: intraGroupPeerReviews,
-        }
-  }
-
-  const prepareAssignmentPayload = () => {
-    // Return null immediately if the assignment is not graded
-    if (!isGraded) return null
-
-    const everyoneOverride =
-      assignedInfoList.find(
-        info =>
-          info.assignedList.includes(defaultEveryoneOption.assetCode) ||
-          info.assignedList.includes(defaultEveryoneElseOption.assetCode)
-      ) || {}
-
-    // Common payload properties for graded assignments
-    let payload = {
-      pointsPossible,
-      postToSis,
-      gradingType: displayGradeAs,
-      assignmentGroupId: assignmentGroup || null,
-      peerReviews: preparePeerReviewPayload(),
-      assignmentOverrides: prepareAssignmentOverridesPayload(),
-      dueAt: everyoneOverride.dueDate || null,
-      lockAt: everyoneOverride.availableUntil || null,
-      unlockAt: everyoneOverride.availableFrom || null,
-      onlyVisibleToOverrides: !Object.keys(everyoneOverride).length,
-      gradingStandardId: gradingSchemeId || null,
-    }
-    // Additional properties for creation of a graded assignment
-    if (!isEditing) {
-      payload = {
-        ...payload,
-        courseId: ENV.context_id,
-        name: title,
-      }
-    }
-    return payload
-  }
 
   const createSubmitPayload = shouldPublish => {
     const payload = {
@@ -602,7 +332,24 @@ export default function DiscussionTopicForm({
       delayedPostAt: availableFrom,
       lockAt: availableUntil,
       // Conditional payload properties
-      assignment: prepareAssignmentPayload(),
+      assignment: prepareAssignmentPayload(
+        isEditing,
+        title,
+        pointsPossible,
+        displayGradeAs,
+        assignmentGroup,
+        gradingSchemeId,
+        isGraded,
+        assignedInfoList,
+        defaultEveryoneOption,
+        defaultEveryoneElseOption,
+        postToSis,
+        peerReviewAssignment,
+        peerReviewsPerStudent,
+        peerReviewDueDate,
+        intraGroupPeerReviews,
+        masteryPathsOption
+      ),
       groupCategoryId: isGroupDiscussion ? groupCategoryId : null,
       specificSections: shouldShowPostToSectionOption ? sectionIdsToPostTo.join() : 'all',
       locked: shouldShowAnnouncementOnlyOptions ? locked : false,
@@ -642,7 +389,31 @@ export default function DiscussionTopicForm({
       setIsSubmitting(true)
     }, 0)
 
-    if (validateFormFields()) {
+    if (
+      validateFormFields(
+        title,
+        availableFrom,
+        availableUntil,
+        isGraded,
+        textInputRef,
+        sectionInputRef,
+        groupOptionsRef,
+        dateInputRef,
+        gradedDiscussionRef,
+        gradedDiscussionRefMap,
+        attachment,
+        usageRightsData,
+        setUsageRightsErrorState,
+        setOnFailure,
+        isGroupDiscussion,
+        groupCategoryId,
+        setGroupCategorySelectError,
+        setTitleValidationMessages,
+        setAvailabilityValidationMessages,
+        shouldShowPostToSectionOption,
+        sectionIdsToPostTo
+      )
+    ) {
       const payload = createSubmitPayload(shouldPublish)
       onSubmit(payload)
       return true
@@ -757,7 +528,7 @@ export default function DiscussionTopicForm({
           value={title}
           ref={textInputRef}
           onChange={(_event, value) => {
-            validateTitle(value)
+            validateTitle(value, setTitleValidationMessages)
             const newTitle = value.substring(0, 255)
             setTitle(newTitle)
           }}
@@ -836,51 +607,17 @@ export default function DiscussionTopicForm({
         )}
         <Text size="large">{I18n.t('Options')}</Text>
         {shouldShowAnonymousOptions && (
-          <View display="block" margin="medium 0">
-            <RadioInputGroup
-              name="anonymous"
-              description={I18n.t('Anonymous Discussion')}
-              value={discussionAnonymousState}
-              onChange={(_event, value) => {
-                if (value !== 'off') {
-                  setIsGraded(false)
-                  setIsGroupDiscussion(false)
-                  setGroupCategoryId(null)
-                }
-                setDiscussionAnonymousState(value)
-              }}
-              disabled={isEditing || isGraded}
-            >
-              <RadioInput
-                key="off"
-                value="off"
-                label={I18n.t(
-                  'Off: student names and profile pictures will be visible to other members of this course'
-                )}
-              />
-              <RadioInput
-                key="partial_anonymity"
-                value="partial_anonymity"
-                label={I18n.t(
-                  'Partial: students can choose to reveal their name and profile picture'
-                )}
-              />
-              <RadioInput
-                key="full_anonymity"
-                value="full_anonymity"
-                label={I18n.t('Full: student names and profile pictures will be hidden')}
-              />
-            </RadioInputGroup>
-            {shouldShowPartialAnonymousSelector && (
-              <View display="block" margin="medium 0">
-                <AnonymousResponseSelector
-                  username={ENV.current_user.display_name}
-                  setAnonymousAuthorState={setAnonymousAuthorState}
-                  discussionAnonymousState={discussionAnonymousState}
-                />
-              </View>
-            )}
-          </View>
+          <AnonymousSelector
+            discussionAnonymousState={discussionAnonymousState}
+            setDiscussionAnonymousState={setDiscussionAnonymousState}
+            isEditing={isEditing}
+            isGraded={isGraded}
+            setIsGraded={setIsGraded}
+            setIsGroupDiscussion={setIsGroupDiscussion}
+            setGroupCategoryId={setGroupCategoryId}
+            shouldShowPartialAnonymousSelector={shouldShowPartialAnonymousSelector}
+            setAnonymousAuthorState={setAnonymousAuthorState}
+          />
         )}
         <FormFieldGroup description="" rowSpacing="small">
           {shouldShowAnnouncementOnlyOptions && (
@@ -961,6 +698,29 @@ export default function DiscussionTopicForm({
               onChange={() => setIsGraded(!isGraded)}
               // disabled={sectionIdsToPostTo === [allSectionsOption._id]}
             />
+          )}
+          {shouldShowCheckpointsOptions && (
+            <>
+              <View display="inline-block">
+                <Checkbox
+                  data-testid="checkpoints-checkbox"
+                  label={I18n.t('Assign graded checkpoints')}
+                  value="checkpoints"
+                  checked={isCheckpoints}
+                  onChange={() => setIsCheckpoints(!isCheckpoints)}
+                />
+              </View>
+              <Tooltip renderTip={checkpointsToolTipText} on={['hover', 'focus']} color="primary">
+                <div
+                  style={{display: "inline-block", marginLeft: theme.spacing.xxSmall}}
+                  // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+                  tabIndex="0"
+                >
+                  <IconInfoLine />
+                  <ScreenReaderContent>{checkpointsToolTipText}</ScreenReaderContent>
+                </div>
+              </Tooltip>
+            </>
           )}
           {shouldShowLikingOption && (
             <>
@@ -1137,112 +897,34 @@ export default function DiscussionTopicForm({
                   setGradingSchemeId={setGradingSchemeId}
                   intraGroupPeerReviews={intraGroupPeerReviews}
                   setIntraGroupPeerReviews={setIntraGroupPeerReviews}
+                  isCheckpoints={isCheckpoints && ENV.DISCUSSION_CHECKPOINTS_ENABLED}
                 />
               </GradedDiscussionDueDatesContext.Provider>
             </View>
           ) : (
-            <FormFieldGroup description="" width={inputWidth}>
-              <DateTimeInput
-                timezone={ENV.TIMEZONE}
-                description={I18n.t('Available from')}
-                dateRenderLabel={I18n.t('Date')}
-                timeRenderLabel={I18n.t('Time')}
-                prevMonthLabel={I18n.t('previous')}
-                nextMonthLabel={I18n.t('next')}
-                value={availableFrom}
-                onChange={(_event, newAvailableFrom) => {
-                  validateAvailability(newAvailableFrom, availableUntil)
-                  setAvailableFrom(newAvailableFrom)
-                }}
-                datePlaceholder={I18n.t('Select Date')}
-                invalidDateTimeMessage={I18n.t('Invalid date and time')}
-                layout="columns"
-              />
-              <DateTimeInput
-                timezone={ENV.TIMEZONE}
-                description={I18n.t('Until')}
-                dateRenderLabel={I18n.t('Date')}
-                timeRenderLabel={I18n.t('Time')}
-                prevMonthLabel={I18n.t('Time')}
-                nextMonthLabel={I18n.t('next')}
-                value={availableUntil}
-                onChange={(_event, newAvailableUntil) => {
-                  validateAvailability(availableFrom, newAvailableUntil)
-                  setAvailableUntil(newAvailableUntil)
-                }}
-                datePlaceholder={I18n.t('Select Date')}
-                invalidDateTimeMessage={I18n.t('Invalid date and time')}
-                messages={availabilityValidationMessages}
-                layout="columns"
-                dateInputRef={ref => {
-                  dateInputRef.current = ref
-                }}
-              />
-            </FormFieldGroup>
-          ))}
-        <View
-          display="block"
-          textAlign="end"
-          borderWidth="small none none none"
-          margin="xx-large none"
-          padding="large none"
-        >
-          <View margin="0 x-small 0 0">
-            <Button
-              type="button"
-              color="secondary"
-              onClick={() => {
-                window.location.assign(ENV.CANCEL_TO)
+            <NonGradedDateOptions
+              availableFrom={availableFrom}
+              setAvailableFrom={setAvailableFrom}
+              availableUntil={availableUntil}
+              setAvailableUntil={setAvailableUntil}
+              isGraded={isGraded}
+              setAvailabilityValidationMessages={setAvailabilityValidationMessages}
+              availabilityValidationMessages={availabilityValidationMessages}
+              inputWidth={inputWidth}
+              setDateInputRef={ref => {
+                dateInputRef.current = ref
               }}
-              disabled={isSubmitting}
-            >
-              {I18n.t('Cancel')}
-            </Button>
-          </View>
-          {shouldShowSaveAndPublishButton && (
-            <View margin="0 x-small 0 0">
-              <Button
-                type="submit"
-                onClick={() => submitForm(true)}
-                color="secondary"
-                margin="xxx-small"
-                data-testid="save-and-publish-button"
-                disabled={isSubmitting}
-              >
-                {I18n.t('Save and Publish')}
-              </Button>
-            </View>
-          )}
-          {/* for announcements, show publish when the available until da */}
-          {isAnnouncement ? (
-            <Button
-              type="submit"
-              // we always process announcements as published.
-              onClick={() => submitForm(true)}
-              color="primary"
-              margin="xxx-small"
-              data-testid="announcement-submit-button"
-              disabled={isSubmitting}
-            >
-              {willAnnouncementPostRightAway ? I18n.t('Publish') : I18n.t('Save')}
-            </Button>
-          ) : (
-            <Button
-              type="submit"
-              data-testid="save-button"
-              // when editing, use the current published state, otherwise:
-              // students will always save as published while for moderators in this case they
-              // can save as unpublished
-              onClick={() =>
-                submitForm(isEditing ? published : !ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MODERATE)
-              }
-              color="primary"
-              disabled={isSubmitting}
-            >
-              {I18n.t('Save')}
-            </Button>
-          )}
-        </View>
+            />
+          ))}
+        <FormControlButtons
+          isAnnouncement={isAnnouncement}
+          isEditing={isEditing}
+          published={published}
+          shouldShowSaveAndPublishButton={shouldShowSaveAndPublishButton}
+          submitForm={submitForm}
+          isSubmitting={isSubmitting}
+          willAnnouncementPostRightAway={willAnnouncementPostRightAway}
+        />
       </FormFieldGroup>
       {shouldShowMissingSectionsWarning && (
         <MissingSectionsWarningModal

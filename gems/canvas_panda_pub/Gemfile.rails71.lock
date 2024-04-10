@@ -105,10 +105,10 @@ GEM
       activerecord (>= 6.1, < 7.2)
       railties (>= 6.1, < 7.2)
     hashdiff (1.1.0)
-    i18n (1.14.1)
+    i18n (1.14.4)
       concurrent-ruby (~> 1.0)
     io-console (0.7.2)
-    irb (1.11.2)
+    irb (1.12.0)
       rdoc
       reline (>= 0.4.2)
     json-jwt (1.16.6)
@@ -123,9 +123,9 @@ GEM
       nokogiri (>= 1.12.0)
     mime-types (3.5.2)
       mime-types-data (~> 3.2015)
-    mime-types-data (3.2024.0206)
+    mime-types-data (3.2024.0305)
     mini_portile2 (2.8.5)
-    minitest (5.22.2)
+    minitest (5.22.3)
     mutex_m (0.2.0)
     net-http (0.4.1)
       uri
@@ -172,7 +172,7 @@ GEM
       psych (>= 4.0.0)
     redis (5.1.0)
       redis-client (>= 0.17.0)
-    redis-client (0.20.0)
+    redis-client (0.21.0)
       connection_pool
     redis-cluster-client (0.7.11)
       redis-client (~> 0.12)

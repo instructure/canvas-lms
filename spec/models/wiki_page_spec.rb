@@ -432,6 +432,30 @@ describe WikiPage do
       expect(page.can_edit_page?(student)).to be_truthy
     end
 
+    it "is true for members who are in the course" do
+      course_with_designer(active_all: true)
+      page = @course.wiki_pages.create(title: "some page", editing_roles: "members")
+      expect(page.can_edit_page?(@designer)).to be_truthy
+    end
+
+    it "is not true for members who are in the course but not active" do
+      course_with_student(active_all: true)
+      page = @course.wiki_pages.create(title: "some page", editing_roles: "members")
+      student = @course.students.first
+      @course.enrollments.update!(workflow_state: "invited")
+      expect(page.can_edit_page?(student)).to be_falsey
+      @course.update!(workflow_state: "creation_pending")
+      expect(page.can_edit_page?(student)).to be_falsey
+      @course.update!(workflow_state: "deleted")
+      expect(page.can_edit_page?(student)).to be_falsey
+      @course.update!(workflow_state: "rejected")
+      expect(page.can_edit_page?(student)).to be_falsey
+      @course.update!(workflow_state: "completed")
+      expect(page.can_edit_page?(student)).to be_falsey
+      @course.update!(workflow_state: "inactive")
+      expect(page.can_edit_page?(student)).to be_falsey
+    end
+
     it "is not true for users who are not in the course (if it is not public)" do
       course_factory(active_all: true)
       page = @course.wiki_pages.create(title: "some page", editing_roles: "public")
@@ -439,13 +463,31 @@ describe WikiPage do
       expect(page.can_edit_page?(@user)).to be_falsey
     end
 
-    it "is true for users who are not in the course (if it is public)" do
+    it "is not true for users who are not in the course (if it is public)" do
       course_factory(active_all: true)
       @course.is_public = true
       @course.save!
       page = @course.wiki_pages.create(title: "some page", editing_roles: "public")
       user_factory(active_all: true)
-      expect(page.can_edit_page?(@user)).to be_truthy
+      expect(page.can_edit_page?(@user)).to be_falsey
+    end
+
+    it "is not true for users who are in the course but not active" do
+      course_with_student(active_all: true)
+      page = @course.wiki_pages.create(title: "some page", editing_roles: "public")
+      student = @course.students.first
+      @course.enrollments.update!(workflow_state: "invited")
+      expect(page.can_edit_page?(student)).to be_falsey
+      @course.update!(workflow_state: "creation_pending")
+      expect(page.can_edit_page?(student)).to be_falsey
+      @course.update!(workflow_state: "deleted")
+      expect(page.can_edit_page?(student)).to be_falsey
+      @course.update!(workflow_state: "rejected")
+      expect(page.can_edit_page?(student)).to be_falsey
+      @course.update!(workflow_state: "completed")
+      expect(page.can_edit_page?(student)).to be_falsey
+      @course.update!(workflow_state: "inactive")
+      expect(page.can_edit_page?(student)).to be_falsey
     end
 
     context "when the page's course is concluded" do
@@ -491,6 +533,14 @@ describe WikiPage do
           expect(subject).to be false
         end
       end
+
+      context "with 'teachers,students,members' as the editing role" do
+        let(:editing_roles) { "teachers,students,members" }
+
+        it "returns false for a teacher" do
+          expect(subject).to be false
+        end
+      end
     end
 
     context "when the context is a Group" do
@@ -524,6 +574,22 @@ describe WikiPage do
         let(:current_user) { teacher }
 
         it { is_expected.to be false }
+      end
+
+      context "with 'members' as the editing role" do
+        let(:editing_roles) { "members" }
+
+        it "returns false for a teacher" do
+          expect(subject).to be false
+        end
+      end
+
+      context "with 'members,public' as the editing role" do
+        let(:editing_roles) { "members,public" }
+
+        it "returns false for a teacher" do
+          expect(subject).to be false
+        end
       end
     end
   end

@@ -253,6 +253,16 @@ export default class WikiPageEditView extends ValidatedFormView {
     $(event.currentTarget).siblings('a').andSelf().toggle().focus()
   }
 
+  showErrors(errors) {
+    if (window.ENV.FEATURES.permanent_page_links) {
+      // Let the IntsUI TextInput component show the title errors
+      const {title, ...otherErrors} = errors
+      super.showErrors(otherErrors)
+    } else {
+      super.showErrors(errors)
+    }
+  }
+
   // Validate they entered in a title.
   // @api ValidatedFormView override
   validateFormData(data) {

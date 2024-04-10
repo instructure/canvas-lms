@@ -338,6 +338,7 @@ export const AddressBookContainer = props => {
       addressBookMessages={props.addressBookMessages}
       isOnObserverSubmenu={isOnObserverSubmenu()}
       placeholder={props.placeholder}
+      addressBookLabel={props.addressBookLabel}
     />
   )
 }
@@ -383,6 +384,7 @@ AddressBookContainer.propTypes = {
    * placeholder text for AddressBook search text input
    */
   placeholder: PropTypes.string,
+  addressBookLabel: PropTypes.string,
 }
 
 AddressBookContainer.defaultProps = {

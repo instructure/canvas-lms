@@ -74,6 +74,7 @@ QUnit.skip('focus management', function () {
   this.server.respond()
   this.clock.tick(1)
   helpDialog.switchTo('#create_ticket')
+  this.clock.tick(1)
   equal(document.activeElement, helpDialog.$dialog.find('#error_subject')[0], 'focuses first input')
   ok(
     !helpDialog.$dialog.find('#help-dialog-options').is(':visible'),

@@ -815,6 +815,11 @@ ko:
         sis_export: 
           description: 
             text: "이 보고서는 관련 범주에 Canvas를 구축하는 데 필요한 모든 정보를 내보냅니다."
+    provisioning_csv_parameters: 
+      account_reports: 
+        default: 
+          include_deleted: 
+            check_box: "삭제된 개체 포함"
     quota_integer_required: "정수 값이 필요함"
     quota_must_be_positive: "값이 양수이어야 함"
     quota_not_updated: "할당량을 업데이트하지 않았음"
@@ -1363,6 +1368,7 @@ ko:
   add_course_assignments_628ed6d0: "과목 과제 추가"
   add_course_calendar_events_146154a5: "과목 행사 추가"
   add_email_address_aef3b61: "이메일 주소 추가하기"
+  add_event_9e21d0ff: "행사 추가"
   add_external_feed_6d437a28: "외부 피드 추가"
   add_feed_49ed1cb2: "피드 추가"
   add_group_c84f9e9d: "그룹 추가"
@@ -1376,6 +1382,7 @@ ko:
   adjust_events_and_due_dates_879744fc: "행사와 기한 조정"
   after_date_981cd41b: "%{date} 이후"
   after_last_attempt_c9168da2: "마지막 시도 이후"
+  agenda_b010136d: 안건
   ajax_errors: 
     error_heading: "Ajax 오류: %{status_code}"
     errors: 
@@ -4614,6 +4621,7 @@ ko:
     quiz_name: "퀴즈 이름"
     ungrded_survey: "평가 안 된 설문"
     url: URL
+  create_new_event_e9fb2fb6: "새 행사 만들기"
   create_users_view: 
     required: "이메일 주소 입력"
   criteria_9fac648: 기준
@@ -5394,6 +5402,7 @@ ko:
   enrollments_students: 학생
   enrollments_tas: 조교
   enrollments_teachers: 교사
+  enter_the_date_you_would_like_to_navigate_to_a712de47: "탐색하려는 날짜를 입력하십시오."
   eportfolio: 
     buttons: 
       done_editing: "편집 마침"
@@ -9353,6 +9362,7 @@ ko:
     must_submit_incomplete: "과제를 제출해야 함"
     must_view_complete: "페이지를 봄"
     must_view_incomplete: "페이지를 봐야 함"
+  month_4b83b95f: 월
   moodle_dropdown_warning_title: "다시 선다 문제를 올바르게 가져오지 못함"
   more_cf9cc661: "외부 도구"
   more_courses_5ebbe998: "다른 과목"
@@ -14173,6 +14183,7 @@ ko:
   webct_file_description: "Blackboard Vista/CE, WebCT 6+ 과목"
   webct_name: "Blackboard Vista/CE (WebCT)"
   website_url_177fc1dc: "웹 사이트 URL"
+  week_1f945ddd: 주
   welcome_to_your_courses_to_customize_the_list_of_c_f95e4b2: "나의 과목에 오신 것을 환영합니다! 과목들의 목록을 편집하려면 \"모든 과목\"을 클릭하고 표시할 과목들에 별표 표시를 하십시오."
   what_should_the_csv_file_look_like_985a59ac: "CSV 파일은 어떻게 보입니까?"
   what_would_you_like_to_do_next_2835397e: "다음에 어떤 작업을 하시겠습니까?"

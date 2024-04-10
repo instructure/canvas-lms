@@ -54,7 +54,8 @@ const ignoredErrors = [
   /You seem to have overlapping act\(\) calls/,
 ]
 const globalWarn = global.console.warn
-const ignoredWarnings = []
+const ignoredWarnings = [/JQMIGRATE:/] // ignore warnings about jquery migrate; these are muted globally when not in a jest test
+
 global.console = {
   log: console.log,
   error: error => {
@@ -269,3 +270,17 @@ Document.prototype.createRange =
 
 global.TextEncoder = TextEncoder
 global.TextDecoder = TextDecoder
+
+if (!('Worker' in window)) {
+  Object.defineProperty(window, 'Worker', {
+    value: class Worker {
+      constructor() {
+        this.postMessage = () => {}
+        this.terminate = () => {}
+        this.addEventListener = () => {}
+        this.removeEventListener = () => {}
+        this.dispatchEvent = () => {}
+      }
+    },
+  })
+}

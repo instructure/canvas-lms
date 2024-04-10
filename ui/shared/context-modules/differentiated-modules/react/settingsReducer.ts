@@ -23,6 +23,7 @@ export type SettingsPanelState = {
   unlockAt: string
   lockUntilChecked: boolean
   nameInputMessages: Array<{type: 'error'; text: string}>
+  lockUntilInputMessages: Array<{type: 'error'; text: string}>
   prerequisites: Module[]
   requirementCount: 'all' | 'one'
   requireSequentialProgress: boolean
@@ -35,6 +36,7 @@ export const defaultState: SettingsPanelState = {
   unlockAt: '',
   lockUntilChecked: false,
   nameInputMessages: [],
+  lockUntilInputMessages: [],
   prerequisites: [],
   requirementCount: 'all',
   requireSequentialProgress: false,
@@ -47,6 +49,7 @@ export const enum actions {
   SET_UNLOCK_AT = 'SET_UNLOCK_AT',
   SET_LOCK_UNTIL_CHECKED = 'SET_LOCK_UNTIL_CHECKED',
   SET_NAME_INPUT_MESSAGES = 'SET_NAME_INPUT_MESSAGES',
+  SET_LOCK_UNTIL_INPUT_MESSAGES = 'SET_LOCK_UNTIL_INPUT_MESSAGES',
   SET_PREREQUISITES = 'SET_PREREQUISITES',
   SET_REQUIREMENT_COUNT = 'SET_REQUIREMENT_COUNT',
   SET_REQUIRE_SEQUENTIAL_PROGRESS = 'SET_REQUIRE_SEQUENTIAL_PROGRESS',
@@ -67,6 +70,8 @@ export function reducer(
       return {...state, lockUntilChecked: action.payload}
     case actions.SET_NAME_INPUT_MESSAGES:
       return {...state, nameInputMessages: action.payload}
+    case actions.SET_LOCK_UNTIL_INPUT_MESSAGES:
+      return {...state, lockUntilInputMessages: action.payload}
     case actions.SET_PREREQUISITES:
       return {...state, prerequisites: action.payload}
     case actions.SET_REQUIREMENT_COUNT:

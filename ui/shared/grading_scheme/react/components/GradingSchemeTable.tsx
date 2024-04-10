@@ -20,7 +20,6 @@ import React, {useState} from 'react'
 import {Table} from '@instructure/ui-table'
 import {Responsive} from '@instructure/ui-responsive'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {Alert} from '@instructure/ui-alerts'
 import {
   IconDuplicateLine,
   IconEditLine,
@@ -37,7 +36,7 @@ import {Pagination} from '@instructure/ui-pagination'
 
 const I18n = useI18nScope('GradingSchemeManagement')
 
-type Props = {
+export type GradingSchemeTableProps = {
   caption: string
   gradingSchemeCards: GradingSchemeCardData[]
   showUsedLocations: boolean
@@ -62,7 +61,7 @@ export const GradingSchemeTable = ({
   archiveOrUnarchiveScheme,
   defaultScheme = false,
   archivedSchemes = false,
-}: Props) => {
+}: GradingSchemeTableProps) => {
   const [ascending, setAscending] = useState(true)
   const [currentPage, setCurrentPage] = useState<number>(0)
   const direction = ascending ? 'ascending' : 'descending'
@@ -77,7 +76,12 @@ export const GradingSchemeTable = ({
   }
   const currentPageSchemes = sortedSchemes.slice(currentPage * 10, currentPage * 10 + 10)
   const pages = [...Array(Math.ceil(sortedSchemes.length / 10)).keys()].map((v, index) => (
-    <Pagination.Page key={v} onClick={() => setCurrentPage(index)} current={index === currentPage}>
+    <Pagination.Page
+      data-testid={`scheme-table-page-${index}`}
+      key={v}
+      onClick={() => setCurrentPage(index)}
+      current={index === currentPage}
+    >
       {index + 1}{' '}
     </Pagination.Page>
   ))
@@ -88,6 +92,7 @@ export const GradingSchemeTable = ({
         key="name"
         width="35%"
         stackedSortByLabel="Grading Scheme Name"
+        data-testid="grading-scheme-name-header"
         onRequestSort={handleSort}
         sortDirection={direction}
       >
@@ -119,11 +124,9 @@ export const GradingSchemeTable = ({
     <>
       <Responsive
         query={{
-          small: {maxWidth: '40rem'},
           large: {minWidth: '41rem'},
         }}
         props={{
-          small: {layout: 'stacked'},
           large: {layout: 'auto'},
         }}
       >
@@ -131,16 +134,23 @@ export const GradingSchemeTable = ({
           <div>
             <Table
               caption={`${caption}: sorted by grading scheme name in ${direction} order`}
+              data-testid={`grading-scheme-table-${
+                archivedSchemes ? 'archived' : defaultScheme ? 'default' : 'active'
+              }`}
               {...props}
             >
               <Table.Head renderSortLabel="Sort by">{header}</Table.Head>
               <Table.Body>
                 {currentPageSchemes.map(gradingSchemeCard => (
-                  <Table.Row key={gradingSchemeCard.gradingScheme.id}>
+                  <Table.Row
+                    key={gradingSchemeCard.gradingScheme.id}
+                    data-testid={`grading-scheme-row-${gradingSchemeCard.gradingScheme.id}`}
+                  >
                     <Table.Cell>
                       <Link
                         onClick={() => openGradingScheme(gradingSchemeCard.gradingScheme)}
                         isWithinText={false}
+                        data-testid={`grading-scheme-${gradingSchemeCard.gradingScheme.id}-name`}
                       >
                         <TruncateText>{gradingSchemeCard.gradingScheme.title}</TruncateText>
                       </Link>
@@ -151,6 +161,7 @@ export const GradingSchemeTable = ({
                           <Link
                             isWithinText={false}
                             onClick={() => viewUsedLocations(gradingSchemeCard.gradingScheme)}
+                            data-testid={`grading-scheme-${gradingSchemeCard.gradingScheme.id}-view-locations-button`}
                           >
                             {I18n.t('Show courses and assignments')}
                           </Link>
@@ -165,6 +176,7 @@ export const GradingSchemeTable = ({
                         withBackground={false}
                         screenReaderLabel={I18n.t('Duplicate Grading Scheme')}
                         onClick={() => openDuplicateModal(gradingSchemeCard.gradingScheme)}
+                        data-testid={`grading-scheme-${gradingSchemeCard.gradingScheme.id}-duplicate-button`}
                       >
                         <IconDuplicateLine />
                       </IconButton>
@@ -175,6 +187,7 @@ export const GradingSchemeTable = ({
                             withBackground={false}
                             onClick={() => editGradingScheme(gradingSchemeCard.gradingScheme.id)}
                             screenReaderLabel={I18n.t('Edit Grading Scheme')}
+                            data-testid={`grading-scheme-${gradingSchemeCard.gradingScheme.id}-edit-button`}
                           >
                             <IconEditLine />
                           </IconButton>
@@ -189,6 +202,7 @@ export const GradingSchemeTable = ({
                             onClick={() =>
                               archiveOrUnarchiveScheme(gradingSchemeCard.gradingScheme)
                             }
+                            data-testid={`grading-scheme-${gradingSchemeCard.gradingScheme.id}-archive-button`}
                           >
                             {archivedSchemes ? <IconUnarchiveLine /> : <IconArchiveLine />}
                           </IconButton>
@@ -198,6 +212,7 @@ export const GradingSchemeTable = ({
                             withBackground={false}
                             screenReaderLabel={I18n.t('Delete Grading Scheme')}
                             onClick={() => openDeleteModal(gradingSchemeCard.gradingScheme)}
+                            data-testid={`grading-scheme-${gradingSchemeCard.gradingScheme.id}-delete-button`}
                             disabled={gradingSchemeCard.gradingScheme.assessed_assignment}
                           >
                             {gradingSchemeCard.gradingScheme.assessed_assignment ? (
@@ -221,13 +236,6 @@ export const GradingSchemeTable = ({
                 ))}
               </Table.Body>
             </Table>
-            <Alert
-              liveRegion={() => document.getElementById('flash-messages') || document.body}
-              liveRegionPoliteness="polite"
-              screenReaderOnly={true}
-            >
-              {`Sorted by grading scheme name in ${direction} order`}
-            </Alert>
           </div>
         )}
       </Responsive>
@@ -238,6 +246,7 @@ export const GradingSchemeTable = ({
           variant="compact"
           labelNext={I18n.t('Next Page')}
           labelPrev={I18n.t('Previous Page')}
+          data-testid="grading-scheme-table-pagination"
         >
           {pages}
         </Pagination>

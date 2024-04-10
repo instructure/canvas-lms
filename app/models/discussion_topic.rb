@@ -133,6 +133,12 @@ class DiscussionTopic < ActiveRecord::Base
   after_create :create_participant
   after_create :create_materialized_view
 
+  include SmartSearchable
+  use_smart_search title_column: :title,
+                   body_column: :message,
+                   index_scope: ->(course) { course.discussion_topics.active },
+                   search_scope: ->(course, user) { DiscussionTopic::ScopedToUser.new(course, user, course.discussion_topics.active).scope }
+
   def section_specific_topics_must_have_sections
     if !deleted? && is_section_specific && discussion_topic_section_visibilities.none?(&:active?)
       errors.add(:is_section_specific, t("Section specific topics must have sections"))
@@ -932,9 +938,17 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def comments_disabled?
-    !!(is_a?(Announcement) &&
-      context.is_a?(Course) &&
-      context.lock_all_announcements)
+    return false unless is_announcement
+
+    if context.is_a?(Course)
+      context.lock_all_announcements
+    elsif context.context.is_a?(Course)
+      context.context.lock_all_announcements
+    elsif context.context.is_a?(Account)
+      context.context.lock_all_announcements[:value]
+    else
+      false
+    end
   end
 
   def lock(opts = {})
@@ -1227,7 +1241,7 @@ class DiscussionTopic < ActiveRecord::Base
     given { |user| grants_right?(user, :read) }
     can :read_replies
 
-    given { |user| self.user && self.user == user && visible_for?(user) && !locked_for?(user, check_policies: true) && can_participate_in_course?(user) }
+    given { |user| self.user && self.user == user && visible_for?(user) && !locked_for?(user, check_policies: true) && can_participate_in_course?(user) && !comments_disabled? }
     can :reply
 
     given { |user| self.user && self.user == user && available_for?(user) && context.user_can_manage_own_discussion_posts?(user) && context.grants_right?(user, :participate_as_student) }
@@ -1238,7 +1252,7 @@ class DiscussionTopic < ActiveRecord::Base
 
     given do |user, session|
       !locked_for?(user, check_policies: true) &&
-        context.grants_right?(user, session, :post_to_forum) && visible_for?(user) && can_participate_in_course?(user)
+        context.grants_right?(user, session, :post_to_forum) && visible_for?(user) && can_participate_in_course?(user) && !comments_disabled?
     end
     can :reply
 

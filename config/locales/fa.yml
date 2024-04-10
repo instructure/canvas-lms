@@ -1258,6 +1258,8 @@ fa:
               check_box: "فایل CSV عضویت گروه"
           groups: 
             check_box: "فایل CSV گروه‌ها"
+          include_deleted: 
+            check_box: "درج اشیاء حذف شده"
           sections: 
             check_box: "فایل CSV بخش ها"
           terms: 
@@ -2063,6 +2065,7 @@ fa:
   add_domain_f15bc6c1: "افزودن دامنه"
   add_domain_lookup_825f9eb7: "جستجوی دامنه را اضافه کنید"
   add_email_address_aef3b61: "افزودن نشانی پست الکترونیکی"
+  add_event_9e21d0ff: "افزودن رویداد"
   add_existing_content_7e36da66: "افزودن محتوای موجود"
   add_external_feed_6d437a28: "افزودن خوراک خبری بیرونی"
   add_feed_49ed1cb2: "افزودن خوراک خبری"
@@ -2212,6 +2215,7 @@ fa:
   after_last_attempt_c9168da2: "بعد از آخرین تلاش"
   after_the_assignment_is_graded_53754607: "بعد از اینکه تکلیف نمره گذاری شد"
   after_the_due_date_eee89c9c: "بعد از تاریخ مهلت"
+  agenda_b010136d: Agenda
   ahead_21f22939: "در پیش"
   ajax_errors: 
     error_heading: "خطای Ajax: %{status_code}"
@@ -5602,6 +5606,7 @@ fa:
   comm_messages: 
     from_beginning: آغاز
     to_now: اکنون
+  comment_7ef1428e: نظر
   comment_added_33ab70d9: "نظر اضافه شد"
   comment_by_replying_to_this_message_or_join_the_co_26d42fde: "با پاسخ دادن به این پیام، نظر دهید، یا با استفاده از این پیوند: %{link} به گفتگو بپیوندید."
   comment_by_replying_to_this_message_or_join_the_co_52b5ac1c: " شما می‌توانید  با پاسخ دادن به این پیام نظر دهید و یا با استفاده از پیوند %{link}  به مکالمه ملحق شوید. هنگامی که مجاز است، اگر نیاز به یک ضمیمه دارید، لطفا به کانواس وارد شوید و به بحث پاسخ دهید."
@@ -8051,6 +8056,7 @@ fa:
   create_new_course_e3ef9cd0: "ایجاد درس جدید"
   create_new_discussions_6ab69da2: "ایجاد کردن بحث‌های جدید"
   create_new_e0946c49: "ایجاد جدید"
+  create_new_event_e9fb2fb6: "ایجاد رویداد جدید"
   create_new_filter_c244aa92: "ایجاد فیلتر جدید"
   create_new_group_bf9561d4: "ایجاد گروه جدید"
   create_new_group_fca5cc73: "ایجاد گروه جدید"
@@ -9709,6 +9715,7 @@ fa:
   enter_specific_phrase_9b686755: "عبارت خاصی را وارد کنید."
   enter_the_access_token_for_your_organization_from__38b84fd1: "شانه دسترسی سازمان خود را از *eduappcenter.com* وارد کنید. به محض اعمال، فقط برنامه هایی که سازمان شما در EduAppCenter تأیید کرده است در صفحه برنامه های بیرونی فهرست خواهد شد. با شیوه **ایجاد نشانه دسترسی** آشنا شوید."
   enter_the_access_token_for_your_organization_from__cc77493d: "نشانه دسترسی سازمان خود را از *eduappcenter.com* وارد کنید. به محض اعمال، فقط برنامه هایی که سازمان شما در EduAppCenter تأیید کرده است در صفحه برنامه های بیرونی فهرست خواهد شد. با شیوه **ایجاد نشانه دسترسی** آشنا شوید."
+  enter_the_date_you_would_like_to_navigate_to_a712de47: "تاریخی که می خواهید به آن پیمایش کنید را وارد کنید."
   enter_the_email_addresses_of_the_users_you_would_l_f76448a6: "نشانی های پست الکترونیکی کاربرانی که باید اضافه شوند به نحوی که با ویرگول یا خط از هم جدا شده باشند وارد کنید"
   enter_the_grade_41d5c97d: "نمره را وارد کنید"
   enter_the_login_ids_of_the_users_you_would_like_to_502fcbc5: "شناسه ورود کاربرانی که باید اضافه شوند را به نحوی که با ویرگول یا خط از هم جدا شده باشند، وارد کنید"
@@ -16000,6 +16007,7 @@ fa:
     must_view_incomplete: "این صفحه باید مشاهده شود"
   modules_settings_a7066f13: "تنظیمات ماژول ها"
   modules_tutorial_tray_d58ac3cb: "سینی خودآموز ماژول ها"
+  month_4b83b95f: ماه
   month_s_5c17590e: "ماه (ها)"
   monthandday_starting_at_time_769b12c8: "%{monthAndDay} شروع از %{time}"
   moodle_dropdown_many_warning_title: "%{count} پرسش بازشونده چندگانه در این مخزن وجود دارد که ممکن است به اشتباه وارد شده باشند"
@@ -25223,6 +25231,7 @@ fa:
   warning_for_improved_accessibility_of_calendar_eve_da54b4e2: "هشدار: برای دسترس پذیری بهتر رویدادهای تقویم، لطفا از نمای Agenda استفاده کنید."
   warning_for_improved_accessibility_of_reordering_a_5d0206c7: "هشدار: برای دسترس پذیری بهتر در مرتب سازی دوباره تکلیف ها و گروه ها، لطفا از گزینه «انتقال به کادر گفتگو» موجود در منو استفاده کنید."
   warning_for_improved_accessibility_please_click_he_e6472c02: "هشدار: برای دسترس پذیری بهتر، لطفا برای استفاده از دفتر نمره با نمای منفرد، اینجا کلیک کنید."
+  warning_for_improved_accessibility_please_use_the__1075c150: "هشدار: برای دسترس پذیری بهتر، لطفا از تقویم «نمای Agenda» استفاده کنید."
   warning_if_there_are_any_users_with_this_role_they_1a7c1fef: "اخطار:اگر کاربرانی با این نقش وجود داشته باشند، مجوزهای فعلی را نگه خواهند داشت، اما قادر نخواهید بود کاربران جدیدی با این نقش ایجاد کنید."
   warning_you_are_about_to_adjust_this_group_s_membe_a04281b6: "هشدار! شما در شرف تنظیم عضویت این گروه هستید. * این تغییر بر موارد ارسالی گروه موجود، یادآوری‌های و نظرات تأثیر می گذارد و منجر به از دست رفتن داده‌ها برای هر دو گروه و گروه قبلی دانشجو  می شود. *** برای جلوگیری از عواقب ناخواسته با موارد ارسالی گروه‌های موجود، یک مجموعه گروه جدید برای تکالیف بعدی ایجاد کنید. **"
   warnings: 
@@ -25278,6 +25287,7 @@ fa:
   website_url_b995c5b6: "آدرس وب سایت"
   website_url_input_1a3eab25: "ورودی آدرس وب سایت"
   website_url_url_bd07233d: "آدرس وب سایت: %{url}"
+  week_1f945ddd: هفته
   week_s_cb1492ee: هفته(ها)
   weekly_summary_56cd0c95: "خلاصه هفتگی"
   weight_9b308e5b: وزن
