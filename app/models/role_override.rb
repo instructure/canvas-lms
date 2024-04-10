@@ -1818,7 +1818,7 @@ class RoleOverride < ActiveRecord::Base
         account_allows: ->(a) { a.feature_enabled?(:admin_analytics_view_permission) }
       },
       view_ask_questions_analytics: {
-        label: -> { t("Ask Questions") },
+        label: -> { t("Ask Your Data") },
         group: "view_advanced_analytics",
         group_label: -> { t("Advanced Analytics") },
         available_to: %w[AccountAdmin AccountMembership],
