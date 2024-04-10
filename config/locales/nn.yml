@@ -507,6 +507,7 @@ nn:
   account_id_2c3b4f15: konto-ID
   account_id_73966078: konto_id
   account_id_f6e26867: Konto-ID
+  account_level_3c2a42a5: Kontonivå
   account_level_notification_preferences_require_an__66467cd7: "Innstillingar for kontovarsel krev ein konto_id for å oppdatere"
   account_level_notification_preferences_ui_update_f5e189a4: "Oppdatering av brukargrensesnitt til innstillingar for kontovarsel"
   account_level_notifications_apply_to_all_courses_n_8b99c5b0: "Innstillingar på konto-nivå vil gjelde for alle emne. Du kan stille inn varslingar på kvart enkelt emne, og då overstyre desse innstillingane."
