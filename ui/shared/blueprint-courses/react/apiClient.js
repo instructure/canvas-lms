@@ -20,6 +20,13 @@ import axios from '@canvas/axios'
 import parseLinkHeader from 'link-header-parsing/parseLinkHeaderFromAxios'
 import MigrationStates from './migrationStates'
 
+export const DEFAULT_PER_PAGE_PARAM = '100'
+export const DEFAULT_BLUEPRINT_PARAM = 'false'
+export const DEFAULT_BLUEPRINT_ASSOCIATED_PARAM = 'false'
+export const DEFAULT_TERM_INCLUDE_PARAM = 'term'
+export const DEFAULT_TEACHERS_INCLUDE_PARAM = 'teachers'
+export const DEFAULT_TEACHERS_LIMIT_PARAM = '5'
+
 const ApiClient = {
   _depaginate(url, maxPages = Infinity, allResults = []) {
     return axios.get(url).then(res => {
@@ -49,13 +56,13 @@ const ApiClient = {
 
   getCourses({accountId}, {search = '', term = '', subAccount = ''} = {}) {
     const params = this._queryString([
-      {per_page: '100'},
-      {blueprint: 'false'},
-      {blueprint_associated: 'false'},
-      {'include[]': 'term'},
-      {'include[]': 'teachers'},
-      {teacher_limit: '5'},
-      {search_term: search},
+      {per_page: DEFAULT_PER_PAGE_PARAM},
+      {blueprint: DEFAULT_BLUEPRINT_PARAM},
+      {blueprint_associated: DEFAULT_BLUEPRINT_ASSOCIATED_PARAM},
+      {'include[]': DEFAULT_TERM_INCLUDE_PARAM},
+      {'include[]': DEFAULT_TEACHERS_INCLUDE_PARAM},
+      {teacher_limit: DEFAULT_TEACHERS_LIMIT_PARAM},
+      {search_term: encodeURIComponent(search)},
       {enrollment_term_id: term},
     ])
 
