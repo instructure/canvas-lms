@@ -290,14 +290,20 @@ class CommunicationChannel < ActiveRecord::Base
     errors.add(:workflow_state, "Can't remove a user's SMS that is used for one time passwords") if id == user.otp_communication_channel_id
   end
 
-  # Public: Build the url where this record can be confirmed.
+  # Public: Provides base components for an email confirmation URL.
   #
+  # Constructs and returns a hash of components necessary to build a
+  # confirmation URL for email type communication channels.
   #
-  # Returns a string.
-  def confirmation_url
-    return "" unless path_type == TYPE_EMAIL
+  # Returns a hash with :context, and :confirmation_code if the path type is
+  # email; returns nil otherwise.
+  def confirmation_url_data
+    return nil unless path_type == TYPE_EMAIL
 
-    "#{HostUrl.protocol}://#{HostUrl.context_host(context)}/register/#{confirmation_code}"
+    {
+      context:,
+      confirmation_code:
+    }
   end
 
   def context
