@@ -34,6 +34,7 @@ class DeveloperKey < ActiveRecord::Base
   belongs_to :account
   belongs_to :root_account, class_name: "Account"
   belongs_to :service_user, class_name: "User"
+  belongs_to :lti_registration, class_name: "Lti::Registration", inverse_of: :developer_key, dependent: :destroy
 
   has_many :page_views
   has_many :access_tokens, -> { where(workflow_state: "active") }
@@ -42,7 +43,7 @@ class DeveloperKey < ActiveRecord::Base
 
   has_one :tool_consumer_profile, class_name: "Lti::ToolConsumerProfile", inverse_of: :developer_key
   has_one :tool_configuration, class_name: "Lti::ToolConfiguration", dependent: :destroy, inverse_of: :developer_key
-  has_one :lti_registration, class_name: "Lti::IMS::Registration", dependent: :destroy, inverse_of: :developer_key
+  has_one :ims_registration, class_name: "Lti::IMS::Registration", dependent: :destroy, inverse_of: :developer_key
   serialize :scopes, type: Array
 
   before_validation :normalize_public_jwk_url
@@ -125,8 +126,8 @@ class DeveloperKey < ActiveRecord::Base
     super(value)
   end
 
-  def lti_registration?
-    lti_registration.present?
+  def ims_registration?
+    ims_registration.present?
   end
 
   def validate_redirect_uris
@@ -408,7 +409,7 @@ class DeveloperKey < ActiveRecord::Base
   end
 
   def tool_configuration
-    lti_registration.presence || referenced_tool_configuration
+    ims_registration.presence || referenced_tool_configuration
   end
 
   private
