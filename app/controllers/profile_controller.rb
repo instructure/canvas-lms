@@ -262,6 +262,7 @@ class ProfileController < ApplicationController
     js_bundle :account_notification_settings
     respond_to do |format|
       format.html do
+        page_has_instui_topnav
         render html: "", layout: true
       end
     end
