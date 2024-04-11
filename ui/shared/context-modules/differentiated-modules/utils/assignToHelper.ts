@@ -19,9 +19,9 @@
 import type {AssigneeOption} from '../react/AssigneeSelector'
 import type {AssignmentOverridePayload, AssignmentOverridesPayload} from '../react/types'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {
-  type DateDetailsPayload,
-  type ItemAssignToCardSpec,
+import type {
+  DateDetailsPayload,
+  ItemAssignToCardSpec,
   DateDetailsOverride,
 } from '../react/Item/types'
 
