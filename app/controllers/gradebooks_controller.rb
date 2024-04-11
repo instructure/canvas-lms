@@ -211,7 +211,7 @@ class GradebooksController < ApplicationController
                                        end
                                      end
     course_active_grading_scheme = if course_active_grading_standard
-                                     GradingSchemesJsonController.gradebook_grading_scheme_json(course_active_grading_standard, @current_user)
+                                     GradingSchemesJsonController.base_grading_scheme_json(course_active_grading_standard, @current_user)
                                    else
                                      nil
                                    end
