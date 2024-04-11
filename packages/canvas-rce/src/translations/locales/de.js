@@ -326,6 +326,8 @@ const locale = {
   "enter_at_least_3_characters_to_search_4f037ee0": {
     "message": "Geben Sie für die Suche mindestens 3 Zeichen ein."
   },
+  "enter_replacement_text_17631bbc": { "message": "Ersatztext eingeben" },
+  "enter_search_text_26cb4459": { "message": "Suchtext eingeben" },
   "epsilon_54bb8afa": { "message": "Epsilon" },
   "epsilon_variant_d31f1e77": { "message": "Epsilon (Variante)" },
   "equals_sign_c51bdc58": { "message": "Gleichheitszeichen" },
@@ -368,6 +370,8 @@ const locale = {
   },
   "files_c300e900": { "message": "Dateien" },
   "files_index_af7c662b": { "message": "Dateienindex" },
+  "find_8d605019": { "message": "Suchen" },
+  "find_and_replace_6e345933": { "message": "Finden und Ersetzen" },
   "finish_bc343002": { "message": "Beenden" },
   "fix_heading_hierarchy_f60884c4": {
     "message": "Feste Überschriftshierarchie"
@@ -494,6 +498,7 @@ const locale = {
   "in_element_of_19ca2f33": { "message": "In (Element von)" },
   "increase_indent_6af90f7c": { "message": "Einzug vergrößern" },
   "indefinite_integral_6623307e": { "message": "Unbestimmtes Integral" },
+  "index_of_max_80dcf7a5": { "message": "{ index } von { max }" },
   "indigo_2035fc55": { "message": "Indigo" },
   "inference_fed5c960": { "message": "Schlussfolgerung" },
   "infinity_7a10f206": { "message": "Unendlichkeit" },
@@ -704,6 +709,7 @@ const locale = {
   },
   "no_quizzes_found_c80c537a": { "message": "Keine Quizze gefunden." },
   "no_results_940393cf": { "message": "Keine Ergebnisse." },
+  "no_results_found_58717065": { "message": "Keine Ergebnisse gefunden" },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Es wurden keine Ergebnisse für { filterTerm } gefunden."
   },
@@ -799,6 +805,7 @@ const locale = {
   "preview_a3f8f854": { "message": "VORSCHAU" },
   "preview_in_overlay_ed772c46": { "message": "Vorschau in Overlay" },
   "preview_inline_9787330": { "message": "Inline-Vorschau" },
+  "previous_bd2ac015": { "message": "Vorherige" },
   "prime_917ea60e": { "message": "Primzahl" },
   "prime_numbers_13464f61": { "message": "Primzahlen" },
   "product_39cf144f": { "message": "Produkt" },
@@ -827,7 +834,9 @@ const locale = {
   "religion_icon_246e0be1": { "message": "Religionssymbol" },
   "remove_heading_style_5fdc8855": { "message": "Überschriftsstil entfernen" },
   "remove_link_d1f2f4d0": { "message": "Link entfernen" },
+  "replace_all_d3d68b3": { "message": "Alle ersetzen" },
   "replace_e61834a7": { "message": "Ersetzen" },
+  "replace_with_eeff01ad": { "message": "Ersetzen mit" },
   "reset_95a81614": { "message": "Zurücksetzen" },
   "resize_ec83d538": { "message": "Größe ändern" },
   "restore_auto_save_deccd84b": {

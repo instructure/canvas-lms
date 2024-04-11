@@ -13,7 +13,7 @@ GEM
       minitest (>= 5.1)
       tzinfo (~> 2.0)
     concurrent-ruby (1.2.3)
-    debug (1.9.1)
+    debug (1.9.2)
       irb (~> 1.10)
       reline (>= 0.3.8)
     diff-lcs (1.5.1)
@@ -27,10 +27,10 @@ GEM
     minitest (5.22.3)
     psych (5.1.2)
       stringio
-    rake (13.1.0)
-    rdoc (6.6.2)
+    rake (13.2.1)
+    rdoc (6.6.3.1)
       psych (>= 4.0.0)
-    reline (0.4.3)
+    reline (0.5.1)
       io-console (~> 0.5)
     rspec (3.13.0)
       rspec-core (~> 3.13.0)
@@ -70,5 +70,8 @@ DEPENDENCIES
   rspec (~> 3.12)
   simplecov (~> 0.22)
 
+RUBY VERSION
+   ruby 3.1.2p20
+
 BUNDLED WITH
-   2.5.6
+   2.5.7

@@ -158,11 +158,11 @@ describe Group do
   context "atom" do
     it "has an atom name as it's own name" do
       group_model(name: "some unique name")
-      expect(@group.to_atom.title).to eql("some unique name")
+      expect(@group.to_atom[:title]).to eql("some unique name")
     end
 
     it "has a link to itself" do
-      link = @group.to_atom.links.first.to_s
+      link = @group.to_atom[:link]
       expect(link).to eql("/groups/#{@group.id}")
     end
   end
@@ -585,21 +585,6 @@ describe Group do
     group = Group.create(group_category: gc)
     hash = group.as_json
     expect(hash["group"]["group_category"]).to eq "Something"
-  end
-
-  it "maintains the deprecated category attribute" do
-    course = course_model
-    group = course.groups.create
-    default_category = GroupCategory.student_organized_for(course)
-    expect(group.read_attribute(:category)).to eql(default_category.name)
-    group.group_category = group.context.group_categories.create(name: "my category")
-    group.save
-    group.reload
-    expect(group.read_attribute(:category)).to eql("my category")
-    group.group_category = nil
-    group.save
-    group.reload
-    expect(group.read_attribute(:category)).to eql(default_category.name)
   end
 
   context "has_common_section?" do

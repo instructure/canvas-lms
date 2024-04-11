@@ -129,6 +129,7 @@ export const DiscussionEdit = props => {
             height={300}
             defaultContent={props.value}
             mirroredAttrs={{'data-testid': 'message-body'}}
+            resourceType={props.isAnnouncement ? 'announcement.reply' : 'discussion_topic.reply'}
           />
         </span>
         <Responsive
@@ -263,6 +264,7 @@ DiscussionEdit.propTypes = {
   isEdit: PropTypes.bool,
   quotedEntry: PropTypes.object,
   onInit: PropTypes.func,
+  isAnnouncement: PropTypes.bool.isRequired,
 }
 
 DiscussionEdit.defaultProps = {

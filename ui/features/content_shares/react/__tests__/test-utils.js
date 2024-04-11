@@ -45,6 +45,8 @@ export function mockShare(overrides = {}) {
 
 export const assignmentShare = mockShare()
 
+export const senderlessAssignmentShare = mockShare({sender: null})
+
 export const attachmentShare = mockShare({
   content_type: 'attachment',
   id: '3',

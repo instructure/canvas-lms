@@ -57,7 +57,7 @@ To add some comments, click the "Edit" link at the top.
   </div>
 </div>
 
-<div id="course_syllabus" style="margin-bottom: 10px;" class="user_content">
+<div id="course_syllabus" style="margin-bottom: 10px;" class="user_content" data-resource-type="syllabus.body" data-resource-id="<%= @context.id %>">
   <%= user_content(@syllabus_body) %>
 </div>
 <div id="course_syllabus_details" style="<%= hidden unless can_do(@context, @current_user, :manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS) && (!@context.syllabus_body || @context.syllabus_body.strip.empty?) %>">

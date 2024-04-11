@@ -50,6 +50,8 @@ QUnit.module('GradebookGrid AssignmentGroupColumnHeader', suiteHooks => {
         gradebookElements.splice(gradebookElements.indexOf($el), 1)
       },
 
+      showMessageStudentsWithObserversDialog: true,
+
       sortBySetting: {
         direction: 'ascending',
         disabled: false,
@@ -61,6 +63,9 @@ QUnit.module('GradebookGrid AssignmentGroupColumnHeader', suiteHooks => {
 
       isRunningScoreToUngraded: false,
 
+      userId: '123',
+      courseId: '1',
+
       viewUngradedAsZero: false,
       weightedGroups: true,
     }
@@ -71,9 +76,9 @@ QUnit.module('GradebookGrid AssignmentGroupColumnHeader', suiteHooks => {
     $container.remove()
   })
 
-  function mountComponent() {
+  function mountComponent(overrides) {
     // eslint-disable-next-line react/no-render-return-value
-    component = ReactDOM.render(<AssignmentGroupColumnHeader {...props} />, $container)
+    component = ReactDOM.render(<AssignmentGroupColumnHeader {...props} {...overrides} />, $container)
   }
 
   function getOptionsMenuTrigger() {
@@ -91,8 +96,8 @@ QUnit.module('GradebookGrid AssignmentGroupColumnHeader', suiteHooks => {
     $menuContent = getOptionsMenuContent()
   }
 
-  function mountAndOpenOptionsMenu() {
-    mountComponent()
+  function mountAndOpenOptionsMenu(overrides = {}) {
+    mountComponent(overrides)
     openOptionsMenu()
   }
 
@@ -344,6 +349,26 @@ QUnit.module('GradebookGrid AssignmentGroupColumnHeader', suiteHooks => {
             strictEqual(props.sortBySetting.onSortByGradeDescending.callCount, 0)
           }
         )
+      })
+    })
+  })
+
+  QUnit.module('"Options" > "Message Students Who" action', () => {
+    test('present when "showMessageStudentsWithObserversDialog" is true', () => {
+      mountAndOpenOptionsMenu()
+      ok(getMenuItem($menuContent, 'Message Students Who'))
+    })
+
+    test('not present when "showMessageStudentsWithObserversDialog" is false', () => {
+      mountAndOpenOptionsMenu({showMessageStudentsWithObserversDialog: false})
+      notOk(getMenuItem($menuContent, 'Message Students Who'))
+    })
+
+    QUnit.module('when clicked', () => {
+      test('does not restore focus to the "Options" menu trigger', () => {
+        mountAndOpenOptionsMenu()
+        getMenuItem($menuContent, 'Message Students Who').click()
+        notEqual(document.activeElement, getOptionsMenuTrigger())
       })
     })
   })

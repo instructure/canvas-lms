@@ -16,17 +16,25 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {mount} from 'enzyme'
 import {render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import MediaAttempt from '../MediaAttempt'
-import {MediaPlayer} from '@instructure/ui-media-player'
+import MediaPlayer from '@instructure/ui-media-player'
 import {mockAssignmentAndSubmission} from '@canvas/assignments/graphql/studentMocks'
 import React from 'react'
 import StudentViewContext from '../../Context'
 import {enableFetchMocks} from 'jest-fetch-mock'
 
 enableFetchMocks()
+
+// We need to set up a mock, as for some reason, jest.spyOn does not work on the original MediaPlayer
+jest.mock('@instructure/ui-media-player', () => {
+  const mockPlayer = jest.fn(() => null)
+  mockPlayer.propTypes = {}
+  return {
+    MediaPlayer: mockPlayer,
+  }
+})
 
 const submissionDraftOverrides = {
   Submission: {
@@ -152,6 +160,7 @@ describe('MediaAttempt', () => {
     })
 
     it('sets default cc when auto_show_cc is enabled', async () => {
+      const playerSpy = jest.spyOn(MediaPlayer, 'MediaPlayer')
       const props = await makeProps({
         Submission: {
           mediaObject: {
@@ -183,9 +192,8 @@ describe('MediaAttempt', () => {
         },
       })
       global.ENV = {auto_show_cc: true, current_user: {id: '1'}}
-      const wrapper = mount(<MediaAttempt {...props} uploadingFiles={false} />)
-      const mediaplayer = wrapper.find(MediaPlayer)
-      expect(mediaplayer.props().autoShowCaption).toBe('en')
+      render(<MediaAttempt {...props} uploadingFiles={false} />)
+      expect(playerSpy).toHaveBeenCalledWith(expect.objectContaining({autoShowCaption: 'en'}), {})
     })
   })
 

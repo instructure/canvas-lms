@@ -666,8 +666,7 @@ describe Quizzes::Quiz do
     expect(data.length).to be(1)
     expect(data[0][:answers]).not_to be_empty
     same = true
-    found = []
-    data[0][:answers].each { |a| found << a[:text] }
+    found = data[0][:answers].pluck(:text)
     expect(found.uniq.length).to be(10)
     same = false if data[0][:answers][0][:text] != "1"
     same = false if data[0][:answers][1][:text] != "2"

@@ -36,7 +36,7 @@ module ConditionalRelease
 
     scope :latest, lambda {
       select("DISTINCT ON (assignment_set_id, student_id) id")
-        .order("assignment_set_id, student_id, created_at DESC")
+        .order("assignment_set_id, student_id, updated_at DESC")
     }
 
     def self.current_assignments(student_id_or_ids, sets = nil)
@@ -49,9 +49,9 @@ module ConditionalRelease
       opts[:actor_id] ||= opts[:student_id]
 
       [["assign", assigned], ["unassign", unassigned]].each do |action, sets|
-        sets = Array.wrap(sets)
-        sets.each do |set|
-          find_or_create_by! opts.merge(action:, assignment_set: set, root_account_id: set.root_account_id)
+        Array.wrap(sets).each do |set|
+          set_action_data = opts.merge(action:, assignment_set: set, root_account_id: set.root_account_id)
+          (set_action = find_by(set_action_data)) ? set_action.touch : create!(set_action_data)
         end
       end
     end

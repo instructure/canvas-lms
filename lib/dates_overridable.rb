@@ -46,8 +46,8 @@ module DatesOverridable
   end
 
   def overridden_for(user, skip_clone: false)
-    # TODO: support DiscussionTopic, WikiPage, Attachment in AssignmentOverrideApplicator (LF-1048)
-    return self if is_a?(DiscussionTopic) || is_a?(WikiPage) || is_a?(Attachment)
+    # TODO: support Attachment in AssignmentOverrideApplicator (LF-1458)
+    return self if is_a?(Attachment)
 
     AssignmentOverrideApplicator.assignment_overridden_for(self, user, skip_clone:)
   end
@@ -101,8 +101,12 @@ module DatesOverridable
 
   def assignment_context_modules
     if is_a?(Assignment) && quiz.present?
-      # if it's a quiz's assignment, the context module content tags are attached to the quiz
+      # if it's another learning object's assignment, the context module content tags are attached to the learning object
       ContextModule.not_deleted.where(id: quiz.context_module_tags.select(:context_module_id))
+    elsif is_a?(Assignment) && discussion_topic.present?
+      ContextModule.not_deleted.where(id: discussion_topic.context_module_tags.select(:context_module_id))
+    elsif is_a?(Assignment) && wiki_page.present? # wiki pages can have assignments through mastery paths
+      ContextModule.not_deleted.where(id: wiki_page.context_module_tags.select(:context_module_id))
     else
       ContextModule.not_deleted.where(id: context_module_tags.select(:context_module_id))
     end

@@ -49,20 +49,20 @@ GEM
     method_source (1.0.0)
     mini_portile2 (2.8.5)
     minitest (5.22.3)
-    nokogiri (1.15.5)
+    nokogiri (1.16.3)
       mini_portile2 (~> 2.8.2)
       racc (~> 1.4)
-    nokogiri (1.15.5-aarch64-linux)
+    nokogiri (1.16.3-aarch64-linux)
       racc (~> 1.4)
-    nokogiri (1.15.5-arm64-darwin)
+    nokogiri (1.16.3-arm64-darwin)
       racc (~> 1.4)
-    nokogiri (1.15.5-x86_64-darwin)
+    nokogiri (1.16.3-x86_64-darwin)
       racc (~> 1.4)
-    nokogiri (1.15.5-x86_64-linux)
+    nokogiri (1.16.3-x86_64-linux)
       racc (~> 1.4)
     pg (1.5.6)
     racc (1.7.3)
-    rack (2.2.8.1)
+    rack (2.2.9)
     rack-test (2.1.0)
       rack (>= 1.3)
     rails-dom-testing (2.2.0)
@@ -79,7 +79,7 @@ GEM
       rake (>= 12.2)
       thor (~> 1.0)
       zeitwerk (~> 2.5)
-    rake (13.1.0)
+    rake (13.2.1)
     rspec (3.13.0)
       rspec-core (~> 3.13.0)
       rspec-expectations (~> 3.13.0)
@@ -117,5 +117,8 @@ DEPENDENCIES
   rspec (~> 3.12)
   simplecov (~> 0.22)
 
+RUBY VERSION
+   ruby 3.1.2p20
+
 BUNDLED WITH
-   2.5.6
+   2.5.7

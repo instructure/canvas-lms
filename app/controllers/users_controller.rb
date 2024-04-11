@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "atom"
-
 # @API Users
 # API for accessing information on the current and other users.
 #
@@ -2397,12 +2395,10 @@ class UsersController < ApplicationController
   def public_feed
     return unless get_feed_context(only: [:user])
 
-    feed = Atom::Feed.new do |f|
-      f.title = "#{@context.name} Feed"
-      f.links << Atom::Link.new(href: dashboard_url, rel: "self")
-      f.updated = Time.now
-      f.id = user_url(@context)
-    end
+    title = "#{@context.name} Feed"
+    link = dashboard_url
+    id = user_url(@context)
+
     @entries = []
     cutoff = 1.week.ago
     @context.courses.each do |context|
@@ -2413,11 +2409,9 @@ class UsersController < ApplicationController
       end)
       @entries.concat WikiPages::ScopedToUser.new(context, @current_user, context.wiki_pages.published.where("wiki_pages.updated_at>?", cutoff)).scope
     end
-    @entries.each do |entry|
-      feed.entries << entry.to_atom(include_context: true, context: @context)
-    end
+
     respond_to do |format|
-      format.atom { render plain: feed.to_xml }
+      format.atom { render plain: AtomFeedHelper.render_xml(title:, link:, id:, entries: @entries, include_context: true, context: @context) }
     end
   end
 

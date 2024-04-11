@@ -18,11 +18,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "atom"
 require "canvas/draft_state_validations"
 
 class AbstractAssignment < ActiveRecord::Base
   self.table_name = "assignments"
+
+  self.ignored_columns += ["group_category"]
 
   include Workflow
   include TextHelper
@@ -660,7 +661,6 @@ class AbstractAssignment < ActiveRecord::Base
   before_save :ensure_post_to_sis_valid,
               :process_if_quiz,
               :default_values,
-              :maintain_group_category_attribute,
               :validate_assignment_overrides,
               :mute_if_changed_to_anonymous,
               :mute_if_changed_to_moderated
@@ -1710,16 +1710,19 @@ class AbstractAssignment < ActiveRecord::Base
         </div>
       "
     end
-    Atom::Entry.new do |entry|
-      entry.title     = t(:feed_entry_title, "Assignment: %{assignment}", assignment: self.title) unless opts[:include_context]
-      entry.title     = t(:feed_entry_title_with_course, "Assignment, %{course}: %{assignment}", assignment: self.title, course: context.name) if opts[:include_context]
-      entry.updated   = updated_at.utc
-      entry.published = created_at.utc
-      entry.id        = "tag:#{HostUrl.default_host},#{created_at.strftime("%Y-%m-%d")}:/assignments/#{feed_code}_#{due_at.strftime("%Y-%m-%d-%H-%M") rescue "none"}"
-      entry.content   = Atom::Content::Html.new(content)
-      entry.links << Atom::Link.new(rel: "alternate", href: direct_link)
-      entry.authors << Atom::Person.new(name: author_name)
-    end
+
+    title = t(:feed_entry_title, "Assignment: %{assignment}", assignment: self.title) unless opts[:include_context]
+    title = t(:feed_entry_title_with_course, "Assignment, %{course}: %{assignment}", assignment: self.title, course: context.name) if opts[:include_context]
+
+    {
+      title:,
+      updated: updated_at.utc,
+      published: created_at.utc,
+      id: "tag:#{HostUrl.default_host},#{created_at.strftime("%Y-%m-%d")}:/assignments/#{feed_code}_#{due_at.strftime("%Y-%m-%d-%H-%M") rescue "none"}",
+      content:,
+      link: direct_link,
+      author: author_name
+    }
   end
 
   def start_at
@@ -2572,9 +2575,6 @@ class AbstractAssignment < ActiveRecord::Base
       if group_category
         # put back version from association
         json["assignment"]["group_category"] = group_category.name
-      elsif read_attribute("group_category").present?
-        # or failing that, version from query
-        json["assignment"]["group_category"] = read_attribute("group_category")
       end
 
       if json.dig("assignment", "rubric_association") && !active_rubric_association?
@@ -2854,18 +2854,6 @@ class AbstractAssignment < ActiveRecord::Base
 
   def submission_reupload_progress
     Progress.where(context_type: "Assignment", context_id: self, tag: "submissions_reupload").last
-  end
-
-  def group_category_name
-    read_attribute(:group_category)
-  end
-
-  def maintain_group_category_attribute
-    # keep this field up to date even though it's not used (group_category_name
-    # exists solely for the migration that introduces the GroupCategory model).
-    # this way group_category_name is correct if someone mistakenly uses it
-    # (modulo category renaming in the GroupCategory model).
-    write_attribute(:group_category, group_category&.name)
   end
 
   def has_group_category?

@@ -337,6 +337,18 @@ describe "Provisional Grades API", type: :request do
           expect(@assignment.reload.grades_published?).to be_truthy
           expect(@submission.reload.grade).to be_nil
         end
+
+        it "returns unprocessable_entity when non-empty provisional grades exist and no grade is selected" do
+          second_ta = course_with_user("TaEnrollment", course: @course, active_all: true).user
+          third_ta = course_with_user("TaEnrollment", course: @course, active_all: true).user
+          @assignment.grade_student(@student, grader: second_ta, score: 72, provisional: true)
+          @assignment.grade_student(@student, grader: third_ta, score: 88, provisional: true)
+
+          api_call_as_user(@teacher, :post, @path, @params)
+
+          expect(response).to have_http_status(:unprocessable_entity)
+          expect(@assignment.reload.grades_published?).to be false
+        end
       end
 
       context "with provisional grades" do

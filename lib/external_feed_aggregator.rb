@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "atom"
+require "feedjira"
 
 class ExternalFeedAggregator
   def self.process
@@ -64,8 +64,8 @@ class ExternalFeedAggregator
       return true
     rescue
       begin
-        require "atom"
-        atom = Atom::Feed.load_feed(body)
+        require "feedjira"
+        atom = Feedjira.parse(body)
         feed.title = atom.title.to_s
         feed.save
         @logger.info("#{atom.entries.length} atom entries found")

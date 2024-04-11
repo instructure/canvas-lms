@@ -50,6 +50,7 @@ const GradeSummaryContainer = () => {
 
   const gradingPeriod = ENV?.grading_period?.id || getGradingPeriodID()
   const viewingUserId = ENV?.student_id
+  const hideTotalRow = ENV?.hide_final_grades
 
   const variables = {
     courseID: ENV.course_id,
@@ -205,6 +206,7 @@ const GradeSummaryContainer = () => {
               handleRubricReadStateChange={handleRubricReadStateChange}
               setSubmissionAssignmentId={setSubmissionAssignmentId}
               submissionAssignmentId={submissionAssignmentId}
+              hideTotalRow={hideTotalRow}
             />
             <SubmissionCommentsTray
               onDismiss={() => {

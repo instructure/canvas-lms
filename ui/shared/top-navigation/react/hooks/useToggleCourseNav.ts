@@ -16,10 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {useEffect, useState} from 'react'
+
 // import {setSetting} from 'features/navigation_header/react/queries/settingsQuery'
 
 interface IUseToggleCourseNav {
-  toggle: () => void
+  toggle: () => boolean
 }
 
 const useToggleCourseNav = (): IUseToggleCourseNav => {
@@ -27,7 +29,7 @@ const useToggleCourseNav = (): IUseToggleCourseNav => {
   const leftSideElement = document.getElementById('left-side')
   const WIDE_BREAKPOINT = 1200
 
-  const toggle = (): void => {
+  const toggle = (): boolean => {
     const sectionTabLinks = document.querySelectorAll('#section-tabs li a')
     const stickyFrame = document.querySelector('#left-side #sticky-container')
 
@@ -58,7 +60,10 @@ const useToggleCourseNav = (): IUseToggleCourseNav => {
         stickyFrame.classList.remove('has-scrollbar')
       }
     }
+
+    return !!isCourseMenuExpanded
     // setSetting({setting: 'collapse_course_nav', newState: !isCourseMenuExpanded})
+
     // TO DO: Update aria-label for hamburger button (evaluate options)
   }
 

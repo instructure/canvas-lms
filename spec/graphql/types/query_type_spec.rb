@@ -177,4 +177,68 @@ describe Types::QueryType do
       end
     end
   end
+
+  context "submission" do
+    before :once do
+      @student1 = student_in_course(active_all: true).user
+      @student2 = student_in_course(active_all: true).user
+      @assignment = @course.assignments.create!(name: "asdf", points_possible: 10)
+    end
+
+    let(:submission) { @assignment.submissions.find_by(user: @student1) }
+
+    it "allows fetching the submission via ID as a teacher" do
+      expect(
+        CanvasSchema.execute(
+          "{ submission(id: #{submission.id}) { _id } }",
+          context: { current_user: @teacher }
+        ).dig("data", "submission", "_id")
+      ).to eq submission.id.to_s
+    end
+
+    it "allows fetching the submission via ID as the submission owner" do
+      expect(
+        CanvasSchema.execute(
+          "{ submission(id: #{submission.id}) { _id } }",
+          context: { current_user: @student1 }
+        ).dig("data", "submission", "_id")
+      ).to eq submission.id.to_s
+    end
+
+    it "does not allow fetching the submission via ID as a non-owner student" do
+      expect(
+        CanvasSchema.execute(
+          "{ submission(id: #{submission.id}) { _id } }",
+          context: { current_user: @student2 }
+        ).dig("data", "submission")
+      ).to be_nil
+    end
+
+    it "returns an error when fetching the submission via ID in combination with the assignment ID" do
+      expect(
+        CanvasSchema.execute(
+          "{ submission(id: #{submission.id}, assignmentId: #{@assignment.id}) { _id } }",
+          context: { current_user: @teacher }
+        ).dig("errors", 0, "message")
+      ).to eq "Must specify an id or an assignment_id and user_id"
+    end
+
+    it "returns an error when fetching the submission via ID in combination with the user ID" do
+      expect(
+        CanvasSchema.execute(
+          "{ submission(id: #{submission.id}, userId: #{@student1.id}) { _id } }",
+          context: { current_user: @teacher }
+        ).dig("errors", 0, "message")
+      ).to eq "Must specify an id or an assignment_id and user_id"
+    end
+
+    it "returns an error when not providing an id or assignment_id and user_id" do
+      expect(
+        CanvasSchema.execute(
+          "{ submission { _id } }",
+          context: { current_user: @teacher }
+        ).dig("errors", 0, "message")
+      ).to eq "Must specify an id or an assignment_id and user_id"
+    end
+  end
 end

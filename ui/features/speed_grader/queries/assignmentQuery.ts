@@ -19,6 +19,7 @@
 import {z} from 'zod'
 import {executeQuery} from '@canvas/query/graphql'
 import gql from 'graphql-tag'
+import {omit} from 'lodash'
 
 const ASSIGNMENT_QUERY = gql`
   query AssignmentQuery($assignmentId: ID!) {
@@ -26,33 +27,70 @@ const ASSIGNMENT_QUERY = gql`
       dueAt
       gradingType
       id
+      _id
       name
       pointsPossible
       rubric {
         _id
+        freeFormCriterionComments
         pointsPossible
         criteria {
+          criterionUseRange
           description
           longDescription
+          ignoreForScoring
           points
           ratings {
+            tag: _id
             description
             longDescription
             points
-            _id
-            rubricId
           }
         }
+      }
+      rubricAssociation {
+        hideOutcomeResults
+        hidePoints
+        hideScoreTotal
+        useForGrading
       }
     }
   }
 `
 
-function transform(result: any) {
-  if (result?.assignment) {
-    return result?.assignment
+function formattedRubric(assignment: any) {
+  if (!assignment.rubric || !assignment.rubricAssociation) {
+    return null
   }
-  return null
+
+  const {_id, criteria, freeFormCriterionComments, pointsPossible} = assignment.rubric
+  const {hideOutcomeResults, hidePoints, hideScoreTotal, useForGrading} =
+    assignment.rubricAssociation
+  return {
+    _id,
+    criteria,
+    freeFormCriterionComments,
+    hideOutcomeResults,
+    hidePoints,
+    hideScoreTotal,
+    pointsPossible,
+    useForGrading,
+  }
+}
+
+function transformRubric(assignment: any) {
+  return {
+    ...omit(assignment, ['rubric', 'rubricAssociation']),
+    rubric: formattedRubric(assignment),
+  }
+}
+
+function transform(result: any) {
+  if (!result?.assignment) {
+    return null
+  }
+
+  return transformRubric(result.assignment)
 }
 
 export const ZGetAssignmentParams = z.object({

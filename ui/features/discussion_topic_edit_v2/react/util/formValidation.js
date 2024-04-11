@@ -18,6 +18,8 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 
+import {minimumReplyToEntryRequiredCount, maximumReplyToEntryRequiredCount} from './constants'
+
 const I18n = useI18nScope('discussion_create')
 
 export const validateTitle = (newTitle, setTitleValidationMessages) => {
@@ -119,6 +121,16 @@ const validateGradedDiscussionFields = (gradedDiscussionRefMap, gradedDiscussion
   return true
 }
 
+const validateReplyToEntryRequiredCount = (isCheckpoints, replyToEntryRequiredCount) => {
+  if (!isCheckpoints) {
+    return true
+  }
+  return (
+    replyToEntryRequiredCount >= minimumReplyToEntryRequiredCount &&
+    replyToEntryRequiredCount <= maximumReplyToEntryRequiredCount
+  )
+}
+
 export const validateFormFields = (
   title,
   availableFrom,
@@ -140,7 +152,10 @@ export const validateFormFields = (
   setTitleValidationMessages,
   setAvailabilityValidationMessages,
   shouldShowPostToSectionOption,
-  sectionIdsToPostTo
+  sectionIdsToPostTo,
+  isCheckpoints,
+  replyToEntryRequiredCount,
+  replyToEntryRequiredRef
 ) => {
   let isValid = true
 
@@ -177,6 +192,13 @@ export const validateFormFields = (
         isGraded
       ),
       ref: gradedDiscussionRef.current,
+    },
+    {
+      validationFunction: validateReplyToEntryRequiredCount(
+        isCheckpoints,
+        replyToEntryRequiredCount
+      ),
+      ref: replyToEntryRequiredRef.current,
     },
     {
       validationFunction: validateUsageRights(

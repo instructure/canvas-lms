@@ -66,6 +66,8 @@ export default class LinkToStudentsView extends DialogBaseView {
     })
     const input = this.$('#student_input').data('token_input')
     input.$fakeInput.css('width', '100%')
+    input.$fakeInput.css('min-height', '78px')
+    input.$fakeInput.css('overflow', 'auto')
 
     for (const e of this.model.allEnrollmentsByType('ObserverEnrollment')) {
       if (e.observed_user && some(e.observed_user.enrollments)) {

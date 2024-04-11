@@ -17,8 +17,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "atom"
-
 class DiscussionTopic < ActiveRecord::Base
   include Workflow
   include SendToStream
@@ -77,6 +75,7 @@ class DiscussionTopic < ActiveRecord::Base
            },
            class_name: "DiscussionEntry"
   has_many :root_discussion_entries, -> { preload(:user).where("discussion_entries.parent_id IS NULL AND discussion_entries.workflow_state<>'deleted'") }, class_name: "DiscussionEntry"
+  has_many :ungraded_discussion_student_visibilities
   has_one :external_feed_entry, as: :asset
   belongs_to :root_account, class_name: "Account"
   belongs_to :external_feed
@@ -1329,16 +1328,16 @@ class DiscussionTopic < ActiveRecord::Base
     author_name = user.present? ? user.name : t("#discussion_topic.atom_no_author", "No Author")
     prefix = [is_announcement ? t("#titles.announcement", "Announcement") : t("#titles.discussion", "Discussion")]
     prefix << context.name if opts[:include_context]
-    Atom::Entry.new do |entry|
-      entry.title = [before_label(prefix.to_sentence), title].join(" ")
-      entry.authors << Atom::Person.new(name: author_name)
-      entry.updated   = updated_at
-      entry.published = created_at
-      entry.id        = "tag:#{HostUrl.default_host},#{created_at.strftime("%Y-%m-%d")}:/discussion_topics/#{feed_code}"
-      entry.links << Atom::Link.new(rel: "alternate",
-                                    href: "http://#{HostUrl.context_host(context)}/#{context_url_prefix}/discussion_topics/#{id}")
-      entry.content   = Atom::Content::Html.new(message || "")
-    end
+
+    {
+      title: [before_label(prefix.to_sentence), title].join(" "),
+      author: author_name,
+      updated: updated_at,
+      published: created_at,
+      id: "tag:#{HostUrl.default_host},#{created_at.strftime("%Y-%m-%d")}:/discussion_topics/#{feed_code}",
+      link: "http://#{HostUrl.context_host(context)}/#{context_url_prefix}/discussion_topics/#{id}",
+      content: message || ""
+    }
   end
 
   def context_prefix

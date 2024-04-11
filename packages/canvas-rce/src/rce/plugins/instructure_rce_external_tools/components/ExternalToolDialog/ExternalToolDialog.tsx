@@ -225,9 +225,11 @@ export default class ExternalToolDialog extends React.Component<
           target="external_tool_launch"
           style={{margin: 0}}
         >
-          <input type="hidden" name="editor" value="1" />
-          <input type="hidden" name="selection" value={state.form.selection} />
-          <input type="hidden" name="editor_contents" value={state.form.contents} />
+          <input type="hidden" name="editor" value="1"/>
+          <input type="hidden" name="selection" value={state.form.selection}/>
+          <input type="hidden" name="editor_contents" value={state.form.contents}/>
+          <input type="hidden" name="com_instructure_course_canvas_resource_type" value={props.env.rceWrapper?.getResourceIdentifiers().resourceType} />
+          <input type="hidden" name="com_instructure_course_canvas_resource_id" value={props.env.rceWrapper?.getResourceIdentifiers().resourceId} />
           {state.form.parent_frame_context != null && (
             <input
               type="hidden"

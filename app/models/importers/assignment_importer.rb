@@ -120,6 +120,7 @@ module Importers
 
       item.title = hash[:title]
       item.title = I18n.t("untitled assignment") if item.title.blank?
+      item.time_zone_edited = hash[:time_zone_edited] if hash.key?(:time_zone_edited)
       item.migration_id = hash[:migration_id]
       if new_record || item.deleted? || master_migration
         restore_lti_models(item) if item.deleted?

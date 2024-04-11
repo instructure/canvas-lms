@@ -54,7 +54,7 @@ function GradersTable(props) {
     !props.gradesLoading && rows.some(row => (row.selectionDetails || {}).allowed)
 
   return (
-    <View as="div" padding="0 small">
+    <View as="div" padding="0 small" data-testid="graders-table">
       <ScreenReaderContent>
         <Heading>{I18n.t('Grader Details')}</Heading>
       </ScreenReaderContent>

@@ -809,6 +809,17 @@ module Canvas::LiveEvents
     out&.context&.uuid
   end
 
+  def self.rubric_assessment_learning_outcome_result_associated_asset(result)
+    # By default associated_asset is nil for RubricAssessment LOR.  For what I can tell, there is no reason for this being
+    # nil and should be updated to reflect the RubricAssociation association object. This work is accounted for in OUT-6303.
+    # setting associated_asset to the Canvas assignment for Rubric Assessments
+    if result.associated_asset.nil? && result.artifact_type == "RubricAssessment" && result.association_type == "RubricAssociation"
+      rubric_association = RubricAssociation.find(result.association_id)
+      result.associated_asset_id = rubric_association.association_id
+      result.associated_asset_type = rubric_association.association_type
+    end
+  end
+
   def self.get_learning_outcome_result_data(result)
     {
       learning_outcome_id: result.learning_outcome_id,
@@ -822,17 +833,35 @@ module Canvas::LiveEvents
       original_possible: result.original_possible,
       original_mastery: result.original_mastery,
       assessed_at: result.assessed_at,
-      title: result.title,
       percent: result.percent,
-      workflow_state: result.workflow_state
+      workflow_state: result.workflow_state,
+      user_uuid: result.user_uuid,
+      artifact_id: result.artifact_id,
+      artifact_type: result.artifact_type,
+      associated_asset_id: result.associated_asset_id,
+      associated_asset_type: result.associated_asset_type
     }
   end
 
   def self.learning_outcome_result_updated(result)
+    # If the LOR's workflow_state is 'deleted' this mean the association object is deleted as well.
+    # this can happen in multiple ways, the most likely case is that the rubric was updated which causes
+    # the rubric association to be created.  After saving the new rubric association, it will call assert_uniqueness
+    # which results in permanently removing the previous association leaving only the new RubricAssociation.
+    # Given this, if the learning outcome results workflow state is deleted, do not worry about updating
+    # the associated asset information as the rubric association no longer exists.
+    rubric_assessment_learning_outcome_result_associated_asset(result) unless result.workflow_state == "deleted"
     post_event_stringified("learning_outcome_result_updated", get_learning_outcome_result_data(result).merge(updated_at: result.updated_at))
   end
 
   def self.learning_outcome_result_created(result)
+    # If the LOR's workflow_state is 'deleted' this mean the association object is deleted as well.
+    # this can happen in multiple ways, the most likely case is that the rubric was updated which causes
+    # the rubric association to be created.  After saving the new rubric association, it will call assert_uniqueness
+    # which results in permanently removing the previous association leaving only the new RubricAssociation.
+    # Given this, if the learning outcome results workflow state is deleted, do not worry about updating
+    # the associated asset information as the rubric association no longer exists.
+    rubric_assessment_learning_outcome_result_associated_asset(result) unless result.workflow_state == "deleted"
     post_event_stringified("learning_outcome_result_created", get_learning_outcome_result_data(result))
   end
 

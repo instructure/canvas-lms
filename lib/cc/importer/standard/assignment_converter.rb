@@ -114,7 +114,7 @@ module CC::Importer::Standard
         assignment[:similarity_detection_tool] = similarity_settings
       end
 
-      %w[title allowed_extensions grading_type submission_types external_tool_url external_tool_data_json external_tool_link_settings_json turnitin_settings].each do |string_type|
+      %w[title allowed_extensions grading_type submission_types external_tool_url external_tool_data_json external_tool_link_settings_json turnitin_settings time_zone_edited].each do |string_type|
         val = get_node_val(meta_doc, string_type)
         assignment[string_type] = val unless val.nil?
       end

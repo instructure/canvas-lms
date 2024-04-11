@@ -52,9 +52,11 @@ const addSearchHighlighting = (searchTerm, searchArea, isSplitView) => {
 
 // Highlight the search term and remove HTML
 const highlightText = (text, searchTerm) => {
-  const searchExpression = new RegExp(`(${searchTerm})`, 'gi')
+  const escapedSearchTerm = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  const searchExpression = new RegExp(`(${escapedSearchTerm})`, 'gi')
+
   return text
-    .replace(/<[^>]*>?/gm, '')
+    .replace(/<[^>]*>/gm, '')
     .replace(
       searchExpression,
       '<span data-testid="highlighted-search-item" style="background-color: rgba(0,142,226,0.2); border-radius: .25rem; padding-bottom: 3px; padding-top: 1px;">$1</span>'
@@ -62,9 +64,21 @@ const highlightText = (text, searchTerm) => {
 }
 
 export function SearchSpan({...props}) {
+  const resourceType = () => {
+    if (props.isAnnouncement == null || props.isTopic == null) {
+      return undefined
+    }
+
+    return `${props.isAnnouncement ? 'announcement' : 'discussion_topic'}.${
+      props.isTopic ? 'body' : 'reply'
+    }`
+  }
+
   return (
     <span
       className="user_content"
+      data-resource-type={resourceType()}
+      data-resource-id={props.resourceId}
       dangerouslySetInnerHTML={{
         __html: addSearchHighlighting(props.searchTerm, props.text, props.isSplitView),
       }}
@@ -82,4 +96,7 @@ SearchSpan.propTypes = {
    */
   text: PropTypes.string.isRequired,
   isSplitView: PropTypes.bool,
+  isAnnouncement: PropTypes.bool,
+  isTopic: PropTypes.bool,
+  resourceId: PropTypes.string,
 }

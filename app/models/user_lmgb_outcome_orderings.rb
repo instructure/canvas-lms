@@ -36,9 +36,8 @@ class UserLmgbOutcomeOrderings < ActiveRecord::Base
   end
 
   def self.set_lmgb_outcome_ordering(root_account_id, user_id, course_id, outcome_position_map)
-    rows = []
-    outcome_position_map.each do |entry|
-      rows.append({ root_account_id:, user_id:, course_id:, learning_outcome_id: entry["outcome_id"], position: entry["position"] })
+    rows = outcome_position_map.map do |entry|
+      { root_account_id:, user_id:, course_id:, learning_outcome_id: entry["outcome_id"], position: entry["position"] }
     end
     transaction do
       # Remove entries from previous ordering

@@ -346,6 +346,10 @@ const locale = {
   "enter_at_least_3_characters_to_search_4f037ee0": {
     "message": "Introduce al menos 3 caracteres para buscar"
   },
+  "enter_replacement_text_17631bbc": {
+    "message": "introducir texto de reemplazo"
+  },
+  "enter_search_text_26cb4459": { "message": "introducir texto de búsqueda" },
   "epsilon_54bb8afa": { "message": "Épsilon" },
   "epsilon_variant_d31f1e77": { "message": "Épsilon (Variante)" },
   "equals_sign_c51bdc58": { "message": "Signo igual" },
@@ -390,6 +394,8 @@ const locale = {
   },
   "files_c300e900": { "message": "Archivos" },
   "files_index_af7c662b": { "message": "Índice de archivos" },
+  "find_8d605019": { "message": "Buscar" },
+  "find_and_replace_6e345933": { "message": "Buscar y reemplazar" },
   "finish_bc343002": { "message": "Terminar" },
   "fix_heading_hierarchy_f60884c4": { "message": "Fijar jerarquía de títulos" },
   "flat_music_76d5a5c3": { "message": "Bemol (Música)" },
@@ -514,6 +520,7 @@ const locale = {
   "in_element_of_19ca2f33": { "message": "En (Elemento de)" },
   "increase_indent_6af90f7c": { "message": "Aumentar sangría" },
   "indefinite_integral_6623307e": { "message": "Integral indefinida" },
+  "index_of_max_80dcf7a5": { "message": "{ index } de { max }" },
   "indigo_2035fc55": { "message": "Índigo" },
   "inference_fed5c960": { "message": "Inferencia" },
   "infinity_7a10f206": { "message": "Infinito" },
@@ -738,6 +745,7 @@ const locale = {
   },
   "no_quizzes_found_c80c537a": { "message": "No se han encontrado pruebas." },
   "no_results_940393cf": { "message": "No hay resultados." },
+  "no_results_found_58717065": { "message": "No se han encontrado resultados" },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "No se han encontrado resultados para { filterTerm }"
   },
@@ -833,6 +841,7 @@ const locale = {
   "preview_a3f8f854": { "message": "VISTA PREVIA" },
   "preview_in_overlay_ed772c46": { "message": "Vista previa en superposición" },
   "preview_inline_9787330": { "message": "Vista previa online" },
+  "previous_bd2ac015": { "message": "Anterior" },
   "prime_917ea60e": { "message": "Primo" },
   "prime_numbers_13464f61": { "message": "Números primo" },
   "product_39cf144f": { "message": "Producto" },
@@ -861,7 +870,9 @@ const locale = {
   "religion_icon_246e0be1": { "message": "Icono religión" },
   "remove_heading_style_5fdc8855": { "message": "Eliminar estilo del título" },
   "remove_link_d1f2f4d0": { "message": "Eliminar enlace" },
+  "replace_all_d3d68b3": { "message": "Reemplazar todo" },
   "replace_e61834a7": { "message": "Sustituir" },
+  "replace_with_eeff01ad": { "message": "Reemplazar con" },
   "reset_95a81614": { "message": "Restablecer" },
   "resize_ec83d538": { "message": "Redimensionar" },
   "restore_auto_save_deccd84b": {

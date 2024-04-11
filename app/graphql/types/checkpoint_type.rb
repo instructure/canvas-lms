@@ -46,5 +46,10 @@ module Types
           Boolean,
           "specifies that this checkpoint is only assigned to students for whom an override applies",
           null: false
+
+    field :assignment_overrides, AssignmentOverrideType.connection_type, null: true
+    def assignment_overrides
+      AssignmentOverrideApplicator.overrides_for_assignment_and_user(checkpoint, current_user)
+    end
   end
 end

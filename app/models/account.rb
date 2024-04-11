@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "atom"
-
 class Account < ActiveRecord::Base
   include Context
   include OutcomeImportContext
@@ -27,8 +25,6 @@ class Account < ActiveRecord::Base
   include SearchTermHelper
 
   INSTANCE_GUID_SUFFIX = "canvas-lms"
-  # a list of columns necessary for validation and save callbacks to work on a slim object
-  BASIC_COLUMNS_FOR_CALLBACKS = %i[id parent_account_id root_account_id name workflow_state settings account_calendar_subscription_type].freeze
   CALENDAR_SUBSCRIPTION_TYPES = %w[manual auto].freeze
 
   include Workflow
@@ -698,6 +694,12 @@ class Account < ActiveRecord::Base
     end
 
     SettingsWrapper.new(self, {}.freeze)
+  end
+
+  def setting_enabled?(setting)
+    return false unless has_attribute?(:settings)
+
+    !!settings[setting.to_sym]
   end
 
   def domain(current_host = nil)
@@ -1515,13 +1517,12 @@ class Account < ActiveRecord::Base
   end
 
   def to_atom
-    Atom::Entry.new do |entry|
-      entry.title     = name
-      entry.updated   = updated_at
-      entry.published = created_at
-      entry.links << Atom::Link.new(rel: "alternate",
-                                    href: "/accounts/#{id}")
-    end
+    {
+      title: name,
+      updated: updated_at,
+      published: created_at,
+      link: "/accounts/#{id}"
+    }
   end
 
   def default_enrollment_term
@@ -1757,7 +1758,7 @@ class Account < ActiveRecord::Base
   end
 
   def dummy?
-    local_id.zero?
+    local_id == 0
   end
 
   def unless_dummy

@@ -23,7 +23,7 @@ GEM
       concurrent-ruby (~> 1.0)
     mini_portile2 (2.8.5)
     minitest (5.22.3)
-    rake (13.1.0)
+    rake (13.2.1)
     rspec (3.13.0)
       rspec-core (~> 3.13.0)
       rspec-expectations (~> 3.13.0)
@@ -43,12 +43,12 @@ GEM
       simplecov_json_formatter (~> 0.1)
     simplecov-html (0.12.3)
     simplecov_json_formatter (0.1.4)
-    sqlite3 (1.7.2)
+    sqlite3 (1.7.3)
       mini_portile2 (~> 2.8.0)
-    sqlite3 (1.7.2-aarch64-linux)
-    sqlite3 (1.7.2-arm64-darwin)
-    sqlite3 (1.7.2-x86_64-darwin)
-    sqlite3 (1.7.2-x86_64-linux)
+    sqlite3 (1.7.3-aarch64-linux)
+    sqlite3 (1.7.3-arm64-darwin)
+    sqlite3 (1.7.3-x86_64-darwin)
+    sqlite3 (1.7.3-x86_64-linux)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
 
@@ -68,5 +68,8 @@ DEPENDENCIES
   simplecov (~> 0.22)
   sqlite3
 
+RUBY VERSION
+   ruby 3.1.2p20
+
 BUNDLED WITH
-   2.5.6
+   2.5.7

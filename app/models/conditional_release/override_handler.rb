@@ -60,16 +60,15 @@ module ConditionalRelease
         relative_score = ConditionalRelease::Stats.percent_from_points(submission.score, submission.assignment.points_possible)
 
         sets_to_assign = []
-        excluded_sets = []
+        sets_to_unassign = []
         rules.each do |rule|
           new_sets = relative_score ? rule.assignment_sets_for_score(relative_score).to_a : []
           if new_sets.length == 1 # otherwise they have to choose between sets
             sets_to_assign += new_sets
           end
-          excluded_sets += rule.assignment_sets.to_a - new_sets
+          sets_to_unassign += rule.assignment_sets.to_a - new_sets
         end
-        # see if there are any they were previously assigned to
-        sets_to_unassign = ConditionalRelease::AssignmentSetAction.current_assignments(submission.user_id, excluded_sets).preload(:assignment_set).map(&:assignment_set)
+        sets_to_unassign = ConditionalRelease::AssignmentSetAction.current_assignments(submission.user_id, sets_to_unassign).preload(:assignment_set).map(&:assignment_set)
         [sets_to_assign, sets_to_unassign]
       end
 

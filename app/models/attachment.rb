@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "atom"
 require "crocodoc"
 
 # See the uploads controller and views for examples on how to use this model.
@@ -1314,17 +1313,18 @@ class Attachment < ActiveRecord::Base
   end
 
   def to_atom(opts = {})
-    Atom::Entry.new do |entry|
-      entry.title     = t(:feed_title, "File: %{title}", title: context.name) unless opts[:include_context]
-      entry.title     = t(:feed_title_with_context, "File, %{course_or_group}: %{title}", course_or_group: context.name, title: context.name) if opts[:include_context]
-      entry.authors << Atom::Person.new(name: context.name)
-      entry.updated   = updated_at
-      entry.published = created_at
-      entry.id        = "tag:#{HostUrl.default_host},#{created_at.strftime("%Y-%m-%d")}:/files/#{feed_code}"
-      entry.links << Atom::Link.new(rel: "alternate",
-                                    href: "http://#{HostUrl.context_host(context)}/#{context_url_prefix}/files/#{id}")
-      entry.content = Atom::Content::Html.new(self.display_name.to_s)
-    end
+    title = t(:feed_title, "File: %{title}", title: context.name) unless opts[:include_context]
+    title = t(:feed_title_with_context, "File, %{course_or_group}: %{title}", course_or_group: context.name, title: context.name) if opts[:include_context]
+
+    {
+      title:,
+      author: context.name,
+      updated: updated_at,
+      published: created_at,
+      id: "tag:#{HostUrl.default_host},#{created_at.strftime("%Y-%m-%d")}:/files/#{feed_code}",
+      link: "http://#{HostUrl.context_host(context)}/#{context_url_prefix}/files/#{id}",
+      content: self.display_name.to_s,
+    }
   end
 
   def name
@@ -1672,13 +1672,12 @@ class Attachment < ActiveRecord::Base
   scope :is_media_object, -> { where.not(media_entry_id: nil) }
 
   def self.build_content_types_sql(types)
-    clauses = []
-    types.each do |type|
-      clauses << if type.include? "/"
-                   sanitize_sql_array(["(attachments.content_type=?)", type])
-                 else
-                   wildcard("attachments.content_type", type, type: :right)
-                 end
+    clauses = types.map do |type|
+      if type.include? "/"
+        sanitize_sql_array(["(attachments.content_type=?)", type])
+      else
+        wildcard("attachments.content_type", type, type: :right)
+      end
     end
     clauses.join(" OR ")
   end
@@ -2242,7 +2241,7 @@ class Attachment < ActiveRecord::Base
     random_backup_name = "#{dir}#{basename}-#{SecureRandom.uuid}#{extname}"
     return random_backup_name if attempts >= 8
 
-    until block.call(new_name = "#{dir}#{basename}-#{addition}#{extname}")
+    until block.call((new_name = "#{dir}#{basename}-#{addition}#{extname}"))
       addition += 1
       return random_backup_name if addition >= 8
     end

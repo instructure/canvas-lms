@@ -1855,14 +1855,14 @@ describe Canvas::LiveEvents do
 
   describe ".learning_outcome_result" do
     let_once :quiz do
-      quiz_model(assignment: assignment_model)
+      quiz_with_graded_submission([])
     end
 
     let :result do
-      create_and_associate_lor(quiz)
+      create_and_associate_lor(@quiz, @quiz_submission, @quiz)
     end
 
-    def create_and_associate_lor(association_object, associated_asset = nil)
+    def create_and_associate_lor(association_object, artifact_object, associated_asset = nil)
       assignment_model
       outcome = @course.created_learning_outcomes.create!(title: "outcome")
       student = @course.enroll_student(User.create!, active_all: true).user
@@ -1876,9 +1876,46 @@ describe Canvas::LiveEvents do
         user: student
       ).tap do |lor|
         lor.association_object = association_object
+        lor.artifact = artifact_object
         lor.context = @course
-        lor.associated_asset = associated_asset || association_object
+        lor.associated_asset = associated_asset
         lor.save!
+      end
+    end
+
+    context "learning_outcome_result_associated_asset" do
+      it "updates associated_asset info to the assignment if the artifact is a RubricAssessment" do
+        assignment_model
+        outcome_model
+        outcome_with_rubric(outcome: @outcome, context: Account.default)
+        course_with_student
+        association = @rubric.associate_with(@assignment, @course, purpose: "grading", use_for_grading: true)
+        rubric_assessment = rubric_assessment_model(rubric: @rubric, user: @student, assessment_type: "graded")
+
+        create_and_associate_lor(association, rubric_assessment, nil)
+
+        expect_event("learning_outcome_result_created", {
+          learning_outcome_id: result.learning_outcome_id.to_s,
+          learning_outcome_context_uuid: @course.uuid,
+          mastery: result.mastery,
+          score: result.score,
+          created_at: result.created_at,
+          attempt: result.attempt,
+          possible: result.possible,
+          original_score: result.original_score,
+          original_possible: result.original_possible,
+          original_mastery: result.original_mastery,
+          assessed_at: result.assessed_at,
+          percent: result.percent,
+          workflow_state: result.workflow_state,
+          user_uuid: result.user_uuid,
+          associated_asset_id: result.associated_asset_id.to_s,
+          associated_asset_type: result.associated_asset_type,
+          artifact_id: result.artifact_id.to_s,
+          artifact_type: result.artifact_type
+        }.compact!).once
+
+        Canvas::LiveEvents.learning_outcome_result_created(result)
       end
     end
 
@@ -1896,9 +1933,13 @@ describe Canvas::LiveEvents do
           original_possible: result.original_possible,
           original_mastery: result.original_mastery,
           assessed_at: result.assessed_at,
-          title: result.title,
           percent: result.percent,
-          workflow_state: result.workflow_state
+          workflow_state: result.workflow_state,
+          user_uuid: result.user_uuid,
+          associated_asset_id: result.associated_asset_id.to_s,
+          associated_asset_type: result.associated_asset_type,
+          artifact_id: result.artifact_id.to_s,
+          artifact_type: result.artifact_type
         }.compact!).once
 
         Canvas::LiveEvents.learning_outcome_result_created(result)
@@ -1921,9 +1962,13 @@ describe Canvas::LiveEvents do
           original_possible: result.original_possible,
           original_mastery: result.original_mastery,
           assessed_at: result.assessed_at,
-          title: result.title,
           percent: result.percent,
-          workflow_state: result.workflow_state
+          workflow_state: result.workflow_state,
+          user_uuid: result.user_uuid,
+          associated_asset_id: result.associated_asset_id.to_s,
+          associated_asset_type: result.associated_asset_type,
+          artifact_id: result.artifact_id.to_s,
+          artifact_type: result.artifact_type
         }.compact!).once
 
         Canvas::LiveEvents.learning_outcome_result_updated(result)
@@ -1945,9 +1990,13 @@ describe Canvas::LiveEvents do
           original_possible: result.original_possible,
           original_mastery: result.original_mastery,
           assessed_at: result.assessed_at,
-          title: result.title,
           percent: result.percent,
-          workflow_state: result.workflow_state
+          workflow_state: result.workflow_state,
+          user_uuid: result.user_uuid,
+          associated_asset_id: result.associated_asset_id.to_s,
+          associated_asset_type: result.associated_asset_type,
+          artifact_id: result.artifact_id.to_s,
+          artifact_type: result.artifact_type
         }.compact!).once
 
         Canvas::LiveEvents.learning_outcome_result_updated(result)

@@ -93,6 +93,7 @@ export interface EnvCommon {
   SETTINGS: Record<Setting, boolean>
   RAILS_ENVIRONMENT: 'development' | 'CD' | 'Beta' | 'Production' | string
   IN_PACED_COURSE: boolean
+  PARSE_LINK_HEADER_THROW_ON_MAXLEN_EXCEEDED?: boolean
   PREFERENCES?: {
     hide_dashcard_color_overlays: boolean
     custom_colors: unknown
@@ -133,7 +134,6 @@ export interface EnvCommon {
     revision: string
   }
 
-  API_GATEWAY_URI?: string
   DATA_COLLECTION_ENDPOINT?: string
 
   /**

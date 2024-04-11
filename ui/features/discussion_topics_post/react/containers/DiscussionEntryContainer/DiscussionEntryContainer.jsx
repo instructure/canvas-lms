@@ -22,7 +22,7 @@ import {DeletedPostMessage} from '../../components/DeletedPostMessage/DeletedPos
 import {PostMessage} from '../../components/PostMessage/PostMessage'
 import PropTypes from 'prop-types'
 import React, {useContext} from 'react'
-import {responsiveQuerySizes} from '../../utils'
+import {responsiveQuerySizes, userNameToShow} from '../../utils'
 import {SearchContext} from '../../utils/constants'
 import {Attachment} from '../../../graphql/Attachment'
 import {User} from '../../../graphql/User'
@@ -35,11 +35,26 @@ import {ReplyPreview} from '../../components/ReplyPreview/ReplyPreview'
 
 export const DiscussionEntryContainer = props => {
   const {searchTerm} = useContext(SearchContext)
+  const getDeletedDisplayName = () => {
+    if (props.editor) {
+      return userNameToShow(
+        props.editor?.displayName,
+        props.author?._id,
+        props.editor.courseRoles || []
+      )
+    } else {
+      return userNameToShow(
+        props.author?.displayName,
+        props.author?._id,
+        props.author.courseRoles || []
+      )
+    }
+  }
 
   if (props.deleted) {
     return (
       <DeletedPostMessage
-        deleterName={props.editor ? props.editor?.displayName : props.author?.displayName}
+        deleterName={getDeletedDisplayName()}
         timingDisplay={props.timingDisplay}
         deletedTimingDisplay={props.editedTimingDisplay}
       >
@@ -108,7 +123,7 @@ export const DiscussionEntryContainer = props => {
       }}
       render={responsiveProps => (
         // If you change the left padding here, please update the DiscussionThreadContainer getReplyLeftMargin function
-        <Flex direction="column" padding="0 0 small small">
+        <Flex direction="column" padding="0 0 small small" data-authorid={props.author?._id}>
           <Flex.Item shouldGrow={true} shouldShrink={true} overflowY="visible">
             <Flex direction={props.isTopic ? responsiveProps.direction : 'row'}>
               {hasAuthor && (
@@ -176,6 +191,7 @@ export const DiscussionEntryContainer = props => {
               onSave={props.onSave}
               onCancel={props.onCancel}
               isSplitView={props.isSplitView}
+              discussionTopic={props.discussionTopic}
             >
               {props.attachment && (
                 <View as="div" padding="small none none">

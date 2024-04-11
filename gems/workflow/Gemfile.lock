@@ -22,7 +22,7 @@ GEM
     i18n (1.14.4)
       concurrent-ruby (~> 1.0)
     minitest (5.22.3)
-    rake (13.1.0)
+    rake (13.2.1)
     rspec (3.13.0)
       rspec-core (~> 3.13.0)
       rspec-expectations (~> 3.13.0)
@@ -53,5 +53,8 @@ DEPENDENCIES
   rspec (~> 3.12)
   workflow!
 
+RUBY VERSION
+   ruby 3.1.2p20
+
 BUNDLED WITH
-   2.5.6
+   2.5.7

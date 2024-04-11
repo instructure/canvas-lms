@@ -58,9 +58,16 @@ describe "outcome gradebook" do
       wait_for_ajaximations
     end
 
+    def mean_values
+      f("button[data-testid='lmgb-course-calc-dropdown']").click
+      fj("[role=\"menuitemradio\"]:contains(\"Course average\")").click
+      wait_for_ajax_requests
+      selected_values
+    end
+
     def median_values
-      f(".al-trigger").click
-      ff(".al-options .ui-menu-item").second.click
+      f("button[data-testid='lmgb-course-calc-dropdown']").click
+      fj("[role=\"menuitemradio\"]:contains(\"Course median\")").click
       wait_for_ajax_requests
       selected_values
     end
@@ -265,6 +272,26 @@ describe "outcome gradebook" do
           # should remain on second section, with mean
           means = selected_values
           expect(means).to contain_exactly("2", "3")
+        end
+
+        # test added because of OUT-6176
+        # Changing from "mean" -> "median" -> "mean" would result in a 404 page
+        # This tests makes sure no errors happen when doing this
+        it "can alternate from mean to median and back to mean" do
+          get "/courses/#{@course.id}/gradebook"
+          select_learning_mastery
+          wait_for_ajax_requests
+
+          # Confirm that "mean" values are shown
+          averages = selected_values
+          expect(averages).to contain_exactly("2.33", "2.67")
+
+          # Switch to "median" values
+          medians = median_values
+          expect(medians).to contain_exactly("2", "3")
+
+          averages = mean_values
+          expect(averages).to contain_exactly("2.33", "2.67")
         end
 
         it "outcome ordering persists accross page refresh" do

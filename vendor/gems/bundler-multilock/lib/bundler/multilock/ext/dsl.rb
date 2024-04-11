@@ -11,12 +11,22 @@ module Bundler
 
           # Significant changes:
           #  * evaluate the prepare block as part of the gemfile
+          #  * keep track of the ruby version set in the default gemfile
+          #  * apply that ruby version to alternate lockfiles if they didn't set one
+          #    themselves
           #  * mark Multilock as loaded once the main gemfile is evaluated
           #    so that they're not loaded multiple times
           def evaluate(gemfile, lockfile, unlock)
             builder = new
             builder.eval_gemfile(gemfile, &Multilock.prepare_block) if Multilock.prepare_block
             builder.eval_gemfile(gemfile)
+            if (ruby_version_requirement = builder.instance_variable_get(:@ruby_version))
+              Multilock.lockfile_definitions[lockfile][:ruby_version_requirement] = ruby_version_requirement
+            elsif (parent_lockfile = Multilock.lockfile_definitions.dig(lockfile, :parent)) &&
+                  (parent_lockfile_definition = Multilock.lockfile_definitions[parent_lockfile]) &&
+                  (parent_ruby_version_requirement = parent_lockfile_definition[:ruby_version_requirement])
+              builder.instance_variable_set(:@ruby_version, parent_ruby_version_requirement)
+            end
             Multilock.loaded!
             builder.to_definition(lockfile, unlock)
           end

@@ -408,6 +408,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                             )}
                             isTopicAuthor={true}
                             attachment={props.discussionTopic.attachment}
+                            discussionTopic={props.discussionTopic}
                           >
                             {props.discussionTopic.permissions?.reply && !expandedReply && (
                               <>
@@ -478,6 +479,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                                     ?.focus()
                                 }, 0)
                               }}
+                              isAnnouncement={props.discussionTopic.isAnnouncement}
                             />
                           )}
                         </Flex.Item>

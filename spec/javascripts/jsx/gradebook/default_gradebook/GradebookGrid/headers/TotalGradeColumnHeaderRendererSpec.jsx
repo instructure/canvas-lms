@@ -364,6 +364,18 @@ QUnit.module('GradebookGrid TotalGradeColumnHeaderRenderer', suiteHooks => {
       }
       notOk(errorFound, 'Exception thrown')
     })
+
+    test('sends message when handleSendMessageStudentWho is executed', () => {
+      const recipientsIds = [1, 2, 3, 4]
+      const subject = 'foo'
+      const body = 'bar'
+      const contextCode = '1'
+
+      sinon.stub(gradebook, 'sendMessageStudentsWho')
+      render()
+      component.props.onSendMessageStudentsWho(recipientsIds, subject, body, contextCode)
+      strictEqual(gradebook.sendMessageStudentsWho.callCount, 1)
+    })
   })
 
   QUnit.module('#destroy()', () => {

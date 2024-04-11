@@ -189,7 +189,12 @@ export default class WikiPageEditView extends ValidatedFormView {
     if (window.ENV.BLOCK_EDITOR) {
       ReactDOM.render(<BlockEditor />, document.getElementById('block_editor'))
     } else {
-      RichContentEditor.loadNewEditor(this.$wikiPageBody, {focus: true, manageParent: true})
+      RichContentEditor.loadNewEditor(this.$wikiPageBody, {
+        focus: true,
+        manageParent: true,
+        resourceType: 'wiki_page.body',
+        resourceId: this.model.id,
+      })
     }
 
     this.checkUnsavedOnLeave = true

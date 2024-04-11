@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
+
+require "feedjira"
 require_relative "../spec_helper"
 
 describe DiscussionTopicsController do
@@ -1719,25 +1721,24 @@ describe DiscussionTopicsController do
 
     it "includes absolute path for rel='self' link" do
       get "public_feed", params: { feed_code: @course.feed_code }, format: "atom"
-      feed = Atom::Feed.load_feed(response.body) rescue nil
+      feed = Feedjira.parse(response.body) rescue nil
       expect(feed).not_to be_nil
-      expect(feed.links.first.rel).to match(/self/)
-      expect(feed.links.first.href).to match(%r{http://})
+      expect(feed.feed_url).to match(%r{http://})
     end
 
     it "does not include entries in an anonymous feed" do
       get "public_feed", params: { feed_code: @course.feed_code }, format: "atom"
-      feed = Atom::Feed.load_feed(response.body) rescue nil
+      feed = Feedjira.parse(response.body) rescue nil
       expect(feed).not_to be_nil
       expect(feed.entries).to be_empty
     end
 
     it "includes an author for each entry with an enrollment feed" do
       get "public_feed", params: { feed_code: @course.teacher_enrollments.first.feed_code }, format: "atom"
-      feed = Atom::Feed.load_feed(response.body) rescue nil
+      feed = Feedjira.parse(response.body) rescue nil
       expect(feed).not_to be_nil
       expect(feed.entries).not_to be_empty
-      expect(feed.entries.all? { |e| e.authors.present? }).to be_truthy
+      expect(feed.entries.all? { |e| e.author.present? }).to be_truthy
     end
   end
 

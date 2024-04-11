@@ -369,7 +369,10 @@ ready(function () {
         if (ui.newTab.find('a').hasClass('submit_online_text_entry_option')) {
           const $el = $('#submit_online_text_entry_form textarea:first')
           if (!RichContentEditor.callOnRCE($el, 'exists?')) {
-            RichContentEditor.loadNewEditor($el, {manageParent: true})
+            RichContentEditor.loadNewEditor($el, {
+              manageParent: true,
+              resourceType: 'assignment.submission',
+            })
           }
         }
 
@@ -382,7 +385,10 @@ ready(function () {
         if (ui.tab.find('a').hasClass('submit_online_text_entry_option')) {
           const $el = $('#submit_online_text_entry_form textarea:first')
           if (!RichContentEditor.callOnRCE($el, 'exists?')) {
-            RichContentEditor.loadNewEditor($el, {manageParent: true})
+            RichContentEditor.loadNewEditor($el, {
+              manageParent: true,
+              resourceType: 'assignment.submission',
+            })
           }
         }
       },

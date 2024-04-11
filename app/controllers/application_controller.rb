@@ -275,10 +275,6 @@ class ApplicationController < ActionController::Base
         end
 
         dynamic_settings_tree = DynamicSettings.find(tree: :private)
-        if dynamic_settings_tree["api_gateway_enabled", failsafe: nil] == "true"
-          @js_env[:API_GATEWAY_URI] = dynamic_settings_tree["api_gateway_uri"]
-        end
-
         if dynamic_settings_tree["frontend_data_collection_endpoint", failsafe: nil]
           @js_env[:DATA_COLLECTION_ENDPOINT] = dynamic_settings_tree["frontend_data_collection_endpoint"]
         end
@@ -408,6 +404,26 @@ class ApplicationController < ActionController::Base
       end
       JS_ENV_BRAND_ACCOUNT_FEATURES.each do |f|
         results[f] = !!brand_config_account&.feature_enabled?(f)
+      end
+      results
+    end
+  end
+
+  JS_ENV_ROOT_ACCOUNT_SETTINGS = %i[
+    calendar_contexts_limit
+    open_registration
+  ].freeze
+  JS_ENV_ROOT_ACCOUNT_SETTINGS_HASH = Digest::SHA256.hexdigest(JS_ENV_ROOT_ACCOUNT_SETTINGS.sort.join(",")).freeze
+
+  def cached_js_env_account_settings
+    # can be invalidated by a settings change on the domain root account
+    # or updating the JS_ENV_ROOT_ACCOUNT_SETTINGS array
+    MultiCache.fetch(["js_env_account_settings",
+                      JS_ENV_ROOT_ACCOUNT_SETTINGS_HASH,
+                      @domain_root_account[:settings]].cache_key) do
+      results = {}
+      JS_ENV_ROOT_ACCOUNT_SETTINGS.each do |s|
+        results[s] = @domain_root_account&.setting_enabled?(s)
       end
       results
     end

@@ -537,6 +537,14 @@ describe('RCEWrapper', () => {
     })
   })
 
+  describe('getResourceIdentifiers', () => {
+    it('returns resourceType and resourceId', () => {
+      createMountedElement({resourceType: 'assignment.body', resourceId: '156'})
+      expect(rce.getResourceIdentifiers().resourceType).toEqual('assignment.body')
+      expect(rce.getResourceIdentifiers().resourceId).toEqual('156')
+    })
+  })
+
   describe('onRemove', () => {
     beforeEach(() => {
       jest.spyOn(Bridge, 'detachEditor')

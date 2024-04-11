@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "atom"
-
 # @API Courses
 # API for accessing course information.
 #
@@ -3475,12 +3473,8 @@ class CoursesController < ApplicationController
   def public_feed
     return unless get_feed_context(only: [:course])
 
-    feed = Atom::Feed.new do |f|
-      f.title = t("titles.rss_feed", "%{course} Feed", course: @context.name)
-      f.links << Atom::Link.new(href: course_url(@context), rel: "self")
-      f.updated = Time.now
-      f.id = course_url(@context)
-    end
+    title = t("titles.rss_feed", "%{course} Feed", course: @context.name)
+    link = course_url(@context)
 
     @entries = []
     @entries.concat Assignments::ScopedToUser.new(@context, @current_user, @context.assignments.published).scope
@@ -3490,11 +3484,9 @@ class CoursesController < ApplicationController
     end)
     @entries.concat WikiPages::ScopedToUser.new(@context, @current_user, @context.wiki_pages.published).scope
     @entries = @entries.sort_by(&:updated_at)
-    @entries.each do |entry|
-      feed.entries << entry.to_atom(context: @context)
-    end
+
     respond_to do |format|
-      format.atom { render plain: feed.to_xml }
+      format.atom { render plain: AtomFeedHelper.render_xml(title:, link:, entries: @entries, context: @context) }
     end
   end
 

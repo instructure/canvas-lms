@@ -328,6 +328,8 @@ const locale = {
   "enter_at_least_3_characters_to_search_4f037ee0": {
     "message": "Wpisz co najmniej 3 znaki, aby wyszukać."
   },
+  "enter_replacement_text_17631bbc": { "message": "Wpisz tekst zastępczy" },
+  "enter_search_text_26cb4459": { "message": "Wpisz tekst do wyszukania" },
   "epsilon_54bb8afa": { "message": "Epsilon" },
   "epsilon_variant_d31f1e77": { "message": "Epsilon (wariant)" },
   "equals_sign_c51bdc58": { "message": "Znak równości" },
@@ -372,6 +374,8 @@ const locale = {
   },
   "files_c300e900": { "message": "Pliki" },
   "files_index_af7c662b": { "message": "Wykaz plików" },
+  "find_8d605019": { "message": "Znajdź" },
+  "find_and_replace_6e345933": { "message": "Znajdź i zamień" },
   "finish_bc343002": { "message": "Zakończ" },
   "fix_heading_hierarchy_f60884c4": {
     "message": "Przypnij hierarchię nagłówków"
@@ -492,6 +496,7 @@ const locale = {
   "in_element_of_19ca2f33": { "message": "W (element)" },
   "increase_indent_6af90f7c": { "message": "Zwiększ wcięcie" },
   "indefinite_integral_6623307e": { "message": "Całka nieoznaczona" },
+  "index_of_max_80dcf7a5": { "message": "{ index } z { max }" },
   "indigo_2035fc55": { "message": "Indygo" },
   "inference_fed5c960": { "message": "Wniosek" },
   "infinity_7a10f206": { "message": "Nieskończoność" },
@@ -698,6 +703,7 @@ const locale = {
   },
   "no_quizzes_found_c80c537a": { "message": "Nie odnaleziono testów." },
   "no_results_940393cf": { "message": "Brak wyników." },
+  "no_results_found_58717065": { "message": "Brak wyników" },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Nie znaleziono wyników dla { filterTerm }"
   },
@@ -795,6 +801,7 @@ const locale = {
   "preview_a3f8f854": { "message": "PODGLĄD" },
   "preview_in_overlay_ed772c46": { "message": "Podgląd w nakładce" },
   "preview_inline_9787330": { "message": "Wbudowany pogląd" },
+  "previous_bd2ac015": { "message": "Poprzednie" },
   "prime_917ea60e": { "message": "Liczba pierwsza" },
   "prime_numbers_13464f61": { "message": "Liczby pierwsze" },
   "product_39cf144f": { "message": "Produkt" },
@@ -825,7 +832,9 @@ const locale = {
   "religion_icon_246e0be1": { "message": "Ikona religii" },
   "remove_heading_style_5fdc8855": { "message": "Usuń styl nagłówka" },
   "remove_link_d1f2f4d0": { "message": "Usuń łącze" },
+  "replace_all_d3d68b3": { "message": "Zamień wszystko" },
   "replace_e61834a7": { "message": "Zastąp" },
+  "replace_with_eeff01ad": { "message": "Zastąp" },
   "reset_95a81614": { "message": "Resetuj" },
   "resize_ec83d538": { "message": "Zmień rozmiar" },
   "restore_auto_save_deccd84b": {

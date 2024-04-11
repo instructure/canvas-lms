@@ -26,6 +26,9 @@ class Lti::IMS::Registration < ApplicationRecord
   REQUIRED_APPLICATION_TYPE = "web"
   REQUIRED_TOKEN_ENDPOINT_AUTH_METHOD = "private_key_jwt"
   COURSE_NAV_DEFAULT_ENABLED_EXTENSION = "https://canvas.instructure.com/lti/course_navigation/default_enabled"
+  PLACEMENT_VISIBILITY_EXTENSION = "https://canvas.instructure.com/lti/visibility"
+
+  PLACEMENT_VISIBILITY_OPTIONS = %(admins members public)
 
   validates :application_type,
             :grant_types,
@@ -89,7 +92,7 @@ class Lti::IMS::Registration < ApplicationRecord
         domain: config["domain"],
         platform: "canvas.instructure.com",
         tool_id: client_name,
-        privacy_level: "public",
+        privacy_level:,
         settings: {
           text: client_name,
           icon_url: config["icon_uri"],
@@ -109,7 +112,9 @@ class Lti::IMS::Registration < ApplicationRecord
   end
 
   def privacy_level
-    registration_overlay["privacy_level"] || lti_tool_configuration["https://#{CANVAS_EXTENSION_LABEL}/lti/privacy_level"] || "anonymous"
+    claims = lti_tool_configuration["claims"] || []
+    infered_privacy_level = infer_privacy_level_from(claims)
+    registration_overlay["privacy_level"] || lti_tool_configuration["https://#{CANVAS_EXTENSION_LABEL}/lti/privacy_level"] || infered_privacy_level
   end
 
   def update_external_tools?
@@ -169,9 +174,19 @@ class Lti::IMS::Registration < ApplicationRecord
         # This supports a very old parameter (hence the obtuse name) that only applies to the course navigation placement. It hides the
         # tool from the course navigation by default. Teachers can still add the tool to the course navigation using the course
         # settings page if they'd like.
-        default: (message[COURSE_NAV_DEFAULT_ENABLED_EXTENSION] == false && placement_name == "course_navigation") ? "disabled" : nil
+        default: (message[COURSE_NAV_DEFAULT_ENABLED_EXTENSION] == false && placement_name == "course_navigation") ? "disabled" : nil,
+        visibility: placement_visibility(message),
       }.merge(width_and_height_settings(message, placement_name)).compact
     ]
+  end
+
+  def placement_visibility(message)
+    availability = message[PLACEMENT_VISIBILITY_EXTENSION]
+    if availability
+      PLACEMENT_VISIBILITY_OPTIONS.include?(availability) ? availability : nil
+    else
+      nil
+    end
   end
 
   def lookup_placement_overlay(placement_type)
@@ -314,5 +329,21 @@ class Lti::IMS::Registration < ApplicationRecord
       keys[0].to_sym => values[0],
       keys[1].to_sym => values[1],
     }
+  end
+
+  def infer_privacy_level_from(claims)
+    has_picture = claims.include?("picture")
+    has_name = claims.include?("name") || claims.include?("given_name") || claims.include?("family_name") || claims.include?("https://purl.imsglobal.org/spec/lti/claim/lis")
+    has_email = claims.include?("email")
+
+    if has_picture || (has_name && has_email)
+      "public"
+    elsif has_name && !has_email
+      "name_only"
+    elsif has_email
+      "email_only"
+    else
+      "anonymous"
+    end
   end
 end

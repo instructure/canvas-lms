@@ -19,7 +19,7 @@
 import React from 'react'
 import $ from 'jquery'
 import moment from 'moment-timezone'
-import {act, fireEvent, render, waitFor} from '@testing-library/react'
+import {act, fireEvent, getByTestId, render, waitFor} from '@testing-library/react'
 import {screen} from '@testing-library/dom'
 import userEvent from '@testing-library/user-event'
 import {eventFormProps, conference, userContext, courseContext, accountContext} from './mocks'
@@ -226,6 +226,23 @@ describe('CalendarEventDetailsForm', () => {
         expect.any(Function)
       )
     )
+  })
+
+  it('shows the date for the France locale', async () => {
+    const old_locale = window.ENV.LOCALE
+    window.ENV.LOCALE = 'fr'
+
+    const props = {...defaultProps}
+    props.event = commonEventFactory(null, [userContext, courseContext])
+    const d = moment('2023-08-28') // a monday
+    props.event.date = d.toDate()
+    props.event.startDate = jest.fn(() => moment(props.event.date))
+
+    const {getByTestId} = render(<CalendarEventDetailsForm {...props} />)
+    const beginning_date = getByTestId('edit-calendar-event-form-date')
+
+    expect(beginning_date.value).toBe('lun. 28 août 2023')
+    window.ENV.LOCALE = old_locale
   })
 
   // LF-630 (08/23/2023)

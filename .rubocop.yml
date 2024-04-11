@@ -283,10 +283,6 @@ Rails/ApplicationMailer:
 Rails/BelongsTo:
   Severity: convention
   AutoCorrect: false
-Rails/BulkChangeTable:
-  Severity: convention
-Rails/CreateTableWithTimestamps:
-  Severity: convention
 Rails/Date:
   Enabled: false
   AutoCorrect: false
@@ -313,8 +309,6 @@ Rails/InverseOf:
   Severity: convention
 Rails/LexicallyScopedActionFilter:
   Severity: convention
-Rails/NotNullColumn:
-  Severity: convention
 Rails/Output:
   Severity: convention
   AutoCorrect: false
@@ -332,8 +326,6 @@ Rails/RakeEnvironment:
 Rails/ReadWriteAttribute:
   Enabled: false # accessors are often defined in terms of read_attribute
   AutoCorrect: false
-Rails/ReversibleMigration:
-  Severity: convention
 Rails/TimeZone:
   Enabled: false
   AutoCorrect: false

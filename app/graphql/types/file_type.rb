@@ -45,6 +45,8 @@ module Types
 
     field :mime_class, String, null: true
 
+    field :word_count, Integer, null: true
+
     field :size, String, null: true
     def size
       ActiveSupport::NumberHelper.number_to_human_size(object.size)

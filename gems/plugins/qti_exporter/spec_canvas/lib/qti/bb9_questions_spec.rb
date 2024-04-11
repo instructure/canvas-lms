@@ -25,8 +25,7 @@ if Qti.migration_executable
       manifest_node = get_manifest_node("matching", interaction_type: "choiceInteraction", bb_question_type: "Matching")
       hash = Qti::ChoiceInteraction.create_instructure_question(manifest_node:, base_dir: bb9_question_dir)
       # make sure the ids are correctly referencing each other
-      matches = []
-      hash[:matches].each { |m| matches << m[:match_id] }
+      matches = hash[:matches].pluck(:match_id)
       hash[:answers].each do |a|
         expect(matches.include?(a[:match_id])).to be_truthy
       end
@@ -43,8 +42,7 @@ if Qti.migration_executable
       manifest_node = get_manifest_node("matching3", interaction_type: "choiceInteraction", bb_question_type: "Matching")
       hash = Qti::ChoiceInteraction.create_instructure_question(manifest_node:, base_dir: bb9_question_dir)
       # make sure the ids are correctly referencing each other
-      matches = []
-      hash[:matches].each { |m| matches << m[:match_id] }
+      matches = hash[:matches].pluck(:match_id)
       hash[:answers].each do |a|
         expect(matches.include?(a[:match_id])).to be_truthy
       end

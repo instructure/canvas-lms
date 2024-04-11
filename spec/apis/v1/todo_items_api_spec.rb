@@ -447,9 +447,8 @@ describe UsersController, type: :request do
       @student_course = course_factory(active_course: true)
       @student_course.enroll_student(@teacher).accept(true)
       # an assignment i need to submit (needs_submitting)
-      batch = []
-      [120, 13, 147, 79, 161, 119, 81, 57, 134, 21].each do |i|
-        batch << {
+      batch = [120, 13, 147, 79, 161, 119, 81, 57, 134, 21].map do |i|
+        {
           context_type: "Course",
           context_id: @student_course.id,
           root_account_id: @student_course.root_account_id,
@@ -462,9 +461,8 @@ describe UsersController, type: :request do
       end
       Assignment.bulk_insert(batch)
       @student_assignments = @student_course.assignments
-      batch = []
-      @student_assignments.each do |a|
-        batch << {
+      batch = @student_assignments.map do |a|
+        {
           cached_due_date: a.due_date,
           assignment_id: a.id,
           course_id: @student_course.id,
@@ -477,9 +475,8 @@ describe UsersController, type: :request do
       # an assignment i created, and a student who submits the assignment (needs_grading)
       @student = user_factory(active_all: true)
       @teacher_course.enroll_student(@student).accept!
-      batch = []
-      [89, 10, 39, 6, 34, 55, 95, 103, 126, 107].each do |i|
-        batch << {
+      batch = [89, 10, 39, 6, 34, 55, 95, 103, 126, 107].map do |i|
+        {
           context_type: "Course",
           context_id: @teacher_course.id,
           root_account_id: @teacher_course.root_account_id,
@@ -492,9 +489,8 @@ describe UsersController, type: :request do
       end
       Assignment.bulk_insert(batch)
       @teacher_assignments = @teacher_course.assignments
-      batch = []
-      @teacher_assignments.each do |a|
-        batch << {
+      batch = @teacher_assignments.map do |a|
+        {
           cached_due_date: a.due_at,
           assignment_id: a.id,
           course_id: @teacher_course.id,
@@ -570,14 +566,13 @@ describe UsersController, type: :request do
       end
       Assignment.bulk_insert(batch)
 
-      batch = []
       assignments = @student_course.assignments
-      assignments.each do |a|
-        batch << { cached_due_date: 6.days.from_now,
-                   assignment_id: a.id,
-                   course_id: a.context_id,
-                   user_id: @user.id,
-                   workflow_state: "unsubmitted" }
+      batch = assignments.map do |a|
+        { cached_due_date: 6.days.from_now,
+          assignment_id: a.id,
+          course_id: a.context_id,
+          user_id: @user.id,
+          workflow_state: "unsubmitted" }
       end
       Submission.bulk_insert(batch)
 

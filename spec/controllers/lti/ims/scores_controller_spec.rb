@@ -182,6 +182,11 @@ module Lti::IMS
         context "when line_item is an assignment" do
           let(:result) { lti_result_model line_item:, user: }
 
+          before do
+            allow(CanvasHttp).to receive(:get).with("https://getsamplefiles.com/download/txt/sample-1.txt").and_return("sample data")
+            allow(CanvasHttp).to receive(:get).with("https://getsamplefiles.com/download/txt/sample-2.txt").and_return("moar sample data")
+          end
+
           shared_examples_for "creates a new submission" do
             it "increments attempt" do
               submission_body = { submitted_at: 1.hour.ago, submission_type: "external_tool" }

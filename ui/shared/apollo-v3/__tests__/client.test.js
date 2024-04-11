@@ -65,33 +65,4 @@ describe('host configuration', () => {
     const client = createClient({httpLinkOptions: {fetch: fakeFetch, uri: uriTarget}})
     await client.query({query: someQuery})
   })
-
-  describe('API gateway override', () => {
-    beforeEach(() => {
-      fetchMock.reset()
-    })
-
-    it('talks to gateway URI with InstAccess token', async () => {
-      // prove that by introducing one config parameter, the client
-      // reconfigures itself to talk there over HTTP and to fetch
-      // InstAccess tokens to do so (see expectation in mock'd
-      // fetch implementation above)
-      fetchMock.mock('/api/v1/inst_access_tokens', {
-        status: 200,
-        body: {token: 'my-fake-token'},
-      })
-
-      // make sure token is being sent to api gateway
-      fetchMock.mock('http://my-gateway/graphql', (url, options) => {
-        expect(options.headers.authorization).toEqual('Bearer my-fake-token')
-        return {status: 200, body: '{"data": { "aField": "aValue" }, "errors": []}'}
-      })
-
-      const gatewayApolloClient = createClient({apiGatewayUri: 'http://my-gateway/graphql'})
-      const gatewayResponse = await gatewayApolloClient.query({query: someQuery})
-      expect(gatewayResponse.data.aField).toEqual('aValue')
-
-      fetchMock.restore()
-    })
-  })
 })

@@ -120,7 +120,7 @@
           {{#if react_discussions_post}}
           {{#if context_is_not_group}}
           {{#ifAny canModerate allow_student_anonymous_discussion_topics}}
-          <h4 id="anonymous_section_header">Anonymous Discussion</h4>
+          <h4 id="anonymous_section_header">{{#t}}Anonymous Discussion{{/t}}</h4>
           <div style="margin: 0 0 20px 0;">
             <label class="radio" style="display: block;">
               <input type="radio" name="anonymous_state" value=null {{checkedIfNullOrUndef anonymousState}} {{#if

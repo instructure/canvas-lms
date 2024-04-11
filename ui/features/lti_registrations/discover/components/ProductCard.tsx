@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import type {Product} from './types'
+import type {Product} from '../model/Product'
 
 import {Flex} from '@instructure/ui-flex'
 import {Img} from '@instructure/ui-img'
@@ -25,7 +25,13 @@ import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 
-const ProductCard = ({product}: Product) => {
+type ProductCardProps = {
+  product: Product
+}
+
+const ProductCard = (props: ProductCardProps) => {
+  const product = props.product
+
   return (
     <Flex.Item>
       <View
@@ -47,6 +53,7 @@ const ProductCard = ({product}: Product) => {
               {product.name}
             </Text>
             <div>
+              {/* TODO: Add I18n to below line */}
               by <Link href={product.companyUrl}>{product.company}</Link>
             </div>
           </div>

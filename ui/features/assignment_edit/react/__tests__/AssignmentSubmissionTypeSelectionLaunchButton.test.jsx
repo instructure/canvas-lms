@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {mount} from 'enzyme'
+import {render} from '@testing-library/react'
 import AssignmentSubmissionTypeSelectionLaunchButton from '../AssignmentSubmissionTypeSelectionLaunchButton'
 
 const tool = {
@@ -27,27 +27,21 @@ const tool = {
 }
 
 describe('AssignmentSubmissionTypeSelectionLaunchButton', () => {
-  let wrapper = 'empty wrapper'
-
   beforeEach(() => {
     window.ENV = {
       UPDATE_ASSIGNMENT_SUBMISSION_TYPE_LAUNCH_BUTTON_ENABLED: true
     }
   });
 
-  afterEach(() => {
-    wrapper.unmount()
-  })
-
   it('renders a button to launch the tool', () => {
-    wrapper = mount(<AssignmentSubmissionTypeSelectionLaunchButton tool={tool} />)
-    expect(wrapper.find('#assignment_submission_type_selection_launch_button')).toBeTruthy()
+    const wrapper = render(<AssignmentSubmissionTypeSelectionLaunchButton tool={tool} />)
+    expect(wrapper.getByRole('button', { name: `${tool.title} ${tool.description}` })).toBeTruthy()
   })
 
   it('renders an icon, a title, description', () => {
-    wrapper = mount(<AssignmentSubmissionTypeSelectionLaunchButton tool={tool} />)
-    expect(wrapper.find('img').prop('src')).toBe(tool.icon_url)
-    expect(wrapper.find('#title_text')).toBeTruthy()
-    expect(wrapper.find('#desc_text')).toBeTruthy()
+    const wrapper = render(<AssignmentSubmissionTypeSelectionLaunchButton tool={tool} />)
+    expect(wrapper.getByRole('img')).toHaveAttribute('src', tool.icon_url)
+    expect(wrapper.getByText(tool.title)).toBeInTheDocument()
+    expect(wrapper.getByText(tool.description)).toBeInTheDocument()
   })
 })

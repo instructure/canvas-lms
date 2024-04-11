@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "atom"
-
 class Enrollment < ActiveRecord::Base
   SIS_TYPES = {
     "TeacherEnrollment" => "teacher",
@@ -28,6 +26,8 @@ class Enrollment < ActiveRecord::Base
     "StudentEnrollment" => "student",
     "ObserverEnrollment" => "observer"
   }.freeze
+
+  self.ignored_columns += ["graded_at"]
 
   include Workflow
 
@@ -1211,14 +1211,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def graded_at
-    score = find_score
-    if score.present?
-      score.updated_at
-    else
-      # TODO: drop the graded_at column after the data fixup to populate
-      # the scores table completes
-      read_attribute(:graded_at)
-    end
+    find_score&.updated_at
   end
 
   def self.typed_enrollment(type)
@@ -1290,13 +1283,12 @@ class Enrollment < ActiveRecord::Base
   end
 
   def to_atom
-    Atom::Entry.new do |entry|
-      entry.title     = t("#enrollment.title", "%{user_name} in %{course_name}", user_name:, course_name:)
-      entry.updated   = updated_at
-      entry.published = created_at
-      entry.links << Atom::Link.new(rel: "alternate",
-                                    href: "/courses/#{course.id}/enrollments/#{id}")
-    end
+    {
+      title: t("#enrollment.title", "%{user_name} in %{course_name}", user_name:, course_name:),
+      updated: updated_at,
+      published: created_at,
+      link: "/courses/#{course.id}/enrollments/#{id}"
+    }
   end
 
   set_policy do

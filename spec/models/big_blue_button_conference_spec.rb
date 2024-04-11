@@ -29,6 +29,7 @@ describe BigBlueButtonConference do
                                                              web_conference_plugin_mock("big_blue_button", {
                                                                                           domain: "bbb.instructure.com",
                                                                                           secret_dec: "secret",
+                                                                                          send_avatar: true,
                                                                                         })
                                                            ])
       @course = course_factory
@@ -57,12 +58,15 @@ describe BigBlueButtonConference do
       @conference.settings[:admin_key] = "admin"
       @conference.settings[:user_key] = "user"
       @conference.save
+      pronouns = user_factory.pronouns
       params = {
         fullName: user_factory.name,
         meetingID: @conference.conference_key,
+        avatarUrl: user_factory.avatar_url,
         userID: user_factory.id,
         createTime: @conference.settings[:create_time]
       }
+      params[:userdataPronouns] = pronouns unless pronouns.nil?
       admin_params = params.merge(password: "admin").to_query
       user_params = params.merge(password: "user").to_query
       expect(@conference.admin_join_url(@user)).to eql("https://bbb.instructure.com/bigbluebutton/api/join?#{admin_params}&checksum=" +

@@ -686,6 +686,12 @@
     "enter_at_least_3_characters_to_search_4f037ee0": {
         "message": "Pātō ki iti ake i te 3 pūāhua hei rapu"
     },
+    "enter_replacement_text_17631bbc": {
+        "message": "tomo kupu whakakapi"
+    },
+    "enter_search_text_26cb4459": {
+        "message": "tomo kupu rapu"
+    },
     "epsilon_54bb8afa": {
         "message": "Epsilon"
     },
@@ -781,6 +787,12 @@
     },
     "filipino_33339264": {
         "message": "Filipino"
+    },
+    "find_8d605019": {
+        "message": "Kimihia"
+    },
+    "find_and_replace_6e345933": {
+        "message": "Kimihia me te Whakakapi"
     },
     "finish_bc343002": {
         "message": "Mutu"
@@ -1057,6 +1069,9 @@
     },
     "indefinite_integral_6623307e": {
         "message": "Noa Tautoko"
+    },
+    "index_of_max_80dcf7a5": {
+        "message": "{ index } ō { max }"
     },
     "indigo_2035fc55": {
         "message": "Indigo"
@@ -1487,6 +1502,9 @@
     "no_results_940393cf": {
         "message": "Kaore he hua."
     },
+    "no_results_found_58717065": {
+        "message": "Kāore he hua i kitea"
+    },
     "no_results_found_for_filterterm_ad1b04c8": {
         "message": "Kaore i kitea he hua mo { filterTerm }"
     },
@@ -1700,6 +1718,9 @@
     "preview_inline_9787330": {
         "message": "Arokite i roto i te raina"
     },
+    "previous_bd2ac015": {
+        "message": "Ō muri"
+    },
     "prime_917ea60e": {
         "message": "Pirimia"
     },
@@ -1772,8 +1793,14 @@
     "remove_link_d1f2f4d0": {
         "message": "Tango Hononga"
     },
+    "replace_all_d3d68b3": {
+        "message": "Whakakapi Katoa"
+    },
     "replace_e61834a7": {
         "message": "Whakakapi"
+    },
+    "replace_with_eeff01ad": {
+        "message": "Whakakapi me"
     },
     "reset_95a81614": {
         "message": "Tautuhi anō"

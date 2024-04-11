@@ -1001,6 +1001,26 @@ describe "Accounts API", type: :request do
     end
   end
 
+  describe "environment" do
+    it "lists cached_js_env_account_settings" do
+      expect_any_instance_of(ApplicationController).to receive(:cached_js_env_account_settings)
+        .and_return({ calendar_contexts_limit: true })
+      json = api_call(:get,
+                      "/api/v1/settings/environment",
+                      { controller: "accounts", action: "environment", format: "json" },
+                      {},
+                      {},
+                      { expected_status: 200 })
+      expect(json).to eq({ "calendar_contexts_limit" => true })
+    end
+
+    it "requires user session" do
+      request_path = "https://www.example.com/api/v1/settings/environment"
+      __send__(:get, request_path, params: { controller: "accounts", action: "environment", format: "json" })
+      expect(response).to have_http_status(:unauthorized)
+    end
+  end
+
   it "finds accounts by sis in only this root account" do
     Account.default.account_users.create!(user: @user)
     other_sub = account_model(name: "other_sub", parent_account: Account.default, root_account: Account.default, sis_source_id: "sis1")

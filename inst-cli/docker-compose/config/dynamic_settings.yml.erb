@@ -66,8 +66,6 @@ development:
         oauth_client_id: <%= ENV['CANVAS_CLIENT_ID'] %>
         prod_oauth_client_id: <%= ENV['CANVAS_CLIENT_ID'] %>
         nonprod_oauth_client_id: <%= ENV['CANVAS_CLIENT_ID'] %>
-      # api_gateway_enabled: 'true'
-      # api_gateway_uri: 'http://inst-gateway.docker/graphql'
       live_events.yml: |-
         aws_endpoint: http://quiz-api-kinesis.<%= Inst::Config.domain %>:4567
         kinesis_stream_name: canvas-live-events

@@ -334,6 +334,8 @@ const locale = {
   "enter_at_least_3_characters_to_search_4f037ee0": {
     "message": "Rhowch o leiaf 3 nod i chwilio"
   },
+  "enter_replacement_text_17631bbc": { "message": "rhowch destun newydd" },
+  "enter_search_text_26cb4459": { "message": "rhowch destun chwilio" },
   "epsilon_54bb8afa": { "message": "Epsilon" },
   "epsilon_variant_d31f1e77": { "message": "Epsilon (Amrywiad)" },
   "equals_sign_c51bdc58": { "message": "Hafalnod" },
@@ -376,6 +378,8 @@ const locale = {
   },
   "files_c300e900": { "message": "Ffeiliau" },
   "files_index_af7c662b": { "message": "Mynegai Ffeiliau" },
+  "find_8d605019": { "message": "Canfod" },
+  "find_and_replace_6e345933": { "message": "Canfod a Chyfnewid" },
   "finish_bc343002": { "message": "Gorffen" },
   "fix_heading_hierarchy_f60884c4": {
     "message": "Pennu hierarchaeth penawdau"
@@ -498,6 +502,7 @@ const locale = {
   "in_element_of_19ca2f33": { "message": "Yn (Elfen O)" },
   "increase_indent_6af90f7c": { "message": "Cynyddu Mewnoliad" },
   "indefinite_integral_6623307e": { "message": "Integryn Amhendant" },
+  "index_of_max_80dcf7a5": { "message": "{ index } o { max }" },
   "indigo_2035fc55": { "message": "Indigo" },
   "inference_fed5c960": { "message": "Casgliad" },
   "infinity_7a10f206": { "message": "Anfeidredd" },
@@ -718,6 +723,7 @@ const locale = {
   },
   "no_quizzes_found_c80c537a": { "message": "Heb ddod o hyd i gwisiau." },
   "no_results_940393cf": { "message": "Dim canlyniadau." },
+  "no_results_found_58717065": { "message": "Heb ddod o hyd i ganlyniadau" },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Heb ddod o hyd i ganlyniadau ar gyfer { filterTerm }"
   },
@@ -809,6 +815,7 @@ const locale = {
   "preview_a3f8f854": { "message": "RHAGOLWG" },
   "preview_in_overlay_ed772c46": { "message": "Rhagolwg mewn troshaen" },
   "preview_inline_9787330": { "message": "Rhagolwg mewn llinell" },
+  "previous_bd2ac015": { "message": "Blaenorol" },
   "prime_917ea60e": { "message": "Cysefin" },
   "prime_numbers_13464f61": { "message": "Rhifau Cysefin" },
   "product_39cf144f": { "message": "Cynnyrch" },
@@ -839,7 +846,9 @@ const locale = {
   "religion_icon_246e0be1": { "message": "Eicon Crefydd" },
   "remove_heading_style_5fdc8855": { "message": "Tynnu arddull y pennawd" },
   "remove_link_d1f2f4d0": { "message": "Tynnu Dolen" },
+  "replace_all_d3d68b3": { "message": "Cyfnewid pob un" },
   "replace_e61834a7": { "message": "Disodli" },
+  "replace_with_eeff01ad": { "message": "Cyfnewid am" },
   "reset_95a81614": { "message": "Ailosod" },
   "resize_ec83d538": { "message": "Ailfeintio" },
   "restore_auto_save_deccd84b": { "message": "Adfer cadw’n awtomatig?" },

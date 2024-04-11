@@ -338,6 +338,10 @@ const locale = {
   "enter_at_least_3_characters_to_search_4f037ee0": {
     "message": "Digite pelo menos 3 caracteres para pesquisar"
   },
+  "enter_replacement_text_17631bbc": {
+    "message": "introduzir texto de substituição"
+  },
+  "enter_search_text_26cb4459": { "message": "introduzir texto de pesquisa" },
   "epsilon_54bb8afa": { "message": "Epsilon" },
   "epsilon_variant_d31f1e77": { "message": "Epsilon (Variante)" },
   "equals_sign_c51bdc58": { "message": "Sinal de igualdade" },
@@ -384,6 +388,8 @@ const locale = {
   },
   "files_c300e900": { "message": "Ficheiros" },
   "files_index_af7c662b": { "message": "Índice de arquivos" },
+  "find_8d605019": { "message": "Localizar" },
+  "find_and_replace_6e345933": { "message": "Localizar e substituir" },
   "finish_bc343002": { "message": "Terminar" },
   "fix_heading_hierarchy_f60884c4": { "message": "Fixar hierarquia" },
   "flat_music_76d5a5c3": { "message": "Plano (Música)" },
@@ -506,6 +512,7 @@ const locale = {
   "in_element_of_19ca2f33": { "message": "Em (Elemento De)" },
   "increase_indent_6af90f7c": { "message": "Aumentar Avanço" },
   "indefinite_integral_6623307e": { "message": "Integral Indefinido" },
+  "index_of_max_80dcf7a5": { "message": "{ index } de { max }" },
   "indigo_2035fc55": { "message": "Indigo" },
   "inference_fed5c960": { "message": "Inferência" },
   "infinity_7a10f206": { "message": "Infinito" },
@@ -724,6 +731,7 @@ const locale = {
     "message": "Não foram encontrados questionários."
   },
   "no_results_940393cf": { "message": "Nenhum resultado." },
+  "no_results_found_58717065": { "message": "Nenhum resultado encontrado" },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Nenhum resultado encontrado para { filterTerm }"
   },
@@ -819,6 +827,7 @@ const locale = {
     "message": "Pré-visualização em sobreposição"
   },
   "preview_inline_9787330": { "message": "Pré-visualização em linha" },
+  "previous_bd2ac015": { "message": "Anterior" },
   "prime_917ea60e": { "message": "Primo" },
   "prime_numbers_13464f61": { "message": "Números primos" },
   "product_39cf144f": { "message": "Produto" },
@@ -847,7 +856,9 @@ const locale = {
   "religion_icon_246e0be1": { "message": "Ícone Religião" },
   "remove_heading_style_5fdc8855": { "message": "Remova estilo de cabeçalho" },
   "remove_link_d1f2f4d0": { "message": "Remover ligação" },
+  "replace_all_d3d68b3": { "message": "Substituir tudo" },
   "replace_e61834a7": { "message": "Substituir" },
+  "replace_with_eeff01ad": { "message": "Substituir por" },
   "reset_95a81614": { "message": "Redefinir" },
   "resize_ec83d538": { "message": "Redimensionar" },
   "restore_auto_save_deccd84b": { "message": "Restaurar o auto-salvamento?" },

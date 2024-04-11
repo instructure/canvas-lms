@@ -53,6 +53,7 @@ export type PartialStudent = {
     submittedAt: null | Date
     workflowState: WorkflowState
   }
+  currentScore?: string
 }
 
 // TODO: remove the need for this type

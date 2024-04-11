@@ -53,6 +53,7 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
   scope :scored_by, ->(scorer) { where(scorer_id: scorer) }
   scope :final, -> { where(final: true) }
   scope :not_final, -> { where(final: false) }
+  scope :graded, -> { where.not(graded_at: nil) }
 
   def must_be_final_or_student_in_need_of_provisional_grade
     if final.blank? && !submission.assignment_can_be_moderated_grader?(scorer)

@@ -11,4 +11,4 @@ gem "legacy_multipart", path: "../legacy_multipart"
 
 gemspec
 
-eval_gemfile(gemfile.dirname.join("../gemfile_prefix.rb"))
+eval_gemfile("../gemfile_prefix.rb")

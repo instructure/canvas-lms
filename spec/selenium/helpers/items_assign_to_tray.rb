@@ -41,6 +41,18 @@ module ItemsAssignToTray
     "//*[@data-testid = 'clearable-date-time-input']//*[contains(@class,'-dateInput')]//input"
   end
 
+  def due_date_input_selector
+    "[data-testid = 'due_at_input']"
+  end
+
+  def available_from_input_selector
+    "[data-testid = 'unlock_at_input']"
+  end
+
+  def until_input_selector
+    "[data-testid = 'lock_at_input']"
+  end
+
   def assign_to_in_tray_selector(button_title)
     "#{module_item_assign_to_card_selector} #{assign_to_button_selector(button_title)}"
   end

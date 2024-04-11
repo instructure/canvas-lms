@@ -19,15 +19,19 @@
 import React from 'react'
 import {Portal} from '@instructure/ui-portal'
 import TopNav from './TopNav'
+import {QueryProvider} from '@canvas/query'
 
 const TopNavPortal = () => {
   const mountPoint: HTMLElement | null = document.getElementById('react-instui-topnav')
   if (!mountPoint) {
     return null
   }
+
   return (
     <Portal open={true} mountNode={mountPoint}>
-      <TopNav />
+      <QueryProvider>
+        <TopNav />
+      </QueryProvider>
     </Portal>
   )
 }

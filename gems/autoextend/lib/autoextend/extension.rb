@@ -25,7 +25,6 @@ module Autoextend
                          :method, # rubocop:disable Lint/StructNewOverride
                          :block,
                          :singleton,
-                         :after_load,
                          :optional,
                          :before,
                          :after,
@@ -40,9 +39,7 @@ module Autoextend
       end
     end
 
-    def extend(const, source: nil)
-      return if after_load && source == :inherited
-
+    def extend(const)
       self.used = true
 
       target = singleton ? const.singleton_class : const
@@ -54,16 +51,7 @@ module Autoextend
               else
                 Object.const_get(self.module.to_s, false)
               end
-        real_method = method
-        # if we're hooking a module, and that module was included/prepended into
-        # another module/class, we also get called on that class, so that the
-        # extension can also be included into it. It won't otherwise have the
-        # extension, because the extension target didn't have it when it was
-        # included in the class
-        if [:included, :prepended].include?(source) && const.name != const_name
-          real_method = :include
-        end
-        target.send(real_method, mod)
+        target.public_send(method, mod)
       end
     end
   end

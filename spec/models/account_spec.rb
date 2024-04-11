@@ -31,14 +31,6 @@ describe Account do
     it { is_expected.to validate_inclusion_of(:account_calendar_subscription_type).in_array(Account::CALENDAR_SUBSCRIPTION_TYPES) }
   end
 
-  context "BASIC_COLUMNS_FOR_CALLBACKS" do
-    it "can save a minimal object" do
-      a = Account.select(*Account::BASIC_COLUMNS_FOR_CALLBACKS).find(Account.default.id)
-      a.name = "Changed"
-      expect { a.save! }.not_to raise_error
-    end
-  end
-
   context "domain_method" do
     it "retrieves correct account domain" do
       root_account = Account.create!
@@ -2401,13 +2393,9 @@ describe Account do
     end
 
     let_once(:level_two_sub_accounts) do
-      level_two_sub_accounts = []
-
-      root_account.sub_accounts.each do |sa|
-        level_two_sub_accounts << sa.sub_accounts.create!(name: "Level 2 - Sub account")
+      root_account.sub_accounts.map do |sa|
+        sa.sub_accounts.create!(name: "Level 2 - Sub account")
       end
-
-      level_two_sub_accounts
     end
 
     context "with empty parent account ids" do

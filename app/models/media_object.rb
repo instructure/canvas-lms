@@ -362,7 +362,7 @@ class MediaObject < ActiveRecord::Base
     return unless %w[Account Course Group User].include?(context_type)
 
     self.attachment = Folder.media_folder(context).attachments
-                            .create(
+                            .create!(
                               context:,
                               display_name: guaranteed_title,
                               filename: guaranteed_title,

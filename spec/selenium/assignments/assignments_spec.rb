@@ -1233,6 +1233,21 @@ describe "assignments" do
           expect(f("#assignment_#{@assignment.id} .js-score .non-screenreader").text).to match "A"
           expect(f("#assignment_#{@assignment.id} .js-score .screenreader-only").text).to match "Grade: A"
         end
+
+        it "shows the course scheme letter grade if letter grade type, pointsPossible is > 0 and score is less than pointsPossible" do
+          @course_standard = @course.grading_standards.create!(title: "course standard", standard_data: { f: { name: "F", value: "" } })
+          @assignment = @course.assignments.create! context: @course, title: "to publish", grading_standard_id: @course_standard.id
+          @assignment.update(points_possible: 100, grading_type: "letter_grade")
+          @assignment.publish
+          course_with_student_logged_in(active_all: true, course: @course)
+          @assignment.grade_student(@student, grade: 90, grader: @teacher)
+
+          get "/courses/#{@course.id}/assignments"
+          wait_for_ajaximations
+
+          expect(f("#assignment_#{@assignment.id} .js-score .non-screenreader").text).to match "F"
+          expect(f("#assignment_#{@assignment.id} .js-score .screenreader-only").text).to match "Grade: F"
+        end
       end
 
       context "creation and edit" do

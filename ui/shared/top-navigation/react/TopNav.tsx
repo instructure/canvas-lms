@@ -20,11 +20,34 @@ import React from 'react'
 import {TopNavBar} from '@instructure/ui-top-nav-bar'
 import {Breadcrumb} from '@instructure/ui-breadcrumb'
 import useToggleCourseNav from './hooks/useToggleCourseNav'
+import {useMutation, useQueryClient} from '@tanstack/react-query'
+import {setSetting} from '@canvas/settings-query/react/settingsQuery'
 
 const TopNav = () => {
   const breadCrumbs = window.ENV.breadcrumbs
+  const queryClient = useQueryClient()
 
   const {toggle} = useToggleCourseNav()
+
+  const setCollapseGlobalNav = useMutation({
+    mutationFn: setSetting,
+    onSuccess: () =>
+      queryClient.invalidateQueries({
+        queryKey: ['settings', 'collapse_course_nav'],
+      }),
+  })
+
+  function updateCollapseGlobalNav(newState: boolean) {
+    setCollapseGlobalNav.mutate({
+      setting: 'collapse_course_nav',
+      newState,
+    })
+  }
+
+  const handleToggleGlobalNav = (): void => {
+    const isExpanded = toggle()
+    updateCollapseGlobalNav(!isExpanded)
+  }
 
   return (
     <TopNavBar inverseColor={true} width="100%">
@@ -39,7 +62,7 @@ const TopNav = () => {
             dropdownMenuLabel: 'Main Menu',
           }}
           renderBreadcrumb={
-            <TopNavBar.Breadcrumb onClick={() => toggle()}>
+            <TopNavBar.Breadcrumb onClick={() => handleToggleGlobalNav()}>
               <Breadcrumb label="test">
                 {breadCrumbs?.map(crumb => (
                   <Breadcrumb.Link key={crumb.name} href={crumb.url}>

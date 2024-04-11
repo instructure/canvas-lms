@@ -929,6 +929,7 @@ describe "Canvas Cartridge importing" do
     asmnt.anonymous_peer_reviews = true
     asmnt.peer_review_count = 37
     asmnt.freeze_on_copy = true
+    asmnt.time_zone_edited = "Mountain Time (US & Canada)"
     asmnt.save!
 
     # export to xml/html
@@ -964,6 +965,7 @@ describe "Canvas Cartridge importing" do
     expect(asmnt_2.peer_review_count).to eq asmnt.peer_review_count
     expect(asmnt_2.freeze_on_copy).to be true
     expect(asmnt_2.copied).to be true
+    expect(asmnt_2.time_zone_edited).to eq asmnt.time_zone_edited
   end
 
   it "imports external tool assignments" do

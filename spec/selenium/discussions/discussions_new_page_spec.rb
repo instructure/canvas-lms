@@ -704,6 +704,22 @@ describe "discussions" do
         expect(f("[data-testid='group-category-opt-#{group_category.id}']")).to be_present
       end
 
+      it "create a require initial post discussion topic successfully for course discussions with a group category" do
+        group_category
+        group
+
+        get "/courses/#{course.id}/discussion_topics/new"
+        f("input[placeholder='Topic Title']").send_keys "my group discussion from course"
+        force_click_native("input[data-testid='require-initial-post-checkbox']")
+        force_click_native("input[data-testid='group-discussion-checkbox']")
+        f("input[placeholder='Select a group category']").click
+        force_click_native("[data-testid='group-category-opt-#{group_category.id}']")
+        f("button[data-testid='save-and-publish-button']").click
+        wait_for_ajaximations
+        dts = DiscussionTopic.where(user_id: teacher.id)
+        expect(dts.collect(&:require_initial_post?)).to match_array([true, true])
+      end
+
       it "creates group via shared group modal" do
         new_section
         group_category

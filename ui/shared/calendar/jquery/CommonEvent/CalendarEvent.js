@@ -59,6 +59,12 @@ Object.assign(CalendarEvent.prototype, {
     this.description = data.description
     // in some rare cases, this.contextCode returns a comma separated list
     const contexts = this.contextCode()?.split(',')
+    // when editing events we need to remove the old context class names
+    this.className.forEach(c => {
+      if (c.startsWith('group_')) {
+        this.removeClass(c)
+      }
+    })
     contexts?.forEach(c => {
       this.addClass(`group_${c}`)
     })

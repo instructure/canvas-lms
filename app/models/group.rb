@@ -18,9 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "atom"
-
 class Group < ActiveRecord::Base
+  self.ignored_columns += ["category"]
+
   include Context
   include Workflow
   include CustomValidations
@@ -77,7 +77,6 @@ class Group < ActiveRecord::Base
            dependent: :destroy
 
   before_validation :ensure_defaults
-  before_save :maintain_category_attribute
   before_save :update_max_membership_from_group_category
 
   after_create :refresh_group_discussion_topics
@@ -334,13 +333,12 @@ class Group < ActiveRecord::Base
   end
 
   def to_atom
-    Atom::Entry.new do |entry|
-      entry.title     = name
-      entry.updated   = updated_at
-      entry.published = created_at
-      entry.links << Atom::Link.new(rel: "alternate",
-                                    href: "/groups/#{id}")
-    end
+    {
+      title: name,
+      updated: updated_at,
+      published: created_at,
+      link: "/groups/#{id}"
+    }
   end
 
   # this method is idempotent
@@ -798,18 +796,6 @@ class Group < ActiveRecord::Base
 
   def allow_media_comments?
     true
-  end
-
-  def group_category_name
-    read_attribute(:category)
-  end
-
-  def maintain_category_attribute
-    # keep this field up to date even though it's not used (group_category_name
-    # exists solely for the migration that introduces the GroupCategory model).
-    # this way group_category_name is correct if someone mistakenly uses it
-    # (modulo category renaming in the GroupCategory model).
-    write_attribute(:category, self.group_category&.name)
   end
 
   def as_json(options = nil)

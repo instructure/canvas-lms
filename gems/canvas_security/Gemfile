@@ -13,4 +13,4 @@ path ".." do
 end
 # rubocop:enable Gemspec/DevelopmentDependencies
 
-eval_gemfile(gemfile.dirname.join("../gemfile_prefix.rb"))
+eval_gemfile("../gemfile_prefix.rb")
