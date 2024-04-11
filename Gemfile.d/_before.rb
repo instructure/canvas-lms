@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-gem "bundler", "~> 2.2"
-
 if RUBY_ENGINE == "truffleruby"
   warn "TruffleRuby support is experimental" unless ENV["SUPPRESS_RUBY_WARNING"]
 elsif RUBY_VERSION >= "3.2.0"
