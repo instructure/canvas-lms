@@ -35,6 +35,17 @@ assignment_edit_placement_not_on_announcements:
   applies_to: SiteAdmin
   display_name: Prevents LTI tools with assignment_edit placement from being launched on Announcements page
   description: When enabled, an LTI tool with the assignment_edit placement will not be launched on the Announcement page.
+assignment_submission_type_card:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Allow submission type resource card to be shown in the assignment edit page
+  description: |-
+    When enabled, the new submission type resource card will be shown in the assignment edit page.
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
 deep_linking_use_window_parent:
   state: hidden
   display_name: Use window.parent in Deep Linking Response

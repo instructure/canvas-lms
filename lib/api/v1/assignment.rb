@@ -245,8 +245,9 @@ module Api::V1::Assignment
       tool_attributes = {
         "url" => external_tool_tag.url,
         "new_tab" => external_tool_tag.new_tab,
+        "external_data" => external_tool_tag.external_data,
         "resource_link_id" => assignment.lti_resource_link_id,
-        "external_data" => external_tool_tag.external_data
+        "resource_link_title" => assignment.primary_resource_link&.title
       }
       tool_attributes.merge!(external_tool_tag.attributes.slice("content_type", "content_id")) if external_tool_tag.content_id
       tool_attributes["custom_params"] = assignment.primary_resource_link&.custom

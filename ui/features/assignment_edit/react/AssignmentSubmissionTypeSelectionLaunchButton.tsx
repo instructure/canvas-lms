@@ -18,35 +18,56 @@
 
 import React from 'react'
 
+import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
+
 import {BaseButton} from '@instructure/ui-buttons'
+import {Avatar} from '@instructure/ui-avatar'
 import {Text} from '@instructure/ui-text'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {View} from '@instructure/ui-view'
 
-export default function AssignmentSubmissionTypeSelectionLaunchButton(props) {
+export type ButtonProps = {
+  tool: {
+    developer_key?: {
+      global_id?: string
+    }
+    id: string
+    title: string
+    description?: string
+    icon_url?: string
+  }
+  onClick: () => void
+}
+
+export function AssignmentSubmissionTypeSelectionLaunchButton(props: ButtonProps) {
   const {tool, onClick} = props
   const {title, description, icon_url: iconUrl} = tool
+
+  const RenderIcon = () => {
+    return iconUrl ? (
+      <Avatar src={iconUrl} name={title} shape="rectangle" width="28px" height="28px" />
+    ) : undefined
+  }
 
   return (
     <BaseButton
       id="assignment_submission_type_selection_launch_button"
+      data-testid="assignment_submission_type_selection_launch_button"
       display="block"
       color="secondary"
       margin="small 0"
       withBackground={true}
       withBorder={true}
       onClick={onClick}
-      renderIcon={iconUrl ? <img src={iconUrl} width="28px" height="28px" /> : undefined}
+      renderIcon={RenderIcon}
     >
       <View>
         <Text as="div" id="title_text">
           {title}
         </Text>
         {description && (
-          <Text weight="light" size="small">
-            <TruncateText as="div" id="desc_text" maxLines={1}>
-              {description}
-            </TruncateText>
+          <Text id="desc_text" weight="light" size="small">
+            <TruncateText maxLines={1}>{description}</TruncateText>
           </Text>
         )}
       </View>
