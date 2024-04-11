@@ -19,15 +19,27 @@ import React, {useContext, useRef} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import {DiscussionTopicNumberInput} from './DiscussionTopicNumberInput'
+import {NumberInput} from '@instructure/ui-number-input'
+import {Tooltip} from '@instructure/ui-tooltip'
+import {IconInfoLine} from '@instructure/ui-icons'
+import theme from '@instructure/canvas-theme'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {PointsPossible} from './PointsPossible'
 import {
   GradedDiscussionDueDatesContext,
   minimumReplyToEntryRequiredCount,
   maximumReplyToEntryRequiredCount,
 } from '../../util/constants'
-import type {FormMessage} from '@instructure/ui-form-field'
 
 const I18n = useI18nScope('discussion_create')
+
+const replyToEntryRequiredCountToolTip = I18n.t(
+  'The number of additional replies required must be between %{minimumReplies} and %{maximumReplies}.',
+  {
+    minimumReplies: minimumReplyToEntryRequiredCount,
+    maximumReplies: maximumReplyToEntryRequiredCount,
+  }
+)
 
 export const CheckpointsSettings = () => {
   const {
@@ -37,23 +49,7 @@ export const CheckpointsSettings = () => {
     setPointsPossibleReplyToEntry,
     replyToEntryRequiredCount,
     setReplyToEntryRequiredCount,
-    setReplyToEntryRequiredRef,
   } = useContext(GradedDiscussionDueDatesContext)
-
-  const validateReplyToEntryRequiredCountMessage = () => {
-    if (
-      replyToEntryRequiredCount >= minimumReplyToEntryRequiredCount &&
-      replyToEntryRequiredCount <= maximumReplyToEntryRequiredCount
-    ) {
-      return []
-    }
-    return [
-      {
-        text: I18n.t('This number must be between 1 and 10'),
-        type: 'error',
-      },
-    ] as FormMessage[]
-  }
 
   return (
     <>
@@ -61,29 +57,75 @@ export const CheckpointsSettings = () => {
         <Text size="large">{I18n.t('Checkpoint Settings')}</Text>
       </View>
       <View as="div" margin="0 0 medium 0">
-        <DiscussionTopicNumberInput
-          numberInput={pointsPossibleReplyToTopic}
-          setNumberInput={setPointsPossibleReplyToTopic}
-          numberInputLabel={I18n.t('Points Possible: Reply to Topic')}
-          numberInputDataTestId="points-possible-input-reply-to-topic"
+        <PointsPossible
+          pointsPossible={pointsPossibleReplyToTopic}
+          setPointsPossible={setPointsPossibleReplyToTopic}
+          pointsPossibleLabel={I18n.t('Points Possible: Reply to Topic')}
+          pointsPossibleDataTestId="points-possible-input-reply-to-topic"
         />
       </View>
       <View as="div" margin="0 0 medium 0">
-        <DiscussionTopicNumberInput
-          numberInput={replyToEntryRequiredCount}
-          setNumberInput={setReplyToEntryRequiredCount}
-          numberInputLabel={I18n.t('Additional Replies Required')}
-          numberInputDataTestId="reply-to-entry-required-count"
-          messages={validateReplyToEntryRequiredCountMessage()}
-          setRef={setReplyToEntryRequiredRef}
+        <NumberInput
+          data-testid="reply-to-entry-required-count"
+          renderLabel={
+            <>
+              <View display="inline-block">
+                <Text>{I18n.t('Additional Replies Required')}</Text>
+              </View>
+              <Tooltip
+                renderTip={replyToEntryRequiredCountToolTip}
+                on={['hover', 'focus']}
+                color="primary"
+              >
+                <div
+                  style={{display: 'inline-block', marginLeft: theme.spacing.xxSmall}}
+                  // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+                  tabIndex={0}
+                >
+                  <IconInfoLine />
+                  <ScreenReaderContent>{replyToEntryRequiredCountToolTip}</ScreenReaderContent>
+                </div>
+              </Tooltip>
+            </>
+          }
+          onIncrement={() => {
+            if (replyToEntryRequiredCount + 1 <= maximumReplyToEntryRequiredCount) {
+              setReplyToEntryRequiredCount(replyToEntryRequiredCount + 1)
+            }
+          }}
+          onDecrement={() => {
+            if (replyToEntryRequiredCount - 1 >= minimumReplyToEntryRequiredCount) {
+              setReplyToEntryRequiredCount(replyToEntryRequiredCount - 1)
+            }
+          }}
+          onBlur={event => {
+            if (event.target.value === '0') {
+              setReplyToEntryRequiredCount(minimumReplyToEntryRequiredCount)
+            }
+          }}
+          value={replyToEntryRequiredCount}
+          onChange={event => {
+            // don't allow non-numeric values
+            if (!/^\d*\.?\d*$/.test(event.target.value)) return
+            const valueInt = parseInt(event.target.value, 10)
+            const isBackspace = Number.isNaN(valueInt)
+            if (
+              !isBackspace &&
+              (valueInt > maximumReplyToEntryRequiredCount ||
+                valueInt < minimumReplyToEntryRequiredCount)
+            ) {
+              return
+            }
+            setReplyToEntryRequiredCount(isBackspace ? 0 : valueInt)
+          }}
         />
       </View>
       <View as="div" margin="0 0 medium 0">
-        <DiscussionTopicNumberInput
-          numberInput={pointsPossibleReplyToEntry}
-          setNumberInput={setPointsPossibleReplyToEntry}
-          numberInputLabel={I18n.t('Points Possible: Additional Replies')}
-          numberInputDataTestId="points-possible-input-reply-to-entry"
+        <PointsPossible
+          pointsPossible={pointsPossibleReplyToEntry}
+          setPointsPossible={setPointsPossibleReplyToEntry}
+          pointsPossibleLabel={I18n.t('Points Possible: Additional Replies')}
+          pointsPossibleDataTestId="points-possible-input-reply-to-entry"
         />
       </View>
       <View as="div" margin="0 0 medium 0">

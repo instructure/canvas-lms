@@ -93,7 +93,6 @@ export default function DiscussionTopicForm({
   const dateInputRef = useRef()
   const groupOptionsRef = useRef()
   const gradedDiscussionRef = useRef()
-  const replyToEntryRequiredRef = useRef()
   const {setOnFailure} = useContext(AlertManagerContext)
 
   const isAnnouncement = ENV?.DISCUSSION_TOPIC?.ATTRIBUTES?.is_announcement ?? false
@@ -236,10 +235,6 @@ export default function DiscussionTopicForm({
   const [pointsPossibleReplyToEntry, setPointsPossibleReplyToEntry] = useState(getCheckpointsPointsPossible('reply_to_entry'))
   const [replyToEntryRequiredCount, setReplyToEntryRequiredCount] = useState(currentDiscussionTopic?.replyToEntryRequiredCount || 1)
 
-  const setReplyToEntryRequiredRef = (ref) => {
-    replyToEntryRequiredRef.current = ref
-  }
-
   const assignmentDueDateContext = {
     assignedInfoList,
     setAssignedInfoList,
@@ -257,7 +252,6 @@ export default function DiscussionTopicForm({
     setPointsPossibleReplyToEntry,
     replyToEntryRequiredCount,
     setReplyToEntryRequiredCount,
-    setReplyToEntryRequiredRef,
     title,
     assignmentID: currentDiscussionTopic?.assignment?._id || null,
     importantDates: currentDiscussionTopic?.assignment?.importantDates || false,
@@ -432,9 +426,6 @@ export default function DiscussionTopicForm({
         setAvailabilityValidationMessages,
         shouldShowPostToSectionOption,
         sectionIdsToPostTo,
-        isCheckpoints,
-        replyToEntryRequiredCount,
-        replyToEntryRequiredRef,
       )
     ) {
       const payload = createSubmitPayload(shouldPublish)

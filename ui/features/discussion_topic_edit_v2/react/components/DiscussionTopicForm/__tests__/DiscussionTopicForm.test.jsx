@@ -461,13 +461,22 @@ describe('DiscussionTopicForm', () => {
       expect(checkbox.checked).toBe(true)
     })
     describe('Checkpoints Settings', () => {
-      it('increments and decrements the checkpoints settings points possible reply to topic fields', () => {
-        const {getByTestId, getByLabelText} = setup()
+      let getByTestId, getByLabelText;
+
+      const setupCheckpoints = (setupFunction) => {
+        const discussionTopicSetup = setupFunction
+
+        getByTestId = discussionTopicSetup.getByTestId;
+        getByLabelText = discussionTopicSetup.getByLabelText;
 
         getByLabelText('Graded').click()
 
         const checkbox = getByTestId('checkpoints-checkbox')
         checkbox.click()
+      }
+
+      it('increments and decrements the checkpoints settings points possible reply to topic fields', () => {
+        setupCheckpoints(setup())
 
         const numberInputReplyToTopic = getByTestId('points-possible-input-reply-to-topic')
         expect(numberInputReplyToTopic.value).toBe('0')
@@ -481,12 +490,7 @@ describe('DiscussionTopicForm', () => {
         expect(numberInputReplyToTopic.value).toBe('0')
       })
       it('increments and decrements the checkpoints settings points possible reply to entry fields', () => {
-        const {getByTestId, getByLabelText} = setup()
-
-        getByLabelText('Graded').click()
-
-        const checkbox = getByTestId('checkpoints-checkbox')
-        checkbox.click()
+        setupCheckpoints(setup())
 
         const numberInputReplyToEntry = getByTestId('points-possible-input-reply-to-entry')
         expect(numberInputReplyToEntry.value).toBe('0')
@@ -499,64 +503,70 @@ describe('DiscussionTopicForm', () => {
         fireEvent.keyDown(numberInputReplyToEntry, {keyCode: 40})
         expect(numberInputReplyToEntry.value).toBe('0')
       })
-      it('increments and decrements the checkpoints settings additional replies required entry field', () => {
-        const {getByTestId, getByLabelText} = setup()
+      describe('Additional Replies Required', () => {
+        it('increments and decrements the checkpoints settings additional replies required entry field', () => {
+          setupCheckpoints(setup())
 
-        getByLabelText('Graded').click()
+          const numberInputReplyToEntryRequiredCount = getByTestId('reply-to-entry-required-count')
+          expect(numberInputReplyToEntryRequiredCount.value).toBe('1')
 
-        const checkbox = getByTestId('checkpoints-checkbox')
-        checkbox.click()
+          fireEvent.click(numberInputReplyToEntryRequiredCount)
 
-        const numberInputReplyToEntryRequiredCount = getByTestId('reply-to-entry-required-count')
-        expect(numberInputReplyToEntryRequiredCount.value).toBe('1')
+          fireEvent.keyDown(numberInputReplyToEntryRequiredCount, {keyCode: 38})
+          expect(numberInputReplyToEntryRequiredCount.value).toBe('2')
 
-        fireEvent.click(numberInputReplyToEntryRequiredCount)
+          fireEvent.keyDown(numberInputReplyToEntryRequiredCount, {keyCode: 40})
+          expect(numberInputReplyToEntryRequiredCount.value).toBe('1')
+        })
+        it('does not allow incrementing or decrementing if required count is not in the allowed range', () => {
+          setupCheckpoints(setup())
 
-        fireEvent.keyDown(numberInputReplyToEntryRequiredCount, {keyCode: 38})
-        expect(numberInputReplyToEntryRequiredCount.value).toBe('2')
+          const numberInputReplyToEntryRequiredCount = getByTestId('reply-to-entry-required-count')
+          expect(numberInputReplyToEntryRequiredCount.value).toBe('1')
 
-        fireEvent.keyDown(numberInputReplyToEntryRequiredCount, {keyCode: 40})
-        expect(numberInputReplyToEntryRequiredCount.value).toBe('1')
-      })
-      it('does not submit when the required replies count is greater than maximum allowed count', () => {
-        const onSubmit = jest.fn()
-        const {container, getByText, getByLabelText, getByTestId, getByPlaceholderText} = setup({onSubmit})
+          fireEvent.click(numberInputReplyToEntryRequiredCount)
 
-        fireEvent.input(getByPlaceholderText('Topic Title'), {target: {value: 'a title'}})
+          fireEvent.keyDown(numberInputReplyToEntryRequiredCount, {keyCode: 40})
+          expect(numberInputReplyToEntryRequiredCount.value).toBe('1')
 
-        getByLabelText('Graded').click()
+          fireEvent.change(numberInputReplyToEntryRequiredCount, {target: {value: '10'}})
 
-        const checkbox = getByTestId('checkpoints-checkbox')
-        checkbox.click()
+          fireEvent.keyDown(numberInputReplyToEntryRequiredCount, {keyCode: 38})
+          expect(numberInputReplyToEntryRequiredCount.value).toBe('10')
+        })
+        it('allows input to be changed if the required count falls within the allowed range', () => {
+          setupCheckpoints(setup())
 
-        const numberInputReplyToEntryRequiredCount = getByTestId('reply-to-entry-required-count')
-        fireEvent.change(numberInputReplyToEntryRequiredCount, {target: {value: '11'}})
+          const numberInputReplyToEntryRequiredCount = getByTestId('reply-to-entry-required-count')
+          expect(numberInputReplyToEntryRequiredCount.value).toBe('1')
 
-        expect(container).toHaveTextContent("This number must be between 1 and 10")
+          fireEvent.change(numberInputReplyToEntryRequiredCount, {target: {value: '6'}})
+          expect(numberInputReplyToEntryRequiredCount.value).toBe('6')
+        })
+        it('does not allow input to be changed if the required count falls outside the allowed range', () => {
+          setupCheckpoints(setup())
 
-        const saveButton = getByText('Save')
-        saveButton.click()
+          const numberInputReplyToEntryRequiredCount = getByTestId('reply-to-entry-required-count')
+          expect(numberInputReplyToEntryRequiredCount.value).toBe('1')
 
-        expect(onSubmit).not.toHaveBeenCalled()
-      })
-      it('submits when the required replies count is between the minimum and maximum allowed count, inclusive', () => {
-        const onSubmit = jest.fn()
-        const {getByText, getByLabelText, getByTestId, getByPlaceholderText} = setup({onSubmit})
+          fireEvent.change(numberInputReplyToEntryRequiredCount, {target: {value: '11'}})
+          expect(numberInputReplyToEntryRequiredCount.value).toBe('1')
 
-        fireEvent.input(getByPlaceholderText('Topic Title'), {target: {value: 'a title'}})
+          fireEvent.change(numberInputReplyToEntryRequiredCount, {target: {value: '0'}})
+          expect(numberInputReplyToEntryRequiredCount.value).toBe('1')
+        })
+        it('reverts to minimum required count value if user has backspaced and leaves the input field', () => {
+          setupCheckpoints(setup())
 
-        getByLabelText('Graded').click()
+          const numberInputReplyToEntryRequiredCount = getByTestId('reply-to-entry-required-count')
+          expect(numberInputReplyToEntryRequiredCount.value).toBe('1')
 
-        const checkbox = getByTestId('checkpoints-checkbox')
-        checkbox.click()
+          fireEvent.change(numberInputReplyToEntryRequiredCount, {target: {value: ''}})
+          expect(numberInputReplyToEntryRequiredCount.value).toBe('0')
 
-        const numberInputReplyToEntryRequiredCount = getByTestId('reply-to-entry-required-count')
-        fireEvent.change(numberInputReplyToEntryRequiredCount, {target: {value: '10'}})
-
-        const saveButton = getByText('Save')
-        saveButton.click()
-
-        expect(onSubmit).toHaveBeenCalled()
+          fireEvent.blur(numberInputReplyToEntryRequiredCount)
+          expect(numberInputReplyToEntryRequiredCount.value).toBe('1')
+        })
       })
       it('sets the correct checkpoint settings values when there are existing checkpoints', () => {
         const {getByTestId} = setup({
@@ -579,6 +589,7 @@ describe('DiscussionTopicForm', () => {
             ]}
           )}),
         })
+
         const numberInputReplyToTopic = getByTestId('points-possible-input-reply-to-topic')
         expect(numberInputReplyToTopic.value).toBe('6')
         const numberInputReplyToEntry = getByTestId('points-possible-input-reply-to-entry')
