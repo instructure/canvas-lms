@@ -29,9 +29,6 @@ import {coursePaceDateFormatter} from '../api/backend_serializer'
 
 const I18n = useI18nScope('course_paces_blackout_dates_table')
 
-// Doing this to avoid TS2339 errors-- remove once we're on InstUI 8
-const {Body, Cell, ColHeader, Head, Row} = Table as any
-
 /* React Components */
 
 interface PassedProps {
@@ -88,22 +85,22 @@ export class BlackoutDatesTable extends React.Component<ComponentProps, LocalSta
     const dates = this.sortedBlackoutDates()
     if (dates.length === 0) {
       return (
-        <Row key="blackout-date-empty">
-          <Cell colSpan={4} textAlign="center">
+        <Table.Row key="blackout-date-empty">
+          <Table.Cell colSpan={4} textAlign="center">
             {I18n.t('No blackout dates')}
-          </Cell>
-        </Row>
+          </Table.Cell>
+        </Table.Row>
       )
     }
     return dates.map(bd => (
-      <Row key={`blackout-date-${bd.id || bd.temp_id}`}>
-        <Cell>
+      <Table.Row key={`blackout-date-${bd.id || bd.temp_id}`}>
+        <Table.Cell>
           <div style={{overflowWrap: 'break-word'}}>{bd.event_title}</div>
-        </Cell>
-        <Cell>{this.dateFormatter(bd.start_date.toDate())}</Cell>
-        <Cell>{this.dateFormatter(bd.end_date.toDate())}</Cell>
-        <Cell textAlign="end">{this.renderTrash(bd)}</Cell>
-      </Row>
+        </Table.Cell>
+        <Table.Cell>{this.dateFormatter(bd.start_date.toDate())}</Table.Cell>
+        <Table.Cell>{this.dateFormatter(bd.end_date.toDate())}</Table.Cell>
+        <Table.Cell textAlign="end">{this.renderTrash(bd)}</Table.Cell>
+      </Table.Row>
     ))
   }
 
@@ -125,18 +122,18 @@ export class BlackoutDatesTable extends React.Component<ComponentProps, LocalSta
   render() {
     return (
       <Table caption="Blackout Dates" layout="fixed" data-testid="blackout_dates_table">
-        <Head>
-          <Row>
-            <ColHeader id="blackout-dates-title">{I18n.t('Event Title')}</ColHeader>
-            <ColHeader id="blackout-dates-start-date">{I18n.t('Start Date')}</ColHeader>
-            <ColHeader id="blackout-dates-end-date">{I18n.t('End Date')}</ColHeader>
+        <Table.Head>
+          <Table.Row>
+            <Table.ColHeader id="blackout-dates-title">{I18n.t('Event Title')}</Table.ColHeader>
+            <Table.ColHeader id="blackout-dates-start-date">{I18n.t('Start Date')}</Table.ColHeader>
+            <Table.ColHeader id="blackout-dates-end-date">{I18n.t('End Date')}</Table.ColHeader>
 
-            <ColHeader id="blackout-dates-actions" width="4rem">
+            <Table.ColHeader id="blackout-dates-actions" width="4rem">
               <ScreenReaderContent>{I18n.t('Actions')}</ScreenReaderContent>
-            </ColHeader>
-          </Row>
-        </Head>
-        <Body>{this.renderRows()}</Body>
+            </Table.ColHeader>
+          </Table.Row>
+        </Table.Head>
+        <Table.Body>{this.renderRows()}</Table.Body>
       </Table>
     )
   }

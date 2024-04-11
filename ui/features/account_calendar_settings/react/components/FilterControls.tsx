@@ -36,9 +36,6 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('account_calendar_settings_filter_controls')
 
-// Doing this to avoid TS2339 errors-- remove once we're on InstUI 8
-const {Option: SimpleSelectOption} = SimpleSelect as any
-
 export enum FilterType {
   SHOW_ALL = 'all',
   SHOW_VISIBLE = 'visible',
@@ -119,13 +116,13 @@ export const FilterControls = ({
           }}
         >
           {FILTER_OPTIONS.map(option => (
-            <SimpleSelectOption
+            <SimpleSelect.Option
               id={option.id}
               value={option.value}
               key={`filter_option_${option.id}`}
             >
               {option.name}
-            </SimpleSelectOption>
+            </SimpleSelect.Option>
           ))}
         </SimpleSelect>
       </View>
