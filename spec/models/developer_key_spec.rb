@@ -931,6 +931,9 @@ describe DeveloperKey do
 
     it { is_expected.to belong_to(:service_user) }
 
+    it { is_expected.to belong_to(:lti_registration).class_name("Lti::Registration").dependent(:destroy).inverse_of(:developer_key) }
+    it { is_expected.to have_one(:ims_registration).class_name("Lti::IMS::Registration").dependent(:destroy).inverse_of(:developer_key) }
+
     it "destroys developer key account bindings when destroyed" do
       binding_id = developer_key_account_binding.id
       developer_key_saved.destroy_permanently!

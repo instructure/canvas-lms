@@ -47,6 +47,13 @@ describe User do
     end
   end
 
+  context "relationships" do
+    subject { User.new }
+
+    it { is_expected.to have_many(:created_lti_registrations).class_name("Lti::Registration").with_foreign_key("created_by_id") }
+    it { is_expected.to have_many(:updated_lti_registrations).class_name("Lti::Registration").with_foreign_key("updated_by_id") }
+  end
+
   describe "notifications" do
     describe "#daily_notification_time" do
       it "returns the users 6pm local time" do

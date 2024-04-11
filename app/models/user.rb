@@ -248,6 +248,8 @@ class User < ActiveRecord::Base
            class_name: "Auditors::ActiveRecord::FeatureFlagRecord",
            dependent: :destroy,
            inverse_of: :user
+  has_many :created_lti_registrations, class_name: "Lti::Registration", foreign_key: "created_by_id", inverse_of: :created_by
+  has_many :updated_lti_registrations, class_name: "Lti::Registration", foreign_key: "updated_by_id", inverse_of: :updated_by
 
   has_many :comment_bank_items, -> { where("workflow_state<>'deleted'") }
   has_many :microsoft_sync_partial_sync_changes, class_name: "MicrosoftSync::PartialSyncChange", dependent: :destroy, inverse_of: :user

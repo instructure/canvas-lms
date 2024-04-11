@@ -127,6 +127,7 @@ class Account < ActiveRecord::Base
            inverse_of: :context,
            class_name: "Lti::ResourceLink",
            dependent: :destroy
+  has_many :lti_registrations, class_name: "Lti::Registration", inverse_of: :account, dependent: :destroy
   belongs_to :course_template, class_name: "Course", inverse_of: :templated_accounts
   belongs_to :grading_standard
 
