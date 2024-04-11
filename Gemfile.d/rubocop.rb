@@ -33,3 +33,5 @@ group :test do
   gem "rubocop-rake", "~> 0.6", require: false
   gem "rubocop-rspec", "~> 2.22", require: false
 end
+
+eval_gemfile("_before.rb") # have to put this here too, since this file is loaded directly by bin/rubocop
