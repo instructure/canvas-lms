@@ -158,14 +158,6 @@ export function storageAvailable() {
     )
   }
 }
-
-function getHtmlEditorCookie() {
-  const value = getCookie('rce.htmleditor')
-  return value === RAW_HTML_EDITOR_VIEW || value === PRETTY_HTML_EDITOR_VIEW
-    ? value
-    : PRETTY_HTML_EDITOR_VIEW
-}
-
 function renderLoading() {
   return formatMessage('Loading')
 }
@@ -312,7 +304,7 @@ class RCEWrapper extends React.Component {
       explicit_latex_typesetting = false,
       rce_transform_loaded_content = false,
       media_links_use_attachment_id = false,
-      rce_find_replace = false
+      rce_find_replace = false,
     } = this.props.features
 
     return {
@@ -613,6 +605,17 @@ class RCEWrapper extends React.Component {
     return this.state.id
   }
 
+   getHtmlEditorStorage() {
+    const cookieValue = getCookie('rce.htmleditor')
+    if (cookieValue) {
+      document.cookie = `rce.htmleditor=${cookieValue};path=/;max-age=0`
+    }
+    const value = cookieValue || this.storage?.getItem?.('rce.htmleditor')?.content
+    return value === RAW_HTML_EDITOR_VIEW || value === PRETTY_HTML_EDITOR_VIEW
+      ? value
+      : PRETTY_HTML_EDITOR_VIEW
+  }
+
   toggleView = newView => {
     // coming from the menubar, we don't have a newView,
 
@@ -630,7 +633,7 @@ class RCEWrapper extends React.Component {
     this.setState(newState)
     this.checkAccessibility()
     if (newView === PRETTY_HTML_EDITOR_VIEW || newView === RAW_HTML_EDITOR_VIEW) {
-      document.cookie = `rce.htmleditor=${newView};path=/;max-age=31536000`
+      this.storage?.setItem?.('rce.htmleditor', newView)
     }
 
     // Emit view change event
@@ -1012,7 +1015,7 @@ class RCEWrapper extends React.Component {
 
     // cleans up highlight artifacts from findreplace plugin
     if (this.getRequiredFeatureStatuses().rce_find_replace) {
-      editor.on('undo redo', (e) => {
+      editor.on('undo redo', e => {
         if (editor?.dom?.doc?.getElementsByClassName?.('mce-match-marker')?.length > 0) {
           editor.plugins?.searchreplace?.done()
         }
@@ -1344,7 +1347,7 @@ class RCEWrapper extends React.Component {
     }
   }
 
-  onA11yChecker = (triggerElementId) => {
+  onA11yChecker = triggerElementId => {
     const editor = this.mceInstance()
     editor.execCommand(
       'openAccessibilityChecker',
@@ -1452,7 +1455,7 @@ class RCEWrapper extends React.Component {
       canvasPlugins.push('instructure_fullscreen')
     }
 
-    if(this.getRequiredFeatureStatuses().rce_find_replace) {
+    if (this.getRequiredFeatureStatuses().rce_find_replace) {
       canvasPlugins.push('searchreplace')
       canvasPlugins.push('instructure_search_and_replace')
     }
@@ -1531,7 +1534,10 @@ class RCEWrapper extends React.Component {
             items:
               'instructure_links instructure_image instructure_media instructure_document instructure_icon_maker | instructure_equation inserttable instructure_media_embed | hr',
           },
-          tools: {title: formatMessage('Tools'), items: 'instructure_wordcount lti_tools_menuitem instructure_search_and_replace'},
+          tools: {
+            title: formatMessage('Tools'),
+            items: 'instructure_wordcount lti_tools_menuitem instructure_search_and_replace',
+          },
           view: {
             title: formatMessage('View'),
             items: 'instructure_fullscreen instructure_exit_fullscreen instructure_html_view',
@@ -1890,7 +1896,7 @@ class RCEWrapper extends React.Component {
                   path={this.state.path}
                   wordCount={this.state.wordCount}
                   editorView={this.state.editorView}
-                  preferredHtmlEditor={getHtmlEditorCookie()}
+                  preferredHtmlEditor={this.getHtmlEditorStorage()}
                   onResize={this.onResize}
                   onKBShortcutModalOpen={this.openKBShortcutModal}
                   onA11yChecker={this.onA11yChecker}
