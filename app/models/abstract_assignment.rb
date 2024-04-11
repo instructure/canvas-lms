@@ -1331,6 +1331,7 @@ class AbstractAssignment < ActiveRecord::Base
 
           options[:lookup_uuid] = lti_resource_link_lookup_uuid unless lti_resource_link_lookup_uuid.nil?
           options[:url] = lti_resource_link_url if lti_resource_link_url
+          options[:title] = lti_resource_link_title if lti_resource_link_title
           options[:lti_1_1_id] = lti_1_1_id if lti_1_1_id.present?
 
           primary_resource_link.update!(options) unless options.empty?

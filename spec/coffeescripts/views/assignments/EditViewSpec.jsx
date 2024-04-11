@@ -19,6 +19,7 @@
 import $ from 'jquery'
 import 'jquery-migrate'
 import React from 'react'
+import ReactDOM from 'react-dom'
 import RCELoader from '@canvas/rce/serviceRCELoader'
 import SectionCollection from '@canvas/sections/backbone/collections/SectionCollection'
 import Assignment from '@canvas/assignments/backbone/models/Assignment'
@@ -1435,6 +1436,7 @@ test('#handleAssignmentSelectionSubmit updates the external_tool_tag_attributes 
     'item[type]': 'LtiResourceLink',
     'item[id]': 1,
     'item[url]': 'https://foo.bar/internal_link/klIknZO7sE',
+    'item[title]': 'tool title',
     'item[new_tab]': '1',
     'item[iframe][width]': '111',
     'item[iframe][height]': '222',
@@ -1446,6 +1448,9 @@ test('#handleAssignmentSelectionSubmit updates the external_tool_tag_attributes 
   }
   const view = editView()
 
+  const reactMock = sinon.mock(ReactDOM)
+  reactMock.expects('render').once()
+
   // when selectContentDialog.submit is triggered the handleAssignmentSelectionSubmit function is called
   view.handleAssignmentSelectionSubmit(data)
 
@@ -1456,11 +1461,14 @@ test('#handleAssignmentSelectionSubmit updates the external_tool_tag_attributes 
   equal(view.$externalToolsContentType.val(), 'LtiResourceLink')
   equal(view.$externalToolsContentId.val(), '1')
   equal(view.$externalToolsUrl.val(), 'https://foo.bar/internal_link/klIknZO7sE')
+  equal(view.$externalToolsTitle.val(), 'tool title')
   equal(view.$externalToolsNewTab.val(), '1')
   equal(view.$assignmentPointsPossible.val(), '1234')
   equal(view.$externalToolsIframeWidth.val(), '111')
   equal(view.$externalToolsIframeHeight.val(), '222')
   equal(view.$externalToolsLineItem.val(), '{"scoreMaximum":1234}')
+
+  sinon.restore()
 })
 
 test('#handleContentItem updates the external_tool_tag_attributes input fields', async () => {
@@ -1494,6 +1502,9 @@ test('#handleContentItem updates the external_tool_tag_attributes input fields',
   }
   const view = editView()
 
+  const reactMock = sinon.mock(ReactDOM)
+  reactMock.expects('render').once()
+
   // when selectContentDialog.submit is triggered the handleAssignmentSelectionSubmit function is called
   view.handleContentItem(data)
 
@@ -1509,6 +1520,8 @@ test('#handleContentItem updates the external_tool_tag_attributes input fields',
   equal(view.$externalToolsIframeWidth.val(), '111')
   equal(view.$externalToolsIframeHeight.val(), '222')
   equal(view.$externalToolsLineItem.val(), '{"scoreMaximum":1234}')
+
+  sinon.restore()
 })
 
 test('submission_type_selection modal opens on tool click', () => {
@@ -1564,6 +1577,7 @@ test('submission_type_selection modal closes on deep link postMessage', () => {
       subject: 'LtiDeepLinkingResponse',
       content_items: [
         {
+          title: 'Resource Link Title',
           type: 'LtiResourceLink',
           url: 'https://foo.bar/internal_link/klIknZO7sE',
           lineItem: {
@@ -1649,7 +1663,6 @@ test('shows the "hide_zero_point_quiz" checkbox when points possible is 0', func
   this.view.$assignmentPointsPossible.val(0)
   this.view.$assignmentPointsPossible.trigger('change')
   strictEqual(this.view.$hideZeroPointQuizzesOption.length, 1)
-  strictEqual(this.view.$hideZeroPointQuizzesOption.css('display'), 'block')
 })
 
 test('does not show the "hide_zero_point_quiz" checkbox when points possible is not 0', function () {

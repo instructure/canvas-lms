@@ -18,36 +18,41 @@
 
 import React from 'react'
 import {render, screen, fireEvent} from '@testing-library/react'
-import {AssignmentSubmissionTypeSelectionLaunchButton} from '../AssignmentSubmissionTypeSelectionLaunchButton'
+import {AssignmentSubmissionTypeSelectionResourceLinkCard} from '../AssignmentSubmissionTypeSelectionResourceLinkCard'
 
-const onClickFn = jest.fn()
+const onCloseFn = jest.fn()
 const tool = {
   id: '1',
   title: 'Tool Title',
   description: 'The tool description.',
   icon_url: 'https://www.example.com/icon.png',
 }
-
-const renderComponent = () => {
-  return render(<AssignmentSubmissionTypeSelectionLaunchButton tool={tool} onClick={onClickFn} />)
+const resource = {
+  title: 'Resource Title',
 }
 
-describe('AssignmentSubmissionTypeSelectionLaunchButton', () => {
-  it('renders a button to launch the tool', () => {
-    const {getByTestId} = renderComponent()
-    expect(getByTestId('assignment_submission_type_selection_launch_button')).toBeTruthy()
-  })
+const renderComponent = () => {
+  return render(
+    <AssignmentSubmissionTypeSelectionResourceLinkCard
+      tool={tool}
+      resourceTitle={resource.title}
+      onCloseButton={onCloseFn}
+    />
+  )
+}
 
-  it('renders an icon, a title, description', () => {
-    const {container} = renderComponent()
-    expect(container.querySelector('img').src).toBe(tool.icon_url)
-    expect(container.querySelector('#title_text')).toBeTruthy()
-    expect(container.querySelector('#desc_text')).toBeTruthy()
-  })
-
-  it('calls the onClick function when the button is clicked', () => {
+describe('AssignmentSubmissionTypeSelectionResourceLinkCard', () => {
+  it('renders a card with a icon, tool title, and resource title, and a reset button', () => {
     renderComponent()
-    fireEvent.click(screen.getByTestId('assignment_submission_type_selection_launch_button'))
-    expect(onClickFn).toHaveBeenCalledTimes(1)
+    expect(screen.getByTestId('lti-tool-icon')).toBeTruthy()
+    expect(screen.getByText(tool.title)).toBeTruthy()
+    expect(screen.getByText(resource.title)).toBeTruthy()
+    expect(screen.getByTestId('close-button')).toBeTruthy()
+  })
+
+  it('calls the onClose action when clicked', () => {
+    renderComponent()
+    fireEvent.click(screen.getByRole('button'))
+    expect(onCloseFn).toHaveBeenCalled()
   })
 })
