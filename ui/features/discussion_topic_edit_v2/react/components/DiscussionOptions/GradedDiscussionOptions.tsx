@@ -22,7 +22,7 @@ import {View} from '@instructure/ui-view'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {AssignmentGroupSelect} from './AssignmentGroupSelect'
 import {DisplayGradeAs} from './DisplayGradeAs'
-import {DiscussionTopicNumberInput} from './DiscussionTopicNumberInput'
+import {PointsPossible} from './PointsPossible'
 import {PeerReviewOptions} from './PeerReviewOptions'
 import {AssignmentDueDatesManager} from './AssignmentDueDatesManager'
 import {SyncToSisCheckbox} from './SyncToSisCheckbox'
@@ -86,11 +86,11 @@ export const GradedDiscussionOptions = ({
     <View as="div">
       {!isCheckpoints && (
         <View as="div" margin="medium 0">
-          <DiscussionTopicNumberInput
-            numberInput={pointsPossible || 0}
-            setNumberInput={setPointsPossible}
-            numberInputLabel={I18n.t('Points Possible')}
-            numberInputDataTestId="points-possible-input"
+          <PointsPossible
+            pointsPossible={pointsPossible || 0}
+            setPointsPossible={setPointsPossible}
+            pointsPossibleLabel={I18n.t('Points Possible')}
+            pointsPossibleDataTestId="points-possible-input"
           />
         </View>
       )}

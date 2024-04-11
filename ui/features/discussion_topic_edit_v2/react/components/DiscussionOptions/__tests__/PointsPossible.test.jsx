@@ -19,35 +19,35 @@
 import {render, fireEvent} from '@testing-library/react'
 import React from 'react'
 
-import {DiscussionTopicNumberInput} from '../DiscussionTopicNumberInput'
+import {PointsPossible} from '../PointsPossible'
 
 const defaultProps = {
-  numberInput: 10,
-  setNumberInput: () => {},
-  numberInputLabel: 'Points Possible',
-  numberInputDataTestId: 'points-possible-input'
+  pointsPossible: 10,
+  setPointsPossible: () => {},
+  pointsPossibleLabel: 'Points Possible',
+  pointsPossibleDataTestId: 'points-possible-input'
 }
 
-const renderDiscussionTopicNumberInput = () => {
-  return render(<DiscussionTopicNumberInput {...defaultProps} />)
+const renderPointsPossible = () => {
+  return render(<PointsPossible {...defaultProps} />)
 }
-describe('DiscussionTopicNumberInput', () => {
+describe('PointsPossible', () => {
   it('renders', () => {
-    const {getByText} = renderDiscussionTopicNumberInput()
+    const {getByText} = renderPointsPossible()
     expect(getByText('Points Possible')).toBeInTheDocument()
   })
 
   it('does not allow negative values on decrement', () => {
-    const mockSetDiscussionTopicNumberInput = jest.fn()
+    const mockSetPointsPossible = jest.fn()
     const {getByTestId} = render(
-    <DiscussionTopicNumberInput {...defaultProps} numberInput={0} setNumberInput={mockSetDiscussionTopicNumberInput}/>)
+    <PointsPossible {...defaultProps} pointsPossible={0} setPointsPossible={mockSetPointsPossible}/>)
 
     // Assuming your decrement button has a test id of 'decrement-button', adjust if necessary
     const input = getByTestId('points-possible-input')
     fireEvent.click(input)
     fireEvent.keyDown(input, {keyCode: 40})
 
-    expect(mockSetDiscussionTopicNumberInput).not.toHaveBeenCalledWith(-1)
-    expect(mockSetDiscussionTopicNumberInput).toHaveBeenCalledWith(0)
+    expect(mockSetPointsPossible).not.toHaveBeenCalledWith(-1)
+    expect(mockSetPointsPossible).toHaveBeenCalledWith(0)
   })
 })

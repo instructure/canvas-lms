@@ -18,40 +18,33 @@
 
 import React from 'react'
 import {NumberInput} from '@instructure/ui-number-input'
-import type {FormMessage} from '@instructure/ui-form-field'
 
 type Props = {
-  numberInput: number
-  setNumberInput: (points: number) => void
-  numberInputLabel: string
-  numberInputDataTestId: string
-  messages?: FormMessage[]
-  setRef?: (ref: HTMLInputElement | null) => void
+  pointsPossible: number
+  setPointsPossible: (points: number) => void
+  pointsPossibleLabel: string
+  pointsPossibleDataTestId: string
 }
 
-export const DiscussionTopicNumberInput = ({
-  numberInput,
-  setNumberInput,
-  numberInputLabel,
-  numberInputDataTestId,
-  messages,
-  setRef,
+export const PointsPossible = ({
+  pointsPossible,
+  setPointsPossible,
+  pointsPossibleLabel,
+  pointsPossibleDataTestId,
 }: Props) => {
   return (
     <NumberInput
-      data-testid={numberInputDataTestId}
-      renderLabel={numberInputLabel}
-      onIncrement={() => setNumberInput(Math.max(0, numberInput + 1))}
-      onDecrement={() => setNumberInput(Math.max(0, numberInput - 1))}
-      value={numberInput.toString()}
+      data-testid={pointsPossibleDataTestId}
+      renderLabel={pointsPossibleLabel}
+      onIncrement={() => setPointsPossible(Math.max(0, pointsPossible + 1))}
+      onDecrement={() => setPointsPossible(Math.max(0, pointsPossible - 1))}
+      value={pointsPossible.toString()}
       onChange={event => {
         // don't allow non-numeric values
         if (!/^\d*\.?\d*$/.test(event.target.value)) return
         const value = parseInt(event.target.value, 10)
-        setNumberInput(Number.isNaN(value) ? 0 : value)
+        setPointsPossible(Number.isNaN(value) ? 0 : value)
       }}
-      messages={messages || []}
-      inputRef={setRef}
     />
   )
 }
