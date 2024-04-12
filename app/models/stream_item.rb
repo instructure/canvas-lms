@@ -277,7 +277,7 @@ class StreamItem < ActiveRecord::Base
           end
         end
 
-        StreamItemInstance.unique_constraint_retry(retries: 3) do
+        StreamItemInstance.unique_constraint_retry(3) do
           StreamItemInstance.where(:stream_item_id => stream_item_id, :user_id => sliced_user_ids).delete_all
           StreamItemInstance.bulk_insert(inserts)
         end
