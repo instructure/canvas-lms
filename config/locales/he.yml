@@ -1521,6 +1521,8 @@ he:
               check_box: "קובץ CSV של חברות בקבוצות"
           groups: 
             check_box: "קובץ CSV של קבוצות"
+          include_deleted: 
+            check_box: "יש לכלול רכיבים שבוטלו"
           sections: 
             check_box: "קבץ CSV של פרקים"
           terms: 
@@ -7047,6 +7049,7 @@ he:
     atom_no_author: "אין עורך"
     default_user_name: "שם משתמש"
   discussion_group_category_locked: " אין להגדיר קטגוריות קבוצה ישירות במשימת דיון, אך ניתן להגדיר אותן בדיון עצמו."
+  discussion_participant_1446188e: "משתתף דיון"
   discussion_podcast_feed_d62cc56f: "פודקאסט פיד של דיון"
   discussion_posts_c998c9ad: "פרסומי דיון"
   discussion_submission_781d5d33: "הגשת דיון"
@@ -19209,6 +19212,7 @@ he:
   this_report_shows_all_the_courses_for_a_given_term_9102a3d7: "דוח זה מראה את כל הקורסים למחצית נתונה. קובץ ה CSV שייוצר יכלול שורה לקורס ויציג את מזהה הקורס, מזהה הקורס במערכת הבין ספרית, שם מקוצר, שם קורס, מזהה חשבון, מזהה חשבון במערכת הבית ספרית, שם חשבון, נפח הנתונים במגהבייט"
   this_report_shows_grading_period_grades_and_overal_a86346a: "דוח זה מציג את ציוני תקופת ההערכה (וציון כולל של הקורס) לכל תלמיד שרשום לתקופה המדוברת. קובץ ה CSV שיווצר יציג שורה אחת לכל נרשם."
   this_sample_page_includes_common_ui_elements_in_ca_331f4ac4: "דף דוגמה זה כולל רכיבי ממשק משתמש נפוצים בקנבס כדי לעזור לך לבנות את המיתוג שלך. ברגע שתתחיל/י לבצע שינויים לערכי הצבע והתמונות בסרגל הצידי, תוכל/י לראות כפתור *תצוגה מקדימה של השינויים*. ניתן להקליק עליו כדי לרענן אל הדף ולבחון כיצד יראה הדף לאחר השינויים."
+  this_student_f8239fed: "תלמיד זה"
   this_student_was_just_awarded_an_unusually_high_gr_9ad835f3: "תלמיד זה קיבל ציון גבוה באופן יוצא מגדר הרגיל"
   this_student_was_just_awarded_negative_points_55741a37: "תלמיד זה קיבל רק נקודות שליליות"
   this_student_wrote_f1a3f22d: "תלמיד זה כתב:"
