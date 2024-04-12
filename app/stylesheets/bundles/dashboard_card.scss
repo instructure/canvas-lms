@@ -86,17 +86,17 @@ $ic-DashboardCard-icon-color: $ic-icon-link-color;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0);
   border-radius: 4px; // to keep consistency between dashboard cards and planner app
   overflow: hidden;
-  background: rgba(0, 0, 0, 0.02);
+  background: rgba(0, 0, 0, 0.02); // because the box shadow only shows on hover, add a slight gray background so the card stands out
   width: $ic-DashboardCard-width;
   display: inline-block;
   vertical-align: top;
   margin: direction-sides($ic-sp*3 0 0 $ic-sp*3);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease; // add transition to the box-shadow and transform
 
   .no-touch & {
     &:is(:hover, :focus-within) {
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-      transform: translateY(-2px);
+      transform: translateY(-2px); // transform the card up so with the shadow it looks even more like it's floating
     }
   }
 }
