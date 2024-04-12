@@ -211,8 +211,9 @@ export default function FindReplaceTray({
                   onClick={onPrevious}
                   disabled={isButtonDisabled('previous')}
                   data-testid="previous-button"
+                  aria-label={formatMessage('Previous {findText}', {findText})}
                 >
-                  {formatMessage('Previous')}
+                  <span aria-hidden="true">{formatMessage('Previous')}</span>
                 </Button>
               </Flex.Item>
               <Flex.Item>
@@ -222,8 +223,9 @@ export default function FindReplaceTray({
                   onClick={onNext}
                   disabled={isButtonDisabled('next')}
                   data-testid="next-button"
+                  aria-label={formatMessage('Next {findText}', {findText})}
                 >
-                  {formatMessage('Next')}
+                  <span aria-hidden="true">{formatMessage('Next')}</span>
                 </Button>
               </Flex.Item>
             </Flex>
@@ -248,8 +250,12 @@ export default function FindReplaceTray({
                   onClick={() => onReplace(replaceText, true, true)}
                   disabled={isButtonDisabled('replaceAll')}
                   data-testid="replace-all-button"
+                  aria-label={formatMessage('Replace all {findText} with {replaceText}', {
+                    findText,
+                    replaceText,
+                  })}
                 >
-                  {formatMessage('Replace All')}
+                  <span aria-hidden="true">{formatMessage('Replace All')}</span>
                 </Button>
               </Flex.Item>
               <Flex.Item>
@@ -261,8 +267,12 @@ export default function FindReplaceTray({
                   }}
                   disabled={isButtonDisabled('replace')}
                   data-testid="replace-button"
+                  aria-label={formatMessage('Replace {findText} with {replaceText}', {
+                    findText,
+                    replaceText,
+                  })}
                 >
-                  {formatMessage('Replace')}
+                  <span aria-hidden="true">{formatMessage('Replace')}</span>
                 </Button>
               </Flex.Item>
             </Flex>
