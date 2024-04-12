@@ -340,6 +340,7 @@ const DiscussionTopicManager = props => {
                             message,
                             attachment: file,
                             isAnonymous:
+                              isAnonymousAuthor &&
                               !!discussionTopicQuery.data.legacyNode.anonymousState &&
                               discussionTopicQuery.data.legacyNode.canReplyAnonymously,
                           }),
