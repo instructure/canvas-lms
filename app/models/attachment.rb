@@ -1803,6 +1803,7 @@ class Attachment < ActiveRecord::Base
   # after replacing this file's instfs_uuid, delete the old file if it's not being used by any other Attachments
   def safe_delete_overwritten_instfs_uuid(instfs_uuid)
     raise ArgumentError, "instfs_uuid not overwritten" if self.instfs_uuid == instfs_uuid
+    return if cloned_item_id.present?
 
     shard.activate do
       InstFS.delete_file(instfs_uuid) unless Attachment.where(instfs_uuid:).exists?
