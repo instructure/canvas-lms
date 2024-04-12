@@ -531,6 +531,7 @@ describe "Files API", type: :request do
         json = api_call(:post, "/api/v1/files/capture?#{@capture_params.to_query}", @capture_params)
         expect(json["id"]).to eq @existing.id
         expect(@existing.reload.instfs_uuid).to eq "new-instfs-uuid"
+        expect(@existing.cloned_item_id).to be_nil
         expect(other_file.reload.instfs_uuid).to eq "old-instfs-uuid"
       end
 
