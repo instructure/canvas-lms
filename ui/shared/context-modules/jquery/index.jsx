@@ -967,7 +967,7 @@ const updatePublishMenuDisabledState = function (disabled) {
         />,
         publishMenu
       )
-    } 
+    }
   }
 }
 
@@ -1331,16 +1331,16 @@ modules.initModuleManagement = function (duplicate) {
           }
           $newModule.find('.collapse_module_link').focus()
           modules.updateAssignmentData()
-          // Without these 'off' commands, the event handler happens twice after
-          // initModuleManagement is called.
-          $('.delete_module_link').die()
-          $('.duplicate_module_link').die()
-          $('.duplicate_item_link').die()
+          // Unbind event handlers with 'off' because they will get re-bound in initModuleManagement
+          // and we don't want them to be called twice on click.
+          $(document).off('click', '.delete_module_link')
+          $(document).off('click', '.delete_item_link')
+          $(document).off('click', '.duplicate_module_link')
+          $(document).off('click', '.duplicate_item_link')
           if (!ENV.FEATURES.instui_header) {
             // not using with instui header, clicks are handled differently
-            $('.add_module_link').die()
+            $(document).off('click', '.add_module_link')
           }
-          $('.edit_module_link').die()
           $('#context_modules').off('addFileToModule')
           $('#add_context_module_form .add_prerequisite_link').off()
           $('#add_context_module_form .add_completion_criterion_link').off()
@@ -1377,10 +1377,10 @@ modules.initModuleManagement = function (duplicate) {
             }
           })
           const $prevModule = $(this).prev()
-          const $addModuleButton = ENV.FEATURES.instui_header ? 
+          const $addModuleButton = ENV.FEATURES.instui_header ?
             $('#context-modules-header-add-module-button') :
             $('#content .header-bar .add_module_link')
-          
+
           const $toFocus = $prevModule.length
             ? $('.ig-header-admin .al-trigger', $prevModule)
             : $addModuleButton
@@ -2318,7 +2318,7 @@ $(document).ready(function () {
         $('#context-modules-header-add-module-button:visible').click()
       } else {
         $('.add_module_link:visible:first').click()
-      }      
+      }
 
       event.preventDefault()
     })
@@ -2386,7 +2386,7 @@ $(document).ready(function () {
   setExpandAllButton()
 
   if (!ENV.FEATURES.instui_header) {
-    // set the click handler for the expand/collapse all button 
+    // set the click handler for the expand/collapse all button
     // if the instui header is not enabled
     setExpandAllButtonHandler()
   }
