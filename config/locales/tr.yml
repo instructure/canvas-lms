@@ -1595,6 +1595,8 @@ tr:
               check_box: "Grup Üyeliği CSV"
           groups: 
             check_box: "Gruplar CSV"
+          include_deleted: 
+            check_box: "Silinen Nesneleri İçer"
           sections: 
             check_box: "Bölümler CSV"
           terms: 
@@ -7304,6 +7306,7 @@ tr:
     atom_no_author: "Yazar Yok"
     default_user_name: "Kullanıcı Adı"
   discussion_group_category_locked: "Grup kategorileri doğrudan bir tartışma ödevine ayarlanamaz; bunun yerine tartışmaya ayarlanmalıdır."
+  discussion_participant_1446188e: "Katılımcılarla Tartışma"
   discussion_podcast_feed_d62cc56f: "Tartışma Podcast Beslemesi"
   discussion_posts_c998c9ad: "Gönderilen Tartışmalar"
   discussion_submission_781d5d33: "Tartışma Gönderim"
@@ -18963,6 +18966,7 @@ tr:
   this_outcome_has_been_used_to_assess_a_student_and_376d5ba9: "Bu öğrenme çıktısı bir öğrenciyi değerlendirmek için kullanılmış durumda ve artık güncellenemez"
   this_outcome_has_been_used_to_assess_a_student_and_5a925169: "Bu öğrenme çıktısı bir öğrencinin değerlendirilmesinde kullanıldı ve düzenlenip silinemez"
   this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*Bu kısa sınav yayınlanmadı* Sadece öğretmenler bu kısa sınav yayınlanana kadar görebilirler."
+  this_student_f8239fed: "Bu Öğrenci"
   this_student_wrote_f1a3f22d: "Bu öğrenci şunu yazmış:"
   this_user_has_not_yet_accepted_the_invitation_to_t_7aef5391: "Bu kullanıcı henüz ders davetinizi kabul etmedi"
   this_will_allow_you_to_authenticate_canvas_for_pos_fdfca40: "Bu, Canvas'ı notları ÖBS'ne aktarmak için yetkilendirmenizi sağlayacak"
