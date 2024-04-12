@@ -18,10 +18,16 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative "../helpers/discussions_common"
+require_relative "../helpers/items_assign_to_tray"
+require_relative "../helpers/context_modules_common"
+require_relative "../assignments/page_objects/assignment_create_edit_page"
+require_relative "pages/discussion_page"
 
 describe "discussions" do
   include_context "in-process server selenium tests"
   include DiscussionsCommon
+  include ItemsAssignToTray
+  include ContextModulesCommon
 
   let(:course) { course_model.tap(&:offer!) }
   let(:default_section) { course.default_section }
@@ -1580,6 +1586,136 @@ describe "discussions" do
           expect(dt.assignment.only_visible_to_overrides).to be false
           expect(dt.assignment.group_category).to be_nil
           expect(dt.assignment.description).to eq "<p>replying to topic</p>"
+        end
+
+        context "set with ItemAssigntoTray" do
+          before do
+            differentiated_modules_on
+
+            course.conditional_release = true
+            course.save!
+
+            Discussion.start_new_discussion(course.id)
+            Discussion.update_discussion_topic_title
+            Discussion.update_discussion_message
+
+            force_click_native(Discussion.grade_checkbox_selector)
+            wait_for_ajaximations
+
+            Discussion.points_possible_input.send_keys "12"
+          end
+
+          it "creates a discussion topic with an assignment set to a student" do
+            Discussion.assign_to_button.click
+            wait_for_assign_to_tray_spinner
+
+            click_add_assign_to_card
+            select_module_item_assignee(1, @student_1.name)
+            update_due_date(1, "12/31/2022")
+            update_due_time(1, "5:00 PM")
+            update_available_date(1, "12/27/2022")
+            update_available_time(1, "8:00 AM")
+            update_until_date(1, "1/7/2023")
+            update_until_time(1, "9:00 PM")
+
+            click_save_button("Apply")
+
+            keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
+            expect(AssignmentCreateEditPage.pending_changes_pill_exists?).to be_truthy
+
+            Discussion.save_and_publish_button.click
+            wait_for_ajaximations
+
+            assignment = Assignment.last
+            expect(assignment.assignment_overrides.active.last.assignment_override_students.count).to eq(1)
+            expect(assignment.only_visible_to_overrides).to be false
+          end
+
+          it "assigns a section and saves assignment" do
+            Discussion.assign_to_button.click
+            wait_for_assign_to_tray_spinner
+
+            keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+            click_add_assign_to_card
+            select_module_item_assignee(1, @section_1.name)
+            update_due_date(1, "12/31/2022")
+            update_due_time(1, "5:00 PM")
+            update_available_date(1, "12/27/2022")
+            update_available_time(1, "8:00 AM")
+            update_until_date(1, "1/7/2023")
+            update_until_time(1, "9:00 PM")
+
+            click_save_button("Apply")
+
+            keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
+            expect(AssignmentCreateEditPage.pending_changes_pill_exists?).to be_truthy
+
+            Discussion.save_and_publish_button.click
+            wait_for_ajaximations
+            assignment = Assignment.last
+
+            expect(assignment.assignment_overrides.active.count).to eq(1)
+            expect(assignment.assignment_overrides.active.last.set_type).to eq("CourseSection")
+            expect(assignment.only_visible_to_overrides).to be false
+          end
+
+          it "assigns overrides only correctly" do
+            Discussion.assign_to_button.click
+            wait_for_assign_to_tray_spinner
+
+            keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+            click_add_assign_to_card
+            select_module_item_assignee(1, @section_1.name)
+            select_module_item_assignee(1, @section_2.name)
+            select_module_item_assignee(1, @section_3.name)
+            select_module_item_assignee(1, @student_1.name)
+            select_module_item_assignee(1, @student_2.name)
+            select_module_item_assignee(1, @student_3.name)
+            select_module_item_assignee(1, "Mastery Paths")
+
+            # Set dates for these overrides
+            update_due_date(1, "12/31/2022")
+            update_due_time(1, "5:00 PM")
+            update_available_date(1, "12/27/2022")
+            update_available_time(1, "8:00 AM")
+            update_until_date(1, "1/7/2023")
+            update_until_time(1, "9:00 PM")
+
+            # Remove the Everyone Else option
+            click_delete_assign_to_card(0)
+
+            click_save_button("Apply")
+            keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
+
+            expect(AssignmentCreateEditPage.pending_changes_pill_exists?).to be_truthy
+
+            # Since not all sections were selected, a warning is displayed
+            Discussion.save_and_publish_button.click
+            Discussion.section_warning_continue_button.click
+            wait_for_ajaximations
+
+            assignment = Assignment.last
+
+            expect(assignment.assignment_overrides.active.count).to eq(5)
+            expected_overrides = [
+              { set_type: "CourseSection", title: "section 1" },
+              { set_type: "CourseSection", title: "section 2" },
+              { set_type: "CourseSection", title: "section 3" },
+              { set_type: "ADHOC", title: "3 students" },
+              { set_type: "Noop", title: "Mastery Paths" }
+            ]
+
+            expected_overrides.each_with_index do |expected_override, index|
+              actual_override = assignment.assignment_overrides[index]
+
+              expect(actual_override.set_type).to eq(expected_override[:set_type])
+              expect(actual_override.title).to eq(expected_override[:title])
+            end
+
+            expect(assignment.only_visible_to_overrides).to be true
+          end
         end
       end
     end
