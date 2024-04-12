@@ -31,6 +31,7 @@ export const Assignment = {
       gradingType
       importantDates
       onlyVisibleToOverrides
+      visibleToEveryone
       dueAt(applyOverrides: false)
       unlockAt(applyOverrides: false)
       lockAt(applyOverrides: false)
@@ -77,6 +78,7 @@ export const Assignment = {
     gradingType: string,
     importantDates: bool,
     onlyVisibleToOverrides: bool,
+    visibleToEveryone: bool,
     unlockAt: string,
     dueAt: string,
     lockAt: string,
@@ -111,6 +113,7 @@ export const Assignment = {
     gradingType = 'points',
     importantDates = false,
     onlyVisibleToOverrides = false,
+    visibleToEveryone = true,
     unlockAt = null,
     dueAt = null,
     lockAt = null,
@@ -128,6 +131,7 @@ export const Assignment = {
     gradingType,
     importantDates,
     onlyVisibleToOverrides,
+    visibleToEveryone,
     unlockAt,
     dueAt,
     lockAt,

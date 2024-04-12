@@ -76,10 +76,16 @@ const DifferentiatedModulesSection = ({
   const linkRef = useRef()
 
   useEffect(() => {
-    overrides.forEach(override => {
-      override.stagedOverrideId = uid()
+    const updatedOverrides = overrides.map(override => {
+      if (!override.stagedOverrideId) {
+        return {
+          ...override,
+          stagedOverrideId: uid(),
+        }
+      }
+      return override
     })
-    setStagedOverrides(overrides)
+    setStagedOverrides(updatedOverrides)
   }, [overrides])
 
   useEffect(() => {
@@ -95,7 +101,7 @@ const DifferentiatedModulesSection = ({
       setCheckPoint(state)
     }
     if (preSavedOverrides === null) {
-      setPreSavedOverrides(cloneObject(overrides))
+      setPreSavedOverrides(cloneObject(stagedOverrides))
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stagedOverrides])
@@ -238,7 +244,7 @@ const DifferentiatedModulesSection = ({
 
   const handleDatesUpdate = (cardId, dateType, newDate) => {
     const card = {...stagedCards[cardId]}
-    const oldOverrides = card.overrides
+    const oldOverrides = card.overrides || []
     const oldDates = card.dates
     const date = newDate === '' ? null : newDate
 

@@ -787,7 +787,7 @@ describe "discussions" do
           expect(assignment_topic.reload.attachment_id).to eq Attachment.last.id
         end
 
-        context "differentiated modules Feature Flag" do
+        context "differentiated modules Feature Flag", :ignore_js_errors do
           before do
             differentiated_modules_on
             @student1 = student_in_course(course:, active_all: true).user
@@ -949,6 +949,131 @@ describe "discussions" do
 
             assignment = Assignment.last
             expect(assignment.assignment_overrides.active.count).to eq 0
+          end
+
+          it "displays module overrides correctly" do
+            graded_discussion = create_graded_discussion(course)
+            module1 = course.context_modules.create!(name: "Module 1")
+            graded_discussion.context_module_tags.create! context_module: module1, context: course, tag_type: "context_module"
+
+            override = module1.assignment_overrides.create!
+            override.assignment_override_students.create!(user: @student1)
+
+            # Open page and assignTo tray
+            get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/edit"
+            Discussion.assign_to_button.click
+            wait_for_assign_to_tray_spinner
+
+            # Verify that Everyone tag does not appear
+            expect(module_item_assign_to_card.count).to eq 1
+            expect(module_item_assign_to_card[0].find_all(assignee_selected_option_selector).map(&:text)).to eq ["User"]
+            expect(inherited_from.last.text).to eq("Inherited from #{module1.name}")
+
+            # Update the inherited card due date, should remove inherited
+            update_due_date(0, "12/31/2022")
+            update_due_time(0, "5:00 PM")
+            click_save_button("Apply")
+
+            Discussion.assign_to_button.click
+            expect(f("body")).not_to contain_jqcss(inherited_from_selector)
+            click_save_button("Apply")
+
+            Discussion.save_button.click
+            Discussion.section_warning_continue_button.click
+            wait_for_ajaximations
+
+            # Expect the module override to be overridden and not appear
+            get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/edit"
+            Discussion.assign_to_button.click
+
+            expect(module_item_assign_to_card.count).to eq 1
+            expect(f("body")).not_to contain_jqcss(inherited_from_selector)
+          end
+
+          it "does not create an override if the modules override is not updated" do
+            graded_discussion = create_graded_discussion(course)
+            module1 = course.context_modules.create!(name: "Module 1")
+            graded_discussion.context_module_tags.create! context_module: module1, context: course, tag_type: "context_module"
+
+            override = module1.assignment_overrides.create!
+            override.assignment_override_students.create!(user: @student1)
+
+            # Open page and assignTo tray
+            get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/edit"
+            Discussion.assign_to_button.click
+            wait_for_assign_to_tray_spinner
+
+            # Verify the module override is shown
+            expect(module_item_assign_to_card.count).to eq 1
+            expect(module_item_assign_to_card[0].find_all(assignee_selected_option_selector).map(&:text)).to eq ["User"]
+            expect(inherited_from.last.text).to eq("Inherited from #{module1.name}")
+            click_save_button("Apply")
+
+            # Save the discussion without changing the inherited module override
+            Discussion.save_button.click
+            Discussion.section_warning_continue_button.click
+            wait_for_ajaximations
+
+            assignment = graded_discussion.assignment
+
+            # Expect the existing override to be the module override
+            expect(assignment.assignment_overrides.active.count).to eq 0
+            expect(assignment.all_assignment_overrides.active.count).to eq 1
+            expect(assignment.all_assignment_overrides.first.context_module_id).to eq module1.id
+          end
+
+          it "displays highighted cards correctly" do
+            graded_discussion = create_graded_discussion(course)
+            get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/edit"
+            Discussion.assign_to_button.click
+            wait_for_assign_to_tray_spinner
+
+            # Expect there to be no highlighted cards
+            expect(module_item_assign_to_card.count).to eq 1
+            expect(f("body")).not_to contain_jqcss(highlighted_card_selector)
+            click_save_button("Apply")
+
+            # Expect that if no changes were made, that the apply button doens't highlight old cards
+            Discussion.assign_to_button.click
+            wait_for_assign_to_tray_spinner
+            expect(module_item_assign_to_card.count).to eq 1
+            expect(f("body")).not_to contain_jqcss(highlighted_card_selector)
+
+            # Expect highlighted card after making a change
+            update_due_date(0, "12/31/2022")
+            click_save_button("Apply")
+            Discussion.assign_to_button.click
+            wait_for_assign_to_tray_spinner
+            expect(highlighted_item_assign_to_card.count).to eq 1
+          end
+
+          it "cancels correctly" do
+            graded_discussion = create_graded_discussion(course)
+
+            # Open page and assignTo tray
+            get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/edit"
+            Discussion.assign_to_button.click
+            wait_for_assign_to_tray_spinner
+
+            # Create a new card, don't apply it
+            click_add_assign_to_card
+            select_module_item_assignee(1, @student1.name)
+            expect(module_item_assign_to_card.count).to eq 2
+            cancel_button.click
+
+            # Reopen, expect new card to not be there
+            Discussion.assign_to_button.click
+            expect(module_item_assign_to_card.count).to eq 1
+
+            # Add a new card, apply it
+            click_add_assign_to_card
+            select_module_item_assignee(1, @student1.name)
+            click_save_button("Apply")
+            expect(AssignmentCreateEditPage.pending_changes_pill_exists?).to be_truthy
+
+            # Expect both cards to be there
+            Discussion.assign_to_button.click
+            expect(module_item_assign_to_card.count).to eq 2
           end
         end
 

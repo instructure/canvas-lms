@@ -113,6 +113,10 @@ module ItemsAssignToTray
     "[data-testid='assignee_selector_selected_option']"
   end
 
+  def highlighted_card_selector
+    "[data-testid='highlighted_card']"
+  end
+
   def selected_assignee_options_text(card)
     card.find_all(assignee_selected_option_selector).map(&:text)
   end
@@ -199,6 +203,10 @@ module ItemsAssignToTray
 
   def module_item_assign_to_card
     ff(module_item_assign_to_card_selector)
+  end
+
+  def highlighted_item_assign_to_card
+    ff(highlighted_card_selector)
   end
 
   def module_item_assignee

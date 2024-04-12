@@ -440,6 +440,10 @@ module Types
           "specifies that this assignment is only assigned to students for whom an
        `AssignmentOverride` applies.",
           null: false
+    field :visible_to_everyone,
+          Boolean,
+          "specifies all other variables that can determine visiblity.",
+          null: false
 
     field :assignment_overrides, AssignmentOverrideType.connection_type, null: true
     def assignment_overrides

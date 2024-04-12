@@ -54,10 +54,13 @@ const prepareAssignmentOverridesPayload = (
 
   const preparedOverrides = []
   assignedInfoList.forEach(info => {
-    const {assignedList} = info
+    const {assignedList, context_module_id: contextModuleId} = info
     const studentIds = assignedList.filter(assetCode => assetCode.includes('user'))
     const sectionIds = assignedList.filter(assetCode => assetCode.includes('section'))
     const groupIds = assignedList.filter(assetCode => assetCode.includes('group'))
+
+    // If the override is a module override, don't update it
+    if (contextModuleId) return null
 
     // override for student ids
     if (studentIds.length > 0) {
