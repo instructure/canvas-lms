@@ -81,6 +81,14 @@ module ModulesIndexPage
     "#context_module_#{module_id} .module_header_items svg[name='IconUnpublished']"
   end
 
+  def all_modules_selector
+    "#context_modules .context_module"
+  end
+
+  def duplicate_module_button_selector(context_module)
+    "#context_module_#{context_module.id} a.duplicate_module_link"
+  end
+
   #------------------------------ Elements ------------------------------
   def context_module(module_id)
     f(context_module_selector(module_id))
@@ -166,6 +174,10 @@ module ModulesIndexPage
     f("#context_module_#{context_module.id} .add_module_item_link")
   end
 
+  def duplicate_module_button(context_module)
+    f(duplicate_module_button_selector(context_module))
+  end
+
   def unlock_details(module_id)
     f(unlock_details_selector(module_id))
   end
@@ -188,6 +200,10 @@ module ModulesIndexPage
 
   def unpublished_module_icon(module_id)
     f(unpublished_module_icon_selector(module_id))
+  end
+
+  def all_modules
+    ff(all_modules_selector)
   end
 
   #------------------------------ Actions ------------------------------
