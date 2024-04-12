@@ -20,6 +20,8 @@ import {z} from 'zod'
 import {executeQuery} from '@canvas/query/graphql'
 import gql from 'graphql-tag'
 import {omit} from 'lodash'
+import speedGraderHelpers from '../jquery/speed_grader_helpers'
+import doFetchApi from '@canvas/do-fetch-api-effect'
 
 const SUBMISSION_QUERY = gql`
   query SubmissionQuery($assignmentId: ID!, $userId: ID!) {
@@ -56,6 +58,7 @@ const SUBMISSION_QUERY = gql`
           customGradeStatus
           excused
           submittedAt
+          submissionType
           commentsConnection {
             nodes {
               id
@@ -99,12 +102,17 @@ function transform(result: any) {
     submission.attachments.forEach((attachment: any) => {
       attachment.downloadUrl = `/courses/${result.assignment.courseId}/assignments/${result.assignment._id}/submissions/${submission.user._id}?download=${attachment._id}`
       attachment.previewUrl = `/courses/${result.assignment.courseId}/assignments/${result.assignment._id}/submissions/${submission.user._id}?download=${attachment._id}&inline=1`
-      attachment.deleteUrl = `/api/v1/files/${attachment._id}?replace=1`
+      attachment.delete = () =>
+        doFetchApi({
+          path: `/api/v1/files/${attachment._id}?replace=1`,
+          method: 'DELETE',
+        })
     })
     return {
       ...omit(submission, ['commentsConnection', 'rubricAssessmentsConnection']),
       comments: submission?.commentsConnection?.nodes,
       rubricAssessments: submission?.rubricAssessmentsConnection?.nodes,
+      submissionState: speedGraderHelpers.submissionState(submission, ENV.grading_role ?? ''),
     }
   }
   return null
