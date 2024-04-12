@@ -1096,6 +1096,8 @@ ko:
               check_box: "그룹 멤버 자격 CSV"
           groups: 
             check_box: "그룹 CSV"
+          include_deleted: 
+            check_box: "삭제된 개체 포함"
           sections: 
             check_box: "섹션 CSV"
           terms: 
