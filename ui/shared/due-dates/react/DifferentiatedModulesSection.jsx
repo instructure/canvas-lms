@@ -256,11 +256,11 @@ const DifferentiatedModulesSection = ({
     updateCard(cardId, newOverrides, newDates)
   }
 
-  const handleAssigneeAddition = (cardId, newToken) => {
+  const handleAssigneeAddition = (cardId, newAssignee) => {
     const targetedItemCard = stagedCards[cardId]
     // returns all new overrides
     const newOverridesForCard = CardActions.handleAssigneeAdd(
-      newToken,
+      newAssignee,
       targetedItemCard?.overrides ?? {},
       cardId,
       targetedItemCard.dates
@@ -268,18 +268,29 @@ const DifferentiatedModulesSection = ({
     // The last override is the new one
     let newOverride = {...newOverridesForCard[newOverridesForCard.length - 1]}
     // handleTokenAdd can either return an object or a backbone model. We convert it here
-    newOverride = cloneObject(newOverride.attributes || newOverride || {})
-    newOverride.stagedOverrideId = uid()
 
-    // add the newOverride to the statedOverrides. then remove duplicates
-    const uniqueOverrides = Object.values(
-      [newOverride, ...stagedOverrides].reduce((uniqueMap, override) => {
-        uniqueMap[override.stagedOverrideId] = override
-        return uniqueMap
-      }, {})
+    newOverride = cloneObject(newOverride.attributes || newOverride || {})
+    newOverride.stagedOverrideId = newOverride.stagedOverrideId
+      ? newOverride.stagedOverrideId
+      : uid()
+
+    // Create a copy of the stagedOverrides array
+    const updatedOverrides = [...stagedOverrides]
+
+    // Check if stagedOverrides contains an object with the same stagedOverrideId
+    const existingOverrideIndex = updatedOverrides.findIndex(
+      override => override.stagedOverrideId === newOverride.stagedOverrideId
     )
 
-    setStagedOverrides(uniqueOverrides)
+    if (existingOverrideIndex !== -1) {
+      // If it contains an object with the same stagedOverrideId, replace it with the new override
+      updatedOverrides[existingOverrideIndex] = newOverride
+    } else {
+      // If it does not contain an object with the same stagedOverrideId, add the new override to the stagedOverrides
+      updatedOverrides.push(newOverride)
+    }
+
+    setStagedOverrides(updatedOverrides)
   }
 
   const handleAssigneeDeletion = (cardId, tokenToRemove) => {

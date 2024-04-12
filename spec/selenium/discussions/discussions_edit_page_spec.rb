@@ -19,13 +19,16 @@
 
 require_relative "../helpers/discussions_common"
 require_relative "../helpers/items_assign_to_tray"
+require_relative "../helpers/context_modules_common"
 require_relative "../common"
 require_relative "pages/discussion_page"
+require_relative "../assignments/page_objects/assignment_create_edit_page"
 
 describe "discussions" do
   include_context "in-process server selenium tests"
   include DiscussionsCommon
   include ItemsAssignToTray
+  include ContextModulesCommon
 
   def generate_expected_overrides(assignment)
     expected_overrides = []
@@ -654,8 +657,16 @@ describe "discussions" do
       end
 
       context "graded" do
-        def create_graded_discussion(assignment_options)
-          discussion_assignment = course.assignments.create!(assignment_options)
+        def create_graded_discussion(discussion_course, assignment_options = {})
+          default_assignment_options = {
+            name: "Default Assignment",
+            points_possible: 10,
+            assignment_group: discussion_course.assignment_groups.create!(name: "Default Assignment Group"),
+            only_visible_to_overrides: false
+          }
+          options = default_assignment_options.merge(assignment_options)
+
+          discussion_assignment = discussion_course.assignments.create!(options)
           all_graded_discussion_options = {
             user: teacher,
             title: "assignment topic title",
@@ -663,7 +674,7 @@ describe "discussions" do
             discussion_type: "threaded",
             assignment: discussion_assignment,
           }
-          course.discussion_topics.create!(all_graded_discussion_options)
+          discussion_course.discussion_topics.create!(all_graded_discussion_options)
         end
 
         it "displays graded assignment options correctly when initially opening edit page" do
@@ -688,7 +699,7 @@ describe "discussions" do
 
           discussion_assignment_options = discussion_assignment_options.merge(discussion_assignment_peer_review_options)
 
-          graded_discussion = create_graded_discussion(discussion_assignment_options)
+          graded_discussion = create_graded_discussion(course, discussion_assignment_options)
 
           course_override_due_date = 5.days.from_now
           course_section = course.course_sections.create!(name: "section alpha")
@@ -778,24 +789,15 @@ describe "discussions" do
 
         context "differentiated modules Feature Flag" do
           before do
-            Account.site_admin.enable_feature!(:differentiated_modules)
-            Setting.set("differentiated_modules_setting", "true")
-            AssignmentStudentVisibility.reset_table_name
+            differentiated_modules_on
+            @student1 = student_in_course(course:, active_all: true).user
+            @student2 = student_in_course(course:, active_all: true).user
+            @course_section = course.course_sections.create!(name: "section alpha")
+            @course_section_2 = course.course_sections.create!(name: "section Beta")
           end
 
-          let(:student1) { student_in_course(course:, active_all: true).user }
-          let(:student2) { student_in_course(course:, active_all: true).user }
-          let(:course_section) { course.course_sections.create!(name: "section alpha") }
-          let(:course_section_2) { course.course_sections.create!(name: "section Beta") }
-
           it "displays Everyone correctly", custom_timeout: 30 do
-            discussion_assignment_options = {
-              name: "assignment",
-              points_possible: 10,
-              assignment_group: course.assignment_groups.create!(name: "assignment group"),
-              only_visible_to_overrides: false,
-            }
-            graded_discussion = create_graded_discussion(discussion_assignment_options)
+            graded_discussion = create_graded_discussion(course)
 
             due_date = "Sat, 06 Apr 2024 00:00:00.000000000 UTC +00:00"
             unlock_at = "Fri, 05 Apr 2024 00:00:00.000000000 UTC +00:00"
@@ -808,14 +810,11 @@ describe "discussions" do
 
             # Expect check card and override count/content
             expect(module_item_assign_to_card.count).to eq 1
-            expect(ff("div[data-testid='assignee_selector_selected_option']").count).to eq 1
-            expect(f("div[data-testid='assignee_selector_selected_option'] span").text).to eq "Everyone"
+            expect(selected_assignee_options.count).to eq 1
+            expect(selected_assignee_options.first.find("span").text).to eq "Everyone"
 
             # Find the date inputs, extract their values, combine date and time values, and parse into DateTime objects
-            displayed_override_dates = ff("div[data-testid='clearable-date-time-input'] input")
-                                       .map { |input| input.attribute("value") }
-                                       .each_slice(2)
-                                       .map { |date, time| DateTime.parse("#{date} #{time}") }
+            displayed_override_dates = all_displayed_assign_to_date_and_time
 
             # Check that the due dates are correctly displayed
             expect(displayed_override_dates.include?(DateTime.parse(due_date))).to be_truthy
@@ -824,27 +823,21 @@ describe "discussions" do
           end
 
           it "displays everyone and section and student overrides correctly", custom_timeout: 30 do
-            discussion_assignment_options = {
-              name: "assignment",
-              points_possible: 10,
-              assignment_group: course.assignment_groups.create!(name: "assignment group"),
-              only_visible_to_overrides: false,
-            }
-            graded_discussion = create_graded_discussion(discussion_assignment_options)
+            graded_discussion = create_graded_discussion(course)
 
             # Create overrides
             # Card 1 = ["Everyone else"], Set by: only_visible_to_overrides: false
 
             # Card 2
-            graded_discussion.assignment.assignment_overrides.create!(set_type: "CourseSection", set_id: course_section.id)
+            graded_discussion.assignment.assignment_overrides.create!(set_type: "CourseSection", set_id: @course_section.id)
 
             # Card 3
-            graded_discussion.assignment.assignment_overrides.create!(set_type: "CourseSection", set_id: course_section_2.id)
+            graded_discussion.assignment.assignment_overrides.create!(set_type: "CourseSection", set_id: @course_section_2.id)
 
             # Card 4
             graded_discussion.assignment.assignment_overrides.create!(set_type: "ADHOC")
-            graded_discussion.assignment.assignment_overrides.last.assignment_override_students.create!(user: student1)
-            graded_discussion.assignment.assignment_overrides.last.assignment_override_students.create!(user: student2)
+            graded_discussion.assignment.assignment_overrides.last.assignment_override_students.create!(user: @student1)
+            graded_discussion.assignment.assignment_overrides.last.assignment_override_students.create!(user: @student2)
 
             # Open edit page and AssignTo Tray
             get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/edit"
@@ -854,7 +847,7 @@ describe "discussions" do
             expect(module_item_assign_to_card.count).to eq 4
 
             displayed_overrides = module_item_assign_to_card.map do |card|
-              card.find_all("div[data-testid='assignee_selector_selected_option']").map(&:text)
+              card.find_all(assignee_selected_option_selector).map(&:text)
             end
 
             expected_overrides = generate_expected_overrides(graded_discussion.assignment)
@@ -864,22 +857,19 @@ describe "discussions" do
           it "displays visible to overrides only correctly", custom_timeout: 30 do
             # The main difference in this test is that only_visible_to_overrides is true
             discussion_assignment_options = {
-              name: "assignment",
-              points_possible: 10,
-              assignment_group: course.assignment_groups.create!(name: "assignment group"),
               only_visible_to_overrides: true,
             }
-            graded_discussion = create_graded_discussion(discussion_assignment_options)
+            graded_discussion = create_graded_discussion(course, discussion_assignment_options)
 
             # Create overrides
             # Card 1
-            graded_discussion.assignment.assignment_overrides.create!(set_type: "CourseSection", set_id: course_section.id)
+            graded_discussion.assignment.assignment_overrides.create!(set_type: "CourseSection", set_id: @course_section.id)
             # Card 2
-            graded_discussion.assignment.assignment_overrides.create!(set_type: "CourseSection", set_id: course_section_2.id)
+            graded_discussion.assignment.assignment_overrides.create!(set_type: "CourseSection", set_id: @course_section_2.id)
             # Card 3
             graded_discussion.assignment.assignment_overrides.create!(set_type: "ADHOC")
-            graded_discussion.assignment.assignment_overrides.last.assignment_override_students.create!(user: student1)
-            graded_discussion.assignment.assignment_overrides.last.assignment_override_students.create!(user: student2)
+            graded_discussion.assignment.assignment_overrides.last.assignment_override_students.create!(user: @student1)
+            graded_discussion.assignment.assignment_overrides.last.assignment_override_students.create!(user: @student2)
 
             # Open edit page and AssignTo Tray
             get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/edit"
@@ -889,11 +879,76 @@ describe "discussions" do
             expect(module_item_assign_to_card.count).to eq 3
 
             displayed_overrides = module_item_assign_to_card.map do |card|
-              card.find_all("div[data-testid='assignee_selector_selected_option']").map(&:text)
+              card.find_all(assignee_selected_option_selector).map(&:text)
             end
 
             expected_overrides = generate_expected_overrides(graded_discussion.assignment)
             expect(displayed_overrides).to match_array(expected_overrides)
+          end
+
+          it "allows adding overrides" do
+            graded_discussion = create_graded_discussion(course)
+
+            due_date = "Sat, 06 Apr 2024 00:00:00.000000000 UTC +00:00"
+            unlock_at = "Fri, 05 Apr 2024 00:00:00.000000000 UTC +00:00"
+            lock_at = "Sun, 07 Apr 2024 00:00:00.000000000 UTC +00:00"
+            graded_discussion.assignment.update!(due_at: due_date, unlock_at:, lock_at:)
+            course.reload
+            # Open page and assignTo tray
+            get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/edit"
+            Discussion.assign_to_button.click
+            wait_for_assign_to_tray_spinner
+
+            keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+            click_add_assign_to_card
+            select_module_item_assignee(1, @student1.name)
+
+            click_save_button("Apply")
+
+            keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
+            expect(AssignmentCreateEditPage.pending_changes_pill_exists?).to be_truthy
+
+            Discussion.save_button.click
+            wait_for_ajaximations
+
+            assignment = Assignment.last
+
+            expect(assignment.assignment_overrides.active.count).to eq 1
+          end
+
+          it "allows removing overrides" do
+            graded_discussion = create_graded_discussion(course)
+
+            due_date = "Sat, 06 Apr 2024 00:00:00.000000000 UTC +00:00"
+            unlock_at = "Fri, 05 Apr 2024 00:00:00.000000000 UTC +00:00"
+            lock_at = "Sun, 07 Apr 2024 00:00:00.000000000 UTC +00:00"
+            graded_discussion.assignment.update!(due_at: due_date, unlock_at:, lock_at:)
+
+            # Create section override
+            course_section = course.course_sections.create!(name: "section alpha")
+            graded_discussion.assignment.assignment_overrides.create!(set_type: "CourseSection", set_id: course_section.id)
+
+            course.reload
+            # Open page and assignTo tray
+            get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/edit"
+            Discussion.assign_to_button.click
+            wait_for_assign_to_tray_spinner
+
+            keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+            # Remove the section override
+            click_delete_assign_to_card(1)
+            click_save_button("Apply")
+
+            keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
+            expect(AssignmentCreateEditPage.pending_changes_pill_exists?).to be_truthy
+
+            Discussion.save_button.click
+            wait_for_ajaximations
+
+            assignment = Assignment.last
+            expect(assignment.assignment_overrides.active.count).to eq 0
           end
         end
 

@@ -109,6 +109,14 @@ module ItemsAssignToTray
     "//*[@data-testid = 'module-item-edit-tray']//button[. = 'Close']"
   end
 
+  def assignee_selected_option_selector
+    "[data-testid='assignee_selector_selected_option']"
+  end
+
+  def selected_assignee_options_text(card)
+    card.find_all(assignee_selected_option_selector).map(&:text)
+  end
+
   #------------------------------ Elements ------------------------------
   def add_assign_to_card
     f(add_assign_to_card_selector)
@@ -124,6 +132,13 @@ module ItemsAssignToTray
 
   def assign_to_date_and_time
     ff(assign_to_date_and_time_selector)
+  end
+
+  def all_displayed_assign_to_date_and_time
+    ff(assign_to_date_and_time_selector + " input")
+      .map { |input| input.attribute("value") }
+      .each_slice(2)
+      .map { |date, time| DateTime.parse("#{date} #{time}") }
   end
 
   def assign_to_available_from_date(card_number = 0)
@@ -156,6 +171,10 @@ module ItemsAssignToTray
 
   def assign_to_until_time(card_number = 0)
     assign_to_time[2 + (card_number * 3)]
+  end
+
+  def selected_assignee_options
+    ff(assignee_selected_option_selector)
   end
 
   def cancel_button
