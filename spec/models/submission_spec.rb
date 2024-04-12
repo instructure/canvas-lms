@@ -1792,6 +1792,34 @@ describe Submission do
         ActiveRecord::Associations.preload([version].map(&:model), :originality_reports)
       end.not_to raise_error
     end
+
+    it "retries if there is a conflict with an existing version number" do
+      submission_spec_model
+      version = Version.find_by(versionable: @submission)
+
+      allow(@submission.versions).to receive(:create).and_call_original
+      called_times = 0
+      expect(@submission.versions).to receive(:create) { |attributes|
+        called_times += 1
+        # This is a hacky way of mimicing a bug where two responses, received very quickly,
+        # would create a RecordNotUnique error when the tried to increment the version
+        # number at the same time.
+        v = Version.create(
+          **attributes,
+          versionable_id: version.versionable_id,
+          versionable_type: version.versionable_type
+        )
+        v.update_attribute(:number, version.number) if called_times == 1
+        v
+      }.twice
+
+      submission_versions = @submission.versions.count
+      @submission.with_versioning(explicit: true) do
+        @submission.broadcast_group_submission
+      end
+
+      expect(@submission.versions.count).to eq(submission_versions + 1)
+    end
   end
 
   it "ensures the media object exists" do

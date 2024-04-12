@@ -2460,9 +2460,11 @@ class Submission < ActiveRecord::Base
   end
 
   def broadcast_group_submission
-    @group_broadcast_submission = true
-    save!
-    @group_broadcast_submission = false
+    Submission.unique_constraint_retry do
+      @group_broadcast_submission = true
+      save!
+      @group_broadcast_submission = false
+    end
   end
 
   # in a module so they can be included in other Submission-like objects. the
