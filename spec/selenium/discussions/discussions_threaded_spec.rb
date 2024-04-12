@@ -1020,6 +1020,60 @@ describe "threaded discussions" do
       end
     end
 
+    context "partially anonymous discussions" do
+      def ui_entry_author_name
+        f("div[data-testid='discussion-root-entry-container'] span[data-testid='author_name']").text
+      end
+
+      before :once do
+        @partially_anon_topic = @course.discussion_topics.create!(
+          user: @teacher,
+          title: "Partially Anonymous Topic",
+          message: "feel free to be anonymous, or not",
+          workflow_state: "published",
+          anonymous_state: "partial_anonymity"
+        )
+      end
+
+      it "lets students post replies as themselves" do
+        message = "Real Name was used"
+        user_session(@student)
+        get "/courses/#{@course.id}/discussion_topics/#{@partially_anon_topic.id}"
+
+        f("button[data-testid='discussion-topic-reply']").click
+
+        force_click_native("span[data-testid='anonymous-response-selector'] input")
+        fj("li:contains('#{@student.name}')").click
+        type_in_tiny "textarea", message
+        f("button[data-testid='DiscussionEdit-submit'").click
+
+        # optimistic response
+        expect(ui_entry_author_name).to eq @student.name
+
+        # graphql response
+        wait_for_ajaximations
+        expect(ui_entry_author_name).to eq @student.name
+      end
+
+      it "lets students post replies anonymously" do
+        message = "Anonymous Name was used"
+        user_session(@student)
+        get "/courses/#{@course.id}/discussion_topics/#{@partially_anon_topic.id}"
+
+        f("button[data-testid='discussion-topic-reply']").click
+
+        force_click_native("span[data-testid='anonymous-response-selector'] input")
+        type_in_tiny "textarea", message
+        f("button[data-testid='DiscussionEdit-submit'").click
+
+        # optimistic response
+        expect(ui_entry_author_name).to start_with "Anonymous"
+        # graphql response
+        wait_for_ajaximations
+        expect(ui_entry_author_name).to start_with "Anonymous"
+      end
+    end
+
     context "users must post before seeing replies" do
       it "requires a post before seeing replies for students" do
         topic = create_discussion("must see replies", "threaded")
