@@ -154,7 +154,8 @@ describe "recurring events" do
     end
 
     it "shows course term end date in custom modal" do
-      @term = Account.default.enrollment_terms.create(name: "Fall", end_at: "April 12, 2024")
+      end_at = 1.month.from_now.to_date
+      @term = Account.default.enrollment_terms.create(name: "Fall", end_at:)
       @course.update!(enrollment_term: @term, restrict_enrollments_to_course_dates: false)
 
       get "/calendar2"
@@ -162,7 +163,7 @@ describe "recurring events" do
 
       select_event_calendar("Programming 101")
       select_frequency_option("Custom")
-      expect(custom_recurrence_text).to include("Course ends April 12, 2024")
+      expect(custom_recurrence_text).to include("Course ends #{I18n.l(end_at, format: :long)}")
     end
 
     it "makes custom change and returns to modal and new value in frequency field" do
@@ -332,7 +333,8 @@ describe "recurring events" do
     end
 
     it "shows course term end date in custom modal" do
-      @term = Account.default.enrollment_terms.create(name: "Fall", end_at: "April 12, 2024")
+      end_at = 1.month.from_now.to_date
+      @term = Account.default.enrollment_terms.create(name: "Fall", end_at:)
       @course.update!(enrollment_term: @term, restrict_enrollments_to_course_dates: false)
 
       get "/courses/#{@course.id}/calendar_events/new"
@@ -341,7 +343,7 @@ describe "recurring events" do
       newdate = "July 20, 2023"
       enter_calendar_start_date(newdate)
       select_frequency_option("Custom")
-      expect(custom_recurrence_text).to include("Course ends April 12, 2024")
+      expect(custom_recurrence_text).to include("Course ends #{I18n.l(end_at, format: :long)}")
     end
 
     it "makes custom change and returns to modal and new value in frequency field" do
