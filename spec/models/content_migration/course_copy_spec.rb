@@ -507,6 +507,7 @@ describe ContentMigration do
       @copy_from.time_zone = "Alaska"
       @copy_from.save!
       @copy_from.allow_student_discussion_reporting = true
+      @copy_from.allow_student_anonymous_discussion_topics = true
 
       tool = external_tool_1_3_model(context: @copy_from)
 
@@ -556,6 +557,8 @@ describe ContentMigration do
 
       rlb = @copy_to.lti_resource_links.find { |rl| rl.lookup_uuid == "1b302c1e-c0a2-42dc-88b6-c029699a7c7b" }
       expect(rlb.url).to be_nil
+      expect(@copy_to.allow_student_discussion_reporting).to be_truthy
+      expect(@copy_to.allow_student_anonymous_discussion_topics).to be_truthy
     end
 
     context "with prevent_course_availability_editing_by_teachers on" do

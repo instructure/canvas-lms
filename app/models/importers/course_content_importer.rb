@@ -560,6 +560,14 @@ module Importers
       if settings.key?(:enable_course_paces) && course.account.feature_enabled?(:course_paces)
         course.enable_course_paces = settings[:enable_course_paces]
       end
+
+      if settings.key?(:allow_student_discussion_reporting)
+        course.allow_student_discussion_reporting = settings[:allow_student_discussion_reporting]
+      end
+
+      if settings.key?(:allow_student_anonymous_discussion_topics)
+        course.allow_student_anonymous_discussion_topics = settings[:allow_student_anonymous_discussion_topics]
+      end
     end
 
     def self.shift_date_options(course, options = {})
