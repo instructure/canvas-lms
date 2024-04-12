@@ -19,7 +19,6 @@
 import React, {useEffect, useRef, useState} from 'react'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
-import {Grid, GridRow, GridCol} from '@instructure/ui-grid'
 import {Heading} from '@instructure/ui-heading'
 import {getTrayHeight} from '../../shared/trayUtils'
 import {View} from '@instructure/ui-view'
@@ -203,6 +202,32 @@ export default function FindReplaceTray({
               data-testid="find-text-input"
             />
           </View>
+          <View as="div">
+            <Flex>
+              <Flex.Item size="6.125rem">
+                <Button
+                  color="secondary"
+                  margin="0 medium 0 0"
+                  onClick={onPrevious}
+                  disabled={isButtonDisabled('previous')}
+                  data-testid="previous-button"
+                >
+                  {formatMessage('Previous')}
+                </Button>
+              </Flex.Item>
+              <Flex.Item>
+                <Button
+                  color="secondary"
+                  margin="0 small 0 0"
+                  onClick={onNext}
+                  disabled={isButtonDisabled('next')}
+                  data-testid="next-button"
+                >
+                  {formatMessage('Next')}
+                </Button>
+              </Flex.Item>
+            </Flex>
+          </View>
           <View as="div" margin="large 0 medium 0">
             <TextInput
               renderLabel={formatMessage('Replace with')}
@@ -215,52 +240,32 @@ export default function FindReplaceTray({
             />
           </View>
           <View as="div">
-            <Grid vAlign="middle" hAlign="space-between" colSpacing="none">
-              <GridRow>
-                <GridCol width="auto">
-                  <Button
-                    color="secondary"
-                    margin="0 small 0 0"
-                    onClick={() => onReplace(replaceText, true, true)}
-                    disabled={isButtonDisabled('replaceAll')}
-                    data-testid="replace-all-button"
-                  >
-                    {formatMessage('Replace All')}
-                  </Button>
-                  <Button
-                    color="secondary"
-                    margin="0 small 0 0"
-                    onClick={() => {
-                      onReplace(replaceText, true, false)
-                    }}
-                    disabled={isButtonDisabled('replace')}
-                    data-testid="replace-button"
-                  >
-                    {formatMessage('Replace')}
-                  </Button>
-                </GridCol>
-                <GridCol>
-                  <Button
-                    color="primary"
-                    onClick={onPrevious}
-                    disabled={isButtonDisabled('previous')}
-                    data-testid="previous-button"
-                  >
-                    {formatMessage('Previous')}
-                  </Button>
-                </GridCol>
-                <GridCol>
-                  <Button
-                    color="primary"
-                    onClick={onNext}
-                    disabled={isButtonDisabled('next')}
-                    data-testid="next-button"
-                  >
-                    {formatMessage('Next')}
-                  </Button>
-                </GridCol>
-              </GridRow>
-            </Grid>
+            <Flex>
+              <Flex.Item>
+                <Button
+                  color="secondary"
+                  margin="0 small 0 0"
+                  onClick={() => onReplace(replaceText, true, true)}
+                  disabled={isButtonDisabled('replaceAll')}
+                  data-testid="replace-all-button"
+                >
+                  {formatMessage('Replace All')}
+                </Button>
+              </Flex.Item>
+              <Flex.Item>
+                <Button
+                  color="secondary"
+                  margin="0 small 0 0"
+                  onClick={() => {
+                    onReplace(replaceText, true, false)
+                  }}
+                  disabled={isButtonDisabled('replace')}
+                  data-testid="replace-button"
+                >
+                  {formatMessage('Replace')}
+                </Button>
+              </Flex.Item>
+            </Flex>
           </View>
         </Flex.Item>
       </Flex>
