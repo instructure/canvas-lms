@@ -169,6 +169,7 @@ export const CourseCopyImporter = ({onSubmit, onCancel}: CourseCopyImporterProps
         canSelectContent={true}
         canImportAsNewQuizzes={ENV.NEW_QUIZZES_MIGRATION}
         canAdjustDates={true}
+        fileUploadProgress={null}
         canImportBPSettings={
           selectedCourse && ENV.SHOW_BP_SETTINGS_IMPORT_OPTION ? selectedCourse.blueprint : false
         }

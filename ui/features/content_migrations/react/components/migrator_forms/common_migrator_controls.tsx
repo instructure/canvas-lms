@@ -28,11 +28,7 @@ import {Button} from '@instructure/ui-buttons'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
 import {InfoButton} from './info_button'
 import {DateAdjustments, remapSubstitutions} from '../date_adjustments'
-import type {
-  onSubmitMigrationFormCallback,
-  DateAdjustmentConfig,
-  submitMigrationFormData,
-} from '../types'
+import type {onSubmitMigrationFormCallback, DateAdjustmentConfig} from '../types'
 
 const I18n = useI18nScope('content_migrations_redesign')
 
