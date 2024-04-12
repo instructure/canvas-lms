@@ -199,7 +199,12 @@ unless $canvas_tasks_loaded
       task predeploy: [:environment, :load_config] do
         migrations = ActiveRecord::Base.connection.migration_context.migrations
         migrations = migrations.select { |m| m.tags.include?(:predeploy) }
-        ActiveRecord::Migrator.new(:up, migrations, ActiveRecord::Base.connection.schema_migration).migrate
+        args = [:up, migrations, ActiveRecord::Base.connection.schema_migration]
+        if $canvas_rails == "7.1"
+          internal_metadata = ActiveRecord::InternalMetadata.new(ActiveRecord::Base.connection)
+          args << internal_metadata
+        end
+        ActiveRecord::Migrator.new(*args).migrate
       end
     end
 
