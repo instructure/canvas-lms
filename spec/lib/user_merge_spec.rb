@@ -1082,6 +1082,23 @@ describe UserMerge do
       expect(@user2.associated_shards).to eq [@shard1, Shard.default]
     end
 
+    it "handles conflicting notification policies" do
+      user1 = user_with_pseudonym(username: "user1@example.com", active_all: 1)
+      p1 = @pseudonym
+      cc1 = @cc
+      notification_policy_model(notification: notification_model, communication_channel: cc1)
+
+      @shard1.activate { @user2 = user_model }
+
+      UserMerge.from(user1).into(@user2)
+
+      expect(user1).to be_deleted
+      expect(p1.reload.user).to eq @user2
+      expect(cc1.reload).to be_retired
+      @user2.reload
+      expect(@user2.communication_channels.to_a.map(&:path).sort).to eq ["user1@example.com"]
+    end
+
     it "handles root_account_ids on ccs" do
       user1 = user_with_pseudonym(username: "user1@example.com", active_all: 1)
       other_account = Account.create(name: "anuroot")
