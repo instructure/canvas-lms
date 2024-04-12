@@ -586,6 +586,7 @@ class ActiveRecord::Base
         connection.clear_query_cache
         return result
       rescue ActiveRecord::RecordNotUnique
+        sleep 0.5
         next
       end
     end
