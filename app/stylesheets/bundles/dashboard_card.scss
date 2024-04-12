@@ -83,17 +83,21 @@ $ic-DashboardCard-icon-color: $ic-icon-link-color;
 
 .ic-DashboardCard {
   box-sizing: border-box;
-  box-shadow: 0 2px 5px rgba(black, 0.3);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0);
   border-radius: 4px; // to keep consistency between dashboard cards and planner app
   overflow: hidden;
-  background: $ic-color-light;
+  background: rgba(0, 0, 0, 0.02);
   width: $ic-DashboardCard-width;
   display: inline-block;
   vertical-align: top;
   margin: direction-sides($ic-sp*3 0 0 $ic-sp*3);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 
   .no-touch & {
-    &:hover { box-shadow: 0 4px 10px rgba(black, 0.35); }
+    &:is(:hover, :focus-within) {
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      transform: translateY(-2px);
+    }
   }
 }
 
@@ -118,7 +122,6 @@ $ic-DashboardCard-icon-color: $ic-icon-link-color;
 .ic-DashboardCard__header_hero {
   box-sizing: border-box;
   height: 146px;
-  border: 1px solid rgba(black, 0.1);
 }
 
 .ic-DashboardCard__header_image {
