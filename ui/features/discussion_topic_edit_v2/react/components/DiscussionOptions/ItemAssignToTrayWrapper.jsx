@@ -58,6 +58,16 @@ export const ItemAssignToTrayWrapper = () => {
       lock_at_overridden: true,
       id: inputObj.dueDateId,
       noop_id: null,
+      stagedOverrideId: inputObj.stagedOverrideId || null,
+      rowKey: inputObj.rowKey || null,
+    }
+
+    // Add context_module_id and context_module_name fields if they exist on inputObj
+    if (inputObj.context_module_id) {
+      outputObj.context_module_id = inputObj.context_module_id
+    }
+    if (inputObj.context_module_name) {
+      outputObj.context_module_name = inputObj.context_module_name
     }
 
     let courseSectionId = null
@@ -104,11 +114,15 @@ export const ItemAssignToTrayWrapper = () => {
 
   function convertToAssignedInfoListObject(inputObj) {
     const outputObj = {
-      dueDateId: inputObj.stagedOverrideId || null,
+      dueDateId: inputObj.rowKey || inputObj.stagedOverrideId || null,
       assignedList: [],
       dueDate: inputObj.due_at ? inputObj.due_at : null,
       availableFrom: inputObj.unlock_at_overridden ? inputObj.unlock_at : null,
       availableUntil: inputObj.lock_at_overridden ? inputObj.lock_at : null,
+      context_module_id: inputObj.context_module_id || null,
+      context_module_name: inputObj.context_module_name || null,
+      stagedOverrideId: inputObj.stagedOverrideId || null,
+      rowKey: inputObj.rowKey || null,
     }
 
     if (inputObj.noop_id === '1') {

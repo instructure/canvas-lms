@@ -98,5 +98,9 @@ module Types
     field :lock_at, DateTimeType, null: true
     field :unlock_at, DateTimeType, null: true
     field :all_day, Boolean, null: true
+    field :context_module, ModuleType, null: true
+    def context_module
+      load_association(:context_module)
+    end
   end
 end

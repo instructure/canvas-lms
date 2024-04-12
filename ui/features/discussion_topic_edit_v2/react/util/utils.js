@@ -98,10 +98,14 @@ export const buildAssignmentOverrides = assignment => {
       dueDate: override.dueAt,
       availableFrom: override.unlockAt,
       availableUntil: override.lockAt,
+      ...(override.contextModule && {
+        context_module_id: override.contextModule._id,
+        context_module_name: override.contextModule.name,
+      }),
     })) || []
 
   // When this is true, then we do not have a everyone/everyone else option
-  if (assignment.onlyVisibleToOverrides) return overrides
+  if (assignment.onlyVisibleToOverrides || !assignment.visibleToEveryone) return overrides
 
   overrides.push({
     dueDateId: nanoid(),
