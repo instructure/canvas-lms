@@ -181,6 +181,7 @@ export default function FindReplaceTray({
             </Flex.Item>
             <Flex.Item>
               <CloseButton
+                data-testid="close-button"
                 screenReaderLabel={formatMessage('Close')}
                 placement="end"
                 onClick={onRequestClose}
@@ -222,6 +223,7 @@ export default function FindReplaceTray({
                     margin="0 small 0 0"
                     onClick={() => onReplace(replaceText, true, true)}
                     disabled={isButtonDisabled('replaceAll')}
+                    data-testid="replace-all-button"
                   >
                     {formatMessage('Replace All')}
                   </Button>
@@ -242,12 +244,18 @@ export default function FindReplaceTray({
                     color="primary"
                     onClick={onPrevious}
                     disabled={isButtonDisabled('previous')}
+                    data-testid="previous-button"
                   >
                     {formatMessage('Previous')}
                   </Button>
                 </GridCol>
                 <GridCol>
-                  <Button color="primary" onClick={onNext} disabled={isButtonDisabled('next')}>
+                  <Button
+                    color="primary"
+                    onClick={onNext}
+                    disabled={isButtonDisabled('next')}
+                    data-testid="next-button"
+                  >
                     {formatMessage('Next')}
                   </Button>
                 </GridCol>
