@@ -130,6 +130,17 @@ If you need to change a button's size, you can do so by adding the appropriate c
 </table>
 */
 
+.btn, .Button, .ui-button {
+  border: none; // clean up buttons and make them look more modern
+}
+
+.btn:focus, .Button:focus, .ui-button:focus {
+  box-shadow: none; // remove the box-shadow when focused so that it won't show when the button is clicked, but add it back when on focus-visible
+}
+.btn:focus-visible, .Button:focus-visible, .ui-button:focus-visible {
+  box-shadow: 0 0 0 2px var(--ic-link-color); // the shadow is normally inset and shows when the button is clicked (usng focus and not focus-visible)
+}
+
 .btn,       // <-- deprecated- do not use
 .Button {
   @include canvas-button($ic-color-medium-light, $ic-color-dark, true);
