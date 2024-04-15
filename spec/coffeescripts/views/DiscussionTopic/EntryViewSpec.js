@@ -69,6 +69,28 @@ test('renders', () => {
   ok(view)
 })
 
+test('should only count non deleted replies', () => {
+  const entry = new Entry({
+    id: 1,
+    message: 'hi',
+    replies: [
+      {
+        id: 2,
+        message: 'hi',
+        deleted: true,
+      },
+      {
+        id: 3,
+        message: 'hi',
+      },
+    ],
+  })
+  const view = new EntryView({model: entry})
+  const stats = view.countPosterity()
+  equal(stats.total, 1)
+  equal(stats.unread, 0)
+})
+
 test('should listen on model change:replies', () => {
   const entry = new Entry({
     id: 1,
