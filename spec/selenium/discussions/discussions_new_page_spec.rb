@@ -1717,6 +1717,48 @@ describe "discussions" do
             expect(assignment.only_visible_to_overrides).to be true
           end
         end
+
+        context "checkpoints" do
+          before do
+            course.root_account.enable_feature!(:discussion_checkpoints)
+          end
+
+          it "successfully creates a discussion topic with checkpoints" do
+            get "/courses/#{course.id}/discussion_topics/new"
+
+            title = "Graded Discussion Topic with checkpoints"
+
+            f("input[placeholder='Topic Title']").send_keys title
+
+            force_click_native('input[type=checkbox][value="graded"]')
+            wait_for_ajaximations
+
+            force_click_native('input[type=checkbox][value="checkpoints"]')
+
+            f("input[data-testid='points-possible-input-reply-to-topic']").send_keys "5"
+            f("input[data-testid='reply-to-entry-required-count']").send_keys :backspace
+            f("input[data-testid='reply-to-entry-required-count']").send_keys 3
+            f("input[data-testid='points-possible-input-reply-to-entry']").send_keys "7"
+
+            f("button[data-testid='save-and-publish-button']").click
+            wait_for_ajaximations
+
+            dt = DiscussionTopic.last
+            expect(dt.reply_to_entry_required_count).to eq 3
+
+            assignment = Assignment.last
+            expect(assignment.has_sub_assignments?).to be true
+
+            sub_assignments = SubAssignment.where(parent_assignment_id: assignment.id)
+            sub_assignment1 = sub_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
+            sub_assignment2 = sub_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
+
+            expect(sub_assignment1.sub_assignment_tag).to eq "reply_to_topic"
+            expect(sub_assignment1.points_possible).to eq 5
+            expect(sub_assignment2.sub_assignment_tag).to eq "reply_to_entry"
+            expect(sub_assignment2.points_possible).to eq 7
+          end
+        end
       end
     end
   end

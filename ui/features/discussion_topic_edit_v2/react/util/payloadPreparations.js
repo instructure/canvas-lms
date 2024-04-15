@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {REPLY_TO_TOPIC, REPLY_TO_ENTRY} from './constants'
+
 const prepareOverride = (
   overrideDueDate,
   overrideAvailableUntil,
@@ -149,6 +151,30 @@ const preparePeerReviewPayload = (
       }
 }
 
+export const prepareCheckpointsPayload = (
+  pointsPossibleReplyToTopic,
+  pointsPossibleReplyToEntry,
+  replyToEntryRequiredCount,
+  isCheckpoints
+) => {
+  return isCheckpoints
+    ? [
+        {
+          checkpointLabel: REPLY_TO_TOPIC,
+          pointsPossible: pointsPossibleReplyToTopic,
+          dates: [],
+          repliesRequired: replyToEntryRequiredCount,
+        },
+        {
+          checkpointLabel: REPLY_TO_ENTRY,
+          pointsPossible: pointsPossibleReplyToEntry,
+          dates: [],
+          repliesRequired: replyToEntryRequiredCount,
+        },
+      ]
+    : []
+}
+
 export const prepareAssignmentPayload = (
   isEditing,
   title,
@@ -165,7 +191,8 @@ export const prepareAssignmentPayload = (
   peerReviewsPerStudent,
   peerReviewDueDate,
   intraGroupPeerReviews,
-  masteryPathsOption
+  masteryPathsOption,
+  isCheckpoints
 ) => {
   // Return null immediately if the assignment is not graded
   if (!isGraded) return null
@@ -176,10 +203,8 @@ export const prepareAssignmentPayload = (
         info.assignedList.includes(defaultEveryoneOption.assetCode) ||
         info.assignedList.includes(defaultEveryoneElseOption.assetCode)
     ) || {}
-
   // Common payload properties for graded assignments
   let payload = {
-    pointsPossible,
     postToSis,
     gradingType: displayGradeAs,
     assignmentGroupId: assignmentGroup || null,
@@ -195,11 +220,19 @@ export const prepareAssignmentPayload = (
       defaultEveryoneOption,
       masteryPathsOption
     ),
-    dueAt: everyoneOverride.dueDate || null,
-    lockAt: everyoneOverride.availableUntil || null,
-    unlockAt: everyoneOverride.availableFrom || null,
     onlyVisibleToOverrides: !Object.keys(everyoneOverride).length,
     gradingStandardId: gradingSchemeId || null,
+    forCheckpoints: isCheckpoints,
+  }
+  // Additional properties if graded assignment is not checkpointed
+  if (!isCheckpoints) {
+    payload = {
+      ...payload,
+      pointsPossible,
+      dueAt: everyoneOverride.dueDate || null,
+      lockAt: everyoneOverride.availableUntil || null,
+      unlockAt: everyoneOverride.availableFrom || null,
+    }
   }
   // Additional properties for creation of a graded assignment
   if (!isEditing) {
