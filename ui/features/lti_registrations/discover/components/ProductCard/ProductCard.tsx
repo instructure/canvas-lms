@@ -17,14 +17,14 @@
  */
 
 import React from 'react'
-import type {Product, Company} from '../model/Product'
+import type {Product, Company} from '../../model/Product'
 
+import {Link as DetailLink, useSearchParams} from 'react-router-dom'
 import {Flex} from '@instructure/ui-flex'
 import {Img} from '@instructure/ui-img'
-import {CondensedButton} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
+import {TruncateText} from '@instructure/ui-truncate-text'
 import {View} from '@instructure/ui-view'
-import {useSearchParams} from 'react-router-dom'
 
 type ProductCardProps = {
   product: Product
@@ -32,6 +32,7 @@ type ProductCardProps = {
 
 const ProductCard = (props: ProductCardProps) => {
   const {product} = props
+
   const [searchParams, setSearchParams] = useSearchParams()
 
   const setCompany = (company: Company) => {
@@ -59,23 +60,27 @@ const ProductCard = (props: ProductCardProps) => {
         borderWidth="medium"
         padding="medium"
       >
-        <Flex gap="small" margin="0 0 x-small 0">
+        <Flex gap="small" margin="0 0 medium 0">
           <div style={{borderRadius: '50%', overflow: 'hidden'}}>
             <Img src={product.logo_url} width={48} height={48} />
           </div>
           <div>
             <Text weight="bold" size="large">
-              {product.name}
+              <DetailLink to={`/product_detail/${product.id}`}>{product.name}</DetailLink>
             </Text>
-            <Flex gap="x-small" wrap="no-wrap">
-              <div>by</div>
-              <CondensedButton onClick={() => setCompany(product.company)}>
+            <div>
+              by{' '}
+              <Text weight="bold" color="secondary">
                 {product.company.name}
-              </CondensedButton>
-            </Flex>
+              </Text>
+            </div>
           </div>
         </Flex>
-        <div>{product.tagline}</div>
+        <Text>
+          <TruncateText maxLines={3} ellipsis=" (...)">
+            {product.tagline}
+          </TruncateText>
+        </Text>
       </View>
     </Flex.Item>
   )
