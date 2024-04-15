@@ -276,20 +276,6 @@ class GradingStandard < ActiveRecord::Base
       .where("submissions.workflow_state='graded'")
   end
 
-  def self.default_scheme_used_locations(context)
-    if context.is_a?(Course)
-      courses = [context]
-    else # is an account
-      accounts = [context] + Account.sub_accounts_recursive(context.id)
-      courses = Course.where(account: accounts, grading_standard_id: [nil, 0]).active
-    end
-
-    assignments = Assignment.for_course(courses.map(&:id))
-
-    assignments.except(:order)
-               .where(grading_standard_id: [nil, 0], grading_type: ["letter_grade", "gpa_scale"])
-  end
-
   delegate :name, to: :context, prefix: true
 
   def update_data(params)
