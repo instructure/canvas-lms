@@ -29,6 +29,7 @@ import {TextInput, TextInputProps} from '@instructure/ui-text-input'
 import {Text} from '@instructure/ui-text'
 import {FormMessage} from '@instructure/ui-form-field'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {Alert} from '@instructure/ui-alerts'
 
 type FindReplaceTrayProps = {
   onNext: () => void
@@ -54,8 +55,11 @@ export default function FindReplaceTray({
   const [findText, setFindText] = useState(initialText)
   const [replaceText, setReplaceText] = useState('')
   const [hasOpened, setHasOpened] = useState(false)
+  const [showReplaceAlert, setShowReplaceAlert] = useState<'' | 'replace' | 'replaceAll'>('')
+  const [alertFindText, setAlertFindText] = useState('')
+  const [alertReplaceText, setAlertReplaceText] = useState('')
   const trayRef = useRef<any>(null)
-
+  const liveRegionKey = useRef(0)
   // moves RCE when tray opens/closes, copied from CanvasContentTray
   useEffect(() => {
     if (!hasOpened) return
@@ -115,20 +119,75 @@ export default function FindReplaceTray({
     if (e.key !== 'Enter') return
     if (isButtonDisabled('replace')) return
     const forward = !e.shiftKey
-    onReplace(replaceText, forward, false)
+    replace(replaceText, forward, false)
   }
 
+  const replace = (newText: string, forward?: boolean, all?: boolean) => {
+    onReplace(newText, forward, all)
+    if (all) {
+      setShowReplaceAlert('replaceAll')
+    } else {
+      setShowReplaceAlert('replace')
+    }
+    setAlertFindText(findText)
+    setAlertReplaceText(newText)
+    liveRegionKey.current++
+  }
+
+  const alertText =
+    showReplaceAlert === ''
+      ? ''
+      : showReplaceAlert === 'replace'
+      ? formatMessage('Replaced {alertFindText} with {alertReplaceText}', {
+          alertFindText,
+          alertReplaceText,
+        })
+      : formatMessage('Replaced all {alertFindText} with {alertReplaceText}', {
+          alertFindText,
+          alertReplaceText,
+        })
+
+  const renderReplaceAlert = () => {
+    if (!showReplaceAlert) {
+      liveRegionKey.current = 0
+      return <></>
+    }
+    return (
+      <Alert
+        variant="success"
+        renderCloseButtonLabel="Close Alert"
+        margin="small"
+        transition="fade"
+        onDismiss={() => setShowReplaceAlert('')}
+        timeout={3000}
+      >
+        {alertText}
+      </Alert>
+    )
+  }
+
+  const renderScreenReaderAlert = () => {
+    return <ScreenReaderContent>{alertText}</ScreenReaderContent>
+  }
+
+  const errMsg = formatMessage('No results found')
+  const messages = findText && max === 0 ? ([{text: errMsg, type: 'error'}] as FormMessage[]) : []
+
   const resultText = () => {
+    const srErrMsg = messages.length === 0 ? '' : errMsg
     // resolves issue where focus is lost when this (dis)appears
     if (max === 0) {
-      return <Text />
+      return (
+        <>
+          <ScreenReaderContent aria-live="polite">{srErrMsg}</ScreenReaderContent>
+          <Text />
+        </>
+      )
     }
     const msg = formatMessage('{index} of {max}', {index, max})
     return (
       <>
-        <ScreenReaderContent aria-live="assertive" aria-relevant="text additions">
-          {msg}
-        </ScreenReaderContent>
+        <ScreenReaderContent aria-live="polite">{msg}</ScreenReaderContent>
         <Text>{msg}</Text>
       </>
     )
@@ -148,15 +207,6 @@ export default function FindReplaceTray({
     }
   }
 
-  const errMsg = formatMessage('No results found')
-  const messages =
-    findText && max === 0
-      ? ([
-          {text: errMsg, type: 'error'},
-          {text: errMsg, type: 'screenreader-only'},
-        ] as FormMessage[])
-      : []
-
   return (
     <Tray
       data-mce-component={true}
@@ -170,19 +220,25 @@ export default function FindReplaceTray({
       shouldReturnFocus={true}
       shouldCloseOnDocumentClick={true}
       onOpen={() => setHasOpened(true)}
-      contentRef={el => (trayRef.current = el)}
     >
+      <View as="div" margin="none none medium none" key={liveRegionKey.current}>
+        {renderReplaceAlert()}
+        <View as="div" role="alert" aria-live="polite">
+          {renderScreenReaderAlert()}
+        </View>
+      </View>
       <Flex direction="column" height={getTrayHeight()}>
-        <Flex.Item as="header" padding="medium medium small">
+        <Flex.Item padding="medium medium small">
           <Flex direction="row">
             <Flex.Item shouldGrow={true} shouldShrink={true}>
               <Heading as="h2">{formatMessage('Find and Replace')}</Heading>
             </Flex.Item>
             <Flex.Item>
               <CloseButton
+                placement="static"
+                color="primary"
                 data-testid="close-button"
                 screenReaderLabel={formatMessage('Close')}
-                placement="end"
                 onClick={onRequestClose}
               />
             </Flex.Item>
@@ -247,7 +303,7 @@ export default function FindReplaceTray({
                 <Button
                   color="secondary"
                   margin="0 small 0 0"
-                  onClick={() => onReplace(replaceText, true, true)}
+                  onClick={() => replace(replaceText, true, true)}
                   disabled={isButtonDisabled('replaceAll')}
                   data-testid="replace-all-button"
                   aria-label={formatMessage('Replace all {findText} with {replaceText}', {
@@ -263,7 +319,7 @@ export default function FindReplaceTray({
                   color="secondary"
                   margin="0 small 0 0"
                   onClick={() => {
-                    onReplace(replaceText, true, false)
+                    replace(replaceText, true, false)
                   }}
                   disabled={isButtonDisabled('replace')}
                   data-testid="replace-button"
