@@ -133,7 +133,6 @@ $ic-DashboardCard-icon-color: $ic-icon-link-color;
 .ic-DashboardCard__header_content {
   box-sizing: border-box;
   padding: $ic-sp $ic-sp*1.5 0;
-  background: $ic-color-light;
 }
 
 @mixin dashcardHeaderButton {
