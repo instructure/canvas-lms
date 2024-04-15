@@ -40,24 +40,8 @@ class AbstractAssignment < ActiveRecord::Base
   include LockedFor
   include Lti::Migratable
 
-  GRADING_TYPES = OpenStruct.new(
-    {
-      points: "points",
-      percent: "percent",
-      letter_grade: "letter_grade",
-      gpa_scale: "gpa_scale",
-      pass_fail: "pass_fail",
-      not_graded: "not_graded"
-    }
-  )
-
-  ALLOWED_GRADING_TYPES = GRADING_TYPES.to_h.values.freeze
-  POINTED_GRADING_TYPES = [
-    GRADING_TYPES.points,
-    GRADING_TYPES.percent,
-    GRADING_TYPES.letter_grade,
-    GRADING_TYPES.gpa_scale
-  ].freeze
+  ALLOWED_GRADING_TYPES = %w[points percent letter_grade gpa_scale pass_fail not_graded].to_set.freeze
+  POINTED_GRADING_TYPES = %w[points percent letter_grade gpa_scale].to_set.freeze
 
   OFFLINE_SUBMISSION_TYPES = %i[on_paper external_tool none not_graded wiki_page].freeze
   SUBMITTABLE_TYPES = %w[online_quiz discussion_topic wiki_page].freeze

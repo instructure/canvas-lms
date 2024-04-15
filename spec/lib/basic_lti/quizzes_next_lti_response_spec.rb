@@ -136,7 +136,7 @@ describe BasicLTI::QuizzesNextLtiResponse do
         before { assignment.update!(points_possible: nil, grading_type:) }
 
         context "and the grading_type requires points" do
-          let(:grading_type) { Assignment::GRADING_TYPES.points }
+          let(:grading_type) { "points" }
 
           it "sets the assignment points_possible to the default" do
             expect { subject }.to change { assignment.reload.points_possible }
@@ -155,7 +155,7 @@ describe BasicLTI::QuizzesNextLtiResponse do
         end
 
         context "and the grading type does not require points" do
-          let(:grading_type) { Assignment::GRADING_TYPES.not_graded }
+          let(:grading_type) { "not_graded" }
 
           it "sets code major to 'failure'" do
             expect(subject.code_major).to eq "failure"
@@ -196,7 +196,7 @@ describe BasicLTI::QuizzesNextLtiResponse do
 
       assignment.update!(
         points_possible: nil,
-        grading_type: Assignment::GRADING_TYPES.not_graded
+        grading_type: "not_graded"
       )
 
       BasicLTI::BasicOutcomes.process_request(tool, xml)
