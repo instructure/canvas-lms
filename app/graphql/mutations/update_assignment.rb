@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class Mutations::UpdateAssignment < Mutations::AssignmentBase
+class Mutations::UpdateAssignment < Mutations::AssignmentBase::Mutation
   graphql_name "UpdateAssignment"
 
   argument :id, ID, required: true

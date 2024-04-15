@@ -23,7 +23,7 @@ class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
 
   argument :discussion_topic_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("DiscussionTopic")
   argument :remove_attachment, Boolean, required: false
-  argument :assignment, Mutations::AssignmentUpdate, required: false
+  argument :assignment, Mutations::AssignmentBase::AssignmentUpdate, required: false
   argument :set_checkpoints, Boolean, required: false
 
   field :discussion_topic, Types::DiscussionType, null: false
