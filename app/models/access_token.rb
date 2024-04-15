@@ -65,12 +65,7 @@ class AccessToken < ActiveRecord::Base
   scope :not_deleted, -> { where(workflow_state: "active") }
 
   TOKEN_SIZE = 64
-  TOKEN_TYPES = OpenStruct.new(
-    {
-      crypted_token: :crypted_token,
-      crypted_refresh_token: :crypted_refresh_token
-    }
-  )
+  TOKEN_TYPES = [:crypted_token, :crypted_refresh_token].freeze
 
   before_create :generate_token
   before_create :generate_refresh_token
