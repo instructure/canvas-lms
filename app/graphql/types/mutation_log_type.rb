@@ -20,7 +20,7 @@
 
 module Types
   class MutationLogType < ApplicationObjectType
-    field :asset_string, ID, null: false, hash_key: :object_id
+    field :asset_string, ID, null: false
     def asset_string
       # strip the domain-root-account prefix
       object["object_id"].split("-", 2).last
