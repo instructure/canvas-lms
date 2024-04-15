@@ -18,16 +18,20 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {createBrowserRouter, RouterProvider, Link} from 'react-router-dom'
+import {createBrowserRouter, RouterProvider} from 'react-router-dom'
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {LtiAppsLayout} from './layout/LtiAppsLayout'
 import {DiscoverRoute} from './discover/components'
 import {ManageRoutes} from './manage'
+import ProductDetail from './discover/components/ProductDetail/ProductDetail'
 
 const getBasename = () => {
   const path = window.location.pathname
   const parts = path.split('/')
   return parts.slice(0, parts.indexOf('extensions') + 1).join('/')
 }
+
+const queryClient = new QueryClient()
 
 // window.ENV.lti_registrations_discover_page
 
@@ -40,7 +44,24 @@ const router = createBrowserRouter(
         ? [DiscoverRoute, ...ManageRoutes]
         : [...ManageRoutes],
     },
+    {
+      path: 'product_detail/:id',
+      element: (
+        <QueryClientProvider client={queryClient}>
+          <ProductDetail />
+        </QueryClientProvider>
+      ),
+    },
+    {
+      path: 'product_detail/:id',
+      element: (
+        <QueryClientProvider client={queryClient}>
+          <ProductDetail />
+        </QueryClientProvider>
+      ),
+    },
   ],
+
   {
     basename: getBasename(),
   }

@@ -22,9 +22,28 @@ export type Product = {
   company: Company
   logo_url: string
   tagline: string
+  description: string
+  updatedAt?: string
+  toolType?: string
+  demographic?: string
+  lti?: Lti
+  countries?: string[]
+  badges: Badges[]
 }
 
 export type Company = {
   id: string
   name: string
+  company_url?: string
+}
+
+export type Lti = {
+  versions: string[]
+  title: string[]
+}
+
+export type Badges = {
+  name: string
+  image_url: string
+  badge_url: string
 }
