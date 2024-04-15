@@ -129,8 +129,8 @@ module BroadcastPolicies
           before do
             allow(submission).to receive(:saved_change_to_workflow_state).and_return(
               [
-                Submission.workflow_states.unsubmitted,
-                Submission.workflow_states.submitted
+                "unsubmitted",
+                "submitted"
               ]
             )
           end
@@ -142,8 +142,8 @@ module BroadcastPolicies
           before do
             allow(submission).to receive(:saved_change_to_workflow_state).and_return(
               [
-                Submission.workflow_states.pending_review,
-                Submission.workflow_states.submitted
+                "pending_review",
+                "submitted"
               ]
             )
           end

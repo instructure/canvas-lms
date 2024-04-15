@@ -41,7 +41,6 @@
 #
 
 require "active_support/core_ext/module/delegation"
-require "ostruct"
 
 module Workflow
   class Specification
@@ -121,7 +120,7 @@ module Workflow
     end
 
     def workflow_states
-      @workflow_states ||= OpenStruct.new(workflow_spec.states.transform_values { |val| val.name.to_s })
+      @workflow_states = workflow_spec.states.keys.to_set
     end
 
     def workflow(&)

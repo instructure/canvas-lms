@@ -73,7 +73,7 @@ describe AuthenticationMethods::InstAccessToken do
     before do
       developer_key.developer_key_account_bindings.find_by(
         account:
-      ).update!(workflow_state: DeveloperKeyAccountBinding.workflow_states.on)
+      ).update!(workflow_state: "on")
     end
 
     context "when the token has no client_id claim set" do
@@ -322,12 +322,12 @@ describe AuthenticationMethods::InstAccessToken do
       context "and the the key is active and has a binding on" do
         before do
           developer_key.update!(
-            workflow_state: DeveloperKey.workflow_states.active
+            workflow_state: "active"
           )
 
           developer_key.developer_key_account_bindings.find_by(
             account:
-          ).update!(workflow_state: DeveloperKeyAccountBinding.workflow_states.on)
+          ).update!(workflow_state: "on")
         end
 
         it { is_expected.to be true }
@@ -349,7 +349,7 @@ describe AuthenticationMethods::InstAccessToken do
         before do
           developer_key.developer_key_account_bindings.find_by(
             account:
-          ).update!(workflow_state: DeveloperKeyAccountBinding.workflow_states.off)
+          ).update!(workflow_state: "off")
         end
 
         it { is_expected.to be false }

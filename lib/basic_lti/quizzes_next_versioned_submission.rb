@@ -99,13 +99,13 @@ module BasicLTI
       # Quizzes indicated the quiz session contains items that are not auto-
       # gradable. Set workflow state to pending_review to indicate manual
       # grading is needed
-      return Submission.workflow_states.pending_review if @needs_additional_review
+      return "pending_review" if @needs_additional_review
 
       # The submission previously was in a pending_review state, but all
       # items that required manual grading have been scored. Set workflow_state
       # to submitted and let the Submission#inferred_workflow_state method handle
       # selecting the correct state
-      return Submission.workflow_states.submitted if additional_review_complete?(submission_record)
+      return "submitted" if additional_review_complete?(submission_record)
 
       submission_record.workflow_state
     end

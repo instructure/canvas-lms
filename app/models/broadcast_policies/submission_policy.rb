@@ -135,8 +135,8 @@ module BroadcastPolicies
       # was submitted for the first time is seeing if the
       # workflow state transitioned from unsubmitted -> submitted.
       submission.saved_change_to_workflow_state == [
-        Submission.workflow_states.unsubmitted,
-        Submission.workflow_states.submitted
+        "unsubmitted",
+        "submitted"
       ]
     end
 
