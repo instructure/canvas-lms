@@ -54,6 +54,20 @@ module Api::V1::AssignmentOverride
     end
   end
 
+  # temporary function to convert discussion_topic_section_visibilities to section overrides
+  # will be able to remove once we deprecate the old section visibilities table
+  def section_visibility_to_override_json(section_visibilities, discussion)
+    section_visibilities.map do |section_visibility|
+      fields = %i[]
+      api_json(section_visibility, @current_user, session, only: fields).tap do |json|
+        json[:discussion_topic_id] = section_visibility.discussion_topic_id
+        json[:course_section_id] = section_visibility.course_section_id
+        json[:unlock_at] = discussion.unlock_at if discussion.unlock_at
+        json[:lock_at] = discussion.lock_at if discussion.lock_at
+      end
+    end
+  end
+
   def assignment_overrides_json(overrides, user = nil, include_names: false)
     visible_users_ids = ::AssignmentOverride.visible_enrollments_for(overrides.compact, user).select(:user_id)
     # we most likely already have the student_ids preloaded here because of overridden_for, but just in case

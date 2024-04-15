@@ -182,6 +182,89 @@ describe LearningObjectDatesController do
                                })
     end
 
+    it "returns date details for an ungraded discussion with a section visibility" do
+      discussion = @course.discussion_topics.create!(title: "ungraded topic",
+                                                     unlock_at: "2022-01-05T12:00:00Z",
+                                                     lock_at: "2022-03-05T12:00:00Z")
+      discussion.discussion_topic_section_visibilities << DiscussionTopicSectionVisibility.new(
+        discussion_topic: @topic,
+        course_section: @course.default_section,
+        workflow_state: "active"
+      )
+      discussion.is_section_specific = true
+      discussion.save!
+
+      get :show, params: { course_id: @course.id, discussion_topic_id: discussion.id }
+      expect(response).to be_successful
+      expect(json_parse).to eq({
+                                 "id" => discussion.id,
+                                 "unlock_at" => "2022-01-05T12:00:00Z",
+                                 "lock_at" => "2022-03-05T12:00:00Z",
+                                 "only_visible_to_overrides" => false,
+                                 "graded" => false,
+                                 "visible_to_everyone" => false,
+                                 "overrides" => [{
+                                   "discussion_topic_id" => discussion.id,
+                                   "course_section_id" => @course.default_section.id,
+                                   "unlock_at" => "2022-01-05T12:00:00Z",
+                                   "lock_at" => "2022-03-05T12:00:00Z"
+                                 }]
+                               })
+    end
+
+    it "returns date details for an ungraded discussion with a section visibility and section override" do
+      section1 = @course.course_sections.create!
+      section2 = @course.course_sections.create!
+      discussion = @course.discussion_topics.create!(title: "ungraded topic",
+                                                     unlock_at: "2022-01-05T12:00:00Z",
+                                                     lock_at: "2022-03-05T12:00:00Z")
+      discussion.discussion_topic_section_visibilities << DiscussionTopicSectionVisibility.new(
+        discussion_topic: @topic,
+        course_section: section1,
+        workflow_state: "active"
+      )
+
+      discussion.discussion_topic_section_visibilities << DiscussionTopicSectionVisibility.new(
+        discussion_topic: @topic,
+        course_section: section2,
+        workflow_state: "active"
+      )
+
+      discussion.is_section_specific = true
+      discussion.save!
+
+      override = discussion.assignment_overrides.create!(set: section1,
+                                                         lock_at: "2022-01-04T12:00:00Z",
+                                                         lock_at_overridden: true)
+
+      get :show, params: { course_id: @course.id, discussion_topic_id: discussion.id }
+      expect(response).to be_successful
+
+      expect(json_parse).to eq({
+                                 "id" => discussion.id,
+                                 "unlock_at" => "2022-01-05T12:00:00Z",
+                                 "lock_at" => "2022-03-05T12:00:00Z",
+                                 "only_visible_to_overrides" => false,
+                                 "graded" => false,
+                                 "visible_to_everyone" => false,
+                                 "overrides" => [
+                                   {
+                                     "id" => override.id,
+                                     "discussion_topic_id" => discussion.id,
+                                     "title" => override.title,
+                                     "course_section_id" => section1.id,
+                                     "lock_at" => "2022-01-04T12:00:00Z"
+                                   },
+                                   {
+                                     "discussion_topic_id" => discussion.id,
+                                     "course_section_id" => section2.id,
+                                     "unlock_at" => "2022-01-05T12:00:00Z",
+                                     "lock_at" => "2022-03-05T12:00:00Z"
+                                   }
+                                 ]
+                               })
+    end
+
     it "returns date details for a page" do
       wiki_page = @course.wiki_pages.create!(title: "My Page",
                                              unlock_at: "2022-01-05T00:00:00Z",
@@ -629,6 +712,24 @@ describe LearningObjectDatesController do
 
       include_examples "learning object updates", false
       include_examples "learning objects without due dates"
+
+      it "removes section visibilities and changes 'is_section_specific' to false" do
+        learning_object.discussion_topic_section_visibilities << DiscussionTopicSectionVisibility.new(
+          discussion_topic: learning_object,
+          course_section: @course.default_section,
+          workflow_state: "active"
+        )
+        learning_object.is_section_specific = true
+        learning_object.save!
+
+        expect(learning_object.discussion_topic_section_visibilities.count).to eq 1
+
+        put :update, params: { **default_params, unlock_at: "2019-01-02T05:00:00Z" }
+        expect(response).to be_no_content
+        learning_object.reload
+        expect(learning_object.is_section_specific).to be false
+        expect(learning_object.discussion_topic_section_visibilities.count).to eq 0
+      end
     end
 
     context "pages" do

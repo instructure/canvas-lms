@@ -93,7 +93,13 @@ module DatesOverridable
 
   def visible_to_everyone
     if Account.site_admin.feature_enabled? :differentiated_modules
-      assignment_overrides.active.where(set_type: "Course").exists? || (!only_visible_to_overrides && (assignment_context_modules.empty? || (assignment_context_modules.any? && assignment_context_modules_without_overrides.any?)))
+      if is_a?(DiscussionTopic)
+        # need to check if is_section_specific for ungraded discussions
+        # this column will eventually be deprecated and then this can be removed
+        assignment_overrides.active.where(set_type: "Course").exists? || ((!only_visible_to_overrides && !is_section_specific) && (assignment_context_modules.empty? || (assignment_context_modules.any? && assignment_context_modules_without_overrides.any?)))
+      else
+        assignment_overrides.active.where(set_type: "Course").exists? || (!only_visible_to_overrides && (assignment_context_modules.empty? || (assignment_context_modules.any? && assignment_context_modules_without_overrides.any?)))
+      end
     else
       !only_visible_to_overrides
     end
