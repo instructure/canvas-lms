@@ -21,7 +21,7 @@ GEM
     docile (1.4.0)
     i18n (1.14.4)
       concurrent-ruby (~> 1.0)
-    mini_portile2 (2.8.5)
+    mini_portile2 (2.8.6)
     minitest (5.22.3)
     rake (13.2.1)
     rspec (3.13.0)
