@@ -19,7 +19,7 @@
 #
 
 class GradingSchemesJsonController < ApplicationController
-  extend GradingSchemeSerializer::ClassMethods
+  extend GradingSchemeSerializer
 
   GRADING_SCHEMES_LIMIT = 100
   USED_LOCATIONS_PER_PAGE = 100
@@ -117,10 +117,6 @@ class GradingSchemesJsonController < ApplicationController
     render json: used_locations_for(grading_standard)
   end
 
-  def default_used_locations
-    render json: default_scheme_used_locations
-  end
-
   def archive
     grading_standard = grading_standards_for_context.find(params[:id])
     if authorized_action(grading_standard, @current_user, :manage)
@@ -167,23 +163,6 @@ class GradingSchemesJsonController < ApplicationController
           format.json { render json: grading_standard.errors, status: :bad_request }
         end
       end
-    end
-  end
-
-  def default_scheme_used_locations
-    GuardRail.activate(:secondary) do
-      scope = GradingStandard.default_scheme_used_locations(@context)
-                             .joins("INNER JOIN #{Course.quoted_table_name} ON assignments.context_type = 'Course' AND assignments.context_id = courses.id")
-                             .order("courses.name ASC, title ASC")
-
-      used_locations = Api.paginate(
-        scope,
-        self,
-        account_grading_schemes_default_used_locations_path(account_id: @context.id),
-        per_page: USED_LOCATIONS_PER_PAGE
-      )
-
-      used_locations_to_json(used_locations)
     end
   end
 
