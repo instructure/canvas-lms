@@ -156,7 +156,7 @@ class AssignmentsController < ApplicationController
       if current_user_submission
         graphql_reviewer_submission_id = CanvasSchema.id_from_object(
           current_user_submission,
-          CanvasSchema.resolve_type(nil, current_user_submission, nil),
+          CanvasSchema.resolve_type(nil, current_user_submission, nil)[0],
           nil
         )
       end
@@ -171,7 +171,7 @@ class AssignmentsController < ApplicationController
     if submission
       graphql_submission_id = CanvasSchema.id_from_object(
         submission,
-        CanvasSchema.resolve_type(nil, submission, nil),
+        CanvasSchema.resolve_type(nil, submission, nil)[0],
         nil
       )
     end
