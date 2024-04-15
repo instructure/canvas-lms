@@ -24,11 +24,6 @@ module Canvas
   # to send APM information to Datadog, but could in the future be re-worked to
   # be configurable for multiple APM backends.
   #
-  # If running with multiple database clusters in production,
-  # you can set the "canvas_cluster" variable before enabling APM
-  # to make sure each cluster can load it's settings (for sampling rate)
-  # individually.
-  #
   # use Canvas::Apm.enable_debug_mode = true to force logging output
   # for every trace we try to write.  Useful for making sure you're getting
   # the tags you want at the client level, etc.
@@ -44,7 +39,6 @@ module Canvas
     HOST_SAMPLING_INTERVAL = 10_000
     class << self
       attr_writer :enable_debug_mode, :hostname, :tracer
-      attr_accessor :canvas_cluster
 
       def reset!
         @_app_analytics_enabled = nil
@@ -52,7 +46,6 @@ module Canvas
         @_host_sample_rate = nil
         @_host_sampling_decision = nil
         @_sample_rate = nil
-        @canvas_cluster = nil
         @enable_debug_mode = nil
         @hostname = nil
         @tracer = nil
@@ -64,9 +57,6 @@ module Canvas
           return @_config if @_config.present?
 
           dynamic_settings = DynamicSettings.find(tree: :private)
-          if canvas_cluster.present?
-            dynamic_settings = DynamicSettings.find(tree: :private, cluster: canvas_cluster)
-          end
           yaml = dynamic_settings["datadog_apm.yml", failsafe: :missing] || "{}"
           return {} if yaml == :missing
 
