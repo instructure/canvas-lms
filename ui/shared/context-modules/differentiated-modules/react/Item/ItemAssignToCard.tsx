@@ -263,6 +263,7 @@ export default forwardRef(function ItemAssignToCard(
             }}
           >
             <IconButton
+              data-testid="delete-card-button"
               color="danger"
               screenReaderLabel={I18n.t('Delete')}
               size="small"
