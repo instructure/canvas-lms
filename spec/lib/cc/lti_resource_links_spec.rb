@@ -20,9 +20,15 @@ require_relative "cc_spec_helper"
 
 require "nokogiri"
 
-describe CC::LtiResourceLinks do
+class TestLtiResourceLinksWrapper
   include CC::LtiResourceLinks
 
+  def initialize
+    @resources = Struct.new(:resource).new
+  end
+end
+
+describe CC::LtiResourceLinks do
   let(:resource_link) do
     Lti::ResourceLink.create!(
       context: tool.context,
@@ -52,7 +58,7 @@ describe CC::LtiResourceLinks do
 
   describe "#add_lti_resource_link" do
     subject do
-      add_lti_resource_link(
+      TestLtiResourceLinksWrapper.new.add_lti_resource_link(
         resource_link,
         tool,
         document
@@ -131,6 +137,48 @@ describe CC::LtiResourceLinks do
     context "when the lookup uuid is populated" do
       it "includes the lookup_uuid extension property" do
         expect(find_extension(subject, "lookup_uuid")).to eq lookup_uuid
+      end
+    end
+  end
+
+  describe "#process_resource_link" do
+    subject do
+      TestLtiResourceLinksWrapper.new
+    end
+
+    before do
+      allow(subject).to receive_messages(
+        create_key: "123",
+        create_resource_link_document: Struct.new(:file, :document).new(StringIO.new, document),
+        add_lti_resource_link: nil
+      )
+      allow(resource_link).to receive(:current_external_tool).and_return("test")
+      allow(subject.instance_variable_get(:@resources)).to receive(:resource)
+    end
+
+    context "when lti_resource_link should be exported" do
+      before do
+        allow(subject).to receive(:export_object?).and_return(true)
+      end
+
+      it "exports all resource links associated with the course" do
+        subject.process_resource_link(resource_link)
+
+        expect(subject).to have_received(:add_lti_resource_link)
+        expect(subject.instance_variable_get(:@resources)).to have_received(:resource)
+      end
+    end
+
+    context "when lti_resource_link should not be exported" do
+      before do
+        allow(subject).to receive(:export_object?).and_return(false)
+      end
+
+      it "does not export resource that are not selected" do
+        subject.process_resource_link(resource_link)
+
+        expect(subject).not_to have_received(:add_lti_resource_link)
+        expect(subject.instance_variable_get(:@resources)).not_to have_received(:resource)
       end
     end
   end
