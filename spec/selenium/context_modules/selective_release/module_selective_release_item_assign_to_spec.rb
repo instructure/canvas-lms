@@ -364,6 +364,21 @@ describe "selective_release module item assign to tray" do
       click_delete_assign_to_card(2)
       expect(module_item_assign_to_card.count).to be(2)
     end
+  end
+
+  context "assign to tray focus validation" do
+    before(:once) do
+      module_setup
+      @module_item1 = ContentTag.find_by(context_id: @course.id, context_module_id: @module.id, content_type: "Assignment", content_id: @assignment1.id)
+      @module_item2 = ContentTag.find_by(context_id: @course.id, context_module_id: @module.id, content_type: "Assignment", content_id: @assignment2.id)
+      @module.update!(workflow_state: "active")
+      @student1 = student_in_course(course: @course, active_all: true, name: "Student 1").user
+      @student2 = student_in_course(course: @course, active_all: true, name: "Student 2").user
+    end
+
+    before do
+      user_session(@teacher)
+    end
 
     it "focus assignees field if there is no selection after trying to submit", :ignore_js_errors do
       go_to_modules
@@ -414,6 +429,64 @@ describe "selective_release module item assign to tray" do
 
       # Error: Invalid date
       check_element_has_focus assign_to_due_date(0)
+    end
+
+    it "focuses on on trash can button on newly created card" do
+      go_to_modules
+
+      manage_module_item_button(@module_item1).click
+      click_manage_module_item_assign_to(@module_item1)
+
+      click_add_assign_to_card
+
+      check_element_has_focus delete_card_button[1]
+    end
+
+    it "focuses on previous card trashcan when middle first card is deleted" do
+      go_to_modules
+
+      manage_module_item_button(@module_item1).click
+      click_manage_module_item_assign_to(@module_item1)
+
+      click_add_assign_to_card
+      select_module_item_assignee(1, @student1.name)
+      expect(assign_to_in_tray("Remove #{@student1.name}")[0]).to be_displayed
+
+      click_add_assign_to_card
+
+      click_delete_assign_to_card(1)
+      check_element_has_focus delete_card_button[0]
+      expect(assign_to_in_tray("Remove Everyone else")[0]).to be_displayed
+    end
+
+    it "focuses Add Card button when only one card remains after delete" do
+      go_to_modules
+
+      manage_module_item_button(@module_item1).click
+      click_manage_module_item_assign_to(@module_item1)
+
+      click_add_assign_to_card
+
+      click_delete_assign_to_card(1)
+      check_element_has_focus add_assign_to_card
+      expect(assign_to_in_tray("Remove Everyone")[0]).to be_displayed
+      expect(element_exists?(delete_card_button_selector)).to be_falsey
+    end
+
+    it "focuses Add Card button when first card is deleted and replaced with next" do
+      go_to_modules
+
+      manage_module_item_button(@module_item1).click
+      click_manage_module_item_assign_to(@module_item1)
+
+      click_add_assign_to_card
+      select_module_item_assignee(1, @student1.name)
+      expect(assign_to_in_tray("Remove #{@student1.name}")[0]).to be_displayed
+
+      click_delete_assign_to_card(0)
+      check_element_has_focus add_assign_to_card
+      expect(assign_to_in_tray("Remove #{@student1.name}")[0]).to be_displayed
+      expect(element_exists?(delete_card_button_selector)).to be_falsey
     end
   end
 

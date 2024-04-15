@@ -538,24 +538,4 @@ describe('ItemAssignToTray', () => {
       expect(cards).toHaveLength(2)
     })
   })
-
-  // LF-1370
-  it.skip('focuses on the add button when deleting a card', async () => {
-    const user = userEvent.setup(USER_EVENT_OPTIONS)
-    const {findAllByText, getByTestId} = renderComponent()
-    const deleteButton = (await findAllByText('Delete'))[1]
-    const addButton = getByTestId('add-card')
-    await user.click(deleteButton)
-    expect(addButton).toHaveFocus()
-  })
-
-  // LF-1370
-  it.skip("focuses on the newly-created card's delete button when adding a card", async () => {
-    const user = userEvent.setup(USER_EVENT_OPTIONS)
-    const {findAllByText, getByTestId} = renderComponent()
-    const addButton = getByTestId('add-card')
-    await user.click(addButton)
-    const deleteButtons = await findAllByText('Delete')
-    expect(deleteButtons[deleteButtons.length - 1].closest('button')).toHaveFocus()
-  })
 })
