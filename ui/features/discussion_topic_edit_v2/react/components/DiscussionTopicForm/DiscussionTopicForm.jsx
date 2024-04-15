@@ -51,6 +51,8 @@ import {
   defaultEveryoneElseOption,
   masteryPathsOption,
   useShouldShowContent,
+  REPLY_TO_TOPIC,
+  REPLY_TO_ENTRY,
 } from '../../util/constants'
 
 import {AttachmentDisplay} from '@canvas/discussions/react/components/AttachmentDisplay/AttachmentDisplay'
@@ -59,7 +61,7 @@ import {UsageRightsContainer} from '../../containers/usageRights/UsageRightsCont
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
-import {prepareAssignmentPayload} from '../../util/payloadPreparations'
+import {prepareAssignmentPayload, prepareCheckpointsPayload} from '../../util/payloadPreparations'
 import {validateTitle, validateFormFields} from '../../util/formValidation'
 
 import {
@@ -227,13 +229,21 @@ export default function DiscussionTopicForm({
   const [isCheckpoints, setIsCheckpoints] = useState(
     currentDiscussionTopic?.assignment?.hasSubAssignments || false
   )
-  const getCheckpointsPointsPossible = (checkpointLabel) => {
-    const checkpoint = currentDiscussionTopic?.assignment?.checkpoints?.find(c => c.tag === checkpointLabel)
+  const getCheckpointsPointsPossible = checkpointLabel => {
+    const checkpoint = currentDiscussionTopic?.assignment?.checkpoints?.find(
+      c => c.tag === checkpointLabel
+    )
     return checkpoint ? checkpoint.pointsPossible : 0
   }
-  const [pointsPossibleReplyToTopic, setPointsPossibleReplyToTopic] = useState(getCheckpointsPointsPossible('reply_to_topic'))
-  const [pointsPossibleReplyToEntry, setPointsPossibleReplyToEntry] = useState(getCheckpointsPointsPossible('reply_to_entry'))
-  const [replyToEntryRequiredCount, setReplyToEntryRequiredCount] = useState(currentDiscussionTopic?.replyToEntryRequiredCount || 1)
+  const [pointsPossibleReplyToTopic, setPointsPossibleReplyToTopic] = useState(
+    getCheckpointsPointsPossible(REPLY_TO_TOPIC)
+  )
+  const [pointsPossibleReplyToEntry, setPointsPossibleReplyToEntry] = useState(
+    getCheckpointsPointsPossible(REPLY_TO_ENTRY)
+  )
+  const [replyToEntryRequiredCount, setReplyToEntryRequiredCount] = useState(
+    currentDiscussionTopic?.replyToEntryRequiredCount || 1
+  )
 
   const assignmentDueDateContext = {
     assignedInfoList,
@@ -360,7 +370,14 @@ export default function DiscussionTopicForm({
         peerReviewsPerStudent,
         peerReviewDueDate,
         intraGroupPeerReviews,
-        masteryPathsOption
+        masteryPathsOption,
+        isCheckpoints
+      ),
+      checkpoints: prepareCheckpointsPayload(
+        pointsPossibleReplyToTopic,
+        pointsPossibleReplyToEntry,
+        replyToEntryRequiredCount,
+        isCheckpoints
       ),
       groupCategoryId: isGroupDiscussion ? groupCategoryId : null,
       specificSections: shouldShowPostToSectionOption ? sectionIdsToPostTo.join() : 'all',

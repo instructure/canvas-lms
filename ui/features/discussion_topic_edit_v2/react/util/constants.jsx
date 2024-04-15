@@ -63,6 +63,9 @@ export const ASSIGNMENT_OVERRIDE_GRAPHQL_TYPENAMES = {
 export const minimumReplyToEntryRequiredCount = 1
 export const maximumReplyToEntryRequiredCount = 10
 
+export const REPLY_TO_TOPIC = 'reply_to_topic'
+export const REPLY_TO_ENTRY = 'reply_to_entry'
+
 export const useShouldShowContent = (
   isGraded,
   isAnnouncement,
