@@ -604,7 +604,7 @@ test('has an error when a title is 257 chars', function () {
   equal(errors.title[0].message, 'Title is too long, must be under 257 characters')
 })
 
-test('allows dicussion to save when a title is 256 chars, MAX_NAME_LENGTH is not required and post_to_sis is true', function () {
+test('allows discussion to save when a title is 256 chars, MAX_NAME_LENGTH is not required and post_to_sis is true', function () {
   const view = this.editView({withAssignment: true})
   const errors = nameLengthHelper(view, 256, false, 30, '1')
   equal(errors.length, 0)
