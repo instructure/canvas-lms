@@ -35,6 +35,10 @@ class SubAssignment < AbstractAssignment
     true
   end
 
+  def checkpoints_parent?
+    false
+  end
+
   private
 
   def aggregate_checkpoint_assignments

@@ -11368,6 +11368,7 @@ describe Assignment do
 
   describe "checkpointed assignments" do
     before do
+      @course.root_account.enable_feature!(:discussion_checkpoints)
       @parent = @course.assignments.create!(has_sub_assignments: true)
       @child = @parent.sub_assignments.create!(context: @course, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
     end
@@ -11385,6 +11386,11 @@ describe Assignment do
 
     it "soft-deletes child assignments when the parent assignment is soft-deleted" do
       expect { @parent.destroy }.to change { @child.reload.deleted? }.from(false).to(true)
+    end
+
+    it "has correct values for is_checkpoints_parent?" do
+      expect(@parent.checkpoints_parent?).to be true
+      expect(@child.checkpoints_parent?).to be false
     end
   end
 
