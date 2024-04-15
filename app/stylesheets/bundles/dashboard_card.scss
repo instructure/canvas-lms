@@ -91,7 +91,7 @@ $ic-DashboardCard-icon-color: $ic-icon-link-color;
   display: inline-block;
   vertical-align: top;
   margin: direction-sides($ic-sp*3 0 0 $ic-sp*3);
-  transition: transform 0.2s ease, box-shadow 0.2s ease; // add transition to the box-shadow and transform
+  transition: transform 0.2s ease, box-shadow 0.2s ease; // add appearance transition
 
   .no-touch & {
     &:is(:hover, :focus-within) {
