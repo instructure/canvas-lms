@@ -25,7 +25,3 @@ module GraphQLSpecHelper
     (args + options.map { |k, v| "#{k.to_s.camelize(:lower)}: #{v.to_json}" }).join(", ")
   end
 end
-
-# building the schema is currently very slow.
-# this ensures the schema is built before specs are run to avoid timeouts
-CanvasSchema.graphql_definition
