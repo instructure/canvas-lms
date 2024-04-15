@@ -26,7 +26,7 @@ shared_examples_for "types with enumerable workflow states" do
     subject { enum_class.values.keys }
 
     it "has values matching the workflow_state values of the model" do
-      expect(subject).to match_array model_class.workflow_states.to_h.keys.map(&:to_s)
+      expect(subject).to match_array model_class.workflow_states.map(&:to_s)
     end
   end
 end
