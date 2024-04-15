@@ -1101,7 +1101,7 @@ GEM
       switchman (~> 3.1, >= 3.5.14)
     sync (0.5.0)
     table_print (1.5.7)
-    term-ansicolor (1.7.2)
+    term-ansicolor (1.8.0)
       tins (~> 1.0)
     testrail_client (0.0.1)
     testrailtagging (0.3.8.7)
