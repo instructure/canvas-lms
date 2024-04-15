@@ -74,7 +74,7 @@ describe('FindReplaceTray', () => {
     await type(user, findInput, 'a')
     await user.keyboard('{backspace}')
     const errorText = screen.queryByLabelText(/no results found/i)
-    expect(errorText).not.toBeInTheDocument()
+    expect(errorText).toBeNull()
     expect(fakePlugin.done).toHaveBeenCalledTimes(1)
   })
 
@@ -154,6 +154,20 @@ describe('FindReplaceTray', () => {
       expect(fakePlugin.replace).toHaveBeenCalledWith('some text', false, false)
       expect(fakePlugin.replace).toHaveBeenCalledTimes(1)
     })
+
+    it('displays visual and screenreader alerts when replacing', async () => {
+      const {user} = renderComponent()
+      const findInput = screen.getByTestId('find-text-input')
+      await type(user, findInput, 'a')
+
+      const replaceInput = screen.getByTestId('replace-text-input')
+      await type(user, replaceInput, 'some text')
+      const replaceButton = screen.getByTestId('replace-button')
+      await user.click(replaceButton)
+
+      const alert = await screen.findAllByText(/Replaced a with some text/i)
+      expect(alert.length).toBe(2)
+    })
   })
 
   describe('replace all button', () => {
@@ -189,6 +203,20 @@ describe('FindReplaceTray', () => {
       expect(fakePlugin.replace).toHaveBeenCalledTimes(1)
       const resultText = screen.queryByLabelText(/2 of 2/i)
       expect(resultText).not.toBeInTheDocument()
+    })
+
+    it('displays visual and screenreader alerts when replacing all', async () => {
+      const {user} = renderComponent()
+      const findInput = screen.getByTestId('find-text-input')
+      await type(user, findInput, 'a')
+
+      const replaceInput = screen.getByTestId('replace-text-input')
+      await type(user, replaceInput, 'some text')
+      const replaceButton = screen.getByTestId('replace-all-button')
+      await user.click(replaceButton)
+
+      const alert = await screen.findAllByText(/Replaced all a with some text/i)
+      expect(alert.length).toBe(2)
     })
   })
 
