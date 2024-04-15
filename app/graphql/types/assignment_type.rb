@@ -45,8 +45,6 @@ module Types
       value "failed_to_clone_outcome_alignment"
     end
 
-    GRADING_TYPES = Assignment::ALLOWED_GRADING_TYPES.zip(Assignment::ALLOWED_GRADING_TYPES).to_h
-
     class AssignmentGradingType < Types::BaseEnum
       graphql_name "GradingType"
       Assignment::ALLOWED_GRADING_TYPES.each { |type| value(type) }
@@ -379,7 +377,9 @@ module Types
 
     field :grading_type, AssignmentGradingType, null: true
     def grading_type
-      GRADING_TYPES[assignment.grading_type]
+      return nil unless Assignment::ALLOWED_GRADING_TYPES.include?(assignment.grading_type)
+
+      assignment.grading_type
     end
 
     field :grading_period_id, String, null: true
