@@ -396,17 +396,6 @@ export const isAnonymous = discussionEntry =>
   discussionEntry.anonymousAuthor !== null &&
   discussionEntry.author === null
 
-const urlParams = new URLSearchParams(window.location.search)
-const hiddenUserId = urlParams.get('hidden_user_id')
-export const hideStudentNames = !!hiddenUserId
-
-export const userNameToShow = (originalName, author_id, course_roles = []) => {
-  if (hideStudentNames && course_roles?.includes('StudentEnrollment')) {
-    return hiddenUserId === author_id ? I18n.t('This Student') : I18n.t('Discussion Participant')
-  }
-  return originalName
-}
-
 export const getDisplayName = discussionEntry => {
   if (isAnonymous(discussionEntry)) {
     if (discussionEntry.anonymousAuthor.shortName === CURRENT_USER) {
@@ -417,12 +406,7 @@ export const getDisplayName = discussionEntry => {
     }
     return I18n.t('Anonymous %{id}', {id: discussionEntry.anonymousAuthor.id})
   }
-  const author = discussionEntry.author
-
-  return (
-    userNameToShow(author?.displayName, author?._id, author?.courseRoles || []) ||
-    userNameToShow(author?.shortName, author?._id, author?.courseRoles || [])
-  )
+  return discussionEntry.author?.displayName || discussionEntry.author?.shortName
 }
 
 export const showErrorWhenMessageTooLong = message => {
