@@ -45,6 +45,7 @@ const testProps = {
   pointsBased: false,
   displayScalingFactor: 1,
   archivedGradingSchemesEnabled: false,
+  editSchemeDataDisabled: false,
 }
 
 describe('GradingSchemeDataRowInput', () => {
@@ -187,6 +188,20 @@ describe('GradingSchemeDataRowInput', () => {
     expect(onRowAddRequested).toHaveBeenCalled()
   })
 
+  it('disables delete button when there is only one row', () => {
+    render(
+      <table>
+        <tbody>
+          <GradingSchemeDataRowInput {...testProps} isFirstRow={true} isLastRow={true} />
+        </tbody>
+      </table>
+    )
+    const deleteRowButton = screen.getByRole<HTMLInputElement>('button', {
+      name: /Remove letter grade row/,
+    })
+    expect(deleteRowButton).toBeDisabled()
+  })
+
   it('grade by points exploration', () => {
     const gradeByPointsComponentProps = {
       letterGrade: 'C',
@@ -204,6 +219,7 @@ describe('GradingSchemeDataRowInput', () => {
       pointsBased: true,
       displayScalingFactor: 3.0,
       archivedGradingSchemesEnabled: false,
+      editSchemeDataDisabled: false,
     }
 
     render(

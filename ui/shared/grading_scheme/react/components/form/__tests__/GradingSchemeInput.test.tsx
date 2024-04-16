@@ -48,7 +48,6 @@ describe('GradingSchemeInput', () => {
         }}
         schemeInputType="percentage"
         onSave={onSave}
-        archivedGradingSchemesEnabled={false}
       />
     )
 
@@ -91,7 +90,6 @@ describe('GradingSchemeInput', () => {
         }}
         schemeInputType="points"
         onSave={onSave}
-        archivedGradingSchemesEnabled={false}
       />
     )
 
@@ -131,7 +129,6 @@ describe('GradingSchemeInput', () => {
         schemeInputType="percentage"
         onSave={onSave}
         ref={gradingSchemeInputRef}
-        archivedGradingSchemesEnabled={false}
       />
     )
     act(() => gradingSchemeInputRef.current?.savePressed())
@@ -149,11 +146,29 @@ describe('GradingSchemeInput', () => {
         schemeInputType="points"
         onSave={onSave}
         ref={gradingSchemeInputRef}
-        archivedGradingSchemesEnabled={false}
       />
     )
     act(() => gradingSchemeInputRef.current?.savePressed())
     expect(onSave).toHaveBeenCalled()
+  })
+
+  it('updates the new first row when the first row is deleted to have the correct max range', () => {
+    const gradingSchemeInputRef = React.createRef<GradingSchemeInputHandle>()
+    render(
+      <GradingSchemeInput
+        initialFormDataByInputType={{
+          percentage: VALID_FORM_INPUT,
+          points: VALID_FORM_INPUT_POINTS_BASED,
+        }}
+        schemeInputType="percentage"
+        onSave={onSave}
+        ref={gradingSchemeInputRef}
+      />
+    )
+    const deleteRowButton = screen.getAllByText('Remove letter grade row')
+    act(() => deleteRowButton[0].click())
+    const maxRangeCells = screen.getAllByLabelText('Upper limit of range')
+    expect(maxRangeCells[0].textContent).toBe('100%')
   })
 
   it('data is accurate when all but the first row is deleted', () => {
@@ -167,7 +182,6 @@ describe('GradingSchemeInput', () => {
         schemeInputType="percentage"
         onSave={onSave}
         ref={gradingSchemeInputRef}
-        archivedGradingSchemesEnabled={false}
       />
     )
     const deleteRowButtons = screen.getAllByText('Remove letter grade row')
@@ -195,7 +209,6 @@ describe('GradingSchemeInput', () => {
         schemeInputType="percentage"
         onSave={onSave}
         ref={gradingSchemeInputRef}
-        archivedGradingSchemesEnabled={false}
       />
     )
     const deleteRowButtons = screen.getAllByText('Remove letter grade row')
@@ -224,7 +237,6 @@ describe('GradingSchemeInput', () => {
         schemeInputType="percentage"
         onSave={onSave}
         ref={gradingSchemeInputRef}
-        archivedGradingSchemesEnabled={false}
       />
     )
     const deleteRowButtons = screen.getAllByText('Remove letter grade row')
@@ -256,7 +268,6 @@ describe('GradingSchemeInput', () => {
         schemeInputType="percentage"
         onSave={onSave}
         ref={gradingSchemeInputRef}
-        archivedGradingSchemesEnabled={false}
       />
     )
     const addRowButtons = screen.getAllByText(
@@ -293,7 +304,6 @@ describe('GradingSchemeInput', () => {
         schemeInputType="points"
         onSave={onSave}
         ref={gradingSchemeInputRef}
-        archivedGradingSchemesEnabled={false}
       />
     )
     const addRowButtons = screen.getAllByText(
@@ -329,7 +339,6 @@ describe('GradingSchemeInput', () => {
         schemeInputType="points"
         onSave={onSave}
         ref={gradingSchemeInputRef}
-        archivedGradingSchemesEnabled={false}
       />
     )
     const rangeInputs = screen.getAllByLabelText('Upper limit of range')
@@ -358,7 +367,6 @@ describe('GradingSchemeInput', () => {
         schemeInputType="points"
         onSave={onSave}
         ref={gradingSchemeInputRef}
-        archivedGradingSchemesEnabled={false}
       />
     )
     const rangeInputs = screen.getAllByLabelText('Upper limit of range')
@@ -386,7 +394,6 @@ describe('GradingSchemeInput', () => {
         schemeInputType="points"
         onSave={onSave}
         ref={gradingSchemeInputRef}
-        archivedGradingSchemesEnabled={false}
       />
     )
 
@@ -412,7 +419,6 @@ describe('GradingSchemeInput', () => {
         schemeInputType="points"
         onSave={onSave}
         ref={gradingSchemeInputRef}
-        archivedGradingSchemesEnabled={false}
       />
     )
     const rangeInputs = screen.getAllByLabelText<HTMLInputElement>('Lower limit of range')
@@ -437,7 +443,6 @@ describe('GradingSchemeInput', () => {
         schemeInputType="points"
         onSave={onSave}
         ref={gradingSchemeInputRef}
-        archivedGradingSchemesEnabled={false}
       />
     )
     const rangeInputs = screen.getAllByLabelText<HTMLInputElement>('Lower limit of range')
@@ -462,7 +467,6 @@ describe('GradingSchemeInput', () => {
         schemeInputType="percentage"
         onSave={onSave}
         ref={gradingSchemeInputRef}
-        archivedGradingSchemesEnabled={false}
       />
     )
     const rangeInputs = screen.getAllByLabelText<HTMLInputElement>('Lower limit of range')
@@ -499,7 +503,6 @@ describe('GradingSchemeInput', () => {
         schemeInputType="percentage"
         onSave={onSave}
         ref={gradingSchemeInputRef}
-        archivedGradingSchemesEnabled={false}
       />
     )
     const rangeInputs = screen.getAllByLabelText<HTMLInputElement>('Lower limit of range')
@@ -524,7 +527,6 @@ describe('GradingSchemeInput', () => {
         schemeInputType="percentage"
         onSave={onSave}
         ref={gradingSchemeInputRef}
-        archivedGradingSchemesEnabled={false}
       />
     )
     const rangeInputs = screen.getAllByLabelText<HTMLInputElement>('Lower limit of range')
@@ -549,7 +551,6 @@ describe('GradingSchemeInput', () => {
         schemeInputType="percentage"
         onSave={onSave}
         ref={gradingSchemeInputRef}
-        archivedGradingSchemesEnabled={false}
       />
     )
     act(() => gradingSchemeInputRef.current?.savePressed())
@@ -571,7 +572,6 @@ describe('GradingSchemeInput', () => {
         schemeInputType="percentage"
         onSave={onSave}
         ref={gradingSchemeInputRef}
-        archivedGradingSchemesEnabled={false}
       />
     )
     act(() => gradingSchemeInputRef.current?.savePressed())
@@ -593,7 +593,6 @@ describe('GradingSchemeInput', () => {
         schemeInputType="percentage"
         onSave={onSave}
         ref={gradingSchemeInputRef}
-        archivedGradingSchemesEnabled={false}
       />
     )
     act(() => gradingSchemeInputRef.current?.savePressed())
@@ -615,7 +614,6 @@ describe('GradingSchemeInput', () => {
         schemeInputType="percentage"
         onSave={onSave}
         ref={gradingSchemeInputRef}
-        archivedGradingSchemesEnabled={false}
       />
     )
     act(() => gradingSchemeInputRef.current?.savePressed())
@@ -635,7 +633,6 @@ describe('GradingSchemeInput', () => {
         }}
         schemeInputType="percentage"
         onSave={onSave}
-        archivedGradingSchemesEnabled={false}
       />
     )
 
@@ -684,7 +681,6 @@ describe('GradingSchemeInput', () => {
         }}
         onSave={onSave}
         schemeInputType="percentage"
-        archivedGradingSchemesEnabled={false}
       />
     )
 

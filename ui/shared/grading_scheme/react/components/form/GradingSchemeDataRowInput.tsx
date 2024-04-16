@@ -184,6 +184,7 @@ export const GradingSchemeDataRowInput = ({
                 ]}
                 style={{margin: '0'}}
                 disabled={editSchemeDataDisabled}
+                data-testid="grading-scheme-letter-grade-input"
               />
             </Flex.Item>
           </Flex>
@@ -303,7 +304,7 @@ export const GradingSchemeDataRowInput = ({
               <IconButton
                 screenReaderLabel={I18n.t('Remove letter grade row')}
                 onClick={onRowDeleteRequested}
-                disabled={editSchemeDataDisabled}
+                disabled={editSchemeDataDisabled || (isLastRow && isFirstRow)}
               >
                 <IconTrashLine />
               </IconButton>

@@ -66,7 +66,7 @@ describe('useGradingSchemesHook', () => {
     const loadedGradingSchemes = await result.current.loadGradingSchemes('Course', courseId)
     const lastCall = doFetchApi.mock.calls.pop()
     expect(lastCall[0]).toMatchObject({
-      path: `/courses/${courseId}/grading_schemes`,
+      path: `/courses/${courseId}/grading_schemes?include_archived=false`,
       method: 'GET',
     })
 
@@ -98,7 +98,7 @@ describe('useGradingSchemesHook', () => {
     const loadedGradingSchemes = await result.current.loadGradingSchemes('Account', accountId)
     const lastCall = doFetchApi.mock.calls.pop()
     expect(lastCall[0]).toMatchObject({
-      path: `/accounts/${accountId}/grading_schemes`,
+      path: `/accounts/${accountId}/grading_schemes?include_archived=false`,
       method: 'GET',
     })
 
