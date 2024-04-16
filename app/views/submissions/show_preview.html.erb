@@ -38,9 +38,6 @@
     annotation_context = @submission.annotation_context(attempt: @submission.attempt)
     preview_url_opts[:annotation_context] = annotation_context.launch_id
   end
-
-  react_discussions_post = @context.is_a?(Course) ? @context.feature_enabled?(:react_discussions_post) : @context.context.feature_enabled?(:react_discussions_post)
-  discussion_preview_div_style = react_discussions_post ? 'width: 100%' : 'width: 600px; margin: 10px auto;'
 %>
 
 <% css_bundle :submission %>
@@ -50,59 +47,42 @@
 
 <% provide :page_title do %><%= join_title @assignment.title, t("Submission Preview") %><% end %>
 <% if @assignment.submission_types == 'discussion_topic' && @assignment.discussion_topic %>
-  <div style="<%= discussion_preview_div_style %>"
+  <div style="width: 600px; margin: 10px auto;">
     <p>
-      <%unless react_discussions_post%>
-        <% if assignment_visible_to_user = @assignment.visible_to_user?(@current_user)%>
-          <% if @assignment.discussion_topic.for_group_discussion? && (group = @assignment.discussion_topic.group_category.group_for(@user)) %>
-            <%= t('group_discussion_submission_description',
-                    "The submissions for this assignment are posts in the assignment's discussion for this group. Below are the discussion posts for %{user}, or you can *view the full group discussion*.",
-                    :user => user_name,
-                    :wrapper => "<a id='discussion_view_link' href=\"#{context_url(group, :context_discussion_topics_url, :root_discussion_topic_id => @assignment.discussion_topic.id, :hide_student_names => params[:hide_student_name], :student_id => @submission.user.id, :headless => 1, :embed => true, )}\"><b>\\1</b></a>") %>
-          <% else %>
-            <%= t('discussion_submission_description',
-                    "The submissions for this assignment are posts in the assignment's discussion. Below are the discussion posts for %{user}, or you can *view the full discussion*.",
-                    :user => user_name,
-                    :wrapper => "<a id='discussion_view_link' href=\"#{context_url(@assignment.context, :context_discussion_topic_url, @assignment.discussion_topic.id, :hide_student_names => params[:hide_student_name], :student_id => @submission.user.id, :headless => 1)}\"><b>\\1</b></a>") %>
-          <% end %>
+      <% if assignment_visible_to_user = @assignment.visible_to_user?(@current_user)%>
+        <% if @assignment.discussion_topic.for_group_discussion? && (group = @assignment.discussion_topic.group_category.group_for(@user)) %>
+          <%= t('group_discussion_submission_description',
+                  "The submissions for this assignment are posts in the assignment's discussion for this group. Below are the discussion posts for %{user}, or you can *view the full group discussion*.",
+                  :user => user_name,
+                  :wrapper => "<a id='discussion_view_link' href=\"#{context_url(group, :context_discussion_topics_url, :root_discussion_topic_id => @assignment.discussion_topic.id, :hide_student_names => params[:hide_student_name], :student_id => @submission.user.id, :headless => 1)}\"><b>\\1</b></a>") %>
         <% else %>
-          <% if @assignment.discussion_topic.for_group_discussion? && (group = @assignment.discussion_topic.group_category.group_for(@user)) %>
-            <%= t('group_discussion_submission_description_without_link',
-                    "The submissions for this assignment are posts in the assignment's discussion for this group. Below are the discussion posts for %{user}.",
-                    :user => user_name) %>
-          <% else %>
-            <%= t('discussion_submission_description_without_link',
-                    "The submissions for this assignment are posts in the assignment's discussion. Below are the discussion posts for %{user}.",
-                    :user => user_name) %>
-          <% end %>
+          <%= t('discussion_submission_description',
+                  "The submissions for this assignment are posts in the assignment's discussion. Below are the discussion posts for %{user}, or you can *view the full discussion*.",
+                  :user => user_name,
+                  :wrapper => "<a id='discussion_view_link' href=\"#{context_url(@assignment.context, :context_discussion_topic_url, @assignment.discussion_topic.id, :hide_student_names => params[:hide_student_name], :student_id => @submission.user.id, :headless => 1)}\"><b>\\1</b></a>") %>
+        <% end %>
+      <% else %>
+        <% if @assignment.discussion_topic.for_group_discussion? && (group = @assignment.discussion_topic.group_category.group_for(@user)) %>
+          <%= t('group_discussion_submission_description_without_link',
+                  "The submissions for this assignment are posts in the assignment's discussion for this group. Below are the discussion posts for %{user}.",
+                  :user => user_name) %>
+        <% else %>
+          <%= t('discussion_submission_description_without_link',
+                  "The submissions for this assignment are posts in the assignment's discussion. Below are the discussion posts for %{user}.",
+                  :user => user_name) %>
         <% end %>
       <% end %>
     </p>
-    <% is_group_discussion = @assignment.discussion_topic.for_group_discussion? 
-      @entries = is_group_discussion ? 
-        @assignment.discussion_topic.child_topics.map{ |t|t.discussion_entries.active.for_user(@user) }.flatten.sort_by{|e| e.created_at}  :
-        @assignment.discussion_topic.discussion_entries.active.for_user(@user)
-      hidden_user_id = params[:hide_student_name] ? @user.id : nil
-      discussion_iframe_src = is_group_discussion ?
-        context_url(@entries.first.discussion_topic.context, :context_discussion_topic_url, @entries.first.discussion_topic.id, :embed => true, :entry_id => @entries.first.id, :hidden_user_id => hidden_user_id) :
-        context_url(@assignment.context, :context_discussion_topic_url, @assignment.discussion_topic.id, :embed => true, :entry_id => @entries.first.id, :hidden_user_id => hidden_user_id )%>
-    <% if @assignment.context.feature_enabled?(:react_discussions_post) %>
-      <div class="ef-file-preview-stretch">
-        <iframe
-          id="discussion_preview_iframe"
-          title="<%= t "Graded discussion submission" %>"
-          src="<%= discussion_iframe_src %>"
-          class="ef-file-preview-frame">
-        </iframe>
-      </div>
-    <% else %>
-      <% @entries.each do |entry| %>
-        <%= render :partial => 'discussion_topics/entry', :object => entry, :locals => {:out_of_context => true, :skip_sub_entries => true, :link_to_headless => true, :hide_student_names => params[:hide_student_name], :assignment_visible_to_user => assignment_visible_to_user} %>
-      <% end %>
-      <div style="text-align: center; font-size: 1.2em; margin-top: 10px; display: none;">
-        <a href="<%= context_url(@assignment.context, :context_discussion_topic_url, @assignment.discussion_topic.id, :headless => 1, :combined => 1) %>" class="forward"><%= t('show_entire_discussion', 'Show the Entire Discussion') %></a>
-      </div>
+    <% @entries = @assignment.discussion_topic.discussion_entries.active.for_user(@user) %>
+    <% if @assignment.discussion_topic.for_group_discussion? %>
+      <% @entries = @assignment.discussion_topic.child_topics.map{|t| t.discussion_entries.active.for_user(@user) }.flatten.sort_by{|e| e.created_at} %>
     <% end %>
+    <% @entries.each do |entry| %>
+      <%= render :partial => 'discussion_topics/entry', :object => entry, :locals => {:out_of_context => true, :skip_sub_entries => true, :link_to_headless => true, :hide_student_names => params[:hide_student_name], :assignment_visible_to_user => assignment_visible_to_user} %>
+    <% end %>
+    <div style="text-align: center; font-size: 1.2em; margin-top: 10px; display: none;">
+      <a href="<%= context_url(@assignment.context, :context_discussion_topic_url, @assignment.discussion_topic.id, :headless => 1, :combined => 1) %>" class="forward"><%= t('show_entire_discussion', 'Show the Entire Discussion') %></a>
+    </div>
   </div>
 <% elsif @submission.submission_type == "online_url" %>
   <div style="text-align: center; width: 500px; margin: 10px auto; font-size: 0.8em;">
