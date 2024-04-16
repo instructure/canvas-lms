@@ -21,14 +21,7 @@ import {AnonymousUser} from '../../../graphql/AnonymousUser'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 import React, {useContext, useMemo} from 'react'
-import {
-  getDisplayName,
-  hideStudentNames,
-  isAnonymous,
-  resolveAuthorRoles,
-  responsiveQuerySizes,
-  userNameToShow,
-} from '../../utils'
+import {getDisplayName, isAnonymous, resolveAuthorRoles, responsiveQuerySizes} from '../../utils'
 import {RolePillContainer} from '../RolePillContainer/RolePillContainer'
 import {SearchContext} from '../../utils/constants'
 import {SearchSpan} from '../SearchSpan/SearchSpan'
@@ -116,7 +109,7 @@ export const AuthorInfo = props => {
                 />
               </div>
             )}
-            {hasAuthor && !isAnonymous(props) && !hideStudentNames && (
+            {hasAuthor && !isAnonymous(props) && (
               <Avatar
                 size={responsiveProps.avatarSize}
                 name={getDisplayName(props)}
@@ -124,9 +117,6 @@ export const AuthorInfo = props => {
                 margin="0"
                 data-testid="author_avatar"
               />
-            )}
-            {hasAuthor && !isAnonymous(props) && hideStudentNames && (
-              <AnonymousAvatar seedString={props.author._id} size={responsiveProps.avatarSize} />
             )}
             {hasAuthor && isAnonymous(props) && (
               <AnonymousAvatar
@@ -150,7 +140,7 @@ export const AuthorInfo = props => {
                         data-testid="author_name"
                         wrap="break-word"
                       >
-                        {isAnonymous(props) || hideStudentNames ? (
+                        {isAnonymous(props) ? (
                           getDisplayName(props)
                         ) : (
                           <NameLink
@@ -272,23 +262,10 @@ const Timestamps = props => {
     if (props.editor && props.editor?._id !== props.author?._id) {
       return (
         <span data-testid="editedByText">
-          {!hideStudentNames ? (
-            <>
-              {I18n.t('Edited by')} <NameLink userType="editor" user={props.editor} />{' '}
-              {I18n.t('%{editedTimingDisplay}', {
-                editedTimingDisplay: props.editedTimingDisplay,
-              })}
-            </>
-          ) : (
-            I18n.t('Edited by %{editorName} %{editedTimingDisplay}', {
-              editorName: userNameToShow(
-                props.editor.displayName,
-                props.author.id,
-                props.editor.courseRoles
-              ),
-              editedTimingDisplay: props.editedTimingDisplay,
-            })
-          )}
+          {I18n.t('Edited by')} <NameLink userType="editor" user={props.editor} />{' '}
+          {I18n.t('%{editedTimingDisplay}', {
+            editedTimingDisplay: props.editedTimingDisplay,
+          })}
         </span>
       )
     } else {
