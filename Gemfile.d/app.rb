@@ -52,7 +52,7 @@ gem "docx", "~> 0.8"
 gem "encrypted_cookie_store-instructure", "~> 1.2", require: "encrypted_cookie_store"
 gem "gepub", "1.0.15"
 gem "apollo-federation", "~> 3.8"
-gem "graphql", "~> 2.1.10"
+gem "graphql", "~> 2.2.14"
 gem "graphql-batch", "~> 0.5"
 gem "highline", "~> 3.0", require: false
 gem "httparty", "~> 0.21"
