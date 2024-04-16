@@ -45,6 +45,10 @@ module CourseWikiPage
     ".delete_pages"
   end
 
+  def assign_to_btn_selector
+    ".assign-to-button"
+  end
+
   #------------------------------ Elements ------------------------------
   def publish_btn
     f(publish_btn_selector)
@@ -112,6 +116,10 @@ module CourseWikiPage
 
   def course_home_nav_menu
     fj("a:contains('Home')")
+  end
+
+  def assign_to_btn
+    f(assign_to_btn_selector)
   end
 
   #------------------------------ Actions -------------------------------

@@ -35,6 +35,7 @@ import '../../jquery/content_locks'
 import DirectShareUserModal from '@canvas/direct-sharing/react/components/DirectShareUserModal'
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
 import {renderFrontPagePill} from '@canvas/wiki/react/renderFrontPagePill'
+import ItemAssignToTray from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToTray'
 
 const I18n = useI18nScope('pages')
 
@@ -57,6 +58,7 @@ export default class WikiPageView extends Backbone.View {
       'click .unset-as-front-page-menu-item': 'unsetAsFrontPage',
       'click .direct-share-send-to-menu-item': 'openSendTo',
       'click .direct-share-copy-to-menu-item': 'openCopyTo',
+      'click .assign-to-button': 'onAssign',
     }
 
     this.optionProperty('modules_path')
@@ -278,6 +280,39 @@ export default class WikiPageView extends Backbone.View {
     )
   }
 
+  onAssign(e) {
+    if (e) e.preventDefault()
+    this.renderItemAssignToTray(true)
+  }
+
+  renderItemAssignToTray(open) {
+    const returnFocusTo = document.querySelector('.assign-to-button')
+    const mountPoint = document.getElementById('assign-to-mount-point')
+    const onTrayClose = () => {
+      this.renderItemAssignToTray(false, returnFocusTo)
+      returnFocusTo.focus()
+    }
+    const onTrayExited = () => ReactDOM.unmountComponentAtNode(mountPoint)
+
+    ReactDOM.render(
+      <ItemAssignToTray
+        open={open}
+        onClose={onTrayClose}
+        onDismiss={onTrayClose}
+        onExited={onTrayExited}
+        iconType="page"
+        itemType="page"
+        locale={ENV.LOCALE || 'en'}
+        timezone={ENV.TIMEZONE || 'UTC'}
+        courseId={this.course_id}
+        itemName={this.model.get('title')}
+        itemContentId={this.model.get('page_id')}
+        removeDueDateInput={true}
+      />,
+      mountPoint
+    )
+  }
+
   toJSON() {
     const json = super.toJSON(...arguments)
     json.page_id = this.model.get('page_id')
@@ -295,6 +330,7 @@ export default class WikiPageView extends Backbone.View {
       UPDATE_CONTENT: !!this.PAGE_RIGHTS.update || !!this.PAGE_RIGHTS.update_content,
       DELETE: !!this.PAGE_RIGHTS.delete && !this.course_home,
       READ_REVISIONS: !!this.PAGE_RIGHTS.read_revisions,
+      UPDATE: !!this.WIKI_RIGHTS.update,
     }
     json.CAN.DIRECT_SHARE = !!ENV.DIRECT_SHARE_ENABLED
     json.CAN.ACCESS_GEAR_MENU = json.CAN.DELETE || json.CAN.READ_REVISIONS || json.CAN.DIRECT_SHARE
@@ -306,6 +342,7 @@ export default class WikiPageView extends Backbone.View {
       json.CAN.ACCESS_GEAR_MENU
     json.recent_announcements_enabled = !!ENV.SHOW_ANNOUNCEMENTS
     json.explicit_latex_typesetting = !!ENV.FEATURES?.explicit_latex_typesetting
+    json.differentiated_modules = !!ENV.FEATURES.differentiated_modules
 
     if (json.lock_info) {
       json.lock_info = clone(json.lock_info)

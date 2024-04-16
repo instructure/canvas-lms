@@ -145,12 +145,16 @@ module ItemsAssignToTray
       .map { |date, time| DateTime.parse("#{date} #{time}") }
   end
 
-  def assign_to_available_from_date(card_number = 0)
-    assign_to_date[1 + (card_number * 3)]
+  def assign_to_available_from_date(card_number = 0, exclude_due_date = false)
+    position = exclude_due_date ? 0 : 1
+    number_of_fields = exclude_due_date ? 2 : 3
+    assign_to_date[position + (card_number * number_of_fields)]
   end
 
-  def assign_to_available_from_time(card_number = 0)
-    assign_to_time[1 + (card_number * 3)]
+  def assign_to_available_from_time(card_number = 0, exclude_due_date = false)
+    position = exclude_due_date ? 0 : 1
+    number_of_fields = exclude_due_date ? 2 : 3
+    assign_to_time[position + (card_number * number_of_fields)]
   end
 
   def assign_to_due_date(card_number = 0)
@@ -169,12 +173,16 @@ module ItemsAssignToTray
     ffxpath(assign_to_time_selector)
   end
 
-  def assign_to_until_date(card_number = 0)
-    assign_to_date[2 + (card_number * 3)]
+  def assign_to_until_date(card_number = 0, exclude_due_date = false)
+    position = exclude_due_date ? 1 : 2
+    number_of_fields = exclude_due_date ? 2 : 3
+    assign_to_date[position + (card_number * number_of_fields)]
   end
 
-  def assign_to_until_time(card_number = 0)
-    assign_to_time[2 + (card_number * 3)]
+  def assign_to_until_time(card_number = 0, exclude_due_date = false)
+    position = exclude_due_date ? 1 : 2
+    number_of_fields = exclude_due_date ? 2 : 3
+    assign_to_time[position + (card_number * number_of_fields)]
   end
 
   def selected_assignee_options
@@ -268,20 +276,20 @@ module ItemsAssignToTray
     replace_content(assign_to_due_time(card_number), due_time, tab_out: true)
   end
 
-  def update_available_date(card_number, available_date)
-    replace_content(assign_to_available_from_date(card_number), available_date, tab_out: true)
+  def update_available_date(card_number, available_date, exclude_due_date = false)
+    replace_content(assign_to_available_from_date(card_number, exclude_due_date), available_date, tab_out: true)
   end
 
-  def update_available_time(card_number, available_time)
-    replace_content(assign_to_available_from_time(card_number), available_time, tab_out: true)
+  def update_available_time(card_number, available_time, exclude_due_date = false)
+    replace_content(assign_to_available_from_time(card_number, exclude_due_date), available_time, tab_out: true)
   end
 
-  def update_until_date(card_number, until_date)
-    replace_content(assign_to_until_date(card_number), until_date, tab_out: true)
+  def update_until_date(card_number, until_date, exclude_due_date = false)
+    replace_content(assign_to_until_date(card_number, exclude_due_date), until_date, tab_out: true)
   end
 
-  def update_until_time(card_number, until_time)
-    replace_content(assign_to_until_time(card_number), until_time, tab_out: true)
+  def update_until_time(card_number, until_time, exclude_due_date = false)
+    replace_content(assign_to_until_time(card_number, exclude_due_date), until_time, tab_out: true)
   end
 
   def wait_for_assign_to_tray_spinner
