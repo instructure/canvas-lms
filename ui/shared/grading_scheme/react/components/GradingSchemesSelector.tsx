@@ -60,6 +60,7 @@ export type GradingSchemesSelectorProps = {
   contextId: string
   courseDefaultSchemeId?: string
   initiallySelectedGradingSchemeId?: string
+  assignmentId?: string | null
   archivedGradingSchemesEnabled: boolean
   shrinkSearchBar?: boolean
   onChange: (gradingStandardId?: string) => any
@@ -71,8 +72,9 @@ export const GradingSchemesSelector = ({
   contextType,
   contextId,
   courseDefaultSchemeId,
-  shrinkSearchBar = false,
   archivedGradingSchemesEnabled,
+  shrinkSearchBar = false,
+  assignmentId = null,
 }: GradingSchemesSelectorProps) => {
   if (initiallySelectedGradingSchemeId === '0' || initiallySelectedGradingSchemeId === '') {
     initiallySelectedGradingSchemeId = undefined
@@ -106,7 +108,11 @@ export const GradingSchemesSelector = ({
   useEffect(() => {
     const loadSchemes = async () => {
       try {
-        const summaries = await loadGradingSchemeSummaries(contextType, contextId)
+        const summaries = await loadGradingSchemeSummaries(
+          contextType,
+          contextId,
+          archivedGradingSchemesEnabled ? assignmentId : null
+        )
         setGradingSchemeSummaries(summaries)
         const defaultScheme = await loadDefaultGradingScheme(contextType, contextId)
         setDefaultCanvasGradingScheme(defaultScheme)
@@ -123,6 +129,7 @@ export const GradingSchemesSelector = ({
     contextId,
     archivedGradingSchemesEnabled,
     initiallySelectedGradingSchemeId,
+    assignmentId,
   ])
 
   if (gradingSchemeSummaries && selectedGradingSchemeId) {
@@ -172,6 +179,8 @@ export const GradingSchemesSelector = ({
     )
     if (archivedGradingSchemesEnabled && updatedGradingScheme) {
       setSelectedGradingScheme(updatedGradingScheme)
+      setSelectedGradingSchemeId(undefined)
+      setSelectedGradingSchemeId(updatedGradingScheme.id)
     }
   }
   function handleDeletedGradingScheme(gradingSchemeId: string) {
@@ -220,7 +229,12 @@ export const GradingSchemesSelector = ({
     setSelectedGradingScheme(undefined)
     try {
       const scheme = selectedGradingSchemeId
-        ? await loadGradingScheme(contextType, contextId, selectedGradingSchemeId)
+        ? await loadGradingScheme(
+            contextType,
+            contextId,
+            selectedGradingSchemeId,
+            archivedGradingSchemesEnabled ? assignmentId : null
+          )
         : defaultCanvasGradingScheme
       setSelectedGradingScheme(scheme)
       setShowViewGradingSchemeModal(true)
@@ -250,7 +264,11 @@ export const GradingSchemesSelector = ({
     setShowEditGradingSchemeModal(true)
   }
   function handleGradingSchemesChanged() {
-    loadGradingSchemeSummaries(contextType, contextId)
+    loadGradingSchemeSummaries(
+      contextType,
+      contextId,
+      archivedGradingSchemesEnabled ? assignmentId : null
+    )
       .then(loadedGradingSchemes => {
         const matchingSelectedId = loadedGradingSchemes.filter(
           gradingSchemeSummary => gradingSchemeSummary.id === selectedGradingSchemeId
@@ -364,7 +382,11 @@ export const GradingSchemesSelector = ({
             shouldGrow={!archivedGradingSchemesEnabled || !shrinkSearchBar}
           >
             <View as="div" withVisualDebug={false}>
-              <FormField label="" id={shortid()}>
+              <FormField
+                label=""
+                id={shortid()}
+                data-testid="grading-schemes-selector-dropdown-form"
+              >
                 {archivedGradingSchemesEnabled ? (
                   <SimpleSelect
                     value={selectedGradingSchemeId ?? ''}
@@ -461,7 +483,10 @@ export const GradingSchemesSelector = ({
           {!archivedGradingSchemesEnabled && (
             <Flex.Item>
               <View as="div" margin="none none none xx-small" withVisualDebug={false}>
-                <Button onClick={openGradingSchemeViewEditModal}>
+                <Button
+                  onClick={openGradingSchemeViewEditModal}
+                  data-testid="grading-schemes-selector-view-button"
+                >
                   {canManage ? I18n.t('View/Edit') : I18n.t('View')}
                 </Button>
               </View>
@@ -512,7 +537,11 @@ export const GradingSchemesSelector = ({
         )}
         {canManage && true && (
           <View as="div" margin="none none small none" withVisualDebug={false}>
-            <CondensedButton color="primary" onClick={openManageGradingSchemesModal}>
+            <CondensedButton
+              color="primary"
+              onClick={openManageGradingSchemesModal}
+              data-testid="manage-all-grading-schemes-button"
+            >
               {I18n.t('Manage All Grading Schemes')}
             </CondensedButton>
           </View>
@@ -611,6 +640,7 @@ export const GradingSchemesSelector = ({
                 offset="small"
                 onClick={closeManageGradingSchemesModal}
                 screenReaderLabel={I18n.t('Close')}
+                data-testid="manage-all-grading-schemes-close-button"
               />
               <Heading>{I18n.t('Manage All Grading Schemes')}</Heading>
             </Modal.Header>

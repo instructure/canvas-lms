@@ -117,7 +117,7 @@ export const GradingSchemesManagement = ({
   const gradingSchemeCreateRef = useRef<GradingSchemeInputHandle>(null)
   const gradingSchemeUpdateRef = useRef<GradingSchemeInputHandle>(null)
   useEffect(() => {
-    loadGradingSchemes(contextType, contextId)
+    loadGradingSchemes(contextType, contextId, archivedGradingSchemesEnabled)
       .then(gradingSchemes => {
         setGradingSchemeCards(
           gradingSchemes

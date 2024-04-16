@@ -97,7 +97,7 @@ class GradingStandard < ActiveRecord::Base
     can :manage
   end
 
-  def self.for(context)
+  def self.for(context, include_archived: false)
     unless Account.site_admin.feature_enabled?(:archived_grading_schemes)
       return GradingStandard.active.for_context(context)
     end
@@ -106,14 +106,14 @@ class GradingStandard < ActiveRecord::Base
     when Account
       for_account(context)
     when Course
-      for_course(context)
+      for_course(context, include_archived:)
     else
-      for_assignment(context)
+      for_assignment(context, include_archived:)
     end
   end
 
-  def self.for_assignment(assignment)
-    standards = GradingStandard.active.for_context(assignment.context)
+  def self.for_assignment(assignment, include_archived: false)
+    standards = include_archived ? GradingStandard.for_context(assignment.context) : GradingStandard.active.for_context(assignment.context)
     standards = GradingStandard.where(id: standards)
     course_scheme = assignment.context.grading_standard
     standards = standards.union(GradingStandard.where(id: course_scheme)) if course_scheme&.archived?
@@ -123,8 +123,8 @@ class GradingStandard < ActiveRecord::Base
     standards
   end
 
-  def self.for_course(course)
-    standards = GradingStandard.active.for_context(course)
+  def self.for_course(course, include_archived: false)
+    standards = include_archived ? GradingStandard.for_context(course) : GradingStandard.active.for_context(course)
     standards = GradingStandard.where(id: standards)
     standards = standards.union(GradingStandard.where(id: course.grading_standard)) if course.grading_standard&.archived?
     standards
