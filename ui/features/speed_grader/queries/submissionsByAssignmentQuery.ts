@@ -38,6 +38,7 @@ const SUBMISSIONS_BY_ASSIGNMENT_QUERY = gql`
           excused
           excused
           gradeMatchesCurrentSubmission
+          submissionCommentDownloadUrl
           gradingPeriodId
           gradingStatus
           groupId
