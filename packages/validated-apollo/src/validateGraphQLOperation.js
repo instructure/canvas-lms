@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {validate, specifiedRules, coerceValue, GraphQLError} from 'graphql'
+import {validate, specifiedRules, coerceInputValue, GraphQLError} from 'graphql'
 
 export function validateGraphQLOperation(schema, query, variables = {}, extraRules = []) {
   const validationRules = [
@@ -55,12 +55,11 @@ function ValidateVariableValueMatchesType(variables = {}) {
       const variableName = node.variable.name.value
       const variableValue = variables[variableName]
       const variableType = context.getInputType()
-      const {errors = []} = coerceValue(variableValue, variableType)
-      errors.forEach(err =>
+      coerceInputValue(variableValue, variableType, (path, invalidValue, error) => {
         context.reportError(
-          new GraphQLError(`Unable to coerce variable: "${variableName}": ${err}`)
+          new GraphQLError(`Unable to coerce variable: "${variableName}": ${error}`)
         )
-      )
+      })
     },
   })
 }
