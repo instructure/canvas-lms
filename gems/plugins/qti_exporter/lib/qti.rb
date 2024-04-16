@@ -74,6 +74,14 @@ module Qti
     doc = Nokogiri::XML(File.open(manifest_path))
     doc.css("manifest resources resource[type=imsqti_assessment_xmlv2p1], manifest resources resource[type=imsqti_test_xmlv2p1]").each do |item|
       a = AssessmentTestConverter.new(item, File.dirname(manifest_path), opts).create_instructure_quiz
+      if Account.site_admin.feature_enabled?(:common_cartridge_qti_new_quizzes_import) && a && a[:migration_id] && opts && opts[:package_root]
+        nq_assessment_path = opts[:package_root].item_path("non_cc_assessments/#{a[:migration_id]}.xml.qti")
+        if File.exist?(nq_assessment_path)
+          nq_assessment_file = Nokogiri::XML(File.open(nq_assessment_path))
+          is_qti_new_quiz = !nq_assessment_file.css("questestinterop assessment").first.attr("external_assignment_id").nil?
+          a[:qti_new_quiz] = true if is_qti_new_quiz
+        end
+      end
       assessments << a if a
     end
     assessments

@@ -265,6 +265,34 @@ if Qti.migration_executable
       expect(@course.quizzes.first.description).to eq "<p>Quiz Description</p>"
     end
 
+    it "loads qti new quiz identifier when import file contains it" do
+      allow(Account.site_admin)
+        .to receive(:feature_enabled?)
+        .with(:common_cartridge_qti_new_quizzes_import)
+        .and_return(true)
+      setup_migration(File.expand_path("fixtures/qti/lti_qti_new_quizzes.zip", __dir__))
+      expect(Canvas::Migration::Worker).to receive(:upload_overview_file) do |arg1, _arg2|
+        overview = JSON.parse(File.read(arg1.path))
+        export_file = JSON.parse(File.read(overview["full_export_file_path"]))
+        expect(export_file["assessments"]["assessments"].first["qti_new_quiz"]).to be true
+      end
+      do_migration
+      expect(@course.quizzes.count).to eq 1
+      expect(@course.quizzes.first.title).to eq "new_quiz"
+    end
+
+    it "does not load qti new quiz identifier when import file does not contain it" do
+      setup_migration(File.expand_path("fixtures/qti/canvas_qti.zip", __dir__))
+      expect(Canvas::Migration::Worker).to receive(:upload_overview_file) do |arg1, _arg2|
+        overview = JSON.parse(File.read(arg1.path))
+        export_file = JSON.parse(File.read(overview["full_export_file_path"]))
+        expect(export_file["assessments"]["assessments"].first["qti_new_quiz"]).to be_nil
+      end
+      do_migration
+      expect(@course.quizzes.count).to eq 1
+      expect(@course.quizzes.first.description).to eq "<p>Quiz Description</p>"
+    end
+
     describe "applying respondus settings" do
       before do
         @copy = Tempfile.new(["spec-canvas", ".zip"])
