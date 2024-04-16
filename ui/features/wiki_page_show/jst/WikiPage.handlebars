@@ -46,6 +46,11 @@
           </div>
           {{/unless}}
           <div class="buttons">
+            {{#if differentiated_modules}}
+              {{#if CAN.UPDATE}}
+                <button class="btn assign-to-button"><i class="icon-permissions"></i><span class="hide-when-small"> {{#t 'buttons.assign_to'}}Assign To{{/t}}</span></button>
+              {{/if}}
+            {{/if}}
             {{#unless cannot_edit_by_master_course}}
               {{#if CAN.UPDATE_CONTENT}}
                 <a href="{{wiki_page_edit_path}}" class="btn edit-wiki"><i class="icon-edit"></i><span class="hide-when-small"> {{#t 'buttons.edit'}}Edit{{/t}}</span></a>
@@ -104,4 +109,5 @@
   {{else}}
     {{convertApiUserContent body}}
   {{/if}}
+<div id="assign-to-mount-point"></div>
 </div>

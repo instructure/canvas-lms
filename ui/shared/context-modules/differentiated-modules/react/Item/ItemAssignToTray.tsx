@@ -33,6 +33,7 @@ import {
   IconQuizSolid,
   IconQuestionLine,
   IconDiscussionLine,
+  IconDocumentLine,
 } from '@instructure/ui-icons'
 import {showFlashAlert, showFlashError} from '@canvas/alerts/react/FlashAlert'
 import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
@@ -67,6 +68,8 @@ function itemTypeToIcon(iconType: string) {
       return <IconQuizSolid data-testid="icon-lti-quiz" />
     case 'discussion':
       return <IconDiscussionLine data-testid="icon-discussion" />
+    case 'page':
+      return <IconDocumentLine data-testid="icon-page" />
     default:
       return <IconQuestionLine data-testid="icon-unknown" />
   }
@@ -81,6 +84,8 @@ function itemTypeToApiURL(courseId: string, itemType: string, itemId: string) {
       return `/api/v1/courses/${courseId}/quizzes/${itemId}/date_details`
     case 'discussion':
       return `/api/v1/courses/${courseId}/discussion_topics/${itemId}/date_details`
+    case 'page':
+      return `/api/v1/courses/${courseId}/pages/${itemId}/date_details`
     default:
       return ''
   }
@@ -138,6 +143,7 @@ export interface ItemAssignToTrayProps {
   onSave?: (overrides: ItemAssignToCardSpec[]) => void
   onClose: () => void
   onDismiss: () => void
+  onExited?: () => void
   courseId: string
   itemName: string
   itemType: string
@@ -165,6 +171,7 @@ export default function ItemAssignToTray({
   open,
   onSave,
   onClose,
+  onExited,
   onDismiss,
   courseId,
   itemName,
@@ -578,6 +585,8 @@ export default function ItemAssignToTray({
         return I18n.t('Quiz')
       case 'discussion':
         return I18n.t('Discussion')
+      case 'page':
+        return I18n.t('Page')
       default:
         return ''
     }
@@ -662,6 +671,7 @@ export default function ItemAssignToTray({
     <Tray
       data-testid="module-item-edit-tray"
       onClose={onClose}
+      onExited={onExited}
       label={I18n.t('Edit assignment %{name}', {
         name: itemName,
       })}
