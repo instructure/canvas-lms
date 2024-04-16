@@ -6,7 +6,7 @@ namespace :graphql do
     Rails.root.join("schema.graphql").open("w") do |f|
       # The front-end library in use doesn't support @specifiedBy until v15.1.0 - remove it for now
       # and match the behaviour of the previous schema dump
-      f.puts CanvasSchema.to_definition
+      f.puts CanvasSchema.to_definition.gsub(/@specifiedBy.*/, "")
     end
 
     Rails.root.join("ui/shared/apollo/fragmentTypes.json").open("w") do |f|
