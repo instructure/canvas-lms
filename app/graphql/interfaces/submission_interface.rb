@@ -442,6 +442,11 @@ module Interfaces::SubmissionInterface
     end
   end
 
+  field :submission_comment_download_url, String, null: true
+  def submission_comment_download_url
+    "/submissions/#{object.id}/comments.pdf"
+  end
+
   field :word_count, Float, null: true
   delegate :word_count, to: :object
 end

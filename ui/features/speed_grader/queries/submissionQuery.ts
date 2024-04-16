@@ -51,6 +51,7 @@ const SUBMISSION_QUERY = gql`
             name
           }
           gradeMatchesCurrentSubmission
+          submissionCommentDownloadUrl
           score
           excused
           id
