@@ -23,6 +23,17 @@ return unless Plugin.installed?("bundler-multilock")
 
 Plugin.send(:load_plugin, "bundler-multilock")
 
+return if is_a?(Bundler::Plugin::DSL)
+
+gemfile_root.glob("gems/plugins/*/Gemfile.d/_before.rb") do |file|
+  eval_gemfile(file)
+end
+
+unless dependencies.empty?
+  Bundler.ui.error("_before.rb from plugins should only modify the Gemfile logic, not introduce gem dependencies")
+  exit 1
+end
+
 require_relative "config/canvas_rails_switcher"
 
 gem "bundler", "~> 2.2"
@@ -80,12 +91,6 @@ module GemOverride
   end
 end
 Bundler::Dsl.prepend(GemOverride)
-
-if @include_plugins
-  gemfile_root.glob("gems/plugins/*/Gemfile.d/_before.rb") do |file|
-    eval_gemfile(file)
-  end
-end
 
 gemfile_root.glob("Gemfile.d/*.rb").each do |file|
   eval_gemfile(file)
