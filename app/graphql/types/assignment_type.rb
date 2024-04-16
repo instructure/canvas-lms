@@ -475,6 +475,15 @@ module Types
       SubmissionSearch.new(assignment, current_user, session, filter).search
     end
 
+    field :my_sub_assignment_submissions_connection, SubmissionType.connection_type, null: true
+    def my_sub_assignment_submissions_connection
+      return nil if current_user.nil?
+
+      load_association(:sub_assignment_submissions).then do |submissions|
+        submissions.active.where(user_id: current_user)
+      end
+    end
+
     field :grading_standard, GradingStandardType, null: true
     def grading_standard
       load_association(:grading_standard)
