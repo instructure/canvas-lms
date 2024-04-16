@@ -36,10 +36,11 @@ const I18n = useI18nScope('GradingSchemes')
 interface ComponentProps {
   gradingScheme: GradingScheme
   archivedGradingSchemesEnabled: boolean
-  disableEdit: boolean
   disableDelete: boolean
   onEditRequested?: () => any
   onDeleteRequested?: () => any
+  disableEdit?: boolean
+  archivedGradingSchemesDisableEdit?: boolean
 }
 
 export const GradingSchemeView: React.FC<ComponentProps> = ({
@@ -47,6 +48,7 @@ export const GradingSchemeView: React.FC<ComponentProps> = ({
   archivedGradingSchemesEnabled,
   disableEdit = false,
   disableDelete = false,
+  archivedGradingSchemesDisableEdit = false,
   onEditRequested,
   onDeleteRequested,
 }) => {
@@ -107,6 +109,7 @@ export const GradingSchemeView: React.FC<ComponentProps> = ({
                   screenReaderLabel={I18n.t('Edit Grading Scheme')}
                   onClick={onEditRequested}
                   data-testid={`grading-scheme-${gradingScheme.id}-edit-button`}
+                  disabled={archivedGradingSchemesDisableEdit}
                 >
                   <IconEditLine />
                 </IconButton>
