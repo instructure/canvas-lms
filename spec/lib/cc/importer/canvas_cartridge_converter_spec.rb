@@ -719,7 +719,7 @@ describe "Canvas Cartridge importing" do
     page_2 = @copy_to.wiki_pages.where(migration_id: hash[:migration_id]).first
     links = Nokogiri::HTML5.fragment(page_2.body).css("a")
     expect(links.count).to eq 2
-    expect(links.first["href"]).to eq "/media_objects/#{media_id}"
+    expect(links.first["href"]).to eq "/media_attachments_iframe/#{att.id}?embedded=true"
     expect(links.last["href"]).to eq "/courses/#{@copy_to.id}/files/#{att.id}/preview"
   end
 
@@ -742,7 +742,8 @@ describe "Canvas Cartridge importing" do
     }.with_indifferent_access
 
     media_id = "m_new-media-id"
-    @copy_to.attachments.find_by(filename: att.filename).update(media_entry_id: media_id)
+    att_to = @copy_to.attachments.find_by(filename: att.filename)
+    att_to.update(media_entry_id: media_id)
 
     @migration.attachment_path_id_lookup = { att.full_path => att.migration_id }
     Importers::WikiPageImporter.import_from_migration(hash, @copy_to, @migration)
@@ -751,7 +752,7 @@ describe "Canvas Cartridge importing" do
     page_2 = @copy_to.wiki_pages.where(migration_id: hash[:migration_id]).first
     expect(page_2.body).to include "</iframe>"
     frame = Nokogiri::HTML5.fragment(page_2.body).at_css("iframe")
-    expect(frame["src"]).to eq "/media_objects_iframe/#{media_id}?type=video"
+    expect(frame["src"]).to eq "/media_attachments_iframe/#{att_to.id}?embedded=true&type=video"
   end
 
   it "translates media sources on import" do
@@ -773,7 +774,8 @@ describe "Canvas Cartridge importing" do
     }.with_indifferent_access
 
     media_id = "m_new-media-id"
-    @copy_to.attachments.find_by(filename: att.filename).update(media_entry_id: media_id)
+    att_to = @copy_to.attachments.find_by(filename: att.filename)
+    att_to.update(media_entry_id: media_id)
 
     @migration.attachment_path_id_lookup = { att.full_path => att.migration_id }
     Importers::WikiPageImporter.import_from_migration(hash, @copy_to, @migration)
@@ -782,7 +784,7 @@ describe "Canvas Cartridge importing" do
     page_2 = @copy_to.wiki_pages.where(migration_id: hash[:migration_id]).first
     expect(page_2.body).to include "</iframe>"
     frame = Nokogiri::HTML5.fragment(page_2.body).at_css("iframe")
-    expect(frame["src"]).to eq "/media_objects_iframe/#{media_id}?type=video"
+    expect(frame["src"]).to eq "/media_attachments_iframe/#{att_to.id}?embedded=true&type=video"
   end
 
   context "Wiki page importing" do

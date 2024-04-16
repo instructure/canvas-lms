@@ -495,7 +495,6 @@ describe ContentMigration do
       data = { "question_type" => "text_only_question", "name" => "Hi", "question_text" => <<~HTML.strip }
         File ref:<img src="/courses/#{@copy_from.id}/files/#{@attachment.id}/download">
         different file ref: <img src="/courses/#{@copy_from.id}/file_contents/course%20files/unfiled/test.jpg">
-        media object: <a id="media_comment_0_l4l5n0wt" class="instructure_inline_media_comment video_comment" href="/media_objects/0_l4l5n0wt">this is a media comment</a>
         equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_216" alt="Log_216">
         link to some other course: <a href="/courses/#{@copy_from.id + @copy_to.id}">Cool Course</a>
         canvas image: <img style="max-width: 723px;" src="/images/preview.png" alt="">
@@ -512,6 +511,30 @@ describe ContentMigration do
       expect(aq.question_data["question_text"]).to match_ignoring_whitespace(@question.question_data["question_text"])
     end
 
+    it "changes old media file references in AQ context on copy" do
+      @bank = @copy_from.assessment_question_banks.create!(title: "Test Bank")
+      @attachment = attachment_with_context(@copy_from, media_entry_id: "0_l4l5n0wt")
+      data = { "question_type" => "text_only_question", "name" => "Hi", "question_text" => <<~HTML.strip }
+        media comment: <a id="media_comment_0_l4l5n0wt" class="instructure_inline_media_comment video_comment" href="/media_objects/0_l4l5n0wt">this is a media comment</a>
+        media object: <iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="/media_objects_iframe/0_l4l5n0wt?type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="0_l4l5n0wt"></iframe>
+      HTML
+      @question = @bank.assessment_questions.create!(question_data: data)
+
+      run_course_copy
+
+      bank = @copy_to.assessment_question_banks.first
+      expect(bank.assessment_questions.count).to eq 1
+      aq = bank.assessment_questions.first
+      # TODO: fix media attachments not being copied to assessment question context like other attachments
+      new_att = @copy_to.attachments.take
+      translated_body = <<~HTML.strip
+        media comment: <iframe id="media_comment_0_l4l5n0wt" class="instructure_inline_media_comment video_comment" style="width: 320px; height: 240px; display: inline-block;" title="this is a media comment" data-media-type="video" src="/media_attachments_iframe/#{new_att.id}?embedded=true&amp;type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="0_l4l5n0wt"></iframe>
+        media object: <iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="0_l4l5n0wt" src="/media_attachments_iframe/#{new_att.id}?embedded=true&amp;type=video"></iframe>
+      HTML
+
+      expect(aq.question_data["question_text"]).to match_ignoring_whitespace(translated_body)
+    end
+
     it "copies quiz question html file references correctly" do
       root = Folder.root_folders(@copy_from).first
       folder = root.sub_folders.create!(context: @copy_from, name: "folder 1")
@@ -524,7 +547,6 @@ describe ContentMigration do
         File ref:<img src="/courses/%s/files/%s/download">
         different file ref: <img src="/courses/%s/%s">
         subfolder file ref: <img src="/courses/%s/%s">
-        media object: <a id="media_comment_0_l4l5n0wt" class="instructure_inline_media_comment video_comment" href="/media_objects/0_l4l5n0wt">this is a media comment</a>
         equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_216" alt="Log_216">
       HTML
 
@@ -552,6 +574,31 @@ describe ContentMigration do
       qq_to = q_to.active_quiz_questions.first
       expect(qq_to.question_data[:question_text]).to match_ignoring_whitespace(qtext % ["/courses/#{@copy_to.id}/files/#{att_2.id}/preview", @copy_to.id, att_2.id, @copy_to.id, "files/#{att2_2.id}/preview", @copy_to.id, "files/#{att4_2.id}/preview"])
       expect(qq_to.question_data[:answers][0][:html]).to match_ignoring_whitespace(%(File ref:<img src="/courses/#{@copy_to.id}/files/#{att3_2.id}/download">))
+    end
+
+    it "updates quiz question media file references to new style" do
+      root = Folder.root_folders(@copy_from).first
+      root.sub_folders.create!(context: @copy_from, name: "folder 1")
+      attachment_with_context(@copy_from, media_entry_id: "0_l4l5n0wt")
+      data = { "question_type" => "text_only_question", "name" => "Hi", "question_text" => <<~HTML.strip }
+        media comment: <a id="media_comment_0_l4l5n0wt" class="instructure_inline_media_comment video_comment" href="/media_objects/0_l4l5n0wt">this is a media comment</a>
+        media object: <iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="/media_objects_iframe/0_l4l5n0wt?type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="0_l4l5n0wt"></iframe>
+      HTML
+      q1 = @copy_from.quizzes.create!(title: "quiz1")
+      q1.quiz_questions.create!(question_data: data)
+
+      run_course_copy
+
+      quiz = @copy_to.quizzes.first
+      expect(quiz.quiz_questions.count).to eq 1
+      question = quiz.quiz_questions.first
+      new_att = @copy_to.attachments.take
+      translated_body = <<~HTML.strip
+        media comment: <iframe id="media_comment_0_l4l5n0wt" class="instructure_inline_media_comment video_comment" style="width: 320px; height: 240px; display: inline-block;" title="this is a media comment" data-media-type="video" src="/media_attachments_iframe/#{new_att.id}?embedded=true&amp;type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="0_l4l5n0wt"></iframe>
+        media object: <iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="0_l4l5n0wt" src="/media_attachments_iframe/#{new_att.id}?embedded=true&amp;type=video"></iframe>
+      HTML
+
+      expect(question.question_data["question_text"]).to match_ignoring_whitespace(translated_body)
     end
 
     it "copies quiz question mathml equation image references correctly" do

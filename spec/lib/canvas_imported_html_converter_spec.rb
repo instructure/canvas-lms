@@ -162,7 +162,7 @@ describe CanvasImportedHtmlConverter do
       att.update!(media_entry_id: "m-yodawg")
       @migration.attachment_path_id_lookup = { "Uploaded Media 2/yodawg.mp4" => att.migration_id }
       test_string = %(<video data-media-type="video" data-media-id="m-yodawg"><source src="$IMS-CC-FILEBASE$/Uploaded%20Media%202/yodawg.mp4?canvas_=1&amp;canvas_qs_amp=&amp;canvas_qs_embedded=true&amp;canvas_qs_type=video&amp;media_attachment=true" data-media-id="m-yodawg" data-media-type="video"></video>)
-      expect(convert_exported_html(test_string)).to eq %(<iframe data-media-type="video" data-media-id="m-yodawg" src="/media_attachments_iframe/#{att.id}?type=video"></iframe>)
+      expect(convert_exported_html(test_string)).to eq %(<iframe data-media-type="video" data-media-id="m-yodawg" src="/media_attachments_iframe/#{att.id}?embedded=true&amp;type=video"></iframe>)
     end
 
     it "converts course section urls" do
@@ -197,41 +197,64 @@ describe CanvasImportedHtmlConverter do
       expect(convert_exported_html(test_string)).to eq %(<a href="#{@path}file_contents/course%20files/relative/path/to/file%20with%20space.html">Linkage</a>)
     end
 
-    it "preserves media comment links" do
+    it "changes media comment links to media_attachment_iframe link" do
+      file1 = attachment_model(context: @course, media_entry_id: "0_l4l5n0wt", display_name: "test.mp4")
+      media_object(media_id: "0_l4l5n0wt", attachment: file1)
+      file2 = attachment_model(context: @course, media_entry_id: "0_bq09qam2", display_name: "test2.mp4")
+      media_object(media_id: "0_bq09qam2", attachment: file2)
       test_string = <<~HTML.strip
         <p>
           with media object url: <a id="media_comment_0_l4l5n0wt" class="instructure_inline_media_comment video_comment" href="/media_objects/0_l4l5n0wt">this is a media comment</a>
-          with file content url: <a id="media_comment_0_bq09qam2" class="instructure_inline_media_comment video_comment" href="/courses/#{@course.id}/file_contents/course%20files/media_objects/0_bq09qam2">this is a media comment</a>
+          with file content url: <a id="media_comment_0_bq09qam2" class="instructure_inline_media_comment video_comment" href="/courses/#{@course.id}/file_contents/course%20files/test2.mp4">this is a media comment</a>
         </p>
       HTML
 
-      expect(convert_exported_html(test_string)).to eq test_string
+      replacement_string = <<~HTML.strip
+        <p>
+          with media object url: <iframe id="media_comment_0_l4l5n0wt" class="instructure_inline_media_comment video_comment" style="width: 320px; height: 240px; display: inline-block;" title="this is a media comment" data-media-type="video" src="/media_attachments_iframe/#{file1.id}?embedded=true&amp;type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="0_l4l5n0wt"></iframe>
+          with file content url: <iframe id="media_comment_0_bq09qam2" class="instructure_inline_media_comment video_comment" style="width: 320px; height: 240px; display: inline-block;" title="this is a media comment" data-media-type="video" src="/media_attachments_iframe/#{file2.id}?embedded=true&amp;type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="0_bq09qam2"></iframe>
+        </p>
+      HTML
+
+      expect(convert_exported_html(test_string)).to eq replacement_string
     end
 
     it "handles and repair half broken media links" do
-      test_string = %(<p><a href="/courses/#{@course.id}/file_contents/%24IMS_CC_FILEBASE%24/#" class="instructure_inline_media_comment video_comment" id="media_comment_0_l4l5n0wt">this is a media comment</a><br><br></p>)
+      file = attachment_model(context: @course, media_entry_id: "0_l4l5n0wt", display_name: "test.mp4")
+      media_object(media_id: "0_l4l5n0wt", attachment: file)
 
-      expect(convert_exported_html(test_string)).to eq %(<p><a href="/media_objects/0_l4l5n0wt" class="instructure_inline_media_comment video_comment" id="media_comment_0_l4l5n0wt">this is a media comment</a><br><br></p>)
+      test_string = %(<p><a href="/courses/#{@course.id}/file_contents/%24IMS_CC_FILEBASE%24/#" class="instructure_inline_media_comment video_comment" id="media_comment_0_l4l5n0wt">this is a media comment</a></p>)
+      expect(convert_exported_html(test_string)).to eq %(<p><iframe class="instructure_inline_media_comment video_comment" id="media_comment_0_l4l5n0wt" style="width: 320px; height: 240px; display: inline-block;" title="this is a media comment" data-media-type="video" src="/media_attachments_iframe/#{file.id}?embedded=true&amp;type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="0_l4l5n0wt"></iframe></p>)
     end
 
-    it "preserves new RCE media iframes" do
+    it "converts old RCE media object iframes" do
+      file = attachment_model(context: @course, media_entry_id: "0_l4l5n0wt", display_name: "test.mp4")
+      media_object(media_id: "0_l4l5n0wt", attachment: file)
+
       test_string = %(<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="/media_objects_iframe/0_l4l5n0wt?type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="0_l4l5n0wt"></iframe>)
-      expect(convert_exported_html(test_string)).to eq test_string
+      converted_string = %(<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="/media_attachments_iframe/#{file.id}?embedded=true&amp;type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="0_l4l5n0wt"></iframe>)
+      expect(convert_exported_html(test_string)).to eq converted_string
     end
 
     it "handles and repair half broken new RCE media iframes" do
+      file = attachment_model(context: @course, media_entry_id: "m-abcde", display_name: "test.mp4")
+      media_object(media_id: "m-abcde", attachment: file)
+
       test_string = %(<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="%24IMS_CC_FILEBASE%24/#" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="m-abcde"></iframe>)
-      repaired_string = %(<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="/media_objects_iframe/m-abcde?type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="m-abcde"></iframe>)
+      repaired_string = %(<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="/media_attachments_iframe/#{file.id}?embedded=true&amp;type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="m-abcde"></iframe>)
       expect(convert_exported_html(test_string)).to eq repaired_string
     end
 
     it "converts source tags to RCE media iframes" do
-      test_string = %(<video style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="0_l4l5n0wt"><source src="/media_objects_iframe/0_l4l5n0wt?type=video" data-media-id="0_l4l5n0wt" data-media-type="video"></video>)
-      converted_string = %(<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="0_l4l5n0wt" src="/media_objects_iframe/0_l4l5n0wt?type=video"></iframe>)
+      file = attachment_model(context: @course, media_entry_id: "0_l4l5n0wt", display_name: "test.mp4")
+      media_object(media_id: "0_l4l5n0wt", attachment: file)
+
+      test_string = %(<video style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="0_l4l5n0wt"><source src="/media_objects_iframe/0_l4l5n0wt?embedded=true&type=video" data-media-id="0_l4l5n0wt" data-media-type="video"></video>)
+      converted_string = %(<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="0_l4l5n0wt" src="/media_attachments_iframe/#{file.id}?embedded=true&amp;type=video"></iframe>)
       expect(convert_exported_html(test_string)).to eq converted_string
 
       test_string = %(<audio style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="audio" data-media-id="0_l4l5n0wt"><source src="/media_objects_iframe/0_l4l5n0wt?type=audio" data-media-id="0_l4l5n0wt" data-media-type="audio"></audio>)
-      converted_string = %(<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="audio" data-media-id="0_l4l5n0wt" src="/media_objects_iframe/0_l4l5n0wt?type=audio"></iframe>)
+      converted_string = %(<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="audio" data-media-id="0_l4l5n0wt" src="/media_attachments_iframe/#{file.id}?embedded=true&amp;type=audio"></iframe>)
       expect(convert_exported_html(test_string)).to eq converted_string
     end
 
@@ -247,7 +270,7 @@ describe CanvasImportedHtmlConverter do
       expect(convert_exported_html(test_string)).to eq converted_string
     end
 
-    it "converts source tags to RCE media attachment iframes when link is untranslated" do
+    it "converts source tags to RCE media attachment iframes when link is an unknown media attachment reference (link from a public file in another course)" do
       att = make_test_att
 
       test_string = %(<video style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="0_l4l5n0wt"><source src="/media_attachments_iframe/#{att.id}?type=video" data-media-id="0_l4l5n0wt" data-media-type="video"></video>)
