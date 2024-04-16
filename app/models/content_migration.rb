@@ -741,7 +741,7 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def for_common_cartridge?
-    migration_type == "common_cartridge_importer"
+    ["common_cartridge_importer", "canvas_cartridge_importer"].include? migration_type
   end
 
   def should_skip_import?(content_importer)

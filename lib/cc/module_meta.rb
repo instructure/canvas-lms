@@ -77,6 +77,8 @@ module CC
             end
 
             ct_id_map = {}
+            new_quizzes_common_cartridge_enabled = Account.site_admin.feature_enabled?(:new_quizzes_common_cartridge)
+
             m_node.items do |items_node|
               cm.content_tags.not_deleted.each do |ct|
                 ct_migration_id = create_key(ct)
@@ -85,7 +87,13 @@ module CC
                   unless ["ContextModuleSubHeader", "ExternalUrl"].member? ct.content_type
                     add_item_to_export(ct.content)
                   end
-                  item_node.content_type ct.content_type
+
+                  is_new_quiz = ct.content.instance_of?(Assignment) && ct.content.quiz_lti?
+                  if is_new_quiz && new_quizzes_common_cartridge_enabled && @for_common_cartridge
+                    item_node.content_type Quizzes::Quiz.to_s
+                  else
+                    item_node.content_type ct.content_type
+                  end
                   item_node.workflow_state ct.workflow_state
                   item_node.title ct.title
                   item_node.identifierref create_key(ct.content_or_self) unless ct.content_type == "ContextModuleSubHeader"
