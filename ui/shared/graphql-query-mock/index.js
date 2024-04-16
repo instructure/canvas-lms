@@ -15,7 +15,8 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {addMockFunctionsToSchema, makeExecutableSchema} from 'graphql-tools'
+import {addMocksToSchema} from '@graphql-tools/mock'
+import {makeExecutableSchema} from '@graphql-tools/schema'
 import {addTypenameToDocument} from 'apollo-utilities'
 import {graphql} from 'graphql'
 import gql from 'graphql-tag'
@@ -138,8 +139,8 @@ export default async function mockGraphqlQuery(query, overrides = [], variables 
   })
 
   // Run our query againsted the mocked server
-  addMockFunctionsToSchema({schema, mocks})
-  const result = await graphql(schema, queryStr, null, null, variables)
+  const schemaWithMocks = addMocksToSchema({schema, mocks})
+  const result = await graphql(schemaWithMocks, queryStr, null, null, variables)
   if (result.errors) {
     const errors = result.errors.map(e => e.message)
     throw new Error('The graphql query contained errors:\n  - ' + errors.join('\n  - '))
