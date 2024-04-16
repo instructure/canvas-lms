@@ -3089,4 +3089,38 @@ describe DiscussionTopic do
       end
     end
   end
+
+  describe "unlock_at and delayed_post_at" do
+    before do
+      @topic = @course.discussion_topics.create!(title: "topic", user: @teacher)
+    end
+
+    it "prefers unlock_at to delayed_post_at" do
+      @topic[:delayed_post_at] = Time.now + 5.days
+      @topic[:unlock_at] = Time.now
+      expect(@topic.delayed_post_at).to equal @topic[:unlock_at]
+      expect(@topic.unlock_at).to equal @topic[:unlock_at]
+    end
+
+    it "defaults to delayed_post_at if unlock_at is nil" do
+      @topic[:delayed_post_at] = Time.now + 5.days
+      @topic[:unlock_at] = nil
+      expect(@topic.delayed_post_at).to equal @topic[:delayed_post_at]
+      expect(@topic.unlock_at).to equal @topic[:delayed_post_at]
+    end
+
+    it "always updates unlock_at and sets delayed_post_at to the same value" do
+      @topic.delayed_post_at = nil
+      expect(@topic[:delayed_post_at]).to be_nil
+      expect(@topic[:unlock_at]).to eq @topic.delayed_post_at
+      expect(@topic.delayed_post_at).to eq @topic.unlock_at
+
+      @topic[:delayed_post_at] = Time.now + 5.days
+      @topic[:unlock_at] = nil
+      @topic.unlock_at = Time.now + 1.day
+      expect(@topic[:delayed_post_at]).to eq @topic[:unlock_at]
+      expect(@topic[:unlock_at]).to eq @topic.delayed_post_at
+      expect(@topic.delayed_post_at).to eq @topic.unlock_at
+    end
+  end
 end

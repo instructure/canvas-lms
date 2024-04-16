@@ -114,7 +114,7 @@ class Mutations::DiscussionBase < Mutations::BaseMutation
     discussion_topic.delayed_post_at = delayed_post_at if delayed_post_at
     discussion_topic.lock_at = lock_at if lock_at
 
-    if discussion_topic.delayed_post_at_changed? || discussion_topic.lock_at_changed?
+    if discussion_topic.unlock_at_changed? || discussion_topic.delayed_post_at_changed? || discussion_topic.lock_at_changed?
       # only apply post_delayed if the topic is set to published
       discussion_topic.workflow_state = (discussion_topic.should_not_post_yet && discussion_topic.workflow_state == "active") ? "post_delayed" : discussion_topic.workflow_state
       if discussion_topic.should_lock_yet
