@@ -538,7 +538,7 @@ class GradebooksController < ApplicationController
       grade_calc_ignore_unposted_anonymous_enabled: root_account.feature_enabled?(:grade_calc_ignore_unposted_anonymous),
       graded_late_submissions_exist:,
       grading_period_set: grading_period_group_json,
-      grading_schemes: GradingStandard.for(@context).as_json(include_root: false),
+      grading_schemes: GradingStandard.for(@context, include_archived: true).as_json(include_root: false),
       grading_standard: @context.grading_standard_enabled? && grading_standard.data,
       grading_standard_points_based: active_grading_standard_points_based(grading_standard),
       grading_standard_scaling_factor: active_grading_standard_scaling_factor(grading_standard),

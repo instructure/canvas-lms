@@ -49,10 +49,10 @@ const GradingSchemeViewModal = ({
   if (!gradingScheme) {
     return <></>
   }
-  const disableEditScheme =
-    (!viewingFromAccountManagementPage && gradingScheme.context_type === 'Account') ||
-    gradingScheme.assessed_assignment ||
-    isCourseDefault
+  const archivedGradingSchemesDisableEdit =
+    !viewingFromAccountManagementPage && gradingScheme.context_type === 'Account'
+  const disableEditSchemeData =
+    archivedGradingSchemesDisableEdit || gradingScheme.assessed_assignment || isCourseDefault
   return (
     <Modal
       as="form"
@@ -76,8 +76,9 @@ const GradingSchemeViewModal = ({
         <GradingSchemeView
           gradingScheme={gradingScheme}
           archivedGradingSchemesEnabled={true}
-          disableDelete={!canManageScheme(gradingScheme) || (disableEditScheme ?? false)}
-          disableEdit={!canManageScheme(gradingScheme) || (disableEditScheme ?? false)}
+          disableDelete={!canManageScheme(gradingScheme) || (disableEditSchemeData ?? false)}
+          disableEdit={!canManageScheme(gradingScheme) || (disableEditSchemeData ?? false)}
+          archivedGradingSchemesDisableEdit={archivedGradingSchemesDisableEdit}
           onDeleteRequested={() => openDeleteModal(gradingScheme)}
           onEditRequested={() => editGradingScheme(gradingScheme.id)}
         />

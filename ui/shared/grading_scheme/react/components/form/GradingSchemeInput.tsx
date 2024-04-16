@@ -305,6 +305,10 @@ export const GradingSchemeInput = React.forwardRef<GradingSchemeInputHandle, Com
       const updatedScheme = {
         ...formState,
       }
+      if (index === 0 && !updatedScheme.pointsBased) {
+        // deleting first row, set the second row to be the new first row
+        updatedScheme.rows[1].maxRangeDisplay = updatedScheme.rows[0].maxRangeDisplay
+      }
       updatedScheme.rows.splice(index, 1)
       if (updatedScheme.rows.length > 0) {
         // the last data row always has a min range of 0
