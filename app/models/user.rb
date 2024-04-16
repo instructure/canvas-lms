@@ -1210,12 +1210,17 @@ class User < ActiveRecord::Base
     new_cc.shard = new_user.shard
     new_cc.position += max_position
     new_cc.user = new_user
+    new_cc.workflow_state = "unconfirmed"
     new_cc.save!
     cc.notification_policies.each do |np|
       new_np = np.clone
       new_np.shard = new_user.shard
       new_np.communication_channel = new_cc
       new_np.save!
+    end
+    unless cc.unconfirmed?
+      new_cc.workflow_state = cc.workflow_state
+      new_cc.save!
     end
   end
 
