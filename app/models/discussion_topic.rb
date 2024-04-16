@@ -46,7 +46,7 @@ class DiscussionTopic < ActiveRecord::Base
                                  sort_by_rating
                                  group_category_id]
   restrict_columns :state, [:workflow_state]
-  restrict_columns :availability_dates, [:delayed_post_at, :lock_at]
+  restrict_columns :availability_dates, %i[unlock_at delayed_post_at lock_at]
   restrict_assignment_columns
 
   attr_writer :can_unpublish, :preloaded_subentry_count, :sections_changed
@@ -260,7 +260,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def set_schedule_delayed_transitions
-    @delayed_post_at_changed = delayed_post_at_changed?
+    @delayed_post_at_changed = delayed_post_at_changed? || unlock_at_changed?
     if delayed_post_at? && @delayed_post_at_changed
       @should_schedule_delayed_post = true
       self.workflow_state = "post_delayed" if [:migration, :after_migration].include?(saved_by) && delayed_post_at > Time.now
@@ -824,7 +824,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   scope :by_posted_at, lambda {
     order(Arel.sql(<<~SQL.squish))
-      COALESCE(discussion_topics.delayed_post_at, discussion_topics.posted_at, discussion_topics.created_at) DESC,
+      COALESCE(discussion_topics.unlock_at, discussion_topics.delayed_post_at, discussion_topics.posted_at, discussion_topics.created_at) DESC,
       discussion_topics.created_at DESC,
       discussion_topics.id DESC
     SQL
@@ -858,11 +858,21 @@ class DiscussionTopic < ActiveRecord::Base
   alias_attribute :available_until, :lock_at
 
   def unlock_at
-    Account.site_admin.feature_enabled?(:differentiated_modules) ? super : delayed_post_at
+    self[:unlock_at].nil? ? self[:delayed_post_at] : self[:unlock_at]
+  end
+
+  def delayed_post_at
+    self[:unlock_at].nil? ? self[:delayed_post_at] : self[:unlock_at]
   end
 
   def unlock_at=(value)
-    Account.site_admin.feature_enabled?(:differentiated_modules) ? super : self.delayed_post_at = value
+    self[:delayed_post_at] = value
+    super
+  end
+
+  def delayed_post_at=(value)
+    self[:unlock_at] = value
+    super
   end
 
   def should_lock_yet
@@ -1072,7 +1082,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   def should_clear_all_stream_items?
     (!published? && saved_change_to_attribute?(:workflow_state)) ||
-      (is_announcement && not_available_yet? && saved_change_to_attribute?(:delayed_post_at))
+      (is_announcement && not_available_yet? && (saved_change_to_attribute?(:delayed_post_at) || saved_change_to_attribute?(:unlock_at)))
   end
 
   def clear_non_applicable_stream_items

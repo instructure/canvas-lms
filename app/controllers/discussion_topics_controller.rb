@@ -353,7 +353,7 @@ class DiscussionTopicsController < ApplicationController
     end
 
     if params[:only_announcements] && !@context.grants_any_right?(@current_user, :manage, :read_course_content)
-      scope = scope.active.where("delayed_post_at IS NULL OR delayed_post_at<?", Time.now.utc)
+      scope = scope.active.where("(unlock_at IS NULL AND delayed_post_at IS NULL) OR (unlock_at<? OR delayed_post_at<?)", Time.now.utc, Time.now.utc)
     end
 
     per_page = params[:per_page] || 100
@@ -1634,7 +1634,7 @@ class DiscussionTopicsController < ApplicationController
     end
     @topic.lock_at = discussion_topic_hash[:lock_at] if params.key? :lock_at
 
-    if @topic.delayed_post_at_changed? || @topic.lock_at_changed?
+    if @topic.unlock_at_changed? || @topic.delayed_post_at_changed? || @topic.lock_at_changed?
       @topic.workflow_state = @topic.should_not_post_yet ? "post_delayed" : "active"
       if @topic.should_lock_yet
         @topic.lock(without_save: true)
