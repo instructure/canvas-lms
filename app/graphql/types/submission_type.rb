@@ -85,5 +85,12 @@ module Types
         histories.select { |h| states.include?(h.workflow_state) }
       end
     end
+
+    field :sub_assignment_tag, String, null: true
+    def sub_assignment_tag
+      return object.assignment.sub_assignment_tag if object.assignment.is_a?(SubAssignment)
+
+      nil
+    end
   end
 end
