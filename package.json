@@ -144,7 +144,7 @@
     "final-form": "^4.20.2",
     "formdata-polyfill": "^3.0.9",
     "fullcalendar": "3.10.5",
-    "graphiql": "^0.14.2",
+    "graphiql": "1.7.2",
     "graphiql-explorer": "^0.4.2",
     "graphql": "^14",
     "graphql-request": "^6.1.0",
