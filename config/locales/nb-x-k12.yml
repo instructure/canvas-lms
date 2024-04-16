@@ -13233,7 +13233,7 @@ nb-x-k12:
   have_students_sign_up_in_groups_d6cfd4d2: "Få elever til å melde seg på gruppevis"
   haven_t_been_graded_d7dee5bb: "Har ikke blitt vurdert"
   haven_t_submitted_yet_e63834db: "Har ikke levert enda"
-  he_him_99aea1a8: Han/ham
+  he_him_99aea1a8: han/ham
   heads_up_a_valid_salesforce_account_id_should_be_a_999cbf7d: "Følg med! En gyldig Salesforce-konto-ID skal være en sekvens på 15 til 18 tall og bokstaver."
   hebrew_88fbf778: Hebraisk
   hello_name_cabdd4ce: "Hei%{name}!"
@@ -24247,7 +24247,7 @@ nb-x-k12:
   shared_content_803ac37b: "Delt innhold"
   shared_secret_892c88f2: "Delt hemmelighet"
   sharing_a_qr_code_can_give_others_immediate_access_79575158: "Å dele en QR-kode kan gi andre umiddelbar tilgang til kontoen din gjennom %{canvas} mobilapplikasjonene."
-  she_her_3f459cc2: Hun/hennes
+  she_her_3f459cc2: Hun/henne
   shift_dates_746698a5: "Skift datoer"
   shift_dates_b5a7b7a1: "Skift datoer"
   shift_due_dates_and_assignment_availability_dates__c5ad272: "Skift forfallsdatoer og datoer for tilgjengelighet for oppgaven med et antall dager."
