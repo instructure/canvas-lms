@@ -234,6 +234,12 @@ also found in the placements sub-menu in the left-navigation of this documentati
       "privacy_level": "public",
       "settings": {
         "text": "Launch The Best Tool",
+        "labels": {
+          "en": "Launch The Best Tool",
+          "en-AU": "G'day, Launch The Best Tool",
+          "es": "Lanzar la mejor herramienta",
+          "zh-Hans": "启动最佳工具"
+        },
         "icon_url": "https://some.icon.url/tool-level.png",
         "selection_height": 800,
         "selection_width": 800,
@@ -552,6 +558,43 @@ object for placement-specific target_link_uri's</p>
       </td>
     </tr>
 
+<!-- text -->
+
+    <tr class="request-param ">
+      <td>text</td>
+      <td>
+
+      </td>
+      <td>string</td>
+
+
+
+      <td class="param-desc">
+
+<p>The default text to show for this tool. Can be set within "settings" for the tool-level display text, or within "placements" object for placement-specific display text.</p>
+
+      </td>
+    </tr>
+
+<!-- labels -->
+
+    <tr class="request-param ">
+      <td>labels</td>
+      <td>
+
+      </td>
+      <td>JSON object</td>
+
+
+
+      <td class="param-desc">
+
+<p>An object for translations of the "text", used to support internationalization (i18n) / localization (l10n). If the user's Canvas interface is set to one of the languages listed, the tool will display the translated text in place of the value in the "text" field. More specific locales ("en-AU") are preferred over less specific ones ("en").  Can be set within "settings" or individual placements.
+</p>
+
+      </td>
+    </tr>
+
 <!-- icon_url -->
 
     <tr class="request-param ">
@@ -596,24 +639,6 @@ object for placement-specific target_link_uri's</p>
       <td class="param-desc">
 
 <p>The display width of the iframe. This may be ignored or overridden for some LTI placements due to other UI requirements set by Canvas. Tools are advised to experiment with this setting to see what makes the most sense for their application.</p>
-
-<!-- text -->
-
-      </td>
-    </tr>
-
-    <tr class="request-param ">
-      <td>text</td>
-      <td>
-
-      </td>
-      <td>string</td>
-
-
-
-      <td class="param-desc">
-
-<p>The default text to show for this tool. Can be set within "settings" for the tool-level display text, or within "placements" object for placement-specific display text.</p>
 
       </td>
     </tr>
