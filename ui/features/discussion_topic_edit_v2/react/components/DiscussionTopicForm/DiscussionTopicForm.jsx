@@ -225,7 +225,7 @@ export default function DiscussionTopicForm({
 
   const [gradedDiscussionRefMap, setGradedDiscussionRefMap] = useState(new Map())
 
-  // Checkpoints - add initial states once checkpoint mutation has been edited
+  // Checkpoints states
   const [isCheckpoints, setIsCheckpoints] = useState(
     currentDiscussionTopic?.assignment?.hasSubAssignments || false
   )
@@ -393,12 +393,18 @@ export default function DiscussionTopicForm({
 
     // Additional properties for editing mode
     if (isEditing) {
-      return {
+      const editingPayload = {
         ...payload,
         discussionTopicId: currentDiscussionTopic._id,
         published: shouldPublish,
         removeAttachment: !attachment?._id,
       }
+
+      if (currentDiscussionTopic?.assignment?.hasSubAssignments) {
+        editingPayload.setCheckpoints = isCheckpoints
+      }
+
+      return editingPayload
     }
 
     // Properties for creation mode

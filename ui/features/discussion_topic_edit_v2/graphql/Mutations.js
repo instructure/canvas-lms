@@ -88,6 +88,7 @@ export const CREATE_DISCUSSION_TOPIC = gql`
         podcastEnabled
         podcastHasStudentPosts
         isAnnouncement
+        replyToEntryRequiredCount
         assignment {
           _id
           name
@@ -152,6 +153,8 @@ export const UPDATE_DISCUSSION_TOPIC = gql`
     $groupCategoryId: ID
     $removeAttachment: Boolean
     $assignment: AssignmentUpdate
+    $checkpoints: [DiscussionCheckpoints!]
+    $setCheckpoints: Boolean
   ) {
     updateDiscussionTopic(
       input: {
@@ -173,6 +176,8 @@ export const UPDATE_DISCUSSION_TOPIC = gql`
         fileId: $fileId
         removeAttachment: $removeAttachment
         assignment: $assignment
+        checkpoints: $checkpoints
+        setCheckpoints: $setCheckpoints
       }
     ) {
       discussionTopic {
@@ -192,6 +197,7 @@ export const UPDATE_DISCUSSION_TOPIC = gql`
         podcastEnabled
         podcastHasStudentPosts
         isAnnouncement
+        replyToEntryRequiredCount
         attachment {
           ...Attachment
         }
@@ -217,6 +223,13 @@ export const UPDATE_DISCUSSION_TOPIC = gql`
             count
             dueAt
             enabled
+          }
+          checkpoints {
+            dueAt
+            name
+            onlyVisibleToOverrides
+            pointsPossible
+            tag
           }
         }
       }
