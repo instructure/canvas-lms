@@ -96,15 +96,11 @@ class PseudonymSession < Authlogic::Session::Base
   # SSO). If too many failed attempts have occured, the validation will fail.
   # In this case, `login_error` will be non-nil, rather than
   # `invalid_password?`.
-  #
-  # Note that for IP based max attempt tracking to occur, you'll need to set
-  # remote_ip on the PseudonymSession before calling save/valid?. Otherwise,
-  # only total # of failed attempts will be tracked.
   def validate_by_password
     super
 
     # have to call super first, as that's what loads attempted_record
-    if (@login_error = attempted_record&.audit_login(remote_ip, !invalid_password?))
+    if (@login_error = attempted_record&.audit_login(!invalid_password?))
       case @login_error
       when :too_many_attempts
         errors.add(password_field, I18n.t("errors.max_attempts", "Too many failed login attempts. Please try again later or contact your system administrator."))
