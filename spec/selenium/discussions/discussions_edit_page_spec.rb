@@ -1080,27 +1080,64 @@ describe "discussions" do
         context "checkpoints" do
           before do
             course.root_account.enable_feature!(:discussion_checkpoints)
-          end
-
-          it "displays checkpoint settings values correctly when there are existing checkpoints" do
-            checkpointed_discussion = DiscussionTopic.create_graded_topic!(course:, title: "checkpointed discussion")
+            @checkpointed_discussion = DiscussionTopic.create_graded_topic!(course:, title: "checkpointed discussion")
             Checkpoints::DiscussionCheckpointCreatorService.call(
-              discussion_topic: checkpointed_discussion,
+              discussion_topic: @checkpointed_discussion,
               checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
               dates: [{ type: "everyone", due_at: 2.days.from_now }],
               points_possible: 6
             )
             Checkpoints::DiscussionCheckpointCreatorService.call(
-              discussion_topic: checkpointed_discussion,
+              discussion_topic: @checkpointed_discussion,
               checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
               dates: [{ type: "everyone", due_at: 2.days.from_now }],
               points_possible: 7,
               replies_required: 5
             )
-            get "/courses/#{course.id}/discussion_topics/#{checkpointed_discussion.id}/edit"
+          end
+
+          it "displays checkpoint settings values correctly when there are existing checkpoints" do
+            get "/courses/#{course.id}/discussion_topics/#{@checkpointed_discussion.id}/edit"
             expect(f("input[data-testid='points-possible-input-reply-to-topic']").attribute("value")).to eq "6"
             expect(f("input[data-testid='points-possible-input-reply-to-entry']").attribute("value")).to eq "7"
             expect(f("input[data-testid='reply-to-entry-required-count']").attribute("value")).to eq "5"
+          end
+
+          it "allows for a discussion with checkpoints to be updated" do
+            get "/courses/#{course.id}/discussion_topics/#{@checkpointed_discussion.id}/edit"
+
+            f("input[data-testid='points-possible-input-reply-to-topic']").send_keys :backspace
+            f("input[data-testid='points-possible-input-reply-to-topic']").send_keys "5"
+            f("input[data-testid='reply-to-entry-required-count']").send_keys :backspace
+            f("input[data-testid='reply-to-entry-required-count']").send_keys "6"
+            f("input[data-testid='points-possible-input-reply-to-entry']").send_keys :backspace
+            f("input[data-testid='points-possible-input-reply-to-entry']").send_keys "7"
+            fj("button:contains('Save')").click
+
+            expect(DiscussionTopic.last.reply_to_entry_required_count).to eq 6
+
+            assignment = Assignment.last
+
+            sub_assignments = SubAssignment.where(parent_assignment_id: assignment.id)
+            sub_assignment1 = sub_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
+            sub_assignment2 = sub_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
+
+            expect(sub_assignment1.points_possible).to eq 5
+            expect(sub_assignment2.points_possible).to eq 7
+          end
+
+          it "deletes checkpoints if the checkpoint checkbox is unselected on an existing discussion with checkpoints" do
+            assignment = Assignment.last
+            expect(assignment.sub_assignments.count).to eq 2
+
+            get "/courses/#{course.id}/discussion_topics/#{@checkpointed_discussion.id}/edit"
+
+            force_click_native('input[type=checkbox][value="checkpoints"]')
+            fj("button:contains('Save')").click
+
+            expect(DiscussionTopic.last.reply_to_entry_required_count).to eq 0
+            expect(assignment.sub_assignments.count).to eq 0
+            expect(Assignment.last.has_sub_assignments).to be(false)
           end
         end
       end
