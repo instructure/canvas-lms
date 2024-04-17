@@ -82,6 +82,15 @@ class WikiPage < ActiveRecord::Base
   after_save :create_lookup, if: :should_create_lookup?
   after_save :delete_lookups, if: -> { !Account.site_admin.feature_enabled?(:permanent_page_links) && saved_change_to_workflow_state? && deleted? }
 
+  scope :visible_to_students_in_course_with_da, lambda { |user_ids, course_ids|
+    # no assignment -> visible if wiki_page_student_visibilities has row
+    # assignment -> visible if assignment_student_visibilities has row
+    without_assignment_in_course(course_ids)
+      .joins(:wiki_page_student_visibilities)
+      .where(wiki_page_student_visibilities: { user_id: user_ids, course_id: course_ids })
+      .union(joins_assignment_student_visibilities(user_ids, course_ids))
+  }
+
   scope :starting_with_title, lambda { |title|
     where("title ILIKE ?", "#{title}%")
   }
@@ -604,5 +613,20 @@ class WikiPage < ActiveRecord::Base
 
   def set_root_account_id
     self.root_account_id = context&.root_account_id unless root_account_id
+  end
+
+  def self.visible_ids_by_user(opts)
+    assignment_page_visibilities = joins_assignment_student_visibilities(opts[:user_id], opts[:course_id])
+                                   .pluck("wiki_pages.id", "assignment_student_visibilities.user_id").group_by { |_, user_id| user_id }
+    no_assignment_page_visibilities = without_assignment_in_course(opts[:course_id])
+                                      .joins(:wiki_page_student_visibilities)
+                                      .where(wiki_page_student_visibilities: opts)
+                                      .pluck("wiki_pages.id", "wiki_page_student_visibilities.user_id").group_by { |_, user_id| user_id }
+
+    opts[:user_id].index_with do |user_id|
+      page_ids_with_assignment = (assignment_page_visibilities[user_id] || []).map { |page_id, _| page_id }
+      page_ids_no_assignment = (no_assignment_page_visibilities[user_id] || []).map { |page_id, _| page_id }
+      page_ids_with_assignment.concat(page_ids_no_assignment)
+    end
   end
 end

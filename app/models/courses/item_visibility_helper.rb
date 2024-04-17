@@ -61,7 +61,7 @@ module Courses
         when :assignment
           AssignmentStudentVisibility.visible_assignment_ids_in_course_by_user(opts)
         when :discussion
-          DiscussionTopic.visible_ids_by_user(opts.merge(item_type:))
+          DiscussionTopic.visible_ids_by_user(opts)
         when :page
           WikiPage.visible_ids_by_user(opts)
         when :quiz
