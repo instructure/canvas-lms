@@ -48,3 +48,35 @@ function fetchSpeedGraderLibrary(resolve, reject) {
 }
 
 exports.fetchSpeedGraderLibrary = fetchSpeedGraderLibrary
+
+function fetchAnalyticsHub(resolve, reject) {
+  const script = document.createElement('script')
+  script.src = window.REMOTES?.analyticsHub || 'http://localhost:3002/remoteEntry.js'
+  script.onload = () => {
+    const module = {
+      get: request => window.AnalyticsHub.get(request),
+      init: arg => {
+        try {
+          return window.AnalyticsHub.init(arg)
+        } catch (e) {
+          // eslint-disable-next-line no-console
+          console.warn('Remote A has already been loaded')
+        }
+      },
+    }
+    resolve(module)
+  }
+
+  script.onerror = errorEvent => {
+    const errorMessage = `Failed to load the script: ${script.src}`
+    // eslint-disable-next-line no-console
+    console.error(errorMessage, errorEvent)
+    if (typeof reject === 'function') {
+      reject(new Error(errorMessage, errorEvent))
+    }
+  }
+
+  document.head.appendChild(script)
+}
+
+exports.fetchAnalyticsHub = fetchAnalyticsHub

@@ -31,7 +31,7 @@ const {
   container: {ModuleFederationPlugin},
 } = require('@rspack/core')
 const WebpackHooks = require('./webpackHooks')
-const {fetchSpeedGraderLibrary} = require('./remotes')
+const {fetchSpeedGraderLibrary, fetchAnalyticsHub} = require('./remotes')
 
 // determines which folder public assets are compiled to
 const webpackPublicPath = require('./webpackPublicPath')
@@ -166,6 +166,7 @@ exports.buildCacheOptions = {
 exports.moduleFederation = new ModuleFederationPlugin({
   name: 'canvas',
   remotes: {
+    analyticshub: `promise new Promise(${fetchAnalyticsHub.toString()})`,
     speedgrader: `promise new Promise(${fetchSpeedGraderLibrary.toString()})`,
   },
   exposes: {},
