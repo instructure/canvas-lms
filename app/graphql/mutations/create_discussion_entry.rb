@@ -30,6 +30,7 @@ class Mutations::CreateDiscussionEntry < Mutations::BaseMutation
   argument :quoted_entry_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("DiscussionEntry")
 
   field :discussion_entry, Types::DiscussionEntryType, null: true
+  field :my_sub_assignment_submissions, [Types::SubmissionType], null: true
   def resolve(input:)
     topic = DiscussionTopic.find(input[:discussion_topic_id])
     raise ActiveRecord::RecordNotFound unless topic.grants_right?(current_user, session, :read)
@@ -67,7 +68,14 @@ class Mutations::CreateDiscussionEntry < Mutations::BaseMutation
     entry.save!
     entry.delete_draft
 
-    { discussion_entry: entry }
+    obj = { discussion_entry: entry, my_sub_assignment_submissions: [] }
+
+    if has_sub_assignment_submissions?(current_user, topic)
+      checkpoint_submissions = topic.assignment&.sub_assignment_submissions&.active&.where(user_id: current_user)
+      obj[:my_sub_assignment_submissions] = checkpoint_submissions
+    end
+
+    obj
   rescue ActiveRecord::RecordNotFound
     raise GraphQL::ExecutionError, "not found"
   rescue InsufficientPermissionsError
@@ -80,6 +88,17 @@ class Mutations::CreateDiscussionEntry < Mutations::BaseMutation
     raise InsufficientPermissionsError unless entry.grants_right?(current_user, session, :create)
 
     entry
+  end
+
+  def has_sub_assignment_submissions?(current_user, topic)
+    # if group discussion context is not a course, then there will be no assignment nor submissions
+    return false if topic.context.is_a?(Group) && !topic.context.context.is_a?(Course)
+
+    course_id = topic.context.is_a?(Course) ? topic.context.id : topic.context.context.id
+
+    # for graded group discussions, .assignment for the root topic and for each child topic is the same
+    # assignment
+    topic.assignment&.reload&.has_sub_assignments? && current_user.student_enrollments.where(course_id:).exists?
   end
 
   class InsufficientPermissionsError < StandardError; end
