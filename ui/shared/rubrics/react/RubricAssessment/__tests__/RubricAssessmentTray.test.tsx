@@ -35,6 +35,10 @@ describe('RubricAssessmentTray Tests', () => {
     )
   }
 
+  const getModernSelectedDiv = (element: HTMLElement) => {
+    return element.querySelector('div[data-testid="rubric-rating-button-selected"]')
+  }
+
   describe('View Mode Select tests', () => {
     it('should render the traditional view option by default', () => {
       const {getByTestId} = renderComponent()
@@ -42,6 +46,8 @@ describe('RubricAssessmentTray Tests', () => {
 
       expect(viewModeSelect.value).toBe('Traditional')
       expect(getByTestId('rubric-assessment-traditional-view')).toBeInTheDocument()
+      expect(getByTestId('rubric-assessment-header')).toHaveTextContent('Rubric')
+      expect(getByTestId('rubric-assessment-footer')).toBeInTheDocument()
     })
 
     it('should render the vertical view option by default if a criterion has greater than 5 ratings', () => {
@@ -181,8 +187,8 @@ describe('RubricAssessmentTray Tests', () => {
   })
 
   describe('Modern View tests', () => {
-    const renderComponentHorizontal = (viewMode: string) => {
-      const component = renderComponent()
+    const renderComponentModern = (viewMode: string, isPeerReview = false) => {
+      const component = renderComponent({isPeerReview})
       const {getByTestId, queryByRole} = component
       const viewModeSelect = getByTestId('rubric-assessment-view-mode-select') as HTMLSelectElement
 
@@ -193,149 +199,135 @@ describe('RubricAssessmentTray Tests', () => {
       return component
     }
 
-    const getSelectedDiv = (element: HTMLElement) => {
-      return element.querySelector('div[data-testid="rubric-rating-button-selected"]')
-    }
-
     describe('Horizontal Display tests', () => {
       it('should select a rating when the rating is clicked', () => {
-        const {getByTestId, queryByTestId} = renderComponentHorizontal('Horizontal')
+        const {getByTestId, queryByTestId} = renderComponentModern('Horizontal')
 
         expect(getByTestId('rubric-assessment-instructor-score')).toHaveTextContent('0 pts')
 
         const ratingDiv = getByTestId('rating-button-4-0')
-        ratingDiv.querySelector('button')
-        expect(getSelectedDiv(ratingDiv)).toBeNull()
+        expect(getModernSelectedDiv(ratingDiv)).toBeNull()
         expect(queryByTestId('rating-details-4')).toBeNull()
         const button = ratingDiv.querySelector('button') as HTMLButtonElement
         fireEvent.click(button)
 
         expect(getByTestId('rubric-assessment-instructor-score')).toHaveTextContent('4 pts')
-        expect(getSelectedDiv(ratingDiv)).toBeInTheDocument()
+        expect(getModernSelectedDiv(ratingDiv)).toBeInTheDocument()
         const detailsDiv = getByTestId('rating-details-4')
         expect(detailsDiv).toHaveTextContent(RUBRIC_DATA.criteria[0].ratings[0].description)
         expect(detailsDiv).toHaveTextContent(RUBRIC_DATA.criteria[0].ratings[0].longDescription)
       })
 
       it('should reselect a rating for the same criterion when another rating is clicked', () => {
-        const {getByTestId} = renderComponentHorizontal('Horizontal')
+        const {getByTestId} = renderComponentModern('Horizontal')
 
         expect(getByTestId('rubric-assessment-instructor-score')).toHaveTextContent('0 pts')
 
         const oldRatingDiv = getByTestId('rating-button-4-0')
-        oldRatingDiv.querySelector('button')
-        expect(getSelectedDiv(oldRatingDiv)).toBeNull()
+        expect(getModernSelectedDiv(oldRatingDiv)).toBeNull()
         const oldRatingButton = oldRatingDiv.querySelector('button') as HTMLButtonElement
         fireEvent.click(oldRatingButton)
 
         expect(getByTestId('rubric-assessment-instructor-score')).toHaveTextContent('4 pts')
-        expect(getSelectedDiv(oldRatingDiv)).toBeInTheDocument()
+        expect(getModernSelectedDiv(oldRatingDiv)).toBeInTheDocument()
 
         const newRatingDiv = getByTestId('rating-button-3-1')
-        newRatingDiv.querySelector('button')
-        expect(getSelectedDiv(newRatingDiv)).toBeNull()
+        expect(getModernSelectedDiv(newRatingDiv)).toBeNull()
         const newRatingButton = newRatingDiv.querySelector('button') as HTMLButtonElement
         fireEvent.click(newRatingButton)
 
         expect(getByTestId('rubric-assessment-instructor-score')).toHaveTextContent('3 pts')
-        expect(getSelectedDiv(newRatingDiv)).toBeInTheDocument()
-        expect(getSelectedDiv(oldRatingDiv)).toBeNull()
+        expect(getModernSelectedDiv(newRatingDiv)).toBeInTheDocument()
+        expect(getModernSelectedDiv(oldRatingDiv)).toBeNull()
       })
 
       it('should select multiple ratings across multiple criteria', () => {
-        const {getByTestId} = renderComponentHorizontal('Horizontal')
+        const {getByTestId} = renderComponentModern('Horizontal')
 
         expect(getByTestId('rubric-assessment-instructor-score')).toHaveTextContent('0 pts')
 
         const oldRatingDiv = getByTestId('rating-button-4-0')
-        oldRatingDiv.querySelector('button')
-        expect(getSelectedDiv(oldRatingDiv)).toBeNull()
+        expect(getModernSelectedDiv(oldRatingDiv)).toBeNull()
         const oldRatingButton = oldRatingDiv.querySelector('button') as HTMLButtonElement
         fireEvent.click(oldRatingButton)
 
         expect(getByTestId('rubric-assessment-instructor-score')).toHaveTextContent('4 pts')
-        expect(getSelectedDiv(oldRatingDiv)).toBeInTheDocument()
+        expect(getModernSelectedDiv(oldRatingDiv)).toBeInTheDocument()
 
         const newRatingDiv = getByTestId('rating-button-10-0')
-        newRatingDiv.querySelector('button')
-        expect(getSelectedDiv(newRatingDiv)).toBeNull()
+        expect(getModernSelectedDiv(newRatingDiv)).toBeNull()
         const newRatingButton = newRatingDiv.querySelector('button') as HTMLButtonElement
         fireEvent.click(newRatingButton)
 
         expect(getByTestId('rubric-assessment-instructor-score')).toHaveTextContent('14 pts')
-        expect(getSelectedDiv(newRatingDiv)).toBeInTheDocument()
-        expect(getSelectedDiv(oldRatingDiv)).toBeInTheDocument()
+        expect(getModernSelectedDiv(newRatingDiv)).toBeInTheDocument()
+        expect(getModernSelectedDiv(oldRatingDiv)).toBeInTheDocument()
       })
     })
 
     describe('Vertical Display tests', () => {
       it('should select a rating when the rating is clicked', () => {
-        const {getByTestId, queryByTestId} = renderComponentHorizontal('Vertical')
+        const {getByTestId, queryByTestId} = renderComponentModern('Vertical')
 
         expect(getByTestId('rubric-assessment-instructor-score')).toHaveTextContent('0 pts')
 
         const ratingDiv = getByTestId('rating-button-4-0')
-        ratingDiv.querySelector('button')
-        expect(getSelectedDiv(ratingDiv)).toBeNull()
+        expect(getModernSelectedDiv(ratingDiv)).toBeNull()
         expect(queryByTestId('rating-details-4')).toBeNull()
         const button = ratingDiv.querySelector('button') as HTMLButtonElement
         fireEvent.click(button)
 
         expect(getByTestId('rubric-assessment-instructor-score')).toHaveTextContent('4 pts')
-        expect(getSelectedDiv(ratingDiv)).toBeInTheDocument()
+        expect(getModernSelectedDiv(ratingDiv)).toBeInTheDocument()
         const detailsDiv = getByTestId('rating-details-4')
         expect(detailsDiv).toHaveTextContent(RUBRIC_DATA.criteria[0].ratings[0].description)
         expect(detailsDiv).toHaveTextContent(RUBRIC_DATA.criteria[0].ratings[0].longDescription)
       })
 
       it('should reselect a rating for the same criterion when another rating is clicked', () => {
-        const {getByTestId} = renderComponentHorizontal('Vertical')
+        const {getByTestId} = renderComponentModern('Vertical')
 
         expect(getByTestId('rubric-assessment-instructor-score')).toHaveTextContent('0 pts')
 
         const oldRatingDiv = getByTestId('rating-button-4-0')
-        oldRatingDiv.querySelector('button')
-        expect(getSelectedDiv(oldRatingDiv)).toBeNull()
+        expect(getModernSelectedDiv(oldRatingDiv)).toBeNull()
         const oldRatingButton = oldRatingDiv.querySelector('button') as HTMLButtonElement
         fireEvent.click(oldRatingButton)
 
         expect(getByTestId('rubric-assessment-instructor-score')).toHaveTextContent('4 pts')
-        expect(getSelectedDiv(oldRatingDiv)).toBeInTheDocument()
+        expect(getModernSelectedDiv(oldRatingDiv)).toBeInTheDocument()
 
         const newRatingDiv = getByTestId('rating-button-3-1')
-        newRatingDiv.querySelector('button')
-        expect(getSelectedDiv(newRatingDiv)).toBeNull()
+        expect(getModernSelectedDiv(newRatingDiv)).toBeNull()
         const newRatingButton = newRatingDiv.querySelector('button') as HTMLButtonElement
         fireEvent.click(newRatingButton)
 
         expect(getByTestId('rubric-assessment-instructor-score')).toHaveTextContent('3 pts')
-        expect(getSelectedDiv(newRatingDiv)).toBeInTheDocument()
-        expect(getSelectedDiv(oldRatingDiv)).toBeNull()
+        expect(getModernSelectedDiv(newRatingDiv)).toBeInTheDocument()
+        expect(getModernSelectedDiv(oldRatingDiv)).toBeNull()
       })
 
       it('should select multiple ratings across multiple criteria', () => {
-        const {getByTestId} = renderComponentHorizontal('Vertical')
+        const {getByTestId} = renderComponentModern('Vertical')
 
         expect(getByTestId('rubric-assessment-instructor-score')).toHaveTextContent('0 pts')
 
         const oldRatingDiv = getByTestId('rating-button-4-0')
-        oldRatingDiv.querySelector('button')
-        expect(getSelectedDiv(oldRatingDiv)).toBeNull()
+        expect(getModernSelectedDiv(oldRatingDiv)).toBeNull()
         const oldRatingButton = oldRatingDiv.querySelector('button') as HTMLButtonElement
         fireEvent.click(oldRatingButton)
 
         expect(getByTestId('rubric-assessment-instructor-score')).toHaveTextContent('4 pts')
-        expect(getSelectedDiv(oldRatingDiv)).toBeInTheDocument()
+        expect(getModernSelectedDiv(oldRatingDiv)).toBeInTheDocument()
 
         const newRatingDiv = getByTestId('rating-button-10-0')
-        newRatingDiv.querySelector('button')
-        expect(getSelectedDiv(newRatingDiv)).toBeNull()
+        expect(getModernSelectedDiv(newRatingDiv)).toBeNull()
         const newRatingButton = newRatingDiv.querySelector('button') as HTMLButtonElement
         fireEvent.click(newRatingButton)
 
         expect(getByTestId('rubric-assessment-instructor-score')).toHaveTextContent('14 pts')
-        expect(getSelectedDiv(newRatingDiv)).toBeInTheDocument()
-        expect(getSelectedDiv(oldRatingDiv)).toBeInTheDocument()
+        expect(getModernSelectedDiv(newRatingDiv)).toBeInTheDocument()
+        expect(getModernSelectedDiv(oldRatingDiv)).toBeInTheDocument()
       })
     })
 
@@ -356,7 +348,7 @@ describe('RubricAssessmentTray Tests', () => {
       expect(getByTestId('rubric-assessment-instructor-score')).toHaveTextContent('4 pts')
       expect(queryAllByTestId('rubric-assessment-horizontal-display')).toHaveLength(2)
       const horizontalRatingDiv = queryByTestId('rating-button-4-0') as HTMLElement
-      expect(getSelectedDiv(horizontalRatingDiv)).toBeInTheDocument()
+      expect(getModernSelectedDiv(horizontalRatingDiv)).toBeInTheDocument()
 
       fireEvent.click(viewModeSelect)
       const verticalRoleOption = queryByRole('option', {name: 'Vertical'}) as HTMLElement
@@ -365,7 +357,75 @@ describe('RubricAssessmentTray Tests', () => {
       expect(getByTestId('rubric-assessment-instructor-score')).toHaveTextContent('4 pts')
       expect(queryAllByTestId('rubric-assessment-vertical-display')).toHaveLength(2)
       const verticalRatingDiv = queryByTestId('rating-button-4-0') as HTMLElement
-      expect(getSelectedDiv(verticalRatingDiv)).toBeInTheDocument()
+      expect(getModernSelectedDiv(verticalRatingDiv)).toBeInTheDocument()
+    })
+  })
+
+  describe('Peer Review tests', () => {
+    const rubricAssessors = [
+      {id: '1', name: 'Teacher'},
+      {id: '2', name: 'Peer Reviewer'},
+    ]
+
+    const renderPeerReviewComponent = () => {
+      return renderComponent({isPeerReview: true, rubricAssessors, rubricAssessmentId: '2'})
+    }
+
+    it('should display the peer review text when in peer review mode', () => {
+      const {getByTestId} = renderPeerReviewComponent()
+      expect(getByTestId('rubric-assessment-header')).toHaveTextContent('Peer Review')
+    })
+
+    it('should render the peer review assessment dropdown', () => {
+      const {getByTestId, queryAllByRole} = renderPeerReviewComponent()
+      const assessorSelect = getByTestId('rubric-assessment-accessor-select') as HTMLSelectElement
+      expect(assessorSelect).toBeInTheDocument()
+      expect(assessorSelect.value).toBe('Peer Reviewer')
+
+      fireEvent.click(assessorSelect)
+      const assessors = queryAllByRole('option') as HTMLElement[]
+      expect(assessors.length).toBe(2)
+      expect(assessors[0].innerHTML).toBe('Teacher')
+      expect(assessors[1].innerHTML).toBe('Peer Reviewer')
+    })
+
+    it('should not render footer section when in peer review mode', () => {
+      const {queryByTestId} = renderPeerReviewComponent()
+      expect(queryByTestId('rubric-assessment-footer')).toBeNull()
+    })
+
+    describe('Traditional View tests', () => {
+      it('should not allow users to select ratings when in peer review mode', () => {
+        const {getByTestId} = renderPeerReviewComponent()
+        const rating = getByTestId('traditional-criterion-1-ratings-0') as HTMLButtonElement
+        fireEvent.click(rating)
+
+        expect(getByTestId('rubric-assessment-instructor-score')).toHaveTextContent('0 pts')
+      })
+    })
+
+    describe('Modern View tests', () => {
+      it('should not allow users to select ratings when in peer review mode', () => {
+        const {getByTestId, queryByTestId, queryByRole} = renderPeerReviewComponent()
+
+        const viewModeSelect = getByTestId(
+          'rubric-assessment-view-mode-select'
+        ) as HTMLSelectElement
+
+        fireEvent.click(viewModeSelect)
+        const roleOption = queryByRole('option', {name: 'Horizontal'}) as HTMLElement
+        fireEvent.click(roleOption)
+
+        expect(getByTestId('rubric-assessment-instructor-score')).toHaveTextContent('0 pts')
+
+        const ratingDiv = getByTestId('rating-button-4-0')
+        expect(getModernSelectedDiv(ratingDiv)).toBeNull()
+        expect(queryByTestId('rating-details-4')).toBeNull()
+        const button = ratingDiv.querySelector('button') as HTMLButtonElement
+        fireEvent.click(button)
+
+        expect(getByTestId('rubric-assessment-instructor-score')).toHaveTextContent('0 pts')
+      })
     })
   })
 })
