@@ -78,3 +78,8 @@ export type UpdateAssessmentData = {
   description?: string
   comments?: string
 }
+
+export type RubricAssessmentSelect = {
+  id: string
+  name: string | null
+}[]

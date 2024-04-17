@@ -36,6 +36,7 @@ type ModernViewModes = 'horizontal' | 'vertical'
 type ModernViewProps = {
   criteria: RubricCriterion[]
   isPreviewMode: boolean
+  isPeerReview: boolean
   ratingOrder: string
   rubricAssessmentData: RubricAssessmentData[]
   selectedViewMode: ModernViewModes
@@ -44,6 +45,7 @@ type ModernViewProps = {
 export const ModernView = ({
   criteria,
   isPreviewMode,
+  isPeerReview,
   ratingOrder,
   rubricAssessmentData,
   selectedViewMode,
@@ -61,6 +63,7 @@ export const ModernView = ({
             key={criterion.id}
             criterion={criterion}
             displayHr={index < criteria.length - 1}
+            isPeerReview={isPeerReview}
             isPreviewMode={isPreviewMode}
             ratingOrder={ratingOrder}
             criterionAssessment={criterionAssessment}
@@ -76,6 +79,7 @@ export const ModernView = ({
 type CriterionRowProps = {
   criterion: RubricCriterion
   displayHr: boolean
+  isPeerReview: boolean
   isPreviewMode: boolean
   ratingOrder: string
   criterionAssessment?: RubricAssessmentData
@@ -85,6 +89,7 @@ type CriterionRowProps = {
 export const CriterionRow = ({
   criterion,
   displayHr,
+  isPeerReview,
   isPreviewMode,
   ratingOrder,
   criterionAssessment,
@@ -96,14 +101,13 @@ export const CriterionRow = ({
     rating => rating.points === criterionAssessment?.points
   )
 
-  const defaultPoints = criterionAssessment?.points ?? ''
-
-  const [pointsInput, setPointsInput] = useState<string>(defaultPoints.toString())
+  const [pointsInput, setPointsInput] = useState<string>()
   const [selectedRatingDescription, setSelectedRatingDescription] = useState<string>()
   const [commentText, setCommentText] = useState<string>(criterionAssessment?.comments ?? '')
 
   useEffect(() => {
     setCommentText(criterionAssessment?.comments ?? '')
+    setPointsInput((criterionAssessment?.points ?? '').toString())
   }, [criterionAssessment])
 
   const updateAssessmentData = (params: Partial<UpdateAssessmentData>) => {
@@ -147,6 +151,7 @@ export const CriterionRow = ({
     if (selectedViewMode === 'horizontal' && ratings.length <= 5) {
       return (
         <HorizontalButtonDisplay
+          isPeerReview={isPeerReview}
           ratings={ratings}
           ratingOrder={ratingOrder}
           selectedRatingIndex={selectedRatingIndex}
@@ -157,6 +162,7 @@ export const CriterionRow = ({
 
     return (
       <VerticalButtonDisplay
+        isPeerReview={isPeerReview}
         ratings={ratings}
         ratingOrder={ratingOrder}
         selectedRatingIndex={selectedRatingIndex}
@@ -168,22 +174,28 @@ export const CriterionRow = ({
   return (
     <View as="div" margin="0 0 small 0">
       <Flex direction="row-reverse">
-        <Flex.Item margin="0 0 0 x-small">
+        <Flex.Item margin={isPeerReview ? '0' : '0 0 0 x-small'}>
           <Text size="small" weight="bold">
             /{criterion.points}
           </Text>
         </Flex.Item>
-        <Flex.Item>
-          <TextInput
-            renderLabel={<ScreenReaderContent>{I18n.t('Instructor Points')}</ScreenReaderContent>}
-            placeholder="--"
-            width="2.688rem"
-            height="2.375rem"
-            value={pointsInput?.toString() ?? ''}
-            onChange={(_e, value) => {
-              setPoints(value)
-            }}
-          />
+        <Flex.Item margin={isPeerReview ? '0 0 0 x-small' : '0'}>
+          {isPeerReview ? (
+            <Text size="small" weight="bold">
+              {pointsInput?.toString() ?? ''}
+            </Text>
+          ) : (
+            <TextInput
+              renderLabel={<ScreenReaderContent>{I18n.t('Instructor Points')}</ScreenReaderContent>}
+              placeholder="--"
+              width="2.688rem"
+              height="2.375rem"
+              value={pointsInput?.toString() ?? ''}
+              onChange={(_e, value) => {
+                setPoints(value)
+              }}
+            />
+          )}
         </Flex.Item>
       </Flex>
       <View as="div">
@@ -207,7 +219,7 @@ export const CriterionRow = ({
           <Flex.Item shouldGrow={true} margin="0 0 0 xx-small">
             <TextArea
               label={<ScreenReaderContent>{I18n.t('Leave criterion comment')}</ScreenReaderContent>}
-              readOnly={isPreviewMode}
+              readOnly={isPreviewMode || isPeerReview}
               size="small"
               value={commentText}
               onChange={e => setCommentText(e.target.value)}

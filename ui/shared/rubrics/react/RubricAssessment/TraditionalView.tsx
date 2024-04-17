@@ -18,26 +18,30 @@
 
 import React, {useEffect, useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import type {RubricAssessmentData, RubricCriterion, UpdateAssessmentData} from '../types/rubric'
+import {colors} from '@instructure/canvas-theme'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
-import {possibleString} from '../Points'
 import {IconChatLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {TextArea} from '@instructure/ui-text-area'
 import {Link} from '@instructure/ui-link'
+import {possibleString} from '../Points'
+import type {RubricAssessmentData, RubricCriterion, UpdateAssessmentData} from '../types/rubric'
 
 const I18n = useI18nScope('rubrics-assessment-tray')
+const {licorice} = colors
 
 type TraditionalViewProps = {
   criteria: RubricCriterion[]
+  isPeerReview: boolean
   rubricAssessmentData: RubricAssessmentData[]
   rubricTitle: string
   onUpdateAssessmentData: (params: UpdateAssessmentData) => void
 }
 export const TraditionalView = ({
   criteria,
+  isPeerReview,
   rubricAssessmentData,
   rubricTitle,
   onUpdateAssessmentData,
@@ -97,6 +101,7 @@ export const TraditionalView = ({
             key={`criterion-${criterion.id}-${index}`}
             criterion={criterion}
             criterionAssessment={criterionAssessment}
+            isPeerReview={isPeerReview}
             onUpdateAssessmentData={onUpdateAssessmentData}
           />
         )
@@ -108,11 +113,13 @@ export const TraditionalView = ({
 type CriterionRowProps = {
   criterion: RubricCriterion
   criterionAssessment?: RubricAssessmentData
+  isPeerReview: boolean
   onUpdateAssessmentData: (params: UpdateAssessmentData) => void
 }
 const CriterionRow = ({
   criterion,
   criterionAssessment,
+  isPeerReview,
   onUpdateAssessmentData,
 }: CriterionRowProps) => {
   const ratingsWidth = Math.max(127.59 * criterion.ratings.length, 638)
@@ -177,7 +184,7 @@ const CriterionRow = ({
                 const isSelected = selectedRatingIndex === index
 
                 const borderWith = isHovered || isSelected ? highlightedBorder : border
-                const borderColor = isHovered || isSelected ? 'success' : 'primary'
+                const borderColor = isHovered || isSelected ? 'brand' : 'primary'
 
                 const onClickRating = (ratingIndex: number) => {
                   if (selectedRatingIndex === ratingIndex) {
@@ -196,6 +203,7 @@ const CriterionRow = ({
                   <Flex.Item width={`${width}%`} key={`criterion-${criterion.id}-ratings-${index}`}>
                     <View
                       as="button"
+                      disabled={isPeerReview}
                       tabIndex={0}
                       background="transparent"
                       height="13.75rem"
@@ -205,10 +213,13 @@ const CriterionRow = ({
                       overflowY="auto"
                       cursor="pointer"
                       padding="xxx-small x-small 0 x-small"
-                      onMouseOver={() => setHoveredRatingIndex(index)}
+                      onMouseOver={() => setHoveredRatingIndex(isPeerReview ? -1 : index)}
                       onMouseOut={() => setHoveredRatingIndex(undefined)}
                       onClick={() => onClickRating(index)}
-                      themeOverride={{borderWidthMedium: isSelected ? '0.188rem' : '0.125rem'}}
+                      themeOverride={{
+                        borderWidthMedium: isSelected ? '0.188rem' : '0.125rem',
+                        borderColorBrand: licorice,
+                      }}
                       data-testid={`traditional-criterion-${criterion.id}-ratings-${index}`}
                     >
                       <Flex direction="column" height="100%">
@@ -242,7 +253,7 @@ const CriterionRow = ({
                                   left: '50%',
                                   borderLeft: '12px solid transparent',
                                   borderRight: '12px solid transparent',
-                                  borderBottom: '12px solid green',
+                                  borderBottom: `12px solid ${licorice}`,
                                   transform: 'translateX(-50%)',
                                 }}
                               />
@@ -305,6 +316,7 @@ const CriterionRow = ({
               <TextArea
                 label={<ScreenReaderContent>{I18n.t('Criterion Comment')}</ScreenReaderContent>}
                 placeholder={I18n.t('Comment')}
+                readOnly={isPeerReview}
                 data-testid={`comment-text-area-${criterion.id}`}
                 width="100%"
                 value={commentText}

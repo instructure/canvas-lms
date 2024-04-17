@@ -18,18 +18,23 @@
 
 import React from 'react'
 import type {RubricRating} from '../types/rubric'
+import {colors} from '@instructure/canvas-theme'
 import {Flex} from '@instructure/ui-flex'
 import {RatingButton} from './RatingButton'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 
+const {licorice} = colors
+
 type HorizontalButtonDisplayProps = {
+  isPeerReview: boolean
   ratings: RubricRating[]
   ratingOrder: string
   selectedRatingIndex?: number
   onSelectRating: (index: number) => void
 }
 export const HorizontalButtonDisplay = ({
+  isPeerReview,
   ratings,
   ratingOrder,
   selectedRatingIndex = -1,
@@ -40,12 +45,13 @@ export const HorizontalButtonDisplay = ({
       {selectedRatingIndex >= 0 && (
         <View
           as="div"
-          borderColor="success"
-          borderWidth="small"
+          borderColor="brand"
+          borderWidth="medium"
           borderRadius="medium"
           padding="xx-small"
           margin="0 xx-small small xx-small"
           data-testid={`rating-details-${ratings[selectedRatingIndex]?.id}`}
+          themeOverride={{borderColorBrand: licorice, borderWidthMedium: '0.188rem'}}
         >
           <View as="div">
             <Text size="x-small" weight="bold">
@@ -69,6 +75,7 @@ export const HorizontalButtonDisplay = ({
               <RatingButton
                 buttonDisplay={buttonDisplay}
                 isSelected={selectedRatingIndex === index}
+                isPeerReview={isPeerReview}
                 selectedArrowDirection="up"
                 onClick={() => onSelectRating(index)}
               />
