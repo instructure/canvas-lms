@@ -74,7 +74,7 @@ describe('UrlEntry', () => {
         Submission: {
           submissionDraft: {
             activeSubmissionType: 'online_url',
-            attachments: () => [],
+            attachments: [],
             body: null,
             meetsUrlCriteria: false,
             url: null,
@@ -101,7 +101,7 @@ describe('UrlEntry', () => {
         Submission: {
           submissionDraft: {
             activeSubmissionType: 'online_url',
-            attachments: () => [],
+            attachments: [],
             body: null,
             meetsUrlCriteria: false,
             url: null,
@@ -130,7 +130,7 @@ describe('UrlEntry', () => {
         Submission: {
           submissionDraft: {
             activeSubmissionType: 'online_url',
-            attachments: () => [],
+            attachments: [],
             body: null,
             meetsUrlCriteria: false,
             url: null,
@@ -158,7 +158,7 @@ describe('UrlEntry', () => {
         Submission: {
           submissionDraft: {
             activeSubmissionType: 'online_url',
-            attachments: () => [],
+            attachments: [],
             body: null,
             meetsUrlCriteria: false,
             url: null,
@@ -185,7 +185,7 @@ describe('UrlEntry', () => {
         Submission: {
           submissionDraft: {
             activeSubmissionType: 'online_url',
-            attachments: () => [],
+            attachments: [],
             body: null,
             meetsUrlCriteria: false,
             url: 'not a valid url',
@@ -212,7 +212,7 @@ describe('UrlEntry', () => {
         Submission: {
           submissionDraft: {
             activeSubmissionType: 'online_url',
-            attachments: () => [],
+            attachments: [],
             body: null,
             meetsUrlCriteria: true,
             url: 'http://www.valid.com',
@@ -239,7 +239,7 @@ describe('UrlEntry', () => {
         Submission: {
           submissionDraft: {
             activeSubmissionType: 'online_url',
-            attachments: () => [],
+            attachments: [],
             body: null,
             meetsUrlCriteria: true,
             url: 'http://www.reddit.com',
