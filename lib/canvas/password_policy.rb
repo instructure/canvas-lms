@@ -36,12 +36,15 @@ module Canvas
       end
     end
 
+    DEFAULT_MAX_ATTEMPTS = 10
+
     def self.default_policy
       {
         # :max_repeats => nil,
         # :max_sequence => nil,
         # :disallow_common_passwords => false,
-        min_length: 8
+        min_length: 8,
+        max_attempts: DEFAULT_MAX_ATTEMPTS
       }
     end
 

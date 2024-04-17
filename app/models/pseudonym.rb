@@ -623,7 +623,7 @@ class Pseudonym < ActiveRecord::Base
     [Shard.default]
   end
 
-  def self.find_all_by_arbitrary_credentials(credentials, account_ids, remote_ip)
+  def self.find_all_by_arbitrary_credentials(credentials, account_ids)
     return [] if credentials[:unique_id].blank? ||
                  credentials[:password].blank?
     if credentials[:unique_id].length > 255
@@ -650,7 +650,7 @@ class Pseudonym < ActiveRecord::Base
         .preload(:user)
         .select do |p|
           valid = p.valid_arbitrary_credentials?(credentials[:password])
-          error ||= p.audit_login(remote_ip, valid)
+          error ||= p.audit_login(valid)
           valid
         end
     end
@@ -659,10 +659,10 @@ class Pseudonym < ActiveRecord::Base
     pseudonyms
   end
 
-  def self.authenticate(credentials, account_ids, remote_ip = nil)
+  def self.authenticate(credentials, account_ids)
     pseudonyms = []
     begin
-      pseudonyms = find_all_by_arbitrary_credentials(credentials, account_ids, remote_ip)
+      pseudonyms = find_all_by_arbitrary_credentials(credentials, account_ids)
     rescue ImpossibleCredentialsError
       Rails.logger.info("Impossible pseudonym credentials: #{credentials[:unique_id]}, invalidating session")
       return :impossible_credentials
@@ -677,8 +677,8 @@ class Pseudonym < ActiveRecord::Base
     end
   end
 
-  def audit_login(remote_ip, valid_password)
-    Canvas::Security::LoginRegistry.audit_login(self, remote_ip, valid_password)
+  def audit_login(valid_password)
+    Canvas::Security::LoginRegistry.audit_login(self, valid_password)
   end
 
   def self.cas_ticket_key(ticket)
