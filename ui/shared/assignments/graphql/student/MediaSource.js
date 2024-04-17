@@ -40,7 +40,7 @@ export const MediaSource = {
 //       graphql type instead of the alias, ie `contentType` instead of `type`
 export const DefaultMocks = {
   MediaSource: () => ({
-    content_type: 'video/mp4',
+    contentType: 'video/mp4',
     height: '360',
     width: '632',
   }),

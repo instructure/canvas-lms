@@ -328,7 +328,7 @@ describe('Assignment Student Content View', () => {
   })
 
   it('does not render the attempt select if there is no submission', async () => {
-    const props = await mockAssignmentAndSubmission({Submission: null})
+    const props = await mockAssignmentAndSubmission({Query: {submission: null}})
     props.allSubmissions = [{id: '1', _id: '1'}]
     const {queryByTestId} = render(
       <MockedProvider>
@@ -811,7 +811,9 @@ describe('Assignment Student Content View', () => {
     })
 
     it('shows the unread comments badge if there are unread comments', async () => {
-      const props = await mockAssignmentAndSubmission({Submission: {unreadCommentCount: 1, feedbackForCurrentAttempt: true}})
+      const props = await mockAssignmentAndSubmission({
+        Submission: {unreadCommentCount: 1, feedbackForCurrentAttempt: true},
+      })
       const {getByTestId} = render(
         <MockedProvider>
           <StudentContent {...props} />
@@ -832,7 +834,6 @@ describe('Assignment Student Content View', () => {
         </MockedProvider>
       )
       expect(queryByTestId('unread_comments_badge')).not.toBeInTheDocument()
-    
     })
 
     it('does not show the unread comments badge if there are no unread comments', async () => {
@@ -1001,7 +1002,9 @@ describe('Assignment Student Content View', () => {
     })
 
     it('shows the unread comments badge if peerReviewModeEnabled is set to false', async () => {
-      const props = await mockAssignmentAndSubmission({Submission: {unreadCommentCount: 1, feedbackForCurrentAttempt: true}})
+      const props = await mockAssignmentAndSubmission({
+        Submission: {unreadCommentCount: 1, feedbackForCurrentAttempt: true},
+      })
       props.assignment.env.peerReviewModeEnabled = false
       const {getByTestId} = render(
         <MockedProvider>
@@ -1024,7 +1027,7 @@ describe('Assignment Student Content View', () => {
     })
 
     it('is not rendered when no submission object is present', async () => {
-      const props = await mockAssignmentAndSubmission({Submission: null})
+      const props = await mockAssignmentAndSubmission({Query: {submission: null}})
       props.allSubmissions = [{id: '1', _id: '1'}]
       const {queryByTestId} = render(
         <MockedProvider>
@@ -1283,7 +1286,7 @@ describe('Assignment Student Content View', () => {
     })
 
     it('is not rendered when no submission object is present', async () => {
-      const props = await mockAssignmentAndSubmission({Submission: null})
+      const props = await mockAssignmentAndSubmission({Query: {submission: null}})
       props.allSubmissions = [{id: '1', _id: '1'}]
       const {queryByTestId} = render(
         <MockedProvider>

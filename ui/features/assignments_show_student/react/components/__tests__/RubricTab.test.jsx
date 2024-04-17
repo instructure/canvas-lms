@@ -28,10 +28,10 @@ import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobal
 
 injectGlobalAlertContainers()
 
-function gradedOverrides() {
+function gradedResolvers() {
   return {
     Submission: {
-      rubricAssessmentsConnection: {
+      rubricAssessmentsConnection: () => ({
         nodes: [
           {
             _id: 1,
@@ -49,27 +49,27 @@ function gradedOverrides() {
             assessor: {_id: 2, name: 'assessor2', enrollments: [{type: 'TaEnrollment'}]},
           },
         ],
-      },
+      }),
     },
     Course: {
       account: {
         outcomeProficiency: {
-          proficiencyRatingsConnection: {
+          proficiencyRatingsConnection: () => ({
             nodes: [{}],
-          },
+          }),
         },
       },
     },
   }
 }
 
-function ungradedOverrides() {
+function ungradedResolvers() {
   return {
-    Submission: {rubricAssessmentsConnection: null},
+    Submission: {rubricAssessmentsConnection: () => null},
     Course: {
       account: {
         outcomeProficiency: {
-          proficiencyRatingsConnection: null,
+          proficiencyRatingsConnection: () => null,
         },
       },
     },
@@ -84,7 +84,7 @@ async function makeProps(opts = {}) {
     submissionAttempt: 0,
   }
 
-  const overrides = opts.graded ? gradedOverrides() : ungradedOverrides()
+  const resolvers = opts.graded ? gradedResolvers() : ungradedResolvers()
   const allOverrides = [
     {
       Node: {__typename: 'Assignment'},
@@ -92,11 +92,10 @@ async function makeProps(opts = {}) {
       Rubric: {
         criteria: [{}],
       },
-      ...overrides,
     },
   ]
 
-  const result = await mockQuery(RUBRIC_QUERY, allOverrides, variables)
+  const result = await mockQuery(RUBRIC_QUERY, allOverrides, variables, resolvers)
   const assessments = result.data.submission.rubricAssessmentsConnection?.nodes
   return {
     assessments: assessments?.map(assessment => transformRubricAssessmentData(assessment)) || [],
