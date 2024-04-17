@@ -660,6 +660,10 @@ CanvasRails::Application.routes.draw do
     end
     get "calendar_settings", action: :account_calendar_settings, as: :calendar_settings
 
+    scope(controller: :analytics_hub) do
+      get "analytics_hub", action: :show, as: :analytics_hub
+    end
+
     scope(controller: :brand_configs) do
       get "theme_editor", action: :new, as: :theme_editor
       get "brand_configs", action: :index

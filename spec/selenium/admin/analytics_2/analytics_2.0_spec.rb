@@ -40,7 +40,7 @@ describe "analytics in Canvas" do
       @admin.account.update(allowed_services: "+analytics")
       visit_admin_settings_tab(@admin.account.id)
 
-      expect(admin_left_nav_menu.text).to include("Analytics")
+      expect(admin_left_nav_menu.text.split("\n")).to include("Analytics")
       expect(analytics_menu_item.attribute("href")).to include("/accounts/#{@admin.account.id}/analytics")
     end
 
@@ -49,7 +49,7 @@ describe "analytics in Canvas" do
       @admin.account.update(allowed_services: "")
       visit_admin_settings_tab(@admin.account.id)
 
-      expect(admin_left_nav_menu.text).not_to include("Analytics")
+      expect(admin_left_nav_menu.text.split("\n")).not_to include("Analytics")
     end
   end
 

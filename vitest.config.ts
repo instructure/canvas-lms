@@ -35,6 +35,7 @@ export default defineConfig({
       'ui/features/account_grading_settings/**/*',
       'ui/features/account_notification_settings/**/*',
       'ui/features/account_settings/**/*',
+      'ui/features/analytics_hub/**/*',
       'ui/features/assignment_edit/**/*',
       'ui/features/assignment_grade_summary/**/*',
       'ui/features/assignment_index/**/*',
