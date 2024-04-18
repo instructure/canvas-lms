@@ -325,7 +325,10 @@ class FeatureFlagsController < ApplicationController
       flag.current_user = @current_user # necessary step for audit log
       if flag.destroy
         feature_def = Feature.definitions[params[:feature]]
-        feature_def.after_state_change_proc&.call(@current_user, @context, prior_state, feature_def.state)
+        if feature_def.after_state_change_proc
+          current_state = @context.lookup_feature_flag(params[:feature], skip_cache: true).state
+          feature_def.after_state_change_proc.call(@current_user, @context, prior_state, current_state)
+        end
       end
       render json: feature_flag_json(flag, @context, @current_user, session)
     end
