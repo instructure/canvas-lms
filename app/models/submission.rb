@@ -3043,8 +3043,15 @@ class Submission < ActiveRecord::Base
 
   def word_count
     if body && submission_type != "online_quiz"
-      tinymce_wordcount_count_regex = /[\w\u2019\x27\-\u00C0-\u1FFF]+/
-      ActionController::Base.helpers.strip_tags(body).scan(tinymce_wordcount_count_regex).size
+      segments = body.split(%r{<br\s*/?>})
+      word_count = 0
+      segments.each do |segment|
+        tinymce_wordcount_count_regex = /(?:[\w\u2019\x27\-\u00C0-\u1FFF]+|(?<=<br>)([^<]+)|([^<]+)(?=<br>))/
+        words = ActionController::Base.helpers.strip_tags(segment).scan(tinymce_wordcount_count_regex).size
+        word_count += words
+      end
+
+      word_count
     elsif versioned_attachments.present?
       Attachment.where(id: versioned_attachments.pluck(:id)).sum(:word_count)
     end

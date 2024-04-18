@@ -8973,6 +8973,11 @@ describe Submission do
       expect(submission.word_count).to eq 2
     end
 
+    it "returns the word count if body is split up by <br> tags" do
+      submission.update(body: "test<br>submission")
+      expect(submission.word_count).to eq 2
+    end
+
     it "returns nil if there is no body" do
       expect(submission.body).to be_nil
       expect(submission.word_count).to be_nil
