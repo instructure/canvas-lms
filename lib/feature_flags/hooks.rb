@@ -109,7 +109,7 @@ module FeatureFlags
     end
 
     def self.smart_search_after_state_change_hook(_user, context, old_state, new_state)
-      if %w[off allowed].include?(old_state) && %w[on allowed_on].include?(new_state)
+      if %w[off allowed hidden].include?(old_state) && %w[on allowed_on].include?(new_state)
         if context.is_a?(Account) && !context.site_admin?
           SmartSearch.delay(priority: Delayed::LOW_PRIORITY).index_account(context)
         elsif context.is_a?(Course)
