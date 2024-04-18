@@ -94,5 +94,17 @@ describe "Smart Search API", type: :request do
       response = api_call(:get, @path + "?q=foo&filter[]=assignments", @params.merge(q: "foo", filter: ["assignments"]))
       expect(response["results"].pluck("content_type")).to match_array %w[Assignment]
     end
+
+    it "indexes on demand" do
+      stub_smart_search
+
+      response = api_call(:get, @path + "?q=foo", @params.merge(q: "foo"))
+      expect(response["status"]).to eq("index_incomplete")
+      expect(response["indexing_progress"]).to eq 0
+
+      run_jobs
+      response = api_call(:get, @path + "/index_status", @params.merge(action: "index_status"))
+      expect(response).to eq({ "status" => "indexed" })
+    end
   end
 end

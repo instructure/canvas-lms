@@ -2636,6 +2636,7 @@ CanvasRails::Application.routes.draw do
     scope(controller: "smart_search") do
       get "courses/:course_id/smartsearch", action: :search, as: :course_smart_search_query
       get "courses/:course_id/smartsearch/log", action: :log
+      get "courses/:course_id/smartsearch/index_status", action: :index_status
       # TODO: add account level search
     end
 
