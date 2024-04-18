@@ -37,6 +37,14 @@ module CourseWikiIndexPage
     ".duplicate-wiki-page"
   end
 
+  def wiki_page_assign_to_menu_selector
+    "li:contains('Assign To...')"
+  end
+
+  def manage_wiki_page_item_button_selector(wiki_page_title)
+    "a[aria-label='Settings for #{wiki_page_title}']"
+  end
+
   #------------------------------ Elements ------------------------------
   def page_index_content_container
     f("#content")
@@ -51,7 +59,7 @@ module CourseWikiIndexPage
   end
 
   def manage_wiki_page_item_button(wiki_page_title)
-    f("a[aria-label='Settings for #{wiki_page_title}']")
+    f(manage_wiki_page_item_button_selector(wiki_page_title))
   end
 
   def wiki_page_item_settings_menu
@@ -68,6 +76,10 @@ module CourseWikiIndexPage
 
   def copy_to_menu_item
     fj("li:contains('Copy to...')")
+  end
+
+  def wiki_page_assign_to_menu
+    fj(wiki_page_assign_to_menu_selector)
   end
 
   def page_index_menu_link
@@ -92,7 +104,7 @@ module CourseWikiIndexPage
   end
 
   def click_manage_wiki_page_item_button(wiki_page_title)
-    f("a[aria-label='Settings for #{wiki_page_title}']").click
+    manage_wiki_page_item_button(wiki_page_title).click
     wait_for_ajaximations
   end
 

@@ -58,7 +58,7 @@ import {Alert} from '@instructure/ui-alerts'
 
 const I18n = useI18nScope('differentiated_modules')
 
-function itemTypeToIcon(iconType: string) {
+function itemTypeToIcon(iconType: IconType) {
   switch (iconType) {
     case 'assignment':
       return <IconAssignmentLine data-testid="icon-assignment" />
@@ -75,7 +75,7 @@ function itemTypeToIcon(iconType: string) {
   }
 }
 
-function itemTypeToApiURL(courseId: string, itemType: string, itemId: string) {
+function itemTypeToApiURL(courseId: string, itemType: ItemType, itemId: string) {
   switch (itemType) {
     case 'assignment':
     case 'lti-quiz':
@@ -111,7 +111,7 @@ export const updateModuleItem = ({
   onSuccess,
 }: {
   courseId: string
-  moduleItemType: string
+  moduleItemType: ItemType
   moduleItemName: string
   moduleItemContentId: string
   payload: DateDetails
@@ -137,6 +137,9 @@ export const updateModuleItem = ({
     })
 }
 
+type ItemType = 'assignment' | 'quiz' | 'lti-quiz' | 'discussion' | 'page'
+type IconType = 'assignment' | 'quiz' | 'lti-quiz' | 'discussion' | 'page' | null
+
 // TODO: need props to initialize with cards corresponding to current assignments
 export interface ItemAssignToTrayProps {
   open: boolean
@@ -146,8 +149,8 @@ export interface ItemAssignToTrayProps {
   onExited?: () => void
   courseId: string
   itemName: string
-  itemType: string
-  iconType: string
+  itemType: ItemType
+  iconType: IconType
   itemContentId: string
   pointsPossible?: number | null
   locale: string
