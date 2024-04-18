@@ -4707,11 +4707,12 @@ ready(function () {
         .find('.expand_link')
         .removeClass('hidden')
         .focus()
-      let $obj = $(this).parents('.group_top').next()
-      while ($obj.length > 0 && $obj.hasClass('question_holder')) {
-        $obj.hide()
-        $obj = $obj.next()
-      }
+      $(this)
+        .parents('.group_top')
+        .nextUntil('.group_bottom', '.question_holder')
+        .each(function () {
+          $(this).hide()
+        })
     })
     .on('click', '.expand_link', function (event) {
       if ($(this).closest('.group_top').length === 0) {
@@ -4726,11 +4727,12 @@ ready(function () {
         .end()
         .find('.expand_link')
         .addClass('hidden')
-      let $obj = $(this).parents('.group_top').next()
-      while ($obj.length > 0 && $obj.hasClass('question_holder')) {
-        $obj.show()
-        $obj = $obj.next()
-      }
+      $(this)
+        .parents('.group_top')
+        .nextUntil('.group_bottom', '.question_holder')
+        .each(function () {
+          $(this).show()
+        })
     })
 
   if (!lockedItems.content) {
