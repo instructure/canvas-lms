@@ -826,5 +826,17 @@ describe "Feature Flags API", type: :request do
       end.to change(t_state_changes, :size).by(1)
       expect(t_state_changes.last).to eql [t_root_admin.id, t_course.id, "on", "allowed"]
     end
+
+    it "includes the correct new state when deleting a feature flag override when a higher-level flag is set" do
+      t_sub_account.set_feature_flag!("custom_feature", Feature::STATE_DEFAULT_ON)
+      t_course.disable_feature!("custom_feature")
+      expect do
+        api_call_as_user(t_root_admin,
+                         :delete,
+                         "/api/v1/courses/#{t_course.id}/features/flags/custom_feature",
+                         { controller: "feature_flags", action: "delete", format: "json", course_id: t_course.to_param, feature: "custom_feature" })
+      end.to change(t_state_changes, :size).by(1)
+      expect(t_state_changes.last).to eql [t_root_admin.id, t_course.id, "off", "allowed_on"]
+    end
   end
 end
