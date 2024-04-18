@@ -192,6 +192,16 @@ const speedGraderHelpers = {
         // if we are a provisional grader and it doesn't need a grade (and we haven't given one already) then we shouldn't be able to grade it
         return 'not_gradeable'
       } else if (
+        submission.submitted_at === null &&
+        submission.grade === null &&
+        submission.workflow_state === 'graded' &&
+        !submission.excused
+      ) {
+        // if a teacher entered a grade on accident and clears it out
+        // for a student that doesn't have a submission, ensure that it
+        // does not show as not_graded
+        return 'not_submitted'
+      } else if (
         !(submission.final_provisional_grade && submission.final_provisional_grade.grade) &&
         !submission.excused &&
         (typeof submission.grade === 'undefined' ||
