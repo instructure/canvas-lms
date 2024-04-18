@@ -68,9 +68,17 @@ const Pill = ({studentId, observerId = null, text, onClick, selected = false}) =
   const textColor = selected ? 'primary' : 'secondary'
   const truncatedText = truncate(text)
 
+  const ariaLabel = selected ? I18n.t('Remove %{text}', {text}) : I18n.t('Add %{text}', {text})
+
   const contents = (
     <Flex as="div" margin="0 xx-small 0 0" justifyItems="space-between">
-      <Flex.Item size="0.75rem" shouldGrow={true} margin="0 xx-small 0 0" overflowX="hidden">
+      <Flex.Item
+        size="0.75rem"
+        shouldGrow={true}
+        margin="0 xx-small 0 0"
+        overflowX="hidden"
+        aria-label={ariaLabel}
+      >
         {renderText(text, truncatedText, textColor)}
       </Flex.Item>
       <Flex.Item>{renderIcon(selected)}</Flex.Item>
