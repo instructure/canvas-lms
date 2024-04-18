@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 - present Instructure, Inc.
+ * Copyright (C) 2024 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -18,9 +18,10 @@
 
 import React from 'react'
 import {Provider} from 'react-redux'
-import {mount} from 'enzyme'
+import {render} from '@testing-library/react'
+import {getByText, getAllByText} from '@testing-library/dom'
 import createStore from '@canvas/blueprint-courses/react/store'
-import {ConnectedUnsyncedChanges} from 'ui/features/blueprint_course_master/react/components/UnsyncedChanges'
+import {ConnectedUnsyncedChanges} from '../UnsyncedChanges'
 import MigrationStates from '@canvas/blueprint-courses/react/migrationStates'
 
 const noop = () => {}
@@ -90,45 +91,39 @@ function connect(props = {...defaultProps}) {
   )
 }
 
-QUnit.module('UnsyncedChanges component')
+describe('UnsyncedChanges component', () => {
 
-test('renders the UnsyncedChanges component', () => {
-  const tree = mount(connect())
-  let node = tree.find('UnsyncedChanges')
-  ok(node.exists())
-  node = tree.find('.bcs__history')
-  ok(node.exists())
-})
+  test('renders the UnsyncedChanges component', () => {
+    const tree = render(connect())
+    let node = tree.container.querySelector('.bcs__unsynced-item__table')
+    expect(node).toBeTruthy()
+    node = tree.container.querySelector('.bcs__history')
+    expect(node).toBeTruthy()
+  })
 
-test('renders the migration options component', () => {
-  const tree = mount(connect())
-  const node = tree.find('MigrationOptions')
-  ok(node.exists())
-})
+  test('renders the migration options component', () => {
+    const tree = render(connect())
+    const node = getByText(tree.container, 'History Settings')
+    expect(node).toBeTruthy()
+  })
 
-test('renders the changes properly', () => {
-  const tree = mount(connect())
-  const changes = tree.find('tr[data-testid="bcs__unsynced-item"]')
-  equal(changes.length, 4)
-  const locks = changes.find('IconBlueprintLockSolid')
-  equal(locks.length, 1)
-  const unlocks = changes.find('IconBlueprintSolid')
-  equal(unlocks.length, 3)
-})
+  test('renders the changes properly', () => {
+    const tree = render(connect())
+    const changes = tree.container.querySelectorAll('tr[data-testid="bcs__unsynced-item"]')
+    expect(changes.length).toEqual(4)
+    const locks = tree.container.querySelectorAll('svg[name="IconBlueprintLock"]')
+    expect(locks.length).toEqual(1)
+    const unlocks = tree.container.querySelectorAll('svg[name="IconBlueprint"]')
+    expect(unlocks.length).toEqual(3)
+  })
 
-test('renders the media tracks properly', () => {
-  const tree = mount(connect())
-  const changes = tree.find('tr[data-testid="bcs__unsynced-item"]')
-  equal(changes.length, 4)
-  const assetName = changes.findWhere(
-    node =>
-      node.name() === 'Text' &&
-      node.text() === 'media.mp4 (English)' &&
-      node.parent().type() === 'span'
-  )
-  equal(assetName.length, 1)
-  const assetType = changes.findWhere(
-    node => node.name() === 'Text' && node.text() === 'Caption' && node.parent().type() === 'td'
-  )
-  equal(assetType.length, 1)
+  test('renders the media tracks properly', () => {
+    const tree = render(connect())
+    const changes = tree.container.querySelectorAll('tr[data-testid="bcs__unsynced-item"]')
+    expect(changes.length).toEqual(4)
+    const assetName = getAllByText(tree.container, 'media.mp4 (English)')
+    expect(assetName.length).toEqual(1)
+    const assetType = getAllByText(tree.container, 'Caption')
+    expect(assetType.length).toEqual(1)
+  })
 })
