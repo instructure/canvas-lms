@@ -30,7 +30,7 @@ export default function OriginalityReport({originalityData}) {
           href={originalityData.reportUrl}
           className={'turnitin_similarity_score ' + originalityData.state + '_score'}
           data-testid="originality_report_url"
-          title={I18n.t('Similarity score -- %{state}', {state: originalityData.state})}
+          title={I18n.t('Similarity score')}
         >
           {originalityData.score}%
         </a>
