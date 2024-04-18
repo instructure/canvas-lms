@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useState} from 'react'
+import React, {useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {func, string} from 'prop-types'
 import {NumberInput} from '@instructure/ui-number-input'
@@ -33,11 +33,6 @@ GroupMembershipInput.propTypes = {
 
 export default function GroupMembershipInput({onChange, value, ...props}) {
   const [messages, setMessages] = useState([])
-  const [groupLimit, setGroupLimit] = useState('')
-
-  useEffect(() => {
-    onChange(groupLimit)
-  }, [groupLimit, onChange])
 
   function handleIncrement() {
     // will allow increment from an empty string
@@ -53,7 +48,7 @@ export default function GroupMembershipInput({onChange, value, ...props}) {
 
   function handleChange(_, input) {
     if (Number.isNaN(Number(input))) {
-      setGroupLimit('')
+      onChange('')
       return setMessages([
         {text: I18n.t('%{INPUT} is not a valid number.', {INPUT: input}), type: 'error'},
       ])
@@ -65,15 +60,14 @@ export default function GroupMembershipInput({onChange, value, ...props}) {
 
   function handleKeyDown(e) {
     if (e.key === 'Backspace' && value < 10) {
-      setGroupLimit('')
-      onChange(groupLimit)
+      onChange('')
     }
   }
 
   function validateAndSetGroupLimit(v) {
     setMessages([])
     if (v < MIN || v > MAX) {
-      setGroupLimit('')
+      onChange('')
       return setMessages([
         {
           text: I18n.t('Number must be between %{min} and %{max}', {min: MIN, max: I18n.n(MAX)}),
@@ -81,7 +75,7 @@ export default function GroupMembershipInput({onChange, value, ...props}) {
         },
       ])
     } else {
-      return setGroupLimit(v)
+      return onChange(v)
     }
   }
 
