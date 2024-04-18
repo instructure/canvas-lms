@@ -820,6 +820,20 @@ describe('Assignment Student Content View', () => {
       expect(getByTestId('unread_comments_badge')).toBeInTheDocument()
     })
 
+    it.only('does not show unread comments if the assignment grade is not posted', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Submission: {unreadCommentCount: 1, feedbackForCurrentAttempt: false},
+      })
+      props.submission.gradingStatus = 'needs_grading'
+      const {queryByTestId} = render(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>
+      )
+      expect(queryByTestId('unread_comments_badge')).not.toBeInTheDocument()
+    
+    })
+
     it('does not show the unread comments badge if there are no unread comments', async () => {
       const props = await mockAssignmentAndSubmission({Submission: {unreadCommentCount: 0}})
       const {queryByTestId} = render(

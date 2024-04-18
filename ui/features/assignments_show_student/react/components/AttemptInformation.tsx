@@ -142,20 +142,20 @@ export default ({
         <div>
           <StudentViewContext.Consumer>
             {context => {
+              const showFeedback =
+                (submission && submission.feedbackForCurrentAttempt) ||
+                !context.allowChangesToSubmission
               const button = (
                 <Button
                   renderIcon={IconChatLine}
                   onClick={openCommentTray}
                   disabled={addCommentsDisabled}
                 >
-                  {(submission && submission.feedbackForCurrentAttempt) ||
-                  !context.allowChangesToSubmission
-                    ? I18n.t('View Feedback')
-                    : I18n.t('Add Comment')}
+                  {showFeedback ? I18n.t('View Feedback') : I18n.t('Add Comment')}
                 </Button>
               )
 
-              const unreadCount = submission?.unreadCommentCount
+              const unreadCount = showFeedback ? submission?.unreadCommentCount : 0
               if (assignment.env.peerReviewModeEnabled || !unreadCount) return button
 
               return (
