@@ -28,6 +28,7 @@ import {useQuery} from 'react-apollo'
 import {transformRubricData, transformRubricAssessmentData} from '../helpers/RubricHelpers'
 import useStore from './stores/index'
 import {fillAssessment} from '@canvas/rubrics/react/helpers'
+import {bool, func} from 'prop-types'
 
 const I18n = useI18nScope('assignments_2')
 
@@ -84,6 +85,8 @@ export default function RubricsQuery(props) {
       rubric={transformRubricData(data.assignment.rubric)}
       rubricAssociation={data.assignment.rubricAssociation}
       peerReviewModeEnabled={props.assignment.env.peerReviewModeEnabled}
+      rubricExpanded={props.rubricExpanded}
+      toggleRubricExpanded={props.toggleRubricExpanded}
     />
   )
 }
@@ -91,4 +94,6 @@ export default function RubricsQuery(props) {
 RubricsQuery.propTypes = {
   assignment: Assignment.shape,
   submission: Submission.shape,
+  rubricExpanded: bool,
+  toggleRubricExpanded: func,
 }

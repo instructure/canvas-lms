@@ -92,6 +92,7 @@ class ViewManager extends React.Component {
     dummyNextSubmission: null,
     submissions: [],
     reviewerSubmission: [],
+    rubricExpanded: true,
   }
 
   static getDerivedStateFromProps(props, state) {
@@ -238,6 +239,12 @@ class ViewManager extends React.Component {
     })
   }
 
+  toggleRubricExpanded = () => {
+    this.setState(prevState => ({
+      rubricExpanded: !prevState.rubricExpanded,
+    }))
+  }
+
   render() {
     const assignment = this.getAssignment()
     const submission = this.getDisplayedSubmission()
@@ -267,6 +274,8 @@ class ViewManager extends React.Component {
           reviewerSubmission={reviewerSubmission}
           allSubmissions={this.state.submissions}
           onChangeSubmission={this.onChangeSubmission}
+          rubricExpanded={this.state.rubricExpanded}
+          toggleRubricExpanded={this.toggleRubricExpanded}
         />
       </StudentViewContext.Provider>
     )
