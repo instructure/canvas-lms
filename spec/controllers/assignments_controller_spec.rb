@@ -1193,7 +1193,7 @@ describe AssignmentsController do
           observer.observer_enrollments.first.update!(associated_user: nil)
 
           get "show", params: { course_id: @course.id, id: @assignment.id }
-          expect(flash[:notice]).to match(/^No student is being observed.*return to the dashboard\.$/)
+          expect(flash[:notice]).to match("No student is being observed.")
           expect(assigns[:js_env]).not_to have_key(:SUBMISSION_ID)
         end
 

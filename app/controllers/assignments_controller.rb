@@ -327,7 +327,7 @@ class AssignmentsController < ApplicationController
             return
           else
             # This should not be reachable but leaving in place until we remove the old view
-            flash[:notice] = t "No student is being observed. To select a student, return to the dashboard."
+            flash[:notice] = t "No student is being observed."
           end
         end
 
