@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useRef, useState} from 'react'
+import React, {useEffect, useRef, useState, useCallback} from 'react'
 import {Alert} from '@instructure/ui-alerts'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
@@ -30,6 +30,7 @@ import {TextInput} from '@instructure/ui-text-input'
 import {View} from '@instructure/ui-view'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import SearchResults from './SearchResults'
+import IndexingProgress from './IndexingProgress'
 
 const I18n = useI18nScope('SmartSearch')
 
@@ -47,11 +48,30 @@ export default function SearchApp() {
   const [isLoading, setIsLoading] = useState(false)
   const [searchResults, setSearchResults] = useState([])
   const [searchTerm, setSearchTerm] = useState('')
+  const [indexingProgress, setIndexingProgress] = useState(null)
 
   useEffect(() => {
     if (searchInput.current) {
       searchInput.current.focus()
     }
+  }, [])
+
+  const checkIndexStatus = useCallback(() => {
+    fetch(`/api/v1/courses/${ENV.COURSE_ID}/smartsearch/index_status`)
+      .then(res => {
+        res.json().then(({status, progress}) => {
+          if (status === 'indexing') {
+            setIndexingProgress(progress)
+            setTimeout(checkIndexStatus, 2000)
+          } else {
+            setIndexingProgress(null)
+          }
+        })
+      })
+  }, [])
+
+  useEffect(() => {
+    checkIndexStatus()
   }, [])
 
   const onDislike = ({id, type}) => {
@@ -185,6 +205,7 @@ export default function SearchApp() {
             placeholder={I18n.t('Food that a panda eats')}
             renderAfterInput={
               <IconButton
+                interaction={indexingProgress ? 'disabled' : 'enabled'}
                 renderIcon={<IconSearchLine />}
                 withBackground={false}
                 withBorder={false}
@@ -197,20 +218,25 @@ export default function SearchApp() {
         </fieldset>
       </form>
 
-      {isLoading ? (
-        <Flex justifyItems="center">
-          <Spinner renderTitle={I18n.t('Searching')} />
-        </Flex>
-      ) : (
-        <View display="block" className="searchResults" margin="small 0 0 0">
-          <SearchResults
-            onDislike={onDislike}
-            onExplain={onExplain}
-            onLike={onLike}
-            searchResults={searchResults}
-          />
-        </View>
-      )}
+      {
+        indexingProgress ? (
+          <IndexingProgress progress={indexingProgress} />
+        ) : isLoading ? (
+          <Flex justifyItems="center">
+            <Spinner renderTitle={I18n.t('Searching')} />
+          </Flex>
+        ) : (
+          <View display="block" className="searchResults" margin="small 0 0 0">
+            <SearchResults
+              onDislike={onDislike}
+              onExplain={onExplain}
+              onLike={onLike}
+              searchResults={searchResults}
+            />
+          </View>
+        )
+      }
+
     </View>
   )
 }

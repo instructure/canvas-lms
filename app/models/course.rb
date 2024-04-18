@@ -3692,6 +3692,7 @@ class Course < ActiveRecord::Base
 
   add_setting :default_due_time, inherited: true
   add_setting :conditional_release, default: false, boolean: true, inherited: true
+  add_setting :search_embedding_version
 
   def elementary_enabled?
     account.enable_as_k5_account?
