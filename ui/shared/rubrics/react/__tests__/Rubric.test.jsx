@@ -174,4 +174,41 @@ describe('the Rubric component', () => {
       ],
     ])
   })
+
+  it('renders rubric-total and table-heading-points when restrictive quantitative data is false', () => {
+    const modal = shallow(
+      <Rubric
+        rubric={rubric}
+        rubricAssessment={assessments.points}
+        rubricAssociation={assessments.points.rubric_association}
+      />
+    )
+    expect(modal.find('[data-testid="rubric-total"]').exists()).toBe(true)
+    expect(modal.find('[data-testid="table-heading-points"]').exists()).toBe(true)
+  })
+
+  describe('with restrict_quantitative_data', () => {
+    let originalENV
+
+    beforeEach(() => {
+      originalENV = {...window.ENV}
+      window.ENV.restrict_quantitative_data = true
+    })
+
+    afterEach(() => {
+      window.ENV = originalENV
+    })
+
+    it('does not renders rubric-total and table-heading-points when restrictive quantitative data is true', () => {
+      const modal = shallow(
+        <Rubric
+          rubric={rubric}
+          rubricAssessment={assessments.points}
+          rubricAssociation={assessments.points.rubric_association}
+        />
+      )
+      expect(modal.find('[data-testid="rubric-total"]').exists()).toBe(false)
+      expect(modal.find('[data-testid="table-heading-points"]').exists()).toBe(false)
+    })
+  })
 })
