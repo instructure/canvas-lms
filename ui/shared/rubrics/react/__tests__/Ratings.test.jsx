@@ -209,4 +209,43 @@ describe('The Ratings component', () => {
     const rating = el.find('Rating')
     expect(rating.prop('hidePoints')).toBe(true)
   })
+
+  it('renders rating-points when restrictive quantitative data and hidePoints is false', () => {
+    const component = shallow(
+      <Rating {...props.tiers[0]} isSummary={false} assessing={true} hidePoints={false} />
+    )
+
+    expect(component.find('[data-testid="rating-points"]').exists()).toBe(true)
+  })
+
+  describe('with restrict_quantitative_data', () => {
+    let originalENV
+
+    beforeEach(() => {
+      originalENV = {...window.ENV}
+      window.ENV.restrict_quantitative_data = true
+    })
+
+    afterEach(() => {
+      window.ENV = originalENV
+    })
+
+    it('does not renders rating-points when restrictive quantitative data is true and hidePoints is false', () => {
+      ENV.restrict_quantitative_data = true
+      const component = shallow(
+        <Rating {...props.tiers[0]} isSummary={false} assessing={true} hidePoints={false} />
+      )
+
+      expect(component.find('[data-testid="rating-points"]').exists()).toBe(false)
+    })
+
+    it('does not renders rubric-total when restrictive quantitative data is false and hidePoints if true', () => {
+      ENV.restrict_quantitative_data = false
+      const component = shallow(
+        <Rating {...props.tiers[0]} isSummary={false} assessing={true} hidePoints={true} />
+      )
+
+      expect(component.find('[data-testid="rating-points"]').exists()).toBe(false)
+    })
+  })
 })

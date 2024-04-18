@@ -126,6 +126,7 @@ exports[`The Ratings component renders the Rating sub-components as expected whe
 >
   <div
     className="rating-points"
+    data-testid="rating-points"
   >
     <Text
       as="span"
@@ -192,6 +193,7 @@ exports[`The Ratings component renders the Rating sub-components as expected whe
 >
   <div
     className="rating-points"
+    data-testid="rating-points"
   >
     <Text
       as="span"
@@ -260,6 +262,7 @@ exports[`The Ratings component renders the Rating sub-components as expected whe
 >
   <div
     className="rating-points"
+    data-testid="rating-points"
   >
     <Text
       as="span"
