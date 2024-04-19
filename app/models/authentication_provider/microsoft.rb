@@ -61,7 +61,7 @@ class AuthenticationProvider::Microsoft < AuthenticationProvider::OpenIDConnect
   end
 
   def self.login_attributes
-    %w[tid+oid sub email oid preferred_username].freeze
+    %w[tid+oid sub email oid preferred_username upn].freeze
   end
   validates :login_attribute, inclusion: login_attributes
 
@@ -72,6 +72,7 @@ class AuthenticationProvider::Microsoft < AuthenticationProvider::OpenIDConnect
       preferred_username
       oid
       sub
+      upn
     ].freeze
   end
 
@@ -147,7 +148,7 @@ class AuthenticationProvider::Microsoft < AuthenticationProvider::OpenIDConnect
   def scope
     result = []
     requested_attributes = [login_attribute] + federated_attributes.values.pluck("attribute")
-    result << "profile" if requested_attributes.intersect?(%w[name oid preferred_username tid+oid])
+    result << "profile" if requested_attributes.intersect?(%w[name oid preferred_username tid+oid upn])
     result << "email" if requested_attributes.include?("email")
     result.join(" ")
   end
