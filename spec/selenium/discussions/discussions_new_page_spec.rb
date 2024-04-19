@@ -1033,7 +1033,8 @@ describe "discussions" do
         expect(dt.assignment.name).to eq title
       end
 
-      it "creates a discussion topic with selected grading scheme/standard" do
+      it "creates a discussion topic with selected grading scheme/standard and archived grading schemes is disabled" do
+        Account.site_admin.disable_feature!(:archived_grading_schemes)
         grading_standard = course.grading_standards.create!(title: "Win/Lose", data: [["Winner", 0.94], ["Loser", 0]])
 
         get "/courses/#{course.id}/discussion_topics/new"
@@ -1050,9 +1051,39 @@ describe "discussions" do
         f("input[data-testid='display-grade-input']").click
         ffj("span:contains('Letter Grade')").last.click
         expect(fj("span:contains('Manage All Grading Schemes')").present?).to be_truthy
-
         ffj("span:contains('Default Canvas Grading Scheme')").last.click
         fj("option:contains('#{grading_standard.title}')").click
+
+        f("button[data-testid='save-and-publish-button']").click
+        wait_for_ajaximations
+
+        dt = DiscussionTopic.last
+
+        expect(dt.title).to eq title
+        expect(dt.assignment.name).to eq title
+        expect(dt.assignment.grading_standard_id).to eq grading_standard.id
+      end
+
+      it "creates a discussion topic with selected grading scheme/standard and archived grading schemes is enabled" do
+        Account.site_admin.enable_feature!(:archived_grading_schemes)
+        grading_standard = course.grading_standards.create!(title: "Win/Lose", data: [["Winner", 0.94], ["Loser", 0]])
+
+        get "/courses/#{course.id}/discussion_topics/new"
+
+        title = "Graded Discussion Topic with letter grade type"
+        message = "replying to topic"
+
+        f("input[placeholder='Topic Title']").send_keys title
+        type_in_tiny("textarea", message)
+
+        force_click_native('input[type=checkbox][value="graded"]')
+        wait_for_ajaximations
+
+        f("input[data-testid='display-grade-input']").click
+        ffj("span:contains('Letter Grade')").last.click
+        expect(fj("span:contains('Manage All Grading Schemes')").present?).to be_truthy
+        f("[data-testid='grading-schemes-selector-dropdown']").click
+        f("[data-testid='grading-schemes-selector-option-#{grading_standard.id}']").click
 
         f("button[data-testid='save-and-publish-button']").click
         wait_for_ajaximations

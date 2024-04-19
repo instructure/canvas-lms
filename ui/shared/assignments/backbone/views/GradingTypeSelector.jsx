@@ -192,7 +192,7 @@ GradingTypeSelector.prototype.renderGradingSchemeSelector = function () {
     contextId: ENV.COURSE_ID,
     contextType: 'Course',
     archivedGradingSchemesEnabled: ENV.ARCHIVED_GRADING_SCHEMES_ENABLED,
-    assignmentId: ENV.ASSIGNMENT.id ? String(this.parentModel.id) : undefined,
+    assignmentId: ENV.ASSIGNMENT?.id ?? ENV.ASSIGNMENT_ID ?? undefined,
   }
   const mountPoint = document.querySelector('#grading_scheme_selector-target')
   // eslint-disable-next-line react/no-render-return-value
