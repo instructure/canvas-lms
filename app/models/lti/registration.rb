@@ -26,6 +26,7 @@ class Lti::Registration < ActiveRecord::Base
   belongs_to :updated_by, class_name: "User", inverse_of: :updated_lti_registrations, optional: false
   has_one :ims_registration, class_name: "Lti::IMS::Registration", inverse_of: :lti_registration, foreign_key: :lti_registration_id
   has_one :developer_key, inverse_of: :lti_registration, foreign_key: :lti_registration_id
+  has_many :lti_registration_account_bindings, class_name: "Lti::RegistrationAccountBinding", dependent: :destroy, inverse_of: :registration
 
   validates :name, :admin_nickname, :vendor, length: { maximum: 255 }
   validates :name, presence: true
