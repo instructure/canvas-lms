@@ -90,6 +90,7 @@ export type Student = {
   sortableName: string
   submittedAt: null | Date
   excused?: boolean
+  workflowState: string
 }
 
 export type Props = {
@@ -242,12 +243,12 @@ function filterStudents(criterion, students, cutoff) {
         }
         break
       case 'submitted_and_graded':
-        if (student.submittedAt && student.grade) {
+        if (student.submittedAt && student.grade && student.workflowState !== 'pending_review') {
           newfilteredStudents.push(student)
         }
         break
       case 'submitted_and_not_graded':
-        if (student.submittedAt && !student.grade) {
+        if (student.submittedAt && (!student.grade || student.workflowState === 'pending_review')) {
           newfilteredStudents.push(student)
         }
         break
@@ -262,7 +263,7 @@ function filterStudents(criterion, students, cutoff) {
         }
         break
       case 'ungraded':
-        if (!student.grade && !student.excused) {
+        if ((!student.grade && !student.excused) || student.workflowState === 'pending_review') {
           newfilteredStudents.push(student)
         }
         break
