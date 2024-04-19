@@ -287,7 +287,7 @@ class Rubric < ActiveRecord::Base
   end
 
   def criteria_object
-    OpenObject.process(data)
+    reconstitute_criteria(data)
   end
 
   def criteria
@@ -441,6 +441,8 @@ class Rubric < ActiveRecord::Base
   end
 
   CriteriaData = Struct.new(:criteria, :points_possible, :title)
+  Criterion = Struct.new(:description, :long_description, :points, :id, :criterion_use_range, :learning_outcome_id, :mastery_points, :ignore_for_scoring, :ratings, keyword_init: true)
+  Rating = Struct.new(:description, :long_description, :points, :id, :criterion_id, keyword_init: true)
   def generate_criteria(params)
     @used_ids = {}
     title = params[:title] || t("context_name_rubric", "%{course_name} Rubric", course_name: context.name)
@@ -483,6 +485,13 @@ class Rubric < ActiveRecord::Base
                        .map(&:second)
     points_possible = total_points_from_criteria(criteria)&.round(POINTS_POSSIBLE_PRECISION)
     CriteriaData.new(criteria, points_possible, title)
+  end
+
+  def reconstitute_criteria(criteria)
+    criteria.map do |criterion|
+      ratings = criterion[:ratings].map { |rating| Rating.new(**rating) }
+      Criterion.new(**criterion, ratings:)
+    end
   end
 
   def total_points_from_criteria(criteria)

@@ -670,11 +670,11 @@ class Account < ActiveRecord::Base
     if endpoint.blank?
       nil
     else
-      OpenObject.new({
-                       endpoint:,
-                       default_action: settings[:equella_action] || "selectOrAdd",
-                       teaser: settings[:equella_teaser]
-                     })
+      {
+        endpoint:,
+        default_action: settings[:equella_action] || "selectOrAdd",
+        teaser: settings[:equella_teaser]
+      }
     end
   end
 

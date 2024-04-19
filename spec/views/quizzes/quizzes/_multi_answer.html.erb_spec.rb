@@ -33,7 +33,7 @@ describe "quizzes/quizzes/_multi_answer" do
     question = {
       question_text: "question text"
     }
-    question_type = OpenObject.new
+    question_type = QuizzesHelper::QuestionType.new
     render partial: "quizzes/quizzes/multi_answer", object: answer, locals: { question:, question_type:, user_answer: nil }
     expect(response).not_to be_nil
   end

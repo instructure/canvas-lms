@@ -16,10 +16,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<%= fields_for :settings, OpenObject.new(settings) do |f| %>
+<%= fields_for :settings do |f| %>
   <p>
     <%= f.label :endpoint_uri, en: "URI to POST data to (https://www.somewhere.com/endpoint/path)" %>
-    <%= f.text_field :endpoint_uri %>
+    <%= f.text_field :endpoint_uri, value: settings[:endpoint_uri] %>
   </p>
 <% end %>
 <%= render partial: "plugins/byots_docs" %>

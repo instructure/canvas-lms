@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<%= fields_for :settings, OpenObject.new(settings) do |f| %>
+<%= fields_for :settings do |f| %>
   <table style="width: 500px;" class="formtable">
     <tr>
       <td colspan="2">
@@ -26,19 +26,19 @@
     </tr>
     <tr>
       <td><%= f.blabel :api_key, :en => "API Key" %></td>
-      <td><%= f.text_field :api_key %></td>
+      <td><%= f.text_field :api_key, value: settings[:api_key] %></td>
     </tr>
     <tr>
       <td><%= f.blabel :base_url, :en => "Base URL" %></td>
-      <td><%= f.text_field :base_url %></td>
+      <td><%= f.text_field :base_url, value: settings[:base_url] %></td>
     </tr>
     <tr>
       <td><%= f.blabel :annotations_supported, :en => "Annotations Supported" %></td>
-      <td><%= f.check_box :annotations_supported %></td>
+      <td><%= f.check_box :annotations_supported, checked: Canvas::Plugin.value_to_boolean(settings[:annotations_supported]) %></td>
     </tr>
     <tr>
       <td><%= f.blabel :hijack_crocodoc_sessions, :en => "Hijack Crocodoc Sessions" %></td>
-      <td><%= f.check_box :hijack_crocodoc_sessions %></td>
+      <td><%= f.check_box :hijack_crocodoc_sessions, checked: Canvas::Plugin.value_to_boolean(settings[:hijack_crocodoc_sessions]) %></td>
     </tr>
   </table>
 <% end %>

@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<%= fields_for :settings, OpenObject.new(settings) do |f| %>
+<%= fields_for :settings do |f| %>
   <table style="width: 500px;" class="formtable">
     <tr>
       <td colspan="2">
@@ -38,23 +38,23 @@ TEXT
     </tr>
     <tr>
       <td><%= f.blabel :format_type, :en => "Output format type" %></td>
-      <td><%= f.select :format_type, Course.valid_grade_export_types.keys.map{|k| [Course.valid_grade_export_types[k][:name], k]}, {} %>
+      <td><%= f.select :format_type, Course.valid_grade_export_types.keys.map{|k| [Course.valid_grade_export_types[k][:name], k]}, { selected: settings[:format_type] } %>
     </tr>
     <tr>
       <td><%= f.blabel :publish_endpoint, :en => "Endpoint to publish to" %></td>
-      <td><%= f.text_field :publish_endpoint %></td>
+      <td><%= f.text_field :publish_endpoint, value: settings[:publish_endpoint] %></td>
     </tr>
     <tr>
-      <td colspan=2><%= f.check_box :wait_for_success, {}, 'yes', 'no' %>
+      <td colspan=2><%= f.check_box :wait_for_success, { checked: Canvas::Plugin.value_to_boolean(settings[:wait_for_success]) }, 'yes', 'no' %>
       <%= f.label :wait_for_success, :en => "Wait for success notifications" %></td>
     </tr>
     <tr>
-      <td colspan=2><%= f.check_box :include_final_grade_overrides, {}, "yes", "no" %>
+      <td colspan=2><%= f.check_box :include_final_grade_overrides, { checked: Canvas::Plugin.value_to_boolean(settings[:include_final_grade_overrides]) }, "yes", "no" %>
       <%= f.label :include_final_grade_overrides, :en => "Include final grade overrides" %></td>
     </tr>
     <tr>
       <td><%= f.blabel :success_timeout, :en => "Success notification timeout (in seconds)" %></td>
-      <td><%= f.text_field :success_timeout %></td>
+      <td><%= f.text_field :success_timeout, value: settings[:success_timeout] %></td>
     </tr>
   </table>
 <% end %>

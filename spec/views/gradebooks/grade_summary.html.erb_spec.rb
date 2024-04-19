@@ -797,16 +797,14 @@ describe "gradebooks/grade_summary" do
       assignment1.grade_student(student, grade: "90%", grader: teacher)
 
       group = course.assignment_groups.create!(name: "a group")
-      group_assignment = OpenObject.build("assignment",
-                                          id: "group-#{group.id}",
-                                          rules: group.rules,
-                                          title: group.name,
-                                          points_possible: 10,
-                                          hard_coded: true,
-                                          special_class: "group_total",
-                                          assignment_group_id: group.id,
-                                          group_weight: group.group_weight,
-                                          asset_string: "group_total_#{group.id}")
+      group_assignment = Assignment::HardCoded.new(id: "group-#{group.id}",
+                                                   rules: group.rules,
+                                                   title: group.name,
+                                                   points_possible: 10,
+                                                   special_class: "group_total",
+                                                   assignment_group_id: group.id,
+                                                   group_weight: group.group_weight,
+                                                   asset_string: "group_total_#{group.id}")
       presenter.groups_assignments = [group_assignment]
 
       render "gradebooks/grade_summary"

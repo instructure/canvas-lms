@@ -1791,21 +1791,42 @@ describe User do
       expect(User.avatar_fallback_url("http://somedomain:3000/path")).to eq(
         "http://somedomain:3000/path"
       )
-      expect(User.avatar_fallback_url(nil, OpenObject.new(host: "foo", protocol: "http://"))).to eq(
-        "http://foo/images/messages/avatar-50.png"
-      )
-      expect(User.avatar_fallback_url("/somepath", OpenObject.new(host: "bar", protocol: "https://"))).to eq(
-        "https://bar/somepath"
-      )
-      expect(User.avatar_fallback_url("//somedomain/path", OpenObject.new(host: "bar", protocol: "https://"))).to eq(
-        "https://somedomain/path"
-      )
-      expect(User.avatar_fallback_url("http://somedomain/path", OpenObject.new(host: "bar", protocol: "https://"))).to eq(
-        "http://somedomain/path"
-      )
-      expect(User.avatar_fallback_url("http://localhost/path", OpenObject.new(host: "bar", protocol: "https://"))).to eq(
-        "https://bar/path"
-      )
+      expect(User.avatar_fallback_url(nil, instance_double("ActionDispatch::Request",
+                                                           host: "foo",
+                                                           protocol: "http://",
+                                                           port: 80,
+                                                           scheme: "http"))).to eq(
+                                                             "http://foo/images/messages/avatar-50.png"
+                                                           )
+      expect(User.avatar_fallback_url("/somepath", instance_double("ActionDispatch::Request",
+                                                                   host:
+                                                                         "bar",
+                                                                   protocol: "https://",
+                                                                   port: 443,
+                                                                   scheme: "https"))).to eq(
+                                                                     "https://bar/somepath"
+                                                                   )
+      expect(User.avatar_fallback_url("//somedomain/path", instance_double("ActionDispatch::Request",
+                                                                           host: "bar",
+                                                                           protocol: "https://",
+                                                                           port: 443,
+                                                                           scheme: "https"))).to eq(
+                                                                             "https://somedomain/path"
+                                                                           )
+      expect(User.avatar_fallback_url("http://somedomain/path", instance_double("ActionDispatch::Request",
+                                                                                host: "bar",
+                                                                                protocol: "https://",
+                                                                                port: 443,
+                                                                                scheme: "https"))).to eq(
+                                                                                  "http://somedomain/path"
+                                                                                )
+      expect(User.avatar_fallback_url("http://localhost/path", instance_double("ActionDispatch::Request",
+                                                                               host: "bar",
+                                                                               protocol: "https://",
+                                                                               port: 443,
+                                                                               scheme: "https"))).to eq(
+                                                                                 "https://bar/path"
+                                                                               )
     end
 
     describe "#clear_avatar_image_url_with_uuid" do

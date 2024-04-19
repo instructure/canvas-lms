@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2011 - present Instructure, Inc.
+# Copyright (C) 2018 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -18,17 +18,31 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../../views_helper"
+class Assignment
+  # Used by GradebooksController to represent a Group or Period as an assignment
+  class HardCoded < AbstractAssignment
+    # Rails removes the :id method, so we have to trick it
+    module Id
+      attr_reader :id
+    end
+    prepend Id
 
-describe "quizzes/quizzes/_display_answer" do
-  it "renders" do
-    course_with_student
-    view_context
-    assign(:quiz, @course.quizzes.create!)
-    answer = {}
-    answer[:id] = 5
-    answer[:weight] = 100
-    render partial: "quizzes/quizzes/display_answer", object: answer, locals: { question_type: QuizzesHelper::QuestionType.new }
-    expect(response).not_to be_nil
+    attr_accessor :rules, :group_weight, :asset_string, :special_class
+
+    def initialize(attributes)
+      super
+
+      @id = attributes[:id]
+    end
+
+    def hard_coded
+      true
+    end
+
+    private
+
+    def _create_record
+      raise "Hard coded assignments should not be saved"
+    end
   end
 end
