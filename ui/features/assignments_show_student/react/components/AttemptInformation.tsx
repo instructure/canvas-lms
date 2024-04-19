@@ -150,6 +150,7 @@ export default ({
                   renderIcon={IconChatLine}
                   onClick={openCommentTray}
                   disabled={addCommentsDisabled}
+                  data-testid="view_feedback_button"
                 >
                   {showFeedback ? I18n.t('View Feedback') : I18n.t('Add Comment')}
                 </Button>
