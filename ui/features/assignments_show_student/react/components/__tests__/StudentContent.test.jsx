@@ -811,16 +811,17 @@ describe('Assignment Student Content View', () => {
     })
 
     it('shows the unread comments badge if there are unread comments', async () => {
-      const props = await mockAssignmentAndSubmission({Submission: {unreadCommentCount: 1}})
+      const props = await mockAssignmentAndSubmission({Submission: {unreadCommentCount: 1, feedbackForCurrentAttempt: true}})
       const {getByTestId} = render(
         <MockedProvider>
           <StudentContent {...props} />
         </MockedProvider>
       )
+      expect(getByTestId('view_feedback_button')).toHaveTextContent('View Feedback')
       expect(getByTestId('unread_comments_badge')).toBeInTheDocument()
     })
 
-    it.only('does not show unread comments if the assignment grade is not posted', async () => {
+    it('does not show unread comments if the assignment grade is not posted', async () => {
       const props = await mockAssignmentAndSubmission({
         Submission: {unreadCommentCount: 1, feedbackForCurrentAttempt: false},
       })
@@ -1000,13 +1001,14 @@ describe('Assignment Student Content View', () => {
     })
 
     it('shows the unread comments badge if peerReviewModeEnabled is set to false', async () => {
-      const props = await mockAssignmentAndSubmission({Submission: {unreadCommentCount: 1}})
+      const props = await mockAssignmentAndSubmission({Submission: {unreadCommentCount: 1, feedbackForCurrentAttempt: true}})
       props.assignment.env.peerReviewModeEnabled = false
       const {getByTestId} = render(
         <MockedProvider>
           <StudentContent {...props} />
         </MockedProvider>
       )
+      expect(getByTestId('view_feedback_button')).toHaveTextContent('View Feedback')
       expect(getByTestId('unread_comments_badge')).toBeInTheDocument()
     })
   })
