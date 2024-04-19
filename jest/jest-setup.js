@@ -56,7 +56,10 @@ const ignoredErrors = [
   /Warning: This synthetic event is reused for performance reasons/,
 ]
 const globalWarn = global.console.warn
-const ignoredWarnings = [/JQMIGRATE:/] // ignore warnings about jquery migrate; these are muted globally when not in a jest test
+const ignoredWarnings = [
+  /JQMIGRATE:/, // ignore warnings about jquery migrate; these are muted globally when not in a jest test
+  /componentWillReceiveProps/, // ignore warnings about componentWillReceiveProps; this method is deprecated and will be removed with react upgrades
+]
 
 global.console = {
   log: console.log,
