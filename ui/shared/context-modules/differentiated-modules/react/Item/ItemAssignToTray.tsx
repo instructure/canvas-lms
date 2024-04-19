@@ -52,9 +52,14 @@ import ItemAssignToCard, {type ItemAssignToCardRef} from './ItemAssignToCard'
 import TrayFooter from '../Footer'
 import type {AssigneeOption} from '../AssigneeSelector'
 import useFetchAssignees from '../../utils/hooks/useFetchAssignees'
-import {generateDateDetailsPayload, getOverriddenAssignees} from '../../utils/assignToHelper'
+import {
+  generateDateDetailsPayload,
+  getOverriddenAssignees,
+  itemTypeToApiURL,
+} from '../../utils/assignToHelper'
 import {Text} from '@instructure/ui-text'
 import {Alert} from '@instructure/ui-alerts'
+import {IconType, ItemType} from '../types'
 
 const I18n = useI18nScope('differentiated_modules')
 
@@ -72,22 +77,6 @@ function itemTypeToIcon(iconType: IconType) {
       return <IconDocumentLine data-testid="icon-page" />
     default:
       return <IconQuestionLine data-testid="icon-unknown" />
-  }
-}
-
-function itemTypeToApiURL(courseId: string, itemType: ItemType, itemId: string) {
-  switch (itemType) {
-    case 'assignment':
-    case 'lti-quiz':
-      return `/api/v1/courses/${courseId}/assignments/${itemId}/date_details`
-    case 'quiz':
-      return `/api/v1/courses/${courseId}/quizzes/${itemId}/date_details`
-    case 'discussion':
-      return `/api/v1/courses/${courseId}/discussion_topics/${itemId}/date_details`
-    case 'page':
-      return `/api/v1/courses/${courseId}/pages/${itemId}/date_details`
-    default:
-      return ''
   }
 }
 
@@ -137,9 +126,6 @@ export const updateModuleItem = ({
     })
 }
 
-type ItemType = 'assignment' | 'quiz' | 'lti-quiz' | 'discussion' | 'page'
-type IconType = 'assignment' | 'quiz' | 'lti-quiz' | 'discussion' | 'page' | null
-
 // TODO: need props to initialize with cards corresponding to current assignments
 export interface ItemAssignToTrayProps {
   open: boolean
@@ -151,7 +137,7 @@ export interface ItemAssignToTrayProps {
   itemName: string
   itemType: ItemType
   iconType: IconType
-  itemContentId: string
+  itemContentId?: string
   pointsPossible?: number | null
   locale: string
   timezone: string
@@ -168,6 +154,7 @@ export interface ItemAssignToTrayProps {
   ) => void
   onDatesChange?: (cardId: string, dateType: string, newDate: string) => void
   onCardRemove?: (cardId: string) => void
+  onInitialStateSet?: (cards: ItemAssignToCardSpec[]) => void
 }
 
 export default function ItemAssignToTray({
@@ -193,6 +180,7 @@ export default function ItemAssignToTray({
   defaultSectionId,
   useApplyButton = false,
   removeDueDateInput = false,
+  onInitialStateSet,
 }: ItemAssignToTrayProps) {
   const [assignToCards, setAssignToCards] = useState<ItemAssignToCardSpec[]>(defaultCards ?? [])
   const [initialCards, setInitialCards] = useState<ItemAssignToCardSpec[]>([])
@@ -268,7 +256,7 @@ export default function ItemAssignToTray({
   }, [JSON.stringify(defaultDisabledOptionIds)])
 
   useEffect(() => {
-    if (defaultCards !== undefined) {
+    if (defaultCards !== undefined || itemContentId === undefined) {
       return
     }
     setFetchInFlight(true)
@@ -348,6 +336,7 @@ export default function ItemAssignToTray({
         setBlueprintDateLocks(dateDetailsApiResponse.blueprint_date_locks)
         setDisabledOptionIds(selectedOptionIds)
         setInitialCards(cards)
+        onInitialStateSet?.(cards)
         setAssignToCards(cards)
       })
       .catch(() => {
@@ -407,14 +396,16 @@ export default function ItemAssignToTray({
         (card.contextModuleId !== null && card.isEdited)
     )
     const payload = generateDateDetailsPayload(filteredCards)
-    updateModuleItem({
-      courseId,
-      moduleItemContentId: itemContentId,
-      moduleItemType: itemType,
-      moduleItemName: itemName,
-      payload,
-      onSuccess: handleDismiss,
-    })
+    if (itemContentId !== undefined) {
+      updateModuleItem({
+        courseId,
+        moduleItemContentId: itemContentId,
+        moduleItemType: itemType,
+        moduleItemName: itemName,
+        payload,
+        onSuccess: handleDismiss,
+      })
+    }
   }, [onSave, assignToCards, courseId, itemContentId, itemType, itemName, handleDismiss])
 
   const handleDeleteCard = useCallback(

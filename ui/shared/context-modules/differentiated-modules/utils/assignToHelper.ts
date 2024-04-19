@@ -17,7 +17,7 @@
  */
 
 import type {AssigneeOption} from '../react/AssigneeSelector'
-import type {AssignmentOverridePayload, AssignmentOverridesPayload} from '../react/types'
+import type {AssignmentOverridePayload, AssignmentOverridesPayload, ItemType} from '../react/types'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import type {
   DateDetailsPayload,
@@ -179,3 +179,29 @@ export function getOverriddenAssignees(overrides?: DateDetailsOverride[]) {
   )
   return overriddenTargets
 }
+
+export const itemTypeToApiURL = (courseId: string, itemType: ItemType, itemId: string) => {
+  switch (itemType) {
+    case 'assignment':
+    case 'lti-quiz':
+      return `/api/v1/courses/${courseId}/assignments/${itemId}/date_details`
+    case 'quiz':
+      return `/api/v1/courses/${courseId}/quizzes/${itemId}/date_details`
+    case 'discussion':
+      return `/api/v1/courses/${courseId}/discussion_topics/${itemId}/date_details`
+    case 'page':
+      return `/api/v1/courses/${courseId}/pages/${itemId}/date_details`
+    default:
+      return ''
+  }
+}
+
+export const generateDefaultCard = () => ({
+  key: 'assign-to-card__everyone',
+  isValid: true,
+  hasAssignees: true,
+  due_at: null,
+  unlock_at: null,
+  lock_at: null,
+  selectedAssigneeIds: ['everyone'],
+})
