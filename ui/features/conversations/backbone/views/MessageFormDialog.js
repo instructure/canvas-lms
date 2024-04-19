@@ -18,7 +18,7 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import {map, pick, keys, filter, find, uniqueId, each, includes, every, isEmpty} from 'lodash'
+import {map, pick, keys, filter, find, uniqueId, includes, every, isEmpty} from 'lodash'
 import {Collection} from '@canvas/backbone'
 import DialogBaseView from '@canvas/dialog-base-view'
 import template from '../../jst/MessageFormDialog.handlebars'
@@ -534,7 +534,9 @@ export default class MessageFormDialog extends DialogBaseView {
     this.setAttachmentClip($attachment)
 
     // have the alert happen later so the focus change doesn't interrupt it
-    const attachedFiles = this.$attachmentsPane.find('input:not([value=])')
+    const attachedFiles = Array.from(this.$attachmentsPane[0].querySelectorAll('input')).filter(
+      input => input.value !== ''
+    )
     setTimeout(() => {
       $.screenReaderFlashMessageExclusive(
         I18n.t('File %{count} attached: %{name}', {count: attachedFiles.length, name})
@@ -590,7 +592,11 @@ export default class MessageFormDialog extends DialogBaseView {
   }
 
   removeEmptyAttachments() {
-    each(this.$attachments.find('input:not([value])'), node => this.removeAttachment(node))
+    this.$attachmentsPane[0].querySelectorAll('input').forEach(input => {
+      if (input.value === '') {
+        this.removeAttachment(input)
+      }
+    })
   }
 
   removeAttachment(node) {
@@ -649,9 +655,14 @@ export default class MessageFormDialog extends DialogBaseView {
   }
 
   updateAttachmentPane() {
-    this.$attachmentsPane[
-      this.$attachmentsPane.find('input:not([value=])').length ? 'addClass' : 'removeClass'
-    ]('has-items')
+    const inputsWithValues = Array.from(this.$attachmentsPane[0].querySelectorAll('input')).filter(
+      input => input.value !== ''
+    )
+    if (inputsWithValues.length > 0) {
+      this.$attachmentsPane.addClass('has-items')
+    } else {
+      this.$attachmentsPane.removeClass('has-items')
+    }
     return this.resizeBody()
   }
 }
