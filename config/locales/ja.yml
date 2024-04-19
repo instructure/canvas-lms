@@ -4071,7 +4071,7 @@ ja:
   arrange_columns_by_due_date_888f2551: 期日で列を並べ替え
   arrange_columns_by_due_date_f74f9e2d: 期日で列を並べ替え
   arrange_columns_by_points_48da9ba3: ポイントで列を調整する
-  artifact_f7003de5: アーティファクト
+  artifact_f7003de5: 課題名
   artist_info_for_username_for_description_12d5d862: "%{userName} の %{description} に対するアーティスト情報"
   as_of_a036fa2e: （）現在
   as_of_date_the_lti_1_3_oidc_auth_endpoint_has_chan_a8783bc6: "%{date}現在、LTI 1.3 OIDC Auth エンドポイントは https://canvas.instructure.com/api/lti/authorize_redirect から https://sso.canvaslms.com/api/lti/authorize_redirect に変更されています。この変更の理由と範囲については、*本Canvas Communityの記事で詳しく説明しています*。また、追加情報については、APIドキュメントを参照してください。この変更は小さなもので、時間はあまりかかりませんが、Canvasにインストールされているすべての LTI 1.3 ツールについて、ツール側で設定を変更する必要があります。"
@@ -5871,7 +5871,7 @@ ja:
     agenda_view: 
       due: 期限
       loading: 読み込み中
-      no_events: "*この日付の後にはイベントがありません。*"
+      no_events: "*この日以降、イベントはありません。*"
       starts_at: 開始日
     agenda_view_displaying_start_end: "%{start} から %{end} までを表示しています"
     appointment_group_deletion_details: これを削除すると、受講生がサインアップしたすべての予定も削除されます。
@@ -8521,7 +8521,7 @@ ja:
   count_release_notes_6f50a89f: 
     one: "%{count}リリースノート。"
     other: "%{count}リリースノート。"
-  count_replies_a685c742: "%{count}返信"
+  count_replies_a685c742: "%{count}の返信"
   count_replies_unread_unread_5c4265e8: 
     one: "%{count}の返信、%{unread}未読"
     other: "%{count}の返信、%{unread}未読"
@@ -8589,7 +8589,7 @@ ja:
   count_unread_release_notes_3be26022: 
     one: "%{count}の未読のリリースノート。"
     other: "%{count}の未読のリリースノート。"
-  count_unread_replies_86976ab: "%{count}未読の返信"
+  count_unread_replies_86976ab: "%{count}の未読"
   count_unread_shares_ff9e91a5: 
     one: "%{count}の未読の共有"
     other: "%{count}の未読の共有"
@@ -10037,8 +10037,8 @@ ja:
       one: "%{count} 個のディスカッションを展開"
       other: "%{count} 個のディスカッションを展開"
     show_more_link: 
-      show_less: 表示を減らす
-      show_more: 表示を増やす
+      show_less: 詳細を閉じる
+      show_more: 詳細を開く
   dashboard_7f1dbf71: ダッシュボード
   dashboard_card_movement_menu_b65b98f5: ダッシュボードカードの移動メニュー
   dashboard_options_b240ed5a: ダッシュボードオプション
@@ -11191,7 +11191,7 @@ ja:
   done_54e3d4b6: 完了
   done_8af51c9b: 終了です。
   done_editing_9f7379d9: 編集完了
-  done_we_took_the_files_you_uploaded_and_attached_t_e529cfc0: よし!アップロードされたファイルを取得し、課題の各ユーザーの提出ページに短いコメントを付けて添付しました。受講者は新しいコメントが追加された際に通知を受け取ります。
+  done_we_took_the_files_you_uploaded_and_attached_t_e529cfc0: ファイルをアップロードした後、各提出物にコメントが添付されました。受講者は新しいコメントの通知を受け取ります。
   dorsey_business_schools_student_activity_and_perfo_160cf319: "Dorsey ビジネススクール - 受講者のアクティビティと評定"
   down_5831a426: 下
   download_3e89bdef: ダウンロード
@@ -11286,8 +11286,8 @@ ja:
   due_date_must_be_before_the_until_date_740484c5: 「締切」は「終了日」の日付の前でなければなりません
   due_date_must_not_be_after_the_available_until_dat_b77b0dcd: 「締切日」は「利用可能日」の日付より後になってはなりません。
   due_date_must_not_be_before_the_available_from_dat_1ea9ca: 「締切日」は「利用可能日」の日付より前になってはなりません。
-  due_date_newest_to_oldest_35cffef9: "期限 - 最新から最古"
-  due_date_oldest_to_newest_73e62815: "期日 - 最古から最新"
+  due_date_newest_to_oldest_35cffef9: "期限 - 新しい順"
+  due_date_oldest_to_newest_73e62815: "期限 - 古い順"
   due_date_set_1c6364db: 期日が設定されました
   due_dates: 
     due_at: "期限: %{assignment_due_date_time}"
@@ -11895,7 +11895,7 @@ ja:
   enter_and_distribute_grades_c1216df: 評定を入力して配布する
   enter_at_least_count_characters_1c7a0b36: "%{count} 文字以上入力してください"
   enter_canvas_user_id_to_substitute_the_user_s_uniq_b2a75735: "ユーザの一意の Canvas ID を置き換えるには、\"{{CANVAS_USER_ID}}\" を入力します"
-  enter_grades_as_e113e606: グレードを～として入力する
+  enter_grades_as_e113e606: グレードの入力方法
   enter_group_set_name_70f51d2: グループセット名を入力
   enter_name_or_code_b4c103f6: 名前またはコードを入力する
   enter_new_group_name_b97d5819: 新しいグループ名を入力してください
@@ -12516,7 +12516,7 @@ ja:
   explicit_latex_typesetting_c1c569c9: 明示的なLaTeXタイプセット
   export_an_existing_quiz_to_new_quizzes_2_format_8fd08a23: 既存のクイズを新しいクイズ2形式にエクスポートする
   export_course_content_f4774b74: コース内容のエクスポート
-  export_current_gradebook_view_6cb376a3: 現在の評定表ビューをエクスポートする
+  export_current_gradebook_view_6cb376a3: 現在表示されている評定表をエクスポートする
   export_de71cd8e: エクスポート
   export_entire_gradebook_e980d946: 評定表全体をエクスポートする
   export_failed_5d615d6d: エクスポートに失敗
@@ -13823,7 +13823,7 @@ ja:
         import_error: アップロードされたデータを用いて算出できない要素がありました。
         missing_assignment: これまで採点表になかったと思われる課題がアップロードされました。新しい課題なのか、または既存の課題を表すものなのかお知らせください。
         missing_student: 次の受講者の行がアップロードされました。クラスのどの受講者なのか判定できません。どの受講者なのかお知らせください。
-        no_changes: アップロードされた評定表に、変更点が検出されませんでした。
+        no_changes: インポートされた評定表に、変更箇所はありませんでした。
         past_grading_periods_prevent_editing: "採点期間中ではないため、次の課題を編集することができません:"
       ignore_assignment_option: 間違いです。無視してください
       ignore_student_option: クラスにいません。この行を無視してください。
@@ -14926,7 +14926,7 @@ ja:
   has_syllabus_body_6f250277: has_syllabus_body
   has_turnitin_score_3e1cacf6: "Turnitin スコアがあります"
   has_ungraded_submissions_2bff87df: 未採点の提出物がある
-  has_ungraded_submissions_b79f5803: 未評定の提出物があります
+  has_ungraded_submissions_b79f5803: 未採点の提出物がある
   has_unposted_grades_3567391e: 未提出の評定があります
   has_unposted_grades_ba0e02b6: 未提出の評定があります
   have_a_question_about_canvas_ask_it_here_5781cce: Canvasについてご質問がありますか？ここで質問してください。
@@ -15687,7 +15687,7 @@ ja:
   ignore_until_new_mark_77eb512: 新しいマークがあるまで無視する
   ignore_until_new_mark_935e00a2: 新しいマークがあるまで無視する
   ignore_until_new_submission_87f32b4: 新しい提出があるまで無視
-  ignore_until_new_submission_90ba19b7: 新しい提出があるまで無視
+  ignore_until_new_submission_90ba19b7: 新しい提出があるまで非表示
   illegal_element_focus_request_b3cea847: 不正な要素フォーカス要求
   ilumno_grade_export_251bc4b5: "Ilumno 評定エクスポート"
   image_8ad06: 画像
@@ -15707,8 +15707,8 @@ ja:
   images_documents_and_more_dccb362f: 画像、ドキュメントなど
   immediate_notifications_for_global_announcements_682f5a3d: グローバルアナウンスの即時通知
   immediately_c128ede6: 即時
-  immersive_reader_7b87538: 没入型リーダー
-  immersive_reader_failed_to_load_bc8d4dd4: 没入型リーダーの読み込みに失敗しました
+  immersive_reader_7b87538: 読み上げ機能
+  immersive_reader_failed_to_load_bc8d4dd4: 読み上げ機能の読み込みに失敗しました
   impact_58f41b1d: Impact
   impact_is_an_add_on_to_canvas_lms_contact_your_csm_23307a67: "ImpactはCanvas LMSのアドオンです。ご興味のある方はCSMまでお問い合わせください。"
   impact_manage_3641fd7f: "Impact - 管理"
@@ -15950,7 +15950,7 @@ ja:
   insert_row_below_25187f89: 下に行を挿入
   insert_row_below_name_a5b3bd41: "%{name}の下に行を挿入"
   insert_row_in_edit_mode_5976f269: 編集モードで行を挿入
-  insert_subject_9f0d8e49: 科目を挿入する
+  insert_subject_9f0d8e49: タイトルを入力
   insights_b514ad8d: Insights
   instaccess_tokens_b13a8390: InstAccessトークン
   install_c54fad9b: インストール
@@ -20568,10 +20568,10 @@ ja:
   nothing_else_due_7f8436af: 他に期限が来ているものはありません
   nothing_else_due_today_for_course_coursename_1a75915e: "コース%{courseName}には他に今日が期限のものなし"
   nothing_for_now_e3e3ce2a: 今のところ何もなし
-  nothing_here_needs_attention_c4eaded6: ここには注意を必要する新しいものは何もない。
+  nothing_here_needs_attention_c4eaded6: 通知はありません。
   nothing_here_yet_8ec9b788: まだなにもありません
   nothing_more_to_do_b665da42: 他にタスクはありません
-  nothing_new_needs_attention_3ac548d4: 注意を必要する新しいものは何もない。
+  nothing_new_needs_attention_3ac548d4: 通知はありません。
   nothing_planned_today_selecting_most_recent_item_ffd71bff: 今日は何も計画されていません。最新のアイテムを選択中。
   nothing_planned_today_selecting_next_item_f6718aa: 今日は何も計画されていません。次のアイテムを選択中。
   nothing_planned_yet_8675ffe9: 予定はありません。
@@ -25080,7 +25080,7 @@ ja:
   replycount_replies_unreadcount_unread_a85c0bc8: 
     one: "%{replyCount}の返信、%{unreadCount}未読"
     other: "%{replyCount}の返信、%{unreadCount}未読"
-  replying_as_f8371a46: （）として返信
+  replying_as_f8371a46: 返信者名
   report_58d2ac9e: 報告
   report_end_date_bce94160: レポート終了日
   report_end_date_e5ad8c08: レポート終了日
@@ -27187,7 +27187,7 @@ ja:
   show_correct_answers_at_a5475aa3: 正解を表示
   show_count_completed_items_aaa1a604: 
     one: "%{count}の完了アイテムを表示する"
-    other: "%{count}の完了アイテムを表示する"
+    other: "%{count}件の完了アイテムを表示する"
   show_count_missing_items_a73b3374: 
     one: "%{count}の欠如アイテムを表示する"
     other: "%{count}の欠如アイテムを表示する"
@@ -27877,7 +27877,7 @@ ja:
   student_name_c45b2a7: 受講者名
   student_name_hidden_b894d102: 受講生(名前は非表示)
   student_name_options_cb029725: 受講者名オプション
-  student_names_ea4b671a: 生徒の名前
+  student_names_ea4b671a: 受講者名
   student_names_must_be_hidden_because_anonymous_gra_d2ca7255: 匿名採点が要求されているので、受講者名は非表示である必要があります。
   student_names_must_be_hidden_because_this_is_an_an_3c82287d: これは匿名アンケートなので、受講者名は非表示である必要があります。
   student_number_db6f06c1: "受講者%{number}"
@@ -29431,9 +29431,9 @@ ja:
   this_group_was_successfully_removed_from_this_acco_63abf7f0: このグループは、このアカウントから正常に削除されました。
   this_group_was_successfully_removed_from_this_cour_8db261c4: このグループは、このコースから正常に削除されました。
   this_has_more_question_types_like_hotspot_categori_620e9df6: |-
-      これには、ホットスポット、分類、マッチング、順序付けなど、
-              より多くの質問タイプがあります。また、
-              さらなる調整機能と適応機能も備えています。
+      ホットスポット、カテゴリ分類、マッチング、順序付けなど、
+              さまざまな問題タイプが利用可能です。また、
+              「クラシック小テスト」タイプと比較して、より多くの機能が利用可能です。
   this_homeroom_syncs_enrollments_and_subject_start__a3d539ff: "このホームルームでは、登録者数と科目の開始/終了日を次のように同期しています： "
   this_image_appears_as_a_background_watermark_to_yo_1c6b4497: "この画像はあなたのページの透かし拝啓として表示されます。使用可能な定式: png, svg, gif, jpeg"
   this_image_has_been_reported_9360e581: この画像は報告されています。
@@ -30725,7 +30725,7 @@ ja:
   twitter_fcef6b54: Twitter
   txt_cae4e953: TXT
   type_a_date_or_use_arrow_keys_to_navigate_date_pic_61f7cc86: 日付を入力する、または矢印キーを使って日付ピッカーを操作してください。
-  type_a_few_letters_to_start_searching_3334657b: いくつか文字を入力して検索を開始する
+  type_a_few_letters_to_start_searching_3334657b: 入力すると候補が表示されます
   type_at_least_3_characters_to_search_f3df561c: 3文字以上入力してください。
   type_at_least_number_characters_to_search_5ff908c9: "検索する語を%{number}文字以上入力してください"
   type_c8106334: タイプ
@@ -30990,7 +30990,7 @@ ja:
   unread_rubric_assessment_2b2d5c47: 未読のルーブリック評価
   unreadcount_unread_9b2af1e7: "%{unreadCount} 未読"
   unreadcount_unread_9c86f4d1: "未読 %{unreadCount} 件"
-  unreadcount_unread_replies_509e167f: "%{unreadCount} 未読の返信"
+  unreadcount_unread_replies_509e167f: "%{unreadCount} の未読"
   unregister_service_985238e9: サービスの登録解除
   unreserved_e86b7425: 予約取り消し
   unsafe_file_link_8a18eceb: 安全でないファイルリンク
@@ -31124,7 +31124,7 @@ ja:
   upload_file_fd2361b8: ファイルをアップロードする
   upload_files_a228f20f: ファイルのアップロード
   upload_files_submitted_with_assignments_to_a_speci_5b4d2df8: 課題と提出されたファイルを特別読み取り専用の提出フォルダにアップロードしてください
-  upload_gradebook_386a46c8: 評定表のアップロード
+  upload_gradebook_386a46c8: 評定表のインポート
   upload_image_6120b609: イメージのアップロード
   upload_internal_root_ca_46cf9b36: 内部ルートCAをアップロードする
   upload_media_ce31135a: メディアを読み込む
@@ -31568,7 +31568,7 @@ ja:
         one: "%{count} 人の受講生の平均"
         other: "%{count} 人の受講者の平均"
       course: コース
-      current_teacher_courses: 私が教えているコース
+      current_teacher_courses: 担当するコース
       linked_student_accounts: リンクされている受講者のアカウント
       links: 
         teacher_activity: 受講者との交流レポート
@@ -31718,7 +31718,7 @@ ja:
         one: "1 日前"
         other: "%{count} 日前"
         zero: "1 日前未満"
-      last_time_never: 一切なし
+      last_time_never: なし
       links: 
         view_full_course: "%{course} の詳細な受講者交流レポートの表示"
       message_student: この受講者にメッセージを送る
@@ -32097,7 +32097,7 @@ ja:
             受講者、補助教員、およびオブザーバーをコースに
             追加できる場合があります。また、グループの課題、考察、およびファイルを保存するための受講者グループを
             作成することもできます。
-  what_should_the_csv_file_look_like_985a59ac: "CSV ファイルはどのような表示にしたいですか?"
+  what_should_the_csv_file_look_like_985a59ac: CSVファイルを評定表にインポートする方法。
   what_storage_options_do_i_have_in_zoom_b79c738e: "Zoom にはどのようなストレージオプションがありますか？"
   what_would_you_like_to_do_next_2835397e: 次に何をしますか?
   when_adding_external_links_to_a_module_users_can_s_1f893718: |-
