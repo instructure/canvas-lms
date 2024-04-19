@@ -8215,4 +8215,31 @@ describe Course do
       expect { @course.destroy }.to change { @course.reload.deleted_at }.from(nil).to be_truthy
     end
   end
+
+  describe "#all_dates" do
+    let(:calendar_event_start_date) { 1.day.from_now }
+    let(:calendar_event_end_date) { 2.days.from_now }
+    let(:assignment_due_at_date) { 3.days.from_now }
+    let(:context_module_unlock_at_date) { 4.days.from_now }
+
+    before do
+      @course = Account.default.courses.build
+      @course.save!
+      @course.calendar_events.create!(title: "an event",
+                                      start_at: calendar_event_start_date,
+                                      end_at: calendar_event_end_date)
+      @course.assignments.create!(due_at: assignment_due_at_date)
+      cm = @course.context_modules.build(name: "some module", unlock_at: context_module_unlock_at_date)
+      cm.save!
+    end
+
+    it "should return all dates" do
+      dates = @course.all_dates
+
+      expect(dates).to include(calendar_event_start_date.to_date)
+      expect(dates).to include(calendar_event_end_date.to_date)
+      expect(dates).to include(assignment_due_at_date.to_date)
+      expect(dates).to include(context_module_unlock_at_date.to_date)
+    end
+  end
 end
