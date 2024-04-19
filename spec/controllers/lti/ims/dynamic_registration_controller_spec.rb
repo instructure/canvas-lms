@@ -239,5 +239,43 @@ describe Lti::IMS::DynamicRegistrationController do
       subject
       expect(response).to have_http_status(:ok)
     end
+
+    it "uses iss domain in config url" do
+      subject
+      expect(response.parsed_body["oidc_configuration_url"]).to include(Canvas::Security.config["lti_iss"])
+    end
+
+    context "in local dev" do
+      before do
+        allow(Rails.env).to receive(:development?).and_return true
+      end
+
+      it "uses local domain instead of iss" do
+        subject
+        expect(response.parsed_body["oidc_configuration_url"]).to include("localhost")
+      end
+
+      context "when request scheme is http" do
+        before do
+          allow_any_instance_of(ActionController::TestRequest).to receive(:scheme).and_return("http")
+        end
+
+        it "uses http for config url" do
+          subject
+          expect(response.parsed_body["oidc_configuration_url"]).to include("http://")
+        end
+      end
+
+      context "when request scheme is https" do
+        before do
+          allow_any_instance_of(ActionController::TestRequest).to receive(:scheme).and_return("https")
+        end
+
+        it "uses https for config url" do
+          subject
+          expect(response.parsed_body["oidc_configuration_url"]).to include("https://")
+        end
+      end
+    end
   end
 end
