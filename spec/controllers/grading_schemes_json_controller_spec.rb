@@ -115,6 +115,8 @@ describe GradingSchemesJsonController, type: :request do
     describe "get grading schemes with archived feature" do
       before(:once) do
         Account.site_admin.enable_feature!(:archived_grading_schemes)
+        @root_account = Account.default
+        course_with_teacher(active_all: true, account: @root_account)
       end
 
       it "doesn't return unrelated archived schemes" do
@@ -147,6 +149,38 @@ describe GradingSchemesJsonController, type: :request do
 
         response_json = response.parsed_body
         expect(response_json.first["title"]).to eq("My Grading Scheme")
+      end
+
+      it "returns archived schemes if the parameter is included" do
+        data = GradingSchemesJsonController.to_grading_standard_data(test_data)
+        course_level_grading_standard = @course.grading_standards.build(title: "My Grading Scheme",
+                                                                        data:,
+                                                                        scaling_factor: 1.0,
+                                                                        points_based: false,
+                                                                        workflow_state: "archived")
+        course_level_grading_standard.save
+        user_session(@admin)
+        get "/courses/#{@course.id}/grading_schemes?include_archived=true", as: :json
+        expect(response).to have_http_status(:ok)
+
+        response_json = response.parsed_body
+        expect(response_json.first["title"]).to eq("My Grading Scheme")
+      end
+
+      it "does not return archived schemes if the parameter is not included" do
+        data = GradingSchemesJsonController.to_grading_standard_data(test_data)
+        course_level_grading_standard = @course.grading_standards.build(title: "My Grading Scheme",
+                                                                        data:,
+                                                                        scaling_factor: 1.0,
+                                                                        points_based: false,
+                                                                        workflow_state: "archived")
+        course_level_grading_standard.save
+        user_session(@admin)
+        get "/courses/#{course_level_grading_standard.context_id}/grading_schemes", as: :json
+        expect(response).to have_http_status(:ok)
+
+        response_json = response.parsed_body
+        expect(response_json.first).to be_nil
       end
     end
 

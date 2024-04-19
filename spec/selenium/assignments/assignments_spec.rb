@@ -140,6 +140,95 @@ describe "assignments" do
       expect(f("#speed-grader-link-container").attribute("class")).to include("hidden")
     end
 
+    context "archived grading schemes enabled" do
+      before do
+        Account.site_admin.enable_feature!(:grading_scheme_updates)
+        Account.site_admin.enable_feature!(:archived_grading_schemes)
+        @account = @course.account
+        @active_grading_standard = @course.grading_standards.create!(title: "Active Grading Scheme", data: { "A" => 0.9, "F" => 0 }, scaling_factor: 1.0, points_based: false, workflow_state: "active")
+        @archived_grading_standard = @course.grading_standards.create!(title: "Archived Grading Scheme", data: { "A" => 0.9, "F" => 0 }, scaling_factor: 1.0, points_based: false, workflow_state: "archived")
+        @account_grading_standard = @account.grading_standards.create!(title: "Account Grading Scheme", data: { "A" => 0.9, "F" => 0 }, scaling_factor: 1.0, points_based: false, workflow_state: "active")
+        assignment_name = "first test assignment"
+        due_date = Time.now.utc + 2.days
+        group = @course.assignment_groups.create!(name: "default")
+        @course.assignment_groups.create!(name: "second default")
+        @assignment = @course.assignments.create!(
+          name: assignment_name,
+          due_at: due_date,
+          assignment_group: group,
+          unlock_at: due_date - 1.day,
+          grading_type: "letter_grade"
+        )
+      end
+
+      it "shows archived grading scheme if it is the course default twice, once to follow course default scheme and once to choose that scheme to use" do
+        @course.update!(grading_standard_id: @archived_grading_standard.id)
+        @course.reload
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
+        wait_for_ajaximations
+        expect(f("[data-testid='grading-schemes-selector-dropdown']").attribute("title")).to eq(@archived_grading_standard.title + " (course default)")
+        f("[data-testid='grading-schemes-selector-dropdown']").click
+        expect(f("[data-testid='grading-schemes-selector-option-#{@course.grading_standard.id}']")).to include_text(@course.grading_standard.title)
+      end
+
+      it "shows archived grading scheme if it is the current assignment grading standard" do
+        @assignment.update!(grading_standard_id: @archived_grading_standard.id)
+        @assignment.reload
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
+        wait_for_ajaximations
+        expect(f("[data-testid='grading-schemes-selector-dropdown']").attribute("title")).to eq(@archived_grading_standard.title)
+      end
+
+      it "removes grading schemes from dropdown after archiving them but still shows them upon reopening the modal" do
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
+        wait_for_ajaximations
+        f("[data-testid='grading-schemes-selector-dropdown']").click
+        expect(f("[data-testid='grading-schemes-selector-option-#{@active_grading_standard.id}']")).to be_present
+        f("[data-testid='manage-all-grading-schemes-button']").click
+        wait_for_ajaximations
+        f("[data-testid='grading-scheme-#{@active_grading_standard.id}-archive-button']").click
+        wait_for_ajaximations
+        f("[data-testid='manage-all-grading-schemes-close-button']").click
+        wait_for_ajaximations
+        f("[data-testid='grading-schemes-selector-dropdown']").click
+        expect(f("[data-testid='grading-schemes-selector-dropdown-form']")).not_to contain_css("[data-testid='grading-schemes-selector-option-#{@active_grading_standard.id}']")
+        f("[data-testid='manage-all-grading-schemes-button']").click
+        wait_for_ajaximations
+        expect(f("[data-testid='grading-scheme-row-#{@active_grading_standard.id}']").text).to be_present
+      end
+
+      it "shows all archived schemes in the manage grading schemes modal" do
+        archived_gs1 = @course.grading_standards.create!(title: "Archived Grading Scheme 1", data: { "A" => 0.9, "F" => 0 }, scaling_factor: 1.0, points_based: false, workflow_state: "archived")
+        archived_gs2 = @course.grading_standards.create!(title: "Archived Grading Scheme 2", data: { "A" => 0.9, "F" => 0 }, scaling_factor: 1.0, points_based: false, workflow_state: "archived")
+        archived_gs3 = @course.grading_standards.create!(title: "Archived Grading Scheme 3", data: { "A" => 0.9, "F" => 0 }, scaling_factor: 1.0, points_based: false, workflow_state: "archived")
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
+        wait_for_ajaximations
+        f("[data-testid='manage-all-grading-schemes-button']").click
+        wait_for_ajaximations
+        expect(f("[data-testid='grading-scheme-#{archived_gs1.id}-name']")).to include_text(archived_gs1.title)
+        expect(f("[data-testid='grading-scheme-#{archived_gs2.id}-name']")).to include_text(archived_gs2.title)
+        expect(f("[data-testid='grading-scheme-#{archived_gs3.id}-name']")).to include_text(archived_gs3.title)
+      end
+
+      it "will still show the assignment grading scheme if you archive it on the edit page in the management modal and persist on reload" do
+        @assignment.update!(grading_standard_id: @active_grading_standard.id)
+        @assignment.reload
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
+        wait_for_ajaximations
+        expect(f("[data-testid='grading-schemes-selector-dropdown']").attribute("title")).to eq(@active_grading_standard.title)
+        f("[data-testid='manage-all-grading-schemes-button']").click
+        wait_for_ajaximations
+        f("[data-testid='grading-scheme-#{@active_grading_standard.id}-archive-button']").click
+        wait_for_ajaximations
+        f("[data-testid='manage-all-grading-schemes-close-button']").click
+        wait_for_ajaximations
+        expect(f("[data-testid='grading-schemes-selector-dropdown']").attribute("title")).to eq(@active_grading_standard.title)
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
+        wait_for_ajaximations
+        expect(f("[data-testid='grading-schemes-selector-dropdown']").attribute("title")).to eq(@active_grading_standard.title)
+      end
+    end
+
     it "edits an assignment", priority: "1" do
       assignment_name = "first test assignment"
       due_date = Time.now.utc + 2.days

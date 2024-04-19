@@ -193,6 +193,22 @@ describe GradingStandard do
       expect(standards.length).to eq 1
       expect(standards[0].id).to eq @standard.id
     end
+
+    it "only includes active schemes when include_archived is false" do
+      grading_standard_for @course
+      @standard.archive!
+      standards = GradingStandard.for(@course)
+      expect(standards.length).to eq 0
+    end
+
+    it "includes archived when the parameter is true for archived grading schemes" do
+      Account.site_admin.enable_feature!(:archived_grading_schemes)
+      grading_standard_for @course
+      @standard.archive!
+      standards = GradingStandard.for(@course, include_archived: true)
+      expect(standards.length).to eq 1
+      expect(standards[0].id).to eq @standard.id
+    end
   end
 
   context "sorted" do
