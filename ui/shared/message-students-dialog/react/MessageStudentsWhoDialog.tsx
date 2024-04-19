@@ -62,6 +62,12 @@ import {
 } from '@canvas/message-attachments'
 import type {CamelizedAssignment} from '@canvas/grading/grading.d'
 
+export enum MSWLaunchContext {
+  ASSIGNMENT_CONTEXT,
+  ASSIGNMENT_GROUP_CONTEXT,
+  TOTAL_COURSE_GRADE_CONTEXT,
+}
+
 export type SendMessageArgs = {
   attachmentIds?: string[]
   recipientsIds: string[]
@@ -88,13 +94,15 @@ export type Student = {
 
 export type Props = {
   assignment?: CamelizedAssignment
+  launchContext: MSWLaunchContext
+  assignmentGroupName?: string
   onClose: () => void
   students: Student[]
   onSend: (args: SendMessageArgs) => void
   messageAttachmentUploadFolderId: string
   userId: string
   courseId?: string
-  pointsBasedGradingScheme: boolean
+  pointsBasedGradingScheme?: boolean
 }
 
 type Attachment = {
@@ -289,7 +297,26 @@ function filterStudents(criterion, students, cutoff) {
   return newfilteredStudents
 }
 
-function defaultSubject(criterion, assignment, cutoff, pointsBasedGradingScheme) {
+function cumulativeScoreDefaultSubject(criterion, launchContext, cutoff, assignmentGroupName = '') {
+  const context =
+    launchContext === MSWLaunchContext.ASSIGNMENT_GROUP_CONTEXT ? assignmentGroupName : 'course'
+
+  switch (criterion) {
+    case 'total_grade_higher_than':
+      return I18n.t('Total grade for %{context} is higher than %{cutoff}', {context, cutoff})
+    case 'total_grade_lower_than':
+      return I18n.t('Total grade for %{context} is lower than %{cutoff}', {context, cutoff})
+  }
+}
+
+function defaultSubject(
+  criterion,
+  assignment,
+  launchContext,
+  cutoff,
+  pointsBasedGradingScheme,
+  assignmentGroupName
+) {
   if (cutoff === '') {
     cutoff = 0
   }
@@ -324,29 +351,26 @@ function defaultSubject(criterion, assignment, cutoff, pointsBasedGradingScheme)
         return I18n.t('%{assignment} is reassigned', {assignment: assignment.name})
     }
   } else {
-    switch (criterion) {
-      case 'total_grade_higher_than':
-        return pointsBasedGradingScheme
-          ? I18n.t('Current total score is higher than %{cutoff}', {
-              cutoff,
-            })
-          : I18n.t('Current total score is higher than %{cutoff}%', {
-              cutoff,
-            })
-      case 'total_grade_lower_than':
-        return pointsBasedGradingScheme
-          ? I18n.t('Current total score is lower than %{cutoff}', {
-              cutoff,
-            })
-          : I18n.t('Current total score is lower than %{cutoff}%', {
-              cutoff,
-            })
+    let defaultSubjectStr = cumulativeScoreDefaultSubject(
+      criterion,
+      launchContext,
+      cutoff,
+      assignmentGroupName
+    )
+
+    // Add % at end of subject line if this is NOT a points based scheme
+    if (!pointsBasedGradingScheme) {
+      defaultSubjectStr += '%'
     }
+
+    return defaultSubjectStr
   }
 }
 
 const MessageStudentsWhoDialog = ({
   assignment,
+  launchContext,
+  assignmentGroupName,
   onClose,
   students,
   onSend,
@@ -410,7 +434,14 @@ const MessageStudentsWhoDialog = ({
     filterStudents(availableCriteria[0], sortedStudents, cutoff)
   )
   const [subject, setSubject] = useState(
-    defaultSubject(availableCriteria[0].value, assignment, cutoff, pointsBasedGradingScheme)
+    defaultSubject(
+      availableCriteria[0].value,
+      assignment,
+      launchContext,
+      cutoff,
+      pointsBasedGradingScheme,
+      assignmentGroupName
+    )
   )
   const [observersDisplayed, setObserversDisplayed] = useState(0.0)
 
@@ -489,7 +520,16 @@ const MessageStudentsWhoDialog = ({
       setObserversDisplayed(
         observerCount(filterStudents(newCriterion, sortedStudents, cutoff), observersByStudentID)
       )
-      setSubject(defaultSubject(newCriterion.value, assignment, cutoff, pointsBasedGradingScheme))
+      setSubject(
+        defaultSubject(
+          newCriterion.value,
+          assignment,
+          launchContext,
+          cutoff,
+          pointsBasedGradingScheme,
+          assignmentGroupName
+        )
+      )
     }
   }
 
@@ -534,7 +574,16 @@ const MessageStudentsWhoDialog = ({
       setObserversDisplayed(
         observerCount(filterStudents(criterion, sortedStudents, cutoff), observersByStudentID)
       )
-      setSubject(defaultSubject(criterion.value, assignment, cutoff))
+      setSubject(
+        defaultSubject(
+          criterion.value,
+          assignment,
+          launchContext,
+          cutoff,
+          true,
+          assignmentGroupName
+        )
+      )
     }
   }
 
@@ -683,8 +732,10 @@ const MessageStudentsWhoDialog = ({
                         defaultSubject(
                           selectedCriterion.value,
                           assignment,
+                          launchContext,
                           value,
-                          pointsBasedGradingScheme
+                          pointsBasedGradingScheme,
+                          assignmentGroupName
                         )
                       )
                     }
@@ -709,19 +760,19 @@ const MessageStudentsWhoDialog = ({
                   data-testid="include-student-radio-group"
                 >
                   <RadioInput
-                    label={I18n.t('All')}
+                    label={I18n.t('All on time submissions')}
                     value="all"
                     onClick={() => onSubmissionRadioSelect('submitted')}
                     data-testid="all-students-radio-button"
                   />
                   <RadioInput
-                    label={I18n.t('Graded')}
+                    label={I18n.t('Graded on time submissions')}
                     value="graded"
                     onClick={() => onSubmissionRadioSelect('submitted_and_graded')}
                     data-testid="graded-students-radio-button"
                   />
                   <RadioInput
-                    label={I18n.t('Not Graded')}
+                    label={I18n.t('Not graded on time submissions')}
                     value="not_graded"
                     onClick={() => onSubmissionRadioSelect('submitted_and_not_graded')}
                     data-testid="not-graded-students-radio-button"
