@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<%= fields_for :settings, OpenObject.new(settings) do |f| %>
+<%= fields_for :settings do |f| %>
   <table style="width: 500px;" class="formtable">
     <tr>
       <td colspan="2"><%= mt(<<~TEXT, twitter_url: "https://apps.twitter.com/", callback_url: oauth_login_callback_url)
@@ -30,7 +30,7 @@ TEXT
     <tr>
       <td><%= f.blabel :consumer_key, :en => "Consumer Key" %></td>
       <td>
-        <%= f.text_field :consumer_key %>
+        <%= f.text_field :consumer_key, value: settings[:consumer_key] %>
       </td>
     </tr>
     <tr>

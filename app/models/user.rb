@@ -1493,7 +1493,7 @@ class User < ActiveRecord::Base
 
   def self.infer_id(obj)
     case obj
-    when User, OpenObject
+    when User
       obj.id
     when Numeric
       obj

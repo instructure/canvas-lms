@@ -17,7 +17,7 @@
 %>
 
 <% rubric_summary_criterion ||= nil; criterion = rubric_summary_criterion || nil; assessing ||= false; brief ||= false; assessment_rating ||= nil %>
-<% @empty_rating ||= [OpenObject.new(:id => "blank", :description => t(:full_marks, "Full Marks"), :points => 5), OpenObject.new(:id => "blank_2", :description => t(:no_marks, "No Marks"), :points => 0)] %>
+<% @empty_rating ||= [Rubric::Rating.new(:id => "blank", :description => t(:full_marks, "Full Marks"), :points => 5), Rubric::Rating.new(:id => "blank_2", :description => t(:no_marks, "No Marks"), :points => 0)] %>
 <tr id="criterion_<%= criterion ? criterion.id : "blank" %>" class="criterion <%= "blank" unless criterion %> criterion_<%= criterion ? criterion.id : "blank" %> <%= 'ignore_criterion_for_scoring' if criterion && criterion.ignore_for_scoring %> <%= 'learning_outcome_criterion' if criterion && criterion.learning_outcome_id %>">
   <td class="criterion_description">
     <% if criterion && criterion.learning_outcome_id.present? %>
@@ -36,8 +36,8 @@
       <div class="ratings">
       <% ratings = criterion ? criterion.ratings : @empty_rating %>
       <% ratings.each_index do |idx| %>
-        <% rating = ratings[idx]; rating.edge = (idx == 0 || idx == ratings.length - 1) %>
-        <div class="rating_holder"><span id="rating_<%= rating.id %>" class="rating <%= "edge_rating" if rating.edge %>"><%= rating.description %></span></div>
+        <% rating = ratings[idx]; edge = (idx == 0 || idx == ratings.length - 1) %>
+        <div class="rating_holder"><span id="rating_<%= rating.id %>" class="rating <%= "edge_rating" if edge %>"><%= rating.description %></span></div>
       <% end %>
       </div>
       <div class="rating description" style="<%= hidden unless criterion %>"><%= assessment_rating ? assessment_rating.description : "" %></div>

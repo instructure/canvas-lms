@@ -175,6 +175,7 @@ class SubmissionsBaseController < ApplicationController
                                                                       except: [:quiz_submission, :submission_history]
                                                                     }).merge(except: submission_json_exclusions, permissions:)
           json_args[:methods] << :provisional_grade_id if provisional
+          json_args[:methods].delete(:submission_comments)
 
           submissions_json = @submissions.map do |submission|
             submission_json = submission.as_json(json_args)

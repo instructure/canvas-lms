@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<%= fields_for :settings, OpenObject.new(settings) do |f| %>
+<%= fields_for :settings do |f| %>
   <table style="width: 500px;" class="formtable">
     <tr>
       <td colspan="2">
@@ -25,7 +25,7 @@
     </tr>
     <tr>
       <td><%= f.blabel :type, :en => "Ticketing System type" %></td>
-      <td><%= f.select :type, Canvas::Plugins::TicketingSystem.registered_extensions.map { |p| [p.name, p.id] } %>
+      <td><%= f.select :type, Canvas::Plugins::TicketingSystem.registered_extensions.map { |p| [p.name, p.id] }, selected: settings[:type] %>
     </tr>
   </table>
 <% end %>

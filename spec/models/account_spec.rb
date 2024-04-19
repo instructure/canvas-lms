@@ -270,8 +270,8 @@ describe Account do
       a = Account.new
       a.equella_endpoint = "http://oer.equella.com/signon.do"
       expect(a.equella_settings).not_to be_nil
-      expect(a.equella_settings.endpoint).to eql("http://oer.equella.com/signon.do")
-      expect(a.equella_settings.default_action).not_to be_nil
+      expect(a.equella_settings[:endpoint]).to eql("http://oer.equella.com/signon.do")
+      expect(a.equella_settings[:default_action]).not_to be_nil
     end
   end
 

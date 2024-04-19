@@ -55,7 +55,7 @@ module Canvas
           I18n.t("messages.content_locked_until", "This content is locked until %{date}.", date: datetime_string(hash[:unlock_at]))
         end
       elsif hash[:context_module]
-        obj = hash[:context_module].is_a?(ContextModule) ? hash[:context_module] : OpenObject.new(hash[:context_module])
+        obj = hash[:context_module].is_a?(ContextModule) ? hash[:context_module] : ContextModule.new(hash[:context_module])
         html = if obj.workflow_state == "unpublished"
                  case type
                  when "quiz"

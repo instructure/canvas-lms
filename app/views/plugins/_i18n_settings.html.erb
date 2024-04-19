@@ -16,12 +16,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<%= fields_for :settings, OpenObject.new(settings) do |f| %>
+<%= fields_for :settings do |f| %>
     <table style="width: 500px;" class="formtable">
       <% LocaleSelection.custom_locales.each do |locale| %>
           <tr>
             <td><%= f.blabel locale, I18n.send(:t, :locales, :locale => locale)[locale] %></td>
-            <td><%= f.check_box locale, :enabled => settings[locale] %></td>
+            <td><%= f.check_box locale, checked: Canvas::Plugin.value_to_boolean(settings[locale]) %></td>
           </tr>
       <% end %>
     </table>
