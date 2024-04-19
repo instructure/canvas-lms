@@ -17,15 +17,17 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
-import {createBrowserRouter, RouterProvider, Link, Outlet, useMatch} from 'react-router-dom'
+
+import {Link, Outlet, useMatch} from 'react-router-dom'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Heading} from '@instructure/ui-heading'
-import {Spinner} from '@instructure/ui-spinner'
 import {Tabs} from '@instructure/ui-tabs'
-import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
+import {Flex} from '@instructure/ui-flex'
+import {Button} from '@instructure/ui-buttons'
+import {DynamicRegistrationModal} from '../manage/dynamic_registration/DynamicRegistrationModal'
+import {useDynamicRegistrationState} from '../manage/dynamic_registration/DynamicRegistrationState'
 
 const I18n = useI18nScope('lti_registrations')
 
@@ -34,20 +36,32 @@ export const LtiAppsLayout = () => {
 
   const queryClient = new QueryClient()
 
+  const contextId = window.location.pathname.split('/')[2]
+
+  const state = useDynamicRegistrationState(s => s)
+
   return (
     <QueryClientProvider client={queryClient}>
-      <View as="div" margin="0 0 small 0" padding="none">
-        <Heading level="h1">{I18n.t('Extensions')}</Heading>
-      </View>
+      <Flex alignItems="start" justifyItems="space-between" margin="0 0 small 0">
+        <Flex.Item>
+          <Heading level="h1">{I18n.t('Extensions')}</Heading>
+        </Flex.Item>
+        {isManage ? (
+          <Flex.Item>
+            <Button color="primary" onClick={() => state.open()}>
+              {I18n.t('Install a New Extension')}
+            </Button>
+          </Flex.Item>
+        ) : null}
+      </Flex>
+      <DynamicRegistrationModal contextId={contextId} />
       <Text size="large">{I18n.t('Discover Something new or manage existing LTI extensions')}</Text>
       <Tabs margin="medium auto" padding="medium" onRequestTabChange={() => {}}>
         {window.ENV.FEATURES.lti_registrations_discover_page && (
           <Tabs.Panel
             isSelected={!isManage}
-            active={!isManage}
             id="tabB"
             href="/"
-            padding="large 0"
             renderTitle={
               <Link style={{color: 'initial', textDecoration: 'initial'}} to="/">
                 {I18n.t('Discover')}
@@ -66,7 +80,7 @@ export const LtiAppsLayout = () => {
           id="tabA"
           padding="large"
           isSelected={!!isManage}
-          active={!!isManage}
+          active={true}
         >
           <Outlet />
         </Tabs.Panel>
