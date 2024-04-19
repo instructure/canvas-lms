@@ -29,6 +29,7 @@ class DeveloperKeyAccountBinding < ApplicationRecord
   belongs_to :account
   belongs_to :developer_key
   belongs_to :root_account, class_name: "Account"
+  has_one :lti_registration_account_binding, class_name: "Lti::RegistrationAccountBinding", inverse_of: :developer_key_account_binding
 
   validates :account, :developer_key, presence: true
 

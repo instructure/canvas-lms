@@ -26,6 +26,7 @@ describe Account do
     it { is_expected.to have_one(:outcome_proficiency).dependent(:destroy) }
     it { is_expected.to have_many(:lti_resource_links).class_name("Lti::ResourceLink") }
     it { is_expected.to have_many(:lti_registrations).class_name("Lti::Registration").dependent(:destroy) }
+    it { is_expected.to have_many(:lti_registration_account_bindings).class_name("Lti::RegistrationAccountBinding").dependent(:destroy) }
   end
 
   describe "validations" do

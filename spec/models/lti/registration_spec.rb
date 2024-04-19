@@ -27,5 +27,6 @@ RSpec.describe Lti::Registration do
     it { is_expected.to have_one(:developer_key).class_name("DeveloperKey").inverse_of(:lti_registration).with_foreign_key(:lti_registration_id) }
     it { is_expected.to belong_to(:created_by).class_name("User").optional(false) }
     it { is_expected.to belong_to(:updated_by).class_name("User").optional(false) }
+    it { is_expected.to have_many(:lti_registration_account_bindings).class_name("Lti::RegistrationAccountBinding").dependent(:destroy) }
   end
 end
