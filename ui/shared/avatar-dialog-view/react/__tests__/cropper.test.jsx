@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2024 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -17,40 +17,37 @@
  */
 
 import React from 'react'
-import {shallow, mount} from 'enzyme'
-import Cropper from '@canvas/avatar-dialog-view/react/cropper'
+import {render} from '@testing-library/react'
+import Cropper from '../cropper'
 
-let file, wrapper
+let file, wrapper, ref
 
-QUnit.module('CanvasCropper', hooks => {
-  hooks.beforeEach(() => {
+describe('CanvasCropper', () => {
+  beforeEach(() => {
     const blob = dataURItoBlob(filedata)
+    ref = React.createRef()
     file = new File([blob], 'test.jpg', {
       type: 'image/jpeg',
       lastModified: Date.now(),
     })
-    wrapper = mount(<Cropper imgFile={file} width={100} height={100} />)
+    wrapper = render(<Cropper imgFile={file} width={100} height={100} ref={ref} />)
   })
 
   test('renders the component', () => {
-    ok(wrapper.find('.CanvasCropper').exists(), 'cropper is in the DOM')
+    expect(wrapper.container.querySelector('.CanvasCropper')).toBeTruthy()
   })
 
   test('renders the image', () => {
-    ok(wrapper.find('.Cropper-image').exists(), 'cropper image is in the DOM')
+    expect(wrapper.container.querySelector('.Cropper-image')).toBeTruthy()
   })
 
-  test('getImage returns cropped image object', assert => {
-    assert.expect(1)
-    const done = assert.async()
-
-    wrapper
-      .instance()
-      .crop()
-      .then(image => {
-        ok(image instanceof Blob, 'image object is a blob')
-        done()
-      })
+  test('getImage returns cropped image object', async () => {
+    const done = jest.fn()
+    ref.current.crop().then(image => {
+      expect(image instanceof Blob).toBeTruthy()
+      expect(done).toHaveBeenCalledTimes(1)
+      done()
+    })
   })
 })
 
