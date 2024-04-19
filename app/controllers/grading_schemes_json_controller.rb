@@ -210,11 +210,12 @@ class GradingSchemesJsonController < ApplicationController
   end
 
   def grading_standards_for_context
+    include_archived = params[:include_archived] == "true"
     if params[:assignment_id]
       @assignment = @context.assignments.find(params[:assignment_id])
-      return GradingStandard.for(@assignment)
+      return GradingStandard.for(@assignment, include_archived:)
     end
-    GradingStandard.for(@context)
+    GradingStandard.for(@context, include_archived:)
   end
 
   def self.default_canvas_grading_standard(context)
