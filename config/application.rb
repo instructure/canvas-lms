@@ -185,7 +185,7 @@ module CanvasRails
 
             begin
               return super(conn_params)
-            rescue ::ActiveRecord::ActiveRecordError => e
+            rescue ::ActiveRecord::ActiveRecordError, ::PG::Error => e
               # If exception occurs using parameters from a predefined pg service, retry without
               if conn_params.key?(:service)
                 CanvasErrors.capture(e, { tags: { pg_service: conn_params[:service] } }, :warn)
@@ -236,7 +236,7 @@ module CanvasRails
             else
               @raw_connection = PG::Connection.connect(connection_parameters)
             end
-          rescue ::PG::Error => e
+          rescue ::ActiveRecord::ActiveRecordError, ::PG::Error => e
             # If exception occurs using parameters from a predefined pg service, retry without
             if connection_parameters.key?(:service)
               CanvasErrors.capture(e, { tags: { pg_service: connection_parameters[:service] } }, :warn)
