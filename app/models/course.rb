@@ -2895,10 +2895,11 @@ class Course < ActiveRecord::Base
   end
 
   def all_dates
-    (calendar_events.active + assignments.active).each_with_object([]) do |e, list|
-      list << e.end_at if e.end_at
-      list << e.start_at if e.start_at
-    end.compact.flatten.map(&:to_date).uniq rescue []
+    [
+      calendar_events.active.pluck(:start_at, :end_at),
+      assignments.active.pluck(:due_at),
+      context_modules.not_deleted.pluck(:unlock_at)
+    ].flatten.compact.map(&:to_date).uniq
   end
 
   def real_end_date
