@@ -104,7 +104,9 @@ export const GradedDiscussionOptions = ({
           contextType="Course"
           initiallySelectedGradingSchemeId={gradingSchemeId}
           onChange={newSchemeId => setGradingSchemeId(newSchemeId || '')}
-          archivedGradingSchemesEnabled={false}
+          archivedGradingSchemesEnabled={ENV.ARCHIVED_GRADING_SCHEMES_ENABLED ?? false}
+          assignmentId={ENV.ASSIGNMENT_ID ? String(ENV.ASSIGNMENT_ID) : undefined}
+          courseDefaultSchemeId={ENV.COURSE_DEFAULT_GRADING_SCHEME_ID || ''}
         />
       )}
       {ENV.POST_TO_SIS && (
