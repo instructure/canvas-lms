@@ -533,6 +533,91 @@ describe.skip('MessageStudentsWhoDialog', () => {
     })
 
     describe('"Have submitted"', () => {
+      it('renders a student cell if the student has workflowState pending_review and submittedAt', async () => {
+        const mocks = await makeMocks()
+
+        students[0].workflowState = 'pending_review'
+        students[0].submittedAt = new Date()
+
+        const {getByTestId, findByLabelText, getByText, getAllByRole, getByRole} = render(
+          <MockedProvider mocks={mocks} cache={createCache()}>
+            <MessageStudentsWhoDialog {...makeProps()} />
+          </MockedProvider>
+        )
+
+        const button = await findByLabelText(/For students who/)
+        fireEvent.click(button)
+        fireEvent.click(getByText(/Have submitted/))
+
+        // Select "All" radio button
+        fireEvent.click(getByTestId('all-students-radio-button'))
+
+        fireEvent.click(getByRole('button', {name: 'Show all recipients'}))
+        expect(getByRole('table')).toBeInTheDocument()
+
+        const tableRows = getAllByRole('row') as HTMLTableRowElement[]
+        const studentCells = tableRows.map(row => row.cells[0])
+        expect(studentCells).toHaveLength(2) // Header + 1 student
+        expect(studentCells[1]).toHaveTextContent('Betty Ford')
+      })
+
+      it('renders a student cell with workflowState pending_review when "Not Graded" radio button is selected', async () => {
+        const mocks = await makeMocks()
+
+        students[0].workflowState = 'pending_review'
+        students[0].submittedAt = new Date()
+
+        const {findByLabelText, getByText, getAllByRole, getByRole, getByTestId} = render(
+          <MockedProvider mocks={mocks} cache={createCache()}>
+            <MessageStudentsWhoDialog {...makeProps()} />
+          </MockedProvider>
+        )
+
+        const button = await findByLabelText(/For students who/)
+        fireEvent.click(button)
+        fireEvent.click(getByText(/Have submitted/))
+
+        // Select "Not Graded" radio button
+        fireEvent.click(getByTestId('not-graded-students-radio-button'))
+
+        fireEvent.click(getByRole('button', {name: 'Show all recipients'}))
+        expect(getByRole('table')).toBeInTheDocument()
+
+        const tableRows = getAllByRole('row') as HTMLTableRowElement[]
+        const studentCells = tableRows.map(row => row.cells[0])
+        expect(studentCells).toHaveLength(2) // Header + 1 student
+        expect(studentCells[1]).toHaveTextContent('Betty Ford')
+      })
+
+      it('renders a student cell if the student does not have workflowState pending_review and has a grade defined when "Graded" radio button is selected', async () => {
+        const mocks = await makeMocks()
+
+        students[0].workflowState = 'graded'
+        students[0].submittedAt = new Date()
+        students[0].grade = 'A'
+
+        const {findByLabelText, getByText, getAllByRole, getByRole, getByTestId} = render(
+          <MockedProvider mocks={mocks} cache={createCache()}>
+            <MessageStudentsWhoDialog {...makeProps()} />
+          </MockedProvider>
+        )
+
+        const button = await findByLabelText(/For students who/)
+        fireEvent.click(button)
+        fireEvent.click(getByText(/Have submitted/))
+
+        // Select "Graded" radio button
+        fireEvent.click(getByTestId('graded-students-radio-button'))
+
+        fireEvent.click(getByRole('button', {name: 'Show all recipients'}))
+        expect(getByRole('table')).toBeInTheDocument()
+
+        const tableRows = getAllByRole('row') as HTMLTableRowElement[]
+        const studentCells = tableRows.map(row => row.cells[0])
+        expect(studentCells).toHaveLength(2) // Header + 1 student
+        expect(studentCells[1]).toHaveTextContent('Betty Ford')
+      })
+
       it('student radio buttons render when "Have submitted" option is selected', async () => {
         const mocks = await makeMocks()
 

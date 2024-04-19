@@ -80,6 +80,7 @@ export default function MessageStudentsWhoModal({
         redoRequest: submission?.redoRequest,
         score: submission?.score,
         excused: submission?.excused,
+        workflowState: submission?.state,
       })
 
       return filteredStudents
