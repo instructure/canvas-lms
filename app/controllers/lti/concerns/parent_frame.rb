@@ -65,11 +65,25 @@ module Lti::Concerns
       origin.to_s
     end
 
-    def set_extra_csp_frame_ancestor!
+    def set_extra_csp_frame_ancestor!(origin = nil)
+      origin ||= parent_frame_origin
+
       # require http/https URI (e.g., no 'data' uris') & don't allow potential
-      # specially characters that could mess up header
-      if parent_frame_origin&.match(/^https?:[^ *;]+$/)
-        csp_frame_ancestors << parent_frame_origin
+      # special characters that could mess up header
+      if origin&.match(/^https?:[^ *;]+$/)
+        csp_frame_ancestors << origin
+      end
+    end
+
+    # In some situations for nested LTI tools, such as if the nested tool needs
+    # to go thru an OAuth flow, parent_frame_context is not available. In these
+    # scenarios, we can allow the Canvas page (e.g. OAuth confirm page) to be
+    # framed inside any trusted tool for the root account. (This requires the
+    # outer tool to be installed at the root account, as is the case for NQ)
+    def allow_trusted_tools_to_embed_this_page!
+      @domain_root_account&.cached_tool_domains(internal_service_only: true)&.each do |domain|
+        set_extra_csp_frame_ancestor! "https://#{domain}"
+        set_extra_csp_frame_ancestor! "http://#{domain}" if Rails.env.development?
       end
     end
   end

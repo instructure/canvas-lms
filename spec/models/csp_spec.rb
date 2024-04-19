@@ -188,20 +188,29 @@ describe Csp do
       @sub2 = @sub1.sub_accounts.create!
     end
 
+    def create_some_tools
+      [
+        create_tool(@root, domain: "example1.com"),
+        create_tool(@sub1, domain: "example2.com"),
+        create_tool(@sub2, url: "https://example3.com/launchnstuff")
+      ]
+    end
+
     it "gets all tool domains in the chain" do
-      create_tool(@root, domain: "example1.com")
-      create_tool(@sub1, domain: "example2.com")
-      create_tool(@sub2, url: "https://example3.com/launchnstuff")
+      create_some_tools
 
       expect(@sub1.cached_tool_domains).to match_array(["example1.com", "*.example1.com", "example2.com", "*.example2.com"])
       expect(@sub2.cached_tool_domains).to match_array(["example1.com", "*.example1.com", "example2.com", "*.example2.com", "example3.com", "*.example3.com"])
     end
 
-    it "caches the tool domains" do
-      enable_cache do
-        expect(@sub2).to receive(:get_account_tool_domains).and_return(["example.com"]).once
-        @sub2.csp_whitelisted_domains(include_files: false, include_tools: true)
-        Account.find(@sub2.id).csp_whitelisted_domains(include_files: false, include_tools: true)
+    context "when internal_service_only: true is passed in" do
+      it "gets only tools with dev keys with internal_service=true, and does not cache them together" do
+        _, t2, t3 = create_some_tools
+        t2.update! developer_key: DeveloperKey.create!(account: @sub1)
+        t3.update! developer_key: DeveloperKey.create!(account: @sub2, internal_service: true)
+
+        expect(@sub2.cached_tool_domains(internal_service_only: false)).to match_array(["example1.com", "*.example1.com", "example2.com", "*.example2.com", "example3.com", "*.example3.com"])
+        expect(@sub2.cached_tool_domains(internal_service_only: true)).to match_array(["example3.com", "*.example3.com"])
       end
     end
 

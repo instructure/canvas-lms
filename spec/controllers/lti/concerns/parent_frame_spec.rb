@@ -72,4 +72,26 @@ describe Lti::Concerns::ParentFrame do
       end
     end
   end
+
+  describe "allow_trusted_tools_to_embed_this_page!" do
+    let(:tool_context) { Account.default }
+
+    before do
+      controller.instance_variable_set(:@domain_root_account, tool_context)
+      allow(controller).to receive(:request).and_return(double(host: "instructure.com"))
+      allow(tool_context).to receive(:cached_tool_domains).with(internal_service_only: true).and_return(["mytool.example.com"])
+    end
+
+    it "adds trusted tool origins to the Content-Security-Policy" do
+      controller.send(:allow_trusted_tools_to_embed_this_page!)
+      expect(controller.send(:csp_frame_ancestors)).to include("https://mytool.example.com")
+    end
+
+    it "adds allows the trusted too to use http in development" do
+      expect(Rails.env).to receive(:development?).and_return(true)
+      controller.send(:allow_trusted_tools_to_embed_this_page!)
+      expect(controller.send(:csp_frame_ancestors)).to include("https://mytool.example.com")
+      expect(controller.send(:csp_frame_ancestors)).to include("http://mytool.example.com")
+    end
+  end
 end
