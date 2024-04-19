@@ -60,7 +60,7 @@
         "message": "アルファ"
     },
     "alphabetical_55b5b4e0": {
-        "message": "アルファベットで"
+        "message": "名前順"
     },
     "alt_attribute_text_should_not_contain_more_than_12_e21d4040": {
         "message": "代替属性テキストは120文字を超えてはなりません。"
@@ -459,7 +459,7 @@
         "message": "デンマーク語"
     },
     "date_added_ed5ad465": {
-        "message": "追加された日付"
+        "message": "追加された日付順"
     },
     "decorative_icon_9a7f3fc3": {
         "message": "装飾アイコン"
@@ -2463,7 +2463,7 @@
         "message": "スクリーンリーダーで使用される{ TYPE }"
     },
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
-        "message": "スクリーンリーダーが画像のコンテンツを説明するのに使用します"
+        "message": "読み上げ機能で使用される代替テキスト"
     },
     "used_by_screen_readers_to_describe_the_video_37ebad25": {
         "message": "ビデオを説明する際にスクリーンリーダーが使用"
