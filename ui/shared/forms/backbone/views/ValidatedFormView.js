@@ -120,7 +120,7 @@ ValidatedFormView.prototype.submit = function (event, sendFunc) {
   const data = this.getFormData()
   const errors = this.validateBeforeSave(data, {})
   if (keys(errors).length === 0) {
-    disablingDfd = new $.Deferred()
+    disablingDfd = this.disablingDfd ?? new $.Deferred()
     saveDfd = this.saveFormData(data)
     // eslint-disable-next-line promise/catch-or-return
     saveDfd.then(this.onSaveSuccess.bind(this), this.onSaveFail.bind(this))
