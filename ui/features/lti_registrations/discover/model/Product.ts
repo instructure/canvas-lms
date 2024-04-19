@@ -19,8 +19,10 @@
 export type Product = {
   id: string
   name: string
-  company: string
-  companyUrl: string
-  logoUrl: string
+  company: {
+    id: string
+    name: string
+  }
+  logo_url: string
   tagline: string
 }

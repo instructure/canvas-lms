@@ -46,15 +46,16 @@ const ProductCard = (props: ProductCardProps) => {
       >
         <Flex gap="small" margin="0 0 medium 0">
           <div style={{borderRadius: '50%', overflow: 'hidden'}}>
-            <Img src={product.logoUrl} width={48} height={48} />
+            <Img src={product.logo_url} width={48} height={48} />
           </div>
           <div>
             <Text weight="bold" size="large">
               {product.name}
             </Text>
             <div>
-              {/* TODO: Add I18n to below line */}
-              by <Link href={product.companyUrl}>{product.company}</Link>
+              {/* TODO - This will link to a discover page with all products by this company
+              by <Link href={"PLACEHOLDER FOR URL TO DISCOVER PAGE WITH COMPANY FILTER APPLIED"}>{product.company}</Link> */}
+              by {product.company.name}
             </div>
           </div>
         </Flex>

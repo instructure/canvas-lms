@@ -17,28 +17,26 @@
  */
 
 import React, {useEffect, useState} from 'react'
-import {Flex} from '@instructure/ui-flex'
-import ProductCard from './ProductCard'
+import {useSearchParams} from 'react-router-dom'
+import {useQuery} from '@tanstack/react-query'
+
+// TODO - remove this useSearch package and use our own solution
 import useSearch from '@canvas/outcomes/react/hooks/useSearch'
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {IconEndSolid, IconFilterLine, IconSearchLine} from '@instructure/ui-icons'
-import {useScope as useI18nScope} from '@canvas/i18n'
-import LtiFilterTray from './LtiFilterTray'
 import {View} from '@instructure/ui-view'
 import {TextInput} from '@instructure/ui-text-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {useSearchParams} from 'react-router-dom'
-import type {LtiFilter} from '../model/Filter'
-import FilterTags from './FilterTags'
+import {Flex} from '@instructure/ui-flex'
 
-const product = {
-  name: 'Product Name',
-  company: 'Company',
-  companyUrl: 'https://google.com',
-  tagline: 'This product supports LTI 1.3',
-  logoUrl:
-    'https://media.istockphoto.com/id/1147544807/vector/thumbnail-image-vector-graphic.jpg?s=612x612&w=0&k=20&c=rnCKVbdxqkjlcs3xH87-9gocETqpspHFXu5dIGB4wuM=',
-}
+import LtiFilterTray from './LtiFilterTray'
+import FilterTags from './FilterTags'
+import ProductCard from './ProductCard'
+
+import {fetchProducts} from '../queries/productsQuery'
+import type {Product} from '../model/Product'
+import type {LtiFilter} from '../model/Filter'
 
 // TODO: remove mock data
 const filterValues: LtiFilter = {
@@ -81,6 +79,8 @@ export const Discover = () => {
   const [searchParams, _] = useSearchParams()
   const [filterIds, setFilterIds] = useState<number[]>([])
 
+  const {data, isLoading} = useQuery({queryKey: ['lti_product_info'], queryFn: fetchProducts})
+
   useEffect(() => {
     onClearHandler()
     const queryParams = searchParams.get('filter')
@@ -90,13 +90,9 @@ export const Discover = () => {
   }, [onClearHandler, searchParams])
 
   const renderProducts = () => {
-    const mock = [...Array(10)]
-      .map(() => product)
-      .filter(e => e.name.includes(searchString) || e.company.includes(searchString))
-    return mock.map((_, i) => {
-      const id = `test-id-${i}`
-      return <ProductCard product={{...product, id}} key={id} />
-    })
+    data?.tools
+      .filter(e => e.name.includes(searchString) || e.company.name.includes(searchString))
+      .map((product: Product) => <ProductCard product={product} />)
   }
 
   return (
@@ -143,7 +139,7 @@ export const Discover = () => {
 
       <h1>This is the Discover page</h1>
       <Flex gap="medium" wrap="wrap">
-        {renderProducts()}
+        {!isLoading && renderProducts()}
       </Flex>
 
       <LtiFilterTray
