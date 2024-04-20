@@ -25,8 +25,19 @@ class SubAssignment < AbstractAssignment
 
   after_commit :aggregate_checkpoint_assignments, if: :checkpoint_changes?
 
-  set_broadcast_policy do
-    # TODO: define broadcast policies for checkpoints
+  set_broadcast_policy do |p|
+    p.dispatch :checkpoints_created
+    p.to do |assignment|
+      BroadcastPolicies::AssignmentParticipants.new(assignment).to
+    end
+    p.whenever do |assignment|
+      BroadcastPolicies::AssignmentPolicy.new(assignment)
+                                         .should_dispatch_assignment_created?
+    end
+    p.data { course_broadcast_data }
+    p.filter_asset_by_recipient do |assignment, user|
+      assignment.overridden_for(user, skip_clone: true)
+    end
   end
 
   delegate :effective_group_category_id, to: :parent_assignment
