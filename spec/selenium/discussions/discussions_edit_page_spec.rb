@@ -677,8 +677,7 @@ describe "discussions" do
           discussion_course.discussion_topics.create!(all_graded_discussion_options)
         end
 
-        it "displays graded assignment options correctly when initially opening edit page with archived grading schemes disabled" do
-          Account.site_admin.disable_feature!(:archived_grading_schemes)
+        it "displays graded assignment options correctly when initially opening edit page" do
           grading_standard = course.grading_standards.create!(title: "Win/Lose", data: [["Winner", 0.94], ["Loser", 0]])
 
           # Create a grading standard and make sure it is selected
