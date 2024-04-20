@@ -1096,6 +1096,35 @@ describe "discussions" do
             expect(assignment.sub_assignments.count).to eq 0
             expect(Assignment.last.has_sub_assignments).to be(false)
           end
+
+          it "can edit a non-checkpointed discussion into a checkpointed discussion" do
+            graded_discussion = create_graded_discussion(course)
+
+            get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/edit"
+
+            force_click_native('input[type=checkbox][value="checkpoints"]')
+
+            f("input[data-testid='points-possible-input-reply-to-topic']").send_keys :backspace
+            f("input[data-testid='points-possible-input-reply-to-topic']").send_keys "5"
+            f("input[data-testid='reply-to-entry-required-count']").send_keys :backspace
+            f("input[data-testid='reply-to-entry-required-count']").send_keys "6"
+            f("input[data-testid='points-possible-input-reply-to-entry']").send_keys :backspace
+            f("input[data-testid='points-possible-input-reply-to-entry']").send_keys "7"
+
+            fj("button:contains('Save')").click
+
+            assignment = Assignment.last
+
+            expect(assignment.has_sub_assignments?).to be true
+            expect(DiscussionTopic.last.reply_to_entry_required_count).to eq 6
+
+            sub_assignments = SubAssignment.where(parent_assignment_id: assignment.id)
+            sub_assignment1 = sub_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
+            sub_assignment2 = sub_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
+
+            expect(sub_assignment1.points_possible).to eq 5
+            expect(sub_assignment2.points_possible).to eq 7
+          end
         end
       end
     end
