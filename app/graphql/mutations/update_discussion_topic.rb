@@ -103,10 +103,15 @@ class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
       if discussion_topic.assignment && input[:checkpoints]&.count == DiscussionTopic::REQUIRED_CHECKPOINT_COUNT
         return validation_error(I18n.t("If checkpoints are defined, forCheckpoints: true must be provided to the discussion topic assignment.")) unless input.dig(:assignment, :for_checkpoints)
 
+        checkpoint_service = if discussion_topic.assignment.has_sub_assignments
+                               Checkpoints::DiscussionCheckpointUpdaterService
+                             else
+                               Checkpoints::DiscussionCheckpointCreatorService
+                             end
+
         input[:checkpoints].each do |checkpoint|
           dates = checkpoint[:dates]
-
-          Checkpoints::DiscussionCheckpointUpdaterService.call(
+          checkpoint_service.call(
             discussion_topic:,
             checkpoint_label: checkpoint[:checkpoint_label],
             points_possible: checkpoint[:points_possible],
