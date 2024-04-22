@@ -70,6 +70,40 @@ Returning postMessage includes the following properties:
 window.parent.postMessage({subject: 'lti.capabilities'}, '*')
 ```
 
+## lti.getPageSettings
+
+Responds with an object containing page settings. This includes the current locale, time zome, contrast settings, and url to the active branding configuration file.
+This is the same json file url provided by the [Brand Configs API](https://canvas.instructure.com/doc/api/brand_configs.html).
+
+**Required properties:**
+
+- subject: "lti.getPageSettings"
+
+```js
+window.parent.postMessage({subject: 'lti.getPageSettings'}, '*')
+```
+
+Returning postMessage includes the following properties:
+
+- subject: "lti.getPageSettings"
+- pageSettings: an object containing the following keys:
+  - locale
+  - time_zone
+  - use_high_contrast
+  - active_brand_config_json_url
+
+
+```js
+{
+  pageSettings: {
+    locale: 'en',
+    time_zone: 'Etc/UTC',
+    use_high_contrast: false,
+    active_brand_config_json_url: 'https://du11hjcvx0uqb.cloudfront.net/dist/brandable_css/default/variables-7dd4b80918af0e0218ec0229e4bd5873.json'
+  }
+}
+```
+
 ## lti.put_data
 
 Stores the provided `value` at the provided `key` in Canvas's [localstorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage),

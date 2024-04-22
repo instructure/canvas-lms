@@ -50,6 +50,7 @@ const SUBJECT_ALLOW_LIST = [
   'lti.get_data',
   'lti.put_data',
   'lti.getPageContent',
+  'lti.getPageSettings',
   'requestFullWindowLaunch',
   'toggleCourseNavigationMenu',
 ] as const
@@ -136,6 +137,7 @@ const handlers: Record<
   'lti.get_data': () => import(`./subjects/lti.get_data`),
   'lti.put_data': () => import(`./subjects/lti.put_data`),
   'lti.getPageContent': () => import(`./subjects/lti.getPageContent`),
+  'lti.getPageSettings': () => import(`./subjects/lti.getPageSettings`),
   requestFullWindowLaunch: () => import(`./subjects/requestFullWindowLaunch`),
   toggleCourseNavigationMenu: () => import(`./subjects/toggleCourseNavigationMenu`),
 }

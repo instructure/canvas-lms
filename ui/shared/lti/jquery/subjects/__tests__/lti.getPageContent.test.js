@@ -18,8 +18,6 @@
 
 import getPageContent from '../lti.getPageContent'
 
-jest.mock('../../platform_storage')
-
 describe('lti.getPageContent handler', () => {
   let responseMessages
   let originalDocument
