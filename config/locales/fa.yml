@@ -25399,6 +25399,7 @@ fa:
         select_folder_for_uploads: "انتخاب پوشه برای بارگذاری های فایل"
     wiki_page: 
       buttons: 
+        assign_to: "اختصاص دادن به"
         edit: ویرایش
         view_all_pages: "مشاهده همه صفحه ها"
       delete_wiki: حذف
