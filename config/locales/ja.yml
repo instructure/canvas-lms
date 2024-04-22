@@ -1465,6 +1465,8 @@ ja:
               check_box: "グループ メンバーシップ CSV"
           groups: 
             check_box: "グループ CSV"
+          include_deleted: 
+            check_box: 削除されたオブジェクトを含む
           sections: 
             check_box: "セクション CSV"
           terms: 
@@ -2308,6 +2310,7 @@ ja:
   add_edit_delete_files_573a4d62: "ファイルの追加 / 編集 / 削除"
   add_edit_delete_sections_d32c5b4d: セクションの追加/編集/削除
   add_email_address_aef3b61: "電子メール アドレスを追加する"
+  add_event_9e21d0ff: イベントの追加
   add_existing_content_7e36da66: 現存のコンテンツを追加する
   add_external_feed_6d437a28: 外部フィードを追加
   add_feed_49ed1cb2: フィードの追加
@@ -2447,6 +2450,7 @@ ja:
   additional_occurrence_s_7b5b0173: 追加の発生
   additional_options_7cefee79: 追加オプション
   additional_outcomes_options_6df428f1: その他の結果オプション
+  additional_replies_required_13697d0a: 追加の回答が必要
   additional_settings_20362654: 追加設定
   additional_settings_for_sis_syncing_f926973e: SIS同期の追加設定
   additional_sis_sync_assignment_quiz_and_discussion_d941fa5: 追加のSIS同期割り当て、小テスト、ディスカッション設定
@@ -2459,6 +2463,9 @@ ja:
   address_use_as_wildcard_48f2cf60: "アドレス (*をワイルドカードとして使用)"
   addressbook_microservice_a4940422: "AddressBook マイクロサービス"
   addressbook_performance_tap_98ddf67: "AddressBook パフォーマンスタップ"
+  adds_a_new_admin_setting_to_the_bigbluebutton_plug_fa648486: |-
+      BigBlueButtonプラグインに新しい管理者設定を追加すると、
+      会議参加時にユーザーアバターの送信できます。
   adds_a_new_bounced_emails_tab_to_account_admin_too_6714c09d: |-
       アカウント管理ツールに新しい[バウンスメール]
       タブを追加します。これにより、はCanvas通知が
@@ -2488,6 +2495,8 @@ ja:
   adjusting_due_dates_a5918b9c: 期限日を調整中...
   admin_4d3ba42f: 管理者
   admin_analytics_course_readiness_c79f13e1: "管理者分析 - コース準備状況"
+  admin_analytics_dap_30f431d6: "Admin Analytics DAP"
+  admin_analytics_dap_model_description: "アカウントレベルでのDAP for Analyticsの使用を有効にします。"
   admin_analytics_description: アカウントレベルで「分析」を有効にします。「アドミ分析」ダッシュボードは、Canvasの使用状況、Canvasコースの成功、および受講者のエンゲージメントに関する詳細を提供しています。詳しくは、Canvasコミュニティの*アドミ分析ハブ*でご確認ください。
   admin_analytics_eacba735: "Admin Analytics（管理者向けアナリティクス）"
   admin_analytics_new_filter_ui_aee1ea8e: "アドミニストレーション分析 - 新しいフィルターUI"
@@ -2516,8 +2525,9 @@ ja:
   admins_add_remove_26811ce5: "管理者 - 追加/削除"
   advanced_36b35b8: アドバンスト
   advanced_analytics_6a2419af: 高度な分析
-  advanced_analytics_ask_questions: "高度な分析 - 質問と付随する権限を有効にします。"
+  advanced_analytics_ask_questions: "Advanced Analytics - 「データに問い合わせる」機能と付随する権限を有効にします。"
   advanced_analytics_ask_questions_26553cd2: "高度な分析 - 質問する"
+  advanced_analytics_ask_your_data_ab54433: "Advanced Analytics - データに問い合わせる"
   advanced_analytics_course_readiness_and_students_i_6b3c439f: "高度な分析 - コースの準備状況と注意が必要な受講者"
   advanced_analytics_course_readiness_closed_alpha_13c8aaf: "Advanced Analytics - コース準備クローズド・アルファ"
   advertise_release_notes_via_the_ui_9254bc6c: UIを介してリリースノートを広告します
@@ -2543,6 +2553,7 @@ ja:
   after_the_due_date_eee89c9c: 期日後
   after_the_first_attempt_you_cannot_leave_comments__3922325f: 最初の試行後、課題を提出するまでコメントを書き込むことはできません。
   after_throttling_the_selected_jobs_the_newly_creat_44952b37: 選択されたジョブをスロットルした後に、新しく作成されたストランドが選択されます。
+  agenda_b010136d: アジェンダ
   ahead_21f22939: 先に
   ai_driven_smart_search_feature_597dbd4f: AIによるスマート検索機能
   ajax_errors: 
@@ -2798,6 +2809,9 @@ ja:
   allows_for_discussion_replies_to_be_sorted_accordi_1065cccc: |-
       ディスカッションの返信を作成
       タイムスタンプに従って並べ替えることができます。ルートレベルの応答のデフォルトの順序は、新しいものから古いもの順になります。
+  allows_for_quickly_enabling_or_disabling_lti_launc_7eee7943: |-
+      アカウントレベルでのロールアウト中に、LTIの起動ロギングをすばやく
+      有効または無効にできます。
   allows_graders_to_type_mi_in_the_gradebook_or_spee_a9bb3577: 採点者が成績表にMIを入力したり、SpeedGrader課題を未提出と手動でタグ付けしたりできるようにする
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: 注目のリンク、または新しいリンクとしてヘルプリンクをタグ付けして、ヘルプメニューで注目のヘルプリンクを人目に付くように表示できるようにします。
   allows_instructors_to_apply_scores_to_ungraded_sub_7e772795: 講師が未採点の提出物に一括してスコアを適用できるようにします。
@@ -4080,6 +4094,7 @@ ja:
   as_you_type_in_this_field_the_list_of_results_will_c1a1a3e4: このフィールドに入力すると、結果のリストが自動的に更新されます。
   ascending_b3c87427: 昇順
   ask_questions_f6b301fe: 質問をする
+  ask_your_data_da53791f: データに問い合わせる
   ask_your_instructor_a_question_a61ca5e9: インストラクタに質問する
   assess_and_survey_your_students_ce8172a9: あなたの受講者のサーベイのいずれかにアクセスする
   assess_student_understanding_1e0b8d7f: 受講者の理解度を評価する
@@ -5776,6 +5791,7 @@ ja:
   calculation_int_is_not_a_valid_value_for_this_calc_1de6e060: "'%{calculation_int}' は、この計算メソッドでは有効な値ではありません。値は、'%{valid_calculation_ints_min}' ～ '%{valid_calculation_ints_max}' の範囲であることが必要です"
   calculation_method_fe281f9: 計算メソッド
   calculation_method_must_be_one_of_the_following_ca_d8ae5dac: "calculation_method は、次のいずれかであることが必要です: %{calc_methods}"
+  calculations_fd087607: 計算
   calculator: 
     buttons: 
       save: 保存
@@ -6935,6 +6951,7 @@ ja:
     from_beginning: 開始
     to_now: 今すぐ
   comma_separated_list_of_users_sis_id_332c98f1: ユーザSISのカンマ区切りリスト
+  comment_7ef1428e: コメント
   comment_added_33ab70d9: コメントが追加されました
   comment_by_replying_to_this_message_or_join_the_co_26d42fde: "このメッセージに返信するか、このリンク:%{link}を使用して会話に参加することで、コメントしてください。"
   comment_by_replying_to_this_message_or_join_the_co_52b5ac1c: "このメッセージに返信してコメントするか、このリンクを使用してスレッドに参加してください：%{link}. 許可されている際には、添付ファイルを含める必要がある場合には、Canvas にログインしてディスカッションに返信してください。"
@@ -9752,6 +9769,7 @@ ja:
   create_new_criterion_1a4efd4: 新しいクライテリアを作成する
   create_new_discussions_6ab69da2: 新しいディスカッションを作成する
   create_new_e0946c49: 新規作成
+  create_new_event_e9fb2fb6: 新しいイベントを作成
   create_new_filter_c244aa92: 新しいフィルタを作成する
   create_new_group_bf9561d4: 新しいグループを作成
   create_new_group_fca5cc73: 新しいグループを作成
@@ -9808,6 +9826,7 @@ ja:
   criteria_9fac648: 基準
   criteria_builder_b214069e: 基準ビルダー
   criterion_5f0b62f8: 基準
+  criterion_comment_642f7747: クライテリアコメント
   criterion_created_42669293: 基準を作成
   criterion_description_757741c3: クライテリア説明
   criterion_long_description_e9a97247: 基準の長い説明
@@ -9945,6 +9964,10 @@ ja:
   current_terms_bcf31fb2: 現在の学期
   current_theme_62e5e8cf: 現在のテーマ
   current_total_67bf5f72: "現在の合計:"
+  current_total_score_is_higher_than_cutoff_c11e90b8: "現在の合計得点が%{cutoff}%超"
+  current_total_score_is_higher_than_cutoff_f2ef8ae: "現在の合計得点が%{cutoff}以上"
+  current_total_score_is_lower_than_cutoff_5f78d46: "現在の合計得点が%{cutoff}未満"
+  current_total_score_is_lower_than_cutoff_a2b1ec5a: "現在の合計得点が%{cutoff}%以下"
   current_volume_level_c55ab825: 現在の音量のレベル
   currently_assigned_to_tokenname_click_to_remove_5a853a84: "現在%{tokenName}に与えられている、クリックして削除する"
   currently_selected_color_93f44b9f: 現在選択されているカラー
@@ -11094,6 +11117,7 @@ ja:
   display_as_e2a5c383: 表示
   display_as_percentage_3e755dc: パーセンテージで表示する
   display_as_points_63084235: ポイント（点数）として表示
+  display_course_calculation_options_11890a89: コース計算オプションの表示
   display_course_catalog: "このルート アカウントの中で、[このコースを公開コース インデックスに含める] フラグが有効になっているコースの検索可能なリストを表示します。"
   display_e6546241: 表示
   display_filter_options_34fb6be2: フィルタオプションを表示
@@ -11740,6 +11764,7 @@ ja:
   english_canada_12688ee4: "英語 (カナダ)"
   english_united_kingdom_a613f831: "英語 (イギリス)"
   enhance_color_contrast_of_content_685ddd49: コンテンツの色のコントラストを強調する
+  enhance_password_options_efbf3e48: パスワードオプションの強化
   enhanced_docviewer_url_security_72e9baa9: DocViewerURLセキュリティを強化する
   enhanced_grade_change_auditing_2b155dfa: 強化された成績の変更監査
   enhanced_gradebook_filters_a3be5e7d: 強化された評定表フィルター
@@ -11915,6 +11940,7 @@ ja:
       *eduappcenter.com*から、あなたの組織にアクセストークンを入力しでください。一度適用されると、EduAppCenter 内であなたの組織が所持する
       アプリのみが承認されたことが、External Appsページに表記されます。どのように**アクセストークンを作成**するかを学びましょう。
   enter_the_access_token_for_your_organization_from__f1c71941: "*eduappcenter.com*から組織のアクセストークンを入力します。                       適用されると、あなたの組織が                       EduAppCenterで承認したアプリのみが外部アプリページに表示されます。                       **アクセストークンの生成**方法については、こちらをご覧ください。"
+  enter_the_date_you_would_like_to_navigate_to_a712de47: 移動する先の日付を入力してください。
   enter_the_description_91ececc1: 説明を入力する
   enter_the_email_address_of_the_user_you_would_like_92112560: 一時的に登録したいユーザーのメールアドレスを入力します
   enter_the_email_addresses_of_the_users_you_would_l_17cef6a0: 追加したいユーザーのメールアドレスを、コンマで区切って入力します
@@ -13366,6 +13392,7 @@ ja:
   give_all_students_the_same_percent_grade_for_assig_6a008004: "以下のグレードの値を入力して提出することによって、すべての生徒に同じ*パーセント*のグレードを**%{assignment.name}**に対して与えます："
   give_this_filter_a_name_36b4b03a: フィルターに名前を付ける
   give_your_filter_preset_a_name_11144c73: フィルタープリセットに名前を付ける
+  gives_users_access_to_new_optional_features_like_s_71cc5bb0: 送信メッセージの最後に追加されるデフォルト署名の設定や、自動応答メッセージの設定など、新しいオプション機能を利用できます。
   giving_up_on_retrieving_media_sources_this_issue_w_ad49b0d3: メディアソースの取得をあきらめる。この問題はおそらく、最終的には解決します。
   global_announcements_a78912c8: "グローバル アナウンスメント"
   global_announcements_add_edit_delete_843ca4d2: "グローバルアナウンス - 追加/編集/削除"
@@ -14140,6 +14167,7 @@ ja:
   graded_date_by_grader_e8e1ff75: "%{graded_date} 〜によって%{grader}"
   graded_discussion_17cc8eaf: 採点されたディスカッション
   graded_discussion_a873bb3e: "課題用ディスカッション:"
+  graded_discussion_submission_6ee4187e: 評定済みディスカッション提出
   graded_on_submission_60ac3010: 提出時に採点済み
   graded_quiz_7fabdf1f: 採点対象の小テスト
   graded_submissions_9c7068a2: "採点済みの提出物:"
@@ -15822,6 +15850,7 @@ ja:
   inactive_enrollments_bd1831ea: 非アクティブな登録
   inappropriate_1930c574: 不適切
   inbox_bb245a60: メッセージ
+  inbox_settings_qw_updates_a3eb954b: "受信トレイ設定 - QWアップデート"
   include_a_download_link_next_to_each_file_link_in__481761de: RCEの各ファイルリンクの横にダウンロードリンクを含める
   include_a_link_to_a_screencast_screenshot_using_so_4b2fabcb: "*Jing* などを使用するスクリーンキャスト/スクリーンショットへのリンクを含めます。"
   include_a_link_to_show_a_qr_code_to_easy_mobile_lo_f3da1267: "プロファイルページに、簡単なモバイルログイン用の QR コードを表示するリンクを含めます。"
@@ -17022,6 +17051,7 @@ ja:
   log_in_to_submit_962106cf: 送信するにはログインしてください
   log_in_url_is_not_a_valid_uri_7b8c57ee: ログインURLが有効なURIではありません
   log_lti_launches_ff06c5fe: "LTI 起動を記録する"
+  log_lti_launches_site_admin_bc4a0b70: LTI起動ログ（サイト管理者）
   log_on_url_fc166e4c: "ログオンの URL"
   log_out_379ba28a: ログアウト
   log_out_url_2605c2c1: "ログアウトの URL"
@@ -19837,6 +19867,7 @@ ja:
   moduletitle_unpublished_8a70e0cd: "%{moduleTitle}（非公開）"
   mon_8f18082a: 月曜
   monday_432ff613: 月曜日
+  month_4b83b95f: 月
   month_s_5c17590e: 月
   monthandday_starting_at_time_769b12c8: "%{monthAndDay}開始地点%{time}"
   months_afdf2830: 月数
@@ -19845,6 +19876,7 @@ ja:
   moodle_formula_many_warning_title: "このバンクの %{count} 件の数式問題について、考えられる解答を再生成する必要があります"
   moodle_formula_warning_title: 数式問題について、考えられる解答を再生成する必要があります
   more_cf9cc661: その他
+  more_control_over_password_settings_at_institution_78d7e069: 機関レベルで、パスワード設定のコントロールを良くする
   more_courses_5ebbe998: その他のコース
   more_details_in_the_speedgrader_8702f408: "SpeedGrader 内の詳細"
   more_importantly_canvas_allows_you_to_add_outcomes_78822cf: "さらに重要なことに、Canvas では評定表にアウトカムを追加できるため、評定を評価する際に習得を評価することができます。アウトカムを設定したら、[ルーブリックスの管理]をクリックして、アウトカムの採点への使用を開始します。"
@@ -21920,6 +21952,7 @@ ja:
         recording_enabled: 会議の録音を許可します。
         replace_with_alternatives: "BigBlueButton 会議を無効化し、代わりに代替案のリストを表示する"
         secret: シークレット
+        send_avatar: 参加時にBigBlueButtonにユーザーアバターを送信する
         use_fallback: BigBlueButtonフォールバックプラグイン設定を使用して、現在構成されているBBBインスタンスによってホストされていない会議の記録を探します。
       secret_description: "これは、構成ファイル %{filename} 内にあるパラメータ %{parameter_name} です。"
     buttons: 
@@ -24786,6 +24819,7 @@ ja:
   record_upload_media_5fdce166: メディアの記録/アップロード
   record_upload_media_comment_4d01b943: "メディア コメントの記録/アップロード"
   record_video_70dc8439: 動画を録画する
+  record_videos_and_screen_capture_with_auto_caption_5c6bc705: 自動キャプション付きビデオ録画と画面取り込み
   record_with_microphone_only_e4ee07aa: マイクロホンでの録音のみ
   record_with_webcam_af21e07c: ウェブカムでの録音
   recording_98da6bda: 記録
@@ -26260,6 +26294,7 @@ ja:
   send_to_b940900a: 送信先...
   send_to_ce05b460: 送信
   send_usage_metrics_cecc7a7d: 使用状況メトリクスの送信
+  send_user_avatar_to_bigbluebutton_17cda2f6: BigBlueButtonにユーザーアバターを送信する
   sending_bf324366: 送信しています...
   sending_message_75923692: メッセージを送信中
   sending_message_8ac5bc90: メッセージを送信しています...
@@ -29518,6 +29553,7 @@ ja:
   this_most_likely_happened_because_you_imported_cou_a78ea880: これは、関連ファイルがない状態でコースのコンテンツをインポートしたことが原因で発生したと考えられます。
   this_name_appears_in_sorted_lists_dccbd84b: 並べ替え後のリストには、この名前が表示されます。
   this_name_will_be_used_by_teachers_for_grading_9b6aa8a0: この名前は、教員が採点する際に使用されます。
+  this_number_must_be_between_1_and_10_d8400fc6: この数字は1から10の間でなければなりません
   this_option_is_not_compatible_with_new_quizzes_ed489d7c: このオプションは、新小テストに対応していません
   this_option_is_not_compatible_with_quizzes_next_6dacd0c1: "このオプションは Quizzes.Next と互換性がありません"
   this_outcome_has_been_used_to_assess_a_student_and_376d5ba9: この成果は、受講生を査定するために使用されていて、更新することはできません
@@ -30598,6 +30634,8 @@ ja:
   total_activity_21022e7c: ログイン合計時間
   total_column_options_4e6a6032: 合計列オプション
   total_grade_b0c33841: "合計:%{grade}"
+  total_grade_higher_than_4c546517: 評点合計が（）超
+  total_grade_lower_than_98891fe4: 評点合計が（）未満
   total_messages_af025be6: 合計メッセージ数
   total_options_351e2682: 合計オプション
   total_points_44d76792: 合計点
@@ -30906,6 +30944,7 @@ ja:
   unknown_quiz: 不明な小テストです
   unknown_quiz_3892d071: 未知の小テスト
   unknown_role_cbe9a089: 未知のロール
+  unknown_sender_68b1abbc: 不明な送信者
   unknown_status_status_35331e1d: "不明なステータス、%{status}"
   unknown_status_status_message_3a4ed4d5: "不明なステータス、%{status}：%{message}"
   unknown_user_1113fcaa: 存在しないユーザー
@@ -31973,6 +32012,7 @@ ja:
   warning_for_improved_accessibility_of_calendar_eve_da54b4e2: "警告: アジェンダビューを使って行事予定表へのアクセスを向上させてください。"
   warning_for_improved_accessibility_of_reordering_a_5d0206c7: "警告: 課題およびグループの並べ替えのアクセスのしやすさを高めるには、メニューにある移動先ダイアログ オプションを使用してください。"
   warning_for_improved_accessibility_please_click_he_e6472c02: "警告: アクセシビリティを高めるには、ここをクリックして、個人の評定表を表示を使用してください。"
+  warning_for_improved_accessibility_please_use_the__1075c150: 警告：アクセシビリティ向上のため、カレンダーは「アジェンダ表示」を利用してください。
   warning_for_improved_accessibility_with_annotated__43e3a5ea: 警告：注釈付きの課題のアクセシビリティを向上させるために、コメントの入力には「ファイルアップロード」または「テキスト入力」を使用してください。
   warning_icon_f64936d7: 警告のアイコン
   warning_if_there_are_any_users_with_this_role_they_1a7c1fef: 警告：このロールを持つユーザーがいる場合、現在の許可は保持されますが、このロールを持つ新しいユーザーを作成することはできません。
@@ -32046,6 +32086,7 @@ ja:
   website_url_url_bd07233d: "ウェブサイトのURL%{url}"
   wed_84932f18: 水曜
   wednesday_b6f755f5: 水曜日
+  week_1f945ddd: 週
   week_s_cb1492ee: 週
   weekly_schedule_navigation_6b042645: 週間スケジュールのナビゲーション
   weekly_summary_56cd0c95: 毎週のサマリー
@@ -32134,6 +32175,9 @@ ja:
       （一貫性のない）動作に従います。このフラグはコンソーシアム
       _child_アカウントにのみ適用されます。このフラグは、一元管理されたコンソーシアムには
       何も影響しません。
+  when_enabled_for_an_account_sends_data_for_all_lti_77568a4f: |-
+      アカウントに対して有効な場合、すべてのLTI起動のデータをPandataEventsシステム
+      に送信し、照会および可視化します。Log LTI 立ち上げ(サイト管理者)も有効にする必要があります。
   when_enabled_for_the_parent_account_of_a_non_centr_4d7adbaa: |-
       一元管理されていないコンソーシアムの親アカウントで有効になっている場合、
       親の開発者キーのオン/オフは子アカウントのツール
