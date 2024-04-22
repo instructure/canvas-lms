@@ -158,6 +158,10 @@ class DiscussionsIndex
       f("#duplicate-discussion-menu-option")
     end
 
+    def assign_to_menu_option
+      f("#assignTo-discussion-menu-option")
+    end
+
     def create_discussions_checkbox
       fj("label:contains('Create discussion')")
     end
@@ -214,6 +218,11 @@ class DiscussionsIndex
       duplicate_menu_option.click
     end
 
+    def click_assign_to_menu_option(title)
+      discussion_menu(title).click
+      assign_to_menu_option.click
+    end
+
     def click_confirm_delete
       confirm_delete_button.click
     end
@@ -228,6 +237,10 @@ class DiscussionsIndex
     end
 
     def click_create_discussions_checkbox
+      create_discussions_checkbox.click
+    end
+
+    def click_assign_to_discussions_setting
       create_discussions_checkbox.click
     end
 
