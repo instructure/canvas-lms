@@ -19,16 +19,17 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
-import SubmissionProgressBars from '@canvas/context-cards/react/SubmissionProgressBars'
-import {ProgressBar} from '@instructure/ui-progress'
-import {shallow, mount} from 'enzyme'
+import SubmissionProgressBars from '../SubmissionProgressBars'
+import {shallow} from 'enzyme'
+import {render} from '@testing-library/react'
+import sinon from 'sinon'
 
-const user = {_id: 1}
+const user = {_id: '1'}
 
-QUnit.module('StudentContextTray/Progress', hooks => {
+describe('StudentContextTray/Progress', () => {
   let grade, score, spy, subject, submission, tag
 
-  hooks.afterEach(() => {
+  afterEach(() => {
     if (subject) {
       const componentNode = ReactDOM.findDOMNode(subject)
       if (componentNode) {
@@ -43,53 +44,53 @@ QUnit.module('StudentContextTray/Progress', hooks => {
     tag = null
   })
 
-  QUnit.module('displayGrade', () => {
-    hooks.beforeEach(() => {
+  describe('displayGrade', () => {
+    beforeEach(() => {
       subject = TestUtils.renderIntoDocument(<SubmissionProgressBars submissions={[]} />)
     })
 
-    QUnit.module('when submission is excused', () => {
+    describe('when submission is excused', () => {
       test('it returns `EX`', () => {
-        submission = {id: 1, excused: true, assignment: {points_possible: 25}}
+        submission = {id: '1', excused: true, assignment: {points_possible: 25}}
         grade = SubmissionProgressBars.displayGrade(submission)
-        equal(grade, 'EX')
+        expect(grade).toEqual('EX')
       })
     })
 
-    QUnit.module('when grade is a percentage', () => {
+    describe('when grade is a percentage', () => {
       test('it returns the grade', () => {
         const percentage = '80%'
         submission = {
-          id: 1,
+          id: '1',
           excused: false,
           grade: percentage,
           assignment: {points_possible: 25},
         }
         grade = SubmissionProgressBars.displayGrade(submission)
-        equal(grade, percentage)
+        expect(grade).toEqual(percentage)
       })
     })
 
-    QUnit.module('when grade is complete or incomplete', () => {
+    describe('when grade is complete or incomplete', () => {
       test('it calls `renderIcon`', () => {
         submission = {
-          id: 1,
+          id: '1',
           excused: false,
           assignment: {points_possible: 25},
         }
         spy = sinon.spy(SubmissionProgressBars, 'renderIcon')
 
         SubmissionProgressBars.displayGrade({...submission, grade: 'complete'})
-        ok(spy.calledOnce)
+        expect(spy.calledOnce).toBeTruthy()
         spy.resetHistory()
 
         SubmissionProgressBars.displayGrade({...submission, grade: 'incomplete'})
-        ok(spy.calledOnce)
+        expect(spy.calledOnce).toBeTruthy()
         SubmissionProgressBars.renderIcon.restore()
       })
     })
 
-    QUnit.module('when grade is a random string', () => {
+    describe('when grade is a random string', () => {
       test('it renders `score/points_possible`', () => {
         const pointsPossible = 25
         score = '15'
@@ -97,15 +98,15 @@ QUnit.module('StudentContextTray/Progress', hooks => {
         submission = {
           grade,
           score,
-          id: 1,
+          id: '1',
           excused: false,
           assignment: {points_possible: pointsPossible},
         }
-        equal(SubmissionProgressBars.displayGrade(submission), `${score}/${pointsPossible}`)
+        expect(SubmissionProgressBars.displayGrade(submission)).toEqual(`${score}/${pointsPossible}`)
       })
     })
 
-    QUnit.module('by default', () => {
+    describe('by default', () => {
       test('it renders `score/points_possible`', () => {
         const pointsPossible = 25
         grade = '15'
@@ -113,62 +114,62 @@ QUnit.module('StudentContextTray/Progress', hooks => {
         submission = {
           grade,
           score,
-          id: 1,
+          id: '1',
           excused: false,
           assignment: {points_possible: pointsPossible},
         }
-        equal(SubmissionProgressBars.displayGrade(submission), `${score}/${pointsPossible}`)
+        expect(SubmissionProgressBars.displayGrade(submission)).toEqual(`${score}/${pointsPossible}`)
       })
     })
   })
 
-  QUnit.module('displayScreenreaderGrade', () => {
-    hooks.beforeEach(() => {
+  describe('displayScreenreaderGrade', () => {
+    beforeEach(() => {
       subject = TestUtils.renderIntoDocument(<SubmissionProgressBars submissions={[]} />)
     })
 
-    QUnit.module('when submission is excused (2)', () => {
+    describe('when submission is excused (2)', () => {
       test('it returns `excused`', () => {
-        submission = {id: 1, excused: true, assignment: {points_possible: 25}}
+        submission = {id: '1', excused: true, assignment: {points_possible: 25}}
         grade = SubmissionProgressBars.displayScreenreaderGrade(submission)
-        equal(grade, 'excused')
+        expect(grade).toEqual('excused')
       })
     })
 
-    QUnit.module('when grade is a percentage (2)', () => {
+    describe('when grade is a percentage (2)', () => {
       test('it returns the grade', () => {
         const percentage = '80%'
         submission = {
-          id: 1,
+          id: '1',
           excused: false,
           grade: percentage,
           assignment: {points_possible: 25},
         }
         grade = SubmissionProgressBars.displayScreenreaderGrade(submission)
-        equal(grade, percentage)
+        expect(grade).toEqual(percentage)
       })
     })
 
-    QUnit.module('when grade is complete or incomplete (2)', () => {
+    describe('when grade is complete or incomplete (2)', () => {
       test('renders `complete` or `incomplete`', () => {
         submission = {
-          id: 1,
+          id: '1',
           excused: false,
           assignment: {points_possible: 25},
         }
 
         grade = SubmissionProgressBars.displayScreenreaderGrade({...submission, grade: 'complete'})
-        equal(grade, 'complete')
+        expect(grade).toEqual('complete')
 
         grade = SubmissionProgressBars.displayScreenreaderGrade({
           ...submission,
           grade: 'incomplete',
         })
-        equal(grade, 'incomplete')
+        expect(grade).toEqual('incomplete')
       })
     })
 
-    QUnit.module('when grade is a random string (2)', () => {
+    describe('when grade is a random string (2)', () => {
       test('it renders `score/points_possible`', () => {
         const pointsPossible = 25
         score = '15'
@@ -176,18 +177,15 @@ QUnit.module('StudentContextTray/Progress', hooks => {
         submission = {
           grade,
           score,
-          id: 1,
+          id: '1',
           excused: false,
           assignment: {points_possible: pointsPossible},
         }
-        equal(
-          SubmissionProgressBars.displayScreenreaderGrade(submission),
-          `${score}/${pointsPossible}`
-        )
+        expect(SubmissionProgressBars.displayScreenreaderGrade(submission)).toEqual(`${score}/${pointsPossible}`)
       })
     })
 
-    QUnit.module('by default (2)', () => {
+    describe('by default (2)', () => {
       test('it renders `score/points_possible`', () => {
         const pointsPossible = 25
         grade = '15'
@@ -195,89 +193,86 @@ QUnit.module('StudentContextTray/Progress', hooks => {
         submission = {
           grade,
           score,
-          id: 1,
+          id: '1',
           excused: false,
           assignment: {points_possible: pointsPossible},
         }
-        equal(
-          SubmissionProgressBars.displayScreenreaderGrade(submission),
-          `15.57/${pointsPossible}`
-        )
+        expect(SubmissionProgressBars.displayScreenreaderGrade(submission)).toEqual(`15.57/${pointsPossible}`)
       })
     })
   })
 
-  QUnit.module('renderIcon', () => {
-    QUnit.module('when grade is `complete`', () => {
+  describe('renderIcon', () => {
+    describe('when grade is `complete`', () => {
       test('renders icon with `icon-check` class', () => {
         subject = TestUtils.renderIntoDocument(
           <SubmissionProgressBars
             submissions={[
               {
-                id: 1,
+                id: '1',
                 grade: 'complete',
                 score: 25,
-                assignment: {points_possible: 25},
+                assignment: {name: 'test', points_possible: 25, html_url: '/test'},
                 user,
               },
             ]}
           />
         )
         tag = TestUtils.findRenderedDOMComponentWithTag(subject, 'i')
-        equal(tag.className, 'icon-check')
+        expect(tag.className).toEqual('icon-check')
       })
     })
 
-    QUnit.module('when grade is `complete` (2)', () => {
+    describe('when grade is `complete` (2)', () => {
       test('renders icon with `icon-check` class', () => {
         subject = TestUtils.renderIntoDocument(
           <SubmissionProgressBars
             submissions={[
               {
-                id: 1,
+                id: '1',
                 grade: 'incomplete',
                 score: 0,
-                assignment: {points_possible: 25},
+                assignment: {name: 'test', points_possible: 25, html_url: '/test'},
                 user,
               },
             ]}
           />
         )
         tag = TestUtils.findRenderedDOMComponentWithTag(subject, 'i')
-        equal(tag.className, 'icon-x')
+        expect(tag.className).toEqual('icon-x')
       })
     })
   })
 
-  QUnit.module('render', () => {
+  describe('render', () => {
     test('renders one ProgressBar component per submission', () => {
       const submissions = [
         {
-          id: 1,
+          id: '1',
           grade: 'incomplete',
           score: 0,
           user,
-          assignment: {points_possible: 25},
+          assignment: {name: 'test', points_possible: 25, html_url: '/test'},
         },
         {
-          id: 2,
+          id: '2',
           grade: 'complete',
           score: 25,
           user,
-          assignment: {points_possible: 25},
+          assignment: {name: 'test', points_possible: 25, html_url: '/test'},
         },
         {
-          id: 3,
+          id: '3',
           grade: 'A+',
           score: 25,
           user,
-          assignment: {points_possible: 25},
+          assignment: {name: 'test', points_possible: 25, html_url: '/test'},
         },
       ]
-      const wrapper = mount(<SubmissionProgressBars submissions={submissions} />)
+      const wrapper = render(<SubmissionProgressBars submissions={submissions} />)
 
-      const ProgressBarBars = wrapper.find(ProgressBar) // Assuming ProgressBar is the name of the component
-      equal(ProgressBarBars.length, submissions.length)
+      const ProgressBarBars = wrapper.container.querySelectorAll(".StudentContextTray-Progress__Bar") // Assuming ProgressBar is the name of the component
+      expect(ProgressBarBars.length).toEqual(submissions.length)
     })
 
     test('ignores submissions with null grades', () => {
@@ -286,20 +281,20 @@ QUnit.module('StudentContextTray/Progress', hooks => {
           id: '1',
           score: 5,
           grade: '5',
-          assignment: {html_url: 'asdf', points_possible: 1},
+          assignment: {name: 'test', html_url: '/test', points_possible: 1},
           user: {short_name: 'bob', _id: '1'},
         },
         {
           id: '2',
           score: null,
           grade: null,
-          assignment: {html_url: 'asdf', points_possible: 1},
+          assignment: {name: 'test', html_url: '/test', points_possible: 1},
           user: {short_name: 'bob', _id: '1'},
         },
       ]
 
       const tray = shallow(<SubmissionProgressBars submissions={submissions} />)
-      equal(tray.find('ProgressBar').length, 1)
+      expect(tray.find('ProgressBar').length).toEqual(1)
     })
 
     test('links to submission urls', () => {
@@ -308,18 +303,18 @@ QUnit.module('StudentContextTray/Progress', hooks => {
           id: '1',
           score: 5,
           grade: '5',
-          assignment: {html_url: 'grades', points_possible: 1},
+          assignment: {name: 'test', html_url: 'grades', points_possible: 1},
           user: {short_name: 'bob', _id: '99'},
         },
       ]
 
       const tray = shallow(<SubmissionProgressBars submissions={submissions} />)
-      ok(
+      expect(
         tray
           .find('Link')
           .getElement()
           .props.href.match(/submissions\/99/)
-      )
+      ).toBeTruthy()
     })
   })
 })
