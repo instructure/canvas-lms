@@ -1465,6 +1465,8 @@ da:
               check_box: "Gruppemedlemskab CSV"
           groups: 
             check_box: "Grupper CSV"
+          include_deleted: 
+            check_box: "Inkluder slettede objekter"
           sections: 
             check_box: "Sektioner CSV"
           terms: 
@@ -2307,6 +2309,7 @@ da:
   add_edit_delete_files_573a4d62: "tilføj / rediger / slet filer"
   add_edit_delete_sections_d32c5b4d: "tilføj / rediger / slet sektioner"
   add_email_address_aef3b61: "Tilføj e-mailadresse"
+  add_event_9e21d0ff: "Tilføj begivenhed"
   add_existing_content_7e36da66: "Tilføj eksisterende indhold"
   add_external_feed_6d437a28: "Tilføj eksternt feed"
   add_feed_49ed1cb2: "Tilføj feed"
@@ -2446,6 +2449,7 @@ da:
   additional_occurrence_s_7b5b0173: "yderligere forekomst(er)"
   additional_options_7cefee79: "Yderligere muligheder"
   additional_outcomes_options_6df428f1: "Yderligere læringsudbytte-muligheder"
+  additional_replies_required_13697d0a: "Yderligere svar påkrævet"
   additional_settings_20362654: "Yderligere indstillinger"
   additional_settings_for_sis_syncing_f926973e: "Yderligere indstillinger for SIS-synkronisering"
   additional_sis_sync_assignment_quiz_and_discussion_d941fa5: "Yderligere SIS-sync opgave, test og diskussionsindstillinger"
@@ -2458,6 +2462,9 @@ da:
   address_use_as_wildcard_48f2cf60: "Adresse (brug * som jokertegn)"
   addressbook_microservice_a4940422: "AddressBook microservice"
   addressbook_performance_tap_98ddf67: "AddressBook ydeevne"
+  adds_a_new_admin_setting_to_the_bigbluebutton_plug_fa648486: |-
+      Tilføjer en ny admin-indstilling til BigBlueButton-pluginnet for at tillade
+      at sende brugeravatarer ved deltagelse i konferencen.
   adds_a_new_bounced_emails_tab_to_account_admin_too_6714c09d: |-
       Føjer en ny fane ”Afviste e-mails” til kontoadministrationsværktøjer, som
       giver dig mulighed for at søge e-mailadresser, hvis Canvas-meddelelser
@@ -2487,6 +2494,8 @@ da:
   adjusting_due_dates_a5918b9c: "Justerer afleveringsdatoer ..."
   admin_4d3ba42f: Administrator
   admin_analytics_course_readiness_c79f13e1: "Admin-analyse – fagparathed"
+  admin_analytics_dap_30f431d6: "Admin analyse DAP"
+  admin_analytics_dap_model_description: "Aktiverer brugen af DAP til analyse på kontoniveau."
   admin_analytics_description: "Aktiverer Analytics på kontoniveau. Admin Analytics-oversigter giver detaljer om Canvas-brug, Canvas-fagets succes og de studerendes engagement. Lær mere i *Admin Analytics Hub* i Canvas Community."
   admin_analytics_eacba735: Admin-analyse
   admin_analytics_new_filter_ui_aee1ea8e: "Admin Analytics – ny filtergrænseflade"
@@ -2515,8 +2524,9 @@ da:
   admins_add_remove_26811ce5: "Admins - tilføj / fjern"
   advanced_36b35b8: Avanceret
   advanced_analytics_6a2419af: "Avanceret analyse"
-  advanced_analytics_ask_questions: "Aktiverer Avanceret analyse - Stil spørgsmål og medfølgende tilladelse."
+  advanced_analytics_ask_questions: "Aktiverer funktionen Avanceret analyse – spørg dine data og medfølgende tilladelse."
   advanced_analytics_ask_questions_26553cd2: "Avanceret analyse - Stil spørgsmål"
+  advanced_analytics_ask_your_data_ab54433: "Avanceret analyse – spørg dine data"
   advanced_analytics_course_readiness_and_students_i_6b3c439f: "Avanceret analyse – Fagparathed og studerende med behov for opmærksomhed"
   advanced_analytics_course_readiness_closed_alpha_13c8aaf: "Avanceret analyse – fagparathed lukket alfa"
   advertise_release_notes_via_the_ui_9254bc6c: "Annoncer udgivelsesnoter via brugergrænsefladen"
@@ -2542,6 +2552,7 @@ da:
   after_the_due_date_eee89c9c: "Efter forfaldsdato"
   after_the_first_attempt_you_cannot_leave_comments__3922325f: "Efter det første forsøg kan du ikke skrive kommentarer, før du har afleveret opgaven."
   after_throttling_the_selected_jobs_the_newly_creat_44952b37: "Efter at have begrænset de valgte job, vil den nyoprettede streng blive valgt."
+  agenda_b010136d: Dagsorden
   ahead_21f22939: Foran
   ai_driven_smart_search_feature_597dbd4f: "AI-drevet smart søgefunktion."
   ajax_errors: 
@@ -2796,6 +2807,9 @@ da:
   allows_for_discussion_replies_to_be_sorted_accordi_1065cccc: |-
       Gør det muligt at sortere svar på diskussioner efter oprettelsestidsstempler
       . Standardrækkefølgen er nyeste til ældste for svar på rodniveau.
+  allows_for_quickly_enabling_or_disabling_lti_launc_7eee7943: |-
+      Giver mulighed for hurtigt at aktivere eller deaktivere LTI-lanceringslogning under udrulning
+      på kontoniveau.
   allows_graders_to_type_mi_in_the_gradebook_or_spee_a9bb3577: "Tillader karaktergivere at skrive MI i karakteroversigten eller SpeedGrader for manuelt at markere en opgave som manglende"
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: "Tillader, at hjælpelinks kan markeres som Fremhævede eller Nye og viser tydeligt det fremhævede hjælpelink i hjælpemenuen."
   allows_instructors_to_apply_scores_to_ungraded_sub_7e772795: "Giver instruktører mulighed for at give en score til ikke bedømte afleveringer en masse."
@@ -4079,6 +4093,7 @@ da:
   as_you_type_in_this_field_the_list_of_results_will_c1a1a3e4: "Når du indtaster i dette felt, opdateres listen over resultater automatisk."
   ascending_b3c87427: Stigende
   ask_questions_f6b301fe: "Stil spørgsmål"
+  ask_your_data_da53791f: "Spørg dine data"
   ask_your_instructor_a_question_a61ca5e9: "Stil din instruktør et spørgsmål"
   assess_and_survey_your_students_ce8172a9: "Vurder og få overblik over dine studerende"
   assess_student_understanding_1e0b8d7f: "Vurder de studerendes forståelse"
@@ -5771,6 +5786,7 @@ da:
   calculation_int_is_not_a_valid_value_for_this_calc_1de6e060: "'%{calculation_int}' er ikke en gyldig værdi til denne beregningsmetode. Værdien skal ligge mellem '%{valid_calculation_ints_min}' og '%{valid_calculation_ints_max}'"
   calculation_method_fe281f9: Beregningsmetode
   calculation_method_must_be_one_of_the_following_ca_d8ae5dac: "calculation_method skal være en af følgende: %{calc_methods}"
+  calculations_fd087607: Beregninger
   calculator: 
     buttons: 
       save: Gem
@@ -6931,6 +6947,7 @@ da:
     from_beginning: begyndelsen
     to_now: nu
   comma_separated_list_of_users_sis_id_332c98f1: "Kommasepareret liste over brugeres SIS-ID"
+  comment_7ef1428e: Kommentar
   comment_added_33ab70d9: "Kommentar tilføjet"
   comment_by_replying_to_this_message_or_join_the_co_26d42fde: "Kommenter ved at svare på beskeden, eller slutte dig til diskussionen ved brug af dette link: %{link}."
   comment_by_replying_to_this_message_or_join_the_co_52b5ac1c: "Kommenter ved at besvare denne besked, eller deltag i diskussionen ved hjælp af dette link: %{link}. Når det er tilladt skal du logge ind på Canvas og svare på diskussionen, hvis du vil inkludere en vedhæftet fil."
@@ -9754,6 +9771,7 @@ da:
   create_new_criterion_1a4efd4: "Opret nyt kriterie"
   create_new_discussions_6ab69da2: "Opret nye diskussioner"
   create_new_e0946c49: "Opret ny"
+  create_new_event_e9fb2fb6: "Opret ny begivenhed"
   create_new_filter_c244aa92: "Opret nyt filter"
   create_new_group_bf9561d4: "Opret ny gruppe"
   create_new_group_fca5cc73: "Opret ny gruppe"
@@ -9810,6 +9828,7 @@ da:
   criteria_9fac648: Kriterier
   criteria_builder_b214069e: Kriterieopretter
   criterion_5f0b62f8: Kriterie
+  criterion_comment_642f7747: Kriteriekommentar
   criterion_created_42669293: "Kriterie oprettet"
   criterion_description_757741c3: "Beskrivelse af kriterie"
   criterion_long_description_e9a97247: "Kriterie lang beskrivelse"
@@ -9947,6 +9966,10 @@ da:
   current_terms_bcf31fb2: "Nuværende semestre"
   current_theme_62e5e8cf: "Nuværende tema"
   current_total_67bf5f72: "Aktuelt samlet antal:"
+  current_total_score_is_higher_than_cutoff_c11e90b8: "Det nuværende samlede resultat er højere end %{cutoff}%"
+  current_total_score_is_higher_than_cutoff_f2ef8ae: "Det nuværende samlede resultat er højere end %{cutoff}"
+  current_total_score_is_lower_than_cutoff_5f78d46: "Det nuværende samlede resultat er lavere end %{cutoff}"
+  current_total_score_is_lower_than_cutoff_a2b1ec5a: "Det nuværende samlede resultat er lavere end %{cutoff}%"
   current_volume_level_c55ab825: "Nuværende lydstyrke"
   currently_assigned_to_tokenname_click_to_remove_5a853a84: "I øjeblikket tildelt til %{tokenName}, klik for at fjerne"
   currently_selected_color_93f44b9f: "I øjeblikket valgt farve"
@@ -11096,6 +11119,7 @@ da:
   display_as_e2a5c383: "Vis som"
   display_as_percentage_3e755dc: "Vis som procent"
   display_as_points_63084235: "Vis som point"
+  display_course_calculation_options_11890a89: "Vis valgmuligheder for beregning af fag"
   display_course_catalog: "Vis en liste over fag, som du kan søge efter i denne rodkonto med den aktiverede afmærkning \"Inkluder dette fag i offentligt fagindeks\"."
   display_e6546241: Vis
   display_filter_options_34fb6be2: "Vis filterindstillinger"
@@ -11743,6 +11767,7 @@ da:
   english_canada_12688ee4: "Engelsk (Canada)"
   english_united_kingdom_a613f831: "Engelsk (Storbrittanien)"
   enhance_color_contrast_of_content_685ddd49: "Forbedr farvekontrasten på indholdet"
+  enhance_password_options_efbf3e48: "Forbedr adgangskodeindstillinger"
   enhanced_docviewer_url_security_72e9baa9: "Forbedret DocViewer URL-sikkerhed"
   enhanced_grade_change_auditing_2b155dfa: "Forbedret karakterændrings-audit"
   enhanced_gradebook_filters_a3be5e7d: "Forbedrede filtre for karakteroversigt"
@@ -11916,6 +11941,7 @@ da:
                           Lær at **generere et adgangs-token**.
   enter_the_access_token_for_your_organization_from__cc77493d: "Indtast adgangs-token for din virksomhed fra *eduappcenter.com*. Når det er gældende, angives kun app'er, som din virksomhed har godkendt i EduAppCenter på siden med eksterne app'er. Læs hvordan man **genererer et adgangs-token**."
   enter_the_access_token_for_your_organization_from__f1c71941: "Indtast dit adgangs-token til organisationen fra                       *eduappcenter.com*. Når anvendt, er det kun apps, som din organisation har godkendt i                       EduAppCenter der bliver opført på siden Eksterne apps.                       Lær at **generere et adgangs-token**."
+  enter_the_date_you_would_like_to_navigate_to_a712de47: "Indtast den dato, du gerne vil navigere til"
   enter_the_description_91ececc1: "Indtast beskrivelsen"
   enter_the_email_address_of_the_user_you_would_like_92112560: "Indtast e-mailadressen på den bruger, du vil tilmelde midlertidigt"
   enter_the_email_addresses_of_the_users_you_would_l_17cef6a0: "Indtast e-mail-adresserne på de brugere, du gerne vil tilføje, adskilt af kommaer"
@@ -13366,6 +13392,7 @@ da:
   give_all_students_the_same_percent_grade_for_assig_6a008004: "Giv alle de studerende samme *procent-karakter* for **%{assignment.name}** ved at indtaste og aflevere en karakterværdi nedenfor:"
   give_this_filter_a_name_36b4b03a: "Giv dette filter et navn"
   give_your_filter_preset_a_name_11144c73: "Giv din filterforudindstilling et navn"
+  gives_users_access_to_new_optional_features_like_s_71cc5bb0: "Giver brugere adgang til nye valgfrie funktioner som f.eks. indstilling af en standardsignatur, som vil blive tilføjet til udgående beskeder, og indstilling af et automatisk svar."
   giving_up_on_retrieving_media_sources_this_issue_w_ad49b0d3: "Giver op at hente mediekilder. Dette problem vil sandsynligvis løse sig selv i sidste ende."
   global_announcements_a78912c8: "Generelle beskeder"
   global_announcements_add_edit_delete_843ca4d2: "Globale beskeder - tilføj / rediger / slet"
@@ -14141,6 +14168,7 @@ da:
   graded_date_by_grader_e8e1ff75: "%{graded_date} af %{grader}"
   graded_discussion_17cc8eaf: "Bedømt diskussion"
   graded_discussion_a873bb3e: "Bedømt diskussion:"
+  graded_discussion_submission_6ee4187e: "Aflevering af diskussion med karakter"
   graded_on_submission_60ac3010: "Bedømt ved aflevering"
   graded_quiz_7fabdf1f: "Bedømt test"
   graded_submissions_9c7068a2: "Bedømte opgaver:"
@@ -15830,6 +15858,7 @@ da:
   inactive_enrollments_bd1831ea: "Inaktive tilmeldinger"
   inappropriate_1930c574: Upassende
   inbox_bb245a60: Indbakke
+  inbox_settings_qw_updates_a3eb954b: "Indbakkeindstillinger – QW-opdateringer"
   include_a_download_link_next_to_each_file_link_in__481761de: "Inkluder et downloadlink ved siden af hvert fillink i RCE"
   include_a_link_to_a_screencast_screenshot_using_so_4b2fabcb: "Inkluder et link til et screencast/screenshot ved brug af f.eks. *Jing*"
   include_a_link_to_show_a_qr_code_to_easy_mobile_lo_f3da1267: "Inkluder et link for at vise en QR-kode for let mobil login på profilsiden."
@@ -17029,6 +17058,7 @@ da:
   log_in_to_submit_962106cf: "Log ind for at aflevere"
   log_in_url_is_not_a_valid_uri_7b8c57ee: "Log-ind-URL er ikke en gyldig URI"
   log_lti_launches_ff06c5fe: "Logfør LTI-lancering"
+  log_lti_launches_site_admin_bc4a0b70: "Log LTI-lanceringer (site admin)"
   log_on_url_fc166e4c: "Login url"
   log_out_379ba28a: "Log ud"
   log_out_url_2605c2c1: "Log ud url"
@@ -19844,6 +19874,7 @@ da:
   moduletitle_unpublished_8a70e0cd: "%{moduleTitle} (ikke offentliggjort)"
   mon_8f18082a: Man
   monday_432ff613: Mandag
+  month_4b83b95f: Måned
   month_s_5c17590e: Måned(er)
   monthandday_starting_at_time_769b12c8: "%{monthAndDay} starter kl. %{time}"
   months_afdf2830: Måneder
@@ -19852,6 +19883,7 @@ da:
   moodle_formula_many_warning_title: "Der er %{count} formel-spørgsmål i denne bank, der skal have deres mulige svar gendannet"
   moodle_formula_warning_title: "Mulige svar skal gendannes for formel-spørgsmål"
   more_cf9cc661: Mere
+  more_control_over_password_settings_at_institution_78d7e069: "Mere kontrol over adgangskodeindstillinger på institutionsniveau"
   more_courses_5ebbe998: "Flere fag"
   more_details_in_the_speedgrader_8702f408: "Yderligere oplysninger i SpeedGrader"
   more_importantly_canvas_allows_you_to_add_outcomes_78822cf: "Endnu vigtigere kan Canvas give dig mulighed for at tilføje læringsudbytter til dine karakterrubrikker, så du kan evaluere opfyldelse af læringsmål, mens du giver opgaver karakterer. Når du har oprettet læringsudbytter, skal du klikke på Administrer rubrikker for at begynde at bruge dine læringsudbytter til karaktergivning."
@@ -21929,6 +21961,7 @@ da:
         recording_enabled: "Giv tilladelse til at optage konferencer"
         replace_with_alternatives: "Deaktiver BigBlueButton-konferencer, vis i stedet en liste over alternativer"
         secret: Hemmelighed
+        send_avatar: "Send brugeravatar til BigBlueButton ved tilmelding"
         use_fallback: "Brug BigBlueButton fallback-plugin-indstillinger til at finde konferenceoptagelser, der ikke blev hold med den aktuelt konfigurerede BBB-instans."
       secret_description: "Dette er den %{parameter_name} parameter, som kan findes i %{filename} konfigurationsfil."
     buttons: 
@@ -24794,6 +24827,7 @@ da:
   record_upload_media_5fdce166: "Optag/overfør medier"
   record_upload_media_comment_4d01b943: "Optag/upload mediekommentar"
   record_video_70dc8439: "Optag video"
+  record_videos_and_screen_capture_with_auto_caption_5c6bc705: "Optag videoer og skærmbilleder med automatisk billedtekst."
   record_with_microphone_only_e4ee07aa: "Optag med mikrofon alene"
   record_with_webcam_af21e07c: "Optag med webkamera"
   recording_98da6bda: Optagelse
@@ -26270,6 +26304,7 @@ da:
   send_to_b940900a: "Send til ..."
   send_to_ce05b460: "Send til"
   send_usage_metrics_cecc7a7d: "Send forbrugsdata"
+  send_user_avatar_to_bigbluebutton_17cda2f6: "Send brugeravatar til BigBlueButton"
   sending_bf324366: "Sender ..."
   sending_message_75923692: "Sender besked"
   sending_message_8ac5bc90: "Sender besked ..."
@@ -29529,6 +29564,7 @@ da:
   this_most_likely_happened_because_you_imported_cou_a78ea880: "Dette skete sandsynligvis, fordi du importerede fagindhold uden dets tilknyttede filer."
   this_name_appears_in_sorted_lists_dccbd84b: "Dette navn forekommer i sorterede lister."
   this_name_will_be_used_by_teachers_for_grading_9b6aa8a0: "Dette navn bruges af lærerne til karaktergivning."
+  this_number_must_be_between_1_and_10_d8400fc6: "Dette tal skal være mellem 1 og 10"
   this_option_is_not_compatible_with_new_quizzes_ed489d7c: "Denne indstilling er ikke kompatibel med New Quizzes"
   this_option_is_not_compatible_with_quizzes_next_6dacd0c1: "Denne indstilling er ikke kompatibel med Quizzes.Next"
   this_outcome_has_been_used_to_assess_a_student_and_376d5ba9: "Dette resultat er blevet brugt til at bedømme den studerende og kan ikke længere opdateres."
@@ -30609,6 +30645,8 @@ da:
   total_activity_21022e7c: "Samlet aktivitet"
   total_column_options_4e6a6032: "Samlede kolonnemuligheder"
   total_grade_b0c33841: "Total: %{grade}"
+  total_grade_higher_than_4c546517: "Samlet karakter højere end"
+  total_grade_lower_than_98891fe4: "Samlet karakter lavere end"
   total_messages_af025be6: "Beskeder i alt"
   total_options_351e2682: "I alt muligheder"
   total_points_44d76792: "Samlede point"
@@ -30917,6 +30955,7 @@ da:
   unknown_quiz: "Ukendt test"
   unknown_quiz_3892d071: "Ukendt test"
   unknown_role_cbe9a089: "Ukendt rolle"
+  unknown_sender_68b1abbc: "ukendt afsender"
   unknown_status_status_35331e1d: "Ukendt status, %{status}"
   unknown_status_status_message_3a4ed4d5: "Ukendt status, %{status}: %{message}"
   unknown_user_1113fcaa: "Ukendt bruger"
@@ -31988,6 +32027,7 @@ da:
   warning_for_improved_accessibility_of_calendar_eve_da54b4e2: "Advarsel: Benyt dagsordenvisning for nemmere at kunne se kalenderbegivenheder."
   warning_for_improved_accessibility_of_reordering_a_5d0206c7: "Advarsel: For at forbedre adgang til omorganisering af opgaver og grupper, skal du benytte muligheden Flyt til dialog i menuen."
   warning_for_improved_accessibility_please_click_he_e6472c02: "Advarsel: Klik på Individuel visning af karakteroversigt for forbedret tilgængelighed."
+  warning_for_improved_accessibility_please_use_the__1075c150: "Advarsel: For forbedret tilgængelighed kan du bruge \"Dagsordenvisning\"."
   warning_for_improved_accessibility_with_annotated__43e3a5ea: "Advarsel: For bedre tilgængelighed for opgaver med anmærkninger skal du bruge Filoverførsel eller Tekstindtastning til at skrive kommentarer."
   warning_icon_f64936d7: "advarsels ikon"
   warning_if_there_are_any_users_with_this_role_they_1a7c1fef: "Advarsel: Hvis der er nogen brugere med denne rolle, vil de beholde de nuværende tilladelser, men du vil ikke være i stand til at oprette nye brugere med denne rolle."
@@ -32061,6 +32101,7 @@ da:
   website_url_url_bd07233d: "Webside-URL: %{url}"
   wed_84932f18: Ons
   wednesday_b6f755f5: Onsdag
+  week_1f945ddd: Uge
   week_s_cb1492ee: Uge(r)
   weekly_schedule_navigation_6b042645: "Ugentlig tidsplannavigation"
   weekly_summary_56cd0c95: "Ugentlig oversigt"
@@ -32149,6 +32190,9 @@ da:
       (inkonsekvent) adfærd. Dette flag gælder kun for konsortiumkonti
       _child_. Dette flag påvirker ikke centralt styrede konsortier på
       nogen måde.
+  when_enabled_for_an_account_sends_data_for_all_lti_77568a4f: |-
+      Når aktiveret for en konto, sendes data for alle LTI-lanceringer til PandataEvents systemet
+      til forespørgsel og visualisering. Kræver Log LTI-lancering (site admin) for også at være aktiveret.
   when_enabled_for_the_parent_account_of_a_non_centr_4d7adbaa: |-
       Når aktiveret for den overordnede konto for et ikke-centralt styret konsortium,
       påvirker tænd/sluk for udvikler-nøgler i den overordnede konto ikke værktøjsinstallationer
