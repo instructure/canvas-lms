@@ -82,3 +82,15 @@ advanced_analytics_ask_questions:
   root_opt_in: true
   beta: true
   shadow: true
+
+# Analytics Hub
+analytics_hub:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: "Analytics Hub"
+  description: This feature provides a new Analytics Hub platform experience.
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on
