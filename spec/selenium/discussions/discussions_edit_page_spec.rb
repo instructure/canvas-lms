@@ -30,29 +30,6 @@ describe "discussions" do
   include ItemsAssignToTray
   include ContextModulesCommon
 
-  def generate_expected_overrides(assignment)
-    expected_overrides = []
-
-    if assignment.assignment_overrides.active.empty?
-      expected_overrides << ["Everyone"]
-    else
-      unless assignment.only_visible_to_overrides
-        expected_overrides << ["Everyone else"]
-      end
-
-      assignment.assignment_overrides.active.each do |override|
-        if override.set_type == "CourseSection"
-          expected_overrides << [override.title]
-        elsif override.set_type == "ADHOC"
-          student_names = override.assignment_override_students.map { |student| student.user.name }
-          expected_overrides << student_names
-        end
-      end
-    end
-
-    expected_overrides
-  end
-
   let(:course) { course_model.tap(&:offer!) }
   let(:teacher) { teacher_in_course(course:, name: "teacher", active_all: true).user }
   let(:teacher_topic) { course.discussion_topics.create!(user: teacher, title: "teacher topic title", message: "teacher topic message") }
@@ -657,26 +634,6 @@ describe "discussions" do
       end
 
       context "graded" do
-        def create_graded_discussion(discussion_course, assignment_options = {})
-          default_assignment_options = {
-            name: "Default Assignment",
-            points_possible: 10,
-            assignment_group: discussion_course.assignment_groups.create!(name: "Default Assignment Group"),
-            only_visible_to_overrides: false
-          }
-          options = default_assignment_options.merge(assignment_options)
-
-          discussion_assignment = discussion_course.assignments.create!(options)
-          all_graded_discussion_options = {
-            user: teacher,
-            title: "assignment topic title",
-            message: "assignment topic message",
-            discussion_type: "threaded",
-            assignment: discussion_assignment,
-          }
-          discussion_course.discussion_topics.create!(all_graded_discussion_options)
-        end
-
         it "displays graded assignment options correctly when initially opening edit page" do
           grading_standard = course.grading_standards.create!(title: "Win/Lose", data: [["Winner", 0.94], ["Loser", 0]])
 
