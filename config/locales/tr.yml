@@ -19993,6 +19993,7 @@ tr:
         select_folder_for_uploads: "Yüklemek istediğiniz dosyaların klasörünü seçiniz"
     wiki_page: 
       buttons: 
+        assign_to: "Şuna Ata"
         edit: Düzenle
         view_all_pages: "Tüm Sayfaları Göster"
       delete_wiki: Sil
