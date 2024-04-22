@@ -1465,6 +1465,8 @@ zh-Hans:
               check_box: "小组成员 CSV"
           groups: 
             check_box: "小组 CSV"
+          include_deleted: 
+            check_box: 包括删除的对象
           sections: 
             check_box: "班级 CSV"
           terms: 
@@ -2308,6 +2310,7 @@ zh-Hans:
   add_edit_delete_files_573a4d62: 添加/编辑/删除文件
   add_edit_delete_sections_d32c5b4d: 添加/编辑/删除班次
   add_email_address_aef3b61: 添加电子邮件地址
+  add_event_9e21d0ff: 添加事件
   add_existing_content_7e36da66: 添加现有内容
   add_external_feed_6d437a28: 添加外部源
   add_feed_49ed1cb2: 添加源
@@ -2447,6 +2450,7 @@ zh-Hans:
   additional_occurrence_s_7b5b0173: 额外事件
   additional_options_7cefee79: 更多选项
   additional_outcomes_options_6df428f1: 其他结果选项
+  additional_replies_required_13697d0a: 需要更多回复
   additional_settings_20362654: 其他设置
   additional_settings_for_sis_syncing_f926973e: "其他的 SIS 同步设置"
   additional_sis_sync_assignment_quiz_and_discussion_d941fa5: "其他 SIS Sync 作业、测验和讨论设置"
@@ -2459,6 +2463,9 @@ zh-Hans:
   address_use_as_wildcard_48f2cf60: 地址（使用*作为通配符）
   addressbook_microservice_a4940422: "AddressBook 微服务"
   addressbook_performance_tap_98ddf67: "AddressBook 成绩表"
+  adds_a_new_admin_setting_to_the_bigbluebutton_plug_fa648486: |-
+      向 BigBlueButton 插件添加新的管理员设置，以允许
+      在用户加入会议时发送用户头像。
   adds_a_new_bounced_emails_tab_to_account_admin_too_6714c09d: |-
       添加新“退信”选项卡到“帐户管理员工具”，
       以便您可以搜索退回Canvas
@@ -2488,6 +2495,8 @@ zh-Hans:
   adjusting_due_dates_a5918b9c: 正在调整到期日期...
   admin_4d3ba42f: 管理员
   admin_analytics_course_readiness_c79f13e1: 管理分析-课程准备状态
+  admin_analytics_dap_30f431d6: "管理员分析 DAP"
+  admin_analytics_dap_model_description: "在帐户级别启用 DAP for Analytics。"
   admin_analytics_description: "启用帐户级别分析。管理员分析控制面板提供有关 Canvas 使用情况、Canvas 课程通过率和学生参与度的详细信息。在 Canvas 社区的*管理分析中心*了解更多信息。"
   admin_analytics_eacba735: 管理员分析工具
   admin_analytics_new_filter_ui_aee1ea8e: "管理员分析 - 新的过滤器 UI"
@@ -2516,8 +2525,9 @@ zh-Hans:
   admins_add_remove_26811ce5: "管理员 - 添加/移除"
   advanced_36b35b8: 高级
   advanced_analytics_6a2419af: 高级分析
-  advanced_analytics_ask_questions: "启用高级分析 - 提问和附带权限。"
+  advanced_analytics_ask_questions: "启用“高级分析 - 询问您的数据”功能和附带权限。"
   advanced_analytics_ask_questions_26553cd2: "高级分析 - 提问"
+  advanced_analytics_ask_your_data_ab54433: "高级分析 - 询问您的数据"
   advanced_analytics_course_readiness_and_students_i_6b3c439f: "高级分析 - 课程就绪度和需要关注的学生"
   advanced_analytics_course_readiness_closed_alpha_13c8aaf: "高级分析 - 课程准备程度封闭内测"
   advertise_release_notes_via_the_ui_9254bc6c: "通过 UI 发布发行说明"
@@ -2543,6 +2553,7 @@ zh-Hans:
   after_the_due_date_eee89c9c: 在截止日期之后
   after_the_first_attempt_you_cannot_leave_comments__3922325f: 第一次尝试后，您必须在提交作业后才能留下评价。
   after_throttling_the_selected_jobs_the_newly_creat_44952b37: "调节所选作业后，将选择新创建的 strand。"
+  agenda_b010136d: 培训课题
   ahead_21f22939: 提前
   ai_driven_smart_search_feature_597dbd4f: "AI 驱动的智能搜索功能。"
   ajax_errors: 
@@ -2796,6 +2807,9 @@ zh-Hans:
   allows_for_discussion_replies_to_be_sorted_accordi_1065cccc: |-
       允许根据创建时间戳
       给讨论回复排序。根级别回复的默认顺序为从新到旧。
+  allows_for_quickly_enabling_or_disabling_lti_launc_7eee7943: |-
+      在推出时允许在帐户级别
+      快速启用或禁用 LTI 启动日志记录。
   allows_graders_to_type_mi_in_the_gradebook_or_spee_a9bb3577: 允许评分人在成绩册或SpeedGrader中输入MI以将作业手动标记为“未交”
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: 允许将帮助链接标记为“特色”或“新”，并且在帮助菜单中突出显示特色帮助链接。
   allows_instructors_to_apply_scores_to_ungraded_sub_7e772795: 允许讲师一次性对所有未评分的提交项应用分数。
@@ -4079,6 +4093,7 @@ zh-Hans:
   as_you_type_in_this_field_the_list_of_results_will_c1a1a3e4: 当您在该栏输入，结果列表将自动地更新。
   ascending_b3c87427: 升序
   ask_questions_f6b301fe: 提问
+  ask_your_data_da53791f: 询问您的数据
   ask_your_instructor_a_question_a61ca5e9: 向您的讲师提问
   assess_and_survey_your_students_ce8172a9: 对您的学生进行评估和调查
   assess_student_understanding_1e0b8d7f: 评估学生的知识掌握情况
@@ -5767,6 +5782,7 @@ zh-Hans:
   calculation_int_is_not_a_valid_value_for_this_calc_1de6e060: "'%{calculation_int}' 不是此计算方法的有效值。该值必须在 '%{valid_calculation_ints_min}' 和 '%{valid_calculation_ints_max}' 之间"
   calculation_method_fe281f9: 计算方法
   calculation_method_must_be_one_of_the_following_ca_d8ae5dac: "calculation_method 必须为以下各项之一：%{calc_methods}"
+  calculations_fd087607: 计算
   calculator: 
     buttons: 
       save: 保存
@@ -6926,6 +6942,7 @@ zh-Hans:
     from_beginning: 开始
     to_now: 立即
   comma_separated_list_of_users_sis_id_332c98f1: "用户 SIS ID 的逗号分隔的列表"
+  comment_7ef1428e: 评论
   comment_added_33ab70d9: 已添加评论
   comment_by_replying_to_this_message_or_join_the_co_26d42fde: "通过回复此邮件评论，或使用该链接加入对话: %{link}."
   comment_by_replying_to_this_message_or_join_the_co_52b5ac1c: "通过回复此消息进行评论，或使用此链接加入对话：%{link}. 在允许的情况下，如果您需要添加附件，请登录到 Canvas 并回复讨论。"
@@ -9741,6 +9758,7 @@ zh-Hans:
   create_new_criterion_1a4efd4: 新建标准
   create_new_discussions_6ab69da2: 创建新讨论
   create_new_e0946c49: 新建
+  create_new_event_e9fb2fb6: 创建新事件
   create_new_filter_c244aa92: 创建新过滤器
   create_new_group_bf9561d4: 创建新组
   create_new_group_fca5cc73: 创建新组
@@ -9797,6 +9815,7 @@ zh-Hans:
   criteria_9fac648: 标准
   criteria_builder_b214069e: 标准生成器
   criterion_5f0b62f8: 标准
+  criterion_comment_642f7747: 标准评论
   criterion_created_42669293: 创建的标准
   criterion_description_757741c3: 标准描述
   criterion_long_description_e9a97247: 标准长说明
@@ -9934,6 +9953,10 @@ zh-Hans:
   current_terms_bcf31fb2: 当前学期
   current_theme_62e5e8cf: 目前主题
   current_total_67bf5f72: 当前总分：
+  current_total_score_is_higher_than_cutoff_c11e90b8: "当前总分高于 %{cutoff}%"
+  current_total_score_is_higher_than_cutoff_f2ef8ae: "当前总分高于 %{cutoff}"
+  current_total_score_is_lower_than_cutoff_5f78d46: "当前总分低于 %{cutoff}"
+  current_total_score_is_lower_than_cutoff_a2b1ec5a: "当前总分低于 %{cutoff}%"
   current_volume_level_c55ab825: 当前音量
   currently_assigned_to_tokenname_click_to_remove_5a853a84: "当前已分配给%{tokenName}，点击以移除"
   currently_selected_color_93f44b9f: 当前选择的颜色
@@ -11083,6 +11106,7 @@ zh-Hans:
   display_as_e2a5c383: 显示为
   display_as_percentage_3e755dc: 显示为百分比
   display_as_points_63084235: 显示为得分
+  display_course_calculation_options_11890a89: 显示课程计算选项
   display_course_catalog: “在公共课程索引中包含此课程”标记启用的情况下，在此母帐户中显示一个可搜索的课程列表。
   display_e6546241: 显示
   display_filter_options_34fb6be2: 显示筛选器选项
@@ -11729,6 +11753,7 @@ zh-Hans:
   english_canada_12688ee4: 英语（加拿大）
   english_united_kingdom_a613f831: "英语 (英国)"
   enhance_color_contrast_of_content_685ddd49: 增强内容的颜色对比度
+  enhance_password_options_efbf3e48: 增强密码选项
   enhanced_docviewer_url_security_72e9baa9: "增强的 DocViewer URL 安全性"
   enhanced_grade_change_auditing_2b155dfa: 增强了评分更改审核
   enhanced_gradebook_filters_a3be5e7d: 增强的评分册过滤器
@@ -11902,6 +11927,7 @@ zh-Hans:
                           了解如何**生成访问令牌**。
   enter_the_access_token_for_your_organization_from__cc77493d: "在 *eduappcenter.com* 输入您的机构的访问令牌。一旦适用，只有您的机构在EduAppCenter批准的应用程序才会在外部应用程序的页面中列出。了解如何**生成一个访问令牌**。"
   enter_the_access_token_for_your_organization_from__f1c71941: 输入来自*eduappcenter.com*的贵组织的访问令牌。一旦应用，仅贵组织在EduAppCenter中批准的应用程序会列在外部应用程序页面上。了解如何**生成访问令牌**。
+  enter_the_date_you_would_like_to_navigate_to_a712de47: 输入您要导航到的日期。
   enter_the_description_91ececc1: 输入描述
   enter_the_email_address_of_the_user_you_would_like_92112560: 输入您希望临时注册的用户的电子邮件地址
   enter_the_email_addresses_of_the_users_you_would_l_17cef6a0: 输入您要添加的用户的电子邮件地址，用逗号隔开
@@ -13352,6 +13378,7 @@ zh-Hans:
   give_all_students_the_same_percent_grade_for_assig_6a008004: "通过输入并提交以下评分值对所有学生的**%{assignment.name}**给出相同的评分*百分比*："
   give_this_filter_a_name_36b4b03a: 为该过滤器命名
   give_your_filter_preset_a_name_11144c73: 为过滤器预设命名
+  gives_users_access_to_new_optional_features_like_s_71cc5bb0: 向用户授予新可选功能的权限，例如设置一个默认的签名添加到传出消息的末尾，以及设置自动响应器。
   giving_up_on_retrieving_media_sources_this_issue_w_ad49b0d3: 放弃获取媒体源。该问题最终可能会自行解决。
   global_announcements_a78912c8: 全局公告
   global_announcements_add_edit_delete_843ca4d2: "全局公告 - 添加/编辑/删除"
@@ -14127,6 +14154,7 @@ zh-Hans:
   graded_date_by_grader_e8e1ff75: "%{graded_date} 按%{grader}"
   graded_discussion_17cc8eaf: 评分讨论
   graded_discussion_a873bb3e: 评分的讨论：
+  graded_discussion_submission_6ee4187e: 评分的讨论提交项
   graded_on_submission_60ac3010: 为提交内容计分
   graded_quiz_7fabdf1f: 评分测验
   graded_submissions_9c7068a2: 已评分的提交项：
@@ -15805,6 +15833,7 @@ zh-Hans:
   inactive_enrollments_bd1831ea: 不活跃的注册学生
   inappropriate_1930c574: 不恰当
   inbox_bb245a60: 收件箱
+  inbox_settings_qw_updates_a3eb954b: "收件箱设置 - QW 更新"
   include_a_download_link_next_to_each_file_link_in__481761de: "RCE 中的每个文件链接旁边包括一个下载链接"
   include_a_link_to_a_screencast_screenshot_using_so_4b2fabcb: 使用类似*Jing*的工具将链接插入截屏/屏幕截图之中。
   include_a_link_to_show_a_qr_code_to_easy_mobile_lo_f3da1267: 包括一个显示二维码的链接，用于通过移动设备轻松登录个人资料页面。
@@ -17001,6 +17030,7 @@ zh-Hans:
   log_in_to_submit_962106cf: 登录并提交
   log_in_url_is_not_a_valid_uri_7b8c57ee: "登录 URL 不是有效的 URL"
   log_lti_launches_ff06c5fe: "记录 LTI 启动"
+  log_lti_launches_site_admin_bc4a0b70: "记录 LTI 启动（站点管理员）"
   log_on_url_fc166e4c: 登录到URL
   log_out_379ba28a: 退出
   log_out_url_2605c2c1: 退出URL
@@ -19816,6 +19846,7 @@ zh-Hans:
   moduletitle_unpublished_8a70e0cd: "%{moduleTitle} （已取消发布）"
   mon_8f18082a: 星期一
   monday_432ff613: 星期一
+  month_4b83b95f: 月
   month_s_5c17590e: 月
   monthandday_starting_at_time_769b12c8: "%{monthAndDay}开始位置%{time}"
   months_afdf2830: 月
@@ -19824,6 +19855,7 @@ zh-Hans:
   moodle_formula_many_warning_title: "此题库中的 %{count} 个公式问题将需要重新生成可能的答案"
   moodle_formula_warning_title: 将需要为公式问题重新生成可能的答案
   more_cf9cc661: 更多
+  more_control_over_password_settings_at_institution_78d7e069: 提高在机构级别对密码设置的控制权
   more_courses_5ebbe998: 更多课程
   more_details_in_the_speedgrader_8702f408: 快速评分器中的更多详细信息
   more_importantly_canvas_allows_you_to_add_outcomes_78822cf: "更重要的是，Canvas允许您将结果添加到评分评价量规中，以便在您给作业评分时评估掌握程度。设置好结果后，单击Manage Rubrics(管理评价量规)可以开始使用要评分的结果。"
@@ -21899,6 +21931,7 @@ zh-Hans:
         recording_enabled: 允许录制会议。
         replace_with_alternatives: "禁用 BigBlueButton 会议；改为显示替代选项列表"
         secret: 加密
+        send_avatar: "在加入时向 BigBlueButton 发送用户头像"
         use_fallback: "使用 BigBlueButton 回滚插件设置查找未使用当前配置的 BBB 实例托管的会议的录制文件。"
       secret_description: "这是 %{parameter_name} 参数，可在 %{filename} 配置文件中找到。"
     buttons: 
@@ -24764,6 +24797,7 @@ zh-Hans:
   record_upload_media_5fdce166: 记录/上传媒体
   record_upload_media_comment_4d01b943: 录制/上传媒体评论
   record_video_70dc8439: 录制视频
+  record_videos_and_screen_capture_with_auto_caption_5c6bc705: 录制视频和截屏并且自动生成字幕。
   record_with_microphone_only_e4ee07aa: 仅用于麦克风录制
   record_with_webcam_af21e07c: 仅用于网络摄像头录制
   recording_98da6bda: 录制
@@ -26237,6 +26271,7 @@ zh-Hans:
   send_to_b940900a: 发送至...
   send_to_ce05b460: 发送到
   send_usage_metrics_cecc7a7d: 发送使用指标
+  send_user_avatar_to_bigbluebutton_17cda2f6: "向 BigBlueButton 发送用户头像"
   sending_bf324366: 正在发送...
   sending_message_75923692: 发送消息
   sending_message_8ac5bc90: 发送信息...
@@ -29487,6 +29522,7 @@ zh-Hans:
   this_most_likely_happened_because_you_imported_cou_a78ea880: 这很可能发生，因为您导入了不带关联文件的课程内容。
   this_name_appears_in_sorted_lists_dccbd84b: 此名称将出现在排序列表中。
   this_name_will_be_used_by_teachers_for_grading_9b6aa8a0: 此名称将被用于教师评分。
+  this_number_must_be_between_1_and_10_d8400fc6: "此数字必须介于 1 和 10 之间"
   this_option_is_not_compatible_with_new_quizzes_ed489d7c: "此选项与 New Quizzes 不兼容"
   this_option_is_not_compatible_with_quizzes_next_6dacd0c1: "此选项和 Quizzes.Next 不兼容"
   this_outcome_has_been_used_to_assess_a_student_and_376d5ba9: 这个结果已被使用于评估学生，以及再不能被更新
@@ -30566,6 +30602,8 @@ zh-Hans:
   total_activity_21022e7c: 总活动
   total_column_options_4e6a6032: 合计列的选项
   total_grade_b0c33841: "总分：%{grade}"
+  total_grade_higher_than_4c546517: 总分高于
+  total_grade_lower_than_98891fe4: 总分低于
   total_messages_af025be6: 总消息数
   total_options_351e2682: 总选项
   total_points_44d76792: 总得分
@@ -30874,6 +30912,7 @@ zh-Hans:
   unknown_quiz: 未知测验
   unknown_quiz_3892d071: 未知的测验
   unknown_role_cbe9a089: 未知的角色
+  unknown_sender_68b1abbc: 未知发件人
   unknown_status_status_35331e1d: "未知状态，%{status}"
   unknown_status_status_message_3a4ed4d5: "未知状态，%{status}：%{message}"
   unknown_user_1113fcaa: 未知用户
@@ -31935,6 +31974,7 @@ zh-Hans:
   warning_for_improved_accessibility_of_calendar_eve_da54b4e2: 警告：为了提高对日历活动的访问，请使用日程视图。
   warning_for_improved_accessibility_of_reordering_a_5d0206c7: 警告：改进重新排序的作业和组群的可访问性，请在菜单中使用移动对话的选项。
   warning_for_improved_accessibility_please_click_he_e6472c02: 警告：为了提高可访问性，请点击这里以使用单独视图评分册。
+  warning_for_improved_accessibility_please_use_the__1075c150: 警告：为加强访问性，请使用“日程视图”日历。
   warning_for_improved_accessibility_with_annotated__43e3a5ea: 警告：为了改进“带有注释的作业”的访问性，请使用“文件上传”或“文本输入”留下备注。
   warning_icon_f64936d7: 警告图标
   warning_if_there_are_any_users_with_this_role_they_1a7c1fef: 警告：如果有任何用户担任此角色，这些用户将保留当前权限，但您将无法使用此角色创建新用户。
@@ -32008,6 +32048,7 @@ zh-Hans:
   website_url_url_bd07233d: "网址：%{url}"
   wed_84932f18: 星期三
   wednesday_b6f755f5: 星期三
+  week_1f945ddd: 周
   week_s_cb1492ee: 星期
   weekly_schedule_navigation_6b042645: 每周日程规划导航
   weekly_summary_56cd0c95: 每周摘要
@@ -32096,6 +32137,9 @@ zh-Hans:
       （不一致）的行为。此标记仅适用于联盟
       _child_帐户。此标记对集中管理的联盟
       不会有任何影响。
+  when_enabled_for_an_account_sends_data_for_all_lti_77568a4f: |-
+      为帐户启用后，向系统发送所有 LTI 启动数据PandataEvents以用于
+      查询和可视化。还要求启用“记录 LTI 启动（站点管理员）”。
   when_enabled_for_the_parent_account_of_a_non_centr_4d7adbaa: |-
       为非集中管理的联盟的父帐户启用后，
       启用/禁用父级中的开发人员密钥不会影响
