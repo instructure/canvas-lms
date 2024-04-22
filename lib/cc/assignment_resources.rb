@@ -24,7 +24,9 @@ module CC
       relation = @user ? Assignments::ScopedToUser.new(@course, @user).scope : @course.active_assignments
       relation.no_submittables.each do |assignment|
         next if @course.assignments.where(id: assignment.id).type_quiz_lti.present? &&
-                Account.site_admin.feature_enabled?(:new_quizzes_common_cartridge)
+                Account.site_admin.feature_enabled?(:new_quizzes_common_cartridge) &&
+                @manifest.exporter.common_cartridge?
+
         next unless export_object?(assignment)
         next if @user && assignment.locked_for?(@user, check_policies: true)
 
