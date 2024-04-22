@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2024 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -17,14 +17,13 @@
  */
 
 import React from 'react'
-import {mount} from 'enzyme'
-import Avatar from '@canvas/context-cards/react/Avatar'
-import {Avatar as InstUIAvatar} from '@instructure/ui-avatar'
+import {render} from '@testing-library/react'
+import Avatar from '../Avatar'
 
-QUnit.module('StudentContextTray/Avatar', _ => {
+describe('StudentContextTray/Avatar', () => {
   test('renders no avatars by default', () => {
-    const wrapper = mount(<Avatar name="" user={{}} courseId="1" canMasquerade={true} />)
-    equal(wrapper.find(InstUIAvatar).first().length, 0)
+    const wrapper = render(<Avatar name="" user={{}} courseId="1" canMasquerade={true} />)
+    expect(wrapper.container.querySelector(".StudentContextTray__Avatar")).toBeFalsy()
   })
 
   test('renders avatar with user object when provided', () => {
@@ -36,14 +35,12 @@ QUnit.module('StudentContextTray/Avatar', _ => {
       _id: '17',
     }
 
-    const wrapper = mount(<Avatar name="" user={user} courseId="1" canMasquerade={true} />)
+    const wrapper = render(<Avatar name="" user={user} courseId="1" canMasquerade={true} />)
+    const avatar = wrapper.container.querySelector(".StudentContextTray__Avatar span")
+    expect(avatar.getAttribute('name')).toEqual(user.name)
+    expect(avatar.getAttribute('src')).toEqual(user.avatar_url)
 
-    const avatar = wrapper.find(InstUIAvatar).first()
-
-    equal(avatar.prop('name'), user.name)
-    equal(avatar.prop('src'), user.avatar_url)
-
-    const link = wrapper.find('a').first()
-    equal(link.prop('href'), '/courses/1/users/17')
+    const link = wrapper.container.querySelector('a')
+    expect(link.getAttribute('href')).toEqual('/courses/1/users/17')
   })
 })
