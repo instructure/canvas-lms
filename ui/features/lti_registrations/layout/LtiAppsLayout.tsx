@@ -44,8 +44,10 @@ export const LtiAppsLayout = () => {
         {window.ENV.FEATURES.lti_registrations_discover_page && (
           <Tabs.Panel
             isSelected={!isManage}
+            active={!isManage}
             id="tabB"
             href="/"
+            padding="large 0"
             renderTitle={
               <Link style={{color: 'initial', textDecoration: 'initial'}} to="/">
                 {I18n.t('Discover')}
@@ -64,7 +66,7 @@ export const LtiAppsLayout = () => {
           id="tabA"
           padding="large"
           isSelected={!!isManage}
-          active={true}
+          active={!!isManage}
         >
           <Outlet />
         </Tabs.Panel>
