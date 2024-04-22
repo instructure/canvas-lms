@@ -1466,6 +1466,8 @@ en-AU:
               check_box: "Group Membership CSV"
           groups: 
             check_box: "Groups CSV"
+          include_deleted: 
+            check_box: "Include Deleted Objects"
           sections: 
             check_box: "Sections CSV"
           terms: 
@@ -2309,6 +2311,7 @@ en-AU:
   add_edit_delete_files_573a4d62: "add / edit / delete Files"
   add_edit_delete_sections_d32c5b4d: "add / edit / delete Sections"
   add_email_address_aef3b61: "Add Email Address"
+  add_event_9e21d0ff: "Add Event"
   add_existing_content_7e36da66: "Add existing content"
   add_external_feed_6d437a28: "Add External Feed"
   add_feed_49ed1cb2: "Add Feed"
@@ -2448,6 +2451,7 @@ en-AU:
   additional_occurrence_s_7b5b0173: "additional occurrence(s)"
   additional_options_7cefee79: "Additional Options"
   additional_outcomes_options_6df428f1: "Additional outcomes options"
+  additional_replies_required_13697d0a: "Additional Replies Required"
   additional_settings_20362654: "Additional Settings"
   additional_settings_for_sis_syncing_f926973e: "Additional settings for SIS syncing"
   additional_sis_sync_assignment_quiz_and_discussion_d941fa5: "Additional SIS Sync Assignment, Quiz, and Discussion settings"
@@ -2460,6 +2464,9 @@ en-AU:
   address_use_as_wildcard_48f2cf60: "Address (use * as wildcard)"
   addressbook_microservice_a4940422: "AddressBook microservice"
   addressbook_performance_tap_98ddf67: "AddressBook performance tap"
+  adds_a_new_admin_setting_to_the_bigbluebutton_plug_fa648486: |-
+      Adds a new admin setting to the BigBlueButton plugin to allow
+      sending of user avatars upon joining conference.
   adds_a_new_bounced_emails_tab_to_account_admin_too_6714c09d: |-
       Adds a new Bounced Emails tab to Account Admin Tools, which
       allows you to search email addresses where Canvas notifications
@@ -2489,6 +2496,8 @@ en-AU:
   adjusting_due_dates_a5918b9c: "Adjusting due dates..."
   admin_4d3ba42f: Admin
   admin_analytics_course_readiness_c79f13e1: "Admin Analytics - Course Readiness"
+  admin_analytics_dap_30f431d6: "Admin Analytics DAP"
+  admin_analytics_dap_model_description: "Enables the use of DAP for Analytics at the account-level."
   admin_analytics_description: "Enables Analytics at the account-level. Admin Analytics dashboards provide details on Canvas usage, Canvas course success, and student engagement. Learn more in the *Admin Analytics Hub* in the Canvas community."
   admin_analytics_eacba735: "Admin Analytics"
   admin_analytics_new_filter_ui_aee1ea8e: "Admin Analytics - New Filter UI"
@@ -2517,8 +2526,9 @@ en-AU:
   admins_add_remove_26811ce5: "Admins - add / remove"
   advanced_36b35b8: Advanced
   advanced_analytics_6a2419af: "Advanced Analytics"
-  advanced_analytics_ask_questions: "Enables the Advanced Analytics - Ask Questions and accompanying permission."
+  advanced_analytics_ask_questions: "Enables the Advanced Analytics - Ask Your Data feature and accompanying permission."
   advanced_analytics_ask_questions_26553cd2: "Advanced Analytics - Ask Questions"
+  advanced_analytics_ask_your_data_ab54433: "Advanced Analytics - Ask Your Data"
   advanced_analytics_course_readiness_and_students_i_6b3c439f: "Advanced Analytics - Course Readiness and Students in Need of Attention"
   advanced_analytics_course_readiness_closed_alpha_13c8aaf: "Advanced Analytics - Course Readiness Closed Alpha"
   advertise_release_notes_via_the_ui_9254bc6c: "Advertise release notes via the UI"
@@ -2544,6 +2554,7 @@ en-AU:
   after_the_due_date_eee89c9c: "After the due date"
   after_the_first_attempt_you_cannot_leave_comments__3922325f: "After the first attempt, you cannot leave comments until you submit the assignment."
   after_throttling_the_selected_jobs_the_newly_creat_44952b37: "After throttling the selected jobs, the newly created strand will be selected."
+  agenda_b010136d: Agenda
   ahead_21f22939: Ahead
   ai_driven_smart_search_feature_597dbd4f: "AI driven smart search feature."
   ajax_errors: 
@@ -2799,6 +2810,9 @@ en-AU:
   allows_for_discussion_replies_to_be_sorted_accordi_1065cccc: |-
       Allows for discussion replies to be sorted according to creation
       timestamps. Default order is newest to oldest for root level replies.
+  allows_for_quickly_enabling_or_disabling_lti_launc_7eee7943: |-
+      Allows for quickly enabling or disabling LTI launch logging while rolling out
+      at the account level.
   allows_graders_to_type_mi_in_the_gradebook_or_spee_a9bb3577: "Allows graders to type MI in the Markbook or SpeedGrader to manually tag an assignment as missing"
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: "Allows Help Links to be tagged as Featured or New and prominently displays the Featured Help Link in the Help Menu."
   allows_instructors_to_apply_scores_to_ungraded_sub_7e772795: "Allows instructors to apply scores to ungraded submissions en masse."
@@ -4087,6 +4101,7 @@ en-AU:
   as_you_type_in_this_field_the_list_of_results_will_c1a1a3e4: "As you type in this field, the list of results will be automatically updated."
   ascending_b3c87427: Ascending
   ask_questions_f6b301fe: "Ask Questions"
+  ask_your_data_da53791f: "Ask Your Data"
   ask_your_instructor_a_question_a61ca5e9: "Ask your instructor a question"
   assess_and_survey_your_students_ce8172a9: "Assess and survey your students"
   assess_student_understanding_1e0b8d7f: "Assess student understanding"
@@ -5783,6 +5798,7 @@ en-AU:
   calculation_int_is_not_a_valid_value_for_this_calc_1de6e060: "'%{calculation_int}' is not a valid value for this calculation method. The value must be between '%{valid_calculation_ints_min}' and '%{valid_calculation_ints_max}'"
   calculation_method_fe281f9: "Calculation Method"
   calculation_method_must_be_one_of_the_following_ca_d8ae5dac: "calculation_method must be one of the following: %{calc_methods}"
+  calculations_fd087607: Calculations
   calculator: 
     buttons: 
       save: Save
@@ -6943,6 +6959,7 @@ en-AU:
     from_beginning: "the beginning"
     to_now: now
   comma_separated_list_of_users_sis_id_332c98f1: "Comma separated list of Users SIS ID"
+  comment_7ef1428e: Comment
   comment_added_33ab70d9: "Comment added"
   comment_by_replying_to_this_message_or_join_the_co_26d42fde: "Comment by replying to this message, or join the conversation using this link: %{link}."
   comment_by_replying_to_this_message_or_join_the_co_52b5ac1c: "Comment by replying to this message, or join the conversation using this link: %{link}. When allowed, if you need to include an attachment, please log in to Canvas and reply to the discussion."
@@ -9774,6 +9791,7 @@ en-AU:
   create_new_criterion_1a4efd4: "Create New Criterion"
   create_new_discussions_6ab69da2: "Create new discussions"
   create_new_e0946c49: "Create new"
+  create_new_event_e9fb2fb6: "Create New Event"
   create_new_filter_c244aa92: "Create New Filter"
   create_new_group_bf9561d4: "Create New Group"
   create_new_group_fca5cc73: "Create new group"
@@ -9831,6 +9849,7 @@ en-AU:
   criteria_9fac648: Criteria
   criteria_builder_b214069e: "Criteria Builder"
   criterion_5f0b62f8: Criterion
+  criterion_comment_642f7747: "Criterion Comment"
   criterion_created_42669293: "Criterion Created"
   criterion_description_757741c3: "Criterion Description"
   criterion_long_description_e9a97247: "Criterion Long Description"
@@ -9968,6 +9987,10 @@ en-AU:
   current_terms_bcf31fb2: "Current Terms"
   current_theme_62e5e8cf: "Current theme"
   current_total_67bf5f72: "Current Total:"
+  current_total_score_is_higher_than_cutoff_c11e90b8: "Current total score is higher than %{cutoff}%"
+  current_total_score_is_higher_than_cutoff_f2ef8ae: "Current total score is higher than %{cutoff}"
+  current_total_score_is_lower_than_cutoff_5f78d46: "Current total score is lower than %{cutoff}"
+  current_total_score_is_lower_than_cutoff_a2b1ec5a: "Current total score is lower than %{cutoff}%"
   current_volume_level_c55ab825: "Current Volume Level"
   currently_assigned_to_tokenname_click_to_remove_5a853a84: "Currently assigned to %{tokenName}, click to remove"
   currently_selected_color_93f44b9f: "Currently Selected Colour"
@@ -11119,6 +11142,7 @@ en-AU:
   display_as_e2a5c383: "Display as"
   display_as_percentage_3e755dc: "Display as Percentage"
   display_as_points_63084235: "Display as Points"
+  display_course_calculation_options_11890a89: "Display Course Calculation Options"
   display_course_catalog: "Show a searchable list of courses in this root account with the \"Include this course in the public course index\" flag enabled."
   display_e6546241: Display
   display_filter_options_34fb6be2: "Display Filter Options"
@@ -11765,6 +11789,7 @@ en-AU:
   english_canada_12688ee4: "English (Canada)"
   english_united_kingdom_a613f831: "English (United Kingdom)"
   enhance_color_contrast_of_content_685ddd49: "Enhance colour contrast of content"
+  enhance_password_options_efbf3e48: "Enhance password options"
   enhanced_docviewer_url_security_72e9baa9: "Enhanced DocViewer URL Security"
   enhanced_grade_change_auditing_2b155dfa: "Enhanced grade change auditing"
   enhanced_gradebook_filters_a3be5e7d: "Enhanced Markbook Filters"
@@ -11938,6 +11963,7 @@ en-AU:
                           Learn how to **generate an access token**.
   enter_the_access_token_for_your_organization_from__cc77493d: "Enter the access token for your organisation from *eduappcenter.com*. Once applied, only apps your organisation has approved in the EduAppCenter will be listed on the External Apps page.                         Learn how to **generate an access token**."
   enter_the_access_token_for_your_organization_from__f1c71941: "Enter the access token for your organisation from                       *eduappcenter.com*. Once applied, only apps your organisation has approved in the                       EduAppCenter will be listed on the External Apps page.                       Learn how to **generate an access token**."
+  enter_the_date_you_would_like_to_navigate_to_a712de47: "Enter the date you would like to navigate to."
   enter_the_description_91ececc1: "Enter the description"
   enter_the_email_address_of_the_user_you_would_like_92112560: "Enter the email address of the user you would like to temporarily enrol"
   enter_the_email_addresses_of_the_users_you_would_l_17cef6a0: "Enter the Email addresses of the users you would like to add, separated by commas"
@@ -13388,6 +13414,7 @@ en-AU:
   give_all_students_the_same_percent_grade_for_assig_6a008004: "Give all students the same *percent* mark for **%{assignment.name}** by entering and submitting a mark value below:"
   give_this_filter_a_name_36b4b03a: "Give this filter a name"
   give_your_filter_preset_a_name_11144c73: "Give your filter preset a name"
+  gives_users_access_to_new_optional_features_like_s_71cc5bb0: "Gives users access to new optional features like setting a default signature that will be added at the end of outgoing messages and setting an autoresponder."
   giving_up_on_retrieving_media_sources_this_issue_w_ad49b0d3: "Giving up on retrieving media sources. This issue will probably resolve itself eventually."
   global_announcements_a78912c8: "Global Announcements"
   global_announcements_add_edit_delete_843ca4d2: "Global Announcements - add / edit / delete"
@@ -14163,6 +14190,7 @@ en-AU:
   graded_date_by_grader_e8e1ff75: "%{graded_date} by %{grader}"
   graded_discussion_17cc8eaf: "Marked Discussion"
   graded_discussion_a873bb3e: "Marked discussion:"
+  graded_discussion_submission_6ee4187e: "Graded discussion submission"
   graded_on_submission_60ac3010: "Marked on submission"
   graded_quiz_7fabdf1f: "Marked Quiz"
   graded_submissions_9c7068a2: "Marked submissions:"
@@ -15855,6 +15883,7 @@ en-AU:
   inactive_enrollments_bd1831ea: "Inactive Enrolments"
   inappropriate_1930c574: Inappropriate
   inbox_bb245a60: Inbox
+  inbox_settings_qw_updates_a3eb954b: "Inbox Settings - QW Updates"
   include_a_download_link_next_to_each_file_link_in__481761de: "Include a download link next to each file link in the RCE"
   include_a_link_to_a_screencast_screenshot_using_so_4b2fabcb: "Include a link to a screencast/screenshot using something like *Jing*."
   include_a_link_to_show_a_qr_code_to_easy_mobile_lo_f3da1267: "Include a link to show a QR code to easy mobile login on the profile page."
@@ -17071,6 +17100,7 @@ en-AU:
   log_in_to_submit_962106cf: "Log in to submit"
   log_in_url_is_not_a_valid_uri_7b8c57ee: "Log in URL is not a valid URI"
   log_lti_launches_ff06c5fe: "Log LTI launches"
+  log_lti_launches_site_admin_bc4a0b70: "Log LTI launches (Site Admin)"
   log_on_url_fc166e4c: "Log On URL"
   log_out_379ba28a: "Log Out"
   log_out_url_2605c2c1: "Log Out URL"
@@ -19887,6 +19917,7 @@ en-AU:
   moduletitle_unpublished_8a70e0cd: "%{moduleTitle} (unpublished)"
   mon_8f18082a: Mon
   monday_432ff613: Monday
+  month_4b83b95f: Month
   month_s_5c17590e: Month(s)
   monthandday_starting_at_time_769b12c8: "%{monthAndDay} starting at %{time}"
   months_afdf2830: Months
@@ -19895,6 +19926,7 @@ en-AU:
   moodle_formula_many_warning_title: "There are %{count} Formula questions in this bank that will need to have their possible answers regenerated"
   moodle_formula_warning_title: "Possible answers will need to be regenerated for Formula question"
   more_cf9cc661: More
+  more_control_over_password_settings_at_institution_78d7e069: "More control over password settings at institution level"
   more_courses_5ebbe998: "More Courses"
   more_details_in_the_speedgrader_8702f408: "More details in the SpeedGrader"
   more_importantly_canvas_allows_you_to_add_outcomes_78822cf: "More importantly, Canvas allows you to add outcomes to your marking rubrics so that you can evaluate mastery as you mark assignments. Once you've set up outcomes, click Manage Rubrics to start using your outcomes for marking."
@@ -21976,6 +22008,7 @@ en-AU:
         recording_enabled: "Allow conferences to be recorded."
         replace_with_alternatives: "Disable BigBlueButton conferences; show a list of alternatives instead"
         secret: Secret
+        send_avatar: "Send user avatar to BigBlueButton on join"
         use_fallback: "Use BigBlueButton Fallback Plugin settings to look for recordings for conferences that weren't hosted by the currently configured BBB instance."
       secret_description: "This is the %{parameter_name} parameter that can be found in the %{filename} config file."
     buttons: 
@@ -24849,6 +24882,7 @@ en-AU:
   record_upload_media_5fdce166: "Record/Upload Media"
   record_upload_media_comment_4d01b943: "Record/Upload Media Comment"
   record_video_70dc8439: "Record Video"
+  record_videos_and_screen_capture_with_auto_caption_5c6bc705: "Record videos and screen capture with auto captioning."
   record_with_microphone_only_e4ee07aa: "Record with Microphone Only"
   record_with_webcam_af21e07c: "Record with Webcam"
   recording_98da6bda: Recording
@@ -26326,6 +26360,7 @@ en-AU:
   send_to_b940900a: "Send To..."
   send_to_ce05b460: "Send to"
   send_usage_metrics_cecc7a7d: "Send usage metrics"
+  send_user_avatar_to_bigbluebutton_17cda2f6: "Send user avatar to BigBlueButton"
   sending_bf324366: Sending...
   sending_message_75923692: "Sending message"
   sending_message_8ac5bc90: "Sending Message..."
@@ -29599,6 +29634,7 @@ en-AU:
   this_most_likely_happened_because_you_imported_cou_a78ea880: "This most likely happened because you imported course content without its associated files."
   this_name_appears_in_sorted_lists_dccbd84b: "This name appears in sorted lists."
   this_name_will_be_used_by_teachers_for_grading_9b6aa8a0: "This name will be used by teachers for marking."
+  this_number_must_be_between_1_and_10_d8400fc6: "This number must be between 1 and 10"
   this_option_is_not_compatible_with_new_quizzes_ed489d7c: "This option is not compatible with New Quizzes"
   this_option_is_not_compatible_with_quizzes_next_6dacd0c1: "This option is not compatible with Quizzes.Next"
   this_outcome_has_been_used_to_assess_a_student_and_376d5ba9: "This outcome has been used to assess a student and can no longer be updated."
@@ -30679,6 +30715,8 @@ en-AU:
   total_activity_21022e7c: "Total Activity"
   total_column_options_4e6a6032: "Total Column Options"
   total_grade_b0c33841: "Total: %{grade}"
+  total_grade_higher_than_4c546517: "Total grade higher than"
+  total_grade_lower_than_98891fe4: "Total grade lower than"
   total_messages_af025be6: "Total messages"
   total_options_351e2682: "Total Options"
   total_points_44d76792: "Total Points"
@@ -30987,6 +31025,7 @@ en-AU:
   unknown_quiz: "Unknown quiz"
   unknown_quiz_3892d071: "Unknown Quiz"
   unknown_role_cbe9a089: "Unknown Role"
+  unknown_sender_68b1abbc: "unknown sender"
   unknown_status_status_35331e1d: "Unknown status, %{status}"
   unknown_status_status_message_3a4ed4d5: "Unknown status, %{status}: %{message}"
   unknown_user_1113fcaa: "Unknown User"
@@ -32061,6 +32100,7 @@ en-AU:
   warning_for_improved_accessibility_of_calendar_eve_da54b4e2: "Warning: For improved accessibility to calendar events, please use the agenda view."
   warning_for_improved_accessibility_of_reordering_a_5d0206c7: "Warning: for improved accessibility to reordering assignments and groups, please use the Move To Dialog option found in the menu."
   warning_for_improved_accessibility_please_click_he_e6472c02: "Warning: For improved accessibility, please click here to use the Individual View Markbook."
+  warning_for_improved_accessibility_please_use_the__1075c150: "Warning: For improved accessibility, please use the \"Agenda view\" Calendar."
   warning_for_improved_accessibility_with_annotated__43e3a5ea: "Warning: For improved accessibility with Annotated Assignments, please use File Upload or Text Entry to leave comments."
   warning_icon_f64936d7: "warning icon"
   warning_if_there_are_any_users_with_this_role_they_1a7c1fef: "Warning: If there are any users with this role, they will keep the current permissions but you will not be able to create new users with this role."
@@ -32134,6 +32174,7 @@ en-AU:
   website_url_url_bd07233d: "Website URL: %{url}"
   wed_84932f18: Wed
   wednesday_b6f755f5: Wednesday
+  week_1f945ddd: Week
   week_s_cb1492ee: Week(s)
   weekly_schedule_navigation_6b042645: "Weekly schedule navigation"
   weekly_summary_56cd0c95: "Weekly summary"
@@ -32222,6 +32263,9 @@ en-AU:
       (inconsistent) behaviour is followed. This flag applies only to consortium
       _child_ accounts. This flag does not affect centrally-managed consortia in
       any way.
+  when_enabled_for_an_account_sends_data_for_all_lti_77568a4f: |-
+      When enabled for an account, sends data for all LTI launches to the PandataEvents system
+      for querying and visualisation. Requires Log LTI launches (Site Admin) to also be enabled.
   when_enabled_for_the_parent_account_of_a_non_centr_4d7adbaa: |-
       When enabled for the parent account of a non-centrally managed consortium,
       turning on/off developer keys in the parent will not affect the tool
