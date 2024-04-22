@@ -84,7 +84,7 @@ describe('AssignmentAvailabilityContainer', () => {
   describe('desktop', () => {
     it('should render', () => {
       const container = setup()
-      expect(container.getByText('Show Due Dates (3)')).toBeInTheDocument()
+      expect(container.getByText('View Due Dates')).toBeInTheDocument()
     })
   })
 
@@ -97,7 +97,7 @@ describe('AssignmentAvailabilityContainer', () => {
 
     it('should render', () => {
       const container = setup()
-      expect(container.getByText('Due Dates (3)')).toBeInTheDocument()
+      expect(container.getByText('Due Dates')).toBeInTheDocument()
     })
   })
 })
