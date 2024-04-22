@@ -27259,6 +27259,7 @@ nn:
         select_folder_for_uploads: "Vel mappe for filopplastingar "
     wiki_page: 
       buttons: 
+        assign_to: "Tilordne til"
         edit: Rediger
         view_all_pages: "Vis alle sider"
       delete_wiki: Slett
