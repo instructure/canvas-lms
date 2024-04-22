@@ -1488,6 +1488,8 @@ ru:
               check_box: "CSV членства в группе"
           groups: 
             check_box: "CSV групп"
+          include_deleted: 
+            check_box: "Включить удаленные объекты"
           sections: 
             check_box: "CSV разделов"
           terms: 
@@ -2339,6 +2341,7 @@ ru:
   add_edit_delete_files_573a4d62: "добавить / редактировать / удалить файлы"
   add_edit_delete_sections_d32c5b4d: "добавить / редактировать / удалить разделы"
   add_email_address_aef3b61: "Добавить адрес электронной почты"
+  add_event_9e21d0ff: "Добавить событие"
   add_existing_content_7e36da66: "Добавить имеющееся содержимое"
   add_external_feed_6d437a28: "Добавить внешний канал"
   add_feed_49ed1cb2: "Добавить канал"
@@ -2478,6 +2481,7 @@ ru:
   additional_occurrence_s_7b5b0173: "дополнительное(-ые) событие(-я)"
   additional_options_7cefee79: "Дополнительные параметры"
   additional_outcomes_options_6df428f1: "Дополнительные варианты отображения результатов"
+  additional_replies_required_13697d0a: "Требуются дополнительные ответы"
   additional_settings_20362654: "Дополнительные настройки"
   additional_settings_for_sis_syncing_f926973e: "Дополнительные настройки для синхронизации SIS"
   additional_sis_sync_assignment_quiz_and_discussion_d941fa5: "Дополнительные SIS-настройки синхронизации заданий, контрольных работ и обсуждений"
@@ -2490,6 +2494,9 @@ ru:
   address_use_as_wildcard_48f2cf60: "Адрес (использовать * в качестве подстановочного знака)"
   addressbook_microservice_a4940422: "AddressBook микрослужба"
   addressbook_performance_tap_98ddf67: "AddressBook функциональный тап"
+  adds_a_new_admin_setting_to_the_bigbluebutton_plug_fa648486: |-
+      Добавляет новую настройку администратора к плагину BigBlueButton для разрешения
+      отправки аватаров пользователей при присоединении к конференции.
   adds_a_new_bounced_emails_tab_to_account_admin_too_6714c09d: |-
       Добавляет новую вкладку «Отклоненные сообщения электронной почты» в инструменты администратора учетных записей, которая
       позволяет выполнять поиск адресов электронной почты, на которых уведомления Canvas
@@ -2519,6 +2526,8 @@ ru:
   adjusting_due_dates_a5918b9c: "Установка дат сдачи..."
   admin_4d3ba42f: Админ
   admin_analytics_course_readiness_c79f13e1: "Аналитика администратора - Готовность курса"
+  admin_analytics_dap_30f431d6: "Аналитика админа DAP"
+  admin_analytics_dap_model_description: "Включает использование DAP для Analytics на уровне учетной записи."
   admin_analytics_description: "Включает аналитику на уровне учетной записи. Информационные панели Admin Analytics (Аналитика Администратора) предоставляют подробную информацию об использовании Canvas, о результатах курсов Canvas и вовлеченности учащихся. Более подробная информация содержится в *Admin Analytics Hub* (Центр Аналитики Администратора) в сообществе Canvas."
   admin_analytics_eacba735: "Аналитика Администратора"
   admin_analytics_new_filter_ui_aee1ea8e: "Admin Analytics - Новый фильтр интерфейса пользователя"
@@ -2547,8 +2556,9 @@ ru:
   admins_add_remove_26811ce5: "Админы - добавить / удалить"
   advanced_36b35b8: Продвинутый
   advanced_analytics_6a2419af: "Advanced Analytics"
-  advanced_analytics_ask_questions: "Включает возможность задавать вопросы по курсу Advanced Analytics и соответствующее разрешение."
+  advanced_analytics_ask_questions: "Включает функцию Advanced Analytics - Ask Your Data и сопутствующее разрешение."
   advanced_analytics_ask_questions_26553cd2: "Advanced Analytics – задать вопросы"
+  advanced_analytics_ask_your_data_ab54433: "Advanced Analytics - Ask Your Data"
   advanced_analytics_course_readiness_and_students_i_6b3c439f: "Advanced Analytics — готовность к курсу и учащиеся, нуждающиеся во внимании"
   advanced_analytics_course_readiness_closed_alpha_13c8aaf: "Advanced Analytics — Готовность курса, закрытая Альфа"
   advertise_release_notes_via_the_ui_9254bc6c: "Показывать примечания к выпуску через пользовательский интерфейс"
@@ -2574,6 +2584,7 @@ ru:
   after_the_due_date_eee89c9c: "После даты выполнения"
   after_the_first_attempt_you_cannot_leave_comments__3922325f: "После первой попытки нельзя оставлять комментарии до тех пор, пока вы не отправите задание."
   after_throttling_the_selected_jobs_the_newly_creat_44952b37: "После регулирования выбранных заданий выбирается вновь созданная линия."
+  agenda_b010136d: Программа
   ahead_21f22939: Вперед
   ai_driven_smart_search_feature_597dbd4f: "Функция интеллектуального поиска на основе искусственного интеллекта."
   ajax_errors: 
@@ -2829,6 +2840,9 @@ ru:
   allows_for_discussion_replies_to_be_sorted_accordi_1065cccc: |-
       Позволяет сортировать ответы в обсуждении в соответствии с временными метками создания
       . По умолчанию для ответов на корневом уровне используется порядок от самых новых к самым старым.
+  allows_for_quickly_enabling_or_disabling_lti_launc_7eee7943: |-
+      Позволяет быстро включать или отключать регистрацию
+      запуска LTI на уровне учетной записи.
   allows_graders_to_type_mi_in_the_gradebook_or_spee_a9bb3577: "Позволяет оценщикам до типа MI в журнале оценок или SpeedGrader вручную помечать задание как отсутствующее"
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: "Позволяет отмечать ссылки для вызова справки как выбранные или новые и постоянно отображать ссылку для вызова выбранной функции справки в меню справки"
   allows_instructors_to_apply_scores_to_ungraded_sub_7e772795: "Позволяет преподавателям массово применять баллы к неоцененным работам."
@@ -4147,6 +4161,7 @@ ru:
   as_you_type_in_this_field_the_list_of_results_will_c1a1a3e4: "По мере ввода текста в это поле, список результатов будет автоматически обновляться."
   ascending_b3c87427: "В порядке возрастания"
   ask_questions_f6b301fe: "Задать вопросы"
+  ask_your_data_da53791f: "Ask Your Data"
   ask_your_instructor_a_question_a61ca5e9: "Задайте вопрос вашему преподавателю"
   assess_and_survey_your_students_ce8172a9: "Оцените и опросите ваших учащихся"
   assess_student_understanding_1e0b8d7f: "Оценка степени усвоения информации учащимися"
@@ -5862,6 +5877,7 @@ ru:
   calculation_int_is_not_a_valid_value_for_this_calc_1de6e060: "'%{calculation_int}' не является допустимым значением для данного метода вычислений. Значение должно быть в диапазоне между '%{valid_calculation_ints_min}' и '%{valid_calculation_ints_max}'"
   calculation_method_fe281f9: "Метод вычисления"
   calculation_method_must_be_one_of_the_following_ca_d8ae5dac: "calculation_method должен быть одним из следующих: %{calc_methods}"
+  calculations_fd087607: Расчеты
   calculator: 
     buttons: 
       save: Сохранить
@@ -7036,6 +7052,7 @@ ru:
     from_beginning: начало
     to_now: сейчас
   comma_separated_list_of_users_sis_id_332c98f1: "Список разделенных запятыми SIS ID пользователей"
+  comment_7ef1428e: Комментарий
   comment_added_33ab70d9: "Комментарий добавлен"
   comment_by_replying_to_this_message_or_join_the_co_26d42fde: "Оставьте комментарий, ответив на это сообщение, или присоединитесь к обсуждению по этой ссылке: %{link}."
   comment_by_replying_to_this_message_or_join_the_co_52b5ac1c: "Прокомментируйте, отвечая на это сообщение, или присоединитесь к разговору по этой ссылке: %{link}. Когда это допустимо, если вам необходимо приложить какой-либо файл, выполните вход в систему Canvas и дайте ответ по обсуждаемому вопросу."
@@ -10008,6 +10025,7 @@ ru:
   create_new_criterion_1a4efd4: "Создать новый критерий"
   create_new_discussions_6ab69da2: "Создать новые обсуждения"
   create_new_e0946c49: "Создать новый"
+  create_new_event_e9fb2fb6: "Создать новое событие"
   create_new_filter_c244aa92: "Создать новый фильтр"
   create_new_group_bf9561d4: "Создать новую группу"
   create_new_group_fca5cc73: "Создать новую группу"
@@ -10065,6 +10083,7 @@ ru:
   criteria_9fac648: Критерии
   criteria_builder_b214069e: "Конструктор критериев"
   criterion_5f0b62f8: Критерий
+  criterion_comment_642f7747: "Комментарий к критерию"
   criterion_created_42669293: "Критерий создан"
   criterion_description_757741c3: "Описание критерия"
   criterion_long_description_e9a97247: "Длинное описание критерия"
@@ -10202,6 +10221,10 @@ ru:
   current_terms_bcf31fb2: "Текущие семестры"
   current_theme_62e5e8cf: "Текущая тема"
   current_total_67bf5f72: "Текущий общий балл:"
+  current_total_score_is_higher_than_cutoff_c11e90b8: "Текущий общий балл выше, чем %{cutoff}%"
+  current_total_score_is_higher_than_cutoff_f2ef8ae: "Текущий общий балл выше, чем %{cutoff}"
+  current_total_score_is_lower_than_cutoff_5f78d46: "Текущий общий балл ниже, чем %{cutoff}"
+  current_total_score_is_lower_than_cutoff_a2b1ec5a: "Текущий общий балл ниже, чем %{cutoff}%"
   current_volume_level_c55ab825: "Уровень текущего объема"
   currently_assigned_to_tokenname_click_to_remove_5a853a84: "В настоящее время закреплено за %{tokenName}, нажмите, чтобы удалить"
   currently_selected_color_93f44b9f: "Текущий выбранный цвет"
@@ -11405,6 +11428,7 @@ ru:
   display_as_e2a5c383: "Отобразить как"
   display_as_percentage_3e755dc: "Показать в процентах"
   display_as_points_63084235: "Отобразить как точки"
+  display_course_calculation_options_11890a89: "Отображение опций расчета курса"
   display_course_catalog: "Отображает список курсов с возможностью поиска данной корневой учетной записи с включенным флагом \"Включить данный курс в индекс общедоступного курса\"."
   display_e6546241: Отобразить
   display_filter_options_34fb6be2: "Опции фильтрации отображения"
@@ -12055,6 +12079,7 @@ ru:
   english_canada_12688ee4: "Английский язык (Канада)"
   english_united_kingdom_a613f831: "Английский язык (Великобритания)"
   enhance_color_contrast_of_content_685ddd49: "Повысить цветовую контрастность содержимого"
+  enhance_password_options_efbf3e48: "Расширение возможностей паролей"
   enhanced_docviewer_url_security_72e9baa9: "Расширенная безопасность URL DocViewer"
   enhanced_grade_change_auditing_2b155dfa: "Расширенная проверка изменения оценок"
   enhanced_gradebook_filters_a3be5e7d: "Усовершенствованные фильтры журнала успеваемости"
@@ -12230,6 +12255,7 @@ ru:
                           Ознакомьтесь с порядком **генерирования токена доступа**.
   enter_the_access_token_for_your_organization_from__cc77493d: "Введите маркер доступа для вашей организации от *eduappcenter.com*. После применения на странице Внешние Приложения будут перечислены только те приложения, которые ваша организация одобрила в EduAppCenter. Узнайте, как **генерировать маркер доступа**."
   enter_the_access_token_for_your_organization_from__f1c71941: "Введите токен доступа для своей организации из *eduappcenter.com*. После применения только приложения, одобренные вашей организацией в EduAppCenter, будут отображаться на странице внешних приложений.                       Ознакомьтесь с порядком **генерирования токена доступа**."
+  enter_the_date_you_would_like_to_navigate_to_a712de47: "Введите дату, к которой вы хотели бы перейти."
   enter_the_description_91ececc1: "Введите описание"
   enter_the_email_address_of_the_user_you_would_like_92112560: "Введите адрес электронной почты пользователя, которого вы хотите временно зарегистрировать."
   enter_the_email_addresses_of_the_users_you_would_l_17cef6a0: "Введите через запятую адреса электронной почты пользователей, которых вы хотите добавить"
@@ -13748,6 +13774,7 @@ ru:
   give_all_students_the_same_percent_grade_for_assig_6a008004: "Поставить всем студентам одинаковую оценку *в процентах* за **%{assignment.name}** путем ввода и отправки значения оценки ниже:"
   give_this_filter_a_name_36b4b03a: "Присвоить этому фильтру имя"
   give_your_filter_preset_a_name_11144c73: "Присвойте имя своему заранее настроенному фильтру"
+  gives_users_access_to_new_optional_features_like_s_71cc5bb0: "Предоставляет пользователям доступ к таким новым дополнительным функциям, как задание подписи по умолчанию, которая будет добавляться в конец исходящих сообщений, и настройка автоответчика."
   giving_up_on_retrieving_media_sources_this_issue_w_ad49b0d3: "Отказ от попыток получения доступа к источникам мультимедиа. Эта проблема в конечном счете может разрешиться сама по себе."
   global_announcements_a78912c8: "Общие объявления"
   global_announcements_add_edit_delete_843ca4d2: "Глобальные объявления - добавить / редактировать / удалить"
@@ -14545,6 +14572,7 @@ ru:
   graded_date_by_grader_e8e1ff75: "%{graded_date} по %{grader}"
   graded_discussion_17cc8eaf: "Оцениваемая дискуссия"
   graded_discussion_a873bb3e: "Оцененное обсуждение:"
+  graded_discussion_submission_6ee4187e: "Отправка обсуждения с выставленной оценкой"
   graded_on_submission_60ac3010: "Оценка по отправке"
   graded_quiz_7fabdf1f: "Оцененное тестирование"
   graded_submissions_9c7068a2: "Оцененные отправки:"
@@ -16252,6 +16280,7 @@ ru:
   inactive_enrollments_bd1831ea: "Неактивные регистрации"
   inappropriate_1930c574: Недопустимый
   inbox_bb245a60: Входящие
+  inbox_settings_qw_updates_a3eb954b: "Настройки Inbox - Обновления QW"
   include_a_download_link_next_to_each_file_link_in__481761de: "Добавьте ссылку для скачивания рядом с каждой ссылкой на файл в RCE"
   include_a_link_to_a_screencast_screenshot_using_so_4b2fabcb: "Включите ссылку на скринкаст / скриншоте, используя что-то вроде *jing*."
   include_a_link_to_show_a_qr_code_to_easy_mobile_lo_f3da1267: "Включает в себя ссылку, позволяющую показать код QR для упрощения регистрации на странице профиля с мобильного устройства."
@@ -17477,6 +17506,7 @@ ru:
   log_in_to_submit_962106cf: "Войдите, чтобы отправить"
   log_in_url_is_not_a_valid_uri_7b8c57ee: "URL-адрес входа не является допустимым URL"
   log_lti_launches_ff06c5fe: "Журнал регистрации запусков LTI"
+  log_lti_launches_site_admin_bc4a0b70: "Регистрация запусков LTI (администратор сайта)"
   log_on_url_fc166e4c: "URL-адрес входа в систему"
   log_out_379ba28a: Выйти
   log_out_url_2605c2c1: "URL-адрес выхода из системы"
@@ -20331,6 +20361,7 @@ ru:
   moduletitle_unpublished_8a70e0cd: "%{moduleTitle} (публикация отменена)"
   mon_8f18082a: Пн
   monday_432ff613: Понедельник
+  month_4b83b95f: Месяц
   month_s_5c17590e: "Месяц (месяцев)"
   monthandday_starting_at_time_769b12c8: "%{monthAndDay} начиная с %{time}"
   months_afdf2830: Месяцы
@@ -20339,6 +20370,7 @@ ru:
   moodle_formula_many_warning_title: "%{count} вопроса (-ов) с формулой в данном банке требуют повторного создания возможных ответов на них"
   moodle_formula_warning_title: "Необходимо повторно создать возможные ответы для вопроса с формулой"
   more_cf9cc661: Больше
+  more_control_over_password_settings_at_institution_78d7e069: "Больше контроля над настройками паролей на уровне учреждения"
   more_courses_5ebbe998: "Другие курсы"
   more_details_in_the_speedgrader_8702f408: "Дополнительные сведения см. в SpeedGrader"
   more_importantly_canvas_allows_you_to_add_outcomes_78822cf: "Что еще более важно, Canvas позволяет добавлять результаты в ваши рубрики выставления оценок, чтобы вы могли оценивать усвоение по мере того, как вы оцениваете задания. После того, как вы настроили результаты, нажмите «Управление рубриками», чтобы начать использовать результаты для выставления оценок."
@@ -22433,6 +22465,7 @@ ru:
         recording_enabled: "Разрешить записывать конференции."
         replace_with_alternatives: "Запрещает веб-конференции BigBlueButton; вместо этого отображается перечень альтернативных вариантов"
         secret: Секретная
+        send_avatar: "Отправить аватар пользователя BigBlueButton при присоединении"
         use_fallback: "Используйте плагин возврата в исходное положение BigBlueButton для просмотра записей конференций, которые не были размещены текущим сконфигурированным экземпляром BBB."
       secret_description: "Это параметр %{parameter_name}, который находится в файле конфигурации %{filename}."
     buttons: 
@@ -25400,6 +25433,7 @@ ru:
   record_upload_media_5fdce166: "Записать / загрузить мультимедиа"
   record_upload_media_comment_4d01b943: "Запись/загрузка мультимедийного комментария"
   record_video_70dc8439: "Записать видео"
+  record_videos_and_screen_capture_with_auto_caption_5c6bc705: "Запись видео и захват экрана с автоматическим добавлением заголовков."
   record_with_microphone_only_e4ee07aa: "Запись только с помощью микрофона"
   record_with_webcam_af21e07c: "Запись с помощью веб-камеры"
   recording_98da6bda: Запись
@@ -26913,6 +26947,7 @@ ru:
   send_to_b940900a: "Отправить в..."
   send_to_ce05b460: Отправить
   send_usage_metrics_cecc7a7d: "Отправить метрики использования"
+  send_user_avatar_to_bigbluebutton_17cda2f6: "Отправить аватар пользователя в BigBlueButton"
   sending_bf324366: Отправка...
   sending_message_75923692: "Идет отправка сообщения"
   sending_message_8ac5bc90: "Отправка сообщения..."
@@ -30244,6 +30279,7 @@ ru:
   this_most_likely_happened_because_you_imported_cou_a78ea880: "Скорее всего, это произошло потому, что вы импортировали содержимое курса без связанных с ним файлов."
   this_name_appears_in_sorted_lists_dccbd84b: "Это имя уже присутствует в отсортированных списках."
   this_name_will_be_used_by_teachers_for_grading_9b6aa8a0: "Это имя будет использоваться преподавателями для выставления оценок."
+  this_number_must_be_between_1_and_10_d8400fc6: "Этот номер телефона должен быть в диапазоне от 1 до 10"
   this_option_is_not_compatible_with_new_quizzes_ed489d7c: "Эта опция несовместима с функцией Новые тестирования"
   this_option_is_not_compatible_with_quizzes_next_6dacd0c1: "Этот параметр не совместим с Quizzes.Next"
   this_outcome_has_been_used_to_assess_a_student_and_376d5ba9: "Этот результат был использован для оценки студента и не может больше быть обновлен"
@@ -31328,6 +31364,8 @@ ru:
   total_activity_21022e7c: "Общая активность"
   total_column_options_4e6a6032: "Общие Опции столбцов"
   total_grade_b0c33841: "Итого: %{grade}"
+  total_grade_higher_than_4c546517: "Общая оценка выше, чем"
+  total_grade_lower_than_98891fe4: "Общая оценка ниже, чем"
   total_messages_af025be6: "Всего сообщений"
   total_options_351e2682: "Всего опций"
   total_points_44d76792: "Общее число баллов"
@@ -31642,6 +31680,7 @@ ru:
   unknown_quiz: "Неизвестное тестирование"
   unknown_quiz_3892d071: "Неизвестное тестирование"
   unknown_role_cbe9a089: "Неизвестная роль"
+  unknown_sender_68b1abbc: "неизвестный отправитель"
   unknown_status_status_35331e1d: "Неизвестный статус, %{status}"
   unknown_status_status_message_3a4ed4d5: "Неизвестный статус, %{status}: %{message}"
   unknown_user_1113fcaa: "Неизвестный пользователь"
@@ -32732,6 +32771,7 @@ ru:
   warning_for_improved_accessibility_of_calendar_eve_da54b4e2: "Внимание: Для улучшения доступности календарных событий, пожалуйста, используйте вкладку повестки дня"
   warning_for_improved_accessibility_of_reordering_a_5d0206c7: "Предупреждение. Для улучшения доступности переназначения заданий и групп, используйте расположенную в меню опцию «Переместить в диалог»."
   warning_for_improved_accessibility_please_click_he_e6472c02: "Предупреждение. Для улучшения доступности, щелкните здесь, чтобы использовать индивидуальное представление Табеля успеваемости."
+  warning_for_improved_accessibility_please_use_the__1075c150: "Внимание! Для улучшения доступности используйте календарь «Просмотр программы»."
   warning_for_improved_accessibility_with_annotated__43e3a5ea: "Внимание! Для улучшения доступности аннотированных заданий используйте загрузку файлов или ввод текста, чтобы оставить комментарии."
   warning_icon_f64936d7: "иконка предупреждения"
   warning_if_there_are_any_users_with_this_role_they_1a7c1fef: "Внимание! Если имеются пользователи с этой ролью, они сохранять текущие разрешения, но вы не сможете создавать новых пользователей с этой ролью."
@@ -32807,6 +32847,7 @@ ru:
   website_url_url_bd07233d: "URL-адрес веб-сайта: %{url}"
   wed_84932f18: Ср
   wednesday_b6f755f5: Среда
+  week_1f945ddd: Неделя
   week_s_cb1492ee: "Неделя (недель)"
   weekly_schedule_navigation_6b042645: "Навигация по еженедельному расписанию"
   weekly_summary_56cd0c95: "Еженедельная сводка"
@@ -32897,6 +32938,9 @@ ru:
       (несогласованное) поведение. Этот флаг относится только к учетным записям
       _child_ консорциума. Этот флаг никак не влияет на консорциумы с центральным
       управлением.
+  when_enabled_for_an_account_sends_data_for_all_lti_77568a4f: |-
+      Если эта функция включена для учетной записи, она отправляет данные обо всех запусках LTI в PandataEvents систему
+      для запроса и визуализации. Требуется, чтобы также была включена регистрация запусков LTI (администратор сайта).
   when_enabled_for_the_parent_account_of_a_non_centr_4d7adbaa: |-
       Если включено для родительской учетной записи консорциума без центрального управления,
       включение и выключение ключей разработчика в родительском элементе не повлияют на установку

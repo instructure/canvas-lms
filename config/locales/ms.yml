@@ -1139,6 +1139,8 @@ ms:
               check_box: "CSV Keahlian Kumpulan"
           groups: 
             check_box: "CSV Kumpulan"
+          include_deleted: 
+            check_box: "Termasuk Objek Dipadam"
           sections: 
             check_box: "CSV Seksyen"
           terms: 
@@ -1847,6 +1849,7 @@ ms:
   add_domain_lookup_825f9eb7: "Tambah Carian Domain"
   add_edit_and_delete_events_on_account_calendars_71bea006: "Tambah, edit atau padam acara pada kalendar akaun"
   add_email_address_aef3b61: "Tambah Alamat E-mel"
+  add_event_9e21d0ff: "Tambah Acara"
   add_external_feed_6d437a28: "Tambah Suapan Luar"
   add_feed_49ed1cb2: "Tambah Suapan"
   add_files_to_the_course_da6ffd32: "Tambah Fail pada Kursus"
@@ -1953,6 +1956,7 @@ ms:
   additional_considerations_f3801683: "Pertimbangan tambahan"
   additional_occurrence_s_7b5b0173: "kejadian tambahan"
   additional_options_7cefee79: "Pilihan tambahan"
+  additional_replies_required_13697d0a: "Balasan Tambahan Diperlukan"
   additional_settings_20362654: "Tetapan tambahan"
   additional_settings_for_sis_syncing_f926973e: "Tetapan tambahan untuk penyegerakan SIS"
   additional_sis_sync_assignment_quiz_and_discussion_d941fa5: "Tetapan Penyegerakan SIS Tugasan, Kuiz dan Perbincangan tambahan"
@@ -1962,6 +1966,9 @@ ms:
   address_book_input_a0d8e76f: "Input Buku Alamat"
   address_book_menu_c986b615: "Menu Buku Alamat"
   address_use_as_wildcard_48f2cf60: "Alamat (guna * sebagai kad bebas)"
+  adds_a_new_admin_setting_to_the_bigbluebutton_plug_fa648486: |-
+      Menambah tetapan pentadbir baharu pada pemalam BigBlueButton untuk membolehkan
+      penghantaran avatar pengguna setelah menyertai persidangan.
   adds_a_new_page_to_the_admin_tools_that_allows_adm_910ea694: |-
       Menambah halaman baharu ke alat pentadbir yang membolehkan pentadbir melihat dan mengurus
       pengguna yang dipadamkan. Juga membolehkan pentadbir mencari pengguna yang dipadamkan dengan kotak semak
@@ -1983,6 +1990,8 @@ ms:
   adjust_events_and_due_dates_879744fc: "Laraskan acara dan tarikh siap"
   admin_4d3ba42f: Pentadbir
   admin_analytics_course_readiness_c79f13e1: "Analisis Pentadbir - Ketersediaan Kursus"
+  admin_analytics_dap_30f431d6: "DAP Analisis Pentadbir"
+  admin_analytics_dap_model_description: "Mendayakan penggunaan DAP untuk Analisis pada tahap akaun."
   admin_analytics_description: "Mendayakan Analisis pada tahap akaun. Papan pemuka Analisis pentadbir menyediakan butiran tentang penggunaan Canvas, kejayaan kursus Canvas dan penglibatan pelajar. Ketahui lebih lanjut dalam *Hab Analisis Pentadbir* dalam komuniti Canvas."
   admin_analytics_eacba735: "Analisis Pentadbir"
   admin_analytics_new_filter_ui_aee1ea8e: "Analisis Pentadbir - UI Penapis Baharu"
@@ -2009,8 +2018,9 @@ ms:
   admins_add_remove_26811ce5: "Pentadbir - tambah / alih keluar"
   advanced_36b35b8: Lanjutan
   advanced_analytics_6a2419af: "Analisis Lanjutan"
-  advanced_analytics_ask_questions: "Mendayakan Analisis Lanjutan - Tanya Soalan dan keizinan sertaan."
+  advanced_analytics_ask_questions: "Mendayakan Analisis Lanjutan - ciri Tanya Data Anda dan keizinan sertaan."
   advanced_analytics_ask_questions_26553cd2: "Analisis Lanjutan - Tanya Soalan"
+  advanced_analytics_ask_your_data_ab54433: "Analisis Lanjutan - Tanya Data Anda"
   advanced_analytics_course_readiness_and_students_i_6b3c439f: "Analisis Lanjutan - Ketersediaan Kursus dan Pelajar yang Memerlukan Perhatian"
   advanced_analytics_course_readiness_closed_alpha_13c8aaf: "Analisis Lanjutan - Alfa Tertutup Ketersediaan Kursus"
   afghanistan_93_ab06805: "Afghanistan (+93)"
@@ -2024,6 +2034,7 @@ ms:
   after_the_due_date_eee89c9c: "Selepas tarikh siap"
   after_the_first_attempt_you_cannot_leave_comments__3922325f: "Selepas percubaan pertama, anda tidak boleh meninggalkan komen sehingga anda menyerahkan tugasan."
   after_throttling_the_selected_jobs_the_newly_creat_44952b37: "Selepas pendikitan kerja yang terpilih, bebenang yang baru dicipta akan dipilih."
+  agenda_b010136d: Agenda
   ai_driven_smart_search_feature_597dbd4f: "Ciri carian pintar berpacukan AI"
   ajax_errors: 
     error_heading: "Ralat Ajax: %{status_code}"
@@ -2229,6 +2240,9 @@ ms:
   allows_blueprint_courses_to_keep_track_of_assignme_3faaa416: "Membenarkan kursus cetakan biru menjejak perubahan id sumber tugasan."
   allows_canvas_to_send_iwork_files_to_docviewer_220f4753: "Membenarkan Canvas menghantar fail iWork ke docviewer."
   allows_course_pages_to_be_published_on_a_schedule_7e12fd52: "Membenarkan halaman kursus diterbitkan mengikut jadual"
+  allows_for_quickly_enabling_or_disabling_lti_launc_7eee7943: |-
+      Membolehkan pendayaan dan penyahdayaan pengelogan pelancaran LTI dengan cepat ketika pelancaran
+      pada tahap akaun.
   allows_graders_to_type_mi_in_the_gradebook_or_spee_a9bb3577: "Membenarkan penggred untuk menaip MI dalam Buku Gred atau SpeedGrader untuk mengetag tugasan secara manual sebagai tiada"
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: "Membenarkan Pautan Bantuan untuk ditag sebagai Sorotan atau Baharu dan pampangkan Sorotan Pautan Bantuan dalam Menu Bantuan."
   allows_instructors_to_apply_scores_to_ungraded_sub_999e34dd: "Membenarkan pengajar memberikan skor untuk serahan tidak bergred secara besar-besaran daripada kumpulan tugasan dan menu lajur Jumlah dalam Buku Gred."
@@ -3038,6 +3052,7 @@ ms:
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: "Ketika anda menaip dalam medan ini, senarai kumpulan akan ditapis secara automatik untuk memasukkan hanya mereka yang namanya sepadan dengan input anda."
   ascending_b3c87427: Menaik
   ask_questions_f6b301fe: "Tanya Soalan"
+  ask_your_data_da53791f: "Tanya Data Anda"
   ask_your_instructor_a_question_a61ca5e9: "Tanya soalan kepada pengajar anda"
   assess_student_understanding_1e0b8d7f: "Taksir pemahaman pelajar"
   assessable_artifacts_include_assignments_quizzes_a_62b9698b: "Artifak boleh taksir termasuk tugasan, kuiz dan diskusi bergred"
@@ -4230,6 +4245,7 @@ ms:
   calculation_int_is_not_a_valid_value_for_this_calc_1de6e060: "'%{calculation_int}' bukan nilai yang sah untuk kaedah pengiraan ini. Nilai mestilah antara '%{valid_calculation_ints_min}' dan '%{valid_calculation_ints_max}'"
   calculation_method_fe281f9: "Kaedah Pengiraan"
   calculation_method_must_be_one_of_the_following_ca_d8ae5dac: "calculation_method mestilah salah satu daripada yang berikut: %{calc_methods}"
+  calculations_fd087607: Pengiraan
   calculator: 
     buttons: 
       save: Simpan
@@ -5168,6 +5184,7 @@ ms:
     from_beginning: permulaan
     to_now: sekarang
   comma_separated_list_of_users_sis_id_332c98f1: "Senarai dipisahkan koma untuk ID SIS Pengguna"
+  comment_7ef1428e: Komen
   comment_added_33ab70d9: "Komen ditambah"
   comment_by_replying_to_this_message_or_join_the_co_52b5ac1c: "Tinggalkan komen dengan membalas mesej ini, atau sertai perbualan menggunakan pautan ini: %{link}. Apabila dibenarkan, jika anda perlu menyertakan kepilan, sila log masuk ke Canvas dan balas pada perbincangan."
   comment_by_replying_to_this_message_or_join_the_co_886bc612: "Tinggalkan komen dengan membalas mesej ini, atau sertai perbualan menggunakan pautan ini: %{link}.Apabila dibenarkan, jika anda perlu menyertakan kepilan, sila log masuk ke Canvas dan balas pada pengumuman."
@@ -7291,6 +7308,7 @@ ms:
   create_new_criterion_1a4efd4: "Cipta Kriteria Baharu"
   create_new_discussions_6ab69da2: "Cipta perbincangan baharu"
   create_new_e0946c49: "Cipta yang baharu"
+  create_new_event_e9fb2fb6: "Cipta Acara Baharu"
   create_new_group_bf9561d4: "Cipta Kumpulan Baharu"
   create_new_group_fca5cc73: "Cipta kumpulan baharu"
   create_new_group_set_13b1f62a: "Cipta Set Kumpulan Baharu"
@@ -7337,6 +7355,7 @@ ms:
   criteria_9fac648: Kriteria
   criteria_builder_b214069e: "Pembina Kriteria"
   criterion_5f0b62f8: Kriteria
+  criterion_comment_642f7747: "Komen Kriteria"
   criterion_created_42669293: "Kriteria Dicipta"
   criterion_description_757741c3: "Perihalan Kriteria"
   criterion_long_description_e9a97247: "Penerangan Lanjut untuk Kriteria"
@@ -7454,6 +7473,10 @@ ms:
   current_terms_bcf31fb2: "Penggal Semasa"
   current_theme_62e5e8cf: "tema semasa"
   current_total_67bf5f72: "Jumlah Semasa:"
+  current_total_score_is_higher_than_cutoff_c11e90b8: "Jumlah skor semasa lebih tinggi daripada %{cutoff}%"
+  current_total_score_is_higher_than_cutoff_f2ef8ae: "Jumlah skor semasa lebih tinggi daripada %{cutoff}"
+  current_total_score_is_lower_than_cutoff_5f78d46: "Jumlah skor semasa lebih rendah daripada %{cutoff}"
+  current_total_score_is_lower_than_cutoff_a2b1ec5a: "Jumlah skor semasa lebih rendah daripada %{cutoff}%"
   current_volume_level_c55ab825: "Tahap Volum Semasa"
   currently_assigned_to_tokenname_click_to_remove_5a853a84: "Pada masa ini ditetapkan untuk %{tokenName}, klik untuk mengalih keluar"
   currently_selected_color_93f44b9f: "Warna Pilihan Semasa"
@@ -8238,6 +8261,7 @@ ms:
   display_as_e2a5c383: "Paparkan sebagai"
   display_as_percentage_3e755dc: "Paparkan sebagai Peratusan"
   display_as_points_63084235: "Paparkan sebagai Mata"
+  display_course_calculation_options_11890a89: "Memaparkan Pilihan Pengiraan Kursus"
   display_e6546241: Paparkan
   display_grade_as_7b5376a6: "Paparkan Gred Sebagai"
   display_grades_as_points_percentages_complete_inco_fa848380: |-
@@ -8700,6 +8724,7 @@ ms:
   enforce_scopes_be28989c: "Kuat Kuasakan Skop"
   engagement_report_986e9621: "Laporan Penglibatan"
   enhance_color_contrast_of_content_685ddd49: "Tingkatkan kontras warna kandungan"
+  enhance_password_options_efbf3e48: "Tingkatkan pilihan kata laluan"
   enhanced_docviewer_url_security_72e9baa9: "Keselamatan URL DocViewer Dipertingkatkan"
   enhanced_gradebook_filters_a3be5e7d: "Penapis Buku Gred Ditambah Baik"
   enhanced_gradebook_filters_description: "Ciri ini menyediakan pilihan penapis yang ditambah baik dalam buku gred Canvas. Apabila bendera ini didayakan, akses awal kepada penambahbaikan yang berterusan akan dipaparkan secara automatik dengan setiap keluaran. Untuk butiran penuh, sila lihat *Kumpulan Pengguna Penapis Buku Gred* dalam Komuniti Canvas."
@@ -8804,6 +8829,7 @@ ms:
                           *eduappcenter.com*. Setelah digunakan, hanya apl yang diluluskan oleh organisasi anda dalam \
                           EduAppCenter akan disenaraikan pada halaman Apl Luar. \
                           Ketahui cara untuk **menjana token akses**.
+  enter_the_date_you_would_like_to_navigate_to_a712de47: "Masukkan tarikh yang ingin anda navigasi."
   enter_the_description_91ececc1: "Masukkan perihalan"
   enter_the_email_address_of_the_user_you_would_like_92112560: "Masukkan alamat e-mel pengguna yang ingin anda daftarkan buat sementara"
   enter_the_email_addresses_of_the_users_you_would_l_f76448a6: "Masukkan alamat e-mel pengguna yang ingin anda tambah, dipisahkan oleh koma atau pemisah baris"
@@ -9906,6 +9932,7 @@ ms:
   give_all_students_the_same_grade_for_assignment_na_e44fcc7e: "Berikan semua pelajar gred yang sama untuk *%{assignment.name}* dengan memasukkan dan menyerahkan nilai gred di bawah:"
   give_all_students_the_same_percent_grade_for_assig_6a008004: "Berikan semua pelajar *peratusan* gred yang sama untuk **%{assignment.name}** dengan memasukkan dan menyerahkan nilai gred di bawah:"
   give_your_filter_preset_a_name_11144c73: "Berikan nama kepada pratentu penapis ini"
+  gives_users_access_to_new_optional_features_like_s_71cc5bb0: "Memberikan pengguna akses kepada ciri pilihan baharu seperti menetapkan tandatangan lalai yang akan ditambahkan di hujung mesej keluar dan menetapkan autoresponder."
   giving_up_on_retrieving_media_sources_this_issue_w_ad49b0d3: "Putus asa untuk mengambil sumber media. Isu ini mungkin akan selesai sendiri akhirnya."
   global_announcements_a78912c8: "Pengumuman Keseluruhan"
   global_announcements_add_edit_delete_843ca4d2: "Pengumuman Global - tambah / edit / padam"
@@ -10008,6 +10035,8 @@ ms:
   grade_summary_initial_query_error_229019c: "Ralat pertanyaan awal Rumusan Gred"
   grade_syncing_e78475e8: "Penyegerakan Gred"
   gradebook: 
+    course_average: "Purata kursus"
+    course_median: "Median kursus"
     gradebook_header_menu: 
       assignment_details: "Butiran Tugasan"
       curve_grades: "Gred Lengkung"
@@ -10228,6 +10257,7 @@ ms:
   graded_25cd3fcd: Bergred
   graded_date_by_grader_e8e1ff75: "%{graded_date} sebelum atau pada %{grader}"
   graded_discussion_17cc8eaf: "Perbincangan Digredkan"
+  graded_discussion_submission_6ee4187e: "Penyerahan perbincangan digredkan"
   graded_quiz_7fabdf1f: "Kuiz Bergred"
   graded_submissions_9c7068a2: "Serahan bergred:"
   graded_survey_c0f0c395: "Tinjauan Bergred"
@@ -11325,6 +11355,7 @@ ms:
   inactive_enrollments_bd1831ea: "Pendaftaran Tidak Aktif"
   inappropriate_1930c574: "Tidak sesuai"
   inbox_bb245a60: "Peti masuk"
+  inbox_settings_qw_updates_a3eb954b: "Tetapan Peti Masuk - Kemas Kini QW"
   include_a_link_to_a_screencast_screenshot_using_so_4b2fabcb: "Termasuk pautan ke rakam siar skrin/syot layar menggunakan sesuatu seperti *Jing*."
   include_assignment_description_36e6ed1b: "Termasuk Penerangan Tugasan"
   include_assignments_graded_with_a_0_score_fb784115: "Termasuk tugasan yang digredkan dengan skor 0."
@@ -12288,6 +12319,7 @@ ms:
   log_in_to_submit_962106cf: "Log masuk untuk membuat penyerahan"
   log_in_url_is_not_a_valid_uri_7b8c57ee: "URL log masuk bukan URI yang sah"
   log_lti_launches_ff06c5fe: "Log pelancaran LTI"
+  log_lti_launches_site_admin_bc4a0b70: "Logkan pelancaran LTI (Pentadbir Laman)"
   log_on_url_fc166e4c: "URL Log Masuk"
   log_out_379ba28a: "Log Keluar"
   log_out_url_2605c2c1: "URL Log Keluar"
@@ -14523,6 +14555,7 @@ ms:
   moduletitle_unpublished_8a70e0cd: "%{moduleTitle} (tidak diterbitkan)"
   mon_8f18082a: Isn
   monday_432ff613: Isnin
+  month_4b83b95f: Bulan
   month_s_5c17590e: Bulan
   monthandday_starting_at_time_769b12c8: "%{monthAndDay} bermula pada %{time}"
   months_afdf2830: Bulan
@@ -14531,6 +14564,7 @@ ms:
   moodle_formula_many_warning_title: "Terdapat %{count} soalan Formula dalam bank ini yang akan memerlukan penjanaan semula jawapan munasabahnya"
   moodle_formula_warning_title: "Jawapan mungkin akan perlu dijanakan semula untuk soalan Formula"
   more_cf9cc661: Lagi
+  more_control_over_password_settings_at_institution_78d7e069: "Lebih kawalan atas tetapan kata laluan pada tahap institusi"
   more_courses_5ebbe998: "Lebih Banyak Kursus"
   more_details_in_the_speedgrader_8702f408: "Butiran lanjut dalam SpeedGrader"
   more_importantly_canvas_allows_you_to_add_outcomes_78822cf: "Lebih penting lagi, Canvas membenarkan anda menambahkan hasil pada rubrik penggredan anda supaya anda dapat menilai tahap penguasaan ketika anda memberikan gred tugasan. Setelah anda menetapkan hasil, klik Urus Rubrik untuk mula menggunakan hasil anda bagi tujuan penggredan."
@@ -16231,6 +16265,7 @@ ms:
         recording_enabled: "Benarkan persidangan untuk membuat rakaman."
         replace_with_alternatives: "Nyahdayakan persidangan BigBlueButton; sebagai ganti tunjuk senarai alternatif"
         secret: "Kod rahsia"
+        send_avatar: "Hantar avatar pengguna ke BigBlueButton ketika penyertaan"
         use_fallback: "Gunakan tetapan Pemalam Sandaran BigBlueButton bagi mencari rakaman untuk persidangan yang tidak dianjurkan oleh tika BBB yang dikonfigurasi sekarang."
       secret_description: "Ini ialah %{parameter_name} parameter yang boleh ditemui dalam %{filename} fail konfigurasi."
     buttons: 
@@ -18449,6 +18484,7 @@ ms:
   record_media_6637ff19: "Rakam Media"
   record_not_found_da7857e9: "Rakaman tidak ditemui"
   record_upload_media_comment_4d01b943: "Rakam/Muat Naik Komen Media"
+  record_videos_and_screen_capture_with_auto_caption_5c6bc705: "Rakam video dan tangkapan skrin dengan pengkapsyenan automatik."
   record_with_microphone_only_e4ee07aa: "Rakam dengan Mikrofon Sahaja"
   record_with_webcam_af21e07c: "Rakam dengan Kamera Web"
   recording_98da6bda: Merakam
@@ -19670,6 +19706,7 @@ ms:
   send_to_all_of_group_6e91ead8: "Hantar kepada semua kumpulan"
   send_to_b940900a: "Hantar Kepada..."
   send_usage_metrics_cecc7a7d: "Hantar metrik penggunaan"
+  send_user_avatar_to_bigbluebutton_17cda2f6: "Hantar avatar pengguna ke BigBlueButton"
   sending_bf324366: Menghantar...
   sending_message_75923692: "Hantar mesej"
   sending_message_8ac5bc90: "Hantar Mesej..."
@@ -22129,6 +22166,7 @@ ms:
   this_most_likely_happened_because_you_imported_cou_a78ea880: "Perkara ini kemungkinan besar terjadi kerana anda mengimport kandungan kursus tanpa fail-failnya yang berkaitan."
   this_name_appears_in_sorted_lists_dccbd84b: "Nama ini muncul dalam senarai terisih."
   this_name_will_be_used_by_teachers_for_grading_9b6aa8a0: "Nama ini akan digunakan oleh guru untuk penggredan."
+  this_number_must_be_between_1_and_10_d8400fc6: "Nombor ini mestilah antara 1 dan 10"
   this_option_is_not_compatible_with_new_quizzes_ed489d7c: "Pilihan ini tidak serasi dengan Kuiz Baharu"
   this_outcome_has_been_used_to_assess_a_student_and_a3a48511: "Hasil ini telah digunakan untuk mentaksir pelajar dan beberapa edit akan mempengaruhi keputusan pelajar."
   this_outcome_has_not_been_aligned_320b20c2: "Hasil ini belum lagi dijajarkan"
@@ -22766,6 +22804,8 @@ ms:
   total_71a4807: Jumlah
   total_activity_21022e7c: "Aktiviti Keseluruhan"
   total_grade_b0c33841: "Jumlah: %{grade}"
+  total_grade_higher_than_4c546517: "Jumlah gred lebih tinggi daripada"
+  total_grade_lower_than_98891fe4: "Jumlah gred lebih rendah daripada"
   total_messages_af025be6: "Jumlah mesej"
   total_options_351e2682: "Jumlah Pilihan"
   total_points_44d76792: "Jumlah Mata"
@@ -22979,6 +23019,7 @@ ms:
   unknown_quiz: "Kuiz tidak diketahui"
   unknown_quiz_3892d071: "Kuiz Tidak Diketahui"
   unknown_role_cbe9a089: "Peranan Diketahui"
+  unknown_sender_68b1abbc: "penghantar tidak diketahui"
   unknown_status_status_35331e1d: "Status tidak diketahui, %{status}"
   unknown_status_status_message_3a4ed4d5: "Status tidak diketahui, %{status}: %{message}"
   unknown_user_1113fcaa: "Pengguna Tidak Diketahui"
@@ -23838,6 +23879,7 @@ ms:
   warning_for_improved_accessibility_in_moving_files_71e1028b: "Amaran: Bagi menambah baik kebolehcapaian dalam mengalih fail, sila gunakan pilihan Alih Ke Dialog yang ditemui dalam menu."
   warning_for_improved_accessibility_of_reordering_a_5d0206c7: "Amaran: bagi menambah baik kebolehcapaian dalam penyusunan semula tugasan dan kumpulan, sila gunakan pilihan Alih Ke Dialog yang ditemui dalam menu."
   warning_for_improved_accessibility_please_click_he_e6472c02: "Amaran: Bagi menambah baik kebolehcapaian, sila klik di sini untuk menggunakan Pandangan Tunggal Buku Gred."
+  warning_for_improved_accessibility_please_use_the__1075c150: "Amaran: Sila gunakan Kalendar \"Lihat agenda\" untuk kebolehcapaian yang ditambah baik"
   warning_for_improved_accessibility_with_annotated__43e3a5ea: "Amaran: Bagi menambah baik kebolehcapaian dengan Tugasan Beranotasi, sila gunakan Muat Naik Fail atau Masukan Teks untuk meninggalkan komen."
   warning_if_there_are_any_users_with_this_role_they_1a7c1fef: "Amaran: Jika terdapat mana-mana pengguna dengan peranan ini, mereka akan memastikan keizinan semasa tetapi anda tidak akan dapat mencipta pengguna baharu dengan peranan ini."
   warning_the_submission_type_selection_placement_is_d327c8d: "Amaran: submission_type_selection peletakan hanya dibenarkan untuk alat LTI yang diluluskan Instructure. Jika anda percaya anda telah menerima mesej ini secara ralat, sila hubungi pasukan sokongan anda."
@@ -23900,6 +23942,7 @@ ms:
   website_url_url_bd07233d: "URL Laman Web: %{url}"
   wed_84932f18: Rabu
   wednesday_b6f755f5: Rabu
+  week_1f945ddd: Minggu
   week_s_cb1492ee: Minggu
   weekly_schedule_navigation_6b042645: "Navigasi jadual mingguan"
   weekly_summary_56cd0c95: "Rumusan Mingguan"
@@ -23976,6 +24019,9 @@ ms:
       (tidak konsisten) legasi diikuti. Bendera ini digunakan hanya untuk akaun
       _child_ konsortium. Bendera ini tidak mempengaruhi konsortium yang diurus secara berpusat dalam
       apa-apa cara.
+  when_enabled_for_an_account_sends_data_for_all_lti_77568a4f: |-
+      Apabila didayakan untuk akaun, menghantar data untuk semua pelancaran LTI kepada sistem PandataEvents
+      untuk pertanyaan dan pengvisualan. Memerlukan Logkan pelancaran LTI (Pentadbir Laman) juga didayakan.
   when_enabled_for_the_parent_account_of_a_non_centr_4d7adbaa: |-
       Apabila didayakan untuk akaun induk bagi konsortium yang diurus secara tidak berpusat,
       mematikan/menghidupkan kunci pembangun dalam induk tidak akan mempengaruhi pemasangan

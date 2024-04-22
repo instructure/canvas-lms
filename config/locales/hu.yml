@@ -21244,6 +21244,7 @@ hu:
         select_folder_for_uploads: "Mappa kiválasztása fájlfeltöltéshez"
     wiki_page: 
       buttons: 
+        assign_to: Hozzárendelés
         edit: Szerkesztés
         view_all_pages: "Összes oldal megtekintése"
       delete_wiki: Törlés
