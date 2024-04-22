@@ -198,10 +198,12 @@ class DiscussionEntry < ActiveRecord::Base
           submission.save!
         end
       else
-        submission.workflow_state = 'unsubmitted'
-        submission.submission_type = nil
-        submission.submitted_at = nil
-        submission.save!
+        unless submission.nil?
+          submission.workflow_state = 'unsubmitted'
+          submission.submission_type = nil
+          submission.submitted_at = nil
+          submission.save!
+        end
       end
     end
   end
