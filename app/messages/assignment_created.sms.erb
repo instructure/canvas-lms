@@ -14,6 +14,8 @@
   <% if asset.context.user_has_been_admin?(user) && asset.context.grants_right?(user, :manage_grades) %>
     <% if asset.all_due_dates.length > 1 %>
       <% display_text = multiple_dates_text %>
+    <% elsif asset.teacher_due_date_for_display(user).nil? %>
+      <% display_text = "due: N/A" %>
     <% elsif (asset_due_at = asset.teacher_due_date_for_display(user)) %>
       <% display_text = I18n.t("due: %{assignment_due_date_time}", :assignment_due_date_time => datetime_string(force_zone(asset_due_at))) %>
     <% end %>
