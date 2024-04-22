@@ -191,6 +191,7 @@ module CanvasRails
                 CanvasErrors.capture(e, { tags: { pg_service: conn_params[:service] } }, :warn)
                 Rails.logger.warn("Error connecting to database using pg service `#{conn_params[:service]}`; retrying without... (error: #{e.message})")
                 conn_params.delete(:service)
+                conn_params[:sslmode] = "disable"
                 retry
               else
                 raise
@@ -241,6 +242,7 @@ module CanvasRails
               CanvasErrors.capture(e, { tags: { pg_service: connection_parameters[:service] } }, :warn)
               Rails.logger.warn("Error connecting to database using pg service `#{connection_parameters[:service]}`; retrying without... (error: #{e.message})")
               connection_parameters.delete(:service)
+              connection_parameters[:sslmode] = "disable"
               retry
             else
               raise
