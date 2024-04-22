@@ -116,14 +116,23 @@ const mockProducts: Array<Product> = [
 ]
 
 export const fetchProducts = async (params: Params): Promise<ProductResponse> => {
+  let tools = [...mockProducts]
+  if (params.company_id_eq) {
+    tools = tools.filter(product => product.company.id === params.company_id_eq)
+  }
+  if (params.name_cont) {
+    tools = tools.filter(
+      e => e.name.includes(params.name_cont) || e.company.name.includes(params.name_cont)
+    )
+  }
   const meta = {
-    count: mockProducts.length,
-    total_count: mockProducts.length,
+    count: tools.length,
+    total_count: tools.length,
     current_page: 1,
     num_pages: 1,
     per_page: 20,
   }
-  return {tools: mockProducts, meta}
+  return {tools, meta}
 
   // TODO: uncomment when backend hooked up and remove mock data
 
