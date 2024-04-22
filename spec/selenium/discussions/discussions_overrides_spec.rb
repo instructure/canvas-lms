@@ -70,7 +70,7 @@ describe "discussions overrides" do
 
       it "shows correct assignment dates in the tray" do
         get "/courses/#{@course.id}/discussion_topics/#{@discussion_topic.id}"
-        fj("button:contains('Show Due Dates (2)')").click
+        fj("button:contains('View Due Dates')").click
         rows = ff("tr[data-testid='assignment-override-row']")
         expect(rows[0].text).to eq "Dec 17, 2016 10am New Section Dec 14, 2016 10am Dec 18, 2016 10am"
         expect(rows[1].text).to eq "Dec 16, 2016 10am Everyone Else No Start Date No End Date"
@@ -80,7 +80,7 @@ describe "discussions overrides" do
         @course.enable_course_paces = true
         @course.save!
         get "/courses/#{@course.id}/discussion_topics/#{@discussion_topic.id}"
-        fj("button:contains('Show Due Dates (2)')").click
+        fj("button:contains('View Due Dates')").click
         expect(f('[data-testid="CoursePacingNotice"]')).to be_displayed
       end
     end
