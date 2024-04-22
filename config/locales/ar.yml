@@ -1509,6 +1509,8 @@ ar:
               check_box: "CSV لعضوية المجموعة"
           groups: 
             check_box: "CSV للمجموعات"
+          include_deleted: 
+            check_box: "تضمين الكائنات المحذوفة"
           sections: 
             check_box: "CSV للأقسام"
           terms: 
@@ -2368,6 +2370,7 @@ ar:
   add_edit_delete_files_573a4d62: "إضافة / تحرير / حذف الملفات"
   add_edit_delete_sections_d32c5b4d: "إضافة / تحرير / حذف الأقسام"
   add_email_address_aef3b61: "إضافة عنوان بريد إلكتروني"
+  add_event_9e21d0ff: "إضافة حدث"
   add_existing_content_7e36da66: "إضافة محتوى حالي"
   add_external_feed_6d437a28: "إضافة موجز خارجي"
   add_feed_49ed1cb2: "إضافة موجز"
@@ -2507,6 +2510,7 @@ ar:
   additional_occurrence_s_7b5b0173: "حدث إضافي (أحداث إضافية)"
   additional_options_7cefee79: "الخيارات الإضافية"
   additional_outcomes_options_6df428f1: "خيارات النواتج الإضافية"
+  additional_replies_required_13697d0a: "الردود الإضافية مطلوبة"
   additional_settings_20362654: "الإعدادات الإضافية"
   additional_settings_for_sis_syncing_f926973e: "إعدادات إضافية لمزامنة نظام معلومات الطالب"
   additional_sis_sync_assignment_quiz_and_discussion_d941fa5: "الإعدادات الإضافية للمهمة والاختبار الموجز والمناقشة الخاصة بمزامنة نظام معلومات الطالب الإضافية"
@@ -2519,6 +2523,9 @@ ar:
   address_use_as_wildcard_48f2cf60: "العنوان (استخدام * كحرف بدل)"
   addressbook_microservice_a4940422: "AddressBook خدمة مصغرة"
   addressbook_performance_tap_98ddf67: "AddressBook علامة تبويب الأداء"
+  adds_a_new_admin_setting_to_the_bigbluebutton_plug_fa648486: |-
+      لإضافة إعداد مسؤول جديد إلى المكون الإضافي BigBlueButton للسماح
+      بإرسال صور أفاتار المستخدمين عند الانضمام إلى المؤتمر.
   adds_a_new_bounced_emails_tab_to_account_admin_too_6714c09d: |-
       تضيف علامة تبويب جديدة لرسائل البريد الإلكتروني المرتدة إلى أدوات مسؤول الحساب
       مما يتيح لك البحث في عناوين البريد الإلكتروني التي ارتدت إليها
@@ -2548,6 +2555,8 @@ ar:
   adjusting_due_dates_a5918b9c: "جارٍ تعديل تواريخ الاستحقاق..."
   admin_4d3ba42f: المسؤول
   admin_analytics_course_readiness_c79f13e1: "تحليلات المسؤول - جاهزية المساق"
+  admin_analytics_dap_30f431d6: "DAP لتحليلات المسؤول"
+  admin_analytics_dap_model_description: "لتمكين استخدام DAP للتحليلات على مستوى الحساب."
   admin_analytics_description: "لتمكين التحليلات على مستوى الحساب. توفر لوحات معلومات تحليلات المسؤول تفاصيل حول استخدام Canvas ونجاح مساق Canvas وتفاعل الطلاب. اعرف المزيد في *مركز تحليلات المسؤول* في مجتمع Canvas."
   admin_analytics_eacba735: "تحليلات المسؤول"
   admin_analytics_new_filter_ui_aee1ea8e: "تحليلات المسؤول - واجهة مستخدم جديدة لعامل التصفية"
@@ -2576,8 +2585,9 @@ ar:
   admins_add_remove_26811ce5: "المسؤولون - إضافة / إزالة"
   advanced_36b35b8: متقدم
   advanced_analytics_6a2419af: "التحليلات المتقدمة"
-  advanced_analytics_ask_questions: "لتمكين التحليلات المتقدمة - طرح أسئلة والإذن المصاحب."
+  advanced_analytics_ask_questions: "لتمكين التحليلات المتقدمة - ميزة اطلب بياناتك والإذن المصاحب."
   advanced_analytics_ask_questions_26553cd2: "التحليلات المتقدمة - طرح الأسئلة"
+  advanced_analytics_ask_your_data_ab54433: "التحليلات المتقدمة - اطلب بياناتك"
   advanced_analytics_course_readiness_and_students_i_6b3c439f: "التحليلات المتقدمة - جاهزية المساق والطلاب ممن بحاجة للاهتمام"
   advanced_analytics_course_readiness_closed_alpha_13c8aaf: "التحليلات المتقدمة - تم إغلاق ألفا لجاهزية المساق"
   advertise_release_notes_via_the_ui_9254bc6c: "الإعلان عن ملاحظات الإصدار عبر واجهة المستخدم"
@@ -2603,6 +2613,7 @@ ar:
   after_the_due_date_eee89c9c: "بعد تاريخ الاستحقاق"
   after_the_first_attempt_you_cannot_leave_comments__3922325f: "بعد المحاولة الأولى، لا يمكنك ترك تعليقات حتى تقوم بإرسال المهمة."
   after_throttling_the_selected_jobs_the_newly_creat_44952b37: "بعد تقييد الوظائف المحددة، سيتم تحديد الفصل المنشأ حديثًا."
+  agenda_b010136d: "جدول الأعمال"
   ahead_21f22939: أمام
   ai_driven_smart_search_feature_597dbd4f: "ميزة بحث ذكي مدعوم بالذكاء الاصطناعي."
   ajax_errors: 
@@ -2858,6 +2869,9 @@ ar:
   allows_for_discussion_replies_to_be_sorted_accordi_1065cccc: |-
       للسماح بفزر ردود النقاش وفقًا الطابع الزمني
       للإنشاء. الترتيب الافتراضي من الأحدث للأقدم لردود مستوى الجذر.
+  allows_for_quickly_enabling_or_disabling_lti_launc_7eee7943: |-
+      للسماح بالتمكين أو التعطيل السريع لتسجيل الدخول عن تشغيل LTI أثناء الطرح
+      على مستوى الحساب.
   allows_graders_to_type_mi_in_the_gradebook_or_spee_a9bb3577: "يسمح للمقيّمين بكتابة MI في دفتر الدرجات أو SpeedGrader لتمييز المهام كمفقودة يدويًا"
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: "تسمح بتمييز روابط التعليمات كروابط بارزة أو جديدة وتعرض رابط التعليمات البارزة بشكل واضح في قائمة التعليمات."
   allows_instructors_to_apply_scores_to_ungraded_sub_7e772795: "للسماح للمعلمين بتطبيق الدرجات على الإرسالات غير المقيّمة بشكل مجمع."
@@ -4199,6 +4213,7 @@ ar:
   as_you_type_in_this_field_the_list_of_results_will_c1a1a3e4: "سيتم تحديث قائمة النتائج تلقائياً أثناء الكتابة في هذا الحقل."
   ascending_b3c87427: تصاعديًا
   ask_questions_f6b301fe: "طرح الأسئلة"
+  ask_your_data_da53791f: "اطلب بياناتك"
   ask_your_instructor_a_question_a61ca5e9: "طرح سؤال على معلمك"
   assess_and_survey_your_students_ce8172a9: "قم بتقييم طلابك واستطلاع آرائهم"
   assess_student_understanding_1e0b8d7f: "قيّم فهم الطلاب"
@@ -5939,6 +5954,7 @@ ar:
   calculation_int_is_not_a_valid_value_for_this_calc_1de6e060: "القيمة '%{calculation_int}' ليست قيمة صحيحة لطريقة الحساب هذه. يجب أن تكون القيمة بين '%{valid_calculation_ints_min}' و'%{valid_calculation_ints_max}'"
   calculation_method_fe281f9: "طريقة الحساب"
   calculation_method_must_be_one_of_the_following_ca_d8ae5dac: "يجب أن تكون طريقة الحساب إحدى الطرق التالية: %{calc_methods}"
+  calculations_fd087607: الحسابات
   calculator: 
     buttons: 
       save: حفظ
@@ -7126,6 +7142,7 @@ ar:
     from_beginning: البداية
     to_now: الآن
   comma_separated_list_of_users_sis_id_332c98f1: "قائمة مفصولة بفاصلة لمعرفات SIS للمستخدمين"
+  comment_7ef1428e: التعليق
   comment_added_33ab70d9: "تمت إضافة التعليق"
   comment_by_replying_to_this_message_or_join_the_co_26d42fde: "إضافة تعليق بالرد على هذه الرسالة أو الالتحاق بالمحادثة باستخدام هذا الارتباط: %{link}."
   comment_by_replying_to_this_message_or_join_the_co_52b5ac1c: "قم بالتعليق بالرد على هذه الرسالة أو انضم إلى المحادثة باستخدام هذا الرابط: %{link}. عندما يُسمح بذلك، إذا كنت بحاجة لتضمين مرفق، فالرجاء تسجيل الدخول إلى Canvas والرد على المناقشة."
@@ -10255,6 +10272,7 @@ ar:
   create_new_criterion_1a4efd4: "إنشاء معيار جديد"
   create_new_discussions_6ab69da2: "إنشاء نقاشات جديدة"
   create_new_e0946c49: "إنشاء جديد"
+  create_new_event_e9fb2fb6: "إنشاء حدث جديد"
   create_new_filter_c244aa92: "إنشاء عامل تصفية جديد"
   create_new_group_bf9561d4: "إنشاء مجموعة جديدة"
   create_new_group_fca5cc73: "إنشاء مجموعة جديدة"
@@ -10311,6 +10329,7 @@ ar:
   criteria_9fac648: المعايير
   criteria_builder_b214069e: "أداة بناء المعايير"
   criterion_5f0b62f8: المعيار
+  criterion_comment_642f7747: "تعليق المعيار"
   criterion_created_42669293: "تم إنشاء المعيار"
   criterion_description_757741c3: "وصف المعيار"
   criterion_long_description_e9a97247: "الوصف الطويل للمعيار"
@@ -10448,6 +10467,10 @@ ar:
   current_terms_bcf31fb2: "الفصول الدراسية الحالية"
   current_theme_62e5e8cf: "النسق الحالي"
   current_total_67bf5f72: "الإجمالي الحالي:"
+  current_total_score_is_higher_than_cutoff_c11e90b8: "إجمالي الدرجات الحالي أعلى من %{cutoff}%"
+  current_total_score_is_higher_than_cutoff_f2ef8ae: "إجمالي الدرجات الحالي أعلى من %{cutoff}"
+  current_total_score_is_lower_than_cutoff_5f78d46: "إجمالي الدرجات الحالي أقل من %{cutoff}"
+  current_total_score_is_lower_than_cutoff_a2b1ec5a: "إجمالي الدرجات الحالي أقل من %{cutoff}%"
   current_volume_level_c55ab825: "مستوى الصوت الحالي"
   currently_assigned_to_tokenname_click_to_remove_5a853a84: "معيَّن حاليًا إلى %{tokenName}، انقر للإزالة"
   currently_selected_color_93f44b9f: "اللون المحدد حاليًا"
@@ -11701,6 +11724,7 @@ ar:
   display_as_e2a5c383: "عرض في صورة"
   display_as_percentage_3e755dc: "عرض في صيغة نسبة"
   display_as_points_63084235: "عرض في صورة نقاط"
+  display_course_calculation_options_11890a89: "عرض خيارات حساب المساق"
   display_course_catalog: "إظهار قائمة من المساقات يمكن البحث فيها في هذا الحساب الجذري مع تمكين إشارة \"تضمين هذا المساق في فهرس المساق العام\"."
   display_e6546241: عرض
   display_filter_options_34fb6be2: "عرض خيارات التصفية"
@@ -12355,6 +12379,7 @@ ar:
   english_canada_12688ee4: "الإنجليزية (كندا)"
   english_united_kingdom_a613f831: "الإنجليزية (المملكة المتحدة)"
   enhance_color_contrast_of_content_685ddd49: "تعزيز تباين ألوان المحتوى"
+  enhance_password_options_efbf3e48: "تعزيز خيارات كلمة المرور"
   enhanced_docviewer_url_security_72e9baa9: "أمان DocViewer URL معزز"
   enhanced_grade_change_auditing_2b155dfa: "تدقيق معزز لتغيير التقديرات"
   enhanced_gradebook_filters_a3be5e7d: "عوامل التصفية المحسنة لدفتر الدرجات"
@@ -12532,6 +12557,7 @@ ar:
                           تعلم كيفية إنشاء **رمز مميز للوصول**.
   enter_the_access_token_for_your_organization_from__cc77493d: "أدخل رمز الوصول المميز لمؤسستك من خلال *eduappcenter.com*. بعد تطبيقه، سيتم فقط إدراج التطبيقات التي اعتمدتها مؤسستك عبر EduAppCenter في صفحة التطبيقات الخارجية. **تعلم كيفية إنشاء رمز مميز**."
   enter_the_access_token_for_your_organization_from__f1c71941: "أدخل الرمز المميز للوصول لمؤسستك من                       *eduappcenter.com*. حالما يتم تطبيقه، سيتم إدراج التطبيقات التي اعتمدتها مؤسستك في                        EduAppCenter فقط على صفحة التطبيقات الخارجية.                       تعلم كيفية إنشاء **رمز مميز للوصول**."
+  enter_the_date_you_would_like_to_navigate_to_a712de47: "أدخل البيانات التي ترغب في الانتقال إليها."
   enter_the_description_91ececc1: "أدخل الوصف"
   enter_the_email_address_of_the_user_you_would_like_92112560: "أدخل عنوان البريد الإلكتروني للمستخدم الذي ترغب في تسجيله مؤقتًا"
   enter_the_email_addresses_of_the_users_you_would_l_17cef6a0: "أدخل عناوين البريد الإلكتروني للمستخدمين الذين ترغب في إضافتهم، مفصولة بفاصلات."
@@ -14118,6 +14144,7 @@ ar:
   give_all_students_the_same_percent_grade_for_assig_6a008004: "منح كافة الطلاب نفس درجة *النسبة المئوية* لـ **%{assignment.name}** عن طريق إدخال قيمة درجة وإرسالها أدناه:"
   give_this_filter_a_name_36b4b03a: "امنح اسمًا لعامل التصفية هذا"
   give_your_filter_preset_a_name_11144c73: "امنح اسمًا للتعين المسبق لعامل التصفية"
+  gives_users_access_to_new_optional_features_like_s_71cc5bb0: "لمنح المستخدمين إمكانية الوصول إلى ميزات اختيارية جديدة مثل تعيين توقيع افتراضي يُضاف في نهاية الرسائل الصادرة وتعيين مجيب تلقائي."
   giving_up_on_retrieving_media_sources_this_issue_w_ad49b0d3: "التوقف عن استرداد مصادر الوسائط. ستحل هذه المشكلة على الأرجح من تلقاء نفسها في النهاية."
   global_announcements_a78912c8: "الإعلانات العمومية"
   global_announcements_add_edit_delete_843ca4d2: "الإعلانات العامة - إضافة / تحرير / حذف"
@@ -14937,6 +14964,7 @@ ar:
   graded_date_by_grader_e8e1ff75: "%{graded_date} بواسطة %{grader}"
   graded_discussion_17cc8eaf: "مناقشة مقيمة"
   graded_discussion_a873bb3e: "مناقشة بدرجات:"
+  graded_discussion_submission_6ee4187e: "إرسال النقاش المقيّم"
   graded_on_submission_60ac3010: "تم التصحيح بعد الإرسال"
   graded_quiz_7fabdf1f: "اختبار تم تقييم درجاته"
   graded_submissions_9c7068a2: "عمليات الإرسال التي تم تقييم درجتها:"
@@ -16666,6 +16694,7 @@ ar:
   inactive_enrollments_bd1831ea: "التسجيلات غير النشطة"
   inappropriate_1930c574: "غير ملائم"
   inbox_bb245a60: "علبة الوارد"
+  inbox_settings_qw_updates_a3eb954b: "إعدادات صندوق الوارد - تحديثات QW"
   include_a_download_link_next_to_each_file_link_in__481761de: "تضمين ارتباط تنزيل إلى جوار كل ارتباط ملف في RCE"
   include_a_link_to_a_screencast_screenshot_using_so_4b2fabcb: "تضمين ارتباط إلى لقطة شاشة/تسجيل رقمي لمخرجات الشاشة باستخدام شيء مثل *Jing*."
   include_a_link_to_show_a_qr_code_to_easy_mobile_lo_f3da1267: "لتضمين رابط لعرض رمز QR لتسهيل تسجيل دخول الجوال على صفحة ملف التعريف."
@@ -17886,6 +17915,7 @@ ar:
   log_in_to_submit_962106cf: "قم بتسجيل الدخول للإرسال"
   log_in_url_is_not_a_valid_uri_7b8c57ee: "عنوان URL لتسجيل الدخول ليس صالحًا"
   log_lti_launches_ff06c5fe: "سجل تشغيلات LTI"
+  log_lti_launches_site_admin_bc4a0b70: "حالات تشغيل تسجيل دخول LTI (مسؤول الموقع)"
   log_on_url_fc166e4c: "عنوان URL لتسجيل الدخول"
   log_out_379ba28a: "تسجيل الخروج"
   log_out_url_2605c2c1: "عنوان URL لتسجيل الخروج"
@@ -20777,6 +20807,7 @@ ar:
   moduletitle_unpublished_8a70e0cd: "%{moduleTitle} (غير منشور)"
   mon_8f18082a: الإثنين
   monday_432ff613: الإثنين
+  month_4b83b95f: الشهر
   month_s_5c17590e: "شهر (أشهر)"
   monthandday_starting_at_time_769b12c8: "%{monthAndDay} يبدأ في %{time}"
   months_afdf2830: شهور
@@ -20785,6 +20816,7 @@ ar:
   moodle_formula_many_warning_title: "يوجد في هذا البنك %{count} من أسئلةالصيغة والتي ربما تم استيرادها بطريقة غير صحيحة"
   moodle_formula_warning_title: "ستحتاج الإجابات الممكنة إلى إعادة إنشائها لسؤال الصيغة"
   more_cf9cc661: المزيد
+  more_control_over_password_settings_at_institution_78d7e069: "المزيد من التحكم في إعدادات كلمة المرور على مستوى المؤسسة التعليمية"
   more_courses_5ebbe998: "مزيد من المساقات"
   more_details_in_the_speedgrader_8702f408: "مزيد من التفاصيل في SpeedGrader"
   more_importantly_canvas_allows_you_to_add_outcomes_78822cf: "الأهم من ذلك، يتيح لك Canvas إضافة النواتج إلى معايير التقييم بحيث يمكنك تقييم الإجادة بينما تقوم بتقييم المهام. بمجرد أن تقوم بإعداد النواتج، انقر فوق إدارة المعايير للبدء في استخدام النواتج الخاصة بالتقييم."
@@ -22889,6 +22921,7 @@ ar:
         recording_enabled: "السماح بتسجيل المؤتمرات."
         replace_with_alternatives: "تعطيل مؤتمرات BigBlueButton، وبدلاً من ذلك إظهار قائمة بدائل"
         secret: "كلمة السر"
+        send_avatar: "إرسال أفاتار المستخدم إلى BigBlueButton عند الانضمام"
         use_fallback: "استخدم إعدادات المكون الإضافي الاحتياطي لـ BigBlueButton للبحث عن تسجيلات المؤتمرات غير المستضافة بواسطة مثيل BBB المكون في الوقت الحالي."
       secret_description: "هذه هي المعلمة %{parameter_name} التي يمكن العثور عليها في ملف التكوين %{filename}."
     buttons: 
@@ -25947,6 +25980,7 @@ ar:
   record_upload_media_5fdce166: "تسجيل/تحميل الوسائط"
   record_upload_media_comment_4d01b943: "تسجيل/تحميل تعليق الوسائط"
   record_video_70dc8439: "تسجيل الفيديو"
+  record_videos_and_screen_capture_with_auto_caption_5c6bc705: "تسجيل مقاطع فيديو والتقاط الشاشة مع التسمية التوضيحية التلقائية."
   record_with_microphone_only_e4ee07aa: "التسجيل بالميكروفون فقط"
   record_with_webcam_af21e07c: "التسجيل بكاميرا ويب"
   recording_98da6bda: "جارٍ التسجيل"
@@ -27495,6 +27529,7 @@ ar:
   send_to_b940900a: "إرسال إلى ..."
   send_to_ce05b460: "إرسال إلى"
   send_usage_metrics_cecc7a7d: "إرسال مقاييس الاستخدام"
+  send_user_avatar_to_bigbluebutton_17cda2f6: "إرسال أفاتار المستخدم إلى BigBlueButton"
   sending_bf324366: "جارٍ الإرسال..."
   sending_message_75923692: "جارٍ إرسال رسالة"
   sending_message_8ac5bc90: "جارٍ إرسال رسالة..."
@@ -30884,6 +30919,7 @@ ar:
   this_most_likely_happened_because_you_imported_cou_a78ea880: "السبب الأرجح في حدوث ذلك هو أنك قمت باستيراد محتوى المساق دون الملفات المرتبطة به."
   this_name_appears_in_sorted_lists_dccbd84b: "يظهر هذا الاسم في القوائم المفروزة."
   this_name_will_be_used_by_teachers_for_grading_9b6aa8a0: "سيستخدم هذا الاسم من قبل المعلمين لتقييم الدرجات."
+  this_number_must_be_between_1_and_10_d8400fc6: "يجب أن يكون هذا الرقم بين 1 و 10"
   this_option_is_not_compatible_with_new_quizzes_ed489d7c: "هذا الخيار غير متوافق مع New Quizzes"
   this_option_is_not_compatible_with_quizzes_next_6dacd0c1: "هذا الخيار غير متوافق مع Quizzes.Next"
   this_outcome_has_been_used_to_assess_a_student_and_376d5ba9: "تم استخدام هذه النتيجة لتقييم أحد الطلاب ولم يعد تحديثها ممكن"
@@ -31972,6 +32008,8 @@ ar:
   total_activity_21022e7c: "إجمالي الأنشطة"
   total_column_options_4e6a6032: "خيارات عمود الإجمالي"
   total_grade_b0c33841: "الإجمالي: %{grade}"
+  total_grade_higher_than_4c546517: "الدرجة الإجمالية أعلى من"
+  total_grade_lower_than_98891fe4: "الدرجة الإجمالية أقل من"
   total_messages_af025be6: "إجمالي الرسائل"
   total_options_351e2682: "خيارات الإجمالي"
   total_points_44d76792: "إجمالي النقاط"
@@ -32292,6 +32330,7 @@ ar:
   unknown_quiz: "الاختبار غير معروف"
   unknown_quiz_3892d071: "اختبار موجز غير معروف"
   unknown_role_cbe9a089: "دور غير معلوم"
+  unknown_sender_68b1abbc: "مرسل غير معروف"
   unknown_status_status_35331e1d: "حالة غير معروفة، %{status}"
   unknown_status_status_message_3a4ed4d5: "حالة غير معروفة، %{status}: %{message}"
   unknown_user_1113fcaa: "مستخدم غير معروف"
@@ -33405,6 +33444,7 @@ ar:
   warning_for_improved_accessibility_of_calendar_eve_da54b4e2: "تحذير: لتحسين إمكانية الوصول إلى أحداث التقويم، يرجى استخدام \"طريقة عرض جدول الأعمال\"."
   warning_for_improved_accessibility_of_reordering_a_5d0206c7: "تحذير: لتحسين إمكانية الوصول إلى إعادة ترتيب المهام والمجموعات، يرجى استخدام الخيار \"نقل إلى مربع الحوار\" الموجود في القائمة."
   warning_for_improved_accessibility_please_click_he_e6472c02: "تحذير: لتحسين إمكانية الوصول، يرجى النقر هنا لاستخدام العرض الفردي لدفتر الدرجات."
+  warning_for_improved_accessibility_please_use_the__1075c150: "تحذير: لتحسين إمكانية الوصول، الرجاء استخدام التقويم \"طريقة عرض جدول الأعمال\"."
   warning_for_improved_accessibility_with_annotated__43e3a5ea: "تحذير: للحصول على إمكانية وصول محسنة مع المهام ذات التعليقات التوضيحية، يرجى استخدام تحميل الملف أو إدخال النص لترك التعليقات."
   warning_icon_f64936d7: "رمز التحذير"
   warning_if_there_are_any_users_with_this_role_they_1a7c1fef: "تحذير: إذا كان هناك أي مستخدم معيّن لهذا الدور، فسيحتفظ بالأذونات الحالية، ولكنك لن تتمكن من إنشاء مستخدمين جدد لهذا الدور."
@@ -33482,6 +33522,7 @@ ar:
   website_url_url_bd07233d: "عنوان URL لموقع الويب: %{url}"
   wed_84932f18: الأربعاء
   wednesday_b6f755f5: الأربعاء
+  week_1f945ddd: الأسبوع
   week_s_cb1492ee: "أسبوع (أسابيع)"
   weekly_schedule_navigation_6b042645: "التنقل للجدول الأسبوعي"
   weekly_summary_56cd0c95: "الموجز الأسبوعي"
@@ -33574,6 +33615,9 @@ ar:
       (غير المتسق). لا تسري هذه العلامة إلا على حسابات
       _child_الاتحاد. لا تؤثر هذه العلامة على الاتحاد المدار مركزيًا
       بأي طريقة.
+  when_enabled_for_an_account_sends_data_for_all_lti_77568a4f: |-
+      عند التمكين لحساب، يرسل البيانات لكل حالات تشغيل LTI إلى نظام PandataEvents
+      للاستعلام والتصور المرئي. يتطلب تمكين حالات تشغيل تسجيل دخول LTI (مسؤول الموقع) أيضًا.
   when_enabled_for_the_parent_account_of_a_non_centr_4d7adbaa: |-
       عند التمكين للحساب الأصلي لاتحاد غير مدار مركزيًا،
       لن يؤثر تشغيل/إيقاف تشغيل مفاتيح المطورين في الحساب الأصلي على
