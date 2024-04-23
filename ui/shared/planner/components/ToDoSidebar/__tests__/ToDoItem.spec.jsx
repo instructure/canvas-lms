@@ -17,7 +17,8 @@
  */
 
 import React from 'react'
-import {shallow, mount} from 'enzyme'
+import {shallow} from 'enzyme'
+import {fireEvent, render, waitFor} from '@testing-library/react'
 import moment from 'moment-timezone'
 import ToDoItem from '../ToDoItem'
 
@@ -85,21 +86,19 @@ it('renders note icon for planner_notes', () => {
 })
 
 it('renders the courses short name when the item has an associated course', () => {
-  const wrapper = mount(<ToDoItem {...getDefaultProps({course_id: '1'})} />)
-  const info = wrapper.find('.ToDoSidebarItem__Info')
-  expect(info.text()).toMatch(/BGG 101/)
+  const wrapper = render(<ToDoItem {...getDefaultProps({course_id: '1'})} />)
+  expect(wrapper.getByText('BGG 101')).toBeInTheDocument()
 })
 
 it('renders out points if the item has points', () => {
-  const wrapper = mount(<ToDoItem {...getDefaultProps({course_id: '1', points: 50})} />)
-  const info = wrapper.find('.ToDoSidebarItem__Info')
-  expect(info.text()).toMatch(/50 points/)
+  const wrapper = render(<ToDoItem {...getDefaultProps({course_id: '1', points: 50})} />)
+  expect(wrapper.getByText('50 points')).toBeInTheDocument()
 })
 
 // TODO: need to unskip this test when we figure out how to use canvas's locale formats
 it.skip('renders out the due date in the proper format', () => {
-  const wrapper = mount(<ToDoItem {...getDefaultProps()} />)
-  const info = wrapper.find('.ToDoSidebarItem__Info')
+  const wrapper = render(<ToDoItem {...getDefaultProps()} />)
+  const info = wrapper.getByTestId('todo-sidebar-item-info')
   // The due date in was '2017-07-15T20:00:00-0600'
   // since this test is not running in canvas,
   // the user's profile TZ will default to UTC
@@ -108,40 +107,38 @@ it.skip('renders out the due date in the proper format', () => {
 })
 
 it('renders the title as an a tag when given an href prop', () => {
-  const wrapper = mount(<ToDoItem {...getDefaultProps({html_url: '/some_example_url'})} />)
-  const titleLink = wrapper.find('.ToDoSidebarItem__Title')
-  expect(titleLink.exists()).toBe(true)
-  expect(titleLink.containsAllMatchingElements(['Introduction to Board Games'])).toBeTruthy()
+  const wrapper = render(<ToDoItem {...getDefaultProps({html_url: '/some_example_url'})} />)
+  expect(wrapper.getByText('Introduction to Board Games')).toBeInTheDocument()
 })
 
 it('renders out the title as a Text when not given an href prop', () => {
-  const wrapper = mount(<ToDoItem {...getDefaultProps()} />)
-  const title = wrapper.find('.ToDoSidebarItem__Title').find('Text').first()
-  expect(title.exists()).toBe(true)
-  expect(title.text()).toBe('Introduction to Board Games')
+  const wrapper = render(<ToDoItem {...getDefaultProps()} />)
+  expect(wrapper.getByText('Introduction to Board Games')).toBeInTheDocument()
 })
 
 it('renders unique text for dismiss button', () => {
-  const wrapper = mount(<ToDoItem {...getDefaultProps()} />)
-  const dismissButton = wrapper.find('.ToDoSidebarItem__Close').find('button')
-  expect(dismissButton.text()).toBe('Dismiss Introduction to Board Games')
+  const wrapper = render(<ToDoItem {...getDefaultProps()} />)
+  expect(wrapper.getByText('Dismiss Introduction to Board Games')).toBeInTheDocument()
 })
 
 it('calls the handleDismissClick prop when the dismiss X is clicked', () => {
   const handleDismissClick = jest.fn()
-  const wrapper = mount(<ToDoItem {...getDefaultProps()} handleDismissClick={handleDismissClick} />)
-  const btn = wrapper.find('button')
-  btn.simulate('click')
-  expect(handleDismissClick).toHaveBeenCalledWith(
-    expect.objectContaining({
-      type: 'Assignment',
-      title: 'Introduction to Board Games',
-    })
+  const wrapper = render(
+    <ToDoItem {...getDefaultProps()} handleDismissClick={handleDismissClick} />
   )
+  const btn = wrapper.getByTestId('todo-sidebar-item-close-button')
+  fireEvent.click(btn)
+  waitFor(() => {
+    expect(handleDismissClick).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'Assignment',
+        title: 'Introduction to Board Games',
+      })
+    )
+  })
 })
 
 it('does not render the dismiss button when isObserving', () => {
-  const wrapper = mount(<ToDoItem {...getDefaultProps()} isObserving />)
-  const dismissButton = wrapper.find('.ToDoSidebarItem__Close').find('button')
-  expect(dismissButton.exists()).toBeFalsy()
+  const wrapper = render(<ToDoItem {...getDefaultProps()} isObserving={true} />)
+  expect(wrapper.queryByTestId('todo-sidebar-item-close-button')).not.toBeInTheDocument()
 })

@@ -61,6 +61,7 @@ exports[`renders the item to update if provided 1`] = `
         <DateTimeInput
           allowNonStepInput={true}
           colSpacing="medium"
+          data-testid="update-date-time"
           dateFormat="LL"
           dateRenderLabel="Date"
           description={
@@ -248,6 +249,7 @@ exports[`updates state when new note is passed in 1`] = `
         <DateTimeInput
           allowNonStepInput={true}
           colSpacing="medium"
+          data-testid="update-date-time"
           dateFormat="LL"
           dateRenderLabel="Date"
           description={
@@ -443,6 +445,7 @@ exports[`updates state when new note is passed in 2`] = `
         <DateTimeInput
           allowNonStepInput={true}
           colSpacing="medium"
+          data-testid="update-date-time"
           dateFormat="LL"
           dateRenderLabel="Date"
           description={

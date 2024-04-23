@@ -1,24 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`passes trigger property functions and forwards the calls to the dynamic ui manager 1`] = `
-<DynamicUiProvider
-  manager={
-    {
-      "deregisterAnimatable": [MockFunction],
-      "handleAction": [MockFunction],
-      "preTriggerUpdates": [MockFunction],
-      "registerAnimatable": [MockFunction],
-      "triggerUpdates": [MockFunction],
-    }
-  }
->
-  <Animatable(MockComponent)>
-    <MockComponent
-      deregisterAnimatable={[Function]}
-      registerAnimatable={[Function]}
-    >
-      <div />
-    </MockComponent>
-  </Animatable(MockComponent)>
-</DynamicUiProvider>
+<div
+  data-testid="mock-component"
+/>
 `;

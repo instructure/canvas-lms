@@ -205,6 +205,7 @@ export class UpdateItemTray_ extends Component {
         : undefined
     return (
       <DateTimeInput
+        data-testid="update-date-time"
         required={true}
         description={
           <ScreenReaderContent>{I18n.t('The date and time this to do is due')}</ScreenReaderContent>
