@@ -597,6 +597,7 @@ EditView.prototype.getFormData = function () {
       assign_data.peer_review_count = numberHelper.parse(assign_data.peer_review_count)
     }
   }
+  data.set_assignment = document.querySelector('#use_for_grading') && document.querySelector('#use_for_grading').checked
   if ((assign_data != null ? assign_data.set_assignment : void 0) === '1') {
     data.set_assignment = '1'
     data.assignment = this.updateAssignment(assign_data)
@@ -761,7 +762,8 @@ EditView.prototype.validateBeforeSave = function (data, errors) {
   if (data.anonymous_state !== 'full_anonymity' && data.anonymous_state !== 'partial_anonymity') {
     data.anonymous_state = null
   }
-  if (this.isTopic() && data.set_assignment === '1') {
+  if (this.isTopic() && data.anonymous_state == null && data.set_assignment === '1') {
+    console.error("set_assignment true")
     if (this.assignmentGroupSelector != null) {
       errors = this.assignmentGroupSelector.validateBeforeSave(data, errors)
     }
@@ -772,13 +774,6 @@ EditView.prototype.validateBeforeSave = function (data, errors) {
     errors = this.dueDateOverrideView.validateBeforeSave(validateBeforeSaveData, errors)
     errors = this._validatePointsPossible(data, errors)
     errors = this._validateTitle(data, errors)
-    if (data.anonymous_state !== null) {
-      errors.anonymous_state = [
-        {
-          message: I18n.t('You are not allowed to create an anonymous graded discussion'),
-        },
-      ]
-    }
   } else {
     this.model.set(
       'assignment',
