@@ -25,6 +25,7 @@ import React, {useState} from 'react'
 import CoursePacingNotice from '@canvas/due-dates/react/CoursePacingNotice'
 import {TrayDisplayer} from '../TrayDisplayer/TrayDisplayer'
 import {DueDateTray} from '../DueDateTray/DueDateTray'
+import {CheckpointsTray} from '../CheckpointsTray/CheckpointsTray'
 
 const I18n = useI18nScope('discussion_posts')
 
@@ -58,11 +59,28 @@ export function AssignmentAvailabilityContainer({...props}) {
         ]
   }
 
+  const useCheckpointsTray = props.assignment?.checkpoints?.length > 0
+
+  const trayComponent = () => {
+    if (props.inPacedCourse) {
+      return <CoursePacingNotice courseId={props.courseId} />
+    } else if (useCheckpointsTray) {
+      return (
+        <CheckpointsTray
+          checkpoints={props.assignment.checkpoints}
+          replyToEntryRequiredCount={props.replyToEntryRequiredCount}
+        />
+      )
+    } else {
+      return <DueDateTray assignmentOverrides={assignmentOverrides} isAdmin={props.isAdmin} />
+    }
+  }
+
   return (
     <>
       {props.inPacedCourse ||
       (props.isAdmin && assignmentOverrides.length > 1) ||
-      props.assignment.mySubAssignmentSubmissionsConnection?.nodes?.length > 0 ? (
+      useCheckpointsTray ? (
         <AssignmentMultipleAvailabilityWindows
           assignmentOverrides={assignmentOverrides}
           onSetDueDateTrayOpen={setDueDateTrayOpen}
@@ -77,16 +95,11 @@ export function AssignmentAvailabilityContainer({...props}) {
         />
       )}
       <TrayDisplayer
+        size={useCheckpointsTray ? 'small' : 'large'}
         setTrayOpen={setDueDateTrayOpen}
         trayTitle="Due Dates"
         isTrayOpen={dueDateTrayOpen}
-        trayComponent={
-          props.inPacedCourse ? (
-            <CoursePacingNotice courseId={props.courseId} />
-          ) : (
-            <DueDateTray assignmentOverrides={assignmentOverrides} isAdmin={props.isAdmin} />
-          )
-        }
+        trayComponent={trayComponent()}
       />
     </>
   )
@@ -97,4 +110,5 @@ AssignmentAvailabilityContainer.propTypes = {
   isAdmin: PropTypes.bool,
   inPacedCourse: PropTypes.bool,
   courseId: PropTypes.string,
+  replyToEntryRequiredCount: PropTypes.number,
 }
