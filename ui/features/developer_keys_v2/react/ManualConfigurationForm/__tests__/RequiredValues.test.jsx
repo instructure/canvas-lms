@@ -17,12 +17,13 @@
  */
 
 import React from 'react'
-import {mount} from 'enzyme'
+import {render, screen} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import get from 'lodash/get'
 
 import RequiredValues from '../RequiredValues'
 
-const props = (overrides = {}) => {
+const props = ({configOverrides = {}, overrides = {}}) => {
   return {
     toolConfiguration: {
       title: 'This is a title',
@@ -31,7 +32,7 @@ const props = (overrides = {}) => {
       oidc_initiation_url: 'http://example.com/initiate',
       // public_jwk is first stringified in the constructor before being JSON.parse()d again:
       public_jwk: {kty: 'RSA', alg: 'RSA256', n: '', e: '', kid: '', use: ''},
-      ...overrides,
+      ...configOverrides,
     },
     flashError: () => {},
     ...overrides,
@@ -39,8 +40,10 @@ const props = (overrides = {}) => {
 }
 
 it('generates the toolConfiguration', () => {
-  const wrapper = mount(<RequiredValues {...props()} />)
-  const toolConfig = wrapper.instance().generateToolConfigurationPart()
+  const ref = React.createRef()
+  const p = props({overrides: {ref}})
+  render(<RequiredValues {...p} />)
+  const toolConfig = ref.current.generateToolConfigurationPart()
   expect(Object.keys(toolConfig).length).toEqual(5)
 })
 
@@ -49,14 +52,11 @@ const checkToolConfigPart = (toolConfig, path, value) => {
 }
 
 const checkChange = (path, funcName, value, expectedValue = null) => {
-  const wrapper = mount(<RequiredValues {...props()} />)
+  const ref = React.createRef()
+  render(<RequiredValues {...props({overrides: {ref}})} />)
 
-  wrapper.instance()[funcName]({target: {value}})
-  checkToolConfigPart(
-    wrapper.instance().generateToolConfigurationPart(),
-    path,
-    expectedValue || value
-  )
+  ref.current[funcName]({target: {value}})
+  checkToolConfigPart(ref.current.generateToolConfigurationPart(), path, expectedValue || value)
 }
 
 it('changes the output when domain changes', () => {
@@ -84,22 +84,35 @@ it('changes the output when public_jwk changes', () => {
 })
 
 it('is valid when valid', () => {
-  const wrapper = mount(<RequiredValues {...props()} />)
-  expect(wrapper.instance().valid()).toEqual(true)
+  const ref = React.createRef()
+  render(<RequiredValues {...props({overrides: {ref}})} />)
+  expect(ref.current.valid()).toEqual(true)
 })
 
 it('is invalid when invalid inputs', () => {
   const flashError = jest.fn()
-  const wrapper = mount(<RequiredValues {...props({target_link_uri: '', flashError})} />)
-  expect(wrapper.instance().valid()).toEqual(false)
+  const ref = React.createRef()
+  render(
+    <RequiredValues
+      {...props({overrides: {flashError, ref}, configOverrides: {target_link_uri: ''}})}
+    />
+  )
+  expect(ref.current.valid()).toEqual(false)
   expect(flashError).toHaveBeenCalled()
 })
 
 it('is invalid when the public JWK is missing a field', () => {
   const flashError = jest.fn()
-  const public_jwk = {kty: 'RSA', alg: 'RSA256', e: '', kid: '', use: ''} // no 'n'
-  const wrapper = mount(<RequiredValues {...props({public_jwk, flashError})} />)
-  expect(wrapper.instance().valid()).toEqual(false)
+  const ref = React.createRef()
+  const overrides = {
+    ref,
+    flashError,
+  }
+  const configOverrides = {
+    public_jwk: {kty: 'RSA', alg: 'RSA256', e: '', kid: '', use: ''}, // no 'n'
+  }
+  render(<RequiredValues {...props({overrides, configOverrides})} />)
+  expect(ref.current.valid()).toEqual(false)
   expect(flashError).toHaveBeenCalled()
 })
 
@@ -107,6 +120,16 @@ it('is valid if the public JWK is empty but a URL is given', () => {
   const flashError = jest.fn()
   const public_jwk = {}
   const public_jwk_url = 'https://www.instructure.com/public_key_url'
-  const wrapper = mount(<RequiredValues {...props({public_jwk, flashError, public_jwk_url})} />)
-  expect(wrapper.instance().valid()).toEqual(true)
+  const ref = React.createRef()
+  const overrides = {
+    flashError,
+    ref,
+  }
+  const configOverrides = {
+    public_jwk,
+    public_jwk_url,
+  }
+  render(<RequiredValues {...props({configOverrides, overrides})} />)
+  expect(ref.current.valid()).toEqual(true)
+  expect(flashError).not.toHaveBeenCalled()
 })
