@@ -602,12 +602,19 @@ window.modules = (function () {
       }
       $item.addClass('indent_' + (data.indent || 0))
       $item.addClass(modules.itemClass(data))
-      // The Assign To menu option is currently valid for assignments and quizzes only.
+
+      const isValidContentType = [
+        'Assignment',
+        'Quizzes::Quiz',
+        'DiscussionTopic',
+        'WikiPage'
+      ].includes(data.content_type)
+      
       // This function is called twice, once with the data the user just entered
       // and again after the api request returns. The second time we have
       // all the real data, including the module item's id. Wait until then
       // to add the option.
-      if (isAssignmentOrQuiz && 'id' in data) {
+      if (isValidContentType && 'id' in data) {
         const $assignToMenuItem = $item.find('.assign-to-option')
         if ($assignToMenuItem.length) {
           $assignToMenuItem.removeClass('hidden')
@@ -2493,6 +2500,18 @@ $(document).ready(function () {
     }
   })
 
+  function handleRemoveDueDateInput(itemProps) {
+    switch(itemProps.moduleItemType) {
+      case 'discussion':
+      case 'discussion_topic':
+      case 'page':
+      case 'wiki_page':
+        return true
+      default:
+        return false
+    }
+  }
+
   function renderItemAssignToTray(open, returnFocusTo, itemProps) {
     ReactDOM.render(
       <ItemAssignToTray
@@ -2514,6 +2533,7 @@ $(document).ready(function () {
         pointsPossible={itemProps.pointsPossible}
         locale={ENV.LOCALE || 'en'}
         timezone={ENV.TIMEZONE || 'UTC'}
+        removeDueDateInput={handleRemoveDueDateInput(itemProps)}
       />,
       document.getElementById('differentiated-modules-mount-point')
     )

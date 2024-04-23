@@ -72,8 +72,10 @@ function itemTypeToIcon(iconType: IconType) {
     case 'lti-quiz':
       return <IconQuizSolid data-testid="icon-lti-quiz" />
     case 'discussion':
+    case 'discussion_topic':
       return <IconDiscussionLine data-testid="icon-discussion" />
     case 'page':
+    case 'wiki_page':
       return <IconDocumentLine data-testid="icon-page" />
     default:
       return <IconQuestionLine data-testid="icon-unknown" />
@@ -593,8 +595,10 @@ export default function ItemAssignToTray({
       case 'lti-quiz':
         return I18n.t('Quiz')
       case 'discussion':
+      case 'discussion_topic':
         return I18n.t('Discussion')
       case 'page':
+      case 'wiki_page':
         return I18n.t('Page')
       default:
         return ''
