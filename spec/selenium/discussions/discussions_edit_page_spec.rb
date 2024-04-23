@@ -697,6 +697,18 @@ describe "discussions" do
           expect(f("input[placeholder='Select Assignment Due Date']").attribute("value")).not_to be_empty
         end
 
+        it "allows settings a graded discussion to an ungraded discussion" do
+          skip("VICE-4225")
+          graded_discussion = create_graded_discussion(course)
+          get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/edit"
+
+          # Uncheck the "graded" checkbox
+          force_click_native('input[type=checkbox][value="graded"]')
+          fj("button:contains('Save')").click
+
+          expect(DiscussionTopic.last.assignment).to be_nil
+        end
+
         it "allows editing the assignment group for the graded discussion" do
           assign_group_2 = course.assignment_groups.create!(name: "Group 2")
           get "/courses/#{course.id}/discussion_topics/#{assignment_topic.id}/edit"
@@ -1124,6 +1136,24 @@ describe "discussions" do
 
             expect(sub_assignment1.points_possible).to eq 5
             expect(sub_assignment2.points_possible).to eq 7
+          end
+
+          it "deletes checkpoints if the graded checkbox is unselected on an exisitng discussion with checkpoints" do
+            skip("VICE-4225")
+            assignment = Assignment.last
+            expect(assignment.sub_assignments.count).to eq 2
+
+            get "/courses/#{course.id}/discussion_topics/#{@checkpointed_discussion.id}/edit"
+
+            # Uncheck the "graded" checkbox
+            force_click_native('input[type=checkbox][value="graded"]')
+            fj("button:contains('Save')").click
+
+            # Expect the assignment an the checkpoints to no longer exist
+            expect(DiscussionTopic.last.reply_to_entry_required_count).to eq 0
+            expect(assignment.sub_assignments.count).to eq 0
+            expect(Assignment.last.has_sub_assignments).to be(false)
+            expect(DiscussionTopic.last.assignment).to be_nil
           end
         end
       end
