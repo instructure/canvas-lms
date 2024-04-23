@@ -66,8 +66,8 @@ describe('ItemAssignToCard', () => {
 
   it('renders the delete button when onDelete is provided', () => {
     const onDelete = jest.fn()
-    const {getByRole} = renderComponent({onDelete})
-    expect(getByRole('button', {name: 'Delete'})).toBeInTheDocument()
+    const {getByTestId} = renderComponent({onDelete})
+    expect(getByTestId('delete-card-button')).toBeInTheDocument()
   })
 
   it('disables blueprint-locked date inputs', () => {
@@ -81,8 +81,8 @@ describe('ItemAssignToCard', () => {
 
   it('calls onDelete when delete button is clicked', () => {
     const onDelete = jest.fn()
-    const {getByRole} = renderComponent({onDelete})
-    getByRole('button', {name: 'Delete'}).click()
+    const {getByTestId} = renderComponent({onDelete})
+    getByTestId('delete-card-button').click()
     expect(onDelete).toHaveBeenCalledWith('assign-to-card-001')
   })
 
