@@ -1,0 +1,18 @@
+.RecordingBar {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.8625rem;
+
+    &__time {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    &__icon {
+      display: inline-flex;
+      font-size: 1.125rem;
+    }
+  }
