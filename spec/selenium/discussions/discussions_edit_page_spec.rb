@@ -163,6 +163,120 @@ describe "discussions" do
 
             driver.switch_to.alert.dismiss
           end
+
+          context "with archived grading schemes enabled" do
+            before do
+              Account.site_admin.enable_feature!(:grading_scheme_updates)
+              Account.site_admin.enable_feature!(:archived_grading_schemes)
+              @course = course
+              @account = @course.account
+              @active_grading_standard = @course.grading_standards.create!(title: "Active Grading Scheme", data: { "A" => 0.9, "F" => 0 }, scaling_factor: 1.0, points_based: false, workflow_state: "active")
+              @archived_grading_standard = @course.grading_standards.create!(title: "Archived Grading Scheme", data: { "A" => 0.9, "F" => 0 }, scaling_factor: 1.0, points_based: false, workflow_state: "archived")
+              @account_grading_standard = @account.grading_standards.create!(title: "Account Grading Scheme", data: { "A" => 0.9, "F" => 0 }, scaling_factor: 1.0, points_based: false, workflow_state: "active")
+              discussion_assignment_options = {
+                name: "assignment",
+                points_possible: 10,
+                grading_type: "letter_grade",
+                assignment_group: course.assignment_groups.create!(name: "assignment group"),
+                only_visible_to_overrides: true,
+              }
+
+              discussion_assignment_peer_review_options = {
+                peer_reviews: true,
+                automatic_peer_reviews: true,
+                peer_reviews_due_at: 1.day.ago,
+                peer_review_count: 2,
+              }
+
+              discussion_assignment_options = discussion_assignment_options.merge(discussion_assignment_peer_review_options)
+
+              @graded_discussion = create_graded_discussion(course, discussion_assignment_options)
+
+              course_override_due_date = 5.days.from_now
+              course_section = course.course_sections.create!(name: "section alpha")
+              @graded_discussion.assignment.assignment_overrides.create!(set_type: "CourseSection", set_id: course_section.id, due_at: course_override_due_date)
+              @assignment = @graded_discussion.assignment
+            end
+
+            it "shows archived grading scheme if it is the course default twice, once to follow course default scheme and once to choose that scheme to use" do
+              @course.update!(grading_standard_id: @archived_grading_standard.id)
+              @course.reload
+              get "/courses/#{@course.id}/discussion_topics/#{@graded_discussion.id}/edit"
+              expect(f("[data-testid='grading-schemes-selector-dropdown']").attribute("title")).to eq(@archived_grading_standard.title + " (course default)")
+              f("[data-testid='grading-schemes-selector-dropdown']").click
+              expect(f("[data-testid='grading-schemes-selector-option-#{@course.grading_standard.id}']")).to include_text(@course.grading_standard.title)
+            end
+
+            it "shows archived grading scheme if it is the current assignment grading standard" do
+              @assignment.update!(grading_standard_id: @archived_grading_standard.id)
+              @assignment.reload
+              get "/courses/#{@course.id}/discussion_topics/#{@graded_discussion.id}/edit"
+              wait_for_ajaximations
+              expect(f("[data-testid='grading-schemes-selector-dropdown']").attribute("title")).to eq(@archived_grading_standard.title)
+            end
+
+            it "removes grading schemes from dropdown after archiving them but still shows them upon reopening the modal" do
+              get "/courses/#{@course.id}/discussion_topics/#{@graded_discussion.id}/edit"
+              wait_for_ajaximations
+              f("[data-testid='grading-schemes-selector-dropdown']").click
+              expect(f("[data-testid='grading-schemes-selector-option-#{@active_grading_standard.id}']")).to be_present
+              f("[data-testid='manage-all-grading-schemes-button']").click
+              wait_for_ajaximations
+              f("[data-testid='grading-scheme-#{@active_grading_standard.id}-archive-button']").click
+              wait_for_ajaximations
+              f("[data-testid='manage-all-grading-schemes-close-button']").click
+              wait_for_ajaximations
+              f("[data-testid='grading-schemes-selector-dropdown']").click
+              expect(f("[data-testid='grading-schemes-selector-dropdown-form']")).not_to contain_css("[data-testid='grading-schemes-selector-option-#{@active_grading_standard.id}']")
+              f("[data-testid='manage-all-grading-schemes-button']").click
+              wait_for_ajaximations
+              expect(f("[data-testid='grading-scheme-row-#{@active_grading_standard.id}']").text).to be_present
+            end
+
+            it "shows all archived schemes in the manage grading schemes modal" do
+              archived_gs1 = @course.grading_standards.create!(title: "Archived Grading Scheme 1", data: { "A" => 0.9, "F" => 0 }, scaling_factor: 1.0, points_based: false, workflow_state: "archived")
+              archived_gs2 = @course.grading_standards.create!(title: "Archived Grading Scheme 2", data: { "A" => 0.9, "F" => 0 }, scaling_factor: 1.0, points_based: false, workflow_state: "archived")
+              archived_gs3 = @course.grading_standards.create!(title: "Archived Grading Scheme 3", data: { "A" => 0.9, "F" => 0 }, scaling_factor: 1.0, points_based: false, workflow_state: "archived")
+              get "/courses/#{@course.id}/discussion_topics/#{@graded_discussion.id}/edit"
+              wait_for_ajaximations
+              f("[data-testid='manage-all-grading-schemes-button']").click
+              wait_for_ajaximations
+              expect(f("[data-testid='grading-scheme-#{archived_gs1.id}-name']")).to include_text(archived_gs1.title)
+              expect(f("[data-testid='grading-scheme-#{archived_gs2.id}-name']")).to include_text(archived_gs2.title)
+              expect(f("[data-testid='grading-scheme-#{archived_gs3.id}-name']")).to include_text(archived_gs3.title)
+            end
+
+            it "will still show the assignment grading scheme if you archive it on the edit page in the management modal and persist on reload" do
+              @assignment.update!(grading_standard_id: @active_grading_standard.id)
+              @assignment.reload
+              get "/courses/#{@course.id}/discussion_topics/#{@graded_discussion.id}/edit"
+              wait_for_ajaximations
+              expect(f("[data-testid='grading-schemes-selector-dropdown']").attribute("title")).to eq(@active_grading_standard.title)
+              f("[data-testid='manage-all-grading-schemes-button']").click
+              wait_for_ajaximations
+              f("[data-testid='grading-scheme-#{@active_grading_standard.id}-archive-button']").click
+              wait_for_ajaximations
+              f("[data-testid='manage-all-grading-schemes-close-button']").click
+              wait_for_ajaximations
+              expect(f("[data-testid='grading-schemes-selector-dropdown']").attribute("title")).to eq(@active_grading_standard.title)
+              get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
+              wait_for_ajaximations
+              expect(f("[data-testid='grading-schemes-selector-dropdown']").attribute("title")).to eq(@active_grading_standard.title)
+            end
+
+            it "creates a discussion topic with selected grading scheme/standard" do
+              grading_standard = @course.grading_standards.create!(title: "Win/Lose", data: [["Winner", 0.94], ["Loser", 0]])
+              get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
+              wait_for_ajaximations
+              f("[data-testid='grading-schemes-selector-dropdown']").click
+              f("[data-testid='grading-schemes-selector-option-#{grading_standard.id}']").click
+
+              f(".form-actions button[type=submit]").click
+              fj("span:contains('Continue')").click
+              a = DiscussionTopic.last.assignment
+              expect(a.grading_standard_id).to eq grading_standard.id
+            end
+          end
         end
 
         context "with a group attached" do
@@ -634,7 +748,28 @@ describe "discussions" do
       end
 
       context "graded" do
-        it "displays graded assignment options correctly when initially opening edit page" do
+        def create_graded_discussion(discussion_course, assignment_options = {})
+          default_assignment_options = {
+            name: "Default Assignment",
+            points_possible: 10,
+            assignment_group: discussion_course.assignment_groups.create!(name: "Default Assignment Group"),
+            only_visible_to_overrides: false
+          }
+          options = default_assignment_options.merge(assignment_options)
+
+          discussion_assignment = discussion_course.assignments.create!(options)
+          all_graded_discussion_options = {
+            user: teacher,
+            title: "assignment topic title",
+            message: "assignment topic message",
+            discussion_type: "threaded",
+            assignment: discussion_assignment,
+          }
+          discussion_course.discussion_topics.create!(all_graded_discussion_options)
+        end
+
+        it "displays graded assignment options correctly when initially opening edit page with archived grading schemes disabled" do
+          Account.site_admin.disable_feature!(:archived_grading_schemes)
           grading_standard = course.grading_standards.create!(title: "Win/Lose", data: [["Winner", 0.94], ["Loser", 0]])
 
           # Create a grading standard and make sure it is selected
@@ -707,6 +842,108 @@ describe "discussions" do
           fj("button:contains('Save')").click
 
           expect(DiscussionTopic.last.assignment).to be_nil
+        end
+
+        context "with archived grading schemes enabled" do
+          before do
+            Account.site_admin.enable_feature!(:grading_scheme_updates)
+            Account.site_admin.enable_feature!(:archived_grading_schemes)
+            @course = course
+            @account = @course.account
+            @active_grading_standard = @course.grading_standards.create!(title: "Active Grading Scheme", data: { "A" => 0.9, "F" => 0 }, scaling_factor: 1.0, points_based: false, workflow_state: "active")
+            @archived_grading_standard = @course.grading_standards.create!(title: "Archived Grading Scheme", data: { "A" => 0.9, "F" => 0 }, scaling_factor: 1.0, points_based: false, workflow_state: "archived")
+            @account_grading_standard = @account.grading_standards.create!(title: "Account Grading Scheme", data: { "A" => 0.9, "F" => 0 }, scaling_factor: 1.0, points_based: false, workflow_state: "active")
+            discussion_assignment_options = {
+              name: "assignment",
+              points_possible: 10,
+              grading_type: "letter_grade",
+              assignment_group: course.assignment_groups.create!(name: "assignment group"),
+              only_visible_to_overrides: true,
+            }
+
+            @graded_discussion = create_graded_discussion(course, discussion_assignment_options)
+            @assignment = @graded_discussion.assignment
+          end
+
+          it "shows archived grading scheme if it is the course default twice, once to follow course default scheme and once to choose that scheme to use" do
+            @course.update!(grading_standard_id: @archived_grading_standard.id)
+            @course.reload
+            get "/courses/#{@course.id}/discussion_topics/#{@graded_discussion.id}/edit"
+            wait_for_ajaximations
+            expect(f("[data-testid='grading-schemes-selector-dropdown']").attribute("title")).to eq(@archived_grading_standard.title + " (course default)")
+            f("[data-testid='grading-schemes-selector-dropdown']").click
+            expect(f("[data-testid='grading-schemes-selector-option-#{@course.grading_standard.id}']")).to include_text(@course.grading_standard.title)
+          end
+
+          it "shows archived grading scheme if it is the current assignment grading standard" do
+            @assignment.update!(grading_standard_id: @archived_grading_standard.id)
+            @assignment.reload
+            get "/courses/#{@course.id}/discussion_topics/#{@graded_discussion.id}/edit"
+            wait_for_ajaximations
+            expect(f("[data-testid='grading-schemes-selector-dropdown']").attribute("title")).to eq(@archived_grading_standard.title)
+          end
+
+          it "removes grading schemes from dropdown after archiving them but still shows them upon reopening the modal" do
+            get "/courses/#{@course.id}/discussion_topics/#{@graded_discussion.id}/edit"
+            wait_for_ajaximations
+            f("[data-testid='grading-schemes-selector-dropdown']").click
+            expect(f("[data-testid='grading-schemes-selector-option-#{@active_grading_standard.id}']")).to be_present
+            f("[data-testid='manage-all-grading-schemes-button']").click
+            wait_for_ajaximations
+            f("[data-testid='grading-scheme-#{@active_grading_standard.id}-archive-button']").click
+            wait_for_ajaximations
+            f("[data-testid='manage-all-grading-schemes-close-button']").click
+            wait_for_ajaximations
+            f("[data-testid='grading-schemes-selector-dropdown']").click
+            expect(f("[data-testid='grading-schemes-selector-dropdown-form']")).not_to contain_css("[data-testid='grading-schemes-selector-option-#{@active_grading_standard.id}']")
+            f("[data-testid='manage-all-grading-schemes-button']").click
+            wait_for_ajaximations
+            expect(f("[data-testid='grading-scheme-row-#{@active_grading_standard.id}']").text).to be_present
+          end
+
+          it "shows all archived schemes in the manage grading schemes modal" do
+            archived_gs1 = @course.grading_standards.create!(title: "Archived Grading Scheme 1", data: { "A" => 0.9, "F" => 0 }, scaling_factor: 1.0, points_based: false, workflow_state: "archived")
+            archived_gs2 = @course.grading_standards.create!(title: "Archived Grading Scheme 2", data: { "A" => 0.9, "F" => 0 }, scaling_factor: 1.0, points_based: false, workflow_state: "archived")
+            archived_gs3 = @course.grading_standards.create!(title: "Archived Grading Scheme 3", data: { "A" => 0.9, "F" => 0 }, scaling_factor: 1.0, points_based: false, workflow_state: "archived")
+            get "/courses/#{@course.id}/discussion_topics/#{@graded_discussion.id}/edit"
+            wait_for_ajaximations
+            f("[data-testid='manage-all-grading-schemes-button']").click
+            wait_for_ajaximations
+            expect(f("[data-testid='grading-scheme-#{archived_gs1.id}-name']")).to include_text(archived_gs1.title)
+            expect(f("[data-testid='grading-scheme-#{archived_gs2.id}-name']")).to include_text(archived_gs2.title)
+            expect(f("[data-testid='grading-scheme-#{archived_gs3.id}-name']")).to include_text(archived_gs3.title)
+          end
+
+          it "will still show the assignment grading scheme if you archive it on the edit page in the management modal and persist on reload" do
+            @assignment.update!(grading_standard_id: @active_grading_standard.id)
+            @assignment.reload
+            get "/courses/#{@course.id}/discussion_topics/#{@graded_discussion.id}/edit"
+            wait_for_ajaximations
+            expect(f("[data-testid='grading-schemes-selector-dropdown']").attribute("title")).to eq(@active_grading_standard.title)
+            f("[data-testid='manage-all-grading-schemes-button']").click
+            wait_for_ajaximations
+            f("[data-testid='grading-scheme-#{@active_grading_standard.id}-archive-button']").click
+            wait_for_ajaximations
+            f("[data-testid='manage-all-grading-schemes-close-button']").click
+            wait_for_ajaximations
+            expect(f("[data-testid='grading-schemes-selector-dropdown']").attribute("title")).to eq(@active_grading_standard.title)
+            get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
+            wait_for_ajaximations
+            expect(f("[data-testid='grading-schemes-selector-dropdown']").attribute("title")).to eq(@active_grading_standard.title)
+          end
+
+          it "creates a discussion topic with selected grading scheme/standard" do
+            grading_standard = @course.grading_standards.create!(title: "Win/Lose", data: [["Winner", 0.94], ["Loser", 0]])
+            get "/courses/#{@course.id}/discussion_topics/#{@graded_discussion.id}/edit"
+            wait_for_ajaximations
+            f("[data-testid='grading-schemes-selector-dropdown']").click
+            f("[data-testid='grading-schemes-selector-option-#{grading_standard.id}']").click
+            f("[data-testid='save-button']").click
+            wait_for_ajaximations
+            expect_new_page_load { f("[data-testid='continue-button']").click }
+            a = DiscussionTopic.last.assignment
+            expect(a.grading_standard_id).to eq grading_standard.id
+          end
         end
 
         it "allows editing the assignment group for the graded discussion" do
