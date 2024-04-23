@@ -27280,6 +27280,7 @@ nn:
       page_locked_by_modules_until: "Sida vil bli tilgjengeleg på %{lock_info.unlock_at} når du har fullført modulane:"
       page_locked_until: "Sida vil bli tilgjengeleg på %{lock_info.unlock_at}"
     wiki_page_edit: 
+      assign_to_label: "Tildel tilgang"
       buttons: 
         cancel: Avbryt
         save: Lagre
