@@ -151,6 +151,13 @@ def set_discussion_assignment_association(assignment_params, discussion_topic)
 
   if is_deleting_assignment && !discussion_topic&.assignment.nil?
     assignment = discussion_topic.assignment
+
+    if assignment.has_sub_assignments
+      Checkpoints::DiscussionCheckpointDeleterService.call(
+        discussion_topic:
+      )
+    end
+
     discussion_topic.assignment = nil
     assignment.discussion_topic = nil
     assignment.destroy

@@ -371,7 +371,8 @@ export default function DiscussionTopicForm({
         peerReviewDueDate,
         intraGroupPeerReviews,
         masteryPathsOption,
-        isCheckpoints
+        isCheckpoints,
+        currentDiscussionTopic?.assignment
       ),
       checkpoints: prepareCheckpointsPayload(
         pointsPossibleReplyToTopic,
@@ -400,7 +401,7 @@ export default function DiscussionTopicForm({
         removeAttachment: !attachment?._id,
       }
 
-      if (currentDiscussionTopic?.assignment?.hasSubAssignments) {
+      if (currentDiscussionTopic?.assignment?.hasSubAssignments && isGraded) {
         editingPayload.setCheckpoints = isCheckpoints
       }
 
