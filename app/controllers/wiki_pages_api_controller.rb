@@ -161,7 +161,7 @@ class WikiPagesApiController < ApplicationController
   before_action :require_wiki_page, except: %i[create update update_front_page index check_title_availability]
   before_action :was_front_page, except: [:index, :check_title_availability]
   before_action only: %i[show update destroy revisions show_revision revert] do
-    check_differentiated_assignments(@page) if @context.conditional_release?
+    check_differentiated_assignments(@page)
   end
 
   include Api::V1::WikiPage
