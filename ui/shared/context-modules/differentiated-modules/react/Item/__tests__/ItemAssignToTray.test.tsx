@@ -117,6 +117,8 @@ describe('ItemAssignToTray', () => {
         overrides: [],
       })
       .get('/api/v1/courses/1/quizzes/23/date_details', {})
+      .get('/api/v1/courses/1/discussion_topics/23/date_details', {})
+      .get('/api/v1/courses/1/pages/23/date_details', {})
     fetchMock.get(STUDENTS_URL, STUDENTS_DATA).get(SECTIONS_URL, SECTIONS_DATA)
   })
 
@@ -155,17 +157,19 @@ describe('ItemAssignToTray', () => {
   })
 
   it('renders a discussion', () => {
-    // When discussions API are supported, this test should fail and this section should be removed
-    fetchMock.get('/', {
-      status: 404,
-      body: {error: 'UnSupported item type'},
-    })
     const {getByTestId, getByText} = renderComponent({
       itemType: 'discussion',
       iconType: 'discussion',
     })
     expect(getByText('Discussion | 10 pts')).toBeInTheDocument()
     const icon = getByTestId('icon-discussion')
+    expect(icon).toBeInTheDocument()
+  })
+
+  it('renders a page', () => {
+    const {getByTestId, getByText} = renderComponent({itemType: 'page', iconType: 'page'})
+    expect(getByText('Page | 10 pts')).toBeInTheDocument()
+    const icon = getByTestId('icon-page')
     expect(icon).toBeInTheDocument()
   })
 

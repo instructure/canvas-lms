@@ -188,8 +188,10 @@ export const itemTypeToApiURL = (courseId: string, itemType: ItemType, itemId: s
     case 'quiz':
       return `/api/v1/courses/${courseId}/quizzes/${itemId}/date_details`
     case 'discussion':
+    case 'discussion_topic':
       return `/api/v1/courses/${courseId}/discussion_topics/${itemId}/date_details`
     case 'page':
+    case 'wiki_page':
       return `/api/v1/courses/${courseId}/pages/${itemId}/date_details`
     default:
       return ''

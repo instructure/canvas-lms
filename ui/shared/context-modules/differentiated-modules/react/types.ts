@@ -59,9 +59,24 @@ interface StudentsOverride {
   student_ids: string[]
 }
 
-export type ItemType = 'assignment' | 'quiz' | 'lti-quiz' | 'discussion' | 'page'
+export type ItemType =
+  | 'assignment'
+  | 'quiz'
+  | 'lti-quiz'
+  | 'discussion'
+  | 'discussion_topic'
+  | 'page'
+  | 'wiki_page'
 
-export type IconType = 'assignment' | 'quiz' | 'lti-quiz' | 'discussion' | 'page' | null
+export type IconType =
+  | 'assignment'
+  | 'quiz'
+  | 'lti-quiz'
+  | 'discussion'
+  | 'discussion_topic'
+  | 'page'
+  | 'wiki_page'
+  | null
 
 export type AssignmentOverridePayload = SectionOverride | StudentsOverride
 
