@@ -204,6 +204,27 @@ export default function ItemAssignToTray({
     return getEveryoneOption(hasOverrides)
   }, [disabledOptionIds, assignToCards])
 
+  useEffect(() => {
+    if (defaultCards === undefined || !itemContentId || itemType !== 'assignment') return
+
+    setFetchInFlight(true)
+    doFetchApi({
+      path: itemTypeToApiURL(courseId, itemType, itemContentId),
+    })
+      .then((response: FetchDueDatesResponse) => {
+        const dateDetailsApiResponse = response.json
+        setBlueprintDateLocks(dateDetailsApiResponse.blueprint_date_locks)
+      })
+      .catch(() => {
+        showFlashError()()
+        handleDismiss()
+      })
+      .finally(() => {
+        setFetchInFlight(false)
+      })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   const handleDismiss = useCallback(() => {
     if (defaultCards) {
       setAssignToCards(defaultCards)

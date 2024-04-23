@@ -27,6 +27,7 @@ const SECTIONS_DATA = [
   {id: '2', course_id: '1', name: 'Section A', start_at: null, end_at: null},
 ]
 const COURSE_ID = 1
+const ASSIGNMENT_ID = '1'
 
 describe('DifferentiatedModulesSection', () => {
   const assignmentcollection = new AssignmentOverrideCollection([
@@ -50,7 +51,7 @@ describe('DifferentiatedModulesSection', () => {
     onSync: () => {},
     importantDates: false,
     assignmentName: 'First Assignment',
-    assignmentId: '1',
+    assignmentId: ASSIGNMENT_ID,
     type: 'assignment',
     pointsPossible: '10',
     overrides: assignmentcollection.models.map(model => model.toJSON().assignment_override),
@@ -59,6 +60,7 @@ describe('DifferentiatedModulesSection', () => {
 
   const SECTIONS_URL = `/api/v1/courses/${COURSE_ID}/sections`
   const STUDENTS_URL = `api/v1/courses/${COURSE_ID}/users?enrollment_type=student`
+  const DATE_DETAILS = `/api/v1/courses/${COURSE_ID}/assignments/${ASSIGNMENT_ID}/date_details`
 
   beforeAll(() => {
     window.ENV ||= {}
@@ -72,7 +74,7 @@ describe('DifferentiatedModulesSection', () => {
   })
 
   beforeEach(() => {
-    fetchMock.get(STUDENTS_URL, []).get(SECTIONS_URL, SECTIONS_DATA)
+    fetchMock.get(STUDENTS_URL, []).get(SECTIONS_URL, SECTIONS_DATA).get(DATE_DETAILS, {})
   })
 
   afterEach(() => {
@@ -136,6 +138,7 @@ describe('DifferentiatedModulesSection', () => {
       await addAssignee(getByTestId, findByTestId, findByText)
       expect(getByTestId('highlighted_card')).toBeInTheDocument()
     })
+
     // skipping for now, since the pill is being validated in selenium specs
     it.skip('reverts highlighted style when changes are removed', async () => {
       const {getByTestId, findByTestId, findByText, getByText, queryByTestId} = render(
@@ -163,6 +166,7 @@ describe('DifferentiatedModulesSection', () => {
   describe('important dates', () => {
     beforeAll(() => {
       global.ENV = {
+        ...global.ENV,
         K5_SUBJECT_COURSE: true,
       }
     })
