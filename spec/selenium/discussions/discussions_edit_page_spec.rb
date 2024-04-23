@@ -833,7 +833,6 @@ describe "discussions" do
         end
 
         it "allows settings a graded discussion to an ungraded discussion" do
-          skip("VICE-4225")
           graded_discussion = create_graded_discussion(course)
           get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/edit"
 
@@ -1376,7 +1375,6 @@ describe "discussions" do
           end
 
           it "deletes checkpoints if the graded checkbox is unselected on an exisitng discussion with checkpoints" do
-            skip("VICE-4225")
             assignment = Assignment.last
             expect(assignment.sub_assignments.count).to eq 2
 

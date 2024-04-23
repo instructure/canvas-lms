@@ -672,5 +672,17 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
       expect(sub_assignment2.points_possible).to eq 8
       expect(assignment.points_possible).to eq 14
     end
+
+    it "can turn a graded checkpointed discussion into a non-graded discussion" do
+      result = run_mutation(id: @graded_topic.id, assignment: { setAssignment: false })
+      expect(result["errors"]).to be_nil
+
+      assignment = Assignment.last
+
+      expect(assignment.has_sub_assignments?).to be false
+      expect(assignment.sub_assignments.count).to eq 0
+      expect(DiscussionTopic.last.reply_to_entry_required_count).to eq 0
+      expect(@graded_topic.reload.assignment).to be_nil
+    end
   end
 end

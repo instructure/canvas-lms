@@ -192,10 +192,15 @@ export const prepareAssignmentPayload = (
   peerReviewDueDate,
   intraGroupPeerReviews,
   masteryPathsOption,
-  isCheckpoints
+  isCheckpoints,
+  existingAssignment
 ) => {
-  // Return null immediately if the assignment is not graded
-  if (!isGraded) return null
+  /*
+  Return null if the assignment is not graded and there is no existing assignment.
+  This is so that we can trigger the deletion of an existing assignment if the graded checkbox is unselected
+  since the endpoint looks for an assignment payload.
+  */
+  if (!isGraded && !existingAssignment) return null
 
   const everyoneOverride =
     assignedInfoList.find(
@@ -232,6 +237,13 @@ export const prepareAssignmentPayload = (
       dueAt: everyoneOverride.dueDate || null,
       lockAt: everyoneOverride.availableUntil || null,
       unlockAt: everyoneOverride.availableFrom || null,
+    }
+  }
+  // Additional properties for editing of a graded assignment
+  if (isEditing) {
+    payload = {
+      ...payload,
+      setAssignment: isGraded,
     }
   }
   // Additional properties for creation of a graded assignment
