@@ -207,7 +207,7 @@ export default function ItemAssignToTray({
     onDismiss()
   }, [defaultCards, onDismiss])
 
-  const {allOptions, isLoading, setSearchTerm} = useFetchAssignees({
+  const {allOptions, isLoading, loadedAssignees, setSearchTerm} = useFetchAssignees({
     courseId,
     everyoneOption,
     checkMasteryPaths: true,
@@ -424,6 +424,13 @@ export default function ItemAssignToTray({
 
   const handleCardValidityChange = useCallback(
     (cardId: string, isValid: boolean) => {
+      const priorCard = assignToCards.find(card => card.key === cardId)
+      if (priorCard) {
+        const validityChanged = priorCard.isValid !== isValid
+        if (!validityChanged) {
+          return
+        }
+      }
       const cards = assignToCards.map(card => (card.key === cardId ? {...card, isValid} : card))
       setAssignToCards(cards)
     },
@@ -514,12 +521,20 @@ export default function ItemAssignToTray({
 
   const handleDatesChange = useCallback(
     (cardId: string, dateAttribute: string, dateValue: string | null) => {
-      const newDate = dateValue === null ? undefined : dateValue
+      const newDate = dateValue // === null ? undefined : dateValue
       const initialCard = initialCards.find(card => card.key === cardId)
       const {highlightCard, isEdited, ...currentCardProps} = assignToCards.find(
         card => card.key === cardId
       ) as ItemAssignToCardSpec
       const currentCard = {...currentCardProps, [dateAttribute]: newDate}
+      const priorCard = assignToCards.find(card => card.key === cardId)
+      if (priorCard) {
+        const dateChanged = priorCard[dateAttribute] !== dateValue
+        if (!dateChanged) {
+          // date did not change - do not setAssignToCards which would trigger a re-render)
+          return
+        }
+      }
       const areEquals = JSON.stringify(initialCard) === JSON.stringify(currentCard)
 
       const newCard = {...currentCard, highlightCard: !areEquals, isEdited: !areEquals}
@@ -625,14 +640,15 @@ export default function ItemAssignToTray({
   function Body() {
     return (
       <Flex.Item padding="small medium" shouldGrow={true} shouldShrink={true}>
-        {fetchInFlight && (
+        {fetchInFlight || !loadedAssignees ? (
           <Mask>
-            <Spinner renderTitle={I18n.t('Loading')} />
+            <Spinner data-testid="cards-loading" renderTitle={I18n.t('Loading')} />
           </Mask>
+        ) : (
+          <ApplyLocale locale={locale} timezone={timezone}>
+            {renderCards(open)}
+          </ApplyLocale>
         )}
-        <ApplyLocale locale={locale} timezone={timezone}>
-          {renderCards(open)}
-        </ApplyLocale>
 
         <Button
           onClick={handleAddCard}
