@@ -65,6 +65,7 @@ const SUBMISSION_QUERY = gql`
           excused
           submittedAt
           submissionType
+          secondsLate
           commentsConnection {
             nodes {
               id

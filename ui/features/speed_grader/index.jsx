@@ -66,7 +66,12 @@ ready(() => {
             courseId: window.ENV.course_id,
             assignmentId: params.get('assignment_id'),
             studentId: params.get('student_id'),
-            gradeBookIconHref: `/courses/${window.ENV.course_id}/gradebook`,
+            hrefs: {
+              heroIcon: `/courses/${window.ENV.course_id}/gradebook`,
+            },
+            features: {
+              extendedSubmissionState: window.ENV.FEATURES.extended_submission_state,
+            },
           },
         })
       })

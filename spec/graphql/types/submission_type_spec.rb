@@ -38,6 +38,7 @@ describe Types::SubmissionType do
     expect(submission_type.resolve("assignmentId")).to eq @assignment.id.to_s
     expect(submission_type.resolve("redoRequest")).to eq @submission.redo_request?
     expect(submission_type.resolve("cachedDueDate")).to eq @submission.cached_due_date
+    expect(submission_type.resolve("secondsLate")).to eq @submission.seconds_late
     expect(submission_type.resolve("studentEnteredScore")).to eq @submission.student_entered_score
     expect(submission_type.resolve("submissionCommentDownloadUrl")).to eq "/submissions/#{@submission.id}/comments.pdf"
   end
