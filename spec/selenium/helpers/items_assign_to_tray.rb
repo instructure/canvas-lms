@@ -30,7 +30,7 @@ module ItemsAssignToTray
   end
 
   def assign_to_card_delete_button_selector
-    "//button[.//*[contains(text(), 'Delete')]]"
+    "//*[@data-testid = 'delete-card-button']"
   end
 
   def assign_to_date_and_time_selector

@@ -141,6 +141,43 @@ export default forwardRef(function ItemAssignToCard(
     })
   )
 
+  const removeCardSRDescription = useMemo(() => {
+    let description
+    const selected =
+      customAllOptions
+        ?.filter(option => selectedAssigneeIds.includes(option.id))
+        .map(({value}) => value) ?? []
+    switch (selected?.length) {
+      case 0:
+        description = I18n.t('Remove card')
+        break
+      case 1:
+        description = I18n.t('Remove card for %{pillA}', {pillA: selected[0]})
+        break
+      case 2:
+        description = I18n.t('Remove card for %{pillA} and %{pillB}', {
+          pillA: selected[0],
+          pillB: selected[1],
+        })
+        break
+      case 3:
+        description = I18n.t('Remove card for %{pillA}, %{pillB} and %{pillC}', {
+          pillA: selected[0],
+          pillB: selected[1],
+          pillC: selected[2],
+        })
+        break
+      default:
+        description = I18n.t('Remove card for %{pillA}, %{pillB} and %{n} others', {
+          pillA: selected[0],
+          pillB: selected[1],
+          n: selected.length - 2,
+        })
+        break
+    }
+    return description
+  }, [customAllOptions, selectedAssigneeIds])
+
   useEffect(() => {
     onValidityChange?.(
       cardId,
@@ -279,7 +316,7 @@ export default forwardRef(function ItemAssignToCard(
             <IconButton
               data-testid="delete-card-button"
               color="danger"
-              screenReaderLabel={I18n.t('Delete')}
+              screenReaderLabel={removeCardSRDescription}
               size="small"
               withBackground={false}
               withBorder={false}
