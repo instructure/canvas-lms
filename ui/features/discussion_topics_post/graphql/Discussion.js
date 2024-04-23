@@ -56,6 +56,7 @@ export const Discussion = {
       lockAt
       availableForUser
       userCount
+      replyToEntryRequiredCount
       editor {
         ...User
       }
@@ -123,6 +124,7 @@ export const Discussion = {
     searchEntryCount: number,
     availableForUser: bool,
     userCount: number,
+    replyToEntryRequiredCount: number,
     entryCounts: shape({
       unreadCount: number,
       repliesCount: number,
@@ -166,6 +168,7 @@ export const Discussion = {
     searchEntryCount = 3,
     availableForUser = true,
     userCount = 4,
+    replyToEntryRequiredCount = 2,
     entryCounts = {
       unreadCount: 2,
       repliesCount: 56,
@@ -212,6 +215,7 @@ export const Discussion = {
     entryCounts,
     availableForUser,
     userCount,
+    replyToEntryRequiredCount,
     author,
     anonymousAuthor,
     editor,
