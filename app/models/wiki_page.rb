@@ -107,7 +107,8 @@ class WikiPage < ActiveRecord::Base
   }
 
   scope :visible_to_user, lambda { |user_id|
-    where("wiki_pages.assignment_id IS NULL OR EXISTS (SELECT 1 FROM #{AssignmentStudentVisibility.quoted_table_name} asv WHERE wiki_pages.assignment_id = asv.assignment_id AND asv.user_id = ?)", user_id)
+    where("wiki_pages.assignment_id IS NULL AND (EXISTS (SELECT 1 FROM #{WikiPageStudentVisibility.quoted_table_name} psv WHERE wiki_pages.id = psv.wiki_page_id AND psv.user_id = ?) OR wiki_pages.context_type = 'Group')", user_id)
+      .or(where("wiki_pages.assignment_id IS NOT NULL AND EXISTS (SELECT 1 FROM #{AssignmentStudentVisibility.quoted_table_name} asv WHERE wiki_pages.assignment_id = asv.assignment_id AND asv.user_id = ?)", user_id))
   }
 
   TITLE_LENGTH = 255
