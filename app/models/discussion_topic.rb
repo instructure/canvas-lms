@@ -741,9 +741,23 @@ class DiscussionTopic < ActiveRecord::Base
     topic_participant
   end
 
+  scope :joins_ungraded_discussion_student_visibilities, lambda { |user_ids, course_ids|
+    joins(:ungraded_discussion_student_visibilities)
+      .where(ungraded_discussion_student_visibilities: { user_id: user_ids, course_id: course_ids })
+  }
+
   scope :visible_to_students_in_course_with_da, lambda { |user_ids, course_ids|
-    without_assignment_in_course(course_ids)
-      .union(joins_assignment_student_visibilities(user_ids, course_ids))
+    if Account.site_admin.feature_enabled?(:differentiated_modules)
+      where.not(assignment_id: nil)
+           .joins_assignment_student_visibilities(user_ids, course_ids)
+           .union(
+             where(assignment_id: nil)
+               .joins_ungraded_discussion_student_visibilities(user_ids, course_ids)
+           )
+    else
+      without_assignment_in_course(course_ids)
+        .union(joins_assignment_student_visibilities(user_ids, course_ids))
+    end
   }
 
   scope :not_ignored_by, lambda { |user, purpose|
@@ -1620,14 +1634,27 @@ class DiscussionTopic < ActiveRecord::Base
           next false unless section_visibilities.intersect?(course_specific_sections)
         end
       end
+      # Verify that section limited teachers/ta's are properly restricted when differentiated_modules is enabled
+      if context.is_a?(Course) && (Account.site_admin.feature_enabled?(:differentiated_modules) && !visible_to_everyone && context.user_is_instructor?(user))
+        section_overrides = assignment_overrides.active.where(set_type: "CourseSection").pluck(:set_id)
+        visible_sections_for_user = context.course_section_visibility(user)
+        next false if visible_sections_for_user == :none
 
+        # If there are no section_overrides, then no check for section_specific instructor roles is needed
+        if visible_sections_for_user != :all && section_overrides.any?
+          course_specific_sections = course_sections.pluck(:id)
+          next false unless visible_sections_for_user.intersect?(course_specific_sections)
+        end
+      end
       # user is an admin in the context (teacher/ta/designer) OR
       # user is an account admin with appropriate permission
       next true if context.grants_any_right?(user, :manage, :read_course_content)
 
       # assignment exists and isn't assigned to user (differentiated assignments)
-      if for_assignment? && !assignment.visible_to_user?(user)
-        next false
+      if for_assignment?
+        next false unless assignment.visible_to_user?(user)
+      elsif Account.site_admin.feature_enabled?(:differentiated_modules)
+        next false unless visible_to_user?(user)
       end
 
       # topic is not published

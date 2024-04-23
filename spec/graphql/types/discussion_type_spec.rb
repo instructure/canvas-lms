@@ -905,4 +905,58 @@ describe Types::DiscussionType do
       expect(discussion_type.resolve("delayedPostAt")).to eq discussion.delayed_post_at&.iso8601
     end
   end
+
+  context "differentiated modules" do
+    before do
+      Account.site_admin.enable_feature! :differentiated_modules
+    end
+
+    context "ungraded discussions" do
+      before do
+        course_factory(active_all: true)
+        @topic = discussion_topic_model(user: @teacher, context: @course)
+        @topic.update!(only_visible_to_overrides: true)
+        @course_section = @course.course_sections.create
+        @student1 = student_in_course(course: @course, active_enrollment: true).user
+        @student2 = student_in_course(course: @course, active_enrollment: true, section: @course_section).user
+        @teacher1 = teacher_in_course(course: @course, active_enrollment: true).user
+
+        @student1_type = GraphQLTypeTester.new(@topic, current_user: @student1)
+        @student2_type = GraphQLTypeTester.new(@topic, current_user: @student2)
+        @teacher1_type = GraphQLTypeTester.new(@topic, current_user: @teacher1)
+      end
+
+      it "is visible only to the assigned student" do
+        override = @topic.assignment_overrides.create!
+        override.assignment_override_students.create!(user: @student1)
+
+        expect(@student1_type.resolve("_id")).to be_truthy
+        expect(@student2_type.resolve("_id")).to be_nil
+        expect(@teacher1_type.resolve("_id")).to be_truthy
+      end
+
+      it "is visible only to users who can access the assigned section" do
+        @topic.assignment_overrides.create!(set: @course_section)
+
+        expect(@student1_type.resolve("_id")).to be_nil
+        expect(@student2_type.resolve("_id")).to be_truthy
+        expect(@teacher1_type.resolve("_id")).to be_truthy
+      end
+
+      it "is visible only to students in module override section" do
+        context_module = @course.context_modules.create!(name: "module")
+        context_module.content_tags.create!(content: @topic, context: @course)
+
+        override2 = @topic.assignment_overrides.create!(unlock_at: "2022-02-01T01:00:00Z",
+                                                        unlock_at_overridden: true,
+                                                        lock_at: "2022-02-02T01:00:00Z",
+                                                        lock_at_overridden: true)
+        override2.assignment_override_students.create!(user: @student1)
+
+        expect(@student1_type.resolve("_id")).to be_truthy
+        expect(@student2_type.resolve("_id")).to be_nil
+        expect(@teacher1_type.resolve("_id")).to be_truthy
+      end
+    end
+  end
 end

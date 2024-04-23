@@ -53,6 +53,8 @@ module DifferentiableAssignment
       ModuleStudentVisibility
     when "WikiPage"
       WikiPageStudentVisibility
+    when "DiscussionTopic"
+      UngradedDiscussionStudentVisibility
     else
       Quizzes::QuizStudentVisibility
     end
@@ -66,6 +68,8 @@ module DifferentiableAssignment
       :context_module_id
     when "WikiPage"
       :wiki_page_id
+    when "DiscussionTopic"
+      :discussion_topic_id
     else
       :quiz_id
     end
