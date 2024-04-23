@@ -20,8 +20,39 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import CanvasMediaRecorder from './react/components/MediaRecorder'
 
-// We have this simple code in a seperate file so that we can take advantage
-// of code splitting
 export default function renderCanvasMediaRecorder(element, onSaveFile) {
-  ReactDOM.render(<CanvasMediaRecorder onSaveFile={onSaveFile} />, element)
+  const fromSpeedGrader = window.location.href.includes('/speed_grader')
+
+  let indicatorBarMountPointId = null
+  let onModalShowToggle = null
+
+  if (fromSpeedGrader) {
+    indicatorBarMountPointId = "screen-capture-indicator-mount-point"
+
+    onModalShowToggle = (disabled) => {
+      // disable media comment button and next/prev student buttons when recording
+      ['media_comment_button', 'next-student-button', 'prev-student-button', 'comment_submit_button'].forEach(id => {
+        const element = document.getElementById(id)
+        if (element) {
+          element.disabled = disabled
+        }
+      })
+
+      // disables the student picker dropdown when recording
+      const studentPicker = document.getElementById('combo_box_container')
+      if (studentPicker) {
+        studentPicker.style.pointerEvents = disabled ? 'none' : 'auto'
+      }
+    }
+  }
+
+
+  ReactDOM.render(
+    <CanvasMediaRecorder
+      onSaveFile={onSaveFile}
+      onModalShowToggle={onModalShowToggle}
+      indicatorBarMountPointId={indicatorBarMountPointId}
+    />,
+    element
+  )
 }
