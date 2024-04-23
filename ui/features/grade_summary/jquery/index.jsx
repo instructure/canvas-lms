@@ -759,7 +759,7 @@ function setup() {
       $('#grades_summary .revert_score_link').each(function () {
         $(this).trigger('click', {skipEval: true, refocus: false})
       })
-      $('#.show_guess_grades.exists').show()
+      $('.show_guess_grades.exists').show()
       GradeSummary.updateStudentGrades()
       showAllWhatIfButton.focus()
       $.screenReaderFlashMessageExclusive(I18n.t('Grades are now reverted to original scores'))
