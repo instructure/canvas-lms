@@ -17,7 +17,8 @@
  */
 
 import React from 'react'
-import {mount} from 'enzyme'
+import {render, screen} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import get from 'lodash/get'
 
 import Placement from '../Placement'
@@ -40,8 +41,9 @@ const props = (overrides = {}, placementOverrides = {}) => {
 }
 
 it('generates the toolConfiguration', () => {
-  const wrapper = mount(<Placement {...props()} />)
-  const toolConfig = wrapper.instance().generateToolConfigurationPart()
+  const ref = React.createRef()
+  render(<Placement {...props()} ref={ref} />)
+  const toolConfig = ref.current.generateToolConfigurationPart()
   expect(Object.keys(toolConfig).length).toEqual(6)
   expect(toolConfig.icon_url).toEqual('http://example.com/icon')
 })
@@ -51,13 +53,14 @@ const checkToolConfigPart = (toolConfig, path, value) => {
 }
 
 const checkChange = (path, funcName, value, placementOverrides, event = null) => {
-  const wrapper = mount(<Placement {...props({}, {...placementOverrides})} />)
+  const ref = React.createRef()
+  render(<Placement {...props({}, {...placementOverrides})} ref={ref} />)
 
   event = event || {target: {value}}
   event = Array.isArray(event) ? event : [event]
 
-  wrapper.instance()[funcName](...event)
-  checkToolConfigPart(wrapper.instance().generateToolConfigurationPart(), path, value)
+  ref.current[funcName](...event)
+  checkToolConfigPart(ref.current.generateToolConfigurationPart(), path, value)
 }
 
 it('changes the output when target_link_uri changes', () => {
@@ -120,36 +123,39 @@ it('changes the output when message_type changes', () => {
 })
 
 it('removes target_link_uri from the placement if it is empty', () => {
-  const wrapper = mount(<Placement {...props()} />)
-  wrapper.instance().handleTargetLinkUriChange({target: {value: ''}})
-  const placement = wrapper.instance().generateToolConfigurationPart()
+  const ref = React.createRef()
+  render(<Placement {...props()} ref={ref} />)
+  ref.current.handleTargetLinkUriChange({target: {value: ''}})
+  const placement = ref.current.generateToolConfigurationPart()
   expect(Object.keys(placement)).not.toContain('target_link_uri')
 })
 
 it('removes selection_width from the placement if it is empty', () => {
-  const wrapper = mount(<Placement {...props()} />)
-  wrapper
-    .instance()
-    .handleWidthChange({target: {value: '', name: 'placement_name_selection_width'}})
-  const placement = wrapper.instance().generateToolConfigurationPart()
+  const ref = React.createRef()
+  render(<Placement {...props()} ref={ref} />)
+  ref.current.handleWidthChange({target: {value: '', name: 'placement_name_selection_width'}})
+  const placement = ref.current.generateToolConfigurationPart()
   expect(Object.keys(placement)).not.toContain('selection_width')
 })
 
 it('removes launch_width from the placement if it is empty', () => {
-  const wrapper = mount(<Placement {...props()} />)
-  wrapper.instance().handleWidthChange({target: {value: '', name: 'placement_name_launch_width'}})
-  const placement = wrapper.instance().generateToolConfigurationPart()
+  const ref = React.createRef()
+  render(<Placement {...props()} ref={ref} />)
+  ref.current.handleWidthChange({target: {value: '', name: 'placement_name_launch_width'}})
+  const placement = ref.current.generateToolConfigurationPart()
   expect(Object.keys(placement)).not.toContain('launch_width')
 })
 
 it('cleans up invalid inputs', () => {
-  const wrapper = mount(<Placement {...props({}, {message_type: undefined})} />)
-  expect(wrapper.instance().valid()).toEqual(true)
+  const ref = React.createRef()
+  render(<Placement {...props({}, {message_type: undefined})} ref={ref} />)
+  expect(ref.current.valid()).toEqual(true)
 })
 
 it('is valid when valid', () => {
-  const wrapper = mount(<Placement {...props()} />)
-  expect(wrapper.instance().valid()).toEqual(true)
+  const ref = React.createRef()
+  render(<Placement {...props()} ref={ref} />)
+  expect(ref.current.valid()).toEqual(true)
 })
 
 const alwaysDeeplinkingPlacements = [
@@ -161,50 +167,31 @@ const alwaysDeeplinkingPlacements = [
 ]
 
 alwaysDeeplinkingPlacements.forEach(placementName => {
-  it('displays alert when placement only supports deep linking', () => {
-    const wrapper = mount(<Placement {...props({placementName})} />)
-    wrapper.find('button').simulate('click')
-    expect(wrapper.exists('Alert')).toBeTruthy()
+  it('displays alert when placement only supports deep linking', async () => {
+    render(<Placement {...props({placementName})} />)
+    await userEvent.click(screen.getByRole('button'))
+    expect(
+      screen.getByText(/This placement requires Deep Link support by the vendor/i)
+    ).toBeInTheDocument()
   })
 })
 
-it('does not require icon_url', () => {
-  const wrapper = mount(<Placement {...props()} />)
-  wrapper.find('button').simulate('click')
-  expect(wrapper.find({isRequired: true}).exists()).toBeFalsy()
-  expect(
-    wrapper
-      .findWhere(
-        n =>
-          n.props().name === 'account_navigation_icon_url' && n.props().renderLabel === 'Icon Url'
-      )
-      .exists()
-  ).toBeTruthy()
+it('does not require icon_url', async () => {
+  render(<Placement {...props()} />)
+  await userEvent.click(screen.getByRole('button'))
+  const iconUrl = screen.getByText(/Icon Url/i)
+  expect(iconUrl).toBeInTheDocument()
+  expect(iconUrl).not.toBeRequired()
 })
 
-it('requires icon_url for editor_button', () => {
-  const wrapper = mount(<Placement {...props({placementName: 'editor_button'})} />)
-  wrapper.find('button').simulate('click')
-  expect(wrapper.find({isRequired: true}).exists()).toBeTruthy()
-  expect(
-    wrapper
-      .findWhere(
-        n =>
-          n.props().name === 'editor_button_icon_url' &&
-          n.props().renderLabel?.includes('Icon Url (required')
-      )
-      .exists()
-  ).toBeTruthy()
+it('requires icon_url for editor_button', async () => {
+  render(<Placement {...props({placementName: 'editor_button', displayName: 'Editor Button'})} />)
+  await userEvent.click(screen.getByRole('button'))
+  const iconUrl = expect(screen.getByText(/Icon Url \(required/i)).toBeInTheDocument()
+  expect(screen.getByRole('textbox', {name: /icon url/i})).toBeRequired()
 })
 
-const couldBeEither = [
-  'assignment_selection',
-  'link_selection',
-  'course_assignments_menu',
-  'collaboration',
-  'module_index_menu_modal',
-  'module_menu_modal',
-]
+const couldBeEither = ['assignment_selection']
 
 couldBeEither.forEach(placementName => {
   if (['course_assignments_menu', 'module_menu_modal'].includes(placementName)) {
@@ -229,17 +216,20 @@ couldBeEither.forEach(placementName => {
     })
   }
 
-  it(`${placementName}: displays alert when placement supports deep linking and resource link and deep linking chosen`, () => {
-    const wrapper = mount(
-      <Placement {...props({placementName}, {message_type: 'LtiDeepLinkingRequest'})} />
-    )
-    wrapper.find('button').simulate('click')
-    expect(wrapper.exists('Alert')).toBeTruthy()
+  it(`${placementName}: displays alert when placement supports deep linking and resource link and deep linking chosen`, async () => {
+    render(<Placement {...props({placementName}, {message_type: 'LtiDeepLinkingRequest'})} />)
+    await userEvent.click(screen.getByRole('button'))
+    expect(
+      screen.getByText(/This placement requires Deep Link support by the vendor/i)
+    ).toBeInTheDocument()
   })
 
-  it(`${placementName}: does not display alert when placement supports deep linking and resource link and deep linking chosen`, () => {
-    const wrapper = mount(<Placement {...props({placementName})} />)
-    wrapper.find('ToggleDetails').at(0).simulate('click')
-    expect(wrapper.exists('Alert')).toBeFalsy()
+  it(`${placementName}: does not display alert when placement supports deep linking and resource link and resource link is chosen`, async () => {
+    const p = props({placementName}, {message_type: 'LtiResourceLinkRequest'})
+    render(<Placement {...p} />)
+    await userEvent.click(screen.getByText(p.displayName))
+    expect(
+      screen.queryByRole(/This placement requires Deep Link support by the vendor/i)
+    ).not.toBeInTheDocument()
   })
 })

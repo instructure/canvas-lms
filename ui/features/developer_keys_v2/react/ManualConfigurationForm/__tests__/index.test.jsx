@@ -17,9 +17,10 @@
  */
 
 import React from 'react'
-import {mount} from 'enzyme'
+import {render, screen} from '@testing-library/react'
 
 import ManualConfiguration from '../index'
+import userEvent from '@testing-library/user-event'
 
 const props = (overrides = {}) => {
   return {
@@ -33,13 +34,19 @@ const props = (overrides = {}) => {
 }
 
 it('renders form', () => {
-  const wrapper = mount(<ManualConfiguration {...props()} />)
-  expect(wrapper.find('RequiredValues').exists()).toBe(true)
+  render(<ManualConfiguration {...props()} />)
+  expect(screen.getByLabelText('* Title')).toBeInTheDocument()
+  expect(screen.getByLabelText('* Title')).toBeInTheDocument()
+  expect(screen.getByLabelText('* Description')).toBeInTheDocument()
+  expect(screen.getByLabelText('* Target Link URI')).toBeInTheDocument()
+  expect(screen.getByLabelText('* OpenID Connect Initiation Url')).toBeInTheDocument()
+  expect(screen.getByLabelText('* JWK Method')).toBeInTheDocument()
 })
 
 it('generates the toolConfiguration', () => {
-  const wrapper = mount(<ManualConfiguration {...props()} />)
-  const toolConfig = wrapper.instance().generateToolConfiguration()
+  const ref = React.createRef()
+  render(<ManualConfiguration {...props()} ref={ref} />)
+  const toolConfig = ref.current.generateToolConfiguration()
   expect(toolConfig.scopes).toBeDefined()
   expect(toolConfig.extensions.length).toEqual(1)
 })
