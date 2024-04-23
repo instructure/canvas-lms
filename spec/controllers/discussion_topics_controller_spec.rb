@@ -368,6 +368,99 @@ describe DiscussionTopicsController do
         expect(InstStatsd::Statsd).to have_received(:count).with("discussion_topic.index.visit.closed_for_comments", 0).at_least(:once)
       end
     end
+
+    describe "differentiated modules" do
+      before do
+        Account.site_admin.enable_feature! :differentiated_modules
+      end
+
+      context "ungraded discussions" do
+        before do
+          course_factory(active_all: true)
+          @course_section = @course.course_sections.create
+
+          @student1, @student2 = create_users(2, return_type: :record)
+          @course.enroll_student(@student1, enrollment_state: "active")
+          @course.enroll_student(@student2, enrollment_state: "active")
+          student_in_section(@course.course_sections.first, user: @student1)
+          student_in_section(@course.course_sections.second, user: @student2)
+
+          @teacher = teacher_in_course(course: @course, active_enrollment: true).user
+          @topic_visible_to_everyone = discussion_topic_model(user: @teacher, context: @course)
+          @topic = discussion_topic_model(user: @teacher, context: @course)
+          @topic.update!(only_visible_to_overrides: true)
+        end
+
+        it "shows only assigned topics" do
+          override = @topic.assignment_overrides.create!
+          override.assignment_override_students.create!(user: @student1)
+
+          user_session(@student2)
+          get "index", params: { course_id: @course.id }, format: :json
+          parsed_json = json_parse(response.body)
+          visible_ids_to_student_2 = parsed_json.pluck("id")
+
+          expect(assigns["topics"]).not_to include(@topic)
+          expect(visible_ids_to_student_2).to include(@topic_visible_to_everyone.id)
+          expect(visible_ids_to_student_2).not_to include(@topic.id)
+
+          user_session(@student1)
+          get "index", params: { course_id: @course.id }, format: :json
+          parsed_json = json_parse(response.body)
+          visible_ids_to_student_1 = parsed_json.pluck("id")
+
+          expect(visible_ids_to_student_1).to include(@topic_visible_to_everyone.id)
+          expect(visible_ids_to_student_1).to include(@topic.id)
+        end
+
+        it "is visible only to users who can access the assigned section" do
+          @topic.assignment_overrides.create!(set: @course_section)
+
+          user_session(@student2)
+          get "index", params: { course_id: @course.id }, format: :json
+          parsed_json = json_parse(response.body)
+          visible_ids_to_student_2 = parsed_json.pluck("id")
+
+          expect(visible_ids_to_student_2).to include(@topic_visible_to_everyone.id)
+          expect(visible_ids_to_student_2).to include(@topic.id)
+
+          user_session(@student1)
+          get "index", params: { course_id: @course.id }, format: :json
+          parsed_json = json_parse(response.body)
+          visible_ids_to_student_1 = parsed_json.pluck("id")
+
+          expect(visible_ids_to_student_1).to include(@topic_visible_to_everyone.id)
+          expect(visible_ids_to_student_1).not_to include(@topic.id)
+        end
+
+        it "is visible only to students in module override section" do
+          context_module = @course.context_modules.create!(name: "module")
+          context_module.content_tags.create!(content: @topic, context: @course)
+
+          override2 = @topic.assignment_overrides.create!(unlock_at: "2022-02-01T01:00:00Z",
+                                                          unlock_at_overridden: true,
+                                                          lock_at: "2022-02-02T01:00:00Z",
+                                                          lock_at_overridden: true)
+          override2.assignment_override_students.create!(user: @student2)
+
+          user_session(@student2)
+          get "index", params: { course_id: @course.id }, format: :json
+          parsed_json = json_parse(response.body)
+          visible_ids_to_student_2 = parsed_json.pluck("id")
+
+          expect(visible_ids_to_student_2).to include(@topic_visible_to_everyone.id)
+          expect(visible_ids_to_student_2).to include(@topic.id)
+
+          user_session(@student1)
+          get "index", params: { course_id: @course.id }, format: :json
+          parsed_json = json_parse(response.body)
+          visible_ids_to_student_1 = parsed_json.pluck("id")
+
+          expect(visible_ids_to_student_1).to include(@topic_visible_to_everyone.id)
+          expect(visible_ids_to_student_1).not_to include(@topic.id)
+        end
+      end
+    end
   end
 
   describe "GET 'show'" do

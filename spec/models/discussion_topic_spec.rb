@@ -529,6 +529,61 @@ describe DiscussionTopic do
           expect(@announcement.active_participants_include_tas_and_teachers.include?(user)).to be_falsey
         end
       end
+
+      context "differentiated modules" do
+        before do
+          Account.site_admin.enable_feature! :differentiated_modules
+        end
+
+        context "ungraded discussions" do
+          before do
+            @topic = discussion_topic_model(user: @teacher, context: @course)
+            @topic.update!(only_visible_to_overrides: true)
+            @course_section = @course.course_sections.create
+            @student1 = student_in_course(course: @course, active_enrollment: true).user
+            @student2 = student_in_course(course: @course, active_enrollment: true, section: @course_section).user
+            @teacher1 = teacher_in_course(course: @course, active_enrollment: true).user
+            @teacher2_limited_to_section = teacher_in_course(course: @course, active_enrollment: true).user
+            Enrollment.limit_privileges_to_course_section!(@course, @teacher2_limited_to_section, true)
+          end
+
+          it "is visible only to the assigned student" do
+            override = @topic.assignment_overrides.create!
+            override.assignment_override_students.create!(user: @student1)
+            expect(@topic.visible_for?(@student1)).to be_truthy
+            expect(@topic.visible_for?(@student2)).to be_falsey
+
+            expect(@topic.visible_for?(@teacher1)).to be_truthy
+            expect(@topic.visible_for?(@teacher2_limited_to_section)).to be_truthy
+          end
+
+          it "is visible only to users who can access the assigned section" do
+            @topic.assignment_overrides.create!(set: @course_section)
+            expect(@topic.visible_for?(@student1)).to be_falsey
+            expect(@topic.visible_for?(@student2)).to be_truthy
+
+            expect(@topic.visible_for?(@teacher1)).to be_truthy
+            expect(@topic.visible_for?(@teacher2_limited_to_section)).to be_falsey
+          end
+
+          it "is visible only to students in module override section" do
+            context_module = @course.context_modules.create!(name: "module")
+            context_module.content_tags.create!(content: @topic, context: @course)
+
+            override2 = @topic.assignment_overrides.create!(unlock_at: "2022-02-01T01:00:00Z",
+                                                            unlock_at_overridden: true,
+                                                            lock_at: "2022-02-02T01:00:00Z",
+                                                            lock_at_overridden: true)
+            override2.assignment_override_students.create!(user: @student1)
+
+            expect(@topic.visible_for?(@student1)).to be_truthy
+            expect(@topic.visible_for?(@student2)).to be_falsey
+
+            expect(@topic.visible_for?(@teacher1)).to be_truthy
+            expect(@topic.visible_for?(@teacher2_limited_to_section)).to be_truthy
+          end
+        end
+      end
     end
 
     context "differentiated assignements" do
@@ -1553,6 +1608,53 @@ describe DiscussionTopic do
 
     it "does not return discussions that have an assignment and no visibility" do
       expect(DiscussionTopic.visible_to_students_in_course_with_da([@student.id], [@course.id])).not_to include(@topic)
+    end
+
+    context "differentiated modules" do
+      before do
+        Account.site_admin.enable_feature! :differentiated_modules
+      end
+
+      context "ungraded discussions" do
+        before do
+          @topic = discussion_topic_model(user: @teacher, context: @course)
+          @topic.update!(only_visible_to_overrides: true)
+          @course_section = @course.course_sections.create
+          @student1 = student_in_course(course: @course, active_enrollment: true).user
+          @student2 = student_in_course(course: @course, active_enrollment: true, section: @course_section).user
+          @teacher1 = teacher_in_course(course: @course, active_enrollment: true).user
+          @teacher2_limited_to_section = teacher_in_course(course: @course, active_enrollment: true).user
+          Enrollment.limit_privileges_to_course_section!(@course, @teacher2_limited_to_section, true)
+        end
+
+        it "is visible only to the assigned student" do
+          override = @topic.assignment_overrides.create!
+          override.assignment_override_students.create!(user: @student1)
+
+          expect(DiscussionTopic.visible_to_students_in_course_with_da([@student1.id], [@course.id])).to include(@topic)
+          expect(DiscussionTopic.visible_to_students_in_course_with_da([@student2.id], [@course.id])).not_to include(@topic)
+        end
+
+        it "is visible only to users who can access the assigned section" do
+          @topic.assignment_overrides.create!(set: @course_section)
+          expect(DiscussionTopic.visible_to_students_in_course_with_da([@student1.id], [@course.id])).not_to include(@topic)
+          expect(DiscussionTopic.visible_to_students_in_course_with_da([@student2.id], [@course.id])).to include(@topic)
+        end
+
+        it "is visible only to students in module override section" do
+          context_module = @course.context_modules.create!(name: "module")
+          context_module.content_tags.create!(content: @topic, context: @course)
+
+          override2 = @topic.assignment_overrides.create!(unlock_at: "2022-02-01T01:00:00Z",
+                                                          unlock_at_overridden: true,
+                                                          lock_at: "2022-02-02T01:00:00Z",
+                                                          lock_at_overridden: true)
+          override2.assignment_override_students.create!(user: @student1)
+
+          expect(DiscussionTopic.visible_to_students_in_course_with_da([@student1.id], [@course.id])).to include(@topic)
+          expect(DiscussionTopic.visible_to_students_in_course_with_da([@student2.id], [@course.id])).not_to include(@topic)
+        end
+      end
     end
   end
 
