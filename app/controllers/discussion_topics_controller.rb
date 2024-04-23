@@ -599,6 +599,7 @@ class DiscussionTopicsController < ApplicationController
       end
 
     js_hash = {
+      ASSIGNMENT_ID: @topic.assignment_id,
       CONTEXT_ACTION_SOURCE: :discussion_topic,
       CONTEXT_ID: @context.id,
       DISCUSSION_TOPIC: hash,
@@ -619,6 +620,7 @@ class DiscussionTopicsController < ApplicationController
       allow_student_anonymous_discussion_topics: @context.allow_student_anonymous_discussion_topics,
       context_is_not_group: !@context.is_a?(Group),
       GRADING_SCHEME_UPDATES_ENABLED: Account.site_admin.feature_enabled?(:grading_scheme_updates),
+      ARCHIVED_GRADING_SCHEMES_ENABLED: Account.site_admin.feature_enabled?(:archived_grading_schemes),
       DISCUSSION_CHECKPOINTS_ENABLED: @context.root_account.feature_enabled?(:discussion_checkpoints)
     }
 
