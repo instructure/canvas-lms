@@ -377,6 +377,36 @@ if Qti.migration_executable
       match_ignoring(data, respondus_questions, %w[id assessment_question_id match_id missing_links position prepped_for_import is_quiz_question_bank question_bank_migration_id quiz_question_id])
     end
 
+    context "with learnosity qti 2.1 files" do
+      it "is able to import one question into a new named assessment question bank" do
+        setup_migration(File.expand_path("fixtures/learnosity_qti_one_question.zip", __dir__))
+        @migration.update_migration_settings(migration_ids_to_import: { copy: { all_quizzes: false, all_assessment_question_banks: true } })
+        @migration.update_migration_settings(question_bank_name: "question bank name 1")
+        @migration.save!
+        do_migration
+
+        expect(@course.quizzes.count).to eq 0
+        qb = @course.assessment_question_banks.last
+        expect(qb).to be_present
+        expect(qb.title).to eq "question bank name 1"
+        expect(qb.assessment_questions.size).to eq 1
+      end
+
+      it "is able to import two questions into a new named assessment question bank" do
+        setup_migration(File.expand_path("fixtures/learnosity_qti_two_questions.zip", __dir__))
+        @migration.update_migration_settings(migration_ids_to_import: { copy: { all_quizzes: false, all_assessment_question_banks: true } })
+        @migration.update_migration_settings(question_bank_name: "question bank name 2")
+        @migration.save!
+        do_migration
+
+        expect(@course.quizzes.count).to eq 0
+        qb = @course.assessment_question_banks.last
+        expect(qb).to be_present
+        expect(qb.title).to eq "question bank name 2"
+        expect(qb.assessment_questions.size).to eq 2
+      end
+    end
+
     def match_ignoring(a, b, ignoring = []) # rubocop:disable Naming/MethodParameterName
       case a
       when Hash
