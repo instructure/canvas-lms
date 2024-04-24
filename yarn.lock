@@ -1983,10 +1983,10 @@
     "@instructure/theme-registry" "8.51.0"
     "@instructure/ui-theme-tokens" "8.51.0"
 
-"@instructure/media-capture-new@npm:@instructure/media-capture@9.1.2-rc.38":
-  version "9.1.2-rc.38"
-  resolved "https://registry.yarnpkg.com/@instructure/media-capture/-/media-capture-9.1.2-rc.38.tgz#6623087494373a071735a7b68609d93656a1f55b"
-  integrity sha512-JXsXwpvDGhazU92agvnbjTzg8HWyLYnjLTom65FvDgUs2ntaMMECMk0p1HF15q9cA9sw+fBilXLgZt872byHtA==
+"@instructure/media-capture-new@npm:@instructure/media-capture@^10":
+  version "10.0.0"
+  resolved "https://registry.yarnpkg.com/@instructure/media-capture/-/media-capture-10.0.0.tgz#22427fe3f9ac6cde83d1007f8e1681058e0f9633"
+  integrity sha512-qcfV4mziHAW7oHnDxqriiaqgPWw8O463Ddp48Dse7j0FWeJ+Ql2tZeFOv2eNhqTmI/VMBTy08CMCsxDK3C48yA==
   dependencies:
     "@babel/runtime" "^7.17.2"
     "@instructure/emotion" "^8"
@@ -2004,6 +2004,7 @@
     "@instructure/ui-spinner" "^8"
     "@instructure/ui-text" "^8"
     "@instructure/ui-text-input" "^8"
+    "@instructure/ui-truncate-text" "^8"
     "@instructure/ui-view" "^8"
     "@instructure/uid" "^8"
     keycode "^2.2.0"
