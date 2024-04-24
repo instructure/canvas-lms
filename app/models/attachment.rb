@@ -2123,14 +2123,14 @@ class Attachment < ActiveRecord::Base
 
   def self.mimetype(filename)
     res = nil
-    res = File.mime_type?(filename) if !res || res == "unknown/unknown"
+    res = File.mime_type(filename) if !res || res == "unknown/unknown"
     res ||= "unknown/unknown"
     res
   end
 
   def mimetype(_filename = nil)
     res = Attachment.mimetype(filename) # use the object's filename, not the passed in filename
-    res = File.mime_type?(uploaded_data) if (!res || res == "unknown/unknown") && uploaded_data
+    res = File.mime_type(uploaded_data) if (!res || res == "unknown/unknown") && uploaded_data
     res ||= "unknown/unknown"
     res
   end
