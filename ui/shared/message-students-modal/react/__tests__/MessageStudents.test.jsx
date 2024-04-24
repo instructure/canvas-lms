@@ -17,9 +17,34 @@
  */
 
 import React from 'react'
-import {mount} from 'enzyme'
 import moxios from 'moxios'
+import {render, cleanup} from '@testing-library/react'
+import {userEvent} from '@testing-library/user-event'
 import MessageStudents from '../index'
+
+const getButtonFromDocument = (index = 0) => {
+  const buttons = document.querySelectorAll('button')
+
+  return buttons[buttons.length + index]
+}
+
+const getDefaultProps = () => ({
+  contextCode: 'course_1',
+  title: 'Send a message',
+  recipients: [{id: 1, email: 'some@one.com'}],
+  onRequestClose: () => {},
+})
+
+const renderMessageStudents = (props = {}) => {
+  const activeProps = {...getDefaultProps(), ...props}
+  const ref = React.createRef()
+  const wrapper = render(<MessageStudents {...activeProps} ref={ref} />)
+
+  return {
+    wrapper,
+    ref,
+  }
+}
 
 describe('MessageStudents', () => {
   beforeEach(() => {
@@ -27,98 +52,73 @@ describe('MessageStudents', () => {
   })
 
   afterEach(() => {
+    cleanup()
     moxios.uninstall()
   })
 
   it('should render', () => {
-    const wrapper = mount(
-      <MessageStudents contextCode="course_1" title="Send a message" onRequestClose={() => {}} />
-    )
-    expect(wrapper.exists()).toBe(true)
+    const {wrapper} = renderMessageStudents()
+
+    expect(wrapper.container).toBeInTheDocument()
   })
 
   describe('composeRequestData()', () => {
     it('simplifies recipients to an array of ids', () => {
-      const wrapper = mount(
-        <MessageStudents
-          contextCode="course_1"
-          title="Send a message"
-          recipients={[{id: 1, email: 'some@one.com'}]}
-          onRequestClose={() => {}}
-        />
-      )
+      const props = getDefaultProps()
+      const {ref} = renderMessageStudents()
 
-      const requestData = wrapper.instance().composeRequestData()
-      expect(requestData.recipients[0]).toBe(1)
+      const result = ref.current.composeRequestData()
+
+      expect(result.recipients[0]).toBe(props.recipients[0].id)
     })
   })
 
   describe('errorMessagesFor()', () => {
     it('fetches error for a given field from state', () => {
-      const wrapper = mount(
-        <MessageStudents
-          contextCode="course_1"
-          title="Send a message"
-          recipients={[{id: 1, email: 'some@one.com'}]}
-          onRequestClose={() => {}}
-        />
-      )
+      const {ref} = renderMessageStudents()
 
-      wrapper.setState({
+      ref.current.setState({
         errors: {
           subject: 'Please provide a subject.',
         },
       })
 
-      const errors = wrapper.instance().errorMessagesFor('subject')
+      const errors = ref.current.errorMessagesFor('subject')
+
       expect(errors[0].text).toBe('Please provide a subject.')
     })
   })
 
   describe('sendMessage()', () => {
-    let wrapper
+    let ref
     let data
 
     beforeEach(() => {
-      moxios.install()
-      wrapper = mount(
-        <MessageStudents
-          title="Send a message"
-          contextCode="course_1"
-          subject="Here is a subject"
-          body="Here is a body"
-          recipients={[
-            {
-              id: 1,
-              email: 'some@one.com',
-            },
-          ]}
-          onRequestClose={() => {}}
-        />
-      )
+      const {ref: reference} = renderMessageStudents()
 
-      data = wrapper.instance().composeRequestData()
-      jest.spyOn(wrapper.instance(), 'handleResponseSuccess')
-      jest.spyOn(wrapper.instance(), 'handleResponseError')
-    })
+      ref = reference
+      data = ref.current.composeRequestData()
 
-    afterEach(() => {
-      moxios.uninstall()
-      wrapper.unmount()
-      jest.clearAllMocks()
+      jest.spyOn(ref.current, 'handleResponseSuccess')
+      jest.spyOn(ref.current, 'handleResponseError')
     })
 
     it('sets state.sending', () => {
-      expect(wrapper.state('sending')).toBeFalsy()
-      wrapper.instance().sendMessage(data)
-      expect(wrapper.state('sending')).toBeTruthy()
+      expect(ref.current.state.sending).toBeFalsy()
+
+      ref.current.sendMessage(data)
+
+      expect(ref.current.state.sending).toBeTruthy()
     })
 
     it('sets hideAlert to false', () => {
-      wrapper.setState({hideAlert: true})
-      expect(wrapper.state('hideAlert')).toBeTruthy()
-      wrapper.instance().sendMessage(data)
-      expect(wrapper.state('hideAlert')).toBeFalsy()
+      ref.current.setState({hideAlert: true})
+
+      expect(ref.current.state.hideAlert).toBeTruthy()
+
+      ref.current.sendMessage(data)
+
+      expect(ref.current.state.hideAlert).toBeFalsy()
     })
 
     describe('on success', () => {
@@ -128,10 +128,12 @@ describe('MessageStudents', () => {
         })
       })
 
-      it('calls handleResponseSuccess', async () => {
-        wrapper.instance().sendMessage(data)
-        await moxios.wait(() => {
-          expect(wrapper.instance().handleResponseSuccess).toHaveBeenCalledTimes(1)
+      it('calls handleResponseSuccess', done => {
+        ref.current.sendMessage(data)
+
+        moxios.wait(() => {
+          expect(ref.current.handleResponseSuccess).toHaveBeenCalledTimes(1)
+          done()
         })
       })
     })
@@ -144,27 +146,25 @@ describe('MessageStudents', () => {
         })
       })
 
-      it('calls handleResponseError', async () => {
-        wrapper.instance().sendMessage(data)
-        await moxios.wait(() => {
-          expect(wrapper.instance().handleResponseError).toHaveBeenCalledTimes(1)
+      it('calls handleResponseError', done => {
+        ref.current.sendMessage(data)
+
+        moxios.wait(() => {
+          expect(ref.current.handleResponseError).toHaveBeenCalledTimes(1)
+          done()
         })
       })
     })
   })
 
   describe('validationErrors()', () => {
-    let wrapper
+    let ref
     const fields = ['subject', 'body']
 
     beforeEach(() => {
-      wrapper = mount(
-        <MessageStudents contextCode="course_1" title="Send a message" onRequestClose={() => {}} />
-      )
-    })
+      const {ref: reference} = renderMessageStudents()
 
-    afterEach(() => {
-      wrapper.unmount()
+      ref = reference
     })
 
     fields.forEach(field => {
@@ -173,13 +173,12 @@ describe('MessageStudents', () => {
           body: '',
           subject: '',
         }
-
-        let errors = wrapper.instance().validationErrors(data)
+        let errors = ref.current.validationErrors(data)
 
         expect(errors).toHaveProperty(field)
 
         data[field] = 'a value'
-        errors = wrapper.instance().validationErrors(data)
+        errors = ref.current.validationErrors(data)
 
         expect(errors).not.toHaveProperty(field)
       })
@@ -191,197 +190,163 @@ describe('MessageStudents', () => {
         subject: 'x'.repeat(256),
       }
 
-      const errors = wrapper.instance().validationErrors(data)
+      const errors = ref.current.validationErrors(data)
 
       expect(errors).toHaveProperty('subject')
     })
   })
 
   describe('handleAlertClose()', () => {
-    let wrapper
+    let ref
     let closeButton
 
     beforeEach(() => {
-      jest.useFakeTimers()
+      const {ref: reference} = renderMessageStudents()
 
-      wrapper = mount(
-        <MessageStudents contextCode="course_1" title="Send a message" onRequestClose={() => {}} />
-      )
+      ref = reference
 
-      wrapper.setState({
+      ref.current.setState({
         errors: {
           subject: 'provide a subject',
         },
       })
 
-      closeButton = wrapper.find('div.MessageStudents__Alert button').hostNodes()
+      closeButton = document.querySelector('div.MessageStudents__Alert button')
     })
 
-    afterEach(() => {
-      jest.clearAllTimers()
-      wrapper.unmount()
-    })
+    it('sets state.hideAlert to true', async () => {
+      expect(ref.current.state.hideAlert).toBeFalsy()
 
-    it('sets state.hideAlert to true', () => {
-      expect(wrapper.state('hideAlert')).toBeFalsy()
+      await userEvent.click(closeButton)
 
-      closeButton.simulate('click')
-      expect(wrapper.state('hideAlert')).toBeTruthy()
+      expect(ref.current.state.hideAlert).toBeTruthy()
     })
   })
 
   describe('handleChange()', () => {
-    let wrapper
+    let ref
 
     beforeEach(() => {
-      wrapper = mount(
-        <MessageStudents contextCode="course_1" title="Send a message" onRequestClose={() => {}} />
-      )
-    })
+      const {ref: reference} = renderMessageStudents()
 
-    afterEach(() => {
-      wrapper.unmount()
+      ref = reference
     })
 
     it('sets provided field / value pair in state.data', () => {
       const messageSubject = 'This is a message subject'
-      expect(wrapper.state('data').subject.length).toBe(0)
+      expect(ref.current.state.data.subject.length).toBe(0)
 
-      wrapper.instance().handleChange('subject', messageSubject)
-      wrapper.update()
+      ref.current.handleChange('subject', messageSubject)
 
-      expect(wrapper.state('data').subject).toBe(messageSubject)
+      expect(ref.current.state.data.subject).toBe(messageSubject)
     })
 
     it('removes error for provided field if present', () => {
-      wrapper.setState({
+      ref.current.setState({
         errors: {
           subject: 'There was an error',
         },
       })
 
-      expect(wrapper.state('errors')).toHaveProperty('subject')
+      expect(ref.current.state.errors).toHaveProperty('subject')
 
-      wrapper.instance().handleChange('subject', 'Fine here is a subject')
-      wrapper.update()
+      ref.current.handleChange('subject', 'Fine here is a subject')
 
-      expect(wrapper.state('errors')).not.toHaveProperty('subject')
+      expect(ref.current.state.errors).not.toHaveProperty('subject')
     })
   })
 
   describe('handleClose()', () => {
-    let wrapper
+    let ref
 
     beforeEach(() => {
-      wrapper = mount(
-        <MessageStudents contextCode="course_1" title="Send a message" onRequestClose={() => {}} />
-      )
+      const {ref: reference} = renderMessageStudents()
+
+      ref = reference
     })
 
-    afterEach(() => {
-      wrapper.unmount()
-    })
+    it('sets state.open to false', async () => {
+      expect(ref.current.state.open).toBeTruthy()
 
-    it('sets state.open to false', () => {
-      // precondition
-      expect(wrapper.state('open')).toBeTruthy()
+      const closeButton = getButtonFromDocument(-2)
 
-      const buttons = wrapper.find('button')
-      const closeButton = buttons.at(buttons.length - 2)
-      closeButton.simulate('click')
+      await userEvent.click(closeButton)
 
-      expect(wrapper.state('open')).toBeFalsy()
+      expect(ref.current.state.open).toBeFalsy()
     })
   })
 
   describe('handleSubmit()', () => {
-    let wrapper
+    let ref
     let sendMessageMock
 
     beforeEach(() => {
-      wrapper = mount(
-        <MessageStudents
-          title="Send a message"
-          contextCode="course_1"
-          recipients={[
-            {
-              id: 1,
-              email: 'some@one.com',
-            },
-          ]}
-          onRequestClose={() => {}}
-        />
-      )
-      sendMessageMock = jest.spyOn(wrapper.instance(), 'sendMessage')
+      const {ref: reference} = renderMessageStudents()
+
+      ref = reference
+
+      sendMessageMock = jest.spyOn(ref.current, 'sendMessage')
     })
 
-    afterEach(() => {
-      wrapper.unmount()
-    })
+    it('does not call sendMessage if errors are present', async () => {
+      const submitButton = getButtonFromDocument(-1)
 
-    it('does not call sendMessage if errors are present', () => {
-      const buttons = wrapper.find('button')
-      const submitButton = buttons.at(buttons.length - 1)
-      submitButton.simulate('click')
+      await userEvent.click(submitButton)
+
       expect(sendMessageMock).not.toHaveBeenCalled()
     })
 
-    it('sets state errors based on validationErrors', () => {
-      expect(wrapper.state('data').subject.length).toBe(0)
-      expect(Object.keys(wrapper.state('errors')).includes('subject')).toBeFalsy()
+    it('sets state errors based on validationErrors', async () => {
+      const submitButton = getButtonFromDocument(-1)
 
-      const buttons = wrapper.find('button')
-      const submitButton = buttons.at(buttons.length - 1)
-      submitButton.simulate('click')
-      expect(Object.keys(wrapper.state('errors')).includes('subject')).toBeTruthy()
+      expect(ref.current.state.data.subject.length).toBe(0)
+      expect(Object.keys(ref.current.state.errors).includes('subject')).toBeFalsy()
+
+      await userEvent.click(submitButton)
+
+      expect(Object.keys(ref.current.state.errors).includes('subject')).toBeTruthy()
     })
 
     describe('with valid data', () => {
       beforeEach(() => {
-        wrapper.instance().handleChange('subject', 'here is a subject')
-        wrapper.instance().handleChange('body', 'here is a body')
+        ref.current.handleChange('subject', 'here is a subject')
+        ref.current.handleChange('body', 'here is a body')
       })
 
-      it('does not set any errors', () => {
-        expect(Object.keys(wrapper.state('errors')).includes('subject')).toBeFalsy()
+      it('does not set any errors', async () => {
+        const submitButton = getButtonFromDocument(-1)
 
-        const buttons = wrapper.find('button')
-        const submitButton = buttons.at(buttons.length - 1)
-        submitButton.simulate('click')
-        expect(Object.keys(wrapper.state('errors')).includes('subject')).toBeFalsy()
+        expect(Object.keys(ref.current.state.errors).includes('subject')).toBeFalsy()
+
+        await userEvent.click(submitButton)
+
+        expect(Object.keys(ref.current.state.errors).includes('subject')).toBeFalsy()
       })
 
-      it('calls sendMessage', () => {
-        const buttons = wrapper.find('button')
-        const submitButton = buttons.at(buttons.length - 1)
-        submitButton.simulate('click')
+      it('calls sendMessage', async () => {
+        const submitButton = getButtonFromDocument(-1)
+
+        await userEvent.click(submitButton)
+
         expect(sendMessageMock).toHaveBeenCalled()
       })
     })
   })
 
   describe('handleResponseSuccess()', () => {
-    let wrapper
+    let ref
 
     beforeEach(() => {
       jest.useFakeTimers()
-      wrapper = mount(
-        <MessageStudents
-          title="Send a message"
-          contextCode="course_1"
-          subject="Here is a subject"
-          body="Here is a body"
-          recipients={[
-            {
-              id: 1,
-              email: 'some@one.com',
-            },
-          ]}
-          onRequestClose={() => {}}
-        />
-      )
 
-      wrapper.setState({
+      const {ref: reference} = renderMessageStudents({
+        subject: 'Here is a subject',
+        body: 'Here is a body',
+      })
+
+      ref = reference
+
+      ref.current.setState({
         hideAlert: true,
         sending: true,
       })
@@ -389,33 +354,32 @@ describe('MessageStudents', () => {
 
     afterEach(() => {
       jest.clearAllTimers()
-      wrapper.unmount()
     })
 
     it('updates state accordingly', () => {
-      expect(wrapper.state('hideAlert')).toBeTruthy()
-      expect(wrapper.state('sending')).toBeTruthy()
-      expect(wrapper.state('success')).toBeFalsy()
+      expect(ref.current.state.hideAlert).toBeTruthy()
+      expect(ref.current.state.sending).toBeTruthy()
+      expect(ref.current.state.success).toBeFalsy()
 
-      wrapper.instance().handleResponseSuccess()
+      ref.current.handleResponseSuccess()
 
-      expect(wrapper.state('hideAlert')).toBeFalsy()
-      expect(wrapper.state('sending')).toBeFalsy()
-      expect(wrapper.state('success')).toBeTruthy()
+      expect(ref.current.state.hideAlert).toBeFalsy()
+      expect(ref.current.state.sending).toBeFalsy()
+      expect(ref.current.state.success).toBeTruthy()
     })
 
     it('sets timeout to close modal', () => {
-      expect(wrapper.state('open')).toBeTruthy()
+      expect(ref.current.state.open).toBeTruthy()
 
-      wrapper.instance().handleResponseSuccess()
-
+      ref.current.handleResponseSuccess()
       jest.advanceTimersByTime(2700)
-      expect(wrapper.state('open')).toBeFalsy()
+
+      expect(ref.current.state.open).toBeFalsy()
     })
   })
 
   describe('handleResponseError()', () => {
-    let wrapper
+    let ref
     let errorResponse
 
     beforeEach(() => {
@@ -430,83 +394,67 @@ describe('MessageStudents', () => {
         },
       }
 
-      wrapper = mount(
-        <MessageStudents
-          title="Send a message"
-          contextCode="course_1"
-          recipients={[
-            {
-              id: 1,
-              email: 'some@one.com',
-            },
-          ]}
-          onRequestClose={() => {}}
-        />
-      )
+      const {ref: reference} = renderMessageStudents()
 
-      wrapper.setState({sending: true})
-    })
+      ref = reference
 
-    afterEach(() => {
-      wrapper.unmount()
+      ref.current.setState({sending: true})
     })
 
     it('sets field errors based on errorResponse', () => {
-      expect(Object.keys(wrapper.state('errors')).length).toBe(0)
+      expect(Object.keys(ref.current.state.errors).length).toBe(0)
 
-      wrapper.instance().handleResponseError(errorResponse)
+      ref.current.handleResponseError(errorResponse)
 
-      expect(Object.keys(wrapper.state('errors'))).toContain('subject')
+      expect(Object.keys(ref.current.state.errors)).toContain('subject')
     })
 
     it('marks sending as false', () => {
-      expect(wrapper.state('sending')).toBeTruthy()
+      expect(ref.current.state.sending).toBeTruthy()
 
-      wrapper.instance().handleResponseError(errorResponse)
+      ref.current.handleResponseError(errorResponse)
 
-      expect(wrapper.state('sending')).toBeFalsy()
+      expect(ref.current.state.sending).toBeFalsy()
     })
   })
 
   describe('renderAlert()', () => {
-    let wrapper
+    let ref
 
     beforeEach(() => {
-      wrapper = mount(
-        <MessageStudents
-          title="Send a message"
-          contextCode="course_1"
-          recipients={[
-            {
-              id: 1,
-              email: 'some@one.com',
-            },
-          ]}
-          onRequestClose={() => {}}
-        />
-      )
-    })
+      const {ref: reference} = renderMessageStudents()
 
-    afterEach(() => {
-      wrapper.unmount()
+      ref = reference
     })
 
     it('is null if provided callback is not truthy', () => {
-      const callback = () => false
-      expect(wrapper.instance().renderAlert('Alert Message', 'info', callback)).toBeNull()
+      const callback = jest.fn().mockReturnValue(false)
+
+      const result = ref.current.renderAlert('Alert Message', 'info', callback)
+
+      expect(callback).toHaveBeenCalled()
+      expect(result).toBeFalsy()
     })
 
     it('renders alert component if callback returns true', () => {
-      const callback = () => true
-      expect(wrapper.instance().renderAlert('Alert Message', 'info', callback)).toBeTruthy()
+      const callback = jest.fn().mockReturnValue(true)
+
+      const result = ref.current.renderAlert('Alert Message', 'info', callback)
+
+      expect(callback).toHaveBeenCalled()
+      expect(result).toBeTruthy()
     })
 
     it('is null if state.hideAlert is true', () => {
-      const callback = () => true
-      expect(wrapper.instance().renderAlert('Alert Message', 'info', callback)).toBeTruthy()
+      const callback = jest.fn().mockReturnValue(true)
 
-      wrapper.setState({hideAlert: true})
-      expect(wrapper.instance().renderAlert('Alert Message', 'info', callback)).toBeNull()
+      ref.current.renderAlert('Alert Message', 'info', callback)
+      ref.current.setState({hideAlert: true})
+
+      const result = ref.current.renderAlert('Alert Message', 'info', callback)
+
+      expect(callback).toHaveBeenCalledTimes(2)
+      expect(result).toBeNull()
     })
   })
 })
