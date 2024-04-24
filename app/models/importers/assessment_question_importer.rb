@@ -80,7 +80,7 @@ module Importers
           question_bank.migration_id = bank_mig_id
         elsif data['assessment_question_banks']
           if bank_hash = data['assessment_question_banks'].detect{|qb_hash| qb_hash['migration_id'] == question_bank.migration_id}
-            question_bank.title = bank_hash['title'] # we should update the title i guess?
+            question_bank.title = bank_hash["title"] if bank_hash["title"]
           end
         end
 
