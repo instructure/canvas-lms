@@ -65,17 +65,57 @@ inst canvas rebase --rebuild
 inst canvas rebuild --rebase
 ```
 
-### With an IDE
+## Debugging
 
-This feature is not yet supported.
+`inst` CLI supports Ruby debugging with Ruby's official `debug` gem.
 
-### Byebug
+Javascript debugging may work but is not yet guaranteed in `inst` CLI.
 
-This feature is not yet supported.
+### Ruby debugging
 
-### Prefer pry?
+If you're using VSCode to debug you must install [this](https://marketplace.visualstudio.com/items?itemName=KoichiSasada.vscode-rdbg) VSCode extension.
 
-This feature is not yet supported.
+With `inst` CLI, Ruby debugging in Canvas LMS is on by default. You can change this default in your `~/.inst-cli/config.yml`:
+
+```yaml
+inst:
+  canvas-lms:
+    debug: false
+```
+
+Or use the CLI flag:
+
+```bash
+inst canvas setup --no-debug
+
+# or
+
+inst canvas rebuild --no-debug
+```
+
+Once Canvas is running you may debug like so:
+
+1. Add a `debugger` statement or VSCode breakpoint to your Ruby code.
+2. Open the VSCode "Run and Debug" tool panel and select "Attach with rdbg (tcp 12345)" from the VSCode dropdown.
+3. Trip the debugger statement by navigating to the webpage, running the test, or whatever.
+
+Alternatively, if you don't want to use VSCode you can remotely attach to the `web` or `jobs` debuggee server like so:
+
+```bash
+docker compose exec web bin/rdbg --attach
+
+# or
+
+docker compose exec jobs bin/rdbg --attach
+```
+
+Go [here](https://github.com/ruby/debug?tab=readme-ov-file#how-to-use) for more tips to use the Ruby `debug` gem. It's a powerful tool!
+
+To learn more about debugging with VSCode, see `.vscode/launch.json` and <https://code.visualstudio.com/docs/editor/debugging>.
+
+### Javascript debugging
+
+Javascript debugging may work but is not yet guaranteed in `inst` CLI.
 
 ## Testing
 
