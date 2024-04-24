@@ -22,8 +22,9 @@
 */
 
 import React from 'react'
-import {mount, shallow} from 'enzyme'
+import {render, cleanup} from '@testing-library/react'
 import ProficiencyRating from '../ProficiencyRating'
+import {userEvent} from '@testing-library/user-event'
 
 const defaultProps = (props = {}) => ({
   color: '00ff00',
@@ -39,128 +40,116 @@ const defaultProps = (props = {}) => ({
   ...props,
 })
 
-it('renders the ProficiencyRating component', () => {
-  const wrapper = shallow(<ProficiencyRating {...defaultProps()} />)
-  expect(wrapper).toMatchSnapshot()
-})
-
-it('mastery checkbox is checked if mastery', () => {
-  const wrapper = shallow(
-    <ProficiencyRating
-      {...defaultProps({
-        mastery: true,
-      })}
-    />
+const renderProficiencyRating = (props = {}) =>
+  render(
+    <table>
+      <tbody>
+        <ProficiencyRating {...defaultProps(props)} />
+      </tbody>
+    </table>
   )
-  const radio = wrapper.find('RadioInput')
-  expect(radio.props().checked).toBe(true)
-})
 
-describe('focus handling', () => {
-  let containerElement = null
-  let wrapper = null
-
-  beforeEach(() => {
-    containerElement = document.createElement('div')
-    document.body.appendChild(containerElement)
-  })
-
+describe('ProficiencyRating', () => {
   afterEach(() => {
-    if (wrapper) wrapper.unmount()
-    document.body.removeChild(containerElement)
+    cleanup()
   })
 
-  it('mastery checkbox receives focus', () => {
-    wrapper = mount(
-      <table>
-        <tbody>
-          <ProficiencyRating {...defaultProps({focusField: 'mastery'})} />
-        </tbody>
-      </table>,
-      {attachTo: containerElement}
-    )
-    expect(wrapper.find('RadioInput').find('input').instance()).toBe(document.activeElement)
+  it('renders the ProficiencyRating component', () => {
+    const wrapper = renderProficiencyRating()
+
+    expect(wrapper.container).toBeInTheDocument()
   })
-})
 
-it('clicking mastery checkbox triggers change', () => {
-  const onMasteryChange = jest.fn()
-  const wrapper = mount(
-    <table>
-      <tbody>
-        <ProficiencyRating {...defaultProps({onMasteryChange})} />
-      </tbody>
-    </table>
-  )
-  wrapper.find('RadioInput').find('input').simulate('change')
-  expect(onMasteryChange).toHaveBeenCalledTimes(1)
-})
+  it('mastery checkbox is checked if mastery', () => {
+    const wrapper = renderProficiencyRating({
+      mastery: true,
+    })
 
-it('includes the rating description', () => {
-  const wrapper = shallow(<ProficiencyRating {...defaultProps()} />)
-  const input = wrapper.find('TextInput').at(0)
-  expect(input.prop('defaultValue')).toBe('Stellar')
-})
+    const radio = wrapper.container.querySelector('input[checked]')
 
-it('changing description triggers change', () => {
-  const onDescriptionChange = jest.fn()
-  const wrapper = mount(
-    <table>
-      <tbody>
-        <ProficiencyRating {...defaultProps({onDescriptionChange})} />
-      </tbody>
-    </table>
-  )
-  wrapper.find('TextInput').at(0).find('input').simulate('change')
-  expect(onDescriptionChange).toHaveBeenCalledTimes(1)
-})
+    expect(radio).toBeInTheDocument()
+  })
 
-it('includes the points', () => {
-  const wrapper = shallow(<ProficiencyRating {...defaultProps()} />)
-  const input = wrapper.find('TextInput').at(1)
-  expect(input.prop('defaultValue')).toBe('10')
-})
+  describe('focus handling', () => {
+    let containerElement = null
+    let wrapper = null
 
-it('changing points triggers change', () => {
-  const onPointsChange = jest.fn()
-  const wrapper = mount(
-    <table>
-      <tbody>
-        <ProficiencyRating {...defaultProps({onPointsChange})} />
-      </tbody>
-    </table>
-  )
-  wrapper.find('TextInput').at(3).find('input').simulate('change')
-  expect(onPointsChange).toHaveBeenCalledTimes(1)
-})
+    beforeEach(() => {
+      containerElement = document.createElement('div')
+      document.body.appendChild(containerElement)
+    })
 
-it('clicking delete button triggers delete', () => {
-  const onDelete = jest.fn()
-  const wrapper = mount(
-    <table>
-      <tbody>
-        <ProficiencyRating {...defaultProps({onDelete})} />
-      </tbody>
-    </table>
-  )
-  wrapper.find('IconButton').at(1).simulate('click')
-  expect(onDelete).toHaveBeenCalledTimes(1)
-})
+    afterEach(() => {
+      if (wrapper) wrapper.unmount()
+      document.body.removeChild(containerElement)
+    })
 
-it('clicking disabled delete button does not triggers delete', () => {
-  const onDelete = jest.fn()
-  const wrapper = mount(
-    <table>
-      <tbody>
-        <ProficiencyRating
-          {...defaultProps({
-            onDelete,
-            disableDelete: true,
-          })}
-        />
-      </tbody>
-    </table>
-  )
-  wrapper.find('IconButton').at(1).simulate('click')
-  expect(onDelete).toHaveBeenCalledTimes(0)
+    it('mastery checkbox receives focus', () => {
+      wrapper = renderProficiencyRating({focusField: 'mastery'})
+
+      expect(document.activeElement).toBe(wrapper.container.querySelector('input'))
+    })
+  })
+
+  it('clicking mastery checkbox triggers change', async () => {
+    const onMasteryChange = jest.fn()
+    const wrapper = renderProficiencyRating({onMasteryChange})
+
+    await userEvent.click(wrapper.container.querySelector('input'))
+
+    expect(onMasteryChange).toHaveBeenCalledTimes(1)
+  })
+
+  it('includes the rating description', () => {
+    const wrapper = renderProficiencyRating()
+    const input = wrapper.container.querySelector('input[value="Stellar"]')
+
+    expect(input).toBeInTheDocument()
+  })
+
+  it('changing description triggers change', async () => {
+    const onDescriptionChange = jest.fn()
+    const wrapper = renderProficiencyRating({onDescriptionChange})
+
+    await userEvent.type(wrapper.container.querySelector('input[value="Stellar"]'), 'c')
+
+    expect(onDescriptionChange).toHaveBeenCalledTimes(1)
+  })
+
+  it('includes the points', () => {
+    const wrapper = renderProficiencyRating()
+    const input = wrapper.container.querySelectorAll('input')[2]
+
+    expect(input.value).toEqual('10')
+  })
+
+  it('changing points triggers change', async () => {
+    const onPointsChange = jest.fn()
+    const wrapper = renderProficiencyRating({onPointsChange})
+
+    await userEvent.type(wrapper.container.querySelector('input[value="10"]'), 'c')
+
+    expect(onPointsChange).toHaveBeenCalledTimes(1)
+  })
+
+  it('clicking delete button triggers delete', async () => {
+    const onDelete = jest.fn()
+    const wrapper = renderProficiencyRating({onDelete})
+
+    await userEvent.click(wrapper.container.querySelector('.delete button'))
+
+    expect(onDelete).toHaveBeenCalledTimes(1)
+  })
+
+  it('clicking disabled delete button does not triggers delete', async () => {
+    const onDelete = jest.fn()
+    const wrapper = renderProficiencyRating({
+      onDelete,
+      disableDelete: true,
+    })
+
+    await userEvent.click(wrapper.container.querySelector('.delete button'))
+
+    expect(onDelete).toHaveBeenCalledTimes(0)
+  })
 })
