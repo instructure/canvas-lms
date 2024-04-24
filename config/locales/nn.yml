@@ -1739,6 +1739,8 @@ nn:
               check_box: "CSV-fil for gruppemedlemskap"
           groups: 
             check_box: "CSV-fil for grupper"
+          include_deleted: 
+            check_box: "Inkluder sletta objekt"
           sections: 
             check_box: "CSV-fil over seksjonar"
           terms: 
@@ -9387,6 +9389,7 @@ nn:
   discussion_inline_grading_4631a62e: "Inline vurdering for diskusjonar"
   discussion_itemtitle_1a5ff063: "Diskusjon, %{itemTitle}"
   discussion_mention_c70cb87a: "Tagging i diskusjon"
+  discussion_participant_1446188e: Diskusjonsdeltakar
   discussion_podcast_feed_d62cc56f: "Diskusjon, podkaststraum"
   discussion_post_count_report_2da4c6c: "Rapport av antall diskusjonsinnlegg"
   discussion_posts_c998c9ad: Diskusjonsinnlegg
@@ -25156,6 +25159,7 @@ nn:
   this_setting_only_affects_your_view_of_student_gra_8f58eb33: "Denne innstillinga påvirkar berre korleis du ser studentvurderingar, og visar vurderingane som om alle ikkje-vurderte oppgåver blei gitt resultatet null. Denne innstillinga er berre ei framvisningn og påvirkar ikkje vurderingsresultatet for studentane eller andre brukarar av vurderingsoversikta. Når denne innstillinga er slått på vil Canvas ikkje sette inn null i Vurderingsoversikta for studentinnleveringar i individuelle oppgåver. Berre oppgåvegrupper og total-kolonner vil automatisk ta med null-resultat i den gjenomsnittlege prosentandelen for kvar student. "
   this_setting_significantly_changes_the_canvas_expe_a9e07674: "Denne innstillinga endrer Canvas-opplevinga betydeleg for studentar og lærarar."
   this_settings_only_impact_enrollments_this_include_7f51358: "Denne innstillinga vil kun påverke påmeldingar. Dette inkluderar objekt med eit siste_aktivitet_på tid større enn Oppdatert Etter parameter. Som standard er det av. "
+  this_student_f8239fed: "Denne studenten"
   this_student_s_enrollment_has_been_concluded_c03bfafe: "Påmeldinga til studenten er avslutta. "
   this_student_s_enrollment_has_been_concluded_f135b8e4: "Påmeldinga til studenten er avslutta"
   this_student_was_just_awarded_an_unusually_high_gr_9ad835f3: "Denne studenten har fått ein uvanleg høg resultatverdi."
@@ -27255,6 +27259,7 @@ nn:
         select_folder_for_uploads: "Vel mappe for filopplastingar "
     wiki_page: 
       buttons: 
+        assign_to: "Tilordne til"
         edit: Rediger
         view_all_pages: "Vis alle sider"
       delete_wiki: Slett
@@ -27275,6 +27280,7 @@ nn:
       page_locked_by_modules_until: "Sida vil bli tilgjengeleg på %{lock_info.unlock_at} når du har fullført modulane:"
       page_locked_until: "Sida vil bli tilgjengeleg på %{lock_info.unlock_at}"
     wiki_page_edit: 
+      assign_to_label: "Tildel tilgang"
       buttons: 
         cancel: Avbryt
         save: Lagre

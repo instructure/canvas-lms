@@ -25,10 +25,9 @@ class KalturaMediaFileHandler
     attachments = Array(attachments)
     client = CanvasKaltura::ClientV3.new
     client.startSession(CanvasKaltura::SessionType::ADMIN)
-    files = []
     root_account_id = attachments.filter_map(&:root_account_id).first
-    attachments.each do |attachment|
-      files << {
+    files = attachments.map do |attachment|
+      {
         name: attachment.display_name,
         url: attachment.public_download_url,
         media_type: attachment.content_type&.start_with?("video") ? "video" : "audio",

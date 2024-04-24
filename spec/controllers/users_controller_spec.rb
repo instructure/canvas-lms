@@ -18,6 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require "feedjira"
 require_relative "../lti_1_3_spec_helper"
 require_relative "../helpers/k5_common"
 
@@ -2096,23 +2097,22 @@ describe UsersController do
 
     it "includes absolute path for rel='self' link" do
       get "public_feed", params: { feed_code: @user.feed_code }, format: "atom"
-      feed = Atom::Feed.load_feed(response.body) rescue nil
+      feed = Feedjira.parse(response.body)
       expect(feed).not_to be_nil
-      expect(feed.links.first.rel).to match(/self/)
-      expect(feed.links.first.href).to match(%r{http://})
+      expect(feed.feed_url).to match(%r{http://})
     end
 
     it "includes an author for each entry" do
       get "public_feed", params: { feed_code: @user.feed_code }, format: "atom"
-      feed = Atom::Feed.load_feed(response.body) rescue nil
+      feed = Feedjira.parse(response.body)
       expect(feed).not_to be_nil
       expect(feed.entries).not_to be_empty
-      expect(feed.entries.all? { |e| e.authors.present? }).to be_truthy
+      expect(feed.entries.all? { |e| e.author.present? }).to be_truthy
     end
 
     it "excludes unpublished things" do
       get "public_feed", params: { feed_code: @user.feed_code }, format: "atom"
-      feed = Atom::Feed.load_feed(response.body) rescue nil
+      feed = Feedjira.parse(response.body)
       expect(feed.entries.size).to eq 3
 
       @as.unpublish
@@ -2120,7 +2120,7 @@ describe UsersController do
       @dt.unpublish! # yes, you really have to shout to unpublish a discussion topic :(
 
       get "public_feed", params: { feed_code: @user.feed_code }, format: "atom"
-      feed = Atom::Feed.load_feed(response.body) rescue nil
+      feed = Feedjira.parse(response.body)
       expect(feed.entries.size).to eq 0
     end
 
@@ -2133,13 +2133,13 @@ describe UsersController do
       @topic.assignment.update_attribute :only_visible_to_overrides, true
 
       get "public_feed", params: { feed_code: @user.feed_code }, format: "atom"
-      feed = Atom::Feed.load_feed(response.body) rescue nil
+      feed = Feedjira.parse(response.body)
       expect(feed.entries.map(&:id).join(" ")).not_to include @as2.asset_string
       expect(feed.entries.map(&:id).join(" ")).not_to include @topic.asset_string
 
       @course.enroll_student(@student, section: @other_section, enrollment_state: "active", allow_multiple_enrollments: true)
       get "public_feed", params: { feed_code: @user.feed_code }, format: "atom"
-      feed = Atom::Feed.load_feed(response.body) rescue nil
+      feed = Feedjira.parse(response.body)
       expect(feed.entries.map(&:id).join(" ")).to include @as2.asset_string
       expect(feed.entries.map(&:id).join(" ")).to include @topic.asset_string
     end

@@ -465,6 +465,7 @@ export const SplitScreenViewContainer = props => {
                     menus.style.zIndex = '10000'
                   }
                 }}
+                isAnnouncement={props.discussionTopic.isAnnouncement}
               />
             </View>
           )}

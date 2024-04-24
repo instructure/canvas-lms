@@ -11,7 +11,7 @@ GEM
     diff-lcs (1.5.1)
     folio-pagination (0.0.12)
     mini_portile2 (2.8.5)
-    rake (13.1.0)
+    rake (13.2.1)
     rspec (3.13.0)
       rspec-core (~> 3.13.0)
       rspec-expectations (~> 3.13.0)
@@ -25,12 +25,12 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.13.0)
     rspec-support (3.13.1)
-    sqlite3 (1.7.2)
+    sqlite3 (1.7.3)
       mini_portile2 (~> 2.8.0)
-    sqlite3 (1.7.2-aarch64-linux)
-    sqlite3 (1.7.2-arm64-darwin)
-    sqlite3 (1.7.2-x86_64-darwin)
-    sqlite3 (1.7.2-x86_64-linux)
+    sqlite3 (1.7.3-aarch64-linux)
+    sqlite3 (1.7.3-arm64-darwin)
+    sqlite3 (1.7.3-x86_64-darwin)
+    sqlite3 (1.7.3-x86_64-linux)
     will_paginate (4.0.0)
 
 PLATFORMS
@@ -47,5 +47,8 @@ DEPENDENCIES
   rspec (~> 3.12)
   sqlite3
 
+RUBY VERSION
+   ruby 3.1.2p20
+
 BUNDLED WITH
-   2.5.6
+   2.5.7

@@ -47,7 +47,7 @@ GEM
     mutex_m (0.2.0)
     net-http (0.4.1)
       uri
-    rake (13.1.0)
+    rake (13.2.1)
     redcarpet (3.6.0)
     rspec (3.13.0)
       rspec-core (~> 3.13.0)
@@ -80,5 +80,8 @@ DEPENDENCIES
   redcarpet
   rspec (~> 3.0)
 
+RUBY VERSION
+   ruby 3.1.2p20
+
 BUNDLED WITH
-   2.5.6
+   2.5.7

@@ -43,6 +43,9 @@ module ConditionalRelease
       it "automatically unassigns if the grade changes" do
         @trigger_assmt.grade_student(@student, grade: 9, grader: @teacher) # should automatically assign to top set
         @trigger_assmt.grade_student(@student, grade: 5, grader: @teacher) # actually nvm should automatically assign to middle set
+        @trigger_assmt.grade_student(@student, grade: 9, grader: @teacher) # should automatically assign to top set
+        @trigger_assmt.grade_student(@student, grade: 5, grader: @teacher) # actually nvm should automatically assign to middle set
+
         visible_assmts = DifferentiableAssignment.scope_filter(@course.assignments, @student, @course).to_a
         expect(visible_assmts).to_not include(@set1_assmt1)
         expect(visible_assmts).to include(@set2_assmt1)

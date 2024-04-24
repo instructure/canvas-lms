@@ -41,6 +41,15 @@ const start = () => {
     calendar2Only: ENV.CALENDAR.CAL2_ONLY,
   })
 
+  if (ENV.FEATURES?.instui_header) {
+    // we need to give time to the react component to be in the DOM
+    return setTimeout(() => initializeDelayed(header), 200)
+  }
+
+  initializeDelayed(header)
+}
+
+const initializeDelayed = (header) => {
   const calendar = new Calendar(
     '#calendar-app',
     ENV.CALENDAR.CONTEXTS,

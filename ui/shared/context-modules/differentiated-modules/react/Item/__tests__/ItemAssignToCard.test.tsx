@@ -30,6 +30,7 @@ const props: ItemAssignToCardProps = {
   unlock_at: null,
   lock_at: null,
   onDelete: undefined,
+  removeDueDateInput: false,
   onValidityChange: () => {},
 }
 
@@ -55,6 +56,11 @@ describe('ItemAssignToCard', () => {
     expect(getByLabelText('Due Date')).toHaveValue('Oct 5, 2023')
     expect(getByLabelText('Available from')).toHaveValue('Oct 3, 2023')
     expect(getByLabelText('Until')).toHaveValue('Oct 10, 2023')
+  })
+
+  it('does not render the due date input if removeDueDateInput is set', () => {
+    const {queryByLabelText} = renderComponent({removeDueDateInput: true})
+    expect(queryByLabelText('Due Date')).not.toBeInTheDocument()
   })
 
   it('renders the delete button when onDelete is provided', () => {

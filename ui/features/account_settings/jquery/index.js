@@ -237,6 +237,39 @@ $(document).ready(function () {
             })
 
             $('.configure_report_link').click(function (_event) {
+              const provisioning_container = document.getElementById('provisioning_csv_form')
+              const checkboxes = provisioning_container.querySelectorAll(
+                'input[type="checkbox"]:not(#parameters_created_by_sis):not(#parameters_include_deleted)'
+              )
+
+              provisioning_container.onclick = function () {
+                let reportIsChecked = false
+
+                checkboxes.forEach(checkbox => {
+                  if (checkbox.checked) {
+                    reportIsChecked = true
+                  }
+                })
+
+                if (reportIsChecked) {
+                  provisioning_container.querySelector(
+                    '#parameters_created_by_sis'
+                  ).disabled = false
+                  provisioning_container.querySelector(
+                    '#parameters_include_deleted'
+                  ).disabled = false
+                } else {
+                  provisioning_container.querySelector('#parameters_created_by_sis').checked = false
+                  provisioning_container.querySelector('#parameters_created_by_sis').disabled = true
+                  provisioning_container.querySelector(
+                    '#parameters_include_deleted'
+                  ).checked = false
+                  provisioning_container.querySelector(
+                    '#parameters_include_deleted'
+                  ).disabled = true
+                }
+              }
+
               event.preventDefault()
               const data = $(this).data()
               let $dialog = data.$report_dialog

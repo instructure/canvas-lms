@@ -19,7 +19,7 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {Component} from 'react'
 import ReactDOM from 'react-dom'
-import {func, number, node} from 'prop-types'
+import {func, number, node, object, oneOfType} from 'prop-types'
 
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import {Button} from '@instructure/ui-buttons'
@@ -48,7 +48,7 @@ export default class ConfirmDeleteModal extends Component {
     onCancel: func,
     onHide: func,
     modalRef: func,
-    parent: node,
+    parent: oneOfType([node, object]),
   }
 
   static defaultProps = {

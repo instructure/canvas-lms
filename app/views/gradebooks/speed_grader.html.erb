@@ -336,38 +336,78 @@
                     </span>
                   </a>
                 </div>
-                <div class="ic-Action-header">
+                <% if Account.site_admin.feature_enabled?(:speedgrader_studio_media_capture) %>
+                  <div class="ic-Action-header flex-wrap">
                   <div id="emojis-attachments-container">
                     <span id="emoji-quick-picker-container"></span>
                     <div class="ic-Action-header__Primary attach_things<%= @emojis_enabled ? " emojis" : "" %>" role="group">
-                      <button class="Button Button--small" id="add_attachment" title="<%= t("File Attachment") %>" type="button">
-                        <i class="icon-paperclip" aria-hidden="true"></i>
-                        <span class="screenreader-only">
-                          <%= t("File Attachment") %>
-                        </span>
-                      </button>
-                      <% if feature_enabled?(:kaltura) %>
-                        <button id="media_comment_button" class="Button Button--small media_comment_link" title="<%= t("Media Comment") %> " type="button">
-                          <i class="icon-media" aria-hidden="true"></i>
-                          <span class="screenreader-only">
-                            <%= t("Media Comment") %>
-                          </span>
-                        </button>
-                      <% end %>
-                      <div class="speech-recognition" style="display:none">
-                        <a id="speech_recognition_button" title="<%= t("Speech Recognition") %>" href="#" class="Button Button--small speech_recognition_link">
+                    <div class="speech-recognition" style="display:none">
+                        <a id="speech_recognition_button" title="<%= t("Speech Recognition") %>" href="#" class="Button Button--small speech_recognition_link transparent-bg borderless">
                           <i class="icon-audio"></i>
                           <span class="screenreader-only">
                             <%= t("Speech Recognition") %>
                           </span>
                         </a>
                       </div>
+                      <% if feature_enabled?(:kaltura) %>
+                        <div id="new-studio-media-indicator-wrapper" title="<%= t("New") + "&excl; " + t(" Record videos and screen capture with auto captioning.") %>">
+                          <button id="media_comment_button" class="Button Button--small media_comment_link transparent-bg borderless r-margin-0" type="button">
+                            <i id="screen-capture-icon-mount-point" aria-hidden="true"></i>
+                            <span class="screenreader-only">
+                              <%= t("Media Comment") %>
+                            </span>
+                          </button>
+                          <p id="new-studio-media-indicator"><%= t("NEW") %></p>
+                        </div>
+                      <% end %>
+                      <div style="display:flex; align-items: center; justify-content: center; flex: 0 0;">
+                        <button class="Button Button--small transparent-bg borderless" id="add_attachment" title="<%= t("File Attachment") %>" type="button">
+                          <i class="icon-paperclip" aria-hidden="true"></i>
+                          <span class="screenreader-only">
+                            <%= t("File Attachment") %>
+                          </span>
+                        </button>
+                      </div>
                     </div>
                   </div>
-                  <div class="ic-Action-header__Secondary">
+                  <div class="ic-Action-header__Secondary m-left-auto">
                     <button id="comment_submit_button" class="Button Button--primary" type="submit"><%= t("Submit") %></button>
                   </div>
                 </div>
+                  <% else %>
+                  <div class="ic-Action-header">
+                    <div id="emojis-attachments-container">
+                      <span id="emoji-quick-picker-container"></span>
+                      <div class="ic-Action-header__Primary attach_things<%= @emojis_enabled ? " emojis" : "" %>" role="group">
+                        <button class="Button Button--small" id="add_attachment" title="<%= t("File Attachment") %>" type="button">
+                          <i class="icon-paperclip" aria-hidden="true"></i>
+                          <span class="screenreader-only">
+                            <%= t("File Attachment") %>
+                          </span>
+                        </button>
+                        <% if feature_enabled?(:kaltura) %>
+                          <button id="media_comment_button" class="Button Button--small media_comment_link" title="<%= t("Media Comment") %> " type="button">
+                            <i class="icon-media" aria-hidden="true"></i>
+                            <span class="screenreader-only">
+                              <%= t("Media Comment") %>
+                            </span>
+                          </button>
+                        <% end %>
+                        <div class="speech-recognition" style="display:none">
+                          <a id="speech_recognition_button" title="<%= t("Speech Recognition") %>" href="#" class="Button Button--small speech_recognition_link">
+                            <i class="icon-audio"></i>
+                            <span class="screenreader-only">
+                              <%= t("Speech Recognition") %>
+                            </span>
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="ic-Action-header__Secondary">
+                      <button id="comment_submit_button" class="Button Button--primary" type="submit"><%= t("Submit") %></button>
+                    </div>
+                  </div>
+                <% end %>
               </form>
 
               <% if @can_reassign_submissions %>

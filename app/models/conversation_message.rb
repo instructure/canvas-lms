@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "atom"
-
 class ConversationMessage < ActiveRecord::Base
   include HtmlTextHelper
   include ConversationHelper
@@ -353,24 +351,24 @@ class ConversationMessage < ActiveRecord::Base
 
     content += opts[:additional_content] if opts[:additional_content]
 
-    Atom::Entry.new do |entry|
-      entry.title = title
-      entry.authors << Atom::Person.new(name: author.name)
-      entry.updated   = created_at.utc
-      entry.published = created_at.utc
-      entry.id        = "tag:#{HostUrl.context_host(context)},#{created_at.strftime("%Y-%m-%d")}:/conversations/#{feed_code}"
-      entry.links << Atom::Link.new(rel: "alternate",
-                                    href: "http://#{HostUrl.context_host(context)}/conversations/#{conversation.id}")
-      attachments.each do |attachment|
-        entry.links << Atom::Link.new(rel: "enclosure",
-                                      href: file_download_url(attachment,
-                                                              verifier: attachment.uuid,
-                                                              download: "1",
-                                                              download_frd: "1",
-                                                              host: HostUrl.context_host(context)))
-      end
-      entry.content = Atom::Content::Html.new(content)
+    attachment_links = attachments.map do |attachment|
+      file_download_url(attachment,
+                        verifier: attachment.uuid,
+                        download: "1",
+                        download_frd: "1",
+                        host: HostUrl.context_host(context))
     end
+
+    {
+      title:,
+      author: author.name,
+      updated: created_at.utc,
+      published: created_at.utc,
+      id: "tag:#{HostUrl.context_host(context)},#{created_at.strftime("%Y-%m-%d")}:/conversations/#{feed_code}",
+      link: "http://#{HostUrl.context_host(context)}/conversations/#{conversation.id}",
+      attachment_links:,
+      content:
+    }
   end
 
   class EventFormatter

@@ -66,6 +66,7 @@ export const DiscussionTopicToolbarContainer = props => {
       </ScreenReaderContent>
       <DiscussionPostToolbar
         isAdmin={props.discussionTopic.permissions.readAsAdmin}
+        canEdit={props.discussionTopic.permissions.update}
         childTopics={getGroupsMenuTopics()}
         selectedView={filter}
         sortDirection={sort}
@@ -81,6 +82,12 @@ export const DiscussionTopicToolbarContainer = props => {
         setUserSplitScreenPreference={props.setUserSplitScreenPreference}
         userSplitScreenPreference={props.userSplitScreenPreference}
         closeView={props.closeView}
+        discussionId={props.discussionTopic._id}
+        typeName={props.discussionTopic.__typename?.toLowerCase()}
+        discussionTitle={props.discussionTopic.title}
+        pointsPossible={props.discussionTopic.assignment?.pointsPossible}
+        isAnnouncement={props.discussionTopic.isAnnouncement}
+        isGraded={props.discussionTopic.assignment !== null}
       />
     </View>
   )

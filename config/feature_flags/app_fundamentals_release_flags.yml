@@ -66,3 +66,9 @@ instui_nav:
   applies_to: RootAccount
   display_name: New InstUI navbar
   description: This is a new navbar being implemented with react router in mind
+password_complexity:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Enhance password options
+  description: More control over password settings at institution level
+  shadow: true

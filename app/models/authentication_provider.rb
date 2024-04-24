@@ -92,7 +92,7 @@ class AuthenticationProvider < ActiveRecord::Base
     t("Login with %{provider}", provider: display_name)
   end
 
-  scope :active, -> { where("workflow_state <> 'deleted'") }
+  scope :active, -> { where.not(workflow_state: "deleted") }
   belongs_to :account
   include ::Canvas::RootAccountCacher
   has_many :pseudonyms, inverse_of: :authentication_provider

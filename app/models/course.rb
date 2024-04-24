@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "atom"
-
 class Course < ActiveRecord::Base
   include Context
   include Workflow
@@ -1720,13 +1718,12 @@ class Course < ActiveRecord::Base
   end
 
   def to_atom
-    Atom::Entry.new do |entry|
-      entry.title     = self.name
-      entry.updated   = updated_at
-      entry.published = created_at
-      entry.links << Atom::Link.new(rel: "alternate",
-                                    href: "/#{context_url_prefix}/courses/#{id}")
-    end
+    {
+      title: self.name,
+      updated: updated_at,
+      published: created_at,
+      link: "/#{context_url_prefix}/courses/#{id}"
+    }
   end
 
   def unenrolled_user_can_read?(user, setting)

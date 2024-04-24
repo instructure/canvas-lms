@@ -100,6 +100,9 @@ export const buildAssignmentOverrides = assignment => {
       availableUntil: override.lockAt,
     })) || []
 
+  // When this is true, then we do not have a everyone/everyone else option
+  if (assignment.onlyVisibleToOverrides) return overrides
+
   overrides.push({
     dueDateId: nanoid(),
     assignedList:

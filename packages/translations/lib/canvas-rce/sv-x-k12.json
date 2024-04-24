@@ -309,6 +309,8 @@
   "enter_at_least_3_characters_to_search_4f037ee0": {
     "message": "Skriv in minst 3 tecken för att söka"
   },
+  "enter_replacement_text_17631bbc": { "message": "ange ersättningstext" },
+  "enter_search_text_26cb4459": { "message": "ange söktext" },
   "epsilon_54bb8afa": { "message": "Epsilon" },
   "epsilon_variant_d31f1e77": { "message": "Epsilon (variant)" },
   "equals_sign_c51bdc58": { "message": "Lika med-tecken" },
@@ -353,6 +355,8 @@
   },
   "files_c300e900": { "message": "Filer" },
   "files_index_af7c662b": { "message": "Filindex" },
+  "find_8d605019": { "message": "Hitta" },
+  "find_and_replace_6e345933": { "message": "Sök och ersätt" },
   "finish_bc343002": { "message": "Avsluta" },
   "fix_heading_hierarchy_f60884c4": { "message": "Fast rubrikhierarki" },
   "flat_music_76d5a5c3": { "message": "Platt (Musik)" },
@@ -475,6 +479,7 @@
   "in_element_of_19ca2f33": { "message": "I (element av)" },
   "increase_indent_6af90f7c": { "message": "Öka indrag" },
   "indefinite_integral_6623307e": { "message": "Obestämd integral" },
+  "index_of_max_80dcf7a5": { "message": "{ index } av { max }" },
   "indigo_2035fc55": { "message": "Indigo" },
   "inference_fed5c960": { "message": "Slutsats" },
   "infinity_7a10f206": { "message": "Oändlighet" },
@@ -679,6 +684,7 @@
   "no_quizzes_created_yet_1a2370b9": { "message": "Inga quiz har skapats än." },
   "no_quizzes_found_c80c537a": { "message": "Inga quiz hittades." },
   "no_results_940393cf": { "message": "Inga resultat." },
+  "no_results_found_58717065": { "message": "Inga resultat hittades" },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Inga resultat hittades för { filterTerm }"
   },
@@ -772,6 +778,7 @@
   "preview_a3f8f854": { "message": "FÖRHANDSGRANSKA" },
   "preview_in_overlay_ed772c46": { "message": "Förhandsgranskning i överlägg" },
   "preview_inline_9787330": { "message": "Inbäddad förhandsgranskning" },
+  "previous_bd2ac015": { "message": "Föregående" },
   "prime_917ea60e": { "message": "Prim" },
   "prime_numbers_13464f61": { "message": "Primtal" },
   "product_39cf144f": { "message": "Produkt" },
@@ -800,7 +807,9 @@
   "religion_icon_246e0be1": { "message": "Religiös ikon" },
   "remove_heading_style_5fdc8855": { "message": "Ta bort rubrikstil" },
   "remove_link_d1f2f4d0": { "message": "Ta bort länk" },
+  "replace_all_d3d68b3": { "message": "Ersätt alla" },
   "replace_e61834a7": { "message": "Ersätt" },
+  "replace_with_eeff01ad": { "message": "Ersätt med" },
   "reset_95a81614": { "message": "Återställ" },
   "resize_ec83d538": { "message": "Ändra storlek" },
   "restore_auto_save_deccd84b": {

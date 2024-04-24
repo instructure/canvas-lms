@@ -1192,6 +1192,7 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :accounts) do
       get "terms_of_service_custom_content", action: :terms_of_service_custom_content
+      get "settings/environment", action: :environment
     end
 
     scope(controller: :tabs) do

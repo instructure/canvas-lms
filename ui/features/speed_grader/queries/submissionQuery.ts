@@ -19,11 +19,17 @@
 import {z} from 'zod'
 import {executeQuery} from '@canvas/query/graphql'
 import gql from 'graphql-tag'
+import {omit} from 'lodash'
 
 const SUBMISSION_QUERY = gql`
   query SubmissionQuery($assignmentId: ID!, $userId: ID!) {
     assignment(id: $assignmentId) {
       id
+      _id
+      name
+      gradingType
+      pointsPossible
+      courseId
       submissionsConnection(
         filter: {includeUnsubmitted: true, userId: $userId, applyGradebookEnrollmentFilters: true}
       ) {
@@ -33,6 +39,7 @@ const SUBMISSION_QUERY = gql`
           cachedDueDate
           gradingStatus
           user {
+            _id
             avatarUrl
             name
           }
@@ -48,6 +55,7 @@ const SUBMISSION_QUERY = gql`
           submissionStatus
           customGradeStatus
           excused
+          submittedAt
           commentsConnection {
             nodes {
               id
@@ -61,23 +69,42 @@ const SUBMISSION_QUERY = gql`
               }
             }
           }
+          attachments {
+            _id
+            displayName
+            wordCount
+          }
+          rubricAssessmentsConnection {
+            nodes {
+              _id
+              assessmentType
+              artifactAttempt
+              score
+              assessmentRatings {
+                ratingTag: _id
+                comments
+                points
+              }
+            }
+          }
         }
       }
-      name
-      gradingType
-      pointsPossible
     }
   }
 `
 
 function transform(result: any) {
-  if (result.assignment?.submissionsConnection?.nodes?.[0]) {
-    const submission = result.assignment?.submissionsConnection?.nodes?.[0]
-    const comments = submission?.commentsConnection?.nodes
-    delete submission?.commentsConnection
+  const submission = result.assignment?.submissionsConnection?.nodes?.[0]
+  if (submission) {
+    submission.attachments.forEach((attachment: any) => {
+      attachment.downloadUrl = `/courses/${result.assignment.courseId}/assignments/${result.assignment._id}/submissions/${submission.user._id}?download=${attachment._id}`
+      attachment.previewUrl = `/courses/${result.assignment.courseId}/assignments/${result.assignment._id}/submissions/${submission.user._id}?download=${attachment._id}&inline=1`
+      attachment.deleteUrl = `/api/v1/files/${attachment._id}?replace=1`
+    })
     return {
-      ...submission,
-      comments,
+      ...omit(submission, ['commentsConnection', 'rubricAssessmentsConnection']),
+      comments: submission?.commentsConnection?.nodes,
+      rubricAssessments: submission?.rubricAssessmentsConnection?.nodes,
     }
   }
   return null

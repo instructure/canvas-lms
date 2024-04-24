@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "atom"
-
 class WikiPage < ActiveRecord::Base
   attr_readonly :wiki_id
   attr_accessor :saved_by
@@ -62,6 +60,7 @@ class WikiPage < ActiveRecord::Base
 
   belongs_to :current_lookup, class_name: "WikiPageLookup"
   has_many :wiki_page_lookups, inverse_of: :wiki_page
+  has_many :wiki_page_student_visibilities
   has_one :master_content_tag, class_name: "MasterCourses::MasterContentTag", inverse_of: :wiki_page
   has_one :block_editor, as: :context, dependent: :destroy
   accepts_nested_attributes_for :block_editor, allow_destroy: true
@@ -455,16 +454,16 @@ class WikiPage < ActiveRecord::Base
 
   def to_atom(opts = {})
     context = opts[:context]
-    Atom::Entry.new do |entry|
-      entry.title = t(:atom_entry_title, "Wiki Page, %{course_or_group_name}: %{page_title}", course_or_group_name: context.name, page_title: self.title)
-      entry.authors << Atom::Person.new(name: t(:atom_author, "Wiki Page"))
-      entry.updated   = updated_at
-      entry.published = created_at
-      entry.id        = "tag:#{HostUrl.default_host},#{created_at.strftime("%Y-%m-%d")}:/wiki_pages/#{feed_code}_#{updated_at.strftime("%Y-%m-%d")}"
-      entry.links << Atom::Link.new(rel: "alternate",
-                                    href: "http://#{HostUrl.context_host(context)}/#{self.context.class.to_s.downcase.pluralize}/#{self.context.id}/pages/#{url}")
-      entry.content = Atom::Content::Html.new(body || t("defaults.no_content", "no content"))
-    end
+
+    {
+      title: t(:atom_entry_title, "Wiki Page, %{course_or_group_name}: %{page_title}", course_or_group_name: context.name, page_title: self.title),
+      author: t(:atom_author, "Wiki Page"),
+      updated: updated_at,
+      published: created_at,
+      id: "tag:#{HostUrl.default_host},#{created_at.strftime("%Y-%m-%d")}:/wiki_pages/#{feed_code}_#{updated_at.strftime("%Y-%m-%d")}",
+      link: "http://#{HostUrl.context_host(context)}/#{self.context.class.to_s.downcase.pluralize}/#{self.context.id}/pages/#{url}",
+      content: body || t("defaults.no_content", "no content")
+    }
   end
 
   def user_name

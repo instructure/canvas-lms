@@ -18,16 +18,9 @@
 
 import '@instructure/canvas-theme'
 import React from 'react'
-import {mount} from 'enzyme'
+import {render} from '@testing-library/react'
+import userEvent from '@testing-library/user-event';
 import RSSFeedList from '../RSSFeedList'
-
-const defaultProps = () => ({
-  feeds: [],
-  hasLoadedFeed: false,
-  getExternalFeeds: () => {},
-  deleteExternalFeed: () => {},
-  focusLastElement: () => {},
-})
 
 const defaultFeeds = () => [
   {
@@ -62,51 +55,60 @@ const defaultFeeds = () => [
   },
 ]
 
+const renderComponent = (props = {}) => {
+  const defaultProps = {
+    feeds: [],
+    hasLoadedFeed: false,
+    getExternalFeeds: () => {},
+    deleteExternalFeed: () => {},
+    focusLastElement: () => {},
+  }
+  return render(<RSSFeedList {...defaultProps} {...props} />)
+}
+
 test('renders the RSSFeedList component', () => {
-  const tree = mount(<RSSFeedList {...defaultProps()} />)
-  expect(tree.exists()).toBe(true)
+  const feeds = defaultFeeds()
+  const tree = renderComponent({ hasLoadedFeed: true, feeds })
+  expect(tree.getByText(feeds[0].display_name)).toBeInTheDocument()
 })
 
-test('renders the RSSFeedList component loading indicator when not loading', () => {
-  const props = defaultProps()
-  props.hasLoadedFeed = false
-  const tree = mount(<RSSFeedList {...props} />)
-  const node = tree.find('Spinner').at(0)
-  expect(node).toHaveLength(1)
+test('renders the RSSFeedList component loading indicator when loading', () => {
+  const tree = renderComponent({ hasLoadedFeed: false })
+  expect(tree.getByText('Adding RSS Feed')).toBeInTheDocument()
 })
 
 test('renders the RSSFeedList component with 5 rows for 5 feeds', () => {
-  const props = defaultProps()
-  props.hasLoadedFeed = true
-  props.feeds = defaultFeeds()
-  const tree = mount(<RSSFeedList {...props} />)
-  const node = tree.find('Grid')
-  expect(node).toHaveLength(5 * 2) // there are two instances per rendering of <Grid> in InstUI 8
+  const feeds = defaultFeeds()
+  const tree = renderComponent({ hasLoadedFeed: true, feeds })
+  feeds.forEach(feed => {
+    expect(tree.getByText(feed.display_name)).toBeInTheDocument()
+  })
+  expect(tree.getAllByRole('button').length).toBe(5)
 })
 
 test('calls getExternalFeeds when feed has not been loaded', () => {
-  const props = defaultProps()
-  props.hasLoadedFeed = false
-  props.getExternalFeeds = jest.fn()
-  props.feeds = defaultFeeds()
-  mount(<RSSFeedList {...props} />)
-  expect(props.getExternalFeeds.mock.calls).toHaveLength(1)
+  const mockGetExternalFeeds = jest.fn()
+  renderComponent({
+    hasLoadedFeed: false,
+    getExternalFeeds: mockGetExternalFeeds
+  })
+
+  expect(mockGetExternalFeeds).toHaveBeenCalledTimes(1)
 })
 
 test('does not call getExternalFeeds when feed has been loaded', () => {
-  const props = defaultProps()
-  props.hasLoadedFeed = true
-  props.getExternalFeeds = jest.fn()
-  props.feeds = defaultFeeds()
-  mount(<RSSFeedList {...props} />)
-  expect(props.getExternalFeeds.mock.calls).toHaveLength(0)
+  const mockGetExternalFeeds = jest.fn()
+  renderComponent({
+    hasLoadedFeed: true,
+    getExternalFeeds: mockGetExternalFeeds
+  })
+
+  expect(mockGetExternalFeeds).not.toHaveBeenCalled()
 })
 
-test('calls deleteExternalFeed with correct feed ID when deleting feed', () => {
-  const props = defaultProps()
-  props.hasLoadedFeed = true
-  props.deleteExternalFeed = jest.fn()
-  props.feeds = [
+test('calls deleteExternalFeed with correct feed ID when deleting feed', async () => {
+  const mockDeleteExternalFeed = jest.fn()
+  const feeds = [
     {
       display_name: 'felix',
       id: '22',
@@ -126,9 +128,13 @@ test('calls deleteExternalFeed with correct feed ID when deleting feed', () => {
       url: 'donotcare.com',
     },
   ]
-  const tree = mount(<RSSFeedList {...props} />)
-  const instance = tree.instance()
-  instance.deleteExternalFeed('22')
-  expect(props.deleteExternalFeed.mock.calls).toHaveLength(1)
-  expect(props.deleteExternalFeed.mock.calls[0][0]).toEqual({feedId: '22'})
+  const tree = renderComponent({
+    feeds,
+    hasLoadedFeed: true,
+    deleteExternalFeed: mockDeleteExternalFeed,
+  })
+  await userEvent.click(tree.getByRole('button', {name: 'Delete felix'}))
+
+  expect(mockDeleteExternalFeed).toHaveBeenCalledTimes(1)
+  expect(mockDeleteExternalFeed).toHaveBeenCalledWith({feedId: '22'})
 })

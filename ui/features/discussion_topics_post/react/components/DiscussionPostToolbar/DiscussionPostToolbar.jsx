@@ -26,10 +26,11 @@ import {
   IconArrowUpLine,
   IconSearchLine,
   IconTroubleLine,
+  IconPermissionsLine
 } from '@instructure/ui-icons'
 import PropTypes from 'prop-types'
 import {CURRENT_USER} from '../../utils/constants'
-import React from 'react'
+import React, {useState} from 'react'
 import {Responsive} from '@instructure/ui-responsive'
 import {responsiveQuerySizes} from '../../utils'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -40,6 +41,7 @@ import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
 import {AnonymousAvatar} from '@canvas/discussions/react/components/AnonymousAvatar/AnonymousAvatar'
 import {ExpandCollapseThreadsButton} from './ExpandCollapseThreadsButton'
+import ItemAssignToTray from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToTray'
 
 const I18n = useI18nScope('discussions_posts')
 
@@ -74,6 +76,8 @@ const getClearButton = props => {
 }
 
 export const DiscussionPostToolbar = props => {
+  const [showAssignToTray, setShowAssignToTray] = useState(false)
+
   const clearButton = () => {
     return getClearButton({
       handleClear: () => {
@@ -86,6 +90,8 @@ export const DiscussionPostToolbar = props => {
   const searchElementText = props.discussionAnonymousState
     ? I18n.t('Search entries...')
     : I18n.t('Search entries or author...')
+
+    const handleClose = () => setShowAssignToTray(false)
 
   return (
     <Responsive
@@ -281,9 +287,31 @@ export const DiscussionPostToolbar = props => {
                     </Flex>
                   </Flex.Item>
                 )}
+                {props.canEdit && ENV.FEATURES?.differentiated_modules && !props.isAnnouncement && (
+                <Flex.Item shouldGrow={true} textAlign="end">
+                  <Button
+                    data-testid="manage-assign-to"
+                    renderIcon={IconPermissionsLine}
+                    onClick={() => (setShowAssignToTray(!showAssignToTray))} >{I18n.t('Assign To')}</Button>
+                </Flex.Item>
+                )}
               </Flex>
             </Flex.Item>
           </Flex>
+          {showAssignToTray && <ItemAssignToTray
+            open={showAssignToTray}
+            onClose={handleClose}
+            onDismiss={handleClose}
+            courseId={ENV.course_id}
+            itemName={props.discussionTitle}
+            itemType={props.typeName}
+            iconType={props.typeName}
+            pointsPossible={props.pointsPossible}
+            itemContentId={props.discussionId}
+            locale={ENV.LOCALE || 'en'}
+            timezone={ENV.TIMEZONE || 'UTC'}
+            removeDueDateInput={!props.isGraded}
+          />}
         </View>
       )}
     />
@@ -294,6 +322,9 @@ export default DiscussionPostToolbar
 
 DiscussionPostToolbar.propTypes = {
   isAdmin: PropTypes.bool,
+  canEdit: PropTypes.bool,
+  isAnnouncement: PropTypes.bool,
+  isGraded: PropTypes.bool,
   childTopics: PropTypes.arrayOf(ChildTopic.shape),
   selectedView: PropTypes.string,
   sortDirection: PropTypes.string,
@@ -301,10 +332,14 @@ DiscussionPostToolbar.propTypes = {
   onViewFilter: PropTypes.func,
   onSortClick: PropTypes.func,
   searchTerm: PropTypes.string,
+  discussionTitle: PropTypes.string,
+  discussionId: PropTypes.string,
+  typeName: PropTypes.string,
   discussionAnonymousState: PropTypes.string,
   setUserSplitScreenPreference: PropTypes.func,
   userSplitScreenPreference: PropTypes.bool,
   closeView: PropTypes.func,
+  pointsPossible: PropTypes.number,
 }
 
 DiscussionPostToolbar.defaultProps = {

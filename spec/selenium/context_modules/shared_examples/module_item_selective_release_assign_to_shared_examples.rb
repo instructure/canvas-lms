@@ -252,4 +252,27 @@ shared_examples_for "module item assign to tray" do |context|
 
     expect(inherited_from.last.text).to eq("Inherited from #{@module.name}")
   end
+
+  it "does not show the inherited module override if there is an assignment override" do
+    @adhoc_override1 = @module.assignment_overrides.create!(set_type: "ADHOC")
+    @adhoc_override1.assignment_override_students.create!(user: @student1)
+
+    get @mod_url
+
+    manage_module_item_button(@module_item1).click
+    click_manage_module_item_assign_to(@module_item1)
+
+    expect(inherited_from.last.text).to eq("Inherited from #{@module.name}")
+
+    update_due_date(0, "12/31/2022")
+    update_due_time(0, "5:00 PM")
+    click_save_button
+
+    expect(wait_for_no_such_element { module_item_edit_tray }).to be_truthy
+
+    manage_module_item_button(@module_item1).click
+    click_manage_module_item_assign_to(@module_item1)
+
+    expect(module_item_assign_to_card.last).not_to contain_css(inherited_from_selector)
+  end
 end

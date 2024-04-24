@@ -22,6 +22,7 @@ import ReceivedTable from '../ReceivedTable'
 import {
   mockShare,
   assignmentShare,
+  senderlessAssignmentShare,
   attachmentShare,
   readDiscussionShare,
   unreadDiscussionShare,
@@ -43,6 +44,18 @@ describe('content shares table', () => {
     expect(getByText(assignmentShare.name)).toBeInTheDocument()
     expect(getByText('Assignment')).toBeInTheDocument()
     expect(getByText(assignmentShare.sender.display_name)).toBeInTheDocument()
+    expect(getAllByText(/2019/)[0]).toBeInTheDocument()
+    expect(getByText(/manage options/i)).toBeInTheDocument()
+  })
+
+  it('renders ok without sender data', () => {
+    const {container, getByText, getAllByText} = render(
+      <ReceivedTable shares={[senderlessAssignmentShare]} />
+    )
+    expect(container.querySelector('th')).toBeInTheDocument()
+    expect(container.querySelector('td')).toBeInTheDocument()
+    expect(getByText(assignmentShare.name)).toBeInTheDocument()
+    expect(getByText('Assignment')).toBeInTheDocument()
     expect(getAllByText(/2019/)[0]).toBeInTheDocument()
     expect(getByText(/manage options/i)).toBeInTheDocument()
   })

@@ -146,7 +146,7 @@
       }
     %>
   </div>
-  <div id="submission_preview" class="paper user_content">
+  <div id="submission_preview" class="paper user_content" data-resource-type="assignment.submission" data-resource-id="<%= @submission.id %>">
     <%= user_content(@submission.body) %>
   </div>
 <% elsif @submission.submission_type == "online_upload" %>

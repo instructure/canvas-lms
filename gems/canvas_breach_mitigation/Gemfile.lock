@@ -53,5 +53,8 @@ DEPENDENCIES
   rspec (~> 3.12)
   simplecov (~> 0.22)
 
+RUBY VERSION
+   ruby 3.1.2p20
+
 BUNDLED WITH
-   2.5.6
+   2.5.7

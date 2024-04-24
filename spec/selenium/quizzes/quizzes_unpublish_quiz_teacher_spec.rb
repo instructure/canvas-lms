@@ -63,8 +63,7 @@ describe "unpublishing a quiz on the quiz show page" do
       wait_for_ajaximations
 
       items = ff("ul#toolbar-1 li.ui-menu-item")
-      items_text = []
-      items.each { |i| items_text << i.text.split("\n")[0] }
+      items_text = items.map { |i| i.text.split("\n")[0] }
 
       expect(items_text).to include "Show Rubric"
       expect(items_text).to include "Lock this Quiz Now"

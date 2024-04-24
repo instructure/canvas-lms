@@ -158,17 +158,23 @@ class PlannerController < ApplicationController
   private
 
   def set_user
+    include_visible_courses = params[:include]&.include?("all_courses")
+
     if params.key?(:user_id)
       @user = api_find(User, params[:user_id])
       @user == @current_user || authorized_action(@user, @current_user, :read_as_parent)
     elsif params.key?(:observed_user_id)
-      return render_unauthorized_action if !params.key?(:context_codes) || params[:context_codes].empty?
+      if (!params.key?(:context_codes) || params[:context_codes].empty?) && !include_visible_courses
+        return render_unauthorized_action
+      end
 
       @user = api_find(User, params[:observed_user_id])
       # observers can only specify course context_codes
       course_ids = Course.find_all_by_asset_string(params[:context_codes]).pluck(:id)
+      include_all_visible_courses = params[:context_codes].nil? && include_all_visible_courses
       valid_course_ids = @current_user.observer_enrollments.active.where(associated_user_id: params[:observed_user_id]).shard(@current_user).pluck(:course_id)
-      render_unauthorized_action unless (course_ids - valid_course_ids).empty?
+      courses = include_all_visible_courses ? [] : course_ids - valid_course_ids
+      render_unauthorized_action unless courses.empty?
     else
       @user = @current_user
     end
@@ -360,16 +366,24 @@ class PlannerController < ApplicationController
   end
 
   def set_params
-    includes = Array.wrap(params[:include]) & %w[concluded account_calendars]
+    includes = Array.wrap(params[:include]) & %w[concluded account_calendars all_courses]
     @per_page = params[:per_page] || 50
     @page = params[:page] || "first"
     @include_concluded = includes.include? "concluded"
     @include_account_calendars = includes.include? "account_calendars"
+    @include_all_courses = includes.include? "all_courses"
+    @include_context_codes = params[:context_codes].present? && !params[:context_codes].nil?
 
     # for specs, that do multiple requests in a single spec, we have to reset these ivars
     @course_ids = @group_ids = @user_ids = @account_ids = nil
-    if params[:context_codes].present?
-      context_ids = ActiveRecord::Base.parse_asset_string_list(Array(params[:context_codes]))
+    if @include_context_codes || @include_all_courses
+      context_codes = Array(params[:context_codes])
+      if !@include_context_codes && @include_all_courses
+        opts = {}
+        opts[:observee_user] = @user
+        context_codes = @current_user.menu_courses(nil, opts).pluck(:asset_string)
+      end
+      context_ids = ActiveRecord::Base.parse_asset_string_list(context_codes)
       @course_ids = context_ids["Course"] || []
       @group_ids = context_ids["Group"] || []
       @user_ids = context_ids["User"] || []
@@ -384,7 +398,7 @@ class PlannerController < ApplicationController
 
     allowed_account_calendars = @user&.all_account_calendars&.map { |a| Shard.relative_id_for(a.id, Shard.current, @user.shard) } || []
     enabled_account_calendars = @user&.enabled_account_calendars&.map { |a| Shard.relative_id_for(a.id, Shard.current, @user.shard) } || []
-    if @include_account_calendars && context_ids["Account"].nil?
+    if @include_account_calendars && !context_ids.nil? && context_ids["Account"].nil?
       @account_ids = enabled_account_calendars
     end
 

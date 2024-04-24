@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 - present Instructure, Inc.
+ * Copyright (C) 2024 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,6 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import ProductCard from './ProductCard'
+import React from 'react'
+import type {RouteObject} from 'react-router-dom'
+import {Discover} from './Discover'
 
-export {ProductCard}
+export const DiscoverRoute: RouteObject = {
+  path: '/',
+  element: <Discover />,
+}

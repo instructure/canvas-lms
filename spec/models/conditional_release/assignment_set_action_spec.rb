@@ -77,13 +77,13 @@ module ConditionalRelease
     end
 
     describe "self.latest" do
-      it "selects only the most recent Action for each Set and user_id" do
+      it "selects only the most recently updated Action for each Set and user_id" do
         actions = []
         actions << create(:assignment_set_action, student_id: 2, assignment_set: create(:assignment_set))
         set = create(:assignment_set)
         actions << create(:assignment_set_action, student_id: 1, assignment_set: set)
         actions.concat create_list(:assignment_set_action, 2, student_id: 2, assignment_set: set)
-        actions.last.update_attribute(:created_at, 1.hour.ago)
+        actions.last.update_attribute(:updated_at, 1.hour.ago)
         expect(AssignmentSetAction.latest).to eq actions[0..2]
       end
     end

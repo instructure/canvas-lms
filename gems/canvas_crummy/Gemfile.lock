@@ -7,7 +7,7 @@ GEM
   remote: https://rubygems.org/
   specs:
     docile (1.4.0)
-    rake (13.1.0)
+    rake (13.2.1)
     simplecov (0.22.0)
       docile (~> 1.1)
       simplecov-html (~> 0.11)
@@ -28,5 +28,8 @@ DEPENDENCIES
   rake
   simplecov (~> 0.22)
 
+RUBY VERSION
+   ruby 3.1.2p20
+
 BUNDLED WITH
-   2.5.6
+   2.5.7

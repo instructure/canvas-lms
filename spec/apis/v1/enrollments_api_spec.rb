@@ -1917,6 +1917,31 @@ describe EnrollmentsApiController, type: :request do
         expect(json.first["enrollment_state"]).to eql "deleted"
       end
 
+      describe "no associated accounts" do
+        before :once do
+          @student.pseudonyms.destroy_all
+          @student.user_account_associations.destroy_all
+        end
+
+        it "returns an empty array when caller has read roster rights but target user has no associated accounts" do
+          path = "/api/v1/users/#{@student.id}/enrollments"
+          params = { controller: "enrollments_api", action: "index", user_id: @student.id.to_param, format: "json" }
+          json = api_call(:get, path, params)
+
+          expect(json).to be_empty
+        end
+
+        it "returns unauthorized when caller doesn't have read roster rights and target user has no associated accounts" do
+          @observer = user_factory
+
+          path = "/api/v1/users/#{@student.id}/enrollments"
+          params = { controller: "enrollments_api", action: "index", user_id: @student.id.to_param, format: "json" }
+          api_call_as_user(@observer, :get, path, params)
+
+          expect(response).to have_http_status :unauthorized
+        end
+      end
+
       describe "custom roles" do
         context "user context" do
           before :once do

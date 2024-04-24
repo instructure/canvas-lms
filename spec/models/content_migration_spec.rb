@@ -759,12 +759,13 @@ describe ContentMigration do
 
     expect(cm.migration_issues).to be_empty
     quiz = @course.quizzes.available.first
+    att_to = @course.attachments.find_by(filename: "m-5U5Jww6HL7zG35CgyaYGyA5bhzsremxY.flv")
     expect(quiz.quiz_data).to be_present
-    expect(quiz.quiz_data.to_yaml).to include("/media_objects/m-5U5Jww6HL7zG35CgyaYGyA5bhzsremxY")
+    expect(quiz.quiz_data.to_yaml).to include("/media_attachments_iframe/#{att_to.id}")
 
     qq = quiz.quiz_questions.first
     expect(qq.question_data).to be_present
-    expect(qq.question_data.to_yaml).to include("/media_objects/m-5U5Jww6HL7zG35CgyaYGyA5bhzsremxY")
+    expect(qq.question_data.to_yaml).to include("/media_attachments_iframe/#{att_to.id}")
   end
 
   context "migrations with skip_job_progress enabled" do

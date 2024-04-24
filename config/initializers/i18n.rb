@@ -58,9 +58,8 @@ module CanvasI18nFallbacks
 
     existing_elements = result.captures.map(&:present?)
 
-    order = []
-    FALLBACK_ORDER.each do |a|
-      order.push(a.dup.select { |e| existing_elements[e] })
+    order = FALLBACK_ORDER.map do |a|
+      a.dup.select { |e| existing_elements[e] }
     end
 
     order.uniq.map do |ordering|

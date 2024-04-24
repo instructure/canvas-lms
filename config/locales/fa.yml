@@ -1621,6 +1621,8 @@ fa:
               check_box: "فایل CSV عضویت گروه"
           groups: 
             check_box: "فایل CSV گروه ها"
+          include_deleted: 
+            check_box: "درج اشیاء حذف شده"
           sections: 
             check_box: "فایل CSV بخش ها"
           terms: 
@@ -8805,6 +8807,7 @@ fa:
   discussion_group_category_locked: "رده های گروه را نمی توان مستقیما در یک تکلیف بحث تعیین کرد، بلکه در عوض باید آنها را در خود بحث تعیین کرد"
   discussion_inline_grading_4631a62e: "بحث نمره بندی درون خطی"
   discussion_mention_c70cb87a: "گفتگوی ذکر شده"
+  discussion_participant_1446188e: "شرکت کننده در بحث"
   discussion_podcast_feed_d62cc56f: "خوراک خبری پادکست بحث"
   discussion_post_count_report_2da4c6c: "گزارش تعداد پست های بحث"
   discussion_posts_c998c9ad: "ارسال های بحث"
@@ -23686,6 +23689,7 @@ fa:
   this_report_shows_grading_period_grades_and_overal_a86346a: "این گزارش نمره های دوره نمره گذاری (و نمره های کلی درس) برای هر دانشجوی ثبت نام شده در یک نیمسال خاص را نشان می دهد. فایل csv حاصله برای هر ثبت نام یک ردیف خواهد داشت."
   this_report_shows_the_student_final_grade_results__5a508b55: "این گزارش نتایج نمره نهایی دانشجو برای همه دانشجویان یک نیسمال خاص را نشان می دهد. فایل CSV حاصله برای هر ثبت نام یک ردیف دارد، و نمره فعلی و نهایی که در دفتر نمره درس نمایش داده می‌شود را نشان خواهد داد."
   this_sample_page_includes_common_ui_elements_in_ca_331f4ac4: "این صفحه نمونه شامل عناصر رایج واسط کاربر در کانواس برای کمک به شما در ساختن علامت تجاری سفارشی است. وقتی ایجاد تغییرات در مقادیر رنگ و تصاویر موجود در نوار کناری سمت چپ را شروع کنید، یک دکمه *پیش نمایش تغییرات خود* را خواهید دید. برای تجدید این صفحه، روی این دکمه کلیک کنید و ببینید تغییرات شما چطور به نظر می رسند."
+  this_student_f8239fed: "این دانشجو"
   this_student_s_enrollment_has_been_concluded_c03bfafe: "ثبت نام این دانشجو پایان یافته است."
   this_student_s_enrollment_has_been_concluded_f135b8e4: "ثبت نام این دانشجو پایان یافته است."
   this_student_was_just_awarded_an_unusually_high_gr_9ad835f3: "این دانشجو فقط یک نمره غیرمعمول بالا گرفته است."
@@ -25395,6 +25399,7 @@ fa:
         select_folder_for_uploads: "انتخاب پوشه برای بارگذاری های فایل"
     wiki_page: 
       buttons: 
+        assign_to: "اختصاص دادن به"
         edit: ویرایش
         view_all_pages: "مشاهده همه صفحه ها"
       delete_wiki: حذف

@@ -112,6 +112,12 @@ export default class EventDataSource {
       participants: {},
       fetchedAppointmentGroups: null,
     }
+    this.resetContexts()
+  }
+
+  // clear the calendar event cache w/o clearing appointment group data
+  resetContexts() {
+    this.cache.contexts = {}
     this.contexts.forEach(contextInfo => {
       this.cache.contexts[contextInfo.asset_string] = {
         events: {},
@@ -179,7 +185,7 @@ export default class EventDataSource {
 
   addEventToCache(event) {
     if (event.old_context_code) {
-      delete this.cache.contexts[event.old_context_code].events[event.id]
+      delete this.cache.contexts[event.old_context_code]?.events[event.id]
       delete event.old_context_code
     }
     // Split by comma, for the odd case where #contextCode() returns a comma seprated list

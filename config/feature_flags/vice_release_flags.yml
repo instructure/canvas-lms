@@ -17,6 +17,14 @@ confetti_for_valid_links:
     a course and no issues are found.
   applies_to: RootAccount
 
+bbb_avatar:
+  state: 'hidden'
+  display_name: 'Send user avatar to BigBlueButton'
+  description: |-
+    Adds a new admin setting to the BigBlueButton plugin to allow
+    sending of user avatars upon joining conference.
+  applies_to: RootAccount
+
 react_discussions_post:
   state: hidden
   beta: true
@@ -136,3 +144,9 @@ discussion_checkpoints:
     response and replies are then graded separately, and those grades are
     combined to form a final discussion grade.
   applies_to: RootAccount
+
+inbox_settings:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Inbox Settings - QW Updates
+  description: Gives users access to new optional features like setting a default signature that will be added at the end of outgoing messages and setting an autoresponder.

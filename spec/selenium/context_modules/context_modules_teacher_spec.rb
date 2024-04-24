@@ -614,6 +614,22 @@ describe "context modules" do
       expect(f("#context_module_item_#{tag.id}")).to contain_css(".item_link")
     end
 
+    it "duplicates a module" do
+      module1 = @course.context_modules.create(name: "My Module")
+      get "/courses/#{@course.id}/modules"
+
+      expect(all_modules.length).to eq 1
+      manage_module_button(module1).click
+      duplicate_module_button(module1).click
+      wait_for_ajaximations
+      expect(all_modules.length).to eq 2
+      expect(f("#flash_screenreader_holder")).not_to include_text("Error")
+      # test that the duplicated module's buttons are functional
+      module2 = @course.context_modules.reload.last
+      add_module_item_button(module2).click
+      expect(f("body")).to contain_jqcss('.ui-dialog:contains("Add Item to"):visible')
+    end
+
     context "expanding/collapsing modules" do
       before do
         @mod = create_modules(2, true)

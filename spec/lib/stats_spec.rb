@@ -133,7 +133,7 @@ describe Stats do
     it "supports .each, .<<, and .push" do
       c = Stats::Counter.new([1, 2, 3])
       test = []
-      c.each { |item| test << item }
+      c.each { |item| test << item } # rubocop:disable Style/MapIntoArray
       c << 4
       c.push 5
       c.each { |item| test << item }

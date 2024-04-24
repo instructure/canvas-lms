@@ -69,6 +69,7 @@ describe('VideoConferenceModal', () => {
         type: 'BigBlueButton',
         settings: [],
         free_trial: false,
+        send_avatar: false,
         lti_settings: null,
         contexts: null,
       },

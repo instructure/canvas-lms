@@ -25,6 +25,7 @@
 !/config/crystalball.yml
 /config/environments/*-local.rb
 /config/locales/generated/
+/config/saml/*
 /config/RAILS_VERSION
 /coverage/
 /coverage-js/

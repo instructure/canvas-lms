@@ -125,7 +125,7 @@ export default class GradesGrid extends Component {
     const rows = this.state.pages[this.state.currentPageIndex]
 
     return (
-      <div>
+      <div data-testid="grades-grid">
         <FocusableView>
           {props => (
             <Grid

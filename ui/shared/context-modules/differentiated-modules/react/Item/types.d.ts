@@ -17,6 +17,8 @@
  */
 
 import {FetchLinkHeader} from '@canvas/do-fetch-api-effect/types'
+import type {Breakpoints} from '@canvas/with-breakpoints'
+import type {SyntheticEvent} from 'react'
 
 export interface BaseDateDetails {
   id: string
@@ -90,4 +92,16 @@ export interface DateDetailsPayload extends BaseDateDetails {
 export interface FetchDueDatesResponse {
   json: DateDetails
   link?: FetchLinkHeader
+}
+
+export type CustomDateTimeInputProps = {
+  validationErrors: Record<string, string>
+  unparsedFieldKeys: Set<string>
+  blueprintDateLocks?: DateLockTypes[]
+  dateInputRefs: Record<string, HTMLInputElement | null>
+  handleBlur: (unparsedFieldKey: string) => (e: SyntheticEvent) => void
+  breakpoints: Breakpoints
+  showMessages?: boolean
+  locale?: string
+  timezone?: string
 }

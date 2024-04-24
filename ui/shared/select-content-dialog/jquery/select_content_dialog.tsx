@@ -468,6 +468,7 @@ export const Events = {
       url = url + '?placement=' + placement_type + '&secure_params=' + $('#secure_params').val()
       if ($('#select_context_content_dialog').data('context_module_id')) {
         url += '&context_module_id=' + $('#select_context_content_dialog').data('context_module_id')
+        url += '&com_instructure_course_canvas_resource_type=context_module.external_tool'
       }
       $dialog.find('#resource_selection_iframe').attr({src: url, title: tool.name})
       $(window).on('beforeunload', beforeUnloadHandler)

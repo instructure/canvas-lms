@@ -656,6 +656,7 @@ export const DiscussionThreadContainer = props => {
                         )
                       : ''
                   }
+                  isAnnouncement={props.discussionTopic.isAnnouncement}
                 />
               </View>
             )}

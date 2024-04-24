@@ -43,7 +43,7 @@ gem "bigdecimal", "~> 3.1"
 gem "browser", "~> 5.3", require: false
 gem "business_time", "0.13.0"
 gem "canvas_connect", "0.3.16"
-gem "canvas_link_migrator", "~> 1.0.6"
+gem "canvas_link_migrator", "~> 1.0.8"
 gem "canvas_webex", "0.18.2"
 gem "crocodoc-ruby", "0.0.1", require: false
 gem "code_ownership", "~> 1.33"
@@ -94,8 +94,7 @@ else
   gem "rack-brotli", "~> 1.2"
 end
 gem "rails-observers", "0.1.5"
-gem "ratom-nokogiri", "0.10.11", require: false
-  gem "nokogiri", "1.15.5" # see https://github.com/sparklemotion/nokogiri/issues/3102
+gem "feedjira", "~> 3.2.3", require: false
 gem "redcarpet", "~> 3.6", require: false
 gem "retriable", "~> 3.1"
 gem "ritex", "1.0.1", require: false
@@ -109,7 +108,7 @@ gem "saml2", "~> 3.1"
 gem "sanitize", "~> 6.0", require: false
 gem "sentry-rails", "~> 5.10"
 gem "sentry-inst_jobs", "~> 5.10"
-gem "twilio-ruby", "~> 6.4", require: false
+gem "twilio-ruby", "~> 7.0", require: false
 gem "vault", "~> 0.17", require: false
 gem "vericite_api", "1.5.3"
 gem "wcag_color_contrast", "0.1.0"

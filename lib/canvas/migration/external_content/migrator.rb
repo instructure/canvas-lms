@@ -33,11 +33,13 @@ module Canvas::Migration::ExternalContent
 
       # tells the services to begin exporting
       # should return the info we need to go retrieve the exported data later (e.g. a status url)
-      def begin_exports(course, opts = {})
+      def begin_exports(course, content_export = nil, opts = {})
         pending_exports = {}
         pending_exports.merge!(Lti::ContentMigrationService.begin_exports(course, opts)) if Lti::ContentMigrationService.enabled?
         registered_services.each do |key, service|
           next unless service.applies_to_course?(course)
+
+          next if key == "quizzes_next_export" && should_load_new_quizzes_export?(content_export)
 
           begin
             if (export = service.begin_export(course, opts))
@@ -154,6 +156,10 @@ module Canvas::Migration::ExternalContent
         else
           registered_services[key]
         end
+      end
+
+      def should_load_new_quizzes_export?(content_export)
+        content_export&.contains_new_quizzes? && content_export.common_cartridge?
       end
     end
   end

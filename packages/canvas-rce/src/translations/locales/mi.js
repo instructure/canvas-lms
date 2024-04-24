@@ -335,6 +335,8 @@ const locale = {
   "enter_at_least_3_characters_to_search_4f037ee0": {
     "message": "Pātō ki iti ake i te 3 pūāhua hei rapu"
   },
+  "enter_replacement_text_17631bbc": { "message": "tomo kupu whakakapi" },
+  "enter_search_text_26cb4459": { "message": "tomo kupu rapu" },
   "epsilon_54bb8afa": { "message": "Epsilon" },
   "epsilon_variant_d31f1e77": { "message": "Epsilon (Tauke)" },
   "equals_sign_c51bdc58": { "message": "Waitohu Ōrite" },
@@ -377,6 +379,8 @@ const locale = {
   },
   "files_c300e900": { "message": "Kōnae" },
   "files_index_af7c662b": { "message": "Taupū kōnae" },
+  "find_8d605019": { "message": "Kimihia" },
+  "find_and_replace_6e345933": { "message": "Kimihia me te Whakakapi" },
   "finish_bc343002": { "message": "Mutu" },
   "fix_heading_hierarchy_f60884c4": {
     "message": "Whakatikahia te hiranga o te pane"
@@ -501,6 +505,7 @@ const locale = {
   "in_element_of_19ca2f33": { "message": "Kei roto (Huahanga o)" },
   "increase_indent_6af90f7c": { "message": "Nuku Whakanui" },
   "indefinite_integral_6623307e": { "message": "Noa Tautoko" },
+  "index_of_max_80dcf7a5": { "message": "{ index } ō { max }" },
   "indigo_2035fc55": { "message": "Indigo" },
   "inference_fed5c960": { "message": "Whakataunga" },
   "infinity_7a10f206": { "message": "Mutunga" },
@@ -705,6 +710,7 @@ const locale = {
   },
   "no_quizzes_found_c80c537a": { "message": "Karekau he patapatai i kitea." },
   "no_results_940393cf": { "message": "Kaore he hua." },
+  "no_results_found_58717065": { "message": "Kāore he hua i kitea" },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Kaore i kitea he hua mo { filterTerm }"
   },
@@ -798,6 +804,7 @@ const locale = {
   "preview_a3f8f854": { "message": "AROKITE" },
   "preview_in_overlay_ed772c46": { "message": "Arokite i roto i paparua" },
   "preview_inline_9787330": { "message": "Arokite i roto i te raina" },
+  "previous_bd2ac015": { "message": "Ō muri" },
   "prime_917ea60e": { "message": "Pirimia" },
   "prime_numbers_13464f61": { "message": "Nga Nama Pirimia" },
   "product_39cf144f": { "message": "Hua" },
@@ -826,7 +833,9 @@ const locale = {
   "religion_icon_246e0be1": { "message": "Whakapono Tohu" },
   "remove_heading_style_5fdc8855": { "message": "Tango pane kāhua" },
   "remove_link_d1f2f4d0": { "message": "Tango Hononga" },
+  "replace_all_d3d68b3": { "message": "Whakakapi Katoa" },
   "replace_e61834a7": { "message": "Whakakapi" },
+  "replace_with_eeff01ad": { "message": "Whakakapi me" },
   "reset_95a81614": { "message": "Tautuhi anō" },
   "resize_ec83d538": { "message": "Rahi anō" },
   "restore_auto_save_deccd84b": { "message": "Whakaora tiaki aunoa?" },

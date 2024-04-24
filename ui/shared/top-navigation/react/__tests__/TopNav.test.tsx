@@ -16,8 +16,10 @@
 import {render} from '@testing-library/react'
 import TopNav from '../TopNav'
 import React from 'react'
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 
 // with this program. If not, see <http://www.gnu.org/licenses/>.
+const queryClient = new QueryClient()
 
 jest.mock('../hooks/useToggleCourseNav', () => ({
   __esModule: true,
@@ -35,11 +37,21 @@ describe('TopNav', () => {
   })
 
   it('renders', () => {
-    expect(() => render(<TopNav />)).not.toThrow()
+    expect(() =>
+      render(
+        <QueryClientProvider client={queryClient}>
+          <TopNav />
+        </QueryClientProvider>
+      )
+    ).not.toThrow()
   })
 
   it('renders with breadcrumbs', () => {
-    const {getByText} = render(<TopNav />)
+    const {getByText} = render(
+      <QueryClientProvider client={queryClient}>
+        <TopNav />
+      </QueryClientProvider>
+    )
 
     expect(getByText('crumb')).toBeInTheDocument()
   })

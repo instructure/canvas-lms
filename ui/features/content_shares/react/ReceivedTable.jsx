@@ -175,11 +175,11 @@ export default function ReceivedTable({shares, onPreview, onImport, onRemove, on
           <Avatar
             margin="0 small 0 0"
             size="small"
-            name={share.sender.display_name}
-            src={share.sender.avatar_image_url}
+            name={share.sender ? share.sender?.display_name : I18n.t('unknown sender')}
+            src={share.sender ? share.sender?.avatar_image_url : '/images/messages/avatar-50.png'}
             data-fs-exclude={true}
           />{' '}
-          {share.sender.display_name}
+          {share.sender ? share.sender?.display_name : '--'}
         </Table.Cell>
         <Table.Cell>{renderReceivedColumn(share.content_export)}</Table.Cell>
         <Table.Cell>{renderActionMenu(share)}</Table.Cell>

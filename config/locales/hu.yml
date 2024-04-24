@@ -1522,6 +1522,8 @@ hu:
               check_box: "Csoporttagság CSV"
           groups: 
             check_box: "Csoportok CSV"
+          include_deleted: 
+            check_box: "Beleértve a törölt elemeket is"
           sections: 
             check_box: "Szekciók CSV"
           terms: 
@@ -8122,6 +8124,7 @@ hu:
   discussion_group_category_locked: "A csoporthalmazok nem állíthatóak be direkt módon a fórumjellegű feladatkiírásban, helyette magában a fórumban kell ezt beállítani."
   discussion_inline_grading_4631a62e: "Fórum beágyazott osztályozás"
   discussion_mention_c70cb87a: "Fórum Említés"
+  discussion_participant_1446188e: Fórum-résztvevő
   discussion_podcast_feed_d62cc56f: "Fórum podcast hírfolyam"
   discussion_post_count_report_2da4c6c: "Fórumbejegyzés számlálási jelentés"
   discussion_posts_c998c9ad: Fórumbejegyzések
@@ -20109,6 +20112,7 @@ hu:
       A tároló tükrözi az összes fájlt, amely ütközik a kurzusok kvótáival. Az összes fájl mérete a kurzusban az összes fájlra vonatkozik a kurzusban, tekintet nélkül a kurzuskvótára.
   this_report_shows_grading_period_grades_and_overal_a86346a: "Ez a jelentés megmutatja az osztályzási időszak érdemjegyeit (és a végleges kurzus osztályzatokat is) minden tanulónak, akik a megadott félévben beiratkoztak. Az ebből származó csv fájl beiratkozásonként 1 sort tartalmaz."
   this_sample_page_includes_common_ui_elements_in_ca_331f4ac4: "Ez a minta oldal a Canvas felhasználói felület gyakori elemeit tartalmazza, hogy segítsen felépíteni Önnek az egyedi arculatot. Amint elkezdi megváltoztatni a színeket és a bal oldalsávban megjelenő képeket, a *Módosítások előnézete* gomb megjelenik. Kattintson rá az oldal frissítéséhez, és a változtatások megtekintéséhez."
+  this_student_f8239fed: "Ez a hallgató"
   this_student_was_just_awarded_an_unusually_high_gr_9ad835f3: "Ennek a hallgatónak az értékelése a többihez képest kiemelkedően magas."
   this_student_was_just_awarded_negative_points_55741a37: "A hallgatóhoz negatív pontszám lett rendelve."
   this_student_wrote_f1a3f22d: "Ez a hallgató írta:"
@@ -21240,6 +21244,7 @@ hu:
         select_folder_for_uploads: "Mappa kiválasztása fájlfeltöltéshez"
     wiki_page: 
       buttons: 
+        assign_to: Hozzárendelés
         edit: Szerkesztés
         view_all_pages: "Összes oldal megtekintése"
       delete_wiki: Törlés

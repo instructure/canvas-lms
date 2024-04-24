@@ -55,13 +55,7 @@ export const RubricAssessmentTray = ({
   }, [rubricAssessmentData, isOpen])
 
   const onUpdateAssessmentData = (params: UpdateAssessmentData) => {
-    const {criterionId, points, description} = params
-    if (points === undefined) {
-      setRubricAssessmentDraftData(
-        rubricAssessmentDraftData.filter(a => a.criterionId !== criterionId)
-      )
-      return
-    }
+    const {criterionId, points, description, comments = ''} = params
 
     const existingAssessmentIndex = rubricAssessmentDraftData.findIndex(
       a => a.criterionId === criterionId
@@ -81,7 +75,7 @@ export const RubricAssessmentTray = ({
         {
           criterionId,
           points,
-          comments: '',
+          comments,
           id: matchingRatingId,
           commentsEnabled: true,
           description: ratingDescription,
@@ -93,6 +87,7 @@ export const RubricAssessmentTray = ({
           a.criterionId === criterionId
             ? {
                 ...a,
+                comments,
                 id: matchingRatingId,
                 points,
                 description: ratingDescription,

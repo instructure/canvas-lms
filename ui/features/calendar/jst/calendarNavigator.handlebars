@@ -1,3 +1,6 @@
+{{#if ENV.FEATURES.instui_header}}
+<span id="calendar_navigator_component"></span>
+{{else}}
 <button class="navigate_today btn">{{#t "today"}}Today{{/t}}</button>
 <span class="navigation_buttons">
   <button class="navigate_prev btn">
@@ -20,3 +23,4 @@
            aria-labelledby="calendar_navigation_date_accessible_label"
            data-tooltip title="{{accessibleDateFormat 'date'}}"/>
 </span>
+{{/if}}

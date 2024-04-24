@@ -404,7 +404,7 @@ describe "course settings" do
         more_options_link.click
         wait_for_ajaximations
         expect(f("body")).not_to contain_jqcss("#course_hide_distribution_graphs")
-        expect(f("body")).not_to contain_jqcss("#course_hide_final_grades")
+        expect(f("#course_hide_final_grades")).to be_present
         # Verify that other parts of the settings are not visilbe when they shouldn't be
         expect(f("#tab-sections").css_value("display")).to eq "none"
       end

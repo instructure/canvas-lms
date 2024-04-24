@@ -49,6 +49,14 @@
         <%= f.check_box :free_trial %> <%= f.label :free_trial, :en => "Mark this BigBlueButton instance as a free trial" %>
       </td>
     </tr>
+    <% if @domain_root_account.feature_enabled?(:bbb_avatar) && !@domain_root_account.site_admin? %>
+    <tr>
+      <td></td>
+      <td>
+        <%= f.check_box :send_avatar %> <%= f.label :send_avatar, :en => "Send user avatar to BigBlueButton on join" %>
+      </td>
+    </tr>
+    <% end %>
     <tr>
       <td></td>
       <td>

@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "atom"
 require "anonymity"
 
 class Submission < ActiveRecord::Base
@@ -1499,7 +1498,7 @@ class Submission < ActiveRecord::Base
     inferred_state = workflow_state
 
     # New Quizzes returned a partial grade, but manual review is needed from a human
-    return workflow_state if workflow_state == Submission.workflow_states.pending_review && graded_by_new_quizzes?
+    return workflow_state if workflow_state == Submission.workflow_states.pending_review && cached_quiz_lti
 
     inferred_state = Submission.workflow_states.submitted if unsubmitted? && submitted_at
     inferred_state = Submission.workflow_states.unsubmitted if submitted? && !has_submission?
@@ -2548,16 +2547,16 @@ class Submission < ActiveRecord::Base
 
   def to_atom(opts = {})
     author_name = (assignment.present? && assignment.context.present?) ? assignment.context.name : t("atom_no_author", "No Author")
-    Atom::Entry.new do |entry|
-      entry.title     = "#{user.name} -- #{assignment.title}#{", " + assignment.context.name if opts[:include_context]}"
-      entry.updated   = updated_at
-      entry.published = created_at
-      entry.id        = "tag:#{HostUrl.default_host},#{created_at.strftime("%Y-%m-%d")}:/submissions/#{feed_code}_#{updated_at.strftime("%Y-%m-%d")}"
-      entry.content   = Atom::Content::Html.new(body || "")
-      entry.links << Atom::Link.new(rel: "alternate", href: "#{assignment.direct_link}/submissions/#{id}")
-      entry.authors << Atom::Person.new(name: author_name)
-      # entry.author    = Atom::Person.new(self.user)
-    end
+
+    {
+      title: "#{user.name} -- #{assignment.title}#{", " + assignment.context.name if opts[:include_context]}",
+      updated: updated_at,
+      published: created_at,
+      id: "tag:#{HostUrl.default_host},#{created_at.strftime("%Y-%m-%d")}:/submissions/#{feed_code}_#{updated_at.strftime("%Y-%m-%d")}",
+      content: body || "",
+      link: "#{assignment.direct_link}/submissions/#{id}",
+      author: author_name
+    }
   end
 
   # include the versioned_attachments in as_json if this was loaded from a
@@ -3072,10 +3071,6 @@ class Submission < ActiveRecord::Base
     tracked_attributes = Checkpoints::SubmissionAggregatorService::AggregateSubmission.members.map(&:to_s) - ["updated_at"]
     relevant_changes = tracked_attributes & saved_changes.keys
     relevant_changes.any?
-  end
-
-  def graded_by_new_quizzes?
-    cached_quiz_lti && autograded?
   end
 
   def remove_sticker

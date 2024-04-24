@@ -1139,7 +1139,7 @@ class AssignmentsController < ApplicationController
 
   def filter_speed_grader_by_student_group?
     # Group assignments only need to filter if they show individual students
-    return false if @assignment.group_category? && !@assignment.grade_group_students_individually?
+    return false if @assignment.group_category_id && !@assignment.grade_group_students_individually?
 
     @context.filter_speed_grader_by_student_group?
   end

@@ -34,7 +34,7 @@ debug_launch = lambda do
 
     DEBUGGER__.open(nonstop: ENV["RUBY_DEBUG_NONSTOP"])
   elsif ENV["RUBY_DEBUG_START"]
-    require "debug/start"
+    require "debug/start" # rubocop:disable Lint/Debugger
   end
 end
 

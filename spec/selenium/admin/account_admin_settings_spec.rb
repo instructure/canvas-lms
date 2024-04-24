@@ -260,6 +260,19 @@ describe "root account basic settings" do
     expect(f("#zero_activity_csv_form")).to contain_css(".ui-datepicker-trigger")
   end
 
+  it "disables report options when a report hasn't been selected" do
+    course_with_admin_logged_in
+    get account_settings_url + "#tab-reports"
+
+    f("#configure_provisioning_csv").click
+    expect(f("#provisioning_csv_form").find("#parameters_created_by_sis")).to be_disabled
+    expect(f("#provisioning_csv_form").find("#parameters_include_deleted")).to be_disabled
+
+    f("#provisioning_csv_form").find("#parameters_courses").click
+    expect(f("#provisioning_csv_form").find("#parameters_created_by_sis")).to_not be_disabled
+    expect(f("#provisioning_csv_form").find("#parameters_include_deleted")).to_not be_disabled
+  end
+
   it "changes the default user quota", priority: "1" do
     course_with_admin_logged_in
     group_model(context: @course)

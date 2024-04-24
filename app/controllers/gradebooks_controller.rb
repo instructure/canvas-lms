@@ -178,6 +178,7 @@ class GradebooksController < ApplicationController
       grading_period_set: grading_period_group_json,
       grading_period:,
       grading_periods: @grading_periods,
+      hide_final_grades: @context.hide_final_grades,
       courses_with_grades: courses_with_grades_json,
       effective_due_dates:,
       exclude_total: @exclude_total,

@@ -7,4 +7,4 @@ source "https://rubygems.org"
 # development dependencies will be added by default to the :development group.
 gemspec
 
-eval_gemfile(gemfile.dirname.join("../gemfile_prefix.rb"))
+eval_gemfile("../gemfile_prefix.rb")

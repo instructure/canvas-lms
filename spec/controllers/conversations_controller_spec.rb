@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require "feedjira"
+
 describe ConversationsController do
   before do
     allow(InstStatsd::Statsd).to receive(:count)
@@ -1309,10 +1311,10 @@ describe ConversationsController do
     it "returns basic feed attributes" do
       conversation
       get "public_feed", params: { feed_code: @student.feed_code }, format: "atom"
-      feed = Atom::Feed.load_feed(response.body) rescue nil
+      feed = Feedjira.parse(response.body) rescue nil
       expect(feed).not_to be_nil
       expect(feed.title).to eq "Conversations Feed"
-      expect(feed.links.first.href).to match(/conversations/)
+      expect(feed.feed_url).to match(/conversations/)
     end
 
     it "includes message entries" do
@@ -1333,7 +1335,7 @@ describe ConversationsController do
       message = "Sending a test message to some random users, in the hopes that it really works."
       conversation(message:)
       get "public_feed", params: { feed_code: @student.feed_code }, format: "atom"
-      feed = Atom::Feed.load_feed(response.body) rescue nil
+      feed = Feedjira.parse(response.body) rescue nil
       expect(feed).not_to be_nil
       expect(feed.entries.first.title).to match(/Sending a test/)
       expect(feed.entries.first.title).not_to match(message)
@@ -1343,7 +1345,7 @@ describe ConversationsController do
       message = "Sending a test message to some random users, in the hopes that it really works."
       conversation(message:)
       get "public_feed", params: { feed_code: @student.feed_code }, format: "atom"
-      feed = Atom::Feed.load_feed(response.body) rescue nil
+      feed = Feedjira.parse(response.body) rescue nil
       expect(feed).not_to be_nil
       expect(feed.entries.first.content).to match(message)
     end
@@ -1352,7 +1354,7 @@ describe ConversationsController do
       message = "Sending a test message to some random users, in the hopes that it really works."
       conversation(num_other_users: 4, message:)
       get "public_feed", params: { feed_code: @student.feed_code }, format: "atom"
-      feed = Atom::Feed.load_feed(response.body) rescue nil
+      feed = Feedjira.parse(response.body) rescue nil
       expect(feed).not_to be_nil
       expect(feed.entries.first.content).to match(/Message Course/)
       expect(feed.entries.first.content).to match(/User/)
@@ -1365,7 +1367,7 @@ describe ConversationsController do
       @conversation.add_message("test attachment", attachment_ids: [attachment.id])
       allow(HostUrl).to receive(:context_host).and_return("test.host")
       get "public_feed", params: { feed_code: @student.feed_code }, format: "atom"
-      feed = Atom::Feed.load_feed(response.body) rescue nil
+      feed = Feedjira.parse(response.body) rescue nil
       expect(feed).not_to be_nil
       expect(feed.entries.first.content).to match(/somefile\.doc/)
     end

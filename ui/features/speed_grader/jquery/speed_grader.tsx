@@ -56,6 +56,7 @@ import AssessmentAuditTray from '../react/AssessmentAuditTray/index'
 import CommentArea from '../react/CommentArea'
 import GradeLoadingSpinner from '../react/GradeLoadingSpinner'
 import RubricAssessmentTrayWrapper from '../react/RubricAssessmentTrayWrapper'
+import ScreenCaptureIcon from '../react/ScreenCaptureIcon'
 import {originalityReportSubmissionKey} from '@canvas/grading/originalityReportHelper'
 import PostPolicies from '../react/PostPolicies/index'
 import SpeedGraderProvisionalGradeSelector from '../react/SpeedGraderProvisionalGradeSelector'
@@ -181,6 +182,7 @@ const SPEED_GRADER_EDIT_STATUS_MENU_SECONDARY_MOUNT_POINT =
   'speed_grader_edit_status_secondary_mount_point'
 const ASSESSMENT_AUDIT_BUTTON_MOUNT_POINT = 'speed_grader_assessment_audit_button_mount_point'
 const ASSESSMENT_AUDIT_TRAY_MOUNT_POINT = 'speed_grader_assessment_audit_tray_mount_point'
+const SCREEN_CAPTURE_ICON_MOUNT_POINT = 'screen-capture-icon-mount-point'
 
 let isAnonymous: boolean
 let anonymousGraders: boolean
@@ -250,6 +252,7 @@ let $assignment_submission_originality_report_url: JQuery
 let $assignment_submission_vericite_report_url: JQuery
 let $assignment_submission_resubmit_to_vericite_url: JQuery
 let $rubric_holder: JQuery
+let $new_screen_capture_indicator_wrapper: JQuery
 let $no_annotation_warning: JQuery
 let $comment_submitted: JQuery
 let $comment_submitted_message: JQuery
@@ -984,6 +987,17 @@ function handleSelectedRubricAssessmentChanged({validateEnteredData = true} = {}
     showEditButton = !selectedAssessment || assessmentBelongsToCurrentUser(selectedAssessment)
   }
   $('#rubric_assessments_list_and_edit_button_holder .edit').showIf(showEditButton)
+
+  if (enhanced_rubrics) {
+    if (
+      !selectedAssessment?.assessor_id ||
+      ENV.RUBRIC_ASSESSMENT.assessor_id === selectedAssessment?.assessor_id
+    ) {
+      $('button.toggle_full_rubric').show()
+    } else {
+      $('button.toggle_full_rubric').hide()
+    }
+  }
 }
 
 function initRubricStuff() {
@@ -3850,6 +3864,17 @@ EG = {
         tooltipClass: 'center bottom vertical',
       })
     }
+    if ($new_screen_capture_indicator_wrapper && $new_screen_capture_indicator_wrapper.length) {
+      $new_screen_capture_indicator_wrapper.tooltip({
+        position: {my: 'left-100 bottom', at: 'center top'},
+        tooltipClass: 'center bottom vertical',
+      })
+    }
+    const screenCaptureMountPoint = document.getElementById(SCREEN_CAPTURE_ICON_MOUNT_POINT)
+    if (screenCaptureMountPoint) {
+      const screen_capture_icon = <ScreenCaptureIcon />
+      ReactDOM.render(screen_capture_icon, screenCaptureMountPoint)
+    }
   },
 
   // Note: do not use compareStudentsBy if your dataset includes 0.
@@ -4218,6 +4243,7 @@ function setupSelectors() {
   $iframe_holder = $('#iframe_holder')
   $left_side = $('#left_side')
   $multiple_submissions = $('#multiple_submissions')
+  $new_screen_capture_indicator_wrapper = $('#new-studio-media-indicator-wrapper')
   $no_annotation_warning = $('#no_annotation_warning')
   $not_gradeable_message = $('#not_gradeable_message')
   $points_deducted = $('#points-deducted')

@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {mount} from 'enzyme'
+import {render} from '@testing-library/react'
 import chicago from 'timezone/America/Chicago'
 import DueDateCalendarPicker from '@canvas/due-dates/react/DueDateCalendarPicker'
 import * as tz from '@canvas/datetime'
@@ -55,11 +55,11 @@ QUnit.module('DueDateCalendarPicker', suiteHooks => {
   })
 
   function mountComponent() {
-    wrapper = mount(<DueDateCalendarPicker {...props} />)
+    wrapper = render(<DueDateCalendarPicker {...props} />)
   }
 
   function simulateChange(value) {
-    const $dateField = wrapper.find('.date_field').getDOMNode()
+    const $dateField = wrapper.container.querySelector('.date_field')
     $dateField.value = value
     $dateField.dispatchEvent(new Event('change'))
   }
@@ -114,14 +114,14 @@ QUnit.module('DueDateCalendarPicker', suiteHooks => {
   test('sets the input as readonly when disabled is true', () => {
     props.disabled = true
     mountComponent()
-    const $input = wrapper.find('input').getDOMNode()
+    const $input = wrapper.container.querySelector('input')
     strictEqual($input.readOnly, true)
   })
 
   test('disables the calendar picker button when disabled is true', () => {
     props.disabled = true
     mountComponent()
-    const $button = wrapper.getDOMNode().querySelector('button')
+    const $button = wrapper.container.querySelector('button')
     equal($button.getAttribute('aria-disabled'), 'true')
   })
 
@@ -130,8 +130,8 @@ QUnit.module('DueDateCalendarPicker', suiteHooks => {
     mountComponent()
     ok(
       wrapper
-        .find('label')
-        .prop('className')
+        .container.querySelector('label')
+        .className
         .match(/special-label/)
     )
   })
@@ -141,8 +141,8 @@ QUnit.module('DueDateCalendarPicker', suiteHooks => {
     mountComponent()
     ok(
       wrapper
-        .find('input')
-        .prop('name')
+        .container.querySelector('input')
+        .name
         .match(/special-name/)
     )
   })
@@ -150,12 +150,12 @@ QUnit.module('DueDateCalendarPicker', suiteHooks => {
   test('label and input reference each other', () => {
     mountComponent()
 
-    const htmlFor = wrapper.find('label').prop('htmlFor')
-    const inputId = wrapper.find('input').prop('id')
+    const htmlFor = wrapper.container.querySelector('label').htmlFor
+    const inputId = wrapper.container.querySelector('input').id
     equal(htmlFor, inputId)
 
-    const labelId = wrapper.find('label').prop('id')
-    const labelledby = wrapper.find('input').prop('aria-labelledby')
+    const labelId = wrapper.container.querySelector('label').id
+    const labelledby = wrapper.container.querySelector('input').getAttribute('aria-labelledby')
     equal(labelId, labelledby)
   })
 

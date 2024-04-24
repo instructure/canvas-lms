@@ -218,6 +218,7 @@ export default class TextEntry extends React.Component {
           onContentChange={content => {
             this.checkForChanges(content)
           }}
+          resourceType="assignment.submission"
         />
       </div>
     )

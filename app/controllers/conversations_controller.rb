@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "atom"
-
 # @API Conversations
 #
 # API for creating, accessing and updating user conversations.
@@ -301,6 +299,8 @@ class ConversationsController < ApplicationController
           CAN_MESSAGE_ACCOUNT_CONTEXT: valid_account_context?(@domain_root_account),
           MAX_GROUP_CONVERSATION_SIZE: Conversation.max_group_conversation_size
         }
+
+        hash[:INBOX_SETTINGS_ENABLED] = Account.site_admin.feature_enabled?(:inbox_settings)
 
         notes_enabled_accounts = @current_user.associated_accounts.having_user_notes_enabled
 
@@ -1094,13 +1094,11 @@ class ConversationsController < ApplicationController
 
     @current_user = @context
     load_all_contexts
-    feed = Atom::Feed.new do |f|
-      f.title = t("titles.rss_feed", "Conversations Feed")
-      f.links << Atom::Link.new(href: conversations_url, rel: "self")
-      f.updated = Time.now
-      f.id = conversations_url
-    end
-    GuardRail.activate(:secondary) do
+
+    title = t("titles.rss_feed", "Conversations Feed")
+    link = conversations_url
+
+    feed_xml = GuardRail.activate(:secondary) do
       @entries = []
       @conversation_contexts = {}
       @current_user.conversations.each do |conversation|
@@ -1110,12 +1108,13 @@ class ConversationsController < ApplicationController
         end
       end
       @entries = @entries.sort_by { |e| [e.created_at, e.id] }.reverse
-      @entries.each do |entry|
-        feed.entries << entry.to_atom(additional_content: @conversation_contexts[entry.conversation.id])
+
+      AtomFeedHelper.render_xml(title:, link:, entries: @entries) do |entry|
+        { additional_content: @conversation_contexts[entry.conversation.id] }
       end
     end
     respond_to do |format|
-      format.atom { render plain: feed.to_xml }
+      format.atom { render plain: feed_xml }
     end
   end
 

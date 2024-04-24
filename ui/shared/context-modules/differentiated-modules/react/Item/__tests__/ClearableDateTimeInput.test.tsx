@@ -45,7 +45,7 @@ describe('ClearableDateTimeInput', () => {
   })
 
   it('disables clear button if blueprint-locked', () => {
-    const {getByText, getByRole} = renderComponent({disabledByBPLock: true})
+    const {getByRole} = renderComponent({disabled: true})
     expect(getByRole('button', {name: 'Clear'})).toBeDisabled()
   })
 

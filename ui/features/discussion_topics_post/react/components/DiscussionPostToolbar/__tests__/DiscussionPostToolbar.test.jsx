@@ -211,4 +211,26 @@ describe('DiscussionPostToolbar', () => {
       })
     })
   })
+
+  describe('Assign To', () => {
+    beforeAll(()=>{
+      ENV.FEATURES = {
+        differentiated_modules: true
+      }
+    })
+
+    it('renders the Assign To button if user can edit', ()=>{
+      const {getByRole} = setup({
+        canEdit: true
+      })
+      expect(getByRole('button', {name: 'Assign To'})).toBeInTheDocument()
+    })
+
+    it('does not render the Assign To button if user can not edit', ()=>{
+      const {queryByRole} = setup({
+        canEdit: false
+      })
+      expect(queryByRole('button', {name: 'Assign To'})).not.toBeInTheDocument()
+    })
+  })
 })

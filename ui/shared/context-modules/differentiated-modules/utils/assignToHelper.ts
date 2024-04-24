@@ -81,13 +81,15 @@ export const generateDateDetailsPayload = (cards: ItemAssignToCardSpec[]) => {
   }
   payload.assignment_overrides = overrideCards
     .map(card => {
+      const isUpdatedModuleOverride = card.contextModuleId !== undefined && card.isEdited
       const isSectionOverride =
         card.defaultOptions?.[0]?.includes('section') &&
         card.overrideId !== everyoneCard?.overrideId
+      const shouldUpdate = isSectionOverride && !isUpdatedModuleOverride
       const overrides: DateDetailsOverride[] = card.selectedAssigneeIds
         .filter(assignee => assignee.includes('section'))
         ?.map((section, index) => ({
-          id: index === 0 && isSectionOverride ? card.overrideId : undefined,
+          id: index === 0 && shouldUpdate ? card.overrideId : undefined,
           course_section_id: section.split('-')[1],
           due_at: card.due_at,
           unlock_at: card.unlock_at,
@@ -101,7 +103,7 @@ export const generateDateDetailsPayload = (cards: ItemAssignToCardSpec[]) => {
         ?.map(id => id.split('-')[1])
       if (studentIds.length > 0) {
         overrides.push({
-          id: !isOverrideUsed ? card.overrideId : undefined,
+          id: !isOverrideUsed && !isUpdatedModuleOverride ? card.overrideId : undefined,
           student_ids: studentIds,
           due_at: card.due_at,
           unlock_at: card.unlock_at,

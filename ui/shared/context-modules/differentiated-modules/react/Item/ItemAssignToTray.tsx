@@ -32,6 +32,7 @@ import {
   IconQuizLine,
   IconQuizSolid,
   IconQuestionLine,
+  IconDiscussionLine,
 } from '@instructure/ui-icons'
 import {showFlashAlert, showFlashError} from '@canvas/alerts/react/FlashAlert'
 import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
@@ -46,7 +47,7 @@ import type {
   FetchDueDatesResponse,
   ItemAssignToCardSpec,
 } from './types'
-import ItemAssignToCard from './ItemAssignToCard'
+import ItemAssignToCard, {type ItemAssignToCardRef} from './ItemAssignToCard'
 import TrayFooter from '../Footer'
 import type {AssigneeOption} from '../AssigneeSelector'
 import useFetchAssignees from '../../utils/hooks/useFetchAssignees'
@@ -59,13 +60,15 @@ const I18n = useI18nScope('differentiated_modules')
 function itemTypeToIcon(iconType: string) {
   switch (iconType) {
     case 'assignment':
-      return <IconAssignmentLine />
+      return <IconAssignmentLine data-testid="icon-assignment" />
     case 'quiz':
-      return <IconQuizLine />
+      return <IconQuizLine data-testid="icon-quiz" />
     case 'lti-quiz':
-      return <IconQuizSolid />
+      return <IconQuizSolid data-testid="icon-lti-quiz" />
+    case 'discussion':
+      return <IconDiscussionLine data-testid="icon-discussion" />
     default:
-      return <IconQuestionLine />
+      return <IconQuestionLine data-testid="icon-unknown" />
   }
 }
 
@@ -76,6 +79,8 @@ function itemTypeToApiURL(courseId: string, itemType: string, itemId: string) {
       return `/api/v1/courses/${courseId}/assignments/${itemId}/date_details`
     case 'quiz':
       return `/api/v1/courses/${courseId}/quizzes/${itemId}/date_details`
+    case 'discussion':
+      return `/api/v1/courses/${courseId}/discussion_topics/${itemId}/date_details`
     default:
       return ''
   }
@@ -145,6 +150,7 @@ export interface ItemAssignToTrayProps {
   defaultDisabledOptionIds?: string[]
   defaultSectionId?: string
   useApplyButton?: boolean
+  removeDueDateInput?: boolean
   onAddCard?: () => void
   onAssigneesChange?: (
     cardId: string,
@@ -176,6 +182,7 @@ export default function ItemAssignToTray({
   onCardRemove,
   defaultSectionId,
   useApplyButton = false,
+  removeDueDateInput = false,
 }: ItemAssignToTrayProps) {
   const [assignToCards, setAssignToCards] = useState<ItemAssignToCardSpec[]>(defaultCards ?? [])
   const [initialCards, setInitialCards] = useState<ItemAssignToCardSpec[]>([])
@@ -185,7 +192,7 @@ export default function ItemAssignToTray({
   const [blueprintDateLocks, setBlueprintDateLocks] = useState<DateLockTypes[] | undefined>(
     undefined
   )
-  const [shouldFocusDeleteButton, setShouldFocusDeleteButton] = useState<boolean>(false)
+  const cardsRefs = useRef<{[cardId: string]: ItemAssignToCardRef}>({})
   const addCardButtonRef = useRef<Element | null>(null)
   const everyoneOption = useMemo(() => {
     const hasOverrides =
@@ -211,8 +218,13 @@ export default function ItemAssignToTray({
   })
 
   useEffect(() => {
-    if (shouldFocusCard) setShouldFocusCard(false)
-  }, [shouldFocusCard])
+    if (assignToCards.length === 0) return
+    const lastCard = assignToCards.at(assignToCards.length - 1)
+    if (!lastCard) return
+    const lastCardRef = cardsRefs.current[lastCard.key]
+    lastCardRef?.focusDeleteButton()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [assignToCards.length])
 
   useEffect(() => {
     if (defaultCards !== undefined) {
@@ -320,7 +332,6 @@ export default function ItemAssignToTray({
   }, [courseId, itemContentId, itemType, JSON.stringify(defaultCards)])
 
   const handleAddCard = () => {
-    setShouldFocusDeleteButton(true)
     if (onAddCard) {
       onAddCard()
       return
@@ -347,7 +358,12 @@ export default function ItemAssignToTray({
     const hasErrors = assignToCards.some(card => !card.isValid)
     // If a card has errors it should not save and the respective card should be focused
     if (hasErrors) {
-      setShouldFocusCard(true)
+      const firstCardWithError = assignToCards.find(card => !card.isValid)
+      if (!firstCardWithError) return
+      const firstCardWithErrorRef = cardsRefs.current[firstCardWithError.key]
+
+      Object.values(cardsRefs.current).forEach(c => c.showValidations())
+      firstCardWithErrorRef?.focusInputs()
       return
     }
 
@@ -411,6 +427,7 @@ export default function ItemAssignToTray({
             ...card,
             selectedAssigneeIds,
             highlightCard: !areEquals,
+            isEdited: !areEquals,
             hasAssignees: assignees.length > 0,
           }
         : card
@@ -487,7 +504,7 @@ export default function ItemAssignToTray({
       const currentCard = {...currentCardProps, [dateAttribute]: newDate}
       const areEquals = JSON.stringify(initialCard) === JSON.stringify(currentCard)
 
-      const newCard = {...currentCard, highlightCard: !areEquals, isEdited: true}
+      const newCard = {...currentCard, highlightCard: !areEquals, isEdited: !areEquals}
       const cards = assignToCards.map(card => (card.key === cardId ? newCard : card))
       setAssignToCards(cards)
       onDatesChange?.(cardId, dateAttribute, newDate ?? '')
@@ -542,6 +559,8 @@ export default function ItemAssignToTray({
         return I18n.t('Quiz')
       case 'lti-quiz':
         return I18n.t('Quiz')
+      case 'discussion':
+        return I18n.t('Discussion')
       default:
         return ''
     }
@@ -549,14 +568,17 @@ export default function ItemAssignToTray({
 
   function renderCards(isOpen?: boolean) {
     const cardCount = assignToCards.length
-    const firstCardWithError = assignToCards.find(card => !card.isValid)
     return assignToCards.map((card, i) => {
       return (
         <View key={card.key} as="div" margin="small 0 0 0">
           <ItemAssignToCard
+            ref={cardRef => {
+              if (cardRef) cardsRefs.current[card.key] = cardRef
+            }}
             courseId={courseId}
             contextModuleId={card.contextModuleId}
             contextModuleName={card.contextModuleName}
+            removeDueDateInput={removeDueDateInput}
             cardId={card.key}
             due_at={card.due_at}
             unlock_at={card.unlock_at}
@@ -573,9 +595,7 @@ export default function ItemAssignToTray({
             customIsLoading={isLoading}
             customSetSearchTerm={setSearchTerm}
             highlightCard={card.highlightCard}
-            focus={shouldFocusCard && firstCardWithError?.key === card.key}
             blueprintDateLocks={blueprintDateLocks}
-            shouldFocusDeleteButton={shouldFocusDeleteButton && i === assignToCards.length - 1}
           />
         </View>
       )

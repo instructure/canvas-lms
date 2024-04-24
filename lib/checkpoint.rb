@@ -19,8 +19,11 @@
 #
 
 class Checkpoint
-  def initialize(assignment)
+  include Api::V1::AssignmentOverride
+
+  def initialize(assignment, user)
     @assignment = assignment
+    @user = user
   end
 
   def as_json
@@ -29,7 +32,8 @@ class Checkpoint
       tag:,
       points_possible:,
       due_at:,
-      only_visible_to_overrides:
+      only_visible_to_overrides:,
+      overrides:
     }
   end
 
@@ -53,5 +57,13 @@ class Checkpoint
 
   def only_visible_to_overrides
     @assignment.only_visible_to_overrides
+  end
+
+  def overrides
+    assignment_overrides_json(@assignment.assignment_overrides.select(&:active?), @user)
+  end
+
+  def session
+    nil
   end
 end

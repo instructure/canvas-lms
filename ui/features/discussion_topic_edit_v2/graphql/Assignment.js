@@ -29,6 +29,8 @@ export const Assignment = {
       postToSis
       pointsPossible
       gradingType
+      importantDates
+      onlyVisibleToOverrides
       dueAt(applyOverrides: false)
       unlockAt(applyOverrides: false)
       lockAt(applyOverrides: false)
@@ -65,6 +67,8 @@ export const Assignment = {
     postToSis: bool,
     pointsPossible: number,
     gradingType: string,
+    importantDates: bool,
+    onlyVisibleToOverrides: bool,
     unlockAt: string,
     dueAt: string,
     lockAt: string,
@@ -87,6 +91,8 @@ export const Assignment = {
     postToSis = false,
     pointsPossible = 10,
     gradingType = 'points',
+    importantDates = false,
+    onlyVisibleToOverrides = false,
     unlockAt = null,
     dueAt = null,
     lockAt = null,
@@ -100,6 +106,8 @@ export const Assignment = {
     postToSis,
     pointsPossible,
     gradingType,
+    importantDates,
+    onlyVisibleToOverrides,
     unlockAt,
     dueAt,
     lockAt,

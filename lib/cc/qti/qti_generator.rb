@@ -75,6 +75,7 @@ module CC
         end
 
         generate_banks(assessment_question_bank_ids)
+        generate_new_quizzes if include_new_quizzes_in_export?
       end
 
       def generate_quiz(quiz, for_cc = true)
@@ -196,6 +197,15 @@ module CC
         ) do |res|
           res.file(href: rel_path)
         end
+      end
+
+      def generate_new_quizzes
+        new_quizzes_generator = NewQuizzesGenerator.new(@manifest)
+        new_quizzes_generator.write_new_quizzes_content
+      end
+
+      def include_new_quizzes_in_export?
+        @manifest.exporter.include_new_quizzes_in_export?
       end
 
       def generate_assessment_meta(doc, quiz, migration_id)

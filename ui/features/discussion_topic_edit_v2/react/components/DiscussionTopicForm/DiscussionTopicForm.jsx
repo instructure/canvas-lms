@@ -93,6 +93,7 @@ export default function DiscussionTopicForm({
   const dateInputRef = useRef()
   const groupOptionsRef = useRef()
   const gradedDiscussionRef = useRef()
+  const replyToEntryRequiredRef = useRef()
   const {setOnFailure} = useContext(AlertManagerContext)
 
   const isAnnouncement = ENV?.DISCUSSION_TOPIC?.ATTRIBUTES?.is_announcement ?? false
@@ -165,9 +166,7 @@ export default function DiscussionTopicForm({
     currentDiscussionTopic?.podcastHasStudentPosts || false
   )
   const [isGraded, setIsGraded] = useState(!!currentDiscussionTopic?.assignment || false)
-  const [isCheckpoints, setIsCheckpoints] = useState(
-    !!currentDiscussionTopic?.assignment?.checkpoints || false
-  )
+
   const [allowLiking, setAllowLiking] = useState(currentDiscussionTopic?.allowRating || false)
   const [onlyGradersCanLike, setOnlyGradersCanLike] = useState(
     currentDiscussionTopic?.onlyGradersCanRate || false
@@ -196,10 +195,6 @@ export default function DiscussionTopicForm({
   const [pointsPossible, setPointsPossible] = useState(
     currentDiscussionTopic?.assignment?.pointsPossible || 0
   )
-  // add initial states once checkpoint mutation has been edited
-  const [pointsPossibleReplyToTopic, setPointsPossibleReplyToTopic] = useState(0)
-  // add initial states once checkpoint mutation has been edited
-  const [pointsPossibleReplyToEntry, setPointsPossibleReplyToEntry] = useState(0)
   const [displayGradeAs, setDisplayGradeAs] = useState(
     currentDiscussionTopic?.assignment?.gradingType || 'points'
   )
@@ -229,6 +224,18 @@ export default function DiscussionTopicForm({
 
   const [gradedDiscussionRefMap, setGradedDiscussionRefMap] = useState(new Map())
 
+  // Checkpoints - add initial states once checkpoint mutation has been edited
+  const [isCheckpoints, setIsCheckpoints] = useState(
+    !!currentDiscussionTopic?.assignment?.checkpoints || false
+  )
+  const [pointsPossibleReplyToTopic, setPointsPossibleReplyToTopic] = useState(0)
+  const [pointsPossibleReplyToEntry, setPointsPossibleReplyToEntry] = useState(0)
+  const [replyToEntryRequiredCount, setReplyToEntryRequiredCount] = useState(1)
+
+  const setReplyToEntryRequiredRef = (ref) => {
+    replyToEntryRequiredRef.current = ref
+  }
+
   const assignmentDueDateContext = {
     assignedInfoList,
     setAssignedInfoList,
@@ -244,6 +251,13 @@ export default function DiscussionTopicForm({
     setPointsPossibleReplyToTopic,
     pointsPossibleReplyToEntry,
     setPointsPossibleReplyToEntry,
+    replyToEntryRequiredCount,
+    setReplyToEntryRequiredCount,
+    setReplyToEntryRequiredRef,
+    title,
+    assignmentID: currentDiscussionTopic?.assignment?._id || null,
+    importantDates: currentDiscussionTopic?.assignment?.importantDates || false,
+    pointsPossible,
   }
   const [showGroupCategoryModal, setShowGroupCategoryModal] = useState(false)
 
@@ -353,7 +367,9 @@ export default function DiscussionTopicForm({
       groupCategoryId: isGroupDiscussion ? groupCategoryId : null,
       specificSections: shouldShowPostToSectionOption ? sectionIdsToPostTo.join() : 'all',
       locked: shouldShowAnnouncementOnlyOptions ? locked : false,
-      requireInitialPost: !isGroupDiscussion ? requireInitialPost : false,
+      // we allow requireInitial posts for group discussions created from the course,
+      // just not from discussions created from within the group context directly
+      requireInitialPost: ENV.context_is_not_group ? requireInitialPost : false,
       todoDate: addToTodo ? todoDate : null,
       allowRating: shouldShowLikingOption ? allowLiking : false,
       onlyGradersCanRate: shouldShowLikingOption ? onlyGradersCanLike : false,
@@ -411,7 +427,10 @@ export default function DiscussionTopicForm({
         setTitleValidationMessages,
         setAvailabilityValidationMessages,
         shouldShowPostToSectionOption,
-        sectionIdsToPostTo
+        sectionIdsToPostTo,
+        isCheckpoints,
+        replyToEntryRequiredCount,
+        replyToEntryRequiredRef,
       )
     ) {
       const payload = createSubmitPayload(shouldPublish)
@@ -550,6 +569,8 @@ export default function DiscussionTopicForm({
           height={300}
           defaultContent={isEditing ? currentDiscussionTopic?.message : ''}
           autosave={false}
+          resourceType={isAnnouncement ? 'announcement.body' : 'discussion_topic.body'}
+          resourceId={currentDiscussionTopic?._id}
         />
         {ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_ATTACH && (
           <AttachmentDisplay

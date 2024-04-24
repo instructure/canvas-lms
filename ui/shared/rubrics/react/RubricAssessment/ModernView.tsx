@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {View} from '@instructure/ui-view'
@@ -27,6 +27,7 @@ import {IconChatLine} from '@instructure/ui-icons'
 import {HorizontalButtonDisplay} from './HorizontalButtonDisplay'
 import {VerticalButtonDisplay} from './VerticalButtonDisplay'
 import type {RubricAssessmentData, RubricCriterion, UpdateAssessmentData} from '../types/rubric'
+import {TextArea} from '@instructure/ui-text-area'
 
 const I18n = useI18nScope('rubrics-assessment-tray')
 
@@ -99,10 +100,24 @@ export const CriterionRow = ({
 
   const [pointsInput, setPointsInput] = useState<string>(defaultPoints.toString())
   const [selectedRatingDescription, setSelectedRatingDescription] = useState<string>()
+  const [commentText, setCommentText] = useState<string>(criterionAssessment?.comments ?? '')
+
+  useEffect(() => {
+    setCommentText(criterionAssessment?.comments ?? '')
+  }, [criterionAssessment])
+
+  const updateAssessmentData = (params: Partial<UpdateAssessmentData>) => {
+    const updatedCriterionAssessment: UpdateAssessmentData = {
+      ...criterionAssessment,
+      ...params,
+      criterionId: criterion.id,
+    }
+    onUpdateAssessmentData(updatedCriterionAssessment)
+  }
 
   const selectRating = (index: number) => {
     if (selectedRatingIndex === index) {
-      onUpdateAssessmentData({criterionId: criterion.id, points: undefined})
+      updateAssessmentData({points: undefined})
       setPoints('')
       return
     }
@@ -116,13 +131,12 @@ export const CriterionRow = ({
     const points = Number(value)
 
     if (!value.trim().length || Number.isNaN(points)) {
-      onUpdateAssessmentData({criterionId: criterion.id, points: undefined})
+      updateAssessmentData({points: undefined})
       setPointsInput('')
       return
     }
 
-    onUpdateAssessmentData({
-      criterionId: criterion.id,
+    updateAssessmentData({
       points,
       description: selectedRatingDescription,
     })
@@ -191,13 +205,13 @@ export const CriterionRow = ({
             <IconChatLine />
           </Flex.Item>
           <Flex.Item shouldGrow={true} margin="0 0 0 xx-small">
-            <TextInput
-              renderLabel={
-                <ScreenReaderContent>{I18n.t('Leave criterion comment')}</ScreenReaderContent>
-              }
+            <TextArea
+              label={<ScreenReaderContent>{I18n.t('Leave criterion comment')}</ScreenReaderContent>}
               readOnly={isPreviewMode}
-              display="block"
               size="small"
+              value={commentText}
+              onChange={e => setCommentText(e.target.value)}
+              onBlur={() => updateAssessmentData({comments: commentText})}
               placeholder={I18n.t('Leave a comment')}
             />
           </Flex.Item>

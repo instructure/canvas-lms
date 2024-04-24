@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "atom"
 require "sanitize"
 
 class EportfolioEntry < ActiveRecord::Base
@@ -153,18 +152,19 @@ class EportfolioEntry < ActiveRecord::Base
   protected :infer_unique_slug
 
   def to_atom(opts = {})
-    Atom::Entry.new do |entry|
-      entry.title = self.name.to_s
-      entry.authors << Atom::Person.new(name: t(:atom_author, "ePortfolio Entry"))
-      entry.updated   = updated_at
-      entry.published = created_at
-      url = "http://#{HostUrl.default_host}/eportfolios/#{eportfolio_id}/#{eportfolio_category.slug}/#{slug}"
-      url += "?verifier=#{eportfolio.uuid}" if opts[:private]
-      entry.links << Atom::Link.new(rel: "alternate", href: url)
-      entry.id = "tag:#{HostUrl.default_host},#{created_at.strftime("%Y-%m-%d")}:/eportfoli_entries/#{feed_code}_#{created_at.strftime("%Y-%m-%d-%H-%M") rescue "none"}"
-      rendered_content = t(:click_through, "Click to view page content")
-      entry.content = Atom::Content::Html.new(rendered_content)
-    end
+    rendered_content = t(:click_through, "Click to view page content")
+    url = "http://#{HostUrl.default_host}/eportfolios/#{eportfolio_id}/#{eportfolio_category.slug}/#{slug}"
+    url += "?verifier=#{eportfolio.uuid}" if opts[:private]
+
+    {
+      title: self.name.to_s,
+      author: t(:atom_author, "ePortfolio Entry"),
+      updated: updated_at,
+      published: created_at,
+      link: url,
+      id: "tag:#{HostUrl.default_host},#{created_at.strftime("%Y-%m-%d")}:/eportfoli_entries/#{feed_code}_#{created_at.strftime("%Y-%m-%d-%H-%M") rescue "none"}",
+      content: rendered_content
+    }
   end
 
   private
