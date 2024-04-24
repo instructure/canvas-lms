@@ -763,7 +763,6 @@ EditView.prototype.validateBeforeSave = function (data, errors) {
     data.anonymous_state = null
   }
   if (this.isTopic() && data.anonymous_state == null && data.set_assignment === '1') {
-    console.error("set_assignment true")
     if (this.assignmentGroupSelector != null) {
       errors = this.assignmentGroupSelector.validateBeforeSave(data, errors)
     }

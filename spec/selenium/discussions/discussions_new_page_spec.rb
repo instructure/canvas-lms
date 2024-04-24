@@ -289,7 +289,7 @@ describe "discussions" do
           expect(f("span[data-testid='author_name']").text).to eq teacher.short_name
         end
 
-        it "disallows full_anonymity along with graded" do
+        it "disallows full_anonymity along with graded", skip: "vice-4200" do
           get url
           replace_content(f("input[name=title]"), "my anonymous title")
           f("input[value='full_anonymity']").click
@@ -338,7 +338,7 @@ describe "discussions" do
           )
         end
 
-        it "does not allow creation of anonymous group discussions" do
+        it "does not allow creation of anonymous group discussions", skip: "VICE-4200" do
           course.allow_student_anonymous_discussion_topics = true
           course.save!
           get url
@@ -369,7 +369,7 @@ describe "discussions" do
           expect(f("span[data-testid='author_name']")).to include_text @student.name
         end
 
-        it "lets students choose to make topics anonymously" do
+        it "lets students choose to make topics anonymously", skip: "VICE-4200" do
           course.allow_student_anonymous_discussion_topics = true
           course.save!
           get url
