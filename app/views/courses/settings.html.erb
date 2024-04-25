@@ -733,6 +733,15 @@
   <div id="tab-sections">
     <h2 style="margin-top: 10px;"><%= t('headings.sections', %{Course Sections}) %></h2>
     <ul id="sections">
+      <% if can_do(@context.course_sections.temp_record, @current_user, :create) %>
+        <li>
+          <%= form_for :course_section, :url => context_url(@context, :context_sections_url), :html => {:id => "add_section_form", :class => "form-inline", :style => "margin-top: 20px;"} do |f| %>
+            <h3><%= f.blabel :name, :course_section_name, :en => "Add a New Section" %></h3>
+            <%= f.text_field :name %>
+            <button class="btn btn-primary" type="submit" title="<%= t('Add Section') %>" aria-label="<%= t('Add Section') %>"><i class="icon-plus" role="presentation"></i> <%= t('buttons.add_section', %{Section}) %></button>
+          <% end %>
+        </li>
+      <% end %>
       <% @context.course_sections.active.order(CourseSection.best_unicode_collation_key('name')).each do |section| %>
         <li class="section">
           <% if can_do section, @current_user, :read %>
@@ -809,15 +818,6 @@
         </span>
         <div class="clear"></div>
       </li>
-      <% if can_do(@context.course_sections.temp_record, @current_user, :create) %>
-        <li>
-          <%= form_for :course_section, :url => context_url(@context, :context_sections_url), :html => {:id => "add_section_form", :class => "form-inline", :style => "margin-top: 20px;"} do |f| %>
-            <h3><%= f.blabel :name, :course_section_name, :en => "Add a New Section" %></h3>
-            <%= f.text_field :name %>
-            <button class="btn btn-primary" type="submit" title="<%= t('Add Section') %>" aria-label="<%= t('Add Section') %>"><i class="icon-plus" role="presentation"></i> <%= t('buttons.add_section', %{Section}) %></button>
-          <% end %>
-        </li>
-      <% end %>
     </ul>
     <%= form_for :course_section, :url => "", :html => {:id => "edit_section_form", :method => :put, :style => "display: none;"} do |f| %>
       <%= f.text_field :name, :id => "course_section_name_edit", :'aria-label' => t('buttons.edit_section_name', "Edit section name") %>
