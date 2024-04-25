@@ -25,7 +25,6 @@ const {
 } = require('@rspack/core')
 const {resolve} = require('path')
 const MomentTimezoneDataPlugin = require('moment-timezone-data-webpack-plugin')
-const EsmacPlugin = require('webpack-esmac-plugin')
 const {WebpackManifestPlugin} = require('rspack-manifest-plugin')
 const {RetryChunkLoadPlugin} = require('webpack-retry-chunk-load-plugin')
 const {
@@ -68,26 +67,6 @@ exports.timezoneData = new MomentTimezoneDataPlugin({
 //   CANVAS_WEBPACK_DONE_HOOK
 // cf. ui-build/webpack/webpackHooks/macNotifications.sh
 exports.webpackHooks = new WebpackHooks()
-
-// controls access between modules; enforces where you can import from
-//   i.e. can't import features into packages, or ui/shared into packages
-exports.controlAccessBetweenModules = new EsmacPlugin({
-  test: /\.[tj]sx?$/,
-  include: [
-    resolve(canvasDir, 'ui/features'),
-    resolve(canvasDir, 'ui/shared'),
-    resolve(canvasDir, 'packages'),
-    resolve(canvasDir, 'public/javascripts'),
-    resolve(canvasDir, 'gems/plugins'),
-  ],
-  exclude: [/\/node_modules\//],
-  formatter: require('./esmac/ErrorFormatter'),
-  rules: require('./esmac/moduleAccessRules'),
-  permit:
-    process.env.WEBPACK_ENCAPSULATION_DEBUG === '1'
-      ? []
-      : require('./esmac/errorsPendingRemoval.json'),
-})
 
 exports.setMoreEnvVars = new DefinePlugin({
   CANVAS_WEBPACK_PUBLIC_PATH: JSON.stringify(webpackPublicPath),
