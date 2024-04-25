@@ -165,6 +165,7 @@ export default class DiscussionSettings extends Component {
       <div
         ref={spinner => spinner && spinner.focus()}
         className="discussion-settings-v2-spinner-container"
+        data-testid="discussion-settings-spinner-container"
         tabIndex="-1"
       >
         <Spinner renderTitle={I18n.t('Saving')} size="small" />
