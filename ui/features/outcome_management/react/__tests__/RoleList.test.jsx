@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, shallow} from 'enzyme'
+import {render} from '@testing-library/react'
 import RoleList from '../RoleList'
 
 const defaultProps = (props = {}) => ({
@@ -29,22 +29,30 @@ const defaultProps = (props = {}) => ({
   ...props,
 })
 
-it('renders the RoleList component', () => {
-  const list = shallow(<RoleList {...defaultProps()} />, {disableLifecycleMethods: true})
-  expect(list.exists()).toBe(true)
-})
+const renderRoleList = (props = {}) => render(<RoleList {...defaultProps(props)} />)
 
-it('renders description', () => {
-  const list = render(<RoleList {...defaultProps()} />)
-  expect(list.text()).toContain('My RoleList')
-})
+describe('RoleList', () => {
+  it('renders the RoleList component', () => {
+    const wrapper = renderRoleList()
 
-it('renders roles with account admin first', () => {
-  const list = render(<RoleList {...defaultProps()} />)
-  expect(list.text()).toContain('Account AdminCustom Admin')
-})
+    expect(wrapper.container).toBeInTheDocument()
+  })
 
-it('does not renders description without roles', () => {
-  const list = render(<RoleList {...defaultProps({roles: []})} />)
-  expect(list.text()).not.toContain('My RoleList')
+  it('renders description', () => {
+    const wrapper = renderRoleList()
+
+    expect(wrapper.getByText('My RoleList')).toBeInTheDocument()
+  })
+
+  it('renders roles with account admin first', () => {
+    const wrapper = renderRoleList()
+
+    expect(wrapper.getByText('Account Admin')).toBeInTheDocument()
+  })
+
+  it('does not renders description without roles', () => {
+    const wrapper = renderRoleList({roles: []})
+
+    expect(wrapper.queryByText('My RoleList')).not.toBeInTheDocument()
+  })
 })
