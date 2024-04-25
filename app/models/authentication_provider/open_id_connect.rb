@@ -132,6 +132,9 @@ class AuthenticationProvider::OpenIDConnect < AuthenticationProvider::OAuth2
         raise
       end
       debug_set(:claims, id_token.to_json) if instance_debugging
+      unless id_token["aud"] == client_id
+        raise OAuthValidationError, t("Invalid JWT audience: %{audience}", audience: id_token["aud"].inspect)
+      end
 
       # we have a userinfo endpoint, and we don't have everything we want,
       # then request more
