@@ -17,14 +17,14 @@
  */
 
 import React from 'react'
-import {mount} from 'enzyme'
-import SubmissionTrayRadioInput from 'ui/features/gradebook/react/default_gradebook/components/SubmissionTrayRadioInput'
-import {NumberInput} from '@instructure/ui-number-input'
+import {fireEvent, render} from '@testing-library/react'
+import SubmissionTrayRadioInput from '../SubmissionTrayRadioInput'
 
-let wrapper
+let wrapper: any
+let props: any
 
-function mountComponent(customProps) {
-  const props = {
+function mountComponent(customProps?: any) {
+  props = {
     checked: false,
     color: '#FEF7E5',
     disabled: false,
@@ -37,104 +37,94 @@ function mountComponent(customProps) {
     value: 'missing',
     ...customProps,
   }
-  return mount(<SubmissionTrayRadioInput {...props} />)
-}
-
-function numberInputContainer() {
-  return wrapper.find('.NumberInput__Container')
+  return render(<SubmissionTrayRadioInput {...props} />)
 }
 
 function numberInput() {
-  return numberInputContainer().find(NumberInput)
+  return wrapper.container.querySelector('.NumberInput__Container input[type="text"]')
 }
 
 function radioInput() {
-  return wrapper.find('input[type="radio"]')
+  return wrapper.container.querySelector('input[type="radio"]')
 }
 
 function radioInputContainer() {
-  return wrapper.find('.SubmissionTray__RadioInput')
+  return wrapper.container.querySelector('.SubmissionTray__RadioInput')
 }
 
-QUnit.module('SubmissionTrayRadioInput', hooks => {
-  hooks.afterEach(() => {
-    wrapper.unmount()
-  })
-
+describe('SubmissionTrayRadioInput', () => {
   test('renders a radio option with a name of "SubmissionTrayRadioInput"', () => {
     wrapper = mountComponent()
-    strictEqual(radioInput().instance().name, 'SubmissionTrayRadioInput')
+    expect(radioInput().getAttribute('name')).toEqual('SubmissionTrayRadioInput')
   })
 
   test('renders with a background color specified by the "color" prop', () => {
     wrapper = mountComponent({color: 'green'})
-    const {style} = radioInputContainer().instance()
-    strictEqual(style.getPropertyValue('background-color'), 'green')
+    expect(radioInputContainer().getAttribute('style')).toContain('background-color: green')
   })
 
   test('renders with a "transparent" background color if a color is not specified', () => {
     wrapper = mountComponent({color: undefined})
-    const {style} = radioInputContainer().instance()
-    strictEqual(style.getPropertyValue('background-color'), 'transparent')
+    expect(radioInputContainer().getAttribute('style')).toContain('background-color: transparent')
   })
 
   test('renders with the radio option enabled when disabled is false', () => {
     wrapper = mountComponent({disabled: false})
-    strictEqual(wrapper.find('RadioInput').first().props().disabled, false)
+    expect(radioInput()).not.toBeDisabled()
   })
 
   test('renders with the radio option disabled when disabled is true', () => {
     wrapper = mountComponent({disabled: true})
-    strictEqual(wrapper.find('RadioInput').first().props().disabled, true)
+    expect(radioInput()).toBeDisabled()
   })
 
   test('renders with the radio option selected when checked is true', () => {
     wrapper = mountComponent({checked: true})
-    strictEqual(radioInput().instance().checked, true)
+    expect(radioInput()).toBeChecked()
   })
 
   test('renders with the radio option deselected when checked is false', () => {
     wrapper = mountComponent()
-    strictEqual(radioInput().instance().checked, false)
+    expect(radioInput()).not.toBeChecked()
   })
 
   test('calls onChange when the radio option is selected', () => {
-    const onChange = sinon.stub()
+    const onChange = jest.fn()
     wrapper = mountComponent({onChange})
-    radioInput().simulate('change', {target: {checked: true}})
-    strictEqual(onChange.callCount, 1)
+    fireEvent.click(radioInput())
+    expect(onChange).toHaveBeenCalledTimes(1)
   })
 
-  QUnit.module('NumberInput', () => {
+  describe('NumberInput', () => {
     test('does not render a NumberInput when value is not "late"', () => {
       wrapper = mountComponent()
-      strictEqual(wrapper.find(NumberInput).length, 0)
+      expect(numberInput()).not.toBeInTheDocument()
     })
 
     test('renders with a NumberInput when value is "late" and checked is true', () => {
       wrapper = mountComponent({value: 'late', checked: true})
-      strictEqual(numberInput().length, 1)
+      expect(numberInput()).toBeInTheDocument()
     })
 
     test('renders without a NumberInput when value is "late" and checked is false', () => {
       wrapper = mountComponent({value: 'late'})
-      strictEqual(numberInput().length, 0)
+      expect(numberInput()).not.toBeInTheDocument()
     })
 
     test('renders with the NumberInput enabled when disabled is false', () => {
       wrapper = mountComponent({value: 'late', checked: true})
-      strictEqual(numberInput().props().interaction, 'enabled')
+      expect(numberInput()).not.toBeDisabled()
     })
 
     test('renders with the NumberInput disabled when disabled is true', () => {
       wrapper = mountComponent({value: 'late', checked: true, disabled: true})
-      strictEqual(numberInput().props().interaction, 'disabled')
+      expect(numberInput()).toBeDisabled()
     })
 
     test('renders NumberInput when value is changed to "late"', () => {
-      wrapper = mountComponent({value: 'late', checked: false})
-      wrapper.setProps({checked: true})
-      strictEqual(numberInput().length, 1)
+      wrapper = render(<SubmissionTrayRadioInput {...props} value="late" checked={false} />)
+      wrapper.rerender(<SubmissionTrayRadioInput {...props} value="late" checked={true} />)
+      expect(numberInput()).toBeInTheDocument()
     })
   })
 })
