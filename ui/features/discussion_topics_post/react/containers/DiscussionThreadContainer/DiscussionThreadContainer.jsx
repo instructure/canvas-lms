@@ -537,15 +537,22 @@ export const DiscussionThreadContainer = props => {
                                 }
                               : null
                           }
-                          onMarkThreadAsRead={readState =>
-                            updateDiscussionThreadReadState({
-                              variables: {
-                                discussionEntryId: props.discussionEntry.rootEntryId
-                                  ? props.discussionEntry.rootEntryId
-                                  : props.discussionEntry.id,
-                                read: readState,
-                              },
-                            })
+                          onMarkThreadAsRead={readState => { 
+                              window['ENV'].discussions_deep_link = {
+                                root_entry_id: props.discussionEntry.rootEntryId,
+                                parent_id: props.discussionEntry.parentId,
+                                entry_id: props.discussionEntry._id
+                              }
+                              updateDiscussionThreadReadState({
+                                variables: {
+                                  discussionEntryId: props.discussionEntry.rootEntryId
+                                    ? props.discussionEntry.rootEntryId
+                                    : props.discussionEntry.id,
+                                  read: readState,
+                                },
+                              })
+                              props.setHighlightEntryId(props.discussionEntry._id)
+                            }
                           }
                         />
                       ) : null
