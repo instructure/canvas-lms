@@ -25097,6 +25097,7 @@ nn:
   this_outcome_has_been_used_to_assess_a_student_and_5a925169: "Læringsmålet har blitt brukt til å vurdere ein student og kan ikkje lenger redigerast og slettast"
   this_outcome_has_been_used_to_assess_a_student_and_a3a48511: "Læringsmålet er brukt til å vurdere ein student og endringar vil påverke studentresultat."
   this_outcome_has_been_used_to_assess_a_student_onl_4b4c1e95: "Læringsmålet har blitt brukt til å vurdere ein student. Berre tekstfelt kan oppdaterast "
+  this_outcome_has_not_been_added_as_it_already_exis_2f4ca777: "Dette læringsmålet blei ikkje lagt til sidan det allereie eksisterer i vurderingsskjemaet."
   this_package_includes_apip_file_s_which_are_not_co_b50b30a7: "Denne pakka inkluderer APIP-fil(ar) som ikkje er kompatible med Canvas, og er difor ikkje inkludert i importen."
   this_package_includes_curriculum_standards_which_a_1a137060: "Denne pakka inkluderer Curriculum Standards som ikkje er kompatibel med Canvas, og er difor ikkje inkludert i importen."
   this_package_includes_epub3_file_s_which_are_not_c_bbafef30: "Denne pakka inkluderer EPub3-fil(ar) som ikkje er kompatible med Canvas, og er difor ikkje inkludert i importen."
