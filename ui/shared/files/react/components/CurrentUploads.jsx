@@ -63,7 +63,11 @@ class CurrentUploads extends React.Component {
       current_uploads: this.state.currentUploads.length,
     })
 
-    return <div className={classes}>{this.renderUploadProgress()}</div>
+    return (
+      <div data-testid="current-uploads" className={classes}>
+        {this.renderUploadProgress()}
+      </div>
+    )
   }
 }
 
