@@ -32,6 +32,7 @@ jest.mock('@canvas/alerts/react/FlashAlert', () => ({
 }))
 
 describe('ItemAssignToTray', () => {
+  let originalLocation = window.location
   const props: ItemAssignToTrayProps = {
     open: true,
     onClose: () => {},
@@ -84,6 +85,10 @@ describe('ItemAssignToTray', () => {
     ENV.SECTION_LIST = [{id: '4'}, {id: '5'}]
     ENV.POST_TO_SIS = false
     ENV.DUE_DATE_REQUIRED_FOR_ACCOUNT = false
+    originalLocation = window.location
+    // @ts-expect-error
+    delete window.location
+    window.location = {...originalLocation, reload: jest.fn()}
     // an assignment with valid dates and overrides
     fetchMock.get('/api/v1/courses/1/settings', {conditional_release: false})
     fetchMock
@@ -123,6 +128,7 @@ describe('ItemAssignToTray', () => {
   })
 
   afterEach(() => {
+    window.location = originalLocation
     fetchMock.resetHistory()
     fetchMock.restore()
   })
@@ -261,7 +267,7 @@ describe('ItemAssignToTray', () => {
     })
 
     expect(
-      getAllByText((_, e) => e.textContent === 'Locked: Availability Dates')[0]
+      getAllByText((_, e) => e?.textContent === 'Locked: Availability Dates')[0]
     ).toBeInTheDocument()
   })
 
@@ -493,6 +499,28 @@ describe('ItemAssignToTray', () => {
         'GET'
       )
       expect(onDismissMock).not.toHaveBeenCalled()
+    })
+
+    it('reloads the page after saving', async () => {
+      const user = userEvent.setup(USER_EVENT_OPTIONS)
+      const {getByRole} = renderComponent()
+      const save = getByRole('button', {name: 'Save'})
+      await user.click(save)
+      await waitFor(() => {
+        expect(window.location.reload).toHaveBeenCalled()
+      })
+    })
+
+    it('does not reload the page after saving if onSave is passed', async () => {
+      const user = userEvent.setup(USER_EVENT_OPTIONS)
+      const onSave = jest.fn()
+      const {getByRole} = renderComponent({onSave})
+      const save = getByRole('button', {name: 'Save'})
+      await user.click(save)
+      await waitFor(() => {
+        expect(onSave).toHaveBeenCalled()
+      })
+      expect(window.location.reload).not.toHaveBeenCalled()
     })
   })
 

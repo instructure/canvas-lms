@@ -59,7 +59,7 @@ import {
 } from '../../utils/assignToHelper'
 import {Text} from '@instructure/ui-text'
 import {Alert} from '@instructure/ui-alerts'
-import {IconType, ItemType} from '../types'
+import type {IconType, ItemType} from '../types'
 
 const I18n = useI18nScope('differentiated_modules')
 
@@ -119,6 +119,7 @@ export const updateModuleItem = ({
         message: I18n.t(`%{moduleItemName} updated`, {moduleItemName}),
       })
       onSuccess()
+      window.location.reload()
     })
     .catch((err: Error) => {
       showFlashAlert({
