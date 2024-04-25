@@ -47,4 +47,21 @@ describe AuthenticationProvider::Microsoft do
     expect(ap.application_secret).to eq "secret"
     expect(ap.client_secret).to eq "secret"
   end
+
+  it "records used tenants" do
+    ap = AuthenticationProvider::Microsoft.new(account: Account.default)
+    allow(ap).to receive(:claims).and_return("tid" => "1234")
+    ap.unique_id("token")
+    expect(ap.settings["known_tenants"]).to eq ["1234"]
+    expect(ap).not_to receive(:save!)
+    ap.unique_id("token")
+    expect(ap.settings["known_tenants"]).to eq ["1234"]
+  end
+
+  it "records used missing tenant" do
+    ap = AuthenticationProvider::Microsoft.new(account: Account.default)
+    allow(ap).to receive(:claims).and_return({})
+    ap.unique_id("token")
+    expect(ap.settings["known_tenants"]).to eq [nil]
+  end
 end
