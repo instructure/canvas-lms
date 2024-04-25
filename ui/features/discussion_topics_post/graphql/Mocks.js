@@ -29,6 +29,7 @@ import {
   CREATE_DISCUSSION_ENTRY,
   DELETE_DISCUSSION_TOPIC,
   UPDATE_DISCUSSION_READ_STATE,
+  UPDATE_DISCUSSION_THREAD_READ_STATE,
   UPDATE_DISCUSSION_TOPIC,
   UPDATE_USER_DISCUSSION_SPLITSCREEN_PREFERENCE,
 } from './Mutations'
@@ -538,6 +539,35 @@ export const updateDiscussionReadStateMock = ({
             _id: discussionTopicId,
           }),
           __typename: 'UpdateDiscussionReadStatePayload',
+        },
+      },
+    },
+  },
+]
+
+export const updateDiscussionThreadReadStateMock = ({
+  discussionEntryId = 'discussion-entry-default-mock',
+  read = true,
+} = {}) => [
+  {
+    request: {
+      query: UPDATE_DISCUSSION_THREAD_READ_STATE,
+      variables: {
+        discussionEntryId,
+        read,
+      },
+    },
+    result: {
+      data: {
+        updateDiscussionThreadReadState: {
+          discussionEntry: DiscussionEntry.mock({
+            id: discussionEntryId,
+            _id: discussionEntryId,
+            read,
+            anonymousAuthor: AnonymousUser.mock({shortName: 'current_user'}),
+          }),
+          errors: null,
+          __typename: 'UpdateDiscussionThreadReadStatePayload',
         },
       },
     },
