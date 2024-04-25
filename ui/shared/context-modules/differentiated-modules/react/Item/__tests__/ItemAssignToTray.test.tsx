@@ -364,6 +364,43 @@ describe('ItemAssignToTray', () => {
       waitFor(() => expect(selectedOptions[0]).toHaveTextContent('Everyone'))
     })
 
+    it('renders everyone option for item with course and module overrides', async () => {
+      fetchMock.get(
+        '/api/v1/courses/1/assignments/23/date_details',
+        {
+          id: '23',
+          due_at: '2023-10-05T12:00:00Z',
+          unlock_at: '2023-10-01T12:00:00Z',
+          lock_at: '2023-11-01T12:00:00Z',
+          only_visible_to_overrides: true,
+          visible_to_everyone: true,
+          overrides: [
+            {
+              due_at: null,
+              id: undefined,
+              lock_at: null,
+              course_id: 1,
+              unlock_at: null,
+            },
+            {
+              due_at: null,
+              id: undefined,
+              lock_at: null,
+              context_module_id: 1,
+              unlock_at: null,
+            },
+          ],
+        },
+        {
+          overwriteRoutes: true,
+        }
+      )
+      const {findAllByTestId} = renderComponent()
+      const selectedOptions = await findAllByTestId('assignee_selector_selected_option')
+      expect(selectedOptions).toHaveLength(1)
+      waitFor(() => expect(selectedOptions[0]).toHaveTextContent('Everyone'))
+    })
+
     it('renders mastery paths option for noop 1 overrides', async () => {
       fetchMock.get(
         '/api/v1/courses/1/settings',
