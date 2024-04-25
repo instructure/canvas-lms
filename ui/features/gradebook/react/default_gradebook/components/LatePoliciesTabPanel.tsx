@@ -428,6 +428,7 @@ class LatePoliciesTabPanel extends React.Component<Props, State> {
                       label={I18n.t('Deduction interval')}
                       onChange={this.changeLateSubmissionInterval}
                       value={data.lateSubmissionInterval}
+                      data-testid="late-submission-interval"
                     >
                       {/* @ts-expect-error */}
                       <CanvasSelect.Option key="day" id="day" value="day">
@@ -465,6 +466,7 @@ class LatePoliciesTabPanel extends React.Component<Props, State> {
                       placeholder="0"
                       display="inline-block"
                       showArrows={false}
+                      data-testid="late-submission-minimum-percent"
                     />
                   </Grid.Col>
                   <Grid.Col width="auto">

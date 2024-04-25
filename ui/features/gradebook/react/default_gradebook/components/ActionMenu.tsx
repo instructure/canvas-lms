@@ -291,7 +291,11 @@ class ActionMenu extends React.Component<ActionMenuProps, ActionMenuState> {
   renderPostGradesFeature() {
     const sisName = this.props.postGradesFeature.label || I18n.t('SIS')
     return (
-      <MenuItem onSelect={this.launchPostGrades} key="post_grades_feature_tool">
+      <MenuItem
+        onSelect={this.launchPostGrades}
+        key="post_grades_feature_tool"
+        data-testid="post_grades_feature_tool"
+      >
         <span data-menu-id="post_grades_feature_tool">
           {I18n.t('Sync to %{sisName}', {sisName})}
         </span>

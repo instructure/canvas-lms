@@ -84,7 +84,7 @@ export default class SubmissionCommentForm extends React.Component<Props, State>
   handlePublishComment(event) {
     event.preventDefault()
     this.props.setProcessing(true)
-    this.publishComment().catch(() => this.props.setProcessing(false))
+    this.publishComment()?.catch(() => this.props.setProcessing(false))
   }
 
   commentIsValid() {
