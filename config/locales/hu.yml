@@ -20095,6 +20095,7 @@ hu:
   this_name_appears_in_sorted_lists_dccbd84b: "Ez a név jelenik meg a rendezett listákban."
   this_name_will_be_used_by_teachers_for_grading_9b6aa8a0: "Ez a név az oktatók által használatos, az értékelés során"
   this_outcome_has_been_used_to_assess_a_student_and_5a925169: "Ezt a tanulási eredményt egy hallgató értékelésére felhasználták, így már nem szerkeszthető vagy törölhető"
+  this_outcome_has_not_been_added_as_it_already_exis_2f4ca777: "Az eredmény nem lett hozzáadva, mivel az már létezik ebben az értékelőtáblában"
   this_package_includes_apip_file_s_which_are_not_co_b50b30a7: "Ez a csomag olyan APIP fájl(oka)t tartalmaz, ami nem kompatibilis a Canvas-szal, és nem került bele az importba."
   this_package_includes_curriculum_standards_which_a_1a137060: "Ez a csomag olyan önéletrajzi szabványokat tartalmaz, amelyek nem kompatibilisek a Canvas-szal, és nem kerültek bele az importba."
   this_package_includes_epub3_file_s_which_are_not_c_bbafef30: "Ez a csomag olyan EPub3 fájl(oka)t tartalmaz, ami nem kompatibilis a Canvas-szal, és nem került bele az importba."
