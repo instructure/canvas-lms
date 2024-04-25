@@ -34,12 +34,13 @@ export type RubricCriterion = {
   id: string
   points: number
   description: string
-  longDescription: string
+  longDescription?: string
   ignoreForScoring?: boolean
   masteryPoints?: number
   criterionUseRange: boolean
   ratings: RubricRating[]
   learningOutcomeId?: string
+  outcome?: RubricOutcome
 }
 
 export type RubricRating = {
@@ -77,4 +78,14 @@ export type UpdateAssessmentData = {
   points?: number
   description?: string
   comments?: string
+}
+
+export type RubricAssessmentSelect = {
+  id: string
+  name: string | null
+}[]
+
+export type RubricOutcome = {
+  displayName: string
+  title: string
 }

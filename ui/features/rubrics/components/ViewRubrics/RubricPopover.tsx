@@ -41,6 +41,8 @@ export type RubricPopoverProps = {
   buttonDisplay?: string
   ratingOrder?: string
   hasRubricAssociations?: boolean
+  onArchiveRubricChange: () => void
+  active: boolean
 }
 
 export const RubricPopover = ({
@@ -54,11 +56,18 @@ export const RubricPopover = ({
   buttonDisplay,
   ratingOrder,
   hasRubricAssociations,
+  onArchiveRubricChange,
+  active,
 }: RubricPopoverProps) => {
   const navigate = useNavigate()
   const [isPopoverOpen, setPopoverIsOpen] = useState(false)
   const [isDuplicateRubricModalOpen, setIsDuplicateRubricModalOpen] = useState(false)
   const [isDeleteRubricModalOpen, setIsDeleteRubricModalOpen] = useState(false)
+
+  const handleArchiveRubric = () => {
+    setPopoverIsOpen(false)
+    onArchiveRubricChange()
+  }
 
   return (
     <View>
@@ -116,8 +125,8 @@ export const RubricPopover = ({
           >
             {I18n.t('Duplicate')}
           </Menu.Item>
-          <Menu.Item data-testid="archive-rubric-button" onClick={() => {}}>
-            {I18n.t('Archive')}
+          <Menu.Item data-testid="archive-rubric-button" onClick={handleArchiveRubric}>
+            {active ? I18n.t('Archive') : I18n.t('Un-Archive')}
           </Menu.Item>
           <Menu.Item data-testid="download-rubric-button" onClick={() => {}}>
             {I18n.t('Download')}

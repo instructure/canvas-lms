@@ -22,7 +22,7 @@ import {View} from '@instructure/ui-view'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {AssignmentGroupSelect} from './AssignmentGroupSelect'
 import {DisplayGradeAs} from './DisplayGradeAs'
-import {DiscussionTopicNumberInput} from './DiscussionTopicNumberInput'
+import {PointsPossible} from './PointsPossible'
 import {PeerReviewOptions} from './PeerReviewOptions'
 import {AssignmentDueDatesManager} from './AssignmentDueDatesManager'
 import {SyncToSisCheckbox} from './SyncToSisCheckbox'
@@ -86,11 +86,11 @@ export const GradedDiscussionOptions = ({
     <View as="div">
       {!isCheckpoints && (
         <View as="div" margin="medium 0">
-          <DiscussionTopicNumberInput
-            numberInput={pointsPossible || 0}
-            setNumberInput={setPointsPossible}
-            numberInputLabel={I18n.t('Points Possible')}
-            numberInputDataTestId="points-possible-input"
+          <PointsPossible
+            pointsPossible={pointsPossible || 0}
+            setPointsPossible={setPointsPossible}
+            pointsPossibleLabel={I18n.t('Points Possible')}
+            pointsPossibleDataTestId="points-possible-input"
           />
         </View>
       )}
@@ -104,7 +104,9 @@ export const GradedDiscussionOptions = ({
           contextType="Course"
           initiallySelectedGradingSchemeId={gradingSchemeId}
           onChange={newSchemeId => setGradingSchemeId(newSchemeId || '')}
-          archivedGradingSchemesEnabled={false}
+          archivedGradingSchemesEnabled={ENV.ARCHIVED_GRADING_SCHEMES_ENABLED ?? false}
+          assignmentId={ENV.ASSIGNMENT_ID ? String(ENV.ASSIGNMENT_ID) : undefined}
+          courseDefaultSchemeId={ENV.COURSE_DEFAULT_GRADING_SCHEME_ID || ''}
         />
       )}
       {ENV.POST_TO_SIS && (

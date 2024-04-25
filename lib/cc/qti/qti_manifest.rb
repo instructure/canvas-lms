@@ -85,7 +85,7 @@ module CC
               path = if att.context_type == "AssessmentQuestion"
                        "assessment_questions#{att.full_display_path}"
                      else
-                       att.full_display_path.sub("course files/", "")
+                       att.full_display_path.sub("course files", "web_resources")
                      end
               zipper.add_attachment_to_zip(att, @exporter.zip_file, path)
 

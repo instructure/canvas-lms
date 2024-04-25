@@ -27,6 +27,8 @@ module BroadcastPolicies
     end
 
     def should_dispatch_assignment_due_date_changed?
+      return false if assignment.checkpoints_parent?
+
       accepting_messages? &&
         assignment.changed_in_state(:published, fields: :due_at) &&
         !just_published? &&
@@ -34,6 +36,8 @@ module BroadcastPolicies
     end
 
     def should_dispatch_assignment_changed?
+      return false if assignment.checkpoints_parent?
+
       accepting_messages? &&
         assignment.published? &&
         !assignment.muted? &&
@@ -42,12 +46,15 @@ module BroadcastPolicies
     end
 
     def should_dispatch_assignment_created?
+      return false if assignment.checkpoints_parent?
       return false unless context_sendable?
 
       published_on_create? || just_published?
     end
 
     def should_dispatch_submissions_posted?
+      return false if assignment.checkpoints_parent?
+
       context_sendable? && assignment.posting_params_for_notifications.present?
     end
 

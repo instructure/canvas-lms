@@ -49,6 +49,7 @@ export default class WikiPageIndexItemView extends Backbone.View {
       'click .duplicate-wiki-page': 'duplicateWikiPage',
       'click .send-wiki-page-to': 'sendWikiPageTo',
       'click .copy-wiki-page-to': 'copyWikiPageTo',
+      'click .assign-wiki-page-to': 'assignWikiPageTo',
       'change .select-page-checkbox': 'changeSelectPageCheckbox',
     }
 
@@ -90,6 +91,7 @@ export default class WikiPageIndexItemView extends Backbone.View {
       json.cannot_edit_by_master_course = json.master_course_restrictions.content
     }
 
+    json.differentiated_modules = !!ENV.FEATURES?.differentiated_modules
     json.wiki_page_menu_tools = ENV.wiki_page_menu_tools || []
     json.wiki_page_menu_tools.forEach(tool => {
       return (tool.url = tool.base_url + `&pages[]=${this.model.get('page_id')}`)
@@ -274,6 +276,11 @@ export default class WikiPageIndexItemView extends Backbone.View {
     this.indexView.setCopyToItem(this.model, this.$settingsMenu)
   }
 
+  assignWikiPageTo(ev) {
+    ev.preventDefault()
+    this.indexView.setAssignToItem(true, this.model, this.$settingsMenu)
+  }
+
   changeSelectPageCheckbox(ev) {
     if (ev) {
       ev.preventDefault()
@@ -288,4 +295,5 @@ export default class WikiPageIndexItemView extends Backbone.View {
     $('.delete_pages').prop('disabled', Object.keys(this.selectedPages).length === 0)
   }
 }
+
 WikiPageIndexItemView.initClass()

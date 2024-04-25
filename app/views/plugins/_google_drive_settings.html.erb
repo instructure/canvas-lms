@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<%= fields_for :settings, OpenObject.new(settings) do |f| %>
+<%= fields_for :settings do |f| %>
   <table style="width: 500px;" class="formtable">
     <tr>
       <td colspan="2">
@@ -26,7 +26,7 @@
     <tr>
       <td><%= f.blabel :client_id, :en => "Client ID" %></td>
       <td>
-        <%= f.text_field :client_id %>
+        <%= f.text_field :client_id, value: settings[:client_id] %>
       </td>
     </tr>
 
@@ -40,7 +40,7 @@
     <tr>
       <td><%= f.blabel :redirect_uri, :en => "Redirect URI" %></td>
       <td>
-        <%= f.text_field :redirect_uri %>
+        <%= f.text_field :redirect_uri, value: settings[:redirect_uri] %>
       </td>
     </tr>
 
@@ -61,7 +61,7 @@ TEXT
     <tr>
       <td><%= f.blabel :client_secret_json, :en => "Client secrets json" %></td>
       <td>
-        <%= f.text_area :client_secret_json, :rows => '4' %>
+        <%= f.text_area :client_secret_json, value: nil, :rows => '4' %>
       </td>
     </tr>
   </table>

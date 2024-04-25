@@ -17,7 +17,8 @@
  */
 
 import React from 'react'
-import {render, mount, shallow} from 'enzyme'
+import {shallow} from 'enzyme'
+import {render} from '@testing-library/react'
 import AssignmentResult from '../AssignmentResult'
 
 const defaultProps = (props = {}) => ({
@@ -52,25 +53,25 @@ it('renders the AlignmentResult component', () => {
 
 it('includes the assignment name', () => {
   const wrapper = render(<AssignmentResult {...defaultProps()} />)
-  expect(wrapper.text()).toMatch('My assignment')
+  expect(wrapper.getByRole('link')).toHaveTextContent('My assignment')
 })
 
 it('includes the ratings of the outcome', () => {
   const wrapper = render(<AssignmentResult {...defaultProps()} />)
-  expect(wrapper.text()).toMatch('My second rating')
+  expect(wrapper.getByText('My second rating')).toBeInTheDocument()
 })
 
 it('shows scores when points are not hidden', () => {
   const wrapper = render(<AssignmentResult {...defaultProps()} />)
-  expect(wrapper.text()).toMatch('Your score: 1')
+  expect(wrapper.getByText('Your score: 1')).toBeInTheDocument()
 })
 
 it('does not show scores when points are hidden', () => {
   const props = defaultProps()
   props.result.hide_points = true
   const wrapper = render(<AssignmentResult {...props} />)
-  expect(wrapper.text()).toMatch('Your score')
-  expect(wrapper.text()).not.toMatch('Your score: 1')
+  expect(wrapper.queryByText('Your score')).toBeInTheDocument()
+  expect(wrapper.queryByText('Your score: 1')).toBeNull()
 })
 
 describe('with percent not available', () => {
@@ -79,7 +80,7 @@ describe('with percent not available', () => {
     props.result.percent = null
     props.result.points_possible = 5
     const wrapper = render(<AssignmentResult {...props} />)
-    expect(wrapper.text()).toMatch('Your score: 2')
+    expect(wrapper.queryByText('Your score: 2')).toBeInTheDocument()
   })
 
   it('can use the raw score, result.points_possible, and outcome.mastery_points if outcome.points_possible is 0', () => {
@@ -88,14 +89,14 @@ describe('with percent not available', () => {
     props.result.points_possible = 5
     props.outcome.points_possible = 0
     const wrapper = render(<AssignmentResult {...props} />)
-    expect(wrapper.text()).toMatch('Your score: 1.2')
+    expect(wrapper.queryByText('Your score: 1.2')).toBeInTheDocument()
   })
 
   it('falls back to using raw score if percent and result.points_possible is not available', () => {
     const props = defaultProps()
     props.result.percent = null
     const wrapper = render(<AssignmentResult {...props} />)
-    expect(wrapper.text()).toMatch('Your score: 2')
+    expect(wrapper.queryByText('Your score: 2')).toBeInTheDocument()
   })
 })
 
@@ -112,19 +113,19 @@ it('falls back to using mastery points if points possible is 0', () => {
     points_possible: 0,
   }
   const wrapper = render(<AssignmentResult {...props} />)
-  expect(wrapper.text()).toMatch('Your score: 0.6')
+  expect(wrapper.queryByText('Your score: 0.6')).toBeInTheDocument()
 })
 
 it('correctly rounds to two decimal places', () => {
   const props = defaultProps()
   props.result.percent = 0.257
   const wrapper = render(<AssignmentResult {...props} />)
-  expect(wrapper.text()).toMatch('Your score: 1.29')
+  expect(wrapper.queryByText('Your score: 1.29')).toBeInTheDocument()
 })
 
 it('renders unlinked result', () => {
   const props = defaultProps()
   props.result.assignment.html_url = ''
-  const wrapper = mount(<AssignmentResult {...props} />)
-  expect(wrapper.find('IconHighlighterLine').exists()).toBe(true)
+  const wrapper = render(<AssignmentResult {...props} />)
+  expect(wrapper.container.querySelector(`svg[name="IconHighlighter"]`)).toBeInTheDocument()
 })

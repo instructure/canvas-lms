@@ -24,9 +24,14 @@ import LoadingIndicator from '@canvas/loading-indicator'
 const DEFAULT_SECTION_ID = '0'
 
 export const ItemAssignToTrayWrapper = () => {
-  const {assignedInfoList, title, assignmentID, importantDates, pointsPossible} = useContext(
-    GradedDiscussionDueDatesContext
-  )
+  const {
+    assignedInfoList,
+    setAssignedInfoList,
+    title,
+    assignmentID,
+    importantDates,
+    pointsPossible,
+  } = useContext(GradedDiscussionDueDatesContext)
 
   const [overrides, setOverrides] = useState([])
   const [loading, setLoading] = useState(true)
@@ -53,6 +58,16 @@ export const ItemAssignToTrayWrapper = () => {
       lock_at_overridden: true,
       id: inputObj.dueDateId,
       noop_id: null,
+      stagedOverrideId: inputObj.stagedOverrideId || null,
+      rowKey: inputObj.rowKey || null,
+    }
+
+    // Add context_module_id and context_module_name fields if they exist on inputObj
+    if (inputObj.context_module_id) {
+      outputObj.context_module_id = inputObj.context_module_id
+    }
+    if (inputObj.context_module_name) {
+      outputObj.context_module_name = inputObj.context_module_name
     }
 
     let courseSectionId = null
@@ -96,9 +111,52 @@ export const ItemAssignToTrayWrapper = () => {
 
     return outputObj
   }
-  const onSync = overrides => {
+
+  function convertToAssignedInfoListObject(inputObj) {
+    const outputObj = {
+      dueDateId: inputObj.rowKey || inputObj.stagedOverrideId || null,
+      assignedList: [],
+      dueDate: inputObj.due_at ? inputObj.due_at : null,
+      availableFrom: inputObj.unlock_at_overridden ? inputObj.unlock_at : null,
+      availableUntil: inputObj.lock_at_overridden ? inputObj.lock_at : null,
+      context_module_id: inputObj.context_module_id || null,
+      context_module_name: inputObj.context_module_name || null,
+      stagedOverrideId: inputObj.stagedOverrideId || null,
+      rowKey: inputObj.rowKey || null,
+    }
+
+    if (inputObj.noop_id === '1') {
+      outputObj.assignedList.push('mastery_paths')
+    } else if (inputObj.course_section_id) {
+      if (inputObj.course_section_id === '0') {
+        outputObj.assignedList.push('everyone')
+      } else {
+        outputObj.assignedList.push('course_section_' + inputObj.course_section_id)
+      }
+    } else if (inputObj.student_ids) {
+      inputObj.student_ids.forEach(id => {
+        outputObj.assignedList.push('user_' + id)
+      })
+    }
+
+    if (!inputObj.course_section_id && !inputObj.student_ids && !inputObj.noop_id) {
+      outputObj.assignedList.push('everyone')
+    }
+
+    return outputObj
+  }
+
+  const onSync = assigneeInfoUpdateOverrides => {
+    const outputArray = []
+
+    assigneeInfoUpdateOverrides.forEach(inputObj => {
+      const outputObj = convertToAssignedInfoListObject(inputObj)
+      outputArray.push(outputObj)
+    })
+
     // convert overrides to the expected assignedInfoList shape
     // Then Set the assignedInfoList
+    setAssignedInfoList(outputArray)
   }
 
   if (loading) {

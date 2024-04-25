@@ -38,6 +38,7 @@ export function AvailableFromDateTimeInput({
   unparsedFieldKeys,
   blueprintDateLocks,
   dateInputRefs,
+  timeInputRefs,
   handleBlur,
   ...otherProps
 }: AvailableFromDateTimeInputProps) {
@@ -45,6 +46,11 @@ export function AvailableFromDateTimeInput({
   const handleClear = useCallback(() => setAvailableFromDate(null), [setAvailableFromDate])
   const dateInputRef = useCallback(
     el => (dateInputRefs[key] = el),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  )
+  const timeInputRef = useCallback(
+    el => (timeInputRefs[key] = el),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   )
@@ -71,6 +77,7 @@ export function AvailableFromDateTimeInput({
     messages,
     onBlur,
     dateInputRef,
+    timeInputRef,
   }
 
   return <ClearableDateTimeInput {...availableFromDateProps} {...otherProps} />

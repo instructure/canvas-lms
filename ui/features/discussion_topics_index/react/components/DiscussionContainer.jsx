@@ -79,6 +79,7 @@ export class DiscussionsContainer extends Component {
     // this really is used
     handleDrop: func, // eslint-disable-line react/no-unused-prop-types
     onMoveDiscussion: func,
+    onOpenAssignToTray: func,
     permissions: propTypes.permissions.isRequired,
     pinned: bool,
     renderContainerBackground: func.isRequired,
@@ -92,6 +93,7 @@ export class DiscussionsContainer extends Component {
     },
     handleDrop: undefined,
     onMoveDiscussion: null,
+    onOpenAssignToTray: null,
     pinned: undefined,
   }
 
@@ -178,6 +180,7 @@ export class DiscussionsContainer extends Component {
           deleteDiscussion={this.props.deleteDiscussion}
           getDiscussionPosition={this.getDiscussionPosition}
           onMoveDiscussion={this.props.onMoveDiscussion}
+          onOpenAssignToTray={this.props.onOpenAssignToTray}
           moveCard={this.moveCard}
           draggable={true}
         />
@@ -187,6 +190,7 @@ export class DiscussionsContainer extends Component {
           discussion={discussion}
           deleteDiscussion={this.props.deleteDiscussion}
           onMoveDiscussion={this.props.onMoveDiscussion}
+          onOpenAssignToTray={this.props.onOpenAssignToTray}
           draggable={false}
         />
       )

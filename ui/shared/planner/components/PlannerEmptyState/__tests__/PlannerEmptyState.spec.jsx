@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import {shallow, mount} from 'enzyme'
+import {shallow} from 'enzyme'
+import {render, fireEvent} from '@testing-library/react'
 import PlannerEmptyState from '../index'
 
 function defaultProps(opts = {}) {
@@ -55,26 +56,26 @@ it('renders balloons and different text when weekly', () => {
 it('does not changeDashboardView on mount', () => {
   const mockDispatch = jest.fn()
   const changeDashboardView = mockDispatch
-  mount(<PlannerEmptyState {...defaultProps({changeDashboardView})} />)
+  render(<PlannerEmptyState {...defaultProps({changeDashboardView})} />)
   expect(changeDashboardView).not.toHaveBeenCalled()
 })
 
 it('calls changeDashboardView on link click', () => {
   const mockDispatch = jest.fn()
   const changeDashboardView = mockDispatch
-  const wrapper = mount(
+  const wrapper = render(
     <PlannerEmptyState {...defaultProps({changeDashboardView, isCompletelyEmpty: true})} />
   )
-  const button = wrapper.find('button#PlannerEmptyState_CardView')
-  button.simulate('click')
+  const button = wrapper.getByText('Go to Card View Dashboard')
+  fireEvent.click(button)
   expect(changeDashboardView).toHaveBeenCalledWith('cards')
 })
 
 it('does not call changeDashboardView on false prop', () => {
-  const wrapper = mount(<PlannerEmptyState {...defaultProps({isCompletelyEmpty: true})} />)
-  const button = wrapper.find('button#PlannerEmptyState_CardView')
-  button.simulate('click')
+  const wrapper = render(<PlannerEmptyState {...defaultProps({isCompletelyEmpty: true})} />)
+  const button = wrapper.getByText('Go to Card View Dashboard')
+  fireEvent.click(button)
   expect(() => {
-    button.simulate('click')
+    fireEvent.click(button)
   }).not.toThrow()
 })

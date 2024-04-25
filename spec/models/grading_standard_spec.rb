@@ -266,6 +266,17 @@ describe GradingStandard do
       expect(standard.score_to_grade(-100)).to eql("M")
     end
 
+    it "computes correct grades for points based grading scemes" do
+      input = [["A", 0.8667], ["B", 0.6667], ["C", 0.4667], ["D", 0]]
+      standard = GradingStandard.new
+      standard.data = input
+      standard.points_based = true
+      expect(standard.score_to_grade(86.66666666667)).to eql("A")
+      expect(standard.score_to_grade(66.66666666667)).to eql("B")
+      expect(standard.score_to_grade(46.66666666667)).to eql("C")
+      expect(standard.score_to_grade(0)).to eql("D")
+    end
+
     it "assigns the lowest grade to below-scale scores" do
       input = [["A", 0.90], ["B", 0.80], ["C", 0.70], ["D", 0.60], ["E", 0.50]]
       standard = GradingStandard.new

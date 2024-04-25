@@ -28,6 +28,7 @@ const SECTIONS_BY_ASSIGNMENT_QUERY = gql`
           id
           _id
           name
+          gradesPosted(assignmentId: $assignmentId)
           students {
             nodes {
               _id

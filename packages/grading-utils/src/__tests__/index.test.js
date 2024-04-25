@@ -17,7 +17,7 @@
  */
 
 import {describe, test, expect} from '@jest/globals'
-import {scoreToGrade, scoreToLetterGrade} from '../index.js'
+import {scoreToGrade, scoreToLetterGrade} from '../index'
 
 describe('index', () => {
   describe('scoreToGrade', () => {
@@ -81,6 +81,20 @@ describe('index', () => {
       expect(scoreToGrade(0, gradingScheme)).toBe('M')
       expect(scoreToGrade(-100, gradingScheme)).toBe('M')
     })
+
+    test('rounds point based grading schemes to appropriate precision to ensure bottom limit is ', () => {
+      const gradingScheme = [
+        {name: 'A', value: 0.8667},
+        {name: 'B', value: 0.6667},
+        {name: 'C', value: 0.4667},
+        {name: 'D', value: 0},
+      ]
+
+      expect(scoreToGrade(86.6666666666667, gradingScheme, true)).toBe('A')
+      expect(scoreToGrade(66.6666666666667, gradingScheme, true)).toBe('B')
+      expect(scoreToGrade(46.6666666666667, gradingScheme, true)).toBe('C')
+      expect(scoreToGrade(45, gradingScheme, true)).toBe('D')
+    })
   })
 
   describe('scoreToLetterGrade', () => {
@@ -128,6 +142,20 @@ describe('index', () => {
       expect(scoreToLetterGrade(99, gradingScheme)).toBe('A')
       expect(scoreToLetterGrade(90, gradingScheme)).toBe('A')
       expect(scoreToLetterGrade(89.999, gradingScheme)).toBe('B+')
+    })
+
+    test('rounds point based grading schemes to appropriate precision to ensure bottom limit is ', () => {
+      const gradingScheme = [
+        {name: 'A', value: 0.8667},
+        {name: 'B', value: 0.6667},
+        {name: 'C', value: 0.4667},
+        {name: 'D', value: 0},
+      ]
+
+      expect(scoreToLetterGrade(86.6666666666667, gradingScheme, true)).toBe('A')
+      expect(scoreToLetterGrade(66.6666666666667, gradingScheme, true)).toBe('B')
+      expect(scoreToLetterGrade(46.6666666666667, gradingScheme, true)).toBe('C')
+      expect(scoreToLetterGrade(45, gradingScheme, true)).toBe('D')
     })
   })
 })

@@ -18,10 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-# pre-build the graphql schema (which is expensive and slow) so that the first
-# request is not slow and terrible
-CanvasSchema.graphql_definition
-
 class GraphQLController < ApplicationController
   include Api::V1
 

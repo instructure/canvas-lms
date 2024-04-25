@@ -19,8 +19,6 @@
 import DashboardCard, {DashboardCardHeaderHero} from '../DashboardCard'
 import React from 'react'
 import {render} from '@testing-library/react'
-import {mount} from 'enzyme'
-import PublishButton from '../PublishButton'
 import * as apiClient from '@canvas/courses/courseAPIClient'
 import fetchMock from 'fetch-mock'
 
@@ -107,8 +105,8 @@ describe('PublishButton', () => {
         defaultView: '',
         onPublishedCourse,
       })
-      const wrapper = mount(<DashboardCard {...props} />)
-      wrapper.find(PublishButton).find('button').simulate('click')
+      const wrapper = render(<DashboardCard {...props} />)
+      wrapper.getByText('Publish').click()
       expect(apiClient.publishCourse).toHaveBeenCalledWith(expect.objectContaining({courseId: '0'}))
     })
   })

@@ -41,7 +41,7 @@ class Mutations::CreateDiscussionTopic < Mutations::DiscussionBase
   argument :anonymous_state, Types::DiscussionTopicAnonymousStateType, required: false
   argument :context_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Context")
   argument :context_type, Types::DiscussionTopicContextType, required: true
-  argument :assignment, Mutations::AssignmentCreate, required: false
+  argument :assignment, Mutations::AssignmentBase::AssignmentCreate, required: false
 
   # most arguments inherited from DiscussionBase
 
@@ -128,7 +128,7 @@ class Mutations::CreateDiscussionTopic < Mutations::DiscussionBase
         return validation_error(I18n.t("If checkpoints are defined, forCheckpoints: true must be provided to the discussion topic assignment.")) unless input.dig(:assignment, :for_checkpoints)
 
         input[:checkpoints].each do |checkpoint|
-          dates = checkpoint[:dates]&.map(&:to_object)
+          dates = checkpoint[:dates]
 
           Checkpoints::DiscussionCheckpointCreatorService.call(
             discussion_topic:,

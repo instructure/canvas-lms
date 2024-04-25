@@ -37,8 +37,6 @@ const files = [
     displayName: 'file_2.zip',
     id: '2',
     mimeClass: 'file',
-    submissionPreviewUrl: null,
-    thumbnailUrl: null,
     url: '/url',
     size: '107 GB',
   },
@@ -47,8 +45,6 @@ const files = [
     displayName: 'file_2.zip',
     id: '3',
     mimeClass: 'file',
-    submissionPreviewUrl: null,
-    thumbnailUrl: null,
     url: '/url',
     size: '10 GB',
   },
@@ -75,10 +71,20 @@ const originalityData = {
   },
 }
 
+// Override default URL mock
+const resolvers = () => ({
+  File: {
+    submissionPreviewUrl: ({$ref}) => files[$ref.key - 1].submissionPreviewUrl,
+    thumbnailUrl: ({$ref}) => files[$ref.key - 1].thumbnailUrl,
+  },
+})
+
+const mockSubmissionWithResolvers = overrides => mockSubmission(overrides, resolvers)
+
 describe('FilePreview', () => {
   it('renders a message if there are no files to display', async () => {
     const props = {
-      submission: await mockSubmission({
+      submission: await mockSubmissionWithResolvers({
         Submission: {attachments: []},
       }),
     }
@@ -88,7 +94,7 @@ describe('FilePreview', () => {
 
   it('renders the appropriate file icons', async () => {
     const props = {
-      submission: await mockSubmission({
+      submission: await mockSubmissionWithResolvers({
         Submission: {attachments: files},
       }),
     }
@@ -108,7 +114,7 @@ describe('FilePreview', () => {
 
   it('does not render the file icons if there is only one file', async () => {
     const props = {
-      submission: await mockSubmission({
+      submission: await mockSubmissionWithResolvers({
         Submission: {attachments: [files[0]]},
       }),
     }
@@ -118,7 +124,7 @@ describe('FilePreview', () => {
 
   it('renders orignality reports for each file if turnitin data exists and there is more than one attachment', async () => {
     const props = {
-      submission: await mockSubmission({
+      submission: await mockSubmissionWithResolvers({
         Submission: {attachments: files, originalityData, submissionType: 'online_upload'},
       }),
       isOriginalityReportVisible: true,
@@ -133,7 +139,7 @@ describe('FilePreview', () => {
 
   it('does not render orignality reports if only one attachment exists', async () => {
     const props = {
-      submission: await mockSubmission({
+      submission: await mockSubmissionWithResolvers({
         Submission: {attachments: [files[0]], originalityData, submissionType: 'online_upload'},
       }),
       isOriginalityReportVisible: true,
@@ -145,7 +151,7 @@ describe('FilePreview', () => {
 
   it('does not render orignality reports if the reports are not visible to the student', async () => {
     const props = {
-      submission: await mockSubmission({
+      submission: await mockSubmissionWithResolvers({
         Submission: {attachments: files, originalityData, submissionType: 'online_upload'},
       }),
       isOriginalityReportVisible: false,
@@ -157,7 +163,7 @@ describe('FilePreview', () => {
 
   it('renders the size of each file being uploaded', async () => {
     const props = {
-      submission: await mockSubmission({
+      submission: await mockSubmissionWithResolvers({
         Submission: {attachments: files},
       }),
     }
@@ -171,7 +177,7 @@ describe('FilePreview', () => {
 
   it('renders the file preview', async () => {
     const props = {
-      submission: await mockSubmission({
+      submission: await mockSubmissionWithResolvers({
         Submission: {attachments: [files[0]]},
       }),
     }
@@ -181,7 +187,7 @@ describe('FilePreview', () => {
 
   it('renders no preview available if the given file has no preview url', async () => {
     const props = {
-      submission: await mockSubmission({
+      submission: await mockSubmissionWithResolvers({
         Submission: {attachments: [files[1]]},
       }),
     }
@@ -191,9 +197,7 @@ describe('FilePreview', () => {
 
   it('renders a download button for files without canvadoc preview', async () => {
     const props = {
-      submission: await mockSubmission({
-        Submission: {attachments: [files[1]]},
-      }),
+      submission: await mockSubmissionWithResolvers({Submission: {attachments: [files[1]]}}),
     }
     const {container, getByText} = render(<FilePreview {...props} />)
     expect(getByText('Preview Unavailable')).toBeInTheDocument()
@@ -202,7 +206,7 @@ describe('FilePreview', () => {
 
   it('changes the preview when a different file icon is clicked', async () => {
     const props = {
-      submission: await mockSubmission({
+      submission: await mockSubmissionWithResolvers({
         Submission: {attachments: files},
       }),
     }
@@ -219,13 +223,13 @@ describe('FilePreview', () => {
   it('displays the first file upload in the preview when switching between attempts', async () => {
     // file[0] = image, file[1] = zip, file[2] = zip
     const propsAttempt1 = {
-      submission: await mockSubmission({
+      submission: await mockSubmissionWithResolvers({
         Submission: {attachments: [files[0], files[1]], attempt: 1},
       }),
     }
 
     const propsAttempt2 = {
-      submission: await mockSubmission({
+      submission: await mockSubmissionWithResolvers({
         Submission: {attachments: files, attempt: 2},
       }),
     }

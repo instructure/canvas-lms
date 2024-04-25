@@ -124,4 +124,14 @@ describe "assignments show page assign to" do
     expect(assign_to_until_date(0).attribute("value")).to eq("Jan 7, 2023")
     expect(assign_to_until_time(0).attribute("value")).to eq("9:00 PM")
   end
+
+  it "focus close button on open" do
+    get "/courses/#{@course.id}/assignments/#{@assignment1.id}"
+
+    AssignmentPage.click_assign_to_button
+    wait_for_assign_to_tray_spinner
+    keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+    check_element_has_focus close_button
+  end
 end

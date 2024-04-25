@@ -1517,17 +1517,15 @@ describe "RCE next tests", :ignore_js_errors do
         expect(fullscreen_element).to eq(f(".RceHtmlEditor"))
       end
 
-      it "gets default html editor from the rce.htmleditor cookie" do
+      it "remembers preferred html editor" do
         get "/"
-        driver.manage.add_cookie(name: "rce.htmleditor", value: "RAW", path: "/")
-
         rce_wysiwyg_state_setup(@course)
-
-        # clicking opens raw editor
+        click_editor_view_button
+        f('button[data-btn-id="rce-editormessage-btn"]').click
+        expect(f("textarea#wiki_page_body")).to be_displayed
+        visit_front_page_edit(@course)
         click_editor_view_button
         expect(f("textarea#wiki_page_body")).to be_displayed
-      ensure
-        driver.manage.delete_cookie("rce.htmleditor")
       end
 
       it "saves pretty HTML editor text on submit" do

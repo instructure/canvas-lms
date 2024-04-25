@@ -15,7 +15,8 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {addMockFunctionsToSchema, makeExecutableSchema} from 'graphql-tools'
+import {addMocksToSchema} from '@graphql-tools/mock'
+import {makeExecutableSchema} from '@graphql-tools/schema'
 import {addTypenameToDocument} from 'apollo-utilities'
 import {graphql} from 'graphql'
 import gql from 'graphql-tag'
@@ -52,7 +53,7 @@ async function getValidTypes() {
       requireResolversForResolveType: false,
     },
   })
-  const result = await graphql(schema, typeIntrospectionQuery)
+  const result = await graphql({schema, source: typeIntrospectionQuery})
   _typeIntrospectionSet = new Set(result.data.__schema.types.map(type => type.name))
   return _typeIntrospectionSet
 }
@@ -116,7 +117,12 @@ function nodeInterfaceProperlyMocked(queryAST, mocks) {
   }
 }
 
-export default async function mockGraphqlQuery(query, overrides = [], variables = {}) {
+export default async function mockGraphqlQuery(
+  query,
+  overrides = [],
+  variables = {},
+  resolvers = undefined
+) {
   const queryAST = typeof query === 'string' ? gql(query) : query
   const mocks = await createMocks(overrides)
 
@@ -138,8 +144,13 @@ export default async function mockGraphqlQuery(query, overrides = [], variables 
   })
 
   // Run our query againsted the mocked server
-  addMockFunctionsToSchema({schema, mocks})
-  const result = await graphql(schema, queryStr, null, null, variables)
+  const schemaWithMocks = addMocksToSchema({schema, resolvers, mocks})
+  const result = await graphql({
+    schema: schemaWithMocks,
+    resolvers,
+    source: queryStr,
+    variableValues: variables,
+  })
   if (result.errors) {
     const errors = result.errors.map(e => e.message)
     throw new Error('The graphql query contained errors:\n  - ' + errors.join('\n  - '))

@@ -25,6 +25,8 @@ describe Account do
     it { is_expected.to have_many(:feature_flags) }
     it { is_expected.to have_one(:outcome_proficiency).dependent(:destroy) }
     it { is_expected.to have_many(:lti_resource_links).class_name("Lti::ResourceLink") }
+    it { is_expected.to have_many(:lti_registrations).class_name("Lti::Registration").dependent(:destroy) }
+    it { is_expected.to have_many(:lti_registration_account_bindings).class_name("Lti::RegistrationAccountBinding").dependent(:destroy) }
   end
 
   describe "validations" do
@@ -269,8 +271,8 @@ describe Account do
       a = Account.new
       a.equella_endpoint = "http://oer.equella.com/signon.do"
       expect(a.equella_settings).not_to be_nil
-      expect(a.equella_settings.endpoint).to eql("http://oer.equella.com/signon.do")
-      expect(a.equella_settings.default_action).not_to be_nil
+      expect(a.equella_settings[:endpoint]).to eql("http://oer.equella.com/signon.do")
+      expect(a.equella_settings[:default_action]).not_to be_nil
     end
   end
 

@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class File
-  def self.mime_type?(file)
+  def self.mime_type(file)
     # INSTRUCTURE: added condition, file.class can also be Tempfile
     if file.instance_of?(File) || file.instance_of?(Tempfile)
       mime = if RUBY_PLATFORM.include? "mswin32"

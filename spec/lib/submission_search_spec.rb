@@ -304,6 +304,49 @@ describe SubmissionSearch do
     expect(results.preload(:user).map(&:user)).to eq [james, amanda, peter]
   end
 
+  context "group assignments" do
+    before(:once) do
+      group_category = course.group_categories.create!(name: "My Category")
+      @group = group_category.groups.create!(name: "My Group", context: course)
+      students.each { |student| @group.add_user(student) }
+      assignment.update!(group_category:)
+    end
+
+    describe "user_id" do
+      it "returns the group rep's submission when provided with the group rep's ID" do
+        results = SubmissionSearch.new(assignment, teacher, nil, user_id: jonah.id).search
+        aggregate_failures do
+          expect(results.count).to eq 1
+          expect(results.first.user_id).to eq jonah.id
+        end
+      end
+
+      it "returns the group rep's submission when provided with a different group member's ID" do
+        results = SubmissionSearch.new(assignment, teacher, nil, user_id: amanda.id).search
+        aggregate_failures do
+          expect(results.count).to eq 1
+          expect(results.first.user.id).to eq jonah.id
+        end
+      end
+    end
+
+    describe "representatives_only" do
+      it "returns a submission for each user in the group by default" do
+        results = SubmissionSearch.new(assignment, teacher, nil, {}).search
+        expect(results.count).to eq students.count
+      end
+
+      it "optionally returns only the group rep's submission" do
+        results = SubmissionSearch.new(assignment, teacher, nil, representatives_only: true).search
+
+        aggregate_failures do
+          expect(results.count).to eq 1
+          expect(results.first.user.id).to eq jonah.id
+        end
+      end
+    end
+  end
+
   # TODO: implement
   it "filters results to assigned users if assigned_only filter is set"
   it "filters results to specified groups"

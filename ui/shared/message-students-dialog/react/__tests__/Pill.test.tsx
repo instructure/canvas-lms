@@ -78,7 +78,7 @@ describe('Pill', () => {
     const props = makeProps({studentId, text: 'Betty Ford', selected: true})
     const {findByRole} = render(<Pill {...props} />)
 
-    const button = await findByRole('button', {name: 'Betty Ford'})
+    const button = await findByRole('button', {name: 'Remove Betty Ford'})
     fireEvent.click(button)
 
     await waitFor(() => {
@@ -90,7 +90,7 @@ describe('Pill', () => {
     const props = makeProps({studentId, observerId, text: 'Observer 0'})
     const {findByRole} = render(<Pill {...props} />)
 
-    const button = await findByRole('button', {name: 'Observer 0'})
+    const button = await findByRole('button', {name: 'Add Observer 0'})
     fireEvent.click(button)
 
     await waitFor(() => {

@@ -76,6 +76,7 @@ export interface ItemAssignToCardSpec {
   contextModuleId?: string | null
   contextModuleName?: string | null
   highlightCard?: boolean
+  [key: string]: any // Define an index signature to allow string indexing (for dynamic date field)
 }
 
 export type DateLockTypes = 'due_dates' | 'availability_dates'
@@ -99,6 +100,7 @@ export type CustomDateTimeInputProps = {
   unparsedFieldKeys: Set<string>
   blueprintDateLocks?: DateLockTypes[]
   dateInputRefs: Record<string, HTMLInputElement | null>
+  timeInputRefs: Record<string, HTMLInputElement | null>
   handleBlur: (unparsedFieldKey: string) => (e: SyntheticEvent) => void
   breakpoints: Breakpoints
   showMessages?: boolean

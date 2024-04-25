@@ -139,6 +139,62 @@ describe('ltiMessageHander', () => {
     })
   })
 
+  describe('when subject requires authorized scopes', () => {
+    const subject = 'lti.getPageContent'
+    const subject_response = 'lti.getPageContent.response'
+    const error_code = 'unauthorized'
+    const origin = 'http://lti-tool.example.com'
+
+    describe('when tool has no scopes', () => {
+      it('returns unauthorized error', async () => {
+        const event = postMessageEvent({subject, origin})
+        ENV.LTI_TOOL_SCOPES = {origin: []}
+
+        await ltiMessageHandler(event)
+        expect(event.source.postMessage).toHaveBeenCalledWith(
+          expect.objectContaining({
+            error: {
+              code: error_code,
+            },
+          }),
+          undefined
+        )
+      })
+    })
+
+    describe('when tool has other scopes', () => {
+      it('returns unauthorized error', async () => {
+        const event = postMessageEvent({subject, origin})
+        ENV.LTI_TOOL_SCOPES = {origin: ['http://canvas.instructure.com/lti/something/else']}
+
+        await ltiMessageHandler(event)
+        expect(event.source.postMessage).toHaveBeenCalledWith(
+          expect.objectContaining({
+            error: {
+              code: error_code,
+            },
+          }),
+          undefined
+        )
+      })
+    })
+
+    describe('when tool has the required scope', () => {
+      it('processes message', async () => {
+        const event = postMessageEvent({subject, origin})
+        ENV.LTI_TOOL_SCOPES = {origin: ['http://canvas.instructure.com/lti/page_content/show']}
+
+        await ltiMessageHandler(event)
+        expect(event.source.postMessage).toHaveBeenCalledWith(
+          expect.objectContaining({
+            subject: subject_response,
+          }),
+          undefined
+        )
+      })
+    })
+  })
+
   describe('response messages', () => {
     describe('when message handler succeeds', () => {
       afterEach(() => {

@@ -517,11 +517,22 @@ describe "Files API", type: :request do
       end
 
       it "reuses the Attachment if a file is re-uploaded to the same folder" do
-        # FIXME: reinstate when we have the proper check in place (and add a test)
-        # expect(InstFS).to receive(:delete_file).with("old-instfs-uuid")
+        expect(InstFS).to receive(:delete_file).with("old-instfs-uuid")
         json = api_call(:post, "/api/v1/files/capture?#{@capture_params.to_query}", @capture_params)
         expect(json["id"]).to eq @existing.id
         expect(@existing.reload.instfs_uuid).to eq "new-instfs-uuid"
+      end
+
+      it "does not delete the old instfs file if it is in use by other Attachments" do
+        other_course = course_factory
+        other_file = @existing.clone_for(other_course)
+        other_file.save!
+        expect(InstFS).not_to receive(:delete_file)
+        json = api_call(:post, "/api/v1/files/capture?#{@capture_params.to_query}", @capture_params)
+        expect(json["id"]).to eq @existing.id
+        expect(@existing.reload.instfs_uuid).to eq "new-instfs-uuid"
+        expect(@existing.cloned_item_id).to be_nil
+        expect(other_file.reload.instfs_uuid).to eq "old-instfs-uuid"
       end
 
       it "does not reuse a deleted Attachment" do

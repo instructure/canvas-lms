@@ -69,6 +69,8 @@ module Types
 
     field :user_id, ID, null: false
 
+    field :seconds_late, Float, null: true
+
     field :submission_histories_connection, SubmissionHistoryType.connection_type, null: true do
       argument :filter, SubmissionHistoryFilterInputType, required: false, default_value: {}
     end
@@ -84,6 +86,13 @@ module Types
         histories.pop unless include_current_submission
         histories.select { |h| states.include?(h.workflow_state) }
       end
+    end
+
+    field :sub_assignment_tag, String, null: true
+    def sub_assignment_tag
+      return object.assignment.sub_assignment_tag if object.assignment.is_a?(SubAssignment)
+
+      nil
     end
   end
 end

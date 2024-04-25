@@ -109,6 +109,7 @@ export default ({
       score: ENV.restrict_quantitative_data && submission.score != null ? submission.score : null,
       restrict_quantitative_data: ENV.restrict_quantitative_data,
       grading_scheme: ENV.grading_scheme,
+      points_based_grading_scheme: ENV.points_based,
     })
 
     return (
@@ -142,20 +143,21 @@ export default ({
         <div>
           <StudentViewContext.Consumer>
             {context => {
+              const showFeedback =
+                (submission && submission.feedbackForCurrentAttempt) ||
+                !context.allowChangesToSubmission
               const button = (
                 <Button
                   renderIcon={IconChatLine}
                   onClick={openCommentTray}
                   disabled={addCommentsDisabled}
+                  data-testid="view_feedback_button"
                 >
-                  {(submission && submission.feedbackForCurrentAttempt) ||
-                  !context.allowChangesToSubmission
-                    ? I18n.t('View Feedback')
-                    : I18n.t('Add Comment')}
+                  {showFeedback ? I18n.t('View Feedback') : I18n.t('Add Comment')}
                 </Button>
               )
 
-              const unreadCount = submission?.unreadCommentCount
+              const unreadCount = showFeedback ? submission?.unreadCommentCount : 0
               if (assignment.env.peerReviewModeEnabled || !unreadCount) return button
 
               return (

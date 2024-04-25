@@ -38,6 +38,7 @@ export function DueDateTimeInput({
   unparsedFieldKeys,
   blueprintDateLocks,
   dateInputRefs,
+  timeInputRefs,
   handleBlur,
   ...otherProps
 }: DueDateTimeInputProps) {
@@ -45,6 +46,11 @@ export function DueDateTimeInput({
   const handleClear = useCallback(() => setDueDate(null), [setDueDate])
   const dateInputRef = useCallback(
     el => (dateInputRefs[key] = el),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  )
+  const timeInputRef = useCallback(
+    el => (timeInputRefs[key] = el),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   )
@@ -66,6 +72,7 @@ export function DueDateTimeInput({
     messages,
     onBlur,
     dateInputRef,
+    timeInputRef,
   }
 
   return <ClearableDateTimeInput {...dueDateProps} {...otherProps} />

@@ -21,18 +21,12 @@ import React from 'react'
 import {TextInput} from '@instructure/ui-text-input'
 import type {FormMessage} from '@instructure/ui-form-field'
 import {SimpleSelect} from '@instructure/ui-simple-select'
-// ui-text-area has types in InstUI 7, but they aren't declared in its package.json
-// so just ignore the error for now. Once we're on InstUI 8, we can remove this.
 import {TextArea} from '@instructure/ui-text-area'
-// ui-grid has types in InstUI 7, but they aren't declared in its package.json
-// so just ignore the error for now. Once we're on InstUI 8, we can remove this.
 import {Grid} from '@instructure/ui-grid'
 import '@canvas/rails-flash-notifications'
 import type {I18nType, TextAreaChangeHandler, TextInputChangeHandler} from './types'
 import MembershipServiceAccess from './MembershipServiceAccess'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-// Doing this to avoid TS2339 errors-- remove once we're on InstUI 8
-const {Option: SimpleSelectOption} = SimpleSelect as any
 
 const I18n: I18nType = useI18nScope('external_tools')
 
@@ -268,14 +262,14 @@ export default class ConfigurationFormManual extends React.Component<
                 renderLabel={I18n.t('Privacy Level')}
               >
                 {Object.entries(PRIVACY_OPTIONS).map(([value, translated]) => (
-                  <SimpleSelectOption
+                  <SimpleSelect.Option
                     key={value}
                     id={value}
                     value={value}
                     selected={value === this.state.privacyLevel}
                   >
                     {translated}
-                  </SimpleSelectOption>
+                  </SimpleSelect.Option>
                 ))}
               </SimpleSelect>
             </Grid.Col>

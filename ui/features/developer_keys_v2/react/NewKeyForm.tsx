@@ -230,7 +230,6 @@ export default class NewKeyForm extends React.Component<NewKeyFormProps> {
                   onChange={e => updateDeveloperKey('notes', e.target.value)}
                   resize="both"
                 />
-                {/* @ts-expect-error */}
                 {ENV.enableTestClusterChecks && !isLtiKey ? (
                   <Checkbox
                     label={I18n.t('Test Cluster Only')}
@@ -285,9 +284,7 @@ export default class NewKeyForm extends React.Component<NewKeyFormProps> {
                   toolConfigurationUrl={toolConfigurationUrl}
                   configurationMethod={this.props.configurationMethod}
                   updateConfigurationMethod={this.props.updateConfigurationMethod}
-                  // @ts-expect-error
                   validScopes={ENV.validLtiScopes}
-                  // @ts-expect-error
                   validPlacements={ENV.validLtiPlacements}
                   invalidJson={this.state.invalidJson}
                   jsonString={this.state.jsonString}

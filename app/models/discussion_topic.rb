@@ -46,7 +46,7 @@ class DiscussionTopic < ActiveRecord::Base
                                  sort_by_rating
                                  group_category_id]
   restrict_columns :state, [:workflow_state]
-  restrict_columns :availability_dates, [:delayed_post_at, :lock_at]
+  restrict_columns :availability_dates, %i[unlock_at delayed_post_at lock_at]
   restrict_assignment_columns
 
   attr_writer :can_unpublish, :preloaded_subentry_count, :sections_changed
@@ -260,7 +260,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def set_schedule_delayed_transitions
-    @delayed_post_at_changed = delayed_post_at_changed?
+    @delayed_post_at_changed = delayed_post_at_changed? || unlock_at_changed?
     if delayed_post_at? && @delayed_post_at_changed
       @should_schedule_delayed_post = true
       self.workflow_state = "post_delayed" if [:migration, :after_migration].include?(saved_by) && delayed_post_at > Time.now
@@ -741,6 +741,11 @@ class DiscussionTopic < ActiveRecord::Base
     topic_participant
   end
 
+  scope :visible_to_students_in_course_with_da, lambda { |user_ids, course_ids|
+    without_assignment_in_course(course_ids)
+      .union(joins_assignment_student_visibilities(user_ids, course_ids))
+  }
+
   scope :not_ignored_by, lambda { |user, purpose|
     where.not(Ignore.where(asset_type: "DiscussionTopic", user_id: user, purpose:)
       .where("asset_id=discussion_topics.id").arel.exists)
@@ -824,7 +829,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   scope :by_posted_at, lambda {
     order(Arel.sql(<<~SQL.squish))
-      COALESCE(discussion_topics.delayed_post_at, discussion_topics.posted_at, discussion_topics.created_at) DESC,
+      COALESCE(discussion_topics.unlock_at, discussion_topics.delayed_post_at, discussion_topics.posted_at, discussion_topics.created_at) DESC,
       discussion_topics.created_at DESC,
       discussion_topics.id DESC
     SQL
@@ -858,11 +863,21 @@ class DiscussionTopic < ActiveRecord::Base
   alias_attribute :available_until, :lock_at
 
   def unlock_at
-    Account.site_admin.feature_enabled?(:differentiated_modules) ? super : delayed_post_at
+    self[:unlock_at].nil? ? self[:delayed_post_at] : self[:unlock_at]
+  end
+
+  def delayed_post_at
+    self[:unlock_at].nil? ? self[:delayed_post_at] : self[:unlock_at]
   end
 
   def unlock_at=(value)
-    Account.site_admin.feature_enabled?(:differentiated_modules) ? super : self.delayed_post_at = value
+    self[:delayed_post_at] = value
+    super
+  end
+
+  def delayed_post_at=(value)
+    self[:unlock_at] = value
+    super
   end
 
   def should_lock_yet
@@ -1072,7 +1087,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   def should_clear_all_stream_items?
     (!published? && saved_change_to_attribute?(:workflow_state)) ||
-      (is_announcement && not_available_yet? && saved_change_to_attribute?(:delayed_post_at))
+      (is_announcement && not_available_yet? && (saved_change_to_attribute?(:delayed_post_at) || saved_change_to_attribute?(:unlock_at)))
   end
 
   def clear_non_applicable_stream_items
@@ -1863,6 +1878,45 @@ class DiscussionTopic < ActiveRecord::Base
       points_possible: reply_to_entry_points,
       replies_required: reply_to_entry_required_count
     )
+  end
+
+  def self.visible_ids_by_user(opts)
+    # Discussions with an assignment: pluck id, assignment_id, and user_id from items joined with the SQL view
+    plucked_visibilities = joins_assignment_student_visibilities(opts[:user_id], opts[:course_id])
+                           .pluck("discussion_topics.id", "discussion_topics.assignment_id", "assignment_student_visibilities.user_id")
+                           .group_by { |_, _, user_id| user_id }
+
+    # Ungraded discussions are *normally* visible to all -- the exception is
+    # section-specific discussions, so here get the ones visible to everyone in the
+    # course, and below get the ones that are visible to the right section.
+    ids_visible_to_all = without_assignment_in_course(opts[:course_id]).where(is_section_specific: false).pluck(:id)
+
+    # Now get the section-specific discussions that are in the proper sections.
+    # build hash of user_ids to array of section ids
+    sections_per_user = {}
+    Enrollment.active.where(course_id: opts[:course_id], user_id: opts[:user_id])
+              .pluck(:user_id, :course_section_id)
+              .each { |user_id, section_id| (sections_per_user[user_id] ||= Set.new) << section_id }
+
+    # build hash of section_ids to array of visible topic ids
+    all_section_ids = sections_per_user.values.reduce([]) { |all_ids, section_ids| all_ids.concat(section_ids.to_a) }
+    topic_ids_per_section = {}
+    DiscussionTopicSectionVisibility.active.where(course_section_id: all_section_ids)
+                                    .pluck(:course_section_id, :discussion_topic_id)
+                                    .each { |section_id, topic_id| (topic_ids_per_section[section_id] ||= Set.new) << topic_id }
+    topic_ids_per_section.each { |section_id, topic_ids| topic_ids_per_section[section_id] = topic_ids.to_a }
+
+    # finally, build hash of user_ids to array of visible topic ids
+    topic_ids_per_user = {}
+    opts[:user_id].each { |user_id| topic_ids_per_user[user_id] = sections_per_user[user_id]&.map { |section_id| topic_ids_per_section[section_id] }&.flatten&.uniq&.compact }
+    ids_visible_to_sections = topic_ids_per_user
+
+    # build map of user_ids to array of item ids {1 => [2,3,4], 2 => [2,4]}
+    opts[:user_id].index_with do |student_id|
+      assignment_item_ids = (plucked_visibilities[student_id] || []).map { |id, _, _| id }
+      section_specific_ids = ids_visible_to_sections[student_id] || []
+      assignment_item_ids.concat(ids_visible_to_all).concat(section_specific_ids)
+    end
   end
 
   private

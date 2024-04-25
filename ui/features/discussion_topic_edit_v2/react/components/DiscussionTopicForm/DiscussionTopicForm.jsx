@@ -51,6 +51,8 @@ import {
   defaultEveryoneElseOption,
   masteryPathsOption,
   useShouldShowContent,
+  REPLY_TO_TOPIC,
+  REPLY_TO_ENTRY,
 } from '../../util/constants'
 
 import {AttachmentDisplay} from '@canvas/discussions/react/components/AttachmentDisplay/AttachmentDisplay'
@@ -59,7 +61,7 @@ import {UsageRightsContainer} from '../../containers/usageRights/UsageRightsCont
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
-import {prepareAssignmentPayload} from '../../util/payloadPreparations'
+import {prepareAssignmentPayload, prepareCheckpointsPayload} from '../../util/payloadPreparations'
 import {validateTitle, validateFormFields} from '../../util/formValidation'
 
 import {
@@ -93,7 +95,6 @@ export default function DiscussionTopicForm({
   const dateInputRef = useRef()
   const groupOptionsRef = useRef()
   const gradedDiscussionRef = useRef()
-  const replyToEntryRequiredRef = useRef()
   const {setOnFailure} = useContext(AlertManagerContext)
 
   const isAnnouncement = ENV?.DISCUSSION_TOPIC?.ATTRIBUTES?.is_announcement ?? false
@@ -224,17 +225,25 @@ export default function DiscussionTopicForm({
 
   const [gradedDiscussionRefMap, setGradedDiscussionRefMap] = useState(new Map())
 
-  // Checkpoints - add initial states once checkpoint mutation has been edited
+  // Checkpoints states
   const [isCheckpoints, setIsCheckpoints] = useState(
-    !!currentDiscussionTopic?.assignment?.checkpoints || false
+    currentDiscussionTopic?.assignment?.hasSubAssignments || false
   )
-  const [pointsPossibleReplyToTopic, setPointsPossibleReplyToTopic] = useState(0)
-  const [pointsPossibleReplyToEntry, setPointsPossibleReplyToEntry] = useState(0)
-  const [replyToEntryRequiredCount, setReplyToEntryRequiredCount] = useState(1)
-
-  const setReplyToEntryRequiredRef = (ref) => {
-    replyToEntryRequiredRef.current = ref
+  const getCheckpointsPointsPossible = checkpointLabel => {
+    const checkpoint = currentDiscussionTopic?.assignment?.checkpoints?.find(
+      c => c.tag === checkpointLabel
+    )
+    return checkpoint ? checkpoint.pointsPossible : 0
   }
+  const [pointsPossibleReplyToTopic, setPointsPossibleReplyToTopic] = useState(
+    getCheckpointsPointsPossible(REPLY_TO_TOPIC)
+  )
+  const [pointsPossibleReplyToEntry, setPointsPossibleReplyToEntry] = useState(
+    getCheckpointsPointsPossible(REPLY_TO_ENTRY)
+  )
+  const [replyToEntryRequiredCount, setReplyToEntryRequiredCount] = useState(
+    currentDiscussionTopic?.replyToEntryRequiredCount || 1
+  )
 
   const assignmentDueDateContext = {
     assignedInfoList,
@@ -253,7 +262,6 @@ export default function DiscussionTopicForm({
     setPointsPossibleReplyToEntry,
     replyToEntryRequiredCount,
     setReplyToEntryRequiredCount,
-    setReplyToEntryRequiredRef,
     title,
     assignmentID: currentDiscussionTopic?.assignment?._id || null,
     importantDates: currentDiscussionTopic?.assignment?.importantDates || false,
@@ -362,7 +370,14 @@ export default function DiscussionTopicForm({
         peerReviewsPerStudent,
         peerReviewDueDate,
         intraGroupPeerReviews,
-        masteryPathsOption
+        masteryPathsOption,
+        isCheckpoints
+      ),
+      checkpoints: prepareCheckpointsPayload(
+        pointsPossibleReplyToTopic,
+        pointsPossibleReplyToEntry,
+        replyToEntryRequiredCount,
+        isCheckpoints
       ),
       groupCategoryId: isGroupDiscussion ? groupCategoryId : null,
       specificSections: shouldShowPostToSectionOption ? sectionIdsToPostTo.join() : 'all',
@@ -378,12 +393,18 @@ export default function DiscussionTopicForm({
 
     // Additional properties for editing mode
     if (isEditing) {
-      return {
+      const editingPayload = {
         ...payload,
         discussionTopicId: currentDiscussionTopic._id,
         published: shouldPublish,
         removeAttachment: !attachment?._id,
       }
+
+      if (currentDiscussionTopic?.assignment?.hasSubAssignments) {
+        editingPayload.setCheckpoints = isCheckpoints
+      }
+
+      return editingPayload
     }
 
     // Properties for creation mode
@@ -428,9 +449,6 @@ export default function DiscussionTopicForm({
         setAvailabilityValidationMessages,
         shouldShowPostToSectionOption,
         sectionIdsToPostTo,
-        isCheckpoints,
-        replyToEntryRequiredCount,
-        replyToEntryRequiredRef,
       )
     ) {
       const payload = createSubmitPayload(shouldPublish)

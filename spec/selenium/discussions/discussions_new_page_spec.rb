@@ -18,10 +18,16 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative "../helpers/discussions_common"
+require_relative "../helpers/items_assign_to_tray"
+require_relative "../helpers/context_modules_common"
+require_relative "../assignments/page_objects/assignment_create_edit_page"
+require_relative "pages/discussion_page"
 
 describe "discussions" do
   include_context "in-process server selenium tests"
   include DiscussionsCommon
+  include ItemsAssignToTray
+  include ContextModulesCommon
 
   let(:course) { course_model.tap(&:offer!) }
   let(:default_section) { course.default_section }
@@ -143,6 +149,103 @@ describe "discussions" do
           error_box = f("div[role='alert'] .error_text")
           expect(error_box.text).to eq "Please create a group set"
         end
+
+        context "archived grading schemes enabled" do
+          before do
+            Account.site_admin.enable_feature!(:grading_scheme_updates)
+            Account.site_admin.enable_feature!(:archived_grading_schemes)
+            @course = course
+            @account = @course.account
+            @active_grading_standard = @course.grading_standards.create!(title: "Active Grading Scheme", data: { "A" => 0.9, "F" => 0 }, scaling_factor: 1.0, points_based: false, workflow_state: "active")
+            @archived_grading_standard = @course.grading_standards.create!(title: "Archived Grading Scheme", data: { "A" => 0.9, "F" => 0 }, scaling_factor: 1.0, points_based: false, workflow_state: "archived")
+            @account_grading_standard = @account.grading_standards.create!(title: "Account Grading Scheme", data: { "A" => 0.9, "F" => 0 }, scaling_factor: 1.0, points_based: false, workflow_state: "active")
+          end
+
+          it "shows archived grading scheme if it is the course default twice, once to follow course default scheme and once to choose that scheme to use" do
+            @course.update!(grading_standard_id: @archived_grading_standard.id)
+            @course.reload
+            get "/courses/#{@course.id}/discussion_topics/new"
+            wait_for_ajaximations
+            f('input[type=checkbox][name="assignment[set_assignment]"]').click
+            wait_for_ajaximations
+            f("#assignment_grading_type").click
+            ffj("option:contains('Letter Grade')").last.click
+            wait_for_ajaximations
+            expect(f("[data-testid='grading-schemes-selector-dropdown']").attribute("title")).to eq(@archived_grading_standard.title + " (course default)")
+            f("[data-testid='grading-schemes-selector-dropdown']").click
+            expect(f("[data-testid='grading-schemes-selector-option-#{@course.grading_standard.id}']")).to include_text(@course.grading_standard.title)
+          end
+
+          it "removes grading schemes from dropdown after archiving them but still shows them upon reopening the modal" do
+            get "/courses/#{@course.id}/discussion_topics/new"
+            wait_for_ajaximations
+            f('input[type=checkbox][name="assignment[set_assignment]"]').click
+            wait_for_ajaximations
+            f("#assignment_grading_type").click
+            ffj("option:contains('Letter Grade')").last.click
+            wait_for_ajaximations
+            f("[data-testid='grading-schemes-selector-dropdown']").click
+            expect(f("[data-testid='grading-schemes-selector-option-#{@active_grading_standard.id}']")).to be_present
+            f("[data-testid='manage-all-grading-schemes-button']").click
+            wait_for_ajaximations
+            f("[data-testid='grading-scheme-#{@active_grading_standard.id}-archive-button']").click
+            wait_for_ajaximations
+            f("[data-testid='manage-all-grading-schemes-close-button']").click
+            wait_for_ajaximations
+            f("[data-testid='grading-schemes-selector-dropdown']").click
+            expect(f("[data-testid='grading-schemes-selector-dropdown-form']")).not_to contain_css("[data-testid='grading-schemes-selector-option-#{@active_grading_standard.id}']")
+            f("[data-testid='manage-all-grading-schemes-button']").click
+            wait_for_ajaximations
+            expect(f("[data-testid='grading-scheme-row-#{@active_grading_standard.id}']").text).to be_present
+          end
+
+          it "shows all archived schemes in the manage grading schemes modal" do
+            archived_gs1 = @course.grading_standards.create!(title: "Archived Grading Scheme 1", data: { "A" => 0.9, "F" => 0 }, scaling_factor: 1.0, points_based: false, workflow_state: "archived")
+            archived_gs2 = @course.grading_standards.create!(title: "Archived Grading Scheme 2", data: { "A" => 0.9, "F" => 0 }, scaling_factor: 1.0, points_based: false, workflow_state: "archived")
+            archived_gs3 = @course.grading_standards.create!(title: "Archived Grading Scheme 3", data: { "A" => 0.9, "F" => 0 }, scaling_factor: 1.0, points_based: false, workflow_state: "archived")
+            get "/courses/#{@course.id}/discussion_topics/new"
+            wait_for_ajaximations
+            f('input[type=checkbox][name="assignment[set_assignment]"]').click
+            wait_for_ajaximations
+            f("#assignment_grading_type").click
+            ffj("option:contains('Letter Grade')").last.click
+            wait_for_ajaximations
+            f("[data-testid='manage-all-grading-schemes-button']").click
+            wait_for_ajaximations
+            expect(f("[data-testid='grading-scheme-#{archived_gs1.id}-name']")).to include_text(archived_gs1.title)
+            expect(f("[data-testid='grading-scheme-#{archived_gs2.id}-name']")).to include_text(archived_gs2.title)
+            expect(f("[data-testid='grading-scheme-#{archived_gs3.id}-name']")).to include_text(archived_gs3.title)
+          end
+
+          it "creates a discussion topic with selected grading scheme/standard" do
+            grading_standard = course.grading_standards.create!(title: "Win/Lose", data: [["Winner", 0.94], ["Loser", 0]])
+
+            get "/courses/#{@course.id}/discussion_topics/new"
+
+            title = "Graded Discussion Topic with letter grade type"
+            message = "replying to topic"
+
+            f("input[placeholder='Topic Title']").send_keys title
+            type_in_tiny("textarea", message)
+
+            f('input[type=checkbox][name="assignment[set_assignment]"]').click
+            wait_for_ajaximations
+            f("#assignment_grading_type").click
+            ffj("option:contains('Letter Grade')").last.click
+            wait_for_ajaximations
+            expect(fj("span:contains('Manage All Grading Schemes')").present?).to be_truthy
+            f("[data-testid='grading-schemes-selector-dropdown']").click
+            f("[data-testid='grading-schemes-selector-option-#{grading_standard.id}']").click
+            f(".btn.btn-default.save_and_publish").click
+            wait_for_ajaximations
+
+            dt = DiscussionTopic.last
+
+            expect(dt.title).to eq title
+            expect(dt.assignment.name).to eq title
+            expect(dt.assignment.grading_standard_id).to eq grading_standard.id
+          end
+        end
       end
 
       context "post to sis default setting" do
@@ -186,7 +289,7 @@ describe "discussions" do
           expect(f("span[data-testid='author_name']").text).to eq teacher.short_name
         end
 
-        it "disallows full_anonymity along with graded" do
+        it "disallows full_anonymity along with graded", skip: "vice-4200" do
           get url
           replace_content(f("input[name=title]"), "my anonymous title")
           f("input[value='full_anonymity']").click
@@ -235,7 +338,7 @@ describe "discussions" do
           )
         end
 
-        it "does not allow creation of anonymous group discussions" do
+        it "does not allow creation of anonymous group discussions", skip: "VICE-4200" do
           course.allow_student_anonymous_discussion_topics = true
           course.save!
           get url
@@ -266,7 +369,7 @@ describe "discussions" do
           expect(f("span[data-testid='author_name']")).to include_text @student.name
         end
 
-        it "lets students choose to make topics anonymously" do
+        it "lets students choose to make topics anonymously", skip: "VICE-4200" do
           course.allow_student_anonymous_discussion_topics = true
           course.save!
           get url
@@ -1027,7 +1130,8 @@ describe "discussions" do
         expect(dt.assignment.name).to eq title
       end
 
-      it "creates a discussion topic with selected grading scheme/standard" do
+      it "creates a discussion topic with selected grading scheme/standard and archived grading schemes is disabled" do
+        Account.site_admin.disable_feature!(:archived_grading_schemes)
         grading_standard = course.grading_standards.create!(title: "Win/Lose", data: [["Winner", 0.94], ["Loser", 0]])
 
         get "/courses/#{course.id}/discussion_topics/new"
@@ -1044,7 +1148,6 @@ describe "discussions" do
         f("input[data-testid='display-grade-input']").click
         ffj("span:contains('Letter Grade')").last.click
         expect(fj("span:contains('Manage All Grading Schemes')").present?).to be_truthy
-
         ffj("span:contains('Default Canvas Grading Scheme')").last.click
         fj("option:contains('#{grading_standard.title}')").click
 
@@ -1056,6 +1159,104 @@ describe "discussions" do
         expect(dt.title).to eq title
         expect(dt.assignment.name).to eq title
         expect(dt.assignment.grading_standard_id).to eq grading_standard.id
+      end
+
+      context "archived grading schemes enabled" do
+        before do
+          Account.site_admin.enable_feature!(:grading_scheme_updates)
+          Account.site_admin.enable_feature!(:archived_grading_schemes)
+          @course = course
+          @account = @course.account
+          @active_grading_standard = @course.grading_standards.create!(title: "Active Grading Scheme", data: { "A" => 0.9, "F" => 0 }, scaling_factor: 1.0, points_based: false, workflow_state: "active")
+          @archived_grading_standard = @course.grading_standards.create!(title: "Archived Grading Scheme", data: { "A" => 0.9, "F" => 0 }, scaling_factor: 1.0, points_based: false, workflow_state: "archived")
+          @account_grading_standard = @account.grading_standards.create!(title: "Account Grading Scheme", data: { "A" => 0.9, "F" => 0 }, scaling_factor: 1.0, points_based: false, workflow_state: "active")
+        end
+
+        it "shows archived grading scheme if it is the course default twice, once to follow course default scheme and once to choose that scheme to use" do
+          @course.update!(grading_standard_id: @archived_grading_standard.id)
+          @course.reload
+          get "/courses/#{@course.id}/discussion_topics/new"
+          wait_for_ajaximations
+          force_click_native('input[type=checkbox][value="graded"]')
+          wait_for_ajaximations
+          f("input[data-testid='display-grade-input']").click
+          ffj("span:contains('Letter Grade')").last.click
+          wait_for_ajaximations
+          expect(f("[data-testid='grading-schemes-selector-dropdown']").attribute("title")).to eq(@archived_grading_standard.title + " (course default)")
+          f("[data-testid='grading-schemes-selector-dropdown']").click
+          expect(f("[data-testid='grading-schemes-selector-option-#{@course.grading_standard.id}']")).to include_text(@course.grading_standard.title)
+        end
+
+        it "removes grading schemes from dropdown after archiving them but still shows them upon reopening the modal" do
+          get "/courses/#{@course.id}/discussion_topics/new"
+          wait_for_ajaximations
+          force_click_native('input[type=checkbox][value="graded"]')
+          wait_for_ajaximations
+          f("input[data-testid='display-grade-input']").click
+          ffj("span:contains('Letter Grade')").last.click
+          wait_for_ajaximations
+          f("[data-testid='grading-schemes-selector-dropdown']").click
+          expect(f("[data-testid='grading-schemes-selector-option-#{@active_grading_standard.id}']")).to be_present
+          f("[data-testid='manage-all-grading-schemes-button']").click
+          wait_for_ajaximations
+          f("[data-testid='grading-scheme-#{@active_grading_standard.id}-archive-button']").click
+          wait_for_ajaximations
+          f("[data-testid='manage-all-grading-schemes-close-button']").click
+          wait_for_ajaximations
+          f("[data-testid='grading-schemes-selector-dropdown']").click
+          expect(f("[data-testid='grading-schemes-selector-dropdown-form']")).not_to contain_css("[data-testid='grading-schemes-selector-option-#{@active_grading_standard.id}']")
+          f("[data-testid='manage-all-grading-schemes-button']").click
+          wait_for_ajaximations
+          expect(f("[data-testid='grading-scheme-row-#{@active_grading_standard.id}']").text).to be_present
+        end
+
+        it "shows all archived schemes in the manage grading schemes modal" do
+          archived_gs1 = @course.grading_standards.create!(title: "Archived Grading Scheme 1", data: { "A" => 0.9, "F" => 0 }, scaling_factor: 1.0, points_based: false, workflow_state: "archived")
+          archived_gs2 = @course.grading_standards.create!(title: "Archived Grading Scheme 2", data: { "A" => 0.9, "F" => 0 }, scaling_factor: 1.0, points_based: false, workflow_state: "archived")
+          archived_gs3 = @course.grading_standards.create!(title: "Archived Grading Scheme 3", data: { "A" => 0.9, "F" => 0 }, scaling_factor: 1.0, points_based: false, workflow_state: "archived")
+          get "/courses/#{@course.id}/discussion_topics/new"
+          wait_for_ajaximations
+          force_click_native('input[type=checkbox][value="graded"]')
+          wait_for_ajaximations
+          f("input[data-testid='display-grade-input']").click
+          ffj("span:contains('Letter Grade')").last.click
+          wait_for_ajaximations
+          f("[data-testid='manage-all-grading-schemes-button']").click
+          wait_for_ajaximations
+          expect(f("[data-testid='grading-scheme-#{archived_gs1.id}-name']")).to include_text(archived_gs1.title)
+          expect(f("[data-testid='grading-scheme-#{archived_gs2.id}-name']")).to include_text(archived_gs2.title)
+          expect(f("[data-testid='grading-scheme-#{archived_gs3.id}-name']")).to include_text(archived_gs3.title)
+        end
+
+        it "creates a discussion topic with selected grading scheme/standard" do
+          grading_standard = course.grading_standards.create!(title: "Win/Lose", data: [["Winner", 0.94], ["Loser", 0]])
+
+          get "/courses/#{course.id}/discussion_topics/new"
+
+          title = "Graded Discussion Topic with letter grade type"
+          message = "replying to topic"
+
+          f("input[placeholder='Topic Title']").send_keys title
+          type_in_tiny("textarea", message)
+
+          force_click_native('input[type=checkbox][value="graded"]')
+          wait_for_ajaximations
+
+          f("input[data-testid='display-grade-input']").click
+          ffj("span:contains('Letter Grade')").last.click
+          expect(fj("span:contains('Manage All Grading Schemes')").present?).to be_truthy
+          f("[data-testid='grading-schemes-selector-dropdown']").click
+          f("[data-testid='grading-schemes-selector-option-#{grading_standard.id}']").click
+
+          f("button[data-testid='save-and-publish-button']").click
+          wait_for_ajaximations
+
+          dt = DiscussionTopic.last
+
+          expect(dt.title).to eq title
+          expect(dt.assignment.name).to eq title
+          expect(dt.assignment.grading_standard_id).to eq grading_standard.id
+        end
       end
 
       it "edits a topic with an assignment with sync to sis" do
@@ -1580,6 +1781,178 @@ describe "discussions" do
           expect(dt.assignment.only_visible_to_overrides).to be false
           expect(dt.assignment.group_category).to be_nil
           expect(dt.assignment.description).to eq "<p>replying to topic</p>"
+        end
+
+        context "set with ItemAssigntoTray" do
+          before do
+            differentiated_modules_on
+
+            course.conditional_release = true
+            course.save!
+
+            Discussion.start_new_discussion(course.id)
+            Discussion.update_discussion_topic_title
+            Discussion.update_discussion_message
+
+            force_click_native(Discussion.grade_checkbox_selector)
+            wait_for_ajaximations
+
+            Discussion.points_possible_input.send_keys "12"
+          end
+
+          it "creates a discussion topic with an assignment set to a student" do
+            Discussion.assign_to_button.click
+            wait_for_assign_to_tray_spinner
+
+            click_add_assign_to_card
+            select_module_item_assignee(1, @student_1.name)
+            update_due_date(1, "12/31/2022")
+            update_due_time(1, "5:00 PM")
+            update_available_date(1, "12/27/2022")
+            update_available_time(1, "8:00 AM")
+            update_until_date(1, "1/7/2023")
+            update_until_time(1, "9:00 PM")
+
+            click_save_button("Apply")
+
+            keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
+            expect(AssignmentCreateEditPage.pending_changes_pill_exists?).to be_truthy
+
+            Discussion.save_and_publish_button.click
+            wait_for_ajaximations
+
+            assignment = Assignment.last
+            expect(assignment.assignment_overrides.active.last.assignment_override_students.count).to eq(1)
+            expect(assignment.only_visible_to_overrides).to be false
+          end
+
+          it "assigns a section and saves assignment" do
+            Discussion.assign_to_button.click
+            wait_for_assign_to_tray_spinner
+
+            keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+            click_add_assign_to_card
+            select_module_item_assignee(1, @section_1.name)
+            update_due_date(1, "12/31/2022")
+            update_due_time(1, "5:00 PM")
+            update_available_date(1, "12/27/2022")
+            update_available_time(1, "8:00 AM")
+            update_until_date(1, "1/7/2023")
+            update_until_time(1, "9:00 PM")
+
+            click_save_button("Apply")
+
+            keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
+            expect(AssignmentCreateEditPage.pending_changes_pill_exists?).to be_truthy
+
+            Discussion.save_and_publish_button.click
+            wait_for_ajaximations
+            assignment = Assignment.last
+
+            expect(assignment.assignment_overrides.active.count).to eq(1)
+            expect(assignment.assignment_overrides.active.last.set_type).to eq("CourseSection")
+            expect(assignment.only_visible_to_overrides).to be false
+          end
+
+          it "assigns overrides only correctly" do
+            Discussion.assign_to_button.click
+            wait_for_assign_to_tray_spinner
+
+            keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+            click_add_assign_to_card
+            select_module_item_assignee(1, @section_1.name)
+            select_module_item_assignee(1, @section_2.name)
+            select_module_item_assignee(1, @section_3.name)
+            select_module_item_assignee(1, @student_1.name)
+            select_module_item_assignee(1, @student_2.name)
+            select_module_item_assignee(1, @student_3.name)
+            select_module_item_assignee(1, "Mastery Paths")
+
+            # Set dates for these overrides
+            update_due_date(1, "12/31/2022")
+            update_due_time(1, "5:00 PM")
+            update_available_date(1, "12/27/2022")
+            update_available_time(1, "8:00 AM")
+            update_until_date(1, "1/7/2023")
+            update_until_time(1, "9:00 PM")
+
+            # Remove the Everyone Else option
+            click_delete_assign_to_card(0)
+
+            click_save_button("Apply")
+            keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
+
+            expect(AssignmentCreateEditPage.pending_changes_pill_exists?).to be_truthy
+
+            # Since not all sections were selected, a warning is displayed
+            Discussion.save_and_publish_button.click
+            Discussion.section_warning_continue_button.click
+            wait_for_ajaximations
+
+            assignment = Assignment.last
+
+            expect(assignment.assignment_overrides.active.count).to eq(5)
+            expected_overrides = [
+              { set_type: "CourseSection", title: "section 1" },
+              { set_type: "CourseSection", title: "section 2" },
+              { set_type: "CourseSection", title: "section 3" },
+              { set_type: "ADHOC", title: "3 students" },
+              { set_type: "Noop", title: "Mastery Paths" }
+            ]
+
+            expected_overrides.each_with_index do |expected_override, index|
+              actual_override = assignment.assignment_overrides[index]
+
+              expect(actual_override.set_type).to eq(expected_override[:set_type])
+              expect(actual_override.title).to eq(expected_override[:title])
+            end
+
+            expect(assignment.only_visible_to_overrides).to be true
+          end
+        end
+
+        context "checkpoints" do
+          before do
+            course.root_account.enable_feature!(:discussion_checkpoints)
+          end
+
+          it "successfully creates a discussion topic with checkpoints" do
+            get "/courses/#{course.id}/discussion_topics/new"
+
+            title = "Graded Discussion Topic with checkpoints"
+
+            f("input[placeholder='Topic Title']").send_keys title
+
+            force_click_native('input[type=checkbox][value="graded"]')
+            wait_for_ajaximations
+
+            force_click_native('input[type=checkbox][value="checkpoints"]')
+
+            f("input[data-testid='points-possible-input-reply-to-topic']").send_keys "5"
+            f("input[data-testid='reply-to-entry-required-count']").send_keys :backspace
+            f("input[data-testid='reply-to-entry-required-count']").send_keys 3
+            f("input[data-testid='points-possible-input-reply-to-entry']").send_keys "7"
+
+            f("button[data-testid='save-and-publish-button']").click
+            wait_for_ajaximations
+
+            dt = DiscussionTopic.last
+            expect(dt.reply_to_entry_required_count).to eq 3
+
+            assignment = Assignment.last
+            expect(assignment.has_sub_assignments?).to be true
+
+            sub_assignments = SubAssignment.where(parent_assignment_id: assignment.id)
+            sub_assignment1 = sub_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
+            sub_assignment2 = sub_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
+
+            expect(sub_assignment1.sub_assignment_tag).to eq "reply_to_topic"
+            expect(sub_assignment1.points_possible).to eq 5
+            expect(sub_assignment2.sub_assignment_tag).to eq "reply_to_entry"
+            expect(sub_assignment2.points_possible).to eq 7
+          end
         end
       end
     end

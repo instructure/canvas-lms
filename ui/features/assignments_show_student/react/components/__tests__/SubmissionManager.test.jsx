@@ -281,7 +281,6 @@ describe('SubmissionManager', () => {
               activeSubmissionType: 'online_url',
               meetsUrlCriteria: true,
               url: 'http://localhost',
-              type: 'online_url',
             },
           },
         })

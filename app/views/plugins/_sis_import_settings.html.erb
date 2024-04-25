@@ -16,11 +16,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<%= fields_for :settings, OpenObject.new(settings) do |f| %>
+<%= fields_for :settings do |f| %>
   <table style="width: 500px;" class="formtable">
     <tr>
       <td><%= f.blabel :parallelism, :en => "Number of job processors to use to process SIS imports in parallel" %></td>
-      <td><%= f.text_field :parallelism %></td>
+      <td><%= f.text_field :parallelism, value: settings[:parallelism] %></td>
     </tr>
   </table>
 <% end %>

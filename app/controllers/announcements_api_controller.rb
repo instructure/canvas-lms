@@ -97,7 +97,8 @@ class AnnouncementsApiController < ApplicationController
                 scope.where.not(workflow_state: "deleted")
               else
                 # workflow state should be 'post_delayed' if delayed_post_at is in the future, but check because other endpoints do
-                scope.where(workflow_state: "active").where("delayed_post_at IS NULL OR delayed_post_at<?", Time.now.utc)
+                scope.where(workflow_state: "active")
+                     .where("(unlock_at IS NULL AND delayed_post_at IS NULL) OR (unlock_at<? OR delayed_post_at<?)", Time.now.utc, Time.now.utc)
               end
 
       @start_date ||= 14.days.ago.beginning_of_day

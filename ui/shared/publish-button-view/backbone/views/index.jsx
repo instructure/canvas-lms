@@ -113,6 +113,9 @@ export default (function (superClass) {
   }
 
   PublishButton.prototype.handleMouseLeave = function () {
+    if (this.isDelayedPublish()) {
+      return
+    }
     this.keepState = false
     if (!(this.isPublish() || this.isDisabled())) {
       this.renderPublished()

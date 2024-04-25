@@ -3581,6 +3581,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         !!(submissionState != null ? submissionState.locked : undefined) || student.isConcluded
       ),
       gradingScheme: this.getAssignmentGradingScheme(assignmentId)?.data || null,
+      pointsBasedGradingScheme: this.getAssignmentGradingScheme(assignmentId)?.pointsBased || false,
       isFirstAssignment,
       isInOtherGradingPeriod: !!(submissionState != null
         ? submissionState.inOtherGradingPeriod

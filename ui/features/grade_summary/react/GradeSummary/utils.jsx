@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import DateHelper from '@canvas/datetime/dateHelper'
 import {ASSIGNMENT_SORT_OPTIONS, ASSIGNMENT_NOT_APPLICABLE, ASSIGNMENT_STATUS} from './constants'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import {IconCheckLine, IconXLine} from '@instructure/ui-icons'
@@ -140,7 +141,7 @@ export const getAssignmentStatus = assignment => {
   const {submissionsConnection, dropped, gradingType, dueAt} = assignment || {}
 
   const latestSubmission = submissionsConnection?.nodes?.[0]
-  const {gradingStatus, late, customGradeStatus, state} = latestSubmission || {}
+  const {gradingStatus, late, customGradeStatus, state, submittedAt} = latestSubmission || {}
 
   let status = null
 
@@ -160,6 +161,8 @@ export const getAssignmentStatus = assignment => {
     }
   } else if (gradingStatus === 'graded') {
     status = ASSIGNMENT_STATUS.GRADED
+  } else if (state === 'submitted') {
+    status = {id: 'submitted', label: submittedAt}
   } else {
     status = ASSIGNMENT_STATUS.NOT_SUBMITTED
   }
@@ -183,6 +186,11 @@ export const getAssignmentNoSubmissionStatus = dueDate => {
 
 export const getDisplayStatus = assignment => {
   const status = getAssignmentStatus(assignment)
+
+  if (status.id === 'submitted') {
+    return DateHelper.formatDatetimeForDisplay(status.label)
+  }
+
   return <Pill color={status.color}>{status.label}</Pill>
 }
 

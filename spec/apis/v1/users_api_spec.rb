@@ -1548,6 +1548,14 @@ describe "Users API", type: :request do
         users = User.where(name: "Test User").to_a
         expect(users.length).to be 1
         user = users.first
+
+        # setup communication channel
+        communication_channel = user.communication_channels.email.first
+        expect(communication_channel).not_to be_nil
+        # create presenter with a mock request
+        request = instance_double("ActionDispatch::Request", host_with_port: "example.com")
+        presenter = CommunicationChannelPresenter.new(communication_channel, request)
+
         expect(user.name).to eql "Test User"
         expect(user.short_name).to eql "Test"
         expect(user.sortable_name).to eql "User, T."
@@ -1559,20 +1567,21 @@ describe "Users API", type: :request do
         expect(pseudonym.unique_id).to eql "test@example.com"
         expect(pseudonym.sis_user_id).to eql "12345"
 
-        expect(JSON.parse(response.body)).to eq({
-                                                  "name" => "Test User",
-                                                  "short_name" => "Test",
-                                                  "sortable_name" => "User, T.",
-                                                  "id" => user.id,
-                                                  "created_at" => user.created_at.iso8601,
-                                                  "sis_user_id" => "12345",
-                                                  "sis_import_id" => user.pseudonym.sis_batch_id,
-                                                  "login_id" => "test@example.com",
-                                                  "integration_id" => nil,
-                                                  "locale" => "en",
-                                                  "confirmation_url" => user.communication_channels.email.first.confirmation_url,
-                                                  "uuid" => user.uuid
-                                                })
+        expected_response = {
+          "name" => "Test User",
+          "short_name" => "Test",
+          "sortable_name" => "User, T.",
+          "id" => user.id,
+          "created_at" => user.created_at.iso8601,
+          "sis_user_id" => "12345",
+          "sis_import_id" => user.pseudonym.sis_batch_id,
+          "login_id" => "test@example.com",
+          "integration_id" => nil,
+          "locale" => "en",
+          "confirmation_url" => presenter.confirmation_url,
+          "uuid" => user.uuid
+        }
+        expect(JSON.parse(response.body)).to eq(expected_response)
       end
 
       it "accepts a valid destination param" do

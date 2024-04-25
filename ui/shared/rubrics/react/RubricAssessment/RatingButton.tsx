@@ -25,19 +25,23 @@ import {Text} from '@instructure/ui-text'
 
 const I18n = useI18nScope('rubrics-assessment-tray')
 
-const {shamrock, licorice} = colors
+const {licorice, tiara} = colors
 type RatingButtonProps = {
   buttonDisplay: string
+  isPeerReview: boolean
   isSelected: boolean
   selectedArrowDirection: 'up' | 'right'
   onClick: () => void
 }
 export const RatingButton = ({
   buttonDisplay,
+  isPeerReview,
   isSelected,
   selectedArrowDirection,
   onClick,
 }: RatingButtonProps) => {
+  const unselectedColor = isPeerReview ? tiara : licorice
+
   return (
     <View
       as="div"
@@ -53,11 +57,13 @@ export const RatingButton = ({
           size="large"
           color="primary-inverse"
           onClick={onClick}
+          readOnly={isPeerReview}
+          cursor={isPeerReview ? 'not-allowed' : 'pointer'}
           themeOverride={{
             largeFontSize: '1rem',
             borderWidth: isSelected ? '3px' : '1px',
-            primaryInverseBorderColor: isSelected ? shamrock : 'rgb(219, 219, 219)',
-            primaryInverseColor: isSelected ? shamrock : licorice,
+            primaryInverseBorderColor: isSelected ? licorice : 'rgb(219, 219, 219)',
+            primaryInverseColor: isSelected ? licorice : unselectedColor,
           }}
         >
           <Text size="medium">{buttonDisplay}</Text>
@@ -89,7 +95,7 @@ const SelectedRatingArrow = ({direction}: SelectedRatingArrowProps) => {
     outerTriangleStyle.right = '0px'
     outerTriangleStyle.borderTop = '6px solid transparent'
     outerTriangleStyle.borderBottom = '6px solid transparent'
-    outerTriangleStyle.borderLeft = `6px solid ${shamrock}`
+    outerTriangleStyle.borderLeft = `6px solid ${licorice}`
     outerTriangleStyle.transform = 'translateY(-50%)'
     innerTriangleSmallStyle.top = '50%'
     innerTriangleSmallStyle.right = '4px'
@@ -102,7 +108,7 @@ const SelectedRatingArrow = ({direction}: SelectedRatingArrowProps) => {
     outerTriangleStyle.top = '-5px'
     outerTriangleStyle.borderLeft = '6px solid transparent'
     outerTriangleStyle.borderRight = '6px solid transparent'
-    outerTriangleStyle.borderBottom = `6px solid ${shamrock}`
+    outerTriangleStyle.borderBottom = `6px solid ${licorice}`
     outerTriangleStyle.transform = 'translateX(-50%)'
     innerTriangleSmallStyle.left = '46%'
     innerTriangleSmallStyle.top = '-1px'

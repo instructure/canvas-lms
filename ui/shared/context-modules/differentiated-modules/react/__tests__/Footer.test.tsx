@@ -23,7 +23,6 @@ import Footer, {type FooterProps} from '../Footer'
 describe('Footer', () => {
   const props: FooterProps = {
     saveButtonLabel: 'Save',
-    updateInteraction: 'enabled',
     onDismiss: jest.fn(),
     onUpdate: jest.fn(),
   }

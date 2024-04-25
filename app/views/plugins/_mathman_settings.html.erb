@@ -16,19 +16,19 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<%= fields_for :settings, OpenObject.new(settings) do |f| %>
+<%= fields_for :settings do |f| %>
     <table style="width: 500px;" class="formtable">
       <tr>
         <td>
           <%= f.blabel :use_for_svg, t('Use MathMan to convert LaTeX to SVG?') %>
         </td>
-        <td><%= f.check_box :use_for_svg %></td>
+        <td><%= f.check_box :use_for_svg, checked: Canvas::Plugin.value_to_boolean(settings[:use_for_svg]) %></td>
       </tr>
       <tr>
         <td>
           <%= f.blabel :use_for_mml, t('Use MathMan to convert LaTeX to MathML?') %>
         </td>
-        <td><%= f.check_box :use_for_mml %></td>
+        <td><%= f.check_box :use_for_mml, checked: Canvas::Plugin.value_to_boolean(settings[:use_for_mml]) %></td>
       </tr>
     </table>
 <% end %>

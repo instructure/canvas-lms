@@ -145,6 +145,7 @@ class Submission < ActiveRecord::Base
 
   belongs_to :quiz_submission, class_name: "Quizzes::QuizSubmission"
   has_many :all_submission_comments, -> { order(:created_at) }, class_name: "SubmissionComment", dependent: :destroy
+  has_many :group_memberships, through: :assignment
   has_many :submission_comments, -> { order(:created_at).where(provisional_grade_id: nil) }
   has_many :visible_submission_comments,
            -> { published.visible.for_final_grade.order(:created_at, :id) },
@@ -2459,9 +2460,11 @@ class Submission < ActiveRecord::Base
   end
 
   def broadcast_group_submission
-    @group_broadcast_submission = true
-    save!
-    @group_broadcast_submission = false
+    Submission.unique_constraint_retry do
+      @group_broadcast_submission = true
+      save!
+      @group_broadcast_submission = false
+    end
   end
 
   # in a module so they can be included in other Submission-like objects. the
@@ -3043,8 +3046,15 @@ class Submission < ActiveRecord::Base
 
   def word_count
     if body && submission_type != "online_quiz"
-      tinymce_wordcount_count_regex = /[\w\u2019\x27\-\u00C0-\u1FFF]+/
-      ActionController::Base.helpers.strip_tags(body).scan(tinymce_wordcount_count_regex).size
+      segments = body.split(%r{<br\s*/?>})
+      word_count = 0
+      segments.each do |segment|
+        tinymce_wordcount_count_regex = /(?:[\w\u2019\x27\-\u00C0-\u1FFF]+|(?<=<br>)([^<]+)|([^<]+)(?=<br>))/
+        words = ActionController::Base.helpers.strip_tags(segment).scan(tinymce_wordcount_count_regex).size
+        word_count += words
+      end
+
+      word_count
     elsif versioned_attachments.present?
       Attachment.where(id: versioned_attachments.pluck(:id)).sum(:word_count)
     end

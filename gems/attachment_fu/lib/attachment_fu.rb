@@ -426,14 +426,14 @@ module AttachmentFu # :nodoc:
     def detect_mimetype(file_data)
       if file_data.respond_to?(:content_type) && (file_data.content_type.blank? || file_data.content_type.strip == "application/octet-stream")
         res = nil
-        res ||= File.mime_type?(file_data.original_filename) if file_data.respond_to?(:original_filename)
-        res ||= File.mime_type?(file_data)
+        res ||= File.mime_type(file_data.original_filename) if file_data.respond_to?(:original_filename)
+        res ||= File.mime_type(file_data)
         res ||= "text/plain" unless file_data.respond_to?(:path)
         res || "unknown/unknown"
       elsif file_data.respond_to?(:content_type)
         file_data.content_type
       else
-        File.mime_type?(file_data)
+        File.mime_type(file_data)
       end
     end
 

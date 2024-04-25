@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {mount} from 'enzyme'
+import {render, screen} from '@testing-library/react'
 import get from 'lodash/get'
 
 import AdditionalSettings from '../AdditionalSettings'
@@ -42,8 +42,9 @@ const props = (overrides = {}, additionalSettingsOverrides = {}, settingsOverrid
 }
 
 it('generates the toolConfiguration', () => {
-  const wrapper = mount(<AdditionalSettings {...props()} />)
-  const toolConfig = wrapper.instance().generateToolConfigurationPart()
+  const ref = React.createRef()
+  render(<AdditionalSettings {...props()} ref={ref} />)
+  const toolConfig = ref.current.generateToolConfigurationPart()
   expect(toolConfig.extensions.length).toEqual(1)
   const ext = toolConfig.extensions[0]
   expect(ext.domain).toEqual('www.example.com')
@@ -56,10 +57,11 @@ const checkToolConfigPart = (toolConfig, path, value) => {
 
 const checkChange = (path, funcName, in_value, out_value) => {
   out_value = out_value || in_value
-  const wrapper = mount(<AdditionalSettings {...props()} />)
+  const ref = React.createRef()
+  render(<AdditionalSettings {...props()} ref={ref} />)
 
-  wrapper.instance()[funcName]({target: {value: in_value}})
-  checkToolConfigPart(wrapper.instance().generateToolConfigurationPart(), path, out_value)
+  ref.current[funcName]({target: {value: in_value}})
+  checkToolConfigPart(ref.current.generateToolConfigurationPart(), path, out_value)
 }
 
 it('changes the output when domain changes', () => {

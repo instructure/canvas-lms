@@ -28,6 +28,7 @@ function formatGrade(
   submission,
   assignment,
   gradingScheme,
+  pointsBasedGradingScheme,
   enterGradesAs,
   pendingGradeInfo: PendingGradeInfo
 ) {
@@ -39,6 +40,7 @@ function formatGrade(
     defaultValue: '',
     formatType: enterGradesAs,
     gradingScheme,
+    pointsBasedGradingScheme,
     pointsPossible: assignment.pointsPossible,
     version: 'entered',
   }
@@ -50,6 +52,7 @@ function getGradeInfo(value, props) {
   return parseTextValue(value, {
     enterGradesAs: props.enterGradesAs,
     gradingScheme: props.gradingScheme,
+    pointsBasedGradingScheme: props.pointsBasedGradingScheme,
     pointsPossible: props.assignment.pointsPossible,
   })
 }
@@ -61,6 +64,7 @@ type Props = {
   disabled: boolean
   enterGradesAs: 'gradingScheme' | 'passFail' | 'percent' | 'points'
   gradingScheme: DeprecatedGradingScheme[]
+  pointsBasedGradingScheme: boolean
   label: React.ReactElement
   messages: Array<{
     text: string
@@ -102,11 +106,19 @@ export default class TextGradeInput extends Component<Props, State> {
     this.handleKeyDown = this.handleKeyDown.bind(this)
     this.handleTextChange = this.handleTextChange.bind(this)
 
-    const {assignment, enterGradesAs, gradingScheme, pendingGradeInfo, submission} = props
+    const {
+      assignment,
+      enterGradesAs,
+      gradingScheme,
+      pointsBasedGradingScheme,
+      pendingGradeInfo,
+      submission,
+    } = props
     const value = formatGrade(
       submission,
       assignment,
       gradingScheme,
+      pointsBasedGradingScheme,
       enterGradesAs,
       pendingGradeInfo
     )
@@ -119,10 +131,24 @@ export default class TextGradeInput extends Component<Props, State> {
 
   UNSAFE_componentWillReceiveProps(nextProps: Props) {
     if (!this.isFocused()) {
-      const {assignment, enterGradesAs, gradingScheme, pendingGradeInfo, submission} = nextProps
+      const {
+        assignment,
+        enterGradesAs,
+        gradingScheme,
+        pointsBasedGradingScheme,
+        pendingGradeInfo,
+        submission,
+      } = nextProps
 
       this.setState({
-        grade: formatGrade(submission, assignment, gradingScheme, enterGradesAs, pendingGradeInfo),
+        grade: formatGrade(
+          submission,
+          assignment,
+          gradingScheme,
+          pointsBasedGradingScheme,
+          enterGradesAs,
+          pendingGradeInfo
+        ),
       })
     }
   }
@@ -149,8 +175,15 @@ export default class TextGradeInput extends Component<Props, State> {
       return this.state.grade.trim() !== this.props.pendingGradeInfo.grade
     }
 
-    const {assignment, enterGradesAs, gradingScheme, submission} = this.props
-    const formattedGrade = formatGrade(submission, assignment, gradingScheme, enterGradesAs)
+    const {assignment, enterGradesAs, gradingScheme, pointsBasedGradingScheme, submission} =
+      this.props
+    const formattedGrade = formatGrade(
+      submission,
+      assignment,
+      gradingScheme,
+      pointsBasedGradingScheme,
+      enterGradesAs
+    )
 
     if (formattedGrade === this.state.grade.trim()) {
       return false

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {arrayOf, bool, shape, string} from 'prop-types'
+import {arrayOf, bool, shape, string, number} from 'prop-types'
 import {Section} from './Section'
 import gql from 'graphql-tag'
 import {Attachment} from './Attachment'
@@ -44,6 +44,7 @@ export const DiscussionTopic = {
       locked
       published
       canGroup
+      replyToEntryRequiredCount
       courseSections {
         ...Section
       }
@@ -80,6 +81,7 @@ export const DiscussionTopic = {
     delayedPostAt: string,
     lockAt: string,
     published: bool,
+    replyToEntryRequiredCount: number,
     courseSections: arrayOf(Section.shape),
     groupSet: GroupSet.shape,
     attachment: Attachment.shape,
@@ -104,6 +106,7 @@ export const DiscussionTopic = {
     delayedPostAt = null,
     lockAt = null,
     published = true,
+    replyToEntryRequiredCount = 1,
     courseSections = [Section.mock()],
     groupSet = GroupSet.mock(),
     attachment = Attachment.mock(),
@@ -126,6 +129,7 @@ export const DiscussionTopic = {
     delayedPostAt,
     lockAt,
     published,
+    replyToEntryRequiredCount,
     courseSections,
     groupSet,
     attachment,

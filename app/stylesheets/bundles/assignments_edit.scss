@@ -180,6 +180,10 @@ div.form-column-right, div.overrides-column-right {
   @include readonly-input;
 }
 
+#grading-schemes-selector-dropdown {
+  font-weight: normal !important;
+}
+
 /* support for master class locked input fields */
 #edit_assignment_form, #discussion-edit-view {
    h1.title {

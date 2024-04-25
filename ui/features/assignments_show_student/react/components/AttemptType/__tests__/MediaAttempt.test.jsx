@@ -40,7 +40,7 @@ const submissionDraftOverrides = {
   Submission: {
     submissionDraft: {
       activeSubmissionType: 'media_recording',
-      attachments: () => [],
+      attachments: [],
       body: null,
       meetsMediaRecordingCriteria: true,
       mediaObject: {
@@ -171,20 +171,17 @@ describe('MediaAttempt', () => {
               {
                 _id: 3,
                 locale: 'fr',
-                type: 'captions',
-                language: 'fr',
+                kind: 'captions',
               },
               {
                 _id: 1,
                 locale: 'en',
-                type: 'captions',
-                language: 'en',
+                kind: 'captions',
               },
               {
                 _id: 2,
                 locale: 'es',
-                type: 'captions',
-                language: 'es',
+                kind: 'captions',
               },
             ],
           },

@@ -476,13 +476,20 @@ describe "Common Cartridge exporting" do
     end
 
     it "includes media objects" do
-      skip "PHO-360 (9/17/2020)"
-
       @q1 = @course.quizzes.create(title: "quiz1")
+      folder = Folder.create!(name: "hidden", context: @course, hidden: true, parent_folder: Folder.root_folders(@course).first)
+      att = Attachment.create!(context: @course, folder:, media_entry_id: "some-kaltura-id", display_name: "test.mp4", filename: "test.mp4", uploaded_data: StringIO.new("media"))
       @media_object = @course.media_objects.create!(
         media_id: "some-kaltura-id",
-        media_type: "video"
+        media_type: "video",
+        attachment: att
       )
+
+      question_text = <<~HTML
+        <p><iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="/media_attachments_iframe/#{att.id}?embedded=true&type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="some-kaltura-id"></iframe></p>
+        <p><iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="/media_objects_iframe/some-kaltura-id?embedded=true&type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="some-kaltura-id"></iframe></p>
+        <p><a id="media_comment_some-kaltura-id" class="instructure_inline_media_comment video_comment" href="/media_objects/some-kaltura-id"></a></p>
+      HTML
 
       qq = @q1.quiz_questions.create!
       data = {
@@ -495,7 +502,7 @@ describe "Common Cartridge exporting" do
         question_name: "test fun",
         name: "test fun",
         points_possible: 1,
-        question_text: "<p><a id=\"media_comment_some-kaltura-id\" class=\"instructure_inline_media_comment video_comment\" href=\"/media_objects/some-kaltura-id\"></a></p>",
+        question_text:,
         answers: [{
           migration_id: "QUE_1016_A1", text: "True", weight: 100, id: 8080
         },
@@ -528,9 +535,14 @@ describe "Common Cartridge exporting" do
       check_resource_node(@q1, CC::CCHelper::QTI_ASSESSMENT_TYPE)
 
       doc = Nokogiri::XML.parse(@zip_file.read("#{mig_id(@q1)}/#{mig_id(@q1)}.xml"))
-      expect(doc.at_css("presentation material mattext").text).to eq "<div><p><a id=\"media_comment_some-kaltura-id\" class=\"instructure_inline_media_comment video_comment\" href=\"$IMS-CC-FILEBASE$/media_objects/some-kaltura-id\"></a></p></div>"
+      export_html = <<~HTML.strip
+        <div><p><video style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="some-kaltura-id"><source src="$IMS-CC-FILEBASE$/hidden/test.mp4?canvas_=1&amp;canvas_qs_embedded=true&amp;canvas_qs_type=video" data-media-id="some-kaltura-id" data-media-type="video"></video></p>
+        <p><video style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="some-kaltura-id"><source src="$IMS-CC-FILEBASE$/media_objects/some-kaltura-id" data-media-id="some-kaltura-id" data-media-type="video"></video></p>
+        <p><a id="media_comment_some-kaltura-id" class="instructure_inline_media_comment video_comment" href="$IMS-CC-FILEBASE$/media_objects/some-kaltura-id"></a></p></div>
+      HTML
+      expect(doc.at_css("presentation material mattext").text).to match_ignoring_whitespace export_html
 
-      resource_node = @manifest_doc.at_css("resource[identifier=#{mig_id(@media_object)}]")
+      resource_node = @manifest_doc.at_css("resource[identifier=#{mig_id(att)}]")
       expect(resource_node).to_not be_nil
       path = resource_node["href"]
       expect(@zip_file.find_entry(path)).not_to be_nil
@@ -1261,6 +1273,89 @@ describe "Common Cartridge exporting" do
         check_resource_node(@visible, CC::CCHelper::WEBCONTENT)
         check_resource_node(@hidden, CC::CCHelper::WEBCONTENT, false)
         check_resource_node(@locked, CC::CCHelper::WEBCONTENT, false)
+      end
+    end
+
+    describe "New Quizzes Common Cartridge" do
+      context "with new_quizzes_common_cartridge feature flag disabled" do
+        before do
+          @course.enable_feature!(:quizzes_next)
+          assignment_model(submission_types: "external_tool", course: @course)
+          tool = @c.context_external_tools.create!(
+            name: "Quizzes.Next",
+            consumer_key: "test_key",
+            shared_secret: "test_secret",
+            tool_id: "Quizzes 2",
+            url: "http://example.com/launch"
+          )
+          @a.external_tool_tag_attributes = { content: tool }
+          @a.save!
+
+          @course.root_account.settings[:provision] = { "lti" => "lti url" }
+          @course.root_account.save!
+          assignment = @course.assignments.last
+          assignment.title = "NewQuizzes"
+          assignment.save!
+
+          @ce.export_type = ContentExport::COMMON_CARTRIDGE
+          @ce.save!
+        end
+
+        it "should include the assignments settings and description html" do
+          run_export
+
+          assignment_id = @manifest_doc.at_css("resource[href*='newquizzes.html']").attr("href").chomp("/newquizzes.html")
+
+          doc = Nokogiri::XML.parse(@zip_file.read("#{assignment_id}/assignment_settings.xml"))
+          expect(doc).to_not be_nil
+        end
+      end
+
+      context "with new_quizzes_common_cartridge feature flag enabled" do
+        before do
+          Account.site_admin.enable_feature!(:new_quizzes_common_cartridge)
+
+          @course.enable_feature!(:quizzes_next)
+          assignment_model(submission_types: "external_tool", course: @course)
+          tool = @c.context_external_tools.create!(
+            name: "Quizzes.Next",
+            consumer_key: "test_key",
+            shared_secret: "test_secret",
+            tool_id: "Quizzes 2",
+            url: "http://example.com/launch"
+          )
+          @a.external_tool_tag_attributes = { content: tool }
+          @a.save!
+
+          @course.root_account.settings[:provision] = { "lti" => "lti url" }
+          @course.root_account.save!
+          assignment = @course.assignments.last
+          assignment.title = "NewQuizzes"
+          assignment.save!
+        end
+
+        it "should not include the assignments settings and description html" do
+          @ce.export_type = ContentExport::COMMON_CARTRIDGE
+          @ce.save!
+          run_export
+
+          assignment_id = @manifest_doc.at_css("resource[href*='newquizzes.html']")&.attr("href")&.chomp("/newquizzes.html")
+
+          expect(assignment_id).to be_nil
+        end
+
+        context "ContentExport::COURSE_COPY" do
+          it "should include the assignments settings and description html" do
+            @ce.export_type = ContentExport::COURSE_COPY
+            @ce.save!
+            run_export
+
+            assignment_id = @manifest_doc.at_css("resource[href*='newquizzes.html']").attr("href").chomp("/newquizzes.html")
+
+            doc = Nokogiri::XML.parse(@zip_file.read("#{assignment_id}/assignment_settings.xml"))
+            expect(doc).to_not be_nil
+          end
+        end
       end
     end
   end

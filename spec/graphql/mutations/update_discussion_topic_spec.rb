@@ -67,6 +67,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
             _id
             published
             locked
+            replyToEntryRequiredCount
             assignment {
               _id
               pointsPossible
@@ -93,6 +94,13 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
                   unlockAt
                   updatedAt
                 }
+              }
+              checkpoints {
+                dueAt
+                name
+                onlyVisibleToOverrides
+                pointsPossible
+                tag
               }
             }
           }
@@ -526,6 +534,27 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
       )
     end
 
+    it "successfully updates a discussion topic with checkpoints" do
+      result = run_mutation(id: @graded_topic.id, assignment: { forCheckpoints: true }, checkpoints: [
+                              { checkpointLabel: CheckpointLabels::REPLY_TO_TOPIC, dates: [{ type: "everyone", dueAt: @due_at1.iso8601 }], pointsPossible: 6 },
+                              { checkpointLabel: CheckpointLabels::REPLY_TO_ENTRY, dates: [{ type: "everyone", dueAt: @due_at2.iso8601 }], pointsPossible: 8, repliesRequired: 5 }
+                            ])
+
+      discussion_topic = result.dig("data", "updateDiscussionTopic", "discussionTopic")
+
+      reply_to_topic_checkpoint = discussion_topic["assignment"]["checkpoints"].find { |checkpoint| checkpoint["tag"] == CheckpointLabels::REPLY_TO_TOPIC }
+      reply_to_entry_checkpoint = discussion_topic["assignment"]["checkpoints"].find { |checkpoint| checkpoint["tag"] == CheckpointLabels::REPLY_TO_ENTRY }
+
+      aggregate_failures do
+        expect(result["errors"]).to be_nil
+        expect(reply_to_topic_checkpoint).to be_truthy
+        expect(reply_to_entry_checkpoint).to be_truthy
+        expect(reply_to_topic_checkpoint["pointsPossible"]).to eq 6
+        expect(reply_to_entry_checkpoint["pointsPossible"]).to eq 8
+        expect(discussion_topic["replyToEntryRequiredCount"]).to eq 5
+      end
+    end
+
     it "updates the reply to topic checkpoint due at date" do
       new_due_at = 3.days.from_now
       result = run_mutation(id: @graded_topic.id, assignment: { forCheckpoints: true }, checkpoints: [
@@ -608,6 +637,40 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
       active_checkpoints = assignment.sub_assignments.active
 
       expect(active_checkpoints.count).to eq(0)
+    end
+
+    it "can edit a non-checkpointed discussion to a checkpointed discussion" do
+      @discussion_assignment = @course.assignments.create!(
+        title: "Graded Topic 1",
+        submission_types: "discussion_topic",
+        post_to_sis: false,
+        grading_type: "points",
+        points_possible: 5,
+        due_at: 3.months.from_now,
+        peer_reviews: false
+      )
+
+      @non_checkpoint_topic = @discussion_assignment.discussion_topic
+
+      run_mutation(id: @non_checkpoint_topic.id, assignment: { forCheckpoints: true }, checkpoints: [
+                     { checkpointLabel: CheckpointLabels::REPLY_TO_TOPIC, dates: [{ type: "everyone", dueAt: @due_at1.iso8601 }], pointsPossible: 6 },
+                     { checkpointLabel: CheckpointLabels::REPLY_TO_ENTRY, dates: [{ type: "everyone", dueAt: @due_at2.iso8601 }], pointsPossible: 8, repliesRequired: 5 }
+                   ])
+
+      assignment = Assignment.last
+
+      expect(assignment.has_sub_assignments?).to be true
+      expect(DiscussionTopic.last.reply_to_entry_required_count).to eq 5
+
+      sub_assignments = SubAssignment.where(parent_assignment_id: assignment.id)
+      sub_assignment1 = sub_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
+      sub_assignment2 = sub_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
+
+      expect(sub_assignment1.sub_assignment_tag).to eq "reply_to_topic"
+      expect(sub_assignment1.points_possible).to eq 6
+      expect(sub_assignment2.sub_assignment_tag).to eq "reply_to_entry"
+      expect(sub_assignment2.points_possible).to eq 8
+      expect(assignment.points_possible).to eq 14
     end
   end
 end

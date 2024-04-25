@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<%= fields_for :settings, OpenObject.new(settings) do |f| %>
+<%= fields_for :settings do |f| %>
   <table style="width: 500px;" class="formtable">
     <tr>
       <td colspan="2"><%= mt(:description, <<~TEXT, :diigo_url => 'https://www.diigo.com/api_keys/new/')
@@ -29,7 +29,7 @@ TEXT
     <tr>
       <td><%= f.blabel :api_key, :en => "API Key" %></td>
       <td>
-        <%= f.text_field :api_key %>
+        <%= f.text_field :api_key, value: settings[:api_key] %>
       </td>
     </tr>
   </table>

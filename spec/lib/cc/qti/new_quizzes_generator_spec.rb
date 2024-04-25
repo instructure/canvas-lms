@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 describe CC::Qti::NewQuizzesGenerator do
-  subject { CC::Qti::NewQuizzesGenerator.new(manifest) }
-
   before do
     @copy_from = course_model
     @from_teacher = @user
@@ -31,61 +29,75 @@ describe CC::Qti::NewQuizzesGenerator do
       Rails.root.join("spec/lib/cc/qti/fixtures/nq_common_cartridge_export.zip").to_s
     @exporter = CC::CCExporter.new(@content_export, course: @copy_from, user: @from_teacher)
     @exporter.send(:create_export_dir)
+    @manifest = CC::Manifest.new(@exporter)
+    @doc = Builder::XmlMarkup.new(target: +"", indent: 2)
   end
 
   let(:manifest) { CC::Manifest.new(@exporter) }
 
   describe "#export_dir" do
     it "obtains the export directory through the manifest" do
-      expect(manifest.export_dir).to_not be_nil
-      expect(subject.export_dir).to eq(manifest.export_dir)
+      @doc.resources do |resource_node|
+        new_quizzes_generator = CC::Qti::NewQuizzesGenerator.new(@manifest, resource_node)
+
+        expect(@manifest.export_dir).to_not be_nil
+        expect(new_quizzes_generator.export_dir).to eq(@manifest.export_dir)
+      end
     end
   end
 
   describe "#new_quizzes_export_file" do
     it "returns the file referenced by new_quizzes_export_file_url" do
-      expected_files = %w[
-        g7a6297c8c5fe5c3dabc42d0ee182dcb8
-        gdbb1b3860016ed4d2392d017a493f0ec
-        imsmanifest.xml
-        non_cc_assessments
-      ]
+      @doc.resources do |resource_node|
+        new_quizzes_generator = CC::Qti::NewQuizzesGenerator.new(@manifest, resource_node)
 
-      export_file = subject.new_quizzes_export_file
-      tmp_file = Tempfile.new
-      tmp_file.binmode
-      tmp_file.write(export_file.read)
-      tmp_file.flush
+        expected_files = %w[
+          g7a6297c8c5fe5c3dabc42d0ee182dcb8
+          gdbb1b3860016ed4d2392d017a493f0ec
+          imsmanifest.xml
+          non_cc_assessments
+        ]
 
-      Dir.mktmpdir do |tmpdir|
-        CanvasUnzip.extract_archive(tmp_file.path, tmpdir)
-        extracted_files = Dir.glob(File.join(tmpdir, "*")).map do |f|
-          f.split("/").last
-        end.sort
+        export_file = new_quizzes_generator.new_quizzes_export_file
+        tmp_file = Tempfile.new
+        tmp_file.binmode
+        tmp_file.write(export_file.read)
+        tmp_file.flush
 
-        expect(extracted_files).to eq(expected_files)
+        Dir.mktmpdir do |tmpdir|
+          CanvasUnzip.extract_archive(tmp_file.path, tmpdir)
+          extracted_files = Dir.glob(File.join(tmpdir, "*")).map do |f|
+            f.split("/").last
+          end.sort
+
+          expect(extracted_files).to eq(expected_files)
+        end
       end
     end
   end
 
   describe "#write_new_quizzes_content" do
-    it "loads new quizes qti files into the new quizzes content dir" do
-      expected_files = %w[
-        g7a6297c8c5fe5c3dabc42d0ee182dcb8/assessment_meta.xml
-        g7a6297c8c5fe5c3dabc42d0ee182dcb8/assessment_qti.xml
-        gdbb1b3860016ed4d2392d017a493f0ec/assessment_meta.xml
-        gdbb1b3860016ed4d2392d017a493f0ec/assessment_qti.xml
-        non_cc_assessments/g7a6297c8c5fe5c3dabc42d0ee182dcb8.xml.qti
-        non_cc_assessments/gdbb1b3860016ed4d2392d017a493f0ec.xml.qti
-      ]
+    it "loads new quizes qti files in the new quizzes content dir" do
+      @doc.resources do |resource_node|
+        new_quizzes_generator = CC::Qti::NewQuizzesGenerator.new(@manifest, resource_node)
 
-      subject.write_new_quizzes_content
+        expected_files = %w[
+          g7a6297c8c5fe5c3dabc42d0ee182dcb8/assessment_meta.xml
+          g7a6297c8c5fe5c3dabc42d0ee182dcb8/assessment_qti.xml
+          gdbb1b3860016ed4d2392d017a493f0ec/assessment_meta.xml
+          gdbb1b3860016ed4d2392d017a493f0ec/assessment_qti.xml
+          non_cc_assessments/g7a6297c8c5fe5c3dabc42d0ee182dcb8.xml.qti
+          non_cc_assessments/gdbb1b3860016ed4d2392d017a493f0ec.xml.qti
+        ]
 
-      extracted_files = Dir.glob(File.join(subject.export_dir, "*", "**")).map do |f|
-        f.sub("#{subject.export_dir}/", "")
-      end.sort
+        new_quizzes_generator.write_new_quizzes_content
 
-      expect(extracted_files).to eq(expected_files)
+        extracted_files = Dir.glob(File.join(new_quizzes_generator.export_dir, "*", "**")).map do |f|
+          f.sub("#{new_quizzes_generator.export_dir}/", "")
+        end.sort
+
+        expect(extracted_files).to eq(expected_files)
+      end
     end
 
     context "when the new quizzes export package contains media files" do
@@ -96,24 +108,153 @@ describe CC::Qti::NewQuizzesGenerator do
       end
 
       it "loads new quizes qti files into the new quizzes content dir" do
-        expected_files = [
-          "Uploaded Media/someuuid1",
-          "Uploaded Media/someuuid2",
-          "g7a6297c8c5fe5c3dabc42d0ee182dcb8/assessment_meta.xml",
-          "g7a6297c8c5fe5c3dabc42d0ee182dcb8/assessment_qti.xml",
-          "gdbb1b3860016ed4d2392d017a493f0ec/assessment_meta.xml",
-          "gdbb1b3860016ed4d2392d017a493f0ec/assessment_qti.xml",
-          "non_cc_assessments/g7a6297c8c5fe5c3dabc42d0ee182dcb8.xml.qti",
-          "non_cc_assessments/gdbb1b3860016ed4d2392d017a493f0ec.xml.qti"
-        ]
+        @doc.resources do |resource_node|
+          new_quizzes_generator = CC::Qti::NewQuizzesGenerator.new(@manifest, resource_node)
 
-        subject.write_new_quizzes_content
+          expected_files = [
+            "Uploaded Media/someuuid1",
+            "Uploaded Media/someuuid2",
+            "g7a6297c8c5fe5c3dabc42d0ee182dcb8/assessment_meta.xml",
+            "g7a6297c8c5fe5c3dabc42d0ee182dcb8/assessment_qti.xml",
+            "gdbb1b3860016ed4d2392d017a493f0ec/assessment_meta.xml",
+            "gdbb1b3860016ed4d2392d017a493f0ec/assessment_qti.xml",
+            "non_cc_assessments/g7a6297c8c5fe5c3dabc42d0ee182dcb8.xml.qti",
+            "non_cc_assessments/gdbb1b3860016ed4d2392d017a493f0ec.xml.qti"
+          ]
 
-        extracted_files = Dir.glob(File.join(subject.export_dir, "*", "**")).map do |f|
-          f.sub("#{subject.export_dir}/", "")
-        end.sort
+          new_quizzes_generator.write_new_quizzes_content
 
-        expect(extracted_files).to eq(expected_files)
+          extracted_files = Dir.glob(File.join(new_quizzes_generator.export_dir, "*", "**")).map do |f|
+            f.sub("#{new_quizzes_generator.export_dir}/", "")
+          end.sort
+
+          expect(extracted_files).to eq(expected_files)
+        end
+      end
+    end
+  end
+
+  describe "#generate_qti" do
+    before do
+      allow(CC::CCHelper).to receive(:create_key).and_call_original
+      allow(CC::CCHelper).to receive(:create_key).with("gdbb1b3860016ed4d2392d017a493f0ec")
+                                                 .and_return("ifa97a69bc35caaad4b1b3e22c29ff9c0")
+      allow(CC::CCHelper).to receive(:create_key).with("g7a6297c8c5fe5c3dabc42d0ee182dcb8")
+                                                 .and_return("if659b73a48b08b4d0f23d47a36278073")
+    end
+
+    it "includes quizzes in the manifest" do
+      @doc.resources do |resource_node|
+        new_quizzes_generator = CC::Qti::NewQuizzesGenerator.new(@manifest, resource_node)
+        new_quizzes_generator.generate_qti
+      end
+
+      expected_manifest_resources = <<~XML
+        <resources>
+          <resource identifier="g7a6297c8c5fe5c3dabc42d0ee182dcb8" type="imsqti_xmlv1p2/imscc_xmlv1p1/assessment">
+            <file href="g7a6297c8c5fe5c3dabc42d0ee182dcb8/assessment_qti.xml"/>
+            <dependency identifierref="if659b73a48b08b4d0f23d47a36278073"/>
+          </resource>
+          <resource identifier="if659b73a48b08b4d0f23d47a36278073" type="associatedcontent/imscc_xmlv1p1/learning-application-resource" href="g7a6297c8c5fe5c3dabc42d0ee182dcb8/assessment_meta.xml">
+            <file href="g7a6297c8c5fe5c3dabc42d0ee182dcb8/assessment_meta.xml"/>
+            <file href="non_cc_assessments/g7a6297c8c5fe5c3dabc42d0ee182dcb8.xml.qti"/>
+          </resource>
+          <resource identifier="gdbb1b3860016ed4d2392d017a493f0ec" type="imsqti_xmlv1p2/imscc_xmlv1p1/assessment">
+            <file href="gdbb1b3860016ed4d2392d017a493f0ec/assessment_qti.xml"/>
+            <dependency identifierref="ifa97a69bc35caaad4b1b3e22c29ff9c0"/>
+          </resource>
+          <resource identifier="ifa97a69bc35caaad4b1b3e22c29ff9c0" type="associatedcontent/imscc_xmlv1p1/learning-application-resource" href="gdbb1b3860016ed4d2392d017a493f0ec/assessment_meta.xml">
+            <file href="gdbb1b3860016ed4d2392d017a493f0ec/assessment_meta.xml"/>
+            <file href="non_cc_assessments/gdbb1b3860016ed4d2392d017a493f0ec.xml.qti"/>
+          </resource>
+        </resources>
+      XML
+
+      expect(@doc.target!).to eq(expected_manifest_resources)
+    end
+
+    context "when the Common Cartridge export contains uploaded media" do
+      before do
+        @content_export.settings[:new_quizzes_export_url] =
+          Rails.root.join("spec/lib/cc/qti/fixtures/nq_common_cartridge_export_with_images.zip").to_s
+        @content_export.save!
+      end
+
+      it "includes quizzes and uploaded media in the manifest" do
+        @doc.resources do |resource_node|
+          new_quizzes_generator = CC::Qti::NewQuizzesGenerator.new(@manifest, resource_node)
+          new_quizzes_generator.generate_qti
+        end
+
+        expected_manifest_resources = <<~XML
+          <resources>
+            <resource identifier="g7a6297c8c5fe5c3dabc42d0ee182dcb8" type="imsqti_xmlv1p2/imscc_xmlv1p1/assessment">
+              <file href="g7a6297c8c5fe5c3dabc42d0ee182dcb8/assessment_qti.xml"/>
+              <dependency identifierref="if659b73a48b08b4d0f23d47a36278073"/>
+            </resource>
+            <resource identifier="if659b73a48b08b4d0f23d47a36278073" type="associatedcontent/imscc_xmlv1p1/learning-application-resource" href="g7a6297c8c5fe5c3dabc42d0ee182dcb8/assessment_meta.xml">
+              <file href="g7a6297c8c5fe5c3dabc42d0ee182dcb8/assessment_meta.xml"/>
+              <file href="non_cc_assessments/g7a6297c8c5fe5c3dabc42d0ee182dcb8.xml.qti"/>
+            </resource>
+            <resource identifier="gdbb1b3860016ed4d2392d017a493f0ec" type="imsqti_xmlv1p2/imscc_xmlv1p1/assessment">
+              <file href="gdbb1b3860016ed4d2392d017a493f0ec/assessment_qti.xml"/>
+              <dependency identifierref="ifa97a69bc35caaad4b1b3e22c29ff9c0"/>
+            </resource>
+            <resource identifier="ifa97a69bc35caaad4b1b3e22c29ff9c0" type="associatedcontent/imscc_xmlv1p1/learning-application-resource" href="gdbb1b3860016ed4d2392d017a493f0ec/assessment_meta.xml">
+              <file href="gdbb1b3860016ed4d2392d017a493f0ec/assessment_meta.xml"/>
+              <file href="non_cc_assessments/gdbb1b3860016ed4d2392d017a493f0ec.xml.qti"/>
+            </resource>
+            <resource identifier="i931e933d0a559fbb7319e5b3c5d3be8e" type="webcontent" href="Uploaded Media/someuuid1">
+              <file href="Uploaded Media/someuuid1"/>
+            </resource>
+            <resource identifier="ic1f6093310b4f2923606824ecd90811f" type="webcontent" href="Uploaded Media/someuuid2">
+              <file href="Uploaded Media/someuuid2"/>
+            </resource>
+          </resources>
+        XML
+
+        expect(@doc.target!).to eq(expected_manifest_resources)
+      end
+    end
+
+    context "when the Common Cartridge export contains item banks" do
+      before do
+        @content_export.settings[:new_quizzes_export_url] =
+          Rails.root.join("spec/lib/cc/qti/fixtures/nq_common_cartridge_export_with_bank.zip").to_s
+        @content_export.save!
+      end
+
+      it "includes quizzes and item banks into the manifest" do
+        @doc.resources do |resource_node|
+          new_quizzes_generator = CC::Qti::NewQuizzesGenerator.new(@manifest, resource_node)
+          new_quizzes_generator.generate_qti
+        end
+
+        expected_manifest_resources = <<~XML
+          <resources>
+            <resource identifier="g14307719f2cd62b89736dc1f5500c420" type="associatedcontent/imscc_xmlv1p1/learning-application-resource" href="non_cc_assessments/g14307719f2cd62b89736dc1f5500c420.xml.qti">
+              <file href="non_cc_assessments/g14307719f2cd62b89736dc1f5500c420.xml.qti"/>
+            </resource>
+            <resource identifier="g7a6297c8c5fe5c3dabc42d0ee182dcb8" type="imsqti_xmlv1p2/imscc_xmlv1p1/assessment">
+              <file href="g7a6297c8c5fe5c3dabc42d0ee182dcb8/assessment_qti.xml"/>
+              <dependency identifierref="if659b73a48b08b4d0f23d47a36278073"/>
+            </resource>
+            <resource identifier="if659b73a48b08b4d0f23d47a36278073" type="associatedcontent/imscc_xmlv1p1/learning-application-resource" href="g7a6297c8c5fe5c3dabc42d0ee182dcb8/assessment_meta.xml">
+              <file href="g7a6297c8c5fe5c3dabc42d0ee182dcb8/assessment_meta.xml"/>
+              <file href="non_cc_assessments/g7a6297c8c5fe5c3dabc42d0ee182dcb8.xml.qti"/>
+            </resource>
+            <resource identifier="gdbb1b3860016ed4d2392d017a493f0ec" type="imsqti_xmlv1p2/imscc_xmlv1p1/assessment">
+              <file href="gdbb1b3860016ed4d2392d017a493f0ec/assessment_qti.xml"/>
+              <dependency identifierref="ifa97a69bc35caaad4b1b3e22c29ff9c0"/>
+            </resource>
+            <resource identifier="ifa97a69bc35caaad4b1b3e22c29ff9c0" type="associatedcontent/imscc_xmlv1p1/learning-application-resource" href="gdbb1b3860016ed4d2392d017a493f0ec/assessment_meta.xml">
+              <file href="gdbb1b3860016ed4d2392d017a493f0ec/assessment_meta.xml"/>
+              <file href="non_cc_assessments/gdbb1b3860016ed4d2392d017a493f0ec.xml.qti"/>
+            </resource>
+          </resources>
+        XML
+
+        expect(@doc.target!).to eq(expected_manifest_resources)
       end
     end
   end

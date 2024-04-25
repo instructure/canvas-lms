@@ -57,7 +57,7 @@
     <%= t("This assignment does not count toward the final grade.") %>
   </div>
 <% end %>
-<div id="assignment_show" class="assignment content_underline_links">
+<div id="assignment_show" class="assignment content_underline_links" data-lti-page-content="true">
   <% if can_do(@context, @current_user, :read_as_admin) %>
     <div class='assignment-title'>
       <div class='title-content'>

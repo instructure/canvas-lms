@@ -817,6 +817,14 @@ Assignment.prototype.externalToolData = function () {
   return tagAttributes.external_data
 }
 
+Assignment.prototype.externalToolDataTitle = function () {
+  const data = this.get('external_tool_tag_attributes')
+  if (!data) {
+    return ''
+  }
+  return data.title
+}
+
 Assignment.prototype.externalToolDataStringified = function () {
   const data = this.externalToolData()
   if (data) {

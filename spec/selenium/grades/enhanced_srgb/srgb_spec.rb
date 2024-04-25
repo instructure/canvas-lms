@@ -234,6 +234,12 @@ describe "Screenreader Gradebook" do
 
     EnhancedSRGB.select_assignment(a1)
     EnhancedSRGB.message_students_button.click
+
+    # Select "Have not submitted" option
+    f("input[data-testid='criterion-dropdown']").click
+    options = ff("[data-testid='criterion-dropdown-item']")
+    options[1].click
+
     EnhancedSRGB.message_students_input.send_keys("Hello!")
 
     expect(EnhancedSRGB.message_students_submit_button).to be_enabled

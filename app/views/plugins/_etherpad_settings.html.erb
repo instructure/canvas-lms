@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<%= fields_for :settings, OpenObject.new(settings) do |f| %>
+<%= fields_for :settings do |f| %>
   <table style="width: 500px;" class="formtable">
     <tr>
       <td colspan="2">
@@ -40,14 +40,14 @@ TEXT
     <tr>
       <td><%= f.blabel :domain, :en => "Domain" %></td>
       <td>
-        <%= f.text_field :domain %>
+        <%= f.text_field :domain, value: settings[:domain] %>
         <div class="hint"><%= t('hints.domain', "Don't include the \"http://\" part or any slashes") %>
       </td>
     </tr>
     <tr>
       <td><%= f.blabel :name, :en => "Name" %></td>
       <td>
-        <%= f.text_field :name %>
+        <%= f.text_field :name, value: settings[:name] %>
       </td>
     </tr>
   </table>

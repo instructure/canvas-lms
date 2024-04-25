@@ -17,7 +17,7 @@
  */
 
 // @ts-ignore
-import Big from 'big.js';
+import Big from 'big.js'
 
 /**
  * @typedef {[string, number]} GradingStandard
@@ -30,44 +30,50 @@ import Big from 'big.js';
  */
 
 /**
- * @deprecated Use scoreToLetterGrade(score: number, gradingSchemeDataRows: GradingSchemeDataRow[]) instead, which takes
+ * @deprecated Use scoreToLetterGrade(score: number, gradingSchemeDataRows: GradingSchemeDataRow[], points_based) instead, which takes
  * a more reasonably typed object model than the 2d array that this function takes in for gradingScheme data rows.
  * @param {number} score
  * @param {GradingStandard[]} gradingSchemes
+ * @param {boolean} pointsBased
  * @returns {?string}
  */
-export function scoreToGrade(score, gradingSchemes) {
+export function scoreToGrade(score, gradingSchemes, pointsBased = false) {
   // Because scoreToGrade is being used in a non typescript file, ui/features/grade_summary/jquery/index.js,
   // score can be NaN despite its type being declared as a number
   if (typeof score !== 'number' || Number.isNaN(score) || gradingSchemes == null) {
-    return null;
+    return null
   }
 
   // convert deprecated 2d array format to newer GradingSchemeDataRow[] format
-  const gradingSchemeDataRows = gradingSchemes.map(row => ({ name: row[0], value: row[1] }));
-  return scoreToLetterGrade(score, gradingSchemeDataRows);
+  const gradingSchemeDataRows = gradingSchemes.map(row => ({name: row[0], value: row[1]}))
+
+  return scoreToLetterGrade(score, gradingSchemeDataRows, pointsBased)
 }
 
 /**
  * @param {number} score
  * @param {GradingSchemeDataRow[]} gradingSchemeDataRows
+ * @param {boolean} pointsBased
  * @returns {string}
  */
-export function scoreToLetterGrade(score, gradingSchemeDataRows) {
+export function scoreToLetterGrade(score, gradingSchemeDataRows, pointsBased = false) {
   // Because scoreToGrade is being used in a non typescript file, ui/features/grade_summary/jquery/index.js,
   // score can be NaN despite its type being declared as a number
   if (typeof score !== 'number' || Number.isNaN(score) || gradingSchemeDataRows == null) {
-    return null;
+    return null
   }
 
-  const roundedScore = parseFloat(Big(score).round(4));
-  const scoreWithLowerBound = Math.max(roundedScore, 0);
+  const roundedScore = pointsBased
+    ? parseFloat(Big(score).round(2)) // round to 2 decimal places because points based grading schemes lower bounds are rounded to 2 decimal places
+    : parseFloat(Big(score).round(4))
+  const scoreWithLowerBound = Math.max(roundedScore, 0)
   const letter = gradingSchemeDataRows.find((row, i) => {
-    const schemeScore = (row.value * 100).toPrecision(4);
-    return scoreWithLowerBound >= parseFloat(schemeScore) || i === gradingSchemeDataRows.length - 1;
-  });
+    const schemeScore = (row.value * 100).toPrecision(4)
+    return scoreWithLowerBound >= parseFloat(schemeScore) || i === gradingSchemeDataRows.length - 1
+  })
   if (!letter) {
-    throw new Error('grading scheme not found');
+    throw new Error('grading scheme not found')
   }
-  return letter.name;
+
+  return letter.name
 }

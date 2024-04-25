@@ -106,6 +106,8 @@ module CC::Importer::Canvas
          hide_distribution_graphs
          allow_student_discussion_topics
          allow_student_discussion_editing
+         allow_student_discussion_reporting
+         allow_student_anonymous_discussion_topics
          show_announcements_on_home_page
          usage_rights_required
          restrict_student_future_view

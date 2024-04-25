@@ -226,7 +226,7 @@ class UploadForm extends React.Component {
   render() {
     return (
       <span>
-        <form ref={this.formRef} className={this.props.visible ? '' : 'hidden'}>
+        <form name="upload-form" ref={this.formRef} className={this.props.visible ? '' : 'hidden'}>
           <input
             id={this.props.inputId}
             name={this.props.inputName}

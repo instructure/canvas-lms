@@ -60,7 +60,9 @@ export function AssignmentAvailabilityContainer({...props}) {
 
   return (
     <>
-      {props.inPacedCourse || (props.isAdmin && assignmentOverrides.length > 1) ? (
+      {props.inPacedCourse ||
+      (props.isAdmin && assignmentOverrides.length > 1) ||
+      props.assignment.mySubAssignmentSubmissionsConnection?.nodes?.length > 0 ? (
         <AssignmentMultipleAvailabilityWindows
           assignmentOverrides={assignmentOverrides}
           onSetDueDateTrayOpen={setDueDateTrayOpen}

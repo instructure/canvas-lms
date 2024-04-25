@@ -257,20 +257,24 @@ module Api::V1::PlannerItem
 
   private
 
-  def assignment_feedback_url(assignment, user, submission_info)
+  def assignment_feedback_url(assignment, user, submission_info, type)
     return nil unless assignment
     return nil unless submission_info
     return nil unless submission_info[:submitted] || submission_info[:graded] || submission_info[:has_feedback]
 
-    context_url(assignment.context, :context_assignment_submission_url, assignment.id, user.id)
+    if type == :assignment && assignment.context.feature_enabled?(:assignments_2_student)
+      named_context_url(assignment.context, :context_assignment_url, assignment.id)
+    else
+      context_url(assignment.context, :context_assignment_submission_url, assignment.id, user.id)
+    end
   end
 
   def assignment_html_url(assignment, user, submission_info)
-    assignment_feedback_url(assignment, user, submission_info) || named_context_url(assignment.context, :context_assignment_url, assignment.id)
+    assignment_feedback_url(assignment, user, submission_info, :assignment) || named_context_url(assignment.context, :context_assignment_url, assignment.id)
   end
 
   def discussion_topic_html_url(topic, user, submission_info)
-    assignment_feedback_url(topic.assignment, user, submission_info) || named_context_url(topic.context, :context_discussion_topic_url, topic.id)
+    assignment_feedback_url(topic.assignment, user, submission_info, :discussion) || named_context_url(topic.context, :context_discussion_topic_url, topic.id)
   end
 
   def online_meeting_url(event_description, event_location)

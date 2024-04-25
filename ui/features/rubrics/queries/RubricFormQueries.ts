@@ -41,7 +41,13 @@ const RUBRIC_QUERY = gql`
           description
           longDescription
           points
+          id: _id
         }
+        outcome {
+          displayName
+          title
+        }
+        learningOutcomeId
         points
         longDescription
         description
@@ -92,6 +98,10 @@ export const saveRubric = async (rubric: RubricFormProps): Promise<RubricQueryRe
       description: criterion.description,
       long_description: criterion.longDescription,
       points: criterion.points,
+      outcome: {
+        display_name: criterion.outcome?.displayName,
+        title: criterion.outcome?.title,
+      },
       learning_outcome_id: criterion.learningOutcomeId,
       criterion_use_range: criterion.criterionUseRange,
       ratings: criterion.ratings.map(rating => ({

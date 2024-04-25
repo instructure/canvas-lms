@@ -16,10 +16,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<%= fields_for :settings, OpenObject.new(settings) do |f| %>
+<%= fields_for :settings do |f| %>
   <p>
     <%= f.label :email_address, en: "email address to send error reports to (something@example.com)" %>
-    <%= f.text_field :email_address %>
+    <%= f.text_field :email_address, value: settings[:email_address] %>
   </p>
 <% end %>
 <%= render partial: "plugins/byots_docs" %>

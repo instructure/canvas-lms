@@ -57,7 +57,7 @@ class SubmissionSearch
 
     if @options[:user_id]
       # Since user_id requires an ID and not just a partial name, the user_search_scope is not needed and the 3 characters limit is not applied
-      search_scope = search_scope.where(user_id: @options[:user_id])
+      search_scope = search_scope.where(user_id: representative_id(@options[:user_id]))
     end
 
     if @options[:enrollment_types].present?
@@ -128,13 +128,35 @@ class SubmissionSearch
   private
 
   def allowed_users
-    if @options[:apply_gradebook_enrollment_filters]
-      @course.users_visible_to(@searcher, true, exclude_enrollment_state: excluded_enrollment_states_from_gradebook_settings)
-    elsif @options[:include_concluded] || @options[:include_deactivated]
-      @course.users_visible_to(@searcher, true, exclude_enrollment_state: excluded_enrollment_states_from_filters)
-    else
-      @course.users_visible_to(@searcher)
+    users = if @options[:apply_gradebook_enrollment_filters]
+              @course.users_visible_to(@searcher, true, exclude_enrollment_state: excluded_enrollment_states_from_gradebook_settings)
+            elsif @options[:include_concluded] || @options[:include_deactivated]
+              @course.users_visible_to(@searcher, true, exclude_enrollment_state: excluded_enrollment_states_from_filters)
+            else
+              @course.users_visible_to(@searcher)
+            end
+
+    if @options[:representatives_only] && @assignment.grade_as_group?
+      rep_ids = representatives.map { |rep, _members| rep.id }
+      users = users.where(id: rep_ids)
     end
+
+    users
+  end
+
+  def representative_id(user_id)
+    user_id_str = user_id.to_s
+    return user_id_str unless @assignment.grade_as_group?
+
+    rep, = representatives.find do |(rep, members)|
+      rep.id.to_s == user_id_str || members.any? { |member| member.id.to_s == user_id_str }
+    end
+
+    rep&.id&.to_s || user_id_str
+  end
+
+  def representatives
+    @representatives ||= @assignment.representatives(user: @searcher, ignore_student_visibility: true, include_others: true)
   end
 
   def excluded_enrollment_states_from_gradebook_settings

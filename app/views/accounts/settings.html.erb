@@ -921,13 +921,9 @@ acknowledge that you have read and agreed to the
                 disabled.concat([0, nil]) unless @account.course_template_id == 0 || @account.grants_any_right?(@current_user, :delete_course_template, :edit_course_template)
               end
 
-              visible_templates = @account.
-                root_account.
-                all_courses.
-                templates.
-                limit(Setting.get('max_visible_course_templates', 25).to_i).
-                order(Course.best_unicode_collation_key('courses.name')).
-                pluck(:name, :id)
+              visible_templates = @account.root_account.all_courses.templates
+                                          .order(Course.best_unicode_collation_key('courses.name'))
+                                          .pluck(:name, :id)
               if @account.course_template_id && !@account.course_template_id.zero?  && !visible_templates.find { |_, id| @account.course_template_id == id }
                 visible_templates.unshift([@account.course_template.name, @account.course_template_id])
               end

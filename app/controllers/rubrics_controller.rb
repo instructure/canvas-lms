@@ -79,6 +79,7 @@ class RubricsController < ApplicationController
   end
 
   def show_rubrics_redesign
+    css_bundle :learning_outcomes
     render html: "".html_safe, layout: true
   end
 

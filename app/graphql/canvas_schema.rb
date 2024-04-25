@@ -21,6 +21,7 @@
 class CanvasSchema < GraphQL::Schema
   query Types::QueryType
   mutation Types::MutationType
+  trace_with GraphQL::Tracing::CallLegacyTracers
 
   use GraphQL::Batch
 

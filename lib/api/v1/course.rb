@@ -169,6 +169,7 @@ module Api::V1::Course
       end
 
       hash["grading_scheme"] = course.grading_standard_or_default.data if includes.include?("grading_scheme")
+      hash["points_based_grading_scheme"] = course.grading_standard_or_default.points_based? if includes.include?("grading_scheme")
       hash["restrict_quantitative_data"] = course.restrict_quantitative_data?(user) if includes.include?("restrict_quantitative_data")
 
       # return hash from the block for additional processing in Api::V1::CourseJson

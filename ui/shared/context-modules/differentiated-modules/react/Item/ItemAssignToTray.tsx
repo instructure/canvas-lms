@@ -33,6 +33,7 @@ import {
   IconQuizSolid,
   IconQuestionLine,
   IconDiscussionLine,
+  IconDocumentLine,
 } from '@instructure/ui-icons'
 import {showFlashAlert, showFlashError} from '@canvas/alerts/react/FlashAlert'
 import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
@@ -51,13 +52,18 @@ import ItemAssignToCard, {type ItemAssignToCardRef} from './ItemAssignToCard'
 import TrayFooter from '../Footer'
 import type {AssigneeOption} from '../AssigneeSelector'
 import useFetchAssignees from '../../utils/hooks/useFetchAssignees'
-import {generateDateDetailsPayload, getOverriddenAssignees} from '../../utils/assignToHelper'
+import {
+  generateDateDetailsPayload,
+  getOverriddenAssignees,
+  itemTypeToApiURL,
+} from '../../utils/assignToHelper'
 import {Text} from '@instructure/ui-text'
 import {Alert} from '@instructure/ui-alerts'
+import {IconType, ItemType} from '../types'
 
 const I18n = useI18nScope('differentiated_modules')
 
-function itemTypeToIcon(iconType: string) {
+function itemTypeToIcon(iconType: IconType) {
   switch (iconType) {
     case 'assignment':
       return <IconAssignmentLine data-testid="icon-assignment" />
@@ -66,23 +72,13 @@ function itemTypeToIcon(iconType: string) {
     case 'lti-quiz':
       return <IconQuizSolid data-testid="icon-lti-quiz" />
     case 'discussion':
+    case 'discussion_topic':
       return <IconDiscussionLine data-testid="icon-discussion" />
+    case 'page':
+    case 'wiki_page':
+      return <IconDocumentLine data-testid="icon-page" />
     default:
       return <IconQuestionLine data-testid="icon-unknown" />
-  }
-}
-
-function itemTypeToApiURL(courseId: string, itemType: string, itemId: string) {
-  switch (itemType) {
-    case 'assignment':
-    case 'lti-quiz':
-      return `/api/v1/courses/${courseId}/assignments/${itemId}/date_details`
-    case 'quiz':
-      return `/api/v1/courses/${courseId}/quizzes/${itemId}/date_details`
-    case 'discussion':
-      return `/api/v1/courses/${courseId}/discussion_topics/${itemId}/date_details`
-    default:
-      return ''
   }
 }
 
@@ -106,7 +102,7 @@ export const updateModuleItem = ({
   onSuccess,
 }: {
   courseId: string
-  moduleItemType: string
+  moduleItemType: ItemType
   moduleItemName: string
   moduleItemContentId: string
   payload: DateDetails
@@ -138,11 +134,12 @@ export interface ItemAssignToTrayProps {
   onSave?: (overrides: ItemAssignToCardSpec[]) => void
   onClose: () => void
   onDismiss: () => void
+  onExited?: () => void
   courseId: string
   itemName: string
-  itemType: string
-  iconType: string
-  itemContentId: string
+  itemType: ItemType
+  iconType: IconType
+  itemContentId?: string
   pointsPossible?: number | null
   locale: string
   timezone: string
@@ -159,12 +156,14 @@ export interface ItemAssignToTrayProps {
   ) => void
   onDatesChange?: (cardId: string, dateType: string, newDate: string) => void
   onCardRemove?: (cardId: string) => void
+  onInitialStateSet?: (cards: ItemAssignToCardSpec[]) => void
 }
 
 export default function ItemAssignToTray({
   open,
   onSave,
   onClose,
+  onExited,
   onDismiss,
   courseId,
   itemName,
@@ -183,15 +182,16 @@ export default function ItemAssignToTray({
   defaultSectionId,
   useApplyButton = false,
   removeDueDateInput = false,
+  onInitialStateSet,
 }: ItemAssignToTrayProps) {
   const [assignToCards, setAssignToCards] = useState<ItemAssignToCardSpec[]>(defaultCards ?? [])
   const [initialCards, setInitialCards] = useState<ItemAssignToCardSpec[]>([])
   const [fetchInFlight, setFetchInFlight] = useState(false)
   const [disabledOptionIds, setDisabledOptionIds] = useState<string[]>(defaultDisabledOptionIds)
-  const [shouldFocusCard, setShouldFocusCard] = useState<boolean>(false)
   const [blueprintDateLocks, setBlueprintDateLocks] = useState<DateLockTypes[] | undefined>(
     undefined
   )
+  const lastPerformedAction = useRef<{action: 'add' | 'delete'; index?: number} | null>(null)
   const cardsRefs = useRef<{[cardId: string]: ItemAssignToCardRef}>({})
   const addCardButtonRef = useRef<Element | null>(null)
   const everyoneOption = useMemo(() => {
@@ -209,7 +209,7 @@ export default function ItemAssignToTray({
     onDismiss()
   }, [defaultCards, onDismiss])
 
-  const {allOptions, isLoading, setSearchTerm} = useFetchAssignees({
+  const {allOptions, isLoading, loadedAssignees, setSearchTerm} = useFetchAssignees({
     courseId,
     everyoneOption,
     checkMasteryPaths: true,
@@ -218,11 +218,30 @@ export default function ItemAssignToTray({
   })
 
   useEffect(() => {
-    if (assignToCards.length === 0) return
-    const lastCard = assignToCards.at(assignToCards.length - 1)
-    if (!lastCard) return
-    const lastCardRef = cardsRefs.current[lastCard.key]
-    lastCardRef?.focusDeleteButton()
+    if (assignToCards.length === 0 && !lastPerformedAction.current) return
+    const action = lastPerformedAction.current?.action
+    const index = lastPerformedAction.current?.index || 0
+    // If only a card remains, we should focus the add button
+    const shouldFocusAddButton = action === 'delete' && assignToCards.length <= 1
+    let focusIndex
+    if (shouldFocusAddButton && addCardButtonRef?.current instanceof HTMLButtonElement) {
+      addCardButtonRef.current.disabled = false // so it can be focused
+      addCardButtonRef.current.focus()
+    } else if (action === 'add') {
+      // Focus the last card
+      focusIndex = assignToCards.length - 1
+    } else if (action === 'delete') {
+      // Focus the previous card
+      focusIndex = index <= 0 ? 0 : index - 1
+    }
+    if (focusIndex !== undefined) {
+      const card = assignToCards.at(focusIndex)
+      if (card) {
+        const cardRef = cardsRefs.current[card.key]
+        cardRef?.focusDeleteButton()
+      }
+    }
+    lastPerformedAction.current = null
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [assignToCards.length])
 
@@ -239,7 +258,7 @@ export default function ItemAssignToTray({
   }, [JSON.stringify(defaultDisabledOptionIds)])
 
   useEffect(() => {
-    if (defaultCards !== undefined) {
+    if (defaultCards !== undefined || itemContentId === undefined) {
       return
     }
     setFetchInFlight(true)
@@ -319,6 +338,7 @@ export default function ItemAssignToTray({
         setBlueprintDateLocks(dateDetailsApiResponse.blueprint_date_locks)
         setDisabledOptionIds(selectedOptionIds)
         setInitialCards(cards)
+        onInitialStateSet?.(cards)
         setAssignToCards(cards)
       })
       .catch(() => {
@@ -351,6 +371,7 @@ export default function ItemAssignToTray({
         selectedAssigneeIds: [] as string[],
       } as ItemAssignToCardSpec,
     ]
+    lastPerformedAction.current = {action: 'add'}
     setAssignToCards(cards)
   }
 
@@ -377,35 +398,41 @@ export default function ItemAssignToTray({
         (card.contextModuleId !== null && card.isEdited)
     )
     const payload = generateDateDetailsPayload(filteredCards)
-    updateModuleItem({
-      courseId,
-      moduleItemContentId: itemContentId,
-      moduleItemType: itemType,
-      moduleItemName: itemName,
-      payload,
-      onSuccess: handleDismiss,
-    })
+    if (itemContentId !== undefined) {
+      updateModuleItem({
+        courseId,
+        moduleItemContentId: itemContentId,
+        moduleItemType: itemType,
+        moduleItemName: itemName,
+        payload,
+        onSuccess: handleDismiss,
+      })
+    }
   }, [onSave, assignToCards, courseId, itemContentId, itemType, itemName, handleDismiss])
 
   const handleDeleteCard = useCallback(
     (cardId: string) => {
-      const cardSelection =
-        assignToCards.find(card => card.key === cardId)?.selectedAssigneeIds ?? []
+      const cardIndex = assignToCards.findIndex(card => card.key === cardId)
+      const cardSelection = assignToCards.at(cardIndex)?.selectedAssigneeIds ?? []
       const newDisabled = disabledOptionIds.filter(id => !cardSelection.includes(id))
       const cards = assignToCards.filter(({key}) => key !== cardId)
+      lastPerformedAction.current = {action: 'delete', index: cardIndex}
       setAssignToCards(cards)
       setDisabledOptionIds(newDisabled)
       onCardRemove?.(cardId)
-      if (addCardButtonRef?.current instanceof HTMLButtonElement) {
-        addCardButtonRef.current.disabled = false // so it can be focused
-        addCardButtonRef.current.focus()
-      }
     },
     [assignToCards, disabledOptionIds, onCardRemove]
   )
 
   const handleCardValidityChange = useCallback(
     (cardId: string, isValid: boolean) => {
+      const priorCard = assignToCards.find(card => card.key === cardId)
+      if (priorCard) {
+        const validityChanged = priorCard.isValid !== isValid
+        if (!validityChanged) {
+          return
+        }
+      }
       const cards = assignToCards.map(card => (card.key === cardId ? {...card, isValid} : card))
       setAssignToCards(cards)
     },
@@ -496,12 +523,20 @@ export default function ItemAssignToTray({
 
   const handleDatesChange = useCallback(
     (cardId: string, dateAttribute: string, dateValue: string | null) => {
-      const newDate = dateValue === null ? undefined : dateValue
+      const newDate = dateValue // === null ? undefined : dateValue
       const initialCard = initialCards.find(card => card.key === cardId)
       const {highlightCard, isEdited, ...currentCardProps} = assignToCards.find(
         card => card.key === cardId
       ) as ItemAssignToCardSpec
       const currentCard = {...currentCardProps, [dateAttribute]: newDate}
+      const priorCard = assignToCards.find(card => card.key === cardId)
+      if (priorCard) {
+        const dateChanged = priorCard[dateAttribute] !== dateValue
+        if (!dateChanged) {
+          // date did not change - do not setAssignToCards which would trigger a re-render)
+          return
+        }
+      }
       const areEquals = JSON.stringify(initialCard) === JSON.stringify(currentCard)
 
       const newCard = {...currentCard, highlightCard: !areEquals, isEdited: !areEquals}
@@ -539,7 +574,7 @@ export default function ItemAssignToTray({
         <View data-testid="item-type-text" as="div" margin="medium 0 0 0">
           {renderItemType()} {pointsPossible != null && `| ${renderPointsPossible()}`}
         </View>
-        {blueprintDateLocks?.length > 0 ? (
+        {blueprintDateLocks && blueprintDateLocks.length > 0 ? (
           <Alert liveRegion={getLiveRegion} variant="info" margin="small 0 0">
             <Text weight="bold" size="small">
               {I18n.t('Locked: ')}
@@ -560,7 +595,11 @@ export default function ItemAssignToTray({
       case 'lti-quiz':
         return I18n.t('Quiz')
       case 'discussion':
+      case 'discussion_topic':
         return I18n.t('Discussion')
+      case 'page':
+      case 'wiki_page':
+        return I18n.t('Page')
       default:
         return ''
     }
@@ -605,14 +644,15 @@ export default function ItemAssignToTray({
   function Body() {
     return (
       <Flex.Item padding="small medium" shouldGrow={true} shouldShrink={true}>
-        {fetchInFlight && (
+        {fetchInFlight || !loadedAssignees ? (
           <Mask>
-            <Spinner renderTitle={I18n.t('Loading')} />
+            <Spinner data-testid="cards-loading" renderTitle={I18n.t('Loading')} />
           </Mask>
+        ) : (
+          <ApplyLocale locale={locale} timezone={timezone}>
+            {renderCards(open)}
+          </ApplyLocale>
         )}
-        <ApplyLocale locale={locale} timezone={timezone}>
-          {renderCards(open)}
-        </ApplyLocale>
 
         <Button
           onClick={handleAddCard}
@@ -645,6 +685,7 @@ export default function ItemAssignToTray({
     <Tray
       data-testid="module-item-edit-tray"
       onClose={onClose}
+      onExited={onExited}
       label={I18n.t('Edit assignment %{name}', {
         name: itemName,
       })}

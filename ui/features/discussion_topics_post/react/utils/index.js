@@ -319,6 +319,7 @@ export const getOptimisticResponse = ({
               id: 'USER_PLACEHOLDER',
               _id: ENV.current_user.id,
               avatarUrl: ENV.current_user.avatar_image_url,
+              htmlUrl: ENV.current_user.html_url,
               displayName: ENV.current_user.display_name,
               courseRoles: [],
               pronouns: null,

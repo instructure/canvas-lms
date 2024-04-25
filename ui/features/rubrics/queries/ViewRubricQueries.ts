@@ -22,10 +22,13 @@ import type {
   RubricQueryResponse,
   DeleteRubricQueryResponse,
   DuplicateRubricQueryResponse,
+  archiveRubricResponse,
 } from '../types/Rubric'
 import getCookie from '@instructure/get-cookie'
 import qs from 'qs'
 import type {Rubric, RubricCriterion} from '@canvas/rubrics/react/types/rubric'
+import type {UsedLocation} from '@canvas/grading_scheme/gradingSchemeApiModel'
+import doFetchApi from '@canvas/do-fetch-api-effect'
 
 const COURSE_RUBRICS_QUERY = gql`
   query CourseRubricsQuery($courseId: ID!) {
@@ -110,6 +113,21 @@ const RUBRIC_PREVIEW_QUERY = gql`
   }
 `
 
+const UPDATE_RUBRIC_ARCHIVE_STATE = gql`
+  mutation UpdateRubricArchivedState($id: ID!, $archived: Boolean!) {
+    updateRubricArchivedState(input: {id: $id, archived: $archived}) {
+      rubric {
+        _id
+        workflowState
+      }
+      errors {
+        attribute
+        message
+      }
+    }
+  }
+`
+
 type AccountRubricsQueryVariables = {
   accountId: string
   courseId?: never
@@ -150,6 +168,18 @@ type DuplicateRubricProps = {
   ratingOrder?: string
 }
 
+type RubricArchiveResponse = {
+  rubric: {
+    _id: string
+    workflowState: string
+  }
+
+  errors: {
+    attribute: string
+    message: string
+  }
+}
+
 export type FetchRubricVariables = AccountRubricsQueryVariables | CourseRubricsQueryVariables
 
 export const fetchCourseRubrics = async (queryVariables: FetchRubricVariables) => {
@@ -173,6 +203,47 @@ export const fetchRubricCriterion = async (id?: string) => {
 
   const {rubric} = await executeQuery<RubricPreviewQueryResponse>(RUBRIC_PREVIEW_QUERY, {id})
   return rubric
+}
+
+type FetchRubricUsedLocationsParams = {
+  accountId?: string
+  courseId?: string
+  id?: string
+  nextPagePath?: string
+}
+export const fetchRubricUsedLocations = async ({
+  accountId,
+  courseId,
+  id,
+  nextPagePath,
+}: FetchRubricUsedLocationsParams) => {
+  if (!id) {
+    return {
+      usedLocations: [],
+      isLastPage: true,
+      nextPage: '',
+    }
+  }
+
+  const urlPrefix = accountId ? `accounts/${accountId}` : `courses/${courseId}`
+  const path = nextPagePath ?? `/api/v1/${urlPrefix}/rubrics/${id}/used_locations`
+
+  const result = await doFetchApi({
+    path,
+    method: 'GET',
+  })
+
+  if (!result.response.ok) {
+    throw new Error(`Failed to fetch rubric locations: ${result.response.statusText}`)
+  }
+
+  const usedLocations = (result.json as UsedLocation[]) ?? []
+
+  return {
+    usedLocations,
+    isLastPage: result.link?.next === undefined,
+    nextPage: result.link?.next?.url,
+  }
 }
 
 export const deleteRubric = async ({
@@ -273,4 +344,22 @@ export const duplicateRubric = async ({
   }
 
   return duplicatedRubric
+}
+
+export const archiveRubric = async (rubricId: string): Promise<archiveRubricResponse> => {
+  const {rubric} = await executeQuery<RubricArchiveResponse>(UPDATE_RUBRIC_ARCHIVE_STATE, {
+    id: rubricId,
+    archived: true,
+  })
+
+  return rubric
+}
+
+export const unarchiveRubric = async (rubricId: string): Promise<archiveRubricResponse> => {
+  const {rubric} = await executeQuery<RubricArchiveResponse>(UPDATE_RUBRIC_ARCHIVE_STATE, {
+    id: rubricId,
+    archived: false,
+  })
+
+  return rubric
 }

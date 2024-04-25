@@ -25,6 +25,10 @@ module ModulesIndexPage
     "#context_module_#{module_id}"
   end
 
+  def delete_card_button_selector
+    "[data-testid = 'delete-card-button']"
+  end
+
   def manage_module_item_assign_to_selector(module_item_id)
     "#context_module_item_#{module_item_id} .module-item-assign-to-link"
   end
@@ -92,6 +96,10 @@ module ModulesIndexPage
   #------------------------------ Elements ------------------------------
   def context_module(module_id)
     f(context_module_selector(module_id))
+  end
+
+  def delete_card_button
+    ff(delete_card_button_selector)
   end
 
   def manage_module_item_assign_to(module_item_id)
@@ -219,6 +227,10 @@ module ModulesIndexPage
     replace_content(f("##{type}s_select input.item_title"), name)
     fj(".add_item_button:visible").click
     wait_for_ajax_requests
+  end
+
+  def click_delete_card_button(button_number)
+    delete_card_button[button_number].click
   end
 
   def click_manage_module_item_assign_to(module_item)

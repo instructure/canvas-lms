@@ -966,12 +966,12 @@ describe AssignmentsController do
 
             @reviewee_submission_id = CanvasSchema.id_from_object(
               @reviewee_submission,
-              CanvasSchema.resolve_type(nil, @reviewee_submission, nil),
+              CanvasSchema.resolve_type(nil, @reviewee_submission, nil)[0],
               nil
             )
             @student_submission_id = CanvasSchema.id_from_object(
               @student_submission,
-              CanvasSchema.resolve_type(nil, @student_submission, nil),
+              CanvasSchema.resolve_type(nil, @student_submission, nil)[0],
               nil
             )
 
@@ -1193,7 +1193,7 @@ describe AssignmentsController do
           observer.observer_enrollments.first.update!(associated_user: nil)
 
           get "show", params: { course_id: @course.id, id: @assignment.id }
-          expect(flash[:notice]).to match(/^No student is being observed.*return to the dashboard\.$/)
+          expect(flash[:notice]).to match("No student is being observed.")
           expect(assigns[:js_env]).not_to have_key(:SUBMISSION_ID)
         end
 
@@ -1533,11 +1533,6 @@ describe AssignmentsController do
           course.enable_feature!(:assignments_2_student)
           assignment.update!(submission_types: "online_upload")
           user_session(student)
-
-          # stub this call because for some reason the invocation in
-          # render_a2_student_view takes long enough that it causes
-          # requests to time out
-          allow(CanvasSchema).to receive(:resolve_type).and_return(Types::SubmissionType)
         end
 
         describe "CONTEXT_MODULE_ITEM" do

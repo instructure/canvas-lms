@@ -92,6 +92,7 @@ describe Mutations::CreateDiscussionTopic do
             podcastEnabled
             podcastHasStudentPosts
             isSectionSpecific
+            replyToEntryRequiredCount
             groupSet {
               _id
             }
@@ -118,6 +119,13 @@ describe Mutations::CreateDiscussionTopic do
                   _id
                   title
                 }
+              }
+              checkpoints {
+                dueAt
+                name
+                onlyVisibleToOverrides
+                pointsPossible
+                tag
               }
             }
           }
@@ -1096,7 +1104,18 @@ describe Mutations::CreateDiscussionTopic do
       GQL
 
       result = execute_with_input_with_assignment(query)
-      expect(result["errors"]).to be_nil
+      discussion_topic = result.dig("data", "createDiscussionTopic", "discussionTopic")
+      reply_to_topic_checkpoint = discussion_topic["assignment"]["checkpoints"].find { |checkpoint| checkpoint["tag"] == CheckpointLabels::REPLY_TO_TOPIC }
+      reply_to_entry_checkpoint = discussion_topic["assignment"]["checkpoints"].find { |checkpoint| checkpoint["tag"] == CheckpointLabels::REPLY_TO_ENTRY }
+      aggregate_failures do
+        expect(result["errors"]).to be_nil
+        expect(discussion_topic["assignment"]["checkpoints"][0]["name"]).to eq title
+        expect(reply_to_topic_checkpoint).to be_truthy
+        expect(reply_to_entry_checkpoint).to be_truthy
+        expect(reply_to_topic_checkpoint["pointsPossible"]).to eq 10
+        expect(reply_to_entry_checkpoint["pointsPossible"]).to eq 15
+        expect(discussion_topic["replyToEntryRequiredCount"]).to eq 3
+      end
     end
 
     it "successfully creates a discussion topic with checkpoints using dueAt, lockAt, unlockAt" do

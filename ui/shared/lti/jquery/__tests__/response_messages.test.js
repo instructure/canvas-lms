@@ -184,4 +184,11 @@ describe('response_messages', () => {
       code: 'unsupported_subject',
     })
   })
+
+  describe('sendUnauthorizedError', () => {
+    expectCodeAndMessageInError({
+      subject: builder => builder.sendUnauthorizedError(),
+      code: 'unauthorized',
+    })
+  })
 })

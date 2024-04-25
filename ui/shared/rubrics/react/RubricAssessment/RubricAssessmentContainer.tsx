@@ -18,6 +18,7 @@
 
 import React, {useEffect, useRef, useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import {colors} from '@instructure/canvas-theme'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
@@ -25,25 +26,34 @@ import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Button, CloseButton, IconButton} from '@instructure/ui-buttons'
 import {IconDownloadLine, IconPrinterLine} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
-import type {RubricAssessmentData, RubricCriterion, UpdateAssessmentData} from '../types/rubric'
+import type {
+  RubricAssessmentData,
+  RubricAssessmentSelect,
+  RubricCriterion,
+  UpdateAssessmentData,
+} from '../types/rubric'
 import {ModernView} from './ModernView'
 import {TraditionalView} from './TraditionalView'
 import {possibleString} from '../Points'
-import {Checkbox} from '@instructure/ui-checkbox'
 
 const I18n = useI18nScope('rubrics-assessment-tray')
 
 const MAX_TRADITIONAL_CRITERIA_RATINGS = 5
 
 export type ViewMode = 'horizontal' | 'vertical' | 'traditional'
+const {ash, shamrock} = colors
 
 type RubricAssessmentContainerProps = {
   criteria: RubricCriterion[]
   isPreviewMode: boolean
+  isPeerReview: boolean
   ratingOrder: string
   rubricTitle: string
   rubricAssessmentData: RubricAssessmentData[]
+  rubricAssessmentId: string
+  rubricAssessors: RubricAssessmentSelect
   selectedViewMode: ViewMode
+  onAccessorChange: (accessorId: string) => void
   onViewModeChange: (viewMode: ViewMode) => void
   onDismiss: () => void
   onSubmit?: () => void
@@ -52,10 +62,14 @@ type RubricAssessmentContainerProps = {
 export const RubricAssessmentContainer = ({
   criteria,
   isPreviewMode,
+  isPeerReview,
   ratingOrder,
   rubricTitle,
   rubricAssessmentData,
+  rubricAssessmentId,
+  rubricAssessors,
   selectedViewMode,
+  onAccessorChange,
   onDismiss,
   onSubmit,
   onViewModeChange,
@@ -87,6 +101,7 @@ export const RubricAssessmentContainer = ({
       return (
         <TraditionalView
           criteria={criteria}
+          isPeerReview={isPeerReview}
           rubricAssessmentData={rubricAssessmentData}
           rubricTitle={rubricTitle}
           onUpdateAssessmentData={onUpdateAssessmentData}
@@ -97,6 +112,7 @@ export const RubricAssessmentContainer = ({
     return (
       <ModernView
         criteria={criteria}
+        isPeerReview={isPeerReview}
         isPreviewMode={isPreviewMode}
         ratingOrder={ratingOrder}
         rubricAssessmentData={rubricAssessmentData}
@@ -111,6 +127,8 @@ export const RubricAssessmentContainer = ({
       onViewModeChange('vertical')
     }
   }, [criteria, disableTraditionalView, onViewModeChange, selectedViewMode])
+
+  const rubricHeader = isPeerReview ? I18n.t('Peer Review') : I18n.t('Rubric')
 
   return (
     <View as="div" padding="medium medium 0 medium" themeOverride={{paddingMedium: '1rem'}}>
@@ -129,10 +147,14 @@ export const RubricAssessmentContainer = ({
             disableTraditionalView={disableTraditionalView}
             instructorPoints={instructorPoints}
             isPreviewMode={isPreviewMode}
+            isPeerReview={isPeerReview}
             isTraditionalView={isTraditionalView}
+            onAccessorChange={onAccessorChange}
             onDismiss={onDismiss}
             onViewModeChange={onViewModeChange}
-            rubricTitle={rubricTitle}
+            rubricAssessmentId={rubricAssessmentId}
+            rubricAssessors={rubricAssessors}
+            rubricHeader={rubricHeader}
             selectedViewMode={selectedViewMode}
           />
         </Flex.Item>
@@ -141,7 +163,7 @@ export const RubricAssessmentContainer = ({
             {renderViewContainer()}
           </View>
         </Flex.Item>
-        {!isPreviewMode && (
+        {!isPreviewMode && !isPeerReview && (
           <Flex.Item as="footer">
             <AssessmentFooter onSubmit={onSubmit} />
           </Flex.Item>
@@ -191,8 +213,9 @@ const ViewModeSelect = ({
 
 type InstructorScoreProps = {
   instructorPoints: number
+  isPeerReview: boolean
 }
-const InstructorScore = ({instructorPoints = 0}: InstructorScoreProps) => {
+const InstructorScore = ({instructorPoints = 0, isPeerReview}: InstructorScoreProps) => {
   return (
     <Flex as="div" height="3rem" alignItems="center">
       <Flex.Item as="div" width="13.813rem" align="center">
@@ -207,7 +230,7 @@ const InstructorScore = ({instructorPoints = 0}: InstructorScoreProps) => {
         >
           <View as="span" margin="0 0 0 small">
             <Text size="medium" weight="bold">
-              {I18n.t('Instructor Score')}
+              {isPeerReview ? I18n.t('Peer Review Score') : I18n.t('Instructor Score')}
             </Text>
           </View>
         </div>
@@ -218,7 +241,7 @@ const InstructorScore = ({instructorPoints = 0}: InstructorScoreProps) => {
             lineHeight: '3rem',
             width: '4.313rem',
             height: '3rem',
-            backgroundColor: '#0B874B',
+            backgroundColor: isPeerReview ? ash : shamrock,
             borderRadius: '0 .35rem .35rem 0',
             textAlign: 'center',
           }}
@@ -237,32 +260,69 @@ const InstructorScore = ({instructorPoints = 0}: InstructorScoreProps) => {
   )
 }
 
+type AccessorSelectProps = {
+  rubricAssessmentId: string
+  rubricAssessors: RubricAssessmentSelect
+  showLabel: boolean
+  onAccessorChange: (accessorId: string) => void
+}
+const AccessorSelect = ({
+  rubricAssessmentId,
+  rubricAssessors,
+  showLabel,
+  onAccessorChange,
+}: AccessorSelectProps) => {
+  const label = I18n.t('Select Rubric')
+  return (
+    <SimpleSelect
+      data-testid="rubric-assessment-accessor-select"
+      renderLabel={showLabel ? label : <ScreenReaderContent>{label}</ScreenReaderContent>}
+      value={rubricAssessmentId}
+      onChange={(e, {value}) => onAccessorChange((value ?? '') as string)}
+    >
+      {rubricAssessors.map(assessor => (
+        <SimpleSelect.Option key={assessor.id} id={assessor.id} value={assessor.id}>
+          {assessor.name ?? ''}
+        </SimpleSelect.Option>
+      ))}
+    </SimpleSelect>
+  )
+}
+
 type AssessmentHeaderProps = {
   disableTraditionalView: boolean
   instructorPoints: number
   isPreviewMode: boolean
+  isPeerReview: boolean
   isTraditionalView: boolean
   onDismiss: () => void
   onViewModeChange: (viewMode: ViewMode) => void
-  rubricTitle: string
+  onAccessorChange: (accessorId: string) => void
+  rubricAssessmentId: string
+  rubricAssessors: RubricAssessmentSelect
+  rubricHeader: string
   selectedViewMode: ViewMode
 }
 const AssessmentHeader = ({
   disableTraditionalView,
   instructorPoints,
   isPreviewMode,
+  isPeerReview,
   isTraditionalView,
+  onAccessorChange,
   onDismiss,
   onViewModeChange,
-  rubricTitle,
+  rubricAssessmentId,
+  rubricAssessors,
+  rubricHeader,
   selectedViewMode,
 }: AssessmentHeaderProps) => {
   return (
     <View as="div" padding={isTraditionalView ? '0 0 medium 0' : '0'}>
       <Flex>
         <Flex.Item align="end">
-          <Text weight="bold" size="large">
-            {rubricTitle}
+          <Text weight="bold" size="large" data-testid="rubric-assessment-header">
+            {rubricHeader}
           </Text>
         </Flex.Item>
         <Flex.Item align="end">
@@ -285,11 +345,25 @@ const AssessmentHeader = ({
           />
         </Flex.Item>
         {isTraditionalView && (
-          <Flex.Item>
-            <View as="div" margin="0 large 0 0" themeOverride={{marginLarge: '2.938rem'}}>
-              <InstructorScore instructorPoints={instructorPoints} />
-            </View>
-          </Flex.Item>
+          <>
+            {rubricAssessors.length > 0 && rubricAssessmentId && (
+              <Flex.Item>
+                <View as="div" margin="0 large 0 0" themeOverride={{marginLarge: '2.938rem'}}>
+                  <AccessorSelect
+                    rubricAssessmentId={rubricAssessmentId}
+                    rubricAssessors={rubricAssessors}
+                    showLabel={false}
+                    onAccessorChange={onAccessorChange}
+                  />
+                </View>
+              </Flex.Item>
+            )}
+            <Flex.Item>
+              <View as="div" margin="0 large 0 0" themeOverride={{marginLarge: '2.938rem'}}>
+                <InstructorScore isPeerReview={isPeerReview} instructorPoints={instructorPoints} />
+              </View>
+            </Flex.Item>
+          </>
         )}
         <Flex.Item margin="0 0 0 small">
           <IconButton disabled={isPreviewMode} screenReaderLabel="Print">
@@ -305,8 +379,19 @@ const AssessmentHeader = ({
 
       {!isTraditionalView && (
         <>
+          {rubricAssessors.length > 0 && rubricAssessmentId && (
+            <Flex.Item margin="0 0 0 small">
+              <AccessorSelect
+                rubricAssessmentId={rubricAssessmentId}
+                rubricAssessors={rubricAssessors}
+                showLabel={true}
+                onAccessorChange={onAccessorChange}
+              />
+            </Flex.Item>
+          )}
+
           <Flex.Item margin="0 0 0 small">
-            <InstructorScore instructorPoints={instructorPoints} />
+            <InstructorScore isPeerReview={isPeerReview} instructorPoints={instructorPoints} />
           </Flex.Item>
 
           <View as="hr" margin="medium 0 medium 0" />
@@ -321,7 +406,7 @@ type AssessmentFooterProps = {
 }
 const AssessmentFooter = ({onSubmit}: AssessmentFooterProps) => {
   return (
-    <View as="div">
+    <View as="div" data-testid="rubric-assessment-footer">
       <View as="hr" margin="0" />
       <Flex justifyItems="end" margin="small 0">
         <Flex.Item>

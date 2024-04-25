@@ -18,6 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class Lti::IMS::Registration < ApplicationRecord
+  extend RootAccountResolver
   CANVAS_EXTENSION_LABEL = "canvas.instructure.com"
   self.table_name = "lti_ims_registrations"
 
@@ -39,7 +40,6 @@ class Lti::IMS::Registration < ApplicationRecord
             :jwks_uri,
             :token_endpoint_auth_method,
             :lti_tool_configuration,
-            :developer_key,
             presence: true
 
   validate :required_values_are_present,
@@ -56,7 +56,10 @@ class Lti::IMS::Registration < ApplicationRecord
             format: { with: URI::DEFAULT_PARSER.make_regexp(["http", "https"]) },
             allow_blank: true
 
-  belongs_to :developer_key, inverse_of: :lti_registration
+  belongs_to :developer_key, inverse_of: :ims_registration, optional: false
+  belongs_to :lti_registration, inverse_of: :ims_registration, optional: true, class_name: "Lti::Registration"
+
+  resolves_root_account through: :developer_key
 
   def settings
     canvas_configuration

@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<%= fields_for :settings, OpenObject.new(settings) do |f| %>
+<%= fields_for :settings do |f| %>
   <table style="width: 500px;" class="formtable">
     <tr>
       <td colspan="2"><%= mt(:description, <<~TEXT, :kaltura_url => 'http://www.kaltura.com', :notification_url => 'http://your_canvas_domain/media_objects/kaltura_notifications')
@@ -42,28 +42,28 @@ TEXT
     <tr>
       <td><%= f.blabel :domain, :en => "Domain" %></td>
       <td>
-        <%= f.text_field :domain %>
+        <%= f.text_field :domain, value: settings[:domain] %>
         <div class="hint"><%= t('hints.domain', 'For hosted accounts, use "www.kaltura.com"') %></div>
       </td>
     </tr>
     <tr>
       <td><%= f.blabel :resource_domain, :en => "Resource Domain" %></td>
       <td>
-        <%= f.text_field :resource_domain %>
+        <%= f.text_field :resource_domain, value: settings[:resource_domain] %>
         <div class="hint"><%= t('hints.resource_domain', 'For hosted accounts, use "cdn.kaltura.com"') %></div>
       </td>
     </tr>
     <tr>
       <td><%= f.blabel :rtmp_domain, :en => "RTMP Domain" %></td>
       <td>
-        <%= f.text_field :rtmp_domain %>
+        <%= f.text_field :rtmp_domain, value: settings[:rtmp_domain] %>
         <div class="hint"><%= t('hints.rtmp_domain', 'For hosted accounts, use "www.kaltura.com"') %></div>
       </td>
     </tr>
     <% if(ENV["RAILS_ENV"] == "development") %>
       <tr>
         <td><%= f.blabel :protocol, :en => "Protocol" %></td>
-        <td><%= f.select :protocol, [t('https'), t('http')] %></td>
+        <td><%= f.select :protocol, [t('https'), t('http')], selected: settings[:protocol] %></td>
       </tr>
     <% end %>
     <tr>
@@ -74,19 +74,19 @@ TEXT
     </tr>
     <tr>
       <td><%= f.blabel :partner_id, :en => "Partner ID" %></td>
-      <td><%= f.text_field :partner_id %></td>
+      <td><%= f.text_field :partner_id, value: settings[:partner_id] %></td>
     </tr>
     <tr>
       <td><%= f.blabel :subpartner_id, :en => "Sub Partner ID" %></td>
-      <td><%= f.text_field :subpartner_id %></td>
+      <td><%= f.text_field :subpartner_id, value: settings[:subpartner_id] %></td>
     </tr>
     <tr>
       <td><%= f.blabel :secret_key, :en => "Administrator Secret" %></td>
-      <td><%= f.text_field :secret_key %></td>
+      <td><%= f.text_field :secret_key, value: settings[:secret_key] %></td>
     </tr>
     <tr>
       <td><%= f.blabel :user_secret_key, :en => "User Secret" %></td>
-      <td><%= f.text_field :user_secret_key %></td>
+      <td><%= f.text_field :user_secret_key, value: settings[:user_secret_key] %></td>
     </tr>
     <tr>
       <td colspan="2" class="sub">
@@ -96,15 +96,15 @@ TEXT
     </tr>
     <tr>
       <td><%= f.blabel :player_ui_conf, :en => "Player UI Conf ID" %></td>
-      <td><%= f.text_field :player_ui_conf %></td>
+      <td><%= f.text_field :player_ui_conf, value: settings[:player_ui_conf] %></td>
     </tr>
     <tr>
       <td><%= f.blabel :kcw_ui_conf, :en => "KCW UI Conf ID" %></td>
-      <td><%= f.text_field :kcw_ui_conf %></td>
+      <td><%= f.text_field :kcw_ui_conf, value: settings[:kcw_ui_conf] %></td>
     </tr>
     <tr>
       <td><%= f.blabel :upload_ui_conf, :en => "Uploader UI Conf ID" %></td>
-      <td><%= f.text_field :upload_ui_conf %></td>
+      <td><%= f.text_field :upload_ui_conf, value: settings[:upload_ui_conf] %></td>
     </tr>
     <tr>
       <td colspan="2" class="sub">
@@ -116,7 +116,7 @@ TEXT
         <%= f.blabel :cache_play_list_seconds, :en => "Seconds to cache playlist URL" %>
         <p style="font-size: 0.8em;"><%= t(:cache_explanation, "Empty means cache indefinitely, 0 means don't cache.") %></p>
       </td>
-      <td><%= f.text_field :cache_play_list_seconds %></td>
+      <td><%= f.text_field :cache_play_list_seconds, value: settings[:cache_play_list_seconds] %></td>
     </tr>
     <tr>
       <td colspan="2" class="sub">
@@ -128,25 +128,25 @@ TEXT
         <%= f.blabel :kaltura_sis, :en => "Write SIS data to Kaltura" %>
         <p style="font-size: 0.8em;"><%= t(:kaltura_sis_explanation, "If checked user and course SIS data will be provided to Kaltura.") %></p>
       </td>
-      <td><%= f.check_box :kaltura_sis %></td>
+      <td><%= f.check_box :kaltura_sis, checked: Canvas::Plugin.value_to_boolean(settings[:kaltura_sis]) %></td>
     </tr>
     <tr>
       <td><%= f.label :do_analytics, :en => "Send analytics events" %></td>
-      <td><%= f.check_box :do_analytics, {}, 'yes', 'no' %></td>
+      <td><%= f.check_box :do_analytics, { checked: Canvas::Plugin.value_to_boolean(settings[:do_analytics]) }, 'yes', 'no' %></td>
     </tr>
     <tr>
       <td colspan="2" style="font-size: 0.8em;"><%= t(:kaltura_path_example, "e.g.")%><code>(#{domain}/api_v3/index.php?service=stats&action=collect&...)</code></td>
     </tr>
     <tr>
       <td><%= f.label :hide_rte_button, :en => "Hide the video icon in Rich Content Editor." %></td>
-      <td><%= f.check_box :hide_rte_button, {}, 'yes', 'no' %></td>
+      <td><%= f.check_box :hide_rte_button, { checked: Canvas::Plugin.value_to_boolean(settings[:hide_rte_button]) }, 'yes', 'no' %></td>
     </tr>
     <tr>
       <td colspan="2" style="font-size: 0.8em;"><%= t(:hide_rte_button_note, "(still there for conversations/SpeedGrader/Media Recordings homework submissions)")%></td>
     </tr>
     <tr>
       <td><%= f.label :js_uploader, :en => "Use html5 (accessible) uploader" %></td>
-      <td><%= f.check_box :js_uploader, {}, 'yes', 'no' %></td>
+      <td><%= f.check_box :js_uploader, { checked: Canvas::Plugin.value_to_boolean(settings[:js_uploader]) }, 'yes', 'no' %></td>
     </tr>
   </table>
 <% end %>

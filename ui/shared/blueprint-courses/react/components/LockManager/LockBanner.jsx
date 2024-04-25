@@ -67,7 +67,7 @@ export default class LockBanner extends Component {
           <Text weight="bold" size="small">
             {I18n.t('Locked:')}&nbsp;
           </Text>
-          <Text size="small">{formatLockObject(this.props.itemLocks)}</Text>
+          <Text size="small" data-testid="lockedMessage">{formatLockObject(this.props.itemLocks)}</Text>
         </Alert>
       )
     }

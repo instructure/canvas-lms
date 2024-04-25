@@ -17,7 +17,8 @@
  */
 
 import React from 'react'
-import {render, shallow} from 'enzyme'
+import {shallow} from 'enzyme'
+import {render} from '@testing-library/react'
 import UnassessedAssignment from '../UnassessedAssignment'
 
 it('properly renders the UnassessedAssignment component', () => {
@@ -36,5 +37,5 @@ it('properly renders with a quiz icon when submission type is online quiz', () =
     },
   }
   const wrapper = render(<UnassessedAssignment {...props} />)
-  expect(wrapper.find('svg[name="IconQuiz"]')).toHaveLength(1)
+  expect(wrapper.container.querySelector('svg[name="IconQuiz"]')).toBeInTheDocument()
 })

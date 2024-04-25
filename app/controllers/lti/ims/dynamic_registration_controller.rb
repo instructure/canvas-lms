@@ -82,6 +82,7 @@ module Lti
                           parsed_issuer.host
                         end
         issuer_protocol = parsed_issuer.scheme
+        issuer_protocol = request.scheme if Rails.env.development?
         issuer_port = parsed_issuer.port
 
         openid_configuration_url(protocol: issuer_protocol, port: issuer_port, host: issuer_domain, registration_token:)

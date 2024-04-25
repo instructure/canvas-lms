@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import type {RubricAssessment} from '@canvas/grading/grading'
 import type {Rubric, RubricAssessmentData} from '@canvas/rubrics/react/types/rubric'
 
 export type RubricTrayType = Pick<Rubric, 'title' | 'criteria' | 'ratingOrder'> | undefined
@@ -36,6 +37,10 @@ export type RubricUnderscoreType = {
     }[]
   }[]
   rating_order: string
+}
+
+export type RubricAssessmentUnderscore = RubricAssessment & {
+  data: RubricAssessmentDataUnderscore[]
 }
 
 export type RubricAssessmentDataUnderscore = {

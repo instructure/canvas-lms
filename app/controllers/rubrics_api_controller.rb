@@ -309,6 +309,16 @@ class RubricsApiController < ApplicationController
     end
   end
 
+  # @API Get the courses and assignments for
+  # Returns the rubric with the given id.
+  # @returns UsedLocations
+  def used_locations
+    rubric = @context.rubric_associations.bookmarked.find_by(rubric_id: params[:id])&.rubric
+    return unless authorized_action(@context, @current_user, :manage_rubrics)
+
+    render json: used_locations_for(rubric)
+  end
+
   private
 
   def rubric_assessments(rubric)
@@ -338,6 +348,31 @@ class RubricsApiController < ApplicationController
       scope.where(association_type: "Course")
     when "account_associations"
       scope.where(association_type: "Account")
+    end
+  end
+
+  def used_locations_to_json(used_locations)
+    used_locations.group_by(&:context).map do |course, assignments|
+      course_json = course.as_json(only: [:id, :name], methods: [:concluded?], include_root: false)
+      course_json[:assignments] = assignments.as_json(only: [:id, :title], include_root: false)
+      course_json
+    end
+  end
+
+  def used_locations_for(rubric)
+    GuardRail.activate(:secondary) do
+      scope = rubric.used_locations
+                    .joins("INNER JOIN #{Course.quoted_table_name} ON assignments.context_type = 'Course' AND assignments.context_id = courses.id")
+                    .order("courses.name ASC, title ASC")
+
+      used_locations = Api.paginate(
+        scope,
+        self,
+        rubric_used_locations_pagination_url(rubric),
+        per_page: 100
+      )
+
+      used_locations_to_json(used_locations)
     end
   end
 

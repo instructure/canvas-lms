@@ -51,6 +51,7 @@ import {
   IconUnpublishedLine,
   IconUpdownLine,
   IconUserLine,
+  IconPermissionsLine,
 } from '@instructure/ui-icons'
 import {Link} from '@instructure/ui-link'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -131,6 +132,8 @@ class DiscussionRow extends Component {
     masteryPathsPillLabel: string, // required if displayMasteryPathsPill is true
     displayManageMenu: bool.isRequired,
     displayPinMenuItem: bool.isRequired,
+    displayDifferentiatedModulesTray: bool.isRequired,
+    onOpenAssignToTray: func,
     draggable: bool,
     duplicateDiscussion: func.isRequired,
     isDragging: bool,
@@ -159,6 +162,7 @@ class DiscussionRow extends Component {
     displayMasteryPathsPill: false,
     masteryPathsPillLabel: '',
     onMoveDiscussion: null,
+    onOpenAssignToTray: null,
   }
 
   componentDidMount = () => {
@@ -238,6 +242,9 @@ class DiscussionRow extends Component {
         break
       case 'ltiMenuTool':
         window.location = `${menuTool.base_url}&discussion_topics[]=${id}`
+        break
+      case 'assignTo':
+        this.props.onOpenAssignToTray(this.props.discussion)
         break
       default:
         throw new Error('Unknown manage discussion action encountered')
@@ -510,6 +517,19 @@ class DiscussionRow extends Component {
             {icon}&nbsp;&nbsp;{menuLabel}{' '}
           </span>,
           screenReaderContent
+        )
+      )
+    }
+
+    if (this.props.displayDifferentiatedModulesTray) {
+      menuList.push(
+        this.createMenuItem(
+          'assignTo',
+          <span aria-hidden="true">
+            <IconPermissionsLine />
+            &nbsp;&nbsp;{I18n.t('Assign To...')}
+          </span>,
+          I18n.t('Set Assign to for %{title}', {title: discussionTitle})
         )
       )
     }
@@ -934,6 +954,8 @@ const mapState = (state, ownProps) => {
       discussion.permissions.delete ||
       (state.DIRECT_SHARE_ENABLED && state.permissions.read_as_admin),
     displayPinMenuItem: state.permissions.moderate,
+    displayDifferentiatedModulesTray:
+      ENV?.FEATURES?.differentiated_modules && discussion.permissions.update,
     masterCourseData: state.masterCourseData,
     isMasterCourse: masterCourse,
     DIRECT_SHARE_ENABLED: state.DIRECT_SHARE_ENABLED,

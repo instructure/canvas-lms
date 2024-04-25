@@ -69,6 +69,36 @@ describe Types::AssignmentType do
     let(:model_class) { Assignment }
   end
 
+  describe "hasGroupCategory" do
+    it "returns true for group assignments" do
+      assignment.update!(group_category: course.group_categories.create!(name: "My Category"))
+      expect(assignment_type.resolve("hasGroupCategory")).to be true
+    end
+
+    it "returns false for non-group assignments" do
+      expect(assignment_type.resolve("hasGroupCategory")).to be false
+    end
+  end
+
+  describe "gradeAsGroup" do
+    it "returns true for group assignments being graded as group" do
+      assignment.update!(group_category: course.group_categories.create!(name: "My Category"))
+      expect(assignment_type.resolve("gradeAsGroup")).to be true
+    end
+
+    it "returns false for group assignments being graded individually" do
+      assignment.update!(
+        group_category: course.group_categories.create!(name: "My Category"),
+        grade_group_students_individually: true
+      )
+      expect(assignment_type.resolve("gradeAsGroup")).to be false
+    end
+
+    it "returns false for non-group assignments" do
+      expect(assignment_type.resolve("gradeAsGroup")).to be false
+    end
+  end
+
   context "top-level permissions" do
     it "requires read permission" do
       assignment.unpublish
@@ -913,6 +943,53 @@ describe Types::AssignmentType do
           expect(query.resolve("checkpoints {dueAt}")).to eq [@everyone_due_at.iso8601]
           expect(query.resolve("checkpoints {assignmentOverrides {nodes {dueAt}}}")).to eq [[@section_due_at.iso8601]]
         end
+      end
+    end
+  end
+
+  describe "mySubAssignmentSubmissionsConnection" do
+    context "when feature flag is enabled" do
+      before do
+        course.root_account.enable_feature!(:discussion_checkpoints)
+        @topic = DiscussionTopic.create_graded_topic!(course:, title: "Checkpointed Discussion")
+        @topic.reply_to_entry_required_count = 2
+        @topic.save!
+        @assignment = @topic.assignment
+        @assignment.update!(has_sub_assignments: true)
+        @assignment.sub_assignments.create!(context: course, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC, points_possible: 5, due_at: 3.days.from_now)
+        @assignment.sub_assignments.create!(context: course, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY, points_possible: 10, due_at: 5.days.from_now)
+        @other_student = student_in_course(course:, active_all: true).user
+      end
+
+      it "returns the correct sub assignment submissions" do
+        root_entry = @topic.discussion_entries.create!(user: student, message: "my reply to topic")
+        2.times { |i| @topic.discussion_entries.create!(user: student, message: "my child reply #{i}", parent_entry: root_entry) }
+        @topic.discussion_entries.create!(user: @other_student, message: "other student reply to topic")
+
+        query = GraphQLTypeTester.new(@assignment, current_user: student)
+
+        expect(query.resolve("mySubAssignmentSubmissionsConnection {nodes {userId}}")).to match_array [student.id.to_s, student.id.to_s]
+        expect(query.resolve("mySubAssignmentSubmissionsConnection {nodes {subAssignmentTag}}")).to match_array [CheckpointLabels::REPLY_TO_TOPIC, CheckpointLabels::REPLY_TO_ENTRY]
+        expect(query.resolve("mySubAssignmentSubmissionsConnection {nodes {submissionStatus}}")).to match_array ["submitted", "submitted"]
+      end
+
+      it "does not mark REPLY_TO_ENTRY as submitted if user has not met minimum count" do
+        root_entry = @topic.discussion_entries.create!(user: student, message: "my reply to topic")
+        @topic.discussion_entries.create!(user: student, message: "my child reply", parent_entry: root_entry)
+
+        query = GraphQLTypeTester.new(@assignment, current_user: student)
+        expect(query.resolve("mySubAssignmentSubmissionsConnection {nodes {userId}}")).to match_array [student.id.to_s, student.id.to_s]
+        expect(query.resolve("mySubAssignmentSubmissionsConnection {nodes {subAssignmentTag}}")).to match_array [CheckpointLabels::REPLY_TO_TOPIC, CheckpointLabels::REPLY_TO_ENTRY]
+        expect(query.resolve("mySubAssignmentSubmissionsConnection {nodes {submissionStatus}}")).to match_array ["submitted", "unsubmitted"]
+      end
+
+      it "does not mark REPLY_TO_TOPIC as submitted if user has only replied to entries (but not enough)" do
+        root_entry = @topic.discussion_entries.create!(user: @other_student, message: "my reply to topic")
+        @topic.discussion_entries.create!(user: student, message: "my child reply", parent_entry: root_entry)
+        query = GraphQLTypeTester.new(@assignment, current_user: student)
+        expect(query.resolve("mySubAssignmentSubmissionsConnection {nodes {userId}}")).to match_array [student.id.to_s, student.id.to_s]
+        expect(query.resolve("mySubAssignmentSubmissionsConnection {nodes {subAssignmentTag}}")).to match_array [CheckpointLabels::REPLY_TO_TOPIC, CheckpointLabels::REPLY_TO_ENTRY]
+        expect(query.resolve("mySubAssignmentSubmissionsConnection {nodes {submissionStatus}}")).to match_array ["unsubmitted", "unsubmitted"]
       end
     end
   end

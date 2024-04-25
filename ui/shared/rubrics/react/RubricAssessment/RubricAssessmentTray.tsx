@@ -21,7 +21,12 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import LoadingIndicator from '@canvas/loading-indicator'
 import {Tray} from '@instructure/ui-tray'
 import {RubricAssessmentContainer, type ViewMode} from './RubricAssessmentContainer'
-import type {Rubric, RubricAssessmentData, UpdateAssessmentData} from '../types/rubric'
+import type {
+  Rubric,
+  RubricAssessmentData,
+  RubricAssessmentSelect,
+  UpdateAssessmentData,
+} from '../types/rubric'
 
 const I18n = useI18nScope('rubrics-assessment-tray')
 
@@ -29,8 +34,12 @@ export type RubricAssessmentTrayProps = {
   isLoading?: boolean
   isOpen: boolean
   isPreviewMode: boolean
+  isPeerReview?: boolean
   rubric?: Pick<Rubric, 'title' | 'criteria' | 'ratingOrder'>
   rubricAssessmentData: RubricAssessmentData[]
+  rubricAssessmentId?: string
+  rubricAssessors?: RubricAssessmentSelect
+  onAccessorChange?: (assessorId: string) => void
   onDismiss: () => void
   onSubmit?: (rubricAssessmentDraftData: RubricAssessmentData[]) => void
 }
@@ -38,8 +47,12 @@ export const RubricAssessmentTray = ({
   isOpen,
   isLoading = false,
   isPreviewMode,
+  isPeerReview = false,
   rubric,
   rubricAssessmentData,
+  rubricAssessmentId = '',
+  rubricAssessors = [],
+  onAccessorChange = () => {},
   onDismiss,
   onSubmit,
 }: RubricAssessmentTrayProps) => {
@@ -114,10 +127,14 @@ export const RubricAssessmentTray = ({
         <RubricAssessmentContainer
           criteria={rubric.criteria ?? []}
           isPreviewMode={isPreviewMode}
+          isPeerReview={isPeerReview}
           ratingOrder={rubric.ratingOrder ?? 'descending'}
           rubricTitle={rubric.title}
           rubricAssessmentData={rubricAssessmentDraftData}
+          rubricAssessmentId={rubricAssessmentId}
+          rubricAssessors={rubricAssessors}
           selectedViewMode={viewMode}
+          onAccessorChange={onAccessorChange}
           onDismiss={onDismiss}
           onSubmit={() => onSubmit?.(rubricAssessmentDraftData)}
           onViewModeChange={mode => setViewMode(mode)}

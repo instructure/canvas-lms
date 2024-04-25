@@ -273,4 +273,23 @@ describe('graphqlMockQuery', () => {
       await expect(promise).rejects.toThrow(/The graphql query contained errors/)
     })
   })
+
+  describe('resolvers', () => {
+    it('can be passed in to a query', async () => {
+      const query = gql`
+        query TestQuery {
+          assignment(id: "1") {
+            name
+          }
+        }
+      `
+      const resolvers = {
+        Assignment: {
+          name: () => 'foobarbaz',
+        },
+      }
+      const result = await mockGraphqlQuery(query, [], {}, resolvers)
+      expect(result.data.assignment.name).toEqual('foobarbaz')
+    })
+  })
 })

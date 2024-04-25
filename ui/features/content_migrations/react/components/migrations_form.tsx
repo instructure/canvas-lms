@@ -34,7 +34,6 @@ import ZipFileImporter from './migrator_forms/zip_file'
 import type {
   AttachmentProgressResponse,
   ContentMigrationItem,
-  ContentMigrationResponse,
   Migrator,
   DateShifts,
   onSubmitMigrationFormCallback,
@@ -74,7 +73,7 @@ const renderMigrator = (props: MigratorProps) => {
     case 'zip_file_importer':
       return <ZipFileImporter {...props} />
     case 'course_copy_importer':
-      delete props.fileUploadProgress
+      props.fileUploadProgress = null
       return <CourseCopyImporter {...props} />
     case 'moodle_converter':
       return <MoodleZipImporter {...props} />
@@ -87,7 +86,7 @@ const renderMigrator = (props: MigratorProps) => {
     case 'angel_exporter':
     case 'blackboard_exporter':
     case 'd2l_exporter':
-      delete props.fileUploadProgress
+      props.fileUploadProgress = null
       return <LegacyMigratorWrapper {...props} />
     default:
       return null
@@ -102,7 +101,7 @@ export const ContentMigrationsForm = ({
   const [migrators, setMigrators] = useState<any>([])
   const [chosenMigrator, setChosenMigrator] = useState<string | null>(null)
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const handleFileProgress = (json, {loaded, total}: AttachmentProgressResponse) => {
+  const handleFileProgress = (json: any, {loaded, total}: AttachmentProgressResponse) => {
     setFileUploadProgress(Math.trunc((loaded / total) * 100))
     if (loaded === total) {
       onResetForm()
@@ -126,15 +125,15 @@ export const ContentMigrationsForm = ({
         ...formData,
       }
 
-      const {json} = (await doFetchApi({
+      const {json} = await doFetchApi({
         method: 'POST',
         path: `/api/v1/courses/${courseId}/content_migrations`,
         body: requestBody,
-      })) as {json: ContentMigrationResponse} // TODO: remove type assertion once doFetchApi is typed
+      })
       if (preAttachmentFile && json.pre_attachment) {
         completeUpload(json.pre_attachment, preAttachmentFile, {
           ignoreResult: true,
-          onProgress: response => {
+          onProgress: (response: any) => {
             handleFileProgress(json, response)
           },
         })

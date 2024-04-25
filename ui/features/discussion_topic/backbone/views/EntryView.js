@@ -330,10 +330,12 @@ EntryView.prototype.countPosterity = function () {
     return stats
   }
   walk(this.model.attributes.replies, 'replies', function (entry) {
-    if (entry.read_state === 'unread') {
-      stats.unread++
+    if (!entry.deleted) {
+      if (entry.read_state === 'unread') {
+        stats.unread++
+      }
+      return stats.total++
     }
-    return stats.total++
   })
   return stats
 }

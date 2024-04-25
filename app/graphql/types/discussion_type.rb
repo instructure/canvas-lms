@@ -115,6 +115,9 @@ module Types
       object.published?
     end
 
+    field :reply_to_entry_required_count, Integer, null: false
+    delegate :reply_to_entry_required_count, to: :object
+
     field :assignment, Types::AssignmentType, null: true
     def assignment
       load_association(:assignment)

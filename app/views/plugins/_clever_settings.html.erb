@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<%= fields_for :settings, OpenObject.new(settings) do |f| %>
+<%= fields_for :settings do |f| %>
     <table style="width: 600px;" class="formtable">
       <tr>
         <td colspan="2"><%= mt(<<~TEXT, clever_url: "http://apps.clever.com/signup", callback_url: clever_callback_url)
@@ -29,7 +29,7 @@ TEXT
       <tr>
         <td><%= f.blabel :client_id, :en => "Client ID" %></td>
         <td>
-          <%= f.text_field :client_id %>
+          <%= f.text_field :client_id, value: settings[:client_id] %>
         </td>
       </tr>
       <tr>
