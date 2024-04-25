@@ -192,6 +192,7 @@ export default function ItemAssignToTray({
   const [blueprintDateLocks, setBlueprintDateLocks] = useState<DateLockTypes[] | undefined>(
     undefined
   )
+  const [hasModuleOverrides, sethasModuleOverrides] = useState(false)
   const lastPerformedAction = useRef<{action: 'add' | 'delete'; index?: number} | null>(null)
   const cardsRefs = useRef<{[cardId: string]: ItemAssignToCardRef}>({})
   const addCardButtonRef = useRef<Element | null>(null)
@@ -274,10 +275,13 @@ export default function ItemAssignToTray({
         delete dateDetailsApiResponse.overrides
         const baseDates: BaseDateDetails = dateDetailsApiResponse
         const onlyOverrides = !dateDetailsApiResponse.visible_to_everyone
+        const hasModuleOverride = overrides?.some(override => override.context_module_id)
+        const hasCourseOverride = overrides?.some(override => override.course_id)
 
         const cards: ItemAssignToCardSpec[] = []
         const selectedOptionIds: string[] = []
-        if (!onlyOverrides) {
+        if (!onlyOverrides && !hasCourseOverride) {
+          // only add the regular everyone card if there isn't a course override
           const cardId = makeCardId()
           const selectedOption = [getEveryoneOption(assignToCards.length > 1).id]
           cards.push({
@@ -311,6 +315,9 @@ export default function ItemAssignToTray({
             if (override.course_section_id) {
               defaultOptions.push(`section-${override.course_section_id}`)
             }
+            if (override.course_id) {
+              defaultOptions.push('everyone')
+            }
             if (
               removeCard ||
               (override.context_module_id &&
@@ -336,6 +343,7 @@ export default function ItemAssignToTray({
             selectedOptionIds.push(...defaultOptions)
           })
         }
+        sethasModuleOverrides(hasModuleOverride || false)
         setBlueprintDateLocks(dateDetailsApiResponse.blueprint_date_locks)
         setDisabledOptionIds(selectedOptionIds)
         setInitialCards(cards)
@@ -398,7 +406,7 @@ export default function ItemAssignToTray({
         [null, undefined, ''].includes(card.contextModuleId) ||
         (card.contextModuleId !== null && card.isEdited)
     )
-    const payload = generateDateDetailsPayload(filteredCards)
+    const payload = generateDateDetailsPayload(filteredCards, hasModuleOverrides)
     if (itemContentId !== undefined) {
       updateModuleItem({
         courseId,
@@ -409,7 +417,16 @@ export default function ItemAssignToTray({
         onSuccess: handleDismiss,
       })
     }
-  }, [onSave, assignToCards, courseId, itemContentId, itemType, itemName, handleDismiss])
+  }, [
+    assignToCards,
+    onSave,
+    hasModuleOverrides,
+    itemContentId,
+    courseId,
+    itemType,
+    itemName,
+    handleDismiss,
+  ])
 
   const handleDeleteCard = useCallback(
     (cardId: string) => {

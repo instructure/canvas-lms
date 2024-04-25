@@ -74,7 +74,7 @@ const AssignToOption = (props: Props) => {
         [null, undefined, ''].includes(card.contextModuleId) ||
         (card.contextModuleId !== null && card.isEdited)
     )
-    const overrides = generateDateDetailsPayload(filteredCards)
+    const overrides = generateDateDetailsPayload(filteredCards, false)
     props.onSync(overrides)
     setCheckPoint(assignToCards)
     handleClose()

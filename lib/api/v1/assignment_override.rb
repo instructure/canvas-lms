@@ -218,6 +218,11 @@ module Api::V1::AssignmentOverride
       override_data[:noop_id] = data[:noop_id]
     end
 
+    if !set_type && data.key?(:course_id)
+      set_type = "Course"
+      override_data[:course] = learning_object.context
+    end
+
     errors << "one of student_ids, group_id, or course_section_id is required" if !set_type && errors.empty?
 
     if %w[ADHOC Noop].include?(set_type) && data.key?(:title)
@@ -356,6 +361,10 @@ module Api::V1::AssignmentOverride
 
     if override_data.key?(:section)
       override.set = override_data[:section]
+    end
+
+    if override_data.key?(:course)
+      override.set = override_data[:course]
     end
 
     if override.set_type == "ADHOC"
