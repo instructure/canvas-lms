@@ -24,6 +24,7 @@ class AuthenticationProvider::Microsoft < AuthenticationProvider::OpenIDConnect
   plugin_settings :application_id, application_secret: :application_secret_dec
 
   SENSITIVE_PARAMS = [:application_secret].freeze
+  MICROSOFT_TENANT = "9188040d-6c67-4c5b-b112-36a304b66dad"
 
   def self.singleton?
     false
@@ -71,11 +72,32 @@ class AuthenticationProvider::Microsoft < AuthenticationProvider::OpenIDConnect
     id_token = claims(token)
     settings["known_tenants"] ||= []
     (settings["known_tenants"] << id_token["tid"]).uniq!
+    allowed_tenants = allowed_tenants_value
+    if allowed_tenants.include?("common")
+      # allow anyone
+    elsif allowed_tenants.include?("guests")
+      # just check the issuer
+      unless id_token["iss"] == "https://login.microsoftonline.com/#{tenant_value}/v2.0"
+        raise OAuthValidationError, t("User is from unacceptable issuer %{issuer}.", issuer: id_token["iss"].inspect)
+      end
+    elsif !allowed_tenants.empty? && !allowed_tenants.include?(id_token["tid"])
+      raise OAuthValidationError, t("User is from unacceptable tenant %{tenant}.", tenant: id_token["tid"].inspect)
+    end
+
     settings["known_idps"] ||= []
     idp = id_token["idp"] || id_token["iss"]
     (settings["known_idps"] << idp).uniq!
     save! if changed?
     id_token[login_attribute]
+  end
+
+  def allowed_tenants=(value)
+    value = value.split(",") if value.is_a?(String)
+    settings["allowed_tenants"] = value.map(&:strip).uniq
+  end
+
+  def allowed_tenants
+    settings["allowed_tenants"] || []
   end
 
   protected
@@ -97,6 +119,12 @@ class AuthenticationProvider::Microsoft < AuthenticationProvider::OpenIDConnect
   end
 
   def tenant_value
+    return MICROSOFT_TENANT if tenant == "microsoft"
+
     tenant.presence || "common"
+  end
+
+  def allowed_tenants_value
+    ([tenant_value.presence] + allowed_tenants).compact.uniq
   end
 end
