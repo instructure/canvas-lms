@@ -650,7 +650,7 @@ ja:
     report_header_course_name: コース名
     report_header_course_sis: "コース SIS"
     report_header_course_sis_id: "コース SIS ID"
-    report_header_created_at: 作成日時
+    report_header_created_at: 作成日
     report_header_current_grade: 現在の評定
     report_header_current_score: 現在のスコア
     report_header_email: Eメール
@@ -839,7 +839,7 @@ ja:
         no_item_found: アイテムが見つかりません
         time: 時刻
       comm_message_item: 
-        created_at: 作成日時
+        created_at: 作成日
         from_name: 自
         reply_to: 返信先
         sent_at: 送信日時
@@ -856,8 +856,8 @@ ja:
         find: 検索
       course_logging_details: 
         Field: フィールド
-        From: 変更前
-        To: 変更後
+        From: 開始時間
+        To: 終了時間
         Value: 値
         blank_placeholder: "-"
         copied_from_label: コピー元
@@ -1895,8 +1895,8 @@ ja:
               header: アクティビティ日：
     statistics: 
       concluded_at: "終了日時 %{at}"
-      created_at: "作成日時 %{at}"
-      created_at_by: "作成日時 %{at} 作成者 [%{teacher}](%{url})"
+      created_at: "作成日 %{at}"
+      created_at_by: "作成日 %{at} 作成者 [%{teacher}](%{url})"
       download_csv_link: "CSV のダウンロード"
       file_storage_header: "ファイル ストレージ"
       general_numbers_title: 全般的な数字
@@ -2377,7 +2377,7 @@ ja:
   add_people_7948b7da: 人々を追加する
   add_people_7ee4b2ec: メンバーの追加
   add_people_and_courses_to_canvas_5c4bfff9: "Canvas に人とコースを追加する"
-  add_people_to_coursename_5ea234e1: "...に人々を追加する：%{courseName}"
+  add_people_to_coursename_5ea234e1: "%{courseName} にユーザーを追加する"
   add_prerequisite_6409bd9: 前提条件の追加
   add_proficiency_level_93bd72d0: 熟達度を追加する
   add_proficiency_rating_d819f6b8: 熟達度を追加する
@@ -2643,8 +2643,8 @@ ja:
   all_gradeable_student_submissions_report_d11ee705: すべての採点可能な受講者の提出物レポート
   all_grades_hidden_3092d5b5: すべての評定が非表示
   all_grades_hidden_84409b76: すべての評定を非表示
-  all_grades_posted_616a85ab: 掲示されたすべての評定
-  all_grades_posted_d5b8cb68: すべての評定を掲示
+  all_grades_posted_616a85ab: すべての評定を表示
+  all_grades_posted_d5b8cb68: すべての評定を表示
   all_grading_period_sets_must_have_a_title_799538f: すべての採点期間のセットには、タイトルがついている必要があります
   all_grading_period_sets_must_have_at_least_one_enr_20b84ba1: すべての採点期間のセットには、最低一つの登録機関が必要です
   all_grading_periods_77974940: すべての採点期間
@@ -2676,7 +2676,7 @@ ja:
   all_student_groups_f74cd6c3: 全受講者グループ
   all_students_have_taken_the_quiz_b558f8b4: すべての受講者が小テストに回答しました。
   all_students_have_taken_the_survey_494f9f42: すべての受講者がサーベイに回答しました。
-  all_students_will_be_able_to_see_their_grade_and_o_66c1beab: すべての受講者が評定や提出コメントを見ることができます。
+  all_students_will_be_able_to_see_their_grade_and_o_66c1beab: すべての受講者が評定や課題コメントを見ることができます。
   all_subject_navigation_has_been_disabled_f06b0154: すべての科目ナビゲーションが無効になっています。
   all_subjects_5a42cfdb: すべての科目
   all_submission_comments_have_been_marked_as_read_74c0683b: すべての提出コメントは既読としてマークされています
@@ -6122,7 +6122,7 @@ ja:
   calendar_custom_recurring_event_repeat_picker: 
     single_and_plural_days: 
       one: 日にち
-      other: 日にち
+      other: 日
     single_and_plural_months: 
       one: 月数
       other: 月数
@@ -6182,7 +6182,7 @@ ja:
     fourth: 第4
     frequency: 頻度
     last: 最終
-    monthly_last_day: "%{weekNumber} %{day}に毎月"
+    monthly_last_day: "%{weekNumber} %{day}曜日に"
     not_repeat: 繰り返さない
     second: 第２
     third: 第3
@@ -7650,7 +7650,7 @@ ja:
   content_type_94fa7953: コンテンツタイプ
   context: 
     deleted_item: 
-      created: 作成日時
+      created: 作成日
       last_updated: 最終更新日時
       links: 
         restore: 復元
@@ -8241,7 +8241,7 @@ ja:
       body: 本文
     titles: 
       rss_feed: 会話フィード
-    unarchive: アーカイブ解凍
+    unarchive: アーカイブの解除
     unstar: スター取り消し
     unstar_conversation: 会話からスターを削除
   conversations_69a8dc26: 会話
@@ -8847,14 +8847,14 @@ ja:
       copied_from: コピー元
       copied_to: コピー先
       corrupted: 詳細なし
-      created: 作成日時
+      created: 作成日
       deleted: 削除済み
       published: 公開済み
       reset_from: リセット元
       reset_to: リセット先
       restored: 復元済み
       unconcluded: 未完了
-      updated: 更新済み
+      updated: 更新日
     field_label: 
       abstract_course_id: "抽象コース ID"
       account_id: "アカウント ID"
@@ -8866,7 +8866,7 @@ ja:
       allow_wiki_comments: "Wiki のコメントを許可"
       conclude_at: 終了日時
       course_code: "コース コード"
-      created_at: 作成日時
+      created_at: 作成日
       default_view: デフォルトのビュー
       default_wiki_editing_roles: "デフォルトの Wiki 編集ロール"
       enrollment_term_id: "登録期間 ID"
@@ -9791,18 +9791,18 @@ ja:
   create_theme_based_on_name_7b1bd318: "%{name}に基づくテーマを作成"
   create_users_view: 
     required: "電子メール アドレスを入力してください:"
-  created_58b8a75a: 作成日時
-  created_6ee36dff: "作成日時:"
-  created_ascending_cff48774: "作成日時:昇順"
+  created_58b8a75a: 作成日
+  created_6ee36dff: "作成日:"
+  created_ascending_cff48774: "作成日:昇順"
   created_at_6373bbea: created_at
-  created_at_73839757: 作成日時
+  created_at_73839757: 作成日
   created_by_b39b9c8b: 作成者
   created_by_sis_93fbb66b: sis_で_作成
   created_by_sis_b590894c: SISが作成しました。
   created_by_sis_e1449c31: SISによって作成されました
-  created_created_at_37c0ec3b: "作成日時:%{created_at}"
-  created_created_bf5714b8: "作成日時%{created}"
-  created_descending_e9a1b097: "作成日時:降順"
+  created_created_at_37c0ec3b: "作成日:%{created_at}"
+  created_created_bf5714b8: "作成日%{created}"
+  created_descending_e9a1b097: "作成日:降順"
   created_group_group_name_2097306b: "グループ %{group_name} を作成しました"
   created_group_group_name_224ce5f9: "グループを作成しました：%{group_name}"
   created_new_group_with_microsoft_id_group_id_71010b3: "Microsoft IDで新しいグループを作成：%{group_id}"
@@ -12341,7 +12341,7 @@ ja:
         account: アカウント
         category: カテゴリ
         comments: コメント
-        created_at: 作成日時
+        created_at: 作成日
         request_context_id: "要求コンテキスト ID"
         subject: 件名
         url: URL
@@ -17269,7 +17269,7 @@ ja:
   mailbox_selection_92d9cbf: メールボックスの選択
   main_navigation_3f080c80: "メイン ナビゲーション"
   main_text_color_7d65ab1b: メインのテキストカラー
-  maintenance_windows_days_weekday_of_the_month_from_e0113bb1: "メンテナンスウィンドウ：%{days} %{weekday} of the month from %{time_range} (%{utc_time_range} UTC )"
+  maintenance_windows_days_weekday_of_the_month_from_e0113bb1: "メンテナンス：%{days} %{weekday} %{time_range} (%{utc_time_range} UTC )"
   make_key_developername_invisible_212ecf72: "%{developerName}キーを非表示にする"
   make_key_developername_visible_97c404bf: "%{developerName}キーを表示する"
   make_key_invisible_e66af89: 鍵を見えなくする
@@ -18824,7 +18824,7 @@ ja:
       meta_data: "メタ データ"
       plain_text: "プレーン テキスト"
       titles: 
-        created_at: 作成日時
+        created_at: 作成日
         delay_for: 遅延
         from_name: 送信元名
         notification_name: お知らせの名前
@@ -19240,18 +19240,18 @@ ja:
           body: "%{author} は、たった今、%{assignment} に関する %{user} の提出物について新しいコメントを書きました"
           link_message: コメントを表示するにはここをクリックします
           someone: 名前未登録ユーザ
-          subject: "提出コメント: %{user}、%{assignment}、%{context}"
+          subject: "課題コメント: %{user}、%{assignment}、%{context}"
           submission_comment_link_message: "以下のリンクを使用して提出物の詳細を確認できます。または、このメッセージに応答してこのコメントに返信できます。許可されている際には、添付ファイルを含める必要がある場合には、Canvas にログインして提出物に返信してください。"
         link_message: "提出物の詳細はここでレビューできます:"
         someone: 名前未登録ユーザ
-        subject: "提出コメント: %{user}、%{assignment}、%{context}"
+        subject: "課題コメント: %{user}、%{assignment}、%{context}"
       sms: 
         body: "%{author} から %{assignment}、%{user}、%{context} に対する新しいコメント"
         more_info: "詳細は %{url} をご覧ください"
       summary: 
         body: "%{author} は、たった今、%{assignment} への提出物について %{user} に新しいコメントを書きました。"
         someone: 名前未登録ユーザ
-        subject: "提出コメント: %{user}、%{assignment}、%{context}"
+        subject: "課題コメント: %{user}、%{assignment}、%{context}"
       twitter: 
         tweet: "Canvas アラート - コメント:%{author} 対象: %{assignment}、%{user}、%{context}"
     submission_comment_for_teacher: 
@@ -19521,7 +19521,7 @@ ja:
   messages_sent_b851d0dd: メッセージを送信しました
   messages_unarchived_5986c440: 
     one: メッセージがアーカイブされていません！
-    other: メッセージがアーカイブされていません！
+    other: アーカイブを解除しました！
   messages_unarchived_df1a4b97: 
     one: メッセージがアーカイブされていません！
     other: メッセージがアーカイブされていません！
@@ -20061,7 +20061,7 @@ ja:
     score_change_notifications: スコア変更のお知らせ
     see_grade: 課題に対する評定
     students_will_see: 受講者は、この課題がミュートになっていることを確認できます。
-    submission_comments: 提出コメント
+    submission_comments: 課題コメント
     sure_you_want_to_mute: "この課題をミュートにしてもよろしいですか?この課題がミュートになっている間、受講者は以下について表示できず、新しいお知らせも受信しません:"
   mute_notifications_by_course_440e18be: コースごとの通知をミュート
   mute_unmute_assignment_62608e44: 課題のミュート/ミュート解除
@@ -20174,7 +20174,7 @@ ja:
   negative_points_fda45730: マイナスのポイント
   netherlands_14ca4f6d: オランダ
   netherlands_31_63e4f1b9: "オランダ (+31)"
-  never_1ed1244d: 一切なし
+  never_1ed1244d: なし
   never_allow_view_outside_eu_ddf0951a: EU圏外の閲覧を許可しない
   never_df100b49: まったくしない
   never_should_have_made_it_here_ab72bdab: ここまで来られるはずではありませんでした
@@ -20342,7 +20342,7 @@ ja:
   next_up_review_feedback_59555dbd: 次へ：フィードバックを確認する
   next_up_submit_assignment_2fdb7174: 次へ：課題を提出する
   next_up_submit_assignment_793a9d41: 次は：課題を提出する
-  next_window_window_90271943: "次のウィンドウ：%{window}"
+  next_window_window_90271943: "次回メンテナンス：%{window}"
   nickname_1e6da3ad: ニックネーム
   nickname_7df95b09: "ニックネーム:"
   nightingale_student_activity_tracking_f7d7c4cf: "Nightingale 受講者アクティビティの追跡"
@@ -20671,7 +20671,7 @@ ja:
       registration: 登録
       reminder: 事前通知
       student_appointment_signups: 受講者の予定のサインアップ
-      submission_comment: 提出コメント
+      submission_comment: 課題コメント
     content_link_error_description: |-
         *講師と管理者のみ：*
         
@@ -20800,7 +20800,7 @@ ja:
       rubric_assessment_invitation: ルーブリックのアセスメントへの招待
       rubric_assessment_submission_reminder: ルーブリックのアセスメントの提出をお忘れなく
       rubric_association_created: ルーブリックへの関連付けが作成されました
-      submission_comment: 提出コメント
+      submission_comment: 課題コメント
       submission_comment_for_teacher: 教員への提出コメント
       submission_grade_changed: 提出物の評定が変更されました
       submission_graded: 提出物が採点されました
@@ -20830,7 +20830,7 @@ ja:
         受講者の予定のサインアップ
     student_appointment_display: 受講者の予定のサインアップ
     submission_comment_description: 課題提出物のコメント
-    submission_comment_display: 提出コメント
+    submission_comment_display: 課題コメント
     web_conference_recording_ready: 会議の録音準備ができました
   notification_policies_requires_the_communication_c_2e7ded08: 通知ポリシーには、通信チャネルID、通知カテゴリー、および更新頻度が必須です
   notification_preferences: 
@@ -21036,7 +21036,7 @@ ja:
   observing_student_name_to_select_a_different_stude_e0466126: "%{student_name}を観察中。別の受講者を選択するには、ダッシュボードに戻ります。"
   observing_user_name_1a64e47b: "観察中：%{user_name}"
   occurrence_s_c12d1aad: 発生
-  occurrences_9710160a: 出現回数
+  occurrences_9710160a: 繰り返し回数
   occurrences_max_max_3201dec: "出現回数（最大%{max}）"
   october_6b2bf82: 10月
   of_grade_984aa550: "評定の %"
@@ -22318,7 +22318,7 @@ ja:
       default_comments_settings: "*ここに入力されるテキストが、課題提出時に受講者に表示されます。*"
       labels: 
         account_id: "VeriCite 消費者キー"
-        comments: 提出コメント
+        comments: 課題コメント
         exclude_quotes: 引用を除外する
         exclude_self_plag: 自己盗作を除外する
         host: "VeriCite ホスト"
@@ -22455,8 +22455,8 @@ ja:
   post_comment_a5a430a6: コメントを掲示する
   post_grade_to_sis_disabled_click_to_toggle_6ee5ff3: SISへのポストが無効です。クリックして切り替えてください。
   post_grade_to_sis_enabled_click_to_toggle_82da8ce8: SISへのポストが有効です。クリックして切り替えてください。
-  post_grades_39c52870: 評定表の投稿
-  post_grades_3e692d46: 評定を掲示する
+  post_grades_39c52870: 評定を表示
+  post_grades_3e692d46: 評定を表示
   post_grades_description: |-
       評定を掲示すると、教員は有効なSISシステムに評定を掲示できます。Powerschool、
       Aspire (SIS2000)、 JMC, およびその他の GradingCategory、GradingAssignment、
@@ -22720,7 +22720,7 @@ ja:
         disable_inbox: "会話の受信箱の未読メッセージ バッジを無効にし、会話のすべてのメッセージおよびお知らせを ASAP の電子メールとして送信します。"
         expires_at: 有効期限
         headers: 
-          approved_integrations: 承認済みの統合
+          approved_integrations: 承認済みのアプリケーション
         locale: 言語
         name: "フル ネーム"
         new_password: 新しいパスワード
@@ -22739,7 +22739,7 @@ ja:
         time_zone: "タイム ゾーン"
         token: トークン
         token_application: アプリ
-        token_created: 作成日時
+        token_created: 作成日
         token_expires: 有効期限
         token_last_used: 最終使用日
         token_purpose: 目的
@@ -22828,7 +22828,7 @@ ja:
       confirm_sms_number: "SMS 番号の確認"
       contact_not_confirmed: この連絡先は確認されていません。詳細についてはアドレスをクリックしてください
       email_not_confirmed: この電子メールは確認されていません。詳細についてはアドレスをクリックしてください
-      register_communication: コミュニケーションの登録
+      register_communication: 連絡先の登録
       unconfirmed_click_to_confirm: 確認されていません。クリックして確認してください
     token_never_expires: 一切なし
     twitter_select: 
@@ -23671,7 +23671,7 @@ ja:
         page_title: "イベント ログ"
       log_crumb: ログ
     quiz_submission_users: 
-      created: 作成日時
+      created: 作成日
     quiz_submissions: 
       errors: 
         invalid_submissions: この小テストへの提出物は、提出者のものであると確認できませんでした。もう一度やり直してください。
@@ -24696,7 +24696,7 @@ ja:
       one: "これら %{count} 個のアイテム、およびその中のすべてのものを削除してもよろしいですか?"
       other: "これら %{count} 個のアイテム、およびその中のすべてのものを削除してもよろしいですか?"
     created_at: 作成日
-    created_at_short: 作成日時
+    created_at_short: 作成日
     delete: 削除
     download: ダウンロード
     download_as_zip: "ZIP としてダウンロード"
@@ -25055,7 +25055,7 @@ ja:
   renderheadertitle_5015f4da: "%{renderHeaderTitle}"
   renders_both_to_do_lists_on_the_dashboard_sidebar__c7d38ae: "ダッシュボードのサイドバーに表示されるTo Doリストを、受講者が登録されている教員用に両方表示します。"
   reorders_some_menu_options_for_more_consistency_an_90efff07: メニューの順序を変更し、SpeedGraderへのリンクを追加。
-  repeat_every_e653d6d0: 毎回繰り返す
+  repeat_every_e653d6d0: 繰り返しの間隔
   repeats_on_61ecde30: 反復日：
   replace_attachmentdisplayname_button_94dd8ba1: "%{attachmentDisplayName}ボタンを交換"
   replace_e61834a7: 置換
@@ -25983,7 +25983,7 @@ ja:
         decrosslit_section: このセクションのクロスリスティング除去
         edit_section: セクションの編集
         recrosslist_section: このセクションの再クロスリスティング
-        uncrosslist_section: このセクションのクロスリスティングを除去
+        uncrosslist_section: このセクションのクロスリスティングを解除
         update_section: セクションの更新
       completed_enrollment: 
         one: "%{count} 件の登録が完了"
@@ -26008,7 +26008,7 @@ ja:
         one: "%{count} 件の登録が保留中"
         other: "%{count} 件の登録が保留中"
       prompts: 
-        are_you_sure_decrosslist: このセクションのクロスリスティングを除去してもよろしいですか?
+        are_you_sure_decrosslist: このセクションのクロスリスティングを解除してもよろしいですか?
       run_dates: "開始日 %{start_date} 終了日 %{end_date}"
       run_from: "開始日 %{start_date} 終了日なし"
       runs_until: "終了日 %{end_date}"
@@ -26018,7 +26018,7 @@ ja:
         cross_listed_sections: セクションのクロスリスティング
         crosslist_this_section: このセクションをクロスリスティング
         current_enrollments: 現在の登録
-        decrosslist_section: このセクションのクロスリスティングを除去
+        decrosslist_section: このセクションのクロスリスティングを解除
   sections_6d057c07: セクション
   sections_94731e51: セクション
   sections_aef3ebf2: "セクション： "
@@ -27543,7 +27543,7 @@ ja:
   sort_by_72dbba9c: 並べ替え基準
   sort_by_access_token_count_f785c683: アクセストークン数ごとに並べ替える
   sort_by_client_id_4c5ea42b: クライアントIDごとに並べ替える
-  sort_by_e75f9e3e: 分類する
+  sort_by_e75f9e3e: 並び変え
   sort_by_email_2e88bd70: 電子メールごとに並べ替える
   sort_by_name_d5cd1d03: 名前ごとに並べ替える
   sort_by_state_6a8913ff: 州ごとに並べ替える
@@ -27607,7 +27607,7 @@ ja:
     late_input: 
       days: 
         one: 日にち
-        other: 日にち
+        other: 日
       hours: 
         one: 時間
         other: 時間
@@ -27988,7 +27988,7 @@ ja:
   students_remove_4b27390b: "学生 - 削除"
   students_remove_4c8b3c3d: "受講生 - 削除"
   students_see_their_grades_here_ae80f808: 受講者はここで自分の評定を確認できます。
-  students_who_have_received_a_grade_or_a_submission_7ef046cc: 評定または提出コメントを受け取った受講者が、評定および/または提出コメントを見ることができます。
+  students_who_have_received_a_grade_or_a_submission_7ef046cc: 評定または課題コメントを受け取った受講者が、評定や課題コメントを見ることができます。
   students_who_have_taken_the_quiz_count_69dbbda0: 
     one: "既にこの小テストに回答した受講者 (%{count})"
     other: "既にこの小テストに回答した受講者 (%{count})"
@@ -28088,9 +28088,9 @@ ja:
   submission_comment_sent_3f2af3d0: 提出物のコメントが送信されました
   submission_comment_submission_submittor_assignment_3302b9af: "提出コメント：%{submission_submittor}, %{assignment},%{context}"
   submission_comment_updated_8d917ded: 提出物のコメントが更新されました
-  submission_comment_user_name_assignment_title_cour_d88ba875: "提出コメント：%{user_name}, %{assignment_title}, %{course_name}"
-  submission_comments_4fa03a17: 提出コメント
-  submission_comments_b6d65841: 提出コメント
+  submission_comment_user_name_assignment_title_cour_d88ba875: "課題コメント：%{user_name}, %{assignment_title}, %{course_name}"
+  submission_comments_4fa03a17: 課題コメント
+  submission_comments_b6d65841: 課題コメント
   submission_comments_sei_a10bc997: "投稿コメント - SEI"
   submission_comments_tray_290fad59: コメント送信トレイ
   submission_comments_tray_893d0267: コメントトレイを送信
@@ -28305,7 +28305,7 @@ ja:
   submit_on_behalf_of_student_af674b95: 受講者の代わりに送信する
   submit_the_assignment_2d038278: 課題を提出する
   submit_ticket_5515ffd: チケットの提出
-  submitted_318fad53: タスクの評定を送信
+  submitted_318fad53: 提出済み
   submitted_718f5cbc: "提出済み： "
   submitted_at_4d5ea3aa: 提出
   submitted_by_name_dab6d5e1: "提出者：%{name}"
@@ -30861,7 +30861,7 @@ ja:
   unable_to_update_quotas_62baf95b: 定数（クォータ）の更新ができない
   unable_to_update_splitscreen_preference_4d449fa5: 分割スクリーンの環境設定を更新できません。
   unaccepted_students_aa68ea98: 受諾されていない受講者
-  unarchive_f245e2d6: アーカイブ解凍
+  unarchive_f245e2d6: アーカイブの解除
   unarchive_grading_scheme_41fea411: 評定スキームをアーカイブ解除する
   unarchive_operation_failed_22c42032: アーカイブから外す操作に失敗しました
   unarchive_selected_e0c4bd3d: アーカイブ解除が選択されました
@@ -31105,7 +31105,7 @@ ja:
       配置を使用するすべてのツールの外観をCanvasの他のUIに沿った、よりモダンなデザインに更新します。
   update_tool_7d48ef2a: " %{tool}を更新"
   update_your_notification_settings_ed9564f3: お知らせ設定を更新
-  updated_2c1e8615: 更新済み
+  updated_2c1e8615: 更新日
   updated_after_3a81825c: （）後に更新
   updated_at_ab9f625d: updated_at
   updated_count_accounts_5fe53c96: 
@@ -31657,7 +31657,7 @@ ja:
         sis_user_id: "SIS ID"
         unique_id: ログイン
       more: もっと読む...
-      never: 一切なし
+      never: なし
       none: なし
       reset_mfa: マルチファクタ認証のリセット
       titles: 
@@ -32281,7 +32281,7 @@ ja:
   which_canvas_account_would_you_like_to_use_to_log__c3718dc6: "どの Canvas アカウントでログインしますか？"
   which_course_is_this_question_about_f819a158: これはどのコースについての質問ですか?
   while_the_grades_for_an_assignment_are_set_to_manu_457c38ff: 課題の評定が手動として設定されている間は、受講者は以下についての新しい通知を受け取らないか、または見ることができません。
-  while_the_grades_for_this_assignment_are_hidden_st_c5d1992b: "この課題の評定は非表示になっていますが、 n受講者​​は見ることができるかについての新しい通知を受け取ることはありません。"
+  while_the_grades_for_this_assignment_are_hidden_st_c5d1992b: この課題の評定を非表示にすると、以下の項目について受講者に通知されません。
   while_the_grades_for_this_assignment_are_set_to_ma_cb716ede: この課題の評定を手動に設定しながら、受講者は、新しい通知を受け取るか、または下記を見ることができます。
   white_87fa64fd: ホワイト
   whitelist_count_max_26a270f: "ホワイトリスト (%{count}/%{max})"
@@ -32553,8 +32553,8 @@ ja:
       
       続行しますか？
   you_are_about_to_remove_this_course_from_your_dash_7e806db6: |-
-      このコースをダッシュ​​ボードから削除しようとしています。メインメニューから[コース]> [すべてのコース]に移動すると、
-                    は引き続き利用できます。
+      このコースをダッシュ​​ボードから削除しようとしています。グローバルナビゲーションから [コース] > [すべてのコース] に移動すれば、
+                    このコース は引き続き利用できます。
   you_are_currently_acting_as_user_name_8d2be0ee: "あなたは現在、～として行動しています%{user_name}"
   you_are_currently_in_the_environment_environment_t_449c4c0f: "あなたは現在、この %{environment} 環境にいます。これはすべての顧客に影響します。よろしいですか？"
   you_are_currently_logged_into_student_view_3e8a1da: 現在、受講者ビューにログインしています
@@ -32588,7 +32588,7 @@ ja:
   you_can_access_the_welcome_tour_here_any_time_as_w_95b44855: ウェルカムツアーはもちろん、他の新しいリソースにも、いつでもアクセスすることができます。
   you_can_add_important_information_here_that_you_wa_ca04a3f: "ここに、[リソース]タブに表示する重要な情報を追加できます。"
   you_can_also_manage_access_at_this_time_105a2530: "この時点のアクセスを管理することもできます:"
-  you_can_begin_sending_notifications_again_by_click_50d3f0cf: "[評定を掲示]リンクをクリックすると、通知の送信を再開できます。"
+  you_can_begin_sending_notifications_again_by_click_50d3f0cf: 「全ての評定を表示」ボタンをクリックすると、通知の送信を再開できます。
   you_can_check_out_other_groups_by_clicking_this_li_1c09e4fb: "このリンクをクリックすると、他のグループについて調べることができます: %{link}"
   you_can_check_out_the_group_by_clicking_this_link__10fb5deb: "下のリンクをクリックすると、グループについて調べることができます: %{link}"
   you_can_check_out_the_group_by_clicking_this_link__e49e4f1d: "このリンクをクリックすると、グループについて調べることができます: %{link}"
@@ -32829,7 +32829,7 @@ ja:
   you_ve_scrolled_back_to_your_very_first_to_do_873510d1: これより前のタスクはありません
   you_ve_updated_the_scoring_criteria_this_will_affe_ec852671: 採点基準を更新しました。これにより、このアウトカムを使用して以前に評価されたすべての受講者に影響があります
   you_will_be_redirected_to_a_login_page_where_you_w_fc8df402: あなたの子供の認証情報でログインする必要があるログインページにリダイレクトされます。
-  you_will_be_redirected_to_gradebook_while_your_fil_23fab7de: "ファイルがアップロードされている間、グレードブックにリダイレクトされます。CSV ファイルが大きいと、変更が更新されるまでに数分かかる場合があります。データを上書きを防ぐため、アップロードが完了しており、グレードブックが正しいことを確認してから追加の変更を行ってください。"
+  you_will_be_redirected_to_gradebook_while_your_fil_23fab7de: "ファイルがアップロードされている間、評定表にリダイレクトされます。CSV ファイルが大きい場合、数分かかります。データの上書きを防ぐため、アップロードの完了後、評定表が正しく反映されたことを確認してから追加の変更を行ってください。"
   you_will_need_to_create_a_new_app_on_facebook_face_8fe85297: |-
       [Facebookに新しいアプリを](%{facebook_url})を作成する必要があり、詳細設定のClient OAuth Login
       を有効にします。有効なOAuthリダイレクトURIとして、 %{callback_url} を設定する必要があります。
