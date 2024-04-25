@@ -441,168 +441,194 @@ describe('DiscussionTopicForm', () => {
     })
   })
 
-  describe('Checkpoints', () => {
-    it('toggles the checkpoints checkbox when clicked', () => {
+  describe('Graded', () => {
+    it('does not allow the automatic peer review per student input to go below 1', () => {
       const {getByTestId, getByLabelText} = setup()
 
       getByLabelText('Graded').click()
+      getByLabelText('Automatically assign').click()
+      const automaticReviewsInput = getByTestId('peer-review-count-input')
+      expect(automaticReviewsInput.value).toBe('1')
 
-      const checkbox = getByTestId('checkpoints-checkbox')
-      checkbox.click()
-      expect(checkbox.checked).toBe(true)
+      fireEvent.click(automaticReviewsInput)
 
-      checkbox.click()
-      expect(checkbox.checked).toBe(false)
+      fireEvent.keyDown(automaticReviewsInput, {keyCode: 40})
+      expect(automaticReviewsInput.value).toBe('1')
     })
-    it('renders the checkpoints checkbox as selected when there are existing checkpoints', () => {
-      const {getByTestId} = setup({
-        currentDiscussionTopic: DiscussionTopic.mock({
-          assignment: Assignment.mock({hasSubAssignments: true}),
-        }),
-      })
-      const checkbox = getByTestId('checkpoints-checkbox')
-      expect(checkbox.checked).toBe(true)
-    })
-    describe('Checkpoints Settings', () => {
-      let getByTestId, getByLabelText
 
-      const setupCheckpoints = setupFunction => {
-        const discussionTopicSetup = setupFunction
-
-        getByTestId = discussionTopicSetup.getByTestId
-        getByLabelText = discussionTopicSetup.getByLabelText
+    describe('Checkpoints', () => {
+      it('toggles the checkpoints checkbox when clicked', () => {
+        const {getByTestId, getByLabelText} = setup()
 
         getByLabelText('Graded').click()
 
         const checkbox = getByTestId('checkpoints-checkbox')
         checkbox.click()
-      }
+        expect(checkbox.checked).toBe(true)
 
-      it('increments and decrements the checkpoints settings points possible reply to topic fields', () => {
-        setupCheckpoints(setup())
-
-        const numberInputReplyToTopic = getByTestId('points-possible-input-reply-to-topic')
-        expect(numberInputReplyToTopic.value).toBe('0')
-
-        fireEvent.click(numberInputReplyToTopic)
-
-        fireEvent.keyDown(numberInputReplyToTopic, {keyCode: 38})
-        expect(numberInputReplyToTopic.value).toBe('1')
-
-        fireEvent.keyDown(numberInputReplyToTopic, {keyCode: 40})
-        expect(numberInputReplyToTopic.value).toBe('0')
+        checkbox.click()
+        expect(checkbox.checked).toBe(false)
       })
-      it('increments and decrements the checkpoints settings points possible reply to entry fields', () => {
-        setupCheckpoints(setup())
-
-        const numberInputReplyToEntry = getByTestId('points-possible-input-reply-to-entry')
-        expect(numberInputReplyToEntry.value).toBe('0')
-
-        fireEvent.click(numberInputReplyToEntry)
-
-        fireEvent.keyDown(numberInputReplyToEntry, {keyCode: 38})
-        expect(numberInputReplyToEntry.value).toBe('1')
-
-        fireEvent.keyDown(numberInputReplyToEntry, {keyCode: 40})
-        expect(numberInputReplyToEntry.value).toBe('0')
-      })
-      describe('Additional Replies Required', () => {
-        it('increments and decrements the checkpoints settings additional replies required entry field', () => {
-          setupCheckpoints(setup())
-
-          const numberInputReplyToEntryRequiredCount = getByTestId('reply-to-entry-required-count')
-          expect(numberInputReplyToEntryRequiredCount.value).toBe('1')
-
-          fireEvent.click(numberInputReplyToEntryRequiredCount)
-
-          fireEvent.keyDown(numberInputReplyToEntryRequiredCount, {keyCode: 38})
-          expect(numberInputReplyToEntryRequiredCount.value).toBe('2')
-
-          fireEvent.keyDown(numberInputReplyToEntryRequiredCount, {keyCode: 40})
-          expect(numberInputReplyToEntryRequiredCount.value).toBe('1')
-        })
-        it('does not allow incrementing or decrementing if required count is not in the allowed range', () => {
-          setupCheckpoints(setup())
-
-          const numberInputReplyToEntryRequiredCount = getByTestId('reply-to-entry-required-count')
-          expect(numberInputReplyToEntryRequiredCount.value).toBe('1')
-
-          fireEvent.click(numberInputReplyToEntryRequiredCount)
-
-          fireEvent.keyDown(numberInputReplyToEntryRequiredCount, {keyCode: 40})
-          expect(numberInputReplyToEntryRequiredCount.value).toBe('1')
-
-          fireEvent.change(numberInputReplyToEntryRequiredCount, {target: {value: '10'}})
-
-          fireEvent.keyDown(numberInputReplyToEntryRequiredCount, {keyCode: 38})
-          expect(numberInputReplyToEntryRequiredCount.value).toBe('10')
-        })
-        it('allows input to be changed if the required count falls within the allowed range', () => {
-          setupCheckpoints(setup())
-
-          const numberInputReplyToEntryRequiredCount = getByTestId('reply-to-entry-required-count')
-          expect(numberInputReplyToEntryRequiredCount.value).toBe('1')
-
-          fireEvent.change(numberInputReplyToEntryRequiredCount, {target: {value: '6'}})
-          expect(numberInputReplyToEntryRequiredCount.value).toBe('6')
-        })
-        it('does not allow input to be changed if the required count falls outside the allowed range', () => {
-          setupCheckpoints(setup())
-
-          const numberInputReplyToEntryRequiredCount = getByTestId('reply-to-entry-required-count')
-          expect(numberInputReplyToEntryRequiredCount.value).toBe('1')
-
-          fireEvent.change(numberInputReplyToEntryRequiredCount, {target: {value: '11'}})
-          expect(numberInputReplyToEntryRequiredCount.value).toBe('1')
-
-          fireEvent.change(numberInputReplyToEntryRequiredCount, {target: {value: '0'}})
-          expect(numberInputReplyToEntryRequiredCount.value).toBe('1')
-        })
-        it('reverts to minimum required count value if user has backspaced and leaves the input field', () => {
-          setupCheckpoints(setup())
-
-          const numberInputReplyToEntryRequiredCount = getByTestId('reply-to-entry-required-count')
-          expect(numberInputReplyToEntryRequiredCount.value).toBe('1')
-
-          fireEvent.change(numberInputReplyToEntryRequiredCount, {target: {value: ''}})
-          expect(numberInputReplyToEntryRequiredCount.value).toBe('0')
-
-          fireEvent.blur(numberInputReplyToEntryRequiredCount)
-          expect(numberInputReplyToEntryRequiredCount.value).toBe('1')
-        })
-      })
-      it('sets the correct checkpoint settings values when there are existing checkpoints', () => {
+      it('renders the checkpoints checkbox as selected when there are existing checkpoints', () => {
         const {getByTestId} = setup({
           currentDiscussionTopic: DiscussionTopic.mock({
-            replyToEntryRequiredCount: 5,
-            assignment: Assignment.mock({
-              hasSubAssignments: true,
-              checkpoints: [
-                {
-                  dueAt: null,
-                  name: 'checkpoint discussion',
-                  onlyVisibleToOverrides: false,
-                  pointsPossible: 6,
-                  tag: REPLY_TO_TOPIC,
-                },
-                {
-                  dueAt: null,
-                  name: 'checkpoint discussion',
-                  onlyVisibleToOverrides: false,
-                  pointsPossible: 7,
-                  tag: REPLY_TO_ENTRY,
-                },
-              ],
-            }),
+            assignment: Assignment.mock({hasSubAssignments: true}),
           }),
         })
+        const checkbox = getByTestId('checkpoints-checkbox')
+        expect(checkbox.checked).toBe(true)
+      })
+      describe('Checkpoints Settings', () => {
+        let getByTestId, getByLabelText
 
-        const numberInputReplyToTopic = getByTestId('points-possible-input-reply-to-topic')
-        expect(numberInputReplyToTopic.value).toBe('6')
-        const numberInputReplyToEntry = getByTestId('points-possible-input-reply-to-entry')
-        expect(numberInputReplyToEntry.value).toBe('7')
-        const numberInputAdditionalRepliesRequired = getByTestId('reply-to-entry-required-count')
-        expect(numberInputAdditionalRepliesRequired.value).toBe('5')
+        const setupCheckpoints = setupFunction => {
+          const discussionTopicSetup = setupFunction
+
+          getByTestId = discussionTopicSetup.getByTestId
+          getByLabelText = discussionTopicSetup.getByLabelText
+
+          getByLabelText('Graded').click()
+
+          const checkbox = getByTestId('checkpoints-checkbox')
+          checkbox.click()
+        }
+
+        it('increments and decrements the checkpoints settings points possible reply to topic fields', () => {
+          setupCheckpoints(setup())
+
+          const numberInputReplyToTopic = getByTestId('points-possible-input-reply-to-topic')
+          expect(numberInputReplyToTopic.value).toBe('0')
+
+          fireEvent.click(numberInputReplyToTopic)
+
+          fireEvent.keyDown(numberInputReplyToTopic, {keyCode: 38})
+          expect(numberInputReplyToTopic.value).toBe('1')
+
+          fireEvent.keyDown(numberInputReplyToTopic, {keyCode: 40})
+          expect(numberInputReplyToTopic.value).toBe('0')
+        })
+        it('increments and decrements the checkpoints settings points possible reply to entry fields', () => {
+          setupCheckpoints(setup())
+
+          const numberInputReplyToEntry = getByTestId('points-possible-input-reply-to-entry')
+          expect(numberInputReplyToEntry.value).toBe('0')
+
+          fireEvent.click(numberInputReplyToEntry)
+
+          fireEvent.keyDown(numberInputReplyToEntry, {keyCode: 38})
+          expect(numberInputReplyToEntry.value).toBe('1')
+
+          fireEvent.keyDown(numberInputReplyToEntry, {keyCode: 40})
+          expect(numberInputReplyToEntry.value).toBe('0')
+        })
+        describe('Additional Replies Required', () => {
+          it('increments and decrements the checkpoints settings additional replies required entry field', () => {
+            setupCheckpoints(setup())
+
+            const numberInputReplyToEntryRequiredCount = getByTestId(
+              'reply-to-entry-required-count'
+            )
+            expect(numberInputReplyToEntryRequiredCount.value).toBe('1')
+
+            fireEvent.click(numberInputReplyToEntryRequiredCount)
+
+            fireEvent.keyDown(numberInputReplyToEntryRequiredCount, {keyCode: 38})
+            expect(numberInputReplyToEntryRequiredCount.value).toBe('2')
+
+            fireEvent.keyDown(numberInputReplyToEntryRequiredCount, {keyCode: 40})
+            expect(numberInputReplyToEntryRequiredCount.value).toBe('1')
+          })
+          it('does not allow incrementing or decrementing if required count is not in the allowed range', () => {
+            setupCheckpoints(setup())
+
+            const numberInputReplyToEntryRequiredCount = getByTestId(
+              'reply-to-entry-required-count'
+            )
+            expect(numberInputReplyToEntryRequiredCount.value).toBe('1')
+
+            fireEvent.click(numberInputReplyToEntryRequiredCount)
+
+            fireEvent.keyDown(numberInputReplyToEntryRequiredCount, {keyCode: 40})
+            expect(numberInputReplyToEntryRequiredCount.value).toBe('1')
+
+            fireEvent.change(numberInputReplyToEntryRequiredCount, {target: {value: '10'}})
+
+            fireEvent.keyDown(numberInputReplyToEntryRequiredCount, {keyCode: 38})
+            expect(numberInputReplyToEntryRequiredCount.value).toBe('10')
+          })
+          it('allows input to be changed if the required count falls within the allowed range', () => {
+            setupCheckpoints(setup())
+
+            const numberInputReplyToEntryRequiredCount = getByTestId(
+              'reply-to-entry-required-count'
+            )
+            expect(numberInputReplyToEntryRequiredCount.value).toBe('1')
+
+            fireEvent.change(numberInputReplyToEntryRequiredCount, {target: {value: '6'}})
+            expect(numberInputReplyToEntryRequiredCount.value).toBe('6')
+          })
+          it('does not allow input to be changed if the required count falls outside the allowed range', () => {
+            setupCheckpoints(setup())
+
+            const numberInputReplyToEntryRequiredCount = getByTestId(
+              'reply-to-entry-required-count'
+            )
+            expect(numberInputReplyToEntryRequiredCount.value).toBe('1')
+
+            fireEvent.change(numberInputReplyToEntryRequiredCount, {target: {value: '11'}})
+            expect(numberInputReplyToEntryRequiredCount.value).toBe('1')
+
+            fireEvent.change(numberInputReplyToEntryRequiredCount, {target: {value: '0'}})
+            expect(numberInputReplyToEntryRequiredCount.value).toBe('1')
+          })
+          it('reverts to minimum required count value if user has backspaced and leaves the input field', () => {
+            setupCheckpoints(setup())
+
+            const numberInputReplyToEntryRequiredCount = getByTestId(
+              'reply-to-entry-required-count'
+            )
+            expect(numberInputReplyToEntryRequiredCount.value).toBe('1')
+
+            fireEvent.change(numberInputReplyToEntryRequiredCount, {target: {value: ''}})
+            expect(numberInputReplyToEntryRequiredCount.value).toBe('0')
+
+            fireEvent.blur(numberInputReplyToEntryRequiredCount)
+            expect(numberInputReplyToEntryRequiredCount.value).toBe('1')
+          })
+        })
+        it('sets the correct checkpoint settings values when there are existing checkpoints', () => {
+          const {getByTestId} = setup({
+            currentDiscussionTopic: DiscussionTopic.mock({
+              replyToEntryRequiredCount: 5,
+              assignment: Assignment.mock({
+                hasSubAssignments: true,
+                checkpoints: [
+                  {
+                    dueAt: null,
+                    name: 'checkpoint discussion',
+                    onlyVisibleToOverrides: false,
+                    pointsPossible: 6,
+                    tag: REPLY_TO_TOPIC,
+                  },
+                  {
+                    dueAt: null,
+                    name: 'checkpoint discussion',
+                    onlyVisibleToOverrides: false,
+                    pointsPossible: 7,
+                    tag: REPLY_TO_ENTRY,
+                  },
+                ],
+              }),
+            }),
+          })
+
+          const numberInputReplyToTopic = getByTestId('points-possible-input-reply-to-topic')
+          expect(numberInputReplyToTopic.value).toBe('6')
+          const numberInputReplyToEntry = getByTestId('points-possible-input-reply-to-entry')
+          expect(numberInputReplyToEntry.value).toBe('7')
+          const numberInputAdditionalRepliesRequired = getByTestId('reply-to-entry-required-count')
+          expect(numberInputAdditionalRepliesRequired.value).toBe('5')
+        })
       })
     })
   })

@@ -74,12 +74,21 @@ export const PeerReviewOptions = ({
               data-testid="peer-review-count-input"
               renderLabel={I18n.t('Reviews Per Student')}
               onIncrement={() => setPeerReviewsPerStudent(peerReviewsPerStudent + 1)}
-              onDecrement={() => setPeerReviewsPerStudent(peerReviewsPerStudent - 1)}
+              onDecrement={() => {
+                if (peerReviewsPerStudent - 1 > 0) {
+                  setPeerReviewsPerStudent(peerReviewsPerStudent - 1)
+                }
+              }}
               value={peerReviewsPerStudent}
               onChange={event => {
                 // don't allow non-numeric values
                 if (!/^\d*\.?\d*$/.test(event.target.value)) return
                 setPeerReviewsPerStudent(Number.parseInt(event.target.value, 10))
+              }}
+              onBlur={event => {
+                if (event.target.value === '0') {
+                  setPeerReviewsPerStudent(1)
+                }
               }}
             />
           </View>
