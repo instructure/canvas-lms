@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {mount} from 'enzyme'
+import {render, waitFor, within} from '@testing-library/react'
 import React from 'react'
 import AddPeople from '../add_people'
 import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
@@ -42,15 +42,17 @@ describe('Focus Handling', () => {
       reset() {},
     }
 
-    const wrapper = mount(<AddPeople {...props} />)
+    const wrapper = render(<AddPeople {...props} />)
+    wrapper.rerender(
+      <AddPeople
+        {...props}
+        apiState={{
+          error: 'Some random error',
+        }}
+      />
+    )
 
-    wrapper.setProps({
-      apiState: {
-        error: 'Some random error',
-      },
-    })
-
-    expect(document.activeElement.textContent).toEqual('Cancel')
+    expect(within(document.activeElement).queryByText('Cancel')).toBeInTheDocument()
   })
 
   it('sends focus to the modal close button when people validation issues happen', () => {
@@ -79,13 +81,15 @@ describe('Focus Handling', () => {
       enrollUsers() {},
       reset() {},
     }
+    const ref = React.createRef()
+    render(<AddPeople {...props} ref={ref} />)
 
-    const wrapper = mount(<AddPeople {...props} />)
-
-    wrapper.setState({
+    ref.current.setState({
       currentPage: 'peoplevalidationissues',
     })
 
-    expect(document.activeElement.textContent).toEqual('Cancel')
+    waitFor(() => {
+      expect(within(document.activeElement).queryByText('Cancel')).toBeInTheDocument()
+    })
   })
 })
