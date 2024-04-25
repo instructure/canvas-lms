@@ -67,6 +67,17 @@ class AuthenticationProvider::Microsoft < AuthenticationProvider::OpenIDConnect
     super || "id"
   end
 
+  def unique_id(token)
+    id_token = claims(token)
+    settings["known_tenants"] ||= []
+    (settings["known_tenants"] << id_token["tid"]).uniq!
+    settings["known_idps"] ||= []
+    idp = id_token["idp"] || id_token["iss"]
+    (settings["known_idps"] << idp).uniq!
+    save! if changed?
+    id_token[login_attribute]
+  end
+
   protected
 
   def authorize_url
