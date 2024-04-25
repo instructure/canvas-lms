@@ -24,6 +24,7 @@ class AuthenticationProvider::Microsoft < AuthenticationProvider::OpenIDConnect
   plugin_settings :application_id, application_secret: :application_secret_dec
 
   SENSITIVE_PARAMS = [:application_secret].freeze
+  MICROSOFT_TENANT = "9188040d-6c67-4c5b-b112-36a304b66dad"
 
   def self.singleton?
     false
@@ -78,6 +79,15 @@ class AuthenticationProvider::Microsoft < AuthenticationProvider::OpenIDConnect
     id_token[login_attribute]
   end
 
+  def allowed_tenants=(value)
+    value = value.split(",") if value.is_a?(String)
+    settings["allowed_tenants"] = value.map(&:strip).uniq
+  end
+
+  def allowed_tenants
+    settings["allowed_tenants"] || []
+  end
+
   protected
 
   def authorize_url
@@ -97,6 +107,8 @@ class AuthenticationProvider::Microsoft < AuthenticationProvider::OpenIDConnect
   end
 
   def tenant_value
+    return MICROSOFT_TENANT if tenant == "microsoft"
+
     tenant.presence || "common"
   end
 end
