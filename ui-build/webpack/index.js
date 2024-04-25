@@ -41,7 +41,6 @@ const {
 
 const {
   buildCacheOptions,
-  controlAccessBetweenModules,
   customSourceFileExtensions,
   environmentVars,
   excludeMomentLocales,
@@ -175,7 +174,6 @@ module.exports = {
     isProduction && timezoneData, // adds 3-4 seconds to build time,
     customSourceFileExtensions,
     webpackHooks,
-    controlAccessBetweenModules,
     setMoreEnvVars,
     provideJQuery,
     moduleFederation,

@@ -19,10 +19,8 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import {shallow} from 'enzyme'
-import ChangeLogRow, {
-  ChangeRow,
-} from '../ChangeLogRow'
-import getSampleData from '../../../../blueprint_course_master/react/components/__tests__/getSampleData'
+import ChangeLogRow, {ChangeRow} from '../ChangeLogRow'
+import getSampleData from '@canvas/blueprint-courses/getSampleData'
 
 describe('ChangeLogRow component', () => {
   const defaultProps = () => ({
@@ -62,7 +60,9 @@ describe('ChangeLogRow component', () => {
 
   test('renders lock icon when its a ChangeRow component', () => {
     const tree = render(<ChangeRow change={getSampleData().history[0].changes[0]} />)
-    const node = tree.container.querySelector('.bcs__history-item__content .bcs__history-item__lock-icon')
+    const node = tree.container.querySelector(
+      '.bcs__history-item__content .bcs__history-item__lock-icon'
+    )
     expect(node).toBeTruthy()
   })
 })
