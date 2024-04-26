@@ -16,24 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash'
-import moxios from 'moxios'
-
-import {screen, render, fireEvent} from '@testing-library/react'
 import React from 'react'
-import {mount} from 'enzyme'
-import InheritanceStateControl from '../InheritanceStateControl'
-import actions from '../actions/developerKeysActions'
+import moxios from 'moxios'
+import {screen, render, fireEvent} from '@testing-library/react'
 import storeCreator from '../store/store'
+import actions from '../actions/developerKeysActions'
+import InheritanceStateControl from '../InheritanceStateControl'
 
 const sampleDeveloperKey = (defaults = {}) => {
-  return _.merge(_.clone(defaults), {
+  return {
+    ...defaults,
     id: '1',
     workflow_state: 'on',
-  })
+  }
 }
 
-const getProps = (developerKey, store = false, contextId = '1') => {
+const defaultProps = (developerKey, store, contextId) => {
   if (!store) {
     store = storeCreator({
       listDeveloperKeys: {
@@ -53,12 +51,16 @@ const getProps = (developerKey, store = false, contextId = '1') => {
   }
 }
 
+const renderInheritanceStateControl = (developerKey, store = false, contextId = '1') =>
+  render(<InheritanceStateControl {...defaultProps(developerKey, store, contextId)} />)
+
 describe('InheritanceStateControl', () => {
   let oldConfirmation = window.confirm
   let oldFeatures = {}
 
   beforeEach(() => {
     oldConfirmation = window.confirm
+    window.confirm = jest.fn(() => true)
     window.ENV.FEATURES ||= {}
     oldFeatures = window.ENV.FEATURES
 
@@ -80,8 +82,9 @@ describe('InheritanceStateControl', () => {
         account_owns_binding: true,
       },
     })
-    const wrapper = mount(<InheritanceStateControl {...getProps(key, false, 'site_admin')} />)
-    const checkedBtn = wrapper.find('input[checked=true]').getDOMNode()
+    const {getByDisplayValue} = renderInheritanceStateControl(key, false, 'site_admin')
+    const checkedBtn = getByDisplayValue('off')
+
     expect(checkedBtn.value).toBe('off')
   })
 
@@ -93,8 +96,9 @@ describe('InheritanceStateControl', () => {
         account_owns_binding: true,
       },
     })
-    const wrapper = mount(<InheritanceStateControl {...getProps(key, false, 'site_admin')} />)
-    const checkedBtn = wrapper.find('input[checked=true]').getDOMNode()
+    const {getByDisplayValue} = renderInheritanceStateControl(key, false, 'site_admin')
+    const checkedBtn = getByDisplayValue('on')
+
     expect(checkedBtn.value).toBe('on')
   })
 
@@ -106,8 +110,9 @@ describe('InheritanceStateControl', () => {
         account_owns_binding: true,
       },
     })
-    const wrapper = mount(<InheritanceStateControl {...getProps(key)} />)
-    const checkedBtn = wrapper.find('input[type="checkbox"]').getDOMNode()
+    const {getByRole} = renderInheritanceStateControl(key)
+    const checkedBtn = getByRole('checkbox')
+
     expect(checkedBtn.checked).toBe(false)
   })
 
@@ -119,21 +124,21 @@ describe('InheritanceStateControl', () => {
         account_owns_binding: true,
       },
     })
-    const wrapper = mount(<InheritanceStateControl {...getProps(key)} />)
-    const checkedBtn = wrapper.find('input[type="checkbox"]').getDOMNode()
+    const {getByRole} = renderInheritanceStateControl(key)
+    const checkedBtn = getByRole('checkbox')
+
     expect(checkedBtn.checked).toBe(true)
   })
 
   it('renders "off" if "allow" is set as the workflow state for root account', () => {
     const key = sampleDeveloperKey()
-    const wrapper = mount(<InheritanceStateControl {...getProps(key)} />)
-    const domNode = wrapper.find('input[type="checkbox"]').getDOMNode()
-    expect(domNode.checked).toBe(false)
+    const {getByRole} = renderInheritanceStateControl(key)
+    const checkedBtn = getByRole('checkbox')
+
+    expect(checkedBtn.checked).toBe(false)
   })
 
   it('updates the state when the RadioInput is clicked', () => {
-    window.confirm = jest.fn(() => true)
-
     const key = sampleDeveloperKey({
       developer_key_account_binding: {
         developer_key_id: '1',
@@ -147,17 +152,18 @@ describe('InheritanceStateControl', () => {
       },
     })
 
-    render(<InheritanceStateControl {...getProps(key, store, 'site_admin')} />)
+    renderInheritanceStateControl(key, store, 'site_admin')
+
     const item = screen.getByText('Off')
+
     fireEvent.click(item)
+
     const updatedDevKey = store.getState().listDeveloperKeys.list[0]
 
     expect(updatedDevKey.developer_key_account_binding.workflow_state).toBe('off')
   })
 
   it('updates the state when the Checkbox is clicked', () => {
-    window.confirm = jest.fn(() => true)
-
     const key = sampleDeveloperKey({
       developer_key_account_binding: {
         developer_key_id: '1',
@@ -171,17 +177,18 @@ describe('InheritanceStateControl', () => {
       },
     })
 
-    render(<InheritanceStateControl {...getProps(key, store)} />)
+    renderInheritanceStateControl(key, store)
+
     const item = document.querySelector('input[type="checkbox"]:checked')
+
     fireEvent.click(item)
+
     const updatedDevKey = store.getState().listDeveloperKeys.list[0]
 
     expect(updatedDevKey.developer_key_account_binding.workflow_state).toBe('off')
   })
 
   it('does nothing if cancel is clicked in the confirmation modal', () => {
-    window.confirm = jest.fn(() => false)
-
     const key = sampleDeveloperKey({
       developer_key_account_binding: {
         developer_key_id: '1',
@@ -195,9 +202,11 @@ describe('InheritanceStateControl', () => {
       },
     })
 
-    render(<InheritanceStateControl {...getProps(key, store)} />)
-    const item = document.querySelector('input[type="checkbox"]')
-    fireEvent.click(item)
+    const {getByRole} = renderInheritanceStateControl(key, store)
+    const item = getByRole('checkbox')
+
+    fireEvent.change(item, {target: {checked: true}})
+
     const devKeyFromStore = store.getState().listDeveloperKeys.list[0]
 
     expect(devKeyFromStore.developer_key_account_binding.workflow_state).toBe('on')
@@ -215,7 +224,7 @@ describe('InheritanceStateControl', () => {
     },
   }
 
-  function mockDevKey(workflowState, isOwnedByAccount, inheritedTo) {
+  const mockDevKey = (workflowState, isOwnedByAccount, inheritedTo) => {
     return {
       id: '10000000000123',
       developer_key_account_binding: {
@@ -226,8 +235,8 @@ describe('InheritanceStateControl', () => {
     }
   }
 
-  function componentNode(key, context = rootAccountCTX) {
-    const component = mount(
+  const componentNode = (key, context = rootAccountCTX) => {
+    const {container} = render(
       <InheritanceStateControl
         developerKey={key}
         ctx={context}
@@ -235,11 +244,12 @@ describe('InheritanceStateControl', () => {
         actions={{setBindingWorkflowState: () => {}}}
       />
     )
-    return component.getDOMNode()
+    return container
   }
 
   it('disables the checkbox if the account does not own the binding and it is set', () => {
     const checkbox = componentNode(mockDevKey('off')).querySelector('input[type="checkbox"]')
+
     expect(checkbox.disabled).toBe(true)
   })
 
@@ -247,6 +257,7 @@ describe('InheritanceStateControl', () => {
     const checkbox = componentNode(mockDevKey('allow', false, 'child_account')).querySelector(
       'input[type="checkbox"]'
     )
+
     expect(checkbox.disabled).toBe(true)
   })
 
@@ -254,11 +265,13 @@ describe('InheritanceStateControl', () => {
     const radioGroup = componentNode(mockDevKey('allow'), siteAdminCTX).querySelector(
       'input[type="radio"]'
     )
+
     expect(radioGroup.disabled).toBeFalsy()
   })
 
   it('enables the radio group if the account does own the binding', () => {
     const radioGroup = componentNode(mockDevKey('on', true)).querySelector('input[type="checkbox"]')
+
     expect(radioGroup.disabled).toBeFalsy()
   })
 
@@ -266,16 +279,19 @@ describe('InheritanceStateControl', () => {
     const offRadioInput = componentNode(mockDevKey(), siteAdminCTX).querySelector(
       'input[value="off"]'
     )
+
     expect(offRadioInput.checked).toBe(true)
   })
 
   it('the correct state for the developer key that is off', () => {
     const toggleSwitch = componentNode(mockDevKey()).querySelector('input[type="checkbox"]')
+
     expect(toggleSwitch.checked).toBe(false)
   })
 
   it('the correct state for a developer key that is on', () => {
     const toggleSwitch = componentNode(mockDevKey('on')).querySelector('input[type="checkbox"]')
+
     expect(toggleSwitch.checked).toBe(true)
   })
 
@@ -285,6 +301,7 @@ describe('InheritanceStateControl', () => {
     const allowRadioInput = componentNode(modifiedKey, siteAdminCTX).querySelector(
       'input[value="allow"]'
     )
+
     expect(allowRadioInput.checked).toBe(true)
   })
 
@@ -318,6 +335,7 @@ describe('InheritanceStateControl', () => {
     const allowRadioInput = componentNode(mockDevKey('allow'), siteAdminCTX).querySelector(
       'input[value="allow"]'
     )
+
     expect(allowRadioInput.checked).toBe(true)
   })
 })
