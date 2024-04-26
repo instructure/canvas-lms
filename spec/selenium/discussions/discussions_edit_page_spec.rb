@@ -20,6 +20,9 @@
 require_relative "../helpers/discussions_common"
 require_relative "../helpers/items_assign_to_tray"
 require_relative "../helpers/context_modules_common"
+require_relative "../../helpers/k5_common"
+require_relative "../dashboard/pages/k5_important_dates_section_page"
+require_relative "../dashboard/pages/k5_dashboard_common_page"
 require_relative "../common"
 require_relative "pages/discussion_page"
 require_relative "../assignments/page_objects/assignment_create_edit_page"
@@ -29,6 +32,9 @@ describe "discussions" do
   include DiscussionsCommon
   include ItemsAssignToTray
   include ContextModulesCommon
+  include K5DashboardCommonPageObject
+  include K5Common
+  include K5ImportantDatesSectionPageObject
 
   let(:course) { course_model.tap(&:offer!) }
   let(:teacher) { teacher_in_course(course:, name: "teacher", active_all: true).user }
@@ -1279,6 +1285,36 @@ describe "discussions" do
             # Expect both cards to be there
             Discussion.assign_to_button.click
             expect(module_item_assign_to_card.count).to eq 2
+          end
+
+          it "sets the mark important dates checkbox for discussion edit" do
+            feature_setup
+
+            graded_discussion = create_graded_discussion(course)
+
+            get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/edit"
+
+            Discussion.assign_to_button.click
+            wait_for_assign_to_tray_spinner
+
+            keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+            formatted_date = format_date_for_view(2.days.from_now(Time.zone.now), "%m/%d/%Y")
+            update_due_date(0, formatted_date)
+            update_due_time(0, "5:00 PM")
+
+            click_save_button("Apply")
+
+            expect(mark_important_dates).to be_displayed
+            scroll_to_element(mark_important_dates)
+            click_mark_important_dates
+
+            Discussion.save_button.click
+            wait_for_ajaximations
+
+            assignment = Assignment.last
+
+            expect(assignment.important_dates).to be(true)
           end
         end
 

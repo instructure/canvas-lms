@@ -94,6 +94,7 @@ export const CREATE_DISCUSSION_TOPIC = gql`
           name
           pointsPossible
           gradingType
+          importantDates
           assignmentGroupId
           canDuplicate
           canUnpublish
@@ -206,6 +207,7 @@ export const UPDATE_DISCUSSION_TOPIC = gql`
           name
           pointsPossible
           gradingType
+          importantDates
           assignmentGroupId
           canDuplicate
           canUnpublish

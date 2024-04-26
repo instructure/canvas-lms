@@ -192,6 +192,7 @@ export const prepareAssignmentPayload = (
   peerReviewDueDate,
   intraGroupPeerReviews,
   masteryPathsOption,
+  importantDates,
   isCheckpoints,
   existingAssignment
 ) => {
@@ -212,6 +213,7 @@ export const prepareAssignmentPayload = (
   let payload = {
     postToSis,
     gradingType: displayGradeAs,
+    importantDates,
     assignmentGroupId: assignmentGroup || null,
     peerReviews: preparePeerReviewPayload(
       isEditing,
