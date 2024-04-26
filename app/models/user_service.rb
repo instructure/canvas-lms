@@ -170,7 +170,7 @@ class UserService < ActiveRecord::Base
     when "google_drive"
       t "#user_service.descriptions.google_drive", "Students can use Google Drive to collaborate on group projects.  Google Drive allows for real-time collaborative editing of documents, spreadsheets and presentations."
     when CommunicationChannel::TYPE_TWITTER
-      t "#user_service.descriptions.twitter", "Twitter is a great resource for out-of-class communication."
+      t "#user_service.descriptions.twitter", "X.com is a great resource for out-of-class communication."
     when "diigo"
       t "#user_service.descriptions.diigo", "Diigo is a collaborative link-sharing tool.  You can tag any page on the Internet for later reference.  You can also link to other users' Diigo accounts to share links of similar interest."
     when "skype"

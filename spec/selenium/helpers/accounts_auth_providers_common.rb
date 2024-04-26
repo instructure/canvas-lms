@@ -152,7 +152,7 @@ module AuthenticationProvidersCommon
 
   def add_twitter_config
     get "/accounts/#{Account.default.id}/authentication_providers"
-    add_auth_type("Twitter")
+    add_auth_type("X.com")
     twitter_form = f("#new_twitter")
     twitter_form.find_element(:id, "consumer_key_twitter").send_keys("1234")
     f("#new_twitter button[type='submit']").click

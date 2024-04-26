@@ -381,10 +381,10 @@ class UsersController < ApplicationController
         )
         oauth_request.destroy
 
-        flash[:notice] = t("twitter_added", "Twitter access authorized!")
+        flash[:notice] = t("twitter_added", "X.com access authorized!")
       rescue => e
         Canvas::Errors.capture_exception(:oauth, e)
-        flash[:error] = t("twitter_fail_whale", "Twitter authorization failed. Please try again")
+        flash[:error] = t("twitter_fail_whale", "X.com authorization failed. Please try again")
       end
       return_to(oauth_request.return_url, user_profile_url(@current_user))
     end
