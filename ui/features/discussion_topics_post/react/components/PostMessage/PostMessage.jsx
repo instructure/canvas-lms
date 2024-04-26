@@ -16,24 +16,26 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {DiscussionEdit} from '../DiscussionEdit/DiscussionEdit'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import { DiscussionEdit } from '../DiscussionEdit/DiscussionEdit'
+import { useScope as useI18nScope } from '@canvas/i18n'
 import PropTypes from 'prop-types'
-import React, {useContext, useEffect} from 'react'
-import {getDisplayName, responsiveQuerySizes} from '../../utils'
-import {SearchContext} from '../../utils/constants'
-import {SearchSpan} from '../SearchSpan/SearchSpan'
+import React, { useContext, useEffect, useState } from 'react'
+import { getDisplayName, responsiveQuerySizes, getTranslation } from '../../utils'
+import { DiscussionManagerUtilityContext, SearchContext } from '../../utils/constants'
+import { SearchSpan } from '../SearchSpan/SearchSpan'
 
-import {AccessibleContent} from '@instructure/ui-a11y-content'
-import {Responsive} from '@instructure/ui-responsive'
-import {Text} from '@instructure/ui-text'
+import { AccessibleContent } from '@instructure/ui-a11y-content'
+import { Responsive } from '@instructure/ui-responsive'
+import { Text } from '@instructure/ui-text'
+import { Flex } from '@instructure/ui-flex'
+import { Spinner } from '@instructure/ui-spinner'
 import theme from '@instructure/canvas-theme'
-import {View} from '@instructure/ui-view'
+import { View } from '@instructure/ui-view'
 
 const I18n = useI18nScope('discussion_posts')
 
-export function PostMessage({...props}) {
-  const {searchTerm} = useContext(SearchContext)
+export function PostMessage({ ...props }) {
+  const { searchTerm } = useContext(SearchContext)
 
   useEffect(() => {
     if (ENV.SEQUENCE !== undefined && props.isTopic) {
@@ -51,10 +53,26 @@ export function PostMessage({...props}) {
     heading = 'h' + depth.toString()
   }
 
+  const { translateTargetLanguage } = useContext(DiscussionManagerUtilityContext)
+  const [translatedTitle, setTranslatedTitle] = useState(props.title)
+  const [translatedMessage, setTranslatedMessage] = useState(props.message)
+  const [isTranslating, setIsTranslating] = useState(false)
+
+  // Shouldn't fire if not feature flagged.
+  useEffect(() => {
+    // This is another change
+    if (translateTargetLanguage == null) {
+      return
+    }
+
+    getTranslation(translatedTitle, translateTargetLanguage, setTranslatedTitle, setIsTranslating)
+    getTranslation(translatedMessage, translateTargetLanguage, setTranslatedMessage, setIsTranslating)
+  }, [translateTargetLanguage])
+
   return (
     <Responsive
       match="media"
-      query={responsiveQuerySizes({mobile: true, desktop: true})}
+      query={responsiveQuerySizes({ mobile: true, desktop: true })}
       props={{
         mobile: {
           titleMargin: '0',
@@ -83,8 +101,9 @@ export function PostMessage({...props}) {
               padding={props.isTopic ? 'small 0 0 0' : '0'}
             >
               <Text size={responsiveProps.titleTextSize} weight={responsiveProps.titleTextWeight}>
-                <AccessibleContent alt={I18n.t('Discussion Topic: %{title}', {title: props.title})}>
-                  {props.title}
+                <AccessibleContent alt={I18n.t('Discussion Topic: %{title}', { title: translatedTitle })}>
+                  {translateTargetLanguage ?
+                    <span lang={translateTargetLanguage}>{translatedTitle}</span> : translatedTitle}
                 </AccessibleContent>
               </Text>
             </View>
@@ -99,6 +118,14 @@ export function PostMessage({...props}) {
               </Text>
             </View>
           )}
+          {isTranslating && <Flex justifyItems="start">
+            <Flex.Item>
+              <Spinner renderTitle={I18n.t('Translating')} size="x-small" />
+            </Flex.Item>
+            <Flex.Item margin="0 0 0 x-small">
+              <Text>{I18n.t('Translating Text')}</Text>
+            </Flex.Item>
+          </Flex>}
           {props.isEditing ? (
             <View display="inline-block" margin="small none none none" width="100%">
               <DiscussionEdit
@@ -106,7 +133,7 @@ export function PostMessage({...props}) {
                 discussionAnonymousState={props.discussionAnonymousState}
                 canReplyAnonymously={props.canReplyAnonymously}
                 onCancel={props.onCancel}
-                value={props.message}
+                value={translatedMessage}
                 attachment={props.attachment}
                 onSubmit={props.onSave}
                 isEdit={true}
@@ -122,9 +149,10 @@ export function PostMessage({...props}) {
                 }}
               >
                 <SearchSpan
+                  lang={translateTargetLanguage}
                   isSplitView={props.isSplitView}
                   searchTerm={searchTerm}
-                  text={props.message}
+                  text={translatedMessage}
                   isAnnouncement={props.discussionTopic?.isAnnouncement}
                   isTopic={props.isTopic}
                   resourceId={

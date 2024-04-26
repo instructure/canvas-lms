@@ -20,6 +20,7 @@ import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {render, fireEvent} from '@testing-library/react'
 import React from 'react'
 import {DiscussionPostToolbar} from '../DiscussionPostToolbar'
+import { DiscussionManagerUtilityContext } from '../../../utils/constants'
 import {updateUserDiscussionsSplitscreenViewMock} from '../../../../graphql/Mocks'
 import {ChildTopic} from '../../../../graphql/ChildTopic'
 import {waitFor} from '@testing-library/dom'
@@ -67,7 +68,11 @@ const setup = (props, mocks) => {
       <AlertManagerContext.Provider
         value={{setOnFailure: onFailureStub, setOnSuccess: onSuccessStub}}
       >
-        <DiscussionPostToolbar {...props} />
+        <DiscussionManagerUtilityContext.Provider
+          value={{translationLanguages: {current: []}}}
+        >
+            <DiscussionPostToolbar {...props} />
+        </DiscussionManagerUtilityContext.Provider>
       </AlertManagerContext.Provider>
     </MockedProvider>
   )

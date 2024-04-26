@@ -29,8 +29,8 @@ import {
   IconPermissionsLine,
 } from '@instructure/ui-icons'
 import PropTypes from 'prop-types'
-import {CURRENT_USER} from '../../utils/constants'
-import React, {useState} from 'react'
+import {CURRENT_USER, DiscussionManagerUtilityContext} from '../../utils/constants'
+import React, { useContext, useState } from 'react'
 import {Responsive} from '@instructure/ui-responsive'
 import {responsiveQuerySizes} from '../../utils'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -42,6 +42,7 @@ import {View} from '@instructure/ui-view'
 import {AnonymousAvatar} from '@canvas/discussions/react/components/AnonymousAvatar/AnonymousAvatar'
 import {ExpandCollapseThreadsButton} from './ExpandCollapseThreadsButton'
 import ItemAssignToTray from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToTray'
+import { MoreMenuButton } from "./MoreMenuButton"
 
 const I18n = useI18nScope('discussions_posts')
 
@@ -77,6 +78,7 @@ const getClearButton = props => {
 
 export const DiscussionPostToolbar = props => {
   const [showAssignToTray, setShowAssignToTray] = useState(false)
+  const { translationLanguages } = useContext(DiscussionManagerUtilityContext)
 
   const clearButton = () => {
     return getClearButton({
@@ -272,6 +274,11 @@ export const DiscussionPostToolbar = props => {
                 {!props.userSplitScreenPreference && (
                   <Flex.Item margin="0 small 0 0" padding={responsiveProps.padding}>
                     <ExpandCollapseThreadsButton showText={!matches.includes('mobile')} />
+                  </Flex.Item>
+                )}
+                {translationLanguages.current.length > 0 && (
+                  <Flex.Item margin="0 small 0 0" padding={responsiveProps.padding}>
+                    <MoreMenuButton />
                   </Flex.Item>
                 )}
                 {props.discussionAnonymousState && ENV.current_user_roles?.includes('student') && (

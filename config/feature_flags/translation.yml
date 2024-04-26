@@ -1,0 +1,7 @@
+---
+translation:
+  state: hidden
+  applies_to: Course
+  display_name: Enable AI Translation
+  description: AI-driven translation controls for courses
+  beta: true

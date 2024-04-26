@@ -54,6 +54,12 @@ const DiscussionTopicManager = props => {
   const [searchPageNumber, setSearchPageNumber] = useState(0)
   const [allThreadsStatus, setAllThreadsStatus] = useState(AllThreadsState.None)
   const [expandedThreads, setExpandedThreads] = useState([])
+  const translationEnabled = useRef(ENV?.discussion_translation_available ?? false)
+  const translationLanguages = useRef(ENV?.discussion_translation_languages ?? [])
+  const [showTranslationControl, setShowTranslationControl] = useState(false)
+  // Start as null, populate when ready.
+  const [translateTargetLanguage, setTranslateTargetLanguage] = useState(null)
+
   const searchContext = {
     searchTerm,
     setSearchTerm,
@@ -120,6 +126,12 @@ const DiscussionTopicManager = props => {
     setIsGradedDiscussion,
     isGradedDiscussion,
     usedThreadingToolbarChildRef,
+    translationEnabled,
+    translationLanguages,
+    showTranslationControl,
+    setShowTranslationControl,
+    translateTargetLanguage,
+    setTranslateTargetLanguage,
   }
 
   const isModuleItem = ENV.SEQUENCE != null
@@ -296,8 +308,7 @@ const DiscussionTopicManager = props => {
         <Responsive
           match="media"
           query={responsiveQuerySizes({mobile: true, desktop: true})}
-          props={{
-            mobile: {
+          props={{mobile: {
               viewPortWidth: '100vw',
             },
             desktop: {

@@ -26,6 +26,15 @@ module Canvas
       end
     end
 
+    def set?
+      return @vault_provider.credentials.set? unless @vault_provider.nil?
+
+      cred_hash = Rails.application.credentials.send(@credential_name)
+      return false if cred_hash.nil?
+
+      cred_hash.key?(:aws_access_key_id) && cred_hash.key?(:aws_secret_access_key)
+    end
+
     def credentials
       return @vault_provider.credentials unless @vault_provider.nil?
 
