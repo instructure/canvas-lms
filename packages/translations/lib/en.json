@@ -1707,6 +1707,9 @@
   "preformatted_d0670862": {
     "message": "Preformatted"
   },
+  "prepend_findtext_append_8e0e769a": {
+    "message": "{ prepend }{ findText }{ append }"
+  },
   "prev_f82cbc48": {
     "message": "Prev"
   },
@@ -1829,6 +1832,9 @@
   },
   "restore_auto_save_deccd84b": {
     "message": "Restore auto-save?"
+  },
+  "result_index_of_max_7db5ad8b": {
+    "message": "Result { index } of { max }."
   },
   "reverse_turnstile_does_not_yield_7558be06": {
     "message": "Reverse Turnstile (Does Not Yield)"
