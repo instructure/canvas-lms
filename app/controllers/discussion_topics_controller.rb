@@ -1395,6 +1395,19 @@ class DiscussionTopicsController < ApplicationController
       end
     end
 
+    attachment = params[:attachment]
+
+    if is_new && attachment
+      get_quota(@context)
+      if attachment.size + @quota_used > @quota
+        error = t "#application.errors.quota_exceeded_course", "Course storage quota exceeded"
+        respond_to do |format|
+          format.json { render json: { errors: { base: error } }, status: :bad_request }
+        end
+        return
+      end
+    end
+
     # Groups do not have settings like courses do, so only run this for Course contexts
     if is_new &&
        !params[:anonymous_state].nil? &&
