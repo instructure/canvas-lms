@@ -37,6 +37,9 @@ export default function useManagedCourseSearchApi(fetchApiOpts = {}) {
   if (!fetchApiOpts.params) {
     fetchApiOpts.params = {}
   }
+  if (!fetchApiOpts.success) {
+    fetchApiOpts.success = () => {}
+  }
 
   const searchTerm = fetchApiOpts.params.term || ''
   let forceResult
