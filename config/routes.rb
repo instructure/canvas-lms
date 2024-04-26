@@ -1106,6 +1106,10 @@ CanvasRails::Application.routes.draw do
     # get "search", action: :show
   end
 
+  scope(controller: :translation) do
+    post "courses/:course_id/translate", action: :translate
+  end
+
   ### API routes ###
 
   # TODO: api routes can't yet take advantage of concerns for DRYness, because of

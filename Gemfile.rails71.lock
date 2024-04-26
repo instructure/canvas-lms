@@ -411,6 +411,9 @@ GEM
       aws-sdk-core (~> 3, >= 3.194.0)
       aws-sdk-kms (~> 1)
       aws-sigv4 (~> 1.8)
+    aws-sdk-sagemakerruntime (1.61.0)
+      aws-sdk-core (~> 3, >= 3.191.0)
+      aws-sigv4 (~> 1.1)
     aws-sdk-sns (1.74.0)
       aws-sdk-core (~> 3, >= 3.193.0)
       aws-sigv4 (~> 1.1)
@@ -1205,6 +1208,7 @@ DEPENDENCIES
   autoextend!
   aws-sdk-kinesis (~> 1.45)
   aws-sdk-s3 (~> 1.119)
+  aws-sdk-sagemakerruntime (~> 1.61)
   aws-sdk-sns (~> 1.60)
   aws-sdk-sqs (~> 1.53)
   bcrypt (~> 3.1)

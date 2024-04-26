@@ -25,6 +25,7 @@ import {Discussion} from '../../graphql/Discussion'
 import {DiscussionEntry} from '../../graphql/DiscussionEntry'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from '@canvas/rails-flash-notifications'
+import doFetchApi from '@canvas/do-fetch-api-effect'
 
 const I18n = useI18nScope('discussion_topics_post')
 
@@ -427,4 +428,36 @@ export const showErrorWhenMessageTooLong = message => {
     return true
   }
   return false
+}
+
+export const getTranslation = async (
+  text,
+  translateTargetLanguage,
+  setter,
+  setIsTranslating = () => {}
+) => {
+  if (text === undefined || text == null) {
+    return // Do nothing, there is no text to translate
+  }
+
+  const apiPath = `/courses/${ENV.course_id}/translate`
+  try {
+    setIsTranslating(true)
+    const {json} = await doFetchApi({
+      method: 'POST',
+      path: apiPath,
+      body: {
+        inputs: {
+          src_lang: 'en', // TODO: detect source language.
+          tgt_lang: translateTargetLanguage,
+          text,
+        },
+      },
+    })
+    setter(json.translated_text)
+  } catch (e) {
+    // TODO: Do something with the error message.
+  }
+
+  setIsTranslating(false)
 }

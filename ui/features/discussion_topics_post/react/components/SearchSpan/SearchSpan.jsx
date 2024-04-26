@@ -76,6 +76,7 @@ export function SearchSpan({...props}) {
 
   return (
     <span
+      lang={props.lang}
       className="user_content"
       data-resource-type={resourceType()}
       data-resource-id={props.resourceId}
@@ -99,4 +100,8 @@ SearchSpan.propTypes = {
   isAnnouncement: PropTypes.bool,
   isTopic: PropTypes.bool,
   resourceId: PropTypes.string,
+  /**
+   * Language code if the span has been translated
+   */
+  lang: PropTypes.string
 }
