@@ -75,6 +75,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
               dueAt
               state
               gradingType
+              importantDates
               peerReviews {
                 anonymousReviews
                 automaticReviews
@@ -131,6 +132,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
     args << "onlyVisibleToOverrides: #{assignment[:onlyVisibleToOverrides]}" if assignment.key?(:onlyVisibleToOverrides)
     args << "setAssignment: #{assignment[:setAssignment]}" if assignment.key?(:setAssignment)
     args << "gradingType: #{assignment[:gradingType]}" if assignment[:gradingType]
+    args << "importantDates: #{assignment[:importantDates]}" if assignment[:importantDates]
     args << peer_reviews_str(assignment[:peerReviews]) if assignment[:peerReviews]
     args << assignment_overrides_str(assignment[:assignmentOverrides]) if assignment[:assignmentOverrides]
     args << "forCheckpoints: #{assignment[:forCheckpoints]}" if assignment[:forCheckpoints]
@@ -391,6 +393,12 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
       # Check updated object
       new_assignment = Assignment.find(@discussion_assignment.id)
       expect(new_assignment.intra_group_peer_reviews).to be false
+    end
+
+    it "sets the important dates field on the assignment" do
+      result = run_mutation(id: @topic.id, assignment: { importantDates: true })
+      expect(result["errors"]).to be_nil
+      expect(Assignment.last.important_dates).to be(true)
     end
 
     it "sets just the due date" do

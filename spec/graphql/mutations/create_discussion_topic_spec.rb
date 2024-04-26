@@ -105,6 +105,7 @@ describe Mutations::CreateDiscussionTopic do
               name
               pointsPossible
               gradingType
+              importantDates
               groupSet {
                 _id
               }
@@ -887,6 +888,7 @@ describe Mutations::CreateDiscussionTopic do
           pointsPossible: 15,
           gradingType: percent,
           postToSis: true,
+          importantDates: true,
           peerReviews: {
             anonymousReviews: true,
             automaticReviews: true,
@@ -909,6 +911,7 @@ describe Mutations::CreateDiscussionTopic do
         expect(discussion_topic["assignment"]["name"]).to eq title
         expect(discussion_topic["assignment"]["pointsPossible"]).to eq 15
         expect(discussion_topic["assignment"]["gradingType"]).to eq "percent"
+        expect(discussion_topic["assignment"]["importantDates"]).to be true
         expect(discussion_topic["assignment"]["peerReviews"]["anonymousReviews"]).to be true
         expect(discussion_topic["assignment"]["peerReviews"]["automaticReviews"]).to be true
         expect(discussion_topic["assignment"]["peerReviews"]["count"]).to eq 2

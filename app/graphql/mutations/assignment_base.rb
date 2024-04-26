@@ -58,6 +58,7 @@ class Mutations::AssignmentBase::AssignmentInputBase < GraphQL::Schema::InputObj
   argument :grading_standard_id, ID, required: false
   argument :grading_type, Types::AssignmentType::AssignmentGradingType, required: false
   argument :group_category_id, ID, required: false
+  argument :important_dates, Boolean, required: false
   argument :intra_reviews, Boolean, required: false
   argument :lock_at, Types::DateTimeType, required: false
   argument :only_visible_to_overrides, Boolean, required: false

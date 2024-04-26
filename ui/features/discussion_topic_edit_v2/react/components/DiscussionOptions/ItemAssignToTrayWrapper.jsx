@@ -30,6 +30,7 @@ export const ItemAssignToTrayWrapper = () => {
     title,
     assignmentID,
     importantDates,
+    setImportantDates,
     pointsPossible,
   } = useContext(GradedDiscussionDueDatesContext)
 
@@ -146,17 +147,18 @@ export const ItemAssignToTrayWrapper = () => {
     return outputObj
   }
 
-  const onSync = assigneeInfoUpdateOverrides => {
-    const outputArray = []
-
-    assigneeInfoUpdateOverrides.forEach(inputObj => {
-      const outputObj = convertToAssignedInfoListObject(inputObj)
-      outputArray.push(outputObj)
-    })
-
-    // convert overrides to the expected assignedInfoList shape
-    // Then Set the assignedInfoList
-    setAssignedInfoList(outputArray)
+  const onSync = (assigneeInfoUpdateOverrides, newImportantDatesValue) => {
+    if (assigneeInfoUpdateOverrides) {
+      const outputArray = []
+      assigneeInfoUpdateOverrides.forEach(inputObj => {
+        const outputObj = convertToAssignedInfoListObject(inputObj)
+        outputArray.push(outputObj)
+      })
+      // convert overrides to the expected assignedInfoList shape
+      // Then Set the assignedInfoList
+      setAssignedInfoList(outputArray)
+    }
+    setImportantDates(newImportantDatesValue)
   }
 
   if (loading) {

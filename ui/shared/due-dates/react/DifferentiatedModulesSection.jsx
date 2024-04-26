@@ -402,7 +402,7 @@ const DifferentiatedModulesSection = ({
           </View>
         </Link>
       </View>
-      {type === 'assignment' && importantDatesCheckbox()}
+      {(type === 'assignment' || type === 'discussion') && importantDatesCheckbox()}
       <ItemAssignToTray
         open={open}
         onClose={handleClose}
