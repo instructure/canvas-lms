@@ -2210,6 +2210,7 @@ nn:
   add_edit_and_delete_events_on_account_calendars_71bea006: "Legg til, rediger og slett hendingar på kontokalendarar"
   add_edit_delete_sections_d32c5b4d: "legg til / rediger / slett seksjonar"
   add_email_address_aef3b61: "Legg til e-postadresse"
+  add_event_9e21d0ff: "Legg til hendelse"
   add_existing_content_7e36da66: "Legg til eksisterande innhald"
   add_external_feed_6d437a28: "Legg til ekstern straum"
   add_feed_49ed1cb2: "Legg til straum"
@@ -2293,6 +2294,7 @@ nn:
   add_tas_to_courses_27741f81: "Legg til undervisingsassistentar på emne"
   add_tas_to_the_course_2aac6e02: "Legg til undervisingsassistentar på emnet"
   add_teachers_to_courses_48ac7a7a: "Legg til Lærere i emne"
+  add_text_376fc48d: "Legg til %{text}"
   add_theme_32fa3d50: "Legg til tema"
   add_to_calendar_1d4a0e81: "Legg til i kalenderen"
   add_to_course_481a51c4: "Legg til emnet..."
@@ -2329,6 +2331,7 @@ nn:
   additional_occurrence_s_7b5b0173: Tilleggsførekomst(ar)
   additional_options_7cefee79: "Fleire innstillingar"
   additional_outcomes_options_6df428f1: "Fleire læringsmålalternativ"
+  additional_replies_required_13697d0a: "Fleire svar er krevd"
   additional_settings_20362654: "Fleire innstillingar"
   additional_settings_for_sis_syncing_f926973e: "Tilleggsinnstillingar for SIS-synkronisering"
   additional_sis_sync_assignment_quiz_and_discussion_d941fa5: "Fleire alternativ for SIS-synkroniserte oppgåver, quizar og diskusjonar"
@@ -3478,6 +3481,7 @@ nn:
       student_view_unauthorized: "Du har ikkje tilgang til denne funksjonaliteten i studentvising."
       submission_unauthorized: "Du har ikkje tilgang til innleveringa."
       unauthorized: 
+        default: "Du har ikkje tilgang til å sjå denne ressursen."
         not_started_yet: "Emnet du vil ha tilgang til har enno ikkje starta. Det startar %{date}."
         unpublished: "Emnet er enno ikkje publisert av faglæraren."
     notices: 
@@ -3519,6 +3523,7 @@ nn:
   applying_new_styles_to_subaccounts_e8aeeef2: "Legg til nye stilar til underkontoar"
   applying_please_be_patient_f7b5f244: "Arbeider, ver tolmodig"
   applying_score_to_ungraded_7311df9a: "Legger til resultat for ikkje-vurdert"
+  appname_details_be277e5d: "%{appName}Detaljar"
   appointment_group: 
     errors: 
       invalid_end_at: "Sluttidspunkt kjem før starttidspunkt"
@@ -3849,6 +3854,7 @@ nn:
   assignment_id_96baa1b7: oppgåve-ID
   assignment_id_b040cee0: Oppgåve-ID
   assignment_information_e871d0e0: Oppgåveinformasjon
+  assignment_is_incomplete_ff55e07c: "%{assignment}er ufullstendig"
   assignment_is_reassigned_dd6b6ef2: "Oppgåva er tilordna på nytt."
   assignment_is_reassigned_ebb31807: "%{assignment} er tilordna på nytt"
   assignment_itemtitle_fee53607: "Oppgåve, %{itemTitle}"
@@ -4521,6 +4527,16 @@ nn:
   assignments_speedgrader_2fbd6df4: "Oppgåver, SpeedGrader"
   assignments_tutorial_tray_4cc844b: "Oppgåver opplæringsmeny"
   assignments_usage_report_50671804: "Rapport om bruk av oppgåver"
+  assignmenttype_title_41101dc0: "%{assignmentType}%{title}."
+  assignmenttype_title_all_day_on_datetime_d20e2f07: "%{assignmentType}%{title}heile dagen den %{datetime}"
+  assignmenttype_title_at_datetime_9a1efd88: "%{assignmentType}%{title}, på %{datetime}"
+  assignmenttype_title_at_datetime_until_endtime_8d4c211a: "%{assignmentType}%{title}, den %{datetime}til %{endTime}"
+  assignmenttype_title_due_datetime_c7eaaffb: "%{assignmentType}%{title}, frist %{datetime}"
+  assignmenttype_title_has_a_to_do_time_at_datetime_dace2699: "%{assignmentType}%{title} har frist %{datetime}."
+  assignmenttype_title_is_marked_as_done_fbcc0bb: "%{assignmentType}%{title}er merka som fullført."
+  assignmenttype_title_is_not_marked_as_done_9344572f: "%{assignmentType}%{title} er ikkje markert som fullført."
+  assignmenttype_title_posted_datetime_e070c79: "%{assignmentType}%{title}publisert %{datetime}."
+  assignmenttype_title_reminder_datetime_2f1e8dca: "%{assignmentType}%{title}, påminning%{datetime}."
   associated_74756cc4: Tilknytte
   associated_account_course_id_d87a01c5: "Tilknytte konto-/emne-ID"
   associated_account_name_91854e37: "Tilknytte kontonamn"
@@ -4572,6 +4588,7 @@ nn:
   attempt_3dd42b18: forsøk
   attempt_attempt_d3911720: "Forsøk %{attempt}"
   attempt_attempt_feedback_1b042ff5: "Forsøk %{attempt} tilbakemelding"
+  attempt_attempt_feedback_549683ba: "Forsøk %{attempt} tilbakemelding:"
   attempt_attempt_grade_c01f45df: "Forsøk %{attempt}: %{grade}"
   attempt_attempt_score_2a973edc: "Forsøk %{attempt} resultat:"
   attempt_count_267a4fc5: "Forsøk %{count}"
@@ -5428,6 +5445,19 @@ nn:
   calendar_283a9ed9: kalender
   calendar_a8563bb2: "Kalender:"
   calendar_contextinfo_name_a7d98525: "Kalender %{contextInfo.name}"
+  calendar_custom_recurring_event_repeat_picker: 
+    single_and_plural_days: 
+      one: Dag
+      other: Dagar
+    single_and_plural_months: 
+      one: Månad
+      other: Månader
+    single_and_plural_weeks: 
+      one: Veke
+      other: Veker
+    single_and_plural_years: 
+      one: År
+      other: År
   calendar_d14cfc8f: Kalender
   calendar_event: 
     errors: 
@@ -5442,6 +5472,7 @@ nn:
     see_quiz: "Sjå %{quiz_name}"
     see_related_link: "Sjå relatert lenke"
   calendar_event_89aadc1c: Kalenderhending
+  calendar_event_itemtitle_812caedd: "Kalenderhendelse, %{itemTitle}"
   calendar_events: 
     crumbs: 
       new: "Ny kalenderhending"
@@ -5468,6 +5499,7 @@ nn:
     ics_title: "%{course_or_group_name}-kalender i Canvas"
     invalid_date_or_time: "Ugyldig dato eller ugyldig dato/klokkeslett for %{attr}"
   calendar_frequency_picker: 
+    annually: "Kvart år %{month}%{date}"
     custom: Tilpassa...
     daily: Dagleg
     first: Først
@@ -5477,6 +5509,7 @@ nn:
     not_repeat: "Gjentek ikkje"
     second: andre
     third: tredje
+    weekly_day: "Ukentleg kvar %{day}"
   calendar_removed_1c841af4: "Kalender fjerna"
   calendar_series_e1b7a4bc: Kalenderserie
   calendars: 
@@ -23483,6 +23516,10 @@ nn:
       aria_stop: "Klikk \"Stopp\" for å avslutte innspeling."
     edit_view_rubric: "Vis vurderingsskjema"
     group: Gruppe
+    late_input: 
+      days: 
+        one: Dag
+        other: Dagar
     mic_blocked_message: "Løyve til å bruke mikrofon er sperra. Dersom du vil endre, må du gå til chrome://settings/content/microphone"
     mute_assignment: "Skjul oppgåve"
     no_submission_time: "inga tid for innlevering"
@@ -27119,6 +27156,7 @@ nn:
   week_s_cb1492ee: Veke(r)
   weekly_schedule_navigation_6b042645: "Navigasjon for vekestimeplan"
   weekly_summary_56cd0c95: Vekesamandrag
+  weeks_4504fe8b: Veker
   weight_9b308e5b: Vekting
   weight_ff579a8e: "Vekting:"
   weight_final_grade_based_on_assignment_groups_3124161: "Vekte sluttvurderingar per oppgåvegruppe"
