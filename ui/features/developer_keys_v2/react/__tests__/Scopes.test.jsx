@@ -17,121 +17,153 @@
  */
 
 import React from 'react'
-import {mount} from 'enzyme'
+import {render, screen} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import sinon from 'sinon'
 import Scopes from '../Scopes'
 
-function props(pending = false, requireScopes = true, onRequireScopesChange = () => {}) {
-  return {
-    developerKey: {
-      allow_includes: true,
-    },
-    availableScopes: {
-      oauth: [
-        {
-          resource: 'oauth',
-          verb: 'GET',
-          scope: '/auth/userinfo',
-        },
-      ],
-      account_domain_lookups: [
-        {
-          resource: 'account_domain_lookups',
-          verb: 'GET',
-          path: '/api/v1/accounts/search',
-          scope: 'url:GET|/api/v1/accounts/search',
-        },
-        {
-          resource: 'account_domain_lookups',
-          verb: 'POST',
-          path: '/api/v1/account_domain_lookups',
-          scope: 'url:POST|/api/v1/account_domain_lookups',
-        },
-      ],
-    },
-    availableScopesPending: pending,
-    dispatch: () => {},
-    listScopesSet: () => {},
-    updateDeveloperKey: () => {},
-    listDeveloperKeyScopesSet: () => {},
-    requireScopes,
-    onRequireScopesChange,
-  }
+const defaultProps = (pending = false, requireScopes = true, onRequireScopesChange = () => {}) => ({
+  developerKey: {
+    allow_includes: true,
+  },
+  availableScopes: {
+    oauth: [
+      {
+        resource: 'oauth',
+        verb: 'GET',
+        scope: '/auth/userinfo',
+      },
+    ],
+    account_domain_lookups: [
+      {
+        resource: 'account_domain_lookups',
+        verb: 'GET',
+        path: '/api/v1/accounts/search',
+        scope: 'url:GET|/api/v1/accounts/search',
+      },
+      {
+        resource: 'account_domain_lookups',
+        verb: 'POST',
+        path: '/api/v1/account_domain_lookups',
+        scope: 'url:POST|/api/v1/account_domain_lookups',
+      },
+    ],
+  },
+  availableScopesPending: pending,
+  dispatch: () => {},
+  listScopesSet: () => {},
+  updateDeveloperKey: () => {},
+  listDeveloperKeyScopesSet: () => {},
+  requireScopes,
+  onRequireScopesChange,
+})
+
+const renderScopes = (pending, requireScopes, onRequireScopesChange) => {
+  const ref = React.createRef()
+  const wrapper = render(
+    <Scopes {...defaultProps(pending, requireScopes, onRequireScopesChange)} ref={ref} />
+  )
+
+  return {ref, wrapper}
 }
 
-describe('when the "includes" checkbox FF is set in the ENV', () => {
-  let wrapper
+describe('Scopes', () => {
+  describe('when the "includes" checkbox FF is set in the ENV', () => {
+    let wrapper
 
-  beforeEach(() => {
-    window.ENV = {
-      includesFeatureFlagEnabled: true,
-    }
+    beforeEach(() => {
+      window.ENV = {
+        includesFeatureFlagEnabled: true,
+      }
 
-    wrapper = mount(<Scopes {...props()} />)
+      const {wrapper: innerWrapper} = renderScopes()
+
+      wrapper = innerWrapper
+    })
+
+    it('renders the "includes" checkbox', () => {
+      expect(
+        wrapper.container.querySelector("[data-automation='includes-checkbox']")
+      ).toBeInTheDocument()
+    })
   })
 
-  it('renders the "includes" checkbox', () => {
-    expect(wrapper.exists("[data-automation='includes-checkbox']")).toEqual(true)
+  it('renders a spinner if scope state is "pending"', () => {
+    renderScopes(true)
+
+    expect(screen.getByText('Loading Available Scopes')).toBeInTheDocument()
   })
-})
 
-it('renders a spinner if scope state is "pending"', () => {
-  const wrapper = mount(<Scopes {...props(true)} />)
-  const spinner = wrapper.find('#scopes-loading-spinner')
-  expect(spinner.text()).toBe('Loading Available Scopes')
-})
+  it('hiding spinner if scope state is not "pending"', () => {
+    renderScopes(false)
 
-it('renders scopes if scope state is not "pending"', () => {
-  const wrapper = mount(<Scopes {...props()} />)
-  const spinner = wrapper.find('#scopes-loading-spinner')
-  expect(spinner.exists()).toBe(false)
-})
+    expect(screen.queryByText('Loading Available Scopes')).not.toBeInTheDocument()
+  })
 
-it('defaults the filter state to an empty string', () => {
-  const wrapper = mount(<Scopes {...props()} />)
-  expect(wrapper.state().filter).toBe('')
-})
+  it('defaults the filter state to an empty string', () => {
+    const {ref} = renderScopes()
 
-it('handles filter input change by setting the filter state', () => {
-  const wrapper = mount(<Scopes {...props()} />)
-  const eventDup = {currentTarget: {value: 'banana'}}
-  wrapper.instance().handleFilterChange(eventDup)
-  expect(wrapper.state().filter).toBe('banana')
-})
+    expect(ref.current.state.filter).toBe('')
+  })
 
-it('renders Billboard if requireScopes is false', () => {
-  const wrapper = mount(<Scopes {...props(undefined, false)} />)
-  expect(wrapper.find('Billboard')).toHaveLength(2)
-})
+  it('handles filter input change by setting the filter state', () => {
+    const {ref} = renderScopes()
+    const eventDup = {currentTarget: {value: 'banana'}}
 
-it('does not render search box if requireScopes is false', () => {
-  const wrapper = mount(<Scopes {...props(undefined, false)} />)
-  expect(wrapper.find('TextInput')).toHaveLength(0)
-})
+    ref.current.handleFilterChange(eventDup)
 
-it('does not render Billboard if requireScopes is true', () => {
-  const wrapper = mount(<Scopes {...props(undefined, true)} />)
-  expect(wrapper.find('Billboard')).toHaveLength(0)
-})
+    expect(ref.current.state.filter).toBe('banana')
+  })
 
-it('renders ScopesList if requireScopes is true', () => {
-  const wrapper = mount(<Scopes {...props(undefined, true)} />)
-  expect(wrapper.find('ScopesList')).toHaveLength(1)
-})
+  it('renders Billboard if requireScopes is false', () => {
+    renderScopes(false, false)
 
-it('does render search box if requireScopes is true', () => {
-  const wrapper = mount(<Scopes {...props()} />)
-  expect(wrapper.find('TextInput')).toHaveLength(3)
-})
+    expect(
+      screen.getByRole('heading', {
+        name: /when scope enforcement is disabled, tokens have access to all endpoints available to the authorizing user\./i,
+      })
+    ).toBeInTheDocument()
+  })
 
-it('controls requireScopes change when clicking requireScopes button', () => {
-  const requireScopesStub = sinon.stub()
-  const wrapper = mount(<Scopes {...props(undefined, true, requireScopesStub)} />)
-  wrapper
-    .find('Checkbox')
-    .filterWhere(n => n.prop('variant') === 'toggle')
-    .at(1)
-    .props()
-    .onChange()
-  expect(requireScopesStub.called).toBe(true)
+  it('does not render search box if requireScopes is false', () => {
+    renderScopes(false, false)
+
+    expect(screen.queryByRole('textbox')).not.toBeInTheDocument()
+  })
+
+  it('does not render Billboard if requireScopes is true', () => {
+    renderScopes(false, true)
+
+    expect(
+      screen.queryByRole('heading', {
+        name: /when scope enforcement is disabled, tokens have access to all endpoints available to the authorizing user\./i,
+      })
+    ).not.toBeInTheDocument()
+  })
+
+  it('renders ScopesList if requireScopes is true', () => {
+    const {wrapper} = renderScopes(false, true)
+
+    expect(wrapper.container.querySelector("[data-automation='scopes-list']")).toBeInTheDocument()
+  })
+
+  it('does render search box if requireScopes is true', () => {
+    renderScopes()
+
+    expect(
+      screen.getByRole('searchbox', {
+        name: /search endpoints/i,
+      })
+    ).toBeInTheDocument()
+  })
+
+  it('controls requireScopes change when clicking requireScopes button', async () => {
+    const requireScopesStub = sinon.stub()
+
+    renderScopes(false, true, requireScopesStub)
+
+    await userEvent.click(screen.getByLabelText(/enforce scopes/i))
+
+    expect(requireScopesStub.called).toBe(true)
+  })
 })

@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {mount} from 'enzyme'
+import {render, screen, fireEvent} from '@testing-library/react'
 import DeveloperKeyScopesList from '../ScopesList'
 
 const scopes = {
@@ -114,7 +114,7 @@ const scopes = {
   ],
 }
 
-const props = {
+const baseProps = {
   dispatch: () => {},
   listDeveloperKeyScopesSet: () => {},
   availableScopes: {
@@ -144,150 +144,168 @@ const props = {
   actions: {listDeveloperKeyScopesSet: () => {}},
 }
 
-it('renders each group', () => {
-  const wrapper = mount(<DeveloperKeyScopesList {...props} />)
-  expect(wrapper.find('.LazyLoad')).toHaveLength(2)
+const defaultProps = props => ({
+  ...baseProps,
+  ...props,
 })
 
-it('uses the correct handler the checkbox is checked', () => {
-  const wrapper = mount(<DeveloperKeyScopesList {...props} />)
-  const stubbedHandler = jest.fn()
-  const component = wrapper.instance()
-  const checkBox = wrapper.find("input[type='checkbox']")
+const renderDeveloperKeyScopesList = props => {
+  const ref = React.createRef()
+  const wrapper = render(<DeveloperKeyScopesList {...defaultProps(props)} ref={ref} />)
 
-  component.handleReadOnlySelected = stubbedHandler
-  component.forceUpdate()
-  wrapper.update()
+  return {ref, wrapper}
+}
 
-  checkBox.simulate('change', {target: {checked: true}})
-  expect(stubbedHandler).toHaveBeenCalled()
-})
+describe('DeveloperKeyScopesList', () => {
+  it('renders each group', () => {
+    const {wrapper} = renderDeveloperKeyScopesList()
 
-it('only renders groups with names that match the fitler', () => {
-  const filterProps = {...props, filter: 'Account'}
-  const wrapper = mount(<DeveloperKeyScopesList {...filterProps} />)
-  expect(wrapper.find('.LazyLoad')).toHaveLength(1)
-})
-
-it('only renders 8 groups on the initaial render', () => {
-  const manyScopesProps = {...props, availableScopes: scopes}
-  const wrapper = mount(<DeveloperKeyScopesList {...manyScopesProps} />)
-  expect(wrapper.instance().state.availableScopes).toHaveLength(8)
-})
-
-describe('handleReadOnlySelected', () => {
-  it('selects all scopes with GET as the verb', () => {
-    const wrapper = mount(<DeveloperKeyScopesList {...props} />)
-    const fakeEvent = {
-      currentTarget: {
-        checked: true,
-      },
-    }
-
-    wrapper.instance().handleReadOnlySelected(fakeEvent)
-    const state = wrapper.instance().state
-    expect(state.selectedScopes).toEqual(
-      expect.arrayContaining(['/auth/userinfo', 'url:GET|/api/v1/accounts/search'])
-    )
+    expect(wrapper.container.querySelectorAll('.LazyLoad')).toHaveLength(2)
   })
 
-  it('deselects all scopes with GET as the verb', () => {
-    const wrapper = mount(<DeveloperKeyScopesList {...props} />)
-    const fakeSelectEvent = {
-      currentTarget: {
-        checked: true,
-      },
-    }
-    const fakeDeselectEvent = {
-      currentTarget: {
-        checked: false,
-      },
-    }
+  it('uses the correct handler the checkbox is checked', () => {
+    const {ref} = renderDeveloperKeyScopesList()
+    const stubbedHandler = jest.fn()
+    const component = ref.current
+    const checkBox = screen.getByRole('checkbox')
 
-    wrapper.instance().handleReadOnlySelected(fakeSelectEvent)
-    wrapper.instance().handleReadOnlySelected(fakeDeselectEvent)
+    component.handleReadOnlySelected = stubbedHandler
+    component.forceUpdate()
 
-    const state = wrapper.instance().state
-    expect(state.selectedScopes).toEqual(expect.arrayContaining([]))
-  })
-})
+    fireEvent.click(checkBox)
 
-describe('initial state', () => {
-  it('initializes selectedScopes to empty array if selectedScopes prop is undefined', () => {
-    const wrapper = mount(<DeveloperKeyScopesList {...props} />)
-    const state = wrapper.instance().state
-    expect(state.selectedScopes).toEqual([])
-  })
-})
-
-describe('verify no duplicate elements get posted', () => {
-  it('filter out duplicate elements when setting the state', () => {
-    const wrapper = mount(<DeveloperKeyScopesList {...props} />)
-    const duplicate = ['a', 'b', 'c', 'd', 'a', 'a', 'a', 'b']
-    wrapper.instance().setSelectedScopes(duplicate)
-    const state = wrapper.instance().state
-    expect(state.selectedScopes).toEqual(expect.arrayContaining(['a', 'b', 'c', 'd']))
+    expect(stubbedHandler).toHaveBeenCalled()
   })
 
-  it('does nothing to empty array when setting the state', () => {
-    const wrapper = mount(<DeveloperKeyScopesList {...props} />)
-    wrapper.instance().setSelectedScopes([])
-    const state = wrapper.instance().state
-    expect(state.selectedScopes).toEqual([])
+  it('only renders groups with names that match the fitler', () => {
+    const {wrapper} = renderDeveloperKeyScopesList({filter: 'Account'})
+
+    expect(wrapper.container.querySelectorAll('.LazyLoad')).toHaveLength(1)
   })
 
-  it('does nothing to array with no duplicate elements when setting the state', () => {
-    const wrapper = mount(<DeveloperKeyScopesList {...props} />)
-    const noDuplicate = ['a', 'b', 'c', 'd', 'e', 'f', 'g']
-    wrapper.instance().setSelectedScopes(noDuplicate)
-    const state = wrapper.instance().state
-    expect(state.selectedScopes).toEqual(
-      expect.arrayContaining(['a', 'b', 'c', 'd', 'e', 'f', 'g'])
-    )
-  })
-})
+  it('only renders 8 groups on the initaial render', () => {
+    const {ref} = renderDeveloperKeyScopesList({availableScopes: scopes})
 
-describe('setSelectedScopes', () => {
-  describe('Read Only check box', () => {
-    it('is not checked when no scope is selected', () => {
-      const wrapper = mount(<DeveloperKeyScopesList {...props} />)
-      wrapper.instance().setSelectedScopes([])
-      const state = wrapper.instance().state
-      expect(state.readOnlySelected).toEqual(false)
+    expect(ref.current.state.availableScopes).toHaveLength(8)
+  })
+
+  describe('handleReadOnlySelected', () => {
+    it('selects all scopes with GET as the verb', () => {
+      const {ref} = renderDeveloperKeyScopesList()
+      const fakeEvent = {
+        currentTarget: {
+          checked: true,
+        },
+      }
+
+      ref.current.handleReadOnlySelected(fakeEvent)
+
+      expect(ref.current.state.selectedScopes).toEqual(
+        expect.arrayContaining(['/auth/userinfo', 'url:GET|/api/v1/accounts/search'])
+      )
     })
 
-    it('is checked when all possible GET is selected', () => {
-      const wrapper = mount(<DeveloperKeyScopesList {...props} />)
-      wrapper.instance().setSelectedScopes(['/auth/userinfo', 'url:GET|/api/v1/accounts/search'])
-      const state = wrapper.instance().state
-      expect(state.readOnlySelected).toEqual(true)
+    it('deselects all scopes with GET as the verb', () => {
+      const {ref} = renderDeveloperKeyScopesList()
+      const fakeSelectEvent = {
+        currentTarget: {
+          checked: true,
+        },
+      }
+      const fakeDeselectEvent = {
+        currentTarget: {
+          checked: false,
+        },
+      }
+
+      ref.current.handleReadOnlySelected(fakeSelectEvent)
+      ref.current.handleReadOnlySelected(fakeDeselectEvent)
+
+      expect(ref.current.state.selectedScopes).toEqual(expect.arrayContaining([]))
+    })
+  })
+
+  describe('initial state', () => {
+    it('initializes selectedScopes to empty array if selectedScopes prop is undefined', () => {
+      const {ref} = renderDeveloperKeyScopesList()
+
+      expect(ref.current.state.selectedScopes).toEqual([])
+    })
+  })
+
+  describe('verify no duplicate elements get posted', () => {
+    it('filter out duplicate elements when setting the state', () => {
+      const {ref} = renderDeveloperKeyScopesList()
+      const duplicate = ['a', 'b', 'c', 'd', 'a', 'a', 'a', 'b']
+
+      ref.current.setSelectedScopes(duplicate)
+
+      expect(ref.current.state.selectedScopes).toEqual(expect.arrayContaining(['a', 'b', 'c', 'd']))
     })
 
-    it('is not checked when some of the GET is selected but nothing else', () => {
-      const wrapper = mount(<DeveloperKeyScopesList {...props} />)
-      wrapper.instance().setSelectedScopes(['/auth/userinfo'])
-      const state = wrapper.instance().state
-      expect(state.readOnlySelected).toEqual(false)
+    it('does nothing to empty array when setting the state', () => {
+      const {ref} = renderDeveloperKeyScopesList()
+
+      ref.current.setSelectedScopes([])
+
+      expect(ref.current.state.selectedScopes).toEqual([])
     })
 
-    it('is not checked when any verb that is not GET and all possible GET is selected', () => {
-      const wrapper = mount(<DeveloperKeyScopesList {...props} />)
-      wrapper
-        .instance()
-        .setSelectedScopes([
+    it('does nothing to array with no duplicate elements when setting the state', () => {
+      const {ref} = renderDeveloperKeyScopesList()
+      const noDuplicate = ['a', 'b', 'c', 'd', 'e', 'f', 'g']
+
+      ref.current.setSelectedScopes(noDuplicate)
+
+      expect(ref.current.state.selectedScopes).toEqual(['a', 'b', 'c', 'd', 'e', 'f', 'g'])
+    })
+  })
+
+  describe('setSelectedScopes', () => {
+    describe('Read Only check box', () => {
+      it('is not checked when no scope is selected', () => {
+        const {ref} = renderDeveloperKeyScopesList()
+
+        ref.current.setSelectedScopes([])
+
+        expect(ref.current.state.readOnlySelected).toBeFalsy()
+      })
+
+      it('is checked when all possible GET is selected', () => {
+        const {ref} = renderDeveloperKeyScopesList()
+
+        ref.current.setSelectedScopes(['/auth/userinfo', 'url:GET|/api/v1/accounts/search'])
+
+        expect(ref.current.state.readOnlySelected).toBeTruthy()
+      })
+
+      it('is not checked when some of the GET is selected but nothing else', () => {
+        const {ref} = renderDeveloperKeyScopesList()
+
+        ref.current.setSelectedScopes(['/auth/userinfo'])
+
+        expect(ref.current.state.readOnlySelected).toEqual(false)
+      })
+
+      it('is not checked when any verb that is not GET and all possible GET is selected', () => {
+        const {ref} = renderDeveloperKeyScopesList()
+
+        ref.current.setSelectedScopes([
           'url:POST|/api/v1/account_domain_lookups',
           '/auth/userinfo',
           'url:GET|/api/v1/accounts/search',
         ])
-      const state = wrapper.instance().state
-      expect(state.readOnlySelected).toEqual(false)
-    })
 
-    it('is not checked when any verb that is not GET is selected only', () => {
-      const wrapper = mount(<DeveloperKeyScopesList {...props} />)
-      wrapper.instance().setSelectedScopes(['url:POST|/api/v1/account_domain_lookups'])
-      const state = wrapper.instance().state
-      expect(state.readOnlySelected).toEqual(false)
+        expect(ref.current.state.readOnlySelected).toEqual(false)
+      })
+
+      it('is not checked when any verb that is not GET is selected only', () => {
+        const {ref} = renderDeveloperKeyScopesList()
+
+        ref.current.setSelectedScopes(['url:POST|/api/v1/account_domain_lookups'])
+
+        expect(ref.current.state.readOnlySelected).toEqual(false)
+      })
     })
   })
 })

@@ -17,36 +17,55 @@
  */
 
 import React from 'react'
-import {mount} from 'enzyme'
+import {render, screen} from '@testing-library/react'
 import DeveloperKeyScopesMethod from '../ScopesMethod'
 
-const props = {
+const baseProps = {
   method: 'get',
 }
 
-it('renders the correct method', () => {
-  const wrapper = mount(<DeveloperKeyScopesMethod {...props} />)
-  expect(wrapper.find('span').first().text()).toContain(props.method)
+const defaultProps = props => ({
+  ...baseProps,
+  ...props,
 })
 
-describe('variant map', () => {
-  it('maps GET to the primary variant', () => {
-    const wrapper = mount(<DeveloperKeyScopesMethod {...props} />)
-    expect(wrapper.instance().methodColorMap().get).toBe('primary')
+const renderDeveloperKeyScopesMethod = props => {
+  const ref = React.createRef()
+  const wrapper = render(<DeveloperKeyScopesMethod ref={ref} {...defaultProps(props)} />)
+
+  return {ref, wrapper}
+}
+
+describe('DeveloperKeyScopesMethod', () => {
+  it('renders the correct method', () => {
+    renderDeveloperKeyScopesMethod()
+
+    expect(screen.getByText(new RegExp(baseProps.method, 'i'))).toBeInTheDocument()
   })
 
-  it('maps PUT to the default variant', () => {
-    const wrapper = mount(<DeveloperKeyScopesMethod {...props} />)
-    expect(wrapper.instance().methodColorMap().put).toBe('default')
-  })
+  describe('variant map', () => {
+    it('maps GET to the primary variant', () => {
+      const {ref} = renderDeveloperKeyScopesMethod()
 
-  it('maps POST to the success variant', () => {
-    const wrapper = mount(<DeveloperKeyScopesMethod {...props} />)
-    expect(wrapper.instance().methodColorMap().post).toBe('success')
-  })
+      expect(ref.current.methodColorMap().get).toBe('primary')
+    })
 
-  it('maps DELETE to the danger variant', () => {
-    const wrapper = mount(<DeveloperKeyScopesMethod {...props} />)
-    expect(wrapper.instance().methodColorMap().delete).toBe('danger')
+    it('maps PUT to the default variant', () => {
+      const {ref} = renderDeveloperKeyScopesMethod()
+
+      expect(ref.current.methodColorMap().put).toBe('default')
+    })
+
+    it('maps POST to the success variant', () => {
+      const {ref} = renderDeveloperKeyScopesMethod()
+
+      expect(ref.current.methodColorMap().post).toBe('success')
+    })
+
+    it('maps DELETE to the danger variant', () => {
+      const {ref} = renderDeveloperKeyScopesMethod()
+
+      expect(ref.current.methodColorMap().delete).toBe('danger')
+    })
   })
 })

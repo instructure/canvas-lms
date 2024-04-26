@@ -150,7 +150,7 @@ describe('GradeSummary PostToStudentsButton', () => {
 
     test('calls the onClick prop when clicked', async () => {
       const user = userEvent.setup({delay: null})
-      screen.debug()
+
       await user.click(screen.getByRole('button', {name: 'Post to Students'}))
       expect(props.onClick).toHaveBeenCalledTimes(1)
     })
