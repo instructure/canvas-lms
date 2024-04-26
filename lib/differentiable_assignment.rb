@@ -23,9 +23,6 @@ module DifferentiableAssignment
       only_visible_to_overrides
     elsif respond_to? :assignment
       assignment.only_visible_to_overrides
-    elsif is_a?(WikiPage) # rubocop:disable Lint/DuplicateBranch
-      # if the page has an assignment, look at the assignment's only_visible_to_overrides first, then look at the page's
-      only_visible_to_overrides
     else
       false
     end
@@ -55,8 +52,6 @@ module DifferentiableAssignment
       AssignmentStudentVisibility
     when "ContextModule"
       ModuleStudentVisibility
-    when "WikiPage"
-      WikiPageStudentVisibility
     else
       Quizzes::QuizStudentVisibility
     end
@@ -68,8 +63,6 @@ module DifferentiableAssignment
       :assignment_id
     when "ContextModule"
       :context_module_id
-    when "WikiPage"
-      :wiki_page_id
     else
       :quiz_id
     end
