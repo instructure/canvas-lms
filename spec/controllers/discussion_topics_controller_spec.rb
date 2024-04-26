@@ -2548,6 +2548,18 @@ describe DiscussionTopicsController do
       expect(attachment.reload).to be_deleted
     end
 
+    it "does not create a new discussion if the storage usage would be greater than the quota" do
+      @course.storage_quota = 60.kilobytes
+      @course.save!
+      old_count = DiscussionTopic.count
+      # the doc.doc is a 63 kb file
+      data = fixture_file_upload("docs/doc.doc", "application/msword", true)
+      post "create", params: topic_params(@course, { attachment: data }), format: :json
+      expect(response).to have_http_status :bad_request
+      expect(response.body).to include("Course storage quota exceeded")
+      expect(DiscussionTopic.count).to eq old_count
+    end
+
     it "uses inst-fs if it is enabled" do
       uuid = "1234-abcd"
       allow(InstFS).to receive_messages(enabled?: true, direct_upload: uuid)

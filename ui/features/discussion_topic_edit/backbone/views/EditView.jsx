@@ -146,6 +146,27 @@ EditView.prototype.initialize = function (options) {
     'success',
     (function (_this) {
       return function (xhr) {
+        // a request with attachment always will be successfull because of the iframe submit
+        const errors = xhr?.errors && Object.values(xhr.errors)
+
+        if (errors?.length) {
+          // when a request with attachment fails we need to re-enable the form
+          this.disablingDfd.reject()
+
+          errors.forEach(errorMsg => {
+            if (typeof errorMsg === 'string') {
+              $.flashError(errorMsg)
+              return
+            }
+
+            // internal server error has a different response
+            if (typeof errorMsg?.message === 'string') {
+              $.flashError(errorMsg.message)
+            }
+          })
+          return
+        }
+
         let contextId, contextType, ref, ref1, usageRights
         if (((ref = xhr.attachments) != null ? ref.length : void 0) === 1) {
           usageRights = _this.attachment_model.get('usage_rights')
@@ -680,6 +701,7 @@ EditView.prototype.submit = function (event) {
   let missingDateDialog, sections
   event.preventDefault()
   event.stopPropagation()
+  this.disablingDfd = new $.Deferred()
   if (this.gradedChecked() && this.dueDateOverrideView.containsSectionsWithoutOverrides()) {
     sections = this.dueDateOverrideView.sectionsWithoutOverrides()
     missingDateDialog = new MissingDateDialog({
