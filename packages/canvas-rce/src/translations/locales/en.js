@@ -777,6 +777,9 @@ const locale = {
   "precedes_196b9aef": { "message": "Precedes" },
   "precedes_equal_20701e84": { "message": "Precedes Equal" },
   "preformatted_d0670862": { "message": "Preformatted" },
+  "prepend_findtext_append_8e0e769a": {
+    "message": "{ prepend }{ findText }{ append }"
+  },
   "prev_f82cbc48": { "message": "Prev" },
   "preview_53003fd2": { "message": "Preview" },
   "preview_a3f8f854": { "message": "PREVIEW" },
@@ -830,6 +833,7 @@ const locale = {
   "reset_95a81614": { "message": "Reset" },
   "resize_ec83d538": { "message": "Resize" },
   "restore_auto_save_deccd84b": { "message": "Restore auto-save?" },
+  "result_index_of_max_7db5ad8b": { "message": "Result { index } of { max }." },
   "reverse_turnstile_does_not_yield_7558be06": {
     "message": "Reverse Turnstile (Does Not Yield)"
   },
