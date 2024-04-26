@@ -2139,10 +2139,10 @@ class Submission < ActiveRecord::Base
   scope :for_user, ->(user) { where(user_id: user) }
   scope :needing_screenshot, -> { where("submissions.submission_type='online_url' AND submissions.attachment_id IS NULL").order(:updated_at) }
 
-  def assignment_visible_to_user?(user)
+  def assignment_visible_to_user?(user, opts = {})
     return visible_to_user unless visible_to_user.nil?
 
-    assignment.visible_to_user?(user)
+    assignment.visible_to_user?(user, opts)
   end
 
   def needs_regrading?
