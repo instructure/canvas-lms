@@ -23,6 +23,14 @@ class AuthenticationProvider::Twitter < AuthenticationProvider::OAuth
   self.plugin = :twitter
   plugin_settings :consumer_key, consumer_secret: :consumer_secret_dec
 
+  def self.display_name
+    "X.com"
+  end
+
+  def self.sti_name
+    "twitter"
+  end
+
   def self.recognized_params
     super + [:login_attribute, :jit_provisioning].freeze
   end

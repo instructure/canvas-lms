@@ -324,7 +324,7 @@ class CommunicationChannel < ActiveRecord::Base
     case path_type
     when TYPE_TWITTER
       res = user.user_services.for_service(TYPE_TWITTER).first.service_user_name rescue nil
-      res ||= t :default_twitter_handle, "Twitter Handle"
+      res ||= t :default_twitter_handle, "X.com Handle"
       res
     when TYPE_PUSH
       t "For All Devices"
