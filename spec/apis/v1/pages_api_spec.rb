@@ -2040,7 +2040,7 @@ describe "Pages API", type: :request do
   end
 
   context "differentiated assignments" do
-    def create_page_with_assignment(assignment_opts = {})
+    def create_page_for_da(assignment_opts = {})
       assignment = @course.assignments.create!(assignment_opts)
       assignment.submission_types = "wiki_page"
       assignment.save!
@@ -2135,97 +2135,133 @@ describe "Pages API", type: :request do
     before :once do
       course_with_teacher(active_all: true, user: user_with_pseudonym)
       @student_with_override, @student_without_override = create_users(2, return_type: :record)
+
+      @assignment_1, @page_assigned_to_override = create_page_for_da(
+        title: "assigned to student_with_override",
+        only_visible_to_overrides: true
+      )
+      @assignment_2, @page_assigned_to_all = create_page_for_da(
+        title: "assigned to all",
+        only_visible_to_overrides: false
+      )
+      @page_unassigned = @course.wiki_pages.create!(
+        title: "definitely not assigned",
+        user: @teacher,
+        editing_roles: "teachers,students"
+      )
+
       @course.enroll_student(@student_without_override, enrollment_state: "active")
       @section = @course.course_sections.create!(name: "test section")
       student_in_section(@section, user: @student_with_override)
+      create_section_override_for_assignment(@assignment_1, course_section: @section)
+
       @observer = User.create
       @observer_enrollment = @course.enroll_user(@observer,
                                                  "ObserverEnrollment",
                                                  section: @course.course_sections.first,
                                                  enrollment_state: "active")
-
-      @page_untouched = @course.wiki_pages.create!(
-        title: "definitely not assigned",
-        user: @teacher,
-        editing_roles: "teachers,students"
-      )
-      @assignment_1, @page_assigned_to_override_via_assignment = create_page_with_assignment(
-        title: "assigned to student_with_override",
-        only_visible_to_overrides: true
-      )
-      create_section_override_for_assignment(@assignment_1, course_section: @section)
-      @assignment_2, @page_assigned_to_all_via_assignment = create_page_with_assignment(
-        title: "assigned to all",
-        only_visible_to_overrides: false
-      )
-      @page_only_visible_to_overrides = @course.wiki_pages.create!(
-        title: "only visible to overrides",
-        editing_roles: "teachers,students",
-        only_visible_to_overrides: true
-      )
-      @page_directly_assigned_to_override = @course.wiki_pages.create!(
-        title: "directly assigned to student_with_override",
-        editing_roles: "teachers,students",
-        only_visible_to_overrides: true
-      )
-      ao = @page_directly_assigned_to_override.assignment_overrides.create!
-      ao.assignment_override_students.create!(user: @student_with_override)
-
-      @all_pages = [@page_untouched,
-                    @page_assigned_to_override_via_assignment,
-                    @page_assigned_to_all_via_assignment,
-                    @page_directly_assigned_to_override,
-                    @page_only_visible_to_overrides]
     end
 
-    it "lets the teacher see all pages" do
-      @user = @teacher
-      @all_pages.each { |p| calls_succeed(p) }
-    end
-
-    it "lets students with visibility see pages" do
-      @user = @student_with_override
-      [@page_untouched, @page_assigned_to_override_via_assignment, @page_assigned_to_all_via_assignment, @page_directly_assigned_to_override].each do |p|
-        calls_succeed(p, except: [:post_revert])
+    context "enabled" do
+      before(:once) do
+        @course.conditional_release = true
+        @course.save!
       end
-      calls_fail(@page_only_visible_to_overrides)
-    end
 
-    it "restricts access to students without visibility" do
-      @user = @student_without_override
-      [@page_untouched, @page_assigned_to_all_via_assignment].each do |p|
-        calls_succeed(p, except: [:post_revert])
+      it "lets the teacher see all pages" do
+        @user = @teacher
+        [@page_assigned_to_override, @page_assigned_to_all, @page_unassigned].each { |p| calls_succeed(p) }
       end
-      [@page_assigned_to_override_via_assignment, @page_only_visible_to_overrides, @page_directly_assigned_to_override].each do |p|
-        calls_fail(p)
+
+      it "lets students with visibility see pages" do
+        @user = @student_with_override
+        [@page_assigned_to_override, @page_assigned_to_all, @page_unassigned].each do |p|
+          calls_succeed(p, except: [:post_revert])
+        end
+      end
+
+      it "restricts access to students without visibility" do
+        @user = @student_without_override
+        calls_fail(@page_assigned_to_override)
+        calls_succeed(@page_assigned_to_all, except: [:post_revert])
+        calls_succeed(@page_unassigned, except: [:post_revert])
+      end
+
+      it "gives observers same visibility as unassigned student" do
+        @observer_enrollment.update_attribute(:associated_user_id, @student_without_override.id)
+        @user = @observer
+        calls_fail(@page_assigned_to_override)
+        [@page_assigned_to_all, @page_unassigned].each do |p|
+          calls_succeed(p, except: %i[post_revert put_update get_revisions get_show_revision])
+        end
+      end
+
+      it "gives observers same visibility as assigned student" do
+        @observer_enrollment.update_attribute(:associated_user_id, @student_with_override.id)
+        @user = @observer
+        [@page_assigned_to_override, @page_assigned_to_all, @page_unassigned].each do |p|
+          calls_succeed(p, except: %i[post_revert put_update get_revisions get_show_revision])
+        end
+      end
+
+      it "gives observers without visibility all the things" do
+        @observer_enrollment.update_attribute(:associated_user_id, nil)
+        @user = @observer
+        [@page_assigned_to_override, @page_assigned_to_all, @page_unassigned].each do |p|
+          calls_succeed(p,
+                        except: %i[post_revert put_update get_revisions get_show_revision])
+        end
       end
     end
 
-    it "gives observers same visibility as unassigned student" do
-      @observer_enrollment.update_attribute(:associated_user_id, @student_without_override.id)
-      @user = @observer
-      [@page_untouched, @page_assigned_to_all_via_assignment].each do |p|
-        calls_succeed(p, except: %i[post_revert put_update get_revisions get_show_revision])
+    context "disabled" do
+      before(:once) do
+        @course.conditional_release = false
+        @course.save!
       end
-      [@page_assigned_to_override_via_assignment, @page_only_visible_to_overrides, @page_directly_assigned_to_override].each do |p|
-        calls_fail(p)
-      end
-    end
 
-    it "gives observers same visibility as assigned student" do
-      @observer_enrollment.update_attribute(:associated_user_id, @student_with_override.id)
-      @user = @observer
-      [@page_untouched, @page_assigned_to_override_via_assignment, @page_assigned_to_all_via_assignment, @page_directly_assigned_to_override].each do |p|
-        calls_succeed(p, except: %i[post_revert put_update get_revisions get_show_revision])
+      it "lets the teacher see all pages" do
+        @user = @teacher
+        [@page_assigned_to_override, @page_assigned_to_all, @page_unassigned].each { |p| calls_succeed(p) }
       end
-      calls_fail(@page_only_visible_to_overrides)
-    end
 
-    it "gives observers without visibility all the things" do
-      @observer_enrollment.update_attribute(:associated_user_id, nil)
-      @user = @observer
-      @all_pages.each do |p|
-        calls_succeed(p, except: %i[post_revert put_update get_revisions get_show_revision])
+      it "lets students with visibility see pages" do
+        @user = @student_with_override
+        [@page_assigned_to_override, @page_assigned_to_all, @page_unassigned].each do |p|
+          calls_succeed(p, except: [:post_revert])
+        end
+      end
+
+      it "lets students without visibility see pages" do
+        @user = @student_without_override
+        [@page_assigned_to_override, @page_assigned_to_all, @page_unassigned].each do |p|
+          calls_succeed(p, except: [:post_revert])
+        end
+      end
+
+      it "gives observers same visibility as unassigned student" do
+        @observer_enrollment.update_attribute(:associated_user_id, @student_without_override.id)
+        @user = @observer
+        [@page_assigned_to_override, @page_assigned_to_all, @page_unassigned].each do |p|
+          calls_succeed(p, except: %i[post_revert put_update get_revisions get_show_revision])
+        end
+      end
+
+      it "gives observers same visibility as assigned student" do
+        @observer_enrollment.update_attribute(:associated_user_id, @student_with_override.id)
+        @user = @observer
+        [@page_assigned_to_override, @page_assigned_to_all, @page_unassigned].each do |p|
+          calls_succeed(p, except: %i[post_revert put_update get_revisions get_show_revision])
+        end
+      end
+
+      it "gives observers without visibility all the things" do
+        @observer_enrollment.update_attribute(:associated_user_id, nil)
+        @user = @observer
+        [@page_assigned_to_override, @page_assigned_to_all, @page_unassigned].each do |p|
+          calls_succeed(p,
+                        except: %i[post_revert put_update get_revisions get_show_revision])
+        end
       end
     end
   end

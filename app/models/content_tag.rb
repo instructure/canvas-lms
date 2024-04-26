@@ -773,9 +773,9 @@ class ContentTag < ActiveRecord::Base
     return false unless published?
 
     if assignment
-      assignment.visible_to_user?(user)
+      assignment.visible_to_user?(user, opts)
     elsif content_type_quiz?
-      content.visible_to_user?(user)
+      content.visible_to_user?(user, opts)
     else
       true
     end
