@@ -24,14 +24,28 @@ import {Img} from '@instructure/ui-img'
 import {CondensedButton} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
+import {useSearchParams} from 'react-router-dom'
 
 type ProductCardProps = {
   product: Product
-  setCompany: (company: Company) => void
 }
 
 const ProductCard = (props: ProductCardProps) => {
-  const {product, setCompany} = props
+  const {product} = props
+  const [searchParams, setSearchParams] = useSearchParams()
+
+  const setCompany = (company: Company) => {
+    const queryParams = searchParams.get('filter')
+    const params = queryParams
+      ? JSON.parse(queryParams)
+      : {companies: [], versions: [], audience: []}
+
+    if (!params.companies.some((c: {id: string}) => c.id === company.id)) {
+      setSearchParams({
+        filter: JSON.stringify({...params, companies: [...params.companies, company]}),
+      })
+    }
+  }
 
   return (
     <Flex.Item>

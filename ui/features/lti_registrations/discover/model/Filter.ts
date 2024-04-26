@@ -17,7 +17,7 @@
  */
 
 export type FilterItem = {
-  id: number
+  id: string
   name: string
 }
 

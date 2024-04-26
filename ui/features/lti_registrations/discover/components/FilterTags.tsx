@@ -16,51 +16,66 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useEffect} from 'react'
-import type {LtiFilter} from '../model/Filter'
+import React, {useState, useEffect, useMemo} from 'react'
+import type {FilterItem, LtiFilter} from '../model/Filter'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {Tag} from '@instructure/ui-tag'
 import {useSearchParams} from 'react-router-dom'
+import {Heading} from '@instructure/ui-heading'
 
 const I18n = useI18nScope('lti_registrations')
 
-export default function FilterTags(props: {filterValues: LtiFilter}) {
+export default function FilterTags(props: {numberOfResults: number}) {
   const [searchParams, setSearchParams] = useSearchParams()
-  const [filterIds, setFilterIds] = useState<number[]>([])
+  const [filters, setFilters] = useState<LtiFilter>({companies: [], versions: [], audience: []})
+  const isAnyFilter = useMemo(() => {
+    return Object.values(filters).flat().length > 0
+  }, [filters])
 
   useEffect(() => {
     const queryParams = searchParams.get('filter')
-    const params = queryParams ? JSON.parse(queryParams) : []
-    const ids: number[] = Object.values(params) as number[]
-    setFilterIds(ids)
+    const params = queryParams
+      ? JSON.parse(queryParams)
+      : {companies: [], versions: [], audience: []}
+    setFilters(params as unknown as LtiFilter)
   }, [searchParams])
 
-  const removeFilter = (id: number) => {
-    const newFilterIds = filterIds.filter(i => i !== id)
-    setSearchParams({filter: JSON.stringify(newFilterIds)})
-  }
-
-  const findFilterName = (id: number) => {
-    const filter = Object.values(props.filterValues)
-      .flat()
-      .find(f => f.id === id)
-    return filter ? filter.name : ''
+  const removeFilter = (filter: FilterItem) => {
+    const newFilters = Object.fromEntries(
+      Object.entries(filters).map(([key, value]) => [key, value.filter(f => f.id !== filter.id)])
+    )
+    setSearchParams({
+      search: searchParams.get('search') ?? '',
+      filter: JSON.stringify(newFilters),
+    })
   }
 
   return (
-    <Flex margin="0 0 medium 0">
-      {filterIds.length > 0 && (
-        // TODO: add number of results
-        <Flex.Item padding="0 small 0 0"> {I18n.t('results filtered by')}</Flex.Item>
+    <>
+      {isAnyFilter && (
+        <>
+          <Heading level="h2">{I18n.t('Search Results')}</Heading>
+          <Flex gap="x-small" wrap="no-wrap" margin="0 0 medium 0">
+            <p>
+              {props.numberOfResults} {I18n.t('result(s) filtered by')}
+            </p>
+            {Object.values(filters)
+              .flat()
+              .map(filter => {
+                return (
+                  <Flex.Item padding="0 small 0 0" key={filter.id}>
+                    <Tag
+                      text={filter.name}
+                      dismissible={true}
+                      onClick={() => removeFilter(filter)}
+                    />
+                  </Flex.Item>
+                )
+              })}
+          </Flex>
+        </>
       )}
-      {filterIds.map(id => {
-        return (
-          <Flex.Item padding="0 small 0 0" key={id}>
-            <Tag text={findFilterName(id)} dismissible={true} onClick={() => removeFilter(id)} />
-          </Flex.Item>
-        )
-      })}
-    </Flex>
+    </>
   )
 }
