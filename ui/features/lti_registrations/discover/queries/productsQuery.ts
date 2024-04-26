@@ -117,8 +117,10 @@ const mockProducts: Array<Product> = [
 
 export const fetchProducts = async (params: Params): Promise<ProductResponse> => {
   let tools = [...mockProducts]
-  if (params.company_id_eq) {
-    tools = tools.filter(product => product.company.id === params.company_id_eq)
+  if (params.filters.companies.length > 0) {
+    tools = tools.filter(product =>
+      params.filters.companies.map((c: {id: any}) => c.id).includes(product.company.id)
+    )
   }
   if (params.name_cont) {
     tools = tools.filter(

@@ -29,7 +29,7 @@ const I18n = useI18nScope('lti_registrations')
 export default function FilterOptions(props: {
   categoryName: string
   options: FilterItem[]
-  filterIds: number[]
+  filterIds: string[]
   setFilterValue: (filterItem: FilterItem, value: boolean) => void
   limit?: number
 }) {
@@ -57,6 +57,11 @@ export default function FilterOptions(props: {
                 onChange={event => {
                   props.setFilterValue(option, event.target.checked)
                 }}
+                ref={
+                  showMore && option.id === props.options[0].id
+                    ? checkbox => checkbox && checkbox.focus()
+                    : null
+                }
               />
             </View>
           )
