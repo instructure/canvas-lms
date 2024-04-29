@@ -3803,7 +3803,7 @@ ja:
   anonymize_all_instructor_comments_and_annotations__713924c9: "DocViewer 内のすべての講師のコメントと注釈を匿名で"
   anonymous_assignments_are_hidden_by_default_and_wi_c8884e1e: "匿名課題はデフォルトでは非表示になっており、コース設定が[自動]に設定されている場合でも手動で投稿する必要があります。"
   anonymous_assignments_must_be_manually_posted_a13d2ca5: 匿名の課題は手動で転記する必要があります
-  anonymous_discussion_1e9b981: "匿名のディスカッション "
+  anonymous_discussion_1e9b981: "匿名のディスカッション | "
   anonymous_discussion_54517e84: 匿名のディスカッション
   anonymous_e1b8ad27: 匿名
   anonymous_grading_cannot_be_enabled_for_group_assi_faa33494: グループ課題は匿名で採点を有効にすることはできません
@@ -7380,7 +7380,7 @@ ja:
       not_found: エクスポートが存在しません
     index: 
       buttons: 
-        create: コースのエクスポートの作成
+        create: エクスポート
       content_exports: コンテンツのエクスポート
       export_type: エクスポートのタイプ
       labels: 
@@ -9871,7 +9871,7 @@ ja:
     revisions: リビジョン
     rubrics: ルーブリック
     search: 検索
-    settings: ~
+    settings: 設定
     site_admin: サイト管理者
     stats: 統計
     syllabus: シラバス
@@ -10846,7 +10846,7 @@ ja:
       sort_by_likes: いいね順
       topic_title: トピックのタイトル
       until: 利用終了日時
-      use_for_grading: 採点済み
+      use_for_grading: 採点対象
       users_must_post_before_seeing_replies: 投稿するまで、他ユーザーの返信は表示しない
     entry: 
       authors_name: 作成者名
@@ -17378,7 +17378,7 @@ ja:
   manual_configuration_b586fe54: 手動設定
   manual_entry_e4a4f99a: 手入力
   manual_posting_scores_hidden_from_instructors_9ccb197c: "%{manual_posting}（講師ーから隠されたスコア）"
-  manual_subscribe_5ad37b14: 手動筆記
+  manual_subscribe_5ad37b14: 手動登録
   manual_syncs_are_available_every_cooldown_minutes__e47de0a8: "手動同期は%{coolDown}分ごとに利用できます。再度同期するまで %{minutesRemaining} 分お待ちください。"
   manually_9de23e1f: 手動で
   manually_mark_posts_as_read_afa5d035: 投稿を手動で既読にする
