@@ -17,15 +17,12 @@
  */
 
 import React from 'react'
-import {shallow, mount} from 'enzyme'
+import {shallow} from 'enzyme'
 import ActAsModal from '../ActAsModal'
 import ActAsMask from '../svg/ActAsMask'
 import ActAsPanda from '../svg/ActAsPanda'
-import {Avatar} from '@instructure/ui-avatar'
-import {Text} from '@instructure/ui-text'
-import {Table} from '@instructure/ui-table'
-import {Spinner} from '@instructure/ui-spinner'
 import {Button} from '@instructure/ui-buttons'
+import {render} from '@testing-library/react'
 
 const props = {
   user: {
@@ -63,44 +60,36 @@ describe('ActAsModal', () => {
     expect(button.exists()).toBeTruthy()
   })
 
-  it('renders avatar with user image url', () => {
-    const wrapper = shallow(<ActAsModal {...props} />)
-    const avatar = wrapper.find(Avatar)
-
-    expect(avatar.props().src).toBe('testImageUrl')
+  it('renders avatar with user image url', async () => {
+    const wrapper = render(<ActAsModal {...props} />)
+    expect(
+      wrapper.getByLabelText('Act as User').querySelector("span[data-fs-exclude='true'] img").src
+    ).toContain('testImageUrl')
   })
 
   test('it renders the table with correct user information', () => {
-    const wrapper = mount(<ActAsModal {...props} />)
-    const tables = wrapper.find(Table)
+    const wrapper = render(<ActAsModal {...props} />)
+    const tables = wrapper.getByLabelText('Act as User').querySelectorAll('table')
 
     expect(tables).toHaveLength(3)
 
-    const textContent = []
-    tables.find('tr').forEach(row => {
-      row.find(Text).forEach(rowContent => {
-        textContent.push(rowContent.props().children)
-      })
-    })
-    const tableText = textContent.join(' ')
     const {user} = props
-
-    expect(tableText).toContain(user.name)
-    expect(tableText).toContain(user.short_name)
-    expect(tableText).toContain(user.sortable_name)
-    expect(tableText).toContain(user.email)
+    expect(wrapper.getByText(user.name)).toBeInTheDocument()
+    expect(wrapper.getByText(user.short_name)).toBeInTheDocument()
+    expect(wrapper.getByText(user.sortable_name)).toBeInTheDocument()
+    expect(wrapper.getByText(user.email)).toBeInTheDocument()
     user.pseudonyms.forEach(pseudonym => {
-      expect(tableText).toContain(pseudonym.login_id)
-      expect(tableText).toContain('' + pseudonym.sis_id)
-      expect(tableText).toContain('' + pseudonym.integration_id)
+      expect(wrapper.getByText(pseudonym.login_id)).toBeInTheDocument()
+      expect(wrapper.getByText('' + pseudonym.sis_id)).toBeInTheDocument()
+      expect(wrapper.getByText('' + pseudonym.integration_id)).toBeInTheDocument()
     })
   })
 
   test('it should only display loading spinner if state is loading', async () => {
-    const wrapper = shallow(<ActAsModal {...props} />)
-    expect(wrapper.find(Spinner).exists()).toBeFalsy()
-
-    await new Promise(resolve => wrapper.setState({isLoading: true}, resolve))
-    expect(wrapper.find(Spinner).exists()).toBeTruthy()
+    const ref = React.createRef()
+    const wrapper = render(<ActAsModal {...props} ref={ref} />)
+    expect(wrapper.queryByText('Loading')).not.toBeInTheDocument()
+    ref.current.setState({isLoading: true})
+    expect(wrapper.getByText('Loading')).toBeInTheDocument()
   })
 })
