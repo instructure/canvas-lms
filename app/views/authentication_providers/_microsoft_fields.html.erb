@@ -45,7 +45,7 @@ TEXT
 %></p>
 <div class="ic-Form-control">
   <%= f.label :allowed_tenants, t('Allowed Tenants'), class: 'ic-Label', for: "allowed_tenants_#{presenter.id_suffix(aac)}" %>
-  <%= f.text_field :allowed_tenants, class: 'ic-Input', id: "allowed_tenants_#{presenter.id_suffix(aac)}" %>
+  <%= f.text_field :allowed_tenants, class: 'ic-Input', id: "allowed_tenants_#{presenter.id_suffix(aac)}", value: aac.allowed_tenants.join(",") %>
 </div>
 <p><%= t <<~TEXT
 Note that email may not always be populated in the user's profile at Microsoft.
