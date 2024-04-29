@@ -89,8 +89,8 @@ class SmartSearchController < ApplicationController
       results: []
     }
 
-    progress = SmartSearch.check_course(@context)
-    unless progress == 100
+    ready, progress = SmartSearch.check_course(@context)
+    unless ready
       response[:status] = "index_incomplete"
       response[:indexing_progress] = progress
     end
@@ -133,11 +133,7 @@ class SmartSearchController < ApplicationController
     @context = Course.find(params[:course_id])
     return render_unauthorized_action unless SmartSearch.smart_search_available?(@context)
 
-    progress = SmartSearch.check_course(@context)
-    if progress == 100
-      render json: { status: "indexed" }
-    else
-      render json: { status: "indexing", progress: }
-    end
+    ready, progress = SmartSearch.check_course(@context)
+    render json: { status: (ready ? "indexed" : "indexing"), progress: }
   end
 end
