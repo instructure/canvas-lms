@@ -171,6 +171,7 @@ describe DeveloperKeysController, type: :request do
                         format: "json",
                         account_id: account.id
                       })
+      expect(response).to be_successful
 
       key_json = json.detect { |r| r["id"] == developer_key.global_id }
       expect(key_json["lti_registration"]).to eq ims_registration.as_json
