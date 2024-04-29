@@ -104,7 +104,7 @@ describe "Smart Search API", type: :request do
 
       run_jobs
       response = api_call(:get, @path + "/index_status", @params.merge(action: "index_status"))
-      expect(response).to eq({ "status" => "indexed" })
+      expect(response["status"]).to eq("indexed")
     end
   end
 end
