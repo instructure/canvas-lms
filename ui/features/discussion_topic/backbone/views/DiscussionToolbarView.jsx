@@ -24,6 +24,7 @@ import ReactDOM from 'react-dom'
 import {TextInput} from '@instructure/ui-text-input'
 import {IconSearchLine} from '@instructure/ui-icons'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 const I18n = useI18nScope('DiscussionToolbarView')
 
@@ -79,6 +80,9 @@ export default class DiscussionToolbarView extends View {
           aria-label={I18n.t(
             'Search entries or author. As you type in this field, the list of discussion entries be automatically filtered to only include those whose message or author match your input.'
           )}
+          renderLabel={
+            <ScreenReaderContent>{I18n.t('Search entries or author')}</ScreenReaderContent>
+          }
           renderBeforeInput={() => <IconSearchLine />}
         />,
         this.$el.find('#search_entries_container')[0]
