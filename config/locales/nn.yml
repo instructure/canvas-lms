@@ -23462,9 +23462,16 @@ nn:
   sorry_we_couldn_t_find_anything_that_matched_91793bb7: "Vi kunne dessverre ikkje finne noko som passa."
   sort_15eac63f: Sorter
   sort_40afa70: "Sorter: "
+  sort_assignments_da00656: "Sorter oppgåver"
   sort_by_72dbba9c: "Sorter etter"
+  sort_by_client_id_4c5ea42b: "Sorter etter klient ID"
   sort_by_e75f9e3e: "Sorter etter"
+  sort_by_email_2e88bd70: "Sorter etter epost"
+  sort_by_name_d5cd1d03: "Sorter på navn"
+  sort_by_state_6a8913ff: "Sorter etter stat"
+  sort_by_type_730342c: "Sorter etter type"
   sort_courses_cf94b8d4: "Sorter emne"
+  sort_ordertype_by_sortby_a0dd1c8: "Sorter %{orderType} etter %{sortBy}"
   sort_outcome_column_c53702ed: "Sorter kolonne for læringsmål"
   sort_students_1a561e98: "Sorter studentar"
   sortable_name_73f707cf: "Namn som kan sorterast"
@@ -23475,6 +23482,7 @@ nn:
   sorted_ascending_b6d61547: "sortert i stigande rekkefølge"
   sorted_by_ascending_af61f8ca: "Sortert i stigande rekkefølge"
   sorted_by_descending_824c4300: "Sortert i synkande rekkefølge"
+  sorted_by_sortby_in_ordertype_order_55c8cf9a: "Sortert etter %{sortBy} i %{orderType} rekkefølge"
   sorted_descending_1e30f0d5: "sortert i fallande rekkefølge"
   sorted_descending_7fcec1ff: "Sortert i fallande rekkefølge"
   sorted_descending_84ec84c8: "sortert i fallande rekkefølge."
@@ -23483,6 +23491,7 @@ nn:
   source_c377a469: Kjelde
   source_code_2395ca74: Kjeldekode
   source_context_does_not_match_group_context_4b55cee4: "Kildekonteksten passar ikkje med gruppekonteksten"
+  source_link_c21ecc23: "Kjelde lenke"
   sourcecontextid_required_if_sourcecontexttype_prov_473c67b1: "sourceContextId påkrevd dersom sourceContextType oppgjeve"
   sourcecontexttype_required_if_sourcecontextid_prov_b702e0c9: "sourceContextType påkrevd dersom sourceContextId oppgjeve"
   south_africa_27_d5e0f1e1: "Sør-Afrika (+27)"
@@ -23520,6 +23529,9 @@ nn:
       days: 
         one: Dag
         other: Dagar
+      hours: 
+        one: Time
+        other: Timar
     mic_blocked_message: "Løyve til å bruke mikrofon er sperra. Dersom du vil endre, må du gå til chrome://settings/content/microphone"
     mute_assignment: "Skjul oppgåve"
     no_submission_time: "inga tid for innlevering"
@@ -23563,12 +23575,17 @@ nn:
       resubmitting: "Sender på nytt..."
   speedgrader_d9a6fa90: SpeedGrader™
   speedgrader_de0affa6: SpeedGrader™
+  speedgrader_error_page_d9c4a075: "SpeedGrader feilside"
+  speedgrader_loading_error_235fd2e2: "SpeedGrader feil med lasting"
   speedgrader_settings_4195099b: SpeedGrader-innstillingar
   speedgrader_settings_c9503705: SpeedGrader-innstillingar
+  speedgrader_studio_media_capture_3fd8aa93: "SpeedGrader Studio Media opptak"
   speedgrader_tm_44688790: SpeedGrader™
   split_74c03348: Separer
   split_merged_users_6b81c595: "Del samanslåtte brukarar"
+  split_number_of_students_per_group_4a05f76f: "Del antall studentar per gruppe"
   split_student_names_df0ef806: "Del opp studentnamn"
+  split_students_by_number_of_groups_5ace5a6a: "Fordel studentar på antal grupper"
   splitting_disabled_reached_maximum_of_three_assign_716acb13: "Deling deaktivert: Grense på tre oppgåvegrupper i vurderingsintervall nådd"
   splitting_disabled_there_can_only_be_a_maximum_of__7070ec11: "Deling deaktivert: Det kan kun vere tre oppgåvegrupper i eit vurderingsintervall."
   spreadsheet_6d622119: Rekneark
@@ -23606,6 +23623,9 @@ nn:
   srsd_student_outcome_results_rollups_3cf58a5c: "SRSD samling av resultat for studentar"
   sso_settings_ebf98263: SSO-innstillingar
   staff_contact_info_2f7a6603: "Kontaktinformasjon til dei ansatte"
+  standard_5664e818: standard
+  standard_af128a4e: Standard
+  standard_status_1b751c6b: "Status for standard"
   star_2d27c137: stjerne
   star_8d156e09: "Merk med stjerne"
   star_conversation_2e2ba614: "Merk samtale med stjerne"
@@ -23616,17 +23636,27 @@ nn:
   starred_subject_click_to_unstar_6aafcddc: "Stjernemerkt \"%{subject}\", klikk for å fjerne stjernemerking. "
   start_5a4cfcd6: Start
   start_a_conversation_with_your_instructor_in_the_c_50c9b8d5: "Start ein samtale med faglæraren din i meldingar."
+  start_a_new_course_57ae2480: "Opprett eit nytt emne"
   start_a_new_subject_7271b3ec: "Start eit nytt tema"
+  start_and_end_date_filter_selections_55bcd8b8: "Filtrer val for Start-og Sluttdato"
   start_assignment_d56256d3: "Start oppgåve"
+  start_at_c7a5789: "Start på:"
+  start_at_end_at_b375cbe7: "I %{start_at} - %{end_at}"
   start_date_c41cb23a: "Startdato:"
   start_date_e937be8a: Startdato
   start_date_end_date_d809dd93: "%{start_date} - %{end_date}"
   start_date_field_for_styleguide_8a8ab1d6: "Startdatofelt for stilguide"
+  start_date_for_conference_1936e809: "Startdato for konferanse"
+  start_date_for_enroll_3c2e1f94: "Startdato for %{enroll}"
   start_date_from_20503757: "Startdato frå:"
+  start_date_must_be_before_end_date_a00be892: "Startdato må være før sluttdato"
   start_date_start_time_to_end_time_dc676ce1: "%{start_date}, %{start_time} til %{end_time}"
+  start_date_time_must_be_before_the_end_date_time_6be0c57f: "Startdato/tid må være før sluttdato/tid"
   start_date_to_1e6e6bbe: "Startdato til:"
   start_date_value_817cab96: "Startdato %{value}"
   start_dates_8f1c22a8: "Startdato:"
+  start_end_date_4a7a56da: "Start & sluttdato"
+  start_end_dates_aaa00ecf: "Start & sluttdatoar"
   start_entry_4b491f60: "Første oppføring"
   start_link_validation_dc0ac99c: "Godkjenning av startlenke"
   start_over_f7552aa9: "Start på nytt"
@@ -23634,15 +23664,21 @@ nn:
   start_recording_9a65141a: "Start opptak"
   start_time_2c3d11b5: Starttidspunkt
   start_time_8c0fbe8b: Starttidspunkt
+  start_time_cannot_be_after_end_time_7e734a43: "Startdato kan ikkje være etter sluttdato"
+  start_time_cannot_be_in_the_future_e91be4a9: "start_tid kan ikkje være i framtid"
   start_tls_26e4b0dc: "Start TLS"
   start_tour_29787099: "Start turen"
   start_typing_to_search_press_the_down_arrow_to_nav_72815747: "Start med å skrive for å søke. Bruk piltastane for å navigere mellom søketreffa."
+  startdate_to_enddate_8811cf2b: "%{startDate} til %{endDate}"
+  startdatetime_enddatetime_4284113b: "%{startDateTime} - %{endDateTime}"
+  startdatetime_endtime_6e08f3c2: "%{startDateTime} - %{endTime}"
   starting_content_share_2d8c2999: "Startar innhaldsdeling"
   starting_copy_operation_cc46d911: "Startar kopieringsjobb"
   starting_import_operation_f25745f0: "Startar importjobb"
   starting_publish_5e4f16b9: "Publisering startar ..."
   starts_at_29843f98: Startar
   starts_ce584f1c: Startar
+  starttime_to_endtime_4c46601f: "%{startTime} til %{endTime}"
   state_66a67ba2: Tilstand
   state_published_e42697da: "tilstand: publisert"
   state_standards_c9b1affd: "Nasjonale standardar"
