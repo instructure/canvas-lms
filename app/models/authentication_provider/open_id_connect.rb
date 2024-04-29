@@ -68,6 +68,7 @@ class AuthenticationProvider::OpenIDConnect < AuthenticationProvider::OAuth2
       get_token_response: -> { t("Error fetching access token") },
       claims_response: -> { t("Error fetching user details") },
       id_token: -> { t("ID Token") },
+      claims: -> { t("Claims") },
       userinfo: -> { t("Userinfo") },
     }]
   end
@@ -130,6 +131,8 @@ class AuthenticationProvider::OpenIDConnect < AuthenticationProvider::OAuth2
         Rails.logger.warn("Failed to decode OpenID Connect id_token: #{jwt_string.inspect}")
         raise
       end
+      debug_set(:claims, id_token.to_json) if instance_debugging
+
       # we have a userinfo endpoint, and we don't have everything we want,
       # then request more
       if userinfo_endpoint.present? && !(id_token.keys - requested_claims).empty?

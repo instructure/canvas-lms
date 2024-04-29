@@ -48,20 +48,28 @@ describe AuthenticationProvider::Microsoft do
     expect(ap.client_secret).to eq "secret"
   end
 
-  it "records used tenants" do
-    ap = AuthenticationProvider::Microsoft.new(account: Account.default)
-    allow(ap).to receive(:claims).and_return("tid" => "1234")
-    ap.unique_id("token")
-    expect(ap.settings["known_tenants"]).to eq ["1234"]
-    expect(ap).not_to receive(:save!)
-    ap.unique_id("token")
-    expect(ap.settings["known_tenants"]).to eq ["1234"]
+  it "allows `microsoft` as an alias for the Microsoft tenant" do
+    ap = AuthenticationProvider::Microsoft.new
+    ap.tenant = "microsoft"
+    expect(ap.send(:authorize_url)).to include(AuthenticationProvider::Microsoft::MICROSOFT_TENANT)
   end
 
-  it "records used missing tenant" do
-    ap = AuthenticationProvider::Microsoft.new(account: Account.default)
-    allow(ap).to receive(:claims).and_return({})
-    ap.unique_id("token")
-    expect(ap.settings["known_tenants"]).to eq [nil]
+  context "fetch unique_id" do
+    it "records used tenants" do
+      ap = AuthenticationProvider::Microsoft.new(account: Account.default)
+      allow(ap).to receive(:claims).and_return("tid" => "1234")
+      ap.unique_id("token")
+      expect(ap.settings["known_tenants"]).to eq ["1234"]
+      expect(ap).not_to receive(:save!)
+      ap.unique_id("token")
+      expect(ap.settings["known_tenants"]).to eq ["1234"]
+    end
+
+    it "records used missing tenant" do
+      ap = AuthenticationProvider::Microsoft.new(account: Account.default)
+      allow(ap).to receive(:claims).and_return({})
+      ap.unique_id("token")
+      expect(ap.settings["known_tenants"]).to eq [nil]
+    end
   end
 end
