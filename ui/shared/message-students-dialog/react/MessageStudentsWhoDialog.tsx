@@ -760,19 +760,19 @@ const MessageStudentsWhoDialog = ({
                   data-testid="include-student-radio-group"
                 >
                   <RadioInput
-                    label={I18n.t('All on time submissions')}
+                    label={I18n.t('All submissions')}
                     value="all"
                     onClick={() => onSubmissionRadioSelect('submitted')}
                     data-testid="all-students-radio-button"
                   />
                   <RadioInput
-                    label={I18n.t('Graded on time submissions')}
+                    label={I18n.t('Graded submissions')}
                     value="graded"
                     onClick={() => onSubmissionRadioSelect('submitted_and_graded')}
                     data-testid="graded-students-radio-button"
                   />
                   <RadioInput
-                    label={I18n.t('Not graded on time submissions')}
+                    label={I18n.t('Not graded submissions')}
                     value="not_graded"
                     onClick={() => onSubmissionRadioSelect('submitted_and_not_graded')}
                     data-testid="not-graded-students-radio-button"
