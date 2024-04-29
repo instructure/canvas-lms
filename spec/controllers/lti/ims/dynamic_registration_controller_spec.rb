@@ -162,22 +162,58 @@ describe Lti::IMS::DynamicRegistrationController do
           post :create, params: invalid_registration_params
         end
 
-        let(:invalid_registration_params) do
-          wrong_grant_types = registration_params
-          wrong_grant_types["grant_types"] = ["not_part_of_the_spec", "implicit"]
-          wrong_grant_types
+        context "with invalid grant types" do
+          let(:invalid_registration_params) do
+            wrong_grant_types = registration_params
+            wrong_grant_types["grant_types"] = ["not_part_of_the_spec", "implicit"]
+            wrong_grant_types
+          end
+
+          it "returns a 422 with validation errors" do
+            subject
+            expect(response).to have_http_status(:unprocessable_entity)
+            expect(response.body).to include("Must include client_credentials, implicit")
+          end
+
+          it "doesn't create a stray developer key" do
+            expect { subject }.not_to change { DeveloperKey.count }
+          end
         end
 
-        it "returns a 422 with validation errors" do
-          subject
-          expect(response).to have_http_status(:unprocessable_entity)
-          expect(response.body).to include("Must include client_credentials, implicit")
+        context "with invalid response types" do
+          let(:invalid_registration_params) do
+            wrong_response_types = registration_params
+            wrong_response_types["response_types"] = ["not_part_of_the_spec"]
+            wrong_response_types
+          end
+
+          it "returns a 422 with validation errors" do
+            subject
+            expect(response).to have_http_status(:unprocessable_entity)
+            expect(response.body).to include("Must include id_token")
+          end
+
+          it "doesn't create a stray developer key" do
+            expect { subject }.not_to change { DeveloperKey.count }
+          end
         end
 
-        it "doesn't create a stray developer key" do
-          previous_key_count = DeveloperKey.count
-          subject
-          expect(DeveloperKey.count).to eq(previous_key_count)
+        context "with invalid token endpoint auth method" do
+          let(:invalid_registration_params) do
+            wrong_token_endpoint_auth_method = registration_params
+            wrong_token_endpoint_auth_method["token_endpoint_auth_method"] = "not_part_of_the_spec"
+            wrong_token_endpoint_auth_method
+          end
+
+          it "returns a 422 with validation errors" do
+            subject
+            expect(response).to have_http_status(:unprocessable_entity)
+            expect(response.body).to include("Must be 'private_key_jwt'")
+          end
+
+          it "doesn't create a stray developer key" do
+            expect { subject }.not_to change { DeveloperKey.count }
+          end
         end
       end
     end

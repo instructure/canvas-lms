@@ -20,18 +20,13 @@
 module Factories
   LTI_IMS_REGISTRATION_BASE_ATTRS =
     {
-      application_type: "web",
       guid: "6378c81b-5996-4754-b850-5de78e6d22f4",
       client_name: "Test Dynamic Registration",
       client_uri: "https://example.com",
-      grant_types: %w[client_credentials implicit],
       jwks_uri: "https://example.com/api/registrations/3/jwks",
       initiate_login_uri: "https://example.com/api/registrations/3/login",
       redirect_uris: [
         "https://example.com/api/registrations/3/launch"
-      ],
-      response_types: [
-        "id_token"
       ],
       scopes: %w[
         https://purl.imsglobal.org/spec/lti-ags/scope/lineitem
@@ -43,7 +38,6 @@ module Factories
         https://canvas.instructure.com/lti/account_lookup/scope/show
         https://canvas.instructure.com/lti-ags/progress/scope/show
       ],
-      token_endpoint_auth_method: "private_key_jwt",
       logo_uri: "https://example.com/api/apps/1/icon.svg",
       lti_tool_configuration: {
         claims: %w[
