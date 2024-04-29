@@ -17,10 +17,9 @@
  */
 
 import React from 'react'
-import {shallow, mount} from 'enzyme'
+import {render} from '@testing-library/react'
 import {omit} from 'lodash'
 import CoursesList from '../CoursesList'
-import CoursesListRow from '../CoursesListRow'
 
 describe('Account Course User Search CoursesList Sorting', () => {
   const coursesProps = {
@@ -158,7 +157,7 @@ describe('Account Course User Search CoursesList Sorting', () => {
     subaccount: 'Sub-Account',
   }).forEach(([columnID, label]) => {
     test(`sorting by ${columnID} asc puts up-arrow on ${label} only`, () => {
-      const wrapper = mount(
+      const wrapper = render(
         <CoursesList
           {...{
             ...coursesProps,
@@ -168,10 +167,8 @@ describe('Account Course User Search CoursesList Sorting', () => {
         />
       )
 
-      expect(wrapper.find('IconMiniArrowDownSolid')).toHaveLength(0)
-      const upArrow = wrapper.find('IconMiniArrowUpSolid')
-      expect(upArrow).toHaveLength(1)
-      const header = upArrow.closest('CourseListHeader')
+      expect(wrapper.container.querySelector(`svg[name="IconMiniArrowDown"]`)).toBeNull()
+      expect(wrapper.container.querySelector(`svg[name="IconMiniArrowUp"]`)).toBeInTheDocument()
 
       const expectedTip =
         {
@@ -179,12 +176,11 @@ describe('Account Course User Search CoursesList Sorting', () => {
           total_students: 'Click to sort by number of students descending',
         }[columnID] || `Click to sort by ${label} descending`
 
-      expect(header.find('Tooltip').first().prop('renderTip')).toMatch(RegExp(expectedTip, 'i'))
-      expect(header.text()).toMatch(label)
+      expect(wrapper.getByText(RegExp(expectedTip, 'i'))).toBeInTheDocument()
     })
 
     test(`sorting by ${columnID} desc puts down-arrow on ${label} only`, () => {
-      const wrapper = mount(
+      const wrapper = render(
         <CoursesList
           {...{
             ...coursesProps,
@@ -194,10 +190,8 @@ describe('Account Course User Search CoursesList Sorting', () => {
         />
       )
 
-      expect(wrapper.find('IconMiniArrowUpSolid')).toHaveLength(0)
-      const downArrow = wrapper.find('IconMiniArrowDownSolid')
-      expect(downArrow).toHaveLength(1)
-      const header = downArrow.closest('CourseListHeader')
+      expect(wrapper.container.querySelector(`svg[name="IconMiniArrowUp"]`)).toBeNull()
+      expect(wrapper.container.querySelector(`svg[name="IconMiniArrowDown"]`)).toBeInTheDocument()
 
       const expectedTip =
         {
@@ -205,13 +199,12 @@ describe('Account Course User Search CoursesList Sorting', () => {
           total_students: 'Click to sort by number of students ascending',
         }[columnID] || `Click to sort by ${label} ascending`
 
-      expect(header.find('Tooltip').first().prop('renderTip')).toMatch(RegExp(expectedTip, 'i'))
-      expect(header.text()).toMatch(label)
+      expect(wrapper.getByText(RegExp(expectedTip, 'i'))).toBeInTheDocument()
     })
 
     test(`clicking the ${label} column header calls onChangeSort with ${columnID}`, () => {
       const onChangeSort = jest.fn()
-      const wrapper = mount(
+      const wrapper = render(
         <CoursesList
           {...{
             ...coursesProps,
@@ -220,19 +213,15 @@ describe('Account Course User Search CoursesList Sorting', () => {
         />
       )
 
-      wrapper
-        .find(`CourseListHeader`)
-        .filterWhere(w => w.text().match(label))
-        .find('button')
-        .simulate('click')
+      wrapper.getByRole('button', {name: label}).click()
       expect(onChangeSort).toHaveBeenCalledTimes(1)
       expect(onChangeSort).toHaveBeenCalledWith(columnID)
     })
   })
 
   test('displays SIS ID column if any course has one', () => {
-    const wrapper = shallow(<CoursesList {...coursesProps} />)
-    expect(wrapper.findWhere(n => n.prop('label') === 'SIS ID').exists()).toBeTruthy()
+    const wrapper = render(<CoursesList {...coursesProps} />)
+    expect(wrapper.getByText('SIS ID')).toBeInTheDocument()
   })
 
   test(`doesn't display SIS ID column if no course has one`, () => {
@@ -240,39 +229,20 @@ describe('Account Course User Search CoursesList Sorting', () => {
       ...coursesProps,
       courses: coursesProps.courses.map(c => omit(c, ['sis_course_id'])),
     }
-    const wrapper = shallow(<CoursesList {...propsWithoutSISids} />)
-    expect(wrapper.findWhere(n => n.prop('label') === 'SIS ID').exists()).toBeFalsy()
+    const wrapper = render(<CoursesList {...propsWithoutSISids} />)
+    expect(wrapper.queryByText('SIS ID')).not.toBeInTheDocument()
   })
 
   test('displays courses in the right order', () => {
-    const wrapper = shallow(<CoursesList {...coursesProps} />)
-    const nodes = wrapper.find(CoursesListRow).getElements()
+    const wrapper = render(<CoursesList {...coursesProps} />)
+    const nodes = wrapper.container.querySelectorAll("tbody[data-automation='courses list'] tr")
 
-    expect(nodes[0].props.name).toBe('A')
-    expect(nodes[1].props.name).toBe('Ba')
-    expect(nodes[2].props.name).toBe('Bb')
-    expect(nodes[3].props.name).toBe('C')
-    expect(nodes[4].props.name).toBe('De')
-    expect(nodes[5].props.name).toBe('Dz')
-
-    expect(nodes[0].props.id).toBe('1')
-    expect(nodes[1].props.id).toBe('2')
-    expect(nodes[2].props.id).toBe('3')
-    expect(nodes[3].props.id).toBe('4')
-    expect(nodes[4].props.id).toBe('5')
-    expect(nodes[5].props.id).toBe('6')
-  })
-
-  test('displays Terms in right order', () => {
-    const nodes = shallow(<CoursesList {...coursesProps} />)
-      .find(CoursesListRow)
-      .getElements()
-
-    expect(nodes[0].props.term.name).toBe('A Term')
-    expect(nodes[1].props.term.name).toBe('Ba Term')
-    expect(nodes[2].props.term.name).toBe('Bb Term')
-    expect(nodes[3].props.term.name).toBe('C Term')
-    expect(nodes[4].props.term.name).toBe('De Term')
-    expect(nodes[5].props.term.name).toBe('Dz Term')
+    expect(nodes).toHaveLength(6)
+    expect(nodes[0]).toHaveTextContent('A Term')
+    expect(nodes[1]).toHaveTextContent('Ba Term')
+    expect(nodes[2]).toHaveTextContent('Bb Term')
+    expect(nodes[3]).toHaveTextContent('C Term')
+    expect(nodes[4]).toHaveTextContent('De Term')
+    expect(nodes[5]).toHaveTextContent('Dz Term')
   })
 })
