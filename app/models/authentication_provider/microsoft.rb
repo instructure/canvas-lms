@@ -46,7 +46,7 @@ class AuthenticationProvider::Microsoft < AuthenticationProvider::OpenIDConnect
 
   def self.recognized_params
     # need to filter out OpenIDConnect params, but still call super to get mfa_required
-    super - open_id_connect_params + %i[tenant login_attribute jit_provisioning].freeze
+    super - open_id_connect_params + %i[tenant login_attribute jit_provisioning allowed_tenants].freeze
   end
 
   def self.login_attributes
