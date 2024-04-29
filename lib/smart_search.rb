@@ -114,24 +114,6 @@ module SmartSearch
       end
     end
 
-    def generate_completion(prompt)
-      url = "https://api.openai.com/v1/completions"
-
-      headers = {
-        "Authorization" => "Bearer #{api_key}",
-        "Content-Type" => "application/json"
-      }
-      data = {
-        model: "text-davinci-003",
-        prompt:,
-        max_tokens: 1500,
-        temperature: 0.7
-      }
-      # TODO: error handling
-      response = Net::HTTP.post(URI(url), data.to_json, headers)
-      JSON.parse(response.body)["choices"][0]["text"].strip
-    end
-
     def check_course(course)
       return -1 unless smart_search_available?(course)
 
