@@ -45,8 +45,11 @@ module Lti::Concerns
 
       # Don't look up tools for unauthenticated users
       return nil unless @current_user && @current_pseudonym
+      return nil if parent_frame_context.blank?
 
-      tool = parent_frame_context.presence && ContextExternalTool.find_by(id: parent_frame_context)
+      validate_parent_frame_context
+
+      tool = ContextExternalTool.find_by(id: parent_frame_context)
 
       @parent_frame_origin =
         if !tool&.active? || !tool&.developer_key&.internal_service ||
@@ -57,6 +60,25 @@ module Lti::Concerns
         elsif tool.domain
           "https://#{tool.domain}"
         end
+    end
+
+    # Tools sometimes may mangle the parent_frame_context header if
+    # they do not account for query parameters present in the launch
+    # or content return URL. This will result in this request being
+    # blocked by browsers since the CSP header is not correct. When
+    # this happens, log an ErrorReport to give admins visibility.
+    def validate_parent_frame_context
+      return if Api::ID_REGEX.match?(parent_frame_context.to_s)
+
+      extra = {
+        query_params: request.query_parameters,
+        message: "Invalid CSP header for nested LTI launch",
+        comments: <<~TEXT
+          Nested LTI launch likely failed. Check query parameters,
+          tool may have ignored query string in launch/content return URL.
+        TEXT
+      }
+      CanvasErrors.capture(:invalid_parent_frame_context, { extra: })
     end
 
     def override_parent_frame_origin(url)

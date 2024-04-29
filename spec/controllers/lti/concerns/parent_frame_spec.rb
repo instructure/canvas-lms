@@ -40,10 +40,15 @@ describe Lti::Concerns::ParentFrame do
     @pseudonym
   end
 
+  let(:request) do
+    double("request", query_parameters: "hello=world")
+  end
+
   before do
     controller.instance_variable_set(:@current_user, current_pseudonym.user)
     controller.instance_variable_set(:@current_pseudonym, current_pseudonym)
-    allow(controller).to receive_messages(parent_frame_context: tool.id.to_s, session: nil)
+    allow(controller).to receive_messages(parent_frame_context: tool.id.to_s, session: nil, request:)
+    allow(ContextExternalTool).to receive(:find_by).and_return(nil)
     allow(ContextExternalTool).to receive(:find_by).with(id: tool.id.to_s).and_return(tool)
   end
 
@@ -69,6 +74,19 @@ describe Lti::Concerns::ParentFrame do
         end
 
         it { is_expected.to be_nil }
+      end
+
+      context "when parent_frame_context is malformed" do
+        before do
+          allow(controller).to receive(:parent_frame_context).and_return("10000000000001uhoh")
+        end
+
+        it "captures an error" do
+          subject
+          error_report = ErrorReport.last
+          expect(error_report.message).to include("Invalid CSP header for nested LTI launch")
+          expect(error_report.data).to include("query_params" => "hello=world")
+        end
       end
     end
   end
