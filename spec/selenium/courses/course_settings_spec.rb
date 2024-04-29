@@ -528,7 +528,8 @@ describe "course settings" do
       replace_content(section_input, section_name)
       submit_form("#add_section_form")
       wait_for_ajaximations
-      new_section = ff("#sections > .section")[1]
+      # New sections are added to the top of the list because we moved teh add section form to the top of the page.
+      new_section = ff("#sections > .section")[0]
       expect(new_section).to include_text(section_name)
     end
 
@@ -539,7 +540,7 @@ describe "course settings" do
       body = f("body")
       expect(body).to include_text("Delete Section")
 
-      f(".delete_section_link").click
+      f("#sections > .section .delete_section_link").click
       expect(driver.switch_to.alert).not_to be_nil
       driver.switch_to.alert.accept
       wait_for_ajaximations
@@ -554,7 +555,7 @@ describe "course settings" do
       body = f("body")
       expect(body).to include_text("Edit Section")
 
-      f(".edit_section_link").click
+      f("#sections > .section .edit_section_link").click
       section_input = f("#course_section_name_edit")
       expect(section_input).to be_displayed
       replace_content(section_input, edit_text)

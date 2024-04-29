@@ -742,6 +742,29 @@
           <% end %>
         </li>
       <% end %>
+      <li class="section_blank" style="display: none;">
+        <a href="<%= context_url(@context, :context_section_url, "{{ id }}") %>" class="name"></a>
+        <span class="section_links">
+          <a class="Button Button--icon-action no-hover edit_section_link"
+             role="button"
+             href="<%= context_url(@context, :context_section_url, "{{ id }}") %>"
+             title="<%= t('links.title.edit_section', %{Edit Section}) %>">
+              <i class="icon-edit" aria-hidden="true"></i>
+              <span class="screenreader-only">
+                <%= t('Edit Section "%{name}"', :name => "%%name%%") %>
+              </span>
+          </a>
+          <a class="Button Button--icon-action delete_section_link"
+             role="button"
+             href="<%= context_url(@context, :context_section_url, "{{ id }}") %>"
+             title="<%= t('links.title.delete_section', %{Delete Section}) %>"
+             class="no-hover">
+              <i class="icon-end" aria-hidden="true"></i>
+              <span class="screenreader-only"><%= t('Delete Section "%{name}"', :name => "%%name%%") %></span>
+          </a>
+        </span>
+        <div class="clear"></div>
+      </li>
       <% @context.course_sections.active.order(CourseSection.best_unicode_collation_key('name')).each do |section| %>
         <li class="section">
           <% if can_do section, @current_user, :read %>
@@ -795,29 +818,6 @@
           <div class="clear"></div>
         </li>
       <% end %>
-      <li class="section_blank" style="display: none;">
-        <a href="<%= context_url(@context, :context_section_url, "{{ id }}") %>" class="name"></a>
-        <span class="section_links">
-          <a class="Button Button--icon-action no-hover edit_section_link"
-            role="button"
-            href="<%= context_url(@context, :context_section_url, "{{ id }}") %>"
-            title="<%= t('links.title.edit_section', %{Edit Section}) %>">
-              <i class="icon-edit" aria-hidden="true"></i>
-              <span class="screenreader-only">
-                <%= t('Edit Section "%{name}"', :name => "%%name%%") %>
-              </span>
-          </a>
-          <a class="Button Button--icon-action delete_section_link"
-            role="button"
-            href="<%= context_url(@context, :context_section_url, "{{ id }}") %>"
-            title="<%= t('links.title.delete_section', %{Delete Section}) %>"
-            class="no-hover">
-              <i class="icon-end" aria-hidden="true"></i>
-              <span class="screenreader-only"><%= t('Delete Section "%{name}"', :name => "%%name%%") %></span>
-          </a>
-        </span>
-        <div class="clear"></div>
-      </li>
     </ul>
     <%= form_for :course_section, :url => "", :html => {:id => "edit_section_form", :method => :put, :style => "display: none;"} do |f| %>
       <%= f.text_field :name, :id => "course_section_name_edit", :'aria-label' => t('buttons.edit_section_name', "Edit section name") %>
