@@ -25,7 +25,7 @@ describe "Smart Search API", type: :request do
 
   def stub_smart_search
     allow(SmartSearch).to receive(:api_key).and_return("dummy")
-    allow(SmartSearch).to receive(:generate_embedding) { |chunk| chunk[0...3].chars.map(&:ord) }
+    allow(SmartSearch).to receive(:generate_embedding) { |chunk| chunk.split(": ").last[0...3].chars.map(&:ord) }
   end
 
   before :once do

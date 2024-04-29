@@ -80,7 +80,7 @@ module SmartSearchable
   handle_asynchronously :generate_embeddings, priority: Delayed::LOW_PRIORITY
 
   def chunk_content(max_character_length = 4000)
-    title = attributes[self.class.search_title_column]
+    title = "#{Context.translated_content_type(self.class.name)}: #{attributes[self.class.search_title_column]}"
     content = body_text
     if content.length > max_character_length
       # Chunk

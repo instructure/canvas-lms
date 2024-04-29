@@ -50,7 +50,7 @@ describe SmartSearchable do
 
     it "strips HTML from the body before indexing" do
       wiki_page_model(title: "test", body: "<ul><li>foo</li></ul>")
-      expect(SmartSearch).to receive(:generate_embedding).with("test\n* foo")
+      expect(SmartSearch).to receive(:generate_embedding).with("Page: test\n* foo")
       run_jobs
     end
 

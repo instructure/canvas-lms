@@ -326,6 +326,31 @@ module Context
     end
   end
 
+  def self.translated_content_type(content_type)
+    case content_type
+    when "Announcement"
+      I18n.t("Announcement")
+    when "Assignment"
+      I18n.t("Assignment")
+    when "Attachment"
+      I18n.t("Attachment")
+    when "ContextExternalTool"
+      I18n.t("External Tool")
+    when "ContextModuleSubHeader"
+      I18n.t("Context Module Sub Header")
+    when "DiscussionTopic"
+      I18n.t("Discussion Topic")
+    when "ExternalUrl"
+      I18n.t("External Url")
+    when "Quizzes::Quiz", "Quiz"
+      I18n.t("Quiz")
+    when "WikiPage"
+      I18n.t("Page")
+    else
+      I18n.t("Unknown Content Type")
+    end
+  end
+
   def self.asset_name(asset)
     name = asset.display_name.presence if asset.respond_to?(:display_name)
     name ||= asset.title.presence if asset.respond_to?(:title)
