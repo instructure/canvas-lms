@@ -62,7 +62,8 @@ class Login::OAuthBaseController < ApplicationController
   end
 
   def find_pseudonym(unique_ids, provider_attributes = {})
-    if unique_ids.nil?
+    unique_id = unique_ids.is_a?(Hash) ? unique_ids[@aac.login_attribute] : unique_ids
+    if unique_id.nil?
       unknown_user_url = @domain_root_account.unknown_user_url.presence || login_url
       logger.warn "Received OAuth2 login with no unique_id"
       flash[:delegated_message] =
@@ -71,15 +72,11 @@ class Login::OAuthBaseController < ApplicationController
       return redirect_to unknown_user_url
     end
 
-    pseudonym = nil
-    unique_ids = Array(unique_ids)
-    unique_ids.any? do |unique_id|
-      pseudonym = @domain_root_account.pseudonyms.for_auth_configuration(unique_id, @aac)
-    end
+    pseudonym = @domain_root_account.pseudonyms.for_auth_configuration(unique_ids, @aac)
     if pseudonym
       @aac.apply_federated_attributes(pseudonym, provider_attributes)
-    elsif !unique_ids.empty? && @aac.jit_provisioning?
-      pseudonym = @aac.provision_user(unique_ids.first, provider_attributes)
+    elsif @aac.jit_provisioning?
+      pseudonym = @aac.provision_user(unique_ids, provider_attributes)
     end
 
     if pseudonym && (user = pseudonym.login_assertions_for_user)
@@ -93,7 +90,7 @@ class Login::OAuthBaseController < ApplicationController
     else
       unknown_user_url = @domain_root_account.unknown_user_url.presence || login_url
       logger.warn "Received OAuth2 login for unknown user: #{unique_ids.inspect}, redirecting to: #{unknown_user_url}."
-      flash[:delegated_message] = t "Canvas doesn't have an account for user: %{user}", user: unique_ids.first
+      flash[:delegated_message] = t "Canvas doesn't have an account for user: %{user}", user: unique_id
       redirect_to unknown_user_url
     end
   end
