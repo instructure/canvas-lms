@@ -37,8 +37,8 @@ import {
   SelectStrings,
 } from '@canvas/upload-media-translations'
 import {ConversationContext} from '../../../util/constants'
-import {useLazyQuery} from 'react-apollo'
-import {RECIPIENTS_OBSERVERS_QUERY} from '../../../graphql/Queries'
+import {useLazyQuery, useQuery} from 'react-apollo'
+import {RECIPIENTS_OBSERVERS_QUERY, INBOX_SETTINGS_QUERY} from '../../../graphql/Queries'
 
 const I18n = useI18nScope('conversations_2')
 
@@ -62,6 +62,24 @@ const ComposeModalContainer = props => {
   const {isSubmissionCommentsType} = useContext(ConversationContext)
   const [loadingObservers, setLoadingObservers] = useState(false)
   const [includeObserversMessages, setIncludeObserversMessages] = useState(null)
+  const [activeSignature, setActiveSignature] = useState()
+
+  const {
+    loading: inboxSettingsLoading
+  } = useQuery(INBOX_SETTINGS_QUERY, {
+    onCompleted: data => {
+      let signature
+      if (data?.myInboxSettings?.useSignature) {
+        signature = data.myInboxSettings.signature
+      }
+      setActiveSignature(signature)
+    },
+    onError: () => {
+      setOnFailure(I18n.t('There was an error while loading inbox settings'))
+      dismiss()
+    },
+    skip: !props.inboxSettingsFeature || !props.open
+  })
 
   const [
     getRecipientsObserversQuery,
@@ -385,6 +403,21 @@ const ComposeModalContainer = props => {
     setMediaUploadFile(null)
   }
 
+  const dismiss = () => {
+    resetState()
+    props.onDismiss()
+  }
+
+  const loadInboxSettingsSpinner = () => (
+    <ModalSpinner
+      label={I18n.t('Loading Inbox Settings')}
+      message={I18n.t('Loading Inbox Settings')}
+      onExited={() => {}}
+    />
+  )
+
+  if (inboxSettingsLoading) return loadInboxSettingsSpinner()
+
   return (
     <>
       <Responsive
@@ -411,7 +444,7 @@ const ComposeModalContainer = props => {
             data-testid={responsiveProps.dataTestId}
           >
             <ModalHeader
-              onDismiss={props.onDismiss}
+              onDismiss={dismiss}
               headerTitle={props?.submissionCommentsHeader}
             />
             <ModalBody
@@ -424,6 +457,8 @@ const ComposeModalContainer = props => {
               modalError={props.modalError}
               mediaUploadFile={mediaUploadFile}
               onRemoveMediaComment={onRemoveMedia}
+              signature={activeSignature}
+              inboxSettingsFeature={props.inboxSettingsFeature}
             >
               {isSubmissionCommentsType ? null : (
                 <HeaderInputs
@@ -462,7 +497,7 @@ const ComposeModalContainer = props => {
               <ComposeActionButtons
                 onAttachmentUpload={addAttachment}
                 onMediaUpload={() => setMediaUploadOpen(true)}
-                onCancel={props.onDismiss}
+                onCancel={dismiss}
                 onSend={() => {
                   if (!validMessageFields()) {
                     return
@@ -531,4 +566,5 @@ ComposeModalContainer.propTypes = {
   modalError: PropTypes.string,
   isPrivateConversation: PropTypes.bool,
   currentCourseFilter: PropTypes.string,
+  inboxSettingsFeature: PropTypes.bool, // TODO: remove after inboxSettingsFeature flag is removed
 }

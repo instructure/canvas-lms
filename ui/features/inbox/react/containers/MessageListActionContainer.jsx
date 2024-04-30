@@ -234,6 +234,7 @@ const MessageListActionContainer = props => {
                 shouldRenderMarkAsRead={shouldRenderMarkAsRead()}
                 shouldRenderMarkAsUnread={shouldRenderMarkAsUnread()}
                 hasMultipleSelectedMessages={hasMultipleSelectedMessages()}
+                showComposeButton={props.showComposeButton}
               />
             </Flex.Item>
           </Flex>
@@ -267,6 +268,7 @@ MessageListActionContainer.propTypes = {
   onReadStateChange: PropTypes.func,
   activeCourseFilter: PropTypes.string,
   canReply: PropTypes.bool,
+  showComposeButton: PropTypes.bool,
 }
 
 MessageListActionContainer.defaultProps = {

@@ -40,7 +40,12 @@ const ModalBody = props => (
     <Flex direction="column" width="100%" height="100%">
       {props.children}
       <View borderWidth="small none none none" padding="x-small">
-        <MessageBody onBodyChange={props.onBodyChange} messages={props.bodyMessages} />
+        <MessageBody
+          onBodyChange={props.onBodyChange}
+          messages={props.bodyMessages}
+          inboxSettingsFeature={props.inboxSettingsFeature}
+          signature={props.signature}
+        />
       </View>
       {props.pastMessages?.length > 0 && <PastMessages messages={props.pastMessages} />}
       <Flex alignItems="start" borderWidth="small none none none" padding="small">
@@ -89,6 +94,8 @@ ModalBody.propTypes = {
   modalError: PropTypes.string,
   mediaUploadFile: PropTypes.object,
   onRemoveMediaComment: PropTypes.func,
+  inboxSettingsFeature: PropTypes.bool,
+  signature: PropTypes.string,
 }
 
 export default ModalBody
