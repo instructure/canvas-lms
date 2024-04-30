@@ -138,6 +138,10 @@ class AuthenticationProvider < ActiveRecord::Base
     Rails.root.join("app/views/shared/svg/_svg_icon_#{sti_name}.svg").exist?
   end
 
+  def login_attribute_for_pseudonyms
+    nil
+  end
+
   def destroy
     send(:remove_from_list_for_destroy)
     self.workflow_state = "deleted"
@@ -260,12 +264,19 @@ class AuthenticationProvider < ActiveRecord::Base
     time_zone
   ].freeze
 
-  def provision_user(unique_id, provider_attributes = {})
+  def provision_user(unique_ids, provider_attributes = {})
     User.transaction(requires_new: true) do
+      if unique_ids.is_a?(Hash)
+        unique_id = unique_ids[login_attribute]
+      else
+        unique_id = unique_ids
+        unique_ids = {}
+      end
       pseudonym = account.pseudonyms.build
       pseudonym.user = User.create!(name: unique_id) { |u| u.workflow_state = "registered" }
       pseudonym.authentication_provider = self
       pseudonym.unique_id = unique_id
+      pseudonym.unique_ids = unique_ids
       pseudonym.save!
       apply_federated_attributes(pseudonym, provider_attributes, purpose: :provisioning)
       pseudonym
