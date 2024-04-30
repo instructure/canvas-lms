@@ -80,6 +80,9 @@ ready(() => {
         )
       })
   } else {
+    // touch punch simulates mouse events for touch devices
+    require("./touch_punch.js")
+
     const mountPoint = document.getElementById('speed_grader_loading')
 
     ReactDOM.render(
