@@ -27,7 +27,6 @@ GEM
     bigdecimal (3.1.8)
     concurrent-ruby (1.2.3)
     connection_pool (2.4.1)
-    diff-lcs (1.5.1)
     drb (2.2.1)
     i18n (1.14.4)
       concurrent-ruby (~> 1.0)
@@ -62,7 +61,6 @@ DEPENDENCIES
   activerecord (>= 3.2)
   bundler (~> 2.2)
   rake
-  rspec (~> 3.12)
   workflow!
 
 RUBY VERSION

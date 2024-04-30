@@ -72,9 +72,9 @@ module SmartSearchable
 
   def generate_embeddings
     delete_embeddings
-    chunk_content do |chunk|
+    chunk_content(SmartSearch::CHUNK_MAX_LENGTH) do |chunk|
       embedding = SmartSearch.generate_embedding(chunk)
-      embeddings.create!(embedding:)
+      embeddings.create!(embedding:, version: SmartSearch::EMBEDDING_VERSION)
     end
   end
   handle_asynchronously :generate_embeddings, priority: Delayed::LOW_PRIORITY
