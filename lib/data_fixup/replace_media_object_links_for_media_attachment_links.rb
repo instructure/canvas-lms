@@ -35,6 +35,10 @@ module DataFixup::ReplaceMediaObjectLinksForMediaAttachmentLinks
   ATTRIBUTES = %w[href data src].freeze
 
   def self.update_active_records(model, field, where_clause, start_at, end_at)
+    error_file_name = "data_fixup_replace_media_object_links_for_media_attachment_links_#{Shard.current.id}_#{model.table_name}_#{field}_#{start_at}_#{end_at}_#{Time.now.to_f}_errors.csv"
+    had_errors = false
+    error_csv = nil
+
     model.where(id: start_at..end_at).where(*where_clause).find_each(strategy: :pluck_ids) do |active_record|
       next unless (field && active_record[field]) || active_record.is_a?(Quizzes::Quiz)
 
@@ -46,7 +50,14 @@ module DataFixup::ReplaceMediaObjectLinksForMediaAttachmentLinks
             a.merge({ "text" => fix_html(active_record, a["text"]) })
           end
         end
-        active_record.update! question_data:
+        begin
+          active_record.update! question_data:
+        rescue => e
+          had_errors = true
+          error_csv = CSV.open(error_file_name, "a")
+          error_csv << [Shard.current.id, active_record.class.table_name, active_record.id, e.message]
+          error_csv.close
+        end
       elsif active_record.is_a?(Quizzes::Quiz)
         active_record.description = fix_html(active_record, active_record.description)
         active_record.quiz_data = active_record.quiz_data.map do |question|
@@ -56,10 +67,28 @@ module DataFixup::ReplaceMediaObjectLinksForMediaAttachmentLinks
           end
           question
         end
-        active_record.save
+        begin
+          active_record.save
+        rescue => e
+          had_errors = true
+          error_csv = CSV.open(error_file_name, "a")
+          error_csv << [Shard.current.id, active_record.class.table_name, active_record.id, e.message]
+          error_csv.close
+        end
       else
-        active_record.update! field => fix_html(active_record, active_record[field])
+        begin
+          active_record.update! field => fix_html(active_record, active_record[field])
+        rescue => e
+          had_errors = true
+          error_csv = CSV.open(error_file_name, "a")
+          error_csv << [Shard.current.id, active_record.class.table_name, active_record.id, e.message]
+          error_csv.close
+        end
       end
+    end
+    if had_errors
+      Attachment.create!(filename: error_file_name, uploaded_data: File.open(error_csv.path), context: Account.site_admin, content_type: "text/csv")
+      FileUtils.rm_f(error_file_name)
     end
   end
 
@@ -168,8 +197,13 @@ module DataFixup::ReplaceMediaObjectLinksForMediaAttachmentLinks
     (chosen_attachment = get_valid_candidate(candidates, active_record)) ? chosen_attachment : create_attachment(active_record, media_id)
   end
 
-  def self.get_dataset(model, where_clause)
-    model.where(*where_clause)
+  def self.update_dataset(model, field, where_clause)
+    model.where(*where_clause).find_ids_in_ranges(batch_size: 100_000) do |start_at, end_at|
+      delay_if_production(
+        priority: Delayed::LOW_PRIORITY,
+        n_strand: ["DataFixup::ReplaceMediaObjectLinksForMediaAttachmentLinks", Shard.current.database_server.id]
+      ).update_active_records(model, field, where_clause, start_at, end_at)
+    end
   end
 
   def self.run
@@ -185,12 +219,7 @@ module DataFixup::ReplaceMediaObjectLinksForMediaAttachmentLinks
         delay_if_production(
           priority: Delayed::LOW_PRIORITY,
           n_strand: ["DataFixup::ReplaceMediaObjectLinksForMediaAttachmentLinks", Shard.current.database_server.id]
-        ).get_dataset(model, where_clause).find_ids_in_ranges(batch_size: 100_000) do |start_at, end_at|
-          delay_if_production(
-            priority: Delayed::LOW_PRIORITY,
-            n_strand: ["DataFixup::ReplaceMediaObjectLinksForMediaAttachmentLinks", Shard.current.database_server.id]
-          ).update_active_records(model, field, where_clause, start_at, end_at)
-        end
+        ).update_dataset(model, field, where_clause)
       end
     end
   end
