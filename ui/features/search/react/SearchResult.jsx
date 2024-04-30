@@ -31,7 +31,7 @@ const I18n = useI18nScope('SmartSearch')
 
 const preview = (body, maxLength = 512) => {
   const preview = []
-  const words = body.match(/\w+/g)
+  const words = body.match(/\p{L}+/gu)
 
   if(words == null) {
     return ''

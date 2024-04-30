@@ -201,7 +201,11 @@ export default function SearchApp() {
         <fieldset>
           <TextInput
             inputRef={el => (searchInput.current = el)}
-            onChange={e => setSearchTerm(e.target.value)}
+            onChange={e => {
+              // Delay setting search term to prevent slowness when typing
+              const value = e.target.value
+              setTimeout(() => setSearchTerm(value), 15)
+            }}
             placeholder={I18n.t('Food that a panda eats')}
             renderAfterInput={
               <IconButton
