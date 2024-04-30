@@ -132,7 +132,7 @@ export const updateModuleItem = ({
 // TODO: need props to initialize with cards corresponding to current assignments
 export interface ItemAssignToTrayProps {
   open: boolean
-  onSave?: (overrides: ItemAssignToCardSpec[]) => void
+  onSave?: (overrides: ItemAssignToCardSpec[], hasModuleOverrides: boolean) => void
   onClose: () => void
   onDismiss: () => void
   onExited?: () => void
@@ -141,6 +141,7 @@ export interface ItemAssignToTrayProps {
   itemType: ItemType
   iconType: IconType
   itemContentId?: string
+  initHasModuleOverrides?: boolean
   pointsPossible?: number | null
   locale: string
   timezone: string
@@ -172,6 +173,7 @@ export default function ItemAssignToTray({
   iconType,
   itemContentId,
   pointsPossible,
+  initHasModuleOverrides,
   locale,
   timezone,
   defaultCards,
@@ -192,7 +194,7 @@ export default function ItemAssignToTray({
   const [blueprintDateLocks, setBlueprintDateLocks] = useState<DateLockTypes[] | undefined>(
     undefined
   )
-  const [hasModuleOverrides, sethasModuleOverrides] = useState(false)
+  const [hasModuleOverrides, setHasModuleOverrides] = useState(false)
   const lastPerformedAction = useRef<{action: 'add' | 'delete'; index?: number} | null>(null)
   const cardsRefs = useRef<{[cardId: string]: ItemAssignToCardRef}>({})
   const addCardButtonRef = useRef<Element | null>(null)
@@ -282,6 +284,9 @@ export default function ItemAssignToTray({
 
   useEffect(() => {
     if (defaultCards !== undefined || itemContentId === undefined) {
+      if (initHasModuleOverrides !== undefined && hasModuleOverrides !== undefined) {
+        setHasModuleOverrides(initHasModuleOverrides)
+      }
       return
     }
     setFetchInFlight(true)
@@ -364,7 +369,7 @@ export default function ItemAssignToTray({
             selectedOptionIds.push(...defaultOptions)
           })
         }
-        sethasModuleOverrides(hasModuleOverride || false)
+        setHasModuleOverrides(hasModuleOverride || false)
         setBlueprintDateLocks(dateDetailsApiResponse.blueprint_date_locks)
         setDisabledOptionIds(selectedOptionIds)
         setInitialCards(cards)
@@ -419,7 +424,7 @@ export default function ItemAssignToTray({
     }
 
     if (onSave !== undefined) {
-      onSave(assignToCards)
+      onSave(assignToCards, hasModuleOverrides)
       return
     }
     const filteredCards = assignToCards.filter(
@@ -531,7 +536,11 @@ export default function ItemAssignToTray({
           } as exportedOverride)
 
     if (newSelectedOption?.id === everyoneOption.id) {
-      parsedCard.course_section_id = defaultSectionId
+      if (hasModuleOverrides) {
+        parsedCard.course_id = 'everyone'
+      } else {
+        parsedCard.course_section_id = defaultSectionId
+      }
     } else if (parsedCard.id && idData[0] === 'section') {
       parsedCard.course_section_id = idData[1]
     } else if (parsedCard.id && idData[0] === 'student') {

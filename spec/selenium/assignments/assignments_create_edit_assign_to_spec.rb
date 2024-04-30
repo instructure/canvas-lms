@@ -207,9 +207,9 @@ shared_examples_for "item assign to tray during assignment creation/update" do
       new_override = @context_module.assignment_overrides.build
       new_override.course_section = @course.course_sections.first
       new_override.save!
-      assignment = Assignment.create!(context: @course, title: "Assignment")
-      @context_module.add_item(type: "assignment", id: assignment.id)
-      AssignmentCreateEditPage.visit_assignment_edit_page(@course.id, assignment.id)
+      @assignment = Assignment.create!(context: @course, title: "Assignment")
+      @context_module.add_item(type: "assignment", id: @assignment.id)
+      AssignmentCreateEditPage.visit_assignment_edit_page(@course.id, @assignment.id)
     end
 
     it "shows module cards if they are not overridden" do
@@ -218,6 +218,18 @@ shared_examples_for "item assign to tray during assignment creation/update" do
       wait_for_assign_to_tray_spinner
       keep_trying_until { expect(item_tray_exists?).to be_truthy }
       expect(inherited_from.last.text).to eq("Inherited from #{@context_module.name}")
+      expect(element_exists?(assign_to_in_tray_selector("Remove Everyone else"))).to be_falsey
+    end
+
+    it "shows everyone card if there are course overrides" do
+      @assignment.assignment_overrides.create!(set: @course, due_at: 1.day.from_now)
+      AssignmentCreateEditPage.visit_assignment_edit_page(@course.id, @assignment.id)
+      AssignmentCreateEditPage.click_manage_assign_to_button
+
+      wait_for_assign_to_tray_spinner
+      keep_trying_until { expect(item_tray_exists?).to be_truthy }
+      expect(inherited_from.last.text).to eq("Inherited from #{@context_module.name}")
+      expect(assign_to_in_tray("Remove Everyone else")[0]).to be_displayed
     end
 
     it "does not show the inherited module override if there is an assignment override" do
