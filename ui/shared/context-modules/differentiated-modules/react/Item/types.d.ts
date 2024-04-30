@@ -39,6 +39,7 @@ export interface exportedOverride {
   id: string
   course_section_id?: string | null
   student_id?: string
+  course_id?: string | null
   name: string
   type: string
   noop_id: string
