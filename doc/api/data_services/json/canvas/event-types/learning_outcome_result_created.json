@@ -3,10 +3,13 @@
   "definition": "The event is emitted anytime a submission is assessed against an outcome. The following setup should be enabled in Canvas in order for the event to be triggered:\n1. Administrator has set up learning outcomes at the account/sub-account level\n2. Instructor has added outcome to assignment rubric\n3. Student submitted a rubric based assignment\n4. Instructor graded a rubric based assignment at the outcome level => there is a result associated with assignment outcome",
   "trigger": "Triggered when a submission is rated against an outcome.",
   "schema": {
+    "id": "The local Canvas ID of the learning outcome result.",
     "assessed_at": "The date when the outcome was last assessed.",
     "attempt": "The submission attempt number.",
     "created_at": "Time when the result was created.",
     "learning_outcome_id": "The local Canvas ID of the learning outcome.",
+    "learning_outcome_context_uuid": "The uuid of the context associated with the learning outcome.",
+    "result_context_uuid": "The uuid of the context associated with the learning outcome result.",
     "mastery": "True if student achieved mastery.",
     "original_mastery": "True if student achieved mastery on the first attempt.",
     "original_possible": "Possible points on the first attempt.",
@@ -34,10 +37,13 @@
           "root_account_uuid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs"
         },
         "body": {
+          "id": "1",
           "assessed_at": "2019-08-09T21:35:05Z",
           "attempt": 1,
           "created_at": "2019-08-09T21:35:05Z",
           "learning_outcome_id": "1",
+          "learning_outcome_context_uuid": "9dewFPr6uKGaiVxchQSsqV6YZy5HBtlq8O2vqp45",
+          "result_context_uuid": "c3JwFPr6uKGaiVxchQSsqV6YZy5HBtlq8O2vqNNN",
           "mastery": true,
           "original_mastery": false,
           "original_possible": 5,
