@@ -19,8 +19,8 @@
 <%= fields_for :settings do |f| %>
   <table style="width: 600px;" class="formtable">
     <tr>
-      <td colspan="2"><%= mt(:description, <<~TEXT, ms_app_url: "https://portal.azure.com/", callback_url: oauth2_login_callback_url)
-You will need to register a [new app with Microsoft](%{ms_app_url}).
+      <td colspan="2"><%= mt(:description, <<~TEXT, ms_app_url: "https://portal.azure.com/", callback_url: oauth2_login_callback_url, wrappers: { "*" => "<code>\\1</code>" })
+You will need to register a [new app with Microsoft](%{ms_app_url}) under *App registrations*.
 You should configure %{callback_url} as the Redirect URI.
 After you save your app, make a note of the Application ID and Secret, and enter them here.
 TEXT
