@@ -8244,9 +8244,9 @@ ja:
     unarchive: アーカイブの解除
     unstar: スター取り消し
     unstar_conversation: 会話からスターを削除
-  conversations_69a8dc26: 会話
-  conversations_send_messages_to_entire_class_3f414741: "会話 - クラス全体にメッセージを送信します"
-  conversations_send_messages_to_individual_course_m_733620b: "会話 - 個々のコースメンバーにメッセージを送信します"
+  conversations_69a8dc26: メッセージ
+  conversations_send_messages_to_entire_class_3f414741: "メッセージ - クラス全体にメッセージを送信します"
+  conversations_send_messages_to_individual_course_m_733620b: "メッセージ - 個々のコースメンバーにメッセージを送信します"
   copy_9748f9f: コピー
   copy_assignment_name_to_another_course_b62d0a54: "課題 %{name} を別のコースにコピーする"
   copy_blueprint_course_settings_31a97e96: "Blueprint Course 設定をコピーする"
@@ -15975,7 +15975,7 @@ ja:
   insert_equella_links_49a8dacd: "Equella リンクを挿入してください"
   insert_here_ccdb022e: ここに挿入
   insert_math_equation_57c6e767: 数学数式を挿入
-  insert_or_select_names_a780902c: 名前の挿入または選択
+  insert_or_select_names_a780902c: 名前を入力または選択
   insert_row_below_25187f89: 下に行を挿入
   insert_row_below_name_a5b3bd41: "%{name}の下に行を挿入"
   insert_row_in_edit_mode_5976f269: 編集モードで行を挿入
@@ -20125,8 +20125,8 @@ ja:
   name_is_unlocked_click_to_lock_b8b9a2c8: "%{name} ロック解除されています。クリックしてロックする。"
   name_is_unread_click_to_mark_as_read_1d18db92: "%{name}は未読です、クリックして既読にする"
   name_lti_tool_b61eb0af: "%{name} (LTI ツール)"
-  name_mark_as_read_cc9e5fd6: "%{name} 赤でマークする"
-  name_mark_as_unread_abd650da: "%{name} 未読としてマークする"
+  name_mark_as_read_cc9e5fd6: "%{name} 既読にする"
+  name_mark_as_unread_abd650da: "%{name} 未読にする"
   name_missing_f4f3eb9e: 名前がありません
   name_must_be_less_than_255_characters_37a49ba: 名前は255文字未満でなければなりません
   name_name_913c785b: "名前:%{name}"
@@ -20241,7 +20241,7 @@ ja:
   new_group_category_66be9cbd: "グループ セットを作成する"
   new_group_set_7241a581: "新しいグループ セット"
   new_instui_navbar_72a69783: "新しい InstUI ナビゲーションバー"
-  new_mention_ad04b872: 新しい言及
+  new_mention_ad04b872: 新しいメンション
   new_mention_in_a_discussion_efceb170: ディスカッションの新しい言及。
   new_mention_in_a_discussion_post_235706f7: ディスカッション投稿での新しい言及。
   new_module_4e9287e4: 新しいモジュール
@@ -20618,7 +20618,7 @@ ja:
     added_to_conversation_description: 会話に追加されました
     added_to_conversation_display: 会話に追加されました
     all_submissions_description: |-
-        *インストラクターと管理者のみ：*
+        *教員と管理者のみ：*
         
               課題（小テストを除く）提出/再提出
     all_submissions_display: すべての提出物
@@ -20638,7 +20638,7 @@ ja:
     appointment_signups_description: カレンダーの新しい予定
     appointment_signups_display: 予定のサインアップ
     blueprint_description: |-
-        *インストラクターと管理者のみ：*
+        *教員と管理者のみ：*
         
         コンテンツが青写真コースから関連コースに同期されました
     blueprint_display: 青写真同期
@@ -20673,14 +20673,14 @@ ja:
       student_appointment_signups: 受講者の予定のサインアップ
       submission_comment: 課題コメント
     content_link_error_description: |-
-        *講師と管理者のみ：*
+        *教員と管理者のみ：*
         
-        受講者がやりとりしたに失敗したリンクの場所とコンテンツ
+        受講者がやりとりに失敗したリンクの場所とコンテンツ
     content_link_error_display: コンテンツリンクエラー
     conversation_created_description: 会話を作成しました
-    conversation_created_display: 自分が作成した会話
+    conversation_created_display: 自分が送信したメッセージ
     conversation_message_description: 受信箱の新しいメッセージ
-    conversation_message_display: 会話メッセージ
+    conversation_message_display: 新着メッセージ
     course_content_description: |-
         コース内容に変更：
         
@@ -20693,11 +20693,11 @@ ja:
     discussion_mention_description: |-
         ディスカッションの新しい言及ディスカッションの新しい言及。
         
-        *ディスカッションでの言及は、
+        *ディスカッションでのメンションは、
         
-        「ディスカッション/通知の再設計」
+        「ディスカッション/通知の再デザイン」
         フラグがオンになっているコースまたはアカウントでのみ利用可能です。*
-    discussion_post_description: 自分が購読しているトピックへの新規返信
+    discussion_post_description: 自分が常に通知に設定している
     discussion_post_display: 新規返信
     due_date_description: 課題の期日が変更されました
     due_date_display: 期日
@@ -20713,7 +20713,7 @@ ja:
     grading_policies_description: コースの採点方針の変更
     grading_policies_display: 採点方針
     invitation_description: |-
-        ～への招待：
+        以下への招待：
         
         * ウェブ会議
         * グループ
@@ -20721,12 +20721,12 @@ ja:
         * ピアレビュー＆リマインダ
     invitation_display: 招待
     late_grading_description: |-
-        *インストラクタおよび管理者のみ:*
+        *教員と管理者のみ:*
         
         課題提出遅延
     late_grading_display: 遅延採点
     membership_update_description: |-
-        *管理者のみ: 保留中登録のアクティブ化*
+        *管理者のみ: 保留中の登録のアクティブ化*
         
         * グループ登録
         * 受諾/拒否
@@ -20766,7 +20766,7 @@ ja:
       content_export_finished: コンテンツのエクスポートが完了しました
       content_link_error: コンテンツリンクエラー
       conversation_created: 会話が作成されました
-      conversation_message: 会話メッセージ
+      conversation_message: 新着メッセージ
       enrollment_accepted: 登録が受け入れられました
       enrollment_invitation: 登録への招待
       enrollment_notification: 登録のお知らせ
@@ -20812,7 +20812,7 @@ ja:
       web_conference_recording_ready: ウェブ会議の録音準備ができました
     no_subject: 件名なし
     other_description: |-
-        *インストラクタおよび管理者のみ:*
+        *教員と管理者のみ:*
         
         * コース登録
         * レポート生成
@@ -20825,7 +20825,7 @@ ja:
     reminder_display: 事前通知
     reported_reply_description: ディスカッション内の新しく報告された返信
     student_appointment_description: |-
-        *インストラクタおよび管理者のみ:*
+        *教員と管理者のみ:*
         
         受講者の予定のサインアップ
     student_appointment_display: 受講者の予定のサインアップ
@@ -22798,7 +22798,7 @@ ja:
           これらの通知は、自分から自分へのダイレクト メッセージとして送信され、
           公開ストリームには表示されません。
       unknown_service: 不明
-      web_services: "Canvas では、ご利用の Web ツールと結び付けることで、受講者活がはるかに便利になります。\"他のサービス\" で任意のサービスをクリックすると、詳細が表示されます。"
+      web_services: "Canvas では、ご利用の Web ツールと結び付けることで、受講者はより便利になります。\"他のサービス\" で任意のサービスをクリックすると、詳細が表示されます。"
       yo_description: |-
           Yo は、タップするだけの文字入力が不要なコミュニケーション ツールです。
           Yo のアカウントを持っている場合は、ここで登録できます。
@@ -25660,7 +25660,7 @@ ja:
   scheduler_must_be_enabled_by_your_canvas_admin_7508c8c2: スケジューラは、Canvas管理者が有効でなければなりません。
   scheduler_must_be_enabled_for_your_account_e6e53972: アカウントでスケジューラが有効でなければなりません。
   scheduler_shown_df77ca6f: 表示されたスケジューラー
-  scheduling_5a3327e7: スケジュール中
+  scheduling_5a3327e7: スケジュール
   scheduling_sync_3f4a7cac: スケジュール同期
   schemes_103aa474: スキーム
   school_of_rock_4b7b1fd0: スクール・オブ・ロック
@@ -25857,8 +25857,8 @@ ja:
   search_by_title_short_name_or_sis_id_fe84aa12: "タイトル、短い名前、またはSIS IDで検索する"
   search_by_user_dd3ad189: ユーザで検索
   search_calendars_f98d663: カレンダーを検索する
-  search_courses_591bc900: コースを検索中...
-  search_courses_7b5c4ab3: コース検索
+  search_courses_591bc900: コースを検索
+  search_courses_7b5c4ab3: コースを検索
   search_courses_by_teacher_e9760a48: コースを教員ごとに検索する...
   search_developer_keys_a9460875: 開発者キーを検索する
   search_discussion_by_title_30466604: ディスカッションを件名ごとに検索
@@ -26407,7 +26407,7 @@ ja:
   settings_5aa0fd0c: 設定
   settings_changed_exceptions_e5247936: 設定変更の例外：
   settings_for_assignment_name_c19565e1: "%{name}課題の設定"
-  settings_for_e2322172: ～の設定
+  settings_for_e2322172: 設定対象
   settings_for_env_dcae6f02: "%{env}の設定"
   settings_for_name_7731a33d: "～の設定%{name}"
   settings_for_tab_label_3bff4468: "～の設定%{tab_label}"
@@ -28058,7 +28058,7 @@ ja:
   subject_home_8e593f72: "件名 ホーム"
   subject_home_page_41226803: 対象ホームページ
   subject_mark_as_read_b0218a: "%{subject}既読としてマークする"
-  subject_mark_as_unread_6f07435f: "%{subject}未読としてマークする"
+  subject_mark_as_unread_6f07435f: "%{subject}未読にする"
   subject_must_contain_fewer_than_255_characters_2e72cd02: 件名は255文字未満でなければなりません。
   subject_name_a1ac4da4: 件名
   subject_not_selected_10dacadf: "%{subject}が選択されていません"
@@ -32560,7 +32560,7 @@ ja:
   you_are_currently_logged_into_student_view_3e8a1da: 現在、受講者ビューにログインしています
   you_are_currently_masquerading_as_user_name_f4a00ade: "現在、%{user_name} としてマスカレードしています"
   you_are_currently_receiving_notifications_for_this_4f542bb2: "現在この%{contextType}の通知を受け取っています。%{contextType}の通知を無効にするには、上記の切り替えを使用してください。"
-  you_are_currently_receiving_notifications_for_this_9646b09d: 現在このコースの通知を受け取っています。コースの通知を無効にするには、上記の切り替えを使用してください。
+  you_are_currently_receiving_notifications_for_this_9646b09d: 現在このコースの通知設定が適用されています。コースの通知設定を無効にするには、上の切り替えボタンを使用してください。
   you_are_here_54075d8c: "あなたの現在地:"
   you_are_logged_in_at_institution1_using_your_crede_3f5bb205: "%{institution2} からの資格情報を使用して %{institution1} にログインしています"
   you_are_logged_out_of_canvas_8b5fc59a: Canvasからログアウトしています。
@@ -32872,7 +32872,7 @@ ja:
       アプリケーションの作成後、コンシューマーキーとシークレットをメモし、それらをここに入力してください。
   you_will_not_be_able_to_preview_your_changes_f7b868fb: 変更をプレビューすることができません
   you_will_not_receive_any_contexttype_notifications_da7a58f1: "現在%{contextType}の通知は受け取らないことになっています。%{contextType}の通知を有効にするには、上記の切り替えを使用してください。"
-  you_will_not_receive_any_course_notifications_at_t_7d9ce24f: 現在コースの通知は受け取らないことになっています。コースの通知を有効にするには、上記の切り替えを使用してください。
+  you_will_not_receive_any_course_notifications_at_t_7d9ce24f: 現在このコースの通知設定は適用されていません。コースの通知設定を有効にするには、上の切り替えボタンを使用してください。
   you_will_only_see_comments_written_by_you_f294cb9d: ご自分が書いたコメントのみ表示されます。
   your_answer_8dad6ea4: "あなたの解答:"
   your_assignment_assignment_name_is_due_on_due_at_9f82e587: "アナタの課題%{assignment_name}の期限は%{due_at}です。"
