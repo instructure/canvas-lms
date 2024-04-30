@@ -48,6 +48,8 @@ const GradedDiscussionDueDateDefaultValues = {
   setPointsPossibleReplyToEntry: (points) => {},
   replyToEntryRequiredCount: 1,
   setReplyToEntryRequiredCount: (count) => {},
+  importantDates: false,
+  setImportantDates: (newImportantDatesValue) => {},
 }
 
 export const GradedDiscussionDueDatesContext = React.createContext(
