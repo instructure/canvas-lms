@@ -34,6 +34,7 @@ class AuthenticationProvider::Microsoft < AuthenticationProvider::OpenIDConnect
   alias_attribute :tenant, :auth_filter
   alias_method :application_secret, :client_secret
   alias_method :application_secret=, :client_secret=
+  alias_method :login_attribute_for_pseudonyms, :login_attribute
 
   def client_id
     application_id
@@ -76,7 +77,10 @@ class AuthenticationProvider::Microsoft < AuthenticationProvider::OpenIDConnect
     idp = id_token["idp"] || id_token["iss"]
     (settings["known_idps"] << idp).uniq!
     save! if changed?
-    id_token[login_attribute]
+
+    ids = id_token.as_json
+    ids["tid+oid"] = "#{ids["tid"]}##{ids["oid"]}"
+    ids.slice("tid", "tid+oid", *self.class.login_attributes)
   end
 
   def allowed_tenants=(value)

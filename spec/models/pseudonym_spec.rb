@@ -59,6 +59,7 @@ describe Pseudonym do
     # make sure a password was generated
     expect(p.password).not_to be_nil
     expect(p.password).not_to match(/tmp-pw/)
+    expect(p.login_attribute).to be_nil
   end
 
   it "does not allow active duplicates" do
@@ -74,6 +75,18 @@ describe Pseudonym do
     p1.save!
     # Should allow creating a new active one if the others are deleted
     Pseudonym.create!(unique_id: "cody@instructure.com", user: u)
+  end
+
+  it "does not allow a login_attribute without an authentication provider" do
+    u = User.create!
+    expect { u.pseudonyms.create!(unique_id: "a@b.com", login_attribute: "b") }.to raise_error(ActiveRecord::StatementInvalid)
+  end
+
+  it "infers the login_attribute on a new pseudonym for an auth provider that uses them" do
+    u = User.create!
+    ap = Account.default.authentication_providers.create!(auth_type: "microsoft")
+    p = u.pseudonyms.create!(unique_id: "a@b.com", authentication_provider: ap)
+    expect(p.login_attribute).to eq "sub"
   end
 
   it "finds the correct pseudonym for logins" do
@@ -707,7 +720,7 @@ describe Pseudonym do
     end
 
     context "with contemporary auth types" do
-      let!(:aac) { Account.default.authentication_providers.create!(auth_type: "facebook") }
+      let!(:aac) { Account.default.authentication_providers.create!(auth_type: "microsoft") }
 
       before do
         new_pseud.authentication_provider_id = aac.id
@@ -722,6 +735,34 @@ describe Pseudonym do
       it "will not load an AAC related pseudonym if you don't provide an AAC" do
         pseud = Account.default.pseudonyms.for_auth_configuration("BobbyRicky", nil)
         expect(pseud).to be_nil
+      end
+
+      context "with a hash of unique ids" do
+        it "only matches against the proper login attribute" do
+          new_pseud.update_attribute(:login_attribute, "sub")
+          Account.default.pseudonyms.create!(user: bob,
+                                             unique_id: "BobbyRicky",
+                                             authentication_provider: aac,
+                                             login_attribute: "oid")
+
+          pseud = Account.default.pseudonyms.for_auth_configuration({ "sub" => "BobbyRicky" }, aac)
+          expect(pseud).to eq(new_pseud)
+        end
+
+        it "still matches against a null login attribute" do
+          pseud = Account.default.pseudonyms.for_auth_configuration({ "sub" => "BobbyRicky" }, aac)
+          expect(pseud).to eq(new_pseud)
+        end
+
+        it "matches against the proper login attribute before a null login_attribute" do
+          proper_pseud = Account.default.pseudonyms.create!(user: bob,
+                                                            unique_id: "BobbyRicky",
+                                                            authentication_provider: aac,
+                                                            login_attribute: "sub")
+
+          pseud = Account.default.pseudonyms.for_auth_configuration({ "sub" => "BobbyRicky" }, aac)
+          expect(pseud).to eq(proper_pseud)
+        end
       end
     end
   end
