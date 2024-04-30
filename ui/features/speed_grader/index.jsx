@@ -32,7 +32,10 @@ import {getSubmissionsByAssignment} from './queries/submissionsByAssignmentQuery
 import {updateSubmissionGrade} from './mutations/updateSubmissionGradeMutation'
 import {createSubmissionComment} from './mutations/createSubmissionCommentMutation'
 import {hideAssignmentGradesForSections} from './mutations/hideAssignmentGradesForSectionsMutation'
-import {postAssignmentGradesForSections} from './mutations/postAssignmentGradesForSectionsMutation'
+import {
+  postAssignmentGradesForSections,
+  resolvePostAssignmentGradesStatus,
+} from './mutations/postAssignmentGradesForSectionsMutation'
 import GenericErrorPage from '@canvas/generic-error-page'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 
@@ -55,6 +58,7 @@ ready(() => {
             getSubmission,
             getSubmissionsByAssignment,
             getSectionsByAssignment,
+            resolvePostAssignmentGradesStatus,
           },
           mutations: {
             updateSubmissionGrade,
@@ -90,7 +94,7 @@ ready(() => {
       })
   } else {
     // touch punch simulates mouse events for touch devices
-    require("./touch_punch.js")
+    require('./touch_punch.js')
 
     const mountPoint = document.getElementById('speed_grader_loading')
 
