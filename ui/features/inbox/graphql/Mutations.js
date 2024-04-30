@@ -206,3 +206,24 @@ export const DELETE_USER_INBOX_LABEL = gql`
     }
   }
 `
+
+export const UPDATE_INBOX_SETTINGS = gql`
+  mutation UpdateMyInboxSettings($input: UpdateMyInboxSettingsInput!) {
+    updateMyInboxSettings(input: $input) {
+      myInboxSettings {
+        _id
+        useSignature
+        signature
+        useOutOfOffice
+        outOfOfficeFirstDate
+        outOfOfficeLastDate
+        outOfOfficeSubject
+        outOfOfficeMessage
+      }
+      errors {
+        attribute
+        message
+      }
+    }
+  }
+`
