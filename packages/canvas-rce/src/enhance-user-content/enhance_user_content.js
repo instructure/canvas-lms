@@ -24,6 +24,7 @@ import mediaCommentThumbnail from './media_comment_thumbnail'
 import {addParentFrameContextToUrl} from '../rce/plugins/instructure_rce_external_tools/util/addParentFrameContextToUrl'
 import {MathJaxDirective, Mathml} from './mathml'
 import {makeExternalLinkIcon} from './external_links'
+import getTranslations from '../getTranslations'
 
 // in jest the es directory doesn't exist so stub the undefined svg
 const IconDownloadSVG = IconDownloadLine?.src || '<svg></svg>'
@@ -168,6 +169,16 @@ export function enhanceUserContent(container = document, opts = {}) {
      */
     containingCanvasLtiToolId,
   } = opts
+
+  getTranslations(locale)
+    .then(() => {
+      formatMessage.setup({
+        locale: locale || 'en',
+      })
+    })
+    .catch(_err => {
+      console.error('Failed loading the language file for', locale, '. Falling back to English.')
+    })
 
   const content =
     (container instanceof HTMLElement && container) ||

@@ -20,12 +20,14 @@
 require_relative "../helpers/wiki_and_tiny_common"
 require_relative "../rcs/pages/rcs_sidebar_page"
 require_relative "../rcs/pages/rce_next_page"
+require_relative "../helpers/files_common"
 
 describe "Wiki pages and Tiny WYSIWYG editor Files", :ignore_js_errors do
   include_context "in-process server selenium tests"
   include WikiAndTinyCommon
   include RCSSidebarPage
   include RCENextPage
+  include FilesCommon
 
   context "wiki and tiny files in RCE Next" do
     before do
@@ -169,6 +171,27 @@ describe "Wiki pages and Tiny WYSIWYG editor Files", :ignore_js_errors do
 
       expect(course_media_links.count).to eq 1
       expect(tray_container).to include_text("bar2.mp4")
+    end
+
+    it "allows shows the non english version of minimized file preview" do
+      skip("USE_OPTIMIZED_JS=true") unless ENV["USE_OPTIMIZED_JS"]
+      skip("RAILS_LOAD_ALL_LOCALES=true") unless ENV["RAILS_LOAD_ALL_LOCALES"]
+
+      @teacher.locale = "es"
+      @teacher.save!
+
+      add_file(fixture_file_upload("a_file.txt", "text/plain"),
+               @course,
+               "a_file.txt")
+      file_attachment = Attachment.last
+      newpage = @course.wiki_pages.create!(title: "newpage", body: "<p><a class=\"instructure_file_link instructure_scribd_file\" title=\"foo.txt\" href=\"/courses/#{@course.id}/files/#{file_attachment.id}?wrap=1\" target=\"_blank\" data-canvas-previewable=\"true\"><span style=\"vertical-align: inherit;\"><span style=\"vertical-align: inherit;\">a_file.txt</span></span></a></p>")
+
+      get "/courses/#{@course.id}/pages/#{newpage.title}"
+      expect(f(".file_preview_link")).to be_displayed
+      f(".file_preview_link").click
+      wait_for_ajaximations
+      expect(f(".hide_file_preview_link")).to be_displayed
+      expect(f(".hide_file_preview_link").text).to eq "Minimice la vista previa del archivo"
     end
   end
 end
