@@ -20,8 +20,11 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 import React from 'react'
 import DateHelper from '@canvas/datetime/dateHelper'
+import {IconDiscussionCheckLine} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {Checkpoint} from '../../../graphql/Checkpoint'
+import {Submission} from '../../../graphql/Submission'
+import {REPLY_TO_TOPIC, REPLY_TO_ENTRY, SUBMITTED} from '../../utils/constants'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 
@@ -35,20 +38,41 @@ export function CheckpointsTray({...props}) {
         })
       : I18n.t('Due: No Due Date')
   }
-  const replyToTopicData = props.checkpoints?.find(
-    checkpoint => checkpoint.tag === 'reply_to_topic'
+  const replyToTopicCheckpoint = props.checkpoints?.find(
+    checkpoint => checkpoint.tag === REPLY_TO_TOPIC
   )
-  const replyToEntryData = props.checkpoints?.find(
-    checkpoint => checkpoint.tag === 'reply_to_entry'
+  const replyToEntryCheckpoint = props.checkpoints?.find(
+    checkpoint => checkpoint.tag === REPLY_TO_ENTRY
   )
+
+  const getCompletedString = submittedAt => {
+    return I18n.t('Completed %{submittedAt}', {
+      submittedAt: DateHelper.formatDatetimeForDiscussions(submittedAt),
+    })
+  }
+
+  const renderSubmissionStatus = (submission = {}, expectedSubmittedStatus = SUBMITTED) => {
+    if (submission.submissionStatus === expectedSubmittedStatus) {
+      return (
+        <Flex.Item align="start">
+          <Text size="small" color="success" weight="bold">
+            <IconDiscussionCheckLine />
+            &nbsp;{getCompletedString(submission.submittedAt)}
+          </Text>
+        </Flex.Item>
+      )
+    } else {
+      return null
+    }
+  }
 
   return (
     <Flex direction="column">
-      {replyToTopicData && (
+      {replyToTopicCheckpoint && (
         <Flex.Item data-testid="reply_to_topic_section">
           <View
             as="div"
-            borderWidth={replyToEntryData ? '0 0 small 0' : 'none'}
+            borderWidth={replyToEntryCheckpoint ? '0 0 small 0' : 'none'}
             padding="0 0 small 0"
           >
             <Flex direction="column">
@@ -56,13 +80,14 @@ export function CheckpointsTray({...props}) {
                 <Text size="small">{I18n.t('Reply to Topic')} </Text>
               </Flex.Item>
               <Flex.Item align="start">
-                <Text size="small">{getCheckpointDueString(replyToTopicData)}</Text>
+                <Text size="small">{getCheckpointDueString(replyToTopicCheckpoint)}</Text>
               </Flex.Item>
+              {renderSubmissionStatus(props.replyToTopicSubmission, SUBMITTED)}
             </Flex>
           </View>
         </Flex.Item>
       )}{' '}
-      {replyToEntryData && (
+      {replyToEntryCheckpoint && (
         <Flex.Item data-testid="reply_to_entry_section" padding="small 0 0 0">
           <Flex direction="column">
             <Flex.Item align="start">
@@ -73,8 +98,9 @@ export function CheckpointsTray({...props}) {
               </Text>
             </Flex.Item>
             <Flex.Item align="start">
-              <Text size="small">{getCheckpointDueString(replyToEntryData)}</Text>
+              <Text size="small">{getCheckpointDueString(replyToEntryCheckpoint)}</Text>
             </Flex.Item>
+            {renderSubmissionStatus(props.replyToEntrySubmission, SUBMITTED)}
           </Flex>
         </Flex.Item>
       )}
@@ -85,4 +111,6 @@ export function CheckpointsTray({...props}) {
 CheckpointsTray.propTypes = {
   checkpoints: PropTypes.arrayOf(Checkpoint.shape),
   replyToEntryRequiredCount: PropTypes.number,
+  replyToTopicSubmission: Submission.shape,
+  replyToEntrySubmission: Submission.shape,
 }

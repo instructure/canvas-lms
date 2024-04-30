@@ -73,7 +73,7 @@ describe "Discussion Topic Show" do
 
       f("button[data-testid='discussion-post-menu-trigger']").click
       fj("span[role='menuitem']:contains('Show Rubric')").click
-      fj(".find_rubric_link").click
+      f(".find_rubric_link").click
 
       expect(fj(".select_rubric_link:contains(#{rubric.title})")).to be_present
       expect(ffj(".rubrics_dialog_rubric:visible").count).to eq 1
@@ -205,7 +205,7 @@ describe "Discussion Topic Show" do
         student_in_course(active_all: true)
 
         @due_at = 2.days.from_now
-        @replies_required = 5
+        @replies_required = 2
         @checkpointed_discussion = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed discussion")
         Checkpoints::DiscussionCheckpointCreatorService.call(
           discussion_topic: @checkpointed_discussion,
@@ -236,6 +236,23 @@ describe "Discussion Topic Show" do
         reply_to_entry_contents = f("span[data-testid='reply_to_entry_section']").text
         expect(reply_to_entry_contents).to include("Additional Replies Required: #{@replies_required}")
         expect(reply_to_entry_contents).to include(format_date_for_view(@due_at))
+      end
+
+      it "lets students see the checkpoints tray with completed status" do
+        root_entry = @checkpointed_discussion.discussion_entries.create!(user: @student, message: "reply to topic")
+
+        @replies_required.times { |i| @checkpointed_discussion.discussion_entries.create!(user: @student, message: "reply to entry #{i}", parent_entry: root_entry) }
+
+        user_session(@student)
+        get "/courses/#{@course.id}/discussion_topics/#{@checkpointed_discussion.id}"
+
+        fj("button:contains('View Due Dates')").click
+        wait_for_ajaximations
+        reply_to_topic_contents = f("span[data-testid='reply_to_topic_section']").text
+        expect(reply_to_topic_contents).to include("Completed #{format_date_for_view(root_entry.created_at)}")
+        reply_to_entry_contents = f("span[data-testid='reply_to_entry_section']").text
+        expect(reply_to_entry_contents).to include("Completed")
+        expect(reply_to_topic_contents).to include("Completed #{format_date_for_view(@checkpointed_discussion.discussion_entries.last.created_at)}")
       end
 
       it "lets teachers see checkpoints tray" do

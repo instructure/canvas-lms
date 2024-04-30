@@ -254,7 +254,7 @@ describe "threaded discussions" do
 
       delete_me = @topic.discussion_entries.create!(user: @student, message: "new threaded reply from student")
       Discussion.visit(@course, @topic)
-      fj('label[for="showDeleted"]').click
+      f('label[for="showDeleted"]').click
 
       delete_entry(delete_me)
       expect(f("#entry-#{delete_me.id} .discussion-title").text).to match("Deleted by #{@teacher.name} on")
