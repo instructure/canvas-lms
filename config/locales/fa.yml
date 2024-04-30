@@ -9631,9 +9631,12 @@ fa:
   enhanced_grade_change_auditing_2b155dfa: "ارتقا حسابرسی تغییر نمره "
   enhanced_gradebook_filters_a3be5e7d: "افزایش فیلتر دفتر نمره"
   enhanced_individual_gradebook: 
+    avg_score: "میانگین نمره"
+    high_score: "نمره بالا"
     invalid_group_warning: 
       one: "نکته: نمره شامل تکلیف گروه های %{list_of_group_names} نیست، زیرا آنها دارای امتیاز ممکن نیستند."
       other: "نکته: نمره شامل تکلیف گروه های %{list_of_group_names} نیست، زیرا آنها دارای امتیاز ممکن نیستند."
+    low_score: "نمره پایین"
   enhances_the_color_contrast_of_text_buttons_etc_88e22e61: "کنتراست رنگ متن، دکمه ها و غیره را افزایش می دهد."
   enroll_in_subject_9c1f1c18: "ثبت نام در موضوع"
   enrolled_a6a517cd: "ثبت نام شده"
@@ -14507,6 +14510,10 @@ fa:
         subject: "همگام‌سازی طرح خاتمه یافت: %{name}"
       twitter: 
         tweet: "هشدار کانواس- تغییرات دوره طرح از %{name} همگام شد."
+    checkpoints_created: 
+      email: 
+        labels: 
+          click_to_see_assignment: "برای مشاهده تکلیف، اینجا کلیک کنید"
     collaboration_invitation: 
       email: 
         body: |-
@@ -16386,6 +16393,7 @@ fa:
   no_more_results_17c4f108: "نتیجه موجود نیست"
   no_more_results_to_load_6774fb1c: "نتایج بیشتر برای بارگذاری وجود ندارد."
   no_outcome_file_or_authority_given_c90f9c5f: "مرجع یا فایل نتیجه ارائه نشده است"
+  no_outcome_selected_16d15753: "هیچ نتیجه ای انتخاب نشده است"
   no_password_was_given_472222e5: "هیچ رمز عبوری ارائه نشد"
   no_placements_enabled_f705f28: "هیچ جای گذاری فعال نشده است"
   no_points_possible_368669d: "امتیازهای ممکن موجود نیست"
@@ -17054,6 +17062,7 @@ fa:
     account_group_description: "گروه نتایج سطح حساب."
   outcome_guid_has_already_appeared_in_this_import_b9b8b34: "نتیجه \"%{guid}\" قبلاً در این ورود ظاهر شده است."
   outcome_imports_c496a81f: "وروردی‌های نتیجه"
+  outcome_information_936c59ef: "اطلاعات نتیجه"
   outcome_path_mastery_points: "امتیازهای تسلط %{path}"
   outcome_path_result: "نتیجه %{path}"
   outcome_results: 
@@ -21039,6 +21048,7 @@ fa:
   select_a_section_37ac1694: "انتخاب بخش"
   select_a_student_adfcc348: "انتخاب دانشجو"
   select_a_student_and_an_assignment_to_view_and_edi_96fda3c1: "دانشجو و تکلیف را برای مشاهده و ویرایش نمره ها انتخاب کنید."
+  select_a_student_and_an_outcome_to_view_results_9b36b177: "دانشجو و نتیجه را برای مشاهده نتایج انتخاب کنید."
   select_a_student_to_view_281d17b9: "یک دانش آموز را برای مشاهده انتخاب کنید"
   select_a_student_to_view_additional_information_he_c371e40c: "دانشجو را برای مشاهده اطلاعات دیگر در اینجا، انتخاب کنید."
   select_all_assignments_bd07b919: "همه تکالیف را انتخاب کنید"
@@ -21049,6 +21059,7 @@ fa:
   select_an_assignment_e52320d7: "انتخاب یک تکلیف"
   select_an_assignment_to_view_additional_informatio_de1370e1: "یک تکلیف را برای مشاهده اطلاعات دیگر در اینجا انتخاب کنید."
   select_an_edit_operation_ec1467d: "ویرایش یک عملیات را انتخاب کنید"
+  select_an_outcome_37fb2096: "انتخاب نتیجه"
   select_an_outcome_group_6edb08a7: "نتیجه یک گروه را انتخاب کنید"
   select_another_group_24773e5f: "گروه دیگری را انتخاب کنید"
   select_assignment_title_4571ffcb: "انتخاب تکلیف: %{title}"
