@@ -42,7 +42,8 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
     assignment: nil,
     checkpoints: nil,
     set_checkpoints: nil,
-    group_category_id: nil
+    group_category_id: nil,
+    ungraded_discussion_overrides: nil
   )
     <<~GQL
       mutation {
@@ -62,12 +63,25 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
           #{assignment_str(assignment)}
           #{checkpoints_str(checkpoints)}
           #{"setCheckpoints: #{set_checkpoints}" unless set_checkpoints.nil?}
+          #{"ungradedDiscussionOverrides: #{ungraded_discussion_overrides_str(ungraded_discussion_overrides)}" unless ungraded_discussion_overrides.nil?}
         }) {
           discussionTopic {
             _id
             published
             locked
             replyToEntryRequiredCount
+            ungradedDiscussionOverrides {
+              nodes {
+                _id
+                createdAt
+                dueAt
+                id
+                lockAt
+                title
+                unlockAt
+                updatedAt
+              }
+            }
             assignment {
               _id
               pointsPossible
@@ -201,6 +215,17 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
     # Add other override input fields if you want to test them
 
     "assignmentOverrides: { #{args.join(", ")} }"
+  end
+
+  def ungraded_discussion_overrides_str(overrides)
+    return "" unless overrides
+
+    args = []
+    args << "sectionId: \"#{overrides[:sectionId]}\"" if overrides[:sectionId]
+    args << "studentIds: [\"#{overrides[:studentIds].join('", "')}\"]" if overrides[:studentIds]
+    # Add other override input fields if you want to test them
+
+    "{ #{args.join(", ")} }"
   end
 
   def run_mutation(opts = {}, current_user = @teacher)
@@ -706,5 +731,23 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
       expect(DiscussionTopic.last.reply_to_entry_required_count).to eq 0
       expect(@graded_topic.reload.assignment).to be_nil
     end
+  end
+
+  it "updates ungraded assignment overrides" do
+    student1 = @course.enroll_student(User.create!, enrollment_state: "active").user
+    student2 = @course.enroll_student(User.create!, enrollment_state: "active").user
+    @course.enroll_student(User.create!, enrollment_state: "active").user
+
+    ungraded_discussion_overrides = {
+      studentIds: [student1.id, student2.id]
+    }
+    result = run_mutation(id: @topic.id, ungraded_discussion_overrides:)
+    expect(result["errors"]).to be_nil
+
+    new_override = DiscussionTopic.last.active_assignment_overrides.first
+
+    expect(new_override.set_type).to eq("ADHOC")
+    expect(new_override.set_id).to be_nil
+    expect(new_override.set.map(&:id)).to match_array([student1.id, student2.id])
   end
 end

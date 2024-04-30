@@ -745,4 +745,60 @@ describe('DiscussionTopicForm', () => {
       })
     })
   })
+
+  describe('Ungraded', () => {
+    describe('differentiated_modules flag is ON', () => {
+      beforeAll(() => {
+        window.ENV.FEATURES.differentiated_modules = true
+      })
+
+      it('renders expected default teacher discussion options', () => {
+        window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_CREATE_ASSIGNMENT = true
+        window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_UPDATE_ASSIGNMENT = true
+        window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_MODERATE = true
+        window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_MANAGE_CONTENT = true
+
+        const document = setup()
+        // Default teacher options in order top to bottom
+        expect(document.getByText('Topic Title')).toBeInTheDocument()
+        expect(document.queryByText('Attach')).toBeTruthy()
+        expect(document.queryByTestId('section-select')).toBeTruthy()
+        expect(document.queryAllByText('Anonymous Discussion')).toBeTruthy()
+        expect(document.queryByTestId('require-initial-post-checkbox')).toBeTruthy()
+        expect(document.queryByLabelText('Enable podcast feed')).toBeInTheDocument()
+        expect(document.queryByTestId('graded-checkbox')).toBeTruthy()
+        expect(document.queryByLabelText('Allow liking')).toBeInTheDocument()
+        expect(document.queryByLabelText('Add to student to-do')).toBeInTheDocument()
+        expect(document.queryByTestId('group-discussion-checkbox')).toBeTruthy()
+        expect(document.queryAllByText('Manage Assign To')).toBeTruthy()
+
+        // Hides announcement options
+        expect(document.queryByLabelText('Delay Posting')).not.toBeInTheDocument()
+        expect(document.queryByLabelText('Allow Participants to Comment')).not.toBeInTheDocument()
+      })
+
+      it('renders expected default student discussion options', () => {
+        window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_CREATE_ASSIGNMENT = false
+        window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_UPDATE_ASSIGNMENT = false
+        window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_MODERATE = false
+        window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_MANAGE_CONTENT = false
+
+        const document = setup()
+        // Default teacher options in order top to bottom
+        expect(document.getByText('Topic Title')).toBeInTheDocument()
+        expect(document.queryByText('Attach')).toBeTruthy()
+        expect(document.queryByTestId('section-select')).toBeTruthy()
+        expect(document.queryAllByText('Anonymous Discussion')).toBeTruthy()
+        expect(document.queryByTestId('require-initial-post-checkbox')).toBeTruthy()
+        expect(document.queryByLabelText('Allow liking')).toBeInTheDocument()
+        expect(document.queryByTestId('group-discussion-checkbox')).toBeTruthy()
+        expect(document.queryAllByText('Available from')).toBeTruthy()
+        expect(document.queryAllByText('Until')).toBeTruthy()
+
+        // Hides announcement options
+        expect(document.queryByLabelText('Delay Posting')).not.toBeInTheDocument()
+        expect(document.queryByLabelText('Allow Participants to Comment')).not.toBeInTheDocument()
+      })
+    })
+  })
 })

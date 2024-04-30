@@ -34,7 +34,7 @@ export const masteryPathsOption = {
   label: I18n.t('Mastery Paths'),
 }
 
-const GradedDiscussionDueDateDefaultValues = {
+const DiscussionDueDateDefaultValues = {
   assignedInfoList: [],
   setAssignedInfoList: () => {},
   studentEnrollments: [],
@@ -52,9 +52,7 @@ const GradedDiscussionDueDateDefaultValues = {
   setImportantDates: newImportantDatesValue => {},
 }
 
-export const GradedDiscussionDueDatesContext = React.createContext(
-  GradedDiscussionDueDateDefaultValues
-)
+export const DiscussionDueDatesContext = React.createContext(DiscussionDueDateDefaultValues)
 
 export const ASSIGNMENT_OVERRIDE_GRAPHQL_TYPENAMES = {
   ADHOC: 'AdhocStudents',
@@ -129,6 +127,17 @@ export const useShouldShowContent = (
 
   const shouldShowCheckpointsOptions = isGraded && ENV.DISCUSSION_CHECKPOINTS_ENABLED
 
+  const canCreateGradedDiscussion =
+    !isEditing && ENV?.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_CREATE_ASSIGNMENT
+  const canEditDiscussionAssignment =
+    isEditing && ENV?.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_UPDATE_ASSIGNMENT
+
+  const shouldShowAssignToForUngradedDiscussions =
+    !isAnnouncement &&
+    !isGraded &&
+    ENV?.FEATURES?.differentiated_modules &&
+    (canCreateGradedDiscussion || canEditDiscussionAssignment)
+
   return {
     shouldShowTodoSettings,
     shouldShowPostToSectionOption,
@@ -143,5 +152,6 @@ export const useShouldShowContent = (
     shouldShowSaveAndPublishButton,
     shouldShowPodcastFeedOption,
     shouldShowCheckpointsOptions,
+    shouldShowAssignToForUngradedDiscussions,
   }
 }

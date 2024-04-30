@@ -22,6 +22,7 @@ import gql from 'graphql-tag'
 import {Attachment} from './Attachment'
 import {GroupSet} from './GroupSet'
 import {Assignment} from './Assignment'
+import {AssignmentOverride} from './AssignmentOverride'
 
 export const DiscussionTopic = {
   fragment: gql`
@@ -45,6 +46,8 @@ export const DiscussionTopic = {
       published
       canGroup
       replyToEntryRequiredCount
+      visibleToEveryone
+      onlyVisibleToOverrides
       courseSections {
         ...Section
       }
@@ -57,11 +60,17 @@ export const DiscussionTopic = {
       assignment {
         ...Assignment
       }
+      ungradedDiscussionOverrides {
+        nodes {
+          ...AssignmentOverride
+        }
+      }
     }
     ${Attachment.fragment}
     ${Assignment.fragment}
     ${Section.fragment}
     ${GroupSet.fragment}
+    ${AssignmentOverride.fragment}
   `,
 
   shape: shape({
@@ -82,11 +91,14 @@ export const DiscussionTopic = {
     lockAt: string,
     published: bool,
     replyToEntryRequiredCount: number,
+    visibleToEveryone: bool,
+    onlyVisibleToOverrides: bool,
     courseSections: arrayOf(Section.shape),
     groupSet: GroupSet.shape,
     attachment: Attachment.shape,
     assignment: Assignment.shape,
     canGroup: bool,
+    ungradedDiscussionOverrides: AssignmentOverride.shape(),
   }),
 
   mock: ({
@@ -107,11 +119,14 @@ export const DiscussionTopic = {
     lockAt = null,
     published = true,
     replyToEntryRequiredCount = 1,
+    visibleToEveryone = false,
+    onlyVisibleToOverrides = false,
     courseSections = [Section.mock()],
     groupSet = GroupSet.mock(),
     attachment = Attachment.mock(),
     assignment = null,
     canGroup = false,
+    ungradedDiscussionOverrides = null,
   } = {}) => ({
     _id,
     id,
@@ -130,11 +145,14 @@ export const DiscussionTopic = {
     lockAt,
     published,
     replyToEntryRequiredCount,
+    visibleToEveryone,
+    onlyVisibleToOverrides,
     courseSections,
     groupSet,
     attachment,
     assignment,
     canGroup,
+    ungradedDiscussionOverrides,
     __typename: 'Discussion',
   }),
 }
