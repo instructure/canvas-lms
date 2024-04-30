@@ -7021,11 +7021,14 @@ uk:
   ends_4fcb632: "Закінчення:"
   ends_at_9a62b528: "Закінчується в:"
   enhanced_individual_gradebook: 
+    avg_score: "Середній бал"
+    high_score: "Висока оцінка"
     invalid_group_warning: 
       few: "Зверніть увагу: оцінка не включає завдань від груп %{list_of_group_names}, тому що оцінування у них неможливе."
       many: "Зверніть увагу: оцінка не включає завдань від груп %{list_of_group_names}, тому що оцінування у них неможливе."
       one: "Зверніть увагу: оцінка не включає завдань від групи %{list_of_group_names}, тому що оцінування у них неможливе."
       other: "Зверніть увагу: оцінка не включає завдань від груп %{list_of_group_names}, тому що за них неможливо отримати бали."
+    low_score: "Низька оцінка"
   enrolled_a6a517cd: Зареєстрований
   enrolled_as_272da3b9: "Зареєстровано як"
   enrollment: 
@@ -10336,6 +10339,10 @@ uk:
         subject: "Синхронізацію проектного курсу завершено: %{name}"
       twitter: 
         tweet: "Сповіщення Canvas - Зміни проектного курсу синхронізовано від %{name}."
+    checkpoints_created: 
+      email: 
+        labels: 
+          click_to_see_assignment: "Натисніть тут для перегляду цього завдання"
     collaboration_invitation: 
       email: 
         body: |-
@@ -11818,6 +11825,7 @@ uk:
   no_migration_file: "Для міграції вмісту потрібен файл."
   no_more_results_to_load_6774fb1c: "Більше немає результатів для завантаження."
   no_outcome_file_or_authority_given_c90f9c5f: "Немає файлу результатів або відсутні повноваження"
+  no_outcome_selected_16d15753: "Результат не обрано"
   no_password_was_given_472222e5: "Не було надано жодного паролю"
   no_placements_enabled_f705f28: "Не доступне розміщення"
   no_points_possible_368669d: "Можливі бали відсутні"
@@ -12307,6 +12315,7 @@ uk:
     invalid_file: "Невірний вихідний файл групи"
   outcome_groups_api: 
     account_group_description: "Рахунок результатів рівня групи."
+  outcome_information_936c59ef: "Інформація про результат"
   outcome_path_mastery_points: "%{path} балів майстерності"
   outcome_path_result: "%{path} результат"
   outcome_results: 
@@ -15568,6 +15577,7 @@ uk:
   select_a_predefined_color_c77ab2f5: "Оберіть заздалегідь заданий колір."
   select_a_section_37ac1694: "Оберіть розділ"
   select_a_student_and_an_assignment_to_view_and_edi_96fda3c1: "Виберіть студента та завдання, щоб переглянути та редагувати оцінки."
+  select_a_student_and_an_outcome_to_view_results_9b36b177: "Оберіть студента і результат для перегляду результатів."
   select_a_student_to_view_additional_information_he_c371e40c: "Виберіть студента, щоб переглянути додаткову інформацію тут."
   select_all_count_courses_4fc63811: 
     few: "Оберіть усі (%{count}) Курси"
@@ -15577,6 +15587,7 @@ uk:
   select_all_students_7c2c34b3: "Вибрати всіх студентів"
   select_an_assignment_e52320d7: "Обрати завдання"
   select_an_assignment_to_view_additional_informatio_de1370e1: "Оберіть завдання, щоб переглянути додаткову інформацію тут."
+  select_an_outcome_37fb2096: "Оберіть результат"
   select_audio_file_7d905cce: "Вибрати аудіо файл"
   select_calendars_d5fa50b6: "Вибрати календарі"
   select_content: "Вибрати вміст"

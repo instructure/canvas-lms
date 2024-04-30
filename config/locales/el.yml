@@ -5941,6 +5941,7 @@ el:
     invalid_group_warning: 
       one: "<mrk mid=\"8251\" mtype=\"seg\">Σημείωση:</mrk> <mrk mid=\"8252\" mtype=\"seg\">Η βαθμολογία δεν περιλαμβάνει εργασίες από την ομάδα %{list_of_group_names} επειδή δεν υπάρχουν πιθανά μόρια.</mrk>"
       other: "Σημείωση: Η βαθμολογία δεν περιλαμβάνει εργασίες από τις ομάδες %{list_of_group_names} επειδή δεν έχουν πιθανά μόρια."
+    low_score: "Χαμηλότερη βαθμολόγιση"
   enrollment: 
     default_course_name: Μάθημα
     default_email: "Κανένα Email"

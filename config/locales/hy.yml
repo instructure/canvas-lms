@@ -6403,9 +6403,12 @@ hy:
   end_date_e0093ed7: "Ավարտման ամսաթիվ"
   ending_date_e1ea13a4: "Ավարտման ամսաթիվ"
   enhanced_individual_gradebook: 
+    avg_score: "Միջին գնահատական"
+    high_score: "Բարձր գնահատական"
     invalid_group_warning: 
       one: "Ծանոթություն. Միավորները չեն ընդգրկում %{list_of_group_names} խմբից հանձնարարությունները, քանի որ  այն հնարավոր միավորներ չունի:"
       other: "Նշում. Միավորները չեն ընդգրկում %{list_of_group_names} խմբի հանձնարարությունները, քանի որ  դրանք հնարավոր միավորներ չունեն:"
+    low_score: "Ցածր գնահատական"
   enrollment: 
     default_course_name: Դասընթաց
     default_email: "Էլեկտրոնային փոստի հասցե չկա"
@@ -9686,6 +9689,10 @@ hy:
       summary: 
         subject: " %{title}, %{course}-ի համար հրապարակվել են գնահատականները և մեկնաբանությունները:"
     assignment_unpublished_module: "Այս հանձնարարությունը չհրապարակված մոդուլի մի մասն է և դեռևս հասանելի չէ"
+    checkpoints_created: 
+      email: 
+        labels: 
+          click_to_see_assignment: "Սեղմեք այստեղ հանձնարարությունը դիտելու համար"
     collaboration_invitation: 
       email: 
         body: |-
@@ -11193,6 +11200,7 @@ hy:
   no_items_in_module_21f111a2: "Ոչ արարկա չկա  մոդուլում"
   no_marks_5e7d2b59: "Գնահատականներ չկան"
   no_migration_file: "Բովանդակության տեղափոխման համար անհրաժեշտ ֆայլ"
+  no_outcome_selected_16d15753: "Ոչ մի արդյունք ընտրված չէ"
   no_password_was_given_472222e5: "Գաղտնաբառ տրված չէ "
   no_placements_enabled_f705f28: "Տեղադրումները միացված չեն"
   no_results_3cda4e72: "Արդյունքներ չկան"
@@ -11610,6 +11618,7 @@ hy:
     invalid_file: "Արդյունքների խմբի սխալ ֆայլ"
   outcome_groups_api: 
     account_group_description: "Հաշվի մակարդակում արդյունքների խումբ"
+  outcome_information_936c59ef: "Տեղեկություններ արդյունքների մասին"
   outcome_path_mastery_points: "%{path}  յուրացման միավորներ"
   outcome_path_result: "%{path} արդյունք"
   outcome_results: 
@@ -14800,10 +14809,12 @@ hy:
   select_a_section_37ac1694: "Ընտրել բաժինը"
   select_a_student_adfcc348: "Ունկնդրի ընտրություն"
   select_a_student_and_an_assignment_to_view_and_edi_96fda3c1: "Ընտրել ունկնդրին և հանձնարարությունը գնահատականները դիտելու և խմբագրելու համար:"
+  select_a_student_and_an_outcome_to_view_results_9b36b177: "Ընտրել ունկնդրին և վերջնական արդյունքները՝  դիտելու արդյունքները: "
   select_a_student_to_view_additional_information_he_c371e40c: "Ընտրել ունկնդրի լրացուցիչ տեղեկությունները այստեղ դիտելու համար:"
   select_all_students_7c2c34b3: "Ընտրել բոլոր ունկնդիրներին"
   select_an_assignment_e52320d7: "Ընտրել հանձնարարություն"
   select_an_assignment_to_view_additional_informatio_de1370e1: "Ընտրել հանձնարարությունը լրացուցիչ տեղեկություններն այստեղ դիտելու համար"
+  select_an_outcome_37fb2096: "Վերջնական արդյունքի ընտրություն"
   select_audio_file_7d905cce: "Ընտրել աուդիո ֆայլ"
   select_content: "Ընտրել բովանդակությունը"
   select_content_7faa4195: "Ընտրել բովանդակությունը"
