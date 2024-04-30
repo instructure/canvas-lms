@@ -258,4 +258,16 @@ describe CoursesHelper do
       end
     end
   end
+
+  describe "#format_course_section_date" do
+    it "returns formatted date when date provided" do
+      date = Time.zone.parse("January 14, 2019")
+      expect(format_course_section_date(date)).to eq "Jan 14, 2019"
+    end
+
+    it "returns string (no date) when date not provided" do
+      expect(self).to receive(:t).with("#courses.sections.no_date", "(no date)").and_return("(no date)")
+      expect(format_course_section_date).to eq "(no date)"
+    end
+  end
 end

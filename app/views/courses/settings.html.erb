@@ -731,6 +731,16 @@
   </div>
   <div id="tab-sections">
     <h2 style="margin-top: 10px;"><%= t('headings.sections', %{Course Sections}) %></h2>
+    <div class="course_section_dates">
+      <%= t('Course Start Date: %{start_date} | Course End Date: %{end_date}', {
+        :start_date => format_course_section_date(@context.start_at),
+        :end_date => format_course_section_date(@context.end_at) }) %>
+    </div>
+    <div class="course_section_dates">
+      <%= t('Term Start Date: %{start_date} | Term End Date: %{end_date}', {
+        :start_date => format_course_section_date(@context.enrollment_term.start_at),
+        :end_date => format_course_section_date(@context.enrollment_term.end_at) }) %>
+    </div>
     <ul id="sections">
       <% if can_do(@context.course_sections.temp_record, @current_user, :create) %>
         <li>
@@ -762,6 +772,11 @@
               <span class="screenreader-only"><%= t('Delete Section "%{name}"', :name => "%%name%%") %></span>
           </a>
         </span>
+        <div class="course_section_dates">
+          <%= t('Start Date: %{start_date} | End Date: %{end_date}', {
+            :start_date => format_course_section_date,
+            :end_date => format_course_section_date }) %>
+        </div>
         <div class="clear"></div>
       </li>
       <% @context.course_sections.active.order(CourseSection.best_unicode_collation_key('name')).each do |section| %>
@@ -814,6 +829,11 @@
               <% end %>
             <% end %>
           </span>
+          <div class="course_section_dates">
+            <%= t('Start Date: %{start_date} | End Date: %{end_date}', {
+              :start_date => format_course_section_date(section.start_at),
+              :end_date => format_course_section_date(section.end_at) }) %>
+          </div>
           <div class="clear"></div>
         </li>
       <% end %>
