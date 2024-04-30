@@ -34,6 +34,11 @@ module Importers
       outcomes.each do |outcome|
         import_item = migration.import_object?("learning_outcomes", outcome["migration_id"])
         import_item ||= migration.import_object?("learning_outcome_groups", outcome["migration_id"]) if selectable_outcomes
+        if migration.migration_type == "course_copy_importer" && outcome["type"] == "learning_outcome"
+          o = LearningOutcome.find_by(id: outcome["copied_from_outcome_id"])
+          next if LearningOutcome.active.where(id: o.fetch_outcome_copies, context_id: migration.context_id).count > 0
+        end
+
         next unless import_item || selectable_outcomes
 
         begin

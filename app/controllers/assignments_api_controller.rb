@@ -961,6 +961,8 @@ class AssignmentsApiController < ApplicationController
         created_on_blueprint_sync: false,
         resource_map_url: "",
         remove_alignments: false,
+        original_assignment_resource_link_id: old_assignment.lti_resource_link_id,
+        new_assignment_resource_link_id: target_assignment.lti_resource_link_id,
         status: "outcome_alignment_cloning"
       }
     )

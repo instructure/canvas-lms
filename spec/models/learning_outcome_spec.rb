@@ -1649,4 +1649,17 @@ describe LearningOutcome do
       expect(@outcome.updateable_rubrics.length).to eq 0
     end
   end
+
+  context "fetch_outcome_copies" do
+    it "fetch every copied learning outcome id from one of the copied outcome" do
+      o1 = LearningOutcome.create!(title: "outcome1")
+      o2 = LearningOutcome.create!(title: "outcome2")
+      o3 = LearningOutcome.create!(title: "outcome3")
+      o4 = LearningOutcome.create!(title: "outcome4")
+      o2.update(copied_from_outcome_id: o1.id)
+      o4.update(copied_from_outcome_id: o3.id)
+      o3.update(copied_from_outcome_id: o1.id)
+      expect(o3.fetch_outcome_copies.length).to eq 4
+    end
+  end
 end
