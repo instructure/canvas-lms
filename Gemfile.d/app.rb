@@ -33,6 +33,7 @@ gem "active_model_serializers", "~> 0.9.9"
 gem "addressable", "~> 2.8", require: false
 gem "authlogic", "~> 6.4"
   gem "scrypt", "~> 3.0"
+gem "aws-sdk-bedrockruntime", "~> 1.7", require: false
 gem "aws-sdk-kinesis", "~> 1.45", require: false
 gem "aws-sdk-s3", "~> 1.119", require: false
 gem "aws-sdk-sns", "~> 1.60", require: false

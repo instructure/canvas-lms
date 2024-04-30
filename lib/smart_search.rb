@@ -15,17 +15,34 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+require "aws-sdk-bedrockruntime"
 
 module SmartSearch
-  EMBEDDING_VERSION = 1
+  EMBEDDING_VERSION = 2
+  CHUNK_MAX_LENGTH = 1500
 
   class << self
     def api_key
       Rails.application.credentials.dig(:smart_search, :openai_api_token)
     end
 
+    def bedrock_client
+      # for local dev, assume that we are using creds from inseng (us-west-2)
+      settings = YAML.safe_load(DynamicSettings.find(tree: :private)["bedrock.yml"] || "{}")
+      config = {
+        region: settings["bedrock_region"] || "us-west-2"
+      }
+      # Will load creds from vault (prod) or rails credential store (local / oss).
+      # Credentials stored in rails credential store in the `bedrock_creds` key
+      # with `aws_access_key_id` and `aws_secret_access_key` keys
+      config[:credentials] = Canvas::AwsCredentialProvider.new("bedrock_creds", settings["vault_credential_path"])
+      if config[:credentials].set?
+        Aws::BedrockRuntime::Client.new(config)
+      end
+    end
+
     def smart_search_available?(context)
-      context&.feature_enabled?(:smart_search) && api_key.present?
+      context&.feature_enabled?(:smart_search) && bedrock_client.present?
     end
 
     def register_class(klass, index_scope_proc, search_scope_proc)
@@ -45,16 +62,19 @@ module SmartSearch
       end
     end
 
-    def generate_embedding(input, version: EMBEDDING_VERSION)
-      case EMBEDDING_VERSION
+    def generate_embedding(input, query: false, version: EMBEDDING_VERSION)
+      case version
       when 1
         generate_embedding_v1(input)
+      when 2
+        generate_embedding_v2(input, query)
       else
         raise ArgumentError, "Unsupported embedding version #{version}"
       end
     end
 
     def generate_embedding_v1(input)
+      # NOTE: openai does not differentiate between query and document embeddings
       url = "https://api.openai.com/v1/embeddings"
       headers = {
         "Authorization" => "Bearer #{api_key}",
@@ -72,9 +92,23 @@ module SmartSearch
       response["data"].pluck("embedding")[0]
     end
 
+    def generate_embedding_v2(input, query)
+      resp = bedrock_client.invoke_model({
+                                           content_type: "application/json",
+                                           accept: "application/json",
+                                           model_id: "cohere.embed-multilingual-v3",
+                                           body: {
+                                             texts: [input],
+                                             input_type: query ? "search_query" : "search_document"
+                                           }.to_json,
+                                         })
+      json = JSON.parse(resp.body.string)
+      json["embeddings"][0]
+    end
+
     def perform_search(context, user, query, type_filter = [])
       version = context.search_embedding_version || EMBEDDING_VERSION
-      embedding = SmartSearch.generate_embedding(query, version:)
+      embedding = SmartSearch.generate_embedding(query, version:, query: true)
       collections = []
       ActiveRecord::Base.with_pgvector do
         SmartSearch.search_scopes(context, user).each do |klass, item_scope|
@@ -132,7 +166,7 @@ module SmartSearch
     def index_course(course)
       return if course.search_embedding_version == EMBEDDING_VERSION
 
-      # TODO: investigate pipelining this after we switch to Bedrock
+      # TODO: investigate pipelining this
       index_scopes(course).each do |scope|
         scope.left_joins(:embeddings)
              .group("#{scope.table_name}.id")
@@ -143,9 +177,7 @@ module SmartSearch
       end
 
       course.update!(search_embedding_version: EMBEDDING_VERSION)
-
-      # TODO: implement this when we add a second embeddings version
-      # delay_if_production(priority: Delayed::LOW_PRIORITY).delete_old_embeddings(course)
+      delay_if_production(priority: Delayed::LOW_PRIORITY).delete_old_embeddings(course)
     end
 
     def delete_old_embeddings(course)
