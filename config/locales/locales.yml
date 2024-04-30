@@ -1202,7 +1202,7 @@ ja:
       long_with_weekday: "%A %B %-d"
       medium: "%Y年%b%-d日"
       medium_month: "%Y %b"
-      medium_with_weekday: "%a %Y年%b%-d日"
+      medium_with_weekday: "%Y年%b%-d日 (%a)"
       short: "%b %-d日"
       short_month: "%b"
       short_weekday: "%a"
