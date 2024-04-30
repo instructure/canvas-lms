@@ -28,7 +28,7 @@ import {Flex} from '@instructure/ui-flex'
 import {IconAddLine} from '@instructure/ui-icons'
 import theme from '@instructure/canvas-theme'
 import {
-  GradedDiscussionDueDatesContext,
+  DiscussionDueDatesContext,
   defaultEveryoneOption,
   defaultEveryoneElseOption,
   masteryPathsOption,
@@ -52,7 +52,7 @@ export const AssignmentDueDatesManager = () => {
     setGradedDiscussionRefMap,
     importantDates,
     setImportantDates,
-  } = useContext(GradedDiscussionDueDatesContext)
+  } = useContext(DiscussionDueDatesContext)
   const [listOptions, setListOptions] = useState({
     '': getDefaultBaseOptions(ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED, defaultEveryoneOption),
     'Course Sections': sections.map(section => {

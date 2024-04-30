@@ -21,7 +21,7 @@ import React from 'react'
 
 import {CheckpointsSettings} from '../CheckpointsSettings'
 
-import {GradedDiscussionDueDatesContext} from '../../../util/constants'
+import {DiscussionDueDatesContext} from '../../../util/constants'
 
 const setup = ({
   pointsPossibleReplyToTopic = 0,
@@ -32,7 +32,7 @@ const setup = ({
   setReplyToEntryRequiredCount = () => {},
 } = {}) => {
   return render(
-    <GradedDiscussionDueDatesContext.Provider
+    <DiscussionDueDatesContext.Provider
       value={{
         pointsPossibleReplyToTopic,
         setPointsPossibleReplyToTopic,
@@ -43,7 +43,7 @@ const setup = ({
       }}
     >
       <CheckpointsSettings />
-    </GradedDiscussionDueDatesContext.Provider>
+    </DiscussionDueDatesContext.Provider>
   )
 }
 

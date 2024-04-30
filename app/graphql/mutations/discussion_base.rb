@@ -72,6 +72,7 @@ class Mutations::DiscussionBase < Mutations::BaseMutation
   argument :locked, Boolean, required: false
   argument :message, String, required: false
   argument :only_graders_can_rate, Boolean, required: false
+  argument :only_visible_to_overrides, Boolean, required: false
   argument :published, Boolean, required: false
   argument :require_initial_post, Boolean, required: false
   argument :title, String, required: false
@@ -85,7 +86,7 @@ class Mutations::DiscussionBase < Mutations::BaseMutation
   field :discussion_topic, Types::DiscussionType, null:
 
   # These are inputs that are allowed to be directly assigned from graphql to the model without additional processing or logic involved
-  ALLOWED_INPUTS = %i[title message require_initial_post allow_rating only_graders_can_rate podcast_enabled podcast_has_student_posts].freeze
+  ALLOWED_INPUTS = %i[title message require_initial_post allow_rating only_graders_can_rate only_visible_to_overrides podcast_enabled podcast_has_student_posts].freeze
 
   def process_common_inputs(input, is_announcement, discussion_topic)
     model_attrs = input.to_h.slice(*ALLOWED_INPUTS)
@@ -110,9 +111,10 @@ class Mutations::DiscussionBase < Mutations::BaseMutation
     end
   end
 
-  def process_future_date_inputs(delayed_post_at, lock_at, discussion_topic)
-    discussion_topic.delayed_post_at = delayed_post_at if delayed_post_at
-    discussion_topic.lock_at = lock_at if lock_at
+  def process_future_date_inputs(dates, discussion_topic)
+    # if dates contain delayed_post_at or lock_at set it even if is nil
+    discussion_topic.delayed_post_at = dates[:delayed_post_at] if dates.key?(:delayed_post_at)
+    discussion_topic.lock_at = dates[:lock_at] if dates.key?(:lock_at)
 
     if discussion_topic.unlock_at_changed? || discussion_topic.delayed_post_at_changed? || discussion_topic.lock_at_changed?
       # only apply post_delayed if the topic is set to published
@@ -166,5 +168,19 @@ class Mutations::DiscussionBase < Mutations::BaseMutation
     else
       discussion_topic.course_sections.map(&:id) - visibilities
     end
+  end
+
+  # Adapted from LearningObjectDatesController#update_ungraded_object
+  def update_ungraded_discussion(discussion_topic, overrides)
+    batch = prepare_assignment_overrides_for_batch_update(discussion_topic, overrides, @current_user) if overrides
+    discussion_topic.transaction do
+      perform_batch_update_assignment_overrides(discussion_topic, batch) if overrides
+      # this is temporary until we are able to remove the dicussion_topic_section_visibilities table
+      if discussion_topic.is_section_specific
+        discussion_topic.discussion_topic_section_visibilities.destroy_all
+        discussion_topic.update!(is_section_specific: false)
+      end
+    end
+    discussion_topic.clear_cache_key(:availability)
   end
 end

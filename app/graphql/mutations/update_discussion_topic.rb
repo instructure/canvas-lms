@@ -19,12 +19,16 @@
 #
 
 class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
+  include Api
+  include Api::V1::AssignmentOverride
+
   graphql_name "UpdateDiscussionTopic"
 
-  argument :discussion_topic_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("DiscussionTopic")
+  argument :discussion_topic_id, GraphQL::Schema::Object::ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("DiscussionTopic")
   argument :remove_attachment, Boolean, required: false
   argument :assignment, Mutations::AssignmentBase::AssignmentUpdate, required: false
   argument :set_checkpoints, Boolean, required: false
+  argument :ungraded_discussion_overrides, [Mutations::AssignmentBase::AssignmentOverrideCreateOrUpdate], required: false
 
   field :discussion_topic, Types::DiscussionType, null: false
   def resolve(input:)
@@ -53,7 +57,7 @@ class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
     end
 
     process_common_inputs(input, discussion_topic.is_announcement, discussion_topic)
-    process_future_date_inputs(input[:delayed_post_at], input[:lock_at], discussion_topic)
+    process_future_date_inputs(input.slice(:delayed_post_at, :lock_at), discussion_topic)
 
     # Take care of Assignment update information
     if input[:assignment]
@@ -132,6 +136,11 @@ class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
     end
 
     return errors_for(discussion_topic) unless discussion_topic.save!
+
+    if input.key?(:ungraded_discussion_overrides)
+      overrides = input[:ungraded_discussion_overrides] || []
+      update_ungraded_discussion(discussion_topic, overrides)
+    end
 
     discussion_topic.assignment = assignment_result[:assignment] if assignment_result && assignment_result[:assignment]
 
