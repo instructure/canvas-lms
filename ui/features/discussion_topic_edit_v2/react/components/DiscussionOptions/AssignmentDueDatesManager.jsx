@@ -21,6 +21,7 @@ import {AssignmentDueDate} from './AssignmentDueDate'
 import {Text} from '@instructure/ui-text'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Button, CloseButton} from '@instructure/ui-buttons'
+import {Checkbox} from '@instructure/ui-checkbox'
 import {nanoid} from 'nanoid'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
@@ -49,6 +50,8 @@ export const AssignmentDueDatesManager = () => {
     groups,
     gradedDiscussionRefMap,
     setGradedDiscussionRefMap,
+    importantDates,
+    setImportantDates,
   } = useContext(GradedDiscussionDueDatesContext)
   const [listOptions, setListOptions] = useState({
     '': getDefaultBaseOptions(ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED, defaultEveryoneOption),
@@ -136,6 +139,8 @@ export const AssignmentDueDatesManager = () => {
 
   const isPacedDiscussion = ENV?.DISCUSSION_TOPIC?.ATTRIBUTES?.in_paced_course
 
+  const isImportantDatesDisabled = !assignedInfoList?.some(override => override.dueDate)
+
   return (
     <>
       <Text size="large">{I18n.t('Assignment Settings')}</Text>
@@ -184,13 +189,24 @@ export const AssignmentDueDatesManager = () => {
               </div>
             </View>
           ))}
-          <Button
-            renderIcon={IconAddLine}
-            onClick={handleAddAssignment}
-            data-testid="add-assignment-override-seciont-btn"
-          >
-            {I18n.t('Add Assignment')}
-          </Button>
+          <View display="block" padding="0 0 medium 0">
+            <Button
+              renderIcon={IconAddLine}
+              onClick={handleAddAssignment}
+              data-testid="add-assignment-override-seciont-btn"
+            >
+              {I18n.t('Add Assignment')}
+            </Button>
+          </View>
+          {(ENV.K5_SUBJECT_COURSE || ENV.K5_HOMEROOM_COURSE) && (
+            <Checkbox
+              data-testid="important-dates-checkbox"
+              label={I18n.t('Mark as important date and show on homeroom sidebar')}
+              checked={importantDates && !isImportantDatesDisabled}
+              onChange={() => setImportantDates(!importantDates)}
+              disabled={isImportantDatesDisabled}
+            />
+          )}
         </>
       )}
     </>

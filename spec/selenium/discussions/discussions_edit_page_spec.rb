@@ -849,6 +849,29 @@ describe "discussions" do
           expect(DiscussionTopic.last.assignment).to be_nil
         end
 
+        it "sets the mark important dates checkbox for discussion edit when differentiated modules ff is off" do
+          feature_setup
+
+          graded_discussion = create_graded_discussion(course)
+
+          course_override_due_date = 5.days.from_now
+          course_section = course.course_sections.create!(name: "section alpha")
+          graded_discussion.assignment.assignment_overrides.create!(set_type: "CourseSection", set_id: course_section.id, due_at: course_override_due_date)
+
+          get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/edit"
+
+          expect(mark_important_dates).to be_displayed
+          scroll_to_element(mark_important_dates)
+          click_mark_important_dates
+
+          Discussion.save_button.click
+          wait_for_ajaximations
+
+          assignment = Assignment.last
+
+          expect(assignment.important_dates).to be(true)
+        end
+
         context "with archived grading schemes enabled" do
           before do
             Account.site_admin.enable_feature!(:grading_scheme_updates)
