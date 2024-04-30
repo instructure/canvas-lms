@@ -5362,6 +5362,10 @@ ko:
   end_date_e0093ed7: 종료일
   end_time_250391e8: "종료 시각"
   english_c60612e2: 영어
+  enhanced_individual_gradebook: 
+    avg_score: "평균 점수"
+    high_score: "최고 점수"
+    low_score: "최저 점수"
   enrollment: 
     default_course_name: 과목
     default_email: "이메일 없음"
@@ -8111,6 +8115,10 @@ ko:
       summary: 
         subject: "다음에 대한 평점과 의견이 배포됨: %{title}, %{course}"
     assignment_unpublished_module: "이 과제는 게시 안 된 모듈의 일부로서 아직 사용할 수 없습니다."
+    checkpoints_created: 
+      email: 
+        labels: 
+          click_to_see_assignment: "과제를 보려면 여기를 클릭"
     collaboration_invitation: 
       email: 
         body: |-
