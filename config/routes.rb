@@ -31,7 +31,7 @@ CanvasRails::Application.routes.draw do
     resources(:settings, controller: :enrollment_settings)
   end
 
-  resources(:users) do
+  scope '/users/:user_id' do
     resources(:assignments) do
       resources(:settings, controller: :student_assignment_settings)
     end
