@@ -55,4 +55,28 @@ describe('MessageBody', () => {
     const {getByText} = render(<MessageBody {...props} />)
     expect(getByText(props.messages[0].text)).toBeInTheDocument()
   })
+
+  describe('Signature', () => {
+    it('renders signature when inboxSettingsFeature prop is true', () => {
+      const props = createProps({
+        inboxSettingsFeature: true,
+        signature: 'My signature'
+      })
+      render(<MessageBody {...props} />)
+      const textArea = document.querySelectorAll('textarea')[0].value
+      const signature = textArea.substring(textArea.length - props.signature.length)
+      expect(signature).toBe(props.signature)
+    })
+
+    it('does not render signature when inboxSettingsFeature prop is false', () => {
+      const props = createProps({
+        inboxSettingsFeature: false,
+        signature: 'My signature'
+      })
+      render(<MessageBody {...props} />)
+      const textArea = document.querySelectorAll('textarea')[0].value
+      const signature = textArea.substring(textArea.length - props.signature.length)
+      expect(signature).not.toBe(props.signature)
+    })
+  })
 })

@@ -388,3 +388,18 @@ export const RECIPIENTS_OBSERVERS_QUERY = gql`
     }
   }
 `
+
+export const INBOX_SETTINGS_QUERY = gql`
+  query GetMyInboxSettings {
+    myInboxSettings {
+      _id
+      useSignature
+      signature
+      useOutOfOffice
+      outOfOfficeFirstDate
+      outOfOfficeLastDate
+      outOfOfficeSubject
+      outOfOfficeMessage
+    }
+  }
+`

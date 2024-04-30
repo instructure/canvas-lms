@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {TextArea} from '@instructure/ui-text-area'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -31,10 +31,18 @@ type Message = {
 type Props = {
   onBodyChange: (body: string) => void
   messages: Message[]
+  inboxSettingsFeature: boolean
+  signature?: string
 }
 
 export const MessageBody = (props: Props) => {
-  const [body, setBody] = useState('')
+  const [body, setBody] = useState<string>('')
+  const signature =
+    (props.inboxSettingsFeature && props.signature && `\n\n---\n${props.signature}`) || ''
+
+  useEffect(() => {
+    if (signature) setBody(body => body + signature)
+  }, [signature])
 
   const handleBodyChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setBody(e.target.value)

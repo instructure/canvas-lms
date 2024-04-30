@@ -23,6 +23,7 @@ import {ConversationContext} from '../../../../util/constants'
 
 const createProps = overrides => {
   return {
+    showComposeButton: true,
     isSubmissionComment: false,
     replyDisabled: false,
     archiveDisabled: false,
