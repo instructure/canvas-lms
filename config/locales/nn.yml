@@ -5502,6 +5502,7 @@ nn:
     annually: "Kvart år %{month}%{date}"
     custom: Tilpassa...
     daily: Dagleg
+    every_weekday: "Kvar vekedag (mandag til fredag)"
     first: Først
     fourth: fjerde
     frequency: Frekvens
@@ -10299,9 +10300,12 @@ nn:
   enhanced_gradebook_filters_a3be5e7d: "Forbetra filter i Karakteroversikt"
   enhanced_gradebook_filters_description: "Denne funksjonaliteten betrar mogelegheitene for filtrering i Canvas vurderingsoversikt. Når funksjonsflagget er skrudd på vil tidleg tilgang til pågåande forbetringar verte vist automatisk ved kvar release. Sjå *Gradebook Filters User Group* i Canvas Community for fleire detaljar."
   enhanced_individual_gradebook: 
+    avg_score: "Gjennomsnittleg resultat"
+    high_score: "Høg poengsum"
     invalid_group_warning: 
       one: "Merk: Resultatet omfattar ikkje oppgåver frå gruppa %{list_of_group_names} fordi ho ikkje har oppnåelege poeng."
       other: "Merk: Resultatet omfattar ikkje oppgåver frå gruppene %{list_of_group_names} fordi dei ikkje har oppnåelege poeng."
+    low_score: "Låg skår:"
   enhances_the_color_contrast_of_text_buttons_etc_88e22e61: "Forsterkar fargekontrasten for tekst, knappar osb."
   enroll_in_subject_9c1f1c18: "Meld deg på emnet"
   enrolled_a6a517cd: Påmeld
@@ -15495,6 +15499,10 @@ nn:
         subject: "Synkronisering av Blueprint-emne er ferdig: %{name}"
       twitter: 
         tweet: "Canvas-varsel - endringar i Blueprint-emne er synkronisert frå %{name}."
+    checkpoints_created: 
+      email: 
+        labels: 
+          click_to_see_assignment: "Klikk her for å sjå oppgåva"
     collaboration_invitation: 
       email: 
         body: |-
@@ -17276,6 +17284,7 @@ nn:
   no_more_results_17c4f108: "Ingen fleire resultat"
   no_more_results_to_load_6774fb1c: "Ikkje fleire resultat å laste."
   no_outcome_file_or_authority_given_c90f9c5f: "Resultatfil eller autoritet er ikkje gitt"
+  no_outcome_selected_16d15753: "Ingen valde resultat"
   no_password_was_given_472222e5: "Passord er ikkje oppgitt"
   no_placements_enabled_f705f28: "Ingen plasseringar er aktivert"
   no_points_possible_368669d: "Ingen moglege poeng"
@@ -18008,6 +18017,7 @@ nn:
     account_group_description: "Læringsmålgruppe på kontonivå."
   outcome_guid_has_already_appeared_in_this_import_b9b8b34: "Læringsmål \"%{guid}\" er allereie importert"
   outcome_imports_c496a81f: "Import av læringsmål"
+  outcome_information_936c59ef: "Informasjon om læringsmål"
   outcome_mastery_scales_8c3a814d: "Ekspertiseskalaer for læringsmål"
   outcome_mastery_scales_add_edit_171551c: "Ekspertiseskalaer for læringsmål - Legg til/rediger"
   outcome_outcome_id_is_not_available_in_context_con_2143db54: "Læringsmål %{outcome_id} er ikkje tilgjengeleg i kontekst %{context_type}#%{context_id}"
@@ -22109,6 +22119,7 @@ nn:
   select_a_section_37ac1694: "Vel ein seksjon"
   select_a_student_adfcc348: "Vel ein student"
   select_a_student_and_an_assignment_to_view_and_edi_96fda3c1: "Vel ein student og ei oppgåve for å sjå og redigere vurderingane."
+  select_a_student_and_an_outcome_to_view_results_9b36b177: "Vel ein student og eit læringsmål for å vise resultat."
   select_a_student_to_view_281d17b9: "Vel ein student du vil sjå på"
   select_a_student_to_view_additional_information_he_c371e40c: "Vel ein student for å sjå meir informasjon."
   select_a_student_to_view_the_page_will_refresh_aut_eaa5d00c: "Vel ein student for å sjå. Sida vil oppdaterast automatisk."
@@ -22122,6 +22133,7 @@ nn:
   select_an_assignment_e52320d7: "Vel ei oppgåve"
   select_an_assignment_to_view_additional_informatio_de1370e1: "Vel ei oppgåve for å sjå meir informasjon."
   select_an_edit_operation_ec1467d: "Vel eindringsjobb"
+  select_an_outcome_37fb2096: "Vel eit læringsmål"
   select_an_outcome_group_6edb08a7: "Vel ei læringsmålgruppe"
   select_another_group_24773e5f: "Vel ei anna gruppe"
   select_assignment_available_from_date_203b323f: "Vel oppgåve tilgjengeleg frå dato"
