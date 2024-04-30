@@ -26,6 +26,7 @@ import CoursePacingNotice from '@canvas/due-dates/react/CoursePacingNotice'
 import {TrayDisplayer} from '../TrayDisplayer/TrayDisplayer'
 import {DueDateTray} from '../DueDateTray/DueDateTray'
 import {CheckpointsTray} from '../CheckpointsTray/CheckpointsTray'
+import {REPLY_TO_TOPIC, REPLY_TO_ENTRY} from '../../utils/constants'
 
 const I18n = useI18nScope('discussion_posts')
 
@@ -60,6 +61,15 @@ export function AssignmentAvailabilityContainer({...props}) {
   }
 
   const useCheckpointsTray = props.assignment?.checkpoints?.length > 0
+  const replyToTopicSubmission =
+    props.assignment?.mySubAssignmentSubmissionsConnection?.nodes?.find(node => {
+      return node.subAssignmentTag === REPLY_TO_TOPIC
+    })
+
+  const replyToEntrySubmission =
+    props.assignment?.mySubAssignmentSubmissionsConnection?.nodes?.find(node => {
+      return node.subAssignmentTag === REPLY_TO_ENTRY
+    })
 
   const trayComponent = () => {
     if (props.inPacedCourse) {
@@ -69,6 +79,8 @@ export function AssignmentAvailabilityContainer({...props}) {
         <CheckpointsTray
           checkpoints={props.assignment.checkpoints}
           replyToEntryRequiredCount={props.replyToEntryRequiredCount}
+          replyToTopicSubmission={replyToTopicSubmission}
+          replyToEntrySubmission={replyToEntrySubmission}
         />
       )
     } else {

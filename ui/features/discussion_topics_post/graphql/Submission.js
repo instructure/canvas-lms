@@ -27,6 +27,7 @@ export const Submission = {
       submissionStatus
       subAssignmentTag
       cachedDueDate
+      submittedAt
     }
   `,
 
@@ -35,6 +36,7 @@ export const Submission = {
     _id: string,
     submissionStatus: string,
     subAssignmentTag: string,
+    submittedAt: string,
     cachedDueDate: string,
   }),
 
@@ -44,12 +46,14 @@ export const Submission = {
     submissionStatus = 'submitted',
     subAssignmentTag = 'reply_to_topic',
     cachedDueDate = null,
+    submittedAt = '2024-07-17T23:59:59Z',
   } = {}) => ({
     id,
     _id,
     submissionStatus,
     subAssignmentTag,
     cachedDueDate,
+    submittedAt,
     __typename: 'Submission',
   }),
 }

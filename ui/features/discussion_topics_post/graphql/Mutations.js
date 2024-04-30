@@ -131,6 +131,12 @@ export const CREATE_DISCUSSION_ENTRY = gql`
           ...AnonymousUser
         }
       }
+      mySubAssignmentSubmissions {
+        _id
+        subAssignmentTag
+        submissionStatus
+        submittedAt
+      }
       errors {
         ...Error
       }
