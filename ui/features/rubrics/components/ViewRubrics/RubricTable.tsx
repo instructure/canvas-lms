@@ -164,6 +164,7 @@ export const RubricTable = ({
                 pointsPossible={rubric.pointsPossible}
                 buttonDisplay={rubric.buttonDisplay}
                 ratingOrder={rubric.ratingOrder}
+                freeFormCriterionComments={rubric.freeFormCriterionComments}
                 hasRubricAssociations={rubric.hasRubricAssociations}
                 onArchiveRubricChange={() => handleArchiveRubricChange(rubric.id)}
                 active={active}

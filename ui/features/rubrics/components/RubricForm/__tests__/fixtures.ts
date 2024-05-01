@@ -27,6 +27,7 @@ export const RUBRICS_QUERY_RESPONSE: Rubric = {
   workflowState: 'active',
   buttonDisplay: 'numeric',
   ratingOrder: 'ascending',
+  freeFormCriterionComments: false,
   criteria: [
     {
       id: '1',

@@ -37,6 +37,7 @@ type ModernViewProps = {
   criteria: RubricCriterion[]
   hidePoints: boolean
   isPreviewMode: boolean
+  isFreeFormCriterionComments: boolean
   ratingOrder: string
   rubricAssessmentData: RubricAssessmentData[]
   selectedViewMode: ModernViewModes
@@ -46,6 +47,7 @@ export const ModernView = ({
   criteria,
   hidePoints,
   isPreviewMode,
+  isFreeFormCriterionComments,
   ratingOrder,
   rubricAssessmentData,
   selectedViewMode,
@@ -69,6 +71,7 @@ export const ModernView = ({
             criterionAssessment={criterionAssessment}
             selectedViewMode={selectedViewMode}
             onUpdateAssessmentData={onUpdateAssessmentData}
+            isFreeFormCriterionComments={isFreeFormCriterionComments}
           />
         )
       })}
@@ -81,6 +84,7 @@ type CriterionRowProps = {
   displayHr: boolean
   hidePoints: boolean
   isPreviewMode: boolean
+  isFreeFormCriterionComments: boolean
   ratingOrder: string
   criterionAssessment?: RubricAssessmentData
   selectedViewMode: ModernViewModes
@@ -91,6 +95,7 @@ export const CriterionRow = ({
   displayHr,
   hidePoints,
   isPreviewMode,
+  isFreeFormCriterionComments,
   ratingOrder,
   criterionAssessment,
   selectedViewMode,
@@ -213,7 +218,7 @@ export const CriterionRow = ({
         </Text>
       </View>
       <View as="div" margin="small 0 0 0">
-        {renderButtonDisplay()}
+        {!isFreeFormCriterionComments && renderButtonDisplay()}
       </View>
       <View as="div" margin="small 0 0 0">
         <Flex>

@@ -19,7 +19,9 @@
 import type {RubricAssessment} from '@canvas/grading/grading'
 import type {Rubric, RubricAssessmentData} from '@canvas/rubrics/react/types/rubric'
 
-export type RubricTrayType = Pick<Rubric, 'title' | 'criteria' | 'ratingOrder'> | undefined
+export type RubricTrayType =
+  | Pick<Rubric, 'title' | 'criteria' | 'ratingOrder' | 'freeFormCriterionComments'>
+  | undefined
 export type RubricUnderscoreType = {
   title: string
   criteria: {
@@ -37,6 +39,7 @@ export type RubricUnderscoreType = {
     }[]
   }[]
   rating_order: string
+  free_form_criterion_comments: boolean
 }
 
 export type RubricAssessmentUnderscore = RubricAssessment & {
@@ -76,6 +79,7 @@ export const mapRubricUnderscoredKeysToCamelCase = (
       }
     }),
     ratingOrder: rubric.rating_order,
+    freeFormCriterionComments: rubric.free_form_criterion_comments,
   }
 }
 
