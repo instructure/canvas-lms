@@ -26,7 +26,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 class FriendlyDatetime extends Component {
   static propTypes = {
-    dateTime: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]).isRequired,
+    dateTime: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
     format: PropTypes.string,
     prefix: PropTypes.string,
     prefixMobile: PropTypes.string,
