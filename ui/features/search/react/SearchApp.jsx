@@ -47,7 +47,6 @@ export default function SearchApp() {
   const [feedbackOpen, setFeedbackOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [searchResults, setSearchResults] = useState([])
-  const [searchTerm, setSearchTerm] = useState('')
   const [indexingProgress, setIndexingProgress] = useState(null)
 
   useEffect(() => {
@@ -115,6 +114,9 @@ export default function SearchApp() {
   const onSearch = e => {
     e.preventDefault()
 
+    if (!searchInput.current) return
+
+    const searchTerm = searchInput.current.value.trim()
     if (searchTerm === '') return
 
     setIsLoading(true)
@@ -201,11 +203,6 @@ export default function SearchApp() {
         <fieldset>
           <TextInput
             inputRef={el => (searchInput.current = el)}
-            onChange={e => {
-              // Delay setting search term to prevent slowness when typing
-              const value = e.target.value
-              setTimeout(() => setSearchTerm(value), 15)
-            }}
             placeholder={I18n.t('Food that a panda eats')}
             renderAfterInput={
               <IconButton
