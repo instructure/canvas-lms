@@ -31,6 +31,11 @@ export interface Course {
   workflow_state: string
   enrollments: Enrollment[]
   sections: Section[]
+  term?: Term
+}
+
+export interface Term {
+  name: string
 }
 
 export interface Section {
@@ -107,6 +112,7 @@ export interface NodeStructure {
   label: string
   parent?: NodeStructure
   workflowState?: string
+  termName?: string
 }
 
 export const EMPTY_USER: User = {
