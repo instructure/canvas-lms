@@ -336,7 +336,7 @@ class AuthenticationProvider < ActiveRecord::Base
 
         cc = user.communication_channels.email.by_path(value).first
         cc ||= user.communication_channels.email.new(path: value)
-        cc.workflow_state = "active"
+        cc.workflow_state = "unconfirmed" if cc.new_record?
         cc.save! if cc.changed?
       when "locale"
         # convert _ to -, be lenient about case, and perform fallbacks
