@@ -249,6 +249,28 @@ describe('EnrollmentTree', () => {
     expect(props.createEnroll).toHaveBeenCalledTimes(1)
   })
 
+  describe('rendering with section name matching course name', () => {
+    const updatedProps: Props = {
+      ...props,
+      enrollmentsByCourse: props.enrollmentsByCourse.map(course => ({
+        ...course,
+        sections: course.sections.map(section => ({
+          ...section,
+          name: course.name, // update the section name to match the course name
+        })),
+      })),
+    }
+
+    it('renders only the course name when section name matches', async () => {
+      const user = userEvent.setup(USER_EVENT_OPTIONS)
+      render(<EnrollmentTree {...updatedProps} />)
+      expect(await screen.findByText('Toggle group SubTeacherRole')).toBeInTheDocument()
+      await user.click(screen.getByText('Toggle group StudentRole'))
+      expect(await screen.findByText('Apple Music')).toBeInTheDocument()
+      expect(screen.queryByText('Apple Music - Section 1')).toBeNull()
+    })
+  })
+
   describe('props.tempEnrollmentsPairing', () => {
     let tempProps: Props
     const tempEnrollmentsPairingMock: Enrollment[] = [
@@ -364,7 +386,7 @@ describe('EnrollmentTree', () => {
       const user = userEvent.setup(USER_EVENT_OPTIONS)
       render(<EnrollmentTree {...tempProps} />)
       await user.click(screen.getByText('Toggle group SubTeacherRole'))
-      expect(screen.getAllByText('Second Grade Math - Second Grade Math')).toHaveLength(3)
+      expect(screen.getAllByText('Second Grade Math')).toHaveLength(3)
     })
   })
 

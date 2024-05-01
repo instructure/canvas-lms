@@ -95,7 +95,24 @@ describe('EnrollmentTreeGroup', () => {
   it('renders role with one course item when toggled', () => {
     const {getByText} = render(<EnrollmentTreeGroup {...rProps} />)
     expect(getByText('Role 1')).toBeInTheDocument()
+    // course and section labels will be shown because they are different
     expect(getByText('Course 1 - Section 1')).toBeInTheDocument()
+  })
+
+  it('renders only course name because section name is the same', () => {
+    const updatedSection2Node = {
+      ...section2Node,
+      label: 'Course 1',
+    }
+    const updatedRProps = {
+      ...rProps,
+      children: [{...courseNode, children: [updatedSection2Node]}],
+    }
+    const {getByText, queryByText} = render(<EnrollmentTreeGroup {...updatedRProps} />)
+    // only the course label will be displayed
+    expect(getByText('Course 1')).toBeInTheDocument()
+    // default section labels match course labels, so it will not be shown to reduce UI clutter
+    expect(queryByText('Course 1 - Course 1')).not.toBeInTheDocument()
   })
 
   it('renders role with one course group when toggled', () => {
