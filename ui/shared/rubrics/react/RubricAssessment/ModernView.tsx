@@ -36,7 +36,6 @@ type ModernViewModes = 'horizontal' | 'vertical'
 type ModernViewProps = {
   criteria: RubricCriterion[]
   isPreviewMode: boolean
-  isPeerReview: boolean
   ratingOrder: string
   rubricAssessmentData: RubricAssessmentData[]
   selectedViewMode: ModernViewModes
@@ -45,7 +44,6 @@ type ModernViewProps = {
 export const ModernView = ({
   criteria,
   isPreviewMode,
-  isPeerReview,
   ratingOrder,
   rubricAssessmentData,
   selectedViewMode,
@@ -63,7 +61,6 @@ export const ModernView = ({
             key={criterion.id}
             criterion={criterion}
             displayHr={index < criteria.length - 1}
-            isPeerReview={isPeerReview}
             isPreviewMode={isPreviewMode}
             ratingOrder={ratingOrder}
             criterionAssessment={criterionAssessment}
@@ -79,7 +76,6 @@ export const ModernView = ({
 type CriterionRowProps = {
   criterion: RubricCriterion
   displayHr: boolean
-  isPeerReview: boolean
   isPreviewMode: boolean
   ratingOrder: string
   criterionAssessment?: RubricAssessmentData
@@ -89,7 +85,6 @@ type CriterionRowProps = {
 export const CriterionRow = ({
   criterion,
   displayHr,
-  isPeerReview,
   isPreviewMode,
   ratingOrder,
   criterionAssessment,
@@ -151,7 +146,7 @@ export const CriterionRow = ({
     if (selectedViewMode === 'horizontal' && ratings.length <= 5) {
       return (
         <HorizontalButtonDisplay
-          isPeerReview={isPeerReview}
+          isPreviewMode={isPreviewMode}
           ratings={ratings}
           ratingOrder={ratingOrder}
           selectedRatingIndex={selectedRatingIndex}
@@ -162,7 +157,7 @@ export const CriterionRow = ({
 
     return (
       <VerticalButtonDisplay
-        isPeerReview={isPeerReview}
+        isPreviewMode={isPreviewMode}
         ratings={ratings}
         ratingOrder={ratingOrder}
         selectedRatingIndex={selectedRatingIndex}
@@ -174,13 +169,13 @@ export const CriterionRow = ({
   return (
     <View as="div" margin="0 0 small 0">
       <Flex direction="row-reverse">
-        <Flex.Item margin={isPeerReview ? '0' : '0 0 0 x-small'}>
+        <Flex.Item margin={isPreviewMode ? '0' : '0 0 0 x-small'}>
           <Text size="small" weight="bold">
             /{criterion.points}
           </Text>
         </Flex.Item>
-        <Flex.Item margin={isPeerReview ? '0 0 0 x-small' : '0'}>
-          {isPeerReview ? (
+        <Flex.Item margin={isPreviewMode ? '0 0 0 x-small' : '0'}>
+          {isPreviewMode ? (
             <Text size="small" weight="bold">
               {pointsInput?.toString() ?? ''}
             </Text>
@@ -219,7 +214,7 @@ export const CriterionRow = ({
           <Flex.Item shouldGrow={true} margin="0 0 0 xx-small">
             <TextArea
               label={<ScreenReaderContent>{I18n.t('Leave criterion comment')}</ScreenReaderContent>}
-              readOnly={isPreviewMode || isPeerReview}
+              readOnly={isPreviewMode}
               size="small"
               value={commentText}
               onChange={e => setCommentText(e.target.value)}

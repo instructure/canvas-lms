@@ -72,6 +72,7 @@ export type Assessment = {
 
 export type RubricsStore = {
   displayedAssessment: Assessment | null
+  isSavingRubricAssessment?: boolean
 }
 
 export type Assignment = {

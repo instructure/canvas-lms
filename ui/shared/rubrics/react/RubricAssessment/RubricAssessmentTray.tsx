@@ -120,6 +120,7 @@ export const RubricAssessmentTray = ({
       shouldCloseOnDocumentClick={false}
       size={viewMode === 'traditional' ? 'large' : 'small'}
       id="enhanced-rubric-assessment-tray"
+      data-testid="enhanced-rubric-assessment-tray"
     >
       {isLoading || !rubric ? (
         <LoadingIndicator />

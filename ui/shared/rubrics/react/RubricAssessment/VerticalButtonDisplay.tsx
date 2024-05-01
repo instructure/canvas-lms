@@ -27,14 +27,14 @@ import {View} from '@instructure/ui-view'
 const {licorice} = colors
 
 type VerticalButtonDisplayProps = {
-  isPeerReview: boolean
+  isPreviewMode: boolean
   ratings: RubricRating[]
   ratingOrder: string
   selectedRatingIndex?: number
   onSelectRating: (index: number) => void
 }
 export const VerticalButtonDisplay = ({
-  isPeerReview,
+  isPreviewMode,
   ratings,
   ratingOrder,
   selectedRatingIndex,
@@ -59,7 +59,7 @@ export const VerticalButtonDisplay = ({
               >
                 <RatingButton
                   buttonDisplay={buttonDisplay}
-                  isPeerReview={isPeerReview}
+                  isPreviewMode={isPreviewMode}
                   isSelected={isSelected}
                   selectedArrowDirection="right"
                   onClick={() => onSelectRating(index)}

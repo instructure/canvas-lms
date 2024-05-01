@@ -27,14 +27,14 @@ import {View} from '@instructure/ui-view'
 const {licorice} = colors
 
 type HorizontalButtonDisplayProps = {
-  isPeerReview: boolean
+  isPreviewMode: boolean
   ratings: RubricRating[]
   ratingOrder: string
   selectedRatingIndex?: number
   onSelectRating: (index: number) => void
 }
 export const HorizontalButtonDisplay = ({
-  isPeerReview,
+  isPreviewMode,
   ratings,
   ratingOrder,
   selectedRatingIndex = -1,
@@ -75,7 +75,7 @@ export const HorizontalButtonDisplay = ({
               <RatingButton
                 buttonDisplay={buttonDisplay}
                 isSelected={selectedRatingIndex === index}
-                isPeerReview={isPeerReview}
+                isPreviewMode={isPreviewMode}
                 selectedArrowDirection="up"
                 onClick={() => onSelectRating(index)}
               />

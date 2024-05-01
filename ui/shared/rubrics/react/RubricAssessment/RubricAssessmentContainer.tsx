@@ -101,9 +101,9 @@ export const RubricAssessmentContainer = ({
       return (
         <TraditionalView
           criteria={criteria}
-          isPeerReview={isPeerReview}
           rubricAssessmentData={rubricAssessmentData}
           rubricTitle={rubricTitle}
+          isPreviewMode={isPreviewMode}
           onUpdateAssessmentData={onUpdateAssessmentData}
         />
       )
@@ -112,7 +112,6 @@ export const RubricAssessmentContainer = ({
     return (
       <ModernView
         criteria={criteria}
-        isPeerReview={isPeerReview}
         isPreviewMode={isPreviewMode}
         ratingOrder={ratingOrder}
         rubricAssessmentData={rubricAssessmentData}
@@ -163,7 +162,7 @@ export const RubricAssessmentContainer = ({
             {renderViewContainer()}
           </View>
         </Flex.Item>
-        {!isPreviewMode && !isPeerReview && (
+        {!isPreviewMode && (
           <Flex.Item as="footer">
             <AssessmentFooter onSubmit={onSubmit} />
           </Flex.Item>
@@ -214,8 +213,13 @@ const ViewModeSelect = ({
 type InstructorScoreProps = {
   instructorPoints: number
   isPeerReview: boolean
+  isPreviewMode: boolean
 }
-const InstructorScore = ({instructorPoints = 0, isPeerReview}: InstructorScoreProps) => {
+const InstructorScore = ({
+  instructorPoints = 0,
+  isPeerReview,
+  isPreviewMode,
+}: InstructorScoreProps) => {
   return (
     <Flex as="div" height="3rem" alignItems="center">
       <Flex.Item as="div" width="13.813rem" align="center">
@@ -241,7 +245,7 @@ const InstructorScore = ({instructorPoints = 0, isPeerReview}: InstructorScorePr
             lineHeight: '3rem',
             width: '4.313rem',
             height: '3rem',
-            backgroundColor: isPeerReview ? ash : shamrock,
+            backgroundColor: isPreviewMode ? ash : shamrock,
             borderRadius: '0 .35rem .35rem 0',
             textAlign: 'center',
           }}
@@ -360,7 +364,11 @@ const AssessmentHeader = ({
             )}
             <Flex.Item>
               <View as="div" margin="0 large 0 0" themeOverride={{marginLarge: '2.938rem'}}>
-                <InstructorScore isPeerReview={isPeerReview} instructorPoints={instructorPoints} />
+                <InstructorScore
+                  isPeerReview={isPeerReview}
+                  instructorPoints={instructorPoints}
+                  isPreviewMode={isPreviewMode}
+                />
               </View>
             </Flex.Item>
           </>
@@ -391,7 +399,11 @@ const AssessmentHeader = ({
           )}
 
           <Flex.Item margin="0 0 0 small">
-            <InstructorScore isPeerReview={isPeerReview} instructorPoints={instructorPoints} />
+            <InstructorScore
+              isPeerReview={isPeerReview}
+              instructorPoints={instructorPoints}
+              isPreviewMode={isPreviewMode}
+            />
           </Flex.Item>
 
           <View as="hr" margin="medium 0 medium 0" />
