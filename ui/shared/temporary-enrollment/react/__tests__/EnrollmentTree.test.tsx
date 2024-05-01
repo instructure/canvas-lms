@@ -80,6 +80,9 @@ const props: Props = {
       id: '1',
       name: 'Apple Music',
       workflow_state: 'available',
+      term: {
+        name: 'Fall 2021',
+      },
       enrollments: [
         {
           role_id: '1',
@@ -100,6 +103,9 @@ const props: Props = {
       id: '1',
       name: 'Apple Music',
       workflow_state: 'available',
+      term: {
+        name: 'Fall 2021',
+      },
       enrollments: [
         {
           role_id: '2',
@@ -120,6 +126,9 @@ const props: Props = {
       id: '1',
       name: 'Apple Music',
       workflow_state: 'available',
+      term: {
+        name: 'Fall 2021',
+      },
       enrollments: [
         {
           role_id: '3',
@@ -140,6 +149,9 @@ const props: Props = {
       id: '2',
       name: 'Studio Beats',
       workflow_state: 'unpublished',
+      term: {
+        name: 'Fall 2021',
+      },
       enrollments: [
         {
           role_id: '4',
@@ -179,7 +191,7 @@ describe('EnrollmentTree', () => {
     render(<EnrollmentTree {...props} />)
     expect(await screen.findByText('Toggle group SubTeacherRole')).toBeInTheDocument()
     await user.click(await screen.findByText('Toggle group StudentRole'))
-    expect(await screen.findByText('Apple Music - Section 1')).toBeInTheDocument()
+    expect(await screen.findByText('Apple Music - Section 1 - Fall 2021')).toBeInTheDocument()
   })
 
   it('hides children after clicking toggle', async () => {
@@ -187,9 +199,9 @@ describe('EnrollmentTree', () => {
     render(<EnrollmentTree {...props} />)
     expect(await screen.findByText('Toggle group SubTeacherRole')).toBeInTheDocument()
     await user.click(screen.getByText('Toggle group StudentRole'))
-    expect(await screen.findByText('Apple Music - Section 1')).toBeInTheDocument()
+    expect(await screen.findByText('Apple Music - Section 1 - Fall 2021')).toBeInTheDocument()
     await user.click(screen.getByText('Toggle group StudentRole'))
-    expect(screen.queryByText('Apple Music - Section 1')).not.toBeInTheDocument()
+    expect(screen.queryByText('Apple Music - Section 1 - Fall 2021')).not.toBeInTheDocument()
   })
 
   it('renders enrollments in order of base role', async () => {
@@ -226,9 +238,9 @@ describe('EnrollmentTree', () => {
     render(<EnrollmentTree {...props} />)
     await screen.findByText('Toggle group StudentRole')
     await user.click(screen.getByText('Toggle group StudentRole'))
-    expect(screen.queryByText('Apple Music - Section 1')).toBeInTheDocument()
+    expect(screen.queryByText('Apple Music - Section 1 - Fall 2021')).toBeInTheDocument()
     await user.click(screen.getByText('Toggle group DesignRole'))
-    expect(screen.queryByText('Apple Music - Section 2')).toBeInTheDocument()
+    expect(screen.queryByText('Apple Music - Section 2 - Fall 2021')).toBeInTheDocument()
   })
 
   it('checks children when group is checked', async () => {
@@ -266,8 +278,8 @@ describe('EnrollmentTree', () => {
       render(<EnrollmentTree {...updatedProps} />)
       expect(await screen.findByText('Toggle group SubTeacherRole')).toBeInTheDocument()
       await user.click(screen.getByText('Toggle group StudentRole'))
-      expect(await screen.findByText('Apple Music')).toBeInTheDocument()
-      expect(screen.queryByText('Apple Music - Section 1')).toBeNull()
+      expect(await screen.findByText('Apple Music - Fall 2021')).toBeInTheDocument()
+      expect(screen.queryByText('Apple Music - Apple Music - Fall 2021')).toBeNull()
     })
   })
 
@@ -317,6 +329,9 @@ describe('EnrollmentTree', () => {
         id: '3',
         name: 'Second Grade Math',
         workflow_state: 'available',
+        term: {
+          name: 'Fall 2021',
+        },
         enrollments: [
           {
             role_id: '2',
@@ -337,6 +352,9 @@ describe('EnrollmentTree', () => {
         id: '4',
         name: 'Second Grade Math',
         workflow_state: 'available',
+        term: {
+          name: 'Fall 2021',
+        },
         enrollments: [
           {
             role_id: '2',
@@ -357,6 +375,9 @@ describe('EnrollmentTree', () => {
         id: '5',
         name: 'Second Grade Math',
         workflow_state: 'available',
+        term: {
+          name: 'Fall 2021',
+        },
         enrollments: [
           {
             role_id: '2',
@@ -386,7 +407,7 @@ describe('EnrollmentTree', () => {
       const user = userEvent.setup(USER_EVENT_OPTIONS)
       render(<EnrollmentTree {...tempProps} />)
       await user.click(screen.getByText('Toggle group SubTeacherRole'))
-      expect(screen.getAllByText('Second Grade Math')).toHaveLength(3)
+      expect(screen.getAllByText('Second Grade Math - Fall 2021')).toHaveLength(3)
     })
   })
 
@@ -397,6 +418,9 @@ describe('EnrollmentTree', () => {
         id: '1',
         name: 'History of Art Period 1',
         workflow_state: 'available',
+        term: {
+          name: 'Fall 2021',
+        },
         enrollments: [
           {
             role_id: '4',
@@ -437,7 +461,7 @@ describe('EnrollmentTree', () => {
       const user = userEvent.setup(USER_EVENT_OPTIONS)
       render(<EnrollmentTree {...tempProps} />)
       await user.click(screen.getByText('Toggle group TeacherRole'))
-      await user.click(screen.getByText('Toggle group History of Art Period 1'))
+      await user.click(screen.getByText('Toggle group History of Art Period 1 - Fall 2021'))
       // teacher roles/enrollments are checked by default if not in edit mode
       expect(screen.getByTestId('check-c1')).toBeChecked()
       expect(screen.getByTestId('tip-c1')).toBeInTheDocument()
@@ -451,7 +475,7 @@ describe('EnrollmentTree', () => {
       const user = userEvent.setup(USER_EVENT_OPTIONS)
       render(<EnrollmentTree {...tempProps} />)
       await user.click(screen.getByText('Toggle group TeacherRole'))
-      await user.click(screen.getByText('Toggle group History of Art Period 1'))
+      await user.click(screen.getByText('Toggle group History of Art Period 1 - Fall 2021'))
       await user.click(screen.getByTestId('check-s1'))
       expect(screen.getByTestId('check-s1')).not.toBeChecked()
       expect(screen.queryByTestId('tip-s1')).not.toBeInTheDocument()
@@ -466,7 +490,7 @@ describe('EnrollmentTree', () => {
       const user = userEvent.setup(USER_EVENT_OPTIONS)
       render(<EnrollmentTree {...tempProps} />)
       await user.click(screen.getByText('Toggle group TeacherRole'))
-      await user.click(screen.getByText('Toggle group History of Art Period 1'))
+      await user.click(screen.getByText('Toggle group History of Art Period 1 - Fall 2021'))
       // check initial state of parent and children
       expect(screen.getByTestId('check-c1')).toBeChecked()
       expect(screen.getByTestId('check-s1')).toBeChecked()
@@ -500,7 +524,7 @@ describe('EnrollmentTree', () => {
       const user = userEvent.setup(USER_EVENT_OPTIONS)
       const {rerender} = render(<EnrollmentTree {...tempProps} />)
       await user.click(screen.getByText('Toggle group TeacherRole'))
-      await user.click(screen.getByText('Toggle group History of Art Period 1'))
+      await user.click(screen.getByText('Toggle group History of Art Period 1 - Fall 2021'))
       expect(screen.getByTestId('tip-c1')).toBeInTheDocument()
       expect(screen.getByTestId('tip-s1')).toBeInTheDocument()
       expect(screen.getByTestId('tip-s2')).toBeInTheDocument()
