@@ -19,12 +19,11 @@
 
 module SubmittableHelper
   def check_differentiated_assignments(submittable)
-    render_unauthorized_action if submittable.for_assignment? &&
-                                  !submittable.assignment.visible_to_user?(@current_user)
+    render_unauthorized_action unless submittable.visible_to_user?(@current_user)
   end
 
   def enforce_assignment_visible(submittable)
-    if @current_user && submittable.for_assignment? && !submittable.assignment.visible_to_user?(@current_user)
+    if @current_user && !submittable.visible_to_user?(@current_user)
       respond_to do |format|
         flash[:error] = t "You do not have access to the requested resource."
         name = submittable.class.name.underscore.pluralize
