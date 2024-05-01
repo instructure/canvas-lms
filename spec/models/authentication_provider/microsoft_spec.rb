@@ -74,16 +74,18 @@ describe AuthenticationProvider::Microsoft do
 
     it "enforces the tenant" do
       ap = AuthenticationProvider::Microsoft.new(account: Account.default, tenant: "microsoft")
-      allow(ap).to receive(:claims).and_return({ "tid" => AuthenticationProvider::Microsoft::MICROSOFT_TENANT, "sub" => "abc" })
-      expect(ap.unique_id("token")).to eql "abc"
+      claims = { "tid" => AuthenticationProvider::Microsoft::MICROSOFT_TENANT, "sub" => "abc" }
+      allow(ap).to receive(:claims).and_return(claims)
+      expect(ap.unique_id("token")).to eql claims.merge("tid+oid" => "#{claims["tid"]}#")
       allow(ap).to receive(:claims).and_return({ "tid" => "elsewhise", "sub" => "abc" })
       expect { ap.unique_id("token") }.to raise_error(OAuthValidationError)
     end
 
     it "allows specifying additional allowed tenants" do
       ap = AuthenticationProvider::Microsoft.new(account: Account.default, tenant: "microsoft", allowed_tenants: "1234")
-      allow(ap).to receive(:claims).and_return({ "tid" => "1234", "sub" => "abc" })
-      expect(ap.unique_id("token")).to eql "abc"
+      claims = { "tid" => "1234", "sub" => "abc" }
+      allow(ap).to receive(:claims).and_return(claims)
+      expect(ap.unique_id("token")).to eql claims.merge("tid+oid" => "1234#")
       allow(ap).to receive(:claims).and_return({ "tid" => "elsewhise", "sub" => "abc" })
       expect { ap.unique_id("token") }.to raise_error(OAuthValidationError)
     end
@@ -93,7 +95,7 @@ describe AuthenticationProvider::Microsoft do
       allow(ap).to receive(:claims).and_return({ "tid" => "1234",
                                                  "sub" => "abc",
                                                  "iss" => "https://login.microsoftonline.com/#{AuthenticationProvider::Microsoft::MICROSOFT_TENANT}/v2.0" })
-      expect(ap.unique_id("token")).to eql "abc"
+      expect(ap.unique_id("token")).to eql({ "tid" => "1234", "sub" => "abc", "tid+oid" => "1234#" })
       allow(ap).to receive(:claims).and_return({ "tid" => "elsewhise", "sub" => "abc" })
       expect { ap.unique_id("token") }.to raise_error(OAuthValidationError)
     end

@@ -81,7 +81,7 @@ class Pseudonym < ActiveRecord::Base
             length: { within: 1..MAX_UNIQUE_ID_LENGTH },
             uniqueness: {
               case_sensitive: false,
-              scope: %i[account_id workflow_state authentication_provider_id],
+              scope: %i[account_id workflow_state authentication_provider_id login_attribute],
               if: ->(p) { (p.unique_id_changed? || p.workflow_state_changed?) && p.active? }
             }
 
@@ -189,22 +189,50 @@ class Pseudonym < ActiveRecord::Base
   def self.custom_find_by_unique_id(unique_id)
     return unless unique_id
 
-    active_only.by_unique_id(unique_id).merge(
-      where(authentication_provider_id: nil)
-        .or(where(AuthenticationProvider
-          .active
-          .where(auth_type: ["canvas", "ldap"])
-          .where("authentication_provider_id=authentication_providers.id")
-          .arel.exists))
-    )
+    active_only.by_unique_id(unique_id)
+               .merge(
+                 where(authentication_provider_id: nil)
+                   .or(where(AuthenticationProvider
+                     .active
+                     .where(auth_type: ["canvas", "ldap"])
+                     .where("authentication_provider_id=authentication_providers.id")
+                     .arel.exists))
+               )
                .order("authentication_provider_id NULLS LAST").first
   end
 
-  def self.for_auth_configuration(unique_id, aac, include_suspended: false)
-    auth_id = aac.try(:auth_provider_filter)
+  def self.for_auth_configuration(unique_ids, auth_provider, include_suspended: false)
     scope = include_suspended ? active : active_only
-    scope.by_unique_id(unique_id).where(authentication_provider_id: auth_id)
-         .order("authentication_provider_id NULLS LAST").take
+    filter = auth_provider&.auth_provider_filter
+    scope = scope.where(authentication_provider_id: filter)
+    scope = scope.order("authentication_provider_id NULLS LAST") unless filter == auth_provider
+
+    if unique_ids.is_a?(Hash)
+      login_attribute = auth_provider.login_attribute
+      unique_id = unique_ids[login_attribute]
+      # form this query to allow NULL login_attribute on the pseudonym, if it
+      # hasn't been populated yet (i.e. the backfill is not yet complete)
+      scope = scope.by_unique_id(unique_id)
+                   .where(login_attribute: [login_attribute, nil])
+                   .order("login_attribute NULLS LAST")
+    else
+      scope = scope.by_unique_id(unique_ids)
+    end
+
+    result = scope.take
+    if result && unique_ids.is_a?(Hash)
+      result.login_attribute ||= login_attribute
+      result.unique_ids = unique_ids
+      begin
+        result.save! if result.changed?
+      rescue ActiveRecord::RecordNotUnique
+        # race condition; the pseudonym for this auth provider with this
+        # login attribute was created elsewhere. just fail this
+        # request, and have the user try again
+        result = nil
+      end
+    end
+    result
   end
 
   def audit_log_update
@@ -290,10 +318,13 @@ class Pseudonym < ActiveRecord::Base
       errors.add(:unique_id, "not_email")
       throw :abort
     end
+    self.login_attribute ||= authentication_provider&.login_attribute_for_pseudonyms if new_record?
+
     unless deleted?
       shard.activate do
         existing_pseudo = Pseudonym.active.by_unique_id(unique_id).where(account_id:,
-                                                                         authentication_provider_id:).where.not(id: self).exists?
+                                                                         authentication_provider_id:,
+                                                                         login_attribute:).where.not(id: self).exists?
         if existing_pseudo
           errors.add(:unique_id,
                      :taken,
