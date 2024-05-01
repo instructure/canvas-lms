@@ -1201,6 +1201,63 @@ describe "discussions" do
             expect(f("body")).not_to contain_jqcss(inherited_from_selector)
           end
 
+          it "displays module and course overrides correctly" do
+            graded_discussion = create_graded_discussion(course)
+            module1 = course.context_modules.create!(name: "Module 1")
+            graded_discussion.context_module_tags.create! context_module: module1, context: course, tag_type: "context_module"
+
+            override = module1.assignment_overrides.create!
+            override.assignment_override_students.create!(user: @student1)
+            graded_discussion.assignment.assignment_overrides.create!(set: course, due_at: 1.day.from_now)
+
+            # Open page and assignTo tray
+            get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/edit"
+            Discussion.assign_to_button.click
+            wait_for_assign_to_tray_spinner
+
+            # Verify that Everyone tag does not appear
+            expect(module_item_assign_to_card.count).to eq 2
+            expect(module_item_assign_to_card[0].find_all(assignee_selected_option_selector).map(&:text)).to eq ["Everyone else"]
+            expect(module_item_assign_to_card[1].find_all(assignee_selected_option_selector).map(&:text)).to eq ["User"]
+            expect(inherited_from.last.text).to eq("Inherited from #{module1.name}")
+          end
+
+          it "creates a course override if everyone is added with a module override" do
+            graded_discussion = create_graded_discussion(course)
+            module1 = course.context_modules.create!(name: "Module 1")
+            graded_discussion.context_module_tags.create! context_module: module1, context: course, tag_type: "context_module"
+
+            override = module1.assignment_overrides.create!
+            override.assignment_override_students.create!(user: @student1)
+
+            # Open page and assignTo tray
+            get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/edit"
+            Discussion.assign_to_button.click
+            wait_for_assign_to_tray_spinner
+
+            # Verify the module override is shown
+            expect(module_item_assign_to_card.count).to eq 1
+            expect(module_item_assign_to_card[0].find_all(assignee_selected_option_selector).map(&:text)).to eq ["User"]
+            expect(inherited_from.last.text).to eq("Inherited from #{module1.name}")
+
+            click_add_assign_to_card
+            select_module_item_assignee(1, "Everyone else")
+
+            click_save_button("Apply")
+
+            # Save the discussion without changing the inherited module override
+            Discussion.save_button.click
+            Discussion.section_warning_continue_button.click
+            wait_for_ajaximations
+
+            assignment = graded_discussion.assignment
+
+            # Expect the existing override to be the module override
+            expect(assignment.assignment_overrides.active.count).to eq 1
+            expect(assignment.all_assignment_overrides.active.count).to eq 2
+            expect(assignment.assignment_overrides.first.set_type).to eq "Course"
+          end
+
           it "does not create an override if the modules override is not updated" do
             graded_discussion = create_graded_discussion(course)
             module1 = course.context_modules.create!(name: "Module 1")

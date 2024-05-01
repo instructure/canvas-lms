@@ -213,14 +213,14 @@ module Api::V1::AssignmentOverride
       override_data[:section] = section
     end
 
+    if !set_type && data.key?(:course_id) && data[:course_id].present?
+      set_type = "Course"
+      override_data[:course] = learning_object.context
+    end
+
     if !set_type && data.key?(:noop_id)
       set_type = "Noop"
       override_data[:noop_id] = data[:noop_id]
-    end
-
-    if !set_type && data.key?(:course_id)
-      set_type = "Course"
-      override_data[:course] = learning_object.context
     end
 
     errors << "one of student_ids, group_id, or course_section_id is required" if !set_type && errors.empty?

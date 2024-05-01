@@ -25,6 +25,7 @@ const prepareOverride = (
   overrideIds = {
     groupId: null,
     courseSectionId: null,
+    courseId: null,
     studentIds: null,
     noopId: null,
   },
@@ -36,6 +37,7 @@ const prepareOverride = (
     unlockAt: overrideAvailableFrom || null,
     groupId: overrideIds.groupIds || null,
     courseSectionId: overrideIds.courseSectionId || null,
+    courseId: overrideIds.courseId || null,
     studentIds: overrideIds.studentIds || null,
     noopId: overrideIds.noopId || null,
     title: overrideTitle || null,
@@ -59,6 +61,9 @@ const prepareAssignmentOverridesPayload = (
     const {assignedList, context_module_id: contextModuleId} = info
     const studentIds = assignedList.filter(assetCode => assetCode.includes('user'))
     const sectionIds = assignedList.filter(assetCode => assetCode.includes('section'))
+    const courseIds = assignedList.filter(
+      assetCode => assetCode.includes('course') && !assetCode.includes('section')
+    )
     const groupIds = assignedList.filter(assetCode => assetCode.includes('group'))
 
     // If the override is a module override, don't update it
@@ -93,6 +98,20 @@ const prepareAssignmentOverridesPayload = (
           )
         )
       })
+    }
+
+    // override for course ids
+    if (courseIds.length > 0) {
+      preparedOverrides.push(
+        prepareOverride(
+          info.dueDate || null,
+          info.availableUntil || null,
+          info.availableFrom || null,
+          {
+            courseId: 'everyone',
+          }
+        )
+      )
     }
 
     // override for group ids
