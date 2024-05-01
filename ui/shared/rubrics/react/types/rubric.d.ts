@@ -21,6 +21,7 @@ export type Rubric = {
   criteria?: RubricCriterion[]
   criteriaCount: number
   hidePoints?: boolean
+  freeFormCriterionComments?: boolean
   locations: string[]
   buttonDisplay?: string
   ratingOrder?: string
@@ -28,6 +29,7 @@ export type Rubric = {
   title: string
   workflowState?: string
   hasRubricAssociations?: boolean
+  freeFormCriterionComments?: boolean
 }
 
 export type RubricCriterion = {

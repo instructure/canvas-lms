@@ -61,7 +61,7 @@ export default function RubricTab(props) {
   const onAssessmentChange = updatedAssessment => {
     const newState = {displayedAssessment: updatedAssessment}
     if (enhancedRubricsEnabled) {
-      newState['isSavingRubricAssessment'] = true
+      newState.isSavingRubricAssessment = true
       setRubricTrayOpen(false)
     }
     useStore.setState(newState)
@@ -86,6 +86,13 @@ export default function RubricTab(props) {
     }
   })
 
+  const rubricData = {
+    title: props.rubric?.title,
+    criteria: props.rubric?.criteria,
+    ratingOrder: props.rubric?.rating_order,
+    freeFormCriterionComments: props.rubric?.free_form_criterion_comments,
+  }
+
   const enhancedRubricsEnabled = ENV.FEATURES.enhanced_rubrics
   const showEnhancedRubricPeerReview = props.peerReviewModeEnabled && enhancedRubricsEnabled
   const hidePoints = props.rubricAssociation?.hide_points
@@ -100,6 +107,7 @@ export default function RubricTab(props) {
         criteria={props.rubric.criteria}
         hidePoints={hidePoints}
         isPreviewMode={true}
+        isFreeFormCriterionComments={props.rubric.free_form_criterion_comments}
         onUpdateAssessmentData={() => {}}
         rubricTitle={props.rubric.title}
         rubricAssessmentData={rubricAssessmentData}
@@ -140,7 +148,7 @@ export default function RubricTab(props) {
               isPeerReview={true}
               onDismiss={() => setRubricTrayOpen(false)}
               rubricAssessmentData={rubricAssessmentData}
-              rubric={props.rubric}
+              rubric={rubricData}
               onSubmit={assessment => {
                 const updatedState = {
                   score: assessment.reduce((prev, curr) => prev + curr.points, 0),

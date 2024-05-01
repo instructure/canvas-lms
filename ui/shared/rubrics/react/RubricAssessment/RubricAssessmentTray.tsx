@@ -36,7 +36,7 @@ export type RubricAssessmentTrayProps = {
   isOpen: boolean
   isPreviewMode: boolean
   isPeerReview?: boolean
-  rubric?: Pick<Rubric, 'title' | 'criteria' | 'ratingOrder'>
+  rubric?: Pick<Rubric, 'title' | 'criteria' | 'ratingOrder' | 'freeFormCriterionComments'>
   rubricAssessmentData: RubricAssessmentData[]
   rubricAssessmentId?: string
   rubricAssessors?: RubricAssessmentSelect
@@ -132,6 +132,7 @@ export const RubricAssessmentTray = ({
           hidePoints={hidePoints}
           isPreviewMode={isPreviewMode}
           isPeerReview={isPeerReview}
+          isFreeFormCriterionComments={rubric.freeFormCriterionComments ?? false}
           ratingOrder={rubric.ratingOrder ?? 'descending'}
           rubricTitle={rubric.title}
           rubricAssessmentData={rubricAssessmentDraftData}

@@ -35,6 +35,11 @@ describe('RubricAssessmentTray Tests', () => {
     )
   }
 
+  const renderFreeformComponent = (props?: Partial<RubricAssessmentTrayProps>) => {
+    const freeformRubric = {...RUBRIC_DATA, freeFormCriterionComments: true}
+    return renderComponent({rubric: freeformRubric})
+  }
+
   const getModernSelectedDiv = (element: HTMLElement) => {
     return element.querySelector('div[data-testid="rubric-rating-button-selected"]')
   }
@@ -200,9 +205,63 @@ describe('RubricAssessmentTray Tests', () => {
 
       expect(commentsIcon).toBeDisabled()
     })
+
+    describe('Free Form Comments', () => {
+      it('should render comment text box instead of the rating selection within the rubric grid', () => {
+        const {getByTestId, queryByTestId} = renderFreeformComponent({})
+
+        expect(getByTestId('free-form-comment-area-1')).toBeInTheDocument()
+        expect(queryByTestId('traditional-criterion-1-ratings-0')).not.toBeInTheDocument()
+      })
+
+      it('should render point inputs within the points column of the rubric grid', () => {
+        const {getByTestId} = renderFreeformComponent({})
+
+        expect(getByTestId('comment-score-1')).toBeInTheDocument()
+      })
+
+      it('should not render the comment icon button in the points column', () => {
+        const {queryByTestId} = renderFreeformComponent({})
+
+        expect(queryByTestId('rubric-comment-button-1')).not.toBeInTheDocument()
+      })
+
+      it('should update the instructor score when a point input is changed within the points column', () => {
+        const {getByTestId} = renderFreeformComponent({})
+        const input = getByTestId('comment-score-1') as HTMLInputElement
+        fireEvent.change(input, {target: {value: '4'}})
+        fireEvent.blur(input)
+
+        expect(getByTestId('rubric-assessment-instructor-score')).toHaveTextContent('4 pts')
+
+        const input2 = getByTestId('comment-score-2') as HTMLInputElement
+        fireEvent.change(input2, {target: {value: '5'}})
+        fireEvent.blur(input2)
+
+        expect(getByTestId('rubric-assessment-instructor-score')).toHaveTextContent('9 pts')
+      })
+    })
   })
 
   describe('Modern View tests', () => {
+    const renderComponentModern = (
+      viewMode: string,
+      isPeerReview = false,
+      freeFormCriterionComments = false
+    ) => {
+      const component = freeFormCriterionComments
+        ? renderFreeformComponent({isPeerReview})
+        : renderComponent({isPeerReview})
+      const {getByTestId, queryByRole} = component
+      const viewModeSelect = getByTestId('rubric-assessment-view-mode-select') as HTMLSelectElement
+
+      fireEvent.click(viewModeSelect)
+      const roleOption = queryByRole('option', {name: viewMode}) as HTMLElement
+      fireEvent.click(roleOption)
+
+      return component
+    }
+
     describe('Horizontal Display tests', () => {
       it('should select a rating when the rating is clicked', () => {
         const {getByTestId, queryByTestId} = renderComponentModern('Horizontal')
@@ -266,6 +325,12 @@ describe('RubricAssessmentTray Tests', () => {
         expect(getByTestId('rubric-assessment-instructor-score')).toHaveTextContent('14 pts')
         expect(getModernSelectedDiv(newRatingDiv)).toBeInTheDocument()
         expect(getModernSelectedDiv(oldRatingDiv)).toBeInTheDocument()
+      })
+
+      it('should not render the rating buttons when free form comments are enabled', () => {
+        const {queryByTestId} = renderComponentModern('Horizontal', false, true)
+
+        expect(queryByTestId('rubric-assessment-horizontal-display')).not.toBeInTheDocument()
       })
     })
 
@@ -362,6 +427,12 @@ describe('RubricAssessmentTray Tests', () => {
       expect(queryAllByTestId('rubric-assessment-vertical-display')).toHaveLength(2)
       const verticalRatingDiv = queryByTestId('rating-button-4-0') as HTMLElement
       expect(getModernSelectedDiv(verticalRatingDiv)).toBeInTheDocument()
+    })
+
+    it('should not render the rating buttons when free form comments are enabled', () => {
+      const {queryByTestId} = renderComponentModern('Vertical', false, true)
+
+      expect(queryByTestId('rubric-assessment-horizontal-display')).not.toBeInTheDocument()
     })
   })
 

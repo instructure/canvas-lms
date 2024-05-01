@@ -40,6 +40,7 @@ export type RubricPopoverProps = {
   pointsPossible: number
   buttonDisplay?: string
   ratingOrder?: string
+  freeFormCriterionComments?: boolean
   hasRubricAssociations?: boolean
   onArchiveRubricChange: () => void
   active: boolean
@@ -55,6 +56,7 @@ export const RubricPopover = ({
   pointsPossible,
   buttonDisplay,
   ratingOrder,
+  freeFormCriterionComments,
   hasRubricAssociations,
   onArchiveRubricChange,
   active,
@@ -82,6 +84,7 @@ export const RubricPopover = ({
         pointsPossible={pointsPossible}
         buttonDisplay={buttonDisplay}
         ratingOrder={ratingOrder}
+        freeFormCriterionComments={freeFormCriterionComments}
         accountId={accountId}
         courseId={courseId}
       />

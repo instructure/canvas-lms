@@ -48,6 +48,7 @@ type RubricAssessmentContainerProps = {
   hidePoints: boolean
   isPreviewMode: boolean
   isPeerReview: boolean
+  isFreeFormCriterionComments: boolean
   ratingOrder: string
   rubricTitle: string
   rubricAssessmentData: RubricAssessmentData[]
@@ -65,6 +66,7 @@ export const RubricAssessmentContainer = ({
   hidePoints,
   isPreviewMode,
   isPeerReview,
+  isFreeFormCriterionComments,
   ratingOrder,
   rubricTitle,
   rubricAssessmentData,
@@ -107,6 +109,7 @@ export const RubricAssessmentContainer = ({
           rubricAssessmentData={rubricAssessmentData}
           rubricTitle={rubricTitle}
           isPreviewMode={isPreviewMode}
+          isFreeFormCriterionComments={isFreeFormCriterionComments}
           onUpdateAssessmentData={onUpdateAssessmentData}
         />
       )
@@ -121,6 +124,7 @@ export const RubricAssessmentContainer = ({
         rubricAssessmentData={rubricAssessmentData}
         selectedViewMode={selectedViewMode}
         onUpdateAssessmentData={onUpdateAssessmentData}
+        isFreeFormCriterionComments={isFreeFormCriterionComments}
       />
     )
   }

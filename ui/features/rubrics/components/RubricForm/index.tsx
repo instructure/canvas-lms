@@ -61,6 +61,7 @@ const defaultRubricForm: RubricFormProps = {
   ratingOrder: 'descending',
   unassessed: true,
   workflowState: 'active',
+  freeFormCriterionComments: false,
 }
 
 const translateRubricData = (fields: RubricQueryResponse): RubricFormProps => {
@@ -75,6 +76,7 @@ const translateRubricData = (fields: RubricQueryResponse): RubricFormProps => {
     ratingOrder: fields.ratingOrder ?? 'descending',
     unassessed: fields.unassessed ?? true,
     workflowState: fields.workflowState ?? 'active',
+    freeFormCriterionComments: fields.freeFormCriterionComments ?? false, // Add the missing property here
   }
 }
 
