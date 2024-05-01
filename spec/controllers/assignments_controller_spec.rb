@@ -630,6 +630,7 @@ describe AssignmentsController do
       a = @course.assignments.create(title: "some assignment")
       get "show", params: { course_id: @course.id, id: a.id }
       expect(assigns[:js_env][:SUBMISSION_ID]).to eq a.submissions.find_by(user: @student).id
+      expect(assigns[:js_env].keys).not_to include(:assignment_menu_tools)
     end
 
     it "renders teacher-specific js_env" do
@@ -637,6 +638,78 @@ describe AssignmentsController do
       a = @course.assignments.create(title: "some assignment")
       get "show", params: { course_id: @course.id, id: a.id }
       expect(assigns[:js_env][:SUBMISSION_ID]).to be_nil
+      expect(assigns[:js_env].keys).not_to include(:assignment_menu_tools)
+    end
+
+    context "tray and non-tray menu tools exist" do
+      before do
+        allow(controller).to receive(:external_tools_display_hashes).and_return(
+          [
+            { id: 1, title: "tool 1" },
+            { id: 2, title: "tool 2", launch_method: "tray" }
+          ]
+        )
+      end
+
+      shared_examples_for "filters student menu tool list" do
+        it "js_env" do
+          get "show", params: { course_id: @course.id, id: @assignment.id }
+          expect(response).to be_successful
+          expect(controller.js_env[:assignment_menu_tools]).to eq [{ id: 2, title: "tool 2", launch_method: "tray" }]
+        end
+
+        context "external_tool_drawer flag is disabled" do
+          before do
+            @course.account.disable_feature!(:external_tool_drawer)
+          end
+
+          it "filters out tray menu tools" do
+            get "show", params: { course_id: @course.id, id: @assignment.id }
+            expect(response).to be_successful
+            expect(controller.js_env.keys).not_to include(:assignment_menu_tools)
+          end
+        end
+      end
+
+      context "user is a student" do
+        before do
+          user_session(@student)
+        end
+
+        it_behaves_like "filters student menu tool list"
+      end
+
+      context "user is a fake student" do
+        before do
+          user_session(@course.student_view_student)
+        end
+
+        it_behaves_like "filters student menu tool list"
+      end
+
+      context "user is a teacher" do
+        before do
+          user_session(@teacher)
+        end
+
+        it "does not filter menu tool list" do
+          get "show", params: { course_id: @course.id, id: @assignment.id }
+          expect(response).to be_successful
+          expect(controller.js_env[:assignment_menu_tools]).to eq [{ id: 1, title: "tool 1" }, { id: 2, title: "tool 2", launch_method: "tray" }]
+        end
+
+        context "external_tool_drawer flag is disabled" do
+          before do
+            @course.account.disable_feature!(:external_tool_drawer)
+          end
+
+          it "filters out tray menu tools" do
+            get "show", params: { course_id: @course.id, id: @assignment.id }
+            expect(response).to be_successful
+            expect(controller.js_env[:assignment_menu_tools]).to eq [{ id: 1, title: "tool 1" }]
+          end
+        end
+      end
     end
 
     context "direct share options" do
