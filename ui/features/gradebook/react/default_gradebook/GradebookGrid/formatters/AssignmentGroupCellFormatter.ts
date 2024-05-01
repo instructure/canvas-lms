@@ -94,10 +94,10 @@ export default class AssignmentGroupCellFormatter {
 
       if (displayAsScaledPoints && value.possible) {
         scaledPossible = I18n.n(scalingFactor, {
-          precision: 1,
+          precision: 2,
         })
         scaledScore = I18n.n(scoreToScaledPoints(value.score, value.possible, scalingFactor), {
-          precision: 1,
+          precision: 2,
         })
       }
     }
