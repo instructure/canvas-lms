@@ -31,14 +31,6 @@ CanvasRails::Application.routes.draw do
     resources(:settings, controller: :enrollment_settings)
   end
 
-  scope '/users/:user_id' do
-    resources(:assignments) do
-      resources(:settings, controller: :student_assignment_settings)
-    end
-
-    resources(:settings, controller: :user_settings)
-  end
-
   resources :submission_comments, only: [:update, :destroy]
 
   resources :epub_exports, only: [:index]
