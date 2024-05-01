@@ -123,7 +123,7 @@ export default function SearchApp() {
     setSearchResults([])
     setPreviousSearch(searchTerm)
 
-    fetch(`/api/v1/courses/${ENV.COURSE_ID}/smartsearch?q=${searchTerm}`)
+    fetch(`/api/v1/courses/${ENV.COURSE_ID}/smartsearch?q=${searchTerm}&per_page=25`)
       .then(res => {
         res
           .json()
