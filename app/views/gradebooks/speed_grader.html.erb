@@ -444,7 +444,8 @@
       <%= select_tag 'eg_sort_by', options_for_select([
         [t('sort_by.student_name', "by student name (alphabetically)"), "alphabetically"],
         [t('sort_by.submitted_at', "the date they submitted the assignment"), "submitted_at"],
-        [t('sort_by.status', "by submission status (needs grading, not submitted, etc)"), "submission_status"]], cookies[:eg_sort_by]) %>
+        [t('sort_by.status', "by submission status (needs grading, not submitted, etc)"), "submission_status"],
+        [t('sort_by.randomize', "randomize students"), "randomize"],], cookies[:eg_sort_by]) %>
     </p>
 
     <% unless @assignment.anonymous_grading? %>

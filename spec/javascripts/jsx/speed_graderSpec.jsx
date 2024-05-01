@@ -55,6 +55,7 @@ const requiredDOMFixtures = `
       <option value="alphabetically"></option>
       <option value="submitted_at"></option>
       <option value="submission_status"></option>
+      <option value="randomize"></option>
     </select>
     <input id="hide_student_names" type="checkbox" name="hide_student_names">
     <input id="enable_speedgrader_grade_by_question" type="checkbox" name="enable_speedgrader_grade_by_question">
@@ -2862,6 +2863,18 @@ QUnit.module('SpeedGrader', rootHooks => {
           SpeedGrader.EG.jsonReady()
           const ids = window.jsonData.studentsWithSubmissions.map(student => student.id)
           deepEqual(ids, ['1101', '1103', '1102', '1104'])
+        })
+        test('sorts students randomly', () => {
+          userSettings.get.withArgs('eg_sort_by').returns('randomize')
+          sandbox
+            .stub(Math, 'random')
+            .onFirstCall().returns(0.3)
+            .onSecondCall().returns(0.1)
+            .onThirdCall().returns(0.4)
+            .onCall(3).returns(0.2)
+          SpeedGrader.EG.jsonReady()
+          const ids = window.jsonData.studentsWithSubmissions.map(student => student.id)
+          deepEqual(ids, ['1102', '1104', '1101', '1103'])
         })
 
         test('sorts students by their assigned index when names are hidden', () => {
