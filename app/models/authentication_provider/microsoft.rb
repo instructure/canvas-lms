@@ -51,7 +51,7 @@ class AuthenticationProvider::Microsoft < AuthenticationProvider::OpenIDConnect
   end
 
   def self.login_attributes
-    %w[sub email oid preferred_username].freeze
+    %w[tid+oid sub email oid preferred_username].freeze
   end
   validates :login_attribute, inclusion: login_attributes
 
@@ -92,7 +92,7 @@ class AuthenticationProvider::Microsoft < AuthenticationProvider::OpenIDConnect
 
     ids = id_token.as_json
     ids["tid+oid"] = "#{ids["tid"]}##{ids["oid"]}"
-    ids.slice("tid", "tid+oid", *self.class.login_attributes)
+    ids.slice("tid", *self.class.login_attributes)
   end
 
   def allowed_tenants=(value)
@@ -117,7 +117,7 @@ class AuthenticationProvider::Microsoft < AuthenticationProvider::OpenIDConnect
   def scope
     result = []
     requested_attributes = [login_attribute] + federated_attributes.values.pluck("attribute")
-    result << "profile" if requested_attributes.intersect?(%w[name oid preferred_username])
+    result << "profile" if requested_attributes.intersect?(%w[name oid preferred_username tid+oid])
     result << "email" if requested_attributes.include?("email")
     result.join(" ")
   end
