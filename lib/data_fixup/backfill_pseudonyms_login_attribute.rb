@@ -20,22 +20,20 @@
 module DataFixup
   module BackfillPseudonymsLoginAttribute
     def self.run(auth_types)
-      # the combination of a join, a limit, and assigning from another table is too complicated
-      # for our AR extensions, so form the subquery ourselves
-      r = Pseudonym.joins(:authentication_provider)
-                   .where(authentication_providers: { auth_type: auth_types },
-                          id: Pseudonym.where(login_attribute: nil)
-                                       .where.not(authentication_providers: { login_attribute: nil })
-                                       .where.not(Pseudonym.from("#{Pseudonym.quoted_table_name} p2")
-                                         .where(<<~SQL.squish)
-                                           pseudonyms.authentication_provider_id=p2.authentication_provider_id AND
-                                           LOWER(pseudonyms.unique_id)=LOWER(p2.unique_id) AND
-                                           authentication_providers.login_attribute=p2.login_attribute
-                                         SQL
-                                         .arel.exists)
-                                       .limit(1000))
-      loop do
-        break if r.update_all("login_attribute=authentication_providers.login_attribute").zero?
+      Pseudonym.find_ids_in_ranges(loose: true, batch_size: 5_000) do |min_id, max_id|
+        # the combination of a join, a limit, and assigning from another table is too complicated
+        # for our AR extensions, so form the subquery ourselves
+        Pseudonym.joins(:authentication_provider)
+                 .where(id: min_id..max_id, login_attribute: nil, authentication_providers: { auth_type: auth_types })
+                 .where.not(authentication_providers: { login_attribute: nil })
+                 .where.not(Pseudonym.from("#{Pseudonym.quoted_table_name} p2")
+                            .where(<<~SQL.squish)
+                              pseudonyms.authentication_provider_id=p2.authentication_provider_id AND
+                              LOWER(pseudonyms.unique_id)=LOWER(p2.unique_id) AND
+                              authentication_providers.login_attribute=p2.login_attribute
+                            SQL
+                            .arel.exists)
+                 .update_all("login_attribute=authentication_providers.login_attribute")
       end
     end
   end
