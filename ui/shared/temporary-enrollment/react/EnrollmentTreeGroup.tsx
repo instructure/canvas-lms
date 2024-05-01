@@ -96,7 +96,10 @@ export function EnrollmentTreeGroup(props: Props) {
               </Flex.Item>
             )
           } else {
-            const label = course.label + ' - ' + course.children[0].label
+            const label =
+              course.label !== course.children[0].label
+                ? course.label + ' - ' + course.children[0].label
+                : course.label
             childRows.push(
               <Flex.Item key={course.id} shouldGrow={true} overflowY="visible">
                 <EnrollmentTreeItem
