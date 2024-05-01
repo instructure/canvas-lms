@@ -820,6 +820,27 @@ describe ContentMigration do
         expect(@copy_to.syllabus_body).to eq translated_body
       end
 
+      it "updates media comment links to be media attachment links when the media object has an attachment in a different course" do
+        course_with_teacher(course_name: "from course", active_all: true)
+        media_object_model(title: "test.mp4", context: @course, media_id: "m-index0")
+        media_object_model(title: "test.mp4", context: @course, media_id: "m-index1")
+
+        @copy_from.wiki_pages.create!(title: "page", body: <<~HTML.strip)
+          with media comment: <a id="media_comment_m-index0" class="instructure_inline_media_comment video_comment" href="/media_objects/m-index0" data-media_comment_type="video" data-alt="">this is a media comment</a>
+          with media objects iframe url: <iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="m-index1" allowfullscreen="allowfullscreen" allow="fullscreen" src="/media_objects_iframe/m-index1?type=video&amp;embedded=true"></iframe>
+        HTML
+
+        run_course_copy
+
+        file0, file1 = @copy_to.attachments.order(:id)
+
+        translated_body = <<~HTML.strip
+          with media comment: <iframe id="media_comment_m-index0" class="instructure_inline_media_comment video_comment" data-media_comment_type="video" data-alt="" style="width: 320px; height: 240px; display: inline-block;" title="this is a media comment" data-media-type="video" src="/media_attachments_iframe/#{file0.id}?embedded=true&amp;type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="m-index0"></iframe>
+          with media objects iframe url: <iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="m-index1" allowfullscreen="allowfullscreen" allow="fullscreen" src="/media_attachments_iframe/#{file1.id}?embedded=true&amp;type=video"></iframe>
+        HTML
+        expect(@copy_to.wiki_pages.take.body).to eq translated_body
+      end
+
       it "updates media comment and media object links without crashing when there isn't an attachment associated with the media object" do
         (0..1).each do |index|
           mo = @copy_from.media_objects.create!(media_id: "m-index#{index}")

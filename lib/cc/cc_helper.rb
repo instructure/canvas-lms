@@ -349,13 +349,18 @@ module CC
         @url_prefix += ":#{port}" if !host&.include?(":") && port.present?
       end
 
-      # after LF-232 is stable on master, we should be able to remove this, I think
+      # after LF-1335 has been run on prod, we should be able to remove this, I think
       def used_media_objects
         return @used_media_objects if @ensure_attachments_for_media_objects
 
         @used_media_objects.each do |obj|
-          unless obj.attachment
-            obj.attachment = Attachment.create!(context: obj.context, media_entry_id: obj.media_id, filename: obj.guaranteed_title, content_type: "unknown/unknown")
+          next if @course.attachments.where(media_entry_id: obj.media_id).any?
+
+          mo_att = obj.attachment
+          if mo_att
+            mo_att.clone_for(@course).save
+          else
+            obj.attachment = @course.attachments.create!(media_entry_id: obj.media_id, filename: obj.guaranteed_title, content_type: "unknown/unknown")
             obj.save!
           end
         end
