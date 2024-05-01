@@ -28,20 +28,21 @@ import {TextArea} from '@instructure/ui-text-area'
 import {Link} from '@instructure/ui-link'
 import {possibleString} from '../Points'
 import type {RubricAssessmentData, RubricCriterion, UpdateAssessmentData} from '../types/rubric'
+import {Grid} from '@instructure/ui-grid'
 
 const I18n = useI18nScope('rubrics-assessment-tray')
 const {licorice} = colors
 
 type TraditionalViewProps = {
   criteria: RubricCriterion[]
-  isPeerReview: boolean
+  isPreviewMode: boolean
   rubricAssessmentData: RubricAssessmentData[]
   rubricTitle: string
   onUpdateAssessmentData: (params: UpdateAssessmentData) => void
 }
 export const TraditionalView = ({
   criteria,
-  isPeerReview,
+  isPreviewMode,
   rubricAssessmentData,
   rubricTitle,
   onUpdateAssessmentData,
@@ -101,7 +102,7 @@ export const TraditionalView = ({
             key={`criterion-${criterion.id}-${index}`}
             criterion={criterion}
             criterionAssessment={criterionAssessment}
-            isPeerReview={isPeerReview}
+            isPreviewMode={isPreviewMode}
             onUpdateAssessmentData={onUpdateAssessmentData}
           />
         )
@@ -113,16 +114,15 @@ export const TraditionalView = ({
 type CriterionRowProps = {
   criterion: RubricCriterion
   criterionAssessment?: RubricAssessmentData
-  isPeerReview: boolean
+  isPreviewMode: boolean
   onUpdateAssessmentData: (params: UpdateAssessmentData) => void
 }
 const CriterionRow = ({
   criterion,
   criterionAssessment,
-  isPeerReview,
+  isPreviewMode,
   onUpdateAssessmentData,
 }: CriterionRowProps) => {
-  const ratingsWidth = Math.max(127.59 * criterion.ratings.length, 638)
   const [hoveredRatingIndex, setHoveredRatingIndex] = useState<number>()
   const [isCommentsOpen, setIsCommentsOpen] = useState(false)
   const [commentText, setCommentText] = useState<string>(criterionAssessment?.comments ?? '')
@@ -149,7 +149,7 @@ const CriterionRow = ({
   }, [criterionAssessment])
 
   return (
-    <View as="div">
+    <View as="div" maxWidth="100%">
       <Flex>
         <Flex.Item width="11.25rem" align="start">
           <View
@@ -162,111 +162,108 @@ const CriterionRow = ({
             <Text weight="bold">{criterion.description}</Text>
           </View>
         </Flex.Item>
-        <Flex.Item overflowX="auto" width="39.875rem" align="start">
-          <div
-            style={{
-              width: `${ratingsWidth}px`,
-              height: '13.75rem',
-              overflowX: 'auto',
-              overflowY: 'auto',
-            }}
-          >
-            <Flex>
-              {criterion.ratings.map((rating, index) => {
-                const width = 100 / criterion.ratings.length
+        <Flex.Item shouldGrow={true} shouldShrink={true} align="start">
+          <View height="13.75rem">
+            <Grid>
+              <Grid.Row colSpacing="none">
+                {criterion.ratings.map((rating, index) => {
+                  const border =
+                    index === criterion.ratings.length - 1 ? '0 0 small 0' : '0 small small 0'
 
-                const border =
-                  index === criterion.ratings.length - 1 ? '0 0 small 0' : '0 small small 0'
+                  const highlightedBorder = 'medium'
 
-                const highlightedBorder = 'medium'
+                  const isHovered = hoveredRatingIndex === index
+                  const isSelected = selectedRatingIndex === index
 
-                const isHovered = hoveredRatingIndex === index
-                const isSelected = selectedRatingIndex === index
+                  const borderWith = isHovered || isSelected ? highlightedBorder : border
+                  const borderColor = isHovered || isSelected ? 'brand' : 'primary'
 
-                const borderWith = isHovered || isSelected ? highlightedBorder : border
-                const borderColor = isHovered || isSelected ? 'brand' : 'primary'
-
-                const onClickRating = (ratingIndex: number) => {
-                  if (selectedRatingIndex === ratingIndex) {
-                    updateAssessmentData({points: undefined})
-                  } else {
-                    updateAssessmentData({
-                      points: rating.points,
-                      description: rating.description,
-                    })
+                  const onClickRating = (ratingIndex: number) => {
+                    if (selectedRatingIndex === ratingIndex) {
+                      updateAssessmentData({points: undefined})
+                    } else {
+                      updateAssessmentData({
+                        points: rating.points,
+                        description: rating.description,
+                      })
+                    }
                   }
-                }
 
-                return (
-                  // we use the array index because rating may not have an id
-                  /* eslint-disable-next-line react/no-array-index-key */
-                  <Flex.Item width={`${width}%`} key={`criterion-${criterion.id}-ratings-${index}`}>
-                    <View
-                      as="button"
-                      disabled={isPeerReview}
-                      tabIndex={0}
-                      background="transparent"
-                      height="13.75rem"
-                      width="100%"
-                      borderWidth={borderWith}
-                      borderColor={borderColor}
-                      overflowY="auto"
-                      cursor="pointer"
-                      padding="xxx-small x-small 0 x-small"
-                      onMouseOver={() => setHoveredRatingIndex(isPeerReview ? -1 : index)}
-                      onMouseOut={() => setHoveredRatingIndex(undefined)}
-                      onClick={() => onClickRating(index)}
-                      themeOverride={{
-                        borderWidthMedium: isSelected ? '0.188rem' : '0.125rem',
-                        borderColorBrand: licorice,
-                      }}
-                      data-testid={`traditional-criterion-${criterion.id}-ratings-${index}`}
-                    >
-                      <Flex direction="column" height="100%">
-                        <Flex.Item>
-                          <Text weight="bold">{rating.description}</Text>
-                        </Flex.Item>
-                        <Flex.Item margin="small 0 0 0" shouldGrow={true}>
-                          <Text size="small">{rating.longDescription}</Text>
-                        </Flex.Item>
-                        <Flex.Item>
-                          <View
-                            as="div"
-                            textAlign="end"
-                            position="relative"
-                            padding="0 0 x-small 0"
-                          >
-                            <View>
-                              <Text size="small" weight="bold">
-                                {possibleString(rating.points)}
-                              </Text>
+                  return (
+                    // we use the array index because rating may not have an id
+                    /* eslint-disable-next-line react/no-array-index-key */
+                    <Grid.Col key={`criterion-${criterion.id}-ratings-${index}`}>
+                      <View
+                        as="button"
+                        disabled={isPreviewMode}
+                        tabIndex={0}
+                        background="transparent"
+                        height="13.75rem"
+                        width="100%"
+                        borderWidth={borderWith}
+                        borderColor={borderColor}
+                        overflowY="auto"
+                        overflowX="hidden"
+                        cursor={isPreviewMode ? 'not-allowed' : 'pointer'}
+                        padding="xxx-small x-small 0 x-small"
+                        onMouseOver={() => setHoveredRatingIndex(isPreviewMode ? -1 : index)}
+                        onMouseOut={() => setHoveredRatingIndex(undefined)}
+                        onClick={() => onClickRating(index)}
+                        themeOverride={{
+                          borderWidthMedium: isSelected ? '0.188rem' : '0.125rem',
+                          borderColorBrand: licorice,
+                        }}
+                        data-testid={`traditional-criterion-${criterion.id}-ratings-${index}`}
+                      >
+                        <Flex direction="column" height="100%">
+                          <Flex.Item>
+                            <Text weight="bold">{rating.description}</Text>
+                          </Flex.Item>
+                          <Flex.Item margin="small 0 0 0" shouldGrow={true}>
+                            <Text size="small">{rating.longDescription}</Text>
+                          </Flex.Item>
+                          <Flex.Item>
+                            <View
+                              as="div"
+                              textAlign="end"
+                              position="relative"
+                              padding="0 0 x-small 0"
+                              overflowX="hidden"
+                              overflowY="hidden"
+                            >
+                              <View>
+                                <Text size="small" weight="bold">
+                                  {possibleString(rating.points)}
+                                </Text>
+                              </View>
+
+                              {isSelected && (
+                                <div
+                                  data-testid={`traditional-criterion-${criterion.id}-ratings-${index}-selected`}
+                                  style={{
+                                    position: 'absolute',
+                                    bottom: '0',
+                                    height: '0',
+                                    width: '0',
+                                    left: '50%',
+                                    borderLeft: '12px solid transparent',
+                                    borderRight: '12px solid transparent',
+                                    borderBottom: `12px solid ${licorice}`,
+                                    transform: 'translateX(-50%)',
+                                  }}
+                                />
+                              )}
                             </View>
-
-                            {isSelected && (
-                              <div
-                                data-testid={`traditional-criterion-${criterion.id}-ratings-${index}-selected`}
-                                style={{
-                                  position: 'absolute',
-                                  bottom: '0',
-                                  height: '0',
-                                  width: '0',
-                                  left: '50%',
-                                  borderLeft: '12px solid transparent',
-                                  borderRight: '12px solid transparent',
-                                  borderBottom: `12px solid ${licorice}`,
-                                  transform: 'translateX(-50%)',
-                                }}
-                              />
-                            )}
-                          </View>
-                        </Flex.Item>
-                      </Flex>
-                    </View>
-                  </Flex.Item>
-                )
-              })}
-            </Flex>
-          </div>
+                          </Flex.Item>
+                        </Flex>
+                      </View>
+                      {/* </Flex.Item> */}
+                    </Grid.Col>
+                  )
+                })}
+              </Grid.Row>
+            </Grid>
+          </View>
         </Flex.Item>
         <Flex.Item width="8.875rem">
           <View
@@ -316,7 +313,7 @@ const CriterionRow = ({
               <TextArea
                 label={<ScreenReaderContent>{I18n.t('Criterion Comment')}</ScreenReaderContent>}
                 placeholder={I18n.t('Comment')}
-                readOnly={isPeerReview}
+                readOnly={isPreviewMode}
                 data-testid={`comment-text-area-${criterion.id}`}
                 width="100%"
                 value={commentText}

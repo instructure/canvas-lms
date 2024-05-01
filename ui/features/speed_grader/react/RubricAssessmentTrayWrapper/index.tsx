@@ -63,13 +63,15 @@ export default ({rubric, onAccessorChange, onSave}: RubricAssessmentTrayWrapperP
     onSave(data)
   }
 
-  const isPeerReview = studentAssessment?.assessor_id !== ENV.RUBRIC_ASSESSMENT?.assessor_id
+  const isPreviewPeerMode =
+    !!studentAssessment?.assessor_id &&
+    studentAssessment.assessor_id !== ENV.RUBRIC_ASSESSMENT?.assessor_id
 
   return (
     <RubricAssessmentTray
       isOpen={rubricAssessmentTrayOpen}
-      isPreviewMode={false}
-      isPeerReview={isPeerReview}
+      isPreviewMode={isPreviewPeerMode}
+      isPeerReview={isPreviewPeerMode}
       rubric={mapRubricUnderscoredKeysToCamelCase(rubric)}
       rubricAssessmentData={mapRubricAssessmentDataUnderscoredKeysToCamelCase(
         studentAssessment?.data ?? []

@@ -388,15 +388,17 @@ describe('RubricAssessmentTray Tests', () => {
       expect(assessors[0].innerHTML).toBe('Teacher')
       expect(assessors[1].innerHTML).toBe('Peer Reviewer')
     })
+  })
 
+  describe('Preview Mode tests', () => {
     it('should not render footer section when in peer review mode', () => {
-      const {queryByTestId} = renderPeerReviewComponent()
+      const {queryByTestId} = renderComponent({isPreviewMode: true})
       expect(queryByTestId('rubric-assessment-footer')).toBeNull()
     })
 
     describe('Traditional View tests', () => {
-      it('should not allow users to select ratings when in peer review mode', () => {
-        const {getByTestId} = renderPeerReviewComponent()
+      it('should not allow users to select ratings when in preview mode', () => {
+        const {getByTestId} = renderComponent({isPreviewMode: true})
         const rating = getByTestId('traditional-criterion-1-ratings-0') as HTMLButtonElement
         fireEvent.click(rating)
 
@@ -405,8 +407,8 @@ describe('RubricAssessmentTray Tests', () => {
     })
 
     describe('Modern View tests', () => {
-      it('should not allow users to select ratings when in peer review mode', () => {
-        const {getByTestId, queryByTestId, queryByRole} = renderPeerReviewComponent()
+      it('should not allow users to select ratings when in preview mode', () => {
+        const {getByTestId, queryByTestId, queryByRole} = renderComponent({isPreviewMode: true})
 
         const viewModeSelect = getByTestId(
           'rubric-assessment-view-mode-select'
