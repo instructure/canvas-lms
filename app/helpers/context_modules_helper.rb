@@ -24,7 +24,7 @@ module ContextModulesHelper
 
   def cache_if_module(context_module, viewable, can_add, can_edit, can_delete, is_student, can_view_unpublished, user, context, &)
     if context_module
-      visible_assignments = user ? user.assignment_and_quiz_visibilities(context) : []
+      visible_assignments = user ? user.learning_object_visibilities(context) : []
       cache_key_items = ["context_module_render_22_",
                          context_module.cache_key,
                          viewable,
