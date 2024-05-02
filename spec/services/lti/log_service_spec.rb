@@ -19,14 +19,16 @@
 
 describe Lti::LogService do
   let(:service) do
-    Lti::LogService.new(tool:, context:, user:, placement:, launch_type:)
+    Lti::LogService.new(tool:, context:, user:, session_id:, placement:, launch_type:)
   end
-  let(:tool) { external_tool_model }
-  let(:user) { user_model }
-  let(:account) { account_model }
-  let(:context) { course_model(root_account: account) }
-  let(:placement) { :course_navigation }
-  let(:launch_type) { :direct_link }
+
+  let_once(:session_id) { SecureRandom.hex }
+  let_once(:tool) { external_tool_model }
+  let_once(:user) { user_model }
+  let_once(:account) { account_model }
+  let_once(:context) { course_model(root_account: account) }
+  let_once(:placement) { :course_navigation }
+  let_once(:launch_type) { :direct_link }
 
   describe ".new" do
     context "when context is not valid type" do
@@ -49,7 +51,7 @@ describe Lti::LogService do
   describe "#call" do
     subject { service.call }
 
-    let(:data) { { foo: "bar" } }
+    let_once(:data) { { foo: "bar" } }
 
     before do
       allow(PandataEvents).to receive(:send_event)
@@ -103,58 +105,62 @@ describe Lti::LogService do
   describe "#log_data" do
     subject { service.log_data }
 
-    let(:user_relationship) { ["StudentEnrollment"] }
+    let_once(:user_relationship) { ["StudentEnrollment"] }
 
     before do
       allow(service).to receive(:user_relationship).and_return(user_relationship)
     end
 
-    it "includes tool tool_id" do
-      expect(subject[:tool_id]).to eq(tool.tool_id)
+    it "includes the correct data" do
+      expect(subject).to eq({
+                              unified_tool_id: nil,
+                              tool_id: tool.id.to_s,
+                              tool_provided_id: tool.tool_id,
+                              tool_domain: tool.domain,
+                              tool_url: tool.url,
+                              tool_name: tool.name,
+                              tool_version: tool.lti_version,
+                              tool_client_id: tool.global_developer_key_id.to_s,
+                              account_id: account.id.to_s,
+                              root_account_uuid: account.uuid,
+                              launch_type:,
+                              message_type: service.message_type,
+                              placement:,
+                              context_id: context.id.to_s,
+                              context_type: context.class.name,
+                              user_id: user.id.to_s,
+                              session_id:,
+                              shard_id: Shard.current.id.to_s,
+                              user_relationship:
+                            })
     end
 
-    it "includes tool domain" do
-      expect(subject[:tool_domain]).to eq(tool.domain)
+    context "when the context is a course" do
+      let_once(:context) { course_model(root_account: account) }
+
+      it "includes the associated account id and root account uuid" do
+        expect(subject[:account_id]).to eq(account.id.to_s)
+        expect(subject[:root_account_uuid]).to eq(account.uuid)
+      end
     end
 
-    it "includes tool url" do
-      expect(subject[:tool_url]).to eq(tool.url)
+    context "when the context is an account" do
+      let_once(:context) { account }
+
+      it "includes the associated account id and root account uuid" do
+        expect(subject[:account_id]).to eq(context.id.to_s)
+        expect(subject[:root_account_uuid]).to eq(account.uuid)
+      end
     end
 
-    it "includes tool name" do
-      expect(subject[:tool_name]).to eq(tool.name)
-    end
+    context "when the context is a group" do
+      let_once(:context) { group_model(context: course, root_account: account) }
+      let_once(:course) { course_model(root_account: account) }
 
-    it "includes tool lti version" do
-      expect(subject[:tool_version]).to eq(tool.lti_version)
-    end
-
-    it "includes tool developer key id" do
-      expect(subject[:tool_client_id]).to eq(tool.global_developer_key_id.to_s)
-    end
-
-    it "includes launch type" do
-      expect(subject[:launch_type]).to eq(launch_type)
-    end
-
-    it "includes placement" do
-      expect(subject[:placement]).to eq(placement)
-    end
-
-    it "includes context id" do
-      expect(subject[:context_id]).to eq(context.global_id.to_s)
-    end
-
-    it "includes context type" do
-      expect(subject[:context_type]).to eq(context.class.name)
-    end
-
-    it "includes user id" do
-      expect(subject[:user_id]).to eq(user.global_id.to_s)
-    end
-
-    it "includes user relationship" do
-      expect(subject[:user_relationship]).to eq(user_relationship)
+      it "includes the associated account id" do
+        expect(subject[:account_id]).to eq(account.id.to_s)
+        expect(subject[:root_account_uuid]).to eq(account.uuid)
+      end
     end
   end
 
@@ -177,10 +183,10 @@ describe Lti::LogService do
     end
 
     context "when context is a Group" do
-      let(:context) { group_model(context: course, root_account: account) }
-      let(:course) { course_model(root_account: account) }
+      let_once(:context) { group_model(context: course, root_account: account) }
+      let_once(:course) { course_model(root_account: account) }
 
-      before do
+      before(:once) do
         context.add_user(user)
         course.enroll_user(user, "StudentEnrollment")
         course.enroll_user(user, "TaEnrollment")
@@ -200,9 +206,9 @@ describe Lti::LogService do
     end
 
     context "when context is a Course" do
-      let(:context) { course_model(root_account: account) }
+      let_once(:context) { course_model(root_account: account) }
 
-      before do
+      before(:once) do
         context.enroll_user(user, "StudentEnrollment")
         context.enroll_user(user, "TaEnrollment")
       end
