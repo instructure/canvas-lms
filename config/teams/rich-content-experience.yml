@@ -1,0 +1,9 @@
+name: rich-content-experience
+owned_globs:
+  - packages/canvas-rce/**/*
+  - packages/canvas-media/**/*
+  - lib/course_link_validator.rb
+  - app/views/courses/link_validator.html.erb
+  - ui/features/course_link_validator/**/*
+  - ui/shared/immersive-reader/**/*
+  - app/controllers/immersive_reader_controller.rb

@@ -1,12 +1,5 @@
-name: learning-foundations
+name: learning-experience
 owned_globs:
-  - packages/canvas-rce/**/*
-  - packages/canvas-media/**/*
-  - lib/course_link_validator.rb
-  - app/views/courses/link_validator.html.erb
-  - ui/features/course_link_validator/**/*
-  - ui/shared/immersive-reader/**/*
-  - app/controllers/immersive_reader_controller.rb
   - app/models/wiki.rb
   - app/models/wiki_page.rb
   - app/models/wiki_page_lookup.rb
@@ -28,8 +21,6 @@ owned_globs:
   - ui/features/syllabus/**/*
   - ui/shared/syllabus/**/*
   - app/views/assignments/syllabus.html.erb
-  - app/models/content_share.rb
-  - ui/shared/direct-sharing/**/*
   - app/controllers/calendar*
   - app/models/calendar_event.rb
   - lib/api/v1/account_calendar.rb
