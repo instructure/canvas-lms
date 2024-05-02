@@ -17138,7 +17138,7 @@ es-ES:
       description: "Ingreso de Microsoft"
     microsoft_settings: 
       description: |-
-          Tendrás que registrar una [nueva aplicación con Microsoft](%{ms_app_url}).
+          Tendrás que registrar una [nueva aplicación con Microsoft](%{ms_app_url}).* *
           Debes configurar %{callback_url} como la URI de redireccionamiento.
           Después de guardar tu aplicación, anota el identificador de la aplicación y secret, e introdúcelos aquí.
       labels: 
