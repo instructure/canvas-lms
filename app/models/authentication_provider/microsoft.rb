@@ -66,7 +66,7 @@ class AuthenticationProvider::Microsoft < AuthenticationProvider::OpenIDConnect
   end
 
   def login_attribute
-    super || "id"
+    raw_login_attribute || "tid+oid"
   end
 
   def unique_id(token)

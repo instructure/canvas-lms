@@ -720,7 +720,7 @@ describe Pseudonym do
     end
 
     context "with contemporary auth types" do
-      let!(:aac) { Account.default.authentication_providers.create!(auth_type: "microsoft") }
+      let!(:aac) { Account.default.authentication_providers.create!(auth_type: "microsoft", login_attribute: "sub") }
 
       before do
         new_pseud.authentication_provider_id = aac.id
