@@ -139,7 +139,7 @@ export const GradingSchemeTable = ({
               }`}
               {...props}
             >
-              <Table.Head renderSortLabel="Sort by">{header}</Table.Head>
+              <Table.Head renderSortLabel={I18n.t('Sort by')}>{header}</Table.Head>
               <Table.Body>
                 {currentPageSchemes.map(gradingSchemeCard => (
                   <Table.Row

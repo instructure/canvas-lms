@@ -15,17 +15,20 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React from 'react'
-import type {RouteObject} from 'react-router-dom'
-import {ManagePage} from './pages/manage/ManagePage'
 
-export const ManageRoutes: ReadonlyArray<RouteObject> = [
-  {
-    path: 'manage',
-    element: <ManagePage />,
-  },
-  {
-    path: 'manage/:registration_id',
-    element: <div>TODO: registration detail</div>,
-  },
-]
+import type {ParsedSearchParamsValue} from '../../../common/lib/useZodParams/useZodSearchParams'
+import {useZodSearchParams} from '../../../common/lib/useZodParams/useZodSearchParams'
+import {z} from 'zod'
+
+export const ZManageSearchParams = {
+  q: z.string().optional(),
+  sort: z
+    .enum(['name', 'nickname', 'lti_version', 'installed', 'installed_by', 'on'])
+    .default('name'),
+  dir: z.enum(['asc', 'desc']).default('asc'),
+  page: z.string().pipe(z.coerce.number()).default('1'),
+}
+
+export type ManageSearchParams = ParsedSearchParamsValue<typeof ZManageSearchParams>
+
+export const useManageSearchParams = () => useZodSearchParams(ZManageSearchParams)

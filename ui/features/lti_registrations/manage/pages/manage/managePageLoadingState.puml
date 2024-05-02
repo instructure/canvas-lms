@@ -1,0 +1,14 @@
+@startuml
+NotRequested: Data is not requested
+Stale: Data on screen doesn't match filters,\n but no request is made yet\ndata: List<Registration>
+Reloading: A new List is being fetched\nlastRequested: date\ndata?: List<Registration>
+Loaded: A List of items has been loaded\ndata: List<Registration>
+Error: An error ocurred while loading
+
+[*] --> NotRequested
+NotRequested --> Reloading
+Stale --> Reloading
+Reloading --> Loaded
+Reloading --> Error
+Loaded --> Stale
+@enduml

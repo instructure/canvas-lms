@@ -1,0 +1,165 @@
+/*
+ * Copyright (C) 2024 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+import {debounce} from 'lodash'
+import React from 'react'
+import {ExtensionsSearchBar} from './ExtensionsSearchBar'
+
+import GenericErrorPage from '@canvas/generic-error-page/react'
+import {useScope as useI18nScope} from '@canvas/i18n'
+import errorShipUrl from '@canvas/images/ErrorShip.svg'
+import {Flex} from '@instructure/ui-flex'
+import {Pagination} from '@instructure/ui-pagination'
+import {Spinner} from '@instructure/ui-spinner'
+import {fetchRegistrations} from '../../api/registrations'
+import {ExtensionsTable} from './ExtensionsTable'
+import {MANAGE_EXTENSIONS_PAGE_LIMIT, mkUseManagePageState} from './ManagePageLoadingState'
+import {type ManageSearchParams, useManageSearchParams} from './ManageSearchParams'
+import {formatSearchParamErrorMessages} from '../../../common/lib/useZodParams/ParamsParseResult'
+
+const SEARCH_DEBOUNCE_MS = 250
+
+const I18n = useI18nScope('lti_registrations')
+
+export const ManagePage = () => {
+  const [searchParams] = useManageSearchParams()
+  return searchParams.success ? (
+    <ManagePageInner searchParams={searchParams.value} />
+  ) : (
+    <GenericErrorPage
+      imageUrl={errorShipUrl}
+      errorMessage="Error parsing query"
+      stack={`error parsing query:\n${formatSearchParamErrorMessages(searchParams.errors)}`}
+      errorCategory="Dynamic Registration"
+    />
+  )
+}
+
+type ManagePageInnerProps = {
+  searchParams: ManageSearchParams
+}
+
+const useManagePageState = mkUseManagePageState(fetchRegistrations)
+
+export const ManagePageInner = (props: ManagePageInnerProps) => {
+  const {sort, dir, page} = props.searchParams
+
+  const [, setManageSearchParams] = useManageSearchParams()
+
+  const [extensions, {setStale}] = useManagePageState(props.searchParams)
+
+  /**
+   * Holds the state of the search input field
+   */
+  const [query, setQuery] = React.useState(props.searchParams.q ?? '')
+
+  /**
+   * Updates the query parameter in the URL,
+   * which will trigger a reload of the data
+   */
+  const updateSearchParams = React.useCallback(
+    (params: Partial<Record<keyof ManageSearchParams, string | undefined>>) => {
+      setStale()
+      setManageSearchParams(params)
+    },
+    [setStale, setManageSearchParams]
+  )
+
+  /**
+   * A debounced version of {@link updateSearchParam}
+   */
+  const updateQueryParamDebounced = React.useCallback(
+    debounce((q: string) => {
+      updateSearchParams({q: q === '' ? undefined : q, page: undefined})
+    }, SEARCH_DEBOUNCE_MS),
+    [updateSearchParams]
+  )
+
+  const handleChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setStale()
+      const value = event.target.value
+      setQuery(value)
+      updateQueryParamDebounced(value)
+    },
+    [setStale, updateQueryParamDebounced]
+  )
+
+  const handleClear = React.useCallback(() => {
+    setStale()
+    setQuery('')
+    updateSearchParams({q: undefined, page: undefined})
+  }, [setStale, updateSearchParams])
+
+  return (
+    <div>
+      <ExtensionsSearchBar value={query} handleChange={handleChange} handleClear={handleClear} />
+      {(() => {
+        if (extensions._type === 'error') {
+          return (
+            <GenericErrorPage
+              imageUrl={errorShipUrl}
+              errorSubject="LTI Registrations listing error"
+              error={extensions.message}
+            />
+          )
+        } else if ('items' in extensions && typeof extensions.items !== 'undefined') {
+          return (
+            <>
+              <ExtensionsTable
+                stale={extensions._type === 'reloading' || extensions._type === 'stale'}
+                extensions={extensions.items}
+                sort={sort}
+                dir={dir}
+                updateSearchParams={updateSearchParams}
+              />
+              <Pagination
+                as="nav"
+                margin="small"
+                variant="compact"
+                labelNext={I18n.t('Next Page')}
+                labelPrev={I18n.t('Previous Page')}
+              >
+                {Array.from(
+                  Array(Math.ceil(extensions.items.total / MANAGE_EXTENSIONS_PAGE_LIMIT))
+                ).map((_, i) => (
+                  <Pagination.Page
+                    // eslint-disable-next-line react/no-array-index-key
+                    key={i}
+                    current={i === page - 1}
+                    onClick={() => {
+                      setManageSearchParams({page: (i + 1).toString()})
+                    }}
+                  >
+                    {i + 1}
+                  </Pagination.Page>
+                ))}
+              </Pagination>
+            </>
+          )
+        } else {
+          return (
+            <Flex direction="column" alignItems="center" padding="large 0">
+              <Spinner renderTitle="Loading" />
+            </Flex>
+          )
+        }
+      })()}
+    </div>
+  )
+}
