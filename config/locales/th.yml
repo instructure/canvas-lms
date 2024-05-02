@@ -17044,7 +17044,7 @@ th:
       description: "การล็อกอินสำหรับ Microsoft"
     microsoft_settings: 
       description: |-
-          คุณจะต้องลงทะเบียน [แอพใหม่กับ Microsoft](%{ms_app_url}).
+          คุณจะต้องลงทะเบียน [แอพใหม่กับ Microsoft](%{ms_app_url}).* *
           คุณควรกำหนดค่า %{callback_url} เป็น URI เปลี่ยนเส้นทาง
           หลังจากบันทึกแอพของคุณ ให้จด ID แอพพลิเคชั่นและข้อมูลลับไว้ แล้วกรอกข้อมูลไว้ที่นี่
       labels: 
