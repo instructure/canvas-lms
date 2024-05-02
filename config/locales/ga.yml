@@ -16046,7 +16046,7 @@ ga:
       description: "Logáil isteach Microsoft"
     microsoft_settings: 
       description: |-
-          Beidh ort [aip nua a chlárú le Microsoft](%{ms_app_url}).
+          Beidh ort [aip nua a chlárú le Microsoft](%{ms_app_url}).* *
           Ba cheart duit cumrú %{callback_url} mar an URI Athdhírithe.
           Tar éis duit d’aip a shábháil, déan nóta d’ID an Iarratais agus an Rún, agus cuir isteach anseo iad.
       labels: 
