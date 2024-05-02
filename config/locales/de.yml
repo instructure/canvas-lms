@@ -5344,7 +5344,7 @@ de:
   avatar_for_studentname_8ea511ae: "Avatar für %{studentName}"
   avatar_for_user_name_61f6be17: "Avatar für %{user_name}"
   average_49c63f9b: Durchschnitt
-  average_is_not_a_good_fit_for_most_outcomes_based__f351ed94: "Der Durchschnitt passt nicht gut zu den meisten Lernergebnisorientierten oder leistungszielorientierten Anwendungsfällen, da die Studierenden möglicherweise Zeit benötigen, um ein das Leistungsziel eines Lernergebniss zu erreichen, und eine frühzeitig schlechtere Leistung den Durchschnitt senken kann."
+  average_is_not_a_good_fit_for_most_outcomes_based__f351ed94: "Die Verwendung des Durchschnitts als Berechnungsmethode für die meisten lernergebnis- oder leistungszielorientierten Anwendungsfälle ist nicht immer geeignet. Dies liegt daran, dass Studierende möglicherweise Zeit benötigen, um das Leistungsziel eines Lernergebnisses zu erreichen, und eine frühere schlechte Leistung den Durchschnitt negativ beeinflussen kann."
   average_score_15cd7c3c: Punktedurchschnitt
   avg_alignments_per_artifact_5573d99c: "Durchschn. Ausrichtungen pro Artefakt"
   avg_alignments_per_outcome_4daf75cd: "Durchschn. Ausrichtungen pro Lernergebnis"
@@ -5423,7 +5423,7 @@ de:
   between_1_and_99_d421a4c0: "Zwischen 1 % und 99 %"
   between_2_and_5_c34f5152: "Zwischen 2 und 5"
   between_50_and_99_72540d1c: "Zwischen 50% und 99%"
-  between_two_assessments_the_most_recent_assessment_9f616a5d: "Zwischen zwei Bewertungen wird die letzte Bewertung mit %{calculation_int} gewichtet und die erste mit %{remainder}. Für jede weitere Bewertung sinkt die Summe der vorherigen Punkteberechnungen um einen zusätzlichen Wert von %{remainder}. Wenn es nur ein Ergebnis gibt, wird der einzelne Punktestand zurückgegeben."
+  between_two_assessments_the_most_recent_assessment_9f616a5d: "Die Bewertung zwischen zwei Ergebnissen erfolgt, indem das letzte Ergebnis mit %{calculation_int} und das erste Ergebnis mit %{remainder} gewichtet wird. Bei jeder weiteren Bewertung wird die Summe der vorherigen Punkteberechnungen um einen zusätzlichen Wert von %{remainder} reduziert. Wenn es nur ein Ergebnis gibt, wird der einzelne Punktestand unverändert belassen."
   big_blue_button_conference: 
     create_time: "Uhrzeit erstellen"
     recording_setting: Aufzeichnung
@@ -10198,7 +10198,7 @@ de:
   deactivate_user_86c09036: "Benutzer\\*in deaktivieren"
   debugging_f98fcd74: Debugging
   debugging_info_advanced_a9e1cc08: "Debugging-Info (Erweitert) ..."
-  decaying_average_8bf6a0dd: "Abfallender Durchschnitt"
+  decaying_average_8bf6a0dd: "Decaying Average"
   decaying_average_recentint_remainderint_ab0636cc: "Durchschnittlicher Verfall – %{recentInt}%/%{remainderInt}%"
   december_acc47508: Dezember
   decorative_image_3c28aa7d: "Dekoratives Bild"
@@ -16724,12 +16724,12 @@ de:
   limit_assignment_names_lengths_max_255_5ee9ebb5: "Länge der Aufgabennamen begrenzen (max. 255)"
   limit_certain_lti_placements_to_authorized_tools_f4384cb6: "Bestimmte LTI-Platzierungen auf autorisierte Tools beschränken"
   limit_course_participation_to_term_or_custom_cours_67797a86: "Die Kursteilnahme auf Semester oder benutzerdefinierte Kurstermine beschränken?"
-  limit_each_time_slot_to_input_value_user_s_47461538: "Jedes Zeitfenster auf %{input_value} Benutzer(innen) begrenzen. "
+  limit_each_time_slot_to_input_value_user_s_47461538: "Jedes Zeitfenster auf %{input_value} Benutzer\\*innen beschränken."
   limit_each_time_slot_to_num_participants_groups_us_14ec4d65: "Jedes Zeitfenster auf %{num_participants} *Gruppen begrenzen.* **Benutzer\\*innen.**"
   limit_file_size_limit_per_file_b336c0d8: "%{file_size_limit} Begrenzung pro Datei"
   limit_group_members_to_leave_blank_for_no_limit_c341e248: "Gruppenmitglieder begrenzen auf (für „keine Begrenzung“ leer lassen)"
   limit_groups_to_group_limit_members_40651ea7: "Gruppen auf %{group_limit} Mitglieder beschränken"
-  limit_participants_to_attend_num_appointments_appo_dd3fd62f: "Teilnehmerzahl für %{num_appointments} Termine begrenzen."
+  limit_participants_to_attend_num_appointments_appo_dd3fd62f: "Teilnehmende können sich für maximal %{num_appointments} Termin(e) eintragen."
   limit_search_to_activity_after_c1ac2449: "Suche einschränken auf Aktivität danach"
   limit_search_to_activity_before_e05aad05: "Suche einschränken auf Aktivität davor"
   limit_section_privileges_e6425dfd: limit_section_privileges
@@ -19833,7 +19833,7 @@ de:
   most_recent_item_4487f7cc: "Letztes Element: "
   most_recent_result_counts_as_calculation_int_of_ma_13628bf0: "Die letzte Punktzahl zählt als %{calculation_int}% der Gewichtung für das Leistungsziel. Der Durchschnitt aller anderen Punktzahlen zählt als %{remainder}% der Gewichtung. Es müssen mind. 2 Ergebnisse vorliegen, bevor eine Punktezahl angezeigt wird."
   most_recent_result_counts_as_calculation_int_of_ma_a734a4db: "Das letzte Ergebnis zählt als %{calculation_int}% der Gewichtung für das Leistungsziel. Der Durchschnitt aller anderen Ergebnisse zählt als %{remainder}% der Gewichtung. Liegt nur ein Ergebnis vor, wird eine Punktzahl angezeigt."
-  most_recent_result_counts_as_calculation_int_of_ma_d2fc1d19: "Jüngste Ergebniszahlen als %{calculation_int} der Leistungszielgewichtung, Durchschnitt aller anderen Ergebnisse zählt als %{remainder}-Gewichtung. Wenn es nur ein Ergebnis gibt, wird der einzelne Punktestand zurückgegeben."
+  most_recent_result_counts_as_calculation_int_of_ma_d2fc1d19: "Punkte für das Ergebnis der jüngsten Aufgabe zählen als %{calculation_int} der Leistungszielgewichtung, der Durchschnitt aller anderen Ergebnisse wird mit %{remainder} gewichtet. Wenn es nur eine Aufgabe (und somit ein Ergebnis) gibt, fällt die Gewichtung weg und die Punkte für diese Aufgabe werden zu 100% gezählt."
   most_recent_score_13a87e8c: "Letzter Punktestand"
   mov_329e9416: MOV
   move_abf00365: Verschieben
@@ -22148,7 +22148,7 @@ de:
       description: Microsoft-Anmeldung
     microsoft_settings: 
       description: |-
-          Sie müssen eine [neue App mit Microsoft](%{ms_app_url}) registrieren.
+          Sie müssen eine [neue App mit Microsoft](%{ms_app_url}) registrieren.* *
           Sie sollten den %{callback_url} als URI zur Weiterleitung konfigurieren.
           Nachdem Sie Ihre App gespeichert haben, notieren Sie sich die App-ID und den App-Schlüssel und geben beide hier ein.
       labels: 
@@ -29903,7 +29903,7 @@ de:
   tls_7a2eaba5: TLS
   to_1126ab55: " bis"
   to_35c6baa2: "bis "
-  to_51406be9: Bis/An/Um
+  to_51406be9: An
   to_access_a_course_people_page_users_view_list_mus_5a4ee1a5: "Um auf die Seite „Teilnehmer\\*innen“ zugreifen zu können, muss „Benutzer\\*innen – Liste anzeigen“ ebenfalls aktiviert sein."
   to_access_assignment_submissions_through_assignmen_30c5c8f2: "Um auf Aufgabeneinreichungen über Aufgabenliste oder das Notenbuch zugreifen zu können und SpeedGrader anzuzeigen, muss eine der Optionen „Noten – alle Noten anzeigen“​oder „Noten – ändern“ ebenfalls aktiviert sein."
   to_access_assignment_submissions_through_assignmen_ce438715: |-
@@ -30030,7 +30030,7 @@ de:
   to_assign_students_to_a_group_enter_group_names_in_913d06fb: "Um Studierenden einer Gruppe zuzuweisen, geben Sie den Gruppennamen in der Spalte „group_name“ ein."
   to_be_added_2959cc72: Hinzuzufügen
   to_be_removed_d4b48586: "Soll entfernt werden"
-  to_c4c44f4b: bis/an/um
+  to_c4c44f4b: bis
   to_change_sis_account_id_the_user_must_have_manage_4b8a37a8: "Zum Ändern von sis_account_id muss die/der Benutzer\\*in manage_sis berechtigt sein."
   to_change_user_passwords_users_view_must_also_be_e_6aeea86c: "Um das Benutzerkennwort zu ändern, muss die Option „Benutzer\\*innen – Liste anzeigen“ ebenfalls aktiviert sein."
   to_check_for_other_broken_links_visit_the_course_l_ace6921d: "Besuchen Sie den Kurs-Link-Prüfer zur Prüfung auf weitere beschädigte Links."
