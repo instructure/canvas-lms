@@ -31,7 +31,7 @@ CanvasRails::Application.routes.draw do
     resources(:settings, controller: :enrollment_settings)
   end
 
-  resources(:users) do
+  scope '/users/:user_id' do
     resources(:assignments) do
       resources(:settings, controller: :student_assignment_settings)
     end
@@ -767,7 +767,7 @@ CanvasRails::Application.routes.draw do
   get 'search/bookmarks' => 'users#bookmark_search', as: :bookmark_search
   get 'search/rubrics' => 'search#rubrics'
   get 'search/all_courses' => 'search#all_courses'
-  resources :users, except: :destroy do
+  resources :users, except: [:destroy, :index] do
     match 'masquerade', via: [:get, :post]
     concerns :files, :file_images
 
