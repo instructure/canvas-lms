@@ -290,6 +290,10 @@ export default class WikiPageView extends Backbone.View {
   }
 
   renderItemAssignToTray(open) {
+    // not supported in group contexts
+    if (!this.course_id) {
+      return
+    }
     const returnFocusTo = document.querySelector('.assign-to-button')
     const mountPoint = document.getElementById('assign-to-mount-point')
     const onTrayClose = () => {
@@ -409,7 +413,7 @@ export default class WikiPageView extends Backbone.View {
       json.CAN.ACCESS_GEAR_MENU
     json.recent_announcements_enabled = !!ENV.SHOW_ANNOUNCEMENTS
     json.explicit_latex_typesetting = !!ENV.FEATURES?.explicit_latex_typesetting
-    json.differentiated_modules = !!ENV.FEATURES.differentiated_modules
+    json.differentiated_modules = !!ENV.FEATURES.differentiated_modules && !!this.course_id
 
     if (json.lock_info) {
       json.lock_info = clone(json.lock_info)

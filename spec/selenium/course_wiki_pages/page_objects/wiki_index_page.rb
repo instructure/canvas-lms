@@ -103,6 +103,10 @@ module CourseWikiIndexPage
     get "/courses/#{course_id}/pages"
   end
 
+  def visit_group_wiki_index_page(group_id)
+    get "/groups/#{group_id}/pages"
+  end
+
   def click_manage_wiki_page_item_button(wiki_page_title)
     manage_wiki_page_item_button(wiki_page_title).click
     wait_for_ajaximations
