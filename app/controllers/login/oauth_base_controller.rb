@@ -62,6 +62,8 @@ class Login::OAuthBaseController < ApplicationController
   end
 
   def find_pseudonym(unique_ids, provider_attributes = {})
+    unique_ids = unique_ids.first if unique_ids.is_a?(Array)
+
     unique_id = unique_ids.is_a?(Hash) ? unique_ids[@aac.login_attribute] : unique_ids
     if unique_id.nil?
       unknown_user_url = @domain_root_account.unknown_user_url.presence || login_url
