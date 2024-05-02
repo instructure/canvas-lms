@@ -20244,7 +20244,7 @@ en-CA:
       description: "Microsoft Login"
     microsoft_settings: 
       description: |-
-          You will need to register a [new app with Microsoft](%{ms_app_url}).
+          You will need to register a [new app with Microsoft](%{ms_app_url}).* *
           You should configure %{callback_url} as the Redirect URI.
           After you save your app, make a note of the Application ID and Secret, and enter them here.
       labels: 
