@@ -20183,7 +20183,7 @@ it:
       description: "Accesso Microsoft"
     microsoft_settings: 
       description: |-
-          Devi registrare una [nuova app con Microsoft](%{ms_app_url}).
+          Devi registrare una [nuova app con Microsoft](%{ms_app_url}).* *
           Devi configurare %{callback_url} come URI di reindirizzamento.
           Dopo aver salvato l'app, annota l'ID e il segreto dell'applicazione e inseriscili qui.
       labels: 
