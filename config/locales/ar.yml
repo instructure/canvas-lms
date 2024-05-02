@@ -23201,7 +23201,7 @@ ar:
       description: "تسجيل دخول Microsoft"
     microsoft_settings: 
       description: |-
-          ستحتاج لتسجيل [تطبيق جديد مع Microsoft](%{ms_app_url}).
+          ستحتاج لتسجيل [تطبيق جديد مع Microsoft](%{ms_app_url}).* *
           عليك بتكوين %{callback_url} كعنوان URL لإعادة التوجيه.
           بعد حفظ تطبيقك، قم بتدوين معرف وكلمة سر التطبيق، ثم أدخلهما هنا.
       labels: 
