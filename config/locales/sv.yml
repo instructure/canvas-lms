@@ -22244,7 +22244,7 @@ sv:
       description: Microsoft-inloggning
     microsoft_settings: 
       description: |-
-          Du måste registrera en [ny app med Microsoft](%{ms_app_url}).
+          Du måste registrera en [ny app med Microsoft](%{ms_app_url}).* *
           Du ska konfigurera %{callback_url} som omdirigerings-URI.
           När du sparar appen ska du notera applikations-ID och hemlighet och ange dem här.
       labels: 

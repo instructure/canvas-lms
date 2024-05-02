@@ -20240,7 +20240,7 @@ cy:
       description: "Mewngofnodi Microsoft"
     microsoft_settings: 
       description: |-
-          Bydd angen i chi gofrestru [ap newydd gyda Microsoft](%{ms_app_url}).
+          Bydd angen i chi gofrestru [ap newydd gyda Microsoft](%{ms_app_url}).* *
           Dylech ffurfweddu %{callback_url} fel yr URI Ailgyfeirio.
           Ar ôl i chi gadw’ch ap, gwnewch nodyn o ID a Chyfrinach y Rhaglen a’u nodi yma.
       labels: 

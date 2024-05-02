@@ -16997,7 +16997,7 @@ vi:
       description: "Đăng Nhập Microsoft"
     microsoft_settings: 
       description: |-
-          Bạn sẽ cần đăng ký [ứng dụng mới với Microsoft](%{ms_app_url}).
+          Bạn sẽ cần đăng ký [ứng dụng mới với Microsoft](%{ms_app_url}).* *
           Bạn nên định cấu hình %{callback_url} làm URL Chuyển Hướng.
           Sau khi bạn lưu ứng dụng của mình, hãy ghi chú ID và Mã Bảo Mật Ứng Dụng rồi nhập chúng vào đây.
       labels: 

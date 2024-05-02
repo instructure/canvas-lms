@@ -22228,7 +22228,7 @@ nl:
       description: "Microsoft aanmelding"
     microsoft_settings: 
       description: |-
-          Je moet je aanmelden op een [nieuwe app bij Microsoft](%{ms_app_url}).
+          Je moet je aanmelden op een [nieuwe app bij Microsoft](%{ms_app_url}).* *
           Je moet %{callback_url} configureren als de Redirect URI.
           Na het opslaan van je app, noteer je het Toepassing-ID en Geheim en voer je ze hier in.
       labels: 

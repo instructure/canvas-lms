@@ -18392,7 +18392,7 @@ sl:
       description: "Prijava v sistem Microsoft"
     microsoft_settings: 
       description: |-
-          Morali boste registrirati [novo aplikacijo v sistemu Microsoft](%{ms_app_url}).
+          Morali boste registrirati [novo aplikacijo v sistemu Microsoft](%{ms_app_url}).* *
           Kot identifikator URI za preusmerjanje morate konfigurirati povratni klic %{callback_url}.
           Ko shranite aplikacijo, si zabeležite njen ID aplikacije in njeno skrivnost ter ju vnesite sem.
       labels: 

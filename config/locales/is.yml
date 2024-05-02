@@ -20351,7 +20351,7 @@ is:
       description: "Microsoft innskráning"
     microsoft_settings: 
       description: |-
-          Þú þarft að skrá [nýtt smáforrit með Microsoft](%{ms_app_url}).
+          Þú þarft að skrá [nýtt smáforrit með Microsoft](%{ms_app_url}).* *
           Hafðu %{callback_url} sem beiningarslóð.
           Þegar þú hefur vistað forritið, skráðu auðkenni þess og lykil hérna.
       labels: 

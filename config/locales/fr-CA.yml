@@ -20966,7 +20966,7 @@ fr-CA:
       description: "Connexion Microsoft"
     microsoft_settings: 
       description: |-
-          Vous allez devoir enregistrer une [nouvelle application avec Microsoft](%{ms_app_url}).
+          Vous allez devoir enregistrer une [nouvelle application avec Microsoft](%{ms_app_url}).* *
           Vous devriez configurer %{callback_url} comme étant l'URL de redirection.
           Après avoir sauvegardé votre application, prenez note de l'ID client et du code secret client, et indiquez-les ici.
       labels: 
