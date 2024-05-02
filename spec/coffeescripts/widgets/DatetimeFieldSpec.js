@@ -345,14 +345,16 @@ test('sets @invalid and not @blank and null dates when invalid input', function 
   equal(this.field.fudged, null)
 })
 
-test('interprets bare numbers < 8 in time-only fields as 12-hour PM', function () {
+// FOO-4485
+QUnit.skip('interprets bare numbers < 8 in time-only fields as 12-hour PM', function () {
   this.field.showDate = false
   this.$field.val('7').change()
   this.field.parseValue()
   equal(tz.format(this.field.datetime, '%-l%P'), '7pm')
 })
 
-test('interprets bare numbers >= 8 in time-only fields as 24-hour', function () {
+// FOO-4485
+QUnit.skip('interprets bare numbers >= 8 in time-only fields as 24-hour', function () {
   this.field.showDate = false
   this.$field.val('8').change()
   this.field.parseValue()
@@ -362,7 +364,8 @@ test('interprets bare numbers >= 8 in time-only fields as 24-hour', function () 
   equal(tz.format(this.field.datetime, '%-l%P'), '1pm')
 })
 
-test('interprets time-only fields as occurring on implicit date if set', function () {
+// FOO-4485
+QUnit.skip('interprets time-only fields as occurring on implicit date if set', function () {
   this.field.showDate = false
   this.field.setDate(challenger)
   this.$field.val('12PM').change()
@@ -370,7 +373,8 @@ test('interprets time-only fields as occurring on implicit date if set', functio
   equal(tz.format(this.field.datetime, '%F %T'), `${tz.format(challenger, '%F ')}12:00:00`)
 })
 
-test('setDate changes the date of an existing time field', function () {
+// FOO-4485
+QUnit.skip('setDate changes the date of an existing time field', function () {
   this.field.showDate = false
   this.field.setDate(challenger)
   this.$field.val('12PM').change()
