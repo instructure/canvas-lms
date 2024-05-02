@@ -22153,7 +22153,7 @@ mi:
       description: "Microsoft Takiuru"
     microsoft_settings: 
       description: |-
-          Me  rēhita koe  i tētahi [taupānga hou ki Microsoft](%{ms_app_url}).
+          Me  rēhita koe  i tētahi [taupānga hou ki Microsoft](%{ms_app_url}).* *
           me whirihora e koe %{callback_url} rite te anō URI.
           I muri tiaki koe tou taupānga, hanga he tuhipoka o te ID Taupānga ko Huna ka whakauru rātou ki konei.
       labels: 
