@@ -17,19 +17,18 @@
  */
 
 import React from 'react'
-import {mount} from 'enzyme'
+import sinon from 'sinon'
 
 import GradeOverrideEntry from '@canvas/grading/GradeEntry/GradeOverrideEntry'
-import EditableCell from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/editors/TotalGradeOverrideCellEditor/EditableCell'
+import EditableCell from '../EditableCell'
+import {fireEvent, render} from '@testing-library/react'
 
-QUnit.module('GradebookGrid TotalGradeOverrideCellEditor EditableCell', suiteHooks => {
-  let $container
+describe('GradebookGrid TotalGradeOverrideCellEditor EditableCell', () => {
+  let ref
   let props
   let wrapper
 
-  suiteHooks.beforeEach(() => {
-    $container = document.body.appendChild(document.createElement('div'))
-
+  beforeEach(() => {
     const gradeEntry = new GradeOverrideEntry()
 
     props = {
@@ -41,29 +40,25 @@ QUnit.module('GradebookGrid TotalGradeOverrideCellEditor EditableCell', suiteHoo
     }
   })
 
-  suiteHooks.afterEach(() => {
-    wrapper.unmount()
-    $container.remove()
-  })
-
   function mountComponent() {
-    wrapper = mount(<EditableCell {...props} />, {attachTo: $container})
+    ref = React.createRef()
+    wrapper = render(<EditableCell {...props} ref={ref} />)
   }
 
   function getInstance() {
-    return wrapper.instance()
+    return ref.current
   }
 
   function getTextInput() {
-    return $container.querySelector('input[type="text"]')
+    return wrapper.container.querySelector('input[type="text"]')
   }
 
   function getInvalidGradeIndicator() {
-    return $container.querySelector('.Grid__GradeCell__InvalidGrade button')
+    return wrapper.container.querySelector('.Grid__GradeCell__InvalidGrade button')
   }
 
   function setTextInputValue(value) {
-    wrapper.find('input[type="text"]').simulate('change', {target: {value}})
+    fireEvent.change(wrapper.container.querySelector('input[type="text"]'), {target: {value}})
   }
 
   function simulateKeyDown(keyCode, shiftKey = false) {
@@ -74,60 +69,60 @@ QUnit.module('GradebookGrid TotalGradeOverrideCellEditor EditableCell', suiteHoo
   }
 
   function updateProps(nextProps) {
-    wrapper.setProps(nextProps)
+    wrapper.rerender(<EditableCell {...{...props, ...nextProps}} />)
   }
 
-  QUnit.module('#render()', () => {
+  describe('#render()', () => {
     test('renders a text input', () => {
       mountComponent()
-      ok(getTextInput())
+      expect(getTextInput()).toBeInTheDocument()
     })
 
     test('sets focus on the grade input', () => {
       mountComponent()
-      strictEqual(document.activeElement, getTextInput())
+      expect(document.activeElement).toBe(getTextInput())
     })
 
     test('disables the input when the grade is updating', () => {
       props.gradeIsUpdating = true
       mountComponent()
-      strictEqual(getTextInput().disabled, true)
+      expect(getTextInput()).toBeDisabled()
     })
 
     test('does not disable the input when the grade is not updating', () => {
       mountComponent()
-      strictEqual(getTextInput().disabled, false)
+      expect(getTextInput()).not.toBeDisabled()
     })
 
     test('displays the given grade info in the input', () => {
       mountComponent()
-      equal(getTextInput().value, '91%')
+      expect(getTextInput().value).toBe('91%')
     })
 
     test('displays the given pending grade info in the input', () => {
       props.pendingGradeInfo = props.gradeEntry.parseValue('92%')
       mountComponent()
-      equal(getTextInput().value, '92%')
+      expect(getTextInput().value).toBe('92%')
     })
 
     test('displays the invalid grade indicator when the pending grade info is invalid', () => {
       props.pendingGradeInfo = props.gradeEntry.parseValue('invalid')
       mountComponent()
-      ok(getInvalidGradeIndicator())
+      expect(getInvalidGradeIndicator()).toBeInTheDocument()
     })
 
     test('does not display the invalid grade indicator when the pending grade info is valid', () => {
       props.pendingGradeInfo = props.gradeEntry.parseValue('92%')
       mountComponent()
-      notOk(getInvalidGradeIndicator())
+      expect(getInvalidGradeIndicator()).toBeNull()
     })
   })
 
-  QUnit.module('#applyValue()', () => {
+  describe('#applyValue()', () => {
     test('calls the .onGradeUpdate prop', () => {
       mountComponent()
       getInstance().applyValue()
-      strictEqual(props.onGradeUpdate.callCount, 1)
+      expect(props.onGradeUpdate.callCount).toBe(1)
     })
 
     test('includes the current grade info when calling the .onGradeUpdate prop', () => {
@@ -136,22 +131,22 @@ QUnit.module('GradebookGrid TotalGradeOverrideCellEditor EditableCell', suiteHoo
       getInstance().applyValue()
       const [gradeInfo] = props.onGradeUpdate.lastCall.args
       const expected = props.gradeEntry.parseValue('93%')
-      deepEqual(gradeInfo, expected)
+      expect(gradeInfo).toEqual(expected)
     })
   })
 
-  QUnit.module('#focus()', () => {
+  describe('#focus()', () => {
     test('sets focus on the grade input', () => {
       mountComponent()
       document.body.focus()
       getInstance().focus()
-      strictEqual(document.activeElement, getTextInput())
+      expect(document.activeElement).toBe(getTextInput())
     })
   })
 
-  QUnit.module('#handleKeyDown()', () => {
-    QUnit.module('when the grade is valid', contextHooks => {
-      contextHooks.beforeEach(() => {
+  describe('#handleKeyDown()', () => {
+    describe('when the grade is valid', () => {
+      beforeEach(() => {
         props.pendingGradeInfo = props.gradeEntry.parseValue('92%')
         mountComponent()
       })
@@ -159,22 +154,20 @@ QUnit.module('GradebookGrid TotalGradeOverrideCellEditor EditableCell', suiteHoo
       test('does not skip SlickGrid default behavior when tabbing from the grade input', () => {
         getTextInput().focus()
         const continueHandling = simulateKeyDown(9, false) // tab to next cell
-        equal(typeof continueHandling, 'undefined')
+        expect(continueHandling).toBeUndefined()
       })
 
       test('does not skip SlickGrid default behavior when shift-tabbing from the grade input', () => {
         getTextInput().focus()
         const continueHandling = simulateKeyDown(9, true) // shift+tab back to previous cell
-        equal(typeof continueHandling, 'undefined')
+        expect(continueHandling).toBeUndefined()
       })
 
       // TODO: GRADE-1926 Ensure SlickGrid behavior is skipped when using the
-      // Grading Scheme Input
-      QUnit.skip('skips SlickGrid default behavior when the grade input handles the event')
     })
 
-    QUnit.module('when the grade is invalid', contextHooks => {
-      contextHooks.beforeEach(() => {
+    describe('when the grade is invalid', () => {
+      beforeEach(() => {
         props.pendingGradeInfo = props.gradeEntry.parseValue('invalid')
         mountComponent()
       })
@@ -182,55 +175,55 @@ QUnit.module('GradebookGrid TotalGradeOverrideCellEditor EditableCell', suiteHoo
       test('skips SlickGrid default behavior when tabbing from the invalid grade indicator', () => {
         getInvalidGradeIndicator().focus()
         const continueHandling = simulateKeyDown(9, false) // tab to grade input
-        strictEqual(continueHandling, false)
+        expect(continueHandling).toBeFalsy()
       })
 
       test('does not skip SlickGrid default behavior when tabbing from the grade input', () => {
         getTextInput().focus()
         const continueHandling = simulateKeyDown(9, false) // tab to next cell
-        equal(typeof continueHandling, 'undefined')
+        expect(continueHandling).toBeUndefined()
       })
 
       test('does not skip SlickGrid default behavior when shift-tabbing from the invalid grade indicator', () => {
         getInvalidGradeIndicator().focus()
         const continueHandling = simulateKeyDown(9, true) // shift+tab back to previous cell
-        equal(typeof continueHandling, 'undefined')
+        expect(continueHandling).toBeUndefined()
       })
 
       test('skips SlickGrid default behavior when shift-tabbing from the grade input', () => {
         getTextInput().focus()
         const continueHandling = simulateKeyDown(9, true) // shift+tab back to invalid grade indicator
-        strictEqual(continueHandling, false)
+        expect(continueHandling).toBeFalsy()
       })
     })
   })
 
-  QUnit.module('#isValueChanged()', () => {
+  describe('#isValueChanged()', () => {
     test('returns false when the grade input value has not changed', () => {
       mountComponent()
-      strictEqual(getInstance().isValueChanged(), false)
+      expect(getInstance().isValueChanged()).toBeFalsy()
     })
 
     test('returns true when the grade input value has changed', () => {
       mountComponent()
       setTextInputValue('93%')
-      strictEqual(getInstance().isValueChanged(), true)
+      expect(getInstance().isValueChanged()).toBeTruthy()
     })
   })
 
-  QUnit.module('when re-rendering', () => {
+  describe('when re-rendering', () => {
     test('sets focus on the grade input when the grade finishes updating', () => {
       props.gradeIsUpdating = true
       mountComponent()
       updateProps({gradeIsUpdating: false})
-      strictEqual(document.activeElement, getTextInput())
+      expect(document.activeElement).toBe(getTextInput())
     })
 
     test('does not set focus on the grade input when the grade has not finished updating', () => {
       props.gradeIsUpdating = true
       mountComponent()
       updateProps({gradeIsUpdating: true})
-      notEqual(document.activeElement, getTextInput())
+      expect(document.activeElement).not.toBe(getTextInput())
     })
   })
 })

@@ -17,29 +17,28 @@
  */
 
 import React from 'react'
-import {mount} from 'enzyme'
-import ReadOnlyCell from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/editors/AssignmentCellEditor/ReadOnlyCell'
+import sinon from 'sinon'
+import ReadOnlyCell from '../ReadOnlyCell'
+import {render} from '@testing-library/react'
 
-QUnit.module('GradebookGrid ReadOnlyCell', suiteHooks => {
-  let $container
+describe('GradebookGrid ReadOnlyCell', () => {
   let props
   let wrapper
+  let ref
 
   function mountComponent() {
-    return mount(<ReadOnlyCell {...props} />, {attachTo: $container})
+    ref = React.createRef()
+    wrapper = render(<ReadOnlyCell {...props} ref={ref} />)
   }
 
   function simulateKeyDown(keyCode, shiftKey = false) {
     const event = new Event('keydown')
     event.which = keyCode
     event.shiftKey = shiftKey
-    return wrapper.instance().handleKeyDown(event)
+    return ref.current.handleKeyDown(event)
   }
 
-  suiteHooks.beforeEach(() => {
-    $container = document.createElement('div')
-    document.body.appendChild($container)
-
+  beforeEach(() => {
     props = {
       assignment: {
         gradingType: 'points',
@@ -72,122 +71,116 @@ QUnit.module('GradebookGrid ReadOnlyCell', suiteHooks => {
     }
   })
 
-  suiteHooks.afterEach(() => {
+  afterEach(() => {
     wrapper.unmount()
-    $container.remove()
   })
 
-  QUnit.module('#render()', () => {
-    function getRenderedGrade() {
-      return wrapper.find('.Grid__GradeCell__Content').text()
-    }
-
+  describe('#render()', () => {
     test('sets focus on the tray button', () => {
-      wrapper = mountComponent()
-      strictEqual(wrapper.instance().trayButton, document.activeElement)
+      mountComponent()
+      expect(ref.current.trayButton).toBe(document.activeElement)
     })
 
     test('renders "Excused" when the submission is excused', () => {
       props.submission.grade = null
       props.submission.score = null
       props.submission.excused = true
-      wrapper = mountComponent()
-      equal(getRenderedGrade(), 'Excused')
+      mountComponent()
+      expect(wrapper.getByText('Excused')).toBeInTheDocument()
     })
 
     test('renders "–" (en dash) when the submission has no grade', () => {
       props.submission.grade = null
       props.submission.score = null
-      wrapper = mountComponent()
-      equal(getRenderedGrade(), '–')
+      mountComponent()
+      expect(wrapper.getByText('–')).toBeInTheDocument()
     })
 
     test('renders no text when the grade is not visible', () => {
       props.gradeIsVisible = false
-      wrapper = mountComponent()
-      strictEqual(getRenderedGrade(), '')
+      mountComponent()
+      expect(wrapper.container.querySelector('.Grid__GradeCell__Content')).toBeEmptyDOMElement()
     })
 
     test('renders the score converted to a points string  "enterGradesAs" is "points"', () => {
-      wrapper = mountComponent()
-      strictEqual(getRenderedGrade(), '7.8')
+      mountComponent()
+      expect(wrapper.getByText('7.8')).toBeInTheDocument()
     })
 
     test('renders the score converted to a percentage when "enterGradesAs" is "percent"', () => {
       props.enterGradesAs = 'percent'
-      wrapper = mountComponent()
-      equal(getRenderedGrade(), '78%')
+      mountComponent()
+      expect(wrapper.getByText('78%')).toBeInTheDocument()
     })
 
     test('renders the score converted to a letter grade when "enterGradesAs" is "gradingScheme"', () => {
       props.enterGradesAs = 'gradingScheme'
-      wrapper = mountComponent()
-      equal(getRenderedGrade(), 'C')
+      mountComponent()
+      expect(wrapper.getByText('C')).toBeInTheDocument()
     })
 
-    QUnit.module('when "enterGradesAs" is "passFail"', contextHooks => {
-      contextHooks.beforeEach(() => {
+    describe('when "enterGradesAs" is "passFail"', () => {
+      beforeEach(() => {
         props.enterGradesAs = 'passFail'
       })
 
       test('renders a checkmark when the grade is "complete"', () => {
         props.submission.rawGrade = 'complete'
-        wrapper = mountComponent()
-        strictEqual(wrapper.find('IconCheckMarkSolid').length, 1)
+        mountComponent()
+        expect(wrapper.container.querySelectorAll('svg[name="IconCheckMark"]')).toHaveLength(1)
       })
 
       test('renders an x-mark when the grade is "incomplete"', () => {
         props.submission.rawGrade = 'incomplete'
-        wrapper = mountComponent()
-        strictEqual(wrapper.find('IconEndSolid').length, 1)
+        mountComponent()
+        expect(wrapper.container.querySelectorAll('svg[name="IconEnd"]')).toHaveLength(1)
       })
     })
   })
 
-  QUnit.module('#handleKeyDown()', () => {
+  describe('#handleKeyDown()', () => {
     test('skips SlickGrid default behavior when pressing enter on tray button', () => {
-      wrapper = mountComponent()
+      mountComponent()
       const continueHandling = simulateKeyDown(13) // enter on tray button (open tray)
-      strictEqual(continueHandling, false)
+      expect(continueHandling).toBe(false)
     })
   })
 
-  QUnit.module('#gradeSubmission()', () => {
+  describe('#gradeSubmission()', () => {
     test('has no effect', () => {
-      wrapper = mountComponent()
-      wrapper.instance().gradeSubmission()
-      ok(true, 'satisfies the AssignmentCellEditor API')
+      mountComponent()
+      ref.current.gradeSubmission()
     })
   })
 
-  QUnit.module('#focus()', () => {
+  describe('#focus()', () => {
     test('sets focus on the tray button', () => {
-      wrapper = mountComponent()
-      wrapper.instance().focus()
-      strictEqual(wrapper.instance().trayButton, document.activeElement)
+      mountComponent()
+      ref.current.focus()
+      expect(wrapper.container.querySelector('button:focus')).toBeInTheDocument()
     })
   })
 
-  QUnit.module('#isValueChanged()', () => {
+  describe('#isValueChanged()', () => {
     test('returns false', () => {
-      wrapper = mountComponent()
-      strictEqual(wrapper.instance().isValueChanged(), false)
+      mountComponent()
+      expect(ref.current.isValueChanged()).toBe(false)
     })
   })
 
-  QUnit.module('"Toggle Tray" Button', () => {
+  describe('"Toggle Tray" Button', () => {
     test('calls onToggleSubmissionTrayOpen when clicked', () => {
       props.onToggleSubmissionTrayOpen = sinon.stub()
-      wrapper = mountComponent()
-      wrapper.find('.Grid__GradeCell__Options button').simulate('click')
-      strictEqual(props.onToggleSubmissionTrayOpen.callCount, 1)
+      mountComponent()
+      wrapper.container.querySelector('.Grid__GradeCell__Options button').click()
+      expect(props.onToggleSubmissionTrayOpen.callCount).toBe(1)
     })
 
     test('calls onToggleSubmissionTrayOpen with the student id and assignment id', () => {
       props.onToggleSubmissionTrayOpen = sinon.stub()
-      wrapper = mountComponent()
-      wrapper.find('.Grid__GradeCell__Options button').simulate('click')
-      deepEqual(props.onToggleSubmissionTrayOpen.getCall(0).args, ['1101', '2301'])
+      mountComponent()
+      wrapper.container.querySelector('.Grid__GradeCell__Options button').click()
+      expect(props.onToggleSubmissionTrayOpen.getCall(0).args).toStrictEqual(['1101', '2301'])
     })
   })
 })
