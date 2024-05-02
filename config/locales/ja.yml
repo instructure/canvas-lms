@@ -22232,7 +22232,7 @@ ja:
       description: "Microsoft ログイン"
     microsoft_settings: 
       description: |-
-          [Microsoftの新しいアプリ](%{ms_app_url})を登録する必要があります。
+          [Microsoftの新しいアプリ](%{ms_app_url})を登録する必要があります。* *
           認証されたコールバックURIとして、%{callback_url} を設定する必要があります。
           アプリケーションを保存後、アプリエーションIDとシークレットをメモし、それらをここに入力してください。
       labels: 
