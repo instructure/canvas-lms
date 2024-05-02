@@ -134,8 +134,8 @@ export function getInitialCourseContent(options: GradebookOptions): CourseConten
   const defaultGradingScheme = options.default_grading_standard
     ? {
         data: options.default_grading_standard,
-        pointsBased: false,
-        scalingFactor: 1.0,
+        pointsBased: options.default_grading_standard_points_based,
+        scalingFactor: options.default_grading_standard_scaling_factor,
       }
     : null
   return {
