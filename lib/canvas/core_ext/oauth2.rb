@@ -27,7 +27,9 @@ module AcceptOpenIDConnectParamAsValidResponse
     else
       opts[:params] = params
     end
+    Rails.logger.warn "OAuth2 request: #{opts.inspect}"
     response = request(options[:token_method], token_url, opts)
+    Rails.logger.warn "OAuth2 response: #{response.inspect}"
     error = OAuth2::Error.new(response)
     # only change is on this line; Microsoft doesn't send back an access_token if you're doing a pure OpenID Connect auth
     fail(error) if options[:raise_errors] && !(response.parsed.is_a?(Hash) && (response.parsed['access_token'] || response.parsed['id_token']))
