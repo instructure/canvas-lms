@@ -621,7 +621,7 @@ describe "account authentication" do
         keep_trying_until { expect(microsoft_aac.active.count).to eq 1 }
         config = microsoft_aac.active.last.reload
         expect(config.entity_id).to eq "1234"
-        expect(config.login_attribute).to eq "sub"
+        expect(config.login_attribute).to eq "tid+oid"
       end
 
       it "allows update of config", priority: "2" do
@@ -635,7 +635,7 @@ describe "account authentication" do
         expect(microsoft_aac.active.count).to eq 1
         config = microsoft_aac.active.last.reload
         expect(config.entity_id).to eq ""
-        expect(config.login_attribute).to eq "sub"
+        expect(config.login_attribute).to eq "tid+oid"
       end
 
       it "allows deletion of config", priority: "2" do
