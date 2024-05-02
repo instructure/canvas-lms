@@ -16053,7 +16053,7 @@ id:
       description: "Login Microsoft"
     microsoft_settings: 
       description: |-
-          Anda harus mendaftarkan [app baru dengan Microsoft](%{ms_app_url}).
+          Anda harus mendaftarkan [app baru dengan Microsoft](%{ms_app_url}).* *
           Anda harus mengonfigurasi %{callback_url} sebagai URI Pengalihan.
           Setelah menyimpan app, catat ID Aplikasi dan Rahasia, dan masukkan di sini.
       labels: 
