@@ -88,11 +88,10 @@ export const RubricCriteriaRow = ({
                       <Tag
                         text={
                           <AccessibleContent alt="Remove outcome">
-                            <Text>{outcome?.displayName}</Text>
+                            <Text>{outcome?.displayName || outcome?.title}</Text>
                           </AccessibleContent>
                         }
                         size="small"
-                        onClick={() => {}}
                         themeOverride={{
                           defaultBackground: 'white',
                           defaultBorderColor: 'rgb(3, 116, 181)',
@@ -101,9 +100,15 @@ export const RubricCriteriaRow = ({
                         data-testid="rubric-criteria-row-outcome-tag"
                       />
                     </View>
-                    <View as="div" margin="small 0 0 0" data-testid="rubric-criteria-outcome-title">
-                      <Text weight="bold">{outcome?.title}</Text>
-                    </View>
+                    {outcome?.displayName && (
+                      <View
+                        as="div"
+                        margin="small 0 0 0"
+                        data-testid="rubric-criteria-outcome-title"
+                      >
+                        <Text weight="bold">{outcome?.title}</Text>
+                      </View>
+                    )}
                     <View
                       as="div"
                       margin="small 0 0 0"
