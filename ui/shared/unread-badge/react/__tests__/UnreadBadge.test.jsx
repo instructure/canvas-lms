@@ -17,31 +17,36 @@
  */
 
 import React from 'react'
-import {mount, shallow} from 'enzyme'
 import UnreadBadge from '@canvas/unread-badge'
+import {render, screen} from '@testing-library/react'
 
-QUnit.module('UnreadBadge component')
-
-const defaultProps = () => ({
+const defaultProps = (props = {}) => ({
   unreadCount: 2,
   totalCount: 5,
-  unreadLabel: '2 unread replies',
-  totalLabel: '5 total replies',
+  unreadLabel: 'unreadLabel',
+  totalLabel: 'totalLabel',
+  ...props,
 })
 
-test('renders the UnreadBadge component', () => {
-  const tree = mount(<UnreadBadge {...defaultProps()} />)
-  ok(tree.exists())
-})
+const renderUnreadBadge = (props = {}) => render(<UnreadBadge {...defaultProps(props)} />)
 
-test('renders the correct unread count', () => {
-  const tree = shallow(<UnreadBadge {...defaultProps()} />)
-  const node = tree.find('.ic-unread-badge__unread-count')
-  equal(node.text(), '2')
-})
+describe('UnreadBadge', () => {
+  it('renders the UnreadBadge component', () => {
+    renderUnreadBadge()
 
-test('renders the correct total count', () => {
-  const tree = shallow(<UnreadBadge {...defaultProps()} />)
-  const node = tree.find('.ic-unread-badge__total-count')
-  equal(node.text(), '5')
+    expect(screen.getByText('unreadLabel')).toBeInTheDocument()
+    expect(screen.getByText('totalLabel')).toBeInTheDocument()
+  })
+
+  it('renders the correct unread count', () => {
+    renderUnreadBadge()
+
+    expect(screen.getByText('2 unread replies')).toBeInTheDocument()
+  })
+
+  it('renders the correct total count', () => {
+    renderUnreadBadge()
+
+    expect(screen.getByText('5 total replies')).toBeInTheDocument()
+  })
 })
