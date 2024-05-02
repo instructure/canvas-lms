@@ -22726,7 +22726,7 @@ pl:
       description: "Login do Microsoft"
     microsoft_settings: 
       description: |-
-          Musisz zarejestrować [nową aplikację w Microsoft](%{ms_app_url}).
+          Musisz zarejestrować [nową aplikację w Microsoft](%{ms_app_url}).* *
           Powinieneś skonfigurować %{callback_url}  jako Przekierowanie URL.
           Po zapisaniu aplikacji, zanotuj Identyfikator Klienta i Tajny klucz Klienta i wpisz je poniżej.
       labels: 
