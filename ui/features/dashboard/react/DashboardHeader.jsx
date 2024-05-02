@@ -357,6 +357,11 @@ class DashboardHeader extends React.Component {
   }
 
   renderResponsiveContent(canEnableElementaryDashboard) {
+    var responsiveSize = this.props.responsiveSize
+    if (observerMode() && responsiveSize == 'large') {
+      responsiveSize = 'medium'
+    }
+
     return (
       <div style={{backgroundColor: 'white', paddingBottom: 'small'}}>
         <Flex
@@ -458,8 +463,12 @@ class DashboardHeader extends React.Component {
   }
 }
 
+
 export {DashboardHeader}
-export default responsiviser()(DashboardHeader)
+export default responsiviser()(
+  DashboardHeader, 
+  ENV.FEATURES?.instui_header ? {small: '(max-width: 62em)', medium: '(max-width: 86em)'} : null
+)
 
 // extract this out to a property so tests can override it and not have to mock
 // out the timers in every single test.
