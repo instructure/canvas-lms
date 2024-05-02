@@ -253,31 +253,12 @@ describe "course settings" do
       test_select_standard_for @course.root_account
     end
 
-    it "toggles more options correctly" do
-      more_options_text = "more options"
-      fewer_options_text = "fewer options"
-      get "/courses/#{@course.id}/settings"
-
-      more_options_link = f(".course_form_more_options_link")
-      expect(more_options_link.text).to eq more_options_text
-      more_options_link.click
-      extra_options = f(".course_form_more_options")
-      expect(extra_options).to be_displayed
-      expect(more_options_link.text).to eq fewer_options_text
-      more_options_link.click
-      wait_for_ajaximations
-      expect(extra_options).not_to be_displayed
-      expect(more_options_link.text).to eq more_options_text
-    end
-
     it "shows the self enrollment code and url once enabled" do
       a = Account.default
       a.courses << @course
       a.settings[:self_enrollment] = "manually_created"
       a.save!
       get "/courses/#{@course.id}/settings"
-      f(".course_form_more_options_link").click
-      wait_for_ajaximations
       f("#course_self_enrollment").click
       wait_for_ajaximations
       wait_for_new_page_load { submit_form("#course_form") }
@@ -311,10 +292,6 @@ describe "course settings" do
 
     it "enables announcement limit if show announcements enabled" do
       get "/courses/#{@course.id}/settings"
-
-      more_options_link = f(".course_form_more_options_link")
-      more_options_link.click
-      wait_for_ajaximations
 
       # Show announcements and limit setting elements
       expect(course_show_announcements_on_home_page_label).to be_displayed
@@ -374,10 +351,6 @@ describe "course settings" do
       @account.enable_as_k5_account!
       get "/courses/#{@course.id}/settings"
 
-      more_options_link = f(".course_form_more_options_link")
-      more_options_link.click
-      wait_for_ajaximations
-
       expect(element_exists?("#course_show_announcements_on_home_page")).to be_falsey
       expect(element_exists?("#course_allow_student_discussion_topics")).to be_falsey
       expect(element_exists?("#course_hide_distribution_graphs")).to be_falsey
@@ -387,9 +360,6 @@ describe "course settings" do
     context "restrict_quantitative_data dependent settings" do
       it "shows by default" do
         get "/courses/#{@course.id}/settings"
-        more_options_link = f(".course_form_more_options_link")
-        more_options_link.click
-        wait_for_ajaximations
         expect(f("#course_hide_distribution_graphs")).to be_present
         expect(f("#course_hide_final_grades")).to be_present
       end
@@ -400,9 +370,6 @@ describe "course settings" do
         @course.save!
 
         get "/courses/#{@course.id}/settings"
-        more_options_link = f(".course_form_more_options_link")
-        more_options_link.click
-        wait_for_ajaximations
         expect(f("body")).not_to contain_jqcss("#course_hide_distribution_graphs")
         expect(f("#course_hide_final_grades")).to be_present
         # Verify that other parts of the settings are not visilbe when they shouldn't be
@@ -416,9 +383,6 @@ describe "course settings" do
         root_account.save!
 
         get "/courses/#{@course.id}/settings"
-        more_options_link = f(".course_form_more_options_link")
-        more_options_link.click
-        wait_for_ajaximations
         expect(f("#course_hide_distribution_graphs")).to be_present
         expect(f("#course_hide_final_grades")).to be_present
       end
@@ -429,9 +393,6 @@ describe "course settings" do
         @course.save!
 
         get "/courses/#{@course.id}/settings"
-        more_options_link = f(".course_form_more_options_link")
-        more_options_link.click
-        wait_for_ajaximations
         expect(f("#course_hide_distribution_graphs")).to be_present
         expect(f("#course_hide_final_grades")).to be_present
       end
@@ -465,8 +426,6 @@ describe "course settings" do
       replace_content(code_input, course_code)
       click_option("#course_locale", locale_text)
       click_option("#course_time_zone", time_zone_value, :value)
-      f(".course_form_more_options_link").click
-      wait_for_ajaximations
       expect(f(".course_form_more_options")).to be_displayed
       wait_for_new_page_load { submit_form(course_form) }
 

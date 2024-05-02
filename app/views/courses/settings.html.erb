@@ -626,8 +626,7 @@
             <% end %>
           </span>
           <% if !@context.elementary_homeroom_course? %>
-            <a href="#" role="button" class="course_form course_form_more_options_link" style="padding-<%= direction('left') %>: 20px;"><%= t('links.more_options', %{more options}) %></a>
-            <div class="course_form_more_options" style="display: none; padding-<%= direction('left') %>: 20px;">
+            <div class="course_form_more_options" style="padding-<%= direction('left') %>: 20px;">
               <% if @context.self_enrollment_allowed? %>
                 <div class="checkbox-flex-container">
                   <%= f.check_box :self_enrollment, :class => 'self_enrollment_checkbox', :disabled => !can_manage %>
