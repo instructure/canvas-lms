@@ -22225,7 +22225,7 @@ pt-BR:
       description: "Login da Microsoft"
     microsoft_settings: 
       description: |-
-          Você precisará registrar um [novo aplicativo com a Microsoft](%{ms_app_url}).
+          Você precisará registrar um [novo aplicativo com a Microsoft](%{ms_app_url}).* *
           Você deve configurar %{callback_url} como o URL de redirecionamento.
           Depois de criar o seu aplicativo, anote a ID do Aplicativo e o Segredo, e insira-os aqui.
       labels: 
