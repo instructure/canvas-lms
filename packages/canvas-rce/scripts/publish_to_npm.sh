@@ -95,7 +95,7 @@ if [ -z "$SKIP_ALERT" ]; then
     (
       aws --region us-east-1 sqs send-message \
         --queue-url https://sqs.us-east-1.amazonaws.com/636161780776/slack-lambda \
-        --message-body "{\"channel\":\"#ask-learning-foundations\",\"username\":\"RCE Publish\",\"text\":\"$SLACK_MESSAGE\"}"
+        --message-body "{\"channel\":\"#rich-content-experience\",\"username\":\"RCE Publish\",\"text\":\"$SLACK_MESSAGE\"}"
     ) || echo "Failed to send Slack message."
 else
     echo "Would have sent a Slack message:"
