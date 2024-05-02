@@ -22254,7 +22254,7 @@ pt:
       description: "Login Microsoft"
     microsoft_settings: 
       description: |-
-          Vai precisar de registar uma [nova app com Microsoft](%{ms_app_url}).
+          Vai precisar de registar uma [nova app com Microsoft](%{ms_app_url}).* *
           Deve configurar %{callback_url} como o URL de Redirecionamento.
           Depois de guardar a sua app, tome nota da ID da Aplicação e a Palavra chave, e insira-as aqui.
       labels: 
