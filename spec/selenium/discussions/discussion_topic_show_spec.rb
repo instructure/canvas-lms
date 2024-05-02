@@ -238,7 +238,7 @@ describe "Discussion Topic Show" do
         expect(reply_to_entry_contents).to include(format_date_for_view(@due_at))
       end
 
-      it "lets students see the checkpoints tray with completed status" do
+      it "lets students see the checkpoints tray with completed status on initial page load" do
         root_entry = @checkpointed_discussion.discussion_entries.create!(user: @student, message: "reply to topic")
 
         @replies_required.times { |i| @checkpointed_discussion.discussion_entries.create!(user: @student, message: "reply to entry #{i}", parent_entry: root_entry) }
@@ -253,6 +253,26 @@ describe "Discussion Topic Show" do
         reply_to_entry_contents = f("span[data-testid='reply_to_entry_section']").text
         expect(reply_to_entry_contents).to include("Completed")
         expect(reply_to_topic_contents).to include("Completed #{format_date_for_view(@checkpointed_discussion.discussion_entries.last.created_at)}")
+      end
+
+      it "lets students see completed status for reply to topic as soon as they successfully reply to topic" do
+        user_session(@student)
+        get "/courses/#{@course.id}/discussion_topics/#{@checkpointed_discussion.id}"
+
+        fj("button:contains('View Due Dates')").click
+        wait_for_ajaximations
+        reply_to_topic_contents = f("span[data-testid='reply_to_topic_section']").text
+        expect(reply_to_topic_contents).not_to include("Completed")
+        fj("button:contains('Close')").click
+
+        f("button[data-testid='discussion-topic-reply']").click
+        wait_for_ajaximations
+        type_in_tiny "textarea", "Test Reply"
+        fj("button:contains('Reply')").click
+        wait_for_ajaximations
+        fj("button:contains('View Due Dates')").click
+        reply_to_topic_contents = f("span[data-testid='reply_to_topic_section']").text
+        expect(reply_to_topic_contents).to include("Completed #{format_date_for_view(@checkpointed_discussion.reload.discussion_entries.last.created_at)}")
       end
 
       it "lets teachers see checkpoints tray" do

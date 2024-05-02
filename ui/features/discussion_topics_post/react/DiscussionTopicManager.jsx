@@ -28,6 +28,8 @@ import {
   SearchContext,
   DiscussionManagerUtilityContext,
   AllThreadsState,
+  REPLY_TO_TOPIC,
+  REPLY_TO_ENTRY,
 } from './utils/constants'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import LoadingIndicator from '@canvas/loading-indicator'
@@ -106,6 +108,9 @@ const DiscussionTopicManager = props => {
   const [isTopicHighlighted, setIsTopicHighlighted] = useState(false)
   const [highlightEntryId, setHighlightEntryId] = useState(ENV.discussions_deep_link?.entry_id)
   const [relativeEntryId, setRelativeEntryId] = useState(null)
+
+  const [replyToTopicSubmission, setReplytoTopicSubmission] = useState({})
+  const [replyToEntrySubmission, setReplyToEntrySubmission] = useState({})
 
   const [isUserMissingInitialPost, setIsUserMissingInitialPost] = useState(null)
 
@@ -231,6 +236,20 @@ const DiscussionTopicManager = props => {
     setIsGradedDiscussion(!!discussionTopicQuery?.data?.legacyNode?.assignment)
   }, [discussionTopicQuery])
 
+  const getSubmissionObject = (submissionsArray, submissionTag) => {
+    return submissionsArray.find(node => node.subAssignmentTag === submissionTag) || {}
+  }
+  // set initial checkpoint submission objects
+  useEffect(() => {
+    setTimeout(() => {
+      const submissionsArray =
+        discussionTopicQuery?.data?.legacyNode?.assignment?.mySubAssignmentSubmissionsConnection
+          ?.nodes || []
+      setReplytoTopicSubmission(getSubmissionObject(submissionsArray, REPLY_TO_TOPIC))
+      setReplyToEntrySubmission(getSubmissionObject(submissionsArray, REPLY_TO_ENTRY))
+    }, 0)
+  }, [discussionTopicQuery])
+
   const updateCache = (cache, result) => {
     try {
       const options = {
@@ -258,13 +277,31 @@ const DiscussionTopicManager = props => {
         }
         cache.writeQuery({...options, data: currentDiscussion})
       }
+
+      if (result.data.createDiscussionEntry.mySubAssignmentSubmissions?.length > 0) {
+        const submissionsArray = result.data.createDiscussionEntry.mySubAssignmentSubmissions
+        currentDiscussion.legacyNode.assignment.mySubAssignmentSubmissionsConnection.nodes =
+          submissionsArray
+        cache.writeQuery({...options, data: currentDiscussion})
+      }
     } catch (e) {
       discussionTopicQuery.refetch(variables)
     }
   }
 
+  const getCheckpointSubmission = (data, subAssignmentTag) => {
+    return (
+      data.createDiscussionEntry.mySubAssignmentSubmissions?.find(
+        sub => sub.subAssignmentTag === subAssignmentTag
+      ) || {}
+    )
+  }
+
   const onEntryCreationCompletion = data => {
     setHighlightEntryId(data.createDiscussionEntry.discussionEntry._id)
+    setReplytoTopicSubmission(getCheckpointSubmission(data, REPLY_TO_TOPIC))
+    setReplyToEntrySubmission(getCheckpointSubmission(data, REPLY_TO_ENTRY))
+
     if (sort === 'asc') {
       setPageNumber(discussionTopicQuery.data.legacyNode.entriesTotalPages - 1)
     }
@@ -359,6 +396,8 @@ const DiscussionTopicManager = props => {
                         setHighlightEntryId('DISCUSSION_ENTRY_PLACEHOLDER')
                       }}
                       isHighlighted={isTopicHighlighted}
+                      replyToTopicSubmission={replyToTopicSubmission}
+                      replyToEntrySubmission={replyToEntrySubmission}
                     />
 
                     {discussionTopicQuery.data.legacyNode.discussionEntriesConnection.nodes
