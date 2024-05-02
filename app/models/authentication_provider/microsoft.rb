@@ -47,7 +47,7 @@ class AuthenticationProvider::Microsoft < AuthenticationProvider::OpenIDConnect
 
   def self.recognized_params
     # need to filter out OpenIDConnect params, but still call super to get mfa_required
-    super - open_id_connect_params + %i[tenant login_attribute jit_provisioning allowed_tenants].freeze
+    super - open_id_connect_params + %i[tenant login_attribute jit_provisioning tenants].freeze
   end
 
   def self.login_attributes
@@ -73,15 +73,15 @@ class AuthenticationProvider::Microsoft < AuthenticationProvider::OpenIDConnect
     id_token = claims(token)
     settings["known_tenants"] ||= []
     (settings["known_tenants"] << id_token["tid"]).uniq!
-    allowed_tenants = allowed_tenants_value
-    if allowed_tenants.include?("common")
+    allowed_tenants = mapped_allowed_tenants
+    if allowed_tenants.empty? || allowed_tenants.include?("common")
       # allow anyone
-    elsif allowed_tenants.include?("guests")
+    elsif allowed_tenants.delete("guests")
       # just check the issuer
-      unless id_token["iss"] == "https://login.microsoftonline.com/#{tenant_value}/v2.0"
+      unless allowed_tenants.find { |tenant| id_token["iss"] == "https://login.microsoftonline.com/#{tenant}/v2.0" }
         raise OAuthValidationError, t("User is from unacceptable issuer %{issuer}.", issuer: id_token["iss"].inspect)
       end
-    elsif !allowed_tenants.empty? && !allowed_tenants.include?(id_token["tid"])
+    elsif !allowed_tenants.include?(id_token["tid"])
       raise OAuthValidationError, t("User is from unacceptable tenant %{tenant}.", tenant: id_token["tid"].inspect)
     end
 
@@ -95,13 +95,15 @@ class AuthenticationProvider::Microsoft < AuthenticationProvider::OpenIDConnect
     ids.slice("tid", *self.class.login_attributes)
   end
 
-  def allowed_tenants=(value)
+  def tenants=(value)
     value = value.split(",") if value.is_a?(String)
-    settings["allowed_tenants"] = value.map(&:strip).uniq
+    value = value.filter_map(&:strip).uniq
+    self.tenant = value.first
+    settings["allowed_tenants"] = value[1..]
   end
 
-  def allowed_tenants
-    settings["allowed_tenants"] || []
+  def tenants
+    [tenant.presence].compact + (settings["allowed_tenants"] || [])
   end
 
   protected
@@ -122,13 +124,19 @@ class AuthenticationProvider::Microsoft < AuthenticationProvider::OpenIDConnect
     result.join(" ")
   end
 
-  def tenant_value
-    return MICROSOFT_TENANT if tenant == "microsoft"
+  def mapped_allowed_tenants(tenants = self.tenants)
+    tenants.map do |tenant|
+      next MICROSOFT_TENANT if tenant == "microsoft"
 
-    tenant.presence || "common"
+      tenant
+    end
   end
 
-  def allowed_tenants_value
-    ([tenant_value.presence] + allowed_tenants).compact.uniq
+  def tenant_value
+    tenants = mapped_allowed_tenants
+    tenants.delete("guests")
+    return "common" if tenants.length != 1 || tenants == ["common"]
+
+    tenants.first
   end
 end
