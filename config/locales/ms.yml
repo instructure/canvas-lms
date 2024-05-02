@@ -16508,7 +16508,7 @@ ms:
       description: "Log Masuk Microsoft"
     microsoft_settings: 
       description: |-
-          Anda akan perlu mendaftarkan [apl baharu dengan Microsoft](%{ms_app_url}).
+          Anda akan perlu mendaftarkan [apl baharu dengan Microsoft](%{ms_app_url}).* *
           Anda sepatutnya mengkonfigurasikan %{callback_url} sebagai URI Hala Semula.
           Selepas anda menyimpan apl anda, salin ID Aplikasi dan Kod Rahsia, kemudian masukkan di sini.
       labels: 
