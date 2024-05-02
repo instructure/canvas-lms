@@ -72,6 +72,13 @@ describe AuthenticationProvider::Microsoft do
       expect(ap.settings["known_tenants"]).to eq [nil]
     end
 
+    it "calculates tid+oid when both are present" do
+      ap = AuthenticationProvider::Microsoft.new(account: Account.default, login_attribute: "tid+oid")
+      claims = { "tid" => "1234", "oid" => "5678" }
+      allow(ap).to receive(:claims).and_return(claims)
+      expect(ap.unique_id("token")).to eql claims.merge("tid+oid" => "1234#5678")
+    end
+
     it "enforces the tenant" do
       ap = AuthenticationProvider::Microsoft.new(account: Account.default, tenants: "microsoft")
       expect(ap.send(:tenant_value)).to eql AuthenticationProvider::Microsoft::MICROSOFT_TENANT
@@ -79,7 +86,7 @@ describe AuthenticationProvider::Microsoft do
       expect(ap.tenants).to eql ["microsoft"]
       claims = { "tid" => AuthenticationProvider::Microsoft::MICROSOFT_TENANT, "sub" => "abc" }
       allow(ap).to receive(:claims).and_return(claims)
-      expect(ap.unique_id("token")).to eql claims.merge("tid+oid" => "#{claims["tid"]}#")
+      expect(ap.unique_id("token")).to eql claims
       allow(ap).to receive(:claims).and_return({ "tid" => "elsewhise", "sub" => "abc" })
       expect { ap.unique_id("token") }.to raise_error(OAuthValidationError)
     end
@@ -91,7 +98,7 @@ describe AuthenticationProvider::Microsoft do
       expect(ap.tenants).to eql ["microsoft", "1234"]
       claims = { "tid" => "1234", "sub" => "abc" }
       allow(ap).to receive(:claims).and_return(claims)
-      expect(ap.unique_id("token")).to eql claims.merge("tid+oid" => "1234#")
+      expect(ap.unique_id("token")).to eql claims
       allow(ap).to receive(:claims).and_return({ "tid" => "elsewhise", "sub" => "abc" })
       expect { ap.unique_id("token") }.to raise_error(OAuthValidationError)
     end
@@ -104,7 +111,7 @@ describe AuthenticationProvider::Microsoft do
       allow(ap).to receive(:claims).and_return({ "tid" => "1234",
                                                  "sub" => "def",
                                                  "iss" => "https://login.microsoftonline.com/abc/v2.0" })
-      expect(ap.unique_id("token")).to eql({ "tid" => "1234", "sub" => "def", "tid+oid" => "1234#" })
+      expect(ap.unique_id("token")).to eql({ "tid" => "1234", "sub" => "def" })
       allow(ap).to receive(:claims).and_return({ "tid" => "elsewhise", "sub" => "abc" })
       expect { ap.unique_id("token") }.to raise_error(OAuthValidationError)
     end
@@ -117,7 +124,7 @@ describe AuthenticationProvider::Microsoft do
       allow(ap).to receive(:claims).and_return({ "tid" => "1234",
                                                  "sub" => "def",
                                                  "iss" => "https://login.microsoftonline.com/abc/v2.0" })
-      expect(ap.unique_id("token")).to eql({ "tid" => "1234", "sub" => "def", "tid+oid" => "1234#" })
+      expect(ap.unique_id("token")).to eql({ "tid" => "1234", "sub" => "def" })
       allow(ap).to receive(:claims).and_return({ "tid" => "elsewhise", "sub" => "abc" })
       expect { ap.unique_id("token") }.to raise_error(OAuthValidationError)
     end
