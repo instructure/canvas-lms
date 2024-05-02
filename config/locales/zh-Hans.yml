@@ -22211,7 +22211,7 @@ zh-Hans:
       description: 微软登录
     microsoft_settings: 
       description: |-
-          您将需要注册一个[带微软的新应用程序](%{ms_app_url})。
+          您将需要注册一个[带微软的新应用程序](%{ms_app_url})。* *
           您应该为重新导向的URI配置%{callback_url}。
           在保存您的应用程序后，记下申请 ID 和秘密，并在这里输入。
       labels: 
