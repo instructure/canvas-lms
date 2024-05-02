@@ -47,11 +47,11 @@ class AuthenticationProvider::Microsoft < AuthenticationProvider::OpenIDConnect
 
   def self.recognized_params
     # need to filter out OpenIDConnect params, but still call super to get mfa_required
-    super - open_id_connect_params + %i[tenant login_attribute jit_provisioning allowed_tenants].freeze
+    super - open_id_connect_params + %i[tenant login_attribute jit_provisioning tenants].freeze
   end
 
   def self.login_attributes
-    %w[sub email oid preferred_username].freeze
+    %w[tid+oid sub email oid preferred_username].freeze
   end
   validates :login_attribute, inclusion: login_attributes
 
@@ -79,17 +79,19 @@ class AuthenticationProvider::Microsoft < AuthenticationProvider::OpenIDConnect
     save! if changed?
 
     ids = id_token.as_json
-    ids["tid+oid"] = "#{ids["tid"]}##{ids["oid"]}"
-    ids.slice("tid", "tid+oid", *self.class.login_attributes)
+    ids["tid+oid"] = "#{ids["tid"]}##{ids["oid"]}" if ids["tid"] && ids["oid"]
+    ids.slice("tid", *self.class.login_attributes)
   end
 
-  def allowed_tenants=(value)
+  def tenants=(value)
     value = value.split(",") if value.is_a?(String)
-    settings["allowed_tenants"] = value.map(&:strip).uniq
+    value = value.filter_map(&:strip).uniq
+    self.tenant = value.first
+    settings["allowed_tenants"] = value[1..]
   end
 
-  def allowed_tenants
-    settings["allowed_tenants"] || []
+  def tenants
+    [tenant.presence].compact + (settings["allowed_tenants"] || [])
   end
 
   protected
@@ -105,14 +107,24 @@ class AuthenticationProvider::Microsoft < AuthenticationProvider::OpenIDConnect
   def scope
     result = []
     requested_attributes = [login_attribute] + federated_attributes.values.pluck("attribute")
-    result << "profile" if requested_attributes.intersect?(%w[name oid preferred_username])
+    result << "profile" if requested_attributes.intersect?(%w[name oid preferred_username tid+oid])
     result << "email" if requested_attributes.include?("email")
     result.join(" ")
   end
 
-  def tenant_value
-    return MICROSOFT_TENANT if tenant == "microsoft"
+  def mapped_allowed_tenants(tenants = self.tenants)
+    tenants.map do |tenant|
+      next MICROSOFT_TENANT if tenant == "microsoft"
 
-    tenant.presence || "common"
+      tenant
+    end
+  end
+
+  def tenant_value
+    tenants = mapped_allowed_tenants
+    tenants.delete("guests")
+    return "common" if tenants.length != 1 || tenants == ["common"]
+
+    tenants.first
   end
 end

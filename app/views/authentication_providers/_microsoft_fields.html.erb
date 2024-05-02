@@ -31,26 +31,20 @@ TEXT
     <%= f.label :application_secret, t('Application Secret'), class: 'ic-Label', for: "application_secret_#{presenter.id_suffix(aac)}" %>
     <%= f.password_field :application_secret, class: 'ic-Input', id: "application_secret_#{presenter.id_suffix(aac)}" %>
   </div><% end %>
-<p><%= t(<<~TEXT, wrappers: { "*" => "<code>\\1</code>" })
-To restrict to users of your Entra ID instance, enter your tenant here. You can use *microsoft* to only allow personal Microsoft accounts.
+<p><%= mt(<<~TEXT, wrappers: { "*" => "<code>\\1</code>" })
+To restrict to users of specific Entra ID instances, enter the tenant GUID(s) here, separated by commas.
+You can specify *microsoft* to allow personal Microsoft accounts.
+If your Entra ID is configured to allow guest users from other tenants, you can specify *guests* to allow them without specifically naming their tenant.
 TEXT
 %></p>
 <div class="ic-Form-control">
-  <%= f.label :tenant, t('Tenant'), class: 'ic-Label', for: "tenant_#{presenter.id_suffix(aac)}" %>
-  <%= f.text_field :tenant, class: 'ic-Input', id: "tenant_#{presenter.id_suffix(aac)}" %>
+  <%= f.label :tenants, t('Tenants'), class: 'ic-Label', for: "tenants_#{presenter.id_suffix(aac)}" %>
+  <%= f.text_field :tenants, class: 'ic-Input', id: "tenants_#{presenter.id_suffix(aac)}", value: aac.tenants.join(","), placeholder: '00000000-0000-0000-0000-000000000000,11111111-1111-1111-1111-111111111111' %>
 </div>
-<p><%= t(<<~TEXT, wrappers: { "*" => "<code>\\1</code>" })
-If your Entra ID is configured to allow guest users from other tenants, populating *guests* below will allow all Entra ID guest users to login.
-Otherwise you may manually enter any additional tenant IDs here, separated by commas.
-TEXT
-%></p>
-<div class="ic-Form-control">
-  <%= f.label :allowed_tenants, t('Allowed Tenants'), class: 'ic-Label', for: "allowed_tenants_#{presenter.id_suffix(aac)}" %>
-  <%= f.text_field :allowed_tenants, class: 'ic-Input', id: "allowed_tenants_#{presenter.id_suffix(aac)}", value: aac.allowed_tenants.join(",") %>
-</div>
-<p><%= t <<~TEXT
-Note that email may not always be populated in the user's profile at Microsoft.
-Oid will not be populated for personal Microsoft accounts.
+<p><%= mt(<<~TEXT, wrappers: { "*" => "<code>\\1</code>" })
+Note that all login attributes from Entra ID logins are potentially modifiable with the exception of *tid* and *oid*.
+To ensure user accounts cannot be compromised, you should only use an attribute besides *tid+oid* if you are certain
+it cannot be changed by users in all of your allowed Entra ID tenants.
 TEXT
 %></p>
 <%= render partial: 'login_attribute_dropdown', locals: { aac: aac, presenter: presenter, f: f } %>

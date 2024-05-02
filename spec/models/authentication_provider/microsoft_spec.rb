@@ -71,5 +71,12 @@ describe AuthenticationProvider::Microsoft do
       ap.unique_id("token")
       expect(ap.settings["known_tenants"]).to eq [nil]
     end
+
+    it "calculates tid+oid when both are present" do
+      ap = AuthenticationProvider::Microsoft.new(account: Account.default, login_attribute: "tid+oid")
+      claims = { "tid" => "1234", "oid" => "5678" }
+      allow(ap).to receive(:claims).and_return(claims)
+      expect(ap.unique_id("token")).to eql claims.merge("tid+oid" => "1234#5678")
+    end
   end
 end
