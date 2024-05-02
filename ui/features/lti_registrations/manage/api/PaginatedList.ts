@@ -16,14 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {Outlet} from 'react-router-dom'
+import * as z from 'zod'
 
-export const Manage = () => {
-  return (
-    <div>
-      <h1>This is the Manage page</h1>
-      <Outlet />
-    </div>
-  )
+/**
+ * Given a schema for a single item,
+ * returns a schema that will parse a
+ * paginated list of those items.
+ * @param itemSchema
+ * @returns
+ */
+export const ZPaginatedList = <ZA extends z.ZodTypeAny>(itemSchema: ZA) =>
+  z.object({
+    data: z.array(itemSchema),
+    total: z.number(),
+  })
+
+export type PaginatedList<A> = {
+  data: A[]
+  total: number
 }

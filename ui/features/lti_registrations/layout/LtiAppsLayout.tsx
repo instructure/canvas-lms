@@ -18,7 +18,7 @@
 
 import React from 'react'
 
-import {Link, Outlet, useMatch} from 'react-router-dom'
+import {Link, Outlet, useMatch, useNavigate} from 'react-router-dom'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Heading} from '@instructure/ui-heading'
@@ -31,8 +31,16 @@ import {useDynamicRegistrationState} from '../manage/dynamic_registration/Dynami
 
 const I18n = useI18nScope('lti_registrations')
 
-export const LtiAppsLayout = () => {
+export const LtiAppsLayout = React.memo(() => {
   const isManage = useMatch('/manage/*')
+  const navigate = useNavigate()
+
+  const onTabClick = React.useCallback(
+    (_, tab: {id?: string}) => {
+      navigate(tab.id === 'manage' ? '/manage' : '/')
+    },
+    [navigate]
+  )
 
   const queryClient = new QueryClient()
 
@@ -55,13 +63,11 @@ export const LtiAppsLayout = () => {
         ) : null}
       </Flex>
       <DynamicRegistrationModal contextId={contextId} />
-      <Text size="large">{I18n.t('Discover Something new or manage existing LTI extensions')}</Text>
-      <Tabs margin="medium auto" padding="medium" onRequestTabChange={() => {}}>
+      <Tabs margin="medium auto" padding="medium" onRequestTabChange={onTabClick}>
         {window.ENV.FEATURES.lti_registrations_discover_page && (
           <Tabs.Panel
             isSelected={!isManage}
-            id="tabB"
-            href="/"
+            id="discover"
             renderTitle={
               <Link style={{color: 'initial', textDecoration: 'initial'}} to="/">
                 {I18n.t('Discover')}
@@ -77,8 +83,8 @@ export const LtiAppsLayout = () => {
               {I18n.t('Manage')}
             </Link>
           }
-          id="tabA"
-          padding="large"
+          id="manage"
+          padding="large x-small"
           isSelected={!!isManage}
           active={true}
         >
@@ -87,4 +93,4 @@ export const LtiAppsLayout = () => {
       </Tabs>
     </QueryClientProvider>
   )
-}
+})

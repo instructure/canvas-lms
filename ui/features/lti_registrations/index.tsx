@@ -19,11 +19,9 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {createBrowserRouter, RouterProvider, Link} from 'react-router-dom'
-import {Discover} from './discover/components/Discover'
-import {Manage} from './manage/Manage'
 import {LtiAppsLayout} from './layout/LtiAppsLayout'
 import {DiscoverRoute} from './discover/components'
-import {ManageRoute} from './manage'
+import {ManageRoutes} from './manage'
 
 const getBasename = () => {
   const path = window.location.pathname
@@ -39,8 +37,8 @@ const router = createBrowserRouter(
       path: '/',
       element: <LtiAppsLayout />,
       children: window.ENV.FEATURES.lti_registrations_discover_page
-        ? [DiscoverRoute, ManageRoute]
-        : [ManageRoute],
+        ? [DiscoverRoute, ...ManageRoutes]
+        : [...ManageRoutes],
     },
   ],
   {
