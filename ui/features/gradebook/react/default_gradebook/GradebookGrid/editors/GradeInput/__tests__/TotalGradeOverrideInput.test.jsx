@@ -17,21 +17,18 @@
  */
 
 import React from 'react'
-import {mount} from 'enzyme'
 
-import GradeInput from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/editors/GradeInput/GradeInput'
+import GradeInput from '../GradeInput'
 import GradeOverrideEntry from '@canvas/grading/GradeEntry/GradeOverrideEntry'
+import {fireEvent, render, waitFor} from '@testing-library/react'
 
-/* eslint-disable qunit/no-identical-names */
-QUnit.module('GradebookGrid GradeInput', suiteHooks => {
-  let $container
+describe('GradebookGrid GradeInput', () => {
+  let ref
   let instance
   let props
   let wrapper
 
-  suiteHooks.beforeEach(() => {
-    $container = document.body.appendChild(document.createElement('div'))
-
+  beforeEach(() => {
     const gradeEntry = new GradeOverrideEntry({
       gradingScheme: {
         data: [
@@ -52,22 +49,19 @@ QUnit.module('GradebookGrid GradeInput', suiteHooks => {
     }
   })
 
-  suiteHooks.afterEach(() => {
-    wrapper.unmount()
-    $container.remove()
-  })
-
   function mountComponent() {
-    wrapper = mount(<GradeInput {...props} />, {attachTo: $container})
-    instance = wrapper.instance()
+    ref = React.createRef()
+    wrapper = render(<GradeInput {...props} ref={ref} />)
+    instance = ref.current
   }
 
   function updateProps(nextProps) {
-    wrapper.setProps(nextProps)
+    ref = React.createRef()
+    wrapper.rerender(<GradeInput {...{...props, ...nextProps}} ref={ref} />)
   }
 
   function getTextInput() {
-    return $container.querySelector('input[type="text"]')
+    return wrapper.container.querySelector('input[type="text"]')
   }
 
   function getTextInputValue() {
@@ -75,321 +69,319 @@ QUnit.module('GradebookGrid GradeInput', suiteHooks => {
   }
 
   function setTextInputValue(value) {
-    wrapper.find('input[type="text"]').simulate('change', {target: {value}})
+    fireEvent.change(wrapper.container.querySelector('input[type="text"]'), {target: {value}})
   }
 
-  QUnit.module('when using a grading scheme', () => {
+  describe('when using a grading scheme', () => {
     test('adds the PercentInput suffix class to the container', () => {
       // TODO: GRADE-1926, Use GradingSchemeInput suffix instead
       mountComponent()
-      const {classList} = $container.firstChild
-      strictEqual(classList.contains('Grid__GradeCell__PercentInput'), true)
+      expect(wrapper.container.querySelector('.Grid__GradeCell__PercentInput')).toBeInTheDocument()
     })
 
     test('renders a text input', () => {
       mountComponent()
-      ok(getTextInput())
+      expect(getTextInput()).toBeInTheDocument()
     })
 
     test('optionally disables the input', () => {
       props.disabled = true
       mountComponent()
-      strictEqual(getTextInput().disabled, true)
+      expect(getTextInput().disabled).toBeTruthy()
     })
   })
 
-  QUnit.module('when not using a grading scheme', contextHooks => {
-    contextHooks.beforeEach(() => {
+  describe('when not using a grading scheme', () => {
+    beforeEach(() => {
       props.gradeEntry = new GradeOverrideEntry({gradingScheme: null})
     })
 
     test('adds the PercentInput suffix class to the container', () => {
       mountComponent()
-      const {classList} = $container.firstChild
-      strictEqual(classList.contains('Grid__GradeCell__PercentInput'), true)
+      expect(wrapper.container.querySelector('.Grid__GradeCell__PercentInput')).toBeInTheDocument()
     })
 
     test('renders a text input', () => {
       mountComponent()
-      ok(getTextInput())
+      expect(getTextInput()).toBeInTheDocument()
     })
 
     test('optionally disables the input', () => {
       props.disabled = true
       mountComponent()
-      strictEqual(getTextInput().disabled, true)
+      expect(getTextInput()).toBeDisabled()
     })
   })
 
-  QUnit.module('when no grade is assigned', contextHooks => {
-    contextHooks.beforeEach(() => {
+  describe('when no grade is assigned', () => {
+    beforeEach(() => {
       props.gradeInfo = props.gradeEntry.gradeInfoFromGrade(null)
       mountComponent()
     })
 
     test('keeps the input blank', () => {
-      strictEqual(getTextInputValue(), '')
+      expect(getTextInputValue()).toBe('')
     })
 
     test('#gradeInfo is set to a null grade', () => {
       const grade = props.gradeEntry.parseValue('')
-      deepEqual(instance.gradeInfo, grade)
+      expect(instance.gradeInfo).toEqual(grade)
     })
 
     test('#hasGradeChanged() returns false when the input value has not changed', () => {
-      strictEqual(instance.hasGradeChanged(), false)
+      expect(instance.hasGradeChanged()).toBeFalsy()
     })
 
     test('#hasGradeChanged() returns true when the input value has changed', () => {
       setTextInputValue('A')
-      strictEqual(instance.hasGradeChanged(), true)
+      expect(instance.hasGradeChanged()).toBeTruthy()
     })
   })
 
-  QUnit.module('when a grade is assigned', () => {
-    QUnit.module('when using a grading scheme', contextHooks => {
-      contextHooks.beforeEach(() => {
+  describe('when a grade is assigned', () => {
+    describe('when using a grading scheme', () => {
+      beforeEach(() => {
         props.gradeInfo = props.gradeEntry.parseValue('91.1%')
         mountComponent()
       })
 
       test('sets the input value with the scheme grade', () => {
-        strictEqual(getTextInputValue(), 'A')
+        expect(getTextInputValue()).toBe('A')
       })
 
       test('#gradeInfo is set to equivalent grade info', () => {
         const gradeInfo = props.gradeEntry.parseValue('91.1%')
-        deepEqual(instance.gradeInfo, gradeInfo)
+        expect(instance.gradeInfo).toEqual(gradeInfo)
       })
 
       test('#hasGradeChanged() returns false when the input value matches the assigned scheme grade', () => {
         setTextInputValue(' A ')
-        strictEqual(instance.hasGradeChanged(), false)
+        expect(instance.hasGradeChanged()).toBeFalsy()
       })
 
       test('#hasGradeChanged() returns false when the input value matches as a percentage', () => {
         setTextInputValue('91.1')
-        strictEqual(instance.hasGradeChanged(), false)
+        expect(instance.hasGradeChanged()).toBeFalsy()
       })
 
       test('#hasGradeChanged() returns true when the input value differs from the assigned grade', () => {
         setTextInputValue('B')
-        strictEqual(instance.hasGradeChanged(), true)
+        expect(instance.hasGradeChanged()).toBeTruthy()
       })
     })
 
-    QUnit.module('when not using a grading scheme', contextHooks => {
-      contextHooks.beforeEach(() => {
+    describe('when not using a grading scheme', () => {
+      beforeEach(() => {
         props.gradeEntry = new GradeOverrideEntry({gradingScheme: null})
         props.gradeInfo = props.gradeEntry.parseValue('91.1%')
       })
 
       test('sets the input value with the percentage grade', () => {
         mountComponent()
-        strictEqual(getTextInputValue(), '91.1%')
+        expect(getTextInputValue()).toBe('91.1%')
       })
 
       test('rounds the input value to two decimal places', () => {
         props.gradeInfo = props.gradeEntry.parseValue('91.1234%')
         mountComponent()
-        strictEqual(getTextInputValue(), '91.12%')
+        expect(getTextInputValue()).toBe('91.12%')
       })
 
       test('strips insignificant zeros', () => {
         props.gradeInfo = props.gradeEntry.parseValue('91.0000%')
         mountComponent()
-        strictEqual(getTextInputValue(), '91%')
+        expect(getTextInputValue()).toBe('91%')
       })
 
       test('#gradeInfo is set to equivalent grade info', () => {
         mountComponent()
         const gradeInfo = props.gradeEntry.parseValue('91.1%')
-        deepEqual(instance.gradeInfo, gradeInfo)
+        expect(instance.gradeInfo).toEqual(gradeInfo)
       })
 
       test('#hasGradeChanged() returns false when the input value matches the assigned grade', () => {
         mountComponent()
         setTextInputValue(' 91.1 ')
-        strictEqual(instance.hasGradeChanged(), false)
+        expect(instance.hasGradeChanged()).toBeFalsy()
       })
 
       test('#hasGradeChanged() returns true when the input value differs from the assigned grade', () => {
         mountComponent()
         setTextInputValue('91.2')
-        strictEqual(instance.hasGradeChanged(), true)
+        expect(instance.hasGradeChanged()).toBeTruthy()
       })
     })
   })
 
-  QUnit.module('when no grade is assigned and a valid grade is pending', contextHooks => {
-    contextHooks.beforeEach(() => {
+  describe('when no grade is assigned and a valid grade is pending', () => {
+    beforeEach(() => {
       props.gradeInfo = props.gradeEntry.gradeInfoFromGrade(null)
     })
 
-    QUnit.module('when using a grading scheme', hooks => {
-      hooks.beforeEach(() => {
+    describe('when using a grading scheme', () => {
+      beforeEach(() => {
         props.pendingGradeInfo = props.gradeEntry.parseValue('91.1')
         mountComponent()
       })
 
       test('sets the input value with the scheme grade', () => {
-        strictEqual(getTextInputValue(), 'A')
+        expect(getTextInputValue()).toBe('A')
       })
 
       test('#gradeInfo is set to the pending grade info', () => {
         const gradeInfo = props.gradeEntry.parseValue('91.1')
-        deepEqual(instance.gradeInfo, gradeInfo)
+        expect(instance.gradeInfo).toEqual(gradeInfo)
       })
 
       test('#hasGradeChanged() returns false when the input value matches the pending scheme grade', () => {
         setTextInputValue(' A ')
-        strictEqual(instance.hasGradeChanged(), false)
+        expect(instance.hasGradeChanged()).toBeFalsy()
       })
 
       test('#hasGradeChanged() returns false when the input value matches as a percentage', () => {
         setTextInputValue('91.1')
-        strictEqual(instance.hasGradeChanged(), false)
+        expect(instance.hasGradeChanged()).toBeFalsy()
       })
 
       test('#hasGradeChanged() returns true when the input value differs from the pending grade', () => {
         setTextInputValue('B')
-        strictEqual(instance.hasGradeChanged(), true)
+        expect(instance.hasGradeChanged()).toBeTruthy()
       })
     })
 
-    QUnit.module('when not using a grading scheme', hooks => {
-      hooks.beforeEach(() => {
+    describe('when not using a grading scheme', () => {
+      beforeEach(() => {
         props.gradeEntry = new GradeOverrideEntry({gradingScheme: null})
         props.pendingGradeInfo = props.gradeEntry.parseValue('91.1')
       })
 
       test('sets the input value with the percentage grade', () => {
         mountComponent()
-        strictEqual(getTextInputValue(), '91.1%')
+        expect(getTextInputValue()).toBe('91.1%')
       })
 
       test('#gradeInfo is set to the pending grade info', () => {
         mountComponent()
         const gradeInfo = props.gradeEntry.parseValue('91.1')
-        deepEqual(instance.gradeInfo, gradeInfo)
+        expect(instance.gradeInfo).toEqual(gradeInfo)
       })
 
       test('#hasGradeChanged() returns false when the input value matches the pending grade', () => {
         mountComponent()
         setTextInputValue(' 91.1 ')
-        strictEqual(instance.hasGradeChanged(), false)
+        expect(instance.hasGradeChanged()).toBeFalsy()
       })
 
       test('#hasGradeChanged() returns true when the input value differs from the pending grade', () => {
         mountComponent()
         setTextInputValue('91.2')
-        strictEqual(instance.hasGradeChanged(), true)
+        expect(instance.hasGradeChanged()).toBeTruthy()
       })
     })
   })
 
-  QUnit.module('when a grade is assigned and an updated, valid grade is pending', contextHooks => {
-    contextHooks.beforeEach(() => {
+  describe('when a grade is assigned and an updated, valid grade is pending', () => {
+    beforeEach(() => {
       props.gradeInfo = props.gradeEntry.parseValue('89.9')
     })
 
-    QUnit.module('when using a grading scheme', hooks => {
-      hooks.beforeEach(() => {
+    describe('when using a grading scheme', () => {
+      beforeEach(() => {
         props.pendingGradeInfo = props.gradeEntry.parseValue('91.1')
         mountComponent()
       })
 
       test('sets the input value with the scheme grade of the pending grade', () => {
-        strictEqual(getTextInputValue(), 'A')
+        expect(getTextInputValue()).toBe('A')
       })
 
       test('#gradeInfo is set to pending grade info', () => {
         const gradeInfo = props.gradeEntry.parseValue('91.1')
-        deepEqual(instance.gradeInfo, gradeInfo)
+        expect(instance.gradeInfo).toEqual(gradeInfo)
       })
 
       test('#hasGradeChanged() returns false when the input value matches the pending scheme grade', () => {
         setTextInputValue(' A ')
-        strictEqual(instance.hasGradeChanged(), false)
+        expect(instance.hasGradeChanged()).toBeFalsy()
       })
 
       test('#hasGradeChanged() returns false when the input value matches as a percentage', () => {
         setTextInputValue('91.1')
-        strictEqual(instance.hasGradeChanged(), false)
+        expect(instance.hasGradeChanged()).toBeFalsy()
       })
 
       test('#hasGradeChanged() returns true when the input value differs from the pending grade', () => {
         setTextInputValue('C')
-        strictEqual(instance.hasGradeChanged(), true)
+        expect(instance.hasGradeChanged()).toBeTruthy()
       })
 
       test('#hasGradeChanged() returns true when the input value matches the assigned grade', () => {
         setTextInputValue('B')
-        strictEqual(instance.hasGradeChanged(), true)
+        expect(instance.hasGradeChanged()).toBeTruthy()
       })
     })
 
-    QUnit.module('when not using a grading scheme', hooks => {
-      hooks.beforeEach(() => {
+    describe('when not using a grading scheme', () => {
+      beforeEach(() => {
         props.gradeEntry = new GradeOverrideEntry({gradingScheme: null})
         props.pendingGradeInfo = props.gradeEntry.parseValue('91.1')
         mountComponent()
       })
 
       test('sets the input value with the percentage grade', () => {
-        strictEqual(getTextInputValue(), '91.1%')
+        expect(getTextInputValue()).toBe('91.1%')
       })
 
       test('#gradeInfo is set to the pending grade info', () => {
         const gradeInfo = props.gradeEntry.parseValue('91.1')
-        deepEqual(instance.gradeInfo, gradeInfo)
+        expect(instance.gradeInfo).toEqual(gradeInfo)
       })
 
       test('#hasGradeChanged() returns false when the input value matches the pending grade', () => {
         setTextInputValue(' 91.1 ')
-        strictEqual(instance.hasGradeChanged(), false)
+        expect(instance.hasGradeChanged()).toBeFalsy()
       })
 
       test('#hasGradeChanged() returns true when the input value differs from the pending grade', () => {
         setTextInputValue('91.2')
-        strictEqual(instance.hasGradeChanged(), true)
+        expect(instance.hasGradeChanged()).toBeTruthy()
       })
 
       test('#hasGradeChanged() returns true when the input value matches the assigned grade', () => {
         setTextInputValue('89.9')
-        strictEqual(instance.hasGradeChanged(), true)
+        expect(instance.hasGradeChanged()).toBeTruthy()
       })
     })
 
-    QUnit.module('when the pending grade cleared the assigned grade', hooks => {
-      hooks.beforeEach(() => {
+    describe('when the pending grade cleared the assigned grade', () => {
+      beforeEach(() => {
         props.gradeInfo = props.gradeEntry.parseValue('A')
         props.pendingGradeInfo = props.gradeEntry.parseValue('')
         mountComponent()
       })
 
       test('keeps the input blank', () => {
-        strictEqual(getTextInputValue(), '')
+        expect(getTextInputValue()).toBe('')
       })
 
       test('#gradeInfo is set to the pending blank grade info', () => {
         const gradeInfo = props.gradeEntry.parseValue('')
-        deepEqual(instance.gradeInfo, gradeInfo)
+        expect(instance.gradeInfo).toEqual(gradeInfo)
       })
 
       test('#hasGradeChanged() returns false while the input remains blank', () => {
-        strictEqual(instance.hasGradeChanged(), false)
+        expect(instance.hasGradeChanged()).toBeFalsy()
       })
 
       test('#hasGradeChanged() returns true when the input is not blank', () => {
         setTextInputValue('A')
-        strictEqual(instance.hasGradeChanged(), true)
+        expect(instance.hasGradeChanged()).toBeTruthy()
       })
     })
   })
 
-  QUnit.module('when a new grade changes from pending to applied', contextHooks => {
-    contextHooks.beforeEach(() => {
+  describe('when a new grade changes from pending to applied', () => {
+    beforeEach(() => {
       props.gradeInfo = props.gradeEntry.gradeInfoFromGrade(null)
       props.pendingGradeInfo = props.gradeEntry.parseValue('91.1')
       mountComponent()
@@ -402,25 +394,25 @@ QUnit.module('GradebookGrid GradeInput', suiteHooks => {
 
     test('sets the input value with the updated grade', () => {
       updateGrade()
-      strictEqual(getTextInputValue(), 'A')
+      expect(getTextInputValue()).toBe('A')
     })
 
     test('#gradeInfo is set to the updated grade info', () => {
       updateGrade()
       const gradeInfo = props.gradeEntry.parseValue('91.1')
-      deepEqual(instance.gradeInfo, gradeInfo)
+      expect(instance.gradeInfo).toEqual(gradeInfo)
     })
 
     test('does not update the input value when the input has focus', () => {
       getTextInput().focus()
       setTextInputValue('91.2%')
       updateGrade()
-      strictEqual(getTextInputValue(), '91.2%')
+      expect(getTextInputValue()).toBe('91.2%')
     })
   })
 
-  QUnit.module('when an updated grade changes from pending to applied', contextHooks => {
-    contextHooks.beforeEach(() => {
+  describe('when an updated grade changes from pending to applied', () => {
+    beforeEach(() => {
       props.gradeInfo = props.gradeEntry.parseValue('89.9')
       props.pendingGradeInfo = props.gradeEntry.parseValue('91.1')
       mountComponent()
@@ -433,66 +425,71 @@ QUnit.module('GradebookGrid GradeInput', suiteHooks => {
 
     test('sets the input value with the updated grade', () => {
       updateGrade()
-      strictEqual(getTextInputValue(), 'A')
+      expect(getTextInputValue()).toBe('A')
     })
 
     test('#gradeInfo is set to the updated grade info', () => {
       updateGrade()
       const gradeInfo = props.gradeEntry.parseValue('91.1')
-      deepEqual(instance.gradeInfo, gradeInfo)
+      expect(instance.gradeInfo).toEqual(gradeInfo)
     })
 
     test('does not update the input value when the input has focus', () => {
       getTextInput().focus()
       setTextInputValue('91.2%')
       updateGrade()
-      strictEqual(getTextInputValue(), '91.2%')
+      expect(getTextInputValue()).toBe('91.2%')
     })
   })
 
-  QUnit.module('#gradeInfo', () => {
+  describe('#gradeInfo', () => {
     test('is set to the parsed grade from the given GradeEntry', () => {
       mountComponent()
       setTextInputValue('91.1')
-      deepEqual(instance.gradeInfo, props.gradeEntry.parseValue('91.1'))
+      waitFor(() => {
+        expect(instance.gradeInfo).toBe(props.gradeEntry.parseValue('91.1'))
+      })
     })
 
     test('trims whitespace from the input value', () => {
       mountComponent()
       setTextInputValue('  90.0  ')
-      deepEqual(instance.gradeInfo, props.gradeEntry.parseValue('90.0'))
+      waitFor(() => {
+        expect(instance.gradeInfo).toBe(props.gradeEntry.parseValue('90.0'))
+      })
     })
 
     test('sets .grade to null when the input was cleared', () => {
       mountComponent()
       setTextInputValue('90.0')
       setTextInputValue('')
-      strictEqual(instance.gradeInfo.grade, null)
+      expect(instance.gradeInfo.grade).toBeNull()
     })
   })
 
-  QUnit.module('#focus()', () => {
+  describe('#focus()', () => {
     test('sets focus on the input', () => {
       mountComponent()
-      wrapper.instance().focus()
-      strictEqual(document.activeElement, getTextInput())
+      ref.current.focus()
+      expect(document.activeElement).toBe(getTextInput())
     })
 
     test('selects the content of the input', () => {
       props.gradeEntry = new GradeOverrideEntry({gradingScheme: null})
       props.gradeInfo = props.gradeEntry.parseValue('78.9')
       mountComponent()
-      wrapper.instance().focus()
-      strictEqual(document.getSelection().toString(), '78.9%')
+      ref.current.focus()
+      waitFor(() => {
+        expect(document.getSelection().toString()).toBe('78.9%')
+      })
     })
   })
 
-  QUnit.module('#handleKeyDown()', () => {
+  describe('#handleKeyDown()', () => {
     test('always returns undefined', () => {
       mountComponent()
-      const result = wrapper.instance().handleKeyDown({shiftKey: false, which: 9})
-      equal(typeof result, 'undefined')
+      const result = ref.current.handleKeyDown({shiftKey: false, which: 9})
+      expect(result).toBeUndefined()
     })
   })
 })
-/* eslint-enable qunit/no-identical-names */
