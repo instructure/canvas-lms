@@ -22228,7 +22228,7 @@ zh-Hant:
       description: 微軟登入
     microsoft_settings: 
       description: |-
-          您需要[在微軟上創建新應用](%{ms_app_url})。您需要將 
+          您需要[在微軟上創建新應用](%{ms_app_url})。您需要將 * *
           %{callback_url} 配置為重定向URL。在您保存應用之後，
           請保存好您的應用 ID 和密碼，並在此輸入。
       labels: 
