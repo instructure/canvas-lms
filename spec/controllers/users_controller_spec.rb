@@ -59,6 +59,9 @@ describe UsersController do
     let_once(:user) { user_factory(active_all: true) }
     before do
       account.account_users.create!(user:)
+      allow(Lti::LogService).to receive(:new) do
+        double("Lti::LogService").tap { |s| allow(s).to receive(:call) }
+      end
       user_session(user)
     end
 
@@ -114,6 +117,18 @@ describe UsersController do
         get :external_tool, params: { id: tool.id, user_id: user.id }
         expect(assigns[:lti_launch].resource_url).to eq override_url + "?first=john&last=smith"
       end
+    end
+
+    it "logs the launch" do
+      get :external_tool, params: { id: tool.id, user_id: user.id }
+      expect(Lti::LogService).to have_received(:new).with(
+        tool:,
+        context: account,
+        user:,
+        session_id: nil,
+        placement: :user_navigation,
+        launch_type: :direct_link
+      )
     end
 
     context "using LTI 1.3 when specified" do
