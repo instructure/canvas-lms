@@ -91,7 +91,7 @@ class AuthenticationProvider::Microsoft < AuthenticationProvider::OpenIDConnect
     save! if changed?
 
     ids = id_token.as_json
-    ids["tid+oid"] = "#{ids["tid"]}##{ids["oid"]}"
+    ids["tid+oid"] = "#{ids["tid"]}##{ids["oid"]}" if ids["tid"] && ids["oid"]
     ids.slice("tid", *self.class.login_attributes)
   end
 
