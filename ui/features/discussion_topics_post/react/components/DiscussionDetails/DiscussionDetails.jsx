@@ -83,6 +83,8 @@ export function DiscussionDetails({...props}) {
                   inPacedCourse={props.inPacedCourse}
                   courseId={props.courseId}
                   replyToEntryRequiredCount={props.discussionTopic.replyToEntryRequiredCount}
+                  replyToTopicSubmission={props.replyToTopicSubmission}
+                  replyToEntrySubmission={props.replyToEntrySubmission}
                 />
               </Flex.Item>
               {!props.discussionTopic.assignment.restrictQuantitativeData && (
@@ -117,6 +119,8 @@ DiscussionDetails.propTypes = {
   discussionTopic: PropTypes.object,
   inPacedCourse: PropTypes.bool,
   courseId: PropTypes.string,
+  replyToTopicSubmission: PropTypes.object,
+  replyToEntrySubmission: PropTypes.object,
 }
 
 export default DiscussionDetails

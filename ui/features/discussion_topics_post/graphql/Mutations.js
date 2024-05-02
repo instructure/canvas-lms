@@ -22,6 +22,7 @@ import {Discussion} from './Discussion'
 import {Error} from '../../../shared/graphql/Error'
 import gql from 'graphql-tag'
 import {User} from './User'
+import {Submission} from './Submission'
 
 export const DELETE_DISCUSSION_TOPIC = gql`
   mutation DeleteDiscussionTopic($id: ID!) {
@@ -132,10 +133,7 @@ export const CREATE_DISCUSSION_ENTRY = gql`
         }
       }
       mySubAssignmentSubmissions {
-        _id
-        subAssignmentTag
-        submissionStatus
-        submittedAt
+        ...Submission
       }
       errors {
         ...Error
@@ -144,6 +142,7 @@ export const CREATE_DISCUSSION_ENTRY = gql`
   }
   ${AnonymousUser.fragment}
   ${DiscussionEntry.fragment}
+  ${Submission.fragment}
   ${Error.fragment}
 `
 

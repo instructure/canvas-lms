@@ -286,6 +286,8 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                             discussionTopic={props.discussionTopic}
                             inPacedCourse={ENV.IN_PACED_COURSE}
                             courseId={ENV.course_id}
+                            replyToTopicSubmission={props.replyToTopicSubmission}
+                            replyToEntrySubmission={props.replyToEntrySubmission}
                           />
                           {props.discussionTopic.assignment?.assessmentRequestsForCurrentUser?.map(
                             assessmentRequest => (
@@ -549,6 +551,14 @@ DiscussionTopicContainer.propTypes = {
    * useState Boolean to toggle highlight
    */
   isHighlighted: PropTypes.bool,
+  /**
+   * useState object to set the REPLY_TO_TOPIC submission status
+   */
+  replyToTopicSubmission: PropTypes.object,
+  /**
+   * useState object to set the REPLY_TO_ENTRY submission status
+   */
+  replyToEntrySubmission: PropTypes.object,
 }
 
 export default DiscussionTopicContainer

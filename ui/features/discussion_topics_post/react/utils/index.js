@@ -369,6 +369,7 @@ export const getOptimisticResponse = ({
         depth,
         __typename: 'DiscussionEntry',
       },
+      mySubAssignmentSubmissions: [],
       errors: null,
       __typename: 'CreateDiscussionEntryPayload',
     },
