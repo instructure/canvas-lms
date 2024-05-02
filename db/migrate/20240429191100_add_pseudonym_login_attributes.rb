@@ -31,9 +31,10 @@ class AddPseudonymLoginAttributes < ActiveRecord::Migration[7.0]
 
       # login_attribute can only be set if authentication_provider_id is set
       # conversely, if authentication_provider_id IS NULL, login_attribute MUST be NULL
-      t.check_constraint <<~SQL.squish, name: "check_login_attribute_authentication_provider_id", if_not_exists: true
+      t.check_constraint <<~SQL.squish, name: "check_login_attribute_authentication_provider_id", validate: false, if_not_exists: true
         authentication_provider_id IS NOT NULL OR login_attribute IS NULL
       SQL
+      connection.validate_constraint :pseudonyms, "check_login_attribute_authentication_provider_id"
 
       t.index "LOWER(unique_id), account_id, authentication_provider_id, login_attribute",
               name: "index_pseudonyms_unique_with_login_attribute",
