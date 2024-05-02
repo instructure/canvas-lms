@@ -19124,7 +19124,7 @@ fi:
       description: Microsoft-sisäänkirjautuminen
     microsoft_settings: 
       description: |-
-          Sinun täytyy rekisteröidä [uusi sovellus Microsoftin kanssa](%{ms_app_url}).
+          Sinun täytyy rekisteröidä [uusi sovellus Microsoftin kanssa](%{ms_app_url}).* *
           Sinun pitäisi konfiguroida %{callback_url} uudelleenohjauksen URI-linkkinä.
           Kun olet tallentanut sovelluksesi, kirjoita sovellustunnus ja salasana muistiin ja syötä ne tänne.
       labels: 
