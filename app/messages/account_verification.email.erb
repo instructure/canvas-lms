@@ -1,0 +1,13 @@
+<% define_content :subject do %>
+  <%= t "Canvas Account Verification" %>
+<% end %>
+
+<%= t <<-BODY, email: asset.email, website: data.from_host || HostUrl.default_host, code: asset.verification_token
+The email address %{email} was used to log into Canvas at %{website}.
+
+Please use the following code to complete your login: %{code}
+NOTE: This code will expire in 15 minutes.
+
+If you did not try to log into Canvas, please disregard this message.
+BODY
+%>

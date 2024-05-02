@@ -146,6 +146,11 @@ class Pseudonym < ActiveRecord::Base
     p.dispatch :pseudonym_registration_done
     p.to { communication_channel || user.communication_channel }
     p.whenever { @send_registration_done_notification }
+
+    p.dispatch :account_verification
+    p.to { communication_channel || user.communication_channel }
+    p.whenever { saved_change_to_verification_token? }
+    p.data { { from_host: HostUrl.context_host(account) } }
   end
 
   def update_account_associations_if_account_changed
@@ -182,6 +187,24 @@ class Pseudonym < ActiveRecord::Base
     @send_confirmation = true
     save!
     @send_confirmation = false
+  end
+
+  def begin_login_attribute_migration!(unique_ids)
+    self.unique_ids = unique_ids
+    self.verification_token = CanvasSlug.generate(nil, 16)
+    save!
+  end
+
+  # supply either the verification code emailed to the user
+  # or an admin user who has permission to update the pseudonym
+  def migrate_login_attribute(code: nil, admin_user: nil)
+    return false unless verification_token.present?
+    return false unless code == verification_token || grants_right?(admin_user, :update)
+
+    login_attribute = authentication_provider&.login_attribute
+    return false unless unique_ids.key?(login_attribute)
+
+    update!(unique_id: unique_ids[login_attribute])
   end
 
   scope :by_unique_id, ->(unique_id) { where("LOWER(unique_id)=LOWER(?)", unique_id.to_s) }

@@ -135,6 +135,23 @@ module Login::Shared
     uri
   end
 
+  def need_email_verification?(unique_ids, auth_provider)
+    old_login_attribute = auth_provider.settings["old_login_attribute"]
+    if old_login_attribute.present? &&
+       auth_provider.login_attribute != old_login_attribute &&
+       unique_ids.is_a?(Hash) &&
+       unique_ids.key?(old_login_attribute) &&
+       unique_ids.key?(auth_provider.login_attribute)
+      pseudonym = @domain_root_account.pseudonyms.for_auth_configuration(unique_ids[old_login_attribute], auth_provider)
+      if pseudonym
+        pseudonym.begin_login_attribute_migration!(unique_ids)
+        redirect_to login_email_verify_show_url(d: CanvasSecurity.create_jwt({ i: pseudonym.id, e: pseudonym.email }, 15.minutes.from_now))
+        return true
+      end
+    end
+    false
+  end
+
   protected
 
   def statsd_timeout_error
