@@ -827,4 +827,39 @@ describe Pseudonym do
              )).to eq []
     end
   end
+
+  describe "migrate_login_attribute" do
+    before :once do
+      user_factory(active_all: true, active_cc: true)
+      Notification.create!(name: "Account Verification", subject: "Test", category: "Registration", delay_for: 0)
+      @authentication_provider = Account.default.authentication_providers.create!(auth_type: "microsoft", login_attribute: "tid+oid")
+      @authentication_provider.settings["old_login_attribute"] = "email"
+      @authentication_provider.save!
+      @pseudonym = @user.pseudonyms.create!(unique_id: "foo@example.com", authentication_provider: @authentication_provider)
+      @pseudonym.begin_login_attribute_migration!({ "email" => "foo@example.com", "tid+oid" => "67890#abcde" })
+    end
+
+    it "allows the user to migrate to the new login attribute via the emailed code" do
+      message = @user.messages.where(notification_name: "Account Verification").take
+      expect(message).to be_present
+      code = message.body.match(/use the following code to complete your login: (\w+)/)[1]
+      expect(@pseudonym.migrate_login_attribute(code:)).to be true
+      expect(@pseudonym.reload.unique_id).to eq "67890#abcde"
+    end
+
+    it "rejects an invalid code" do
+      expect(@pseudonym.migrate_login_attribute(code: "invalid")).to be false
+      expect(@pseudonym.reload.unique_id).to eq "foo@example.com"
+    end
+
+    it "allows an admin to migrate the login attribute" do
+      expect(@pseudonym.migrate_login_attribute(admin_user: account_admin_user)).to be true
+      expect(@pseudonym.reload.unique_id).to eq "67890#abcde"
+    end
+
+    it "rejects a user without permission to modify the login" do
+      expect(@pseudonym.migrate_login_attribute(admin_user: user_factory)).to be false
+      expect(@pseudonym.reload.unique_id).to eq "foo@example.com"
+    end
+  end
 end

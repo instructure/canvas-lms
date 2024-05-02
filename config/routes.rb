@@ -827,6 +827,9 @@ CanvasRails::Application.routes.draw do
   get "login/canvas" => "login/canvas#new", :as => :canvas_login
   post "login/canvas" => "login/canvas#create"
 
+  get "login/email_verify" => "login/email_verify#show", :as => :login_email_verify_show
+  post "login/email_verify" => "login/email_verify#verify", :as => :login_email_verify
+
   get "login/ldap" => "login/ldap#new"
   post "login/ldap" => "login/ldap#create"
 
@@ -1700,6 +1703,7 @@ CanvasRails::Application.routes.draw do
       put "accounts/:account_id/logins/:id", action: :update
       delete "users/:user_id/logins/:id", action: :destroy
       post "users/reset_password", action: :forgot_password
+      post "users/:user_id/logins/:id/migrate_login_attribute", action: :migrate_login_attribute
     end
 
     scope(controller: :accounts) do

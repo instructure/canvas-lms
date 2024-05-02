@@ -829,6 +829,8 @@
   path: "/api/v1/accounts/:account_id/logins/:id"
 - verb: DELETE
   path: "/api/v1/users/:user_id/logins/:id"
+- verb: POST
+  path: "/api/v1/users/:user_id/logins/:id/migrate_login_attribute"
 - verb: GET
   path: "/api/v1/accounts"
 - verb: GET
