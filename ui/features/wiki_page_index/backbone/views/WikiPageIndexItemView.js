@@ -91,7 +91,8 @@ export default class WikiPageIndexItemView extends Backbone.View {
       json.cannot_edit_by_master_course = json.master_course_restrictions.content
     }
 
-    json.differentiated_modules = !!ENV.FEATURES?.differentiated_modules
+    json.differentiated_modules =
+      !!ENV.FEATURES?.differentiated_modules && this.contextName === 'courses'
     json.wiki_page_menu_tools = ENV.wiki_page_menu_tools || []
     json.wiki_page_menu_tools.forEach(tool => {
       return (tool.url = tool.base_url + `&pages[]=${this.model.get('page_id')}`)

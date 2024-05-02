@@ -123,4 +123,13 @@ describe "wiki pages edit page assign to" do
     expect(assign_to_in_tray("Remove Everyone else")[0]).to be_displayed
     expect(assign_to_in_tray("Remove #{@course.course_sections.first.name}")[0]).to be_displayed
   end
+
+  it "does not show Manage Assign To for group pages" do
+    group = @course.groups.create!(name: "Group 1")
+    page = group.wiki_pages.create!(title: "group-page")
+    visit_group_wiki_edit_page(group.id, page.title)
+    wait_for_ajaximations
+    expect(element_exists?(editing_roles_input_selector)).to be_truthy
+    expect(element_exists?(assign_to_link_selector)).to be_falsey
+  end
 end

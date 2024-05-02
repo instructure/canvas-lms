@@ -333,6 +333,10 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
   }
 
   setAssignToItem(open, newAssignToItem, returnFocusTo) {
+    // not supported in group contexts
+    if (ENV.COURSE_ID == null) {
+      return
+    }
     const handleTrayClose = () => {
       this.setAssignToItem(false, newAssignToItem, returnFocusTo)
       setTimeout(() => returnFocusTo?.focus(), 100)

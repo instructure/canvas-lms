@@ -163,4 +163,13 @@ describe "wiki pages show page assign to" do
 
     check_element_has_focus manage_wiki_page_item_button(@page.title)
   end
+
+  it "does not show assign to button for group pages" do
+    group = @course.groups.create!(name: "Group 1")
+    page = group.wiki_pages.create!(title: "group-page")
+    visit_group_wiki_index_page(group.id)
+    manage_wiki_page_item_button(page.title).click
+    expect(wiki_page_item_settings_menu).to include_text("Edit")
+    expect(wiki_page_item_settings_menu).not_to include_text("Assign To")
+  end
 end
