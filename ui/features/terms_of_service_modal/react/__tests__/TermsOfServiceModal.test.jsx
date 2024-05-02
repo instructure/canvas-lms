@@ -19,28 +19,34 @@
 import React from 'react'
 import $ from 'jquery'
 import 'jquery-migrate'
-import {mount} from 'enzyme'
-import TermsOfServiceModal from 'ui/features/terms_of_service_modal/react/TermsOfServiceModal'
+import {render, screen} from '@testing-library/react'
+import TermsOfServiceModal from '../TermsOfServiceModal'
 
-QUnit.module('Terms of Service Modal Link', {
-  beforeEach() {
+const renderTermsOfServiceModal = (props = {}) => render(<TermsOfServiceModal {...props} />)
+
+describe('TermsOfServiceModal', () => {
+  beforeEach(() => {
     $('#fixtures').html('<div id="main">')
-  },
-  afterEach() {
+
+    window.ENV = {
+      TERMS_OF_SERVICE_CUSTOM_CONTENT: 'Hello World',
+    }
+  })
+
+  afterEach(() => {
     $('#fixtures').empty()
-  },
-})
+    delete window.ENV
+  })
 
-test('renders correct link when preview is provided', () => {
-  ENV.TERMS_OF_SERVICE_CUSTOM_CONTENT = 'Hello World'
-  const wrapper = mount(<TermsOfServiceModal preview />)
-  const renderedLink = wrapper.find('a')
-  equal(renderedLink.text(), 'Preview')
-})
+  it('renders correct link when preview is provided', () => {
+    renderTermsOfServiceModal({preview: true})
 
-test('renders correct link when preview is not provided', () => {
-  ENV.TERMS_OF_SERVICE_CUSTOM_CONTENT = 'Hello World'
-  const wrapper = mount(<TermsOfServiceModal />)
-  const renderedLink = wrapper.find('a')
-  equal(renderedLink.text(), 'Acceptable Use Policy')
+    expect(screen.getByText('Preview')).toBeInTheDocument()
+  })
+
+  it('renders correct link when preview is not provided', () => {
+    renderTermsOfServiceModal()
+
+    expect(screen.getByText('Acceptable Use Policy')).toBeInTheDocument()
+  })
 })
