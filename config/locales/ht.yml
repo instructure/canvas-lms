@@ -20724,7 +20724,7 @@ ht:
       description: "Koneksyon Microsoft"
     microsoft_settings: 
       description: |-
-          W ap bezwen enskri yon [nouvo app ak Microsoft](%{ms_app_url}).
+          W ap bezwen enskri yon [nouvo app ak Microsoft](%{ms_app_url}).* *
           Ou dwe konfigire %{callback_url} tankou yon URI Redirije.
           Aprè w fin anrejistre app ou a, note Application ID e Sekrè a, epi antre yo la.
       labels: 
