@@ -4370,7 +4370,7 @@ ca:
   autodetect_field_separators_in_compatible_spreadsh_768067e1: "Detecta automàticament els separadors de camps en les exportacions de fulls de càlcul compatibles"
   automatic_mobile_app_login_3724af59: "Inici de sessió automàtica a l’aplicació mòbil"
   automatically_apply_deduction_to_late_submissions_2b68166e: "Aplica la deducció automàticament a les entregues endarrerides"
-  automatically_apply_grade_for_missing_submissions_2b5c1a72: "Aplica automàticament la nota a les entregues no no presentades"
+  automatically_apply_grade_for_missing_submissions_2b5c1a72: "Aplica automàticament la nota als lliuraments no presentats"
   automatically_assign_709c6ddb: "Assigna-ho automàticament"
   automatically_assign_a_student_group_leader_29448649: "Assigna automàticament un líder del grup d'estudiants"
   automatically_dff02416: Automàticament
@@ -18067,7 +18067,7 @@ ca:
       description: "Inici de sessió a Microsoft"
     microsoft_settings: 
       description: |-
-          Haureu de registrar una [nova aplicació amb Microsoft](%{ms_app_url}).
+          Haureu de registrar una [nova aplicació amb Microsoft](%{ms_app_url}).* *
           Heu de configurar %{callback_url} com a URI de redirecció.
           Quan hàgiu desat l'aplicació, preneu nota de l'ID i el secret de l'aplicació, i introduïu-los aquí.
       labels: 
