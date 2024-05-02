@@ -19920,7 +19920,7 @@ nb-x-k12:
       description: "Microsoft-logg inn"
     microsoft_settings: 
       description: |-
-          Du trenger å registrere en [ny app hos Microsoft](%{ms_app_url}).
+          Du trenger å registrere en [ny app hos Microsoft](%{ms_app_url}).* *
           Du bør konfigurere %{callback_url} som omadresserings-URL.
           Noter søknads-ID og hemmelighet etter at du har lagret appen din, og skriv de inn her.
       labels: 
