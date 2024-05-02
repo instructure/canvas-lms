@@ -1,0 +1,13 @@
+<% define_content :subject do %>
+  <%= t :subject, "Canvas Account Verification" %>
+<% end %>
+
+<p><%= t "The email address %{email} was used to log into Canvas at %{website}.",
+         email: asset.email,
+         website:  data.from_host || HostUrl.default_host %></p>
+<p><%= t "Please use the following code to complete your login: *%{code}*",
+         code: asset.verification_token,
+         wrapper: '<br><span style="font-size: 1.5em; font-weight: bold;">\1</span>' %></p>
+<p><%= t "*NOTE*: This code will expire in 15 minutes.", wrapper: '<strong>\1</strong>' %>
+
+<p><%= t "If you did not try to log into Canvas, please disregard this message." %></p>
