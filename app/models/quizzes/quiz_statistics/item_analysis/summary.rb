@@ -66,7 +66,7 @@ class Quizzes::QuizStatistics::ItemAnalysis::Summary
   def buckets
     @buckets ||= begin
                    bucket_defs = @options[:buckets]
-                   ranked_respondent_ids = @respondent_scores.sort_by(&:last)
+                   ranked_respondent_ids = @respondent_scores.compact.sort_by(&:last)
                    previous_floor = ranked_respondent_ids.length
                    buckets = {}
                    bucket_defs.each do |(name, cutoff)|
