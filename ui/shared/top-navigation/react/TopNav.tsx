@@ -19,9 +19,16 @@
 import React from 'react'
 import {TopNavBar} from '@instructure/ui-top-nav-bar'
 import {Breadcrumb} from '@instructure/ui-breadcrumb'
+import {getCurrentTheme} from '@instructure/theme-registry'
 import useToggleCourseNav from './hooks/useToggleCourseNav'
 import {useMutation, useQueryClient} from '@tanstack/react-query'
 import {setSetting} from '@canvas/settings-query/react/settingsQuery'
+
+const {porcelain} = getCurrentTheme()?.colors ?? {porcelain: 'white'}
+const overrides = {
+  desktopBackgroundInverse: porcelain,
+  smallViewportBackgroundInverse: porcelain,
+}
 
 const TopNav = () => {
   const breadCrumbs = window.ENV.breadcrumbs
@@ -53,6 +60,7 @@ const TopNav = () => {
     <TopNavBar inverseColor={true} width="100%">
       {() => (
         <TopNavBar.Layout
+          themeOverride={overrides}
           navLabel="Top Navigation"
           desktopConfig={{
             hideActionsUserSeparator: false,
