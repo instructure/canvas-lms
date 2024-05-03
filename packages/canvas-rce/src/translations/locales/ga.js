@@ -283,7 +283,7 @@ const locale = {
   },
   "division_sign_72190870": { "message": "Comhartha Rannóige" },
   "document_678cd7bf": { "message": "Doiciméad" },
-  "documents_81393201": { "message": "Doiciméid" },
+  "documents_81393201": { "message": "Cáipéisí" },
   "done_54e3d4b6": { "message": "Déanta" },
   "double_dagger_faf78681": { "message": "Oibil Dúbailte" },
   "down_5831a426": { "message": "Síos" },
