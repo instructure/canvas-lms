@@ -25,3 +25,14 @@ export interface InboxSettings {
   outOfOfficeSubject?: string
   outOfOfficeMessage?: string
 }
+
+export interface InboxSettingsData {
+  _id: string
+  useSignature?: boolean
+  signature?: string
+  useOutOfOffice?: boolean
+  outOfOfficeFirstDate?: string
+  outOfOfficeLastDate?: string
+  outOfOfficeSubject?: string
+  outOfOfficeMessage?: string
+}
