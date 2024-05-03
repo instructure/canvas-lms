@@ -74,6 +74,8 @@ describe('DiscussionTopicForm', () => {
       current_user: {},
       STUDENT_PLANNER_ENABLED: true,
       DISCUSSION_CHECKPOINTS_ENABLED: true,
+      ASSIGNMENT_EDIT_PLACEMENT_NOT_ON_ANNOUNCEMENTS: false,
+      context_is_not_group: true,
     }
   })
 
@@ -133,6 +135,36 @@ describe('DiscussionTopicForm', () => {
     expect(document.queryByTestId('group-discussion-checkbox')).not.toBeTruthy()
     expect(document.queryByText('Available from')).not.toBeTruthy()
     expect(document.queryByText('Until')).not.toBeTruthy()
+  })
+
+  describe('assignment edit placement', () => {
+    it('renders if the discussion is not an announcement', () => {
+      const {queryByTestId} = setup()
+      expect(queryByTestId('assignment-external-tools')).toBeInTheDocument()
+    })
+
+    it('renders if it is an announcement and the assignment edit placement not on announcements FF is off', () => {
+      window.ENV.DISCUSSION_TOPIC.ATTRIBUTES = {
+        is_announcement: true,
+      }
+      const {queryByTestId} = setup()
+      expect(queryByTestId('assignment-external-tools')).toBeInTheDocument()
+    })
+
+    it('does not render if it is an announcement and the assignment edit placement not on announcements FF is on', () => {
+      window.ENV.DISCUSSION_TOPIC.ATTRIBUTES = {
+        is_announcement: true,
+      }
+      window.ENV.ASSIGNMENT_EDIT_PLACEMENT_NOT_ON_ANNOUNCEMENTS = true
+      const {queryByTestId} = setup()
+      expect(queryByTestId('assignment-external-tools')).not.toBeInTheDocument()
+    })
+
+    it('does not render if the context is not a course', () => {
+      ENV.context_is_not_group = false
+      const {queryByTestId} = setup()
+      expect(queryByTestId('assignment-external-tools')).not.toBeInTheDocument()
+    })
   })
 
   describe('publish indicator', () => {

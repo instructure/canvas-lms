@@ -40,7 +40,6 @@ import CanvasMultiSelect from '@canvas/multi-select'
 import CanvasRce from '@canvas/rce/react/CanvasRce'
 import {Alert} from '@instructure/ui-alerts'
 import theme from '@instructure/canvas-theme'
-
 import {FormControlButtons} from './FormControlButtons'
 import {GradedDiscussionOptions} from '../DiscussionOptions/GradedDiscussionOptions'
 import {NonGradedDateOptions} from '../DiscussionOptions/NonGradedDateOptions'
@@ -63,6 +62,8 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 import {prepareAssignmentPayload, prepareCheckpointsPayload} from '../../util/payloadPreparations'
 import {validateTitle, validateFormFields} from '../../util/formValidation'
+
+import AssignmentExternalTools from '@canvas/assignments/react/AssignmentExternalTools'
 
 import {
   addNewGroupCategoryToCache,
@@ -318,6 +319,18 @@ export default function DiscussionTopicForm({
   useEffect(() => {
     if (!isGroupDiscussion) setGroupCategoryId(null)
   }, [isGroupDiscussion])
+
+  useEffect(() => {
+    if (document.querySelector('#assignment_external_tools') && ENV.context_is_not_group) {
+      AssignmentExternalTools.attach(
+        document.querySelector('#assignment_external_tools'),
+        'assignment_edit',
+        parseInt(ENV.context_id, 10),
+        parseInt(currentDiscussionTopic?.assignment?._id, 10)
+      )
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const {
     shouldShowTodoSettings,
@@ -962,6 +975,10 @@ export default function DiscussionTopicForm({
               }}
             />
           ))}
+        {(!isAnnouncement || !ENV.ASSIGNMENT_EDIT_PLACEMENT_NOT_ON_ANNOUNCEMENTS) &&
+          ENV.context_is_not_group && (
+            <div id="assignment_external_tools" data-testid="assignment-external-tools" />
+          )}
         <FormControlButtons
           isAnnouncement={isAnnouncement}
           isEditing={isEditing}
