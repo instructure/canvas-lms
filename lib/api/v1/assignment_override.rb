@@ -44,6 +44,7 @@ module Api::V1::AssignmentOverride
         json[:students] = student_ids.map { |id| { id:, name: student_names[id] } } if student_names
       when "Group"
         json[:group_id] = override.set_id
+        json[:group_category_id] = override.assignment.group_category_id
       when "CourseSection"
         json[:course_section_id] = override.set_id
       when "Course"

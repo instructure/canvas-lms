@@ -126,6 +126,7 @@ export interface ItemAssignToTrayProps {
   iconType: IconType
   itemContentId?: string
   initHasModuleOverrides?: boolean
+  defaultGroupCategoryId?: string | null
   pointsPossible?: number | null
   locale: string
   timezone: string
@@ -156,6 +157,7 @@ export default function ItemAssignToTray({
   itemType,
   iconType,
   itemContentId,
+  defaultGroupCategoryId = null,
   pointsPossible,
   initHasModuleOverrides,
   locale,
@@ -362,6 +364,7 @@ export default function ItemAssignToTray({
             setModuleAssignees={setModuleAssignees}
             disabledOptionIds={disabledOptionIds}
             setDisabledOptionIds={setDisabledOptionIds}
+            defaultGroupCategoryId={defaultGroupCategoryId}
           />
         )}
         {Footer()}

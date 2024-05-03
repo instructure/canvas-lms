@@ -39,6 +39,14 @@ class AssignmentCreateEditPage
       "#assignment_text_entry"
     end
 
+    def group_category_checkbox_selector
+      "#has_group_category"
+    end
+
+    def group_categories_selector
+      "#assignment_group_category_id option"
+    end
+
     # Selectors
     def assignment_form
       f("#edit_assignment_form")
@@ -106,6 +114,14 @@ class AssignmentCreateEditPage
 
     def due_date_input
       f("input.datePickerDateField.DueDateInput")
+    end
+
+    def group_category_checkbox
+      f(group_category_checkbox_selector)
+    end
+
+    def group_categories
+      ff(group_categories_selector)
     end
 
     # Moderated Grading Options
@@ -212,6 +228,16 @@ class AssignmentCreateEditPage
 
     def pending_changes_pill_exists?
       element_exists?(pending_changes_pill_selector)
+    end
+
+    def click_group_category_assignment_check
+      group_category_checkbox.click
+    end
+
+    def select_assignment_group_category(id)
+      options = group_categories
+      option_element = id.blank? ? options.first : options[id]
+      option_element.click
     end
   end
 end
