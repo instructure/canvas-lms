@@ -3141,15 +3141,15 @@ ga:
     unmute_button: "Díbhalbhaigh an Tasc"
     unmuting_assignment: "Tasc á dhíbhalbhú..."
   assignment_name_12eadcbd: "Ainm an taisc"
-  assignment_name_a_z_aeefaa36: "Ainm an Tasc - AZ"
-  assignment_name_b2d87383: "Ainm an Tasc"
+  assignment_name_a_z_aeefaa36: "Ainm an Taisc - AZ"
+  assignment_name_b2d87383: "Ainm an Taisc"
   assignment_name_course_name_override_is_now_due_ed5ce1e: "%{assignment_name}, %{course_name} (%{override}) dlite anois"
   assignment_name_course_name_override_no_longer_has_5a94da2b: "Níl dáta dlite ag %{assignment_name}, %{course_name} (%{override}) a thuilleadh"
   assignment_name_is_now_due_80025e91: "Tá %{assignment_name} dlite anois:"
   assignment_name_is_now_due_no_due_date_d3127a8f: "Tá %{assignment_name} dlite anois: Níl Dáta Dlite"
   assignment_name_is_required_9d17311b: "Tá ainm an taisc riachtanach"
   assignment_name_options_43b1795: "roghanna sannadh %{name}"
-  assignment_name_z_a_34f92f4b: "Ainm an Tasc - Z-A"
+  assignment_name_z_a_34f92f4b: "Ainm an Taisc - Z-A"
   assignment_names_858b1880: "Ainmneacha Tascanna"
   assignment_options_1e5b7074: "Roghanna Sannacháin"
   assignment_override: 
@@ -3262,7 +3262,7 @@ ga:
       links: 
         add_rubric: Rúibric
     edit_view: 
-      assignment_name: "Ainm an Tasc"
+      assignment_name: "Ainm an Taisc"
       buttons: 
         build: Tógáil
         save: Sábháil
@@ -3611,9 +3611,9 @@ ga:
   assignments_group_menu_c2522316: "Roghchlár Grúpa Taisc"
   assignments_in_this_group_have_no_points_possible__ab0adb72: "Níl aon phointí indéanta ag tascanna sa ghrúpa seo agus ní féidir iad a chuimsiú i ríomh an mhairc."
   assignments_include_quizzes_graded_discussions_and_182e5899: |-
-      Cuimsítear le tascanna tá quizeanna, fóraim marcáilte, agus go leor cineálacha
+      Cuimsítear le tascanna quizeanna, fóraim mharcáilte, agus go leor cineálacha
             uaslódálacha ar líne (comhaid, íomhánna, téacs, URLanna, agus meáin). Sann
-            iad do gach duine i gcúrsa, nó sannaigh dátaí dlite difriúla do
+            iad do gach duine i gcúrsa, nó sann dátaí dlite difriúla do
             rannóga nó úsáideoirí ar leith. Cruthaigh grúpaí tascanna chun do thascanna a eagrú
             agus chun grúpaí meáchain de réir céatadán. Cumasaigh Piarbhreithniú le gur féidir le mic léinn
             athbhreithniú a dhéanamh ar obair a chéile.
@@ -7798,7 +7798,7 @@ ga:
   discarded_20a4e7e8: caithte
   discovery_service_url_ca13d3f4: "URL na Seirbhíse Fionnachtana"
   discovery_url_3dce06d9: "URL fionnachtana"
-  discussion_6719c51d: Plé
+  discussion_6719c51d: Fóram
   discussion_assignments_cannot_be_section_specific_93d63843: "Ní féidir le tascanna plé a bheith sainiúil do rannóg"
   discussion_checkpoints_f40122e8: "Seicphointí Plé"
   discussion_content_is_locked_or_not_yet_available_ab6d5314: "Tá ábhar an phlé faoi ghlas nó níl sé ar fáil fós"
@@ -8039,14 +8039,14 @@ ga:
     uknown_author: "Údar Anaithnid"
     unknown: Anaithnid
     unknown_author: "Údar Anaithnid"
-  discussions_2365ec45: fóram
-  discussions_a5f96392: Fóram
+  discussions_2365ec45: fóraim
+  discussions_a5f96392: Fóraim
   discussions_allow_students_and_instructors_to_comm_ce03ca43: |-
       Tugann fóraim deis do mhic léinn agus do theagascóirí cumarsáid a dhéanamh faoi
             thopaicí an chúrsa ag am ar bith. Cruthaigh fóraim le haghaidh Marc, nó éascaigh
             fóraim do mhic léinn chun smaointe a mhalartú agus fadhbanna a réiteach. Snáithithe
-            tá plé foirfe chun plé domhain nó fadtéarmach a choinneáil
-            eagraithe, cé go n-oireann fóraim Dírithe is fearr do mhalartuithe gearrthéarmacha.
+            foirfe chun plé domhain nó fadtéarmach a choinneáil
+            eagraithe/in eagar, cé gur fearr a n-oireann fóraim Dhírithe do mhalartuithe gearrthéarmacha.
   discussions_announcements_redesign_901c5528: "Fóraim/Fógraí Athdhearadh"
   discussions_create_94dff604: "Fóraim - cruthaigh"
   discussions_index_menu_42591bc9: "Roghchlár Innéacs Fóraim"
@@ -10692,7 +10692,7 @@ ga:
   how_do_i_publish_or_unpublish_a_discussion_as_an_i_4055a43e: "Conas is féidir liom fóram a fhoilsiú nó a dhífhoilsiú mar theagascóir?"
   how_do_i_publish_or_unpublish_a_module_as_an_instr_6e1758d7: "Conas is féidir liom modúl a fhoilsiú nó a dhífhoilsiú mar theagascóir?"
   how_do_i_publish_or_unpublish_a_page_as_an_instruc_5721ea3: "Conas is féidir liom leathanach a fhoilsiú nó a dhífhoilsiú mar theagascóir?"
-  how_do_i_publish_or_unpublish_an_assignment_as_an__616f465: "Conas is féidir liom tasc mar theagascóir a fhoilsiú nó a dhífhoilsiú?"
+  how_do_i_publish_or_unpublish_an_assignment_as_an__616f465: "Conas is féidir liom, mar theagascóir, tasc a fhoilsiú nó a dhífhoilsiú?"
   how_do_i_record_a_conference_e4845e7: "Conas a dhéanaim taifead ar chomhdháil?"
   how_do_i_record_a_meeting_ae3a0d4e: "Conas a dhéanaim taifead ar chruinniú?"
   how_do_i_reply_to_a_discussion_as_an_instructor_399fdaff: "Conas a thabharfaidh mé freagra ar phlé mar theagascóir?"
@@ -14807,8 +14807,8 @@ ga:
       calendar: Féilire
       content_link_error: "Earráid Nasc Ábhar"
       course_content: "Ábhar an Chúrsa"
-      discussion: Plé
-      discussion_entry: "Iontráil Plé"
+      discussion: Fóram
+      discussion_entry: "Iontráil Fóram"
       due_date: "Dáta dlite"
       files: Comhaid
       grading: marcáil
@@ -15677,7 +15677,7 @@ ga:
   pin_of_discussion_title_failed_6c2c32a5: "Theip ar %{title} a ghreamú le biorán"
   pin_of_discussion_title_succeeded_c7d59580: "D’éirigh le %{title} a ghreamú le biorán"
   pink_68ad45cb: Bándearg
-  pinned_discussions_a55c0cea: "fóraim Greamaithe"
+  pinned_discussions_a55c0cea: "Fóraim Ghreamaithe"
   place_b128fa94: Áit
   place_section_before_5b45714e: "Cuir “%{section}“ roimh:"
   place_title_2c183274: "Áit \"%{title}\""
@@ -18789,7 +18789,7 @@ ga:
   search_by_name_or_id_3bdab12e: "Cuardaigh de réir ainm nó ID"
   search_by_name_or_id_9530b544: "Cuardaigh de réir ainm nó ID"
   search_by_student_name_26536097: "Cuardaigh de réir ainm an mac léinn"
-  search_by_title_or_author_273a8f49: "Cuardaigh de réir teidil nó údar..."
+  search_by_title_or_author_273a8f49: "Cuardaigh de réir teidil nó údair..."
   search_by_title_short_name_or_sis_id_fe84aa12: "Cuardaigh de réir teidil, ainm ghearr, nó ID SIS"
   search_by_user_dd3ad189: "Cuardaigh de réir úsáideora"
   search_calendars_f98d663: "Cuardaigh Féilirí"
@@ -18946,7 +18946,7 @@ ga:
   security_tab_failed_to_load_2d2242a: "Theip ar lódáil an Táb Slándála"
   see_comments_details_44f460d9: "Amharc sonraí na ráitis"
   see_example_below_to_see_how_different_calculation_618de98d: "Amharc an sampla thíos chun a fheiceáil conas a théann paraiméadair ríofa éagsúla i bhfeidhm ar ríomh forlámhas na mac léinn."
-  see_more_in_canvas_guides_fc90a457: "Amharc ar thuilleadh i treoracha Canvas"
+  see_more_in_canvas_guides_fc90a457: "Amharc ar thuilleadh i dtreoracha Canvas"
   see_other_users_primary_email_address_59c8473f: "Amharc ar phríomhsheoladh ríomhphoist úsáideoirí eile"
   see_other_viewers_webcams_f10f8fd3: "Amharc ar cheamaraí gréasáin breathnóirí eile"
   see_rubric_results_62a6447d: "Amharc ar torthaí rúibric"
@@ -19479,8 +19479,8 @@ ga:
       links: 
         skip_to_content: "Léim Go Ábhar"
     no_recent_activity: 
-      empty_stream_message: "Níl aon teachtaireacht agat le taispeáint i do shruth go fóill. Nuair a thosaíonn tú ag glacadh páirte i do chúrsaí feicfidh tú an sruth seo lán le teachtaireachtaí ó fóraim, nuashonruithe marcála, teachtaireachtaí príobháideacha idir tú féin agus úsáideoirí eile, srl."
-      no_recent_messages: "Níl aon Theachtaireachtaí le Déanaí"
+      empty_stream_message: "Níl aon teachtaireacht agat le taispeáint i do shruth go fóill. Nuair a thosaíonn tú ag glacadh páirte i do chúrsaí feicfidh tú an sruth seo lán le teachtaireachtaí ó fhóraim, nuashonruithe marcála, teachtaireachtaí príobháideacha idir tú féin agus úsáideoirí eile, srl."
+      no_recent_messages: "Níl aon Teachtaireachtaí le Déanaí"
     pending_enrollment: 
       designer: "%{course} mar dhearthóir."
       designer_title: "Cuireadh faighte mar dhearthóir, cliceáil chun an Cúrsa a fheiceáil"
@@ -19635,7 +19635,7 @@ ga:
         other: "*Eangaigh %{count} leibhéil*"
         zero: "*Ná heangaigh*"
       labels: 
-        assignment_name: "Ainm an Tasc"
+        assignment_name: "Ainm an Taisc"
         files: Comhaid
         folder: Fillteán
         header: Ceanntásc
@@ -19647,7 +19647,7 @@ ga:
         topic_name: "Ainm an Topaic"
         url: URL
         wiki_page_name: "Ainm an Leathanaigh"
-        wiki_page_namem: "Ainm an Tasc"
+        wiki_page_namem: "Ainm an Taisc"
       loading: "Ag lódáil..."
       new_tab: "Lódáil i dtáb nua"
       options: 
@@ -23638,7 +23638,7 @@ ga:
   you_created_an_announcement_in_course_c49e3d70: "Chruthaigh tú fógra i %{course}"
   you_created_this_announcement_42d745a7: "Chruthaigh tú an Fógraí seo:"
   you_currently_have_no_discussions_with_closed_comm_366a9dab: "Níl aon fhóram agat faoi láthair le ráitis dúnta"
-  you_currently_have_no_pinned_discussions_6f0078b8: "Níl aon phléanna greamaithe agat faoi láthair"
+  you_currently_have_no_pinned_discussions_6f0078b8: "Níl aon fhóraim ghreamaithe agat faoi láthair"
   you_do_not_have_access_to_the_requested_announceme_a774d80a: "Níl rochtain agat ar an bhfógra iarrtha."
   you_do_not_have_access_to_the_requested_discussion_90d8ec99: "Níl rochtain agat ar an bfóram iarrtha."
   you_do_not_have_access_to_the_requested_quiz_d3659e4b: "Níl rochtain agat ar an Quiz iarrtha."
