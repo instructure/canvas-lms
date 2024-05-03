@@ -955,7 +955,9 @@ const mapState = (state, ownProps) => {
       (state.DIRECT_SHARE_ENABLED && state.permissions.read_as_admin),
     displayPinMenuItem: state.permissions.moderate,
     displayDifferentiatedModulesTray:
-      ENV?.FEATURES?.differentiated_modules && discussion.permissions.update,
+      ENV?.FEATURES?.differentiated_modules &&
+      discussion.permissions.update &&
+      state.contextType === 'course',
     masterCourseData: state.masterCourseData,
     isMasterCourse: masterCourse,
     DIRECT_SHARE_ENABLED: state.DIRECT_SHARE_ENABLED,
