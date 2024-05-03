@@ -19,13 +19,10 @@
 #
 
 describe "rubrics" do
-  before do
-    Account.site_admin.disable_feature!(:enhanced_rubrics)
-  end
-
   it "doesn't render edit links for outcome criterion rows" do
     course_with_teacher_logged_in(active_all: true)
     outcome_with_rubric
+    @course.root_account.disable_feature!(:enhanced_rubrics)
     @rubric.rubric_associations.create!(
       association_object: @course,
       context: @course,

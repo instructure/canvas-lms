@@ -26,8 +26,8 @@ describe "assignment rubrics" do
 
   context "assignment rubrics as a teacher" do
     before do
-      Account.site_admin.disable_feature!(:enhanced_rubrics)
       course_with_teacher_logged_in
+      @course.root_account.disable_feature!(:enhanced_rubrics)
     end
 
     def get(url)
@@ -723,8 +723,8 @@ describe "assignment rubrics" do
 
   context "assignment rubrics as an designer" do
     before do
-      Account.site_admin.disable_feature!(:enhanced_rubrics)
       course_with_designer_logged_in
+      @course.root_account.disable_feature!(:enhanced_rubrics)
     end
 
     it "allows a designer to create a course rubric", priority: "2" do
