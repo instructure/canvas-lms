@@ -7,6 +7,7 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
+    bigdecimal (3.1.7)
     debug (1.9.2)
       irb (~> 1.10)
       reline (>= 0.3.8)
@@ -23,7 +24,8 @@ GEM
       reline (>= 0.4.2)
     mini_mime (1.1.5)
     mini_portile2 (2.8.6)
-    multi_xml (0.6.0)
+    multi_xml (0.7.1)
+      bigdecimal (~> 3.1)
     psych (5.1.2)
       stringio
     rdoc (6.6.3.1)
