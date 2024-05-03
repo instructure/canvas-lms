@@ -184,6 +184,7 @@ class Lti::ToolConfigurationsApiController < ApplicationController
     developer_key.public_jwk_url = tool_config.settings["public_jwk_url"]
     developer_key.oidc_initiation_url = tool_config.settings["oidc_initiation_url"]
     developer_key.is_lti_key = true
+    developer_key.current_user = @current_user
     developer_key.update!(developer_key_params)
   end
 

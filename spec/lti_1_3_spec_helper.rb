@@ -30,7 +30,7 @@ RSpec.shared_context "lti_1_3_spec_helper", shared_context: :metadata do
                                        })
   end
 
-  let(:developer_key) { DeveloperKey.create!(account:) }
+  let(:developer_key) { DeveloperKey.create!(account:, skip_lti_sync: true) }
 
   before do
     allow(DynamicSettings).to receive(:kv_proxy).and_return(fallback_proxy)
