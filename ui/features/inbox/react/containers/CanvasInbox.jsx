@@ -878,7 +878,6 @@ const CanvasInbox = () => {
           </Flex>
           {inboxSettingsFeature && inboxSettingsModal && (
             <InboxSettingsModalContainer
-              open={inboxSettingsModal}
               onDismissWithAlert={handleDismissWithAlert}
             />
           )}
