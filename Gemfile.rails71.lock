@@ -484,6 +484,7 @@ GEM
     crass (1.0.6)
     crocodoc-ruby (0.0.1)
       json
+    csv (3.3.0)
     database_cleaner (2.0.2)
       database_cleaner-active_record (>= 2, < 3)
     database_cleaner-active_record (2.1.0)
@@ -615,7 +616,8 @@ GEM
     hashie (5.0.0)
     headless (2.3.1)
     highline (3.0.1)
-    httparty (0.21.0)
+    httparty (0.22.0)
+      csv
       mini_mime (>= 1.0.0)
       multi_xml (>= 0.5.2)
     httpclient (2.8.3)
