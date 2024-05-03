@@ -253,12 +253,7 @@ class DeveloperKey < ActiveRecord::Base
     return true if account_id.blank?
     return true if target_account.id == account_id
 
-    include_federated_parent_id =
-      if target_account.feature_enabled?(:developer_key_consortia_fix_inheritance_logic)
-        !target_account.root_account.primary_settings_root_account?
-      else
-        !target_account.primary_settings_root_account?
-      end
+    include_federated_parent_id = !target_account.root_account.primary_settings_root_account?
 
     target_account.account_chain_ids(include_federated_parent_id:).include?(account_id)
   end
@@ -303,12 +298,7 @@ class DeveloperKey < ActiveRecord::Base
 
     # Search for bindings in the account chain starting with the highest account,
     # and include consortium parent if necessary
-    include_federated_parent =
-      if binding_account.root_account.feature_enabled?(:developer_key_consortia_fix_inheritance_logic)
-        !binding_account.root_account.primary_settings_root_account?
-      else
-        !binding_account.primary_settings_root_account?
-      end
+    include_federated_parent = !binding_account.root_account.primary_settings_root_account?
     accounts = binding_account.account_chain(include_federated_parent:).reverse
     binding = DeveloperKeyAccountBinding.find_in_account_priority(accounts, self)
 
