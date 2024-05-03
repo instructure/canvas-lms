@@ -55,6 +55,7 @@ export interface ItemAssignToTrayContentProps
   setModuleAssignees: (assignees: string[]) => void
   disabledOptionIds: string[]
   setDisabledOptionIds: (options: string[]) => void
+  defaultGroupCategoryId: string | null
   cardsRefs: React.MutableRefObject<{
     [cardId: string]: ItemAssignToCardRef
   }>
@@ -92,9 +93,12 @@ const ItemAssignToTrayContent = ({
   setModuleAssignees,
   disabledOptionIds,
   setDisabledOptionIds,
+  defaultGroupCategoryId,
 }: ItemAssignToTrayContentProps) => {
   const [initialCards, setInitialCards] = useState<ItemAssignToCardSpec[]>([])
   const [fetchInFlight, setFetchInFlight] = useState(false)
+  const [groupCategoryId, setGroupCategoryId] = useState<string | null>(defaultGroupCategoryId)
+  const [overridesFetched, setOverridesFetched] = useState(defaultCards !== undefined)
 
   const lastPerformedAction = useRef<{action: 'add' | 'delete'; index?: number} | null>(null)
   const addCardButtonRef = useRef<Element | null>(null)
@@ -129,11 +133,17 @@ const ItemAssignToTrayContent = ({
 
   const {allOptions, isLoading, loadedAssignees, setSearchTerm} = useFetchAssignees({
     courseId,
+    groupCategoryId,
+    disableFetch: !overridesFetched,
     everyoneOption,
     checkMasteryPaths: true,
     defaultValues: [],
     onError: handleDismiss,
   })
+
+  useEffect(() => {
+    setGroupCategoryId(defaultGroupCategoryId)
+  }, [defaultGroupCategoryId])
 
   useEffect(() => {
     if (assignToCards.length === 0 && !lastPerformedAction.current) return
@@ -167,6 +177,7 @@ const ItemAssignToTrayContent = ({
     if (defaultCards !== undefined) {
       setAssignToCards(defaultCards)
     }
+    setOverridesFetched(defaultCards !== undefined)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(defaultCards)])
 
@@ -252,6 +263,9 @@ const ItemAssignToTrayContent = ({
             if (override.course_id) {
               defaultOptions.push('everyone')
             }
+            if (override.group_id) {
+              defaultOptions.push(`group-${override.group_id}`)
+            }
             if (
               removeCard ||
               (override.context_module_id &&
@@ -280,6 +294,8 @@ const ItemAssignToTrayContent = ({
         }
         setModuleAssignees(allModuleAssignees)
         setHasModuleOverrides(hasModuleOverride || false)
+        setGroupCategoryId(dateDetailsApiResponse.group_category_id)
+        setOverridesFetched(true)
         setBlueprintDateLocks(dateDetailsApiResponse.blueprint_date_locks)
         setDisabledOptionIds(selectedOptionIds)
         setInitialCards(cards)
@@ -412,6 +428,9 @@ const ItemAssignToTrayContent = ({
       parsedCard.course_section_id = idData[1]
     } else if (parsedCard.id && idData[0] === 'student') {
       parsedCard.short_name = newSelectedOption.value
+    } else if (parsedCard.id && idData[0] === 'group') {
+      parsedCard.group_id = idData[1]
+      parsedCard.group_category_id = newSelectedOption.groupCategoryId
     } else if (idData && idData[0] === 'mastery_paths') {
       parsedCard.noop_id = '1'
     }
@@ -428,6 +447,8 @@ const ItemAssignToTrayContent = ({
       } else if (data?.[0] === 'student') {
         deleted.short_name = card?.value
         deleted.student_id = data[1]
+      } else if (data?.[0] === 'group') {
+        deleted.group_id = data[1]
       } else if (data?.[0] === 'mastery_paths') {
         deleted.noop_id = '1'
       }

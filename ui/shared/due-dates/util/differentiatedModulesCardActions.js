@@ -67,6 +67,7 @@ const CardActions = {
   handleGroupAdd(assignee, overridesFromRow) {
     const newOverride = this.newOverrideForCard({
       group_id: assignee.group_id,
+      group_category_id: assignee.group_category_id,
       title: assignee.name,
     })
 

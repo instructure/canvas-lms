@@ -26,6 +26,7 @@ const SECTIONS_DATA = [
   {id: '1', course_id: '1', name: 'Course 1', start_at: null, end_at: null},
   {id: '2', course_id: '1', name: 'Section A', start_at: null, end_at: null},
 ]
+
 const COURSE_ID = 1
 const ASSIGNMENT_ID = '1'
 

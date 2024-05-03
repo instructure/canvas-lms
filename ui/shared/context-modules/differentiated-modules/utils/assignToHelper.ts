@@ -136,7 +136,19 @@ export const generateDateDetailsPayload = (
           unassign_item: false,
         })
       }
-      return overrides
+      const groupOverrides = card.selectedAssigneeIds
+        .filter(assignee => assignee.includes('group'))
+        ?.map(group => {
+          const isDefaultGroupOverride = card.defaultOptions?.[0]?.includes(group)
+          return {
+            id: isDefaultGroupOverride ? card.overrideId : undefined,
+            group_id: group.split('-')[1],
+            due_at: card.due_at,
+            unlock_at: card.unlock_at,
+            lock_at: card.lock_at,
+          }
+        })
+      return [...overrides, ...groupOverrides]
     })
     .flat()
 

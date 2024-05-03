@@ -51,6 +51,7 @@ describe LearningObjectDatesController do
                                  "unlock_at" => "2022-01-01T00:00:00Z",
                                  "lock_at" => "2022-01-03T01:00:00Z",
                                  "only_visible_to_overrides" => true,
+                                 "group_category_id" => nil,
                                  "graded" => true,
                                  "visible_to_everyone" => false,
                                  "overrides" => [{
@@ -81,6 +82,7 @@ describe LearningObjectDatesController do
                                  "lock_at" => nil,
                                  "only_visible_to_overrides" => false,
                                  "graded" => true,
+                                 "group_category_id" => nil,
                                  "visible_to_everyone" => true,
                                  "overrides" => [{
                                    "id" => @override.id,
@@ -144,6 +146,7 @@ describe LearningObjectDatesController do
                                  "lock_at" => "2022-05-07T12:00:00Z",
                                  "only_visible_to_overrides" => false,
                                  "graded" => true,
+                                 "group_category_id" => nil,
                                  "visible_to_everyone" => true,
                                  "overrides" => [{
                                    "id" => override.id,
@@ -175,6 +178,7 @@ describe LearningObjectDatesController do
                                  "lock_at" => "2022-03-05T12:00:00Z",
                                  "only_visible_to_overrides" => false,
                                  "graded" => false,
+                                 "group_category_id" => nil,
                                  "visible_to_everyone" => true,
                                  "overrides" => [{
                                    "id" => override.id,
@@ -207,6 +211,7 @@ describe LearningObjectDatesController do
                                  "lock_at" => "2022-03-05T12:00:00Z",
                                  "only_visible_to_overrides" => false,
                                  "graded" => false,
+                                 "group_category_id" => nil,
                                  "visible_to_everyone" => false,
                                  "overrides" => [{
                                    "discussion_topic_id" => discussion.id,
@@ -252,6 +257,7 @@ describe LearningObjectDatesController do
                                  "lock_at" => "2022-03-05T12:00:00Z",
                                  "only_visible_to_overrides" => false,
                                  "graded" => false,
+                                 "group_category_id" => nil,
                                  "visible_to_everyone" => false,
                                  "overrides" => [
                                    {
@@ -326,6 +332,7 @@ describe LearningObjectDatesController do
                                  "lock_at" => "2022-02-05T00:00:00Z",
                                  "only_visible_to_overrides" => true,
                                  "graded" => false,
+                                 "group_category_id" => nil,
                                  "visible_to_everyone" => false,
                                  "overrides" => [{
                                    "id" => override.id,
@@ -378,6 +385,7 @@ describe LearningObjectDatesController do
                                  "lock_at" => "2022-01-03T01:00:00Z",
                                  "only_visible_to_overrides" => true,
                                  "graded" => true,
+                                 "group_category_id" => nil,
                                  "visible_to_everyone" => false,
                                  "overrides" => [{
                                    "id" => @override.id,
@@ -409,6 +417,16 @@ describe LearningObjectDatesController do
       expect(response).to be_successful
       overrides = json_parse["overrides"]
       expect(overrides.pluck("id")).to contain_exactly(@override.id, module1_override.id, module2_override.id)
+    end
+
+    it "includes group_category_id on a group assignment" do
+      category = @course.group_categories.create(name: "Student Groups")
+      @assignment.update!(group_category_id: category.id)
+
+      get :show, params: { course_id: @course.id, assignment_id: @assignment.id }
+      expect(response).to be_successful
+      json = json_parse
+      expect(json["group_category_id"]).to eq category.id
     end
 
     it "paginates overrides" do

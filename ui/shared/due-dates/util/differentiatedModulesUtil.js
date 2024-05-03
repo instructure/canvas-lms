@@ -66,10 +66,13 @@ export const areCardsEqual = (preSavedCard, currentCard) => {
   const {index, ...preSaved} = preSavedCard
   const {index: indexb, ...current} = currentCard
   preSaved.overrides = preSaved.overrides.map(override => {
-    const {course_section_id, student_ids, due_at, lock_at, unlock_at, rowKey} = override
+    const {course_section_id, student_ids, group_id, due_at, lock_at, unlock_at, rowKey} = override
     const params = {due_at, lock_at, unlock_at, rowKey}
     if (course_section_id) {
       params.course_section_id = course_section_id
+    }
+    if (group_id) {
+      params.group_id = group_id
     }
     if (student_ids) {
       return {...params, student_ids: student_ids.filter(s => s).sort()}
@@ -83,14 +86,19 @@ export const areCardsEqual = (preSavedCard, currentCard) => {
         override?.course_section_id ||
         override?.student_ids ||
         override?.course_id ||
-        override?.noop_id === '1'
+        override?.noop_id === '1' ||
+        override?.group_id
     )
     .map(override => {
-      const {course_section_id, student_ids, due_at, lock_at, unlock_at, rowKey} = override
+      const {course_section_id, group_id, student_ids, due_at, lock_at, unlock_at, rowKey} =
+        override
 
       const params = {due_at, lock_at, unlock_at, rowKey}
       if (course_section_id) {
         params.course_section_id = course_section_id
+      }
+      if (group_id) {
+        params.group_id = group_id
       }
       if (student_ids) {
         return {...params, student_ids: student_ids.filter(s => s).sort()}
@@ -129,9 +137,12 @@ export const resetStagedCards = (cards, newCardsState, defaultState) => {
   return newState
 }
 
-export const getParsedOverrides = (stagedOverrides, cards) => {
+export const getParsedOverrides = (stagedOverrides, cards, groupCategoryId) => {
   let index = 0
-  const overridesByKey = stagedOverrides.reduce((acc, override) => {
+  const validOverrides = stagedOverrides.filter(override =>
+    [undefined, groupCategoryId].includes(override.group_category_id)
+  )
+  const overridesByKey = validOverrides.reduce((acc, override) => {
     const rowKey = override?.rowKey ?? combinedDates(override)
     override.rowKey = rowKey
 

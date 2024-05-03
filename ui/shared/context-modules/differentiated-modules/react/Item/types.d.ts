@@ -25,6 +25,7 @@ export interface BaseDateDetails {
   due_at: string | null
   unlock_at: string | null
   lock_at: string | null
+  group_category_id: string | null
   only_visible_to_overrides: boolean
   visible_to_everyone: boolean
 }
@@ -40,6 +41,8 @@ export interface exportedOverride {
   course_section_id?: string | null
   student_id?: string
   course_id?: string | null
+  group_id?: string
+  group_category_id?: string
   name: string
   type: string
   noop_id: string
@@ -55,6 +58,7 @@ export interface DateDetailsOverride {
   students?: StudentInfo[]
   student_ids?: string[]
   course_id?: string | null
+  group_id?: string
   due_at: string | null
   unlock_at: string | null
   lock_at: string | null

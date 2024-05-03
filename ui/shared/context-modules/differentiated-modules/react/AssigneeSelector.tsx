@@ -58,6 +58,7 @@ export interface AssigneeOption {
   id: string
   value: string
   sisID?: string
+  groupCategoryId?: string
   overrideId?: string
   group?: string
 }

@@ -64,6 +64,18 @@ export const FILTERED_STUDENTS_DATA = [
   },
 ]
 
+export const FIRST_GROUP_CATEGORY_DATA = [
+  {id: '1', course_id: '1', name: 'Group 1'},
+  {id: '2', course_id: '1', name: 'Group 2'},
+  {id: '3', course_id: '1', name: 'Group 3'},
+]
+
+export const SECOND_GROUP_CATEGORY_DATA = [
+  {id: '5', course_id: '1', name: 'Group 5'},
+  {id: '6', course_id: '1', name: 'Group 6'},
+  {id: '7', course_id: '1', name: 'Group 7'},
+]
+
 export const ASSIGNMENT_OVERRIDES_DATA = [
   {
     id: '1',

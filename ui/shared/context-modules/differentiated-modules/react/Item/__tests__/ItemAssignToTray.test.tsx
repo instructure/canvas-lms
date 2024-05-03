@@ -21,7 +21,12 @@ import {act, fireEvent, render, waitFor} from '@testing-library/react'
 import userEvent, {PointerEventsCheckLevel} from '@testing-library/user-event'
 import fetchMock from 'fetch-mock'
 import ItemAssignToTray, {type ItemAssignToTrayProps} from '../ItemAssignToTray'
-import {SECTIONS_DATA, STUDENTS_DATA} from '../../__tests__/mocks'
+import {
+  SECTIONS_DATA,
+  STUDENTS_DATA,
+  FIRST_GROUP_CATEGORY_DATA,
+  SECOND_GROUP_CATEGORY_DATA,
+} from '../../__tests__/mocks'
 
 const USER_EVENT_OPTIONS = {pointerEventsCheck: PointerEventsCheckLevel.Never, delay: null}
 
@@ -47,6 +52,10 @@ describe('ItemAssignToTray', () => {
     timezone: 'UTC',
   }
 
+  const FIRST_GROUP_CATEGORY_ID = '2'
+  const SECOND_GROUP_CATEGORY_ID = '3'
+  const FIRST_GROUP_CATEGORY_URL = `/api/v1/group_categories/${FIRST_GROUP_CATEGORY_ID}/groups`
+  const SECOND_GROUP_CATEGORY_URL = `/api/v1/group_categories/${SECOND_GROUP_CATEGORY_ID}/groups`
   const SECTIONS_URL = `/api/v1/courses/${props.courseId}/sections`
   const STUDENTS_URL = `api/v1/courses/${props.courseId}/users?enrollment_type=student`
 
@@ -124,7 +133,11 @@ describe('ItemAssignToTray', () => {
       .get('/api/v1/courses/1/quizzes/23/date_details', {})
       .get('/api/v1/courses/1/discussion_topics/23/date_details', {})
       .get('/api/v1/courses/1/pages/23/date_details', {})
-    fetchMock.get(STUDENTS_URL, STUDENTS_DATA).get(SECTIONS_URL, SECTIONS_DATA)
+    fetchMock
+      .get(STUDENTS_URL, STUDENTS_DATA)
+      .get(SECTIONS_URL, SECTIONS_DATA)
+      .get(FIRST_GROUP_CATEGORY_URL, FIRST_GROUP_CATEGORY_DATA)
+      .get(SECOND_GROUP_CATEGORY_URL, SECOND_GROUP_CATEGORY_DATA)
   })
 
   afterEach(() => {
@@ -715,9 +728,57 @@ describe('ItemAssignToTray', () => {
     expect(deleteButtons[deleteButtons.length - 1].closest('button')).toHaveFocus()
   })
 
+  describe('Student Groups', () => {
+    const payload = {
+      id: '23',
+      due_at: '2023-10-05T12:00:00Z',
+      unlock_at: '2023-10-01T12:00:00Z',
+      lock_at: '2023-11-01T12:00:00Z',
+      only_visible_to_overrides: false,
+      group_category_id: FIRST_GROUP_CATEGORY_ID,
+      visible_to_everyone: true,
+      overrides: [],
+    }
+
+    it('displays student groups if the assignmet is a group assignment', async () => {
+      fetchMock.get('/api/v1/courses/1/assignments/23/date_details', payload, {
+        overwriteRoutes: true,
+      })
+      const {findByText, findByTestId, getByText} = renderComponent()
+      const assigneeSelector = await findByTestId('assignee_selector')
+      act(() => assigneeSelector.click())
+      await findByText(FIRST_GROUP_CATEGORY_DATA[0].name)
+      FIRST_GROUP_CATEGORY_DATA.forEach(group => {
+        expect(getByText(group.name)).toBeInTheDocument()
+      })
+    })
+
+    it('refreshes the group options if the group category is overridden', async () => {
+      fetchMock.get('/api/v1/courses/1/assignments/23/date_details', payload, {
+        overwriteRoutes: true,
+      })
+      const {findByText, findByTestId, getByText, queryByText, rerender} = renderComponent()
+      const assigneeSelector = await findByTestId('assignee_selector')
+      act(() => assigneeSelector.click())
+      await findByText(FIRST_GROUP_CATEGORY_DATA[0].name)
+      SECOND_GROUP_CATEGORY_DATA.forEach(group => {
+        expect(queryByText(group.name)).not.toBeInTheDocument()
+      })
+      rerender(<ItemAssignToTray {...props} defaultGroupCategoryId={SECOND_GROUP_CATEGORY_ID} />)
+      await findByText(SECOND_GROUP_CATEGORY_DATA[0].name)
+      SECOND_GROUP_CATEGORY_DATA.forEach(group => {
+        expect(getByText(group.name)).toBeInTheDocument()
+      })
+    })
+  })
+
   describe('in a paced course', () => {
     beforeEach(() => {
       ENV.IN_PACED_COURSE = true
+    })
+
+    afterEach(() => {
+      ENV.IN_PACED_COURSE = false
     })
 
     it('shows the course pacing notice', () => {
