@@ -313,6 +313,17 @@ describe "discussions index" do
         expected_overrides = generate_expected_overrides(graded_discussion.assignment)
         expect(displayed_overrides).to match_array(expected_overrides)
       end
+
+      it "does not render assign to tray on group discussions index" do
+        group = @course.groups.create!(name: "Group 1")
+        discussion = group.discussion_topics.create!(title: "group topic")
+        user_session(@teacher)
+        get("/groups/#{group.id}/discussion_topics/")
+        wait_for_ajaximations
+        DiscussionsIndex.discussion_menu(discussion.title).click
+        expect(DiscussionsIndex.manage_discussions_menu).to include_text("Delete")
+        expect(DiscussionsIndex.manage_discussions_menu).not_to include_text("Assign To")
+      end
     end
   end
 end

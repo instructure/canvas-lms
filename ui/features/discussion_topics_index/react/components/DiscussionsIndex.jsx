@@ -285,22 +285,24 @@ export default class DiscussionsIndex extends Component {
             onDismiss={() => this.props.setSendToOpen(false)}
           />
         )}{' '}
-        {ENV?.FEATURES?.differentiated_modules && this.state.showAssignToTray && (
-          <ItemAssignToTray
-            open={this.state.showAssignToTray}
-            onClose={this.closeAssignToTray}
-            onDismiss={this.closeAssignToTray}
-            courseId={ENV.COURSE_ID}
-            itemName={this.state.discussionDetails.title}
-            itemType="discussion"
-            iconType="discussion"
-            pointsPossible={this.state?.discussionDetails?.assignment?.points_possible || null}
-            itemContentId={this.state.discussionDetails.id}
-            locale={ENV.LOCALE || 'en'}
-            timezone={ENV.TIMEZONE || 'UTC'}
-            removeDueDateInput={!this.state?.discussionDetails?.assignment_id}
-          />
-        )}
+        {ENV?.FEATURES?.differentiated_modules &&
+          this.state.showAssignToTray &&
+          this.props.contextType === 'course' && (
+            <ItemAssignToTray
+              open={this.state.showAssignToTray}
+              onClose={this.closeAssignToTray}
+              onDismiss={this.closeAssignToTray}
+              courseId={ENV.COURSE_ID}
+              itemName={this.state.discussionDetails.title}
+              itemType="discussion"
+              iconType="discussion"
+              pointsPossible={this.state?.discussionDetails?.assignment?.points_possible || null}
+              itemContentId={this.state.discussionDetails.id}
+              locale={ENV.LOCALE || 'en'}
+              timezone={ENV.TIMEZONE || 'UTC'}
+              removeDueDateInput={!this.state?.discussionDetails?.assignment_id}
+            />
+          )}
       </View>
     )
   }

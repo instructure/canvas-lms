@@ -57,6 +57,7 @@ export const Discussion = {
       availableForUser
       userCount
       replyToEntryRequiredCount
+      contextType
       editor {
         ...User
       }
@@ -125,6 +126,7 @@ export const Discussion = {
     availableForUser: bool,
     userCount: number,
     replyToEntryRequiredCount: number,
+    contextType: string,
     entryCounts: shape({
       unreadCount: number,
       repliesCount: number,
@@ -169,6 +171,7 @@ export const Discussion = {
     availableForUser = true,
     userCount = 4,
     replyToEntryRequiredCount = 2,
+    contextType = 'Course',
     entryCounts = {
       unreadCount: 2,
       repliesCount: 56,
@@ -216,6 +219,7 @@ export const Discussion = {
     availableForUser,
     userCount,
     replyToEntryRequiredCount,
+    contextType,
     author,
     anonymousAuthor,
     editor,

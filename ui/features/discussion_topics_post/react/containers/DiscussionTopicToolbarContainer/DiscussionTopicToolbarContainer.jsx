@@ -88,6 +88,7 @@ export const DiscussionTopicToolbarContainer = props => {
         pointsPossible={props.discussionTopic.assignment?.pointsPossible}
         isAnnouncement={props.discussionTopic.isAnnouncement}
         isGraded={props.discussionTopic.assignment !== null}
+        contextType={props.discussionTopic.contextType}
       />
     </View>
   )
