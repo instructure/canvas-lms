@@ -2217,3 +2217,11 @@
   path: /api/v1/groups/:group_id/discussion_topics/:topic_id/summaries/disable
 - verb: POST
   path: /api/v1/groups/:group_id/discussion_topics/:topic_id/summaries/:summary_id/feedback
+- verb: GET
+  path: /api/v1/accounts/:account_id/learn_platform/products
+- verb: GET
+  path: /api/v1/accounts/:account_id/learn_platform/products_categories
+- verb: GET
+  path: /api/v1/accounts/:account_id/learn_platform/products/:id
+- verb: GET
+  path: /api/v1/accounts/:account_id/learn_platform/products/filters

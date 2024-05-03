@@ -2300,6 +2300,14 @@ CanvasRails::Application.routes.draw do
       end
     end
 
+    scope(controller: :learn_platform) do
+      prefix = "accounts/:account_id/learn_platform"
+      get  "#{prefix}/products", action: :index
+      get  "#{prefix}/products_categories", action: :index_by_category
+      get  "#{prefix}/products/:id", action: :show
+      get  "#{prefix}/products/filters", action: :filters
+    end
+
     scope(controller: :feature_flags) do
       %w[course account user].each do |context|
         prefix = "#{context}s/:#{context}_id/features"
