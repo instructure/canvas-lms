@@ -77,6 +77,9 @@ export const LtiAppsLayout = React.memo(() => {
           <Tabs.Panel
             isSelected={!isManage}
             id="discover"
+            active={!isManage}
+            padding="large 0"
+            href="/"
             renderTitle={
               <Link style={{color: 'initial', textDecoration: 'initial'}} to="/">
                 {I18n.t('Discover')}
@@ -95,7 +98,7 @@ export const LtiAppsLayout = React.memo(() => {
           id="manage"
           padding="large x-small"
           isSelected={!!isManage}
-          active={true}
+          active={!!isManage}
         >
           <Outlet />
         </Tabs.Panel>
