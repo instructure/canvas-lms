@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-#
-# Copyright (C) 2011 - present Instructure, Inc.
+# Copyright (C) 2024 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -17,16 +16,16 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-# Be sure to restart your server when you modify this file.
+class AddReplicaIdentityToDiscussionSummaries < ActiveRecord::Migration[7.0]
+  tag :predeploy
 
-ActiveSupport::Inflector.inflections do |inflect|
-  inflect.singular(/(criteri)a$/i, '\1on')
-  inflect.plural(/(criteri)on$/i, '\1a')
-  inflect.acronym "GraphQL"
-  inflect.acronym "IMS"
-  inflect.acronym "BLTI"
-  inflect.acronym "CSV"
-  inflect.acronym "OAuth"
-  inflect.acronym "OAuth2"
-  inflect.irregular "feedback", "feedback"
+  def up
+    set_replica_identity :discussion_topic_summaries
+    set_replica_identity :discussion_topic_summary_feedback
+  end
+
+  def down
+    set_replica_identity :discussion_topic_summaries, :default
+    set_replica_identity :discussion_topic_summary_feedback, :default
+  end
 end
