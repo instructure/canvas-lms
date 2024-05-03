@@ -191,8 +191,8 @@ ready(() => {
         const isFullyAnonymous = anonymousState === 'full_anonymity'
         const isAnonymous = isPartiallyAnonymous || isFullyAnonymous
 
-        if (isAnonymous && gradingCheckbox.checked) gradingCheckbox.click()
-        gradingCheckbox.disabled = isAnonymous
+        if (isAnonymous && gradingCheckbox?.checked) gradingCheckbox.click()
+        if (gradingCheckbox) gradingCheckbox.disabled = isAnonymous
         document.querySelector('#group_category_options').hidden = isAnonymous
         groupsNotAllowedRoot.style.display = isAnonymous ? 'inline' : 'none'
 
