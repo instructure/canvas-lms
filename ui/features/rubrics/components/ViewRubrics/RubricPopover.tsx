@@ -128,12 +128,12 @@ export const RubricPopover = ({
           <Menu.Item data-testid="archive-rubric-button" onClick={handleArchiveRubric}>
             {active ? I18n.t('Archive') : I18n.t('Un-Archive')}
           </Menu.Item>
-          <Menu.Item data-testid="download-rubric-button" onClick={() => {}}>
+          {/* <Menu.Item data-testid="download-rubric-button" onClick={() => {}}>
             {I18n.t('Download')}
           </Menu.Item>
           <Menu.Item data-testid="print-rubric-button" onClick={() => {}}>
             {I18n.t('Print')}
-          </Menu.Item>
+          </Menu.Item> */}
           <Menu.Item
             disabled={hasRubricAssociations}
             data-testid="delete-rubric-button"

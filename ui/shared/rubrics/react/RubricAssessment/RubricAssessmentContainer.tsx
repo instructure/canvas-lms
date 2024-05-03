@@ -373,7 +373,7 @@ const AssessmentHeader = ({
             </Flex.Item>
           </>
         )}
-        <Flex.Item margin="0 0 0 small">
+        {/* <Flex.Item margin="0 0 0 small">
           <IconButton disabled={isPreviewMode} screenReaderLabel="Print">
             <IconPrinterLine />
           </IconButton>
@@ -382,7 +382,7 @@ const AssessmentHeader = ({
           <IconButton disabled={isPreviewMode} screenReaderLabel="Download">
             <IconDownloadLine />
           </IconButton>
-        </Flex.Item>
+        </Flex.Item> */}
       </Flex>
 
       {!isTraditionalView && (
