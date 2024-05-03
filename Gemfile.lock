@@ -623,11 +623,11 @@ GEM
     ice_cube (0.16.4)
     ice_nine (0.11.2)
     idn-ruby (0.1.5)
-    ims-lti (2.3.4)
+    ims-lti (2.3.5)
       addressable (~> 2.5, >= 2.5.1)
       builder (~> 3.2)
       faraday (< 3.0)
-      json-jwt (~> 1.7)
+      json-jwt (~> 1.16.6)
       rexml
       simple_oauth (~> 0.3.1)
     inst-jobs (3.1.17)
