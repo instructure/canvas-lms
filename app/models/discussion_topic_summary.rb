@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-#
-# Copyright (C) 2011 - present Instructure, Inc.
+# Copyright (C) 2024 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -17,16 +16,19 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-# Be sure to restart your server when you modify this file.
+class DiscussionTopicSummary < ActiveRecord::Base
+  belongs_to :root_account, class_name: "Account"
+  belongs_to :discussion_topic, inverse_of: :summaries
 
-ActiveSupport::Inflector.inflections do |inflect|
-  inflect.singular(/(criteri)a$/i, '\1on')
-  inflect.plural(/(criteri)on$/i, '\1a')
-  inflect.acronym "GraphQL"
-  inflect.acronym "IMS"
-  inflect.acronym "BLTI"
-  inflect.acronym "CSV"
-  inflect.acronym "OAuth"
-  inflect.acronym "OAuth2"
-  inflect.irregular "feedback", "feedback"
+  has_many :feedback, class_name: "DiscussionTopicSummary::Feedback"
+
+  validates :summary, presence: true
+  validates :llm_config_version, presence: true
+  validates :dynamic_content_hash, presence: true
+
+  before_validation :set_root_account
+
+  def set_root_account
+    self.root_account ||= discussion_topic.root_account
+  end
 end
