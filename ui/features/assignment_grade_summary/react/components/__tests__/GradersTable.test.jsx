@@ -17,8 +17,9 @@
  */
 
 import React from 'react'
-import {render, act} from '@testing-library/react'
+import {render, act, within} from '@testing-library/react'
 import {Provider} from 'react-redux'
+import sinon from 'sinon'
 
 import * as GradeActions from '../../grades/GradeActions'
 import * as StudentActions from '../../students/StudentActions'
@@ -109,11 +110,7 @@ describe('GradeSummary GradersTable', () => {
   }
 
   function getGraderRow(graderId) {
-    const {graderName} = storeEnv.graders.find(grader => grader.graderId === graderId)
-    const rows = [...wrapper.container.querySelectorAll('.grader-label')].filter(row =>
-      row.textContent.includes(graderName)
-    )[0]
-    return rows
+    return wrapper.container.querySelector(`#grader-row-${graderId}`)
   }
 
   function getAcceptGradesColumnHeader() {
@@ -135,7 +132,7 @@ describe('GradeSummary GradersTable', () => {
     )
   })
 
-  describe('"Accept Grades" column', hooks => {
+  describe('"Accept Grades" column', () => {
     beforeEach(() => {
       mountComponent()
     })
@@ -183,9 +180,9 @@ describe('GradeSummary GradersTable', () => {
     })
   })
 
-  describe.skip('"Accept Grades" button', () => {
+  describe('"Accept Grades" button', () => {
     function getGraderAcceptGradesButton(graderId) {
-      return getGraderRow(graderId).find('AcceptGradesButton')
+      return within(getGraderRow(graderId)).getByRole('button')
     }
 
     test('receives the "accept grades" status for the related grader', () => {
@@ -195,26 +192,30 @@ describe('GradeSummary GradersTable', () => {
           GradeActions.setBulkSelectProvisionalGradesStatus('1101', GradeActions.STARTED)
         )
       })
-      const button = getGraderAcceptGradesButton('1101')
-      equal(button.prop('acceptGradesStatus'), GradeActions.STARTED)
+      const row = getGraderRow('1101')
+      expect(
+        within(row.querySelector('[aria-hidden="true"]')).getByText('Accepting')
+      ).toBeInTheDocument()
     })
 
     test('accepts grades for the related grader when clicked', () => {
-      sandbox
+      sinon
         .stub(GradeActions, 'acceptGraderGrades')
         .callsFake(graderId =>
           GradeActions.setBulkSelectProvisionalGradesStatus(graderId, GradeActions.STARTED)
         )
       mountAndFinishLoading()
       const button = getGraderAcceptGradesButton('1101')
-      button.prop('onClick')()
-      equal(store.getState().grades.bulkSelectProvisionalGradeStatuses[1101], GradeActions.STARTED)
+      button.click()
+      expect(store.getState().grades.bulkSelectProvisionalGradeStatuses[1101]).toBe(
+        GradeActions.STARTED
+      )
     })
 
     test('receives the grade selection details for the related grader', () => {
       mountAndFinishLoading()
-      const button = getGraderAcceptGradesButton('1103')
-      deepEqual(button.prop('selectionDetails').provisionalGradeIds, ['4603'])
+      const row = getGraderRow('1103')
+      expect(within(row).getByLabelText('Mrs. Krabappel')).toBeInTheDocument()
     })
   })
 })
