@@ -50,7 +50,7 @@ gem "code_ownership", "~> 1.33"
 gem "ddtrace", "~> 1.13", require: false
 gem "docx", "~> 0.8"
 gem "encrypted_cookie_store-instructure", "~> 1.2", require: "encrypted_cookie_store"
-gem "gepub", "1.0.15"
+gem "gepub", "~> 1.0"
 gem "apollo-federation", "~> 3.8"
 gem "graphql", "~> 2.3.0"
 gem "graphql-batch", "~> 0.5"
