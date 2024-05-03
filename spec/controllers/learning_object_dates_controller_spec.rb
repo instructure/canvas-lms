@@ -587,6 +587,18 @@ describe LearningObjectDatesController do
         expect(override2.lock_at_overridden).to be false
       end
 
+      it "allows creating an override for a student who's previously been deleted" do
+        student_in_course
+        ao = differentiable.assignment_overrides.create!
+        aos = ao.assignment_override_students.create!(user: @student)
+        aos.destroy
+        put :update, params: { **default_params, assignment_overrides: [{ student_ids: [@student.id] }] }
+        expect(response).to be_no_content
+        expect(differentiable.assignment_overrides.active.count).to eq 1
+        expect(differentiable.assignment_overrides.active.first.assignment_override_students.active.pluck(:user_id)).to eq [@student.id]
+        expect(aos.reload).to be_deleted
+      end
+
       it "returns bad_request if trying to create duplicate overrides" do
         put :update, params: { **default_params,
           assignment_overrides: [{ course_section_id: @course.default_section.id },
