@@ -114,12 +114,12 @@ describe('GradeSummary Header', () => {
     })
   }
 
-  test('includes the "Grade Summary" heading', () => {
+  it('includes the "Grade Summary" heading', () => {
     mountComponent()
     expect(wrapper.container.querySelector('h1').textContent).toBe('Grade Summary')
   })
 
-  test('includes the assignment title', () => {
+  it('includes the assignment title', () => {
     mountComponent()
     const children = wrapper.container.querySelector('header').children
     const childArray = [...children].map(child => child)
@@ -127,7 +127,7 @@ describe('GradeSummary Header', () => {
     expect(childArray[headingIndex + 1].textContent).toBe('Example Assignment')
   })
 
-  test('includes a "grader with inactive enrollments" message when a grader with inactive enrollment was selected', () => {
+  it('includes a "grader with inactive enrollments" message when a grader with inactive enrollment was selected', () => {
     mountComponent()
     act(() => {
       store.dispatch(
@@ -139,25 +139,25 @@ describe('GradeSummary Header', () => {
     expect(screen.getByText('grader with inactive enrollments', {exact: false})).toBeInTheDocument()
   })
 
-  test('includes a "grades released" message when grades have been released', () => {
+  it('includes a "grades released" message when grades have been released', () => {
     storeEnv.assignment.gradesPublished = true
     mountComponent()
     expect(screen.getByText('they have already been released', {exact: false})).toBeInTheDocument()
   })
 
-  test('excludes the "grades released" message when grades have not yet been released', () => {
+  it('excludes the "grades released" message when grades have not yet been released', () => {
     mountComponent()
     expect(screen.queryByText('they have already been released', {exact: false})).toBeNull()
   })
 
   describe('Graders Table', () => {
-    test('is not displayed when there are no graders', () => {
+    it('is not displayed when there are no graders', () => {
       storeEnv.graders = []
       mountComponent()
       expect(screen.queryByTestId('graders-table')).toBeNull()
     })
 
-    test('is displayed when there are graders', () => {
+    it('is displayed when there are graders', () => {
       mountComponent()
       expect(screen.getByTestId('graders-table')).toBeInTheDocument()
     })
@@ -176,18 +176,21 @@ describe('GradeSummary Header', () => {
       }))
     })
 
-    test('is always displayed', () => {
+    it('is always displayed', () => {
       storeEnv.graders = []
       mountComponent()
       expect(screen.getByRole('button', {name: /release grades/i})).toBeInTheDocument()
     })
 
-    test.skip('receives the assignment gradesPublished property as a prop', () => {
+    it('receives the assignment gradesPublished property as a prop', () => {
+      storeEnv.assignment.gradesPublished = true
+
       mountComponent()
-      strictEqual(wrapper.find('ReleaseButton').prop('gradesReleased'), false)
+
+      expect(screen.queryByRole('button', {name: /grades released/i})).toBeInTheDocument()
     })
 
-    test('receives the unmuteAssignmentStatus as a prop', () => {
+    it('receives the unmuteAssignmentStatus as a prop', () => {
       mountComponent()
       act(() => {
         store.dispatch(AssignmentActions.setReleaseGradesStatus(AssignmentActions.STARTED))
@@ -195,7 +198,7 @@ describe('GradeSummary Header', () => {
       expect(screen.getByRole('button', {name: /releasing grades/i})).toBeInTheDocument()
     })
 
-    test('displays a confirmation dialog when clicked', async () => {
+    it('displays a confirmation dialog when clicked', async () => {
       const user = userEvent.setup({delay: null})
       mountComponent()
       await user.click(screen.getByRole('button', {name: /release grades/i}))
@@ -204,7 +207,7 @@ describe('GradeSummary Header', () => {
       })
     })
 
-    test('releases grades when dialog is confirmed', async () => {
+    it('releases grades when dialog is confirmed', async () => {
       const user = userEvent.setup({delay: null})
       mountComponent()
       await user.click(screen.getByRole('button', {name: /release grades/i}))
@@ -213,7 +216,7 @@ describe('GradeSummary Header', () => {
       })
     })
 
-    test('does not release grades when dialog is dismissed', async () => {
+    it('does not release grades when dialog is dismissed', async () => {
       window.confirm = () => false
       //   window.confirm.returns(false)
       const user = userEvent.setup({delay: null})
@@ -225,21 +228,21 @@ describe('GradeSummary Header', () => {
       })
     })
 
-    test('enables onClick when there are no grades', async () => {
+    it('enables onClick when there are no grades', async () => {
       grades = []
       mountAndInitialize()
       const releaseButton = screen.getByRole('button', {name: /release grades/i})
       expect(releaseButton.disabled).toBe(false)
     })
 
-    test('enables button when there are no grades selected', () => {
+    it('enables button when there are no grades selected', () => {
       grades.forEach(grade => (grade.selected = false))
       mountAndInitialize()
       const releaseButton = screen.getByRole('button', {name: /release grades/i})
       expect(releaseButton.disabled).toBe(false)
     })
 
-    test('disables onClick when there is at least one grade with a not selectable grader', () => {
+    it('disables onClick when there is at least one grade with a not selectable grader', () => {
       grades[0].selected = false
       grades[1].selected = true
       mountAndInitialize()
@@ -247,7 +250,7 @@ describe('GradeSummary Header', () => {
       expect(releaseButton.disabled).toBe(true)
     })
 
-    test('enables onClick when all the grades have a selectable grader', () => {
+    it('enables onClick when all the grades have a selectable grader', () => {
       mountAndInitialize()
       const releaseButton = screen.getByRole('button', {name: /release grades/i})
       expect(releaseButton.disabled).toBe(false)
@@ -268,19 +271,22 @@ describe('GradeSummary Header', () => {
       }))
     })
 
-    test('is always displayed', () => {
+    it('is always displayed', () => {
       storeEnv.graders = []
       mountComponent()
       expect(screen.getByRole('button', {name: /post to students/i})).toBeInTheDocument()
     })
 
-    test.skip('receives the assignment as a prop', () => {
+    it('receives the assignment as a prop', () => {
+      storeEnv.assignment.muted = false
+      storeEnv.assignment.gradesPublished = false
+
       mountComponent()
-      const button = wrapper.find('PostToStudentsButton')
-      deepEqual(button.prop('assignment'), storeEnv.assignment)
+
+      expect(screen.queryByRole('button', {name: /grades posted to students/i})).toBeDisabled()
     })
 
-    test('receives the unmuteAssignmentStatus as a prop', () => {
+    it('receives the unmuteAssignmentStatus as a prop', () => {
       mountComponent()
       act(() => {
         store.dispatch(AssignmentActions.setUnmuteAssignmentStatus(AssignmentActions.STARTED))
@@ -288,7 +294,7 @@ describe('GradeSummary Header', () => {
       expect(screen.getByRole('button', {name: /posting to students/i})).toBeInTheDocument()
     })
 
-    test('displays a confirmation dialog when clicked', async () => {
+    it('displays a confirmation dialog when clicked', async () => {
       const user = userEvent.setup({delay: null})
       mountComponent()
       await user.click(screen.getByRole('button', {name: /post to students/i}))
@@ -297,7 +303,7 @@ describe('GradeSummary Header', () => {
       })
     })
 
-    test('unmutes the assignment when dialog is confirmed', async () => {
+    it('unmutes the assignment when dialog is confirmed', async () => {
       const user = userEvent.setup({delay: null})
       mountComponent()
       await user.click(screen.getByRole('button', {name: /post to students/i}))
@@ -306,7 +312,7 @@ describe('GradeSummary Header', () => {
       })
     })
 
-    test('does not unmute the assignment when dialog is dismissed', async () => {
+    it('does not unmute the assignment when dialog is dismissed', async () => {
       window.confirm = () => false
       const user = userEvent.setup({delay: null})
 
