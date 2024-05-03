@@ -356,7 +356,6 @@ class ApplicationController < ActionController::Base
     differentiated_modules
     enhanced_course_creation_account_fetching
     instui_for_import_page
-    enhanced_rubrics
     multiselect_gradebook_filters
     assignment_edit_placement_not_on_announcements
     platform_service_speedgrader
@@ -383,6 +382,7 @@ class ApplicationController < ActionController::Base
     instui_nav
     enhanced_developer_keys_tables
     lti_registrations_discover_page
+    enhanced_rubrics
   ].freeze
   JS_ENV_BRAND_ACCOUNT_FEATURES = [
     :embedded_release_notes

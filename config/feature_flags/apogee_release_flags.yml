@@ -312,8 +312,10 @@ archived_grading_schemes:
     development:
       state: allowed_on
 enhanced_rubrics:
+  beta: true
   state: hidden
-  applies_to: SiteAdmin
+  applies_to: RootAccount
+  root_opt_in: true
   display_name: Rubric Enhancements
   description: This feature provides visual and functional enhancements to rubrics across Canvas.
   environments:
