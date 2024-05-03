@@ -1138,9 +1138,14 @@ rubricEditing.init = function () {
             $link.addClass('loaded')
             $rubric_dialog.find('.rubrics_loading_message').hide()
             $rubric_dialog.find('.rubrics_dialog_rubrics,.rubrics_dialog_rubrics_select').show()
-            data.forEach(item => {
+            for (const item of data) {
               const association = item.rubric_association
               const rubric = association.rubric
+
+              if (rubric.workflow_state !== 'active') {
+                continue
+              }
+
               const $rubric_select = $rubric_dialog
                 .find('.rubrics_dialog_rubric_select.blank:first')
                 .clone(true)
@@ -1185,7 +1190,7 @@ rubricEditing.init = function () {
                 $rubric.find('.rubric.rubric_summary tr.summary').before($criterion.show())
               })
               $rubric_dialog.find('.rubrics_dialog_rubrics').append($rubric)
-            })
+            }
             $rubric_dialog
               .find('.rubrics_dialog_rubrics_select .rubrics_dialog_rubric_select')
               .hide()
