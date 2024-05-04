@@ -1445,6 +1445,9 @@
     "next_40e12421": {
         "message": "Tiếp"
     },
+    "next_findtext_9d69f0fe": {
+        "message": "{ findText } Tiếp Theo"
+    },
     "no_accessibility_issues_were_detected_f8d3c875": {
         "message": "Không phát hiện vấn đề khả năng tiếp cận."
     },
@@ -1721,6 +1724,9 @@
     "previous_bd2ac015": {
         "message": "Trước"
     },
+    "previous_findtext_8dfbfd30": {
+        "message": "{ findText } Trước"
+    },
     "prime_917ea60e": {
         "message": "Nguyên Tố"
     },
@@ -1796,11 +1802,23 @@
     "replace_all_d3d68b3": {
         "message": "Thay Tất Cả"
     },
+    "replace_all_findtext_with_replacetext_da574b32": {
+        "message": "Thay thế tất cả { findText } bằng { replaceText }"
+    },
     "replace_e61834a7": {
         "message": "Thay Thế"
     },
+    "replace_findtext_with_replacetext_7b5c7fb3": {
+        "message": "Thay thế { findText } bằng { replaceText }"
+    },
     "replace_with_eeff01ad": {
         "message": "Thay bằng"
+    },
+    "replaced_alertfindtext_with_alertreplacetext_de5c1795": {
+        "message": "Đã thay thế { alertFindText } bằng { alertReplaceText }"
+    },
+    "replaced_all_alertfindtext_with_alertreplacetext_83fdfe59": {
+        "message": "Đã thay thế tất cả { alertFindText } bằng { alertReplaceText }"
     },
     "reset_95a81614": {
         "message": "Cài lại"

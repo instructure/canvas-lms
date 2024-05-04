@@ -1445,6 +1445,9 @@
     "next_40e12421": {
         "message": "Naprej"
     },
+    "next_findtext_9d69f0fe": {
+        "message": "Naslednji { findText }"
+    },
     "no_accessibility_issues_were_detected_f8d3c875": {
         "message": "Ni zaznanih težav z dostopnostjo."
     },
@@ -1721,6 +1724,9 @@
     "previous_bd2ac015": {
         "message": "Nazaj"
     },
+    "previous_findtext_8dfbfd30": {
+        "message": "Prejšnji { findText }"
+    },
     "prime_917ea60e": {
         "message": "Pra"
     },
@@ -1796,11 +1802,23 @@
     "replace_all_d3d68b3": {
         "message": "Zamenjaj vse"
     },
+    "replace_all_findtext_with_replacetext_da574b32": {
+        "message": "Zamenjaj vse { findText } s/z { replaceText }"
+    },
     "replace_e61834a7": {
         "message": "Zamenjaj"
     },
+    "replace_findtext_with_replacetext_7b5c7fb3": {
+        "message": "Zamenjaj { findText } s/z { replaceText }"
+    },
     "replace_with_eeff01ad": {
         "message": "Zamenjaj s/z"
+    },
+    "replaced_alertfindtext_with_alertreplacetext_de5c1795": {
+        "message": "Zamenjano { alertFindText } s/z { alertReplaceText }"
+    },
+    "replaced_all_alertfindtext_with_alertreplacetext_83fdfe59": {
+        "message": "Zamenjano vse { alertFindText } s/z { alertReplaceText }"
     },
     "reset_95a81614": {
         "message": "Obnovi"

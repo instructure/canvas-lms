@@ -647,6 +647,7 @@
   "nested_less_than_27d17e58": { "message": "Kurang Daripada Tersarang" },
   "new_quiz_34aacba6": { "message": "Kuiz Baharu" },
   "next_40e12421": { "message": "Seterusnya" },
+  "next_findtext_9d69f0fe": { "message": "Seterusnya { findText }" },
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "Tiada isu kebolehcapaian dikesan."
   },
@@ -767,6 +768,7 @@
   "preview_in_overlay_ed772c46": { "message": "Pratonton dalam tindihan" },
   "preview_inline_9787330": { "message": "Pratonton dalam sebaris" },
   "previous_bd2ac015": { "message": "Sebelumnya" },
+  "previous_findtext_8dfbfd30": { "message": "Sebelumnya { findText }" },
   "prime_917ea60e": { "message": "Perdana" },
   "prime_numbers_13464f61": { "message": "Nombor Perdana" },
   "product_39cf144f": { "message": "Produk" },
@@ -796,8 +798,20 @@
   "remove_heading_style_5fdc8855": { "message": "Alih keluar gaya tajuk" },
   "remove_link_d1f2f4d0": { "message": "Alih Keluar Pautan" },
   "replace_all_d3d68b3": { "message": "Gantikan Semua" },
+  "replace_all_findtext_with_replacetext_da574b32": {
+    "message": "Gantikan semua { findText } dengan { replaceText }"
+  },
   "replace_e61834a7": { "message": "Gantikan" },
+  "replace_findtext_with_replacetext_7b5c7fb3": {
+    "message": "Gantikan semua { findText } dengan { replaceText }"
+  },
   "replace_with_eeff01ad": { "message": "Gantikan dengan" },
+  "replaced_alertfindtext_with_alertreplacetext_de5c1795": {
+    "message": "Gantikan semua { alertFindText } dengan { alertReplaceText }"
+  },
+  "replaced_all_alertfindtext_with_alertreplacetext_83fdfe59": {
+    "message": "Gantikan semua { alertFindText } dengan { alertReplaceText }"
+  },
   "reset_95a81614": { "message": "Tetap Semula" },
   "resize_ec83d538": { "message": "Saiz Semula" },
   "restore_auto_save_deccd84b": {

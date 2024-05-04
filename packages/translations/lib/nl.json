@@ -1445,6 +1445,9 @@
     "next_40e12421": {
         "message": "Volgende"
     },
+    "next_findtext_9d69f0fe": {
+        "message": "Volgende { findText }"
+    },
     "no_accessibility_issues_were_detected_f8d3c875": {
         "message": "Geen toegankelijkheidsproblemen gevonden."
     },
@@ -1721,6 +1724,9 @@
     "previous_bd2ac015": {
         "message": "Vorige"
     },
+    "previous_findtext_8dfbfd30": {
+        "message": "Vorige { findText }"
+    },
     "prime_917ea60e": {
         "message": "Priem"
     },
@@ -1796,11 +1802,23 @@
     "replace_all_d3d68b3": {
         "message": "Alles vervangen"
     },
+    "replace_all_findtext_with_replacetext_da574b32": {
+        "message": "Vervang alle { findText } door { replaceText }"
+    },
     "replace_e61834a7": {
         "message": "Vervangen"
     },
+    "replace_findtext_with_replacetext_7b5c7fb3": {
+        "message": "Vervang { findText } door { replaceText }"
+    },
     "replace_with_eeff01ad": {
         "message": "Vervangen door"
+    },
+    "replaced_alertfindtext_with_alertreplacetext_de5c1795": {
+        "message": "{ alertFindText } is vervangen door { alertReplaceText }"
+    },
+    "replaced_all_alertfindtext_with_alertreplacetext_83fdfe59": {
+        "message": "Alle { alertFindText } zijn vervangen door { alertReplaceText }"
     },
     "reset_95a81614": {
         "message": "Opnieuw instellen"

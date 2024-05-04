@@ -1445,6 +1445,9 @@
     "next_40e12421": {
         "message": "Następny"
     },
+    "next_findtext_9d69f0fe": {
+        "message": "Następny { findText }"
+    },
     "no_accessibility_issues_were_detected_f8d3c875": {
         "message": "Nie wykryto problemów z dostępnością."
     },
@@ -1721,6 +1724,9 @@
     "previous_bd2ac015": {
         "message": "Poprzednie"
     },
+    "previous_findtext_8dfbfd30": {
+        "message": "Poprzednie { findText }"
+    },
     "prime_917ea60e": {
         "message": "Liczba pierwsza"
     },
@@ -1796,11 +1802,23 @@
     "replace_all_d3d68b3": {
         "message": "Zamień wszystko"
     },
+    "replace_all_findtext_with_replacetext_da574b32": {
+        "message": "Zamień wszystkie { findText } na { replaceText }"
+    },
     "replace_e61834a7": {
         "message": "Zastąp"
     },
+    "replace_findtext_with_replacetext_7b5c7fb3": {
+        "message": "Zamień { findText } na { replaceText }"
+    },
     "replace_with_eeff01ad": {
         "message": "Zastąp"
+    },
+    "replaced_alertfindtext_with_alertreplacetext_de5c1795": {
+        "message": "Zamieniono { alertFindText } na { alertReplaceText }"
+    },
+    "replaced_all_alertfindtext_with_alertreplacetext_83fdfe59": {
+        "message": "Zamieniono wszystkie { alertFindText } na { alertReplaceText }"
     },
     "reset_95a81614": {
         "message": "Resetuj"
