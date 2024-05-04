@@ -602,6 +602,7 @@ const locale = {
   "nested_less_than_27d17e58": { "message": "巢式小於" },
   "new_quiz_34aacba6": { "message": "新測驗" },
   "next_40e12421": { "message": "下一個" },
+  "next_findtext_9d69f0fe": { "message": "下一個 { findText }" },
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "並無偵察任何可訪問性問題。"
   },
@@ -710,6 +711,7 @@ const locale = {
   "preview_in_overlay_ed772c46": { "message": "覆蓋預覽" },
   "preview_inline_9787330": { "message": "預覽內嵌" },
   "previous_bd2ac015": { "message": "上一個" },
+  "previous_findtext_8dfbfd30": { "message": "上一個 { findText }" },
   "prime_917ea60e": { "message": "質數" },
   "prime_numbers_13464f61": { "message": "質數" },
   "product_39cf144f": { "message": "產品" },
@@ -739,8 +741,20 @@ const locale = {
   "remove_heading_style_5fdc8855": { "message": "移除標題樣式" },
   "remove_link_d1f2f4d0": { "message": "移除連結" },
   "replace_all_d3d68b3": { "message": "全部取代" },
+  "replace_all_findtext_with_replacetext_da574b32": {
+    "message": "以 { replaceText } 取代所有的 { findText }"
+  },
   "replace_e61834a7": { "message": "替換" },
+  "replace_findtext_with_replacetext_7b5c7fb3": {
+    "message": "以 { replaceText } 取代 { findText }"
+  },
   "replace_with_eeff01ad": { "message": "取代為" },
+  "replaced_alertfindtext_with_alertreplacetext_de5c1795": {
+    "message": "以 { alertReplaceText } 取代 { alertFindText }"
+  },
+  "replaced_all_alertfindtext_with_alertreplacetext_83fdfe59": {
+    "message": "以 { alertReplaceText } 取代所有的 { alertFindText }"
+  },
   "reset_95a81614": { "message": "重設" },
   "resize_ec83d538": { "message": "調校大小" },
   "restore_auto_save_deccd84b": { "message": "還原自動儲存？" },

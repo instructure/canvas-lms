@@ -655,6 +655,7 @@ const locale = {
   "nested_less_than_27d17e58": { "message": "Faldað minna en" },
   "new_quiz_34aacba6": { "message": "Nýtt próf" },
   "next_40e12421": { "message": "Næsti" },
+  "next_findtext_9d69f0fe": { "message": "Næst { findText }" },
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "Engin vandamál fundust varðandi aðgengileika."
   },
@@ -783,6 +784,7 @@ const locale = {
   "preview_in_overlay_ed772c46": { "message": "Forskoðun með yfirlagningu" },
   "preview_inline_9787330": { "message": "Forskoðun í línu" },
   "previous_bd2ac015": { "message": "Fyrri" },
+  "previous_findtext_8dfbfd30": { "message": "Fyrri { findText }" },
   "prime_917ea60e": { "message": "Frum" },
   "prime_numbers_13464f61": { "message": "Frumtölur" },
   "product_39cf144f": { "message": "Feldi" },
@@ -814,8 +816,20 @@ const locale = {
   "remove_heading_style_5fdc8855": { "message": "Fjarlægja stíl hauss" },
   "remove_link_d1f2f4d0": { "message": "Fjarlægja tengil" },
   "replace_all_d3d68b3": { "message": "Skipta um allt" },
+  "replace_all_findtext_with_replacetext_da574b32": {
+    "message": "Skipta út öllu { findText } fyrir { replaceText }"
+  },
   "replace_e61834a7": { "message": "Skipta út" },
+  "replace_findtext_with_replacetext_7b5c7fb3": {
+    "message": "Skipta út { findText } fyrir { replaceText }"
+  },
   "replace_with_eeff01ad": { "message": "Skipta um með" },
+  "replaced_alertfindtext_with_alertreplacetext_de5c1795": {
+    "message": "Skipt út { alertFindText } fyrir { alertReplaceText }"
+  },
+  "replaced_all_alertfindtext_with_alertreplacetext_83fdfe59": {
+    "message": "Skipt út öllu { alertFindText } fyrir { alertReplaceText }"
+  },
   "reset_95a81614": { "message": "Endurstilla" },
   "resize_ec83d538": { "message": "Breyta stærð" },
   "restore_auto_save_deccd84b": { "message": "Endurheimta sjálfvirka vistun?" },
