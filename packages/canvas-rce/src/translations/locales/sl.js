@@ -678,6 +678,7 @@ const locale = {
   "nested_less_than_27d17e58": { "message": "Ugnezdeni znak za manjše kot" },
   "new_quiz_34aacba6": { "message": "Nov kviz" },
   "next_40e12421": { "message": "Naprej" },
+  "next_findtext_9d69f0fe": { "message": "Naslednji { findText }" },
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "Ni zaznanih težav z dostopnostjo."
   },
@@ -818,6 +819,7 @@ const locale = {
   },
   "preview_inline_9787330": { "message": "Vstavljen predogled" },
   "previous_bd2ac015": { "message": "Nazaj" },
+  "previous_findtext_8dfbfd30": { "message": "Prejšnji { findText }" },
   "prime_917ea60e": { "message": "Pra" },
   "prime_numbers_13464f61": { "message": "Praštevila" },
   "product_39cf144f": { "message": "Zmnožek" },
@@ -847,8 +849,20 @@ const locale = {
   "remove_heading_style_5fdc8855": { "message": "Odstrani slog naslova" },
   "remove_link_d1f2f4d0": { "message": "Odstrani povezavo" },
   "replace_all_d3d68b3": { "message": "Zamenjaj vse" },
+  "replace_all_findtext_with_replacetext_da574b32": {
+    "message": "Zamenjaj vse { findText } s/z { replaceText }"
+  },
   "replace_e61834a7": { "message": "Zamenjaj" },
+  "replace_findtext_with_replacetext_7b5c7fb3": {
+    "message": "Zamenjaj { findText } s/z { replaceText }"
+  },
   "replace_with_eeff01ad": { "message": "Zamenjaj s/z" },
+  "replaced_alertfindtext_with_alertreplacetext_de5c1795": {
+    "message": "Zamenjano { alertFindText } s/z { alertReplaceText }"
+  },
+  "replaced_all_alertfindtext_with_alertreplacetext_83fdfe59": {
+    "message": "Zamenjano vse { alertFindText } s/z { alertReplaceText }"
+  },
   "reset_95a81614": { "message": "Obnovi" },
   "resize_ec83d538": { "message": "Spremeni velikost" },
   "restore_auto_save_deccd84b": {

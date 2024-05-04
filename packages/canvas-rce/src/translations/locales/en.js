@@ -184,6 +184,9 @@ const locale = {
   "congruent_5a244acd": { "message": "Congruent" },
   "contains_311f37b7": { "message": "Contains" },
   "content_1440204b": { "message": "Content" },
+  "content_in_the_editor_will_be_changed_press_cancel_d5bf3357": {
+    "message": "Content in the editor will be changed. Press Cancel to keep the original content."
+  },
   "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
     "message": "Content is still being uploaded, if you continue it will not be embedded properly."
   },

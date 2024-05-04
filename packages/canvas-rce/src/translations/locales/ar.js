@@ -646,6 +646,7 @@ const locale = {
   "nested_less_than_27d17e58": { "message": "Nested Less Than" },
   "new_quiz_34aacba6": { "message": "اختبار جديد" },
   "next_40e12421": { "message": "التالي" },
+  "next_findtext_9d69f0fe": { "message": "{ findText } التالي" },
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "لم يتم الكشف عن مشاكل إمكانية الوصول."
   },
@@ -776,6 +777,7 @@ const locale = {
   "preview_in_overlay_ed772c46": { "message": "المعاينة بشكل متراكب" },
   "preview_inline_9787330": { "message": "معاينة مضمّنة" },
   "previous_bd2ac015": { "message": "السابق" },
+  "previous_findtext_8dfbfd30": { "message": "{ findText } السابق" },
   "prime_917ea60e": { "message": "Prime" },
   "prime_numbers_13464f61": { "message": "Prime Numbers" },
   "product_39cf144f": { "message": "منتج" },
@@ -805,8 +807,20 @@ const locale = {
   "remove_heading_style_5fdc8855": { "message": "إزالة نمط العنوان" },
   "remove_link_d1f2f4d0": { "message": "إزالة الارتباط" },
   "replace_all_d3d68b3": { "message": "استبدال الكل" },
+  "replace_all_findtext_with_replacetext_da574b32": {
+    "message": "استبدال كل { findText } بـ{ replaceText }"
+  },
   "replace_e61834a7": { "message": "استبدال" },
+  "replace_findtext_with_replacetext_7b5c7fb3": {
+    "message": "استبدال { findText } بـ{ replaceText }"
+  },
   "replace_with_eeff01ad": { "message": "استبدال بـ" },
+  "replaced_alertfindtext_with_alertreplacetext_de5c1795": {
+    "message": "تم استبدال { alertFindText } بـ{ alertReplaceText }"
+  },
+  "replaced_all_alertfindtext_with_alertreplacetext_83fdfe59": {
+    "message": "تم استبدال كل { alertFindText } بـ{ alertReplaceText }"
+  },
   "reset_95a81614": { "message": "إعادة التعيين" },
   "resize_ec83d538": { "message": "تغيير الحجم" },
   "restore_auto_save_deccd84b": { "message": "استعادة الحفظ التلقائي؟" },
