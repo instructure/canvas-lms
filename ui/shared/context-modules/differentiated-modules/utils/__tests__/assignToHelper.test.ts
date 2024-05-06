@@ -40,7 +40,7 @@ describe('generateDateDetailsPayload', () => {
       assignment_overrides: [] as DateDetailsOverride[],
       only_visible_to_overrides: false,
     }
-    expect(generateDateDetailsPayload(cards, false)).toEqual(expectedPayload)
+    expect(generateDateDetailsPayload(cards, false, [])).toEqual(expectedPayload)
   })
 
   it('returns a mastery paths override if a MP card was setup', () => {
@@ -61,11 +61,12 @@ describe('generateDateDetailsPayload', () => {
           noop_id: 1,
           unlock_at: null,
           title: 'Mastery Paths',
+          unassign_item: false,
         },
       ] as unknown as DateDetailsOverride[],
       only_visible_to_overrides: true,
     }
-    expect(generateDateDetailsPayload(cards, false)).toEqual(expectedPayload)
+    expect(generateDateDetailsPayload(cards, false, [])).toEqual(expectedPayload)
   })
 
   it('returns a course override if allowed and an everyone card was created', () => {
@@ -87,10 +88,11 @@ describe('generateDateDetailsPayload', () => {
           lock_at: null,
           course_id: 'everyone',
           unlock_at: null,
+          unassign_item: false,
         },
       ] as unknown as DateDetailsOverride[],
     }
-    expect(generateDateDetailsPayload(cards, true)).toEqual(expectedPayload)
+    expect(generateDateDetailsPayload(cards, true, [])).toEqual(expectedPayload)
   })
 
   it('does not include override id for a course override if not originally a course override', () => {
@@ -111,10 +113,11 @@ describe('generateDateDetailsPayload', () => {
           lock_at: null,
           course_id: 'everyone',
           unlock_at: null,
+          unassign_item: false,
         },
       ] as unknown as DateDetailsOverride[],
     }
-    expect(generateDateDetailsPayload(cards, true)).toEqual(expectedPayload)
+    expect(generateDateDetailsPayload(cards, true, [])).toEqual(expectedPayload)
   })
 
   it('does not include override id for a section override if not originally a section', () => {
@@ -136,9 +139,54 @@ describe('generateDateDetailsPayload', () => {
           lock_at: undefined,
           course_section_id: '1',
           unlock_at: undefined,
+          unassign_item: false,
         },
       ] as unknown as DateDetailsOverride[],
     }
-    expect(generateDateDetailsPayload(cards, true)).toEqual(expectedPayload)
+    expect(generateDateDetailsPayload(cards, true, [])).toEqual(expectedPayload)
+  })
+
+  it('includes an unassigned override for any deleted module assignees', () => {
+    const cards: ItemAssignToCardSpec[] = [
+      {
+        overrideId: '1',
+        isValid: true,
+        hasAssignees: true,
+        selectedAssigneeIds: ['section-1'] as string[],
+        defaultOptions: ['student-1'],
+        due_at: '2021-01-01T00:00:00Z',
+      } as ItemAssignToCardSpec,
+    ]
+    const expectedPayload = <DateDetailsPayload>{
+      assignment_overrides: [
+        {
+          due_at: '2021-01-01T00:00:00Z',
+          id: undefined,
+          lock_at: undefined,
+          course_section_id: '1',
+          unlock_at: undefined,
+          unassign_item: false,
+        },
+        {
+          due_at: null,
+          id: undefined,
+          lock_at: null,
+          student_ids: ['1'],
+          unlock_at: null,
+          unassign_item: true,
+        },
+        {
+          due_at: null,
+          id: undefined,
+          lock_at: null,
+          course_section_id: '2',
+          unlock_at: null,
+          unassign_item: true,
+        },
+      ] as unknown as DateDetailsOverride[],
+    }
+    expect(generateDateDetailsPayload(cards, true, ['section-2', 'student-1'])).toEqual(
+      expectedPayload
+    )
   })
 })

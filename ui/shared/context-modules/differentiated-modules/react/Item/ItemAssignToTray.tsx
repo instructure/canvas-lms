@@ -132,7 +132,11 @@ export const updateModuleItem = ({
 // TODO: need props to initialize with cards corresponding to current assignments
 export interface ItemAssignToTrayProps {
   open: boolean
-  onSave?: (overrides: ItemAssignToCardSpec[], hasModuleOverrides: boolean) => void
+  onSave?: (
+    overrides: ItemAssignToCardSpec[],
+    hasModuleOverrides: boolean,
+    deletedModuleAssignees: String[]
+  ) => void
   onClose: () => void
   onDismiss: () => void
   onExited?: () => void
@@ -195,6 +199,7 @@ export default function ItemAssignToTray({
     undefined
   )
   const [hasModuleOverrides, setHasModuleOverrides] = useState(false)
+  const [moduleAssignees, setModuleAssignees] = useState<string[]>([])
   const lastPerformedAction = useRef<{action: 'add' | 'delete'; index?: number} | null>(null)
   const cardsRefs = useRef<{[cardId: string]: ItemAssignToCardRef}>({})
   const addCardButtonRef = useRef<Element | null>(null)
@@ -301,6 +306,7 @@ export default function ItemAssignToTray({
         delete dateDetailsApiResponse.overrides
         const baseDates: BaseDateDetails = dateDetailsApiResponse
         const onlyOverrides = !dateDetailsApiResponse.visible_to_everyone
+        const allModuleAssignees: string[] = []
         const hasModuleOverride = overrides?.some(override => override.context_module_id)
         const hasCourseOverride = overrides?.some(override => override.course_id)
 
@@ -324,6 +330,19 @@ export default function ItemAssignToTray({
         }
         if (overrides?.length) {
           overrides.forEach(override => {
+            // if an override is unassigned, we don't need to show a card for it
+            if (override.unassign_item) {
+              return
+            }
+            // need to get any module assignees before we start filtering out hidden module cards
+            if (override.context_module_id) {
+              if (override.course_section_id) {
+                allModuleAssignees.push(`section-${override.course_section_id}`)
+              }
+              if (override.student_ids) {
+                allModuleAssignees.push(...override.student_ids.map(id => `student-${id}`))
+              }
+            }
             let removeCard = false
             let filteredStudents = override.student_ids
             if (override.context_module_id && override.student_ids) {
@@ -369,6 +388,7 @@ export default function ItemAssignToTray({
             selectedOptionIds.push(...defaultOptions)
           })
         }
+        setModuleAssignees(allModuleAssignees)
         setHasModuleOverrides(hasModuleOverride || false)
         setBlueprintDateLocks(dateDetailsApiResponse.blueprint_date_locks)
         setDisabledOptionIds(selectedOptionIds)
@@ -422,9 +442,13 @@ export default function ItemAssignToTray({
       firstCardWithErrorRef?.focusInputs()
       return
     }
+    // compare original module assignees to see if they were removed for unassign_item overrides
+    const deletedModuleAssignees = moduleAssignees.filter(
+      override => !disabledOptionIds.includes(override)
+    )
 
     if (onSave !== undefined) {
-      onSave(assignToCards, hasModuleOverrides)
+      onSave(assignToCards, hasModuleOverrides, deletedModuleAssignees)
       return
     }
     const filteredCards = assignToCards.filter(
@@ -432,7 +456,11 @@ export default function ItemAssignToTray({
         [null, undefined, ''].includes(card.contextModuleId) ||
         (card.contextModuleId !== null && card.isEdited)
     )
-    const payload = generateDateDetailsPayload(filteredCards, hasModuleOverrides)
+    const payload = generateDateDetailsPayload(
+      filteredCards,
+      hasModuleOverrides,
+      deletedModuleAssignees
+    )
     if (itemContentId !== undefined) {
       updateModuleItem({
         courseId,
@@ -445,9 +473,11 @@ export default function ItemAssignToTray({
     }
   }, [
     assignToCards,
+    moduleAssignees,
     onSave,
     hasModuleOverrides,
     itemContentId,
+    disabledOptionIds,
     courseId,
     itemType,
     itemName,

@@ -351,7 +351,7 @@ describe "Api::V1::Assignment" do
       overrides = assignment.assignment_overrides
       json = api.assignment_json(assignment, user, session, { overrides: })
       expect(json).to be_a(Hash)
-      expect(json["overrides"].first.keys.sort).to eq %w[assignment_id id title student_ids].sort
+      expect(json["overrides"].first.keys.sort).to eq %w[assignment_id id title student_ids unassign_item].sort
     end
 
     it "excludes descriptions when exclude_response_fields flag is passed and includes 'description'" do

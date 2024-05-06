@@ -64,7 +64,11 @@ const AssignToOption = (props: Props) => {
     }
   }, [props.pageId])
 
-  const handleSave = (assignToCards: ItemAssignToCardSpec[], hasModuleOverrides: boolean) => {
+  const handleSave = (
+    assignToCards: ItemAssignToCardSpec[],
+    hasModuleOverrides: boolean,
+    deletedModuleAssignees: string[]
+  ) => {
     const hasChanges =
       assignToCards.some(({highlightCard}) => highlightCard) ||
       (checkPoint !== undefined && assignToCards.length < Object.entries(checkPoint).length)
@@ -74,7 +78,11 @@ const AssignToOption = (props: Props) => {
         [null, undefined, ''].includes(card.contextModuleId) ||
         (card.contextModuleId !== null && card.isEdited)
     )
-    const overrides = generateDateDetailsPayload(filteredCards, hasModuleOverrides)
+    const overrides = generateDateDetailsPayload(
+      filteredCards,
+      hasModuleOverrides,
+      deletedModuleAssignees
+    )
     props.onSync(overrides)
     setCheckPoint(assignToCards)
     handleClose()
