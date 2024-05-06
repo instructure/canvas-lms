@@ -410,6 +410,15 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                             attachment={props.discussionTopic.attachment}
                             discussionTopic={props.discussionTopic}
                           >
+                            {!props.discussionTopic.permissions?.reply && (
+                              <Text
+                                size="small"
+                                color="secondary"
+                                data-testid="discussion-topic-closed-for-comments"
+                              >
+                                {I18n.t("This topic is closed for comments.")}
+                              </Text>
+                            )}
                             {props.discussionTopic.permissions?.reply && !expandedReply && (
                               <>
                                 <View
