@@ -790,9 +790,9 @@ CanvasRails::Application.routes.draw do
     resources :developer_keys, only: :index
     get "/developer_keys/:key_id", controller: :developer_keys, action: :index, as: "account_developer_key_view"
 
-    get "extensions", controller: :lti_registrations, action: :index, as: "lti_registrations"
-    get "extensions/*path", controller: :lti_registrations, action: :index
-    get "extensions/manage", controller: :lti_registrations, action: :index, as: "lti_manage_registrations"
+    get "extensions", controller: "lti/registrations", action: :index, as: "lti_registrations"
+    get "extensions/*path", controller: "lti/registrations", action: :index
+    get "extensions/manage", controller: "lti/registrations", action: :index, as: "lti_manage_registrations"
 
     get "release_notes" => "release_notes#manage", :as => :release_notes_manage
 
