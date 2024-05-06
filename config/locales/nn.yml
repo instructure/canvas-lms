@@ -23740,6 +23740,7 @@ nn:
   student_activity_tracking_90bdd519: "Spor studentaktivitet"
   student_annotation: "ein studentmerknad"
   student_annotation_assignments_are_not_currently_s_d840064b: "Studentmerknader er foreløbig ikkje mogleg i gruppeoppgåver"
+  student_annotation_b9dc088c: "Studentmerknader "
   student_annotation_documents_c0f5c4ec: "Studentmerknader Dokument"
   student_annotation_f6810b5c: "Studentmerknader "
   student_annotation_submission_d0025105: "Studentmerknader innlevering"
@@ -23770,6 +23771,9 @@ nn:
   student_extensions_d35a907: "Utvidingar for studentar"
   student_feedback_required_in_comments_above_to_rea_2f5dafbf: "Tilbakemelding til student krevst i kommentarfelt over for å tildele på ny."
   student_first_name_aaa42cbc: "Student fornamn"
+  student_first_name_options_82f5685f: "Alternativ for student fornamn"
+  student_grade_pass_fail_grade_options_742e29c6: "Studentvurdering bestått - ikkje bestått alternativ"
+  student_grade_summary_d7a5cac0: "Vurderingssamandrag for student"
   student_grades_4cbc59a1: "Vurderingar for student"
   student_group_75b86a9f: Studentgruppe
   student_group_filter_185fb085: "Filter for studentgrupper"
@@ -23780,6 +23784,7 @@ nn:
   student_id_236970d8: student_id
   student_id_7cc45fb5: student-ID
   student_id_a61d78c7: Student-ID
+  student_id_c2a72227: "Student %{id}"
   student_information_8715d0c7: Studentinformasjon
   student_integration_id_b9e6ede: "integrasjons-ID student"
   student_integration_id_e08f80af: "integrasjons-ID student"
@@ -23808,6 +23813,7 @@ nn:
       i forhold til læringsmål for emnet. Måla er presenterte i eit karakterbokliknande
       format, og framgangen blir vist både som numerisk resultat og som meistring/nær
       meistring/trengst forbetring.
+  student_outcome_result_b26b7ab4: "Student Læringsmål resultat"
   student_pace_2200bf85: Studentframdrift
   student_page_history_ce86b3c2: "Student sidehistorikk"
   student_paired_successfully_a88def61: "Paring av studentar vellukka"
@@ -23820,10 +23826,13 @@ nn:
   student_settings_354d9a7e: Studentinnstillingar
   student_sis_6721040e: Student-SIS
   student_sis_d9f0cd39: student-SIS
+  student_sis_id: "Student SIS ID"
   student_sis_id_abe6b292: student-SIS-ID
   student_student_number_5c98bd2d: "Student %{student_number}"
   student_studentnumber_f398d9c2: "Student %{studentNumber}"
+  student_submission_report_af01e697: "Rapport studentinnleveringar"
   student_submissions_910da1b3: Studentinnleveringar
+  student_submissions_report_b28f9022: "Rapport studentinnleveringar"
   student_submissions_report_prospect_education_108daf59: "Rapport av studentinnleveringar (Prospect Education)"
   student_to_do_c018c835: "Student å gjere"
   student_tour_38b735c8: Studentvegvisar
@@ -23849,10 +23858,16 @@ nn:
   students_can_only_participate_in_the_course_betwee_6f8595aa: "Studentar kan berre delta på emnet mellom desse datoane"
   students_can_see_originality_score_797fe634: "Studentar kan sjå det opphavlege resultatet"
   students_cannot_view_quiz_responses_after_course_c_88e929ed: "Studentane kan ikkje sjå quizrespons etter at emnet er fullført"
+  students_enrolled_in_this_course_859fa7a2: "Studentar påmeldt i dette emne"
+  students_enrolled_in_this_section_681ba503: "Studentar påmeldt i denne seksjonen"
+  students_have_already_submitted_homework_on_this_a_7eb5cb6e: "Studentar har allereie levert inn til denne oppgåva, så innstillingane for plagiatkontroll kan ikkje endras"
   students_have_already_submitted_to_this_discussion_f55db744: "Studentar har allereie sendt innlegg til diskusjonen og gruppeinnstillingar kan difor ikkje endrast."
   students_have_either_already_taken_or_started_taki_a076336: "Studentar har enten gjennomført eller er i gang med å ta denne quizen. Ver forsiktig med å redigere han. Dersom du gjer store endringar i quiz-spørsmåla, bør du tenkje på å vurdere dei studentane som svarte på den tidlegare versjonen av quizen på nytt."
   students_have_the_option_to_reply_anonymously_some_503cdf6c: "Studentar har mogleheit til å svara anonymt. Nokre namn og profilbilde kan vere skjulte."
   students_must_complete_all_of_these_requirements_15fa97f7: "Studentane må fullføre alle desse krava"
+  students_must_complete_all_of_these_requirements_e7268cf9: "Studentar må fullfør alle desse krava"
+  students_must_complete_one_of_these_requirements_10db0d1b: "Studentar må fullføre eitt av desse krava"
+  students_must_complete_one_of_these_requirements_4e9f0330: "Studentar må fullføre eitt av desse krava."
   students_must_move_through_requirements_in_sequent_2c750874: "Studentane må gå gjennom vilkåra i kronologisk rekkefølgje"
   students_must_sign_up_in_groups_681206ac: "Studentar må melde seg på gruppevis."
   students_over_time_7ec52f7a: "studentar over tid"
@@ -23876,6 +23891,7 @@ nn:
     other: "Studentar som ikkje har teke undersøkinga (%{count})"
     zero: "Studentar som ikkje har teke undersøkinga"
   students_will_automatically_receive_full_credit_on_cc61df39: "studentar får automatisk fullt utbytte når dei gjennomfører undersøkinga"
+  students_will_be_able_to_provide_feedback_on_anoth_b43209db: "Studentar vil ha moglegheit til å gi tilbakemelding på ein annan student si innlevering ved å bruke ny versjon av oppgåvevisning"
   students_will_be_able_to_see_that_the_grades_for_t_5421a866: "Studentar vil sjå at vurderingsresultata for oppgåva er skjulte."
   students_will_be_able_to_see_that_the_grades_for_t_e98d7726: |-
       
@@ -23925,10 +23941,17 @@ nn:
   subject_114b2e98: Tittel
   subject_1bc03dea: "Meldingstittel:"
   subject_details_12405b1: Emnedetaljar
+  subject_home_8e593f72: "Emne Heim"
   subject_home_page_41226803: "Emnet si heimeside"
+  subject_mark_as_read_b0218a: "%{subject}Merk som lest"
+  subject_mark_as_unread_6f07435f: "%{subject} merk som ikkje lest"
   subject_must_contain_fewer_than_255_characters_2e72cd02: "Tittel må innehalde færre enn 255 teikn"
   subject_name_a1ac4da4: "Emnet sitt namn"
+  subject_not_selected_10dacadf: "%{subject} ikkje valt"
+  subject_not_starred_4a113097: "%{subject} ikkje stjernemarkert"
   subject_reply_to: "Ang.: %{subject}"
+  subject_selected_2196b77e: "%{subject} valt"
+  subject_starred_8ca02058: "%{subject}stjernemarkert"
   subject_subject_9e1057f7: "Emne: %{subject}"
   subjects_14c0c4de: Emne
   submission: 
@@ -23942,6 +23965,8 @@ nn:
   submission_action_take_quiz: "Ta %{title}"
   submission_action_turn_in_assignment: "Lever %{title}"
   submission_added_title_50ebdc85: "innlevering lagt til: %{title}"
+  submission_and_grade_for_assignment_48556e7f: "Innlevering og vurdering for %{assignment}"
+  submission_and_no_grade_for_assignment_6c558206: "Innlevering og inga vurdering for %{assignment}"
   submission_annotation_user_name_assignment_title_c_39910597: "Innleveringsmerknad: %{user_name}, %{assignment_title}, %{course_name}"
   submission_comment: 
     unknown_author: Nokon
