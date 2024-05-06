@@ -13,6 +13,7 @@
 .env
 .mutagen
 .swc
+.idea/
 /.yardoc/
 /.ruby-version
 /app/views/info/styleguide.html.erb
