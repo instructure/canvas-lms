@@ -51,7 +51,7 @@ exports.fetchSpeedGraderLibrary = fetchSpeedGraderLibrary
 
 function fetchAnalyticsHub(resolve, reject) {
   const script = document.createElement('script')
-  script.src = window.REMOTES?.analyticsHub || 'http://localhost:3002/remoteEntry.js'
+  script.src = window.REMOTES?.analytics_hub?.launch_url || 'http://localhost:3002/remoteEntry.js'
   script.onload = () => {
     const module = {
       get: request => window.AnalyticsHub.get(request),
