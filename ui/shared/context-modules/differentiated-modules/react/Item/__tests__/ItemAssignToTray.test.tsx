@@ -567,6 +567,7 @@ describe('ItemAssignToTray', () => {
           {
             course_section_id: SECTIONS_DATA[0].id,
             ...payloadValues,
+            unassign_item: false,
           },
         ],
       })

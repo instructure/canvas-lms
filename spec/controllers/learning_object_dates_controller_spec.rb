@@ -60,7 +60,8 @@ describe LearningObjectDatesController do
                                    "course_section_id" => @course.default_section.id,
                                    "due_at" => "2022-02-01T01:00:00Z",
                                    "all_day" => false,
-                                   "all_day_date" => "2022-02-01"
+                                   "all_day_date" => "2022-02-01",
+                                   "unassign_item" => false
                                  }]
                                })
     end
@@ -88,7 +89,8 @@ describe LearningObjectDatesController do
                                    "course_section_id" => @course.default_section.id,
                                    "due_at" => "2022-02-01T01:00:00Z",
                                    "all_day" => false,
-                                   "all_day_date" => "2022-02-01"
+                                   "all_day_date" => "2022-02-01",
+                                   "unassign_item" => false
                                  }]
                                })
     end
@@ -114,7 +116,8 @@ describe LearningObjectDatesController do
                                    "course_section_id" => @course.default_section.id,
                                    "due_at" => "2022-02-01T01:00:00Z",
                                    "all_day" => false,
-                                   "all_day_date" => "2022-02-01"
+                                   "all_day_date" => "2022-02-01",
+                                   "unassign_item" => false
                                  }]
                                })
     end
@@ -151,7 +154,8 @@ describe LearningObjectDatesController do
                                    "unlock_at" => "2022-04-05T12:00:00Z",
                                    "lock_at" => "2022-04-07T12:00:00Z",
                                    "all_day" => false,
-                                   "all_day_date" => "2022-04-06"
+                                   "all_day_date" => "2022-04-06",
+                                   "unassign_item" => false
                                  }]
                                })
     end
@@ -177,7 +181,8 @@ describe LearningObjectDatesController do
                                    "discussion_topic_id" => discussion.id,
                                    "title" => "Unnamed Course",
                                    "course_section_id" => @course.default_section.id,
-                                   "lock_at" => "2022-01-04T12:00:00Z"
+                                   "lock_at" => "2022-01-04T12:00:00Z",
+                                   "unassign_item" => false
                                  }]
                                })
     end
@@ -207,7 +212,8 @@ describe LearningObjectDatesController do
                                    "discussion_topic_id" => discussion.id,
                                    "course_section_id" => @course.default_section.id,
                                    "unlock_at" => "2022-01-05T12:00:00Z",
-                                   "lock_at" => "2022-03-05T12:00:00Z"
+                                   "lock_at" => "2022-03-05T12:00:00Z",
+                                   "unassign_item" => false
                                  }]
                                })
     end
@@ -253,13 +259,15 @@ describe LearningObjectDatesController do
                                      "discussion_topic_id" => discussion.id,
                                      "title" => override.title,
                                      "course_section_id" => section1.id,
-                                     "lock_at" => "2022-01-04T12:00:00Z"
+                                     "lock_at" => "2022-01-04T12:00:00Z",
+                                     "unassign_item" => false
                                    },
                                    {
                                      "discussion_topic_id" => discussion.id,
                                      "course_section_id" => section2.id,
                                      "unlock_at" => "2022-01-05T12:00:00Z",
-                                     "lock_at" => "2022-03-05T12:00:00Z"
+                                     "lock_at" => "2022-03-05T12:00:00Z",
+                                     "unassign_item" => false
                                    }
                                  ]
                                })
@@ -286,7 +294,8 @@ describe LearningObjectDatesController do
                                    "wiki_page_id" => wiki_page.id,
                                    "title" => "Unnamed Course",
                                    "course_section_id" => @course.default_section.id,
-                                   "unlock_at" => "2022-01-04T00:00:00Z"
+                                   "unlock_at" => "2022-01-04T00:00:00Z",
+                                   "unassign_item" => false
                                  }]
                                })
     end
@@ -323,7 +332,8 @@ describe LearningObjectDatesController do
                                    "assignment_id" => wiki_page.assignment.id,
                                    "title" => "Unnamed Course",
                                    "course_section_id" => @course.default_section.id,
-                                   "unlock_at" => "2022-01-07T00:00:00Z"
+                                   "unlock_at" => "2022-01-07T00:00:00Z",
+                                   "unassign_item" => false
                                  }]
                                })
     end
@@ -350,7 +360,34 @@ describe LearningObjectDatesController do
                                    "attachment_id" => attachment.id,
                                    "title" => "Unnamed Course",
                                    "course_section_id" => @course.default_section.id,
-                                   "unlock_at" => "2022-01-04T00:00:00Z"
+                                   "unlock_at" => "2022-01-04T00:00:00Z",
+                                   "unassign_item" => false
+                                 }]
+                               })
+    end
+
+    it "includes an unassigned assignment override" do
+      @override.unassign_item = true
+      @override.save!
+      get :show, params: { course_id: @course.id, assignment_id: @assignment.id }
+      expect(response).to be_successful
+      expect(json_parse).to eq({
+                                 "id" => @assignment.id,
+                                 "due_at" => "2022-01-02T00:00:00Z",
+                                 "unlock_at" => "2022-01-01T00:00:00Z",
+                                 "lock_at" => "2022-01-03T01:00:00Z",
+                                 "only_visible_to_overrides" => true,
+                                 "graded" => true,
+                                 "visible_to_everyone" => false,
+                                 "overrides" => [{
+                                   "id" => @override.id,
+                                   "assignment_id" => @assignment.id,
+                                   "title" => "Unnamed Course",
+                                   "course_section_id" => @course.default_section.id,
+                                   "due_at" => "2022-02-01T01:00:00Z",
+                                   "all_day" => false,
+                                   "all_day_date" => "2022-02-01",
+                                   "unassign_item" => true
                                  }]
                                })
     end
