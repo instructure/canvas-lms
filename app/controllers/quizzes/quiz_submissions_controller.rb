@@ -30,8 +30,6 @@ class Quizzes::QuizSubmissionsController < ApplicationController
   def index
     if params[:zip] && authorized_action(@quiz, @current_user, :grade)
       generate_submission_zip(@quiz, @context)
-    else
-      redirect_to named_context_url(@context, :context_quiz_url, @quiz.id)
     end
   end
 

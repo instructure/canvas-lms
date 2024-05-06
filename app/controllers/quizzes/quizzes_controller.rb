@@ -159,6 +159,7 @@ class Quizzes::QuizzesController < ApplicationController
   end
 
   def show
+    @user_authorized = @quiz.grants_any_right?(@current_user, session, *Array(:grade))
     if @quiz.deleted?
       flash[:error] = t('errors.quiz_deleted', "That quiz has been deleted")
       redirect_to named_context_url(@context, :context_quizzes_url)
