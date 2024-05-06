@@ -110,6 +110,34 @@ describe('SelectContentDialog', () => {
     expect($dialog.find('#resource_selection_iframe').attr('allow')).toEqual(allowances.join('; '))
   })
 
+  it("starts with focus on the 'x' button", function () {
+    const l = document.getElementById('test-tool')
+    Events.onContextExternalToolSelect.bind(l)(clickEvent)
+    expect(document.activeElement).toEqual(document.querySelector('.ui-dialog-titlebar-close'))
+  })
+
+  it('maintains the same size iframe after focusing and blurring the screen reader alerts', function () {
+    const l = document.getElementById('test-tool')
+    Events.onContextExternalToolSelect.bind(l)(clickEvent)
+    const $dialog = $('#resource_selection_dialog')
+    const closeButton = document.querySelector('.ui-dialog-titlebar-close')
+    const srAlert = document.querySelector('.before_external_content_info_alert')
+    // Something seems to be setting width to 0 in the test, probably because
+    // width and eheight are messed up. We can just set the css width/height
+    // again here.
+    // NOTE: may be fragile if we do stuff with 'width' and 'height' in the
+    // future and don't use css('height') etc. to change the dimensions.
+    const $iframe = $dialog.find('#resource_selection_iframe')
+    $iframe.css('height', '800px')
+    $iframe.css('width', '400px')
+    srAlert.focus()
+    closeButton.focus()
+    srAlert.focus()
+    closeButton.focus()
+    expect($iframe.css('height')).toEqual('800px')
+    expect($iframe.css('width')).toEqual('400px')
+  })
+
   it('sets the iframe "data-lti-launch" attribute', function () {
     const l = document.getElementById('test-tool')
     Events.onContextExternalToolSelect.bind(l)(clickEvent)
