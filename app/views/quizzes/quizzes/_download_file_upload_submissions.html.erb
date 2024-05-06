@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% if @quiz.has_file_upload_question? %>
+<% if @quiz.has_file_upload_question? && @user_authorized %>
   <%= render :partial => 'submissions/submission_download' %>
   <a href="<%= context_url(@context, :context_quiz_quiz_submissions_url, @quiz.id, :zip => 1) %>"
     id="download_submission_button"
