@@ -19,16 +19,41 @@
 #
 
 class Lti::RegistrationsController < ApplicationController
+  before_action :require_account_context_instrumented
+  before_action :require_feature_flag
+  before_action :require_manage_lti_registrations
+
   def index
+    set_active_tab "extensions"
+    add_crumb t("#crumbs.apps", "Extensions")
+
+    render :index
+  end
+
+  private
+
+  def require_account_context_instrumented
     require_account_context
+  rescue ActiveRecord::RecordNotFound => e
+    report_error(e)
+    raise e
+  end
 
-    if @context.feature_enabled?(:lti_registrations_page)
-      set_active_tab "extensions"
-      add_crumb t("#crumbs.apps", "Extensions")
-
-      render :index
-    else
-      render "shared/errors/404_message", status: :not_found, formats: [:html]
+  def require_feature_flag
+    unless @context.feature_enabled?(:lti_registrations_page)
+      respond_to do |format|
+        format.html { render "shared/errors/404_message", status: :not_found }
+        format.json { render json: { errors: [{ message: "The specified resource does not exist." }] }, status: :not_found }
+      end
     end
+  end
+
+  def require_manage_lti_registrations
+    require_context_with_permission(@context, :manage_lti_registrations)
+  end
+
+  def report_error(exception, code = nil)
+    code ||= response_code_for_rescue(exception) if exception
+    InstStatsd::Statsd.increment("canvas.lti_registrations_controller.request_error", tags: { action: action_name, code: })
   end
 end
