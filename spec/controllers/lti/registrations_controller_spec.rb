@@ -21,6 +21,36 @@
 describe Lti::RegistrationsController do
   describe "GET index" do
     let(:account) { account_model }
+    let(:admin) { account_admin_user(account:) }
+
+    before do
+      user_session(admin)
+      account.enable_feature!(:lti_registrations_page)
+    end
+
+    context "without user session" do
+      before do
+        remove_user_session
+      end
+
+      it "redirects to login page" do
+        get :index, params: { account_id: account.id }
+        expect(response).to redirect_to(login_url)
+      end
+    end
+
+    context "with non-admin user" do
+      let(:student) { student_in_course(account:).user }
+
+      before do
+        user_session(student)
+      end
+
+      it "redirects to homepage" do
+        get :index, params: { account_id: account.id }
+        expect(response).to be_redirect
+      end
+    end
 
     context "with flag disabled" do
       before do
@@ -33,26 +63,20 @@ describe Lti::RegistrationsController do
       end
     end
 
-    context "with flag enabled" do
-      before do
-        account.enable_feature!(:lti_registrations_page)
-      end
+    it "renders Extensions page" do
+      get :index, params: { account_id: account.id }
+      expect(response).to render_template(:index)
+      expect(response).to be_successful
+    end
 
-      it "renders Extensions page" do
-        get :index, params: { account_id: account.id }
-        expect(response).to render_template(:index)
-        expect(response).to be_successful
-      end
+    it "sets Extensions crumb" do
+      get :index, params: { account_id: account.id }
+      expect(assigns[:_crumbs].last).to include("Extensions")
+    end
 
-      it "sets Extensions crumb" do
-        get :index, params: { account_id: account.id }
-        expect(assigns[:_crumbs].last).to include("Extensions")
-      end
-
-      it "sets active tab" do
-        get :index, params: { account_id: account.id }
-        expect(assigns[:active_tab]).to eq("extensions")
-      end
+    it "sets active tab" do
+      get :index, params: { account_id: account.id }
+      expect(assigns[:active_tab]).to eq("extensions")
     end
   end
 end

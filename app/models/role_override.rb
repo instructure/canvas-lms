@@ -324,6 +324,13 @@ class RoleOverride < ActiveRecord::Base
         true_for: %w[AccountAdmin],
         available_to: %w[AccountAdmin AccountMembership],
       },
+      manage_lti_registrations: {
+        label: -> { t("LTI Registrations - manage ") },
+        account_only: true,
+        true_for: %w[AccountAdmin],
+        available_to: %w[AccountAdmin AccountMembership],
+        account_allows: ->(a) { a.root_account.feature_enabled?(:lti_registrations_page) }
+      },
       manage_release_notes: {
         label: -> { t("Manage release notes") },
         account_only: :site_admin,
