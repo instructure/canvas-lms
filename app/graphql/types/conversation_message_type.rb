@@ -37,7 +37,11 @@ module Types
     def recipients
       load_association(:conversation_message_participants).then do |cmps|
         # handle case where user sent a message to themself or if cmp is bad ex: hard deleted user.
-        cmps = cmps.reject { |cmp| cmp.user_id == current_user.id || !cmp.active? || cmp.user.nil? } unless cmps.size == 1
+        unless cmps.size == 1
+          # preload user to avoid N+1 queries at cmp.user.nil? below
+          ConversationMessageParticipant::Preloader.new(records: cmps, associations: :user).call
+          cmps = cmps.reject { |cmp| cmp.user_id == current_user.id || !cmp.active? || cmp.user.nil? }
+        end
         Loaders::AssociationLoader.for(ConversationMessageParticipant, :user).load_many(cmps)
       end
     end
