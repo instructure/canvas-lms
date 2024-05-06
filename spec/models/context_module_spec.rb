@@ -1525,6 +1525,11 @@ describe ContextModule do
       expect(cm.completion_events).to eq [:publish_final_grade]
     end
 
+    it "serializes an empty string" do
+      cm = ContextModule.new(completion_events: "")
+      expect(cm.completion_events).to eq []
+    end
+
     it "generates methods correctly" do
       cm = ContextModule.new
       expect(cm.publish_final_grade?).to be_falsey

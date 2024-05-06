@@ -947,7 +947,7 @@ class ContextModule < ActiveRecord::Base
   end
 
   def completion_events=(value)
-    unless value
+    unless value.present?
       write_attribute(:completion_events, nil)
       return
     end
