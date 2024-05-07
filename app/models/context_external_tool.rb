@@ -836,10 +836,6 @@ class ContextExternalTool < ActiveRecord::Base
       settings.delete(type) unless extension_setting(type, :url)
     end
 
-    unless root_account.feature_enabled?(:allow_lti_tools_editor_button_placement_without_icon)
-      settings.delete(:editor_button) unless editor_button(:icon_url) || editor_button(:canvas_icon_class)
-    end
-
     sync_placements!(Lti::ResourcePlacement::PLACEMENTS.select { |type| settings[type] }.map(&:to_s))
     true
   end
