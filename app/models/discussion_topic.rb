@@ -1346,6 +1346,16 @@ class DiscussionTopic < ActiveRecord::Base
       context.grants_right?(user, session, :read_as_admin)
   end
 
+  def user_can_summarize?(user)
+    if is_announcement
+      return false
+    end
+
+    course.feature_enabled?(:discussion_summary) && (
+      course.user_is_instructor?(user) || course.grants_right?(user, :read_as_admin)
+    )
+  end
+
   def discussion_topic_id
     id
   end
