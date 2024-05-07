@@ -5124,6 +5124,7 @@ nn:
   calculation_int_is_not_a_valid_value_for_this_calc_1de6e060: "'%{calculation_int}' er ikkje ein gyldig verdi for denne utrekningsmetoden. Verdien skal vere mellom '%{valid_calculation_ints_min}' og '%{valid_calculation_ints_max}'"
   calculation_method_fe281f9: Utrekningsmetode
   calculation_method_must_be_one_of_the_following_ca_d8ae5dac: "utreknings_metode må vere ei av dei følgande: %{calc_methods}"
+  calculations_fd087607: Utrekningar
   calculator: 
     buttons: 
       save: Lagre
@@ -5562,6 +5563,7 @@ nn:
         delete: "Slette ei hending/oppgåve"
         new: "Opprette ei ny hending"
   calendars_a756c286: Kalendrar
+  calendars_added_by_the_admin_cannot_be_removed_23c5effa: "Kalendrar lagt til av admin kan ikkje fjernast"
   calendars_toggle_list_visibility_488db143: "Vis/skjul liste i kalender"
   campbell_union_high_school_district_grade_report_7f3bb801: "Campbell Union High School District vurderingsrapport"
   campus_vue_non_graded_assignment_report_1cd8999a: "Campus Vue ikkje-vurdert innleveringsrapport"
@@ -5580,6 +5582,7 @@ nn:
   can_list_external_tools_9132ad0f: "Kan liste eksterne verktøy."
   can_list_subscriptions_to_data_service_data_b52d5e37: "Kan vise abonnement til datateneste-data."
   can_lookup_account_information_13d69520: "Kan slå opp kontoinformasjon"
+  can_replace_the_entire_contents_of_the_rce_c6c97cba: "Kan erstatte heile innhaldet i editoren"
   can_retrieve_user_data_associated_with_the_context_c5ec482c: "Kan hente brukardata knytta til konteksten verktøyet er installert i."
   can_show_external_tools_bb4988c5: "Kan vise eksterne verktøy."
   can_show_subscription_to_data_service_data_688ce3: "Kan vise abonnement til datateneste-data."
@@ -5635,13 +5638,17 @@ nn:
   cannot_change_the_due_date_of_an_override_in_a_clo_4b3a4dcd: "Kan ikkje endre innleveringsfristen etter overstyring i ein lukka karaktersetjingsperiode"
   cannot_change_the_due_date_to_a_date_within_a_clos_61eb0951: "Kan ikkje endre innleveringsfristen til ein dato innanfor ein lukka karaktersetjingsperiode"
   cannot_change_the_due_date_when_due_in_a_closed_gr_965b99cb: "Kan ikkje endre innleveringsfrist når fristen er innanfor ein karaktersetjingsperiode"
+  cannot_create_a_temporary_enrollment_with_an_inact_c471bfbe: "Kan ikkje lage ei midlertidig påmelding med ei inaktiv rolle"
   cannot_create_an_appointment_group_for_a_concluded_f4da02e3: "kan ikkje opprette ei avtalegruppe på eit fullført emne"
   cannot_create_event_for_deleted_course_c800f310: "kan ikkje opprette ei hending på eit sletta emne"
+  cannot_create_or_change_reservation_for_past_appoi_45870c16: "Kan ikkje lage eller endre reservasjonar for tidlegare avtalar"
   cannot_delete_a_file_that_has_been_submitted_as_pa_fda24c4: "Kan ikkje slette ei fil som er levert inn som del av ei oppgåve"
   cannot_delete_an_override_with_a_due_date_within_a_fa94ca3b: "Kan ikkje slette ei overstyring med ein innleveringsfrist innanfor ein karaktersetjingsperiode"
   cannot_give_outcomes_extra_credit_696208f0: "Kan ikkje gi ekstra utbyte for læringsmåla"
   cannot_grade_at_this_time_489744b0: "Kan ikkje vurdere akkurat no"
+  cannot_have_a_blueprint_course_with_observers_d00b3deb: "Kan ikkje ha blåkopiemne med observatorar"
   cannot_have_a_blueprint_course_with_students_248e3e76: "Kan ikkje ha eit Blueprint-emne med studentar"
+  cannot_have_duplicate_or_empty_row_names_fix_the_n_4fce15dd: "Kan ikkje ha navnekopiar eller tomme kolonnenavn. Endre på navna og prøv å trykk lagre på nytt"
   cannot_import_a_root_group_d4654def: "Kan ikkje importere ei rotgruppe"
   cannot_import_to_other_courses_af885742: "Kan ikkje importere til andre emner"
   cannot_modify_outcome_from_another_context_changes_a80561a4: "Kan ikkje modifisere læringsmål frå ein anna kontekst: %{changes}; læringsmål må modifiserast i %{context}"
@@ -5727,6 +5734,7 @@ nn:
       samarbeidsdokumenter som lagrast i sanntid—ei endring laga av
       kven som helst vil være synleg med ein gong for alle brukarane.
   canvas_id_f42f6ad: Canvas-ID
+  canvas_instructor_guide_7cf106cb: "Canvas guide for undervisarar"
   canvas_introduction_video_2d81f3ad: "Canvas introduksjonsvideo"
   canvas_is_not_configured_to_receive_logins_from_is_502a4491: "Canvas er ikkje sett opp til å ta imot innloggingar frå %{issuer}."
   canvas_login_failure_message_4c922f2f: "Feilmelding frå Canvas-pålogging"
@@ -5748,6 +5756,7 @@ nn:
       og feil. Denne innstillinga oppdaterer omskriving av URL, slik at
       ein kan forhåndsvise filer i Canvas utan å laste ned.
   canvas_student_id_c74f57bf: canvas_student_id
+  canvas_support_center_6bd07a43: "Canvas Kundeservice Senter"
   canvas_thinks_response_is_valid_8cc4a67d: "Canvas vurderer svaret som gyldig"
   canvas_ticketing_email_connector_27e253ae: "Koplingspunkt for Canvas Ticketing e-post"
   canvas_ticketing_web_post_connector_11158897: "Koplingspunkt for Canvas Ticketing weboppføring"
@@ -6115,11 +6124,14 @@ nn:
   collaborations_are_web_based_tools_to_work_collabo_8ae6dd38: "Samarbeid er nettbaserte verkty som tillet studentar t.d. å ta felles notater eller arbeide med gruppeoppgåver. Start ved å legge til ein samarbeids-app."
   collaborations_tutorial_tray_9219d9d: "Samarbeid opplæringsmeny"
   collapse_all_50275533: "Skjul alle"
+  collapse_all_686a13d3: "Skjul alle"
   collapse_all_modules_e092807c: "Legg saman alle modular"
   collapse_description_for_outcome_title_bcd9b8c9: "Slå sammen beskrivelse for læringsmål %{title}"
   collapse_discussion_thread_52bab65a: "Slå sammen diskusjonstråd"
+  collapse_discussion_thread_from_author_34f9cd18: "Skjul diskusjonstråd fra %{author}"
   collapse_group_c2af7cad: "Skjul gruppe"
   collapse_list_of_group_members_for_groupname_d6c66fa0: "Skjul medlemslista for gruppe %{groupName}"
+  collapse_name_fdea035c: "Skjul %{name}"
   collapse_replies_ef4fc36b: "Skjul svar"
   collapse_subdiscussion_89af1f5c: "Skjul underordna diskusjon"
   collapse_tutorial_tray_66ee7dc1: "Skjul opplæringsmeny"
@@ -6349,15 +6361,19 @@ nn:
     resource_course_content_distribution_comparison: "https://community.canvaslms.com/t5/Resource-Documents/Blueprint-Courses-and-Canvas-Commons-Comparison-PDF/ta-p/387051"
     resource_pairing_codes_faq: "https://community.canvaslms.com/t5/Resource-Documents/Pairing-Codes-FAQ-PDF/ta-p/388738"
   complete_4f4efbc: fullført
+  complete_all_7eba5f88: "Fullfør alle"
   complete_all_items_e1779257: "Fullfør alle element"
   complete_fd828dea: Fullført
   complete_incomplete_15b3a89c: "Godkjend / ikkje godkjend"
+  complete_one_3fcea8a4: "Fullfør ein"
   complete_one_item_90e5fb03: "Fullfør eit element"
   complete_registration_by_clicking_the_finish_the_r_6c1c958b: "Klikk på lenka “fullfør registreringsprosessen” som du har fått på e-post for å fullføre registreringa. "
   complete_registration_by_clicking_the_finish_the_r_fcd13ac8: "Klikk på lenka \"fullfør registreringsprosessen\" som er sendt til deg på e-post for å fullføre registreringa. "
   complete_title_7482ddcf: "Fullfør %{title}"
   completed_19711ce7: Fullført
   completed_9b809e44: fullført
+  completed_peer_reviews_c134676: "Fullførte fagfellevurderingar"
+  completed_submittedat_66f56614: "Fullført %{submittedAt}"
   compose_a_new_message_db3a68ed: "Skriv ei ny melding"
   compose_message_8abd180a: "Skriv ei melding"
   compressing_f4a35c08: Komprimerer...
@@ -6384,11 +6400,16 @@ nn:
       Send lyd og video i sanntid, del presentasjonar, demonstrer applikasjonar og nettressursar, m.m.
   conference_36b50fda: Konferanse
   conference_created_date_7ef1e8d4: "konferanse oppretta dato"
+  conference_description_1f4ac9b8: "Konferanse Beskrivelse"
   conference_has_been_removed_f771cb11: "Konferanse har blitt fjerna"
   conference_has_been_updated_title_2bacc5fa: "Konferanse har blitt oppdatert: %{title}"
+  conference_name_fdb7e091: "Konferanse Navn"
   conference_participant_count_87e86c5c: "antal konferansedeltakarar"
   conference_recorded_7e776ec2: "konferanse tatt opp"
+  conference_saved_7dad9c3e: "Konferanse Lagra"
+  conference_saved_8895cfbc: "Konferanse Lagra!"
   conference_selection_ea4050bb: Konferanseval
+  conference_type_2f4ac9be: "Konferanse Type"
   conference_type_7bd581e: konferansetype
   conference_type_names_bcdeb3ad: "%{conference_type_names}"
   conference_was_deleted_30869390: "Konferanse er sletta"
@@ -6422,6 +6443,8 @@ nn:
       members: Medlemmar
       name: Namn
       options: Alternativ
+    errors: 
+      create_failed: "Oppretting av konferanse mislukkast"
     general_error: "Det oppstod ein feil under tilkopling til konferansen"
     general_error_with_message: "Det oppstod ein feil under tilkopling til konferansen. Melding: '%{message}'"
     inactive_error: "Konferansen er ikkje aktiv akkurat no"
@@ -6485,6 +6508,7 @@ nn:
   configure_toolname_app_651371be: "Konfigurer %{toolName}-appen"
   confirm_6556b3a6: Stadfest
   confirm_as_spam_2f8b7105: "Stadfest som søppelpost"
+  confirm_changes_fe60b7ff: "Bekreft endringar"
   confirm_communication_channel_81c48d08: "Stadfest kommunikasjonskanal"
   confirm_contact_method_29d6fe4b: "Stadfest kontaktmetode"
   confirm_delete_6febeafb: "Stadfest sletting"
@@ -27049,6 +27073,7 @@ nn:
       resubmit_to_vericite: "Lever til VeriCite på nytt"
   vericite_similarity_score_more_information_7df9ea5c: "VeriCite likskapsresultat – meir informasjon"
   vericite_similarity_score_see_detailed_report_390ab687: "VeriCite likskapsresultat – sjå detaljrapport"
+  verification_code_5acd64ef: Stadfestingskode
   video_78335c71: video
   video_b9f27375: Video
   video_conferencing_guides_for_remote_classrooms_ffab4a1b: "Rettleiar for bruk av videokonferanse i virtuelle klasserom"
