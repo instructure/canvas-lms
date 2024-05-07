@@ -22,7 +22,7 @@
 # API for creating and viewing user logins under an account
 class PseudonymsController < ApplicationController
   before_action :get_context, only: [:index, :create]
-  before_action :require_user, only: %i[create show edit update]
+  before_action :require_user, only: %i[create show edit update migrate_login_attribute]
   before_action :reject_student_view_student, only: %i[create show edit update]
   protect_from_forgery except: %i[registration_confirmation change_password forgot_password], with: :exception
 
@@ -486,6 +486,15 @@ class PseudonymsController < ApplicationController
     else
       render json: @pseudonym.errors, status: :bad_request
     end
+  end
+
+  def migrate_login_attribute
+    return unless get_user
+
+    @pseudonym = @user.pseudonyms.find(params[:id])
+    return render_unauthorized_action unless @pseudonym.migrate_login_attribute(admin_user: @current_user)
+
+    render json: pseudonym_json(@pseudonym, @current_user, session)
   end
 
   protected
