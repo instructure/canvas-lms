@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require "benchmark"
+
 # @API Discussion Topics
 class DiscussionTopicsApiController < ApplicationController
   include Api::V1::DiscussionTopics
@@ -76,6 +78,171 @@ class DiscussionTopicsApiController < ApplicationController
                                             include_sections: include_params.include?("sections"),
                                             include_sections_user_count: include_params.include?("sections_user_count"),
                                             include_overrides: include_params.include?("overrides")).first)
+  end
+
+  # @API Summary
+  #
+  # Generates a summary for a discussion topic.
+  #
+  # @argument force [Boolean]
+  #   If set to true, forces the generation of a summary,
+  #   even if a previous one for the given input params exists.
+  #
+  # @example_request
+  #
+  #     curl https://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/summaries \
+  #         -H 'Authorization: Bearer <token>'
+  #
+  # @example_response
+  #
+  #     {
+  #       "id": 1,
+  #       "text": "This is a summary of the discussion topic."
+  #     }
+  def summary
+    return render_unauthorized_action unless @topic.user_can_summarize?(@current_user)
+
+    llm_config = LLMConfigs.config_for("discussion_topic_summary")
+    if llm_config.nil?
+      logger.error("No LLM config found for discussion topic summary")
+      return render(json: { error: t("Sorry, we are unable to summarize this discussion at this time. Please try again later.") }, status: :unprocessable_entity)
+    end
+
+    dynamic_content = DiscussionTopic::PromptPresenter.new(@topic).dynamic_content_for_summary
+    dynamic_content_hash = Digest::SHA256.hexdigest(dynamic_content)
+
+    forced = params[:force] == "true"
+    unless @topic.summary_enabled
+      @topic.update!(summary_enabled: true)
+      forced = true
+    end
+
+    unless forced
+      dts = @topic.summaries.where(discussion_topic: @topic, llm_config_version: llm_config.name, dynamic_content_hash:)
+                  .order(created_at: :desc)
+                  .first
+
+      if dts
+        return render(json: { id: dts.id, text: dts.summary })
+      end
+    end
+
+    response = nil
+    begin
+      time = Benchmark.measure do
+        response = InstLLMHelper.client(llm_config.model_id).chat(
+          [{ role: "user", content: llm_config.generate_prompt(dynamic_content:) }],
+          **llm_config.options.symbolize_keys
+        )
+      end
+    rescue => e
+      logger.error("Error summarizing discussion topic: #{e.class} - #{e.message}")
+
+      case e
+      when InstLLM::ServiceQuotaExceededError
+        return render(json: { error: t("Sorry, we are currently experiencing high demand. Please try again later.") }, status: :service_unavailable)
+      when InstLLM::ThrottlingError
+        return render(json: { error: t("Sorry, the service is currently busy. Please try again later.") }, status: :service_unavailable)
+      when InstLLM::ValidationTooLongError
+        return render(json: { error: t("Sorry, we are unable to summarize this discussion as it is too long.") }, status: :unprocessable_entity)
+      when InstLLM::ValidationError
+        return render(json: { error: t("Oops! There was an error validating the service request. Please try again later.") }, status: :unprocessable_entity)
+      else
+        return render(json: { error: t("Sorry, we are unable to summarize this discussion at this time. Please try again later.") }, status: :unprocessable_entity)
+      end
+    end
+
+    summary = response.message[:content]
+    dts = @topic.summaries.create!(
+      llm_config_version: llm_config.name,
+      dynamic_content_hash:,
+      summary:,
+      input_tokens: response.usage[:input_tokens],
+      output_tokens: response.usage[:output_tokens],
+      generation_time: time.real.round(2)
+    )
+
+    render(json: { id: dts.id, text: dts.summary })
+  end
+
+  # @API Disable summary
+  #
+  # Disables the summary for a discussion topic.
+  #
+  # @example_request
+  #
+  #     curl -X PUT https://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/disable_summary \
+  #
+  # @example_response
+  #
+  #     {
+  #       "success": true
+  #     }
+  def disable_summary
+    return render_unauthorized_action unless @topic.user_can_summarize?(@current_user)
+
+    @topic.update!(summary_enabled: false)
+
+    render(json: { success: true })
+  end
+
+  # @API Summary Feedback
+  #
+  # Persists feedback on a discussion topic summary.
+  #
+  # @argument _action [String] Required
+  #   The action to take on the summary. Possible values are:
+  #   - "seen": Marks the summary as seen. This action saves the feedback if it's not already persisted.
+  #   - "like": Marks the summary as liked.
+  #   - "dislike": Marks the summary as disliked.
+  #   - "reset_like": Resets the like status of the summary.
+  #   - "regenerate": Regenerates the summary feedback.
+  #   - "disable_summary": Disables the summary feedback.
+  #   Any other value will result in an error response.
+  #
+  # @example_request
+  #
+  #     curl -X POST https://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/summaries/<summary_id>/feedback \
+  #          -F '_action=like' \
+  #          -H "Authorization: Bearer
+  #
+  # @example_response
+  #
+  #     {
+  #       "liked": true,
+  #       "disliked": false
+  #     }
+  def summary_feedback
+    return render_unauthorized_action unless @topic.user_can_summarize?(@current_user)
+
+    begin
+      dts = @topic.summaries.find(params[:summary_id])
+    rescue ActiveRecord::RecordNotFound
+      return render(json: { error: "Summary not found." }, status: :not_found)
+    end
+
+    feedback = dts.feedback.find_or_initialize_by(user: @current_user)
+    action = params[:_action].to_sym
+
+    case action
+    when :seen
+      feedback.save! unless feedback.persisted?
+    when :like
+      feedback.like
+    when :dislike
+      feedback.dislike
+    when :reset_like
+      feedback.reset_like
+    when :regenerate
+      feedback.regenerate
+    when :disable_summary
+      feedback.disable_summary
+    else
+      logger.warn("Invalid discussion topic summary feedback action: #{action}")
+      return render(json: { error: "Invalid action." }, status: :bad_request)
+    end
+
+    render(json: { liked: feedback.liked, disliked: feedback.disliked })
   end
 
   # @API Get the full topic

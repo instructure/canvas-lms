@@ -18,5 +18,5 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 Rails.configuration.to_prepare do
-  LlmConfigs.configs
+  LLMConfigs.configs
 end

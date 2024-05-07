@@ -168,4 +168,210 @@ describe DiscussionTopicsApiController do
       end
     end
   end
+
+  context "summary" do
+    before do
+      course_with_teacher(active_course: true)
+      @topic = @course.discussion_topics.create!(title: "discussion", summary_enabled: true)
+      user_session(@teacher)
+
+      @inst_llm = double("InstLLM::Client")
+      allow(InstLLMHelper).to receive(:client).and_return(@inst_llm)
+    end
+
+    context "with llm config" do
+      before do
+        expect(LLMConfigs).to receive(:config_for).and_return(
+          LLMConfig.new(
+            name: "V0_A",
+            model_id: "model"
+          )
+        )
+      end
+
+      context "with a previous summary" do
+        before do
+          @summary = @topic.summaries.create!(
+            summary: "summary",
+            dynamic_content_hash: "fcfa768511b6a7a5881d017dae0d5aaa8dd8615937c1b89ea680c4dbb9af2a51",
+            llm_config_version: "V0_A"
+          )
+        end
+
+        it "returns the existing summary" do
+          expect_any_instance_of(DiscussionTopic).to receive(:user_can_summarize?).and_return(true)
+
+          expect(@inst_llm).not_to receive(:chat)
+
+          get "summary", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id }, format: "json"
+
+          expect(response).to be_successful
+          expect(response.parsed_body["id"]).to eq(@summary.id)
+        end
+
+        it "returns a new summary if forced" do
+          expect_any_instance_of(DiscussionTopic).to receive(:user_can_summarize?).and_return(true)
+
+          expect(@inst_llm).to receive(:chat).and_return(
+            InstLLM::Response::ChatResponse.new(
+              model: "model",
+              message: { role: :assistant, content: "summary_1" },
+              stop_reason: "stop_reason",
+              usage: {
+                input_tokens: 10,
+                output_tokens: 20,
+              }
+            )
+          )
+
+          get "summary", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id, force: true }, format: "json"
+
+          expect(response).to be_successful
+          expect(@topic.reload.summary_enabled).to be_truthy
+          expect(response.parsed_body["id"]).not_to eq(@summary.id)
+        end
+      end
+
+      it "returns a new summary" do
+        expect_any_instance_of(DiscussionTopic).to receive(:user_can_summarize?).and_return(true)
+
+        expect(@inst_llm).to receive(:chat).and_return(
+          InstLLM::Response::ChatResponse.new(
+            model: "model",
+            message: { role: :assistant, content: "summary_1" },
+            stop_reason: "stop_reason",
+            usage: {
+              input_tokens: 10,
+              output_tokens: 20,
+            }
+          )
+        )
+
+        get "summary", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id }, format: "json"
+
+        expect(response).to be_successful
+      end
+
+      it "enables summary if it was disabled" do
+        expect_any_instance_of(DiscussionTopic).to receive(:user_can_summarize?).and_return(true)
+        @topic.update!(summary_enabled: false)
+
+        expect(@inst_llm).to receive(:chat).and_return(
+          InstLLM::Response::ChatResponse.new(
+            model: "model",
+            message: { role: :assistant, content: "summary_1" },
+            stop_reason: "stop_reason",
+            usage: {
+              input_tokens: 10,
+              output_tokens: 20,
+            }
+          )
+        )
+
+        get "summary", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id }, format: "json"
+
+        expect(response).to be_successful
+        expect(@topic.reload.summary_enabled).to be_truthy
+      end
+    end
+
+    it "returns an error if the user can't summarize" do
+      expect_any_instance_of(DiscussionTopic).to receive(:user_can_summarize?).and_return(false)
+
+      get "summary", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id }, format: "json"
+
+      expect(response).to be_unauthorized
+    end
+
+    it "returns an error if there is no llm config" do
+      expect_any_instance_of(DiscussionTopic).to receive(:user_can_summarize?).and_return(true)
+      expect(LLMConfigs).to receive(:config_for).and_return(nil)
+
+      get "summary", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id }, format: "json"
+
+      expect(response).to be_unprocessable
+    end
+  end
+
+  context "summary_feedback" do
+    before do
+      course_with_teacher(active_course: true)
+      @topic = @course.discussion_topics.create!(title: "discussion")
+      @summary = @topic.summaries.create!(
+        summary: "summary",
+        dynamic_content_hash: "fcfa768511b6a7a5881d017dae0d5aaa8dd8615937c1b89ea680c4dbb9af2a51",
+        llm_config_version: "V0_A"
+      )
+      user_session(@teacher)
+    end
+
+    it "returns an error if the user can't summarize" do
+      allow_any_instance_of(DiscussionTopic).to receive(:user_can_summarize?).and_return(false)
+
+      post "summary_feedback", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id, summary_id: @summary.id, _action: "like" }, format: "json"
+
+      expect(response).to be_unauthorized
+    end
+
+    it "returns an error if the summary is not found" do
+      allow_any_instance_of(DiscussionTopic).to receive(:user_can_summarize?).and_return(true)
+
+      post "summary_feedback", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id, summary_id: 0, _action: "like" }, format: "json"
+
+      expect(response).to be_not_found
+    end
+
+    it "returns an error if the action is invalid" do
+      allow_any_instance_of(DiscussionTopic).to receive(:user_can_summarize?).and_return(true)
+
+      post "summary_feedback", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id, summary_id: @summary.id, _action: "invalid" }, format: "json"
+
+      expect(response).to be_bad_request
+    end
+
+    it "returns an error if the summary does not belong to the topic" do
+      allow_any_instance_of(DiscussionTopic).to receive(:user_can_summarize?).and_return(true)
+      another_topic = @course.discussion_topics.create!(title: "discussion")
+
+      post "summary_feedback", params: { topic_id: another_topic.id, course_id: @course.id, user_id: @teacher.id, summary_id: @summary.id, _action: "like" }, format: "json"
+
+      expect(response).to be_not_found
+    end
+
+    it "creates feedback" do
+      allow_any_instance_of(DiscussionTopic).to receive(:user_can_summarize?).and_return(true)
+
+      post "summary_feedback", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id, summary_id: @summary.id, _action: "like" }, format: "json"
+
+      expect(response).to be_successful
+      expect(response.parsed_body["liked"]).to be_truthy
+      expect(response.parsed_body["disliked"]).to be_falsey
+    end
+  end
+
+  context "disable_summary" do
+    before do
+      course_with_teacher(active_course: true)
+      @topic = @course.discussion_topics.create!(title: "discussion")
+      user_session(@teacher)
+    end
+
+    it "returns an error if the user can't summarize" do
+      allow_any_instance_of(DiscussionTopic).to receive(:user_can_summarize?).and_return(false)
+
+      put "disable_summary", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id }, format: "json"
+
+      expect(response).to be_unauthorized
+    end
+
+    it "disables the summary" do
+      allow_any_instance_of(DiscussionTopic).to receive(:user_can_summarize?).and_return(true)
+      @topic.update!(summary_enabled: true)
+
+      put "disable_summary", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id }, format: "json"
+
+      expect(response).to be_successful
+      expect(@topic.reload.summary_enabled).to be_falsey
+    end
+  end
 end

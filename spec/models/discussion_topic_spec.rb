@@ -3363,4 +3363,44 @@ describe DiscussionTopic do
       end
     end
   end
+
+  describe "user_can_summarize" do
+    before do
+      @course = course_factory(active_all: true)
+      @admin = account_admin_user(account: @course.root_account)
+      @teacher = user_model
+      @course.enroll_teacher(@teacher, enrollment_state: "active")
+      @student = user_model
+      @course.enroll_student(@student, enrollment_state: "active")
+      @observer = user_model
+      @course.enroll_user(@observer, "ObserverEnrollment").update_attribute(:associated_user_id, @student.id)
+      @ta = user_model
+      @course.enroll_ta(@ta, enrollment_state: "active")
+      @designer = user_model
+      @course.enroll_designer(@designer, enrollment_state: "active")
+
+      @topic = @course.discussion_topics.create!(title: "topic")
+    end
+
+    it "does not allow to summarize if the feature is disabled" do
+      expect(@topic.user_can_summarize?(@teacher)).to be false
+      expect(@topic.user_can_summarize?(@ta)).to be false
+      expect(@topic.user_can_summarize?(@admin)).to be false
+      expect(@topic.user_can_summarize?(@designer)).to be false
+      expect(@topic.user_can_summarize?(@observer)).to be false
+      expect(@topic.user_can_summarize?(@student)).to be false
+    end
+
+    it "allows instructors and read admins to summarize if the feature is enabled" do
+      @course.enable_feature!(:discussion_summary)
+
+      expect(@topic.user_can_summarize?(@teacher)).to be true
+      expect(@topic.user_can_summarize?(@ta)).to be true
+      expect(@topic.user_can_summarize?(@admin)).to be true
+      expect(@topic.user_can_summarize?(@designer)).to be true
+
+      expect(@topic.user_can_summarize?(@observer)).to be false
+      expect(@topic.user_can_summarize?(@student)).to be false
+    end
+  end
 end

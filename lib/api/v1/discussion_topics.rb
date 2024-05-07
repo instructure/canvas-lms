@@ -47,6 +47,7 @@ module Api::V1::DiscussionTopics
     sort_by_rating
     is_section_specific
     anonymous_state
+    summary_enabled
   ].freeze
 
   # Public: DiscussionTopic methods to serialize.

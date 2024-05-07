@@ -5948,6 +5948,7 @@ describe AssignmentsApiController, type: :request do
                                                  "author" => {},
                                                  "id" => @topic.id,
                                                  "is_section_specific" => @topic.is_section_specific,
+                                                 "summary_enabled" => @topic.summary_enabled,
                                                  "title" => "assignment1",
                                                  "message" => nil,
                                                  "posted_at" => @topic.posted_at.as_json,
