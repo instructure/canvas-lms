@@ -23,6 +23,7 @@ export const MOCK_COURSE_GRADING_SCHEME: GradingScheme = {
   context_id: '5',
   context_name: 'The 5th Course',
   context_type: 'Course',
+  workflow_state: 'active',
   data: [
     {name: 'A', value: 0.9},
     {name: 'B', value: 0.8},
@@ -44,6 +45,7 @@ export const MOCK_DEFAULT_GRADING_SCHEME: GradingScheme = {
   context_name: '',
   permissions: {manage: false},
   assessed_assignment: false,
+  workflow_state: 'active',
   data: [
     {name: 'A', value: 0.9},
     {name: 'B', value: 0.8},
