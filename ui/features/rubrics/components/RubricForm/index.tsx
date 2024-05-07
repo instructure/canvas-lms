@@ -368,12 +368,12 @@ export const RubricForm = ({rootOutcomeGroup}: RubricFormComponentProp) => {
             </Flex.Item>
             {rubricForm.unassessed && (
               <>
-                <Flex.Item margin="0 0 0 small">
+                {/* <Flex.Item margin="0 0 0 small">
                   <RubricHidePointsSelect
                     hidePoints={rubricForm.hidePoints}
                     onChangeHidePoints={hidePoints => setRubricFormField('hidePoints', hidePoints)}
                   />
-                </Flex.Item>
+                </Flex.Item> */}
                 <Flex.Item margin="0 0 0 small">
                   <RubricRatingOrderSelect
                     ratingOrder={rubricForm.ratingOrder}

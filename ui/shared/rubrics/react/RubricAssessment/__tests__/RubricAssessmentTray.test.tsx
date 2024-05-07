@@ -39,6 +39,22 @@ describe('RubricAssessmentTray Tests', () => {
     return element.querySelector('div[data-testid="rubric-rating-button-selected"]')
   }
 
+  const renderComponentModern = (
+    viewMode: string,
+    isPeerReview = false,
+    props?: Partial<RubricAssessmentTrayProps>
+  ) => {
+    const component = renderComponent({isPeerReview, ...props})
+    const {getByTestId, queryByRole} = component
+    const viewModeSelect = getByTestId('rubric-assessment-view-mode-select') as HTMLSelectElement
+
+    fireEvent.click(viewModeSelect)
+    const roleOption = queryByRole('option', {name: viewMode}) as HTMLElement
+    fireEvent.click(roleOption)
+
+    return component
+  }
+
   describe('View Mode Select tests', () => {
     it('should render the traditional view option by default', () => {
       const {getByTestId} = renderComponent()
@@ -187,18 +203,6 @@ describe('RubricAssessmentTray Tests', () => {
   })
 
   describe('Modern View tests', () => {
-    const renderComponentModern = (viewMode: string, isPeerReview = false) => {
-      const component = renderComponent({isPeerReview})
-      const {getByTestId, queryByRole} = component
-      const viewModeSelect = getByTestId('rubric-assessment-view-mode-select') as HTMLSelectElement
-
-      fireEvent.click(viewModeSelect)
-      const roleOption = queryByRole('option', {name: viewMode}) as HTMLElement
-      fireEvent.click(roleOption)
-
-      return component
-    }
-
     describe('Horizontal Display tests', () => {
       it('should select a rating when the rating is clicked', () => {
         const {getByTestId, queryByTestId} = renderComponentModern('Horizontal')
@@ -428,6 +432,30 @@ describe('RubricAssessmentTray Tests', () => {
 
         expect(getByTestId('rubric-assessment-instructor-score')).toHaveTextContent('0 pts')
       })
+    })
+  })
+
+  describe('hidePoints tests', () => {
+    it('should not display points when hidePoints is true', () => {
+      const {getByTestId, queryByTestId} = renderComponent({hidePoints: true})
+      expect(queryByTestId('rubric-assessment-instructor-score')).toBeNull()
+      expect(getByTestId('traditional-criterion-1-ratings-0-points')).toHaveTextContent('')
+    })
+
+    it('should display points when hidePoints is false', () => {
+      const {getByTestId} = renderComponent({hidePoints: false})
+      expect(getByTestId('rubric-assessment-instructor-score')).toBeInTheDocument()
+      expect(getByTestId('traditional-criterion-1-ratings-0-points')).toHaveTextContent('4 pts')
+    })
+
+    it('should not display points when hidePoints is true in modern view', () => {
+      const {queryByTestId} = renderComponentModern('Vertical', false, {hidePoints: true})
+      expect(queryByTestId('modern-view-out-of-points')).toBeNull()
+    })
+
+    it('should display points when hidePoints is false in modern view', () => {
+      const {queryAllByTestId} = renderComponentModern('Vertical', false, {hidePoints: false})
+      expect(queryAllByTestId('modern-view-out-of-points')).toHaveLength(2)
     })
   })
 })

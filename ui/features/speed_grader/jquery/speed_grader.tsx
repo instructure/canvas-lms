@@ -3051,7 +3051,11 @@ EG = {
       const showSelectMenu = isModerator || selectMenu.find('option').length > 1
       $('#rubric_assessments_list').showIf(showSelectMenu)
 
-      useStore.setState({rubricAssessors: showSelectMenu ? selectMenuOptions : []})
+      const {hide_points} = (window?.jsonData?.rubric_association ?? {}) as {hide_points: boolean}
+      useStore.setState({
+        rubricAssessors: showSelectMenu ? selectMenuOptions : [],
+        rubricHidePoints: hide_points,
+      })
       handleSelectedRubricAssessmentChanged({validateEnteredData})
     }
   },

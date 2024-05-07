@@ -88,6 +88,7 @@ export default function RubricTab(props) {
 
   const enhancedRubricsEnabled = ENV.FEATURES.enhanced_rubrics
   const showEnhancedRubricPeerReview = props.peerReviewModeEnabled && enhancedRubricsEnabled
+  const hidePoints = props.rubricAssociation?.hide_points
 
   const renderRubricPreview = () => {
     if (!props.rubric) {
@@ -97,6 +98,7 @@ export default function RubricTab(props) {
     return enhancedRubricsEnabled ? (
       <TraditionalView
         criteria={props.rubric.criteria}
+        hidePoints={hidePoints}
         isPreviewMode={true}
         onUpdateAssessmentData={() => { }}
         rubricTitle={props.rubric.title}
@@ -133,6 +135,7 @@ export default function RubricTab(props) {
                 {hasSubmittedAssessment ? I18n.t('View Rubric') : I18n.t('Fill Out Rubric')}
               </Button>
               <RubricAssessmentTray
+                hidePoints={hidePoints}
                 isOpen={rubricTrayOpen}
                 isPreviewMode={hasSubmittedAssessment}
                 isPeerReview={true}

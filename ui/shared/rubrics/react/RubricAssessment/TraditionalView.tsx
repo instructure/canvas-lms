@@ -35,6 +35,7 @@ const {licorice} = colors
 
 type TraditionalViewProps = {
   criteria: RubricCriterion[]
+  hidePoints: boolean
   isPreviewMode: boolean
   rubricAssessmentData: RubricAssessmentData[]
   rubricTitle: string
@@ -42,6 +43,7 @@ type TraditionalViewProps = {
 }
 export const TraditionalView = ({
   criteria,
+  hidePoints,
   isPreviewMode,
   rubricAssessmentData,
   rubricTitle,
@@ -74,20 +76,27 @@ export const TraditionalView = ({
           </View>
         </Flex.Item>
         <Flex.Item shouldGrow={true}>
-          <View as="div" background="secondary" borderWidth="small 0" height="2.375rem" />
-        </Flex.Item>
-        <Flex.Item width="8.875rem" height="2.375rem">
           <View
             as="div"
             background="secondary"
-            borderWidth="small"
-            height="100%"
-            padding="x-small 0 0 small"
-            themeOverride={{paddingXSmall: '0.438rem'}}
-          >
-            <Text weight="bold">{I18n.t('Points')}</Text>
-          </View>
+            borderWidth="small small small 0"
+            height="2.375rem"
+          />
         </Flex.Item>
+        {!hidePoints && (
+          <Flex.Item width="8.875rem" height="2.375rem">
+            <View
+              as="div"
+              background="secondary"
+              borderWidth="small small small 0"
+              height="100%"
+              padding="x-small 0 0 small"
+              themeOverride={{paddingXSmall: '0.438rem'}}
+            >
+              <Text weight="bold">{I18n.t('Points')}</Text>
+            </View>
+          </Flex.Item>
+        )}
       </Flex>
 
       {criteria.map((criterion, index) => {
@@ -102,6 +111,7 @@ export const TraditionalView = ({
             key={`criterion-${criterion.id}-${index}`}
             criterion={criterion}
             criterionAssessment={criterionAssessment}
+            hidePoints={hidePoints}
             isPreviewMode={isPreviewMode}
             onUpdateAssessmentData={onUpdateAssessmentData}
           />
@@ -114,17 +124,19 @@ export const TraditionalView = ({
 type CriterionRowProps = {
   criterion: RubricCriterion
   criterionAssessment?: RubricAssessmentData
+  hidePoints: boolean
   isPreviewMode: boolean
   onUpdateAssessmentData: (params: UpdateAssessmentData) => void
 }
 const CriterionRow = ({
   criterion,
   criterionAssessment,
+  hidePoints,
   isPreviewMode,
   onUpdateAssessmentData,
 }: CriterionRowProps) => {
   const [hoveredRatingIndex, setHoveredRatingIndex] = useState<number>()
-  const [isCommentsOpen, setIsCommentsOpen] = useState(false)
+  const [isCommentsOpen, setIsCommentsOpen] = useState(hidePoints)
   const [commentText, setCommentText] = useState<string>(criterionAssessment?.comments ?? '')
 
   const selectedRatingIndex = criterion.ratings.findIndex(
@@ -167,9 +179,7 @@ const CriterionRow = ({
             <Grid>
               <Grid.Row colSpacing="none">
                 {criterion.ratings.map((rating, index) => {
-                  const border =
-                    index === criterion.ratings.length - 1 ? '0 0 small 0' : '0 small small 0'
-
+                  const border = '0 small small 0'
                   const highlightedBorder = 'medium'
 
                   const isHovered = hoveredRatingIndex === index
@@ -230,10 +240,15 @@ const CriterionRow = ({
                               padding="0 0 x-small 0"
                               overflowX="hidden"
                               overflowY="hidden"
+                              minHeight="1.875rem"
                             >
                               <View>
-                                <Text size="small" weight="bold">
-                                  {possibleString(rating.points)}
+                                <Text
+                                  size="small"
+                                  weight="bold"
+                                  data-testid={`traditional-criterion-${criterion.id}-ratings-${index}-points`}
+                                >
+                                  {!hidePoints && possibleString(rating.points)}
                                 </Text>
                               </View>
 
@@ -265,37 +280,39 @@ const CriterionRow = ({
             </Grid>
           </View>
         </Flex.Item>
-        <Flex.Item width="8.875rem">
-          <View
-            as="div"
-            padding="xxx-small x-small"
-            borderWidth="0 small small small"
-            height="13.75rem"
-            overflowY="auto"
-          >
-            <Flex direction="column" height="100%">
-              <Flex.Item shouldGrow={true}>
-                <Text>{possibleString(criterion.points)}</Text>
-              </Flex.Item>
-              <Flex.Item>
-                <View as="div" position="relative" padding="0 0 x-small 0">
-                  <Link
-                    forceButtonRole={true}
-                    isWithinText={false}
-                    disabled={(criterionAssessment?.comments?.length ?? 0) > 0}
-                    data-testid={`rubric-comment-button-${criterion.id}`}
-                    onClick={() => setIsCommentsOpen(!isCommentsOpen)}
-                  >
-                    <IconChatLine />
-                    <View as="span" margin="0 0 0 xx-small">
-                      <Text size="small">Comment</Text>
-                    </View>
-                  </Link>
-                </View>
-              </Flex.Item>
-            </Flex>
-          </View>
-        </Flex.Item>
+        {!hidePoints && (
+          <Flex.Item width="8.875rem">
+            <View
+              as="div"
+              padding="xxx-small x-small"
+              borderWidth="0 small small 0"
+              height="13.75rem"
+              overflowY="auto"
+            >
+              <Flex direction="column" height="100%">
+                <Flex.Item shouldGrow={true}>
+                  <Text>{!hidePoints && possibleString(criterion.points)}</Text>
+                </Flex.Item>
+                <Flex.Item>
+                  <View as="div" position="relative" padding="0 0 x-small 0">
+                    <Link
+                      forceButtonRole={true}
+                      isWithinText={false}
+                      disabled={(criterionAssessment?.comments?.length ?? 0) > 0}
+                      data-testid={`rubric-comment-button-${criterion.id}`}
+                      onClick={() => setIsCommentsOpen(!isCommentsOpen)}
+                    >
+                      <IconChatLine />
+                      <View as="span" margin="0 0 0 xx-small">
+                        <Text size="small">Comment</Text>
+                      </View>
+                    </Link>
+                  </View>
+                </Flex.Item>
+              </Flex>
+            </View>
+          </Flex.Item>
+        )}
       </Flex>
       {isCommentsOpen && (
         <View
