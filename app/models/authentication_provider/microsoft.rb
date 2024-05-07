@@ -74,7 +74,7 @@ class AuthenticationProvider::Microsoft < AuthenticationProvider::OpenIDConnect
     settings["known_tenants"] ||= []
     (settings["known_tenants"] << id_token["tid"]).uniq!
     allowed_tenants = mapped_allowed_tenants
-    if allowed_tenants.empty? || allowed_tenants.include?("common")
+    if allowed_tenants.empty? || allowed_tenants.include?("common") || settings["skip_tenant_verification"]
       # allow anyone
     elsif allowed_tenants.delete("guests")
       # just check the issuer
