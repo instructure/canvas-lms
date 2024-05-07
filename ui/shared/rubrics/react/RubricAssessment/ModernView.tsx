@@ -35,6 +35,7 @@ type ModernViewModes = 'horizontal' | 'vertical'
 
 type ModernViewProps = {
   criteria: RubricCriterion[]
+  hidePoints: boolean
   isPreviewMode: boolean
   ratingOrder: string
   rubricAssessmentData: RubricAssessmentData[]
@@ -43,6 +44,7 @@ type ModernViewProps = {
 }
 export const ModernView = ({
   criteria,
+  hidePoints,
   isPreviewMode,
   ratingOrder,
   rubricAssessmentData,
@@ -61,6 +63,7 @@ export const ModernView = ({
             key={criterion.id}
             criterion={criterion}
             displayHr={index < criteria.length - 1}
+            hidePoints={hidePoints}
             isPreviewMode={isPreviewMode}
             ratingOrder={ratingOrder}
             criterionAssessment={criterionAssessment}
@@ -76,6 +79,7 @@ export const ModernView = ({
 type CriterionRowProps = {
   criterion: RubricCriterion
   displayHr: boolean
+  hidePoints: boolean
   isPreviewMode: boolean
   ratingOrder: string
   criterionAssessment?: RubricAssessmentData
@@ -85,6 +89,7 @@ type CriterionRowProps = {
 export const CriterionRow = ({
   criterion,
   displayHr,
+  hidePoints,
   isPreviewMode,
   ratingOrder,
   criterionAssessment,
@@ -168,31 +173,35 @@ export const CriterionRow = ({
 
   return (
     <View as="div" margin="0 0 small 0">
-      <Flex direction="row-reverse">
-        <Flex.Item margin={isPreviewMode ? '0' : '0 0 0 x-small'}>
-          <Text size="small" weight="bold">
-            /{criterion.points}
-          </Text>
-        </Flex.Item>
-        <Flex.Item margin={isPreviewMode ? '0 0 0 x-small' : '0'}>
-          {isPreviewMode ? (
+      {!hidePoints && (
+        <Flex direction="row-reverse" data-testid="modern-view-out-of-points">
+          <Flex.Item margin={isPreviewMode ? '0' : '0 0 0 x-small'}>
             <Text size="small" weight="bold">
-              {pointsInput?.toString() ?? ''}
+              /{criterion.points}
             </Text>
-          ) : (
-            <TextInput
-              renderLabel={<ScreenReaderContent>{I18n.t('Instructor Points')}</ScreenReaderContent>}
-              placeholder="--"
-              width="2.688rem"
-              height="2.375rem"
-              value={pointsInput?.toString() ?? ''}
-              onChange={(_e, value) => {
-                setPoints(value)
-              }}
-            />
-          )}
-        </Flex.Item>
-      </Flex>
+          </Flex.Item>
+          <Flex.Item margin={isPreviewMode ? '0 0 0 x-small' : '0'}>
+            {isPreviewMode ? (
+              <Text size="small" weight="bold">
+                {pointsInput?.toString() ?? ''}
+              </Text>
+            ) : (
+              <TextInput
+                renderLabel={
+                  <ScreenReaderContent>{I18n.t('Instructor Points')}</ScreenReaderContent>
+                }
+                placeholder="--"
+                width="2.688rem"
+                height="2.375rem"
+                value={pointsInput?.toString() ?? ''}
+                onChange={(_e, value) => {
+                  setPoints(value)
+                }}
+              />
+            )}
+          </Flex.Item>
+        </Flex>
+      )}
       <View as="div">
         <Text size="medium" weight="bold">
           {criterion.description}

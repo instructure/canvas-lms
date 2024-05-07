@@ -31,6 +31,7 @@ import type {
 const I18n = useI18nScope('rubrics-assessment-tray')
 
 export type RubricAssessmentTrayProps = {
+  hidePoints?: boolean
   isLoading?: boolean
   isOpen: boolean
   isPreviewMode: boolean
@@ -44,6 +45,7 @@ export type RubricAssessmentTrayProps = {
   onSubmit?: (rubricAssessmentDraftData: RubricAssessmentData[]) => void
 }
 export const RubricAssessmentTray = ({
+  hidePoints = false,
   isOpen,
   isLoading = false,
   isPreviewMode,
@@ -127,6 +129,7 @@ export const RubricAssessmentTray = ({
       ) : (
         <RubricAssessmentContainer
           criteria={rubric.criteria ?? []}
+          hidePoints={hidePoints}
           isPreviewMode={isPreviewMode}
           isPeerReview={isPeerReview}
           ratingOrder={rubric.ratingOrder ?? 'descending'}

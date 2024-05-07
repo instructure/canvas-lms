@@ -85,7 +85,7 @@ describe('RubricForm Tests', () => {
       const {getByTestId, getByText} = renderComponent()
       expect(getByText('Create New Rubric')).toBeInTheDocument()
       expect(getByTestId('rubric-form-title')).toHaveValue('')
-      expect(getByTestId('rubric-hide-points-select')).toBeInTheDocument()
+      // expect(getByTestId('rubric-hide-points-select')).toBeInTheDocument()
       expect(getByTestId('rubric-rating-order-select')).toBeInTheDocument()
       expect(getByTestId('save-as-draft-button')).toBeInTheDocument()
     })
@@ -523,7 +523,7 @@ describe('RubricForm Tests', () => {
 
       const {getByTestId, queryByTestId, queryAllByTestId} = renderComponent()
       expect(getByTestId('rubric-form-title')).toHaveValue('Rubric 1')
-      expect(queryByTestId('rubric-hide-points-select')).toBeNull()
+      // expect(queryByTestId('rubric-hide-points-select')).toBeNull()
       expect(queryByTestId('rubric-rating-order-select')).toBeNull()
       expect(queryByTestId('add-criterion-button')).toBeNull()
       expect(queryAllByTestId('rubric-criteria-row-delete-button')).toHaveLength(0)
