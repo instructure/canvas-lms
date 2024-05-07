@@ -2572,20 +2572,6 @@ describe ContextExternalTool do
       expect(tool.editor_button).not_to be_nil
     end
 
-    context "when allow_lti_tools_editor_button_placement_without_icon FF is disabled" do
-      let(:ff) { :allow_lti_tools_editor_button_placement_without_icon }
-
-      before { @root_account.disable_feature! ff }
-      after { @root_account.enable_feature! ff }
-
-      it "deletes the editor_button if icon_url is not present" do
-        tool = new_external_tool
-        tool.settings = { editor_button: { url: "http://www.example.com" } }
-        tool.save
-        expect(tool.editor_button).to be_nil
-      end
-    end
-
     it "sets user_navigation if navigation configured" do
       tool = new_external_tool
       tool.settings = { user_navigation: { url: "http://www.example.com" } }
