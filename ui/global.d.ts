@@ -164,6 +164,43 @@ declare global {
   declare interface Object {
     fromEntries: any
   }
+
+  // due to overrides in packages/date-js/core.js
+  interface Date {
+    add(config: {[key: string]: number}): Date
+    addDays(value: number): Date
+    addHours(value: number): Date
+    addMilliseconds(value: number): Date
+    addMinutes(value: number): Date
+    addMonths(value: number): Date
+    addSeconds(value: number): Date
+    addWeeks(value: number): Date
+    addYears(value: number): Date
+    between(start: Date, end: Date): boolean
+    clearTime(): Date
+    clone(): Date
+    compareTo(date: Date): number
+    equals(date: Date): boolean
+    getElapsed(date?: Date): number
+    getOrdinalNumber(): number
+    getTimezone(): string | null
+    getUTCOffset(): string
+    hasDaylightSavingTime(): boolean
+    isAfter(date?: Date): boolean
+    isBefore(date?: Date): boolean
+    isDaylightSavingTime(): boolean
+    isSameDay(date?: Date): boolean
+    isToday(date?: Date): boolean
+    moveToDayOfWeek(dayOfWeek: number, orient?: number): Date
+    moveToFirstDayOfMonth(): Date
+    moveToLastDayOfMonth(): Date
+    moveToMonth(month: number, orient?: number): Date
+    moveToNthOccurrence(dayOfWeek: number, occurrence: number): Date
+    setTimeToNow(): Date
+    setTimezone(offset: string): Date
+    setTimezoneOffset(offset: number): Date
+    toString(format?: string): string
+  }
 }
 
 // Global scope declarations are only allowed in module contexts, so we
