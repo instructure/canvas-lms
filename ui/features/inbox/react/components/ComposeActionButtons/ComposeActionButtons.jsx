@@ -15,19 +15,15 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
 import {useScope as useI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 import React, {useContext} from 'react'
-
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {IconAttachMediaLine, IconPaperclipLine} from '@instructure/ui-icons'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {ConversationContext} from '../../../util/constants'
-
 const I18n = useI18nScope('conversations_2')
-
 export const ComposeActionButtons = ({...props}) => {
   const {isSubmissionCommentsType} = useContext(ConversationContext)
   return (
@@ -37,7 +33,6 @@ export const ComposeActionButtons = ({...props}) => {
     </Flex>
   )
 }
-
 const renderUploadButtons = props => {
   let attachmentInput = null
   const handleAttachmentClick = () => attachmentInput?.click()
@@ -81,7 +76,6 @@ const renderUploadButtons = props => {
     </>
   )
 }
-
 const renderMessageButtons = props => {
   return (
     <>
@@ -104,7 +98,6 @@ const renderMessageButtons = props => {
     </>
   )
 }
-
 ComposeActionButtons.propTypes = {
   /**
    * Behavior when the attachment upload is clicked
@@ -132,5 +125,4 @@ ComposeActionButtons.propTypes = {
    */
   hasMediaComment: PropTypes.bool,
 }
-
 export default ComposeActionButtons

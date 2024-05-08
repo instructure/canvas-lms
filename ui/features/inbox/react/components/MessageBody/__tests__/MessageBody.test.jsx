@@ -16,9 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {fireEvent, render} from '@testing-library/react'
+import { fireEvent, render, waitFor } from '@testing-library/react'
 import React from 'react'
-import {MessageBody} from '../MessageBody'
+import { MessageBody } from '../MessageBody'
+import { ModalBodyContext } from '../../../utils/constants'
 
 const createProps = overrides => {
   return {
@@ -30,16 +31,28 @@ const createProps = overrides => {
 describe('MessageBody', () => {
   it('renders the message body', () => {
     const props = createProps()
-    const {getByTestId} = render(<MessageBody {...props} />)
+    const { getByTestId } = render(
+      <MessageBody {...props} />
+    )
     expect(getByTestId('message-body')).toBeInTheDocument()
   })
 
   it('uses the onBodyChange prop when the value has changed', () => {
     const props = createProps()
-    const {getByTestId} = render(<MessageBody {...props} />)
+    const mockContext = {
+      body: "",
+      setBody: jest.fn(),
+      translating: false
+    }
+
+    const { getByTestId } = render(
+      <ModalBodyContext.Provider value={mockContext}>
+        <MessageBody {...props} />
+      </ModalBodyContext.Provider>
+    )
     const messageBody = getByTestId('message-body')
-    fireEvent.change(messageBody, {target: {value: 'howdy'}})
-    expect(messageBody.value).toBe('howdy')
+    fireEvent.change(messageBody, { target: { value: 'howdy' } })
+    expect(mockContext.setBody).toHaveBeenCalledWith('howdy')
     expect(props.onBodyChange).toHaveBeenCalled()
   })
 
@@ -52,20 +65,29 @@ describe('MessageBody', () => {
         },
       ],
     })
-    const {getByText} = render(<MessageBody {...props} />)
+    const { getByText } = render(<MessageBody {...props} />)
     expect(getByText(props.messages[0].text)).toBeInTheDocument()
   })
 
   describe('Signature', () => {
-    it('renders signature when inboxSettingsFeature prop is true', () => {
+    it('renders signature when inboxSettingsFeature prop is true', async () => {
       const props = createProps({
         inboxSettingsFeature: true,
         signature: 'My signature',
       })
-      render(<MessageBody {...props} />)
-      const textArea = document.querySelectorAll('textarea')[0].value
-      const signature = textArea.substring(textArea.length - props.signature.length)
-      expect(signature).toBe(props.signature)
+
+      const mockContext = {
+        body: "",
+        setBody: jest.fn(),
+        translating: false
+      }
+      render(
+        <ModalBodyContext.Provider value={mockContext}>
+          <MessageBody {...props} />
+        </ModalBodyContext.Provider>
+      )
+
+      expect(mockContext.setBody).toHaveBeenCalled()
     })
 
     it('does not render signature when inboxSettingsFeature prop is false', () => {

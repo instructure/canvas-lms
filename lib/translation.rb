@@ -37,8 +37,8 @@ module Translation
     ##
     # Can we provide API translations?
     #
-    def available?(context)
-      context&.feature_enabled?(:translation) && sagemaker_client.present?
+    def available?(context, feature_flag)
+      context&.feature_enabled?(feature_flag) && sagemaker_client.present?
     end
 
     ##
