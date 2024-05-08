@@ -16,34 +16,36 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
-import {ComposeActionButtons} from '../../components/ComposeActionButtons/ComposeActionButtons'
-import {Conversation} from '../../../graphql/Conversation'
+import { AlertManagerContext } from '@canvas/alerts/react/AlertManager'
+import { ComposeActionButtons } from '../../components/ComposeActionButtons/ComposeActionButtons'
+import { Conversation } from '../../../graphql/Conversation'
 import HeaderInputs from './HeaderInputs'
-import {useScope as useI18nScope} from '@canvas/i18n'
-import {Modal} from '@instructure/ui-modal'
+import { useScope as useI18nScope } from '@canvas/i18n'
+import { Modal } from '@instructure/ui-modal'
 import ModalBody from './ModalBody'
 import ModalHeader from './ModalHeader'
 import ModalSpinner from './ModalSpinner'
 import PropTypes from 'prop-types'
-import React, {useContext, useState, useEffect} from 'react'
-import {Responsive} from '@instructure/ui-responsive'
-import {responsiveQuerySizes} from '../../../util/utils'
-import {uploadFiles} from '@canvas/upload-file'
+import React, { useContext, useState, useEffect, useCallback } from 'react'
+import { Responsive } from '@instructure/ui-responsive'
+import { responsiveQuerySizes } from '../../../util/utils'
+import { uploadFiles } from '@canvas/upload-file'
 import UploadMedia from '@instructure/canvas-media'
 import {
   UploadMediaStrings,
   MediaCaptureStrings,
   SelectStrings,
 } from '@canvas/upload-media-translations'
-import {ConversationContext} from '../../../util/constants'
-import {useLazyQuery, useQuery} from 'react-apollo'
-import {RECIPIENTS_OBSERVERS_QUERY, INBOX_SETTINGS_QUERY} from '../../../graphql/Queries'
+import { ConversationContext } from '../../../util/constants'
+import { useLazyQuery, useQuery } from 'react-apollo'
+import { RECIPIENTS_OBSERVERS_QUERY, INBOX_SETTINGS_QUERY } from '../../../graphql/Queries'
+import { ModalBodyContext } from '../../utils/constants'
+import { translateMessage, handleTranslatedModalBody } from '../../utils/inbox_translator'
 
 const I18n = useI18nScope('conversations_2')
 
 const ComposeModalContainer = props => {
-  const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
+  const { setOnFailure, setOnSuccess } = useContext(AlertManagerContext)
 
   const [attachments, setAttachments] = useState([])
   const [attachmentsToUpload, setAttachmentsToUpload] = useState([])
@@ -59,7 +61,7 @@ const ComposeModalContainer = props => {
   const [mediaUploadOpen, setMediaUploadOpen] = useState(false)
   const [uploadingMediaFile, setUploadingMediaFile] = useState(false)
   const [mediaUploadFile, setMediaUploadFile] = useState(null)
-  const {isSubmissionCommentsType} = useContext(ConversationContext)
+  const { isSubmissionCommentsType } = useContext(ConversationContext)
   const [loadingObservers, setLoadingObservers] = useState(false)
   const [includeObserversMessages, setIncludeObserversMessages] = useState(null)
   const [activeSignature, setActiveSignature] = useState()
@@ -80,6 +82,10 @@ const ComposeModalContainer = props => {
     },
     skip: !props.inboxSettingsFeature || !props.open
   })
+  // Translation features
+  const [translating, setTranslating] = useState(false)
+  const [messagePosition, setMessagePosition] = useState(null)
+  const [translationTargetLanguage, setTranslationTargetLanguage] = useState('')
 
   const [
     getRecipientsObserversQuery,
@@ -215,14 +221,14 @@ const ComposeModalContainer = props => {
     }
 
     const newAttachmentsToUpload = files.map((file, i) => {
-      return {isLoading: true, id: file.url ? `${i}-${file.url}` : `${i}-${file.name}`}
+      return { isLoading: true, id: file.url ? `${i}-${file.url}` : `${i}-${file.name}` }
     })
 
     setAttachmentsToUpload(prev => prev.concat(newAttachmentsToUpload))
     setOnSuccess(I18n.t('Uploading files'))
 
     try {
-      const newFiles = await uploadFiles(files, '/files/pending', {conversations: true})
+      const newFiles = await uploadFiles(files, '/files/pending', { conversations: true })
       setAttachments(prev => prev.concat(newFiles))
     } catch (err) {
       setOnFailure(I18n.t('Error uploading files'))
@@ -254,7 +260,6 @@ const ComposeModalContainer = props => {
   }
 
   const onBodyChange = value => {
-    setBody(value)
     if (value) {
       setBodyMessages([])
     }
@@ -275,12 +280,29 @@ const ComposeModalContainer = props => {
     }
   }, [props.maxGroupRecipientsMet])
 
+  /** TRANSLATION CODE */
+  const translateBody = (isPrimary) => {
+    setTranslating(true)
+    translateMessage({
+      subject: subject,
+      body: body,
+      signature: activeSignature,
+      srcLang: 'en',
+      tgtLang: translationTargetLanguage,
+      callback: (translatedText) => {
+        handleTranslatedModalBody(translatedText, isPrimary, activeSignature, setBody)
+        setTranslating(false)
+      }
+    })
+  }
+  /**  END TRANSLATION CODE */
+
   const onContextSelect = context => {
     if (context && context?.contextID) {
       setCourseMessages([])
     }
     props.onSelectedIdsChange([])
-    setSelectedContext({contextID: context.contextID, contextName: context.contextName})
+    setSelectedContext({ contextID: context.contextID, contextName: context.contextName })
   }
 
   const validMessageFields = () => {
@@ -289,7 +311,7 @@ const ComposeModalContainer = props => {
 
     if (!body) {
       const errorMessage = I18n.t('Please insert a message body.')
-      setBodyMessages([{text: errorMessage, type: 'error'}])
+      setBodyMessages([{ text: errorMessage, type: 'error' }])
       errors.push(errorMessage) // Add error message to the array
       isValid = false
     }
@@ -297,12 +319,12 @@ const ComposeModalContainer = props => {
     if (!isSubmissionCommentsType) {
       if (addressBookInputValue !== '') {
         const errorMessage = I18n.t('No matches found. Please insert a valid recipient.')
-        setAddressBookMessages([{text: errorMessage, type: 'error'}])
+        setAddressBookMessages([{ text: errorMessage, type: 'error' }])
         errors.push(errorMessage) // Add error message to the array
         isValid = false
       } else if (props.selectedIds.length === 0) {
         const errorMessage = I18n.t('Please select a recipient.')
-        setAddressBookMessages([{text: errorMessage, type: 'error'}])
+        setAddressBookMessages([{ text: errorMessage, type: 'error' }])
         errors.push(errorMessage) // Add error message to the array
         isValid = false
       }
@@ -314,7 +336,7 @@ const ComposeModalContainer = props => {
         (!selectedContext || !selectedContext?.contextID)
       ) {
         const errorMessage = I18n.t('Please select a course')
-        setCourseMessages([{text: errorMessage, type: 'error'}])
+        setCourseMessages([{ text: errorMessage, type: 'error' }])
         errors.push(errorMessage) // Add error message to the array
         isValid = false
       }
@@ -418,11 +440,22 @@ const ComposeModalContainer = props => {
 
   if (inboxSettingsLoading) return loadInboxSettingsSpinner()
 
+  const modalBodyContext = {
+    body,
+    setBody,
+    translating,
+    setTranslating,
+    setTranslationTargetLanguage,
+    messagePosition,
+    setMessagePosition,
+    translateBody
+  }
+
   return (
     <>
       <Responsive
         match="media"
-        query={responsiveQuerySizes({mobile: true, desktop: true})}
+        query={responsiveQuerySizes({ mobile: true, desktop: true })}
         props={{
           mobile: {
             modalSize: 'fullscreen',
@@ -434,85 +467,84 @@ const ComposeModalContainer = props => {
           },
         }}
         render={responsiveProps => (
-          <Modal
-            open={props.open}
-            onDismiss={props.onDismiss}
-            size={responsiveProps.modalSize}
-            label={I18n.t('Compose Message')}
-            shouldCloseOnDocumentClick={false}
-            onExited={resetState}
-            data-testid={responsiveProps.dataTestId}
-          >
-            <ModalHeader
-              onDismiss={dismiss}
-              headerTitle={props?.submissionCommentsHeader}
-            />
-            <ModalBody
-              attachments={[...attachments, ...attachmentsToUpload]}
-              bodyMessages={bodyMessages}
-              onBodyChange={onBodyChange}
-              pastMessages={props.pastConversation?.conversationMessagesConnection.nodes}
-              removeAttachment={removeAttachment}
-              replaceAttachment={replaceAttachment}
-              modalError={props.modalError}
-              mediaUploadFile={mediaUploadFile}
-              onRemoveMediaComment={onRemoveMedia}
-              signature={activeSignature}
-              inboxSettingsFeature={props.inboxSettingsFeature}
+          <ModalBodyContext.Provider value={modalBodyContext}>
+            <Modal
+              open={props.open}
+              onDismiss={props.onDismiss}
+              size={responsiveProps.modalSize}
+              label={I18n.t('Compose Message')}
+              shouldCloseOnDocumentClick={false}
+              onExited={resetState}
+              data-testid={responsiveProps.dataTestId}
             >
-              {isSubmissionCommentsType ? null : (
-                <HeaderInputs
-                  activeCourseFilter={selectedContext}
-                  setUserNote={setUserNote}
-                  contextName={props.pastConversation?.contextName}
-                  courses={props.courses}
-                  selectedRecipients={props.selectedIds}
-                  maxGroupRecipientsMet={props.maxGroupRecipientsMet}
-                  isReply={props.isReply}
-                  isForward={props.isForward}
-                  onContextSelect={onContextSelect}
-                  onSelectedIdsChange={onSelectedIdsChange}
-                  onUserNoteChange={onUserNoteChange}
-                  onSendIndividualMessagesChange={onSendIndividualMessagesChange}
-                  onSubjectChange={onSubjectChange}
-                  onAddressBookInputValueChange={setAddressBookInputValue}
-                  userNote={userNote}
-                  sendIndividualMessages={sendIndividualMessages}
-                  subject={
-                    props.isReply || props.isForward ? props.pastConversation?.subject : subject
-                  }
-                  addressBookMessages={addressBookMessages}
-                  courseMessages={courseMessages}
-                  data-testid="compose-modal-inputs"
-                  isPrivateConversation={props.isPrivateConversation}
-                  selectedContext={selectedContext}
-                  getRecipientsObserver={getRecipientsObserver}
-                  areObserversLoading={loadingObservers}
-                  includeObserversMessages={includeObserversMessages}
-                  setIncludeObserversMessages={setIncludeObserversMessages}
-                />
-              )}
-            </ModalBody>
-            <Modal.Footer>
-              <ComposeActionButtons
-                onAttachmentUpload={addAttachment}
-                onMediaUpload={() => setMediaUploadOpen(true)}
-                onCancel={dismiss}
-                onSend={() => {
-                  if (!validMessageFields()) {
-                    return
-                  }
+              <ModalHeader onDismiss={dismiss} headerTitle={props?.submissionCommentsHeader} />
+              <ModalBody
+                attachments={[...attachments, ...attachmentsToUpload]}
+                bodyMessages={bodyMessages}
+                onBodyChange={onBodyChange}
+                pastMessages={props.pastConversation?.conversationMessagesConnection.nodes}
+                removeAttachment={removeAttachment}
+                replaceAttachment={replaceAttachment}
+                modalError={props.modalError}
+                mediaUploadFile={mediaUploadFile}
+                onRemoveMediaComment={onRemoveMedia}
+                signature={activeSignature}
+                inboxSettingsFeature={props.inboxSettingsFeature}
+              >
+                {isSubmissionCommentsType ? null : (
+                  <HeaderInputs
+                    activeCourseFilter={selectedContext}
+                    setUserNote={setUserNote}
+                    contextName={props.pastConversation?.contextName}
+                    courses={props.courses}
+                    selectedRecipients={props.selectedIds}
+                    maxGroupRecipientsMet={props.maxGroupRecipientsMet}
+                    isReply={props.isReply}
+                    isForward={props.isForward}
+                    onContextSelect={onContextSelect}
+                    onSelectedIdsChange={onSelectedIdsChange}
+                    onUserNoteChange={onUserNoteChange}
+                    onSendIndividualMessagesChange={onSendIndividualMessagesChange}
+                    onSubjectChange={onSubjectChange}
+                    onAddressBookInputValueChange={setAddressBookInputValue}
+                    userNote={userNote}
+                    sendIndividualMessages={sendIndividualMessages}
+                    subject={
+                      props.isReply || props.isForward ? props.pastConversation?.subject : subject
+                    }
+                    addressBookMessages={addressBookMessages}
+                    courseMessages={courseMessages}
+                    data-testid="compose-modal-inputs"
+                    isPrivateConversation={props.isPrivateConversation}
+                    selectedContext={selectedContext}
+                    getRecipientsObserver={getRecipientsObserver}
+                    areObserversLoading={loadingObservers}
+                    includeObserversMessages={includeObserversMessages}
+                    setIncludeObserversMessages={setIncludeObserversMessages}
+                  />
+                )}
+              </ModalBody>
+              <Modal.Footer>
+                <ComposeActionButtons
+                  onAttachmentUpload={addAttachment}
+                  onMediaUpload={() => setMediaUploadOpen(true)}
+                  onCancel={dismiss}
+                  onSend={() => {
+                    if (!validMessageFields()) {
+                      return
+                    }
 
-                  if (!attachmentsToUpload.length) {
-                    sendMessage()
-                  }
-                  props.setSendingMessage(true)
-                }}
-                isSending={false}
-                hasMediaComment={!!mediaUploadFile}
-              />
-            </Modal.Footer>
-          </Modal>
+                    if (!attachmentsToUpload.length) {
+                      sendMessage()
+                    }
+                    props.setSendingMessage(true)
+                  }}
+                  isSending={false}
+                  hasMediaComment={!!mediaUploadFile}
+                />
+              </Modal.Footer>
+            </Modal>
+          </ModalBodyContext.Provider>
         )}
       />
       <UploadMedia
@@ -520,8 +552,8 @@ const ComposeModalContainer = props => {
         onUploadComplete={onMediaUploadComplete}
         onDismiss={() => setMediaUploadOpen(false)}
         open={mediaUploadOpen}
-        tabs={{embed: false, record: true, upload: true}}
-        uploadMediaTranslations={{UploadMediaStrings, MediaCaptureStrings, SelectStrings}}
+        tabs={{ embed: false, record: true, upload: true }}
+        uploadMediaTranslations={{ UploadMediaStrings, MediaCaptureStrings, SelectStrings }}
         liveRegion={() => document.getElementById('flash_screenreader_holder')}
         rcsConfig={{
           contextId: ENV.current_user_id,
