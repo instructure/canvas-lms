@@ -23,16 +23,21 @@ import {humanReadableSize} from '../utils'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {Button, IconButton} from '@instructure/ui-buttons'
-import {IconSearchLine, IconTroubleLine, IconUploadLine} from '@instructure/ui-icons'
+import {IconButton} from '@instructure/ui-buttons'
+import {IconSearchLine, IconTroubleLine} from '@instructure/ui-icons'
 import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
 import {TextInput} from '@instructure/ui-text-input'
-import {TreeBrowser, Collection} from '@instructure/ui-tree-browser'
+import {TreeBrowser} from '@instructure/ui-tree-browser'
 import {View} from '@instructure/ui-view'
 import type {FetchLinkHeader} from '@canvas/do-fetch-api-effect/types'
 import type {onSubmitMigrationFormCallback} from '../types'
 import MigrationFileInput from './file_input'
+
+import type {TreeBrowserProps} from '@instructure/ui-tree-browser'
+
+type Collection = TreeBrowserProps['collections'][0]
+type CollectionClickArgs = TreeBrowserProps['onCollectionClick']
 
 const I18n = useI18nScope('content_migrations_redesign')
 
@@ -82,6 +87,9 @@ const ZipFileImporter = ({onSubmit, onCancel, fileUploadProgress}: ZipFileImport
   const [fileError, setFileError] = useState<boolean>(false)
   const [folderError, setFolderError] = useState<boolean>(false)
 
+  // TODO Remove this function if it's not going to be used, or remove
+  //      this linter rule disable if/when it ever is.
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleSelectFile = useCallback(() => {
     const files = fileInput.current?.files
     if (!files) {
@@ -186,7 +194,7 @@ const ZipFileImporter = ({onSubmit, onCancel, fileUploadProgress}: ZipFileImport
     return collection
   }
 
-  const handleCollectionClick = (_id: any, collection: Collection) => {
+  const handleCollectionClick: CollectionClickArgs = (_e, collection) => {
     setFolder(folders.find((f: Folder) => collection.id === parseInt(f.id, 10)) ?? null)
     setFolderError(false)
   }

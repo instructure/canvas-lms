@@ -54,7 +54,6 @@ class StreamItem < ActiveRecord::Base
   def self.reconstitute_ar_object(type, data)
     return nil unless data
 
-    data = data.instance_variable_get(:@table) if data.is_a?(OpenObject)
     data = data.with_indifferent_access
     type = data["type"] || type
     res = type.constantize.new

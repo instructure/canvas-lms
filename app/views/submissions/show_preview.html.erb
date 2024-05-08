@@ -59,7 +59,8 @@
           <%= t('discussion_submission_description',
                   "The submissions for this assignment are posts in the assignment's discussion. Below are the discussion posts for %{user}, or you can *view the full discussion*.",
                   :user => user_name,
-                  :wrapper => "<a id='discussion_view_link' href=\"#{context_url(@assignment.context, :context_discussion_topic_url, @assignment.discussion_topic.id, :hide_student_names => params[:hide_student_name], :student_id => @submission.user.id, :headless => 1)}\"><b>\\1</b></a>") %>
+                  # legacy discussions uses headless, hide student name, and student id, while discussions redesign uses embed
+                  :wrapper => "<a id='discussion_view_link' href=\"#{context_url(@assignment.context, :context_discussion_topic_url, @assignment.discussion_topic.id, :hide_student_names => params[:hide_student_name], :student_id => @submission.user.id, :headless => 1, :embed => true)}\"><b>\\1</b></a>") %>
         <% end %>
       <% else %>
         <% if @assignment.discussion_topic.for_group_discussion? && (group = @assignment.discussion_topic.group_category.group_for(@user)) %>

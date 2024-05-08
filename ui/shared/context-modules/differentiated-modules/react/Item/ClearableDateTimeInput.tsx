@@ -63,6 +63,7 @@ export interface ClearableDateTimeInputProps {
   locale?: string
   timezone?: string
   dateInputRef?: (el: HTMLInputElement | null) => void
+  timeInputRef?: (el: HTMLInputElement | null) => void
 }
 
 function ClearableDateTimeInput({
@@ -80,6 +81,7 @@ function ClearableDateTimeInput({
   locale,
   timezone,
   dateInputRef,
+  timeInputRef,
 }: ClearableDateTimeInputProps) {
   const [hasErrorBorder, setHasErrorBorder] = useState(false)
   const clearButtonContainer = useRef<HTMLElement | null>()
@@ -134,6 +136,7 @@ function ClearableDateTimeInput({
           onChange={onChange}
           onBlur={onBlur}
           dateInputRef={dateInputRef}
+          timeInputRef={timeInputRef}
           interaction={disabled ? 'disabled' : 'enabled'}
         />
       </Flex.Item>

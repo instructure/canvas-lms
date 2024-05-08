@@ -16,7 +16,7 @@
   # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<%= fields_for :settings, OpenObject.new(settings) do |f| %>
+<%= fields_for :settings do |f| %>
   <table style="width: 600px;" class="formtable">
     <tr>
       <td colspan="2">
@@ -29,7 +29,7 @@ Enable Sign in with Apple, and add %{callback_url} as a return URL. Enter the Id
     <tr>
       <td><%= f.blabel :client_id, en: "Service ID" %></td>
       <td>
-        <%= f.text_field :client_id %>
+        <%= f.text_field :client_id, value: settings[:client_id] %>
       </td>
     </tr>
   </table>

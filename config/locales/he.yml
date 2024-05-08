@@ -7695,11 +7695,14 @@ he:
   ends_4fcb632: "מסתיים:"
   ends_at_9a62b528: "מסתיים ב"
   enhanced_individual_gradebook: 
+    avg_score: "ציון ממוצע"
+    high_score: "ציון גבוה"
     invalid_group_warning: 
       many: "שימו לב: הציון אינו כולל משימות מהקבוצות %{list_of_group_names} כיון שאין להן נקודות אפשריות"
       one: "שימו לב: הציון אינו כולל משימות מהקבוצה %{list_of_group_names} כיון שאין לה נקודות אפשריות."
       other: "שימו לב: הציון אינו כולל משימות מהקבוצות %{list_of_group_names} כיון שאין להן נקודות אפשריות"
       two: "שימו לב: הציון אינו כולל משימות מהקבוצות %{list_of_group_names} כיון שאין להן נקודות אפשריות"
+    low_score: "ציון נמוך"
   enrolled_a6a517cd: נרשם
   enrolled_as_272da3b9: "רשום/ה כ-"
   enrollment: 
@@ -11733,6 +11736,10 @@ he:
         subject: "הסינכרון של תבנית הדוגמה נסתים: %{name}"
       twitter: 
         tweet: "אתראת קנבס - שינויי קורס תבנית דוגמה סונכרנו מתוך%{name}"
+    checkpoints_created: 
+      email: 
+        labels: 
+          click_to_see_assignment: "יש להקליק כאן כדי לעיין במשימה"
     collaboration_invitation: 
       email: 
         body: |-
@@ -13271,6 +13278,7 @@ he:
   no_matching_users_found_83889c10: "לא נמצאו משתמשים מתאימים"
   no_migration_file: "נדרש קובץ עבור תוכן ההגירה"
   no_outcome_file_or_authority_given_c90f9c5f: "אין קובץ תוצאות למידה או הרשאות אליו"
+  no_outcome_selected_16d15753: "לא נבחרה אף תוצאת למידה"
   no_password_was_given_472222e5: "לא סופקה סיסמה"
   no_placements_enabled_f705f28: "לא הופעלו הצבות"
   no_points_possible_368669d: "אין ניקוד אפשרי"
@@ -13776,6 +13784,7 @@ he:
     invalid_file: "בקובץ הקבוצתי של תוצאות למידה לא תקין"
   outcome_groups_api: 
     account_group_description: "תוצאות קבוצתיות ברמת החשבון"
+  outcome_information_936c59ef: "מידע על תוצאות למידה"
   outcome_path_mastery_points: "%{path} נקודות התמחות"
   outcome_path_result: "%{path} תוצאה"
   outcome_results: 
@@ -17274,6 +17283,7 @@ he:
   select_a_section_37ac1694: "בחירת הקבצה"
   select_a_student_adfcc348: "בחירת תלמיד "
   select_a_student_and_an_assignment_to_view_and_edi_96fda3c1: "בחירת תלמיד ומשימה להצגת ועריכת ציונים"
+  select_a_student_and_an_outcome_to_view_results_9b36b177: "בחירת תלמיד ותוצאות הלמידה כדי לעיין בתוצאות"
   select_a_student_to_view_additional_information_he_c371e40c: "בחירת תלמיד כדי לעיין במידע נוסף"
   select_all_count_9ad54aa1: "חיפוש כולם (%{count})"
   select_all_count_courses_4fc63811: 
@@ -17284,6 +17294,7 @@ he:
   select_all_students_7c2c34b3: "בחירת כל התלמידים"
   select_an_assignment_e52320d7: "בחירת משימה"
   select_an_assignment_to_view_additional_informatio_de1370e1: "בחירת משימה להצגת מידע נוסף"
+  select_an_outcome_37fb2096: "בחירת תוצאת למידה"
   select_audio_file_7d905cce: "בחירת קובץ שמע"
   select_calendars_d5fa50b6: "בחירת יומנים"
   select_content: "בחירת תוכן"
@@ -20185,6 +20196,7 @@ he:
       resubmit_to_vericite: "הגשה מחודשת ל VeriCite"
   vericite_similarity_score_more_information_7df9ea5c: "ניקוד תאימות של VeriCite - מידע נוסף"
   vericite_similarity_score_see_detailed_report_390ab687: "ניקוד תאימות של VeriCite - ניתן לעיין בפרטי הדו\"ח."
+  verification_code_5acd64ef: "קוד אימות"
   video_b9f27375: וידאו
   video_content_is_not_supported_by_your_device_or_a_25214f57: "תוכן הוידאו אינו נתמך במכשיר או האפליקציה שלך."
   video_player_b371005: "נגן הוידאו"

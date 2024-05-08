@@ -16,12 +16,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<%= fields_for :settings, OpenObject.new(settings) do |f| %>
+<%= fields_for :settings do |f| %>
     <table style="width: 500px;" class="formtable">
       <% AccountReports::REPORTS.map.sort_by { |(report, details)| [details[:module], report] }.each do |(report, details)| %>
         <tr>
           <td><%= f.blabel report, "#{details.title} (#{details[:module]})" %></td>
-          <td><%= f.check_box report, :enabled => settings[report] %></td>
+          <td><%= f.check_box report, checked: settings[report] %></td>
         </tr>
       <% end %>
     </table>

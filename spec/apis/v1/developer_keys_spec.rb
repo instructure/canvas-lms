@@ -160,6 +160,22 @@ describe DeveloperKeysController, type: :request do
       expect(json.first.keys).to include("test_cluster_only")
     end
 
+    it "includes the lti_registration for Dynamic Reg keys" do
+      account = Account.default
+      developer_key = developer_key_model(account:)
+      ims_registration = lti_ims_registration_model(developer_key:)
+      admin_session
+      json = api_call(:get, "/api/v1/accounts/#{account.id}/developer_keys", {
+                        controller: "developer_keys",
+                        action: "index",
+                        format: "json",
+                        account_id: account.id
+                      })
+
+      key_json = json.detect { |r| r["id"] == developer_key.global_id }
+      expect(key_json["lti_registration"]).to eq ims_registration.as_json
+    end
+
     describe "developer key account bindings" do
       specs_require_sharding
 

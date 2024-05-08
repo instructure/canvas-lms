@@ -63,17 +63,17 @@ const ASSIGNMENT_QUERY = gql`
 `
 
 // Small wrapper around mockGraphqlQuery which includes our default overrides
-export async function mockQuery(queryAST, overrides = [], variables = {}) {
+export async function mockQuery(queryAST, overrides = [], variables = {}, resolvers = undefined) {
   if (!Array.isArray(overrides)) {
     overrides = [overrides]
   }
   const defaultOverrides = await loadDefaultMocks()
   const allOverrides = [...defaultOverrides, ...overrides]
-  return mockGraphqlQuery(queryAST, allOverrides, variables)
+  return mockGraphqlQuery(queryAST, allOverrides, variables, resolvers)
 }
 
-export async function mockAssignment(overrides = []) {
-  const result = await mockQuery(ASSIGNMENT_QUERY, overrides)
+export async function mockAssignment(overrides = [], resolvers = undefined) {
+  const result = await mockQuery(ASSIGNMENT_QUERY, overrides, {}, resolvers)
   const assignment = result.data.assignment
 
   // TODO: Move env out of assignment and into react context.
@@ -88,8 +88,8 @@ export async function mockAssignment(overrides = []) {
   return assignment
 }
 
-export async function mockSubmission(overrides = []) {
-  const result = await mockQuery(SUBMISSION_QUERY, overrides, {submissionID: '1'})
+export async function mockSubmission(overrides = [], resolvers = undefined) {
+  const result = await mockQuery(SUBMISSION_QUERY, overrides, {submissionID: '1'}, resolvers)
   return result.data.submission
 }
 

@@ -66,13 +66,25 @@ class AuthenticationProvider::Microsoft < AuthenticationProvider::OpenIDConnect
   end
 
   def login_attribute
-    super || "id"
+    raw_login_attribute || "tid+oid"
   end
 
   def unique_id(token)
     id_token = claims(token)
     settings["known_tenants"] ||= []
     (settings["known_tenants"] << id_token["tid"]).uniq!
+    allowed_tenants = mapped_allowed_tenants
+    if allowed_tenants.empty? || allowed_tenants.include?("common") || settings["skip_tenant_verification"]
+      # allow anyone
+    elsif allowed_tenants.delete("guests")
+      # just check the issuer
+      unless allowed_tenants.find { |tenant| id_token["iss"] == "https://login.microsoftonline.com/#{tenant}/v2.0" }
+        raise OAuthValidationError, t("User is from unacceptable issuer %{issuer}.", issuer: id_token["iss"].inspect)
+      end
+    elsif !allowed_tenants.include?(id_token["tid"])
+      raise OAuthValidationError, t("User is from unacceptable tenant %{tenant}.", tenant: id_token["tid"].inspect)
+    end
+
     settings["known_idps"] ||= []
     idp = id_token["idp"] || id_token["iss"]
     (settings["known_idps"] << idp).uniq!

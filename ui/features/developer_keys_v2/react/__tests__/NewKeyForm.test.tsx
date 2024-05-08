@@ -16,14 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {DeveloperKey} from 'features/developer_keys_v2/model/api/DeveloperKey'
 import React, {Component} from 'react'
 import TestUtils from 'react-dom/test-utils'
-import DeveloperKeyFormFields, {NewKeyFormProps} from '../NewKeyForm'
-import {GlobalEnv} from '@canvas/global/env/GlobalEnv'
+import DeveloperKeyFormFields from '../NewKeyForm'
 import ToolConfigurationForm from '../ToolConfigurationForm'
 import Scopes from '../Scopes'
 import {render} from '@testing-library/react'
+
+import type {DeveloperKey} from 'features/developer_keys_v2/model/api/DeveloperKey'
+import type {NewKeyFormProps} from '../NewKeyForm'
+import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
 
 const developerKey: DeveloperKey = {
   access_token_count: 77,

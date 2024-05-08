@@ -17,8 +17,8 @@
  */
 
 import React from 'react'
-import {mount} from 'enzyme'
 import ModuleFileDrop from '../index'
+import {cleanup, render} from '@testing-library/react'
 
 jest.mock('../apiClient', () => {
   const originalModule = jest.requireActual('../apiClient')
@@ -44,18 +44,15 @@ beforeEach(() => {
 })
 
 afterEach(() => {
-  if (component.exists()) {
-    component.unmount()
-  }
   jest.restoreAllMocks()
 })
 
 it('fetchRootFolder sets folderState ', done => {
-  component = mount(<ModuleFileDrop {...props} />)
+  const ref = React.createRef()
+  component = render(<ModuleFileDrop {...props} ref={ref} />)
   jest.restoreAllMocks()
 
-  component
-    .instance()
+  ref.current
     .fetchRootFolder()
     .then(() => {
       expect(ModuleFileDrop.folderState).toEqual({
@@ -73,38 +70,39 @@ it('fetchRootFolder sets folderState ', done => {
 })
 
 it('registers and deregisters drop components', () => {
-  component = mount(<ModuleFileDrop {...props} />)
+  component = render(<ModuleFileDrop {...props} />)
   expect(ModuleFileDrop.activeDrops.size).toEqual(1)
-  component.unmount()
+  cleanup()
   expect(ModuleFileDrop.activeDrops.size).toEqual(0)
 })
 
 it('renders disabled file drop with loading billboard', () => {
-  component = mount(<ModuleFileDrop {...props} />)
-  expect(component.find('FileDrop').first().props().interaction).toEqual('disabled')
-  expect(component.find('Billboard').first().text()).toEqual('Loading...')
+  const ref = React.createRef()
+  component = render(<ModuleFileDrop {...props} ref={ref} />)
+  expect(ref.current.state.interaction).toBeTruthy()
+  expect(ref.current.state.folder).toBeFalsy()
+  expect(component.queryByText('Loading...')).toBeInTheDocument()
 })
 
 it('renders enabled file drop with active billboard', () => {
-  component = mount(<ModuleFileDrop {...props} />)
-  component.find(ModuleFileDrop).setState({folder: {files: []}}, () => {
-    expect(component.find('FileDrop').first().props().interaction).toEqual('enabled')
-    const billboard = component.find('Billboard').first()
-    expect(billboard.text()).toContain('Drop files here to add to module')
-    expect(billboard.text()).toContain('or choose files')
-  })
+  const ref = React.createRef()
+  component = render(<ModuleFileDrop {...props} ref={ref} />)
+  ref.current.setState({folder: {files: []}})
+  expect(ref.current.state.interaction).toBeTruthy()
+  expect(ref.current.state.folder).toBeTruthy()
+  expect(component.queryByText('Drop files here to add to module')).toBeInTheDocument()
+  expect(component.queryByText('or choose files')).toBeInTheDocument()
 })
 
-it('renders invisible upload form when files are dropped', () => {
-  component = mount(<ModuleFileDrop {...props} />)
-  component.setState(
-    {folder: {files: []}, isUploading: true, contextId: '1', contextType: 'Course'},
-    () => {
-      const uploadForm = component.find('UploadForm')
-      expect(uploadForm.exists()).toEqual(true)
-      expect(uploadForm.props().visible).toEqual(false)
-      expect(uploadForm.props().alwaysUploadZips).toEqual(true)
-      expect(component.find('CurrentUploads').exists()).toEqual(true)
-    }
-  )
+it('renders invisible upload form when files are dropped', async () => {
+  const ref = React.createRef()
+  component = render(<ModuleFileDrop {...props} ref={ref} />)
+  await ref.current.setState({
+    folder: {files: []},
+    isUploading: true,
+    contextId: '1',
+    contextType: 'Course',
+  })
+  expect(component.getByRole('form', {hidden: true})).toBeInTheDocument()
+  expect(component.getByTestId('current-uploads')).toBeInTheDocument()
 })

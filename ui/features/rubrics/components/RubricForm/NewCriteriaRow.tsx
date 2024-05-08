@@ -36,9 +36,10 @@ const I18n = useI18nScope('rubrics-criteria-new-row')
 type NewCriteriaRowProps = {
   rowIndex: number
   onEditCriterion: () => void
+  onAddOutcome: () => void
 }
 
-export const NewCriteriaRow = ({rowIndex, onEditCriterion}: NewCriteriaRowProps) => {
+export const NewCriteriaRow = ({rowIndex, onEditCriterion, onAddOutcome}: NewCriteriaRowProps) => {
   return (
     <View>
       <Flex>
@@ -60,7 +61,12 @@ export const NewCriteriaRow = ({rowIndex, onEditCriterion}: NewCriteriaRowProps)
           >
             {I18n.t('Draft New Criterion')}
           </Button>
-          <Button renderIcon={IconOutcomesLine} margin="0 0 0 small">
+          <Button
+            renderIcon={IconOutcomesLine}
+            margin="0 0 0 small"
+            onClick={onAddOutcome}
+            data-testid="create-from-outcome-button"
+          >
             {I18n.t('Create From Outcome')}
           </Button>
         </Flex.Item>

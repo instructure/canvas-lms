@@ -52,6 +52,7 @@ const useFetchAssignees = ({
   const [searchTerm, setSearchTerm] = useState('')
   const [allOptions, setAllOptions] = useState<AssigneeOption[]>(defaultValues)
   const [isLoading, setIsLoading] = useState(false)
+  const [loaded, setLoaded] = useState(false)
   const [hasErrors, setHasErrors] = useState(false)
 
   useEffect(() => {
@@ -162,6 +163,7 @@ const useFetchAssignees = ({
           )
           setAllOptions(newOptions)
           setIsLoading(false)
+          setLoaded(true)
         })
         .catch(e => {
           showFlashError(I18n.t('Something went wrong while fetching data'))(e)
@@ -197,6 +199,7 @@ const useFetchAssignees = ({
   return {
     allOptions: customAllOptions ?? allOptions,
     isLoading: customIsLoading ?? isLoading,
+    loadedAssignees: loaded,
     setSearchTerm: customSetSearchTerm ?? setSearchTerm,
   }
 }

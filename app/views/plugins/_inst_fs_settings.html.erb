@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<%= fields_for :settings, OpenObject.new(settings) do |f| %>
+<%= fields_for :settings do |f| %>
   <table style="width: 500px;" class="formtable">
     <tr>
       <td colspan="2">
@@ -29,13 +29,13 @@
     <tr>
       <td><%= f.blabel :migration_rate, :en => "Chance of migrating older files into Inst-FS on access (0 to 100)" %></td>
       <td>
-        <%= f.text_field :migration_rate %>
+        <%= f.text_field :migration_rate, value: settings[:migration_rate] %>
       </td>
     </tr>
     <tr>
       <td><%= f.blabel :service_worker, :en => "Use service worker to authenticate file accesses in Safari 13+" %></td>
       <td>
-        <%= f.check_box :service_worker %>
+        <%= f.check_box :service_worker, checked: Canvas::Plugin.value_to_boolean(settings[:service_worker]) %>
       </td>
     </tr>
   </table>

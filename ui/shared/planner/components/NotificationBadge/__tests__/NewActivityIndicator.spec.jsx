@@ -17,7 +17,8 @@
  */
 
 import React from 'react'
-import {shallow, mount} from 'enzyme'
+import {shallow} from 'enzyme'
+import {render} from '@testing-library/react'
 import {NewActivityIndicator} from '../NewActivityIndicator'
 
 it('passes props to Indicator', () => {
@@ -28,33 +29,37 @@ it('passes props to Indicator', () => {
 it('registers itself as animatable', () => {
   const fakeRegister = jest.fn()
   const fakeDeregister = jest.fn()
-  const wrapper = mount(
+  const ref = React.createRef()
+  const wrapper = render(
     <NewActivityIndicator
       title="some title"
       itemIds={['first', 'second']}
       registerAnimatable={fakeRegister}
       deregisterAnimatable={fakeDeregister}
       animatableIndex={42}
+      ref={ref}
     />
   )
-  const instance = wrapper.instance()
-  expect(fakeRegister).toHaveBeenCalledWith('new-activity-indicator', instance, 42, [
+  expect(fakeRegister).toHaveBeenCalledWith('new-activity-indicator', ref.current, 42, [
     'first',
     'second',
   ])
 
-  wrapper.setProps({animatableIndex: 84, itemIds: ['third', 'fourth']})
-  expect(fakeDeregister).toHaveBeenCalledWith('new-activity-indicator', instance, [
+  wrapper.rerender(
+    <NewActivityIndicator
+      title="some title"
+      itemIds={['third', 'fourth']}
+      registerAnimatable={fakeRegister}
+      deregisterAnimatable={fakeDeregister}
+      animatableIndex={84}
+      ref={ref}
+    />
+  )
+  expect(fakeDeregister).toHaveBeenCalledWith('new-activity-indicator', ref.current, [
     'first',
     'second',
   ])
-  expect(fakeRegister).toHaveBeenCalledWith('new-activity-indicator', instance, 84, [
-    'third',
-    'fourth',
-  ])
-
-  wrapper.unmount()
-  expect(fakeDeregister).toHaveBeenCalledWith('new-activity-indicator', instance, [
+  expect(fakeRegister).toHaveBeenCalledWith('new-activity-indicator', ref.current, 84, [
     'third',
     'fourth',
   ])

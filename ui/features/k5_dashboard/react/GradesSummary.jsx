@@ -54,6 +54,7 @@ const GradeSummaryShape = {
   showTotalsForAllGradingPeriods: PropTypes.bool,
   showingAllGradingPeriods: PropTypes.bool,
   gradingScheme: PropTypes.array,
+  pointsBasedGradingScheme: PropTypes.bool,
   restrictQuantitativeData: PropTypes.bool,
 }
 
@@ -99,12 +100,13 @@ export const GradeSummaryLine = ({
   showTotalsForAllGradingPeriods,
   showingAllGradingPeriods,
   gradingScheme,
+  pointsBasedGradingScheme,
   restrictQuantitativeData,
 }) => {
   let gradeText = grade
   let isPercentage = false
   if (restrictQuantitativeData) {
-    gradeText = scoreToGrade(score, gradingScheme)
+    gradeText = scoreToGrade(score, gradingScheme, pointsBasedGradingScheme)
   } else if (!grade) {
     if (score || score === 0) {
       gradeText = I18n.toPercentage(score, {

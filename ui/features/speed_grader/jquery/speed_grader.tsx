@@ -155,7 +155,10 @@ import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 import type {EnvGradebookSpeedGrader} from '@canvas/global/env/EnvGradebook'
 import replaceTags from '@canvas/util/replaceTags'
 import type {GradeStatusUnderscore} from '@canvas/grading/accountGradingStatus'
-import type {RubricUnderscoreType} from '../react/RubricAssessmentTrayWrapper/utils'
+import type {
+  RubricAssessmentUnderscore,
+  RubricUnderscoreType,
+} from '../react/RubricAssessmentTrayWrapper/utils'
 
 declare global {
   interface Window {
@@ -989,14 +992,9 @@ function handleSelectedRubricAssessmentChanged({validateEnteredData = true} = {}
   $('#rubric_assessments_list_and_edit_button_holder .edit').showIf(showEditButton)
 
   if (enhanced_rubrics) {
-    if (
-      !selectedAssessment?.assessor_id ||
-      ENV.RUBRIC_ASSESSMENT.assessor_id === selectedAssessment?.assessor_id
-    ) {
-      $('button.toggle_full_rubric').show()
-    } else {
-      $('button.toggle_full_rubric').hide()
-    }
+    useStore.setState({
+      studentAssessment: (selectedAssessment ?? {}) as RubricAssessmentUnderscore,
+    })
   }
 }
 
@@ -1528,8 +1526,6 @@ EG = {
 
   refreshFullRubric() {
     if (enhanced_rubrics) {
-      const assessment = rubricAssessmentToPopulate(EG) as any
-      useStore.setState({studentAssessmentData: assessment?.data})
       return
     }
 
@@ -1897,6 +1893,10 @@ EG = {
     ReactDOM.render(
       <RubricAssessmentTrayWrapper
         rubric={ENV.rubric as RubricUnderscoreType}
+        onAccessorChange={accessorId => {
+          $('#rubric_assessments_select').val(accessorId)
+          handleSelectedRubricAssessmentChanged()
+        }}
         onSave={data => {
           useStore.setState({rubricAssessmentTrayOpen: false})
           this.saveRubricAssessment(data)
@@ -3040,8 +3040,10 @@ EG = {
       }
 
       selectMenu.val(idToSelect)
-      $('#rubric_assessments_list').showIf(isModerator || selectMenu.find('option').length > 1)
+      const showSelectMenu = isModerator || selectMenu.find('option').length > 1
+      $('#rubric_assessments_list').showIf(showSelectMenu)
 
+      useStore.setState({rubricAssessors: showSelectMenu ? selectMenuOptions : []})
       handleSelectedRubricAssessmentChanged({validateEnteredData})
     }
   },

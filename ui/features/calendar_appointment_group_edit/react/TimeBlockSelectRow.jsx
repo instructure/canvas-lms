@@ -45,9 +45,9 @@ const timeToString = (dateObj, format) => {
 class TimeBlockSelectorRow extends React.Component {
   static propTypes = {
     timeData: PropTypes.shape({
-      date: PropTypes.date,
-      startTime: PropTypes.date,
-      endTime: PropTypes.date,
+      date: PropTypes.any,
+      startTime: PropTypes.any,
+      endTime: PropTypes.any,
     }).isRequired,
     slotEventId: PropTypes.string,
     readOnly: PropTypes.bool,

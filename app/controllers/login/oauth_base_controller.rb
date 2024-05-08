@@ -75,6 +75,10 @@ class Login::OAuthBaseController < ApplicationController
     end
 
     pseudonym = @domain_root_account.pseudonyms.for_auth_configuration(unique_ids, @aac)
+    unless pseudonym
+      return if need_email_verification?(unique_ids, @aac)
+    end
+
     if pseudonym
       @aac.apply_federated_attributes(pseudonym, provider_attributes)
     elsif @aac.jit_provisioning?

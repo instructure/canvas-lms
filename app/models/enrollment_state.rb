@@ -168,10 +168,13 @@ class EnrollmentState < ActiveRecord::Base
       elsif global_start_at < now
         if enrollment.temporary_enrollment?
           ending_enrollment_state = enrollment.temporary_enrollment_pairing&.ending_enrollment_state
-
           case ending_enrollment_state
-          when "completed", "inactive"
-            self.state = ending_enrollment_state
+          when "completed"
+            enrollment.conclude
+            self.state = "completed"
+          when "inactive"
+            enrollment.deactivate
+            self.state = "inactive"
           when "deleted", nil
             enrollment.destroy
           end

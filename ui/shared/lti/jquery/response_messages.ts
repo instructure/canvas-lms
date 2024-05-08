@@ -21,6 +21,7 @@ const GENERIC_ERROR_CODE = 'error'
 const UNSUPPORTED_SUBJECT_ERROR_CODE = 'unsupported_subject'
 const WRONG_ORIGIN_ERROR_CODE = 'wrong_origin'
 const BAD_REQUEST_ERROR_CODE = 'bad_request'
+const UNAUTHORIZED_ERROR_CODE = 'unauthorized'
 
 export interface ResponseMessages {
   sendResponse: (contents?: {}) => void
@@ -30,6 +31,7 @@ export interface ResponseMessages {
   sendBadRequestError: (message: any) => void
   sendWrongOriginError: () => void
   sendUnsupportedSubjectError: (message?: string | undefined) => void
+  sendUnauthorizedError: () => void
   isResponse: (message: any) => boolean
 }
 
@@ -94,6 +96,10 @@ const buildResponseMessages = ({
     sendError(UNSUPPORTED_SUBJECT_ERROR_CODE, message)
   }
 
+  const sendUnauthorizedError = () => {
+    sendError(UNAUTHORIZED_ERROR_CODE)
+  }
+
   const isResponse = message => !!message.data?.subject?.endsWith('.response')
 
   return {
@@ -104,6 +110,7 @@ const buildResponseMessages = ({
     sendBadRequestError,
     sendWrongOriginError,
     sendUnsupportedSubjectError,
+    sendUnauthorizedError,
     isResponse,
   }
 }

@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<%= fields_for :settings, OpenObject.new(settings) do |f| %>
+<%= fields_for :settings do |f| %>
   <table style="width: 500px;" class="formtable">
     <tr>
       <td colspan="2">
@@ -29,13 +29,13 @@ TEXT
     </tr>
     <tr>
       <td colspan="2">
-        <%= f.check_box "no_copying", {}, 'yes', 'no' %>
+        <%= f.check_box "no_copying", { checked: Canvas::Plugin.value_to_boolean(settings[:no_copying]) }, 'yes', 'no' %>
         <%= f.label "no_copying", t('no_copying_frozen', "Don't allow frozen assignments to be copied.") %>
       </td>
     </tr>
     <% Assignment::FREEZABLE_ATTRIBUTES.sort.each do |att| %>
       <tr>
-        <td colspan=2><%= f.check_box att, {}, 'yes', 'no' %>
+        <td colspan=2><%= f.check_box att, { checked: Canvas::Plugin.value_to_boolean(settings[att]) }, 'yes', 'no' %>
         <%= f.label att, att %></td>
       </tr>
     <% end %>

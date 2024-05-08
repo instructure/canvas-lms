@@ -17,16 +17,18 @@
  */
 
 import KeyboardShortcutModal from '../KeyboardShortcutModal'
-import {mount} from 'enzyme'
+import {render, screen} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import React from 'react'
 
 const waitForInstUIModalCssTransitions = () => new Promise(resolve => setTimeout(resolve, 1))
 
 describe('KeyboardShortcutModal', () => {
-  let component
-
   beforeEach(() => {
-    component = mount(
+    userEvent.setup()
+  })
+  test('appears when ALT + F8 is pressed', async () => {
+    render(
       <KeyboardShortcutModal
         shortcuts={[
           {
@@ -36,14 +38,8 @@ describe('KeyboardShortcutModal', () => {
         ]}
       />
     )
-  })
 
-  afterEach(() => {
-    component.unmount()
-  })
-
-  test('appears when ALT + F8 is pressed', async () => {
-    expect(document.querySelector('.keyboard_navigation')).toBeNull()
+    expect(document.querySelector('.keyboard_navigation')).not.toBeInTheDocument()
     const e = new Event('keydown')
     e.which = 119
     e.altKey = true
@@ -51,24 +47,8 @@ describe('KeyboardShortcutModal', () => {
 
     await waitForInstUIModalCssTransitions()
 
-    expect(document.querySelector('.keyboard_navigation')).toBeTruthy()
-  })
-
-  describe('shortcuts', () => {
-    beforeEach(() => {
-      const e = new Event('keydown')
-      e.which = 119
-      e.altKey = true
-      document.dispatchEvent(e)
-      return waitForInstUIModalCssTransitions()
-    })
-
-    test('renders shortcuts prop', () => {
-      expect(document.querySelectorAll('.keyboard_navigation')).toHaveLength(1)
-      expect(document.querySelector('.keycode').innerHTML).toBe('j')
-      expect(document.querySelector('.description').innerHTML).toBe(
-        'this is a test keyboard shortcut'
-      )
-    })
+    expect(document.querySelectorAll('.keyboard_navigation')).toHaveLength(1)
+    expect(screen.getByText('j')).toBeInTheDocument()
+    expect(screen.getByText('this is a test keyboard shortcut')).toBeInTheDocument()
   })
 })

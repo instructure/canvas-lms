@@ -124,21 +124,21 @@ GEM
     mime-types (3.5.2)
       mime-types-data (~> 3.2015)
     mime-types-data (3.2024.0305)
-    mini_portile2 (2.8.5)
+    mini_portile2 (2.8.6)
     minitest (5.22.3)
     mutex_m (0.2.0)
     net-http (0.4.1)
       uri
-    nokogiri (1.16.3)
+    nokogiri (1.16.4)
       mini_portile2 (~> 2.8.2)
       racc (~> 1.4)
-    nokogiri (1.16.3-aarch64-linux)
+    nokogiri (1.16.4-aarch64-linux)
       racc (~> 1.4)
-    nokogiri (1.16.3-arm64-darwin)
+    nokogiri (1.16.4-arm64-darwin)
       racc (~> 1.4)
-    nokogiri (1.16.3-x86_64-darwin)
+    nokogiri (1.16.4-x86_64-darwin)
       racc (~> 1.4)
-    nokogiri (1.16.3-x86_64-linux)
+    nokogiri (1.16.4-x86_64-linux)
       racc (~> 1.4)
     psych (5.1.2)
       stringio
@@ -181,7 +181,7 @@ GEM
       redis-cluster-client (>= 0.7.0)
     redis-scripting (1.0.1)
       redis (>= 3.0)
-    reline (0.5.1)
+    reline (0.5.2)
       io-console (~> 0.5)
     rexml (3.2.6)
     rspec (3.13.0)
@@ -234,4 +234,4 @@ RUBY VERSION
    ruby 3.1.2p20
 
 BUNDLED WITH
-   2.5.7
+   2.5.9

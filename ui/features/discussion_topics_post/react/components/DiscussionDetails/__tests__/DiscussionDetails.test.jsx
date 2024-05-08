@@ -150,15 +150,15 @@ describe('DiscussionDetails', () => {
         expect(queryByText('Available from Mar 24, 2021 until Apr 4, 2021')).toBeTruthy()
       })
 
-      it('displays "Show due dates" button when there are overrides', () => {
+      it('displays "View due dates" button when there are overrides', () => {
         const {getByText} = setup({}, mockOverrides)
-        expect(getByText('Show Due Dates (4)')).toBeTruthy()
+        expect(getByText('View Due Dates')).toBeTruthy()
       })
 
       it('displays tray and correctly formatted dates', async () => {
         const {queryByText, findByText, findAllByTestId} = setup({}, mockOverrides)
-        expect(queryByText('Show Due Dates (4)')).toBeTruthy()
-        fireEvent.click(queryByText('Show Due Dates (4)'))
+        expect(queryByText('View Due Dates')).toBeTruthy()
+        fireEvent.click(queryByText('View Due Dates'))
         expect(await findAllByTestId('assignment-override-row')).toBeTruthy()
         expect(await findByText('Sep 4, 2021 5:59am')).toBeTruthy()
       })
@@ -168,8 +168,8 @@ describe('DiscussionDetails', () => {
         mockOverrides[2].unlockAt = null
         mockOverrides[2].lockAt = null
         const {queryByText, findByText} = setup({}, mockOverrides)
-        expect(queryByText('Show Due Dates (4)')).toBeTruthy()
-        fireEvent.click(queryByText('Show Due Dates (4)'))
+        expect(queryByText('View Due Dates')).toBeTruthy()
+        fireEvent.click(queryByText('View Due Dates'))
         expect(await findByText('No Due Date')).toBeTruthy()
         expect(await findByText('No Start Date')).toBeTruthy()
         expect(await findByText('No End Date')).toBeTruthy()
@@ -222,7 +222,7 @@ describe('DiscussionDetails', () => {
 
       it('displays "Show due dates" button when there are overrides', () => {
         const {queryByText} = setup({}, mockOverrides)
-        expect(queryByText('Due Dates (4)')).toBeTruthy()
+        expect(queryByText('Due Dates')).toBeTruthy()
       })
       describe('Restrict Quantitative Data is true', () => {
         const mockTopic = Discussion.mock({

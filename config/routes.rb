@@ -827,6 +827,9 @@ CanvasRails::Application.routes.draw do
   get "login/canvas" => "login/canvas#new", :as => :canvas_login
   post "login/canvas" => "login/canvas#create"
 
+  get "login/email_verify" => "login/email_verify#show", :as => :login_email_verify_show
+  post "login/email_verify" => "login/email_verify#verify", :as => :login_email_verify
+
   get "login/ldap" => "login/ldap#new"
   post "login/ldap" => "login/ldap#create"
 
@@ -1700,6 +1703,7 @@ CanvasRails::Application.routes.draw do
       put "accounts/:account_id/logins/:id", action: :update
       delete "users/:user_id/logins/:id", action: :destroy
       post "users/reset_password", action: :forgot_password
+      post "users/:user_id/logins/:id/migrate_login_attribute", action: :migrate_login_attribute
     end
 
     scope(controller: :accounts) do
@@ -2448,6 +2452,8 @@ CanvasRails::Application.routes.draw do
       get "accounts/:account_id/rubrics/:id", action: :show
       get "courses/:course_id/rubrics", action: :index, as: :course_rubrics
       get "courses/:course_id/rubrics/:id", action: :show
+      get "courses/:course_id/rubrics/:id/used_locations", action: "used_locations", as: "rubrics_course_used_locations"
+      get "accounts/:account_id/rubrics/:id/used_locations", action: "used_locations", as: "rubrics_account_used_locations"
       post "courses/:course_id/rubrics", controller: :rubrics, action: :create
       put "courses/:course_id/rubrics/:id", controller: :rubrics, action: :update
       delete "courses/:course_id/rubrics/:id", controller: :rubrics, action: :destroy

@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {
-  type DateDetailsPayload,
-  type ItemAssignToCardSpec,
+import type {
+  DateDetailsPayload,
+  ItemAssignToCardSpec,
   DateDetailsOverride,
 } from '../../react/Item/types'
 import {generateDateDetailsPayload} from '../assignToHelper'

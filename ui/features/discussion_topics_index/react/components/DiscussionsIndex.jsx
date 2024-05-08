@@ -29,6 +29,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {Heading} from '@instructure/ui-heading'
 import {Spinner} from '@instructure/ui-spinner'
+import ItemAssignToTray from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToTray'
 
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
 import DirectShareUserModal from '@canvas/direct-sharing/react/components/DirectShareUserModal'
@@ -85,6 +86,8 @@ export default class DiscussionsIndex extends Component {
   state = {
     showDelete: false,
     deleteFunction: () => {},
+    showAssignToTray: false,
+    discussionDetails: {},
   }
 
   componentDidMount() {
@@ -102,6 +105,14 @@ export default class DiscussionsIndex extends Component {
       this.props.deleteDiscussion(discussion)
     }
     this.setState({showDelete: false, deleteFunction: () => {}})
+  }
+
+  openAssignToTray = discussion => {
+    this.setState({showAssignToTray: true, discussionDetails: discussion})
+  }
+
+  closeAssignToTray = () => {
+    this.setState({showAssignToTray: false, discussionDetails: null})
   }
 
   selectPage(page) {
@@ -212,6 +223,7 @@ export default class DiscussionsIndex extends Component {
             discussions={this.props.pinnedDiscussions}
             deleteDiscussion={this.openDeleteDiscussionsModal}
             onMoveDiscussion={this.renderMoveDiscussionTray}
+            onOpenAssignToTray={this.openAssignToTray}
             pinned={true}
             renderContainerBackground={() =>
               pinnedDiscussionBackground({
@@ -225,6 +237,7 @@ export default class DiscussionsIndex extends Component {
             title={I18n.t('Discussions')}
             discussions={this.props.unpinnedDiscussions}
             deleteDiscussion={this.openDeleteDiscussionsModal}
+            onOpenAssignToTray={this.openAssignToTray}
             closedState={false}
             renderContainerBackground={() =>
               unpinnedDiscussionsBackground({
@@ -240,6 +253,7 @@ export default class DiscussionsIndex extends Component {
             title={I18n.t('Closed for Comments')}
             discussions={this.props.closedForCommentsDiscussions}
             deleteDiscussion={this.openDeleteDiscussionsModal}
+            onOpenAssignToTray={this.openAssignToTray}
             closedState={true}
             renderContainerBackground={() =>
               closedDiscussionBackground({
@@ -271,6 +285,22 @@ export default class DiscussionsIndex extends Component {
             onDismiss={() => this.props.setSendToOpen(false)}
           />
         )}{' '}
+        {ENV?.FEATURES?.differentiated_modules && this.state.showAssignToTray && (
+          <ItemAssignToTray
+            open={this.state.showAssignToTray}
+            onClose={this.closeAssignToTray}
+            onDismiss={this.closeAssignToTray}
+            courseId={ENV.COURSE_ID}
+            itemName={this.state.discussionDetails.title}
+            itemType="discussion"
+            iconType="discussion"
+            pointsPossible={this.state?.discussionDetails?.assignment?.points_possible || null}
+            itemContentId={this.state.discussionDetails.id}
+            locale={ENV.LOCALE || 'en'}
+            timezone={ENV.TIMEZONE || 'UTC'}
+            removeDueDateInput={!this.state?.discussionDetails?.assignment_id}
+          />
+        )}
       </View>
     )
   }

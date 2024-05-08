@@ -21,9 +21,11 @@ import {executeQuery} from '@canvas/query/graphql'
 import gql from 'graphql-tag'
 
 export const CREATE_SUBMISSION_COMMENT = gql`
-  mutation CreateSubmissionComment($submissionId: ID!, $comment: String!) {
+  mutation CreateSubmissionComment($submissionId: ID!, $comment: String!, $groupComment: Boolean!) {
     __typename
-    createSubmissionComment(input: {submissionId: $submissionId, comment: $comment}) {
+    createSubmissionComment(
+      input: {submissionId: $submissionId, comment: $comment, groupComment: $groupComment}
+    ) {
       submissionComment {
         _id
         id
@@ -42,6 +44,7 @@ export const CREATE_SUBMISSION_COMMENT = gql`
 export const ZCreateSubmissionCommentParams = z.object({
   submissionId: z.string(),
   comment: z.string(),
+  groupComment: z.boolean(),
 })
 
 type CreateSubmissionCommentParams = z.infer<typeof ZCreateSubmissionCommentParams>
@@ -49,10 +52,12 @@ type CreateSubmissionCommentParams = z.infer<typeof ZCreateSubmissionCommentPara
 export async function createSubmissionComment({
   submissionId,
   comment,
+  groupComment,
 }: CreateSubmissionCommentParams): Promise<any> {
   const result = executeQuery<any>(CREATE_SUBMISSION_COMMENT, {
     submissionId,
     comment,
+    groupComment,
   })
 
   return result

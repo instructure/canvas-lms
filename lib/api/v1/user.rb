@@ -131,7 +131,15 @@ module Api::V1::User
 
       json[:locale] = user.locale if includes.include?("locale")
       json[:effective_locale] = I18n.locale if includes.include?("effective_locale") && user == current_user
-      json[:confirmation_url] = user.communication_channels.email.first.try(:confirmation_url) if includes.include?("confirmation_url")
+
+      if includes.include?("confirmation_url")
+        email_channel = user.communication_channels.email.first
+        if email_channel.present?
+          presenter = CommunicationChannelPresenter.new(email_channel, request)
+          confirmation_url = presenter.confirmation_url
+          json[:confirmation_url] = confirmation_url if confirmation_url.present?
+        end
+      end
 
       if includes.include?("last_login")
         last_login = user.last_login || user.read_attribute(:last_login)

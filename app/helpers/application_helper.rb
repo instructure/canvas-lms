@@ -37,7 +37,7 @@ module ApplicationHelper
     return nil unless user
     return context_user_name_display(user) if user.respond_to?(:short_name)
 
-    user_id = user.is_a?(OpenObject) ? user.id : user
+    user_id = user.is_a?(User) ? user.id : user
     Rails
       .cache
       .fetch(["context_user_name", context, user_id].cache_key, { expires_in: 15.minutes }) do

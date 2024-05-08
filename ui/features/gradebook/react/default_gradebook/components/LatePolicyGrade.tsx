@@ -30,6 +30,7 @@ type Props = {
   }
   enterGradesAs: 'points' | 'percent' | 'passFail' | 'gradingScheme'
   gradingScheme: Array<Array<string | number>>
+  pointsBasedGradingScheme: boolean
   submission: SubmissionData
 }
 
@@ -40,6 +41,7 @@ export default function LatePolicyGrade(props: Props) {
     formatType: props.enterGradesAs,
     pointsPossible: props.assignment.pointsPossible,
     gradingScheme: props.gradingScheme,
+    pointsBasedGradingScheme: props.pointsBasedGradingScheme,
     version: 'final',
   }
   const finalGrade = GradeFormatHelper.formatSubmissionGrade(props.submission, formatOptions)

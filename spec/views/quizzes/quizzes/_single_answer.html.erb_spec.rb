@@ -25,11 +25,8 @@ describe "quizzes/quizzes/_single_answer" do
     course_with_student
     view_context
     assign(:quiz, @course.quizzes.create!)
-    answer = OpenObject.new
-    answer.id = 5
-    answer.weight = 100
-    question_type = OpenObject.new
-    render partial: "quizzes/quizzes/single_answer", object: answer, locals: { question_type:, user_answer: nil }
+    question_type = QuizzesHelper::QuestionType.new
+    render partial: "quizzes/quizzes/single_answer", locals: { question_type:, user_answer: nil }
     expect(response).not_to be_nil
   end
 end

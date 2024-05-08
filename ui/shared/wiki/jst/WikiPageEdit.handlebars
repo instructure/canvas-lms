@@ -74,6 +74,14 @@
         {{/if}}
       </div>
     </div>
+    {{#if ENV.FEATURES.differentiated_modules}}
+    <div class="responsive-control-group options">
+      <label class="control-label"><strong>{{#t "assign_to_label"}}Assign Access{{/t}}</strong></label>
+      <div class="controls">
+        <div id="assign-to-mount-point-edit-page" />
+      </div>
+    </div>
+    {{/if}}
   {{/if}}
 </div>
 

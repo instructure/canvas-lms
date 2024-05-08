@@ -117,7 +117,7 @@ GEM
       railties (>= 6.1, < 7.2)
     i18n (1.14.4)
       concurrent-ruby (~> 1.0)
-    inst-jobs (3.1.16)
+    inst-jobs (3.1.17)
       activerecord (>= 6.0)
       activerecord-pg-extensions (~> 0.4)
       activesupport (>= 6.0)
@@ -139,21 +139,21 @@ GEM
     loofah (2.22.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
-    mini_portile2 (2.8.5)
+    mini_portile2 (2.8.6)
     minitest (5.22.3)
     mutex_m (0.2.0)
     net-http (0.4.1)
       uri
-    nokogiri (1.16.3)
+    nokogiri (1.16.4)
       mini_portile2 (~> 2.8.2)
       racc (~> 1.4)
-    nokogiri (1.16.3-aarch64-linux)
+    nokogiri (1.16.4-aarch64-linux)
       racc (~> 1.4)
-    nokogiri (1.16.3-arm64-darwin)
+    nokogiri (1.16.4-arm64-darwin)
       racc (~> 1.4)
-    nokogiri (1.16.3-x86_64-darwin)
+    nokogiri (1.16.4-x86_64-darwin)
       racc (~> 1.4)
-    nokogiri (1.16.3-x86_64-linux)
+    nokogiri (1.16.4-x86_64-linux)
       racc (~> 1.4)
     packs-specification (0.0.10)
       sorbet-runtime
@@ -198,7 +198,7 @@ GEM
       redis-cluster-client (>= 0.7.0)
     redis-scripting (1.0.1)
       redis (>= 3.0)
-    reline (0.5.1)
+    reline (0.5.2)
       io-console (~> 0.5)
     rspec (3.13.0)
       rspec-core (~> 3.13.0)
@@ -246,4 +246,4 @@ RUBY VERSION
    ruby 3.1.2p20
 
 BUNDLED WITH
-   2.5.7
+   2.5.9

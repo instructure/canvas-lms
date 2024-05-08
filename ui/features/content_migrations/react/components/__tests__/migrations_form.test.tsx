@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, screen, waitFor, waitForElementToBeRemoved} from '@testing-library/react'
+import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import ContentMigrationsForm from '../migrations_form'
 import fetchMock from 'fetch-mock'
@@ -28,8 +28,10 @@ jest.mock('@canvas/upload-file', () => ({
 }))
 
 const CommonCartridgeImporter = jest.fn()
+// @ts-expect-error
 jest.mock('../migrator_forms/common_cartridge', () => props => {
   CommonCartridgeImporter(props)
+  // @ts-expect-error
   return <mock-CommonCartridgeImporter />
 })
 

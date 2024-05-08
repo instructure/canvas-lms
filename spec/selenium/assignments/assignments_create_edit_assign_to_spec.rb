@@ -192,6 +192,15 @@ shared_examples_for "item assign to tray during assignment creation/update" do
     expect(AssignmentCreateEditPage.pending_changes_pill_exists?).to be_truthy
   end
 
+  it "focus close button on open" do
+    AssignmentCreateEditPage.click_manage_assign_to_button
+
+    wait_for_assign_to_tray_spinner
+    keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+    check_element_has_focus close_button
+  end
+
   context "Module overrides" do
     before do
       @context_module = @course.context_modules.create! name: "Mod"

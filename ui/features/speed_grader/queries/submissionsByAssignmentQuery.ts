@@ -24,7 +24,11 @@ const SUBMISSIONS_BY_ASSIGNMENT_QUERY = gql`
   query SubmissionsByAssignmentQuery($assignmentId: ID!) {
     assignment(id: $assignmentId) {
       submissionsConnection(
-        filter: {includeUnsubmitted: true, applyGradebookEnrollmentFilters: true}
+        filter: {
+          includeUnsubmitted: true
+          applyGradebookEnrollmentFilters: true
+          representativesOnly: true
+        }
       ) {
         nodes {
           _id
@@ -34,8 +38,10 @@ const SUBMISSIONS_BY_ASSIGNMENT_QUERY = gql`
           excused
           excused
           gradeMatchesCurrentSubmission
+          submissionCommentDownloadUrl
           gradingPeriodId
           gradingStatus
+          groupId
           postedAt
           score
           submissionStatus

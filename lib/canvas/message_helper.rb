@@ -70,6 +70,7 @@ module Canvas::MessageHelper
     using = { delay_for: 0 }.with_indifferent_access.merge(values)
     using[:category] ||= args[1] # type
     using[:delay_for] ||= args[2] # delay
+    using[:priority] ||= false
     # 'txt' is the legacy message body. Pull name from first line.
     if args[4].present?
       # txt
@@ -80,7 +81,7 @@ module Canvas::MessageHelper
 
     n = Notification.where(name: using[:name]).first_or_initialize
     begin
-      n.update(delay_for: using[:delay_for], category: using[:category])
+      n.update(delay_for: using[:delay_for], category: using[:category], priority: using[:priority])
     rescue => e
       if n.new_record?
         raise "New notification '#{using[:name]}' creation failed. Message: #{e.message}"

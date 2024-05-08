@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class Mutations::CreateAssignment < Mutations::AssignmentBase
+class Mutations::CreateAssignment < Mutations::AssignmentBase::Mutation
   graphql_name "CreateAssignment"
 
   argument :course_id, ID, required: true

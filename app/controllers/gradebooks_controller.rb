@@ -521,6 +521,8 @@ class GradebooksController < ApplicationController
       custom_grade_statuses:,
       custom_grade_statuses_enabled:,
       default_grading_standard: grading_standard.data,
+      default_grading_standard_points_based: grading_standard.points_based,
+      default_grading_standard_scaling_factor: grading_standard.scaling_factor,
       download_assignment_submissions_url: named_context_url(@context, :context_assignment_submissions_url, "{{ assignment_id }}", zip: 1),
       enhanced_gradebook_filters: @context.feature_enabled?(:enhanced_gradebook_filters),
       hide_zero_point_quizzes: Account.site_admin.feature_enabled?(:hide_zero_point_quizzes_option),
@@ -1545,39 +1547,37 @@ class GradebooksController < ApplicationController
   end
 
   def group_as_assignment(group, options)
-    OpenObject.build("assignment",
-                     id: "group-#{group.id}",
-                     rules: group.rules,
-                     title: group.name,
-                     points_possible: points_possible(group.group_weight, options),
-                     hard_coded: true,
-                     special_class: "group_total",
-                     assignment_group_id: group.id,
-                     group_weight: group.group_weight,
-                     asset_string: "group_total_#{group.id}")
+    Assignment::HardCoded.new(id: "group-#{group.id}",
+                              rules: group.rules,
+                              title: group.name,
+                              points_possible: points_possible(group.group_weight, options),
+                              special_class: "group_total",
+                              assignment_group_id: group.id,
+                              group_weight: group.group_weight,
+                              asset_string: "group_total_#{group.id}")
   end
 
   def period_as_assignment(period, options)
-    OpenObject.build("assignment",
-                     id: "period-#{period.id}",
-                     rules: [],
-                     title: period.title,
-                     points_possible: points_possible(period.weight, options),
-                     hard_coded: true,
-                     special_class: "group_total",
-                     assignment_group_id: period.id,
-                     group_weight: period.weight,
-                     asset_string: "period_total_#{period.id}")
+    Assignment::HardCoded.new(
+      id: "period-#{period.id}",
+      rules: [],
+      title: period.title,
+      points_possible: points_possible(period.weight, options),
+      special_class: "group_total",
+      assignment_group_id: period.id,
+      group_weight: period.weight,
+      asset_string: "period_total_#{period.id}"
+    )
   end
 
   def total_as_assignment(options = {})
-    OpenObject.build("assignment",
-                     id: "final-grade",
-                     title: t("Total"),
-                     points_possible: (options[:out_of_final] ? "" : percentage(100)),
-                     hard_coded: true,
-                     special_class: "final_grade",
-                     asset_string: "final_grade_column")
+    Assignment::HardCoded.new(
+      id: "final-grade",
+      title: t("Total"),
+      points_possible: (options[:out_of_final] ? "" : percentage(100)),
+      special_class: "final_grade",
+      asset_string: "final_grade_column"
+    )
   end
 
   def moderated_grading_enabled_and_no_grades_published?

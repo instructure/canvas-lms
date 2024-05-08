@@ -116,6 +116,7 @@ export type SubmissionTrayProps = {
   onClose: () => void
   requireStudentGroupForSpeedGrader: boolean
   gradingScheme: null | GradingStandard[]
+  pointsBasedGradingScheme: boolean
   onGradeSubmission: (submission: CamelizedSubmission, gradeInfo: GradeResult) => void
   onRequestClose: () => void
   selectNextAssignment: () => void
@@ -475,6 +476,7 @@ export default class SubmissionTray extends React.Component<
                   disabled={this.props.gradingDisabled}
                   enterGradesAs={this.props.enterGradesAs}
                   gradingScheme={this.props.gradingScheme}
+                  pointsBasedGradingScheme={this.props.pointsBasedGradingScheme}
                   pendingGradeInfo={this.props.pendingGradeInfo}
                   onSubmissionUpdate={this.props.onGradeSubmission}
                   submission={this.props.submission}
@@ -486,6 +488,7 @@ export default class SubmissionTray extends React.Component<
                       assignment={this.props.assignment}
                       enterGradesAs={this.props.enterGradesAs}
                       gradingScheme={this.props.gradingScheme}
+                      pointsBasedGradingScheme={this.props.pointsBasedGradingScheme}
                       submission={this.props.submission}
                     />
                   </View>

@@ -62,7 +62,13 @@ module Api::V1::DiscussionTopics
     return {} unless root_topic_ids.present?
 
     fields_with_id = fields.unshift(:id)
-    root_topics_array = DiscussionTopic.select(fields_with_id).find(root_topic_ids)
+    root_topics_array = if fields_with_id.delete(:delayed_post_at)
+                          with_correct_unlock_at = DiscussionTopic.select("COALESCE(unlock_at, delayed_post_at) AS delayed_post_at", fields_with_id).find(root_topic_ids)
+                          fields_with_id << :delayed_post_at
+                          with_correct_unlock_at
+                        else
+                          DiscussionTopic.select(fields_with_id).find(root_topic_ids)
+                        end
     root_topics_array.index_by(&:id)
   end
 

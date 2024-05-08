@@ -1980,6 +1980,23 @@ describe Assignment do
   end
 
   describe "#representatives" do
+    it "optionally returns group members along with the reps" do
+      @first_student = @student
+      @second_student = student_in_course(active_all: true).user
+      group_category = @course.group_categories.create!(name: "My Category")
+      group = @course.groups.create!(name: "My Group", group_category:)
+      group.add_user(@first_student)
+      group.add_user(@second_student)
+      group.save!
+      assignment = @course.assignments.create!(assignment_valid_attributes.merge(group_category:))
+      rep, others = assignment.representatives(user: @teacher, include_others: true).first
+      aggregate_failures do
+        expect(rep.id).to eq @first_student.id
+        expect(others.count).to eq 1
+        expect(others.first.id).to eq @second_student.id
+      end
+    end
+
     context "when filtering by section" do
       before(:once) do
         @student_enrollment = @enrollment
@@ -11368,6 +11385,7 @@ describe Assignment do
 
   describe "checkpointed assignments" do
     before do
+      @course.root_account.enable_feature!(:discussion_checkpoints)
       @parent = @course.assignments.create!(has_sub_assignments: true)
       @child = @parent.sub_assignments.create!(context: @course, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
     end
@@ -11385,6 +11403,11 @@ describe Assignment do
 
     it "soft-deletes child assignments when the parent assignment is soft-deleted" do
       expect { @parent.destroy }.to change { @child.reload.deleted? }.from(false).to(true)
+    end
+
+    it "has correct values for is_checkpoints_parent?" do
+      expect(@parent.checkpoints_parent?).to be true
+      expect(@child.checkpoints_parent?).to be false
     end
   end
 

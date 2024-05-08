@@ -631,7 +631,8 @@ pipeline {
                     ])
 
                   // Trigger Crystalball map build if spec files were added or removed, will not vote on builds.
-                  if (configuration.isChangeMerged() && filesChangedStage.hasNewDeletedSpecFiles(buildConfig)) {
+                  // Only trigger for main-postmerge job.
+                  if (env.JOB_NAME == "Canvas/main-postmerge" && configuration.isChangeMerged() && filesChangedStage.hasNewDeletedSpecFiles(buildConfig)) {
                     build(wait: false, job: 'Canvas/helpers/crystalball-map')
                   }
 

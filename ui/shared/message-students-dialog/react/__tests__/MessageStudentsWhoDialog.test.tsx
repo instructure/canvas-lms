@@ -294,6 +294,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
       const button = await findByLabelText(/For students who/)
       fireEvent.click(button)
       const criteriaLabels = getAllByRole('option').map(option => option.textContent)
+      expect(criteriaLabels).toContain('Have submitted')
       expect(criteriaLabels).toContain('Have not yet submitted')
       expect(criteriaLabels).toContain('Have not been graded')
       expect(criteriaLabels).toContain('Scored more than')
@@ -312,6 +313,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
       const button = await findByLabelText(/For students who/)
       fireEvent.click(button)
       const criteriaLabels = getAllByRole('option').map(option => option.textContent)
+      expect(criteriaLabels).toContain('Have submitted')
       expect(criteriaLabels).toContain('Have not yet submitted')
       expect(criteriaLabels).toContain('Have not been graded')
       expect(criteriaLabels).toContain('Marked incomplete')
@@ -335,7 +337,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
       expect(criteriaLabels).not.toContain('Scored less than')
     })
 
-    it('includes "Have not yet submitted" if the assignment accepts digital submissions', async () => {
+    it('includes "Have Submitted" and "Have not yet submitted" if the assignment accepts digital submissions', async () => {
       const mocks = await makeMocks()
 
       const {getAllByRole, findByLabelText} = render(
@@ -346,10 +348,11 @@ describe.skip('MessageStudentsWhoDialog', () => {
       const button = await findByLabelText(/For students who/)
       fireEvent.click(button)
       const criteriaLabels = getAllByRole('option').map(option => option.textContent)
+      expect(criteriaLabels).toContain('Have submitted')
       expect(criteriaLabels).toContain('Have not yet submitted')
     })
 
-    it('does not include "Have not yet submitted" if the assignment does not accept digital submissions', async () => {
+    it('does not include "Have Submitted" and "Have not yet submitted" if the assignment does not accept digital submissions', async () => {
       const mocks = await makeMocks()
 
       const {getAllByRole, findByLabelText} = render(
@@ -360,6 +363,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
       const button = await findByLabelText(/For students who/)
       fireEvent.click(button)
       const criteriaLabels = getAllByRole('option').map(option => option.textContent)
+      expect(criteriaLabels).not.toContain('Have submitted')
       expect(criteriaLabels).not.toContain('Have not yet submitted')
     })
 
@@ -459,6 +463,11 @@ describe.skip('MessageStudentsWhoDialog', () => {
       })
     })
     it('updates the student and observer checkbox counts', async () => {
+      students[0].submittedAt = new Date()
+      students[1].submittedAt = new Date()
+      students[2].submittedAt = new Date()
+      students[3].submittedAt = new Date()
+
       students[0].grade = '8'
       students[1].grade = '10'
       const mocks = await makeMocks()
@@ -479,7 +488,147 @@ describe.skip('MessageStudentsWhoDialog', () => {
       expect(await findByRole('checkbox', {name: /Observers/})).toHaveAccessibleName('0 Observers')
     })
 
-    it('"Have not yet submitted" does not display students who are excused', async () => {
+    describe('"Have submitted"', () => {
+      it('student radio buttons render when "Have submitted" option is selected', async () => {
+        const mocks = await makeMocks()
+
+        const {getByTestId, findByLabelText, getByText} = render(
+          <MockedProvider mocks={mocks} cache={createCache()}>
+            <MessageStudentsWhoDialog {...makeProps()} />
+          </MockedProvider>
+        )
+
+        const button = await findByLabelText(/For students who/)
+        fireEvent.click(button)
+        fireEvent.click(getByText(/Have submitted/))
+
+        expect(getByTestId('include-student-radio-group')).toBeInTheDocument()
+        expect(getByTestId('all-students-radio-button')).toBeInTheDocument()
+        expect(getByTestId('graded-students-radio-button')).toBeInTheDocument()
+        expect(getByTestId('not-graded-students-radio-button')).toBeInTheDocument()
+      })
+
+      it('displays all students that have submitted the assignment', async () => {
+        const mocks = await makeMocks()
+
+        students[0].submittedAt = new Date()
+        students[1].submittedAt = new Date()
+
+        const {getAllByRole, getByRole, findByLabelText, getByText, getByTestId} = render(
+          <MockedProvider mocks={mocks} cache={createCache()}>
+            <MessageStudentsWhoDialog {...makeProps()} />
+          </MockedProvider>
+        )
+
+        const button = await findByLabelText(/For students who/)
+        fireEvent.click(button)
+        fireEvent.click(getByText(/Have submitted/))
+
+        // Select "All" radio button
+        fireEvent.click(getByTestId('all-students-radio-button'))
+
+        fireEvent.click(getByRole('button', {name: 'Show all recipients'}))
+        expect(getByRole('table')).toBeInTheDocument()
+
+        const tableRows = getAllByRole('row') as HTMLTableRowElement[]
+        const studentCells = tableRows.map(row => row.cells[0])
+        expect(studentCells).toHaveLength(3)
+        expect(studentCells[0]).toHaveTextContent('Students')
+        expect(studentCells[1]).toHaveTextContent('Betty Ford')
+        expect(studentCells[2]).toHaveTextContent('Adam Jones')
+      })
+
+      it('displays students that have submitted the assignment and have been graded', async () => {
+        const mocks = await makeMocks()
+
+        students[0].submittedAt = new Date()
+        students[1].submittedAt = new Date()
+
+        students[1].grade = '8'
+
+        const {getAllByRole, getByRole, findByLabelText, getByText, getByTestId} = render(
+          <MockedProvider mocks={mocks} cache={createCache()}>
+            <MessageStudentsWhoDialog {...makeProps()} />
+          </MockedProvider>
+        )
+
+        const button = await findByLabelText(/For students who/)
+        fireEvent.click(button)
+        fireEvent.click(getByText(/Have submitted/))
+
+        // Select "Graded" radio button
+        fireEvent.click(getByTestId('graded-students-radio-button'))
+
+        fireEvent.click(getByRole('button', {name: 'Show all recipients'}))
+        expect(getByRole('table')).toBeInTheDocument()
+
+        const tableRows = getAllByRole('row') as HTMLTableRowElement[]
+        const studentCells = tableRows.map(row => row.cells[0])
+        expect(studentCells).toHaveLength(2)
+        expect(studentCells[0]).toHaveTextContent('Students')
+        expect(studentCells[1]).toHaveTextContent('Adam Jones')
+      })
+
+      it('displays students that have submitted the assignment but have NOT been graded', async () => {
+        const mocks = await makeMocks()
+
+        students[0].submittedAt = new Date()
+        students[1].submittedAt = new Date()
+
+        students[1].grade = '8'
+
+        const {getAllByRole, getByRole, findByLabelText, getByText, getByTestId} = render(
+          <MockedProvider mocks={mocks} cache={createCache()}>
+            <MessageStudentsWhoDialog {...makeProps()} />
+          </MockedProvider>
+        )
+
+        const button = await findByLabelText(/For students who/)
+        fireEvent.click(button)
+        fireEvent.click(getByText(/Have submitted/))
+
+        // Select "Not Graded" radio button
+        fireEvent.click(getByTestId('not-graded-students-radio-button'))
+
+        fireEvent.click(getByRole('button', {name: 'Show all recipients'}))
+        expect(getByRole('table')).toBeInTheDocument()
+
+        const tableRows = getAllByRole('row') as HTMLTableRowElement[]
+        const studentCells = tableRows.map(row => row.cells[0])
+        expect(studentCells).toHaveLength(2)
+        expect(studentCells[0]).toHaveTextContent('Students')
+        expect(studentCells[1]).toHaveTextContent('Betty Ford')
+      })
+    })
+
+    it('"Have not yet submitted" does not display students who are excused when selecting "skip excused" checkbox', async () => {
+      const mocks = await makeMocks()
+      students[2].excused = true
+      const {getAllByRole, getByRole, findByLabelText, getByText, getByTestId} = render(
+        <MockedProvider mocks={mocks} cache={createCache()}>
+          <MessageStudentsWhoDialog {...makeProps()} />
+        </MockedProvider>
+      )
+
+      const button = await findByLabelText(/For students who/)
+      fireEvent.click(button)
+      fireEvent.click(getByText(/Have not yet submitted/))
+
+      fireEvent.click(getByTestId('skip-excused-checkbox'))
+
+      fireEvent.click(getByRole('button', {name: 'Show all recipients'}))
+      expect(getByRole('table')).toBeInTheDocument()
+
+      const tableRows = getAllByRole('row') as HTMLTableRowElement[]
+      const studentCells = tableRows.map(row => row.cells[0])
+      expect(studentCells).toHaveLength(4)
+      expect(studentCells[0]).toHaveTextContent('Students')
+      expect(studentCells[1]).toHaveTextContent('Betty Ford')
+      expect(studentCells[2]).toHaveTextContent('Adam Jones')
+      expect(studentCells[3]).toHaveTextContent('Dana Smith')
+    })
+
+    it('"Have not yet submitted" does display students who are excused when "skip excused" checkbox is not selected', async () => {
       const mocks = await makeMocks()
       students[2].excused = true
       const {getAllByRole, getByRole, findByLabelText, getByText} = render(
@@ -497,11 +646,12 @@ describe.skip('MessageStudentsWhoDialog', () => {
 
       const tableRows = getAllByRole('row') as HTMLTableRowElement[]
       const studentCells = tableRows.map(row => row.cells[0])
-      expect(studentCells).toHaveLength(4)
+      expect(studentCells).toHaveLength(5)
       expect(studentCells[0]).toHaveTextContent('Students')
       expect(studentCells[1]).toHaveTextContent('Betty Ford')
       expect(studentCells[2]).toHaveTextContent('Adam Jones')
       expect(studentCells[3]).toHaveTextContent('Dana Smith')
+      expect(studentCells[4]).toHaveTextContent('Charlie Xi')
     })
 
     it('"Have not yet submitted" displays students who have no submitted next to their observers', async () => {
@@ -776,7 +926,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
       )
 
       const subjectInput = await findByTestId('subject-input')
-      expect(subjectInput).toHaveValue('No submission for A pointed assignment')
+      expect(subjectInput).toHaveValue('Submission for A pointed assignment')
     })
 
     it('is updated when a new criteria is selected', async () => {

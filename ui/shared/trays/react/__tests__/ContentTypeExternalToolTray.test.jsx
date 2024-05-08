@@ -25,6 +25,7 @@ describe('ContentTypeExternalToolTray', () => {
   const tool = {id: '1', base_url: 'https://one.lti.com/', title: 'First LTI'}
   const onDismiss = jest.fn()
   const onExternalContentReady = jest.fn()
+  const extraQueryParams = {param1: "value1", param2: "value2"}
 
   function renderTray(props) {
     return render(
@@ -38,6 +39,7 @@ describe('ContentTypeExternalToolTray', () => {
         allowItemSelection={true}
         selectableItems={[{id: '1', name: 'module 1'}]}
         open={true}
+        extraQueryParams={extraQueryParams}
         {...props}
       />
     )
@@ -93,6 +95,9 @@ describe('ContentTypeExternalToolTray', () => {
       expect(src).toContain('com_instructure_course_available_canvas_resources')
       expect(src).toContain('display')
       expect(src).toContain('placement')
+      // from extraQueryParams
+      expect(src).toContain('param1=value1')
+      expect(src).toContain('param2=value2')
     })
   })
 })

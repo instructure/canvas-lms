@@ -44,7 +44,7 @@ const locale = {
   "all_4321c3a1": { "message": "すべて" },
   "all_apps_a50dea49": { "message": "すべてのアプリ" },
   "alpha_15d59033": { "message": "アルファ" },
-  "alphabetical_55b5b4e0": { "message": "アルファベットで" },
+  "alphabetical_55b5b4e0": { "message": "名前順" },
   "alt_attribute_text_should_not_contain_more_than_12_e21d4040": {
     "message": "代替属性テキストは120文字を超えてはなりません。"
   },
@@ -235,7 +235,7 @@ const locale = {
   },
   "cyan_c1d5f68a": { "message": "シアン" },
   "dagger_57e0f4e5": { "message": "短剣" },
-  "date_added_ed5ad465": { "message": "追加された日付" },
+  "date_added_ed5ad465": { "message": "追加された日付順" },
   "decorative_icon_9a7f3fc3": { "message": "装飾アイコン" },
   "decorative_image_fde98579": { "message": "飾りの画像" },
   "decorative_type_upper_f2c95e3": { "message": "装飾的{ TYPE_UPPER }" },
@@ -1151,7 +1151,7 @@ const locale = {
     "message": "スクリーンリーダーで使用される{ TYPE }"
   },
   "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
-    "message": "スクリーンリーダーが画像のコンテンツを説明するのに使用します"
+    "message": "読み上げ機能で使用される代替テキスト"
   },
   "used_by_screen_readers_to_describe_the_video_37ebad25": {
     "message": "ビデオを説明する際にスクリーンリーダーが使用"

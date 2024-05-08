@@ -50,9 +50,10 @@ describe Checkpoints::DiscussionCheckpointDeleterService do
     it "deletes a simple checkpoint" do
       creator_service.call(
         discussion_topic: @topic,
-        checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+        checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
         dates: [{ type: "everyone", due_at: 2.days.from_now }],
-        points_possible: 6
+        points_possible: 6,
+        replies_required: 5
       )
 
       expect do
@@ -60,6 +61,8 @@ describe Checkpoints::DiscussionCheckpointDeleterService do
           discussion_topic: @topic
         )
       end.to change { SubAssignment.active.count }.by(-1)
+      expect(@topic.assignment.has_sub_assignments).to be(false)
+      expect(@topic.reply_to_entry_required_count).to eq 0
     end
 
     it "deletes a checkpoint with overrides" do

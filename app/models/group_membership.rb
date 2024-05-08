@@ -52,6 +52,15 @@ class GroupMembership < ActiveRecord::Base
     joins(:group).active.where(user_id: users, groups: { context_id: context, workflow_state: "available" })
   }
 
+  scope :for_assignments, lambda { |ids|
+    active.joins(group: { group_category: :assignments })
+          .merge(Group.active)
+          .merge(GroupCategory.active)
+          .merge(Assignment.active).where(assignments: { id: ids })
+  }
+
+  scope :for_students, ->(ids) { where(user_id: ids) }
+
   resolves_root_account through: :group
 
   alias_method :context, :group

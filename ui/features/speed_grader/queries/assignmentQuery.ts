@@ -30,6 +30,16 @@ const ASSIGNMENT_QUERY = gql`
       _id
       name
       pointsPossible
+      gradeAsGroup
+      groupAssignment: hasGroupCategory
+      groupSet {
+        groupsConnection {
+          nodes {
+            _id
+            name
+          }
+        }
+      }
       rubric {
         _id
         freeFormCriterionComments
@@ -78,11 +88,9 @@ function formattedRubric(assignment: any) {
   }
 }
 
-function transformRubric(assignment: any) {
-  return {
-    ...omit(assignment, ['rubric', 'rubricAssociation']),
-    rubric: formattedRubric(assignment),
-  }
+function formattedGroups(assignment: any) {
+  const groups = assignment.groupSet?.groupsConnection?.nodes ?? []
+  return groups.map(({_id, name}: any) => ({_id, name}))
 }
 
 function transform(result: any) {
@@ -90,7 +98,11 @@ function transform(result: any) {
     return null
   }
 
-  return transformRubric(result.assignment)
+  return {
+    ...omit(result.assignment, ['groupSet', 'rubric', 'rubricAssociation']),
+    groups: formattedGroups(result.assignment),
+    rubric: formattedRubric(result.assignment),
+  }
 }
 
 export const ZGetAssignmentParams = z.object({

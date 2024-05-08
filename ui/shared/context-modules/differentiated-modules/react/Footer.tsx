@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback} from 'react'
+import React from 'react'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Button} from '@instructure/ui-buttons'
@@ -24,9 +24,6 @@ import {Tooltip} from '@instructure/ui-tooltip'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('differentiated_modules')
-
-// Doing this to avoid TS2339 errors-- remove once we're on InstUI 8
-const {Item: FlexItem} = Flex as any
 
 export interface FooterProps {
   saveButtonLabel: string
@@ -69,10 +66,10 @@ export default function Footer({
   return (
     <View as="div" padding="small" background="secondary" borderWidth="small none none none">
       <Flex as="div" justifyItems="end">
-        <FlexItem>
+        <Flex.Item>
           <Button onClick={onDismiss}>{I18n.t('Cancel')}</Button>
-        </FlexItem>
-        <FlexItem margin="0 0 0 small">{updateButton()}</FlexItem>
+        </Flex.Item>
+        <Flex.Item margin="0 0 0 small">{updateButton()}</Flex.Item>
       </Flex>
     </View>
   )

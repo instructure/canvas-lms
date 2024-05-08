@@ -647,6 +647,7 @@ export class PlannerItem_raw extends Component {
           }}
         >
           <Checkbox
+            data-testid="planner-item-completed-checkbox"
             ref={this.registerFocusElementRef}
             label={<ScreenReaderContent>{checkboxLabel}</ScreenReaderContent>}
             checked={this.props.toggleAPIPending ? !this.state.completed : this.state.completed}
@@ -691,6 +692,7 @@ export class PlannerItem_raw extends Component {
       <>
         <style>{this.style.css}</style>
         <div
+          data-testid="planner-item-raw"
           className={classnames(
             this.style.classNames.root,
             this.style.classNames[this.getLayout()],

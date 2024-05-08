@@ -96,10 +96,21 @@ class LearningObjectDatesController < ApplicationController
   def show
     route = polymorphic_url([:api_v1, @context, asset, :date_details])
     overrides = Api.paginate(overridable.all_assignment_overrides.active, self, route)
+
+    # this is a temporary check for any discussion_topic_section_visibilities until we eventually backfill that table
+    visibilities_to_override = if overridable.is_a?(DiscussionTopic) && overridable.is_section_specific
+                                 section_overrides = overridable.assignment_overrides.active.where(set_type: "CourseSection").select(:set_id)
+                                 section_visibilities = overridable.discussion_topic_section_visibilities.active.where.not(course_section_id: section_overrides)
+                                 Api.paginate(section_visibilities, self, route)
+                               end
+
+    all_overrides = assignment_overrides_json(overrides, @current_user, include_names: true)
+    all_overrides += section_visibility_to_override_json(section_visibilities, overridable) if visibilities_to_override
+
     render json: {
       **learning_object_dates_json(asset, overridable),
       **blueprint_date_locks_json(asset),
-      overrides: assignment_overrides_json(overrides, @current_user, include_names: true),
+      overrides: all_overrides,
     }
   end
 
@@ -243,6 +254,11 @@ class LearningObjectDatesController < ApplicationController
     object.transaction do
       object.update!(params)
       perform_batch_update_assignment_overrides(object, batch) if overrides
+      # this is temporary until we are able to remove the dicussion_topic_section_visibilities table
+      if object.is_a?(DiscussionTopic) && object.is_section_specific
+        object.discussion_topic_section_visibilities.destroy_all
+        object.update!(is_section_specific: false)
+      end
     end
     head :no_content
   end

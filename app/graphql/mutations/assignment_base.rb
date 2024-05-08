@@ -18,7 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class Mutations::AssignmentOverrideCreateOrUpdate < GraphQL::Schema::InputObject
+module Mutations::AssignmentBase; end
+
+class Mutations::AssignmentBase::AssignmentOverrideCreateOrUpdate < GraphQL::Schema::InputObject
   argument :id, ID, required: false
   argument :due_at, Types::DateTimeType, required: false
   argument :lock_at, Types::DateTimeType, required: false
@@ -31,7 +33,7 @@ class Mutations::AssignmentOverrideCreateOrUpdate < GraphQL::Schema::InputObject
   argument :title, String, required: false
 end
 
-class Mutations::AssignmentModeratedGradingUpdate < GraphQL::Schema::InputObject
+class Mutations::AssignmentBase::AssignmentModeratedGradingUpdate < GraphQL::Schema::InputObject
   argument :enabled, Boolean, required: false
   argument :grader_count, Int, required: false
   argument :grader_comments_visible_to_graders, Boolean, required: false
@@ -40,7 +42,7 @@ class Mutations::AssignmentModeratedGradingUpdate < GraphQL::Schema::InputObject
   argument :final_grader_id, ID, required: false
 end
 
-class Mutations::AssignmentPeerReviewsUpdate < GraphQL::Schema::InputObject
+class Mutations::AssignmentBase::AssignmentPeerReviewsUpdate < GraphQL::Schema::InputObject
   argument :enabled, Boolean, required: false
   argument :count, Int, required: false
   argument :due_at, Types::DateTimeType, required: false
@@ -49,9 +51,9 @@ class Mutations::AssignmentPeerReviewsUpdate < GraphQL::Schema::InputObject
   argument :automatic_reviews, Boolean, required: false
 end
 
-class Mutations::AssignmentInputBase < GraphQL::Schema::InputObject
+class Mutations::AssignmentBase::AssignmentInputBase < GraphQL::Schema::InputObject
   argument :assignment_group_id, ID, required: false
-  argument :assignment_overrides, [Mutations::AssignmentOverrideCreateOrUpdate], required: false
+  argument :assignment_overrides, [Mutations::AssignmentBase::AssignmentOverrideCreateOrUpdate], required: false
   argument :due_at, Types::DateTimeType, required: false
   argument :grading_standard_id, ID, required: false
   argument :grading_type, Types::AssignmentType::AssignmentGradingType, required: false
@@ -59,23 +61,23 @@ class Mutations::AssignmentInputBase < GraphQL::Schema::InputObject
   argument :intra_reviews, Boolean, required: false
   argument :lock_at, Types::DateTimeType, required: false
   argument :only_visible_to_overrides, Boolean, required: false
-  argument :peer_reviews, Mutations::AssignmentPeerReviewsUpdate, required: false
+  argument :peer_reviews, Mutations::AssignmentBase::AssignmentPeerReviewsUpdate, required: false
   argument :points_possible, Float, required: false
   argument :post_to_sis, Boolean, required: false
   argument :unlock_at, Types::DateTimeType, required: false
   argument :for_checkpoints, Boolean, required: false
 end
 
-class Mutations::AssignmentCreate < Mutations::AssignmentInputBase
+class Mutations::AssignmentBase::AssignmentCreate < Mutations::AssignmentBase::AssignmentInputBase
   argument :course_id, ID, required: true
   argument :name, String, required: true
 end
 
-class Mutations::AssignmentUpdate < Mutations::AssignmentInputBase
+class Mutations::AssignmentBase::AssignmentUpdate < Mutations::AssignmentBase::AssignmentInputBase
   argument :set_assignment, Boolean, required: false
 end
 
-class Mutations::AssignmentBase < Mutations::BaseMutation
+class Mutations::AssignmentBase::Mutation < Mutations::BaseMutation
   # we are required to wrap the update method with a proxy class because
   # we are required to include `Api` for instance methods within the module.
   # the main problem is that including the `Api` module conflicts with the
@@ -128,7 +130,7 @@ class Mutations::AssignmentBase < Mutations::BaseMutation
   argument :lock_at, Types::DateTimeType, required: false
   argument :unlock_at, Types::DateTimeType, required: false
   argument :description, String, required: false
-  argument :assignment_overrides, [Mutations::AssignmentOverrideCreateOrUpdate], required: false
+  argument :assignment_overrides, [Mutations::AssignmentBase::AssignmentOverrideCreateOrUpdate], required: false
   argument :position, Int, required: false
   argument :points_possible, Float, required: false
   argument :grading_type, Types::AssignmentType::AssignmentGradingType, required: false
@@ -139,8 +141,8 @@ class Mutations::AssignmentBase < Mutations::BaseMutation
   argument :only_visible_to_overrides, Boolean, required: false
   argument :submission_types, [Types::AssignmentSubmissionType], required: false
   argument :grading_standard_id, ID, required: false
-  argument :peer_reviews, Mutations::AssignmentPeerReviewsUpdate, required: false
-  argument :moderated_grading, Mutations::AssignmentModeratedGradingUpdate, required: false
+  argument :peer_reviews, Mutations::AssignmentBase::AssignmentPeerReviewsUpdate, required: false
+  argument :moderated_grading, Mutations::AssignmentBase::AssignmentModeratedGradingUpdate, required: false
   argument :grade_group_students_individually, Boolean, required: false
   argument :group_category_id, ID, required: false
   argument :omit_from_final_grade, Boolean, required: false

@@ -77,6 +77,7 @@ class Account < ActiveRecord::Base
   has_many :active_folders, -> { where("folder.workflow_state<>'deleted'").order("folders.name") }, class_name: "Folder", as: :context, inverse_of: :context
   has_many :developer_keys
   has_many :developer_key_account_bindings, inverse_of: :account, dependent: :destroy
+  has_many :lti_registration_account_bindings, class_name: "Lti::RegistrationAccountBinding", inverse_of: :account, dependent: :destroy
   has_many :authentication_providers,
            -> { ordered },
            inverse_of: :account,
@@ -127,6 +128,7 @@ class Account < ActiveRecord::Base
            inverse_of: :context,
            class_name: "Lti::ResourceLink",
            dependent: :destroy
+  has_many :lti_registrations, class_name: "Lti::Registration", inverse_of: :account, dependent: :destroy
   belongs_to :course_template, class_name: "Course", inverse_of: :templated_accounts
   belongs_to :grading_standard
 
@@ -669,11 +671,11 @@ class Account < ActiveRecord::Base
     if endpoint.blank?
       nil
     else
-      OpenObject.new({
-                       endpoint:,
-                       default_action: settings[:equella_action] || "selectOrAdd",
-                       teaser: settings[:equella_teaser]
-                     })
+      {
+        endpoint:,
+        default_action: settings[:equella_action] || "selectOrAdd",
+        teaser: settings[:equella_teaser]
+      }
     end
   end
 

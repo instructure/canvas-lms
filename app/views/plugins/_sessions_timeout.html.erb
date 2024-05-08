@@ -16,15 +16,15 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<%= fields_for :settings, OpenObject.new(settings) do |f| %>
+<%= fields_for :settings do |f| %>
   <table style="width: 500px;" class="formtable">
     <tr>
       <td><%= f.blabel :session_timeout, :en => "Time before session expires in minutes (20 minimum)" %></td>
-      <td><%= f.text_field :session_timeout %></td>
+      <td><%= f.text_field :session_timeout, value: settings[:session_timeout] %></td>
     </tr>
     <tr>
       <td><%= f.blabel :mobile_timeout, :en => "Time after login before session expires in minutes (2880 [2 day] minimum) for mobile applications" %></td>
-      <td><%= f.text_field :mobile_timeout %></td>
+      <td><%= f.text_field :mobile_timeout, value: settings[:mobile_timeout] %></td>
     </tr>
   </table>
 <% end %>

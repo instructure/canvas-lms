@@ -417,6 +417,7 @@ class Notification < Switchman::UnshardedRecord
     t "names.new_user", "New User"
     t "names.pseudonym_registration", "Pseudonym Registration"
     t "names.pseudonym_registration_done", "Pseudonym Registration Done"
+    t "names.account_verification", "Account Verification"
     t "names.report_generated", "Report Generated"
     t "names.report_generation_failed", "Report Generation Failed"
     t "names.rubric_assessment_invitation", "Rubric Assessment Invitation"

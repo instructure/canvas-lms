@@ -799,7 +799,12 @@ describe UsersController, type: :request do
 
   it "formats WebConference" do
     allow(WebConference).to receive(:plugins).and_return(
-      [OpenObject.new(id: "big_blue_button", settings: { domain: "bbb.instructure.com", secret_dec: "secret" }, valid_settings?: true, enabled?: true),]
+      [instance_double("Canvas::Plugin",
+                       id: "big_blue_button",
+                       name: "BigBlueButton",
+                       settings: { domain: "bbb.instructure.com", secret_dec: "secret" },
+                       base: nil,
+                       enabled?: true),]
     )
     @conference = BigBlueButtonConference.create!(title: "myconf", user: @user, description: "mydesc", conference_type: "big_blue_button", context: @course)
     json = api_call(:get,

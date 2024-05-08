@@ -38,6 +38,8 @@ class Checkpoints::DiscussionCheckpointDeleterService < ApplicationService
 
     checkpoints.destroy_all
 
+    update_assignment_and_discussion
+
     true
   end
 
@@ -55,5 +57,10 @@ class Checkpoints::DiscussionCheckpointDeleterService < ApplicationService
     unless @discussion_topic.context.root_account.feature_enabled?(:discussion_checkpoints)
       raise Checkpoints::FlagDisabledError, "discussion_checkpoints feature flag must be enabled"
     end
+  end
+
+  def update_assignment_and_discussion
+    @assignment.update!(has_sub_assignments: false)
+    @discussion_topic.update!(reply_to_entry_required_count: 0)
   end
 end

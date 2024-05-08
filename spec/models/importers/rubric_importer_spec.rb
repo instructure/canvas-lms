@@ -44,6 +44,8 @@ describe "Importing Rubrics" do
       expect(r.title).to eq data[:title]
       expect(r.description).to include(data[:description]) if data[:description]
       expect(r.points_possible).to eq data[:points_possible].to_f
+      # make sure we can reconstitute whatever the importer stuffed into the hash
+      expect(r.criteria_object).to be_a(Array)
 
       crit_ids = r.data.map { |rub| rub[:ratings].first[:criterion_id] }
 

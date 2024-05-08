@@ -31,6 +31,8 @@ import {getSubmission} from './queries/submissionQuery'
 import {getSubmissionsByAssignment} from './queries/submissionsByAssignmentQuery'
 import {updateSubmissionGrade} from './mutations/updateSubmissionGradeMutation'
 import {createSubmissionComment} from './mutations/createSubmissionCommentMutation'
+import {hideAssignmentGradesForSections} from './mutations/hideAssignmentGradesForSectionsMutation'
+import {postAssignmentGradesForSections} from './mutations/postAssignmentGradesForSectionsMutation'
 import GenericErrorPage from '@canvas/generic-error-page'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 
@@ -57,12 +59,19 @@ ready(() => {
           mutations: {
             updateSubmissionGrade,
             createSubmissionComment,
+            hideAssignmentGradesForSections,
+            postAssignmentGradesForSections,
           },
           context: {
             courseId: window.ENV.course_id,
             assignmentId: params.get('assignment_id'),
             studentId: params.get('student_id'),
-            gradeBookIconHref: `/courses/${window.ENV.course_id}/gradebook`,
+            hrefs: {
+              heroIcon: `/courses/${window.ENV.course_id}/gradebook`,
+            },
+            features: {
+              extendedSubmissionState: window.ENV.FEATURES.extended_submission_state,
+            },
           },
         })
       })

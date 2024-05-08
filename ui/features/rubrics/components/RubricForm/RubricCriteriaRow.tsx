@@ -35,6 +35,8 @@ import {
   IconEditLine,
   IconTrashLine,
 } from '@instructure/ui-icons'
+import {Draggable} from 'react-beautiful-dnd'
+import './drag-and-drop/styles.css'
 
 const I18n = useI18nScope('rubrics-criteria-row')
 
@@ -55,112 +57,151 @@ export const RubricCriteriaRow = ({
   onDuplicateCriterion,
   onEditCriterion,
 }: RubricCriteriaRowProps) => {
-  const {description, longDescription, points} = criterion
+  const {description, longDescription, outcome, learningOutcomeId, points} = criterion
 
   return (
-    <>
-      <Flex data-testid="rubric-criteria-row">
-        <Flex.Item align="start" draggable={unassessed}>
-          <View as="div" cursor="pointer">
-            <IconDragHandleLine />
-          </View>
-        </Flex.Item>
-        <Flex.Item align="start" shouldShrink={true}>
-          <View as="div" margin="xxx-small 0 0 small" themeOverride={{marginSmall: '1.5rem'}}>
-            <Text weight="bold" data-testid="rubric-criteria-row-index">
-              {rowIndex}.
-            </Text>
-          </View>
-        </Flex.Item>
-        <Flex.Item margin="0 small" align="start" shouldGrow={true} shouldShrink={true}>
-          <View as="div">
-            <Tag
-              text={
-                <AccessibleContent alt="Remove outcome">
-                  <Text>FA.V.CR.1</Text>
-                </AccessibleContent>
-              }
-              size="small"
-              dismissible={true}
-              onClick={() => {}}
-              themeOverride={{
-                defaultBackground: 'white',
-                defaultBorderColor: 'rgb(3, 116, 181)',
-                defaultColor: 'rgb(3, 116, 181)',
-              }}
-            />
-          </View>
-          <View as="div" margin="small 0 0 0" data-testid="rubric-criteria-row-description">
-            <Text weight="bold">{description}</Text>
-          </View>
-          <View as="div" data-testid="rubric-criteria-row-long-description">
-            <Text>{longDescription}</Text>
-          </View>
-        </Flex.Item>
-        <Flex.Item align="start">
-          <Pill
-            color="info"
-            disabled={true}
-            themeOverride={{
-              background: 'rgb(3, 116, 181)',
-              infoColor: 'white',
-            }}
+    <Draggable draggableId={criterion.id} index={rowIndex - 1}>
+      {(provided, snapshot) => {
+        return (
+          <div
+            ref={provided.innerRef}
+            className={snapshot.isDragging ? 'draggable dragging' : 'draggable'}
+            {...provided.draggableProps}
           >
-            <Text data-testid="rubric-criteria-row-points" size="x-small">
-              {possibleString(points)}
-            </Text>
-          </Pill>
-          <View as="span" margin="0 0 0 medium">
-            <IconButton
-              withBackground={false}
-              withBorder={false}
-              screenReaderLabel={I18n.t('Edit Criterion')}
-              onClick={onEditCriterion}
-              size="small"
-              themeOverride={{smallHeight: '18px'}}
-              data-testid="rubric-criteria-row-edit-button"
-            >
-              <IconEditLine />
-            </IconButton>
-          </View>
+            <Flex data-testid="rubric-criteria-row">
+              <Flex.Item align="start">
+                <div className="drag-handle" {...provided.dragHandleProps}>
+                  <IconDragHandleLine />
+                </div>
+              </Flex.Item>
+              <Flex.Item align="start" shouldShrink={true}>
+                <View as="div" margin="xxx-small 0 0 small" themeOverride={{marginSmall: '1.5rem'}}>
+                  <Text weight="bold" data-testid="rubric-criteria-row-index">
+                    {rowIndex}.
+                  </Text>
+                </View>
+              </Flex.Item>
+              <Flex.Item margin="0 small" align="start" shouldGrow={true} shouldShrink={true}>
+                {learningOutcomeId ? (
+                  <>
+                    <View as="div">
+                      <Tag
+                        text={
+                          <AccessibleContent alt="Remove outcome">
+                            <Text>{outcome?.displayName}</Text>
+                          </AccessibleContent>
+                        }
+                        size="small"
+                        onClick={() => {}}
+                        themeOverride={{
+                          defaultBackground: 'white',
+                          defaultBorderColor: 'rgb(3, 116, 181)',
+                          defaultColor: 'rgb(3, 116, 181)',
+                        }}
+                        data-testid="rubric-criteria-row-outcome-tag"
+                      />
+                    </View>
+                    <View as="div" margin="small 0 0 0" data-testid="rubric-criteria-outcome-title">
+                      <Text weight="bold">{outcome?.title}</Text>
+                    </View>
+                    <View
+                      as="div"
+                      margin="small 0 0 0"
+                      data-testid="rubric-criteria-row-description"
+                    >
+                      <Text>{description}</Text>
+                    </View>
+                  </>
+                ) : (
+                  <>
+                    <View
+                      as="div"
+                      margin="xxx-small 0 0 0"
+                      data-testid="rubric-criteria-row-description"
+                    >
+                      <Text weight="bold">{description}</Text>
+                    </View>
+                    <View as="div" data-testid="rubric-criteria-row-long-description">
+                      <Text>{longDescription}</Text>
+                    </View>
+                  </>
+                )}
+              </Flex.Item>
+              <Flex.Item align="start">
+                <Pill
+                  color="info"
+                  disabled={true}
+                  themeOverride={{
+                    background: 'rgb(3, 116, 181)',
+                    infoColor: 'white',
+                  }}
+                >
+                  <Text data-testid="rubric-criteria-row-points" size="x-small">
+                    {possibleString(points)}
+                  </Text>
+                </Pill>
+                <View as="span" margin="0 0 0 medium">
+                  <IconButton
+                    withBackground={false}
+                    withBorder={false}
+                    screenReaderLabel={I18n.t('Edit Criterion')}
+                    onClick={onEditCriterion}
+                    disabled={!unassessed && !!learningOutcomeId}
+                    size="small"
+                    themeOverride={{smallHeight: '18px'}}
+                    data-testid="rubric-criteria-row-edit-button"
+                  >
+                    <IconEditLine />
+                  </IconButton>
+                </View>
 
-          {unassessed && (
-            <View as="span" margin="0 0 0 medium">
-              <IconButton
-                withBackground={false}
-                withBorder={false}
-                screenReaderLabel={I18n.t('Delete Criterion')}
-                onClick={onDeleteCriterion}
-                size="small"
-                themeOverride={{smallHeight: '18px'}}
-                data-testid="rubric-criteria-row-delete-button"
-              >
-                <IconTrashLine />
-              </IconButton>
-            </View>
-          )}
+                {unassessed && (
+                  <View as="span" margin="0 0 0 medium">
+                    <IconButton
+                      withBackground={false}
+                      withBorder={false}
+                      screenReaderLabel={I18n.t('Delete Criterion')}
+                      onClick={onDeleteCriterion}
+                      size="small"
+                      themeOverride={{smallHeight: '18px'}}
+                      data-testid="rubric-criteria-row-delete-button"
+                    >
+                      <IconTrashLine />
+                    </IconButton>
+                  </View>
+                )}
 
-          {unassessed && (
-            <View as="span" margin="0 0 0 medium">
-              <IconButton
-                withBackground={false}
-                withBorder={false}
-                screenReaderLabel={I18n.t('Duplicate Criterion')}
-                onClick={onDuplicateCriterion}
-                size="small"
-                themeOverride={{smallHeight: '18px'}}
-                data-testid="rubric-criteria-row-duplicate-button"
-              >
-                <IconDuplicateLine />
-              </IconButton>
-            </View>
-          )}
-        </Flex.Item>
-      </Flex>
-      <RatingScaleAccordion ratings={criterion.ratings} />
-
-      <View as="hr" margin="medium 0 medium 0" />
-    </>
+                {unassessed && (
+                  <View as="span" margin="0 0 0 medium">
+                    <IconButton
+                      withBackground={false}
+                      withBorder={false}
+                      screenReaderLabel={I18n.t('Duplicate Criterion')}
+                      onClick={onDuplicateCriterion}
+                      size="small"
+                      themeOverride={{smallHeight: '18px'}}
+                      data-testid="rubric-criteria-row-duplicate-button"
+                    >
+                      <IconDuplicateLine />
+                    </IconButton>
+                  </View>
+                )}
+              </Flex.Item>
+            </Flex>
+            <RatingScaleAccordion ratings={criterion.ratings} />
+            <View
+              as="hr"
+              margin="medium 0 medium 0"
+              className={
+                snapshot.isDragging
+                  ? 'draggable dragging rubric-divider'
+                  : 'draggable rubric-divider'
+              }
+            />
+          </div>
+        )
+      }}
+    </Draggable>
   )
 }
 

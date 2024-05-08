@@ -17,45 +17,48 @@
  */
 
 import React from 'react'
-import type {Product} from '../model/Product'
+import type {Product, Company} from '../model/Product'
 
 import {Flex} from '@instructure/ui-flex'
 import {Img} from '@instructure/ui-img'
-import {Link} from '@instructure/ui-link'
+import {CondensedButton} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 
 type ProductCardProps = {
   product: Product
+  setCompany: (company: Company) => void
 }
 
 const ProductCard = (props: ProductCardProps) => {
-  const product = props.product
+  const {product, setCompany} = props
 
   return (
     <Flex.Item>
       <View
         key={product.id}
         as="div"
-        width={444}
-        height={236}
+        width={340}
+        height={200}
         borderColor="primary"
         borderRadius="small"
         borderWidth="medium"
         padding="medium"
       >
-        <Flex gap="small" margin="0 0 medium 0">
+        <Flex gap="small" margin="0 0 x-small 0">
           <div style={{borderRadius: '50%', overflow: 'hidden'}}>
-            <Img src={product.logoUrl} width={48} height={48} />
+            <Img src={product.logo_url} width={48} height={48} />
           </div>
           <div>
             <Text weight="bold" size="large">
               {product.name}
             </Text>
-            <div>
-              {/* TODO: Add I18n to below line */}
-              by <Link href={product.companyUrl}>{product.company}</Link>
-            </div>
+            <Flex gap="x-small" wrap="no-wrap">
+              <div>by</div>
+              <CondensedButton onClick={() => setCompany(product.company)}>
+                {product.company.name}
+              </CondensedButton>
+            </Flex>
           </div>
         </Flex>
         <div>{product.tagline}</div>

@@ -30,10 +30,6 @@ import {Link} from '@instructure/ui-link'
 
 const I18n = useI18nScope('internal-settings')
 
-// Doing this to avoid TS2339 errors-- remove once we're on InstUI 8
-const {Body, ColHeader, Head, Row, RowHeader, Cell} = Table as any
-const {Item} = Menu as any
-
 // id, name, width, sortable
 const tableHeaders: [string, string, string, boolean][] = [
   ['name', I18n.t('Name'), '45%', true],
@@ -115,15 +111,19 @@ export const InternalSettingsTable = (props: InternalSettingsTableProps) => {
             </Link>
           }
         >
-          <Item onClick={() => exportFromJSON({...exportParams, exportType: 'json'})}>JSON</Item>
-          <Item onClick={() => exportFromJSON({...exportParams, exportType: 'csv'})}>CSV</Item>
+          <Menu.Item onClick={() => exportFromJSON({...exportParams, exportType: 'json'})}>
+            JSON
+          </Menu.Item>
+          <Menu.Item onClick={() => exportFromJSON({...exportParams, exportType: 'csv'})}>
+            CSV
+          </Menu.Item>
         </Menu>
       </div>
       <Table caption={I18n.t('Internal settings')} layout="fixed" margin="small auto">
-        <Head renderSortLabel={I18n.t('Sort by')}>
-          <Row>
+        <Table.Head renderSortLabel={I18n.t('Sort by')}>
+          <Table.Row>
             {tableHeaders.map(([id, name, width, sortable]) => (
-              <ColHeader
+              <Table.ColHeader
                 key={id}
                 id={id}
                 width={width}
@@ -131,14 +131,14 @@ export const InternalSettingsTable = (props: InternalSettingsTableProps) => {
                 sortDirection={id === sort.sortBy ? sortDirection : 'none'}
               >
                 {name}
-              </ColHeader>
+              </Table.ColHeader>
             ))}
-          </Row>
-        </Head>
-        <Body>
+          </Table.Row>
+        </Table.Head>
+        <Table.Body>
           {/* First row allows a new internal setting to be added */}
-          <Row>
-            <RowHeader>
+          <Table.Row>
+            <Table.RowHeader>
               <EditableCodeValue
                 value={props.pendingNewInternalSetting?.name || ''}
                 onValueChange={name => props.onSetPendingNewInternalSetting({name})}
@@ -151,8 +151,8 @@ export const InternalSettingsTable = (props: InternalSettingsTableProps) => {
                   ) : undefined
                 }
               />
-            </RowHeader>
-            <Cell>
+            </Table.RowHeader>
+            <Table.Cell>
               <EditableCodeValue
                 value={props.pendingNewInternalSetting?.value || ''}
                 onValueChange={value => props.onSetPendingNewInternalSetting({value})}
@@ -165,8 +165,8 @@ export const InternalSettingsTable = (props: InternalSettingsTableProps) => {
                   ) : undefined
                 }
               />
-            </Cell>
-            <Cell>
+            </Table.Cell>
+            <Table.Cell>
               <InternalSettingActionButtons
                 name={props.pendingNewInternalSetting?.name || ''}
                 pendingChange={
@@ -177,17 +177,17 @@ export const InternalSettingsTable = (props: InternalSettingsTableProps) => {
                 onSubmitPendingChange={props.onSubmitPendingNewInternalSetting}
                 onClearPendingChange={props.onClearPendingNewInternalSetting}
               />
-            </Cell>
-          </Row>
+            </Table.Cell>
+          </Table.Row>
           {/* Rows for existing internal settings */}
           {sortedRows.map(internalSetting => (
-            <Row key={internalSetting.id}>
-              <RowHeader>
+            <Table.Row key={internalSetting.id}>
+              <Table.RowHeader>
                 <Text>
                   <code style={{wordBreak: 'break-word'}}>{internalSetting.name}</code>
                 </Text>
-              </RowHeader>
-              <Cell>
+              </Table.RowHeader>
+              <Table.Cell>
                 <EditableCodeValue
                   name={internalSetting.name}
                   value={props.pendingChanges[internalSetting.id] || internalSetting.value || ''}
@@ -195,8 +195,8 @@ export const InternalSettingsTable = (props: InternalSettingsTableProps) => {
                   readonly={internalSetting.secret}
                   onValueChange={value => props.onValueChange(internalSetting.id, value)}
                 />
-              </Cell>
-              <Cell>
+              </Table.Cell>
+              <Table.Cell>
                 <InternalSettingActionButtons
                   name={internalSetting.name}
                   value={internalSetting.value || undefined}
@@ -207,10 +207,10 @@ export const InternalSettingsTable = (props: InternalSettingsTableProps) => {
                   onDelete={() => props.onDelete(internalSetting.id)}
                   allowCopy={true}
                 />
-              </Cell>
-            </Row>
+              </Table.Cell>
+            </Table.Row>
           ))}
-        </Body>
+        </Table.Body>
       </Table>
     </div>
   )

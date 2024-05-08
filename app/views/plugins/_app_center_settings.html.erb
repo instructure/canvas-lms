@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<%= fields_for :settings, OpenObject.new(settings) do |f| %>
+<%= fields_for :settings do |f| %>
   <table style="width: 500px;" class="formtable">
     <tr>
       <td colspan="2">
@@ -28,25 +28,25 @@
     <tr>
       <td><%= f.blabel :token, :en => "Access Token" %></td>
       <td>
-        <%= f.text_field :token %>
+        <%= f.text_field :token, value: settings[:token] %>
       </td>
     </tr>
     <tr>
       <td><%= f.blabel :base_url, :en => "Base URL" %></td>
       <td>
-        <%= f.text_field :base_url %>
+        <%= f.text_field :base_url, value: settings[:base_url] %>
       </td>
     </tr>
     <tr>
       <td><%= f.blabel :apps_index_endpoint, :en => "Apps Index Endpoint" %></td>
       <td>
-        <%= f.text_field :apps_index_endpoint %>
+        <%= f.text_field :apps_index_endpoint, value: settings[:apps_index_endpoint] %>
       </td>
     </tr>
     <tr>
       <td><%= f.blabel :app_reviews_endpoint, :en => "App Show Endpoint" %></td>
       <td>
-        <%= f.text_field :app_reviews_endpoint %>
+        <%= f.text_field :app_reviews_endpoint, value: settings[:app_reviews_endpoint] %>
       </td>
     </tr>
   </table>

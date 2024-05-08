@@ -302,6 +302,8 @@ RSpec.describe SubmissionComment do
     @comment.reload
     @comment.update(attachments: [a])
     expect(@comment.attachment_ids).to eql(a.id.to_s)
+    expect(@comment.cached_attachments.first).to be_an(Attachment)
+    expect(@comment.cached_attachments).to eql [a]
   end
 
   it "rejects invalid attachments" do
@@ -310,6 +312,26 @@ RSpec.describe SubmissionComment do
     @comment = @submission.submission_comments.create!(valid_attributes)
     @comment.update(attachments: [a])
     expect(@comment.attachment_ids).to eql("")
+  end
+
+  it "handles legacy OpenObject attachments" do
+    a = Attachment.create!(context: @assignment, uploaded_data: default_uploaded_data)
+    a.recently_created = false
+    @comment = @submission.submission_comments.create!(valid_attributes)
+    @comment.update(attachments: [a])
+    @comment.cached_attachments = [OpenObject.new(a.attributes, in_specs: true)]
+    expect(@comment.cached_attachments.first).to be_an(Attachment)
+    expect(@comment.cached_attachments).to eql [a]
+  end
+
+  it "handles even older legacy OpenObject attachments" do
+    a = Attachment.create!(context: @assignment, uploaded_data: default_uploaded_data)
+    a.recently_created = false
+    @comment = @submission.submission_comments.create!(valid_attributes)
+    @comment.update(attachments: [a])
+    @comment.cached_attachments = [OpenObject.new({ table: a.attributes, object_type: "attachment" }, in_specs: true)]
+    expect(@comment.cached_attachments.first).to be_an(Attachment)
+    expect(@comment.cached_attachments).to eql [a]
   end
 
   it "renders formatted_body correctly" do

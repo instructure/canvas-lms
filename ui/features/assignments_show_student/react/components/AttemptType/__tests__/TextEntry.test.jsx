@@ -38,9 +38,8 @@ async function makeProps(opts = {}) {
   const mockedSubmission =
     opts.submission ||
     (await mockSubmission({
-      Submission: {
-        submissionDraft: {body: 'words'},
-      },
+      Submission: {submissionDraft: {}},
+      SubmissionDraft: {body: 'words'},
     }))
 
   return {

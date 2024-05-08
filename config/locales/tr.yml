@@ -7957,9 +7957,12 @@ tr:
   ends_at_9a62b528: "Şu zaman bitiyor"
   english_c60612e2: İngilizce
   enhanced_individual_gradebook: 
+    avg_score: "Ortalama Puan"
+    high_score: "Yüksek Puan"
     invalid_group_warning: 
       one: "Not: Olası puanları olmadığı için not %{list_of_group_names} grubundan ödevler içermiyor."
       other: "Not: Olası puanları olmadığı için not %{list_of_group_names} gruplarından ödevler içermiyor."
+    low_score: "Düşük Puan"
   enrolled_a6a517cd: Kayıtlı
   enrolled_as_272da3b9: "Şu rolde kayıt olundu"
   enrollment: 
@@ -11706,6 +11709,10 @@ tr:
       summary: 
         subject: "Yayımlanan puan ve yorumlar : %{title}, %{course}"
     assignment_unpublished_module: "Bu ödev yayınlanmamış bir modülünün bir parçasıdır ve henüz mevcut değildir."
+    checkpoints_created: 
+      email: 
+        labels: 
+          click_to_see_assignment: "Ödevi görmek için tıklayınız."
     collaboration_invitation: 
       email: 
         body: |-
@@ -13338,6 +13345,7 @@ tr:
   no_marks_5e7d2b59: "Puan Yok"
   no_matching_users_found_83889c10: "Eşleşen kullanıcı bulunamadı."
   no_migration_file: "İçerik taşıma için dosya gereklidir."
+  no_outcome_selected_16d15753: "Öğrenci Çıktısı Seçilmedi"
   no_password_was_given_472222e5: "Şifre verilmedi"
   no_points_possible_368669d: "Olası Puan Yok"
   no_results_3cda4e72: "Sonuç Yok"
@@ -13840,6 +13848,7 @@ tr:
     invalid_file: "Geçersiz öğrenme çıktısı grubu dosyası"
   outcome_groups_api: 
     account_group_description: "Hesap düzeyi öğrenme çıktıları grubu."
+  outcome_information_936c59ef: "Öğrenme Çıktı Bilgisi"
   outcome_path_mastery_points: "%{path} yeterlik puanı"
   outcome_path_result: "%{path} sonuç"
   outcome_results: 
@@ -17268,9 +17277,11 @@ tr:
   select_a_section_37ac1694: "Bölüm seçin"
   select_a_student_adfcc348: "Öğrenci seçiniz"
   select_a_student_and_an_assignment_to_view_and_edi_96fda3c1: "Görüntülemek ve notları değiştirmek için bir öğrenci ve ödev seçin."
+  select_a_student_and_an_outcome_to_view_results_9b36b177: "Sonuçları görmek için bir öğrenci ve öğrenme çıktısı seçin."
   select_a_student_to_view_additional_information_he_c371e40c: "Ek bilgilerini görmek istediğiniz öğrenciyi seçiniz."
   select_an_assignment_e52320d7: "Ödev seçiniz"
   select_an_assignment_to_view_additional_informatio_de1370e1: "Ek bilgilerini görmek istediğiniz ödevi seçiniz."
+  select_an_outcome_37fb2096: "Bir öğrenme çıktısı seçin"
   select_content: "İçerik Seçiniz"
   select_content_7faa4195: "İçerik Seçiniz"
   select_content_checkbox: 
@@ -19856,6 +19867,7 @@ tr:
   validation_error_3b943100: "Doğrulama Hatası"
   venezuela_58_959d01f7: "Venezuella (+58)"
   vericite_similarity_score_more_information_7df9ea5c: "VeriCite benzerlik puanı -- daha fazla bilgi"
+  verification_code_5acd64ef: "Doğrulama Kodu"
   video_b9f27375: Video
   video_player_b371005: "Video Oynatıcı"
   vietnam_84_e50a2a44: "Viyetnam (+84)"

@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {mount} from 'enzyme'
+import {cleanup, render} from '@testing-library/react'
 import DashboardCardMenu from '../DashboardCardMenu'
 
 const defaultProps = () => ({
@@ -43,36 +43,38 @@ const defaultMovementMenuProps = () => ({
   },
 })
 
-const getTabWithText = text => {
-  const tabs = Array.from(document.querySelectorAll('[role="tab"]'))
-  return tabs.filter(tab => tab.textContent.trim() === text)[0]
-}
-
 describe('DashboardCardMenu - reordering', () => {
   let wrapper
+  let ref
 
   beforeEach(() => {
-    wrapper = mount(<DashboardCardMenu {...defaultProps()} {...defaultMovementMenuProps()} />)
-  })
-
-  afterEach(() => {
-    wrapper.unmount()
+    ref = React.createRef()
+    wrapper = render(
+      <DashboardCardMenu {...defaultProps()} {...defaultMovementMenuProps()} ref={ref} />
+    )
   })
 
   // FOO-3822
-  it.skip('it should render a tabList with colorpicker and movement menu', async () => {
+  it('it should render a tabList with colorpicker and movement menu', async () => {
     const handleShowPromise = new Promise(resolve => {
       const handleShow = () => {
-        expect(wrapper.instance()._tabList).toBeTruthy()
-        expect(wrapper.instance()._colorPicker).toBeTruthy()
-        getTabWithText('Move').click()
-        expect(wrapper.instance()._movementMenu).toBeTruthy()
+        expect(ref.current._tabList).toBeTruthy()
+        expect(ref.current._colorPicker).toBeTruthy()
+        wrapper.getByText('Move').click()
+        expect(ref.current._movementMenu).toBeTruthy()
         resolve()
       }
 
-      wrapper.setProps({handleShow}, () => {
-        wrapper.find('button').simulate('click')
-      })
+      wrapper.rerender(
+        <DashboardCardMenu
+          {...defaultProps()}
+          {...defaultMovementMenuProps()}
+          ref={ref}
+          handleShow={handleShow}
+        />
+      )
+
+      wrapper.getByText('menu').click()
     })
 
     await handleShowPromise
@@ -87,14 +89,21 @@ describe('DashboardCardMenu - reordering', () => {
 
     const handleShowPromise = new Promise(resolve => {
       const handleShow = () => {
-        wrapper.instance()._closeButton.click()
+        ref.current._closeButton.click()
         expect(popoverContent).toBeFalsy()
         resolve()
       }
 
-      wrapper.setProps({handleShow, popoverContentRef}, () => {
-        wrapper.find('button').simulate('click')
-      })
+      wrapper.rerender(
+        <DashboardCardMenu
+          {...defaultProps()}
+          {...defaultMovementMenuProps()}
+          ref={ref}
+          handleShow={handleShow}
+          popoverContentRef={popoverContentRef}
+        />
+      )
+      wrapper.getByText('menu').click()
     })
 
     await handleShowPromise
@@ -108,21 +117,28 @@ describe('DashboardCardMenu - reordering', () => {
 
     const handleShowPromise = new Promise(resolve => {
       const handleShow = () => {
-        wrapper.instance()._colorPicker.closeModal()
+        ref.current._colorPicker.closeModal()
         expect(popoverContent).toBeFalsy()
         resolve()
       }
 
-      wrapper.setProps({handleShow, popoverContentRef}, () => {
-        wrapper.find('button').simulate('click')
-      })
+      wrapper.rerender(
+        <DashboardCardMenu
+          {...defaultProps()}
+          {...defaultMovementMenuProps()}
+          ref={ref}
+          handleShow={handleShow}
+          popoverContentRef={popoverContentRef}
+        />
+      )
+      wrapper.getByText('menu').click()
     })
 
     await handleShowPromise
   })
 
   // FOO-3822
-  it.skip('it should close the popover on movement menu option select', async () => {
+  it('it should close the popover on movement menu option select', async () => {
     let popoverContent
     const popoverContentRef = c => {
       popoverContent = c
@@ -130,15 +146,22 @@ describe('DashboardCardMenu - reordering', () => {
 
     const handleShowPromise = new Promise(resolve => {
       const handleShow = () => {
-        getTabWithText('Move').click()
+        wrapper.getByText('Move').click()
         document.querySelectorAll('[role="menuitem"]')[0].click()
         expect(popoverContent).toBeFalsy()
         resolve()
       }
 
-      wrapper.setProps({handleShow, popoverContentRef}, () => {
-        wrapper.find('button').simulate('click')
-      })
+      wrapper.rerender(
+        <DashboardCardMenu
+          {...defaultProps()}
+          {...defaultMovementMenuProps()}
+          ref={ref}
+          handleShow={handleShow}
+          popoverContentRef={popoverContentRef}
+        />
+      )
+      wrapper.getByText('menu').click()
     })
 
     await handleShowPromise

@@ -117,6 +117,8 @@ describe('ItemAssignToTray', () => {
         overrides: [],
       })
       .get('/api/v1/courses/1/quizzes/23/date_details', {})
+      .get('/api/v1/courses/1/discussion_topics/23/date_details', {})
+      .get('/api/v1/courses/1/pages/23/date_details', {})
     fetchMock.get(STUDENTS_URL, STUDENTS_DATA).get(SECTIONS_URL, SECTIONS_DATA)
   })
 
@@ -155,17 +157,19 @@ describe('ItemAssignToTray', () => {
   })
 
   it('renders a discussion', () => {
-    // When discussions API are supported, this test should fail and this section should be removed
-    fetchMock.get('/', {
-      status: 404,
-      body: {error: 'UnSupported item type'},
-    })
     const {getByTestId, getByText} = renderComponent({
       itemType: 'discussion',
       iconType: 'discussion',
     })
     expect(getByText('Discussion | 10 pts')).toBeInTheDocument()
     const icon = getByTestId('icon-discussion')
+    expect(icon).toBeInTheDocument()
+  })
+
+  it('renders a page', () => {
+    const {getByTestId, getByText} = renderComponent({itemType: 'page', iconType: 'page'})
+    expect(getByText('Page | 10 pts')).toBeInTheDocument()
+    const icon = getByTestId('icon-page')
     expect(icon).toBeInTheDocument()
   })
 
@@ -245,23 +249,32 @@ describe('ItemAssignToTray', () => {
     expect(getAllByTestId('item-assign-to-card')).toHaveLength(2)
   })
 
-  // LF-1370
-  it.skip('renders blueprint locking info when there are locked dates', async () => {
+  it('renders blueprint locking info when there are locked dates', async () => {
     fetchMock.get('/api/v1/courses/1/assignments/31/date_details', {
       blueprint_date_locks: ['availability_dates'],
     })
-    const {getAllByText, findAllByTestId} = renderComponent({itemContentId: '31'})
-    await findAllByTestId('item-assign-to-card')
+    const {getAllByText, getByTestId} = renderComponent({itemContentId: '31'})
+    // wait for the cards to render
+    const loadingSpinner = getByTestId('cards-loading')
+    await waitFor(() => {
+      expect(loadingSpinner).not.toBeInTheDocument()
+    })
+
     expect(
       getAllByText((_, e) => e.textContent === 'Locked: Availability Dates')[0]
     ).toBeInTheDocument()
   })
 
-  // LF-1370
-  it.skip('does not render blueprint locking info when locked with unlocked due dates', async () => {
+  it('does not render blueprint locking info when locked with unlocked due dates', async () => {
     fetchMock.get('/api/v1/courses/1/assignments/31/date_details', {blueprint_date_locks: []})
-    const {findAllByTestId, queryByText} = renderComponent({itemContentId: '31'})
-    await findAllByTestId('item-assign-to-card')
+    const {getByTestId, queryByText} = renderComponent({itemContentId: '31'})
+
+    // wait for the cards to render
+    const loadingSpinner = getByTestId('cards-loading')
+    await waitFor(() => {
+      expect(loadingSpinner).not.toBeInTheDocument()
+    })
+
     await expect(queryByText('Locked:')).not.toBeInTheDocument()
   })
 
@@ -539,23 +552,30 @@ describe('ItemAssignToTray', () => {
     })
   })
 
-  // LF-1370
-  it.skip('focuses on the add button when deleting a card', async () => {
+  it('focuses on the add button when deleting a card', async () => {
     const user = userEvent.setup(USER_EVENT_OPTIONS)
-    const {findAllByText, getByTestId} = renderComponent()
-    const deleteButton = (await findAllByText('Delete'))[1]
-    const addButton = getByTestId('add-card')
+    const {findAllByTestId, getByTestId} = renderComponent()
+
+    const deleteButton = (await findAllByTestId('delete-card-button'))[1]
     await user.click(deleteButton)
+
+    const addButton = getByTestId('add-card')
     expect(addButton).toHaveFocus()
   })
 
-  // LF-1370
-  it.skip("focuses on the newly-created card's delete button when adding a card", async () => {
+  it("focuses on the newly-created card's delete button when adding a card", async () => {
     const user = userEvent.setup(USER_EVENT_OPTIONS)
-    const {findAllByText, getByTestId} = renderComponent()
+    const {findAllByTestId, getByTestId} = renderComponent()
+
+    // wait for the cards to render
+    const loadingSpinner = getByTestId('cards-loading')
+    await waitFor(() => {
+      expect(loadingSpinner).not.toBeInTheDocument()
+    })
+
     const addButton = getByTestId('add-card')
     await user.click(addButton)
-    const deleteButtons = await findAllByText('Delete')
+    const deleteButtons = await findAllByTestId('delete-card-button')
     expect(deleteButtons[deleteButtons.length - 1].closest('button')).toHaveFocus()
   })
 })

@@ -187,6 +187,10 @@ module CC
       @content_export.settings[:new_quizzes_export_url]
     end
 
+    def common_cartridge?
+      @content_export.common_cartridge?
+    end
+
     private
 
     def copy_all_to_zip

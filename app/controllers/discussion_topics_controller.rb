@@ -353,7 +353,7 @@ class DiscussionTopicsController < ApplicationController
     end
 
     if params[:only_announcements] && !@context.grants_any_right?(@current_user, :manage, :read_course_content)
-      scope = scope.active.where("delayed_post_at IS NULL OR delayed_post_at<?", Time.now.utc)
+      scope = scope.active.where("(unlock_at IS NULL AND delayed_post_at IS NULL) OR (unlock_at<? OR delayed_post_at<?)", Time.now.utc, Time.now.utc)
     end
 
     per_page = params[:per_page] || 100
@@ -599,6 +599,7 @@ class DiscussionTopicsController < ApplicationController
       end
 
     js_hash = {
+      ASSIGNMENT_ID: @topic.assignment_id,
       CONTEXT_ACTION_SOURCE: :discussion_topic,
       CONTEXT_ID: @context.id,
       DISCUSSION_TOPIC: hash,
@@ -619,6 +620,7 @@ class DiscussionTopicsController < ApplicationController
       allow_student_anonymous_discussion_topics: @context.allow_student_anonymous_discussion_topics,
       context_is_not_group: !@context.is_a?(Group),
       GRADING_SCHEME_UPDATES_ENABLED: Account.site_admin.feature_enabled?(:grading_scheme_updates),
+      ARCHIVED_GRADING_SCHEMES_ENABLED: Account.site_admin.feature_enabled?(:archived_grading_schemes),
       DISCUSSION_CHECKPOINTS_ENABLED: @context.root_account.feature_enabled?(:discussion_checkpoints)
     }
 
@@ -1634,7 +1636,7 @@ class DiscussionTopicsController < ApplicationController
     end
     @topic.lock_at = discussion_topic_hash[:lock_at] if params.key? :lock_at
 
-    if @topic.delayed_post_at_changed? || @topic.lock_at_changed?
+    if @topic.unlock_at_changed? || @topic.delayed_post_at_changed? || @topic.lock_at_changed?
       @topic.workflow_state = @topic.should_not_post_yet ? "post_delayed" : "active"
       if @topic.should_lock_yet
         @topic.lock(without_save: true)

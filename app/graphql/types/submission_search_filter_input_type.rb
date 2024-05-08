@@ -30,6 +30,12 @@ module Types
 
     argument :include_unsubmitted, Boolean, required: false
 
+    argument :representatives_only, Boolean, <<~MD, required: false
+      For group assignments, include submissions for group representatives only.
+      Has no effect on non-group assignments or group assignments where students
+      are being graded individually.
+    MD
+
     argument :states, [SubmissionStateType], required: false, default_value: DEFAULT_SUBMISSION_STATES
     argument :section_ids, [ID], required: false, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("Section")
 

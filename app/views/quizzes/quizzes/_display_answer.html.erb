@@ -21,7 +21,7 @@
   display_answer ||= nil
   answer = display_answer
   assessment_results ||= false
-  question_type ||= OpenObject.new
+  question_type ||= QuizzesHelper::QuestionType.new
   question ||= nil
   answer_type = question_type ? question_type.answer_type : "select_answer"
   user_answer ||= nil

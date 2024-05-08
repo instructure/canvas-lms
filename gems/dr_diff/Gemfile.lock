@@ -22,13 +22,13 @@ GEM
       rdoc
       reline (>= 0.4.2)
     mini_mime (1.1.5)
-    mini_portile2 (2.8.5)
+    mini_portile2 (2.8.6)
     multi_xml (0.6.0)
     psych (5.1.2)
       stringio
     rdoc (6.6.3.1)
       psych (>= 4.0.0)
-    reline (0.5.1)
+    reline (0.5.2)
       io-console (~> 0.5)
     rspec (3.13.0)
       rspec-core (~> 3.13.0)
@@ -68,4 +68,4 @@ RUBY VERSION
    ruby 3.1.2p20
 
 BUNDLED WITH
-   2.5.7
+   2.5.9

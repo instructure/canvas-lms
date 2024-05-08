@@ -31,9 +31,6 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('gradebook')
 
-// Doing this to avoid TS2339 errors. Remove once we're on InstUI 8
-const {Group, Item, Separator} = Menu as any
-
 export type GradiantVariantName =
   | 'DefaultGradebook'
   | 'DefaultGradebookLearningMastery'
@@ -112,8 +109,12 @@ export default function GradebookMenu({
           trigger={menuTrigger}
           onToggle={window.ENV.FEATURES.instui_nav ? handleRenderArrowIcon : undefined}
         >
-          <Group selected={[variant]} onSelect={() => {}} label={I18n.t('Change Gradebook view')}>
-            <Item
+          <Menu.Group
+            selected={[variant]}
+            onSelect={() => {}}
+            label={I18n.t('Change Gradebook view')}
+          >
+            <Menu.Item
               href={`${courseUrl}/gradebook/change_gradebook_version?version=gradebook`}
               value="DefaultGradebook"
             >
@@ -123,45 +124,45 @@ export default function GradebookMenu({
               >
                 {I18n.t('Traditional Gradebook')}
               </span>
-            </Item>
+            </Menu.Item>
 
             {learningMasteryEnabled && (
-              <Item
+              <Menu.Item
                 href={`${courseUrl}/gradebook?view=learning_mastery`}
                 value="DefaultGradebookLearningMastery"
               >
                 <span data-menu-item-id="learning-mastery">
                   {I18n.t('Learning Mastery Gradebook')}
                 </span>
-              </Item>
+              </Menu.Item>
             )}
 
             {enhancedIndividualGradebookEnabled ? (
-              <Item
+              <Menu.Item
                 href={`${courseUrl}/gradebook/change_gradebook_version?version=individual_enhanced`}
                 value="EnhancedIndividualGradebook"
               >
                 <span data-menu-item-id="individual-gradebook">
                   {I18n.t('Individual Gradebook')}
                 </span>
-              </Item>
+              </Menu.Item>
             ) : (
-              <Item
+              <Menu.Item
                 href={`${courseUrl}/gradebook/change_gradebook_version?version=individual`}
                 value="IndividualGradebook"
               >
                 <span data-menu-item-id="individual-gradebook">
                   {I18n.t('Individual Gradebook')}
                 </span>
-              </Item>
+              </Menu.Item>
             )}
 
-            <Separator key="separator" />
+            <Menu.Separator key="separator" />
 
-            <Item href={`${courseUrl}/gradebook/history`} value="GradebookHistory">
+            <Menu.Item href={`${courseUrl}/gradebook/history`} value="GradebookHistory">
               <span data-menu-item-id="gradebook-history">{I18n.t('Gradebook History')}</span>
-            </Item>
-          </Group>
+            </Menu.Item>
+          </Menu.Group>
         </Menu>
       </Flex>
     </>

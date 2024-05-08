@@ -63,6 +63,12 @@ module Lti::IMS
     end
     let(:developer_key) { DeveloperKey.create }
 
+    describe "associations" do
+      subject { Lti::IMS::Registration.new }
+      it { is_expected.to belong_to(:lti_registration).class_name("Lti::Registration") }
+      it { is_expected.to belong_to(:developer_key).inverse_of(:ims_registration).optional(false) }
+    end
+
     describe "validations" do
       subject { registration.validate }
 

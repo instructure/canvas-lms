@@ -78,9 +78,7 @@ describe "submissions" do
       wait_for_tiny(assignment_form)
 
       type_in_tiny("#submission_body", "my assignment submission")
-      # scroll to below the button so it doesn't get covered by the student view overlay
-      scroll_to(f("#fixed_bottom"))
-      expect_new_page_load { submit_form(assignment_form) }
+      expect_new_page_load { scroll_to_submit_button_and_click(assignment_form) }
 
       expect(@course.student_view_student.submissions.count).to eq 1
       expect(f("#sidebar_content .details")).to include_text "Submitted!"

@@ -57,7 +57,7 @@
     <%= t("This assignment does not count toward the final grade.") %>
   </div>
 <% end %>
-<div id="assignment_show" class="assignment content_underline_links">
+<div id="assignment_show" class="assignment content_underline_links" data-lti-page-content="true">
   <% if can_do(@context, @current_user, :read_as_admin) %>
     <div class='assignment-title'>
       <div class='title-content'>
@@ -146,6 +146,15 @@
         <%= render "shared/mark_as_done" %>
         <%= assignment_submission_button(@assignment, @current_user, @current_user_submission, @first_annotation_submission) %>
       </div>
+      <% if @assignment_menu_tools.present? %>
+        <button class="al-trigger btn" aria-haspopup="true" aria-owns="toolbar-1">
+          <i class="icon-more" aria-hidden="true"></i>
+          <span class="screenreader-only"><%= t('manage', 'Manage') %></span>
+        </button>
+        <ul id="toolbar-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false">
+          <%= external_tools_menu_items(@assignment_menu_tools, {link_class: "menu_tool_link", settings_key: :assignment_menu, in_list: true, url_params: {:assignments => [@assignment.id]}}) %>
+        </ul>
+      <% end %>
     </div>
     <%= render "student_assignment_overview" %>
   <% end %>

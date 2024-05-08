@@ -671,7 +671,7 @@ $revision-button-color: $ic-color-dark;
   }
 
   .buttons {
-    margin-#{direction(left)}: 12px;
+    margin-#{direction(left)}: 4px;
   }
 
   @include breakpoint(mini-tablet, $maximum: true) {

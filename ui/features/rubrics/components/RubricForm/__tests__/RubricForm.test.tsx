@@ -19,11 +19,13 @@
 import React from 'react'
 import Router from 'react-router'
 import {BrowserRouter} from 'react-router-dom'
-import {fireEvent, render} from '@testing-library/react'
+import {fireEvent, render, waitFor} from '@testing-library/react'
 import {QueryProvider, queryClient} from '@canvas/query'
-import {RubricForm} from '../index'
+import {RubricForm, reorder} from '../index'
 import {RUBRICS_QUERY_RESPONSE} from './fixtures'
 import * as RubricFormQueries from '../../../queries/RubricFormQueries'
+import FindDialog from '@canvas/outcomes/backbone/views/FindDialog'
+import {get} from 'lodash'
 
 jest.mock('react-router', () => ({
   ...jest.requireActual('react-router'),
@@ -36,9 +38,28 @@ jest.mock('../../../queries/RubricFormQueries', () => ({
   saveRubric: () => saveRubricMock,
 }))
 
+const ROOT_OUTCOME_GROUP = {
+  id: '1',
+  title: 'Root Outcome Group',
+  vendor_guid: '12345',
+  subgroups_url: 'https://example.com/subgroups',
+  outcomes_url: 'https://example.com/outcomes',
+  can_edit: true,
+  import_url: 'https://example.com/import',
+  context_id: '1',
+  context_type: 'Account',
+  description: 'Root Outcome Group Description',
+  url: 'https://example.com/root',
+}
+
 describe('RubricForm Tests', () => {
   beforeEach(() => {
     jest.spyOn(Router, 'useParams').mockReturnValue({accountId: '1'})
+
+    window.ENV = {
+      ...window.ENV,
+      context_asset_string: 'user_1',
+    }
   })
 
   afterEach(() => {
@@ -49,7 +70,7 @@ describe('RubricForm Tests', () => {
     return render(
       <QueryProvider>
         <BrowserRouter>
-          <RubricForm />
+          <RubricForm rootOutcomeGroup={ROOT_OUTCOME_GROUP} />
         </BrowserRouter>
       </QueryProvider>
     )
@@ -167,9 +188,8 @@ describe('RubricForm Tests', () => {
       const criteriaRowIndexes = queryAllByTestId('rubric-criteria-row-index')
       expect(criteriaRows.length).toEqual(2)
       expect(criteriaRowDescriptions[0]).toHaveTextContent(criteria[0].description)
-      expect(criteriaRowDescriptions[1]).toHaveTextContent(criteria[1].description)
-      expect(criteriaRowLongDescriptions[0]).toHaveTextContent(criteria[0].longDescription)
-      expect(criteriaRowLongDescriptions[1]).toHaveTextContent(criteria[1].longDescription)
+      expect(criteriaRowDescriptions[1]).toHaveTextContent(criteria[1].description ?? '')
+      expect(criteriaRowLongDescriptions[0]).toHaveTextContent(criteria[0].longDescription ?? '')
       expect(criteriaRowPoints[0]).toHaveTextContent(criteria[0].points.toString())
       expect(criteriaRowPoints[1]).toHaveTextContent(criteria[1].points.toString())
       expect(criteriaRowIndexes[0]).toHaveTextContent('1.')
@@ -214,6 +234,158 @@ describe('RubricForm Tests', () => {
 
       const ratingScaleAccordionItems = queryAllByTestId('rating-scale-accordion-item')
       expect(ratingScaleAccordionItems.length).toEqual(0)
+    })
+
+    it('should reorder all criteria after drag and drop, but keep original point values of criteria', () => {
+      const criteria = [
+        {
+          id: '1',
+          points: 5,
+          description: 'Criterion 1',
+          longDescription: 'Long description for criterion 1',
+          ignoreForScoring: false,
+          masteryPoints: 3,
+          criterionUseRange: false,
+          ratings: [
+            {
+              id: '1',
+              description: 'Rating 1',
+              longDescription: 'Long description for rating 1',
+              points: 5,
+            },
+            {
+              id: '2',
+              description: 'Rating 2',
+              longDescription: 'Long description for rating 2',
+              points: 0,
+            },
+          ],
+        },
+        {
+          id: '2',
+          points: 15,
+          description: 'Criterion 2',
+          longDescription: 'Long description for criterion 2',
+          ignoreForScoring: false,
+          masteryPoints: 3,
+          criterionUseRange: false,
+          ratings: [
+            {
+              id: '1',
+              description: 'Rating 1',
+              longDescription: 'Long description for rating 1',
+              points: 15,
+            },
+            {
+              id: '2',
+              description: 'Rating 2',
+              longDescription: 'Long description for rating 2',
+              points: 0,
+            },
+          ],
+        },
+        {
+          id: '3',
+          points: 10,
+          description: 'Criterion 3',
+          longDescription: 'Long description for criterion 3',
+          ignoreForScoring: false,
+          masteryPoints: 3,
+          criterionUseRange: false,
+          ratings: [
+            {
+              id: '1',
+              description: 'Rating 1',
+              longDescription: 'Long description for rating 1',
+              points: 10,
+            },
+            {
+              id: '2',
+              description: 'Rating 2',
+              longDescription: 'Long description for rating 2',
+              points: 0,
+            },
+          ],
+        },
+      ]
+
+      const startIndex = 0
+      const endIndex = 2
+
+      const reorderedCriteria = reorder({list: criteria, startIndex, endIndex})
+
+      expect(reorderedCriteria[0]).toEqual(criteria[1])
+      expect(reorderedCriteria[1]).toEqual(criteria[2])
+      expect(reorderedCriteria[2]).toEqual(criteria[0])
+    })
+
+    describe('new outcome criterion modal', () => {
+      it('imports an outcome linked criteria when the import button is clicked in the find outcome modal', () => {
+        const outcomeData = {
+          attributes: {
+            points_possible: 10,
+            description: '<p>Sample description</p>',
+            display_name: 'Sample Outcome Display Name',
+            mastery_points: 8,
+            ratings: ['A', 'B', 'C'],
+          },
+          outcomeLink: {
+            outcome: {
+              title: 'Sample Outcome Title',
+              id: '123',
+            },
+          },
+        }
+        jest.spyOn(FindDialog.prototype, 'import').mockImplementation(function (e) {
+          // @ts-ignore
+          ;(this as FindDialog).trigger('import', {...outcomeData})
+        })
+        queryClient.setQueryData(['fetch-rubric-1'], RUBRICS_QUERY_RESPONSE)
+        const {getByTestId, getByText, queryAllByTestId} = renderComponent()
+        fireEvent.click(getByTestId('create-from-outcome-button'))
+        fireEvent.click(getByText('Import'))
+
+        expect(queryAllByTestId('rubric-criteria-row').length).toEqual(3)
+        expect(queryAllByTestId('rubric-criteria-row-description')[2]).toHaveTextContent(
+          'Sample description'
+        ) // removes p tags correctly
+        expect(queryAllByTestId('rubric-criteria-outcome-title')[1]).toHaveTextContent(
+          'Sample Outcome Title'
+        )
+        expect(queryAllByTestId('rubric-criteria-row-outcome-tag')[1]).toHaveTextContent(
+          'Sample Outcome Display Name'
+        )
+      })
+
+      it('displays a flash error if the outcome has already been imported into the current rubric', () => {
+        const outcomeData = {
+          attributes: {
+            points_possible: 10,
+            description: '<p>Sample description</p>',
+            display_name: 'Sample Outcome Display Name',
+            mastery_points: 8,
+            ratings: ['A', 'B', 'C'],
+          },
+          outcomeLink: {
+            outcome: {
+              title: 'Sample Outcome Title',
+              id: '12345',
+            },
+          },
+        }
+        jest.spyOn(FindDialog.prototype, 'import').mockImplementation(function (e) {
+          // @ts-ignore
+          ;(this as FindDialog).trigger('import', {...outcomeData})
+        })
+        queryClient.setQueryData(['fetch-rubric-1'], RUBRICS_QUERY_RESPONSE)
+        const {getByTestId, getByText, getAllByText} = renderComponent()
+        fireEvent.click(getByTestId('create-from-outcome-button'))
+        fireEvent.click(getByText('Import'))
+
+        expect(
+          getAllByText('This Outcome has not been added as it already exists in this rubric.')[0]
+        ).toBeInTheDocument()
+      })
     })
 
     describe('criterion modal', () => {
@@ -297,6 +469,41 @@ describe('RubricForm Tests', () => {
         expect(queryAllByTestId('rubric-criteria-row').length).toEqual(2)
         const criteriaRowDescriptions = queryAllByTestId('rubric-criteria-row-description')
         expect(criteriaRowDescriptions[0]).not.toHaveTextContent('Updated Criterion Test')
+      })
+    })
+
+    describe('edit outcome criterion modal', () => {
+      it('updates existing outcome criterion when the save button is clicked', async () => {
+        queryClient.setQueryData(['fetch-rubric-1'], RUBRICS_QUERY_RESPONSE)
+
+        const {getByTestId, queryAllByTestId} = renderComponent()
+        expect(queryAllByTestId('rubric-criteria-row').length).toEqual(2)
+
+        fireEvent.click(queryAllByTestId('rubric-criteria-row-edit-button')[1])
+        await new Promise(resolve => setTimeout(resolve, 0))
+        expect(getByTestId('outcome-rubric-criterion-modal')).toBeInTheDocument()
+        const ratingPoints = queryAllByTestId(`rating-points`)[1] as HTMLInputElement
+
+        fireEvent.change(ratingPoints, {target: {value: '20'}})
+        fireEvent.blur(ratingPoints)
+
+        fireEvent.click(getByTestId('outcome-rubric-criterion-save'))
+        fireEvent.click(queryAllByTestId('criterion-row-rating-accordion')[1])
+        const acordianRatings = queryAllByTestId('rating-scale-accordion-item')
+        expect(acordianRatings[0]).toHaveTextContent('Outcome Rating 1')
+        expect(acordianRatings[0]).toHaveTextContent('20 pts')
+        expect(acordianRatings[1]).toHaveTextContent('Outcome Rating 2')
+        expect(acordianRatings[1]).toHaveTextContent('5 pts')
+      })
+
+      it('disables the edit outcome criterion button when rubric is being used', async () => {
+        const rubricQueryResponse = {...RUBRICS_QUERY_RESPONSE, unassessed: false}
+        queryClient.setQueryData(['fetch-rubric-1'], rubricQueryResponse)
+
+        const {queryAllByTestId} = renderComponent()
+        expect(queryAllByTestId('rubric-criteria-row').length).toEqual(2)
+
+        expect(queryAllByTestId('rubric-criteria-row-edit-button')[1]).toBeDisabled()
       })
     })
   })

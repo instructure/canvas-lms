@@ -33,6 +33,7 @@ import DirectShareCourseTray from '@canvas/direct-sharing/react/components/Direc
 import DirectShareUserModal from '@canvas/direct-sharing/react/components/DirectShareUserModal'
 import '@canvas/jquery/jquery.disableWhileLoading'
 import {ltiState} from '@canvas/lti/jquery/messages'
+import ItemAssignToTray from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToTray'
 
 const I18n = useI18nScope('pages')
 
@@ -56,6 +57,7 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
         '#external-tool-mount-point': '$externalToolMountPoint',
         '#copy-to-mount-point': '$copyToMountPoint',
         '#send-to-mount-point': '$sendToMountPoint',
+        '#assign-to-mount-point': '$assignToMountPoint',
       },
     })
 
@@ -327,6 +329,32 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
         onDismiss={handleDismiss}
       />,
       this.$sendToMountPoint[0]
+    )
+  }
+
+  setAssignToItem(open, newAssignToItem, returnFocusTo) {
+    const handleTrayClose = () => {
+      this.setAssignToItem(false, newAssignToItem, returnFocusTo)
+      setTimeout(() => returnFocusTo?.focus(), 100)
+    }
+    const handleTrayExited = () => ReactDOM.unmountComponentAtNode(this.$assignToMountPoint[0])
+
+    ReactDOM.render(
+      <ItemAssignToTray
+        open={open}
+        onClose={handleTrayClose}
+        onDismiss={handleTrayClose}
+        onExited={handleTrayExited}
+        iconType="page"
+        itemType="page"
+        locale={ENV.LOCALE || 'en'}
+        timezone={ENV.TIMEZONE || 'UTC'}
+        courseId={ENV.COURSE_ID}
+        itemName={newAssignToItem.get('title')}
+        itemContentId={newAssignToItem.get('page_id')}
+        removeDueDateInput={true}
+      />,
+      this.$assignToMountPoint[0]
     )
   }
 

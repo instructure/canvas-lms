@@ -66,10 +66,9 @@ $.fn.disableWhileLoading = function (deferred, options) {
         dataKey = 'disabled_' + $.guid++
         $disabledArea = $this.add($this.nextAll('.ui-dialog-buttonpane'))
         disabled = true
-        //  todo: replace .andSelf with .addBack when JQuery is upgraded.
         $inputsToDisable = $disabledArea
           .find('*')
-          .andSelf()
+          .addBack()
           .filter(':input')
           .not(':disabled,[type=file],[name="authenticity_token"]')
         $inputsToDisable.prop('disabled', true)

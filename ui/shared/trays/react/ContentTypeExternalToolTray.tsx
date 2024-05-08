@@ -55,6 +55,7 @@ type Props = {
   onDismiss: any
   onExternalContentReady: any
   open: boolean
+  extraQueryParams?: {}
 }
 
 export default function ContentTypeExternalToolTray({
@@ -67,6 +68,7 @@ export default function ContentTypeExternalToolTray({
   onDismiss,
   onExternalContentReady,
   open,
+  extraQueryParams = {},
 }: Props) {
   const queryParams = {
     com_instructure_course_accept_canvas_resource_types: acceptedResourceTypes,
@@ -75,6 +77,7 @@ export default function ContentTypeExternalToolTray({
     com_instructure_course_available_canvas_resources: selectableItems,
     display: 'borderless',
     placement,
+    ...extraQueryParams,
   }
   const prefix = tool?.base_url.indexOf('?') === -1 ? '?' : '&'
   const iframeUrl = `${tool?.base_url}${prefix}${$.param(queryParams)}`

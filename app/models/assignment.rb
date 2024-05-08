@@ -91,6 +91,10 @@ class Assignment < AbstractAssignment
                    index_scope: ->(course) { course.assignments.active },
                    search_scope: ->(course, user) { Assignments::ScopedToUser.new(course, user, course.assignments.active).scope }
 
+  def checkpoints_parent?
+    has_sub_assignments? && root_account&.feature_enabled?(:discussion_checkpoints)
+  end
+
   private
 
   def before_soft_delete

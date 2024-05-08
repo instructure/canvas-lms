@@ -19,6 +19,7 @@
 import React from 'react'
 import {render, fireEvent, screen, waitFor} from '@testing-library/react'
 import ItemAssignToCard, {type ItemAssignToCardProps} from '../ItemAssignToCard'
+import userEvent from '@testing-library/user-event'
 
 const props: ItemAssignToCardProps = {
   courseId: '1',
@@ -65,8 +66,8 @@ describe('ItemAssignToCard', () => {
 
   it('renders the delete button when onDelete is provided', () => {
     const onDelete = jest.fn()
-    const {getByRole} = renderComponent({onDelete})
-    expect(getByRole('button', {name: 'Delete'})).toBeInTheDocument()
+    const {getByTestId} = renderComponent({onDelete})
+    expect(getByTestId('delete-card-button')).toBeInTheDocument()
   })
 
   it('disables blueprint-locked date inputs', () => {
@@ -80,8 +81,8 @@ describe('ItemAssignToCard', () => {
 
   it('calls onDelete when delete button is clicked', () => {
     const onDelete = jest.fn()
-    const {getByRole} = renderComponent({onDelete})
-    getByRole('button', {name: 'Delete'}).click()
+    const {getByTestId} = renderComponent({onDelete})
+    getByTestId('delete-card-button').click()
     expect(onDelete).toHaveBeenCalledWith('assign-to-card-001')
   })
 
@@ -217,6 +218,19 @@ describe('ItemAssignToCard', () => {
     const link = screen.getByRole('link', {name: 'My fabulous module'})
     expect(link).toHaveAttribute('href', '/courses/1/modules#2')
     expect(link).toHaveAttribute('target', '_blank')
+  })
+
+  it('show error when date field is blank and time field has value on blur', async () => {
+    const {getAllByLabelText, getAllByText} = renderComponent()
+    const timeInput = getAllByLabelText('Time')[0]
+
+    await userEvent.type(timeInput, '3:30 PM')
+    await userEvent.tab()
+
+    await waitFor(async () => {
+      expect(timeInput).toHaveValue('3:30 PM')
+      expect(await getAllByText('Invalid date')[0]).toBeInTheDocument()
+    })
   })
 
   describe('when course and user timezones differ', () => {

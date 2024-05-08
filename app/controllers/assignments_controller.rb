@@ -83,7 +83,8 @@ class AssignmentsController < ApplicationController
             newquizzes_on_quiz_page: @context.root_account.feature_enabled?(:newquizzes_on_quiz_page),
             show_additional_speed_grader_link: Account.site_admin.feature_enabled?(:additional_speedgrader_links),
           },
-          grading_scheme: @context.grading_standard_or_default.data
+          grading_scheme: @context.grading_standard_or_default.data,
+          points_based: @context.grading_standard_or_default.points_based?,
         }
 
         set_default_tool_env!(@context, hash)
@@ -148,7 +149,8 @@ class AssignmentsController < ApplicationController
              peer_display_name: @assignment.anonymous_peer_reviews? ? I18n.t("Anonymous student") : submission&.user&.name,
              originality_reports_for_a2_enabled: Account.site_admin.feature_enabled?(:originality_reports_for_a2),
              restrict_quantitative_data: @assignment.restrict_quantitative_data?(@current_user),
-             grading_scheme: @context.grading_standard_or_default.data
+             grading_scheme: @context.grading_standard_or_default.data,
+             points_based: @context.grading_standard_or_default.points_based?,
            })
 
     if peer_review_mode_enabled
@@ -156,7 +158,7 @@ class AssignmentsController < ApplicationController
       if current_user_submission
         graphql_reviewer_submission_id = CanvasSchema.id_from_object(
           current_user_submission,
-          CanvasSchema.resolve_type(nil, current_user_submission, nil),
+          CanvasSchema.resolve_type(nil, current_user_submission, nil)[0],
           nil
         )
       end
@@ -171,7 +173,7 @@ class AssignmentsController < ApplicationController
     if submission
       graphql_submission_id = CanvasSchema.id_from_object(
         submission,
-        CanvasSchema.resolve_type(nil, submission, nil),
+        CanvasSchema.resolve_type(nil, submission, nil)[0],
         nil
       )
     end
@@ -266,6 +268,9 @@ class AssignmentsController < ApplicationController
           return
         end
 
+        menu_tools = filtered_assignment_menu_tools
+        js_env(assignment_menu_tools: menu_tools) if menu_tools.present?
+
         # override media comment context: in the show action, these will be submissions
         js_env media_comment_asset_string: @current_user.asset_string if @current_user
 
@@ -327,7 +332,7 @@ class AssignmentsController < ApplicationController
             return
           else
             # This should not be reachable but leaving in place until we remove the old view
-            flash[:notice] = t "No student is being observed. To select a student, return to the dashboard."
+            flash[:notice] = t "No student is being observed."
           end
         end
 
@@ -454,7 +459,7 @@ class AssignmentsController < ApplicationController
         @can_direct_share = @context.grants_right?(@current_user, session, :direct_share)
         @can_link_to_speed_grader = Account.site_admin.feature_enabled?(:additional_speedgrader_links) && @assignment.can_view_speed_grader?(@current_user)
 
-        @assignment_menu_tools = external_tools_display_hashes(:assignment_menu)
+        @assignment_menu_tools = filtered_assignment_menu_tools
 
         @mark_done = MarkDonePresenter.new(self, @context, params["module_item_id"], @current_user, @assignment)
 
@@ -1182,5 +1187,22 @@ class AssignmentsController < ApplicationController
         override_course_and_term_dates: section.restrict_enrollments_to_section_dates
       }
     }
+  end
+
+  def filtered_assignment_menu_tools
+    tools = external_tools_display_hashes(:assignment_menu)
+    return tools unless tools.present? && @context.is_a?(Course)
+
+    # we do not support tray launch method on this page without the drawer
+    unless @domain_root_account&.feature_enabled?(:external_tool_drawer)
+      tools.reject! { |tool| tool[:launch_method] == "tray" }
+    end
+
+    # students should only see menu tools that launch in the tray
+    if context.user_is_student?(@current_user, include_fake_student: true, include_all: true)
+      tools.select! { |tool| tool[:launch_method] == "tray" }
+    end
+
+    tools.presence || []
   end
 end
