@@ -381,10 +381,17 @@ class SubmissionComment < ActiveRecord::Base
     return result if result.blank?
 
     result.map do |attachment|
-      # back-compat for when this was OpenObject. can be removed when we datafix all existing data
-      # to just be a hash, not an OpenObject
-      attributes = attachment.is_a?(Hash) ? attachment : attachment.instance_variable_get(:@table)
-      Attachment.new(attributes)
+      if attachment.is_a?(Hash)
+        attributes = attachment
+      else
+        # back-compat for when this was OpenObject. can be removed when we datafix all existing data
+        # to just be a hash, not an OpenObject
+        attributes = attachment.table
+        attributes = attributes[:table] if attributes.keys == [:table, :object_type]
+        attributes = attributes.stringify_keys
+      end
+
+      Attachment.new(attributes.slice(*Attachment.columns.map(&:name)))
     end
   end
 
