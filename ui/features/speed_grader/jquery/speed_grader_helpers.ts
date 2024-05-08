@@ -208,6 +208,31 @@ const speedGraderHelpers = {
       return 'not_submitted'
     }
   },
+
+  submissionStateSortingValue(student: StudentWithSubmission, grading_role: string) {
+    const states = {
+      not_graded: 1,
+      resubmitted: 2,
+      not_submitted: 3,
+      graded: 4,
+      not_gradeable: 5,
+    }
+    return states[this.submissionState(student, grading_role)]
+  },
+
+  randomizedStudentSorter(
+    studentWithSubmission: StudentWithSubmission[],
+    sort_function: (student: StudentWithSubmission) => number = () => Math.random()
+  ) {
+    return studentWithSubmission
+      .map(student => ({
+        student,
+        sort: sort_function(student),
+      }))
+      .sort((a, b) => a.sort - b.sort)
+      .map(({student}) => student)
+  },
+
   plagiarismResubmitHandler: (event: any, resubmitUrl: string) => {
     event.preventDefault()
 

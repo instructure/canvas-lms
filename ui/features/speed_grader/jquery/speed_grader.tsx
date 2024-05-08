@@ -497,27 +497,28 @@ function mergeStudentsAndSubmission() {
     }
 
     case 'submission_status': {
-      const states = {
-        not_graded: 1,
-        resubmitted: 2,
-        not_submitted: 3,
-        graded: 4,
-        not_gradeable: 5,
-      }
       jsonData.studentsWithSubmissions.sort(
         EG.compareStudentsBy(
           student =>
-            student && states[SpeedgraderHelpers.submissionState(student, ENV.grading_role)]
+            student && SpeedgraderHelpers.submissionStateSortingValue(student, ENV.grading_role)
         )
       )
       break
     }
 
+    case 'submission_status_randomize': {
+      jsonData.studentsWithSubmissions = SpeedgraderHelpers.randomizedStudentSorter(
+        jsonData.studentsWithSubmissions,
+        student =>
+          SpeedgraderHelpers.submissionStateSortingValue(student, ENV.grading_role) + Math.random()
+      )
+      break
+    }
+
     case 'randomize': {
-      jsonData.studentsWithSubmissions = jsonData.studentsWithSubmissions
-        .map(value => ({value, sort: Math.random()}))
-        .sort((a, b) => a.sort - b.sort)
-        .map(({value}) => value)
+      jsonData.studentsWithSubmissions = SpeedgraderHelpers.randomizedStudentSorter(
+        jsonData.studentsWithSubmissions
+      )
       break
     }
 
