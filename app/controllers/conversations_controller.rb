@@ -318,7 +318,9 @@ class ConversationsController < ApplicationController
                  CONVERSATIONS: hash,
                  apollo_caching: Account.site_admin.feature_enabled?(:apollo_caching),
                  conversation_cache_key: Base64.encode64("#{@current_user.uuid}jamDN74lLSmfnmo74Hb6snyBnmc6q"),
-                 react_inbox_labels: Account.site_admin.feature_enabled?(:react_inbox_labels)
+                 react_inbox_labels: Account.site_admin.feature_enabled?(:react_inbox_labels),
+                 inbox_translation_languages: @current_user.feature_enabled?(:translate_compose_message) ? Translation.languages : [],
+                 inbox_translation_enabled: @current_user.feature_enabled?(:translate_compose_message)
                })
         if @domain_root_account.feature_enabled?(:react_inbox)
           @page_title = t("Inbox")

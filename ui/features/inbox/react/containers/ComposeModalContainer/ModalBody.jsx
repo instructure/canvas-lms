@@ -16,67 +16,72 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ConversationMessage} from '../../../graphql/ConversationMessage'
-import {MessageBody} from '../../components/MessageBody/MessageBody'
-import {PastMessages} from '../../components/PastMessages/PastMessages'
+import { ConversationMessage } from '../../../graphql/ConversationMessage'
+import { MessageBody } from '../../components/MessageBody/MessageBody'
+import { PastMessages } from '../../components/PastMessages/PastMessages'
 import PropTypes from 'prop-types'
-import React from 'react'
+import React, { useState } from 'react'
 
-import {AttachmentDisplay, MediaAttachment} from '@canvas/message-attachments'
-import {Flex} from '@instructure/ui-flex'
-import {Modal} from '@instructure/ui-modal'
-import {View} from '@instructure/ui-view'
-import {Alert} from '@instructure/ui-alerts'
+import { AttachmentDisplay, MediaAttachment } from '@canvas/message-attachments'
+import { Flex } from '@instructure/ui-flex'
+import { Modal } from '@instructure/ui-modal'
+import { View } from '@instructure/ui-view'
+import { Alert } from '@instructure/ui-alerts'
+import TranslationControls from '../../components/TranslationControls/TranslationControls'
 
-const {Item} = Flex
+const { Item } = Flex
 
-const ModalBody = props => (
-  <Modal.Body padding="none">
-    {props.modalError && (
-      <Alert margin="small" variant="error" timeout={2500}>
-        {props.modalError}
-      </Alert>
-    )}
-    <Flex direction="column" width="100%" height="100%">
-      {props.children}
-      <View borderWidth="small none none none" padding="x-small">
-        <MessageBody
-          onBodyChange={props.onBodyChange}
-          messages={props.bodyMessages}
-          inboxSettingsFeature={props.inboxSettingsFeature}
-          signature={props.signature}
-        />
-      </View>
-      {props.pastMessages?.length > 0 && <PastMessages messages={props.pastMessages} />}
-      <Flex alignItems="start" borderWidth="small none none none" padding="small">
-        {props.mediaUploadFile && props.mediaUploadFile.uploadedFile && (
-          <Item data-testid="media-attachment">
-            <MediaAttachment
-              file={{
-                mediaID: props.mediaUploadFile.mediaObject.media_object.media_id,
-                src: URL.createObjectURL(props.mediaUploadFile.uploadedFile),
-                title:
-                  props.mediaUploadFile.mediaObject.media_object.user_entered_title ??
-                  props.mediaUploadFile.mediaObject.media_object.title,
-                type: props.mediaUploadFile.mediaObject.media_object.media_type,
-                mediaTracks: props.mediaUploadFile.mediaObject.media_object.media_tracks,
-              }}
-              onRemoveMediaComment={props.onRemoveMediaComment}
+const ModalBody = props => {
+  const shouldTranslate = ENV?.inbox_translation_enabled
+  return (
+    <Modal.Body padding="none">
+      {props.modalError && (
+        <Alert margin="small" variant="error" timeout={2500}>
+          {props.modalError}
+        </Alert>
+      )}
+      <Flex direction="column" width="100%" height="100%">
+        {props.children}
+        <View borderWidth="small none none none" padding="x-small">
+          <MessageBody
+            onBodyChange={props.onBodyChange}
+            messages={props.bodyMessages}
+            inboxSettingsFeature={props.inboxSettingsFeature}
+            signature={props.signature}
+          />
+          {shouldTranslate && <TranslationControls signature={props.signature} inboxSettingsFeature={props.inboxSettingsFeature} />}
+        </View>
+        {props.pastMessages?.length > 0 && <PastMessages messages={props.pastMessages} />}
+        <Flex alignItems="start" borderWidth="small none none none" padding="small">
+          {props.mediaUploadFile && props.mediaUploadFile.uploadedFile && (
+            <Item data-testid="media-attachment">
+              <MediaAttachment
+                file={{
+                  mediaID: props.mediaUploadFile.mediaObject.media_object.media_id,
+                  src: URL.createObjectURL(props.mediaUploadFile.uploadedFile),
+                  title:
+                    props.mediaUploadFile.mediaObject.media_object.user_entered_title ??
+                    props.mediaUploadFile.mediaObject.media_object.title,
+                  type: props.mediaUploadFile.mediaObject.media_object.media_type,
+                  mediaTracks: props.mediaUploadFile.mediaObject.media_object.media_tracks,
+                }}
+                onRemoveMediaComment={props.onRemoveMediaComment}
+              />
+            </Item>)}
+
+          <Item shouldShrink={true}>
+            <AttachmentDisplay
+              attachments={props.attachments}
+              onReplaceItem={props.replaceAttachment}
+              onDeleteItem={props.removeAttachment}
             />
           </Item>
-        )}
-
-        <Item shouldShrink={true}>
-          <AttachmentDisplay
-            attachments={props.attachments}
-            onReplaceItem={props.replaceAttachment}
-            onDeleteItem={props.removeAttachment}
-          />
-        </Item>
+        </Flex>
       </Flex>
-    </Flex>
-  </Modal.Body>
-)
+    </Modal.Body>
+  )
+
+}
 
 ModalBody.propTypes = {
   attachments: PropTypes.array,
