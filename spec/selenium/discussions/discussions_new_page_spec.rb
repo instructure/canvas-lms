@@ -296,6 +296,7 @@ describe "discussions" do
         end
 
         it "disallows full_anonymity along with graded" do
+          skip("revert enable ungraded discussion")
           get url
           replace_content(f("input[name=title]"), "my anonymous title")
           expect(f("input[id='use_for_grading']").attribute("checked")).to be_nil

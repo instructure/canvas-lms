@@ -178,7 +178,6 @@ ready(() => {
   setTimeout(() => {
     const groupsNotAllowedRoot = document.querySelector('#sections_groups_not_allowed_root')
     const anonymousPostSelector = document.querySelector('#sections_anonymous_post_selector')
-    const gradingCheckbox = document.querySelector('#use_for_grading')
 
     const radioButtons = document.querySelectorAll('input[name=anonymous_state]')
     radioButtons.forEach(radioButton => {
@@ -191,8 +190,6 @@ ready(() => {
         const isFullyAnonymous = anonymousState === 'full_anonymity'
         const isAnonymous = isPartiallyAnonymous || isFullyAnonymous
 
-        if (isAnonymous && gradingCheckbox?.checked) gradingCheckbox.click()
-        if (gradingCheckbox) gradingCheckbox.disabled = isAnonymous
         document.querySelector('#group_category_options').hidden = isAnonymous
         groupsNotAllowedRoot.style.display = isAnonymous ? 'inline' : 'none'
 
