@@ -16,10 +16,4 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {Img} from '@instructure/ui-img'
-import svg from '@canvas/images/ScreenCaptureIcon.svg'
-
-export default function ScreenCaptureIcon() {
-  return <Img src={svg} alt="screen capture" height={21} width={21} />
-}
+declare module '@canvas/images/ScreenCaptureIcon.svg'
