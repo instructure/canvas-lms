@@ -289,7 +289,8 @@ describe "discussions" do
           expect(f("span[data-testid='author_name']").text).to eq teacher.short_name
         end
 
-        it "disallows full_anonymity along with graded", skip: "vice-4200" do
+        it "disallows full_anonymity along with graded" do
+          skip("revert enable ungraded discussion")
           get url
           replace_content(f("input[name=title]"), "my anonymous title")
           f("input[value='full_anonymity']").click
