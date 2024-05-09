@@ -1555,7 +1555,7 @@ class Attachment < ActiveRecord::Base
       elsif lock_at && Time.now > lock_at
         locked = { asset_string:, lock_at: }
       elsif could_be_locked && (item = locked_by_module_item?(user, opts))
-        locked = { asset_string:, context_module: item.context_module.attributes }
+        locked = { asset_string:, context_module: item.context_module.attributes.slice(*LockedFor::MODULE_ATTRIBUTES) }
         locked[:unlock_at] = locked[:context_module]["unlock_at"] if locked[:context_module]["unlock_at"] && locked[:context_module]["unlock_at"] > Time.now.utc
       end
       locked

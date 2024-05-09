@@ -19,12 +19,14 @@
 #
 
 module LockedFor
+  MODULE_ATTRIBUTES = %w[id name context_type context_id workflow_state unlock_at].freeze
+
   def locked_for?(user, opts = {})
     lock_info = low_level_locked_for?(user, opts).dup
     return false if lock_info == false
 
     lock_info[:asset_string] = lock_info.delete(:object).asset_string
-    lock_info[:context_module] = lock_info.delete(:module).attributes if lock_info.key?(:module)
+    lock_info[:context_module] = lock_info.delete(:module).attributes.slice(*MODULE_ATTRIBUTES) if lock_info.key?(:module)
     lock_info
   end
 end
