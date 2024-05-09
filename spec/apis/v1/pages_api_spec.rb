@@ -1541,6 +1541,16 @@ describe "Pages API", type: :request do
                { controller: "wiki_pages_api", action: "show", format: "json", course_id: other_course.id.to_s, url_or_id: "front-page" })
     end
 
+    it "includes lock info on pages locked by a module with completion_events" do
+      cm = @course.context_modules.create!(name: "unpublished module", workflow_state: "unpublished", completion_events: ["publish_final_grade"])
+      cm.add_item(id: @front_page.id, type: "wiki_page")
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course.id}/pages",
+                      { controller: "wiki_pages_api", action: "index", format: "json", course_id: @course.id.to_s })
+      expect(response).to be_successful
+      expect(json.find { |page| page["url"] == @front_page.url }["lock_explanation"]).to eq("This page is part of an unpublished module and is not available yet.")
+    end
+
     describe "module progression" do
       before :once do
         @mod = @course.context_modules.create!(name: "some module")
