@@ -489,9 +489,9 @@ describe('EnhancedActionMenu', () => {
       jest.useFakeTimers()
       const appLaunch = jest.spyOn(PostGradesApp, 'AppLaunch').mockReturnValue(true)
       selectDropdownOption('Sync to SIS')
-      setTimeout(() => {
+      await waitFor(() => {
         expect(appLaunch).toHaveBeenCalled()
-      }, 15)
+      })
       jest.runAllTimers()
     })
   })
