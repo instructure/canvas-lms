@@ -41,7 +41,16 @@ admin_analytics_dap_model:
   description:
     wrapper: <a href="https://community.canvaslms.com/t5/Admin-Analytics-Hub/gh-p/admin_analytics">\1</a>
     admin_analytics_dap_model_description: Enables the use of DAP for Analytics at the account-level.
-  after_state_change_proc: analytics_2_after_state_change_hook
+  root_opt_in: true
+  beta: true
+  shadow: true
+course_analytics_dap_model:
+  state: hidden
+  applies_to: Account
+  display_name: New/Course Analytics DAP
+  description:
+    wrapper: <a href="https://community.canvaslms.com/t5/Admin-Analytics-Hub/gh-p/admin_analytics">\1</a>
+    admin_analytics_dap_model_description: Enables the use of DAP for Analytics at the account-level.
   root_opt_in: true
   beta: true
   shadow: true
