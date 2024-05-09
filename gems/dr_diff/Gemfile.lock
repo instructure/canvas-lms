@@ -7,7 +7,7 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    bigdecimal (3.1.7)
+    bigdecimal (3.1.8)
     debug (1.9.2)
       irb (~> 1.10)
       reline (>= 0.3.8)
