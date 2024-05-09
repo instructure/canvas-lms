@@ -27,12 +27,6 @@ const tool = {
 }
 
 describe('AssignmentSubmissionTypeSelectionLaunchButton', () => {
-  beforeEach(() => {
-    window.ENV = {
-      UPDATE_ASSIGNMENT_SUBMISSION_TYPE_LAUNCH_BUTTON_ENABLED: true
-    }
-  });
-
   it('renders a button to launch the tool', () => {
     const wrapper = render(<AssignmentSubmissionTypeSelectionLaunchButton tool={tool} />)
     expect(wrapper.getByRole('button', { name: `${tool.title} ${tool.description}` })).toBeTruthy()

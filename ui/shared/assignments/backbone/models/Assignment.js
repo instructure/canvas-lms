@@ -173,8 +173,6 @@ function Assignment() {
   this.defaultToNone = this.defaultToNone.bind(this)
   this.isDefaultTool = this.isDefaultTool.bind(this)
   this.shouldShowDefaultTool = this.shouldShowDefaultTool.bind(this)
-  this.isUpdateAssignmentSubmissionTypeLaunchButtonEnabled =
-    this.isUpdateAssignmentSubmissionTypeLaunchButtonEnabled.bind(this)
   this.isNewAssignment = this.isNewAssignment.bind(this)
   this.submissionTypes = this.submissionTypes.bind(this)
   this.inPacedCourse = this.inPacedCourse.bind(this)
@@ -468,10 +466,6 @@ Assignment.prototype.shouldShowDefaultTool = function () {
 
 Assignment.prototype.isDefaultTool = function () {
   return this.submissionType() === 'external_tool' && this.shouldShowDefaultTool()
-}
-
-Assignment.prototype.isUpdateAssignmentSubmissionTypeLaunchButtonEnabled = function () {
-  return window.ENV.UPDATE_ASSIGNMENT_SUBMISSION_TYPE_LAUNCH_BUTTON_ENABLED
 }
 
 Assignment.prototype.defaultToNone = function () {
@@ -1299,7 +1293,6 @@ Assignment.prototype.toView = function () {
     'externalToolIframeHeight',
     'isCloningAlignment',
     'failedToCloneAlignment',
-    'isUpdateAssignmentSubmissionTypeLaunchButtonEnabled',
   ]
   const hash = {
     id: this.get('id'),

@@ -28,7 +28,6 @@ export default function AssignmentSubmissionTypeSelectionLaunchButton(props) {
   const {title, description, icon_url: iconUrl} = tool
 
   return (
-    window.ENV.UPDATE_ASSIGNMENT_SUBMISSION_TYPE_LAUNCH_BUTTON_ENABLED ? (
       <BaseButton
       id="assignment_submission_type_selection_launch_button"
       display="block"
@@ -52,15 +51,5 @@ export default function AssignmentSubmissionTypeSelectionLaunchButton(props) {
           )}
         </View>
       </BaseButton>
-      ) : (
-        <div class="pad-box">
-          <div class="ic-Form-control">
-            <button class="Button btn-primary" type="button" id="assignment_submission_type_selection_launch_button" onClick={onClick}>
-              <i class="icon-link sr-hide" />
-              <span style={{marginLeft: "8px"}}>{title}</span>
-            </button>
-          </div>
-        </div>
-      )
   )
 }

@@ -363,15 +363,3 @@ tune_lti_context_id_history_query:
     improve performance. Caution: for some accounts where this query
     doesn't already time out, enabling this may cause the query to take
     much longer and even time out.
-update_assignment_submission_type_launch_button:
-  state: hidden
-  applies_to: SiteAdmin
-  display_name: Update the assignment submission type launch button
-  description: |-
-    Update the look of all tools using the submission_type_selection
-    placement to be a more modern design in line with the rest of Canvas' UI
-  environments:
-    development:
-      state: allowed_on
-    ci:
-      state: allowed_on

@@ -10,7 +10,7 @@
     <div class="border border-trbl border-round">
 
       {{!-- Submission type accepted --}}
-      <select id="assignment_submission_type" name="submission_type" style="margin-left: 0;{{fullWidthIf isUpdateAssignmentSubmissionTypeLaunchButtonEnabled}}"
+      <select id="assignment_submission_type" name="submission_type" style="margin-left: 0; width: 100%;"
         aria-controls="assignment_online_submission_types,assignment_external_tool_settings,assignment_group_selector,assignment_peer_reviews_fields"
         {{disabledIfIncludes frozenAttributes "submission_types"}}>
         {{#if defaultToolName}}

@@ -725,12 +725,6 @@ const object = {
     }
   },
 
-  fullWidthIf(condition) {
-    if (condition) {
-      return ' width: 100%; '
-    }
-  },
-
   selectedIf(thing, thingToCompare, _hash) {
     if (arguments.length === 3) {
       if (thing === thingToCompare) {
