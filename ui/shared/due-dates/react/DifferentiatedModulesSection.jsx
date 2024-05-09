@@ -48,10 +48,10 @@ const I18n = useI18nScope('DueDateOverrideView')
 
 const DifferentiatedModulesSection = ({
   onSync,
-  assignmentName,
+  getAssignmentName,
   assignmentId,
   type,
-  pointsPossible,
+  getPointsPossible,
   overrides,
   defaultSectionId,
   importantDates,
@@ -76,6 +76,11 @@ const DifferentiatedModulesSection = ({
   const [hasModuleOverrides, setHasModuleOverrides] = useState(false)
   const [moduleAssignees, setModuleAssignees] = useState([])
   const linkRef = useRef()
+
+  const formData = useMemo(() => ({
+    assignmentName: getAssignmentName(),
+    pointsPossible: getPointsPossible()
+  }), [open]);
 
   useEffect(() => {
     const updatedOverrides = overrides.map(override => {
@@ -441,12 +446,12 @@ const DifferentiatedModulesSection = ({
         onClose={handleClose}
         onDismiss={handleDismiss}
         courseId={ENV.COURSE_ID}
-        itemName={assignmentName}
+        itemName={formData.assignmentName}
         itemType={type}
         iconType={type}
         itemContentId={assignmentId}
         initHasModuleOverrides={hasModuleOverrides}
-        pointsPossible={pointsPossible}
+        pointsPossible={formData.pointsPossible}
         useApplyButton={true}
         locale={ENV.LOCALE || 'en'}
         timezone={ENV.TIMEZONE || 'UTC'}
@@ -465,10 +470,10 @@ const DifferentiatedModulesSection = ({
 
 DifferentiatedModulesSection.propTypes = {
   onSync: func.isRequired,
-  assignmentName: string.isRequired,
+  getAssignmentName: func.isRequired,
   assignmentId: string,
   type: string.isRequired,
-  pointsPossible: oneOfType([number, string]),
+  getPointsPossible: func.isRequired,
   overrides: array.isRequired,
   defaultSectionId: oneOfType([number, string]),
   importantDates: bool,

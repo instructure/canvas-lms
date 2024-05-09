@@ -201,6 +201,19 @@ shared_examples_for "item assign to tray during assignment creation/update" do
     check_element_has_focus close_button
   end
 
+  it "updates tray when form information changes" do
+    AssignmentCreateEditPage.replace_assignment_name("new assignment")
+    AssignmentCreateEditPage.enter_points_possible("100")
+
+    AssignmentCreateEditPage.click_manage_assign_to_button
+
+    wait_for_assign_to_tray_spinner
+    keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+    expect(tray_header.text).to eq("new assignment")
+    expect(item_type_text.text).to include("100 pts")
+  end
+
   context "Module overrides" do
     before do
       @context_module = @course.context_modules.create! name: "Mod"

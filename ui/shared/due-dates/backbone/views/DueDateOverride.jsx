@@ -85,9 +85,15 @@ DueDateOverrideView.prototype.render = function () {
         defaultSectionId: this.model.defaultDueDateSectionId,
         overrides: this.model.overrides.models.map(model => model.toJSON().assignment_override),
         assignmentId: this.model.assignment.get('id'),
-        assignmentName: this.model.assignment.get('name') || this.model.assignment.get('title'),
+        getAssignmentName: () => {
+          const element = document.getElementById('assignment_name') ?? document.getElementById('quiz_title')
+          return element?.value ?? this.model.assignment.get('name') ?? this.model.assignment.get('title')
+        },
         isOnlyVisibleToOverrides: this.model.assignment.isOnlyVisibleToOverrides(),
-        pointsPossible: this.model.assignment.get('points_possible'),
+        getPointsPossible: () => {
+          const elementValue = document.querySelector('#assignment_points_possible')?.value ?? document.querySelector('#quiz_display_points_possible > .points_possible')?.innerHTML
+          return elementValue ?? this.model.assignment.get('points_possible')
+        },
         type: this.model.assignment.objectType().toLowerCase(),
         importantDates: this.model.assignment.get('important_dates'),
         onTrayOpen: () => this.trigger('tray:open'),
