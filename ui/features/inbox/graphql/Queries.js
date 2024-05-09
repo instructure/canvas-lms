@@ -19,6 +19,7 @@ import gql from 'graphql-tag'
 
 import {Conversation} from './Conversation'
 import {ConversationMessage} from './ConversationMessage'
+import {ConversationParticipant} from './ConversationParticipant'
 import {Enrollment} from './Enrollment'
 import {Course} from './Course'
 import {Group} from './Group'
@@ -178,42 +179,15 @@ export const CONVERSATIONS_QUERY = gql`
           after: $afterConversation
         ) {
           nodes {
-            _id
-            id
-            label
-            workflowState
+            ...ConversationParticipant
             conversation {
-              _id
-              id
-              subject
-              isPrivate
-              canReply
-              conversationMessagesCount
-              conversationParticipantsConnection(first: 10) {
-                nodes {
-                  user {
-                    shortName
-                  }
-                }
-              }
+              ...Conversation
               conversationMessagesConnection(first: 1) {
                 nodes {
-                  id
-                  body
-                  createdAt
-                  author {
-                    id
-                    _id
-                    name
-                    shortName
-                  }
-                  recipients {
-                    id
-                    _id
-                    name
-                  }
+                  ...ConversationMessage
                 }
               }
+              conversationMessagesCount
             }
           }
           pageInfo {
@@ -223,6 +197,9 @@ export const CONVERSATIONS_QUERY = gql`
       }
     }
   }
+  ${ConversationParticipant.fragment}
+  ${Conversation.fragment}
+  ${ConversationMessage.fragment}
   ${PageInfo.fragment}
 `
 
