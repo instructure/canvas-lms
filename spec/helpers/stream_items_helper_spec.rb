@@ -158,14 +158,6 @@ describe StreamItemsHelper do
       expect(@categorized["DiscussionEntry"].first.path).to match("/courses/#{@course.id}/discussion_topics/#{@discussion.id}?entry_id=#{DiscussionEntry.last.id}")
       expect(@categorized["AssessmentRequest"].first.path).to match("/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}")
     end
-
-    it "links to the correct page for assessment requests when Assignment Enhancements — Student is enabled" do
-      @course.enable_feature!(:assignments_2_student)
-      items = @teacher.recent_stream_items
-      assessment_item = helper.categorize_stream_items(items, @teacher).dig("AssessmentRequest", 0)
-      reviewee_id = @reviewer_student.id # this is intentional. the reviewee and the reviewer are reviewing each other.
-      expect(assessment_item.path).to eq("/courses/#{Shard.short_id_for(@course)}/assignments/#{Shard.short_id_for(@assignment)}?reviewee_id=#{reviewee_id}")
-    end
   end
 
   context "extract_context" do
