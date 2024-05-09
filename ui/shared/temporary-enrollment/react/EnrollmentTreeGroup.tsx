@@ -57,6 +57,23 @@ export function translateState(workflow: string) {
   }
 }
 
+export function constructLabel(
+  label: string,
+  termName?: string,
+  children?: NodeStructure[]
+): string {
+  const labelParts = [label]
+  // append section label if it exists and is different
+  if (children?.[0]?.label && label !== children[0].label) {
+    labelParts.push(children[0].label)
+  }
+  // append term name if it exists
+  if (termName) {
+    labelParts.push(termName)
+  }
+  return labelParts.join(' - ')
+}
+
 export function EnrollmentTreeGroup(props: Props) {
   const handleCheckboxChange = () => {
     if (props.updateCheck) {
@@ -76,12 +93,18 @@ export function EnrollmentTreeGroup(props: Props) {
         for (const course of props.children as NodeStructure[]) {
           if (course.children.length === 0) return {elements: undefined, count: 0}
           if (course.children.length > 1) {
+            // nested course group
             childRows.push(
-              <Flex.Item key={course.id} shouldGrow={true} overflowY="visible">
+              <Flex.Item
+                key={course.id}
+                shouldGrow={true}
+                overflowY="visible"
+                padding="0 0 xx-small"
+              >
                 <EnrollmentTreeGroup
                   indent="0"
                   id={course.id}
-                  label={course.label}
+                  label={constructLabel(course.label, course.termName)}
                   isCheck={course.isCheck}
                   isToggle={course.isToggle}
                   updateCheck={props.updateCheck}
@@ -96,13 +119,13 @@ export function EnrollmentTreeGroup(props: Props) {
               </Flex.Item>
             )
           } else {
-            const label = course.label + ' - ' + course.children[0].label
+            // top-level course
             childRows.push(
               <Flex.Item key={course.id} shouldGrow={true} overflowY="visible">
                 <EnrollmentTreeItem
                   indent="0 0 0 large"
                   id={course.id}
-                  label={label}
+                  label={constructLabel(course.label, course.termName, course.children)}
                   isCheck={course.isCheck}
                   updateCheck={props.updateCheck}
                   isMixed={false}
@@ -118,6 +141,7 @@ export function EnrollmentTreeGroup(props: Props) {
         }
       } else {
         for (const section of props.children) {
+          // nested sections
           childRows.push(
             <Flex.Item key={section.id} shouldGrow={true} overflowY="visible">
               <EnrollmentTreeItem

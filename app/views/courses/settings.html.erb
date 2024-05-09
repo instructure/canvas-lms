@@ -626,8 +626,7 @@
             <% end %>
           </span>
           <% if !@context.elementary_homeroom_course? %>
-            <a href="#" role="button" class="course_form course_form_more_options_link" style="padding-<%= direction('left') %>: 20px;"><%= t('links.more_options', %{more options}) %></a>
-            <div class="course_form_more_options" style="display: none; padding-<%= direction('left') %>: 20px;">
+            <div class="course_form_more_options" style="padding-<%= direction('left') %>: 20px;">
               <% if @context.self_enrollment_allowed? %>
                 <div class="checkbox-flex-container">
                   <%= f.check_box :self_enrollment, :class => 'self_enrollment_checkbox', :disabled => !can_manage %>
@@ -732,7 +731,54 @@
   </div>
   <div id="tab-sections">
     <h2 style="margin-top: 10px;"><%= t('headings.sections', %{Course Sections}) %></h2>
+    <div class="course_section_dates">
+      <%= t('Course Start Date: %{start_date} | Course End Date: %{end_date}', {
+        :start_date => format_course_section_date(@context.start_at),
+        :end_date => format_course_section_date(@context.end_at) }) %>
+    </div>
+    <div class="course_section_dates">
+      <%= t('Term Start Date: %{start_date} | Term End Date: %{end_date}', {
+        :start_date => format_course_section_date(@context.enrollment_term.start_at),
+        :end_date => format_course_section_date(@context.enrollment_term.end_at) }) %>
+    </div>
     <ul id="sections">
+      <% if can_do(@context.course_sections.temp_record, @current_user, :create) %>
+        <li>
+          <%= form_for :course_section, :url => context_url(@context, :context_sections_url), :html => {:id => "add_section_form", :class => "form-inline", :style => "margin-top: 20px;"} do |f| %>
+            <h3><%= f.blabel :name, :course_section_name, :en => "Add a New Section" %></h3>
+            <%= f.text_field :name %>
+            <button class="btn btn-primary" type="submit" title="<%= t('Add Section') %>" aria-label="<%= t('Add Section') %>"><i class="icon-plus" role="presentation"></i> <%= t('buttons.add_section', %{Section}) %></button>
+          <% end %>
+        </li>
+      <% end %>
+      <li class="section_blank" style="display: none;">
+        <a href="<%= context_url(@context, :context_section_url, "{{ id }}") %>" class="name"></a>
+        <span class="section_links">
+          <a class="Button Button--icon-action no-hover edit_section_link"
+             role="button"
+             href="<%= context_url(@context, :context_section_url, "{{ id }}") %>"
+             title="<%= t('links.title.edit_section', %{Edit Section}) %>">
+              <i class="icon-edit" aria-hidden="true"></i>
+              <span class="screenreader-only">
+                <%= t('Edit Section "%{name}"', :name => "%%name%%") %>
+              </span>
+          </a>
+          <a class="Button Button--icon-action delete_section_link"
+             role="button"
+             href="<%= context_url(@context, :context_section_url, "{{ id }}") %>"
+             title="<%= t('links.title.delete_section', %{Delete Section}) %>"
+             class="no-hover">
+              <i class="icon-end" aria-hidden="true"></i>
+              <span class="screenreader-only"><%= t('Delete Section "%{name}"', :name => "%%name%%") %></span>
+          </a>
+        </span>
+        <div class="course_section_dates">
+          <%= t('Start Date: %{start_date} | End Date: %{end_date}', {
+            :start_date => format_course_section_date,
+            :end_date => format_course_section_date }) %>
+        </div>
+        <div class="clear"></div>
+      </li>
       <% @context.course_sections.active.order(CourseSection.best_unicode_collation_key('name')).each do |section| %>
         <li class="section">
           <% if can_do section, @current_user, :read %>
@@ -783,39 +829,12 @@
               <% end %>
             <% end %>
           </span>
+          <div class="course_section_dates">
+            <%= t('Start Date: %{start_date} | End Date: %{end_date}', {
+              :start_date => format_course_section_date(section.start_at),
+              :end_date => format_course_section_date(section.end_at) }) %>
+          </div>
           <div class="clear"></div>
-        </li>
-      <% end %>
-      <li class="section_blank" style="display: none;">
-        <a href="<%= context_url(@context, :context_section_url, "{{ id }}") %>" class="name"></a>
-        <span class="section_links">
-          <a class="Button Button--icon-action no-hover edit_section_link"
-            role="button"
-            href="<%= context_url(@context, :context_section_url, "{{ id }}") %>"
-            title="<%= t('links.title.edit_section', %{Edit Section}) %>">
-              <i class="icon-edit" aria-hidden="true"></i>
-              <span class="screenreader-only">
-                <%= t('Edit Section "%{name}"', :name => "%%name%%") %>
-              </span>
-          </a>
-          <a class="Button Button--icon-action delete_section_link"
-            role="button"
-            href="<%= context_url(@context, :context_section_url, "{{ id }}") %>"
-            title="<%= t('links.title.delete_section', %{Delete Section}) %>"
-            class="no-hover">
-              <i class="icon-end" aria-hidden="true"></i>
-              <span class="screenreader-only"><%= t('Delete Section "%{name}"', :name => "%%name%%") %></span>
-          </a>
-        </span>
-        <div class="clear"></div>
-      </li>
-      <% if can_do(@context.course_sections.temp_record, @current_user, :create) %>
-        <li>
-          <%= form_for :course_section, :url => context_url(@context, :context_sections_url), :html => {:id => "add_section_form", :class => "form-inline", :style => "margin-top: 20px;"} do |f| %>
-            <h3><%= f.blabel :name, :course_section_name, :en => "Add a New Section" %></h3>
-            <%= f.text_field :name %>
-            <button class="btn btn-primary" type="submit" title="<%= t('Add Section') %>" aria-label="<%= t('Add Section') %>"><i class="icon-plus" role="presentation"></i> <%= t('buttons.add_section', %{Section}) %></button>
-          <% end %>
         </li>
       <% end %>
     </ul>

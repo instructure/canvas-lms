@@ -2847,6 +2847,24 @@ describe ContextExternalTool do
     it "returns resource_selection when the type is 'resource_selection'" do
       expect(subject.extension_default_value(:resource_selection, :message_type)).to eq "resource_selection"
     end
+
+    it "returns basic-lti-launch-request for all other types" do
+      expect(subject.extension_default_value(:course_navigation, :message_type)).to eq "basic-lti-launch-request"
+    end
+
+    context "the tool uses 1.3" do
+      let(:tool) do
+        external_tool_1_3_model(context: @root_account)
+      end
+
+      it "returns LtiResourceLinkRequest when the property is 'message_type'" do
+        expect(tool.extension_default_value(:course_navigation, :message_type)).to eq "LtiResourceLinkRequest"
+      end
+
+      it "returns LtiDeepLinkingRequest when the property is 'message_type' and type is editor_button" do
+        expect(tool.extension_default_value(:editor_button, :message_type)).to eq "LtiDeepLinkingRequest"
+      end
+    end
   end
 
   describe "change_domain" do

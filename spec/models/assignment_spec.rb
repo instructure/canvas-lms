@@ -11694,4 +11694,89 @@ describe Assignment do
       end
     end
   end
+
+  describe "common_cartridge_qti_new_quizzes_import" do
+    subject(:assignment) { Assignment.new }
+
+    describe ".ready_to_migrate_to_quiz_next?" do
+      it "returns false when .settings is nil" do
+        expect(subject.settings).to be_nil
+        expect(subject.ready_to_migrate_to_quiz_next?).to be_falsey
+      end
+
+      it "returns false when .settings is {}" do
+        subject.settings = {}
+        expect(subject.settings).to eq({})
+        expect(subject.ready_to_migrate_to_quiz_next?).to be_falsey
+      end
+
+      it "returns true when .settings contains the migrate_to_quizzes_next" do
+        subject.settings = { "common_cartridge_import" => { "migrate_to_quizzes_next" => true } }
+        expect(subject.ready_to_migrate_to_quiz_next?).to be_truthy
+      end
+    end
+
+    describe ".mark_as_ready_to_migrate_to_quiz_next" do
+      it "generates migrate_to_quizzes_next when .settings is nil" do
+        expect(subject.settings).to be_nil
+        subject.mark_as_ready_to_migrate_to_quiz_next
+        expect(subject.settings).not_to be_nil
+        expect(subject.ready_to_migrate_to_quiz_next?).to be_truthy
+      end
+
+      it "generates migrate_to_quizzes_next when .settings is {}" do
+        subject.settings = {}
+        expect(subject.settings).not_to be_nil
+        subject.mark_as_ready_to_migrate_to_quiz_next
+        expect(subject.settings).not_to be_nil
+        expect(subject.ready_to_migrate_to_quiz_next?).to be_truthy
+      end
+
+      it "generates migrate_to_quizzes_next when .settings is populated" do
+        subject.settings = { "another" => 123 }
+        expect(subject.settings).not_to be_nil
+        subject.mark_as_ready_to_migrate_to_quiz_next
+        expect(subject.settings).not_to be_nil
+        expect(subject.ready_to_migrate_to_quiz_next?).to be_truthy
+        expect(subject.settings).to eq({ "another" => 123, "common_cartridge_import" => { "migrate_to_quizzes_next" => true } })
+      end
+    end
+
+    describe ".unmark_as_ready_to_migrate_to_quiz_next" do
+      it "leaves .settings as nil .settings is nil" do
+        expect(subject.settings).to be_nil
+        subject.unmark_as_ready_to_migrate_to_quiz_next
+        expect(subject.settings).to be_nil
+        expect(subject.ready_to_migrate_to_quiz_next?).to be_falsey
+      end
+
+      it "leaves .settings as it is when .settings is {}" do
+        subject.settings = {}
+        expect(subject.settings).not_to be_nil
+        subject.unmark_as_ready_to_migrate_to_quiz_next
+        expect(subject.settings).not_to be_nil
+        expect(subject.settings).to eq({})
+        expect(subject.ready_to_migrate_to_quiz_next?).to be_falsey
+      end
+
+      it "leaves .settings as it is when .settings is populated" do
+        subject.settings = { "another" => 123 }
+        expect(subject.settings).not_to be_nil
+        subject.unmark_as_ready_to_migrate_to_quiz_next
+        expect(subject.settings).not_to be_nil
+        expect(subject.ready_to_migrate_to_quiz_next?).to be_falsey
+        expect(subject.settings).to eq({ "another" => 123 })
+      end
+
+      it "preserves other elements in .settings as it is when .settings is populated and contains migrate_to_quizzes_next" do
+        subject.settings = { "another" => 123, "common_cartridge_import" => { "migrate_to_quizzes_next" => true } }
+        expect(subject.settings).not_to be_nil
+        expect(subject.ready_to_migrate_to_quiz_next?).to be_truthy
+        subject.unmark_as_ready_to_migrate_to_quiz_next
+        expect(subject.settings).not_to be_nil
+        expect(subject.ready_to_migrate_to_quiz_next?).to be_falsey
+        expect(subject.settings).to eq({ "another" => 123 })
+      end
+    end
+  end
 end

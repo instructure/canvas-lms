@@ -25,4 +25,5 @@ export type DeepLinkResponse = {
   errorlog?: string
   ltiEndpoint?: string
   reloadpage?: boolean
+  replaceEditorContents?: boolean
 }

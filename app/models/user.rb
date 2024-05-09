@@ -380,11 +380,17 @@ class User < ActiveRecord::Base
     super
   end
 
-  def assignment_and_quiz_visibilities(context)
-    RequestCache.cache("assignment_and_quiz_visibilities", self, context) do
+  def learning_object_visibilities(context)
+    RequestCache.cache("learning_object_visibilities", self, context) do
       GuardRail.activate(:secondary) do
-        { assignment_ids: DifferentiableAssignment.scope_filter(context.assignments, self, context).pluck(:id),
-          quiz_ids: DifferentiableAssignment.scope_filter(context.quizzes, self, context).pluck(:id) }
+        visibilities = { assignment_ids: DifferentiableAssignment.scope_filter(context.assignments, self, context).pluck(:id),
+                         quiz_ids: DifferentiableAssignment.scope_filter(context.quizzes, self, context).pluck(:id) }
+        if Account.site_admin.feature_enabled?(:differentiated_modules)
+          visibilities[:context_module_ids] = DifferentiableAssignment.scope_filter(context.context_modules, self, context).pluck(:id)
+          visibilities[:discussion_topic_ids] = DifferentiableAssignment.scope_filter(context.discussion_topics, self, context).pluck(:id)
+          visibilities[:wiki_page_ids] = DifferentiableAssignment.scope_filter(context.wiki_pages, self, context).pluck(:id)
+        end
+        visibilities
       end
     end
   end

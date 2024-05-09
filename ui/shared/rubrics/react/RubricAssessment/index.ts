@@ -18,3 +18,4 @@
 
 export * from './RubricAssessmentTray'
 export * from './RubricAssessmentContainer'
+export * from './TraditionalView'

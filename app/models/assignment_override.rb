@@ -28,6 +28,7 @@ class AssignmentOverride < ActiveRecord::Base
   SET_TYPE_COURSE_SECTION = "CourseSection"
   SET_TYPE_GROUP = "Group"
   SET_TYPE_NOOP = "Noop"
+  SET_TYPE_COURSE = "Course"
 
   simply_versioned keep: 10
 

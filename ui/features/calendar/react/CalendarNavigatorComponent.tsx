@@ -27,9 +27,9 @@ const I18n = useI18nScope('calendar.header')
 const LegacyBackboneDateComponent = ({size}: {size: string}) => {
   return (
     <>
-      <h2 className="navigation_title" tabIndex="-1">
+      <h2 className="navigation_title" tabIndex={-1}>
         {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
-        <span role="button" className="navigation_title_text blue" tabIndex="0" />
+        <span role="button" className="navigation_title_text blue" tabIndex={0} />
       </h2>
       <span className="date_field_wrapper">
         {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
@@ -98,7 +98,7 @@ const ContentSmallSize = (props: CalendarNavigatorComponentProps) => {
           </Flex.Item>
         </span>
 
-        <Flex.Item overflowY="visible" shouldGrow={true} alignItems="center" textAlign="center">
+        <Flex.Item overflowY="visible" shouldGrow={true} align="center" textAlign="center">
           <LegacyBackboneDateComponent size="small" />
         </Flex.Item>
 

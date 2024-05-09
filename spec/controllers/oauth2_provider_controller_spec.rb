@@ -138,12 +138,27 @@ describe OAuth2ProviderController do
         allow(Canvas).to receive_messages(redis:)
       end
 
-      it "redirects to the confirm url if the user has no token" do
-        get :auth,
-            params: { client_id: key.id,
-                      redirect_uri: Canvas::OAuth::Provider::OAUTH2_OOB_URI,
-                      response_type: "code" }
-        expect(response).to redirect_to(oauth2_auth_confirm_url)
+      context "if the user has no token" do
+        it "redirects to the confirm url if the user has no token" do
+          get :auth,
+              params: { client_id: key.id,
+                        redirect_uri: Canvas::OAuth::Provider::OAUTH2_OOB_URI,
+                        response_type: "code" }
+          expect(response).to redirect_to(oauth2_auth_confirm_url)
+        end
+
+        it "shows a confirm page that allows being embedded (as an iframe) by trusted tools" do
+          t = external_tool_model(context: Account.default)
+          t.update! url: "https://myschool.instructure.com", domain: "myschool.instructure.com", developer_key: DeveloperKey.create(account: Account.default, internal_service: true)
+
+          get :auth,
+              params: { client_id: key.id,
+                        redirect_uri: Canvas::OAuth::Provider::OAUTH2_OOB_URI,
+                        response_type: "code" }
+          get :confirm
+          expect(response).to have_http_status :ok
+          expect(response.headers["Content-Security-Policy"]).to include("https://myschool.instructure.com")
+        end
       end
 
       it "redirects to login_url with ?force_login=1" do

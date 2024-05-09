@@ -74,6 +74,7 @@ describe "better_file_browsing, folders" do
       move("test folder", 0, :cog_icon)
       wait_for_ajaximations
       expect(f("#flash_message_holder").text).to eq "test folder moved to course files"
+      get "/courses/#{@course.id}/files"
       expect(ff(".treeLabel span")[2].text).to eq "test folder"
     end
 
@@ -169,7 +170,8 @@ describe "better_file_browsing, folders" do
         expect(all_files_folders.last.text).to match folder_regex
       end
       get "/courses/#{@course.id}/files"
-      f("ul.collectionViewItems > li > a > i.icon-mini-arrow-right").click
+      wait_for_ajaximations
+      f(".ef-name-col > a.ef-name-col__link").click
       wait_for_ajaximations
       expect(ff("ul.collectionViewItems > li > ul.treeContents > li.subtrees > ul.collectionViewItems li")).to have_size(15)
     end

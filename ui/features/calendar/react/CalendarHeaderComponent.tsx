@@ -80,7 +80,7 @@ const RenderViewsSelector = ({
             role="tab"
             aria-selected="false"
             aria-controls="calendar-app"
-            tabIndex="-1"
+            tabIndex={-1}
           >
             {I18n.t('Week')}
           </button>
@@ -91,7 +91,7 @@ const RenderViewsSelector = ({
             role="tab"
             aria-selected="false"
             aria-controls="calendar-app"
-            tabIndex="-1"
+            tabIndex={-1}
           >
             {I18n.t('Month')}
           </button>
@@ -102,7 +102,7 @@ const RenderViewsSelector = ({
             role="tab"
             aria-selected="false"
             aria-controls="calendar-app"
-            tabIndex="-1"
+            tabIndex={-1}
           >
             {I18n.t('Agenda')}
           </button>
@@ -112,7 +112,7 @@ const RenderViewsSelector = ({
       <span style={{display: size === 'large' ? 'none' : 'block'}}>
         <SimpleSelect
           renderLabel=""
-          onChange={(e, data) => onChangeSelectViewMode(data.value)}
+          onChange={(e, data) => onChangeSelectViewMode(String(data.value))}
           value={view}
         >
           <SimpleSelect.Option id="s_week" value="week">
@@ -226,7 +226,9 @@ const CalendarHeaderComponent = (headerProps: CalendarHeaderComponentProps) => {
         small: {maxWidth: '607px'},
         large: {minWidth: '608px'},
       }}
-      render={(_, matches) => <RenderContent headerProps={headerProps} size={matches[0]} />}
+      render={(_, matches) => (
+        <RenderContent headerProps={headerProps} size={matches ? matches[0] : ''} />
+      )}
     />
   )
 }

@@ -1445,6 +1445,9 @@
     "next_40e12421": {
         "message": "Seuraava"
     },
+    "next_findtext_9d69f0fe": {
+        "message": "Seuraava { findText }"
+    },
     "no_accessibility_issues_were_detected_f8d3c875": {
         "message": "Ei havaittu käytettävyysongelmia."
     },
@@ -1721,6 +1724,9 @@
     "previous_bd2ac015": {
         "message": "Edellinen"
     },
+    "previous_findtext_8dfbfd30": {
+        "message": "Edellinen { findText }"
+    },
     "prime_917ea60e": {
         "message": "Alku"
     },
@@ -1796,11 +1802,23 @@
     "replace_all_d3d68b3": {
         "message": "Korvaa kaikki"
     },
+    "replace_all_findtext_with_replacetext_da574b32": {
+        "message": "Korvaa kaikki { findText } kohteella { replaceText }"
+    },
     "replace_e61834a7": {
         "message": "Korvaa"
     },
+    "replace_findtext_with_replacetext_7b5c7fb3": {
+        "message": "Korvaa kohde { findText } kohteella { replaceText }"
+    },
     "replace_with_eeff01ad": {
         "message": "Korvaa tällä"
+    },
+    "replaced_alertfindtext_with_alertreplacetext_de5c1795": {
+        "message": "Kohde { alertFindText } korvattu kohteella { alertReplaceText }"
+    },
+    "replaced_all_alertfindtext_with_alertreplacetext_83fdfe59": {
+        "message": "Kaikki kohteetl { alertFindText } korvattu kohteella { alertReplaceText }"
     },
     "reset_95a81614": {
         "message": "Nollaa"

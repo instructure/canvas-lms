@@ -62,6 +62,7 @@ module CC
     def create_resources
       @manifest_node.resources do |resources|
         @resources = resources
+        @for_common_cartridge = @manifest.exporter.common_cartridge?
         run_and_set_progress(:add_canvas_non_cc_data, 15, I18n.t("course_exports.errors.canvas_meta", "Failed to export canvas-specific meta data"))
         run_and_set_progress(:add_wiki_pages, 30, I18n.t("course_exports.errors.wiki_pages", "Failed to export wiki pages"))
         run_and_set_progress(:add_lti_resource_links, 32, I18n.t("Failed to import some LTI resource links"))

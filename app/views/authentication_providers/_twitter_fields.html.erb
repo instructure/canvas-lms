@@ -18,7 +18,7 @@
 
 <% unless AuthenticationProvider::Twitter.globally_configured? %>
   <p><%= mt(<<~TEXT, twitter_url: "https://apps.twitter.com/", callback_url: oauth_login_callback_url)
-You will need to [register an application on Twitter](%{twitter_url}).
+You will need to [register an application on X.com](%{twitter_url}).
 You should configure %{callback_url} as the Callback URL.
 After you create your application, make a note of the Consumer Key and Consumer Secret, and enter them here.
 TEXT

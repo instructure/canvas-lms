@@ -1445,6 +1445,9 @@
     "next_40e12421": {
         "message": "Berikutnya"
     },
+    "next_findtext_9d69f0fe": {
+        "message": "{ findText } Selanjutnya"
+    },
     "no_accessibility_issues_were_detected_f8d3c875": {
         "message": "Masalah aksesabilitas tidak terdeteksi."
     },
@@ -1721,6 +1724,9 @@
     "previous_bd2ac015": {
         "message": "Sebelumnya"
     },
+    "previous_findtext_8dfbfd30": {
+        "message": "{ findText } Sebelumnya"
+    },
     "prime_917ea60e": {
         "message": "Prima"
     },
@@ -1796,11 +1802,23 @@
     "replace_all_d3d68b3": {
         "message": "Ganti Semua"
     },
+    "replace_all_findtext_with_replacetext_da574b32": {
+        "message": "Ganti semua { findText } dengan { replaceText }"
+    },
     "replace_e61834a7": {
         "message": "Ganti"
     },
+    "replace_findtext_with_replacetext_7b5c7fb3": {
+        "message": "Ganti { findText } dengan { replaceText }"
+    },
     "replace_with_eeff01ad": {
         "message": "Ganti dengan"
+    },
+    "replaced_alertfindtext_with_alertreplacetext_de5c1795": {
+        "message": "Mengganti { alertFindText } dengan { alertReplaceText }"
+    },
+    "replaced_all_alertfindtext_with_alertreplacetext_83fdfe59": {
+        "message": "Mengganti semua { alertFindText } dengan { alertReplaceText }"
     },
     "reset_95a81614": {
         "message": "Atur Ulang"

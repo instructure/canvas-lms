@@ -143,10 +143,10 @@ class Lti::ToolConfigurationsApiController < ApplicationController
   #
   # @returns ToolConfiguration
   def show
-    if developer_key.lti_registration.present?
+    if developer_key.ims_registration.present?
       render json: ({
         tool_configuration: {
-          settings: developer_key.lti_registration.canvas_configuration
+          settings: developer_key.ims_registration.canvas_configuration
         }
       })
     else

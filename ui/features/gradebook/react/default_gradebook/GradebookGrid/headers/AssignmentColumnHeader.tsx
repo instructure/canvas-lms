@@ -33,6 +33,7 @@ import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
 import type {CamelizedAssignment, PartialStudent} from '@canvas/grading/grading.d'
 import {showMessageStudentsWithObserversModal} from '../../../shared/MessageStudentsWithObserversModal'
+import {MSWLaunchContext} from '@canvas/message-students-dialog/react/MessageStudentsWhoDialog'
 
 const {Separator: MenuSeparator, Item: MenuItem, Group: MenuGroup} = Menu as any
 
@@ -236,6 +237,7 @@ export default class AssignmentColumnHeader extends ColumnHeader<
     if (this.props.showMessageStudentsWithObserversDialog) {
       const props = {
         assignment: options.assignment,
+        launchContext: MSWLaunchContext.ASSIGNMENT_CONTEXT,
         students: options.students,
         courseId: options.assignment.courseId,
         onClose: () => {},

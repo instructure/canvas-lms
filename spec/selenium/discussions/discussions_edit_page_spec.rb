@@ -20,6 +20,9 @@
 require_relative "../helpers/discussions_common"
 require_relative "../helpers/items_assign_to_tray"
 require_relative "../helpers/context_modules_common"
+require_relative "../../helpers/k5_common"
+require_relative "../dashboard/pages/k5_important_dates_section_page"
+require_relative "../dashboard/pages/k5_dashboard_common_page"
 require_relative "../common"
 require_relative "pages/discussion_page"
 require_relative "../assignments/page_objects/assignment_create_edit_page"
@@ -29,6 +32,9 @@ describe "discussions" do
   include DiscussionsCommon
   include ItemsAssignToTray
   include ContextModulesCommon
+  include K5DashboardCommonPageObject
+  include K5Common
+  include K5ImportantDatesSectionPageObject
 
   let(:course) { course_model.tap(&:offer!) }
   let(:teacher) { teacher_in_course(course:, name: "teacher", active_all: true).user }
@@ -833,7 +839,6 @@ describe "discussions" do
         end
 
         it "allows settings a graded discussion to an ungraded discussion" do
-          skip("VICE-4225")
           graded_discussion = create_graded_discussion(course)
           get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/edit"
 
@@ -1196,6 +1201,63 @@ describe "discussions" do
             expect(f("body")).not_to contain_jqcss(inherited_from_selector)
           end
 
+          it "displays module and course overrides correctly" do
+            graded_discussion = create_graded_discussion(course)
+            module1 = course.context_modules.create!(name: "Module 1")
+            graded_discussion.context_module_tags.create! context_module: module1, context: course, tag_type: "context_module"
+
+            override = module1.assignment_overrides.create!
+            override.assignment_override_students.create!(user: @student1)
+            graded_discussion.assignment.assignment_overrides.create!(set: course, due_at: 1.day.from_now)
+
+            # Open page and assignTo tray
+            get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/edit"
+            Discussion.assign_to_button.click
+            wait_for_assign_to_tray_spinner
+
+            # Verify that Everyone tag does not appear
+            expect(module_item_assign_to_card.count).to eq 2
+            expect(module_item_assign_to_card[0].find_all(assignee_selected_option_selector).map(&:text)).to eq ["Everyone else"]
+            expect(module_item_assign_to_card[1].find_all(assignee_selected_option_selector).map(&:text)).to eq ["User"]
+            expect(inherited_from.last.text).to eq("Inherited from #{module1.name}")
+          end
+
+          it "creates a course override if everyone is added with a module override" do
+            graded_discussion = create_graded_discussion(course)
+            module1 = course.context_modules.create!(name: "Module 1")
+            graded_discussion.context_module_tags.create! context_module: module1, context: course, tag_type: "context_module"
+
+            override = module1.assignment_overrides.create!
+            override.assignment_override_students.create!(user: @student1)
+
+            # Open page and assignTo tray
+            get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/edit"
+            Discussion.assign_to_button.click
+            wait_for_assign_to_tray_spinner
+
+            # Verify the module override is shown
+            expect(module_item_assign_to_card.count).to eq 1
+            expect(module_item_assign_to_card[0].find_all(assignee_selected_option_selector).map(&:text)).to eq ["User"]
+            expect(inherited_from.last.text).to eq("Inherited from #{module1.name}")
+
+            click_add_assign_to_card
+            select_module_item_assignee(1, "Everyone else")
+
+            click_save_button("Apply")
+
+            # Save the discussion without changing the inherited module override
+            Discussion.save_button.click
+            Discussion.section_warning_continue_button.click
+            wait_for_ajaximations
+
+            assignment = graded_discussion.assignment
+
+            # Expect the existing override to be the module override
+            expect(assignment.assignment_overrides.active.count).to eq 1
+            expect(assignment.all_assignment_overrides.active.count).to eq 2
+            expect(assignment.assignment_overrides.first.set_type).to eq "Course"
+          end
+
           it "does not create an override if the modules override is not updated" do
             graded_discussion = create_graded_discussion(course)
             module1 = course.context_modules.create!(name: "Module 1")
@@ -1280,6 +1342,36 @@ describe "discussions" do
             # Expect both cards to be there
             Discussion.assign_to_button.click
             expect(module_item_assign_to_card.count).to eq 2
+          end
+
+          it "sets the mark important dates checkbox for discussion edit" do
+            feature_setup
+
+            graded_discussion = create_graded_discussion(course)
+
+            get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/edit"
+
+            Discussion.assign_to_button.click
+            wait_for_assign_to_tray_spinner
+
+            keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+            formatted_date = format_date_for_view(2.days.from_now(Time.zone.now), "%m/%d/%Y")
+            update_due_date(0, formatted_date)
+            update_due_time(0, "5:00 PM")
+
+            click_save_button("Apply")
+
+            expect(mark_important_dates).to be_displayed
+            scroll_to_element(mark_important_dates)
+            click_mark_important_dates
+
+            Discussion.save_button.click
+            wait_for_ajaximations
+
+            assignment = Assignment.last
+
+            expect(assignment.important_dates).to be(true)
           end
         end
 
@@ -1376,7 +1468,6 @@ describe "discussions" do
           end
 
           it "deletes checkpoints if the graded checkbox is unselected on an exisitng discussion with checkpoints" do
-            skip("VICE-4225")
             assignment = Assignment.last
             expect(assignment.sub_assignments.count).to eq 2
 

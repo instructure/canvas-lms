@@ -67,6 +67,7 @@ describe('useGradingSchemeUpdateHook', () => {
       context_name: 'A Course Name',
       context_type: 'Course',
       permissions: {manage: true},
+      workflow_state: 'active',
     }
 
     doFetchApi.mockResolvedValue({
@@ -109,6 +110,7 @@ describe('useGradingSchemeUpdateHook', () => {
       context_name: 'An Account Name',
       context_type: 'Account',
       permissions: {manage: true},
+      workflow_state: 'active',
     }
     doFetchApi.mockResolvedValue({
       response: {ok: true},

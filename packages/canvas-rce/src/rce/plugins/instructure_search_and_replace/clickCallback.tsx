@@ -21,6 +21,7 @@ import ReactDOM from 'react-dom'
 import {Editor} from 'tinymce'
 import FindReplaceController from './components/FindReplaceTrayController'
 import {SearchReplacePlugin} from './types'
+import {getSelectionContext} from './getSelectionContext'
 
 const CONTAINER_ID = 'instructure-find-replace-tray-container'
 
@@ -48,6 +49,11 @@ export default function (editor: Editor, document: Document) {
       onDismiss={handleDismiss}
       initialText={initalSelection}
       undoManager={editor.undoManager}
+      getSelectionContext={() => {
+        const selectedElements = editor.dom.doc.getElementsByClassName('mce-match-marker-selected')
+        if (selectedElements.length > 0) return getSelectionContext(selectedElements)
+        return ['', '']
+      }}
     />,
     container
   )

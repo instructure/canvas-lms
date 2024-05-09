@@ -29,7 +29,7 @@ import DueDateCalendarPicker from '@canvas/due-dates/react/DueDateCalendarPicker
 import '@canvas/datetime/jquery'
 import renderWikiPageTitle from '../../react/renderWikiPageTitle'
 import {renderAssignToTray} from '../../react/renderAssignToTray'
-import { itemTypeToApiURL } from "@canvas/context-modules/differentiated-modules/utils/assignToHelper"
+import {itemTypeToApiURL} from '@canvas/context-modules/differentiated-modules/utils/assignToHelper'
 
 const I18n = useI18nScope('pages')
 
@@ -60,7 +60,7 @@ export default class WikiPageEditView extends ValidatedFormView {
     this.prototype.className = 'form-horizontal edit-form validated-form-view'
     this.prototype.dontRenableAfterSaveSuccess = true
     if (window.ENV.FEATURES?.differentiated_modules) {
-    this.prototype.disablingDfd = new $.Deferred()
+      this.prototype.disablingDfd = new $.Deferred()
     }
     this.optionProperty('wiki_pages_path')
     this.optionProperty('WIKI_RIGHTS')
@@ -71,12 +71,13 @@ export default class WikiPageEditView extends ValidatedFormView {
     super.initialize(...arguments)
     if (!this.WIKI_RIGHTS) this.WIKI_RIGHTS = {}
     if (!this.PAGE_RIGHTS) this.PAGE_RIGHTS = {}
+    this.enableAssignTo = window.ENV.FEATURES?.differentiated_modules && ENV.COURSE_ID != null
     let redirect = () => {
       window.location.href = this.model.get('html_url')
     }
-    let callBack = redirect;
-    if (window.ENV.FEATURES?.differentiated_modules) {
-      callBack = (_args) => this.handleOverridesSave(_args, redirect)
+    let callBack = redirect
+    if (this.enableAssignTo) {
+      callBack = _args => this.handleOverridesSave(_args, redirect)
     }
     this.on('success', callBack)
     this.lockedItems = options.lockedItems || {}
@@ -86,15 +87,15 @@ export default class WikiPageEditView extends ValidatedFormView {
   }
 
   handleOverridesSave(page, redirect) {
-    if(!page.page_id) return;
+    if (!page.page_id) return
     const url = itemTypeToApiURL(ENV.COURSE_ID, 'page', page.page_id)
-    const errorCallBack = () =>{
+    const errorCallBack = () => {
       this.disablingDfd.reject()
-      $.flashError(
-        I18n.t("Oops! We weren't able to save your page. Please try again")
-      )
+      $.flashError(I18n.t("Oops! We weren't able to save your page. Please try again"))
     }
-    $.ajaxJSON(url, 'PUT',JSON.stringify(this.overrides), redirect , errorCallBack, {contentType: 'application/json'})
+    $.ajaxJSON(url, 'PUT', JSON.stringify(this.overrides), redirect, errorCallBack, {
+      contentType: 'application/json',
+    })
   }
 
   toJSON() {
@@ -137,6 +138,7 @@ export default class WikiPageEditView extends ValidatedFormView {
     json.assignment = json.assignment != null ? json.assignment.toView() : undefined
 
     json.content_is_locked = this.lockedItems.content
+    json.differentiated_modules = this.enableAssignTo
 
     return json
   }
@@ -210,14 +212,14 @@ export default class WikiPageEditView extends ValidatedFormView {
       })
     }
 
-    if (window.ENV.FEATURES?.differentiated_modules) {
-    const pageName = this.model.get('title')
-    const pageId = this.model.id
-    const mountElement = document.getElementById('assign-to-mount-point-edit-page')
-    const onSync = (payload) => {
+    if (this.enableAssignTo) {
+      const pageName = this.model.get('title')
+      const pageId = this.model.id
+      const mountElement = document.getElementById('assign-to-mount-point-edit-page')
+      const onSync = payload => {
         this.overrides = payload
-    }
-    renderAssignToTray(mountElement, {pageId, onSync, pageName})
+      }
+      renderAssignToTray(mountElement, {pageId, onSync, pageName})
     }
     if (window.ENV.BLOCK_EDITOR) {
       ReactDOM.render(<BlockEditor />, document.getElementById('block_editor'))
@@ -364,7 +366,7 @@ export default class WikiPageEditView extends ValidatedFormView {
     }
     if (window.block_editor) {
       let blockEditorData
-      await window.block_editor.save().then((outputData) => {
+      await window.block_editor.save().then(outputData => {
         blockEditorData = outputData
       })
       this.blockEditorData = blockEditorData

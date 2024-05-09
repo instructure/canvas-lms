@@ -49,7 +49,7 @@ class AuthenticationProvider < ActiveRecord::Base
     case type_name
     when "cas", "ldap", "saml"
       const_get(type_name.upcase)
-    when "apple", "clever", "facebook", "google", "microsoft", "saml_idp_discovery", "twitter"
+    when "apple", "clever", "facebook", "google", "microsoft", "saml_idp_discovery"
       const_get(type_name.classify)
     when "canvas"
       Canvas
@@ -59,6 +59,8 @@ class AuthenticationProvider < ActiveRecord::Base
       LinkedIn
     when "openid_connect"
       OpenIDConnect
+    when "twitter"
+      Twitter
     else
       super
     end

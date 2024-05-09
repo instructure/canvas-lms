@@ -28,7 +28,7 @@ RSpec.describe DeveloperKeyAccountBindingsController do
   let(:valid_parameters) do
     {
       account_id: root_account.id,
-      developer_key_id: root_account_developer_key.id,
+      developer_key_id: root_account_developer_key.global_id,
       developer_key_account_binding: {
         workflow_state: "on"
       }

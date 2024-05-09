@@ -20,6 +20,7 @@ import React, {useMemo} from 'react'
 import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import MessageStudentsWhoDialog, {
+  MSWLaunchContext,
   type SendMessageArgs,
   type Student,
 } from '@canvas/message-students-dialog/react/MessageStudentsWhoDialog'
@@ -36,6 +37,7 @@ const I18n = useI18nScope('enhanced_individual_gradebook')
 
 type MessageStudentsWhoModalProps = {
   assignment: AssignmentConnection
+  launchContext: MSWLaunchContext
   students: SortableStudent[]
   submissions: SubmissionConnection[]
   gradebookOptions: GradebookOptions
@@ -44,6 +46,7 @@ type MessageStudentsWhoModalProps = {
 }
 export default function MessageStudentsWhoModal({
   assignment,
+  launchContext,
   gradebookOptions,
   students,
   submissions,
@@ -112,6 +115,7 @@ export default function MessageStudentsWhoModal({
   return (
     <MessageStudentsWhoDialog
       assignment={messageWhoAssignment}
+      launchContext={launchContext}
       students={studentsWithSubmissionDetails}
       onClose={onClose}
       onSend={onSendMessage}

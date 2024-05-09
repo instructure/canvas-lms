@@ -36,6 +36,95 @@ export const setGradebookOptions = (gradebookOptions = {}) => {
 const GRADEBOOK_QUERY_MOCK_RESPONSE = {
   data: {
     course: {
+      rootOutcomeGroup: {
+        outcomes: {
+          nodes: [
+            {
+              id: '1',
+              assessd: false,
+              calculationInt: 65,
+              calculationMethod: 'decaying_average',
+              description: 'This is a test outcome',
+              displayName: 'Test Outcome',
+              masteryPoints: 3,
+              pointsPossible: 5,
+              title: 'JPLO',
+              ratings: [
+                {
+                  color: null,
+                  description: 'Excellent',
+                  mastery: false,
+                  points: 5,
+                },
+                {
+                  color: null,
+                  description: 'Very good',
+                  mastery: false,
+                  points: 4,
+                },
+                {
+                  color: null,
+                  description: 'Meets Expectations',
+                  mastery: false,
+                  points: 3,
+                },
+                {
+                  color: null,
+                  description: 'Does Not Meet Expectations',
+                  mastery: false,
+                  points: 0,
+                },
+              ],
+            },
+            {
+              id: '2',
+              calculationMethod: 'decaying_average',
+              calculationInt: 65,
+              assessed: false,
+              canEdit: true,
+              contextId: '1',
+              contextType: 'Course',
+              createdAt: '2024-02-26T15:46:19-07:00',
+              displayName: 'Algorithm',
+              masteryPoints: 8,
+              pointsPossible: 15,
+              ratings: [
+                {
+                  color: null,
+                  description: 'Know everything',
+                  mastery: false,
+                  points: 15,
+                },
+                {
+                  color: null,
+                  description: 'Knows almost everything',
+                  mastery: false,
+                  points: 10,
+                },
+                {
+                  color: null,
+                  description: 'Knows things',
+                  mastery: false,
+                  points: 8,
+                },
+                {
+                  color: null,
+                  description: 'Knows something',
+                  mastery: false,
+                  points: 4,
+                },
+                {
+                  color: null,
+                  description: 'Does Not Meet Expectations',
+                  mastery: false,
+                  points: 0,
+                },
+              ],
+              title: 'MATH.ALGO',
+            },
+          ],
+        },
+      },
       assignmentGroupsConnection: {
         nodes: [
           {
@@ -233,3 +322,29 @@ export const defaultGradebookOptions: GradebookOptions = {
   gradingStandardPointsBased: false,
   proxySubmissionEnabled: false,
 }
+
+export const OUTCOME_ROLLUP_QUERY_RESPONSE = [
+  {
+    links: {user: '5', section: '1', status: 'active'},
+    scores: [
+      {links: {outcome_id: '1'}, score: 5},
+      {links: {outcome_id: '2'}, score: 0},
+      {links: {outcome_id: '3'}, score: 4},
+    ],
+  },
+  {
+    links: {user: '4', section: '1', status: 'active'},
+    scores: [
+      {links: {outcome_id: '1'}, score: 0},
+      {links: {outcome_id: '2'}, score: 5},
+    ],
+  },
+  {
+    links: {user: '2', section: '1', status: 'active'},
+    scores: [
+      {links: {outcome_id: '1'}, score: 5},
+      {links: {outcome_id: '2'}, score: 4},
+      {links: {outcome_id: '3'}, score: 5},
+    ],
+  },
+]

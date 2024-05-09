@@ -20,12 +20,14 @@ import {Discussion} from '../../../graphql/Discussion'
 import {DiscussionPostToolbar} from '../../components/DiscussionPostToolbar/DiscussionPostToolbar'
 import PropTypes from 'prop-types'
 import React, {useContext, useEffect, useState} from 'react'
-import {SEARCH_TERM_DEBOUNCE_DELAY, SearchContext} from '../../utils/constants'
+import {DiscussionManagerUtilityContext, SEARCH_TERM_DEBOUNCE_DELAY, SearchContext} from '../../utils/constants'
 import {View} from '@instructure/ui-view'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import { TranslationControls } from '../../components/TranslationControls/TranslationControls'
 
 export const DiscussionTopicToolbarContainer = props => {
   const {searchTerm, filter, sort, setSearchTerm, setFilter, setSort} = useContext(SearchContext)
+  const {showTranslationControl} = useContext(DiscussionManagerUtilityContext);
   const [currentSearchValue, setCurrentSearchValue] = useState(searchTerm || '')
 
   useEffect(() => {
@@ -88,7 +90,9 @@ export const DiscussionTopicToolbarContainer = props => {
         pointsPossible={props.discussionTopic.assignment?.pointsPossible}
         isAnnouncement={props.discussionTopic.isAnnouncement}
         isGraded={props.discussionTopic.assignment !== null}
+        contextType={props.discussionTopic.contextType}
       />
+      {showTranslationControl && <TranslationControls />}
     </View>
   )
 }

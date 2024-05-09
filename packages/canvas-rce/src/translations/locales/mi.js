@@ -675,6 +675,7 @@ const locale = {
   "nested_less_than_27d17e58": { "message": "Kohanga Iti I Te" },
   "new_quiz_34aacba6": { "message": "Quiz Hou" },
   "next_40e12421": { "message": "E haere ake nei" },
+  "next_findtext_9d69f0fe": { "message": "Tō muri mai { findText }" },
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "Kaore he whakaurunga take i kitea."
   },
@@ -805,6 +806,7 @@ const locale = {
   "preview_in_overlay_ed772c46": { "message": "Arokite i roto i paparua" },
   "preview_inline_9787330": { "message": "Arokite i roto i te raina" },
   "previous_bd2ac015": { "message": "Ō muri" },
+  "previous_findtext_8dfbfd30": { "message": "Mua { findText }" },
   "prime_917ea60e": { "message": "Pirimia" },
   "prime_numbers_13464f61": { "message": "Nga Nama Pirimia" },
   "product_39cf144f": { "message": "Hua" },
@@ -834,8 +836,20 @@ const locale = {
   "remove_heading_style_5fdc8855": { "message": "Tango pane kāhua" },
   "remove_link_d1f2f4d0": { "message": "Tango Hononga" },
   "replace_all_d3d68b3": { "message": "Whakakapi Katoa" },
+  "replace_all_findtext_with_replacetext_da574b32": {
+    "message": "Whakakapi katoa { findText } me { replaceText }"
+  },
   "replace_e61834a7": { "message": "Whakakapi" },
+  "replace_findtext_with_replacetext_7b5c7fb3": {
+    "message": "Whakakapi { findText } me { replaceText }"
+  },
   "replace_with_eeff01ad": { "message": "Whakakapi me" },
+  "replaced_alertfindtext_with_alertreplacetext_de5c1795": {
+    "message": "Kua whakakapia { alertFindText } me { alertReplaceText }"
+  },
+  "replaced_all_alertfindtext_with_alertreplacetext_83fdfe59": {
+    "message": "I whakakapi katoa { alertFindText } me { alertReplaceText }"
+  },
   "reset_95a81614": { "message": "Tautuhi anō" },
   "resize_ec83d538": { "message": "Rahi anō" },
   "restore_auto_save_deccd84b": { "message": "Whakaora tiaki aunoa?" },

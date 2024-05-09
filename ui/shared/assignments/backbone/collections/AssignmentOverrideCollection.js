@@ -34,6 +34,7 @@ function AssignmentOverrideCollection() {
   this.containsDefaultDueDate = this.containsDefaultDueDate.bind(this)
   this.getDefaultDueDate = this.getDefaultDueDate.bind(this)
   this.courseSectionIDs = this.courseSectionIDs.bind(this)
+  this.courseIDs = this.courseIDs.bind(this)
   return AssignmentOverrideCollection.__super__.constructor.apply(this, arguments)
 }
 
@@ -41,6 +42,10 @@ AssignmentOverrideCollection.prototype.model = AssignmentOverride
 
 AssignmentOverrideCollection.prototype.courseSectionIDs = function () {
   return this.pluck('course_section_id')
+}
+
+AssignmentOverrideCollection.prototype.courseIDs = function () {
+  return this.pluck('course_id')
 }
 
 AssignmentOverrideCollection.prototype.comparator = function (override) {

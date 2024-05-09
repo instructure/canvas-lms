@@ -298,7 +298,7 @@ export function TempEnrollAssign(props: Props) {
           path: `/api/v1/users/${userProps.id}/courses`,
           params: {
             enrollment_state: 'active',
-            include: ['sections'],
+            include: ['sections', 'term'],
             per_page: MAX_ALLOWED_COURSES_PER_PAGE,
             ...(ENV.ACCOUNT_ID !== ENV.ROOT_ACCOUNT_ID && {account_id: ENV.ACCOUNT_ID}),
           },

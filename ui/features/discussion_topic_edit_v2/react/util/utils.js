@@ -65,6 +65,7 @@ export const addNewGroupCategoryToCache = (cache, newCategory) => {
 const getAssetCode = (assetType, assetId) => {
   if (assetType === ASSIGNMENT_OVERRIDE_GRAPHQL_TYPENAMES.SECTION)
     return `course_section_${assetId}`
+  if (assetType === ASSIGNMENT_OVERRIDE_GRAPHQL_TYPENAMES.COURSE) return `course_${assetId}`
   if (assetType === ASSIGNMENT_OVERRIDE_GRAPHQL_TYPENAMES.GROUP) return `group_${assetId}`
   return masteryPathsOption.assetCode
 }
@@ -104,8 +105,12 @@ export const buildAssignmentOverrides = assignment => {
       }),
     })) || []
 
+  const hasCourseOverride = overrides.some(obj =>
+    obj.assignedList.some(item => item.includes('course') && !item.includes('section'))
+  )
   // When this is true, then we do not have a everyone/everyone else option
-  if (assignment.onlyVisibleToOverrides || !assignment.visibleToEveryone) return overrides
+  if (assignment.onlyVisibleToOverrides || !assignment.visibleToEveryone || hasCourseOverride)
+    return overrides
 
   overrides.push({
     dueDateId: nanoid(),

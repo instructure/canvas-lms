@@ -42,7 +42,7 @@ export default class DialogManager {
     }
     this.dialog.text(I18n.t('messages.loading', 'Loading...'))
     this.dialog.dialog({
-      title: I18n.t('titles.record_upload_media_comment', 'Record/Upload Media Comment'),
+      title: I18n.t('Studio Capture'),
       resizable: false,
       width: 470,
       height: 300,
@@ -65,7 +65,7 @@ export default class DialogManager {
 
   showUpdateDialog() {
     return this.dialog.dialog({
-      title: I18n.t('titles.record_upload_media_comment', 'Record/Upload Media Comment'),
+      title: I18n.t('Studio Capture'),
       width: 650,
       height: 550,
       modal: true,

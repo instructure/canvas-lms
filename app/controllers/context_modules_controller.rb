@@ -47,7 +47,7 @@ class ContextModulesController < ApplicationController
 
     def modules_cache_key
       @modules_cache_key ||= begin
-        visible_assignments = @current_user.try(:assignment_and_quiz_visibilities, @context)
+        visible_assignments = @current_user.try(:learning_object_visibilities, @context)
         cache_key_items = [@context.cache_key,
                            @can_view,
                            @can_add,

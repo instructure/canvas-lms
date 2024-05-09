@@ -26,6 +26,7 @@ type FindReplaceTrayControllerProps = {
   onDismiss: () => void
   initialText?: string
   undoManager?: UndoManager
+  getSelectionContext: () => string[]
 }
 
 export default function FindReplaceTrayController({
@@ -33,10 +34,17 @@ export default function FindReplaceTrayController({
   onDismiss,
   initialText = '',
   undoManager,
+  getSelectionContext,
 }: FindReplaceTrayControllerProps) {
   // this component really just exists to make the index easier to track
   const [findIndex, setFindIndex] = useState(0)
   const [findCount, setFindCount] = useState(0)
+  const [selectionContext, setSelectionContext] = useState<string[]>(['', ''])
+
+  const updateSelectionContext = () => {
+    const srText = getSelectionContext()
+    setSelectionContext(srText)
+  }
 
   const newFindIndex = (direction: 1 | -1) => {
     let newIndex = 0
@@ -60,6 +68,7 @@ export default function FindReplaceTrayController({
     plugin.done(false)
     setFindCount(0)
     setFindIndex(0)
+    setSelectionContext([])
   }
 
   const handleDismiss = () => {
@@ -70,11 +79,13 @@ export default function FindReplaceTrayController({
   const handleNext = () => {
     plugin.next()
     setFindIndex(newFindIndex(1))
+    updateSelectionContext()
   }
 
   const handlePrevious = () => {
     plugin.prev()
     setFindIndex(newFindIndex(-1))
+    updateSelectionContext()
   }
 
   const handleFind = (text: string) => {
@@ -85,6 +96,7 @@ export default function FindReplaceTrayController({
       setFindCount(count)
       const index = count ? 1 : 0
       setFindIndex(index)
+      updateSelectionContext()
     }
   }
 
@@ -106,6 +118,7 @@ export default function FindReplaceTrayController({
     }
     setFindCount(newFindCount)
     setFindIndex(newIndex)
+    updateSelectionContext()
   }
 
   return (
@@ -118,6 +131,7 @@ export default function FindReplaceTrayController({
       index={findIndex}
       max={findCount}
       initialText={initialText}
+      selectionContext={selectionContext}
     />
   )
 }

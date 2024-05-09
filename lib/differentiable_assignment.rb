@@ -19,26 +19,17 @@
 
 module DifferentiableAssignment
   def differentiated_assignments_applies?
-    if is_a?(AbstractAssignment) || Quizzes::Quiz.class_names.include?(class_name) || is_a?(ContextModule)
-      only_visible_to_overrides
-    elsif respond_to? :assignment
-      assignment.only_visible_to_overrides
-    else
-      false
-    end
+    differentiable.only_visible_to_overrides
   end
 
-  def visible_to_user?(user, opts = {})
-    # slightly redundant conditional, but avoiding unnecessary lookups
-    return true if opts[:differentiated_assignments] == false ||
-                   (opts[:differentiated_assignments] == true && !only_visible_to_overrides) ||
-                   !differentiated_assignments_applies? # checks if DA enabled on course and then only_visible_to_overrides
+  def visible_to_user?(user)
+    return true unless differentiated_assignments_applies?
 
     is_visible = false
     Shard.with_each_shard(user.associated_shards) do
-      visible_instances = DifferentiableAssignment.filter([self], user, context) do |_, user_ids|
+      visible_instances = DifferentiableAssignment.filter([differentiable], user, context) do |_, user_ids|
         conditions = { user_id: user_ids }
-        conditions[column_name] = id
+        conditions[column_name] = differentiable.id
         visibility_view.where(conditions)
       end
       is_visible = true if visible_instances.any?
@@ -46,23 +37,39 @@ module DifferentiableAssignment
     is_visible
   end
 
+  def differentiable
+    if (is_a?(WikiPage) || is_a?(DiscussionTopic)) && assignment.present?
+      assignment
+    else
+      self
+    end
+  end
+
   def visibility_view
-    case class_name
+    case differentiable.class_name
     when "Assignment"
       AssignmentStudentVisibility
     when "ContextModule"
       ModuleStudentVisibility
+    when "WikiPage"
+      WikiPageStudentVisibility
+    when "DiscussionTopic"
+      UngradedDiscussionStudentVisibility
     else
       Quizzes::QuizStudentVisibility
     end
   end
 
   def column_name
-    case class_name
+    case differentiable.class_name
     when "Assignment"
       :assignment_id
     when "ContextModule"
       :context_module_id
+    when "WikiPage"
+      :wiki_page_id
+    when "DiscussionTopic"
+      :discussion_topic_id
     else
       :quiz_id
     end

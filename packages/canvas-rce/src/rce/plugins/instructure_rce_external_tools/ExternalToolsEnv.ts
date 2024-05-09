@@ -77,6 +77,7 @@ export interface ExternalToolsEnv {
   editorContent: string | null
 
   insertCode(code: string)
+  replaceCode(code: string)
 }
 
 /**
@@ -186,6 +187,10 @@ export function externalToolsEnvFor(
 
     insertCode(code: string) {
       this.rceWrapper?.insertCode(code)
+    },
+
+    replaceCode(code: string) {
+      this.rceWrapper?.replaceCode(code)
     },
   }
 }

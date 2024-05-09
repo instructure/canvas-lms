@@ -86,6 +86,108 @@ describe "Importers::QuizImporter" do
         end
       end
     end
+
+    context "common_cartridge_qti_new_quizzes_import" do
+      let :context do
+        course_model
+      end
+
+      let :question_data do
+        import_example_questions
+      end
+
+      let :data do
+        data = get_import_data ["vista", "quiz"], "simple_quiz_data"
+        data[:assignment] = {}
+        data
+      end
+
+      before do
+        allow_any_instance_of(ContentMigration)
+          .to receive(:for_common_cartridge?)
+          .and_return(true)
+      end
+
+      context "FF is enabled" do
+        before do
+          allow(NewQuizzesFeaturesHelper)
+            .to receive(:common_cartridge_qti_new_quizzes_import_enabled?)
+            .with(instance_of(Course))
+            .and_return(true)
+        end
+
+        it "marks the assignment as ready to migrate when qti_new_quiz" do
+          data[:qti_new_quiz] = true
+
+          Importers::QuizImporter.import_from_migration(data, context, @migration, question_data)
+          quiz = Quizzes::Quiz.where(migration_id: data[:migration_id]).first
+
+          expect(quiz.assignment.settings["common_cartridge_import"]["migrate_to_quizzes_next"]).to be true
+        end
+
+        it "leaves the assignment.settings as nil when not qti_new_quiz" do
+          Importers::QuizImporter.import_from_migration(data, context, @migration, question_data)
+          quiz = Quizzes::Quiz.where(migration_id: data[:migration_id]).first
+
+          expect(quiz.assignment.settings).to be_nil
+        end
+
+        context "is import_quizzes_next" do
+          before do
+            allow(@migration)
+              .to receive(:migration_settings)
+              .and_return({ import_quizzes_next: true })
+          end
+
+          it "marks the assignment as ready to migrate" do
+            Importers::QuizImporter.import_from_migration(data, context, @migration, question_data)
+            quiz = Quizzes::Quiz.where(migration_id: data[:migration_id]).first
+
+            expect(quiz.assignment.settings["common_cartridge_import"]["migrate_to_quizzes_next"]).to be true
+          end
+        end
+      end
+
+      context "FF is disabled" do
+        before do
+          allow(NewQuizzesFeaturesHelper)
+            .to receive(:common_cartridge_qti_new_quizzes_import_enabled?)
+            .with(instance_of(Course))
+            .and_return(false)
+        end
+
+        it "does not mark the assignment as ready to migrate when qti_new_quiz" do
+          data[:qti_new_quiz] = true
+
+          Importers::QuizImporter.import_from_migration(data, context, @migration, question_data)
+          quiz = Quizzes::Quiz.where(migration_id: data[:migration_id]).first
+
+          expect(quiz.assignment.settings).to be_nil
+        end
+
+        it "leaves the assignment.settings as nil when not qti_new_quiz" do
+          Importers::QuizImporter.import_from_migration(data, context, @migration, question_data)
+          quiz = Quizzes::Quiz.where(migration_id: data[:migration_id]).first
+
+          expect(quiz.assignment.settings).to be_nil
+        end
+
+        context "is import_quizzes_next" do
+          before do
+            allow(@migration)
+              .to receive(:migration_settings)
+              .and_return({ import_quizzes_next: true })
+          end
+
+          it "marks the assignment as ready to migrate" do
+            Importers::QuizImporter.import_from_migration(data, context, @migration, question_data)
+            quiz = Quizzes::Quiz.where(migration_id: data[:migration_id]).first
+
+            expect(quiz.assignment.settings).to be_nil
+          end
+        end
+      end
+    end
   end
 
   it "completes a quiz question reference" do

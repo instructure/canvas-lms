@@ -675,6 +675,9 @@
   "nested_less_than_27d17e58": { "message": "Signe inférieur imbriqué" },
   "new_quiz_34aacba6": { "message": "Nouveau questionnaire" },
   "next_40e12421": { "message": "Suivant" },
+  "next_findtext_9d69f0fe": {
+    "message": "Occurrence suivante de { findText }"
+  },
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "Aucun problème d''accessibilité n’a été détecté."
   },
@@ -811,6 +814,9 @@
   "preview_in_overlay_ed772c46": { "message": "Aperçu en superposition" },
   "preview_inline_9787330": { "message": "Aperçu incorporé" },
   "previous_bd2ac015": { "message": "Précédent" },
+  "previous_findtext_8dfbfd30": {
+    "message": "Occurrence précédente de { findText }"
+  },
   "prime_917ea60e": { "message": "Prime" },
   "prime_numbers_13464f61": { "message": "Nombres premiers" },
   "product_39cf144f": { "message": "Produit" },
@@ -844,8 +850,20 @@
   },
   "remove_link_d1f2f4d0": { "message": "Supprimer lien" },
   "replace_all_d3d68b3": { "message": "Tout remplacer" },
+  "replace_all_findtext_with_replacetext_da574b32": {
+    "message": "Remplacer toutes les occurrences de { findText } par { replaceText }"
+  },
   "replace_e61834a7": { "message": "Remplacer" },
+  "replace_findtext_with_replacetext_7b5c7fb3": {
+    "message": "Remplacer { findText } par { replaceText }"
+  },
   "replace_with_eeff01ad": { "message": "Remplacer par" },
+  "replaced_alertfindtext_with_alertreplacetext_de5c1795": {
+    "message": "Remplacement de { alertFindText } par { alertReplaceText }"
+  },
+  "replaced_all_alertfindtext_with_alertreplacetext_83fdfe59": {
+    "message": "Remplacement de toutes les occurrences de { alertFindText } par { alertReplaceText }"
+  },
   "reset_95a81614": { "message": "Réinitialiser" },
   "resize_ec83d538": { "message": "Redimensionner" },
   "restore_auto_save_deccd84b": {

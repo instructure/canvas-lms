@@ -246,7 +246,7 @@ class AuthenticationProvidersController < ApplicationController
   #
   # Add external authentication provider(s) for the account.
   # Services may be Apple, CAS, Facebook, GitHub, Google, LDAP, LinkedIn,
-  # Microsoft, OpenID Connect, SAML, or Twitter.
+  # Microsoft, OpenID Connect, SAML, or X.com.
   #
   # Each authentication provider is specified as a set of parameters as
   # described below. A provider specification must include an 'auth_type'
@@ -605,15 +605,15 @@ class AuthenticationProvidersController < ApplicationController
   #
   #   See FederatedAttributesConfig. Any value is allowed for the provider attribute names.
   #
-  # For Twitter, the additional recognized parameters are:
+  # For X.com, the additional recognized parameters are:
   #
   # - consumer_key [Required]
   #
-  #   The Twitter Consumer Key. Not available if configured globally for Canvas.
+  #   The X.com Consumer Key. Not available if configured globally for Canvas.
   #
   # - consumer_secret [Required]
   #
-  #   The Twitter Consumer Secret. Not available if configured globally for Canvas.
+  #   The X.com Consumer Secret. Not available if configured globally for Canvas.
   #
   # - login_attribute [Optional]
   #

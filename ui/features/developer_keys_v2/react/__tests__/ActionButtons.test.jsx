@@ -17,13 +17,10 @@
  */
 
 import React from 'react'
-import {mount} from 'enzyme'
-
-import {IconEditLine, IconEyeLine} from '@instructure/ui-icons'
-
+import {render, fireEvent} from '@testing-library/react'
 import ActionButtons from '../ActionButtons'
 
-const props = ({
+const defaultProps = ({
   showVisibilityToggle = true,
   developerKey = {
     id: '1',
@@ -48,75 +45,76 @@ const props = ({
   }
 }
 
-it('renders visibility icon for Site Admin', () => {
-  const wrapper = mount(<ActionButtons {...props()} />)
-  expect(wrapper.find(IconEyeLine).exists()).toBe(true)
-})
+const renderActionButtons = props => render(<ActionButtons {...defaultProps(props)} />)
 
-it('does not render visibility icon for root account', () => {
-  const wrapper = mount(<ActionButtons {...props({showVisibilityToggle: false})} />)
-  expect(wrapper.find(IconEyeLine).exists()).toBe(false)
-})
+describe('ActionButtons', () => {
+  it('renders visibility icon for Site Admin', () => {
+    const {getByText} = renderActionButtons()
 
-it('renders edit button for non lti keys', () => {
-  const wrapper = mount(<ActionButtons {...props()} />)
-  expect(wrapper.find(IconEditLine).exists()).toBe(true)
-})
+    expect(getByText('Make key Unnamed Tool invisible')).toBeInTheDocument()
+  })
 
-it('renders edit button for lti registration keys', () => {
-  const wrapper = mount(
-    <ActionButtons
-      {...props({
-        developerKey: {
-          id: '1',
-          api_key: 'test',
-          created_at: 'test',
-          is_lti_key: true,
-          is_lti_registration: true,
-          ltiRegistration: {},
-        },
-      })}
-    />
-  )
-  expect(wrapper.find(IconEditLine).exists()).toBe(true)
-  expect(wrapper.find('a').prop('href')).toBe('/accounts/2/developer_keys/1')
-})
+  it('does not render visibility icon for root account', () => {
+    const {container} = renderActionButtons({showVisibilityToggle: false})
 
-it('renders edit button for lti keys', () => {
-  const wrapper = mount(
-    <ActionButtons
-      {...props({
-        developerKey: {
-          id: '1',
-          api_key: 'test',
-          created_at: 'test',
-          is_lti_key: true,
-        },
-      })}
-    />
-  )
-  expect(wrapper.find(IconEditLine).exists()).toBe(true)
-})
+    expect(container).not.toHaveTextContent('Make key Unnamed Tool invisible')
+  })
 
-it('warns the user when deleting a LTI key', () => {
-  const oldConfirm = window.confirm
-  const wrapper = mount(
-    <ActionButtons
-      {...props({
-        developerKey: {
-          id: '1',
-          api_key: 'test',
-          created_at: 'test',
-          is_lti_key: true,
-        },
-      })}
-    />
-  )
+  it('renders edit button for non lti keys', () => {
+    const {container} = renderActionButtons()
 
-  window.confirm = jest.fn()
-  wrapper.find('IconButton').at(4).simulate('click')
-  expect(window.confirm).toHaveBeenCalledWith(
-    'Are you sure you want to delete this developer key? This action will also delete all tools associated with the developer key in this context.'
-  )
-  window.confirm = oldConfirm
+    expect(container).toHaveTextContent('Edit key Unnamed Tool')
+  })
+
+  it('renders edit button for lti registration keys', () => {
+    const {getByText} = renderActionButtons({
+      developerKey: {
+        id: '1',
+        api_key: 'test',
+        created_at: 'test',
+        is_lti_key: true,
+        is_lti_registration: true,
+        ltiRegistration: {},
+      },
+    })
+    const editButton = getByText('Edit key Unnamed Tool')
+
+    expect(editButton).toBeInTheDocument()
+    expect(editButton.closest('a').href).toContain('/accounts/2/developer_keys/1')
+  })
+
+  it('renders edit button for lti keys', () => {
+    const {container} = renderActionButtons({
+      developerKey: {
+        id: '1',
+        api_key: 'test',
+        created_at: 'test',
+        is_lti_key: true,
+      },
+    })
+
+    expect(container.querySelector('#edit-developer-key-button')).toBeInTheDocument()
+  })
+
+  it('warns the user when deleting a LTI key', () => {
+    const oldConfirm = window.confirm
+    window.confirm = jest.fn()
+
+    const {getByText} = renderActionButtons({
+      developerKey: {
+        id: '1',
+        api_key: 'test',
+        created_at: 'test',
+        is_lti_key: true,
+      },
+    })
+
+    fireEvent.click(getByText('Delete key Unnamed Tool'))
+
+    expect(window.confirm).toHaveBeenCalledWith(
+      'Are you sure you want to delete this developer key? This action will also delete all tools associated with the developer key in this context.'
+    )
+
+    window.confirm = oldConfirm
+  })
 })

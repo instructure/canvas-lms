@@ -702,6 +702,7 @@ const locale = {
   "nested_less_than_27d17e58": { "message": "Estructura imbricada inferior a" },
   "new_quiz_34aacba6": { "message": "Prova nova" },
   "next_40e12421": { "message": "Següent" },
+  "next_findtext_9d69f0fe": { "message": "Següent { findText }" },
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "No s’ha detectat cap problema d’accessibilitat."
   },
@@ -842,6 +843,7 @@ const locale = {
   },
   "preview_inline_9787330": { "message": "Visualització prèvia en línia" },
   "previous_bd2ac015": { "message": "Anterior" },
+  "previous_findtext_8dfbfd30": { "message": "{ findText } anterior" },
   "prime_917ea60e": { "message": "Primer" },
   "prime_numbers_13464f61": { "message": "Números primers" },
   "product_39cf144f": { "message": "Producte" },
@@ -875,8 +877,20 @@ const locale = {
   },
   "remove_link_d1f2f4d0": { "message": "Elimina l''enllaç" },
   "replace_all_d3d68b3": { "message": "Substitueixo-ho tot" },
+  "replace_all_findtext_with_replacetext_da574b32": {
+    "message": "Substitueix tot { findText } amb { replaceText }"
+  },
   "replace_e61834a7": { "message": "Substitueix" },
+  "replace_findtext_with_replacetext_7b5c7fb3": {
+    "message": "Substitueix { findText } amb { replaceText }"
+  },
   "replace_with_eeff01ad": { "message": "Substitueixo-ho per" },
+  "replaced_alertfindtext_with_alertreplacetext_de5c1795": {
+    "message": "S’ha substituït { alertFindText } amb { alertReplaceText }"
+  },
+  "replaced_all_alertfindtext_with_alertreplacetext_83fdfe59": {
+    "message": "S’ha substituït tot { alertFindText } amb { alertReplaceText }"
+  },
   "reset_95a81614": { "message": "Restableix" },
   "resize_ec83d538": { "message": "Canvia la mida" },
   "restore_auto_save_deccd84b": {

@@ -41,7 +41,7 @@
 
 import $ from 'jquery'
 import 'jquery-migrate'
-import assignmentRubricDialog from 'ui/features/discussion_topic/jquery/assignmentRubricDialog'
+import assignmentRubricDialog from '@canvas/discussions/jquery/assignmentRubricDialog'
 
 QUnit.module('assignmentRubricDialog')
 

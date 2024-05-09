@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {mount} from 'enzyme'
+import {render, screen, fireEvent} from '@testing-library/react'
 import ScopesGroup from '../ScopesGroup'
 
 const scopes = [
@@ -35,7 +35,7 @@ const scopes = [
   },
 ]
 
-const props = {
+const baseProps = {
   setSelectedScopes: jest.fn(),
   setReadOnlySelected: jest.fn(),
   selectedScopes: [scopes[0].scope],
@@ -43,42 +43,59 @@ const props = {
   name: 'Cool Scope Group',
 }
 
-it("adds all scopes to 'selected scopes' when the checkbox is checked", () => {
-  const wrapper = mount(<ScopesGroup {...props} />)
-  const checkBox = wrapper.find('input[type="checkbox"]')
-  checkBox.simulate('change', {target: {checked: true}})
-  expect(props.setSelectedScopes).toHaveBeenCalled()
+const defaultProps = props => ({
+  ...baseProps,
+  ...props,
 })
 
-it("removes all scopes from 'selected scopes' when the checbox is unchecked", () => {
-  const wrapper = mount(<ScopesGroup {...props} />)
-  const checkBox = wrapper.find('input[type="checkbox"]')
-  checkBox.simulate('change', {target: {checked: true}})
-  checkBox.simulate('change', {target: {checked: false}})
-  expect(props.setSelectedScopes).toHaveBeenCalledTimes(3)
-})
+const renderScopesGroup = props => render(<ScopesGroup {...defaultProps(props)} />)
 
-it('checks the selected scopes', () => {
-  const wrapper = mount(<ScopesGroup {...props} />)
-  wrapper.find('button').first().simulate('click')
-  const checkBox = wrapper.find('input[value="url:GET|/api/v1/accounts/search"]').first()
-  expect(checkBox.props().checked).toBe(true)
-})
+describe('ScopesGroup', () => {
+  it("adds all scopes to 'selected scopes' when the checkbox is checked", () => {
+    renderScopesGroup()
 
-it('renders the http verb for each selected scope', () => {
-  const wrapper = mount(<ScopesGroup {...props} />)
-  const button = wrapper.find('button').first()
-  expect(button.text()).toContain('GET')
-})
+    fireEvent.click(screen.getByRole('checkbox'))
 
-it('does not render the http verb for non-selected scopes', () => {
-  const wrapper = mount(<ScopesGroup {...props} />)
-  const button = wrapper.find('button').first()
-  expect(button.text()).not.toContain('POST')
-})
+    expect(baseProps.setSelectedScopes).toHaveBeenCalled()
+  })
 
-it('renders the scope group name', () => {
-  const wrapper = mount(<ScopesGroup {...props} />)
-  const button = wrapper.find('button').first()
-  expect(button.text()).toContain(props.name)
+  it("removes all scopes from 'selected scopes' when the checbox is unchecked", () => {
+    renderScopesGroup()
+
+    fireEvent.click(screen.getByRole('checkbox'))
+
+    expect(baseProps.setSelectedScopes).toHaveBeenCalledTimes(2)
+  })
+
+  it('checks the selected scopes', () => {
+    renderScopesGroup()
+
+    fireEvent.click(screen.getByRole('button'))
+
+    expect(screen.getAllByRole('checkbox')[1]).toBeChecked()
+  })
+
+  it('renders the http verb for each selected scope', () => {
+    renderScopesGroup()
+
+    fireEvent.click(screen.getByRole('button'))
+
+    expect(screen.getByRole('button', {text: baseProps.scopes[0].verb})).toBeInTheDocument()
+    expect(screen.getByRole('button', {text: baseProps.scopes[1].verb})).toBeInTheDocument()
+  })
+
+  it('renders different state of scopes with different selection values', () => {
+    renderScopesGroup()
+
+    fireEvent.click(screen.getByRole('button'))
+
+    expect(screen.getByLabelText(/enable scope/i)).toBeInTheDocument()
+    expect(screen.getByLabelText(/disable scope/i)).toBeInTheDocument()
+  })
+
+  it('renders the scope group name', () => {
+    renderScopesGroup()
+
+    expect(screen.getByRole('button', {name: new RegExp(baseProps.name, 'i')})).toBeInTheDocument()
+  })
 })

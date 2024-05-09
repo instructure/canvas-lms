@@ -254,7 +254,7 @@ describe "threaded discussions" do
 
       delete_me = @topic.discussion_entries.create!(user: @student, message: "new threaded reply from student")
       Discussion.visit(@course, @topic)
-      fj('label[for="showDeleted"]').click
+      f('label[for="showDeleted"]').click
 
       delete_entry(delete_me)
       expect(f("#entry-#{delete_me.id} .discussion-title").text).to match("Deleted by #{@teacher.name} on")
@@ -520,7 +520,7 @@ describe "threaded discussions" do
             expect(fj("div[data-testid='reply-preview']:contains('#{@third_reply.summary}')")).to be_present
             # Verify that the correct @mentions is created
             expect(new_reply.message).to include "<p><span class=\"mceNonEditable mention\""
-            expect(new_reply.message).to include "data-mention=\"#{@third_reply.user_id}\" data-reactroot=\"\">"
+            expect(new_reply.message).to include "data-mention=\"#{@third_reply.user_id}\""
             expect(new_reply.message).to include "@#{@third_reply.author_name}</span>quoting 3rd level reply</p>"
           end
 

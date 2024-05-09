@@ -153,6 +153,35 @@ describe('RubricTab', () => {
       fireEvent.click(await findByText(`9 pts`))
       expect(await queryByText(/^Total Points: 9 out of/)).not.toBeInTheDocument()
     })
+
+    describe('enhanced rubrics', () => {
+      beforeAll(() => {
+        window.ENV.FEATURES.enhanced_rubrics = true
+      })
+
+      afterAll(() => {
+        window.ENV.FEATURES.enhanced_rubrics = false
+      })
+
+      it('contains "View Rubric" when peer review mode is OFF', async () => {
+        const props = await makeProps({graded: false})
+        props.peerReviewModeEnabled = false
+        const {findByText, queryByText} = render(<RubricTab {...props} />)
+
+        expect(await findByText('View Rubric')).toBeInTheDocument()
+        expect(await queryByText('Fill Out Rubric')).not.toBeInTheDocument()
+      })
+
+      it('contains "Fill Out Rubric" when peer review mode is ON', async () => {
+        const props = await makeProps({graded: false})
+        props.peerReviewModeEnabled = true
+        makeStore(props)
+        const {findByText, queryByText} = render(<RubricTab {...props} />)
+
+        expect(await findByText('Fill Out Rubric')).toBeInTheDocument()
+        expect(await queryByText('View Rubric')).not.toBeInTheDocument()
+      })
+    })
   })
 
   describe('peer reviews', () => {
@@ -207,6 +236,23 @@ describe('RubricTab', () => {
           'Fill out the rubric below after reviewing the student submission to complete this review.'
         )
       ).not.toBeInTheDocument()
+    })
+
+    describe('enhanced rubrics', () => {
+      beforeAll(() => {
+        window.ENV.FEATURES.enhanced_rubrics = true
+      })
+
+      afterAll(() => {
+        window.ENV.FEATURES.enhanced_rubrics = false
+      })
+
+      it('opens rubric assessment tray by default', async () => {
+        const props = makeProps({graded: false})
+        props.peerReviewModeEnabled = true
+        const {getByTestId} = render(<RubricTab {...props} />)
+        expect(getByTestId('enhanced-rubric-assessment-tray')).toBeInTheDocument()
+      })
     })
   })
 
@@ -316,6 +362,40 @@ describe('RubricTab', () => {
       fireEvent.click(await findByLabelText('Select Grader'))
       fireEvent.click(await findByText('Anonymous'))
       expect(await findByText('Total Points: 10')).toBeInTheDocument()
+    })
+
+    describe('enhanced rubrics', () => {
+      beforeAll(() => {
+        window.ENV.FEATURES.enhanced_rubrics = true
+      })
+
+      afterAll(() => {
+        window.ENV.FEATURES.enhanced_rubrics = false
+      })
+
+      it('displays comments', async () => {
+        const {getByTestId} = render(<RubricTab {...props} />)
+        const assessmentData = props.assessments[0].data[0]
+        const commentSection = getByTestId(`comment-text-area-${assessmentData.criterion_id}`)
+        expect(commentSection).toHaveTextContent(assessmentData.comments)
+        expect(commentSection).toBeDisabled()
+      })
+
+      it('displays the name of the assessor if present', async () => {
+        const {findByLabelText, findByText} = render(<RubricTab {...props} />)
+        fireEvent.click(await findByLabelText('Select Grader'))
+        expect(await findByText('assessor1')).toBeInTheDocument()
+      })
+
+      it('displays in preview mode', () => {
+        const {getByTestId} = render(<RubricTab {...props} />)
+        const assessmentData = props.assessments[0].data[0]
+        const {criterion_id} = assessmentData
+        const commentSection = getByTestId(`comment-text-area-${criterion_id}`)
+        expect(commentSection).toBeDisabled()
+        const ratingSection = getByTestId(`traditional-criterion-${criterion_id}-ratings-0`)
+        expect(ratingSection).toBeDisabled()
+      })
     })
   })
 })

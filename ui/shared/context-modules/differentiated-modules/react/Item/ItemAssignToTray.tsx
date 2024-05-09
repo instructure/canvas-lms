@@ -59,7 +59,7 @@ import {
 } from '../../utils/assignToHelper'
 import {Text} from '@instructure/ui-text'
 import {Alert} from '@instructure/ui-alerts'
-import {IconType, ItemType} from '../types'
+import type {IconType, ItemType} from '../types'
 
 const I18n = useI18nScope('differentiated_modules')
 
@@ -119,6 +119,7 @@ export const updateModuleItem = ({
         message: I18n.t(`%{moduleItemName} updated`, {moduleItemName}),
       })
       onSuccess()
+      window.location.reload()
     })
     .catch((err: Error) => {
       showFlashAlert({
@@ -131,7 +132,7 @@ export const updateModuleItem = ({
 // TODO: need props to initialize with cards corresponding to current assignments
 export interface ItemAssignToTrayProps {
   open: boolean
-  onSave?: (overrides: ItemAssignToCardSpec[]) => void
+  onSave?: (overrides: ItemAssignToCardSpec[], hasModuleOverrides: boolean) => void
   onClose: () => void
   onDismiss: () => void
   onExited?: () => void
@@ -140,6 +141,7 @@ export interface ItemAssignToTrayProps {
   itemType: ItemType
   iconType: IconType
   itemContentId?: string
+  initHasModuleOverrides?: boolean
   pointsPossible?: number | null
   locale: string
   timezone: string
@@ -171,6 +173,7 @@ export default function ItemAssignToTray({
   iconType,
   itemContentId,
   pointsPossible,
+  initHasModuleOverrides,
   locale,
   timezone,
   defaultCards,
@@ -191,6 +194,7 @@ export default function ItemAssignToTray({
   const [blueprintDateLocks, setBlueprintDateLocks] = useState<DateLockTypes[] | undefined>(
     undefined
   )
+  const [hasModuleOverrides, setHasModuleOverrides] = useState(false)
   const lastPerformedAction = useRef<{action: 'add' | 'delete'; index?: number} | null>(null)
   const cardsRefs = useRef<{[cardId: string]: ItemAssignToCardRef}>({})
   const addCardButtonRef = useRef<Element | null>(null)
@@ -201,6 +205,27 @@ export default function ItemAssignToTray({
       assignToCards.length > 1
     return getEveryoneOption(hasOverrides)
   }, [disabledOptionIds, assignToCards])
+
+  useEffect(() => {
+    if (defaultCards === undefined || !itemContentId || itemType !== 'assignment') return
+
+    setFetchInFlight(true)
+    doFetchApi({
+      path: itemTypeToApiURL(courseId, itemType, itemContentId),
+    })
+      .then((response: FetchDueDatesResponse) => {
+        const dateDetailsApiResponse = response.json
+        setBlueprintDateLocks(dateDetailsApiResponse.blueprint_date_locks)
+      })
+      .catch(() => {
+        showFlashError()()
+        handleDismiss()
+      })
+      .finally(() => {
+        setFetchInFlight(false)
+      })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const handleDismiss = useCallback(() => {
     if (defaultCards) {
@@ -259,6 +284,9 @@ export default function ItemAssignToTray({
 
   useEffect(() => {
     if (defaultCards !== undefined || itemContentId === undefined) {
+      if (initHasModuleOverrides !== undefined && hasModuleOverrides !== undefined) {
+        setHasModuleOverrides(initHasModuleOverrides)
+      }
       return
     }
     setFetchInFlight(true)
@@ -273,10 +301,13 @@ export default function ItemAssignToTray({
         delete dateDetailsApiResponse.overrides
         const baseDates: BaseDateDetails = dateDetailsApiResponse
         const onlyOverrides = !dateDetailsApiResponse.visible_to_everyone
+        const hasModuleOverride = overrides?.some(override => override.context_module_id)
+        const hasCourseOverride = overrides?.some(override => override.course_id)
 
         const cards: ItemAssignToCardSpec[] = []
         const selectedOptionIds: string[] = []
-        if (!onlyOverrides) {
+        if (!onlyOverrides && !hasCourseOverride) {
+          // only add the regular everyone card if there isn't a course override
           const cardId = makeCardId()
           const selectedOption = [getEveryoneOption(assignToCards.length > 1).id]
           cards.push({
@@ -310,6 +341,9 @@ export default function ItemAssignToTray({
             if (override.course_section_id) {
               defaultOptions.push(`section-${override.course_section_id}`)
             }
+            if (override.course_id) {
+              defaultOptions.push('everyone')
+            }
             if (
               removeCard ||
               (override.context_module_id &&
@@ -335,6 +369,7 @@ export default function ItemAssignToTray({
             selectedOptionIds.push(...defaultOptions)
           })
         }
+        setHasModuleOverrides(hasModuleOverride || false)
         setBlueprintDateLocks(dateDetailsApiResponse.blueprint_date_locks)
         setDisabledOptionIds(selectedOptionIds)
         setInitialCards(cards)
@@ -389,7 +424,7 @@ export default function ItemAssignToTray({
     }
 
     if (onSave !== undefined) {
-      onSave(assignToCards)
+      onSave(assignToCards, hasModuleOverrides)
       return
     }
     const filteredCards = assignToCards.filter(
@@ -397,7 +432,7 @@ export default function ItemAssignToTray({
         [null, undefined, ''].includes(card.contextModuleId) ||
         (card.contextModuleId !== null && card.isEdited)
     )
-    const payload = generateDateDetailsPayload(filteredCards)
+    const payload = generateDateDetailsPayload(filteredCards, hasModuleOverrides)
     if (itemContentId !== undefined) {
       updateModuleItem({
         courseId,
@@ -408,7 +443,16 @@ export default function ItemAssignToTray({
         onSuccess: handleDismiss,
       })
     }
-  }, [onSave, assignToCards, courseId, itemContentId, itemType, itemName, handleDismiss])
+  }, [
+    assignToCards,
+    onSave,
+    hasModuleOverrides,
+    itemContentId,
+    courseId,
+    itemType,
+    itemName,
+    handleDismiss,
+  ])
 
   const handleDeleteCard = useCallback(
     (cardId: string) => {
@@ -492,7 +536,11 @@ export default function ItemAssignToTray({
           } as exportedOverride)
 
     if (newSelectedOption?.id === everyoneOption.id) {
-      parsedCard.course_section_id = defaultSectionId
+      if (hasModuleOverrides) {
+        parsedCard.course_id = 'everyone'
+      } else {
+        parsedCard.course_section_id = defaultSectionId
+      }
     } else if (parsedCard.id && idData[0] === 'section') {
       parsedCard.course_section_id = idData[1]
     } else if (parsedCard.id && idData[0] === 'student') {

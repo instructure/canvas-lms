@@ -661,6 +661,7 @@
   "nested_less_than_27d17e58": { "message": "Nythu’n Llai Na" },
   "new_quiz_34aacba6": { "message": "Cwis Newydd" },
   "next_40e12421": { "message": "Nesaf" },
+  "next_findtext_9d69f0fe": { "message": "Nesaf { findText }" },
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "Heb ganfod problemau o ran hygyrchedd."
   },
@@ -795,6 +796,7 @@
   "preview_in_overlay_ed772c46": { "message": "Rhagolwg mewn troshaen" },
   "preview_inline_9787330": { "message": "Rhagolwg mewn llinell" },
   "previous_bd2ac015": { "message": "Blaenorol" },
+  "previous_findtext_8dfbfd30": { "message": "Blaenorol { findText }" },
   "prime_917ea60e": { "message": "Cysefin" },
   "prime_numbers_13464f61": { "message": "Rhifau Cysefin" },
   "product_39cf144f": { "message": "Cynnyrch" },
@@ -826,8 +828,20 @@
   "remove_heading_style_5fdc8855": { "message": "Tynnu arddull y pennawd" },
   "remove_link_d1f2f4d0": { "message": "Tynnu Dolen" },
   "replace_all_d3d68b3": { "message": "Cyfnewid pob un" },
+  "replace_all_findtext_with_replacetext_da574b32": {
+    "message": "Disodli pob un { findText } â { replaceText }"
+  },
   "replace_e61834a7": { "message": "Disodli" },
+  "replace_findtext_with_replacetext_7b5c7fb3": {
+    "message": "Disodli { findText } â { replaceText }"
+  },
   "replace_with_eeff01ad": { "message": "Cyfnewid am" },
+  "replaced_alertfindtext_with_alertreplacetext_de5c1795": {
+    "message": "Disodlwyd { alertFindText } â { alertReplaceText }"
+  },
+  "replaced_all_alertfindtext_with_alertreplacetext_83fdfe59": {
+    "message": "Disodlwyd pob un { alertFindText } â { alertReplaceText }"
+  },
   "reset_95a81614": { "message": "Ailosod" },
   "resize_ec83d538": { "message": "Ailfeintio" },
   "restore_auto_save_deccd84b": { "message": "Adfer cadw’n awtomatig?" },

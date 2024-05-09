@@ -660,6 +660,10 @@ CanvasRails::Application.routes.draw do
     end
     get "calendar_settings", action: :account_calendar_settings, as: :calendar_settings
 
+    scope(controller: :analytics_hub) do
+      get "analytics_hub", action: :show, as: :analytics_hub
+    end
+
     scope(controller: :brand_configs) do
       get "theme_editor", action: :new, as: :theme_editor
       get "brand_configs", action: :index
@@ -1103,6 +1107,10 @@ CanvasRails::Application.routes.draw do
     get "courses/:course_id/search", action: :show, as: :course_search
     # TODO: Add back global search once we have a good way to handle it
     # get "search", action: :show
+  end
+
+  scope(controller: :translation) do
+    post "courses/:course_id/translate", action: :translate
   end
 
   ### API routes ###
@@ -2636,6 +2644,7 @@ CanvasRails::Application.routes.draw do
     scope(controller: "smart_search") do
       get "courses/:course_id/smartsearch", action: :search, as: :course_smart_search_query
       get "courses/:course_id/smartsearch/log", action: :log
+      get "courses/:course_id/smartsearch/index_status", action: :index_status
       # TODO: add account level search
     end
 

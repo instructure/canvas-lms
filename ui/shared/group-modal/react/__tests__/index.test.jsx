@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react'
-import {act, fireEvent, render} from '@testing-library/react'
+import {act, fireEvent, render, waitForElementToBeRemoved, waitFor} from '@testing-library/react'
 import fetchMock from 'fetch-mock'
 import userEvent, {PointerEventsCheckLevel} from '@testing-library/user-event'
 import GroupModal from '../index'
@@ -233,6 +233,36 @@ describe('GroupModal', () => {
       )
       expect(getByPlaceholderText('Name')).toHaveValue('foo')
       expect(getByPlaceholderText('Number')).toHaveValue('3')
+    })
+
+    it('correctly displays input even after reopening the modal', async () => {
+      function TestComponent() {
+        const [isOpen, toggleOpen] = React.useReducer(o => !o, true)
+        return (
+          <>
+            <button type="button" onClick={() => toggleOpen()}>
+              Toggle
+            </button>
+            <GroupModal
+              group={{...group, name: 'foo', group_limit: 3}}
+              label="Edit Group"
+              open={isOpen}
+              requestMethod="PUT"
+              onSave={onSave}
+              onDismiss={onDismiss}
+            />
+          </>
+        )
+      }
+      const wrapper = render(<TestComponent />)
+      expect(wrapper.getByPlaceholderText('Name')).toHaveValue('foo')
+      expect(wrapper.getByPlaceholderText('Number')).toHaveValue('3')
+      await userEvent.click(wrapper.getByText('Toggle')) // close
+      await waitForElementToBeRemoved(() => wrapper.getByPlaceholderText('Number'))
+      await userEvent.click(wrapper.getByText('Toggle')) // reopen
+      await waitFor(() => wrapper.getByPlaceholderText('Number'))
+      expect(wrapper.getByPlaceholderText('Name')).toHaveValue('foo')
+      expect(wrapper.getByPlaceholderText('Number')).toHaveValue('3')
     })
 
     it('allows updating a non student organized group', async () => {

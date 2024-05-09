@@ -225,6 +225,10 @@ export default function DiscussionTopicForm({
 
   const [gradedDiscussionRefMap, setGradedDiscussionRefMap] = useState(new Map())
 
+  const [importantDates, setImportantDates] = useState(
+    currentDiscussionTopic?.assignment?.importantDates || false
+  )
+
   // Checkpoints states
   const [isCheckpoints, setIsCheckpoints] = useState(
     currentDiscussionTopic?.assignment?.hasSubAssignments || false
@@ -264,7 +268,8 @@ export default function DiscussionTopicForm({
     setReplyToEntryRequiredCount,
     title,
     assignmentID: currentDiscussionTopic?.assignment?._id || null,
-    importantDates: currentDiscussionTopic?.assignment?.importantDates || false,
+    importantDates,
+    setImportantDates,
     pointsPossible,
   }
   const [showGroupCategoryModal, setShowGroupCategoryModal] = useState(false)
@@ -371,7 +376,9 @@ export default function DiscussionTopicForm({
         peerReviewDueDate,
         intraGroupPeerReviews,
         masteryPathsOption,
-        isCheckpoints
+        importantDates,
+        isCheckpoints,
+        currentDiscussionTopic?.assignment
       ),
       checkpoints: prepareCheckpointsPayload(
         pointsPossibleReplyToTopic,
@@ -400,7 +407,7 @@ export default function DiscussionTopicForm({
         removeAttachment: !attachment?._id,
       }
 
-      if (currentDiscussionTopic?.assignment?.hasSubAssignments) {
+      if (currentDiscussionTopic?.assignment?.hasSubAssignments && isGraded) {
         editingPayload.setCheckpoints = isCheckpoints
       }
 

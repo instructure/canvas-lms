@@ -311,8 +311,8 @@ const ContextModulesHeader = (props: Props) => {
   return (
     <Responsive
       query={{
-        small: {maxWidth: '607px'},
-        medium: {minWidth: '608px', maxWidth: '991px'},
+        small: {maxWidth: '787px'},
+        medium: {minWidth: '788px', maxWidth: '991px'},
         large: {minWidth: '992px'},
       }}
       props={{

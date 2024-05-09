@@ -174,25 +174,27 @@ export class DiscussionsContainer extends Component {
   renderDiscussions() {
     return this.state.discussions.map(discussion =>
       this.props.permissions.moderate ? (
-        <ConnectedDraggableDiscussionRow
-          key={discussion.id}
-          discussion={discussion}
-          deleteDiscussion={this.props.deleteDiscussion}
-          getDiscussionPosition={this.getDiscussionPosition}
-          onMoveDiscussion={this.props.onMoveDiscussion}
-          onOpenAssignToTray={this.props.onOpenAssignToTray}
-          moveCard={this.moveCard}
-          draggable={true}
-        />
+        <div data-testid="discussion-draggable-row-container" key={discussion.id}>
+          <ConnectedDraggableDiscussionRow
+            discussion={discussion}
+            deleteDiscussion={this.props.deleteDiscussion}
+            getDiscussionPosition={this.getDiscussionPosition}
+            onMoveDiscussion={this.props.onMoveDiscussion}
+            onOpenAssignToTray={this.props.onOpenAssignToTray}
+            moveCard={this.moveCard}
+            draggable={true}
+          />
+        </div>
       ) : (
-        <ConnectedDiscussionRow
-          key={discussion.id}
-          discussion={discussion}
-          deleteDiscussion={this.props.deleteDiscussion}
-          onMoveDiscussion={this.props.onMoveDiscussion}
-          onOpenAssignToTray={this.props.onOpenAssignToTray}
-          draggable={false}
-        />
+        <div data-testid="discussion-row-container" key={discussion.id}>
+          <ConnectedDiscussionRow
+            discussion={discussion}
+            deleteDiscussion={this.props.deleteDiscussion}
+            onMoveDiscussion={this.props.onMoveDiscussion}
+            onOpenAssignToTray={this.props.onOpenAssignToTray}
+            draggable={false}
+          />
+        </div>
       )
     )
   }

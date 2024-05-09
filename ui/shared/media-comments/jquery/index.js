@@ -311,7 +311,7 @@ $.mediaComment.init = function (mediaType, opts) {
         }
         $('#video_record_title,#audio_record_title').val(defaultTitle)
         $dialog.dialog({
-          title: I18n.t('titles.record_upload_media_comment', 'Record/Upload Media Comment'),
+          title: I18n.t('Studio Capture'),
           width: 560,
           height: 475,
           modal: true,
@@ -613,7 +613,7 @@ $.mediaComment.init = function (mediaType, opts) {
         const $div = $('<div/>').attr('id', 'media_comment_dialog')
         $div.text(I18n.t('messages.loading', 'Loading...'))
         $div.dialog({
-          title: I18n.t('titles.record_upload_media_comment', 'Record/Upload Media Comment'),
+          title: I18n.t('Studio Capture'),
           resizable: false,
           width: 470,
           height: 300,

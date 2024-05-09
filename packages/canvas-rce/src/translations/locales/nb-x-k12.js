@@ -666,6 +666,7 @@ const locale = {
   "nested_less_than_27d17e58": { "message": "Nested mindre enn" },
   "new_quiz_34aacba6": { "message": "Ny quiz" },
   "next_40e12421": { "message": "Neste" },
+  "next_findtext_9d69f0fe": { "message": "Neste { findText }" },
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "Ingen tiljengelighetsproblemer ble oppdaget."
   },
@@ -792,6 +793,7 @@ const locale = {
   "preview_in_overlay_ed772c46": { "message": "Forhåndsvis i utvidet vindu" },
   "preview_inline_9787330": { "message": "Forhåndsvis i vindu" },
   "previous_bd2ac015": { "message": "Forrige" },
+  "previous_findtext_8dfbfd30": { "message": "Forrige { findText }" },
   "prime_917ea60e": { "message": "Prim" },
   "prime_numbers_13464f61": { "message": "Primtall" },
   "product_39cf144f": { "message": "Produkt" },
@@ -821,8 +823,20 @@ const locale = {
   "remove_heading_style_5fdc8855": { "message": "Fjern tittelstil" },
   "remove_link_d1f2f4d0": { "message": "Fjerne lenke" },
   "replace_all_d3d68b3": { "message": "Erstatt alle" },
+  "replace_all_findtext_with_replacetext_da574b32": {
+    "message": "Erstatt alle { findText } med { replaceText }"
+  },
   "replace_e61834a7": { "message": "Erstatt" },
+  "replace_findtext_with_replacetext_7b5c7fb3": {
+    "message": "Erstatt { findText } med { replaceText }"
+  },
   "replace_with_eeff01ad": { "message": "Erstatt med" },
+  "replaced_alertfindtext_with_alertreplacetext_de5c1795": {
+    "message": "Erstattet { alertFindText } med { alertReplaceText }"
+  },
+  "replaced_all_alertfindtext_with_alertreplacetext_83fdfe59": {
+    "message": "Erstattet alle { alertFindText } med { alertReplaceText }"
+  },
   "reset_95a81614": { "message": "Tilbakestill" },
   "resize_ec83d538": { "message": "Endre størrelse" },
   "restore_auto_save_deccd84b": {

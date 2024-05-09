@@ -1890,11 +1890,12 @@ class Account < ActiveRecord::Base
   TAB_SIS_IMPORT = 11
   TAB_GRADING_STANDARDS = 12
   TAB_QUESTION_BANKS = 13
-  TAB_ADMIN_TOOLS = 17
-  TAB_SEARCH = 18
-  TAB_BRAND_CONFIGS = 19
-  TAB_EPORTFOLIO_MODERATION = 20
-  TAB_ACCOUNT_CALENDARS = 21
+  TAB_ANALYTICS_HUB = 17
+  TAB_ADMIN_TOOLS = 18
+  TAB_SEARCH = 19
+  TAB_BRAND_CONFIGS = 20
+  TAB_EPORTFOLIO_MODERATION = 21
+  TAB_ACCOUNT_CALENDARS = 22
 
   # site admin tabs
   TAB_PLUGINS = 14
@@ -1963,6 +1964,10 @@ class Account < ActiveRecord::Base
 
     if root_account? && grants_right?(user, :manage_developer_keys)
       tabs << { id: TAB_DEVELOPER_KEYS, label: t("#account.tab_developer_keys", "Developer Keys"), css_class: "developer_keys", href: :account_developer_keys_path, account_id: root_account.id }
+    end
+
+    if Account.site_admin.feature_enabled?(:analytics_hub)
+      tabs << { id: TAB_ANALYTICS_HUB, label: t("#account.tab_analytics_hub", "Analytics Hub"), css_class: "analytics_hub", href: :account_analytics_hub_path }
     end
 
     if root_account? && grants_right?(user, :manage_developer_keys) && root_account.feature_enabled?(:lti_registrations_page)

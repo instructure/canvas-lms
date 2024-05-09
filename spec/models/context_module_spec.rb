@@ -1566,10 +1566,10 @@ describe ContextModule do
         expect(@module.content_tags_visible_to(@student_2).map(&:content).include?(@assignment)).to be_falsey
       end
 
-      it "alsoes have the right assignment_and_quiz_visibilities" do
-        expect(@teacher.assignment_and_quiz_visibilities(@course)[:assignment_ids].include?(@assignment.id)).to be_truthy
-        expect(@student_1.assignment_and_quiz_visibilities(@course)[:assignment_ids].include?(@assignment.id)).to be_truthy
-        expect(@student_2.assignment_and_quiz_visibilities(@course)[:assignment_ids].include?(@assignment.id)).to be_falsey
+      it "has the right learning_object_visibilities" do
+        expect(@teacher.learning_object_visibilities(@course)[:assignment_ids].include?(@assignment.id)).to be_truthy
+        expect(@student_1.learning_object_visibilities(@course)[:assignment_ids].include?(@assignment.id)).to be_truthy
+        expect(@student_2.learning_object_visibilities(@course)[:assignment_ids].include?(@assignment.id)).to be_falsey
       end
 
       it "properly returns differentiated assignments for teacher even without update rights" do

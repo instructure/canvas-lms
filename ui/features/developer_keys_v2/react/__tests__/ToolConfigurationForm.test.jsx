@@ -17,150 +17,145 @@
  */
 
 import React from 'react'
-import {mount} from 'enzyme'
-import {render} from '@testing-library/react'
+import {render, screen, fireEvent} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import ToolConfigurationForm from '../ToolConfigurationForm'
 
-function newProps(overrides = {}) {
-  return {
-    toolConfiguration: {
-      name: 'Test Tool',
-      url: 'https://www.test.com/launch',
-      target_link_uri: 'https://example.com/target_link_uri',
-    },
-    toolConfigurationUrl: 'https://www.test.com/config.json',
-    validScopes: {},
-    validPlacements: [],
-    editing: false,
-    showRequiredMessages: false,
-    dispatch: jest.fn(),
-    updateConfigurationMethod: jest.fn(),
-    configurationMethod: 'json',
-    updateToolConfiguration: Function.prototype,
-    updateToolConfigurationUrl: Function.prototype,
-    prettifyPastedJson: jest.fn(),
-    canPrettify: false,
-    ...overrides,
+const defaultProps = (overrides = {}) => ({
+  toolConfiguration: {
+    name: 'Test Tool',
+    url: 'https://www.test.com/launch',
+    target_link_uri: 'https://example.com/target_link_uri',
+  },
+  toolConfigurationUrl: 'https://www.test.com/config.json',
+  validScopes: {},
+  validPlacements: [],
+  editing: false,
+  showRequiredMessages: false,
+  dispatch: jest.fn(),
+  updateConfigurationMethod: jest.fn(),
+  configurationMethod: 'json',
+  updateToolConfiguration: Function.prototype,
+  updateToolConfigurationUrl: Function.prototype,
+  prettifyPastedJson: jest.fn(),
+  canPrettify: false,
+  ...overrides,
+})
+
+const renderToolConfigurationForm = (props = {}, setup) => {
+  const ref = React.createRef()
+  const wrapper = render(<ToolConfigurationForm ref={ref} {...defaultProps(props)} />)
+
+  if (setup) {
+    setup(ref)
   }
+
+  return {ref, wrapper}
 }
 
-let wrapper = 'empty wrapper'
+describe('ToolConfigurationForm', () => {
+  describe('when configuration method is by JSON', () => {
+    const mountForm = (propOverrides = {}) =>
+      renderToolConfigurationForm(propOverrides, ref => {
+        ref.current.setState({configurationMethod: 'json'})
+      })
 
-beforeEach(() => {
-  wrapper = null
-})
+    it('renders the tool configuration JSON in a text area', () => {
+      mountForm()
 
-afterEach(() => {
-  if (wrapper) {
-    wrapper.unmount()
-  }
-})
+      expect(
+        screen.getByText(new RegExp(defaultProps().toolConfiguration.url, 'i'))
+      ).toBeInTheDocument()
+    })
 
-describe('when configuration method is by JSON', () => {
-  function mountForm(propOverrides = {}) {
-    wrapper = mount(<ToolConfigurationForm {...newProps(propOverrides)} />)
-    wrapper.setState({configurationType: 'json'})
-  }
+    it('transitions to configuring by URL when the url option is selected', () => {
+      const {ref} = mountForm()
 
-  it('renders the tool configuration JSON in a text area', () => {
-    mountForm()
-    const textArea = wrapper.find('TextArea').at(0)
-    expect(textArea.text()).toEqual(expect.stringContaining(newProps().toolConfiguration.url))
-  })
+      fireEvent.click(screen.getByRole('combobox', {name: /method/i}))
+      fireEvent.click(document.querySelector('[value="url"]'))
 
-  it('transitions to configuring by URL when the url option is selected', () => {
-    mountForm()
-    const select = wrapper.find('SimpleSelect').at(1)
-    select.instance().props.onChange({}, {value: 'url'})
-    expect(wrapper.instance().props.updateConfigurationMethod).toHaveBeenCalled()
-  })
+      expect(ref.current.props.updateConfigurationMethod).toHaveBeenCalled()
+    })
 
-  it('renders the text in the jsonString prop', () => {
-    mountForm({jsonString: '{"test": "test"}'})
-    const textArea = wrapper.find('TextArea').at(0)
-    expect(textArea.text()).toEqual(expect.stringContaining('{"test": "test"}'))
-  })
+    it('renders the text in the jsonString prop', () => {
+      mountForm({jsonString: '{"test": "test"}'})
 
-  it('prefers the text in the invalidJson prop even if it is an empty string', () => {
-    mountForm({jsonString: '{"test": "test"}', invalidJson: ''})
-    const textArea = wrapper.find('TextArea').at(0)
-    expect(textArea.text()).not.toEqual(expect.stringContaining('test'))
-  })
+      expect(screen.getByText(/{"test": "test"}/)).toBeInTheDocument()
+    })
 
-  it('renders a button that fires the prettifyPastedJson prop', () => {
-    mountForm({canPrettify: true})
-    const button = wrapper.find('Button').at(0)
-    button.simulate('click')
-    expect(wrapper.instance().props.prettifyPastedJson).toHaveBeenCalled()
-  })
+    it('prefers the text in the invalidJson prop even if it is an empty string', () => {
+      mountForm({jsonString: '{"test": "test"}', invalidJson: ''})
 
-  it('does not render a visible manual configuration', async () => {
-    const rendered = render(
-      <ToolConfigurationForm {...newProps()} />
-    )
-    const elem1 = rendered.queryByText(/Target Link URI/)
-    if (elem1) {
+      expect(screen.queryByText(/test/)).not.toBeInTheDocument()
+    })
+
+    it('renders a button that fires the prettifyPastedJson prop', () => {
+      const {ref} = mountForm({canPrettify: true})
+
+      fireEvent.click(screen.getByRole('button'))
+
+      expect(ref.current.props.prettifyPastedJson).toHaveBeenCalled()
+    })
+
+    it('does not render a visible manual configuration', async () => {
+      renderToolConfigurationForm()
+
+      const elem1 = screen.queryByText(/Target Link URI/)
+      const elem2 = screen.queryByText(/OpenID Connect Initiation Url/)
+
       expect(elem1).not.toBeVisible()
-    }
-    const elem2 = rendered.queryByText(/OpenID Connect Initiation Url/)
-    if (elem2) {
       expect(elem2).not.toBeVisible()
-    }
-  })
-})
-
-describe('when configuration method is by URL', () => {
-  beforeEach(() => {
-    wrapper = mount(<ToolConfigurationForm {...newProps({configurationMethod: 'url'})} />)
+    })
   })
 
-  it('renders the tool configuration URL in a text input', () => {
-    const textInput = wrapper.find('TextInput').at(3)
-    const expectedString = newProps().toolConfigurationUrl
-    expect(textInput.html()).toEqual(expect.stringContaining(expectedString))
+  describe('when configuration method is by URL', () => {
+    it('renders the tool configuration URL in a text input', () => {
+      renderToolConfigurationForm({configurationMethod: 'url'})
+
+      expect(screen.getByDisplayValue(defaultProps().toolConfigurationUrl)).toBeInTheDocument()
+    })
+
+    it('transitions to configuring by JSON when the json option is selected', () => {
+      const {ref} = renderToolConfigurationForm({configurationMethod: 'url'})
+
+      fireEvent.click(screen.getByRole('combobox', {name: /method/i}))
+      fireEvent.click(document.querySelector('[value="json"]'))
+
+      expect(ref.current.props.updateConfigurationMethod).toHaveBeenCalled()
+    })
   })
 
-  it('transitions to configuring by JSON when the json option is selected', () => {
-    const select = wrapper.find('SimpleSelect').at(1)
-    select.instance().props.onChange({}, {value: 'json'})
-    expect(wrapper.instance().props.updateConfigurationMethod).toHaveBeenCalled()
-  })
-})
+  describe('when configuration method is manual', () => {
+    it('renders the manual configuration form', () => {
+      renderToolConfigurationForm({configurationMethod: 'manual'})
 
-describe('when configuration method is manual', () => {
-  beforeEach(() => {
-    wrapper = mount(<ToolConfigurationForm {...newProps({configurationMethod: 'manual'})} />)
-  })
+      expect(screen.getAllByRole('group').length).toBeTruthy()
+    })
 
-  it('renders the manual configuration form', () => {
-    expect(wrapper.find('ManualConfigurationForm').exists()).toEqual(true)
-  })
+    it('renders a visible manual configuration', () => {
+      renderToolConfigurationForm({configurationMethod: 'manual'})
 
-  it('renders a visible manual configuration', async () => {
-    const rendered = render(
-      <ToolConfigurationForm {...newProps({configurationMethod: 'manual'})} />
-    )
-    const elem1 = rendered.queryByText('* Target Link URI')
-    expect(elem1).toBeVisible()
-    const elem2 = rendered.queryByText('* OpenID Connect Initiation Url')
-    expect(elem2).toBeVisible()
-  })
+      const elem1 = screen.queryByText('* Target Link URI')
+      const elem2 = screen.queryByText('* OpenID Connect Initiation Url')
 
-  it('preserves state when changing to Pasted JSON mode and back again', async () => {
-    const user = userEvent.setup()
+      expect(elem1).toBeVisible()
+      expect(elem2).toBeVisible()
+    })
 
-    const props = newProps({configurationMethod: 'manual'})
-    const rendered = render(<ToolConfigurationForm {...props} />)
+    it('preserves state when changing to Pasted JSON mode and back again', async () => {
+      const {wrapper} = renderToolConfigurationForm({configurationMethod: 'manual'})
+      const user = userEvent.setup()
+      const props = defaultProps({configurationMethod: 'manual'})
+      const oldUrl = props.toolConfiguration.target_link_uri
+      const newUrl = oldUrl + 'abc'
+      const input = wrapper.queryByDisplayValue(oldUrl)
 
-    const oldUrl = props.toolConfiguration.target_link_uri
-    const newUrl = oldUrl + 'abc'
-    const input = rendered.queryByDisplayValue(oldUrl)
-    await user.type(input, 'abc')
+      await user.type(input, 'abc')
 
-    expect(rendered.queryByDisplayValue(newUrl)).toBeTruthy()
-    rendered.rerender(<ToolConfigurationForm {...newProps({configurationMethod: 'json'})} />)
-    rendered.rerender(<ToolConfigurationForm {...newProps({configurationMethod: 'manual'})} />)
-    expect(rendered.queryByDisplayValue(newUrl)).toBeTruthy()
+      expect(wrapper.queryByDisplayValue(newUrl)).toBeTruthy()
+      wrapper.rerender(<ToolConfigurationForm {...defaultProps({configurationMethod: 'json'})} />)
+      wrapper.rerender(<ToolConfigurationForm {...defaultProps({configurationMethod: 'manual'})} />)
+      expect(wrapper.queryByDisplayValue(newUrl)).toBeTruthy()
+    })
   })
 })

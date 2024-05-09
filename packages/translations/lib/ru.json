@@ -1445,6 +1445,9 @@
     "next_40e12421": {
         "message": "Далее"
     },
+    "next_findtext_9d69f0fe": {
+        "message": "Далее { findText }"
+    },
     "no_accessibility_issues_were_detected_f8d3c875": {
         "message": "Проблем, связанных с доступностью, не обнаружено."
     },
@@ -1721,6 +1724,9 @@
     "previous_bd2ac015": {
         "message": "Предыдущий"
     },
+    "previous_findtext_8dfbfd30": {
+        "message": "Предыдущий { findText }"
+    },
     "prime_917ea60e": {
         "message": "Знак штриха"
     },
@@ -1796,11 +1802,23 @@
     "replace_all_d3d68b3": {
         "message": "Заменить все"
     },
+    "replace_all_findtext_with_replacetext_da574b32": {
+        "message": "Заменить все { findText } на { replaceText }"
+    },
     "replace_e61834a7": {
         "message": "Заменить"
     },
+    "replace_findtext_with_replacetext_7b5c7fb3": {
+        "message": "Заменить { findText } на { replaceText }"
+    },
     "replace_with_eeff01ad": {
         "message": "Заменить на"
+    },
+    "replaced_alertfindtext_with_alertreplacetext_de5c1795": {
+        "message": "{ alertFindText } заменено на { alertReplaceText }"
+    },
+    "replaced_all_alertfindtext_with_alertreplacetext_83fdfe59": {
+        "message": "Заменить все { alertFindText } на { alertReplaceText }"
     },
     "reset_95a81614": {
         "message": "Восстановить"

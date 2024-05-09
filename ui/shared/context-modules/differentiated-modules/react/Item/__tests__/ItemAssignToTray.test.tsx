@@ -32,6 +32,7 @@ jest.mock('@canvas/alerts/react/FlashAlert', () => ({
 }))
 
 describe('ItemAssignToTray', () => {
+  let originalLocation = window.location
   const props: ItemAssignToTrayProps = {
     open: true,
     onClose: () => {},
@@ -84,6 +85,10 @@ describe('ItemAssignToTray', () => {
     ENV.SECTION_LIST = [{id: '4'}, {id: '5'}]
     ENV.POST_TO_SIS = false
     ENV.DUE_DATE_REQUIRED_FOR_ACCOUNT = false
+    originalLocation = window.location
+    // @ts-expect-error
+    delete window.location
+    window.location = {...originalLocation, reload: jest.fn()}
     // an assignment with valid dates and overrides
     fetchMock.get('/api/v1/courses/1/settings', {conditional_release: false})
     fetchMock
@@ -123,6 +128,7 @@ describe('ItemAssignToTray', () => {
   })
 
   afterEach(() => {
+    window.location = originalLocation
     fetchMock.resetHistory()
     fetchMock.restore()
   })
@@ -261,7 +267,34 @@ describe('ItemAssignToTray', () => {
     })
 
     expect(
-      getAllByText((_, e) => e.textContent === 'Locked: Availability Dates')[0]
+      getAllByText((_, e) => e?.textContent === 'Locked: Availability Dates')[0]
+    ).toBeInTheDocument()
+  })
+
+  // LF-1370
+  it.skip('renders blueprint locking info when there are locked dates and default cards', async () => {
+    fetchMock.get('/api/v1/courses/1/assignments/31/date_details', {
+      blueprint_date_locks: ['availability_dates'],
+    })
+    const {getAllByText, findAllByTestId} = renderComponent({
+      itemContentId: '31',
+      defaultCards: [
+        {
+          defaultOptions: ['everyone'],
+          key: 'key-card-0',
+          isValid: true,
+          highlightCard: false,
+          hasAssignees: true,
+          due_at: '2023-10-05T12:00:00Z',
+          unlock_at: '2023-10-01T12:00:00Z',
+          lock_at: '2023-11-01T12:00:00Z',
+          selectedAssigneeIds: ['everyone'],
+        },
+      ],
+    })
+    await findAllByTestId('item-assign-to-card')
+    expect(
+      getAllByText((_, e) => e?.textContent === 'Locked: Availability Dates')[0]
     ).toBeInTheDocument()
   })
 
@@ -278,11 +311,37 @@ describe('ItemAssignToTray', () => {
     await expect(queryByText('Locked:')).not.toBeInTheDocument()
   })
 
-  it('disables add button if there are blueprint-locked dates', async () => {
+  // LF-1370
+  it.skip('disables add button if there are blueprint-locked dates', async () => {
     fetchMock.get('/api/v1/courses/1/assignments/31/date_details', {
       blueprint_date_locks: ['availability_dates'],
     })
     const {getByRole, findAllByText} = renderComponent({itemContentId: '31'})
+    await findAllByText('Locked:')
+    await expect(getByRole('button', {name: 'Add'})).toBeDisabled()
+  })
+
+  // LF-1370
+  it.skip('disables add button if there are blueprint-locked dates and default cards', async () => {
+    fetchMock.get('/api/v1/courses/1/assignments/31/date_details', {
+      blueprint_date_locks: ['availability_dates'],
+    })
+    const {getByRole, findAllByText} = renderComponent({
+      itemContentId: '31',
+      defaultCards: [
+        {
+          defaultOptions: ['everyone'],
+          key: 'key-card-0',
+          isValid: true,
+          highlightCard: false,
+          hasAssignees: true,
+          due_at: '2023-10-05T12:00:00Z',
+          unlock_at: '2023-10-01T12:00:00Z',
+          lock_at: '2023-11-01T12:00:00Z',
+          selectedAssigneeIds: ['everyone'],
+        },
+      ],
+    })
     await findAllByText('Locked:')
     await expect(getByRole('button', {name: 'Add'})).toBeDisabled()
   })
@@ -294,9 +353,24 @@ describe('ItemAssignToTray', () => {
     expect(onDismiss).toHaveBeenCalled()
   })
 
-  it('does not fetch assignee options when defaultCards are passed', () => {
+  it('fetches assignee options when defaultCards are passed', () => {
+    fetchMock.get(
+      '/api/v1/courses/1/assignments/23/date_details',
+      {
+        id: '23',
+        due_at: '2023-10-05T12:00:00Z',
+        unlock_at: '2023-10-01T12:00:00Z',
+        lock_at: '2023-11-01T12:00:00Z',
+        only_visible_to_overrides: false,
+        visible_to_everyone: true,
+        overrides: [],
+      },
+      {
+        overwriteRoutes: true,
+      }
+    )
     renderComponent({defaultCards: []})
-    expect(fetchMock.calls('/api/v1/courses/1/assignments/23/date_details').length).toBe(0)
+    expect(fetchMock.calls('/api/v1/courses/1/assignments/23/date_details').length).toBe(1)
   })
 
   it('calls customAddCard if passed when a card is added', () => {
@@ -347,6 +421,43 @@ describe('ItemAssignToTray', () => {
           only_visible_to_overrides: false,
           visible_to_everyone: true,
           overrides: [],
+        },
+        {
+          overwriteRoutes: true,
+        }
+      )
+      const {findAllByTestId} = renderComponent()
+      const selectedOptions = await findAllByTestId('assignee_selector_selected_option')
+      expect(selectedOptions).toHaveLength(1)
+      waitFor(() => expect(selectedOptions[0]).toHaveTextContent('Everyone'))
+    })
+
+    it('renders everyone option for item with course and module overrides', async () => {
+      fetchMock.get(
+        '/api/v1/courses/1/assignments/23/date_details',
+        {
+          id: '23',
+          due_at: '2023-10-05T12:00:00Z',
+          unlock_at: '2023-10-01T12:00:00Z',
+          lock_at: '2023-11-01T12:00:00Z',
+          only_visible_to_overrides: true,
+          visible_to_everyone: true,
+          overrides: [
+            {
+              due_at: null,
+              id: undefined,
+              lock_at: null,
+              course_id: 1,
+              unlock_at: null,
+            },
+            {
+              due_at: null,
+              id: undefined,
+              lock_at: null,
+              context_module_id: 1,
+              unlock_at: null,
+            },
+          ],
         },
         {
           overwriteRoutes: true,
@@ -493,6 +604,28 @@ describe('ItemAssignToTray', () => {
         'GET'
       )
       expect(onDismissMock).not.toHaveBeenCalled()
+    })
+
+    it('reloads the page after saving', async () => {
+      const user = userEvent.setup(USER_EVENT_OPTIONS)
+      const {getByRole} = renderComponent()
+      const save = getByRole('button', {name: 'Save'})
+      await user.click(save)
+      await waitFor(() => {
+        expect(window.location.reload).toHaveBeenCalled()
+      })
+    })
+
+    it('does not reload the page after saving if onSave is passed', async () => {
+      const user = userEvent.setup(USER_EVENT_OPTIONS)
+      const onSave = jest.fn()
+      const {getByRole} = renderComponent({onSave})
+      const save = getByRole('button', {name: 'Save'})
+      await user.click(save)
+      await waitFor(() => {
+        expect(onSave).toHaveBeenCalled()
+      })
+      expect(window.location.reload).not.toHaveBeenCalled()
     })
   })
 

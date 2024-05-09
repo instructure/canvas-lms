@@ -127,6 +127,39 @@ describe QuizzesNext::Importers::CourseContentImporter do
       expect(quiz01_context_module_tag.reload.content).to eq(assignment01)
       expect(quiz01_context_module_tag.content_type).to eq("Assignment")
     end
+
+    context "common_cartridge_qti_new_quizzes_import FF enabled" do
+      before do
+        allow(migration)
+          .to receive(:imported_migration_items_by_class)
+          .with(Quizzes::Quiz)
+          .and_return([quiz01, quiz02, quiz03, practice_quiz, survey_quiz, ungraded_survey])
+        allow_any_instance_of(ContentMigration)
+          .to receive(:for_common_cartridge?)
+          .and_return(true)
+        allow(NewQuizzesFeaturesHelper)
+          .to receive(:common_cartridge_qti_new_quizzes_import_enabled?)
+          .with(instance_of(Course))
+          .and_return(true)
+      end
+
+      it "makes lti assignments only when ready_to_migrate_to_quiz_next" do
+        quiz01.assignment.mark_as_ready_to_migrate_to_quiz_next
+        quiz01.save!
+        expect(quiz01.assignment.ready_to_migrate_to_quiz_next?).to be(true)
+        expect(quiz02.assignment.ready_to_migrate_to_quiz_next?).to be(false)
+        expect(Importers::CourseContentImporter)
+          .to receive(:import_content)
+        expect { importer.import_content(double) }
+          .to change(Assignment, :count).by(3)
+
+        expect(migration.workflow_state).to eq("imported")
+        expect(migration.migration_settings[:imported_assets][:lti_assignment_quiz_set])
+          .to eq([[assignment01.global_id, quiz01.global_id]])
+        expect(quiz01.workflow_state).to eq("deleted")
+        expect(quiz01.assignment.ready_to_migrate_to_quiz_next?).to be(false)
+      end
+    end
   end
 
   context "migration context is not a Course" do

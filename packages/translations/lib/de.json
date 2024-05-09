@@ -1445,6 +1445,9 @@
     "next_40e12421": {
         "message": "Weiter"
     },
+    "next_findtext_9d69f0fe": {
+        "message": "Nächster { findText }"
+    },
     "no_accessibility_issues_were_detected_f8d3c875": {
         "message": "Es wurden keine Zugangsprobleme festgestellt."
     },
@@ -1721,6 +1724,9 @@
     "previous_bd2ac015": {
         "message": "Vorherige"
     },
+    "previous_findtext_8dfbfd30": {
+        "message": "Vorheriger { findText }"
+    },
     "prime_917ea60e": {
         "message": "Primzahl"
     },
@@ -1796,11 +1802,23 @@
     "replace_all_d3d68b3": {
         "message": "Alle ersetzen"
     },
+    "replace_all_findtext_with_replacetext_da574b32": {
+        "message": "Alle { findText } mit { replaceText } ersetzen"
+    },
     "replace_e61834a7": {
         "message": "Ersetzen"
     },
+    "replace_findtext_with_replacetext_7b5c7fb3": {
+        "message": "{ findText } mit { replaceText } ersetzen"
+    },
     "replace_with_eeff01ad": {
         "message": "Ersetzen mit"
+    },
+    "replaced_alertfindtext_with_alertreplacetext_de5c1795": {
+        "message": "{ alertFindText } mit { alertReplaceText } ersetzt"
+    },
+    "replaced_all_alertfindtext_with_alertreplacetext_83fdfe59": {
+        "message": "Alle { alertFindText } mit { alertReplaceText } ersetzt"
     },
     "reset_95a81614": {
         "message": "Zurücksetzen"

@@ -37,6 +37,7 @@ gem "aws-sdk-kinesis", "~> 1.45", require: false
 gem "aws-sdk-s3", "~> 1.119", require: false
 gem "aws-sdk-sns", "~> 1.60", require: false
 gem "aws-sdk-sqs", "~> 1.53", require: false
+gem "aws-sdk-sagemakerruntime", "~> 1.61", require: false
 gem "rqrcode", "~> 2.2", require: false
 gem "bcrypt", "~> 3.1"
 gem "bigdecimal", "~> 3.1"
@@ -50,7 +51,7 @@ gem "code_ownership", "~> 1.33"
 gem "ddtrace", "~> 1.13", require: false
 gem "docx", "~> 0.8"
 gem "encrypted_cookie_store-instructure", "~> 1.2", require: "encrypted_cookie_store"
-gem "gepub", "1.0.15"
+gem "gepub", "~> 1.0"
 gem "apollo-federation", "~> 3.8"
 gem "graphql", "~> 2.3.0"
 gem "graphql-batch", "~> 0.5"

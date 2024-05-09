@@ -652,6 +652,7 @@ const locale = {
   "nested_less_than_27d17e58": { "message": "ネストされた＜" },
   "new_quiz_34aacba6": { "message": "新しい小テスト" },
   "next_40e12421": { "message": "次へ" },
+  "next_findtext_9d69f0fe": { "message": "次{ findText }" },
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "アクセシビリティの問題は検出されませんでした。"
   },
@@ -786,6 +787,7 @@ const locale = {
   "preview_in_overlay_ed772c46": { "message": "オーバーレイでのプレビュー" },
   "preview_inline_9787330": { "message": "インラインでのプレビュー" },
   "previous_bd2ac015": { "message": "前" },
+  "previous_findtext_8dfbfd30": { "message": "前{ findText }" },
   "prime_917ea60e": { "message": "素数" },
   "prime_numbers_13464f61": { "message": "素数" },
   "product_39cf144f": { "message": "積" },
@@ -815,8 +817,20 @@ const locale = {
   "remove_heading_style_5fdc8855": { "message": "見出しスタイルを削除する" },
   "remove_link_d1f2f4d0": { "message": "リンクの削除" },
   "replace_all_d3d68b3": { "message": "すべて置換する" },
+  "replace_all_findtext_with_replacetext_da574b32": {
+    "message": "すべての{ findText }を{ replaceText }に置き換える"
+  },
   "replace_e61834a7": { "message": "置換" },
+  "replace_findtext_with_replacetext_7b5c7fb3": {
+    "message": "{ findText }を{ replaceText }に置き換える"
+  },
   "replace_with_eeff01ad": { "message": "（）と置換する" },
+  "replaced_alertfindtext_with_alertreplacetext_de5c1795": {
+    "message": "{ alertFindText }を{ alertReplaceText }に置き換えた"
+  },
+  "replaced_all_alertfindtext_with_alertreplacetext_83fdfe59": {
+    "message": "すべての{ alertFindText }を{ alertReplaceText }に置き換えた"
+  },
   "reset_95a81614": { "message": "リセット" },
   "resize_ec83d538": { "message": "サイズ変更" },
   "restore_auto_save_deccd84b": {

@@ -674,6 +674,7 @@ const locale = {
   "nested_less_than_27d17e58": { "message": "Terpasang Kurang Dari" },
   "new_quiz_34aacba6": { "message": "Kuis Baru" },
   "next_40e12421": { "message": "Berikutnya" },
+  "next_findtext_9d69f0fe": { "message": "{ findText } Selanjutnya" },
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "Masalah aksesabilitas tidak terdeteksi."
   },
@@ -794,6 +795,7 @@ const locale = {
   "preview_in_overlay_ed772c46": { "message": "Pratinjau dalam overlay" },
   "preview_inline_9787330": { "message": "Pratinjau inline" },
   "previous_bd2ac015": { "message": "Sebelumnya" },
+  "previous_findtext_8dfbfd30": { "message": "{ findText } Sebelumnya" },
   "prime_917ea60e": { "message": "Prima" },
   "prime_numbers_13464f61": { "message": "Bilangan Prima" },
   "product_39cf144f": { "message": "Produk" },
@@ -823,8 +825,20 @@ const locale = {
   "remove_heading_style_5fdc8855": { "message": "Hapus gaya heading" },
   "remove_link_d1f2f4d0": { "message": "Hapus Tautan" },
   "replace_all_d3d68b3": { "message": "Ganti Semua" },
+  "replace_all_findtext_with_replacetext_da574b32": {
+    "message": "Ganti semua { findText } dengan { replaceText }"
+  },
   "replace_e61834a7": { "message": "Ganti" },
+  "replace_findtext_with_replacetext_7b5c7fb3": {
+    "message": "Ganti { findText } dengan { replaceText }"
+  },
   "replace_with_eeff01ad": { "message": "Ganti dengan" },
+  "replaced_alertfindtext_with_alertreplacetext_de5c1795": {
+    "message": "Mengganti { alertFindText } dengan { alertReplaceText }"
+  },
+  "replaced_all_alertfindtext_with_alertreplacetext_83fdfe59": {
+    "message": "Mengganti semua { alertFindText } dengan { alertReplaceText }"
+  },
   "reset_95a81614": { "message": "Atur Ulang" },
   "resize_ec83d538": { "message": "Ubah Ukuran" },
   "restore_auto_save_deccd84b": { "message": "Pulihkan simpan otomatis?" },

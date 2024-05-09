@@ -85,6 +85,8 @@ class LearningObjectDatesController < ApplicationController
   include Api::V1::Assignment
   include Api::V1::AssignmentOverride
 
+  OBJECTS_WITH_ASSIGNMENTS = %w[DiscussionTopic WikiPage].freeze
+
   # @API Get a learning object's date information
   #
   # Get a learning object's date-related information, including due date, availability dates,
@@ -176,7 +178,13 @@ class LearningObjectDatesController < ApplicationController
         update_assignment(overridable, object_update_params)
         prefer_assignment_availability_dates(asset, overridable)
       end
-    when "WikiPage", "Attachment"
+    when "WikiPage"
+      if asset == overridable
+        update_ungraded_object(asset, object_update_params)
+      else
+        update_assignment(overridable, object_update_params)
+      end
+    when "Attachment"
       update_ungraded_object(asset, object_update_params)
     end
   end
@@ -211,7 +219,8 @@ class LearningObjectDatesController < ApplicationController
   def overridable
     # graded discussions have an assignment and are differentiated solely via that assignment
     # ungraded topics do not have an assignment and have direct overrides and availability dates
-    @overridable ||= (asset.is_a?(DiscussionTopic) && asset.assignment) ? asset.assignment : asset
+    # pages might have an assignment if they're "allowed in mastery paths"
+    @overridable ||= (OBJECTS_WITH_ASSIGNMENTS.include?(asset.class_name) && asset.assignment) ? asset.assignment : asset
   end
 
   def update_assignment(assignment, params)

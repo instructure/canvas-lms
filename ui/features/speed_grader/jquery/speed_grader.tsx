@@ -513,6 +513,14 @@ function mergeStudentsAndSubmission() {
       break
     }
 
+    case 'randomize': {
+      jsonData.studentsWithSubmissions = jsonData.studentsWithSubmissions
+        .map(value => ({value, sort: Math.random()}))
+        .sort((a, b) => a.sort - b.sort)
+        .map(({value}) => value)
+      break
+    }
+
     // The list of students is sorted alphabetically on the server by student last name.
     default: {
       // sorting for isAnonymous occurred earlier before setting up studentMap
@@ -3043,7 +3051,11 @@ EG = {
       const showSelectMenu = isModerator || selectMenu.find('option').length > 1
       $('#rubric_assessments_list').showIf(showSelectMenu)
 
-      useStore.setState({rubricAssessors: showSelectMenu ? selectMenuOptions : []})
+      const {hide_points} = (window?.jsonData?.rubric_association ?? {}) as {hide_points: boolean}
+      useStore.setState({
+        rubricAssessors: showSelectMenu ? selectMenuOptions : [],
+        rubricHidePoints: hide_points,
+      })
       handleSelectedRubricAssessmentChanged({validateEnteredData})
     }
   },

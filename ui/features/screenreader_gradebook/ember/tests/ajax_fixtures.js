@@ -682,6 +682,7 @@ const outcomeRollupsRaw = {
       scores: [
         {links: {outcome: '1'}, score: 5},
         {links: {outcome: '2'}, score: 4},
+        {links: {outcome: '3'}, score: 5},
       ],
     },
     {

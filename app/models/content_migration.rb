@@ -667,7 +667,7 @@ class ContentMigration < ActiveRecord::Base
   alias_method :import_content_without_send_later, :import_content
 
   def import!(data)
-    return import_quizzes_next!(data) if quizzes_next_migration?
+    return import_quizzes_next!(data) if cc_qti_migration? || quizzes_next_migration?
 
     Importers.content_importer_for(context_type)
              .import_content(
@@ -678,10 +678,20 @@ class ContentMigration < ActiveRecord::Base
              )
   end
 
+  def cc_qti_migration?
+    context.instance_of?(Course) &&
+      NewQuizzesFeaturesHelper.common_cartridge_qti_new_quizzes_import_enabled?(context) &&
+      for_common_cartridge?
+  end
+
+  def import_quizzes_next?
+    !!migration_settings[:import_quizzes_next]
+  end
+
   def quizzes_next_migration?
     context.instance_of?(Course) &&
       context.feature_enabled?(:quizzes_next) &&
-      migration_settings[:import_quizzes_next]
+      import_quizzes_next?
   end
 
   def quizzes_next_banks_migration?
@@ -728,6 +738,10 @@ class ContentMigration < ActiveRecord::Base
 
   def for_course_copy?
     migration_type == "course_copy_importer" || for_master_course_import?
+  end
+
+  def for_common_cartridge?
+    ["common_cartridge_importer", "canvas_cartridge_importer"].include? migration_type
   end
 
   def should_skip_import?(content_importer)
