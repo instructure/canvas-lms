@@ -2629,22 +2629,6 @@ describe AssignmentsController do
       end
     end
 
-    describe "js_env UPDATE_ASSIGNMENT_SUBMISSION_TYPE_LAUNCH_BUTTON_ENABLED" do
-      it "sets UPDATE_ASSIGNMENT_SUBMISSION_TYPE_LAUNCH_BUTTON_ENABLED in js_env as true if enabled" do
-        user_session(@teacher)
-        Account.site_admin.enable_feature!(:update_assignment_submission_type_launch_button)
-        get "edit", params: { course_id: @course.id, id: @assignment.id }
-        expect(assigns[:js_env][:UPDATE_ASSIGNMENT_SUBMISSION_TYPE_LAUNCH_BUTTON_ENABLED]).to be(true)
-      end
-
-      it "sets UPDATE_ASSIGNMENT_SUBMISSION_TYPE_LAUNCH_BUTTON_ENABLED in js_env as false if disabled" do
-        user_session(@teacher)
-        Account.site_admin.disable_feature!(:update_assignment_submission_type_launch_button)
-        get "edit", params: { course_id: @course.id, id: @assignment.id }
-        expect(assigns[:js_env][:UPDATE_ASSIGNMENT_SUBMISSION_TYPE_LAUNCH_BUTTON_ENABLED]).to be(false)
-      end
-    end
-
     describe "js_env HIDE_ZERO_POINT_QUIZZES_OPTION_ENABLED" do
       it "sets HIDE_ZERO_POINT_QUIZZES_OPTION_ENABLED in js_env as true if enabled" do
         user_session(@teacher)
