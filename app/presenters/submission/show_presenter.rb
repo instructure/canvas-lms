@@ -62,11 +62,13 @@ class Submission::ShowPresenter
   end
 
   def submission_data_url(**additional_params)
-    if @context.feature_enabled?(:assignments_2_student)
-      new_submission_data_url(additional_params)
-    else
-      old_submission_data_url(additional_params)
-    end
+    submission_route = if anonymize_submission_owner?
+                         :context_assignment_anonymous_submission_url
+                       else
+                         :context_assignment_submission_url
+                       end
+
+    context_url(@context, submission_route, @assignment.id, anonymizable_student_id, **additional_params)
   end
 
   def submission_details_tool_launch_url
@@ -114,30 +116,6 @@ class Submission::ShowPresenter
   end
 
   private
-
-  def add_reviewee_param(additional_params)
-    if anonymize_submission_owner?
-      additional_params[:anonymous_asset_id] = @assessment_request.asset&.anonymous_id
-    else
-      additional_params[:reviewee_id] = @assessment_request.user_id
-    end
-  end
-
-  def old_submission_data_url(additional_params)
-    route = if anonymize_submission_owner?
-              :context_assignment_anonymous_submission_url
-            else
-              :context_assignment_submission_url
-            end
-
-    context_url(@context, route, @assignment.id, anonymizable_student_id, **additional_params)
-  end
-
-  def new_submission_data_url(additional_params)
-    add_reviewee_param(additional_params) if @assessment_request&.user_id
-
-    context_url(@context, :context_assignment_url, @assignment.id, **additional_params)
-  end
 
   def anonymizable_student_id
     anonymize_submission_owner? ? @submission.anonymous_id : @submission.user_id

@@ -215,7 +215,7 @@ describe Api::V1::PlannerItem do
         expect(json[:plannable][:todo_date]).to eq submission.cached_due_date
       end
 
-      it "includes the submission url when assignment enhancements is disabled" do
+      it "includes the submission url" do
         submission = @assignment.submit_homework(@student, body: "the stuff")
         assessor_submission = @assignment.find_or_create_submission(@reviewer)
         @peer_review = AssessmentRequest.create!(
@@ -226,21 +226,6 @@ describe Api::V1::PlannerItem do
         )
         json = api.planner_item_json(@peer_review, @reviewer, session)
         expected_url = "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
-        expect(json[:html_url]).to eq expected_url
-      end
-
-      it "includes the assignment url when assignment enhancements is enabled" do
-        @course.enable_feature!(:assignments_2_student)
-        submission = @assignment.submit_homework(@student, body: "the stuff")
-        assessor_submission = @assignment.find_or_create_submission(@reviewer)
-        peer_review = AssessmentRequest.create!(
-          assessor: @reviewer,
-          assessor_asset: assessor_submission,
-          asset: submission,
-          user: @student
-        )
-        json = api.planner_item_json(peer_review, @reviewer, session)
-        expected_url = "/courses/#{@course.id}/assignments/#{@assignment.id}?reviewee_id=#{peer_review.user_id}"
         expect(json[:html_url]).to eq expected_url
       end
 
