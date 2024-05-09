@@ -52,7 +52,7 @@ GEM
     faraday-net_http (3.1.0)
       net-http
     hashdiff (1.1.0)
-    i18n (1.14.4)
+    i18n (1.14.5)
       concurrent-ruby (~> 1.0)
     inst_statsd (3.0.4)
       aroi (>= 0.0.7)

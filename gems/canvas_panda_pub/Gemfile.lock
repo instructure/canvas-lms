@@ -95,7 +95,7 @@ GEM
       activerecord (>= 6.1, < 7.2)
       railties (>= 6.1, < 7.2)
     hashdiff (1.1.0)
-    i18n (1.14.4)
+    i18n (1.14.5)
       concurrent-ruby (~> 1.0)
     json-jwt (1.16.6)
       activesupport (>= 4.2)
