@@ -50,10 +50,10 @@ describe('DifferentiatedModulesSection', () => {
   const props = {
     onSync: () => {},
     importantDates: false,
-    assignmentName: 'First Assignment',
+    getAssignmentName: () => 'First Assignment',
     assignmentId: ASSIGNMENT_ID,
     type: 'assignment',
-    pointsPossible: '10',
+    getPointsPossible: () => '10',
     overrides: assignmentcollection.models.map(model => model.toJSON().assignment_override),
     defaultSectionId: 0,
   }

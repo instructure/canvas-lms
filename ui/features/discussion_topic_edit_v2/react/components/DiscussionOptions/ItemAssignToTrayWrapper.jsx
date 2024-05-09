@@ -179,8 +179,8 @@ export const ItemAssignToTrayWrapper = () => {
       onSync={onSync}
       overrides={overrides}
       assignmentId={assignmentID}
-      assignmentName={title}
-      pointsPossible={pointsPossible}
+      getAssignmentName={() => title}
+      getPointsPossible={() => pointsPossible}
       type="discussion"
       importantDates={importantDates}
       defaultSectionId={DEFAULT_SECTION_ID}
