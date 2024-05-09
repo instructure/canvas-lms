@@ -95,7 +95,6 @@ class TutorialTray extends React.Component {
         label={this.props.label}
         open={!this.state.isCollapsed}
         placement="end"
-        zIndex="100"
         onExiting={this.handleExiting}
         onEntered={this.handleEntering}
         shouldContainFocus={true}
