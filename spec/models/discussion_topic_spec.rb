@@ -2565,6 +2565,32 @@ describe DiscussionTopic do
       expect(topic.address_book_context_for(user).to_a).to eq [@section]
     end
 
+    context "differentiated modules address_book_context_for" do
+      before do
+        Account.site_admin.enable_feature! :differentiated_modules
+
+        @topic = discussion_topic_model(user: @teacher, context: @course)
+        @topic.update!(only_visible_to_overrides: true)
+        @course_section = @course.course_sections.create
+        @student1 = student_in_course(course: @course, active_enrollment: true).user
+        @student2 = student_in_course(course: @course, active_enrollment: true, section: @course_section).user
+        @teacher1 = teacher_in_course(course: @course, active_enrollment: true).user
+      end
+
+      it "returns the section for the address_book_context relative to the student with differentiated modules enabled" do
+        @topic.assignment_overrides.create!(set: @course_section)
+
+        expect(@topic.address_book_context_for(@teacher1).to_a).to eq [@course_section]
+      end
+
+      it "returns the course if there are student overrides" do
+        override = @topic.assignment_overrides.create!
+        override.assignment_override_students.create!(user: @student1)
+
+        expect(@topic.address_book_context_for(@teacher1)).to eq @course
+      end
+    end
+
     it "returns no sections for the address_book_context when student has none" do
       topic = DiscussionTopic.create!(title: "some title", context: @course, user: @teacher)
       section2 = @course.course_sections.create!(name: "no topics")

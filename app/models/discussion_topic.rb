@@ -191,8 +191,22 @@ class DiscussionTopic < ActiveRecord::Base
     end
   end
 
+  # This Method is used to help the messageable user calculator narrow down the scope of users to filter.
+  # After the scope is narrowed down , the calculator uses the visible_for? method to reject users without visibility permissions
   def address_book_context_for(user)
-    if is_section_specific?
+    # If the differentiated flag is on, and only section overrides are present
+    if Account.site_admin.feature_enabled?(:differentiated_modules) && only_visible_to_overrides && !all_assignment_overrides.active.where.not(set_type: "CourseSection").exists?
+      # Get all section overrides for the topic
+      section_overrides = all_assignment_overrides.active.where(set_type: "CourseSection").pluck(:set_id)
+
+      # get the sectiosn the user can see
+      visible_sections_for_user = context.course_section_visibility(user)
+      return [] if visible_sections_for_user == :none
+
+      # If a user can see alls ections, then just return section_overrides for the topic
+      section_overrides_and_visibility = (visible_sections_for_user == :all) ? section_overrides : (visible_sections_for_user & section_overrides) # return a list of sections that the user can see
+      CourseSection.where(id: section_overrides_and_visibility)
+    elsif is_section_specific?
       sections_for(user)
     else
       context
