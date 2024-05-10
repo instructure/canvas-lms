@@ -471,18 +471,13 @@ module AccountReports
 
     def section_query_options(sections)
       if @include_deleted
-        sections.where!("course_sections.workflow_state<>'deleted'
-                           OR
-                           (course_sections.sis_source_id IS NOT NULL
-                            AND rc.sis_source_id IS NOT NULL)")
+        sections.where!("course_sections.workflow_state<>'deleted' OR course_sections.sis_source_id IS NOT NULL")
       else
-        sections.where!("course_sections.workflow_state<>'deleted'
-                           AND rc.workflow_state<>'deleted'")
+        sections.where!("course_sections.workflow_state<>'deleted' AND rc.workflow_state<>'deleted'")
       end
 
       if @sis_format
-        sections = sections.where("course_sections.sis_source_id IS NOT NULL
-                                     AND rc.sis_source_id IS NOT NULL")
+        sections = sections.where("course_sections.sis_source_id IS NOT NULL AND rc.sis_source_id IS NOT NULL")
       end
 
       sections = sections.where.not(course_sections: { sis_batch_id: nil }) if @created_by_sis
