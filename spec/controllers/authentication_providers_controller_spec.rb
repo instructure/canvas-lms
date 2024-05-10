@@ -66,7 +66,7 @@ describe AuthenticationProvidersController do
 
     context "with a Microsoft AAC" do
       it "renders ok" do
-        account.authentication_providers.create!(microsoft_hash)
+        account.authentication_providers.create!(**microsoft_hash, tenant: "common")
         get "index", params: { account_id: account.id }
         expect(response).to be_successful
       end
@@ -90,7 +90,7 @@ describe AuthenticationProvidersController do
     end
 
     it "errors on unsupported auth type" do
-      provider = account.authentication_providers.create!(microsoft_hash)
+      provider = account.authentication_providers.create!(**microsoft_hash, tenant: "common")
       get "refresh_saml_metadata", params: { account_id: account.id, authentication_provider_id: provider.id }
       expect(flash[:error]).to match("Unsupported authentication type")
       expect(response).to be_redirect
