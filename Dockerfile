@@ -65,7 +65,7 @@ RUN mkdir -p /etc/apt/keyrings \
 
 RUN gem install bundler --no-document -v 2.5.9 \
   && find $GEM_HOME ! -user docker | xargs chown docker:docker
-RUN npm install -g npm@9.8.1 && npm cache clean --force
+RUN npm install -g npm@10.7.0 && npm cache clean --force
 
 USER docker
 
