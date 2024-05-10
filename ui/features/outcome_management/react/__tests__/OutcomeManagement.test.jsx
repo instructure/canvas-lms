@@ -105,18 +105,18 @@ describe('OutcomeManagement', () => {
         <OutcomeManagement breakpoints={{tablet: true}} />
       </MockedProvider>
     )
-    jest.runAllTimers()
+    await act(async () => jest.runAllTimers())
 
     // Select a group in the lsh
     const cf0 = await findByText('Course folder 0')
     fireEvent.click(cf0)
-    jest.runAllTimers()
+    await act(async () => jest.runAllTimers())
 
     // The easy way to determine if lsh is passing to ManagementHeader is
     // to open the create outcome modal and check if the lhs group was loaded
     // by checking if the child of the lhs group is there
     fireEvent.click(within(getByTestId('managementHeader')).getByText('Create'))
-    jest.runAllTimers()
+    await act(async () => jest.runAllTimers())
     // there's something weird going on in the test here that while we find the modal
     // .toBeInTheDocument() fails, even though a findBy for it fails before ^that click.
     // We can test that the elements expected to be within it exist.
