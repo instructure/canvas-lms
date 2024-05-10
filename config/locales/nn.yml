@@ -25018,6 +25018,7 @@ nn:
   there_was_an_unexpected_error_creating_the_discuss_8811a868: "Det oppstod ein uventa feil under opprettinga av diskusjonsinnlegget."
   there_was_an_unexpected_error_deleting_the_convers_412fd621: "Det oppstod ein uventa feil under sletting av innlegget."
   there_was_an_unexpected_error_deleting_the_discuss_fe1022cb: "Det oppstod ein uventa feil under sletting av diskusjonstemaet."
+  there_was_an_unexpected_error_error_ca0fc77e: "Det oppstod ein uventa feil: %{error}"
   there_was_an_unexpected_error_loading_the_replies_578d9738: "Det oppstod ein uventa feil ved innlasting av svara."
   there_was_an_unexpected_error_marking_all_as_read_117fe739: "Det oppstod ein uventa feil ved merking av alle som lesne."
   there_was_an_unexpected_error_marking_all_as_unrea_e4658766: "Det oppstod ein uventa feil ved merking av alle som ulesne."
@@ -25047,6 +25048,7 @@ nn:
   third_20c6a639: tredje
   this_account_does_not_allow_for_microsoft_teams_sy_266f11c7: "Denne kontoen tillet ikkje synkronisering med Microsoft Teams. Du må slå på funksjonaliteten for \"Microsoft gruppepåmelding synkronisering\" før du får endra nokon innstillingar."
   this_action_has_been_disabled_by_your_admin_5e34bfa0: "Funksjonen er deaktivert av administrator. "
+  this_and_all_following_events_4b4b283: "Denne og hendingane etterpå"
   this_announcement_will_not_be_visible_until_delaye_88f7f5c: "Denne kunngjeringa vil ikkje visast før %{delayedPostAt}"
   this_area_will_be_used_by_the_assessor_to_leave_co_98a5db8b: "Her skriv ein inn kommentarar som er relatert til kriteriet."
   this_assignment_does_not_count_toward_the_final_gr_29ede05f: "Denne oppgåva blir ikkje rekna med i sluttresultatet"
@@ -25073,6 +25075,7 @@ nn:
   this_assignment_submission_is_my_own_original_work_e820ce4b: "Den leverte oppgåva er mitt eige, sjølvstendige arbeid"
   this_assignment_will_no_longer_count_towards_your__a6eb6778: "Denne oppgåva tel ikkje lenger for sluttvurderinga di."
   this_attachment_has_been_unpublished_by_the_author_37bff9c3: "Dette vedlegget er avpublisert av forfattaren"
+  this_can_be_a_device_that_can_generate_verificatio_f0787dcf: "Dette kan være eit verktøy som kan generere verifiseringskodar, eller ein telefon som kan motta tekstmeldingar"
   this_canvas_installation_is_only_for_testing_and_w_12e52370: "Denne Canvas-installasjonen er kun for testing og blir *tilbakestilt kvar månad.*"
   this_canvas_installation_is_only_for_testing_and_w_17ce8bc2: 
     one: "Denne Canvas-installasjonen er berre for testing og blir *tilbakestilt kvar veke.*"
@@ -25186,10 +25189,12 @@ nn:
       har levert ein oppgåve. Rapporten inneheld ein rad per
       studentinnlevering.
   this_is_a_siteadmin_test_feature_flag_3ab5184: "Dette er ein test funksjon-merknad for SiteAdmin"
+  this_is_a_what_if_score_709bca0d: "Dette er eit kva-skjer-dersom-resultat"
   this_is_a_what_if_score_cbdc04f9: "Dette er kva-skjer-dersom-resultat"
   this_is_an_account_setting_that_must_be_enabled_by_8ced660: "Dette er ei kontoinnstilling som må slås på av ein Customer Success Manager hos Instructure. Varsel av denne typen er ein lite brukt funksjon designa for å sende eit varsel til studentar, lærarar eller administratorar for spesifikke utløysarar (f.eks. ingen lærar-student-interaksjon i løpet av 7 dagar). Dei vert sjekka kvar dag og varslingar vil bli sendt ut til studenten og/eller læraren fram til det utløysande problemet er løyst."
   this_is_an_account_setting_that_must_be_turned_on__4c939dea: "Dette er ein kontoinnstilling som institusjonen sin Canvas-kontakt må aktivere."
   this_is_an_anonymous_discussion_student_names_and__bc19b64d: "Dette er ein anonym diskusjon. Studentnamn og profilbilder er skjult."
+  this_is_an_anonymous_discussion_though_student_nam_c45b563e: "Dette er ein anonym diskusjon. Sjøl om studentnamn og profilbilete vert skjult her, så vil ditt namn og profilbilete være synleg for alle på emnet. Tagge personar har og blitt slått av."
   this_is_an_anonymous_discussion_though_student_nam_f98abe71: "Dette er ein anonym diskusjon. Sjøl om studentnamn og profilbilete vert skjult her, så vil det visast for alle på emnet"
   this_is_an_anonymous_discussion_your_name_and_prof_72c49b77: "Dette er ein anonym diskusjon, ditt namn og profilbilde vil være skjult for andre studentar på emnet."
   this_is_just_a_dev_only_feature_you_can_turn_on_to_7f88c58f: "Dette er ein utviklarfunksjon som førehandsviser korleis sider vil sjå ut i eit høgre-til-venstre-miljø, utan å faktisk endre til eit språk som normalt brukar høgre-til-venstre-prinsippar."
