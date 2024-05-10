@@ -184,6 +184,22 @@ describe PlannerController do
         expect(response_json.select { |i| i["plannable_type"] == "announcement" }.pluck("plannable_id")).to eq [a1.id]
       end
 
+      it "differentiated modules: only shows section specific announcements to students who can view them" do
+        Account.site_admin.enable_feature! :differentiated_modules
+        a1 = @course.announcements.create!(message: "for the defaults")
+        a1.update!(only_visible_to_overrides: true)
+        a1.assignment_overrides.create!(set: @course.default_section)
+        sec2 = @course.course_sections.create!
+        a2 = @course.announcements.create!(message: "for my favorites")
+        a2.update!(only_visible_to_overrides: true)
+
+        a2.assignment_overrides.create!(set: sec2)
+
+        get :index
+        response_json = json_parse(response.body)
+        expect(response_json.select { |i| i["plannable_type"] == "announcement" }.pluck("plannable_id")).to eq [a1.id]
+      end
+
       it "shows planner overrides created on quizzes" do
         quiz = quiz_model(course: @course, due_at: 1.day.from_now)
         PlannerOverride.create!(plannable_id: quiz.id, plannable_type: Quizzes::Quiz, user_id: @student.id)
