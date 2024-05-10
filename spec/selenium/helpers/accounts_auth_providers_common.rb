@@ -133,6 +133,7 @@ module AuthenticationProvidersCommon
     add_auth_type("Microsoft")
     microsoft_form = f("#new_microsoft")
     microsoft_form.find_element(:id, "application_id_microsoft").send_keys("1234")
+    microsoft_form.find_element(:id, "tenants_microsoft").send_keys("common")
     f("#new_microsoft button[type='submit']").click
     wait_for_ajaximations
   end

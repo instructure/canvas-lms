@@ -354,7 +354,7 @@ describe AuthenticationProvider do
   end
 
   describe "#provision_user" do
-    let(:auth_provider) { account.authentication_providers.create!(auth_type: "microsoft", login_attribute: "sub") }
+    let(:auth_provider) { account.authentication_providers.create!(auth_type: "microsoft", tenant: "microsoft", login_attribute: "sub") }
 
     it "works" do
       p = auth_provider.provision_user("unique_id")
