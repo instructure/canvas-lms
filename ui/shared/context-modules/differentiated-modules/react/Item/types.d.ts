@@ -43,6 +43,7 @@ export interface exportedOverride {
   name: string
   type: string
   noop_id: string
+  unassign_item: boolean
 }
 
 export interface DateDetailsOverride {
