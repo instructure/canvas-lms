@@ -828,20 +828,37 @@ class DiscussionTopic < ActiveRecord::Base
              { course_sections: course_sections.pluck(:id) }).distinct
   }
 
+  scope :discussion_topic_section_visibility_scope, lambda { |student|
+    DiscussionTopicSectionVisibility
+      .active
+      .where("discussion_topic_section_visibilities.discussion_topic_id = discussion_topics.id")
+      .where(
+        Enrollment.active_or_pending.where(user_id: student)
+          .where("enrollments.course_section_id = discussion_topic_section_visibilities.course_section_id")
+          .arel.exists
+      )
+  }
+
   scope :visible_to_student_sections, lambda { |student|
-    visibility_scope = DiscussionTopicSectionVisibility
-                       .active
-                       .where("discussion_topic_section_visibilities.discussion_topic_id = discussion_topics.id")
-                       .where(
-                         Enrollment.active_or_pending.where(user_id: student)
-                          .where("enrollments.course_section_id = discussion_topic_section_visibilities.course_section_id")
-                          .arel.exists
-                       )
     merge(
       DiscussionTopic.where.not(discussion_topics: { context_type: "Course" })
       .or(DiscussionTopic.where(discussion_topics: { is_section_specific: false }))
-      .or(DiscussionTopic.where(visibility_scope.arel.exists))
+      .or(DiscussionTopic.where(discussion_topic_section_visibility_scope(student).arel.exists))
     )
+  }
+
+  scope :visible_to_ungraded_discussion_student_visibilities, lambda { |student|
+    if Account.site_admin.feature_enabled?(:differentiated_modules)
+      visible_topic_ids = UngradedDiscussionStudentVisibility.where(user_id: student).select(:discussion_topic_id)
+
+      non_course_topics = DiscussionTopic.where.not(context_type: "Course")
+      differentiated_visible_topics = DiscussionTopic.where(id: visible_topic_ids).where(is_section_specific: false)
+      section_specific_visible_topics = DiscussionTopic.where(is_section_specific: true).where(discussion_topic_section_visibility_scope(student).arel.exists)
+
+      merge(non_course_topics.or(differentiated_visible_topics).or(section_specific_visible_topics))
+    else
+      visible_to_student_sections(student)
+    end
   }
 
   scope :recent, -> { where("discussion_topics.last_reply_at>?", 2.weeks.ago).order("discussion_topics.last_reply_at DESC") }

@@ -2366,7 +2366,7 @@ class CoursesController < ApplicationController
             scope = Announcement.where(context_type: "Course", context_id: @context.id, workflow_state: "active")
                                 .ordered_between(start_date, end_date)
             unless @context.grants_any_right?(@current_user, session, :read_as_admin, :manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
-              scope = scope.visible_to_student_sections(@current_user)
+              scope = scope.visible_to_ungraded_discussion_student_visibilities(@current_user)
             end
             latest_announcement = scope.limit(1).first
           end

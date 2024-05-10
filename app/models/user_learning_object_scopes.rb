@@ -440,7 +440,7 @@ module UserLearningObjectScopes
         .published
         .for_courses_and_groups(shard_course_ids, shard_group_ids)
         .todo_date_between(due_after, due_before)
-        .visible_to_student_sections(self)
+        .visible_to_ungraded_discussion_student_visibilities(self)
     end
   end
 
