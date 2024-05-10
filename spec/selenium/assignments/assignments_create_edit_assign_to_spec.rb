@@ -221,6 +221,17 @@ shared_examples_for "item assign to tray during assignment creation/update" do
       expect(element_exists?(assign_to_in_tray_selector("Remove Everyone else"))).to be_falsey
     end
 
+    it "does not show module override if an unassigned override exists" do
+      @assignment.assignment_overrides.create!(set: @course, unassign_item: false)
+      @assignment.assignment_overrides.create!(set: @course.course_sections.first, unassign_item: true)
+      AssignmentCreateEditPage.visit_assignment_edit_page(@course.id, @assignment.id)
+      AssignmentCreateEditPage.click_manage_assign_to_button
+
+      wait_for_assign_to_tray_spinner
+      keep_trying_until { expect(item_tray_exists?).to be_truthy }
+      expect(module_item_assign_to_card.last).not_to contain_css(inherited_from_selector)
+    end
+
     it "shows everyone card if there are course overrides" do
       @assignment.assignment_overrides.create!(set: @course, due_at: 1.day.from_now)
       AssignmentCreateEditPage.visit_assignment_edit_page(@course.id, @assignment.id)

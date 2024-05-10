@@ -74,6 +74,7 @@ const DifferentiatedModulesSection = ({
   const [disabledOptionIds, setDisabledOptionIds] = useState([])
   const [stagedImportantDates, setStagedImportantDates] = useState(importantDates)
   const [hasModuleOverrides, setHasModuleOverrides] = useState(false)
+  const [moduleAssignees, setModuleAssignees] = useState([])
   const linkRef = useRef()
 
   useEffect(() => {
@@ -98,8 +99,17 @@ const DifferentiatedModulesSection = ({
       const state = cloneObject(uniqueOverrides)
       // initialState is set only 1 time to check if the overrides have pending changes
       setInitialState(state)
-      // hasModuleOverrides also is only set once since this value never changes
+      // hasModuleOverrides and module assignees are only set once since they don't change
       setHasModuleOverrides(overrides.some(card => card.context_module_id))
+      const allModuleAssignees = overrides.filter(override => override.context_module_id)?.map(moduleOverride => {
+        if (moduleOverride.course_section_id) {
+          return `section-${moduleOverride.course_section_id}`
+        }
+        if (moduleOverride.student_ids) {
+          return moduleOverride.student_ids.map(id => `student-${id}`)
+        }
+      }).flat()
+      setModuleAssignees(allModuleAssignees)
       // checkPoint is set every time the user applies changes to the overrides
       setCheckPoint(state)
     }
@@ -347,6 +357,19 @@ const DifferentiatedModulesSection = ({
     const newOverrides = getAllOverridesFromCards(stagedCards).filter(
       card => card.course_section_id || card.student_ids || card.noop_id || card.course_id
     )
+
+    const deletedModuleAssignees = moduleAssignees.filter(
+      assignee => !disabledOptionIds.includes(assignee)
+    )
+
+    deletedModuleAssignees.forEach(assignee => {
+      newOverrides.push({
+        id: undefined,
+        course_section_id: assignee.includes('section-') ? assignee.split('-')[1] : undefined,
+        student_ids: assignee.includes('student-') ? [assignee.split('-')[1]] : undefined,
+        unassign_item: true,
+      })
+    })
 
     const withoutModuleOverrides = processModuleOverrides(newOverrides, checkPoint)
     resetOverrides(newOverrides, withoutModuleOverrides)

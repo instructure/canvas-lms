@@ -159,6 +159,9 @@ export const removeOverriddenAssignees = (overrides, parsedOverrides) => {
 
   for (const [key, value] of Object.entries(parsedOverrides)) {
     value.overrides.forEach(override => {
+      if (override.unassign_item) {
+        delete parsedOverrides[key]
+      }
       const {context_module_id, student_ids, course_section_id} = override
 
       if (context_module_id && student_ids) {
