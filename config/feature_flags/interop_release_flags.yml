@@ -312,6 +312,17 @@ resource_link_uuid_in_custom_substitution:
     Changes the $ResourceLink.id substitution parameter's behavior
     to include the resource_link_uuid, instead of the resource_id for the line item
   applies_to: RootAccount
+top_navigation_placement:
+  state: hidden
+  shadow: true
+  applies_to: RootAccount
+  display_name: Top Navigation Placement
+  description: Enables top_navigation LTI placement. (LTI 1.3 Only)
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
 tune_lti_context_id_history_query:
   state: hidden
   applies_to: RootAccount
