@@ -38,7 +38,7 @@ const students: Student[] = [
     redoRequest: false,
     sortableName: 'Ford, Betty',
     score: undefined,
-    submittedAt: undefined,
+    submittedAt: Date.now(),
     excused: false,
   },
   {
@@ -48,7 +48,7 @@ const students: Student[] = [
     redoRequest: false,
     sortableName: 'Jones, Adam',
     score: undefined,
-    submittedAt: undefined,
+    submittedAt: Date.now(),
     excused: false,
   },
   {
@@ -58,7 +58,7 @@ const students: Student[] = [
     redoRequest: false,
     sortableName: 'Xi, Charlie',
     score: undefined,
-    submittedAt: undefined,
+    submittedAt: Date.now(),
     excused: false,
   },
   {
@@ -68,7 +68,7 @@ const students: Student[] = [
     redoRequest: false,
     sortableName: 'Smith, Dana',
     score: undefined,
-    submittedAt: undefined,
+    submittedAt: Date.now(),
     excused: false,
   },
 ]
@@ -271,6 +271,28 @@ describe.skip('MessageStudentsWhoDialog', () => {
     expect(await findByRole('checkbox', {name: /Students/})).toHaveAccessibleName('4 Students')
   })
 
+  it('updates total number of students in checkbox label when student is removed from list', async () => {
+    const mocks = await makeMocks()
+
+    const {findByRole, findByTestId, findAllByTestId} = render(
+      <MockedProvider mocks={mocks} cache={createCache()}>
+        <MessageStudentsWhoDialog {...makeProps()} />
+      </MockedProvider>
+    )
+
+    expect(await findByTestId('total-student-checkbox')).toHaveAccessibleName('4 Students')
+
+    // Open recipient table
+    const button = await findByRole('button', {name: 'Show all recipients'})
+    fireEvent.click(button)
+
+    // Select a student cell
+    const studentCells = await findAllByTestId('student-pill')
+    fireEvent.click(studentCells[0])
+
+    expect(await findByTestId('total-student-checkbox')).toHaveAccessibleName('3 Students')
+  })
+
   it('includes the total number of observers in the checkbox label', async () => {
     const mocks = await makeMocks()
 
@@ -280,6 +302,28 @@ describe.skip('MessageStudentsWhoDialog', () => {
       </MockedProvider>
     )
     expect(await findByRole('checkbox', {name: /Observers/})).toHaveAccessibleName('2 Observers')
+  })
+
+  it('updates total number of observers in checkbox label when observer is added to list', async () => {
+    const mocks = await makeMocks()
+
+    const {findByRole, findByTestId, findAllByTestId} = render(
+      <MockedProvider mocks={mocks} cache={createCache()}>
+        <MessageStudentsWhoDialog {...makeProps()} />
+      </MockedProvider>
+    )
+
+    expect(await findByTestId('total-observer-checkbox')).toHaveAccessibleName('0 Observers')
+
+    // Open recipient table
+    const button = await findByRole('button', {name: 'Show all recipients'})
+    fireEvent.click(button)
+
+    // Select an observer cell
+    const observerCells = await findAllByTestId('observer-pill')
+    fireEvent.click(observerCells[0])
+
+    expect(await findByTestId('total-observer-checkbox')).toHaveAccessibleName('1 Observers')
   })
 
   describe('available criteria', () => {

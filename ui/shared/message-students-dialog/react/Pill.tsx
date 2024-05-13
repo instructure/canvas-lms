@@ -67,11 +67,12 @@ function renderIcon(selected: boolean) {
 const Pill = ({studentId, observerId = null, text, onClick, selected = false}) => {
   const textColor = selected ? 'primary' : 'secondary'
   const truncatedText = truncate(text)
+  const testId = observerId ? 'observer-pill' : 'student-pill'
 
   const ariaLabel = selected ? I18n.t('Remove %{text}', {text}) : I18n.t('Add %{text}', {text})
 
   const contents = (
-    <Flex as="div" margin="0 xx-small 0 0" justifyItems="space-between">
+    <Flex as="div" margin="0 xxx-small 0 0" justifyItems="space-between">
       <Flex.Item
         size="0.75rem"
         shouldGrow={true}
@@ -81,13 +82,13 @@ const Pill = ({studentId, observerId = null, text, onClick, selected = false}) =
       >
         {renderText(text, truncatedText, textColor)}
       </Flex.Item>
-      <Flex.Item>{renderIcon(selected)}</Flex.Item>
+      <Flex.Item padding="0 0 xxx-small 0">{renderIcon(selected)}</Flex.Item>
     </Flex>
   )
 
   return (
     <InstUISettingsProvider theme={{componentOverrides}}>
-      <Tag text={contents} onClick={() => onClick(studentId, observerId)} />
+      <Tag text={contents} data-testid={testId} onClick={() => onClick(studentId, observerId)} />
     </InstUISettingsProvider>
   )
 }
