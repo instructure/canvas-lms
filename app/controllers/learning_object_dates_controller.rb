@@ -269,6 +269,7 @@ class LearningObjectDatesController < ApplicationController
         object.update!(is_section_specific: false)
       end
     end
+    object.clear_cache_key(:availability) if caches_availability?
     head :no_content
   end
 
@@ -283,6 +284,10 @@ class LearningObjectDatesController < ApplicationController
 
   def allow_due_at?
     asset.is_a?(Assignment) || asset.is_a?(Quizzes::Quiz) || (asset.is_a?(DiscussionTopic) && asset.assignment)
+  end
+
+  def caches_availability?
+    asset.is_a?(Assignment) || asset.is_a?(Quizzes::Quiz) || asset.is_a?(DiscussionTopic) || asset.is_a?(WikiPage)
   end
 
   def object_update_params

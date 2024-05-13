@@ -1551,6 +1551,44 @@ describe "Pages API", type: :request do
       expect(json.find { |page| page["url"] == @front_page.url }["lock_explanation"]).to eq("This page is part of an unpublished module and is not available yet.")
     end
 
+    context "with differentiated_modules enabled" do
+      before :once do
+        Account.site_admin.enable_feature!(:differentiated_modules)
+        @page = @course.wiki_pages.create!(title: "potentially locked page", body: "the page body")
+      end
+
+      let(:json) do
+        api_call(:get,
+                 "/api/v1/courses/#{@course.id}/pages",
+                 { controller: "wiki_pages_api", action: "index", format: "json", course_id: @course.id.to_s, include: ["body"] })
+      end
+
+      it "includes lock info and excludes body for pages locked by unlock_at with differentiated_modules enabled" do
+        @page.update!(unlock_at: 1.day.from_now)
+        page_json = json.find { |p| p["url"] == @page.url }
+        expect(page_json["locked_for_user"]).to be(true)
+        expect(page_json["lock_explanation"]).to include("This page is locked until")
+        expect(page_json.keys).not_to include("body")
+      end
+
+      it "includes lock info and excludes body for pages locked by lock_at with differentiated_modules enabled" do
+        @page.update!(lock_at: 1.day.ago)
+        page_json = json.find { |p| p["url"] == @page.url }
+        expect(page_json["locked_for_user"]).to be(true)
+        expect(page_json["lock_explanation"]).to include("This page was locked")
+        expect(page_json.keys).not_to include("body")
+      end
+
+      it "includes body for unlocked pages" do
+        @page.update!(unlock_at: 1.day.ago)
+        page_json = json.find { |p| p["url"] == @page.url }
+        expect(page_json["locked_for_user"]).to be(false)
+        expect(page_json.keys).not_to include("lock_explanation")
+        p page_json
+        expect(page_json["body"]).to eq("the page body")
+      end
+    end
+
     describe "module progression" do
       before :once do
         @mod = @course.context_modules.create!(name: "some module")
