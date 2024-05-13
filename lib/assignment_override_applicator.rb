@@ -50,7 +50,7 @@ module AssignmentOverrideApplicator
     # students get the last overridden date that applies to them, but teachers
     # should see the assignment's due_date if that is more lenient
     context = result_learning_object.context
-    if context &&
+    if context.is_a?(Course) &&
        (context.user_has_been_admin?(user) || context.user_has_no_enrollments?(user)) && # don't make a permissions call if we don't need to
        context.grants_any_right?(user, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS) # faster than calling :delete rights on each learning object
 
