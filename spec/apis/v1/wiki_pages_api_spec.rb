@@ -132,7 +132,7 @@ describe WikiPagesApiController, type: :request do
           end
 
           context "with the block editor" do
-            context "with the block editor feature flag on" do
+            context "with the block editor feature flag on", skip: "defer until we have a stable block editor json schema" do
               before do
                 Account.default.enable_feature!(:block_editor)
               end

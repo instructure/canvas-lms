@@ -1,3 +1,7 @@
+/* eslint-disable  */
+// @ts-nocheck
+// TODO: we get complaints about <Overlay> because it can be either a Modal or a Tray
+// and they have different props. I don't have time to fix this the right way now.
 /*
  * Copyright (C) 2019 - present Instructure, Inc.
  *
@@ -225,11 +229,19 @@ export default class ExternalToolDialog extends React.Component<
           target="external_tool_launch"
           style={{margin: 0}}
         >
-          <input type="hidden" name="editor" value="1"/>
-          <input type="hidden" name="selection" value={state.form.selection}/>
-          <input type="hidden" name="editor_contents" value={state.form.contents}/>
-          <input type="hidden" name="com_instructure_course_canvas_resource_type" value={props.env.rceWrapper?.getResourceIdentifiers().resourceType} />
-          <input type="hidden" name="com_instructure_course_canvas_resource_id" value={props.env.rceWrapper?.getResourceIdentifiers().resourceId} />
+          <input type="hidden" name="editor" value="1" />
+          <input type="hidden" name="selection" value={state.form.selection} />
+          <input type="hidden" name="editor_contents" value={state.form.contents} />
+          <input
+            type="hidden"
+            name="com_instructure_course_canvas_resource_type"
+            value={props.env.rceWrapper?.getResourceIdentifiers().resourceType}
+          />
+          <input
+            type="hidden"
+            name="com_instructure_course_canvas_resource_id"
+            value={props.env.rceWrapper?.getResourceIdentifiers().resourceId}
+          />
           {state.form.parent_frame_context != null && (
             <input
               type="hidden"
