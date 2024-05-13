@@ -25,6 +25,8 @@ export const DEFAULT_AVATAR_URL = 'http://canvas.instructure.com/images/messages
 export const REPLY_TO_TOPIC = 'reply_to_topic'
 export const REPLY_TO_ENTRY = 'reply_to_entry'
 export const SUBMITTED = 'submitted'
+export const MISSING = 'missing'
+export const LATE = 'late'
 
 export const AllThreadsState = {
   None: 0,

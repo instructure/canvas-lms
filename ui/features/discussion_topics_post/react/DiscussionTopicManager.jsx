@@ -22,7 +22,7 @@ import {DiscussionTopicRepliesContainer} from './containers/DiscussionTopicRepli
 import {DiscussionTopicContainer} from './containers/DiscussionTopicContainer/DiscussionTopicContainer'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page'
-import {getOptimisticResponse, responsiveQuerySizes} from './utils'
+import {getOptimisticResponse, responsiveQuerySizes, getCheckpointSubmission} from './utils'
 import {
   HIGHLIGHT_TIMEOUT,
   SearchContext,
@@ -293,14 +293,6 @@ const DiscussionTopicManager = props => {
     }
   }
 
-  const getCheckpointSubmission = (data, subAssignmentTag) => {
-    return (
-      data.createDiscussionEntry.mySubAssignmentSubmissions?.find(
-        sub => sub.subAssignmentTag === subAssignmentTag
-      ) || {}
-    )
-  }
-
   const onEntryCreationCompletion = data => {
     setHighlightEntryId(data.createDiscussionEntry.discussionEntry._id)
     setReplytoTopicSubmission(getCheckpointSubmission(data, REPLY_TO_TOPIC))
@@ -460,6 +452,8 @@ const DiscussionTopicManager = props => {
                         highlightEntryId={highlightEntryId}
                         setHighlightEntryId={setHighlightEntryId}
                         isTrayFinishedOpening={isTrayFinishedOpening}
+                        setReplytoTopicSubmission={setReplytoTopicSubmission}
+                        setReplyToEntrySubmission={setReplyToEntrySubmission}
                       />
                     </View>
                   )}
