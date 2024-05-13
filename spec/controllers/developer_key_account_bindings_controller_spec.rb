@@ -23,7 +23,21 @@ RSpec.describe DeveloperKeyAccountBindingsController do
   let(:root_account_admin) { account_admin_user(account: root_account) }
   let(:sub_account) { account_model(parent_account: root_account) }
   let(:sub_account_admin) { account_admin_user(account: sub_account) }
-  let(:root_account_developer_key) { DeveloperKey.create!(account: root_account) }
+  let(:root_account_developer_key) do
+    DeveloperKey.create!(
+      account: root_account,
+      lti_registration: root_account_lti_registration
+    )
+  end
+  let(:root_account_lti_registration) do
+    Lti::Registration.create!(
+      account: root_account,
+      name: "lti registration",
+      admin_nickname: "lti registration",
+      created_by: sub_account_admin,
+      updated_by: sub_account_admin
+    )
+  end
 
   let(:valid_parameters) do
     {
@@ -58,7 +72,7 @@ RSpec.describe DeveloperKeyAccountBindingsController do
       user_session(authorized_admin)
       post(:create_or_update, params:)
       expect(created_binding.account).to eq expected_account
-      expect(created_binding.developer_key_id).to eq params[:developer_key_id]
+      expect(created_binding.developer_key.global_id).to eq params[:developer_key_id]
       expect(created_binding.workflow_state).to eq params.dig(:developer_key_account_binding, :workflow_state)
     end
 
@@ -103,10 +117,40 @@ RSpec.describe DeveloperKeyAccountBindingsController do
       post(:create_or_update, params:)
       expect(json_parse.keys).to match_array(expected_keys)
     end
+
+    it "updates the corresponding Lti::RegistrationAccountBinding" do
+      user_session(authorized_admin)
+
+      params[:developer_key_account_binding][:workflow_state] = "allow"
+      post(:create_or_update, params:)
+
+      updated_binding.lti_registration_account_binding.reload
+      expect(updated_binding.lti_registration_account_binding.workflow_state).to eq("allow")
+      expect(updated_binding.lti_registration_account_binding.updated_by).to eq(authorized_admin)
+      expect(updated_binding.lti_registration_account_binding.created_by).to eq(root_account_admin)
+    end
   end
 
   context "when the account is a parent account" do
     describe "POST #create_or_edit" do
+      before do
+        registration = Lti::Registration.create!(
+          account: root_account,
+          created_by: root_account_admin,
+          updated_by: root_account_admin,
+          name: "an lti tool",
+          admin_nickname: "an lti tool"
+        )
+        Lti::RegistrationAccountBinding.create!(
+          account: root_account,
+          developer_key_account_binding: root_account_developer_key.developer_key_account_bindings.first,
+          created_by: root_account_admin,
+          updated_by: root_account_admin,
+          registration:,
+          skip_lime_sync: true
+        )
+      end
+
       it_behaves_like "the developer key account binding create endpoint" do
         let(:authorized_admin) { root_account_admin }
         let(:unauthorized_admin) { sub_account_admin }

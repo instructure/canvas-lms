@@ -55,4 +55,23 @@ class Lti::RegistrationAccountBinding < ActiveRecord::Base
     true
   end
   # -- END SoftDeleteable --
+
+  # The skip_lime_sync attribute should be set when this this model is being updated
+  # by the developer_key_account_binding's after_save method. If it is set, this model
+  # should skip its own update_developer_key_account_binding method. This is to prevent
+  # a loop between the two models' after_saves.
+  attr_accessor :skip_lime_sync
+
+  after_save :update_developer_key_account_binding
+
+  private
+
+  def update_developer_key_account_binding
+    if @skip_lime_sync
+      @skip_lime_sync = false
+      return
+    end
+
+    developer_key_account_binding&.update!(workflow_state:, skip_lime_sync: true)
+  end
 end
