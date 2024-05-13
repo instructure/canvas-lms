@@ -376,6 +376,15 @@ export const getOptimisticResponse = ({
   }
 }
 
+// data must contain data response to create discussion entry mutation
+export const getCheckpointSubmission = (data, subAssignmentTag) => {
+  return (
+    data.createDiscussionEntry.mySubAssignmentSubmissions?.find(
+      sub => sub.subAssignmentTag === subAssignmentTag
+    ) || {}
+  )
+}
+
 export const buildQuotedReply = (nodes, previewId) => {
   if (!nodes) return ''
   let preview = {}
