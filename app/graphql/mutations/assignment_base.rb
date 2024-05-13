@@ -54,6 +54,7 @@ class Mutations::AssignmentBase::AssignmentPeerReviewsUpdate < GraphQL::Schema::
 end
 
 class Mutations::AssignmentBase::AssignmentInputBase < GraphQL::Schema::InputObject
+  argument :ab_guid, [String], required: false
   argument :assignment_group_id, ID, required: false
   argument :assignment_overrides, [Mutations::AssignmentBase::AssignmentOverrideCreateOrUpdate], required: false
   argument :due_at, Types::DateTimeType, required: false

@@ -202,6 +202,7 @@ export const prepareCheckpointsPayload = (
 }
 
 export const prepareAssignmentPayload = (
+  abGuid,
   isEditing,
   title,
   pointsPossible,
@@ -256,6 +257,12 @@ export const prepareAssignmentPayload = (
     onlyVisibleToOverrides: !Object.keys(everyoneOverride).length,
     gradingStandardId: gradingSchemeId || null,
     forCheckpoints: isCheckpoints,
+  }
+  if (abGuid) {
+    payload = {
+      ...payload,
+      abGuid,
+    }
   }
   // Additional properties if graded assignment is not checkpointed
   if (!isCheckpoints) {

@@ -20,7 +20,7 @@
 import {render, waitFor, fireEvent} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
-import DiscussionTopicForm from '../DiscussionTopicForm'
+import DiscussionTopicForm, {isGuidDataValid, getAbGuidArray} from '../DiscussionTopicForm'
 import {DiscussionTopic} from '../../../../graphql/DiscussionTopic'
 import {Assignment} from '../../../../graphql/Assignment'
 import {GroupSet} from '../../../../graphql/GroupSet'
@@ -486,6 +486,63 @@ describe('DiscussionTopicForm', () => {
 
       fireEvent.keyDown(automaticReviewsInput, {keyCode: 40})
       expect(automaticReviewsInput.value).toBe('1')
+    })
+
+    describe('validate abGuid for Mastery Connect', () => {
+      it('returns the ab_guid array from the event data', () => {
+        setup()
+
+        const mockEvent = {
+          data: {
+            subject: 'assignment.set_ab_guid',
+            data: ['1E20776E-7053-11DF-8EBF-BE719DFF4B22', '1E20776E-7053-0000-0000-BE719DFF4B22'],
+          },
+        }
+
+        expect(getAbGuidArray(mockEvent)).toEqual([
+          '1E20776E-7053-11DF-8EBF-BE719DFF4B22',
+          '1E20776E-7053-0000-0000-BE719DFF4B22',
+        ])
+      })
+
+      it('isGuidDataValid returns true if ab_guid format and subject are correct', () => {
+        setup()
+
+        const mockEvent = {
+          data: {
+            subject: 'assignment.set_ab_guid',
+            data: ['1E20776E-7053-11DF-8EBF-BE719DFF4B22'],
+          },
+        }
+
+        expect(isGuidDataValid(mockEvent)).toEqual(true)
+      })
+
+      it('isGuidDataValid returns false if subject is not assignment.set_ab_guid', () => {
+        setup()
+
+        const mockEvent = {
+          data: {
+            subject: 'not right subject',
+            data: ['1E20776E-7053-11DF-8EBF-BE719DFF4B22'],
+          },
+        }
+
+        expect(isGuidDataValid(mockEvent)).toBe(false)
+      })
+
+      it('isGuidDataValid returns false if at least one of the ab_guids in the array is not formatted correctly', () => {
+        setup()
+
+        const mockEvent = {
+          data: {
+            subject: 'assignment.set_ab_guid',
+            data: ['not right format', '1E20776E-7053-11DF-8EBF-BE719DFF4B22'],
+          },
+        }
+
+        expect(isGuidDataValid(mockEvent)).toBe(false)
+      })
     })
 
     describe('Checkpoints', () => {
