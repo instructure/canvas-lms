@@ -690,54 +690,56 @@ module Lti
         it { is_expected.to be_nil }
       end
 
-      context "when the lti_placement_restrictions feature flag is enabled" do
-        before do
-          Account.site_admin.enable_feature!(:lti_placement_restrictions)
-        end
-
-        it "returns nil when there are no submission_type_selection placements" do
-          expect(subject).to be_nil
-        end
-
-        context "when the configuration has a submission_type_selection placement" do
-          let(:tool_configuration) do
-            tc = super()
-
-            tc.settings["extensions"].first["settings"]["placements"] << {
-              "placement" => "submission_type_selection",
-              "message_type" => "LtiResourceLinkRequest",
-              "target_link_uri" => "http://example.com/launch?placement=submission_type_selection"
-            }
-
-            tc
+      %w[submission_type_selection top_navigation].each do |placement|
+        context "when the lti_placement_restrictions feature flag is enabled" do
+          before do
+            Account.site_admin.enable_feature!(:lti_placement_restrictions)
           end
 
-          it { is_expected.to include("Warning").and include("submission_type_selection") }
-
-          context "when the tool is allowed to use the submission_type_selection placement through it's dev key" do
-            before do
-              Setting.set("submission_type_selection_allowed_dev_keys", tool_configuration.developer_key.global_id.to_s)
-            end
-
-            it { is_expected.to be_nil }
+          it "returns nil when there are no #{placement} placements" do
+            expect(subject).to be_nil
           end
 
-          context "when the tool is allowed to use the submission_type_selection placement through it's domain" do
-            before do
-              Setting.set("submission_type_selection_allowed_launch_domains", tool_configuration.domain)
+          context "when the configuration has a #{placement} placement" do
+            let(:tool_configuration) do
+              tc = super()
+
+              tc.settings["extensions"].first["settings"]["placements"] << {
+                "placement" => placement,
+                "message_type" => "LtiResourceLinkRequest",
+                "target_link_uri" => "http://example.com/launch?placement=#{placement}"
+              }
+
+              tc
             end
 
-            it { is_expected.to be_nil }
-          end
+            it { is_expected.to include("Warning").and include(placement) }
 
-          context "when the tool has no domain and domain list is containing an empty space" do
-            before do
-              allow(tool_configuration).to receive_messages(domain: "", developer_key_id: nil)
-              Setting.set("submission_type_selection_allowed_launch_domains", ", ,,")
-              Setting.set("submission_type_selection_allowed_dev_keys", ", ,,")
+            context "when the tool is allowed to use the #{placement} placement through it's dev key" do
+              before do
+                Setting.set("#{placement}_allowed_dev_keys", tool_configuration.developer_key.global_id.to_s)
+              end
+
+              it { is_expected.to be_nil }
             end
 
-            it { is_expected.to include("Warning").and include("submission_type_selection") }
+            context "when the tool is allowed to use the #{placement} placement through it's domain" do
+              before do
+                Setting.set("#{placement}_allowed_launch_domains", tool_configuration.domain)
+              end
+
+              it { is_expected.to be_nil }
+            end
+
+            context "when the tool has no domain and domain list is containing an empty space" do
+              before do
+                allow(tool_configuration).to receive_messages(domain: "", developer_key_id: nil)
+                Setting.set("#{placement}_allowed_launch_domains", ", ,,")
+                Setting.set("#{placement}_allowed_dev_keys", ", ,,")
+              end
+
+              it { is_expected.to include("Warning").and include(placement) }
+            end
           end
         end
       end

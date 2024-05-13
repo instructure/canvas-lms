@@ -4078,43 +4078,97 @@ describe ContextExternalTool do
     let(:domain) { "http://example.com" }
     let(:tool) { external_tool_1_3_model(developer_key:, opts: { domain: }) }
 
-    context "when the tool has a submission_type_selection placement" do
-      let(:placement) { :submission_type_selection }
+    %w[submission_type_selection top_navigation].each do |restricted_placement|
+      context "when the tool has a #{restricted_placement} placement" do
+        let(:placement) { restricted_placement.to_sym }
 
-      context "when the placement is not on any allow list" do
-        it { is_expected.to be false }
-      end
-
-      context "when the placement is allowed by developer_key_id" do
-        before do
-          Setting.set("submission_type_selection_allowed_dev_keys", Shard.global_id_for(developer_key.id).to_s)
+        context "when the placement is not on any allow list" do
+          it { is_expected.to be false }
         end
 
-        it { is_expected.to be true }
-      end
+        context "when the placement is allowed by developer_key_id" do
+          before do
+            Setting.set("#{restricted_placement}_allowed_dev_keys", Shard.global_id_for(developer_key.id).to_s)
+          end
 
-      context "when the placement is allowed by the domain" do
-        before do
-          Setting.set("submission_type_selection_allowed_launch_domains", domain)
+          it { is_expected.to be true }
         end
 
-        it { is_expected.to be true }
-      end
+        context "when the placement is allowed by the domain" do
+          before do
+            Setting.set("#{restricted_placement}_allowed_launch_domains", domain)
+          end
 
-      context "when the tool has no domain and domain list is containing an empty space" do
-        before do
-          tool.update!(domain: "")
-          tool.update!(developer_key: nil)
-          Setting.set("submission_type_selection_allowed_launch_domains", ", ,,")
-          Setting.set("submission_type_selection_allowed_dev_keys", ", ,,")
+          it { is_expected.to be true }
         end
 
-        it { is_expected.to be false }
+        context "when the tool has no domain and domain list is containing an empty space" do
+          before do
+            tool.update!(domain: "")
+            tool.update!(developer_key: nil)
+            Setting.set("#{restricted_placement}_allowed_launch_domains", ", ,,")
+            Setting.set("#{restricted_placement}_allowed_dev_keys", ", ,,")
+          end
+
+          it { is_expected.to be false }
+        end
       end
     end
 
-    it "return true for all placements other than submission_type_selection" do
+    it "return true for all other placements" do
       expect(tool.placement_allowed?(:collaboration)).to be true
+    end
+  end
+
+  describe "#placement_pinned?" do
+    let(:tool) { external_tool_1_3_model }
+
+    context "when the placement is not pinnable" do
+      let(:placement) { :global_navigation }
+
+      before do
+        Setting.set("#{placement}_pinned_dev_keys", Shard.global_id_for(tool.developer_key.id).to_s)
+        Setting.set("#{placement}_pinned_launch_domains", tool.domain)
+      end
+
+      it "is false" do
+        expect(tool.placement_pinned?(placement)).to be false
+      end
+    end
+
+    %i[top_navigation].each do |pinnable_placement|
+      context "when the placement is pinnable #{pinnable_placement}" do
+        let(:placement) { pinnable_placement }
+
+        before do
+          Setting.set("#{placement}_pinned_dev_keys", "")
+          Setting.set("#{placement}_pinned_launch_domains", "")
+        end
+
+        it "is false by default" do
+          expect(tool.placement_pinned?(placement)).to be false
+        end
+
+        context "when dev key is in pinned list" do
+          before do
+            Setting.set("#{placement}_pinned_dev_keys", Shard.global_id_for(tool.developer_key.id).to_s)
+          end
+
+          it "is true" do
+            expect(tool.placement_pinned?(placement)).to be true
+          end
+        end
+
+        context "when domain is in pinned list" do
+          before do
+            Setting.set("#{placement}_pinned_launch_domains", tool.domain)
+          end
+
+          it "is true" do
+            expect(tool.placement_pinned?(placement)).to be true
+          end
+        end
+      end
     end
   end
 end
