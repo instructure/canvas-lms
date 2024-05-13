@@ -861,5 +861,21 @@ describe Pseudonym do
       expect(@pseudonym.migrate_login_attribute(admin_user: user_factory)).to be false
       expect(@pseudonym.reload.unique_id).to eq "foo@example.com"
     end
+
+    it "keeps the verification token if a new login attempt is made within 5 minutes" do
+      token = @pseudonym.verification_token
+      @pseudonym.begin_login_attribute_migration!({ "email" => "foo@example.com", "tid+oid" => "67890#abcde" })
+      expect(@pseudonym.reload.verification_token).to eq token
+      expect(@user.messages.where(notification_name: "Account Verification").count).to eq 2
+    end
+
+    it "regenerates the verification token if a new login attempt is made after 5 minutes" do
+      token = @pseudonym.verification_token
+      Timecop.travel(10.minutes.from_now) do
+        @pseudonym.begin_login_attribute_migration!({ "email" => "foo@example.com", "tid+oid" => "67890#abcde" })
+      end
+      expect(@pseudonym.reload.verification_token).not_to eq token
+      expect(@user.messages.where(notification_name: "Account Verification").count).to eq 2
+    end
   end
 end

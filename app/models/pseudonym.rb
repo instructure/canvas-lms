@@ -191,7 +191,11 @@ class Pseudonym < ActiveRecord::Base
 
   def begin_login_attribute_migration!(unique_ids)
     self.unique_ids = unique_ids
-    self.verification_token = CanvasSlug.generate(nil, 16)
+    if verification_token.present? && updated_at > 5.minutes.ago
+      verification_token_will_change! # force email to be resent
+    else
+      self.verification_token = CanvasSlug.generate(nil, 16)
+    end
     save!
   end
 
