@@ -107,14 +107,6 @@ RSpec.describe DeveloperKeyAccountBindingsController do
 
   context "when the account is a parent account" do
     describe "POST #create_or_edit" do
-      let(:binding_to_edit) do
-        DeveloperKeyAccountBinding.create!(
-          account: root_account,
-          developer_key: root_account_developer_key,
-          workflow_state: "off"
-        )
-      end
-
       it_behaves_like "the developer key account binding create endpoint" do
         let(:authorized_admin) { root_account_admin }
         let(:unauthorized_admin) { sub_account_admin }
