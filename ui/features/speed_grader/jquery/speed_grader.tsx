@@ -1724,7 +1724,7 @@ EG = {
         let submissionComments = this.currentStudent.submission.submission_comments
         if (submissionComments) {
           submissionComments = submissionComments.filter(
-            comment => comment.author_id === ENV.current_user_id
+            comment => comment.author_id?.toString() === ENV.current_user_id
           )
           const lastCommentByUser = submissionComments[submissionComments.length - 1]
           if (lastCommentByUser?.created_at) {
