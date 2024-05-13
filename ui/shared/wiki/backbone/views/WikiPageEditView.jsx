@@ -226,7 +226,14 @@ export default class WikiPageEditView extends ValidatedFormView {
       renderAssignToTray(mountElement, {pageId, onSync, pageName})
     }
     if (window.ENV.BLOCK_EDITOR) {
-      ReactDOM.render(<BlockEditor />, document.getElementById('block_editor'))
+      const blockEditorData = ENV.WIKI_PAGE?.block_editor_attributes || {
+        version: '1',
+        blocks: [{data: undefined}],
+      }
+      ReactDOM.render(
+        <BlockEditor version={blockEditorData.version} content={blockEditorData.blocks[0].data} />,
+        document.getElementById('block_editor')
+      )
     } else {
       RichContentEditor.loadNewEditor(this.$wikiPageBody, {
         focus: true,
@@ -368,11 +375,11 @@ export default class WikiPageEditView extends ValidatedFormView {
       }
     }
     if (window.block_editor) {
-      let blockEditorData
-      await window.block_editor.save().then(outputData => {
-        blockEditorData = outputData
-      })
-      this.blockEditorData = blockEditorData
+      this.blockEditorData = {
+        time: Date.now(),
+        version: '1',
+        blocks: [{data: window.block_editor.serialize()}],
+      }
     }
 
     if (this.reloadView != null) {

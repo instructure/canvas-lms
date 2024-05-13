@@ -508,6 +508,7 @@ module RCENextPage
   end
 
   def click_course_item_link(title)
+    scroll_into_view(course_item_link(title))
     course_item_link(title).click
   end
 

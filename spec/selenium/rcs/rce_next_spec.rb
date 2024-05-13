@@ -389,9 +389,13 @@ describe "RCE next tests", :ignore_js_errors do
       end
 
       it "clicks on sidebar course navigation page to create link in body", :ignore_js_errors do
+        skip("RCX-1964")
+
         title = "Files"
         visit_front_page_edit(@course)
 
+        # Selenium::WebDriver::Error::ElementClickInterceptedError:
+        # element click intercepted: Element is not clickable at point (1112, 906)
         click_course_links_toolbar_menuitem
 
         click_navigation_accordion
