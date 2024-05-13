@@ -1453,6 +1453,7 @@ RSpec.describe ApplicationController do
             tool:,
             context: course,
             user:,
+            session_id: nil,
             placement: nil,
             launch_type: :content_item
           )

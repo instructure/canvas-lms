@@ -26,7 +26,7 @@ module Lti
       resource_selection
     ].freeze
 
-    def initialize(tool:, context:, user:, launch_type:, placement: nil)
+    def initialize(tool:, context:, user:, session_id:, launch_type:, placement: nil)
       raise ArgumentError, "context must be a Course, Account, or Group" unless [Course, Account, Group].include? context.class
       raise ArgumentError, "launch_type must be one of #{LAUNCH_TYPES.join(", ")}" unless LAUNCH_TYPES.include?(launch_type.to_sym)
 
@@ -36,6 +36,7 @@ module Lti
       @user = user
       @launch_type = launch_type
       @placement = placement
+      @session_id = session_id
     end
 
     def call
@@ -47,18 +48,26 @@ module Lti
 
     def log_data
       {
-        tool_id: @tool.tool_id,
+        # We'll need this column in the near future but don't have the values for it yet.
+        # We're including it to make everyone's life easier when we do have the values.
+        unified_tool_id: nil,
+        tool_id: @tool.id.to_s,
+        tool_provided_id: @tool.tool_id,
         tool_domain: @tool.domain,
         tool_url: @tool.url, # this could get really long
         tool_name: @tool.name,
         tool_version: @tool.lti_version,
         tool_client_id: @tool.global_developer_key_id.to_s,
+        account_id: @context.is_a?(Account) ? @context.id.to_s : @context.account_id.to_s,
+        root_account_uuid: @context.root_account.uuid,
         launch_type: @launch_type,
         message_type:,
         placement: @placement,
-        context_id: @context.global_id.to_s,
+        context_id: @context.id.to_s,
         context_type: @context.class.name,
-        user_id: @user&.global_id&.to_s,
+        user_id: Shard.relative_id_for(@user&.id, @user&.shard, Shard.current).to_s,
+        session_id: @session_id,
+        shard_id: Shard.current.id.to_s,
         user_relationship:
       }
     end

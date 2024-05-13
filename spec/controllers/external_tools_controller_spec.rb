@@ -1249,6 +1249,7 @@ describe ExternalToolsController do
             tool:,
             context: @course,
             user: @teacher,
+            session_id: nil,
             placement:,
             launch_type: :indirect_link
           )
@@ -1263,6 +1264,7 @@ describe ExternalToolsController do
             tool:,
             context: @course,
             user: @teacher,
+            session_id: nil,
             placement: nil,
             launch_type: :content_item
           )
@@ -1750,6 +1752,7 @@ describe ExternalToolsController do
         tool:,
         context: @course,
         user: @teacher,
+        session_id: nil,
         placement: "resource_selection",
         launch_type: :resource_selection
       )
@@ -3234,6 +3237,7 @@ describe ExternalToolsController do
         tool:,
         context: @course,
         user: @user,
+        session_id: nil,
         placement: "course_navigation",
         launch_type: :direct_link
       )
