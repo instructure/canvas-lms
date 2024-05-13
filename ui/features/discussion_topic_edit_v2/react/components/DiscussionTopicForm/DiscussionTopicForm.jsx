@@ -76,6 +76,29 @@ import {SavingDiscussionTopicOverlay} from '../SavingDiscussionTopicOverlay/Savi
 
 const I18n = useI18nScope('discussion_create')
 
+export const getAbGuidArray = event => {
+  const {data} = event.data
+
+  return Array.isArray(data) ? data : [data]
+}
+
+export const isGuidDataValid = event => {
+  if (event?.data?.subject !== 'assignment.set_ab_guid') {
+    return false
+  }
+
+  const abGuidArray = getAbGuidArray(event)
+
+  const regexPattern =
+    /^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$/
+
+  if (abGuidArray.find(abGuid => !regexPattern.test(abGuid))) {
+    return false
+  }
+
+  return true
+}
+
 export default function DiscussionTopicForm({
   isEditing,
   currentDiscussionTopic,
@@ -230,6 +253,8 @@ export default function DiscussionTopicForm({
     currentDiscussionTopic?.assignment?.importantDates || false
   )
 
+  const [abGuid, setAbGuid] = useState(null)
+
   // Checkpoints states
   const [isCheckpoints, setIsCheckpoints] = useState(
     currentDiscussionTopic?.assignment?.hasSubAssignments || false
@@ -320,7 +345,16 @@ export default function DiscussionTopicForm({
     if (!isGroupDiscussion) setGroupCategoryId(null)
   }, [isGroupDiscussion])
 
+  const setAbGuidPostMessageListener = event => {
+    const validatedAbGuid = isGuidDataValid(event)
+    if (validatedAbGuid) {
+      setAbGuid(getAbGuidArray(event))
+    }
+  }
+
   useEffect(() => {
+    window.addEventListener('message', setAbGuidPostMessageListener)
+
     if (document.querySelector('#assignment_external_tools') && ENV.context_is_not_group) {
       AssignmentExternalTools.attach(
         document.querySelector('#assignment_external_tools'),
@@ -373,6 +407,7 @@ export default function DiscussionTopicForm({
       lockAt: availableUntil,
       // Conditional payload properties
       assignment: prepareAssignmentPayload(
+        abGuid,
         isEditing,
         title,
         pointsPossible,
