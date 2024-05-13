@@ -773,7 +773,7 @@ describe ContentMigration do
       expect(@copy_to.reload.syllabus_body).to include "/courses/#{@copy_to.id}/pages/#{page2.url}"
     end
 
-    context "kaltura media objects" do
+    context "media objects" do
       before do
         Account.site_admin.enable_feature!(:media_links_use_attachment_id)
         kaltura_double = double("kaltura")
@@ -917,6 +917,37 @@ describe ContentMigration do
         run_course_copy
         expect(@copy_to.attachments.where(media_entry_id: media_id)).to be_exist
         expect(@copy_to.attachments.where(media_entry_id: media_id2)).not_to be_exist
+      end
+
+      it "copies media objects or media comments linked in HTML for an object copied selectively" do
+        course_with_teacher(course_name: "from course", active_all: true)
+        media_object_model(title: "test.mp4", context: @course, media_id: "m-index0")
+        media_object_model(title: "test.mp4", context: @course, media_id: "m-index1")
+
+        wiki = @copy_from.wiki_pages.create!(title: "page", body: <<~HTML.strip)
+          with media comment: <a id="media_comment_m-index0" class="instructure_inline_media_comment video_comment" href="/media_objects/m-index0" data-media_comment_type="video" data-alt="">this is a media comment</a>
+          with media objects iframe url 0: <iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="m-index0" allowfullscreen="allowfullscreen" allow="fullscreen" src="/media_objects_iframe/m-index0?type=video&amp;embedded=true"></iframe>
+          with media objects iframe url 1: <iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="m-index1" allowfullscreen="allowfullscreen" allow="fullscreen" src="/media_objects_iframe/m-index1?type=video&amp;embedded=true"></iframe>
+        HTML
+
+        @cm = ContentMigration.create!(
+          context: @copy_to,
+          user: @user,
+          source_course: @copy_from,
+          migration_type: "course_copy_importer",
+          copy_options: { wiki_pages: { mig_id(wiki) => "1" } }
+        )
+
+        run_course_copy
+
+        file0, file1 = @copy_to.attachments.order(:id)
+
+        translated_body = <<~HTML.strip
+          with media comment: <iframe id="media_comment_m-index0" class="instructure_inline_media_comment video_comment" data-media_comment_type="video" data-alt="" style="width: 320px; height: 240px; display: inline-block;" title="this is a media comment" data-media-type="video" src="/media_attachments_iframe/#{file0.id}?embedded=true&amp;type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="m-index0"></iframe>
+          with media objects iframe url 0: <iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="m-index0" allowfullscreen="allowfullscreen" allow="fullscreen" src="/media_attachments_iframe/#{file0.id}?embedded=true&amp;type=video"></iframe>
+          with media objects iframe url 1: <iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="m-index1" allowfullscreen="allowfullscreen" allow="fullscreen" src="/media_attachments_iframe/#{file1.id}?embedded=true&amp;type=video"></iframe>
+        HTML
+        expect(@copy_to.wiki_pages.take.body).to eq translated_body
       end
 
       it "re-uses kaltura media objects" do
