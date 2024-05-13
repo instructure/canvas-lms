@@ -228,6 +228,10 @@ function observerCount(students, observers) {
   return students.reduce((acc, student) => acc + (observers[student.id]?.length || 0), 0)
 }
 
+function calculateObserverRecipientCount(selectedObservers) {
+  return Object.values(selectedObservers).reduce((acc: number, array: any) => acc + array.length, 0)
+}
+
 function filterStudents(criterion, students, cutoff) {
   const newfilteredStudents: Student[] = []
   for (const student of students) {
@@ -443,7 +447,8 @@ const MessageStudentsWhoDialog = ({
       assignmentGroupName
     )
   )
-  const [observersDisplayed, setObserversDisplayed] = useState(0.0)
+
+  const [observerRecipientCount, setObserverRecipientCount] = useState(0)
 
   useEffect(() => {
     const partialStudentSelection = isLengthBetweenBoundaries(
@@ -491,14 +496,17 @@ const MessageStudentsWhoDialog = ({
 
   useEffect(() => {
     if (!loading && data) {
-      setObserversDisplayed(
-        observerCount(
-          filterStudents(selectedCriterion, sortedStudents, cutoff),
-          observersByStudentID
-        )
-      )
+      setObserverRecipientCount(calculateObserverRecipientCount(selectedObservers))
     }
-  }, [loading, data, selectedCriterion, sortedStudents, cutoff, observersByStudentID])
+  }, [
+    loading,
+    data,
+    selectedCriterion,
+    sortedStudents,
+    cutoff,
+    observersByStudentID,
+    selectedObservers,
+  ])
 
   useEffect(() => {
     return () => {
@@ -517,9 +525,7 @@ const MessageStudentsWhoDialog = ({
     if (newCriterion != null) {
       setSelectedCriterion(newCriterion)
       setFilteredStudents(filterStudents(newCriterion, sortedStudents, cutoff))
-      setObserversDisplayed(
-        observerCount(filterStudents(newCriterion, sortedStudents, cutoff), observersByStudentID)
-      )
+      setObserverRecipientCount(calculateObserverRecipientCount(selectedObservers))
       setSubject(
         defaultSubject(
           newCriterion.value,
@@ -571,9 +577,7 @@ const MessageStudentsWhoDialog = ({
     const criterion = filterCriteria.find(c => c.value === value)
     if (criterion) {
       setFilteredStudents(filterStudents(criterion, sortedStudents, cutoff))
-      setObserversDisplayed(
-        observerCount(filterStudents(criterion, sortedStudents, cutoff), observersByStudentID)
-      )
+      setObserverRecipientCount(calculateObserverRecipientCount(selectedObservers))
       setSubject(
         defaultSubject(
           criterion.value,
@@ -592,9 +596,7 @@ const MessageStudentsWhoDialog = ({
     const criterion = filterCriteria.find(c => c.value === criteriaValue)
     if (criterion) {
       setFilteredStudents(filterStudents(criterion, sortedStudents, cutoff))
-      setObserversDisplayed(
-        observerCount(filterStudents(criterion, sortedStudents, cutoff), observersByStudentID)
-      )
+      setObserverRecipientCount(calculateObserverRecipientCount(selectedObservers))
     }
   }
 
@@ -803,9 +805,10 @@ const MessageStudentsWhoDialog = ({
                 onChange={onStudentsCheckboxChanged}
                 checked={isCheckedStudentsCheckbox}
                 defaultChecked={true}
+                data-testid="total-student-checkbox"
                 label={
                   <Text weight="bold">
-                    {I18n.t('%{studentCount} Students', {studentCount: filteredStudents.length})}
+                    {I18n.t('%{studentCount} Students', {studentCount: selectedStudents.length})}
                   </Text>
                 }
               />
@@ -816,10 +819,11 @@ const MessageStudentsWhoDialog = ({
                 disabled={isDisabledObserversCheckbox}
                 onChange={onObserversCheckboxChanged}
                 checked={isCheckedObserversCheckbox}
+                data-testid="total-observer-checkbox"
                 label={
                   <Text weight="bold">
                     {I18n.t('%{observerCount} Observers', {
-                      observerCount: observersDisplayed,
+                      observerCount: observerRecipientCount,
                     })}
                   </Text>
                 }
