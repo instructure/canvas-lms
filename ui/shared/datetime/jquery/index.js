@@ -20,7 +20,18 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import * as tz from '../index'
 import htmlEscape from '@instructure/html-escape'
-import * as dateFunctions from '../date-functions'
+import {
+  dateString,
+  datetimeString,
+  discussionsDatetimeString,
+  friendlyDate,
+  friendlyDatetime,
+  fudgeDateForProfileTimezone,
+  sameDate,
+  sameYear,
+  timeString,
+  unfudgeDateForProfileTimezone,
+} from '../date-functions'
 import {changeTimezone} from '../changeTimezone'
 import DatetimeField from './DatetimeField'
 import renderDatepickerTime from '../react/components/render-datepicker-time'
@@ -32,16 +43,16 @@ const I18n = useI18nScope('instructure_date_and_time')
 // these functions were extracted to @canvas/datetime/date-functions so they
 // could more easily be reused by non-jQuery-reliant code. See their
 // definitions there for more usage info.
-$.fudgeDateForProfileTimezone = dateFunctions.fudgeDateForProfileTimezone
-$.unfudgeDateForProfileTimezone = dateFunctions.unfudgeDateForProfileTimezone
-$.sameYear = dateFunctions.sameYear
-$.sameDate = dateFunctions.sameDate
-$.dateString = dateFunctions.dateString
-$.timeString = dateFunctions.timeString
-$.datetimeString = dateFunctions.datetimeString
-$.discussionsDatetimeString = dateFunctions.discussionsDatetimeString
-$.friendlyDate = dateFunctions.friendlyDate
-$.friendlyDatetime = dateFunctions.friendlyDatetime
+$.fudgeDateForProfileTimezone = fudgeDateForProfileTimezone
+$.unfudgeDateForProfileTimezone = unfudgeDateForProfileTimezone
+$.sameYear = sameYear
+$.sameDate = sameDate
+$.dateString = dateString
+$.timeString = timeString
+$.datetimeString = datetimeString
+$.discussionsDatetimeString = discussionsDatetimeString
+$.friendlyDate = friendlyDate
+$.friendlyDatetime = friendlyDatetime
 
 $.datepicker.oldParseDate = $.datepicker.parseDate
 $.datepicker.parseDate = function (format, value, settings) {
