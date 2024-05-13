@@ -26,6 +26,36 @@ RSpec.describe Lti::RegistrationAccountBinding do
     it { is_expected.to belong_to(:developer_key_account_binding).class_name("DeveloperKeyAccountBinding") }
   end
 
+  describe "after_save hooks" do
+    let(:lrab) do
+      account = account_model
+      user = user_model
+      registration = Lti::Registration.create!(
+        name: "an lti registration",
+        account:,
+        created_by: user,
+        updated_by: user
+      )
+      Lti::RegistrationAccountBinding.create!(
+        workflow_state: :off,
+        account:,
+        registration:
+      )
+    end
+
+    it "updates the corresponding developer key account binding" do
+      dev_key_account_binding = DeveloperKeyAccountBinding.create!(
+        workflow_state: lrab.workflow_state,
+        developer_key: developer_key_model,
+        account: lrab.account,
+        lti_registration_account_binding: lrab
+      )
+
+      lrab.update!(workflow_state: :on)
+      expect(dev_key_account_binding.reload.workflow_state).to eq("on")
+    end
+  end
+
   describe "#destroy" do
     subject { account_binding.destroy }
 
