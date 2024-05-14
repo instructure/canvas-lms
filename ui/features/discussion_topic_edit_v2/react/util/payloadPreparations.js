@@ -22,6 +22,7 @@ const prepareOverride = (
   overrideDueDate,
   overrideAvailableUntil,
   overrideAvailableFrom,
+  overrideUnassignItem,
   overrideIds = {
     groupId: null,
     courseSectionId: null,
@@ -35,6 +36,7 @@ const prepareOverride = (
     dueAt: overrideDueDate || null,
     lockAt: overrideAvailableUntil || null,
     unlockAt: overrideAvailableFrom || null,
+    unassignItem: overrideUnassignItem || false,
     groupId: overrideIds.groupIds || null,
     courseSectionId: overrideIds.courseSectionId || null,
     courseId: overrideIds.courseId || null,
@@ -76,6 +78,7 @@ const prepareAssignmentOverridesPayload = (
           info.dueDate || null,
           info.availableUntil || null,
           info.availableFrom || null,
+          info.unassignItem || false,
           {
             studentIds:
               studentIds.length > 0 ? studentIds.map(id => id.split('_').reverse()[0]) : null,
@@ -92,6 +95,7 @@ const prepareAssignmentOverridesPayload = (
             info.dueDate || null,
             info.availableUntil || null,
             info.availableFrom || null,
+            info.unassignItem || false,
             {
               courseSectionId: sectionId.split('_').reverse()[0] || null,
             }
@@ -107,6 +111,7 @@ const prepareAssignmentOverridesPayload = (
           info.dueDate || null,
           info.availableUntil || null,
           info.availableFrom || null,
+          info.unassignItem || false,
           {
             courseId: 'everyone',
           }
@@ -122,6 +127,7 @@ const prepareAssignmentOverridesPayload = (
             info.dueDate || null,
             info.availableUntil || null,
             info.availableFrom || null,
+            info.unassignItem || false,
             {
               groupIds: groupId.split('_').reverse()[0] || null,
             }
@@ -141,6 +147,7 @@ const prepareAssignmentOverridesPayload = (
         masteryPathOverride.dueDate || null,
         masteryPathOverride.availableUntil || null,
         masteryPathOverride.availableFrom || null,
+        masteryPathOverride.unassignItem || false,
         {
           noopId: '1',
         },
