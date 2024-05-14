@@ -23924,6 +23924,7 @@ nn:
   students_with_no_submissions_title: "Studentar utan innleveringar"
   students_without_assessments_eb100e60: "Studentar utan vurdering"
   studentsperrangecount_out_of_totalstudentsenrolled_90cbfaf1: "%{studentsPerRangeCount} av %{totalStudentsEnrolled} studentar"
+  studio_capture_a88ec4e: "Studio Opptak"
   sub_account_daeadd0: Underkonto
   sub_accounts: 
     alerts: 
@@ -24001,6 +24002,8 @@ nn:
   submission_comment_user_name_assignment_title_cour_d88ba875: "Kommentar til innlevering: %{user_name}, %{assignment_title}, %{course_name}"
   submission_comments_4fa03a17: "Kommentarar til innlevering"
   submission_comments_b6d65841: "Kommentarar til innlevering"
+  submission_comments_sei_a10bc997: "Kommentarar til innlevering - SEI"
+  submission_comments_tray_893d0267: "Meny for innleveringskommentarar"
   submission_data_88085815: Innleveringsdata
   submission_date_8f659c0c: Innleveringsdato
   submission_date_a7920dac: innleveringsdato
@@ -24029,6 +24032,7 @@ nn:
   submission_draft_updated_e953166a: "Innleveringsutkast er oppdatert"
   submission_failed_to_submit_8de4efcd: "Innlevering mislukkast"
   submission_feedback_indicators_eb1d31ec: "Indikatorar på tilbakemelding"
+  submission_for_assignment_56ea189a: "Innlevering for %{assignment}"
   submission_in_another_grading_period_e754b329: "Innlevering i annan karaktersetjingsperiode"
   submission_index_e960f9bf: "Innlevering %{index}"
   submission_is_being_processed_by_plagiarism_servic_df4aa603: "Innleveringa prosesserast av plagiatkontrolltenesta."
@@ -24036,6 +24040,7 @@ nn:
   submission_items_b2db1b8d: Innleveringselement
   submission_locked_a6074f8b: "Innlevering låst"
   submission_locked_image_93aced38: "Innlevering låst-bilde"
+  submission_not_found_f043aa09: "Finn ikkje innlevering"
   submission_posted_title_course_138bd744: "Innlevering er posta: %{title}, %{course}"
   submission_preview_383473ec: "Førehandsvising av innlevering"
   submission_progress_323f5e7b: "Framdrift i innleveringa"
@@ -24043,6 +24048,7 @@ nn:
   submission_requirement_8ba1ee08: "Krav til innlevering"
   submission_score_b7a291e8: "resultat innlevering"
   submission_sent_3f0d2ee1: "Innlevering er sendt"
+  submission_submit_on_behalf_of_student_f0ed14e4: "Innlevering - Lever på vegne av student"
   submission_tray_429ac3df: Innleveringsmeny
   submission_type_a925fc5f: Innleveringstype
   submission_type_displayname_currently_selected_3f8aa9f8: "Type innlevering%{displayName}, som no er valt"
@@ -24060,6 +24066,7 @@ nn:
     on_paper: "på papir"
   submission_types_79f7b436: "Innleveringstypar:"
   submission_updated_8897f3b7: "Innlevering oppdatert"
+  submission_uploaded_successfully_47e76d6a: "Innlevering vart lasta opp!"
   submission_user_name_assignment_title_2cf5e3e9: "Innlevering: %{user_name},%{assignment_title}"
   submissions: 
     assignment_submit_success: "Oppgåva er levert."
@@ -24171,6 +24178,7 @@ nn:
   submit_a3cc6859: Send!
   submit_a_comment_7edbf648: "Send ein kommentar"
   submit_a_feature_idea_2d4baa3d: "Send ein funksjonsidé"
+  submit_assessment_900ecd29: "Lever oppgåve"
   submit_assignment: 
     buttons: 
       submit_assignment: "Lever oppgåve"
@@ -24195,10 +24203,17 @@ nn:
   submit_confirmation_4d366dd1: "Stadfest innlevering"
   submit_file_using_label_9fa4bbb7: "Lever fila ved bruk av %{label}"
   submit_for_student_d90838e8: "Lever for student"
+  submit_for_student_name_bd890232: "Lever for student%{name}"
   submit_media_file_f334c1ba: "Send mediefil"
+  submit_on_behalf_of_student_af674b95: "Lever på vegne av student"
+  submit_the_assignment_2d038278: "lever oppgåva"
   submit_ticket_5515ffd: "Send feilmelding"
   submitted_318fad53: Innlevert
+  submitted_718f5cbc: "Levert:"
   submitted_at_4d5ea3aa: Levert
+  submitted_by_name_dab6d5e1: "Levert av: %{name}"
+  submitted_by_proxy_on_date_569cbae9: "Levert av %{proxy}den %{date}"
+  submitted_by_submitter_1dcd07a1: "Levert av %{submitter}"
   submitted_d5ba370a: "Levert:"
   submitted_date_ba55b0ae: "innlevert %{date}"
   submitted_datetime_fa2e9287: "Levert: %{dateTime}"
@@ -24207,6 +24222,7 @@ nn:
   submitted_late_97730017: "Levert etter fristen"
   submitted_on_a09f839e: "LEVERT den"
   submitted_on_bb3b53fc: "Levert den"
+  submitted_on_date_13c89fb: "Levert den %{date}"
   submitted_submitdate_bdd3bf09: "Innlevert %{submitDate}"
   submitting_types_7c5a7096: "Leverer: %{types}"
   subscribe_4b301fb7: Abonner
@@ -24216,6 +24232,7 @@ nn:
   substitution_713c65b9: Erstatning
   subtitle_ee60ca78: Undertekst
   subtitles_could_not_be_imported_from_file_5de6da0b: "Undertekstar kunne ikkje importerast frå %{file}"
+  success_a5aeb7: Ferdig!
   success_file_uploaded_8174e93f: "Vellukka: fil lasta opp"
   success_grades_have_been_hidden_for_assignmentname_4ed03c00: "Vurderingar er skjulte for %{assignmentName}"
   success_grades_have_been_hidden_for_the_selected_s_3ad5692: "Vurderingar er no skjult for dei utvalde seksjonane for %{assignmentName}."
@@ -24229,6 +24246,7 @@ nn:
   success_you_added_hostname_as_an_allowed_domain_4713bfe8: "Du la til %{hostname} som eit tillate domene."
   successfully_added_fb3e6008: "Er lagt til"
   successfully_created_a_set_38374719: "Settet er oppretta"
+  successfully_deleted_custom_status_statusname_2e7fea3: "Sletta tilpassa status %{statusName}"
   successfully_deleted_discussion_title_a685f345: "Diskusjonen %{title} er sletta"
   successfully_deleted_the_comment_a8bbe561: "Kommentar er sletta"
   successfully_deleted_the_conversation_message_2a546732: "Samtalemeldinga er sletta"
@@ -24240,7 +24258,11 @@ nn:
   successfully_updated_the_comment_946360d5: "Kommentar er oppdatert"
   suffix_294d5cc4: Suffiks
   sum_of_all_files_in_mb_2b705055: "summen av alle filene i MB"
+  summarize_discussions_using_ai_a1259ac: "Oppsummer diskusjonar med bruk av KI"
+  summary_of_report_types_d064d42b: "Samandrag av rapporttypar"
   summary_statistics_f74852a5: "Samandrag av statistikk"
+  sun_298d7c8b: Sol
+  sunday_50a31adb: Søndag
   support: 
     array: 
       last_word_connector: ", og "
@@ -24317,6 +24339,7 @@ nn:
   sync_to_name_successfully_disabled_8045ad95: "Synkroniser til %{name} er deaktivert"
   sync_to_posttosisname_9837a8bf: "Synkroniser til %{postToSISName}:"
   sync_to_posttosisname_dffd5c9: "Synkroniser til %{postToSISName}"
+  sync_to_sis_friendly_name_a0e7d231: "Synkroniser til %{sis_friendly_name}"
   sync_to_sisname_f343e59: "Synkroniser til %{sisName}"
   synced_97764882: Synkronisert
   synced_message_20469c8f: "Synkronisert: %{message}"
