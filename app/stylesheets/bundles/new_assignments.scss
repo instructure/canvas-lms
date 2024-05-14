@@ -214,6 +214,15 @@
     font-size: 1.5rem;
     vertical-align: middle;
   }
+
+  .icon-link:before {
+    font-size: 1.5rem;
+    vertical-align: middle;
+  }
+
+  .icon-sis-imported:after {
+    margin-right: 0.5rem;
+  }
 }
 
 /* support for master class locked input fields */
