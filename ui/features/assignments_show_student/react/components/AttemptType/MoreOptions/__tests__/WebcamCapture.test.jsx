@@ -16,51 +16,60 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {act, fireEvent, render, waitFor} from '@testing-library/react'
 import React from 'react'
+import {fireEvent, render, screen} from '@testing-library/react'
 import WebcamCapture from '../WebcamCapture'
+
+const onSelectImage = jest.fn()
+const defaultProps = (props = {}) => ({
+  onSelectImage,
+  ...props,
+})
+const renderWebcamCapture = (props = {}) => render(<WebcamCapture {...defaultProps(props)} />)
 
 describe('WebcamCapture', () => {
   let fakeStream
   let getUserMedia
-  let onSelectImage
   let tracks
 
   beforeEach(() => {
     jest.useFakeTimers()
 
-    onSelectImage = jest.fn()
-
+    tracks = {forEach: jest.fn()}
+    fakeStream = {
+      getTracks: () => tracks,
+      clientWidth: 640,
+      clientHeight: 480,
+    }
     getUserMedia = jest.fn()
-    tracks = [{stop: jest.fn()}]
-    fakeStream = {getTracks: () => tracks}
-
     navigator.mediaDevices = {getUserMedia}
+    HTMLCanvasElement.prototype.getContext = () => ({
+      drawImage: jest.fn(),
+    })
+    HTMLCanvasElement.prototype.toDataURL = jest.fn().mockReturnValue('data:image/png;base64,')
+    HTMLCanvasElement.prototype.toBlob = jest.fn().mockImplementation(cb => cb(new Blob()))
   })
 
-  afterEach(async () => {
-    await act(async () => {
-      jest.runAllTimers()
-    })
+  afterEach(() => {
+    jest.resetAllMocks()
+    jest.runAllTimers()
     delete navigator.mediaDevices
   })
 
   it('shows a message indicating it needs permission to access the camera after a brief delay', () => {
     getUserMedia.mockImplementation(() => new Promise(() => {}))
-    const {getByText} = render(<WebcamCapture onSelectImage={onSelectImage} />)
-    act(() => {
-      jest.advanceTimersByTime(1000)
-    })
-    expect(getByText(/Canvas needs access to your camera/)).toBeInTheDocument()
+    renderWebcamCapture()
+
+    jest.advanceTimersByTime(1000)
+
+    expect(screen.getByText(/Canvas needs access to your camera/)).toBeInTheDocument()
   })
 
   it('continues to say it needs webcam access if the user does not grant permission', async () => {
     getUserMedia.mockRejectedValue(new Error('NO'))
-    const {getByText} = render(<WebcamCapture onSelectImage={onSelectImage} />)
+    renderWebcamCapture()
 
-    await waitFor(() => {
-      expect(getByText(/Canvas needs access to your camera/)).toBeInTheDocument()
-    })
+    expect(await screen.findByText(/Canvas needs access to your camera/)).toBeInTheDocument()
   })
 
   describe('when permission has been granted', () => {
@@ -69,94 +78,111 @@ describe('WebcamCapture', () => {
     })
 
     it('shows a video feed', async () => {
-      const {getByTestId} = render(<WebcamCapture onSelectImage={onSelectImage} />)
-      await waitFor(() => {
-        expect(getByTestId('webcam-capture-video')).toBeVisible()
-      })
+      renderWebcamCapture()
+
+      expect(await screen.findByTestId('webcam-capture-video')).toBeVisible()
     })
 
     it('shows a button to take a photo', async () => {
-      const {findByRole} = render(<WebcamCapture onSelectImage={onSelectImage} />)
-      expect(await findByRole('button', {name: 'Take Photo'})).toBeInTheDocument()
+      renderWebcamCapture()
+
+      expect(
+        await screen.findByRole('button', {
+          name: /take photo/i,
+        })
+      ).toBeInTheDocument()
     })
 
     it('shows a countdown when the user clicks the "record" button', async () => {
-      const {findByRole, findByTestId} = render(<WebcamCapture onSelectImage={onSelectImage} />)
+      renderWebcamCapture()
 
-      const recordButton = await findByRole('button', {name: 'Take Photo'})
-      act(() => {
-        fireEvent.click(recordButton)
+      const recordButton = await screen.findByRole('button', {
+        name: /take photo/i,
       })
 
-      expect(await findByTestId('webcam-countdown-container')).toBeInTheDocument()
+      fireEvent.click(recordButton)
+
+      expect(await screen.findByTestId('webcam-countdown-container')).toBeInTheDocument()
     })
 
     describe('when the user takes a photo and the countdown has completed', () => {
       const renderAndTakePhoto = async () => {
-        const renderResult = render(<WebcamCapture onSelectImage={onSelectImage} />)
-        const recordButton = await renderResult.findByRole('button', {name: 'Take Photo'})
-        fireEvent.click(recordButton)
-
-        act(() => {
-          jest.advanceTimersByTime(10000)
+        const wrapper = renderWebcamCapture()
+        const recordButton = await screen.findByRole('button', {
+          name: /take photo/i,
         })
 
-        return renderResult
+        fireEvent.click(recordButton)
+        await screen.findByTestId('webcam-countdown-container')
+        jest.advanceTimersByTime(10000)
+
+        return {...wrapper}
       }
 
       it('no longer shows the video feed', async () => {
-        const {getByTestId} = await renderAndTakePhoto()
-        expect(getByTestId('webcam-capture-video')).not.toBeVisible()
+        await renderAndTakePhoto()
+
+        expect(screen.queryByTestId('webcam-capture-video')).not.toBeVisible()
       })
 
       it('shows an image containing the photo that was taken', async () => {
-        const {getByAltText} = await renderAndTakePhoto()
-        expect(getByAltText('Captured Image')).toBeInTheDocument()
+        await renderAndTakePhoto()
+
+        expect(await screen.findByAltText('Captured Image')).toBeInTheDocument()
       })
 
       it('shows a text field to rename the image', async () => {
-        const {getByRole} = await renderAndTakePhoto()
-        expect(getByRole('textbox')).toBeInTheDocument()
+        await renderAndTakePhoto()
+
+        expect(await screen.findByRole('textbox')).toBeInTheDocument()
       })
 
       it('populates the text field with a default name for the file', async () => {
-        const {getByRole} = await renderAndTakePhoto()
-        const textInput = getByRole('textbox')
-        expect(textInput).toHaveValue('webcam-picture.png')
+        await renderAndTakePhoto()
+
+        expect(await screen.findByRole('textbox')).toHaveValue('webcam-picture.png')
       })
 
       it('shows a "Start Over" button', async () => {
-        const {getByRole} = await renderAndTakePhoto()
-        expect(getByRole('button', {name: 'Start Over'})).toBeInTheDocument()
+        await renderAndTakePhoto()
+
+        expect(await screen.findByRole('button', {name: 'Start Over'})).toBeInTheDocument()
       })
 
       it('returns the user to the video feed if the "Start Over" button is clicked', async () => {
-        const {getByRole, getByTestId} = await renderAndTakePhoto()
-        const startOverButton = getByRole('button', {name: 'Start Over'})
+        await renderAndTakePhoto()
+
+        const startOverButton = await screen.findByRole('button', {name: 'Start Over'})
+
         fireEvent.click(startOverButton)
 
-        expect(getByTestId('webcam-capture-video')).toBeVisible()
+        expect(await screen.findByTestId('webcam-capture-video')).toBeVisible()
       })
 
       it('shows a "Save" button', async () => {
-        const {getByRole} = await renderAndTakePhoto()
-        expect(getByRole('button', {name: 'Save'})).toBeInTheDocument()
+        await renderAndTakePhoto()
+
+        expect(await screen.findByRole('button', {name: 'Save'})).toBeInTheDocument()
       })
 
       it('calls the onSelectImage prop when the user clicks the "Save" button', async () => {
-        const {getByRole} = await renderAndTakePhoto()
-        const saveButton = getByRole('button', {name: 'Save'})
+        await renderAndTakePhoto()
+        const saveButton = await screen.findByRole('button', {name: 'Save'})
+
         fireEvent.click(saveButton)
 
         expect(onSelectImage).toHaveBeenCalledTimes(1)
       })
 
       it('passes the filename specified by the user as the "filename" prop to onSelectImage', async () => {
-        const {getByRole} = await renderAndTakePhoto()
+        await renderAndTakePhoto()
 
-        const filenameInput = getByRole('textbox')
+        const filenameInput = await screen.findByRole('textbox')
+
         fireEvent.change(filenameInput, {target: {value: 'not-a-webcam-picture.png'}})
-        const saveButton = getByRole('button', {name: 'Save'})
+
+        const saveButton = await screen.findByRole('button', {name: 'Save'})
+
         fireEvent.click(saveButton)
 
         expect(onSelectImage).toHaveBeenCalledWith(
@@ -165,12 +191,13 @@ describe('WebcamCapture', () => {
       })
 
       it('passes an "image" prop to onSelectImage containing the captured blob and URL', async () => {
-        const {getByRole} = await renderAndTakePhoto()
+        await renderAndTakePhoto()
+        const saveButton = await screen.findByRole('button', {name: 'Save'})
 
-        const saveButton = getByRole('button', {name: 'Save'})
         fireEvent.click(saveButton)
 
         const [{image}] = onSelectImage.mock.calls[0]
+
         expect(image.blob).toBeDefined()
         expect(image.dataURL).toBeDefined()
       })
