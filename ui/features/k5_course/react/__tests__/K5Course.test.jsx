@@ -68,6 +68,12 @@ const dtf = new Intl.DateTimeFormat('en', {
 
 const dateFormatter = d => dtf.format(d instanceof Date ? d : new Date(d))
 
+const getOneMonthAgo = () => {
+  const date = new Date()
+  date.setMonth(date.getMonth() - 1)
+  return ('0' + (date.getMonth() + 1)).slice(-2)
+}
+
 const defaultTabs = [
   {id: '0'},
   {id: '19'},
@@ -113,7 +119,7 @@ const defaultProps = {
     permissions: {
       update: true,
     },
-    posted_at: '2021-05-14T17:06:21-06:00',
+    posted_at: `2021-${getOneMonthAgo()}-14T17:06:21-06:00`,
   },
   pagesPath: '/courses/30/pages',
   hasWikiPages: true,
@@ -474,7 +480,7 @@ describe('K-5 Subject Course', () => {
       const {getByText, getByRole} = render(<K5Course {...defaultProps} canManage={true} />)
       const button = getByRole('link', {name: 'Edit announcement Important announcement'})
       const attachment = getByRole('link', {name: 'hw.pdf'})
-      const targetDate = new Date('2021-05-14T17:06:21Z')
+      const targetDate = new Date(`2021-${getOneMonthAgo()}-14T17:06:21Z`)
       const datePortion = new Intl.DateTimeFormat('en', {
         month: 'short',
         day: 'numeric',
