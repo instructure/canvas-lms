@@ -714,4 +714,26 @@ describe('ItemAssignToTray', () => {
     const deleteButtons = await findAllByTestId('delete-card-button')
     expect(deleteButtons[deleteButtons.length - 1].closest('button')).toHaveFocus()
   })
+
+  describe('in a paced course', () => {
+    beforeEach(() => {
+      ENV.IN_PACED_COURSE = true
+    })
+
+    it('shows the course pacing notice', () => {
+      const {getByTestId} = renderComponent()
+      expect(getByTestId('CoursePacingNotice')).toBeInTheDocument()
+    })
+
+    it('does not request existing overrides', () => {
+      renderComponent()
+      expect(fetchMock.calls('/api/v1/courses/1/assignments/23/date_details').length).toBe(0)
+    })
+
+    it('does not fetch assignee options', () => {
+      renderComponent()
+      expect(fetchMock.calls(STUDENTS_URL).length).toBe(0)
+      expect(fetchMock.calls(SECTIONS_URL).length).toBe(0)
+    })
+  })
 })
