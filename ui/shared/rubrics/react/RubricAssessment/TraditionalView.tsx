@@ -30,6 +30,8 @@ import {possibleString} from '../Points'
 import type {RubricAssessmentData, RubricCriterion, UpdateAssessmentData} from '../types/rubric'
 import {Grid} from '@instructure/ui-grid'
 import {TextInput} from '@instructure/ui-text-input'
+import {Checkbox} from '@instructure/ui-checkbox'
+import {CommentLibrary} from './CommentLibrary'
 
 const I18n = useI18nScope('rubrics-assessment-tray')
 const {licorice} = colors
@@ -38,18 +40,22 @@ type TraditionalViewProps = {
   criteria: RubricCriterion[]
   hidePoints: boolean
   isPreviewMode: boolean
+  isPeerReview?: boolean
   isFreeFormCriterionComments: boolean
   rubricAssessmentData: RubricAssessmentData[]
   rubricTitle: string
+  rubricSavedComments?: Record<string, string[]>
   onUpdateAssessmentData: (params: UpdateAssessmentData) => void
 }
 export const TraditionalView = ({
   criteria,
   hidePoints,
   isPreviewMode,
+  isPeerReview,
   isFreeFormCriterionComments,
   rubricAssessmentData,
   rubricTitle,
+  rubricSavedComments,
   onUpdateAssessmentData,
 }: TraditionalViewProps) => {
   return (
@@ -125,10 +131,12 @@ export const TraditionalView = ({
             key={`criterion-${criterion.id}-${index}`}
             criterion={criterion}
             criterionAssessment={criterionAssessment}
-            hidePoints={hidePoints}
+            rubricSavedComments={rubricSavedComments?.[criterion.id] ?? []}
             isPreviewMode={isPreviewMode}
+            isPeerReview={isPeerReview}
             onUpdateAssessmentData={onUpdateAssessmentData}
             isFreeFormCriterionComments={isFreeFormCriterionComments}
+            hidePoints={hidePoints}
           />
         )
       })}
@@ -141,20 +149,25 @@ type CriterionRowProps = {
   criterionAssessment?: RubricAssessmentData
   hidePoints: boolean
   isPreviewMode: boolean
+  isPeerReview?: boolean
   isFreeFormCriterionComments: boolean
   onUpdateAssessmentData: (params: UpdateAssessmentData) => void
+  rubricSavedComments: string[]
 }
 const CriterionRow = ({
   criterion,
   criterionAssessment,
   hidePoints,
   isPreviewMode,
+  isPeerReview,
   isFreeFormCriterionComments,
   onUpdateAssessmentData,
+  rubricSavedComments,
 }: CriterionRowProps) => {
   const [hoveredRatingIndex, setHoveredRatingIndex] = useState<number>()
   const [isCommentsOpen, setIsCommentsOpen] = useState(hidePoints)
   const [commentText, setCommentText] = useState<string>(criterionAssessment?.comments ?? '')
+  const [isSaveCommentChecked, setIsSaveCommentChecked] = useState(false)
 
   const selectedRatingIndex = criterion.ratings.findIndex(
     rating => rating.points === criterionAssessment?.points
@@ -204,9 +217,26 @@ const CriterionRow = ({
                       borderWidth="0 small small 0"
                       overflowY="auto"
                     >
-                      <Flex direction="column" height="100%">
-                        <Flex.Item>
-                          <Text weight="bold">{I18n.t('Comments')}</Text>
+                      <Flex direction="column">
+                        {!isPreviewMode && !isPeerReview && rubricSavedComments.length > 0 && (
+                          <>
+                            <Flex.Item>
+                              <Text weight="bold">{I18n.t('Comment Library')}</Text>
+                            </Flex.Item>
+                            <Flex.Item margin="x-small 0 0 0" shouldGrow={true}>
+                              <CommentLibrary
+                                rubricSavedComments={rubricSavedComments}
+                                criterionId={criterion.id}
+                                setCommentText={setCommentText}
+                                updateAssessmentData={updateAssessmentData}
+                              />
+                            </Flex.Item>
+                          </>
+                        )}
+                        <Flex.Item
+                          margin={rubricSavedComments.length > 0 ? 'medium 0 0 0' : '0 0 0 0'}
+                        >
+                          <Text weight="bold">{I18n.t('Comment')}</Text>
                         </Flex.Item>
                         <Flex.Item margin="x-small 0 0 0" shouldGrow={true}>
                           <TextArea
@@ -224,6 +254,20 @@ const CriterionRow = ({
                             onBlur={e => updateAssessmentData({comments: e.target.value})}
                           />
                         </Flex.Item>
+                        {!isPeerReview && !isPreviewMode && (
+                          <Flex.Item margin="medium 0 x-small 0" shouldGrow={true}>
+                            <Checkbox
+                              checked={isSaveCommentChecked}
+                              label={I18n.t('Save this comment for reuse')}
+                              size="small"
+                              data-testid={`save-comment-checkbox-${criterion.id}`}
+                              onChange={e => {
+                                updateAssessmentData({saveCommentsForLater: !!e.target.checked})
+                                setIsSaveCommentChecked(!!e.target.checked)
+                              }}
+                            />
+                          </Flex.Item>
+                        )}
                       </Flex>
                     </View>
                   </Grid.Col>
@@ -406,7 +450,7 @@ const CriterionRow = ({
           </Flex.Item>
         )}
       </Flex>
-      {isCommentsOpen && (
+      {isCommentsOpen && !isFreeFormCriterionComments && (
         <View
           as="div"
           padding="small medium"
