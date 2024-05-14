@@ -41,6 +41,17 @@ type Role = {
   plural_label: string
 }
 
+type ToolPlacement = 'top_navigation'
+
+export type Tool = {
+  id: string
+  title: string
+  base_url: string
+  icon_url: string
+  pinned?: boolean
+  placement?: ToolPlacement
+}
+
 export type GroupOutcome = {
   id: string
   title: string
@@ -210,6 +221,12 @@ export interface EnvCommon {
     classes?: string
   }>
   breadcrumbs: {name: string; url: string}[]
+
+  /**
+   * Used by ui/features/top_navigation_tools/react/TopNavigationTools.tsx
+   * and ui/shared/trays/react/ContentTypeExternalToolDrawer.tsx
+   */
+  top_navigation_tools: Tool[]
 }
 
 /**

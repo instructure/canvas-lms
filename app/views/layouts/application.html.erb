@@ -19,6 +19,7 @@
   css_bundle(:instructure_eportfolio) if @eportfolio_view === true
   css_bundle(:new_user_tutorials) if tutorials_enabled?
   js_bundle(:navigation_header) unless @headers == false
+  js_bundle(:top_navigation_tools) if @domain_root_account&.feature_enabled?(:top_navigation_placement)
 
   load_blueprint_courses_ui
   @has_content_notices = load_content_notices
@@ -95,7 +96,7 @@
 <%# Flash messages must be outside of #application or they won't work in screenreaders with modals open. %>
 <%= render :partial => 'shared/static_notices' %>
 <%= render :partial => 'shared/flash_notices' %>
-<%if !!@domain_root_account&.feature_enabled?(:external_tool_drawer) %>
+<%if @domain_root_account&.feature_enabled?(:top_navigation_placement) %>
   <div id="drawer-layout-mount-point"></div>
 <% end %>
 <div id="application" class="ic-app">
@@ -135,6 +136,9 @@
           <% end %>
 
           <div class="right-of-crumbs">
+            <%if @domain_root_account&.feature_enabled?(:top_navigation_placement) %>
+              <div id="top-nav-tools-mount-point"></div>
+            <% end %>
             <% if tutorials_enabled? %>
               <div class="TutorialToggleHolder"></div>
             <% end %>

@@ -207,6 +207,7 @@ const featureBundles: {
   terms_of_use: () => import('./features/terms_of_use/index'),
   theme_editor: () => import('./features/theme_editor/index'),
   theme_preview: () => import('./features/theme_preview/index'),
+  top_navigation_tools: () => import('./features/top_navigation_tools/index'),
   user_grades: () => import('./features/user_grades/index'),
   user_lists: () => import('./features/user_lists/index'),
   user_logins: () => import('./features/user_logins/index'),
