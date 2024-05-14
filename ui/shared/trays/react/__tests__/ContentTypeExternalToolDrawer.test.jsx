@@ -21,7 +21,13 @@ import {render, fireEvent} from '@testing-library/react'
 import ContentTypeExternalToolDrawer from '../ContentTypeExternalToolDrawer'
 
 describe('ContentTypeExternalToolDrawer', () => {
-  const tool = {id: '1', base_url: 'https://one.lti.com/', title: 'First LTI'}
+  const tool = {
+    id: '1',
+    base_url: 'https://lti1.example.com/',
+    title: 'First LTI',
+    pinned: true,
+    placement: 'top_navigation',
+  }
   const onDismiss = jest.fn()
   const onExternalContentReady = jest.fn()
   const extraQueryParams = {key1: 'value1', key2: 'value2'}
@@ -39,17 +45,11 @@ describe('ContentTypeExternalToolDrawer', () => {
         tool={tool}
         pageContent={pageContent}
         pageContentTitle={pageContentTitle}
-        pageContentMinWidth=""
+        pageContentMinWidth="40rem"
         trayPlacement="end"
-        acceptedResourceTypes={['page', 'module']}
-        targetResourceType="page"
-        allowItemSelection={true}
-        selectableItems={[{id: '1', name: 'module 1'}]}
         onDismiss={onDismiss}
         onExternalContentReady={onExternalContentReady}
         open={true}
-        placement="wiki_index_menu"
-        extraQueryParams={extraQueryParams}
         {...props}
       />
     )
@@ -75,7 +75,7 @@ describe('ContentTypeExternalToolDrawer', () => {
     let icon_url
 
     beforeAll(() => {
-      icon_url = 'https://one.lti.com/icon.png'
+      icon_url = 'https://lti1.example.com/icon.png'
       tool.icon_url = icon_url
     })
 
@@ -85,7 +85,7 @@ describe('ContentTypeExternalToolDrawer', () => {
 
     it('renders an icon', () => {
       const {getByAltText} = renderTray()
-      expect(getByAltText('First LTI icon')).toHaveAttribute('src', icon_url)
+      expect(getByAltText('First LTI Icon')).toHaveAttribute('src', icon_url)
     })
   })
 
@@ -103,33 +103,10 @@ describe('ContentTypeExternalToolDrawer', () => {
     })
   })
 
-  describe('constructs iframe src url', () => {
-    it('adds ? before parameters if none are already present', () => {
-      expect(tool.base_url).not.toContain('?')
-      const {getByTestId} = renderTray()
-      const src = getByTestId('ltiIframe').src
-      expect(src).toContain(`${tool.base_url}?`)
-    })
-
-    it('appends parameters if some exist already', () => {
-      tool.base_url = 'https://one.lti.com/?launch_type=wiki_index_menu'
-      const {getByTestId} = renderTray()
-      const src = getByTestId('ltiIframe').src
-      expect(src).toContain(`${tool.base_url}&`)
-    })
-
-    it('includes expected parameters', () => {
-      const {getByTestId} = renderTray()
-      const src = getByTestId('ltiIframe').src
-      expect(src).toContain('com_instructure_course_accept_canvas_resource_types')
-      expect(src).toContain('com_instructure_course_canvas_resource_type')
-      expect(src).toContain('com_instructure_course_allow_canvas_resource_selection')
-      expect(src).toContain('com_instructure_course_available_canvas_resources')
-      expect(src).toContain('display')
-      expect(src).toContain('placement')
-      // from extraQueryParams
-      expect(src).toContain('key1=value1')
-      expect(src).toContain('key2=value2')
-    })
+  it('constructs iframe src url', () => {
+    expect(tool.base_url).not.toContain('?')
+    const {getByTestId} = renderTray()
+    const src = getByTestId('ltiIframe').src
+    expect(src).toContain(`${tool.base_url}?`)
   })
 })

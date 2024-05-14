@@ -173,8 +173,8 @@ describe "SpeedGrader - rubrics" do
     wait_for_ajaximations
     scroll_into_view(".toggle_full_rubric")
     f("button.toggle_full_rubric").click
-    fj("span:contains('Rockin\\''):visible").click
-    fj("span:contains('You Learned'):visible").click
+    hover_and_click("span:contains('Rockin\\''):visible")
+    hover_and_click("span:contains('You Learned'):visible")
     scroll_into_view(".save_rubric_button")
     f("#rubric_holder button.save_rubric_button").click
     wait_for_ajaximations

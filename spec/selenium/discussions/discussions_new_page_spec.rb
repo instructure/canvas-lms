@@ -150,7 +150,9 @@ describe "discussions" do
           f('input[type=checkbox][name="assignment[set_assignment]"]').click
           f("#has_group_category").click
           f(%(span[data-testid="group-set-close"])).click
-          f("#edit_discussion_form_buttons .btn-primary[type=submit]").click
+          submit_button = f("#edit_discussion_form_buttons .btn-primary[type=submit]")
+          scroll_into_view(submit_button)
+          submit_button.click
           wait_for_ajaximations
           error_box = f("div[role='alert'] .error_text")
           expect(error_box.text).to eq "Please create a group set"

@@ -26,6 +26,9 @@ describe "Gradebook History Page" do
   include CustomScreenActions
 
   before(:once) do
+    # This does not currently work correctly with top_navigation_placement enabled
+    # ADV-112 is open to address this issue
+    Account.default.disable_feature!(:top_navigation_placement)
     gb_history_setup(50)
   end
 

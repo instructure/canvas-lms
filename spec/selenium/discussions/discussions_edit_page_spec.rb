@@ -278,7 +278,7 @@ describe "discussions" do
               f("[data-testid='grading-schemes-selector-option-#{grading_standard.id}']").click
 
               f(".form-actions button[type=submit]").click
-              fj("span:contains('Continue')").click
+              fj(".ui-button-text:contains('Continue')").click
               a = DiscussionTopic.last.assignment
               expect(a.grading_standard_id).to eq grading_standard.id
             end
