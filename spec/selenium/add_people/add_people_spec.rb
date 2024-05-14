@@ -45,7 +45,7 @@ describe "add_people" do
       # open the add people modal dialog
       f("a#addUsers").click
       expect(f(".addpeople")).to be_displayed
-      expect(f("#application")).to have_attribute("aria-hidden", "true")
+      expect(f("#drawer-layout-mount-point")).to have_attribute("aria-hidden", "true")
 
       # can't click the 'login id' radio button directly, since it's covered
       # with inst-ui prettiness and selenium won't allow it.

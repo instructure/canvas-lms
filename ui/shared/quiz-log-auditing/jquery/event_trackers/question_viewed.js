@@ -25,6 +25,9 @@ import parseQuestionId from '../util/parse_question_id'
 
 export default class QuestionViewed extends EventTracker {
   install(deliver, scrollContainer = window) {
+    // The quiz might be inside a drawer layout, in which case we need to
+    // watch the content inside the drawer layout instead of the window.
+    scrollContainer = document.getElementById('drawer-layout-content') || scrollContainer
     let viewed = []
 
     return this.bind(

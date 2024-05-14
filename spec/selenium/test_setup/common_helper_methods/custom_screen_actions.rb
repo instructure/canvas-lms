@@ -23,7 +23,12 @@ module CustomScreenActions
   end
 
   def scroll_page_to_bottom
-    driver.execute_script("window.scrollTo(0, document.body.scrollHeight)")
+    # If the drawer layout is in use, we need to scroll the content element instead
+    if element_has_children?("#drawer-layout-mount-point")
+      scroll_element("#drawer-layout-content", "max")
+    else
+      driver.execute_script("window.scrollTo(0, document.body.scrollHeight)")
+    end
   end
 
   def resize_screen_to_standard
