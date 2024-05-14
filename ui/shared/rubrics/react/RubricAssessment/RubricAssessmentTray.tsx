@@ -40,6 +40,7 @@ export type RubricAssessmentTrayProps = {
   rubricAssessmentData: RubricAssessmentData[]
   rubricAssessmentId?: string
   rubricAssessors?: RubricAssessmentSelect
+  rubricSavedComments?: Record<string, string[]>
   onAccessorChange?: (assessorId: string) => void
   onDismiss: () => void
   onSubmit?: (rubricAssessmentDraftData: RubricAssessmentData[]) => void
@@ -54,6 +55,7 @@ export const RubricAssessmentTray = ({
   rubricAssessmentData,
   rubricAssessmentId = '',
   rubricAssessors = [],
+  rubricSavedComments = {},
   onAccessorChange = () => {},
   onDismiss,
   onSubmit,
@@ -70,7 +72,7 @@ export const RubricAssessmentTray = ({
   }, [rubricAssessmentData, isOpen])
 
   const onUpdateAssessmentData = (params: UpdateAssessmentData) => {
-    const {criterionId, points, description, comments = ''} = params
+    const {criterionId, points, description, comments = '', saveCommentsForLater} = params
 
     const existingAssessmentIndex = rubricAssessmentDraftData.findIndex(
       a => a.criterionId === criterionId
@@ -94,6 +96,7 @@ export const RubricAssessmentTray = ({
           id: matchingRatingId,
           commentsEnabled: true,
           description: ratingDescription,
+          saveCommentsForLater,
         },
       ])
     } else {
@@ -106,6 +109,7 @@ export const RubricAssessmentTray = ({
                 id: matchingRatingId,
                 points,
                 description: ratingDescription,
+                saveCommentsForLater,
               }
             : a
         )
@@ -138,6 +142,7 @@ export const RubricAssessmentTray = ({
           rubricAssessmentData={rubricAssessmentDraftData}
           rubricAssessmentId={rubricAssessmentId}
           rubricAssessors={rubricAssessors}
+          rubricSavedComments={rubricSavedComments}
           selectedViewMode={viewMode}
           onAccessorChange={onAccessorChange}
           onDismiss={onDismiss}

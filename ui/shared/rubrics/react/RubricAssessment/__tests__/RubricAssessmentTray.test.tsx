@@ -37,7 +37,7 @@ describe('RubricAssessmentTray Tests', () => {
 
   const renderFreeformComponent = (props?: Partial<RubricAssessmentTrayProps>) => {
     const freeformRubric = {...RUBRIC_DATA, freeFormCriterionComments: true}
-    return renderComponent({rubric: freeformRubric})
+    return renderComponent({rubric: freeformRubric, ...props})
   }
 
   const getModernSelectedDiv = (element: HTMLElement) => {
@@ -47,9 +47,12 @@ describe('RubricAssessmentTray Tests', () => {
   const renderComponentModern = (
     viewMode: string,
     isPeerReview = false,
+    freeFormCriterionComments = false,
     props?: Partial<RubricAssessmentTrayProps>
   ) => {
-    const component = renderComponent({isPeerReview, ...props})
+    const component = freeFormCriterionComments
+      ? renderFreeformComponent({isPeerReview, ...props})
+      : renderComponent({isPeerReview, ...props})
     const {getByTestId, queryByRole} = component
     const viewModeSelect = getByTestId('rubric-assessment-view-mode-select') as HTMLSelectElement
 
@@ -214,6 +217,63 @@ describe('RubricAssessmentTray Tests', () => {
         expect(queryByTestId('traditional-criterion-1-ratings-0')).not.toBeInTheDocument()
       })
 
+      it('should render the comment library dropdown if saved comments exist for that criterion', () => {
+        const {getByTestId, queryByTestId, queryByRole} = renderFreeformComponent({
+          rubricSavedComments: {1: ['comment 1']},
+        })
+        const commentLibrary = getByTestId('comment-library-1')
+        fireEvent.click(commentLibrary)
+
+        expect(queryByRole('option', {name: 'comment 1'})).toBeInTheDocument()
+        expect(queryByTestId('comment-library-2')).not.toBeInTheDocument()
+      })
+
+      it('should not render the comment library when in preview', () => {
+        const {queryByTestId} = renderFreeformComponent({isPreviewMode: true})
+
+        expect(queryByTestId('comment-library-1')).not.toBeInTheDocument()
+      })
+
+      it('should not render the comment library when in peer review mode', () => {
+        const {queryByTestId} = renderFreeformComponent({isPeerReview: true})
+
+        expect(queryByTestId('comment-library-1')).not.toBeInTheDocument()
+      })
+
+      it('should add a saved comment to the comment text area when a comment is selected from the comment library', () => {
+        const {getByTestId, queryByRole} = renderFreeformComponent({
+          rubricSavedComments: {1: ['comment 1']},
+        })
+        const commentLibrary = getByTestId('comment-library-1')
+        fireEvent.click(commentLibrary)
+
+        const commentOption = queryByRole('option', {name: 'comment 1'}) as HTMLElement
+        fireEvent.click(commentOption)
+
+        expect(getByTestId('free-form-comment-area-1')).toHaveValue('comment 1')
+      })
+
+      it('should render the save comment for later checkbox for each criterion', () => {
+        const {getByTestId} = renderFreeformComponent({})
+
+        expect(getByTestId('save-comment-checkbox-1')).toBeInTheDocument()
+        expect(getByTestId('save-comment-checkbox-2')).toBeInTheDocument()
+      })
+
+      it('should not render the save comment for later checkbox when in preview', () => {
+        const {queryByTestId} = renderFreeformComponent({isPreviewMode: true})
+
+        expect(queryByTestId('save-comment-checkbox-1')).not.toBeInTheDocument()
+        expect(queryByTestId('save-comment-checkbox-2')).not.toBeInTheDocument()
+      })
+
+      it('should not render the save comment for later checkbox when in peer review mode', () => {
+        const {queryByTestId} = renderFreeformComponent({isPeerReview: true})
+
+        expect(queryByTestId('save-comment-checkbox-1')).not.toBeInTheDocument()
+        expect(queryByTestId('save-comment-checkbox-2')).not.toBeInTheDocument()
+      })
+
       it('should render point inputs within the points column of the rubric grid', () => {
         const {getByTestId} = renderFreeformComponent({})
 
@@ -244,24 +304,6 @@ describe('RubricAssessmentTray Tests', () => {
   })
 
   describe('Modern View tests', () => {
-    const renderComponentModern = (
-      viewMode: string,
-      isPeerReview = false,
-      freeFormCriterionComments = false
-    ) => {
-      const component = freeFormCriterionComments
-        ? renderFreeformComponent({isPeerReview})
-        : renderComponent({isPeerReview})
-      const {getByTestId, queryByRole} = component
-      const viewModeSelect = getByTestId('rubric-assessment-view-mode-select') as HTMLSelectElement
-
-      fireEvent.click(viewModeSelect)
-      const roleOption = queryByRole('option', {name: viewMode}) as HTMLElement
-      fireEvent.click(roleOption)
-
-      return component
-    }
-
     describe('Horizontal Display tests', () => {
       it('should select a rating when the rating is clicked', () => {
         const {getByTestId, queryByTestId} = renderComponentModern('Horizontal')
@@ -327,10 +369,84 @@ describe('RubricAssessmentTray Tests', () => {
         expect(getModernSelectedDiv(oldRatingDiv)).toBeInTheDocument()
       })
 
-      it('should not render the rating buttons when free form comments are enabled', () => {
-        const {queryByTestId} = renderComponentModern('Horizontal', false, true)
+      describe('Free Form Comments', () => {
+        it('should not render the rating buttons when free form comments are enabled', () => {
+          const {queryByTestId} = renderComponentModern('Horizontal', false, true, {})
 
-        expect(queryByTestId('rubric-assessment-horizontal-display')).not.toBeInTheDocument()
+          expect(queryByTestId('rubric-assessment-horizontal-display')).not.toBeInTheDocument()
+        })
+
+        it('should render the comment library dropdown if saved comments exist for that criterion', () => {
+          const {getByTestId, queryByTestId, queryByRole} = renderComponentModern(
+            'Horizontal',
+            false,
+            true,
+            {rubricSavedComments: {1: ['comment 1']}}
+          )
+          const commentLibrary = getByTestId('comment-library-1')
+          fireEvent.click(commentLibrary)
+
+          expect(queryByRole('option', {name: 'comment 1'})).toBeInTheDocument()
+          expect(queryByTestId('comment-library-2')).not.toBeInTheDocument()
+        })
+
+        it('should not render the comment library when in preview', () => {
+          const {queryByTestId} = renderComponentModern('Horizontal', false, true, {
+            rubricSavedComments: {1: ['comment 1']},
+            isPreviewMode: true,
+          })
+
+          expect(queryByTestId('comment-library-1')).not.toBeInTheDocument()
+        })
+
+        it('should not render the comment library when in peer review mode', () => {
+          const {queryByTestId} = renderComponentModern('Horizontal', true, true, {
+            rubricSavedComments: {1: ['comment 1']},
+          })
+
+          expect(queryByTestId('comment-library-1')).not.toBeInTheDocument()
+        })
+
+        it('should add a saved comment to the comment text area when a comment is selected from the comment library', () => {
+          const {getByTestId, queryByRole} = renderComponentModern('Horizontal', false, true, {
+            rubricSavedComments: {1: ['comment 1']},
+          })
+          const commentLibrary = getByTestId('comment-library-1')
+          fireEvent.click(commentLibrary)
+
+          const commentOption = queryByRole('option', {name: 'comment 1'}) as HTMLElement
+          fireEvent.click(commentOption)
+
+          expect(getByTestId('free-form-comment-area-1')).toHaveValue('comment 1')
+        })
+
+        it('should render the save comment for later checkbox for each criterion', () => {
+          const {getByTestId} = renderComponentModern('Horizontal', false, true, {
+            rubricSavedComments: {1: ['comment 1']},
+          })
+
+          expect(getByTestId('save-comment-checkbox-1')).toBeInTheDocument()
+          expect(getByTestId('save-comment-checkbox-2')).toBeInTheDocument()
+        })
+
+        it('should not render the save comment for later checkbox when in preview', () => {
+          const {queryByTestId} = renderComponentModern('Horizontal', false, true, {
+            rubricSavedComments: {1: ['comment 1']},
+            isPreviewMode: true,
+          })
+
+          expect(queryByTestId('save-comment-checkbox-1')).not.toBeInTheDocument()
+          expect(queryByTestId('save-comment-checkbox-2')).not.toBeInTheDocument()
+        })
+
+        it('should not render the save comment for later checkbox when in peer review mode', () => {
+          const {queryByTestId} = renderComponentModern('Horizontal', true, true, {
+            rubricSavedComments: {1: ['comment 1']},
+          })
+
+          expect(queryByTestId('save-comment-checkbox-1')).not.toBeInTheDocument()
+          expect(queryByTestId('save-comment-checkbox-2')).not.toBeInTheDocument()
+        })
       })
     })
 
@@ -398,6 +514,17 @@ describe('RubricAssessmentTray Tests', () => {
         expect(getModernSelectedDiv(newRatingDiv)).toBeInTheDocument()
         expect(getModernSelectedDiv(oldRatingDiv)).toBeInTheDocument()
       })
+
+      it('should not render Vertical option when free form comments are enabled', () => {
+        const {getByTestId, queryByRole} = renderFreeformComponent()
+        const viewModeSelect = getByTestId(
+          'rubric-assessment-view-mode-select'
+        ) as HTMLSelectElement
+
+        fireEvent.click(viewModeSelect)
+
+        expect(queryByRole('option', {name: 'Vertical'}) as HTMLElement).not.toBeInTheDocument()
+      })
     })
 
     it('should keep the selected rating when switching between view modes', () => {
@@ -427,12 +554,6 @@ describe('RubricAssessmentTray Tests', () => {
       expect(queryAllByTestId('rubric-assessment-vertical-display')).toHaveLength(2)
       const verticalRatingDiv = queryByTestId('rating-button-4-0') as HTMLElement
       expect(getModernSelectedDiv(verticalRatingDiv)).toBeInTheDocument()
-    })
-
-    it('should not render the rating buttons when free form comments are enabled', () => {
-      const {queryByTestId} = renderComponentModern('Vertical', false, true)
-
-      expect(queryByTestId('rubric-assessment-horizontal-display')).not.toBeInTheDocument()
     })
   })
 
@@ -520,12 +641,14 @@ describe('RubricAssessmentTray Tests', () => {
     })
 
     it('should not display points when hidePoints is true in modern view', () => {
-      const {queryByTestId} = renderComponentModern('Vertical', false, {hidePoints: true})
+      const {queryByTestId} = renderComponentModern('Vertical', false, false, {hidePoints: true})
       expect(queryByTestId('modern-view-out-of-points')).toBeNull()
     })
 
     it('should display points when hidePoints is false in modern view', () => {
-      const {queryAllByTestId} = renderComponentModern('Vertical', false, {hidePoints: false})
+      const {queryAllByTestId} = renderComponentModern('Vertical', false, false, {
+        hidePoints: false,
+      })
       expect(queryAllByTestId('modern-view-out-of-points')).toHaveLength(2)
     })
   })

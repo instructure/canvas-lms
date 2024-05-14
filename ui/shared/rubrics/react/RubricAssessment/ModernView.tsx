@@ -23,11 +23,12 @@ import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {TextInput} from '@instructure/ui-text-input'
-import {IconChatLine} from '@instructure/ui-icons'
 import {HorizontalButtonDisplay} from './HorizontalButtonDisplay'
 import {VerticalButtonDisplay} from './VerticalButtonDisplay'
 import type {RubricAssessmentData, RubricCriterion, UpdateAssessmentData} from '../types/rubric'
 import {TextArea} from '@instructure/ui-text-area'
+import {Checkbox} from '@instructure/ui-checkbox'
+import {CommentLibrary} from './CommentLibrary'
 
 const I18n = useI18nScope('rubrics-assessment-tray')
 
@@ -37,20 +38,24 @@ type ModernViewProps = {
   criteria: RubricCriterion[]
   hidePoints: boolean
   isPreviewMode: boolean
+  isPeerReview: boolean
   isFreeFormCriterionComments: boolean
   ratingOrder: string
   rubricAssessmentData: RubricAssessmentData[]
   selectedViewMode: ModernViewModes
+  rubricSavedComments?: Record<string, string[]>
   onUpdateAssessmentData: (params: UpdateAssessmentData) => void
 }
 export const ModernView = ({
   criteria,
   hidePoints,
   isPreviewMode,
+  isPeerReview,
   isFreeFormCriterionComments,
   ratingOrder,
   rubricAssessmentData,
   selectedViewMode,
+  rubricSavedComments,
   onUpdateAssessmentData,
 }: ModernViewProps) => {
   return (
@@ -67,9 +72,11 @@ export const ModernView = ({
             displayHr={index < criteria.length - 1}
             hidePoints={hidePoints}
             isPreviewMode={isPreviewMode}
+            isPeerReview={isPeerReview}
             ratingOrder={ratingOrder}
             criterionAssessment={criterionAssessment}
             selectedViewMode={selectedViewMode}
+            rubricSavedComments={rubricSavedComments?.[criterion.id] ?? []}
             onUpdateAssessmentData={onUpdateAssessmentData}
             isFreeFormCriterionComments={isFreeFormCriterionComments}
           />
@@ -84,10 +91,12 @@ type CriterionRowProps = {
   displayHr: boolean
   hidePoints: boolean
   isPreviewMode: boolean
+  isPeerReview: boolean
   isFreeFormCriterionComments: boolean
   ratingOrder: string
   criterionAssessment?: RubricAssessmentData
   selectedViewMode: ModernViewModes
+  rubricSavedComments: string[]
   onUpdateAssessmentData: (params: UpdateAssessmentData) => void
 }
 export const CriterionRow = ({
@@ -95,10 +104,12 @@ export const CriterionRow = ({
   displayHr,
   hidePoints,
   isPreviewMode,
+  isPeerReview,
   isFreeFormCriterionComments,
   ratingOrder,
   criterionAssessment,
   selectedViewMode,
+  rubricSavedComments,
   onUpdateAssessmentData,
 }: CriterionRowProps) => {
   const {ratings} = criterion
@@ -109,6 +120,7 @@ export const CriterionRow = ({
   const [pointsInput, setPointsInput] = useState<string>()
   const [selectedRatingDescription, setSelectedRatingDescription] = useState<string>()
   const [commentText, setCommentText] = useState<string>(criterionAssessment?.comments ?? '')
+  const [isSaveCommentChecked, setIsSaveCommentChecked] = useState(false)
 
   useEffect(() => {
     setCommentText(criterionAssessment?.comments ?? '')
@@ -221,22 +233,72 @@ export const CriterionRow = ({
         {!isFreeFormCriterionComments && renderButtonDisplay()}
       </View>
       <View as="div" margin="small 0 0 0">
-        <Flex>
-          <Flex.Item>
-            <IconChatLine />
-          </Flex.Item>
-          <Flex.Item shouldGrow={true} margin="0 0 0 xx-small">
-            <TextArea
-              label={<ScreenReaderContent>{I18n.t('Leave criterion comment')}</ScreenReaderContent>}
-              readOnly={isPreviewMode}
-              size="small"
-              value={commentText}
-              onChange={e => setCommentText(e.target.value)}
-              onBlur={() => updateAssessmentData({comments: commentText})}
-              placeholder={I18n.t('Leave a comment')}
-            />
-          </Flex.Item>
-        </Flex>
+        {isFreeFormCriterionComments ? (
+          <Flex direction="column">
+            {!isPreviewMode && !isPeerReview && rubricSavedComments.length > 0 && (
+              <>
+                <Flex.Item>
+                  <Text weight="bold">{I18n.t('Comment Library')}</Text>
+                </Flex.Item>
+                <Flex.Item margin="x-small 0 0 0" shouldGrow={true}>
+                  <CommentLibrary
+                    rubricSavedComments={rubricSavedComments}
+                    criterionId={criterion.id}
+                    setCommentText={setCommentText}
+                    updateAssessmentData={updateAssessmentData}
+                  />
+                </Flex.Item>
+              </>
+            )}
+            <Flex.Item margin={rubricSavedComments.length > 0 ? 'medium 0 0 0' : '0 0 0 0'}>
+              <Text weight="bold">{I18n.t('Comment')}</Text>
+            </Flex.Item>
+            <Flex.Item margin="x-small 0 0 0" shouldGrow={true}>
+              <TextArea
+                label={<ScreenReaderContent>{I18n.t('Criterion Comment')}</ScreenReaderContent>}
+                readOnly={isPreviewMode}
+                data-testid={`free-form-comment-area-${criterion.id}`}
+                width="100%"
+                height="38px"
+                value={commentText}
+                onChange={e => setCommentText(e.target.value)}
+                onBlur={e => updateAssessmentData({comments: e.target.value})}
+              />
+            </Flex.Item>
+            {!isPeerReview && !isPreviewMode && (
+              <Flex.Item margin="medium 0 x-small 0" shouldGrow={true}>
+                <Checkbox
+                  checked={isSaveCommentChecked}
+                  label={I18n.t('Save this comment for reuse')}
+                  size="small"
+                  data-testid={`save-comment-checkbox-${criterion.id}`}
+                  onChange={e => {
+                    updateAssessmentData({saveCommentsForLater: !!e.target.checked})
+                    setIsSaveCommentChecked(!!e.target.checked)
+                  }}
+                />
+              </Flex.Item>
+            )}
+          </Flex>
+        ) : (
+          <Flex direction="column">
+            <Flex.Item>
+              <Text weight="bold">{I18n.t('Comment')}</Text>
+            </Flex.Item>
+            <Flex.Item margin="x-small 0 0 0" shouldGrow={true}>
+              <TextArea
+                label={<ScreenReaderContent>{I18n.t('Criterion Comment')}</ScreenReaderContent>}
+                readOnly={isPreviewMode}
+                data-testid={`modern-comment-area-${criterion.id}`}
+                width="100%"
+                height="38px"
+                value={commentText}
+                onChange={e => setCommentText(e.target.value)}
+                onBlur={e => updateAssessmentData({comments: e.target.value})}
+              />
+            </Flex.Item>
+          </Flex>
+        )}
       </View>
       {displayHr && <View as="hr" margin="medium 0" />}
     </View>

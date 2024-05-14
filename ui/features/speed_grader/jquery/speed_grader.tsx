@@ -289,6 +289,7 @@ const HISTORY_PUSH = 'push'
 const HISTORY_REPLACE = 'replace'
 
 const {enhanced_rubrics} = ENV.FEATURES ?? {}
+type RubricSavedComments = {summary_data?: {saved_comments: Record<string, string[]>}}
 
 function setGradeLoading(studentId: string, loading: boolean) {
   useStore.setState(state => {
@@ -1957,6 +1958,11 @@ EG = {
         if (response && response.rubric_association) {
           if (!enhanced_rubrics) {
             rubricAssessment.updateRubricAssociation(rubricElement, response.rubric_association)
+          } else {
+            const rubricAssociation: RubricSavedComments = response?.rubric_association ?? {}
+            useStore.setState({
+              rubricSavedComments: rubricAssociation?.summary_data?.saved_comments,
+            })
           }
           delete response.rubric_association
         }
@@ -4216,6 +4222,14 @@ function setupSpeedGrader(
   EG.jsonReady()
   EG.setInitiallyLoadedStudent()
   EG.setupGradeLoadingSpinner()
+
+  if (enhanced_rubrics && ENV.rubric) {
+    const rubricAssociation: RubricSavedComments = window.jsonData?.rubric_association ?? {}
+    useStore.setState({
+      rubricSavedComments: rubricAssociation.summary_data?.saved_comments,
+    })
+    EG.setUpRubricAssessmentTrayWrapper()
+  }
 }
 
 function setupSelectors() {
@@ -4307,10 +4321,6 @@ export default {
 
     if (ENV.can_view_audit_trail) {
       EG.setUpAssessmentAuditTray()
-    }
-
-    if (enhanced_rubrics && ENV.rubric) {
-      EG.setUpRubricAssessmentTrayWrapper()
     }
 
     function registerQuizzesNext(

@@ -56,8 +56,13 @@ type RubricAssessmentTrayWrapperProps = {
   onSave: (assessmentData: any) => void
 }
 export default ({rubric, onAccessorChange, onSave}: RubricAssessmentTrayWrapperProps) => {
-  const {rubricAssessmentTrayOpen, studentAssessment, rubricAssessors, rubricHidePoints} =
-    useStore()
+  const {
+    rubricAssessmentTrayOpen,
+    studentAssessment,
+    rubricAssessors,
+    rubricHidePoints,
+    rubricSavedComments = {},
+  } = useStore()
 
   const handleSubmit = (assessmentData: RubricAssessmentData[]) => {
     const data = convertSubmittedAssessment(assessmentData)
@@ -80,6 +85,7 @@ export default ({rubric, onAccessorChange, onSave}: RubricAssessmentTrayWrapperP
       )}
       rubricAssessmentId={studentAssessment?.id}
       rubricAssessors={rubricAssessors}
+      rubricSavedComments={rubricSavedComments}
       onAccessorChange={onAccessorChange}
       onDismiss={() => useStore.setState({rubricAssessmentTrayOpen: false})}
       onSubmit={handleSubmit}

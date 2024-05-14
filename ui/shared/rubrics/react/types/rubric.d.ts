@@ -72,6 +72,7 @@ export type RubricAssessmentData = {
   comments: string
   commentsEnabled: boolean
   description: string
+  rubricSavedComments?: string[]
   saveCommentsForLater?: boolean
 }
 
@@ -80,6 +81,7 @@ export type UpdateAssessmentData = {
   points?: number
   description?: string
   comments?: string
+  saveCommentsForLater?: boolean
 }
 
 export type RubricAssessmentSelect = {
