@@ -25,6 +25,7 @@ class Lti::RegistrationAccountBinding < ActiveRecord::Base
     state :off
     state :on
     state :allow
+    state :deleted
   end
 
   belongs_to :account, inverse_of: :lti_registration_account_bindings, optional: false
@@ -35,4 +36,23 @@ class Lti::RegistrationAccountBinding < ActiveRecord::Base
   belongs_to :developer_key_account_binding, inverse_of: :lti_registration_account_binding
 
   resolves_root_account through: :account
+
+  # -- BEGIN SoftDeleteable --
+  # adapting SoftDeleteable, but with no "active" state
+  scope :active, -> { where.not(workflow_state: :deleted) }
+
+  alias_method :destroy_permanently!, :destroy
+  def destroy
+    return true if deleted?
+
+    self.workflow_state = :deleted
+    run_callbacks(:destroy) { save! }
+  end
+
+  def undestroy(active_state: "off")
+    self.workflow_state = active_state
+    save!
+    true
+  end
+  # -- END SoftDeleteable --
 end

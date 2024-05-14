@@ -67,7 +67,7 @@ class Lti::IMS::Registration < ApplicationRecord
     canvas_configuration
   end
 
-  # A Registration (this class) denotes a registration of a tool with a platform. This
+  # An IMS::Registration (this class) denotes a registration of a tool with a platform. This
   # follows the IMS Dynamic Registration specification. A "Tool Configuration" is
   # Canvas' proprietary representation of a tool's configuration, which predates
   # the dynamic registration specification. This method converts an ims registration
@@ -75,13 +75,9 @@ class Lti::IMS::Registration < ApplicationRecord
   def canvas_configuration(apply_overlay: true)
     config = lti_tool_configuration
 
-    overlay = registration_overlay
-
     {
       title: client_name,
-      scopes: scopes.reject do |s|
-        apply_overlay ? (overlay["disabledScopes"]&.include?(s) || false) : false
-      end,
+      scopes: overlaid_scopes(apply_overlay:),
       public_jwk_url: jwks_uri,
       description: config["description"],
       custom_fields: config["custom_parameters"],
@@ -104,6 +100,28 @@ class Lti::IMS::Registration < ApplicationRecord
     }.with_indifferent_access
   end
 
+  # This method converts an IMS Registration into a "Tool Configuration V2",
+  # the flattened and standardized version of the Canvas proprietary configuration
+  # format meant for internal use with LTI Registrations.
+  def registration_configuration
+    config = lti_tool_configuration
+
+    {
+      name: client_name,
+      description: config["description"],
+      domain: config["domain"],
+      custom_fields: config["custom_parameters"],
+      target_link_uri: config["target_link_uri"],
+      privacy_level:,
+      icon_url: config["icon_uri"],
+      oidc_initiation_url: initiate_login_uri,
+      redirect_uris:,
+      public_jwk_url: jwks_uri,
+      scopes: overlaid_scopes,
+      placements:
+    }.with_indifferent_access
+  end
+
   def importable_configuration
     configuration&.merge(canvas_extensions)&.merge(configuration_to_cet_settings_map)
   end
@@ -116,6 +134,12 @@ class Lti::IMS::Registration < ApplicationRecord
     claims = lti_tool_configuration["claims"] || []
     infered_privacy_level = infer_privacy_level_from(claims)
     registration_overlay["privacy_level"] || lti_tool_configuration["https://#{CANVAS_EXTENSION_LABEL}/lti/privacy_level"] || infered_privacy_level
+  end
+
+  def overlaid_scopes(apply_overlay: true)
+    return scopes unless apply_overlay
+
+    scopes.reject { |s| registration_overlay["disabledScopes"]&.include?(s) || false }
   end
 
   def update_external_tools?

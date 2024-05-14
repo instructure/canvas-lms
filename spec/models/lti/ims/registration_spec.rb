@@ -592,5 +592,30 @@ module Lti::IMS
         end
       end
     end
+
+    describe "registration_configuration" do
+      subject { registration.registration_configuration }
+
+      it "formats the configuration correctly" do
+        config = registration.lti_tool_configuration.with_indifferent_access
+
+        expect(subject).to eq(
+          {
+            name: registration.client_name,
+            description: config[:description],
+            domain: config[:domain],
+            custom_fields: config[:custom_parameters],
+            target_link_uri: config[:target_link_uri],
+            privacy_level: registration.privacy_level,
+            icon_url: config[:icon_uri],
+            oidc_initiation_url: registration.initiate_login_uri,
+            redirect_uris: registration.redirect_uris,
+            public_jwk_url: registration.jwks_uri,
+            scopes: registration.overlaid_scopes,
+            placements: registration.placements,
+          }.with_indifferent_access
+        )
+      end
+    end
   end
 end

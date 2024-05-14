@@ -25,4 +25,46 @@ RSpec.describe Lti::RegistrationAccountBinding do
     it { is_expected.to belong_to(:updated_by).class_name("User").inverse_of(:updated_lti_registration_account_bindings) }
     it { is_expected.to belong_to(:developer_key_account_binding).class_name("DeveloperKeyAccountBinding") }
   end
+
+  describe "#destroy" do
+    subject { account_binding.destroy }
+
+    let(:account_binding) { lti_registration_account_binding_model }
+
+    it "sets workflow_state to deleted" do
+      subject
+      expect(account_binding.workflow_state).to eq("deleted")
+    end
+  end
+
+  describe "#undestroy" do
+    subject { account_binding.undestroy }
+
+    let(:account_binding) { lti_registration_account_binding_model }
+
+    it "sets workflow_state to off" do
+      subject
+      expect(account_binding.workflow_state).to eq("off")
+    end
+
+    context "when active_state is provided" do
+      subject { account_binding.undestroy(active_state: "on") }
+
+      it "sets workflow_state to the provided state" do
+        subject
+        expect(account_binding.workflow_state).to eq("on")
+      end
+    end
+  end
+
+  describe "#destroy_permanently!" do
+    subject { account_binding.destroy_permanently! }
+
+    let(:account_binding) { lti_registration_account_binding_model }
+
+    it "hard deletes binding" do
+      subject
+      expect(Lti::RegistrationAccountBinding.find_by(id: account_binding.id)).to be_nil
+    end
+  end
 end

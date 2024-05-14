@@ -79,4 +79,80 @@ describe Lti::RegistrationsController do
       expect(assigns[:active_tab]).to eq("extensions")
     end
   end
+
+  describe "DELETE destroy" do
+    subject { delete :destroy, params: { account_id: account.id, id: registration.id }, format: :json }
+
+    let(:account) { account_model }
+    let(:admin) { account_admin_user(account:) }
+    let(:registration) { lti_registration_model(account:) }
+    let(:ims_registration) { lti_ims_registration_model(lti_registration: registration) }
+
+    before do
+      ims_registration
+      user_session(admin)
+      account.enable_feature!(:lti_registrations_page)
+    end
+
+    context "without user session" do
+      before do
+        remove_user_session
+      end
+
+      it "returns 401" do
+        subject
+        expect(response).to be_unauthorized
+      end
+    end
+
+    context "with non-admin user" do
+      let(:student) { student_in_course(account:).user }
+
+      before do
+        user_session(student)
+      end
+
+      it "returns 401" do
+        subject
+        expect(response).to be_unauthorized
+      end
+    end
+
+    context "with flag disabled" do
+      before do
+        account.disable_feature!(:lti_registrations_page)
+      end
+
+      it "returns 404" do
+        subject
+        expect(response).to be_not_found
+      end
+    end
+
+    context "with non-dynamic registration" do
+      before do
+        ims_registration.update!(lti_registration: nil)
+      end
+
+      it "returns 422" do
+        subject
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
+
+      it "does not delete the registration" do
+        subject
+        expect(registration.reload).not_to be_deleted
+      end
+    end
+
+    it "is successful" do
+      subject
+      expect(response).to be_successful
+    end
+
+    it "deletes the registration" do
+      subject
+      expect(registration.reload).to be_deleted
+    end
+  end
 end
