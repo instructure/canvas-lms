@@ -34,7 +34,7 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'Users with this permission may be able to use the Act as feature to manage account settings, view and adjust grades, access user information, etc. This permissions also allows admins designated to a sub-account to access settings and information outside of their sub-account.'
+        'Users with this permission may be able to use the Act as feature to manage account settings, view and adjust grades, access user information, etc.'
       ),
     },
     {
