@@ -18,7 +18,7 @@
 
 import {extend} from '@canvas/backbone/utils'
 import Backbone from '@canvas/backbone'
-import {intersection, isEmpty} from 'lodash'
+import {intersection, isEmpty, has} from 'lodash'
 import DefaultUrlMixin from '@canvas/backbone/DefaultUrlMixin'
 import AssignmentCollection from '../collections/AssignmentCollection'
 
@@ -126,8 +126,12 @@ AssignmentGroup.prototype.anyAssignmentInClosedGradingPeriod = function () {
   return this.get('any_assignment_in_closed_grading_period')
 }
 
-AssignmentGroup.prototype.hasIntegrationData = function () {
-  return !isEmpty(this.get('integration_data')) || !isEmpty(this.get('sis_source_id'))
+AssignmentGroup.prototype.hasSisSourceId = function () {
+  return !isEmpty(this.get('sis_source_id'))
+}
+
+AssignmentGroup.prototype.syncedWithSisCategory = function () {
+  return has(this.get('integration_data'), 'sistemic.categoryMapping')
 }
 
 export default AssignmentGroup

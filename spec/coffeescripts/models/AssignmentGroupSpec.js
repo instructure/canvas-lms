@@ -76,42 +76,34 @@ test('#countRules returns false if the group has no rules', () => {
   strictEqual(ag.countRules(), 0)
 })
 
-test('#hasIntegrationData returns true if integration_data is not empty', () => {
-  const ag = new AssignmentGroup({integration_data: {key: 'value'}})
-  strictEqual(ag.hasIntegrationData(), true)
+test('#syncedWithSisCategory returns true if integration_data contains mapping', () => {
+  const ag = new AssignmentGroup({integration_data: {sistemic: {categoryMapping: {abc: {}}}}})
+  strictEqual(ag.syncedWithSisCategory(), true)
 })
 
-test('#hasIntegrationData returns false if integration_data is empty', () => {
+test('#syncedWithSisCategory returns false if integration_data is empty', () => {
   const ag = new AssignmentGroup({integration_data: {}})
-  strictEqual(ag.hasIntegrationData(), false)
+  strictEqual(ag.syncedWithSisCategory(), false)
 })
 
-test('#hasIntegrationData returns false if integration_data is not set', () => {
+test('#syncedWithSisCategory returns false if integration_data is not set', () => {
   const ag = new AssignmentGroup()
-  strictEqual(ag.hasIntegrationData(), false)
+  strictEqual(ag.syncedWithSisCategory(), false)
 })
 
-test('#hasIntegrationData returns true if sis_source_id is not empty', () => {
+test('#hasSisSourceId returns true if sis_source_id is not empty', () => {
   const ag = new AssignmentGroup({sis_source_id: '1234'})
-  strictEqual(ag.hasIntegrationData(), true)
+  strictEqual(ag.hasSisSourceId(), true)
 })
 
 test('#hasIntegrationData returns false if sis_source_id is empty', () => {
   const ag = new AssignmentGroup({sis_source_id: ''})
-  strictEqual(ag.hasIntegrationData(), false)
+  strictEqual(ag.hasSisSourceId(), false)
 })
 
-test('#hasIntegrationData returns false if sis_source_id is not set', () => {
+test('#hasSisSourceId returns false if sis_source_id is not set', () => {
   const ag = new AssignmentGroup()
-  strictEqual(ag.hasIntegrationData(), false)
-})
-
-test('#hasIntegrationData returns false if sis_source_id and integration_data is empty', () => {
-  const ag = new AssignmentGroup({
-    sis_source_id: '',
-    integration_data: {},
-  })
-  strictEqual(ag.hasIntegrationData(), false)
+  strictEqual(ag.hasSisSourceId(), false)
 })
 
 QUnit.module('AssignmentGroup#canDelete as admin', {
