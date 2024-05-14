@@ -46,7 +46,7 @@
           <%= select_tag :pronouns,
             options_for_select(([[t("None"), '']] + @domain_root_account.pronouns + [@user.pronouns]).compact.uniq, @user.pronouns),
             class:"show-if-editing",
-            disabled:!@domain_root_account.can_change_pronouns?
+            disabled:!@domain_root_account.can_change_pronouns? && (!@domain_root_account.can_add_pronouns? || !@domain_root_account.grants_right?(@current_user, :manage_courses_admin))
           %>
         <% end %>
         <p class="profileDetails">
