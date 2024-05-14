@@ -235,14 +235,14 @@ describe('LibraryManager', () => {
   })
 
   describe('search', () => {
-    it('loads search results when commentAreaText is provided', async () => {
+    it('loads search results when commentAreaText is provided', () => {
       const mocks = [...commentBankItemMocks(), ...searchMocks()]
       const {getByText} = render({
         props: defaultProps({commentAreaText: 'search'}),
         mocks,
       })
 
-      await act(async () => jest.advanceTimersByTime(1000))
+      jest.advanceTimersByTime(1000)
       expect(getByText('search result 0')).toBeInTheDocument()
     })
 
@@ -256,20 +256,20 @@ describe('LibraryManager', () => {
       expect(queryByText('search result 0')).not.toBeInTheDocument()
     })
 
-    it('debounces the commentAreaText when displaying results', async () => {
+    it('debounces the commentAreaText when displaying results', () => {
       const mocks = [...commentBankItemMocks(), ...searchMocks()]
       const {getByText, queryByText} = render({
         props: defaultProps({commentAreaText: 'search'}),
         mocks,
       })
 
-      await act(async () => jest.advanceTimersByTime(50))
+      jest.advanceTimersByTime(50)
       expect(queryByText('search result 0')).not.toBeInTheDocument()
-      await act(async () => jest.advanceTimersByTime(1000))
+      jest.advanceTimersByTime(1000)
       expect(getByText('search result 0')).toBeInTheDocument()
     })
 
-    it('doesnt rerender the suggestions after clicking on a suggested comment', async () => {
+    it('doesnt rerender the suggestions after clicking on a suggested comment', () => {
       const mocks = [
         ...commentBankItemMocks(),
         ...searchMocks({query: 'search'}),
@@ -277,16 +277,16 @@ describe('LibraryManager', () => {
       ]
       const props = defaultProps({commentAreaText: 'search'})
       const {getByText, queryByText, rerender} = render({props, mocks})
-      await act(async () => jest.advanceTimersByTime(1000))
+      jest.advanceTimersByTime(1000)
       fireEvent.click(getByText('search result 0'))
-      await act(async () => jest.advanceTimersByTime(1000))
+      jest.advanceTimersByTime(1000)
 
       render({
         props: defaultProps({commentAreaText: 'search result 0'}),
         mocks,
         func: rerender,
       })
-      await act(async () => jest.advanceTimersByTime(1000))
+      jest.advanceTimersByTime(1000)
       expect(queryByText('search result 0')).not.toBeInTheDocument()
     })
 
