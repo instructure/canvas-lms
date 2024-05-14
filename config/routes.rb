@@ -1918,6 +1918,7 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: "lti/registrations") do
       delete "accounts/:account_id/lti_registrations/:id", action: :destroy
+      get "accounts/:account_id/lti_registrations/:id", action: :show
     end
 
     scope(controller: :immersive_reader) do

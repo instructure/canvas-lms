@@ -453,6 +453,27 @@ class Lti::RegistrationsController < ApplicationController
     render :index
   end
 
+  # @API Show an LTI Registration
+  # Return details about the specified LTI registration, including the
+  # configuration and account binding.
+  #
+  # @returns Lti::Registration
+  #
+  # @example_request
+  #
+  #   This would return the specified LTI registration
+  #   curl -X GET 'https://<canvas>/api/v1/accounts/<account_id>/registrations/<registration_id>' \
+  #        -H "Authorization: Bearer <token
+  def show
+    GuardRail.activate(:secondary) do
+      registration = Lti::Registration.active.find(params[:id])
+      render json: lti_registration_json(registration, @current_user, session, @context, includes: [:account_binding, :configuration])
+    end
+  rescue => e
+    report_error(e)
+    raise e
+  end
+
   # @API Delete an LTI Registration
   # Remove the specified LTI registration
   #
