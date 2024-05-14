@@ -543,7 +543,6 @@ $(document).ready(function () {
       }
     )
   })
-  $('.date_entry').datetime_field({alwaysShowTime: true})
 
   const $default_edit_roles_select = $('#course_default_wiki_editing_roles')
   $default_edit_roles_select.data(
