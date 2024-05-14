@@ -58,11 +58,13 @@ const ComposeModalManager = props => {
   })
 
   const getReplyRecipients = () => {
-    if (isSubmissionCommentsType) return
+    if (isSubmissionCommentsType) return []
+    if (!replyConversationQuery.data?.legacyNode) return []
 
-    const lastAuthor = props.conversationMessage
-      ? props.conversationMessage?.author
-      : props.conversation?.messages[0]?.author
+    const lastMessage =
+      replyConversationQuery.data.legacyNode.conversationMessagesConnection.nodes[0]
+
+    const lastAuthor = lastMessage?.author
 
     if (
       lastAuthor &&
@@ -71,22 +73,14 @@ const ComposeModalManager = props => {
       lastAuthor?._id.toString() !== ENV.current_user_id.toString()
     ) {
       return [lastAuthor]
-    } else {
-      const recipients = props.conversationMessage
-        ? props.conversationMessage?.recipients
-        : props.conversation?.messages[0]?.recipients
-      return recipients || []
     }
-  }
-
-  const getReplyRecipientIDs = () => {
-    return getReplyRecipients()?.map(r => r._id.toString())
+    return lastMessage?.recipients || []
   }
 
   const replyConversationQuery = useQuery(REPLY_CONVERSATION_QUERY, {
     variables: {
       conversationID: props.conversation?._id,
-      participants: getReplyRecipientIDs(),
+      participants: [ENV.current_user_id?.toString()],
       ...(props.conversationMessage && {createdBefore: props.conversationMessage?.createdAt}),
       first: props.isForward && props.conversationMessage ? 1 : null,
     },
@@ -136,7 +130,7 @@ const ComposeModalManager = props => {
             query: REPLY_CONVERSATION_QUERY,
             variables: {
               conversationID: props.conversation?._id,
-              participants: getReplyRecipientIDs(),
+              participants: [ENV.current_user_id?.toString()],
               ...(props.conversationMessage && {
                 createdBefore: props.conversationMessage?.createdAt,
               }),
@@ -144,7 +138,6 @@ const ComposeModalManager = props => {
           })
         )
       )
-
       replyQueryResult.legacyNode.conversationMessagesConnection.nodes.unshift(
         result.data.addConversationMessage.conversationMessage
       )
@@ -153,7 +146,7 @@ const ComposeModalManager = props => {
         query: REPLY_CONVERSATION_QUERY,
         variables: {
           conversationID: props.conversation?._id,
-          participants: getReplyRecipientIDs(),
+          participants: [ENV.current_user_id?.toString()],
           ...(props.conversationMessage && {createdBefore: props.conversationMessage?.createdAt}),
         },
         data: {legacyNode: replyQueryResult.legacyNode},
@@ -163,20 +156,20 @@ const ComposeModalManager = props => {
 
   const updateConversationMessagesCache = (cache, result) => {
     if (props?.conversation) {
-      const querytoUpdate = {
+      const queryToUpdate = {
         query: CONVERSATION_MESSAGES_QUERY,
         variables: {
           conversationID: props.conversation._id,
         },
       }
-      const data = JSON.parse(JSON.stringify(cache.readQuery(querytoUpdate)))
+      const data = JSON.parse(JSON.stringify(cache.readQuery(queryToUpdate)))
 
       data.legacyNode.conversationMessagesConnection.nodes = [
         result.data.addConversationMessage.conversationMessage,
         ...data.legacyNode.conversationMessagesConnection.nodes,
       ]
 
-      cache.writeQuery({...querytoUpdate, data})
+      cache.writeQuery({...queryToUpdate, data})
     }
   }
 
@@ -295,7 +288,7 @@ const ComposeModalManager = props => {
       props.onSelectedIdsChange(selectedUsers)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSubmissionCommentsType, props.isReply, props.isReplyAll])
+  }, [isSubmissionCommentsType, props.isReply, props.isReplyAll, replyConversationQuery.data])
 
   if (!props.open) {
     return null
