@@ -28,6 +28,7 @@ import DialogFormView from '@canvas/forms/backbone/views/DialogFormView'
 import $ from 'jquery'
 import 'jquery-migrate'
 import tzInTest from '@canvas/datetime/specHelpers'
+import {unfudgeDateForProfileTimezone} from '@canvas/datetime/date-functions'
 import timezone from 'timezone'
 import juneau from 'timezone/America/Juneau'
 import french from 'timezone/fr_FR'
@@ -631,7 +632,7 @@ QUnit.module('due_at', hooks => {
   const assignment = {
     id: 1,
     name: 'Charlie Brown Quiz',
-    due_at: $.unfudgeDateForProfileTimezone(new Date(date).toISOString()),
+    due_at: unfudgeDateForProfileTimezone(new Date(date).toISOString()),
   }
   let view
 

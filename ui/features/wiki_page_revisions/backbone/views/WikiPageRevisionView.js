@@ -15,11 +15,11 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import $ from 'jquery'
 import Backbone from '@canvas/backbone'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import template from '../../jst/WikiPageRevision.handlebars'
 import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDialog'
+import {datetimeString} from '@canvas/datetime/date-functions'
 
 const I18n = useI18nScope('pages')
 
@@ -70,7 +70,7 @@ export default class WikiPageRevisionView extends Backbone.View {
       json.IS.LOADED &&
       this.model.get('title') === (latest != null ? latest.get('title') : undefined) &&
       this.model.get('body') === (latest != null ? latest.get('body') : undefined)
-    json.updated_at = $.datetimeString(json.updated_at)
+    json.updated_at = datetimeString(json.updated_at)
     json.edited_by = json.edited_by != null ? json.edited_by.display_name : undefined
     return json
   }

@@ -18,13 +18,13 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 import $ from 'jquery'
-import '@canvas/datetime/jquery'
 import '@canvas/jquery/jquery.instructure_forms'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 import '@canvas/util/templateData'
 import replaceTags from '@canvas/util/replaceTags'
 import {underscoreString} from '@canvas/convert-case'
+import {dateString} from '@canvas/datetime/date-functions'
 
 const I18n = useI18nScope('terms.index')
 
@@ -121,7 +121,7 @@ $(document).ready(() => {
         // and designer roles without an overridden start date allow access from the dawn of time. The logic
         // implementing this is in EnrollmentTerm#enrollment_dates_for.
         if (override.start_at) {
-          start_string = $.dateString(override.start_at, dateOpts)
+          start_string = dateString(override.start_at, dateOpts)
         } else if (type_string === 'student_enrollment') {
           start_string = I18n.t('term start')
         } else {
@@ -130,19 +130,18 @@ $(document).ready(() => {
         term[`${type_string}_start_at`] = start_string
         // Non-overridden end dates always inherit the term end date, no matter the role.
         term[`${type_string}_end_at`] =
-          $.dateString(override.end_at, dateOpts) || I18n.t('date.term_end', 'term end')
-        term[`enrollment_term[overrides][${type_string}][start_at]`] = $.dateString(
+          dateString(override.end_at, dateOpts) || I18n.t('date.term_end', 'term end')
+        term[`enrollment_term[overrides][${type_string}][start_at]`] = dateString(
           override.start_at,
           dateOpts
         )
-        term[`enrollment_term[overrides][${type_string}][end_at]`] = $.dateString(
+        term[`enrollment_term[overrides][${type_string}][end_at]`] = dateString(
           override.end_at,
           dateOpts
         )
       }
-      term.start_at =
-        $.dateString(term.start_at, dateOpts) || I18n.t('date.unspecified', 'whenever')
-      term.end_at = $.dateString(term.end_at, dateOpts) || I18n.t('date.unspecified', 'whenever')
+      term.start_at = dateString(term.start_at, dateOpts) || I18n.t('date.unspecified', 'whenever')
+      term.end_at = dateString(term.end_at, dateOpts) || I18n.t('date.unspecified', 'whenever')
       $tr.fillTemplateData({data: term})
       $tr.attr('id', `term_${term.id}`)
       $tr.fillFormData(data, {object_name: 'enrollment_term'})

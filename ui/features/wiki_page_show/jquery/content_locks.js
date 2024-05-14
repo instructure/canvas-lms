@@ -20,7 +20,6 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import htmlEscape from '@instructure/html-escape'
 import '@canvas/content-locks/jquery/lock_reason'
-import '@canvas/datetime/jquery' /* datetimeString */
 import 'jqueryui/dialog'
 
 const I18n = useI18nScope('content_locks')

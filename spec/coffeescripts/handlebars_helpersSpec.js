@@ -164,13 +164,13 @@ test('should parse non-qualified string relative to profile timezone', () =>
 test('includes a screenreader accessible version', () =>
   contains(
     helpers.friendlyDatetime(new Date(0), {hash: {pubDate: false}}).string,
-    "<span class='screenreader-only'>Dec 31, 1969 at 7pm</span>"
+    `<span class=\"screenreader-only\">Dec 31, 1969 at 7pm</span>`
   ))
 
 test('includes a visible version', () =>
   contains(
     helpers.friendlyDatetime(new Date(0), {hash: {pubDate: false}}).string,
-    "<span aria-hidden='true'>Dec 31, 1969</span>"
+    `<span aria-hidden=\"true\">Dec 31, 1969</span>`
   ))
 
 QUnit.module('contextSensitive FriendlyDatetime', {
@@ -222,7 +222,7 @@ test('reverts to friendly display when there is no contextual timezone', () => {
   const timeTag = helpers.friendlyDatetime('1970-01-01 00:00:00Z', {
     hash: {pubDate: false, contextSensitive: true},
   }).string
-  return contains(timeTag, "<span aria-hidden='true'>Dec 31, 1969</span>")
+  return contains(timeTag, `<span aria-hidden=\"true\">Dec 31, 1969</span>`)
 })
 
 QUnit.module('contextSensitiveDatetimeTitle', {

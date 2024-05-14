@@ -31,7 +31,7 @@ import QuizLogAuditingEventDumper from '@canvas/quiz-log-auditing/jquery/dump_ev
 import RichContentEditor from '@canvas/rce/RichContentEditor'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.toJSON'
-import '@canvas/datetime/jquery' /* friendlyDatetime, friendlyDate */
+import {friendlyDatetime} from '@canvas/datetime/date-functions'
 import '@canvas/jquery/jquery.instructure_forms' /* getFormData, errorBox */
 import 'jqueryui/dialog'
 import '@canvas/rails-flash-notifications'
@@ -143,7 +143,7 @@ const quizSubmission = (function () {
         ) {
           $lastSaved.text(
             I18n.t('saving_not_needed', 'No new data to save. Last checked at %{t}', {
-              t: $.friendlyDatetime(new Date()),
+              t: friendlyDatetime(new Date()),
             })
           )
 
@@ -162,7 +162,7 @@ const quizSubmission = (function () {
           data => {
             lastSuccessfulSubmissionData = thisSubmissionData
             $lastSaved.text(
-              I18n.t('saved_at', 'Quiz saved at %{t}', {t: $.friendlyDatetime(new Date())})
+              I18n.t('saved_at', 'Quiz saved at %{t}', {t: friendlyDatetime(new Date())})
             )
             quizSubmission.currentlyBackingUp = false
             quizSubmission.inBackground = false

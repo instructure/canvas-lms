@@ -21,7 +21,7 @@ import PropTypes from 'prop-types'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import customPropTypes from '../modules/customPropTypes'
 import '@canvas/rails-flash-notifications'
-import '@canvas/datetime/jquery' // $.datetimeString
+import {datetimeString} from '@canvas/datetime/date-functions'
 
 const I18n = useI18nScope('broccoli_cloud')
 
@@ -65,16 +65,16 @@ export default {
   getRestrictedText() {
     if (this.props.model.get('unlock_at') && this.props.model.get('lock_at')) {
       return I18n.t('Available after %{unlock_at} until %{lock_at}', {
-        unlock_at: $.datetimeString(this.props.model.get('unlock_at')),
-        lock_at: $.datetimeString(this.props.model.get('lock_at')),
+        unlock_at: datetimeString(this.props.model.get('unlock_at')),
+        lock_at: datetimeString(this.props.model.get('lock_at')),
       })
     } else if (this.props.model.get('unlock_at') && !this.props.model.get('lock_at')) {
       return I18n.t('Available after %{unlock_at}', {
-        unlock_at: $.datetimeString(this.props.model.get('unlock_at')),
+        unlock_at: datetimeString(this.props.model.get('unlock_at')),
       })
     } else if (!this.props.model.get('unlock_at') && this.props.model.get('lock_at')) {
       return I18n.t('Available until %{lock_at}', {
-        lock_at: $.datetimeString(this.props.model.get('lock_at')),
+        lock_at: datetimeString(this.props.model.get('lock_at')),
       })
     }
   },

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import '@canvas/datetime/jquery' /* datetimeString */
+import {datetimeString} from '@canvas/datetime/date-functions'
 import $ from 'jquery'
 import htmlEscape, {raw} from '@instructure/html-escape'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -28,7 +28,7 @@ if (!('INST' in window)) window.INST = {}
 INST.lockExplanation = function (data, type) {
   // Any additions to this function should also be added to similar logic in ApplicationController.rb
   if (data.lock_at) {
-    const lock_at = $.datetimeString(data.lock_at)
+    const lock_at = datetimeString(data.lock_at)
     switch (type) {
       case 'quiz':
         return I18n.t('messages.quiz_locked_at', 'This quiz was locked %{at}.', {at: lock_at})
@@ -46,7 +46,7 @@ INST.lockExplanation = function (data, type) {
         return I18n.t('messages.content_locked_at', 'This content was locked %{at}.', {at: lock_at})
     }
   } else if (data.unlock_at) {
-    const unlock_at = $.datetimeString(data.unlock_at)
+    const unlock_at = datetimeString(data.unlock_at)
     switch (type) {
       case 'quiz':
         return I18n.t('messages.quiz_locked_until', 'This quiz is locked until %{date}.', {

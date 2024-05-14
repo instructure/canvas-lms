@@ -46,6 +46,7 @@ import UsageRightsIndicator from '@canvas/files/react/components/UsageRightsIndi
 import setUsageRights from '@canvas/files/util/setUsageRights'
 import * as returnToHelper from '@canvas/util/validateReturnToURL'
 import 'jqueryui/tabs'
+import {unfudgeDateForProfileTimezone} from '@canvas/datetime/date-functions'
 
 const I18n = useI18nScope('discussion_topics')
 
@@ -580,7 +581,7 @@ EditView.prototype.getFormData = function () {
   const dateFields = ['last_reply_at', 'posted_at', 'delayed_post_at', 'lock_at']
   for (i = 0, len = dateFields.length; i < len; i++) {
     dateField = dateFields[i]
-    data[dateField] = $.unfudgeDateForProfileTimezone(data[dateField])
+    data[dateField] = unfudgeDateForProfileTimezone(data[dateField])
   }
   data.title || (data.title = I18n.t('default_discussion_title', 'No Title'))
   data.discussion_type = data.threaded === '1' ? 'threaded' : 'side_comment'

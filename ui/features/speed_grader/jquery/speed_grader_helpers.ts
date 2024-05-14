@@ -20,8 +20,8 @@ import type JQuery from 'jquery'
 import $ from 'jquery'
 import {each} from 'lodash'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import '@canvas/datetime/jquery'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
+import {datetimeString} from '@canvas/datetime/date-functions'
 import replaceTags from '@canvas/util/replaceTags'
 import type {
   HistoricalSubmission,
@@ -170,7 +170,7 @@ const speedGraderHelpers = {
         break
       case 'resubmitted':
         formatted = I18n.t('graded_then_resubmitted', 'graded, then resubmitted (%{when})', {
-          when: $.datetimeString(submission.submitted_at),
+          when: datetimeString(submission.submitted_at),
         })
         break
     }

@@ -32,8 +32,8 @@ import datePickerFormat from '@canvas/datetime/datePickerFormat'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import withinMomentDates from '../../momentDateHelper'
 import * as tz from '@canvas/datetime'
+import {unfudgeDateForProfileTimezone} from '@canvas/datetime/date-functions'
 import fcUtil from '@canvas/calendar/jquery/fcUtil'
-import '@canvas/datetime/jquery'
 import '@canvas/jquery/jquery.instructure_forms'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 import '../../fcMomentHandlebarsHelpers'
@@ -202,7 +202,7 @@ export default class EditAssignmentDetailsRewrite extends ValidatedFormView {
   }
 
   unfudgedDate(date) {
-    const unfudged = $.unfudgeDateForProfileTimezone(date)
+    const unfudged = unfudgeDateForProfileTimezone(date)
     if (unfudged) {
       return unfudged.toISOString()
     } else {

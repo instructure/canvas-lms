@@ -26,6 +26,7 @@ import File from '../../backbone/models/File'
 import '@canvas/datetime/jquery'
 import accessibleDateFormat from '@canvas/datetime/accessibleDateFormat'
 import filesEnv from '../modules/filesEnv'
+import {datetimeString} from '@canvas/datetime/date-functions'
 
 const I18n = useI18nScope('restrict_student_access')
 
@@ -191,7 +192,7 @@ class RestrictedRadioButtons extends React.Component {
           <input
             id="dateSelectInput"
             ref={e => (this.unlock_at = e)}
-            defaultValue={this.state.unlock_at ? $.datetimeString(this.state.unlock_at) : ''}
+            defaultValue={this.state.unlock_at ? datetimeString(this.state.unlock_at) : ''}
             className="form-control dateSelectInput"
             type="text"
             title={accessibleDateFormat()}
@@ -207,7 +208,7 @@ class RestrictedRadioButtons extends React.Component {
             <input
               id="lockDate"
               ref={e => (this.lock_at = e)}
-              defaultValue={this.state.lock_at ? $.datetimeString(this.state.lock_at) : ''}
+              defaultValue={this.state.lock_at ? datetimeString(this.state.lock_at) : ''}
               className="form-control dateSelectInput"
               type="text"
               title={accessibleDateFormat()}

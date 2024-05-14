@@ -35,6 +35,7 @@ import {initializePlanner, renderToDoSidebar} from '@canvas/planner'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import apiUserContent from '@canvas/util/jquery/apiUserContent'
 import * as apiClient from '@canvas/courses/courseAPIClient'
+import {dateString, datetimeString, timeString} from '@canvas/datetime/date-functions'
 
 const I18n = useI18nScope('courses_show')
 
@@ -97,9 +98,9 @@ const addToDoSidebar = parent => {
     srFlashMessage: $.screenReaderFlashMessage,
     convertApiUserContent: apiUserContent.convert,
     dateTimeFormatters: {
-      dateString: $.dateString,
-      timeString: $.timeString,
-      datetimeString: $.datetimeString,
+      dateString,
+      timeString,
+      datetimeString,
     },
     forCourse: ENV.COURSE.id,
   })

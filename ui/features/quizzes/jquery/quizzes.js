@@ -52,7 +52,7 @@ import deparam from 'deparam'
 import SisValidationHelper from '@canvas/sis/SisValidationHelper'
 import LockManager from '@canvas/blueprint-courses/react/components/LockManager/index'
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/datetime/jquery' /* time_field, datetime_field */
+import {unfudgeDateForProfileTimezone} from '@canvas/datetime/date-functions'
 import '@canvas/jquery/jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formErrors, errorBox */
 import 'jqueryui/dialog'
 import '@canvas/jquery/jquery.instructure_misc_helpers' /* replaceTags, /\$\.underscore/ */
@@ -1481,7 +1481,7 @@ correctAnswerVisibility = {
 
       if ($field.val().length && $field.data().date) {
         date = $field.data().date
-        data['quiz[' + key + ']'] = $.unfudgeDateForProfileTimezone(date).toISOString()
+        data['quiz[' + key + ']'] = unfudgeDateForProfileTimezone(date).toISOString()
       } else {
         resetField(key)
       }

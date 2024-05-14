@@ -27,6 +27,7 @@ import '@canvas/jquery/jquery.instructure_misc_plugins'
 import '@canvas/loading-image'
 import '@canvas/rails-flash-notifications'
 import '@canvas/link-enrollment'
+import {datetimeString} from '@canvas/datetime/date-functions'
 
 const I18n = useI18nScope('context.roster_user')
 
@@ -59,7 +60,7 @@ $(document).ready(() => {
         message: I18n.t('confirm.conclude', 'Are you sure you want to conclude this enrollment?'),
         url: $(this).attr('href'),
         success(data) {
-          const comp_at = $.datetimeString(data.enrollment.completed_at)
+          const comp_at = datetimeString(data.enrollment.completed_at)
           const $enrollment = $(this)
           $enrollment.undim()
           $enrollment.find('.conclude_enrollment_link_holder').hide()

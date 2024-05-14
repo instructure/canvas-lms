@@ -19,7 +19,7 @@
 import React from 'react'
 import {bool, shape, string} from 'prop-types'
 import $ from 'jquery'
-import '@canvas/datetime/jquery'
+import {datetimeString} from '@canvas/datetime/date-functions'
 import environment from './environment'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import NumberHelper from '@canvas/i18n/numberHelper'
@@ -102,7 +102,7 @@ function SearchResultsRow(props) {
   return (
     <Table.Row>
       <Table.Cell>
-        {$.datetimeString(new Date(date), {format: 'medium', timezone: environment.timezone()})}
+        {datetimeString(new Date(date), {format: 'medium', timezone: environment.timezone()})}
       </Table.Cell>
       <Table.Cell>{anonymouslyGraded(gradedAnonymously)}</Table.Cell>
       <Table.Cell>{displayStudentName(student, assignment)}</Table.Cell>

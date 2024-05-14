@@ -25,16 +25,16 @@ import {Grid} from '@instructure/ui-grid'
 import {Pill} from '@instructure/ui-pill'
 import {Text} from '@instructure/ui-text'
 import {IconCalendarAddLine, IconCalendarReservedLine} from '@instructure/ui-icons'
-import $ from 'jquery'
 import '@canvas/datetime/jquery'
+import {dateString, timeString} from '@canvas/datetime/date-functions'
 
 const I18n = useI18nScope('appointment_groups')
 
 const renderAppointment = (appointment, participantList = '') => {
   const timeLabel = I18n.t('%{start_date}, %{start_time} to %{end_time}', {
-    start_date: $.dateString(appointment.start_at),
-    start_time: $.timeString(appointment.start_at),
-    end_time: $.timeString(appointment.end_at),
+    start_date: dateString(appointment.start_at),
+    start_time: timeString(appointment.start_at),
+    end_time: timeString(appointment.end_at),
   })
 
   const isReserved = appointment.child_events && appointment.child_events.length > 0

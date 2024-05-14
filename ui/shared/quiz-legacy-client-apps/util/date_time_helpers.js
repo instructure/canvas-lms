@@ -16,10 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
-import '@canvas/datetime/jquery'
+import {friendlyDatetime as friendlyDatetime_} from '@canvas/datetime/date-functions'
 
-export function friendlyDatetime (dateTime, perspective) {
+export {fudgeDateForProfileTimezone} from '@canvas/datetime/date-functions'
+
+export function friendlyDatetime(dateTime, perspective) {
   const muddledDateTime = dateTime
 
   if (muddledDateTime) {
@@ -28,7 +29,5 @@ export function friendlyDatetime (dateTime, perspective) {
     }
   }
 
-  return $.friendlyDatetime(muddledDateTime, perspective)
+  return friendlyDatetime_(muddledDateTime, perspective)
 }
-
-export const fudgeDateForProfileTimezone = $.fudgeDateForProfileTimezone
