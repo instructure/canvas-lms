@@ -20,7 +20,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 import React from 'react'
 import DateHelper from '@canvas/datetime/dateHelper'
-import {IconDiscussionCheckLine, IconQuestionLine} from '@instructure/ui-icons'
+import {IconDiscussionCheckLine} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {Checkpoint} from '../../../graphql/Checkpoint'
 import {Submission} from '../../../graphql/Submission'
@@ -45,12 +45,6 @@ export function CheckpointsTray({...props}) {
     checkpoint => checkpoint.tag === REPLY_TO_ENTRY
   )
 
-  const getCompletedString = (submittedAt, submissionStatus) => {
-    return I18n.t('Completed %{submittedAt}', {
-      submittedAt: DateHelper.formatDatetimeForDiscussions(submittedAt),
-    })
-  }
-
   const renderSubmissionStatus = (submission = {}) => {
     if (submission.submissionStatus === SUBMITTED) {
       return (
@@ -67,9 +61,7 @@ export function CheckpointsTray({...props}) {
     } else if (submission.submissionStatus === LATE) {
       return (
         <Flex.Item align="start">
-          <Text size="small" color="danger" weight="bold">
-            <IconDiscussionCheckLine />
-            &nbsp;
+          <Text size="small" color="brand" weight="bold">
             {I18n.t('Late %{submittedAt}', {
               submittedAt: DateHelper.formatDatetimeForDiscussions(submission.submittedAt),
             })}
@@ -80,8 +72,6 @@ export function CheckpointsTray({...props}) {
       return (
         <Flex.Item align="start">
           <Text size="small" color="danger" weight="bold">
-            <IconQuestionLine />
-            &nbsp;
             {I18n.t('Missing')}
           </Text>
         </Flex.Item>
