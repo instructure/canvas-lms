@@ -16,7 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {renderHook} from '@testing-library/react-hooks'
+import React from 'react'
+import PropTypes from 'prop-types'
+import {render, waitFor} from '@testing-library/react'
 import usePlanner from '../usePlanner'
 
 jest.mock('@canvas/planner')
@@ -44,34 +46,49 @@ const PLANNER_CONFIG_KEYS = [
   'observedUserId',
 ]
 
-const defaults = {plannerEnabled: true, isPlannerActive: () => {}}
+const TestComponent = ({defaults, getResult = () => {}}) => {
+  const plannerInitialized = usePlanner(defaults)
+  getResult(plannerInitialized)
+  return <div className="test-wrapper">Test</div>
+}
 
-const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
+TestComponent.propTypes = {
+  defaults: PropTypes.object.isRequired,
+  getResult: PropTypes.func,
+}
+
+const renderHook = defaults => {
+  const {container} = render(<TestComponent defaults={defaults} />)
+  return container.querySelector('.test-wrapper').innerHTML
+}
+
+const defaults = {plannerEnabled: true, isPlannerActive: () => {}}
 
 afterEach(() => {
   plannerExports.initializePlanner.mockClear()
 })
 
 describe('usePlanner hook', () => {
-  it('Calls initializePlanner when plannerEnabled is true', () => {
-    renderHook(() => usePlanner(defaults))
-    expect(plannerExports.initializePlanner).toHaveBeenCalled()
+  it('Calls initializePlanner when plannerEnabled is true', async () => {
+    renderHook(defaults)
+    await waitFor(() => expect(plannerExports.initializePlanner).toHaveBeenCalled())
   })
 
   it('Does not call initializePlanner when plannerEnabled is false', () => {
-    renderHook(() => usePlanner({...defaults, plannerEnabled: false}))
+    renderHook({...defaults, plannerEnabled: false})
     expect(plannerExports.initializePlanner).not.toHaveBeenCalled()
   })
 
   it('returns planner configuration once initialization has completed', async () => {
-    const {result, waitForNextUpdate} = renderHook(() => usePlanner(defaults))
-    await waitForNextUpdate()
-    expect(Object.keys(result.current)).toEqual(PLANNER_CONFIG_KEYS)
+    renderHook(defaults, result => {
+      expect(result).toEqual(PLANNER_CONFIG_KEYS)
+    })
   })
 
   it('returns false if initialization does not happen', () => {
-    const {result} = renderHook(() => usePlanner({...defaults, plannerEnabled: false}))
-    expect(result.current).toBe(false)
+    renderHook({...defaults, plannerEnabled: false}, result => {
+      expect(result).toBe(false)
+    })
   })
 
   it('shows a flash error message and returns false if initialization fails', async () => {
@@ -79,22 +96,17 @@ describe('usePlanner hook', () => {
     plannerExports.initializePlanner.mockImplementationOnce(() =>
       Promise.reject(new Error('something went wrong'))
     )
-    const {result} = renderHook(() => usePlanner(defaults))
-
-    // I wish there was a better way to do this, but I didn't see a better way to wait for rejection
-    await sleep(1)
-
-    expect(flashAlerts.showFlashError).toHaveBeenCalledWith('Failed to load the schedule tab')
-    expect(result.current).toBe(false)
+    renderHook(defaults, result => {
+      expect(flashAlerts.showFlashError).toHaveBeenCalledWith('Failed to load the schedule tab')
+      expect(result).toBe(false)
+    })
   })
 
   it('passes the provided focus fallback ref to the planner via initialization options', async () => {
     const dummyRef = 'test'
-    const {result, waitForNextUpdate} = renderHook(() =>
-      usePlanner({...defaults, focusFallback: dummyRef})
-    )
-    await waitForNextUpdate()
-    expect(result.current).toBeTruthy()
-    expect(result.current.externalFallbackFocusable).toBe(dummyRef)
+    renderHook({...defaults, focusFallback: dummyRef}, result => {
+      expect(result).toBeTruthy()
+      expect(result.externalFallbackFocusable).toBe(dummyRef)
+    })
   })
 })
