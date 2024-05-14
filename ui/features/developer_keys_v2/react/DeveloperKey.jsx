@@ -33,6 +33,7 @@ import {Link} from '@instructure/ui-link'
 import {Img} from '@instructure/ui-img'
 import {Table} from '@instructure/ui-table'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {datetimeString} from '@canvas/datetime/date-functions'
 
 import DeveloperKeyActionButtons from './ActionButtons'
 import DeveloperKeyStateControl from './InheritanceStateControl'
@@ -201,7 +202,7 @@ class DeveloperKey extends React.Component {
             </div>
             <div>
               {I18n.t('Created: %{created_at}', {
-                created_at: $.datetimeString(developerKey.created_at),
+                created_at: datetimeString(developerKey.created_at),
               })}
             </div>
             <div>{this.lastUsed(developerKey)}</div>

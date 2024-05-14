@@ -44,6 +44,7 @@ import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
 import {Flex} from '@instructure/ui-flex'
 import {Button} from '@instructure/ui-buttons'
+import {dateString, datetimeString, timeString} from '@canvas/datetime/date-functions'
 
 const I18n = useI18nScope('dashboard')
 
@@ -103,9 +104,9 @@ class DashboardHeader extends React.Component {
         srFlashMessage: this.props.screenReaderFlashMessage,
         convertApiUserContent: apiUserContent.convert,
         dateTimeFormatters: {
-          dateString: $.dateString,
-          timeString: $.timeString,
-          datetimeString: $.datetimeString,
+          dateString,
+          timeString,
+          datetimeString: datetimeString,
         },
         externalFallbackFocusable: this.menuButtonFocusable,
         observedUser,
@@ -357,7 +358,7 @@ class DashboardHeader extends React.Component {
   }
 
   renderResponsiveContent(canEnableElementaryDashboard) {
-    var responsiveSize = this.props.responsiveSize
+    let responsiveSize = this.props.responsiveSize
     if (observerMode() && responsiveSize == 'large') {
       responsiveSize = 'medium'
     }
@@ -392,12 +393,12 @@ class DashboardHeader extends React.Component {
               {observerMode() && (
                 <Flex.Item overflowY="visible">
                   <ObserverOptions
-                      currentUser={ENV.current_user}
-                      currentUserRoles={ENV.current_user_roles}
-                      observedUsersList={ENV.OBSERVED_USERS_LIST}
-                      canAddObservee={ENV.CAN_ADD_OBSERVEE}
-                      handleChangeObservedUser={id => this.handleChangeObservedUser(id)}
-                    />
+                    currentUser={ENV.current_user}
+                    currentUserRoles={ENV.current_user_roles}
+                    observedUsersList={ENV.OBSERVED_USERS_LIST}
+                    canAddObservee={ENV.CAN_ADD_OBSERVEE}
+                    handleChangeObservedUser={id => this.handleChangeObservedUser(id)}
+                  />
                 </Flex.Item>
               )}
               <Flex.Item overflowY="visible">
@@ -414,15 +415,22 @@ class DashboardHeader extends React.Component {
                   />
                 </div>
               </Flex.Item>
-              <span style={{display: (this.props.planner_enabled && this.state.currentDashboard == 'planner' ? 'block' : 'none')}}>
+              <span
+                style={{
+                  display:
+                    this.props.planner_enabled && this.state.currentDashboard == 'planner'
+                      ? 'block'
+                      : 'none',
+                }}
+              >
                 <Flex.Item overflowY="visible">
-                  <span id="dashboard-planner-header"></span>
-                  <span id="dashboard-planner-header-aux"></span>
+                  <span id="dashboard-planner-header" />
+                  <span id="dashboard-planner-header-aux" />
                 </Flex.Item>
               </span>
-              {(this.props.startNewCourseVisible) && (
+              {this.props.startNewCourseVisible && (
                 <Flex.Item overflowY="visible">
-                  <Button 
+                  <Button
                     display={this.props.responsiveSize == 'small' ? 'block' : 'inline-block'}
                     onclick={() => {}}
                     id="start_new_course"
@@ -433,15 +441,15 @@ class DashboardHeader extends React.Component {
                 </Flex.Item>
               )}
               {this.state.currentDashboard != 'planner' && (
-              <Flex.Item overflowY="visible">
-                <Button 
-                  id="ic-Dashboard-header__view_grades_button"
-                  display={this.props.responsiveSize == 'small' ? 'block' : 'inline-block'}
-                  href={this.props.viewGradesUrl}
-                >
-                  {I18n.t('View Grades')}
-                </Button>
-              </Flex.Item>
+                <Flex.Item overflowY="visible">
+                  <Button
+                    id="ic-Dashboard-header__view_grades_button"
+                    display={this.props.responsiveSize == 'small' ? 'block' : 'inline-block'}
+                    href={this.props.viewGradesUrl}
+                  >
+                    {I18n.t('View Grades')}
+                  </Button>
+                </Flex.Item>
               )}
             </Flex>
           </Flex.Item>
@@ -463,10 +471,9 @@ class DashboardHeader extends React.Component {
   }
 }
 
-
 export {DashboardHeader}
 export default responsiviser()(
-  DashboardHeader, 
+  DashboardHeader,
   ENV.FEATURES?.instui_header ? {small: '(max-width: 62em)', medium: '(max-width: 86em)'} : null
 )
 

@@ -20,6 +20,7 @@ import $ from 'jquery'
 import 'jquery-migrate'
 import CalendarNavigator from 'ui/features/calendar/backbone/views/CalendarNavigator'
 import assertions from 'helpers/assertions'
+import {unfudgeDateForProfileTimezone} from '@canvas/datetime/date-functions'
 
 QUnit.module('CalendarNavigator', {
   setup() {
@@ -62,7 +63,7 @@ QUnit.skip('clicking a day in picker navigates to that date', function () {
   const year = $sibling.data('year')
   const month = $sibling.data('month')
   const day = $sibling.text()
-  const expectedDate = $.unfudgeDateForProfileTimezone(new Date(year, month, day))
+  const expectedDate = unfudgeDateForProfileTimezone(new Date(year, month, day))
 
   // check that we got the expected value to the callback
   equal(+handler.getCall(0).args[0], +expectedDate)
@@ -80,6 +81,6 @@ QUnit.skip('hitting enter in date field navigates to date', function () {
   $dateField.trigger($.Event('keydown', {keyCode: 13}))
 
   // check that we got the expected value to the callback
-  const expectedDate = $.unfudgeDateForProfileTimezone(new Date(2015, 6, 4))
+  const expectedDate = unfudgeDateForProfileTimezone(new Date(2015, 6, 4))
   equal(+handler.getCall(0).args[0], +expectedDate)
 })

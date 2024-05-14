@@ -26,7 +26,7 @@ import WikiPageDeleteDialog from './WikiPageDeleteDialog'
 import WikiPageReloadView from './WikiPageReloadView'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import DueDateCalendarPicker from '@canvas/due-dates/react/DueDateCalendarPicker'
-import '@canvas/datetime/jquery'
+import {unfudgeDateForProfileTimezone} from '@canvas/datetime/date-functions'
 import renderWikiPageTitle from '../../react/renderWikiPageTitle'
 import {renderAssignToTray} from '../../react/renderAssignToTray'
 import {itemTypeToApiURL} from '@canvas/context-modules/differentiated-modules/utils/assignToHelper'
@@ -409,7 +409,7 @@ export default class WikiPageEditView extends ValidatedFormView {
     }
 
     if (page_data.publish_at) {
-      page_data.publish_at = $.unfudgeDateForProfileTimezone(page_data.publish_at)
+      page_data.publish_at = unfudgeDateForProfileTimezone(page_data.publish_at)
     }
     if (this.blockEditorData) {
       page_data.block_editor_attributes = this.blockEditorData

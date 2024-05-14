@@ -54,7 +54,7 @@ import GradingPeriodsApi from '@canvas/grading/jquery/gradingPeriodsApi'
 import GradingPeriodSetsApi from '@canvas/grading/jquery/gradingPeriodSetsApi'
 import ProxyUploadModal from '@canvas/proxy-submission/react/ProxyUploadModal'
 import {updateFinalGradeOverride} from '@canvas/grading/FinalGradeOverrideApi'
-import '@canvas/datetime/jquery'
+import {datetimeString} from '@canvas/datetime/date-functions'
 import 'jquery-tinypubsub'
 
 import '../components/ic_submission_download_dialog_component'
@@ -185,7 +185,7 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
         'ENV.GRADEBOOK_OPTIONS.gradebook_csv_progress.progress.updated_at'
       )
       return I18n.t('Download Scores Generated on %{date}', {
-        date: $.datetimeString(gradebook_csv_export_date),
+        date: datetimeString(gradebook_csv_export_date),
       })
     }
   })(),
@@ -1290,10 +1290,10 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
     if (submission.proxy_submitter) {
       return I18n.t('Submitted by %{proxy} on %{date}', {
         proxy: submission.proxy_submitter,
-        date: $.datetimeString(submission.submitted_at),
+        date: datetimeString(submission.submitted_at),
       })
     }
-    return I18n.t('Submitted on %{date}', {date: $.datetimeString(submission.submitted_at)})
+    return I18n.t('Submitted on %{date}', {date: datetimeString(submission.submitted_at)})
   }.property('selectedSubmission'),
 
   assignmentGroupsHash() {

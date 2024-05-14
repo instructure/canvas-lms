@@ -16,8 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
-import '@canvas/datetime/jquery' // $.datetimeString
+import {datetimeString} from '@canvas/datetime/date-functions'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {useState} from 'react'
 
@@ -47,7 +46,7 @@ const debugInfoItem = (item, index) => {
   if (item && item.msg && item.msg.length > 0) {
     return (
       <List.Item key={index}>
-        <Tooltip renderTip={$.datetimeString(item.timestamp)}>{item.msg}</Tooltip>
+        <Tooltip renderTip={datetimeString(item.timestamp)}>{item.msg}</Tooltip>
         {usersList(item.user_ids)}
       </List.Item>
     )

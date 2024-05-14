@@ -89,6 +89,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import natcompare from '@canvas/util/natcompare'
 import qs from 'qs'
 import * as tz from '@canvas/datetime'
+import {datetimeString} from '@canvas/datetime/date-functions'
 import userSettings from '@canvas/user-settings'
 import htmlEscape from '@instructure/html-escape'
 import rubricAssessment from '@canvas/rubrics/jquery/rubric_assessment'
@@ -135,7 +136,6 @@ import 'jqueryui/draggable'
 import '@canvas/jquery/jquery.ajaxJSON' /* getJSON, ajaxJSON */
 import '@canvas/jquery/jquery.instructure_forms' /* ajaxJSONFiles */
 import {loadDocPreview} from '@instructure/canvas-rce/es/enhance-user-content/doc_previews'
-import '@canvas/datetime/jquery' /* datetimeString */
 import 'jqueryui/dialog'
 import 'jqueryui/menu'
 import '@canvas/jquery/jquery.instructure_misc_helpers' /* replaceTags */
@@ -2415,7 +2415,7 @@ EG = {
 
       if (!window.jsonData.anonymize_students || isAdmin) {
         studentViewedAtHTML = studentViewedAtTemplate({
-          viewed_at: $.datetimeString(attachment.viewed_at),
+          viewed_at: datetimeString(attachment.viewed_at),
         })
       }
 
@@ -2627,7 +2627,7 @@ EG = {
           selected: selectedIndex === i,
           proxy_submitter: s.proxy_submitter,
           proxy_submitter_label_text: s.proxy_submitter ? ` by ${s.proxy_submitter}` : null,
-          submittedAt: $.datetimeString(s.submitted_at) || noSubmittedAt,
+          submittedAt: datetimeString(s.submitted_at) || noSubmittedAt,
           grade,
         }
       })
@@ -3221,7 +3221,7 @@ EG = {
     // For screenreaders
     spokenComment = comment.comment.replace(/\s+/, ' ')
 
-    comment.posted_at = $.datetimeString(comment.created_at)
+    comment.posted_at = datetimeString(comment.created_at)
 
     hideStudentName =
       opts.hideStudentNames && window.jsonData.studentMap[comment[anonymizableAuthorId]]

@@ -23,6 +23,11 @@ import {isDate, memoize} from 'lodash'
 import $ from 'jquery'
 import '../../jquery/index'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {
+  fudgeDateForProfileTimezone,
+  friendlyDatetime,
+  datetimeString,
+} from '@canvas/datetime/date-functions'
 
 class FriendlyDatetime extends Component {
   static propTypes = {
@@ -41,7 +46,7 @@ class FriendlyDatetime extends Component {
   }
 
   // The original render function is really slow because of all
-  // tz.parse, $.fudge, $.datetimeString, etc.
+  // tz.parse, $.fudge, datetimeString, etc.
   // As long as @props.datetime stays same, we don't have to recompute our output.
   // memoizing like this beat React.addons.PureRenderMixin 3x
   render = memoize(
@@ -56,19 +61,19 @@ class FriendlyDatetime extends Component {
       if (!isDate(datetime)) {
         datetime = tz.parse(datetime)
       }
-      const fudged = $.fudgeDateForProfileTimezone(datetime)
+      const fudged = fudgeDateForProfileTimezone(datetime)
       let friendly
       if (this.props.format) {
         friendly = tz.format(datetime, this.props.format)
       } else if (showTime) {
-        friendly = $.datetimeString(datetime)
+        friendly = datetimeString(datetime)
       } else {
-        friendly = $.friendlyDatetime(fudged)
+        friendly = friendlyDatetime(fudged)
       }
 
       const timeProps = {
         ...timeElementProps,
-        title: $.datetimeString(datetime),
+        title: datetimeString(datetime),
         dateTime: datetime.toISOString(),
       }
 

@@ -32,7 +32,11 @@ import round from '@canvas/round'
 import $ from 'jquery'
 import GradingPeriodsAPI from '@canvas/grading/jquery/gradingPeriodsApi'
 import SisValidationHelper from '@canvas/sis/SisValidationHelper'
-import '@canvas/datetime/jquery'
+import {
+  dateString,
+  timeString,
+  unfudgeDateForProfileTimezone,
+} from '@canvas/datetime/date-functions'
 import * as tz from '@canvas/datetime'
 import {encodeQueryString} from '@canvas/query-string-encoding'
 
@@ -95,7 +99,7 @@ CreateAssignmentView.prototype.onSaveSuccess = function () {
 
 CreateAssignmentView.prototype.getFormData = function () {
   const data = CreateAssignmentView.__super__.getFormData.apply(this, arguments)
-  const unfudged = $.unfudgeDateForProfileTimezone(data.due_at)
+  const unfudged = unfudgeDateForProfileTimezone(data.due_at)
   if (unfudged != null) {
     data.due_at = this._getDueAt(unfudged)
   }
@@ -237,10 +241,10 @@ CreateAssignmentView.prototype.openAgain = function () {
           newDate = tz.changeToTheSecondBeforeMidnight(newDate)
         }
       }
-      const dateStr = $.dateString(newDate, {
+      const dateStr = dateString(newDate, {
         format: 'medium',
       })
-      const timeStr = $.timeString(newDate)
+      const timeStr = timeString(newDate)
       return timeField.data('inputdate', newDate).val(dateStr + ' ' + timeStr)
     })
   }

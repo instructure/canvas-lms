@@ -26,7 +26,7 @@ import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import {EmojiPicker, EmojiQuickPicker} from '@canvas/emoji'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.instructure_forms' /* ajaxJSONFiles */
-import '@canvas/datetime/jquery' /* datetimeString */
+import {datetimeString} from '@canvas/datetime/date-functions'
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* fragmentChange, showIf */
 import '@canvas/loading-image'
 import '@canvas/util/templateData'
@@ -63,7 +63,7 @@ function submissionLoaded(data) {
         continue
       }
       const $comment = $('#comment_blank').clone(true).removeAttr('id')
-      comment.posted_at = $.datetimeString(comment.created_at)
+      comment.posted_at = datetimeString(comment.created_at)
       $comment.fillTemplateData({
         data: comment,
         id: 'submission_comment_' + comment.id,

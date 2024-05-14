@@ -26,7 +26,15 @@ import juneau from 'timezone/America/Juneau'
 import kolkata from 'timezone/Asia/Kolkata'
 import portuguese from 'timezone/pt_PT'
 import I18nStubber from 'helpers/I18nStubber'
-import '@canvas/datetime/jquery'
+import {
+  dateString,
+  datetimeString,
+  fudgeDateForProfileTimezone,
+  sameDate,
+  sameYear,
+  timeString,
+  unfudgeDateForProfileTimezone,
+} from '@canvas/datetime/date-functions'
 import {getI18nFormats} from 'ui/boot/initializers/configureDateTime'
 
 QUnit.module('fudgeDateForProfileTimezone', {
@@ -39,7 +47,7 @@ QUnit.module('fudgeDateForProfileTimezone', {
 })
 
 test('should produce a date that formats via toString same as the original formats via tz', function () {
-  const fudged = $.fudgeDateForProfileTimezone(this.original)
+  const fudged = fudgeDateForProfileTimezone(this.original)
   equal(fudged.toString('yyyy-MM-dd HH:mm:ss'), tz.format(this.original, '%F %T'))
 })
 
@@ -58,25 +66,25 @@ test('should parse dates before the year 1000', () => {
   })
 
   const oldDate = new Date(Date.UTC(900, 1, 1, 0, 0, 0))
-  const oldFudgeDate = $.fudgeDateForProfileTimezone(oldDate)
+  const oldFudgeDate = fudgeDateForProfileTimezone(oldDate)
   equal(oldFudgeDate.toString('yyyy-MM-dd HH:mm:ss'), '0900-02-01 00:00:00')
 })
 
 test('should work on non-date date-like values', function () {
-  let fudged = $.fudgeDateForProfileTimezone(+this.original)
+  let fudged = fudgeDateForProfileTimezone(+this.original)
   equal(fudged.toString('yyyy-MM-dd HH:mm:ss'), tz.format(this.original, '%F %T'))
-  fudged = $.fudgeDateForProfileTimezone(this.original.toISOString())
+  fudged = fudgeDateForProfileTimezone(this.original.toISOString())
   equal(fudged.toString('yyyy-MM-dd HH:mm:ss'), tz.format(this.original, '%F %T'))
 })
 
 test('should return null for invalid values', () => {
-  equal($.fudgeDateForProfileTimezone(null), null)
-  equal($.fudgeDateForProfileTimezone(''), null)
-  equal($.fudgeDateForProfileTimezone('bogus'), null)
+  equal(fudgeDateForProfileTimezone(null), null)
+  equal(fudgeDateForProfileTimezone(''), null)
+  equal(fudgeDateForProfileTimezone('bogus'), null)
 })
 
 test('should not return treat 0 as invalid', () =>
-  equal(+$.fudgeDateForProfileTimezone(0), +$.fudgeDateForProfileTimezone(new Date(0))))
+  equal(+fudgeDateForProfileTimezone(0), +fudgeDateForProfileTimezone(new Date(0))))
 
 test('should be sensitive to profile time zone', function () {
   tzInTest.configureAndRestoreLater({
@@ -85,7 +93,7 @@ test('should be sensitive to profile time zone', function () {
       'America/Detroit': detroit,
     },
   })
-  let fudged = $.fudgeDateForProfileTimezone(this.original)
+  let fudged = fudgeDateForProfileTimezone(this.original)
   equal(fudged.toString('yyyy-MM-dd HH:mm:ss'), tz.format(this.original, '%F %T'))
   tzInTest.configureAndRestoreLater({
     tz: timezone(juneau, 'America/Juneau'),
@@ -93,7 +101,7 @@ test('should be sensitive to profile time zone', function () {
       'America/Juneau': juneau,
     },
   })
-  fudged = $.fudgeDateForProfileTimezone(this.original)
+  fudged = fudgeDateForProfileTimezone(this.original)
   equal(fudged.toString('yyyy-MM-dd HH:mm:ss'), tz.format(this.original, '%F %T'))
 })
 
@@ -107,25 +115,25 @@ QUnit.module('unfudgeDateForProfileTimezone', {
 })
 
 test('should produce a date that formats via tz same as the original formats via toString()', function () {
-  const unfudged = $.unfudgeDateForProfileTimezone(this.original)
+  const unfudged = unfudgeDateForProfileTimezone(this.original)
   equal(tz.format(unfudged, '%F %T'), this.original.toString('yyyy-MM-dd HH:mm:ss'))
 })
 
 test('should work on non-date date-like values', function () {
-  let unfudged = $.unfudgeDateForProfileTimezone(+this.original)
+  let unfudged = unfudgeDateForProfileTimezone(+this.original)
   equal(tz.format(unfudged, '%F %T'), this.original.toString('yyyy-MM-dd HH:mm:ss'))
-  unfudged = $.unfudgeDateForProfileTimezone(this.original.toISOString())
+  unfudged = unfudgeDateForProfileTimezone(this.original.toISOString())
   equal(tz.format(unfudged, '%F %T'), this.original.toString('yyyy-MM-dd HH:mm:ss'))
 })
 
 test('should return null for invalid values', () => {
-  equal($.unfudgeDateForProfileTimezone(null), null)
-  equal($.unfudgeDateForProfileTimezone(''), null)
-  equal($.unfudgeDateForProfileTimezone('bogus'), null)
+  equal(unfudgeDateForProfileTimezone(null), null)
+  equal(unfudgeDateForProfileTimezone(''), null)
+  equal(unfudgeDateForProfileTimezone('bogus'), null)
 })
 
 test('should not return treat 0 as invalid', () =>
-  equal(+$.unfudgeDateForProfileTimezone(0), +$.unfudgeDateForProfileTimezone(new Date(0))))
+  equal(+unfudgeDateForProfileTimezone(0), +unfudgeDateForProfileTimezone(new Date(0))))
 
 test('should be sensitive to profile time zone', function () {
   tzInTest.configureAndRestoreLater({
@@ -135,7 +143,7 @@ test('should be sensitive to profile time zone', function () {
     },
   })
 
-  let unfudged = $.unfudgeDateForProfileTimezone(this.original)
+  let unfudged = unfudgeDateForProfileTimezone(this.original)
   equal(tz.format(unfudged, '%F %T'), this.original.toString('yyyy-MM-dd HH:mm:ss'))
   tzInTest.configureAndRestoreLater({
     tz: timezone(juneau, 'America/Juneau'),
@@ -143,7 +151,7 @@ test('should be sensitive to profile time zone', function () {
       'America/Juneau': juneau,
     },
   })
-  unfudged = $.unfudgeDateForProfileTimezone(this.original)
+  unfudged = unfudgeDateForProfileTimezone(this.original)
   equal(tz.format(unfudged, '%F %T'), this.original.toString('yyyy-MM-dd HH:mm:ss'))
 })
 
@@ -157,8 +165,8 @@ test('should return true iff both dates from same year', () => {
   const date1 = new Date(0)
   const date2 = new Date(+date1 + 86400000)
   const date3 = new Date(+date1 - 86400000)
-  ok($.sameYear(date1, date2))
-  ok(!$.sameYear(date1, date3))
+  ok(sameYear(date1, date2))
+  ok(!sameYear(date1, date3))
 })
 
 test('should compare relative to profile timezone', () => {
@@ -171,8 +179,8 @@ test('should compare relative to profile timezone', () => {
   const date1 = new Date(5 * 3600000) // 5am UTC = 12am EST
   const date2 = new Date(+date1 + 1000) // Jan 1, 1970 at 11:59:59pm EST
   const date3 = new Date(+date1 - 1000) // Jan 2, 1970 at 00:00:01am EST
-  ok($.sameYear(date1, date2))
-  ok(!$.sameYear(date1, date3))
+  ok(sameYear(date1, date2))
+  ok(!sameYear(date1, date3))
 })
 
 QUnit.module('sameDate', {
@@ -185,8 +193,8 @@ test('should return true iff both times from same day', () => {
   const date1 = new Date(86400000)
   const date2 = new Date(+date1 + 3600000)
   const date3 = new Date(+date1 - 3600000)
-  ok($.sameDate(date1, date2))
-  ok(!$.sameDate(date1, date3))
+  ok(sameDate(date1, date2))
+  ok(!sameDate(date1, date3))
 })
 
 test('should compare relative to profile timezone', () => {
@@ -199,8 +207,8 @@ test('should compare relative to profile timezone', () => {
   const date1 = new Date(86400000 + 5 * 3600000)
   const date2 = new Date(+date1 + 1000)
   const date3 = new Date(+date1 - 1000)
-  ok($.sameDate(date1, date2))
-  ok(!$.sameDate(date1, date3))
+  ok(sameDate(date1, date2))
+  ok(!sameDate(date1, date3))
 })
 
 QUnit.module('dateString', {
@@ -217,7 +225,7 @@ test('should format in profile timezone', () => {
     },
     formats: {'date.formats.medium': '%b %-d, %Y'},
   })
-  equal($.dateString(new Date(0)), 'Dec 31, 1969')
+  equal(dateString(new Date(0)), 'Dec 31, 1969')
 })
 
 QUnit.module('timeString', {
@@ -234,14 +242,14 @@ test('should format in profile timezone', () => {
     },
     formats: {'time.formats.tiny': '%l:%M%P'},
   })
-  equal($.timeString(new Date(60000)), '7:01pm')
+  equal(timeString(new Date(60000)), '7:01pm')
 })
 
 test('should format according to profile locale', () => {
   tzInTest.configureAndRestoreLater({
     formats: {'time.formats.tiny': '%k:%M'},
   })
-  equal($.timeString(new Date(46860000)), '13:01')
+  equal(timeString(new Date(46860000)), '13:01')
 })
 
 test('should use the tiny_on_the_hour format on the hour', () => {
@@ -252,7 +260,7 @@ test('should use the tiny_on_the_hour format on the hour', () => {
     },
     formats: {'time.formats.tiny_on_the_hour': '%l%P'},
   })
-  equal($.timeString(new Date(0)), '7pm')
+  equal(timeString(new Date(0)), '7pm')
 })
 
 test('should use the tiny format on the hour, when timezone difference is not in whole hours', () => {
@@ -268,7 +276,7 @@ test('should use the tiny format on the hour, when timezone difference is not in
       'time.formats.tiny_on_the_hour': '%l%P',
     },
   })
-  equal($.timeString(new Date(30 * 60 * 1000), {timezone: 'America/Detroit'}), '7:30pm')
+  equal(timeString(new Date(30 * 60 * 1000), {timezone: 'America/Detroit'}), '7:30pm')
 })
 
 QUnit.module('datetimeString', {
@@ -294,7 +302,7 @@ test('should format in profile timezone', () => {
     },
   })
 
-  equal($.datetimeString(new Date(60000)), 'Dec 31, 1969 at 7:01pm')
+  equal(datetimeString(new Date(60000)), 'Dec 31, 1969 at 7:01pm')
 })
 
 test('should translate into the profile locale', () => {
@@ -311,7 +319,7 @@ test('should translate into the profile locale', () => {
     formats,
   })
 
-  equal($.datetimeString('1970-01-01 15:01:00Z'), '1 Jan 1970 em 15:01')
+  equal(datetimeString('1970-01-01 15:01:00Z'), '1 Jan 1970 em 15:01')
 })
 
 QUnit.module('$.datepicker.parseDate', {
@@ -345,7 +353,7 @@ test('should accept localized strings and return them fudged', () => {
   // 6pm EDT (detroit) = 22:00Z, but parsed will be fudged, so make sure to
   // also fudge what we're comparing to
   const parsed = $.datepicker.parseDate('dd/mm/yyyy', '3 Ago 2015 em 18:06')
-  const fudged = $.fudgeDateForProfileTimezone('2015-08-03 22:06:00Z')
+  const fudged = fudgeDateForProfileTimezone('2015-08-03 22:06:00Z')
   equal(+parsed, +fudged)
 })
 

@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
 import '@canvas/datetime/jquery'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import {datetimeString} from '@canvas/datetime/date-functions'
 import React from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
@@ -81,7 +81,7 @@ const MicrosoftSync = ({group, loading, children}) => {
               <Text weight="bold">{I18n.t('Last Sync:')}</Text>
               <Text fontStyle="italic">
                 {' '}
-                {$.datetimeString(group.last_synced_at) || I18n.t('never')}
+                {datetimeString(group.last_synced_at) || I18n.t('never')}
               </Text>
             </InlineList.Item>
             {group.workflow_state !== 'errored' && (

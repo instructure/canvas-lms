@@ -39,7 +39,7 @@ import get from 'lodash/get'
 import axios from '@canvas/axios'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/datetime/jquery' /* dateString, datetimeString, time_field, datetime_field */
+import {dateString, datetimeString} from '@canvas/datetime/date-functions'
 import '@canvas/jquery/jquery.instructure_forms' /* formSubmit, fillFormData, formErrors, errorBox */
 import 'jqueryui/dialog'
 import '@canvas/util/jquery/fixDialogButtons'
@@ -300,12 +300,12 @@ window.modules = (function () {
               if (ENV.IN_PACED_COURSE && !ENV.IS_STUDENT) {
                 $context_module_item.find('.due_date_display').remove()
               } else if (info.todo_date != null) {
-                data.due_date_display = $.dateString(info.todo_date)
+                data.due_date_display = dateString(info.todo_date)
               } else if (info.due_date != null) {
                 if (info.past_due != null) {
                   $context_module_item.data('past_due', true)
                 }
-                data.due_date_display = $.dateString(info.due_date)
+                data.due_date_display = dateString(info.due_date)
               } else if (info.has_many_overrides != null) {
                 data.due_date_display = I18n.t('Multiple Due Dates')
               } else if (info.vdd_tooltip != null) {
@@ -607,9 +607,9 @@ window.modules = (function () {
         'Assignment',
         'Quizzes::Quiz',
         'DiscussionTopic',
-        'WikiPage'
+        'WikiPage',
       ].includes(data.content_type)
-      
+
       // This function is called twice, once with the data the user just entered
       // and again after the api request returns. The second time we have
       // all the real data, including the module item's id. Wait until then
@@ -862,7 +862,7 @@ const renderDifferentiatedModulesTray = (
 
 // Based on the logic from ui/shared/context-modules/differentiated-modules/utils/moduleHelpers.ts
 const updateUnlockTime = function ($module, unlock_at) {
-  const friendlyDatetime = unlock_at ? $.datetimeString(unlock_at) : ''
+  const friendlyDatetime = unlock_at ? datetimeString(unlock_at) : ''
 
   const unlockAtElement = $module.find('.unlock_at')
   if (unlockAtElement.length) {
@@ -959,7 +959,9 @@ const newPillMessage = function ($module, requirement_count) {
 const updatePublishMenuDisabledState = function (disabled) {
   if (ENV.FEATURES.instui_header) {
     // Send event to ContextModulesHeader component to update the publish menu
-    window.dispatchEvent(new CustomEvent('update-publish-menu-disabled-state', {detail: {disabled}}))
+    window.dispatchEvent(
+      new CustomEvent('update-publish-menu-disabled-state', {detail: {disabled}})
+    )
   } else {
     // Update the top level publish menu to reflect the new module
     const publishMenu = document.getElementById('context-modules-publish-menu')
@@ -1384,9 +1386,9 @@ modules.initModuleManagement = function (duplicate) {
             }
           })
           const $prevModule = $(this).prev()
-          const $addModuleButton = ENV.FEATURES.instui_header ?
-            $('#context-modules-header-add-module-button') :
-            $('#content .header-bar .add_module_link')
+          const $addModuleButton = ENV.FEATURES.instui_header
+            ? $('#context-modules-header-add-module-button')
+            : $('#content .header-bar .add_module_link')
 
           const $toFocus = $prevModule.length
             ? $('.ig-header-admin .al-trigger', $prevModule)
@@ -1718,7 +1720,7 @@ modules.initModuleManagement = function (duplicate) {
     $(event.currentTarget).addClass('screenreader-only')
   })
 
-  const add_module_link_handler = (event) => {
+  const add_module_link_handler = event => {
     event.preventDefault()
     const addModuleCallback = (data, $moduleElement) =>
       addModuleElement(
@@ -2501,12 +2503,12 @@ $(document).ready(function () {
   })
 
   function handleRemoveDueDateInput(itemProps) {
-    switch(itemProps.moduleItemType) {
+    switch (itemProps.moduleItemType) {
       case 'discussion':
       case 'discussion_topic':
-        if(itemProps.moduleItemHasAssignment === 'true') {
+        if (itemProps.moduleItemHasAssignment === 'true') {
           return false
-        }else return true
+        } else return true
       case 'page':
       case 'wiki_page':
         return true

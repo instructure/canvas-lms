@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import '@canvas/datetime/jquery'
+import {unfudgeDateForProfileTimezone} from '@canvas/datetime/date-functions'
 import moment from 'moment'
 import PageViewCollection from './backbone/collections/PageViewCollection'
 import PageViewView from './backbone/views/PageViewView'
@@ -33,7 +33,7 @@ function renderTable(date) {
   const $csvLink = $('#page_views_csv_link')
   let csvUrl = $csvLink.attr('href').split('?')[0]
   if (date) {
-    const start_time = $.unfudgeDateForProfileTimezone(date)
+    const start_time = unfudgeDateForProfileTimezone(date)
     const end_time = moment(start_time).add(1, 'days')
     const date_params = `?start_time=${start_time.toISOString()}&end_time=${end_time.toISOString()}`
     pageViews.url += date_params

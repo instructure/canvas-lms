@@ -26,6 +26,7 @@ import DueDateList from '@canvas/due-dates/backbone/models/DueDateList'
 import Section from '@canvas/sections/backbone/models/Section'
 import AssignmentGroupSelector from '@canvas/assignments/backbone/views/AssignmentGroupSelector'
 import DueDateOverrideView from '@canvas/due-dates'
+import {unfudgeDateForProfileTimezone} from '@canvas/datetime/date-functions'
 import EditView from 'ui/features/assignment_edit/backbone/views/EditView'
 import GradingTypeSelector from '@canvas/assignments/backbone/views/GradingTypeSelector'
 import GroupCategorySelector from '@canvas/groups/backbone/views/GroupCategorySelector'
@@ -603,19 +604,19 @@ test('rounds points_possible', function () {
 
 test('sets seconds of due_at to 59 if the new minute value is 59', function () {
   const view = this.editView({
-    due_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:58:23')),
+    due_at: unfudgeDateForProfileTimezone(new Date('2000-08-28T11:58:23')),
   })
   const override = view.assignment.attributes.assignment_overrides.models[0]
-  override.attributes.due_at = $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))
+  override.attributes.due_at = unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))
   strictEqual(view.getFormData().due_at, '2000-08-28T11:59:59.000Z')
 })
 
 test('sets seconds of due_at to 00 if the new minute value is not 59', function () {
   const view = this.editView({
-    due_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23')),
+    due_at: unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23')),
   })
   const override = view.assignment.attributes.assignment_overrides.models[0]
-  override.attributes.due_at = $.unfudgeDateForProfileTimezone(new Date('2000-09-28T11:58:23'))
+  override.attributes.due_at = unfudgeDateForProfileTimezone(new Date('2000-09-28T11:58:23'))
   strictEqual(view.getFormData().due_at, '2000-09-28T11:58:00.000Z')
 })
 
@@ -637,37 +638,37 @@ test('getFormData returns custom_params as a JSON object, not a string', functio
 // that value.
 test('keeps original due_at seconds if only the seconds value has changed', function () {
   const view = this.editView({
-    due_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-29T11:59:23')),
+    due_at: unfudgeDateForProfileTimezone(new Date('2000-08-29T11:59:23')),
   })
   const override = view.assignment.attributes.assignment_overrides.models[0]
-  override.attributes.due_at = $.unfudgeDateForProfileTimezone(new Date('2000-08-29T11:59:59'))
+  override.attributes.due_at = unfudgeDateForProfileTimezone(new Date('2000-08-29T11:59:59'))
   strictEqual(view.getFormData().due_at, '2000-08-29T11:59:23.000Z')
 })
 
 test('keeps original due_at seconds if the date has not changed', function () {
   const view = this.editView({
-    due_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23')),
+    due_at: unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23')),
   })
   const override = view.assignment.attributes.assignment_overrides.models[0]
-  override.attributes.due_at = $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))
+  override.attributes.due_at = unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))
   strictEqual(view.getFormData().due_at, '2000-08-28T11:59:23.000Z')
 })
 
 test('sets seconds of unlock_at to 59 if the new minute value is 59', function () {
   const view = this.editView({
-    unlock_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:58:23')),
+    unlock_at: unfudgeDateForProfileTimezone(new Date('2000-08-28T11:58:23')),
   })
   const override = view.assignment.attributes.assignment_overrides.models[0]
-  override.attributes.unlock_at = $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))
+  override.attributes.unlock_at = unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))
   strictEqual(view.getFormData().unlock_at, '2000-08-28T11:59:59.000Z')
 })
 
 test('sets seconds of unlock_at to 00 if the new minute value is not 59', function () {
   const view = this.editView({
-    unlock_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23')),
+    unlock_at: unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23')),
   })
   const override = view.assignment.attributes.assignment_overrides.models[0]
-  override.attributes.unlock_at = $.unfudgeDateForProfileTimezone(new Date('2000-09-28T11:58:23'))
+  override.attributes.unlock_at = unfudgeDateForProfileTimezone(new Date('2000-09-28T11:58:23'))
   strictEqual(view.getFormData().unlock_at, '2000-09-28T11:58:00.000Z')
 })
 
@@ -676,37 +677,37 @@ test('sets seconds of unlock_at to 00 if the new minute value is not 59', functi
 // that value.
 test('keeps original unlock_at seconds if only the seconds value has changed', function () {
   const view = this.editView({
-    unlock_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-29T11:59:23')),
+    unlock_at: unfudgeDateForProfileTimezone(new Date('2000-08-29T11:59:23')),
   })
   const override = view.assignment.attributes.assignment_overrides.models[0]
-  override.attributes.unlock_at = $.unfudgeDateForProfileTimezone(new Date('2000-08-29T11:59:59'))
+  override.attributes.unlock_at = unfudgeDateForProfileTimezone(new Date('2000-08-29T11:59:59'))
   strictEqual(view.getFormData().unlock_at, '2000-08-29T11:59:23.000Z')
 })
 
 test('keeps original unlock_at seconds if the date has not changed', function () {
   const view = this.editView({
-    unlock_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23')),
+    unlock_at: unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23')),
   })
   const override = view.assignment.attributes.assignment_overrides.models[0]
-  override.attributes.unlock_at = $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))
+  override.attributes.unlock_at = unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))
   strictEqual(view.getFormData().unlock_at, '2000-08-28T11:59:23.000Z')
 })
 
 test('sets seconds of lock_at to 59 if the new minute value is 59', function () {
   const view = this.editView({
-    lock_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:58:23')),
+    lock_at: unfudgeDateForProfileTimezone(new Date('2000-08-28T11:58:23')),
   })
   const override = view.assignment.attributes.assignment_overrides.models[0]
-  override.attributes.lock_at = $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))
+  override.attributes.lock_at = unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))
   strictEqual(view.getFormData().lock_at, '2000-08-28T11:59:59.000Z')
 })
 
 test('sets seconds of lock_at to 00 if the new minute value is not 59', function () {
   const view = this.editView({
-    lock_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23')),
+    lock_at: unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23')),
   })
   const override = view.assignment.attributes.assignment_overrides.models[0]
-  override.attributes.lock_at = $.unfudgeDateForProfileTimezone(new Date('2000-09-28T11:58:23'))
+  override.attributes.lock_at = unfudgeDateForProfileTimezone(new Date('2000-09-28T11:58:23'))
   strictEqual(view.getFormData().lock_at, '2000-09-28T11:58:00.000Z')
 })
 
@@ -715,19 +716,19 @@ test('sets seconds of lock_at to 00 if the new minute value is not 59', function
 // that value.
 test('keeps original lock_at seconds if only the seconds value has changed', function () {
   const view = this.editView({
-    lock_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-29T11:59:23')),
+    lock_at: unfudgeDateForProfileTimezone(new Date('2000-08-29T11:59:23')),
   })
   const override = view.assignment.attributes.assignment_overrides.models[0]
-  override.attributes.lock_at = $.unfudgeDateForProfileTimezone(new Date('2000-08-29T11:59:59'))
+  override.attributes.lock_at = unfudgeDateForProfileTimezone(new Date('2000-08-29T11:59:59'))
   strictEqual(view.getFormData().lock_at, '2000-08-29T11:59:23.000Z')
 })
 
 test('keeps original lock_at seconds if the date has not changed', function () {
   const view = this.editView({
-    lock_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23')),
+    lock_at: unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23')),
   })
   const override = view.assignment.attributes.assignment_overrides.models[0]
-  override.attributes.lock_at = $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))
+  override.attributes.lock_at = unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))
   strictEqual(view.getFormData().lock_at, '2000-08-28T11:59:23.000Z')
 })
 

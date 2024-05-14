@@ -24,6 +24,7 @@ import 'jquery-migrate'
 import axios from '@canvas/axios'
 import EditPage from 'ui/features/calendar_appointment_group_edit/react/EditPage'
 import london from 'timezone/Europe/London'
+import {fudgeDateForProfileTimezone} from '@canvas/datetime/date-functions'
 import * as tz from '@canvas/datetime'
 import fakeENV from 'helpers/fakeENV'
 import moxios from 'moxios'
@@ -71,7 +72,7 @@ test('mocks editPage axios to appointmentGroups', assert => {
   })
   const component = renderComponent()
   moxios.wait(() => {
-    ok(component.state.appointmentGroup.limitUsersPerSlot === 4)
+    strictEqual(component.state.appointmentGroup.limitUsersPerSlot, 4)
     done()
   })
 })
@@ -85,7 +86,7 @@ test('mocks editPage axios to calendarEvents', assert => {
   })
   const component = renderComponent()
   moxios.wait(() => {
-    ok(component.state.contexts[0].asset_string === 'course_1')
+    strictEqual(component.state.contexts[0].asset_string, 'course_1')
     done()
   })
 })
@@ -99,7 +100,7 @@ test('set time blocks correctly', assert => {
   const component = renderComponent()
   moxios.wait(() => {
     component.setTimeBlocks(4)
-    ok(component.state.formValues.timeblocks === 4)
+    strictEqual(component.state.formValues.timeblocks, 4)
     done()
   })
 })
@@ -154,6 +155,7 @@ test('flashes error on error delete response', () => {
   const component = renderComponent()
   sandbox
     .stub(axios, 'delete')
+    // eslint-disable-next-line prefer-promise-reject-errors
     .callsFake(() => Promise.reject({respose: {data: new Error('Something bad happened')}}))
   sandbox.spy($, 'flashError')
 
@@ -303,17 +305,17 @@ test('handleSave prepares the timeblocks appropriately', () => {
         {
           slotEventId: 'NEW-1',
           timeData: {
-            date: $.fudgeDateForProfileTimezone(new Date('2016-10-28T19:00:00.000Z')),
-            startTime: $.fudgeDateForProfileTimezone(new Date('2016-10-28T19:00:00.000Z')),
-            endTime: $.fudgeDateForProfileTimezone(new Date('2016-10-28T19:30:00.000Z')),
+            date: fudgeDateForProfileTimezone(new Date('2016-10-28T19:00:00.000Z')),
+            startTime: fudgeDateForProfileTimezone(new Date('2016-10-28T19:00:00.000Z')),
+            endTime: fudgeDateForProfileTimezone(new Date('2016-10-28T19:30:00.000Z')),
           },
         },
         {
           slotEventId: 'NEW-2',
           timeData: {
-            date: $.fudgeDateForProfileTimezone(new Date('2016-10-28T19:30:00.000Z')),
-            startTime: $.fudgeDateForProfileTimezone(new Date('2016-10-28T19:30:00.000Z')),
-            endTime: $.fudgeDateForProfileTimezone(new Date('2016-10-28T20:00:00.000Z')),
+            date: fudgeDateForProfileTimezone(new Date('2016-10-28T19:30:00.000Z')),
+            startTime: fudgeDateForProfileTimezone(new Date('2016-10-28T19:30:00.000Z')),
+            endTime: fudgeDateForProfileTimezone(new Date('2016-10-28T20:00:00.000Z')),
           },
         },
         {
@@ -353,6 +355,7 @@ test('flashes error on error delete response', () => {
   const component = renderComponent()
   sandbox
     .stub(axios, 'put')
+    // eslint-disable-next-line prefer-promise-reject-errors
     .callsFake(() => Promise.reject({respose: {data: new Error('Something bad happened')}}))
   sandbox.stub($, 'flashError')
 
