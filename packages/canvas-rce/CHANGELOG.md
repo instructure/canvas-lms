@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 5.13.0 - 2024-05-14
+
+### Added
+
+-	Find and Replace Tray
+-	Support for Bahasa Indonesia Language and Irish (Gaeilge) Language
+-	Support for tools to always be present in toolbar
+-	LTI enhancements
+
+### Changed
+
+-	Limited list of fonts to self-hosted and websafe
+-	Preferred HTML editor stored in localstorage
+-	Stopped adding aria-hidden to RCE’s parent label
+
+### Fixed
+
+- Focus properly restored after closing a11y checker
+-	Allow non relative video srcs when editing captions
+-	Enhanced user content now translated correctly
+
 ## 5.12.2 - 2024-01-31
 
 ### Changed
